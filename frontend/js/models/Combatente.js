@@ -20,6 +20,10 @@ export class Combatente {
         this.inteligencia = data.inteligencia || 10;
         this.sabedoria = data.sabedoria || 10;
         this.carisma = data.carisma || 10;
+
+        this.fortitude = data.fortitude || 0;
+        this.reflexos = data.reflexos || 0;
+        this.vontade = data.vontade || 0;
         
         // Progressão
         this.nivel = data.nivel || 1;
