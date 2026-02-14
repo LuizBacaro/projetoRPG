@@ -8,7 +8,6 @@ import { Toast } from '../ui/Toast.js';
 import { atualizarModificadorDOM } from '../utils/dnd.js';
 
 export class ModalEdicao {
-    
     constructor() {
         this.combatenteService = new CombatenteService();
         this.uploadService = new UploadService();
@@ -16,7 +15,7 @@ export class ModalEdicao {
         
         this.inicializar();
     }
-    
+
     /**
      * Inicializa o modal
      */
@@ -25,7 +24,7 @@ export class ModalEdicao {
         this.configurarFormulario();
         this.configurarUpload();
     }
-    
+
     /**
      * Configura eventos customizados
      */
@@ -42,7 +41,7 @@ export class ModalEdicao {
             }
         });
     }
-    
+
     /**
      * Configura submit do formulário
      */
@@ -56,7 +55,7 @@ export class ModalEdicao {
             await this.salvar(form);
         });
     }
-    
+
     /**
      * Configura upload de imagem
      */
@@ -90,7 +89,7 @@ export class ModalEdicao {
             }
         });
     }
-    
+
     /**
      * Abre o modal para editar um combatente
      */
@@ -107,7 +106,7 @@ export class ModalEdicao {
             console.error(error);
         }
     }
-    
+
     /**
      * Carrega dados do combatente no formulário
      */
@@ -134,6 +133,11 @@ export class ModalEdicao {
             document.getElementById('editSAB').value = combatente.sabedoria;
             document.getElementById('editCAR').value = combatente.carisma;
             
+            // ========== RESISTÊNCIAS - ADICIONAR ==========
+            document.getElementById('editFortitude').value = combatente.fortitude || 0;
+            document.getElementById('editReflexos').value = combatente.reflexos || 0;
+            document.getElementById('editVontade').value = combatente.vontade || 0;
+            
             // Atualizar modificadores
             ['editFOR', 'editDES', 'editCON', 'editINT', 'editSAB', 'editCAR'].forEach(id => {
                 const input = document.getElementById(id);
@@ -159,7 +163,7 @@ export class ModalEdicao {
             throw error;
         }
     }
-    
+
     /**
      * Salva as alterações
      */
@@ -170,7 +174,7 @@ export class ModalEdicao {
             
             await this.combatenteService.atualizar(id, formData);
             
-            Toast.success('Combatente atualizado!');
+            Toast.success('Combatente atualizado! ');
             
             this.fechar();
             
@@ -182,7 +186,7 @@ export class ModalEdicao {
             console.error(error);
         }
     }
-    
+
     /**
      * Deleta o combatente
      */
@@ -196,7 +200,7 @@ export class ModalEdicao {
         try {
             await this.combatenteService.deletar(this.combatenteAtual.id);
             
-            Toast.success('Combatente deletado!');
+            Toast.success('Combatente deletado! ');
             
             this.fechar();
             
@@ -208,7 +212,7 @@ export class ModalEdicao {
             console.error(error);
         }
     }
-    
+
     /**
      * Fecha o modal
      */

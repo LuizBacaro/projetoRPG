@@ -5,17 +5,15 @@ Princípio SOLID: SRP - Responsável apenas por HTTP routing
 from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
-
 from ...core.database import get_db
 from ...core.dependencies import get_combatente_service
 from ...services.combatente_service import CombatenteService
 from ...schemas.combatente import (
-    CombatenteResponse, 
-    HPUpdateRequest, 
+    CombatenteResponse,
+    HPUpdateRequest,
     IniciativaUpdateRequest
 )
 from ...exceptions.custom_exceptions import ArenaBaseException
-
 
 router = APIRouter(prefix="/combatentes", tags=["Combatentes"])
 
@@ -58,6 +56,9 @@ async def criar_combatente(
     inteligencia: int = Form(10),
     sabedoria: int = Form(10),
     carisma: int = Form(10),
+    fortitude: int = Form(0),
+    reflexos: int = Form(0),
+    vontade: int = Form(0),
     nivel: int = Form(1),
     pontos: int = Form(0),
     foto: Optional[UploadFile] = File(None),
@@ -78,6 +79,9 @@ async def criar_combatente(
         "inteligencia": inteligencia,
         "sabedoria": sabedoria,
         "carisma": carisma,
+        "fortitude": fortitude,
+        "reflexos": reflexos,
+        "vontade": vontade,
         "nivel": nivel,
         "pontos": pontos
     }
@@ -103,6 +107,9 @@ async def atualizar_combatente(
     inteligencia: int = Form(10),
     sabedoria: int = Form(10),
     carisma: int = Form(10),
+    fortitude: int = Form(0),
+    reflexos: int = Form(0),
+    vontade: int = Form(0),
     nivel: int = Form(1),
     pontos: int = Form(0),
     foto: Optional[UploadFile] = File(None),
@@ -123,6 +130,9 @@ async def atualizar_combatente(
         "inteligencia": inteligencia,
         "sabedoria": sabedoria,
         "carisma": carisma,
+        "fortitude": fortitude,
+        "reflexos": reflexos,
+        "vontade": vontade,
         "nivel": nivel,
         "pontos": pontos
     }

@@ -2209,3 +2209,66 @@ header p {
 .tela.ativa {
     display: block;
 }
+
+/* ==================== RESISTÊNCIAS ==================== */
+
+.resistencias-container {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid rgba(139, 69, 19, 0.2);
+}
+
+.resistencias-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.resistencia-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.resistencia-field label {
+    font-weight: 600;
+    color: var(--cor-madeira);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.resistencia-field input[type="number"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    background: white;
+    color: var(--cor-madeira);
+    transition: all 0.3s ease;
+}
+
+.resistencia-field input[type="number"]:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.resistencia-field input[type="number"]:hover {
+    border-color: var(--cor-dourada);
+}
+
+/* Responsivo para resistências */
+@media (max-width: 768px) {
+    .resistencias-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
