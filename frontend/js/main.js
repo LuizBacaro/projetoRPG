@@ -8,8 +8,6 @@ import { ModalCadastro } from './ui/ModalCadastro.js';
 import { ModalEdicao } from './ui/ModalEdicao.js';
 import { TipoSelector } from './ui/TipoSelector.js';
 import { atualizarModificadorDOM } from './utils/dnd.js';
-import { OrdemIniciativa } from './ui/OrdemIniciativa.js';
-import { CombatenteAtivoView } from './ui/CombatenteAtivoView.js';
 
 // ==================== STATE GLOBAL ====================
 
@@ -127,3 +125,31 @@ function removerImagemUpload(sufixo = '', isEdit = false) {
     if (placeholder) placeholder.style.display = 'flex';
     if (preview) preview.style.display = 'none';
 }
+
+/**
+ * Abre modal de cadastro do tipo específico
+ */
+window.abrirModalCadastro = function(tipo) {
+    // Fechar seletor de tipo
+    window.fecharSeletorTipo();
+    
+    // Abrir modal correspondente
+    if (tipo === 'jogador' && app.modals.cadastroJogador) {
+        app.modals.cadastroJogador.abrir();
+    } else if (tipo === 'monstro' && app.modals.cadastroMonstro) {
+        app.modals.cadastroMonstro.abrir();
+    } else if (tipo === 'npc' && app.modals.cadastroNPC) {
+        app.modals.cadastroNPC.abrir();
+    }
+};
+
+/**
+ * Fecha seletor de tipo
+ */
+window.fecharSeletorTipo = function() {
+    TipoSelector.fechar();
+};
+
+// ==================== EXPORT ====================
+
+export { app };
