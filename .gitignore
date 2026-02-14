@@ -1,0 +1,172 @@
+# ==================== BANCO DE DADOS ====================
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+projetorpg.db
+
+# PostgreSQL
+*.pgsql
+
+# MySQL
+*.sql
+
+
+# ==================== UPLOADS E MÍDIA ====================
+backend/uploads/
+uploads/
+media/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.mp4
+*.avi
+*.mov
+
+
+# ==================== PYTHON ====================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+backend/venv/
+backend/env/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+
+# ==================== IDEs ====================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+
+# ==================== SISTEMA OPERACIONAL ====================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+
+# ==================== LOGS ====================
+*.log
+logs/
+*.log.*
+
+
+# ==================== JAVASCRIPT / NODE ====================
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm/
+
+
+# ==================== VARIÁVEIS DE AMBIENTE ====================
+.env
+.env.local
+.env.*.local
+*.env
+
+
+# ==================== TEMPORÁRIOS ====================
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+
+
+# ==================== GIT ====================
+*.orig
+.git/
+.gitattributes
+
+
+# ==================== FASTAPI / UVICORN ====================
+*.pid
+uvicorn.pid
+
+
+# ==================== JUPYTER NOTEBOOK ====================
+.ipynb_checkpoints/
+*.ipynb
+
+
+# ==================== TERRAFORM (se usar) ====================
+*.tfstate
+*.tfstate.*
+
+
+# ==================== DOCKER (se usar) ====================
+docker-compose.override.yml

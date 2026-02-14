@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arena de Combate TTRPG</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- CONFIGURAÇÃO -->
+    <div id="telaConfiguracao" class="tela ativa">
+        <header>
+            <h1>⚔️ Arena de Combate - Configuração</h1>
+            <p>Selecione os combatentes e configure a ordem de iniciativa</p>
+        </header>
+
+        <div class="container">
+            <div class="painel-esquerdo">
+                <h2>Personagens Disponíveis</h2>
+                
+                <div class="filters">
+                    <button class="filter-btn active" data-tipo="todos">Todos</button>
+                    <button class="filter-btn" data-tipo="jogador">Jogadores</button>
+                    <button class="filter-btn" data-tipo="monstro">Monstros</button>
+                    <button class="filter-btn" data-tipo="npc">NPCs</button>
+                </div>
+
+                <div id="listaCombatentes" class="lista-combatentes">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+
+            <div class="painel-direito">
+                <div class="header-selecionados">
+                    <h2>Combatentes Selecionados (<span id="contadorSelecionados">0</span>)</h2>
+                </div>
+                
+                <div id="combatentesSelecionados" class="lista-selecionados">
+                    <div class="empty-state">
+                        <p>Nenhum combatente selecionado</p>
+                        <small>Clique nos personagens ao lado para adicionar</small>
+                    </div>
+                </div>
+
+                <button id="btnIniciarCombate" class="btn-iniciar">Iniciar Combate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARENA DE COMBATE -->
+    <div id="telaArena" class="tela">
+        <header>
+            <h1>⚔️ Arena de Combate - Em Progresso</h1>
+            <div class="info-combate">
+                <span>Rodada: <strong id="rodadaAtual">1</strong></span>
+                <button id="btnResetarCombate" class="btn-secundario">Resetar Combate</button>
+                <button id="btnFinalizarCombate" class="btn-secundario">Finalizar Combate</button>
+            </div>
+        </header>
+
+        <div class="arena-layout">
+            <!-- COLUNA ESQUERDA: Ordem de Iniciativa -->
+            <aside class="ordem-iniciativa-panel">
+                <div class="ordem-header">
+                    <h2>📋 Ordem de Iniciativa</h2>
+                </div>
+                <div id="ordemIniciativaContainer" class="ordem-lista">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </aside>
+
+            <!-- COLUNA CENTRAL: Combatente Ativo -->
+            <main class="arena-main-ativo">
+                <div class="turno-ativo">
+                    <h2>🎯 Turno Ativo</h2>
+                    <button id="btnAvancarTurno" class="btn-proximo">Próximo Turno →</button>
+                </div>
+
+                <div id="combatenteAtivoContainer">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </main>
+        </div>
+    </div>
+    <!-- ==================== MODAL DE CADASTRO DE JOGADOR ==================== -->
+    <div id="modalCadastro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚔️ Cadastrar Novo Jogador</h2>
+                <button class="modal-close" onclick="fecharModalCadastro()">&times;</button>
+            </div>
+            <form id="formCadastroJogador" enctype="multipart/form-data">
+                <input type="hidden" name="tipo" value="jogador">
+                
+                <!-- NÍVEL E PONTOS NO TOPO -->
+                <div class="nivel-pontos-container">
+                    <div class="nivel-field">
+                        <label for="inputNivel">NÍVEL</label>
+                        <div class="nivel-circle-container">
+                            <input type="number" id="inputNivel" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                        </div>
+                    </div>
+                    
+                    <div class="pontos-field">
+                        <label for="inputPontos">PONTOS</label>
+                        <input type="number" id="inputPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputNome">Nome do Personagem *</label>
+                    <input type="text" id="inputNome" name="nome" required placeholder="Ex: Aragorn">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inputHP">HP Máximo *</label>
+                        <input type="number" id="inputHP" name="hp_maximo" required min="1" placeholder="Ex: 100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inputIniciativa">Iniciativa *</label>
+                        <input type="number" id="inputIniciativa" name="iniciativa" required min="0" placeholder="Ex: 15">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputClasse">Classe</label>
+                    <input type="text" id="inputClasse" name="classe" value="Aventureiro" placeholder="Ex: Guerreiro, Mago, Ladino...">
+                </div>
+                
+                <!-- CONTAINER FOTO + ATRIBUTOS LADO A LADO -->
+                <div class="foto-atributos-container">
+                    <!-- FOTO VERTICAL -->
+                    <div class="form-group foto-vertical">
+                        <label for="inputFoto">Foto</label>
+                        <div class="upload-area-vertical" id="uploadArea">
+                            <input type="file" id="inputFoto" name="foto" accept="image/*" style="display: none;">
+                            <div class="upload-placeholder-vertical" id="uploadPlaceholder">
+                                <span class="upload-icon">📷</span>
+                                <p>Clique para upload</p>
+                            </div>
+                            <div class="upload-preview-vertical" id="uploadPreview" style="display: none;">
+                                <img id="previewImage" src="" alt="Preview">
+                                <button type="button" class="btn-remove-image-vertical" onclick="removerImagem()">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ATRIBUTOS D&D - 2 COLUNAS -->
+                    <div class="atributos-container">
+                        <div class="form-group">
+                            <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                        </div>
+                        
+                        <div class="atributos-duas-colunas">
+                            <!-- COLUNA ESQUERDA -->
+                            <div class="atributos-coluna">
+                                <div class="atributo-field">
+                                    <label for="inputFOR">FOR</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputFOR" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputDES">DES</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputDES" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputCON">CON</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputCON" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- COLUNA DIREITA -->
+                            <div class="atributos-coluna">
+                                <div class="atributo-field">
+                                    <label for="inputINT">INT</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputINT" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputSAB">SAB</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputSAB" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputCAR">CAR</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputCAR" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secundario" onclick="fecharModalCadastro()">Cancelar</button>
+                    <button type="submit" class="btn-iniciar">✅ Cadastrar Jogador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DE CADASTRO DE MONSTRO ==================== -->
+    <div id="modalCadastroMonstro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👹 Cadastrar Novo Monstro</h2>
+                <button class="modal-close" onclick="fecharModalCadastroMonstro()">&times;</button>
+            </div>
+            <form id="formCadastroMonstro" enctype="multipart/form-data">
+                <input type="hidden" name="tipo" value="monstro">
+                
+                <!-- NÍVEL E PONTOS NO TOPO -->
+                <div class="nivel-pontos-container">
+                    <div class="nivel-field">
+                        <label for="inputNivelMonstro">NÍVEL</label>
+                        <div class="nivel-circle-container">
+                            <input type="number" id="inputNivelMonstro" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                        </div>
+                    </div>
+                    
+                    <div class="pontos-field">
+                        <label for="inputPontosMonstro">PONTOS</label>
+                        <input type="number" id="inputPontosMonstro" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputNomeMonstro">Nome do Monstro *</label>
+                    <input type="text" id="inputNomeMonstro" name="nome" required placeholder="Ex: Dragão Vermelho">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inputHPMonstro">HP Máximo *</label>
+                        <input type="number" id="inputHPMonstro" name="hp_maximo" required min="1" placeholder="Ex: 200">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inputIniciativaMonstro">Iniciativa *</label>
+                        <input type="number" id="inputIniciativaMonstro" name="iniciativa" required min="0" placeholder="Ex: 10">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputClasseMonstro">Tipo/Categoria</label>
+                    <input type="text" id="inputClasseMonstro" name="classe" value="Criatura" placeholder="Ex: Dragão, Goblin, Morto-Vivo...">
+                </div>
+                
+                <!-- CONTAINER FOTO + ATRIBUTOS LADO A LADO -->
+                <div class="foto-atributos-container">
+                    <!-- FOTO VERTICAL -->
+                    <div class="form-group foto-vertical">
+                        <label for="inputFotoMonstro">Foto</label>
+                        <div class="upload-area-vertical" id="uploadAreaMonstro">
+                            <input type="file" id="inputFotoMonstro" name="foto" accept="image/*" style="display: none;">
+                            <div class="upload-placeholder-vertical" id="uploadPlaceholderMonstro">
+                                <span class="upload-icon">📷</span>
+                                <p>Clique para upload</p>
+                            </div>
+                            <div class="upload-preview-vertical" id="uploadPreviewMonstro" style="display: none;">
+                                <img id="previewImageMonstro" src="" alt="Preview">
+                                <button type="button" class="btn-remove-image-vertical" onclick="removerImagemMonstro()">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ATRIBUTOS D&D - 2 COLUNAS -->
+                    <div class="atributos-container">
+                        <div class="form-group">
+                            <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                        </div>
+                        
+                        <div class="atributos-duas-colunas">
+                            <!-- COLUNA ESQUERDA -->
+                            <div class="atributos-coluna">
+                                <div class="atributo-field">
+                                    <label for="inputFORMonstro">FOR</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputFORMonstro" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputDESMonstro">DES</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputDESMonstro" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputCONMonstro">CON</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputCONMonstro" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- COLUNA DIREITA -->
+                            <div class="atributos-coluna">
+                                <div class="atributo-field">
+                                    <label for="inputINTMonstro">INT</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputINTMonstro" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputSABMonstro">SAB</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputSABMonstro" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputCARMonstro">CAR</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputCARMonstro" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secundario" onclick="fecharModalCadastroMonstro()">Cancelar</button>
+                    <button type="submit" class="btn-iniciar">✅ Cadastrar Monstro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DE CADASTRO DE NPC ==================== -->
+    <div id="modalCadastroNPC" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🧙 Cadastrar Novo NPC</h2>
+                <button class="modal-close" onclick="fecharModalCadastroNPC()">&times;</button>
+            </div>
+            <form id="formCadastroNPC" enctype="multipart/form-data">
+                <input type="hidden" name="tipo" value="npc">
+                
+                <!-- NÍVEL E PONTOS NO TOPO -->
+                <div class="nivel-pontos-container">
+                    <div class="nivel-field">
+                        <label for="inputNivelNPC">NÍVEL</label>
+                        <div class="nivel-circle-container">
+                            <input type="number" id="inputNivelNPC" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                        </div>
+                    </div>
+                    
+                    <div class="pontos-field">
+                        <label for="inputPontosNPC">PONTOS</label>
+                        <input type="number" id="inputPontosNPC" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputNomeNPC">Nome do NPC *</label>
+                    <input type="text" id="inputNomeNPC" name="nome" required placeholder="Ex: Elrond">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inputHPNPC">HP Máximo *</label>
+                        <input type="number" id="inputHPNPC" name="hp_maximo" required min="1" placeholder="Ex: 50">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inputIniciativaNPC">Iniciativa *</label>
+                        <input type="number" id="inputIniciativaNPC" name="iniciativa" required min="0" placeholder="Ex: 12">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputClasseNPC">Classe/Papel</label>
+                    <input type="text" id="inputClasseNPC" name="classe" value="Aliado" placeholder="Ex: Mercador, Guarda, Aliado...">
+                </div>
+                
+                <!-- CONTAINER FOTO + ATRIBUTOS LADO A LADO -->
+                <div class="foto-atributos-container">
+                    <!-- FOTO VERTICAL -->
+                    <div class="form-group foto-vertical">
+                        <label for="inputFotoNPC">Foto</label>
+                        <div class="upload-area-vertical" id="uploadAreaNPC">
+                            <input type="file" id="inputFotoNPC" name="foto" accept="image/*" style="display: none;">
+                            <div class="upload-placeholder-vertical" id="uploadPlaceholderNPC">
+                                <span class="upload-icon">📷</span>
+                                <p>Clique para upload</p>
+                            </div>
+                            <div class="upload-preview-vertical" id="uploadPreviewNPC" style="display: none;">
+                                <img id="previewImageNPC" src="" alt="Preview">
+                                <button type="button" class="btn-remove-image-vertical" onclick="removerImagemNPC()">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ATRIBUTOS D&D - 2 COLUNAS -->
+                    <div class="atributos-container">
+                        <div class="form-group">
+                            <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                        </div>
+                        
+                        <div class="atributos-duas-colunas">
+                            <!-- COLUNA ESQUERDA -->
+                            <div class="atributos-coluna">
+                                <div class="atributo-field">
+                                    <label for="inputFORNPC">FOR</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputFORNPC" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputDESNPC">DES</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputDESNPC" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputCONNPC">CON</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputCONNPC" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- COLUNA DIREITA -->
+                            <div class="atributos-coluna">
+                                <div class="atributo-field">
+                                    <label for="inputINTNPC">INT</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputINTNPC" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputSABNPC">SAB</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputSABNPC" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="inputCARNPC">CAR</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="inputCARNPC" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secundario" onclick="fecharModalCadastroNPC()">Cancelar</button>
+                    <button type="submit" class="btn-iniciar">✅ Cadastrar NPC</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DE EDIÇÃO ==================== -->
+    <div id="modalEdicao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Combatente</h2>
+                <button class="modal-close" onclick="fecharModalEdicao()">&times;</button>
+            </div>
+            <form id="formEdicaoCombatente" enctype="multipart/form-data">
+                <input type="hidden" id="editId" name="id">
+                
+                <!-- NÍVEL E PONTOS NO TOPO -->
+                <div class="nivel-pontos-container">
+                    <div class="nivel-field">
+                        <label for="editNivel">NÍVEL</label>
+                        <div class="nivel-circle-container">
+                            <input type="number" id="editNivel" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                        </div>
+                    </div>
+                    
+                    <div class="pontos-field">
+                        <label for="editPontos">PONTOS</label>
+                        <input type="number" id="editPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editNome">Nome do Personagem *</label>
+                    <input type="text" id="editNome" name="nome" required placeholder="Ex: Aragorn">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editHP">HP Máximo *</label>
+                        <input type="number" id="editHP" name="hp_maximo" required min="1" placeholder="Ex: 100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editIniciativa">Iniciativa *</label>
+                        <input type="number" id="editIniciativa" name="iniciativa" required min="0" placeholder="Ex: 15">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClasse">Classe</label>
+                    <input type="text" id="editClasse" name="classe" placeholder="Ex: Guerreiro, Mago, Ladino...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editTipo">Tipo</label>
+                    <select id="editTipo" name="tipo" class="form-select">
+                        <option value="jogador">Jogador</option>
+                        <option value="monstro">Monstro</option>
+                        <option value="npc">NPC</option>
+                    </select>
+                </div>
+                
+                <!-- CONTAINER FOTO + ATRIBUTOS LADO A LADO -->
+                <div class="foto-atributos-container">
+                    <!-- FOTO VERTICAL -->
+                    <div class="form-group foto-vertical">
+                        <label for="editFoto">Foto</label>
+                        <div class="upload-area-vertical" id="editUploadArea">
+                            <input type="file" id="editFoto" name="foto" accept="image/*" style="display: none;">
+                            <div class="upload-placeholder-vertical" id="editUploadPlaceholder">
+                                <span class="upload-icon">📷</span>
+                                <p>Clique para alterar</p>
+                            </div>
+                            <div class="upload-preview-vertical" id="editUploadPreview" style="display: none;">
+                                <img id="editPreviewImage" src="" alt="Preview">
+                                <button type="button" class="btn-remove-image-vertical" onclick="removerImagemEdicao()">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ATRIBUTOS D&D - 2 COLUNAS -->
+                    <div class="atributos-container">
+                        <div class="form-group">
+                            <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                        </div>
+                        
+                        <div class="atributos-duas-colunas">
+                            <!-- COLUNA ESQUERDA -->
+                            <div class="atributos-coluna">
+                                <div class="atributo-field">
+                                    <label for="editFOR">FOR</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="editFOR" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="editDES">DES</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="editDES" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="editCON">CON</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="editCON" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- COLUNA DIREITA -->
+                            <div class="atributos-coluna">
+                                <div class="atributo-field">
+                                    <label for="editINT">INT</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="editINT" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="editSAB">SAB</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="editSAB" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                                <div class="atributo-field">
+                                    <label for="editCAR">CAR</label>
+                                    <div class="atributo-circles-container">
+                                        <input type="number" id="editCAR" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                        <span class="atributo-modificador">+0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secundario" onclick="fecharModalEdicao()">Cancelar</button>
+                    <button type="button" class="btn-delete" onclick="confirmarDelecao()">🗑️ Deletar</button>
+                    <button type="submit" class="btn-iniciar">💾 Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
