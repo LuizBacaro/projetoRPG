@@ -11,7 +11,7 @@ export class ArenaController {
         this.combatentes = [];
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
-        this.hpVisivel = false; // ← NOVO: Controla visibilidade dos valores de HP
+        this.hpVisivel = false; // ← Inicia OCULTO
         
         this.inicializar();
     }
@@ -73,7 +73,7 @@ export class ArenaController {
         this.combatentes = combatentes.sort((a, b) => b.iniciativa - a.iniciativa);
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
-        this.hpVisivel = false; // ← NOVO: Resetar visibilidade ao iniciar
+        this.hpVisivel = false; // ← Reseta para OCULTO ao iniciar
         
         console.log('📊 Ordem de iniciativa:', this.combatentes.map(c => `${c.nome} (${c.iniciativa})`));
         
@@ -108,17 +108,17 @@ export class ArenaController {
     }
 
     /**
-     * ← NOVO: Alterna visibilidade dos valores de HP
+     * Alterna visibilidade dos valores de HP (APENAS do combatente ativo)
      */
     toggleVisibilidadeHP() {
         this.hpVisivel = !this.hpVisivel;
-        console.log(`👁️ Visibilidade HP: ${this.hpVisivel ? 'Visível' : 'Oculto'}`);
+        console.log(`👁️ Visibilidade HP (combatente ativo): ${this.hpVisivel ? 'Visível' : 'Oculto'}`);
         
-        // Re-renderizar para aplicar mudança
-        this.renderizarOrdemIniciativa();
+        // Re-renderizar combatente ativo E lista de ordem
+        this.renderizarOrdemIniciativa(); // ← ADICIONADO
         this.renderizarCombatenteAtivo();
         
-        Toast.success(this.hpVisivel ? '👁️ HP Visível' : '🙈 HP Oculto');
+        Toast.success(this.hpVisivel ? '👁️ HP do Combatente Ativo Visível' : '🙈 HP do Combatente Ativo Oculto');
     }
 
     /**
@@ -147,8 +147,8 @@ export class ArenaController {
             const icon = isMorto ? '💀' : (isAtivo ? '⚔️' : index + 1);
             const hpClass = c.hp_atual <= (c.hp_maximo * 0.25) ? 'ordem-hp-critical' : '';
 
-            // ← NOVO: Condicional para exibir ou ocultar HP
-            const hpTexto = this.hpVisivel 
+            // ← ALTERADO: Mostrar HP real apenas se for o combatente ativo E hpVisivel === true
+            const hpTexto = (isAtivo && this.hpVisivel)
                 ? `HP: ${c.hp_atual}/${c.hp_maximo}`
                 : `HP: ???/???`;
 
@@ -184,7 +184,7 @@ export class ArenaController {
         const hpCor = this.getCorHP(hpPercentual);
         const hpCritical = hpPercentual <= 25;
 
-        // ← NOVO: Condicional para exibir ou ocultar valores de HP
+        // Condicional para exibir ou ocultar valores de HP
         const hpValorTexto = this.hpVisivel 
             ? `${combatente.hp_atual} / ${combatente.hp_maximo}`
             : `??? / ???`;
@@ -282,7 +282,7 @@ export class ArenaController {
         // Configurar funções globais para botões
         window.aplicarDano = (id) => this.aplicarDano(id);
         window.aplicarCura = (id) => this.aplicarCura(id);
-        window.toggleVisibilidadeHP = () => this.toggleVisibilidadeHP(); // ← NOVO
+        window.toggleVisibilidadeHP = () => this.toggleVisibilidadeHP();
     }
 
     /**
@@ -422,6 +422,7 @@ export class ArenaController {
 
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
+        this.hpVisivel = false; // ← Resetar para OCULTO
         this.atualizarRodada();
         
         Toast.success('Combate resetado! 🔄');
