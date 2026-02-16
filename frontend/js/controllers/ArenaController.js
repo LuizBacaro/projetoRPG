@@ -11,7 +11,7 @@ export class ArenaController {
         this.combatentes = [];
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
-        this.hpVisivel = true; // ← NOVO: Controla visibilidade dos valores de HP
+        this.hpVisivel = false; // ← NOVO: Controla visibilidade dos valores de HP
         
         this.inicializar();
     }
@@ -73,7 +73,7 @@ export class ArenaController {
         this.combatentes = combatentes.sort((a, b) => b.iniciativa - a.iniciativa);
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
-        this.hpVisivel = true; // ← NOVO: Resetar visibilidade ao iniciar
+        this.hpVisivel = false; // ← NOVO: Resetar visibilidade ao iniciar
         
         console.log('📊 Ordem de iniciativa:', this.combatentes.map(c => `${c.nome} (${c.iniciativa})`));
         
