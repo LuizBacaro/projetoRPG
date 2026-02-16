@@ -201,15 +201,45 @@ export class ConfiguracaoController {
      * Inicia o combate
      */
     async iniciarCombate() {
-        if (this.combatentesSelecionados.length === 0) {
-            Toast.warning('Selecione pelo menos um combatente');
+        if (this.combatentesSelecionados.length < 2) {
+            Toast.error('Selecione pelo menos 2 combatentes');
             return;
         }
-        
-        // Disparar evento para ArenaController
-        const event = new CustomEvent('iniciarCombate', { 
-            detail: { ids: this.combatentesSelecionados } 
-        });
-        document.dispatchEvent(event);
+
+        try {
+            console.log('🎯 Iniciando combate com IDs:', this.combatentesSelecionados);
+            
+            // Buscar dados completos dos combatentes selecionados
+            const combatentesCompletos = await Promise.all(
+                this.combatentesSelecionados.map(id => 
+                    this.combatenteService.obterPorId(id)
+                )
+            );
+
+            console.log('✅ Combatentes carregados:', combatentesCompletos);
+
+            // CRÍTICO: Validar que temos dados válidos
+            if (!Array.isArray(combatentesCompletos) || combatentesCompletos.length === 0) {
+                throw new Error('Erro ao carregar dados dos combatentes');
+            }
+
+            // Mudar para tela de arena
+            document.getElementById('telaConfiguracao').classList.remove('ativa');
+            document.getElementById('telaArena').classList.add('ativa');
+
+            // CRÍTICO: Disparar evento COM os dados corretos
+            const evento = new CustomEvent('iniciarCombate', {
+                detail: { combatentes: combatentesCompletos }
+            });
+            
+            console.log('📤 Disparando evento iniciarCombate com:', evento.detail);
+            document.dispatchEvent(evento);
+
+            Toast.success(`Combate iniciado com ${combatentesCompletos.length} combatentes! ⚔️`);
+
+        } catch (error) {
+            console.error('❌ Erro ao iniciar combate:', error);
+            Toast.error('Erro ao iniciar combate');
+        }
     }
 }
