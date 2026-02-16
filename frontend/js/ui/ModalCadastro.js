@@ -14,8 +14,22 @@ export class ModalCadastro {
         this.combatenteService = new CombatenteService();
         this.uploadService = new UploadService();
         
-        this.modalId = tipo === 'jogador' ? 'modalCadastro' : `modalCadastro${this.capitalize(tipo)}`;
-        this.formId = `formCadastro${this.capitalize(tipo === 'jogador' ? 'Jogador' : tipo)}`;
+        // ← CORREÇÃO: Tratar NPC de forma especial
+        if (tipo === 'jogador') {
+            this.modalId = 'modalCadastro';
+            this.formId = 'formCadastroJogador';
+        } else if (tipo === 'monstro') {
+            this.modalId = 'modalCadastroMonstro';
+            this.formId = 'formCadastroMonstro';
+        } else if (tipo === 'npc') {
+            this.modalId = 'modalCadastroNPC'; // ← NPC todo maiúsculo
+            this.formId = 'formCadastroNPC';   // ← NPC todo maiúsculo
+        }
+        
+        console.log(`🎬 ModalCadastro criado para tipo: ${tipo}`, {
+            modalId: this.modalId,
+            formId: this.formId
+        });
         
         this.inicializar();
     }
@@ -34,7 +48,12 @@ export class ModalCadastro {
     configurarFormulario() {
         const form = document.getElementById(this.formId);
         
-        if (!form) return;
+        if (!form) {
+            console.error(`❌ Formulário não encontrado: ${this.formId}`);
+            return;
+        }
+        
+        console.log(`✅ Formulário configurado: ${this.formId}`);
         
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -46,7 +65,7 @@ export class ModalCadastro {
      * Configura upload de imagem
      */
     configurarUpload() {
-        const sufixo = this.tipo === 'jogador' ? '' : this.capitalize(this.tipo);
+        const sufixo = this.getSufixo();
         const inputId = `inputFoto${sufixo}`;
         const areaId = `uploadArea${sufixo}`;
         const placeholderId = `uploadPlaceholder${sufixo}`;
@@ -59,7 +78,10 @@ export class ModalCadastro {
         const preview = document.getElementById(previewId);
         const previewImage = document.getElementById(previewImageId);
         
-        if (!input || !area) return;
+        if (!input || !area) {
+            console.warn(`⚠️ Elementos de upload não encontrados para ${this.tipo}`);
+            return;
+        }
         
         // Clique na área abre seletor
         area.addEventListener('click', () => input.click());
@@ -110,9 +132,14 @@ export class ModalCadastro {
      * Abre o modal
      */
     abrir() {
+        console.log(`📂 Tentando abrir modal: ${this.modalId}`);
         const modal = document.getElementById(this.modalId);
+        
         if (modal) {
             modal.classList.add('show');
+            console.log(`✅ Modal ${this.modalId} aberto`);
+        } else {
+            console.error(`❌ Modal não encontrado: ${this.modalId}`);
         }
     }
     
@@ -133,7 +160,7 @@ export class ModalCadastro {
         form.reset();
         
         // Resetar preview de imagem
-        const sufixo = this.tipo === 'jogador' ? '' : this.capitalize(this.tipo);
+        const sufixo = this.getSufixo();
         const placeholder = document.getElementById(`uploadPlaceholder${sufixo}`);
         const preview = document.getElementById(`uploadPreview${sufixo}`);
         
@@ -149,7 +176,17 @@ export class ModalCadastro {
     }
     
     /**
-     * Capitaliza primeira letra
+     * ← NOVO: Retorna sufixo correto para IDs de elementos
+     */
+    getSufixo() {
+        if (this.tipo === 'jogador') return '';
+        if (this.tipo === 'monstro') return 'Monstro';
+        if (this.tipo === 'npc') return 'NPC'; // ← NPC todo maiúsculo
+        return '';
+    }
+    
+    /**
+     * Capitaliza primeira letra (mantido para compatibilidade)
      */
     capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);

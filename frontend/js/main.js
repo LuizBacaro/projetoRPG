@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
     app.modals.cadastroNPC = new ModalCadastro('npc');
     app.modals.edicao = new ModalEdicao();
     
+    console.log('✅ Modais criados:', {
+        jogador: app.modals.cadastroJogador,
+        monstro: app.modals.cadastroMonstro,
+        npc: app.modals.cadastroNPC
+    });
+    
     // Configurar botão único de cadastro
     configurarBotaoCadastro();
     
@@ -68,13 +74,22 @@ function configurarBotaoCadastro() {
     btnAdicionar.innerHTML = '⚔️ Adicionar Combatente';
     
     btnAdicionar.addEventListener('click', () => {
+        console.log('🎯 Botão Adicionar Combatente clicado');
+        
         TipoSelector.mostrar((tipo) => {
+            console.log(`📝 Callback recebeu tipo: ${tipo}`);
+            
             if (tipo === 'jogador') {
+                console.log('➡️ Abrindo modal de Jogador');
                 app.modals.cadastroJogador.abrir();
             } else if (tipo === 'monstro') {
+                console.log('➡️ Abrindo modal de Monstro');
                 app.modals.cadastroMonstro.abrir();
             } else if (tipo === 'npc') {
+                console.log('➡️ Abrindo modal de NPC');
                 app.modals.cadastroNPC.abrir();
+            } else {
+                console.error('❌ Tipo desconhecido:', tipo);
             }
         });
     });
@@ -130,6 +145,8 @@ function removerImagemUpload(sufixo = '', isEdit = false) {
  * Abre modal de cadastro do tipo específico
  */
 window.abrirModalCadastro = function(tipo) {
+    console.log(`🔓 abrirModalCadastro chamado com tipo: ${tipo}`);
+    
     // Fechar seletor de tipo
     window.fecharSeletorTipo();
     
@@ -140,6 +157,8 @@ window.abrirModalCadastro = function(tipo) {
         app.modals.cadastroMonstro.abrir();
     } else if (tipo === 'npc' && app.modals.cadastroNPC) {
         app.modals.cadastroNPC.abrir();
+    } else {
+        console.error('❌ Modal não encontrado para tipo:', tipo);
     }
 };
 
@@ -153,3 +172,6 @@ window.fecharSeletorTipo = function() {
 // ==================== EXPORT ====================
 
 export { app };
+
+// ← ADICIONAR ESTA LINHA PARA DEBUG
+window.app = app;
