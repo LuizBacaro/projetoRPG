@@ -10,7 +10,8 @@ export class ArenaController {
         this.combatenteService = new CombatenteService();
         this.combatentes = [];
         this.turnoAtual = 0;
-        this.rodadaAtual = 1; // ← NOVO: Contador de rodadas
+        this.rodadaAtual = 1;
+        this.hpVisivel = true; // ← NOVO: Controla visibilidade dos valores de HP
         
         this.inicializar();
     }
@@ -30,7 +31,6 @@ export class ArenaController {
         document.addEventListener('iniciarCombate', (e) => {
             console.log('🎮 Evento iniciarCombate recebido:', e.detail);
             
-            // VALIDAÇÃO CRÍTICA: Verificar se combatentes existe
             if (e.detail && e.detail.combatentes) {
                 this.iniciarCombate(e.detail.combatentes);
             } else {
@@ -64,21 +64,20 @@ export class ArenaController {
     iniciarCombate(combatentes) {
         console.log('⚔️ Iniciando combate com:', combatentes);
         
-        // VALIDAÇÃO CRÍTICA
         if (!combatentes || !Array.isArray(combatentes) || combatentes.length === 0) {
             console.error('❌ Combatentes inválidos:', combatentes);
             Toast.error('Erro: Nenhum combatente válido para iniciar combate');
             return;
         }
 
-        // Ordenar por iniciativa (maior primeiro)
         this.combatentes = combatentes.sort((a, b) => b.iniciativa - a.iniciativa);
         this.turnoAtual = 0;
-        this.rodadaAtual = 1; // ← NOVO: Resetar contador de rodadas
+        this.rodadaAtual = 1;
+        this.hpVisivel = true; // ← NOVO: Resetar visibilidade ao iniciar
         
         console.log('📊 Ordem de iniciativa:', this.combatentes.map(c => `${c.nome} (${c.iniciativa})`));
         
-        this.atualizarRodada(); // ← NOVO: Atualizar display de rodada
+        this.atualizarRodada();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
@@ -91,10 +90,8 @@ export class ArenaController {
         
         console.log(`➡️ Avançando turno. Turno atual: ${this.turnoAtual}, Combatente: ${combatenteAtual?.nome}`);
         
-        // Avançar turno
         this.turnoAtual++;
         
-        // ← NOVO: Se completou um ciclo, incrementar rodada
         if (this.turnoAtual >= this.combatentes.length) {
             this.turnoAtual = 0;
             this.rodadaAtual++;
@@ -111,7 +108,21 @@ export class ArenaController {
     }
 
     /**
-     * ← NOVO: Atualiza o display da rodada atual
+     * ← NOVO: Alterna visibilidade dos valores de HP
+     */
+    toggleVisibilidadeHP() {
+        this.hpVisivel = !this.hpVisivel;
+        console.log(`👁️ Visibilidade HP: ${this.hpVisivel ? 'Visível' : 'Oculto'}`);
+        
+        // Re-renderizar para aplicar mudança
+        this.renderizarOrdemIniciativa();
+        this.renderizarCombatenteAtivo();
+        
+        Toast.success(this.hpVisivel ? '👁️ HP Visível' : '🙈 HP Oculto');
+    }
+
+    /**
+     * Atualiza o display da rodada atual
      */
     atualizarRodada() {
         const rodadaDisplay = document.getElementById('rodadaAtual');
@@ -136,6 +147,11 @@ export class ArenaController {
             const icon = isMorto ? '💀' : (isAtivo ? '⚔️' : index + 1);
             const hpClass = c.hp_atual <= (c.hp_maximo * 0.25) ? 'ordem-hp-critical' : '';
 
+            // ← NOVO: Condicional para exibir ou ocultar HP
+            const hpTexto = this.hpVisivel 
+                ? `HP: ${c.hp_atual}/${c.hp_maximo}`
+                : `HP: ???/???`;
+
             return `
                 <div class="ordem-item ${statusClass}">
                     <span class="ordem-status-icon ${iconClass}">${icon}</span>
@@ -144,7 +160,7 @@ export class ArenaController {
                         <div class="ordem-detalhes">
                             <span class="ordem-iniciativa">Ini: ${c.iniciativa}</span>
                             <span class="ordem-hp ${hpClass}">
-                                HP: ${c.hp_atual}/${c.hp_maximo}
+                                ${hpTexto}
                             </span>
                         </div>
                     </div>
@@ -168,6 +184,14 @@ export class ArenaController {
         const hpCor = this.getCorHP(hpPercentual);
         const hpCritical = hpPercentual <= 25;
 
+        // ← NOVO: Condicional para exibir ou ocultar valores de HP
+        const hpValorTexto = this.hpVisivel 
+            ? `${combatente.hp_atual} / ${combatente.hp_maximo}`
+            : `??? / ???`;
+
+        const iconVisibilidade = this.hpVisivel ? '👁️' : '🙈';
+        const tooltipVisibilidade = this.hpVisivel ? 'Ocultar HP' : 'Mostrar HP';
+
         container.innerHTML = `
             <div class="combatente-ativo-card ${isMorto ? 'morto' : ''}">
                 <div class="combatente-foto-vertical">
@@ -189,13 +213,18 @@ export class ArenaController {
                     <div class="combatente-grid-principal">
                         <!-- HP -->
                         <div class="secao-hp">
-                            <h3>💚 Pontos de Vida</h3>
+                            <div class="secao-hp-header">
+                                <h3>💚 Pontos de Vida</h3>
+                                <button class="btn-toggle-hp" onclick="toggleVisibilidadeHP()" title="${tooltipVisibilidade}">
+                                    ${iconVisibilidade}
+                                </button>
+                            </div>
                             <div class="hp-display">
                                 <div class="hp-bar-grande">
                                     <div class="hp-fill-grande" style="width: ${hpPercentual}%; background: ${hpCor};"></div>
                                 </div>
-                                <div class="hp-valor-grande ${hpCritical ? 'hp-critical-text' : ''}">
-                                    ${combatente.hp_atual} / ${combatente.hp_maximo}
+                                <div class="hp-valor-grande ${hpCritical ? 'hp-critical-text' : ''} ${!this.hpVisivel ? 'hp-oculto' : ''}">
+                                    ${hpValorTexto}
                                 </div>
                             </div>
                             <div class="hp-acoes">
@@ -253,6 +282,7 @@ export class ArenaController {
         // Configurar funções globais para botões
         window.aplicarDano = (id) => this.aplicarDano(id);
         window.aplicarCura = (id) => this.aplicarCura(id);
+        window.toggleVisibilidadeHP = () => this.toggleVisibilidadeHP(); // ← NOVO
     }
 
     /**
@@ -391,7 +421,7 @@ export class ArenaController {
         });
 
         this.turnoAtual = 0;
-        this.rodadaAtual = 1; // ← NOVO: Resetar rodada
+        this.rodadaAtual = 1;
         this.atualizarRodada();
         
         Toast.success('Combate resetado! 🔄');

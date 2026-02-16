@@ -2272,3 +2272,54 @@ header p {
         gap: 0.75rem;
     }
 }
+
+/* ==================== BOTÃO TOGGLE VISIBILIDADE HP ==================== */
+
+.secao-hp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.secao-hp-header h3 {
+    margin: 0 !important;
+}
+
+.btn-toggle-hp {
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    color: #2c1810;
+    font-size: 1.3rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    height: 40px;
+}
+
+.btn-toggle-hp:hover {
+    background: linear-gradient(135deg, #e8b887 0%, #d4a574 100%);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-toggle-hp:active {
+    transform: scale(0.95);
+}
+
+.hp-oculto {
+    filter: blur(8px);
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Animação suave ao alternar visibilidade */
+.hp-valor-grande {
+    transition: filter 0.3s ease;
+}
