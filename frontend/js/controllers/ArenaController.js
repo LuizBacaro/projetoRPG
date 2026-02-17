@@ -227,19 +227,12 @@ export class ArenaController {
                                     ${hpValorTexto}
                                 </div>
                             </div>
-                            <div class="hp-acoes">
-                                <div class="hp-input-group">
-                                    <input type="number" class="input-hp" id="inputDano" min="0" value="5" placeholder="Dano">
-                                    <button class="btn-dano" onclick="aplicarDano(${combatente.id})" ${isMorto ? 'disabled' : ''}>
-                                        ⚔️ Aplicar Dano
-                                    </button>
-                                </div>
-                                <div class="hp-input-group">
-                                    <input type="number" class="input-hp" id="inputCura" min="0" value="5" placeholder="Cura">
-                                    <button class="btn-cura" onclick="aplicarCura(${combatente.id})" ${isMorto ? 'disabled' : ''}>
-                                        💚 Aplicar Cura
-                                    </button>
-                                </div>
+                            
+                            <!-- ✅ NOVO: Botão único -->
+                            <div class="hp-acoes-simplificadas">
+                                <button class="btn-abrir-dano-cura" onclick="abrirModalDanoCura()">
+                                    ⚔️💚 Aplicar Dano / Cura
+                                </button>
                             </div>
                         </div>
 
@@ -280,8 +273,6 @@ export class ArenaController {
         `;
 
         // Configurar funções globais para botões
-        window.aplicarDano = (id) => this.aplicarDano(id);
-        window.aplicarCura = (id) => this.aplicarCura(id);
         window.toggleVisibilidadeHP = () => this.toggleVisibilidadeHP();
     }
 
@@ -341,72 +332,7 @@ export class ArenaController {
         return emojis[tipo] || '⚔️';
     }
 
-    /**
-     * Aplica dano a um combatente
-     */
-    async aplicarDano(id) {
-        const input = document.getElementById('inputDano');
-        const dano = parseInt(input.value) || 0;
-
-        if (dano <= 0) {
-            Toast.error('Digite um valor de dano válido');
-            return;
-        }
-
-        const combatente = this.combatentes.find(c => c.id === id);
-        if (!combatente) return;
-
-        const novoHP = Math.max(0, combatente.hp_atual - dano);
-
-        try {
-            await this.combatenteService.atualizarHP(id, novoHP);
-            combatente.hp_atual = novoHP;
-
-            Toast.success(`${combatente.nome} sofreu ${dano} de dano! 💥`);
-
-            if (novoHP === 0) {
-                Toast.error(`${combatente.nome} foi derrotado! 💀`);
-            }
-
-            this.renderizarOrdemIniciativa();
-            this.renderizarCombatenteAtivo();
-        } catch (error) {
-            Toast.error('Erro ao aplicar dano');
-            console.error(error);
-        }
-    }
-
-    /**
-     * Aplica cura a um combatente
-     */
-    async aplicarCura(id) {
-        const input = document.getElementById('inputCura');
-        const cura = parseInt(input.value) || 0;
-
-        if (cura <= 0) {
-            Toast.error('Digite um valor de cura válido');
-            return;
-        }
-
-        const combatente = this.combatentes.find(c => c.id === id);
-        if (!combatente) return;
-
-        const novoHP = Math.min(combatente.hp_maximo, combatente.hp_atual + cura);
-
-        try {
-            await this.combatenteService.atualizarHP(id, novoHP);
-            combatente.hp_atual = novoHP;
-
-            Toast.success(`${combatente.nome} recuperou ${cura} HP! 💚`);
-
-            this.renderizarOrdemIniciativa();
-            this.renderizarCombatenteAtivo();
-        } catch (error) {
-            Toast.error('Erro ao aplicar cura');
-            console.error(error);
-        }
-    }
-
+   
     /**
      * Reseta o combate
      */

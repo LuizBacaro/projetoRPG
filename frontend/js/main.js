@@ -24,6 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar controllers
     app.controllers.configuracao = new ConfiguracaoController();
     app.controllers.arena = new ArenaController();
+
+    // ✅ ADICIONAR AQUI: Inicializar Modal de Dano/Cura
+    const combatenteService = new CombatenteService();
+    const danoCuraService = new DanoCuraService(combatenteService);
+    window.modalDanoCuraInstance = new ModalDanoCura(danoCuraService, app.controllers.arena);
+
+    console.log('✅ Modal de Dano/Cura inicializado');
     
     // Inicializar modais
     app.modals.cadastroJogador = new ModalCadastro('jogador');
@@ -173,5 +180,14 @@ window.fecharSeletorTipo = function() {
 
 export { app };
 
-// ← ADICIONAR ESTA LINHA PARA DEBUG
-window.app = app;
+/**
+ * Função global para abrir o modal de Dano/Cura
+ */
+window.abrirModalDanoCura = function() {
+    if (window.modalDanoCuraInstance) {
+        window.modalDanoCuraInstance.abrir();
+    } else {
+        console.error('❌ Modal de Dano/Cura não foi inicializado');
+    }
+};
+
