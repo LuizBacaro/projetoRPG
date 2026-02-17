@@ -2,12 +2,17 @@
 Service de Combatente (Business Logic)
 Princípio SOLID: SRP - Lógica de negócio de Combatente
 """
-from typing import List, Optional
+from typing import List, Optional, Dict
 from ..repositories.combatente_repository import CombatenteRepository
 from ..services.file_service import FileService
 from ..schemas.combatente import CombatenteCreate, CombatenteUpdate, CombatenteResponse
 from ..models.combatente import Combatente
-from ..exceptions.custom_exceptions import CombatenteNotFoundError, InvalidHPError
+from ..exceptions.custom_exceptions import (
+    CombatenteNotFoundError, 
+    InvalidHPError,
+    CombatenteNaoEncontrado,
+    DadosInvalidos
+)
 
 
 class CombatenteService:
@@ -29,7 +34,7 @@ class CombatenteService:
         """Obtém um combatente por ID"""
         combatente = self.repository.get_by_id(combatente_id)
         if not combatente:
-            raise CombatenteNotFoundError(f"Combatente {combatente_id} não encontrado")
+            raise CombatenteNaoEncontrado(combatente_id)
         return combatente
     
     def criar(self, combatente_data: dict, foto_file=None) -> Combatente:
@@ -123,31 +128,9 @@ class CombatenteService:
         combatente.iniciativa = nova_iniciativa
         return self.repository.update(combatente)
     
-    def aplicar_dano(self, combatente_id: int, dano: int) -> Combatente:
-        """
-        Aplica dano a um combatente
-        """
-        if dano <= 0:
-            raise InvalidHPError("Dano deve ser maior que zero")
-        
-        combatente = self.obter_por_id(combatente_id)
-        combatente.aplicar_dano(dano)
-        return self.repository.update(combatente)
-    
-    def curar(self, combatente_id: int, cura: int) -> Combatente:
-        """
-        Cura um combatente
-        """
-        if cura <= 0:
-            raise InvalidHPError("Cura deve ser maior que zero")
-        
-        combatente = self.obter_por_id(combatente_id)
-        combatente.curar(cura)
-        return self.repository.update(combatente)
-    
     # ==================== MÉTODOS DE DANO/CURA ====================
-
-    def aplicar_dano(self, combatente_id: int, valor: int) -> dict:
+    
+    def aplicar_dano(self, combatente_id: int, valor: int) -> Dict:
         """
         Aplica dano a um combatente
         
@@ -162,15 +145,12 @@ class CombatenteService:
             CombatenteNaoEncontrado: Se combatente não existir
             DadosInvalidos: Se valor for inválido
         """
-        # Buscar combatente
-        combatente = self.repository.obter_por_id(combatente_id)
-        
-        if not combatente:
-            raise CombatenteNaoEncontrado(combatente_id)
-        
         # Validar valor
         if valor <= 0:
             raise DadosInvalidos("Valor de dano deve ser maior que zero")
+        
+        # Buscar combatente usando o método do próprio service
+        combatente = self.obter_por_id(combatente_id)
         
         # Calcular novo HP (não pode ser negativo)
         hp_anterior = combatente.hp_atual
@@ -195,9 +175,8 @@ class CombatenteService:
             "hp_maximo": combatente.hp_maximo,
             "mensagem": mensagem
         }
-
-
-    def aplicar_cura(self, combatente_id: int, valor: int) -> dict:
+    
+    def aplicar_cura(self, combatente_id: int, valor: int) -> Dict:
         """
         Aplica cura a um combatente
         
@@ -212,15 +191,12 @@ class CombatenteService:
             CombatenteNaoEncontrado: Se combatente não existir
             DadosInvalidos: Se valor for inválido
         """
-        # Buscar combatente
-        combatente = self.repository.obter_por_id(combatente_id)
-        
-        if not combatente:
-            raise CombatenteNaoEncontrado(combatente_id)
-        
         # Validar valor
         if valor <= 0:
             raise DadosInvalidos("Valor de cura deve ser maior que zero")
+        
+        # Buscar combatente usando o método do próprio service
+        combatente = self.obter_por_id(combatente_id)
         
         # Calcular novo HP (não pode ultrapassar HP máximo)
         hp_anterior = combatente.hp_atual
