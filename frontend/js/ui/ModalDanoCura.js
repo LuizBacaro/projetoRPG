@@ -175,7 +175,6 @@ class ModalDanoCura {
      * Carrega lista de combatentes no modal
      */
     carregarCombatentes() {
-        // ✅ CORRIGIDO: Obter combatentes do controller da arena
         const combatentes = this.arenaController.combatentes;
         const container = document.getElementById('listaCombatentesDanoCura');
         
@@ -211,7 +210,7 @@ class ModalDanoCura {
         } else {
             this.combatentesSelecionados.add(combatenteId);
         }
-        console.log('Combatentes selecionados:', Array.from(this.combatentesSelecionados));
+        console.log('✅ Combatentes selecionados:', Array.from(this.combatentesSelecionados));
     }
 
     /**
@@ -231,7 +230,7 @@ class ModalDanoCura {
             const valorDano = parseInt(document.getElementById('inputDanoModal').value) || 0;
             const valorCura = parseInt(document.getElementById('inputCuraModal').value) || 0;
 
-            console.log('Valores:', { dano: valorDano, cura: valorCura });
+            console.log('📊 Valores:', { dano: valorDano, cura: valorCura });
 
             // Validação: dano/cura mutuamente exclusivos
             const validacao = this.danoCuraService.validarEntrada(valorDano, valorCura);
@@ -241,28 +240,27 @@ class ModalDanoCura {
                 return;
             }
 
-            // Aplicar dano ou cura
+            // Obter IDs selecionados
             const ids = Array.from(this.combatentesSelecionados);
             
-            console.log(`Aplicando ${validacao.tipo} de ${validacao.valor} a:`, ids);
+            console.log(`🎲 Aplicando ${validacao.tipo} de ${validacao.valor} a ${ids.length} combatente(s)`);
             
+            // Aplicar dano ou cura via backend
+            let resultados;
             if (validacao.tipo === 'dano') {
-                await this.danoCuraService.aplicarDanoEmMassa(ids, validacao.valor);
+                resultados = await this.danoCuraService.aplicarDanoEmMassa(ids, validacao.valor);
                 mostrarToast(`⚔️ Dano de ${validacao.valor} aplicado a ${ids.length} combatente(s)`, 'success');
             } else {
-                await this.danoCuraService.aplicarCuraEmMassa(ids, validacao.valor);
+                resultados = await this.danoCuraService.aplicarCuraEmMassa(ids, validacao.valor);
                 mostrarToast(`💚 Cura de ${validacao.valor} aplicada a ${ids.length} combatente(s)`, 'success');
             }
 
-            // Atualizar HP dos combatentes no controller
-            ids.forEach(id => {
-                const combatente = this.arenaController.combatentes.find(c => c.id === id);
+            // Atualizar HP dos combatentes localmente com os dados do backend
+            resultados.forEach(resultado => {
+                const combatente = this.arenaController.combatentes.find(c => c.id === resultado.id);
                 if (combatente) {
-                    if (validacao.tipo === 'dano') {
-                        combatente.hp_atual = Math.max(0, combatente.hp_atual - validacao.valor);
-                    } else {
-                        combatente.hp_atual = Math.min(combatente.hp_maximo, combatente.hp_atual + validacao.valor);
-                    }
+                    combatente.hp_atual = resultado.hp_atual;
+                    console.log(`✅ ${resultado.nome}: ${resultado.hp_atual}/${resultado.hp_maximo}`);
                 }
             });
 
