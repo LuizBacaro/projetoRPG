@@ -358,6 +358,15 @@ export class ArenaController {
     }
 
     /**
+     * Atualiza toda a interface da arena após mudanças
+     */
+    atualizarInterface() {
+        console.log('🔄 Atualizando interface da arena');
+        this.renderizarOrdemIniciativa();
+        this.renderizarCombatenteAtivo();
+    }
+
+    /**
      * Finaliza o combate
      */
     finalizarCombate() {

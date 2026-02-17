@@ -24,13 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar controllers
     app.controllers.configuracao = new ConfiguracaoController();
     app.controllers.arena = new ArenaController();
-
-    // ✅ ADICIONAR AQUI: Inicializar Modal de Dano/Cura
-    const combatenteService = new CombatenteService();
-    const danoCuraService = new DanoCuraService(combatenteService);
-    window.modalDanoCuraInstance = new ModalDanoCura(danoCuraService, app.controllers.arena);
-
-    console.log('✅ Modal de Dano/Cura inicializado');
     
     // Inicializar modais
     app.modals.cadastroJogador = new ModalCadastro('jogador');
@@ -43,6 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
         monstro: app.modals.cadastroMonstro,
         npc: app.modals.cadastroNPC
     });
+    
+    // ✅ NOVO: Inicializar Modal de Dano/Cura
+    try {
+        const danoCuraService = new DanoCuraService();
+        window.modalDanoCuraInstance = new ModalDanoCura(danoCuraService, app.controllers.arena);
+        console.log('✅ Modal de Dano/Cura inicializado');
+    } catch (error) {
+        console.error('❌ Erro ao inicializar Modal de Dano/Cura:', error);
+    }
     
     // Configurar botão único de cadastro
     configurarBotaoCadastro();
@@ -176,18 +178,24 @@ window.fecharSeletorTipo = function() {
     TipoSelector.fechar();
 };
 
+/**
+ * ✅ NOVO: Função global para abrir o modal de Dano/Cura
+ */
+window.abrirModalDanoCura = function() {
+    console.log('🎯 Tentando abrir modal de Dano/Cura...');
+    
+    if (window.modalDanoCuraInstance) {
+        console.log('✅ Abrindo modal de Dano/Cura');
+        window.modalDanoCuraInstance.abrir();
+    } else {
+        console.error('❌ Modal de Dano/Cura não foi inicializado');
+        alert('Erro: Modal de Dano/Cura não está disponível. Recarregue a página.');
+    }
+};
+
 // ==================== EXPORT ====================
 
 export { app };
 
-/**
- * Função global para abrir o modal de Dano/Cura
- */
-window.abrirModalDanoCura = function() {
-    if (window.modalDanoCuraInstance) {
-        window.modalDanoCuraInstance.abrir();
-    } else {
-        console.error('❌ Modal de Dano/Cura não foi inicializado');
-    }
-};
-
+// Debug: expor app globalmente
+window.app = app;

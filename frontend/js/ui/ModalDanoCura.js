@@ -1,4 +1,44 @@
 /**
+ * Helper para exibir toasts
+ * Função auxiliar que deve estar FORA da classe
+ */
+function mostrarToast(mensagem, tipo = 'success') {
+    // Usar o sistema de Toast existente se disponível
+    if (typeof Toast !== 'undefined') {
+        if (tipo === 'success') {
+            Toast.success(mensagem);
+        } else if (tipo === 'error') {
+            Toast.error(mensagem);
+        }
+    } else {
+        // Fallback: criar toast simples
+        const toast = document.createElement('div');
+        toast.className = 'toast show';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 2rem;
+            background: ${tipo === 'success' ? '#32CD32' : '#DC143C'};
+            color: white;
+            border-radius: 8px;
+            font-family: var(--fonte-texto);
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        `;
+        toast.textContent = mensagem;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+}
+
+/**
  * Componente UI responsável pelo modal de aplicação de dano/cura
  * Single Responsibility Principle: apenas gerencia a UI do modal
  */
@@ -135,7 +175,8 @@ class ModalDanoCura {
      * Carrega lista de combatentes no modal
      */
     carregarCombatentes() {
-        const combatentes = combatenteStorage.obterTodos();
+        // ✅ CORRIGIDO: Obter combatentes do controller da arena
+        const combatentes = this.arenaController.combatentes;
         const container = document.getElementById('listaCombatentesDanoCura');
         
         if (!combatentes || combatentes.length === 0) {
@@ -170,6 +211,7 @@ class ModalDanoCura {
         } else {
             this.combatentesSelecionados.add(combatenteId);
         }
+        console.log('Combatentes selecionados:', Array.from(this.combatentesSelecionados));
     }
 
     /**
@@ -177,6 +219,8 @@ class ModalDanoCura {
      */
     async aplicar() {
         try {
+            console.log('🎯 Iniciando aplicação de dano/cura...');
+            
             // Validação: combatentes selecionados
             if (this.combatentesSelecionados.size === 0) {
                 mostrarToast('⚠️ Selecione pelo menos um combatente', 'error');
@@ -186,6 +230,8 @@ class ModalDanoCura {
             // Obter valores
             const valorDano = parseInt(document.getElementById('inputDanoModal').value) || 0;
             const valorCura = parseInt(document.getElementById('inputCuraModal').value) || 0;
+
+            console.log('Valores:', { dano: valorDano, cura: valorCura });
 
             // Validação: dano/cura mutuamente exclusivos
             const validacao = this.danoCuraService.validarEntrada(valorDano, valorCura);
@@ -198,6 +244,8 @@ class ModalDanoCura {
             // Aplicar dano ou cura
             const ids = Array.from(this.combatentesSelecionados);
             
+            console.log(`Aplicando ${validacao.tipo} de ${validacao.valor} a:`, ids);
+            
             if (validacao.tipo === 'dano') {
                 await this.danoCuraService.aplicarDanoEmMassa(ids, validacao.valor);
                 mostrarToast(`⚔️ Dano de ${validacao.valor} aplicado a ${ids.length} combatente(s)`, 'success');
@@ -206,16 +254,25 @@ class ModalDanoCura {
                 mostrarToast(`💚 Cura de ${validacao.valor} aplicada a ${ids.length} combatente(s)`, 'success');
             }
 
+            // Atualizar HP dos combatentes no controller
+            ids.forEach(id => {
+                const combatente = this.arenaController.combatentes.find(c => c.id === id);
+                if (combatente) {
+                    if (validacao.tipo === 'dano') {
+                        combatente.hp_atual = Math.max(0, combatente.hp_atual - validacao.valor);
+                    } else {
+                        combatente.hp_atual = Math.min(combatente.hp_maximo, combatente.hp_atual + validacao.valor);
+                    }
+                }
+            });
+
             // Atualizar UI
             this.arenaController.atualizarInterface();
             this.fechar();
 
         } catch (erro) {
-            console.error('Erro ao aplicar dano/cura:', erro);
+            console.error('❌ Erro ao aplicar dano/cura:', erro);
             mostrarToast(`❌ Erro: ${erro.message}`, 'error');
         }
     }
 }
-
-// Instância global (será inicializada no app.js)
-let modalDanoCuraInstance;
