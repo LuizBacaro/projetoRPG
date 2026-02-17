@@ -1024,3 +1024,29 @@ function mostrarMensagem(texto, tipo) {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+
+// ============================================
+// INICIALIZAÇÃO DO MODAL DANO/CURA
+// ============================================
+
+// Inicializar após o carregamento da página
+document.addEventListener('DOMContentLoaded', function() {
+    // Supondo que você já tenha combatenteRepository definido
+    if (typeof combatenteRepository !== 'undefined') {
+        window.danoCuraService = new DanoCuraService(combatenteRepository);
+        window.modalDanoCuraInstance = new ModalDanoCura(danoCuraService, arenaController);
+        console.log('✅ Modal de Dano/Cura inicializado');
+    }
+});
+
+/**
+ * Função global para abrir o modal
+ */
+function abrirModalDanoCura() {
+    if (window.modalDanoCuraInstance) {
+        window.modalDanoCuraInstance.abrir();
+    } else {
+        console.error('Modal de Dano/Cura não foi inicializado');
+        mostrarToast('❌ Erro ao abrir modal', 'error');
+    }
+}

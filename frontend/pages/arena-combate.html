@@ -1,0 +1,25 @@
+<!-- Substituir a seção atual de HP por esta versão simplificada -->
+
+<div class="secao-hp">
+    <div class="secao-hp-header">
+        <h3>💚 Pontos de Vida</h3>
+        <button class="btn-toggle-hp" onclick="toggleVisibilidadeHP()" title="Mostrar HP">
+            🙈
+        </button>
+    </div>
+    <div class="hp-display">
+        <div class="hp-bar-grande">
+            <div class="hp-fill-grande" id="hpFillAtivo" style="width: 100%;"></div>
+        </div>
+        <div class="hp-valor-grande hp-oculto" id="hpValorAtivo">
+            ??? / ???
+        </div>
+    </div>
+    
+    <!-- NOVO: Botão único para abrir modal -->
+    <div class="hp-acoes-simplificadas">
+        <button class="btn-abrir-dano-cura" onclick="abrirModalDanoCura()">
+            ⚔️💚 Aplicar Dano / Cura
+        </button>
+    </div>
+</div>

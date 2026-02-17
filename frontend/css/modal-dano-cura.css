@@ -1,0 +1,228 @@
+/**
+ * Estilos específicos para o Modal de Dano/Cura
+ */
+
+.modal-dano-cura {
+    max-width: 800px;
+    max-height: 85vh;
+}
+
+/* Layout Principal */
+.dano-cura-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* Seção de Seleção de Combatentes */
+.combatentes-selecao {
+    border-right: 3px solid var(--cor-madeira);
+    padding-right: 2rem;
+}
+
+.combatentes-selecao h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Lista de Checkboxes */
+.lista-checkbox-combatentes {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar personalizada */
+.lista-checkbox-combatentes::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lista-checkbox-combatentes::-webkit-scrollbar-track {
+    background: var(--cor-pergaminho);
+    border-radius: 10px;
+}
+
+.lista-checkbox-combatentes::-webkit-scrollbar-thumb {
+    background: var(--cor-madeira);
+    border-radius: 10px;
+}
+
+.lista-checkbox-combatentes::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-dourada);
+}
+
+/* Item de Checkbox */
+.checkbox-combatente-item {
+    background: linear-gradient(135deg, #f4e8d8 0%, #e8dcc8 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.checkbox-combatente-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-color: var(--cor-dourada);
+}
+
+.checkbox-combatente-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-right: 1rem;
+    accent-color: var(--cor-dourada);
+}
+
+.checkbox-combatente-item label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    flex: 1;
+    margin: 0;
+}
+
+.combatente-nome {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-madeira);
+    font-size: 1.1rem;
+    font-weight: bold;
+    flex: 1;
+}
+
+.combatente-hp {
+    font-family: var(--fonte-texto);
+    color: #32CD32;
+    font-size: 1rem;
+    font-weight: bold;
+    background: rgba(50, 205, 50, 0.1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+    border: 2px solid #32CD32;
+}
+
+/* Seção de Valores */
+.valores-aplicacao {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.campo-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.campo-grupo label {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 1.2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.input-valor-modal {
+    width: 100%;
+    padding: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    border: 3px solid var(--cor-madeira);
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #f4e8d8 100%);
+    color: var(--cor-madeira);
+    font-family: var(--fonte-texto);
+    transition: all 0.3s;
+}
+
+.input-valor-modal:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    transform: scale(1.05);
+}
+
+.input-valor-modal:hover {
+    border-color: var(--cor-dourada);
+}
+
+/* Botão Aplicar Principal */
+.btn-aplicar-principal {
+    padding: 1.2rem 3rem;
+    background: linear-gradient(135deg, var(--cor-dourada) 0%, #d4a574 100%);
+    border: 3px solid var(--cor-madeira);
+    border-radius: 12px;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+    font-size: 1.3rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-aplicar-principal:hover {
+    background: linear-gradient(135deg, #ffed4e 0%, #e8b887 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+}
+
+.btn-aplicar-principal:active {
+    transform: translateY(0);
+}
+
+/* Mensagem de lista vazia */
+.sem-combatentes {
+    text-align: center;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-texto);
+    font-size: 1.1rem;
+    padding: 2rem;
+    font-style: italic;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .modal-dano-cura {
+        max-width: 95%;
+    }
+
+    .dano-cura-layout {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .combatentes-selecao {
+        border-right: none;
+        border-bottom: 3px solid var(--cor-madeira);
+        padding-right: 0;
+        padding-bottom: 1.5rem;
+    }
+
+    .valores-aplicacao {
+        gap: 1.5rem;
+    }
+
+    .input-valor-modal {
+        font-size: 1.5rem;
+        padding: 1rem;
+    }
+
+    .btn-aplicar-principal {
+        width: 100%;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+}
