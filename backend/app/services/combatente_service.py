@@ -144,3 +144,104 @@ class CombatenteService:
         combatente = self.obter_por_id(combatente_id)
         combatente.curar(cura)
         return self.repository.update(combatente)
+    
+    # ==================== MÉTODOS DE DANO/CURA ====================
+
+    def aplicar_dano(self, combatente_id: int, valor: int) -> dict:
+        """
+        Aplica dano a um combatente
+        
+        Args:
+            combatente_id: ID do combatente
+            valor: Valor do dano
+            
+        Returns:
+            Dicionário com dados atualizados e mensagem
+            
+        Raises:
+            CombatenteNaoEncontrado: Se combatente não existir
+            DadosInvalidos: Se valor for inválido
+        """
+        # Buscar combatente
+        combatente = self.repository.obter_por_id(combatente_id)
+        
+        if not combatente:
+            raise CombatenteNaoEncontrado(combatente_id)
+        
+        # Validar valor
+        if valor <= 0:
+            raise DadosInvalidos("Valor de dano deve ser maior que zero")
+        
+        # Calcular novo HP (não pode ser negativo)
+        hp_anterior = combatente.hp_atual
+        novo_hp = max(0, combatente.hp_atual - valor)
+        dano_aplicado = hp_anterior - novo_hp
+        
+        # Atualizar no banco
+        combatente.hp_atual = novo_hp
+        self.repository.db.commit()
+        self.repository.db.refresh(combatente)
+        
+        # Gerar mensagem
+        if novo_hp == 0:
+            mensagem = f"{combatente.nome} foi derrotado! 💀"
+        else:
+            mensagem = f"{combatente.nome} sofreu {dano_aplicado} de dano"
+        
+        return {
+            "id": combatente.id,
+            "nome": combatente.nome,
+            "hp_atual": combatente.hp_atual,
+            "hp_maximo": combatente.hp_maximo,
+            "mensagem": mensagem
+        }
+
+
+    def aplicar_cura(self, combatente_id: int, valor: int) -> dict:
+        """
+        Aplica cura a um combatente
+        
+        Args:
+            combatente_id: ID do combatente
+            valor: Valor da cura
+            
+        Returns:
+            Dicionário com dados atualizados e mensagem
+            
+        Raises:
+            CombatenteNaoEncontrado: Se combatente não existir
+            DadosInvalidos: Se valor for inválido
+        """
+        # Buscar combatente
+        combatente = self.repository.obter_por_id(combatente_id)
+        
+        if not combatente:
+            raise CombatenteNaoEncontrado(combatente_id)
+        
+        # Validar valor
+        if valor <= 0:
+            raise DadosInvalidos("Valor de cura deve ser maior que zero")
+        
+        # Calcular novo HP (não pode ultrapassar HP máximo)
+        hp_anterior = combatente.hp_atual
+        novo_hp = min(combatente.hp_maximo, combatente.hp_atual + valor)
+        cura_aplicada = novo_hp - hp_anterior
+        
+        # Atualizar no banco
+        combatente.hp_atual = novo_hp
+        self.repository.db.commit()
+        self.repository.db.refresh(combatente)
+        
+        # Gerar mensagem
+        if cura_aplicada == 0:
+            mensagem = f"{combatente.nome} já está com HP máximo"
+        else:
+            mensagem = f"{combatente.nome} recuperou {cura_aplicada} HP"
+        
+        return {
+            "id": combatente.id,
+            "nome": combatente.nome,
+            "hp_atual": combatente.hp_atual,
+            "hp_maximo": combatente.hp_maximo,
+            "mensagem": mensagem
+        }

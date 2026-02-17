@@ -11,7 +11,9 @@ from ...services.combatente_service import CombatenteService
 from ...schemas.combatente import (
     CombatenteResponse,
     HPUpdateRequest,
-    IniciativaUpdateRequest
+    IniciativaUpdateRequest,
+    DanoCuraRequest,
+    DanoCuraResponse
 )
 from ...exceptions.custom_exceptions import ArenaBaseException
 
@@ -173,6 +175,50 @@ def atualizar_iniciativa(
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
+
+# ==================== NOVOS ENDPOINTS DE DANO/CURA ====================
+
+@router.post("/{combatente_id}/dano", response_model=DanoCuraResponse)
+def aplicar_dano(
+    combatente_id: int,
+    dano_data: DanoCuraRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Aplica dano a um combatente
+    
+    - **combatente_id**: ID do combatente
+    - **valor**: Valor do dano a ser aplicado
+    """
+    service = get_combatente_service(db)
+    try:
+        resultado = service.aplicar_dano(combatente_id, dano_data.valor)
+        return resultado
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/{combatente_id}/cura", response_model=DanoCuraResponse)
+def aplicar_cura(
+    combatente_id: int,
+    cura_data: DanoCuraRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Aplica cura a um combatente
+    
+    - **combatente_id**: ID do combatente
+    - **valor**: Valor da cura a ser aplicada
+    """
+    service = get_combatente_service(db)
+    try:
+        resultado = service.aplicar_cura(combatente_id, cura_data.valor)
+        return resultado
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+# ==================== ENDPOINTS EXISTENTES ====================
 
 @router.patch("/{combatente_id}", response_model=CombatenteResponse)
 def atualizar_parcial(

@@ -85,3 +85,37 @@ class IniciativaUpdateRequest(BaseModel):
 class DanoRequest(BaseModel):
     """Schema para aplicação de dano"""
     dano: int = Field(..., gt=0)
+    
+# ==================== SCHEMAS DE DANO/CURA ====================
+
+class DanoCuraRequest(BaseModel):
+    """Schema para requisição de dano/cura"""
+    valor: int = Field(..., gt=0, description="Valor do dano ou cura (deve ser maior que 0)")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "valor": 10
+            }
+        }
+
+
+class DanoCuraResponse(BaseModel):
+    """Schema de resposta para aplicação de dano/cura"""
+    id: int
+    nome: str
+    hp_atual: int
+    hp_maximo: int
+    mensagem: str
+    
+    class Config:
+        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "nome": "Theron",
+                "hp_atual": 90,
+                "hp_maximo": 100,
+                "mensagem": "Theron sofreu 10 de dano"
+            }
+        }
