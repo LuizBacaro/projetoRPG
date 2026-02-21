@@ -182,6 +182,13 @@ export class ArenaController {
             ? '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '">'
             : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
 
+        // ✅ Valor do PV respeitando visibilidade
+        const pvValor = this.hpVisivel
+            ? (combatente.hp_atual + '/' + combatente.hp_maximo)
+            : '???/???';
+        const pvClasse = this.hpVisivel ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        const pvOlho   = this.hpVisivel ? '👁️' : '🙈';
+
         container.innerHTML =
             '<div class="arena-card">' +
 
@@ -207,11 +214,15 @@ export class ArenaController {
                         '<span class="arena-stat-label">CA</span>' +
                         '<span class="arena-stat-valor">' + ca + '</span>' +
                     '</div>' +
+
+                    // ✅ PV com botão toggle olho
                     '<div class="arena-stat-box arena-stat-pv">' +
                         '<span class="arena-stat-label">PV</span>' +
-                        '<span class="arena-stat-valor">' + combatente.hp_atual + '/' + combatente.hp_maximo + '</span>' +
+                        '<button class="arena-hp-toggle" onclick="window._toggleHP()" title="Mostrar/Ocultar HP">' + pvOlho + '</button>' +
+                        '<span class="' + pvClasse + '">' + pvValor + '</span>' +
                         '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:' + hpPercentual + '%;background:' + hpCor + ';"></div></div>' +
                     '</div>' +
+
                     '<div class="arena-stat-box arena-stat-surpresa">' +
                         '<span class="arena-stat-label">S</span>' +
                         '<span class="arena-stat-valor">' + surpresa + '</span>' +
@@ -295,16 +306,20 @@ export class ArenaController {
                 '</div>' +
             '</div>';
 
-        // ✅ Expor funções globais usadas pelos botões do card
+        // ✅ Funções globais dos botões do card
         window._abrirDanoCura = function() {
             if (typeof modalDanoCuraInstance !== 'undefined') {
                 modalDanoCuraInstance.abrir(this.combatentes);
             }
         }.bind(this);
 
-        // ✅ Encerrar turno → avança para o próximo combatente
         window._avancarTurno = function() {
             this.avancarTurno();
+        }.bind(this);
+
+        // ✅ Toggle ocultar/mostrar HP
+        window._toggleHP = function() {
+            this.toggleVisibilidadeHP();
         }.bind(this);
     }
 
