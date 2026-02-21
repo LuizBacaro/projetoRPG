@@ -55,8 +55,8 @@ class CombatenteService:
         return self.repository.create(combatente)
     
     def atualizar(
-        self, 
-        combatente_id: int, 
+        self,
+        combatente_id: int,
         combatente_data: dict,
         foto_file=None
     ) -> Combatente:
@@ -64,32 +64,29 @@ class CombatenteService:
         Atualiza um combatente existente
         """
         combatente = self.obter_por_id(combatente_id)
-        
-        # Upload de nova foto se fornecida
-        if foto_file:
-            # Deletar foto antiga
+
+        # Upload de nova foto SOMENTE se fornecida e válida
+        if foto_file and hasattr(foto_file, 'filename') and foto_file.filename:
             if combatente.foto_url:
                 self.file_service.deletar_arquivo(combatente.foto_url)
-            
-            # Salvar nova foto
             foto_url = self.file_service.salvar_arquivo(foto_file)
             combatente_data["foto_url"] = foto_url
-        
+
         # Ajustar HP atual se HP máximo mudou
         if "hp_maximo" in combatente_data and combatente.hp_maximo != combatente_data["hp_maximo"]:
             novo_hp_max = combatente_data["hp_maximo"]
-            
-            # Manter proporção do HP
             if "hp_atual" not in combatente_data and combatente.hp_maximo > 0:
                 proporcao = combatente.hp_atual / combatente.hp_maximo
                 combatente_data["hp_atual"] = int(novo_hp_max * proporcao)
-        
-        # Atualizar campos
+
+        # ✅ CORRIGIDO: usar 'is not None' cobre int 0 corretamente
+        # mas também precisamos aceitar value == 0 (zero é válido)
         for key, value in combatente_data.items():
             if hasattr(combatente, key) and value is not None:
                 setattr(combatente, key, value)
-        
+
         return self.repository.update(combatente)
+
     
     def deletar(self, combatente_id: int) -> bool:
         """Deleta um combatente"""
