@@ -1,7 +1,7 @@
 """
 Schemas Pydantic para Combatente (DTOs)
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
 
@@ -13,7 +13,7 @@ class CombatenteBase(BaseModel):
     hp_maximo: int = Field(..., gt=0)
     iniciativa: int = Field(..., ge=0)
 
-    # Defesa
+    # ✅ Defesa
     ca: int = Field(default=10, ge=0, le=50)
     toque: int = Field(default=10, ge=0, le=50)
     surpresa: int = Field(default=10, ge=0, le=50)
@@ -51,7 +51,7 @@ class CombatenteUpdate(BaseModel):
     iniciativa: Optional[int] = Field(None, ge=0)
     foto_url: Optional[str] = None
 
-    # Defesa
+    # ✅ Defesa
     ca: Optional[int] = Field(None, ge=0, le=50)
     toque: Optional[int] = Field(None, ge=0, le=50)
     surpresa: Optional[int] = Field(None, ge=0, le=50)

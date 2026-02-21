@@ -96,11 +96,11 @@ export class ModalEdicao {
             document.getElementById('editPontos').value = combatente.pontos;
 
             // ✅ Defesa - CA, Toque, Surpresa
-            document.getElementById('editCA').value = combatente.ca || 10;
-            document.getElementById('editToque').value = combatente.toque || 10;
-            document.getElementById('editSurpresa').value = combatente.surpresa || 10;
+            document.getElementById('editCA').value = combatente.ca ?? 10;
+            document.getElementById('editToque').value = combatente.toque ?? 10;
+            document.getElementById('editSurpresa').value = combatente.surpresa ?? 10;
 
-            // Atributos
+            // Atributos D&D
             document.getElementById('editFOR').value = combatente.forca;
             document.getElementById('editDES').value = combatente.destreza;
             document.getElementById('editCON').value = combatente.constituicao;
@@ -109,9 +109,9 @@ export class ModalEdicao {
             document.getElementById('editCAR').value = combatente.carisma;
 
             // Resistências
-            document.getElementById('editFortitude').value = combatente.fortitude || 0;
-            document.getElementById('editReflexos').value = combatente.reflexos || 0;
-            document.getElementById('editVontade').value = combatente.vontade || 0;
+            document.getElementById('editFortitude').value = combatente.fortitude ?? 0;
+            document.getElementById('editReflexos').value = combatente.reflexos ?? 0;
+            document.getElementById('editVontade').value = combatente.vontade ?? 0;
 
             // Atualizar modificadores
             ['editFOR', 'editDES', 'editCON', 'editINT', 'editSAB', 'editCAR'].forEach(id => {
