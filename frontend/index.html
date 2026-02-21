@@ -60,8 +60,13 @@
     </header>
 
     <div class="arena-layout">
-        <!-- COLUNA ESQUERDA: Ordem de Iniciativa -->
+        <!-- COLUNA ESQUERDA: Foto vertical + Ordem de Iniciativa -->
         <aside class="ordem-iniciativa-panel">
+            <!-- ✅ FOTO VERTICAL DO COMBATENTE ATIVO -->
+            <div id="arenaFotoAtivo" class="arena-foto-vertical-container">
+                <!-- Preenchido via JavaScript -->
+            </div>
+
             <div class="ordem-header">
                 <h2>📋 Ordem de Iniciativa</h2>
             </div>
@@ -70,13 +75,8 @@
             </div>
         </aside>
 
-        <!-- COLUNA CENTRAL: Combatente Ativo -->
+        <!-- COLUNA CENTRAL: Combatente Ativo (sem turno-ativo) -->
         <main class="arena-main-ativo">
-            <div class="turno-ativo">
-                <h2>🎯 Turno Ativo</h2>
-                <button id="btnAvancarTurno" class="btn-proximo">Próximo Turno →</button>
-            </div>
-
             <div id="combatenteAtivoContainer">
                 <!-- Preenchido via JavaScript -->
             </div>

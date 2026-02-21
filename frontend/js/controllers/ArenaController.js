@@ -11,167 +11,113 @@ export class ArenaController {
         this.combatentes = [];
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
-        this.hpVisivel = false; // ← Inicia OCULTO
-        
+        this.hpVisivel = false;
         this.inicializar();
     }
 
-    /**
-     * Inicializa o controller
-     */
     inicializar() {
         this.configurarEventos();
     }
 
-    /**
-     * Configura event listeners
-     */
     configurarEventos() {
-        // Evento: Iniciar Combate
         document.addEventListener('iniciarCombate', (e) => {
-            console.log('🎮 Evento iniciarCombate recebido:', e.detail);
-            
             if (e.detail && e.detail.combatentes) {
                 this.iniciarCombate(e.detail.combatentes);
             } else {
-                console.error('❌ Dados de combatentes inválidos:', e.detail);
                 Toast.error('Erro: Dados de combatentes inválidos');
             }
         });
 
-        // Botão: Avançar Turno
         const btnAvancar = document.getElementById('btnAvancarTurno');
-        if (btnAvancar) {
-            btnAvancar.addEventListener('click', () => this.avancarTurno());
-        }
+        if (btnAvancar) btnAvancar.addEventListener('click', () => this.avancarTurno());
 
-        // Botão: Resetar Combate
         const btnResetar = document.getElementById('btnResetarCombate');
-        if (btnResetar) {
-            btnResetar.addEventListener('click', () => this.resetarCombate());
-        }
+        if (btnResetar) btnResetar.addEventListener('click', () => this.resetarCombate());
 
-        // Botão: Finalizar Combate
         const btnFinalizar = document.getElementById('btnFinalizarCombate');
-        if (btnFinalizar) {
-            btnFinalizar.addEventListener('click', () => this.finalizarCombate());
-        }
+        if (btnFinalizar) btnFinalizar.addEventListener('click', () => this.finalizarCombate());
     }
 
-    /**
-     * Inicia o combate com os combatentes selecionados
-     */
     iniciarCombate(combatentes) {
-        console.log('⚔️ Iniciando combate com:', combatentes);
-        
         if (!combatentes || !Array.isArray(combatentes) || combatentes.length === 0) {
-            console.error('❌ Combatentes inválidos:', combatentes);
             Toast.error('Erro: Nenhum combatente válido para iniciar combate');
             return;
         }
-
         this.combatentes = combatentes.sort((a, b) => b.iniciativa - a.iniciativa);
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
-        this.hpVisivel = false; // ← Reseta para OCULTO ao iniciar
-        
-        console.log('📊 Ordem de iniciativa:', this.combatentes.map(c => `${c.nome} (${c.iniciativa})`));
-        
+        this.hpVisivel = false;
         this.atualizarRodada();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
 
-    /**
-     * Avança para o próximo turno
-     */
     avancarTurno() {
-        const combatenteAtual = this.combatentes[this.turnoAtual];
-        
-        console.log(`➡️ Avançando turno. Turno atual: ${this.turnoAtual}, Combatente: ${combatenteAtual?.nome}`);
-        
         this.turnoAtual++;
-        
         if (this.turnoAtual >= this.combatentes.length) {
             this.turnoAtual = 0;
             this.rodadaAtual++;
             this.atualizarRodada();
-            Toast.success(`🎯 Rodada ${this.rodadaAtual} iniciada!`);
-            console.log(`🔄 Nova rodada iniciada: ${this.rodadaAtual}`);
+            Toast.success('🎯 Rodada ' + this.rodadaAtual + ' iniciada!');
         }
-        
-        const proximoCombatente = this.combatentes[this.turnoAtual];
-        console.log(`✅ Próximo combatente: ${proximoCombatente?.nome}`);
-        
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
 
-    /**
-     * Alterna visibilidade dos valores de HP (APENAS do combatente ativo)
-     */
     toggleVisibilidadeHP() {
         this.hpVisivel = !this.hpVisivel;
-        console.log(`👁️ Visibilidade HP (combatente ativo): ${this.hpVisivel ? 'Visível' : 'Oculto'}`);
-        
-        // Re-renderizar combatente ativo E lista de ordem
-        this.renderizarOrdemIniciativa(); // ← ADICIONADO
+        this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
-        
-        Toast.success(this.hpVisivel ? '👁️ HP do Combatente Ativo Visível' : '🙈 HP do Combatente Ativo Oculto');
+        Toast.success(this.hpVisivel ? '👁️ HP Visível' : '🙈 HP Oculto');
     }
 
-    /**
-     * Atualiza o display da rodada atual
-     */
     atualizarRodada() {
-        const rodadaDisplay = document.getElementById('rodadaAtual');
-        if (rodadaDisplay) {
-            rodadaDisplay.textContent = this.rodadaAtual;
-            console.log(`📊 Rodada atualizada no display: ${this.rodadaAtual}`);
-        }
+        const el = document.getElementById('rodadaAtual');
+        if (el) el.textContent = this.rodadaAtual;
     }
 
-    /**
-     * Renderiza a ordem de iniciativa
-     */
     renderizarOrdemIniciativa() {
         const container = document.getElementById('ordemIniciativaContainer');
         if (!container) return;
 
-        container.innerHTML = this.combatentes.map((c, index) => {
-            const isAtivo = index === this.turnoAtual;
-            const isMorto = c.hp_atual <= 0;
-            const statusClass = isMorto ? 'ordem-morto' : (isAtivo ? 'ordem-ativo' : '');
-            const iconClass = isMorto ? 'ordem-status-morto' : (isAtivo ? 'ordem-status-ativo' : 'ordem-status-aguardando');
-            const icon = isMorto ? '💀' : (isAtivo ? '⚔️' : index + 1);
-            const hpClass = c.hp_atual <= (c.hp_maximo * 0.25) ? 'ordem-hp-critical' : '';
+        container.innerHTML = this.combatentes.map(function(c, index) {
+            const ativo = index === this.turnoAtual;
+            const hpPercentual = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
+            const hpCor = hpPercentual > 50 ? '#4CAF50' : hpPercentual > 25 ? '#FF9800' : '#F44336';
+            const morto = c.hp_atual <= 0;
 
-            // ← ALTERADO: Mostrar HP real apenas se for o combatente ativo E hpVisivel === true
-            const hpTexto = (isAtivo && this.hpVisivel)
-                ? `HP: ${c.hp_atual}/${c.hp_maximo}`
-                : `HP: ???/???`;
+            return '<div class="combatente-ordem-item ' + (ativo ? 'ativo' : '') + ' ' + (morto ? 'morto' : '') + '">' +
+                '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>' +
+                '<div class="ordem-info">' +
+                    '<span class="ordem-nome">' + c.nome + '</span>' +
+                    '<div class="ordem-hp-bar">' +
+                        '<div class="ordem-hp-fill" style="width:' + hpPercentual + '%;background:' + hpCor + ';"></div>' +
+                    '</div>' +
+                '</div>' +
+                '<span class="badge ' + this.getBadgeClass(c.tipo) + ' badge-mini">' + this.getEmojiTipo(c.tipo) + '</span>' +
+            '</div>';
+        }.bind(this)).join('');
 
-            return `
-                <div class="ordem-item ${statusClass}">
-                    <span class="ordem-status-icon ${iconClass}">${icon}</span>
-                    <div class="ordem-info">
-                        <div class="ordem-nome">${c.nome}</div>
-                        <div class="ordem-detalhes">
-                            <span class="ordem-iniciativa">Ini: ${c.iniciativa}</span>
-                            <span class="ordem-hp ${hpClass}">
-                                ${hpTexto}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        this.renderizarFotoAtivo();
     }
 
-   /**
-     * Renderiza o combatente ativo
-     */
+    renderizarFotoAtivo() {
+        const container = document.getElementById('arenaFotoAtivo');
+        if (!container) return;
+
+        const combatente = this.combatentes[this.turnoAtual];
+        if (!combatente) {
+            container.innerHTML = '';
+            return;
+        }
+
+        if (combatente.foto_url) {
+            container.innerHTML = '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '" style="width:100%;height:100%;object-fit:cover;">';
+        } else {
+            container.innerHTML = '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
+        }
+    }
+
     renderizarCombatenteAtivo() {
         const container = document.getElementById('combatenteAtivoContainer');
         if (!container) return;
@@ -179,221 +125,245 @@ export class ArenaController {
         const combatente = this.combatentes[this.turnoAtual];
         if (!combatente) return;
 
-        const isMorto = combatente.hp_atual <= 0;
-        const hpPercentual = (combatente.hp_atual / combatente.hp_maximo) * 100;
-        const hpCor = this.getCorHP(hpPercentual);
-        const hpCritical = hpPercentual <= 25;
+        this.renderizarFotoAtivo();
 
-        const hpValorTexto = this.hpVisivel
-            ? `${combatente.hp_atual} / ${combatente.hp_maximo}`
-            : `??? / ???`;
+        const hpPercentual = Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100);
+        const hpCor = hpPercentual > 50 ? '#4CAF50' : hpPercentual > 25 ? '#FF9800' : '#F44336';
 
-        const iconVisibilidade = this.hpVisivel ? '👁️' : '🙈';
-        const tooltipVisibilidade = this.hpVisivel ? 'Ocultar HP' : 'Mostrar HP';
+        const ca       = combatente.ca        !== undefined ? combatente.ca        : 10;
+        const toque    = combatente.toque     !== undefined ? combatente.toque     : 10;
+        const surpresa = combatente.surpresa  !== undefined ? combatente.surpresa  : 10;
+        const fort     = combatente.fortitude !== undefined ? combatente.fortitude : 0;
+        const reflex   = combatente.reflexos  !== undefined ? combatente.reflexos  : 0;
+        const vont     = combatente.vontade   !== undefined ? combatente.vontade   : 0;
+        const nivel    = combatente.nivel  || 1;
+        const classe   = combatente.classe || 'Aventureiro';
 
-        container.innerHTML = `
-            <div class="combatente-ativo-card ${isMorto ? 'morto' : ''}">
-                <div class="combatente-foto-vertical">
-                    ${combatente.foto_url
-                        ? `<img src="${combatente.foto_url}" alt="${combatente.nome}">`
-                        : `<div class="foto-placeholder">${this.getEmojiTipo(combatente.tipo)}</div>`
-                    }
-                </div>
+        const mod = function(val) {
+            var v = val || 10;
+            var m = Math.floor((v - 10) / 2);
+            return m >= 0 ? '+' + m : '' + m;
+        };
 
-                <div class="combatente-conteudo">
-                    <div class="combatente-header-ativo">
-                        <div>
-                            <h2>${combatente.nome}</h2>
-                            <span class="combatente-classe">${combatente.classe || 'Aventureiro'} • Nível ${combatente.nivel || 1}</span>
-                        </div>
-                        <span class="badge ${this.getBadgeClass(combatente.tipo)}">${this.getEmojiTipo(combatente.tipo)} ${combatente.tipo}</span>
-                    </div>
+        const sinal = function(val) {
+            return val >= 0 ? '+' + val : '' + val;
+        };
 
-                    <div class="combatente-grid-principal">
+        const atributos = [
+            ['For', combatente.forca        || 10],
+            ['Des', combatente.destreza     || 10],
+            ['Con', combatente.constituicao || 10],
+            ['Int', combatente.inteligencia || 10],
+            ['Sab', combatente.sabedoria    || 10],
+            ['Car', combatente.carisma      || 10]
+        ];
 
-                        <!-- HP -->
-                        <div class="secao-hp">
-                            <div class="secao-hp-header">
-                                <h3>💚 Pontos de Vida</h3>
-                                <button class="btn-toggle-hp" onclick="toggleVisibilidadeHP()" title="${tooltipVisibilidade}">
-                                    ${iconVisibilidade}
-                                </button>
-                            </div>
-                            <div class="hp-display">
-                                <div class="hp-bar-grande">
-                                    <div class="hp-fill-grande" style="width: ${hpPercentual}%; background: ${hpCor};"></div>
-                                </div>
-                                <div class="hp-valor-grande ${hpCritical ? 'hp-critical-text' : ''} ${!this.hpVisivel ? 'hp-oculto' : ''}">
-                                    ${hpValorTexto}
-                                </div>
-                            </div>
-                            <div class="hp-acoes-simplificadas">
-                                <button class="btn-abrir-dano-cura" onclick="abrirModalDanoCura()">
-                                    ⚔️💚 Aplicar Dano / Cura
-                                </button>
-                            </div>
-                        </div>
+        const atributosHTML = atributos.map(function(item) {
+            return '<div class="arena-atributo-box">' +
+                '<span class="arena-atributo-nome">' + item[0] + '</span>' +
+                '<span class="arena-atributo-valor">' + item[1] + '</span>' +
+                '<span class="arena-atributo-mod">' + mod(item[1]) + '</span>' +
+            '</div>';
+        }).join('');
 
-                        <!-- ✅ NOVO: Defesa - CA, Toque, Surpresa -->
-                        <div class="secao-defesa">
-                            <h3>🛡️ Defesa</h3>
-                            <div class="defesa-grid">
-                                <div class="defesa-item">
-                                    <span class="defesa-label">CA</span>
-                                    <span class="defesa-valor">${combatente.ca ?? 10}</span>
-                                </div>
-                                <div class="defesa-item">
-                                    <span class="defesa-label">Toque</span>
-                                    <span class="defesa-valor">${combatente.toque ?? 10}</span>
-                                </div>
-                                <div class="defesa-item">
-                                    <span class="defesa-label">Surpresa</span>
-                                    <span class="defesa-valor">${combatente.surpresa ?? 10}</span>
-                                </div>
-                            </div>
-                        </div>
+        const magiasHTML = [0,1,2,3,4,5,6,7,8,9].map(function(n) {
+            return '<div class="arena-magia-linha">' +
+                '<span class="arena-magia-nivel">NÍV ' + n + '</span>' +
+                '<div class="arena-magia-controle">' +
+                    '<button class="arena-magia-btn">−</button>' +
+                    '<span class="arena-magia-valor">0</span>' +
+                    '<button class="arena-magia-btn">+</button>' +
+                '</div>' +
+                '<span class="arena-magia-usados">0</span>' +
+            '</div>';
+        }).join('');
 
-                        <!-- Resistências -->
-                        <div class="secao-resistencias">
-                            <h3>⚡ Resistências</h3>
-                            <div class="resistencias-grid">
-                                <div class="resistencia-item">
-                                    <span class="resistencia-label">Fortitude</span>
-                                    <span class="resistencia-valor">${combatente.fortitude ?? 0}</span>
-                                </div>
-                                <div class="resistencia-item">
-                                    <span class="resistencia-label">Reflexos</span>
-                                    <span class="resistencia-valor">${combatente.reflexos ?? 0}</span>
-                                </div>
-                                <div class="resistencia-item">
-                                    <span class="resistencia-label">Vontade</span>
-                                    <span class="resistencia-valor">${combatente.vontade ?? 0}</span>
-                                </div>
-                            </div>
-                        </div>
+        const fotoTopo = combatente.foto_url
+            ? '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '">'
+            : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
 
-                        <!-- Atributos -->
-                        <div class="secao-atributos">
-                            <h3>🎲 Atributos</h3>
-                            <div class="atributos-compacto">
-                                ${this.renderizarAtributo('FOR', combatente.forca)}
-                                ${this.renderizarAtributo('DES', combatente.destreza)}
-                                ${this.renderizarAtributo('CON', combatente.constituicao)}
-                                ${this.renderizarAtributo('INT', combatente.inteligencia)}
-                                ${this.renderizarAtributo('SAB', combatente.sabedoria)}
-                                ${this.renderizarAtributo('CAR', combatente.carisma)}
-                            </div>
-                        </div>
+        container.innerHTML =
+            '<div class="arena-card">' +
 
-                    </div>
-                </div>
-            </div>
-        `;
+                // TOPO
+                '<div class="arena-topo">' +
+                    '<div class="arena-foto-nome">' +
+                        '<div class="arena-foto">' + fotoTopo + '</div>' +
+                        '<div class="arena-nome-info">' +
+                            '<h2 class="arena-nome">' + combatente.nome + ' (' + nivel + '° nível)</h2>' +
+                            '<span class="arena-classe">' + classe +
+                                ' <span class="badge ' + this.getBadgeClass(combatente.tipo) + '">' + combatente.tipo + '</span>' +
+                            '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button class="btn-encerrar-combate" onclick="document.getElementById(\'btnFinalizarCombate\').click()">' +
+                        '✖ Encerrar combate' +
+                    '</button>' +
+                '</div>' +
 
-        window.toggleVisibilidadeHP = () => this.toggleVisibilidadeHP();
+                // STATS: CA / PV / S / T
+                '<div class="arena-stats-linha">' +
+                    '<div class="arena-stat-box arena-stat-ca">' +
+                        '<span class="arena-stat-label">CA</span>' +
+                        '<span class="arena-stat-valor">' + ca + '</span>' +
+                    '</div>' +
+                    '<div class="arena-stat-box arena-stat-pv">' +
+                        '<span class="arena-stat-label">PV</span>' +
+                        '<span class="arena-stat-valor">' + combatente.hp_atual + '/' + combatente.hp_maximo + '</span>' +
+                        '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:' + hpPercentual + '%;background:' + hpCor + ';"></div></div>' +
+                    '</div>' +
+                    '<div class="arena-stat-box arena-stat-surpresa">' +
+                        '<span class="arena-stat-label">S</span>' +
+                        '<span class="arena-stat-valor">' + surpresa + '</span>' +
+                    '</div>' +
+                    '<div class="arena-stat-box arena-stat-toque">' +
+                        '<span class="arena-stat-label">T</span>' +
+                        '<span class="arena-stat-valor">' + toque + '</span>' +
+                    '</div>' +
+                '</div>' +
+
+                // GRADE CENTRAL
+                '<div class="arena-grade-central">' +
+
+                    '<div class="arena-secao">' +
+                        '<h3 class="arena-secao-titulo">Atributos</h3>' +
+                        '<div class="arena-atributos-grid">' + atributosHTML + '</div>' +
+                    '</div>' +
+
+                    '<div class="arena-secao">' +
+                        '<h3 class="arena-secao-titulo">Resistências</h3>' +
+                        '<div class="arena-resistencias-lista">' +
+                            '<div class="arena-resistencia-item">' +
+                                '<span class="arena-resistencia-nome">Fortitude</span>' +
+                                '<span class="arena-resistencia-valor">' + sinal(fort) + '</span>' +
+                            '</div>' +
+                            '<div class="arena-resistencia-item">' +
+                                '<span class="arena-resistencia-nome">Reflexos</span>' +
+                                '<span class="arena-resistencia-valor">' + sinal(reflex) + '</span>' +
+                            '</div>' +
+                            '<div class="arena-resistencia-item">' +
+                                '<span class="arena-resistencia-nome">Vontade</span>' +
+                                '<span class="arena-resistencia-valor">' + sinal(vont) + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+
+                    '<div class="arena-secao">' +
+                        '<h3 class="arena-secao-titulo">Condições</h3>' +
+                        '<div class="arena-condicoes-lista">' +
+                            '<span class="arena-condicao arena-condicao-flanqueado">Flanqueado</span>' +
+                            '<span class="arena-condicao arena-condicao-atordoado">Atordoado</span>' +
+                            '<span class="arena-condicao arena-condicao-agarrado">Agarrado</span>' +
+                            '<span class="arena-condicao arena-condicao-envenenado">Envenenado</span>' +
+                            '<span class="arena-condicao arena-condicao-sangrando">Sangrando</span>' +
+                        '</div>' +
+                    '</div>' +
+
+                    '<div class="arena-secao arena-acoes-col">' +
+                        '<h3 class="arena-secao-titulo">Aplicar</h3>' +
+                        '<button class="arena-btn-dano-cura" onclick="window._abrirDanoCura()">⚔️ Dano / Cura</button>' +
+                        '<button class="arena-btn-condicao">🔮 Condição</button>' +
+                        '<button class="arena-btn-proximo" onclick="window._avancarTurno()">✅ Encerrar turno</button>' +
+                    '</div>' +
+
+                '</div>' +
+
+                // LINHA INFERIOR
+                '<div class="arena-linha-inferior">' +
+
+                    '<div class="arena-secao">' +
+                        '<h3 class="arena-secao-titulo">Ataques</h3>' +
+                        '<div class="arena-ataques-lista">' +
+                            '<div class="arena-ataque-header">' +
+                                '<span>Nome</span><span>Ataque</span><span>Dano</span>' +
+                            '</div>' +
+                            '<div class="arena-ataque-item arena-ataque-placeholder">' +
+                                '<span>— Ataques serão exibidos aqui —</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+
+                    '<div class="arena-secao">' +
+                        '<h3 class="arena-secao-titulo">Controle de magias</h3>' +
+                        '<div class="arena-magias-grid">' + magiasHTML + '</div>' +
+                    '</div>' +
+
+                    '<div class="arena-secao arena-futuro-secao">' +
+                        '<div class="arena-futuro-placeholder">Quadro para futuro uso de outras informações</div>' +
+                    '</div>' +
+
+                '</div>' +
+            '</div>';
+
+        // ✅ Expor funções globais usadas pelos botões do card
+        window._abrirDanoCura = function() {
+            if (typeof modalDanoCuraInstance !== 'undefined') {
+                modalDanoCuraInstance.abrir(this.combatentes);
+            }
+        }.bind(this);
+
+        // ✅ Encerrar turno → avança para o próximo combatente
+        window._avancarTurno = function() {
+            this.avancarTurno();
+        }.bind(this);
     }
 
-    /**
-     * Renderiza um atributo
-     */
     renderizarAtributo(nome, valor) {
         const mod = this.calcularModificador(valor);
-        const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
-        
-        return `
-            <div class="atributo-compacto">
-                <div class="atributo-nome">${nome}</div>
-                <div class="atributo-valor">${valor}</div>
-                <div class="atributo-mod">${modStr}</div>
-            </div>
-        `;
+        const modStr = mod >= 0 ? '+' + mod : '' + mod;
+        return '<div class="atributo-compacto">' +
+            '<div class="atributo-nome">' + nome + '</div>' +
+            '<div class="atributo-valor">' + valor + '</div>' +
+            '<div class="atributo-mod">' + modStr + '</div>' +
+        '</div>';
     }
 
-    /**
-     * Calcula modificador de atributo D&D
-     */
     calcularModificador(valor) {
         return Math.floor((valor - 10) / 2);
     }
 
-    /**
-     * Retorna cor do HP baseado no percentual
-     */
     getCorHP(percentual) {
         if (percentual > 50) return 'linear-gradient(90deg, #32CD32 0%, #228B22 100%)';
         if (percentual > 25) return 'linear-gradient(90deg, #FFA500 0%, #FF8C00 100%)';
         return 'linear-gradient(90deg, #DC143C 0%, #8B0000 100%)';
     }
 
-    /**
-     * Retorna classe CSS para badge do tipo
-     */
     getBadgeClass(tipo) {
-        const classes = {
-            'jogador': 'badge-jogador',
-            'monstro': 'badge-monstro',
-            'npc': 'badge-npc'
-        };
+        const classes = { 'jogador': 'badge-jogador', 'monstro': 'badge-monstro', 'npc': 'badge-npc' };
         return classes[tipo] || 'badge-default';
     }
 
-    /**
-     * Retorna emoji para o tipo
-     */
     getEmojiTipo(tipo) {
-        const emojis = {
-            'jogador': '🧙',
-            'monstro': '👹',
-            'npc': '🤝'
-        };
+        const emojis = { 'jogador': '🧙', 'monstro': '👹', 'npc': '🤝' };
         return emojis[tipo] || '⚔️';
     }
 
-   
-    /**
-     * Reseta o combate
-     */
     resetarCombate() {
-        if (!confirm('⚠️ Deseja realmente resetar o combate?\n\nTodos os combatentes retornarão ao HP máximo.')) {
-            return;
-        }
+        if (!confirm('⚠️ Deseja realmente resetar o combate?\n\nTodos os combatentes retornarão ao HP máximo.')) return;
 
-        this.combatentes.forEach(c => {
+        this.combatentes.forEach(function(c) {
             c.hp_atual = c.hp_maximo;
             this.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
-        });
+        }.bind(this));
 
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
-        this.hpVisivel = false; // ← Resetar para OCULTO
+        this.hpVisivel = false;
         this.atualizarRodada();
-        
         Toast.success('Combate resetado! 🔄');
-        
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
 
-    /**
-     * Atualiza toda a interface da arena após mudanças
-     */
     atualizarInterface() {
-        console.log('🔄 Atualizando interface da arena');
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
 
-    /**
-     * Finaliza o combate
-     */
     finalizarCombate() {
-        if (!confirm('⚠️ Deseja finalizar o combate e voltar para a configuração?')) {
-            return;
-        }
-
+        if (!confirm('⚠️ Deseja finalizar o combate e voltar para a configuração?')) return;
         document.getElementById('telaArena').classList.remove('ativa');
         document.getElementById('telaConfiguracao').classList.add('ativa');
-
         Toast.success('Combate finalizado! 🏁');
     }
 }

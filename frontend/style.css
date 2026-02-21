@@ -2598,3 +2598,1249 @@ header p {
         padding: 1rem 1.5rem;
     }
 }
+
+/* 
+   ARENA DE COMBATE - LAYOUT NOVO (baseado no wireframe)
+    */
+
+.arena-card {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 16px;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.1);
+}
+
+/* ── TOPO ── */
+.arena-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    padding-bottom: 0.8rem;
+}
+
+.arena-foto-nome {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.arena-foto {
+    width: 70px;
+    height: 70px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--cor-dourada);
+    flex-shrink: 0;
+}
+
+.arena-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.arena-foto-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    background: rgba(255,215,0,0.1);
+}
+
+.arena-nome {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 1.3rem;
+    margin: 0 0 0.2rem 0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+.arena-classe {
+    color: var(--cor-pergaminho);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-encerrar-combate {
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    color: #fff;
+    border: 2px solid #DC143C;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-encerrar-combate:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+/* ── STATS LINHA ── */
+.arena-stats-linha {
+    display: flex;
+    gap: 0.8rem;
+    align-items: stretch;
+}
+
+.arena-stat-box {
+    flex: 1;
+    border-radius: 10px;
+    padding: 0.6rem 0.8rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    min-width: 70px;
+}
+
+.arena-stat-label {
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.85;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.arena-stat-valor {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    font-family: var(--fonte-titulo);
+}
+
+.arena-stat-ca {
+    background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
+    border: 2px solid #42A5F5;
+}
+
+.arena-stat-pv {
+    flex: 2;
+    background: linear-gradient(135deg, #880E4F 0%, #4A148C 100%);
+    border: 2px solid #E91E63;
+    position: relative;
+}
+
+.arena-hp-bar {
+    width: 100%;
+    height: 5px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 0.3rem;
+}
+
+.arena-hp-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.arena-stat-surpresa {
+    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+    border: 2px solid #66BB6A;
+}
+
+.arena-stat-toque {
+    background: linear-gradient(135deg, #E65100 0%, #BF360C 100%);
+    border: 2px solid #FF7043;
+}
+
+/* ── GRADE CENTRAL ── */
+.arena-grade-central {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 0.8rem;
+    align-items: start;
+}
+
+.arena-secao {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 10px;
+    padding: 0.8rem;
+}
+
+.arena-secao-titulo {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 0.85rem;
+    margin: 0 0 0.6rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    padding-bottom: 0.4rem;
+}
+
+/* Atributos */
+.arena-atributos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+}
+
+.arena-atributo-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 0.4rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.arena-atributo-nome {
+    font-size: 0.7rem;
+    color: var(--cor-dourada);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.arena-atributo-valor {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.arena-atributo-mod {
+    font-size: 0.75rem;
+    color: var(--cor-pergaminho);
+}
+
+/* Resistências */
+.arena-resistencias-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.arena-resistencia-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+}
+
+.arena-resistencia-nome {
+    font-size: 0.8rem;
+    color: var(--cor-pergaminho);
+}
+
+.arena-resistencia-valor {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--cor-dourada);
+}
+
+/* Condições */
+.arena-condicoes-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.arena-condicao {
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+    transition: filter 0.2s;
+    opacity: 0.5;
+}
+
+.arena-condicao:hover {
+    opacity: 1;
+    filter: brightness(1.2);
+}
+
+.arena-condicao-flanqueado  { background: #E65100; border: 1px solid #FF7043; }
+.arena-condicao-atordoado   { background: #2E7D32; border: 1px solid #66BB6A; }
+.arena-condicao-agarrado    { background: #1565C0; border: 1px solid #42A5F5; }
+.arena-condicao-envenenado  { background: #00695C; border: 1px solid #26A69A; }
+.arena-condicao-sangrando   { background: #B71C1C; border: 1px solid #EF5350; }
+
+/* Coluna de Ações */
+.arena-acoes-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.arena-btn-dano-cura {
+    background: linear-gradient(135deg, #00838F 0%, #006064 100%);
+    color: #fff;
+    border: 2px solid #26C6DA;
+    border-radius: 8px;
+    padding: 0.6rem 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.arena-btn-condicao {
+    background: linear-gradient(135deg, #6A1B9A 0%, #4A148C 100%);
+    color: #fff;
+    border: 2px solid #AB47BC;
+    border-radius: 8px;
+    padding: 0.6rem 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.arena-btn-proximo {
+    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+    color: #fff;
+    border: 2px solid #66BB6A;
+    border-radius: 8px;
+    padding: 0.8rem 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: auto;
+}
+
+.arena-btn-dano-cura:hover,
+.arena-btn-condicao:hover,
+.arena-btn-proximo:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+/* ── LINHA INFERIOR ── */
+.arena-linha-inferior {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.8rem;
+    align-items: start;
+}
+
+/* Ataques */
+.arena-ataques-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.arena-ataque-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.4rem;
+    padding: 0.3rem 0.4rem;
+    background: rgba(255,215,0,0.1);
+    border-radius: 6px;
+    font-size: 0.7rem;
+    color: var(--cor-dourada);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.arena-ataque-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.4rem;
+    padding: 0.35rem 0.4rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--cor-pergaminho);
+    border-left: 3px solid var(--cor-madeira);
+}
+
+.arena-ataque-placeholder {
+    grid-template-columns: 1fr;
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+    font-style: italic;
+    border-left: none;
+}
+
+/* Magias */
+.arena-magias-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.arena-magia-linha {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.4rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+}
+
+.arena-magia-nivel {
+    font-size: 0.7rem;
+    color: var(--cor-dourada);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.arena-magia-controle {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.arena-magia-btn {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.arena-magia-btn:hover {
+    background: rgba(255,215,0,0.2);
+}
+
+.arena-magia-valor {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #fff;
+    min-width: 20px;
+    text-align: center;
+}
+
+.arena-magia-usados {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Placeholder futuro */
+.arena-futuro-secao {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arena-futuro-placeholder {
+    color: rgba(255,255,255,0.2);
+    font-style: italic;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* ── RESPONSIVO ── */
+@media (max-width: 900px) {
+    .arena-grade-central {
+        grid-template-columns: 1fr 1fr;
+    }
+    .arena-linha-inferior {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .arena-grade-central {
+        grid-template-columns: 1fr;
+    }
+    .arena-stats-linha {
+        flex-wrap: wrap;
+    }
+}
+
+/* 
+   ARENA DE COMBATE - LAYOUT NOVO (sem scrollbar, foto lateral)
+    */
+
+/* Layout geral da tela arena */
+#telaArena {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#telaArena header {
+    flex-shrink: 0;
+}
+
+.arena-layout {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0.8rem;
+    overflow: hidden;
+    padding: 0.5rem;
+    min-height: 0;
+}
+
+/* ── COLUNA ESQUERDA ── */
+.ordem-iniciativa-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* ✅ FOTO VERTICAL DO COMBATENTE ATIVO */
+.arena-foto-vertical-container {
+    flex-shrink: 0;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--cor-dourada);
+    background: rgba(0,0,0,0.3);
+    aspect-ratio: 3/4;
+    max-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arena-foto-vertical-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.arena-foto-vertical-placeholder {
+    font-size: 3rem;
+    color: rgba(255,215,0,0.4);
+    text-align: center;
+}
+
+.ordem-header {
+    flex-shrink: 0;
+}
+
+.ordem-lista {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* ── COLUNA PRINCIPAL ── */
+.arena-main-ativo {
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 0.3rem;
+}
+
+/* ── CARD PRINCIPAL ── */
+.arena-card {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 16px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.1);
+}
+
+/* ── TOPO ── */
+.arena-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    padding-bottom: 0.6rem;
+}
+
+.arena-foto-nome {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.arena-foto {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--cor-dourada);
+    flex-shrink: 0;
+}
+
+.arena-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.arena-foto-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: rgba(255,215,0,0.1);
+}
+
+.arena-nome {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 1.1rem;
+    margin: 0 0 0.1rem 0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+.arena-classe {
+    color: var(--cor-pergaminho);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-encerrar-combate {
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    color: #fff;
+    border: 2px solid #DC143C;
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-encerrar-combate:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+/* ── STATS LINHA ── */
+.arena-stats-linha {
+    display: flex;
+    gap: 0.6rem;
+    align-items: stretch;
+}
+
+.arena-stat-box {
+    flex: 1;
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    min-width: 60px;
+}
+
+.arena-stat-label {
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.85;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.arena-stat-valor {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #fff;
+    font-family: var(--fonte-titulo);
+}
+
+.arena-stat-ca       { background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%); border: 2px solid #42A5F5; }
+.arena-stat-pv       { flex: 2; background: linear-gradient(135deg, #880E4F 0%, #4A148C 100%); border: 2px solid #E91E63; }
+.arena-stat-surpresa { background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%); border: 2px solid #66BB6A; }
+.arena-stat-toque    { background: linear-gradient(135deg, #E65100 0%, #BF360C 100%); border: 2px solid #FF7043; }
+
+.arena-hp-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 0.2rem;
+}
+
+.arena-hp-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+/* ── GRADE CENTRAL ── */
+.arena-grade-central {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 0.6rem;
+    align-items: start;
+}
+
+.arena-secao {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 8px;
+    padding: 0.6rem;
+}
+
+.arena-secao-titulo {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 0.75rem;
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    padding-bottom: 0.3rem;
+}
+
+/* Atributos */
+.arena-atributos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem;
+}
+
+.arena-atributo-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 0.3rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.arena-atributo-nome  { font-size: 0.65rem; color: var(--cor-dourada); font-weight: bold; text-transform: uppercase; }
+.arena-atributo-valor { font-size: 1rem; font-weight: bold; color: #fff; }
+.arena-atributo-mod   { font-size: 0.7rem; color: var(--cor-pergaminho); }
+
+/* Resistências */
+.arena-resistencias-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.arena-resistencia-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    border-radius: 5px;
+    padding: 0.3rem 0.5rem;
+}
+
+.arena-resistencia-nome  { font-size: 0.75rem; color: var(--cor-pergaminho); }
+.arena-resistencia-valor { font-size: 0.9rem; font-weight: bold; color: var(--cor-dourada); }
+
+/* Condições */
+.arena-condicoes-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.arena-condicao {
+    padding: 0.28rem 0.5rem;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.45;
+}
+
+.arena-condicao:hover               { opacity: 1; filter: brightness(1.2); }
+.arena-condicao-flanqueado          { background: #E65100; border: 1px solid #FF7043; }
+.arena-condicao-atordoado           { background: #2E7D32; border: 1px solid #66BB6A; }
+.arena-condicao-agarrado            { background: #1565C0; border: 1px solid #42A5F5; }
+.arena-condicao-envenenado          { background: #00695C; border: 1px solid #26A69A; }
+.arena-condicao-sangrando           { background: #B71C1C; border: 1px solid #EF5350; }
+
+/* Coluna de Ações */
+.arena-acoes-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.arena-btn-dano-cura,
+.arena-btn-condicao,
+.arena-btn-proximo {
+    border-radius: 7px;
+    padding: 0.5rem 0.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    width: 100%;
+    border-width: 2px;
+    border-style: solid;
+    color: #fff;
+}
+
+.arena-btn-dano-cura { background: linear-gradient(135deg, #00838F, #006064); border-color: #26C6DA; }
+.arena-btn-condicao  { background: linear-gradient(135deg, #6A1B9A, #4A148C); border-color: #AB47BC; }
+.arena-btn-proximo   { background: linear-gradient(135deg, #1B5E20, #2E7D32); border-color: #66BB6A; margin-top: 0.3rem; padding: 0.7rem 0.4rem; }
+
+.arena-btn-dano-cura:hover,
+.arena-btn-condicao:hover,
+.arena-btn-proximo:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+/* ── LINHA INFERIOR ── */
+.arena-linha-inferior {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.6rem;
+    align-items: start;
+}
+
+/* Ataques */
+.arena-ataques-lista    { display: flex; flex-direction: column; gap: 0.25rem; }
+
+.arena-ataque-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.3rem;
+    padding: 0.25rem 0.4rem;
+    background: rgba(255,215,0,0.1);
+    border-radius: 5px;
+    font-size: 0.65rem;
+    color: var(--cor-dourada);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.arena-ataque-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.3rem;
+    padding: 0.3rem 0.4rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 5px;
+    font-size: 0.78rem;
+    color: var(--cor-pergaminho);
+    border-left: 3px solid var(--cor-madeira);
+}
+
+.arena-ataque-placeholder {
+    grid-template-columns: 1fr;
+    text-align: center;
+    color: rgba(255,255,255,0.25);
+    font-style: italic;
+    border-left: none;
+}
+
+/* Magias */
+.arena-magias-grid { display: flex; flex-direction: column; gap: 0.2rem; }
+
+.arena-magia-linha {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.4rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 5px;
+}
+
+.arena-magia-nivel   { font-size: 0.65rem; color: var(--cor-dourada); font-weight: bold; }
+.arena-magia-controle { display: flex; align-items: center; gap: 0.25rem; }
+
+.arena-magia-btn {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    padding: 0;
+    line-height: 1;
+}
+
+.arena-magia-btn:hover  { background: rgba(255,215,0,0.2); }
+.arena-magia-valor      { font-size: 0.85rem; font-weight: bold; color: #fff; min-width: 16px; text-align: center; }
+.arena-magia-usados     { font-size: 0.75rem; color: rgba(255,255,255,0.35); min-width: 16px; text-align: center; }
+
+/* Placeholder futuro */
+.arena-futuro-secao { min-height: 80px; display: flex; align-items: center; justify-content: center; }
+.arena-futuro-placeholder { color: rgba(255,255,255,0.2); font-style: italic; font-size: 0.8rem; text-align: center; }
+
+/* ── RESPONSIVO ── */
+@media (max-width: 1100px) {
+    .arena-grade-central    { grid-template-columns: 1fr 1fr; }
+    .arena-linha-inferior   { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+    .arena-layout           { grid-template-columns: 1fr; }
+    .arena-grade-central    { grid-template-columns: 1fr 1fr; }
+    .arena-linha-inferior   { grid-template-columns: 1fr; }
+    #telaArena              { height: auto; overflow: auto; }
+}
+
+/* ============================================================
+   ARENA DE COMBATE - LAYOUT NOVO
+   Escopo isolado: não afeta telaConfiguracao
+   ============================================================ */
+
+/* Layout da tela arena — sem afetar outras telas */
+#telaArena.ativa {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+#telaArena .arena-layout {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 0.8rem;
+    padding: 0.5rem;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Coluna esquerda */
+#telaArena .ordem-iniciativa-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Foto vertical do ativo */
+.arena-foto-vertical-container {
+    width: 100%;
+    flex-shrink: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--cor-dourada);
+    background: rgba(0,0,0,0.3);
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arena-foto-vertical-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.arena-foto-vertical-placeholder {
+    font-size: 3rem;
+    color: rgba(255,215,0,0.4);
+}
+
+#telaArena .ordem-header { flex-shrink: 0; }
+
+#telaArena .ordem-lista {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* Coluna principal */
+#telaArena .arena-main-ativo {
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 0.3rem;
+}
+
+/* ── CARD ── */
+.arena-card {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 14px;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(255,215,0,0.1);
+}
+
+/* TOPO */
+.arena-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    padding-bottom: 0.6rem;
+}
+
+.arena-foto-nome { display: flex; align-items: center; gap: 0.7rem; }
+
+.arena-foto {
+    width: 46px; height: 46px;
+    border-radius: 8px; overflow: hidden;
+    border: 2px solid var(--cor-dourada); flex-shrink: 0;
+}
+
+.arena-foto img { width: 100%; height: 100%; object-fit: cover; }
+
+.arena-foto-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    background: rgba(255,215,0,0.1);
+}
+
+.arena-nome {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 1rem;
+    margin: 0 0 0.1rem 0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+.arena-classe {
+    color: var(--cor-pergaminho);
+    font-size: 0.82rem;
+    display: flex; align-items: center; gap: 0.4rem;
+}
+
+.btn-encerrar-combate {
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    color: #fff;
+    border: 2px solid #DC143C;
+    border-radius: 7px;
+    padding: 0.35rem 0.7rem;
+    font-weight: bold; cursor: pointer;
+    font-size: 0.78rem; transition: all 0.2s; white-space: nowrap;
+}
+
+.btn-encerrar-combate:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+/* STATS */
+.arena-stats-linha {
+    display: flex; gap: 0.5rem; align-items: stretch;
+}
+
+.arena-stat-box {
+    flex: 1; border-radius: 8px; padding: 0.35rem 0.5rem;
+    text-align: center; display: flex; flex-direction: column;
+    align-items: center; gap: 0.1rem; min-width: 55px;
+}
+
+.arena-stat-label { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; opacity: 0.9; color: #fff; letter-spacing: 1px; }
+.arena-stat-valor { font-size: 1.2rem; font-weight: bold; color: #fff; font-family: var(--fonte-titulo); }
+
+.arena-stat-ca       { background: linear-gradient(135deg, #1565C0, #0D47A1); border: 2px solid #42A5F5; }
+.arena-stat-pv       { flex: 2; background: linear-gradient(135deg, #880E4F, #4A148C); border: 2px solid #E91E63; }
+.arena-stat-surpresa { background: linear-gradient(135deg, #1B5E20, #2E7D32); border: 2px solid #66BB6A; }
+.arena-stat-toque    { background: linear-gradient(135deg, #E65100, #BF360C); border: 2px solid #FF7043; }
+
+.arena-hp-bar {
+    width: 100%; height: 4px;
+    background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; margin-top: 0.2rem;
+}
+.arena-hp-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+
+/* GRADE CENTRAL */
+.arena-grade-central {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 0.5rem; align-items: start;
+}
+
+.arena-secao {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 8px; padding: 0.55rem;
+}
+
+.arena-secao-titulo {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 0.7rem; margin: 0 0 0.4rem 0;
+    text-transform: uppercase; letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255,215,0,0.2); padding-bottom: 0.3rem;
+}
+
+/* Atributos */
+.arena-atributos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.28rem; }
+
+.arena-atributo-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px; padding: 0.25rem;
+    text-align: center; display: flex; flex-direction: column; gap: 0;
+}
+
+.arena-atributo-nome  { font-size: 0.6rem; color: var(--cor-dourada); font-weight: bold; text-transform: uppercase; }
+.arena-atributo-valor { font-size: 0.95rem; font-weight: bold; color: #fff; }
+.arena-atributo-mod   { font-size: 0.65rem; color: var(--cor-pergaminho); }
+
+/* Resistências */
+.arena-resistencias-lista { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.arena-resistencia-item {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.05); border-radius: 5px; padding: 0.28rem 0.5rem;
+}
+
+.arena-resistencia-nome  { font-size: 0.72rem; color: var(--cor-pergaminho); }
+.arena-resistencia-valor { font-size: 0.88rem; font-weight: bold; color: var(--cor-dourada); }
+
+/* Condições */
+.arena-condicoes-lista { display: flex; flex-direction: column; gap: 0.28rem; }
+
+.arena-condicao {
+    padding: 0.25rem 0.4rem; border-radius: 5px;
+    font-size: 0.72rem; font-weight: bold; color: #fff;
+    text-align: center; cursor: pointer;
+    transition: all 0.2s; opacity: 0.45;
+}
+
+.arena-condicao:hover               { opacity: 1; filter: brightness(1.2); }
+.arena-condicao-flanqueado          { background: #E65100; border: 1px solid #FF7043; }
+.arena-condicao-atordoado           { background: #2E7D32; border: 1px solid #66BB6A; }
+.arena-condicao-agarrado            { background: #1565C0; border: 1px solid #42A5F5; }
+.arena-condicao-envenenado          { background: #00695C; border: 1px solid #26A69A; }
+.arena-condicao-sangrando           { background: #B71C1C; border: 1px solid #EF5350; }
+
+/* Ações */
+.arena-acoes-col { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.arena-btn-dano-cura,
+.arena-btn-condicao,
+.arena-btn-proximo {
+    border-radius: 7px; padding: 0.45rem 0.4rem;
+    font-weight: bold; cursor: pointer;
+    font-size: 0.78rem; transition: all 0.2s;
+    width: 100%; border-width: 2px; border-style: solid; color: #fff;
+}
+
+.arena-btn-dano-cura { background: linear-gradient(135deg, #00838F, #006064); border-color: #26C6DA; }
+.arena-btn-condicao  { background: linear-gradient(135deg, #6A1B9A, #4A148C); border-color: #AB47BC; }
+.arena-btn-proximo   { background: linear-gradient(135deg, #1B5E20, #2E7D32); border-color: #66BB6A; margin-top: auto; padding: 0.6rem 0.4rem; }
+
+.arena-btn-dano-cura:hover,
+.arena-btn-condicao:hover,
+.arena-btn-proximo:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+/* LINHA INFERIOR */
+.arena-linha-inferior {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem; align-items: start;
+}
+
+/* Ataques */
+.arena-ataques-lista { display: flex; flex-direction: column; gap: 0.22rem; }
+
+.arena-ataque-header {
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.3rem;
+    padding: 0.22rem 0.4rem;
+    background: rgba(255,215,0,0.1); border-radius: 4px;
+    font-size: 0.62rem; color: var(--cor-dourada);
+    font-weight: bold; text-transform: uppercase;
+}
+
+.arena-ataque-item {
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.3rem;
+    padding: 0.28rem 0.4rem;
+    background: rgba(255,255,255,0.04); border-radius: 4px;
+    font-size: 0.75rem; color: var(--cor-pergaminho);
+    border-left: 3px solid var(--cor-madeira);
+}
+
+.arena-ataque-placeholder {
+    grid-template-columns: 1fr; text-align: center;
+    color: rgba(255,255,255,0.25); font-style: italic; border-left: none;
+}
+
+/* Magias */
+.arena-magias-grid { display: flex; flex-direction: column; gap: 0.18rem; }
+
+.arena-magia-linha {
+    display: grid; grid-template-columns: 1fr auto auto;
+    align-items: center; gap: 0.3rem;
+    padding: 0.18rem 0.4rem;
+    background: rgba(255,255,255,0.04); border-radius: 4px;
+}
+
+.arena-magia-nivel   { font-size: 0.62rem; color: var(--cor-dourada); font-weight: bold; }
+.arena-magia-controle { display: flex; align-items: center; gap: 0.22rem; }
+
+.arena-magia-btn {
+    background: rgba(255,255,255,0.1); color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px; width: 17px; height: 17px;
+    cursor: pointer; font-size: 0.8rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s; padding: 0; line-height: 1;
+}
+
+.arena-magia-btn:hover  { background: rgba(255,215,0,0.2); }
+.arena-magia-valor      { font-size: 0.82rem; font-weight: bold; color: #fff; min-width: 14px; text-align: center; }
+.arena-magia-usados     { font-size: 0.72rem; color: rgba(255,255,255,0.3); min-width: 14px; text-align: center; }
+
+/* Placeholder futuro */
+.arena-futuro-secao   { min-height: 60px; display: flex; align-items: center; justify-content: center; }
+.arena-futuro-placeholder { color: rgba(255,255,255,0.2); font-style: italic; font-size: 0.78rem; text-align: center; }
+
+/* RESPONSIVO */
+@media (max-width: 1100px) {
+    #telaArena .arena-layout      { grid-template-columns: 180px 1fr; }
+    .arena-grade-central          { grid-template-columns: 1fr 1fr; }
+    .arena-linha-inferior         { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+    #telaArena .arena-layout      { grid-template-columns: 1fr; }
+    #telaArena.ativa              { height: auto; overflow: auto; }
+    .arena-grade-central          { grid-template-columns: 1fr 1fr; }
+    .arena-linha-inferior         { grid-template-columns: 1fr; }
+}
