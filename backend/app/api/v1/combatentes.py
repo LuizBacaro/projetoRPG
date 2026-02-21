@@ -50,7 +50,7 @@ async def criar_combatente(
     iniciativa: int = Form(...),
     tipo: str = Form("jogador"),
     classe: str = Form("Aventureiro"),
-    # Defesa
+    # ✅ Defesa
     ca: int = Form(10),
     toque: int = Form(10),
     surpresa: int = Form(10),
@@ -74,13 +74,25 @@ async def criar_combatente(
     """Cria um novo combatente"""
     service = get_combatente_service(db)
     combatente_data = {
-        "nome": nome, "tipo": tipo, "classe": classe,
-        "hp_maximo": hp_maximo, "iniciativa": iniciativa,
-        "ca": ca, "toque": toque, "surpresa": surpresa,
-        "forca": forca, "destreza": destreza, "constituicao": constituicao,
-        "inteligencia": inteligencia, "sabedoria": sabedoria, "carisma": carisma,
-        "fortitude": fortitude, "reflexos": reflexos, "vontade": vontade,
-        "nivel": nivel, "pontos": pontos
+        "nome": nome,
+        "tipo": tipo,
+        "classe": classe,
+        "hp_maximo": hp_maximo,
+        "iniciativa": iniciativa,
+        "ca": ca,
+        "toque": toque,
+        "surpresa": surpresa,
+        "forca": forca,
+        "destreza": destreza,
+        "constituicao": constituicao,
+        "inteligencia": inteligencia,
+        "sabedoria": sabedoria,
+        "carisma": carisma,
+        "fortitude": fortitude,
+        "reflexos": reflexos,
+        "vontade": vontade,
+        "nivel": nivel,
+        "pontos": pontos
     }
     try:
         return service.criar(combatente_data, foto)
@@ -96,7 +108,7 @@ async def atualizar_combatente(
     iniciativa: int = Form(...),
     tipo: str = Form(...),
     classe: str = Form("Aventureiro"),
-    # Defesa
+    # ✅ Defesa
     ca: int = Form(10),
     toque: int = Form(10),
     surpresa: int = Form(10),
@@ -120,13 +132,25 @@ async def atualizar_combatente(
     """Atualiza um combatente existente"""
     service = get_combatente_service(db)
     combatente_data = {
-        "nome": nome, "tipo": tipo, "classe": classe,
-        "hp_maximo": hp_maximo, "iniciativa": iniciativa,
-        "ca": ca, "toque": toque, "surpresa": surpresa,
-        "forca": forca, "destreza": destreza, "constituicao": constituicao,
-        "inteligencia": inteligencia, "sabedoria": sabedoria, "carisma": carisma,
-        "fortitude": fortitude, "reflexos": reflexos, "vontade": vontade,
-        "nivel": nivel, "pontos": pontos
+        "nome": nome,
+        "tipo": tipo,
+        "classe": classe,
+        "hp_maximo": hp_maximo,
+        "iniciativa": iniciativa,
+        "ca": ca,
+        "toque": toque,
+        "surpresa": surpresa,
+        "forca": forca,
+        "destreza": destreza,
+        "constituicao": constituicao,
+        "inteligencia": inteligencia,
+        "sabedoria": sabedoria,
+        "carisma": carisma,
+        "fortitude": fortitude,
+        "reflexos": reflexos,
+        "vontade": vontade,
+        "nivel": nivel,
+        "pontos": pontos
     }
     try:
         return service.atualizar(combatente_id, combatente_data, foto)
