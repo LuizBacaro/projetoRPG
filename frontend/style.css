@@ -137,103 +137,171 @@ header p {
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
-    max-height: 500px;
+    max-height: 600px;
     overflow-y: auto;
+    padding-right: 0.5rem;
 }
 
-/* ✅ CORRIGIDO: flex-wrap e min-height garantidos */
+.lista-combatentes::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lista-combatentes::-webkit-scrollbar-track {
+    background: rgba(139, 69, 19, 0.1);
+    border-radius: 4px;
+}
+
+.lista-combatentes::-webkit-scrollbar-thumb {
+    background: var(--cor-madeira);
+    border-radius: 4px;
+}
+
 .combatente-card {
+    background: linear-gradient(135deg, #f5f5dc 0%, #e8dcc4 100%);
+    border: 3px solid var(--cor-madeira);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
-    border: 2px solid var(--cor-madeira);
-    border-radius: 12px;
-    cursor: pointer;
+    gap: 0.75rem;
     transition: all 0.3s;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    flex-wrap: nowrap;
-    min-height: 70px;
+    min-width: 0;                           /* ← evita overflow do flex pai */
 }
 
 .combatente-card:hover {
-    border-color: var(--cor-dourada);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    border-color: var(--cor-dourada);
 }
 
-.combatente-card.selecionado {
-    border-color: var(--cor-dourada);
-    background: linear-gradient(135deg, #2a2015 0%, #3a2820 100%);
-    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+.combatente-card.selected {
+    border: 3px solid var(--cor-dourada);
+    background: linear-gradient(135deg, #fff8dc 0%, #f0e6c8 100%);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+/* div inline do HTML (display:flex dentro do card) */
+.combatente-card > div {
+    min-width: 0;                           /* ← impede overflow do conteúdo interno */
+    flex: 1;
 }
 
 .combatente-foto {
-    width: 60px;
-    height: 60px;
+    width: 56px;                            /* ← era 80px, reduzido para caber melhor */
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--cor-madeira);
+    object-position: center top;
+    border: 3px solid var(--cor-madeira);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     flex-shrink: 0;
 }
 
 .combatente-foto-placeholder {
-    width: 60px;
-    height: 60px;
+    width: 56px;                            /* ← era 80px */
+    height: 56px;
     border-radius: 50%;
-    border: 2px solid var(--cor-madeira);
-    background: rgba(139, 69, 19, 0.3);
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 1.8rem;                      /* ← era 2.5rem */
+    border: 3px solid var(--cor-madeira);
     flex-shrink: 0;
 }
 
-/* ✅ CORRIGIDO: info com flex column */
 .combatente-info {
     flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-.combatente-nome {
-    font-family: var(--fonte-titulo);
-    color: var(--cor-dourada);
-    font-size: 1rem;
-    font-weight: bold;
-    white-space: nowrap;
+    min-width: 0;                           /* ← adicionado, essencial para ellipsis funcionar */
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-/* ✅ CORRIGIDO: ellipsis na classe */
-.combatente-classe {
-    color: var(--cor-madeira-claro);
-    font-size: 0.85rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.combatente-hp {
-    font-size: 0.85rem;
-    color: var(--cor-pergaminho);
-    margin-top: 0.2rem;
-}
-
-/* ✅ Ações do card (btn-editar) */
-.combatente-acoes {
+.combatente-header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.combatente-header h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-madeira);
+    font-size: 1.1rem;                      /* ← era 1.3rem */
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.combatente-classe {
+    color: #654321;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.combatente-stats {
+    display: flex;
+    gap: 0.75rem;                           /* ← era 1.5rem */
+    flex-wrap: wrap;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.stat-label {
+    font-weight: bold;
+    color: var(--cor-madeira);
+    font-size: 0.8rem;
+}
+
+.stat-value {
+    color: #654321;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* ==================== BADGES ==================== */
+
+.badge {
+    padding: 0.2rem 0.6rem;                 /* ← era 0.3rem 0.8rem */
+    border-radius: 20px;
+    font-size: 0.75rem;                     /* ← era 0.85rem */
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
     flex-shrink: 0;
 }
 
+.badge-jogador {
+    background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%);
+    color: #FFD700;
+}
+
+.badge-monstro {
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    color: #FFD700;
+}
+
+.badge-npc {
+    background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+    color: #FFD700;
+}
+
+/* ==================== BOTÃO EDITAR ==================== */
+
 .btn-editar {
+    padding: 0.4rem 0.8rem;                 /* ← era 0.6rem 1.2rem */
     background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
     border: 2px solid var(--cor-madeira);
     border-radius: 8px;
@@ -242,9 +310,10 @@ header p {
     cursor: pointer;
     transition: all 0.3s;
     font-family: var(--fonte-texto);
+    font-size: 0.8rem;                      /* ← reduzido */
     white-space: nowrap;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
+    flex-shrink: 0;
+    align-self: center;
 }
 
 .btn-editar:hover {
@@ -515,6 +584,40 @@ header p {
     background: linear-gradient(135deg, #ff1744 0%, #c62828 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(220, 20, 60, 0.5);
+}
+
+/* ==================== BOTÃO ADICIONAR COMBATENTE ==================== */
+
+.btn-add-combatente {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    color: var(--cor-dourada);
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--fonte-titulo);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+}
+
+.btn-add-combatente:hover {
+    background: linear-gradient(135deg, #a0522d 0%, var(--cor-madeira) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 215, 0, 0.35);
+    border-color: #ffed4e;
+}
+
+.btn-add-combatente:active {
+    transform: translateY(0);
 }
 
 /* ==================== BOTÕES ADICIONAR COMBATENTES ==================== */
