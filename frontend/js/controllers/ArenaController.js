@@ -12,6 +12,7 @@ export class ArenaController {
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
         this.hpVisivel = false;
+        this.caVisivel = false;
         this.inicializar();
     }
 
@@ -47,6 +48,7 @@ export class ArenaController {
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
         this.hpVisivel = false;
+        this.caVisivel = false;
         this.atualizarRodada();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
@@ -69,6 +71,12 @@ export class ArenaController {
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
         Toast.success(this.hpVisivel ? '👁️ HP Visível' : '🙈 HP Oculto');
+    }
+
+    toggleVisibilidadeCA() {
+        this.caVisivel = !this.caVisivel;
+        this.renderizarCombatenteAtivo();
+        Toast.success(this.caVisivel ? '👁️ CA Visível' : '🙈 CA Oculto');
     }
 
     atualizarRodada() {
@@ -149,6 +157,16 @@ export class ArenaController {
             return val >= 0 ? '+' + val : '' + val;
         };
 
+        // ✅ CA: visibilidade controlada
+        const caValor  = this.caVisivel ? ca    : '?';
+        const caClasse = this.caVisivel ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        const caOlho   = this.caVisivel ? '👁️' : '🙈';
+
+        // ✅ PV: visibilidade controlada
+        const pvValor  = this.hpVisivel ? (combatente.hp_atual + '/' + combatente.hp_maximo) : '???/???';
+        const pvClasse = this.hpVisivel ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        const pvOlho   = this.hpVisivel ? '👁️' : '🙈';
+
         const atributos = [
             ['For', combatente.forca        || 10],
             ['Des', combatente.destreza     || 10],
@@ -182,13 +200,6 @@ export class ArenaController {
             ? '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '">'
             : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
 
-        // ✅ Valor do PV respeitando visibilidade
-        const pvValor = this.hpVisivel
-            ? (combatente.hp_atual + '/' + combatente.hp_maximo)
-            : '???/???';
-        const pvClasse = this.hpVisivel ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-        const pvOlho   = this.hpVisivel ? '👁️' : '🙈';
-
         container.innerHTML =
             '<div class="arena-card">' +
 
@@ -210,12 +221,15 @@ export class ArenaController {
 
                 // STATS: CA / PV / S / T
                 '<div class="arena-stats-linha">' +
+
+                    // ✅ CA com toggle
                     '<div class="arena-stat-box arena-stat-ca">' +
                         '<span class="arena-stat-label">CA</span>' +
-                        '<span class="arena-stat-valor">' + ca + '</span>' +
+                        '<button class="arena-hp-toggle" onclick="window._toggleCA()" title="Mostrar/Ocultar CA">' + caOlho + '</button>' +
+                        '<span class="' + caClasse + '">' + caValor + '</span>' +
                     '</div>' +
 
-                    // ✅ PV com botão toggle olho
+                    // ✅ PV com toggle
                     '<div class="arena-stat-box arena-stat-pv">' +
                         '<span class="arena-stat-label">PV</span>' +
                         '<button class="arena-hp-toggle" onclick="window._toggleHP()" title="Mostrar/Ocultar HP">' + pvOlho + '</button>' +
@@ -317,9 +331,13 @@ export class ArenaController {
             this.avancarTurno();
         }.bind(this);
 
-        // ✅ Toggle ocultar/mostrar HP
         window._toggleHP = function() {
             this.toggleVisibilidadeHP();
+        }.bind(this);
+
+        // ✅ Toggle CA
+        window._toggleCA = function() {
+            this.toggleVisibilidadeCA();
         }.bind(this);
     }
 
@@ -364,6 +382,7 @@ export class ArenaController {
         this.turnoAtual = 0;
         this.rodadaAtual = 1;
         this.hpVisivel = false;
+        this.caVisivel = false;
         this.atualizarRodada();
         Toast.success('Combate resetado! 🔄');
         this.renderizarOrdemIniciativa();
