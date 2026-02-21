@@ -1,150 +1,28 @@
 """
-Script de migração para adicionar campos nivel e pontos
-Execute: python migration.py
+Script de migração para adicionar campos CA, TOQUE e SURPRESA
 """
+from app.core.database import engine
+from sqlalchemy import text
 
-from sqlalchemy import create_engine, text
-import sys
-
-# ATENÇÃO: Usar o mesmo nome do banco que database.py usa
-SQLALCHEMY_DATABASE_URL = "sqlite:///./rpg_arena.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-
-def verificar_tabela_existe(conn):
-    """Verifica se a tabela combatentes existe"""
-    result = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name='combatentes'"))
-    return result.fetchone() is not None
-
-
-def criar_tabelas():
-    """Cria as tabelas se não existirem"""
-    print("🔍 Verificando se tabelas existem...")
-    
-    try:
-        from database import Base
-        import models
+def migrar():
+    with engine.connect() as conn:
+        # Verificar se colunas já existem antes de adicionar
+        colunas_novas = [
+            ("ca", "INTEGER DEFAULT 10"),
+            ("toque", "INTEGER DEFAULT 10"),
+            ("surpresa", "INTEGER DEFAULT 10"),
+        ]
         
-        Base.metadata.create_all(bind=engine)
-        print("✅ Tabelas criadas/verificadas com sucesso!")
-        return True
-    except Exception as e:
-        print(f"❌ Erro ao criar tabelas: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
-
-
-def migrate():
-    """Adiciona colunas nivel e pontos na tabela combatentes"""
-    
-    print("🔄 Iniciando migração do banco de dados...")
-    print("=" * 50)
-    
-    try:
-        with engine.connect() as conn:
-            # Verificar se tabela existe
-            if not verificar_tabela_existe(conn):
-                print("⚠️  Tabela 'combatentes' não existe!")
-                print("🔧 Criando tabelas do banco de dados...")
-                if not criar_tabelas():
-                    print("❌ Falha ao criar tabelas. Abortando.")
-                    return False
-                print()
-            
-            # Verificar colunas existentes
-            result = conn.execute(text("PRAGMA table_info(combatentes)"))
-            colunas_existentes = [row[1] for row in result]
-            
-            print(f"📊 Colunas existentes: {colunas_existentes}")
-            print()
-            
-            # Adicionar coluna nivel
-            if 'nivel' not in colunas_existentes:
-                try:
-                    conn.execute(text("ALTER TABLE combatentes ADD COLUMN nivel INTEGER DEFAULT 1"))
-                    conn.commit()
-                    print("✅ Coluna 'nivel' adicionada com sucesso!")
-                except Exception as e:
-                    print(f"❌ Erro ao adicionar coluna 'nivel': {e}")
-                    conn.rollback()
-                    return False
-            else:
-                print("⚠️  Coluna 'nivel' já existe, pulando...")
-            
-            # Adicionar coluna pontos
-            if 'pontos' not in colunas_existentes:
-                try:
-                    conn.execute(text("ALTER TABLE combatentes ADD COLUMN pontos INTEGER DEFAULT 0"))
-                    conn.commit()
-                    print("✅ Coluna 'pontos' adicionada com sucesso!")
-                except Exception as e:
-                    print(f"❌ Erro ao adicionar coluna 'pontos': {e}")
-                    conn.rollback()
-                    return False
-            else:
-                print("⚠️  Coluna 'pontos' já existe, pulando...")
-            
-            print()
-            print("=" * 50)
-            
-            # Verificar resultado final
-            result = conn.execute(text("PRAGMA table_info(combatentes)"))
-            colunas_finais = [row[1] for row in result]
-            
-            print(f"📊 Colunas após migração: {colunas_finais}")
-            print()
-            
-            if 'nivel' in colunas_finais and 'pontos' in colunas_finais:
-                print("🎉 Migração concluída com sucesso!")
-                print("✅ Banco de dados atualizado")
-                return True
-            else:
-                print("⚠️  Migração parcial - verifique os erros acima")
-                return False
-                
-    except Exception as e:
-        print(f"❌ Erro fatal na migração: {e}")
-        import traceback
-        traceback.print_exc()
-        return False
-
-
-def verificar_dados():
-    """Verifica alguns dados após migração"""
-    print()
-    print("🔍 Verificando dados existentes...")
-    print("=" * 50)
-    
-    try:
-        with engine.connect() as conn:
-            result = conn.execute(text("SELECT id, nome, nivel, pontos FROM combatentes LIMIT 5"))
-            rows = result.fetchall()
-            
-            if rows:
-                print("Primeiros 5 combatentes:")
-                for row in rows:
-                    print(f"  ID: {row[0]} | Nome: {row[1]} | Nível: {row[2]} | Pontos: {row[3]}")
-            else:
-                print("  📭 Nenhum combatente cadastrado ainda.")
-        
-        print("=" * 50)
-    except Exception as e:
-        print(f"⚠️  Erro ao verificar dados: {e}")
-
+        for coluna, definicao in colunas_novas:
+            try:
+                conn.execute(text(f"ALTER TABLE combatentes ADD COLUMN {coluna} {definicao}"))
+                conn.commit()
+                print(f"✅ Coluna '{coluna}' adicionada com sucesso")
+            except Exception as e:
+                if "duplicate column" in str(e).lower() or "already exists" in str(e).lower():
+                    print(f"⚠️ Coluna '{coluna}' já existe, pulando...")
+                else:
+                    print(f"❌ Erro ao adicionar coluna '{coluna}': {e}")
 
 if __name__ == "__main__":
-    print("🛡️  MIGRAÇÃO DE BANCO DE DADOS - Arena TTRPG")
-    print()
-    
-    sucesso = migrate()
-    
-    if sucesso:
-        verificar_dados()
-        print()
-        print("✅ Tudo pronto! Reinicie o servidor FastAPI.")
-        print("   Comando: uvicorn main:app --reload")
-        sys.exit(0)
-    else:
-        print()
-        print("❌ Migração falhou. Verifique os erros acima.")
-        sys.exit(1)
+    migrar()

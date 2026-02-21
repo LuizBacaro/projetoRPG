@@ -102,7 +102,6 @@
                         <input type="number" id="inputNivel" name="nivel" value="1" min="1" max="20" class="nivel-input">
                     </div>
                 </div>
-                
                 <div class="pontos-field">
                     <label for="inputPontos">PONTOS</label>
                     <input type="number" id="inputPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
@@ -119,10 +118,30 @@
                     <label for="inputHP">HP Máximo *</label>
                     <input type="number" id="inputHP" name="hp_maximo" required min="1" placeholder="Ex: 100">
                 </div>
-                
                 <div class="form-group">
                     <label for="inputIniciativa">Iniciativa *</label>
                     <input type="number" id="inputIniciativa" name="iniciativa" required min="0" placeholder="Ex: 15">
+                </div>
+            </div>
+
+            <!-- ✅ DEFESA: CA, TOQUE, SURPRESA - JOGADOR -->
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="inputCA">CA</label>
+                        <input type="number" id="inputCA" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputToque">Toque</label>
+                        <input type="number" id="inputToque" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputSurpresa">Surpresa</label>
+                        <input type="number" id="inputSurpresa" name="surpresa" value="10" min="0" max="50">
+                    </div>
                 </div>
             </div>
             
@@ -164,7 +183,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputDES">DES</label>
                                 <div class="atributo-circles-container">
@@ -172,7 +190,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputCON">CON</label>
                                 <div class="atributo-circles-container">
@@ -181,7 +198,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <!-- COLUNA DIREITA -->
                         <div class="atributos-coluna">
                             <div class="atributo-field">
@@ -191,7 +207,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputSAB">SAB</label>
                                 <div class="atributo-circles-container">
@@ -199,7 +214,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputCAR">CAR</label>
                                 <div class="atributo-circles-container">
@@ -210,7 +224,7 @@
                         </div>
                     </div>
                     
-                    <!-- ========== RESISTÊNCIAS - NOVO ========== -->
+                    <!-- RESISTÊNCIAS -->
                     <div class="resistencias-container">
                         <div class="form-group">
                             <label class="atributos-label">🛡️ RESISTÊNCIAS</label>
@@ -220,12 +234,10 @@
                                 <label for="inputFortitude">Fortitude</label>
                                 <input type="number" id="inputFortitude" name="fortitude" value="0" min="-10" max="50">
                             </div>
-                            
                             <div class="resistencia-field">
                                 <label for="inputReflexos">Reflexos</label>
                                 <input type="number" id="inputReflexos" name="reflexos" value="0" min="-10" max="50">
                             </div>
-                            
                             <div class="resistencia-field">
                                 <label for="inputVontade">Vontade</label>
                                 <input type="number" id="inputVontade" name="vontade" value="0" min="-10" max="50">
@@ -253,7 +265,6 @@
         <form id="formCadastroMonstro" enctype="multipart/form-data">
             <input type="hidden" name="tipo" value="monstro">
             
-            <!-- NÍVEL E PONTOS NO TOPO -->
             <div class="nivel-pontos-container">
                 <div class="nivel-field">
                     <label for="inputNivelMonstro">NÍVEL</label>
@@ -261,7 +272,6 @@
                         <input type="number" id="inputNivelMonstro" name="nivel" value="1" min="1" max="20" class="nivel-input">
                     </div>
                 </div>
-                
                 <div class="pontos-field">
                     <label for="inputPontosMonstro">PONTOS</label>
                     <input type="number" id="inputPontosMonstro" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
@@ -278,10 +288,30 @@
                     <label for="inputHPMonstro">HP Máximo *</label>
                     <input type="number" id="inputHPMonstro" name="hp_maximo" required min="1" placeholder="Ex: 200">
                 </div>
-                
                 <div class="form-group">
                     <label for="inputIniciativaMonstro">Iniciativa *</label>
                     <input type="number" id="inputIniciativaMonstro" name="iniciativa" required min="0" placeholder="Ex: 10">
+                </div>
+            </div>
+
+            <!-- ✅ DEFESA: CA, TOQUE, SURPRESA - MONSTRO -->
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="inputCAMonstro">CA</label>
+                        <input type="number" id="inputCAMonstro" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputToqueMonstro">Toque</label>
+                        <input type="number" id="inputToqueMonstro" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputSurpresaMonstro">Surpresa</label>
+                        <input type="number" id="inputSurpresaMonstro" name="surpresa" value="10" min="0" max="50">
+                    </div>
                 </div>
             </div>
             
@@ -290,9 +320,7 @@
                 <input type="text" id="inputClasseMonstro" name="classe" value="Criatura" placeholder="Ex: Dragão, Goblin, Morto-Vivo...">
             </div>
             
-            <!-- CONTAINER FOTO + ATRIBUTOS LADO A LADO -->
             <div class="foto-atributos-container">
-                <!-- FOTO VERTICAL -->
                 <div class="form-group foto-vertical">
                     <label for="inputFotoMonstro">Foto</label>
                     <div class="upload-area-vertical" id="uploadAreaMonstro">
@@ -308,13 +336,11 @@
                     </div>
                 </div>
                 
-                <!-- ATRIBUTOS D&D - 2 COLUNAS -->
                 <div class="atributos-container">
                     <div class="form-group">
                         <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
                     </div>
                     <div class="atributos-duas-colunas">
-                        <!-- COLUNA ESQUERDA -->
                         <div class="atributos-coluna">
                             <div class="atributo-field">
                                 <label for="inputFORMonstro">FOR</label>
@@ -323,7 +349,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputDESMonstro">DES</label>
                                 <div class="atributo-circles-container">
@@ -331,7 +356,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputCONMonstro">CON</label>
                                 <div class="atributo-circles-container">
@@ -340,8 +364,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- COLUNA DIREITA -->
                         <div class="atributos-coluna">
                             <div class="atributo-field">
                                 <label for="inputINTMonstro">INT</label>
@@ -350,7 +372,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputSABMonstro">SAB</label>
                                 <div class="atributo-circles-container">
@@ -358,7 +379,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputCARMonstro">CAR</label>
                                 <div class="atributo-circles-container">
@@ -368,8 +388,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- ========== RESISTÊNCIAS - NOVO ========== -->
                     <div class="resistencias-container">
                         <div class="form-group">
                             <label class="atributos-label">🛡️ RESISTÊNCIAS</label>
@@ -379,12 +397,10 @@
                                 <label for="inputFortitudeMonstro">Fortitude</label>
                                 <input type="number" id="inputFortitudeMonstro" name="fortitude" value="0" min="-10" max="50">
                             </div>
-                            
                             <div class="resistencia-field">
                                 <label for="inputReflexosMonstro">Reflexos</label>
                                 <input type="number" id="inputReflexosMonstro" name="reflexos" value="0" min="-10" max="50">
                             </div>
-                            
                             <div class="resistencia-field">
                                 <label for="inputVontadeMonstro">Vontade</label>
                                 <input type="number" id="inputVontadeMonstro" name="vontade" value="0" min="-10" max="50">
@@ -412,7 +428,6 @@
         <form id="formCadastroNPC" enctype="multipart/form-data">
             <input type="hidden" name="tipo" value="npc">
             
-            <!-- NÍVEL E PONTOS NO TOPO -->
             <div class="nivel-pontos-container">
                 <div class="nivel-field">
                     <label for="inputNivelNPC">NÍVEL</label>
@@ -420,7 +435,6 @@
                         <input type="number" id="inputNivelNPC" name="nivel" value="1" min="1" max="20" class="nivel-input">
                     </div>
                 </div>
-                
                 <div class="pontos-field">
                     <label for="inputPontosNPC">PONTOS</label>
                     <input type="number" id="inputPontosNPC" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
@@ -437,10 +451,30 @@
                     <label for="inputHPNPC">HP Máximo *</label>
                     <input type="number" id="inputHPNPC" name="hp_maximo" required min="1" placeholder="Ex: 50">
                 </div>
-                
                 <div class="form-group">
                     <label for="inputIniciativaNPC">Iniciativa *</label>
                     <input type="number" id="inputIniciativaNPC" name="iniciativa" required min="0" placeholder="Ex: 12">
+                </div>
+            </div>
+
+            <!-- ✅ DEFESA: CA, TOQUE, SURPRESA - NPC -->
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="inputCANPC">CA</label>
+                        <input type="number" id="inputCANPC" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputToqueNPC">Toque</label>
+                        <input type="number" id="inputToqueNPC" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputSurpresaNPC">Surpresa</label>
+                        <input type="number" id="inputSurpresaNPC" name="surpresa" value="10" min="0" max="50">
+                    </div>
                 </div>
             </div>
             
@@ -449,9 +483,7 @@
                 <input type="text" id="inputClasseNPC" name="classe" value="Aliado" placeholder="Ex: Mercador, Guarda, Aliado...">
             </div>
             
-            <!-- CONTAINER FOTO + ATRIBUTOS LADO A LADO -->
             <div class="foto-atributos-container">
-                <!-- FOTO VERTICAL -->
                 <div class="form-group foto-vertical">
                     <label for="inputFotoNPC">Foto</label>
                     <div class="upload-area-vertical" id="uploadAreaNPC">
@@ -467,13 +499,11 @@
                     </div>
                 </div>
                 
-                <!-- ATRIBUTOS D&D - 2 COLUNAS -->
                 <div class="atributos-container">
                     <div class="form-group">
                         <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
                     </div>
                     <div class="atributos-duas-colunas">
-                        <!-- COLUNA ESQUERDA -->
                         <div class="atributos-coluna">
                             <div class="atributo-field">
                                 <label for="inputFORNPC">FOR</label>
@@ -482,7 +512,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputDESNPC">DES</label>
                                 <div class="atributo-circles-container">
@@ -490,7 +519,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputCONNPC">CON</label>
                                 <div class="atributo-circles-container">
@@ -499,8 +527,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- COLUNA DIREITA -->
                         <div class="atributos-coluna">
                             <div class="atributo-field">
                                 <label for="inputINTNPC">INT</label>
@@ -509,7 +535,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputSABNPC">SAB</label>
                                 <div class="atributo-circles-container">
@@ -517,7 +542,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="inputCARNPC">CAR</label>
                                 <div class="atributo-circles-container">
@@ -527,8 +551,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- ========== RESISTÊNCIAS - NOVO ========== -->
                     <div class="resistencias-container">
                         <div class="form-group">
                             <label class="atributos-label">🛡️ RESISTÊNCIAS</label>
@@ -538,12 +560,10 @@
                                 <label for="inputFortitudeNPC">Fortitude</label>
                                 <input type="number" id="inputFortitudeNPC" name="fortitude" value="0" min="-10" max="50">
                             </div>
-                            
                             <div class="resistencia-field">
                                 <label for="inputReflexosNPC">Reflexos</label>
                                 <input type="number" id="inputReflexosNPC" name="reflexos" value="0" min="-10" max="50">
                             </div>
-                            
                             <div class="resistencia-field">
                                 <label for="inputVontadeNPC">Vontade</label>
                                 <input type="number" id="inputVontadeNPC" name="vontade" value="0" min="-10" max="50">
@@ -571,7 +591,6 @@
         <form id="formEdicaoCombatente" enctype="multipart/form-data">
             <input type="hidden" id="editId" name="id">
             
-            <!-- NÍVEL E PONTOS NO TOPO -->
             <div class="nivel-pontos-container">
                 <div class="nivel-field">
                     <label for="editNivel">NÍVEL</label>
@@ -579,7 +598,6 @@
                         <input type="number" id="editNivel" name="nivel" value="1" min="1" max="20" class="nivel-input">
                     </div>
                 </div>
-                
                 <div class="pontos-field">
                     <label for="editPontos">PONTOS</label>
                     <input type="number" id="editPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
@@ -596,10 +614,30 @@
                     <label for="editHP">HP Máximo *</label>
                     <input type="number" id="editHP" name="hp_maximo" required min="1" placeholder="Ex: 100">
                 </div>
-                
                 <div class="form-group">
                     <label for="editIniciativa">Iniciativa *</label>
                     <input type="number" id="editIniciativa" name="iniciativa" required min="0" placeholder="Ex: 15">
+                </div>
+            </div>
+
+            <!-- ✅ DEFESA: CA, TOQUE, SURPRESA - EDIÇÃO -->
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="editCA">CA</label>
+                        <input type="number" id="editCA" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="editToque">Toque</label>
+                        <input type="number" id="editToque" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="editSurpresa">Surpresa</label>
+                        <input type="number" id="editSurpresa" name="surpresa" value="10" min="0" max="50">
+                    </div>
                 </div>
             </div>
             
@@ -617,9 +655,7 @@
                 </select>
             </div>
             
-            <!-- CONTAINER FOTO + ATRIBUTOS LADO A LADO -->
             <div class="foto-atributos-container">
-                <!-- FOTO VERTICAL -->
                 <div class="form-group foto-vertical">
                     <label for="editFoto">Foto</label>
                     <div class="upload-area-vertical" id="editUploadArea">
@@ -635,13 +671,11 @@
                     </div>
                 </div>
                 
-                <!-- ATRIBUTOS D&D - 2 COLUNAS -->
                 <div class="atributos-container">
                     <div class="form-group">
                         <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
                     </div>
                     <div class="atributos-duas-colunas">
-                        <!-- COLUNA ESQUERDA -->
                         <div class="atributos-coluna">
                             <div class="atributo-field">
                                 <label for="editFOR">FOR</label>
@@ -650,7 +684,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="editDES">DES</label>
                                 <div class="atributo-circles-container">
@@ -658,7 +691,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="editCON">CON</label>
                                 <div class="atributo-circles-container">
@@ -667,8 +699,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- COLUNA DIREITA -->
                         <div class="atributos-coluna">
                             <div class="atributo-field">
                                 <label for="editINT">INT</label>
@@ -677,7 +707,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="editSAB">SAB</label>
                                 <div class="atributo-circles-container">
@@ -685,7 +714,6 @@
                                     <span class="atributo-modificador">+0</span>
                                 </div>
                             </div>
-                            
                             <div class="atributo-field">
                                 <label for="editCAR">CAR</label>
                                 <div class="atributo-circles-container">
@@ -695,8 +723,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- ========== RESISTÊNCIAS - NOVO ========== -->
                     <div class="resistencias-container">
                         <div class="form-group">
                             <label class="atributos-label">🛡️ RESISTÊNCIAS</label>
@@ -706,12 +732,10 @@
                                 <label for="editFortitude">Fortitude</label>
                                 <input type="number" id="editFortitude" name="fortitude" min="-10" max="50">
                             </div>
-                            
                             <div class="resistencia-field">
                                 <label for="editReflexos">Reflexos</label>
                                 <input type="number" id="editReflexos" name="reflexos" min="-10" max="50">
                             </div>
-                            
                             <div class="resistencia-field">
                                 <label for="editVontade">Vontade</label>
                                 <input type="number" id="editVontade" name="vontade" min="-10" max="50">
@@ -739,61 +763,34 @@
         </div>
         <div class="modal-body">
             <div class="dano-cura-layout">
-                <!-- Lista de Combatentes -->
                 <div class="combatentes-selecao">
                     <h3>🎯 Selecionar Combatentes:</h3>
                     <div id="listaCombatentesDanoCura" class="lista-checkbox-combatentes">
                         <!-- Preenchido dinamicamente -->
                     </div>
                 </div>
-
-                <!-- Campos de Dano e Cura -->
                 <div class="valores-aplicacao">
                     <div class="campo-grupo">
                         <label for="inputDanoModal">⚔️ DANO:</label>
-                        <input 
-                            type="number" 
-                            id="inputDanoModal" 
-                            class="input-valor-modal" 
-                            min="0" 
-                            placeholder="0"
-                            value="0"
-                        >
+                        <input type="number" id="inputDanoModal" class="input-valor-modal" min="0" placeholder="0" value="0">
                     </div>
-
                     <div class="campo-grupo">
                         <label for="inputCuraModal">💚 CURA:</label>
-                        <input 
-                            type="number" 
-                            id="inputCuraModal" 
-                            class="input-valor-modal" 
-                            min="0" 
-                            placeholder="0"
-                            value="0"
-                        >
+                        <input type="number" id="inputCuraModal" class="input-valor-modal" min="0" placeholder="0" value="0">
                     </div>
                 </div>
             </div>
         </div>
         <div class="modal-actions">
-            <button class="btn-cancelar" onclick="modalDanoCuraInstance.fechar()">
-                ❌ Cancelar
-            </button>
-            <button class="btn-aplicar-principal" onclick="modalDanoCuraInstance.aplicar()">
-                ✅ Aplicar Dano / Cura
-            </button>
+            <button class="btn-cancelar" onclick="modalDanoCuraInstance.fechar()">❌ Cancelar</button>
+            <button class="btn-aplicar-principal" onclick="modalDanoCuraInstance.aplicar()">✅ Aplicar Dano / Cura</button>
         </div>
     </div>
 </div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<!-- Services -->
 <script src="js/services/DanoCuraService.js"></script>
-
-<!-- UI Components -->
 <script src="js/ui/ModalDanoCura.js"></script>
-
-<!-- Main -->
 <script type="module" src="js/main.js"></script>
 
 </body>

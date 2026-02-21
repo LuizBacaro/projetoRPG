@@ -169,7 +169,7 @@ export class ArenaController {
         }).join('');
     }
 
-    /**
+   /**
      * Renderiza o combatente ativo
      */
     renderizarCombatenteAtivo() {
@@ -184,8 +184,7 @@ export class ArenaController {
         const hpCor = this.getCorHP(hpPercentual);
         const hpCritical = hpPercentual <= 25;
 
-        // Condicional para exibir ou ocultar valores de HP
-        const hpValorTexto = this.hpVisivel 
+        const hpValorTexto = this.hpVisivel
             ? `${combatente.hp_atual} / ${combatente.hp_maximo}`
             : `??? / ???`;
 
@@ -195,7 +194,7 @@ export class ArenaController {
         container.innerHTML = `
             <div class="combatente-ativo-card ${isMorto ? 'morto' : ''}">
                 <div class="combatente-foto-vertical">
-                    ${combatente.foto_url 
+                    ${combatente.foto_url
                         ? `<img src="${combatente.foto_url}" alt="${combatente.nome}">`
                         : `<div class="foto-placeholder">${this.getEmojiTipo(combatente.tipo)}</div>`
                     }
@@ -211,6 +210,7 @@ export class ArenaController {
                     </div>
 
                     <div class="combatente-grid-principal">
+
                         <!-- HP -->
                         <div class="secao-hp">
                             <div class="secao-hp-header">
@@ -227,8 +227,6 @@ export class ArenaController {
                                     ${hpValorTexto}
                                 </div>
                             </div>
-                            
-                            <!-- ✅ NOVO: Botão único -->
                             <div class="hp-acoes-simplificadas">
                                 <button class="btn-abrir-dano-cura" onclick="abrirModalDanoCura()">
                                     ⚔️💚 Aplicar Dano / Cura
@@ -236,28 +234,47 @@ export class ArenaController {
                             </div>
                         </div>
 
+                        <!-- ✅ NOVO: Defesa - CA, Toque, Surpresa -->
+                        <div class="secao-defesa">
+                            <h3>🛡️ Defesa</h3>
+                            <div class="defesa-grid">
+                                <div class="defesa-item">
+                                    <span class="defesa-label">CA</span>
+                                    <span class="defesa-valor">${combatente.ca ?? 10}</span>
+                                </div>
+                                <div class="defesa-item">
+                                    <span class="defesa-label">Toque</span>
+                                    <span class="defesa-valor">${combatente.toque ?? 10}</span>
+                                </div>
+                                <div class="defesa-item">
+                                    <span class="defesa-label">Surpresa</span>
+                                    <span class="defesa-valor">${combatente.surpresa ?? 10}</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Resistências -->
                         <div class="secao-resistencias">
-                            <h3>🛡️ Resistências</h3>
+                            <h3>⚡ Resistências</h3>
                             <div class="resistencias-grid">
                                 <div class="resistencia-item">
                                     <span class="resistencia-label">Fortitude</span>
-                                    <span class="resistencia-valor">${combatente.fortitude !== undefined ? combatente.fortitude : 0}</span>
+                                    <span class="resistencia-valor">${combatente.fortitude ?? 0}</span>
                                 </div>
                                 <div class="resistencia-item">
                                     <span class="resistencia-label">Reflexos</span>
-                                    <span class="resistencia-valor">${combatente.reflexos !== undefined ? combatente.reflexos : 0}</span>
+                                    <span class="resistencia-valor">${combatente.reflexos ?? 0}</span>
                                 </div>
                                 <div class="resistencia-item">
                                     <span class="resistencia-label">Vontade</span>
-                                    <span class="resistencia-valor">${combatente.vontade !== undefined ? combatente.vontade : 0}</span>
+                                    <span class="resistencia-valor">${combatente.vontade ?? 0}</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Atributos -->
                         <div class="secao-atributos">
-                            <h3>⚡ Atributos</h3>
+                            <h3>🎲 Atributos</h3>
                             <div class="atributos-compacto">
                                 ${this.renderizarAtributo('FOR', combatente.forca)}
                                 ${this.renderizarAtributo('DES', combatente.destreza)}
@@ -267,12 +284,12 @@ export class ArenaController {
                                 ${this.renderizarAtributo('CAR', combatente.carisma)}
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         `;
 
-        // Configurar funções globais para botões
         window.toggleVisibilidadeHP = () => this.toggleVisibilidadeHP();
     }
 

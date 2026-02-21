@@ -27,8 +27,7 @@ def listar_combatentes(
 ):
     """Lista todos os combatentes ou filtra por tipo"""
     service = get_combatente_service(db)
-    combatentes = service.listar_todos(tipo)
-    return combatentes
+    return service.listar_todos(tipo)
 
 
 @router.get("/{combatente_id}", response_model=CombatenteResponse)
@@ -39,8 +38,7 @@ def obter_combatente(
     """Obtém um combatente específico por ID"""
     service = get_combatente_service(db)
     try:
-        combatente = service.obter_por_id(combatente_id)
-        return combatente
+        return service.obter_por_id(combatente_id)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -52,15 +50,22 @@ async def criar_combatente(
     iniciativa: int = Form(...),
     tipo: str = Form("jogador"),
     classe: str = Form("Aventureiro"),
+    # Defesa
+    ca: int = Form(10),
+    toque: int = Form(10),
+    surpresa: int = Form(10),
+    # Atributos
     forca: int = Form(10),
     destreza: int = Form(10),
     constituicao: int = Form(10),
     inteligencia: int = Form(10),
     sabedoria: int = Form(10),
     carisma: int = Form(10),
+    # Resistências
     fortitude: int = Form(0),
     reflexos: int = Form(0),
     vontade: int = Form(0),
+    # Progressão
     nivel: int = Form(1),
     pontos: int = Form(0),
     foto: Optional[UploadFile] = File(None),
@@ -68,29 +73,17 @@ async def criar_combatente(
 ):
     """Cria um novo combatente"""
     service = get_combatente_service(db)
-    
     combatente_data = {
-        "nome": nome,
-        "tipo": tipo,
-        "classe": classe,
-        "hp_maximo": hp_maximo,
-        "iniciativa": iniciativa,
-        "forca": forca,
-        "destreza": destreza,
-        "constituicao": constituicao,
-        "inteligencia": inteligencia,
-        "sabedoria": sabedoria,
-        "carisma": carisma,
-        "fortitude": fortitude,
-        "reflexos": reflexos,
-        "vontade": vontade,
-        "nivel": nivel,
-        "pontos": pontos
+        "nome": nome, "tipo": tipo, "classe": classe,
+        "hp_maximo": hp_maximo, "iniciativa": iniciativa,
+        "ca": ca, "toque": toque, "surpresa": surpresa,
+        "forca": forca, "destreza": destreza, "constituicao": constituicao,
+        "inteligencia": inteligencia, "sabedoria": sabedoria, "carisma": carisma,
+        "fortitude": fortitude, "reflexos": reflexos, "vontade": vontade,
+        "nivel": nivel, "pontos": pontos
     }
-    
     try:
-        combatente = service.criar(combatente_data, foto)
-        return combatente
+        return service.criar(combatente_data, foto)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -103,15 +96,22 @@ async def atualizar_combatente(
     iniciativa: int = Form(...),
     tipo: str = Form(...),
     classe: str = Form("Aventureiro"),
+    # Defesa
+    ca: int = Form(10),
+    toque: int = Form(10),
+    surpresa: int = Form(10),
+    # Atributos
     forca: int = Form(10),
     destreza: int = Form(10),
     constituicao: int = Form(10),
     inteligencia: int = Form(10),
     sabedoria: int = Form(10),
     carisma: int = Form(10),
+    # Resistências
     fortitude: int = Form(0),
     reflexos: int = Form(0),
     vontade: int = Form(0),
+    # Progressão
     nivel: int = Form(1),
     pontos: int = Form(0),
     foto: Optional[UploadFile] = File(None),
@@ -119,29 +119,17 @@ async def atualizar_combatente(
 ):
     """Atualiza um combatente existente"""
     service = get_combatente_service(db)
-    
     combatente_data = {
-        "nome": nome,
-        "tipo": tipo,
-        "classe": classe,
-        "hp_maximo": hp_maximo,
-        "iniciativa": iniciativa,
-        "forca": forca,
-        "destreza": destreza,
-        "constituicao": constituicao,
-        "inteligencia": inteligencia,
-        "sabedoria": sabedoria,
-        "carisma": carisma,
-        "fortitude": fortitude,
-        "reflexos": reflexos,
-        "vontade": vontade,
-        "nivel": nivel,
-        "pontos": pontos
+        "nome": nome, "tipo": tipo, "classe": classe,
+        "hp_maximo": hp_maximo, "iniciativa": iniciativa,
+        "ca": ca, "toque": toque, "surpresa": surpresa,
+        "forca": forca, "destreza": destreza, "constituicao": constituicao,
+        "inteligencia": inteligencia, "sabedoria": sabedoria, "carisma": carisma,
+        "fortitude": fortitude, "reflexos": reflexos, "vontade": vontade,
+        "nivel": nivel, "pontos": pontos
     }
-    
     try:
-        combatente = service.atualizar(combatente_id, combatente_data, foto)
-        return combatente
+        return service.atualizar(combatente_id, combatente_data, foto)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -155,8 +143,7 @@ def atualizar_hp(
     """Atualiza apenas o HP atual de um combatente"""
     service = get_combatente_service(db)
     try:
-        combatente = service.atualizar_hp(combatente_id, hp_data.hp_atual)
-        return combatente
+        return service.atualizar_hp(combatente_id, hp_data.hp_atual)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -170,13 +157,10 @@ def atualizar_iniciativa(
     """Atualiza apenas a iniciativa de um combatente"""
     service = get_combatente_service(db)
     try:
-        combatente = service.atualizar_iniciativa(combatente_id, ini_data.iniciativa)
-        return combatente
+        return service.atualizar_iniciativa(combatente_id, ini_data.iniciativa)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
-
-# ==================== NOVOS ENDPOINTS DE DANO/CURA ====================
 
 @router.post("/{combatente_id}/dano", response_model=DanoCuraResponse)
 def aplicar_dano(
@@ -184,16 +168,10 @@ def aplicar_dano(
     dano_data: DanoCuraRequest,
     db: Session = Depends(get_db)
 ):
-    """
-    Aplica dano a um combatente
-    
-    - **combatente_id**: ID do combatente
-    - **valor**: Valor do dano a ser aplicado
-    """
+    """Aplica dano a um combatente"""
     service = get_combatente_service(db)
     try:
-        resultado = service.aplicar_dano(combatente_id, dano_data.valor)
-        return resultado
+        return service.aplicar_dano(combatente_id, dano_data.valor)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -204,21 +182,13 @@ def aplicar_cura(
     cura_data: DanoCuraRequest,
     db: Session = Depends(get_db)
 ):
-    """
-    Aplica cura a um combatente
-    
-    - **combatente_id**: ID do combatente
-    - **valor**: Valor da cura a ser aplicada
-    """
+    """Aplica cura a um combatente"""
     service = get_combatente_service(db)
     try:
-        resultado = service.aplicar_cura(combatente_id, cura_data.valor)
-        return resultado
+        return service.aplicar_cura(combatente_id, cura_data.valor)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
-
-# ==================== ENDPOINTS EXISTENTES ====================
 
 @router.patch("/{combatente_id}", response_model=CombatenteResponse)
 def atualizar_parcial(
@@ -229,8 +199,7 @@ def atualizar_parcial(
     """Atualiza campos específicos de um combatente"""
     service = get_combatente_service(db)
     try:
-        combatente = service.atualizar(combatente_id, data)
-        return combatente
+        return service.atualizar(combatente_id, data)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
