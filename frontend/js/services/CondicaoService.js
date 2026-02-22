@@ -1,5 +1,6 @@
 /**
  * CondicaoService
+ * Classe global (sem export) — carregada via <script> no index.html
  * SOLID: SRP - apenas comunicação HTTP com a API de condições
  */
 class CondicaoService {
@@ -7,21 +8,18 @@ class CondicaoService {
         this.baseUrl = baseUrl;
     }
 
-    /** Retorna o catálogo completo das 25 condições */
     async listarTodas() {
         const res = await fetch(`${this.baseUrl}/condicoes`);
         if (!res.ok) throw new Error('Erro ao carregar condições');
         return res.json();
     }
 
-    /** Retorna condições ativas de um combatente */
     async listarDoCombatente(combatenteId) {
         const res = await fetch(`${this.baseUrl}/condicoes/combatente/${combatenteId}`);
         if (!res.ok) throw new Error('Erro ao carregar condições do combatente');
         return res.json();
     }
 
-    /** Aplica uma condição a um combatente */
     async aplicar(combatenteId, condicaoId) {
         const res = await fetch(`${this.baseUrl}/condicoes/combatente/${combatenteId}`, {
             method:  'POST',
@@ -32,23 +30,12 @@ class CondicaoService {
         return res.json();
     }
 
-    /** Remove uma condição específica de um combatente */
     async remover(combatenteId, condicaoId) {
         const res = await fetch(
             `${this.baseUrl}/condicoes/combatente/${combatenteId}/${condicaoId}`,
             { method: 'DELETE' }
         );
         if (!res.ok) throw new Error('Erro ao remover condição');
-        return res.json();
-    }
-
-    /** Remove todas as condições de um combatente */
-    async removerTodas(combatenteId) {
-        const res = await fetch(
-            `${this.baseUrl}/condicoes/combatente/${combatenteId}`,
-            { method: 'DELETE' }
-        );
-        if (!res.ok) throw new Error('Erro ao remover condições');
         return res.json();
     }
 }

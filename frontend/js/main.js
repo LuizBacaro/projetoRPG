@@ -1,6 +1,12 @@
 /**
  * Entry Point da Aplicação Frontend
  * SOLID: SRP - apenas inicialização e orquestração global
+ *
+ * Arquivos globais (via <script> no index.html, SEM type="module"):
+ *   - DanoCuraService.js
+ *   - ModalDanoCura.js
+ *   - CondicaoService.js
+ *   - CondicaoUI.js  (contém class ModalCondicao)
  */
 import { ConfiguracaoController }  from './controllers/ConfiguracaoController.js';
 import { ArenaController }         from './controllers/ArenaController.js';
@@ -8,9 +14,6 @@ import { ModalCadastro }           from './ui/ModalCadastro.js';
 import { ModalEdicao }             from './ui/ModalEdicao.js';
 import { TipoSelector }            from './ui/TipoSelector.js';
 import { atualizarModificadorDOM } from './utils/dnd.js';
-
-// DanoCuraService, ModalDanoCura, ModalCondicao e CondicaoService
-// são classes globais carregadas via <script> no index.html
 
 const app = { controllers: {}, modals: {} };
 
@@ -30,8 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Modal Dano/Cura (classe global via <script>)
     if (typeof DanoCuraService !== 'undefined' && typeof ModalDanoCura !== 'undefined') {
         try {
-            const danoCuraService        = new DanoCuraService();
-            window.modalDanoCuraInstance = new ModalDanoCura(danoCuraService, app.controllers.arena);
+            window.modalDanoCuraInstance = new ModalDanoCura(
+                new DanoCuraService(),
+                app.controllers.arena
+            );
             console.log('✅ Modal de Dano/Cura inicializado');
         } catch (error) {
             console.error('❌ Erro ao inicializar Modal de Dano/Cura:', error);
@@ -39,10 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ── Modal Condição (classe global via <script>)
-    if (typeof ModalCondicao !== 'undefined') {
+    if (typeof ModalCondicao !== 'undefined' && typeof CondicaoService !== 'undefined') {
         try {
-            const condicaoService        = new CondicaoService('/api');
-            window.modalCondicaoInstance = new ModalCondicao(condicaoService, app.controllers.arena);
+            window.modalCondicaoInstance = new ModalCondicao(
+                new CondicaoService('/api'),
+                app.controllers.arena
+            );
             console.log('✅ Modal de Condição inicializado');
         } catch (error) {
             console.error('❌ Erro ao inicializar Modal de Condição:', error);
@@ -52,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarBotaoCadastro();
     configurarEventosRecarregamento();
 
-    // ── Funções globais para HTML inline
     window.atualizarModificador       = atualizarModificadorDOM;
     window.fecharModalCadastro        = () => app.modals.cadastroJogador.fechar();
     window.fecharModalCadastroMonstro = () => app.modals.cadastroMonstro.fechar();
@@ -67,29 +73,22 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('✅ Aplicação inicializada com sucesso!');
 });
 
-// ── Helpers
-
 function configurarBotaoCadastro() {
     const listaCombatentes = document.getElementById('listaCombatentes');
     if (!listaCombatentes) return;
-
-    // Evita duplicar se já existir
     if (listaCombatentes.parentElement.querySelector('.btn-add-combatente')) return;
 
-    const btnAdicionar     = document.createElement('button');
-    btnAdicionar.className = 'btn-add-combatente';
-    btnAdicionar.innerHTML = '⚔️ Adicionar Combatente';
-
-    btnAdicionar.addEventListener('click', () => {
+    const btn     = document.createElement('button');
+    btn.className = 'btn-add-combatente';
+    btn.innerHTML = '⚔️ Adicionar Combatente';
+    btn.addEventListener('click', () => {
         TipoSelector.mostrar((tipo) => {
             if      (tipo === 'jogador') app.modals.cadastroJogador.abrir();
             else if (tipo === 'monstro') app.modals.cadastroMonstro.abrir();
             else if (tipo === 'npc')     app.modals.cadastroNPC.abrir();
-            else console.error('❌ Tipo desconhecido:', tipo);
         });
     });
-
-    listaCombatentes.parentElement.insertBefore(btnAdicionar, listaCombatentes);
+    listaCombatentes.parentElement.insertBefore(btn, listaCombatentes);
 }
 
 function configurarEventosRecarregamento() {
@@ -112,38 +111,30 @@ function removerImagemUpload(sufixo = '', isEdit = false) {
     const input       = document.getElementById(`${prefix}Foto${sufixo}`);
     const placeholder = document.getElementById(isEdit ? `${prefix}UploadPlaceholder` : `uploadPlaceholder${sufixo}`);
     const preview     = document.getElementById(isEdit ? `${prefix}UploadPreview`     : `uploadPreview${sufixo}`);
-
     if (input)       input.value             = '';
     if (placeholder) placeholder.style.display = 'flex';
     if (preview)     preview.style.display     = 'none';
 }
 
-// ── Globais para HTML inline
-
 window.abrirModalCadastro = function(tipo) {
     window.fecharSeletorTipo();
-    if      (tipo === 'jogador' && app.modals.cadastroJogador) app.modals.cadastroJogador.abrir();
-    else if (tipo === 'monstro' && app.modals.cadastroMonstro) app.modals.cadastroMonstro.abrir();
-    else if (tipo === 'npc'     && app.modals.cadastroNPC)     app.modals.cadastroNPC.abrir();
-    else console.error('❌ Modal não encontrado para tipo:', tipo);
+    if      (tipo === 'jogador') app.modals.cadastroJogador?.abrir();
+    else if (tipo === 'monstro') app.modals.cadastroMonstro?.abrir();
+    else if (tipo === 'npc')     app.modals.cadastroNPC?.abrir();
 };
 
-window.fecharSeletorTipo = function() { TipoSelector.fechar(); };
+window.fecharSeletorTipo  = () => TipoSelector.fechar();
 
 window.abrirModalDanoCura = function() {
-    if (window.modalDanoCuraInstance) {
-        window.modalDanoCuraInstance.abrir();
-    } else {
-        console.error('❌ Modal de Dano/Cura não inicializado');
-    }
+    window.modalDanoCuraInstance
+        ? window.modalDanoCuraInstance.abrir()
+        : console.error('❌ modalDanoCuraInstance não inicializado');
 };
 
 window.abrirModalCondicao = function() {
-    if (window.modalCondicaoInstance) {
-        window.modalCondicaoInstance.abrir();
-    } else {
-        console.error('❌ Modal de Condição não inicializado');
-    }
+    window.modalCondicaoInstance
+        ? window.modalCondicaoInstance.abrir()
+        : console.error('❌ modalCondicaoInstance não inicializado');
 };
 
 export { app };

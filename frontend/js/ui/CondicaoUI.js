@@ -1,15 +1,15 @@
 /**
  * ModalCondicao
- * Classe global (sem export) — mesmo padrão do ModalDanoCura
- * SOLID: SRP - apenas gerencia UI do modal de condição
+ * Classe global (sem export) — carregada via <script> no index.html
+ * SOLID: SRP - gerencia UI do modal de condição com lista de combatentes
  */
 class ModalCondicao {
     constructor(condicaoService, arenaController) {
-        this.condicaoService     = condicaoService;
-        this.arenaController     = arenaController;
-        this.todasCondicoes      = [];
+        this.condicaoService         = condicaoService;
+        this.arenaController         = arenaController;
+        this.todasCondicoes          = [];
         this.combatentesSelecionados = new Set();
-        this.modalElement        = null;
+        this.modalElement            = null;
         this._inicializar();
     }
 
@@ -24,6 +24,7 @@ class ModalCondicao {
     async _carregarCatalogo() {
         try {
             this.todasCondicoes = await this.condicaoService.listarTodas();
+            console.log('✅ Catálogo de condições carregado:', this.todasCondicoes.length);
         } catch (err) {
             console.error('❌ Erro ao carregar catálogo de condições:', err);
         }
@@ -32,11 +33,10 @@ class ModalCondicao {
     // ── Criação do Modal 
 
     _criarModal() {
-        // Remove modal existente se houver (evita duplicação)
         const existente = document.getElementById('modal-condicao');
         if (existente) existente.remove();
 
-        const html = `
+        document.body.insertAdjacentHTML('beforeend', `
             <div id="modal-condicao" class="modal-condicao-overlay" style="display:none;">
                 <div class="modal-condicao-container">
 
@@ -48,15 +48,11 @@ class ModalCondicao {
                     <div class="modal-condicao-body">
                         <div class="condicao-layout">
 
-                            <!-- Coluna esquerda: lista de combatentes -->
                             <div class="condicao-combatentes-selecao">
                                 <h3>🎯 Selecionar Combatentes:</h3>
-                                <div id="lista-combatentes-condicao" class="lista-checkbox-combatentes">
-                                    <!-- preenchido dinamicamente -->
-                                </div>
+                                <div id="lista-combatentes-condicao" class="lista-checkbox-combatentes"></div>
                             </div>
 
-                            <!-- Coluna direita: select de condição + preview -->
                             <div class="condicao-valores-aplicacao">
                                 <div class="campo-grupo">
                                     <label for="select-condicao" class="modal-label">Condição:</label>
@@ -77,9 +73,8 @@ class ModalCondicao {
 
                 </div>
             </div>
-        `;
+        `);
 
-        document.body.insertAdjacentHTML('beforeend', html);
         this.modalElement = document.getElementById('modal-condicao');
     }
 
@@ -95,12 +90,10 @@ class ModalCondicao {
         document.getElementById('btn-aplicar-condicao')
             ?.addEventListener('click', () => this.aplicar());
 
-        // Fecha ao clicar fora
         this.modalElement?.addEventListener('click', (e) => {
             if (e.target === this.modalElement) this.fechar();
         });
 
-        // Preview do efeito ao selecionar condição
         document.getElementById('select-condicao')
             ?.addEventListener('change', (e) => this._mostrarEfeito(e.target.value));
     }
@@ -132,11 +125,11 @@ class ModalCondicao {
         const condicaoId = Number(document.getElementById('select-condicao')?.value);
 
         if (this.combatentesSelecionados.size === 0) {
-            this._toast('⚠️ Selecione pelo menos um combatente', 'error');
+            if (typeof Toast !== 'undefined') Toast.error('⚠️ Selecione pelo menos um combatente');
             return;
         }
         if (!condicaoId) {
-            this._toast('⚠️ Selecione uma condição', 'error');
+            if (typeof Toast !== 'undefined') Toast.error('⚠️ Selecione uma condição');
             return;
         }
 
@@ -144,105 +137,30 @@ class ModalCondicao {
         const ids      = Array.from(this.combatentesSelecionados);
 
         try {
-            // Aplica a condição em cada combatente selecionado em paralelo
-            await Promise.all(
-                ids.map(cid => this.condicaoService.aplicar(cid, condicaoId))
-            );
+            await Promise.all(ids.map(cid => this.condicaoService.aplicar(cid, condicaoId)));
 
-            this._toast(`🔮 "${condicao?.nome}" aplicada a ${ids.length} combatente(s)`, 'success');
+            if (typeof Toast !== 'undefined') {
+                Toast.success(`🔮 "${condicao?.nome}" aplicada a ${ids.length} combatente(s)`);
+            }
 
-            // Atualiza a seção de condições do combatente ativo na arena
-            if (this.arenaController?.condicaoController) {
-                const combatenteAtivo = this.arenaController.combatentes[this.arenaController.turnoAtual];
-                if (combatenteAtivo) {
+            // Atualiza arena após aplicar
+            if (this.arenaController) {
+                const ativo = this.arenaController.combatentes[this.arenaController.turnoAtual];
+                if (ativo) {
                     await this.arenaController.condicaoController
-                        .carregarCondicoesDoCombatente(combatenteAtivo.id);
+                        .carregarCondicoesDoCombatente(ativo.id);
                 }
-                // Atualiza badges na ordem de iniciativa
                 await this.arenaController._atualizarBadgesOrdemTodos();
             }
 
             this.fechar();
-
         } catch (err) {
             console.error('❌ Erro ao aplicar condição:', err);
-            this._toast(`❌ Erro: ${err.message}`, 'error');
+            if (typeof Toast !== 'undefined') Toast.error(`❌ Erro: ${err.message}`);
         }
     }
 
-    // ── Privados 
-
-    _popularCombatentes() {
-        const container  = document.getElementById('lista-combatentes-condicao');
-        const combatentes = this.arenaController?.combatentes || [];
-
-        if (!combatentes.length) {
-            container.innerHTML = '<p class="sem-combatentes">⚠️ Nenhum combatente disponível</p>';
-            return;
-        }
-
-        container.innerHTML = combatentes.map(c => `
-            <div class="checkbox-combatente-item">
-                <input
-                    type="checkbox"
-                    id="cond-check-${c.id}"
-                    value="${c.id}"
-                    onchange="modalCondicaoInstance.toggleCombatente(${c.id})"
-                >
-                <label for="cond-check-${c.id}">
-                    <span class="combatente-nome">${c.nome}</span>
-                    <span class="combatente-hp">${c.hp_atual}/${c.hp_maximo} PV</span>
-                    <span class="badge-tipo badge-${c.tipo.toLowerCase()}">${c.tipo}</span>
-                </label>
-            </div>
-        `).join('');
-    }
-
-    _popularSelect() {
-        const select = document.getElementById('select-condicao');
-        if (!select) return;
-
-        select.innerHTML = '<option value="">Selecione uma condição...</option>';
-
-        this.todasCondicoes.forEach(c => {
-            const opt       = document.createElement('option');
-            opt.value       = c.id;
-            opt.textContent = c.nome;
-            opt.title       = c.efeito;
-            select.appendChild(opt);
-        });
-    }
-
-    _mostrarEfeito(condicaoId) {
-        const descEl = document.getElementById('condicao-descricao');
-        if (!descEl) return;
-
-        const c = this.todasCondicoes.find(c => c.id === Number(condicaoId));
-        if (c) {
-            descEl.textContent   = c.efeito;
-            descEl.style.display = 'block';
-        } else {
-            descEl.textContent   = '';
-            descEl.style.display = 'none';
-        }
-    }
-
-    _limparDescricao() {
-        const select = document.getElementById('select-condicao');
-        const descEl = document.getElementById('condicao-descricao');
-        if (select)  select.value        = '';
-        if (descEl) { descEl.textContent = ''; descEl.style.display = 'none'; }
-    }
-
-    _toast(mensagem, tipo = 'success') {
-        if (typeof Toast !== 'undefined') {
-            tipo === 'success' ? Toast.success(mensagem) : Toast.error(mensagem);
-        } else {
-            console.log(mensagem);
-        }
-    }
-
-    // ── Renderização de condições ativas (usada pelo CondicaoController) ──────
+    // ── Renderização (usada pelo CondicaoController) 
 
     renderizarCondicoesAtivas(condicoes, combatenteId, onRemover) {
         const container = document.querySelector('.arena-condicoes-lista');
@@ -256,12 +174,11 @@ class ModalCondicao {
         }
 
         condicoes.forEach(c => {
-            const slug       = c.nome.toLowerCase()
+            const slug     = c.nome.toLowerCase()
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-');
-            const span       = document.createElement('span');
-            span.className   = `arena-condicao arena-condicao-${slug}`;
-            span.dataset.id  = c.id;
-            span.title       = c.efeito;
+            const span     = document.createElement('span');
+            span.className = `arena-condicao arena-condicao-${slug}`;
+            span.title     = c.efeito;
 
             span.innerHTML = `
                 ${c.nome}
@@ -284,10 +201,7 @@ class ModalCondicao {
         wrapper.innerHTML = '';
         if (!condicoes.length) return;
 
-        const visiveis = condicoes.slice(0, 3);
-        const extras   = condicoes.length - visiveis.length;
-
-        visiveis.forEach(c => {
+        condicoes.slice(0, 3).forEach(c => {
             const badge       = document.createElement('span');
             badge.className   = 'badge-condicao-ordem';
             badge.textContent = c.nome.slice(0, 3).toUpperCase();
@@ -295,6 +209,7 @@ class ModalCondicao {
             wrapper.appendChild(badge);
         });
 
+        const extras = condicoes.length - 3;
         if (extras > 0) {
             const mais       = document.createElement('span');
             mais.className   = 'badge-condicao-ordem badge-condicao-mais';
@@ -302,5 +217,62 @@ class ModalCondicao {
             mais.title       = condicoes.slice(3).map(c => c.nome).join(', ');
             wrapper.appendChild(mais);
         }
+    }
+
+    // ── Privados 
+
+    _popularCombatentes() {
+        const container   = document.getElementById('lista-combatentes-condicao');
+        const combatentes = this.arenaController?.combatentes || [];
+
+        if (!combatentes.length) {
+            container.innerHTML = '<p style="color:#888;font-style:italic;">Nenhum combatente disponível</p>';
+            return;
+        }
+
+        container.innerHTML = combatentes.map(c => `
+            <div class="checkbox-combatente-item">
+                <input
+                    type="checkbox"
+                    id="cond-check-${c.id}"
+                    value="${c.id}"
+                    onchange="modalCondicaoInstance.toggleCombatente(${c.id})"
+                >
+                <label for="cond-check-${c.id}">
+                    <span class="combatente-nome">${c.nome}</span>
+                    <span class="combatente-hp">${c.hp_atual}/${c.hp_maximo} PV</span>
+                    <span class="badge badge-${c.tipo}">${c.tipo}</span>
+                </label>
+            </div>
+        `).join('');
+    }
+
+    _popularSelect() {
+        const select = document.getElementById('select-condicao');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Selecione uma condição...</option>';
+        this.todasCondicoes.forEach(c => {
+            const opt       = document.createElement('option');
+            opt.value       = c.id;
+            opt.textContent = c.nome;
+            opt.title       = c.efeito;
+            select.appendChild(opt);
+        });
+    }
+
+    _mostrarEfeito(condicaoId) {
+        const descEl = document.getElementById('condicao-descricao');
+        if (!descEl) return;
+        const c = this.todasCondicoes.find(c => c.id === Number(condicaoId));
+        if (c) { descEl.textContent = c.efeito; descEl.style.display = 'block'; }
+        else   { descEl.textContent = '';        descEl.style.display = 'none';  }
+    }
+
+    _limparDescricao() {
+        const select = document.getElementById('select-condicao');
+        const descEl = document.getElementById('condicao-descricao');
+        if (select)  select.value        = '';
+        if (descEl) { descEl.textContent = ''; descEl.style.display = 'none'; }
     }
 }
