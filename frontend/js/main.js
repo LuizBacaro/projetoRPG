@@ -1,14 +1,17 @@
 /**
  * Entry Point da Aplicação Frontend
+ * DanoCuraService e ModalDanoCura são classes globais (sem export)
+ * Os demais são ES Modules com export nomeado
  */
-import { ConfiguracaoController } from './controllers/ConfiguracaoController.js';
-import { ArenaController }        from './controllers/ArenaController.js';
-import { ModalCadastro }          from './ui/ModalCadastro.js';
-import { ModalEdicao }            from './ui/ModalEdicao.js';
-import { TipoSelector }           from './ui/TipoSelector.js';
-import { ModalDanoCura }          from './ui/ModalDanoCura.js';
-import { DanoCuraService }        from './services/DanoCuraService.js';
+import { ConfiguracaoController }  from './controllers/ConfiguracaoController.js';
+import { ArenaController }         from './controllers/ArenaController.js';
+import { ModalCadastro }           from './ui/ModalCadastro.js';
+import { ModalEdicao }             from './ui/ModalEdicao.js';
+import { TipoSelector }            from './ui/TipoSelector.js';
 import { atualizarModificadorDOM } from './utils/dnd.js';
+
+// ⚠️ DanoCuraService e ModalDanoCura NÃO têm export — são carregadas
+// como scripts globais via <script> no index.html, não como módulos
 
 const app = { controllers: {}, modals: {} };
 
@@ -18,17 +21,23 @@ document.addEventListener('DOMContentLoaded', () => {
     app.controllers.configuracao = new ConfiguracaoController();
     app.controllers.arena        = new ArenaController();
 
-    app.modals.cadastroJogador = new ModalCadastro('jogador');
-    app.modals.cadastroMonstro = new ModalCadastro('monstro');
-    app.modals.cadastroNPC     = new ModalCadastro('npc');
-    app.modals.edicao          = new ModalEdicao();
+    app.modals.cadastroJogador   = new ModalCadastro('jogador');
+    app.modals.cadastroMonstro   = new ModalCadastro('monstro');
+    app.modals.cadastroNPC       = new ModalCadastro('npc');
+    app.modals.edicao            = new ModalEdicao();
 
-    try {
-        const danoCuraService        = new DanoCuraService();
-        window.modalDanoCuraInstance = new ModalDanoCura(danoCuraService, app.controllers.arena);
-        console.log('✅ Modal de Dano/Cura inicializado');
-    } catch (error) {
-        console.error('❌ Erro ao inicializar Modal de Dano/Cura:', error);
+    // DanoCuraService e ModalDanoCura são globais — acessadas via window
+    // Só instancia se as classes estiverem disponíveis no escopo global
+    if (typeof DanoCuraService !== 'undefined' && typeof ModalDanoCura !== 'undefined') {
+        try {
+            const danoCuraService        = new DanoCuraService();
+            window.modalDanoCuraInstance = new ModalDanoCura(danoCuraService, app.controllers.arena);
+            console.log('✅ Modal de Dano/Cura inicializado');
+        } catch (error) {
+            console.error('❌ Erro ao inicializar Modal de Dano/Cura:', error);
+        }
+    } else {
+        console.warn('⚠️ DanoCuraService ou ModalDanoCura não encontrados no escopo global');
     }
 
     configurarBotaoCadastro();
@@ -52,19 +61,13 @@ function configurarBotaoCadastro() {
     const listaCombatentes = document.getElementById('listaCombatentes');
     if (!listaCombatentes) return;
 
+    // Evita duplicar o botão se já existir
+    if (listaCombatentes.parentElement.querySelector('.btn-add-combatente')) return;
+
     const btnAdicionar     = document.createElement('button');
     btnAdicionar.className = 'btn-add-combatente';
     btnAdicionar.innerHTML = '⚔️ Adicionar Combatente';
-
-    btnAdicionar.addEventListener('click', () => {
-        TipoSelector.mostrar((tipo) => {
-            if      (tipo === 'jogador') app.modals.cadastroJogador.abrir();
-            else if (tipo === 'monstro') app.modals.cadastroMonstro.abrir();
-            else if (tipo === 'npc')     app.modals.cadastroNPC.abrir();
-            else console.error('❌ Tipo desconhecido:', tipo);
-        });
-    });
-
+    btnAdicionar.addEventListener('click', () => TipoSelector.abrir());
     listaCombatentes.parentElement.insertBefore(btnAdicionar, listaCombatentes);
 }
 
@@ -84,14 +87,12 @@ function configurarEventosRecarregamento() {
 }
 
 function removerImagemUpload(sufixo = '', isEdit = false) {
-    const prefix        = isEdit ? 'edit' : 'input';
-    const input         = document.getElementById(`${prefix}Foto${sufixo}`);
-    const placeholderId = isEdit ? `${prefix}UploadPlaceholder` : `uploadPlaceholder${sufixo}`;
-    const previewId     = isEdit ? `${prefix}UploadPreview`     : `uploadPreview${sufixo}`;
-    const placeholder   = document.getElementById(placeholderId);
-    const preview       = document.getElementById(previewId);
+    const prefix      = isEdit ? 'edit' : 'input';
+    const input       = document.getElementById(`${prefix}Foto${sufixo}`);
+    const placeholder = document.getElementById(isEdit ? `${prefix}UploadPlaceholder` : `uploadPlaceholder${sufixo}`);
+    const preview     = document.getElementById(isEdit ? `${prefix}UploadPreview`     : `uploadPreview${sufixo}`);
 
-    if (input)       input.value           = '';
+    if (input)       input.value             = '';
     if (placeholder) placeholder.style.display = 'flex';
     if (preview)     preview.style.display     = 'none';
 }
@@ -104,13 +105,13 @@ window.abrirModalCadastro = function(tipo) {
     else console.error('❌ Modal não encontrado para tipo:', tipo);
 };
 
-window.fecharSeletorTipo = function() { TipoSelector.fechar(); };
+window.fecharSeletorTipo  = function() { TipoSelector.fechar(); };
 
 window.abrirModalDanoCura = function() {
     if (window.modalDanoCuraInstance) {
         window.modalDanoCuraInstance.abrir();
     } else {
-        console.error('❌ Modal de Dano/Cura não foi inicializado');
+        console.error('❌ Modal de Dano/Cura não disponível');
     }
 };
 
