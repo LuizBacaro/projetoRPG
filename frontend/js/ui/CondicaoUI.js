@@ -6,9 +6,9 @@ export class CondicaoUI {
 
     /**
      * Renderiza a lista de condições ativas na div .arena-condicoes-lista
-     * @param {Array}  condicoes     - lista de objetos { id, nome, efeito }
-     * @param {number} combatenteId  - ID do combatente atual
-     * @param {Function} onRemover   - callback(combatenteId, condicaoId)
+     * @param {Array}    condicoes    - lista de objetos { id, nome, efeito }
+     * @param {number}   combatenteId - ID do combatente atual
+     * @param {Function} onRemover    - callback(combatenteId, condicaoId)
      */
     renderizarCondicoesAtivas(condicoes, combatenteId, onRemover) {
         const container = document.querySelector('.arena-condicoes-lista');
@@ -22,11 +22,16 @@ export class CondicaoUI {
         }
 
         condicoes.forEach(c => {
-            const slug  = c.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-');
-            const span  = document.createElement('span');
-            span.className   = `arena-condicao arena-condicao-${slug}`;
-            span.dataset.id  = c.id;
-            span.title       = c.efeito;   // tooltip com o efeito
+            const slug = c.nome
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, '-');
+
+            const span         = document.createElement('span');
+            span.className     = `arena-condicao arena-condicao-${slug}`;
+            span.dataset.id    = c.id;
+            span.title         = c.efeito;
 
             span.innerHTML = `
                 ${c.nome}
@@ -43,57 +48,52 @@ export class CondicaoUI {
     }
 
     /**
-     * Renderiza badge de condição no card da ordem de iniciativa
+     * Renderiza badges de condição no card da ordem de iniciativa
      * @param {HTMLElement} cardEl    - elemento do card
      * @param {Array}       condicoes - lista de condições ativas
      */
     renderizarBadgesOrdem(cardEl, condicoes) {
-        // Remove badges anteriores
-        cardEl.querySelectorAll('.badge-condicao-ordem').forEach(el => el.remove());
+        const wrapper = cardEl.querySelector('.badges-condicao-ordem-wrapper');
+        if (!wrapper) return;
 
+        wrapper.innerHTML = '';
         if (!condicoes.length) return;
 
-        const wrapper = document.createElement('div');
-        wrapper.className = 'badges-condicao-ordem';
-
-        // Exibe no máximo 3 badges no card — o resto fica no tooltip
         const visiveis = condicoes.slice(0, 3);
         const extras   = condicoes.length - visiveis.length;
 
         visiveis.forEach(c => {
-            const badge = document.createElement('span');
-            badge.className = 'badge-condicao-ordem';
-            badge.textContent = c.nome.slice(0, 3).toUpperCase(); // ex: "ATO"
-            badge.title = c.efeito;
+            const badge       = document.createElement('span');
+            badge.className   = 'badge-condicao-ordem';
+            badge.textContent = c.nome.slice(0, 3).toUpperCase();
+            badge.title       = c.efeito;
             wrapper.appendChild(badge);
         });
 
         if (extras > 0) {
-            const mais = document.createElement('span');
+            const mais       = document.createElement('span');
             mais.className   = 'badge-condicao-ordem badge-condicao-mais';
             mais.textContent = `+${extras}`;
             mais.title       = condicoes.slice(3).map(c => c.nome).join(', ');
             wrapper.appendChild(mais);
         }
-
-        cardEl.appendChild(wrapper);
     }
 
     /**
      * Popula o select do modal com todas as condições do catálogo
-     * @param {Array}  todasCondicoes  - catálogo completo
-     * @param {Array}  ativas          - condições já ativas (para desabilitar)
+     * @param {Array} todasCondicoes - catálogo completo
+     * @param {Array} ativas         - condições já ativas (para desabilitar)
      */
     popularSelectModal(todasCondicoes, ativas = []) {
         const select = document.getElementById('select-condicao');
         if (!select) return;
 
-        const ativasIds = new Set(ativas.map(c => c.id));
-        select.innerHTML = '<option value="">Selecione uma condição...</option>';
+        const ativasIds    = new Set(ativas.map(c => c.id));
+        select.innerHTML   = '<option value="">Selecione uma condição...</option>';
 
         todasCondicoes.forEach(c => {
-            const opt      = document.createElement('option');
-            opt.value      = c.id;
+            const opt       = document.createElement('option');
+            opt.value       = c.id;
             opt.textContent = c.nome;
             opt.title       = c.efeito;
             if (ativasIds.has(c.id)) {
@@ -113,26 +113,23 @@ export class CondicaoUI {
         const descEl = document.getElementById('condicao-descricao');
         if (!descEl) return;
 
-        const c = todasCondicoes.find(c => c.id === Number(condicaoId));
+        const c            = todasCondicoes.find(c => c.id === Number(condicaoId));
         descEl.textContent = c ? c.efeito : '';
         descEl.style.display = c ? 'block' : 'none';
     }
 
-    /** Abre o modal de condição */
     abrirModal() {
         const modal = document.getElementById('modal-condicao');
         if (modal) modal.style.display = 'flex';
     }
 
-    /** Fecha o modal de condição */
     fecharModal() {
-        const modal = document.getElementById('modal-condicao');
-        if (modal) modal.style.display = 'none';
+        const modal  = document.getElementById('modal-condicao');
+        if (modal)   modal.style.display = 'none';
 
-        // Limpa o select e a descrição
-        const select  = document.getElementById('select-condicao');
-        const descEl  = document.getElementById('condicao-descricao');
-        if (select)  select.value = '';
+        const select = document.getElementById('select-condicao');
+        const descEl = document.getElementById('condicao-descricao');
+        if (select)  select.value        = '';
         if (descEl) { descEl.textContent = ''; descEl.style.display = 'none'; }
     }
 }

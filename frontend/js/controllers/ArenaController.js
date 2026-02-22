@@ -43,7 +43,7 @@ export class ArenaController {
         if (btnFinalizar) btnFinalizar.addEventListener('click', () => this.finalizarCombate());
     }
 
-    // ── Combate ──────────────────────────────────────────────────────────────
+    // ── Combate ───────────────────────────────────────────────────────────────
 
     iniciarCombate(combatentes) {
         if (!combatentes || !Array.isArray(combatentes) || combatentes.length === 0) {
@@ -187,9 +187,9 @@ export class ArenaController {
             ['Car', combatente.carisma      || 10]
         ].map(([nome, val]) =>
             '<div class="arena-atributo-box">' +
-                '<span class="arena-atributo-nome">'  + nome      + '</span>' +
-                '<span class="arena-atributo-valor">' + val       + '</span>' +
-                '<span class="arena-atributo-mod">'   + mod(val)  + '</span>' +
+                '<span class="arena-atributo-nome">'  + nome     + '</span>' +
+                '<span class="arena-atributo-valor">' + val      + '</span>' +
+                '<span class="arena-atributo-mod">'   + mod(val) + '</span>' +
             '</div>'
         ).join('');
 
@@ -254,9 +254,9 @@ export class ArenaController {
                     '<div class="arena-secao">' +
                         '<h3 class="arena-secao-titulo">Resistências</h3>' +
                         '<div class="arena-resistencias-lista">' +
-                            '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Fortitude</span><span class="arena-resistencia-valor">' + sinal(fort)  + '</span></div>' +
+                            '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Fortitude</span><span class="arena-resistencia-valor">' + sinal(fort)   + '</span></div>' +
                             '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Reflexos</span><span class="arena-resistencia-valor">'   + sinal(reflex) + '</span></div>' +
-                            '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Vontade</span><span class="arena-resistencia-valor">'    + sinal(vont)  + '</span></div>' +
+                            '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Vontade</span><span class="arena-resistencia-valor">'    + sinal(vont)   + '</span></div>' +
                         '</div>' +
                     '</div>' +
                     '<div class="arena-secao">' +
@@ -300,7 +300,6 @@ export class ArenaController {
         window._toggleHP     = () => this.toggleVisibilidadeHP();
         window._toggleCA     = () => this.toggleVisibilidadeCA();
 
-        // Carrega condições do combatente ativo
         this.condicaoController.carregarCondicoesDoCombatente(combatente.id);
     }
 
