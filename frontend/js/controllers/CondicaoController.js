@@ -4,8 +4,8 @@
  *   SRP - orquestra apenas o fluxo de condições
  *   DIP - depende das abstrações CondicaoService e CondicaoUI
  */
-import { CondicaoService } from '../services/condicaoService.js';
-import { CondicaoUI }      from '../ui/condicaoUI.js';
+import { CondicaoService } from '../services/CondicaoService.js';
+import { CondicaoUI }      from '../ui/CondicaoUI.js';
 
 export class CondicaoController {
     constructor() {
