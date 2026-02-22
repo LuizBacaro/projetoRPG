@@ -9,7 +9,8 @@ from ..repositories.combate_repository import CombateRepository
 from ..services.combatente_service import CombatenteService
 from ..services.combate_service import CombateService
 from ..services.file_service import FileService
-
+from ..repositories.condicao_repository import CondicaoRepository
+from ..services.condicao_service import CondicaoService
 
 # ==================== REPOSITORIES ====================
 
@@ -56,3 +57,9 @@ def get_combate_service(
 def get_file_service() -> FileService:
     """Factory para FileService"""
     return FileService()
+
+
+def get_condicao_service(db: Session) -> CondicaoService:
+    condicao_repo   = CondicaoRepository(db)
+    combatente_repo = CombatenteRepository(db)
+    return CondicaoService(condicao_repo, combatente_repo)

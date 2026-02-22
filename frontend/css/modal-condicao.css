@@ -1,0 +1,272 @@
+/* ==================== MODAL CONDIÇÃO ==================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-condicao-container {
+    background: var(--cor-pergaminho);
+    border: 4px solid var(--cor-madeira);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    width: 460px;
+    max-width: 95vw;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+}
+
+/* Header */
+.modal-condicao-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    padding: 1rem 1.5rem;
+}
+
+.modal-condicao-header h2 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 1.4rem;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+}
+
+.modal-fechar {
+    background: transparent;
+    border: 2px solid var(--cor-dourada);
+    border-radius: 50%;
+    color: var(--cor-dourada);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.modal-fechar:hover {
+    background: var(--cor-dourada);
+    color: var(--cor-madeira);
+    transform: scale(1.1);
+}
+
+/* Body */
+.modal-condicao-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.modal-label {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-madeira);
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.modal-select-condicao {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    font-family: var(--fonte-texto);
+    font-size: 0.95rem;
+    background: white;
+    color: #2c1810;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.modal-select-condicao:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+/* Preview do efeito */
+.condicao-descricao-preview {
+    background: linear-gradient(135deg, rgba(139,69,19,0.1) 0%, rgba(101,67,33,0.08) 100%);
+    border: 1px solid var(--cor-madeira);
+    border-left: 4px solid var(--cor-dourada);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    color: #3a1f0d;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* Footer */
+.modal-condicao-footer {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 2px solid rgba(139,69,19,0.2);
+    justify-content: flex-end;
+}
+
+.btn-aplicar-condicao {
+    padding: 0.6rem 1.4rem;
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-aplicar-condicao:hover {
+    background: linear-gradient(135deg, #a0522d 0%, var(--cor-madeira) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.btn-cancelar-condicao {
+    padding: 0.6rem 1.2rem;
+    background: transparent;
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancelar-condicao:hover {
+    background: rgba(139,69,19,0.1);
+}
+
+/* ==================== BADGES NA ARENA (.arena-condicoes-lista) ==================== */
+
+.arena-condicao {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: default;
+    border: 1px solid rgba(0,0,0,0.2);
+    transition: transform 0.15s;
+}
+
+.arena-condicao:hover {
+    transform: scale(1.05);
+}
+
+.btn-remover-condicao {
+    background: rgba(0,0,0,0.25);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.btn-remover-condicao:hover {
+    background: rgba(220, 20, 60, 0.7);
+}
+
+.arena-condicao-vazia {
+    color: #888;
+    font-style: italic;
+    font-size: 0.85rem;
+}
+
+/* Cores por condição */
+.arena-condicao-flanqueado    { background: #4169E1; color: white; }
+.arena-condicao-atordoado     { background: #FFD700; color: #2c1810; }
+.arena-condicao-agarrado      { background: #8B4513; color: white; }
+.arena-condicao-envenenado    { background: #228B22; color: white; }
+.arena-condicao-sangrando     { background: #DC143C; color: white; }
+.arena-condicao-cego          { background: #2c2c2c; color: white; }
+.arena-condicao-confuso       { background: #9932CC; color: white; }
+.arena-condicao-paralisado    { background: #708090; color: white; }
+.arena-condicao-exausto       { background: #A0522D; color: white; }
+.arena-condicao-fatigado      { background: #CD853F; color: #2c1810; }
+.arena-condicao-nauseado      { background: #6B8E23; color: white; }
+.arena-condicao-apavorado     { background: #FF8C00; color: white; }
+.arena-condicao-enjoado       { background: #20B2AA; color: white; }
+.arena-condicao-surdo         { background: #708090; color: white; }
+.arena-condicao-fascinado     { background: #FF69B4; color: #2c1810; }
+.arena-condicao-invisivel     { background: rgba(200,200,200,0.4); color: #2c1810; border: 1px dashed #999; }
+.arena-condicao-abalado       { background: #DAA520; color: #2c1810; }
+.arena-condicao-cowering      { background: #800000; color: white; }
+.arena-condicao-deslumbrado   { background: #FFFACD; color: #2c1810; border: 1px solid #DAA520; }
+.arena-condicao-desprevenido  { background: #B8860B; color: white; }
+.arena-condicao-energizado    { background: #FF4500; color: white; }
+.arena-condicao-entorpecido   { background: #4682B4; color: white; }
+.arena-condicao-esmorecido    { background: #696969; color: white; }
+.arena-condicao-incorporeo    { background: rgba(135,206,235,0.5); color: #2c1810; border: 1px dashed #4682B4; }
+
+/* ==================== BADGES NA ORDEM DE INICIATIVA ==================== */
+
+.badges-condicao-ordem {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    margin-top: 0.3rem;
+}
+
+.badge-condicao-ordem {
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.62rem;
+    font-weight: bold;
+    background: rgba(139,69,19,0.75);
+    color: var(--cor-dourada);
+    border: 1px solid var(--cor-dourada);
+    cursor: default;
+    letter-spacing: 0.3px;
+}
+
+.badge-condicao-mais {
+    background: rgba(50,50,50,0.7);
+    color: #ccc;
+    border-color: #888;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 480px) {
+    .modal-condicao-container {
+        width: 95vw;
+    }
+
+    .modal-condicao-footer {
+        flex-direction: column;
+    }
+
+    .btn-aplicar-condicao,
+    .btn-cancelar-condicao {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
