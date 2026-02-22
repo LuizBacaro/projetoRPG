@@ -3,7 +3,7 @@
  * SOLID: SRP - apenas comunicação HTTP com a API de condições
  */
 export class CondicaoService {
-    constructor(baseUrl = '/api/v1') {
+    constructor(baseUrl = '/api') {
         this.baseUrl = baseUrl;
     }
 
