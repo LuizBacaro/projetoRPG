@@ -1,7 +1,8 @@
 /**
  * Controller da Arena de Combate
- * SOLID: SRP - Gerencia apenas a tela de arena
- *        DIP - Depende das abstrações CondicaoController e CombatenteService
+ * SOLID:
+ *   SRP - Gerencia apenas a tela de arena
+ *   DIP - Depende das abstrações CombatenteService e CondicaoController (ES Module)
  */
 import { CombatenteService }  from '../services/CombatenteService.js';
 import { CondicaoController } from './CondicaoController.js';
@@ -20,7 +21,7 @@ export class ArenaController {
     }
 
     async _inicializar() {
-        await this.condicaoController.init();
+        this.condicaoController.init();
         this.configurarEventos();
     }
 
@@ -43,7 +44,7 @@ export class ArenaController {
         if (btnFinalizar) btnFinalizar.addEventListener('click', () => this.finalizarCombate());
     }
 
-    // ── Combate ───────────────────────────────────────────────────────────────
+    // ── Combate 
 
     iniciarCombate(combatentes) {
         if (!combatentes || !Array.isArray(combatentes) || combatentes.length === 0) {
@@ -90,7 +91,7 @@ export class ArenaController {
         if (el) el.textContent = this.rodadaAtual;
     }
 
-    // ── Render: Ordem de Iniciativa ───────────────────────────────────────────
+    // ── Render: Ordem de Iniciativa 
 
     renderizarOrdemIniciativa() {
         const container = document.getElementById('ordemIniciativaContainer');
@@ -131,7 +132,7 @@ export class ArenaController {
         }
     }
 
-    // ── Render: Foto Ativo ────────────────────────────────────────────────────
+    // ── Render: Foto Ativo 
 
     renderizarFotoAtivo() {
         const container  = document.getElementById('arenaFotoAtivo');
@@ -145,7 +146,7 @@ export class ArenaController {
             : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
     }
 
-    // ── Render: Combatente Ativo ──────────────────────────────────────────────
+    // ── Render: Combatente Ativo 
 
     renderizarCombatenteAtivo() {
         const container  = document.getElementById('combatenteAtivoContainer');
@@ -268,7 +269,7 @@ export class ArenaController {
                     '<div class="arena-secao arena-acoes-col">' +
                         '<h3 class="arena-secao-titulo">Aplicar</h3>' +
                         '<button class="arena-btn-dano-cura" onclick="window._abrirDanoCura()">⚔️ Dano / Cura</button>' +
-                        '<button class="arena-btn-condicao" data-acao="condicao" data-combatente-id="' + combatente.id + '">🔮 Condição</button>' +
+                        '<button class="arena-btn-condicao" onclick="window._abrirCondicao()">🔮 Condição</button>' +
                         '<button class="arena-btn-proximo" onclick="window._avancarTurno()">✅ Encerrar turno</button>' +
                     '</div>' +
                 '</div>' +
@@ -291,19 +292,41 @@ export class ArenaController {
                 '</div>' +
             '</div>';
 
+        // ── Funções globais dos botões inline
         window._abrirDanoCura = () => {
             if (typeof modalDanoCuraInstance !== 'undefined') {
                 modalDanoCuraInstance.abrir(this.combatentes);
             }
         };
+
+        // ← Abre o ModalCondicao global com a lista de combatentes atualizada
+        window._abrirCondicao = () => {
+            if (typeof modalCondicaoInstance !== 'undefined') {
+                modalCondicaoInstance.abrir();
+            } else {
+                console.error('❌ modalCondicaoInstance não inicializado');
+            }
+        };
+
         window._avancarTurno = () => this.avancarTurno();
         window._toggleHP     = () => this.toggleVisibilidadeHP();
         window._toggleCA     = () => this.toggleVisibilidadeCA();
 
+        // Carrega condições ativas do combatente atual
         this.condicaoController.carregarCondicoesDoCombatente(combatente.id);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // ── Helpers 
+
+    renderizarAtributo(nome, valor) {
+        const mod    = this.calcularModificador(valor);
+        const modStr = mod >= 0 ? '+' + mod : '' + mod;
+        return '<div class="atributo-compacto">' +
+            '<div class="atributo-nome">'  + nome   + '</div>' +
+            '<div class="atributo-valor">' + valor  + '</div>' +
+            '<div class="atributo-mod">'   + modStr + '</div>' +
+        '</div>';
+    }
 
     calcularModificador(valor) { return Math.floor((valor - 10) / 2); }
 
@@ -321,12 +344,16 @@ export class ArenaController {
         return { jogador: '🧙', monstro: '👹', npc: '🤝' }[tipo] || '⚔️';
     }
 
+    // ── Ações de combate 
+
     resetarCombate() {
         if (!confirm('⚠️ Deseja realmente resetar o combate?\n\nTodos os combatentes retornarão ao HP máximo.')) return;
+
         this.combatentes.forEach(c => {
             c.hp_atual = c.hp_maximo;
             this.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
         });
+
         this.turnoAtual  = 0;
         this.rodadaAtual = 1;
         this.hpVisivel   = false;
