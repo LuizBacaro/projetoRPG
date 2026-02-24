@@ -61,27 +61,25 @@
     </header>
 
     <div class="arena-layout">
-        <!-- COLUNA ESQUERDA: Foto vertical + Ordem de Iniciativa -->
-        <aside class="ordem-iniciativa-panel">
-            <!-- ✅ FOTO VERTICAL DO COMBATENTE ATIVO -->
-            <div id="arenaFotoAtivo" class="arena-foto-vertical-container">
-                <!-- Preenchido via JavaScript -->
-            </div>
 
+        <!-- ✅ COLUNA 1: Foto do combatente ativo — separada -->
+        <div class="arena-foto-col">
+            <div id="arenaFotoAtivo" class="arena-foto-vertical-container"></div>
+        </div>
+
+        <!-- ✅ COLUNA 2: Lista de iniciativa — sem a foto competindo espaço -->
+        <aside class="ordem-iniciativa-panel">
             <div class="ordem-header">
                 <h2>📋 Ordem de Iniciativa</h2>
             </div>
-            <div id="ordemIniciativaContainer" class="ordem-lista">
-                <!-- Preenchido via JavaScript -->
-            </div>
+            <div id="ordemIniciativaContainer" class="ordem-lista"></div>
         </aside>
 
-        <!-- COLUNA CENTRAL: Combatente Ativo (sem turno-ativo) -->
+        <!-- ✅ COLUNA 3: Card do combatente ativo -->
         <main class="arena-main-ativo">
-            <div id="combatenteAtivoContainer">
-                <!-- Preenchido via JavaScript -->
-            </div>
+            <div id="combatenteAtivoContainer"></div>
         </main>
+
     </div>
 </div>
 
