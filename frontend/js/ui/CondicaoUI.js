@@ -19,18 +19,14 @@ class ModalCondicao {
         this._vincularEventos();
     }
 
-    // ── Catálogo 
-
     async _carregarCatalogo() {
         try {
             this.todasCondicoes = await this.condicaoService.listarTodas();
             console.log('✅ Catálogo de condições carregado:', this.todasCondicoes.length);
         } catch (err) {
-            console.error('❌ Erro ao carregar catálogo de condições:', err);
+            console.error('❌ Erro ao carregar catálogo:', err);
         }
     }
-
-    // ── Criação do Modal 
 
     _criarModal() {
         const existente = document.getElementById('modal-condicao');
@@ -39,20 +35,16 @@ class ModalCondicao {
         document.body.insertAdjacentHTML('beforeend', `
             <div id="modal-condicao" class="modal-condicao-overlay" style="display:none;">
                 <div class="modal-condicao-container">
-
                     <div class="modal-condicao-header">
                         <h2>🔮 Aplicar Condição</h2>
                         <button id="btn-fechar-modal-condicao" class="modal-condicao-fechar">✕</button>
                     </div>
-
                     <div class="modal-condicao-body">
                         <div class="condicao-layout">
-
                             <div class="condicao-combatentes-selecao">
                                 <h3>🎯 Selecionar Combatentes:</h3>
                                 <div id="lista-combatentes-condicao" class="lista-checkbox-combatentes"></div>
                             </div>
-
                             <div class="condicao-valores-aplicacao">
                                 <div class="campo-grupo">
                                     <label for="select-condicao" class="modal-label">Condição:</label>
@@ -62,23 +54,18 @@ class ModalCondicao {
                                 </div>
                                 <div id="condicao-descricao" class="condicao-descricao-preview" style="display:none;"></div>
                             </div>
-
                         </div>
                     </div>
-
                     <div class="modal-condicao-footer">
                         <button id="btn-cancelar-condicao" class="btn-cancelar-condicao">❌ Cancelar</button>
                         <button id="btn-aplicar-condicao" class="btn-aplicar-condicao">✅ Aplicar Condição</button>
                     </div>
-
                 </div>
             </div>
         `);
 
         this.modalElement = document.getElementById('modal-condicao');
     }
-
-    // ── Eventos 
 
     _vincularEventos() {
         document.getElementById('btn-fechar-modal-condicao')
@@ -97,8 +84,6 @@ class ModalCondicao {
         document.getElementById('select-condicao')
             ?.addEventListener('change', (e) => this._mostrarEfeito(e.target.value));
     }
-
-    // ── API Pública 
 
     abrir() {
         this.combatentesSelecionados.clear();
@@ -143,7 +128,6 @@ class ModalCondicao {
                 Toast.success(`🔮 "${condicao?.nome}" aplicada a ${ids.length} combatente(s)`);
             }
 
-            // Atualiza arena após aplicar
             if (this.arenaController) {
                 const ativo = this.arenaController.combatentes[this.arenaController.turnoAtual];
                 if (ativo) {
@@ -159,8 +143,6 @@ class ModalCondicao {
             if (typeof Toast !== 'undefined') Toast.error(`❌ Erro: ${err.message}`);
         }
     }
-
-    // ── Renderização (usada pelo CondicaoController) 
 
     renderizarCondicoesAtivas(condicoes, combatenteId, onRemover) {
         const container = document.querySelector('.arena-condicoes-lista');
@@ -179,17 +161,14 @@ class ModalCondicao {
             const span     = document.createElement('span');
             span.className = `arena-condicao arena-condicao-${slug}`;
             span.title     = c.efeito;
-
             span.innerHTML = `
                 ${c.nome}
                 <button class="btn-remover-condicao" title="Remover ${c.nome}" data-id="${c.id}">✕</button>
             `;
-
             span.querySelector('.btn-remover-condicao').addEventListener('click', (e) => {
                 e.stopPropagation();
                 onRemover(combatenteId, c.id);
             });
-
             container.appendChild(span);
         });
     }
@@ -218,8 +197,6 @@ class ModalCondicao {
             wrapper.appendChild(mais);
         }
     }
-
-    // ── Privados 
 
     _popularCombatentes() {
         const container   = document.getElementById('lista-combatentes-condicao');

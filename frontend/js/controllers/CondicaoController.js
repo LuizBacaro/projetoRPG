@@ -6,13 +6,11 @@
  */
 export class CondicaoController {
     constructor() {
-        // CondicaoService é global — carregado via <script> no index.html
         this.service         = new CondicaoService('/api');
         this.combatenteAtual = null;
     }
 
     init() {
-        // ModalCondicao cuida do próprio init — nada a fazer aqui
         console.log('✅ CondicaoController inicializado');
     }
 
