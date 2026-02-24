@@ -75,18 +75,16 @@ header p {
     padding: 2rem;
     max-width: 1600px;
     margin: 0 auto;
-      align-items: start;  
 }
 
 .painel-esquerdo,
 .painel-direito {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    position: sticky;        /* ← NOVO: fica visível ao rolar */
-    top: 1rem;
-    max-height: calc(100vh - 2rem);   /* ← NOVO: nunca ultrapassa a tela */
-    overflow: hidden;        /* ← NOVO: conteúdo interno rola, não o painel */
+    background: var(--cor-pergaminho);
+    border: 4px solid var(--cor-madeira);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 8px 30px var(--cor-sombra);
+    min-width: 0;
 }
 
 .painel-esquerdo h2,
@@ -99,27 +97,17 @@ header p {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* ==================== HEADER SELECIONADOS ==================== */
-.header-selecionados {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;          /* ← não encolhe */
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--cor-madeira);
-}
-
 /* ==================== FILTROS ==================== */
 .filters {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
 }
 
 .filter-btn {
     flex: 1;
-    padding: 0.8rem 1.5rem;
+    padding: 0.6rem 1rem;
     background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
     border: 2px solid var(--cor-madeira);
     border-radius: 8px;
@@ -128,7 +116,8 @@ header p {
     cursor: pointer;
     transition: all 0.3s;
     font-family: var(--fonte-texto);
-    font-size: 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
 }
 
 .filter-btn:hover {
@@ -144,64 +133,88 @@ header p {
     box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
 }
 
-/* ==================== LISTA DE COMBATENTES ==================== */
+/* ==================== BOTÃO ADICIONAR COMBATENTE ==================== */
+.btn-add-combatente {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    color: var(--cor-dourada);
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--fonte-titulo);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+}
 
+.btn-add-combatente:hover {
+    background: linear-gradient(135deg, #a0522d 0%, var(--cor-madeira) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 215, 0, 0.35);
+    border-color: #ffed4e;
+}
+
+.btn-add-combatente:active { transform: translateY(0); }
+
+/* ==================== LISTA DE COMBATENTES ==================== */
 .lista-combatentes {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-    max-height: 600px;
+    gap: 0.5rem;
+    max-height: 500px;
     overflow-y: auto;
-    padding-right: 0.5rem;
+    padding-right: 0.3rem;
 }
 
-.lista-combatentes::-webkit-scrollbar {
-    width: 8px;
-}
+.lista-combatentes::-webkit-scrollbar { width: 6px; }
+.lista-combatentes::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
+.lista-combatentes::-webkit-scrollbar-thumb { background: var(--cor-madeira); border-radius: 3px; }
 
-.lista-combatentes::-webkit-scrollbar-track {
-    background: rgba(139, 69, 19, 0.1);
-    border-radius: 4px;
-}
-
-.lista-combatentes::-webkit-scrollbar-thumb {
-    background: var(--cor-madeira);
-    border-radius: 4px;
-}
-
+/* ✅ CORRIGIDO: card sem quebra */
 .combatente-card {
-    background: linear-gradient(135deg, #f5f5dc 0%, #e8dcc4 100%);
-    border: 3px solid var(--cor-madeira);
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(232,220,196,0.9) 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 12px;
+    cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    min-width: 0;                           /* ← evita overflow do flex pai */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    flex-wrap: nowrap;
+    min-width: 0;
 }
 
 .combatente-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     border-color: var(--cor-dourada);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,240,200,0.95) 100%);
 }
 
 .combatente-card.selected {
-    border: 3px solid var(--cor-dourada);
-    background: linear-gradient(135deg, #fff8dc 0%, #f0e6c8 100%);
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    border-color: var(--cor-dourada);
+    background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(218,165,32,0.1) 100%);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
 }
 
-/* div inline do HTML (display:flex dentro do card) */
+/* ✅ CORRIGIDO: inner div do card */
 .combatente-card > div {
-    min-width: 0;                           /* ← impede overflow do conteúdo interno */
+    min-width: 0;
     flex: 1;
 }
 
 .combatente-foto {
-    width: 56px;                            /* ← era 80px, reduzido para caber melhor */
+    width: 56px;
     height: 56px;
     border-radius: 50%;
     object-fit: cover;
@@ -212,21 +225,21 @@ header p {
 }
 
 .combatente-foto-placeholder {
-    width: 56px;                            /* ← era 80px */
+    width: 56px;
     height: 56px;
     border-radius: 50%;
     background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;                      /* ← era 2.5rem */
+    font-size: 1.8rem;
     border: 3px solid var(--cor-madeira);
     flex-shrink: 0;
 }
 
 .combatente-info {
     flex: 1;
-    min-width: 0;                           /* ← adicionado, essencial para ellipsis funcionar */
+    min-width: 0;
     overflow: hidden;
 }
 
@@ -235,23 +248,25 @@ header p {
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.25rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    min-width: 0;
 }
 
 .combatente-header h3 {
     font-family: var(--fonte-titulo);
     color: var(--cor-madeira);
-    font-size: 1.1rem;                      /* ← era 1.3rem */
+    font-size: 1rem;
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
+    min-width: 0;
+    flex: 1;
 }
 
 .combatente-classe {
     color: #654321;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     margin-bottom: 0.25rem;
     white-space: nowrap;
     overflow: hidden;
@@ -260,34 +275,35 @@ header p {
 
 .combatente-stats {
     display: flex;
-    gap: 0.75rem;                           /* ← era 1.5rem */
-    flex-wrap: wrap;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+    align-items: center;
 }
 
 .stat {
     display: flex;
     align-items: center;
     gap: 0.2rem;
+    white-space: nowrap;
 }
 
 .stat-label {
     font-weight: bold;
     color: var(--cor-madeira);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
 }
 
 .stat-value {
     color: #654321;
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
 }
 
 /* ==================== BADGES ==================== */
-
 .badge {
-    padding: 0.2rem 0.6rem;                 /* ← era 0.3rem 0.8rem */
+    padding: 0.15rem 0.5rem;
     border-radius: 20px;
-    font-size: 0.75rem;                     /* ← era 0.85rem */
+    font-size: 0.7rem;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -296,25 +312,13 @@ header p {
     flex-shrink: 0;
 }
 
-.badge-jogador {
-    background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%);
-    color: #FFD700;
-}
-
-.badge-monstro {
-    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
-    color: #FFD700;
-}
-
-.badge-npc {
-    background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
-    color: #FFD700;
-}
+.badge-jogador { background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%); color: #FFD700; }
+.badge-monstro { background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%); color: #FFD700; }
+.badge-npc     { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); color: #FFD700; }
 
 /* ==================== BOTÃO EDITAR ==================== */
-
 .btn-editar {
-    padding: 0.4rem 0.8rem;                 /* ← era 0.6rem 1.2rem */
+    padding: 0.4rem 0.7rem;
     background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
     border: 2px solid var(--cor-madeira);
     border-radius: 8px;
@@ -323,7 +327,7 @@ header p {
     cursor: pointer;
     transition: all 0.3s;
     font-family: var(--fonte-texto);
-    font-size: 0.8rem;                      /* ← reduzido */
+    font-size: 0.78rem;
     white-space: nowrap;
     flex-shrink: 0;
     align-self: center;
@@ -335,71 +339,53 @@ header p {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* ==================== BADGES ==================== */
-.badge {
-    padding: 0.2rem 0.6rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+/* ==================== HEADER SELECIONADOS ==================== */
+.header-selecionados {
+    margin-bottom: 1rem;
 }
 
-.badge-jogador {
-    background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%);
-    color: #FFD700;
-}
-
-.badge-monstro {
-    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
-    color: #FFD700;
-}
-
-.badge-npc {
-    background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
-    color: #FFD700;
-}
-
-/* ==================== COMBATENTES SELECIONADOS ==================== */
-
+/* ==================== LISTA COMBATENTES SELECIONADOS ==================== */
+/* ✅ CORRIGIDO: scroll correto sem quebrar os cards */
 .lista-selecionados {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    max-height: 400px;
+    max-height: 420px;
     overflow-y: auto;
+    overflow-x: hidden;
     padding-right: 0.3rem;
+    margin-bottom: 1rem;
 }
 
-.lista-selecionados::-webkit-scrollbar {
-    width: 6px;
+.lista-selecionados::-webkit-scrollbar { width: 6px; }
+.lista-selecionados::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
+.lista-selecionados::-webkit-scrollbar-thumb { background: var(--cor-madeira); border-radius: 3px; }
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: rgba(139, 69, 19, 0.5);
+    font-style: italic;
 }
 
-.lista-selecionados::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.1);
-    border-radius: 3px;
-}
-
-.lista-selecionados::-webkit-scrollbar-thumb {
-    background: var(--cor-madeira);
-    border-radius: 3px;
-}
-
+/* ✅ CORRIGIDO: card selecionado sem quebra */
 .combatente-selecionado-card {
     display: flex;
-    align-items: flex-start;        /* ← era center */
-    gap: 0.5rem;
-    background: linear-gradient(135deg, rgba(139, 69, 19, 0.15) 0%, rgba(101, 67, 33, 0.1) 100%);
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.12) 0%, rgba(101, 67, 33, 0.08) 100%);
     border: 2px solid var(--cor-madeira);
     border-radius: 10px;
-    padding: 0.5rem;
+    padding: 0.6rem 0.8rem;
     transition: all 0.3s;
-    flex-wrap: wrap;                /* ← era nowrap */
-    min-height: 56px;
+    flex-wrap: nowrap;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .combatente-selecionado-card:hover {
-    background: linear-gradient(135deg, rgba(139, 69, 19, 0.25) 0%, rgba(101, 67, 33, 0.2) 100%);
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(101, 67, 33, 0.15) 100%);
     border-color: var(--cor-dourada);
 }
 
@@ -423,105 +409,98 @@ header p {
     object-position: center top;
 }
 
+.selecionado-foto-placeholder {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+/* ✅ CORRIGIDO: info com min-width: 0 para ellipsis funcionar */
 .selecionado-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.3rem;
     overflow: hidden;
-    min-width: 0;                   /* ← adicionado */
+    min-width: 0;
 }
 
 .selecionado-header {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    min-width: 0;
 }
 
 .selecionado-header h4 {
     margin: 0;
     font-family: var(--fonte-titulo);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: var(--cor-madeira);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 120px;
+    min-width: 0;
+    flex: 1;
 }
 
+/* ✅ CORRIGIDO: stats em linha sem quebrar */
 .selecionado-stats {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
 }
 
-.selecionado-stat-hp {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.8rem;
-    color: #2c1810;
-    flex-wrap: wrap;                /* ← adicionado, separado do ini */
-}
-
+.selecionado-stat-hp,
 .selecionado-stat-ini {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.8rem;
-    color: #2c1810;                 /* ← sem flex-wrap intencional */
+    gap: 0.3rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
-.stat-icon {
-    font-size: 0.75rem;
-    flex-shrink: 0;
-}
+.stat-icon { font-size: 0.75rem; flex-shrink: 0; }
+.stat-separator { color: var(--cor-madeira); font-weight: bold; font-size: 0.8rem; }
 
-.stat-label {
-    font-weight: bold;
-    color: var(--cor-madeira);
-    flex-shrink: 0;
-}
-
-.stat-value {
-    color: #2c1810;
-    font-weight: bold;
-    flex-shrink: 0;
-}
-
-.stat-separator {
-    color: var(--cor-madeira);
-    flex-shrink: 0;
-}
-
+/* ✅ Inputs de HP e Iniciativa editáveis */
 .hp-input-selecionado,
 .ini-input-selecionado {
-    width: 60px;                    /* ← era 70px */
+    width: 52px;
     padding: 0.15rem 0.3rem;
     border: 1px solid var(--cor-madeira);
-    border-radius: 4px;
-    font-size: 0.8rem;
-    background: white;
-    color: #2c1810;
+    border-radius: 5px;
+    font-size: 0.82rem;
+    font-weight: bold;
     text-align: center;
+    background: rgba(255,255,255,0.8);
+    color: #2c1810;
     font-family: var(--fonte-texto);
+    transition: all 0.2s;
 }
 
 .hp-input-selecionado:focus,
 .ini-input-selecionado:focus {
     outline: none;
     border-color: var(--cor-dourada);
-    box-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 6px rgba(255,215,0,0.4);
+    background: white;
 }
 
+.stat-value {
+    color: #654321;
+    font-weight: bold;
+    font-size: 0.82rem;
+}
+
+/* ✅ Botão remover */
 .btn-remove-selecionado {
-    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
-    border: 1px solid #DC143C;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    border: 2px solid #DC143C;
     color: white;
-    width: 24px;
-    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -530,7 +509,7 @@ header p {
     font-size: 0.7rem;
     transition: all 0.3s;
     padding: 0;
-    align-self: flex-start;         /* ← adicionado */
+    align-self: center;
 }
 
 .btn-remove-selecionado:hover {
@@ -599,41 +578,7 @@ header p {
     box-shadow: 0 4px 15px rgba(220, 20, 60, 0.5);
 }
 
-/* ==================== BOTÃO ADICIONAR COMBATENTE ==================== */
-
-.btn-add-combatente {
-    width: 100%;
-    padding: 0.65rem 1rem;
-    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
-    border: 2px solid var(--cor-dourada);
-    border-radius: 8px;
-    color: var(--cor-dourada);
-    font-size: 0.95rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-family: var(--fonte-titulo);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: center;
-    margin-bottom: 1rem;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-    letter-spacing: 0.5px;
-}
-
-.btn-add-combatente:hover {
-    background: linear-gradient(135deg, #a0522d 0%, var(--cor-madeira) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(255, 215, 0, 0.35);
-    border-color: #ffed4e;
-}
-
-.btn-add-combatente:active {
-    transform: translateY(0);
-}
-
-/* ==================== BOTÕES ADICIONAR COMBATENTES ==================== */
+/* ==================== BOTÕES ADICIONAR TIPO ==================== */
 .btns-adicionar {
     display: flex;
     gap: 0.5rem;
@@ -1120,8 +1065,7 @@ header p {
     box-sizing: border-box;
 }
 
-
-/* ✅ Grid de 3 colunas: foto | iniciativa | card ativo */
+/* ✅ CORRIGIDO: 3 colunas — foto | iniciativa | card ativo */
 #telaArena .arena-layout {
     flex: 1;
     display: grid;
@@ -1140,7 +1084,6 @@ header p {
     overflow: hidden;
 }
 
-/* Foto vertical — agora ocupa coluna própria e pode crescer mais */
 .arena-foto-vertical-container {
     width: 100%;
     flex: 1;
@@ -1167,9 +1110,7 @@ header p {
     color: rgba(255, 215, 0, 0.35);
 }
 
-
-/* ==================== PAINEL ESQUERDO: FOTO + INICIATIVA ==================== */
-/* ✅ Escopado com #telaArena para não afetar tela de configuração */
+/* ==================== COLUNA 2: PAINEL INICIATIVA ==================== */
 #telaArena .ordem-iniciativa-panel {
     display: flex;
     flex-direction: column;
@@ -1182,34 +1123,6 @@ header p {
     box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 2px 10px rgba(255,215,0,0.1);
 }
 
-
-/* Foto vertical do combatente ativo */
-.arena-foto-vertical-container {
-    width: 100%;
-    flex-shrink: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid var(--cor-dourada);
-    background: rgba(0,0,0,0.3);
-    height: 280px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4), 0 0 10px rgba(255,215,0,0.1);
-}
-
-.arena-foto-vertical-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.arena-foto-vertical-placeholder {
-    font-size: 3.5rem;
-    color: rgba(255, 215, 0, 0.35);
-}
-
-/* Cabeçalho de iniciativa */
 #telaArena .ordem-header {
     flex-shrink: 0;
     padding: 0.25rem 0;
@@ -1239,215 +1152,7 @@ header p {
     gap: 0.3rem;
 }
 
-/* ✅ Items da lista — escopados */
-#telaArena .combatente-ordem-item {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.32rem 0.4rem;
-    border-radius: 7px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,215,0,0.1);
-    transition: all 0.2s;
-    min-width: 0;
-    overflow: hidden;
-}
-
-#telaArena .combatente-ordem-item.ativo {
-    background: rgba(255, 215, 0, 0.12);
-    border-color: var(--cor-dourada);
-    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
-}
-
-#telaArena .combatente-ordem-item.morto {
-    opacity: 0.35;
-    filter: grayscale(1);
-}
-
-.ordem-iniciativa-valor {
-    font-size: 0.88rem;
-    font-weight: bold;
-    color: var(--cor-dourada);
-    font-family: var(--fonte-titulo);
-    min-width: 20px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.ordem-info {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.18rem;
-    overflow: hidden;
-}
-
-.ordem-nome {
-    font-size: 0.72rem;
-    color: var(--cor-pergaminho);
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-}
-
-.ordem-hp-bar {
-    width: 100%;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.ordem-hp-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.4s ease;
-}
-
-.badge-mini {
-    font-size: 0.7rem;
-    flex-shrink: 0;
-    padding: 0.08rem 0.15rem;
-    line-height: 1;
-}
-
-/* ==================== COLUNA 3: CARD DO ATIVO ==================== */
-#telaArena .arena-main-ativo {
-    overflow-y: auto;
-    min-height: 0;
-    padding-right: 0.3rem;
-}
-
-/* ==================== RESPONSIVO ==================== */
-@media (max-width: 1100px) {
-    #telaArena .arena-layout {
-        grid-template-columns: 140px 180px 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    #telaArena .arena-layout {
-        grid-template-columns: 120px 1fr;
-        grid-template-rows: auto 1fr;
-    }
-    /* Foto ocupa linha inteira no mobile */
-    .arena-foto-col {
-        grid-column: 1 / -1;
-        height: 200px;
-        flex-direction: row;
-    }
-    #telaArena.ativa { height: auto; overflow: auto; }
-}
-
-@media (max-width: 480px) {
-    #telaArena .arena-layout {
-        grid-template-columns: 1fr;
-    }
-    .arena-foto-col {
-        height: 180px;
-    }
-}/* ==================== LAYOUT DA ARENA ==================== */
-#telaArena.ativa {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-/* ✅ Grid de 3 colunas: foto | iniciativa | card ativo */
-#telaArena .arena-layout {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 160px 200px 1fr;
-    gap: 0.8rem;
-    padding: 0.5rem;
-    overflow: hidden;
-    min-height: 0;
-}
-
-/* ==================== COLUNA 1: FOTO DO ATIVO ==================== */
-.arena-foto-col {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-}
-
-/* Foto vertical — agora ocupa coluna própria e pode crescer mais */
-.arena-foto-vertical-container {
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid var(--cor-dourada);
-    background: rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4), 0 0 10px rgba(255,215,0,0.1);
-}
-
-.arena-foto-vertical-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-}
-
-.arena-foto-vertical-placeholder {
-    font-size: 4rem;
-    color: rgba(255, 215, 0, 0.35);
-}
-
-/* ==================== COLUNA 2: PAINEL DE INICIATIVA ==================== */
 /* ✅ Escopado com #telaArena */
-#telaArena .ordem-iniciativa-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    overflow: hidden;
-    min-height: 0;
-    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
-    border-radius: 12px;
-    padding: 0.6rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 2px 10px rgba(255,215,0,0.1);
-}
-
-#telaArena .ordem-header {
-    flex-shrink: 0;
-    padding: 0.25rem 0;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
-    margin-bottom: 0.2rem;
-}
-
-#telaArena .ordem-header h2 {
-    font-family: var(--fonte-titulo);
-    color: var(--cor-dourada);
-    font-size: 0.82rem;
-    margin: 0;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-    letter-spacing: 0.5px;
-}
-
-#telaArena .ordem-lista {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-/* ✅ Items da lista — escopados */
 #telaArena .combatente-ordem-item {
     display: flex;
     align-items: center;
@@ -1527,36 +1232,6 @@ header p {
     overflow-y: auto;
     min-height: 0;
     padding-right: 0.3rem;
-}
-
-/* ==================== RESPONSIVO ==================== */
-@media (max-width: 1100px) {
-    #telaArena .arena-layout {
-        grid-template-columns: 140px 180px 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    #telaArena .arena-layout {
-        grid-template-columns: 120px 1fr;
-        grid-template-rows: auto 1fr;
-    }
-    /* Foto ocupa linha inteira no mobile */
-    .arena-foto-col {
-        grid-column: 1 / -1;
-        height: 200px;
-        flex-direction: row;
-    }
-    #telaArena.ativa { height: auto; overflow: auto; }
-}
-
-@media (max-width: 480px) {
-    #telaArena .arena-layout {
-        grid-template-columns: 1fr;
-    }
-    .arena-foto-col {
-        height: 180px;
-    }
 }
 
 /* ==================== CARD DO COMBATENTE ATIVO ==================== */
@@ -1679,7 +1354,6 @@ header p {
     transition: width 0.4s ease;
 }
 
-/* Botão toggle olho */
 .arena-hp-toggle {
     position: absolute;
     top: 0.25rem; right: 0.25rem;
@@ -1690,8 +1364,6 @@ header p {
 }
 
 .arena-hp-toggle:hover { opacity: 1; }
-
-/* Valor oculto */
 .arena-stat-valor.hp-oculto { letter-spacing: 2px; font-size: 0.85rem; }
 
 /* ==================== GRADE CENTRAL ==================== */
@@ -1889,7 +1561,6 @@ header p {
 }
 
 .checkbox-combatente-item:hover { border-color: var(--cor-dourada); }
-
 .checkbox-combatente-item.selecionado {
     border-color: var(--cor-dourada);
     background: linear-gradient(135deg, #2a2015 0%, #3a2820 100%);
@@ -1994,15 +1665,26 @@ header p {
 }
 
 /* ==================== RESPONSIVO ==================== */
+@media (max-width: 1200px) {
+    #telaArena .arena-layout { grid-template-columns: 140px 180px 1fr; }
+}
+
 @media (max-width: 1100px) {
-    #telaArena .arena-layout  { grid-template-columns: 180px 1fr; }
+    #telaArena .arena-layout  { grid-template-columns: 130px 170px 1fr; }
     .arena-grade-central      { grid-template-columns: 1fr 1fr; }
     .arena-linha-inferior     { grid-template-columns: 1fr 1fr; }
 }
 
+@media (max-width: 900px) {
+    #telaArena .arena-layout  { grid-template-columns: 120px 160px 1fr; }
+}
+
 @media (max-width: 768px) {
     .container                { grid-template-columns: 1fr; }
-    #telaArena .arena-layout  { grid-template-columns: 1fr; }
+    #telaArena .arena-layout  { grid-template-columns: 1fr 1fr; grid-template-rows: 180px 1fr; }
+    .arena-foto-col           { grid-column: 1; grid-row: 1; }
+    #telaArena .ordem-iniciativa-panel { grid-column: 2; grid-row: 1; }
+    #telaArena .arena-main-ativo { grid-column: 1 / -1; grid-row: 2; }
     #telaArena.ativa          { height: auto; overflow: auto; }
     .arena-grade-central      { grid-template-columns: 1fr 1fr; }
     .arena-linha-inferior     { grid-template-columns: 1fr; }
@@ -2011,8 +1693,8 @@ header p {
 }
 
 @media (max-width: 600px) {
-    header         { padding: 0.6rem 1rem; }
-    header h1      { font-size: 1.4rem; }
+    header        { padding: 0.6rem 1rem; }
+    header h1     { font-size: 1.4rem; }
     .arena-stats-linha { flex-wrap: wrap; }
 }
 
@@ -2033,4 +1715,6 @@ header p {
     .foto-atributos-container { flex-direction: column; align-items: center; }
     .foto-vertical            { width: 100%; max-width: 250px; }
     .upload-area-vertical     { height: 320px; }
+    #telaArena .arena-layout  { grid-template-columns: 1fr; }
+    .arena-foto-col           { height: 180px; }
 }
