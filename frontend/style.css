@@ -1334,10 +1334,11 @@ header p {
     font-family: var(--fonte-titulo);
 }
 
-.arena-stat-ca       { background: linear-gradient(135deg, #1565C0, #0D47A1); border: 2px solid #42A5F5; }
-.arena-stat-pv       { flex: 2; background: linear-gradient(135deg, #6A0020, #4A0030); border: 2px solid #E91E63; }
-.arena-stat-surpresa { background: linear-gradient(135deg, #1B5E20, #2E7D32); border: 2px solid #66BB6A; }
-.arena-stat-toque    { background: linear-gradient(135deg, #E65100, #BF360C); border: 2px solid #FF7043; }
+/* ✅ CORRIGIDO: CA fica à DIREITA do PV usando order */
+.arena-stat-pv       { order: 1; flex: 2; background: linear-gradient(135deg, #6A0020, #4A0030); border: 2px solid #E91E63; }
+.arena-stat-ca       { order: 2; background: linear-gradient(135deg, #1565C0, #0D47A1); border: 2px solid #42A5F5; }
+.arena-stat-surpresa { order: 3; background: linear-gradient(135deg, #1B5E20, #2E7D32); border: 2px solid #66BB6A; }
+.arena-stat-toque    { order: 4; background: linear-gradient(135deg, #E65100, #BF360C); border: 2px solid #FF7043; }
 
 .arena-hp-bar {
     width: 100%;
