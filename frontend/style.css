@@ -1719,3 +1719,42 @@ header p {
     #telaArena .arena-layout  { grid-template-columns: 1fr; }
     .arena-foto-col           { height: 180px; }
 }
+
+/* ==================== TOGGLE STATS (BOTÃO ÚNICO) ==================== */
+.arena-topo-acoes {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.btn-toggle-stats {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 7px;
+    color: var(--cor-dourada);
+    padding: 0.35rem 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: var(--fonte-texto);
+}
+
+.btn-toggle-stats:hover {
+    background: linear-gradient(135deg, #2c1810 0%, #3a2010 100%);
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* ✅ Labels Surpresa e Toque: font-size menor para caber */
+.arena-stat-surpresa .arena-stat-label,
+.arena-stat-toque    .arena-stat-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.3px;
+}
+
+/* Remove o botão olho legado caso ainda exista no DOM */
+.arena-hp-toggle { display: none !important; }

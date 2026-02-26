@@ -1,24 +1,29 @@
 /**
  * Controller da Arena de Combate
  * SOLID:
- *   SRP - Gerencia apenas a tela de arena
- *   DIP - Depende das abstrações CombatenteService e CondicaoController (ES Module)
+ * SRP - Gerencia apenas a tela de arena
+ * DIP - Depende das abstrações CombatenteService e CondicaoController (ES Module)
  */
 import { CombatenteService }  from '../services/CombatenteService.js';
 import { CondicaoController } from './CondicaoController.js';
 import { Toast }              from '../ui/Toast.js';
 
 export class ArenaController {
+
     constructor() {
         this.combatenteService  = new CombatenteService();
         this.condicaoController = new CondicaoController();
         this.combatentes        = [];
         this.turnoAtual         = 0;
         this.rodadaAtual        = 1;
-        this.hpVisivel          = false;
-        this.caVisivel          = false;
+        // ✅ Um único estado controla todos os stats sensíveis
+        this.statsVisiveis      = false;
         this._inicializar();
     }
+
+    // 
+    // Init
+    // 
 
     async _inicializar() {
         this.condicaoController.init();
@@ -44,18 +49,19 @@ export class ArenaController {
         if (btnFinalizar) btnFinalizar.addEventListener('click', () => this.finalizarCombate());
     }
 
-    // ── Combate 
+    // 
+    // Combate
+    // 
 
     iniciarCombate(combatentes) {
         if (!combatentes || !Array.isArray(combatentes) || combatentes.length === 0) {
             Toast.error('Erro: Nenhum combatente válido para iniciar combate');
             return;
         }
-        this.combatentes = combatentes.sort((a, b) => b.iniciativa - a.iniciativa);
-        this.turnoAtual  = 0;
-        this.rodadaAtual = 1;
-        this.hpVisivel   = false;
-        this.caVisivel   = false;
+        this.combatentes    = combatentes.sort((a, b) => b.iniciativa - a.iniciativa);
+        this.turnoAtual     = 0;
+        this.rodadaAtual    = 1;
+        this.statsVisiveis  = false;
         this.atualizarRodada();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
@@ -73,17 +79,12 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
-    toggleVisibilidadeHP() {
-        this.hpVisivel = !this.hpVisivel;
+    // ✅ Um único método toggle para todos os stats sensíveis
+    toggleVisibilidadeStats() {
+        this.statsVisiveis = !this.statsVisiveis;
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
-        Toast.success(this.hpVisivel ? '👁️ HP Visível' : '🙈 HP Oculto');
-    }
-
-    toggleVisibilidadeCA() {
-        this.caVisivel = !this.caVisivel;
-        this.renderizarCombatenteAtivo();
-        Toast.success(this.caVisivel ? '👁️ CA Visível' : '🙈 CA Oculto');
+        Toast.success(this.statsVisiveis ? '👁️ Stats visíveis' : '🙈 Stats ocultos');
     }
 
     atualizarRodada() {
@@ -91,7 +92,9 @@ export class ArenaController {
         if (el) el.textContent = this.rodadaAtual;
     }
 
-    // ── Render: Ordem de Iniciativa 
+    // 
+    // Render: Ordem de Iniciativa
+    // 
 
     renderizarOrdemIniciativa() {
         const container = document.getElementById('ordemIniciativaContainer');
@@ -132,7 +135,9 @@ export class ArenaController {
         }
     }
 
-    // ── Render: Foto Ativo 
+    // 
+    // Render: Foto Ativo
+    // 
 
     renderizarFotoAtivo() {
         const container  = document.getElementById('arenaFotoAtivo');
@@ -146,7 +151,9 @@ export class ArenaController {
             : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
     }
 
-    // ── Render: Combatente Ativo 
+    // 
+    // Render: Combatente Ativo
+    // 
 
     renderizarCombatenteAtivo() {
         const container  = document.getElementById('combatenteAtivoContainer');
@@ -172,12 +179,23 @@ export class ArenaController {
         const mod   = (val) => { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? '+' + m : '' + m; };
         const sinal = (val) => val >= 0 ? '+' + val : '' + val;
 
-        const caValor  = this.caVisivel ? ca    : '?';
-        const caClasse = this.caVisivel ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-        const caOlho   = this.caVisivel ? '👁️' : '🙈';
-        const pvValor  = this.hpVisivel ? (combatente.hp_atual + '/' + combatente.hp_maximo) : '???/???';
-        const pvClasse = this.hpVisivel ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-        const pvOlho   = this.hpVisivel ? '👁️' : '🙈';
+        // ✅ Único estado para todos os stats sensíveis
+        const olhoIcon  = this.statsVisiveis ? '👁️' : '🙈';
+        const olhoTitle = this.statsVisiveis ? 'Ocultar stats' : 'Mostrar stats';
+
+        const pvValor   = this.statsVisiveis
+            ? (combatente.hp_atual + '/' + combatente.hp_maximo)
+            : '???/???';
+        const pvClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+
+        const caValor   = this.statsVisiveis ? ca       : '?';
+        const caClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+
+        const sValor    = this.statsVisiveis ? surpresa : '?';
+        const sClasse   = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+
+        const tValor    = this.statsVisiveis ? toque    : '?';
+        const tClasse   = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
 
         const atributosHTML = [
             ['For', combatente.forca        || 10],
@@ -212,6 +230,8 @@ export class ArenaController {
 
         container.innerHTML =
             '<div class="arena-card">' +
+
+                // ── Topo ──
                 '<div class="arena-topo">' +
                     '<div class="arena-foto-nome">' +
                         '<div class="arena-foto">' + fotoTopo + '</div>' +
@@ -222,31 +242,42 @@ export class ArenaController {
                             '</span>' +
                         '</div>' +
                     '</div>' +
-                    '<button class="btn-encerrar-combate" onclick="document.getElementById(\'btnFinalizarCombate\').click()">✖ Encerrar combate</button>' +
+
+                    // ✅ Botão único de toggle — posicionado no topo direito
+                    '<div class="arena-topo-acoes">' +
+                        '<button class="btn-toggle-stats" onclick="window._toggleStats()" title="' + olhoTitle + '">' +
+                            olhoIcon + ' ' + (this.statsVisiveis ? 'Ocultar' : 'Revelar') + ' Stats' +
+                        '</button>' +
+                        '<button class="btn-encerrar-combate" onclick="document.getElementById(\'btnFinalizarCombate\').click()">✖ Encerrar combate</button>' +
+                    '</div>' +
                 '</div>' +
 
+                // ── Stats linha: PV | CA | Surpresa | Toque ──
                 '<div class="arena-stats-linha">' +
-                    '<div class="arena-stat-box arena-stat-ca">' +
-                        '<span class="arena-stat-label">CA</span>' +
-                        '<button class="arena-hp-toggle" onclick="window._toggleCA()" title="Mostrar/Ocultar CA">' + caOlho + '</button>' +
-                        '<span class="' + caClasse + '">' + caValor + '</span>' +
-                    '</div>' +
+                    // PV (sem botão olho individual)
                     '<div class="arena-stat-box arena-stat-pv">' +
                         '<span class="arena-stat-label">PV</span>' +
-                        '<button class="arena-hp-toggle" onclick="window._toggleHP()" title="Mostrar/Ocultar HP">' + pvOlho + '</button>' +
                         '<span class="' + pvClasse + '">' + pvValor + '</span>' +
                         '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:' + hpPercentual + '%;background:' + hpCor + ';"></div></div>' +
                     '</div>' +
-                    '<div class="arena-stat-box arena-stat-surpresa">' +
-                        '<span class="arena-stat-label">S</span>' +
-                        '<span class="arena-stat-valor">' + surpresa + '</span>' +
+                    // CA (sem botão olho individual)
+                    '<div class="arena-stat-box arena-stat-ca">' +
+                        '<span class="arena-stat-label">CA</span>' +
+                        '<span class="' + caClasse + '">' + caValor + '</span>' +
                     '</div>' +
+                    // ✅ Label completo: Surpresa
+                    '<div class="arena-stat-box arena-stat-surpresa">' +
+                        '<span class="arena-stat-label">Surpresa</span>' +
+                        '<span class="' + sClasse + '">' + sValor + '</span>' +
+                    '</div>' +
+                    // ✅ Label completo: Toque
                     '<div class="arena-stat-box arena-stat-toque">' +
-                        '<span class="arena-stat-label">T</span>' +
-                        '<span class="arena-stat-valor">' + toque + '</span>' +
+                        '<span class="arena-stat-label">Toque</span>' +
+                        '<span class="' + tClasse + '">' + tValor + '</span>' +
                     '</div>' +
                 '</div>' +
 
+                // ── Grade Central ──
                 '<div class="arena-grade-central">' +
                     '<div class="arena-secao">' +
                         '<h3 class="arena-secao-titulo">Atributos</h3>' +
@@ -269,11 +300,12 @@ export class ArenaController {
                     '<div class="arena-secao arena-acoes-col">' +
                         '<h3 class="arena-secao-titulo">Aplicar</h3>' +
                         '<button class="arena-btn-dano-cura" onclick="window._abrirDanoCura()">⚔️ Dano / Cura</button>' +
-                        '<button class="arena-btn-condicao" onclick="window._abrirCondicao()">🔮 Condição</button>' +
-                        '<button class="arena-btn-proximo" onclick="window._avancarTurno()">✅ Encerrar turno</button>' +
+                        '<button class="arena-btn-condicao"  onclick="window._abrirCondicao()">🔮 Condição</button>' +
+                        '<button class="arena-btn-proximo"   onclick="window._avancarTurno()">✅ Encerrar turno</button>' +
                     '</div>' +
                 '</div>' +
 
+                // ── Linha Inferior ──
                 '<div class="arena-linha-inferior">' +
                     '<div class="arena-secao">' +
                         '<h3 class="arena-secao-titulo">Ataques</h3>' +
@@ -290,16 +322,16 @@ export class ArenaController {
                         '<div class="arena-futuro-placeholder">Quadro para futuro uso de outras informações</div>' +
                     '</div>' +
                 '</div>' +
+
             '</div>';
 
-        // ── Funções globais dos botões inline
+        // ── Funções globais dos botões inline ──
         window._abrirDanoCura = () => {
             if (typeof modalDanoCuraInstance !== 'undefined') {
                 modalDanoCuraInstance.abrir(this.combatentes);
             }
         };
 
-        // ← Abre o ModalCondicao global com a lista de combatentes atualizada
         window._abrirCondicao = () => {
             if (typeof modalCondicaoInstance !== 'undefined') {
                 modalCondicaoInstance.abrir();
@@ -308,15 +340,17 @@ export class ArenaController {
             }
         };
 
+        // ✅ Toggle único
+        window._toggleStats  = () => this.toggleVisibilidadeStats();
         window._avancarTurno = () => this.avancarTurno();
-        window._toggleHP     = () => this.toggleVisibilidadeHP();
-        window._toggleCA     = () => this.toggleVisibilidadeCA();
 
         // Carrega condições ativas do combatente atual
         this.condicaoController.carregarCondicoesDoCombatente(combatente.id);
     }
 
-    // ── Helpers 
+    // 
+    // Helpers
+    // 
 
     renderizarAtributo(nome, valor) {
         const mod    = this.calcularModificador(valor);
@@ -344,7 +378,9 @@ export class ArenaController {
         return { jogador: '🧙', monstro: '👹', npc: '🤝' }[tipo] || '⚔️';
     }
 
-    // ── Ações de combate 
+    // 
+    // Ações de Combate
+    // 
 
     resetarCombate() {
         if (!confirm('⚠️ Deseja realmente resetar o combate?\n\nTodos os combatentes retornarão ao HP máximo.')) return;
@@ -354,10 +390,9 @@ export class ArenaController {
             this.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
         });
 
-        this.turnoAtual  = 0;
-        this.rodadaAtual = 1;
-        this.hpVisivel   = false;
-        this.caVisivel   = false;
+        this.turnoAtual    = 0;
+        this.rodadaAtual   = 1;
+        this.statsVisiveis = false;
         this.atualizarRodada();
         Toast.success('Combate resetado! 🔄');
         this.renderizarOrdemIniciativa();
