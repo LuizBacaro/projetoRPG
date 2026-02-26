@@ -62,12 +62,12 @@
 
 <!-- ARENA DE COMBATE -->
 <div id="telaArena" class="tela">
-    <header>
-        <h1>⚔️ Arena de Combate - Em Progresso</h1>
-        <div class="info-combate">
-            <span>Rodada: <strong id="rodadaAtual">1</strong></span>
-            <button id="btnResetarCombate" class="btn-secundario">Resetar Combate</button>
-            <button id="btnFinalizarCombate" class="btn-secundario">Finalizar Combate</button>
+
+    <!-- ✅ Header compacto: título + rodada inline, sem botões -->
+    <header class="header-arena">
+        <div class="header-arena-titulo">
+            <h1>⚔️ Arena de Combate - Em Progresso</h1>
+            <span class="rodada-badge">Rodada <strong id="rodadaAtual">1</strong></span>
         </div>
     </header>
 
@@ -78,7 +78,7 @@
             <div id="arenaFotoAtivo" class="arena-foto-vertical-container"></div>
         </div>
 
-        <!-- ✅ COLUNA 2: Lista de iniciativa — sem a foto competindo espaço -->
+        <!-- ✅ COLUNA 2: Lista de iniciativa -->
         <aside class="ordem-iniciativa-panel">
             <div class="ordem-header">
                 <h2>📋 Ordem de Iniciativa</h2>

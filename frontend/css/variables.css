@@ -28,7 +28,7 @@ body {
     min-height: 100vh;
 }
 
-/* ==================== HEADER ==================== */
+/* ==================== HEADER PADRÃO (tela configuração) ==================== */
 header {
     background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
     padding: 0.8rem 2rem;
@@ -50,6 +50,54 @@ header p {
     color: var(--cor-pergaminho);
 }
 
+/* ==================== HEADER ARENA (compacto, inline) ==================== */
+/* ✅ Escopado para não afetar o header de configuração */
+.header-arena {
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    padding: 0.45rem 1.2rem;
+    border-bottom: 3px solid var(--cor-dourada);
+    box-shadow: 0 3px 12px var(--cor-sombra);
+    flex-shrink: 0;
+}
+
+/* ✅ Título + badge de rodada em linha, alinhados */
+.header-arena-titulo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-arena h1 {
+    font-family: var(--fonte-titulo);
+    font-size: 1.1rem;
+    color: var(--cor-dourada);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* ✅ Badge de rodada — destaque dourado compacto */
+.rodada-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1.5px solid var(--cor-dourada);
+    border-radius: 20px;
+    padding: 0.18rem 0.75rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.88rem;
+    color: var(--cor-pergaminho);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.rodada-badge strong {
+    color: var(--cor-dourada);
+    font-size: 1rem;
+}
+
+/* ==================== INFO-COMBATE (tela configuração legado) ==================== */
 .info-combate {
     display: flex;
     gap: 1rem;
