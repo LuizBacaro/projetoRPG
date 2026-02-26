@@ -16,14 +16,13 @@ export class ArenaController {
         this.combatentes        = [];
         this.turnoAtual         = 0;
         this.rodadaAtual        = 1;
-        // ✅ Um único estado controla todos os stats sensíveis
         this.statsVisiveis      = false;
         this._inicializar();
     }
 
-    // 
+    // ─────────────────────────────────────────
     // Init
-    // 
+    // ─────────────────────────────────────────
 
     async _inicializar() {
         this.condicaoController.init();
@@ -39,29 +38,22 @@ export class ArenaController {
             }
         });
 
-        const btnAvancar   = document.getElementById('btnAvancarTurno');
-        if (btnAvancar)   btnAvancar.addEventListener('click',   () => this.avancarTurno());
-
-        const btnResetar   = document.getElementById('btnResetarCombate');
-        if (btnResetar)   btnResetar.addEventListener('click',   () => this.resetarCombate());
-
-        const btnFinalizar = document.getElementById('btnFinalizarCombate');
-        if (btnFinalizar) btnFinalizar.addEventListener('click', () => this.finalizarCombate());
+        // ✅ Botões legados removidos da info-combate — não precisam mais de listener
     }
 
-    // 
+    // ─────────────────────────────────────────
     // Combate
-    // 
+    // ─────────────────────────────────────────
 
     iniciarCombate(combatentes) {
         if (!combatentes || !Array.isArray(combatentes) || combatentes.length === 0) {
             Toast.error('Erro: Nenhum combatente válido para iniciar combate');
             return;
         }
-        this.combatentes    = combatentes.sort((a, b) => b.iniciativa - a.iniciativa);
-        this.turnoAtual     = 0;
-        this.rodadaAtual    = 1;
-        this.statsVisiveis  = false;
+        this.combatentes   = combatentes.sort((a, b) => b.iniciativa - a.iniciativa);
+        this.turnoAtual    = 0;
+        this.rodadaAtual   = 1;
+        this.statsVisiveis = false;
         this.atualizarRodada();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
@@ -79,7 +71,6 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
-    // ✅ Um único método toggle para todos os stats sensíveis
     toggleVisibilidadeStats() {
         this.statsVisiveis = !this.statsVisiveis;
         this.renderizarOrdemIniciativa();
@@ -92,9 +83,9 @@ export class ArenaController {
         if (el) el.textContent = this.rodadaAtual;
     }
 
-    // 
+    // ─────────────────────────────────────────
     // Render: Ordem de Iniciativa
-    // 
+    // ─────────────────────────────────────────
 
     renderizarOrdemIniciativa() {
         const container = document.getElementById('ordemIniciativaContainer');
@@ -135,9 +126,9 @@ export class ArenaController {
         }
     }
 
-    // 
+    // ─────────────────────────────────────────
     // Render: Foto Ativo
-    // 
+    // ─────────────────────────────────────────
 
     renderizarFotoAtivo() {
         const container  = document.getElementById('arenaFotoAtivo');
@@ -151,9 +142,9 @@ export class ArenaController {
             : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
     }
 
-    // 
+    // ─────────────────────────────────────────
     // Render: Combatente Ativo
-    // 
+    // ─────────────────────────────────────────
 
     renderizarCombatenteAtivo() {
         const container  = document.getElementById('combatenteAtivoContainer');
@@ -179,23 +170,17 @@ export class ArenaController {
         const mod   = (val) => { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? '+' + m : '' + m; };
         const sinal = (val) => val >= 0 ? '+' + val : '' + val;
 
-        // ✅ Único estado para todos os stats sensíveis
         const olhoIcon  = this.statsVisiveis ? '👁️' : '🙈';
         const olhoTitle = this.statsVisiveis ? 'Ocultar stats' : 'Mostrar stats';
 
-        const pvValor   = this.statsVisiveis
-            ? (combatente.hp_atual + '/' + combatente.hp_maximo)
-            : '???/???';
-        const pvClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-
-        const caValor   = this.statsVisiveis ? ca       : '?';
-        const caClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-
-        const sValor    = this.statsVisiveis ? surpresa : '?';
-        const sClasse   = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-
-        const tValor    = this.statsVisiveis ? toque    : '?';
-        const tClasse   = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        const pvValor  = this.statsVisiveis ? (combatente.hp_atual + '/' + combatente.hp_maximo) : '???/???';
+        const pvClasse = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        const caValor  = this.statsVisiveis ? ca       : '?';
+        const caClasse = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        const sValor   = this.statsVisiveis ? surpresa : '?';
+        const sClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        const tValor   = this.statsVisiveis ? toque    : '?';
+        const tClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
 
         const atributosHTML = [
             ['For', combatente.forca        || 10],
@@ -242,35 +227,31 @@ export class ArenaController {
                             '</span>' +
                         '</div>' +
                     '</div>' +
-
-                    // ✅ Botão único de toggle — posicionado no topo direito
                     '<div class="arena-topo-acoes">' +
                         '<button class="btn-toggle-stats" onclick="window._toggleStats()" title="' + olhoTitle + '">' +
                             olhoIcon + ' ' + (this.statsVisiveis ? 'Ocultar' : 'Revelar') + ' Stats' +
                         '</button>' +
-                        '<button class="btn-encerrar-combate" onclick="document.getElementById(\'btnFinalizarCombate\').click()">✖ Encerrar combate</button>' +
+                        // ✅ CORRIGIDO: chama window._finalizarCombate() diretamente
+                        // sem depender de btnFinalizarCombate que foi removido do HTML
+                        '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()" title="Encerrar combate">✖ Encerrar combate</button>' +
                     '</div>' +
                 '</div>' +
 
                 // ── Stats linha: PV | CA | Surpresa | Toque ──
                 '<div class="arena-stats-linha">' +
-                    // PV (sem botão olho individual)
                     '<div class="arena-stat-box arena-stat-pv">' +
                         '<span class="arena-stat-label">PV</span>' +
                         '<span class="' + pvClasse + '">' + pvValor + '</span>' +
                         '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:' + hpPercentual + '%;background:' + hpCor + ';"></div></div>' +
                     '</div>' +
-                    // CA (sem botão olho individual)
                     '<div class="arena-stat-box arena-stat-ca">' +
                         '<span class="arena-stat-label">CA</span>' +
                         '<span class="' + caClasse + '">' + caValor + '</span>' +
                     '</div>' +
-                    // ✅ Label completo: Surpresa
                     '<div class="arena-stat-box arena-stat-surpresa">' +
                         '<span class="arena-stat-label">Surpresa</span>' +
                         '<span class="' + sClasse + '">' + sValor + '</span>' +
                     '</div>' +
-                    // ✅ Label completo: Toque
                     '<div class="arena-stat-box arena-stat-toque">' +
                         '<span class="arena-stat-label">Toque</span>' +
                         '<span class="' + tClasse + '">' + tValor + '</span>' +
@@ -340,27 +321,17 @@ export class ArenaController {
             }
         };
 
-        // ✅ Toggle único
-        window._toggleStats  = () => this.toggleVisibilidadeStats();
-        window._avancarTurno = () => this.avancarTurno();
+        window._toggleStats      = () => this.toggleVisibilidadeStats();
+        window._avancarTurno     = () => this.avancarTurno();
+        // ✅ CORRIGIDO: função global que chama finalizarCombate() diretamente
+        window._finalizarCombate = () => this.finalizarCombate();
 
-        // Carrega condições ativas do combatente atual
         this.condicaoController.carregarCondicoesDoCombatente(combatente.id);
     }
 
-    // 
+    // ─────────────────────────────────────────
     // Helpers
-    // 
-
-    renderizarAtributo(nome, valor) {
-        const mod    = this.calcularModificador(valor);
-        const modStr = mod >= 0 ? '+' + mod : '' + mod;
-        return '<div class="atributo-compacto">' +
-            '<div class="atributo-nome">'  + nome   + '</div>' +
-            '<div class="atributo-valor">' + valor  + '</div>' +
-            '<div class="atributo-mod">'   + modStr + '</div>' +
-        '</div>';
-    }
+    // ─────────────────────────────────────────
 
     calcularModificador(valor) { return Math.floor((valor - 10) / 2); }
 
@@ -378,9 +349,9 @@ export class ArenaController {
         return { jogador: '🧙', monstro: '👹', npc: '🤝' }[tipo] || '⚔️';
     }
 
-    // 
+    // ─────────────────────────────────────────
     // Ações de Combate
-    // 
+    // ─────────────────────────────────────────
 
     resetarCombate() {
         if (!confirm('⚠️ Deseja realmente resetar o combate?\n\nTodos os combatentes retornarão ao HP máximo.')) return;
@@ -404,10 +375,17 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
+    // ✅ CORRIGIDO: finalizarCombate() é autossuficiente
+    // não depende mais de btnFinalizarCombate no HTML
     finalizarCombate() {
         if (!confirm('⚠️ Deseja finalizar o combate e voltar para a configuração?')) return;
-        document.getElementById('telaArena').classList.remove('ativa');
-        document.getElementById('telaConfiguracao').classList.add('ativa');
+
+        const telaArena        = document.getElementById('telaArena');
+        const telaConfiguracao = document.getElementById('telaConfiguracao');
+
+        if (telaArena)        telaArena.classList.remove('ativa');
+        if (telaConfiguracao) telaConfiguracao.classList.add('ativa');
+
         Toast.success('Combate finalizado! 🏁');
     }
 }
