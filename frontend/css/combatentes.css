@@ -1,0 +1,316 @@
+/* ==================== FILTROS ==================== */
+.filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    color: #2c1810;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--fonte-texto);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    background: linear-gradient(135deg, #e8b887 0%, #d4a574 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, var(--cor-dourada) 0%, #daa520 100%);
+    border-color: #8B4513;
+    color: #2c1810;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+}
+
+/* ==================== LISTA DE COMBATENTES ==================== */
+.lista-combatentes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.3rem;
+}
+
+.lista-combatentes::-webkit-scrollbar { width: 6px; }
+.lista-combatentes::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
+.lista-combatentes::-webkit-scrollbar-thumb { background: var(--cor-madeira); border-radius: 3px; }
+
+/* ==================== CARD COMBATENTE ==================== */
+.combatente-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(232,220,196,0.9) 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.combatente-card:hover {
+    border-color: var(--cor-dourada);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,240,200,0.95) 100%);
+}
+
+.combatente-card.selected {
+    border-color: var(--cor-dourada);
+    background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(218,165,32,0.1) 100%);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.combatente-card > div {
+    min-width: 0;
+    flex: 1;
+}
+
+/* ==================== FOTOS ==================== */
+.combatente-foto {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid var(--cor-madeira);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+}
+
+.combatente-foto-placeholder {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    border: 3px solid var(--cor-madeira);
+    flex-shrink: 0;
+}
+
+/* ==================== INFO DO COMBATENTE ==================== */
+.combatente-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.combatente-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.combatente-header h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-madeira);
+    font-size: 1rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+}
+
+.combatente-classe {
+    color: #654321;
+    font-size: 0.82rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.combatente-stats {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+}
+
+.stat-label {
+    font-weight: bold;
+    color: var(--cor-madeira);
+    font-size: 0.78rem;
+}
+
+.stat-value {
+    color: #654321;
+    font-weight: bold;
+    font-size: 0.78rem;
+}
+
+/* ==================== BADGES ==================== */
+.badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.badge-jogador { background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%); color: #FFD700; }
+.badge-monstro { background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%); color: #FFD700; }
+.badge-npc     { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); color: #FFD700; }
+
+/* ==================== LISTA SELECIONADOS ==================== */
+.lista-selecionados {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.3rem;
+    margin-bottom: 1rem;
+}
+
+.lista-selecionados::-webkit-scrollbar { width: 6px; }
+.lista-selecionados::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
+.lista-selecionados::-webkit-scrollbar-thumb { background: var(--cor-madeira); border-radius: 3px; }
+
+.combatente-selecionado-card {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.12) 0%, rgba(101, 67, 33, 0.08) 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 10px;
+    padding: 0.6rem 0.8rem;
+    transition: all 0.3s;
+    flex-wrap: nowrap;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.combatente-selecionado-card:hover {
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(101, 67, 33, 0.15) 100%);
+    border-color: var(--cor-dourada);
+}
+
+.selecionado-foto-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--cor-madeira);
+    flex-shrink: 0;
+    background: var(--cor-pergaminho-escuro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.selecionado-foto {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+}
+
+.selecionado-foto-placeholder { font-size: 1.4rem; line-height: 1; }
+
+.selecionado-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.selecionado-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.selecionado-header h4 {
+    margin: 0;
+    font-family: var(--fonte-titulo);
+    font-size: 0.88rem;
+    color: var(--cor-madeira);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+}
+
+.selecionado-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.selecionado-stat-hp,
+.selecionado-stat-ini {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.stat-icon     { font-size: 0.75rem; flex-shrink: 0; }
+.stat-separator { color: var(--cor-madeira); font-weight: bold; font-size: 0.8rem; }
+
+.hp-input-selecionado,
+.ini-input-selecionado {
+    width: 52px;
+    padding: 0.15rem 0.3rem;
+    border: 1px solid var(--cor-madeira);
+    border-radius: 5px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    text-align: center;
+    background: rgba(255,255,255,0.8);
+    color: #2c1810;
+    font-family: var(--fonte-texto);
+    transition: all 0.2s;
+}
+
+.hp-input-selecionado:focus,
+.ini-input-selecionado:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 6px rgba(255,215,0,0.4);
+    background: white;
+}

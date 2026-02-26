@@ -1,0 +1,64 @@
+/* ==================== RESET E VARIÁVEIS ==================== */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Philosopher:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --cor-dourada: #FFD700;
+    --cor-madeira: #8B4513;
+    --cor-madeira-claro: #d4a574;
+    --cor-pergaminho: #e8dcc4;
+    --cor-pergaminho-escuro: #d4c5a3;
+    --cor-sombra: rgba(0, 0, 0, 0.3);
+    --cor-jogador: #4169E1;
+    --cor-monstro: #DC143C;
+    --cor-npc: #32CD32;
+    --fonte-titulo: 'Cinzel', serif;
+    --fonte-texto: 'Philosopher', sans-serif;
+}
+
+body {
+    font-family: var(--fonte-texto);
+    background: linear-gradient(135deg, #2c1810 0%, #1a0f08 100%);
+    color: #f5f5dc;
+    min-height: 100vh;
+}
+
+/* ==================== HEADER ==================== */
+header {
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    padding: 0.8rem 2rem;
+    text-align: center;
+    border-bottom: 5px solid var(--cor-dourada);
+    box-shadow: 0 4px 20px var(--cor-sombra);
+}
+
+header h1 {
+    font-family: var(--fonte-titulo);
+    font-size: 2rem;
+    color: var(--cor-dourada);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    margin-bottom: 0.2rem;
+}
+
+header p {
+    font-size: 1rem;
+    color: var(--cor-pergaminho);
+}
+
+.info-combate {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.4rem;
+}
+
+.info-combate span {
+    color: var(--cor-dourada);
+    font-size: 1rem;
+}

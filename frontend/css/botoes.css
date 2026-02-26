@@ -1,0 +1,219 @@
+/* ==================== BOTÃO ADICIONAR COMBATENTE ==================== */
+.btn-add-combatente {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    color: var(--cor-dourada);
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--fonte-titulo);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+}
+
+.btn-add-combatente:hover {
+    background: linear-gradient(135deg, #a0522d 0%, var(--cor-madeira) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 215, 0, 0.35);
+    border-color: #ffed4e;
+}
+
+.btn-add-combatente:active { transform: translateY(0); }
+
+/* ==================== BOTÃO EDITAR ==================== */
+.btn-editar {
+    padding: 0.4rem 0.7rem;
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    color: #2c1810;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--fonte-texto);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.btn-editar:hover {
+    background: linear-gradient(135deg, #e8b887 0%, #d4a574 100%);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== BOTÃO REMOVER SELECIONADO ==================== */
+.btn-remove-selecionado {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    border: 2px solid #DC143C;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    transition: all 0.3s;
+    padding: 0;
+    align-self: center;
+}
+
+.btn-remove-selecionado:hover {
+    transform: scale(1.2);
+    box-shadow: 0 2px 8px rgba(220, 20, 60, 0.5);
+}
+
+/* ==================== BOTÕES PRINCIPAIS ==================== */
+.btn-iniciar {
+    width: 100%;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, var(--cor-dourada) 0%, #daa520 100%);
+    border: 3px solid var(--cor-madeira);
+    border-radius: 12px;
+    color: #2c1810;
+    font-family: var(--fonte-titulo);
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.btn-iniciar:hover {
+    background: linear-gradient(135deg, #ffed4e 0%, #e8b887 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+}
+
+.btn-iniciar:active { transform: translateY(0); }
+
+.btn-secundario {
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    color: #2c1810;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--fonte-texto);
+}
+
+.btn-secundario:hover {
+    background: linear-gradient(135deg, #e8b887 0%, #d4a574 100%);
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    padding: 1rem;
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    border: 2px solid #DC143C;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--fonte-texto);
+    font-size: 1.1rem;
+    flex: 1;
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #ff1744 0%, #c62828 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(220, 20, 60, 0.5);
+}
+
+/* ==================== BOTÕES ADICIONAR TIPO ==================== */
+.btns-adicionar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-add-jogador,
+.btn-add-monstro,
+.btn-add-npc {
+    flex: 1;
+    padding: 0.8rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: var(--fonte-texto);
+    font-size: 0.9rem;
+}
+
+.btn-add-jogador { background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%); color: #FFD700; }
+.btn-add-monstro { background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%); color: #FFD700; }
+.btn-add-npc     { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); color: #FFD700; }
+
+.btn-add-jogador:hover,
+.btn-add-monstro:hover,
+.btn-add-npc:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    filter: brightness(1.2);
+}
+
+/* ==================== BOTÃO TOGGLE STATS ARENA ==================== */
+.arena-topo-acoes {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.btn-toggle-stats {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 7px;
+    color: var(--cor-dourada);
+    padding: 0.35rem 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: var(--fonte-texto);
+}
+
+.btn-toggle-stats:hover {
+    background: linear-gradient(135deg, #2c1810 0%, #3a2010 100%);
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.btn-encerrar-combate {
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    color: #fff;
+    border: 2px solid #DC143C;
+    border-radius: 7px;
+    padding: 0.35rem 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-encerrar-combate:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+/* Legado: oculta botão olho individual */
+.arena-hp-toggle { display: none !important; }
