@@ -764,37 +764,49 @@
     </div>
 </div>
 
-<!-- ==================== MODAL DE DANO/CURA (NOVO) ==================== -->
-<div id="modalDanoCura" class="modal">
-    <div class="modal-content modal-dano-cura">
-        <div class="modal-header">
+<!-- ==================== MODAL DE DANO/CURA ==================== -->
+<div id="modalDanoCura" class="modal-dano-overlay">
+    <div class="modal-dano-container">
+
+        <!-- HEADER -->
+        <div class="modal-dano-header">
             <h2>⚔️ Aplicar Dano / Cura</h2>
-            <button class="modal-close" onclick="modalDanoCuraInstance.fechar()">✖</button>
+            <button class="modal-dano-fechar" onclick="modalDanoCuraInstance.fechar()">✕</button>
         </div>
-        <div class="modal-body">
-            <div class="dano-cura-layout">
-                <div class="combatentes-selecao">
+
+        <!-- BODY -->
+        <div class="modal-dano-body">
+            <div class="modal-dano-layout">
+
+                <!-- COLUNA ESQUERDA: lista de combatentes -->
+                <div class="dano-combatentes-selecao">
                     <h3>🎯 Selecionar Combatentes:</h3>
                     <div id="listaCombatentesDanoCura" class="lista-checkbox-combatentes">
                         <!-- Preenchido dinamicamente -->
                     </div>
                 </div>
-                <div class="valores-aplicacao">
+
+                <!-- COLUNA DIREITA: inputs de dano e cura -->
+                <div class="dano-valores-aplicacao">
                     <div class="campo-grupo">
-                        <label for="inputDanoModal">⚔️ DANO:</label>
+                        <label for="inputDanoModal" class="modal-label">⚔️ Dano:</label>
                         <input type="number" id="inputDanoModal" class="input-valor-modal" min="0" placeholder="0" value="0">
                     </div>
                     <div class="campo-grupo">
-                        <label for="inputCuraModal">💚 CURA:</label>
+                        <label for="inputCuraModal" class="modal-label">💚 Cura:</label>
                         <input type="number" id="inputCuraModal" class="input-valor-modal" min="0" placeholder="0" value="0">
                     </div>
                 </div>
+
             </div>
         </div>
-        <div class="modal-actions">
-            <button class="btn-cancelar" onclick="modalDanoCuraInstance.fechar()">❌ Cancelar</button>
-            <button class="btn-aplicar-principal" onclick="modalDanoCuraInstance.aplicar()">✅ Aplicar Dano / Cura</button>
+
+        <!-- FOOTER -->
+        <div class="modal-dano-footer">
+            <button class="btn-cancelar-dano" onclick="modalDanoCuraInstance.fechar()">❌ Cancelar</button>
+            <button class="btn-aplicar-dano" onclick="modalDanoCuraInstance.aplicar()">✅ Aplicar Dano / Cura</button>
         </div>
+
     </div>
 </div>
 
