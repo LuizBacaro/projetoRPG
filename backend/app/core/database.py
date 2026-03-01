@@ -10,25 +10,29 @@ from .config import settings
 
 def _build_engine():
     """
-    ✅ Monta a engine correta dependendo do banco:
+    Monta a engine correta dependendo do banco:
     - SQLite  (dev local): precisa de check_same_thread=False
-    - PostgreSQL (Railway): sem connect_args especiais
+    - PostgreSQL (Railway): pool_pre_ping + pool_recycle para conexões estáveis
     """
     is_sqlite = "sqlite" in settings.DATABASE_URL
 
-    connect_args = {"check_same_thread": False} if is_sqlite else {}
+    if is_sqlite:
+        return create_engine(
+            settings.DATABASE_URL,
+            connect_args={"check_same_thread": False},
+        )
 
+    # ✅ PostgreSQL no Railway — configurações de pool para produção
     return create_engine(
         settings.DATABASE_URL,
-        connect_args=connect_args,
-        # ✅ Pool adequado para PostgreSQL no Railway
-        pool_pre_ping=True,   # testa conexão antes de usar (evita conexão morta)
-        pool_recycle=300,     # recicla conexões a cada 5 min
+        pool_pre_ping=True,  # testa conexão antes de usar (evita conexão morta)
+        pool_recycle=300,    # recicla conexões a cada 5 min
+        pool_size=5,         # máximo de conexões simultâneas
+        max_overflow=10,     # conexões extras permitidas sob carga
     )
 
 
 # Engine
-engine = create_engine.__class__  # tipagem — engine criada abaixo
 engine = _build_engine()
 
 # Session factory
@@ -40,8 +44,8 @@ Base = declarative_base()
 
 def get_db():
     """
-    Dependency que fornece a sessão do banco de dados
-    Garante fechamento mesmo em caso de erro (context manager)
+    Dependency que fornece sessão do banco de dados.
+    Garante fechamento mesmo em caso de erro.
     """
     db = SessionLocal()
     try:

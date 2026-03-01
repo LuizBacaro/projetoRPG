@@ -5,32 +5,30 @@ SRP: única responsabilidade — centralizar configurações via variáveis de a
 from pydantic_settings import BaseSettings
 from pathlib import Path
 from typing import List
-import os
 
 
 class Settings(BaseSettings):
     """Configurações da aplicação — lidas do ambiente ou .env"""
 
     # Projeto
-    PROJECT_NAME: str = "Arena de Combate TTRPG API"
-    VERSION:      str = "1.0.0"
+    PROJECT_NAME:  str = "Arena de Combate TTRPG API"
+    VERSION:       str = "1.0.0"
     API_V1_PREFIX: str = "/api"
 
-    # ✅ Database — SQLite local em dev, PostgreSQL no Railway em prod
-    # Railway injeta DATABASE_URL automaticamente ao adicionar o plugin PostgreSQL
+    # ✅ DATABASE_URL: SQLite local em dev, PostgreSQL no Railway em prod
+    # Railway injeta DATABASE_URL automaticamente ao adicionar plugin PostgreSQL
     DATABASE_URL: str = "sqlite:///./rpg_arena.db"
 
     # Paths
-    BASE_DIR:     Path = Path(__file__).resolve().parent.parent.parent  # backend/
+    BASE_DIR:     Path = Path(__file__).resolve().parent.parent.parent
     UPLOADS_DIR:  Path = BASE_DIR / "uploads"
     FRONTEND_DIR: Path = BASE_DIR.parent / "frontend"
 
-    # ✅ CORS — em prod aceita apenas a URL do GitHub Pages
-    # Defina ALLOWED_ORIGINS no Railway: https://luizbacaro.github.io
+    # ✅ CORS — Railway: defina ALLOWED_ORIGINS=https://luizbacaro.github.io
     ALLOWED_ORIGINS: List[str] = ["*"]
 
     # Arquivo
-    MAX_FILE_SIZE:      int = 5 * 1024 * 1024   # 5MB
+    MAX_FILE_SIZE:      int = 5 * 1024 * 1024
     ALLOWED_EXTENSIONS: set = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 
     class Config:
@@ -40,7 +38,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# ✅ Corrige URL do Railway: 'postgres://' → 'postgresql://' (exigido pelo SQLAlchemy)
+# ✅ CORRIGIDO: Railway gera 'postgres://' mas SQLAlchemy exige 'postgresql://'
 if settings.DATABASE_URL.startswith("postgres://"):
     settings.DATABASE_URL = settings.DATABASE_URL.replace(
         "postgres://", "postgresql://", 1
