@@ -7,6 +7,9 @@ uvicorn[standard]==0.24.0
 # Database
 sqlalchemy==2.0.23
 
+# ✅ Driver PostgreSQL para produção (Railway)
+psycopg2-binary==2.9.9
+
 # File Upload
 python-multipart==0.0.6
 
