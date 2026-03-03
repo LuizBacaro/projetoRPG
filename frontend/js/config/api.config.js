@@ -1,25 +1,21 @@
 /**
- * Configuração da API — Single Responsibility (SOLID)
- * Determina a URL base conforme o ambiente (dev vs produção)
+ * Configuração centralizada da API
+ * Single Responsibility: única fonte de verdade para URLs
+ * Open/Closed: novos ambientes sem modificar consumidores
  */
 
-/** @type {boolean} true se estiver rodando em produção */
-const IS_PRODUCTION = window.location.hostname === 'arena-de-combate-rpg.com.br';
+const IS_PRODUCTION = !['localhost', '127.0.0.1'].includes(window.location.hostname);
 
-/**
- * Em produção: '' (string vazia) — frontend servido pelo mesmo FastAPI,
- *              chamadas são relativas ao próprio domínio
- * Em dev:      'http://localhost:8000'
- * @type {string}
- */
-const BASE_URL = IS_PRODUCTION ? '' : 'http://localhost:8000';
+const BASE_URL = IS_PRODUCTION ? '' : 'http://127.0.0.1:8000';
 
 export const API_CONFIG = {
     BASE_URL,
-    API_PREFIX: '/api',
+    API_PREFIX:    '/api',
+    API_V1_PREFIX: '/api',   // backend usa /api (não /api/v1)
     ENDPOINTS: {
         COMBATENTES: '/combatentes',
-        COMBATE: '/combate'
+        COMBATE:     '/combate',
+        CONDICOES:   '/condicoes',
     }
 };
 

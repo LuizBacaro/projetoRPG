@@ -3,9 +3,16 @@
  * Classe global (sem export) — carregada via <script> no index.html
  * SOLID: SRP - apenas comunicação HTTP com a API de condições
  */
+
+const _getCondicaoBaseUrl = () => {
+    const isProduction = !['localhost', '127.0.0.1'].includes(window.location.hostname);
+    return isProduction ? '/api' : 'http://127.0.0.1:8000/api';
+};
+
 class CondicaoService {
-    constructor(baseUrl = '/api') {
-        this.baseUrl = baseUrl;
+
+    constructor() {
+        this.baseUrl = _getCondicaoBaseUrl();
     }
 
     async listarTodas() {
