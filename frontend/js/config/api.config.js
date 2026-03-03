@@ -1,14 +1,23 @@
 /**
- * Configuração centralizada da API
- * Single Responsibility: única fonte de verdade para URLs
- * Compatível com ES modules (import) E scripts globais (window)
+ * Configuração da API — Single Responsibility (SOLID)
+ * Determina a URL base conforme o ambiente (dev vs produção)
+ *
+ * ✅ Compatível com ES modules  → import { getApiUrl } from '...'
+ * ✅ Compatível com scripts globais → window.getApiUrl('/combatentes')
  */
 
-const IS_PRODUCTION = !['localhost', '127.0.0.1'].includes(window.location.hostname);
+/** @type {boolean} true se estiver rodando em produção */
+const IS_PRODUCTION = window.location.hostname === 'arena-de-combate-rpg.com.br';
 
-const BASE_URL = IS_PRODUCTION ? '' : 'http://127.0.0.1:8000';
+/**
+ * Em produção: '' (string vazia) — frontend servido pelo mesmo FastAPI,
+ *              chamadas são relativas ao próprio domínio
+ * Em dev:      'http://localhost:8000'
+ * @type {string}
+ */
+const BASE_URL = IS_PRODUCTION ? '' : 'http://localhost:8000';
 
-const API_CONFIG = {
+export const API_CONFIG = {
     BASE_URL,
     API_PREFIX: '/api',
     ENDPOINTS: {
@@ -23,13 +32,16 @@ const API_CONFIG = {
  * @param {string} endpoint - ex: '/combatentes'
  * @returns {string}
  */
-const getApiUrl = (endpoint) => {
+export const getApiUrl = (endpoint) => {
     return `${BASE_URL}${API_CONFIG.API_PREFIX}${endpoint}`;
 };
 
-// ✅ Expõe globalmente para scripts não-modulares (DanoCuraService, CondicaoService, ModalDanoCura)
+/**
+ * Ponte para scripts não-modulares (DanoCuraService, CondicaoService, ModalDanoCura)
+ * que são carregados via <script> puro sem type="module"
+ * Única linha adicionada em relação à versão original ✅
+ */
 window.getApiUrl  = getApiUrl;
 window.API_CONFIG = API_CONFIG;
 
-// ✅ Exporta para ES modules (ConfiguracaoController, CombatenteService, etc.)
-export { getApiUrl, API_CONFIG, IS_PRODUCTION, BASE_URL };
+export { IS_PRODUCTION, BASE_URL };
