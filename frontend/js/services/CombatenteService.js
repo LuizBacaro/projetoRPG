@@ -1,10 +1,10 @@
 /**
  * Service de Combatente (Business Logic + API Calls)
  * Single Responsibility: apenas lógica de combatente
- * Carregado via <script> — sem módulos ES6
+ * Carregado via import ES module pelo main.js
  */
 
-class CombatenteService {
+export class CombatenteService {
 
     /**
      * Lista todos os combatentes ou filtra por tipo
@@ -18,9 +18,7 @@ class CombatenteService {
                 : getApiUrl('/combatentes');
 
             const response = await fetch(url);
-
             if (!response.ok) throw new Error('Erro ao carregar combatentes');
-
             return await response.json();
 
         } catch (error) {
@@ -37,9 +35,7 @@ class CombatenteService {
     async obterPorId(id) {
         try {
             const response = await fetch(`${getApiUrl('/combatentes')}/${id}`);
-
             if (!response.ok) throw new Error('Combatente não encontrado');
-
             return await response.json();
 
         } catch (error) {
@@ -114,7 +110,6 @@ class CombatenteService {
             });
 
             if (!response.ok) throw new Error('Erro ao atualizar HP');
-
             return await response.json();
 
         } catch (error) {
@@ -138,7 +133,6 @@ class CombatenteService {
             });
 
             if (!response.ok) throw new Error('Erro ao atualizar iniciativa');
-
             return await response.json();
 
         } catch (error) {
@@ -159,7 +153,6 @@ class CombatenteService {
             });
 
             if (!response.ok) throw new Error('Erro ao deletar combatente');
-
             return true;
 
         } catch (error) {
