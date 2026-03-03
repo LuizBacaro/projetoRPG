@@ -3,7 +3,6 @@
  * Single Responsibility: única fonte de verdade para URLs
  * Carregado via <script> — sem módulos ES6
  */
-
 (function () {
     const IS_PRODUCTION = !['localhost', '127.0.0.1'].includes(window.location.hostname);
 
@@ -17,11 +16,6 @@
         }
     };
 
-    /**
-     * Monta URL completa: BASE_URL + /api + endpoint
-     * @param {string} endpoint - ex: '/combatentes'
-     * @returns {string}
-     */
     window.getApiUrl = function (endpoint) {
         return `${window.API_CONFIG.BASE_URL}${window.API_CONFIG.API_PREFIX}${endpoint}`;
     };
