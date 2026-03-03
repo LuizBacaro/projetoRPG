@@ -2,9 +2,8 @@
  * Service responsável pela lógica de negócio de dano e cura
  * Single Responsibility Principle: apenas gerencia dano/cura
  * VERSÃO COM PERSISTÊNCIA: Faz requisições HTTP para o backend
+ * Carregado via <script> — sem módulos ES6
  */
-
-import { getApiUrl } from '../config/api.config.js';
 
 class DanoCuraService {
 
@@ -165,5 +164,3 @@ class DanoCuraService {
         }
     }
 }
-
-export { DanoCuraService };
