@@ -46,7 +46,9 @@ UPLOADS_DIR.mkdir(exist_ok=True)
 
 # Montar arquivos estáticos
 if FRONTEND_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+    app.mount("/css",    StaticFiles(directory=str(FRONTEND_DIR / "css")),    name="css")
+    app.mount("/js",     StaticFiles(directory=str(FRONTEND_DIR / "js")),     name="js")
+    app.mount("/pages",  StaticFiles(directory=str(FRONTEND_DIR / "pages")),  name="pages")
     print(f"✅ Frontend montado em: {FRONTEND_DIR}")
 else:
     print(f"⚠️  Frontend não encontrado em: {FRONTEND_DIR}")
