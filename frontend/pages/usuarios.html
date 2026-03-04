@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Usuários — Arena TTRPG</title>
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/components.css" />
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .tabela-usuarios { width: 100%; border-collapse: collapse; }
+        .tabela-usuarios th,
+        .tabela-usuarios td {
+            padding: .75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color, #333);
+        }
+        .tabela-usuarios th { background: var(--bg-secondary, #1a1a2e); font-weight: 600; }
+        .usuario-inativo td { opacity: .55; }
+
+        /* Badges */
+        .badge { padding: .25rem .65rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+        .badge-admin   { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed55; }
+        .badge-mestre  { background: #0369a122; color: #38bdf8; border: 1px solid #0369a155; }
+        .badge-jogador { background: #05966922; color: #34d399; border: 1px solid #05966955; }
+        .badge-ativo   { background: #16a34a22; color: #4ade80; border: 1px solid #16a34a55; }
+        .badge-inativo { background: #dc262622; color: #f87171; border: 1px solid #dc262655; }
+
+        /* Ações */
+        .btn-acao { background: none; border: none; cursor: pointer; font-size: 1rem; padding: .25rem; }
+        .btn-acao:hover { transform: scale(1.2); }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: #000000aa;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-box {
+            background: var(--bg-secondary, #1a1a2e);
+            border: 1px solid var(--border-color, #333);
+            border-radius: .75rem;
+            padding: 2rem;
+            min-width: 420px;
+            max-width: 90vw;
+        }
+        .modal-box h2 { margin-bottom: 1.25rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: .35rem; font-size: .875rem; color: #aaa; }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: .6rem .85rem;
+            border-radius: .4rem;
+            border: 1px solid var(--border-color, #444);
+            background: var(--bg-primary, #0f0f23);
+            color: inherit;
+            font-size: .95rem;
+        }
+        .form-group input:disabled,
+        .form-group select:disabled { opacity: .45; cursor: not-allowed; }
+        .aviso-inativo {
+            display: none;
+            background: #78350f22;
+            border: 1px solid #78350f88;
+            color: #fbbf24;
+            padding: .65rem 1rem;
+            border-radius: .4rem;
+            margin-bottom: 1rem;
+            font-size: .875rem;
+        }
+        .modal-acoes { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="page-header">
+            <h1>👤 Gerenciamento de Usuários</h1>
+            <div style="display:flex; gap:.75rem;">
+                <a href="/" class="btn btn-secondary">← Voltar</a>
+                <button id="btnNovoUsuario" class="btn btn-primary">+ Novo Usuário</button>
+            </div>
+        </div>
+
+        <!-- Tabela de usuários -->
+        <div class="card">
+            <table class="tabela-usuarios">
+                <thead>
+                    <tr>
+                        <th>Perfil</th>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Status</th>
+                        <th>Responsável</th>
+                        <th>Data da Ação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaUsuarios">
+                    <tr><td colspan="7" style="text-align:center;padding:2rem;">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div><!-- /container -->
+
+    <!-- Modal de cadastro/edição -->
+    <div id="modalUsuario" class="modal-overlay">
+        <div class="modal-box">
+            <h2 id="modalUsuarioTitulo">Novo Usuário</h2>
+
+            <div id="avisoInativo" class="aviso-inativo">
+                ⚠️ Usuário inativo — somente o Status pode ser alterado.
+            </div>
+
+            <div class="form-group">
+                <label>Perfil *</label>
+                <select id="selectPerfil">
+                    <option value="administrador">Administrador</option>
+                    <option value="mestre">Mestre</option>
+                    <option value="jogador" selected>Jogador</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Nome *</label>
+                <input id="inputNome" type="text" placeholder="Nome completo" />
+            </div>
+
+            <div class="form-group">
+                <label>E-mail * (usado no login)</label>
+                <input id="inputEmail" type="email" placeholder="email@exemplo.com" />
+            </div>
+
+            <div class="form-group">
+                <label>Senha * <small style="color:#888">(mín. 6 caracteres — deixe em branco para não alterar)</small></label>
+                <input id="inputSenha" type="password" placeholder="••••••" />
+            </div>
+
+            <div class="form-group">
+                <label>Status *</label>
+                <select id="selectStatus">
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                </select>
+            </div>
+
+            <div class="modal-acoes">
+                <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').style.display='none'">Cancelar</button>
+                <button class="btn btn-primary" onclick="usuarioController.modal.salvar()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts — config primeiro -->
+    <script src="/js/config/api.config.js"></script>
+    <script src="/js/services/UsuarioService.js"></script>
+    <script src="/js/ui/ModalUsuario.js"></script>
+    <script src="/js/controllers/UsuarioController.js"></script>
+</body>
+</html>

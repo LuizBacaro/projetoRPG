@@ -9,9 +9,10 @@ from pathlib import Path
 
 from .core.config import settings
 from .core.database import engine, Base, SessionLocal
-from .api.v1 import combatentes, combate, condicoes
+from .api.v1 import combatentes, combate, condicoes, usuarios
 
 # Importar models para criar tabelas (ordem importa para FK)
+from .models import usuario as usuario_mode
 from .models import combatente as combatente_model
 from .models import combate as combate_model
 from .models import condicao as condicao_model
@@ -56,6 +57,7 @@ else:
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 # Incluir routers
+app.include_router(usuarios.router,    prefix=settings.API_V1_PREFIX)  
 app.include_router(combatentes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(combate.router,     prefix=settings.API_V1_PREFIX)
 app.include_router(condicoes.router,   prefix=settings.API_V1_PREFIX)
