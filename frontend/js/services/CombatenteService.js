@@ -1,15 +1,26 @@
 /**
- * Service de Combatente (Business Logic + API Calls)
- * Single Responsibility: apenas lógica de combatente
- * Carregado via import ES module pelo main.js
+ * Service de Combatente
+ * Single Responsibility: comunicação HTTP + conversão para modelo de domínio
  */
+
+import { getApiUrl } from '../config/api.config.js';
+import { Combatente } from '../models/Combatente.js';
 
 export class CombatenteService {
 
     /**
+     * Converte JSON da API para instância de Combatente (com métodos)
+     * @param {Object} data - JSON puro da API
+     * @returns {Combatente}
+     */
+    _toModel(data) {
+        return new Combatente(data);
+    }
+
+    /**
      * Lista todos os combatentes ou filtra por tipo
      * @param {string|null} tipo
-     * @returns {Promise<Array>}
+     * @returns {Promise<Combatente[]>}
      */
     async listar(tipo = null) {
         try {
@@ -19,7 +30,9 @@ export class CombatenteService {
 
             const response = await fetch(url);
             if (!response.ok) throw new Error('Erro ao carregar combatentes');
-            return await response.json();
+
+            const data = await response.json();
+            return data.map(item => this._toModel(item)); // ✅ converte para Combatente
 
         } catch (error) {
             console.error('Erro ao listar combatentes:', error);
@@ -30,13 +43,15 @@ export class CombatenteService {
     /**
      * Obtém um combatente por ID
      * @param {number} id
-     * @returns {Promise<Object>}
+     * @returns {Promise<Combatente>}
      */
     async obterPorId(id) {
         try {
             const response = await fetch(`${getApiUrl('/combatentes')}/${id}`);
             if (!response.ok) throw new Error('Combatente não encontrado');
-            return await response.json();
+
+            const data = await response.json();
+            return this._toModel(data); // ✅ converte para Combatente
 
         } catch (error) {
             console.error('Erro ao obter combatente:', error);
@@ -47,7 +62,7 @@ export class CombatenteService {
     /**
      * Cria um novo combatente
      * @param {FormData} formData
-     * @returns {Promise<Object>}
+     * @returns {Promise<Combatente>}
      */
     async criar(formData) {
         try {
@@ -61,7 +76,8 @@ export class CombatenteService {
                 throw new Error(errorData.detail || 'Erro ao criar combatente');
             }
 
-            return await response.json();
+            const data = await response.json();
+            return this._toModel(data); // ✅ converte para Combatente
 
         } catch (error) {
             console.error('Erro ao criar combatente:', error);
@@ -73,7 +89,7 @@ export class CombatenteService {
      * Atualiza um combatente
      * @param {number} id
      * @param {FormData} formData
-     * @returns {Promise<Object>}
+     * @returns {Promise<Combatente>}
      */
     async atualizar(id, formData) {
         try {
@@ -87,7 +103,8 @@ export class CombatenteService {
                 throw new Error(errorData.detail || 'Erro ao atualizar combatente');
             }
 
-            return await response.json();
+            const data = await response.json();
+            return this._toModel(data); // ✅ converte para Combatente
 
         } catch (error) {
             console.error('Erro ao atualizar combatente:', error);
@@ -99,7 +116,7 @@ export class CombatenteService {
      * Atualiza apenas o HP de um combatente
      * @param {number} id
      * @param {number} hpAtual
-     * @returns {Promise<Object>}
+     * @returns {Promise<Combatente>}
      */
     async atualizarHP(id, hpAtual) {
         try {
@@ -110,7 +127,9 @@ export class CombatenteService {
             });
 
             if (!response.ok) throw new Error('Erro ao atualizar HP');
-            return await response.json();
+
+            const data = await response.json();
+            return this._toModel(data); // ✅ converte para Combatente
 
         } catch (error) {
             console.error('Erro ao atualizar HP:', error);
@@ -122,7 +141,7 @@ export class CombatenteService {
      * Atualiza apenas a iniciativa de um combatente
      * @param {number} id
      * @param {number} iniciativa
-     * @returns {Promise<Object>}
+     * @returns {Promise<Combatente>}
      */
     async atualizarIniciativa(id, iniciativa) {
         try {
@@ -133,7 +152,9 @@ export class CombatenteService {
             });
 
             if (!response.ok) throw new Error('Erro ao atualizar iniciativa');
-            return await response.json();
+
+            const data = await response.json();
+            return this._toModel(data); // ✅ converte para Combatente
 
         } catch (error) {
             console.error('Erro ao atualizar iniciativa:', error);
