@@ -9,8 +9,6 @@ from ..models.usuario import PerfilUsuario
 import re
 
 
-# ── Base ──────────────────────────────────────────────────────────────────────
-
 class UsuarioBase(BaseModel):
     perfil: PerfilUsuario
     nome:   str
@@ -32,8 +30,6 @@ class UsuarioBase(BaseModel):
         return v.lower().strip()
 
 
-# ── Criação ───────────────────────────────────────────────────────────────────
-
 class UsuarioCreate(UsuarioBase):
     senha: str
     ativo: bool = True
@@ -45,8 +41,6 @@ class UsuarioCreate(UsuarioBase):
             raise ValueError("Senha deve ter ao menos 6 caracteres")
         return v
 
-
-# ── Atualização ───────────────────────────────────────────────────────────────
 
 class UsuarioUpdate(BaseModel):
     perfil: Optional[PerfilUsuario] = None
@@ -73,8 +67,6 @@ class UsuarioUpdate(BaseModel):
         return v
 
 
-# ── Resposta ──────────────────────────────────────────────────────────────────
-
 class UsuarioResponse(UsuarioBase):
     id:                  int
     ativo:               bool
@@ -83,8 +75,6 @@ class UsuarioResponse(UsuarioBase):
 
     model_config = {"from_attributes": True}
 
-
-# ── Lista ─────────────────────────────────────────────────────────────────────
 
 class UsuarioListResponse(BaseModel):
     total:    int

@@ -4,7 +4,6 @@ SRP: apenas rotas HTTP para usuários
 """
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from typing import Optional
 from ...core.database import get_db
 from ...repositories.usuario_repository import UsuarioRepository
 from ...services.usuario_service import UsuarioService
@@ -24,7 +23,7 @@ def listar_usuarios(
     apenas_ativos: bool = Query(False, description="Filtrar apenas usuários ativos"),
     service: UsuarioService = Depends(get_service)
 ):
-    """Lista todos os usuários (Administrador)."""
+    """Lista todos os usuários."""
     usuarios = service.listar(apenas_ativos=apenas_ativos)
     return {"total": len(usuarios), "usuarios": usuarios}
 
@@ -43,7 +42,7 @@ def criar_usuario(
     dados: UsuarioCreate,
     service: UsuarioService = Depends(get_service)
 ):
-    """Cria um novo usuário (Administrador)."""
+    """Cria um novo usuário."""
     return service.criar(dados, usuario_responsavel="admin")
 
 
