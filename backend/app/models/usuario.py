@@ -25,7 +25,7 @@ class Usuario(Base):
     ativo      = Column(Boolean, default=True, nullable=False)
 
     # Campos de auditoria (read-only, gerados automaticamente)
-    usuario_responsavel = Column(String(150), nullable=True)   # usuário logado que executou
+    usuario_responsavel = Column(String(150), nullable=True)
     data_acao           = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
