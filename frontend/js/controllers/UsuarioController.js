@@ -141,6 +141,6 @@ class UsuarioController {
 
 // ── Instância global ──────────────────────────────────────────────────────────
 let usuarioController;
-document.addEventListener('DOMContentLoaded', () => {
+(function init() {
     usuarioController = new UsuarioController();
-});
+})();

@@ -12,7 +12,7 @@ from .core.database import engine, Base, SessionLocal
 from .api.v1 import combatentes, combate, condicoes, usuarios
 
 # Importar models para criar tabelas (ordem importa para FK)
-from .models import usuario as usuario_mode
+from .models import usuario as usuario_model
 from .models import combatente as combatente_model
 from .models import combate as combate_model
 from .models import condicao as condicao_model
