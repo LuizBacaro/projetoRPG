@@ -14,7 +14,7 @@ import re
 class UsuarioBase(BaseModel):
     perfil: PerfilUsuario
     nome:   str
-    email:  str  # str simples — validado manualmente abaixo
+    email:  str
 
     @field_validator("nome")
     @classmethod
@@ -36,7 +36,7 @@ class UsuarioBase(BaseModel):
 
 class UsuarioCreate(UsuarioBase):
     senha: str
-    ativo: bool = True  # ✅ adicionado — frontend envia este campo
+    ativo: bool = True
 
     @field_validator("senha")
     @classmethod

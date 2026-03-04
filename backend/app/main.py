@@ -12,7 +12,7 @@ from .core.database import engine, Base, SessionLocal
 from .api.v1 import combatentes, combate, condicoes, usuarios
 
 # Importar models para criar tabelas (ordem importa para FK)
-from .models import usuario as usuario_model
+from .models import usuario as usuario_model        # ✅ corrigido: era usuario_mode
 from .models import combatente as combatente_model
 from .models import combate as combate_model
 from .models import condicao as condicao_model
@@ -38,8 +38,8 @@ app.add_middleware(
 )
 
 # Definir caminhos
-BASE_DIR     = Path(__file__).resolve().parent.parent  # backend/
-FRONTEND_DIR = BASE_DIR.parent / "frontend"            # projetoRPG/frontend
+BASE_DIR     = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR.parent / "frontend"
 UPLOADS_DIR  = BASE_DIR / "uploads"
 
 # Criar diretório de uploads se não existir
@@ -57,7 +57,7 @@ else:
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 # Incluir routers
-app.include_router(usuarios.router,    prefix=settings.API_V1_PREFIX)  
+app.include_router(usuarios.router,    prefix=settings.API_V1_PREFIX)
 app.include_router(combatentes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(combate.router,     prefix=settings.API_V1_PREFIX)
 app.include_router(condicoes.router,   prefix=settings.API_V1_PREFIX)
@@ -65,13 +65,11 @@ app.include_router(condicoes.router,   prefix=settings.API_V1_PREFIX)
 
 @app.get("/")
 async def root():
-    """Redireciona para o frontend"""
     return FileResponse(str(FRONTEND_DIR / "index.html"))
 
 
 @app.get("/frontend/{file_path:path}")
 async def serve_frontend(file_path: str):
-    """Serve arquivos do frontend"""
     file = FRONTEND_DIR / file_path
     if file.exists() and file.is_file():
         return FileResponse(file)
@@ -80,12 +78,6 @@ async def serve_frontend(file_path: str):
 
 @app.on_event("startup")
 async def startup_event():
-    """
-    Evento de inicialização da aplicação.
-    Responsabilidades:
-      1. Popular combatentes iniciais (se banco vazio)
-      2. Seed das 25 condições D&D (idempotente)
-    """
     db = SessionLocal()
     try:
         _seed_combatentes(db)
@@ -94,10 +86,7 @@ async def startup_event():
         db.close()
 
 
-# ── Helpers de seed ────────────────────────────────────────────────────────────
-
 def _seed_combatentes(db) -> None:
-    """Popula combatentes iniciais se o banco estiver vazio."""
     from .repositories.combatente_repository import CombatenteRepository
     from .models.combatente import Combatente
 
@@ -159,17 +148,13 @@ def _seed_combatentes(db) -> None:
 
 
 def _seed_condicoes(db) -> None:
-    """
-    Popula as 25 condições D&D 3.5 se a tabela estiver vazia.
-    Idempotente — seguro de chamar sempre no startup.
-    """
     from .repositories.condicao_repository import CondicaoRepository
     from .services.condicao_service import CondicaoService
 
     repo    = CondicaoRepository(db)
     service = CondicaoService(
         condicao_repository=repo,
-        combatente_repository=None   # não necessário para seed
+        combatente_repository=None
     )
     service.inicializar_seed()
     print("✅ Seed de condições D&D verificado/executado com sucesso!")
