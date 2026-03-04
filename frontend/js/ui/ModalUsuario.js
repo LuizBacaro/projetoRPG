@@ -1,16 +1,27 @@
 /**
  * ModalUsuario
  * SRP: renderização e controle do modal de cadastro/edição de usuário
- * Carregado via <script>
+ * Carregado via <script> dinâmico
  */
-
 class ModalUsuario {
 
+    /**
+     * @param {UsuarioService} usuarioService
+     * @param {Function} onSucesso - callback chamado após salvar com sucesso
+     */
     constructor(usuarioService, onSucesso) {
-        this.service    = usuarioService;
-        this.onSucesso  = onSucesso;
-        this.usuarioId  = null;
+        this.service   = usuarioService;
+        this.onSucesso = onSucesso;
+        this.usuarioId = null;
+
+        // Bind dos botões do modal
+        document.getElementById('btnCancelarModal')
+            ?.addEventListener('click', () => this.fechar());
+        document.getElementById('btnSalvarModal')
+            ?.addEventListener('click', () => this.salvar());
     }
+
+    // ── Abertura ──────────────────────────────────────────────────────────────
 
     abrirParaCriar() {
         this.usuarioId = null;
@@ -32,12 +43,17 @@ class ModalUsuario {
         document.getElementById('modalUsuario').style.display = 'none';
     }
 
+    // ── Renderização ─────────────────────────────────────────────────────────
+
     _renderizar(usuario = {}) {
-        const titulo  = this.usuarioId ? 'Editar Usuário' : 'Novo Usuário';
-        const inativo = this.usuarioId && !usuario.ativo;
+        const editando = !!this.usuarioId;
+        const inativo  = editando && !usuario.ativo;
 
-        document.getElementById('modalUsuarioTitulo').textContent = titulo;
+        // Título
+        document.getElementById('modalUsuarioTitulo').textContent =
+            editando ? 'Editar Usuário' : 'Novo Usuário';
 
+        // Campos
         document.getElementById('inputNome').value  = usuario.nome  || '';
         document.getElementById('inputEmail').value = usuario.email || '';
         document.getElementById('inputSenha').value = '';
@@ -48,18 +64,20 @@ class ModalUsuario {
         selPerfil.disabled = inativo;
 
         // Status
-        const selStatus = document.getElementById('selectStatus');
-        selStatus.value = usuario.ativo ? 'ativo' : 'inativo';
+        document.getElementById('selectStatus').value =
+            usuario.ativo ? 'ativo' : 'inativo';
 
-        // Campos bloqueados se inativo (exceto status)
+        // Bloqueia campos se inativo (exceto status — regra do PDF item f)
         ['inputNome', 'inputEmail', 'inputSenha'].forEach(id => {
             document.getElementById(id).disabled = inativo;
         });
 
-        // Mensagem de aviso
+        // Aviso de inativo
         const aviso = document.getElementById('avisoInativo');
         if (aviso) aviso.style.display = inativo ? 'block' : 'none';
     }
+
+    // ── Salvar ────────────────────────────────────────────────────────────────
 
     async salvar() {
         const nome   = document.getElementById('inputNome').value.trim();
@@ -70,16 +88,17 @@ class ModalUsuario {
 
         try {
             if (this.usuarioId) {
-                // Edição — envia apenas campos preenchidos
+                // ── Edição: envia apenas campos preenchidos
                 const dados = { perfil, ativo };
                 if (nome)  dados.nome  = nome;
                 if (email) dados.email = email;
                 if (senha) dados.senha = senha;
                 await this.service.atualizar(this.usuarioId, dados);
+
             } else {
-                // Criação — todos os campos obrigatórios
+                // ── Criação: todos os campos são obrigatórios
                 if (!nome || !email || !senha) {
-                    alert('Preencha todos os campos obrigatórios.');
+                    alert('Preencha todos os campos obrigatórios (Nome, E-mail e Senha).');
                     return;
                 }
                 await this.service.criar({ nome, email, senha, perfil, ativo });

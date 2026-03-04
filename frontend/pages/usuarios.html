@@ -4,70 +4,148 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Usuários — Arena TTRPG</title>
-    <link rel="stylesheet" href="/css/variables.css" />
-    <link rel="stylesheet" href="/css/base.css" />
-    <link rel="stylesheet" href="/css/components.css" />
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0f23;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* Header */
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
+        .page-header h1 { font-size: 1.5rem; }
+
+        /* Botões */
+        .btn {
+            padding: .5rem 1.25rem;
+            border-radius: .4rem;
+            border: none;
+            cursor: pointer;
+            font-size: .9rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary  { background: #7c3aed; color: #fff; }
+        .btn-primary:hover  { background: #6d28d9; }
+        .btn-secondary { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; }
+        .btn-secondary:hover { background: #334155; }
+
+        /* Card */
+        .card {
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
+            border-radius: .75rem;
+            overflow: hidden;
+        }
+
+        /* Tabela */
         .tabela-usuarios { width: 100%; border-collapse: collapse; }
         .tabela-usuarios th,
         .tabela-usuarios td {
             padding: .75rem 1rem;
             text-align: left;
-            border-bottom: 1px solid var(--border-color, #333);
+            border-bottom: 1px solid #2d2d44;
+            font-size: .9rem;
         }
-        .tabela-usuarios th { background: var(--bg-secondary, #1a1a2e); font-weight: 600; }
-        .usuario-inativo td { opacity: .55; }
+        .tabela-usuarios th {
+            background: #12122a;
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+        .tabela-usuarios tr:last-child td { border-bottom: none; }
+        .tabela-usuarios tr:hover td { background: #ffffff08; }
+        .usuario-inativo td { opacity: .5; }
 
         /* Badges */
-        .badge { padding: .25rem .65rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+        .badge {
+            padding: .25rem .65rem;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
         .badge-admin   { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed55; }
         .badge-mestre  { background: #0369a122; color: #38bdf8; border: 1px solid #0369a155; }
         .badge-jogador { background: #05966922; color: #34d399; border: 1px solid #05966955; }
         .badge-ativo   { background: #16a34a22; color: #4ade80; border: 1px solid #16a34a55; }
         .badge-inativo { background: #dc262622; color: #f87171; border: 1px solid #dc262655; }
 
-        /* Ações */
-        .btn-acao { background: none; border: none; cursor: pointer; font-size: 1rem; padding: .25rem; }
-        .btn-acao:hover { transform: scale(1.2); }
+        /* Botões de ação */
+        .btn-acao {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: .25rem .4rem;
+            border-radius: .3rem;
+            transition: transform .15s, background .15s;
+        }
+        .btn-acao:hover { transform: scale(1.2); background: #ffffff11; }
 
-        /* Modal */
+        /* Modal overlay */
         .modal-overlay {
             display: none;
-            position: fixed; inset: 0;
-            background: #000000aa;
+            position: fixed;
+            inset: 0;
+            background: #000000bb;
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
+
+        /* Modal box */
         .modal-box {
-            background: var(--bg-secondary, #1a1a2e);
-            border: 1px solid var(--border-color, #333);
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
             border-radius: .75rem;
             padding: 2rem;
-            min-width: 420px;
-            max-width: 90vw;
+            width: 460px;
+            max-width: 95vw;
         }
-        .modal-box h2 { margin-bottom: 1.25rem; }
+        .modal-box h2 { margin-bottom: 1.25rem; font-size: 1.2rem; }
+
+        /* Formulário */
         .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: .35rem; font-size: .875rem; color: #aaa; }
+        .form-group label {
+            display: block;
+            margin-bottom: .35rem;
+            font-size: .82rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
         .form-group input,
         .form-group select {
             width: 100%;
             padding: .6rem .85rem;
             border-radius: .4rem;
-            border: 1px solid var(--border-color, #444);
-            background: var(--bg-primary, #0f0f23);
-            color: inherit;
+            border: 1px solid #334155;
+            background: #0f0f23;
+            color: #e2e8f0;
             font-size: .95rem;
+            outline: none;
+            transition: border-color .2s;
         }
+        .form-group input:focus,
+        .form-group select:focus { border-color: #7c3aed; }
         .form-group input:disabled,
-        .form-group select:disabled { opacity: .45; cursor: not-allowed; }
+        .form-group select:disabled { opacity: .4; cursor: not-allowed; }
+
+        /* Aviso inativo */
         .aviso-inativo {
             display: none;
             background: #78350f22;
@@ -76,96 +154,132 @@
             padding: .65rem 1rem;
             border-radius: .4rem;
             margin-bottom: 1rem;
-            font-size: .875rem;
+            font-size: .85rem;
         }
-        .modal-acoes { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.5rem; }
+
+        /* Ações do modal */
+        .modal-acoes {
+            display: flex;
+            justify-content: flex-end;
+            gap: .75rem;
+            margin-top: 1.5rem;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+<div class="container">
 
-        <div class="page-header">
-            <h1>👤 Gerenciamento de Usuários</h1>
-            <div style="display:flex; gap:.75rem;">
-                <a href="/" class="btn btn-secondary">← Voltar</a>
-                <button id="btnNovoUsuario" class="btn btn-primary">+ Novo Usuário</button>
-            </div>
-        </div>
-
-        <!-- Tabela de usuários -->
-        <div class="card">
-            <table class="tabela-usuarios">
-                <thead>
-                    <tr>
-                        <th>Perfil</th>
-                        <th>Nome</th>
-                        <th>E-mail</th>
-                        <th>Status</th>
-                        <th>Responsável</th>
-                        <th>Data da Ação</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaUsuarios">
-                    <tr><td colspan="7" style="text-align:center;padding:2rem;">Carregando...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-    </div><!-- /container -->
-
-    <!-- Modal de cadastro/edição -->
-    <div id="modalUsuario" class="modal-overlay">
-        <div class="modal-box">
-            <h2 id="modalUsuarioTitulo">Novo Usuário</h2>
-
-            <div id="avisoInativo" class="aviso-inativo">
-                ⚠️ Usuário inativo — somente o Status pode ser alterado.
-            </div>
-
-            <div class="form-group">
-                <label>Perfil *</label>
-                <select id="selectPerfil">
-                    <option value="administrador">Administrador</option>
-                    <option value="mestre">Mestre</option>
-                    <option value="jogador" selected>Jogador</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Nome *</label>
-                <input id="inputNome" type="text" placeholder="Nome completo" />
-            </div>
-
-            <div class="form-group">
-                <label>E-mail * (usado no login)</label>
-                <input id="inputEmail" type="email" placeholder="email@exemplo.com" />
-            </div>
-
-            <div class="form-group">
-                <label>Senha * <small style="color:#888">(mín. 6 caracteres — deixe em branco para não alterar)</small></label>
-                <input id="inputSenha" type="password" placeholder="••••••" />
-            </div>
-
-            <div class="form-group">
-                <label>Status *</label>
-                <select id="selectStatus">
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                </select>
-            </div>
-
-            <div class="modal-acoes">
-                <button class="btn btn-secondary" onclick="document.querySelector('.modal-overlay').style.display='none'">Cancelar</button>
-                <button class="btn btn-primary" onclick="usuarioController.modal.salvar()">Salvar</button>
-            </div>
+    <!-- Cabeçalho da página -->
+    <div class="page-header">
+        <h1>👤 Gerenciamento de Usuários</h1>
+        <div style="display:flex; gap:.75rem;">
+            <a href="/" class="btn btn-secondary">← Voltar</a>
+            <button id="btnNovoUsuario" class="btn btn-primary">+ Novo Usuário</button>
         </div>
     </div>
 
-    <!-- Scripts — config primeiro -->
-    <script src="/js/config/api.config.js"></script>
-    <script src="/js/services/UsuarioService.js"></script>
-    <script src="/js/ui/ModalUsuario.js"></script>
-    <script src="/js/controllers/UsuarioController.js"></script>
+    <!-- Tabela de usuários -->
+    <div class="card">
+        <table class="tabela-usuarios">
+            <thead>
+                <tr>
+                    <th>Perfil</th>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Status</th>
+                    <th>Responsável</th>
+                    <th>Data da Ação</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaUsuarios">
+                <tr>
+                    <td colspan="7" style="text-align:center; padding:2rem; color:#64748b;">
+                        Carregando...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ─── Modal de cadastro / edição ─────────────────────────────── -->
+<div id="modalUsuario" class="modal-overlay">
+    <div class="modal-box">
+        <h2 id="modalUsuarioTitulo">Novo Usuário</h2>
+
+        <div id="avisoInativo" class="aviso-inativo">
+            ⚠️ Usuário inativo — somente o Status pode ser alterado.
+        </div>
+
+        <div class="form-group">
+            <label>Perfil *</label>
+            <select id="selectPerfil">
+                <option value="administrador">Administrador</option>
+                <option value="mestre">Mestre</option>
+                <option value="jogador" selected>Jogador</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Nome *</label>
+            <input id="inputNome" type="text" placeholder="Nome completo" />
+        </div>
+
+        <div class="form-group">
+            <label>E-mail * <small style="color:#64748b">(usado no login — deve ser único)</small></label>
+            <input id="inputEmail" type="email" placeholder="email@exemplo.com" />
+        </div>
+
+        <div class="form-group">
+            <label>Senha * <small style="color:#64748b">(mín. 6 caracteres — deixe em branco para não alterar)</small></label>
+            <input id="inputSenha" type="password" placeholder="••••••" />
+        </div>
+
+        <div class="form-group">
+            <label>Status *</label>
+            <select id="selectStatus">
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+            </select>
+        </div>
+
+        <div class="modal-acoes">
+            <button class="btn btn-secondary" id="btnCancelarModal">Cancelar</button>
+            <button class="btn btn-primary"   id="btnSalvarModal">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Scripts ────────────────────────────────────────────────── -->
+<!--
+    ESTRATÉGIA:
+    api.config.js tem "export" → precisa de type="module"
+    UsuarioService / ModalUsuario / UsuarioController NÃO têm export
+    → usamos um módulo de entrada que:
+      1. importa getApiUrl e expõe em window
+      2. carrega os demais scripts dinamicamente (já com window.getApiUrl disponível)
+-->
+<script type="module">
+    import { getApiUrl } from '/js/config/api.config.js';
+
+    // Ponte: torna getApiUrl acessível para scripts não-modulares
+    window.getApiUrl = getApiUrl;
+
+    // Carrega os scripts em ordem — cada await garante que o anterior terminou
+    const carregar = (src) => new Promise((resolve, reject) => {
+        const s  = document.createElement('script');
+        s.src    = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.body.appendChild(s);
+    });
+
+    await carregar('/js/services/UsuarioService.js');
+    await carregar('/js/ui/ModalUsuario.js');
+    await carregar('/js/controllers/UsuarioController.js');
+</script>
+
 </body>
 </html>
