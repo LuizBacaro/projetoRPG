@@ -1,54 +1,58 @@
 /**
  * DashboardController
- * SRP: orquestra a tela de dashboard (listagem, cadastro e edição de combatentes)
- * DIP: depende de CombatenteService e UploadService globais (carregados via script)
+ * SRP: orquestra listagem, cadastro e edição de combatentes no dashboard
+ * DIP: depende de CombatenteServiceGlobal (definido abaixo, sem import/export)
  *
- * NOTA: Este controller usa as classes globais (não ES modules) porque o dashboard
- * carrega scripts dinamicamente sem type="module". As classes ModalCadastroInline
- * e ModalEdicaoInline são definidas aqui mesmo para evitar conflito de escopo.
+ * NOTA: Não usa ES modules porque o dashboard carrega scripts via createElement
+ * sem type="module". Todas as dependências são definidas neste mesmo arquivo.
  */
 class DashboardController {
 
     constructor() {
-        this.service       = new CombatenteServiceGlobal();
-        this.uploadService = new UploadServiceGlobal();
-        this.filtroAtual   = 'todos';
+        this.service            = new CombatenteServiceGlobal();
+        this.filtroAtual        = 'todos';
         this.combatenteEmEdicao = null;
 
-        this._registrarGlobais();
+        this._registrarGlobais(); // ← DEVE ser chamado antes de _inicializar
         this._inicializar();
     }
 
-    // ── Registra funções globais chamadas pelos botões inline dos modais ──
+    // ── Globais (chamados pelos atributos onclick do HTML) ────────────────
 
     _registrarGlobais() {
-        // Cadastro
+        // Fechar modais
         window.fecharModalCadastro        = () => this._fecharModal('modalCadastroJogador');
         window.fecharModalCadastroMonstro = () => this._fecharModal('modalCadastroMonstro');
         window.fecharModalCadastroNPC     = () => this._fecharModal('modalCadastroNPC');
         window.fecharSeletorTipo          = () => this._fecharModal('seletorTipo');
+        window.fecharModalEdicao          = () => this._fecharModal('modalEdicaoDashboard');
 
+        // Abrir modal por tipo
         window.abrirModalCadastro = (tipo) => {
             this._fecharModal('seletorTipo');
-            const ids = { jogador: 'modalCadastroJogador', monstro: 'modalCadastroMonstro', npc: 'modalCadastroNPC' };
-            this._abrirModal(ids[tipo]);
+            const mapa = {
+                jogador: 'modalCadastroJogador',
+                monstro: 'modalCadastroMonstro',
+                npc:     'modalCadastroNPC'
+            };
+            this._abrirModal(mapa[tipo]);
         };
 
-        // Edição
-        window.fecharModalEdicao   = () => this._fecharModal('modalEdicaoDashboard');
-        window.confirmarDelecao    = () => this._deletarCombatente();
+        // Edição e deleção
+        window.confirmarDelecao     = () => this._deletarCombatente();
         window.atualizarModificador = (input) => this._calcularModificador(input);
 
         // Upload
-        window.previewImagemUpload    = (input, previewId, imgId, placeholderId) =>
+        window.previewImagemUpload  = (input, previewId, imgId, placeholderId) =>
             this._previewImagem(input, previewId, imgId, placeholderId);
-        window.removerImagem          = () => this._removerImagem('', false);
-        window.removerImagemMonstro   = () => this._removerImagem('Monstro', false);
-        window.removerImagemNPC       = () => this._removerImagem('NPC', false);
-        window.removerImagemEdicao    = () => this._removerImagem('Edit', true);
+
+        window.removerImagem        = () => this._removerImagem('',       false);
+        window.removerImagemMonstro = () => this._removerImagem('Monstro', false);
+        window.removerImagemNPC     = () => this._removerImagem('NPC',     false);
+        window.removerImagemEdicao  = () => this._removerImagem('',       true);
     }
 
-    // ── Init 
+    // ── Inicialização ─────────────────────────────────────────────────────
 
     _inicializar() {
         this._configurarAbas();
@@ -58,14 +62,11 @@ class DashboardController {
         this._configurarFormCadastro('formCadastroMonstro', 'monstro',  'modalCadastroMonstro');
         this._configurarFormCadastro('formCadastroNPC',     'npc',      'modalCadastroNPC');
         this._configurarFormEdicao();
-        this._configurarUpload('',       'modalCadastroJogador');
-        this._configurarUpload('Monstro','modalCadastroMonstro');
-        this._configurarUpload('NPC',    'modalCadastroNPC');
         this._configurarUploadEdicao();
         this.carregarCombatentes();
     }
 
-    // ── Abas 
+    // ── Abas ──────────────────────────────────────────────────────────────
 
     _configurarAbas() {
         document.querySelectorAll('.nav-tab').forEach(btn => {
@@ -78,7 +79,7 @@ class DashboardController {
         });
     }
 
-    // ── Filtros 
+    // ── Filtros ───────────────────────────────────────────────────────────
 
     _configurarFiltros() {
         document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -91,65 +92,78 @@ class DashboardController {
         });
     }
 
-    // ── Botão novo 
+    // ── Botão novo ────────────────────────────────────────────────────────
 
     _configurarBotaoNovo() {
-        document.getElementById('btnNovoCombatente')
-            .addEventListener('click', () => this._abrirModal('seletorTipo'));
+        const btn = document.getElementById('btnNovoCombatente');
+        if (btn) btn.addEventListener('click', () => this._abrirModal('seletorTipo'));
     }
 
-    // ── Formulários de cadastro 
+    // ── Formulários de cadastro ───────────────────────────────────────────
 
     _configurarFormCadastro(formId, tipo, modalId) {
         const form = document.getElementById(formId);
-        if (!form) { console.error(`❌ Form não encontrado: ${formId}`); return; }
+        if (!form) {
+            console.error(`❌ Form não encontrado: ${formId}`);
+            return;
+        }
+
+        const textosBotao = {
+            jogador: '✅ Cadastrar Jogador',
+            monstro: '✅ Cadastrar Monstro',
+            npc:     '✅ Cadastrar NPC'
+        };
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = form.querySelector('[type="submit"]');
-            btn.disabled    = true;
-            btn.textContent = 'Salvando...';
+
+            const btn         = form.querySelector('[type="submit"]');
+            btn.disabled      = true;
+            btn.textContent   = 'Salvando...';
 
             try {
-                const formData = new FormData(form);
+                const formData   = new FormData(form);
                 const combatente = await this.service.criar(formData);
-                Toast.success(`${combatente.nome} cadastrado com sucesso!`);
+                Toast.success(`${combatente.nome} cadastrado com sucesso! ✅`);
                 this._fecharModal(modalId);
                 this._limparForm(form, tipo);
                 this.carregarCombatentes();
             } catch (err) {
-                Toast.error(err.message || 'Erro ao cadastrar');
+                Toast.error(err.message || 'Erro ao cadastrar combatente');
                 console.error(err);
             } finally {
                 btn.disabled    = false;
-                btn.textContent = tipo === 'jogador' ? '✅ Cadastrar Jogador'
-                                : tipo === 'monstro' ? '✅ Cadastrar Monstro'
-                                : '✅ Cadastrar NPC';
+                btn.textContent = textosBotao[tipo];
             }
         });
     }
 
-    // ── Formulário de edição 
+    // ── Formulário de edição ──────────────────────────────────────────────
 
     _configurarFormEdicao() {
         const form = document.getElementById('formEdicaoDashboard');
-        if (!form) { console.error('❌ Form edição não encontrado'); return; }
+        if (!form) {
+            console.error('❌ Form de edição não encontrado');
+            return;
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = form.querySelector('[type="submit"]');
+
+            const btn       = form.querySelector('[type="submit"]');
             btn.disabled    = true;
             btn.textContent = 'Salvando...';
 
             try {
                 const id       = parseInt(document.getElementById('dashEditId').value);
                 const formData = new FormData(form);
-                await this.service.atualizar(id, formData);
-                Toast.success('Combatente atualizado! ✅');
+                const atualizado = await this.service.atualizar(id, formData);
+                Toast.success(`${atualizado.nome} atualizado com sucesso! ✅`);
                 this._fecharModal('modalEdicaoDashboard');
+                this.combatenteEmEdicao = null;
                 this.carregarCombatentes();
             } catch (err) {
-                Toast.error(err.message || 'Erro ao atualizar');
+                Toast.error(err.message || 'Erro ao atualizar combatente');
                 console.error(err);
             } finally {
                 btn.disabled    = false;
@@ -158,25 +172,7 @@ class DashboardController {
         });
     }
 
-    // ── Upload de imagem (cadastro) ───────────────────────────────────────
-
-    _configurarUpload(sufixo, modalId) {
-        const inputId       = `inputFoto${sufixo}`;
-        const placeholderId = `uploadPlaceholder${sufixo}`;
-        const previewId     = `uploadPreview${sufixo}`;
-        const imgId         = `previewImage${sufixo}`;
-
-        const input = document.getElementById(inputId);
-        if (!input) return;
-
-        input.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            this._previewImagem(input, previewId, imgId, placeholderId);
-        });
-    }
-
-    // ── Upload de imagem (edição) 
+    // ── Upload de imagem (edição) ─────────────────────────────────────────
 
     _configurarUploadEdicao() {
         const area  = document.getElementById('dashEditUploadArea');
@@ -184,17 +180,17 @@ class DashboardController {
         if (!area || !input) return;
 
         area.addEventListener('click', () => input.click());
-        input.addEventListener('change', () => {
+        input.addEventListener('change', () =>
             this._previewImagem(
                 input,
                 'dashEditUploadPreview',
                 'dashEditPreviewImage',
                 'dashEditUploadPlaceholder'
-            );
-        });
+            )
+        );
     }
 
-    // ── Carrega combatentes 
+    // ── Carregar combatentes ──────────────────────────────────────────────
 
     async carregarCombatentes() {
         try {
@@ -208,10 +204,11 @@ class DashboardController {
         }
     }
 
-    // ── Renderiza tabela 
+    // ── Renderiza tabela ──────────────────────────────────────────────────
 
     _renderizarTabela(combatentes) {
         const tbody = document.getElementById('tabelaCombatentes');
+
         if (!combatentes.length) {
             tbody.innerHTML = `
                 <tr>
@@ -231,8 +228,8 @@ class DashboardController {
                 <td>${c.hp_maximo}</td>
                 <td>${c.iniciativa}</td>
                 <td>
-                    <button class="btn-acao" title="Editar"  data-id="${c.id}" data-acao="editar">✏️</button>
-                    <button class="btn-acao" title="Excluir" data-id="${c.id}" data-acao="excluir">🗑️</button>
+                    <button class="btn-acao" data-id="${c.id}" data-acao="editar"  title="Editar">✏️</button>
+                    <button class="btn-acao" data-id="${c.id}" data-acao="excluir" title="Excluir">🗑️</button>
                 </td>
             </tr>
         `).join('');
@@ -245,7 +242,7 @@ class DashboardController {
         );
     }
 
-    // ── Resumo 
+    // ── Resumo ────────────────────────────────────────────────────────────
 
     _atualizarResumo(combatentes) {
         document.getElementById('totalGeral').textContent     = combatentes.length;
@@ -254,38 +251,39 @@ class DashboardController {
         document.getElementById('totalNPCs').textContent      = combatentes.filter(c => c.tipo === 'npc').length;
     }
 
-    // ── Edição 
+    // ── Edição ────────────────────────────────────────────────────────────
 
     async _abrirEdicao(id) {
         try {
             const c = await this.service.obterPorId(id);
             this.combatenteEmEdicao = c;
 
-            // Preenche formulário
-            document.getElementById('dashEditId').value         = c.id;
-            document.getElementById('dashEditTipo').value       = c.tipo;
-            document.getElementById('dashEditNome').value       = c.nome;
-            document.getElementById('dashEditHP').value         = c.hp_maximo;
-            document.getElementById('dashEditIniciativa').value = c.iniciativa;
-            document.getElementById('dashEditClasse').value     = c.classe   || '';
-            document.getElementById('dashEditNivel').value      = c.nivel    || 1;
-            document.getElementById('dashEditPontos').value     = c.pontos   || 0;
-            document.getElementById('dashEditCA').value         = c.ca       ?? 10;
-            document.getElementById('dashEditToque').value      = c.toque    ?? 10;
-            document.getElementById('dashEditSurpresa').value   = c.surpresa ?? 10;
-            document.getElementById('dashEditFOR').value        = c.forca         || 10;
-            document.getElementById('dashEditDES').value        = c.destreza      || 10;
-            document.getElementById('dashEditCON').value        = c.constituicao  || 10;
-            document.getElementById('dashEditINT').value        = c.inteligencia  || 10;
-            document.getElementById('dashEditSAB').value        = c.sabedoria     || 10;
-            document.getElementById('dashEditCAR').value        = c.carisma       || 10;
-            document.getElementById('dashEditFortitude').value  = c.fortitude     ?? 0;
-            document.getElementById('dashEditReflexos').value   = c.reflexos      ?? 0;
-            document.getElementById('dashEditVontade').value    = c.vontade       ?? 0;
+            // Preenche todos os campos
+            document.getElementById('dashEditId').value          = c.id;
+            document.getElementById('dashEditTipo').value        = c.tipo;
+            document.getElementById('dashEditNome').value        = c.nome;
+            document.getElementById('dashEditHP').value          = c.hp_maximo;
+            document.getElementById('dashEditIniciativa').value  = c.iniciativa;
+            document.getElementById('dashEditClasse').value      = c.classe        || '';
+            document.getElementById('dashEditNivel').value       = c.nivel         || 1;
+            document.getElementById('dashEditPontos').value      = c.pontos        || 0;
+            document.getElementById('dashEditCA').value          = c.ca            ?? 10;
+            document.getElementById('dashEditToque').value       = c.toque         ?? 10;
+            document.getElementById('dashEditSurpresa').value    = c.surpresa      ?? 10;
+            document.getElementById('dashEditFortitude').value   = c.fortitude     ?? 0;
+            document.getElementById('dashEditReflexos').value    = c.reflexos      ?? 0;
+            document.getElementById('dashEditVontade').value     = c.vontade       ?? 0;
+            document.getElementById('dashEditFOR').value         = c.forca         || 10;
+            document.getElementById('dashEditDES').value         = c.destreza      || 10;
+            document.getElementById('dashEditCON').value         = c.constituicao  || 10;
+            document.getElementById('dashEditINT').value         = c.inteligencia  || 10;
+            document.getElementById('dashEditSAB').value         = c.sabedoria     || 10;
+            document.getElementById('dashEditCAR').value         = c.carisma       || 10;
 
-            // Atualiza modificadores
-            ['dashEditFOR','dashEditDES','dashEditCON','dashEditINT','dashEditSAB','dashEditCAR'].forEach(id => {
-                const el = document.getElementById(id);
+            // Recalcula modificadores
+            ['dashEditFOR','dashEditDES','dashEditCON',
+             'dashEditINT','dashEditSAB','dashEditCAR'].forEach(fieldId => {
+                const el = document.getElementById(fieldId);
                 if (el) this._calcularModificador(el);
             });
 
@@ -295,7 +293,7 @@ class DashboardController {
             const img         = document.getElementById('dashEditPreviewImage');
 
             if (c.foto_url) {
-                img.src                  = c.foto_url;
+                img.src                   = c.foto_url;
                 placeholder.style.display = 'none';
                 preview.style.display     = 'block';
             } else {
@@ -305,7 +303,7 @@ class DashboardController {
 
             this._abrirModal('modalEdicaoDashboard');
         } catch (err) {
-            Toast.error('Erro ao carregar combatente');
+            Toast.error('Erro ao carregar dados do combatente');
             console.error(err);
         }
     }
@@ -324,7 +322,7 @@ class DashboardController {
 
     async _deletarCombatente() {
         if (!this.combatenteEmEdicao) return;
-        if (!confirm(`Deseja realmente deletar ${this.combatenteEmEdicao.nome}?`)) return;
+        if (!confirm(`Deletar ${this.combatenteEmEdicao.nome}? Esta ação não pode ser desfeita.`)) return;
         try {
             await this.service.deletar(this.combatenteEmEdicao.id);
             Toast.success('Combatente deletado! 🗑️');
@@ -332,17 +330,17 @@ class DashboardController {
             this.combatenteEmEdicao = null;
             this.carregarCombatentes();
         } catch (err) {
-            Toast.error('Erro ao deletar');
+            Toast.error('Erro ao deletar combatente');
             console.error(err);
         }
     }
 
-    // ── Helpers de modal 
+    // ── Helpers de modal ──────────────────────────────────────────────────
 
     _abrirModal(id) {
         const el = document.getElementById(id);
         if (el) el.classList.add('show');
-        else console.error(`❌ Modal não encontrado: ${id}`);
+        else    console.error(`❌ Modal não encontrado: #${id}`);
     }
 
     _fecharModal(id) {
@@ -350,12 +348,12 @@ class DashboardController {
         if (el) el.classList.remove('show');
     }
 
-    // ── Helpers de upload 
+    // ── Helpers de upload ─────────────────────────────────────────────────
 
     _previewImagem(input, previewId, imgId, placeholderId) {
-        const file = (input instanceof HTMLInputElement) ? input.files[0] : input.files[0];
+        const file = input.files?.[0];
         if (!file) return;
-        const reader = new FileReader();
+        const reader  = new FileReader();
         reader.onload = e => {
             const ph = document.getElementById(placeholderId);
             const pv = document.getElementById(previewId);
@@ -381,12 +379,13 @@ class DashboardController {
         if (preview)     preview.style.display     = 'none';
     }
 
-    // ── Helpers de atributos D&D 
+    // ── Helpers de atributos D&D ──────────────────────────────────────────
 
     _calcularModificador(input) {
         const valor = parseInt(input.value) || 10;
         const mod   = Math.floor((valor - 10) / 2);
-        const span  = input.closest('.atributo-field')?.querySelector('.atributo-modificador');
+        const modId = `mod${input.id.charAt(0).toUpperCase() + input.id.slice(1)}`;
+        const span  = document.getElementById(modId);
         if (span) span.textContent = mod >= 0 ? `+${mod}` : `${mod}`;
     }
 
@@ -394,7 +393,8 @@ class DashboardController {
 
     _limparForm(form, tipo) {
         form.reset();
-        const sufixo = tipo === 'jogador' ? '' : tipo === 'monstro' ? 'Monstro' : 'NPC';
+        const sufixos = { jogador: '', monstro: 'Monstro', npc: 'NPC' };
+        const sufixo  = sufixos[tipo] ?? '';
         const ph = document.getElementById(`uploadPlaceholder${sufixo}`);
         const pv = document.getElementById(`uploadPreview${sufixo}`);
         if (ph) ph.style.display = 'flex';
@@ -402,13 +402,14 @@ class DashboardController {
     }
 }
 
-// ── CombatenteServiceGlobal 
-// Versão global (sem import/export) para uso no dashboard
-// SRP: apenas comunicação HTTP com a API de combatentes
+// ── CombatenteServiceGlobal ───────────────────────────────────────────────
+// SRP: comunicação HTTP com a API de combatentes (sem import/export)
 
 class CombatenteServiceGlobal {
 
-    _url(path = '') { return getApiUrl(`/combatentes${path}`); }
+    _url(path = '') {
+        return getApiUrl(`/combatentes${path}`);
+    }
 
     async listar(tipo = null) {
         const url      = tipo ? `${this._url()}?tipo=${tipo}` : this._url();
@@ -424,18 +425,24 @@ class CombatenteServiceGlobal {
     }
 
     async criar(formData) {
-        const response = await fetch(this._url(), { method: 'POST', body: formData });
+        const response = await fetch(this._url(), {
+            method: 'POST',
+            body:   formData
+        });
         if (!response.ok) {
-            const err = await response.json();
+            const err = await response.json().catch(() => ({}));
             throw new Error(err.detail || 'Erro ao criar combatente');
         }
         return response.json();
     }
 
     async atualizar(id, formData) {
-        const response = await fetch(this._url(`/${id}`), { method: 'PUT', body: formData });
+        const response = await fetch(this._url(`/${id}`), {
+            method: 'PUT',
+            body:   formData
+        });
         if (!response.ok) {
-            const err = await response.json();
+            const err = await response.json().catch(() => ({}));
             throw new Error(err.detail || 'Erro ao atualizar combatente');
         }
         return response.json();
@@ -448,17 +455,5 @@ class CombatenteServiceGlobal {
     }
 }
 
-// ── UploadServiceGlobal 
-// Versão global (sem import/export) para preview de imagens
-
-class UploadServiceGlobal {
-    criarPreview(file, callback) {
-        if (!file.type.startsWith('image/')) throw new Error('Arquivo deve ser uma imagem');
-        const reader = new FileReader();
-        reader.onload = e => callback(e.target.result);
-        reader.readAsDataURL(file);
-    }
-}
-
-// ── Instancia após DOM pronto 
+// ── Instancia o controller ────────────────────────────────────────────────
 new DashboardController();
