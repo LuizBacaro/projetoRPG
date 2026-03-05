@@ -1,36 +1,45 @@
 /**
- * Entry Point da Aplicação Frontend
- * SOLID: SRP - apenas inicialização e orquestração global
+ * Entry Point da Aplicação Frontend — Arena de Combate
+ * SRP: inicialização e orquestração dos controllers da Arena APENAS
+ *
+ * Responsabilidades REMOVIDAS (movidas para DashboardController):
+ * - ModalCadastro (jogador, monstro, npc)
+ * - TipoSelector
+ * - Botão "Adicionar Combatente"
  *
  * Arquivos globais (via <script> no index.html, SEM type="module"):
- *   - DanoCuraService.js
- *   - ModalDanoCura.js
- *   - CondicaoService.js
- *   - CondicaoUI.js  (contém class ModalCondicao)
+ * - DanoCuraService.js
+ * - ModalDanoCura.js
+ * - CondicaoService.js
+ * - CondicaoUI.js (contém class ModalCondicao)
  */
-import { ConfiguracaoController }  from './controllers/ConfiguracaoController.js';
-import { ArenaController }         from './controllers/ArenaController.js';
-import { ModalCadastro }           from './ui/ModalCadastro.js';
-import { ModalEdicao }             from './ui/ModalEdicao.js';
-import { TipoSelector }            from './ui/TipoSelector.js';
+import { ConfiguracaoController } from './controllers/ConfiguracaoController.js';
+import { ArenaController }        from './controllers/ArenaController.js';
+import { ModalEdicao }            from './ui/ModalEdicao.js';
 import { atualizarModificadorDOM } from './utils/dnd.js';
 
 const app = { controllers: {}, modals: {} };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎮 Arena de Combate TTRPG - Iniciando...');
 
-    // ── Controllers
+    // ── Proteção JWT ─────────────────────────────────────────────────
+    // AuthService é carregado como global via <script> antes do main.js
+    // Se não estiver logado, redireciona para login
+    if (typeof AuthService !== 'undefined') {
+        AuthService.exigirLogin();
+        _exibirUsuarioHeader();
+    }
+
+    // ── Controllers ──────────────────────────────────────────────────
     app.controllers.configuracao = new ConfiguracaoController();
     app.controllers.arena        = new ArenaController();
 
-    // ── Modais de cadastro
-    app.modals.cadastroJogador = new ModalCadastro('jogador');
-    app.modals.cadastroMonstro = new ModalCadastro('monstro');
-    app.modals.cadastroNPC     = new ModalCadastro('npc');
-    app.modals.edicao          = new ModalEdicao();
+    // ── Modal de Edição ──────────────────────────────────────────────
+    // (Cadastro foi movido para o Dashboard)
+    app.modals.edicao = new ModalEdicao();
 
-    // ── Modal Dano/Cura (classe global via <script>)
+    // ── Modal Dano/Cura (classe global via <script>) ──────────────────
     if (typeof DanoCuraService !== 'undefined' && typeof ModalDanoCura !== 'undefined') {
         try {
             window.modalDanoCuraInstance = new ModalDanoCura(
@@ -43,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ── Modal Condição (classe global via <script>)
+    // ── Modal Condição (classe global via <script>) ───────────────────
     if (typeof ModalCondicao !== 'undefined' && typeof CondicaoService !== 'undefined') {
         try {
             window.modalCondicaoInstance = new ModalCondicao(
@@ -56,42 +65,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    configurarBotaoCadastro();
-    configurarEventosRecarregamento();
+    // ── Eventos de recarregamento ─────────────────────────────────────
+    _configurarEventosRecarregamento();
 
-    window.atualizarModificador       = atualizarModificadorDOM;
-    window.fecharModalCadastro        = () => app.modals.cadastroJogador.fechar();
-    window.fecharModalCadastroMonstro = () => app.modals.cadastroMonstro.fechar();
-    window.fecharModalCadastroNPC     = () => app.modals.cadastroNPC.fechar();
-    window.fecharModalEdicao          = () => app.modals.edicao.fechar();
-    window.confirmarDelecao           = () => app.modals.edicao.deletar();
-    window.removerImagem              = () => removerImagemUpload('');
-    window.removerImagemMonstro       = () => removerImagemUpload('Monstro');
-    window.removerImagemNPC           = () => removerImagemUpload('NPC');
-    window.removerImagemEdicao        = () => removerImagemUpload('', true);
+    // ── Funções globais expostas para HTML inline ─────────────────────
+    window.atualizarModificador  = atualizarModificadorDOM;
+    window.fecharModalEdicao     = () => app.modals.edicao.fechar();
+    window.confirmarDelecao      = () => app.modals.edicao.deletar();
+    window.removerImagemEdicao   = () => _removerImagemUpload('', true);
 
-    console.log('✅ Aplicação inicializada com sucesso!');
+    window.abrirModalDanoCura = () => {
+        window.modalDanoCuraInstance
+            ? window.modalDanoCuraInstance.abrir()
+            : console.error('❌ modalDanoCuraInstance não inicializado');
+    };
+
+    window.abrirModalCondicao = () => {
+        window.modalCondicaoInstance
+            ? window.modalCondicaoInstance.abrir()
+            : console.error('❌ modalCondicaoInstance não inicializado');
+    };
+
+    console.log('✅ Arena inicializada com sucesso!');
 });
 
-function configurarBotaoCadastro() {
-    const listaCombatentes = document.getElementById('listaCombatentes');
-    if (!listaCombatentes) return;
-    if (listaCombatentes.parentElement.querySelector('.btn-add-combatente')) return;
+// ── Exibe nome e perfil do usuário no header da arena ────────────────
 
-    const btn     = document.createElement('button');
-    btn.className = 'btn-add-combatente';
-    btn.innerHTML = '⚔️ Adicionar Combatente';
-    btn.addEventListener('click', () => {
-        TipoSelector.mostrar((tipo) => {
-            if      (tipo === 'jogador') app.modals.cadastroJogador.abrir();
-            else if (tipo === 'monstro') app.modals.cadastroMonstro.abrir();
-            else if (tipo === 'npc')     app.modals.cadastroNPC.abrir();
-        });
-    });
-    listaCombatentes.parentElement.insertBefore(btn, listaCombatentes);
+function _exibirUsuarioHeader() {
+    const nomeEl   = document.getElementById('nomeUsuarioArena');
+    const badgeEl  = document.getElementById('badgePerfilArena');
+    const logoutEl = document.getElementById('btnLogoutArena');
+
+    if (nomeEl)  nomeEl.textContent  = AuthService.getNome();
+    if (badgeEl) badgeEl.textContent = AuthService.getPerfil();
+    if (logoutEl) logoutEl.addEventListener('click', () => AuthService.logout());
 }
 
-function configurarEventosRecarregamento() {
+// ── Eventos de recarregamento após CRUD no Dashboard ─────────────────
+
+function _configurarEventosRecarregamento() {
+    // Recarrega lista quando combatente é criado/editado/deletado no Dashboard
     ['combatenteCriado', 'combatenteAtualizado', 'combatenteDeletado'].forEach(evento => {
         document.addEventListener(evento, () => {
             app.controllers.configuracao.carregarCombatentes();
@@ -99,6 +112,7 @@ function configurarEventosRecarregamento() {
         });
     });
 
+    // Volta para configuração ao sair da arena
     document.addEventListener('voltarConfiguracao', () => {
         app.controllers.configuracao.carregarCombatentes();
         app.controllers.configuracao.combatentesSelecionados = [];
@@ -106,36 +120,18 @@ function configurarEventosRecarregamento() {
     });
 }
 
-function removerImagemUpload(sufixo = '', isEdit = false) {
+// ── Helper de remoção de imagem (edição) ─────────────────────────────
+
+function _removerImagemUpload(sufixo = '', isEdit = false) {
     const prefix      = isEdit ? 'edit' : 'input';
     const input       = document.getElementById(`${prefix}Foto${sufixo}`);
     const placeholder = document.getElementById(isEdit ? `${prefix}UploadPlaceholder` : `uploadPlaceholder${sufixo}`);
     const preview     = document.getElementById(isEdit ? `${prefix}UploadPreview`     : `uploadPreview${sufixo}`);
+
     if (input)       input.value             = '';
     if (placeholder) placeholder.style.display = 'flex';
     if (preview)     preview.style.display     = 'none';
 }
-
-window.abrirModalCadastro = function(tipo) {
-    window.fecharSeletorTipo();
-    if      (tipo === 'jogador') app.modals.cadastroJogador?.abrir();
-    else if (tipo === 'monstro') app.modals.cadastroMonstro?.abrir();
-    else if (tipo === 'npc')     app.modals.cadastroNPC?.abrir();
-};
-
-window.fecharSeletorTipo  = () => TipoSelector.fechar();
-
-window.abrirModalDanoCura = function() {
-    window.modalDanoCuraInstance
-        ? window.modalDanoCuraInstance.abrir()
-        : console.error('❌ modalDanoCuraInstance não inicializado');
-};
-
-window.abrirModalCondicao = function() {
-    window.modalCondicaoInstance
-        ? window.modalCondicaoInstance.abrir()
-        : console.error('❌ modalCondicaoInstance não inicializado');
-};
 
 export { app };
 window.app = app;

@@ -158,7 +158,7 @@
 
     // Se já tem token válido → redireciona direto
     const tokenSalvo = sessionStorage.getItem('rpg_token');
-    if (tokenSalvo) window.location.href = '/arena';
+    if (tokenSalvo) window.location.href = '/dashboard';
 
     function mostrarErro(msg) {
         erroMsg.textContent    = msg;
@@ -201,7 +201,7 @@
             sessionStorage.setItem('rpg_usuario', JSON.stringify(data.usuario));
 
             // Redireciona conforme perfil
-            window.location.href = '/arena';
+            window.location.href = '/dashboard';
 
         } catch (err) {
             mostrarErro('Erro de conexão com o servidor.');

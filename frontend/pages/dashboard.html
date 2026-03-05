@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — Arena TTRPG</title>
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/botoes.css" />
+    <link rel="stylesheet" href="/css/combatentes.css" />
+    <link rel="stylesheet" href="/css/formularios.css" />
+    <link rel="stylesheet" href="/css/modais.css" />
+    <link rel="stylesheet" href="/css/responsivo.css" />
+    <style>
+        body { background: #0f0f23; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+
+        /* ── Header ── */
+        .dashboard-header {
+            background: #1a1a2e;
+            border-bottom: 1px solid #2d2d44;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-header h1 { font-size: 1.3rem; margin: 0; }
+        .header-usuario { display: flex; align-items: center; gap: 1rem; }
+        .badge-perfil {
+            padding: .25rem .75rem;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 600;
+            background: #7c3aed22;
+            color: #a78bfa;
+            border: 1px solid #7c3aed55;
+        }
+        .btn-logout {
+            background: none;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: .4rem .9rem;
+            border-radius: .4rem;
+            cursor: pointer;
+            font-size: .85rem;
+        }
+        .btn-logout:hover { background: #1e293b; }
+
+        /* ── Nav do dashboard ── */
+        .dashboard-nav {
+            background: #12122a;
+            border-bottom: 1px solid #2d2d44;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0;
+        }
+        .nav-tab {
+            padding: .85rem 1.25rem;
+            border: none;
+            background: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: .9rem;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all .2s;
+        }
+        .nav-tab:hover { color: #e2e8f0; }
+        .nav-tab.active { color: #a78bfa; border-bottom-color: #7c3aed; }
+
+        /* ── Container ── */
+        .dashboard-body { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+        /* ── Seção de aba ── */
+        .tab-section { display: none; }
+        .tab-section.active { display: block; }
+
+        /* ── Cards de resumo ── */
+        .resumo-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .resumo-card {
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
+            border-radius: .75rem;
+            padding: 1.25rem;
+            text-align: center;
+        }
+        .resumo-card .numero { font-size: 2rem; font-weight: 700; color: #a78bfa; }
+        .resumo-card .label  { font-size: .82rem; color: #64748b; margin-top: .25rem; }
+
+        /* ── Toolbar da lista ── */
+        .lista-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .filtros-tipo { display: flex; gap: .5rem; }
+        .filter-btn {
+            padding: .4rem .9rem;
+            border-radius: .4rem;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: .82rem;
+        }
+        .filter-btn.active { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+
+        /* ── Btn primário ── */
+        .btn-primary {
+            background: #7c3aed;
+            color: #fff;
+            border: none;
+            padding: .5rem 1.25rem;
+            border-radius: .4rem;
+            cursor: pointer;
+            font-size: .9rem;
+            font-weight: 600;
+        }
+        .btn-primary:hover { background: #6d28d9; }
+
+        /* ── Tabela de combatentes ── */
+        .card {
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
+            border-radius: .75rem;
+            overflow: hidden;
+        }
+        .tabela-combatentes { width: 100%; border-collapse: collapse; }
+        .tabela-combatentes th,
+        .tabela-combatentes td {
+            padding: .75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #2d2d44;
+            font-size: .88rem;
+        }
+        .tabela-combatentes th {
+            background: #12122a;
+            color: #64748b;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            font-weight: 600;
+        }
+        .tabela-combatentes tr:last-child td { border-bottom: none; }
+        .tabela-combatentes tr:hover td { background: #ffffff06; }
+
+        /* ── Badges ── */
+        .badge {
+            padding: .2rem .6rem;
+            border-radius: 999px;
+            font-size: .72rem;
+            font-weight: 600;
+        }
+        .badge-jogador { background: #05966922; color: #34d399; border: 1px solid #05966955; }
+        .badge-monstro { background: #dc262622; color: #f87171; border: 1px solid #dc262655; }
+        .badge-npc     { background: #0369a122; color: #38bdf8; border: 1px solid #0369a155; }
+
+        /* ── Botões de ação ── */
+        .btn-acao {
+            background: none; border: none; cursor: pointer;
+            font-size: .95rem; padding: .2rem .4rem;
+            border-radius: .3rem; transition: transform .15s;
+        }
+        .btn-acao:hover { transform: scale(1.2); background: #ffffff11; }
+
+        /* ── Link para Arena ── */
+        .arena-cta {
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            border: 1px solid #4338ca44;
+            border-radius: .75rem;
+            padding: 2rem;
+            text-align: center;
+        }
+        .arena-cta h3 { font-size: 1.2rem; margin-bottom: .5rem; }
+        .arena-cta p  { color: #94a3b8; margin-bottom: 1.25rem; font-size: .9rem; }
+        .btn-arena {
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            padding: .75rem 2rem;
+            border-radius: .4rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-arena:hover { background: #4338ca; }
+
+        /* ── Admin link ── */
+        .admin-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            color: #a78bfa;
+            text-decoration: none;
+            font-size: .85rem;
+            padding: .4rem .75rem;
+            border-radius: .4rem;
+            border: 1px solid #7c3aed44;
+        }
+        .admin-link:hover { background: #7c3aed11; }
+    </style>
+</head>
+<body>
+
+<!-- ── Header  -->
+<header class="dashboard-header">
+    <h1>⚔️ Arena TTRPG</h1>
+    <div class="header-usuario">
+        <span id="nomeUsuario"></span>
+        <span id="badgePerfil" class="badge-perfil"></span>
+        <a id="linkAdmin" href="/pages/usuarios.html" class="admin-link" style="display:none">
+            👤 Usuários
+        </a>
+        <button class="btn-logout" id="btnLogout">Sair</button>
+    </div>
+</header>
+
+<!-- ── Navegação por abas  -->
+<nav class="dashboard-nav">
+    <button class="nav-tab active" data-tab="combatentes">⚔️ Combatentes</button>
+    <button class="nav-tab" data-tab="arena">🏟️ Arena</button>
+</nav>
+
+<!-- ── Corpo  -->
+<div class="dashboard-body">
+
+    <!-- Aba: Combatentes -->
+    <section class="tab-section active" id="tab-combatentes">
+
+        <!-- Cards de resumo -->
+        <div class="resumo-cards">
+            <div class="resumo-card">
+                <div class="numero" id="totalJogadores">—</div>
+                <div class="label">Jogadores</div>
+            </div>
+            <div class="resumo-card">
+                <div class="numero" id="totalMonstros">—</div>
+                <div class="label">Monstros</div>
+            </div>
+            <div class="resumo-card">
+                <div class="numero" id="totalNPCs">—</div>
+                <div class="label">NPCs</div>
+            </div>
+            <div class="resumo-card">
+                <div class="numero" id="totalGeral">—</div>
+                <div class="label">Total</div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="lista-toolbar">
+            <div class="filtros-tipo">
+                <button class="filter-btn active" data-tipo="todos">Todos</button>
+                <button class="filter-btn" data-tipo="jogador">Jogadores</button>
+                <button class="filter-btn" data-tipo="monstro">Monstros</button>
+                <button class="filter-btn" data-tipo="npc">NPCs</button>
+            </div>
+            <button class="btn-primary" id="btnNovoCombatente">+ Novo Combatente</button>
+        </div>
+
+        <!-- Tabela -->
+        <div class="card">
+            <table class="tabela-combatentes">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Nome</th>
+                        <th>Classe</th>
+                        <th>Nível</th>
+                        <th>HP Máximo</th>
+                        <th>Iniciativa</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaCombatentes">
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:2rem;color:#64748b">
+                            Carregando...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Aba: Arena -->
+    <section class="tab-section" id="tab-arena">
+        <div class="arena-cta">
+            <h3>🏟️ Arena de Combate</h3>
+            <p>Inicie uma sessão de combate com os combatentes cadastrados.</p>
+            <a href="/arena" class="btn-arena">Entrar na Arena ⚔️</a>
+        </div>
+    </section>
+
+</div>
+
+<!-- ── Modais de cadastro (copiados do index.html) ─────────────────── -->
+<!-- Modal Jogador -->
+<div id="modalCadastroJogador" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🧙 Cadastrar Jogador</h2>
+            <button class="modal-close" onclick="fecharModalCadastro()">×</button>
+        </div>
+        <form id="formCadastroJogador" enctype="multipart/form-data">
+            <input type="hidden" name="tipo" value="jogador" />
+            <div class="nivel-pontos-container">
+                <div class="nivel-field">
+                    <label for="inputNivel">NÍVEL</label>
+                    <div class="nivel-circle-container">
+                        <input type="number" id="inputNivel" name="nivel" value="1" min="1" max="20" class="nivel-input" />
+                    </div>
+                </div>
+                <div class="pontos-field">
+                    <label for="inputPontos">PONTOS</label>
+                    <input type="number" id="inputPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputNome">Nome do Personagem *</label>
+                <input type="text" id="inputNome" name="nome" required placeholder="Ex: Aragorn" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputHP">HP Máximo *</label>
+                    <input type="number" id="inputHP" name="hp_maximo" required min="1" placeholder="Ex: 100" />
+                </div>
+                <div class="form-group">
+                    <label for="inputIniciativa">Iniciativa *</label>
+                    <input type="number" id="inputIniciativa" name="iniciativa" required placeholder="Ex: 15" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputClasse">Classe</label>
+                <input type="text" id="inputClasse" name="classe" placeholder="Ex: Guerreiro" />
+            </div>
+            <div class="form-group">
+                <label>Foto do Personagem</label>
+                <div class="upload-area-vertical" id="uploadPlaceholder"
+                    onclick="document.getElementById('inputFoto').click()">
+                    <span>📷 Clique para adicionar foto</span>
+                </div>
+                <input type="file" id="inputFoto" name="foto" accept="image/*" style="display:none"
+                    onchange="previewImagemUpload(this,'uploadPreview','previewImage','uploadPlaceholder')" />
+                <div class="upload-preview-vertical" id="uploadPreview" style="display:none">
+                    <img id="previewImage" src="" alt="Preview" />
+                    <button type="button" class="btn-remove-image-vertical" onclick="removerImagem()">✕</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" onclick="fecharModalCadastro()">Cancelar</button>
+                <button type="submit" class="btn-iniciar">✅ Cadastrar Jogador</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Monstro -->
+<div id="modalCadastroMonstro" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>👹 Cadastrar Monstro</h2>
+            <button class="modal-close" onclick="fecharModalCadastroMonstro()">×</button>
+        </div>
+        <form id="formCadastroMonstro" enctype="multipart/form-data">
+            <input type="hidden" name="tipo" value="monstro" />
+            <div class="nivel-pontos-container">
+                <div class="nivel-field">
+                    <label for="inputNivelMonstro">NÍVEL</label>
+                    <div class="nivel-circle-container">
+                        <input type="number" id="inputNivelMonstro" name="nivel" value="1" min="1" max="20" class="nivel-input" />
+                    </div>
+                </div>
+                <div class="pontos-field">
+                    <label for="inputPontosMonstro">PONTOS</label>
+                    <input type="number" id="inputPontosMonstro" name="pontos" value="0" min="0" class="pontos-input" placeholder="0" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputNomeMonstro">Nome *</label>
+                <input type="text" id="inputNomeMonstro" name="nome" required placeholder="Ex: Goblin" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputHPMonstro">HP Máximo *</label>
+                    <input type="number" id="inputHPMonstro" name="hp_maximo" required min="1" placeholder="Ex: 30" />
+                </div>
+                <div class="form-group">
+                    <label for="inputIniciativaMonstro">Iniciativa *</label>
+                    <input type="number" id="inputIniciativaMonstro" name="iniciativa" required placeholder="Ex: 12" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputClasseMonstro">Tipo/Espécie</label>
+                <input type="text" id="inputClasseMonstro" name="classe" placeholder="Ex: Humanoide" />
+            </div>
+            <div class="form-group">
+                <label>Foto</label>
+                <div class="upload-area-vertical" id="uploadPlaceholderMonstro"
+                    onclick="document.getElementById('inputFotoMonstro').click()">
+                    <span>📷 Clique para adicionar foto</span>
+                </div>
+                <input type="file" id="inputFotoMonstro" name="foto" accept="image/*" style="display:none"
+                    onchange="previewImagemUpload(this,'uploadPreviewMonstro','previewImageMonstro','uploadPlaceholderMonstro')" />
+                <div class="upload-preview-vertical" id="uploadPreviewMonstro" style="display:none">
+                    <img id="previewImageMonstro" src="" alt="Preview" />
+                    <button type="button" class="btn-remove-image-vertical" onclick="removerImagemMonstro()">✕</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" onclick="fecharModalCadastroMonstro()">Cancelar</button>
+                <button type="submit" class="btn-iniciar">✅ Cadastrar Monstro</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal NPC -->
+<div id="modalCadastroNPC" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🧝 Cadastrar NPC</h2>
+            <button class="modal-close" onclick="fecharModalCadastroNPC()">×</button>
+        </div>
+        <form id="formCadastroNPC" enctype="multipart/form-data">
+            <input type="hidden" name="tipo" value="npc" />
+            <div class="nivel-pontos-container">
+                <div class="nivel-field">
+                    <label for="inputNivelNPC">NÍVEL</label>
+                    <div class="nivel-circle-container">
+                        <input type="number" id="inputNivelNPC" name="nivel" value="1" min="1" max="20" class="nivel-input" />
+                    </div>
+                </div>
+                <div class="pontos-field">
+                    <label for="inputPontosNPC">PONTOS</label>
+                    <input type="number" id="inputPontosNPC" name="pontos" value="0" min="0" class="pontos-input" placeholder="0" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputNomeNPC">Nome *</label>
+                <input type="text" id="inputNomeNPC" name="nome" required placeholder="Ex: Taverneiro" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputHPNPC">HP Máximo *</label>
+                    <input type="number" id="inputHPNPC" name="hp_maximo" required min="1" placeholder="Ex: 20" />
+                </div>
+                <div class="form-group">
+                    <label for="inputIniciativaNPC">Iniciativa *</label>
+                    <input type="number" id="inputIniciativaNPC" name="iniciativa" required placeholder="Ex: 10" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputClasseNPC">Papel/Função</label>
+                <input type="text" id="inputClasseNPC" name="classe" placeholder="Ex: Aliado" />
+            </div>
+            <div class="form-group">
+                <label>Foto</label>
+                <div class="upload-area-vertical" id="uploadPlaceholderNPC"
+                    onclick="document.getElementById('inputFotoNPC').click()">
+                    <span>📷 Clique para adicionar foto</span>
+                </div>
+                <input type="file" id="inputFotoNPC" name="foto" accept="image/*" style="display:none"
+                    onchange="previewImagemUpload(this,'uploadPreviewNPC','previewImageNPC','uploadPlaceholderNPC')" />
+                <div class="upload-preview-vertical" id="uploadPreviewNPC" style="display:none">
+                    <img id="previewImageNPC" src="" alt="Preview" />
+                    <button type="button" class="btn-remove-image-vertical" onclick="removerImagemNPC()">✕</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" onclick="fecharModalCadastroNPC()">Cancelar</button>
+                <button type="submit" class="btn-iniciar">✅ Cadastrar NPC</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Seletor de Tipo -->
+<div id="seletorTipo" class="modal" style="display:none">
+    <div class="modal-content" style="max-width:340px">
+        <div class="modal-header">
+            <h2>Que tipo de combatente?</h2>
+            <button class="modal-close" onclick="fecharSeletorTipo()">×</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.75rem;padding:1rem 0">
+            <button class="btn-iniciar" onclick="abrirModalCadastro('jogador')">🧙 Jogador</button>
+            <button class="btn-iniciar" onclick="abrirModalCadastro('monstro')">👹 Monstro</button>
+            <button class="btn-iniciar" onclick="abrirModalCadastro('npc')">🧝 NPC</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Scripts  -->
+<script type="module">
+    import { getApiUrl } from '/js/config/api.config.js';
+    window.getApiUrl = getApiUrl;
+
+    const carregar = (src) => new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src; s.onload = resolve; s.onerror = reject;
+        document.body.appendChild(s);
+    });
+
+    // Carrega AuthService primeiro — protege a página
+    await carregar('/js/services/AuthService.js');
+    AuthService.exigirLogin();
+
+    // Exibe nome e perfil do usuário logado
+    document.getElementById('nomeUsuario').textContent = AuthService.getNome();
+    document.getElementById('badgePerfil').textContent = AuthService.getPerfil();
+
+    // Mostra link de admin só para administradores
+    if (AuthService.isAdmin()) {
+        document.getElementById('linkAdmin').style.display = 'inline-flex';
+    }
+
+    // Logout
+    document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout());
+
+    // Carrega demais scripts
+    await carregar('/js/services/CombatenteService.js');
+    await carregar('/js/services/UploadService.js');
+    await carregar('/js/ui/Toast.js');
+    await carregar('/js/ui/TipoSelector.js');
+    await carregar('/js/ui/ModalCadastro.js');
+    await carregar('/js/ui/ModalEdicao.js');
+    await carregar('/js/utils/dnd.js');
+    await carregar('/js/controllers/DashboardController.js');
+</script>
+
+</body>
+</html>

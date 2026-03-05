@@ -7,50 +7,25 @@ class AuthService {
     static TOKEN_KEY   = 'rpg_token';
     static USUARIO_KEY = 'rpg_usuario';
 
-    // ── Token ─────────────────────────────────────────────────────────────────
-
-    static getToken() {
-        return sessionStorage.getItem(this.TOKEN_KEY);
-    }
+    static getToken()  { return sessionStorage.getItem(this.TOKEN_KEY); }
 
     static getAuthHeader() {
         const token = this.getToken();
         return token ? { 'Authorization': `Bearer ${token}` } : {};
     }
 
-    static estaLogado() {
-        return !!this.getToken();
-    }
-
-    // ── Usuário ───────────────────────────────────────────────────────────────
+    static estaLogado() { return !!this.getToken(); }
 
     static getUsuario() {
-        try {
-            return JSON.parse(sessionStorage.getItem(this.USUARIO_KEY)) || null;
-        } catch {
-            return null;
-        }
+        try { return JSON.parse(sessionStorage.getItem(this.USUARIO_KEY)) || null; }
+        catch { return null; }
     }
 
-    static getPerfil() {
-        return this.getUsuario()?.perfil || null;
-    }
+    static getPerfil() { return this.getUsuario()?.perfil || null; }
+    static getNome()   { return this.getUsuario()?.nome   || 'Usuário'; }
 
-    static getNome() {
-        return this.getUsuario()?.nome || 'Usuário';
-    }
-
-    // ── Permissões ────────────────────────────────────────────────────────────
-
-    static isAdmin() {
-        return this.getPerfil() === 'administrador';
-    }
-
-    static isMestre() {
-        return ['mestre', 'administrador'].includes(this.getPerfil());
-    }
-
-    // ── Sessão ────────────────────────────────────────────────────────────────
+    static isAdmin()  { return this.getPerfil() === 'administrador'; }
+    static isMestre() { return ['mestre', 'administrador'].includes(this.getPerfil()); }
 
     static logout() {
         sessionStorage.removeItem(this.TOKEN_KEY);

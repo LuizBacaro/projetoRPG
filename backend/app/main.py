@@ -54,7 +54,12 @@ app.include_router(condicoes.router,   prefix=settings.API_V1_PREFIX)
 
 @app.get("/")
 async def root():
-    return FileResponse(str(FRONTEND_DIR / "pages" / "login.html"))  # ← adiciona /pages/
+    return FileResponse(str(FRONTEND_DIR / "pages" / "login.html"))
+
+
+@app.get("/dashboard")
+async def dashboard():
+    return FileResponse(str(FRONTEND_DIR / "pages" / "dashboard.html"))
 
 
 @app.get("/arena")

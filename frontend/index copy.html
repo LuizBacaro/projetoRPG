@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arena de Combate TTRPG</title>
+    <!-- link rel="stylesheet" href="style.css"-->
+    <!-- link rel="stylesheet" href="css/modal-condicao.css"-->
+
+    <!-- ✅ CSS modular por tema (ordem importa: variables primeiro) -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/combatentes.css">
+    <link rel="stylesheet" href="css/botoes.css">
+    <link rel="stylesheet" href="css/formularios.css">
+    <link rel="stylesheet" href="css/modais.css">
+    <link rel="stylesheet" href="css/arena.css">
+    <link rel="stylesheet" href="css/modal-condicao.css">
+    <link rel="stylesheet" href="css/responsivo.css">
+</head>
+<body>
+
+<!-- CONFIGURAÇÃO -->
+<div id="telaConfiguracao" class="tela ativa">
+    <header>
+        <h1>⚔️ Arena de Combate - Configuração</h1>
+        <p>Selecione os combatentes e configure a ordem de iniciativa</p>
+    </header>
+
+    <div class="container">
+        <div class="painel-esquerdo">
+            <h2>Personagens Disponíveis</h2>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-tipo="todos">Todos</button>
+                <button class="filter-btn" data-tipo="jogador">Jogadores</button>
+                <button class="filter-btn" data-tipo="monstro">Monstros</button>
+                <button class="filter-btn" data-tipo="npc">NPCs</button>
+            </div>
+
+            <div id="listaCombatentes" class="lista-combatentes">
+                <!-- Preenchido via JavaScript -->
+            </div>
+        </div>
+
+        <div class="painel-direito">
+            <div class="header-selecionados">
+                <h2>Combatentes Selecionados (<span id="contadorSelecionados">0</span>)</h2>
+            </div>
+            
+            <div id="combatentesSelecionados" class="lista-selecionados">
+                <div class="empty-state">
+                    <p>Nenhum combatente selecionado</p>
+                    <small>Clique nos personagens ao lado para adicionar</small>
+                </div>
+            </div>
+
+            <button id="btnIniciarCombate" class="btn-iniciar">Iniciar Combate</button>
+        </div>
+    </div>
+</div>
+
+<!-- ARENA DE COMBATE -->
+<div id="telaArena" class="tela">
+
+    <!-- ✅ Header compacto: título + rodada inline, sem botões -->
+    <header class="header-arena">
+        <div class="header-arena-titulo">
+            <h1>⚔️ Arena de Combate - Em Progresso</h1>
+            <span class="rodada-badge">Rodada <strong id="rodadaAtual">1</strong></span>
+        </div>
+    </header>
+
+    <div class="arena-layout">
+
+        <!-- ✅ COLUNA 1: Foto do combatente ativo — separada -->
+        <div class="arena-foto-col">
+            <div id="arenaFotoAtivo" class="arena-foto-vertical-container"></div>
+        </div>
+
+        <!-- ✅ COLUNA 2: Lista de iniciativa -->
+        <aside class="ordem-iniciativa-panel">
+            <div class="ordem-header">
+                <h2>📋 Ordem de Iniciativa</h2>
+            </div>
+            <div id="ordemIniciativaContainer" class="ordem-lista"></div>
+        </aside>
+
+        <!-- ✅ COLUNA 3: Card do combatente ativo -->
+        <main class="arena-main-ativo">
+            <div id="combatenteAtivoContainer"></div>
+        </main>
+
+    </div>
+</div>
+
+<!-- ==================== MODAL DE CADASTRO DE JOGADOR ==================== -->
+<div id="modalCadastro" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>⚔️ Cadastrar Novo Jogador</h2>
+            <button class="modal-close" onclick="fecharModalCadastro()">&times;</button>
+        </div>
+        <form id="formCadastroJogador" enctype="multipart/form-data">
+            <input type="hidden" name="tipo" value="jogador">
+            
+            <!-- NÍVEL E PONTOS NO TOPO -->
+            <div class="nivel-pontos-container">
+                <div class="nivel-field">
+                    <label for="inputNivel">NÍVEL</label>
+                    <div class="nivel-circle-container">
+                        <input type="number" id="inputNivel" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                    </div>
+                </div>
+                <div class="pontos-field">
+                    <label for="inputPontos">PONTOS</label>
+                    <input type="number" id="inputPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="inputNome">Nome do Personagem *</label>
+                <input type="text" id="inputNome" name="nome" required placeholder="Ex: Aragorn">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputHP">HP Máximo *</label>
+                    <input type="number" id="inputHP" name="hp_maximo" required min="1" placeholder="Ex: 100">
+                </div>
+                <div class="form-group">
+                    <label for="inputIniciativa">Iniciativa *</label>
+                    <input type="number" id="inputIniciativa" name="iniciativa" required min="0" placeholder="Ex: 15">
+                </div>
+            </div>
+
+            <!-- ✅ DEFESA: CA, TOQUE, SURPRESA - JOGADOR -->
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="inputCA">CA</label>
+                        <input type="number" id="inputCA" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputToque">Toque</label>
+                        <input type="number" id="inputToque" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputSurpresa">Surpresa</label>
+                        <input type="number" id="inputSurpresa" name="surpresa" value="10" min="0" max="50">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="inputClasse">Classe</label>
+                <input type="text" id="inputClasse" name="classe" value="Aventureiro" placeholder="Ex: Guerreiro, Mago, Ladino...">
+            </div>
+            
+            <!-- CONTAINER FOTO + ATRIBUTOS LADO A LADO -->
+            <div class="foto-atributos-container">
+                <!-- FOTO VERTICAL -->
+                <div class="form-group foto-vertical">
+                    <label for="inputFoto">Foto</label>
+                    <div class="upload-area-vertical" id="uploadArea">
+                        <input type="file" id="inputFoto" name="foto" accept="image/*" style="display: none;">
+                        <div class="upload-placeholder-vertical" id="uploadPlaceholder">
+                            <span class="upload-icon">📷</span>
+                            <p>Clique para upload</p>
+                        </div>
+                        <div class="upload-preview-vertical" id="uploadPreview" style="display: none;">
+                            <img id="previewImage" src="" alt="Preview">
+                            <button type="button" class="btn-remove-image-vertical" onclick="removerImagem()">✕</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ATRIBUTOS D&D - 2 COLUNAS -->
+                <div class="atributos-container">
+                    <div class="form-group">
+                        <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                    </div>
+                    <div class="atributos-duas-colunas">
+                        <!-- COLUNA ESQUERDA -->
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="inputFOR">FOR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputFOR" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputDES">DES</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputDES" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputCON">CON</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputCON" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- COLUNA DIREITA -->
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="inputINT">INT</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputINT" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputSAB">SAB</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputSAB" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputCAR">CAR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputCAR" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- RESISTÊNCIAS -->
+                    <div class="resistencias-container">
+                        <div class="form-group">
+                            <label class="atributos-label">🛡️ RESISTÊNCIAS</label>
+                        </div>
+                        <div class="resistencias-grid">
+                            <div class="resistencia-field">
+                                <label for="inputFortitude">Fortitude</label>
+                                <input type="number" id="inputFortitude" name="fortitude" value="0" min="-10" max="50">
+                            </div>
+                            <div class="resistencia-field">
+                                <label for="inputReflexos">Reflexos</label>
+                                <input type="number" id="inputReflexos" name="reflexos" value="0" min="-10" max="50">
+                            </div>
+                            <div class="resistencia-field">
+                                <label for="inputVontade">Vontade</label>
+                                <input type="number" id="inputVontade" name="vontade" value="0" min="-10" max="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" onclick="fecharModalCadastro()">Cancelar</button>
+                <button type="submit" class="btn-iniciar">✅ Cadastrar Jogador</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== MODAL DE CADASTRO DE MONSTRO ==================== -->
+<div id="modalCadastroMonstro" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>👹 Cadastrar Novo Monstro</h2>
+            <button class="modal-close" onclick="fecharModalCadastroMonstro()">&times;</button>
+        </div>
+        <form id="formCadastroMonstro" enctype="multipart/form-data">
+            <input type="hidden" name="tipo" value="monstro">
+            
+            <div class="nivel-pontos-container">
+                <div class="nivel-field">
+                    <label for="inputNivelMonstro">NÍVEL</label>
+                    <div class="nivel-circle-container">
+                        <input type="number" id="inputNivelMonstro" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                    </div>
+                </div>
+                <div class="pontos-field">
+                    <label for="inputPontosMonstro">PONTOS</label>
+                    <input type="number" id="inputPontosMonstro" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="inputNomeMonstro">Nome do Monstro *</label>
+                <input type="text" id="inputNomeMonstro" name="nome" required placeholder="Ex: Dragão Vermelho">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputHPMonstro">HP Máximo *</label>
+                    <input type="number" id="inputHPMonstro" name="hp_maximo" required min="1" placeholder="Ex: 200">
+                </div>
+                <div class="form-group">
+                    <label for="inputIniciativaMonstro">Iniciativa *</label>
+                    <input type="number" id="inputIniciativaMonstro" name="iniciativa" required min="0" placeholder="Ex: 10">
+                </div>
+            </div>
+
+            <!-- ✅ DEFESA: CA, TOQUE, SURPRESA - MONSTRO -->
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="inputCAMonstro">CA</label>
+                        <input type="number" id="inputCAMonstro" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputToqueMonstro">Toque</label>
+                        <input type="number" id="inputToqueMonstro" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputSurpresaMonstro">Surpresa</label>
+                        <input type="number" id="inputSurpresaMonstro" name="surpresa" value="10" min="0" max="50">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="inputClasseMonstro">Tipo/Categoria</label>
+                <input type="text" id="inputClasseMonstro" name="classe" value="Criatura" placeholder="Ex: Dragão, Goblin, Morto-Vivo...">
+            </div>
+            
+            <div class="foto-atributos-container">
+                <div class="form-group foto-vertical">
+                    <label for="inputFotoMonstro">Foto</label>
+                    <div class="upload-area-vertical" id="uploadAreaMonstro">
+                        <input type="file" id="inputFotoMonstro" name="foto" accept="image/*" style="display: none;">
+                        <div class="upload-placeholder-vertical" id="uploadPlaceholderMonstro">
+                            <span class="upload-icon">📷</span>
+                            <p>Clique para upload</p>
+                        </div>
+                        <div class="upload-preview-vertical" id="uploadPreviewMonstro" style="display: none;">
+                            <img id="previewImageMonstro" src="" alt="Preview">
+                            <button type="button" class="btn-remove-image-vertical" onclick="removerImagemMonstro()">✕</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="atributos-container">
+                    <div class="form-group">
+                        <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                    </div>
+                    <div class="atributos-duas-colunas">
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="inputFORMonstro">FOR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputFORMonstro" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputDESMonstro">DES</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputDESMonstro" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputCONMonstro">CON</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputCONMonstro" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="inputINTMonstro">INT</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputINTMonstro" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputSABMonstro">SAB</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputSABMonstro" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputCARMonstro">CAR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputCARMonstro" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resistencias-container">
+                        <div class="form-group">
+                            <label class="atributos-label">🛡️ RESISTÊNCIAS</label>
+                        </div>
+                        <div class="resistencias-grid">
+                            <div class="resistencia-field">
+                                <label for="inputFortitudeMonstro">Fortitude</label>
+                                <input type="number" id="inputFortitudeMonstro" name="fortitude" value="0" min="-10" max="50">
+                            </div>
+                            <div class="resistencia-field">
+                                <label for="inputReflexosMonstro">Reflexos</label>
+                                <input type="number" id="inputReflexosMonstro" name="reflexos" value="0" min="-10" max="50">
+                            </div>
+                            <div class="resistencia-field">
+                                <label for="inputVontadeMonstro">Vontade</label>
+                                <input type="number" id="inputVontadeMonstro" name="vontade" value="0" min="-10" max="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" onclick="fecharModalCadastroMonstro()">Cancelar</button>
+                <button type="submit" class="btn-iniciar">✅ Cadastrar Monstro</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== MODAL DE CADASTRO DE NPC ==================== -->
+<div id="modalCadastroNPC" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🧙 Cadastrar Novo NPC</h2>
+            <button class="modal-close" onclick="fecharModalCadastroNPC()">&times;</button>
+        </div>
+        <form id="formCadastroNPC" enctype="multipart/form-data">
+            <input type="hidden" name="tipo" value="npc">
+            
+            <div class="nivel-pontos-container">
+                <div class="nivel-field">
+                    <label for="inputNivelNPC">NÍVEL</label>
+                    <div class="nivel-circle-container">
+                        <input type="number" id="inputNivelNPC" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                    </div>
+                </div>
+                <div class="pontos-field">
+                    <label for="inputPontosNPC">PONTOS</label>
+                    <input type="number" id="inputPontosNPC" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="inputNomeNPC">Nome do NPC *</label>
+                <input type="text" id="inputNomeNPC" name="nome" required placeholder="Ex: Elrond">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputHPNPC">HP Máximo *</label>
+                    <input type="number" id="inputHPNPC" name="hp_maximo" required min="1" placeholder="Ex: 50">
+                </div>
+                <div class="form-group">
+                    <label for="inputIniciativaNPC">Iniciativa *</label>
+                    <input type="number" id="inputIniciativaNPC" name="iniciativa" required min="0" placeholder="Ex: 12">
+                </div>
+            </div>
+
+            <!-- ✅ DEFESA: CA, TOQUE, SURPRESA - NPC -->
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="inputCANPC">CA</label>
+                        <input type="number" id="inputCANPC" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputToqueNPC">Toque</label>
+                        <input type="number" id="inputToqueNPC" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="inputSurpresaNPC">Surpresa</label>
+                        <input type="number" id="inputSurpresaNPC" name="surpresa" value="10" min="0" max="50">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="inputClasseNPC">Classe/Papel</label>
+                <input type="text" id="inputClasseNPC" name="classe" value="Aliado" placeholder="Ex: Mercador, Guarda, Aliado...">
+            </div>
+            
+            <div class="foto-atributos-container">
+                <div class="form-group foto-vertical">
+                    <label for="inputFotoNPC">Foto</label>
+                    <div class="upload-area-vertical" id="uploadAreaNPC">
+                        <input type="file" id="inputFotoNPC" name="foto" accept="image/*" style="display: none;">
+                        <div class="upload-placeholder-vertical" id="uploadPlaceholderNPC">
+                            <span class="upload-icon">📷</span>
+                            <p>Clique para upload</p>
+                        </div>
+                        <div class="upload-preview-vertical" id="uploadPreviewNPC" style="display: none;">
+                            <img id="previewImageNPC" src="" alt="Preview">
+                            <button type="button" class="btn-remove-image-vertical" onclick="removerImagemNPC()">✕</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="atributos-container">
+                    <div class="form-group">
+                        <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                    </div>
+                    <div class="atributos-duas-colunas">
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="inputFORNPC">FOR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputFORNPC" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputDESNPC">DES</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputDESNPC" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputCONNPC">CON</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputCONNPC" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="inputINTNPC">INT</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputINTNPC" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputSABNPC">SAB</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputSABNPC" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="inputCARNPC">CAR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="inputCARNPC" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resistencias-container">
+                        <div class="form-group">
+                            <label class="atributos-label">🛡️ RESISTÊNCIAS</label>
+                        </div>
+                        <div class="resistencias-grid">
+                            <div class="resistencia-field">
+                                <label for="inputFortitudeNPC">Fortitude</label>
+                                <input type="number" id="inputFortitudeNPC" name="fortitude" value="0" min="-10" max="50">
+                            </div>
+                            <div class="resistencia-field">
+                                <label for="inputReflexosNPC">Reflexos</label>
+                                <input type="number" id="inputReflexosNPC" name="reflexos" value="0" min="-10" max="50">
+                            </div>
+                            <div class="resistencia-field">
+                                <label for="inputVontadeNPC">Vontade</label>
+                                <input type="number" id="inputVontadeNPC" name="vontade" value="0" min="-10" max="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" onclick="fecharModalCadastroNPC()">Cancelar</button>
+                <button type="submit" class="btn-iniciar">✅ Cadastrar NPC</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== MODAL DE EDIÇÃO ==================== -->
+<div id="modalEdicao" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>✏️ Editar Combatente</h2>
+            <button class="modal-close" onclick="fecharModalEdicao()">&times;</button>
+        </div>
+        <form id="formEdicaoCombatente" enctype="multipart/form-data">
+            <input type="hidden" id="editId" name="id">
+            
+            <div class="nivel-pontos-container">
+                <div class="nivel-field">
+                    <label for="editNivel">NÍVEL</label>
+                    <div class="nivel-circle-container">
+                        <input type="number" id="editNivel" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                    </div>
+                </div>
+                <div class="pontos-field">
+                    <label for="editPontos">PONTOS</label>
+                    <input type="number" id="editPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="editNome">Nome do Personagem *</label>
+                <input type="text" id="editNome" name="nome" required placeholder="Ex: Aragorn">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editHP">HP Máximo *</label>
+                    <input type="number" id="editHP" name="hp_maximo" required min="1" placeholder="Ex: 100">
+                </div>
+                <div class="form-group">
+                    <label for="editIniciativa">Iniciativa *</label>
+                    <input type="number" id="editIniciativa" name="iniciativa" required min="0" placeholder="Ex: 15">
+                </div>
+            </div>
+
+            <!-- ✅ DEFESA: CA, TOQUE, SURPRESA - EDIÇÃO -->
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="editCA">CA</label>
+                        <input type="number" id="editCA" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="editToque">Toque</label>
+                        <input type="number" id="editToque" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="editSurpresa">Surpresa</label>
+                        <input type="number" id="editSurpresa" name="surpresa" value="10" min="0" max="50">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="editClasse">Classe</label>
+                <input type="text" id="editClasse" name="classe" placeholder="Ex: Guerreiro, Mago, Ladino...">
+            </div>
+            
+            <div class="form-group">
+                <label for="editTipo">Tipo</label>
+                <select id="editTipo" name="tipo" class="form-select">
+                    <option value="jogador">Jogador</option>
+                    <option value="monstro">Monstro</option>
+                    <option value="npc">NPC</option>
+                </select>
+            </div>
+            
+            <div class="foto-atributos-container">
+                <div class="form-group foto-vertical">
+                    <label for="editFoto">Foto</label>
+                    <div class="upload-area-vertical" id="editUploadArea">
+                        <input type="file" id="editFoto" name="foto" accept="image/*" style="display: none;">
+                        <div class="upload-placeholder-vertical" id="editUploadPlaceholder">
+                            <span class="upload-icon">📷</span>
+                            <p>Clique para alterar</p>
+                        </div>
+                        <div class="upload-preview-vertical" id="editUploadPreview" style="display: none;">
+                            <img id="editPreviewImage" src="" alt="Preview">
+                            <button type="button" class="btn-remove-image-vertical" onclick="removerImagemEdicao()">✕</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="atributos-container">
+                    <div class="form-group">
+                        <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                    </div>
+                    <div class="atributos-duas-colunas">
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="editFOR">FOR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editFOR" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="editDES">DES</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editDES" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="editCON">CON</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editCON" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="editINT">INT</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editINT" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="editSAB">SAB</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editSAB" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="editCAR">CAR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editCAR" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <span class="atributo-modificador">+0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resistencias-container">
+                        <div class="form-group">
+                            <label class="atributos-label">🛡️ RESISTÊNCIAS</label>
+                        </div>
+                        <div class="resistencias-grid">
+                            <div class="resistencia-field">
+                                <label for="editFortitude">Fortitude</label>
+                                <input type="number" id="editFortitude" name="fortitude" min="-10" max="50">
+                            </div>
+                            <div class="resistencia-field">
+                                <label for="editReflexos">Reflexos</label>
+                                <input type="number" id="editReflexos" name="reflexos" min="-10" max="50">
+                            </div>
+                            <div class="resistencia-field">
+                                <label for="editVontade">Vontade</label>
+                                <input type="number" id="editVontade" name="vontade" min="-10" max="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" onclick="fecharModalEdicao()">Cancelar</button>
+                <button type="button" class="btn-delete" onclick="confirmarDelecao()">🗑️ Deletar</button>
+                <button type="submit" class="btn-iniciar">💾 Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== MODAL DE DANO/CURA ==================== -->
+<div id="modalDanoCura" class="modal-dano-overlay">
+    <div class="modal-dano-container">
+
+        <!-- HEADER -->
+        <div class="modal-dano-header">
+            <h2>⚔️ Aplicar Dano / Cura</h2>
+            <button class="modal-dano-fechar" onclick="modalDanoCuraInstance.fechar()">✕</button>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-dano-body">
+            <div class="modal-dano-layout">
+
+                <!-- COLUNA ESQUERDA: lista de combatentes -->
+                <div class="dano-combatentes-selecao">
+                    <h3>🎯 Selecionar Combatentes:</h3>
+                    <div id="listaCombatentesDanoCura" class="lista-checkbox-combatentes">
+                        <!-- Preenchido dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- COLUNA DIREITA: inputs de dano e cura -->
+                <div class="dano-valores-aplicacao">
+                    <div class="campo-grupo">
+                        <label for="inputDanoModal" class="modal-label">⚔️ Dano:</label>
+                        <input type="number" id="inputDanoModal" class="input-valor-modal" min="0" placeholder="0" value="0">
+                    </div>
+                    <div class="campo-grupo">
+                        <label for="inputCuraModal" class="modal-label">💚 Cura:</label>
+                        <input type="number" id="inputCuraModal" class="input-valor-modal" min="0" placeholder="0" value="0">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-dano-footer">
+            <button class="btn-cancelar-dano" onclick="modalDanoCuraInstance.fechar()">❌ Cancelar</button>
+            <button class="btn-aplicar-dano" onclick="modalDanoCuraInstance.aplicar()">✅ Aplicar Dano / Cura</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+ <!-- ✅ Config primeiro — expõe getApiUrl() globalmente -->
+<script src="js/config/api.config.js"></script>
+
+<!-- Depois os services -->
+<script src="js/services/DanoCuraService.js"></script>
+<script src="js/ui/ModalDanoCura.js"></script>
+<script src="js/services/CondicaoService.js"></script>  
+<script src="js/ui/CondicaoUI.js"></script>              
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>
