@@ -1,35 +1,33 @@
 /**
- * ModalDanoCura
- * SRP: gerencia apenas a UI do modal de aplicação de dano/cura
- * DIP: depende de DanoCuraService e ArenaController via injeção
- *
- * CORRIGIDO: carregarCombatentes() agora renderiza HP para
- * jogadores, monstros e NPCs igualmente
+ * Helper para exibir toasts
+ * Função auxiliar fora da classe (SRP)
  */
-
-// ── Helper de Toast (fora da classe — SRP) ────────────────────────────────
 function mostrarToast(mensagem, tipo = 'success') {
     if (typeof Toast !== 'undefined') {
         tipo === 'success' ? Toast.success(mensagem) : Toast.error(mensagem);
-        return;
+    } else {
+        const toast = document.createElement('div');
+        toast.className    = 'toast show';
+        toast.style.cssText = `
+            position: fixed; bottom: 2rem; right: 2rem;
+            padding: 1rem 2rem;
+            background: ${tipo === 'success' ? '#32CD32' : '#DC143C'};
+            color: white; border-radius: 8px;
+            font-family: var(--fonte-texto); font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 10000;
+        `;
+        toast.textContent = mensagem;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
     }
-    const toast = document.createElement('div');
-    toast.className  = 'toast show';
-    toast.style.cssText = `
-        position: fixed; bottom: 2rem; right: 2rem;
-        padding: 1rem 2rem;
-        background: ${tipo === 'success' ? '#32CD32' : '#DC143C'};
-        color: white; border-radius: 8px;
-        font-weight: bold;
-        box-shadow: 0 4px 15px rgba(0,0,0,.3);
-        z-index: 10000;
-    `;
-    toast.textContent = mensagem;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
 }
 
-// ── Classe principal ──────────────────────────────────────────────────────
+/**
+ * Componente UI do modal de aplicação de dano/cura
+ * SRP: apenas gerencia a UI do modal
+ * DIP: depende de DanoCuraService e ArenaController via injeção
+ */
 class ModalDanoCura {
 
     constructor(danoCuraService, arenaController) {
@@ -47,16 +45,19 @@ class ModalDanoCura {
         this.vincularEventos();
     }
 
+    // ── Eventos ───────────────────────────────────────────────────────────
+
     vincularEventos() {
-        // Inputs numéricos — aceita apenas valores positivos
         const inputDano = document.getElementById('inputDanoModal');
         const inputCura = document.getElementById('inputCuraModal');
 
-        if (inputDano) inputDano.addEventListener('input', () => {
+        if (!inputDano || !inputCura) return;
+
+        // Quando preencher dano, zera cura e vice-versa
+        inputDano.addEventListener('input', () => {
             if (parseInt(inputDano.value) > 0) inputCura.value = '0';
         });
-
-        if (inputCura) inputCura.addEventListener('input', () => {
+        inputCura.addEventListener('input', () => {
             if (parseInt(inputCura.value) > 0) inputDano.value = '0';
         });
     }
@@ -64,15 +65,17 @@ class ModalDanoCura {
     // ── Abrir / Fechar ────────────────────────────────────────────────────
 
     abrir() {
+        this.carregarCombatentes();
         this.combatentesSelecionados.clear();
         this.limparInputs();
-        this.carregarCombatentes();
         this.modalElement.classList.add('show');
     }
 
     fechar() {
         this.modalElement.classList.remove('show');
     }
+
+    // ── Helpers ───────────────────────────────────────────────────────────
 
     limparInputs() {
         const inputDano = document.getElementById('inputDanoModal');
@@ -81,82 +84,49 @@ class ModalDanoCura {
         if (inputCura) inputCura.value = '0';
     }
 
-    // ── Renderiza lista de combatentes ────────────────────────────────────
+    // ── Render: Lista de combatentes ──────────────────────────────────────
     //
-    // CORREÇÃO: combatentes.tipo pode ser 'jogador', 'monstro' ou 'npc'
-    // O HP é exibido para TODOS os tipos — a condição anterior
-    // limitava ao tipo 'jogador' implicitamente por usar c.hp_atual
-    // que monstros/NPCs não tinham no objeto local (vinham sem hp_atual
-    // atualizado). Agora usa hp_atual ?? hp_maximo como fallback.
+    // REGRA DE NEGÓCIO:
+    //   jogador  → exibe HP (ex: "45/45 PV")
+    //   monstro  → NÃO exibe HP
+    //   npc      → NÃO exibe HP
 
     carregarCombatentes() {
-        const combatentes = this.arenaController?.combatentes;
+        const combatentes = this.arenaController.combatentes;
         const container   = document.getElementById('listaCombatentesDanoCura');
 
-        if (!container) return;
-
-        if (!combatentes || !combatentes.length) {
-            container.innerHTML = '<p style="color:#64748b;text-align:center">Nenhum combatente na arena</p>';
+        if (!combatentes || combatentes.length === 0) {
+            container.innerHTML = '<p style="color:#888;font-style:italic;padding:1rem;">⚠️ Nenhum combatente disponível</p>';
             return;
         }
 
-        container.innerHTML = '';
+        container.innerHTML = combatentes.map(c => {
 
-        combatentes.forEach(c => {
-            // Garante hp_atual para monstros e NPCs que podem não ter
-            // o campo atualizado no objeto local — usa hp_maximo como fallback
-            const hpAtual  = c.hp_atual  ?? c.hp_maximo ?? '—';
-            const hpMaximo = c.hp_maximo ?? '—';
+            // Só jogadores têm o HP exibido publicamente
+            const mostrarHP  = c.tipo.toLowerCase() === 'jogador';
+            const spanHP     = mostrarHP
+                ? `<span class="combatente-hp">${c.hp_atual}/${c.hp_maximo} PV</span>`
+                : '';
 
-            // Badge por tipo
-            const badgeClass = {
-                jogador: 'badge-jogador',
-                monstro: 'badge-monstro',
-                npc:     'badge-npc'
-            }[c.tipo] ?? 'badge-jogador';
-
-            // Cor do HP baseada no percentual
-            let hpClass = 'hp-normal';
-            if (hpMaximo > 0) {
-                const pct = (hpAtual / hpMaximo) * 100;
-                if (pct <= 25)      hpClass = 'hp-critico';
-                else if (pct <= 50) hpClass = 'hp-baixo';
-            }
-
-            const item = document.createElement('div');
-            item.className   = 'combatente-dano-item';
-            item.dataset.id  = c.id;
-
-            item.innerHTML = `
-                <label class="combatente-dano-label">
+            return `
+                <div class="checkbox-combatente-item">
                     <input
                         type="checkbox"
-                        class="combatente-checkbox"
-                        data-id="${c.id}"
-                    />
-                    <div class="combatente-dano-info">
-                        <span class="combatente-dano-nome">${c.nome}</span>
-                        <div class="combatente-dano-meta">
-                            <span class="badge ${badgeClass}">${c.tipo}</span>
-                            <span class="combatente-hp ${hpClass}">${hpAtual}/${hpMaximo} PV</span>
-                        </div>
-                    </div>
-                </label>
+                        id="dano-check-${c.id}"
+                        value="${c.id}"
+                        onchange="modalDanoCuraInstance.toggleCombatente(${c.id})"
+                    >
+                    <label for="dano-check-${c.id}">
+                        <span class="combatente-nome">${c.nome}</span>
+                        ${spanHP}
+                        <span class="badge badge-${c.tipo.toLowerCase()}">${c.tipo}</span>
+                    </label>
+                </div>
             `;
-
-            // Toggle seleção ao clicar no checkbox
-            const checkbox = item.querySelector('.combatente-checkbox');
-            checkbox.addEventListener('change', () => {
-                this.toggleCombatente(c.id);
-                // Feedback visual no item
-                item.classList.toggle('selecionado', checkbox.checked);
-            });
-
-            container.appendChild(item);
-        });
+        }).join('');
     }
 
-    // ── Toggle seleção ────────────────────────────────────────────────────
+    // ── Toggle combatente selecionado ─────────────────────────────────────
 
     toggleCombatente(combatenteId) {
         if (this.combatentesSelecionados.has(combatenteId)) {
@@ -164,51 +134,63 @@ class ModalDanoCura {
         } else {
             this.combatentesSelecionados.add(combatenteId);
         }
+        console.log('✅ Combatentes selecionados:', Array.from(this.combatentesSelecionados));
     }
 
-    // ── Aplicar dano / cura ───────────────────────────────────────────────
+    // ── Aplicar dano ou cura ──────────────────────────────────────────────
 
     async aplicar() {
         try {
-            const dano = parseInt(document.getElementById('inputDanoModal')?.value) || 0;
-            const cura = parseInt(document.getElementById('inputCuraModal')?.value) || 0;
+            console.log('🎯 Iniciando aplicação de dano/cura...');
 
-            // Valida entrada
+            const dano = parseInt(document.getElementById('inputDanoModal').value) || 0;
+            const cura = parseInt(document.getElementById('inputCuraModal').value) || 0;
+
             const validacao = this.danoCuraService.validarEntrada(dano, cura);
-            if (!validacao.valido) {
-                mostrarToast(validacao.erro, 'error');
-                return;
-            }
 
-            // Valida seleção
             if (this.combatentesSelecionados.size === 0) {
-                mostrarToast('Selecione pelo menos um combatente', 'error');
+                mostrarToast('⚠️ Selecione ao menos um combatente!', 'error');
                 return;
             }
 
-            const ids = Array.from(this.combatentesSelecionados);
-
-            let resultados;
-            if (validacao.tipo === 'dano') {
-                resultados = await this.danoCuraService.aplicarDanoEmMassa(ids, validacao.valor);
-                mostrarToast(`💥 ${validacao.valor} de dano aplicado a ${ids.length} combatente(s)!`);
-            } else {
-                resultados = await this.danoCuraService.aplicarCuraEmMassa(ids, validacao.valor);
-                mostrarToast(`💚 ${validacao.valor} de cura aplicada a ${ids.length} combatente(s)!`);
+            if (!validacao.valido) {
+                mostrarToast(`⚠️ ${validacao.erro}`, 'error');
+                return;
             }
 
-            // Atualiza os combatentes na arena
-            resultados.forEach(resultado => {
-                if (resultado?.combatente) {
-                    this.arenaController.atualizarCombatente(resultado.combatente);
+            const ids   = Array.from(this.combatentesSelecionados);
+            const tipo  = validacao.tipo;   // 'dano' | 'cura'
+            const valor = validacao.valor;
+
+            if (tipo === 'dano') {
+                await this.danoCuraService.aplicarDanoEmMassa(ids, valor);
+            } else {
+                await this.danoCuraService.aplicarCuraEmMassa(ids, valor);
+            }
+
+            // Sincroniza HP nos combatentes locais do ArenaController
+            ids.forEach(id => {
+                const c = this.arenaController.combatentes.find(x => x.id === id);
+                if (!c) return;
+
+                if (tipo === 'dano') {
+                    c.hp_atual = Math.max(0, c.hp_atual - valor);
+                } else {
+                    c.hp_atual = Math.min(c.hp_maximo, c.hp_atual + valor);
                 }
             });
 
+            // Atualiza a interface da arena
+            this.arenaController.atualizarInterface();
+
+            const emoji = tipo === 'dano' ? '⚔️' : '💚';
+            mostrarToast(`${emoji} ${tipo === 'dano' ? 'Dano' : 'Cura'} de ${valor} aplicado!`, 'success');
+
             this.fechar();
 
-        } catch (err) {
-            mostrarToast(err.message || 'Erro ao aplicar dano/cura', 'error');
-            console.error('❌ Erro ao aplicar dano/cura:', err);
+        } catch (erro) {
+            console.error('❌ Erro ao aplicar dano/cura:', erro);
+            mostrarToast(`❌ Erro: ${erro.message}`, 'error');
         }
     }
 }
