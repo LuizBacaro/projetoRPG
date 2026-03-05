@@ -1,7 +1,9 @@
 /**
  * Toast
  * SRP: apenas exibir notificações visuais
- * Global: compatível com <script> dinâmico e ES modules
+ * Compatível com:
+ *   - ES modules (import { Toast } from '../ui/Toast.js')
+ *   - Scripts globais (window.Toast via createElement)
  */
 class Toast {
 
@@ -56,5 +58,8 @@ class Toast {
     }
 }
 
-// Disponibiliza globalmente para scripts dinâmicos e ES modules
+// ── Disponibiliza para scripts globais (DashboardController) ──────────
 window.Toast = Toast;
+
+// ── Disponibiliza para ES modules (ConfiguracaoController, ArenaController) ──
+export { Toast };
