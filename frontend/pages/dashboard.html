@@ -589,6 +589,7 @@
         document.body.appendChild(s);
     });
 
+    // 1️⃣ Auth — protege a página
     await carregar('/js/services/AuthService.js');
     AuthService.exigirLogin();
 
@@ -599,9 +600,11 @@
     }
     document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout());
 
+    // 2️⃣ Toast — deve ser carregado ANTES do DashboardController
     await carregar('/js/ui/Toast.js');
+
+    // 3️⃣ Controller (já inclui CombatenteServiceGlobal e UploadServiceGlobal)
     await carregar('/js/controllers/DashboardController.js');
 </script>
-
 </body>
 </html>
