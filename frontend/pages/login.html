@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — Arena TTRPG</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0f23;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+            padding: 1rem;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-logo p {
+            color: #64748b;
+            margin-top: .4rem;
+            font-size: .9rem;
+        }
+
+        .login-card {
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
+            border-radius: .75rem;
+            padding: 2rem;
+        }
+
+        .login-card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: .35rem;
+            font-size: .82rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: .65rem .9rem;
+            border-radius: .4rem;
+            border: 1px solid #334155;
+            background: #0f0f23;
+            color: #e2e8f0;
+            font-size: .95rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .form-group input:focus { border-color: #7c3aed; }
+
+        .btn-login {
+            width: 100%;
+            padding: .7rem;
+            background: #7c3aed;
+            color: #fff;
+            border: none;
+            border-radius: .4rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: .5rem;
+            transition: background .2s;
+        }
+
+        .btn-login:hover { background: #6d28d9; }
+        .btn-login:disabled { background: #4c1d95; cursor: not-allowed; opacity: .7; }
+
+        .erro-msg {
+            display: none;
+            background: #dc262622;
+            border: 1px solid #dc262655;
+            color: #f87171;
+            padding: .65rem 1rem;
+            border-radius: .4rem;
+            margin-bottom: 1rem;
+            font-size: .85rem;
+        }
+
+        .hint {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: .8rem;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+    <div class="login-logo">
+        <h1>⚔️ Arena TTRPG</h1>
+        <p>Plataforma de gestão de campanhas e combates</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Acesse sua conta</h2>
+
+        <div id="erroMsg" class="erro-msg"></div>
+
+        <div class="form-group">
+            <label>E-mail</label>
+            <input id="inputEmail" type="email" placeholder="seu@email.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+            <label>Senha</label>
+            <input id="inputSenha" type="password" placeholder="••••••" autocomplete="current-password" />
+        </div>
+
+        <button id="btnLogin" class="btn-login">Entrar</button>
+
+        <p class="hint">Acesso restrito a usuários cadastrados</p>
+    </div>
+
+</div>
+
+<script type="module">
+    import { getApiUrl } from '/js/config/api.config.js';
+
+    const btnLogin   = document.getElementById('btnLogin');
+    const inputEmail = document.getElementById('inputEmail');
+    const inputSenha = document.getElementById('inputSenha');
+    const erroMsg    = document.getElementById('erroMsg');
+
+    // Se já tem token válido → redireciona direto
+    const tokenSalvo = sessionStorage.getItem('rpg_token');
+    if (tokenSalvo) window.location.href = '/arena';
+
+    function mostrarErro(msg) {
+        erroMsg.textContent    = msg;
+        erroMsg.style.display  = 'block';
+    }
+
+    function esconderErro() {
+        erroMsg.style.display = 'none';
+    }
+
+    async function fazerLogin() {
+        esconderErro();
+        const email = inputEmail.value.trim();
+        const senha = inputSenha.value;
+
+        if (!email || !senha) {
+            mostrarErro('Preencha e-mail e senha.');
+            return;
+        }
+
+        btnLogin.disabled     = true;
+        btnLogin.textContent  = 'Entrando...';
+
+        try {
+            const res = await fetch(getApiUrl('/auth/login'), {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ email, senha })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                mostrarErro(data.detail || 'Erro ao fazer login.');
+                return;
+            }
+
+            // Salva token e dados do usuário na sessão
+            sessionStorage.setItem('rpg_token',   data.access_token);
+            sessionStorage.setItem('rpg_usuario', JSON.stringify(data.usuario));
+
+            // Redireciona conforme perfil
+            window.location.href = '/arena';
+
+        } catch (err) {
+            mostrarErro('Erro de conexão com o servidor.');
+        } finally {
+            btnLogin.disabled    = false;
+            btnLogin.textContent = 'Entrar';
+        }
+    }
+
+    btnLogin.addEventListener('click', fazerLogin);
+
+    // Login com Enter
+    [inputEmail, inputSenha].forEach(el =>
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') fazerLogin(); })
+    );
+</script>
+
+</body>
+</html>

@@ -1,19 +1,13 @@
 """
 UsuarioService
 SRP: regras de negócio para usuários
+DIP: depende da abstração do repositório
 """
-from passlib.context import CryptContext
 from fastapi import HTTPException, status
+from ..core.security import hash_senha, verificar_senha
+from ..models.usuario import Usuario
 from ..repositories.usuario_repository import UsuarioRepository
 from ..schemas.usuario import UsuarioCreate, UsuarioUpdate
-from ..models.usuario import Usuario
-
-# bcrypt 4.x não tem __about__ — usar schemes alternativos como fallback
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__rounds=12
-)
 
 
 class UsuarioService:
@@ -21,14 +15,15 @@ class UsuarioService:
     def __init__(self, repository: UsuarioRepository):
         self.repo = repository
 
-    # ── Hash ──────────────────────────────────────────────────────────────────
+    # ── Regras de negócio ─────────────────────────────────────────────────────
 
-    def _hash_senha(self, senha: str) -> str:
-        # bcrypt limita a 72 bytes — trunca preventivamente
-        return pwd_context.hash(senha[:72])
-
-    def _verificar_senha(self, senha: str, hash_: str) -> bool:
-        return pwd_context.verify(senha[:72], hash_)
+    def _validar_email_unico(self, email: str, excluir_id: int = None) -> None:
+        existente = self.repo.buscar_por_email(email)
+        if existente and existente.id != excluir_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"E-mail '{email}' já está em uso por outro usuário"
+            )
 
     # ── CRUD ──────────────────────────────────────────────────────────────────
 
@@ -45,50 +40,38 @@ class UsuarioService:
         return usuario
 
     def criar(self, dados: UsuarioCreate, usuario_responsavel: str = "sistema") -> Usuario:
-        # Verifica e-mail duplicado
-        if self.repo.buscar_por_email(dados.email):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="E-mail já cadastrado"
-            )
-
+        self._validar_email_unico(dados.email)
         usuario = Usuario(
             perfil              = dados.perfil,
             nome                = dados.nome,
             email               = dados.email,
-            senha_hash          = self._hash_senha(dados.senha),
+            senha_hash          = hash_senha(dados.senha),
             ativo               = dados.ativo,
             usuario_responsavel = usuario_responsavel,
         )
         return self.repo.criar(usuario)
 
-    def atualizar(
-        self,
-        usuario_id: int,
-        dados: UsuarioUpdate,
-        usuario_responsavel: str = "sistema"
-    ) -> Usuario:
+    def atualizar(self, usuario_id: int, dados: UsuarioUpdate, usuario_responsavel: str = "sistema") -> Usuario:
         usuario = self.buscar_por_id(usuario_id)
 
-        # Verifica e-mail duplicado (se mudou)
-        if dados.email and dados.email != usuario.email:
-            if self.repo.buscar_por_email(dados.email):
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail="E-mail já cadastrado"
-                )
+        if not usuario.ativo:
+            if dados.ativo is True:
+                usuario.ativo               = True
+                usuario.usuario_responsavel = usuario_responsavel
+                return self.repo.atualizar(usuario)
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Usuário inativo só pode ter o status reativado."
+            )
 
-        # Aplica apenas os campos enviados
-        if dados.perfil is not None:
-            usuario.perfil = dados.perfil
-        if dados.nome is not None:
-            usuario.nome = dados.nome
         if dados.email is not None:
+            self._validar_email_unico(dados.email, excluir_id=usuario_id)
             usuario.email = dados.email
-        if dados.senha is not None:
-            usuario.senha_hash = self._hash_senha(dados.senha)
-        if dados.ativo is not None:
-            usuario.ativo = dados.ativo
+
+        if dados.nome   is not None: usuario.nome       = dados.nome
+        if dados.perfil is not None: usuario.perfil     = dados.perfil
+        if dados.senha  is not None: usuario.senha_hash = hash_senha(dados.senha)
+        if dados.ativo  is not None: usuario.ativo      = dados.ativo
 
         usuario.usuario_responsavel = usuario_responsavel
         return self.repo.atualizar(usuario)
