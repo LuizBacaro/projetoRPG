@@ -54,7 +54,7 @@ app.include_router(condicoes.router,   prefix=settings.API_V1_PREFIX)
 
 @app.get("/")
 async def root():
-    return FileResponse(str(FRONTEND_DIR / "login.html"))   # ← redireciona para login
+    return FileResponse(str(FRONTEND_DIR / "pages" / "login.html"))  # ← adiciona /pages/
 
 
 @app.get("/arena")
