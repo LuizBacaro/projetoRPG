@@ -12,201 +12,146 @@
     <link rel="stylesheet" href="/css/modais.css" />
     <link rel="stylesheet" href="/css/responsivo.css" />
     <style>
-        body { background: #0f0f23; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+        body { background:#0f0f23; color:#e2e8f0; font-family:'Segoe UI',sans-serif; margin:0; padding:0; }
 
-        /* ── Header ── */
-        .dashboard-header {
-            background: #1a1a2e;
-            border-bottom: 1px solid #2d2d44;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
+        .dashboard-header { background:#1a1a2e; border-bottom:1px solid #2d2d44; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; }
+        .dashboard-header h1 { font-size:1.3rem; margin:0; }
+        .header-usuario { display:flex; align-items:center; gap:1rem; }
+        .badge-perfil { padding:.25rem .75rem; border-radius:999px; font-size:.75rem; font-weight:600; background:#7c3aed22; color:#a78bfa; border:1px solid #7c3aed55; }
+        .btn-logout { background:none; border:1px solid #334155; color:#94a3b8; padding:.4rem .9rem; border-radius:.4rem; cursor:pointer; font-size:.85rem; }
+        .btn-logout:hover { background:#1e293b; }
+
+        .dashboard-nav { background:#12122a; border-bottom:1px solid #2d2d44; padding:0 2rem; display:flex; gap:0; }
+        .nav-tab { padding:.85rem 1.25rem; border:none; background:none; color:#64748b; cursor:pointer; font-size:.9rem; font-weight:500; border-bottom:2px solid transparent; transition:all .2s; }
+        .nav-tab:hover { color:#e2e8f0; }
+        .nav-tab.active { color:#a78bfa; border-bottom-color:#7c3aed; }
+
+        .dashboard-body { max-width:1200px; margin:0 auto; padding:2rem; }
+        .tab-section { display:none; }
+        .tab-section.active { display:block; }
+
+        .resumo-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:2rem; }
+        .resumo-card { background:#1a1a2e; border:1px solid #2d2d44; border-radius:.75rem; padding:1.25rem; text-align:center; }
+        .resumo-card .numero { font-size:2rem; font-weight:700; color:#a78bfa; }
+        .resumo-card .label  { font-size:.82rem; color:#64748b; margin-top:.25rem; }
+
+        .lista-toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; gap:1rem; flex-wrap:wrap; }
+        .filtros-tipo { display:flex; gap:.5rem; flex-wrap:wrap; }
+        .filter-btn { padding:.4rem .9rem; border-radius:.4rem; border:1px solid #334155; background:#1e293b; color:#94a3b8; cursor:pointer; font-size:.82rem; }
+        .filter-btn.active { background:#7c3aed; border-color:#7c3aed; color:#fff; }
+
+        .btn-primary { background:#7c3aed; color:#fff; border:none; padding:.5rem 1.25rem; border-radius:.4rem; cursor:pointer; font-size:.9rem; font-weight:600; }
+        .btn-primary:hover { background:#6d28d9; }
+
+        .card { background:#1a1a2e; border:1px solid #2d2d44; border-radius:.75rem; overflow:hidden; }
+        .tabela-combatentes { width:100%; border-collapse:collapse; }
+        .tabela-combatentes th, .tabela-combatentes td { padding:.75rem 1rem; text-align:left; border-bottom:1px solid #2d2d44; font-size:.88rem; }
+        .tabela-combatentes th { background:#12122a; color:#64748b; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; font-weight:600; }
+        .tabela-combatentes tr:last-child td { border-bottom:none; }
+        .tabela-combatentes tr:hover td { background:#ffffff06; }
+
+        .badge { padding:.2rem .6rem; border-radius:999px; font-size:.72rem; font-weight:600; }
+        .badge-jogador { background:#05966922; color:#34d399; border:1px solid #05966955; }
+        .badge-monstro { background:#dc262622; color:#f87171; border:1px solid #dc262655; }
+        .badge-npc     { background:#0369a122; color:#38bdf8; border:1px solid #0369a155; }
+
+        .btn-acao { background:none; border:none; cursor:pointer; font-size:.95rem; padding:.2rem .4rem; border-radius:.3rem; transition:transform .15s; }
+        .btn-acao:hover { transform:scale(1.2); background:#ffffff11; }
+
+        .arena-cta { background:linear-gradient(135deg,#1e1b4b,#312e81); border:1px solid #4338ca44; border-radius:.75rem; padding:2rem; text-align:center; }
+        .arena-cta h3 { font-size:1.2rem; margin-bottom:.5rem; }
+        .arena-cta p  { color:#94a3b8; margin-bottom:1.25rem; font-size:.9rem; }
+        .btn-arena { background:#4f46e5; color:#fff; border:none; padding:.75rem 2rem; border-radius:.4rem; font-size:1rem; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; }
+        .btn-arena:hover { background:#4338ca; }
+
+        .admin-link { display:inline-flex; align-items:center; gap:.5rem; color:#a78bfa; text-decoration:none; font-size:.85rem; padding:.4rem .75rem; border-radius:.4rem; border:1px solid #7c3aed44; }
+        .admin-link:hover { background:#7c3aed11; }
+
+        /* ── Modal estilo dashboard (sem variáveis CSS do tema RPG) ── */
+        .dash-modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.7);
+            z-index: 1000;
             align-items: center;
+            justify-content: center;
+            padding: 1rem;
         }
-        .dashboard-header h1 { font-size: 1.3rem; margin: 0; }
-        .header-usuario { display: flex; align-items: center; gap: 1rem; }
-        .badge-perfil {
-            padding: .25rem .75rem;
-            border-radius: 999px;
-            font-size: .75rem;
-            font-weight: 600;
-            background: #7c3aed22;
-            color: #a78bfa;
-            border: 1px solid #7c3aed55;
-        }
-        .btn-logout {
-            background: none;
-            border: 1px solid #334155;
-            color: #94a3b8;
-            padding: .4rem .9rem;
-            border-radius: .4rem;
-            cursor: pointer;
-            font-size: .85rem;
-        }
-        .btn-logout:hover { background: #1e293b; }
-
-        /* ── Nav do dashboard ── */
-        .dashboard-nav {
-            background: #12122a;
-            border-bottom: 1px solid #2d2d44;
-            padding: 0 2rem;
-            display: flex;
-            gap: 0;
-        }
-        .nav-tab {
-            padding: .85rem 1.25rem;
-            border: none;
-            background: none;
-            color: #64748b;
-            cursor: pointer;
-            font-size: .9rem;
-            font-weight: 500;
-            border-bottom: 2px solid transparent;
-            transition: all .2s;
-        }
-        .nav-tab:hover { color: #e2e8f0; }
-        .nav-tab.active { color: #a78bfa; border-bottom-color: #7c3aed; }
-
-        /* ── Container ── */
-        .dashboard-body { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-
-        /* ── Seção de aba ── */
-        .tab-section { display: none; }
-        .tab-section.active { display: block; }
-
-        /* ── Cards de resumo ── */
-        .resumo-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .resumo-card {
+        .dash-modal-overlay.show { display: flex; }
+        .dash-modal-box {
             background: #1a1a2e;
             border: 1px solid #2d2d44;
             border-radius: .75rem;
-            padding: 1.25rem;
-            text-align: center;
+            width: 100%;
+            max-width: 700px;
+            max-height: 92vh;
+            overflow-y: auto;
         }
-        .resumo-card .numero { font-size: 2rem; font-weight: 700; color: #a78bfa; }
-        .resumo-card .label  { font-size: .82rem; color: #64748b; margin-top: .25rem; }
-
-        /* ── Toolbar da lista ── */
-        .lista-toolbar {
+        .dash-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .filtros-tipo { display: flex; gap: .5rem; }
-        .filter-btn {
-            padding: .4rem .9rem;
-            border-radius: .4rem;
-            border: 1px solid #334155;
-            background: #1e293b;
-            color: #94a3b8;
-            cursor: pointer;
-            font-size: .82rem;
-        }
-        .filter-btn.active { background: #7c3aed; border-color: #7c3aed; color: #fff; }
-
-        /* ── Btn primário ── */
-        .btn-primary {
-            background: #7c3aed;
-            color: #fff;
-            border: none;
-            padding: .5rem 1.25rem;
-            border-radius: .4rem;
-            cursor: pointer;
-            font-size: .9rem;
-            font-weight: 600;
-        }
-        .btn-primary:hover { background: #6d28d9; }
-
-        /* ── Tabela de combatentes ── */
-        .card {
-            background: #1a1a2e;
-            border: 1px solid #2d2d44;
-            border-radius: .75rem;
-            overflow: hidden;
-        }
-        .tabela-combatentes { width: 100%; border-collapse: collapse; }
-        .tabela-combatentes th,
-        .tabela-combatentes td {
-            padding: .75rem 1rem;
-            text-align: left;
+            padding: 1.25rem 1.5rem;
             border-bottom: 1px solid #2d2d44;
-            font-size: .88rem;
+            position: sticky; top: 0;
+            background: #1a1a2e;
+            z-index: 1;
         }
-        .tabela-combatentes th {
-            background: #12122a;
-            color: #64748b;
-            font-size: .78rem;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            font-weight: 600;
-        }
-        .tabela-combatentes tr:last-child td { border-bottom: none; }
-        .tabela-combatentes tr:hover td { background: #ffffff06; }
+        .dash-modal-header h2 { margin:0; font-size:1.1rem; color:#e2e8f0; }
+        .dash-modal-close { background:none; border:none; color:#64748b; font-size:1.4rem; cursor:pointer; line-height:1; padding:.2rem .4rem; border-radius:.3rem; }
+        .dash-modal-close:hover { background:#ffffff11; color:#e2e8f0; }
+        .dash-modal-body { padding:1.5rem; }
 
-        /* ── Badges ── */
-        .badge {
-            padding: .2rem .6rem;
-            border-radius: 999px;
-            font-size: .72rem;
-            font-weight: 600;
+        .dash-form-group { margin-bottom:1rem; }
+        .dash-form-group label { display:block; margin-bottom:.35rem; font-size:.82rem; color:#94a3b8; font-weight:500; }
+        .dash-form-group input, .dash-form-group select {
+            width:100%; padding:.6rem .85rem; border-radius:.4rem;
+            border:1px solid #334155; background:#0f0f23;
+            color:#e2e8f0; font-size:.9rem; outline:none;
+            transition:border-color .2s; box-sizing:border-box;
         }
-        .badge-jogador { background: #05966922; color: #34d399; border: 1px solid #05966955; }
-        .badge-monstro { background: #dc262622; color: #f87171; border: 1px solid #dc262655; }
-        .badge-npc     { background: #0369a122; color: #38bdf8; border: 1px solid #0369a155; }
+        .dash-form-group input:focus, .dash-form-group select:focus { border-color:#7c3aed; }
 
-        /* ── Botões de ação ── */
-        .btn-acao {
-            background: none; border: none; cursor: pointer;
-            font-size: .95rem; padding: .2rem .4rem;
-            border-radius: .3rem; transition: transform .15s;
-        }
-        .btn-acao:hover { transform: scale(1.2); background: #ffffff11; }
+        .dash-form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .dash-form-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.75rem; }
 
-        /* ── Link para Arena ── */
-        .arena-cta {
-            background: linear-gradient(135deg, #1e1b4b, #312e81);
-            border: 1px solid #4338ca44;
-            border-radius: .75rem;
-            padding: 2rem;
-            text-align: center;
-        }
-        .arena-cta h3 { font-size: 1.2rem; margin-bottom: .5rem; }
-        .arena-cta p  { color: #94a3b8; margin-bottom: 1.25rem; font-size: .9rem; }
-        .btn-arena {
-            background: #4f46e5;
-            color: #fff;
-            border: none;
-            padding: .75rem 2rem;
-            border-radius: .4rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-arena:hover { background: #4338ca; }
+        .dash-section-label { font-size:.75rem; font-weight:600; color:#7c3aed; text-transform:uppercase; letter-spacing:.08em; margin:.5rem 0 .75rem; padding-bottom:.35rem; border-bottom:1px solid #2d2d44; }
 
-        /* ── Admin link ── */
-        .admin-link {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
-            color: #a78bfa;
-            text-decoration: none;
-            font-size: .85rem;
-            padding: .4rem .75rem;
-            border-radius: .4rem;
-            border: 1px solid #7c3aed44;
+        .dash-atributos-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:.5rem; }
+        .dash-atrib-field { text-align:center; }
+        .dash-atrib-field label { font-size:.72rem; color:#64748b; display:block; margin-bottom:.25rem; }
+        .dash-atrib-field input { text-align:center; padding:.4rem .2rem; font-size:.9rem; font-weight:600; }
+        .dash-atrib-mod { font-size:.7rem; color:#a78bfa; margin-top:.2rem; text-align:center; }
+
+        .dash-modal-actions { display:flex; gap:.75rem; justify-content:flex-end; padding-top:1rem; border-top:1px solid #2d2d44; margin-top:1rem; flex-wrap:wrap; }
+        .btn-dash-cancel { background:none; border:1px solid #334155; color:#94a3b8; padding:.55rem 1.1rem; border-radius:.4rem; cursor:pointer; font-size:.88rem; }
+        .btn-dash-cancel:hover { background:#1e293b; }
+        .btn-dash-delete { background:#dc262611; border:1px solid #dc262655; color:#f87171; padding:.55rem 1.1rem; border-radius:.4rem; cursor:pointer; font-size:.88rem; }
+        .btn-dash-delete:hover { background:#dc262622; }
+        .btn-dash-save { background:#7c3aed; border:none; color:#fff; padding:.55rem 1.25rem; border-radius:.4rem; cursor:pointer; font-size:.88rem; font-weight:600; }
+        .btn-dash-save:hover { background:#6d28d9; }
+        .btn-dash-save:disabled { opacity:.6; cursor:not-allowed; }
+
+        /* Upload no dashboard */
+        .dash-upload-area {
+            border:2px dashed #334155; border-radius:.5rem;
+            padding:1.5rem; text-align:center; cursor:pointer;
+            color:#64748b; font-size:.85rem;
+            transition:border-color .2s;
         }
-        .admin-link:hover { background: #7c3aed11; }
+        .dash-upload-area:hover { border-color:#7c3aed; color:#a78bfa; }
+        .dash-upload-preview { position:relative; display:inline-block; }
+        .dash-upload-preview img { max-height:120px; border-radius:.4rem; border:1px solid #334155; }
+        .dash-upload-remove { position:absolute; top:-.4rem; right:-.4rem; background:#dc2626; border:none; color:#fff; border-radius:50%; width:1.3rem; height:1.3rem; cursor:pointer; font-size:.75rem; line-height:1.3rem; text-align:center; }
+
+        /* Seletor de tipo */
+        .tipo-selector-btns { display:flex; flex-direction:column; gap:.75rem; padding:.5rem 0; }
+        .btn-tipo-jogador { background:#05966922; border:1px solid #05966955; color:#34d399; padding:.75rem; border-radius:.4rem; cursor:pointer; font-size:.95rem; font-weight:600; transition:background .2s; }
+        .btn-tipo-jogador:hover { background:#05966944; }
+        .btn-tipo-monstro { background:#dc262622; border:1px solid #dc262655; color:#f87171; padding:.75rem; border-radius:.4rem; cursor:pointer; font-size:.95rem; font-weight:600; transition:background .2s; }
+        .btn-tipo-monstro:hover { background:#dc262633; }
+        .btn-tipo-npc     { background:#0369a122; border:1px solid #0369a155; color:#38bdf8; padding:.75rem; border-radius:.4rem; cursor:pointer; font-size:.95rem; font-weight:600; transition:background .2s; }
+        .btn-tipo-npc:hover { background:#0369a133; }
     </style>
 </head>
 <body>
@@ -217,14 +162,12 @@
     <div class="header-usuario">
         <span id="nomeUsuario"></span>
         <span id="badgePerfil" class="badge-perfil"></span>
-        <a id="linkAdmin" href="/pages/usuarios.html" class="admin-link" style="display:none">
-            👤 Usuários
-        </a>
+        <a id="linkAdmin" href="/pages/usuarios.html" class="admin-link" style="display:none">👤 Usuários</a>
         <button class="btn-logout" id="btnLogout">Sair</button>
     </div>
 </header>
 
-<!-- ── Navegação por abas  -->
+<!-- ── Navegação  -->
 <nav class="dashboard-nav">
     <button class="nav-tab active" data-tab="combatentes">⚔️ Combatentes</button>
     <button class="nav-tab" data-tab="arena">🏟️ Arena</button>
@@ -235,28 +178,13 @@
 
     <!-- Aba: Combatentes -->
     <section class="tab-section active" id="tab-combatentes">
-
-        <!-- Cards de resumo -->
         <div class="resumo-cards">
-            <div class="resumo-card">
-                <div class="numero" id="totalJogadores">—</div>
-                <div class="label">Jogadores</div>
-            </div>
-            <div class="resumo-card">
-                <div class="numero" id="totalMonstros">—</div>
-                <div class="label">Monstros</div>
-            </div>
-            <div class="resumo-card">
-                <div class="numero" id="totalNPCs">—</div>
-                <div class="label">NPCs</div>
-            </div>
-            <div class="resumo-card">
-                <div class="numero" id="totalGeral">—</div>
-                <div class="label">Total</div>
-            </div>
+            <div class="resumo-card"><div class="numero" id="totalJogadores">—</div><div class="label">Jogadores</div></div>
+            <div class="resumo-card"><div class="numero" id="totalMonstros">—</div><div class="label">Monstros</div></div>
+            <div class="resumo-card"><div class="numero" id="totalNPCs">—</div><div class="label">NPCs</div></div>
+            <div class="resumo-card"><div class="numero" id="totalGeral">—</div><div class="label">Total</div></div>
         </div>
 
-        <!-- Toolbar -->
         <div class="lista-toolbar">
             <div class="filtros-tipo">
                 <button class="filter-btn active" data-tipo="todos">Todos</button>
@@ -267,26 +195,16 @@
             <button class="btn-primary" id="btnNovoCombatente">+ Novo Combatente</button>
         </div>
 
-        <!-- Tabela -->
         <div class="card">
             <table class="tabela-combatentes">
                 <thead>
                     <tr>
-                        <th>Tipo</th>
-                        <th>Nome</th>
-                        <th>Classe</th>
-                        <th>Nível</th>
-                        <th>HP Máximo</th>
-                        <th>Iniciativa</th>
-                        <th>Ações</th>
+                        <th>Tipo</th><th>Nome</th><th>Classe</th>
+                        <th>Nível</th><th>HP Máx</th><th>Iniciativa</th><th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tabelaCombatentes">
-                    <tr>
-                        <td colspan="7" style="text-align:center;padding:2rem;color:#64748b">
-                            Carregando...
-                        </td>
-                    </tr>
+                    <tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b">Carregando...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -303,198 +221,359 @@
 
 </div>
 
-<!-- ── Modais de cadastro (copiados do index.html) ─────────────────── -->
-<!-- Modal Jogador -->
-<div id="modalCadastroJogador" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>🧙 Cadastrar Jogador</h2>
-            <button class="modal-close" onclick="fecharModalCadastro()">×</button>
-        </div>
-        <form id="formCadastroJogador" enctype="multipart/form-data">
-            <input type="hidden" name="tipo" value="jogador" />
-            <div class="nivel-pontos-container">
-                <div class="nivel-field">
-                    <label for="inputNivel">NÍVEL</label>
-                    <div class="nivel-circle-container">
-                        <input type="number" id="inputNivel" name="nivel" value="1" min="1" max="20" class="nivel-input" />
-                    </div>
-                </div>
-                <div class="pontos-field">
-                    <label for="inputPontos">PONTOS</label>
-                    <input type="number" id="inputPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputNome">Nome do Personagem *</label>
-                <input type="text" id="inputNome" name="nome" required placeholder="Ex: Aragorn" />
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inputHP">HP Máximo *</label>
-                    <input type="number" id="inputHP" name="hp_maximo" required min="1" placeholder="Ex: 100" />
-                </div>
-                <div class="form-group">
-                    <label for="inputIniciativa">Iniciativa *</label>
-                    <input type="number" id="inputIniciativa" name="iniciativa" required placeholder="Ex: 15" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputClasse">Classe</label>
-                <input type="text" id="inputClasse" name="classe" placeholder="Ex: Guerreiro" />
-            </div>
-            <div class="form-group">
-                <label>Foto do Personagem</label>
-                <div class="upload-area-vertical" id="uploadPlaceholder"
-                    onclick="document.getElementById('inputFoto').click()">
-                    <span>📷 Clique para adicionar foto</span>
-                </div>
-                <input type="file" id="inputFoto" name="foto" accept="image/*" style="display:none"
-                    onchange="previewImagemUpload(this,'uploadPreview','previewImage','uploadPlaceholder')" />
-                <div class="upload-preview-vertical" id="uploadPreview" style="display:none">
-                    <img id="previewImage" src="" alt="Preview" />
-                    <button type="button" class="btn-remove-image-vertical" onclick="removerImagem()">✕</button>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-secundario" onclick="fecharModalCadastro()">Cancelar</button>
-                <button type="submit" class="btn-iniciar">✅ Cadastrar Jogador</button>
-            </div>
-        </form>
-    </div>
-</div>
+<!--  -->
+<!-- MODAIS DE CADASTRO                                                 -->
+<!--  -->
 
-<!-- Modal Monstro -->
-<div id="modalCadastroMonstro" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>👹 Cadastrar Monstro</h2>
-            <button class="modal-close" onclick="fecharModalCadastroMonstro()">×</button>
-        </div>
-        <form id="formCadastroMonstro" enctype="multipart/form-data">
-            <input type="hidden" name="tipo" value="monstro" />
-            <div class="nivel-pontos-container">
-                <div class="nivel-field">
-                    <label for="inputNivelMonstro">NÍVEL</label>
-                    <div class="nivel-circle-container">
-                        <input type="number" id="inputNivelMonstro" name="nivel" value="1" min="1" max="20" class="nivel-input" />
-                    </div>
-                </div>
-                <div class="pontos-field">
-                    <label for="inputPontosMonstro">PONTOS</label>
-                    <input type="number" id="inputPontosMonstro" name="pontos" value="0" min="0" class="pontos-input" placeholder="0" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputNomeMonstro">Nome *</label>
-                <input type="text" id="inputNomeMonstro" name="nome" required placeholder="Ex: Goblin" />
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inputHPMonstro">HP Máximo *</label>
-                    <input type="number" id="inputHPMonstro" name="hp_maximo" required min="1" placeholder="Ex: 30" />
-                </div>
-                <div class="form-group">
-                    <label for="inputIniciativaMonstro">Iniciativa *</label>
-                    <input type="number" id="inputIniciativaMonstro" name="iniciativa" required placeholder="Ex: 12" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputClasseMonstro">Tipo/Espécie</label>
-                <input type="text" id="inputClasseMonstro" name="classe" placeholder="Ex: Humanoide" />
-            </div>
-            <div class="form-group">
-                <label>Foto</label>
-                <div class="upload-area-vertical" id="uploadPlaceholderMonstro"
-                    onclick="document.getElementById('inputFotoMonstro').click()">
-                    <span>📷 Clique para adicionar foto</span>
-                </div>
-                <input type="file" id="inputFotoMonstro" name="foto" accept="image/*" style="display:none"
-                    onchange="previewImagemUpload(this,'uploadPreviewMonstro','previewImageMonstro','uploadPlaceholderMonstro')" />
-                <div class="upload-preview-vertical" id="uploadPreviewMonstro" style="display:none">
-                    <img id="previewImageMonstro" src="" alt="Preview" />
-                    <button type="button" class="btn-remove-image-vertical" onclick="removerImagemMonstro()">✕</button>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-secundario" onclick="fecharModalCadastroMonstro()">Cancelar</button>
-                <button type="submit" class="btn-iniciar">✅ Cadastrar Monstro</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal NPC -->
-<div id="modalCadastroNPC" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>🧝 Cadastrar NPC</h2>
-            <button class="modal-close" onclick="fecharModalCadastroNPC()">×</button>
-        </div>
-        <form id="formCadastroNPC" enctype="multipart/form-data">
-            <input type="hidden" name="tipo" value="npc" />
-            <div class="nivel-pontos-container">
-                <div class="nivel-field">
-                    <label for="inputNivelNPC">NÍVEL</label>
-                    <div class="nivel-circle-container">
-                        <input type="number" id="inputNivelNPC" name="nivel" value="1" min="1" max="20" class="nivel-input" />
-                    </div>
-                </div>
-                <div class="pontos-field">
-                    <label for="inputPontosNPC">PONTOS</label>
-                    <input type="number" id="inputPontosNPC" name="pontos" value="0" min="0" class="pontos-input" placeholder="0" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputNomeNPC">Nome *</label>
-                <input type="text" id="inputNomeNPC" name="nome" required placeholder="Ex: Taverneiro" />
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="inputHPNPC">HP Máximo *</label>
-                    <input type="number" id="inputHPNPC" name="hp_maximo" required min="1" placeholder="Ex: 20" />
-                </div>
-                <div class="form-group">
-                    <label for="inputIniciativaNPC">Iniciativa *</label>
-                    <input type="number" id="inputIniciativaNPC" name="iniciativa" required placeholder="Ex: 10" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputClasseNPC">Papel/Função</label>
-                <input type="text" id="inputClasseNPC" name="classe" placeholder="Ex: Aliado" />
-            </div>
-            <div class="form-group">
-                <label>Foto</label>
-                <div class="upload-area-vertical" id="uploadPlaceholderNPC"
-                    onclick="document.getElementById('inputFotoNPC').click()">
-                    <span>📷 Clique para adicionar foto</span>
-                </div>
-                <input type="file" id="inputFotoNPC" name="foto" accept="image/*" style="display:none"
-                    onchange="previewImagemUpload(this,'uploadPreviewNPC','previewImageNPC','uploadPlaceholderNPC')" />
-                <div class="upload-preview-vertical" id="uploadPreviewNPC" style="display:none">
-                    <img id="previewImageNPC" src="" alt="Preview" />
-                    <button type="button" class="btn-remove-image-vertical" onclick="removerImagemNPC()">✕</button>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-secundario" onclick="fecharModalCadastroNPC()">Cancelar</button>
-                <button type="submit" class="btn-iniciar">✅ Cadastrar NPC</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal Seletor de Tipo -->
-<div id="seletorTipo" class="modal" style="display:none">
-    <div class="modal-content" style="max-width:340px">
-        <div class="modal-header">
+<!-- Seletor de Tipo -->
+<div id="seletorTipo" class="dash-modal-overlay">
+    <div class="dash-modal-box" style="max-width:320px">
+        <div class="dash-modal-header">
             <h2>Que tipo de combatente?</h2>
-            <button class="modal-close" onclick="fecharSeletorTipo()">×</button>
+            <button class="dash-modal-close" onclick="fecharSeletorTipo()">×</button>
         </div>
-        <div style="display:flex;flex-direction:column;gap:.75rem;padding:1rem 0">
-            <button class="btn-iniciar" onclick="abrirModalCadastro('jogador')">🧙 Jogador</button>
-            <button class="btn-iniciar" onclick="abrirModalCadastro('monstro')">👹 Monstro</button>
-            <button class="btn-iniciar" onclick="abrirModalCadastro('npc')">🧝 NPC</button>
+        <div class="dash-modal-body">
+            <div class="tipo-selector-btns">
+                <button class="btn-tipo-jogador" onclick="abrirModalCadastro('jogador')">🧙 Jogador</button>
+                <button class="btn-tipo-monstro" onclick="abrirModalCadastro('monstro')">👹 Monstro</button>
+                <button class="btn-tipo-npc"     onclick="abrirModalCadastro('npc')">🧝 NPC</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cadastro Jogador -->
+<div id="modalCadastroJogador" class="dash-modal-overlay">
+    <div class="dash-modal-box">
+        <div class="dash-modal-header">
+            <h2>🧙 Cadastrar Jogador</h2>
+            <button class="dash-modal-close" onclick="fecharModalCadastro()">×</button>
+        </div>
+        <div class="dash-modal-body">
+            <form id="formCadastroJogador" enctype="multipart/form-data">
+                <input type="hidden" name="tipo" value="jogador" />
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>Nível</label>
+                        <input type="number" name="nivel" value="1" min="1" max="20" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Pontos</label>
+                        <input type="number" name="pontos" value="0" min="0" />
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Nome do Personagem *</label>
+                    <input type="text" name="nome" required placeholder="Ex: Aragorn" />
+                </div>
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>HP Máximo *</label>
+                        <input type="number" name="hp_maximo" required min="1" placeholder="Ex: 100" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Iniciativa *</label>
+                        <input type="number" name="iniciativa" required placeholder="Ex: 15" />
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Classe</label>
+                    <input type="text" name="classe" placeholder="Ex: Guerreiro" />
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Foto do Personagem</label>
+                    <div class="dash-upload-area" id="uploadPlaceholder"
+                         onclick="document.getElementById('inputFoto').click()">
+                        📷 Clique para adicionar foto
+                    </div>
+                    <input type="file" id="inputFoto" name="foto" accept="image/*" style="display:none"
+                           onchange="previewImagemUpload(this,'uploadPreview','previewImage','uploadPlaceholder')" />
+                    <div id="uploadPreview" class="dash-upload-preview" style="display:none">
+                        <img id="previewImage" src="" alt="Preview" />
+                        <button type="button" class="dash-upload-remove" onclick="removerImagem()">✕</button>
+                    </div>
+                </div>
+
+                <div class="dash-modal-actions">
+                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastro()">Cancelar</button>
+                    <button type="submit" class="btn-dash-save">✅ Cadastrar Jogador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cadastro Monstro -->
+<div id="modalCadastroMonstro" class="dash-modal-overlay">
+    <div class="dash-modal-box">
+        <div class="dash-modal-header">
+            <h2>👹 Cadastrar Monstro</h2>
+            <button class="dash-modal-close" onclick="fecharModalCadastroMonstro()">×</button>
+        </div>
+        <div class="dash-modal-body">
+            <form id="formCadastroMonstro" enctype="multipart/form-data">
+                <input type="hidden" name="tipo" value="monstro" />
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>Nível</label>
+                        <input type="number" name="nivel" value="1" min="1" max="20" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Pontos</label>
+                        <input type="number" name="pontos" value="0" min="0" />
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Nome *</label>
+                    <input type="text" name="nome" required placeholder="Ex: Goblin" />
+                </div>
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>HP Máximo *</label>
+                        <input type="number" name="hp_maximo" required min="1" placeholder="Ex: 30" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Iniciativa *</label>
+                        <input type="number" name="iniciativa" required placeholder="Ex: 12" />
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Tipo/Espécie</label>
+                    <input type="text" name="classe" placeholder="Ex: Humanoide" />
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Foto</label>
+                    <div class="dash-upload-area" id="uploadPlaceholderMonstro"
+                         onclick="document.getElementById('inputFotoMonstro').click()">
+                        📷 Clique para adicionar foto
+                    </div>
+                    <input type="file" id="inputFotoMonstro" name="foto" accept="image/*" style="display:none"
+                           onchange="previewImagemUpload(this,'uploadPreviewMonstro','previewImageMonstro','uploadPlaceholderMonstro')" />
+                    <div id="uploadPreviewMonstro" class="dash-upload-preview" style="display:none">
+                        <img id="previewImageMonstro" src="" alt="Preview" />
+                        <button type="button" class="dash-upload-remove" onclick="removerImagemMonstro()">✕</button>
+                    </div>
+                </div>
+
+                <div class="dash-modal-actions">
+                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastroMonstro()">Cancelar</button>
+                    <button type="submit" class="btn-dash-save">✅ Cadastrar Monstro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cadastro NPC -->
+<div id="modalCadastroNPC" class="dash-modal-overlay">
+    <div class="dash-modal-box">
+        <div class="dash-modal-header">
+            <h2>🧝 Cadastrar NPC</h2>
+            <button class="dash-modal-close" onclick="fecharModalCadastroNPC()">×</button>
+        </div>
+        <div class="dash-modal-body">
+            <form id="formCadastroNPC" enctype="multipart/form-data">
+                <input type="hidden" name="tipo" value="npc" />
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>Nível</label>
+                        <input type="number" name="nivel" value="1" min="1" max="20" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Pontos</label>
+                        <input type="number" name="pontos" value="0" min="0" />
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Nome *</label>
+                    <input type="text" name="nome" required placeholder="Ex: Taverneiro" />
+                </div>
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>HP Máximo *</label>
+                        <input type="number" name="hp_maximo" required min="1" placeholder="Ex: 20" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Iniciativa *</label>
+                        <input type="number" name="iniciativa" required placeholder="Ex: 10" />
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Papel/Função</label>
+                    <input type="text" name="classe" placeholder="Ex: Aliado" />
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Foto</label>
+                    <div class="dash-upload-area" id="uploadPlaceholderNPC"
+                         onclick="document.getElementById('inputFotoNPC').click()">
+                        📷 Clique para adicionar foto
+                    </div>
+                    <input type="file" id="inputFotoNPC" name="foto" accept="image/*" style="display:none"
+                           onchange="previewImagemUpload(this,'uploadPreviewNPC','previewImageNPC','uploadPlaceholderNPC')" />
+                    <div id="uploadPreviewNPC" class="dash-upload-preview" style="display:none">
+                        <img id="previewImageNPC" src="" alt="Preview" />
+                        <button type="button" class="dash-upload-remove" onclick="removerImagemNPC()">✕</button>
+                    </div>
+                </div>
+
+                <div class="dash-modal-actions">
+                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastroNPC()">Cancelar</button>
+                    <button type="submit" class="btn-dash-save">✅ Cadastrar NPC</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--  -->
+<!-- MODAL DE EDIÇÃO                                                    -->
+<!--  -->
+<div id="modalEdicaoDashboard" class="dash-modal-overlay">
+    <div class="dash-modal-box">
+        <div class="dash-modal-header">
+            <h2>✏️ Editar Combatente</h2>
+            <button class="dash-modal-close" onclick="fecharModalEdicao()">×</button>
+        </div>
+        <div class="dash-modal-body">
+            <form id="formEdicaoDashboard" enctype="multipart/form-data">
+                <input type="hidden" id="dashEditId"   name="id" />
+                <input type="hidden" id="dashEditTipo" name="tipo" />
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>Nível</label>
+                        <input type="number" id="dashEditNivel" name="nivel" value="1" min="1" max="20" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Pontos</label>
+                        <input type="number" id="dashEditPontos" name="pontos" value="0" min="0" />
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="dashEditNome" name="nome" required placeholder="Nome do combatente" />
+                </div>
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>HP Máximo *</label>
+                        <input type="number" id="dashEditHP" name="hp_maximo" required min="1" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Iniciativa *</label>
+                        <input type="number" id="dashEditIniciativa" name="iniciativa" required />
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Classe</label>
+                    <input type="text" id="dashEditClasse" name="classe" placeholder="Ex: Guerreiro" />
+                </div>
+
+                <!-- Defesa -->
+                <p class="dash-section-label">🛡️ Defesa</p>
+                <div class="dash-form-row3">
+                    <div class="dash-form-group">
+                        <label>CA</label>
+                        <input type="number" id="dashEditCA" name="ca" value="10" min="0" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Toque</label>
+                        <input type="number" id="dashEditToque" name="toque" value="10" min="0" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Surpresa</label>
+                        <input type="number" id="dashEditSurpresa" name="surpresa" value="10" min="0" />
+                    </div>
+                </div>
+
+                <!-- Resistências -->
+                <p class="dash-section-label">⚡ Resistências</p>
+                <div class="dash-form-row3">
+                    <div class="dash-form-group">
+                        <label>Fortitude</label>
+                        <input type="number" id="dashEditFortitude" name="fortitude" value="0" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Reflexos</label>
+                        <input type="number" id="dashEditReflexos" name="reflexos" value="0" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Vontade</label>
+                        <input type="number" id="dashEditVontade" name="vontade" value="0" />
+                    </div>
+                </div>
+
+                <!-- Atributos D&D -->
+                <p class="dash-section-label">🎲 Atributos D&D</p>
+                <div class="dash-atributos-grid">
+                    <div class="dash-atrib-field">
+                        <label>FOR</label>
+                        <input type="number" id="dashEditFOR" name="forca"        value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <div class="dash-atrib-mod" id="modDashEditFOR">+0</div>
+                    </div>
+                    <div class="dash-atrib-field">
+                        <label>DES</label>
+                        <input type="number" id="dashEditDES" name="destreza"     value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <div class="dash-atrib-mod" id="modDashEditDES">+0</div>
+                    </div>
+                    <div class="dash-atrib-field">
+                        <label>CON</label>
+                        <input type="number" id="dashEditCON" name="constituicao" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <div class="dash-atrib-mod" id="modDashEditCON">+0</div>
+                    </div>
+                    <div class="dash-atrib-field">
+                        <label>INT</label>
+                        <input type="number" id="dashEditINT" name="inteligencia" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <div class="dash-atrib-mod" id="modDashEditINT">+0</div>
+                    </div>
+                    <div class="dash-atrib-field">
+                        <label>SAB</label>
+                        <input type="number" id="dashEditSAB" name="sabedoria"    value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <div class="dash-atrib-mod" id="modDashEditSAB">+0</div>
+                    </div>
+                    <div class="dash-atrib-field">
+                        <label>CAR</label>
+                        <input type="number" id="dashEditCAR" name="carisma"      value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <div class="dash-atrib-mod" id="modDashEditCAR">+0</div>
+                    </div>
+                </div>
+
+                <!-- Foto -->
+                <p class="dash-section-label" style="margin-top:1rem">📷 Foto</p>
+                <div id="dashEditUploadArea">
+                    <div class="dash-upload-area" id="dashEditUploadPlaceholder">
+                        📷 Clique para trocar a foto
+                    </div>
+                    <input type="file" id="dashEditFoto" name="foto" accept="image/*" style="display:none" />
+                    <div id="dashEditUploadPreview" class="dash-upload-preview" style="display:none">
+                        <img id="dashEditPreviewImage" src="" alt="Preview" />
+                        <button type="button" class="dash-upload-remove" onclick="removerImagemEdicao()">✕</button>
+                    </div>
+                </div>
+
+                <div class="dash-modal-actions">
+                    <button type="button" class="btn-dash-cancel" onclick="fecharModalEdicao()">Cancelar</button>
+                    <button type="button" class="btn-dash-delete" onclick="confirmarDelecao()">🗑️ Deletar</button>
+                    <button type="submit"  class="btn-dash-save">💾 Salvar Alterações</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -510,30 +589,17 @@
         document.body.appendChild(s);
     });
 
-    // Carrega AuthService primeiro — protege a página
     await carregar('/js/services/AuthService.js');
     AuthService.exigirLogin();
 
-    // Exibe nome e perfil do usuário logado
     document.getElementById('nomeUsuario').textContent = AuthService.getNome();
     document.getElementById('badgePerfil').textContent = AuthService.getPerfil();
-
-    // Mostra link de admin só para administradores
     if (AuthService.isAdmin()) {
         document.getElementById('linkAdmin').style.display = 'inline-flex';
     }
-
-    // Logout
     document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout());
 
-    // Carrega demais scripts
-    await carregar('/js/services/CombatenteService.js');
-    await carregar('/js/services/UploadService.js');
     await carregar('/js/ui/Toast.js');
-    await carregar('/js/ui/TipoSelector.js');
-    await carregar('/js/ui/ModalCadastro.js');
-    await carregar('/js/ui/ModalEdicao.js');
-    await carregar('/js/utils/dnd.js');
     await carregar('/js/controllers/DashboardController.js');
 </script>
 
