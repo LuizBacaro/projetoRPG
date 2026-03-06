@@ -1,13 +1,3 @@
-/**
- * ArenaController
- * SRP: gerencia apenas a tela de arena (turno, renderizacao, combate)
- * DIP: depende de CombatenteService e CondicaoController
- *
- * REGRA: usa concatenacao de strings em vez de template literals
- * para evitar corrupcao pelo editor web do GitHub
- *
- * Dispara 'combatenteAtivoMudou' — main.js delega para ArenaAtaquesMagias
- */
 import { CombatenteService  } from '../services/CombatenteService.js';
 import { CondicaoController } from './CondicaoController.js';
 import { Toast              } from '../ui/Toast.js';
@@ -24,28 +14,25 @@ export class ArenaController {
         this._inicializar();
     }
 
-    // ── Init ──────────────────────────────────────────────────────────────
-
-    async _inicializar() {
+    _inicializar() {
         this.condicaoController.init();
         this._configurarEventos();
     }
 
     _configurarEventos() {
-        document.addEventListener('iniciarCombate', (e) => {
+        var self = this;
+        document.addEventListener('iniciarCombate', function(e) {
             if (e.detail && e.detail.combatentes) {
-                this.iniciarCombate(e.detail.combatentes);
+                self.iniciarCombate(e.detail.combatentes);
             } else {
                 Toast.error('Erro: Dados de combatentes invalidos');
             }
         });
     }
 
-    // ── Combate ───────────────────────────────────────────────────────────
-
     iniciarCombate(combatentes) {
         if (!combatentes || !Array.isArray(combatentes) || !combatentes.length) {
-            Toast.error('Erro: Nenhum combatente valido para iniciar combate');
+            Toast.error('Erro: Nenhum combatente valido');
             return;
         }
         this.combatentes   = combatentes.sort(function(a, b) { return b.iniciativa - a.iniciativa; });
@@ -77,7 +64,7 @@ export class ArenaController {
     }
 
     atualizarRodada() {
-        const el = document.getElementById('rodadaAtual');
+        var el = document.getElementById('rodadaAtual');
         if (el) el.textContent = this.rodadaAtual;
     }
 
@@ -86,206 +73,171 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
-    // ── Ordem de Iniciativa ───────────────────────────────────────────────
-
     renderizarOrdemIniciativa() {
-        const container = document.getElementById('ordemIniciativaContainer');
+        var container = document.getElementById('ordemIniciativaContainer');
         if (!container) return;
-
-        const self = this;
-        container.innerHTML = this.combatentes.map(function(c, index) {
-            const ativo        = index === self.turnoAtual;
-            const hpPercentual = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
-            const hpCor        = hpPercentual > 50 ? '#4CAF50' : hpPercentual > 25 ? '#FF9800' : '#F44336';
-            const morto        = c.hp_atual <= 0;
-            return (
-                '<div class="combatente-ordem-item ' + (ativo ? 'ativo' : '') + ' ' + (morto ? 'morto' : '') + '"' +
-                     ' data-combatente-id="' + c.id + '">' +
-                    '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>' +
-                    '<div class="ordem-info">' +
-                        '<span class="ordem-nome">' + c.nome + '</span>' +
-                        '<div class="ordem-hp-bar">' +
-                            '<div class="ordem-hp-fill" style="width:' + hpPercentual + '%;background:' + hpCor + ';"></div>' +
-                        '</div>' +
-                        '<div class="badges-condicao-ordem-wrapper"></div>' +
-                    '</div>' +
-                    '<span class="badge ' + self.getBadgeClass(c.tipo) + ' badge-mini">' + self.getEmojiTipo(c.tipo) + '</span>' +
-                '</div>'
-            );
-        }).join('');
-
+        var self = this;
+        var html = '';
+        for (var i = 0; i < this.combatentes.length; i++) {
+            var c          = this.combatentes[i];
+            var ativo      = i === this.turnoAtual;
+            var hpPct      = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
+            var hpCor      = hpPct > 50 ? '#4CAF50' : hpPct > 25 ? '#FF9800' : '#F44336';
+            var morto      = c.hp_atual <= 0;
+            var cls        = 'combatente-ordem-item' + (ativo ? ' ativo' : '') + (morto ? ' morto' : '');
+            html += '<div class="' + cls + '" data-combatente-id="' + c.id + '">';
+            html += '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>';
+            html += '<div class="ordem-info">';
+            html += '<span class="ordem-nome">' + c.nome + '</span>';
+            html += '<div class="ordem-hp-bar">';
+            html += '<div class="ordem-hp-fill" style="width:' + hpPct + '%;background:' + hpCor + ';"></div>';
+            html += '</div>';
+            html += '<div class="badges-condicao-ordem-wrapper"></div>';
+            html += '</div>';
+            html += '<span class="badge ' + self.getBadgeClass(c.tipo) + ' badge-mini">' + self.getEmojiTipo(c.tipo) + '</span>';
+            html += '</div>';
+        }
+        container.innerHTML = html;
         this.renderizarFotoAtivo();
         this._atualizarBadgesOrdemTodos();
     }
 
-    async _atualizarBadgesOrdemTodos() {
-        for (const c of this.combatentes) {
-            const cardEl = document.querySelector('.combatente-ordem-item[data-combatente-id="' + c.id + '"]');
-            if (cardEl) await this.condicaoController.atualizarBadgesOrdem(cardEl, c.id);
+    _atualizarBadgesOrdemTodos() {
+        var self = this;
+        var i    = 0;
+        function next() {
+            if (i >= self.combatentes.length) return;
+            var c      = self.combatentes[i++];
+            var cardEl = document.querySelector('.combatente-ordem-item[data-combatente-id="' + c.id + '"]');
+            if (cardEl) {
+                self.condicaoController.atualizarBadgesOrdem(cardEl, c.id).then(next);
+            } else {
+                next();
+            }
+        }
+        next();
+    }
+
+    renderizarFotoAtivo() {
+        var container  = document.getElementById('arenaFotoAtivo');
+        if (!container) return;
+        var combatente = this.combatentes[this.turnoAtual];
+        if (!combatente) { container.innerHTML = ''; return; }
+        if (combatente.foto_url) {
+            container.innerHTML = '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '" style="width:100%;height:100%;object-fit:cover;">';
+        } else {
+            container.innerHTML = '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
         }
     }
 
-    // ── Foto Ativo ────────────────────────────────────────────────────────
-
-    renderizarFotoAtivo() {
-        const container  = document.getElementById('arenaFotoAtivo');
-        if (!container) return;
-        const combatente = this.combatentes[this.turnoAtual];
-        if (!combatente) { container.innerHTML = ''; return; }
-        container.innerHTML = combatente.foto_url
-            ? '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '" style="width:100%;height:100%;object-fit:cover;">'
-            : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
-    }
-
-    // ── Combatente Ativo ──────────────────────────────────────────────────
-    //
-    // Injeta containers vazios para ataques e magias
-    // e dispara 'combatenteAtivoMudou' — main.js delega para ArenaAtaquesMagias
-    // OCP: ArenaController nao conhece ArenaAtaquesMagias diretamente
-
     renderizarCombatenteAtivo() {
-        const container  = document.getElementById('combatenteAtivoContainer');
+        var container  = document.getElementById('combatenteAtivoContainer');
         if (!container) return;
-
-        const combatente = this.combatentes[this.turnoAtual];
+        var combatente = this.combatentes[this.turnoAtual];
         if (!combatente) return;
 
         this.renderizarFotoAtivo();
 
-        const hpPercentual = Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100);
-        const hpCor        = hpPercentual > 50 ? '#4CAF50' : hpPercentual > 25 ? '#FF9800' : '#F44336';
+        var hpPct  = Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100);
+        var hpCor  = hpPct > 50 ? '#4CAF50' : hpPct > 25 ? '#FF9800' : '#F44336';
 
-        // Valores com fallback seguro — sem ?? para evitar corrupcao
-        const ca       = combatente.ca        !== null && combatente.ca        !== undefined ? combatente.ca        : 10;
-        const toque    = combatente.toque     !== null && combatente.toque     !== undefined ? combatente.toque     : 10;
-        const surpresa = combatente.surpresa  !== null && combatente.surpresa  !== undefined ? combatente.surpresa  : 10;
-        const fort     = combatente.fortitude !== null && combatente.fortitude !== undefined ? combatente.fortitude : 0;
-        const reflex   = combatente.reflexos  !== null && combatente.reflexos  !== undefined ? combatente.reflexos  : 0;
-        const vont     = combatente.vontade   !== null && combatente.vontade   !== undefined ? combatente.vontade   : 0;
-        const nivel    = combatente.nivel  || 1;
-        const classe   = combatente.classe || 'Aventureiro';
+        var ca       = (combatente.ca        !== null && combatente.ca        !== undefined) ? combatente.ca        : 10;
+        var toque    = (combatente.toque     !== null && combatente.toque     !== undefined) ? combatente.toque     : 10;
+        var surpresa = (combatente.surpresa  !== null && combatente.surpresa  !== undefined) ? combatente.surpresa  : 10;
+        var fort     = (combatente.fortitude !== null && combatente.fortitude !== undefined) ? combatente.fortitude : 0;
+        var reflex   = (combatente.reflexos  !== null && combatente.reflexos  !== undefined) ? combatente.reflexos  : 0;
+        var vont     = (combatente.vontade   !== null && combatente.vontade   !== undefined) ? combatente.vontade   : 0;
+        var nivel    = combatente.nivel  || 1;
+        var classe   = combatente.classe || 'Aventureiro';
 
-        const mod   = function(val) { const m = Math.floor(((val || 10) - 10) / 2); return m >= 0 ? '+' + m : '' + m; };
-        const sinal = function(val) { return val >= 0 ? '+' + val : '' + val; };
+        function mod(val) {
+            var m = Math.floor(((val || 10) - 10) / 2);
+            return m >= 0 ? '+' + m : '' + m;
+        }
+        function sinal(val) { return val >= 0 ? '+' + val : '' + val; }
 
-        const olhoIcon  = this.statsVisiveis ? '👁️' : '🙈';
-        const olhoTitle = this.statsVisiveis ? 'Ocultar stats' : 'Mostrar stats';
+        var pvValor  = this.statsVisiveis ? combatente.hp_atual + '/' + combatente.hp_maximo : '???/???';
+        var pvClasse = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        var caValor  = this.statsVisiveis ? ca       : '?';
+        var caClasse = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        var sValor   = this.statsVisiveis ? surpresa : '?';
+        var sClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        var tValor   = this.statsVisiveis ? toque    : '?';
+        var tClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
+        var olhoIcon = this.statsVisiveis ? 'Ocultar Stats' : 'Revelar Stats';
 
-        const pvValor  = this.statsVisiveis ? combatente.hp_atual + '/' + combatente.hp_maximo : '???/???';
-        const pvClasse = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-        const caValor  = this.statsVisiveis ? ca       : '?';
-        const caClasse = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-        const sValor   = this.statsVisiveis ? surpresa : '?';
-        const sClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-        const tValor   = this.statsVisiveis ? toque    : '?';
-        const tClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-
-        const self = this;
-        const atributosHTML = [
+        var atribs = [
             ['For', combatente.forca        || 10],
             ['Des', combatente.destreza     || 10],
             ['Con', combatente.constituicao || 10],
             ['Int', combatente.inteligencia || 10],
             ['Sab', combatente.sabedoria    || 10],
             ['Car', combatente.carisma      || 10]
-        ].map(function(item) {
-            return (
-                '<div class="arena-atributo-box">' +
-                    '<span class="arena-atributo-nome">' + item[0] + '</span>' +
-                    '<span class="arena-atributo-valor">' + item[1] + '</span>' +
-                    '<span class="arena-atributo-mod">' + mod(item[1]) + '</span>' +
-                '</div>'
-            );
-        }).join('');
+        ];
+        var atributosHTML = '';
+        for (var j = 0; j < atribs.length; j++) {
+            atributosHTML += '<div class="arena-atributo-box">';
+            atributosHTML += '<span class="arena-atributo-nome">' + atribs[j][0] + '</span>';
+            atributosHTML += '<span class="arena-atributo-valor">' + atribs[j][1] + '</span>';
+            atributosHTML += '<span class="arena-atributo-mod">' + mod(atribs[j][1]) + '</span>';
+            atributosHTML += '</div>';
+        }
 
-        const fotoTopo = combatente.foto_url
+        var fotoTopo = combatente.foto_url
             ? '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '">'
             : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
 
-        container.innerHTML =
-            '<div class="arena-card">' +
+        var html = '';
+        html += '<div class="arena-card">';
 
-                '<div class="arena-topo">' +
-                    '<div class="arena-foto-nome">' +
-                        '<div class="arena-foto">' + fotoTopo + '</div>' +
-                        '<div class="arena-nome-info">' +
-                            '<h2 class="arena-nome">' + combatente.nome + ' (' + nivel + ' nivel)</h2>' +
-                            '<span class="arena-classe">' + classe +
-                                '<span class="badge ' + this.getBadgeClass(combatente.tipo) + '">' + combatente.tipo + '</span>' +
-                            '</span>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="arena-topo-acoes">' +
-                        '<button class="btn-toggle-stats" onclick="window._toggleStats()" title="' + olhoTitle + '">' +
-                            olhoIcon + ' ' + (this.statsVisiveis ? 'Ocultar' : 'Revelar') + ' Stats' +
-                        '</button>' +
-                        '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()" title="Encerrar combate">' +
-                            'Encerrar combate' +
-                        '</button>' +
-                    '</div>' +
-                '</div>' +
+        html += '<div class="arena-topo">';
+        html += '<div class="arena-foto-nome">';
+        html += '<div class="arena-foto">' + fotoTopo + '</div>';
+        html += '<div class="arena-nome-info">';
+        html += '<h2 class="arena-nome">' + combatente.nome + ' (' + nivel + ' nivel)</h2>';
+        html += '<span class="arena-classe">' + classe;
+        html += '<span class="badge ' + this.getBadgeClass(combatente.tipo) + '">' + combatente.tipo + '</span>';
+        html += '</span></div></div>';
+        html += '<div class="arena-topo-acoes">';
+        html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoIcon + '</button>';
+        html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
+        html += '</div></div>';
 
-                '<div class="arena-stats-linha">' +
-                    '<div class="arena-stat-box arena-stat-pv">' +
-                        '<span class="arena-stat-label">PV</span>' +
-                        '<span class="' + pvClasse + '">' + pvValor + '</span>' +
-                        '<div class="arena-hp-bar">' +
-                            '<div class="arena-hp-fill" style="width:' + hpPercentual + '%;background:' + hpCor + ';"></div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="arena-stat-box arena-stat-ca">' +
-                        '<span class="arena-stat-label">CA</span>' +
-                        '<span class="' + caClasse + '">' + caValor + '</span>' +
-                    '</div>' +
-                    '<div class="arena-stat-box arena-stat-surpresa">' +
-                        '<span class="arena-stat-label">Surpresa</span>' +
-                        '<span class="' + sClasse + '">' + sValor + '</span>' +
-                    '</div>' +
-                    '<div class="arena-stat-box arena-stat-toque">' +
-                        '<span class="arena-stat-label">Toque</span>' +
-                        '<span class="' + tClasse + '">' + tValor + '</span>' +
-                    '</div>' +
-                '</div>' +
+        html += '<div class="arena-stats-linha">';
+        html += '<div class="arena-stat-box arena-stat-pv">';
+        html += '<span class="arena-stat-label">PV</span>';
+        html += '<span class="' + pvClasse + '">' + pvValor + '</span>';
+        html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:' + hpPct + '%;background:' + hpCor + ';"></div></div>';
+        html += '</div>';
+        html += '<div class="arena-stat-box arena-stat-ca"><span class="arena-stat-label">CA</span><span class="' + caClasse + '">' + caValor + '</span></div>';
+        html += '<div class="arena-stat-box arena-stat-surpresa"><span class="arena-stat-label">Surpresa</span><span class="' + sClasse + '">' + sValor + '</span></div>';
+        html += '<div class="arena-stat-box arena-stat-toque"><span class="arena-stat-label">Toque</span><span class="' + tClasse + '">' + tValor + '</span></div>';
+        html += '</div>';
 
-                '<div class="arena-grade-central">' +
-                    '<div class="arena-secao">' +
-                        '<h3 class="arena-secao-titulo">Atributos</h3>' +
-                        '<div class="arena-atributos-grid">' + atributosHTML + '</div>' +
-                    '</div>' +
-                    '<div class="arena-secao">' +
-                        '<h3 class="arena-secao-titulo">Resistencias</h3>' +
-                        '<div class="arena-resistencias-lista">' +
-                            '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Fortitude</span><span class="arena-resistencia-valor">' + sinal(fort)  + '</span></div>' +
-                            '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Reflexos</span><span class="arena-resistencia-valor">'  + sinal(reflex) + '</span></div>' +
-                            '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Vontade</span><span class="arena-resistencia-valor">'   + sinal(vont)   + '</span></div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="arena-secao">' +
-                        '<h3 class="arena-secao-titulo">Condicoes</h3>' +
-                        '<div class="arena-condicoes-lista">' +
-                            '<span class="arena-condicao-vazia">Nenhuma condicao ativa</span>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="arena-secao arena-acoes-col">' +
-                        '<h3 class="arena-secao-titulo">Aplicar</h3>' +
-                        '<button class="arena-btn-dano-cura" onclick="window._abrirDanoCura()">Dano / Cura</button>' +
-                        '<button class="arena-btn-condicao"  onclick="window._abrirCondicao()">Condicao</button>' +
-                        '<button class="arena-btn-proximo"   onclick="window._avancarTurno()">Encerrar turno</button>' +
-                    '</div>' +
-                '</div>' +
+        html += '<div class="arena-grade-central">';
+        html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Atributos</h3><div class="arena-atributos-grid">' + atributosHTML + '</div></div>';
+        html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Resistencias</h3><div class="arena-resistencias-lista">';
+        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Fortitude</span><span class="arena-resistencia-valor">' + sinal(fort) + '</span></div>';
+        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Reflexos</span><span class="arena-resistencia-valor">' + sinal(reflex) + '</span></div>';
+        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Vontade</span><span class="arena-resistencia-valor">' + sinal(vont) + '</span></div>';
+        html += '</div></div>';
+        html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Condicoes</h3><div class="arena-condicoes-lista"><span class="arena-condicao-vazia">Nenhuma condicao ativa</span></div></div>';
+        html += '<div class="arena-secao arena-acoes-col"><h3 class="arena-secao-titulo">Aplicar</h3>';
+        html += '<button class="arena-btn-dano-cura" onclick="window._abrirDanoCura()">Dano / Cura</button>';
+        html += '<button class="arena-btn-condicao"  onclick="window._abrirCondicao()">Condicao</button>';
+        html += '<button class="arena-btn-proximo"   onclick="window._avancarTurno()">Encerrar turno</button>';
+        html += '</div></div>';
 
-                // Containers dinamicos — preenchidos pelo ArenaAtaquesMagias via evento
-                '<div class="arena-linha-inferior">' +
-                    '<div id="arenaAtaquesContainer"></div>' +
-                    '<div id="arenaMagiasContainer"></div>' +
-                    '<div class="arena-secao arena-futuro-secao">' +
-                        '<div class="arena-futuro-placeholder">Quadro para futuro uso</div>' +
-                    '</div>' +
-                '</div>' +
+        html += '<div class="arena-linha-inferior">';
+        html += '<div id="arenaAtaquesContainer"></div>';
+        html += '<div id="arenaMagiasContainer"></div>';
+        html += '<div class="arena-secao arena-futuro-secao"><div class="arena-futuro-placeholder">Quadro para futuro uso</div></div>';
+        html += '</div>';
+        html += '</div>';
 
-            '</div>';
+        container.innerHTML = html;
 
-        // Funções globais dos botões
+        var self = this;
         window._abrirDanoCura    = function() { if (window.modalDanoCuraInstance) window.modalDanoCuraInstance.abrir(self.combatentes); };
         window._abrirCondicao    = function() { if (window.modalCondicaoInstance) window.modalCondicaoInstance.abrir(); else console.error('modalCondicaoInstance nao inicializado'); };
         window._toggleStats      = function() { self.toggleVisibilidadeStats(); };
@@ -294,31 +246,26 @@ export class ArenaController {
 
         this.condicaoController.carregarCondicoesDoCombatente(combatente.id);
 
-        // Dispara evento — main.js escuta e delega para ArenaAtaquesMagias
         document.dispatchEvent(new CustomEvent('combatenteAtivoMudou', {
             detail: { combatente: combatente }
         }));
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────
-
     calcularModificador(valor) { return Math.floor((valor - 10) / 2); }
 
     getBadgeClass(tipo) {
-        const mapa = { jogador: 'badge-jogador', monstro: 'badge-monstro', npc: 'badge-npc' };
+        var mapa = { jogador: 'badge-jogador', monstro: 'badge-monstro', npc: 'badge-npc' };
         return mapa[tipo] || 'badge-default';
     }
 
     getEmojiTipo(tipo) {
-        const mapa = { jogador: '🧙', monstro: '👹', npc: '🤝' };
+        var mapa = { jogador: '🧙', monstro: '👹', npc: '🤝' };
         return mapa[tipo] || '⚔️';
     }
 
-    // ── Ações de combate ──────────────────────────────────────────────────
-
     resetarCombate() {
-        if (!confirm('Deseja resetar o combate? Todos os combatentes voltarao ao HP maximo.')) return;
-        const self = this;
+        if (!confirm('Deseja resetar o combate? Todos voltarao ao HP maximo.')) return;
+        var self = this;
         this.combatentes.forEach(function(c) {
             c.hp_atual = c.hp_maximo;
             self.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
@@ -334,8 +281,8 @@ export class ArenaController {
 
     finalizarCombate() {
         if (!confirm('Deseja finalizar o combate e voltar para a configuracao?')) return;
-        const telaArena        = document.getElementById('telaArena');
-        const telaConfiguracao = document.getElementById('telaConfiguracao');
+        var telaArena        = document.getElementById('telaArena');
+        var telaConfiguracao = document.getElementById('telaConfiguracao');
         if (telaArena)        telaArena.classList.remove('ativa');
         if (telaConfiguracao) telaConfiguracao.classList.add('ativa');
         Toast.success('Combate finalizado!');
