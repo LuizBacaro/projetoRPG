@@ -44,17 +44,105 @@ controle de perfis de usuário e arena de combate em tempo real.
 
 ## 🗺️ Fluxo de navegação
 
-/                    → redireciona para login
-/pages/login.html    → autenticação JWT
-↓ login OK
-/dashboard           → cadastro de combatentes (todos os perfis)
-├── Aba Combatentes → CRUD jogador / monstro / NPC
-├── Aba Arena       → link para /arena
-└── Header         → nome, perfil, link Usuários (admin), Sair/arena               → seleção e combate (sem cadastro)
-/pages/usuarios.html → gestão de usuários (só Administrador)
-**Credencial padrão** (criada no primeiro startup):E-mail: admin@rpg.com
-Senha:  admin123
+/  (raiz)
+└── redireciona para ──► /pages/login.html
+│
+┌─────────┴──────────┐
+│                    │
+[Entrar]         [Criar nova conta]
+│                    │
+JWT gerado        POST /api/auth/registro
+│           (perfil Jogador, público)
+│                    │
+└────────┬───────────┘
+▼
+/dashboard
+┌────────────────────────────────┐
+│  Aba Combatentes                │
+│  ├── Cadastrar Jogador          │
+│  ├── Cadastrar Monstro          │
+│  ├── Cadastrar NPC              │
+│  └── Editar / Excluir           │
+│                                 │
+│  Aba Arena ──► /arena           │
+│                                 │
+│  Header                         │
+│  ├── 👤 Usuários  (só Admin)    │
+│  └── Sair                       │
+└────────────────────────────────┘
+│
+/arena
+┌────────────────────────────────┐
+│  Seleção de combatentes         │
+│  Ordem de iniciativa            │
+│  Dano / Cura em massa           │
+│  Condições D&D 5e               │
+│  ← Voltar ao Dashboard          │
+└────────────────────────────────┘/pages/usuarios.html  ──  restrito a Administrador
+**Credencial padrão** criada no primeiro startup:E-mail: admin@rpg.com
+Senha:  admin123   ← altere após o primeiro acesso
 ---
+
+## 🏛️ Arquitetura
+
+Clean Architecture + SOLID — separação estrita em camadas.
+
+### Backendbackend/app/
+│
+├── api/v1/                  # Routers HTTP (SRP por domínio)
+│   ├── auth.py              # Login, registro público e JWT
+│   ├── usuarios.py          # CRUD de usuários
+│   ├── combatentes.py       # CRUD de combatentes + upload de foto
+│   ├── combate.py           # Lógica de combate (dano, cura, iniciativa)
+│   └── condicoes.py         # Condições D&D 5e
+│
+├── core/                    # Infraestrutura e configurações
+│   ├── config.py            # Settings via Pydantic + .env
+│   ├── database.py          # Engine + sessão SQLAlchemy
+│   ├── security.py          # JWT — geração e validação (lê SECRET_KEY do .env)
+│   └── deps.py              # Dependências FastAPI (get_usuario_atual)
+│
+├── models/                  # ORM SQLAlchemy — mapeamento das tabelas
+├── repositories/            # Acesso a dados — DIP (depende de abstração)
+├── schemas/                 # Pydantic — validação de request/response
+├── services/                # Regras de negócio — SRP por domínio
+└── main.py                  # Entry point + CORS + seeds + rotas estáticas
+### Frontendfrontend/
+│
+├── index.html               # Arena de combate
+│
+├── pages/
+│   ├── login.html           # Tela de login + cadastro público
+│   ├── dashboard.html       # Pós-login — cadastro de combatentes
+│   └── usuarios.html        # Gestão de usuários (só Administrador)
+│
+└── js/
+├── config/
+│   └── api.config.js    # URLs dev/prod (único ponto de configuração)
+│
+├── controllers/         # Orquestração de telas (SRP por página)
+│   ├── ArenaController.js
+│   ├── ConfiguracaoController.js
+│   ├── DashboardController.js
+│   └── UsuarioController.js
+│
+├── services/            # Comunicação HTTP + sessão
+│   ├── AuthService.js   # JWT, perfil, permissões, logout
+│   ├── CombatenteService.js
+│   ├── UsuarioService.js
+│   ├── DanoCuraService.js
+│   └── CondicaoService.js
+│
+├── ui/                  # Componentes visuais reutilizáveis
+│   ├── Toast.js         # Notificações (global + ES module)
+│   ├── ModalDanoCura.js
+│   ├── ModalUsuario.js
+│   └── CombatenteCard.js
+│
+├── models/              # Entidades do domínio no frontend
+│   └── Combatente.js
+│
+└── main.js              # Entry point da arena
 
 ## 🛠️ Stack
 
