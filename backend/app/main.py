@@ -18,6 +18,9 @@ from .models import combatente          as combatente_model
 from .models import combate             as combate_model
 from .models import condicao            as condicao_model
 from .models import combatente_condicao as pivot_model
+from .models import ataque as ataque_model          
+from .api.v1 import ataques                         
+ 
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +66,7 @@ app.include_router(usuarios.router,    prefix=settings.API_V1_PREFIX)
 app.include_router(combatentes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(combate.router,     prefix=settings.API_V1_PREFIX)
 app.include_router(condicoes.router,   prefix=settings.API_V1_PREFIX)
+app.include_router(ataques.router,     prefix=settings.API_V1_PREFIX)  
 
 # ── Rotas de frontend ─────────────────────────────────────────────────────────
 
