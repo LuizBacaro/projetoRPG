@@ -1,10 +1,10 @@
 /**
  * DashboardController
  * SRP: orquestra listagem, cadastro e edição de combatentes no dashboard
- * DIP: depende de CombatenteServiceGlobal e AtaqueService (globais, sem import/export)
+ * DIP: depende de CombatenteServiceGlobal e AtaqueService via window global
  *
- * NOTA: Não usa ES modules — dashboard carrega scripts via createElement
- * sem type="module". Todas as dependências são definidas neste mesmo arquivo.
+ * IMPORTANTE: não usa ES modules — carregado via createElement no dashboard.html
+ * Ordem obrigatória: AuthService → Toast → AtaqueService → DashboardController
  */
 class DashboardController {
 
@@ -21,14 +21,12 @@ class DashboardController {
     // ── Globais (chamados pelos atributos onclick do HTML) ────────────────
 
     _registrarGlobais() {
-        // Fechar modais
         window.fecharModalCadastro        = () => this._fecharModal('modalCadastroJogador');
         window.fecharModalCadastroMonstro = () => this._fecharModal('modalCadastroMonstro');
         window.fecharModalCadastroNPC     = () => this._fecharModal('modalCadastroNPC');
         window.fecharSeletorTipo          = () => this._fecharModal('seletorTipo');
         window.fecharModalEdicao          = () => this._fecharModal('modalEdicaoDashboard');
 
-        // Abrir modal por tipo
         window.abrirModalCadastro = (tipo) => {
             this._fecharModal('seletorTipo');
             const mapa = {
@@ -39,11 +37,9 @@ class DashboardController {
             this._abrirModal(mapa[tipo]);
         };
 
-        // Edição / Deleção
         window.confirmarDelecao     = () => this._deletarCombatente();
         window.atualizarModificador = (input) => this._calcularModificador(input);
 
-        // Upload
         window.previewImagemUpload  = (input, previewId, imgId, placeholderId) =>
             this._previewImagem(input, previewId, imgId, placeholderId);
         window.removerImagem        = () => this._removerImagem('',        false);
@@ -51,29 +47,28 @@ class DashboardController {
         window.removerImagemNPC     = () => this._removerImagem('NPC',     false);
         window.removerImagemEdicao  = () => this._removerImagem('',        true);
 
-        // Ataques
         window.adicionarLinhaAtaque = () => this._adicionarLinhaAtaque();
         window.removerLinhaAtaque   = (btn) => btn.closest('.ataque-linha').remove();
     }
 
-    // ── Inicialização 
+    // ── Inicialização ─────────────────────────────────────────────────────
 
     _inicializar() {
         this._configurarAbas();
         this._configurarFiltros();
         this._configurarBotaoNovo();
-        this._configurarFormCadastro('formCadastroJogador', 'jogador',  'modalCadastroJogador');
-        this._configurarFormCadastro('formCadastroMonstro', 'monstro',  'modalCadastroMonstro');
-        this._configurarFormCadastro('formCadastroNPC',     'npc',      'modalCadastroNPC');
+        this._configurarFormCadastro('formCadastroJogador', 'jogador', 'modalCadastroJogador');
+        this._configurarFormCadastro('formCadastroMonstro', 'monstro', 'modalCadastroMonstro');
+        this._configurarFormCadastro('formCadastroNPC',     'npc',     'modalCadastroNPC');
         this._configurarFormEdicao();
-        this._configurarUpload('',        'modalCadastroJogador');
-        this._configurarUpload('Monstro', 'modalCadastroMonstro');
-        this._configurarUpload('NPC',     'modalCadastroNPC');
+        this._configurarUpload('');
+        this._configurarUpload('Monstro');
+        this._configurarUpload('NPC');
         this._configurarUploadEdicao();
         this.carregarCombatentes();
     }
 
-    // ── Abas 
+    // ── Abas ──────────────────────────────────────────────────────────────
 
     _configurarAbas() {
         document.querySelectorAll('.nav-tab').forEach(btn => {
@@ -86,7 +81,7 @@ class DashboardController {
         });
     }
 
-    // ── Filtros 
+    // ── Filtros ───────────────────────────────────────────────────────────
 
     _configurarFiltros() {
         document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -99,14 +94,14 @@ class DashboardController {
         });
     }
 
-    // ── Botão novo 
+    // ── Botão novo ────────────────────────────────────────────────────────
 
     _configurarBotaoNovo() {
         const btn = document.getElementById('btnNovoCombatente');
         if (btn) btn.addEventListener('click', () => this._abrirModal('seletorTipo'));
     }
 
-    // ── Formulários de cadastro 
+    // ── Formulários de cadastro ───────────────────────────────────────────
 
     _configurarFormCadastro(formId, tipo, modalId) {
         const form = document.getElementById(formId);
@@ -123,14 +118,11 @@ class DashboardController {
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const btn       = form.querySelector('[type="submit"]');
             btn.disabled    = true;
             btn.textContent = 'Salvando...';
-
             try {
-                const formData   = new FormData(form);
-                const combatente = await this.service.criar(formData);
+                const combatente = await this.service.criar(new FormData(form));
                 Toast.success(`${combatente.nome} cadastrado com sucesso! ✅`);
                 this._fecharModal(modalId);
                 this._limparForm(form, tipo);
@@ -145,7 +137,7 @@ class DashboardController {
         });
     }
 
-    // ── Formulário de edição 
+    // ── Formulário de edição ──────────────────────────────────────────────
 
     _configurarFormEdicao() {
         const form = document.getElementById('formEdicaoDashboard');
@@ -156,17 +148,14 @@ class DashboardController {
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const btn       = form.querySelector('[type="submit"]');
             btn.disabled    = true;
             btn.textContent = 'Salvando...';
-
             try {
-                const id     = parseInt(document.getElementById('dashEditId').value);
-                const formData = new FormData(form);
-                await this.service.atualizar(id, formData);
+                const id = parseInt(document.getElementById('dashEditId').value);
+                await this.service.atualizar(id, new FormData(form));
 
-                // Salva ataques e magias em paralelo
+                // Salva ataques e magias em paralelo com os dados básicos
                 await Promise.all([
                     this._salvarAtaquesEdicao(id),
                     this._salvarMagiasEdicao(id)
@@ -189,25 +178,24 @@ class DashboardController {
     // ── Upload de imagem (cadastro) ───────────────────────────────────────
 
     _configurarUpload(sufixo) {
-        const inputId       = `inputFoto${sufixo}`;
-        const placeholderId = `uploadPlaceholder${sufixo}`;
-        const previewId     = `uploadPreview${sufixo}`;
-        const imgId         = `previewImage${sufixo}`;
-        const input         = document.getElementById(inputId);
+        const input = document.getElementById(`inputFoto${sufixo}`);
         if (!input) return;
-
-        input.addEventListener('change', () => {
-            this._previewImagem(input, previewId, imgId, placeholderId);
-        });
+        input.addEventListener('change', () =>
+            this._previewImagem(
+                input,
+                `uploadPreview${sufixo}`,
+                `previewImage${sufixo}`,
+                `uploadPlaceholder${sufixo}`
+            )
+        );
     }
 
-    // ── Upload de imagem (edição) 
+    // ── Upload de imagem (edição) ─────────────────────────────────────────
 
     _configurarUploadEdicao() {
         const area  = document.getElementById('dashEditUploadArea');
         const input = document.getElementById('dashEditFoto');
         if (!area || !input) return;
-
         area.addEventListener('click', () => input.click());
         input.addEventListener('change', () =>
             this._previewImagem(
@@ -219,7 +207,7 @@ class DashboardController {
         );
     }
 
-    // ── Carrega combatentes 
+    // ── Carrega combatentes ───────────────────────────────────────────────
 
     async carregarCombatentes() {
         try {
@@ -233,7 +221,7 @@ class DashboardController {
         }
     }
 
-    // ── Renderiza tabela 
+    // ── Renderiza tabela ──────────────────────────────────────────────────
 
     _renderizarTabela(combatentes) {
         const tbody = document.getElementById('tabelaCombatentes');
@@ -271,7 +259,7 @@ class DashboardController {
         );
     }
 
-    // ── Resumo 
+    // ── Resumo ────────────────────────────────────────────────────────────
 
     _atualizarResumo(combatentes) {
         document.getElementById('totalGeral').textContent     = combatentes.length;
@@ -280,14 +268,14 @@ class DashboardController {
         document.getElementById('totalNPCs').textContent      = combatentes.filter(c => c.tipo === 'npc').length;
     }
 
-    // ── Edição 
+    // ── Edição ────────────────────────────────────────────────────────────
 
     async _abrirEdicao(id) {
         try {
             const c = await this.service.obterPorId(id);
             this.combatenteEmEdicao = c;
 
-            // Preenche campos básicos
+            // Campos básicos
             document.getElementById('dashEditId').value         = c.id;
             document.getElementById('dashEditTipo').value       = c.tipo;
             document.getElementById('dashEditNome').value       = c.nome;
@@ -311,8 +299,8 @@ class DashboardController {
 
             // Recalcula modificadores D&D
             ['dashEditFOR','dashEditDES','dashEditCON',
-             'dashEditINT','dashEditSAB','dashEditCAR'].forEach(fieldId => {
-                const el = document.getElementById(fieldId);
+             'dashEditINT','dashEditSAB','dashEditCAR'].forEach(fid => {
+                const el = document.getElementById(fid);
                 if (el) this._calcularModificador(el);
             });
 
@@ -329,7 +317,7 @@ class DashboardController {
                 preview.style.display     = 'none';
             }
 
-            // Ataques e magias — só para jogadores
+            // ── Seções de ataques e magias — só para jogadores ────────────
             const secAtaques = document.getElementById('secaoAtaquesEdicao');
             const secMagias  = document.getElementById('secaoMagiasEdicao');
             const isJogador  = c.tipo === 'jogador';
@@ -376,7 +364,7 @@ class DashboardController {
         }
     }
 
-    // ── Ataques no modal de edição 
+    // ── Ataques no modal de edição ────────────────────────────────────────
 
     _renderizarAtaquesEdicao(ataques) {
         const lista = document.getElementById('listaAtaquesEdicao');
@@ -393,23 +381,23 @@ class DashboardController {
         const lista = document.getElementById('listaAtaquesEdicao');
         if (!lista) return;
 
-        const div       = document.createElement('div');
-        div.className   = 'ataque-linha';
-        div.innerHTML   = `
+        const div     = document.createElement('div');
+        div.className = 'ataque-linha';
+        div.innerHTML = `
             <input type="text" class="ataque-nome"
                    placeholder="Nome do ataque"
-                   value="${ataque?.nome         || ''}" />
+                   value="${ataque ? ataque.nome : ''}" />
             <input type="text" class="ataque-bonus"
                    placeholder="+0"
-                   value="${ataque?.bonus_ataque || '+0'}"
+                   value="${ataque ? ataque.bonus_ataque : '+0'}"
                    style="width:70px" />
             <input type="text" class="ataque-dano"
                    placeholder="1d6"
-                   value="${ataque?.dano         || ''}"
+                   value="${ataque ? ataque.dano : ''}"
                    style="width:90px" />
             <input type="text" class="ataque-tipo"
                    placeholder="ex: cortante"
-                   value="${ataque?.tipo_dano    || ''}"
+                   value="${ataque ? ataque.tipo_dano : ''}"
                    style="width:120px" />
             <button type="button"
                     class="btn-dash-delete"
@@ -422,14 +410,12 @@ class DashboardController {
     _coletarAtaquesEdicao() {
         return Array.from(
             document.querySelectorAll('#listaAtaquesEdicao .ataque-linha')
-        )
-        .map(l => ({
+        ).map(l => ({
             nome:         l.querySelector('.ataque-nome').value.trim(),
             bonus_ataque: l.querySelector('.ataque-bonus').value.trim() || '+0',
             dano:         l.querySelector('.ataque-dano').value.trim()  || '1d6',
             tipo_dano:    l.querySelector('.ataque-tipo').value.trim()
-        }))
-        .filter(a => a.nome); // descarta linhas sem nome
+        })).filter(a => a.nome);
     }
 
     async _salvarAtaquesEdicao(combatenteId) {
@@ -437,7 +423,7 @@ class DashboardController {
         await this.ataqueService.salvarAtaques(combatenteId, ataques);
     }
 
-    // ── Magias no modal de edição 
+    // ── Magias no modal de edição ─────────────────────────────────────────
 
     _renderizarMagiasEdicao(slots) {
         const container = document.getElementById('gridMagiasEdicao');
@@ -445,18 +431,21 @@ class DashboardController {
 
         container.innerHTML = Array.from({ length: 10 }, (_, nivel) => {
             const slot  = slots.find(s => s.nivel === nivel);
-            const total = slot?.total ?? 0;
+            const total = slot ? slot.total : 0;
             return `
                 <div class="magia-edicao-linha">
                     <span class="magia-nivel-label">Nível ${nivel}</span>
-                    <div class="dash-form-group" style="margin:0;flex:1">
+                    <div style="flex:1">
                         <input type="number"
                                class="magia-total-input"
                                data-nivel="${nivel}"
                                value="${total}"
                                min="0"
                                max="20"
-                               placeholder="Total de slots" />
+                               placeholder="Total de slots"
+                               style="width:100%;padding:.4rem .6rem;border-radius:.35rem;
+                                      border:1px solid #334155;background:#0f0f23;
+                                      color:#e2e8f0;font-size:.85rem;box-sizing:border-box" />
                     </div>
                 </div>`;
         }).join('');
@@ -468,7 +457,7 @@ class DashboardController {
         ).map(input => ({
             nivel:  parseInt(input.dataset.nivel),
             total:  parseInt(input.value) || 0,
-            usados: 0   // usados são controlados em tempo real na arena
+            usados: 0
         }));
     }
 
@@ -477,7 +466,7 @@ class DashboardController {
         await this.ataqueService.salvarMagias(combatenteId, slots);
     }
 
-    // ── Helpers de modal 
+    // ── Helpers de modal ──────────────────────────────────────────────────
 
     _abrirModal(id) {
         const el = document.getElementById(id);
@@ -490,10 +479,10 @@ class DashboardController {
         if (el) el.classList.remove('show');
     }
 
-    // ── Helpers de upload 
+    // ── Helpers de upload ─────────────────────────────────────────────────
 
     _previewImagem(input, previewId, imgId, placeholderId) {
-        const file = input.files?.[0];
+        const file = input.files ? input.files[0] : null;
         if (!file) return;
         const reader  = new FileReader();
         reader.onload = e => {
@@ -521,7 +510,7 @@ class DashboardController {
         if (preview)     preview.style.display     = 'none';
     }
 
-    // ── Helpers de atributos D&D 
+    // ── Helpers D&D ───────────────────────────────────────────────────────
 
     _calcularModificador(input) {
         const valor = parseInt(input.value) || 10;
@@ -531,12 +520,10 @@ class DashboardController {
         if (span) span.textContent = mod >= 0 ? `+${mod}` : `${mod}`;
     }
 
-    // ── Limpa formulário de cadastro ──────────────────────────────────────
-
     _limparForm(form, tipo) {
         form.reset();
         const sufixos = { jogador: '', monstro: 'Monstro', npc: 'NPC' };
-        const sufixo  = sufixos[tipo] ?? '';
+        const sufixo  = sufixos[tipo] || '';
         const ph = document.getElementById(`uploadPlaceholder${sufixo}`);
         const pv = document.getElementById(`uploadPreview${sufixo}`);
         if (ph) ph.style.display = 'flex';
@@ -544,14 +531,12 @@ class DashboardController {
     }
 }
 
-// ── CombatenteServiceGlobal 
-// SRP: comunicação HTTP com a API de combatentes (sem import/export)
+// ── CombatenteServiceGlobal ───────────────────────────────────────────────────
+// SRP: comunicação HTTP com a API de combatentes
 
 class CombatenteServiceGlobal {
 
-    _url(path = '') {
-        return window.getApiUrl(`/combatentes${path}`);
-    }
+    _url(path = '') { return window.getApiUrl(`/combatentes${path}`); }
 
     _headers() {
         const h = {};
@@ -611,7 +596,7 @@ class CombatenteServiceGlobal {
     }
 }
 
-// ── UploadServiceGlobal 
+// ── UploadServiceGlobal ───────────────────────────────────────────────────────
 // SRP: preview de imagens no cliente
 
 class UploadServiceGlobal {
@@ -623,5 +608,5 @@ class UploadServiceGlobal {
     }
 }
 
-// ── Instancia o controller 
+// ── Entry point ───────────────────────────────────────────────────────────────
 new DashboardController();
