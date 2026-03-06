@@ -583,36 +583,44 @@
     import { getApiUrl } from '/js/config/api.config.js';
     window.getApiUrl = getApiUrl;
 
+    /**
+     * Carrega scripts dinamicamente em ordem sequencial
+     * SRP: cada script tem uma única responsabilidade
+     * DIP: controller depende de serviços já disponíveis no window
+     */
     const carregar = (src) => new Promise((resolve, reject) => {
         const s     = document.createElement('script');
         s.src       = src;
         s.onload    = resolve;
-        s.onerror   = () => reject(new Error(`Falha ao carregar: ${src}`));
+        s.onerror   = () => reject(new Error(`❌ Falha ao carregar: ${src}`));
         document.body.appendChild(s);
     });
 
-    // 1️⃣ AuthService — protege a página (DEVE ser o primeiro)
+    // 1️⃣ AuthService — DEVE ser o primeiro (protege a página)
     await carregar('/js/services/AuthService.js');
     AuthService.exigirLogin();
 
-    // Exibe nome e perfil
-    document.getElementById('nomeUsuario').textContent = AuthService.getNome();
-    document.getElementById('badgePerfil').textContent = AuthService.getPerfil();
+    // Preenche header com dados do usuário logado
+    const nomeEl   = document.getElementById('nomeUsuario');
+    const badgeEl  = document.getElementById('badgePerfil');
+    const logoutEl = document.getElementById('btnLogout');
 
-    // Oculta botão Usuários para não-Admin
+    if (nomeEl)   nomeEl.textContent  = AuthService.getNome();
+    if (badgeEl)  badgeEl.textContent = AuthService.getPerfil();
+    if (logoutEl) logoutEl.addEventListener('click', () => AuthService.logout());
+
+    // Oculta botão Usuários para Mestre e Jogador (só Admin vê)
     AuthService.configurarVisibilidadeAdmin('linkAdmin');
-
-    // Logout
-    document.getElementById('btnLogout')
-        .addEventListener('click', () => AuthService.logout());
 
     // 2️⃣ Toast — DEVE vir antes de qualquer controller
     await carregar('/js/ui/Toast.js');
 
     // 3️⃣ AtaqueService — DEVE vir antes do DashboardController
+    //    DashboardController faz: this.ataqueService = new AtaqueService()
+    //    Se AtaqueService não existir → ReferenceError imediato
     await carregar('/js/services/AtaqueService.js');
 
-    // 4️⃣ DashboardController (depende de Toast + AtaqueService)
+    // 4️⃣ DashboardController — depende de Toast + AtaqueService + AuthService
     await carregar('/js/controllers/DashboardController.js');
 </script>
 </body>

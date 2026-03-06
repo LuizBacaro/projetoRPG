@@ -29,6 +29,7 @@ class Toast {
 
     static _injetarEstilos() {
         if (document.getElementById('toast-styles')) return;
+
         const style    = document.createElement('style');
         style.id       = 'toast-styles';
         style.textContent = `
