@@ -433,9 +433,9 @@
     </div>
 </div>
 
-<!--  -->
-<!-- MODAL — Edição de Combatente                                   -->
-<!--  -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL DE EDIÇÃO                                               -->
+<!-- ══════════════════════════════════════════════════════════════ -->
 <div id="modalEdicaoDashboard" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
@@ -444,22 +444,25 @@
         </div>
         <div class="dash-modal-body">
             <form id="formEdicaoDashboard" enctype="multipart/form-data">
-                <input type="hidden" id="dashEditId" name="id" />
+                <input type="hidden" id="dashEditId"   name="id" />
+                <input type="hidden" id="dashEditTipo" name="tipo" />
 
-                <!-- Tipo + Nome -->
+                <!-- Nível + Pontos -->
                 <div class="dash-form-row">
                     <div class="dash-form-group">
-                        <label>Tipo</label>
-                        <select id="dashEditTipo" name="tipo">
-                            <option value="jogador">Jogador</option>
-                            <option value="monstro">Monstro</option>
-                            <option value="npc">NPC</option>
-                        </select>
+                        <label>Nível</label>
+                        <input type="number" id="dashEditNivel" name="nivel" value="1" min="1" max="20" />
                     </div>
                     <div class="dash-form-group">
-                        <label>Nome *</label>
-                        <input type="text" id="dashEditNome" name="nome" required />
+                        <label>Pontos</label>
+                        <input type="number" id="dashEditPontos" name="pontos" value="0" min="0" />
                     </div>
+                </div>
+
+                <!-- Nome -->
+                <div class="dash-form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="dashEditNome" name="nome" required placeholder="Nome do combatente" />
                 </div>
 
                 <!-- HP + Iniciativa -->
@@ -474,20 +477,10 @@
                     </div>
                 </div>
 
-                <!-- Classe + Nível + Pontos -->
-                <div class="dash-form-row3">
-                    <div class="dash-form-group">
-                        <label>Classe</label>
-                        <input type="text" id="dashEditClasse" name="classe" />
-                    </div>
-                    <div class="dash-form-group">
-                        <label>Nível</label>
-                        <input type="number" id="dashEditNivel" name="nivel" min="1" max="20" value="1" />
-                    </div>
-                    <div class="dash-form-group">
-                        <label>Pontos</label>
-                        <input type="number" id="dashEditPontos" name="pontos" min="0" value="0" />
-                    </div>
+                <!-- Classe -->
+                <div class="dash-form-group">
+                    <label>Classe</label>
+                    <input type="text" id="dashEditClasse" name="classe" placeholder="Ex: Guerreiro" />
                 </div>
 
                 <!-- Defesa -->
@@ -529,32 +522,44 @@
                 <div class="dash-atributos-grid">
                     <div class="dash-atrib-field">
                         <label>FOR</label>
-                        <input type="number" id="dashEditFOR" name="forca"        value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditFOR" name="forca"
+                               value="10" min="1" max="30"
+                               oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditFOR">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>DES</label>
-                        <input type="number" id="dashEditDES" name="destreza"     value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditDES" name="destreza"
+                               value="10" min="1" max="30"
+                               oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditDES">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>CON</label>
-                        <input type="number" id="dashEditCON" name="constituicao" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditCON" name="constituicao"
+                               value="10" min="1" max="30"
+                               oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditCON">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>INT</label>
-                        <input type="number" id="dashEditINT" name="inteligencia" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditINT" name="inteligencia"
+                               value="10" min="1" max="30"
+                               oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditINT">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>SAB</label>
-                        <input type="number" id="dashEditSAB" name="sabedoria"    value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditSAB" name="sabedoria"
+                               value="10" min="1" max="30"
+                               oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditSAB">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>CAR</label>
-                        <input type="number" id="dashEditCAR" name="carisma"      value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditCAR" name="carisma"
+                               value="10" min="1" max="30"
+                               oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditCAR">+0</div>
                     </div>
                 </div>
@@ -578,8 +583,10 @@
                 <!-- ══ ATAQUES — só visível para Jogador ══ -->
                 <div id="secaoAtaquesEdicao" style="display:none">
                     <p class="dash-section-label" style="margin-top:1rem">⚔️ Ataques</p>
-                    <div style="display:grid;grid-template-columns:1fr 70px 90px 120px 36px;
-                                gap:.4rem;margin-bottom:.4rem;font-size:.72rem;color:#64748b;">
+                    <div style="display:grid;
+                                grid-template-columns:1fr 70px 90px 120px 36px;
+                                gap:.4rem;margin-bottom:.4rem;
+                                font-size:.72rem;color:#64748b;">
                         <span>Nome</span>
                         <span>Bônus</span>
                         <span>Dano</span>
@@ -607,11 +614,11 @@
 
                 <!-- Ações -->
                 <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-delete"
-                            onclick="confirmarDelecao()">🗑️ Deletar</button>
                     <button type="button" class="btn-dash-cancel"
                             onclick="fecharModalEdicao()">Cancelar</button>
-                    <button type="submit" class="btn-dash-save">💾 Salvar Alterações</button>
+                    <button type="button" class="btn-dash-delete"
+                            onclick="confirmarDelecao()">🗑️ Deletar</button>
+                    <button type="submit"  class="btn-dash-save">💾 Salvar Alterações</button>
                 </div>
 
             </form>
@@ -619,9 +626,9 @@
     </div>
 </div>
 
-<!--  -->
-<!-- Scripts — carregamento sequencial obrigatório                  -->
-<!--  -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- Scripts — ordem sequencial obrigatória                        -->
+<!-- ══════════════════════════════════════════════════════════════ -->
 <script type="module">
     import { getApiUrl } from '/js/config/api.config.js';
     window.getApiUrl = getApiUrl;
@@ -630,11 +637,11 @@
         const s     = document.createElement('script');
         s.src       = src;
         s.onload    = resolve;
-        s.onerror   = () => reject(new Error(`❌ Falha ao carregar: ${src}`));
+        s.onerror   = () => reject(new Error('Falha ao carregar: ' + src));
         document.body.appendChild(s);
     });
 
-    // 1️⃣ AuthService — DEVE ser o primeiro (protege a página)
+    // 1 — AuthService (protege a página, DEVE ser o primeiro)
     await carregar('/js/services/AuthService.js');
     AuthService.exigirLogin();
 
@@ -644,17 +651,15 @@
     if (nomeEl)   nomeEl.textContent  = AuthService.getNome();
     if (badgeEl)  badgeEl.textContent = AuthService.getPerfil();
     if (logoutEl) logoutEl.addEventListener('click', () => AuthService.logout());
-
-    // Oculta botão Usuários para Mestre e Jogador (só Admin vê)
     AuthService.configurarVisibilidadeAdmin('linkAdmin');
 
-    // 2️⃣ Toast — DEVE vir antes de qualquer controller
+    // 2 — Toast (DEVE vir antes de qualquer controller)
     await carregar('/js/ui/Toast.js');
 
-    // 3️⃣ AtaqueService — DEVE vir antes do DashboardController
+    // 3 — AtaqueService (DEVE vir antes do DashboardController)
     await carregar('/js/services/AtaqueService.js');
 
-    // 4️⃣ DashboardController — depende de todos os anteriores
+    // 4 — DashboardController (depende de Toast + AtaqueService)
     await carregar('/js/controllers/DashboardController.js');
 </script>
 

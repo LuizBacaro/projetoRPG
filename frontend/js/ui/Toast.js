@@ -30,37 +30,39 @@ class Toast {
     static _injetarEstilos() {
         if (document.getElementById('toast-styles')) return;
 
-        const style    = document.createElement('style');
-        style.id       = 'toast-styles';
-        style.textContent = `
-            .toast {
-                position: fixed;
-                bottom: 1.5rem;
-                right:  1.5rem;
-                padding: .75rem 1.25rem;
-                border-radius: .5rem;
-                color: #fff;
-                font-size: .9rem;
-                font-weight: 500;
-                opacity: 0;
-                transform: translateY(1rem);
-                transition: opacity .3s, transform .3s;
-                z-index: 9999;
-                max-width: 360px;
-                box-shadow: 0 4px 12px rgba(0,0,0,.4);
-            }
-            .toast.show    { opacity: 1; transform: translateY(0); }
-            .toast-success { background: #059669; }
-            .toast-error   { background: #dc2626; }
-            .toast-warning { background: #d97706; }
-            .toast-info    { background: #2563eb; }
-        `;
+        const style = document.createElement('style');
+        style.id    = 'toast-styles';
+
+        style.textContent = [
+            '.toast {',
+            '    position: fixed;',
+            '    bottom: 1.5rem;',
+            '    right: 1.5rem;',
+            '    padding: .75rem 1.25rem;',
+            '    border-radius: .5rem;',
+            '    color: #fff;',
+            '    font-size: .9rem;',
+            '    font-weight: 500;',
+            '    opacity: 0;',
+            '    transform: translateY(1rem);',
+            '    transition: opacity .3s, transform .3s;',
+            '    z-index: 9999;',
+            '    max-width: 360px;',
+            '    box-shadow: 0 4px 12px rgba(0,0,0,.4);',
+            '}',
+            '.toast.show    { opacity: 1; transform: translateY(0); }',
+            '.toast-success { background: #059669; }',
+            '.toast-error   { background: #dc2626; }',
+            '.toast-warning { background: #d97706; }',
+            '.toast-info    { background: #2563eb; }'
+        ].join('\n');
+
         document.head.appendChild(style);
     }
 }
 
-// ── Para scripts globais (DashboardController, UsuarioController) ─────────
+// Para scripts globais (DashboardController, UsuarioController)
 window.Toast = Toast;
 
-// ── Para ES modules (ConfiguracaoController, ArenaController) ─────────────
+// Para ES modules (ConfiguracaoController, ArenaController)
 export { Toast };
