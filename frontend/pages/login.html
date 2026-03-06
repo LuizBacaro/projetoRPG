@@ -19,6 +19,7 @@
 
         .login-wrapper { width: 100%; max-width: 420px; padding: 1rem; }
 
+        /* ── Logo ── */
         .login-logo { text-align: center; margin-bottom: 2rem; }
         .login-logo h1 {
             font-size: 2rem;
@@ -28,6 +29,7 @@
         }
         .login-logo p { color: #64748b; margin-top: .4rem; font-size: .9rem; }
 
+        /* ── Card ── */
         .login-card {
             background: #1a1a2e;
             border: 1px solid #2d2d44;
@@ -41,6 +43,7 @@
             font-weight: 500;
         }
 
+        /* ── Campos ── */
         .form-group { margin-bottom: 1.1rem; }
         .form-group label {
             display: block;
@@ -59,10 +62,10 @@
             font-size: .95rem;
             outline: none;
             transition: border-color .2s;
-            box-sizing: border-box;
         }
         .form-group input:focus { border-color: #7c3aed; }
 
+        /* ── Botão principal ── */
         .btn-login {
             width: 100%;
             padding: .7rem;
@@ -79,28 +82,107 @@
         .btn-login:hover    { background: #6d28d9; }
         .btn-login:disabled { background: #4c1d95; cursor: not-allowed; opacity: .7; }
 
-        .erro-msg {
+        /* ── Botão secundário (cadastro) ── */
+        .btn-cadastro {
+            width: 100%;
+            padding: .65rem;
+            background: transparent;
+            color: #a78bfa;
+            border: 1px solid #7c3aed55;
+            border-radius: .4rem;
+            font-size: .9rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: .65rem;
+            transition: background .2s, border-color .2s;
+        }
+        .btn-cadastro:hover { background: #7c3aed11; border-color: #7c3aed; }
+
+        /* ── Divisor ── */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin: 1.1rem 0 .5rem;
+            color: #334155;
+            font-size: .78rem;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #2d2d44;
+        }
+
+        /* ── Mensagens ── */
+        .msg-box {
             display: none;
-            background: #dc262622;
-            border: 1px solid #dc262655;
-            color: #f87171;
             padding: .65rem 1rem;
             border-radius: .4rem;
             margin-bottom: 1rem;
             font-size: .85rem;
         }
+        .msg-erro    { background: #dc262622; border: 1px solid #dc262655; color: #f87171; }
+        .msg-sucesso { background: #05966922; border: 1px solid #05966955; color: #34d399; }
 
-        .hint {
-            text-align: center;
-            margin-top: 1.25rem;
-            font-size: .8rem;
-            color: #334155;
+        .hint { text-align: center; margin-top: 1.25rem; font-size: .8rem; color: #334155; }
+
+        /* ── Modal de cadastro ── */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.75);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal-box {
+            background: #1a1a2e;
+            border: 1px solid #2d2d44;
+            border-radius: .75rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 420px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-header h2 { font-size: 1.1rem; color: #e2e8f0; }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1.4rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: .2rem .4rem;
+            border-radius: .3rem;
+        }
+        .modal-close:hover { background: #ffffff11; color: #e2e8f0; }
+
+        .perfil-info {
+            background: #7c3aed11;
+            border: 1px solid #7c3aed33;
+            border-radius: .4rem;
+            padding: .65rem 1rem;
+            font-size: .82rem;
+            color: #a78bfa;
+            margin-bottom: 1.1rem;
         }
     </style>
 </head>
 <body>
 
+<!-- ── Tela de Login ────────────────────────────────────────────────────── -->
 <div class="login-wrapper">
+
     <div class="login-logo">
         <h1>⚔️ Arena TTRPG</h1>
         <p>Plataforma de gestão de campanhas e combates</p>
@@ -109,7 +191,7 @@
     <div class="login-card">
         <h2>Acesse sua conta</h2>
 
-        <div id="erroMsg" class="erro-msg"></div>
+        <div id="erroLogin" class="msg-box msg-erro"></div>
 
         <div class="form-group">
             <label>E-mail</label>
@@ -123,44 +205,132 @@
 
         <button id="btnLogin" class="btn-login">Entrar</button>
 
-        <p class="hint">Acesso restrito a usuários cadastrados</p>
+        <div class="divider">ou</div>
+
+        <button id="btnAbrirCadastro" class="btn-cadastro">✨ Criar nova conta</button>
+
+        <p class="hint">Novas contas são criadas como <strong>Jogador</strong></p>
+    </div>
+
+</div>
+
+<!-- ── Modal de Cadastro ─────────────────────────────────────────────────── -->
+<div id="modalCadastro" class="modal-overlay">
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2>✨ Criar conta</h2>
+            <button id="btnFecharCadastro" class="modal-close">×</button>
+        </div>
+
+        <div class="perfil-info">
+            🎮 Sua conta será criada com o perfil <strong>Jogador</strong>.
+            O Administrador pode alterar o perfil depois se necessário.
+        </div>
+
+        <div id="erroCadastro"  class="msg-box msg-erro"></div>
+        <div id="sucessoCadastro" class="msg-box msg-sucesso"></div>
+
+        <div class="form-group">
+            <label>Nome completo *</label>
+            <input id="cadNome" type="text" placeholder="Seu nome" autocomplete="name" />
+        </div>
+
+        <div class="form-group">
+            <label>E-mail *</label>
+            <input id="cadEmail" type="email" placeholder="seu@email.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+            <label>Senha * <small style="color:#64748b">(mín. 6 caracteres)</small></label>
+            <input id="cadSenha" type="password" placeholder="••••••" autocomplete="new-password" />
+        </div>
+
+        <div class="form-group">
+            <label>Confirmar senha *</label>
+            <input id="cadConfirma" type="password" placeholder="••••••" autocomplete="new-password" />
+        </div>
+
+        <button id="btnSalvarCadastro" class="btn-login" style="margin-top:.25rem">
+            Criar conta
+        </button>
+
+        <button id="btnCancelarCadastro" class="btn-cadastro">
+            Cancelar
+        </button>
+
     </div>
 </div>
 
+<!-- ── Scripts ───────────────────────────────────────────────────────────── -->
 <script type="module">
     import { getApiUrl } from '/js/config/api.config.js';
 
+    // ── Elementos de Login ────────────────────────────────────────────────
     const btnLogin   = document.getElementById('btnLogin');
     const inputEmail = document.getElementById('inputEmail');
     const inputSenha = document.getElementById('inputSenha');
-    const erroMsg    = document.getElementById('erroMsg');
+    const erroLogin  = document.getElementById('erroLogin');
 
-    // ✅ REMOVIDO: redirect automático se já logado
-    // A tela de login é SEMPRE mostrada ao acessar a raiz "/"
-    // O usuário deve fazer login explicitamente a cada sessão
-    // Isso garante que sessões antigas não permanecem ativas silenciosamente
+    // ── Elementos de Cadastro ─────────────────────────────────────────────
+    const modalCadastro     = document.getElementById('modalCadastro');
+    const btnAbrirCadastro  = document.getElementById('btnAbrirCadastro');
+    const btnFecharCadastro = document.getElementById('btnFecharCadastro');
+    const btnCancelarCadastro = document.getElementById('btnCancelarCadastro');
+    const btnSalvarCadastro = document.getElementById('btnSalvarCadastro');
+    const cadNome           = document.getElementById('cadNome');
+    const cadEmail          = document.getElementById('cadEmail');
+    const cadSenha          = document.getElementById('cadSenha');
+    const cadConfirma       = document.getElementById('cadConfirma');
+    const erroCadastro      = document.getElementById('erroCadastro');
+    const sucessoCadastro   = document.getElementById('sucessoCadastro');
 
-    // Limpa qualquer sessão anterior ao chegar no login
+    // Limpa sessão anterior — login sempre explícito
     sessionStorage.removeItem('rpg_token');
     sessionStorage.removeItem('rpg_usuario');
 
-    function mostrarErro(msg) {
-        erroMsg.textContent   = msg;
-        erroMsg.style.display = 'block';
+    // ── Helpers ───────────────────────────────────────────────────────────
+
+    function mostrarErroLogin(msg) {
+        erroLogin.textContent   = msg;
+        erroLogin.style.display = 'block';
     }
 
-    function esconderErro() {
-        erroMsg.style.display = 'none';
+    function ocultarErroLogin() {
+        erroLogin.style.display = 'none';
     }
+
+    function mostrarErroCadastro(msg) {
+        erroCadastro.textContent      = msg;
+        erroCadastro.style.display    = 'block';
+        sucessoCadastro.style.display = 'none';
+    }
+
+    function mostrarSucessoCadastro(msg) {
+        sucessoCadastro.textContent   = msg;
+        sucessoCadastro.style.display = 'block';
+        erroCadastro.style.display    = 'none';
+    }
+
+    function limparCadastro() {
+        cadNome.value     = '';
+        cadEmail.value    = '';
+        cadSenha.value    = '';
+        cadConfirma.value = '';
+        erroCadastro.style.display    = 'none';
+        sucessoCadastro.style.display = 'none';
+    }
+
+    // ── Login ─────────────────────────────────────────────────────────────
 
     async function fazerLogin() {
-        esconderErro();
+        ocultarErroLogin();
 
         const email = inputEmail.value.trim();
         const senha = inputSenha.value;
 
         if (!email || !senha) {
-            mostrarErro('Preencha e-mail e senha.');
+            mostrarErroLogin('Preencha e-mail e senha.');
             return;
         }
 
@@ -168,7 +338,7 @@
         btnLogin.textContent = 'Entrando...';
 
         try {
-            const res = await fetch(getApiUrl('/auth/login'), {
+            const res  = await fetch(getApiUrl('/auth/login'), {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body:    JSON.stringify({ email, senha })
@@ -177,19 +347,16 @@
             const data = await res.json();
 
             if (!res.ok) {
-                mostrarErro(data.detail || 'E-mail ou senha incorretos.');
+                mostrarErroLogin(data.detail || 'E-mail ou senha incorretos.');
                 return;
             }
 
-            // Salva token e dados do usuário na sessão
             sessionStorage.setItem('rpg_token',   data.access_token);
             sessionStorage.setItem('rpg_usuario', JSON.stringify(data.usuario));
-
-            // Redireciona para o dashboard após login bem-sucedido
             window.location.href = '/dashboard';
 
         } catch (err) {
-            mostrarErro('Erro de conexão com o servidor.');
+            mostrarErroLogin('Erro de conexão com o servidor.');
             console.error(err);
         } finally {
             btnLogin.disabled    = false;
@@ -197,11 +364,99 @@
         }
     }
 
-    btnLogin.addEventListener('click', fazerLogin);
+    // ── Cadastro ──────────────────────────────────────────────────────────
 
-    // Login com Enter
+    async function fazerCadastro() {
+        const nome     = cadNome.value.trim();
+        const email    = cadEmail.value.trim();
+        const senha    = cadSenha.value;
+        const confirma = cadConfirma.value;
+
+        // Validações no cliente
+        if (!nome || !email || !senha || !confirma) {
+            mostrarErroCadastro('Preencha todos os campos.');
+            return;
+        }
+        if (senha.length < 6) {
+            mostrarErroCadastro('Senha deve ter ao menos 6 caracteres.');
+            return;
+        }
+        if (senha !== confirma) {
+            mostrarErroCadastro('As senhas não coincidem.');
+            return;
+        }
+
+        btnSalvarCadastro.disabled    = true;
+        btnSalvarCadastro.textContent = 'Criando conta...';
+
+        try {
+            const res = await fetch(getApiUrl('/auth/registro'), {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ nome, email, senha })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                mostrarErroCadastro(data.detail || 'Erro ao criar conta.');
+                return;
+            }
+
+            // Sucesso — orienta o usuário a fazer login
+            mostrarSucessoCadastro(`✅ Conta criada com sucesso! Bem-vindo, ${data.nome}! Faça login para continuar.`);
+
+            // Pré-preenche o e-mail no campo de login
+            inputEmail.value = email;
+
+            // Fecha o modal após 2 segundos
+            setTimeout(() => {
+                modalCadastro.classList.remove('show');
+                limparCadastro();
+                inputSenha.focus();
+            }, 2000);
+
+        } catch (err) {
+            mostrarErroCadastro('Erro de conexão com o servidor.');
+            console.error(err);
+        } finally {
+            btnSalvarCadastro.disabled    = false;
+            btnSalvarCadastro.textContent = 'Criar conta';
+        }
+    }
+
+    // ── Eventos ───────────────────────────────────────────────────────────
+
+    // Login
+    btnLogin.addEventListener('click', fazerLogin);
     [inputEmail, inputSenha].forEach(el =>
         el.addEventListener('keydown', e => { if (e.key === 'Enter') fazerLogin(); })
+    );
+
+    // Abrir modal de cadastro
+    btnAbrirCadastro.addEventListener('click', () => {
+        limparCadastro();
+        modalCadastro.classList.add('show');
+        cadNome.focus();
+    });
+
+    // Fechar modal
+    const fecharModal = () => {
+        modalCadastro.classList.remove('show');
+        limparCadastro();
+    };
+    btnFecharCadastro.addEventListener('click',   fecharModal);
+    btnCancelarCadastro.addEventListener('click', fecharModal);
+
+    // Fechar modal clicando fora
+    modalCadastro.addEventListener('click', (e) => {
+        if (e.target === modalCadastro) fecharModal();
+    });
+
+    // Salvar cadastro
+    btnSalvarCadastro.addEventListener('click', fazerCadastro);
+    [cadNome, cadEmail, cadSenha, cadConfirma].forEach(el =>
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') fazerCadastro(); })
     );
 </script>
 

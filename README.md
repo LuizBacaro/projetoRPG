@@ -84,36 +84,75 @@ Senha:  admin123
 
 ## 🏛️ Arquitetura
 
-Clean Architecture + SOLID. Separação em camadas:backend/app/
-├── api/v1/         # Routers HTTP (SRP por domínio)
-│   ├── auth.py
-│   ├── usuarios.py
-│   ├── combatentes.py
-│   ├── combate.py
-│   └── condicoes.py
-├── core/
-│   ├── config.py   # Configurações via Pydantic Settings
-│   ├── database.py # Engine + sessão SQLAlchemy
-│   ├── security.py # JWT — geração e validação
-│   └── deps.py     # Dependências FastAPI (get_usuario_atual)
-├── models/         # ORM SQLAlchemy
-├── repositories/   # Acesso a dados (DIP)
-├── schemas/        # Pydantic request/response
-├── services/       # Regras de negócio (SRP)
-└── main.py         # Entry point + seedsfrontend/
+Clean Architecture + SOLID — separação estrita em camadas.
+
+### Backend
+
+backend/app/
+│
+├── api/v1/                  # Routers HTTP (SRP por domínio)
+│   ├── auth.py              # Login e geração de JWT
+│   ├── usuarios.py          # CRUD de usuários
+│   ├── combatentes.py       # CRUD de combatentes + upload de foto
+│   ├── combate.py           # Lógica de combate (dano, cura, iniciativa)
+│   └── condicoes.py         # Condições D&D 5e
+│
+├── core/                    # Infraestrutura e configurações
+│   ├── config.py            # Settings via Pydantic + .env
+│   ├── database.py          # Engine + sessão SQLAlchemy
+│   ├── security.py          # JWT — geração e validação
+│   └── deps.py              # Dependências FastAPI (get_usuario_atual)
+│
+├── models/                  # ORM SQLAlchemy (mapeamento das tabelas)
+├── repositories/            # Acesso a dados — DIP (depende de abstração)
+├── schemas/                 # Pydantic — validação de request/response
+├── services/                # Regras de negócio — SRP por domínio
+└── main.py                  # Entry point + CORS + seeds + rotas estáticas
+### Frontendfrontend/
+│
+├── index.html               # Arena de combate
+│
 ├── pages/
-│   ├── login.html
-│   ├── dashboard.html
-│   └── usuarios.html
-├── js/
-│   ├── config/api.config.js    # URLs dev/prod
-│   ├── controllers/            # Orquestração de telas
-│   ├── services/               # HTTP + AuthService
-│   ├── ui/                     # Componentes visuais
-│   ├── models/                 # Entidades frontend
-│   └── main.js                 # Entry point arena
-└── index.html                  # Arena de combate
----
+│   ├── login.html           # Tela de login (sempre exibida na entrada)
+│   ├── dashboard.html       # Pós-login — cadastro de combatentes
+│   └── usuarios.html        # Gestão de usuários (só Administrador)
+│
+└── js/
+├── config/
+│   └── api.config.js    # URLs dev/prod (único ponto de configuração)
+│
+├── controllers/         # Orquestração de telas (SRP por página)
+│   ├── ArenaController.js
+│   ├── ConfiguracaoController.js
+│   ├── DashboardController.js
+│   └── UsuarioController.js
+│
+├── services/            # Comunicação HTTP + sessão
+│   ├── AuthService.js   # JWT, perfil, permissões, logout
+│   ├── CombatenteService.js
+│   ├── UsuarioService.js
+│   ├── DanoCuraService.js
+│   └── CondicaoService.js
+│
+├── ui/                  # Componentes visuais reutilizáveis
+│   ├── Toast.js         # Notificações (global + ES module)
+│   ├── ModalDanoCura.js
+│   ├── ModalUsuario.js
+│   └── CombatenteCard.js
+│
+├── models/              # Entidades e regras do domínio no frontend
+│   └── Combatente.js
+│
+└── main.js              # Entry point da arena
+
+### Princípios aplicados
+
+| Princípio | Aplicação |
+|-----------|-----------|
+| **SRP** — Single Responsibility | Cada classe/arquivo tem uma única responsabilidade (ex: `AuthService` só gerencia sessão, `security.py` só gera/valida JWT) |
+| **OCP** — Open/Closed | Novos tipos de combatente ou perfil de usuário sem alterar código existente |
+| **DIP** — Dependency Inversion | Services dependem de Repositories via injeção — nunca instanciam diretamente |
+| **ISP** — Interface Segregation | Schemas Pydantic separados por operação (`UsuarioCreate`, `UsuarioUpdate`, `UsuarioResponse`) |
 
 ## 🚀 Como executar localmente
 ```bash
