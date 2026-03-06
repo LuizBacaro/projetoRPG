@@ -99,7 +99,7 @@ export class ArenaController {
             const hpPercentual = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
             const hpCor        = hpPercentual > 50 ? '#4CAF50'
                                : hpPercentual > 25 ? '#FF9800' : '#F44336';
-            const morto        = c.hp_atual &lt;= 0;
+            const morto        = c.hp_atual <= 0;
 
             return `
                 <div class="combatente-ordem-item ${ativo ? 'ativo' : ''} ${morto ? 'morto' : ''}"
