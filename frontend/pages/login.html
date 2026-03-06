@@ -17,29 +17,16 @@
             justify-content: center;
         }
 
-        .login-wrapper {
-            width: 100%;
-            max-width: 420px;
-            padding: 1rem;
-        }
+        .login-wrapper { width: 100%; max-width: 420px; padding: 1rem; }
 
-        .login-logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
+        .login-logo { text-align: center; margin-bottom: 2rem; }
         .login-logo h1 {
             font-size: 2rem;
             background: linear-gradient(135deg, #7c3aed, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .login-logo p {
-            color: #64748b;
-            margin-top: .4rem;
-            font-size: .9rem;
-        }
+        .login-logo p { color: #64748b; margin-top: .4rem; font-size: .9rem; }
 
         .login-card {
             background: #1a1a2e;
@@ -47,7 +34,6 @@
             border-radius: .75rem;
             padding: 2rem;
         }
-
         .login-card h2 {
             font-size: 1.1rem;
             margin-bottom: 1.5rem;
@@ -55,10 +41,7 @@
             font-weight: 500;
         }
 
-        .form-group {
-            margin-bottom: 1.1rem;
-        }
-
+        .form-group { margin-bottom: 1.1rem; }
         .form-group label {
             display: block;
             margin-bottom: .35rem;
@@ -66,7 +49,6 @@
             color: #94a3b8;
             font-weight: 500;
         }
-
         .form-group input {
             width: 100%;
             padding: .65rem .9rem;
@@ -77,8 +59,8 @@
             font-size: .95rem;
             outline: none;
             transition: border-color .2s;
+            box-sizing: border-box;
         }
-
         .form-group input:focus { border-color: #7c3aed; }
 
         .btn-login {
@@ -94,8 +76,7 @@
             margin-top: .5rem;
             transition: background .2s;
         }
-
-        .btn-login:hover { background: #6d28d9; }
+        .btn-login:hover    { background: #6d28d9; }
         .btn-login:disabled { background: #4c1d95; cursor: not-allowed; opacity: .7; }
 
         .erro-msg {
@@ -120,7 +101,6 @@
 <body>
 
 <div class="login-wrapper">
-
     <div class="login-logo">
         <h1>⚔️ Arena TTRPG</h1>
         <p>Plataforma de gestão de campanhas e combates</p>
@@ -145,7 +125,6 @@
 
         <p class="hint">Acesso restrito a usuários cadastrados</p>
     </div>
-
 </div>
 
 <script type="module">
@@ -156,13 +135,18 @@
     const inputSenha = document.getElementById('inputSenha');
     const erroMsg    = document.getElementById('erroMsg');
 
-    // Se já tem token válido → redireciona direto
-    const tokenSalvo = sessionStorage.getItem('rpg_token');
-    if (tokenSalvo) window.location.href = '/dashboard';
+    // ✅ REMOVIDO: redirect automático se já logado
+    // A tela de login é SEMPRE mostrada ao acessar a raiz "/"
+    // O usuário deve fazer login explicitamente a cada sessão
+    // Isso garante que sessões antigas não permanecem ativas silenciosamente
+
+    // Limpa qualquer sessão anterior ao chegar no login
+    sessionStorage.removeItem('rpg_token');
+    sessionStorage.removeItem('rpg_usuario');
 
     function mostrarErro(msg) {
-        erroMsg.textContent    = msg;
-        erroMsg.style.display  = 'block';
+        erroMsg.textContent   = msg;
+        erroMsg.style.display = 'block';
     }
 
     function esconderErro() {
@@ -171,6 +155,7 @@
 
     async function fazerLogin() {
         esconderErro();
+
         const email = inputEmail.value.trim();
         const senha = inputSenha.value;
 
@@ -179,8 +164,8 @@
             return;
         }
 
-        btnLogin.disabled     = true;
-        btnLogin.textContent  = 'Entrando...';
+        btnLogin.disabled    = true;
+        btnLogin.textContent = 'Entrando...';
 
         try {
             const res = await fetch(getApiUrl('/auth/login'), {
@@ -192,7 +177,7 @@
             const data = await res.json();
 
             if (!res.ok) {
-                mostrarErro(data.detail || 'Erro ao fazer login.');
+                mostrarErro(data.detail || 'E-mail ou senha incorretos.');
                 return;
             }
 
@@ -200,11 +185,12 @@
             sessionStorage.setItem('rpg_token',   data.access_token);
             sessionStorage.setItem('rpg_usuario', JSON.stringify(data.usuario));
 
-            // Redireciona conforme perfil
+            // Redireciona para o dashboard após login bem-sucedido
             window.location.href = '/dashboard';
 
         } catch (err) {
             mostrarErro('Erro de conexão com o servidor.');
+            console.error(err);
         } finally {
             btnLogin.disabled    = false;
             btnLogin.textContent = 'Entrar';

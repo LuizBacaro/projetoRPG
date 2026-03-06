@@ -142,7 +142,25 @@ uvicorn app.main:app --reload --port 8000
 
 📡 Endpoints principais
 
-MétodoRotaAuthDescriçãoPOST/api/auth/login❌Login — retorna JWTGET/api/usuarios✅ AdminLista usuáriosPOST/api/usuarios✅ AdminCria usuárioPUT/api/usuarios/{id}✅ AdminAtualiza usuárioDELETE/api/usuarios/{id}✅ AdminInativa usuárioGET/api/combatentes✅Lista combatentesPOST/api/combatentes✅Cria combatentePUT/api/combatentes/{id}✅Edita combatenteDELETE/api/combatentes/{id}✅Remove combatentePOST/api/combatentes/{id}/dano✅Aplica danoPOST/api/combatentes/{id}/cura✅Aplica curaGET/api/condicoes✅Lista condições D&D
+## 📡 Endpoints principais
+
+| Método | Rota | Auth | Descrição |
+|--------|------|------|-----------|
+| `POST` | `/api/auth/login` | ❌ Público | Login — retorna JWT |
+| `GET` | `/api/usuarios` | ✅ Admin | Lista usuários |
+| `POST` | `/api/usuarios` | ✅ Admin | Cria usuário |
+| `PUT` | `/api/usuarios/{id}` | ✅ Admin | Atualiza usuário |
+| `DELETE` | `/api/usuarios/{id}` | ✅ Admin | Inativa usuário |
+| `GET` | `/api/combatentes` | ✅ Logado | Lista combatentes |
+| `POST` | `/api/combatentes` | ✅ Logado | Cria combatente |
+| `PUT` | `/api/combatentes/{id}` | ✅ Logado | Edita combatente |
+| `DELETE` | `/api/combatentes/{id}` | ✅ Logado | Remove combatente |
+| `POST` | `/api/combatentes/{id}/dano` | ✅ Logado | Aplica dano |
+| `POST` | `/api/combatentes/{id}/cura` | ✅ Logado | Aplica cura |
+| `GET` | `/api/condicoes` | ✅ Logado | Lista condições D&D |
+
+> 💡 Todos os endpoints protegidos exigem header `Authorization: Bearer <token>`
+> obtido no `POST /api/auth/login`.
 
 🗄️ Modelo de dados
 

@@ -15,16 +15,22 @@ class Settings(BaseSettings):
     VERSION:       str = "1.0.0"
     API_V1_PREFIX: str = "/api"
 
-    # ✅ DATABASE_URL: SQLite local em dev, PostgreSQL no Railway em prod
+    # ── Segurança ─────────────────────────────────────────────────────────
+    # Lida do .env ou variável de ambiente no Railway
+    # NUNCA deixe o valor padrão em produção
+    SECRET_KEY: str = "rpg-arena-secret-key-change-in-production"
+
+    # ── Banco de dados ────────────────────────────────────────────────────
     # Railway injeta DATABASE_URL automaticamente ao adicionar plugin PostgreSQL
     DATABASE_URL: str = "sqlite:///./rpg_arena.db"
 
     # Paths
     BASE_DIR:     Path = Path(__file__).resolve().parent.parent.parent
-    UPLOADS_DIR:  Path = BASE_DIR / "uploads"
-    FRONTEND_DIR: Path = BASE_DIR.parent / "frontend"
+    UPLOADS_DIR:  Path = Path(__file__).resolve().parent.parent.parent / "uploads"
+    FRONTEND_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent / "frontend"
 
-    # ✅ CORS — Railway: defina ALLOWED_ORIGINS=https://luizbacaro.github.io
+    # ── CORS ──────────────────────────────────────────────────────────────
+    # Railway: defina ALLOWED_ORIGINS=https://arena-de-combate-rpg.com.br
     ALLOWED_ORIGINS: List[str] = ["*"]
 
     # Arquivo
@@ -38,7 +44,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# ✅ CORRIGIDO: Railway gera 'postgres://' mas SQLAlchemy exige 'postgresql://'
+# Railway gera 'postgres://' mas SQLAlchemy exige 'postgresql://'
 if settings.DATABASE_URL.startswith("postgres://"):
     settings.DATABASE_URL = settings.DATABASE_URL.replace(
         "postgres://", "postgresql://", 1

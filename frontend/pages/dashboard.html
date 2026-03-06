@@ -589,21 +589,24 @@
         document.body.appendChild(s);
     });
 
-    // 1️⃣ Auth — protege a página
+    // 1️⃣ AuthService — protege a página
     await carregar('/js/services/AuthService.js');
     AuthService.exigirLogin();
 
+    // Exibe nome e perfil
     document.getElementById('nomeUsuario').textContent = AuthService.getNome();
     document.getElementById('badgePerfil').textContent = AuthService.getPerfil();
-    if (AuthService.isAdmin()) {
-        document.getElementById('linkAdmin').style.display = 'inline-flex';
-    }
+
+    // ✅ Oculta botão "Usuários" para Jogadores (só Admin vê)
+    AuthService.configurarVisibilidadeAdmin('linkAdmin');
+
+    // Logout
     document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout());
 
-    // 2️⃣ Toast — deve ser carregado ANTES do DashboardController
+    // 2️⃣ Toast — antes do controller
     await carregar('/js/ui/Toast.js');
 
-    // 3️⃣ Controller (já inclui CombatenteServiceGlobal e UploadServiceGlobal)
+    // 3️⃣ Controller
     await carregar('/js/controllers/DashboardController.js');
 </script>
 </body>
