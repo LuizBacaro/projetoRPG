@@ -2,8 +2,8 @@
  * Toast
  * SRP: apenas exibir notificações visuais
  * Compatível com:
- *   - ES modules (import { Toast } from '../ui/Toast.js')
- *   - Scripts globais (window.Toast via createElement)
+ *   - Scripts globais via createElement (window.Toast)
+ *   - ES modules via import { Toast } (export)
  */
 class Toast {
 
@@ -29,8 +29,8 @@ class Toast {
 
     static _injetarEstilos() {
         if (document.getElementById('toast-styles')) return;
-        const style = document.createElement('style');
-        style.id    = 'toast-styles';
+        const style    = document.createElement('style');
+        style.id       = 'toast-styles';
         style.textContent = `
             .toast {
                 position: fixed;
@@ -58,8 +58,8 @@ class Toast {
     }
 }
 
-// ── Disponibiliza para scripts globais (DashboardController) ──────────
+// ── Para scripts globais (DashboardController, UsuarioController) ─────────
 window.Toast = Toast;
 
-// ── Disponibiliza para ES modules (ConfiguracaoController, ArenaController) ──
+// ── Para ES modules (ConfiguracaoController, ArenaController) ─────────────
 export { Toast };

@@ -584,12 +584,14 @@
     window.getApiUrl = getApiUrl;
 
     const carregar = (src) => new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = src; s.onload = resolve; s.onerror = reject;
+        const s     = document.createElement('script');
+        s.src       = src;
+        s.onload    = resolve;
+        s.onerror   = () => reject(new Error(`Falha ao carregar: ${src}`));
         document.body.appendChild(s);
     });
 
-    // 1️⃣ AuthService — protege a página
+    // 1️⃣ AuthService — protege a página (DEVE ser o primeiro)
     await carregar('/js/services/AuthService.js');
     AuthService.exigirLogin();
 
@@ -597,16 +599,20 @@
     document.getElementById('nomeUsuario').textContent = AuthService.getNome();
     document.getElementById('badgePerfil').textContent = AuthService.getPerfil();
 
-    // ✅ Oculta botão "Usuários" para Jogadores (só Admin vê)
+    // Oculta botão Usuários para não-Admin
     AuthService.configurarVisibilidadeAdmin('linkAdmin');
 
     // Logout
-    document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout());
+    document.getElementById('btnLogout')
+        .addEventListener('click', () => AuthService.logout());
 
-    // 2️⃣ Toast — antes do controller
+    // 2️⃣ Toast — DEVE vir antes de qualquer controller
     await carregar('/js/ui/Toast.js');
 
-    // 3️⃣ Controller
+    // 3️⃣ AtaqueService — DEVE vir antes do DashboardController
+    await carregar('/js/services/AtaqueService.js');
+
+    // 4️⃣ DashboardController (depende de Toast + AtaqueService)
     await carregar('/js/controllers/DashboardController.js');
 </script>
 </body>
