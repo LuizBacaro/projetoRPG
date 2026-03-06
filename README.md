@@ -266,8 +266,7 @@ uvicorn app.main:app --reload --port 8000
 
 # 5. Acessa
 # http://127.0.0.1:8000  →  tela de login
-
-📡 Endpoints principais
+```
 
 ## 📡 Endpoints principais
 
@@ -311,14 +310,14 @@ Combatente
 Condicao
 └── id, nome, descricao, icone
 
-🌐 Deploy em Produção
+## 🌐 Deploy em Produção
 URLs
 Aplicação:  https://arena-de-combate-rpg.com.br
 API Docs:   https://arena-de-combate-rpg.com.br/docs
 Infraestrutura
 O fluxo de deploy em produção é configurado da seguinte forma: Registro.br (gerenciamento de domínio) → Cloudflare (DNS e CDN para performance e segurança) → Railway (hospedagem do backend FastAPI e do banco de dados PostgreSQL).
 
-Railway
+## Railway
 O deploy é automático a cada push na branch feature/salva. O Railway detecta as mudanças e reconstrói/redesplanta a aplicação.
 
 Variáveis de ambiente configuradas no Railway:
@@ -327,5 +326,6 @@ DATABASE_URL      → URL de conexão com o PostgreSQL (gerada automaticamente p
 PROJECT_NAME      → Arena de Combate TTRPG
 ALLOWED_ORIGINS   → ["https://arena-de-combate-rpg.com.br"]
 
-👤 Autor
+
+## 👤 Autor
 Luiz Salvador GitHub: @LuizBacaro
