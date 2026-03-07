@@ -459,33 +459,56 @@ export class ArenaController {
 
     _renderizarMagias(slots, tipo) {
         var isJogador = (tipo === 'jogador');
-        var html = '';
+        var self      = this;
+        var html      = '';
+
         html += '<div class="arena-secao">';
         html += '<h3 class="arena-secao-titulo">Controle de Magias</h3>';
-        html += '<div class="arena-magias-grid">';
-        for (var nivel = 0; nivel <= 9; nivel++) {
-            var slot = null;
-            for (var k = 0; k < slots.length; k++) {
-                if (slots[k].nivel === nivel) { slot = slots[k]; break; }
-            }
-            var total      = slot ? slot.total  : 0;
-            var usados     = slot ? slot.usados : 0;
-            var slotId     = slot ? slot.id     : null;
-            var disAumentar = (!isJogador || total === 0 || usados >= total) ? 'disabled' : '';
-            var disDiminuir = (!isJogador || total === 0 || usados <= 0)    ? 'disabled' : '';
-            var linhaClass  = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
+        html += '<div class="arena-magias-duas-colunas">';
 
-            html += '<div class="' + linhaClass + '" data-nivel="' + nivel + '">';
-            html += '<span class="arena-magia-nivel">NIV ' + nivel + '</span>';
-            html += '<div class="arena-magia-controle">';
-            html += '<button class="arena-magia-btn arena-magia-btn-diminuir" data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '" ' + disDiminuir + '>-</button>';
-            html += '<span class="arena-magia-valor" data-nivel="' + nivel + '">' + usados + '</span>';
-            html += '<button class="arena-magia-btn arena-magia-btn-aumentar" data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '" ' + disAumentar + '>+</button>';
-            html += '</div>';
-            html += '<span class="arena-magia-total">' + usados + '/' + total + '</span>';
-            html += '</div>';
+        // Coluna esquerda: NIV 0 → 4
+        html += '<div class="arena-magias-coluna">';
+        html += '<div class="arena-magias-coluna-titulo">NIV 0–4</div>';
+        for (var n1 = 0; n1 <= 4; n1++) {
+            html += self._renderizarMagiaLinha(slots, n1, isJogador);
         }
-        html += '</div></div>';
+        html += '</div>';
+
+        // Coluna direita: NIV 5 → 9
+        html += '<div class="arena-magias-coluna">';
+        html += '<div class="arena-magias-coluna-titulo">NIV 5–9</div>';
+        for (var n2 = 5; n2 <= 9; n2++) {
+            html += self._renderizarMagiaLinha(slots, n2, isJogador);
+        }
+        html += '</div>';
+
+        html += '</div>';
+        html += '</div>';
+        return html;
+    }
+    
+    _renderizarMagiaLinha(slots, nivel, isJogador) {
+        var slot = null;
+        for (var k = 0; k < slots.length; k++) {
+            if (slots[k].nivel === nivel) { slot = slots[k]; break; }
+        }
+        var total       = slot ? slot.total  : 0;
+        var usados      = slot ? slot.usados : 0;
+        var slotId      = slot ? slot.id     : null;
+        var disAumentar = (!isJogador || total === 0 || usados >= total) ? 'disabled' : '';
+        var disDiminuir = (!isJogador || total === 0 || usados <= 0)    ? 'disabled' : '';
+        var linhaClass  = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
+
+        var html = '';
+        html += '<div class="' + linhaClass + '" data-nivel="' + nivel + '">';
+        html += '<span class="arena-magia-nivel">NIV ' + nivel + '</span>';
+        html += '<div class="arena-magia-controle">';
+        html += '<button class="arena-magia-btn arena-magia-btn-diminuir" data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '" ' + disDiminuir + '>-</button>';
+        html += '<span class="arena-magia-valor" data-nivel="' + nivel + '">' + usados + '</span>';
+        html += '<button class="arena-magia-btn arena-magia-btn-aumentar" data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '" ' + disAumentar + '>+</button>';
+        html += '</div>';
+        html += '<span class="arena-magia-total">' + usados + '/' + total + '</span>';
+        html += '</div>';
         return html;
     }
 
