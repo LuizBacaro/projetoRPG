@@ -5,15 +5,16 @@ import { Toast              } from '../ui/Toast.js';
 export class ArenaController {
 
     constructor() {
-        this.combatenteService  = new CombatenteService();
-        this.condicaoController = new CondicaoController();
-        this.combatentes        = [];
-        this.turnoAtual         = 0;
-        this.rodadaAtual        = 1;
-        this.statsVisiveis      = false;
+        this.combatenteService   = new CombatenteService();
+        this.condicaoController  = new CondicaoController();
+        this.combatentes         = [];
+        this.turnoAtual          = 0;
+        this.rodadaAtual         = 1;
+        this.statsVisiveis       = false;
         this._cronometroSegundos = 0;
         this._cronometroInterval = null;
         this._cronometroAtivo    = false;
+        this._jaAgiram           = [];
         this._inicializar();
     }
 
@@ -44,6 +45,7 @@ export class ArenaController {
         this.turnoAtual          = 0;
         this.rodadaAtual         = 1;
         this.statsVisiveis       = false;
+        this._jaAgiram           = [];
         this._cronometroSegundos = 0;
         this._pararCronometro();
         this._iniciarCronometro();
@@ -53,10 +55,16 @@ export class ArenaController {
     }
 
     avancarTurno() {
+        var idAtual = this.combatentes[this.turnoAtual] ? this.combatentes[this.turnoAtual].id : null;
+        if (idAtual !== null && this._jaAgiram.indexOf(idAtual) === -1) {
+            this._jaAgiram.push(idAtual);
+        }
+
         this.turnoAtual++;
         if (this.turnoAtual >= this.combatentes.length) {
-            this.turnoAtual = 0;
+            this.turnoAtual  = 0;
             this.rodadaAtual++;
+            this._jaAgiram   = [];
             this.atualizarRodada();
             Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
         }
@@ -81,7 +89,7 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
-    // ─── Cronometro ───────────────────────────────────
+    // ─── Cronometro ────────────────────────────────────────
 
     _iniciarCronometro() {
         var self = this;
@@ -118,10 +126,10 @@ export class ArenaController {
     }
 
     _formatarTempo(segundos) {
-        var h = Math.floor(segundos / 3600);
-        var m = Math.floor((segundos % 3600) / 60);
-        var s = segundos % 60;
-        var hh = h > 0 ? (h < 10 ? '0' + h + ':' : h + ':') : '';
+        var h  = Math.floor(segundos / 3600);
+        var m  = Math.floor((segundos % 3600) / 60);
+        var s  = segundos % 60;
+        var hh = h > 0 ? ((h < 10 ? '0' + h : '' + h) + ':') : '';
         var mm = m < 10 ? '0' + m : '' + m;
         var ss = s < 10 ? '0' + s : '' + s;
         return hh + mm + ':' + ss;
@@ -136,12 +144,10 @@ export class ArenaController {
         var btn = document.getElementById('btnToggleCronometro');
         if (!btn) return;
         btn.textContent = this._cronometroAtivo ? 'Pausar' : 'Retomar';
-        btn.className   = this._cronometroAtivo
-            ? 'btn-cronometro btn-cronometro-pausar'
-            : 'btn-cronometro btn-cronometro-retomar';
+        btn.className   = 'btn-cronometro ' + (this._cronometroAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar');
     }
 
-    // ─── Render: Ordem de Iniciativa ──────────────────
+    // ─── Render: Ordem de Iniciativa ───────────────────────
 
     renderizarOrdemIniciativa() {
         var container = document.getElementById('ordemIniciativaContainer');
@@ -149,16 +155,24 @@ export class ArenaController {
         var self = this;
         var html = '';
         for (var i = 0; i < this.combatentes.length; i++) {
-            var c     = this.combatentes[i];
-            var ativo = (i === this.turnoAtual);
-            var hpPct = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
-            var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
-            var morto = (c.hp_atual <= 0);
-            var cls   = 'combatente-ordem-item' + (ativo ? ' ativo' : '') + (morto ? ' morto' : '');
+            var c      = this.combatentes[i];
+            var ativo  = (i === this.turnoAtual);
+            var jaAgiu = (this._jaAgiram.indexOf(c.id) !== -1);
+            var hpPct  = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
+            var hpCor  = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
+            var morto  = (c.hp_atual <= 0);
+            var cls    = 'combatente-ordem-item';
+            if (ativo)  cls += ' ativo';
+            if (morto)  cls += ' morto';
+            if (jaAgiu) cls += ' ja-agiu';
+
             html += '<div class="' + cls + '" data-combatente-id="' + c.id + '">';
             html += '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>';
             html += '<div class="ordem-info">';
+            html += '<div class="ordem-nome-linha">';
             html += '<span class="ordem-nome">' + c.nome + '</span>';
+            if (jaAgiu) html += '<span class="ordem-agiu-badge">✓</span>';
+            html += '</div>';
             html += '<div class="ordem-hp-bar">';
             html += '<div class="ordem-hp-fill" style="width:' + hpPct + '%;background:' + hpCor + ';"></div>';
             html += '</div>';
@@ -198,7 +212,7 @@ export class ArenaController {
             : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
     }
 
-    // ─── Render: Combatente Ativo ─────────────────────
+    // ─── Render: Combatente Ativo ───────────────────────────
 
     renderizarCombatenteAtivo() {
         var container = document.getElementById('combatenteAtivoContainer');
@@ -263,9 +277,13 @@ export class ArenaController {
             ? '<img src="' + c.foto_url + '" alt="' + c.nome + '">'
             : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
 
+        var cronAtivo = this._cronometroAtivo;
+        var tempoAtual = this._formatarTempo(this._cronometroSegundos);
+
         var html = '';
         html += '<div class="arena-card">';
 
+        // Topo
         html += '<div class="arena-topo">';
         html += '<div class="arena-foto-nome">';
         html += '<div class="arena-foto">' + fotoTopo + '</div>';
@@ -279,17 +297,24 @@ export class ArenaController {
         html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
         html += '</div></div>';
 
+        // Cronometro
         html += '<div class="arena-cronometro-bar">';
+        html += '<div class="arena-cronometro-esquerda">';
+        html += '<div class="arena-cronometro-icone">⏱</div>';
         html += '<div class="arena-cronometro-info">';
-        html += '<span class="arena-cronometro-label">Sessao</span>';
-        html += '<span class="arena-cronometro-display" id="cronometroDisplay">' + this._formatarTempo(this._cronometroSegundos) + '</span>';
+        html += '<span class="arena-cronometro-label">Tempo de Sessao</span>';
+        html += '<span class="arena-cronometro-display ' + (cronAtivo ? 'cronometro-ativo' : 'cronometro-pausado') + '" id="cronometroDisplay">' + tempoAtual + '</span>';
+        html += '</div>';
         html += '</div>';
         html += '<div class="arena-cronometro-acoes">';
-        html += '<button id="btnToggleCronometro" class="btn-cronometro ' + (this._cronometroAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar') + '" onclick="window._toggleCronometro()">' + (this._cronometroAtivo ? 'Pausar' : 'Retomar') + '</button>';
-        html += '<button class="btn-cronometro btn-cronometro-reset" onclick="window._resetarCronometro()">Zerar</button>';
+        html += '<button id="btnToggleCronometro" class="btn-cronometro ' + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar') + '" onclick="window._toggleCronometro()">';
+        html += cronAtivo ? '⏸ Pausar' : '▶ Retomar';
+        html += '</button>';
+        html += '<button class="btn-cronometro btn-cronometro-reset" onclick="window._resetarCronometro()">↺ Zerar</button>';
         html += '</div>';
         html += '</div>';
 
+        // Stats
         html += '<div class="arena-stats-linha">';
         html += '<div class="arena-stat-box arena-stat-pv">';
         html += '<span class="arena-stat-label">PV</span>';
@@ -301,6 +326,7 @@ export class ArenaController {
         html += '<div class="arena-stat-box arena-stat-toque"><span class="arena-stat-label">Toque</span><span class="' + tClasse + '">' + tValor + '</span></div>';
         html += '</div>';
 
+        // Grade central
         html += '<div class="arena-grade-central">';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Atributos</h3><div class="arena-atributos-grid">' + atributosHTML + '</div></div>';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Resistencias</h3><div class="arena-resistencias-lista">';
@@ -316,6 +342,7 @@ export class ArenaController {
         html += '<button class="arena-btn-proximo"   onclick="window._avancarTurno()">Encerrar turno</button>';
         html += '</div></div>';
 
+        // Linha inferior
         html += '<div class="arena-linha-inferior">';
         html += ataquesHTML;
         html += magiasHTML;
@@ -326,13 +353,13 @@ export class ArenaController {
         container.innerHTML = html;
 
         var self = this;
-        window._abrirDanoCura    = function() { if (typeof modalDanoCuraInstance !== 'undefined') modalDanoCuraInstance.abrir(self.combatentes); };
-        window._abrirCondicao    = function() { if (typeof modalCondicaoInstance !== 'undefined') modalCondicaoInstance.abrir(); else console.error('modalCondicaoInstance nao inicializado'); };
-        window._toggleStats      = function() { self.toggleVisibilidadeStats(); };
-        window._avancarTurno     = function() { self.avancarTurno(); };
-        window._finalizarCombate = function() { self.finalizarCombate(); };
-        window._toggleCronometro = function() { self.toggleCronometro(); };
-        window._resetarCronometro= function() { self._resetarCronometro(); self._iniciarCronometro(); };
+        window._abrirDanoCura     = function() { if (typeof modalDanoCuraInstance !== 'undefined') modalDanoCuraInstance.abrir(self.combatentes); };
+        window._abrirCondicao     = function() { if (typeof modalCondicaoInstance !== 'undefined') modalCondicaoInstance.abrir(); else console.error('modalCondicaoInstance nao inicializado'); };
+        window._toggleStats       = function() { self.toggleVisibilidadeStats(); };
+        window._avancarTurno      = function() { self.avancarTurno(); };
+        window._finalizarCombate  = function() { self.finalizarCombate(); };
+        window._toggleCronometro  = function() { self.toggleCronometro(); };
+        window._resetarCronometro = function() { self._resetarCronometro(); self._iniciarCronometro(); };
 
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
     }
@@ -411,6 +438,7 @@ export class ArenaController {
         this.turnoAtual    = 0;
         this.rodadaAtual   = 1;
         this.statsVisiveis = false;
+        this._jaAgiram     = [];
         this._resetarCronometro();
         this._iniciarCronometro();
         this.atualizarRodada();
