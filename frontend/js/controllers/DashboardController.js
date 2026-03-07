@@ -10,33 +10,36 @@ class DashboardController {
     }
 
     _registrarGlobais() {
-        window.fecharModalCadastro        = function() { _dc._fecharModal('modalCadastroJogador'); };
-        window.fecharModalCadastroMonstro = function() { _dc._fecharModal('modalCadastroMonstro'); };
-        window.fecharModalCadastroNPC     = function() { _dc._fecharModal('modalCadastroNPC'); };
-        window.fecharSeletorTipo          = function() { _dc._fecharModal('seletorTipo'); };
-        window.fecharModalEdicao          = function() { _dc._fecharModal('modalEdicaoDashboard'); };
+        var self = this;
+        window.fecharModalCadastro        = function() { self._fecharModal('modalCadastroJogador'); };
+        window.fecharModalCadastroMonstro = function() { self._fecharModal('modalCadastroMonstro'); };
+        window.fecharModalCadastroNPC     = function() { self._fecharModal('modalCadastroNPC'); };
+        window.fecharSeletorTipo          = function() { self._fecharModal('seletorTipo'); };
+        window.fecharModalEdicao          = function() { self._fecharModal('modalEdicaoDashboard'); };
 
         window.abrirModalCadastro = function(tipo) {
-            _dc._fecharModal('seletorTipo');
-            var mapa = { jogador: 'modalCadastroJogador', monstro: 'modalCadastroMonstro', npc: 'modalCadastroNPC' };
-            _dc._abrirModal(mapa[tipo]);
+            self._fecharModal('seletorTipo');
+            var mapa = {
+                jogador: 'modalCadastroJogador',
+                monstro: 'modalCadastroMonstro',
+                npc:     'modalCadastroNPC'
+            };
+            self._abrirModal(mapa[tipo]);
         };
 
-        window.confirmarDelecao     = function() { _dc._deletarCombatente(); };
-        window.atualizarModificador = function(input) { _dc._calcularModificador(input); };
+        window.confirmarDelecao     = function() { self._deletarCombatente(); };
+        window.atualizarModificador = function(input) { self._calcularModificador(input); };
 
-        window.previewImagemUpload  = function(input, previewId, imgId, placeholderId) {
-            _dc._previewImagem(input, previewId, imgId, placeholderId);
+        window.previewImagemUpload = function(input, previewId, imgId, placeholderId) {
+            self._previewImagem(input, previewId, imgId, placeholderId);
         };
-        window.removerImagem        = function() { _dc._removerImagem('', false); };
-        window.removerImagemMonstro = function() { _dc._removerImagem('Monstro', false); };
-        window.removerImagemNPC     = function() { _dc._removerImagem('NPC', false); };
-        window.removerImagemEdicao  = function() { _dc._removerImagem('', true); };
+        window.removerImagem        = function() { self._removerImagem('', false); };
+        window.removerImagemMonstro = function() { self._removerImagem('Monstro', false); };
+        window.removerImagemNPC     = function() { self._removerImagem('NPC', false); };
+        window.removerImagemEdicao  = function() { self._removerImagem('', true); };
 
-        window.adicionarLinhaAtaque = function() { _dc._adicionarLinhaAtaque(); };
+        window.adicionarLinhaAtaque = function() { self._adicionarLinhaAtaque(); };
         window.removerLinhaAtaque   = function(btn) { btn.closest('.ataque-linha').remove(); };
-
-        window._dc = this;
     }
 
     _inicializar() {
@@ -79,7 +82,7 @@ class DashboardController {
 
     _configurarBotaoNovo() {
         var self = this;
-        var btn = document.getElementById('btnNovoCombatente');
+        var btn  = document.getElementById('btnNovoCombatente');
         if (btn) btn.addEventListener('click', function() { self._abrirModal('seletorTipo'); });
     }
 
@@ -88,7 +91,11 @@ class DashboardController {
         var form = document.getElementById(formId);
         if (!form) { console.error('Form nao encontrado: ' + formId); return; }
 
-        var textos = { jogador: 'Cadastrar Jogador', monstro: 'Cadastrar Monstro', npc: 'Cadastrar NPC' };
+        var textos = {
+            jogador: 'Cadastrar Jogador',
+            monstro: 'Cadastrar Monstro',
+            npc:     'Cadastrar NPC'
+        };
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -143,7 +150,7 @@ class DashboardController {
     }
 
     _configurarUpload(sufixo) {
-        var self = this;
+        var self  = this;
         var input = document.getElementById('inputFoto' + sufixo);
         if (!input) return;
         input.addEventListener('change', function() {
@@ -163,7 +170,12 @@ class DashboardController {
         if (!area || !input) return;
         area.addEventListener('click', function() { input.click(); });
         input.addEventListener('change', function() {
-            self._previewImagem(input, 'dashEditUploadPreview', 'dashEditPreviewImage', 'dashEditUploadPlaceholder');
+            self._previewImagem(
+                input,
+                'dashEditUploadPreview',
+                'dashEditPreviewImage',
+                'dashEditUploadPlaceholder'
+            );
         });
     }
 
@@ -202,7 +214,6 @@ class DashboardController {
             rows += '</td></tr>';
         }
         tbody.innerHTML = rows;
-
         tbody.querySelectorAll('[data-acao="editar"]').forEach(function(btn) {
             btn.addEventListener('click', function() { self._abrirEdicao(parseInt(btn.dataset.id)); });
         });
@@ -314,7 +325,7 @@ class DashboardController {
         if (!lista) return;
         lista.innerHTML = '';
         if (!ataques.length) { this._adicionarLinhaAtaque(); return; }
-        for (var nivel = 0; nivel <= 9; nivel++) { this._adicionarLinhaAtaque(ataques[i]); }
+        for (var i = 0; i < ataques.length; i++) { this._adicionarLinhaAtaque(ataques[i]); }
     }
 
     _adicionarLinhaAtaque(ataque) {
@@ -323,10 +334,10 @@ class DashboardController {
         var div     = document.createElement('div');
         div.className = 'ataque-linha';
         div.innerHTML =
-            '<input type="text" class="ataque-nome"  placeholder="Nome" value="' + (ataque && ataque.nome         ? ataque.nome         : '') + '" />' +
-            '<input type="text" class="ataque-bonus" placeholder="+0"   value="' + (ataque && ataque.bonus_ataque ? ataque.bonus_ataque : '+0') + '" style="width:70px" />' +
-            '<input type="text" class="ataque-dano"  placeholder="1d6"  value="' + (ataque && ataque.dano         ? ataque.dano         : '') + '" style="width:90px" />' +
-            '<input type="text" class="ataque-tipo"  placeholder="tipo" value="' + (ataque && ataque.tipo_dano   ? ataque.tipo_dano   : '') + '" style="width:120px" />' +
+            '<input type="text" class="ataque-nome"  placeholder="Nome" value="'  + (ataque && ataque.nome         ? ataque.nome         : '') + '" />' +
+            '<input type="text" class="ataque-bonus" placeholder="+0"   value="'  + (ataque && ataque.bonus_ataque ? ataque.bonus_ataque : '+0') + '" style="width:70px" />' +
+            '<input type="text" class="ataque-dano"  placeholder="1d6"  value="'  + (ataque && ataque.dano         ? ataque.dano         : '') + '" style="width:90px" />' +
+            '<input type="text" class="ataque-tipo"  placeholder="tipo" value="'  + (ataque && ataque.tipo_dano   ? ataque.tipo_dano   : '') + '" style="width:120px" />' +
             '<button type="button" class="btn-dash-delete" style="padding:.3rem .6rem;font-size:.8rem" onclick="removerLinhaAtaque(this)">x</button>';
         lista.appendChild(div);
     }
@@ -352,7 +363,7 @@ class DashboardController {
         var container = document.getElementById('gridMagiasEdicao');
         if (!container) return;
         var html = '';
-        for (var k = 0; k < slots.length; k++) {
+        for (var nivel = 0; nivel <= 9; nivel++) {
             var slot  = null;
             for (var k = 0; k < slots.length; k++) {
                 if (slots[k].nivel === nivel) { slot = slots[k]; break; }
@@ -370,7 +381,11 @@ class DashboardController {
     _coletarMagiasEdicao() {
         return Array.from(document.querySelectorAll('#gridMagiasEdicao .magia-total-input'))
             .map(function(input) {
-                return { nivel: parseInt(input.dataset.nivel), total: parseInt(input.value) || 0, usados: 0 };
+                return {
+                    nivel:  parseInt(input.dataset.nivel),
+                    total:  parseInt(input.value) || 0,
+                    usados: 0
+                };
             });
     }
 
