@@ -57,7 +57,7 @@ class Combatente(Base):
         return f"<Combatente(id={self.id}, nome='{self.nome}', tipo='{self.tipo}')>"
 
     def esta_vivo(self)     -> bool: return self.hp_atual > 0
-    def esta_critico(self)  -> bool: return self.hp_atual &lt; self.hp_maximo * 0.25
+    def esta_critico(self)  -> bool: return self.hp_atual < self.hp_maximo * 0.25
     def aplicar_dano(self, dano: int)  -> int:
         self.hp_atual = max(0, self.hp_atual - dano); return self.hp_atual
     def curar(self, cura: int)         -> int:

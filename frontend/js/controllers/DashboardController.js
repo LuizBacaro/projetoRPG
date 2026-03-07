@@ -5,8 +5,13 @@ class DashboardController {
         this.ataqueService      = new AtaqueService();
         this.filtroAtual        = 'todos';
         this.combatenteEmEdicao = null;
+        this.perfil             = (typeof AuthService !== 'undefined') ? AuthService.getPerfil() : 'mestre';
         this._registrarGlobais();
         this._inicializar();
+    }
+
+    _isMestre() {
+        return this.perfil === 'mestre' || this.perfil === 'administrador';
     }
 
     _registrarGlobais() {
@@ -18,6 +23,10 @@ class DashboardController {
         window.fecharModalEdicao          = function() { self._fecharModal('modalEdicaoDashboard'); };
 
         window.abrirModalCadastro = function(tipo) {
+            if (!self._isMestre() && (tipo === 'monstro' || tipo === 'npc')) {
+                Toast.error('Acesso restrito: apenas Mestre ou Administrador pode cadastrar monstros e NPCs.');
+                return;
+            }
             self._fecharModal('seletorTipo');
             var mapa = {
                 jogador: 'modalCadastroJogador',
@@ -43,6 +52,7 @@ class DashboardController {
     }
 
     _inicializar() {
+        this._aplicarRestricoesPerfil();
         this._configurarAbas();
         this._configurarFiltros();
         this._configurarBotaoNovo();
@@ -55,6 +65,31 @@ class DashboardController {
         this._configurarUpload('NPC');
         this._configurarUploadEdicao();
         this.carregarCombatentes();
+    }
+
+    _aplicarRestricoesPerfil() {
+        if (this._isMestre()) return;
+
+        // Jogador: oculta filtros de monstro e NPC
+        var filtroMonstro = document.querySelector('.filter-btn[data-tipo="monstro"]');
+        var filtroNPC     = document.querySelector('.filter-btn[data-tipo="npc"]');
+        if (filtroMonstro) filtroMonstro.style.display = 'none';
+        if (filtroNPC)     filtroNPC.style.display     = 'none';
+
+        // Jogador: oculta contadores de monstro e NPC no resumo
+        var boxMonstros = document.getElementById('totalMonstros');
+        var boxNPCs     = document.getElementById('totalNPCs');
+        if (boxMonstros) boxMonstros.closest('.resumo-box') && (boxMonstros.closest('.resumo-box').style.display = 'none');
+        if (boxNPCs)     boxNPCs.closest('.resumo-box')     && (boxNPCs.closest('.resumo-box').style.display     = 'none');
+
+        // Jogador: oculta botoes de monstro/NPC no seletor de tipo
+        var btnMonstro = document.querySelector('[onclick*="monstro"]');
+        var btnNPC     = document.querySelector('[onclick*="npc"]');
+        if (btnMonstro) btnMonstro.style.display = 'none';
+        if (btnNPC)     btnNPC.style.display     = 'none';
+
+        // Jogador: define filtro padrao como jogador
+        this.filtroAtual = 'jogador';
     }
 
     _configurarAbas() {
@@ -72,6 +107,7 @@ class DashboardController {
         var self = this;
         document.querySelectorAll('.filter-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
+                if (!self._isMestre() && (btn.dataset.tipo === 'monstro' || btn.dataset.tipo === 'npc')) return;
                 document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
                 btn.classList.add('active');
                 self.filtroAtual = btn.dataset.tipo;
@@ -154,12 +190,7 @@ class DashboardController {
         var input = document.getElementById('inputFoto' + sufixo);
         if (!input) return;
         input.addEventListener('change', function() {
-            self._previewImagem(
-                input,
-                'uploadPreview'     + sufixo,
-                'previewImage'      + sufixo,
-                'uploadPlaceholder' + sufixo
-            );
+            self._previewImagem(input, 'uploadPreview' + sufixo, 'previewImage' + sufixo, 'uploadPlaceholder' + sufixo);
         });
     }
 
@@ -170,18 +201,22 @@ class DashboardController {
         if (!area || !input) return;
         area.addEventListener('click', function() { input.click(); });
         input.addEventListener('change', function() {
-            self._previewImagem(
-                input,
-                'dashEditUploadPreview',
-                'dashEditPreviewImage',
-                'dashEditUploadPlaceholder'
-            );
+            self._previewImagem(input, 'dashEditUploadPreview', 'dashEditPreviewImage', 'dashEditUploadPlaceholder');
         });
     }
 
     async carregarCombatentes() {
         try {
-            var tipo        = this.filtroAtual === 'todos' ? null : this.filtroAtual;
+            var tipo = this.filtroAtual === 'todos' ? null : this.filtroAtual;
+
+            // Jogador: nunca carrega monstros nem NPCs
+            if (!this._isMestre() && (tipo === 'monstro' || tipo === 'npc')) {
+                tipo = 'jogador';
+            }
+            if (!this._isMestre() && tipo === null) {
+                tipo = 'jogador';
+            }
+
             var combatentes = await this.service.listar(tipo);
             this._renderizarTabela(combatentes);
             this._atualizarResumo(combatentes);
@@ -210,28 +245,43 @@ class DashboardController {
             rows += '<td>' + c.iniciativa + '</td>';
             rows += '<td>';
             rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="editar" title="Editar">✏️</button>';
-            rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="excluir" title="Excluir">🗑️</button>';
+            if (self._isMestre()) {
+                rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="excluir" title="Excluir">🗑️</button>';
+            }
             rows += '</td></tr>';
         }
         tbody.innerHTML = rows;
         tbody.querySelectorAll('[data-acao="editar"]').forEach(function(btn) {
             btn.addEventListener('click', function() { self._abrirEdicao(parseInt(btn.dataset.id)); });
         });
-        tbody.querySelectorAll('[data-acao="excluir"]').forEach(function(btn) {
-            btn.addEventListener('click', function() { self._excluirCombatente(parseInt(btn.dataset.id)); });
-        });
+        if (self._isMestre()) {
+            tbody.querySelectorAll('[data-acao="excluir"]').forEach(function(btn) {
+                btn.addEventListener('click', function() { self._excluirCombatente(parseInt(btn.dataset.id)); });
+            });
+        }
     }
 
     _atualizarResumo(combatentes) {
-        document.getElementById('totalGeral').textContent     = combatentes.length;
-        document.getElementById('totalJogadores').textContent = combatentes.filter(function(c) { return c.tipo === 'jogador'; }).length;
-        document.getElementById('totalMonstros').textContent  = combatentes.filter(function(c) { return c.tipo === 'monstro'; }).length;
-        document.getElementById('totalNPCs').textContent      = combatentes.filter(function(c) { return c.tipo === 'npc'; }).length;
+        var totalEl     = document.getElementById('totalGeral');
+        var jogEl       = document.getElementById('totalJogadores');
+        var monEl       = document.getElementById('totalMonstros');
+        var npcEl       = document.getElementById('totalNPCs');
+        if (totalEl) totalEl.textContent = combatentes.length;
+        if (jogEl)   jogEl.textContent   = combatentes.filter(function(c) { return c.tipo === 'jogador'; }).length;
+        if (monEl)   monEl.textContent   = combatentes.filter(function(c) { return c.tipo === 'monstro'; }).length;
+        if (npcEl)   npcEl.textContent   = combatentes.filter(function(c) { return c.tipo === 'npc'; }).length;
     }
 
     async _abrirEdicao(id) {
         try {
             var c = await this.service.obterPorId(id);
+
+            // Jogador nao pode editar monstro ou NPC
+            if (!this._isMestre() && (c.tipo === 'monstro' || c.tipo === 'npc')) {
+                Toast.error('Acesso restrito: voce nao pode editar monstros ou NPCs.');
+                return;
+            }
+
             this.combatenteEmEdicao = c;
 
             document.getElementById('dashEditId').value         = c.id;
@@ -286,6 +336,10 @@ class DashboardController {
                 this._renderizarMagiasEdicao (c.magias_slots || []);
             }
 
+            // Jogador nao pode deletar — oculta botao
+            var btnDeletar = document.getElementById('btnDeletarCombatente');
+            if (btnDeletar) btnDeletar.style.display = this._isMestre() ? 'inline-flex' : 'none';
+
             this._abrirModal('modalEdicaoDashboard');
         } catch (err) {
             Toast.error('Erro ao carregar combatente');
@@ -294,6 +348,7 @@ class DashboardController {
     }
 
     async _excluirCombatente(id) {
+        if (!this._isMestre()) { Toast.error('Acesso restrito.'); return; }
         if (!confirm('Deseja excluir este combatente?')) return;
         try {
             await this.service.deletar(id);
@@ -306,8 +361,9 @@ class DashboardController {
     }
 
     async _deletarCombatente() {
+        if (!this._isMestre()) { Toast.error('Acesso restrito.'); return; }
         if (!this.combatenteEmEdicao) return;
-        if (!confirm('Deletar ' + this.combatenteEmEdicao.nome + '? Esta acao nao pode ser desfeita.')) return;
+        if (!confirm('Deletar ' + this.combatenteEmEdicao.nome + '?')) return;
         try {
             await this.service.deletar(this.combatenteEmEdicao.id);
             Toast.success('Combatente deletado!');
@@ -331,14 +387,14 @@ class DashboardController {
     _adicionarLinhaAtaque(ataque) {
         var lista = document.getElementById('listaAtaquesEdicao');
         if (!lista) return;
-        var div     = document.createElement('div');
+        var div = document.createElement('div');
         div.className = 'ataque-linha';
         div.innerHTML =
-            '<input type="text" class="ataque-nome"  placeholder="Nome" value="'  + (ataque && ataque.nome         ? ataque.nome         : '') + '" />' +
-            '<input type="text" class="ataque-bonus" placeholder="+0"   value="'  + (ataque && ataque.bonus_ataque ? ataque.bonus_ataque : '+0') + '" style="width:70px" />' +
-            '<input type="text" class="ataque-dano"  placeholder="1d6"  value="'  + (ataque && ataque.dano         ? ataque.dano         : '') + '" style="width:90px" />' +
-            '<input type="text" class="ataque-tipo"  placeholder="tipo" value="'  + (ataque && ataque.tipo_dano   ? ataque.tipo_dano   : '') + '" style="width:120px" />' +
-            '<button type="button" class="btn-dash-delete" style="padding:.3rem .6rem;font-size:.8rem" onclick="removerLinhaAtaque(this)">x</button>';
+            '<input type="text" class="ataque-nome"  placeholder="Nome"  value="' + (ataque && ataque.nome         ? ataque.nome         : '') + '" />' +
+            '<input type="text" class="ataque-bonus" placeholder="+0"    value="' + (ataque && ataque.bonus_ataque ? ataque.bonus_ataque : '+0') + '" style="width:70px" />' +
+            '<input type="text" class="ataque-dano"  placeholder="1d6"   value="' + (ataque && ataque.dano         ? ataque.dano         : '') + '" style="width:90px" />' +
+            '<input type="text" class="ataque-tipo"  placeholder="tipo"  value="' + (ataque && ataque.tipo_dano   ? ataque.tipo_dano   : '') + '" style="width:120px" />' +
+            '<button type="button" class="btn-dash-delete" onclick="removerLinhaAtaque(this)">x</button>';
         lista.appendChild(div);
     }
 
@@ -372,7 +428,7 @@ class DashboardController {
             html += '<div class="magia-edicao-linha">';
             html += '<span class="magia-nivel-label">Nivel ' + nivel + '</span>';
             html += '<div style="flex:1">';
-            html += '<input type="number" class="magia-total-input" data-nivel="' + nivel + '" value="' + total + '" min="0" max="20" placeholder="Total de slots" style="width:100%;padding:.4rem .6rem;border-radius:.35rem;border:1px solid #334155;background:#0f0f23;color:#e2e8f0;font-size:.85rem;box-sizing:border-box" />';
+            html += '<input type="number" class="magia-total-input" data-nivel="' + nivel + '" value="' + total + '" min="0" max="20" style="width:100%;padding:.4rem .6rem;border-radius:.35rem;border:1px solid #334155;background:#0f0f23;color:#e2e8f0;font-size:.85rem;box-sizing:border-box" />';
             html += '</div></div>';
         }
         container.innerHTML = html;
@@ -381,11 +437,7 @@ class DashboardController {
     _coletarMagiasEdicao() {
         return Array.from(document.querySelectorAll('#gridMagiasEdicao .magia-total-input'))
             .map(function(input) {
-                return {
-                    nivel:  parseInt(input.dataset.nivel),
-                    total:  parseInt(input.value) || 0,
-                    usados: 0
-                };
+                return { nivel: parseInt(input.dataset.nivel), total: parseInt(input.value) || 0, usados: 0 };
             });
     }
 

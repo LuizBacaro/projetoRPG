@@ -425,3 +425,73 @@
 
 .arena-futuro-secao       { min-height: 60px; display: flex; align-items: center; justify-content: center; }
 .arena-futuro-placeholder { color: rgba(255,255,255,0.2); font-style: italic; font-size: 0.78rem; text-align: center; }
+
+.arena-cronometro-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    border: 1px solid #334155;
+    border-radius: .5rem;
+    padding: .6rem 1rem;
+    margin-bottom: .75rem;
+    gap: 1rem;
+}
+
+.arena-cronometro-info {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.arena-cronometro-label {
+    color: #64748b;
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.arena-cronometro-display {
+    color: #f8fafc;
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    letter-spacing: .1em;
+    min-width: 90px;
+}
+
+.arena-cronometro-acoes {
+    display: flex;
+    gap: .5rem;
+}
+
+.btn-cronometro {
+    padding: .35rem .85rem;
+    border-radius: .4rem;
+    border: none;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.btn-cronometro-pausar {
+    background: #d97706;
+    color: #fff;
+}
+
+.btn-cronometro-retomar {
+    background: #059669;
+    color: #fff;
+}
+
+.btn-cronometro-reset {
+    background: #334155;
+    color: #94a3b8;
+}
+
+.btn-cronometro:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}

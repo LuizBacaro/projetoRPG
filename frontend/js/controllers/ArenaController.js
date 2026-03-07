@@ -11,15 +11,18 @@ export class ArenaController {
         this.turnoAtual         = 0;
         this.rodadaAtual        = 1;
         this.statsVisiveis      = false;
+        this._cronometroSegundos = 0;
+        this._cronometroInterval = null;
+        this._cronometroAtivo    = false;
         this._inicializar();
     }
 
     _inicializar() {
         this.condicaoController.init();
-        this.configurarEventos();
+        this._configurarEventos();
     }
 
-    configurarEventos() {
+    _configurarEventos() {
         var self = this;
         document.addEventListener('iniciarCombate', function(e) {
             if (e.detail && e.detail.combatentes) {
@@ -38,9 +41,12 @@ export class ArenaController {
         this.combatentes = combatentes.sort(function(a, b) {
             return b.iniciativa - a.iniciativa;
         });
-        this.turnoAtual    = 0;
-        this.rodadaAtual   = 1;
-        this.statsVisiveis = false;
+        this.turnoAtual          = 0;
+        this.rodadaAtual         = 1;
+        this.statsVisiveis       = false;
+        this._cronometroSegundos = 0;
+        this._pararCronometro();
+        this._iniciarCronometro();
         this.atualizarRodada();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
@@ -74,6 +80,68 @@ export class ArenaController {
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
+
+    // ─── Cronometro ───────────────────────────────────
+
+    _iniciarCronometro() {
+        var self = this;
+        this._cronometroAtivo    = true;
+        this._cronometroInterval = setInterval(function() {
+            self._cronometroSegundos++;
+            self._atualizarDisplayCronometro();
+        }, 1000);
+        this._atualizarDisplayCronometro();
+        this._atualizarBotaoCronometro();
+    }
+
+    _pararCronometro() {
+        if (this._cronometroInterval) {
+            clearInterval(this._cronometroInterval);
+            this._cronometroInterval = null;
+        }
+        this._cronometroAtivo = false;
+        this._atualizarBotaoCronometro();
+    }
+
+    _resetarCronometro() {
+        this._pararCronometro();
+        this._cronometroSegundos = 0;
+        this._atualizarDisplayCronometro();
+    }
+
+    toggleCronometro() {
+        if (this._cronometroAtivo) {
+            this._pararCronometro();
+        } else {
+            this._iniciarCronometro();
+        }
+    }
+
+    _formatarTempo(segundos) {
+        var h = Math.floor(segundos / 3600);
+        var m = Math.floor((segundos % 3600) / 60);
+        var s = segundos % 60;
+        var hh = h > 0 ? (h < 10 ? '0' + h + ':' : h + ':') : '';
+        var mm = m < 10 ? '0' + m : '' + m;
+        var ss = s < 10 ? '0' + s : '' + s;
+        return hh + mm + ':' + ss;
+    }
+
+    _atualizarDisplayCronometro() {
+        var el = document.getElementById('cronometroDisplay');
+        if (el) el.textContent = this._formatarTempo(this._cronometroSegundos);
+    }
+
+    _atualizarBotaoCronometro() {
+        var btn = document.getElementById('btnToggleCronometro');
+        if (!btn) return;
+        btn.textContent = this._cronometroAtivo ? 'Pausar' : 'Retomar';
+        btn.className   = this._cronometroAtivo
+            ? 'btn-cronometro btn-cronometro-pausar'
+            : 'btn-cronometro btn-cronometro-retomar';
+    }
+
+    // ─── Render: Ordem de Iniciativa ──────────────────
 
     renderizarOrdemIniciativa() {
         var container = document.getElementById('ordemIniciativaContainer');
@@ -109,7 +177,7 @@ export class ArenaController {
         var i = 0;
         function next() {
             if (i >= self.combatentes.length) return;
-            var c = self.combatentes[i++];
+            var c  = self.combatentes[i++];
             var el = document.querySelector('.combatente-ordem-item[data-combatente-id="' + c.id + '"]');
             if (el) {
                 self.condicaoController.atualizarBadgesOrdem(el, c.id).then(next);
@@ -125,12 +193,12 @@ export class ArenaController {
         if (!container) return;
         var c = this.combatentes[this.turnoAtual];
         if (!c) { container.innerHTML = ''; return; }
-        if (c.foto_url) {
-            container.innerHTML = '<img src="' + c.foto_url + '" alt="' + c.nome + '" style="width:100%;height:100%;object-fit:cover;">';
-        } else {
-            container.innerHTML = '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
-        }
+        container.innerHTML = c.foto_url
+            ? '<img src="' + c.foto_url + '" alt="' + c.nome + '" style="width:100%;height:100%;object-fit:cover;">'
+            : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
     }
+
+    // ─── Render: Combatente Ativo ─────────────────────
 
     renderizarCombatenteAtivo() {
         var container = document.getElementById('combatenteAtivoContainer');
@@ -197,6 +265,7 @@ export class ArenaController {
 
         var html = '';
         html += '<div class="arena-card">';
+
         html += '<div class="arena-topo">';
         html += '<div class="arena-foto-nome">';
         html += '<div class="arena-foto">' + fotoTopo + '</div>';
@@ -209,6 +278,17 @@ export class ArenaController {
         html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoTxt + '</button>';
         html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
         html += '</div></div>';
+
+        html += '<div class="arena-cronometro-bar">';
+        html += '<div class="arena-cronometro-info">';
+        html += '<span class="arena-cronometro-label">Sessao</span>';
+        html += '<span class="arena-cronometro-display" id="cronometroDisplay">' + this._formatarTempo(this._cronometroSegundos) + '</span>';
+        html += '</div>';
+        html += '<div class="arena-cronometro-acoes">';
+        html += '<button id="btnToggleCronometro" class="btn-cronometro ' + (this._cronometroAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar') + '" onclick="window._toggleCronometro()">' + (this._cronometroAtivo ? 'Pausar' : 'Retomar') + '</button>';
+        html += '<button class="btn-cronometro btn-cronometro-reset" onclick="window._resetarCronometro()">Zerar</button>';
+        html += '</div>';
+        html += '</div>';
 
         html += '<div class="arena-stats-linha">';
         html += '<div class="arena-stat-box arena-stat-pv">';
@@ -251,6 +331,8 @@ export class ArenaController {
         window._toggleStats      = function() { self.toggleVisibilidadeStats(); };
         window._avancarTurno     = function() { self.avancarTurno(); };
         window._finalizarCombate = function() { self.finalizarCombate(); };
+        window._toggleCronometro = function() { self.toggleCronometro(); };
+        window._resetarCronometro= function() { self._resetarCronometro(); self._iniciarCronometro(); };
 
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
     }
@@ -261,7 +343,6 @@ export class ArenaController {
         html += '<h3 class="arena-secao-titulo">Ataques</h3>';
         html += '<div class="arena-ataques-lista">';
         html += '<div class="arena-ataque-header"><span>Nome</span><span>Ataque</span><span>Dano</span></div>';
-
         if (!ataques || ataques.length === 0) {
             html += '<div class="arena-ataque-item arena-ataque-placeholder"><span>Nenhum ataque cadastrado</span></div>';
         } else {
@@ -275,7 +356,6 @@ export class ArenaController {
                 html += '</div>';
             }
         }
-
         html += '</div></div>';
         return html;
     }
@@ -286,17 +366,15 @@ export class ArenaController {
         html += '<div class="arena-secao">';
         html += '<h3 class="arena-secao-titulo">Controle de Magias</h3>';
         html += '<div class="arena-magias-grid">';
-
         for (var nivel = 0; nivel <= 9; nivel++) {
-            var slot  = null;
+            var slot = null;
             for (var k = 0; k < slots.length; k++) {
                 if (slots[k].nivel === nivel) { slot = slots[k]; break; }
             }
-            var total       = slot ? slot.total  : 0;
-            var usados      = slot ? slot.usados : 0;
-            var slotId      = slot ? slot.id     : null;
-            var disabled    = (!isJogador || total === 0) ? 'disabled' : '';
-
+            var total    = slot ? slot.total  : 0;
+            var usados   = slot ? slot.usados : 0;
+            var slotId   = slot ? slot.id     : null;
+            var disabled = (!isJogador || total === 0) ? 'disabled' : '';
             html += '<div class="arena-magia-linha" data-nivel="' + nivel + '">';
             html += '<span class="arena-magia-nivel">NIV ' + nivel + '</span>';
             html += '<div class="arena-magia-controle">';
@@ -307,7 +385,6 @@ export class ArenaController {
             html += '<span class="arena-magia-usados" data-nivel-total="' + nivel + '">' + total + '</span>';
             html += '</div>';
         }
-
         html += '</div></div>';
         return html;
     }
@@ -334,6 +411,8 @@ export class ArenaController {
         this.turnoAtual    = 0;
         this.rodadaAtual   = 1;
         this.statsVisiveis = false;
+        this._resetarCronometro();
+        this._iniciarCronometro();
         this.atualizarRodada();
         Toast.success('Combate resetado!');
         this.renderizarOrdemIniciativa();
@@ -342,6 +421,7 @@ export class ArenaController {
 
     finalizarCombate() {
         if (!confirm('Deseja finalizar o combate e voltar para a configuracao?')) return;
+        this._pararCronometro();
         var telaArena        = document.getElementById('telaArena');
         var telaConfiguracao = document.getElementById('telaConfiguracao');
         if (telaArena)        telaArena.classList.remove('ativa');
