@@ -290,6 +290,7 @@ class DashboardController {
             document.getElementById('dashEditHP').value         = c.hp_maximo;
             document.getElementById('dashEditIniciativa').value = c.iniciativa;
             document.getElementById('dashEditClasse').value     = c.classe || '';
+            document.getElementById('dashEditRaca').value = c.raca || '';
             document.getElementById('dashEditNivel').value      = c.nivel  || 1;
             document.getElementById('dashEditPontos').value     = c.pontos || 0;
 
