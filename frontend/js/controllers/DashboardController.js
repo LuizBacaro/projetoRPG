@@ -244,10 +244,13 @@ class DashboardController {
             rows += '<td>' + c.hp_maximo + '</td>';
             rows += '<td>' + c.iniciativa + '</td>';
             rows += '<td>';
+            rows += '<div class="tabela-acoes">';
+            rows += '<button class="btn-acao btn-ver-ficha" data-id="' + c.id + '" data-acao="ver" title="Ver ficha completa" onclick="window.open(\'../pages/ficha-personagem.html?id=' + c.id + '\', \'_blank\')">👁️</button>';
             rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="editar" title="Editar">✏️</button>';
             if (self._isMestre()) {
                 rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="excluir" title="Excluir">🗑️</button>';
             }
+            rows += '</div>';
             rows += '</td></tr>';
         }
         tbody.innerHTML = rows;

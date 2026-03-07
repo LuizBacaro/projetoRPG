@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha do Personagem</title>
+    <link rel="stylesheet" href="../css/ficha-personagem.css">
+</head>
+<body>
+
+    <div class="ficha-wrapper">
+
+        <!-- ── HEADER ── -->
+        <header class="ficha-header">
+            <div class="ficha-header-esquerda">
+                <button class="btn-voltar" onclick="window.close()">← Voltar</button>
+            </div>
+            <div class="ficha-titulo">
+                <h1 class="ficha-titulo-texto">📜 Ficha do Personagem</h1>
+            </div>
+            <div class="ficha-header-direita"></div>
+        </header>
+
+        <!-- ── CORPO PRINCIPAL ── -->
+        <main class="ficha-corpo">
+
+            <!-- COLUNA ESQUERDA: foto + identidade + perícias -->
+            <aside class="ficha-coluna-esquerda">
+
+                <!-- Foto -->
+                <div class="ficha-foto-container">
+                    <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto">
+                    <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
+                </div>
+
+                <!-- Identidade -->
+                <div class="ficha-identidade">
+                    <h2 id="fichaNome" class="ficha-nome">—</h2>
+                    <div class="ficha-meta">
+                        <span id="fichaRaca" class="ficha-tag ficha-tag-raca">—</span>
+                        <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
+                        <span id="fichaTipo" class="ficha-tag ficha-tag-tipo">—</span>
+                    </div>
+                    <div class="ficha-nivel-linha">
+                        <span class="ficha-nivel-label">Nível</span>
+                        <span id="fichaNivel" class="ficha-nivel-valor">—</span>
+                    </div>
+                </div>
+
+                <!-- Perícias -->
+                <div class="ficha-secao">
+                    <h3 class="ficha-secao-titulo">⚡ Perícias</h3>
+                    <div id="fichaPericiasLista" class="ficha-pericias-lista">
+                        <span class="ficha-vazio">Nenhuma perícia cadastrada</span>
+                    </div>
+                </div>
+
+                <!-- Equipamentos -->
+                <div class="ficha-secao">
+                    <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
+                    <div id="fichaEquipamentos" class="ficha-equipamentos-lista">
+                        <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- COLUNA CENTRAL: atributos + defesa + resistências + condições -->
+            <section class="ficha-coluna-central">
+
+                <!-- Atributos em círculos -->
+                <div class="ficha-secao">
+                    <h3 class="ficha-secao-titulo">⚔️ Atributos</h3>
+                    <div class="ficha-atributos-circulo-grid">
+                        <div class="ficha-atributo-circulo" data-id="forca">
+                            <div class="circulo-externo">
+                                <span class="circulo-valor" id="fichaFor">10</span>
+                                <span class="circulo-mod"  id="fichaForMod">+0</span>
+                            </div>
+                            <span class="circulo-label">FOR</span>
+                        </div>
+                        <div class="ficha-atributo-circulo" data-id="destreza">
+                            <div class="circulo-externo">
+                                <span class="circulo-valor" id="fichaDes">10</span>
+                                <span class="circulo-mod"  id="fichaDesMod">+0</span>
+                            </div>
+                            <span class="circulo-label">DES</span>
+                        </div>
+                        <div class="ficha-atributo-circulo" data-id="constituicao">
+                            <div class="circulo-externo">
+                                <span class="circulo-valor" id="fichaCon">10</span>
+                                <span class="circulo-mod"  id="fichaConMod">+0</span>
+                            </div>
+                            <span class="circulo-label">CON</span>
+                        </div>
+                        <div class="ficha-atributo-circulo" data-id="inteligencia">
+                            <div class="circulo-externo">
+                                <span class="circulo-valor" id="fichaInt">10</span>
+                                <span class="circulo-mod"  id="fichaIntMod">+0</span>
+                            </div>
+                            <span class="circulo-label">INT</span>
+                        </div>
+                        <div class="ficha-atributo-circulo" data-id="sabedoria">
+                            <div class="circulo-externo">
+                                <span class="circulo-valor" id="fichaSab">10</span>
+                                <span class="circulo-mod"  id="fichaSabMod">+0</span>
+                            </div>
+                            <span class="circulo-label">SAB</span>
+                        </div>
+                        <div class="ficha-atributo-circulo" data-id="carisma">
+                            <div class="circulo-externo">
+                                <span class="circulo-valor" id="fichaCar">10</span>
+                                <span class="circulo-mod"  id="fichaCarMod">+0</span>
+                            </div>
+                            <span class="circulo-label">CAR</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Defesa: CA + PV -->
+                <div class="ficha-defesa-row">
+                    <div class="ficha-defesa-box ficha-ca-box">
+                        <span class="ficha-defesa-label">CA</span>
+                        <span id="fichaCa" class="ficha-defesa-valor">10</span>
+                        <div class="ficha-ca-detalhes">
+                            <div class="ficha-ca-sub">
+                                <span class="ficha-ca-sub-label">Toque</span>
+                                <span id="fichaToque" class="ficha-ca-sub-valor">10</span>
+                            </div>
+                            <div class="ficha-ca-sub">
+                                <span class="ficha-ca-sub-label">Surpresa</span>
+                                <span id="fichaSurpresa" class="ficha-ca-sub-valor">10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ficha-defesa-box ficha-pv-box">
+                        <span class="ficha-defesa-label">PV</span>
+                        <span id="fichaPv" class="ficha-defesa-valor ficha-pv-valor">—/—</span>
+                        <div class="ficha-pv-barra-wrap">
+                            <div class="ficha-pv-barra">
+                                <div id="fichaPvFill" class="ficha-pv-fill" style="width:100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ficha-defesa-box ficha-ini-box">
+                        <span class="ficha-defesa-label">Iniciativa</span>
+                        <span id="fichaIniciativa" class="ficha-defesa-valor">+0</span>
+                    </div>
+                </div>
+
+                <!-- Resistências -->
+                <div class="ficha-secao">
+                    <h3 class="ficha-secao-titulo">🛡️ Resistências</h3>
+                    <div class="ficha-resistencias-row">
+                        <div class="ficha-resistencia-box">
+                            <span class="ficha-res-label">Fortitude</span>
+                            <span id="fichaFort" class="ficha-res-valor">+0</span>
+                        </div>
+                        <div class="ficha-resistencia-box">
+                            <span class="ficha-res-label">Reflexos</span>
+                            <span id="fichaReflex" class="ficha-res-valor">+0</span>
+                        </div>
+                        <div class="ficha-resistencia-box">
+                            <span class="ficha-res-label">Vontade</span>
+                            <span id="fichaVont" class="ficha-res-valor">+0</span>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- COLUNA DIREITA: ataques + magias -->
+            <aside class="ficha-coluna-direita">
+
+                <!-- Ataques -->
+                <div class="ficha-secao">
+                    <h3 class="ficha-secao-titulo">⚔️ Ataques</h3>
+                    <div class="ficha-ataques-tabela">
+                        <div class="ficha-ataque-header">
+                            <span>Nome</span>
+                            <span>Ataque</span>
+                            <span>Dano</span>
+                        </div>
+                        <div id="fichaAtaquesLista" class="ficha-ataques-lista">
+                            <div class="ficha-ataque-vazio">Nenhum ataque cadastrado</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Magias -->
+                <div class="ficha-secao">
+                    <h3 class="ficha-secao-titulo">✨ Slots de Magia</h3>
+                    <div class="ficha-magias-grid" id="fichaMagiasGrid">
+                        <div class="ficha-magia-vazio">Nenhum slot cadastrado</div>
+                    </div>
+                </div>
+
+            </aside>
+
+        </main>
+
+    </div>
+
+    <script src="../js/controllers/FichaPersonagemController.js" type="module"></script>
+</body>
+</html>
