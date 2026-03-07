@@ -5,12 +5,12 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from .ataque import AtaqueResponse, MagiaSlotResponse
 
-
 class CombatenteBase(BaseModel):
-    nome:      str = Field(..., min_length=1, max_length=100)
-    tipo:      str = Field(..., pattern="^(jogador|monstro|npc)$")
-    classe:    str = Field(..., min_length=1, max_length=50)
-    hp_maximo: int = Field(..., gt=0)
+    nome:       str = Field(..., min_length=1, max_length=100)
+    tipo:       str = Field(..., pattern="^(jogador|monstro|npc)$")
+    classe:     str = Field(..., min_length=1, max_length=50)
+    raca:       Optional[str] = Field(default="", max_length=50)
+    hp_maximo:  int = Field(..., gt=0)
     iniciativa: int = Field(..., ge=0)
 
     # Defesa
@@ -35,19 +35,18 @@ class CombatenteBase(BaseModel):
     nivel:  int = Field(default=1,  ge=1, le=20)
     pontos: int = Field(default=0,  ge=0)
 
-
 class CombatenteCreate(CombatenteBase):
     foto_url: Optional[str] = None
 
-
 class CombatenteUpdate(BaseModel):
-    nome:      Optional[str] = Field(None, min_length=1, max_length=100)
-    tipo:      Optional[str] = Field(None, pattern="^(jogador|monstro|npc)$")
-    classe:    Optional[str] = Field(None, min_length=1, max_length=50)
-    hp_atual:  Optional[int] = Field(None, ge=0)
-    hp_maximo: Optional[int] = Field(None, gt=0)
+    nome:       Optional[str] = Field(None, min_length=1, max_length=100)
+    tipo:       Optional[str] = Field(None, pattern="^(jogador|monstro|npc)$")
+    classe:     Optional[str] = Field(None, min_length=1, max_length=50)
+    raca:       Optional[str] = Field(None, max_length=50)
+    hp_atual:   Optional[int] = Field(None, ge=0)
+    hp_maximo:  Optional[int] = Field(None, gt=0)
     iniciativa: Optional[int] = Field(None, ge=0)
-    foto_url:  Optional[str] = None
+    foto_url:   Optional[str] = None
 
     ca:       Optional[int] = Field(None, ge=0, le=50)
     toque:    Optional[int] = Field(None, ge=0, le=50)
@@ -67,22 +66,19 @@ class CombatenteUpdate(BaseModel):
     nivel:  Optional[int] = Field(None, ge=1, le=20)
     pontos: Optional[int] = Field(None, ge=0)
 
-
 class CombatenteResponse(CombatenteBase):
     id:       int
     hp_atual: int
     foto_url: Optional[str] = None
+    raca:     Optional[str] = ""
 
-    # Ataques e magias retornam junto com o combatente
-    ataques:      List[AtaqueResponse]      = []
-    magias_slots: List[MagiaSlotResponse]   = []
+    ataques:      List[AtaqueResponse]    = []
+    magias_slots: List[MagiaSlotResponse] = []
 
     class Config:
         from_attributes = True
 
-
-# ── Schemas de dano/cura 
-
+# ── Schemas de dano/cura ──────────────────────────────
 class HPUpdateRequest(BaseModel):
     hp_atual: int = Field(..., ge=0)
 
@@ -99,11 +95,11 @@ class DanoCuraRequest(BaseModel):
         json_schema_extra = {"example": {"valor": 10}}
 
 class DanoCuraResponse(BaseModel):
-    id:       int
-    nome:     str
-    hp_atual: int
+    id:        int
+    nome:      str
+    hp_atual:  int
     hp_maximo: int
-    mensagem: str
+    mensagem:  str
 
     class Config:
         from_attributes = True

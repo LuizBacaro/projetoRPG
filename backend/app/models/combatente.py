@@ -5,16 +5,16 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from ..core.database import Base
 
-
 class Combatente(Base):
     __tablename__  = "combatentes"
     __table_args__ = {"extend_existing": True}
 
     # Identificação
-    id      = Column(Integer, primary_key=True, index=True)
-    nome    = Column(String, nullable=False)
-    tipo    = Column(String, nullable=False)
-    classe  = Column(String, nullable=False)
+    id     = Column(Integer, primary_key=True, index=True)
+    nome   = Column(String, nullable=False)
+    tipo   = Column(String, nullable=False)
+    classe = Column(String, nullable=False)
+    raca   = Column(String, nullable=True, default="")
 
     # Combate
     hp_atual   = Column(Integer, nullable=False)
@@ -46,7 +46,7 @@ class Combatente(Base):
     nivel  = Column(Integer, default=1)
     pontos = Column(Integer, default=0)
 
-    # ── Relacionamentos 
+    # Relacionamentos
     ataques      = relationship("Ataque",    back_populates="combatente",
                                 cascade="all, delete-orphan", lazy="selectin")
     magias_slots = relationship("MagiaSlot", back_populates="combatente",
