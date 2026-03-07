@@ -1,6 +1,6 @@
-/* ============================================================
+/* 
    ARENA — CSS completo alinhado ao index.html real
-   ============================================================ */
+    */
 
 /* ── Tela wrapper (substitui .arena-layout) ── */
 .tela {
@@ -111,7 +111,6 @@
     flex-shrink: 0;
 }
 
-/* mantém compatibilidade com .ordem-header antigo */
 .ordem-header h2 {
     font-size: 0.62rem;
     font-weight: 700;
@@ -367,16 +366,24 @@
 .btn-encerrar-combate:hover { filter: brightness(1.2); }
 
 /* ── Layout principal 3 colunas ── */
+/* ✅ ALTERADO: coluna esquerda maior para comportar os 3 painéis lado a lado */
 .arena-layout-principal {
     display: grid;
-    grid-template-columns: 1fr 1.4fr 150px;
+    grid-template-columns: 1.8fr 1.1fr 145px;
     gap: 0.65rem;
     flex: 1;
     min-height: 0;
     overflow: hidden;
 }
 
-.arena-coluna-esquerda,
+.arena-coluna-esquerda {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow-y: auto;
+    min-height: 0;
+}
+
 .arena-coluna-central {
     display: flex;
     flex-direction: column;
@@ -406,11 +413,19 @@
     border-bottom: 1px solid #1e2d3d;
 }
 
-/* ── Atributos ── */
+/* ✅ NOVO: Atributos | Resistencias | Condicoes lado a lado */
+.arena-linha-info {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 0.5rem;
+    align-items: start;
+}
+
+/* ✅ ALTERADO: Atributos de 3 colunas para 2 colunas x 3 linhas (FOR/DES, CON/INT, SAB/CAR) */
 .arena-atributos-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.25rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.2rem;
 }
 
 .arena-atributo-box {
@@ -420,15 +435,16 @@
     background: #0f1729;
     border: 1px solid #1e2d3d;
     border-radius: 5px;
-    padding: 0.25rem 0.15rem;
-    gap: 0.05rem;
+    padding: 0.2rem 0.3rem;
+    gap: 0.04rem;
 }
 
 .arena-atributo-nome  { font-size: 0.55rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-.arena-atributo-valor { font-size: 0.9rem;  color: #f8fafc; font-weight: 700; }
-.arena-atributo-mod   { font-size: 0.65rem; color: #94a3b8; }
+.arena-atributo-valor { font-size: 0.88rem; color: #f8fafc; font-weight: 700; }
+.arena-atributo-mod   { font-size: 0.62rem; color: #94a3b8; }
 
 /* ── Resistências ── */
+.arena-secao-resistencias { min-width: 0; }
 .arena-resistencias-lista { display: flex; flex-direction: column; gap: 0.18rem; }
 
 .arena-resistencia-item {
@@ -438,41 +454,48 @@
     background: #0f1729;
     border: 1px solid #1e2d3d;
     border-radius: 4px;
-    padding: 0.2rem 0.4rem;
+    padding: 0.2rem 0.35rem;
+    gap: 0.3rem;
 }
 
-.arena-resistencia-nome  { font-size: 0.68rem; color: #94a3b8; }
-.arena-resistencia-valor { font-size: 0.75rem; color: #f8fafc; font-weight: 700; }
+.arena-resistencia-nome  { font-size: 0.62rem; color: #94a3b8; white-space: nowrap; }
+.arena-resistencia-valor { font-size: 0.72rem; color: #f8fafc; font-weight: 700; }
 
 /* ── Condições ── */
-.arena-condicoes-lista { display: flex; flex-direction: column; gap: 0.18rem; }
-.arena-condicao-vazia  { font-size: 0.65rem; color: #334155; font-style: italic; }
+.arena-secao-condicoes { min-width: 0; }
+.arena-condicoes-lista  { display: flex; flex-direction: column; gap: 0.18rem; }
+.arena-condicao-vazia   { font-size: 0.62rem; color: #334155; font-style: italic; }
 
-/* ── Ações ── */
-.arena-acoes-col { display: flex; flex-direction: column; gap: 0.35rem; }
+/* ── Ações: botões lado a lado ── */
+.arena-acoes-col    { display: flex; flex-direction: column; gap: 0.3rem; }
+.arena-acoes-botoes { display: flex; gap: 0.4rem; }
 
 .arena-btn-dano-cura {
-    padding: 0.4rem 0.45rem;
+    flex: 1;
+    padding: 0.38rem 0.4rem;
     border-radius: 6px;
     border: 1px solid #1d4ed8;
     background: linear-gradient(135deg, #1d4ed8, #1e40af);
     color: #bfdbfe;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .arena-btn-condicao {
-    padding: 0.4rem 0.45rem;
+    flex: 1;
+    padding: 0.38rem 0.4rem;
     border-radius: 6px;
     border: 1px solid #7c3aed;
     background: linear-gradient(135deg, #7c3aed, #6d28d9);
     color: #ddd6fe;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .arena-btn-dano-cura:hover,

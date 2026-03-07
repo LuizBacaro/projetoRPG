@@ -341,15 +341,20 @@ export class ArenaController {
         // ── Layout principal: 3 colunas conforme protótipo
         html += '<div class="arena-layout-principal">';
 
-        // COLUNA ESQUERDA: atributos + resistencias + condicoes + aplicar
+        // COLUNA ESQUERDA: atributos + resistencias + condicoes lado a lado + aplicar
         html += '<div class="arena-coluna-esquerda">';
 
-        html += '<div class="arena-secao">';
+        // Linha superior: Atributos | Resistencias | Condicoes lado a lado
+        html += '<div class="arena-linha-info">';
+
+        // Atributos — 2 colunas x 3 linhas
+        html += '<div class="arena-secao arena-secao-atributos">';
         html += '<h3 class="arena-secao-titulo">Atributos</h3>';
         html += '<div class="arena-atributos-grid">' + atributosHTML + '</div>';
         html += '</div>';
 
-        html += '<div class="arena-secao">';
+        // Resistencias
+        html += '<div class="arena-secao arena-secao-resistencias">';
         html += '<h3 class="arena-secao-titulo">Resistencias</h3>';
         html += '<div class="arena-resistencias-lista">';
         html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Fortitude</span><span class="arena-resistencia-valor">' + sinal(fort)   + '</span></div>';
@@ -357,16 +362,21 @@ export class ArenaController {
         html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Vontade</span><span class="arena-resistencia-valor">'   + sinal(vont)   + '</span></div>';
         html += '</div></div>';
 
-        html += '<div class="arena-secao">';
+        // Condicoes
+        html += '<div class="arena-secao arena-secao-condicoes">';
         html += '<h3 class="arena-secao-titulo">Condicoes</h3>';
         html += '<div class="arena-condicoes-lista"><span class="arena-condicao-vazia">Nenhuma condicao ativa</span></div>';
         html += '</div>';
 
+        html += '</div>'; // fim arena-linha-info
+
+        // Linha inferior: botoes Aplicar
         html += '<div class="arena-secao arena-acoes-col">';
         html += '<h3 class="arena-secao-titulo">Aplicar</h3>';
+        html += '<div class="arena-acoes-botoes">';
         html += '<button class="arena-btn-dano-cura" onclick="window._abrirDanoCura()">Dano / Cura</button>';
         html += '<button class="arena-btn-condicao"  onclick="window._abrirCondicao()">Condicao</button>';
-        html += '</div>';
+        html += '</div></div>';
 
         html += '</div>'; // fim coluna esquerda
 
@@ -486,7 +496,7 @@ export class ArenaController {
         html += '</div>';
         return html;
     }
-    
+
     _renderizarMagiaLinha(slots, nivel, isJogador) {
         var slot = null;
         for (var k = 0; k < slots.length; k++) {
