@@ -356,10 +356,19 @@ export class ArenaController {
         // Resistencias
         html += '<div class="arena-secao arena-secao-resistencias">';
         html += '<h3 class="arena-secao-titulo">Resistencias</h3>';
-        html += '<div class="arena-resistencias-lista">';
-        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Fortitude</span><span class="arena-resistencia-valor">' + sinal(fort)   + '</span></div>';
-        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Reflexos</span><span class="arena-resistencia-valor">'  + sinal(reflex) + '</span></div>';
-        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Vontade</span><span class="arena-resistencia-valor">'   + sinal(vont)   + '</span></div>';
+        html += '<div class="arena-resistencias-grid">';
+        html += '<div class="arena-atributo-box">';
+        html += '<span class="arena-atributo-nome">Fort</span>';
+        html += '<span class="arena-atributo-valor">' + sinal(fort) + '</span>';
+        html += '</div>';
+        html += '<div class="arena-atributo-box">';
+        html += '<span class="arena-atributo-nome">Reflex</span>';
+        html += '<span class="arena-atributo-valor">' + sinal(reflex) + '</span>';
+        html += '</div>';
+        html += '<div class="arena-atributo-box">';
+        html += '<span class="arena-atributo-nome">Vont</span>';
+        html += '<span class="arena-atributo-valor">' + sinal(vont) + '</span>';
+        html += '</div>';
         html += '</div></div>';
 
         // Condicoes

@@ -493,7 +493,7 @@
 /* ── Linha info: Atributos | Resistencias | Condicoes lado a lado ── */
 .arena-linha-info {
     display: grid;
-    grid-template-columns: auto 1fr 1fr;
+    grid-template-columns: 1.1fr 0.65fr 1fr;
     gap: 0.45rem;
     align-items: start;
 }
@@ -502,7 +502,7 @@
 .arena-atributos-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.18rem;
+    gap: 0.2rem;
 }
 
 .arena-atributo-box {
@@ -512,31 +512,28 @@
     background: #0f1729;
     border: 1px solid #1e2d3d;
     border-radius: 5px;
-    padding: 0.22rem 0.25rem;
+    padding: 0.22rem 0.45rem;
     gap: 0.03rem;
 }
 
-.arena-atributo-nome  { font-size: 0.55rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-.arena-atributo-valor { font-size: 0.92rem; color: #f8fafc; font-weight: 700; }
-.arena-atributo-mod   { font-size: 0.63rem; color: #94a3b8; }
+.arena-atributo-nome  { font-size: 0.58rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
+.arena-atributo-valor { font-size: 0.95rem; color: #f8fafc; font-weight: 700; }
+.arena-atributo-mod   { font-size: 0.65rem; color: #94a3b8; }
 
-/* ── Resistências ── */
+/* ── Resistências — coluna única ── */
 .arena-secao-resistencias { min-width: 0; }
-.arena-resistencias-lista { display: flex; flex-direction: column; gap: 0.15rem; }
 
-.arena-resistencia-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #0f1729;
-    border: 1px solid #1e2d3d;
-    border-radius: 4px;
-    padding: 0.18rem 0.3rem;
-    gap: 0.25rem;
+.arena-resistencias-grid {
+    display: grid;
+    gap: 0.18rem;
 }
 
-.arena-resistencia-nome  { font-size: 0.6rem; color: #94a3b8; white-space: nowrap; }
-.arena-resistencia-valor { font-size: 0.7rem; color: #f8fafc; font-weight: 700; }
+.arena-resistencias-coluna {
+    grid-template-columns: 1fr;
+}
+
+.arena-resistencia-nome  { font-size: 0.58rem; color: #94a3b8; white-space: nowrap; }
+.arena-resistencia-valor { font-size: 0.68rem; color: #f8fafc; font-weight: 700; }
 
 /* ── Condições ── */
 .arena-secao-condicoes { min-width: 0; }
