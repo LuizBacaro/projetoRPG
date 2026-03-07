@@ -1,435 +1,79 @@
 /* ============================================================
-   ARENA — CSS completo fiel ao protótipo layout_arena_combate
+   ARENA — CSS completo alinhado ao index.html real
    ============================================================ */
 
-/* ── Card principal ── */
-.arena-card {
-    display: flex;
+/* ── Tela wrapper (substitui .arena-layout) ── */
+.tela {
+    display: none;
     flex-direction: column;
-    gap: 0.75rem;
-    background: linear-gradient(135deg, #0d1117 0%, #161b27 100%);
-    border: 1px solid #1e2d3d;
-    border-radius: 12px;
-    padding: 1rem;
-    height: 100%;
-    box-sizing: border-box;
-}
-
-/* ── Header: nome + cronometro + botoes ── */
-.arena-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 1px solid #1e2d3d;
-    flex-wrap: wrap;
-}
-
-.arena-header-nome { display: flex; flex-direction: column; gap: 0.15rem; }
-
-.arena-nome {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #f8fafc;
-    margin: 0;
-}
-
-.arena-nivel   { color: #94a3b8; font-size: 0.9rem; font-weight: 400; }
-
-.arena-raca-classe {
-    font-size: 0.8rem;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-}
-
-.arena-header-acoes {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-}
-
-/* ── Cronometro inline ── */
-.arena-cronometro-inline {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,215,0,0.15);
-    border-radius: 8px;
-    padding: 0.2rem 0.5rem;
-}
-
-.arena-cronometro-display {
-    font-size: 0.9rem;
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 0.08em;
-    min-width: 48px;
-}
-
-.cronometro-ativo   { color: #f0f9ff; text-shadow: 0 0 6px rgba(56,189,248,0.5); }
-.cronometro-pausado { color: #475569; }
-
-.btn-cronometro {
-    display: flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px;
-    border-radius: 4px; border: 1px solid transparent;
-    font-size: 0.7rem; cursor: pointer;
-    transition: all 0.2s; padding: 0; flex-shrink: 0;
-}
-.btn-cronometro-pausar  { background: rgba(180,83,9,0.4);     border-color: rgba(245,158,11,0.5); color: #fcd34d; }
-.btn-cronometro-retomar { background: rgba(6,78,59,0.5);      border-color: rgba(16,185,129,0.5); color: #6ee7b7; }
-.btn-cronometro-reset   { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #475569; }
-.btn-cronometro:hover   { filter: brightness(1.3); transform: scale(1.1); }
-.btn-cronometro:active  { transform: scale(0.95); }
-
-/* ── Botoes header ── */
-.btn-toggle-stats {
-    padding: 0.3rem 0.75rem;
-    border-radius: 6px;
-    border: 1px solid #334155;
-    background: rgba(255,255,255,0.05);
-    color: #94a3b8;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-.btn-toggle-stats:hover { background: rgba(255,255,255,0.1); color: #f8fafc; }
-
-.btn-encerrar-combate {
-    padding: 0.3rem 0.75rem;
-    border-radius: 6px;
-    border: 1px solid #7f1d1d;
-    background: linear-gradient(135deg, #7f1d1d, #991b1b);
-    color: #fca5a5;
-    font-size: 0.75rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-.btn-encerrar-combate:hover { filter: brightness(1.2); }
-
-/* ── Layout principal: 3 colunas ── */
-.arena-layout-principal {
-    display: grid;
-    grid-template-columns: 1fr 1.4fr 160px;
-    gap: 0.75rem;
-    flex: 1;
-    min-height: 0;
-}
-
-/* ── Colunas ── */
-.arena-coluna-esquerda,
-.arena-coluna-central  {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    overflow-y: auto;
-}
-
-.arena-coluna-direita {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-}
-
-/* ── Secao generica ── */
-.arena-secao { display: flex; flex-direction: column; gap: 0.35rem; }
-
-.arena-secao-titulo {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #475569;
-    margin: 0;
-    padding-bottom: 0.2rem;
-    border-bottom: 1px solid #1e2d3d;
-}
-
-/* ── Atributos ── */
-.arena-atributos-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.3rem;
-}
-
-.arena-atributo-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #0f1729;
-    border: 1px solid #1e2d3d;
-    border-radius: 6px;
-    padding: 0.3rem 0.2rem;
-    gap: 0.1rem;
-}
-
-.arena-atributo-nome  { font-size: 0.6rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-.arena-atributo-valor { font-size: 0.95rem; color: #f8fafc; font-weight: 700; }
-.arena-atributo-mod   { font-size: 0.7rem; color: #94a3b8; }
-
-/* ── Resistencias ── */
-.arena-resistencias-lista { display: flex; flex-direction: column; gap: 0.2rem; }
-
-.arena-resistencia-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #0f1729;
-    border: 1px solid #1e2d3d;
-    border-radius: 5px;
-    padding: 0.25rem 0.5rem;
-}
-
-.arena-resistencia-nome  { font-size: 0.72rem; color: #94a3b8; }
-.arena-resistencia-valor { font-size: 0.8rem; color: #f8fafc; font-weight: 700; }
-
-/* ── Condicoes ── */
-.arena-condicoes-lista  { display: flex; flex-direction: column; gap: 0.2rem; }
-.arena-condicao-vazia   { font-size: 0.7rem; color: #334155; font-style: italic; }
-
-/* ── Acoes: Dano/Cura + Condicao ── */
-.arena-acoes-col { display: flex; flex-direction: column; gap: 0.4rem; }
-
-.arena-btn-dano-cura {
-    padding: 0.45rem 0.5rem;
-    border-radius: 6px;
-    border: 1px solid #1d4ed8;
-    background: linear-gradient(135deg, #1d4ed8, #1e40af);
-    color: #bfdbfe;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.arena-btn-condicao {
-    padding: 0.45rem 0.5rem;
-    border-radius: 6px;
-    border: 1px solid #7c3aed;
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    color: #ddd6fe;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.arena-btn-dano-cura:hover,
-.arena-btn-condicao:hover { filter: brightness(1.2); transform: translateY(-1px); }
-
-/* ── Ataques ── */
-.arena-ataques-lista { display: flex; flex-direction: column; gap: 0.15rem; }
-
-.arena-ataque-header {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 0.3rem;
-    padding: 0.2rem 0.4rem;
-    background: #0a0f1a;
-    border-radius: 4px;
-}
-
-.arena-ataque-header span { font-size: 0.6rem; color: #475569; font-weight: 700; text-transform: uppercase; }
-
-.arena-ataque-item {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 0.3rem;
-    padding: 0.25rem 0.4rem;
-    background: #0f1729;
-    border: 1px solid #1e2d3d;
-    border-radius: 4px;
-    transition: background 0.2s;
-}
-
-.arena-ataque-item:hover         { background: #162032; }
-.arena-ataque-item span          { font-size: 0.75rem; color: #e2e8f0; }
-.arena-ataque-placeholder span   { color: #334155; font-style: italic; }
-
-/* ── Magias ── */
-.arena-magias-grid { display: flex; flex-direction: column; gap: 0.15rem; }
-
-.arena-magia-linha {
-    display: grid;
-    grid-template-columns: 50px 1fr 45px;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.4rem;
-    background: #0f1729;
-    border: 1px solid #1e2d3d;
-    border-radius: 4px;
-    transition: background 0.2s;
-}
-
-.arena-magia-linha:hover { background: #162032; }
-.magia-sem-slot          { opacity: 0.3; }
-
-.arena-magia-nivel {
-    font-size: 0.6rem;
-    color: #475569;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.arena-magia-controle {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.arena-magia-btn {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    font-size: 0.8rem; font-weight: 700;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s; flex-shrink: 0; line-height: 1;
-}
-
-.arena-magia-btn-aumentar:not(:disabled) { background: rgba(34,197,94,0.25); border-color: rgba(34,197,94,0.6); color: #86efac; }
-.arena-magia-btn-diminuir:not(:disabled) { background: rgba(239,68,68,0.25);  border-color: rgba(239,68,68,0.6);  color: #fca5a5; }
-.arena-magia-btn:not(:disabled):hover    { filter: brightness(1.3); transform: scale(1.15); }
-.arena-magia-btn:disabled                { opacity: 0.2; cursor: not-allowed; }
-
-.arena-magia-valor {
-    font-size: 0.85rem;
-    color: #f8fafc;
-    font-weight: 700;
-    min-width: 16px;
-    text-align: center;
-}
-
-.arena-magia-total { font-size: 0.65rem; color: #475569; text-align: right; }
-
-/* ── Coluna direita: CA / PV / Encerrar turno ── */
-.arena-defesa-box {
-    background: #0f1729;
-    border: 1px solid #1e2d3d;
-    border-radius: 8px;
-    padding: 0.6rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    align-items: center;
-}
-
-.arena-ca-principal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.1rem;
-}
-
-.arena-ca-valor {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #7dd3fc;
-    line-height: 1;
-}
-
-.arena-defesa-label {
-    font-size: 0.6rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #475569;
-}
-
-.arena-defesa-secundaria {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    width: 100%;
-}
-
-.arena-defesa-item   { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; }
-.arena-defesa-label-sm { font-size: 0.55rem; color: #475569; font-weight: 700; text-transform: uppercase; }
-.arena-defesa-valor-sm { font-size: 0.9rem; color: #94a3b8; font-weight: 700; }
-
-.arena-pv-box {
-    background: linear-gradient(135deg, #3b0764, #4c0519);
-    border: 1px solid #7c3aed;
-    border-radius: 8px;
-    padding: 0.6rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.arena-pv-valor {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #f0abfc;
-    line-height: 1;
-}
-
-.arena-hp-bar {
-    width: 100%;
-    height: 6px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 3px;
+    height: calc(100vh - 0px);
     overflow: hidden;
 }
 
-.arena-hp-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.tela.ativa { display: flex; }
 
-.arena-btn-proximo {
-    margin-top: auto;
-    padding: 0.6rem 0.5rem;
-    border-radius: 8px;
-    border: 2px solid #15803d;
-    background: linear-gradient(135deg, #15803d, #166534);
-    color: #bbf7d0;
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    width: 100%;
+.header-arena {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #0d1117, #1a1a2e);
+    border-bottom: 1px solid #1e2d3d;
+    flex-shrink: 0;
 }
 
-.arena-btn-proximo:hover { filter: brightness(1.2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21,128,61,0.4); }
-.arena-btn-proximo:active { transform: translateY(0); }
+.header-arena-titulo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
 
-/* ── HP oculto ── */
-.hp-oculto { color: #334155 !important; letter-spacing: 0.1em; }
+.header-arena-titulo h1 {
+    font-size: 1rem;
+    color: #f8fafc;
+    margin: 0;
+    font-weight: 700;
+}
 
-/* ── Indicador ja agiu ── */
-.combatente-ordem-item.ja-agiu             { opacity: 0.5; }
-.combatente-ordem-item.ja-agiu .ordem-nome { text-decoration: line-through; color: rgba(255,255,255,0.4); }
-.ordem-nome-linha    { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
-.ordem-agiu-badge    { font-size: 0.6rem; color: #4ade80; background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); border-radius: 3px; padding: 0 0.2rem; }
+.rodada-badge {
+    background: rgba(255,215,0,0.15);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    color: #ffd700;
+}
 
-/* ==================== PAINEL LATERAL (foto + iniciativa) ==================== */
+/* ── Layout principal da arena ── */
+.arena-tela-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    flex: 1;
+    min-height: 0;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    overflow: hidden;
+}
 
+/* ── Painel lateral esquerdo ── */
 .arena-lateral-panel {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    width: 160px;
-    min-width: 160px;
-    max-width: 160px;
+    width: 155px;
+    min-width: 155px;
+    max-width: 155px;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
-/* ── Foto vertical do combatente ativo ── */
-#arenaFotoAtivo {
+/* ── Foto vertical ── */
+#arenaFotoAtivo,
+.arena-foto-vertical-container {
     width: 100%;
-    height: 200px;
-    min-height: 200px;
-    max-height: 200px;
+    height: 190px;
+    min-height: 190px;
+    max-height: 190px;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid #1e2d3d;
@@ -440,12 +84,13 @@
     flex-shrink: 0;
 }
 
-#arenaFotoAtivo img {
+#arenaFotoAtivo img,
+.arena-foto-vertical-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: top;
-    border-radius: 8px;
+    border-radius: 0;
 }
 
 .arena-foto-vertical-placeholder {
@@ -455,30 +100,44 @@
 
 /* ── Ordem de iniciativa ── */
 .arena-ordem-titulo {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #475569;
     text-align: center;
-    padding: 0.3rem 0;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #1e2d3d;
+    flex-shrink: 0;
+}
+
+/* mantém compatibilidade com .ordem-header antigo */
+.ordem-header h2 {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #475569;
+    text-align: center;
+    margin: 0;
+    padding: 0.25rem 0;
     border-bottom: 1px solid #1e2d3d;
 }
 
-#ordemIniciativaContainer {
+#ordemIniciativaContainer,
+.ordem-lista {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     overflow-y: auto;
     flex: 1;
-    max-height: calc(100vh - 320px);
+    min-height: 0;
 }
 
 .combatente-ordem-item {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.4rem;
+    gap: 0.3rem;
+    padding: 0.28rem 0.35rem;
     border-radius: 6px;
     border: 1px solid #1e2d3d;
     background: #0f1729;
@@ -498,20 +157,17 @@
     filter: grayscale(0.8);
 }
 
-.combatente-ordem-item.ja-agiu {
-    opacity: 0.5;
-}
-
+.combatente-ordem-item.ja-agiu { opacity: 0.5; }
 .combatente-ordem-item.ja-agiu .ordem-nome {
     text-decoration: line-through;
     color: rgba(255,255,255,0.35);
 }
 
 .ordem-iniciativa-valor {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: #ffd700;
-    min-width: 18px;
+    min-width: 16px;
     text-align: center;
     flex-shrink: 0;
 }
@@ -534,7 +190,7 @@
 }
 
 .ordem-nome {
-    font-size: 0.67rem;
+    font-size: 0.65rem;
     color: #e2e8f0;
     font-weight: 600;
     white-space: nowrap;
@@ -545,12 +201,12 @@
 }
 
 .ordem-agiu-badge {
-    font-size: 0.55rem;
+    font-size: 0.52rem;
     color: #4ade80;
     background: rgba(74,222,128,0.15);
     border: 1px solid rgba(74,222,128,0.3);
     border-radius: 3px;
-    padding: 0 0.2rem;
+    padding: 0 0.18rem;
     flex-shrink: 0;
     line-height: 1.4;
 }
@@ -570,8 +226,8 @@
 }
 
 .badge-mini {
-    font-size: 0.55rem;
-    padding: 0.1rem 0.2rem;
+    font-size: 0.52rem;
+    padding: 0.08rem 0.18rem;
     border-radius: 3px;
     flex-shrink: 0;
 }
@@ -583,19 +239,383 @@
     margin-top: 1px;
 }
 
-/* ── Layout geral da tela de arena ── */
-.arena-tela-wrapper {
-    display: flex;
-    gap: 0.75rem;
-    height: 100%;
-    min-height: 0;
-    padding: 0.75rem;
-    box-sizing: border-box;
-}
-
+/* ── Conteúdo principal ── */
 .arena-conteudo-principal {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
+
+/* ── Card principal ── */
+.arena-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    background: linear-gradient(135deg, #0d1117 0%, #161b27 100%);
+    border: 1px solid #1e2d3d;
+    border-radius: 12px;
+    padding: 0.85rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* ── Header: nome + cronômetro + botões ── */
+.arena-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #1e2d3d;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.arena-header-nome { display: flex; flex-direction: column; gap: 0.12rem; }
+
+.arena-nome {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0;
+}
+
+.arena-nivel   { color: #94a3b8; font-size: 0.85rem; font-weight: 400; }
+
+.arena-raca-classe {
+    font-size: 0.75rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.arena-header-acoes {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+/* ── Cronômetro inline ── */
+.arena-cronometro-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.22rem;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 7px;
+    padding: 0.18rem 0.45rem;
+}
+
+.arena-cronometro-display {
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.08em;
+    min-width: 44px;
+}
+
+.cronometro-ativo   { color: #f0f9ff; text-shadow: 0 0 6px rgba(56,189,248,0.5); }
+.cronometro-pausado { color: #475569; }
+
+.btn-cronometro {
+    display: flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 4px; border: 1px solid transparent;
+    font-size: 0.65rem; cursor: pointer;
+    transition: all 0.2s; padding: 0; flex-shrink: 0;
+}
+.btn-cronometro-pausar  { background: rgba(180,83,9,0.4);     border-color: rgba(245,158,11,0.5); color: #fcd34d; }
+.btn-cronometro-retomar { background: rgba(6,78,59,0.5);      border-color: rgba(16,185,129,0.5); color: #6ee7b7; }
+.btn-cronometro-reset   { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); color: #475569; }
+.btn-cronometro:hover   { filter: brightness(1.3); transform: scale(1.1); }
+.btn-cronometro:active  { transform: scale(0.95); }
+
+/* ── Botões header ── */
+.btn-toggle-stats {
+    padding: 0.28rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    background: rgba(255,255,255,0.05);
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.btn-toggle-stats:hover { background: rgba(255,255,255,0.1); color: #f8fafc; }
+
+.btn-encerrar-combate {
+    padding: 0.28rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid #7f1d1d;
+    background: linear-gradient(135deg, #7f1d1d, #991b1b);
+    color: #fca5a5;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.btn-encerrar-combate:hover { filter: brightness(1.2); }
+
+/* ── Layout principal 3 colunas ── */
+.arena-layout-principal {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 150px;
+    gap: 0.65rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.arena-coluna-esquerda,
+.arena-coluna-central {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.arena-coluna-direita {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 0;
+}
+
+/* ── Seção genérica ── */
+.arena-secao { display: flex; flex-direction: column; gap: 0.3rem; flex-shrink: 0; }
+
+.arena-secao-titulo {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #475569;
+    margin: 0;
+    padding-bottom: 0.18rem;
+    border-bottom: 1px solid #1e2d3d;
+}
+
+/* ── Atributos ── */
+.arena-atributos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+}
+
+.arena-atributo-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #0f1729;
+    border: 1px solid #1e2d3d;
+    border-radius: 5px;
+    padding: 0.25rem 0.15rem;
+    gap: 0.05rem;
+}
+
+.arena-atributo-nome  { font-size: 0.55rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
+.arena-atributo-valor { font-size: 0.9rem;  color: #f8fafc; font-weight: 700; }
+.arena-atributo-mod   { font-size: 0.65rem; color: #94a3b8; }
+
+/* ── Resistências ── */
+.arena-resistencias-lista { display: flex; flex-direction: column; gap: 0.18rem; }
+
+.arena-resistencia-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0f1729;
+    border: 1px solid #1e2d3d;
+    border-radius: 4px;
+    padding: 0.2rem 0.4rem;
+}
+
+.arena-resistencia-nome  { font-size: 0.68rem; color: #94a3b8; }
+.arena-resistencia-valor { font-size: 0.75rem; color: #f8fafc; font-weight: 700; }
+
+/* ── Condições ── */
+.arena-condicoes-lista { display: flex; flex-direction: column; gap: 0.18rem; }
+.arena-condicao-vazia  { font-size: 0.65rem; color: #334155; font-style: italic; }
+
+/* ── Ações ── */
+.arena-acoes-col { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.arena-btn-dano-cura {
+    padding: 0.4rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid #1d4ed8;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    color: #bfdbfe;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.arena-btn-condicao {
+    padding: 0.4rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid #7c3aed;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: #ddd6fe;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.arena-btn-dano-cura:hover,
+.arena-btn-condicao:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+/* ── Ataques ── */
+.arena-ataques-lista { display: flex; flex-direction: column; gap: 0.12rem; }
+
+.arena-ataque-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.25rem;
+    padding: 0.18rem 0.35rem;
+    background: #0a0f1a;
+    border-radius: 3px;
+}
+.arena-ataque-header span { font-size: 0.57rem; color: #475569; font-weight: 700; text-transform: uppercase; }
+
+.arena-ataque-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.25rem;
+    padding: 0.22rem 0.35rem;
+    background: #0f1729;
+    border: 1px solid #1e2d3d;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+.arena-ataque-item:hover       { background: #162032; }
+.arena-ataque-item span        { font-size: 0.7rem; color: #e2e8f0; }
+.arena-ataque-placeholder span { color: #334155; font-style: italic; }
+
+/* ── Magias ── */
+.arena-magias-grid { display: flex; flex-direction: column; gap: 0.12rem; }
+
+.arena-magia-linha {
+    display: grid;
+    grid-template-columns: 46px 1fr 42px;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.18rem 0.35rem;
+    background: #0f1729;
+    border: 1px solid #1e2d3d;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+.arena-magia-linha:hover { background: #162032; }
+.magia-sem-slot          { opacity: 0.28; }
+
+.arena-magia-nivel { font-size: 0.57rem; color: #475569; font-weight: 700; text-transform: uppercase; }
+
+.arena-magia-controle { display: flex; align-items: center; gap: 0.25rem; }
+
+.arena-magia-btn {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    font-size: 0.75rem; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0; line-height: 1;
+}
+.arena-magia-btn-aumentar:not(:disabled) { background: rgba(34,197,94,0.25); border-color: rgba(34,197,94,0.6); color: #86efac; }
+.arena-magia-btn-diminuir:not(:disabled) { background: rgba(239,68,68,0.25);  border-color: rgba(239,68,68,0.6);  color: #fca5a5; }
+.arena-magia-btn:not(:disabled):hover    { filter: brightness(1.3); transform: scale(1.15); }
+.arena-magia-btn:disabled                { opacity: 0.2; cursor: not-allowed; }
+
+.arena-magia-valor {
+    font-size: 0.8rem; color: #f8fafc; font-weight: 700;
+    min-width: 14px; text-align: center;
+}
+.arena-magia-total { font-size: 0.6rem; color: #475569; text-align: right; }
+
+/* ── Coluna direita: CA / PV / Encerrar ── */
+.arena-defesa-box {
+    background: #0f1729;
+    border: 1px solid #1e2d3d;
+    border-radius: 8px;
+    padding: 0.55rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.arena-ca-principal { display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
+
+.arena-ca-valor { font-size: 1.85rem; font-weight: 700; color: #7dd3fc; line-height: 1; }
+
+.arena-defesa-label {
+    font-size: 0.57rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em; color: #475569;
+}
+
+.arena-defesa-secundaria { display: flex; gap: 0.4rem; justify-content: center; width: 100%; }
+.arena-defesa-item       { display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
+.arena-defesa-label-sm   { font-size: 0.52rem; color: #475569; font-weight: 700; text-transform: uppercase; }
+.arena-defesa-valor-sm   { font-size: 0.85rem; color: #94a3b8; font-weight: 700; }
+
+.arena-pv-box {
+    background: linear-gradient(135deg, #3b0764, #4c0519);
+    border: 1px solid #7c3aed;
+    border-radius: 8px;
+    padding: 0.55rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.arena-pv-valor { font-size: 1.25rem; font-weight: 700; color: #f0abfc; line-height: 1; }
+
+.arena-hp-bar {
+    width: 100%; height: 5px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px; overflow: hidden;
+}
+.arena-hp-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+
+.arena-btn-proximo {
+    margin-top: auto;
+    padding: 0.55rem 0.4rem;
+    border-radius: 8px;
+    border: 2px solid #15803d;
+    background: linear-gradient(135deg, #15803d, #166534);
+    color: #bbf7d0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    width: 100%;
+}
+.arena-btn-proximo:hover  { filter: brightness(1.2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21,128,61,0.4); }
+.arena-btn-proximo:active { transform: translateY(0); }
+
+/* ── HP oculto ── */
+.hp-oculto { color: #334155 !important; letter-spacing: 0.1em; }
+
+/* ── Badges ── */
+.badge { font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700; }
+.badge-jogador { background: linear-gradient(135deg,#4169E1,#1e3a8a); color: #FFD700; }
+.badge-monstro { background: linear-gradient(135deg,#DC143C,#8B0000);  color: #FFD700; }
+.badge-npc     { background: linear-gradient(135deg,#32CD32,#228B22);  color: #FFD700; }

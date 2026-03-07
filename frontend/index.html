@@ -110,7 +110,7 @@
     </div>
 </div>
 
-<!-- ── Tela da Arena ─────────────────────────────────────────────────── -->
+<!-- ── Tela da Arena ─────────────────────────────────── -->
 <div id="telaArena" class="tela">
     <header class="header-arena">
         <div class="header-arena-titulo">
@@ -119,21 +119,20 @@
         </div>
     </header>
 
-    <div class="arena-layout">
-        <div class="arena-foto-col">
+    <div class="arena-tela-wrapper">
+
+        <!-- Painel lateral esquerdo -->
+        <div class="arena-lateral-panel">
             <div id="arenaFotoAtivo" class="arena-foto-vertical-container"></div>
+            <div class="arena-ordem-titulo">📋 Iniciativa</div>
+            <div id="ordemIniciativaContainer"></div>
         </div>
 
-        <aside class="ordem-iniciativa-panel">
-            <div class="ordem-header">
-                <h2>📋 Ordem de Iniciativa</h2>
-            </div>
-            <div id="ordemIniciativaContainer" class="ordem-lista"></div>
-        </aside>
-
-        <main class="arena-main-ativo">
+        <!-- Conteúdo principal -->
+        <div class="arena-conteudo-principal">
             <div id="combatenteAtivoContainer"></div>
-        </main>
+        </div>
+
     </div>
 </div>
 
