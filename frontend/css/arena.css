@@ -555,7 +555,9 @@
     background: #0a0f1a;
     border-radius: 3px;
 }
-.arena-ataque-header span { font-size: 0.55rem; color: #475569; font-weight: 700; text-transform: uppercase; }
+/* ── Ataques ── */
+.arena-ataque-header span { font-size: 0.65rem; color: #475569; font-weight: 700; text-transform: uppercase; }
+
 
 .arena-ataque-item {
     display: grid;
@@ -568,7 +570,7 @@
     transition: background 0.2s;
 }
 .arena-ataque-item:hover       { background: #162032; }
-.arena-ataque-item span        { font-size: 0.68rem; color: #e2e8f0; }
+.arena-ataque-item span        { font-size: 0.78rem; color: #e2e8f0; }
 .arena-ataque-placeholder span { color: #334155; font-style: italic; }
 
 /* ── Magias: duas colunas ── */
@@ -584,8 +586,9 @@
     gap: 0.08rem;
 }
 
+/* ── Magias ── */
 .arena-magias-coluna-titulo {
-    font-size: 0.52rem;
+    font-size: 0.62rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -610,7 +613,7 @@
 .arena-magia-linha:hover { background: #162032; }
 .magia-sem-slot          { opacity: 0.28; }
 
-.arena-magia-nivel { font-size: 0.52rem; color: #475569; font-weight: 700; text-transform: uppercase; }
+.arena-magia-nivel { font-size: 0.62rem; color: #475569; font-weight: 700; text-transform: uppercase; }
 
 .arena-magia-controle { display: flex; align-items: center; gap: 0.15rem; }
 
@@ -629,7 +632,7 @@
 .arena-magia-btn:disabled                { opacity: 0.2; cursor: not-allowed; }
 
 .arena-magia-valor {
-    font-size: 0.72rem; color: #f8fafc; font-weight: 700;
+    font-size: 0.82rem; color: #f8fafc; font-weight: 700;
     min-width: 11px; text-align: center;
 }
 
