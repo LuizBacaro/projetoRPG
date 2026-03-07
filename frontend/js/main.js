@@ -7,6 +7,7 @@ import { atualizarModificadorDOM} from './utils/dnd.js';
 var app = { controllers: {}, modals: {} };
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Arena de Combate TTRPG - Iniciando...');
 
     if (typeof AuthService !== 'undefined') {
         AuthService.exigirLogin();
@@ -34,10 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
     _configurarEventosRecarregamento();
 
     document.addEventListener('combatenteAtivoMudou', function(e) {
-        var combatente = e.detail && e.detail.combatente ? e.detail.combatente : null;
+        var combatente = (e.detail && e.detail.combatente) ? e.detail.combatente : null;
         if (!combatente) return;
 
-        var isJogador = combatente.tipo === 'jogador';
+        var isJogador = (combatente.tipo === 'jogador');
 
         ArenaAtaquesMagias.renderAtaques(
             combatente.ataques || [],
@@ -57,7 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Authorization': 'Bearer ' + token
                     },
                     body: JSON.stringify({ usados: usados })
-                }).catch(function(err) { console.error('Erro slot magia:', err); });
+                }).catch(function(err) {
+                    console.error('Erro ao persistir slot de magia:', err);
+                });
             }
         );
     });
@@ -91,7 +94,7 @@ function _exibirUsuarioHeader() {
 
 function _configurarEventosRecarregamento() {
     var eventos = ['combatenteCriado', 'combatenteAtualizado', 'combatenteDeletado'];
-    for (var i = 0; i < eventos.length; i++) {
+    for (var i = 0; i &lt; eventos.length; i++) {
         (function(ev) {
             document.addEventListener(ev, function() {
                 app.controllers.configuracao.carregarCombatentes();

@@ -21,7 +21,7 @@ class Toast {
     static _injetarEstilos() {
         if (document.getElementById('toast-styles')) return;
         var s = document.createElement('style');
-        s.id  = 'toast-styles';
+        s.id = 'toast-styles';
         var c = '';
         c += '.toast{position:fixed;bottom:1.5rem;right:1.5rem;';
         c += 'padding:.75rem 1.25rem;border-radius:.5rem;color:#fff;';

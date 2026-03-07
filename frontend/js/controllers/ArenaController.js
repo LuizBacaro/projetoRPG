@@ -32,10 +32,12 @@ export class ArenaController {
 
     iniciarCombate(combatentes) {
         if (!combatentes || !Array.isArray(combatentes) || !combatentes.length) {
-            Toast.error('Erro: Nenhum combatente valido');
+            Toast.error('Nenhum combatente valido');
             return;
         }
-        this.combatentes   = combatentes.sort(function(a, b) { return b.iniciativa - a.iniciativa; });
+        this.combatentes = combatentes.sort(function(a, b) {
+            return b.iniciativa - a.iniciativa;
+        });
         this.turnoAtual    = 0;
         this.rodadaAtual   = 1;
         this.statsVisiveis = false;
@@ -78,13 +80,13 @@ export class ArenaController {
         if (!container) return;
         var self = this;
         var html = '';
-        for (var i = 0; i < this.combatentes.length; i++) {
-            var c          = this.combatentes[i];
-            var ativo      = i === this.turnoAtual;
-            var hpPct      = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
-            var hpCor      = hpPct > 50 ? '#4CAF50' : hpPct > 25 ? '#FF9800' : '#F44336';
-            var morto      = c.hp_atual <= 0;
-            var cls        = 'combatente-ordem-item' + (ativo ? ' ativo' : '') + (morto ? ' morto' : '');
+        for (var i = 0; i &lt; this.combatentes.length; i++) {
+            var c     = this.combatentes[i];
+            var ativo = (i === this.turnoAtual);
+            var hpPct = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
+            var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
+            var morto = (c.hp_atual &lt;= 0);
+            var cls   = 'combatente-ordem-item' + (ativo ? ' ativo' : '') + (morto ? ' morto' : '');
             html += '<div class="' + cls + '" data-combatente-id="' + c.id + '">';
             html += '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>';
             html += '<div class="ordem-info">';
@@ -104,10 +106,10 @@ export class ArenaController {
 
     _atualizarBadgesOrdemTodos() {
         var self = this;
-        var i    = 0;
+        var i = 0;
         function next() {
             if (i >= self.combatentes.length) return;
-            var c      = self.combatentes[i++];
+            var c = self.combatentes[i++];
             var cardEl = document.querySelector('.combatente-ordem-item[data-combatente-id="' + c.id + '"]');
             if (cardEl) {
                 self.condicaoController.atualizarBadgesOrdem(cardEl, c.id).then(next);
@@ -119,44 +121,47 @@ export class ArenaController {
     }
 
     renderizarFotoAtivo() {
-        var container  = document.getElementById('arenaFotoAtivo');
+        var container = document.getElementById('arenaFotoAtivo');
         if (!container) return;
-        var combatente = this.combatentes[this.turnoAtual];
-        if (!combatente) { container.innerHTML = ''; return; }
-        if (combatente.foto_url) {
-            container.innerHTML = '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '" style="width:100%;height:100%;object-fit:cover;">';
+        var c = this.combatentes[this.turnoAtual];
+        if (!c) { container.innerHTML = ''; return; }
+        if (c.foto_url) {
+            container.innerHTML = '<img src="' + c.foto_url + '" alt="' + c.nome + '" style="width:100%;height:100%;object-fit:cover;">';
         } else {
-            container.innerHTML = '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
+            container.innerHTML = '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
         }
     }
 
     renderizarCombatenteAtivo() {
-        var container  = document.getElementById('combatenteAtivoContainer');
+        var container = document.getElementById('combatenteAtivoContainer');
         if (!container) return;
-        var combatente = this.combatentes[this.turnoAtual];
-        if (!combatente) return;
+
+        var c = this.combatentes[this.turnoAtual];
+        if (!c) return;
 
         this.renderizarFotoAtivo();
 
-        var hpPct  = Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100);
-        var hpCor  = hpPct > 50 ? '#4CAF50' : hpPct > 25 ? '#FF9800' : '#F44336';
+        var hpPct  = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
+        var hpCor  = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
 
-        var ca       = (combatente.ca        !== null && combatente.ca        !== undefined) ? combatente.ca        : 10;
-        var toque    = (combatente.toque     !== null && combatente.toque     !== undefined) ? combatente.toque     : 10;
-        var surpresa = (combatente.surpresa  !== null && combatente.surpresa  !== undefined) ? combatente.surpresa  : 10;
-        var fort     = (combatente.fortitude !== null && combatente.fortitude !== undefined) ? combatente.fortitude : 0;
-        var reflex   = (combatente.reflexos  !== null && combatente.reflexos  !== undefined) ? combatente.reflexos  : 0;
-        var vont     = (combatente.vontade   !== null && combatente.vontade   !== undefined) ? combatente.vontade   : 0;
-        var nivel    = combatente.nivel  || 1;
-        var classe   = combatente.classe || 'Aventureiro';
+        var ca       = (c.ca        !== null && c.ca        !== undefined) ? c.ca        : 10;
+        var toque    = (c.toque     !== null && c.toque     !== undefined) ? c.toque     : 10;
+        var surpresa = (c.surpresa  !== null && c.surpresa  !== undefined) ? c.surpresa  : 10;
+        var fort     = (c.fortitude !== null && c.fortitude !== undefined) ? c.fortitude : 0;
+        var reflex   = (c.reflexos  !== null && c.reflexos  !== undefined) ? c.reflexos  : 0;
+        var vont     = (c.vontade   !== null && c.vontade   !== undefined) ? c.vontade   : 0;
+        var nivel    = c.nivel  || 1;
+        var classe   = c.classe || 'Aventureiro';
 
         function mod(val) {
             var m = Math.floor(((val || 10) - 10) / 2);
-            return m >= 0 ? '+' + m : '' + m;
+            return m >= 0 ? ('+' + m) : ('' + m);
         }
-        function sinal(val) { return val >= 0 ? '+' + val : '' + val; }
+        function sinal(val) {
+            return val >= 0 ? ('+' + val) : ('' + val);
+        }
 
-        var pvValor  = this.statsVisiveis ? combatente.hp_atual + '/' + combatente.hp_maximo : '???/???';
+        var pvValor  = this.statsVisiveis ? (c.hp_atual + '/' + c.hp_maximo) : '???/???';
         var pvClasse = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
         var caValor  = this.statsVisiveis ? ca       : '?';
         var caClasse = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
@@ -164,18 +169,18 @@ export class ArenaController {
         var sClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
         var tValor   = this.statsVisiveis ? toque    : '?';
         var tClasse  = this.statsVisiveis ? 'arena-stat-valor' : 'arena-stat-valor hp-oculto';
-        var olhoIcon = this.statsVisiveis ? 'Ocultar Stats' : 'Revelar Stats';
+        var olhoTxt  = this.statsVisiveis ? 'Ocultar Stats' : 'Revelar Stats';
 
         var atribs = [
-            ['For', combatente.forca        || 10],
-            ['Des', combatente.destreza     || 10],
-            ['Con', combatente.constituicao || 10],
-            ['Int', combatente.inteligencia || 10],
-            ['Sab', combatente.sabedoria    || 10],
-            ['Car', combatente.carisma      || 10]
+            ['For', c.forca        || 10],
+            ['Des', c.destreza     || 10],
+            ['Con', c.constituicao || 10],
+            ['Int', c.inteligencia || 10],
+            ['Sab', c.sabedoria    || 10],
+            ['Car', c.carisma      || 10]
         ];
         var atributosHTML = '';
-        for (var j = 0; j < atribs.length; j++) {
+        for (var j = 0; j &lt; atribs.length; j++) {
             atributosHTML += '<div class="arena-atributo-box">';
             atributosHTML += '<span class="arena-atributo-nome">' + atribs[j][0] + '</span>';
             atributosHTML += '<span class="arena-atributo-valor">' + atribs[j][1] + '</span>';
@@ -183,23 +188,22 @@ export class ArenaController {
             atributosHTML += '</div>';
         }
 
-        var fotoTopo = combatente.foto_url
-            ? '<img src="' + combatente.foto_url + '" alt="' + combatente.nome + '">'
-            : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(combatente.tipo) + '</div>';
+        var fotoTopo = c.foto_url
+            ? '<img src="' + c.foto_url + '" alt="' + c.nome + '">'
+            : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
 
         var html = '';
         html += '<div class="arena-card">';
-
         html += '<div class="arena-topo">';
         html += '<div class="arena-foto-nome">';
         html += '<div class="arena-foto">' + fotoTopo + '</div>';
         html += '<div class="arena-nome-info">';
-        html += '<h2 class="arena-nome">' + combatente.nome + ' (' + nivel + ' nivel)</h2>';
+        html += '<h2 class="arena-nome">' + c.nome + ' (' + nivel + ' nivel)</h2>';
         html += '<span class="arena-classe">' + classe;
-        html += '<span class="badge ' + this.getBadgeClass(combatente.tipo) + '">' + combatente.tipo + '</span>';
+        html += '<span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span>';
         html += '</span></div></div>';
         html += '<div class="arena-topo-acoes">';
-        html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoIcon + '</button>';
+        html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoTxt + '</button>';
         html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
         html += '</div></div>';
 
@@ -217,11 +221,12 @@ export class ArenaController {
         html += '<div class="arena-grade-central">';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Atributos</h3><div class="arena-atributos-grid">' + atributosHTML + '</div></div>';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Resistencias</h3><div class="arena-resistencias-lista">';
-        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Fortitude</span><span class="arena-resistencia-valor">' + sinal(fort) + '</span></div>';
-        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Reflexos</span><span class="arena-resistencia-valor">' + sinal(reflex) + '</span></div>';
-        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Vontade</span><span class="arena-resistencia-valor">' + sinal(vont) + '</span></div>';
+        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Fortitude</span><span class="arena-resistencia-valor">' + sinal(fort)   + '</span></div>';
+        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Reflexos</span><span class="arena-resistencia-valor">'  + sinal(reflex) + '</span></div>';
+        html += '<div class="arena-resistencia-item"><span class="arena-resistencia-nome">Vontade</span><span class="arena-resistencia-valor">'   + sinal(vont)   + '</span></div>';
         html += '</div></div>';
-        html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Condicoes</h3><div class="arena-condicoes-lista"><span class="arena-condicao-vazia">Nenhuma condicao ativa</span></div></div>';
+        html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Condicoes</h3>';
+        html += '<div class="arena-condicoes-lista"><span class="arena-condicao-vazia">Nenhuma condicao ativa</span></div></div>';
         html += '<div class="arena-secao arena-acoes-col"><h3 class="arena-secao-titulo">Aplicar</h3>';
         html += '<button class="arena-btn-dano-cura" onclick="window._abrirDanoCura()">Dano / Cura</button>';
         html += '<button class="arena-btn-condicao"  onclick="window._abrirCondicao()">Condicao</button>';
@@ -244,10 +249,10 @@ export class ArenaController {
         window._avancarTurno     = function() { self.avancarTurno(); };
         window._finalizarCombate = function() { self.finalizarCombate(); };
 
-        this.condicaoController.carregarCondicoesDoCombatente(combatente.id);
+        this.condicaoController.carregarCondicoesDoCombatente(c.id);
 
         document.dispatchEvent(new CustomEvent('combatenteAtivoMudou', {
-            detail: { combatente: combatente }
+            detail: { combatente: c }
         }));
     }
 
