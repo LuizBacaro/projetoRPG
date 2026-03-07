@@ -370,14 +370,6 @@ export class ArenaController {
 
         html += '</div>'; // fim arena-linha-info
 
-        // Linha inferior: botoes Aplicar
-        html += '<div class="arena-secao arena-acoes-col">';
-        html += '<h3 class="arena-secao-titulo">Aplicar</h3>';
-        html += '<div class="arena-acoes-botoes">';
-        html += '<button class="arena-btn-dano-cura" onclick="window._abrirDanoCura()">Dano / Cura</button>';
-        html += '<button class="arena-btn-condicao"  onclick="window._abrirCondicao()">Condicao</button>';
-        html += '</div></div>';
-
         html += '</div>'; // fim coluna esquerda
 
         // COLUNA CENTRAL: ataques + magias

@@ -2,14 +2,13 @@
    ARENA — CSS completo alinhado ao index.html real
     */
 
-/* ── Tela wrapper (substitui .arena-layout) ── */
+/* ── Tela wrapper ── */
 .tela {
     display: none;
     flex-direction: column;
     height: calc(100vh - 0px);
     overflow: hidden;
 }
-
 .tela.ativa { display: flex; }
 
 .header-arena {
@@ -44,7 +43,7 @@
     color: #ffd700;
 }
 
-/* ── Layout principal da arena ── */
+/* ── Wrapper principal ── */
 .arena-tela-wrapper {
     display: flex;
     gap: 0.75rem;
@@ -59,46 +58,35 @@
 .arena-lateral-panel {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    width: 155px;
-    min-width: 155px;
-    max-width: 155px;
+    width: 230px;
+    min-width: 230px;
+    max-width: 230px;
     flex-shrink: 0;
     overflow: hidden;
+    gap: 0;
 }
 
-/* ── Foto vertical ── */
-#arenaFotoAtivo,
-.arena-foto-vertical-container {
-    width: 100%;
-    height: 190px;
-    min-height: 190px;
-    max-height: 190px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #1e2d3d;
-    background: #0f1729;
+/* ── Topo do painel: iniciativa (esq) + foto (dir) lado a lado ── */
+.arena-lateral-topo {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    flex-direction: row;
+    gap: 0.4rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
-#arenaFotoAtivo img,
-.arena-foto-vertical-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-    border-radius: 0;
+/* ── Coluna da iniciativa ── */
+.arena-lateral-iniciativa {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    gap: 0.25rem;
 }
 
-.arena-foto-vertical-placeholder {
-    font-size: 3rem;
-    opacity: 0.3;
-}
-
-/* ── Ordem de iniciativa ── */
+/* ── Label iniciativa ── */
 .arena-ordem-titulo {
     font-size: 0.62rem;
     font-weight: 700;
@@ -122,6 +110,7 @@
     border-bottom: 1px solid #1e2d3d;
 }
 
+/* ── Lista de iniciativa ── */
 #ordemIniciativaContainer,
 .ordem-lista {
     display: flex;
@@ -132,6 +121,99 @@
     min-height: 0;
 }
 
+/* ── Coluna da foto + botoes (direita do painel) ── */
+.arena-lateral-foto-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 95px;
+    min-width: 95px;
+    max-width: 95px;
+    flex-shrink: 0;
+}
+
+/* ── Foto vertical ── */
+#arenaFotoAtivo,
+.arena-foto-vertical-container {
+    width: 100%;
+    height: 180px;
+    min-height: 180px;
+    max-height: 180px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #1e2d3d;
+    background: #0f1729;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#arenaFotoAtivo img,
+.arena-foto-vertical-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 0;
+}
+
+.arena-foto-vertical-placeholder {
+    font-size: 2rem;
+    opacity: 0.3;
+}
+
+/* ── Botões Aplicar (abaixo da foto, na coluna direita do painel) ── */
+.arena-lateral-acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.arena-lateral-acoes-titulo {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #475569;
+    padding-bottom: 0.15rem;
+    border-bottom: 1px solid #1e2d3d;
+}
+
+.arena-btn-dano-cura {
+    width: 100%;
+    padding: 0.35rem 0.2rem;
+    border-radius: 6px;
+    border: 1px solid #1d4ed8;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    color: #bfdbfe;
+    font-size: 0.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.arena-btn-condicao {
+    width: 100%;
+    padding: 0.35rem 0.2rem;
+    border-radius: 6px;
+    border: 1px solid #7c3aed;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: #ddd6fe;
+    font-size: 0.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.arena-btn-dano-cura:hover,
+.arena-btn-condicao:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+/* ── Cards de ordem de iniciativa ── */
 .combatente-ordem-item {
     display: flex;
     align-items: center;
@@ -151,11 +233,7 @@
     box-shadow: 0 0 6px rgba(255,215,0,0.2);
 }
 
-.combatente-ordem-item.morto {
-    opacity: 0.3;
-    filter: grayscale(0.8);
-}
-
+.combatente-ordem-item.morto   { opacity: 0.3; filter: grayscale(0.8); }
 .combatente-ordem-item.ja-agiu { opacity: 0.5; }
 .combatente-ordem-item.ja-agiu .ordem-nome {
     text-decoration: line-through;
@@ -251,11 +329,11 @@
 .arena-card {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.55rem;
     background: linear-gradient(135deg, #0d1117 0%, #161b27 100%);
     border: 1px solid #1e2d3d;
     border-radius: 12px;
-    padding: 0.85rem;
+    padding: 0.75rem;
     flex: 1;
     min-height: 0;
     overflow: hidden;
@@ -268,25 +346,25 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.45rem;
     border-bottom: 1px solid #1e2d3d;
     flex-wrap: wrap;
     flex-shrink: 0;
 }
 
-.arena-header-nome { display: flex; flex-direction: column; gap: 0.12rem; }
+.arena-header-nome { display: flex; flex-direction: column; gap: 0.1rem; }
 
 .arena-nome {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: #f8fafc;
     margin: 0;
 }
 
-.arena-nivel   { color: #94a3b8; font-size: 0.85rem; font-weight: 400; }
+.arena-nivel { color: #94a3b8; font-size: 0.82rem; font-weight: 400; }
 
 .arena-raca-classe {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: #64748b;
     display: flex;
     align-items: center;
@@ -338,12 +416,12 @@
 
 /* ── Botões header ── */
 .btn-toggle-stats {
-    padding: 0.28rem 0.65rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 6px;
     border: 1px solid #334155;
     background: rgba(255,255,255,0.05);
     color: #94a3b8;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -352,12 +430,12 @@
 .btn-toggle-stats:hover { background: rgba(255,255,255,0.1); color: #f8fafc; }
 
 .btn-encerrar-combate {
-    padding: 0.28rem 0.65rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 6px;
     border: 1px solid #7f1d1d;
     background: linear-gradient(135deg, #7f1d1d, #991b1b);
     color: #fca5a5;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
@@ -366,11 +444,10 @@
 .btn-encerrar-combate:hover { filter: brightness(1.2); }
 
 /* ── Layout principal 3 colunas ── */
-/* ✅ ALTERADO: coluna esquerda maior para comportar os 3 painéis lado a lado */
 .arena-layout-principal {
     display: grid;
-    grid-template-columns: 1.8fr 1.1fr 145px;
-    gap: 0.65rem;
+    grid-template-columns: 1.7fr 1fr 140px;
+    gap: 0.55rem;
     flex: 1;
     min-height: 0;
     overflow: hidden;
@@ -379,7 +456,7 @@
 .arena-coluna-esquerda {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.45rem;
     overflow-y: auto;
     min-height: 0;
 }
@@ -387,7 +464,7 @@
 .arena-coluna-central {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.45rem;
     overflow-y: auto;
     min-height: 0;
 }
@@ -395,37 +472,37 @@
 .arena-coluna-direita {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.45rem;
     min-height: 0;
 }
 
 /* ── Seção genérica ── */
-.arena-secao { display: flex; flex-direction: column; gap: 0.3rem; flex-shrink: 0; }
+.arena-secao { display: flex; flex-direction: column; gap: 0.28rem; flex-shrink: 0; }
 
 .arena-secao-titulo {
-    font-size: 0.62rem;
+    font-size: 0.6rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: #475569;
     margin: 0;
-    padding-bottom: 0.18rem;
+    padding-bottom: 0.15rem;
     border-bottom: 1px solid #1e2d3d;
 }
 
-/* ✅ NOVO: Atributos | Resistencias | Condicoes lado a lado */
+/* ── Linha info: Atributos | Resistencias | Condicoes lado a lado ── */
 .arena-linha-info {
     display: grid;
     grid-template-columns: auto 1fr 1fr;
-    gap: 0.5rem;
+    gap: 0.45rem;
     align-items: start;
 }
 
-/* ✅ ALTERADO: Atributos de 3 colunas para 2 colunas x 3 linhas (FOR/DES, CON/INT, SAB/CAR) */
+/* ── Atributos: 2 colunas x 3 linhas ── */
 .arena-atributos-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.2rem;
+    gap: 0.18rem;
 }
 
 .arena-atributo-box {
@@ -435,17 +512,17 @@
     background: #0f1729;
     border: 1px solid #1e2d3d;
     border-radius: 5px;
-    padding: 0.2rem 0.3rem;
-    gap: 0.04rem;
+    padding: 0.22rem 0.25rem;
+    gap: 0.03rem;
 }
 
 .arena-atributo-nome  { font-size: 0.55rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-.arena-atributo-valor { font-size: 0.88rem; color: #f8fafc; font-weight: 700; }
-.arena-atributo-mod   { font-size: 0.62rem; color: #94a3b8; }
+.arena-atributo-valor { font-size: 0.92rem; color: #f8fafc; font-weight: 700; }
+.arena-atributo-mod   { font-size: 0.63rem; color: #94a3b8; }
 
 /* ── Resistências ── */
 .arena-secao-resistencias { min-width: 0; }
-.arena-resistencias-lista { display: flex; flex-direction: column; gap: 0.18rem; }
+.arena-resistencias-lista { display: flex; flex-direction: column; gap: 0.15rem; }
 
 .arena-resistencia-item {
     display: flex;
@@ -454,111 +531,80 @@
     background: #0f1729;
     border: 1px solid #1e2d3d;
     border-radius: 4px;
-    padding: 0.2rem 0.35rem;
-    gap: 0.3rem;
+    padding: 0.18rem 0.3rem;
+    gap: 0.25rem;
 }
 
-.arena-resistencia-nome  { font-size: 0.62rem; color: #94a3b8; white-space: nowrap; }
-.arena-resistencia-valor { font-size: 0.72rem; color: #f8fafc; font-weight: 700; }
+.arena-resistencia-nome  { font-size: 0.6rem; color: #94a3b8; white-space: nowrap; }
+.arena-resistencia-valor { font-size: 0.7rem; color: #f8fafc; font-weight: 700; }
 
 /* ── Condições ── */
 .arena-secao-condicoes { min-width: 0; }
-.arena-condicoes-lista  { display: flex; flex-direction: column; gap: 0.18rem; }
-.arena-condicao-vazia   { font-size: 0.62rem; color: #334155; font-style: italic; }
+.arena-condicoes-lista { display: flex; flex-direction: column; gap: 0.15rem; flex-wrap: wrap; }
+.arena-condicao-vazia  { font-size: 0.6rem; color: #334155; font-style: italic; }
 
-/* ── Ações: botões lado a lado ── */
-.arena-acoes-col    { display: flex; flex-direction: column; gap: 0.3rem; }
-.arena-acoes-botoes { display: flex; gap: 0.4rem; }
-
-.arena-btn-dano-cura {
-    flex: 1;
-    padding: 0.38rem 0.4rem;
-    border-radius: 6px;
-    border: 1px solid #1d4ed8;
-    background: linear-gradient(135deg, #1d4ed8, #1e40af);
-    color: #bfdbfe;
-    font-size: 0.72rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.arena-btn-condicao {
-    flex: 1;
-    padding: 0.38rem 0.4rem;
-    border-radius: 6px;
-    border: 1px solid #7c3aed;
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    color: #ddd6fe;
-    font-size: 0.72rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.arena-btn-dano-cura:hover,
-.arena-btn-condicao:hover { filter: brightness(1.2); transform: translateY(-1px); }
+/* ── Ações dentro do card ── */
+.arena-acoes-col    { display: flex; flex-direction: column; gap: 0.28rem; }
+.arena-acoes-botoes { display: flex; gap: 0.35rem; }
 
 /* ── Ataques ── */
-.arena-ataques-lista { display: flex; flex-direction: column; gap: 0.12rem; }
+.arena-ataques-lista { display: flex; flex-direction: column; gap: 0.1rem; }
 
 .arena-ataque-header {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
-    gap: 0.25rem;
-    padding: 0.18rem 0.35rem;
+    gap: 0.2rem;
+    padding: 0.15rem 0.3rem;
     background: #0a0f1a;
     border-radius: 3px;
 }
-.arena-ataque-header span { font-size: 0.57rem; color: #475569; font-weight: 700; text-transform: uppercase; }
+.arena-ataque-header span { font-size: 0.55rem; color: #475569; font-weight: 700; text-transform: uppercase; }
 
 .arena-ataque-item {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
-    gap: 0.25rem;
-    padding: 0.22rem 0.35rem;
+    gap: 0.2rem;
+    padding: 0.2rem 0.3rem;
     background: #0f1729;
     border: 1px solid #1e2d3d;
     border-radius: 3px;
     transition: background 0.2s;
 }
 .arena-ataque-item:hover       { background: #162032; }
-.arena-ataque-item span        { font-size: 0.7rem; color: #e2e8f0; }
+.arena-ataque-item span        { font-size: 0.68rem; color: #e2e8f0; }
 .arena-ataque-placeholder span { color: #334155; font-style: italic; }
 
 /* ── Magias: duas colunas ── */
 .arena-magias-duas-colunas {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.4rem;
+    gap: 0.3rem;
 }
 
 .arena-magias-coluna {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 0.08rem;
 }
 
 .arena-magias-coluna-titulo {
-    font-size: 0.55rem;
+    font-size: 0.52rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #334155;
     text-align: center;
-    padding: 0.15rem 0;
-    margin-bottom: 0.1rem;
+    padding: 0.12rem 0;
+    margin-bottom: 0.08rem;
     border-bottom: 1px solid #1e2d3d;
 }
 
 .arena-magia-linha {
     display: grid;
-    grid-template-columns: 36px 1fr 34px;
+    grid-template-columns: 32px 1fr 30px;
     align-items: center;
-    gap: 0.2rem;
-    padding: 0.15rem 0.25rem;
+    gap: 0.15rem;
+    padding: 0.13rem 0.2rem;
     background: #0f1729;
     border: 1px solid #1e2d3d;
     border-radius: 3px;
@@ -567,20 +613,15 @@
 .arena-magia-linha:hover { background: #162032; }
 .magia-sem-slot          { opacity: 0.28; }
 
-.arena-magia-nivel {
-    font-size: 0.55rem;
-    color: #475569;
-    font-weight: 700;
-    text-transform: uppercase;
-}
+.arena-magia-nivel { font-size: 0.52rem; color: #475569; font-weight: 700; text-transform: uppercase; }
 
-.arena-magia-controle { display: flex; align-items: center; gap: 0.18rem; }
+.arena-magia-controle { display: flex; align-items: center; gap: 0.15rem; }
 
 .arena-magia-btn {
-    width: 16px; height: 16px;
+    width: 15px; height: 15px;
     border-radius: 50%;
     border: 1px solid transparent;
-    font-size: 0.7rem; font-weight: 700;
+    font-size: 0.68rem; font-weight: 700;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.2s; flex-shrink: 0; line-height: 1;
@@ -591,52 +632,52 @@
 .arena-magia-btn:disabled                { opacity: 0.2; cursor: not-allowed; }
 
 .arena-magia-valor {
-    font-size: 0.75rem; color: #f8fafc; font-weight: 700;
-    min-width: 12px; text-align: center;
+    font-size: 0.72rem; color: #f8fafc; font-weight: 700;
+    min-width: 11px; text-align: center;
 }
 
-.arena-magia-total { font-size: 0.58rem; color: #475569; text-align: right; }
+.arena-magia-total { font-size: 0.55rem; color: #475569; text-align: right; }
 
 /* ── Coluna direita: CA / PV / Encerrar ── */
 .arena-defesa-box {
     background: #0f1729;
     border: 1px solid #1e2d3d;
     border-radius: 8px;
-    padding: 0.55rem;
+    padding: 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.3rem;
     align-items: center;
     flex-shrink: 0;
 }
 
-.arena-ca-principal { display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
+.arena-ca-principal { display: flex; flex-direction: column; align-items: center; gap: 0.06rem; }
 
-.arena-ca-valor { font-size: 1.85rem; font-weight: 700; color: #7dd3fc; line-height: 1; }
+.arena-ca-valor { font-size: 1.75rem; font-weight: 700; color: #7dd3fc; line-height: 1; }
 
 .arena-defesa-label {
-    font-size: 0.57rem; font-weight: 700;
+    font-size: 0.55rem; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.1em; color: #475569;
 }
 
-.arena-defesa-secundaria { display: flex; gap: 0.4rem; justify-content: center; width: 100%; }
-.arena-defesa-item       { display: flex; flex-direction: column; align-items: center; gap: 0.08rem; }
-.arena-defesa-label-sm   { font-size: 0.52rem; color: #475569; font-weight: 700; text-transform: uppercase; }
-.arena-defesa-valor-sm   { font-size: 0.85rem; color: #94a3b8; font-weight: 700; }
+.arena-defesa-secundaria { display: flex; gap: 0.35rem; justify-content: center; width: 100%; }
+.arena-defesa-item       { display: flex; flex-direction: column; align-items: center; gap: 0.06rem; }
+.arena-defesa-label-sm   { font-size: 0.5rem; color: #475569; font-weight: 700; text-transform: uppercase; }
+.arena-defesa-valor-sm   { font-size: 0.82rem; color: #94a3b8; font-weight: 700; }
 
 .arena-pv-box {
     background: linear-gradient(135deg, #3b0764, #4c0519);
     border: 1px solid #7c3aed;
     border-radius: 8px;
-    padding: 0.55rem;
+    padding: 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.22rem;
     flex-shrink: 0;
 }
 
-.arena-pv-valor { font-size: 1.25rem; font-weight: 700; color: #f0abfc; line-height: 1; }
+.arena-pv-valor { font-size: 1.15rem; font-weight: 700; color: #f0abfc; line-height: 1; }
 
 .arena-hp-bar {
     width: 100%; height: 5px;
@@ -647,12 +688,12 @@
 
 .arena-btn-proximo {
     margin-top: auto;
-    padding: 0.55rem 0.4rem;
+    padding: 0.5rem 0.35rem;
     border-radius: 8px;
     border: 2px solid #15803d;
     background: linear-gradient(135deg, #15803d, #166534);
     color: #bbf7d0;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;

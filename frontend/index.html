@@ -123,9 +123,28 @@
 
         <!-- Painel lateral esquerdo -->
         <div class="arena-lateral-panel">
-            <div id="arenaFotoAtivo" class="arena-foto-vertical-container"></div>
-            <div class="arena-ordem-titulo">📋 Iniciativa</div>
-            <div id="ordemIniciativaContainer"></div>
+
+            <!-- Linha com iniciativa À ESQUERDA e foto À DIREITA -->
+            <div class="arena-lateral-topo">
+
+                <!-- Coluna iniciativa -->
+                <div class="arena-lateral-iniciativa">
+                    <div class="arena-ordem-titulo">📋 Iniciativa</div>
+                    <div id="ordemIniciativaContainer"></div>
+                </div>
+
+                <!-- Coluna foto + botoes -->
+                <div class="arena-lateral-foto-col">
+                    <div id="arenaFotoAtivo" class="arena-foto-vertical-container"></div>
+                    <div class="arena-lateral-acoes">
+                        <div class="arena-lateral-acoes-titulo">Aplicar</div>
+                        <button class="arena-btn-dano-cura" onclick="window.abrirModalDanoCura && window.abrirModalDanoCura()">⚔️ Dano / Cura</button>
+                        <button class="arena-btn-condicao"  onclick="window.abrirModalCondicao && window.abrirModalCondicao()">🔮 Condição</button>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
 
         <!-- Conteúdo principal -->
