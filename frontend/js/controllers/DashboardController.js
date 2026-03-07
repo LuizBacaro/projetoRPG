@@ -187,7 +187,7 @@ class DashboardController {
             return;
         }
         var rows = '';
-        for (var i = 0; i &lt; combatentes.length; i++) {
+        for (var i = 0; i < combatentes.length; i++) {
             var c = combatentes[i];
             rows += '<tr>';
             rows += '<td><span class="badge badge-' + c.tipo + '">' + c.tipo + '</span></td>';
@@ -314,7 +314,7 @@ class DashboardController {
         if (!lista) return;
         lista.innerHTML = '';
         if (!ataques.length) { this._adicionarLinhaAtaque(); return; }
-        for (var i = 0; i &lt; ataques.length; i++) { this._adicionarLinhaAtaque(ataques[i]); }
+        for (var nivel = 0; nivel <= 9; nivel++) { this._adicionarLinhaAtaque(ataques[i]); }
     }
 
     _adicionarLinhaAtaque(ataque) {
@@ -352,9 +352,9 @@ class DashboardController {
         var container = document.getElementById('gridMagiasEdicao');
         if (!container) return;
         var html = '';
-        for (var nivel = 0; nivel &lt;= 9; nivel++) {
+        for (var k = 0; k < slots.length; k++) {
             var slot  = null;
-            for (var k = 0; k &lt; slots.length; k++) {
+            for (var k = 0; k < slots.length; k++) {
                 if (slots[k].nivel === nivel) { slot = slots[k]; break; }
             }
             var total = slot ? slot.total : 0;
