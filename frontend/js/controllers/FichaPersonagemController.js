@@ -1,13 +1,14 @@
-/* 
-   FichaPersonagemPage.js
-   Responsabilidade única: carregar e exibir a ficha do personagem
+/*
+   FichaPersonagemController.js
+   SRP: carregar e exibir a ficha completa do personagem
    Recebe o ID via query string: /ficha-personagem.html?id=123
-    */
+*/
 
 import { CombatenteService } from '../services/CombatenteService.js';
 import { MagiaSlotService   } from '../services/MagiaSlotService.js';
+import { getApiUrl          } from '../config/api.config.js';
 
-class FichaPersonagemPage {
+class FichaPersonagemController {
 
     constructor() {
         this.combatenteService = new CombatenteService();
@@ -15,26 +16,35 @@ class FichaPersonagemPage {
         this._init();
     }
 
+    // ── Inicialização ─────────────────────────────────────────
     async _init() {
-        var id = this._obterIdDaUrl();
-        if (!id) { this._mostrarErro('ID do personagem não encontrado na URL.'); return; }
+        const id = this._obterIdDaUrl();
+        if (!id) {
+            this._mostrarErro('ID do personagem não encontrado na URL.');
+            return;
+        }
         try {
-            var personagem = await this.combatenteService.buscarPorId(id);
-            if (!personagem) { this._mostrarErro('Personagem não encontrado.'); return; }
+            // ✅ CORRIGIDO: obterPorId() — nome correto do CombatenteService
+            const personagem = await this.combatenteService.obterPorId(id);
+            if (!personagem) {
+                this._mostrarErro('Personagem não encontrado.');
+                return;
+            }
             this._renderizar(personagem);
         } catch (err) {
-            console.error(err);
-            this._mostrarErro('Erro ao carregar personagem.');
+            console.error('[FichaPersonagemController] Erro ao carregar:', err);
+            this._mostrarErro('Erro ao carregar personagem. Verifique o console.');
         }
     }
 
+    // ── Utilitários ───────────────────────────────────────────
     _obterIdDaUrl() {
-        var params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(window.location.search);
         return params.get('id');
     }
 
     _mod(valor) {
-        var m = Math.floor(((valor || 10) - 10) / 2);
+        const m = Math.floor(((valor || 10) - 10) / 2);
         return m >= 0 ? ('+' + m) : ('' + m);
     }
 
@@ -43,26 +53,63 @@ class FichaPersonagemPage {
         return valor >= 0 ? ('+' + valor) : ('' + valor);
     }
 
+    _texto(id, valor) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = valor;
+    }
+
+    // ── Renderização principal ────────────────────────────────
     _renderizar(p) {
-        document.title = p.nome + ' — Ficha';
+        document.title = (p.nome || 'Personagem') + ' — Ficha';
 
-        // Identidade
-        this._texto('fichaNome',    p.nome || '—');
-        this._texto('fichaRaca',    p.raca || '—');
-        this._texto('fichaClasse',  p.classe || '—');
-        this._texto('fichaTipo',    p.tipo || '—');
-        this._texto('fichaNivel',   (p.nivel || 1) + 'º nível');
+        this._renderizarIdentidade(p);
+        this._renderizarFoto(p);
+        this._renderizarAtributos(p);
+        this._renderizarDefesa(p);
+        this._renderizarResistencias(p);
+        this._renderizarPericias(p.pericias || []);
+        this._renderizarEquipamentos(p.equipamentos || []);
+        this._renderizarAtaques(p.ataques || []);
+        this._renderizarMagias(p.magias_slots || []);
+    }
 
-        // Foto
-        if (p.foto_url) {
-            var img = document.getElementById('fichaFoto');
-            img.src = p.foto_url;
-            img.classList.add('carregada');
-            document.getElementById('fichaFotoPlaceholder').style.display = 'none';
+    // ── Identidade ────────────────────────────────────────────
+    _renderizarIdentidade(p) {
+        this._texto('fichaNome',   p.nome    || '—');
+        this._texto('fichaRaca',   p.raca    || '—');
+        this._texto('fichaClasse', p.classe  || '—');
+        this._texto('fichaTipo',   p.tipo    || '—');
+        this._texto('fichaNivel',  (p.nivel  || 1) + 'º nível');
+
+        // ✅ Aplica cor do badge de tipo
+        const tagTipo = document.getElementById('fichaTipo');
+        if (tagTipo && p.tipo) {
+            tagTipo.className = 'ficha-tag ficha-tag-tipo ficha-tag-' + p.tipo.toLowerCase();
         }
+    }
 
-        // Atributos
-        var atribs = [
+    // ── Foto ──────────────────────────────────────────────────
+    _renderizarFoto(p) {
+        const img         = document.getElementById('fichaFoto');
+        const placeholder = document.getElementById('fichaFotoPlaceholder');
+        if (!img) return;
+
+        if (p.foto_url) {
+            img.src = p.foto_url;
+            img.onload  = () => {
+                img.classList.add('carregada');
+                if (placeholder) placeholder.style.display = 'none';
+            };
+            img.onerror = () => {
+                // Foto com erro → mantém placeholder
+                img.style.display = 'none';
+            };
+        }
+    }
+
+    // ── Atributos ─────────────────────────────────────────────
+    _renderizarAtributos(p) {
+        const atribs = [
             ['For', p.forca        || 10],
             ['Des', p.destreza     || 10],
             ['Con', p.constituicao || 10],
@@ -70,126 +117,147 @@ class FichaPersonagemPage {
             ['Sab', p.sabedoria    || 10],
             ['Car', p.carisma      || 10],
         ];
-        var self = this;
-        atribs.forEach(function(a) {
-            self._texto('ficha' + a[0],        a[1]);
-            self._texto('ficha' + a[0] + 'Mod', self._mod(a[1]));
-        });
 
-        // Defesa
-        this._texto('fichaCa',       p.ca        !== undefined ? p.ca       : 10);
+        atribs.forEach(([chave, valor]) => {
+            this._texto('ficha' + chave,        valor);
+            this._texto('ficha' + chave + 'Mod', this._mod(valor));
+        });
+    }
+
+    // ── Defesa ────────────────────────────────────────────────
+    _renderizarDefesa(p) {
+        // CA
+        this._texto('fichaCa',       p.ca       !== undefined ? p.ca       : 10);
         this._texto('fichaToque',    p.toque     !== undefined ? p.toque    : 10);
         this._texto('fichaSurpresa', p.surpresa  !== undefined ? p.surpresa : 10);
+
+        // Iniciativa
         this._texto('fichaIniciativa', this._sinal(p.iniciativa || 0));
 
-        // PV
-        var hpAtual = p.hp_atual  || 0;
-        var hpMax   = p.hp_maximo || 0;
+        // PV com barra de cor dinâmica
+        const hpAtual = p.hp_atual  || 0;
+        const hpMax   = p.hp_maximo || 0;
         this._texto('fichaPv', hpAtual + ' / ' + hpMax);
-        var pct = hpMax > 0 ? Math.min(100, (hpAtual / hpMax) * 100) : 0;
-        var cor = pct > 50 ? '#4CAF50' : pct > 25 ? '#FF9800' : '#F44336';
-        var fill = document.getElementById('fichaPvFill');
-        if (fill) { fill.style.width = pct + '%'; fill.style.background = cor; }
 
-        // Resistências
+        const pct  = hpMax > 0 ? Math.min(100, (hpAtual / hpMax) * 100) : 0;
+        const cor  = pct > 50 ? '#4CAF50' : pct > 25 ? '#FF9800' : '#F44336';
+        const fill = document.getElementById('fichaPvFill');
+        if (fill) {
+            fill.style.width      = pct + '%';
+            fill.style.background = cor;
+        }
+    }
+
+    // ── Resistências ──────────────────────────────────────────
+    _renderizarResistencias(p) {
         this._texto('fichaFort',   this._sinal(p.fortitude || 0));
         this._texto('fichaReflex', this._sinal(p.reflexos  || 0));
         this._texto('fichaVont',   this._sinal(p.vontade   || 0));
-
-        // Perícias
-        this._renderizarPericias(p.pericias || []);
-
-        // Equipamentos
-        this._renderizarEquipamentos(p.equipamentos || []);
-
-        // Ataques
-        this._renderizarAtaques(p.ataques || []);
-
-        // Magias
-        this._renderizarMagias(p.magias_slots || []);
     }
 
+    // ── Perícias ──────────────────────────────────────────────
     _renderizarPericias(pericias) {
-        var container = document.getElementById('fichaPericiasLista');
+        const container = document.getElementById('fichaPericiasLista');
         if (!container) return;
-        if (!pericias || pericias.length === 0) {
+
+        if (!pericias.length) {
             container.innerHTML = '<span class="ficha-vazio">Nenhuma perícia cadastrada</span>';
             return;
         }
-        var html = '';
-        for (var i = 0; i < pericias.length; i++) {
-            var p = pericias[i];
-            html += '<div class="ficha-pericia-item">';
-            html += '<span class="ficha-pericia-nome">' + p.nome + '</span>';
-            html += '<span class="ficha-pericia-valor">' + this._sinal(p.valor || 0) + '</span>';
-            html += '</div>';
-        }
-        container.innerHTML = html;
+
+        // ✅ Ordena por valor decrescente
+        const ordenadas = [...pericias].sort((a, b) => (b.valor || 0) - (a.valor || 0));
+
+        container.innerHTML = ordenadas.map(p => `
+            <div class="ficha-pericia-item">
+                <span class="ficha-pericia-nome">${p.nome || '—'}</span>
+                <span class="ficha-pericia-valor">${this._sinal(p.valor || 0)}</span>
+            </div>
+        `).join('');
     }
 
+    // ── Equipamentos ──────────────────────────────────────────
     _renderizarEquipamentos(equipamentos) {
-        var container = document.getElementById('fichaEquipamentos');
+        const container = document.getElementById('fichaEquipamentos');
         if (!container) return;
-        if (!equipamentos || equipamentos.length === 0) {
+
+        if (!equipamentos.length) {
             container.innerHTML = '<span class="ficha-vazio">Nenhum equipamento cadastrado</span>';
             return;
         }
-        var html = '';
-        for (var i = 0; i < equipamentos.length; i++) {
-            var e = equipamentos[i];
-            html += '<div class="ficha-equip-item">';
-            html += '🗡️ <span>' + e.nome + (e.descricao ? ' — ' + e.descricao : '') + '</span>';
-            html += '</div>';
-        }
-        container.innerHTML = html;
+
+        container.innerHTML = equipamentos.map(e => `
+            <div class="ficha-equip-item">
+                🗡️ <span>${e.nome || '—'}${e.descricao ? ' — ' + e.descricao : ''}</span>
+            </div>
+        `).join('');
     }
 
+    // ── Ataques ───────────────────────────────────────────────
     _renderizarAtaques(ataques) {
-        var container = document.getElementById('fichaAtaquesLista');
+        const container = document.getElementById('fichaAtaquesLista');
         if (!container) return;
-        if (!ataques || ataques.length === 0) {
+
+        if (!ataques.length) {
             container.innerHTML = '<div class="ficha-ataque-vazio">Nenhum ataque cadastrado</div>';
             return;
         }
-        var html = '';
-        for (var i = 0; i < ataques.length; i++) {
-            var a    = ataques[i];
-            var tipo = a.tipo_dano ? ' (' + a.tipo_dano + ')' : '';
-            html += '<div class="ficha-ataque-row">';
-            html += '<span class="ataque-nome">' + a.nome + '</span>';
-            html += '<span>' + (a.bonus_ataque || '—') + '</span>';
-            html += '<span>' + (a.dano || '—') + tipo + '</span>';
-            html += '</div>';
-        }
-        container.innerHTML = html;
+
+        container.innerHTML = ataques.map(a => {
+            const tipo = a.tipo_dano ? ` <span class="ataque-tipo">(${a.tipo_dano})</span>` : '';
+            return `
+                <div class="ficha-ataque-row">
+                    <span class="ataque-nome">${a.nome || '—'}</span>
+                    <span>${a.bonus_ataque !== undefined ? this._sinal(a.bonus_ataque) : '—'}</span>
+                    <span>${a.dano || '—'}${tipo}</span>
+                </div>
+            `;
+        }).join('');
     }
 
+    // ── Magias ────────────────────────────────────────────────
     _renderizarMagias(slots) {
-        var container = document.getElementById('fichaMagiasGrid');
+        const container = document.getElementById('fichaMagiasGrid');
         if (!container) return;
-        var comSlot = slots.filter(function(s) { return s.total > 0; });
-        if (comSlot.length === 0) {
+
+        // ✅ Filtra slots com total > 0 e ordena por nível
+        const comSlot = slots
+            .filter(s => s.total > 0)
+            .sort((a, b) => a.nivel - b.nivel);
+
+        if (!comSlot.length) {
             container.innerHTML = '<div class="ficha-magia-vazio">Nenhum slot cadastrado</div>';
             return;
         }
-        var html = '';
-        for (var i = 0; i < comSlot.length; i++) {
-            var s = comSlot[i];
-            html += '<div class="ficha-magia-row">';
-            html += '<span class="ficha-magia-nivel">NIV ' + s.nivel + '</span>';
-            html += '<span class="ficha-magia-slots">' + (s.total - s.usados) + '/' + s.total + '</span>';
-            html += '</div>';
-        }
-        container.innerHTML = html;
+
+        container.innerHTML = comSlot.map(s => {
+            const restantes = s.total - (s.usados || 0);
+            const corSlot   = restantes === 0 ? 'ficha-magia-esgotado' : '';
+            return `
+                <div class="ficha-magia-row ${corSlot}">
+                    <span class="ficha-magia-nivel">Nív ${s.nivel}</span>
+                    <span class="ficha-magia-slots">${restantes}/${s.total}</span>
+                </div>
+            `;
+        }).join('');
     }
 
-    _texto(id, valor) {
-        var el = document.getElementById(id);
-        if (el) el.textContent = valor;
-    }
-
+    // ── Erro ──────────────────────────────────────────────────
     _mostrarErro(msg) {
-        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#f4e9d0;font-family:serif;font-size:1.2rem;">' + msg + '</div>';
+        document.body.innerHTML = `
+            <div style="
+                display:flex; align-items:center; justify-content:center;
+                height:100vh; flex-direction:column; gap:1rem;
+                background:#1a0e06; color:#f4e9d0; font-family:serif;
+            ">
+                <span style="font-size:3rem;">⚠️</span>
+                <p style="font-size:1.1rem; text-align:center; max-width:400px;">${msg}</p>
+                <button onclick="window.close()"
+                    style="padding:0.5rem 1.5rem; background:#c9a84c; border:none;
+                           border-radius:8px; cursor:pointer; font-weight:bold;">
+                    Fechar
+                </button>
+            </div>`;
     }
 }
 
