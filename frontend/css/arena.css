@@ -558,3 +558,65 @@
     padding: 0 0.25rem;
     line-height: 1.4;
 }
+
+/* ── Magias: pips visuais de slot ── */
+.magia-sem-slot {
+    opacity: 0.35;
+}
+
+.arena-magia-slots-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+    min-width: 60px;
+}
+
+.arena-magia-usados-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+.arena-magia-pips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    justify-content: flex-end;
+    max-width: 60px;
+}
+
+.pip {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: background 0.2s;
+}
+
+.pip-livre  { background: rgba(99,102,241,0.5); }
+.pip-usado  { background: rgba(239,68,68,0.7);  }
+
+/* ── Botoes de magia com feedback visual ── */
+.arena-magia-btn-aumentar:not(:disabled) {
+    background: rgba(99,102,241,0.3);
+    border-color: rgba(99,102,241,0.6);
+    color: #a5b4fc;
+}
+
+.arena-magia-btn-diminuir:not(:disabled) {
+    background: rgba(239,68,68,0.25);
+    border-color: rgba(239,68,68,0.5);
+    color: #fca5a5;
+}
+
+.arena-magia-btn:not(:disabled):hover {
+    filter: brightness(1.3);
+    transform: scale(1.1);
+}
+
+.arena-magia-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}

@@ -1,5 +1,6 @@
 import { CombatenteService  } from '../services/CombatenteService.js';
 import { CondicaoController } from './CondicaoController.js';
+import { MagiaSlotService   } from '../services/MagiaSlotService.js';
 import { Toast              } from '../ui/Toast.js';
 
 export class ArenaController {
@@ -7,6 +8,7 @@ export class ArenaController {
     constructor() {
         this.combatenteService   = new CombatenteService();
         this.condicaoController  = new CondicaoController();
+        this.magiaSlotService    = new MagiaSlotService();
         this.combatentes         = [];
         this.turnoAtual          = 0;
         this.rodadaAtual         = 1;
@@ -59,7 +61,6 @@ export class ArenaController {
         if (idAtual !== null && this._jaAgiram.indexOf(idAtual) === -1) {
             this._jaAgiram.push(idAtual);
         }
-
         this.turnoAtual++;
         if (this.turnoAtual >= this.combatentes.length) {
             this.turnoAtual  = 0;
@@ -143,8 +144,67 @@ export class ArenaController {
     _atualizarBotaoCronometro() {
         var btn = document.getElementById('btnToggleCronometro');
         if (!btn) return;
-        btn.textContent = this._cronometroAtivo ? 'Pausar' : 'Retomar';
+        btn.textContent = this._cronometroAtivo ? '⏸ Pausar' : '▶ Retomar';
         btn.className   = 'btn-cronometro ' + (this._cronometroAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar');
+    }
+
+    // ─── Magias: lógica funcional ──────────────────────────
+
+    async _alterarUsadosMagia(slotId, nivel, acao) {
+        if (!slotId || slotId === 'null') {
+            Toast.error('Slot de magia nao encontrado para este nivel');
+            return;
+        }
+
+        var combatente = this.combatentes[this.turnoAtual];
+        if (!combatente) return;
+
+        var slot = null;
+        for (var k = 0; k < combatente.magias_slots.length; k++) {
+            if (combatente.magias_slots[k].nivel === nivel) {
+                slot = combatente.magias_slots[k];
+                break;
+            }
+        }
+        if (!slot) return;
+
+        var novoUsados = slot.usados;
+        if (acao === 'aumentar') {
+            if (slot.usados >= slot.total) {
+                Toast.error('Todos os slots do nivel ' + nivel + ' ja foram usados!');
+                return;
+            }
+            novoUsados = slot.usados + 1;
+        } else {
+            if (slot.usados <= 0) {
+                Toast.error('Nenhum slot usado no nivel ' + nivel);
+                return;
+            }
+            novoUsados = slot.usados - 1;
+        }
+
+        try {
+            await this.magiaSlotService.atualizarUsados(slotId, novoUsados);
+            slot.usados = novoUsados;
+
+            // Atualiza display sem re-renderizar o card inteiro
+            var spanValor = document.querySelector('.arena-magia-valor[data-nivel="' + nivel + '"]');
+            if (spanValor) spanValor.textContent = novoUsados;
+
+            // Atualiza estado visual dos botoes
+            var btnDiminuir = document.querySelector('.arena-magia-btn[data-acao="diminuir"][data-nivel="' + nivel + '"]');
+            var btnAumentar = document.querySelector('.arena-magia-btn[data-acao="aumentar"][data-nivel="' + nivel + '"]');
+            if (btnDiminuir) btnDiminuir.disabled = (novoUsados <= 0);
+            if (btnAumentar) btnAumentar.disabled = (novoUsados >= slot.total);
+
+            var msg = acao === 'aumentar'
+                ? 'Slot nivel ' + nivel + ' usado (' + novoUsados + '/' + slot.total + ')'
+                : 'Slot nivel ' + nivel + ' recuperado (' + novoUsados + '/' + slot.total + ')';
+            Toast.success(msg);
+        } catch (err) {
+            Toast.error('Erro ao atualizar magia: ' + (err.message || ''));
+            console.error(err);
+        }
     }
 
     // ─── Render: Ordem de Iniciativa ───────────────────────
@@ -277,13 +337,13 @@ export class ArenaController {
             ? '<img src="' + c.foto_url + '" alt="' + c.nome + '">'
             : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
 
-        var cronAtivo = this._cronometroAtivo;
+        var cronAtivo  = this._cronometroAtivo;
         var tempoAtual = this._formatarTempo(this._cronometroSegundos);
 
         var html = '';
         html += '<div class="arena-card">';
 
-        // Topo
+        // ── Topo
         html += '<div class="arena-topo">';
         html += '<div class="arena-foto-nome">';
         html += '<div class="arena-foto">' + fotoTopo + '</div>';
@@ -297,24 +357,22 @@ export class ArenaController {
         html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
         html += '</div></div>';
 
-        // Cronometro
+        // ── Cronometro
         html += '<div class="arena-cronometro-bar">';
         html += '<div class="arena-cronometro-esquerda">';
         html += '<div class="arena-cronometro-icone">⏱</div>';
         html += '<div class="arena-cronometro-info">';
         html += '<span class="arena-cronometro-label">Tempo de Sessao</span>';
         html += '<span class="arena-cronometro-display ' + (cronAtivo ? 'cronometro-ativo' : 'cronometro-pausado') + '" id="cronometroDisplay">' + tempoAtual + '</span>';
-        html += '</div>';
-        html += '</div>';
+        html += '</div></div>';
         html += '<div class="arena-cronometro-acoes">';
         html += '<button id="btnToggleCronometro" class="btn-cronometro ' + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar') + '" onclick="window._toggleCronometro()">';
         html += cronAtivo ? '⏸ Pausar' : '▶ Retomar';
         html += '</button>';
         html += '<button class="btn-cronometro btn-cronometro-reset" onclick="window._resetarCronometro()">↺ Zerar</button>';
-        html += '</div>';
-        html += '</div>';
+        html += '</div></div>';
 
-        // Stats
+        // ── Stats
         html += '<div class="arena-stats-linha">';
         html += '<div class="arena-stat-box arena-stat-pv">';
         html += '<span class="arena-stat-label">PV</span>';
@@ -326,7 +384,7 @@ export class ArenaController {
         html += '<div class="arena-stat-box arena-stat-toque"><span class="arena-stat-label">Toque</span><span class="' + tClasse + '">' + tValor + '</span></div>';
         html += '</div>';
 
-        // Grade central
+        // ── Grade central
         html += '<div class="arena-grade-central">';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Atributos</h3><div class="arena-atributos-grid">' + atributosHTML + '</div></div>';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Resistencias</h3><div class="arena-resistencias-lista">';
@@ -342,11 +400,10 @@ export class ArenaController {
         html += '<button class="arena-btn-proximo"   onclick="window._avancarTurno()">Encerrar turno</button>';
         html += '</div></div>';
 
-        // Linha inferior
+        // ── Linha inferior — SEM div futuro
         html += '<div class="arena-linha-inferior">';
         html += ataquesHTML;
         html += magiasHTML;
-        html += '<div class="arena-secao arena-futuro-secao"><div class="arena-futuro-placeholder">Quadro para futuro uso</div></div>';
         html += '</div>';
         html += '</div>';
 
@@ -361,7 +418,22 @@ export class ArenaController {
         window._toggleCronometro  = function() { self.toggleCronometro(); };
         window._resetarCronometro = function() { self._resetarCronometro(); self._iniciarCronometro(); };
 
+        // ── Eventos dos botoes de magia (delegação no container)
+        this._configurarEventosMagias(container);
+
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
+    }
+
+    _configurarEventosMagias(container) {
+        var self = this;
+        container.querySelectorAll('.arena-magia-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var slotId = btn.getAttribute('data-slot-id');
+                var acao   = btn.getAttribute('data-acao');
+                var nivel  = parseInt(btn.getAttribute('data-nivel'));
+                self._alterarUsadosMagia(slotId, nivel, acao);
+            });
+        });
     }
 
     _renderizarAtaques(ataques) {
@@ -393,6 +465,7 @@ export class ArenaController {
         html += '<div class="arena-secao">';
         html += '<h3 class="arena-secao-titulo">Controle de Magias</h3>';
         html += '<div class="arena-magias-grid">';
+
         for (var nivel = 0; nivel <= 9; nivel++) {
             var slot = null;
             for (var k = 0; k < slots.length; k++) {
@@ -401,17 +474,33 @@ export class ArenaController {
             var total    = slot ? slot.total  : 0;
             var usados   = slot ? slot.usados : 0;
             var slotId   = slot ? slot.id     : null;
-            var disabled = (!isJogador || total === 0) ? 'disabled' : '';
-            html += '<div class="arena-magia-linha" data-nivel="' + nivel + '">';
+
+            // Botoes so ativos se for jogador, tiver total > 0 e dentro dos limites
+            var disAumentar = (!isJogador || total === 0 || usados >= total) ? 'disabled' : '';
+            var disDiminuir = (!isJogador || total === 0 || usados <= 0)    ? 'disabled' : '';
+
+            // Calcula restante para exibir visualmente
+            var restante = total - usados;
+            var linhaClass = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
+
+            html += '<div class="' + linhaClass + '" data-nivel="' + nivel + '">';
             html += '<span class="arena-magia-nivel">NIV ' + nivel + '</span>';
             html += '<div class="arena-magia-controle">';
-            html += '<button class="arena-magia-btn" data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '" ' + disabled + '>-</button>';
+            html += '<button class="arena-magia-btn arena-magia-btn-diminuir" data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '" ' + disDiminuir + '>-</button>';
             html += '<span class="arena-magia-valor" data-nivel="' + nivel + '">' + usados + '</span>';
-            html += '<button class="arena-magia-btn" data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '" ' + disabled + '>+</button>';
+            html += '<button class="arena-magia-btn arena-magia-btn-aumentar" data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '" ' + disAumentar + '>+</button>';
             html += '</div>';
-            html += '<span class="arena-magia-usados" data-nivel-total="' + nivel + '">' + total + '</span>';
+            html += '<div class="arena-magia-slots-info">';
+            html += '<span class="arena-magia-usados-label">' + usados + '/' + total + '</span>';
+            html += '<div class="arena-magia-pips">';
+            for (var p = 0; p < total; p++) {
+                var pipClass = p < usados ? 'pip pip-usado' : 'pip pip-livre';
+                html += '<span class="' + pipClass + '"></span>';
+            }
+            html += '</div></div>';
             html += '</div>';
         }
+
         html += '</div></div>';
         return html;
     }
