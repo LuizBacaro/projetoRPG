@@ -25,7 +25,7 @@ export class ArenaController {
             if (e.detail && e.detail.combatentes) {
                 self.iniciarCombate(e.detail.combatentes);
             } else {
-                Toast.error('Erro: Dados de combatentes invalidos');
+                Toast.error('Dados de combatentes invalidos');
             }
         });
     }
@@ -110,9 +110,9 @@ export class ArenaController {
         function next() {
             if (i >= self.combatentes.length) return;
             var c = self.combatentes[i++];
-            var cardEl = document.querySelector('.combatente-ordem-item[data-combatente-id="' + c.id + '"]');
-            if (cardEl) {
-                self.condicaoController.atualizarBadgesOrdem(cardEl, c.id).then(next);
+            var el = document.querySelector('.combatente-ordem-item[data-combatente-id="' + c.id + '"]');
+            if (el) {
+                self.condicaoController.atualizarBadgesOrdem(el, c.id).then(next);
             } else {
                 next();
             }
@@ -269,7 +269,7 @@ export class ArenaController {
     }
 
     resetarCombate() {
-        if (!confirm('Deseja resetar o combate? Todos voltarao ao HP maximo.')) return;
+        if (!confirm('Deseja resetar o combate?')) return;
         var self = this;
         this.combatentes.forEach(function(c) {
             c.hp_atual = c.hp_maximo;
