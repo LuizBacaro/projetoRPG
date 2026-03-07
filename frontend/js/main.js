@@ -94,7 +94,7 @@ function _exibirUsuarioHeader() {
 
 function _configurarEventosRecarregamento() {
     var eventos = ['combatenteCriado', 'combatenteAtualizado', 'combatenteDeletado'];
-    for (var i = 0; i &lt; eventos.length; i++) {
+    for (var i = 0; i < eventos.length; i++) {
         (function(ev) {
             document.addEventListener(ev, function() {
                 app.controllers.configuracao.carregarCombatentes();

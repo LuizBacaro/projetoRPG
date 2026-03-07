@@ -80,12 +80,12 @@ export class ArenaController {
         if (!container) return;
         var self = this;
         var html = '';
-        for (var i = 0; i &lt; this.combatentes.length; i++) {
+        for (var i = 0; i < this.combatentes.length; i++) {
             var c     = this.combatentes[i];
             var ativo = (i === this.turnoAtual);
             var hpPct = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
             var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
-            var morto = (c.hp_atual &lt;= 0);
+            var morto = (c.hp_atual <= 0);
             var cls   = 'combatente-ordem-item' + (ativo ? ' ativo' : '') + (morto ? ' morto' : '');
             html += '<div class="' + cls + '" data-combatente-id="' + c.id + '">';
             html += '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>';
@@ -141,8 +141,8 @@ export class ArenaController {
 
         this.renderizarFotoAtivo();
 
-        var hpPct  = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
-        var hpCor  = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
+        var hpPct = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
+        var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
 
         var ca       = (c.ca        !== null && c.ca        !== undefined) ? c.ca        : 10;
         var toque    = (c.toque     !== null && c.toque     !== undefined) ? c.toque     : 10;
@@ -180,7 +180,7 @@ export class ArenaController {
             ['Car', c.carisma      || 10]
         ];
         var atributosHTML = '';
-        for (var j = 0; j &lt; atribs.length; j++) {
+        for (var j = 0; j < atribs.length; j++) {
             atributosHTML += '<div class="arena-atributo-box">';
             atributosHTML += '<span class="arena-atributo-nome">' + atribs[j][0] + '</span>';
             atributosHTML += '<span class="arena-atributo-valor">' + atribs[j][1] + '</span>';

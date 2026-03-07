@@ -18,9 +18,9 @@ export class ArenaAtaquesMagias {
         }
 
         var linhas = '';
-        for (var i = 0; i &lt; ataques.length; i++) {
-            var a      = ataques[i];
-            var tipo   = a.tipo_dano ? ' (' + a.tipo_dano + ')' : '';
+        for (var i = 0; i < ataques.length; i++) {
+            var a    = ataques[i];
+            var tipo = a.tipo_dano ? ' (' + a.tipo_dano + ')' : '';
             linhas += '<div class="arena-ataque-item">';
             linhas += '<span>' + a.nome + '</span>';
             linhas += '<span>' + a.bonus_ataque + '</span>';
@@ -46,10 +46,10 @@ export class ArenaAtaquesMagias {
         if (!container) return;
 
         var grid = [];
-        for (var i = 0; i &lt;= 9; i++) {
+        for (var i = 0; i <= 9; i++) {
             var slot = null;
             if (slots) {
-                for (var k = 0; k &lt; slots.length; k++) {
+                for (var k = 0; k < slots.length; k++) {
                     if (slots[k].nivel === i) { slot = slots[k]; break; }
                 }
             }
@@ -62,7 +62,7 @@ export class ArenaAtaquesMagias {
         }
 
         var linhas = '';
-        for (var j = 0; j &lt; grid.length; j++) {
+        for (var j = 0; j < grid.length; j++) {
             var s        = grid[j];
             var disabled = (s.total === 0) ? 'disabled' : '';
             linhas += '<div class="arena-magia-linha" data-nivel="' + s.nivel + '">';
@@ -85,7 +85,7 @@ export class ArenaAtaquesMagias {
 
         if (onUsadosChange) {
             var btns = container.querySelectorAll('.arena-magia-btn');
-            for (var b = 0; b &lt; btns.length; b++) {
+            for (var b = 0; b < btns.length; b++) {
                 (function(btn) {
                     btn.addEventListener('click', function() {
                         var nivel   = parseInt(btn.dataset.nivel);
@@ -96,7 +96,7 @@ export class ArenaAtaquesMagias {
                         var total   = parseInt(spanTot ? spanTot.textContent : 0);
                         var usados  = parseInt(spanVal ? spanVal.textContent : 0);
 
-                        if      (acao === 'aumentar' && usados &lt; total) usados++;
+                        if      (acao === 'aumentar' && usados < total) usados++;
                         else if (acao === 'diminuir' && usados > 0)     usados--;
                         else return;
 
