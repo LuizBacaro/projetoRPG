@@ -16,23 +16,23 @@ export class ArenaController {
 
     _inicializar() {
         this.condicaoController.init();
-        this._configurarEventos();
+        this.configurarEventos();
     }
 
-    _configurarEventos() {
+    configurarEventos() {
         var self = this;
         document.addEventListener('iniciarCombate', function(e) {
             if (e.detail && e.detail.combatentes) {
                 self.iniciarCombate(e.detail.combatentes);
             } else {
-                Toast.error('Dados de combatentes invalidos');
+                Toast.error('Erro: Dados de combatentes invalidos');
             }
         });
     }
 
     iniciarCombate(combatentes) {
-        if (!combatentes || !Array.isArray(combatentes) || !combatentes.length) {
-            Toast.error('Nenhum combatente valido');
+        if (!combatentes || !Array.isArray(combatentes) || combatentes.length === 0) {
+            Toast.error('Nenhum combatente valido para iniciar combate');
             return;
         }
         this.combatentes = combatentes.sort(function(a, b) {
@@ -188,6 +188,9 @@ export class ArenaController {
             atributosHTML += '</div>';
         }
 
+        var ataquesHTML = this._renderizarAtaques(c.ataques || []);
+        var magiasHTML  = this._renderizarMagias(c.magias_slots || [], c.tipo);
+
         var fotoTopo = c.foto_url
             ? '<img src="' + c.foto_url + '" alt="' + c.nome + '">'
             : '<div class="arena-foto-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
@@ -206,6 +209,7 @@ export class ArenaController {
         html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoTxt + '</button>';
         html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
         html += '</div></div>';
+
         html += '<div class="arena-stats-linha">';
         html += '<div class="arena-stat-box arena-stat-pv">';
         html += '<span class="arena-stat-label">PV</span>';
@@ -216,6 +220,7 @@ export class ArenaController {
         html += '<div class="arena-stat-box arena-stat-surpresa"><span class="arena-stat-label">Surpresa</span><span class="' + sClasse + '">' + sValor + '</span></div>';
         html += '<div class="arena-stat-box arena-stat-toque"><span class="arena-stat-label">Toque</span><span class="' + tClasse + '">' + tValor + '</span></div>';
         html += '</div>';
+
         html += '<div class="arena-grade-central">';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Atributos</h3><div class="arena-atributos-grid">' + atributosHTML + '</div></div>';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Resistencias</h3><div class="arena-resistencias-lista">';
@@ -230,9 +235,10 @@ export class ArenaController {
         html += '<button class="arena-btn-condicao"  onclick="window._abrirCondicao()">Condicao</button>';
         html += '<button class="arena-btn-proximo"   onclick="window._avancarTurno()">Encerrar turno</button>';
         html += '</div></div>';
+
         html += '<div class="arena-linha-inferior">';
-        html += '<div id="arenaAtaquesContainer"></div>';
-        html += '<div id="arenaMagiasContainer"></div>';
+        html += ataquesHTML;
+        html += magiasHTML;
         html += '<div class="arena-secao arena-futuro-secao"><div class="arena-futuro-placeholder">Quadro para futuro uso</div></div>';
         html += '</div>';
         html += '</div>';
@@ -240,17 +246,70 @@ export class ArenaController {
         container.innerHTML = html;
 
         var self = this;
-        window._abrirDanoCura    = function() { if (window.modalDanoCuraInstance) window.modalDanoCuraInstance.abrir(self.combatentes); };
-        window._abrirCondicao    = function() { if (window.modalCondicaoInstance) window.modalCondicaoInstance.abrir(); else console.error('modalCondicaoInstance nao inicializado'); };
+        window._abrirDanoCura    = function() { if (typeof modalDanoCuraInstance !== 'undefined') modalDanoCuraInstance.abrir(self.combatentes); };
+        window._abrirCondicao    = function() { if (typeof modalCondicaoInstance !== 'undefined') modalCondicaoInstance.abrir(); else console.error('modalCondicaoInstance nao inicializado'); };
         window._toggleStats      = function() { self.toggleVisibilidadeStats(); };
         window._avancarTurno     = function() { self.avancarTurno(); };
         window._finalizarCombate = function() { self.finalizarCombate(); };
 
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
+    }
 
-        document.dispatchEvent(new CustomEvent('combatenteAtivoMudou', {
-            detail: { combatente: c }
-        }));
+    _renderizarAtaques(ataques) {
+        var html = '';
+        html += '<div class="arena-secao">';
+        html += '<h3 class="arena-secao-titulo">Ataques</h3>';
+        html += '<div class="arena-ataques-lista">';
+        html += '<div class="arena-ataque-header"><span>Nome</span><span>Ataque</span><span>Dano</span></div>';
+
+        if (!ataques || ataques.length === 0) {
+            html += '<div class="arena-ataque-item arena-ataque-placeholder"><span>Nenhum ataque cadastrado</span></div>';
+        } else {
+            for (var i = 0; i < ataques.length; i++) {
+                var a    = ataques[i];
+                var tipo = a.tipo_dano ? ' (' + a.tipo_dano + ')' : '';
+                html += '<div class="arena-ataque-item">';
+                html += '<span>' + a.nome + '</span>';
+                html += '<span>' + a.bonus_ataque + '</span>';
+                html += '<span>' + a.dano + tipo + '</span>';
+                html += '</div>';
+            }
+        }
+
+        html += '</div></div>';
+        return html;
+    }
+
+    _renderizarMagias(slots, tipo) {
+        var isJogador = (tipo === 'jogador');
+        var html = '';
+        html += '<div class="arena-secao">';
+        html += '<h3 class="arena-secao-titulo">Controle de Magias</h3>';
+        html += '<div class="arena-magias-grid">';
+
+        for (var nivel = 0; nivel <= 9; nivel++) {
+            var slot  = null;
+            for (var k = 0; k < slots.length; k++) {
+                if (slots[k].nivel === nivel) { slot = slots[k]; break; }
+            }
+            var total       = slot ? slot.total  : 0;
+            var usados      = slot ? slot.usados : 0;
+            var slotId      = slot ? slot.id     : null;
+            var disabled    = (!isJogador || total === 0) ? 'disabled' : '';
+
+            html += '<div class="arena-magia-linha" data-nivel="' + nivel + '">';
+            html += '<span class="arena-magia-nivel">NIV ' + nivel + '</span>';
+            html += '<div class="arena-magia-controle">';
+            html += '<button class="arena-magia-btn" data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '" ' + disabled + '>-</button>';
+            html += '<span class="arena-magia-valor" data-nivel="' + nivel + '">' + usados + '</span>';
+            html += '<button class="arena-magia-btn" data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '" ' + disabled + '>+</button>';
+            html += '</div>';
+            html += '<span class="arena-magia-usados" data-nivel-total="' + nivel + '">' + total + '</span>';
+            html += '</div>';
+        }
+
+        html += '</div></div>';
+        return html;
     }
 
     calcularModificador(valor) { return Math.floor((valor - 10) / 2); }
@@ -266,7 +325,7 @@ export class ArenaController {
     }
 
     resetarCombate() {
-        if (!confirm('Deseja resetar o combate?')) return;
+        if (!confirm('Deseja resetar o combate? Todos voltarao ao HP maximo.')) return;
         var self = this;
         this.combatentes.forEach(function(c) {
             c.hp_atual = c.hp_maximo;
