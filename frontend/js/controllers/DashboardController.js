@@ -171,12 +171,12 @@ class DashboardController {
                     self._salvarAtaquesEdicao(id),
                     self._salvarMagiasEdicao(id)
                 ]);
-                Toast.success('Combatente atualizado com sucesso!');
                 self._fecharModal('modalEdicaoDashboard');
                 self.combatenteEmEdicao = null;
                 self.carregarCombatentes();
+                Toast.success('Alteracoes salvas com sucesso!');
             } catch (err) {
-                Toast.error(err.message || 'Erro ao atualizar');
+                Toast.error(err.message || 'Erro ao salvar alteracoes');
                 console.error(err);
             } finally {
                 btn.disabled    = false;
