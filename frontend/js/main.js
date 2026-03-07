@@ -1,7 +1,6 @@
 import { ConfiguracaoController } from './controllers/ConfiguracaoController.js';
 import { ArenaController        } from './controllers/ArenaController.js';
 import { ModalEdicao            } from './ui/ModalEdicao.js';
-import { ArenaAtaquesMagias     } from './ui/ArenaAtaquesMagias.js';
 import { atualizarModificadorDOM} from './utils/dnd.js';
 
 var app = { controllers: {}, modals: {} };
@@ -33,37 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     _configurarEventosRecarregamento();
-
-    document.addEventListener('combatenteAtivoMudou', function(e) {
-        var combatente = (e.detail && e.detail.combatente) ? e.detail.combatente : null;
-        if (!combatente) return;
-
-        var isJogador = (combatente.tipo === 'jogador');
-
-        ArenaAtaquesMagias.renderAtaques(
-            combatente.ataques || [],
-            'arenaAtaquesContainer'
-        );
-
-        ArenaAtaquesMagias.renderMagias(
-            isJogador ? (combatente.magias_slots || []) : [],
-            'arenaMagiasContainer',
-            function(slotId, nivel, usados) {
-                if (!slotId) return;
-                var token = sessionStorage.getItem('rpg_token');
-                fetch('/api/magias_slots/' + slotId + '/usados', {
-                    method:  'PATCH',
-                    headers: {
-                        'Content-Type':  'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify({ usados: usados })
-                }).catch(function(err) {
-                    console.error('Erro ao persistir slot de magia:', err);
-                });
-            }
-        );
-    });
 
     window.atualizarModificador = atualizarModificadorDOM;
     window.fecharModalEdicao    = function() { app.modals.edicao.fechar();  };
@@ -118,7 +86,7 @@ function _removerImagemUpload(sufixo, isEdit) {
     var input         = document.getElementById(inputId);
     var placeholder   = document.getElementById(placeholderId);
     var preview       = document.getElementById(previewId);
-    if (input)       input.value              = '';
+    if (input)       input.value               = '';
     if (placeholder) placeholder.style.display = 'flex';
     if (preview)     preview.style.display     = 'none';
 }
