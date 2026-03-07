@@ -1,11 +1,3 @@
-/**
- * DashboardController
- * SRP: orquestra listagem, cadastro e edição de combatentes no dashboard
- * DIP: depende de CombatenteServiceGlobal e AtaqueService via window global
- *
- * Carregado via createElement (sem type="module")
- * Ordem obrigatória: AuthService → Toast → AtaqueService → DashboardController
- */
 class DashboardController {
 
     constructor() {
@@ -17,40 +9,35 @@ class DashboardController {
         this._inicializar();
     }
 
-    // ── Globais ───────────────────────────────────────────────────────────
-
     _registrarGlobais() {
-        window.fecharModalCadastro        = () => this._fecharModal('modalCadastroJogador');
-        window.fecharModalCadastroMonstro = () => this._fecharModal('modalCadastroMonstro');
-        window.fecharModalCadastroNPC     = () => this._fecharModal('modalCadastroNPC');
-        window.fecharSeletorTipo          = () => this._fecharModal('seletorTipo');
-        window.fecharModalEdicao          = () => this._fecharModal('modalEdicaoDashboard');
+        window.fecharModalCadastro        = function() { _dc._fecharModal('modalCadastroJogador'); };
+        window.fecharModalCadastroMonstro = function() { _dc._fecharModal('modalCadastroMonstro'); };
+        window.fecharModalCadastroNPC     = function() { _dc._fecharModal('modalCadastroNPC'); };
+        window.fecharSeletorTipo          = function() { _dc._fecharModal('seletorTipo'); };
+        window.fecharModalEdicao          = function() { _dc._fecharModal('modalEdicaoDashboard'); };
 
-        window.abrirModalCadastro = (tipo) => {
-            this._fecharModal('seletorTipo');
-            const mapa = {
-                jogador: 'modalCadastroJogador',
-                monstro: 'modalCadastroMonstro',
-                npc:     'modalCadastroNPC'
-            };
-            this._abrirModal(mapa[tipo]);
+        window.abrirModalCadastro = function(tipo) {
+            _dc._fecharModal('seletorTipo');
+            var mapa = { jogador: 'modalCadastroJogador', monstro: 'modalCadastroMonstro', npc: 'modalCadastroNPC' };
+            _dc._abrirModal(mapa[tipo]);
         };
 
-        window.confirmarDelecao     = () => this._deletarCombatente();
-        window.atualizarModificador = (input) => this._calcularModificador(input);
+        window.confirmarDelecao     = function() { _dc._deletarCombatente(); };
+        window.atualizarModificador = function(input) { _dc._calcularModificador(input); };
 
-        window.previewImagemUpload  = (input, previewId, imgId, placeholderId) =>
-            this._previewImagem(input, previewId, imgId, placeholderId);
-        window.removerImagem        = () => this._removerImagem('',        false);
-        window.removerImagemMonstro = () => this._removerImagem('Monstro', false);
-        window.removerImagemNPC     = () => this._removerImagem('NPC',     false);
-        window.removerImagemEdicao  = () => this._removerImagem('',        true);
+        window.previewImagemUpload  = function(input, previewId, imgId, placeholderId) {
+            _dc._previewImagem(input, previewId, imgId, placeholderId);
+        };
+        window.removerImagem        = function() { _dc._removerImagem('', false); };
+        window.removerImagemMonstro = function() { _dc._removerImagem('Monstro', false); };
+        window.removerImagemNPC     = function() { _dc._removerImagem('NPC', false); };
+        window.removerImagemEdicao  = function() { _dc._removerImagem('', true); };
 
-        window.adicionarLinhaAtaque = () => this._adicionarLinhaAtaque();
-        window.removerLinhaAtaque   = (btn) => btn.closest('.ataque-linha').remove();
+        window.adicionarLinhaAtaque = function() { _dc._adicionarLinhaAtaque(); };
+        window.removerLinhaAtaque   = function(btn) { btn.closest('.ataque-linha').remove(); };
+
+        window._dc = this;
     }
-
-    // ── Inicialização ─────────────────────────────────────────────────────
 
     _inicializar() {
         this._configurarAbas();
@@ -67,62 +54,53 @@ class DashboardController {
         this.carregarCombatentes();
     }
 
-    // ── Abas ──────────────────────────────────────────────────────────────
-
     _configurarAbas() {
-        document.querySelectorAll('.nav-tab').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(function(b) { b.classList.remove('active'); });
+                document.querySelectorAll('.tab-section').forEach(function(s) { s.classList.remove('active'); });
                 btn.classList.add('active');
                 document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
             });
         });
     }
 
-    // ── Filtros ───────────────────────────────────────────────────────────
-
     _configurarFiltros() {
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        var self = this;
+        document.querySelectorAll('.filter-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
                 btn.classList.add('active');
-                this.filtroAtual = btn.dataset.tipo;
-                this.carregarCombatentes();
+                self.filtroAtual = btn.dataset.tipo;
+                self.carregarCombatentes();
             });
         });
     }
 
-    // ── Botão novo ────────────────────────────────────────────────────────
-
     _configurarBotaoNovo() {
-        const btn = document.getElementById('btnNovoCombatente');
-        if (btn) btn.addEventListener('click', () => this._abrirModal('seletorTipo'));
+        var self = this;
+        var btn = document.getElementById('btnNovoCombatente');
+        if (btn) btn.addEventListener('click', function() { self._abrirModal('seletorTipo'); });
     }
 
-    // ── Formulários de cadastro ───────────────────────────────────────────
-
     _configurarFormCadastro(formId, tipo, modalId) {
-        const form = document.getElementById(formId);
+        var self = this;
+        var form = document.getElementById(formId);
         if (!form) { console.error('Form nao encontrado: ' + formId); return; }
 
-        const textos = {
-            jogador: 'Cadastrar Jogador',
-            monstro: 'Cadastrar Monstro',
-            npc:     'Cadastrar NPC'
-        };
+        var textos = { jogador: 'Cadastrar Jogador', monstro: 'Cadastrar Monstro', npc: 'Cadastrar NPC' };
 
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = form.querySelector('[type="submit"]');
+            var btn = form.querySelector('[type="submit"]');
             btn.disabled    = true;
             btn.textContent = 'Salvando...';
             try {
-                const c = await this.service.criar(new FormData(form));
+                var c = await self.service.criar(new FormData(form));
                 Toast.success(c.nome + ' cadastrado com sucesso!');
-                this._fecharModal(modalId);
-                this._limparForm(form, tipo);
-                this.carregarCombatentes();
+                self._fecharModal(modalId);
+                self._limparForm(form, tipo);
+                self.carregarCombatentes();
             } catch (err) {
                 Toast.error(err.message || 'Erro ao cadastrar');
                 console.error(err);
@@ -133,31 +111,27 @@ class DashboardController {
         });
     }
 
-    // ── Formulário de edição ──────────────────────────────────────────────
-
     _configurarFormEdicao() {
-        const form = document.getElementById('formEdicaoDashboard');
+        var self = this;
+        var form = document.getElementById('formEdicaoDashboard');
         if (!form) { console.error('Form de edicao nao encontrado'); return; }
 
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = form.querySelector('[type="submit"]');
+            var btn = form.querySelector('[type="submit"]');
             btn.disabled    = true;
             btn.textContent = 'Salvando...';
             try {
-                const id = parseInt(document.getElementById('dashEditId').value);
-                await this.service.atualizar(id, new FormData(form));
-
+                var id = parseInt(document.getElementById('dashEditId').value);
+                await self.service.atualizar(id, new FormData(form));
                 await Promise.all([
-                    this._salvarAtaquesEdicao(id),
-                    this._salvarMagiasEdicao(id)
+                    self._salvarAtaquesEdicao(id),
+                    self._salvarMagiasEdicao(id)
                 ]);
-
-                // ✅ Toast sem quebra de linha — string simples
                 Toast.success('Combatente atualizado com sucesso!');
-                this._fecharModal('modalEdicaoDashboard');
-                this.combatenteEmEdicao = null;
-                this.carregarCombatentes();
+                self._fecharModal('modalEdicaoDashboard');
+                self.combatenteEmEdicao = null;
+                self.carregarCombatentes();
             } catch (err) {
                 Toast.error(err.message || 'Erro ao atualizar');
                 console.error(err);
@@ -168,44 +142,35 @@ class DashboardController {
         });
     }
 
-    // ── Upload (cadastro) ─────────────────────────────────────────────────
-
     _configurarUpload(sufixo) {
-        const input = document.getElementById('inputFoto' + sufixo);
+        var self = this;
+        var input = document.getElementById('inputFoto' + sufixo);
         if (!input) return;
-        input.addEventListener('change', () =>
-            this._previewImagem(
+        input.addEventListener('change', function() {
+            self._previewImagem(
                 input,
                 'uploadPreview'     + sufixo,
                 'previewImage'      + sufixo,
                 'uploadPlaceholder' + sufixo
-            )
-        );
+            );
+        });
     }
-
-    // ── Upload (edição) ───────────────────────────────────────────────────
 
     _configurarUploadEdicao() {
-        const area  = document.getElementById('dashEditUploadArea');
-        const input = document.getElementById('dashEditFoto');
+        var self  = this;
+        var area  = document.getElementById('dashEditUploadArea');
+        var input = document.getElementById('dashEditFoto');
         if (!area || !input) return;
-        area.addEventListener('click', () => input.click());
-        input.addEventListener('change', () =>
-            this._previewImagem(
-                input,
-                'dashEditUploadPreview',
-                'dashEditPreviewImage',
-                'dashEditUploadPlaceholder'
-            )
-        );
+        area.addEventListener('click', function() { input.click(); });
+        input.addEventListener('change', function() {
+            self._previewImagem(input, 'dashEditUploadPreview', 'dashEditPreviewImage', 'dashEditUploadPlaceholder');
+        });
     }
-
-    // ── Carrega combatentes ───────────────────────────────────────────────
 
     async carregarCombatentes() {
         try {
-            const tipo        = this.filtroAtual === 'todos' ? null : this.filtroAtual;
-            const combatentes = await this.service.listar(tipo);
+            var tipo        = this.filtroAtual === 'todos' ? null : this.filtroAtual;
+            var combatentes = await this.service.listar(tipo);
             this._renderizarTabela(combatentes);
             this._atualizarResumo(combatentes);
         } catch (err) {
@@ -214,38 +179,37 @@ class DashboardController {
         }
     }
 
-    // ── Renderiza tabela ──────────────────────────────────────────────────
-
     _renderizarTabela(combatentes) {
-        const tbody = document.getElementById('tabelaCombatentes');
+        var self  = this;
+        var tbody = document.getElementById('tabelaCombatentes');
         if (!combatentes.length) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b">Nenhum combatente cadastrado.</td></tr>';
             return;
         }
-        tbody.innerHTML = combatentes.map(function(c) {
-            return '<tr>' +
-                '<td><span class="badge badge-' + c.tipo + '">' + c.tipo + '</span></td>' +
-                '<td>' + c.nome + '</td>' +
-                '<td>' + (c.classe || '-') + '</td>' +
-                '<td>' + (c.nivel || 1) + '</td>' +
-                '<td>' + c.hp_maximo + '</td>' +
-                '<td>' + c.iniciativa + '</td>' +
-                '<td>' +
-                    '<button class="btn-acao" data-id="' + c.id + '" data-acao="editar" title="Editar">✏️</button>' +
-                    '<button class="btn-acao" data-id="' + c.id + '" data-acao="excluir" title="Excluir">🗑️</button>' +
-                '</td>' +
-                '</tr>';
-        }).join('');
+        var rows = '';
+        for (var i = 0; i &lt; combatentes.length; i++) {
+            var c = combatentes[i];
+            rows += '<tr>';
+            rows += '<td><span class="badge badge-' + c.tipo + '">' + c.tipo + '</span></td>';
+            rows += '<td>' + c.nome + '</td>';
+            rows += '<td>' + (c.classe || '-') + '</td>';
+            rows += '<td>' + (c.nivel || 1) + '</td>';
+            rows += '<td>' + c.hp_maximo + '</td>';
+            rows += '<td>' + c.iniciativa + '</td>';
+            rows += '<td>';
+            rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="editar" title="Editar">✏️</button>';
+            rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="excluir" title="Excluir">🗑️</button>';
+            rows += '</td></tr>';
+        }
+        tbody.innerHTML = rows;
 
-        tbody.querySelectorAll('[data-acao="editar"]').forEach((btn) => {
-            btn.addEventListener('click', () => this._abrirEdicao(parseInt(btn.dataset.id)));
+        tbody.querySelectorAll('[data-acao="editar"]').forEach(function(btn) {
+            btn.addEventListener('click', function() { self._abrirEdicao(parseInt(btn.dataset.id)); });
         });
-        tbody.querySelectorAll('[data-acao="excluir"]').forEach((btn) => {
-            btn.addEventListener('click', () => this._excluirCombatente(parseInt(btn.dataset.id)));
+        tbody.querySelectorAll('[data-acao="excluir"]').forEach(function(btn) {
+            btn.addEventListener('click', function() { self._excluirCombatente(parseInt(btn.dataset.id)); });
         });
     }
-
-    // ── Resumo ────────────────────────────────────────────────────────────
 
     _atualizarResumo(combatentes) {
         document.getElementById('totalGeral').textContent     = combatentes.length;
@@ -254,11 +218,9 @@ class DashboardController {
         document.getElementById('totalNPCs').textContent      = combatentes.filter(function(c) { return c.tipo === 'npc'; }).length;
     }
 
-    // ── Edição ────────────────────────────────────────────────────────────
-
     async _abrirEdicao(id) {
         try {
-            const c = await this.service.obterPorId(id);
+            var c = await this.service.obterPorId(id);
             this.combatenteEmEdicao = c;
 
             document.getElementById('dashEditId').value         = c.id;
@@ -266,17 +228,16 @@ class DashboardController {
             document.getElementById('dashEditNome').value       = c.nome;
             document.getElementById('dashEditHP').value         = c.hp_maximo;
             document.getElementById('dashEditIniciativa').value = c.iniciativa;
-            document.getElementById('dashEditClasse').value     = c.classe       || '';
-            document.getElementById('dashEditNivel').value      = c.nivel        || 1;
-            document.getElementById('dashEditPontos').value     = c.pontos       || 0;
+            document.getElementById('dashEditClasse').value     = c.classe || '';
+            document.getElementById('dashEditNivel').value      = c.nivel  || 1;
+            document.getElementById('dashEditPontos').value     = c.pontos || 0;
 
-            // ✅ Sem ?? — usa operador ternário para compatibilidade total
-            document.getElementById('dashEditCA').value         = c.ca        !== null && c.ca        !== undefined ? c.ca        : 10;
-            document.getElementById('dashEditToque').value      = c.toque     !== null && c.toque     !== undefined ? c.toque     : 10;
-            document.getElementById('dashEditSurpresa').value   = c.surpresa  !== null && c.surpresa  !== undefined ? c.surpresa  : 10;
-            document.getElementById('dashEditFortitude').value  = c.fortitude !== null && c.fortitude !== undefined ? c.fortitude : 0;
-            document.getElementById('dashEditReflexos').value   = c.reflexos  !== null && c.reflexos  !== undefined ? c.reflexos  : 0;
-            document.getElementById('dashEditVontade').value    = c.vontade   !== null && c.vontade   !== undefined ? c.vontade   : 0;
+            document.getElementById('dashEditCA').value        = (c.ca        !== null && c.ca        !== undefined) ? c.ca        : 10;
+            document.getElementById('dashEditToque').value     = (c.toque     !== null && c.toque     !== undefined) ? c.toque     : 10;
+            document.getElementById('dashEditSurpresa').value  = (c.surpresa  !== null && c.surpresa  !== undefined) ? c.surpresa  : 10;
+            document.getElementById('dashEditFortitude').value = (c.fortitude !== null && c.fortitude !== undefined) ? c.fortitude : 0;
+            document.getElementById('dashEditReflexos').value  = (c.reflexos  !== null && c.reflexos  !== undefined) ? c.reflexos  : 0;
+            document.getElementById('dashEditVontade').value   = (c.vontade   !== null && c.vontade   !== undefined) ? c.vontade   : 0;
 
             document.getElementById('dashEditFOR').value = c.forca        || 10;
             document.getElementById('dashEditDES').value = c.destreza     || 10;
@@ -285,15 +246,15 @@ class DashboardController {
             document.getElementById('dashEditSAB').value = c.sabedoria    || 10;
             document.getElementById('dashEditCAR').value = c.carisma      || 10;
 
-            ['dashEditFOR','dashEditDES','dashEditCON',
-             'dashEditINT','dashEditSAB','dashEditCAR'].forEach((fid) => {
-                const el = document.getElementById(fid);
-                if (el) this._calcularModificador(el);
+            var self = this;
+            ['dashEditFOR','dashEditDES','dashEditCON','dashEditINT','dashEditSAB','dashEditCAR'].forEach(function(fid) {
+                var el = document.getElementById(fid);
+                if (el) self._calcularModificador(el);
             });
 
-            const placeholder = document.getElementById('dashEditUploadPlaceholder');
-            const preview     = document.getElementById('dashEditUploadPreview');
-            const img         = document.getElementById('dashEditPreviewImage');
+            var placeholder = document.getElementById('dashEditUploadPlaceholder');
+            var preview     = document.getElementById('dashEditUploadPreview');
+            var img         = document.getElementById('dashEditPreviewImage');
             if (c.foto_url) {
                 img.src                   = c.foto_url;
                 placeholder.style.display = 'none';
@@ -303,10 +264,9 @@ class DashboardController {
                 preview.style.display     = 'none';
             }
 
-            const secAtaques = document.getElementById('secaoAtaquesEdicao');
-            const secMagias  = document.getElementById('secaoMagiasEdicao');
-            const isJogador  = c.tipo === 'jogador';
-
+            var secAtaques = document.getElementById('secaoAtaquesEdicao');
+            var secMagias  = document.getElementById('secaoMagiasEdicao');
+            var isJogador  = (c.tipo === 'jogador');
             if (secAtaques) secAtaques.style.display = isJogador ? 'block' : 'none';
             if (secMagias)  secMagias.style.display  = isJogador ? 'block' : 'none';
 
@@ -349,26 +309,24 @@ class DashboardController {
         }
     }
 
-    // ── Ataques ───────────────────────────────────────────────────────────
-
     _renderizarAtaquesEdicao(ataques) {
-        const lista = document.getElementById('listaAtaquesEdicao');
+        var lista = document.getElementById('listaAtaquesEdicao');
         if (!lista) return;
         lista.innerHTML = '';
         if (!ataques.length) { this._adicionarLinhaAtaque(); return; }
-        ataques.forEach((a) => this._adicionarLinhaAtaque(a));
+        for (var i = 0; i &lt; ataques.length; i++) { this._adicionarLinhaAtaque(ataques[i]); }
     }
 
     _adicionarLinhaAtaque(ataque) {
-        const lista = document.getElementById('listaAtaquesEdicao');
+        var lista = document.getElementById('listaAtaquesEdicao');
         if (!lista) return;
-        const div     = document.createElement('div');
+        var div     = document.createElement('div');
         div.className = 'ataque-linha';
         div.innerHTML =
-            '<input type="text"  class="ataque-nome"  placeholder="Nome do ataque" value="' + (ataque && ataque.nome         ? ataque.nome         : '') + '" />' +
-            '<input type="text"  class="ataque-bonus" placeholder="+0"             value="' + (ataque && ataque.bonus_ataque ? ataque.bonus_ataque : '+0') + '" style="width:70px" />' +
-            '<input type="text"  class="ataque-dano"  placeholder="1d6"            value="' + (ataque && ataque.dano         ? ataque.dano         : '') + '" style="width:90px" />' +
-            '<input type="text"  class="ataque-tipo"  placeholder="ex: cortante"   value="' + (ataque && ataque.tipo_dano   ? ataque.tipo_dano   : '') + '" style="width:120px" />' +
+            '<input type="text" class="ataque-nome"  placeholder="Nome" value="' + (ataque && ataque.nome         ? ataque.nome         : '') + '" />' +
+            '<input type="text" class="ataque-bonus" placeholder="+0"   value="' + (ataque && ataque.bonus_ataque ? ataque.bonus_ataque : '+0') + '" style="width:70px" />' +
+            '<input type="text" class="ataque-dano"  placeholder="1d6"  value="' + (ataque && ataque.dano         ? ataque.dano         : '') + '" style="width:90px" />' +
+            '<input type="text" class="ataque-tipo"  placeholder="tipo" value="' + (ataque && ataque.tipo_dano   ? ataque.tipo_dano   : '') + '" style="width:120px" />' +
             '<button type="button" class="btn-dash-delete" style="padding:.3rem .6rem;font-size:.8rem" onclick="removerLinhaAtaque(this)">x</button>';
         lista.appendChild(div);
     }
@@ -390,30 +348,21 @@ class DashboardController {
         await this.ataqueService.salvarAtaques(combatenteId, this._coletarAtaquesEdicao());
     }
 
-    // ── Magias ────────────────────────────────────────────────────────────
-
     _renderizarMagiasEdicao(slots) {
-        const container = document.getElementById('gridMagiasEdicao');
+        var container = document.getElementById('gridMagiasEdicao');
         if (!container) return;
         var html = '';
-        for (var nivel = 0; nivel <= 9; nivel++) {
-            var slot  = slots.find(function(s) { return s.nivel === nivel; });
-            var total = slot && slot.total !== undefined ? slot.total : 0;
-            html +=
-                '<div class="magia-edicao-linha">' +
-                    '<span class="magia-nivel-label">Nivel ' + nivel + '</span>' +
-                    '<div style="flex:1">' +
-                        '<input type="number"' +
-                               ' class="magia-total-input"' +
-                               ' data-nivel="' + nivel + '"' +
-                               ' value="' + total + '"' +
-                               ' min="0" max="20"' +
-                               ' placeholder="Total de slots"' +
-                               ' style="width:100%;padding:.4rem .6rem;border-radius:.35rem;' +
-                                       'border:1px solid #334155;background:#0f0f23;' +
-                                       'color:#e2e8f0;font-size:.85rem;box-sizing:border-box" />' +
-                    '</div>' +
-                '</div>';
+        for (var nivel = 0; nivel &lt;= 9; nivel++) {
+            var slot  = null;
+            for (var k = 0; k &lt; slots.length; k++) {
+                if (slots[k].nivel === nivel) { slot = slots[k]; break; }
+            }
+            var total = slot ? slot.total : 0;
+            html += '<div class="magia-edicao-linha">';
+            html += '<span class="magia-nivel-label">Nivel ' + nivel + '</span>';
+            html += '<div style="flex:1">';
+            html += '<input type="number" class="magia-total-input" data-nivel="' + nivel + '" value="' + total + '" min="0" max="20" placeholder="Total de slots" style="width:100%;padding:.4rem .6rem;border-radius:.35rem;border:1px solid #334155;background:#0f0f23;color:#e2e8f0;font-size:.85rem;box-sizing:border-box" />';
+            html += '</div></div>';
         }
         container.innerHTML = html;
     }
@@ -421,11 +370,7 @@ class DashboardController {
     _coletarMagiasEdicao() {
         return Array.from(document.querySelectorAll('#gridMagiasEdicao .magia-total-input'))
             .map(function(input) {
-                return {
-                    nivel:  parseInt(input.dataset.nivel),
-                    total:  parseInt(input.value) || 0,
-                    usados: 0
-                };
+                return { nivel: parseInt(input.dataset.nivel), total: parseInt(input.value) || 0, usados: 0 };
             });
     }
 
@@ -433,29 +378,25 @@ class DashboardController {
         await this.ataqueService.salvarMagias(combatenteId, this._coletarMagiasEdicao());
     }
 
-    // ── Helpers de modal ──────────────────────────────────────────────────
-
     _abrirModal(id) {
-        const el = document.getElementById(id);
+        var el = document.getElementById(id);
         if (el) el.classList.add('show');
         else    console.error('Modal nao encontrado: ' + id);
     }
 
     _fecharModal(id) {
-        const el = document.getElementById(id);
+        var el = document.getElementById(id);
         if (el) el.classList.remove('show');
     }
 
-    // ── Helpers de upload ─────────────────────────────────────────────────
-
     _previewImagem(input, previewId, imgId, placeholderId) {
-        const file = input.files ? input.files[0] : null;
+        var file = input.files ? input.files[0] : null;
         if (!file) return;
-        const reader  = new FileReader();
+        var reader = new FileReader();
         reader.onload = function(e) {
-            const ph = document.getElementById(placeholderId);
-            const pv = document.getElementById(previewId);
-            const im = document.getElementById(imgId);
+            var ph = document.getElementById(placeholderId);
+            var pv = document.getElementById(previewId);
+            var im = document.getElementById(imgId);
             if (ph) ph.style.display = 'none';
             if (pv) pv.style.display = 'block';
             if (im) im.src           = e.target.result;
@@ -464,84 +405,78 @@ class DashboardController {
     }
 
     _removerImagem(sufixo, isEdit) {
-        const inputId       = isEdit ? 'dashEditFoto'              : 'inputFoto'        + sufixo;
-        const placeholderId = isEdit ? 'dashEditUploadPlaceholder' : 'uploadPlaceholder' + sufixo;
-        const previewId     = isEdit ? 'dashEditUploadPreview'     : 'uploadPreview'    + sufixo;
-        const input       = document.getElementById(inputId);
-        const placeholder = document.getElementById(placeholderId);
-        const preview     = document.getElementById(previewId);
-        if (input)       input.value             = '';
+        var inputId       = isEdit ? 'dashEditFoto'              : 'inputFoto'         + sufixo;
+        var placeholderId = isEdit ? 'dashEditUploadPlaceholder' : 'uploadPlaceholder' + sufixo;
+        var previewId     = isEdit ? 'dashEditUploadPreview'     : 'uploadPreview'     + sufixo;
+        var input         = document.getElementById(inputId);
+        var placeholder   = document.getElementById(placeholderId);
+        var preview       = document.getElementById(previewId);
+        if (input)       input.value              = '';
         if (placeholder) placeholder.style.display = 'flex';
         if (preview)     preview.style.display     = 'none';
     }
 
-    // ── Helpers D&D ───────────────────────────────────────────────────────
-
     _calcularModificador(input) {
-        const valor = parseInt(input.value) || 10;
-        const mod   = Math.floor((valor - 10) / 2);
-        const modId = 'mod' + input.id.charAt(0).toUpperCase() + input.id.slice(1);
-        const span  = document.getElementById(modId);
-        if (span) span.textContent = mod >= 0 ? '+' + mod : '' + mod;
+        var valor = parseInt(input.value) || 10;
+        var mod   = Math.floor((valor - 10) / 2);
+        var modId = 'mod' + input.id.charAt(0).toUpperCase() + input.id.slice(1);
+        var span  = document.getElementById(modId);
+        if (span) span.textContent = mod >= 0 ? ('+' + mod) : ('' + mod);
     }
 
     _limparForm(form, tipo) {
         form.reset();
-        const sufixos = { jogador: '', monstro: 'Monstro', npc: 'NPC' };
-        const sufixo  = sufixos[tipo] || '';
-        const ph = document.getElementById('uploadPlaceholder' + sufixo);
-        const pv = document.getElementById('uploadPreview'     + sufixo);
+        var sufixos = { jogador: '', monstro: 'Monstro', npc: 'NPC' };
+        var sufixo  = sufixos[tipo] || '';
+        var ph = document.getElementById('uploadPlaceholder' + sufixo);
+        var pv = document.getElementById('uploadPreview'     + sufixo);
         if (ph) ph.style.display = 'flex';
         if (pv) pv.style.display = 'none';
     }
 }
 
-// ── CombatenteServiceGlobal ───────────────────────────────────────────────────
-
 class CombatenteServiceGlobal {
     _url(path) { return window.getApiUrl('/combatentes' + (path || '')); }
     _headers() {
-        const h = {};
+        var h = {};
         if (typeof AuthService !== 'undefined') {
-            const t = AuthService.getToken();
+            var t = AuthService.getToken();
             if (t) h['Authorization'] = 'Bearer ' + t;
         }
         return h;
     }
     async listar(tipo) {
-        const url = tipo ? this._url() + '?tipo=' + tipo : this._url();
-        const res = await fetch(url, { headers: this._headers() });
+        var url = tipo ? (this._url() + '?tipo=' + tipo) : this._url();
+        var res = await fetch(url, { headers: this._headers() });
         if (!res.ok) throw new Error('Erro ao carregar combatentes');
         return res.json();
     }
     async obterPorId(id) {
-        const res = await fetch(this._url('/' + id), { headers: this._headers() });
+        var res = await fetch(this._url('/' + id), { headers: this._headers() });
         if (!res.ok) throw new Error('Combatente nao encontrado');
         return res.json();
     }
     async criar(formData) {
-        const res = await fetch(this._url(), { method: 'POST', headers: this._headers(), body: formData });
-        if (!res.ok) { const e = await res.json().catch(function() { return {}; }); throw new Error(e.detail || 'Erro ao criar'); }
+        var res = await fetch(this._url(), { method: 'POST', headers: this._headers(), body: formData });
+        if (!res.ok) { var e = await res.json().catch(function() { return {}; }); throw new Error(e.detail || 'Erro ao criar'); }
         return res.json();
     }
     async atualizar(id, formData) {
-        const res = await fetch(this._url('/' + id), { method: 'PUT', headers: this._headers(), body: formData });
-        if (!res.ok) { const e = await res.json().catch(function() { return {}; }); throw new Error(e.detail || 'Erro ao atualizar'); }
+        var res = await fetch(this._url('/' + id), { method: 'PUT', headers: this._headers(), body: formData });
+        if (!res.ok) { var e = await res.json().catch(function() { return {}; }); throw new Error(e.detail || 'Erro ao atualizar'); }
         return res.json();
     }
     async deletar(id) {
-        const res = await fetch(this._url('/' + id), { method: 'DELETE', headers: this._headers() });
+        var res = await fetch(this._url('/' + id), { method: 'DELETE', headers: this._headers() });
         if (!res.ok) throw new Error('Erro ao deletar');
         return true;
     }
 }
 
-// ── UploadServiceGlobal ───────────────────────────────────────────────────────
-
 class UploadServiceGlobal {
     criarPreview(file, callback) {
         if (!file.type.startsWith('image/')) throw new Error('Arquivo deve ser uma imagem');
-        const reader  = new FileReader();
+        var reader = new FileReader();
         reader.onload = function(e) { callback(e.target.result); };
         reader.readAsDataURL(file);
     }
