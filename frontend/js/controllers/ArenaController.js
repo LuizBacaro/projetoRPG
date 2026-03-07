@@ -353,23 +353,13 @@ export class ArenaController {
         html += '<span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span>';
         html += '</span></div></div>';
         html += '<div class="arena-topo-acoes">';
+        html += '<div class="arena-cronometro-inline">';
+        html += '<span class="arena-cronometro-display ' + (cronAtivo ? 'cronometro-ativo' : 'cronometro-pausado') + '" id="cronometroDisplay">' + tempoAtual + '</span>';
+        html += '<button id="btnToggleCronometro" class="btn-cronometro ' + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar') + '" onclick="window._toggleCronometro()">' + (cronAtivo ? '⏸' : '▶') + '</button>';
+        html += '<button class="btn-cronometro btn-cronometro-reset" onclick="window._resetarCronometro()">↺</button>';
+        html += '</div>';
         html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoTxt + '</button>';
         html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
-        html += '</div></div>';
-
-        // ── Cronometro
-        html += '<div class="arena-cronometro-bar">';
-        html += '<div class="arena-cronometro-esquerda">';
-        html += '<div class="arena-cronometro-icone">⏱</div>';
-        html += '<div class="arena-cronometro-info">';
-        html += '<span class="arena-cronometro-label">Tempo de Sessao</span>';
-        html += '<span class="arena-cronometro-display ' + (cronAtivo ? 'cronometro-ativo' : 'cronometro-pausado') + '" id="cronometroDisplay">' + tempoAtual + '</span>';
-        html += '</div></div>';
-        html += '<div class="arena-cronometro-acoes">';
-        html += '<button id="btnToggleCronometro" class="btn-cronometro ' + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar') + '" onclick="window._toggleCronometro()">';
-        html += cronAtivo ? '⏸ Pausar' : '▶ Retomar';
-        html += '</button>';
-        html += '<button class="btn-cronometro btn-cronometro-reset" onclick="window._resetarCronometro()">↺ Zerar</button>';
         html += '</div></div>';
 
         // ── Stats
