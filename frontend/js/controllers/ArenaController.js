@@ -206,7 +206,6 @@ export class ArenaController {
         html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoTxt + '</button>';
         html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
         html += '</div></div>';
-
         html += '<div class="arena-stats-linha">';
         html += '<div class="arena-stat-box arena-stat-pv">';
         html += '<span class="arena-stat-label">PV</span>';
@@ -217,7 +216,6 @@ export class ArenaController {
         html += '<div class="arena-stat-box arena-stat-surpresa"><span class="arena-stat-label">Surpresa</span><span class="' + sClasse + '">' + sValor + '</span></div>';
         html += '<div class="arena-stat-box arena-stat-toque"><span class="arena-stat-label">Toque</span><span class="' + tClasse + '">' + tValor + '</span></div>';
         html += '</div>';
-
         html += '<div class="arena-grade-central">';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Atributos</h3><div class="arena-atributos-grid">' + atributosHTML + '</div></div>';
         html += '<div class="arena-secao"><h3 class="arena-secao-titulo">Resistencias</h3><div class="arena-resistencias-lista">';
@@ -232,7 +230,6 @@ export class ArenaController {
         html += '<button class="arena-btn-condicao"  onclick="window._abrirCondicao()">Condicao</button>';
         html += '<button class="arena-btn-proximo"   onclick="window._avancarTurno()">Encerrar turno</button>';
         html += '</div></div>';
-
         html += '<div class="arena-linha-inferior">';
         html += '<div id="arenaAtaquesContainer"></div>';
         html += '<div id="arenaMagiasContainer"></div>';

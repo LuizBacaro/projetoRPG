@@ -6,14 +6,14 @@ export class ArenaAtaquesMagias {
         if (!container) return;
 
         if (!ataques || ataques.length === 0) {
-            var html = '';
-            html += '<div class="arena-secao">';
-            html += '<h3 class="arena-secao-titulo">Ataques</h3>';
-            html += '<div class="arena-ataques-lista">';
-            html += '<div class="arena-ataque-header"><span>Nome</span><span>Ataque</span><span>Dano</span></div>';
-            html += '<div class="arena-ataque-item arena-ataque-placeholder"><span>Nenhum ataque cadastrado</span></div>';
-            html += '</div></div>';
-            container.innerHTML = html;
+            var h = '';
+            h += '<div class="arena-secao">';
+            h += '<h3 class="arena-secao-titulo">Ataques</h3>';
+            h += '<div class="arena-ataques-lista">';
+            h += '<div class="arena-ataque-header"><span>Nome</span><span>Ataque</span><span>Dano</span></div>';
+            h += '<div class="arena-ataque-item arena-ataque-placeholder"><span>Nenhum ataque cadastrado</span></div>';
+            h += '</div></div>';
+            container.innerHTML = h;
             return;
         }
 
@@ -28,14 +28,14 @@ export class ArenaAtaquesMagias {
             linhas += '</div>';
         }
 
-        var html2 = '';
-        html2 += '<div class="arena-secao">';
-        html2 += '<h3 class="arena-secao-titulo">Ataques</h3>';
-        html2 += '<div class="arena-ataques-lista">';
-        html2 += '<div class="arena-ataque-header"><span>Nome</span><span>Ataque</span><span>Dano</span></div>';
-        html2 += linhas;
-        html2 += '</div></div>';
-        container.innerHTML = html2;
+        var h2 = '';
+        h2 += '<div class="arena-secao">';
+        h2 += '<h3 class="arena-secao-titulo">Ataques</h3>';
+        h2 += '<div class="arena-ataques-lista">';
+        h2 += '<div class="arena-ataque-header"><span>Nome</span><span>Ataque</span><span>Dano</span></div>';
+        h2 += linhas;
+        h2 += '</div></div>';
+        container.innerHTML = h2;
     }
 
     static renderMagias(slots, containerId, onUsadosChange) {
@@ -95,11 +95,9 @@ export class ArenaAtaquesMagias {
                         var spanTot = container.querySelector('[data-nivel-total="' + nivel + '"]');
                         var total   = parseInt(spanTot ? spanTot.textContent : 0);
                         var usados  = parseInt(spanVal ? spanVal.textContent : 0);
-
                         if      (acao === 'aumentar' && usados < total) usados++;
                         else if (acao === 'diminuir' && usados > 0)     usados--;
                         else return;
-
                         if (spanVal) spanVal.textContent = usados;
                         onUsadosChange(slotId, nivel, usados);
                     });
