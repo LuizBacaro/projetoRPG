@@ -1,10 +1,9 @@
 /*
    CombatenteCard.js
    SRP: renderizar card visual de combatente
-   ✅ import AuthService — sem depender de window global
+   ✅ HP e Iniciativa ocultados para Monstro/NPC em ambas as listas
+   ✅ Regra por TIPO — independente do perfil do usuário
 */
-
-import { AuthService } from '../services/AuthService.js';
 
 export class CombatenteCard {
 
@@ -12,9 +11,8 @@ export class CombatenteCard {
         const card = document.createElement('div');
         card.className = 'combatente-card' + (selecionado ? ' selecionado' : '');
 
-        const podeVerStats    = AuthService.podeVerStatsDe(combatente.tipo);
-        const hpTexto         = podeVerStats ? combatente.hp_maximo : '???';
-        const iniciativaTexto = podeVerStats ? combatente.iniciativa : '???';
+        // ✅ Apenas jogadores exibem HP e Iniciativa
+        const isJogador = combatente.tipo === 'jogador';
 
         card.innerHTML = `
             <div class="card-foto-wrapper">
@@ -36,30 +34,34 @@ export class CombatenteCard {
                     <span class="card-nome">${combatente.nome}</span>
                     <span class="badge badge-${combatente.tipo}">${combatente.tipo}</span>
                 </div>
-
                 <div class="card-meta">
                     ${combatente.classe ? `<span class="card-classe">${combatente.classe}</span>` : ''}
                     ${combatente.raca   ? `<span class="card-raca">${combatente.raca}</span>`     : ''}
                 </div>
 
-                <div class="card-stats">
-                    <div class="card-stat">
-                        <span class="card-stat-label">HP</span>
-                        <span class="card-stat-valor ${podeVerStats ? '' : 'stat-oculto'}">
-                            ${hpTexto}
-                        </span>
+                ${isJogador ? `
+                    <div class="card-stats">
+                        <div class="card-stat">
+                            <span class="card-stat-label">HP</span>
+                            <span class="card-stat-valor">${combatente.hp_maximo}</span>
+                        </div>
+                        <div class="card-stat">
+                            <span class="card-stat-label">Iniciativa</span>
+                            <span class="card-stat-valor">${combatente.iniciativa}</span>
+                        </div>
+                        <div class="card-stat">
+                            <span class="card-stat-label">Nível</span>
+                            <span class="card-stat-valor">${combatente.nivel || 1}</span>
+                        </div>
                     </div>
-                    <div class="card-stat">
-                        <span class="card-stat-label">Iniciativa</span>
-                        <span class="card-stat-valor ${podeVerStats ? '' : 'stat-oculto'}">
-                            ${iniciativaTexto}
-                        </span>
+                ` : `
+                    <div class="card-stats">
+                        <div class="card-stat">
+                            <span class="card-stat-label">Nível</span>
+                            <span class="card-stat-valor">${combatente.nivel || 1}</span>
+                        </div>
                     </div>
-                    <div class="card-stat">
-                        <span class="card-stat-label">Nível</span>
-                        <span class="card-stat-valor">${combatente.nivel || 1}</span>
-                    </div>
-                </div>
+                `}
             </div>
 
             <button class="btn-selecionar ${selecionado ? 'selecionado' : ''}">
@@ -81,8 +83,13 @@ export class CombatenteCard {
         const card     = document.createElement('div');
         card.className = 'combatente-selecionado-card';
 
-        const podeVerStats = AuthService.podeVerStatsDe(combatente.tipo);
-        const isMestre     = AuthService.isMestre();
+        // ✅ Apenas jogadores exibem HP e Iniciativa
+        const isJogador = combatente.tipo === 'jogador';
+
+        // Mestre ainda pode editar HP/Ini de jogadores
+        const isMestre = window.AuthService
+            ? window.AuthService.isMestre()
+            : true;
 
         card.innerHTML = `
             <div class="selecionado-header">
@@ -94,34 +101,31 @@ export class CombatenteCard {
             </div>
 
             <div class="selecionado-stats">
-                <div class="selecionado-stat-hp">
-                    <span>❤️</span>
-                    ${isMestre
-                        ? `<input type="number"
-                                  class="stat-input"
-                                  value="${combatente.hp_maximo}"
-                                  min="1"
-                                  data-original="${combatente.hp_maximo}"
-                                  title="HP Máximo">
-                           <span class="stat-label">/ ${combatente.hp_atual} atual</span>`
-                        : `<span class="${podeVerStats ? '' : 'stat-oculto'}">
-                               ${podeVerStats ? combatente.hp_maximo : '???'}
-                           </span>`
-                    }
-                </div>
-
-                <div class="selecionado-stat-ini">
-                    <span>🎲</span>
-                    ${isMestre
-                        ? `<input type="number"
-                                  class="stat-input stat-input-ini"
-                                  value="${combatente.iniciativa}"
-                                  title="Iniciativa">`
-                        : `<span class="${podeVerStats ? '' : 'stat-oculto'}">
-                               ${podeVerStats ? combatente.iniciativa : '???'}
-                           </span>`
-                    }
-                </div>
+                ${isJogador ? `
+                    <div class="selecionado-stat-hp">
+                        <span>❤️</span>
+                        ${isMestre
+                            ? `<input type="number"
+                                      class="stat-input"
+                                      value="${combatente.hp_maximo}"
+                                      min="1"
+                                      data-original="${combatente.hp_maximo}"
+                                      title="HP Máximo">
+                               <span class="stat-label">/ ${combatente.hp_atual} atual</span>`
+                            : `<span>${combatente.hp_maximo}</span>`
+                        }
+                    </div>
+                    <div class="selecionado-stat-ini">
+                        <span>🎲</span>
+                        ${isMestre
+                            ? `<input type="number"
+                                      class="stat-input stat-input-ini"
+                                      value="${combatente.iniciativa}"
+                                      title="Iniciativa">`
+                            : `<span>${combatente.iniciativa}</span>`
+                        }
+                    </div>
+                ` : ''}
             </div>
         `;
 
@@ -131,7 +135,7 @@ export class CombatenteCard {
                 onRemover(combatente.id);
             });
 
-        if (isMestre) {
+        if (isJogador && isMestre) {
             const inputHP = card.querySelector('input[data-original]');
             if (inputHP) {
                 inputHP.addEventListener('change', () =>

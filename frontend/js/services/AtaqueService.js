@@ -1,7 +1,7 @@
 /*
    AtaqueService.js
    SRP: comunicação HTTP para ataques e slots de magia
-   ✅ Padrão global (window) — sem export/import
+   ✅ URLs alinhadas com o backend: /combatentes/{id}/ataques
 */
 
 class AtaqueService {
@@ -23,7 +23,8 @@ class AtaqueService {
 
     async listarAtaques(combatenteId) {
         var res = await fetch(
-            this._url('/ataques/?combatente_id=' + combatenteId),
+            // ✅ GET /combatentes/{id}/ataques
+            this._url('/combatentes/' + combatenteId + '/ataques'),
             { headers: this._headers() }
         );
         if (!res.ok) throw new Error('Erro ao buscar ataques');
@@ -32,22 +33,24 @@ class AtaqueService {
 
     async salvarAtaques(combatenteId, ataques) {
         var res = await fetch(
-            this._url('/ataques/combatente/' + combatenteId),
+            // ✅ PUT /combatentes/{id}/ataques
+            this._url('/combatentes/' + combatenteId + '/ataques'),
             {
                 method:  'PUT',
                 headers: this._headers(),
-                body:    JSON.stringify(ataques)
+                body:    JSON.stringify({ ataques: ataques })
             }
         );
         if (!res.ok) throw new Error('Erro ao salvar ataques');
         return res.json();
     }
 
-    // ── Slots de Magia ───────────────────────────────────────────
+    // ── Magias ───────────────────────────────────────────────────
 
     async listarMagias(combatenteId) {
         var res = await fetch(
-            this._url('/magias_slots/?combatente_id=' + combatenteId),
+            // ✅ GET /combatentes/{id}/magias
+            this._url('/combatentes/' + combatenteId + '/magias'),
             { headers: this._headers() }
         );
         if (!res.ok) throw new Error('Erro ao buscar slots de magia');
@@ -56,11 +59,12 @@ class AtaqueService {
 
     async salvarMagias(combatenteId, slots) {
         var res = await fetch(
-            this._url('/magias_slots/combatente/' + combatenteId),
+            // ✅ PUT /combatentes/{id}/magias
+            this._url('/combatentes/' + combatenteId + '/magias'),
             {
                 method:  'PUT',
                 headers: this._headers(),
-                body:    JSON.stringify(slots)
+                body:    JSON.stringify({ slots: slots })
             }
         );
         if (!res.ok) throw new Error('Erro ao salvar slots de magia');
@@ -69,6 +73,7 @@ class AtaqueService {
 
     async atualizarSlotUsados(slotId, usados) {
         var res = await fetch(
+            // ✅ PATCH /magias_slots/{slot_id}/usados (rota separada — está correta)
             this._url('/magias_slots/' + slotId + '/usados'),
             {
                 method:  'PATCH',
@@ -81,5 +86,5 @@ class AtaqueService {
     }
 }
 
-// ✅ Expõe globalmente — sem export
+// ✅ Global — sem export
 window.AtaqueService = AtaqueService;
