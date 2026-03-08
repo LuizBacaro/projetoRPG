@@ -1,8 +1,7 @@
 /*
    variables.css
-   SRP: APENAS @import de fontes + :root com tokens de design
-   ✅ FASE 1: body, header, info-combate, header-arena movidos para layout.css
-   ✅ CORES: harmonizadas com paleta da imagem de referência
+   SRP: APENAS @import de fontes + reset + :root com tokens de design
+   ✅ body, header, .header-arena REMOVIDOS → estão em layout.css
 */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Philosopher:wght@400;700&display=swap');
@@ -15,42 +14,44 @@
 
 :root {
     /* ── Tema medieval (mantido) ── */
-    --cor-dourada:          #FFD700;
-    --cor-madeira:          #8B4513;
-    --cor-madeira-claro:    #d4a574;
-    --cor-pergaminho:       #e8dcc4;
-    --cor-pergaminho-escuro:#d4c5a3;
-    --cor-sombra:           rgba(0, 0, 0, 0.3);
+    --cor-dourada:            #FFD700;
+    --cor-madeira:            #8B4513;
+    --cor-madeira-claro:      #d4a574;
+    --cor-pergaminho:         #e8dcc4;
+    --cor-pergaminho-escuro:  #d4c5a3;
+    --cor-sombra:             rgba(0, 0, 0, 0.3);
 
     /* ── Tipos de combatente ── */
-    --cor-jogador:          #4169E1;
-    --cor-monstro:          #DC143C;
-    --cor-npc:              #32CD32;
+    --cor-jogador:            #4169E1;
+    --cor-monstro:            #DC143C;
+    --cor-npc:                #32CD32;
 
     /* ── Fontes ── */
-    --fonte-titulo:         'Cinzel', serif;
-    --fonte-texto:          'Philosopher', sans-serif;
+    --fonte-titulo:           'Cinzel', serif;
+    --fonte-texto:            'Philosopher', sans-serif;
 
-    /* ── Paleta azul (extraída da imagem ref) ── */
-    --bg-principal:         #0d1829;
-    --bg-painel:            #1a2744;
-    --bg-painel-interno:    #0f1f3d;
-    --azul-destaque:        #4a90d9;
-    --azul-hover:           #60a5e8;
-    --azul-acao:            #1d4ed8;
-    --borda-painel:         #2d4a7a;
-    --borda-destaque:       #3d6099;
+    /* ── Paleta azul (imagem de referência) ── */
+    --bg-principal:           #0e1b2e;
+    --bg-secundario:          #162032;
+    --bg-painel:              #1a2744;
+    --bg-painel-interno:      #0f1f3d;
+    --azul-destaque:          #4a90d9;
+    --azul-hover:             #60a5e8;
+    --azul-acao:              #1d4ed8;
+    --borda-painel:           #2d4a7a;
+    --borda-sutil:            #1e2d3d;
+    --borda-destaque:         #3d6099;
 
     /* ── Texto ── */
-    --texto-principal:      #e2eaf5;
-    --texto-secundario:     #94a3b8;
-    --texto-label:          #4a6fa5;
+    --texto-principal:        #e2eaf5;
+    --texto-secundario:       #94a3b8;
+    --texto-label:            #64748b;
 
     /* ── Ações ── */
-    --cor-perigo:           #dc2626;
-    --cor-perigo-borda:     #7f1d1d;
-    --cor-sucesso:          #15803d;
-    --cor-sucesso-claro:    #4ade80;
-    --cor-roxo:             #7c3aed;
-    --cor-roxo-claro:       #a78bfa;
+    --cor-perigo:             #dc2626;
+    --cor-perigo-borda:       #7f1d1d;
+    --cor-sucesso:            #15803d;
+    --cor-sucesso-claro:      #4ade80;
+    --cor-roxo:               #7c3aed;
+    --cor-roxo-claro:         #a78bfa;
 }
