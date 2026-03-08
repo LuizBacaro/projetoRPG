@@ -5,7 +5,7 @@
  */
 import { CombatenteService }    from '../services/CombatenteService.js';
 import { CombatenteCard }       from '../ui/CombatenteCard.js';
-import { Toast } from '/js/ui/toast.module.js';
+import { Toast } from '../ui/toast.module.js';
 import { getApiUrl }            from '../config/api.config.js';
 
 export class ConfiguracaoController {

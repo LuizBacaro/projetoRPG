@@ -597,21 +597,23 @@ body::before {
     border: 1px solid rgba(65, 105, 225, 0.4);
 }
 
-/* Tipo */
+/* ── Tipo: Jogador ── */
 .ficha-tag-jogador {
-    background: rgba(65, 105, 225, 0.15);
-    color: #FFD700;
-    border: 1px solid rgba(65, 105, 225, 0.4);
+    background: rgba(26, 58, 107, 0.18);
+    color: #4a7abf;                          /* ✅ azul medieval */
+    border: 1px solid rgba(26, 58, 107, 0.45);
 }
 
+/* ── Tipo: Monstro ── */
 .ficha-tag-monstro {
-    background: rgba(220, 20, 60, 0.15);
-    color: #FFD700;
-    border: 1px solid rgba(220, 20, 60, 0.4);
+    background: rgba(139, 26, 26, 0.15);
+    color: #c45c5c;                          /* ✅ vermelho escarlate suave */
+    border: 1px solid rgba(139, 26, 26, 0.45);
 }
 
+/* ── Tipo: NPC ── */
 .ficha-tag-npc {
-    background: rgba(50, 205, 50, 0.15);
-    color: #FFD700;
-    border: 1px solid rgba(50, 205, 50, 0.4);
+    background: rgba(26, 92, 42, 0.15);
+    color: #4a9e5c;                          /* ✅ verde floresta */
+    border: 1px solid rgba(26, 92, 42, 0.45);
 }
