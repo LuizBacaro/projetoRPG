@@ -1,60 +1,202 @@
-/* ==================== RESPONSIVO ==================== */
+/*
+   responsivo.css
+   SRP: APENAS breakpoints responsivos — sem estilos base
+   ✅ FASE 1: seletores fantasmas removidos
+   ✅ Adicionados seletores reais da arena atual
+*/
+
+/* ══════════════════════════════════════════════
+   1200px — arena lateral comprime levemente
+══════════════════════════════════════════════ */
 @media (max-width: 1200px) {
-    #telaArena .arena-layout { grid-template-columns: 140px 180px 1fr; }
+
+    /* Arena — painéis laterais comprimem */
+    .arena-tela-wrapper {
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .arena-lateral-panel { min-width: 180px; max-width: 210px; }
 }
 
+/* ══════════════════════════════════════════════
+   1100px — ajustes intermediários
+══════════════════════════════════════════════ */
 @media (max-width: 1100px) {
-    #telaArena .arena-layout  { grid-template-columns: 130px 170px 1fr; }
-    .arena-grade-central      { grid-template-columns: 1fr 1fr; }
-    .arena-linha-inferior     { grid-template-columns: 1fr 1fr; }
+
+    .arena-lateral-panel { min-width: 160px; max-width: 190px; }
+
+    .arena-lateral-topo { gap: 0.5rem; }
 }
 
+/* ══════════════════════════════════════════════
+   900px — painel lateral começa a empilhar
+══════════════════════════════════════════════ */
 @media (max-width: 900px) {
-    #telaArena .arena-layout  { grid-template-columns: 120px 160px 1fr; }
+
+    .arena-lateral-panel { min-width: 140px; max-width: 170px; }
+
+    .arena-lateral-foto-col { display: none; }
 }
 
+/* ══════════════════════════════════════════════
+   768px — empilhamento geral
+══════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    .container                { grid-template-columns: 1fr; }
-    #telaArena .arena-layout  { grid-template-columns: 1fr 1fr; grid-template-rows: 180px 1fr; }
-    .arena-foto-col           { grid-column: 1; grid-row: 1; }
-    #telaArena .ordem-iniciativa-panel { grid-column: 2; grid-row: 1; }
-    #telaArena .arena-main-ativo { grid-column: 1 / -1; grid-row: 2; }
-    #telaArena.ativa          { height: auto; overflow: auto; }
-    .arena-grade-central      { grid-template-columns: 1fr 1fr; }
-    .arena-linha-inferior     { grid-template-columns: 1fr; }
-    .dano-cura-layout         { grid-template-columns: 1fr; gap: 1.5rem; }
-    .combatentes-selecao      { border-right: none; border-bottom: 3px solid var(--cor-madeira); padding-right: 0; padding-bottom: 1.5rem; }
+
+    /* Configuração — painéis empilham */
+    .container { grid-template-columns: 1fr; }
+
+    /* Arena — wrapper vira coluna */
+    .arena-tela-wrapper {
+        flex-direction: column;
+        height: auto;
+        overflow: auto;
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .arena-lateral-panel {
+        min-width: unset;
+        max-width: unset;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .arena-lateral-topo {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .arena-lateral-iniciativa { flex: 1; min-width: 140px; }
+
+    .arena-lateral-foto-col   { display: none; }
+
+    .arena-conteudo-principal { width: 100%; overflow-y: visible; }
+
+    /* Condicao modal */
+    .condicao-layout {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .condicao-combatentes-selecao {
+        border-right: none;
+        border-bottom: 3px solid var(--borda-painel, #2d4a7a);
+        padding-right: 0;
+        padding-bottom: 1.5rem;
+    }
 }
 
+/* ══════════════════════════════════════════════
+   600px — header e stats
+══════════════════════════════════════════════ */
 @media (max-width: 600px) {
-    header        { padding: 0.6rem 1rem; }
-    header h1     { font-size: 1.4rem; }
+
+    header     { padding: 0.6rem 1rem; }
+    header h1  { font-size: 1.4rem; }
+
+    .header-arena { padding: 0.4rem 0.75rem; }
+    .header-arena h1 { font-size: 0.95rem; }
+
     .arena-stats-linha { flex-wrap: wrap; }
-    .condicao-layout  { grid-template-columns: 1fr; gap: 1rem; }
-    .condicao-combatentes-selecao { border-right: none; border-bottom: 3px solid var(--cor-madeira); padding-right: 0; padding-bottom: 1rem; }
+
+    /* Condicao modal compacto */
+    .condicao-layout { gap: 1rem; }
+
+    .condicao-combatentes-selecao {
+        border-right: none;
+        border-bottom: 1px solid var(--borda-painel, #2d4a7a);
+        padding-right: 0;
+        padding-bottom: 1rem;
+    }
 }
 
+/* ══════════════════════════════════════════════
+   480px — mobile
+══════════════════════════════════════════════ */
 @media (max-width: 480px) {
-    .filters                  { flex-direction: column; }
-    .filter-btn               { width: 100%; }
-    .atributos-coluna         { gap: 0.6rem; }
-    .atributos-duas-colunas   { grid-template-columns: 1fr; }
-    .atributo-circles-container { width: 45px; height: 45px; }
-    .atributo-circles-container input[type="number"] { width: 42px; height: 42px; font-size: 15px; border-width: 2px; }
-    .atributo-modificador     { width: 22px; height: 22px; font-size: 9px; top: -4px; right: -5px; }
-    .nivel-pontos-container   { flex-direction: column; gap: 15px; }
-    .nivel-input              { width: 70px; height: 70px; font-size: 28px; }
-    .pontos-field             { width: 100%; }
-    .pontos-input             { font-size: 24px; padding: 15px; }
-    .modal-actions            { flex-direction: column; }
-    .form-row                 { grid-template-columns: 1fr; }
+
+    /* ── Filtros ── */
+    .filters    { flex-direction: column; }
+    .filter-btn { width: 100%; }
+
+    /* ── Atributos D&D ── */
+    .atributos-coluna           { gap: 0.6rem; }
+    .atributos-duas-colunas     { grid-template-columns: 1fr; gap: 1.5rem; }
+
+    .atributo-circles-container {
+        width: 45px;
+        height: 45px;
+    }
+
+    .atributo-circles-container input[type="number"] {
+        width: 42px;
+        height: 42px;
+        font-size: 15px;
+        border-width: 2px;
+    }
+
+    .atributo-modificador {
+        width: 22px;
+        height: 22px;
+        font-size: 9px;
+        top: -4px;
+        right: -5px;
+    }
+
+    /* ── Nível e Pontos ── */
+    .nivel-pontos-container { flex-direction: column; gap: 15px; }
+    .nivel-input            { width: 70px; height: 70px; font-size: 28px; }
+    .pontos-field           { width: 100%; }
+    .pontos-input           { font-size: 24px; padding: 15px; }
+
+    /* ── Modais ── */
+    .modal-actions  { flex-direction: column; }
+    .form-row       { grid-template-columns: 1fr; }
+
+    /* ── Upload de foto ── */
     .foto-atributos-container { flex-direction: column; align-items: center; }
     .foto-vertical            { width: 100%; max-width: 250px; }
     .upload-area-vertical     { height: 320px; }
-    #telaArena .arena-layout  { grid-template-columns: 1fr; }
-    .arena-foto-col           { height: 180px; }
+
+    /* ── Arena mobile: empilha completamente ── */
+    .arena-tela-wrapper       { padding: 0.25rem; gap: 0.25rem; }
+    .arena-lateral-panel      { padding: 0.5rem; }
+    .arena-lateral-topo       { flex-direction: column; }
+    .arena-conteudo-principal { padding: 0.5rem; }
+
+    /* ── Modal condição ── */
     .modal-condicao-container { width: 95vw; }
     .modal-condicao-footer    { flex-direction: column; }
+
     .btn-aplicar-condicao,
-    .btn-cancelar-condicao    { width: 100%; text-align: center; justify-content: center; }
+    .btn-cancelar-condicao {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* ── Modal dano/cura ── */
+    .modal-dano-container { width: 95vw; }
+    .modal-dano-footer    { flex-direction: column; }
+
+    .btn-aplicar-dano,
+    .btn-cancelar-dano {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* ── Dashboard header usuario ── */
+    .header-usuario-arena {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    /* ── Rodada badge ── */
+    .rodada-badge { font-size: 0.75rem; padding: 0.15rem 0.5rem; }
 }

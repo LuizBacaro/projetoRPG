@@ -1,45 +1,171 @@
-/* ==================== TELAS ==================== */
-.tela { display: none; }
-.tela.ativa { display: block; }
+/*
+   layout.css
+   SRP: estrutura global de body, header, containers e navegação
+   ✅ FASE 1: body/header recebidos de variables.css
+   ✅ CORES: harmonizadas com paleta azul da imagem de referência
+*/
 
-/* ==================== CONTAINER PRINCIPAL ==================== */
+/* ── Body global ── */
+body {
+    font-family: var(--fonte-texto);
+    background: linear-gradient(135deg, var(--bg-principal) 0%, #060f1e 100%);
+    color: var(--texto-principal);
+    min-height: 100vh;
+}
+
+/* ── Header padrão (tela configuração/dashboard) ── */
+header {
+    background: linear-gradient(135deg, #1a2744 0%, #0d1829 100%);
+    padding: 0.8rem 2rem;
+    text-align: center;
+    border-bottom: 3px solid var(--azul-destaque);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+header h1 {
+    font-family: var(--fonte-titulo);
+    font-size: 2rem;
+    color: var(--cor-dourada);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    margin-bottom: 0.2rem;
+}
+
+header p {
+    font-size: 1rem;
+    color: var(--texto-secundario);
+}
+
+/* ── Header arena (compacto inline) ── */
+.header-arena {
+    background: linear-gradient(135deg, #1a2744 0%, #0d1829 100%);
+    padding: 0.45rem 1.2rem;
+    border-bottom: 2px solid var(--azul-destaque);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.header-arena-titulo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-arena h1 {
+    font-family: var(--fonte-titulo);
+    font-size: 1.1rem;
+    color: var(--cor-dourada);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* ── Badge de rodada ── */
+.rodada-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1.5px solid var(--cor-dourada);
+    border-radius: 20px;
+    padding: 0.18rem 0.75rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.88rem;
+    color: var(--texto-principal);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.rodada-badge strong { color: var(--cor-dourada); font-size: 1rem; }
+
+/* ── Info-combate (legado tela configuração) ── */
+.info-combate {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.4rem;
+}
+
+.info-combate span {
+    color: var(--cor-dourada);
+    font-size: 1rem;
+}
+
+/* ── Container principal ── */
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     padding: 2rem;
-    max-width: 1600px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
+/* ── Painéis esquerdo e direito ── */
 .painel-esquerdo,
 .painel-direito {
-    background: var(--cor-pergaminho);
-    border: 4px solid var(--cor-madeira);
-    border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 8px 30px var(--cor-sombra);
-    min-width: 0;
+    background: linear-gradient(135deg, var(--bg-painel) 0%, var(--bg-painel-interno) 100%);
+    border: 1px solid var(--borda-painel);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .painel-esquerdo h2,
 .painel-direito h2 {
     font-family: var(--fonte-titulo);
-    color: var(--cor-madeira);
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    color: var(--cor-dourada);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid var(--borda-painel);
+    padding-bottom: 0.5rem;
 }
 
-/* ==================== HEADER SELECIONADOS ==================== */
+/* ── Header selecionados ── */
 .header-selecionados {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
 }
 
-.empty-state {
-    text-align: center;
-    padding: 2rem;
-    color: rgba(139, 69, 19, 0.5);
-    font-style: italic;
+/* ── Botão iniciar combate ── */
+.btn-iniciar {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--cor-sucesso) 0%, #166534 100%);
+    border: 2px solid var(--cor-sucesso-claro);
+    border-radius: 10px;
+    color: #fff;
+    font-family: var(--fonte-titulo);
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.btn-iniciar:hover {
+    background: linear-gradient(135deg, #166534 0%, var(--cor-sucesso) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(21, 128, 61, 0.4);
+}
+
+.btn-iniciar:active { transform: translateY(0); }
+
+/* ── Responsividade ── */
+@media (max-width: 768px) {
+    .container { grid-template-columns: 1fr; padding: 1rem; gap: 1rem; }
+    header     { padding: 0.6rem 1rem; }
+    header h1  { font-size: 1.4rem; }
+}
+
+@media (max-width: 480px) {
+    header h1 { font-size: 1rem; }
 }

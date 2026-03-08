@@ -1,4 +1,11 @@
-/* ==================== MODAL BASE (cadastro/edição) ==================== */
+/*
+   modais.css
+   SRP: modais base, dano/cura e toast
+   ✅ FASE 1: .modal-label mantido APENAS aqui (removido de modal-condicao.css)
+   ✅ CORES: harmonizadas com paleta azul
+*/
+
+/* ── Modal base (arena legado) ── */
 .modal {
     display: none;
     position: fixed;
@@ -21,25 +28,25 @@
 }
 
 .modal-content {
-    background: var(--cor-pergaminho);
-    border: 5px solid var(--cor-madeira);
-    border-radius: 20px;
+    background: var(--bg-painel);
+    border: 2px solid var(--borda-destaque);
+    border-radius: 16px;
     width: 100%;
     max-width: 900px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6);
     animation: modalSlideIn 0.3s ease;
 }
 
 .modal-header {
-    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    background: linear-gradient(135deg, #1a2744 0%, #0d1829 100%);
     padding: 1.5rem 2rem;
-    border-bottom: 3px solid var(--cor-dourada);
+    border-bottom: 2px solid var(--azul-destaque);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 15px 15px 0 0;
+    border-radius: 14px 14px 0 0;
 }
 
 .modal-header h2 {
@@ -65,20 +72,17 @@
     justify-content: center;
 }
 
-.modal-close:hover {
-    transform: rotate(90deg) scale(1.2);
-    color: #FFED4E;
-}
+.modal-close:hover { transform: rotate(90deg) scale(1.2); color: #FFED4E; }
 
 .modal-content form { padding: 2rem; }
 
-/* ==================== AÇÕES DO MODAL BASE ==================== */
+/* ── Ações do modal base ── */
 .modal-actions {
     display: flex;
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 2px solid rgba(139, 69, 19, 0.2);
+    border-top: 1px solid var(--borda-painel);
 }
 
 .modal-actions button {
@@ -93,10 +97,7 @@
     border: 2px solid;
 }
 
-/* ==================== MODAL DANO/CURA ==================== */
-/* ✅ Estrutura idêntica ao modal-condicao */
-
-/* Overlay */
+/* ── Modal Dano/Cura ── */
 .modal-dano-overlay {
     display: none;
     position: fixed;
@@ -108,16 +109,13 @@
     backdrop-filter: blur(4px);
 }
 
-.modal-dano-overlay.show {
-    display: flex;
-}
+.modal-dano-overlay.show { display: flex; }
 
-/* Container principal — flex column com altura controlada */
 .modal-dano-container {
-    background: var(--cor-pergaminho);
-    border: 4px solid var(--cor-madeira);
+    background: var(--bg-painel);
+    border: 2px solid var(--borda-destaque);
     border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
     width: 780px;
     max-width: 95vw;
     max-height: 85vh;
@@ -127,13 +125,13 @@
     animation: modalSlideIn 0.3s ease;
 }
 
-/* HEADER */
 .modal-dano-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    background: linear-gradient(135deg, #1a2744 0%, #0d1829 100%);
     padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--azul-destaque);
     flex-shrink: 0;
 }
 
@@ -147,11 +145,10 @@
 
 .modal-dano-fechar {
     background: transparent;
-    border: 2px solid var(--cor-dourada);
+    border: 2px solid var(--azul-destaque);
     border-radius: 50%;
-    color: var(--cor-dourada);
-    width: 32px;
-    height: 32px;
+    color: var(--azul-destaque);
+    width: 32px; height: 32px;
     cursor: pointer;
     font-size: 1rem;
     display: flex;
@@ -162,19 +159,18 @@
 }
 
 .modal-dano-fechar:hover {
-    background: var(--cor-dourada);
-    color: var(--cor-madeira);
+    background: var(--azul-destaque);
+    color: #fff;
     transform: scale(1.1);
 }
 
-/* BODY — flex:1 + overflow-y:auto para não sumir o footer */
 .modal-dano-body {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    background: var(--bg-painel);
 }
 
-/* Layout 2 colunas: lista | inputs */
 .modal-dano-layout {
     display: grid;
     grid-template-columns: 1fr 320px;
@@ -183,9 +179,8 @@
     min-height: 0;
 }
 
-/* Coluna esquerda — lista de combatentes */
 .dano-combatentes-selecao {
-    border-right: 3px solid var(--cor-madeira);
+    border-right: 1px solid var(--borda-painel);
     padding-right: 1.5rem;
     overflow: hidden;
     display: flex;
@@ -198,11 +193,9 @@
     color: var(--cor-dourada);
     font-size: 1.1rem;
     margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     flex-shrink: 0;
 }
 
-/* Lista com scroll */
 .dano-combatentes-selecao .lista-checkbox-combatentes {
     flex: 1;
     overflow-y: auto;
@@ -213,7 +206,6 @@
     max-height: 300px;
 }
 
-/* Coluna direita — inputs dano e cura */
 .dano-valores-aplicacao {
     display: flex;
     flex-direction: column;
@@ -221,23 +213,22 @@
     justify-content: center;
 }
 
-/* FOOTER — flex-shrink:0 garante que nunca desapareça */
 .modal-dano-footer {
     display: flex;
     gap: 0.75rem;
     padding: 1rem 1.5rem;
-    border-top: 2px solid rgba(139, 69, 19, 0.2);
+    border-top: 1px solid var(--borda-painel);
     justify-content: flex-end;
     flex-shrink: 0;
-    background: var(--cor-pergaminho);
+    background: var(--bg-painel-interno);
 }
 
 .btn-aplicar-dano {
     padding: 0.6rem 1.4rem;
-    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
-    border: 2px solid var(--cor-dourada);
+    background: linear-gradient(135deg, var(--azul-acao) 0%, #1e40af 100%);
+    border: 2px solid var(--azul-destaque);
     border-radius: 8px;
-    color: var(--cor-dourada);
+    color: #fff;
     font-family: var(--fonte-titulo);
     font-size: 0.95rem;
     font-weight: bold;
@@ -246,17 +237,17 @@
 }
 
 .btn-aplicar-dano:hover {
-    background: linear-gradient(135deg, #a0522d 0%, var(--cor-madeira) 100%);
+    background: linear-gradient(135deg, var(--azul-hover) 0%, var(--azul-acao) 100%);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(74, 144, 217, 0.4);
 }
 
 .btn-cancelar-dano {
     padding: 0.6rem 1.2rem;
     background: transparent;
-    border: 2px solid var(--cor-madeira);
+    border: 1px solid var(--borda-painel);
     border-radius: 8px;
-    color: var(--cor-madeira);
+    color: var(--texto-secundario);
     font-family: var(--fonte-titulo);
     font-size: 0.95rem;
     cursor: pointer;
@@ -264,13 +255,15 @@
 }
 
 .btn-cancelar-dano:hover {
-    background: rgba(139, 69, 19, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--azul-destaque);
+    color: var(--texto-principal);
 }
 
-/* ==================== CAMPOS COMPARTILHADOS ==================== */
+/* ✅ FONTE DA VERDADE para .modal-label — removida de modal-condicao.css */
 .modal-label {
     font-family: var(--fonte-titulo);
-    color: var(--cor-madeira);
+    color: var(--azul-destaque);
     font-size: 1rem;
     font-weight: bold;
     display: block;
@@ -283,36 +276,36 @@
     font-size: 1.8rem;
     font-weight: bold;
     text-align: center;
-    border: 3px solid var(--cor-madeira);
+    border: 2px solid var(--borda-painel);
     border-radius: 12px;
-    background: linear-gradient(135deg, #ffffff 0%, #f4e8d8 100%);
-    color: var(--cor-madeira);
+    background: var(--bg-painel-interno);
+    color: var(--texto-principal);
     font-family: var(--fonte-texto);
     transition: all 0.3s;
 }
 
 .input-valor-modal:focus {
     outline: none;
-    border-color: var(--cor-dourada);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    border-color: var(--azul-destaque);
+    box-shadow: 0 0 16px rgba(74, 144, 217, 0.3);
     transform: scale(1.02);
 }
 
-.input-valor-modal:hover { border-color: var(--cor-dourada); }
+.input-valor-modal:hover { border-color: var(--azul-destaque); }
 
-/* ==================== CHECKBOX COMBATENTES (modal dano/cura) ==================== */
-/* ✅ Fundo claro igual ao modal-condicao */
+/* ── Checkbox combatentes (modal dano/cura) ── */
 #listaCombatentesDanoCura .checkbox-combatente-item {
-    background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(232,220,196,0.8) 100%);
-    color: var(--cor-madeira);
+    background: linear-gradient(135deg, rgba(26,39,68,0.9) 0%, rgba(15,31,61,0.95) 100%);
+    color: var(--texto-principal);
+    border-color: var(--borda-painel);
 }
 
 #listaCombatentesDanoCura .checkbox-combatente-item input[type="checkbox"] {
-    accent-color: var(--cor-madeira);
+    accent-color: var(--azul-destaque);
 }
 
 #listaCombatentesDanoCura .checkbox-combatente-item .checkbox-label-nome {
-    color: var(--cor-madeira);
+    color: var(--texto-principal);
     font-weight: bold;
     font-size: 0.9rem;
     white-space: nowrap;
@@ -323,23 +316,23 @@
 }
 
 #listaCombatentesDanoCura .checkbox-combatente-item .checkbox-label-hp {
-    color: #654321;
+    color: var(--texto-secundario);
     font-size: 0.8rem;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
-/* ==================== TOAST NOTIFICATIONS ==================== */
+/* ── Toast ── */
 .toast {
     position: fixed;
     bottom: 2rem; right: 2rem;
-    padding: 1.2rem 2rem;
-    background: var(--cor-pergaminho);
-    border: 3px solid var(--cor-madeira);
-    border-radius: 12px;
-    color: var(--cor-madeira);
+    padding: 1rem 1.5rem;
+    background: var(--bg-painel);
+    border: 2px solid var(--borda-destaque);
+    border-radius: 10px;
+    color: var(--texto-principal);
     font-weight: bold;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.3s;
@@ -349,10 +342,12 @@
 }
 
 .toast.show         { opacity: 1; transform: translateY(0); }
-.toast-success      { border-color: #32CD32; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
-.toast-error        { border-color: #DC143C; background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); }
+.toast-success      { border-color: #15803d; background: linear-gradient(135deg, #0f2d1a 0%, #14532d 100%); color: #4ade80; }
+.toast-error        { border-color: #dc2626; background: linear-gradient(135deg, #1a0a0a 0%, #3b0d0d 100%); color: #f87171; }
+.toast-warning      { border-color: #d97706; background: linear-gradient(135deg, #1a1000 0%, #3b2000 100%); color: #fcd34d; }
+.toast-info         { border-color: var(--azul-destaque); background: linear-gradient(135deg, #0d1829 0%, #1a2744 100%); color: var(--azul-hover); }
 
-/* ==================== RESPONSIVE ==================== */
+/* ── Responsividade ── */
 @media (max-width: 600px) {
     .modal-dano-layout {
         grid-template-columns: 1fr;
@@ -360,7 +355,7 @@
     }
     .dano-combatentes-selecao {
         border-right: none;
-        border-bottom: 3px solid var(--cor-madeira);
+        border-bottom: 1px solid var(--borda-painel);
         padding-right: 0;
         padding-bottom: 1rem;
     }
@@ -370,5 +365,5 @@
     .modal-dano-container { width: 95vw; }
     .modal-dano-footer    { flex-direction: column; }
     .btn-aplicar-dano,
-    .btn-cancelar-dano    { width: 100%; text-align: center; justify-content: center; }
+    .btn-cancelar-dano    { width: 100%; text-align: center; }
 }
