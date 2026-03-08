@@ -4,6 +4,7 @@ export class Combatente {
         this.nome         = data.nome;
         this.tipo         = data.tipo;
         this.classe       = data.classe;
+        this.raca         = data.raca         || '';  
         this.hp_atual     = data.hp_atual;
         this.hp_maximo    = data.hp_maximo;
         this.iniciativa   = data.iniciativa;

@@ -1,7 +1,7 @@
 import { CombatenteService  } from '../services/CombatenteService.js';
 import { CondicaoController } from './CondicaoController.js';
 import { MagiaSlotService   } from '../services/MagiaSlotService.js';
-import { Toast              } from '../ui/Toast.js';
+import { Toast } from '/js/ui/toast.module.js';
 
 export class ArenaController {
 

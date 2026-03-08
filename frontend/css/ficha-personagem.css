@@ -572,3 +572,46 @@ body::before {
     z-index: 0;
 }
 .ficha-wrapper { position: relative; z-index: 1; }
+
+/* ── Tags de identidade ── */
+.ficha-tag {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* ✅ Raça — estava faltando */
+.ficha-tag-raca {
+    background: rgba(180, 120, 60, 0.15);
+    color: #c9a84c;
+    border: 1px solid rgba(180, 120, 60, 0.4);
+}
+
+/* Classe */
+.ficha-tag-classe {
+    background: rgba(65, 105, 225, 0.15);
+    color: #7b9ef7;
+    border: 1px solid rgba(65, 105, 225, 0.4);
+}
+
+/* Tipo */
+.ficha-tag-jogador {
+    background: rgba(65, 105, 225, 0.15);
+    color: #FFD700;
+    border: 1px solid rgba(65, 105, 225, 0.4);
+}
+
+.ficha-tag-monstro {
+    background: rgba(220, 20, 60, 0.15);
+    color: #FFD700;
+    border: 1px solid rgba(220, 20, 60, 0.4);
+}
+
+.ficha-tag-npc {
+    background: rgba(50, 205, 50, 0.15);
+    color: #FFD700;
+    border: 1px solid rgba(50, 205, 50, 0.4);
+}

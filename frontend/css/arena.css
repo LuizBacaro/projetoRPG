@@ -14,6 +14,8 @@
     padding: 0.75rem;
     box-sizing: border-box;
     overflow: hidden;
+    /* ✅ azul escuro */
+    background: #2a4a7a;
 }
 
 /* ── Painel lateral esquerdo ── */
@@ -249,7 +251,8 @@
     flex-direction: column;
     gap: 0.55rem;
     /* ✅ era #0d1117/#161b27 quase preto */
-    background: linear-gradient(135deg, var(--bg-painel-interno) 0%, var(--bg-secundario) 100%);
+    /* background: linear-gradient(135deg, var(--bg-painel-interno) 0%, var(--bg-secundario) 100%); */
+    background: #1e3a5f;
     border: 1px solid var(--borda-painel);
     border-radius: 12px;
     padding: 0.75rem;

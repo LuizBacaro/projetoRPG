@@ -1,8 +1,8 @@
 /*
    Toast.js
-   ✅ Compatível com AMBOS os padrões:
-      - window.Toast  → usado pelo dashboard (carregar())
-      - export Toast  → usado pelo ConfiguracaoController (ES module)
+   SRP: notificações visuais — carregado como script CLÁSSICO via carregar()
+   ✅ window.Toast → usado pelo dashboard e qualquer script clássico
+   ❌ export REMOVIDO → causa SyntaxError em scripts clássicos
 */
 
 class Toast {
@@ -14,41 +14,40 @@ class Toast {
     static mostrar(texto, tipo) {
         if (!tipo) tipo = 'info';
         Toast._injetarEstilos();
-        var el = document.createElement('div');
+        const el       = document.createElement('div');
         el.className   = 'toast toast-' + tipo;
         el.textContent = texto;
         document.body.appendChild(el);
-        setTimeout(function() { el.classList.add('show'); }, 50);
-        setTimeout(function() {
+        setTimeout(() => el.classList.add('show'), 50);
+        setTimeout(() => {
             el.classList.remove('show');
-            setTimeout(function() { el.remove(); }, 300);
+            setTimeout(() => el.remove(), 300);
         }, 3000);
     }
 
     static _injetarEstilos() {
         if (document.getElementById('toast-styles')) return;
-        var s = document.createElement('style');
-        s.id  = 'toast-styles';
-        var c = '';
-        c += '.toast{position:fixed;bottom:1.5rem;right:1.5rem;';
-        c += 'padding:.75rem 1.25rem;border-radius:.5rem;color:#fff;';
-        c += 'font-size:.9rem;font-weight:500;opacity:0;';
-        c += 'transform:translateY(1rem);';
-        c += 'transition:opacity .3s,transform .3s;';
-        c += 'z-index:9999;max-width:360px;';
-        c += 'box-shadow:0 4px 12px rgba(0,0,0,.4);}';
-        c += '.toast.show{opacity:1;transform:translateY(0);}';
-        c += '.toast-success{background:#059669;}';
-        c += '.toast-error{background:#dc2626;}';
-        c += '.toast-warning{background:#d97706;}';
-        c += '.toast-info{background:#2563eb;}';
-        s.textContent = c;
+        const s  = document.createElement('style');
+        s.id     = 'toast-styles';
+        s.textContent = `
+            .toast {
+                position: fixed; bottom: 1.5rem; right: 1.5rem;
+                padding: .75rem 1.25rem; border-radius: .5rem;
+                color: #fff; font-size: .9rem; font-weight: 500;
+                opacity: 0; transform: translateY(1rem);
+                transition: opacity .3s, transform .3s;
+                z-index: 9999; max-width: 360px;
+                box-shadow: 0 4px 12px rgba(0,0,0,.4);
+            }
+            .toast.show    { opacity: 1; transform: translateY(0); }
+            .toast-success { background: #059669; }
+            .toast-error   { background: #dc2626; }
+            .toast-warning { background: #d97706; }
+            .toast-info    { background: #2563eb; }
+        `;
         document.head.appendChild(s);
     }
 }
 
-// ✅ Global para dashboard (carregar())
+// ✅ Global — disponível em TODOS os contextos
 window.Toast = Toast;
-
-// ✅ Export para ES modules (ConfiguracaoController, ArenaController, etc.)
-export { Toast };
