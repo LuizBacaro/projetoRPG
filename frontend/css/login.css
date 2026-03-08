@@ -1,0 +1,206 @@
+/*
+   login.css
+   SRP: estilos exclusivos da tela de login e modal de cadastro
+*/
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f0f23;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Wrapper ── */
+.login-wrapper {
+    width: 100%;
+    max-width: 420px;
+    padding: 1rem;
+}
+
+/* ── Logo ── */
+.login-logo { text-align: center; margin-bottom: 2rem; }
+
+.login-logo h1 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.login-logo p {
+    color: #64748b;
+    margin-top: .4rem;
+    font-size: .9rem;
+}
+
+/* ── Card ── */
+.login-card {
+    background: #1a1a2e;
+    border: 1px solid #2d2d44;
+    border-radius: .75rem;
+    padding: 2rem;
+}
+
+.login-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* ── Campos ── */
+.form-group { margin-bottom: 1.1rem; }
+
+.form-group label {
+    display: block;
+    margin-bottom: .35rem;
+    font-size: .82rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: .65rem .9rem;
+    border-radius: .4rem;
+    border: 1px solid #334155;
+    background: #0f0f23;
+    color: #e2e8f0;
+    font-size: .95rem;
+    outline: none;
+    transition: border-color .2s;
+}
+.form-group input:focus { border-color: #7c3aed; }
+
+/* ── Botão principal ── */
+.btn-login {
+    width: 100%;
+    padding: .7rem;
+    background: #7c3aed;
+    color: #fff;
+    border: none;
+    border-radius: .4rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: .5rem;
+    transition: background .2s;
+}
+.btn-login:hover    { background: #6d28d9; }
+.btn-login:disabled { background: #4c1d95; cursor: not-allowed; opacity: .7; }
+
+/* ── Botão secundário ── */
+.btn-cadastro {
+    width: 100%;
+    padding: .65rem;
+    background: transparent;
+    color: #a78bfa;
+    border: 1px solid #7c3aed55;
+    border-radius: .4rem;
+    font-size: .9rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: .65rem;
+    transition: background .2s, border-color .2s;
+}
+.btn-cadastro:hover { background: #7c3aed11; border-color: #7c3aed; }
+
+/* ── Divisor ── */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 1.1rem 0 .5rem;
+    color: #334155;
+    font-size: .78rem;
+}
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #2d2d44;
+}
+
+/* ── Mensagens ── */
+.msg-box {
+    display: none;
+    padding: .65rem 1rem;
+    border-radius: .4rem;
+    margin-bottom: 1rem;
+    font-size: .85rem;
+}
+.msg-erro    { background: #dc262622; border: 1px solid #dc262655; color: #f87171; }
+.msg-sucesso { background: #05966922; border: 1px solid #05966955; color: #34d399; }
+
+.hint {
+    text-align: center;
+    margin-top: 1.25rem;
+    font-size: .8rem;
+    color: #334155;
+}
+
+/* ── Modal de cadastro ── */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.modal-overlay.show { display: flex; }
+
+.modal-box {
+    background: #1a1a2e;
+    border: 1px solid #2d2d44;
+    border-radius: .75rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.modal-header h2 { font-size: 1.1rem; color: #e2e8f0; }
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: .2rem .4rem;
+    border-radius: .3rem;
+}
+.modal-close:hover { background: #ffffff11; color: #e2e8f0; }
+
+.perfil-info {
+    background: #7c3aed11;
+    border: 1px solid #7c3aed33;
+    border-radius: .4rem;
+    padding: .65rem 1rem;
+    font-size: .82rem;
+    color: #a78bfa;
+    margin-bottom: 1.1rem;
+}
+
+/* ── Responsividade ── */
+@media (max-width: 480px) {
+    .login-wrapper { padding: .75rem; }
+    .login-card    { padding: 1.5rem; }
+    .modal-box     { padding: 1.5rem; }
+    .login-logo h1 { font-size: 1.6rem; }
+}
