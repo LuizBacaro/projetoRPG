@@ -1,3 +1,9 @@
+/*
+   DashboardController.js
+   ✅ Sem imports ES module — carregado via carregar() no dashboard.html
+   Dependências via window: AuthService, Toast, AtaqueService
+*/
+
 class DashboardController {
 
     constructor() {
@@ -24,7 +30,7 @@ class DashboardController {
 
         window.abrirModalCadastro = function(tipo) {
             if (!self._isMestre() && (tipo === 'monstro' || tipo === 'npc')) {
-                Toast.error('Acesso restrito: apenas Mestre ou Administrador pode cadastrar monstros e NPCs.');
+                Toast.error('Acesso restrito: apenas Mestre pode cadastrar monstros e NPCs.');
                 return;
             }
             self._fecharModal('seletorTipo');
@@ -70,26 +76,25 @@ class DashboardController {
     _aplicarRestricoesPerfil() {
         if (this._isMestre()) return;
 
-        // Jogador: oculta filtros de monstro e NPC
-        var filtroMonstro = document.querySelector('.filter-btn[data-tipo="monstro"]');
-        var filtroNPC     = document.querySelector('.filter-btn[data-tipo="npc"]');
+        // ✅ Oculta aba Arena para Jogador
+        const tabArena = document.querySelector('.nav-tab[data-tab="arena"]');
+        if (tabArena) tabArena.style.display = 'none';
+
+        // Oculta filtros de monstro e NPC
+        const filtroMonstro = document.querySelector('.filter-btn[data-tipo="monstro"]');
+        const filtroNPC     = document.querySelector('.filter-btn[data-tipo="npc"]');
         if (filtroMonstro) filtroMonstro.style.display = 'none';
         if (filtroNPC)     filtroNPC.style.display     = 'none';
 
-        // Jogador: oculta contadores de monstro e NPC no resumo
-        var boxMonstros = document.getElementById('totalMonstros');
-        var boxNPCs     = document.getElementById('totalNPCs');
-        if (boxMonstros) boxMonstros.closest('.resumo-box') && (boxMonstros.closest('.resumo-box').style.display = 'none');
-        if (boxNPCs)     boxNPCs.closest('.resumo-box')     && (boxNPCs.closest('.resumo-box').style.display     = 'none');
+        // Oculta botão Novo Combatente
+        const btnNovo = document.getElementById('btnNovoCombatente');
+        if (btnNovo) btnNovo.style.display = 'none';
 
-        // Jogador: oculta botoes de monstro/NPC no seletor de tipo
-        var btnMonstro = document.querySelector('[onclick*="monstro"]');
-        var btnNPC     = document.querySelector('[onclick*="npc"]');
-        if (btnMonstro) btnMonstro.style.display = 'none';
-        if (btnNPC)     btnNPC.style.display     = 'none';
-
-        // Jogador: define filtro padrao como jogador
-        this.filtroAtual = 'jogador';
+        // Oculta cards de resumo de Monstros e NPCs
+        const resumoMonstros = document.getElementById('totalMonstros')?.closest('.resumo-card');
+        const resumoNPCs     = document.getElementById('totalNPCs')?.closest('.resumo-card');
+        if (resumoMonstros) resumoMonstros.style.display = 'none';
+        if (resumoNPCs)     resumoNPCs.style.display     = 'none';
     }
 
     _configurarAbas() {
@@ -127,11 +132,7 @@ class DashboardController {
         var form = document.getElementById(formId);
         if (!form) { console.error('Form nao encontrado: ' + formId); return; }
 
-        var textos = {
-            jogador: 'Cadastrar Jogador',
-            monstro: 'Cadastrar Monstro',
-            npc:     'Cadastrar NPC'
-        };
+        var textos = { jogador: 'Cadastrar Jogador', monstro: 'Cadastrar Monstro', npc: 'Cadastrar NPC' };
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -210,12 +211,8 @@ class DashboardController {
             var tipo = this.filtroAtual === 'todos' ? null : this.filtroAtual;
 
             // Jogador: nunca carrega monstros nem NPCs
-            if (!this._isMestre() && (tipo === 'monstro' || tipo === 'npc')) {
-                tipo = 'jogador';
-            }
-            if (!this._isMestre() && tipo === null) {
-                tipo = 'jogador';
-            }
+            if (!this._isMestre() && (tipo === 'monstro' || tipo === 'npc')) tipo = 'jogador';
+            if (!this._isMestre() && tipo === null) tipo = 'jogador';
 
             var combatentes = await this.service.listar(tipo);
             this._renderizarTabela(combatentes);
@@ -229,31 +226,48 @@ class DashboardController {
     _renderizarTabela(combatentes) {
         var self  = this;
         var tbody = document.getElementById('tabelaCombatentes');
+
         if (!combatentes.length) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b">Nenhum combatente cadastrado.</td></tr>';
             return;
         }
+
+        // ✅ Oculta colunas HP e Iniciativa para Jogador ver monstro/NPC
+        var cabecalho = document.querySelectorAll('.tabela-combatentes th');
+        if (cabecalho.length >= 6) {
+            cabecalho[4].style.display = this._isMestre() ? '' : 'none'; // HP Máx
+            cabecalho[5].style.display = this._isMestre() ? '' : 'none'; // Iniciativa
+        }
+
         var rows = '';
         for (var i = 0; i < combatentes.length; i++) {
-            var c = combatentes[i];
+            var c          = combatentes[i];
+            var podeVerStats = AuthService.podeVerStatsDe(c.tipo);
+            var hpTexto      = podeVerStats ? c.hp_maximo  : '???';
+            var iniTexto     = podeVerStats ? c.iniciativa : '???';
+
             rows += '<tr>';
             rows += '<td><span class="badge badge-' + c.tipo + '">' + c.tipo + '</span></td>';
             rows += '<td>' + c.nome + '</td>';
             rows += '<td>' + (c.classe || '-') + '</td>';
             rows += '<td>' + (c.nivel || 1) + '</td>';
-            rows += '<td>' + c.hp_maximo + '</td>';
-            rows += '<td>' + c.iniciativa + '</td>';
+            rows += '<td style="' + (this._isMestre() ? '' : 'display:none') + '">';
+            rows += '<span class="' + (podeVerStats ? '' : 'stat-oculto') + '">' + hpTexto + '</span>';
+            rows += '</td>';
+            rows += '<td style="' + (this._isMestre() ? '' : 'display:none') + '">';
+            rows += '<span class="' + (podeVerStats ? '' : 'stat-oculto') + '">' + iniTexto + '</span>';
+            rows += '</td>';
             rows += '<td>';
             rows += '<div class="tabela-acoes">';
-            rows += '<button class="btn-acao btn-ver-ficha" data-id="' + c.id + '" data-acao="ver" title="Ver ficha completa" onclick="window.open(\'../pages/ficha-personagem.html?id=' + c.id + '\', \'_blank\')">👁️</button>';
+            rows += '<button class="btn-acao btn-ver-ficha" data-id="' + c.id + '" data-acao="ver" title="Ver ficha" onclick="window.open(\'/pages/ficha-personagem.html?id=' + c.id + '\', \'_blank\')">👁️</button>';
             rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="editar" title="Editar">✏️</button>';
             if (self._isMestre()) {
                 rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="excluir" title="Excluir">🗑️</button>';
             }
-            rows += '</div>';
-            rows += '</td></tr>';
+            rows += '</div></td></tr>';
         }
         tbody.innerHTML = rows;
+
         tbody.querySelectorAll('[data-acao="editar"]').forEach(function(btn) {
             btn.addEventListener('click', function() { self._abrirEdicao(parseInt(btn.dataset.id)); });
         });
@@ -265,10 +279,10 @@ class DashboardController {
     }
 
     _atualizarResumo(combatentes) {
-        var totalEl     = document.getElementById('totalGeral');
-        var jogEl       = document.getElementById('totalJogadores');
-        var monEl       = document.getElementById('totalMonstros');
-        var npcEl       = document.getElementById('totalNPCs');
+        var totalEl = document.getElementById('totalGeral');
+        var jogEl   = document.getElementById('totalJogadores');
+        var monEl   = document.getElementById('totalMonstros');
+        var npcEl   = document.getElementById('totalNPCs');
         if (totalEl) totalEl.textContent = combatentes.length;
         if (jogEl)   jogEl.textContent   = combatentes.filter(function(c) { return c.tipo === 'jogador'; }).length;
         if (monEl)   monEl.textContent   = combatentes.filter(function(c) { return c.tipo === 'monstro'; }).length;
@@ -279,7 +293,6 @@ class DashboardController {
         try {
             var c = await this.service.obterPorId(id);
 
-            // Jogador nao pode editar monstro ou NPC
             if (!this._isMestre() && (c.tipo === 'monstro' || c.tipo === 'npc')) {
                 Toast.error('Acesso restrito: voce nao pode editar monstros ou NPCs.');
                 return;
@@ -293,16 +306,16 @@ class DashboardController {
             document.getElementById('dashEditHP').value         = c.hp_maximo;
             document.getElementById('dashEditIniciativa').value = c.iniciativa;
             document.getElementById('dashEditClasse').value     = c.classe || '';
-            document.getElementById('dashEditRaca').value       = c.raca || '';
+            document.getElementById('dashEditRaca').value       = c.raca   || '';
             document.getElementById('dashEditNivel').value      = c.nivel  || 1;
             document.getElementById('dashEditPontos').value     = c.pontos || 0;
 
-            document.getElementById('dashEditCA').value        = (c.ca        !== null && c.ca        !== undefined) ? c.ca        : 10;
-            document.getElementById('dashEditToque').value     = (c.toque     !== null && c.toque     !== undefined) ? c.toque     : 10;
-            document.getElementById('dashEditSurpresa').value  = (c.surpresa  !== null && c.surpresa  !== undefined) ? c.surpresa  : 10;
-            document.getElementById('dashEditFortitude').value = (c.fortitude !== null && c.fortitude !== undefined) ? c.fortitude : 0;
-            document.getElementById('dashEditReflexos').value  = (c.reflexos  !== null && c.reflexos  !== undefined) ? c.reflexos  : 0;
-            document.getElementById('dashEditVontade').value   = (c.vontade   !== null && c.vontade   !== undefined) ? c.vontade   : 0;
+            document.getElementById('dashEditCA').value        = c.ca        ?? 10;
+            document.getElementById('dashEditToque').value     = c.toque     ?? 10;
+            document.getElementById('dashEditSurpresa').value  = c.surpresa  ?? 10;
+            document.getElementById('dashEditFortitude').value = c.fortitude ?? 0;
+            document.getElementById('dashEditReflexos').value  = c.reflexos  ?? 0;
+            document.getElementById('dashEditVontade').value   = c.vontade   ?? 0;
 
             document.getElementById('dashEditFOR').value = c.forca        || 10;
             document.getElementById('dashEditDES').value = c.destreza     || 10;
@@ -339,10 +352,6 @@ class DashboardController {
                 this._renderizarAtaquesEdicao(c.ataques      || []);
                 this._renderizarMagiasEdicao (c.magias_slots || []);
             }
-
-            // Jogador nao pode deletar — oculta botao
-            var btnDeletar = document.getElementById('btnDeletarCombatente');
-            if (btnDeletar) btnDeletar.style.display = this._isMestre() ? 'inline-flex' : 'none';
 
             this._abrirModal('modalEdicaoDashboard');
         } catch (err) {
@@ -391,14 +400,14 @@ class DashboardController {
     _adicionarLinhaAtaque(ataque) {
         var lista = document.getElementById('listaAtaquesEdicao');
         if (!lista) return;
-        var div = document.createElement('div');
+        var div       = document.createElement('div');
         div.className = 'ataque-linha';
         div.innerHTML =
-            '<input type="text" class="ataque-nome"  placeholder="Nome"  value="' + (ataque && ataque.nome         ? ataque.nome         : '') + '" />' +
-            '<input type="text" class="ataque-bonus" placeholder="+0"    value="' + (ataque && ataque.bonus_ataque ? ataque.bonus_ataque : '+0') + '" style="width:70px" />' +
-            '<input type="text" class="ataque-dano"  placeholder="1d6"   value="' + (ataque && ataque.dano         ? ataque.dano         : '') + '" style="width:90px" />' +
-            '<input type="text" class="ataque-tipo"  placeholder="tipo"  value="' + (ataque && ataque.tipo_dano   ? ataque.tipo_dano   : '') + '" style="width:120px" />' +
-            '<button type="button" class="btn-dash-delete" onclick="removerLinhaAtaque(this)">x</button>';
+            '<input type="text" class="ataque-nome"  placeholder="Nome"  value="' + (ataque?.nome         || '') + '" />' +
+            '<input type="text" class="ataque-bonus" placeholder="+0"    value="' + (ataque?.bonus_ataque  || '+0') + '" style="width:70px" />' +
+            '<input type="text" class="ataque-dano"  placeholder="1d6"   value="' + (ataque?.dano          || '') + '" style="width:90px" />' +
+            '<input type="text" class="ataque-tipo"  placeholder="tipo"  value="' + (ataque?.tipo_dano     || '') + '" style="width:120px" />' +
+            '<button type="button" class="btn-dash-delete" onclick="removerLinhaAtaque(this)">✕</button>';
         lista.appendChild(div);
     }
 
@@ -424,10 +433,7 @@ class DashboardController {
         if (!container) return;
         var html = '';
         for (var nivel = 0; nivel <= 9; nivel++) {
-            var slot  = null;
-            for (var k = 0; k < slots.length; k++) {
-                if (slots[k].nivel === nivel) { slot = slots[k]; break; }
-            }
+            var slot  = slots.find(function(s) { return s.nivel === nivel; }) || null;
             var total = slot ? slot.total : 0;
             html += '<div class="magia-edicao-linha">';
             html += '<span class="magia-nivel-label">Nivel ' + nivel + '</span>';
@@ -463,7 +469,7 @@ class DashboardController {
     _previewImagem(input, previewId, imgId, placeholderId) {
         var file = input.files ? input.files[0] : null;
         if (!file) return;
-        var reader = new FileReader();
+        var reader    = new FileReader();
         reader.onload = function(e) {
             var ph = document.getElementById(placeholderId);
             var pv = document.getElementById(previewId);
@@ -482,7 +488,7 @@ class DashboardController {
         var input         = document.getElementById(inputId);
         var placeholder   = document.getElementById(placeholderId);
         var preview       = document.getElementById(previewId);
-        if (input)       input.value              = '';
+        if (input)       input.value               = '';
         if (placeholder) placeholder.style.display = 'flex';
         if (preview)     preview.style.display     = 'none';
     }
@@ -505,6 +511,8 @@ class DashboardController {
         if (pv) pv.style.display = 'none';
     }
 }
+
+// ── Classes auxiliares 
 
 class CombatenteServiceGlobal {
     _url(path) { return window.getApiUrl('/combatentes' + (path || '')); }
@@ -544,13 +552,5 @@ class CombatenteServiceGlobal {
     }
 }
 
-class UploadServiceGlobal {
-    criarPreview(file, callback) {
-        if (!file.type.startsWith('image/')) throw new Error('Arquivo deve ser uma imagem');
-        var reader = new FileReader();
-        reader.onload = function(e) { callback(e.target.result); };
-        reader.readAsDataURL(file);
-    }
-}
-
+// ✅ Instancia após todos os serviços carregados
 new DashboardController();
