@@ -525,17 +525,17 @@
 <!-- ══════════════════════════════════════════════════════════════ -->
 <script type="module">
     import { getApiUrl } from '/js/config/api.config.js';
+    import { Toast     } from '/js/ui/toast.module.js';   // ✅ AQUI
     window.getApiUrl = getApiUrl;
 
     const carregar = (src) => new Promise((resolve, reject) => {
-        const s     = document.createElement('script');
-        s.src       = src;
-        s.onload    = resolve;
-        s.onerror   = () => reject(new Error('Falha ao carregar: ' + src));
+        const s  = document.createElement('script');
+        s.src    = src;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Falha ao carregar: ' + src));
         document.body.appendChild(s);
     });
 
-    // 1 — AuthService (protege a página, DEVE ser o primeiro)
     await carregar('/js/services/AuthService.js');
     AuthService.exigirLogin();
 
@@ -547,13 +547,8 @@
     if (logoutEl) logoutEl.addEventListener('click', () => AuthService.logout());
     AuthService.configurarVisibilidadeAdmin('linkAdmin');
 
-    // 2 — Toast (DEVE vir antes de qualquer controller)
-    await carregar('/js/ui/Toast.js');
-
-    // 3 — AtaqueService (DEVE vir antes do DashboardController)
+    // ✅ Toast já disponível via import acima — não precisa de carregar()
     await carregar('/js/services/AtaqueService.js');
-
-    // 4 — DashboardController (depende de Toast + AtaqueService)
     await carregar('/js/controllers/DashboardController.js');
 </script>
 
