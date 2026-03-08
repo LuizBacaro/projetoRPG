@@ -4,7 +4,7 @@
  */
 import { CombatenteService } from '../services/CombatenteService.js';
 import { UploadService } from '../services/UploadService.js';
-import { Toast } from '../ui/Toast.js';
+import { Toast } from './toast.module.js';
 import { atualizarModificadorDOM } from '../utils/dnd.js';
 
 export class ModalCadastro {
