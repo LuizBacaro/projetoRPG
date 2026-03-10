@@ -69,6 +69,11 @@ export class ArenaController {
             this.atualizarRodada();
             Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
         }
+
+        // ✅ ADICIONA AQUI — reseta e reinicia o cronômetro a cada turno
+        this._resetarCronometro();
+        this._iniciarCronometro();
+
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }

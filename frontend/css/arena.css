@@ -363,19 +363,24 @@
 }
 .btn-toggle-stats:hover { background: rgba(255,255,255,0.1); color: var(--texto-principal); }
 
+/* ── Botão encerrar — agora no header-arena principal ── */
 .btn-encerrar-combate {
-    padding: 0.25rem 0.6rem;
+    padding: 0.35rem 0.9rem;
     border-radius: 6px;
-    border: 1px solid var(--cor-perigo-borda);
-    background: linear-gradient(135deg, var(--cor-perigo-borda), #991b1b);
+    border: 1px solid #7f1d1d;
+    background: linear-gradient(135deg, #7f1d1d, #991b1b);
     color: #fca5a5;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
+    flex-shrink: 0;                   /* ✅ não encolhe */
 }
-.btn-encerrar-combate:hover { filter: brightness(1.2); }
+.btn-encerrar-combate:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 10px rgba(153,27,27,0.5);
+}
 
 /* ── Layout 3 colunas ── */
 .arena-layout-principal {
