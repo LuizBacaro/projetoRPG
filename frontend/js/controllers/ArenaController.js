@@ -183,14 +183,14 @@ export class ArenaController {
             slot.usados = novoUsados;
 
             var spanValor = document.querySelector('.arena-magia-valor[data-nivel="' + nivel + '"]');
-            if (spanValor) spanValor.textContent = novoUsados;
+            if (spanValor) spanValor.textContent = (slot.total - novoUsados);   // ✅ mostra disponíveis
 
-            var btnDiminuir = document.querySelector('.arena-magia-btn[data-acao="diminuir"][data-nivel="' + nivel + '"]');
-            var btnAumentar = document.querySelector('.arena-magia-btn[data-acao="aumentar"][data-nivel="' + nivel + '"]');
-            if (btnDiminuir) btnDiminuir.disabled = (novoUsados <= 0);
-            if (btnAumentar) btnAumentar.disabled = (novoUsados >= slot.total);
+            var btnDiminuir = document.querySelector('.arena-magia-btn[data-acao="aumentar"][data-nivel="' + nivel + '"]');
+            var btnAumentar = document.querySelector('.arena-magia-btn[data-acao="diminuir"][data-nivel="' + nivel + '"]');
+            if (btnDiminuir) btnDiminuir.disabled = (novoUsados >= slot.total); // '-' bloqueado se esgotado
+            if (btnAumentar) btnAumentar.disabled = (novoUsados <= 0);          // '+' bloqueado se nada usado
 
-            Toast.success('Slot nivel ' + nivel + ': ' + novoUsados + '/' + slot.total);
+            Toast.success('NIV ' + nivel + ': ' + (slot.total - novoUsados) + '/' + slot.total + ' disponíveis');
         } catch (err) {
             Toast.error('Erro ao atualizar magia: ' + (err.message || ''));
             console.error(err);
@@ -510,24 +510,36 @@ export class ArenaController {
         }
         var total       = slot ? slot.total  : 0;
         var usados      = slot ? slot.usados : 0;
+        var disponiveis = total - usados;           // ✅ quantos ainda pode usar
         var slotId      = slot ? slot.id     : null;
+
+        // '-' consome: só disponível se há disponiveis > 0
         var disAumentar = (!isJogador || total === 0 || usados >= total) ? 'disabled' : '';
+        // '+' devolve: só disponível se há usados > 0
         var disDiminuir = (!isJogador || total === 0 || usados <= 0)    ? 'disabled' : '';
-        var linhaClass  = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
+
+        var linhaClass = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
 
         var html = '';
         html += '<div class="' + linhaClass + '" data-nivel="' + nivel + '">';
         html += '<span class="arena-magia-nivel">NIV ' + nivel + '</span>';
         html += '<div class="arena-magia-controle">';
-        html += '<button class="arena-magia-btn arena-magia-btn-diminuir" data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '" ' + disDiminuir + '>-</button>';
-        html += '<span class="arena-magia-valor" data-nivel="' + nivel + '">' + usados + '</span>';
-        html += '<button class="arena-magia-btn arena-magia-btn-aumentar" data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '" ' + disAumentar + '>+</button>';
+
+        // '-' = consome slot (aumenta usados)
+        html += '<button class="arena-magia-btn arena-magia-btn-diminuir" data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '" ' + disAumentar + '>-</button>';
+
+        // ✅ mostra disponíveis / total (ex: 3/5)
+        html += '<span class="arena-magia-valor" data-nivel="' + nivel + '">' + disponiveis + '</span>';
+        html += '<span class="arena-magia-sep">/</span>';
+        html += '<span class="arena-magia-total-inline">' + total + '</span>';
+
+        // '+' = devolve slot (diminui usados)
+        html += '<button class="arena-magia-btn arena-magia-btn-aumentar" data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '" ' + disDiminuir + '>+</button>';
+
         html += '</div>';
-        html += '<span class="arena-magia-total">' + usados + '/' + total + '</span>';
         html += '</div>';
         return html;
     }
-
     calcularModificador(valor) { return Math.floor((valor - 10) / 2); }
 
     getBadgeClass(tipo) {
