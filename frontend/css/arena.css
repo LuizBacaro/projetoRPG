@@ -39,6 +39,7 @@
     overflow: hidden;
 }
 
+/* ── Coluna da iniciativa ── */
 .arena-lateral-iniciativa {
     display: flex;
     flex-direction: column;
@@ -46,24 +47,48 @@
     min-width: 0;
     overflow: hidden;
     gap: 0.25rem;
+    white-space: nowrap;          /* ✅ ADICIONADO — impede quebra */
 }
 
 /* ── Labels e títulos de seção ── */
-.arena-ordem-titulo,
-.arena-secao-titulo,
-.arena-lateral-acoes-titulo,
-.ordem-header h2 {
-    font-size: 0.62rem;
+/* ── Label iniciativa ── */
+.arena-ordem-titulo {
+    font-size: 0.58rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    /* ✅ era #475569 — agora legível */
-    color: var(--texto-secundario);
+    letter-spacing: 0.05em;
+    color: #f8fafc;                        /* ✅ era #475569 — invisível */
+    text-shadow: 0 0 8px rgba(248,250,252,0.3);
     text-align: center;
     padding: 0.25rem 0;
-    border-bottom: 1px solid var(--borda-sutil);
+    border-bottom: 1px solid #1e2d3d;
     flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.arena-secao-titulo {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;                        /* ✅ era #475569 — muito apagado */
     margin: 0;
+    padding-bottom: 0.15rem;
+    border-bottom: 1px solid #1e2d3d;
+}
+.arena-lateral-acoes-titulo,
+.ordem-header h2 {
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #f8fafc;                        /* ✅ era #475569 */
+    text-align: center;
+    margin: 0;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #1e2d3d;
+    white-space: nowrap;
 }
 
 /* ── Lista de iniciativa ── */
@@ -82,9 +107,9 @@
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
+    width: 150px;        /* ✅ era 120px */
+    min-width: 150px;    /* ✅ era 120px */
+    max-width: 150px;    /* ✅ era 120px */
     flex-shrink: 0;
 }
 
@@ -92,14 +117,13 @@
 #arenaFotoAtivo,
 .arena-foto-vertical-container {
     width: 100%;
-    height: calc(100vh - 220px);
-    min-height: 240px;
-    max-height: 500px;
+    height: calc(100vh - 180px);   /* ✅ era calc(100vh - 220px) — mais comprida */
+    min-height: 280px;             /* ✅ era 240px */
+    max-height: 560px;             /* ✅ era 500px */
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid var(--borda-painel);
-    /* ✅ era #0f1729 muito escuro */
-    background: var(--bg-painel);
+    border: 1px solid #1e2d3d;
+    background: #0f1729;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -371,39 +395,47 @@
 .arena-secao        { display: flex; flex-direction: column; gap: 0.28rem; flex-shrink: 0; }
 .arena-secao-titulo { text-align: left; letter-spacing: 0.1em; padding-bottom: 0.15rem; margin: 0; }
 
-/* ── Linha info ── */
+/* ── Linha info: Atributos | Resistencias | Condicoes lado a lado ── */
 .arena-linha-info {
     display: grid;
-    grid-template-columns: 1.1fr 0.65fr 1fr;
+    grid-template-columns: 1.0fr 0.45fr 1fr;  /* ✅ atributos: 1.1→1.0 | resistencias: 0.65→0.45 */
     gap: 0.45rem;
     align-items: start;
 }
 
-/* ── Atributos ── */
-.arena-atributos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.2rem; }
+/* ── Atributos: 2 colunas x 3 linhas ── */
+.arena-atributos-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.12rem;                          /* ✅ era 0.2rem */
+}
 
 .arena-atributo-box {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* ✅ era #0f1729 */
-    background: var(--bg-painel);
-    border: 1px solid var(--borda-painel);
+    background: #0f1729;
+    border: 1px solid #1e2d3d;
     border-radius: 5px;
-    padding: 0.22rem 0.45rem;
-    gap: 0.03rem;
+    padding: 0.12rem 0.3rem;               /* ✅ era 0.22rem 0.45rem */
+    gap: 0.02rem;                          /* ✅ era 0.03rem */
 }
 
-.arena-atributo-nome  { font-size: 0.58rem; color: var(--texto-label);      font-weight: 700; text-transform: uppercase; }
-.arena-atributo-valor { font-size: 0.95rem; color: var(--texto-principal);   font-weight: 700; }
-.arena-atributo-mod   { font-size: 0.65rem; color: var(--texto-secundario); }
+.arena-atributo-nome  { font-size: 0.52rem; color: #64748b; font-weight: 700; text-transform: uppercase; }  /* ✅ era 0.58rem */
+.arena-atributo-valor { font-size: 0.82rem; color: #f8fafc; font-weight: 700; }                             /* ✅ era 0.95rem */
+.arena-atributo-mod   { font-size: 0.58rem; color: #94a3b8; }     
 
 /* ── Resistências ── */
 .arena-secao-resistencias { min-width: 0; }
-.arena-resistencias-grid  { display: grid; gap: 0.18rem; }
-.arena-resistencias-coluna { grid-template-columns: 1fr; }
-.arena-resistencia-nome   { font-size: 0.58rem; color: var(--texto-secundario); white-space: nowrap; }
-.arena-resistencia-valor  { font-size: 0.68rem; color: var(--texto-principal);  font-weight: 700; }
+.arena-resistencias-grid {
+    display: grid;
+    gap: 0.1rem;                               /* ✅ gap menor: 0.18rem → 0.1rem */
+}
+.arena-resistencias-coluna {
+    grid-template-columns: 1fr;
+}
+.arena-resistencia-nome  { font-size: 0.54rem; color: #94a3b8; white-space: nowrap; }  /* ✅ menor */
+.arena-resistencia-valor { font-size: 0.62rem; color: #f8fafc; font-weight: 700; }     /* ✅ menor *
 
 /* ── Condições ── */
 .arena-secao-condicoes { min-width: 0; }
