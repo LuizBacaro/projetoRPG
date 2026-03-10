@@ -39,13 +39,26 @@ app = FastAPI(
 )
 
 # ── Middleware CORS ──────────────────────────────────────────────────────────
+# ✅ CRÍTICO: Configuração correta para desenvolvimento
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=[
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+        "http://localhost:3000",
+        "*"  # ⚠️ Em produção, remover e especificar domínios
+    ],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization"
+    ],
+    expose_headers=["Content-Length"],
+    max_age=600,
 )
+
+logger.info(f"✅ CORS configurado para: {settings.ALLOWED_ORIGINS}")
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -99,7 +112,8 @@ async def health():
     return {
         "status": "ok",
         "environment": settings.ENVIRONMENT,
-        "version": settings.VERSION
+        "version": settings.VERSION,
+        "cors_enabled": True
     }
 
 

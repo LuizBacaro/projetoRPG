@@ -104,3 +104,78 @@
     .modal-acoes { flex-direction: column; }
     .modal-acoes .btn { width: 100%; text-align: center; }
 }
+
+/* ── Tabela de usuários — Ajuste tabular ── */
+
+.tabela-usuarios {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-primary, #0f0f23);
+}
+
+.tabela-usuarios thead {
+    background: var(--bg-secondary, #1a1a2e);
+    border-bottom: 2px solid var(--border-color, #333);
+}
+
+.tabela-usuarios th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #aaa;
+    border-right: 1px solid var(--border-color, #333);
+}
+
+.tabela-usuarios th:last-child {
+    border-right: none;
+}
+
+.tabela-usuarios tbody tr {
+    border-bottom: 1px solid var(--border-color, #333);
+    transition: background .2s;
+}
+
+.tabela-usuarios tbody tr:hover {
+    background: #1e1e3a;
+}
+
+.tabela-usuarios td {
+    padding: 0.75rem 1rem;
+    color: #cbd5e0;
+    border-right: 1px solid var(--border-color, #333);
+}
+
+.tabela-usuarios td:last-child {
+    border-right: none;
+}
+
+/* ── Container da tabela com scroll ── */
+
+.tabela-usuarios-container {
+    overflow-x: auto;
+    border-radius: .5rem;
+    border: 1px solid var(--border-color, #333);
+}
+
+/* ── Colunas específicas ── */
+
+.tabela-usuarios th:nth-child(1),
+.tabela-usuarios td:nth-child(1) { width: 60px; text-align: center; }
+
+.tabela-usuarios th:nth-child(2),
+.tabela-usuarios td:nth-child(2) { width: 180px; }
+
+.tabela-usuarios th:nth-child(3),
+.tabela-usuarios td:nth-child(3) { width: 200px; }
+
+.tabela-usuarios th:nth-child(4),
+.tabela-usuarios td:nth-child(4) { width: 120px; }
+
+.tabela-usuarios th:nth-child(5),
+.tabela-usuarios td:nth-child(5) { width: 100px; }
+
+.tabela-usuarios th:nth-child(6),
+.tabela-usuarios td:nth-child(6) { width: 150px; }
+
+.tabela-usuarios th:nth-child(7),
+.tabela-usuarios td:nth-child(7) { width: 120px; text-align: center; }

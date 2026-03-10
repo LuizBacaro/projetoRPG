@@ -4,9 +4,9 @@ SRP: Dependências de autenticação/autorização para injeção no FastAPI
 SOLID: Dependency Injection — desacoplamento de segurança da lógica
 """
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
+from starlette.requests import Request
 from sqlalchemy.orm import Session
-from typing import Generator
+from typing import Generator, Optional
 import logging
 
 from .config import settings
@@ -16,9 +16,6 @@ from ..repositories.usuario_repository import UsuarioRepository
 from ..models.usuario import PerfilUsuario
 
 logger = logging.getLogger(__name__)
-
-# ── Security Scheme ──────────────────────────────────────────────────────────
-security = HTTPBearer()
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -49,29 +46,53 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
+def extrair_token_do_header(request: Request) -> Optional[str]:
+    """
+    Extrai o token Bearer do header Authorization.
+
+    Args:
+        request: Request do FastAPI
+
+    Returns:
+        Token ou None se não encontrado
+
+    Example:
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+    """
+    auth_header = request.headers.get("authorization")
+    if not auth_header:
+        return None
+
+    partes = auth_header.split()
+    if len(partes) != 2 or partes[0].lower() != "bearer":
+        return None
+
+    return partes[1]
+
+
 def get_usuario_atual(
-    credentials: HTTPAuthCredentials = Depends(security),
+    request: Request,
     db: Session = Depends(get_db)
 ) -> "Usuario":
     """
     Dependency: Extrai e valida o usuário autenticado do token JWT.
 
     FLUXO:
-    1. HTTPBearer extrai o token do header Authorization
+    1. Extrai token do header Authorization
     2. Token é decodificado via JWT
     3. Email é extraído do payload
     4. Usuário é buscado no banco
     5. Validações (token válido, usuário existe, está ativo)
 
     Args:
-        credentials: Bearer token via HTTPBearer
+        request: Request do FastAPI (contém headers)
         db: Sessão do banco de dados
 
     Returns:
         Objeto Usuario autenticado
 
     Raises:
-        HTTPException 401: Token inválido/expirado
+        HTTPException 401: Token inválido/expirado/ausente
         HTTPException 404: Usuário não encontrado
         HTTPException 403: Usuário inativo
 
@@ -80,7 +101,15 @@ def get_usuario_atual(
         def meu_perfil(usuario = Depends(get_usuario_atual)):
             return {"nome": usuario.nome, "email": usuario.email}
     """
-    token = credentials.credentials
+    # ✅ Extrai token do header
+    token = extrair_token_do_header(request)
+    if not token:
+        logger.warning("❌ Tentativa de acesso sem token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token não fornecido",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     # ✅ Decodifica token
     payload = decodificar_token(token, settings.SECRET_KEY)
@@ -130,11 +159,6 @@ def requer_admin(
     """
     Dependency: Valida se o usuário é ADMINISTRADOR.
 
-    FLUXO:
-    1. Chama get_usuario_atual (autentica)
-    2. Verifica se perfil = ADMINISTRADOR
-    3. Retorna usuário ou lança exceção 403
-
     Args:
         usuario: Usuário autenticado (via get_usuario_atual)
 
@@ -143,12 +167,6 @@ def requer_admin(
 
     Raises:
         HTTPException 403: Usuário não é administrador
-
-    Example:
-        @app.delete("/usuarios/{id}")
-        def deletar_usuario(id: int, admin = Depends(requer_admin)):
-            # apenas admins chegam aqui
-            pass
     """
     if usuario.perfil != PerfilUsuario.ADMINISTRADOR:
         logger.warning(
@@ -168,11 +186,6 @@ def requer_mestre_ou_admin(
     """
     Dependency: Valida se é MESTRE ou ADMINISTRADOR.
 
-    FLUXO:
-    1. Chama get_usuario_atual (autentica)
-    2. Verifica se perfil ∈ [ADMINISTRADOR, MESTRE]
-    3. Retorna usuário ou lança exceção 403
-
     Args:
         usuario: Usuário autenticado
 
@@ -181,12 +194,6 @@ def requer_mestre_ou_admin(
 
     Raises:
         HTTPException 403: Sem permissão adequada
-
-    Example:
-        @app.post("/combates")
-        def criar_combate(combate: dict, mestre = Depends(requer_mestre_ou_admin)):
-            # apenas mestres e admins chegam aqui
-            pass
     """
     if usuario.perfil not in [
         PerfilUsuario.ADMINISTRADOR,
@@ -217,11 +224,6 @@ def requer_jogador(
 
     Raises:
         HTTPException 403: Não é jogador
-
-    Example:
-        @app.get("/personagens")
-        def listar_personagens(jogador = Depends(requer_jogador)):
-            pass
     """
     if usuario.perfil not in [
         PerfilUsuario.JOGADOR,
