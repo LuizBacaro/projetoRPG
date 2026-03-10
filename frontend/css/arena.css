@@ -77,6 +77,7 @@
     margin: 0;
     padding-bottom: 0.15rem;
     border-bottom: 1px solid #1e2d3d;
+    text-align: center;
 }
 .arena-lateral-acoes-titulo,
 .ordem-header h2 {
@@ -385,7 +386,7 @@
 /* ── Layout 3 colunas ── */
 .arena-layout-principal {
     display: grid;
-    grid-template-columns: 1.7fr 1fr 140px;
+    grid-template-columns: 1.4fr 1.4fr 140px;  /* ✅ esquerda: 1.7→1.4 | central: 1→1.4 */
     gap: 0.55rem;
     flex: 1;
     min-height: 0;
@@ -393,7 +394,16 @@
 }
 
 .arena-coluna-esquerda,
-.arena-coluna-central { display: flex; flex-direction: column; gap: 0.45rem; overflow-y: auto; min-height: 0; }
+.arena-coluna-central {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    overflow-y: auto;
+    overflow-x: hidden;    /* ✅ ADICIONADO — elimina barra horizontal */
+    min-height: 0;
+    min-width: 0;          /* ✅ ADICIONADO — respeita limite do grid */
+}
+
 .arena-coluna-direita  { display: flex; flex-direction: column; gap: 0.45rem; min-height: 0; }
 
 /* ── Seção genérica ── */
@@ -403,8 +413,8 @@
 /* ── Linha info: Atributos | Resistencias | Condicoes lado a lado ── */
 .arena-linha-info {
     display: grid;
-    grid-template-columns: 1.0fr 0.45fr 1fr;  /* ✅ atributos: 1.1→1.0 | resistencias: 0.65→0.45 */
-    gap: 0.45rem;
+    grid-template-columns: 0.9fr 0.4fr 0.7fr;  /* ✅ atrib+resist menores | condições mais estreita */
+    gap: 0.35rem;
     align-items: start;
 }
 

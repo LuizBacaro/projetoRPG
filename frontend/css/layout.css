@@ -43,8 +43,8 @@ header p {
 .header-arena {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0.45rem 1.2rem;
+    justify-content: space-between; /* ✅ empurra botão para a direita */
+    padding: 0.5rem 1rem;
     background: linear-gradient(135deg, var(--bg-painel) 0%, var(--bg-principal) 100%);
     border-bottom: 2px solid var(--azul-destaque);
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);

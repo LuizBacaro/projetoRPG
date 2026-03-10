@@ -264,7 +264,7 @@ export class ArenaController {
 
     // ─── Render: Combatente Ativo ───────────────────────────
 
-    renderizarCombatenteAtivo() {
+   renderizarCombatenteAtivo() {
         var container = document.getElementById('combatenteAtivoContainer');
         if (!container) return;
 
@@ -340,19 +340,17 @@ export class ArenaController {
         html += '<button class="btn-cronometro btn-cronometro-reset" onclick="window._resetarCronometro()">↺</button>';
         html += '</div>';
         html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoTxt + '</button>';
-        html += '<button class="btn-encerrar-combate" onclick="window._finalizarCombate()">Encerrar combate</button>';
+        // ✅ LINHA REMOVIDA — botão agora está fixo no header-arena do index.html
         html += '</div></div>';
 
         // ── Layout principal: 3 colunas conforme protótipo
         html += '<div class="arena-layout-principal">';
 
-        // COLUNA ESQUERDA: atributos + resistencias + condicoes lado a lado + aplicar
+        // COLUNA ESQUERDA: atributos + resistencias + condicoes lado a lado
         html += '<div class="arena-coluna-esquerda">';
-
-        // Linha superior: Atributos | Resistencias | Condicoes lado a lado
         html += '<div class="arena-linha-info">';
 
-        // Atributos — 2 colunas x 3 linhas
+        // Atributos
         html += '<div class="arena-secao arena-secao-atributos">';
         html += '<h3 class="arena-secao-titulo">Atributos</h3>';
         html += '<div class="arena-atributos-grid">' + atributosHTML + '</div>';
@@ -383,7 +381,6 @@ export class ArenaController {
         html += '</div>';
 
         html += '</div>'; // fim arena-linha-info
-
         html += '</div>'; // fim coluna esquerda
 
         // COLUNA CENTRAL: ataques + magias
