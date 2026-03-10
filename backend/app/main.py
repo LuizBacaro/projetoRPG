@@ -116,6 +116,7 @@ async def startup_event():
     db = SessionLocal()
     try:
         _inicializar_banco(db)
+        logger.info("✅ Aplicação inicializada com sucesso")
     except Exception as e:
         logger.error(f"❌ Erro durante startup: {str(e)}")
         raise
@@ -125,7 +126,7 @@ async def startup_event():
 
 # ── Funções de Inicialização ─────────────────────────────────────────────────
 
-def _inicializar_banco(db: Session) -> None:
+def _inicializar_banco(db) -> None:
     """
     SRP: Orquestra a inicialização completa do banco.
 
@@ -137,7 +138,7 @@ def _inicializar_banco(db: Session) -> None:
     _seed_condicoes(db)
 
 
-def _seed_combatentes(db: Session) -> None:
+def _seed_combatentes(db) -> None:
     """
     Popula combatentes iniciais se o banco estiver vazio.
 
@@ -260,7 +261,7 @@ def _seed_combatentes(db: Session) -> None:
     print("✅ Combatentes iniciais inseridos com sucesso!")
 
 
-def _seed_condicoes(db: Session) -> None:
+def _seed_condicoes(db) -> None:
     """
     Popula as 25 condições D&D se não existirem.
 

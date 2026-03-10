@@ -4,14 +4,14 @@ SRP: Dependências de autenticação/autorização para injeção no FastAPI
 SOLID: Dependency Injection — desacoplamento de segurança da lógica
 """
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthenticationError
+from fastapi.security import HTTPBearer, HTTPAuthCredentials
 from sqlalchemy.orm import Session
-from typing import Optional, Generator
+from typing import Generator
 import logging
 
 from .config import settings
 from .database import SessionLocal
-from .security import decodificar_token, extrair_email_do_token
+from .security import decodificar_token
 from ..repositories.usuario_repository import UsuarioRepository
 from ..models.usuario import PerfilUsuario
 
@@ -50,7 +50,7 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def get_usuario_atual(
-    credentials: HTTPBearer = Depends(security),
+    credentials: HTTPAuthCredentials = Depends(security),
     db: Session = Depends(get_db)
 ) -> "Usuario":
     """
