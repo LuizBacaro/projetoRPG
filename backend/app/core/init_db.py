@@ -4,9 +4,9 @@ SRP: Inicializar banco de dados e seed de dados padrão
 SOLID: Single Responsibility — responsável APENAS por inicialização
 """
 from sqlalchemy.orm import Session
-from app.core.config import settings
-from app.models.usuario import Usuario, PerfilUsuario
-from app.core.security import hash_senha
+from ..core.config import settings  # ✅ MUDADO: relativa em vez de absoluta
+from ..models.usuario import Usuario, PerfilUsuario
+from .security import hash_senha
 import logging
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ def criar_admin_padrao(db: Session) -> None:
     Args:
         db: Sessão do banco de dados
     """
-    from app.repositories.usuario_repository import UsuarioRepository
+    from ..repositories.usuario_repository import UsuarioRepository
 
     repo = UsuarioRepository(db)
 
