@@ -290,6 +290,61 @@
                     </div>
                 </div>
             </div>
+            <div class="form-actions" style="margin-top: 1.5rem; gap: 0.75rem;">
+    <button 
+        type="button" 
+        id="btnPericiasModal" 
+        class="btn-editar"
+        onclick="abrirModalPericia()">
+        📚 Perícias
+    </button>
+    <button 
+        type="button" 
+        id="btnSalvarCombatente" 
+        class="btn-primary">
+        ✅ Salvar
+    </button>
+    <button 
+        type="button" 
+        class="btn-secondary" 
+        onclick="fecharModalCombatente()">
+        ❌ Cancelar
+    </button>
+</div>
+
+<!-- ── Modal de Perícias (Novo) ── -->
+<div id="modalPericias" class="modal-overlay">
+    <div class="modal-box" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2>⚔️ Perícias do Combatente</h2>
+            <span class="modal-close" onclick="fecharModalPericia()">&times;</span>
+        </div>
+
+        <div class="modal-content">
+            <!-- Input para buscar/filtrar perícias -->
+            <input 
+                type="text" 
+                id="inputBuscaPericia" 
+                placeholder="🔍 Buscar perícia..."
+                class="input-busca"
+                style="margin-bottom: 1rem; width: 100%; padding: 0.6rem; border: 1px solid var(--border-color, #333); border-radius: 0.4rem; background: var(--bg-primary, #0f0f23); color: inherit;">
+
+            <!-- Perícias por Atributo -->
+            <div id="periciasPorAtributo">
+                <!-- Preenchido dinamicamente pelo JS -->
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-primary" onclick="salvarPericiasEdit()">
+                ✅ Aplicar
+            </button>
+            <button type="button" class="btn-secondary" onclick="fecharModalPericia()">
+                ❌ Cancelar
+            </button>
+        </div>
+    </div>
+</div>
 
             <div class="modal-actions">
                 <button type="button" class="btn-secundario" onclick="fecharModalEdicao()">Cancelar</button>

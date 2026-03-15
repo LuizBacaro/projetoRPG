@@ -88,7 +88,7 @@
 </div>
 
 <!--  -->
-<!-- MODAL — Seletor de Tipo                                        -->
+<!-- MODAL — Seletor de Tipo                                         -->
 <!--  -->
 <div id="seletorTipo" class="dash-modal-overlay">
     <div class="dash-modal-box" style="max-width:420px">
@@ -105,7 +105,7 @@
 </div>
 
 <!--  -->
-<!-- MODAL — Cadastro de Jogador                                    -->
+<!-- MODAL — Cadastro de Jogador                                     -->
 <!--  -->
 <div id="modalCadastroJogador" class="dash-modal-overlay">
     <div class="dash-modal-box">
@@ -131,7 +131,7 @@
                         <input type="number" name="pontos" value="0" min="0" />
                     </div>
                 </div>
-                <!-- Raça -->
+
                 <div class="dash-form-group">
                     <label>Raça</label>
                     <input type="text" name="raca" placeholder="Ex: Elfo, Humano, Anão" />
@@ -177,7 +177,7 @@
 </div>
 
 <!--  -->
-<!-- MODAL — Cadastro de Monstro                                    -->
+<!-- MODAL — Cadastro de Monstro                                     -->
 <!--  -->
 <div id="modalCadastroMonstro" class="dash-modal-overlay">
     <div class="dash-modal-box">
@@ -203,7 +203,7 @@
                         <input type="number" name="pontos" value="0" min="0" />
                     </div>
                 </div>
-                <!-- Raça -->
+
                 <div class="dash-form-group">
                     <label>Raça / Origem</label>
                     <input type="text" name="raca" placeholder="Ex: Goblinoide, Morto-Vivo" />
@@ -249,7 +249,7 @@
 </div>
 
 <!--  -->
-<!-- MODAL — Cadastro de NPC                                        -->
+<!-- MODAL — Cadastro de NPC                                         -->
 <!--  -->
 <div id="modalCadastroNPC" class="dash-modal-overlay">
     <div class="dash-modal-box">
@@ -275,7 +275,7 @@
                         <input type="number" name="pontos" value="0" min="0" />
                     </div>
                 </div>
-                <!-- Raça -->
+
                 <div class="dash-form-group">
                     <label>Raça</label>
                     <input type="text" name="raca" placeholder="Ex: Humano, Halfling" />
@@ -320,9 +320,9 @@
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- MODAL DE EDIÇÃO                                               -->
-<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  -->
+<!-- MODAL DE EDIÇÃO                                                 -->
+<!--  -->
 <div id="modalEdicaoDashboard" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
@@ -392,7 +392,6 @@
                         <input type="number" id="dashEditSurpresa" name="surpresa" value="10" min="0" />
                     </div>
                 </div>
-                
 
                 <!-- Resistências -->
                 <p class="dash-section-label">⚡ Resistências</p>
@@ -506,13 +505,32 @@
                     <div id="gridMagiasEdicao"></div>
                 </div>
 
-                <!-- Ações -->
-                <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-cancel"
-                            onclick="fecharModalEdicao()">Cancelar</button>
-                    <button type="button" class="btn-dash-delete"
-                            onclick="confirmarDelecao()">🗑️ Deletar</button>
-                    <button type="submit"  class="btn-dash-save">💾 Salvar Alterações</button>
+                <!-- ══ AÇÕES (Perícias + Salvar + Cancelar) ══ -->
+                <div class="dash-modal-actions" style="margin-top: 1.5rem; gap: 0.75rem; flex-wrap: wrap;">
+                    <button 
+                        type="button" 
+                        id="btnPericiasModal" 
+                        class="btn-editar"
+                        onclick="abrirPaginaPericias()">
+                        📚 Perícias
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="btn-dash-save">
+                        💾 Salvar Alterações
+                    </button>
+                    <button 
+                        type="button" 
+                        class="btn-dash-delete"
+                        onclick="confirmarDelecao()">
+                        🗑️ Deletar
+                    </button>
+                    <button 
+                        type="button" 
+                        class="btn-dash-cancel"
+                        onclick="fecharModalEdicao()">
+                        Cancelar
+                    </button>
                 </div>
 
             </form>
@@ -520,12 +538,12 @@
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- Scripts — ordem sequencial obrigatória                        -->
-<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  -->
+<!-- Scripts — ordem sequencial obrigatória                          -->
+<!--  -->
 <script type="module">
     import { getApiUrl } from '/js/config/api.config.js';
-    import { Toast     } from '/js/ui/toast.module.js';   // ✅ AQUI
+    import { Toast     } from '/js/ui/toast.module.js';
     window.getApiUrl = getApiUrl;
 
     const carregar = (src) => new Promise((resolve, reject) => {
@@ -547,7 +565,6 @@
     if (logoutEl) logoutEl.addEventListener('click', () => AuthService.logout());
     AuthService.configurarVisibilidadeAdmin('linkAdmin');
 
-    // ✅ Toast já disponível via import acima — não precisa de carregar()
     await carregar('/js/services/AtaqueService.js');
     await carregar('/js/controllers/DashboardController.js');
 </script>

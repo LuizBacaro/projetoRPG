@@ -1,0 +1,394 @@
+/*
+   pericias.css
+   SRP: Estilos exclusivos da página de perícias
+   SOLID: Classes reutilizáveis, bem estruturadas
+*/
+
+/* ── Variáveis ── */
+:root {
+    --cor-madeira: #8B4513;
+    --cor-madeira-claro: #B8860B;
+    --cor-dourada: #FFD700;
+    --cor-pergaminho: #F4E8D8;
+    --bg-primary: #0f0f23;
+    --bg-secondary: #1a1a2e;
+    --border-color: #333;
+}
+
+/* ── Body ── */
+body {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    color: #cbd5e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Header ── */
+.pericias-header {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border-bottom: 3px solid var(--cor-dourada);
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.pericias-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.pericias-header-top h1 {
+    font-size: 1.8rem;
+    color: var(--cor-dourada);
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    flex: 1;
+    text-align: center;
+}
+
+.btn-voltar {
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    color: #2c1810;
+    font-weight: bold;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.btn-voltar:hover {
+    background: linear-gradient(135deg, #e8b887 0%, #d4a574 100%);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.pericias-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #a0aec0;
+}
+
+.nome-combatente {
+    font-weight: 600;
+    color: var(--cor-dourada);
+    font-size: 1rem;
+}
+
+.tipo-combatente {
+    color: #cbd5e0;
+    font-size: 0.85rem;
+}
+
+.separador {
+    color: var(--cor-madeira);
+}
+
+/* ── Main ── */
+.pericias-main {
+    flex: 1;
+    padding: 2rem 1.5rem;
+    overflow-y: auto;
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* ── Toolbar ── */
+.pericias-toolbar {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.pericias-busca {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: #cbd5e0;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.pericias-busca:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+}
+
+.pericias-contador {
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+    color: var(--cor-dourada);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+/* ── Container de Perícias ── */
+.pericias-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ── Grupo de Atributo ── */
+.pericia-atributo-group {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.pericia-atributo-header {
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #654321 100%);
+    color: var(--cor-dourada);
+    padding: 1rem 1.5rem;
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.pericia-atributo-header:hover {
+    background: linear-gradient(135deg, #9D5524 0%, #6B4423 100%);
+    box-shadow: 0 4px 16px rgba(139, 69, 19, 0.5);
+}
+
+.pericia-atributo-toggle {
+    font-size: 1.3rem;
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.pericia-atributo-toggle.collapsed {
+    transform: rotate(-90deg);
+}
+
+.pericia-atributo-content {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    background: var(--bg-primary);
+}
+
+.pericia-atributo-content.collapsed {
+    display: none;
+}
+
+/* ── Item de Perícia ── */
+.pericia-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pericia-item:hover {
+    background: #1e2d3d;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+}
+
+.pericia-item.selected {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(139, 69, 19, 0.15) 100%);
+    border-color: var(--cor-dourada);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.pericia-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--cor-dourada);
+    flex-shrink: 0;
+}
+
+.pericia-item label {
+    flex: 1;
+    cursor: pointer;
+    color: #cbd5e0;
+    font-size: 0.95rem;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.pericia-item.selected label {
+    color: var(--cor-dourada);
+    font-weight: 600;
+}
+
+.pericia-info {
+    font-size: 0.8rem;
+    color: #a0aec0;
+    margin-left: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Sem Resultados ── */
+.pericias-sem-resultados {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #a0aec0;
+    font-size: 1.2rem;
+    font-style: italic;
+}
+
+/* ── Footer ── */
+.pericias-footer {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border-top: 3px solid var(--cor-dourada);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.btn-pericias-cancel,
+.btn-pericias-limpar,
+.btn-pericias-salvar {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.btn-pericias-cancel {
+    background: #4a4a4a;
+    color: #cbd5e0;
+}
+
+.btn-pericias-cancel:hover {
+    background: #5a5a5a;
+    border-color: #cbd5e0;
+}
+
+.btn-pericias-limpar {
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
+    color: #2c1810;
+    border-color: var(--cor-madeira);
+}
+
+.btn-pericias-limpar:hover {
+    background: linear-gradient(135deg, #e8b887 0%, #d4a574 100%);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-pericias-salvar {
+    background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+    color: var(--cor-dourada);
+    border-color: #32CD32;
+}
+
+.btn-pericias-salvar:hover {
+    background: linear-gradient(135deg, #3DEF3D 0%, #2BA82B 100%);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(50, 205, 50, 0.3);
+}
+
+/* ── Responsividade ── */
+@media (max-width: 768px) {
+    .pericias-main {
+        padding: 1.5rem 1rem;
+    }
+
+    .pericias-toolbar {
+        flex-direction: column;
+    }
+
+    .pericias-busca {
+        width: 100%;
+    }
+
+    .pericias-contador {
+        width: 100%;
+        text-align: center;
+    }
+
+    .pericia-atributo-content {
+        grid-template-columns: 1fr;
+    }
+
+    .pericias-footer {
+        flex-wrap: wrap;
+    }
+
+    .btn-pericias-cancel,
+    .btn-pericias-limpar,
+    .btn-pericias-salvar {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pericias-header-top {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .pericias-header-top h1 {
+        font-size: 1.4rem;
+    }
+
+    .btn-voltar {
+        width: 100%;
+    }
+
+    .pericias-main {
+        padding: 1rem;
+    }
+
+    .pericia-atributo-content {
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .pericia-item {
+        padding: 0.75rem;
+    }
+
+    .pericias-footer {
+        flex-direction: column;
+    }
+
+    .btn-pericias-cancel,
+    .btn-pericias-limpar,
+    .btn-pericias-salvar {
+        width: 100%;
+    }
+}
