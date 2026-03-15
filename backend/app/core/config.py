@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # ── Projeto ──────────────────────────────────────────────────────────────
     PROJECT_NAME: str = "Arena de Combate TTRPG API"
     VERSION: str = "1.0.0"
-    API_V1_PREFIX: str = "/api"
+    API_V1_PREFIX: str = "/api/v1"
     ENVIRONMENT: str = "development"  # development | staging | production
 
     # ── Segurança ────────────────────────────────────────────────────────────

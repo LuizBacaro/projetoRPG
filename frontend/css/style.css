@@ -1,0 +1,270 @@
+/* 
+   ============================================
+   VARIÁVEIS GLOBAIS - CSS Custom Properties
+   ============================================
+    */
+:root {
+    /* Cores Temáticas */
+    --cor-madeira: #8B4513;
+    --cor-dourada: #FFD700;
+    --cor-pergaminho: #D2B48C;
+    --cor-fundo-escuro: #1a1410;
+    --cor-fundo-medio: #2c1810;
+    --cor-fundo-claro: #3d2817;
+
+    /* Cores dos Atributos */
+    --cor-destreza: #8B4513;
+    --cor-inteligencia: #4B0082;
+    --cor-sabedoria: #228B22;
+    --cor-carisma: #DC143C;
+    --cor-forca: #8B0000;
+    --cor-constituicao: #A9A9A9;
+
+    /* Fontes */
+    --fonte-titulo: 'Georgia', 'Times New Roman', serif;
+    --fonte-texto: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --fonte-mono: 'Courier New', monospace;
+
+    /* Espaçamentos */
+    --espacamento-xs: 0.25rem;
+    --espacamento-sm: 0.5rem;
+    --espacamento-md: 1rem;
+    --espacamento-lg: 1.5rem;
+    --espacamento-xl: 2rem;
+    --espacamento-2xl: 3rem;
+
+    /* Sombras */
+    --sombra-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --sombra-md: 0 4px 15px rgba(0, 0, 0, 0.3);
+    --sombra-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+
+    /* Border Radius */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 15px;
+
+    /* Transições */
+    --transicao-rapida: 0.15s ease-in-out;
+    --transicao-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transicao-lenta: 0.5s ease-in-out;
+}
+
+/* 
+   ============================================
+   RESET E ESTILOS BASE
+   ============================================
+    */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--fonte-texto);
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    color: #c9b896;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* 
+   ============================================
+   CONTAINER PRINCIPAL
+   ============================================
+    */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    margin-bottom: 3rem;
+    text-align: center;
+    border-bottom: 3px solid var(--cor-dourada);
+    padding-bottom: 2rem;
+}
+
+header h1 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    margin-bottom: 0.5rem;
+}
+
+header .subtitulo {
+    color: #c9b896;
+    font-size: 1.1rem;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+main {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* 
+   ============================================
+   INPUTS E FORMS
+   ============================================
+    */
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    font-family: var(--fonte-texto);
+    transition: all var(--transicao-normal);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+}
+
+/* 
+   ============================================
+   ANIMAÇÕES
+   ============================================
+    */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* 
+   ============================================
+   RESPONSIVIDADE GLOBAL
+   ============================================
+    */
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    header .subtitulo {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 0.5rem;
+    }
+
+    header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    header .subtitulo {
+        font-size: 0.9rem;
+    }
+}
+
+/* 
+   ============================================
+   SCROLLBAR CUSTOMIZADO
+   ============================================
+    */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cor-fundo-escuro);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--cor-dourada);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ffd700;
+}
+
+/* 
+   ============================================
+   SELEÇÃO DE TEXTO
+   ============================================
+    */
+::selection {
+    background: var(--cor-dourada);
+    color: var(--cor-fundo-escuro);
+}
+
+::-moz-selection {
+    background: var(--cor-dourada);
+    color: var(--cor-fundo-escuro);
+}
+
+/* 
+   ============================================
+   ACESSIBILIDADE
+   ============================================
+    */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #0f0a08 0%, #1a1410 100%);
+    }
+}

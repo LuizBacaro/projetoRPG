@@ -3,7 +3,7 @@ var BASE_URL = IS_PRODUCTION ? '' : 'http://localhost:8000';
 
 var API_CONFIG = {
     BASE_URL: BASE_URL,
-    API_PREFIX: '/api',
+    API_PREFIX: '/api/v1',
     ENDPOINTS: {
         COMBATENTES: '/combatentes',
         COMBATE: '/combate',
