@@ -1,8 +1,8 @@
-/*
-   DashboardController.js
-   ✅ Sem imports ES module — carregado via carregar() no dashboard.html
-   Dependências via window: AuthService, Toast, AtaqueService
-*/
+/**
+ * DashboardController.js
+ * ✅ Sem imports ES module — carregado via carregar() no dashboard.html
+ * Dependências via window: AuthService, Toast, AtaqueService
+ */
 
 class DashboardController {
 
@@ -55,6 +55,10 @@ class DashboardController {
 
         window.adicionarLinhaAtaque = function() { self._adicionarLinhaAtaque(); };
         window.removerLinhaAtaque   = function(btn) { btn.closest('.ataque-linha').remove(); };
+
+        // ✅ NOVO: Registrar funções de perícias
+        window.abrirPaginaPericias             = function() { self._abrirPaginaPericias(); };
+        window.recuperarPericiasDoSessionStorage = function() { self._recuperarPericiasDoSessionStorage(); };
     }
 
     _inicializar() {
@@ -170,7 +174,8 @@ class DashboardController {
                 await self.service.atualizar(id, new FormData(form));
                 await Promise.all([
                     self._salvarAtaquesEdicao(id),
-                    self._salvarMagiasEdicao(id)
+                    self._salvarMagiasEdicao(id),
+                    self._salvarPericiasEdicao(id)  // ✅ NOVO: Salvar perícias
                 ]);
                 self._fecharModal('modalEdicaoDashboard');
                 self.combatenteEmEdicao = null;
@@ -298,7 +303,9 @@ class DashboardController {
                 return;
             }
 
+            // ✅ NOVO: Armazenar em window também para abrirPaginaPericias()
             this.combatenteEmEdicao = c;
+            window.combatenteEmEdicao = c;
 
             document.getElementById('dashEditId').value         = c.id;
             document.getElementById('dashEditTipo').value       = c.tipo;
@@ -353,6 +360,9 @@ class DashboardController {
                 this._renderizarMagiasEdicao (c.magias_slots || []);
             }
 
+            // ✅ NOVO: Recuperar perícias salvas antes de abrir modal
+            this._recuperarPericiasDoSessionStorage();
+
             this._abrirModal('modalEdicaoDashboard');
         } catch (err) {
             Toast.error('Erro ao carregar combatente');
@@ -382,6 +392,7 @@ class DashboardController {
             Toast.success('Combatente deletado!');
             this._fecharModal('modalEdicaoDashboard');
             this.combatenteEmEdicao = null;
+            window.combatenteEmEdicao = null;
             this.carregarCombatentes();
         } catch (err) {
             Toast.error('Erro ao deletar');
@@ -453,6 +464,82 @@ class DashboardController {
 
     async _salvarMagiasEdicao(combatenteId) {
         await this.ataqueService.salvarMagias(combatenteId, this._coletarMagiasEdicao());
+    }
+
+    // ✅ NOVO: Salvar perícias
+    async _salvarPericiasEdicao(combatenteId) {
+        if (!window.combatenteEmEdicao || !window.combatenteEmEdicao.pericias) {
+            return; // Nenhuma perícia selecionada
+        }
+        try {
+            // Armazenar perícias para recuperação após volta
+            sessionStorage.setItem('periciasEdit', JSON.stringify(window.combatenteEmEdicao.pericias));
+            sessionStorage.setItem('combatenteEditId', combatenteId);
+        } catch (err) {
+            console.error('Erro ao salvar perícias em sessionStorage:', err);
+        }
+    }
+
+    // ✅ NOVO: Abrir página de perícias
+    _abrirPaginaPericias() {
+        if (!this.combatenteEmEdicao || !this.combatenteEmEdicao.id) {
+            Toast.error('❌ Selecione um combatente primeiro');
+            return;
+        }
+
+        try {
+            var id      = this.combatenteEmEdicao.id;
+            var nome    = document.getElementById('dashEditNome')?.value || this.combatenteEmEdicao.nome;
+            var tipo    = document.getElementById('dashEditTipo')?.value || this.combatenteEmEdicao.tipo;
+            var pericias = window.combatenteEmEdicao?.pericias || [];
+
+            var params = new URLSearchParams({
+                combatente_id: id,
+                nome: nome,
+                tipo: tipo,
+                pericias: JSON.stringify(pericias)
+            });
+
+            console.log('🔗 Navegando para perícias:', {
+                id: id,
+                nome: nome,
+                tipo: tipo,
+                periciasCount: pericias.length
+            });
+
+            window.location.href = '/pages/pericias.html?' + params.toString();
+        } catch (erro) {
+            Toast.error('❌ Erro ao abrir perícias');
+            console.error(erro);
+        }
+    }
+
+    // ✅ NOVO: Recuperar perícias do sessionStorage
+    _recuperarPericiasDoSessionStorage() {
+        var periciasEdit = sessionStorage.getItem('periciasEdit');
+        var combatenteId = sessionStorage.getItem('combatenteEditId');
+
+        if (periciasEdit && combatenteId) {
+            try {
+                var pericias = JSON.parse(periciasEdit);
+
+                // Atualizar combatente se for o mesmo
+                if (window.combatenteEmEdicao && window.combatenteEmEdicao.id == combatenteId) {
+                    window.combatenteEmEdicao.pericias = pericias;
+                    this.combatenteEmEdicao.pericias = pericias;
+                    Toast.success('✅ ' + pericias.length + ' perícia(s) carregada(s)');
+
+                    console.log('📚 Perícias recuperadas:', pericias);
+                }
+
+                // Limpar sessionStorage
+                sessionStorage.removeItem('periciasEdit');
+                sessionStorage.removeItem('combatenteEditId');
+            } catch (erro) {
+                console.error('❌ Erro ao recuperar perícias:', erro);
+                Toast.error('⚠️ Erro ao carregar perícias salvas');
+            }
+        }
     }
 
     _abrirModal(id) {

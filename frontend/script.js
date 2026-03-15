@@ -596,6 +596,9 @@ function abrirModalEdicao(combatenteId) {
                 document.getElementById('editUploadPlaceholder').style.display = 'block';
                 document.getElementById('editUploadPreview').style.display = 'none';
             }
+
+            recuperarPericiasDoSessionStorage();
+            window.combatenteEmEdicao = combatente;
             
             document.getElementById('modalEdicao').classList.add('show');
         })
@@ -1048,5 +1051,77 @@ function abrirModalDanoCura() {
     } else {
         console.error('Modal de Dano/Cura não foi inicializado');
         mostrarToast('❌ Erro ao abrir modal', 'error');
+    }
+}
+
+/**
+ * abrirPaginaPericias()
+ * SRP: Navegar para página de perícias com parâmetros do combatente
+ * SOLID: Single Responsibility — apenas navegação
+ */
+function abrirPaginaPericias() {
+    // ✅ Validar se existe combatente em edição
+    if (!combatenteEditando) {
+        mostrarMensagem('❌ Nenhum combatente selecionado', 'error');
+        return;
+    }
+
+    try {
+        const id = combatenteEditando;
+        const nome = document.getElementById('editNome').value;
+        const tipo = document.getElementById('editTipo').value;
+        const pericias = window.combatenteEmEdicao?.pericias || [];
+
+        // ✅ Construir URL com query params
+        const params = new URLSearchParams({
+            combatente_id: id,
+            nome: nome,
+            tipo: tipo,
+            pericias: JSON.stringify(pericias)
+        });
+
+        console.log('🔗 Navegando para perícias:', {
+            id,
+            nome,
+            tipo,
+            periciasCount: pericias.length
+        });
+
+        // ✅ Redirecionar para página de perícias
+        window.location.href = `/pages/pericias.html?${params.toString()}`;
+    } catch (erro) {
+        console.error('❌ Erro ao navegar para perícias:', erro);
+        mostrarMensagem('❌ Erro ao abrir perícias', 'error');
+    }
+}
+
+/**
+ * recuperarPericiasDoSessionStorage()
+ * SRP: Recuperar perícias salvas da página de perícias
+ * SOLID: Single Responsibility — apenas recuperação de dados
+ */
+function recuperarPericiasDoSessionStorage() {
+    const periciasEdit = sessionStorage.getItem('periciasEdit');
+    const combatenteId = sessionStorage.getItem('combatenteEditId');
+
+    if (periciasEdit && combatenteId) {
+        try {
+            const pericias = JSON.parse(periciasEdit);
+            
+            // ✅ Atualizar combatente em edição se for o mesmo
+            if (window.combatenteEmEdicao && window.combatenteEmEdicao.id == combatenteId) {
+                window.combatenteEmEdicao.pericias = pericias;
+                mostrarMensagem(`✅ ${pericias.length} perícia(s) carregada(s)`, 'success');
+                
+                console.log('📚 Perícias recuperadas:', pericias);
+            }
+
+            // ✅ Limpar sessionStorage
+            sessionStorage.removeItem('periciasEdit');
+            sessionStorage.removeItem('combatenteEditId');
+        } catch (erro) {
+            console.error('❌ Erro ao recuperar perícias:', erro);
+            mostrarMensagem('⚠️ Erro ao carregar perícias salvas', 'error');
+        }
     }
 }
