@@ -1,0 +1,150 @@
+"""
+Service de Perícia
+Single Responsibility: Lógica de negócio das perícias
+"""
+
+from sqlalchemy.orm import Session
+from typing import List, Optional
+from app.models.pericia import Pericia, PericiaJogador
+from app.models.combatente import Combatente
+from app.models.atributo import Atributo
+from app.repositories.pericia_repository import PericiaRepository, PericiaJogadorRepository
+from app.schemas.pericia import (
+    PericiaCreate, PericiaUpdate, PericiaJogadorCreate, PericiaJogadorUpdate, PericiaJogadorListResponse
+)
+
+
+class PericiaService:
+    """Serviço de lógica de negócio para perícias"""
+
+    def __init__(self, db: Session):
+        self.db = db
+        self.repo = PericiaRepository()
+        self.repo_jogador = PericiaJogadorRepository()
+
+    # ========== OPERAÇÕES COM PERÍCIAS DISPONÍVEIS ==========
+
+    def criar_pericia(self, pericia: PericiaCreate) -> Pericia:
+        """Cria uma nova perícia"""
+        pericia_existente = self.repo.obter_pericia_por_nome(self.db, pericia.nome)
+        if pericia_existente:
+            raise ValueError(f"Perícia '{pericia.nome}' já existe")
+        return self.repo.criar_pericia(self.db, pericia)
+
+    def obter_pericia(self, pericia_id: int) -> Optional[Pericia]:
+        """Obtém uma perícia por ID"""
+        return self.repo.obter_pericia(self.db, pericia_id)
+
+    def listar_todas_pericias(self, skip: int = 0, limit: int = 100) -> List[Pericia]:
+        """Lista todas as perícias disponíveis"""
+        return self.repo.listar_pericias(self.db, skip, limit)
+
+    def listar_pericias_por_atributo(self, atributo: str) -> List[Pericia]:
+        """Lista perícias filtradas por atributo"""
+        atributos_validos = ["FOR", "DES", "CON", "INT", "SAB", "CAR"]
+        if atributo not in atributos_validos:
+            raise ValueError(f"Atributo '{atributo}' inválido")
+        return self.repo.listar_pericias_por_atributo(self.db, atributo)
+
+    def atualizar_pericia(self, pericia_id: int, pericia: PericiaUpdate) -> Optional[Pericia]:
+        """Atualiza uma perícia"""
+        return self.repo.atualizar_pericia(self.db, pericia_id, pericia)
+
+    def deletar_pericia(self, pericia_id: int) -> bool:
+        """Deleta uma perícia"""
+        return self.repo.deletar_pericia(self.db, pericia_id)
+
+    # ========== OPERAÇÕES COM PERÍCIAS DO JOGADOR ==========
+
+    def adicionar_pericia_jogador(
+        self,
+        combatente_id: int,
+        pericia_jogador: PericiaJogadorCreate
+    ) -> PericiaJogador:
+        """Adiciona uma perícia ao jogador"""
+        # Validar se o combatente existe
+        combatente = self.db.query(Combatente).filter(
+            Combatente.id == combatente_id
+        ).first()
+        if not combatente:
+            raise ValueError(f"Combatente com ID {combatente_id} não existe")
+
+        # Validar se a perícia existe
+        pericia = self.repo.obter_pericia(self.db, pericia_jogador.pericia_id)
+        if not pericia:
+            raise ValueError(f"Perícia com ID {pericia_jogador.pericia_id} não existe")
+
+        # Verificar se jogador já tem essa perícia
+        pericia_existente = self.db.query(PericiaJogador).filter(
+            PericiaJogador.combatente_id == combatente_id,
+            PericiaJogador.pericia_id == pericia_jogador.pericia_id
+        ).first()
+        if pericia_existente:
+            raise ValueError("Jogador já possui essa perícia")
+
+        # Calcular modificador do atributo
+        atributo_map = {
+            "FOR": "forca",
+            "DES": "destreza",
+            "CON": "constituicao",
+            "INT": "inteligencia",
+            "SAB": "sabedoria",
+            "CAR": "carisma"
+        }
+
+        atributo_nome = atributo_map[pericia.atributo]
+        atributo = self.db.query(Atributo).filter(
+            Atributo.combatente_id == combatente_id,
+            Atributo.tipo == atributo_nome
+        ).first()
+
+        modificador = (atributo.valor - 10) // 2 if atributo else 0
+
+        # Criar perícia do jogador
+        pericia_jogador_data = pericia_jogador.dict()
+        pericia_jogador_data["combatente_id"] = combatente_id
+        pericia_jogador_data["modificador_atributo"] = modificador
+
+        db_pericia_jogador = PericiaJogador(**pericia_jogador_data)
+        self.db.add(db_pericia_jogador)
+        self.db.commit()
+        self.db.refresh(db_pericia_jogador)
+
+        return db_pericia_jogador
+
+    def obter_pericia_jogador(self, pericia_jogador_id: int) -> Optional[PericiaJogador]:
+        """Obtém uma perícia específica do jogador"""
+        return self.repo_jogador.obter_pericia_jogador(self.db, pericia_jogador_id)
+
+    def listar_pericias_combatente(self, combatente_id: int) -> List[PericiaJogador]:
+        """Lista todas as perícias de um combatente"""
+        return self.repo_jogador.listar_pericias_jogador(self.db, combatente_id)
+
+    def atualizar_pericia_jogador(
+        self,
+        pericia_jogador_id: int,
+        pericia: PericiaJogadorUpdate
+    ) -> Optional[PericiaJogador]:
+        """Atualiza uma perícia do jogador"""
+        return self.repo_jogador.atualizar_pericia_jogador(self.db, pericia_jogador_id, pericia)
+
+    def deletar_pericia_jogador(self, pericia_jogador_id: int) -> bool:
+        """Deleta uma perícia do jogador"""
+        return self.repo_jogador.deletar_pericia_jogador(self.db, pericia_jogador_id)
+
+    def obter_estatisticas_pericias(self, combatente_id: int) -> dict:
+        """Obtém estatísticas de perícias do combatente"""
+        pericias = self.repo_jogador.listar_pericias_jogador(self.db, combatente_id)
+        pontos_gastos = self.repo_jogador.contar_pontos_gastos(self.db, combatente_id)
+        
+        # Assumindo que o combatente é um jogador (máx 3 * nível)
+        combatente = self.db.query(Combatente).filter(Combatente.id == combatente_id).first()
+        nivel = combatente.nivel if combatente else 1
+        pontos_disponiveis = max(0, (3 * nivel) - pontos_gastos)
+
+        return {
+            "total_pericias": len(pericias),
+            "pontos_gastos": pontos_gastos,
+            "pontos_disponiveis": pontos_disponiveis,
+            "pericias": pericias
+        }

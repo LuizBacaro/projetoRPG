@@ -13,7 +13,7 @@ import logging
 from .core.config import settings
 from .core.database import engine, Base, SessionLocal
 from .core.init_db import criar_admin_padrao
-from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques
+from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
 from .models import usuario as usuario_model
@@ -22,6 +22,7 @@ from .models import combate as combate_model
 from .models import condicao as condicao_model
 from .models import combatente_condicao as pivot_model
 from .models import ataque as ataque_model
+from .models import pericia as pericia_model
 
 logger = logging.getLogger(__name__)
 
@@ -77,12 +78,16 @@ else:
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 # ── Rotas da API v1 ──────────────────────────────────────────────────────────
+# Ordem importa: dependências primeiro
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(usuarios.router, prefix=settings.API_V1_PREFIX)
 app.include_router(combatentes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(combate.router, prefix=settings.API_V1_PREFIX)
 app.include_router(condicoes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(ataques.router, prefix=settings.API_V1_PREFIX)
+app.include_router(pericias.router, prefix=settings.API_V1_PREFIX)
+
+logger.info("✅ Rotas da API v1 registradas com sucesso")
 
 # ── Rotas Frontend ───────────────────────────────────────────────────────────
 
@@ -102,6 +107,12 @@ async def dashboard():
 async def arena():
     """Tela da arena de combate."""
     return FileResponse(str(FRONTEND_DIR / "index.html"))
+
+
+@app.get("/pericias")
+async def pericias_page():
+    """Tela de perícias do personagem."""
+    return FileResponse(str(FRONTEND_DIR / "pages" / "pericias.html"))
 
 
 # ── Health Check ─────────────────────────────────────────────────────────────
@@ -126,13 +137,18 @@ async def startup_event():
     1. Cria admin padrão
     2. Popula combatentes iniciais
     3. Popula condições D&D
+    4. Popula perícias D&D
     """
     db = SessionLocal()
     try:
         _inicializar_banco(db)
         logger.info("✅ Aplicação inicializada com sucesso")
+        print("=" * 60)
+        print("✅ API INICIADA COM SUCESSO")
+        print("=" * 60)
     except Exception as e:
         logger.error(f"❌ Erro durante startup: {str(e)}")
+        print(f"❌ Erro durante startup: {str(e)}")
         raise
     finally:
         db.close()
@@ -143,13 +159,118 @@ async def startup_event():
 def _inicializar_banco(db) -> None:
     """
     SRP: Orquestra a inicialização completa do banco.
+    Ordem importa:
+    1. Admin (dependência de tudo)
+    2. Condições (globais)
+    3. Perícias (globais)
+    4. Combatentes (usam condições)
 
     Args:
         db: Sessão do banco
     """
+    # 1. Criar admin padrão (precisa ser primeiro)
     criar_admin_padrao(db)
-    _seed_combatentes(db)
+    
+    # 2. Popular condições D&D (global, sem dependências)
     _seed_condicoes(db)
+    
+    # 3. Popular perícias D&D (global, sem dependências)
+    _seed_pericias(db)
+    
+    # 4. Popular combatentes iniciais (pode usar condições e perícias)
+    _seed_combatentes(db)
+
+
+def _seed_pericias(db) -> None:
+    """
+    Popula as perícias D&D 3.5 se não existirem.
+    
+    SRP: Apenas popula perícias
+    
+    Args:
+        db: Sessão do banco
+    """
+    from .models.pericia import Pericia
+    
+    try:
+        # Verificar se já existem perícias
+        pericia_count = db.query(Pericia).count()
+        if pericia_count > 0:
+            logger.info(f"✅ {pericia_count} perícias já existem no banco")
+            print(f"✅ {pericia_count} perícias já existem no banco de dados")
+            return
+        
+        logger.info("🔄 Populando perícias D&D 3.5...")
+        print("🔄 Populando banco de dados com perícias D&D 3.5...")
+        
+        # Lista completa de perícias D&D 3.5
+        pericias_iniciais = [
+            # ========== DESTREZA ==========
+            {"nome": "Acrobacia", "descricao": "Equilibrar-se, saltar, cambalhotas.", "atributo": "DES", "tipo": "comum"},
+            {"nome": "Abrir Fechaduras", "descricao": "Usar ferramentas de ladino.", "atributo": "DES", "tipo": "comum", "requer_treinamento": 1},
+            {"nome": "Cavalgar", "descricao": "Controlar montarias.", "atributo": "DES", "tipo": "comum"},
+            {"nome": "Esconder-se", "descricao": "Ficar fora de vista.", "atributo": "DES", "tipo": "comum"},
+            {"nome": "Furtividade", "descricao": "Mover-se silenciosamente.", "atributo": "DES", "tipo": "comum"},
+            {"nome": "Equilíbrio", "descricao": "Manter-se em pé em superfícies instáveis.", "atributo": "DES", "tipo": "comum"},
+            {"nome": "Usar Cordas", "descricao": "Amarrar e soltar nós.", "atributo": "DES", "tipo": "comum"},
+            
+            # ========== FORÇA ==========
+            {"nome": "Escalar", "descricao": "Subir paredes e obstáculos.", "atributo": "FOR", "tipo": "comum"},
+            {"nome": "Natação", "descricao": "Nadar.", "atributo": "FOR", "tipo": "comum"},
+            {"nome": "Saltar", "descricao": "Distância de salto.", "atributo": "FOR", "tipo": "comum"},
+            
+            # ========== INTELIGÊNCIA ==========
+            {"nome": "Alquimia", "descricao": "Criar itens alquímicos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
+            {"nome": "Apreciar", "descricao": "Avaliar o valor de itens.", "atributo": "INT", "tipo": "comum"},
+            {"nome": "Decifrar Escrita", "descricao": "Traduzir línguas antigas ou códigos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
+            {"nome": "Falsificação", "descricao": "Criar documentos falsos.", "atributo": "INT", "tipo": "comum"},
+            {"nome": "Identificar Magia", "descricao": "Reconhecer efeitos mágicos.", "atributo": "INT", "tipo": "comum"},
+            {"nome": "Operar Mecanismo", "descricao": "Desativar armadilhas ou dispositivos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
+            {"nome": "Pesquisa", "descricao": "Encontrar informações em bibliotecas.", "atributo": "INT", "tipo": "comum"},
+            {"nome": "Procurar", "descricao": "Achar itens escondidos ou armadilhas.", "atributo": "INT", "tipo": "comum"},
+            
+            # ========== CONHECIMENTO (INT) ==========
+            {"nome": "Conhecimento: Arcano", "descricao": "Magia, monstros mágicos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            {"nome": "Conhecimento: Arquitetura", "descricao": "Construções e engenharia.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            {"nome": "Conhecimento: Geografia", "descricao": "Terras, climas.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            {"nome": "Conhecimento: História", "descricao": "Eventos passados.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            {"nome": "Conhecimento: Local", "descricao": "Notícias, fofocas.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            {"nome": "Conhecimento: Natureza", "descricao": "Animais, plantas, clima.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            {"nome": "Conhecimento: Nobreza", "descricao": "Linhas de sangue, títulos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            {"nome": "Conhecimento: Plano", "descricao": "Outras dimensões.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            {"nome": "Conhecimento: Religião", "descricao": "Divindades, ritos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
+            
+            # ========== SABEDORIA ==========
+            {"nome": "Cura", "descricao": "Tratar ferimentos e doenças.", "atributo": "SAB", "tipo": "comum"},
+            {"nome": "Intuição", "descricao": "Perceber mentiras e intenções.", "atributo": "SAB", "tipo": "comum"},
+            {"nome": "Navegação", "descricao": "Orientar-se.", "atributo": "SAB", "tipo": "comum"},
+            {"nome": "Ouvir", "descricao": "Detectar sons.", "atributo": "SAB", "tipo": "comum"},
+            {"nome": "Sobrevivência", "descricao": "Rastrear e viver na natureza.", "atributo": "SAB", "tipo": "comum"},
+            {"nome": "Profissão", "descricao": "Ofício específico.", "atributo": "SAB", "tipo": "profissao"},
+            
+            # ========== CARISMA ==========
+            {"nome": "Adestrar Animais", "descricao": "Treinar e controlar animais.", "atributo": "CAR", "tipo": "comum", "requer_treinamento": 1},
+            {"nome": "Atuação", "descricao": "Canto, dança, oratória, instrumentos.", "atributo": "CAR", "tipo": "performance"},
+            {"nome": "Diplomacia", "descricao": "Negociar e influenciar.", "atributo": "CAR", "tipo": "comum"},
+            {"nome": "Disfarce", "descricao": "Mudar a aparência.", "atributo": "CAR", "tipo": "comum"},
+            {"nome": "Intimidação", "descricao": "Ameaçar e coagir.", "atributo": "CAR", "tipo": "comum"},
+            {"nome": "Uso de Dispositivos Mágicos", "descricao": "Usar itens de classes diferentes.", "atributo": "CAR", "tipo": "comum", "requer_treinamento": 1},
+        ]
+        
+        # Inserir perícias
+        for pericia_data in pericias_iniciais:
+            pericia = Pericia(**pericia_data)
+            db.add(pericia)
+        
+        db.commit()
+        logger.info(f"✅ {len(pericias_iniciais)} perícias D&D 3.5 inseridas com sucesso")
+        print(f"✅ {len(pericias_iniciais)} perícias D&D 3.5 inseridas com sucesso!")
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"❌ Erro ao popular perícias: {str(e)}")
+        print(f"❌ Erro ao popular perícias: {str(e)}")
+        raise
 
 
 def _seed_combatentes(db) -> None:
@@ -164,6 +285,8 @@ def _seed_combatentes(db) -> None:
 
     repo = CombatenteRepository(db)
     if repo.count() > 0:
+        logger.info(f"✅ {repo.count()} combatentes já existem no banco")
+        print(f"✅ {repo.count()} combatentes já existem no banco de dados")
         return
 
     logger.info("🔄 Populando combatentes iniciais...")
@@ -294,6 +417,7 @@ def _seed_condicoes(db) -> None:
         print("✅ Seed de condições D&D verificado/executado com sucesso!")
     except Exception as e:
         logger.warning(f"⚠️  Erro ao popular condições: {str(e)}")
+        print(f"⚠️  Erro ao popular condições: {str(e)}")
 
 
 # ── Entry point ──────────────────────────────────────────────────────────────
