@@ -11,7 +11,7 @@ from pathlib import Path
 import logging
 
 from .core.config import settings
-from .core.database import engine, Base, SessionLocal
+from .core.database import engine, Base, SessionLocal, get_db
 from .core.init_db import criar_admin_padrao
 from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias
 

@@ -1,13 +1,14 @@
 """
 Modelos de Perícia para D&D 3.5
 Single Responsibility: Apenas representam a estrutura das perícias
+SOLID: Dependency Injection via Base declarativo centralizado
 """
 
-from sqlalchemy import Column, Integer, String, Text, Enum, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 
-from app.database import Base
+from app.core.database import Base
 
 
 class AtributoEnum(str, PyEnum):
@@ -44,7 +45,7 @@ class Pericia(Base):
     requer_treinamento = Column(Integer, default=0)  # 1 se precisa treino
     pagina_livro = Column(Integer, nullable=True)
 
-    # Relacionamento com perícias do jogador
+    # ✅ Relacionamento com perícias do jogador
     pericia_jogadores = relationship(
         "PericiaJogador",
         back_populates="pericia",
@@ -70,7 +71,7 @@ class PericiaJogador(Base):
     modificador_atributo = Column(Float, default=0)  # Modificador do atributo
     bonus_outros = Column(Float, default=0)  # Bônus de outros fatores (magias, itens, etc)
     
-    # Relacionamentos
+    # ✅ Relacionamentos (certifique-se que back_populates existe em ambos)
     pericia = relationship("Pericia", back_populates="pericia_jogadores")
     combatente = relationship("Combatente", back_populates="pericias")
 

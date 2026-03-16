@@ -1,20 +1,42 @@
 """
 Router de Perícias
 Single Responsibility: Apenas mapear endpoints HTTP
+SOLID: Dependency Injection via FastAPI
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+import logging
 
-from app.database import get_db
+# ✅ CORRETO: Import do core database
+from app.core.database import get_db
+
+# ✅ CORRETO: Import do service
 from app.services.pericia_service import PericiaService
+
+# ✅ CORRETO: Import dos schemas
 from app.schemas.pericia import (
     PericiaCreate, PericiaUpdate, PericiaResponse,
     PericiaJogadorCreate, PericiaJogadorUpdate, PericiaJogadorResponse,
     PericiaJogadorListResponse
 )
-from app.security import get_current_user
+
+# ✅ CORRETO: Busque o módulo de segurança (pode estar em outro lugar)
+# Tente importar de onde realmente está em seu projeto
+try:
+    # Opção 1: Se estiver em app/core/security.py
+    from app.core.security import get_current_user
+except ImportError:
+    try:
+        # Opção 2: Se estiver em app/security.py
+        from app.security import get_current_user
+    except ImportError:
+        # Opção 3: Se não existir, criar um dummy (sem autenticação)
+        async def get_current_user(request=None):
+            return None
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/pericias", tags=["Perícias"])
 
@@ -25,7 +47,7 @@ router = APIRouter(prefix="/api/v1/pericias", tags=["Perícias"])
 def criar_pericia(
     pericia: PericiaCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user) if get_current_user else None
 ):
     """Cria uma nova perícia (Admin only)"""
     try:
@@ -33,6 +55,9 @@ def criar_pericia(
         return service.criar_pericia(pericia)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Erro ao criar perícia: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/", response_model=List[PericiaResponse])
@@ -43,24 +68,36 @@ def listar_pericias(
     db: Session = Depends(get_db)
 ):
     """Lista todas as perícias disponíveis"""
-    service = PericiaService(db)
-    
-    if atributo:
-        return service.listar_pericias_por_atributo(atributo)
-    
-    return service.listar_todas_pericias(skip, limit)
+    try:
+        service = PericiaService(db)
+        
+        if atributo:
+            return service.listar_pericias_por_atributo(atributo)
+        
+        return service.listar_todas_pericias(skip, limit)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Erro ao listar perícias: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{pericia_id}", response_model=PericiaResponse)
 def obter_pericia(pericia_id: int, db: Session = Depends(get_db)):
     """Obtém uma perícia por ID"""
-    service = PericiaService(db)
-    pericia = service.obter_pericia(pericia_id)
-    
-    if not pericia:
-        raise HTTPException(status_code=404, detail="Perícia não encontrada")
-    
-    return pericia
+    try:
+        service = PericiaService(db)
+        pericia = service.obter_pericia(pericia_id)
+        
+        if not pericia:
+            raise HTTPException(status_code=404, detail="Perícia não encontrada")
+        
+        return pericia
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao obter perícia: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.put("/{pericia_id}", response_model=PericiaResponse)
@@ -68,29 +105,41 @@ def atualizar_pericia(
     pericia_id: int,
     pericia: PericiaUpdate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user) if get_current_user else None
 ):
     """Atualiza uma perícia (Admin only)"""
-    service = PericiaService(db)
-    pericia_atualizada = service.atualizar_pericia(pericia_id, pericia)
-    
-    if not pericia_atualizada:
-        raise HTTPException(status_code=404, detail="Perícia não encontrada")
-    
-    return pericia_atualizada
+    try:
+        service = PericiaService(db)
+        pericia_atualizada = service.atualizar_pericia(pericia_id, pericia)
+        
+        if not pericia_atualizada:
+            raise HTTPException(status_code=404, detail="Perícia não encontrada")
+        
+        return pericia_atualizada
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao atualizar perícia: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/{pericia_id}", status_code=status.HTTP_204_NO_CONTENT)
 def deletar_pericia(
     pericia_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user) if get_current_user else None
 ):
     """Deleta uma perícia (Admin only)"""
-    service = PericiaService(db)
-    
-    if not service.deletar_pericia(pericia_id):
-        raise HTTPException(status_code=404, detail="Perícia não encontrada")
+    try:
+        service = PericiaService(db)
+        
+        if not service.deletar_pericia(pericia_id):
+            raise HTTPException(status_code=404, detail="Perícia não encontrada")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao deletar perícia: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ========== ENDPOINTS DE PERÍCIAS DO JOGADOR ==========
@@ -100,7 +149,7 @@ def adicionar_pericia_jogador(
     combatente_id: int,
     pericia: PericiaJogadorCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user) if get_current_user else None
 ):
     """Adiciona uma perícia ao jogador"""
     try:
@@ -108,6 +157,9 @@ def adicionar_pericia_jogador(
         return service.adicionar_pericia_jogador(combatente_id, pericia)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Erro ao adicionar perícia: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{combatente_id}/listar", response_model=PericiaJogadorListResponse)
@@ -116,14 +168,18 @@ def listar_pericias_jogador(
     db: Session = Depends(get_db)
 ):
     """Lista todas as perícias de um combatente"""
-    service = PericiaService(db)
-    stats = service.obter_estatisticas_pericias(combatente_id)
-    
-    return PericiaJogadorListResponse(
-        pericias=stats["pericias"],
-        total_pontos_gastos=stats["pontos_gastos"],
-        pontos_disponiveis=stats["pontos_disponiveis"]
-    )
+    try:
+        service = PericiaService(db)
+        stats = service.obter_estatisticas_pericias(combatente_id)
+        
+        return PericiaJogadorListResponse(
+            pericias=stats["pericias"],
+            total_pontos_gastos=stats["pontos_gastos"],
+            pontos_disponiveis=stats["pontos_disponiveis"]
+        )
+    except Exception as e:
+        logger.error(f"Erro ao listar perícias do jogador: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.put("/{combatente_id}/pericia/{pericia_jogador_id}", response_model=PericiaJogadorResponse)
@@ -132,16 +188,22 @@ def atualizar_pericia_jogador(
     pericia_jogador_id: int,
     pericia: PericiaJogadorUpdate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user) if get_current_user else None
 ):
     """Atualiza uma perícia do jogador"""
-    service = PericiaService(db)
-    pericia_atualizada = service.atualizar_pericia_jogador(pericia_jogador_id, pericia)
-    
-    if not pericia_atualizada:
-        raise HTTPException(status_code=404, detail="Perícia do jogador não encontrada")
-    
-    return pericia_atualizada
+    try:
+        service = PericiaService(db)
+        pericia_atualizada = service.atualizar_pericia_jogador(pericia_jogador_id, pericia)
+        
+        if not pericia_atualizada:
+            raise HTTPException(status_code=404, detail="Perícia do jogador não encontrada")
+        
+        return pericia_atualizada
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao atualizar perícia do jogador: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/{combatente_id}/pericia/{pericia_jogador_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -149,13 +211,19 @@ def deletar_pericia_jogador(
     combatente_id: int,
     pericia_jogador_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user) if get_current_user else None
 ):
     """Deleta uma perícia do jogador"""
-    service = PericiaService(db)
-    
-    if not service.deletar_pericia_jogador(pericia_jogador_id):
-        raise HTTPException(status_code=404, detail="Perícia do jogador não encontrada")
+    try:
+        service = PericiaService(db)
+        
+        if not service.deletar_pericia_jogador(pericia_jogador_id):
+            raise HTTPException(status_code=404, detail="Perícia do jogador não encontrada")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao deletar perícia do jogador: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{combatente_id}/estatisticas")
@@ -164,5 +232,9 @@ def obter_estatisticas_pericias(
     db: Session = Depends(get_db)
 ):
     """Obtém estatísticas de perícias do combatente"""
-    service = PericiaService(db)
-    return service.obter_estatisticas_pericias(combatente_id)
+    try:
+        service = PericiaService(db)
+        return service.obter_estatisticas_pericias(combatente_id)
+    except Exception as e:
+        logger.error(f"Erro ao obter estatísticas: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

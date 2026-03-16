@@ -46,12 +46,15 @@ class Combatente(Base):
     nivel  = Column(Integer, default=1)
     pontos = Column(Integer, default=0)
 
-    # Relacionamentos
-    ataques      = relationship("Ataque",    back_populates="combatente",
+    # ✅ RELACIONAMENTOS
+    ataques      = relationship("Ataque", back_populates="combatente",
                                 cascade="all, delete-orphan", lazy="selectin")
     magias_slots = relationship("MagiaSlot", back_populates="combatente",
                                 cascade="all, delete-orphan", lazy="selectin",
                                 order_by="MagiaSlot.nivel")
+    # ✅ NOVO: Relacionamento com PericiaJogador
+    pericias     = relationship("PericiaJogador", back_populates="combatente",
+                                cascade="all, delete-orphan", lazy="selectin")
 
     def __repr__(self):
         return f"<Combatente(id={self.id}, nome='{self.nome}', tipo='{self.tipo}')>"
