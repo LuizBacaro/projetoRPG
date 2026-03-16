@@ -7,15 +7,281 @@
     <meta name="theme-color" content="#8B4513">
     <title>Perícias - D&D 3.5</title>
     
-    <!-- CSS na ordem correta -->
+    <!-- CSS -->
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/pericias.css">
+    <link rel="stylesheet" href="/css/pericias.css?v=3.0">
+    
+    <!-- FORÇA MÁXIMA: CSS INLINE COM !important -->
+    <style>
+        /* RESET: Remove layouts anteriores */
+        .pericias-header {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+            gap: 2rem !important;
+            margin-bottom: 3rem !important;
+            padding: 2rem !important;
+            background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%) !important;
+            border-bottom: 3px solid var(--cor-dourada) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+            grid-template-columns: unset !important;
+        }
+
+        /* BOTÃO VOLTAR */
+        .btn-voltar {
+            padding: 0.9rem 1.8rem !important;
+            background: linear-gradient(135deg, #8B4513 0%, #5c2e0f 100%) !important;
+            color: var(--cor-dourada) !important;
+            border: 2px solid var(--cor-dourada) !important;
+            border-radius: 8px !important;
+            font-size: 1rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            white-space: nowrap !important;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3) !important;
+            order: 1 !important;
+            flex-shrink: 0 !important;
+        }
+
+        .btn-voltar:hover {
+            background: linear-gradient(135deg, #a6521e 0%, #7a3f14 100%) !important;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) !important;
+            transform: translateX(-4px) !important;
+        }
+
+        /* HEADER CONTENT - CENTRO */
+        .header-content {
+            text-align: center !important;
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            order: 2 !important;
+            grid-column: unset !important;
+        }
+
+        .header-content h1 {
+            margin: 0 0 0.5rem 0 !important;
+            font-size: 2.2rem !important;
+            color: var(--cor-dourada) !important;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        .header-content .subtitulo {
+            margin: 0 !important;
+            color: #c9b896 !important;
+            font-size: 0.95rem !important;
+            font-style: italic !important;
+            opacity: 0.9 !important;
+        }
+
+        /* HEADER INFO - DIREITA */
+        .header-info {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            text-align: right !important;
+            padding: 1rem !important;
+            background: rgba(255, 215, 0, 0.05) !important;
+            border-left: 3px solid var(--cor-dourada) !important;
+            border-radius: 6px !important;
+            order: 3 !important;
+            flex-shrink: 0 !important;
+        }
+
+        .combatente-nome {
+            color: var(--cor-dourada) !important;
+            font-weight: bold !important;
+            font-size: 1.1rem !important;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5) !important;
+            margin: 0 !important;
+        }
+
+        .combatente-tipo {
+            color: #c9b896 !important;
+            font-style: italic !important;
+            font-size: 0.9rem !important;
+            opacity: 0.85 !important;
+            margin: 0 !important;
+        }
+
+        /* CONTAINER PRINCIPAL - LAYOUT VERTICAL */
+        .container {
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            gap: 0 !important;
+        }
+
+        /* MAIN COM PERÍCIAS */
+        .pericias-container {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2.5rem !important;
+            padding: 0 !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            width: 100% !important;
+        }
+
+        /* FOOTER HORIZONTAL */
+        .pericias-footer {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 1.2rem !important;
+            justify-content: center !important;
+            flex-wrap: nowrap !important;
+            margin-top: 3rem !important;
+            padding: 2.5rem !important;
+            background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%) !important;
+            border-top: 3px solid var(--cor-dourada) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3) !important;
+            width: 100% !important;
+        }
+
+        .btn-exportar,
+        .btn-resetar,
+        .btn-stats {
+            padding: 1.1rem 2.2rem !important;
+            border: 2px solid var(--cor-dourada) !important;
+            border-radius: 8px !important;
+            color: var(--cor-dourada) !important;
+            font-size: 1rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            min-width: 160px !important;
+            white-space: nowrap !important;
+            flex: 0 1 auto !important;
+        }
+
+        .btn-exportar {
+            background: linear-gradient(135deg, #4B0082 0%, #2d0052 100%) !important;
+        }
+
+        .btn-exportar:hover {
+            background: linear-gradient(135deg, #6200ad 0%, #3d0066 100%) !important;
+            box-shadow: 0 0 20px rgba(98, 0, 173, 0.4) !important;
+            transform: translateY(-3px) !important;
+        }
+
+        .btn-resetar {
+            background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%) !important;
+        }
+
+        .btn-resetar:hover {
+            background: linear-gradient(135deg, #ff1744 0%, #c41c3b 100%) !important;
+            box-shadow: 0 0 20px rgba(255, 23, 68, 0.4) !important;
+            transform: translateY(-3px) !important;
+        }
+
+        .btn-stats {
+            background: linear-gradient(135deg, #228B22 0%, #0d5a0d 100%) !important;
+        }
+
+        .btn-stats:hover {
+            background: linear-gradient(135deg, #32cd32 0%, #1a7a1a 100%) !important;
+            box-shadow: 0 0 20px rgba(50, 205, 50, 0.4) !important;
+            transform: translateY(-3px) !important;
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 1024px) {
+            .pericias-header {
+                flex-direction: column !important;
+                gap: 1.5rem !important;
+            }
+
+            .btn-voltar {
+                order: 1 !important;
+                width: 100% !important;
+            }
+
+            .header-content {
+                order: 2 !important;
+            }
+
+            .header-info {
+                order: 3 !important;
+                width: 100% !important;
+                text-align: center !important;
+                border-left: none !important;
+                border-top: 3px solid var(--cor-dourada) !important;
+                padding-top: 1rem !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pericias-header {
+                padding: 1.5rem !important;
+                gap: 1rem !important;
+            }
+
+            .header-content h1 {
+                font-size: 1.8rem !important;
+            }
+
+            .pericias-footer {
+                flex-wrap: wrap !important;
+                padding: 1.8rem !important;
+            }
+
+            .btn-exportar,
+            .btn-resetar,
+            .btn-stats {
+                flex: 1 1 calc(33.333% - 0.8rem) !important;
+                min-width: 140px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pericias-header {
+                padding: 1rem !important;
+                gap: 0.8rem !important;
+            }
+
+            .header-content h1 {
+                font-size: 1.4rem !important;
+            }
+
+            .btn-voltar {
+                padding: 0.7rem 1.2rem !important;
+                font-size: 0.95rem !important;
+                width: 100% !important;
+            }
+
+            .header-info {
+                width: 100% !important;
+                padding: 0.8rem !important;
+            }
+
+            .pericias-footer {
+                flex-direction: column !important;
+                padding: 1.2rem !important;
+            }
+
+            .btn-exportar,
+            .btn-resetar,
+            .btn-stats {
+                flex: 1 1 100% !important;
+                min-width: auto !important;
+                width: 100% !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- HEADER com Botão Voltar -->
+        <!-- ========== HEADER HORIZONTAL ========== -->
         <header class="pericias-header">
             <button id="btn-voltar" class="btn-voltar" aria-label="Voltar para página anterior">
                 ← Voltar
@@ -25,11 +291,12 @@
                 <p class="subtitulo">D&D 3.5 - Gerencie suas perícias e modificadores</p>
             </div>
             <div class="header-info">
-                <span id="combatente-nome" class="combatente-nome">👤 Personagem</span>
+                <span id="combatente-nome" class="combatente-nome">👤 Aragorn</span>
                 <span id="combatente-tipo" class="combatente-tipo">(jogador)</span>
             </div>
         </header>
 
+        <!-- ========== MAIN COM PERÍCIAS ========== -->
         <main class="pericias-container">
             <!-- Seção de Perícias de Destreza -->
             <section class="pericias-secao">
@@ -356,7 +623,7 @@
             </section>
         </main>
 
-        <!-- Footer com botões -->
+        <!-- ========== FOOTER HORIZONTAL ========== -->
         <footer class="pericias-footer">
             <button id="btn-exportar" class="btn-exportar" title="Exportar perícias para JSON">
                 📥 Exportar Dados
@@ -373,24 +640,18 @@
     <!-- Container para notificações -->
     <div id="toast-container"></div>
 
-    <!-- Script Simples (sem dependências externas) -->
+    <!-- Script Simples -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Página de Perícias carregada com sucesso!');
-            console.log('📋 Total de perícias visíveis: 16');
 
-            // Recuperar parâmetros da URL
             const params = new URLSearchParams(window.location.search);
             const nomeCombatente = params.get('nome') || 'Personagem';
             const tipoCombatente = params.get('tipo') || 'jogador';
 
-            // Atualizar header com info do combatente
             document.getElementById('combatente-nome').textContent = `👤 ${nomeCombatente}`;
             document.getElementById('combatente-tipo').textContent = `(${tipoCombatente})`;
 
-            console.log(`✅ Carregando perícias para: ${nomeCombatente} (${tipoCombatente})`);
-
-            // Botão Voltar
             document.getElementById('btn-voltar').addEventListener('click', () => {
                 if (window.history.length > 1) {
                     window.history.back();
@@ -399,22 +660,6 @@
                 }
             });
 
-            // Botão Exportar (placeholder)
-            document.getElementById('btn-exportar').addEventListener('click', () => {
-                alert('⚠️ Exportar será habilitado quando o PericiaService.js estiver integrado');
-            });
-
-            // Botão Resetar (placeholder)
-            document.getElementById('btn-resetar').addEventListener('click', () => {
-                alert('⚠️ Resetar será habilitado quando o PericiaService.js estiver integrado');
-            });
-
-            // Botão Stats (placeholder)
-            document.getElementById('btn-stats').addEventListener('click', () => {
-                alert('⚠️ Estatísticas serão habilitadas quando o PericiaService.js estiver integrado');
-            });
-
-            // Script de atualização simples (cálculo em tempo real)
             document.querySelectorAll('.skill-input-number').forEach(input => {
                 input.addEventListener('input', (e) => {
                     const skillCard = e.target.closest('.skill-card');
@@ -425,10 +670,8 @@
                     const resultadoDiv = skillCard.querySelector('.skill-resultado');
                     const valorSpan = resultadoDiv.querySelector('.valor-resultado');
 
-                    // Atualizar valor
                     valorSpan.textContent = resultado >= 0 ? `+${resultado}` : `${resultado}`;
 
-                    // Atualizar classe de cor
                     resultadoDiv.classList.remove('positivo', 'negativo', 'neutro');
                     if (resultado > 0) resultadoDiv.classList.add('positivo');
                     else if (resultado < 0) resultadoDiv.classList.add('negativo');
