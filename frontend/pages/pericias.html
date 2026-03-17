@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/pericias.css?v=7.0">
+    <link rel="stylesheet" href="/css/pericias.css?v=8.0">
 </head>
 <body>
     <div class="pericias-wrapper">
@@ -46,23 +46,28 @@
                     <tr>
                         <th class="col-checkbox">✓</th>
                         <th class="col-nome">Perícia</th>
-                        <th class="col-atributo">Atributo</th>
+                        <th class="col-atributo">Atr.</th>
                         <th class="col-descricao">Descrição</th>
                         <th class="col-tipo">Tipo</th>
+                        <th class="col-modificadores">
+                            <div style="display: grid; grid-template-columns: 60px 60px 60px 60px; gap: 0.5rem; text-align: center;">
+                                <div>Grad.</div>
+                                <div>Mod.</div>
+                                <div>Bôn.</div>
+                                <div>Total</div>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="tbody-pericias">
-                    <tr><td colspan="5" class="vazio">⏳ Carregando perícias...</td></tr>
+                    <tr><td colspan="6" class="vazio">⏳ Carregando perícias...</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- PERÍCIAS SELECIONADAS -->
-        <div class="pericias-selecionadas-container">
-            <h2 class="pericias-selecionadas-titulo">⭐ Perícias Selecionadas</h2>
-            <div class="pericias-selecionadas-lista" id="pericias-selecionadas-lista">
-                <p class="vazio">Nenhuma perícia selecionada ainda</p>
-            </div>
+        <!-- FOOTER COM BOTÕES -->
+        <div class="pericias-footer">
+            <button id="btn-limpar-pericias" class="btn-limpar">🔄 Limpar Seleção</button>
             <button id="btn-salvar-pericias" class="btn-salvar-pericias">💾 Salvar Perícias</button>
         </div>
     </div>
@@ -96,7 +101,6 @@
         });
 
         function setupEventos(controller) {
-            // Filtros
             document.querySelectorAll('.btn-filtro').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('ativo'));
@@ -119,6 +123,10 @@
 
             document.getElementById('btn-salvar-pericias').addEventListener('click', () => {
                 controller.salvarPericias();
+            });
+
+            document.getElementById('btn-limpar-pericias').addEventListener('click', () => {
+                controller.limparSelecao();
             });
         }
     </script>
