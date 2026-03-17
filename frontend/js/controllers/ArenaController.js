@@ -549,32 +549,107 @@ export class ArenaController {
         return mapa[tipo] || '⚔️';
     }
 
-    resetarCombate() {
-        if (!confirm('Deseja resetar o combate? Todos voltarao ao HP maximo.')) return;
-        var self = this;
-        this.combatentes.forEach(function(c) {
-            c.hp_atual = c.hp_maximo;
-            self.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
+    // ─── Modal de Confirmação Customizado ──────────────────
+
+    _mostrarModalConfirmacao(opcoes) {
+        var overlay = document.createElement('div');
+        overlay.id        = 'modalConfirmacaoArena';
+        overlay.className = 'arena-modal-overlay';
+
+        overlay.innerHTML =
+            '<div class="arena-modal-confirmacao">' +
+                '<div class="arena-modal-confirmacao-header">' +
+                    '<span class="arena-modal-confirmacao-icone">' + (opcoes.icone || '⚔️') + '</span>' +
+                    '<h3 class="arena-modal-confirmacao-titulo">' + (opcoes.titulo || 'Confirmar') + '</h3>' +
+                '</div>' +
+                '<p class="arena-modal-confirmacao-texto">' + (opcoes.texto || 'Deseja continuar?') + '</p>' +
+                '<div class="arena-modal-confirmacao-botoes">' +
+                    '<button class="arena-modal-btn arena-modal-btn-cancelar" id="btnModalCancelar">' +
+                        (opcoes.textoCancelar || 'Cancelar') +
+                    '</button>' +
+                    '<button class="arena-modal-btn arena-modal-btn-confirmar" id="btnModalConfirmar">' +
+                        (opcoes.textoConfirmar || 'Confirmar') +
+                    '</button>' +
+                '</div>' +
+            '</div>';
+
+        document.body.appendChild(overlay);
+
+        // Animação de entrada
+        requestAnimationFrame(function() {
+            overlay.classList.add('arena-modal-overlay-show');
         });
-        this.turnoAtual    = 0;
-        this.rodadaAtual   = 1;
-        this.statsVisiveis = false;
-        this._jaAgiram     = [];
-        this._resetarCronometro();
-        this._iniciarCronometro();
-        this.atualizarRodada();
-        Toast.success('Combate resetado!');
-        this.renderizarOrdemIniciativa();
-        this.renderizarCombatenteAtivo();
+
+        var self = this;
+
+        function fechar() {
+            overlay.classList.remove('arena-modal-overlay-show');
+            setTimeout(function() {
+                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, 250);
+        }
+
+        document.getElementById('btnModalCancelar').addEventListener('click', function() {
+            fechar();
+            if (opcoes.onCancelar) opcoes.onCancelar();
+        });
+
+        document.getElementById('btnModalConfirmar').addEventListener('click', function() {
+            fechar();
+            if (opcoes.onConfirmar) opcoes.onConfirmar();
+        });
+
+        // Fechar ao clicar no overlay
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) fechar();
+        });
     }
 
     finalizarCombate() {
-        if (!confirm('Deseja finalizar o combate e voltar para a configuracao?')) return;
-        this._pararCronometro();
-        var telaArena        = document.getElementById('telaArena');
-        var telaConfiguracao = document.getElementById('telaConfiguracao');
-        if (telaArena)        telaArena.classList.remove('ativa');
-        if (telaConfiguracao) telaConfiguracao.classList.add('ativa');
-        Toast.success('Combate finalizado!');
+        var self = this;
+        this._mostrarModalConfirmacao({
+            icone:          '🏳️',
+            titulo:         'Encerrar Combate',
+            texto:          'Deseja finalizar o combate e voltar para a configuração?',
+            textoCancelar:  '← Continuar Combate',
+            textoConfirmar: 'Encerrar ✓',
+            onConfirmar: function() {
+                self._pararCronometro();
+                var telaArena        = document.getElementById('telaArena');
+                var telaConfiguracao = document.getElementById('telaConfiguracao');
+                if (telaArena)        telaArena.classList.remove('ativa');
+                if (telaConfiguracao) telaConfiguracao.classList.add('ativa');
+                Toast.success('Combate finalizado!');
+            }
+        });
     }
+
+    resetarCombate() {
+        var self = this;
+        this._mostrarModalConfirmacao({
+            icone:          '🔄',
+            titulo:         'Resetar Combate',
+            texto:          'Deseja resetar o combate? Todos voltarão ao HP máximo.',
+            textoCancelar:  '← Cancelar',
+            textoConfirmar: 'Resetar ✓',
+            onConfirmar: function() {
+                self.combatentes.forEach(function(c) {
+                    c.hp_atual = c.hp_maximo;
+                    self.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
+                });
+                self.turnoAtual    = 0;
+                self.rodadaAtual   = 1;
+                self.statsVisiveis = false;
+                self._jaAgiram     = [];
+                self._resetarCronometro();
+                self._iniciarCronometro();
+                self.atualizarRodada();
+                Toast.success('Combate resetado!');
+                self.renderizarOrdemIniciativa();
+                self.renderizarCombatenteAtivo();
+            }
+        });
+    }
+
+    
 }
