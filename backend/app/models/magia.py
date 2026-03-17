@@ -6,7 +6,7 @@ SOLID: Single Responsibility — apenas mapeamento de tabela de magias
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from datetime import datetime
-from .base import Base
+from ..core.database import Base 
 
 
 class Magia(Base):

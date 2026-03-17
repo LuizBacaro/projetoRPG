@@ -8,10 +8,11 @@ import os
 import sys
 
 # ── Adicionar raiz ao path ──
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from sqlalchemy.orm import Session
 from app.models.magia import Magia
+from app.core.database import SessionLocal
 
 
 # ══════════════════════════════════════════════════════════════
@@ -40,7 +41,7 @@ MAGIAS_MAGO = [
 
     # ── Nível 1 ──
     ("Armadura de Mago",    1, "Mago", "Conjuração",    "Criação",    "V, S, F",  "Toque",    "",                         "1 hora/nível",       "1 ação padrão", "",          "Vontade",  False, "Concede +4 de bônus de armadura à CA."),
-    ("Charme de Pessoa",    1, "Mago", "Encantamento",  "Enfeitiçar", "V, S",     "Curto",    "",                         "1 hora/nível",       "1 ação padrão", "",          "Vontade",  Sim,   "Faz a criatura tratar o conjurador como amigo."),
+    ("Charme de Pessoa",    1, "Mago", "Encantamento",  "Enfeitiçar", "V, S",     "Curto",    "",                         "1 hora/nível",       "1 ação padrão", "",          "Vontade",  True,   "Faz a criatura tratar o conjurador como amigo."),
     ("Compreender Idiomas", 1, "Mago", "Adivinhação",   "",           "V, S, M",  "Pessoal",  "",                         "10 min/nível",       "1 ação padrão", "",          "Nenhum",   False, "Compreende qualquer idioma falado ou escrito."),
     ("Dormir",              1, "Mago", "Encantamento",  "Compulsão",  "V, S, M",  "Médio",    "Burst de 10 pés",          "1 min/nível",        "1 rodada",      "",          "Vontade",  False, "Faz criaturas com até 4 DV adormecerem."),
     ("Escudo",              1, "Mago", "Abjuração",     "",           "V, S",     "Pessoal",  "",                         "1 min/nível",        "1 ação padrão", "",          "Nenhum",   False, "+4 de escudo à CA; bloqueia Projéteis Mágicos."),
@@ -59,8 +60,8 @@ MAGIAS_MAGO = [
     ("Localizar Objeto",    2, "Mago", "Adivinhação",   "",           "V, S, F",  "Longo",    "",                         "1 min/nível",        "1 ação padrão", "",          "Nenhum",   False, "Sente direção de objeto familiar no alcance."),
     ("Nuvem de Névoa",      2, "Mago", "Conjuração",    "Criação",    "V, S",     "Médio",    "Cilindro de 20 pés raio",  "10 min/nível",       "1 rodada",      "",          "Nenhum",   False, "Cria névoa densa que bloqueia visão."),
     ("Resistência a Energia",2,"Mago","Abjuração",     "",           "V, S, M",  "Toque",    "",                         "10 min/nível",       "1 ação padrão", "",          "Fortitude", False,"Reduz dano de energia específica em 10/20/30 pts."),
-    ("Toque de Idiotice",   2, "Mago", "Encantamento",  "Compulsão",  "V, S",     "Toque",    "",                         "1 min/nível",        "1 ação padrão", "",          "Vontade",  Sim,   "Reduz INT e SAB do alvo em 1d6."),
-    ("Web",                 2, "Mago", "Conjuração",    "Criação",    "V, S, M",  "Médio",    "20 pés raio, 10 pés altura", "10 min/nível",    "1 ação padrão", "",          "Reflexos", Sim,   "Cria teia pegajosa que prende criaturas na área."),
+    ("Toque de Idiotice",   2, "Mago", "Encantamento",  "Compulsão",  "V, S",     "Toque",    "",                         "1 min/nível",        "1 ação padrão", "",          "Vontade",  True,   "Reduz INT e SAB do alvo em 1d6."),
+    ("Web",                 2, "Mago", "Conjuração",    "Criação",    "V, S, M",  "Médio",    "20 pés raio, 10 pés altura", "10 min/nível",    "1 ação padrão", "",          "Reflexos", True,   "Cria teia pegajosa que prende criaturas na área."),
 
     # ── Nível 3 ──
     ("Bola de Fogo",        3, "Mago", "Evocação",      "Fogo",       "V, S, M",  "Longo",    "Burst de 20 pés de raio",  "Instantânea",        "1 ação padrão", "1d6/nível (máx 10d6)", "Reflexos", "Sim", "Bola de fogo que explode em área de 20 pés de raio."),
@@ -68,23 +69,23 @@ MAGIAS_MAGO = [
     ("Deslocamento",        3, "Mago", "Ilusão",        "Figurado",   "V, M",     "Toque",    "",                         "1 rnd/nível",        "1 ação padrão", "",          "Vontade",  False, "Alvo parece estar levemente deslocado; 50% de erro."),
     ("Dissipar Magia",      3, "Mago", "Abjuração",     "",           "V, S",     "Médio",    "",                         "Instantânea",        "1 ação padrão", "",          "Nenhum",   False, "Cancela feitiços e efeitos mágicos."),
     ("Relâmpago",           3, "Mago", "Evocação",      "Elétrico",   "V, S, M",  "Médio",    "Raio de 120 pés",          "Instantânea",        "1 ação padrão", "1d6/nível (máx 10d6)", "Reflexos", "Sim", "Raio elétrico que percorre 120 pés em linha reta."),
-    ("Sugestão",            3, "Mago", "Encantamento",  "Compulsão",  "V, M",     "Curto",    "",                         "1 hora/nível",       "1 ação padrão", "",          "Vontade",  Sim,   "Compele alvo a seguir sugestão razoável."),
+    ("Sugestão",            3, "Mago", "Encantamento",  "Compulsão",  "V, M",     "Curto",    "",                         "1 hora/nível",       "1 ação padrão", "",          "Vontade",  True,   "Compele alvo a seguir sugestão razoável."),
     ("Voo",                 3, "Mago", "Transmutação",  "",           "V, S, F",  "Toque",    "",                         "1 min/nível",        "1 ação padrão", "",          "Vontade",  False, "Alvo ganha velocidade de voo de 60 pés."),
     ("Haste",               3, "Mago", "Transmutação",  "",           "V, S, M",  "Curto",    "1 criatura/nível",         "1 rnd/nível",        "1 ação padrão", "",          "Fortitude", False,"Concede velocidade extra, +1 ataque e +1 CA."),
 
     # ── Nível 4 ──
     ("Arcano Olho",         4, "Mago", "Adivinhação",   "",           "V, S, M",  "Ilimitado","",                         "1 min/nível",        "10 minutos",    "",          "Nenhum",   False, "Cria olho invisível que pode voar e espionar."),
-    ("Confusão",            4, "Mago", "Encantamento",  "Compulsão",  "V, S, M",  "Médio",    "Burst de 15 pés de raio",  "1 rnd/nível",        "1 ação padrão", "",          "Vontade",  Sim,   "Criaturas na área agem aleatoriamente."),
+    ("Confusão",            4, "Mago", "Encantamento",  "Compulsão",  "V, S, M",  "Médio",    "Burst de 15 pés de raio",  "1 rnd/nível",        "1 ação padrão", "",          "Vontade",  True,   "Criaturas na área agem aleatoriamente."),
     ("Dimensão Porta",      4, "Mago", "Conjuração",    "Teletransporte","V",     "Longo",    "",                         "Instantânea",        "1 ação padrão", "",          "Nenhum",   False, "Teletransporta o conjurador para local visível."),
     ("Polimorfar",          4, "Mago", "Transmutação",  "",           "V, S, M",  "Toque",    "",                         "1 min/nível",        "1 ação padrão", "",          "Fortitude", False,"Transforma criatura em outra forma animal."),
     ("Tempestade de Gelo",  4, "Mago", "Evocação",      "Frio/Impacto","V, S, M, F","Longo",  "Cilindro 20 pés raio",     "1 rodada",           "1 ação padrão", "3d6 impacto + 2d6 frio", "Nenhum", "Sim", "Granizo que causa 3d6+2d6 e dificulta movimento."),
     ("Muro de Fogo",        4, "Mago", "Evocação",      "Fogo",       "V, S, M",  "Médio",    "Muro de 20 pés/nível",     "Concentração + 1 rnd/nível", "1 ação padrão", "2d4 fogo (próx) ou 1d4 (distante)", "Reflexos", "Sim", "Cria muro de fogo que causa dano ao atravessar."),
-    ("Muro de Gelo",        4, "Mago", "Evocação",      "Frio",       "V, S, M",  "Médio",    "Muro de 10 pés/nível",     "1 min/nível",        "1 ação padrão", "2d6 frio",  "Reflexos", Sim,   "Cria parede sólida de gelo."),
+    ("Muro de Gelo",        4, "Mago", "Evocação",      "Frio",       "V, S, M",  "Médio",    "Muro de 10 pés/nível",     "1 min/nível",        "1 ação padrão", "2d6 frio",  "Reflexos", True,   "Cria parede sólida de gelo."),
 
     # ── Nível 5 ──
     ("Cone de Frio",        5, "Mago", "Evocação",      "Frio",       "V, S, M",  "60 pés",   "Cone de 60 pés",           "Instantânea",        "1 ação padrão", "1d6/nível (máx 15d6)", "Reflexos", "Sim", "Cone de frio intenso que causa 1d6/nível."),
-    ("Dominar Pessoa",      5, "Mago", "Encantamento",  "Compulsão",  "V, S",     "Curto",    "",                         "1 dia/nível",        "1 rodada",      "",          "Vontade",  Sim,   "Controla completamente ações de uma pessoa."),
-    ("Nuvem Mortal",        5, "Mago", "Conjuração",    "Criação",    "V, S",     "Médio",    "Cilindro 30 pés raio",     "1 min/nível",        "1 rodada",      "1d4 Con",   "Fortitude", Sim,  "Nuvem de gás mortal que reduz Constituição."),
+    ("Dominar Pessoa",      5, "Mago", "Encantamento",  "Compulsão",  "V, S",     "Curto",    "",                         "1 dia/nível",        "1 rodada",      "",          "Vontade",  True,   "Controla completamente ações de uma pessoa."),
+    ("Nuvem Mortal",        5, "Mago", "Conjuração",    "Criação",    "V, S",     "Médio",    "Cilindro 30 pés raio",     "1 min/nível",        "1 rodada",      "1d4 Con",   "Fortitude", True,  "Nuvem de gás mortal que reduz Constituição."),
     ("Passagem de Parede",  5, "Mago", "Transmutação",  "",           "V, S, M",  "Toque",    "",                         "1 hora/nível",       "1 ação padrão", "",          "Nenhum",   False, "Permite atravessar paredes sólidas."),
     ("Teletransporte",      5, "Mago", "Conjuração",    "Teletransporte","V",     "Pessoal e Toque","",                   "Instantânea",        "1 ação padrão", "",          "Nenhum",   False, "Teletransporta o conjurador e aliados."),
 
@@ -105,7 +106,7 @@ MAGIAS_MAGO = [
     # ── Nível 9 ──
     ("Desejo",              9, "Mago", "Universal",     "",           "V",        "Veja texto","",                        "Veja texto",         "1 ação padrão", "",          "Nenhum",   False, "Versão mais poderosa de Desejo Limitado."),
     ("Portal",              9, "Mago", "Conjuração",    "Criação",    "V, S",     "Médio",    "",                         "Concentração + 2 rnds/nível", "1 ação padrão", "", "Nenhum", False, "Cria portal para outro plano de existência."),
-    ("Prisão Astral",       9, "Mago", "Abjuração",     "",           "V, S",     "Curto",    "",                         "Permanente",         "1 ação padrão", "",          "Vontade",  Sim,   "Aprisiona criatura no plano astral."),
+    ("Prisão Astral",       9, "Mago", "Abjuração",     "",           "V, S",     "Curto",    "",                         "Permanente",         "1 ação padrão", "",          "Vontade",  True,   "Aprisiona criatura no plano astral."),
 ]
 
 MAGIAS_CLERIGO = [
@@ -151,7 +152,7 @@ MAGIAS_CLERIGO = [
 
     # ── Nível 7 ──
     ("Ressurreição",        7, "Clérigo","Conjuração",  "Cura",       "V, S, M",  "Toque",    "",                         "Instantânea",        "10 minutos",    "",          "Nenhum",   False, "Traz de volta criatura morta com todos os PV."),
-    ("Palavra Sagrada",     7, "Clérigo","Evocação",    "",           "V",        "40 pés",   "Criaturas não-boas em 40 pés","Instantânea",     "1 ação padrão", "",          "Vontade",  Sim,   "Atordoa, cega, surda ou mata criaturas malignas."),
+    ("Palavra Sagrada",     7, "Clérigo","Evocação",    "",           "V",        "40 pés",   "Criaturas não-boas em 40 pés","Instantânea",     "1 ação padrão", "",          "Vontade",  True,   "Atordoa, cega, surda ou mata criaturas malignas."),
 
     # ── Nível 9 ──
     ("Milagre",             9, "Clérigo","Evocação",    "",           "V, S",     "Veja texto","",                        "Veja texto",         "1 ação padrão", "",          "Veja texto",False,"Solicita intervenção divina para qualquer efeito."),
@@ -160,12 +161,12 @@ MAGIAS_CLERIGO = [
 MAGIAS_DRUIDA = [
     ("Criar Água",          0, "Druida","Conjuração",   "Criação",    "V, S",     "Curto",    "",              "Instantânea",     "1 ação padrão","",             "Nenhum",   False,"Cria 2 galões de água por nível."),
     ("Detectar Magia",      0, "Druida","Adivinhação",  "",           "V, S",     "60 pés",   "Cone 60 pés",   "Concentração 1 min/nível","1 ação padrão","",    "Nenhum",   False,"Detecta feitiços e itens mágicos."),
-    ("Flare",               0, "Druida","Evocação",     "",           "V",        "Curto",    "",              "Instantânea",     "1 ação padrão","",             "Fortitude",Sim,  "Flash ofuscante; -1 ataque ao alvo."),
+    ("Flare",               0, "Druida","Evocação",     "",           "V",        "Curto",    "",              "Instantânea",     "1 ação padrão","",             "Fortitude",True,  "Flash ofuscante; -1 ataque ao alvo."),
     ("Resistência",         0, "Druida","Abjuração",    "",           "V, S, DF", "Toque",    "",              "1 minuto",        "1 ação padrão","",             "Vontade",  False,"+1 em todos os testes de resistência."),
     ("Amizade com Animais", 1, "Druida","Encantamento", "Encantamento","V, S, M", "Curto",    "",              "1 hora/nível",    "1 ação padrão","",             "Vontade",  False,"Torna animal magicamente amigável."),
     ("Entalar",             1, "Druida","Transmutação", "",           "V, S, DF", "Longo",    "40 pés de raio","1 min/nível",     "1 ação padrão","",             "Reflexos", False,"Plantas crescem e imobilizam criaturas na área."),
     ("Forma Animal",        2, "Druida","Transmutação", "",           "V, S, DF", "Pessoal",  "",              "1 hora/nível",    "1 ação padrão","",             "Nenhum",   False,"Transforma o druida em animal de tamanho médio ou menor."),
-    ("Chamado de Relâmpago",3, "Druida","Evocação",     "Elétrico",   "V, S, DF", "Médio",    "Cilindro 30 pés","Concentração 1 min/nível","1 rodada","3d6 elétrico","Reflexos",Sim,"Chama raios do céu repetidamente na área."),
+    ("Chamado de Relâmpago",3, "Druida","Evocação",     "Elétrico",   "V, S, DF", "Médio",    "Cilindro 30 pés","Concentração 1 min/nível","1 rodada","3d6 elétrico","Reflexos",True,"Chama raios do céu repetidamente na área."),
     ("Neutralizar Veneno",  3, "Druida","Conjuração",   "Cura",       "V, S, M",  "Toque",    "",              "Instantânea",     "1 ação padrão","",             "Vontade",  False,"Neutraliza veneno e cura dano de veneno."),
     ("Controlar Água",      4, "Druida","Transmutação", "",           "V, S, DF", "Longo",    "300 pés cúbicos/nível","10 min/nível","1 ação padrão","",          "Nenhum",   False,"Baixa ou eleva nível de água em área."),
     ("Reencarnação",        4, "Druida","Transmutação", "",           "V, S, M, DF","Toque",  "",              "Instantânea",     "10 minutos",   "",             "Nenhum",   False,"Traz criatura morta de volta em novo corpo aleatório."),
@@ -180,16 +181,16 @@ MAGIAS_BARDO = [
     ("Mão de Mago",         0, "Bardo","Transmutação",  "",           "V, S",     "Curto",    "",              "Concentração",    "1 ação padrão","",             "Nenhum",   False,"Mão telecinética move até 5 lb."),
     ("Mensagem",            0, "Bardo","Transmutação",  "",           "V, S, F",  "Médio",    "",              "10 min/nível",    "1 ação padrão","",             "Nenhum",   False,"Sussurra mensagem a distância."),
     ("Prestidigitação",     0, "Bardo","Universal",     "",           "V, S",     "10 pés",   "",              "1 hora",          "1 ação padrão","",             "Nenhum",   False,"Realiza truques mágicos menores."),
-    ("Charme de Pessoa",    1, "Bardo","Encantamento",  "Enfeitiçar", "V, S",     "Curto",    "",              "1 hora/nível",    "1 ação padrão","",             "Vontade",  Sim,  "Faz pessoa tratar conjurador como amigo."),
+    ("Charme de Pessoa",    1, "Bardo","Encantamento",  "Enfeitiçar", "V, S",     "Curto",    "",              "1 hora/nível",    "1 ação padrão","",             "Vontade",  True,  "Faz pessoa tratar conjurador como amigo."),
     ("Compreender Idiomas", 1, "Bardo","Adivinhação",   "",           "V, S, M",  "Pessoal",  "",              "10 min/nível",    "1 ação padrão","",             "Nenhum",   False,"Compreende qualquer idioma."),
     ("Cura Leve",           1, "Bardo","Conjuração",    "Cura",       "V, S",     "Toque",    "",              "Instantânea",     "1 ação padrão","1d8+1/nível",  "Vontade",  False,"Cura 1d8 + 1/nível PV."),
     ("Dormir",              1, "Bardo","Encantamento",  "Compulsão",  "V, S, M",  "Médio",    "Burst 10 pés",  "1 min/nível",     "1 rodada",     "",             "Vontade",  False,"Faz criaturas adormecerem."),
     ("Detectar Pensamentos",2, "Bardo","Adivinhação",   "",           "V, S, F",  "60 pés",   "Cone 60 pés",   "Concentração 1 min/nível","1 ação padrão","",    "Vontade",  False,"Lê pensamentos superficiais."),
     ("Invisibilidade",      2, "Bardo","Ilusão",        "Glamour",    "V, S, M",  "Pessoal/Toque","",          "1 min/nível",     "1 ação padrão","",             "Vontade",  False,"Torna criatura invisível."),
-    ("Sugestão",            2, "Bardo","Encantamento",  "Compulsão",  "V, M",     "Curto",    "",              "1 hora/nível",    "1 ação padrão","",             "Vontade",  Sim,  "Compele alvo a seguir sugestão razoável."),
+    ("Sugestão",            2, "Bardo","Encantamento",  "Compulsão",  "V, M",     "Curto",    "",              "1 hora/nível",    "1 ação padrão","",             "Vontade",  True,  "Compele alvo a seguir sugestão razoável."),
     ("Clarividência",       3, "Bardo","Adivinhação",   "",           "V, S, F",  "Longo",    "",              "1 min/nível",     "10 minutos",   "",             "Nenhum",   False,"Vê ou ouve em local distante."),
     ("Dissipar Magia",      3, "Bardo","Abjuração",     "",           "V, S",     "Médio",    "",              "Instantânea",     "1 ação padrão","",             "Nenhum",   False,"Cancela feitiços e efeitos mágicos."),
-    ("Dominar Pessoa",      4, "Bardo","Encantamento",  "Compulsão",  "V, S",     "Curto",    "",              "1 dia/nível",     "1 rodada",     "",             "Vontade",  Sim,  "Controla ações de uma pessoa."),
+    ("Dominar Pessoa",      4, "Bardo","Encantamento",  "Compulsão",  "V, S",     "Curto",    "",              "1 dia/nível",     "1 rodada",     "",             "Vontade",  True,  "Controla ações de uma pessoa."),
     ("Localizar Criatura",  4, "Bardo","Adivinhação",   "",           "V, S, M",  "Longo",    "",              "10 min/nível",    "1 ação padrão","",             "Nenhum",   False,"Sente direção de criatura específica."),
     ("Geas",                6, "Bardo","Encantamento",  "Compulsão",  "V",        "Curto",    "",              "1 dia/nível",     "1 rodada",     "",             "Vontade",  False,"Obriga criatura a cumprir tarefa ou sofrer penalidade."),
 ]
@@ -233,86 +234,70 @@ MAGIAS_RANGER = [
 
 
 def seed_magias(db: Session, force: bool = False) -> dict:
-    """
-    Popula tabela de magias com dados do D&D 3.5 PHB.
+    stats = {'inseridas': 0, 'ignoradas': 0, 'erros': 0, 'total': 0}
 
-    SRP: Única responsabilidade — inserir dados de magias.
-
-    Args:
-        db: Sessão SQLAlchemy
-        force: Se True, limpa a tabela antes de inserir
-
-    Returns:
-        dict: Estatísticas da operação
-    """
-    stats = {
-        'inseridas': 0,
-        'ignoradas': 0,
-        'erros': 0,
-        'total': 0,
-    }
-
-    try:
-        # ── Verificar se já tem dados ──
-        total_existente = db.query(Magia).count()
-        if total_existente > 0 and not force:
-            print(f"✅ Tabela magias já populada com {total_existente} registros. Pulando seed.")
-            stats['ignoradas'] = total_existente
-            return stats
-
-        # ── Limpar se force=True ──
-        if force:
-            db.query(Magia).delete()
-            db.commit()
-            print("🗑️  Tabela magias limpa para re-seed.")
-
-        # ── Consolidar todas as magias ──
-        todas_magias = (
-            MAGIAS_MAGO +
-            MAGIAS_CLERIGO +
-            MAGIAS_DRUIDA +
-            MAGIAS_BARDO +
-            MAGIAS_PALADINO +
-            MAGIAS_RANGER
-        )
-
-        # ── Inserir em lotes ──
-        LOTE = 50
-        for i in range(0, len(todas_magias), LOTE):
-            lote = todas_magias[i:i + LOTE]
-            for dados in lote:
-                try:
-                    magia = Magia(
-                        nome              = dados[0],
-                        nivel             = dados[1],
-                        classe            = dados[2],
-                        escola            = dados[3],
-                        sub_escola        = dados[4],
-                        componentes       = dados[5],
-                        alcance           = dados[6],
-                        area_efeito       = dados[7],
-                        duracao           = dados[8],
-                        tempo_conjuracao  = dados[9],
-                        dano              = dados[10],
-                        teste_resistencia = dados[11],
-                        resistencia_magica= dados[12],
-                        descricao         = dados[13],
-                        ativo             = True,
-                    )
-                    db.add(magia)
-                    stats['inseridas'] += 1
-                except Exception as e:
-                    stats['erros'] += 1
-                    print(f"❌ Erro ao inserir magia '{dados[0]}': {e}")
-
-            db.commit()
-            print(f"✅ Lote {i // LOTE + 1}: {min(i + LOTE, len(todas_magias))}/{len(todas_magias)} magias inseridas.")
-
-        stats['total'] = stats['inseridas']
-        print(f"\n✅ Seed completo! {stats['inseridas']} magias inseridas com sucesso.")
+    total_existente = db.query(Magia).count()
+    if total_existente > 0 and not force:
+        print(f"✅ Tabela 'magias' já populada com {total_existente} registros.")
+        stats['ignoradas'] = total_existente
         return stats
 
-    except Exception as e:
-        db.rollback()
-        print(f"❌ Erro crítico no seed de magias: {e}")
-        raise
+    if force and total_existente > 0:
+        db.query(Magia).delete()
+        db.commit()
+        print(f"🗑️  Tabela limpa.")
+
+    todas_magias = (
+        MAGIAS_MAGO + MAGIAS_CLERIGO + MAGIAS_DRUIDA +
+        MAGIAS_BARDO + MAGIAS_PALADINO + MAGIAS_RANGER
+    )
+
+    stats['total'] = len(todas_magias)
+    LOTE = 50
+
+    for i in range(0, len(todas_magias), LOTE):
+        lote = todas_magias[i:i + LOTE]
+        try:
+            for dados in lote:
+                # ✅ CORRIGIDO: converte "Sim"/strings para bool correto
+                res_magica = dados[12]
+                if isinstance(res_magica, str):
+                    res_magica = res_magica.strip().lower() in ('sim', 'true', '1', 'yes')
+
+                magia = Magia(
+                    nome               = dados[0],
+                    nivel              = dados[1],
+                    classe             = dados[2],
+                    escola             = dados[3] or None,
+                    sub_escola         = dados[4] or None,
+                    componentes        = dados[5] or None,
+                    alcance            = dados[6] or None,
+                    area_efeito        = dados[7] or None,
+                    duracao            = dados[8] or None,
+                    tempo_conjuracao   = dados[9] or None,
+                    dano               = dados[10] or None,
+                    teste_resistencia  = dados[11] or None,
+                    resistencia_magica = res_magica,  # ✅ bool correto
+                    descricao          = dados[13],
+                    ativo              = True,
+                )
+                db.add(magia)
+                stats['inseridas'] += 1
+            db.commit()
+            print(f"✅ Lote {i // LOTE + 1}: {min(i + LOTE, len(todas_magias))}/{stats['total']}")
+        except Exception as e:
+            db.rollback()
+            stats['erros'] += len(lote)
+            print(f"❌ Erro no lote {i // LOTE + 1}: {e}")
+
+    print(f"\n🎲 Seed finalizado: {stats['inseridas']} inseridas | {stats['erros']} erros")
+    return stats
+
+
+if __name__ == '__main__':
+    db = SessionLocal()
+    try:
+        resultado = seed_magias(db, force=True)
+        print(f"\n📊 Total: {resultado}")
+    finally:
+        db.close()
