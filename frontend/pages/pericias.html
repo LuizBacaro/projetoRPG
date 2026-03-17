@@ -7,22 +7,19 @@
     <meta name="theme-color" content="#8B4513">
     <title>Perícias - D&D 3.5</title>
     
-    <!-- CSS -->
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/pericias.css?v=6.0">
+    <link rel="stylesheet" href="/css/pericias.css?v=7.0">
 </head>
 <body>
     <div class="pericias-wrapper">
-        <!-- ========== HEADER ========== -->
+        <!-- HEADER -->
         <header class="pericias-header">
-            <button id="btn-voltar" class="btn-voltar" aria-label="Voltar">
-                ← Voltar
-            </button>
+            <button id="btn-voltar" class="btn-voltar">← Voltar</button>
             <div class="header-content">
                 <h1>⚔️ Perícias do Personagem</h1>
-                <p class="subtitulo">D&D 3.5 - Gerencie suas perícias e modificadores</p>
+                <p class="subtitulo">D&D 3.5 - Selecione e configure suas perícias</p>
             </div>
             <div class="header-info">
                 <span id="combatente-nome" class="combatente-nome">👤 Carregando...</span>
@@ -30,77 +27,67 @@
             </div>
         </header>
 
-        <!-- ========== SEÇÃO PERÍCIAS DISPONÍVEIS ========== -->
-        <section class="pericias-disponíveis-secao">
-            <h2 class="secao-titulo">📚 Perícias Disponíveis</h2>
-            
-            <!-- Filtros -->
-            <div class="filtros-container">
-                <input type="text" id="filtro-busca" class="filtro-input" placeholder="🔍 Buscar perícia...">
-                <button class="btn-filtro ativo" data-atributo="">Todas</button>
-                <button class="btn-filtro" data-atributo="FOR">💪 FOR</button>
-                <button class="btn-filtro" data-atributo="DES">🎯 DES</button>
-                <button class="btn-filtro" data-atributo="CON">❤️ CON</button>
-                <button class="btn-filtro" data-atributo="INT">🧠 INT</button>
-                <button class="btn-filtro" data-atributo="SAB">👁️ SAB</button>
-                <button class="btn-filtro" data-atributo="CAR">💬 CAR</button>
-            </div>
+        <!-- FILTROS -->
+        <div class="filtros-container">
+            <input type="text" id="filtro-busca" class="filtro-input" placeholder="🔍 Buscar perícia...">
+            <button class="btn-filtro ativo" data-atributo="">Todas</button>
+            <button class="btn-filtro" data-atributo="FOR">💪 FOR</button>
+            <button class="btn-filtro" data-atributo="DES">🎯 DES</button>
+            <button class="btn-filtro" data-atributo="CON">❤️ CON</button>
+            <button class="btn-filtro" data-atributo="INT">🧠 INT</button>
+            <button class="btn-filtro" data-atributo="SAB">👁️ SAB</button>
+            <button class="btn-filtro" data-atributo="CAR">💬 CAR</button>
+        </div>
 
-            <!-- Grid de Perícias -->
-            <div class="pericias-disponivel-grid" id="pericias-disponivel-grid">
-                <p class="vazio">⏳ Carregando perícias...</p>
-            </div>
-        </section>
+        <!-- TABELA DE PERÍCIAS -->
+        <div class="tabela-pericias-container">
+            <table class="tabela-pericias" id="tabela-pericias">
+                <thead>
+                    <tr>
+                        <th class="col-checkbox">✓</th>
+                        <th class="col-nome">Perícia</th>
+                        <th class="col-atributo">Atributo</th>
+                        <th class="col-descricao">Descrição</th>
+                        <th class="col-tipo">Tipo</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-pericias">
+                    <tr><td colspan="5" class="vazio">⏳ Carregando perícias...</td></tr>
+                </tbody>
+            </table>
+        </div>
 
-        <!-- ========== SEÇÃO PERÍCIAS SELECIONADAS ========== -->
-        <section class="pericias-selecionadas-secao">
-            <h2 class="secao-titulo">⭐ Perícias Selecionadas</h2>
-            
-            <!-- Grid de Perícias Selecionadas -->
-            <div class="pericias-selecionada-grid" id="pericias-selecionada-grid">
-                <p class="vazio">Nenhuma perícia adicionada ainda</p>
+        <!-- PERÍCIAS SELECIONADAS -->
+        <div class="pericias-selecionadas-container">
+            <h2 class="pericias-selecionadas-titulo">⭐ Perícias Selecionadas</h2>
+            <div class="pericias-selecionadas-lista" id="pericias-selecionadas-lista">
+                <p class="vazio">Nenhuma perícia selecionada ainda</p>
             </div>
-
-            <!-- Resumo de Estatísticas -->
-            <div id="pericias-stats" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--cor-dourada);">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div style="text-align: center; padding: 1rem; background: rgba(255,215,0,0.08); border-radius: 8px; border: 2px solid var(--cor-dourada);">
-                        <p style="color: #c9b896; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Total de Perícias</p>
-                        <p id="stat-total" style="color: var(--cor-dourada); font-size: 1.5rem; margin: 0; font-weight: bold;">0</p>
-                    </div>
-                    <div style="text-align: center; padding: 1rem; background: rgba(255,215,0,0.08); border-radius: 8px; border: 2px solid var(--cor-dourada);">
-                        <p style="color: #c9b896; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Pontos Gastos</p>
-                        <p id="stat-gastos" style="color: var(--cor-dourada); font-size: 1.5rem; margin: 0; font-weight: bold;">0</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+            <button id="btn-salvar-pericias" class="btn-salvar-pericias">💾 Salvar Perícias</button>
+        </div>
     </div>
 
-    <!-- Container para notificações -->
     <div id="toast-container"></div>
 
-    <!-- Scripts -->
     <script type="module">
         import { PericiaController } from '/js/controllers/PericiaController.js';
         import { NotificationService } from '/js/services/NotificationService.js';
 
         console.log('🎬 Script pericias.html carregado');
 
-        // Verificar token
         const token = localStorage.getItem('token');
         if (!token) {
             window.location.href = '/pages/login.html';
         }
 
-        // Inicializar controller
         const controller = new PericiaController();
+        window.periciaController = controller;
 
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 console.log('🎮 Inicializando controller...');
                 await controller.inicializar();
-                setupFiltros(controller);
+                setupEventos(controller);
                 NotificationService.mostrarSucesso('✅ Perícias carregadas!');
             } catch (error) {
                 console.error('❌ Erro:', error);
@@ -108,24 +95,20 @@
             }
         });
 
-        function setupFiltros(controller) {
-            // Botões de atributo
+        function setupEventos(controller) {
+            // Filtros
             document.querySelectorAll('.btn-filtro').forEach(btn => {
-                btn.addEventListener('click', async () => {
+                btn.addEventListener('click', () => {
                     document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('ativo'));
                     btn.classList.add('ativo');
-                    
-                    const atributo = btn.dataset.atributo;
-                    await controller.filtrarPorAtributo(atributo);
+                    controller.filtrarPorAtributo(btn.dataset.atributo);
                 });
             });
 
-            // Busca
             document.getElementById('filtro-busca').addEventListener('input', (e) => {
                 controller.buscarPericias(e.target.value);
             });
 
-            // Voltar
             document.getElementById('btn-voltar').addEventListener('click', () => {
                 if (window.history.length > 1) {
                     window.history.back();
@@ -133,10 +116,11 @@
                     window.location.href = '/pages/dashboard.html';
                 }
             });
-        }
 
-        // Expor controller globalmente para acesso de event listeners
-        window.periciaController = controller;
+            document.getElementById('btn-salvar-pericias').addEventListener('click', () => {
+                controller.salvarPericias();
+            });
+        }
     </script>
 </body>
 </html>

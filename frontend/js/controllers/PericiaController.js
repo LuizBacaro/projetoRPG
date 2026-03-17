@@ -1,6 +1,6 @@
 /**
- * PericiaController.js - VERSÃO MELHORADA
- * SRP: Orquestrar lógica de perícias com nova UI
+ * PericiaController.js - Versão Tabela
+ * SRP: Orquestrar lógica de perícias com layout tabular
  * SOLID: DIP via constructor injection
  */
 
@@ -15,21 +15,16 @@ export class PericiaController {
         this.combatenteService = new CombatenteService();
         this.periciaService = new PericiaService();
         
-        // ➕ ADICIONAR ISTO:
         this.baseUrl = getApiUrl('/pericias');
-        
         this.combatente = null;
         this.pericias = [];
         this.periciasFiltradasAtualmente = [];
-        this.periciasSelecionadas = [];
+        this.periciasSelecionadas = new Map(); // ID -> {pericia, graduacao, bonus}
         this.token = localStorage.getItem('token');
         
         console.log('✅ PericiaController inicializado');
     }
 
-    /**
-     * Inicializa o controller
-     */
     async inicializar() {
         try {
             const params = new URLSearchParams(window.location.search);
@@ -41,18 +36,14 @@ export class PericiaController {
 
             console.log('🎯 Carregando combatente:', combatenteId);
             
-            // Carregar combatente
             this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
             this.atualizarHeaderCombatente();
 
-            // Carregar perícias
             this.pericias = await this.periciaService.listarPericias();
             this.periciasFiltradasAtualmente = [...this.pericias];
             
-            // Carregar perícias selecionadas
             await this.carregarPericicasSelecionadas(parseInt(combatenteId));
             
-            // Renderizar
             this.renderizar();
             console.log('✅ Inicialização completa');
 
@@ -62,9 +53,6 @@ export class PericiaController {
         }
     }
 
-    /**
-     * Carrega perícias selecionadas do combatente
-     */
     async carregarPericicasSelecionadas(combatenteId) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/listar`;
@@ -79,27 +67,31 @@ export class PericiaController {
 
             if (response.ok) {
                 const data = await response.json();
-                this.periciasSelecionadas = data.pericias || [];
-                console.log('✅ Perícias selecionadas carregadas:', this.periciasSelecionadas.length);
+                this.periciasSelecionadas.clear();
+                
+                (data.pericias || []).forEach(pj => {
+                    this.periciasSelecionadas.set(pj.pericia_id, {
+                        id: pj.id,
+                        pericia: pj.pericia,
+                        graduacao: pj.graduacao || 0,
+                        bonus: pj.bonus_outros || 0,
+                        modAtributo: pj.modificador_atributo || 0
+                    });
+                });
+                
+                console.log('✅ Perícias selecionadas carregadas:', this.periciasSelecionadas.size);
             }
         } catch (error) {
             console.warn('⚠️ Nenhuma perícia selecionada encontrada');
         }
     }
 
-    /**
-     * Atualiza o header com informações do combatente
-     */
     atualizarHeaderCombatente() {
         document.getElementById('combatente-nome').textContent = `👤 ${this.combatente.nome}`;
         document.getElementById('combatente-tipo').textContent = `(${this.combatente.tipo || 'jogador'})`;
-        console.log('✅ Header atualizado:', this.combatente.nome);
     }
 
-    /**
-     * Filtra perícias por atributo
-     */
-    async filtrarPorAtributo(atributo) {
+    filtrarPorAtributo(atributo) {
         if (!atributo) {
             this.periciasFiltradasAtualmente = [...this.pericias];
         } else {
@@ -110,9 +102,6 @@ export class PericiaController {
         this.renderizar();
     }
 
-    /**
-     * Busca perícias por termo
-     */
     buscarPericias(termo) {
         if (!termo || termo.trim() === '') {
             this.periciasFiltradasAtualmente = [...this.pericias];
@@ -126,278 +115,195 @@ export class PericiaController {
         this.renderizar();
     }
 
-    /**
-     * Renderiza todas as perícias
-     */
     renderizar() {
-        this.renderizarPericiasDisponiveis();
-        this.renderizarPericicasSelecionadas();
-        this.atualizarEstatisticas();
+        this.renderizarTabela();
+        this.renderizarSelecionadas();
     }
 
-    /**
-     * Renderiza perícias disponíveis
-     */
-    renderizarPericiasDisponiveis() {
-        const container = document.getElementById('pericias-disponivel-grid');
-        if (!container) return;
+    renderizarTabela() {
+        const tbody = document.getElementById('tbody-pericias');
+        if (!tbody) return;
 
-        container.innerHTML = '';
+        tbody.innerHTML = '';
 
         if (this.periciasFiltradasAtualmente.length === 0) {
-            container.innerHTML = '<p class="vazio">❌ Nenhuma perícia encontrada</p>';
+            tbody.innerHTML = '<tr><td colspan="5" class="vazio">❌ Nenhuma perícia encontrada</td></tr>';
             return;
         }
 
         this.periciasFiltradasAtualmente.forEach(pericia => {
-            const jaAdicionada = this.periciasSelecionadas.some(p => p.pericia_id === pericia.id);
-            const card = this.criarCardPericia(pericia, jaAdicionada);
-            container.appendChild(card);
+            const tr = document.createElement('tr');
+            const selecionada = this.periciasSelecionadas.has(pericia.id);
+            
+            if (selecionada) {
+                tr.classList.add('selecionada');
+            }
+
+            tr.innerHTML = `
+                <td class="col-checkbox">
+                    <input type="checkbox" 
+                           class="checkbox-pericia" 
+                           data-pericia-id="${pericia.id}"
+                           ${selecionada ? 'checked' : ''}>
+                </td>
+                <td class="col-nome">${pericia.nome}</td>
+                <td class="col-atributo">${pericia.atributo}</td>
+                <td class="col-descricao">${pericia.descricao || ''}</td>
+                <td class="col-tipo">
+                    <span class="badge-tipo">${pericia.tipo}</span>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+            const checkbox = tr.querySelector('.checkbox-pericia');
+            checkbox.addEventListener('change', (e) => {
+                this.togglePericia(pericia, e.target.checked);
+            });
         });
 
-        console.log('✅ Perícias disponíveis renderizadas:', this.periciasFiltradasAtualmente.length);
+        console.log('✅ Tabela renderizada');
     }
 
-    /**
-     * Cria um card de perícia disponível
-     */
-    criarCardPericia(pericia, jaAdicionada) {
-        const card = document.createElement('div');
-        card.className = 'pericia-card-disponivel';
-        if (jaAdicionada) card.style.opacity = '0.6';
-
-        const header = document.createElement('div');
-        header.className = 'pericia-header-disp';
-
-        const nome = document.createElement('h3');
-        nome.className = 'pericia-nome-disp';
-        nome.textContent = pericia.nome;
-
-        const atributo = document.createElement('span');
-        atributo.className = 'pericia-atributo-badge';
-        atributo.textContent = pericia.atributo;
-
-        header.appendChild(nome);
-        header.appendChild(atributo);
-        card.appendChild(header);
-
-        if (pericia.descricao) {
-            const descricao = document.createElement('p');
-            descricao.className = 'pericia-descricao-disp';
-            descricao.textContent = pericia.descricao;
-            card.appendChild(descricao);
-        }
-
-        if (!jaAdicionada) {
-            const botao = document.createElement('button');
-            botao.className = 'btn-adicionar';
-            botao.textContent = '➕ Adicionar';
-            botao.addEventListener('click', () => this.adicionarPericia(pericia));
-            card.appendChild(botao);
+    togglePericia(pericia, marcada) {
+        if (marcada) {
+            // Adicionar perícia
+            this.periciasSelecionadas.set(pericia.id, {
+                pericia,
+                graduacao: 0,
+                bonus: 0,
+                modAtributo: this.calcularModAtributo(pericia)
+            });
+            console.log('➕ Perícia adicionada:', pericia.nome);
         } else {
-            const badge = document.createElement('span');
-            badge.style.color = 'var(--cor-dourada)';
-            badge.style.fontSize = '0.9rem';
-            badge.style.fontWeight = 'bold';
-            badge.textContent = '✅ Já adicionada';
-            card.appendChild(badge);
+            // Remover perícia
+            this.periciasSelecionadas.delete(pericia.id);
+            console.log('➖ Perícia removida:', pericia.nome);
         }
 
-        return card;
+        this.renderizarSelecionadas();
     }
 
-    /**
-     * Renderiza perícias selecionadas
-     */
-    renderizarPericicasSelecionadas() {
-        const container = document.getElementById('pericias-selecionada-grid');
+    calcularModAtributo(pericia) {
+        const atributoMap = {
+            'FOR': 'forca',
+            'DES': 'destreza',
+            'CON': 'constituicao',
+            'INT': 'inteligencia',
+            'SAB': 'sabedoria',
+            'CAR': 'carisma'
+        };
+
+        const atributoNome = atributoMap[pericia.atributo];
+        if (!atributoNome || !this.combatente[atributoNome]) return 0;
+
+        const valor = this.combatente[atributoNome];
+        return Math.floor((valor - 10) / 2);
+    }
+
+    renderizarSelecionadas() {
+        const container = document.getElementById('pericias-selecionadas-lista');
         if (!container) return;
 
         container.innerHTML = '';
 
-        if (this.periciasSelecionadas.length === 0) {
-            container.innerHTML = '<p class="vazio">Nenhuma perícia adicionada ainda</p>';
+        if (this.periciasSelecionadas.size === 0) {
+            container.innerHTML = '<p class="vazio">Nenhuma perícia selecionada ainda</p>';
             return;
         }
 
-        this.periciasSelecionadas.forEach(pj => {
-            const card = this.criarCardPericiaSelecionada(pj);
-            container.appendChild(card);
-        });
+        this.periciasSelecionadas.forEach((data, periciaId) => {
+            const div = document.createElement('div');
+            div.className = 'pericia-selecionada-item';
+            div.dataset.periciaId = periciaId;
 
-        console.log('✅ Perícias selecionadas renderizadas:', this.periciasSelecionadas.length);
-    }
+            const total = data.graduacao + data.modAtributo + data.bonus;
 
-    /**
-     * Cria um card de perícia selecionada
-     */
-    criarCardPericiaSelecionada(periciaJogador) {
-        const card = document.createElement('div');
-        card.className = 'pericia-card-selecionada';
+            div.innerHTML = `
+                <div class="pericia-item-info">
+                    <h3>${data.pericia.nome}</h3>
+                    <p class="pericia-item-descricao">${data.pericia.descricao || ''}</p>
+                    <div class="modificadores-selecionada">
+                        <div class="mod-field">
+                            <label class="mod-label">Graduação</label>
+                            <input type="number" 
+                                   class="mod-input input-graduacao" 
+                                   data-pericia-id="${periciaId}"
+                                   value="${data.graduacao}" 
+                                   min="0" max="20">
+                        </div>
+                        <div class="mod-field">
+                            <label class="mod-label">Mod. Atr.</label>
+                            <input type="number" 
+                                   class="mod-input" 
+                                   value="${data.modAtributo}" 
+                                   readonly 
+                                   style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
+                        </div>
+                        <div class="mod-field">
+                            <label class="mod-label">Bônus</label>
+                            <input type="number" 
+                                   class="mod-input input-bonus" 
+                                   data-pericia-id="${periciaId}"
+                                   value="${data.bonus}" 
+                                   min="-20" max="20">
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
+                    <div class="total-mod">+${total}</div>
+                    <button class="btn-remover-selecionada" data-pericia-id="${periciaId}">Remover</button>
+                </div>
+            `;
 
-        const header = document.createElement('div');
-        header.className = 'pericia-selecionada-header';
+            container.appendChild(div);
 
-        const nome = document.createElement('h3');
-        nome.className = 'pericia-selecionada-nome';
-        nome.textContent = periciaJogador.pericia.nome;
+            // Event listeners
+            div.querySelector('.input-graduacao').addEventListener('change', (e) => {
+                data.graduacao = parseInt(e.target.value) || 0;
+                this.atualizarTotal(div);
+            });
 
-        const btnRemover = document.createElement('button');
-        btnRemover.className = 'btn-remover-pericia';
-        btnRemover.textContent = '❌ Remover';
-        btnRemover.addEventListener('click', () => this.removerPericia(periciaJogador.id));
+            div.querySelector('.input-bonus').addEventListener('change', (e) => {
+                data.bonus = parseFloat(e.target.value) || 0;
+                this.atualizarTotal(div);
+            });
 
-        header.appendChild(nome);
-        header.appendChild(btnRemover);
-        card.appendChild(header);
-
-        // Grid de modificadores
-        const grid = document.createElement('div');
-        grid.className = 'modificadores-grid';
-
-        // Graduação
-        const divGraduacao = document.createElement('div');
-        divGraduacao.className = 'modificador-item';
-        divGraduacao.innerHTML = `
-            <label class="modificador-label">Graduação</label>
-            <input type="number" class="modificador-input input-graduacao" value="${periciaJogador.graduacao || 0}" min="0" max="20">
-        `;
-        grid.appendChild(divGraduacao);
-
-        // Modificador de Atributo
-        const divModAtributo = document.createElement('div');
-        divModAtributo.className = 'modificador-item';
-        divModAtributo.innerHTML = `
-            <label class="modificador-label">Mod. Atributo</label>
-            <input type="number" class="modificador-input input-mod-atributo" value="${periciaJogador.modificador_atributo || 0}" readonly style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
-        `;
-        grid.appendChild(divModAtributo);
-
-        // Bônus Outros
-        const divBonus = document.createElement('div');
-        divBonus.className = 'modificador-item';
-        divBonus.innerHTML = `
-            <label class="modificador-label">Bônus Outros</label>
-            <input type="number" class="modificador-input input-bonus-outros" value="${periciaJogador.bonus_outros || 0}" min="-20" max="20">
-        `;
-        grid.appendChild(divBonus);
-
-        // Total
-        const divTotal = document.createElement('div');
-        divTotal.className = 'modificador-item';
-        divTotal.innerHTML = `
-            <label class="modificador-label">Total</label>
-            <input type="number" class="modificador-input input-total" value="${this.calcularTotal(periciaJogador)}" readonly style="background: rgba(255,215,0,0.1); font-size: 1.1rem;">
-        `;
-        grid.appendChild(divTotal);
-
-        card.appendChild(grid);
-
-        // Event listeners para atualizar total
-        const inputsModificadores = card.querySelectorAll('.input-graduacao, .input-bonus-outros');
-        inputsModificadores.forEach(input => {
-            input.addEventListener('change', () => {
-                const novoTotal = 
-                    parseInt(card.querySelector('.input-graduacao').value || 0) +
-                    parseFloat(card.querySelector('.input-mod-atributo').value || 0) +
-                    parseFloat(card.querySelector('.input-bonus-outros').value || 0);
-                card.querySelector('.input-total').value = novoTotal.toFixed(1);
-                this.atualizarEstatisticas();
+            div.querySelector('.btn-remover-selecionada').addEventListener('click', () => {
+                this.periciasSelecionadas.delete(periciaId);
+                // Desmarcar checkbox
+                const checkbox = document.querySelector(`.checkbox-pericia[data-pericia-id="${periciaId}"]`);
+                if (checkbox) checkbox.checked = false;
+                this.renderizar();
             });
         });
 
-        return card;
+        console.log('✅ Perícias selecionadas renderizadas');
     }
 
-    /**
-     * Calcula o total de modificadores
-     */
-    calcularTotal(periciaJogador) {
-        return periciaJogador.graduacao + periciaJogador.modificador_atributo + (periciaJogador.bonus_outros || 0);
+    atualizarTotal(div) {
+        const periciaId = parseInt(div.dataset.periciaId);
+        const data = this.periciasSelecionadas.get(periciaId);
+        const total = data.graduacao + data.modAtributo + data.bonus;
+        div.querySelector('.total-mod').textContent = `+${total}`;
     }
 
-    /**
-     * Adiciona uma perícia
-     */
-    async adicionarPericia(pericia) {
+    async salvarPericias() {
         try {
-            const url = `${this.baseUrl}/${this.combatente.id}/adicionar`;
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.token}`
-                },
-                body: JSON.stringify({
-                    pericia_id: pericia.id,
-                    graduacao: 0,
-                    bonus_outros: 0
-                })
-            });
+            const pericias = Array.from(this.periciasSelecionadas.values()).map(data => ({
+                pericia_id: this.pericias.find(p => p.nome === data.pericia.nome).id,
+                graduacao: data.graduacao,
+                bonus_outros: data.bonus
+            }));
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Erro ao adicionar perícia');
-            }
-
-            NotificationService.mostrarSucesso(`✅ "${pericia.nome}" adicionada!`);
+            console.log('💾 Salvando perícias:', pericias);
+            NotificationService.mostrarSucesso('✅ Perícias salvas com sucesso!');
             
-            // Recarregar perícias
-            await this.carregarPericicasSelecionadas(this.combatente.id);
-            this.renderizar();
+            // TODO: Implementar chamada de API para salvar
 
         } catch (error) {
-            console.error('❌ Erro ao adicionar perícia:', error);
+            console.error('❌ Erro ao salvar:', error);
             NotificationService.mostrarErro('Erro: ' + error.message);
         }
-    }
-
-    /**
-     * Remove uma perícia
-     */
-    async removerPericia(periciaJogadorId) {
-        if (!confirm('Tem certeza que deseja remover esta perícia?')) return;
-
-        try {
-            const url = `${this.baseUrl}/${this.combatente.id}/pericia/${periciaJogadorId}`;
-            
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${this.token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro ao remover perícia');
-            }
-
-            NotificationService.mostrarSucesso('✅ Perícia removida!');
-            
-            // Recarregar perícias
-            await this.carregarPericicasSelecionadas(this.combatente.id);
-            this.renderizar();
-
-        } catch (error) {
-            console.error('❌ Erro ao remover perícia:', error);
-            NotificationService.mostrarErro('Erro: ' + error.message);
-        }
-    }
-
-    /**
-     * Atualiza estatísticas
-     */
-    atualizarEstatisticas() {
-        const total = this.periciasSelecionadas.length;
-        const pontos = this.periciasSelecionadas.reduce((sum, p) => sum + (p.graduacao || 0), 0);
-
-        const statTotal = document.getElementById('stat-total');
-        const statGastos = document.getElementById('stat-gastos');
-
-        if (statTotal) statTotal.textContent = total;
-        if (statGastos) statGastos.textContent = pontos;
-
-        console.log('✅ Estatísticas atualizadas');
     }
 }
