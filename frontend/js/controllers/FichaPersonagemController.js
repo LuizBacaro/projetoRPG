@@ -1,264 +1,251 @@
-/*
-   FichaPersonagemController.js
-   SRP: carregar e exibir a ficha completa do personagem
-   Recebe o ID via query string: /ficha-personagem.html?id=123
-*/
+/**
+ * FichaPersonagemController.js
+ * SRP: Controlar renderização da ficha do personagem
+ * SOLID: DIP via constructor injection de services
+ */
 
+import { PericiaService } from '../services/PericiaService.js';
 import { CombatenteService } from '../services/CombatenteService.js';
-import { MagiaSlotService   } from '../services/MagiaSlotService.js';
-import { getApiUrl          } from '../config/api.config.js';
 
-class FichaPersonagemController {
-
+export class FichaPersonagemController {
     constructor() {
+        this.periciaService = new PericiaService();
         this.combatenteService = new CombatenteService();
-        this.magiaSlotService  = new MagiaSlotService();
-        this._init();
+        this.token = localStorage.getItem('token');
+        this.combatente = null;
+        this.pericias = [];
+        
+        console.log('✅ FichaPersonagemController inicializado');
     }
 
-    // ── Inicialização ─────────────────────────────────────────
-    async _init() {
-        const id = this._obterIdDaUrl();
-        if (!id) {
-            this._mostrarErro('ID do personagem não encontrado na URL.');
-            return;
-        }
+    async inicializar() {
         try {
-            // ✅ CORRIGIDO: obterPorId() — nome correto do CombatenteService
-            const personagem = await this.combatenteService.obterPorId(id);
-            if (!personagem) {
-                this._mostrarErro('Personagem não encontrado.');
-                return;
+            // Obter ID da URL
+            const params = new URLSearchParams(window.location.search);
+            const combatenteId = params.get('id');
+
+            if (!combatenteId) {
+                throw new Error('ID do combatente não fornecido');
             }
-            this._renderizar(personagem);
-        } catch (err) {
-            console.error('[FichaPersonagemController] Erro ao carregar:', err);
-            this._mostrarErro('Erro ao carregar personagem. Verifique o console.');
+
+            console.log('🎯 Carregando ficha do combatente:', combatenteId);
+
+            // Carregar combatente
+            this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
+            console.log('✅ Combatente carregado:', this.combatente.nome);
+
+            // Renderizar dados básicos
+            this.renderizarIdentidade();
+            this.renderizarAtributos();
+            this.renderizarDefesa();
+            this.renderizarResistencias();
+
+            // Carregar e renderizar perícias
+            await this.carregarRenderizarPericias(parseInt(combatenteId));
+
+            console.log('✅ Ficha carregada com sucesso');
+
+        } catch (error) {
+            console.error('❌ Erro ao inicializar ficha:', error);
+            this.mostrarErro('Erro ao carregar ficha: ' + error.message);
         }
     }
 
-    // ── Utilitários ───────────────────────────────────────────
-    _obterIdDaUrl() {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('id');
-    }
-
-    _mod(valor) {
-        const m = Math.floor(((valor || 10) - 10) / 2);
-        return m >= 0 ? ('+' + m) : ('' + m);
-    }
-
-    _sinal(valor) {
-        if (valor === null || valor === undefined) return '+0';
-        return valor >= 0 ? ('+' + valor) : ('' + valor);
-    }
-
-    _texto(id, valor) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = valor;
-    }
-
-    // ── Renderização principal ────────────────────────────────
-    _renderizar(p) {
-        document.title = (p.nome || 'Personagem') + ' — Ficha';
-
-        this._renderizarIdentidade(p);
-        this._renderizarFoto(p);
-        this._renderizarAtributos(p);
-        this._renderizarDefesa(p);
-        this._renderizarResistencias(p);
-        this._renderizarPericias(p.pericias || []);
-        this._renderizarEquipamentos(p.equipamentos || []);
-        this._renderizarAtaques(p.ataques || []);
-        this._renderizarMagias(p.magias_slots || []);
-    }
-
-    // ── Identidade ────────────────────────────────────────────
-    _renderizarIdentidade(p) {
-        this._texto('fichaNome',   p.nome    || '—');
-        this._texto('fichaRaca',   p.raca    || '—');
-        this._texto('fichaClasse', p.classe  || '—');
-        this._texto('fichaTipo',   p.tipo    || '—');
-        this._texto('fichaNivel',  (p.nivel  || 1) + 'º nível');
-
-        // ✅ Aplica cor do badge de tipo
-        const tagTipo = document.getElementById('fichaTipo');
-        if (tagTipo && p.tipo) {
-            tagTipo.className = 'ficha-tag ficha-tag-tipo ficha-tag-' + p.tipo.toLowerCase();
-        }
-    }
-
-    // ── Foto ──────────────────────────────────────────────────
-    _renderizarFoto(p) {
-        const img         = document.getElementById('fichaFoto');
+    /**
+     * Renderiza identidade do combatente
+     */
+    renderizarIdentidade() {
+        const nome = document.getElementById('fichaNome');
+        const raca = document.getElementById('fichaRaca');
+        const classe = document.getElementById('fichaClasse');
+        const tipo = document.getElementById('fichaTipo');
+        const nivel = document.getElementById('fichaNivel');
         const placeholder = document.getElementById('fichaFotoPlaceholder');
-        if (!img) return;
+        const foto = document.getElementById('fichaFoto');
 
-        if (p.foto_url) {
-            img.src = p.foto_url;
-            img.onload  = () => {
-                img.classList.add('carregada');
-                if (placeholder) placeholder.style.display = 'none';
-            };
-            img.onerror = () => {
-                // Foto com erro → mantém placeholder
-                img.style.display = 'none';
-            };
+        if (nome) nome.textContent = this.combatente.nome;
+        if (raca) raca.textContent = this.combatente.raca || '—';
+        if (classe) classe.textContent = this.combatente.classe || '—';
+        if (tipo) tipo.textContent = this.combatente.tipo || 'jogador';
+        if (nivel) nivel.textContent = this.combatente.nivel || 1;
+
+        // Foto
+        if (this.combatente.foto_url) {
+            foto.src = this.combatente.foto_url;
+            foto.classList.add('carregada');
+            if (placeholder) placeholder.style.display = 'none';
+        } else {
+            const emojiMap = { jogador: '🧙', npc: '🤝', monstro: '👹' };
+            if (placeholder) placeholder.textContent = emojiMap[this.combatente.tipo] || '⚔️';
         }
+
+        console.log('✅ Identidade renderizada');
     }
 
-    // ── Atributos ─────────────────────────────────────────────
-    _renderizarAtributos(p) {
-        const atribs = [
-            ['For', p.forca        || 10],
-            ['Des', p.destreza     || 10],
-            ['Con', p.constituicao || 10],
-            ['Int', p.inteligencia || 10],
-            ['Sab', p.sabedoria    || 10],
-            ['Car', p.carisma      || 10],
-        ];
+    /**
+     * Renderiza atributos em círculos
+     */
+    renderizarAtributos() {
+        const atributos = ['forca', 'destreza', 'constituicao', 'inteligencia', 'sabedoria', 'carisma'];
+        const abreviacoes = { forca: 'For', destreza: 'Des', constituicao: 'Con', inteligencia: 'Int', sabedoria: 'Sab', carisma: 'Car' };
 
-        atribs.forEach(([chave, valor]) => {
-            this._texto('ficha' + chave,        valor);
-            this._texto('ficha' + chave + 'Mod', this._mod(valor));
+        atributos.forEach(attr => {
+            const valor = this.combatente[attr] || 10;
+            const modificador = Math.floor((valor - 10) / 2);
+
+            const elementoValor = document.getElementById(`ficha${abreviacoes[attr]}`);
+            const elementoMod = document.getElementById(`ficha${abreviacoes[attr]}Mod`);
+
+            if (elementoValor) elementoValor.textContent = valor;
+            if (elementoMod) elementoMod.textContent = modificador >= 0 ? `+${modificador}` : `${modificador}`;
         });
+
+        console.log('✅ Atributos renderizados');
     }
 
-    // ── Defesa ────────────────────────────────────────────────
-    _renderizarDefesa(p) {
-        // CA
-        this._texto('fichaCa',       p.ca       !== undefined ? p.ca       : 10);
-        this._texto('fichaToque',    p.toque     !== undefined ? p.toque    : 10);
-        this._texto('fichaSurpresa', p.surpresa  !== undefined ? p.surpresa : 10);
+    /**
+     * Renderiza defesa (CA, PV, Iniciativa)
+     */
+    renderizarDefesa() {
+        const ca = document.getElementById('fichaCa');
+        const pv = document.getElementById('fichaPv');
+        const pvFill = document.getElementById('fichaPvFill');
+        const iniciativa = document.getElementById('fichaIniciativa');
 
-        // Iniciativa
-        this._texto('fichaIniciativa', this._sinal(p.iniciativa || 0));
+        if (ca) ca.textContent = this.combatente.ca || 10;
+        if (pv) pv.textContent = `${this.combatente.hp_atual}/${this.combatente.hp_maximo}`;
+        
+        if (pvFill) {
+            const percentual = (this.combatente.hp_atual / this.combatente.hp_maximo) * 100;
+            pvFill.style.width = `${percentual}%`;
+        }
 
-        // PV com barra de cor dinâmica
-        const hpAtual = p.hp_atual  || 0;
-        const hpMax   = p.hp_maximo || 0;
-        this._texto('fichaPv', hpAtual + ' / ' + hpMax);
+        if (iniciativa) {
+            const ini = this.combatente.iniciativa || 0;
+            iniciativa.textContent = ini >= 0 ? `+${ini}` : `${ini}`;
+        }
 
-        const pct  = hpMax > 0 ? Math.min(100, (hpAtual / hpMax) * 100) : 0;
-        const cor  = pct > 50 ? '#4CAF50' : pct > 25 ? '#FF9800' : '#F44336';
-        const fill = document.getElementById('fichaPvFill');
-        if (fill) {
-            fill.style.width      = pct + '%';
-            fill.style.background = cor;
+        console.log('✅ Defesa renderizada');
+    }
+
+    /**
+     * Renderiza resistências
+     */
+    renderizarResistencias() {
+        const fort = document.getElementById('fichaFort');
+        const reflex = document.getElementById('fichaReflex');
+        const vont = document.getElementById('fichaVont');
+
+        if (fort) fort.textContent = `+${this.combatente.fortitude || 0}`;
+        if (reflex) reflex.textContent = `+${this.combatente.reflexos || 0}`;
+        if (vont) vont.textContent = `+${this.combatente.vontade || 0}`;
+
+        console.log('✅ Resistências renderizadas');
+    }
+
+    /**
+     * Carrega e renderiza perícias do combatente
+     */
+    async carregarRenderizarPericias(combatenteId) {
+        try {
+            const url = `http://localhost:8000/api/v1/pericias/${combatenteId}/listar`;
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Erro ao carregar perícias`);
+            }
+
+            const data = await response.json();
+            const pericias = data.pericias || [];
+
+            console.log('✅ Perícias carregadas:', pericias.length);
+
+            this.renderizarPericiasNaFicha(pericias);
+
+        } catch (error) {
+            console.warn('⚠️ Erro ao carregar perícias:', error);
+            this.renderizarPericiasVazias();
         }
     }
 
-    // ── Resistências ──────────────────────────────────────────
-    _renderizarResistencias(p) {
-        this._texto('fichaFort',   this._sinal(p.fortitude || 0));
-        this._texto('fichaReflex', this._sinal(p.reflexos  || 0));
-        this._texto('fichaVont',   this._sinal(p.vontade   || 0));
-    }
-
-    // ── Perícias ──────────────────────────────────────────────
-    _renderizarPericias(pericias) {
+    /**
+     * Renderiza perícias na ficha
+     */
+    renderizarPericiasNaFicha(pericias) {
         const container = document.getElementById('fichaPericiasLista');
         if (!container) return;
 
-        if (!pericias.length) {
-            container.innerHTML = '<span class="ficha-vazio">Nenhuma perícia cadastrada</span>';
+        container.innerHTML = '';
+
+        if (pericias.length === 0) {
+            container.innerHTML = '<span class="ficha-vazio">Nenhuma perícia selecionada</span>';
             return;
         }
 
-        // ✅ Ordena por valor decrescente
-        const ordenadas = [...pericias].sort((a, b) => (b.valor || 0) - (a.valor || 0));
+        pericias.forEach(pj => {
+            const total = pj.graduacao + pj.modificador_atributo + (pj.bonus_outros || 0);
 
-        container.innerHTML = ordenadas.map(p => `
-            <div class="ficha-pericia-item">
-                <span class="ficha-pericia-nome">${p.nome || '—'}</span>
-                <span class="ficha-pericia-valor">${this._sinal(p.valor || 0)}</span>
-            </div>
-        `).join('');
-    }
+            const item = document.createElement('div');
+            item.className = 'ficha-pericia-item';
+            item.title = pj.pericia.descricao || '';
 
-    // ── Equipamentos ──────────────────────────────────────────
-    _renderizarEquipamentos(equipamentos) {
-        const container = document.getElementById('fichaEquipamentos');
-        if (!container) return;
-
-        if (!equipamentos.length) {
-            container.innerHTML = '<span class="ficha-vazio">Nenhum equipamento cadastrado</span>';
-            return;
-        }
-
-        container.innerHTML = equipamentos.map(e => `
-            <div class="ficha-equip-item">
-                🗡️ <span>${e.nome || '—'}${e.descricao ? ' — ' + e.descricao : ''}</span>
-            </div>
-        `).join('');
-    }
-
-    // ── Ataques ───────────────────────────────────────────────
-    _renderizarAtaques(ataques) {
-        const container = document.getElementById('fichaAtaquesLista');
-        if (!container) return;
-
-        if (!ataques.length) {
-            container.innerHTML = '<div class="ficha-ataque-vazio">Nenhum ataque cadastrado</div>';
-            return;
-        }
-
-        container.innerHTML = ataques.map(a => {
-            const tipo = a.tipo_dano ? ` <span class="ataque-tipo">(${a.tipo_dano})</span>` : '';
-            return `
-                <div class="ficha-ataque-row">
-                    <span class="ataque-nome">${a.nome || '—'}</span>
-                    <span>${a.bonus_ataque !== undefined ? this._sinal(a.bonus_ataque) : '—'}</span>
-                    <span>${a.dano || '—'}${tipo}</span>
+            item.innerHTML = `
+                <span class="ficha-pericia-nome">${pj.pericia.nome}</span>
+                <span class="ficha-pericia-atributo">${pj.pericia.atributo}</span>
+                <div class="ficha-pericia-mods">
+                    <div class="ficha-pericia-mod">
+                        <span class="ficha-pericia-mod-label">Gra</span>
+                        <span class="ficha-pericia-mod-valor">${pj.graduacao}</span>
+                    </div>
+                    <div class="ficha-pericia-mod">
+                        <span class="ficha-pericia-mod-label">Atr</span>
+                        <span class="ficha-pericia-mod-valor">${pj.modificador_atributo >= 0 ? '+' : ''}${pj.modificador_atributo}</span>
+                    </div>
+                    <div class="ficha-pericia-mod">
+                        <span class="ficha-pericia-mod-label">Bôn</span>
+                        <span class="ficha-pericia-mod-valor">${pj.bonus_outros >= 0 ? '+' : ''}${pj.bonus_outros || 0}</span>
+                    </div>
                 </div>
+                <span class="ficha-pericia-total">${total >= 0 ? '+' : ''}${total}</span>
             `;
-        }).join('');
+
+            container.appendChild(item);
+        });
+
+        console.log('✅ Perícias renderizadas na ficha:', pericias.length);
     }
 
-    // ── Magias ────────────────────────────────────────────────
-    _renderizarMagias(slots) {
-        const container = document.getElementById('fichaMagiasGrid');
-        if (!container) return;
-
-        // ✅ Filtra slots com total > 0 e ordena por nível
-        const comSlot = slots
-            .filter(s => s.total > 0)
-            .sort((a, b) => a.nivel - b.nivel);
-
-        if (!comSlot.length) {
-            container.innerHTML = '<div class="ficha-magia-vazio">Nenhum slot cadastrado</div>';
-            return;
+    /**
+     * Renderiza perícias vazias
+     */
+    renderizarPericiasVazias() {
+        const container = document.getElementById('fichaPericiasLista');
+        if (container) {
+            container.innerHTML = '<span class="ficha-vazio">Nenhuma perícia selecionada</span>';
         }
-
-        container.innerHTML = comSlot.map(s => {
-            const restantes = s.total - (s.usados || 0);
-            const corSlot   = restantes === 0 ? 'ficha-magia-esgotado' : '';
-            return `
-                <div class="ficha-magia-row ${corSlot}">
-                    <span class="ficha-magia-nivel">Nív ${s.nivel}</span>
-                    <span class="ficha-magia-slots">${restantes}/${s.total}</span>
-                </div>
-            `;
-        }).join('');
     }
 
-    // ── Erro ──────────────────────────────────────────────────
-    _mostrarErro(msg) {
-        document.body.innerHTML = `
-            <div style="
-                display:flex; align-items:center; justify-content:center;
-                height:100vh; flex-direction:column; gap:1rem;
-                background:#1a0e06; color:#f4e9d0; font-family:serif;
-            ">
-                <span style="font-size:3rem;">⚠️</span>
-                <p style="font-size:1.1rem; text-align:center; max-width:400px;">${msg}</p>
-                <button onclick="window.close()"
-                    style="padding:0.5rem 1.5rem; background:#c9a84c; border:none;
-                           border-radius:8px; cursor:pointer; font-weight:bold;">
-                    Fechar
-                </button>
-            </div>`;
+    /**
+     * Mostra erro na ficha
+     */
+    mostrarErro(mensagem) {
+        console.error('❌', mensagem);
+        const container = document.getElementById('fichaPericiasLista');
+        if (container) {
+            container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+        }
     }
 }
 
-new FichaPersonagemController();
+// Inicializar quando DOM estiver pronto
+document.addEventListener('DOMContentLoaded', async () => {
+    const controller = new FichaPersonagemController();
+    await controller.inicializar();
+});
