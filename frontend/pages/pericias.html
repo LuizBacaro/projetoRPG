@@ -11,11 +11,10 @@
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/pericias.css?v=4.0">
+    <link rel="stylesheet" href="/css/pericias.css?v=5.0">
     
-    <!-- FORÇA MÁXIMA: CSS INLINE COM !important -->
     <style>
-        /* RESET: Remove layouts anteriores */
+        /* ========== HEADER ========== */
         .pericias-header {
             display: flex !important;
             flex-direction: row !important;
@@ -29,10 +28,8 @@
             border-bottom: 3px solid var(--cor-dourada) !important;
             border-radius: 12px !important;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
-            grid-template-columns: unset !important;
         }
 
-        /* BOTÃO VOLTAR */
         .btn-voltar {
             padding: 0.9rem 1.8rem !important;
             background: linear-gradient(135deg, #8B4513 0%, #5c2e0f 100%) !important;
@@ -42,11 +39,8 @@
             font-size: 1rem !important;
             font-weight: bold !important;
             cursor: pointer !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transition: all 0.3s !important;
             white-space: nowrap !important;
-            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3) !important;
-            order: 1 !important;
-            flex-shrink: 0 !important;
         }
 
         .btn-voltar:hover {
@@ -55,16 +49,9 @@
             transform: translateX(-4px) !important;
         }
 
-        /* HEADER CONTENT - CENTRO */
         .header-content {
             text-align: center !important;
             flex: 1 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            align-items: center !important;
-            order: 2 !important;
-            grid-column: unset !important;
         }
 
         .header-content h1 {
@@ -79,10 +66,8 @@
             color: #c9b896 !important;
             font-size: 0.95rem !important;
             font-style: italic !important;
-            opacity: 0.9 !important;
         }
 
-        /* HEADER INFO - DIREITA */
         .header-info {
             display: flex !important;
             flex-direction: column !important;
@@ -92,1049 +77,346 @@
             background: rgba(255, 215, 0, 0.05) !important;
             border-left: 3px solid var(--cor-dourada) !important;
             border-radius: 6px !important;
-            order: 3 !important;
-            flex-shrink: 0 !important;
         }
 
         .combatente-nome {
             color: var(--cor-dourada) !important;
             font-weight: bold !important;
             font-size: 1.1rem !important;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5) !important;
-            margin: 0 !important;
         }
 
-        .combatente-tipo {
-            color: #c9b896 !important;
-            font-style: italic !important;
-            font-size: 0.9rem !important;
-            opacity: 0.85 !important;
-            margin: 0 !important;
-        }
-
-        /* CONTAINER PRINCIPAL - LAYOUT VERTICAL */
-        .container {
+        /* ========== FILTROS ========== */
+        .pericias-filtros {
             display: flex !important;
-            flex-direction: column !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            gap: 0 !important;
+            flex-wrap: wrap !important;
+            gap: 1rem !important;
+            margin-bottom: 2rem !important;
+            padding: 1.5rem !important;
+            background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%) !important;
+            border-radius: 12px !important;
+            border: 2px solid var(--cor-dourada) !important;
         }
 
-        /* MAIN COM PERÍCIAS */
+        .filtro-label {
+            color: var(--cor-dourada) !important;
+            font-weight: bold !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+
+        .filtro-input {
+            padding: 0.7rem 1rem !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 2px solid var(--cor-dourada) !important;
+            color: var(--cor-dourada) !important;
+            border-radius: 6px !important;
+            font-size: 0.95rem !important;
+            min-width: 150px !important;
+        }
+
+        .filtro-input::placeholder {
+            color: rgba(255, 215, 0, 0.5) !important;
+        }
+
+        .btn-filtro {
+            padding: 0.7rem 1.2rem !important;
+            background: rgba(139, 69, 19, 0.5) !important;
+            border: 2px solid var(--cor-dourada) !important;
+            color: var(--cor-dourada) !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            font-weight: bold !important;
+            font-size: 0.9rem !important;
+        }
+
+        .btn-filtro:hover,
+        .btn-filtro.ativo {
+            background: var(--cor-dourada) !important;
+            color: #1a1410 !important;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4) !important;
+        }
+
+        /* ========== SEÇÕES DE PERÍCIAS ========== */
         .pericias-container {
             display: flex !important;
             flex-direction: column !important;
             gap: 2.5rem !important;
-            padding: 0 !important;
             max-width: 100% !important;
-            margin: 0 !important;
-            width: 100% !important;
         }
 
-        /* FOOTER HORIZONTAL */
-        .pericias-footer {
-            display: flex !important;
-            flex-direction: row !important;
-            gap: 1.2rem !important;
-            justify-content: center !important;
-            flex-wrap: nowrap !important;
-            margin-top: 3rem !important;
-            padding: 2.5rem !important;
+        .pericias-secao {
             background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%) !important;
-            border-top: 3px solid var(--cor-dourada) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3) !important;
-            width: 100% !important;
-        }
-
-        .btn-exportar,
-        .btn-resetar,
-        .btn-stats {
-            padding: 1.1rem 2.2rem !important;
             border: 2px solid var(--cor-dourada) !important;
-            border-radius: 8px !important;
+            border-radius: 12px !important;
+            padding: 2rem !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .secao-titulo {
             color: var(--cor-dourada) !important;
-            font-size: 1rem !important;
-            font-weight: bold !important;
+            font-size: 1.8rem !important;
+            margin: 0 0 1.5rem 0 !important;
+            padding-bottom: 1rem !important;
+            border-bottom: 2px solid var(--cor-dourada) !important;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        /* ========== GRID DE PERÍCIAS ========== */
+        .pericias-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 1.5rem !important;
+        }
+
+        .pericia-card {
+            background: linear-gradient(135deg, #1a1410 0%, #3d2817 100%) !important;
+            border: 2px solid var(--cor-madeira) !important;
+            border-radius: 10px !important;
+            padding: 1.5rem !important;
             cursor: pointer !important;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-            min-width: 160px !important;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 1rem !important;
+        }
+
+        .pericia-card:hover {
+            transform: translateY(-8px) !important;
+            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3) !important;
+            border-color: var(--cor-dourada) !important;
+            background: linear-gradient(135deg, #2c1810 0%, #5c3d2a 100%) !important;
+        }
+
+        .pericia-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+        }
+
+        .pericia-nome {
+            color: var(--cor-dourada) !important;
+            font-size: 1.2rem !important;
+            font-weight: bold !important;
+            margin: 0 !important;
+            flex: 1 !important;
+        }
+
+        .pericia-atributo {
+            background: var(--cor-madeira) !important;
+            color: var(--cor-dourada) !important;
+            padding: 0.3rem 0.8rem !important;
+            border-radius: 6px !important;
+            font-size: 0.85rem !important;
+            font-weight: bold !important;
             white-space: nowrap !important;
-            flex: 0 1 auto !important;
         }
 
-        .btn-exportar {
-            background: linear-gradient(135deg, #4B0082 0%, #2d0052 100%) !important;
+        .pericia-descricao {
+            color: #c9b896 !important;
+            font-size: 0.9rem !important;
+            margin: 0 !important;
+            line-height: 1.4 !important;
         }
 
-        .btn-exportar:hover {
-            background: linear-gradient(135deg, #6200ad 0%, #3d0066 100%) !important;
-            box-shadow: 0 0 20px rgba(98, 0, 173, 0.4) !important;
-            transform: translateY(-3px) !important;
+        .pericia-tipo {
+            display: inline-block !important;
+            background: rgba(255, 215, 0, 0.1) !important;
+            border: 1px solid var(--cor-dourada) !important;
+            color: var(--cor-dourada) !important;
+            padding: 0.2rem 0.6rem !important;
+            border-radius: 4px !important;
+            font-size: 0.75rem !important;
         }
 
-        .btn-resetar {
-            background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%) !important;
+        /* ========== BOTÕES ========== */
+        .btn-adicionar-pericia {
+            padding: 0.8rem 1.2rem !important;
+            background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%) !important;
+            color: var(--cor-dourada) !important;
+            border: 2px solid var(--cor-dourada) !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            font-weight: bold !important;
+            font-size: 0.9rem !important;
+            transition: all 0.3s !important;
+            align-self: flex-start !important;
         }
 
-        .btn-resetar:hover {
-            background: linear-gradient(135deg, #ff1744 0%, #c41c3b 100%) !important;
-            box-shadow: 0 0 20px rgba(255, 23, 68, 0.4) !important;
-            transform: translateY(-3px) !important;
+        .btn-adicionar-pericia:hover {
+            background: linear-gradient(135deg, #536ce8 0%, #3a5ccc 100%) !important;
+            box-shadow: 0 0 15px rgba(65, 105, 225, 0.4) !important;
+            transform: scale(1.05) !important;
         }
 
-        .btn-stats {
-            background: linear-gradient(135deg, #228B22 0%, #0d5a0d 100%) !important;
+        .pericia-carregada {
+            opacity: 0.6 !important;
         }
 
-        .btn-stats:hover {
-            background: linear-gradient(135deg, #32cd32 0%, #1a7a1a 100%) !important;
-            box-shadow: 0 0 20px rgba(50, 205, 50, 0.4) !important;
-            transform: translateY(-3px) !important;
+        .badge-carregada {
+            display: inline-block !important;
+            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%) !important;
+            color: #FFD700 !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px !important;
+            font-weight: bold !important;
+            font-size: 0.85rem !important;
+            margin-top: 0.5rem !important;
         }
 
-        /* RESPONSIVIDADE */
+        /* ========== RESPONSIVIDADE ========== */
         @media (max-width: 1024px) {
             .pericias-header {
                 flex-direction: column !important;
                 gap: 1.5rem !important;
             }
 
-            .btn-voltar {
-                order: 1 !important;
-                width: 100% !important;
-            }
-
-            .header-content {
-                order: 2 !important;
-            }
-
             .header-info {
-                order: 3 !important;
                 width: 100% !important;
                 text-align: center !important;
                 border-left: none !important;
                 border-top: 3px solid var(--cor-dourada) !important;
-                padding-top: 1rem !important;
             }
         }
 
         @media (max-width: 768px) {
             .pericias-header {
                 padding: 1.5rem !important;
+            }
+
+            .pericias-filtros {
+                flex-direction: column !important;
+            }
+
+            .filtro-input {
+                width: 100% !important;
+                min-width: auto !important;
+            }
+
+            .btn-filtro {
+                width: 100% !important;
+            }
+
+            .pericias-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
                 gap: 1rem !important;
-            }
-
-            .header-content h1 {
-                font-size: 1.8rem !important;
-            }
-
-            .pericias-footer {
-                flex-wrap: wrap !important;
-                padding: 1.8rem !important;
-            }
-
-            .btn-exportar,
-            .btn-resetar,
-            .btn-stats {
-                flex: 1 1 calc(33.333% - 0.8rem) !important;
-                min-width: 140px !important;
             }
         }
 
         @media (max-width: 480px) {
-            .pericias-header {
-                padding: 1rem !important;
-                gap: 0.8rem !important;
-            }
-
             .header-content h1 {
                 font-size: 1.4rem !important;
             }
 
-            .btn-voltar {
-                padding: 0.7rem 1.2rem !important;
-                font-size: 0.95rem !important;
-                width: 100% !important;
+            .pericias-grid {
+                grid-template-columns: 1fr !important;
             }
+        }
 
-            .header-info {
-                width: 100% !important;
-                padding: 0.8rem !important;
-            }
-
-            .pericias-footer {
-                flex-direction: column !important;
-                padding: 1.2rem !important;
-            }
-
-            .btn-exportar,
-            .btn-resetar,
-            .btn-stats {
-                flex: 1 1 100% !important;
-                min-width: auto !important;
-                width: 100% !important;
-            }
+        .vazio {
+            text-align: center !important;
+            color: #c9b896 !important;
+            font-style: italic !important;
+            padding: 2rem !important;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- ========== HEADER HORIZONTAL ========== -->
+        <!-- ========== HEADER ========== -->
         <header class="pericias-header">
-            <button id="btn-voltar" class="btn-voltar" aria-label="Voltar para página anterior">
+            <button id="btn-voltar" class="btn-voltar" aria-label="Voltar">
                 ← Voltar
             </button>
             <div class="header-content">
                 <h1>⚔️ Perícias do Personagem</h1>
-                <p class="subtitulo">D&D 3.5 - Gerencie suas perícias e modificadores</p>
+                <p class="subtitulo">D&D 3.5 - Gerencie suas perícias</p>
             </div>
             <div class="header-info">
-                <span id="combatente-nome" class="combatente-nome">👤 Aragorn</span>
-                <span id="combatente-tipo" class="combatente-tipo">(jogador)</span>
+                <span id="combatente-nome" class="combatente-nome">👤 Carregando...</span>
+                <span id="combatente-tipo" class="combatente-tipo">(tipo)</span>
             </div>
         </header>
 
-        <!-- ========== MAIN COM PERÍCIAS ========== -->
-        <main class="pericias-container">
-            <!-- Seção de Perícias de Destreza -->
-            <section class="pericias-secao">
-                <h2 class="secao-titulo">🎯 Destreza (DEX)</h2>
-                <div class="pericias-grid">
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B4513">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-abrir-fechaduras" class="skill-radio">
-                                <label for="select-abrir-fechaduras" class="skill-nome">Abrir Fechaduras</label>
-                                <span class="skill-atributo">DEX</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-abrir-fechaduras">Mod.</label>
-                                    <input type="number" id="mod-base-abrir-fechaduras" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-abrir-fechaduras">Bônus</label>
-                                    <input type="number" id="bonus-abrir-fechaduras" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- ========== FILTROS ========== -->
+        <div class="pericias-filtros">
+            <label class="filtro-label">🔍 Filtros:</label>
+            <input type="text" id="filtro-busca" class="filtro-input" placeholder="Buscar perícia...">
+            <button class="btn-filtro ativo" data-atributo="">Todas</button>
+            <button class="btn-filtro" data-atributo="FOR">💪 Força</button>
+            <button class="btn-filtro" data-atributo="DES">🎯 Destreza</button>
+            <button class="btn-filtro" data-atributo="CON">❤️ Constituição</button>
+            <button class="btn-filtro" data-atributo="INT">🧠 Inteligência</button>
+            <button class="btn-filtro" data-atributo="SAB">👁️ Sabedoria</button>
+            <button class="btn-filtro" data-atributo="CAR">💬 Carisma</button>
+        </div>
 
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B4513">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-acrobacias" class="skill-radio">
-                                <label for="select-acrobacias" class="skill-nome">Acrobacias</label>
-                                <span class="skill-atributo">DEX</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-acrobacias">Mod.</label>
-                                    <input type="number" id="mod-base-acrobacias" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-acrobacias">Bônus</label>
-                                    <input type="number" id="bonus-acrobacias" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B4513">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-furtividade" class="skill-radio">
-                                <label for="select-furtividade" class="skill-nome">Furtividade</label>
-                                <span class="skill-atributo">DEX</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-furtividade">Mod.</label>
-                                    <input type="number" id="mod-base-furtividade" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-furtividade">Bônus</label>
-                                    <input type="number" id="bonus-furtividade" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B4513">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-equilibrio" class="skill-radio">
-                                <label for="select-equilibrio" class="skill-nome">Equilíbrio</label>
-                                <span class="skill-atributo">DEX</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-equilibrio">Mod.</label>
-                                    <input type="number" id="mod-base-equilibrio" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-equilibrio">Bônus</label>
-                                    <input type="number" id="bonus-equilibrio" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B4513">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-salto" class="skill-radio">
-                                <label for="select-salto" class="skill-nome">Salto</label>
-                                <span class="skill-atributo">DEX</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-salto">Mod.</label>
-                                    <input type="number" id="mod-base-salto" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-salto">Bônus</label>
-                                    <input type="number" id="bonus-salto" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B4513">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-agarrar" class="skill-radio">
-                                <label for="select-agarrar" class="skill-nome">Agarrar</label>
-                                <span class="skill-atributo">DEX</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-agarrar">Mod.</label>
-                                    <input type="number" id="mod-base-agarrar" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-agarrar">Bônus</label>
-                                    <input type="number" id="bonus-agarrar" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Seção de Perícias de Inteligência -->
-            <section class="pericias-secao">
-                <h2 class="secao-titulo">🧠 Inteligência (INT)</h2>
-                <div class="pericias-grid">
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #4B0082">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-conhecimento-arcano" class="skill-radio">
-                                <label for="select-conhecimento-arcano" class="skill-nome">Conhec. Arcano</label>
-                                <span class="skill-atributo">INT</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-conhecimento-arcano">Mod.</label>
-                                    <input type="number" id="mod-base-conhecimento-arcano" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-conhecimento-arcano">Bônus</label>
-                                    <input type="number" id="bonus-conhecimento-arcano" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #4B0082">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-oficio" class="skill-radio">
-                                <label for="select-oficio" class="skill-nome">Ofício</label>
-                                <span class="skill-atributo">INT</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-oficio">Mod.</label>
-                                    <input type="number" id="mod-base-oficio" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-oficio">Bônus</label>
-                                    <input type="number" id="bonus-oficio" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #4B0082">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-investigacao" class="skill-radio">
-                                <label for="select-investigacao" class="skill-nome">Investigação</label>
-                                <span class="skill-atributo">INT</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-investigacao">Mod.</label>
-                                    <input type="number" id="mod-base-investigacao" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-investigacao">Bônus</label>
-                                    <input type="number" id="bonus-investigacao" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #4B0082">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-decifrar" class="skill-radio">
-                                <label for="select-decifrar" class="skill-nome">Decifrar</label>
-                                <span class="skill-atributo">INT</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-decifrar">Mod.</label>
-                                    <input type="number" id="mod-base-decifrar" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-decifrar">Bônus</label>
-                                    <input type="number" id="bonus-decifrar" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #4B0082">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-saber" class="skill-radio">
-                                <label for="select-saber" class="skill-nome">Saber</label>
-                                <span class="skill-atributo">INT</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-saber">Mod.</label>
-                                    <input type="number" id="mod-base-saber" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-saber">Bônus</label>
-                                    <input type="number" id="bonus-saber" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #4B0082">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-viagem" class="skill-radio">
-                                <label for="select-viagem" class="skill-nome">Viagem</label>
-                                <span class="skill-atributo">INT</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-viagem">Mod.</label>
-                                    <input type="number" id="mod-base-viagem" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-viagem">Bônus</label>
-                                    <input type="number" id="bonus-viagem" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Seção de Perícias de Sabedoria -->
-            <section class="pericias-secao">
-                <h2 class="secao-titulo">👁️ Sabedoria (SAB)</h2>
-                <div class="pericias-grid">
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #228B22">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-percepcao" class="skill-radio">
-                                <label for="select-percepcao" class="skill-nome">Percepção</label>
-                                <span class="skill-atributo">SAB</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-percepcao">Mod.</label>
-                                    <input type="number" id="mod-base-percepcao" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-percepcao">Bônus</label>
-                                    <input type="number" id="bonus-percepcao" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #228B22">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-intuicao" class="skill-radio">
-                                <label for="select-intuicao" class="skill-nome">Intuição</label>
-                                <span class="skill-atributo">SAB</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-intuicao">Mod.</label>
-                                    <input type="number" id="mod-base-intuicao" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-intuicao">Bônus</label>
-                                    <input type="number" id="bonus-intuicao" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #228B22">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-medicina" class="skill-radio">
-                                <label for="select-medicina" class="skill-nome">Medicina</label>
-                                <span class="skill-atributo">SAB</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-medicina">Mod.</label>
-                                    <input type="number" id="mod-base-medicina" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-medicina">Bônus</label>
-                                    <input type="number" id="bonus-medicina" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #228B22">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-natureza" class="skill-radio">
-                                <label for="select-natureza" class="skill-nome">Natureza</label>
-                                <span class="skill-atributo">SAB</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-natureza">Mod.</label>
-                                    <input type="number" id="mod-base-natureza" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-natureza">Bônus</label>
-                                    <input type="number" id="bonus-natureza" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #228B22">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-profissao" class="skill-radio">
-                                <label for="select-profissao" class="skill-nome">Profissão</label>
-                                <span class="skill-atributo">SAB</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-profissao">Mod.</label>
-                                    <input type="number" id="mod-base-profissao" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-profissao">Bônus</label>
-                                    <input type="number" id="bonus-profissao" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #228B22">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-sobrevivencia" class="skill-radio">
-                                <label for="select-sobrevivencia" class="skill-nome">Sobrevivência</label>
-                                <span class="skill-atributo">SAB</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-sobrevivencia">Mod.</label>
-                                    <input type="number" id="mod-base-sobrevivencia" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-sobrevivencia">Bônus</label>
-                                    <input type="number" id="bonus-sobrevivencia" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Seção de Perícias de Carisma -->
-            <section class="pericias-secao">
-                <h2 class="secao-titulo">💬 Carisma (CAR)</h2>
-                <div class="pericias-grid">
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #DC143C">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-persuasao" class="skill-radio">
-                                <label for="select-persuasao" class="skill-nome">Persuasão</label>
-                                <span class="skill-atributo">CAR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-persuasao">Mod.</label>
-                                    <input type="number" id="mod-base-persuasao" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-persuasao">Bônus</label>
-                                    <input type="number" id="bonus-persuasao" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #DC143C">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-enganacao" class="skill-radio">
-                                <label for="select-enganacao" class="skill-nome">Enganação</label>
-                                <span class="skill-atributo">CAR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-enganacao">Mod.</label>
-                                    <input type="number" id="mod-base-enganacao" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-enganacao">Bônus</label>
-                                    <input type="number" id="bonus-enganacao" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #DC143C">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-atuacao" class="skill-radio">
-                                <label for="select-atuacao" class="skill-nome">Atuação</label>
-                                <span class="skill-atributo">CAR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-atuacao">Mod.</label>
-                                    <input type="number" id="mod-base-atuacao" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-atuacao">Bônus</label>
-                                    <input type="number" id="bonus-atuacao" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #DC143C">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-intimidacao" class="skill-radio">
-                                <label for="select-intimidacao" class="skill-nome">Intimidação</label>
-                                <span class="skill-atributo">CAR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-intimidacao">Mod.</label>
-                                    <input type="number" id="mod-base-intimidacao" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-intimidacao">Bônus</label>
-                                    <input type="number" id="bonus-intimidacao" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #DC143C">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-diplomacia" class="skill-radio">
-                                <label for="select-diplomacia" class="skill-nome">Diplomacia</label>
-                                <span class="skill-atributo">CAR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-diplomacia">Mod.</label>
-                                    <input type="number" id="mod-base-diplomacia" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-diplomacia">Bônus</label>
-                                    <input type="number" id="bonus-diplomacia" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #DC143C">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-lideranca" class="skill-radio">
-                                <label for="select-lideranca" class="skill-nome">Liderança</label>
-                                <span class="skill-atributo">CAR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-lideranca">Mod.</label>
-                                    <input type="number" id="mod-base-lideranca" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-lideranca">Bônus</label>
-                                    <input type="number" id="bonus-lideranca" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Seção de Perícias de Força -->
-            <section class="pericias-secao">
-                <h2 class="secao-titulo">💪 Força (FOR)</h2>
-                <div class="pericias-grid">
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B0000">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-escalar" class="skill-radio">
-                                <label for="select-escalar" class="skill-nome">Escalar</label>
-                                <span class="skill-atributo">FOR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-escalar">Mod.</label>
-                                    <input type="number" id="mod-base-escalar" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-escalar">Bônus</label>
-                                    <input type="number" id="bonus-escalar" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B0000">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-nadar" class="skill-radio">
-                                <label for="select-nadar" class="skill-nome">Nadar</label>
-                                <span class="skill-atributo">FOR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-nadar">Mod.</label>
-                                    <input type="number" id="mod-base-nadar" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-nadar">Bônus</label>
-                                    <input type="number" id="bonus-nadar" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B0000">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-arrombar" class="skill-radio">
-                                <label for="select-arrombar" class="skill-nome">Arrombar</label>
-                                <span class="skill-atributo">FOR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-arrombar">Mod.</label>
-                                    <input type="number" id="mod-base-arrombar" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-arrombar">Bônus</label>
-                                    <input type="number" id="bonus-arrombar" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B0000">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-dirigir" class="skill-radio">
-                                <label for="select-dirigir" class="skill-nome">Dirigir</label>
-                                <span class="skill-atributo">FOR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-dirigir">Mod.</label>
-                                    <input type="number" id="mod-base-dirigir" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-dirigir">Bônus</label>
-                                    <input type="number" id="bonus-dirigir" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B0000">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-montar" class="skill-radio">
-                                <label for="select-montar" class="skill-nome">Montar</label>
-                                <span class="skill-atributo">FOR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-montar">Mod.</label>
-                                    <input type="number" id="mod-base-montar" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-montar">Bônus</label>
-                                    <input type="number" id="bonus-montar" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #8B0000">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-lancar" class="skill-radio">
-                                <label for="select-lancar" class="skill-nome">Lançar</label>
-                                <span class="skill-atributo">FOR</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-lancar">Mod.</label>
-                                    <input type="number" id="mod-base-lancar" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-lancar">Bônus</label>
-                                    <input type="number" id="bonus-lancar" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Seção de Perícias de Constituição -->
-            <section class="pericias-secao">
-                <h2 class="secao-titulo">❤️ Constituição (CON)</h2>
-                <div class="pericias-grid">
-                    <div class="skill-item">
-                        <div class="skill-card" style="border-left-color: #A9A9A9">
-                            <div class="skill-header">
-                                <input type="radio" name="skill-select" id="select-resistencia" class="skill-radio">
-                                <label for="select-resistencia" class="skill-nome">Resistência</label>
-                                <span class="skill-atributo">CON</span>
-                            </div>
-                            <div class="skill-inputs">
-                                <div class="skill-input-group">
-                                    <label for="mod-base-resistencia">Mod.</label>
-                                    <input type="number" id="mod-base-resistencia" class="skill-input-number" value="0" min="-20" max="20">
-                                </div>
-                                <div class="skill-input-group">
-                                    <label for="bonus-resistencia">Bônus</label>
-                                    <input type="number" id="bonus-resistencia" class="skill-input-number" value="0" min="0" max="10">
-                                </div>
-                                <div class="skill-resultado neutro">
-                                    <span class="label-resultado">Total</span>
-                                    <span class="valor-resultado">+0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <!-- ========== PERÍCIAS ========== -->
+        <main class="pericias-container" id="pericias-container">
+            <p class="vazio">⏳ Carregando perícias...</p>
         </main>
-
-        <!-- ========== FOOTER HORIZONTAL ========== -->
-        <footer class="pericias-footer">
-            <button id="btn-exportar" class="btn-exportar" title="Exportar perícias para JSON">
-                📥 Exportar Dados
-            </button>
-            <button id="btn-resetar" class="btn-resetar" title="Resetar todas as perícias">
-                🔄 Resetar Tudo
-            </button>
-            <button id="btn-stats" class="btn-stats" title="Ver estatísticas">
-                📊 Estatísticas
-            </button>
-        </footer>
     </div>
 
     <!-- Container para notificações -->
     <div id="toast-container"></div>
 
-    <!-- Script Simples -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('✅ Página de Perícias carregada com sucesso!');
+    <!-- Scripts -->
+    <script type="module">
+        import { PericiaController } from '/js/controllers/PericiaController.js';
+        import { NotificationService } from '/js/services/NotificationService.js';
 
-            const params = new URLSearchParams(window.location.search);
-            const nomeCombatente = params.get('nome') || 'Personagem';
-            const tipoCombatente = params.get('tipo') || 'jogador';
+        console.log('🎬 Script pericias.html carregado');
 
-            document.getElementById('combatente-nome').textContent = `👤 ${nomeCombatente}`;
-            document.getElementById('combatente-tipo').textContent = `(${tipoCombatente})`;
+        // Verificar token
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/pages/login.html';
+        }
 
+        // Inicializar controller
+        const controller = new PericiaController();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('🎮 Inicializando controller...');
+                await controller.inicializar();
+                setupFiltros(controller);
+                NotificationService.mostrarSucesso('✅ Perícias carregadas!');
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                NotificationService.mostrarErro('Erro: ' + error.message);
+            }
+        });
+
+        function setupFiltros(controller) {
+            // Botões de atributo
+            document.querySelectorAll('.btn-filtro').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('ativo'));
+                    btn.classList.add('ativo');
+                    
+                    const atributo = btn.dataset.atributo;
+                    await controller.filtrarPorAtributo(atributo);
+                });
+            });
+
+            // Busca
+            document.getElementById('filtro-busca').addEventListener('input', (e) => {
+                controller.buscarPericias(e.target.value);
+            });
+
+            // Voltar
             document.getElementById('btn-voltar').addEventListener('click', () => {
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {
-                    window.location.href = '/dashboard';
+                    window.location.href = '/pages/dashboard.html';
                 }
             });
-
-            document.querySelectorAll('.skill-input-number').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const skillCard = e.target.closest('.skill-card');
-                    const modBase = parseInt(skillCard.querySelector('[id*="mod-base-"]').value) || 0;
-                    const bonus = parseInt(skillCard.querySelector('[id*="bonus-"]').value) || 0;
-                    const resultado = modBase + bonus;
-
-                    const resultadoDiv = skillCard.querySelector('.skill-resultado');
-                    const valorSpan = resultadoDiv.querySelector('.valor-resultado');
-
-                    valorSpan.textContent = resultado >= 0 ? `+${resultado}` : `${resultado}`;
-
-                    resultadoDiv.classList.remove('positivo', 'negativo', 'neutro');
-                    if (resultado > 0) resultadoDiv.classList.add('positivo');
-                    else if (resultado < 0) resultadoDiv.classList.add('negativo');
-                    else resultadoDiv.classList.add('neutro');
-                });
-            });
-        });
+        }
     </script>
 </body>
 </html>

@@ -1,130 +1,150 @@
 /**
- * PericiaService - Gerencia comunicação com backend de perícias
- * Single Responsibility: Apenas fazer requisições HTTP
+ * PericiaService.js
+ * SRP: Comunicação HTTP com API de perícias
+ * SOLID: DIP - Dependency Injection via constructor
  */
 
-class PericiaService {
-    constructor(apiUrl = '/api/v1') {
-        this.baseUrl = `${apiUrl}/pericias`;
+import { getApiUrl } from '../config/api.config.js';
+
+export class PericiaService {
+    constructor() {
+        this.token = localStorage.getItem('token');
+        this.baseUrl = getApiUrl('/pericias');
+        console.log('✅ PericiaService inicializado');
     }
 
-    // ========== PERÍCIAS DISPONÍVEIS ==========
-
-    async obterTodasPericias(skip = 0, limit = 100) {
+    /**
+     * Lista todas as perícias disponíveis
+     * @param {number} skip - Offset para paginação
+     * @param {number} limit - Limite de resultados
+     * @param {string|null} atributo - Filtro por atributo (FOR, DES, CON, INT, SAB, CAR)
+     * @returns {Promise<Array>}
+     */
+    async listarPericias(skip = 0, limit = 100, atributo = null) {
         try {
-            const response = await fetch(`${this.baseUrl}?skip=${skip}&limit=${limit}`);
-            if (!response.ok) throw new Error('Erro ao obter perícias');
-            return await response.json();
+            let url = `${this.baseUrl}?skip=${skip}&limit=${limit}`;
+            if (atributo) url += `&atributo=${atributo.toUpperCase()}`;
+
+            console.log('📡 GET:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Perícias carregadas:', data.length);
+            return data;
+
         } catch (error) {
-            console.error('Erro em obterTodasPericias:', error);
+            console.error('❌ Erro em listarPericias:', error);
             throw error;
         }
     }
 
-    async obterPericiasPorAtributo(atributo) {
-        try {
-            const response = await fetch(`${this.baseUrl}?atributo=${atributo}`);
-            if (!response.ok) throw new Error('Erro ao obter perícias');
-            return await response.json();
-        } catch (error) {
-            console.error('Erro em obterPericiasPorAtributo:', error);
-            throw error;
-        }
-    }
-
+    /**
+     * Obtém uma perícia por ID
+     * @param {number} periciaId
+     * @returns {Promise<Object>}
+     */
     async obterPericia(periciaId) {
         try {
-            const response = await fetch(`${this.baseUrl}/${periciaId}`);
-            if (!response.ok) throw new Error('Perícia não encontrada');
-            return await response.json();
-        } catch (error) {
-            console.error('Erro em obterPericia:', error);
-            throw error;
-        }
-    }
+            const url = `${this.baseUrl}/${periciaId}`;
+            console.log('📡 GET:', url);
 
-    // ========== PERÍCIAS DO JOGADOR ==========
-
-    async adicionarPericiaJogador(combatenteId, periciaId, graduacao = 0) {
-        try {
-            const response = await fetch(`${this.baseUrl}/${combatenteId}/adicionar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    pericia_id: periciaId,
-                    graduacao: graduacao
-                })
-            });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Erro ao adicionar perícia');
-            }
-            return await response.json();
-        } catch (error) {
-            console.error('Erro em adicionarPericiaJogador:', error);
-            throw error;
-        }
-    }
-
-    async obterPerienciasJogador(combatenteId) {
-        try {
-            const response = await fetch(`${this.baseUrl}/${combatenteId}/listar`);
-            if (!response.ok) throw new Error('Erro ao obter perícias do jogador');
-            return await response.json();
-        } catch (error) {
-            console.error('Erro em obterPerienciasJogador:', error);
-            throw error;
-        }
-    }
-
-    async atualizarPericiaJogador(combatenteId, periciaJogadorId, graduacao, bonusOutros = 0) {
-        try {
-            const response = await fetch(
-                `${this.baseUrl}/${combatenteId}/pericia/${periciaJogadorId}`,
-                {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        graduacao: graduacao,
-                        bonus_outros: bonusOutros
-                    })
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
                 }
-            );
-            if (!response.ok) throw new Error('Erro ao atualizar perícia');
-            return await response.json();
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Perícia não encontrada`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Perícia obtida:', data.nome);
+            return data;
+
         } catch (error) {
-            console.error('Erro em atualizarPericiaJogador:', error);
+            console.error('❌ Erro em obterPericia:', error);
             throw error;
         }
     }
 
-    async deletarPericiaJogador(combatenteId, periciaJogadorId) {
-        try {
-            const response = await fetch(
-                `${this.baseUrl}/${combatenteId}/pericia/${periciaJogadorId}`,
-                { method: 'DELETE' }
-            );
-            if (!response.ok) throw new Error('Erro ao deletar perícia');
-            return true;
-        } catch (error) {
-            console.error('Erro em deletarPericiaJogador:', error);
-            throw error;
-        }
+    /**
+     * Lista perícias por atributo
+     * @param {string} atributo - FOR, DES, CON, INT, SAB, CAR
+     * @returns {Promise<Array>}
+     */
+    async listarPorAtributo(atributo) {
+        return this.listarPericias(0, 100, atributo);
     }
 
-    async obterEstatisticasPericias(combatenteId) {
-        try {
-            const response = await fetch(`${this.baseUrl}/${combatenteId}/estatisticas`);
-            if (!response.ok) throw new Error('Erro ao obter estatísticas');
-            return await response.json();
-        } catch (error) {
-            console.error('Erro em obterEstatisticasPericias:', error);
-            throw error;
-        }
-    }
-}
+    /**
+     * Agrupa perícias por atributo
+     * @param {Array} pericias - Array de perícias
+     * @returns {Object} Perícias agrupadas por atributo
+     */
+    agruparPorAtributo(pericias) {
+        const grupos = {
+            'FOR': [],
+            'DES': [],
+            'CON': [],
+            'INT': [],
+            'SAB': [],
+            'CAR': []
+        };
 
-// Exportar para uso global
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = PericiaService;
+        pericias.forEach(pericia => {
+            if (grupos[pericia.atributo]) {
+                grupos[pericia.atributo].push(pericia);
+            }
+        });
+
+        return grupos;
+    }
+
+    /**
+     * Mapeia atributo para label legível
+     * @param {string} atributo
+     * @returns {Object} {label, emoji, cor}
+     */
+    obterInfoAtributo(atributo) {
+        const info = {
+            'FOR': { label: 'Força', emoji: '💪', cor: '#8B0000' },
+            'DES': { label: 'Destreza', emoji: '🎯', cor: '#8B4513' },
+            'CON': { label: 'Constituição', emoji: '❤️', cor: '#A9A9A9' },
+            'INT': { label: 'Inteligência', emoji: '🧠', cor: '#4B0082' },
+            'SAB': { label: 'Sabedoria', emoji: '👁️', cor: '#228B22' },
+            'CAR': { label: 'Carisma', emoji: '💬', cor: '#DC143C' }
+        };
+
+        return info[atributo] || { label: 'Desconhecido', emoji: '❓', cor: '#888888' };
+    }
+
+    /**
+     * Filtra perícias por termo de busca
+     * @param {Array} pericias
+     * @param {string} termo
+     * @returns {Array}
+     */
+    filtrarPorBusca(pericias, termo) {
+        if (!termo || termo.trim() === '') return pericias;
+
+        const termoLower = termo.toLowerCase();
+        return pericias.filter(p =>
+            p.nome.toLowerCase().includes(termoLower) ||
+            (p.descricao && p.descricao.toLowerCase().includes(termoLower))
+        );
+    }
 }

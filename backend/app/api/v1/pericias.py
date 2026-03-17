@@ -38,7 +38,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/pericias", tags=["Perícias"])
+router = APIRouter(prefix="/pericias", tags=["Perícias"])
 
 
 # ========== ENDPOINTS DE PERÍCIAS DISPONÍVEIS ==========
