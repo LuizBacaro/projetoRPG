@@ -22,9 +22,9 @@
 .arena-lateral-panel {
     display: flex;
     flex-direction: column;
-    width: 280px;
-    min-width: 280px;
-    max-width: 280px;
+    width: 310px;        /* ✅ AUMENTADO de 280px para 310px */
+    min-width: 310px;    /* ✅ AUMENTADO de 280px para 310px */
+    max-width: 310px;    /* ✅ AUMENTADO de 280px para 310px */
     flex-shrink: 0;
     overflow: hidden;
     gap: 0;
@@ -387,7 +387,7 @@
 /* ── Layout 3 colunas ── */
 .arena-layout-principal {
     display: grid;
-    grid-template-columns: 1.4fr 1.4fr 140px;  /* ✅ esquerda: 1.7→1.4 | central: 1→1.4 */
+    grid-template-columns: 1.4fr 1.4fr 160px;  /* ✅ coluna direita AUMENTADA de 140px para 160px *
     gap: 0.55rem;
     flex: 1;
     min-height: 0;
@@ -405,7 +405,14 @@
     min-width: 0;          /* ✅ ADICIONADO — respeita limite do grid */
 }
 
-.arena-coluna-direita  { display: flex; flex-direction: column; gap: 0.45rem; min-height: 0; }
+/* ── Coluna direita — AUMENTADA ── */
+.arena-coluna-direita {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-height: 0;
+    width: 100%;  /* ✅ garante que ocupa todo espaço */
+}
 
 /* ── Seção genérica ── */
 .arena-secao {

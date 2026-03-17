@@ -3,6 +3,7 @@
    SRP: APENAS breakpoints responsivos — sem estilos base
    ✅ FASE 1: seletores fantasmas removidos
    ✅ Adicionados seletores reais da arena atual
+   ✅ ATUALIZADO: Painéis esquerdo e direito aumentados
 */
 
 /* ══════════════════════════════════════════════
@@ -16,7 +17,11 @@
         padding: 0.75rem;
     }
 
-    .arena-lateral-panel { min-width: 180px; max-width: 210px; }
+    .arena-lateral-panel { 
+        width: 300px;
+        min-width: 300px; 
+        max-width: 310px; 
+    }
 }
 
 /* ══════════════════════════════════════════════
@@ -24,7 +29,11 @@
 ══════════════════════════════════════════════ */
 @media (max-width: 1100px) {
 
-    .arena-lateral-panel { min-width: 160px; max-width: 190px; }
+    .arena-lateral-panel { 
+        width: 290px;
+        min-width: 290px; 
+        max-width: 300px; 
+    }
 
     .arena-lateral-topo { gap: 0.5rem; }
 }
@@ -34,7 +43,11 @@
 ══════════════════════════════════════════════ */
 @media (max-width: 900px) {
 
-    .arena-lateral-panel { min-width: 140px; max-width: 170px; }
+    .arena-lateral-panel { 
+        width: 270px;
+        min-width: 270px; 
+        max-width: 280px; 
+    }
 
     .arena-lateral-foto-col { display: none; }
 }
