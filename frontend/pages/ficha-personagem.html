@@ -24,7 +24,7 @@
         <!-- ── CORPO PRINCIPAL ── -->
         <main class="ficha-corpo">
 
-            <!-- COLUNA ESQUERDA: foto + identidade + perícias -->
+            <!-- COLUNA ESQUERDA: foto + identidade + equipamentos -->
             <aside class="ficha-coluna-esquerda">
 
                 <!-- Foto -->
@@ -37,21 +37,13 @@
                 <div class="ficha-identidade">
                     <h2 id="fichaNome" class="ficha-nome">—</h2>
                     <div class="ficha-meta">
-                        <span id="fichaRaca" class="ficha-tag ficha-tag-raca">—</span>
+                        <span id="fichaRaca"   class="ficha-tag ficha-tag-raca">—</span>
                         <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
-                        <span id="fichaTipo" class="ficha-tag ficha-tag-tipo">—</span>
+                        <span id="fichaTipo"   class="ficha-tag ficha-tag-tipo">—</span>
                     </div>
                     <div class="ficha-nivel-linha">
                         <span class="ficha-nivel-label">Nível</span>
                         <span id="fichaNivel" class="ficha-nivel-valor">—</span>
-                    </div>
-                </div>
-
-                <!-- Perícias -->
-                <div class="ficha-secao">
-                    <h3 class="ficha-secao-titulo">⚡ Perícias</h3>
-                    <div id="fichaPericiasLista" class="ficha-pericias-lista">
-                        <span class="ficha-vazio">Carregando perícias...</span>
                     </div>
                 </div>
 
@@ -65,7 +57,7 @@
 
             </aside>
 
-            <!-- COLUNA CENTRAL: atributos + defesa + resistências + condições -->
+            <!-- COLUNA CENTRAL: atributos + defesa + resistências -->
             <section class="ficha-coluna-central">
 
                 <!-- Atributos em círculos -->
@@ -75,42 +67,42 @@
                         <div class="ficha-atributo-circulo" data-id="forca">
                             <div class="circulo-externo">
                                 <span class="circulo-valor" id="fichaFor">10</span>
-                                <span class="circulo-mod"  id="fichaForMod">+0</span>
+                                <span class="circulo-mod"   id="fichaForMod">+0</span>
                             </div>
                             <span class="circulo-label">FOR</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-id="destreza">
                             <div class="circulo-externo">
                                 <span class="circulo-valor" id="fichaDes">10</span>
-                                <span class="circulo-mod"  id="fichaDesMod">+0</span>
+                                <span class="circulo-mod"   id="fichaDesMod">+0</span>
                             </div>
                             <span class="circulo-label">DES</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-id="constituicao">
                             <div class="circulo-externo">
                                 <span class="circulo-valor" id="fichaCon">10</span>
-                                <span class="circulo-mod"  id="fichaConMod">+0</span>
+                                <span class="circulo-mod"   id="fichaConMod">+0</span>
                             </div>
                             <span class="circulo-label">CON</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-id="inteligencia">
                             <div class="circulo-externo">
                                 <span class="circulo-valor" id="fichaInt">10</span>
-                                <span class="circulo-mod"  id="fichaIntMod">+0</span>
+                                <span class="circulo-mod"   id="fichaIntMod">+0</span>
                             </div>
                             <span class="circulo-label">INT</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-id="sabedoria">
                             <div class="circulo-externo">
                                 <span class="circulo-valor" id="fichaSab">10</span>
-                                <span class="circulo-mod"  id="fichaSabMod">+0</span>
+                                <span class="circulo-mod"   id="fichaSabMod">+0</span>
                             </div>
                             <span class="circulo-label">SAB</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-id="carisma">
                             <div class="circulo-externo">
                                 <span class="circulo-valor" id="fichaCar">10</span>
-                                <span class="circulo-mod"  id="fichaCarMod">+0</span>
+                                <span class="circulo-mod"   id="fichaCarMod">+0</span>
                             </div>
                             <span class="circulo-label">CAR</span>
                         </div>
@@ -171,7 +163,7 @@
 
             </section>
 
-            <!-- COLUNA DIREITA: ataques + magias -->
+            <!-- COLUNA DIREITA: ataques + magias + perícias -->
             <aside class="ficha-coluna-direita">
 
                 <!-- Ataques -->
@@ -197,13 +189,20 @@
                     </div>
                 </div>
 
+                <!-- ✅ Perícias movidas para APÓS Slots de Magia -->
+                <div class="ficha-secao">
+                    <h3 class="ficha-secao-titulo">⚡ Perícias</h3>
+                    <div id="fichaPericiasLista" class="ficha-pericias-lista">
+                        <span class="ficha-vazio">Carregando perícias...</span>
+                    </div>
+                </div>
+
             </aside>
 
         </main>
 
     </div>
 
-    <script src="../js/services/PericiaService.js" type="module"></script>
     <script src="../js/controllers/FichaPersonagemController.js" type="module"></script>
 </body>
 </html>
