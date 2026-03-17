@@ -1,896 +1,496 @@
-/* 
-   
-   ESTILOS AVANÇADOS - PERÍCIAS
-   
-    */
+/**
+ * pericias.css
+ * Design responsivo D&D 3.5 com layout de duas colunas
+ * SOLID: Separação de responsabilidades por componente
+ */
 
-/* 
-   
-   HEADER - LAYOUT HORIZONTAL (GRID 3 COLUNAS)
-   
-    */
+:root {
+    --cor-dourada: #FFD700;
+    --cor-madeira: #8B4513;
+    --cor-madeira-claro: #A0522D;
+    --cor-pergaminho: #F4E4C1;
+    --cor-fundo: #1a1410;
+    --cor-fundo-light: #2c1810;
+    --fonte-titulo: 'Georgia', serif;
+    --fonte-texto: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --transicao: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ========== CONTAINER PRINCIPAL ========== */
+.pericias-wrapper {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 2rem !important;
+    padding: 2rem !important;
+    max-width: 1600px !important;
+    margin: 0 auto !important;
+    min-height: 100vh !important;
+}
+
+/* ========== HEADER ========== */
 .pericias-header {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 2rem;
-    margin-bottom: 3rem;
-    padding: 2rem;
-    background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%);
-    border-bottom: 3px solid var(--cor-dourada);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 2rem !important;
+    margin-bottom: 2rem !important;
+    padding: 2rem !important;
+    background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%) !important;
+    border-bottom: 3px solid var(--cor-dourada) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
 }
 
 .btn-voltar {
-    padding: 0.9rem 1.8rem;
-    background: linear-gradient(135deg, #8B4513 0%, #5c2e0f 100%);
-    color: var(--cor-dourada);
-    border: 2px solid var(--cor-dourada);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-    justify-self: start;
+    padding: 0.9rem 1.8rem !important;
+    background: linear-gradient(135deg, #8B4513 0%, #5c2e0f 100%) !important;
+    color: var(--cor-dourada) !important;
+    border: 2px solid var(--cor-dourada) !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: var(--transicao) !important;
+    white-space: nowrap !important;
 }
 
 .btn-voltar:hover {
-    background: linear-gradient(135deg, #a6521e 0%, #7a3f14 100%);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    transform: translateX(-4px);
-}
-
-.btn-voltar:active {
-    transform: translateX(-2px);
-}
-
-.btn-voltar:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+    background: linear-gradient(135deg, #a6521e 0%, #7a3f14 100%) !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) !important;
+    transform: translateX(-4px) !important;
 }
 
 .header-content {
-    text-align: center;
-    grid-column: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    text-align: center !important;
+    flex: 1 !important;
 }
 
 .header-content h1 {
-    margin: 0 0 0.5rem 0;
-    font-size: 2.2rem;
-    color: var(--cor-dourada);
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    margin: 0 0 0.5rem 0 !important;
+    font-size: 2.2rem !important;
+    color: var(--cor-dourada) !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
+    font-family: var(--fonte-titulo) !important;
 }
 
 .header-content .subtitulo {
-    margin: 0;
-    color: #c9b896;
-    font-size: 0.95rem;
-    font-style: italic;
-    opacity: 0.9;
+    margin: 0 !important;
+    color: #c9b896 !important;
+    font-size: 0.95rem !important;
+    font-style: italic !important;
 }
 
 .header-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: right;
-    padding: 1rem;
-    background: rgba(255, 215, 0, 0.05);
-    border-left: 3px solid var(--cor-dourada);
-    border-radius: 6px;
-    justify-self: end;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    text-align: right !important;
+    padding: 1rem !important;
+    background: rgba(255, 215, 0, 0.05) !important;
+    border-left: 3px solid var(--cor-dourada) !important;
+    border-radius: 6px !important;
 }
 
 .combatente-nome {
-    color: var(--cor-dourada);
-    font-weight: bold;
-    font-size: 1.1rem;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-    margin: 0;
+    color: var(--cor-dourada) !important;
+    font-weight: bold !important;
+    font-size: 1.1rem !important;
+    margin: 0 !important;
 }
 
 .combatente-tipo {
-    color: #c9b896;
-    font-style: italic;
-    font-size: 0.9rem;
-    opacity: 0.85;
-    margin: 0;
+    color: #c9b896 !important;
+    font-style: italic !important;
+    font-size: 0.9rem !important;
+    margin: 0 !important;
 }
 
-/* 
-   
-   CONTAINER E LAYOUT
-   
-    */
-.pericias-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-    padding: 0;
-    max-width: 100%;
-    margin: 0;
+/* ========== SEÇÕES PRINCIPAIS ========== */
+.pericias-disponíveis-secao {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    padding: 2rem !important;
+    background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%) !important;
+    border: 2px solid var(--cor-madeira) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+    height: fit-content !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
 }
 
-.pericias-secao {
-    background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%);
-    border: 2px solid var(--cor-madeira);
-    border-radius: 15px;
-    padding: 2.5rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
+.pericias-selecionadas-secao {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    padding: 2rem !important;
+    background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%) !important;
+    border: 2px solid var(--cor-dourada) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+    height: fit-content !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
 }
 
-.pericias-secao:hover {
-    box-shadow: 0 12px 40px rgba(255, 215, 0, 0.1);
-    border-color: var(--cor-dourada);
-}
-
+/* ========== TÍTULOS DE SEÇÃO ========== */
 .secao-titulo {
-    font-family: var(--fonte-titulo);
-    color: var(--cor-dourada);
-    font-size: 1.7rem;
-    margin: 0 0 1.8rem 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    border-bottom: 2px solid var(--cor-dourada);
-    padding-bottom: 1rem;
-    letter-spacing: 0.5px;
+    color: var(--cor-dourada) !important;
+    font-size: 1.6rem !important;
+    margin: 0 0 1rem 0 !important;
+    padding-bottom: 0.8rem !important;
+    border-bottom: 2px solid var(--cor-dourada) !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+    font-family: var(--fonte-titulo) !important;
 }
 
-/* 
-   
-   PERICIAS GRID - DUAS COLUNAS
-   
-    */
-.pericias-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    padding: 1rem 0;
+/* ========== FILTROS ========== */
+.filtros-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.8rem !important;
+    margin-bottom: 1rem !important;
 }
 
-.skill-item {
-    min-height: auto;
-    perspective: 1000px;
+.filtro-input {
+    flex: 1 !important;
+    min-width: 150px !important;
+    padding: 0.7rem 1rem !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 2px solid var(--cor-madeira) !important;
+    color: var(--cor-dourada) !important;
+    border-radius: 6px !important;
+    font-size: 0.9rem !important;
+    font-family: var(--fonte-texto) !important;
 }
 
-/* 
-   
-   CARTÃO DE PERÍCIA - LAYOUT HORIZONTAL
-   
-    */
-.skill-card {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    background: linear-gradient(135deg, #3d2817 0%, #2c1810 100%);
-    border-radius: 12px;
-    padding: 1.2rem;
-    border: 2px solid var(--cor-madeira);
-    border-left: 5px solid;
-    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    position: relative;
-    overflow: hidden;
+.filtro-input::placeholder {
+    color: rgba(255, 215, 0, 0.4) !important;
 }
 
-.skill-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
-    transition: left 0.5s;
-    pointer-events: none;
+.btn-filtro {
+    padding: 0.6rem 1rem !important;
+    background: rgba(139, 69, 19, 0.3) !important;
+    border: 2px solid var(--cor-madeira) !important;
+    color: var(--cor-dourada) !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: var(--transicao) !important;
+    font-weight: bold !important;
+    font-size: 0.85rem !important;
+    white-space: nowrap !important;
 }
 
-.skill-card:hover::before {
-    left: 100%;
+.btn-filtro:hover,
+.btn-filtro.ativo {
+    background: var(--cor-dourada) !important;
+    color: #1a1410 !important;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4) !important;
+    transform: scale(1.05) !important;
 }
 
-.skill-card:hover {
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.2);
-    border-color: var(--cor-dourada);
+/* ========== GRID DE PERÍCIAS DISPONÍVEIS ========== */
+.pericias-disponivel-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
 }
 
-.skill-card:focus-within {
-    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.25);
-    border-color: var(--cor-dourada);
-    outline: none;
+.pericia-card-disponivel {
+    background: linear-gradient(135deg, #1a1410 0%, #3d2817 100%) !important;
+    border: 2px solid var(--cor-madeira) !important;
+    border-radius: 10px !important;
+    padding: 1.2rem !important;
+    cursor: pointer !important;
+    transition: var(--transicao) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.8rem !important;
 }
 
-.skill-card:active {
-    transform: translateY(0) scale(1);
+.pericia-card-disponivel:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3) !important;
+    border-color: var(--cor-dourada) !important;
+    background: linear-gradient(135deg, #2c1810 0%, #5c3d2a 100%) !important;
 }
 
-/* 
-   
-   SKILL HEADER - HORIZONTAL
-   
-    */
-.skill-header {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 0;
-    position: relative;
-    z-index: 1;
-    min-width: 0;
-    flex: 1;
+.pericia-header-disp {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 0.8rem !important;
 }
 
-.skill-radio {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--cor-dourada);
-    flex-shrink: 0;
-    transition: all 0.2s;
-    appearance: none;
-    -webkit-appearance: none;
-    border: 2px solid var(--cor-dourada);
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+.pericia-nome-disp {
+    color: var(--cor-dourada) !important;
+    font-size: 1.1rem !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    flex: 1 !important;
+    font-family: var(--fonte-titulo) !important;
 }
 
-.skill-radio:hover {
-    transform: scale(1.15);
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+.pericia-atributo-badge {
+    background: var(--cor-madeira) !important;
+    color: var(--cor-dourada) !important;
+    padding: 0.3rem 0.7rem !important;
+    border-radius: 6px !important;
+    font-size: 0.75rem !important;
+    font-weight: bold !important;
+    white-space: nowrap !important;
 }
 
-.skill-radio:checked {
-    background: radial-gradient(circle, var(--cor-dourada) 35%, transparent 70%);
+.pericia-descricao-disp {
+    color: #c9b896 !important;
+    font-size: 0.85rem !important;
+    margin: 0 !important;
+    line-height: 1.3 !important;
 }
 
-.skill-nome {
-    font-family: var(--fonte-titulo);
-    font-size: 0.95rem;
-    color: var(--cor-dourada);
-    font-weight: bold;
-    margin: 0;
-    cursor: pointer;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
-    transition: all 0.2s;
-    user-select: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
+.btn-adicionar {
+    align-self: flex-start !important;
+    padding: 0.6rem 1.2rem !important;
+    background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%) !important;
+    color: var(--cor-dourada) !important;
+    border: 2px solid var(--cor-dourada) !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-weight: bold !important;
+    font-size: 0.85rem !important;
+    transition: var(--transicao) !important;
 }
 
-.skill-nome:hover {
-    color: #ffd700;
-    text-shadow: 2px 2px 5px rgba(255, 215, 0, 0.3);
+.btn-adicionar:hover {
+    background: linear-gradient(135deg, #536ce8 0%, #3a5ccc 100%) !important;
+    box-shadow: 0 0 15px rgba(65, 105, 225, 0.4) !important;
+    transform: scale(1.05) !important;
 }
 
-.skill-atributo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--cor-madeira);
-    color: var(--cor-dourada);
-    padding: 0.3rem 0.5rem;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 0.7rem;
-    flex-shrink: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 215, 0, 0.3);
+/* ========== GRID DE PERÍCIAS SELECIONADAS ========== */
+.pericias-selecionada-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1.2rem !important;
 }
 
-/* 
-   
-   SKILL INPUTS - HORIZONTAL COMPACTO
-   
-    */
-.skill-inputs {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    margin-top: 0;
-    flex-wrap: nowrap;
-    position: relative;
-    z-index: 1;
-    flex-shrink: 0;
+.pericia-card-selecionada {
+    background: linear-gradient(135deg, #1a2833 0%, #0f1f2e 100%) !important;
+    border: 3px solid var(--cor-dourada) !important;
+    border-radius: 10px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.2) !important;
+    transition: var(--transicao) !important;
 }
 
-.skill-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    flex: 0 0 auto;
-    min-width: fit-content;
+.pericia-card-selecionada:hover {
+    box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4) !important;
+    transform: translateY(-2px) !important;
 }
 
-.skill-input-group label {
-    font-size: 0.6rem;
-    color: var(--cor-dourada);
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
+.pericia-selecionada-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 1.2rem !important;
+    padding-bottom: 0.8rem !important;
+    border-bottom: 2px solid var(--cor-dourada) !important;
 }
 
-.skill-input-number {
-    width: 38px;
-    height: 35px;
-    padding: 0.2rem;
-    border: 2px solid var(--cor-madeira);
-    border-radius: 5px;
-    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
-    color: var(--cor-dourada);
-    font-weight: bold;
-    font-size: 0.8rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-family: var(--fonte-texto);
+.pericia-selecionada-nome {
+    color: var(--cor-dourada) !important;
+    font-size: 1.1rem !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    font-family: var(--fonte-titulo) !important;
 }
 
-.skill-input-number:hover {
-    border-color: var(--cor-dourada);
-    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
-    background: linear-gradient(135deg, #2c1810 0%, #3d2817 100%);
+.btn-remover-pericia {
+    padding: 0.4rem 0.8rem !important;
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%) !important;
+    color: var(--cor-dourada) !important;
+    border: 2px solid var(--cor-dourada) !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-weight: bold !important;
+    font-size: 0.75rem !important;
+    transition: var(--transicao) !important;
 }
 
-.skill-input-number:focus {
-    outline: none;
-    border-color: var(--cor-dourada);
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
-    background: linear-gradient(135deg, #3d2817 0%, #4a3620 100%);
+.btn-remover-pericia:hover {
+    background: linear-gradient(135deg, #ff1744 0%, #c41c3b 100%) !important;
+    box-shadow: 0 0 12px rgba(255, 23, 68, 0.4) !important;
+    transform: scale(1.08) !important;
 }
 
-.skill-input-number::-webkit-outer-spin-button,
-.skill-input-number::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+/* ========== MODIFICADORES ========== */
+.modificadores-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
 }
 
-.skill-input-number[type=number] {
-    -moz-appearance: textfield;
+.modificador-item {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.4rem !important;
 }
 
-/* 
-   
-   SKILL RESULTADO - COMPACTO
-   
-    */
-.skill-resultado {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.1rem;
-    padding: 0.5rem 0.7rem;
-    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
-    border: 2px solid var(--cor-dourada);
-    border-radius: 5px;
-    min-width: 55px;
-    transition: all 0.3s;
-    position: relative;
-    flex-shrink: 0;
+.modificador-label {
+    color: var(--cor-dourada) !important;
+    font-size: 0.85rem !important;
+    font-weight: bold !important;
+    margin: 0 !important;
 }
 
-.skill-resultado:hover {
-    box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
-    transform: scale(1.05);
+.modificador-input {
+    padding: 0.7rem !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 2px solid var(--cor-madeira) !important;
+    color: var(--cor-dourada) !important;
+    border-radius: 6px !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    font-family: var(--fonte-texto) !important;
 }
 
-.skill-resultado.positivo {
-    border-color: #32cd32;
-    background: linear-gradient(135deg, #1a3a1a 0%, #0d260d 100%);
-    box-shadow: 0 0 6px rgba(50, 205, 50, 0.12);
+.modificador-input:focus {
+    outline: none !important;
+    border-color: var(--cor-dourada) !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3) !important;
 }
 
-.skill-resultado.negativo {
-    border-color: #ff6b6b;
-    background: linear-gradient(135deg, #3a1a1a 0%, #260d0d 100%);
-    box-shadow: 0 0 6px rgba(255, 107, 107, 0.12);
+/* ========== TOTAL MODIFICADOR ========== */
+.total-modificador-container {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%) !important;
+    border: 2px solid var(--cor-dourada) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    margin-top: 0.8rem !important;
+    text-align: center !important;
 }
 
-.skill-resultado.neutro {
-    border-color: var(--cor-dourada);
+.total-modificador-label {
+    color: #c9b896 !important;
+    font-size: 0.9rem !important;
+    margin: 0 0 0.5rem 0 !important;
+    font-weight: bold !important;
 }
 
-.label-resultado {
-    font-size: 0.55rem;
-    color: var(--cor-dourada);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    font-weight: bold;
-    opacity: 0.75;
+.total-modificador-valor {
+    color: var(--cor-dourada) !important;
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    font-family: var(--fonte-titulo) !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
-.valor-resultado {
-    font-size: 1.2rem;
-    color: var(--cor-dourada);
-    font-weight: bold;
-    text-shadow: 0 0 6px rgba(255, 215, 0, 0.25);
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
+/* ========== VAZIO ========== */
+.vazio {
+    text-align: center !important;
+    color: #c9b896 !important;
+    font-style: italic !important;
+    padding: 2rem !important;
 }
 
-.skill-resultado.positivo .valor-resultado {
-    color: #32cd32;
-    text-shadow: 0 0 8px rgba(50, 205, 50, 0.3);
+/* ========== SCROLLBAR ========== */
+.pericias-disponíveis-secao::-webkit-scrollbar,
+.pericias-selecionadas-secao::-webkit-scrollbar {
+    width: 8px !important;
 }
 
-.skill-resultado.negativo .valor-resultado {
-    color: #ff6b6b;
-    text-shadow: 0 0 8px rgba(255, 107, 107, 0.3);
+.pericias-disponíveis-secao::-webkit-scrollbar-track,
+.pericias-selecionadas-secao::-webkit-scrollbar-track {
+    background: transparent !important;
 }
 
-/* 
-   
-   FOOTER COM BOTÕES - LAYOUT HORIZONTAL
-   
-    */
-.pericias-footer {
-    display: flex;
-    gap: 1.2rem;
-    justify-content: center;
-    flex-wrap: nowrap;
-    margin-top: 3rem;
-    padding: 2.5rem;
-    background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%);
-    border-top: 3px solid var(--cor-dourada);
-    border-radius: 12px;
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
+.pericias-disponíveis-secao::-webkit-scrollbar-thumb,
+.pericias-selecionadas-secao::-webkit-scrollbar-thumb {
+    background: var(--cor-madeira) !important;
+    border-radius: 4px !important;
 }
 
-.btn-exportar,
-.btn-resetar,
-.btn-stats {
-    padding: 1.1rem 2.2rem;
-    border: 2px solid var(--cor-dourada);
-    border-radius: 8px;
-    color: var(--cor-dourada);
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    min-width: 160px;
-    white-space: nowrap;
-    flex: 0 1 auto;
+.pericias-disponíveis-secao::-webkit-scrollbar-thumb:hover,
+.pericias-selecionadas-secao::-webkit-scrollbar-thumb:hover {
+    background: var(--cor-dourada) !important;
 }
 
-.btn-exportar {
-    background: linear-gradient(135deg, #4B0082 0%, #2d0052 100%);
-}
-
-.btn-exportar:hover {
-    background: linear-gradient(135deg, #6200ad 0%, #3d0066 100%);
-    box-shadow: 0 0 20px rgba(98, 0, 173, 0.4);
-    transform: translateY(-3px);
-}
-
-.btn-resetar {
-    background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
-}
-
-.btn-resetar:hover {
-    background: linear-gradient(135deg, #ff1744 0%, #c41c3b 100%);
-    box-shadow: 0 0 20px rgba(255, 23, 68, 0.4);
-    transform: translateY(-3px);
-}
-
-.btn-stats {
-    background: linear-gradient(135deg, #228B22 0%, #0d5a0d 100%);
-}
-
-.btn-stats:hover {
-    background: linear-gradient(135deg, #32cd32 0%, #1a7a1a 100%);
-    box-shadow: 0 0 20px rgba(50, 205, 50, 0.4);
-    transform: translateY(-3px);
-}
-
-.btn-exportar:active,
-.btn-resetar:active,
-.btn-stats:active {
-    transform: translateY(-1px);
-}
-
-/* 
-   
-   NOTIFICAÇÕES TOAST
-   
-    */
-#toast-container {
-    position: fixed;
-    top: 2rem;
-    right: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    z-index: 9999;
-    pointer-events: none;
-    max-width: 400px;
-}
-
-.toast {
-    padding: 1.2rem 1.8rem;
-    border-radius: 8px;
-    font-weight: 500;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transform: translateX(450px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: auto;
-    min-width: 260px;
-}
-
-.toast.show {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.toast-success {
-    background: linear-gradient(135deg, #228B22 0%, #1a6b1a 100%);
-    color: #fff;
-    border-left: 4px solid #32cd32;
-}
-
-.toast-error {
-    background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
-    color: #fff;
-    border-left: 4px solid #ff6b6b;
-}
-
-.toast-info {
-    background: linear-gradient(135deg, #4169e1 0%, #1e40af 100%);
-    color: #fff;
-    border-left: 4px solid #87ceeb;
-}
-
-.toast-warning {
-    background: linear-gradient(135deg, #ff8c00 0%, #cc6600 100%);
-    color: #fff;
-    border-left: 4px solid #ffa500;
-}
-
-/* 
-   
-   RESPONSIVIDADE - DESKTOP A TABLET
-   
-    */
+/* ========== RESPONSIVIDADE ========== */
 @media (max-width: 1200px) {
-    .pericias-grid {
-        grid-template-columns: 1fr;
+    .pericias-wrapper {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
     }
 
-    .skill-card {
-        flex-wrap: wrap;
-    }
-
-    .skill-header {
-        min-width: 100%;
-    }
-
-    .skill-inputs {
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    .skill-resultado {
-        width: 100%;
-    }
-}
-
-/* 
-   
-   RESPONSIVIDADE - TABLET
-   
-    */
-@media (max-width: 1024px) {
-    .pericias-header {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .btn-voltar {
-        justify-self: center;
-        width: 100%;
-    }
-
-    .header-content {
-        grid-column: 1;
-    }
-
-    .header-info {
-        text-align: center;
-        border-left: none;
-        border-top: 3px solid var(--cor-dourada);
-        padding-top: 1rem;
-        justify-self: center;
-        width: 100%;
+    .pericias-disponíveis-secao,
+    .pericias-selecionadas-secao {
+        max-height: none !important;
     }
 }
 
 @media (max-width: 768px) {
     .pericias-header {
-        padding: 1.5rem;
-        gap: 1rem;
-    }
-
-    .header-content h1 {
-        font-size: 1.8rem;
-    }
-
-    .header-content .subtitulo {
-        font-size: 0.9rem;
-    }
-
-    .pericias-container {
-        gap: 1.8rem;
-    }
-
-    .pericias-secao {
-        padding: 1.8rem;
-    }
-
-    .secao-titulo {
-        font-size: 1.4rem;
-    }
-
-    .skill-card {
-        flex-direction: column;
-        gap: 0.6rem;
-        padding: 0.8rem;
-    }
-
-    .skill-header {
-        width: 100%;
-        min-width: auto;
-        gap: 0.6rem;
-    }
-
-    .skill-inputs {
-        width: 100%;
-    }
-
-    .skill-resultado {
-        width: 100%;
-        min-width: auto;
-    }
-
-    .skill-nome {
-        font-size: 0.9rem;
-    }
-
-    .skill-input-number {
-        width: 40px;
-        height: 36px;
-        font-size: 0.85rem;
-    }
-
-    .pericias-footer {
-        flex-wrap: wrap;
-        padding: 1.8rem;
-        gap: 0.8rem;
-    }
-
-    .btn-exportar,
-    .btn-resetar,
-    .btn-stats {
-        flex: 1 1 calc(33.333% - 0.8rem);
-        min-width: 140px;
-    }
-
-    #toast-container {
-        top: 1rem;
-        right: 1rem;
-        left: 1rem;
-        max-width: none;
-    }
-}
-
-/* 
-   
-   RESPONSIVIDADE - MOBILE
-   
-    */
-@media (max-width: 480px) {
-    .container {
-        padding: 0.8rem;
-    }
-
-    .pericias-header {
-        padding: 1rem;
-        gap: 0.8rem;
-    }
-
-    .header-content h1 {
-        font-size: 1.4rem;
-    }
-
-    .header-content .subtitulo {
-        font-size: 0.85rem;
-    }
-
-    .btn-voltar {
-        padding: 0.7rem 1.2rem;
-        font-size: 0.95rem;
-        width: 100%;
+        flex-direction: column !important;
+        gap: 1rem !important;
+        padding: 1.5rem !important;
     }
 
     .header-info {
-        width: 100%;
-        padding: 0.8rem;
-    }
-
-    .combatente-nome {
-        font-size: 1rem;
-    }
-
-    .combatente-tipo {
-        font-size: 0.8rem;
-    }
-
-    .pericias-container {
-        gap: 1.2rem;
-    }
-
-    .pericias-secao {
-        padding: 1.2rem;
+        width: 100% !important;
+        text-align: center !important;
+        border-left: none !important;
+        border-top: 2px solid var(--cor-dourada) !important;
     }
 
     .secao-titulo {
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.8rem;
+        font-size: 1.4rem !important;
     }
 
-    .pericias-grid {
-        grid-template-columns: 1fr;
-        gap: 0.8rem;
+    .filtros-container {
+        flex-direction: column !important;
     }
 
-    .skill-card {
-        flex-direction: column;
-        gap: 0.5rem;
-        padding: 0.7rem;
+    .filtro-input,
+    .btn-filtro {
+        width: 100% !important;
     }
 
-    .skill-header {
-        width: 100%;
-        min-width: auto;
-        gap: 0.5rem;
-    }
-
-    .skill-nome {
-        font-size: 0.85rem;
-    }
-
-    .skill-atributo {
-        font-size: 0.6rem;
-        padding: 0.2rem 0.4rem;
-    }
-
-    .skill-inputs {
-        width: 100%;
-        gap: 0.4rem;
-    }
-
-    .skill-input-number {
-        width: 35px;
-        height: 32px;
-        font-size: 0.75rem;
-        padding: 0.15rem;
-    }
-
-    .skill-resultado {
-        width: 100%;
-        padding: 0.45rem 0.6rem;
-        min-width: auto;
-    }
-
-    .label-resultado {
-        font-size: 0.5rem;
-    }
-
-    .valor-resultado {
-        font-size: 1rem;
-    }
-
-    .pericias-footer {
-        flex-direction: column;
-        padding: 1.2rem;
-        gap: 0.8rem;
-    }
-
-    .btn-exportar,
-    .btn-resetar,
-    .btn-stats {
-        padding: 0.8rem 1.4rem;
-        font-size: 0.9rem;
-        flex: 1 1 100%;
-        min-width: auto;
-        width: 100%;
+    .modificadores-grid {
+        grid-template-columns: 1fr !important;
     }
 }
 
-/* 
-   
-   ANIMAÇÕES
-   
-    */
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.skill-card {
-    animation: slideUp 0.4s ease-out forwards;
-}
-
-.skill-card:nth-child(1) { animation-delay: 0.05s; }
-.skill-card:nth-child(2) { animation-delay: 0.1s; }
-.skill-card:nth-child(3) { animation-delay: 0.15s; }
-.skill-card:nth-child(4) { animation-delay: 0.2s; }
-.skill-card:nth-child(5) { animation-delay: 0.25s; }
-.skill-card:nth-child(6) { animation-delay: 0.3s; }
-
-/* 
-   
-   DARK MODE SUPPORT
-   
-    */
-@media (prefers-color-scheme: dark) {
-    .pericias-secao {
-        background: linear-gradient(135deg, #1a1410 0%, #0f0a08 100%);
-    }
-
-    .skill-card {
-        background: linear-gradient(135deg, #2c1810 0%, #1a1410 100%);
-    }
-}
-
-/* 
-   
-   PRINT MEDIA QUERIES
-   
-    */
-@media print {
-    .btn-voltar,
-    .pericias-footer,
-    #toast-container {
-        display: none;
+@media (max-width: 480px) {
+    .pericias-wrapper {
+        padding: 1rem !important;
     }
 
     .pericias-header {
-        margin-bottom: 1.5rem;
-        padding: 1rem;
+        padding: 1rem !important;
     }
 
-    .skill-card {
-        break-inside: avoid;
+    .header-content h1 {
+        font-size: 1.6rem !important;
+    }
+
+    .pericias-disponíveis-secao,
+    .pericias-selecionadas-secao {
+        padding: 1rem !important;
+    }
+
+    .pericia-card-disponivel,
+    .pericia-card-selecionada {
+        padding: 0.8rem !important;
+    }
+
+    .secao-titulo {
+        font-size: 1.2rem !important;
     }
 }
