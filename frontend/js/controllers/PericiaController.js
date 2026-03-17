@@ -1,7 +1,7 @@
 /**
  * PericiaController.js
  * SRP: Orquestrar a lógica de perícias
- * SOLID: DIP via constructor injection
+ * SOLID: DIP via constructor injection de services
  */
 
 import { API_CONFIG, getApiUrl } from '../config/api.config.js';
@@ -19,6 +19,10 @@ export class PericiaController {
         console.log('✅ PericiaController inicializado');
     }
 
+    /**
+     * Inicializa o controller carregando todos os dados
+     * SRP: Apenas orquestra o carregamento
+     */
     async inicializar() {
         try {
             const params = new URLSearchParams(window.location.search);
@@ -30,20 +34,20 @@ export class PericiaController {
 
             console.log('🎯 Inicializando para combatente:', combatenteId);
 
-            // Carregar combatente
-            this.combatente = await this.combatenteService.obterCombatente(combatenteId);
+            // 1. Carregar combatente (✅ FUNÇÃO CORRIGIDA)
+            this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
             console.log('✅ Combatente carregado:', this.combatente.nome);
 
-            // Carregar perícias
+            // 2. Carregar perícias disponíveis
             this.pericias = await this.listarPericias();
             console.log('✅ Perícias carregadas:', this.pericias.length);
 
-            // Carregar perícias do jogador
-            const resultado = await this.listarPericiasJogador(combatenteId);
+            // 3. Carregar perícias do jogador
+            const resultado = await this.listarPericiasJogador(parseInt(combatenteId));
             this.periciasSelecionadas = resultado.pericias || [];
             console.log('✅ Perícias do jogador carregadas:', this.periciasSelecionadas.length);
 
-            // Renderizar
+            // 4. Renderizar interface
             this.renderizar();
             NotificationService.mostrarSucesso(`Bem-vindo, ${this.combatente.nome}!`);
 
@@ -55,6 +59,13 @@ export class PericiaController {
 
     // ========== MÉTODOS DE PERÍCIA ==========
 
+    /**
+     * Lista todas as perícias disponíveis
+     * @param {number} skip
+     * @param {number} limit
+     * @param {string|null} atributo - filtro por atributo
+     * @returns {Promise<Array>}
+     */
     async listarPericias(skip = 0, limit = 100, atributo = null) {
         try {
             let url = getApiUrl(this.apiConfig.ENDPOINTS.PERICIAS);
@@ -85,6 +96,11 @@ export class PericiaController {
         }
     }
 
+    /**
+     * Lista perícias do jogador
+     * @param {number} combatenteId
+     * @returns {Promise<Object>}
+     */
     async listarPericiasJogador(combatenteId) {
         try {
             const url = getApiUrl(`${this.apiConfig.ENDPOINTS.PERICIAS}/${combatenteId}/listar`);
@@ -103,7 +119,7 @@ export class PericiaController {
             }
 
             const data = await response.json();
-            console.log('✅ Perícias do jogador recebidas:', data.pericias.length);
+            console.log('✅ Perícias do jogador recebidas:', data.pericias?.length || 0);
             return data;
 
         } catch (error) {
@@ -112,6 +128,12 @@ export class PericiaController {
         }
     }
 
+    /**
+     * Adiciona uma perícia ao jogador
+     * @param {number} combatenteId
+     * @param {Object} periciaJogadorData
+     * @returns {Promise<Object>}
+     */
     async adicionarPericiaJogador(combatenteId, periciaJogadorData) {
         try {
             const url = getApiUrl(`${this.apiConfig.ENDPOINTS.PERICIAS}/${combatenteId}/adicionar`);
@@ -141,6 +163,12 @@ export class PericiaController {
         }
     }
 
+    /**
+     * Deleta uma perícia do jogador
+     * @param {number} combatenteId
+     * @param {number} periciaJogadorId
+     * @returns {Promise<void>}
+     */
     async deletarPericiaJogador(combatenteId, periciaJogadorId) {
         try {
             const url = getApiUrl(`${this.apiConfig.ENDPOINTS.PERICIAS}/${combatenteId}/pericia/${periciaJogadorId}`);
@@ -167,12 +195,20 @@ export class PericiaController {
 
     // ========== RENDERIZAÇÃO ==========
 
+    /**
+     * Renderiza toda a interface
+     * SRP: Orquestra a renderização
+     */
     renderizar() {
         this.renderizarPericias();
         this.renderizarPericiasJogador();
         this.atualizarEstatisticas();
     }
 
+    /**
+     * Renderiza a lista de perícias disponíveis
+     * SRP: Apenas renderiza perícias
+     */
     renderizarPericias() {
         const container = document.getElementById('pericias-disponiveis');
         if (!container) {
@@ -205,13 +241,20 @@ export class PericiaController {
             container.appendChild(card);
         });
 
+        // Event listeners para adicionar perícia
         document.querySelectorAll('.btn-adicionar-pericia').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 this.abrirModalAdicionar(e.target.dataset.periciaId);
             });
         });
+
+        console.log('✅ Perícias renderizadas');
     }
 
+    /**
+     * Renderiza as perícias do jogador
+     * SRP: Apenas renderiza perícias do jogador
+     */
     renderizarPericiasJogador() {
         const container = document.getElementById('pericias-jogador');
         if (!container) return;
@@ -224,7 +267,7 @@ export class PericiaController {
         }
 
         this.periciasSelecionadas.forEach(pj => {
-            const totalMod = pj.graduacao + pj.modificador_atributo + pj.bonus_outros;
+            const totalMod = pj.graduacao + (pj.modificador_atributo || 0) + (pj.bonus_outros || 0);
             
             const card = document.createElement('div');
             card.className = 'pericia-jogador-card';
@@ -241,28 +284,50 @@ export class PericiaController {
             container.appendChild(card);
         });
 
+        // Event listeners para remover perícia
         document.querySelectorAll('.btn-remover-pj').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 this.removerPericiaJogador(e.target.dataset.pjId);
             });
         });
+
+        console.log('✅ Perícias do jogador renderizadas');
     }
 
+    /**
+     * Abre o modal de adicionar perícia
+     * @param {number} periciaId
+     */
     abrirModalAdicionar(periciaId) {
         const pericia = this.pericias.find(p => p.id === parseInt(periciaId));
-        if (!pericia) return;
+        if (!pericia) {
+            console.error('❌ Perícia não encontrada');
+            return;
+        }
 
         const modal = document.getElementById('modal-adicionar-pericia');
+        const form = modal?.querySelector('form');
+
+        if (!modal || !form) {
+            console.error('❌ Modal ou form não encontrado');
+            return;
+        }
+
         document.getElementById('modal-pericia-nome').textContent = pericia.nome;
 
-        modal.querySelector('form').onsubmit = (e) => {
+        form.onsubmit = (e) => {
             e.preventDefault();
             this.adicionarPericia(periciaId);
         };
 
         modal.classList.add('show');
+        console.log('✅ Modal aberto para perícia:', pericia.nome);
     }
 
+    /**
+     * Adiciona uma perícia ao jogador via modal
+     * @param {number} periciaId
+     */
     async adicionarPericia(periciaId) {
         try {
             const graduacao = parseInt(document.getElementById('input-graduacao').value) || 0;
@@ -277,6 +342,7 @@ export class PericiaController {
             NotificationService.mostrarSucesso('Perícia adicionada!');
             document.getElementById('modal-adicionar-pericia').classList.remove('show');
             
+            // Recarregar perícias do jogador
             const resultado = await this.listarPericiasJogador(this.combatente.id);
             this.periciasSelecionadas = resultado.pericias || [];
             this.renderizar();
@@ -286,6 +352,10 @@ export class PericiaController {
         }
     }
 
+    /**
+     * Remove uma perícia do jogador
+     * @param {number} periciaJogadorId
+     */
     async removerPericiaJogador(periciaJogadorId) {
         if (!confirm('Remover perícia?')) return;
 
@@ -293,6 +363,7 @@ export class PericiaController {
             await this.deletarPericiaJogador(this.combatente.id, periciaJogadorId);
             NotificationService.mostrarSucesso('Perícia removida!');
             
+            // Recarregar perícias do jogador
             const resultado = await this.listarPericiasJogador(this.combatente.id);
             this.periciasSelecionadas = resultado.pericias || [];
             this.renderizar();
@@ -302,12 +373,16 @@ export class PericiaController {
         }
     }
 
+    /**
+     * Atualiza e exibe estatísticas de perícias
+     * SRP: Apenas atualiza estatísticas
+     */
     atualizarEstatisticas() {
         const statsDiv = document.getElementById('pericias-stats');
         if (!statsDiv) return;
 
-        const pontos_gastos = this.periciasSelecionadas.reduce((sum, p) => sum + p.graduacao, 0);
-        const pontos_disponiveis = (this.combatente.nivel * 3) - pontos_gastos;
+        const pontos_gastos = this.periciasSelecionadas.reduce((sum, p) => sum + (p.graduacao || 0), 0);
+        const pontos_disponiveis = ((this.combatente.nivel || 1) * 3) - pontos_gastos;
 
         statsDiv.innerHTML = `
             <div class="stat-item">
@@ -323,5 +398,7 @@ export class PericiaController {
                 <span class="stat-valor">${pontos_disponiveis}</span>
             </div>
         `;
+
+        console.log('✅ Estatísticas atualizadas');
     }
 }
