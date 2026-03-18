@@ -19,10 +19,7 @@ export class ArenaController {
         this._cronometroInterval   = null;
         this._cronometroAtivo      = false;
         this._jaAgiram             = [];
-
-        // ✅ NOVO: canal de comunicação arena → ficha
-        this._canal = new BroadcastChannel('magias-rpg');
-
+        this._canal                = new BroadcastChannel('magias-rpg');
         this._inicializar();
     }
 
@@ -124,7 +121,7 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
-    // ─── Cronômetro 
+    // ─── Cronômetro ────────────────────────────────────────
 
     _iniciarCronometro() {
         var self = this;
@@ -230,11 +227,6 @@ export class ArenaController {
         if (btnDevolver) btnDevolver.disabled  = (slot.usados <= 0);
     }
 
-    /**
-     * Lançar magia preparada (jogadores conjuradores)
-     * PATCH /usar + atualiza UI local + ✅ broadcast para ficha aberta
-     * SRP: orquestra toggle, UI e notificação — cada um em método próprio
-     */
     async _lancarMagiaPreparada(combatenteId, magiaId, nivel) {
         var combatente = this.combatentes[this.turnoAtual];
         if (!combatente) return;
@@ -247,17 +239,10 @@ export class ArenaController {
 
         try {
             var data = await this.magiaPreparadaService.toggleUsada(combatenteId, magiaId);
-
-            // 1. Atualiza estado local
             magiaPrep.usada = data.usada;
             grupo.usadas    = grupo.preparadas.filter(function(p) { return p.usada; }).length;
-
-            // 2. Atualiza UI da arena
             this._atualizarUIPreparada(nivel, grupo, magiaId, data.usada);
-
-            // 3. ✅ NOVO: Notifica ficha aberta via BroadcastChannel
             this._publicarEventoMagia(combatenteId, magiaId, nivel, data.usada, grupo);
-
             Toast.success(data.usada
                 ? '🔥 ' + (magiaPrep.magia_nome || 'Magia') + ' lançada!'
                 : '↩️ ' + (magiaPrep.magia_nome || 'Magia') + ' restaurada'
@@ -267,37 +252,23 @@ export class ArenaController {
         }
     }
 
-    /**
-     * ✅ NOVO: Publica evento no BroadcastChannel para sincronizar ficha
-     * SRP: apenas serialização e envio — sem lógica de negócio
-     * @param {number} combatenteId
-     * @param {number} magiaId
-     * @param {number} nivel
-     * @param {boolean} usada
-     * @param {Object} grupo - { total, usadas, preparadas[] }
-     */
     _publicarEventoMagia(combatenteId, magiaId, nivel, usada, grupo) {
         try {
             this._canal.postMessage({
-                tipo:          'magia-usada',
-                combatenteId:  combatenteId,
-                magiaId:       magiaId,
-                nivel:         nivel,
-                usada:         usada,
-                disponiveis:   grupo.total - grupo.usadas,
-                total:         grupo.total,
-                timestamp:     Date.now(),
+                tipo:         'magia-usada',
+                combatenteId: combatenteId,
+                magiaId:      magiaId,
+                nivel:        nivel,
+                usada:        usada,
+                disponiveis:  grupo.total - grupo.usadas,
+                total:        grupo.total,
+                timestamp:    Date.now(),
             });
         } catch (err) {
-            // BroadcastChannel falha silenciosamente — não quebra o fluxo
             console.warn('⚠️ BroadcastChannel indisponível:', err.message);
         }
     }
 
-    /**
-     * Atualiza UI de uma linha de magia preparada na arena
-     * SRP: apenas manipulação de DOM da arena
-     */
     _atualizarUIPreparada(nivel, grupo, magiaId, usada) {
         var spanDisp = document.querySelector(
             '.arena-magia-preparada-nivel[data-nivel="' + nivel + '"] .arena-prep-disponiveis'
@@ -309,14 +280,12 @@ export class ArenaController {
                                  : grupo.usadas > 0  ? '#facc15'
                                  :                     '#4ade80';
         }
-
         var btn = document.querySelector('.arena-prep-btn[data-magia-id="' + magiaId + '"]');
         if (btn) {
             btn.textContent = usada ? '↩️' : '🔥';
             btn.title       = usada ? 'Restaurar magia' : 'Lançar magia';
             btn.classList.toggle('arena-prep-btn-usada', usada);
         }
-
         var nome = document.querySelector('.arena-prep-nome[data-magia-id="' + magiaId + '"]');
         if (nome) nome.classList.toggle('arena-prep-nome-usada', usada);
     }
@@ -445,16 +414,25 @@ export class ArenaController {
             ? this._renderizarMagiasPreparadas(c._magiasGrupos, c.id)
             : this._renderizarMagias(c.magias_slots || [], c.tipo);
 
+        // ✅ badge de página de referência — só para monstros com página definida
+        var refBadge = (c.tipo === 'monstro' && c.pagina_referencia)
+            ? ' <span class="arena-badge-referencia" title="Referência do livro">📖 '
+              + c.pagina_referencia + '</span>'
+            : '';
+
         var html = '';
         html += '<div class="arena-card">';
 
+        // ── Header ──
         html += '<div class="arena-header">';
         html += '<div class="arena-header-nome">';
         html += '<h2 class="arena-nome">' + c.nome
               + ' <span class="arena-nivel">(' + nivel + '° nivel)</span></h2>';
         html += '<span class="arena-raca-classe">'
               + (raca ? raca + ' / ' : '') + classe
-              + ' <span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span></span>';
+              + ' <span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span>'
+              + refBadge   // ✅ badge inline após o tipo
+              + '</span>';
         html += '</div>';
         html += '<div class="arena-header-acoes">';
         html += '<div class="arena-cronometro-inline">';
@@ -472,8 +450,10 @@ export class ArenaController {
               + olhoTxt + '</button>';
         html += '</div></div>';
 
+        // ── Layout principal ──
         html += '<div class="arena-layout-principal">';
 
+        // Coluna esquerda
         html += '<div class="arena-coluna-esquerda">';
         html += '<div class="arena-linha-info">';
         html += '<div class="arena-secao arena-secao-atributos">';
@@ -497,11 +477,13 @@ export class ArenaController {
         html += '</div>';
         html += '</div></div>';
 
+        // Coluna central
         html += '<div class="arena-coluna-central">';
         html += ataquesHTML;
         html += magiasHTML;
         html += '</div>';
 
+        // Coluna direita
         html += '<div class="arena-coluna-direita">';
         html += '<div class="arena-defesa-box">';
         html += '<div class="arena-ca-principal">';
@@ -526,9 +508,9 @@ export class ArenaController {
         html += '</div>';
         html += '<button class="arena-btn-proximo" onclick="window._avancarTurno()">'
               + 'Encerrar turno</button>';
-        html += '</div>';
-        html += '</div>';
-        html += '</div>';
+        html += '</div>';  // fim coluna-direita
+        html += '</div>';  // fim layout-principal
+        html += '</div>';  // fim arena-card
 
         container.innerHTML = html;
 
@@ -749,7 +731,6 @@ export class ArenaController {
             textoCancelar: '← Continuar Combate', textoConfirmar: 'Encerrar ✓',
             onConfirmar: function() {
                 self._pararCronometro();
-                // ✅ NOVO: fecha o canal ao encerrar combate
                 try { self._canal.close(); } catch(e) {}
                 var telaArena        = document.getElementById('telaArena');
                 var telaConfiguracao = document.getElementById('telaConfiguracao');
