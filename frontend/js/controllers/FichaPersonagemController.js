@@ -291,21 +291,24 @@ export class FichaPersonagemController {
             item.title     = pj.pericia?.descricao || '';
             item.innerHTML = `
                 <span class="ficha-pericia-nome">${pj.pericia?.nome || '—'}</span>
-                <span class="ficha-pericia-attr">${pj.pericia?.atributo || '—'}</span>
-                <div class="ficha-pericia-numeros">
-                    <span class="ficha-pericia-num" title="Graduação">
-                        <small>Gra</small> ${pj.graduacao}
-                    </span>
-                    <span class="ficha-pericia-num" title="Atributo">
-                        <small>Atr</small> ${pj.modificador_atributo >= 0 ? '+' : ''}${pj.modificador_atributo}
-                    </span>
-                    <span class="ficha-pericia-num" title="Bônus outros">
-                        <small>Bôn</small> ${(pj.bonus_outros || 0) >= 0 ? '+' : ''}${pj.bonus_outros || 0}
-                    </span>
-                    <span class="ficha-pericia-total ${total >= 0 ? 'positivo' : 'negativo'}">
-                        ${total >= 0 ? '+' : ''}${total}
-                    </span>
+                <span class="ficha-pericia-atributo">${pj.pericia?.atributo || '—'}</span>
+                <div class="ficha-pericia-mods">
+                    <div class="ficha-pericia-mod">
+                        <span class="ficha-pericia-mod-label">Gra</span>
+                        <span class="ficha-pericia-mod-valor">${pj.graduacao}</span>
+                    </div>
+                    <div class="ficha-pericia-mod">
+                        <span class="ficha-pericia-mod-label">Atr</span>
+                        <span class="ficha-pericia-mod-valor">${pj.modificador_atributo >= 0 ? '+' : ''}${pj.modificador_atributo}</span>
+                    </div>
+                    <div class="ficha-pericia-mod">
+                        <span class="ficha-pericia-mod-label">Bôn</span>
+                        <span class="ficha-pericia-mod-valor">${(pj.bonus_outros || 0) >= 0 ? '+' : ''}${pj.bonus_outros || 0}</span>
+                    </div>
                 </div>
+                <span class="ficha-pericia-total ${total >= 0 ? 'positivo' : 'negativo'}">
+                    ${total >= 0 ? '+' : ''}${total}
+                </span>
             `;
             container.appendChild(item);
         });
