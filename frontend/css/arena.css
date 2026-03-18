@@ -865,3 +865,27 @@
     font-size: 0.78rem;
     line-height: 1.5;
 }
+
+/* ── Badge página de referência (monstros) ── */
+.arena-badge-referencia {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             0.25rem;
+    margin-left:     0.5rem;
+    padding:         0.15rem 0.5rem;
+    background:      rgba(251,191,36,0.12);
+    border:          1px solid rgba(251,191,36,0.3);
+    border-radius:   4px;
+    font-size:       0.68rem;
+    color:           rgba(251,191,36,0.85);
+    font-style:      italic;
+    letter-spacing:  0.02em;
+    vertical-align:  middle;
+    cursor:          default;
+    transition:      background 0.2s;
+}
+
+.arena-badge-referencia:hover {
+    background: rgba(251,191,36,0.22);
+    color:      #fbbf24;
+}
