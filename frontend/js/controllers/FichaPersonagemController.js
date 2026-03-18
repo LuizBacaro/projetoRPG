@@ -2,10 +2,11 @@
  * FichaPersonagemController.js
  * SRP: Controlar renderização da ficha do personagem
  * SOLID: DIP via constructor injection de services
+ * ✅ NOVO: BroadcastChannel sync arena→ficha em tempo real
  */
 
 import { CombatenteService } from '../services/CombatenteService.js';
-import { getApiUrl         } from '../config/api.config.js';
+import { getApiUrl } from '../config/api.config.js';
 
 export class FichaPersonagemController {
 
@@ -13,6 +14,11 @@ export class FichaPersonagemController {
         this.combatenteService = new CombatenteService();
         this.token             = localStorage.getItem('token');
         this.combatente        = null;
+
+        // ✅ NOVO: canal de escuta arena → ficha
+        this._canal = null;
+        this._configurarCanalSync();
+
         console.log('✅ FichaPersonagemController inicializado');
     }
 
@@ -40,7 +46,7 @@ export class FichaPersonagemController {
             this.renderizarDefesa();
             this.renderizarResistencias();
             this.renderizarAtaques();
-            this.renderizarSlotsDeMapia();    // ✅ slots de magia
+            this.renderizarSlotsDeMapia();
             await this.carregarRenderizarPericias(parseInt(combatenteId));
 
             console.log('✅ Ficha carregada com sucesso');
@@ -48,6 +54,157 @@ export class FichaPersonagemController {
         } catch (error) {
             console.error('❌ Erro ao inicializar ficha:', error);
             this.mostrarErro('Erro ao carregar ficha: ' + error.message);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // ✅ NOVO: SINCRONIZAÇÃO COM ARENA
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * ✅ NOVO: Configura escuta do BroadcastChannel
+     * SRP: apenas setup do canal — processamento delegado a _processarEventoMagia()
+     */
+    _configurarCanalSync() {
+        try {
+            this._canal = new BroadcastChannel('magias-rpg');
+            this._canal.onmessage = (event) => {
+                if (event.data?.tipo === 'magia-usada') {
+                    this._processarEventoMagia(event.data);
+                }
+            };
+            console.log('✅ FichaController: canal sync arena→ficha ativo');
+        } catch (err) {
+            console.warn('⚠️ BroadcastChannel indisponível:', err.message);
+        }
+    }
+
+    /**
+     * ✅ NOVO: Processa evento de magia lançada na arena
+     * Atualiza o painel de slots (fichaMagiasGrid) em tempo real
+     * SRP: apenas roteamento — atualização de UI delegada a métodos específicos
+     * @param {{ combatenteId, magiaId, nivel, usada, disponiveis, total }} payload
+     */
+    _processarEventoMagia(payload) {
+        // Ignora eventos de outros combatentes
+        if (!this.combatente || this.combatente.id !== payload.combatenteId) {
+            return;
+        }
+
+        console.log('📡 Sync magia recebida na ficha:', payload);
+
+        // 1. Atualiza painel de slots na ficha
+        this._atualizarPainelSlotsFicha(payload.nivel, payload.disponiveis, payload.total);
+
+        // 2. Pulsa o slot para dar feedback visual
+        this._pulsarSlot(payload.nivel);
+
+        // 3. Atualiza painel de slots no grimório (se estiver aberto)
+        if (window._grimorioController) {
+            this._atualizarPainelSlotsGrimorio(payload.nivel, payload.disponiveis, payload.total);
+        }
+    }
+
+    /**
+     * ✅ NOVO: Atualiza o painel de slots na ficha (fichaMagiasGrid)
+     * SRP: apenas DOM da ficha — sem lógica de negócio
+     * @param {number} nivel
+     * @param {number} disponiveis
+     * @param {number} total
+     */
+    _atualizarPainelSlotsFicha(nivel, disponiveis, total) {
+        const grid = document.getElementById('fichaMagiasGrid');
+        if (!grid) return;
+
+        // Encontra a linha do slot por nível
+        const linhas = grid.querySelectorAll('.ficha-slot-linha');
+        let slotLinha = null;
+
+        for (const linha of linhas) {
+            const nivelSpan = linha.querySelector('.ficha-slot-nivel');
+            if (!nivelSpan) continue;
+
+            const labelNivel = nivel === 0 ? 'Truques' : `${nivel}° Nível`;
+            if (nivelSpan.textContent.trim() === labelNivel) {
+                slotLinha = linha;
+                break;
+            }
+        }
+
+        if (!slotLinha) return; // Slot não existe na ficha
+
+        // Atualiza contagem
+        const contagemEl = slotLinha.querySelector('.ficha-slot-contagem');
+        if (contagemEl) {
+            contagemEl.textContent = `${disponiveis}/${total}`;
+        }
+
+        // Atualiza barra de progresso
+        const fill = slotLinha.querySelector('.ficha-slot-barra-fill');
+        if (fill) {
+            const pct = total > 0 ? (disponiveis / total) * 100 : 0;
+            fill.style.width = `${pct}%`;
+
+            // Cor baseada na disponibilidade
+            let cor = '#4ade80'; // Verde
+            if (pct <= 50) cor = '#facc15'; // Amarelo
+            if (pct <= 25) cor = '#f87171'; // Vermelho
+            fill.style.background = cor;
+        }
+
+        console.log(`📊 Slot nível ${nivel} atualizado: ${disponiveis}/${total}`);
+    }
+
+    /**
+     * ✅ NOVO: Atualiza painel de slots no grimório (se aberto)
+     * SRP: apenas integração com GrimorioController
+     * @param {number} nivel
+     * @param {number} disponiveis
+     * @param {number} total
+     */
+    _atualizarPainelSlotsGrimorio(nivel, disponiveis, total) {
+        try {
+            const gc = window._grimorioController;
+            if (!gc || !gc.slotsDisponiveis) return;
+
+            if (gc.slotsDisponiveis[nivel]) {
+                gc.slotsDisponiveis[nivel].preparadas = total;
+                gc.slotsDisponiveis[nivel].disponivel = disponiveis;
+                gc._renderizarPainelSlots();
+                console.log(`📖 Grimório: slot nível ${nivel} sincronizado`);
+            }
+        } catch (err) {
+            console.warn('⚠️ Erro ao sincronizar grimório:', err.message);
+        }
+    }
+
+    /**
+     * ✅ NOVO: Pulsa visualmente o slot que foi alterado
+     * SRP: apenas feedback visual — sem lógica de estado
+     * @param {number} nivel
+     */
+    _pulsarSlot(nivel) {
+        const grid = document.getElementById('fichaMagiasGrid');
+        if (!grid) return;
+
+        const linhas = grid.querySelectorAll('.ficha-slot-linha');
+        for (const linha of linhas) {
+            const nivelSpan = linha.querySelector('.ficha-slot-nivel');
+            if (!nivelSpan) continue;
+
+            const labelNivel = nivel === 0 ? 'Truques' : `${nivel}° Nível`;
+            if (nivelSpan.textContent.trim() === labelNivel) {
+                // Força reflow para reiniciar animação
+                linha.classList.remove('ficha-slot-pulse');
+                void linha.offsetWidth;
+                linha.classList.add('ficha-slot-pulse');
+
+                // Remove classe após animação
+                setTimeout(() => {
+                    linha.classList.remove('ficha-slot-pulse');
+                }, 600);
+                break;
+            }
         }
     }
 
@@ -204,8 +361,6 @@ export class FichaPersonagemController {
         console.log('🔮 Todos os slots:', slots);
         console.log('🔮 Slots ativos (total > 0):', slotsAtivos);
 
-        // ✅ Mostrar seção sempre que o personagem for jogador
-        // (independente de ser conjurador — GrimorioController cuida do botão)
         if (secao && this.combatente.tipo === 'jogador') {
             secao.style.display = 'flex';
         }
@@ -216,7 +371,6 @@ export class FichaPersonagemController {
             return;
         }
 
-        // Ordenar por nível
         slotsAtivos.sort((a, b) => a.nivel - b.nivel);
 
         grid.innerHTML = slotsAtivos.map(slot => {
@@ -226,7 +380,6 @@ export class FichaPersonagemController {
             const pct         = total > 0 ? (disponiveis / total) * 100 : 0;
             const labelNivel  = slot.nivel === 0 ? 'Truques' : `${slot.nivel}° Nível`;
 
-            // Verde > 50%, Amarelo > 25%, Vermelho <= 25%
             const corBarra = pct > 50 ? '#4ade80' : pct > 25 ? '#facc15' : '#f87171';
 
             return `
@@ -237,7 +390,7 @@ export class FichaPersonagemController {
                     </div>
                     <div class="ficha-slot-barra-wrap">
                         <div class="ficha-slot-barra-fill"
-                             style="width:${pct}%; background:${corBarra}">
+                            style="width:${pct}%; background:${corBarra}">
                         </div>
                     </div>
                 </div>
@@ -303,7 +456,6 @@ export class FichaPersonagemController {
                     </div>
                     <div class="ficha-pericia-mod">
                         <span class="ficha-pericia-mod-label">Bôn</span>
-                        <span class="ficha-pericia-mod-valor">${(pj.bonus_outros || 0) >= 0 ? '+' : ''}${pj.bonus_outros || 0}</span>
                     </div>
                 </div>
                 <span class="ficha-pericia-total ${total >= 0 ? 'positivo' : 'negativo'}">
@@ -329,11 +481,9 @@ export class FichaPersonagemController {
         console.error('❌', mensagem);
         const container = document.getElementById('fichaPericiasLista');
         if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
-    }
-}
-
-// ── Inicializar quando DOM estiver pronto ──
-document.addEventListener('DOMContentLoaded', async () => {
+    }}// ── Inicializar quando DOM estiver pronto ──
+    document.addEventListener('DOMContentLoaded', async () => {
     const controller = new FichaPersonagemController();
     await controller.inicializar();
-});
+    }
+);

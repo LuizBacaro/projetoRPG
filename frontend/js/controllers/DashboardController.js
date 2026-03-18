@@ -174,8 +174,8 @@ class DashboardController {
                 await self.service.atualizar(id, new FormData(form));
                 await Promise.all([
                     self._salvarAtaquesEdicao(id),
-                    self._salvarMagiasEdicao(id),
-                    self._salvarPericiasEdicao(id)  // ✅ NOVO: Salvar perícias
+                    // ✅ _salvarMagiasEdicao REMOVIDO — grimório gerencia os slots
+                    self._salvarPericiasEdicao(id),
                 ]);
                 self._fecharModal('modalEdicaoDashboard');
                 self.combatenteEmEdicao = null;
@@ -303,8 +303,7 @@ class DashboardController {
                 return;
             }
 
-            // ✅ NOVO: Armazenar em window também para abrirPaginaPericias()
-            this.combatenteEmEdicao = c;
+            this.combatenteEmEdicao   = c;
             window.combatenteEmEdicao = c;
 
             document.getElementById('dashEditId').value         = c.id;
@@ -349,21 +348,20 @@ class DashboardController {
                 preview.style.display     = 'none';
             }
 
+            // ✅ Ataques: apenas para jogadores
             var secAtaques = document.getElementById('secaoAtaquesEdicao');
-            var secMagias  = document.getElementById('secaoMagiasEdicao');
             var isJogador  = (c.tipo === 'jogador');
             if (secAtaques) secAtaques.style.display = isJogador ? 'block' : 'none';
-            if (secMagias)  secMagias.style.display  = isJogador ? 'block' : 'none';
 
             if (isJogador) {
-                this._renderizarAtaquesEdicao(c.ataques      || []);
-                this._renderizarMagiasEdicao (c.magias_slots || []);
+                this._renderizarAtaquesEdicao(c.ataques || []);
             }
 
-            // ✅ NOVO: Recuperar perícias salvas antes de abrir modal
-            this._recuperarPericiasDoSessionStorage();
+            // ✅ secaoMagiasEdicao REMOVIDA — slots controlados pelo grimório
 
+            this._recuperarPericiasDoSessionStorage();
             this._abrirModal('modalEdicaoDashboard');
+
         } catch (err) {
             Toast.error('Erro ao carregar combatente');
             console.error(err);

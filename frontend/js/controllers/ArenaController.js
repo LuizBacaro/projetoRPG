@@ -1,24 +1,28 @@
-import { CombatenteService    } from '../services/CombatenteService.js';
-import { CondicaoController   } from './CondicaoController.js';
-import { MagiaSlotService     } from '../services/MagiaSlotService.js';
-import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js';  // ✅ NOVO
+import { CombatenteService     } from '../services/CombatenteService.js';
+import { CondicaoController    } from './CondicaoController.js';
+import { MagiaSlotService      } from '../services/MagiaSlotService.js';
+import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js';
 import { Toast } from '/js/ui/toast.module.js';
 
 export class ArenaController {
 
     constructor() {
-        this.combatenteService    = new CombatenteService();
-        this.condicaoController   = new CondicaoController();
-        this.magiaSlotService     = new MagiaSlotService();
-        this.magiaPreparadaService = new MagiaPreparadaService();  // ✅ NOVO
-        this.combatentes          = [];
-        this.turnoAtual           = 0;
-        this.rodadaAtual          = 1;
-        this.statsVisiveis        = false;
-        this._cronometroSegundos  = 0;
-        this._cronometroInterval  = null;
-        this._cronometroAtivo     = false;
-        this._jaAgiram            = [];
+        this.combatenteService     = new CombatenteService();
+        this.condicaoController    = new CondicaoController();
+        this.magiaSlotService      = new MagiaSlotService();
+        this.magiaPreparadaService = new MagiaPreparadaService();
+        this.combatentes           = [];
+        this.turnoAtual            = 0;
+        this.rodadaAtual           = 1;
+        this.statsVisiveis         = false;
+        this._cronometroSegundos   = 0;
+        this._cronometroInterval   = null;
+        this._cronometroAtivo      = false;
+        this._jaAgiram             = [];
+
+        // ✅ NOVO: canal de comunicação arena → ficha
+        this._canal = new BroadcastChannel('magias-rpg');
+
         this._inicializar();
     }
 
@@ -52,20 +56,13 @@ export class ArenaController {
         this._jaAgiram           = [];
         this._cronometroSegundos = 0;
         this._pararCronometro();
-
-        // ✅ NOVO: carregar magias preparadas para todos os jogadores conjuradores
         await this._carregarMagiasPreparadasTodos();
-
         this._iniciarCronometro();
         this.atualizarRodada();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
 
-    /**
-     * ✅ NOVO: Carrega magias preparadas para cada combatente jogador conjurador
-     * SRP: apenas carregamento de dados, sem UI
-     */
     async _carregarMagiasPreparadasTodos() {
         const CLASSES_CONJURADORAS = new Set([
             'mago','feiticeiro','clérigo','clerigo','druida',
@@ -73,13 +70,11 @@ export class ArenaController {
             'Mago','Feiticeiro','Clérigo','Clerigo','Druida',
             'Bardo','Paladino','Ranger',
         ]);
-
         const promessas = this.combatentes
             .filter(c => c.tipo === 'jogador' && CLASSES_CONJURADORAS.has(c.classe))
             .map(async c => {
                 try {
-                    const preparadas = await this.magiaPreparadaService.listar(c.id);
-                    // ✅ Substitui magias_slots por grupos de preparadas (fonte de verdade)
+                    const preparadas    = await this.magiaPreparadaService.listar(c.id);
                     c._magiasPreparadas = preparadas;
                     c._magiasGrupos     = this.magiaPreparadaService.agruparPorNivel(preparadas);
                     console.log(`✅ ${c.nome}: ${preparadas.length} magias preparadas`);
@@ -89,7 +84,6 @@ export class ArenaController {
                     c._magiasGrupos     = {};
                 }
             });
-
         await Promise.all(promessas);
     }
 
@@ -130,7 +124,7 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
-    // ─── Cronômetro ────────────────────────────────────────
+    // ─── Cronômetro 
 
     _iniciarCronometro() {
         var self = this;
@@ -231,15 +225,15 @@ export class ArenaController {
         var spanValor   = document.querySelector('.arena-magia-valor[data-nivel="' + nivel + '"]');
         var btnConsumir = document.querySelector('.arena-magia-btn[data-acao="aumentar"][data-nivel="' + nivel + '"]');
         var btnDevolver = document.querySelector('.arena-magia-btn[data-acao="diminuir"][data-nivel="' + nivel + '"]');
-        if (spanValor)   spanValor.textContent  = (slot.total - slot.usados);
-        if (btnConsumir) btnConsumir.disabled   = (slot.usados >= slot.total);
-        if (btnDevolver) btnDevolver.disabled   = (slot.usados <= 0);
+        if (spanValor)   spanValor.textContent = (slot.total - slot.usados);
+        if (btnConsumir) btnConsumir.disabled  = (slot.usados >= slot.total);
+        if (btnDevolver) btnDevolver.disabled  = (slot.usados <= 0);
     }
 
     /**
-     * ✅ NOVO: Lançar magia preparada (jogadores conjuradores)
-     * Chama PATCH /magias-preparadas/{id}/{magia_id}/usar
-     * SRP: apenas toggle de uso — UI atualizada via _atualizarUIPreparada()
+     * Lançar magia preparada (jogadores conjuradores)
+     * PATCH /usar + atualiza UI local + ✅ broadcast para ficha aberta
+     * SRP: orquestra toggle, UI e notificação — cada um em método próprio
      */
     async _lancarMagiaPreparada(combatenteId, magiaId, nivel) {
         var combatente = this.combatentes[this.turnoAtual];
@@ -248,18 +242,21 @@ export class ArenaController {
         var grupo = (combatente._magiasGrupos || {})[nivel];
         if (!grupo) { Toast.error('Nenhuma magia preparada no nível ' + nivel); return; }
 
-        // Encontra a magia específica no grupo
         var magiaPrep = grupo.preparadas.find(function(p) { return p.magia_id === magiaId; });
         if (!magiaPrep) { Toast.error('Magia não encontrada nas preparadas'); return; }
 
         try {
             var data = await this.magiaPreparadaService.toggleUsada(combatenteId, magiaId);
 
-            // Atualiza estado local
+            // 1. Atualiza estado local
             magiaPrep.usada = data.usada;
             grupo.usadas    = grupo.preparadas.filter(function(p) { return p.usada; }).length;
 
+            // 2. Atualiza UI da arena
             this._atualizarUIPreparada(nivel, grupo, magiaId, data.usada);
+
+            // 3. ✅ NOVO: Notifica ficha aberta via BroadcastChannel
+            this._publicarEventoMagia(combatenteId, magiaId, nivel, data.usada, grupo);
 
             Toast.success(data.usada
                 ? '🔥 ' + (magiaPrep.magia_nome || 'Magia') + ' lançada!'
@@ -271,11 +268,37 @@ export class ArenaController {
     }
 
     /**
-     * ✅ NOVO: Atualiza UI de uma linha de magia preparada
-     * SRP: apenas manipulação de DOM
+     * ✅ NOVO: Publica evento no BroadcastChannel para sincronizar ficha
+     * SRP: apenas serialização e envio — sem lógica de negócio
+     * @param {number} combatenteId
+     * @param {number} magiaId
+     * @param {number} nivel
+     * @param {boolean} usada
+     * @param {Object} grupo - { total, usadas, preparadas[] }
+     */
+    _publicarEventoMagia(combatenteId, magiaId, nivel, usada, grupo) {
+        try {
+            this._canal.postMessage({
+                tipo:          'magia-usada',
+                combatenteId:  combatenteId,
+                magiaId:       magiaId,
+                nivel:         nivel,
+                usada:         usada,
+                disponiveis:   grupo.total - grupo.usadas,
+                total:         grupo.total,
+                timestamp:     Date.now(),
+            });
+        } catch (err) {
+            // BroadcastChannel falha silenciosamente — não quebra o fluxo
+            console.warn('⚠️ BroadcastChannel indisponível:', err.message);
+        }
+    }
+
+    /**
+     * Atualiza UI de uma linha de magia preparada na arena
+     * SRP: apenas manipulação de DOM da arena
      */
     _atualizarUIPreparada(nivel, grupo, magiaId, usada) {
-        // Atualiza contador do nível
         var spanDisp = document.querySelector(
             '.arena-magia-preparada-nivel[data-nivel="' + nivel + '"] .arena-prep-disponiveis'
         );
@@ -287,20 +310,14 @@ export class ArenaController {
                                  :                     '#4ade80';
         }
 
-        // Atualiza botão da magia específica
-        var btn = document.querySelector(
-            '.arena-prep-btn[data-magia-id="' + magiaId + '"]'
-        );
+        var btn = document.querySelector('.arena-prep-btn[data-magia-id="' + magiaId + '"]');
         if (btn) {
-            btn.textContent      = usada ? '↩️' : '🔥';
-            btn.title            = usada ? 'Restaurar magia' : 'Lançar magia';
+            btn.textContent = usada ? '↩️' : '🔥';
+            btn.title       = usada ? 'Restaurar magia' : 'Lançar magia';
             btn.classList.toggle('arena-prep-btn-usada', usada);
         }
 
-        // Atualiza nome da magia (riscado se usada)
-        var nome = document.querySelector(
-            '.arena-prep-nome[data-magia-id="' + magiaId + '"]'
-        );
+        var nome = document.querySelector('.arena-prep-nome[data-magia-id="' + magiaId + '"]');
         if (nome) nome.classList.toggle('arena-prep-nome-usada', usada);
     }
 
@@ -405,7 +422,6 @@ export class ArenaController {
         var sValor  = this.statsVisiveis ? surpresa : '?';
         var tValor  = this.statsVisiveis ? toque    : '?';
         var olhoTxt = this.statsVisiveis ? 'Ocultar Stats' : 'Revelar Stats';
-
         var cronAtivo  = this._cronometroAtivo;
         var tempoAtual = this._formatarTempo(this._cronometroSegundos);
 
@@ -425,16 +441,13 @@ export class ArenaController {
         }
 
         var ataquesHTML = this._renderizarAtaques(c.ataques || []);
-
-        // ✅ NOVO: jogadores conjuradores usam magias_preparadas; demais usam magias_slots
-        var magiasHTML = (c._magiasGrupos && Object.keys(c._magiasGrupos).length > 0)
+        var magiasHTML  = (c._magiasGrupos && Object.keys(c._magiasGrupos).length > 0)
             ? this._renderizarMagiasPreparadas(c._magiasGrupos, c.id)
             : this._renderizarMagias(c.magias_slots || [], c.tipo);
 
         var html = '';
         html += '<div class="arena-card">';
 
-        // Header
         html += '<div class="arena-header">';
         html += '<div class="arena-header-nome">';
         html += '<h2 class="arena-nome">' + c.nome
@@ -459,18 +472,14 @@ export class ArenaController {
               + olhoTxt + '</button>';
         html += '</div></div>';
 
-        // Layout principal
         html += '<div class="arena-layout-principal">';
 
-        // Coluna esquerda
         html += '<div class="arena-coluna-esquerda">';
         html += '<div class="arena-linha-info">';
-
         html += '<div class="arena-secao arena-secao-atributos">';
         html += '<h3 class="arena-secao-titulo">Atributos</h3>';
         html += '<div class="arena-atributos-grid">' + atributosHTML + '</div>';
         html += '</div>';
-
         html += '<div class="arena-secao arena-secao-resistencias">';
         html += '<h3 class="arena-secao-titulo">Resistencias</h3>';
         html += '<div class="arena-resistencias-grid">';
@@ -481,22 +490,18 @@ export class ArenaController {
         html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Vont</span>'
               + '<span class="arena-atributo-valor">' + sinal(vont) + '</span></div>';
         html += '</div></div>';
-
         html += '<div class="arena-secao arena-secao-condicoes">';
         html += '<h3 class="arena-secao-titulo">Condicoes</h3>';
         html += '<div class="arena-condicoes-lista">'
               + '<span class="arena-condicao-vazia">Nenhuma condicao ativa</span></div>';
         html += '</div>';
+        html += '</div></div>';
 
-        html += '</div></div>'; // fim linha-info + coluna-esquerda
-
-        // Coluna central
         html += '<div class="arena-coluna-central">';
         html += ataquesHTML;
         html += magiasHTML;
         html += '</div>';
 
-        // Coluna direita
         html += '<div class="arena-coluna-direita">';
         html += '<div class="arena-defesa-box">';
         html += '<div class="arena-ca-principal">';
@@ -512,7 +517,6 @@ export class ArenaController {
               + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
               + tValor + '</span></div>';
         html += '</div></div>';
-
         html += '<div class="arena-pv-box">';
         html += '<span class="arena-defesa-label">PV</span>';
         html += '<span class="arena-pv-valor ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
@@ -520,12 +524,11 @@ export class ArenaController {
         html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:'
               + hpPct + '%;background:' + hpCor + ';"></div></div>';
         html += '</div>';
-
         html += '<button class="arena-btn-proximo" onclick="window._avancarTurno()">'
               + 'Encerrar turno</button>';
-        html += '</div>'; // fim coluna-direita
-        html += '</div>'; // fim layout-principal
-        html += '</div>'; // fim arena-card
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
 
         container.innerHTML = html;
 
@@ -551,8 +554,6 @@ export class ArenaController {
 
     _configurarEventosMagias(container) {
         var self = this;
-
-        // Eventos para magias_slots (monstros/NPCs)
         container.querySelectorAll('.arena-magia-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 var slotId = btn.getAttribute('data-slot-id');
@@ -561,8 +562,6 @@ export class ArenaController {
                 self._alterarUsadosMagia(slotId, nivel, acao);
             });
         });
-
-        // ✅ NOVO: Eventos para magias preparadas (jogadores)
         container.querySelectorAll('.arena-prep-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 var combatenteId = parseInt(btn.getAttribute('data-combatente-id'));
@@ -577,31 +576,22 @@ export class ArenaController {
         var html = '<div class="arena-secao">';
         html += '<h3 class="arena-secao-titulo">Ataques</h3>';
         html += '<div class="arena-ataques-lista">';
-        html += '<div class="arena-ataque-header">'
-              + '<span>Nome</span><span>Ataque</span><span>Dano</span></div>';
+        html += '<div class="arena-ataque-header"><span>Nome</span><span>Ataque</span><span>Dano</span></div>';
         if (!ataques || ataques.length === 0) {
-            html += '<div class="arena-ataque-item arena-ataque-placeholder">'
-                  + '<span>Nenhum ataque cadastrado</span></div>';
+            html += '<div class="arena-ataque-item arena-ataque-placeholder"><span>Nenhum ataque cadastrado</span></div>';
         } else {
             for (var i = 0; i < ataques.length; i++) {
                 var a    = ataques[i];
                 var tipo = a.tipo_dano ? ' (' + a.tipo_dano + ')' : '';
-                html += '<div class="arena-ataque-item">'
-                      + '<span>' + a.nome + '</span>'
+                html += '<div class="arena-ataque-item"><span>' + a.nome + '</span>'
                       + '<span>' + a.bonus_ataque + '</span>'
-                      + '<span>' + a.dano + tipo + '</span>'
-                      + '</div>';
+                      + '<span>' + a.dano + tipo + '</span></div>';
             }
         }
         html += '</div></div>';
         return html;
     }
 
-    /**
-     * ✅ NOVO: Renderiza magias preparadas para jogadores conjuradores
-     * Agrupa por nivel_slot e mostra cada magia com botão 🔥/↩️
-     * SRP: apenas renderização HTML
-     */
     _renderizarMagiasPreparadas(grupos, combatenteId) {
         var niveisOrdenados = Object.keys(grupos).map(Number).sort(function(a, b) { return a - b; });
 
@@ -624,7 +614,6 @@ export class ArenaController {
                             : grupo.usadas > 0  ? '#facc15'
                             :                     '#4ade80';
 
-            // Cabeçalho do nível
             html += '<div class="arena-magia-preparada-nivel" data-nivel="' + nivel + '">';
             html += '<div class="arena-prep-nivel-header">';
             html += '<span class="arena-prep-nivel-label">NIV ' + nivel + '</span>';
@@ -632,7 +621,6 @@ export class ArenaController {
                   + disponiveis + '/' + grupo.total + '</span>';
             html += '</div>';
 
-            // Magias do nível
             grupo.preparadas.forEach(function(prep) {
                 var usada = prep.usada;
                 html += '<div class="arena-prep-magia-row ' + (usada ? 'arena-prep-usada' : '') + '">';
@@ -647,40 +635,31 @@ export class ArenaController {
                       + ' data-magia-id="' + prep.magia_id + '"'
                       + ' data-nivel="' + nivel + '"'
                       + ' title="' + (usada ? 'Restaurar magia' : 'Lançar magia') + '">'
-                      + (usada ? '↩️' : '🔥')
-                      + '</button>';
+                      + (usada ? '↩️' : '🔥') + '</button>';
                 html += '</div>';
             });
 
-            html += '</div>'; // fim nivel
+            html += '</div>';
         });
 
         html += '</div></div>';
         return html;
     }
 
-    // Mantido para monstros/NPCs que usam magias_slots
     _renderizarMagias(slots, tipo) {
         var isJogador = (tipo === 'jogador');
         var self      = this;
         var html      = '<div class="arena-secao">';
         html += '<h3 class="arena-secao-titulo">Controle de Magias</h3>';
         html += '<div class="arena-magias-duas-colunas">';
-
         html += '<div class="arena-magias-coluna">';
         html += '<div class="arena-magias-coluna-titulo">NIV 0–4</div>';
-        for (var n1 = 0; n1 <= 4; n1++) {
-            html += self._renderizarMagiaLinha(slots, n1, isJogador);
-        }
+        for (var n1 = 0; n1 <= 4; n1++) html += self._renderizarMagiaLinha(slots, n1, isJogador);
         html += '</div>';
-
         html += '<div class="arena-magias-coluna">';
         html += '<div class="arena-magias-coluna-titulo">NIV 5–9</div>';
-        for (var n2 = 5; n2 <= 9; n2++) {
-            html += self._renderizarMagiaLinha(slots, n2, isJogador);
-        }
+        for (var n2 = 5; n2 <= 9; n2++) html += self._renderizarMagiaLinha(slots, n2, isJogador);
         html += '</div>';
-
         html += '</div></div>';
         return html;
     }
@@ -694,11 +673,9 @@ export class ArenaController {
         var usados      = slot ? slot.usados : 0;
         var disponiveis = total - usados;
         var slotId      = slot ? slot.id     : null;
-
         var disAumentar = (!isJogador || total === 0 || usados >= total) ? 'disabled' : '';
         var disDiminuir = (!isJogador || total === 0 || usados <= 0)    ? 'disabled' : '';
-
-        var linhaClass = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
+        var linhaClass  = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
 
         var html = '<div class="' + linhaClass + '" data-nivel="' + nivel + '">';
         html += '<span class="arena-magia-nivel">NIV ' + nivel + '</span>';
@@ -725,8 +702,6 @@ export class ArenaController {
     getEmojiTipo(tipo) {
         return { jogador:'🧙', monstro:'👹', npc:'🤝' }[tipo] || '⚔️';
     }
-
-    // ─── Modal de Confirmação ──────────────────────────────
 
     _mostrarModalConfirmacao(opcoes) {
         var overlay = document.createElement('div');
@@ -774,6 +749,8 @@ export class ArenaController {
             textoCancelar: '← Continuar Combate', textoConfirmar: 'Encerrar ✓',
             onConfirmar: function() {
                 self._pararCronometro();
+                // ✅ NOVO: fecha o canal ao encerrar combate
+                try { self._canal.close(); } catch(e) {}
                 var telaArena        = document.getElementById('telaArena');
                 var telaConfiguracao = document.getElementById('telaConfiguracao');
                 if (telaArena)        telaArena.classList.remove('ativa');
