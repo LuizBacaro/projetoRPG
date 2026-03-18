@@ -12,6 +12,10 @@ class CombatenteBase(BaseModel):
     tipo:       str = Field(..., pattern="^(jogador|monstro|npc)$")
     classe:     str = Field(..., min_length=1, max_length=50)
     raca:       Optional[str] = Field(default="", max_length=50)
+
+    # ✅ NOVO: apenas monstros usam, mas aceita em todos os tipos (nullable)
+    pagina_referencia: Optional[str] = Field(default="", max_length=100)
+
     hp_maximo:  int = Field(..., gt=0)
     iniciativa: int = Field(..., ge=0)
 
@@ -43,6 +47,10 @@ class CombatenteUpdate(BaseModel):
     tipo:       Optional[str] = Field(None, pattern="^(jogador|monstro|npc)$")
     classe:     Optional[str] = Field(None, min_length=1, max_length=50)
     raca:       Optional[str] = Field(None, max_length=50)
+
+    # ✅ NOVO
+    pagina_referencia: Optional[str] = Field(None, max_length=100)
+
     hp_atual:   Optional[int] = Field(None, ge=0)
     hp_maximo:  Optional[int] = Field(None, gt=0)
     iniciativa: Optional[int] = Field(None, ge=0)
@@ -73,9 +81,12 @@ class CombatenteResponse(CombatenteBase):
     foto_url: Optional[str] = None
     raca:     Optional[str] = ""
 
-    ataques:           List[AtaqueResponse]        = []
-    magias_slots:      List[MagiaSlotResponse]     = []   # mantido para monstros/NPCs
-    magias_preparadas: List[MagiaPreparadaResponse] = []  # ✅ NOVO: jogadores conjuradores
+    # ✅ NOVO: exposto no response para o frontend exibir na ficha/arena
+    pagina_referencia: Optional[str] = ""
+
+    ataques:           List[AtaqueResponse]         = []
+    magias_slots:      List[MagiaSlotResponse]      = []
+    magias_preparadas: List[MagiaPreparadaResponse] = []
 
     class Config:
         from_attributes = True

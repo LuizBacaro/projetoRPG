@@ -336,6 +336,13 @@ class DashboardController {
                 if (el) self._calcularModificador(el);
             });
 
+            // ✅ NOVO: Página de referência — visível só para monstros
+            var secPagRef   = document.getElementById('secaoPaginaReferencia');
+            var inputPagRef = document.getElementById('dashEditPaginaReferencia');
+            var isMonstro   = (c.tipo === 'monstro');
+            if (secPagRef)   secPagRef.style.display   = isMonstro ? 'block' : 'none';
+            if (inputPagRef) inputPagRef.value          = isMonstro ? (c.pagina_referencia || '') : '';
+
             var placeholder = document.getElementById('dashEditUploadPlaceholder');
             var preview     = document.getElementById('dashEditUploadPreview');
             var img         = document.getElementById('dashEditPreviewImage');
@@ -348,16 +355,11 @@ class DashboardController {
                 preview.style.display     = 'none';
             }
 
-            // ✅ Ataques: apenas para jogadores
+            // Ataques: apenas para jogadores
             var secAtaques = document.getElementById('secaoAtaquesEdicao');
             var isJogador  = (c.tipo === 'jogador');
             if (secAtaques) secAtaques.style.display = isJogador ? 'block' : 'none';
-
-            if (isJogador) {
-                this._renderizarAtaquesEdicao(c.ataques || []);
-            }
-
-            // ✅ secaoMagiasEdicao REMOVIDA — slots controlados pelo grimório
+            if (isJogador)  this._renderizarAtaquesEdicao(c.ataques || []);
 
             this._recuperarPericiasDoSessionStorage();
             this._abrirModal('modalEdicaoDashboard');

@@ -18,6 +18,9 @@ class Combatente(Base):
     classe = Column(String,  nullable=False)
     raca   = Column(String,  nullable=True, default="")
 
+    # ── Referência (apenas monstros) ──
+    pagina_referencia = Column(String, nullable=True, default="")  # ✅ NOVO
+
     # ── Combate ──
     hp_atual   = Column(Integer, nullable=False)
     hp_maximo  = Column(Integer, nullable=False)
@@ -68,13 +71,12 @@ class Combatente(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
-    # ✅ CORRIGIDO: duplicata removida + lazy="selectin" consistente com os demais
     magias_preparadas = relationship(
         "MagiaPreparada",
         back_populates="combatente",
         cascade="all, delete-orphan",
         lazy="selectin",
-        order_by="MagiaPreparada.nivel_slot",   # ✅ já vem ordenado por nível
+        order_by="MagiaPreparada.nivel_slot",
     )
 
     # ── Helpers de domínio ──
