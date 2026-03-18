@@ -1,102 +1,276 @@
 /**
  * GrimorioController.js
- * SRP: Controlar o Grimório de Magias na ficha do personagem
- * SOLID: SRP — apenas lógica do grimório
- *        DIP — recebe classe via parâmetro, não acessa DOM direto para dados
- * Carregado como module em ficha-personagem.html
+ * SRP: Grimório de Magias — preparação diária com slots D&D 3.5
+ * SOLID: SRP separado da ficha | DIP via parâmetros do constructor
  */
 
 import { getApiUrl } from '../config/api.config.js';
 
-// ── Classes que podem usar magias ──
+// ── Classes conjuradoras ──
 const CLASSES_CONJURADORAS = new Set([
-    'Mago', 'Feiticeiro', 'Clérigo', 'Druida', 'Bardo', 'Paladino', 'Ranger',
-    'mago', 'feiticeiro', 'clérigo', 'clerigo', 'druida', 'bardo', 'paladino', 'ranger'
+    'Mago', 'Feiticeiro', 'Clérigo', 'Clerigo', 'Druida',
+    'Bardo', 'Paladino', 'Ranger',
+    'mago', 'feiticeiro', 'clérigo', 'clerigo', 'druida',
+    'bardo', 'paladino', 'ranger'
 ]);
+
+// ── Tabelas de magias por dia D&D 3.5 (base, sem bônus de atributo) ──
+// Índice: [nivelPersonagem-1][nivelMagia]  null = não disponível
+const TABELA_MAGIAS_DIA = {
+    Mago: [
+        [3,1,null,null,null,null,null,null,null,null], // nível 1
+        [4,2,null,null,null,null,null,null,null,null], // nível 2
+        [4,2,1,null,null,null,null,null,null,null],    // nível 3
+        [4,3,2,null,null,null,null,null,null,null],    // nível 4
+        [4,3,2,1,null,null,null,null,null,null],       // nível 5
+        [4,3,3,2,null,null,null,null,null,null],       // nível 6
+        [4,4,3,2,1,null,null,null,null,null],          // nível 7
+        [4,4,3,3,2,null,null,null,null,null],          // nível 8
+        [4,4,4,3,2,1,null,null,null,null],             // nível 9
+        [4,4,4,3,3,2,null,null,null,null],             // nível 10
+        [4,4,4,4,3,2,1,null,null,null],                // nível 11
+        [4,4,4,4,3,3,2,null,null,null],                // nível 12
+        [4,4,4,4,4,3,2,1,null,null],                   // nível 13
+        [4,4,4,4,4,3,3,2,null,null],                   // nível 14
+        [4,4,4,4,4,4,3,2,1,null],                      // nível 15
+        [4,4,4,4,4,4,3,3,2,null],                      // nível 16
+        [4,4,4,4,4,4,4,3,2,1],                         // nível 17
+        [4,4,4,4,4,4,4,3,3,2],                         // nível 18
+        [4,4,4,4,4,4,4,4,3,3],                         // nível 19
+        [4,4,4,4,4,4,4,4,4,4],                         // nível 20
+    ],
+    Clérigo: [
+        [3,1,null,null,null,null,null,null,null,null],
+        [4,2,null,null,null,null,null,null,null,null],
+        [4,2,1,null,null,null,null,null,null,null],
+        [5,3,2,null,null,null,null,null,null,null],
+        [5,3,2,1,null,null,null,null,null,null],
+        [5,3,3,2,null,null,null,null,null,null],
+        [6,4,3,2,1,null,null,null,null,null],
+        [6,4,3,3,2,null,null,null,null,null],
+        [6,4,4,3,2,1,null,null,null,null],
+        [6,4,4,3,3,2,null,null,null,null],
+        [6,5,4,4,3,2,1,null,null,null],
+        [6,5,4,4,3,3,2,null,null,null],
+        [6,5,5,4,4,3,2,1,null,null],
+        [6,5,5,4,4,3,3,2,null,null],
+        [6,5,5,5,4,4,3,2,1,null],
+        [6,5,5,5,4,4,3,3,2,null],
+        [6,5,5,5,5,4,4,3,2,1],
+        [6,5,5,5,5,4,4,3,3,2],
+        [6,5,5,5,5,5,4,4,3,3],
+        [6,5,5,5,5,5,4,4,4,4],
+    ],
+    Druida: [
+        [3,1,null,null,null,null,null,null,null,null],
+        [4,2,null,null,null,null,null,null,null,null],
+        [4,2,1,null,null,null,null,null,null,null],
+        [5,3,2,null,null,null,null,null,null,null],
+        [5,3,2,1,null,null,null,null,null,null],
+        [5,3,3,2,null,null,null,null,null,null],
+        [6,4,3,2,1,null,null,null,null,null],
+        [6,4,3,3,2,null,null,null,null,null],
+        [6,4,4,3,2,1,null,null,null,null],
+        [6,4,4,3,3,2,null,null,null,null],
+        [6,5,4,4,3,2,1,null,null,null],
+        [6,5,4,4,3,3,2,null,null,null],
+        [6,5,5,4,4,3,2,1,null,null],
+        [6,5,5,4,4,3,3,2,null,null],
+        [6,5,5,5,4,4,3,2,1,null],
+        [6,5,5,5,4,4,3,3,2,null],
+        [6,5,5,5,5,4,4,3,2,1],
+        [6,5,5,5,5,4,4,3,3,2],
+        [6,5,5,5,5,5,4,4,3,3],
+        [6,5,5,5,5,5,4,4,4,4],
+    ],
+    Bardo: [
+        [2,null,null,null,null,null,null],
+        [3,0,null,null,null,null,null],
+        [3,1,null,null,null,null,null],
+        [3,2,0,null,null,null,null],
+        [3,3,1,null,null,null,null],
+        [3,3,2,null,null,null,null],
+        [3,3,2,0,null,null,null],
+        [3,3,3,1,null,null,null],
+        [3,3,3,2,null,null,null],
+        [3,3,3,2,0,null,null],
+        [3,3,3,3,1,null,null],
+        [3,3,3,3,2,null,null],
+        [3,3,3,3,2,0,null],
+        [4,3,3,3,3,1,null],
+        [4,4,3,3,3,2,null],
+        [4,4,4,3,3,2,0],
+        [4,4,4,4,3,3,1],
+        [4,4,4,4,4,3,2],
+        [4,4,4,4,4,4,3],
+        [4,4,4,4,4,4,4],
+    ],
+    Paladino: [
+        [null,null,null,null],
+        [null,null,null,null],
+        [null,null,null,null],
+        [0,null,null,null],
+        [0,null,null,null],
+        [1,null,null,null],
+        [1,null,null,null],
+        [1,0,null,null],
+        [1,0,null,null],
+        [1,1,null,null],
+        [1,1,0,null],
+        [1,1,1,null],
+        [1,1,1,null],
+        [2,1,1,0],
+        [2,1,1,1],
+        [2,2,1,1],
+        [2,2,2,1],
+        [3,2,2,1],
+        [3,3,3,2],
+        [3,3,3,3],
+    ],
+    Ranger: [
+        [null,null,null,null],
+        [null,null,null,null],
+        [null,null,null,null],
+        [0,null,null,null],
+        [0,null,null,null],
+        [1,null,null,null],
+        [1,null,null,null],
+        [1,0,null,null],
+        [1,0,null,null],
+        [1,1,null,null],
+        [1,1,0,null],
+        [1,1,1,null],
+        [1,1,1,null],
+        [2,1,1,0],
+        [2,1,1,1],
+        [2,2,1,1],
+        [2,2,2,1],
+        [3,2,2,1],
+        [3,3,3,2],
+        [3,3,3,3],
+    ],
+};
+
+// ── Bônus de magias por dia por modificador de atributo ──
+// tabela 1-1 do PHB: [mod] = [bonus_niv1, bonus_niv2, ..., bonus_niv9]
+const BONUS_ATRIBUTO = {
+    1: [1,0,0,0,0,0,0,0,0],
+    2: [1,1,0,0,0,0,0,0,0],
+    3: [1,1,1,0,0,0,0,0,0],
+    4: [1,1,1,1,0,0,0,0,0],
+    5: [2,1,1,1,1,0,0,0,0],
+    6: [2,2,1,1,1,1,0,0,0],
+    7: [2,2,2,1,1,1,1,0,0],
+    8: [2,2,2,2,1,1,1,1,0],
+    9: [2,2,2,2,2,1,1,1,1],
+};
+
+// ── Atributo chave por classe ──
+const ATRIBUTO_CHAVE = {
+    Mago: 'inteligencia', Feiticeiro: 'carisma',
+    Clérigo: 'sabedoria', Clerigo: 'sabedoria',
+    Druida: 'sabedoria',  Bardo: 'carisma',
+    Paladino: 'sabedoria', Ranger: 'sabedoria',
+};
 
 // ── Emojis por escola ──
 const EMOJI_ESCOLA = {
-    'Abjuração':    '🛡️',
-    'Adivinhação':  '🔮',
-    'Conjuração':   '✨',
-    'Encantamento': '💫',
-    'Evocação':     '⚡',
-    'Ilusão':       '🌀',
-    'Necromancia':  '💀',
-    'Transmutação': '🔄',
-    'Universal':    '⭐',
+    'Abjuração':'🛡️','Adivinhação':'🔮','Conjuração':'✨',
+    'Encantamento':'💫','Evocação':'⚡','Ilusão':'🌀',
+    'Necromancia':'💀','Transmutação':'🔄','Universal':'⭐',
 };
 
 
 class GrimorioController {
-    /**
-     * @param {string} classe  — Classe do personagem (ex: "Mago")
-     * @param {string} nome    — Nome do personagem para exibir no subtítulo
-     * @param {string} token   — JWT para autenticação
-     */
-    constructor(classe, nome, token) {
-        this.classe       = this._normalizarClasse(classe);
-        this.nome         = nome;
-        this.token        = token;
-        this.magias       = [];        // todas as magias carregadas
-        this.magiasFiltro = [];        // após filtro ativo
-        this.nivelAtivo   = 'todos';
-        this.cardsAbertos = new Set(); // IDs de cards expandidos
-        this._carregado   = false;
+    constructor(combatente, token) {
+        this.combatente      = combatente;           // objeto completo
+        this.classe          = this._normalizarClasse(combatente.classe);
+        this.token           = token;
+        this.magias          = [];
+        this.magiasFiltro    = [];
+        this.preparadas      = new Set();            // Set de magia_id preparados
+        this.slotsDisponiveis = {};                  // { nivel: { total, preparadas } }
+        this.nivelAtivo      = 'todos';
+        this.cardsAbertos    = new Set();
+        this._carregado      = false;
         console.log('✅ GrimorioController inicializado — classe:', this.classe);
     }
 
-    // ─────────────────────────────────────────────
+    // 
     // PÚBLICO
-    // ─────────────────────────────────────────────
+    // 
 
-    /** Abre o grimório; carrega magias se ainda não carregou */
     async abrirGrimorio() {
         const overlay = document.getElementById('modalGrimorio');
         if (!overlay) return;
 
-        // Subtítulo
         const sub = document.getElementById('grimorioSubtitulo');
-        if (sub) sub.textContent = `${this.nome} · ${this.classe}`;
+        if (sub) sub.textContent = `${this.combatente.nome} · ${this.classe} · Nível ${this.combatente.nivel}`;
 
         overlay.classList.add('show');
         document.body.style.overflow = 'hidden';
 
         if (!this._carregado) {
-            await this._carregarMagias();
-        } else {
-            this._renderizarLista();
+            await Promise.all([
+                this._carregarMagias(),
+                this._carregarPreparadas(),
+            ]);
+            this._calcularSlotsDisponiveis();
+            this._carregado = true;
         }
 
+        this._renderizarPainelSlots();
+        this._renderizarLista();
         this._configurarFiltros();
     }
 
-    /** Fecha o grimório */
     fecharGrimorio() {
         const overlay = document.getElementById('modalGrimorio');
         if (overlay) overlay.classList.remove('show');
         document.body.style.overflow = '';
     }
 
-    /** Filtrar por busca de texto */
     filtrar() {
         const busca = document.getElementById('grimorioBusca')?.value.toLowerCase().trim() || '';
         this.magiasFiltro = this.magias.filter(m => {
             const matchNivel = this.nivelAtivo === 'todos' || String(m.nivel) === String(this.nivelAtivo);
-            const matchBusca = !busca ||
-                m.nome.toLowerCase().includes(busca) ||
-                (m.escola || '').toLowerCase().includes(busca) ||
-                (m.descricao || '').toLowerCase().includes(busca);
+            const matchBusca = !busca
+                || m.nome.toLowerCase().includes(busca)
+                || (m.escola || '').toLowerCase().includes(busca)
+                || (m.descricao || '').toLowerCase().includes(busca);
             return matchNivel && matchBusca;
         });
         this._renderizarLista();
     }
 
-    // ─────────────────────────────────────────────
-    // PRIVADO
-    // ─────────────────────────────────────────────
+    async descansoLongo() {
+        if (!confirm('🌙 Realizar descanso longo?\nIsso resetará todas as magias preparadas e slots usados.')) return;
+        try {
+            const url = getApiUrl(`/magias-preparadas/${this.combatente.id}/descanso`);
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ confirmar: true }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            this.preparadas = new Set();
+            this._calcularSlotsDisponiveis();
+            this._renderizarPainelSlots();
+            this._renderizarLista();
+            this._mostrarToast('🌙 Descanso longo! Magias prontas para preparação.', 'sucesso');
+        } catch (err) {
+            console.error('❌ Erro no descanso longo:', err);
+            this._mostrarToast('Erro ao realizar descanso longo.', 'erro');
+        }
+    }
 
-    /** Normaliza nome de classe para match com API */
+    // 
+    // PRIVADO — CARREGAMENTO
+    // 
+
     _normalizarClasse(classe) {
         if (!classe) return '';
         const mapa = {
@@ -108,36 +282,140 @@ class GrimorioController {
         return mapa[classe.toLowerCase()] || classe;
     }
 
-    /** Carrega magias da classe via API */
     async _carregarMagias() {
-        this._mostrarLoading(true);
         try {
-            const url = getApiUrl(`/magias?classe=${encodeURIComponent(this.classe)}&limit=500`);
+            const url = getApiUrl(`/magias/?classe=${encodeURIComponent(this.classe)}&limit=500`);
             const res = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json',
-                }
+                headers: { 'Authorization': `Bearer ${this.token}` }
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             this.magias       = await res.json();
             this.magiasFiltro = [...this.magias];
-            this._carregado   = true;
-            console.log(`✅ Grimório: ${this.magias.length} magias de ${this.classe} carregadas`);
+            console.log(`✅ Grimório: ${this.magias.length} magias de ${this.classe}`);
         } catch (err) {
             console.error('❌ Erro ao carregar magias:', err);
-            this._mostrarErro();
-            return;
-        } finally {
-            this._mostrarLoading(false);
         }
-        this._renderizarLista();
     }
 
-    /** Configura cliques nos botões de nível */
+    async _carregarPreparadas() {
+        try {
+            const url = getApiUrl(`/magias-preparadas/${this.combatente.id}`);
+            const res = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${this.token}` }
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const lista = await res.json();
+            this.preparadas = new Set(lista.map(p => p.magia_id));
+            console.log(`✅ Preparadas carregadas: ${this.preparadas.size}`);
+        } catch (err) {
+            console.error('❌ Erro ao carregar preparadas:', err);
+        }
+    }
+
+    /**
+     * Calcula slots disponíveis por nível:
+     * base da tabela D&D 3.5 + bônus de atributo
+     */
+    _calcularSlotsDisponiveis() {
+        const nivel       = Math.max(1, Math.min(20, this.combatente.nivel || 1));
+        const tabelaClasse = TABELA_MAGIAS_DIA[this.classe];
+        if (!tabelaClasse) { this.slotsDisponiveis = {}; return; }
+
+        const linhaNivel = tabelaClasse[nivel - 1] || [];
+
+        // Calcular modificador do atributo chave
+        const attrChave = ATRIBUTO_CHAVE[this.classe] || 'inteligencia';
+        const valorAttr  = this.combatente[attrChave] || 10;
+        const mod        = Math.floor((valorAttr - 10) / 2);
+        const bonusAttr  = BONUS_ATRIBUTO[mod] || [];
+
+        this.slotsDisponiveis = {};
+
+        linhaNivel.forEach((base, nivelMagia) => {
+            if (base === null) return;  // — não tem esse nível
+            const bonus    = nivelMagia > 0 ? (bonusAttr[nivelMagia - 1] || 0) : 0;
+            const total    = base + bonus;
+            const preparadasNivel = [...this.preparadas].filter(id => {
+                const m = this.magias.find(x => x.id === id);
+                return m && m.nivel === nivelMagia;
+            }).length;
+
+            this.slotsDisponiveis[nivelMagia] = {
+                total,
+                preparadas: preparadasNivel,
+                disponivel: total - preparadasNivel,
+            };
+        });
+
+        console.log('📊 Slots calculados:', this.slotsDisponiveis);
+    }
+
+    // 
+    // PRIVADO — PREPARAÇÃO
+    // 
+
+    async _togglePreparacao(magiaId, nivelMagia) {
+        if (this.preparadas.has(magiaId)) {
+            await this._desmarcarMagia(magiaId);
+        } else {
+            await this._prepararMagia(magiaId, nivelMagia);
+        }
+        this._calcularSlotsDisponiveis();
+        this._renderizarPainelSlots();
+        this._atualizarCard(magiaId, nivelMagia);
+    }
+
+    async _prepararMagia(magiaId, nivelMagia) {
+        // Verificar se há slot disponível
+        const slot = this.slotsDisponiveis[nivelMagia];
+        if (!slot || slot.disponivel <= 0) {
+            this._mostrarToast(`⚠️ Sem slots disponíveis para nível ${nivelMagia}!`, 'erro');
+            return;
+        }
+        try {
+            const url = getApiUrl(`/magias-preparadas/${this.combatente.id}`);
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ magia_id: magiaId, nivel_slot: nivelMagia }),
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.detail || `HTTP ${res.status}`);
+            }
+            this.preparadas.add(magiaId);
+            this._mostrarToast('✅ Magia preparada!', 'sucesso');
+        } catch (err) {
+            console.error('❌ Erro ao preparar magia:', err);
+            this._mostrarToast(`Erro: ${err.message}`, 'erro');
+        }
+    }
+
+    async _desmarcarMagia(magiaId) {
+        try {
+            const url = getApiUrl(`/magias-preparadas/${this.combatente.id}/${magiaId}`);
+            const res = await fetch(url, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${this.token}` },
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            this.preparadas.delete(magiaId);
+            this._mostrarToast('📖 Magia removida da preparação.', 'info');
+        } catch (err) {
+            console.error('❌ Erro ao desmarcar magia:', err);
+            this._mostrarToast('Erro ao remover magia.', 'erro');
+        }
+    }
+
+    // 
+    // PRIVADO — RENDERIZAÇÃO
+    // 
+
     _configurarFiltros() {
         document.querySelectorAll('.grimorio-nivel-btn').forEach(btn => {
-            // Evitar duplicate listeners
             btn.replaceWith(btn.cloneNode(true));
         });
         document.querySelectorAll('.grimorio-nivel-btn').forEach(btn => {
@@ -148,9 +426,47 @@ class GrimorioController {
                 this.filtrar();
             });
         });
+
+        // Botão descanso longo
+        const btnDescanso = document.getElementById('btnDescansoLongo');
+        if (btnDescanso) {
+            btnDescanso.replaceWith(btnDescanso.cloneNode(true));
+            document.getElementById('btnDescansoLongo')
+                ?.addEventListener('click', () => this.descansoLongo());
+        }
     }
 
-    /** Renderiza lista de magias agrupadas por nível */
+    /** Painel de slots no topo do grimório */
+    _renderizarPainelSlots() {
+        const painel = document.getElementById('grimorioPainelSlots');
+        if (!painel) return;
+
+        const niveis = Object.keys(this.slotsDisponiveis).map(Number).sort((a, b) => a - b);
+        if (niveis.length === 0) {
+            painel.innerHTML = '<span class="grimorio-slots-vazio">Sem slots configurados</span>';
+            return;
+        }
+
+        painel.innerHTML = niveis.map(n => {
+            const s   = this.slotsDisponiveis[n];
+            const pct = s.total > 0 ? (s.preparadas / s.total) * 100 : 0;
+            const cor = s.disponivel === 0 ? '#f87171'
+                      : s.preparadas > 0   ? '#facc15'
+                      :                      '#4ade80';
+            return `
+                <div class="grimorio-slot-box" title="Nível ${n}: ${s.preparadas}/${s.total} preparadas">
+                    <span class="grimorio-slot-nivel">${n === 0 ? '0' : n + 'º'}</span>
+                    <div class="grimorio-slot-barra-wrap">
+                        <div class="grimorio-slot-barra-fill" style="width:${pct}%;background:${cor}"></div>
+                    </div>
+                    <span class="grimorio-slot-contagem" style="color:${cor}">
+                        ${s.preparadas}/${s.total}
+                    </span>
+                </div>
+            `;
+        }).join('');
+    }
+
     _renderizarLista() {
         const lista = document.getElementById('grimorioLista');
         if (!lista) return;
@@ -163,62 +479,77 @@ class GrimorioController {
         // Agrupar por nível
         const grupos = {};
         this.magiasFiltro.forEach(m => {
-            const k = m.nivel;
-            if (!grupos[k]) grupos[k] = [];
-            grupos[k].push(m);
+            if (!grupos[m.nivel]) grupos[m.nivel] = [];
+            grupos[m.nivel].push(m);
         });
 
-        const niveisOrdenados = Object.keys(grupos).map(Number).sort((a, b) => a - b);
         const LABEL_NIVEL = {
-            0: '✦ Truques (Cantrips)',
-            1: '✦ 1° Nível', 2: '✦ 2° Nível', 3: '✦ 3° Nível',
-            4: '✦ 4° Nível', 5: '✦ 5° Nível', 6: '✦ 6° Nível',
-            7: '✦ 7° Nível', 8: '✦ 8° Nível', 9: '✦ 9° Nível',
+            0:'✦ Truques (Cantrips)', 1:'✦ 1° Nível', 2:'✦ 2° Nível',
+            3:'✦ 3° Nível', 4:'✦ 4° Nível', 5:'✦ 5° Nível',
+            6:'✦ 6° Nível', 7:'✦ 7° Nível', 8:'✦ 8° Nível', 9:'✦ 9° Nível',
         };
 
-        lista.innerHTML = niveisOrdenados.map(nivel => `
-            <div class="grimorio-grupo">
-                <div class="grimorio-grupo-titulo">${LABEL_NIVEL[nivel] || `✦ Nível ${nivel}`}</div>
-                ${grupos[nivel].map(m => this._renderizarCard(m)).join('')}
-            </div>
-        `).join('');
+        lista.innerHTML = Object.keys(grupos).map(Number).sort((a,b) => a-b).map(nivel => {
+            const slot = this.slotsDisponiveis[nivel];
+            const slotInfo = slot
+                ? `<span class="grimorio-grupo-slots">${slot.preparadas}/${slot.total} preparadas</span>`
+                : '';
+            return `
+                <div class="grimorio-grupo">
+                    <div class="grimorio-grupo-titulo">
+                        ${LABEL_NIVEL[nivel] || `✦ Nível ${nivel}`}
+                        ${slotInfo}
+                    </div>
+                    ${grupos[nivel].map(m => this._renderizarCard(m)).join('')}
+                </div>
+            `;
+        }).join('');
 
-        // Bind cliques nos cards
-        lista.querySelectorAll('.grimorio-magia-card').forEach(card => {
-            const id = Number(card.dataset.id);
-            card.querySelector('.grimorio-expandir-btn')?.addEventListener('click', (e) => {
+        // Bind eventos dos checkboxes
+        lista.querySelectorAll('.grimorio-checkbox').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const magiaId  = Number(cb.dataset.magiaId);
+                const nivelMag = Number(cb.dataset.nivel);
+                this._togglePreparacao(magiaId, nivelMag);
+            });
+        });
+
+        // Bind botões expandir
+        lista.querySelectorAll('.grimorio-expandir-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this._toggleCard(id);
+                this._toggleCard(Number(btn.dataset.id));
             });
         });
     }
 
-    /** Renderiza um card individual de magia */
     _renderizarCard(m) {
-        const emoji   = EMOJI_ESCOLA[m.escola] || '📜';
-        const aberto  = this.cardsAbertos.has(m.id);
-        const temDano = m.dano && m.dano.trim();
+        const emoji     = EMOJI_ESCOLA[m.escola] || '📜';
+        const preparada = this.preparadas.has(m.id);
+        const aberto    = this.cardsAbertos.has(m.id);
+        const temDano   = m.dano && m.dano.trim();
+        const slot      = this.slotsDisponiveis[m.nivel];
+        const semSlot   = slot && !preparada && slot.disponivel <= 0;
 
         const badges = [
-            m.escola     ? `<span class="grimorio-badge grimorio-badge-escola">${emoji} ${m.escola}</span>` : '',
-            m.componentes? `<span class="grimorio-badge grimorio-badge-comp">${m.componentes}</span>` : '',
-            temDano      ? `<span class="grimorio-badge grimorio-badge-dano">🗡 ${m.dano}</span>` : '',
+            m.escola      ? `<span class="grimorio-badge grimorio-badge-escola">${emoji} ${m.escola}</span>` : '',
+            m.componentes ? `<span class="grimorio-badge grimorio-badge-comp">${m.componentes}</span>` : '',
+            temDano       ? `<span class="grimorio-badge grimorio-badge-dano">🗡 ${m.dano}</span>` : '',
             m.teste_resistencia && m.teste_resistencia !== 'Nenhum'
-                         ? `<span class="grimorio-badge grimorio-badge-res">🎲 ${m.teste_resistencia}</span>` : '',
+                          ? `<span class="grimorio-badge grimorio-badge-res">🎲 ${m.teste_resistencia}</span>` : '',
         ].filter(Boolean).join('');
 
         const metaItens = [
-            { label: 'Alcance',      valor: m.alcance },
-            { label: 'Duração',      valor: m.duracao },
-            { label: 'Conjuração',   valor: m.tempo_conjuracao },
-            { label: 'Área',         valor: m.area_efeito },
-        ].filter(i => i.valor && i.valor.trim())
-         .map(i => `
+            { label: 'Alcance',    valor: m.alcance },
+            { label: 'Duração',    valor: m.duracao },
+            { label: 'Conjuração', valor: m.tempo_conjuracao },
+            { label: 'Área',       valor: m.area_efeito },
+        ].filter(i => i.valor?.trim()).map(i => `
             <div class="grimorio-meta-item">
                 <span class="grimorio-meta-label">${i.label}</span>
                 <span class="grimorio-meta-valor">${i.valor}</span>
             </div>
-         `).join('');
+        `).join('');
 
         const detalhes = `
             <div class="grimorio-card-detalhes ${aberto ? 'show' : ''}">
@@ -245,32 +576,82 @@ class GrimorioController {
         `;
 
         return `
-            <div class="grimorio-magia-card" data-id="${m.id}">
+            <div class="grimorio-magia-card ${preparada ? 'preparada' : ''} ${semSlot ? 'sem-slot' : ''}"
+                 data-id="${m.id}">
                 <div class="grimorio-card-topo">
-                    <span class="grimorio-card-nome">${m.nome}</span>
+                    <label class="grimorio-checkbox-label" title="${semSlot ? 'Sem slots disponíveis neste nível' : preparada ? 'Remover da preparação' : 'Preparar magia'}">
+                        <input type="checkbox"
+                               class="grimorio-checkbox"
+                               data-magia-id="${m.id}"
+                               data-nivel="${m.nivel}"
+                               ${preparada ? 'checked' : ''}
+                               ${semSlot ? 'disabled' : ''}>
+                        <span class="grimorio-checkbox-custom ${preparada ? 'checked' : ''} ${semSlot ? 'disabled' : ''}"></span>
+                    </label>
+                    <span class="grimorio-card-nome ${preparada ? 'preparada-nome' : ''}">${m.nome}</span>
                     <div class="grimorio-card-badges">${badges}</div>
                 </div>
                 <p class="grimorio-card-descricao">${m.descricao || '—'}</p>
                 <div class="grimorio-card-meta">${metaItens}</div>
                 ${detalhes}
                 <div class="grimorio-card-rodape">
-                    <button class="grimorio-expandir-btn">
+                    <button class="grimorio-expandir-btn" data-id="${m.id}">
                         ${aberto ? '▲ Menos detalhes' : '▼ Ver detalhes'}
                     </button>
+                    ${preparada ? '<span class="grimorio-preparada-badge">✦ Preparada</span>' : ''}
                 </div>
             </div>
         `;
     }
 
-    /** Alterna exibição de detalhes de um card */
+    /** Atualiza apenas o card afetado sem re-renderizar a lista toda */
+    _atualizarCard(magiaId, nivelMagia) {
+        const card = document.querySelector(`.grimorio-magia-card[data-id="${magiaId}"]`);
+        if (!card) { this._renderizarLista(); return; }
+
+        const preparada = this.preparadas.has(magiaId);
+        const slot      = this.slotsDisponiveis[nivelMagia];
+        const semSlot   = slot && !preparada && slot.disponivel <= 0;
+
+        // Atualizar classes do card
+        card.classList.toggle('preparada', preparada);
+        card.classList.toggle('sem-slot',  semSlot);
+
+        // Atualizar checkbox
+        const cb = card.querySelector('.grimorio-checkbox');
+        if (cb) {
+            cb.checked  = preparada;
+            cb.disabled = semSlot;
+        }
+        const cbCustom = card.querySelector('.grimorio-checkbox-custom');
+        if (cbCustom) {
+            cbCustom.classList.toggle('checked',  preparada);
+            cbCustom.classList.toggle('disabled', semSlot);
+        }
+
+        // Atualizar nome
+        const nome = card.querySelector('.grimorio-card-nome');
+        if (nome) nome.classList.toggle('preparada-nome', preparada);
+
+        // Atualizar rodapé
+        const rodape = card.querySelector('.grimorio-card-rodape');
+        if (rodape) {
+            const badgeExistente = rodape.querySelector('.grimorio-preparada-badge');
+            if (preparada && !badgeExistente) {
+                rodape.insertAdjacentHTML('beforeend', '<span class="grimorio-preparada-badge">✦ Preparada</span>');
+            } else if (!preparada && badgeExistente) {
+                badgeExistente.remove();
+            }
+        }
+    }
+
     _toggleCard(id) {
         if (this.cardsAbertos.has(id)) {
             this.cardsAbertos.delete(id);
         } else {
             this.cardsAbertos.add(id);
         }
-        // Re-renderizar apenas o card afetado
-        const card = document.querySelector(`.grimorio-magia-card[data-id="${id}"]`);
+        const card     = document.querySelector(`.grimorio-magia-card[data-id="${id}"]`);
         if (!card) return;
         const detalhes = card.querySelector('.grimorio-card-detalhes');
         const btn      = card.querySelector('.grimorio-expandir-btn');
@@ -278,61 +659,55 @@ class GrimorioController {
         if (btn)      btn.textContent = this.cardsAbertos.has(id) ? '▲ Menos detalhes' : '▼ Ver detalhes';
     }
 
+    _mostrarToast(msg, tipo = 'sucesso') {
+        const toast = document.createElement('div');
+        toast.className = `grimorio-toast grimorio-toast-${tipo}`;
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
+    }
+
     _mostrarLoading(visivel) {
-        const el = document.getElementById('grimorioLoading');
+        const el    = document.getElementById('grimorioLoading');
         const lista = document.getElementById('grimorioLista');
         if (el)    el.style.display    = visivel ? 'flex' : 'none';
         if (lista) lista.style.display = visivel ? 'none' : 'block';
     }
-
-    _mostrarErro() {
-        const lista = document.getElementById('grimorioLista');
-        if (lista) lista.innerHTML = `
-            <div class="grimorio-vazio">
-                ❌ Erro ao carregar magias. Verifique o servidor.
-            </div>
-        `;
-        this._mostrarLoading(false);
-    }
 }
 
 
-// ── Inicialização: aguarda FichaPersonagemController carregar o combatente ──
+// ── Inicialização ──
 document.addEventListener('DOMContentLoaded', () => {
-    // Verifica a cada 300ms se o combatente já foi carregado pelo FichaController
     const tentarInicializar = setInterval(() => {
         const nomeEl   = document.getElementById('fichaNome');
         const classeEl = document.getElementById('fichaClasse');
-
         if (!nomeEl || !classeEl) return;
+
         const nome   = nomeEl.textContent?.trim();
         const classe = classeEl.textContent?.trim();
         if (!nome || nome === '—' || !classe || classe === '—') return;
 
         clearInterval(tentarInicializar);
 
+        const combatente = window._fichaController?.combatente;
+        if (!combatente) return;
+
         const token = localStorage.getItem('token');
+        window._grimorioController = new GrimorioController(combatente, token);
 
-        // ✅ Instância global acessível pelos onclick do HTML
-        window._grimorioController = new GrimorioController(classe, nome, token);
-
-        // Mostrar botão Grimório apenas para classes conjuradoras
-        if (CLASSES_CONJURADORAS.has(classe.toLowerCase())) {
+        if (CLASSES_CONJURADORAS.has(classe.toLowerCase()) || CLASSES_CONJURADORAS.has(classe)) {
             const btnHeader  = document.getElementById('btnGrimorio');
             const secaoMagia = document.getElementById('secaoMagias');
             if (btnHeader)  btnHeader.style.display  = 'inline-flex';
             if (secaoMagia) secaoMagia.style.display = 'flex';
         }
 
-        // Fechar ao clicar fora
-        document.getElementById('modalGrimorio')?.addEventListener('click', (e) => {
-            if (e.target.id === 'modalGrimorio') {
-                window._grimorioController.fecharGrimorio();
-            }
+        document.getElementById('modalGrimorio')?.addEventListener('click', e => {
+            if (e.target.id === 'modalGrimorio') window._grimorioController.fecharGrimorio();
         });
 
-        // Fechar com ESC
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', e => {
             if (e.key === 'Escape') window._grimorioController?.fecharGrimorio();
         });
 

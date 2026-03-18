@@ -13,7 +13,7 @@ import logging
 from .core.config import settings
 from .core.database import engine, Base, SessionLocal, get_db
 from .core.init_db import criar_admin_padrao
-from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias
+from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias, magias_preparadas
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
 from .models import usuario as usuario_model
@@ -87,7 +87,8 @@ app.include_router(combate.router, prefix=settings.API_V1_PREFIX)
 app.include_router(condicoes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(ataques.router, prefix=settings.API_V1_PREFIX)
 app.include_router(pericias.router, prefix=settings.API_V1_PREFIX)
-app.include_router(magias.router, prefix=settings.API_V1_PREFIX)  # ✅ ADICIONAR
+app.include_router(magias.router, prefix=settings.API_V1_PREFIX)
+app.include_router(magias_preparadas.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 

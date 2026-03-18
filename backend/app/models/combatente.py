@@ -55,6 +55,9 @@ class Combatente(Base):
     # ✅ NOVO: Relacionamento com PericiaJogador
     pericias     = relationship("PericiaJogador", back_populates="combatente",
                                 cascade="all, delete-orphan", lazy="selectin")
+    
+    magias_preparadas = relationship("MagiaPreparada", back_populates="combatente",
+                                    cascade="all, delete-orphan",lazy="selectin")
 
     def __repr__(self):
         return f"<Combatente(id={self.id}, nome='{self.nome}', tipo='{self.tipo}')>"
