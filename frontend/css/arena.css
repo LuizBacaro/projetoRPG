@@ -758,3 +758,110 @@
         padding: 0.65rem;
     }
 }
+
+/* ── Magias Preparadas na Arena ── */
+.arena-magias-preparadas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.arena-magia-preparada-nivel {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.arena-prep-nivel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0.6rem;
+    background: rgba(201,168,76,0.08);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+}
+
+.arena-prep-nivel-label {
+    font-family: var(--font-medieval, 'Cinzel', serif);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(201,168,76,0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.arena-prep-disponiveis {
+    font-family: var(--font-medieval, 'Cinzel', serif);
+    font-size: 0.72rem;
+    font-weight: 700;
+    transition: color 0.3s;
+}
+
+.arena-prep-magia-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+}
+.arena-prep-magia-row:last-child { border-bottom: none; }
+.arena-prep-magia-row:hover { background: rgba(255,255,255,0.04); }
+.arena-prep-magia-row.arena-prep-usada { opacity: 0.5; }
+
+.arena-prep-nome {
+    flex: 1;
+    font-size: 0.78rem;
+    color: #e8d8b5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s;
+}
+.arena-prep-nome-usada {
+    text-decoration: line-through;
+    color: rgba(248,113,113,0.6);
+}
+
+.arena-prep-escola {
+    font-size: 0.58rem;
+    color: rgba(123,158,247,0.7);
+    font-style: italic;
+    flex-shrink: 0;
+}
+
+.arena-prep-btn {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 5px;
+    color: #facc15;
+    font-size: 0.78rem;
+    width: 28px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.arena-prep-btn:hover {
+    background: rgba(201,168,76,0.25);
+    transform: scale(1.1);
+}
+.arena-prep-btn-usada {
+    background: rgba(248,113,113,0.1);
+    border-color: rgba(248,113,113,0.3);
+    color: #f87171;
+}
+
+.arena-magia-vazio {
+    text-align: center;
+    padding: 1rem;
+    color: rgba(201,168,76,0.4);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
