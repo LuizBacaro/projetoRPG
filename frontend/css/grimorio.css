@@ -1,7 +1,6 @@
 /*
  * grimorio.css
  * Estilo do Grimório de Magias — tema medieval arcano
- * Dependências: variables.css
  */
 
 /* ── Overlay ── */
@@ -16,9 +15,7 @@
     padding: 1rem;
     backdrop-filter: blur(4px);
 }
-.grimorio-overlay.show {
-    display: flex;
-}
+.grimorio-overlay.show { display: flex; }
 
 /* ── Container principal ── */
 .grimorio-container {
@@ -26,8 +23,8 @@
     border: 3px solid var(--cor-dourada);
     border-radius: 16px;
     width: 100%;
-    max-width: 900px;
-    max-height: 90vh;
+    max-width: 960px;
+    max-height: 92vh;
     display: flex;
     flex-direction: column;
     box-shadow:
@@ -43,11 +40,11 @@
     to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
-/* ── Header do grimório ── */
+/* ── Header ── */
 .grimorio-header {
     background: linear-gradient(135deg, #2a1a08 0%, #3d2410 50%, #2a1a08 100%);
     border-bottom: 2px solid var(--cor-dourada);
-    padding: 1.25rem 1.5rem;
+    padding: 0.85rem 1.5rem;        /* ✅ menos padding vertical */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -56,10 +53,10 @@
 .grimorio-header-esquerda {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 .grimorio-icone {
-    font-size: 2.5rem;
+    font-size: 2rem;               /* ✅ menor */
     filter: drop-shadow(0 0 8px rgba(201, 168, 76, 0.6));
     animation: flutuarIcone 3s ease-in-out infinite;
 }
@@ -69,7 +66,7 @@
 }
 .grimorio-titulo {
     font-family: var(--fonte-titulo);
-    font-size: 1.6rem;
+    font-size: 1.3rem;             /* ✅ menor */
     color: var(--cor-dourada);
     margin: 0;
     text-shadow: 0 0 20px rgba(201, 168, 76, 0.5);
@@ -77,10 +74,15 @@
 }
 .grimorio-subtitulo {
     font-family: var(--fonte-titulo);
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: var(--cor-madeira-clara);
-    margin: 0.15rem 0 0;
+    margin: 0.1rem 0 0;
     letter-spacing: 0.05em;
+}
+.grimorio-header-acoes {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 .grimorio-fechar {
     background: rgba(201, 168, 76, 0.15);
@@ -88,91 +90,240 @@
     border-radius: 8px;
     color: var(--cor-dourada);
     font-size: 1.2rem;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    font-family: var(--fonte-titulo);
 }
 .grimorio-fechar:hover {
     background: rgba(201, 168, 76, 0.3);
     transform: scale(1.1);
 }
 
-/* ── Filtros ── */
-.grimorio-filtros {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid rgba(201, 168, 76, 0.2);
-    background: rgba(0, 0, 0, 0.2);
+/* ── Botão descanso longo ── */
+.grimorio-btn-descanso {
+    background: rgba(30,20,60,0.5);
+    border: 1px solid rgba(130,80,200,0.4);
+    border-radius: 8px;
+    color: #b49ee0;
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    padding: 0.35rem 0.65rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+}
+.grimorio-btn-descanso:hover {
+    background: rgba(50,30,100,0.6);
+    border-color: rgba(180,120,255,0.6);
+    color: #d0b8ff;
+    box-shadow: 0 0 10px rgba(130,80,200,0.3);
+}
+
+/* 
+   ✅ NOVA ZONA TOPO: slots + busca na mesma linha
+    */
+.grimorio-topo-controles {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.6rem 1.5rem;
+    background: rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    flex-shrink: 0;
+}
+
+/* Painel de slots — ocupa espaço disponível */
+.grimorio-slots-painel {
+    flex: 1;
+    min-width: 0;
+}
+.grimorio-slots-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    color: rgba(201,168,76,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.35rem;
+}
+.grimorio-slots-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+.grimorio-slots-vazio {
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    color: rgba(201,168,76,0.4);
+    font-style: italic;
+}
+.grimorio-slot-box {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 0.15rem;
+    min-width: 38px;
+}
+.grimorio-slot-nivel {
+    font-family: var(--fonte-titulo);
+    font-size: 0.55rem;
+    color: rgba(201,168,76,0.65);
+    text-transform: uppercase;
+}
+.grimorio-slot-barra-wrap {
+    width: 36px;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.grimorio-slot-barra-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+.grimorio-slot-contagem {
+    font-family: var(--fonte-titulo);
+    font-size: 0.58rem;
+    font-weight: 700;
+}
+.grimorio-slot-usadas {
+    font-size: 0.52rem;
+    color: #f87171;
+    font-family: var(--fonte-titulo);
+}
+
+/* Busca — lado direito do topo */
+.grimorio-busca-wrapper {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.grimorio-busca-label {
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    color: rgba(201,168,76,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+.grimorio-busca {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 8px;
+    color: var(--cor-pergaminho);
+    font-family: var(--fonte-texto);
+    font-size: 0.82rem;
+    padding: 0.4rem 0.75rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 220px;
+}
+.grimorio-busca::placeholder { color: rgba(201,168,76,0.3); }
+.grimorio-busca:focus { border-color: var(--cor-dourada); }
+
+/* 
+   ✅ FILTROS COMPACTOS: nível + escola em 2 linhas enxutas
+    */
+.grimorio-filtros {
+    padding: 0.5rem 1.5rem;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    background: rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;               /* ✅ gap reduzido */
     flex-shrink: 0;
 }
 .grimorio-filtro-grupo {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 .grimorio-filtro-label {
     font-family: var(--fonte-titulo);
-    font-size: 0.72rem;
-    color: var(--cor-madeira-clara);
+    font-size: 0.62rem;
+    color: rgba(201,168,76,0.55);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    min-width: 45px;
+    letter-spacing: 0.08em;
+    min-width: 42px;
+    flex-shrink: 0;
 }
 .grimorio-niveis {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: 0.25rem;              /* ✅ gap menor */
 }
 .grimorio-nivel-btn {
-    background: rgba(201, 168, 76, 0.08);
-    border: 1px solid rgba(201, 168, 76, 0.25);
-    border-radius: 6px;
-    color: var(--cor-madeira-clara);
+    background: rgba(201,168,76,0.07);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 5px;
+    color: rgba(201,168,76,0.55);
     font-family: var(--fonte-titulo);
-    font-size: 0.7rem;
-    padding: 0.25rem 0.55rem;
+    font-size: 0.62rem;        /* ✅ fonte menor */
+    padding: 0.18rem 0.45rem;  /* ✅ padding menor */
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 .grimorio-nivel-btn:hover {
-    background: rgba(201, 168, 76, 0.2);
+    background: rgba(201,168,76,0.18);
     color: var(--cor-dourada);
-    border-color: var(--cor-dourada);
+    border-color: rgba(201,168,76,0.5);
 }
 .grimorio-nivel-btn.ativo {
-    background: linear-gradient(135deg, rgba(201, 168, 76, 0.3), rgba(201, 168, 76, 0.15));
+    background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.12));
     border-color: var(--cor-dourada);
     color: var(--cor-dourada);
-    box-shadow: 0 0 8px rgba(201, 168, 76, 0.3);
+    box-shadow: 0 0 6px rgba(201,168,76,0.25);
 }
-.grimorio-busca {
-    flex: 1;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(201, 168, 76, 0.3);
-    border-radius: 8px;
-    color: var(--cor-pergaminho);
-    font-family: var(--fonte-texto);
-    font-size: 0.85rem;
-    padding: 0.45rem 0.85rem;
-    outline: none;
-    transition: border-color 0.2s;
-    max-width: 320px;
-}
-.grimorio-busca::placeholder { color: rgba(201, 168, 76, 0.35); }
-.grimorio-busca:focus { border-color: var(--cor-dourada); }
 
-/* ── Corpo / Lista ── */
+/* Botão "Preparadas Hoje" */
+.grimorio-btn-preparadas {
+    border-color: rgba(250,204,21,0.35) !important;
+    color: rgba(250,204,21,0.6) !important;
+}
+.grimorio-btn-preparadas.ativo {
+    background: rgba(250,204,21,0.12) !important;
+    border-color: #facc15 !important;
+    color: #facc15 !important;
+    box-shadow: 0 0 7px rgba(250,204,21,0.25) !important;
+}
+
+/* Filtro escola */
+.grimorio-escola-btn {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 5px;
+    color: rgba(201,168,76,0.55);
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    padding: 0.18rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.grimorio-escola-btn:hover {
+    border-color: rgba(201,168,76,0.45);
+    color: var(--cor-dourada);
+}
+.grimorio-escola-btn.ativo {
+    background: rgba(201,168,76,0.13);
+    border-color: var(--cor-dourada);
+    color: var(--cor-dourada);
+    box-shadow: 0 0 5px rgba(201,168,76,0.18);
+}
+
+/* 
+   ✅ CORPO DA LISTA — flex:1 garante máximo espaço possível
+    */
 .grimorio-corpo {
-    flex: 1;
+    flex: 1;                   /* ✅ ocupa TODO o espaço restante */
     overflow-y: auto;
-    padding: 1rem 1.5rem;
+    padding: 0.85rem 1.5rem;
+    min-height: 0;             /* ✅ crítico para flex funcionar */
 }
 
 /* Loading */
@@ -207,37 +358,42 @@
 }
 
 /* ── Grupos por nível ── */
-.grimorio-grupo {
-    margin-bottom: 1.5rem;
-}
+.grimorio-grupo { margin-bottom: 1.25rem; }
 .grimorio-grupo-titulo {
     font-family: var(--fonte-titulo);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--cor-dourada);
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    padding: 0.4rem 0.6rem;
-    border-bottom: 1px solid rgba(201, 168, 76, 0.3);
-    margin-bottom: 0.6rem;
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 .grimorio-grupo-titulo::before {
     content: '';
-    width: 20px;
+    width: 16px;
     height: 1px;
     background: var(--cor-dourada);
     opacity: 0.5;
+}
+.grimorio-grupo-slots {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    color: rgba(201,168,76,0.55);
+    margin-left: auto;
+    font-weight: normal;
 }
 
 /* ── Card de magia ── */
 .grimorio-magia-card {
     background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(201,168,76,0.04) 100%);
-    border: 1px solid rgba(201, 168, 76, 0.18);
+    border: 1px solid rgba(201,168,76,0.18);
     border-radius: 10px;
-    padding: 0.85rem 1rem;
-    margin-bottom: 0.5rem;
+    padding: 0.75rem 0.9rem;
+    margin-bottom: 0.4rem;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
@@ -254,95 +410,114 @@
 }
 .grimorio-magia-card:hover {
     background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(201,168,76,0.08) 100%);
-    border-color: rgba(201, 168, 76, 0.4);
+    border-color: rgba(201,168,76,0.4);
     transform: translateX(3px);
 }
 .grimorio-magia-card:hover::before { opacity: 1; }
+.grimorio-magia-card.preparada {
+    background: linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.06) 100%);
+    border-color: rgba(201,168,76,0.45);
+    box-shadow: 0 0 12px rgba(201,168,76,0.15);
+}
+.grimorio-magia-card.sem-slot { opacity: 0.5; }
+.grimorio-magia-card.ja-usada {
+    opacity: 0.6;
+    background: linear-gradient(135deg, rgba(248,113,113,0.06) 0%, rgba(248,113,113,0.03) 100%);
+    border-color: rgba(248,113,113,0.25);
+}
 
-/* Cabeçalho do card */
+/* Topo do card */
 .grimorio-card-topo {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.5rem;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
 }
 .grimorio-card-nome {
     font-family: var(--fonte-titulo);
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--cor-dourada);
     font-weight: 700;
     line-height: 1.2;
 }
+.grimorio-card-nome.preparada-nome {
+    color: var(--cor-dourada);
+    text-shadow: 0 0 10px rgba(201,168,76,0.4);
+}
+.grimorio-card-nome.usada-nome {
+    text-decoration: line-through;
+    color: rgba(248,113,113,0.7);
+}
 .grimorio-card-badges {
     display: flex;
-    gap: 0.35rem;
+    gap: 0.3rem;
     flex-shrink: 0;
     flex-wrap: wrap;
     justify-content: flex-end;
 }
 .grimorio-badge {
     font-family: var(--fonte-titulo);
-    font-size: 0.6rem;
+    font-size: 0.58rem;
     font-weight: 700;
-    padding: 0.15rem 0.45rem;
+    padding: 0.12rem 0.4rem;
     border-radius: 999px;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     white-space: nowrap;
 }
 .grimorio-badge-escola {
-    background: rgba(65, 105, 225, 0.2);
+    background: rgba(65,105,225,0.2);
     color: #7b9ef7;
-    border: 1px solid rgba(65, 105, 225, 0.35);
+    border: 1px solid rgba(65,105,225,0.35);
 }
 .grimorio-badge-comp {
-    background: rgba(92, 58, 30, 0.25);
+    background: rgba(92,58,30,0.25);
     color: var(--cor-madeira-clara);
-    border: 1px solid rgba(92, 58, 30, 0.4);
+    border: 1px solid rgba(92,58,30,0.4);
 }
 .grimorio-badge-res {
-    background: rgba(139, 26, 26, 0.2);
+    background: rgba(139,26,26,0.2);
     color: #e07070;
-    border: 1px solid rgba(139, 26, 26, 0.35);
+    border: 1px solid rgba(139,26,26,0.35);
 }
 .grimorio-badge-dano {
-    background: rgba(220, 80, 20, 0.2);
+    background: rgba(220,80,20,0.2);
     color: #e89060;
-    border: 1px solid rgba(220, 80, 20, 0.35);
+    border: 1px solid rgba(220,80,20,0.35);
 }
 
 /* Descrição */
 .grimorio-card-descricao {
-    font-size: 0.8rem;
-    color: rgba(232, 216, 185, 0.75);
+    font-size: 0.78rem;
+    color: rgba(232,216,185,0.75);
     font-family: var(--fonte-texto);
-    line-height: 1.45;
-    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    margin-bottom: 0.4rem;
 }
 
-/* Meta linha (alcance, duração etc.) */
+/* Meta */
 .grimorio-card-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 0.35rem;
+    margin-top: 0.3rem;
 }
 .grimorio-meta-item {
     display: flex;
     flex-direction: column;
-    gap: 0.05rem;
+    gap: 0.04rem;
 }
 .grimorio-meta-label {
     font-family: var(--fonte-titulo);
-    font-size: 0.5rem;
-    color: rgba(201, 168, 76, 0.5);
+    font-size: 0.48rem;
+    color: rgba(201,168,76,0.5);
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 .grimorio-meta-valor {
     font-family: var(--fonte-titulo);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     color: var(--cor-madeira-clara);
     font-weight: 600;
 }
@@ -350,9 +525,9 @@
 /* Detalhes expandidos */
 .grimorio-card-detalhes {
     display: none;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(201, 168, 76, 0.15);
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(201,168,76,0.15);
     animation: expandirDetalhes 0.25s ease;
 }
 .grimorio-card-detalhes.show { display: block; }
@@ -364,11 +539,11 @@
     display: flex;
     gap: 0.5rem;
     align-items: baseline;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.25rem;
 }
 .grimorio-detalhe-chave {
     font-family: var(--fonte-titulo);
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: var(--cor-dourada);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -376,31 +551,36 @@
     flex-shrink: 0;
 }
 .grimorio-detalhe-valor {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     color: var(--cor-pergaminho);
     font-family: var(--fonte-texto);
     line-height: 1.4;
 }
 .grimorio-dano-destaque {
     font-family: var(--fonte-titulo);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: #e07070;
     font-weight: 700;
 }
 
-/* Barra inferior do card */
+/* Rodapé do card */
 .grimorio-card-rodape {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 0.5rem;
+    margin-top: 0.45rem;
+}
+.grimorio-rodape-direita {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 .grimorio-expandir-btn {
     background: none;
     border: none;
-    color: rgba(201, 168, 76, 0.5);
+    color: rgba(201,168,76,0.45);
     font-family: var(--fonte-titulo);
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     cursor: pointer;
     padding: 0;
     text-transform: uppercase;
@@ -408,8 +588,87 @@
     transition: color 0.2s;
 }
 .grimorio-expandir-btn:hover { color: var(--cor-dourada); }
+.grimorio-preparada-badge {
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    color: var(--cor-dourada);
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 6px rgba(201,168,76,0.5);
+}
 
-/* ── Scrollbar temático ── */
+/* ── Checkbox preparar ── */
+.grimorio-checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.grimorio-checkbox { display: none; }
+.grimorio-checkbox-custom {
+    width: 17px;
+    height: 17px;
+    border: 2px solid rgba(201,168,76,0.3);
+    border-radius: 4px;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.grimorio-checkbox-custom::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background: var(--cor-dourada);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.15s;
+}
+.grimorio-checkbox-custom.checked {
+    border-color: var(--cor-dourada);
+    background: rgba(201,168,76,0.15);
+    box-shadow: 0 0 8px rgba(201,168,76,0.3);
+}
+.grimorio-checkbox-custom.checked::after { opacity: 1; transform: scale(1); }
+.grimorio-checkbox-custom.disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── Checkbox "lançada hoje" ── */
+.grimorio-usada-label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    color: rgba(248,113,113,0.55);
+    transition: color 0.2s;
+}
+.grimorio-usada-label:hover { color: #f87171; }
+.grimorio-checkbox-usada { display: none; }
+.grimorio-usada-custom {
+    font-size: 0.82rem;
+    opacity: 0.3;
+    transition: all 0.2s;
+    filter: grayscale(1);
+}
+.grimorio-usada-custom.usada {
+    opacity: 1;
+    filter: grayscale(0);
+    animation: pulseFlame 0.4s ease;
+}
+@keyframes pulseFlame {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+.grimorio-usada-texto {
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+}
+
+/* ── Scrollbar ── */
 .grimorio-corpo::-webkit-scrollbar { width: 5px; }
 .grimorio-corpo::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
 .grimorio-corpo::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 3px; }
@@ -425,7 +684,7 @@
     font-family: var(--fonte-titulo);
     font-size: 0.85rem;
     font-weight: 700;
-    padding: 0.65rem;
+    padding: 0.6rem;
     cursor: pointer;
     transition: all 0.25s;
     letter-spacing: 0.06em;
@@ -438,7 +697,7 @@
     transform: translateY(-1px);
 }
 
-/* ── Botão grimório no header ── */
+/* ── Botão grimório no header da ficha ── */
 .btn-grimorio {
     background: linear-gradient(135deg, #2a1a08 0%, #3d2410 100%);
     border: 2px solid var(--cor-dourada);
@@ -458,197 +717,15 @@
     transform: translateY(-1px);
 }
 
-/* ── Responsividade ── */
-@media (max-width: 768px) {
-    .grimorio-container {
-        max-height: 95vh;
-        border-radius: 12px;
-    }
-    .grimorio-header { padding: 1rem; }
-    .grimorio-titulo { font-size: 1.2rem; }
-    .grimorio-icone  { font-size: 1.8rem; }
-    .grimorio-filtros { padding: 0.75rem 1rem; }
-    .grimorio-filtro-grupo { flex-wrap: wrap; }
-    .grimorio-busca { max-width: 100%; }
-    .grimorio-corpo { padding: 0.75rem 1rem; }
-    .grimorio-card-topo { flex-direction: column; gap: 0.4rem; }
-    .grimorio-card-badges { justify-content: flex-start; }
-}
-@media (max-width: 480px) {
-    .grimorio-nivel-btn { font-size: 0.65rem; padding: 0.2rem 0.4rem; }
-    .grimorio-card-nome { font-size: 0.9rem; }
-    .grimorio-card-descricao { font-size: 0.75rem; }
-}
-
-/* ── Painel de slots do dia ── */
-.grimorio-slots-painel {
-    padding: 0.75rem 1.5rem;
-    background: rgba(0,0,0,0.25);
-    border-bottom: 1px solid rgba(201,168,76,0.15);
-    flex-shrink: 0;
-}
-.grimorio-slots-titulo {
-    font-family: var(--fonte-titulo);
-    font-size: 0.65rem;
-    color: rgba(201,168,76,0.6);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
-}
-.grimorio-slots-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-.grimorio-slots-vazio {
-    font-family: var(--fonte-titulo);
-    font-size: 0.72rem;
-    color: rgba(201,168,76,0.4);
-    font-style: italic;
-}
-.grimorio-slot-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-    min-width: 42px;
-}
-.grimorio-slot-nivel {
-    font-family: var(--fonte-titulo);
-    font-size: 0.6rem;
-    color: rgba(201,168,76,0.7);
-    text-transform: uppercase;
-}
-.grimorio-slot-barra-wrap {
-    width: 40px;
-    height: 4px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 2px;
-    overflow: hidden;
-}
-.grimorio-slot-barra-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.3s ease;
-}
-.grimorio-slot-contagem {
-    font-family: var(--fonte-titulo);
-    font-size: 0.6rem;
-    font-weight: 700;
-}
-
-/* ── Checkbox de preparação ── */
-.grimorio-checkbox-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-.grimorio-checkbox {
-    display: none; /* esconde o checkbox nativo */
-}
-.grimorio-checkbox-custom {
-    width: 18px;
-    height: 18px;
-    border: 2px solid rgba(201,168,76,0.35);
-    border-radius: 4px;
-    background: rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
-}
-.grimorio-checkbox-custom::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--cor-dourada);
-    border-radius: 2px;
-    opacity: 0;
-    transform: scale(0);
-    transition: all 0.15s;
-}
-.grimorio-checkbox-custom.checked {
-    border-color: var(--cor-dourada);
-    background: rgba(201,168,76,0.15);
-    box-shadow: 0 0 8px rgba(201,168,76,0.3);
-}
-.grimorio-checkbox-custom.checked::after {
-    opacity: 1;
-    transform: scale(1);
-}
-.grimorio-checkbox-custom.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-/* ── Card preparada ── */
-.grimorio-magia-card.preparada {
-    background: linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.06) 100%);
-    border-color: rgba(201,168,76,0.45);
-    box-shadow: 0 0 12px rgba(201,168,76,0.15);
-}
-.grimorio-magia-card.sem-slot {
-    opacity: 0.55;
-}
-.grimorio-card-nome.preparada-nome {
-    color: var(--cor-dourada);
-    text-shadow: 0 0 10px rgba(201,168,76,0.4);
-}
-.grimorio-preparada-badge {
-    font-family: var(--fonte-titulo);
-    font-size: 0.62rem;
-    color: var(--cor-dourada);
-    letter-spacing: 0.06em;
-    text-shadow: 0 0 6px rgba(201,168,76,0.5);
-}
-
-/* ── Slots no título do grupo ── */
-.grimorio-grupo-slots {
-    font-family: var(--fonte-titulo);
-    font-size: 0.65rem;
-    color: rgba(201,168,76,0.6);
-    margin-left: auto;
-    font-weight: normal;
-}
-
-/* ── Botão descanso longo ── */
-.grimorio-btn-descanso {
-    background: rgba(30,20,60,0.5);
-    border: 1px solid rgba(130,80,200,0.4);
-    border-radius: 8px;
-    color: #b49ee0;
-    font-family: var(--fonte-titulo);
-    font-size: 0.72rem;
-    padding: 0.4rem 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.04em;
-}
-.grimorio-btn-descanso:hover {
-    background: rgba(50,30,100,0.6);
-    border-color: rgba(180,120,255,0.6);
-    color: #d0b8ff;
-    box-shadow: 0 0 10px rgba(130,80,200,0.3);
-}
-
-/* ── Header ações ── */
-.grimorio-header-acoes {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* ── Toast do grimório ── */
+/* ── Toast ── */
 .grimorio-toast {
     position: fixed;
     bottom: 1.5rem;
     right: 1.5rem;
-    padding: 0.75rem 1.25rem;
+    padding: 0.65rem 1.1rem;
     border-radius: 10px;
     font-family: var(--fonte-titulo);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 700;
     z-index: 9999;
     opacity: 0;
@@ -657,10 +734,7 @@
     pointer-events: none;
     letter-spacing: 0.04em;
 }
-.grimorio-toast.show {
-    opacity: 1;
-    transform: translateY(0);
-}
+.grimorio-toast.show { opacity: 1; transform: translateY(0); }
 .grimorio-toast-sucesso {
     background: linear-gradient(135deg, #1a3a1a, #2a4a2a);
     border: 1px solid #4ade80;
@@ -675,4 +749,28 @@
     background: linear-gradient(135deg, #1a1a3a, #2a2a4a);
     border: 1px solid #818cf8;
     color: #818cf8;
+}
+
+/* ── Responsividade ── */
+@media (max-width: 768px) {
+    .grimorio-container { max-height: 96vh; border-radius: 12px; }
+    .grimorio-header    { padding: 0.75rem 1rem; }
+    .grimorio-titulo    { font-size: 1.1rem; }
+    .grimorio-icone     { font-size: 1.6rem; }
+    .grimorio-topo-controles {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+    .grimorio-busca     { width: 100%; }
+    .grimorio-filtros   { padding: 0.4rem 1rem; }
+    .grimorio-corpo     { padding: 0.6rem 1rem; }
+    .grimorio-card-topo { flex-direction: column; gap: 0.35rem; }
+    .grimorio-card-badges { justify-content: flex-start; }
+}
+@media (max-width: 480px) {
+    .grimorio-nivel-btn      { font-size: 0.58rem; padding: 0.15rem 0.35rem; }
+    .grimorio-card-nome      { font-size: 0.88rem; }
+    .grimorio-card-descricao { font-size: 0.74rem; }
+    .grimorio-busca          { width: 100%; }
 }

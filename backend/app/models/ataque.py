@@ -1,6 +1,6 @@
 """
 Models de Ataque, MagiaSlot e MagiaPreparada
-SRP: representa as tabelas de ataques, slots e magias preparadas no banco
+SRP: representa as tabelas no banco
 """
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
@@ -9,7 +9,6 @@ from ..core.database import Base
 
 
 class Ataque(Base):
-    """Ataque vinculado a um combatente."""
     __tablename__  = "ataques"
     __table_args__ = {"extend_existing": True}
 
@@ -24,7 +23,6 @@ class Ataque(Base):
 
 
 class MagiaSlot(Base):
-    """Slot de magia por nível (0–9) vinculado a um combatente."""
     __tablename__  = "magias_slots"
     __table_args__ = {"extend_existing": True}
 
@@ -39,9 +37,9 @@ class MagiaSlot(Base):
 
 class MagiaPreparada(Base):
     """
-    Magia preparada por um conjurador para o dia atual.
-    Reseta ao descanso longo (via endpoint POST /descanso).
-    SRP: apenas persistência de preparação diária.
+    Magia preparada para o dia.
+    usada=True → já foi lançada hoje (decrementou slot na arena).
+    Reseta ao descanso longo.
     """
     __tablename__  = "magias_preparadas"
     __table_args__ = {"extend_existing": True}
@@ -49,9 +47,9 @@ class MagiaPreparada(Base):
     id            = Column(Integer, primary_key=True, index=True)
     combatente_id = Column(Integer, ForeignKey("combatentes.id", ondelete="CASCADE"), nullable=False)
     magia_id      = Column(Integer, ForeignKey("magias.id",       ondelete="CASCADE"), nullable=False)
-    nivel_slot    = Column(Integer, nullable=False)   # nível do slot usado (pode diferir da magia)
+    nivel_slot    = Column(Integer, nullable=False)
+    usada         = Column(Boolean, nullable=False, default=False)   # ✅ NOVO
     preparada_em  = Column(DateTime, default=datetime.utcnow)
 
-    # Relacionamentos
     combatente = relationship("Combatente", back_populates="magias_preparadas")
     magia      = relationship("Magia")

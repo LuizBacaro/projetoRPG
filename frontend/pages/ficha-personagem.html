@@ -204,6 +204,7 @@
 <div id="modalGrimorio" class="grimorio-overlay">
     <div class="grimorio-container">
 
+        <!-- HEADER -->
         <div class="grimorio-header">
             <div class="grimorio-header-esquerda">
                 <span class="grimorio-icone">📖</span>
@@ -213,8 +214,8 @@
                 </div>
             </div>
             <div class="grimorio-header-acoes">
-                <!-- ✅ NOVO: botão descanso longo -->
-                <button class="grimorio-btn-descanso" id="btnDescansoLongo" title="Descanso longo — reseta preparação">
+                <button class="grimorio-btn-descanso" id="btnDescansoLongo"
+                        title="Descanso longo — reseta preparação">
                     🌙 Descanso
                 </button>
                 <button class="grimorio-fechar"
@@ -222,20 +223,29 @@
             </div>
         </div>
 
-        <!-- ✅ NOVO: painel de slots por nível -->
-        <div class="grimorio-slots-painel">
-            <div class="grimorio-slots-titulo">📊 Slots do Dia</div>
-            <div class="grimorio-slots-grid" id="grimorioPainelSlots">
-                <span class="grimorio-slots-vazio">Calculando...</span>
+        <!-- ✅ SLOTS DO DIA + BUSCA na mesma linha -->
+        <div class="grimorio-topo-controles">
+            <div class="grimorio-slots-painel">
+                <div class="grimorio-slots-titulo">📊 Slots do Dia</div>
+                <div class="grimorio-slots-grid" id="grimorioPainelSlots">
+                    <span class="grimorio-slots-vazio">Calculando...</span>
+                </div>
+            </div>
+            <div class="grimorio-busca-wrapper">
+                <span class="grimorio-busca-label">🔍 Buscar</span>
+                <input type="text" id="grimorioBusca" class="grimorio-busca"
+                       placeholder="Nome da magia..."
+                       oninput="window._grimorioController && window._grimorioController.filtrar()">
             </div>
         </div>
 
+        <!-- ✅ FILTROS COMPACTOS: nível + escola -->
         <div class="grimorio-filtros">
             <div class="grimorio-filtro-grupo">
                 <label class="grimorio-filtro-label">Nível</label>
                 <div class="grimorio-niveis" id="grimorioNiveis">
                     <button class="grimorio-nivel-btn ativo" data-nivel="todos">Todos</button>
-                    <button class="grimorio-nivel-btn" data-nivel="0">Cantrips</button>
+                    <button class="grimorio-nivel-btn" data-nivel="0">0°</button>
                     <button class="grimorio-nivel-btn" data-nivel="1">1°</button>
                     <button class="grimorio-nivel-btn" data-nivel="2">2°</button>
                     <button class="grimorio-nivel-btn" data-nivel="3">3°</button>
@@ -245,18 +255,21 @@
                     <button class="grimorio-nivel-btn" data-nivel="7">7°</button>
                     <button class="grimorio-nivel-btn" data-nivel="8">8°</button>
                     <button class="grimorio-nivel-btn" data-nivel="9">9°</button>
+                    <button class="grimorio-nivel-btn grimorio-btn-preparadas"
+                            id="btnFiltroPreparadas">✦ Preparadas</button>
                 </div>
             </div>
             <div class="grimorio-filtro-grupo">
-                <label class="grimorio-filtro-label">Buscar</label>
-                <input type="text" id="grimorioBusca" class="grimorio-busca"
-                       placeholder="Nome da magia..."
-                       oninput="window._grimorioController && window._grimorioController.filtrar()">
+                <label class="grimorio-filtro-label">Escola</label>
+                <div class="grimorio-niveis" id="grimorioFiltroEscolas">
+                    <!-- Populado dinamicamente -->
+                </div>
             </div>
         </div>
 
+        <!-- LISTA DE MAGIAS — ocupa todo o espaço restante -->
         <div class="grimorio-corpo" id="grimorioCopo">
-            <div class="grimorio-loading" id="grimorioLoading">
+            <div class="grimorio-loading" id="grimorioLoading" style="display:none">
                 <span class="grimorio-loading-icone">🔮</span>
                 <p>Consultando os tomos arcanos...</p>
             </div>
