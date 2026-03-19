@@ -370,15 +370,15 @@ class DashboardController {
         }
     }
 
+     // ✅ REFATORADO: usa ModalConfirm centralizado (carregado via window)
     async _excluirCombatente(id) {
         if (!this._isMestre()) { Toast.error('Acesso restrito.'); return; }
         var self = this;
-        this._mostrarModalConfirmacao({
-            icone:          '🗑️',
-            titulo:         'Excluir Combatente',
-            texto:          'Deseja excluir este combatente? Esta ação não pode ser desfeita.',
-            textoCancelar:  'Cancelar',
-            textoConfirmar: '🗑️ Excluir',
+        ModalConfirm.mostrar({
+            icone:           '🗑️',
+            titulo:          'Excluir Combatente',
+            texto:           'Deseja excluir este combatente? Esta ação não pode ser desfeita.',
+            textoConfirmar:  '🗑️ Excluir',
             classeConfirmar: 'modal-confirm-btn-perigo',
             onConfirmar: async function() {
                 try {
@@ -393,21 +393,17 @@ class DashboardController {
         });
     }
 
-    /**
-     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
-     * Chamado pelo botão "Deletar" dentro do modal de edição
-     */
+    // ✅ REFATORADO: usa ModalConfirm centralizado
     async _deletarCombatente() {
         if (!this._isMestre()) { Toast.error('Acesso restrito.'); return; }
         if (!this.combatenteEmEdicao) return;
         var self = this;
         var nome = this.combatenteEmEdicao.nome;
-        this._mostrarModalConfirmacao({
-            icone:          '🗑️',
-            titulo:         'Deletar Combatente',
-            texto:          'Deletar <strong>' + nome + '</strong>? Esta ação não pode ser desfeita.',
-            textoCancelar:  'Cancelar',
-            textoConfirmar: '🗑️ Deletar',
+        ModalConfirm.mostrar({
+            icone:           '🗑️',
+            titulo:          'Deletar Combatente',
+            texto:           'Deletar <strong>' + nome + '</strong>? Esta ação não pode ser desfeita.',
+            textoConfirmar:  '🗑️ Deletar',
             classeConfirmar: 'modal-confirm-btn-perigo',
             onConfirmar: async function() {
                 try {
@@ -424,6 +420,7 @@ class DashboardController {
             }
         });
     }
+
 
     /**
      * Modal customizado de confirmação — SRP: apenas DOM

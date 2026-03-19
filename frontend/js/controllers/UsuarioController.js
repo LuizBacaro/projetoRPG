@@ -1,6 +1,7 @@
 /**
  * UsuarioController
  * SRP: orquestra a tela de gerenciamento de usuários
+ * Carregado via <script> dinâmico — usa window.ModalConfirm
  */
 class UsuarioController {
 
@@ -90,10 +91,10 @@ class UsuarioController {
 
     _escapar(str = '') {
         return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+            .replace(/&/g,  '&amp;')
+            .replace(/</g,  '&lt;')
+            .replace(/>/g,  '&gt;')
+            .replace(/"/g,  '&quot;');
     }
 
     async editar(id) {
@@ -101,23 +102,19 @@ class UsuarioController {
             const usuario = await this.service.buscarPorId(id);
             this.modal.abrirParaEditar(usuario);
         } catch (err) {
-            // ✅ CORRIGIDO: Toast em vez de alert()
             Toast.error('Erro ao carregar usuário: ' + err.message);
         }
     }
 
-    /**
-     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
-     */
+    // ✅ REFATORADO: usa window.ModalConfirm centralizado
     inativar(id) {
-        this._mostrarModalConfirmacao({
-            icone:          '🚫',
-            titulo:         'Inativar Usuário',
-            texto:          'Deseja inativar este usuário? O acesso será bloqueado.',
-            textoCancelar:  'Cancelar',
-            textoConfirmar: '🚫 Inativar',
+        ModalConfirm.mostrar({
+            icone:           '🚫',
+            titulo:          'Inativar Usuário',
+            texto:           'Deseja inativar este usuário? O acesso será bloqueado.',
+            textoConfirmar:  '🚫 Inativar',
             classeConfirmar: 'modal-confirm-btn-perigo',
-            onConfirmar:    () => this._executarInativar(id),
+            onConfirmar:     () => this._executarInativar(id),
         });
     }
 
@@ -130,15 +127,12 @@ class UsuarioController {
         }
     }
 
-    /**
-     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
-     */
+    // ✅ REFATORADO: usa window.ModalConfirm centralizado
     reativar(id) {
-        this._mostrarModalConfirmacao({
+        ModalConfirm.mostrar({
             icone:          '✅',
             titulo:         'Reativar Usuário',
             texto:          'Deseja reativar este usuário? O acesso será restaurado.',
-            textoCancelar:  'Cancelar',
             textoConfirmar: '✅ Reativar',
             onConfirmar:    () => this._executarReativar(id),
         });
@@ -151,58 +145,6 @@ class UsuarioController {
         } catch (err) {
             Toast.error('Erro ao reativar: ' + err.message);
         }
-    }
-
-    /**
-     * Modal customizado de confirmação — SRP: apenas DOM
-     */
-    _mostrarModalConfirmacao(opcoes) {
-        const anterior = document.getElementById('_modalConfirmGlobal');
-        if (anterior) anterior.remove();
-
-        const overlay = document.createElement('div');
-        overlay.id        = '_modalConfirmGlobal';
-        overlay.className = 'modal-confirm-overlay';
-        overlay.innerHTML = `
-            <div class="modal-confirm-box">
-                <div class="modal-confirm-header">
-                    <span class="modal-confirm-icone">${opcoes.icone || '⚠️'}</span>
-                    <h3 class="modal-confirm-titulo">${opcoes.titulo || 'Confirmar'}</h3>
-                </div>
-                <p class="modal-confirm-texto">${opcoes.texto || 'Deseja continuar?'}</p>
-                <div class="modal-confirm-botoes">
-                    <button class="modal-confirm-btn modal-confirm-cancelar" id="_confirmCancelar">
-                        ${opcoes.textoCancelar || 'Cancelar'}
-                    </button>
-                    <button class="modal-confirm-btn ${opcoes.classeConfirmar || 'modal-confirm-ok'}" id="_confirmOk">
-                        ${opcoes.textoConfirmar || 'Confirmar'}
-                    </button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-        requestAnimationFrame(() => overlay.classList.add('show'));
-
-        const fechar = () => {
-            overlay.classList.remove('show');
-            setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 250);
-        };
-
-        document.getElementById('_confirmCancelar').addEventListener('click', () => {
-            fechar();
-            if (opcoes.onCancelar) opcoes.onCancelar();
-        });
-        document.getElementById('_confirmOk').addEventListener('click', () => {
-            fechar();
-            if (opcoes.onConfirmar) opcoes.onConfirmar();
-        });
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) fechar(); });
-
-        const onEsc = (e) => {
-            if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); }
-        };
-        document.addEventListener('keydown', onEsc);
     }
 }
 

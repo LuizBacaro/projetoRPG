@@ -1,11 +1,12 @@
 /**
- * Componente de Modal de Edição
+ * ModalEdicao.js
  * SRP: gerenciar modal de edição
  */
-import { CombatenteService }    from '../services/CombatenteService.js';
-import { UploadService }        from '../services/UploadService.js';
-import { Toast }                from './toast.module.js';
+import { CombatenteService }       from '../services/CombatenteService.js';
+import { UploadService }           from '../services/UploadService.js';
+import { Toast }                   from './toast.module.js';
 import { atualizarModificadorDOM } from '../utils/dnd.js';
+import { ModalConfirm }            from './ModalConfirm.js';   // ✅ import centralizado
 
 export class ModalEdicao {
     constructor() {
@@ -40,10 +41,10 @@ export class ModalEdicao {
     }
 
     configurarUpload() {
-        const input       = document.getElementById('editFoto');
-        const area        = document.getElementById('editUploadArea');
-        const placeholder = document.getElementById('editUploadPlaceholder');
-        const preview     = document.getElementById('editUploadPreview');
+        const input        = document.getElementById('editFoto');
+        const area         = document.getElementById('editUploadArea');
+        const placeholder  = document.getElementById('editUploadPlaceholder');
+        const preview      = document.getElementById('editUploadPreview');
         const previewImage = document.getElementById('editPreviewImage');
         if (!input || !area) return;
 
@@ -80,14 +81,14 @@ export class ModalEdicao {
             const combatente = await this.combatenteService.obterPorId(combatenteId);
             this.combatenteAtual = combatente;
 
-            document.getElementById('editId').value        = combatente.id;
-            document.getElementById('editNome').value      = combatente.nome;
-            document.getElementById('editHP').value        = combatente.hp_maximo;
+            document.getElementById('editId').value         = combatente.id;
+            document.getElementById('editNome').value       = combatente.nome;
+            document.getElementById('editHP').value         = combatente.hp_maximo;
             document.getElementById('editIniciativa').value = combatente.iniciativa;
-            document.getElementById('editClasse').value    = combatente.classe;
-            document.getElementById('editTipo').value      = combatente.tipo;
-            document.getElementById('editNivel').value     = combatente.nivel;
-            document.getElementById('editPontos').value    = combatente.pontos;
+            document.getElementById('editClasse').value     = combatente.classe;
+            document.getElementById('editTipo').value       = combatente.tipo;
+            document.getElementById('editNivel').value      = combatente.nivel;
+            document.getElementById('editPontos').value     = combatente.pontos;
 
             document.getElementById('editCA').value       = combatente.ca       ?? 10;
             document.getElementById('editToque').value    = combatente.toque    ?? 10;
@@ -142,20 +143,16 @@ export class ModalEdicao {
         }
     }
 
-    /**
-     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
-     * SRP: confirmação delegada ao modal — HTTP delegado a _executarDeletar()
-     */
+    // ✅ REFATORADO: usa ModalConfirm centralizado
     deletar() {
         if (!this.combatenteAtual) return;
-        this._mostrarModalConfirmacao({
-            icone:          '🗑️',
-            titulo:         'Deletar Combatente',
-            texto:          `Deseja realmente deletar <strong>${this.combatenteAtual.nome}</strong>? Esta ação não pode ser desfeita.`,
-            textoCancelar:  'Cancelar',
-            textoConfirmar: '🗑️ Deletar',
+        ModalConfirm.mostrar({
+            icone:           '🗑️',
+            titulo:          'Deletar Combatente',
+            texto:           `Deseja realmente deletar <strong>${this.combatenteAtual.nome}</strong>? Esta ação não pode ser desfeita.`,
+            textoConfirmar:  '🗑️ Deletar',
             classeConfirmar: 'modal-confirm-btn-perigo',
-            onConfirmar:    () => this._executarDeletar(),
+            onConfirmar:     () => this._executarDeletar(),
         });
     }
 
@@ -175,59 +172,5 @@ export class ModalEdicao {
         const modal = document.getElementById('modalEdicao');
         if (modal) modal.classList.remove('show');
         this.combatenteAtual = null;
-    }
-
-    // ──────────────────────────────────────────
-    // Modal customizado de confirmação
-    // SRP: apenas criação e controle do modal DOM
-    // ──────────────────────────────────────────
-
-    _mostrarModalConfirmacao(opcoes) {
-        const anterior = document.getElementById('_modalConfirmGlobal');
-        if (anterior) anterior.remove();
-
-        const overlay = document.createElement('div');
-        overlay.id        = '_modalConfirmGlobal';
-        overlay.className = 'modal-confirm-overlay';
-        overlay.innerHTML = `
-            <div class="modal-confirm-box">
-                <div class="modal-confirm-header">
-                    <span class="modal-confirm-icone">${opcoes.icone || '⚠️'}</span>
-                    <h3 class="modal-confirm-titulo">${opcoes.titulo || 'Confirmar'}</h3>
-                </div>
-                <p class="modal-confirm-texto">${opcoes.texto || 'Deseja continuar?'}</p>
-                <div class="modal-confirm-botoes">
-                    <button class="modal-confirm-btn modal-confirm-cancelar" id="_confirmCancelar">
-                        ${opcoes.textoCancelar || 'Cancelar'}
-                    </button>
-                    <button class="modal-confirm-btn ${opcoes.classeConfirmar || 'modal-confirm-ok'}" id="_confirmOk">
-                        ${opcoes.textoConfirmar || 'Confirmar'}
-                    </button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-        requestAnimationFrame(() => overlay.classList.add('show'));
-
-        const fechar = () => {
-            overlay.classList.remove('show');
-            setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 250);
-        };
-
-        document.getElementById('_confirmCancelar').addEventListener('click', () => {
-            fechar();
-            if (opcoes.onCancelar) opcoes.onCancelar();
-        });
-        document.getElementById('_confirmOk').addEventListener('click', () => {
-            fechar();
-            if (opcoes.onConfirmar) opcoes.onConfirmar();
-        });
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) fechar(); });
-
-        const onEsc = (e) => {
-            if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); }
-        };
-        document.addEventListener('keydown', onEsc);
     }
 }
