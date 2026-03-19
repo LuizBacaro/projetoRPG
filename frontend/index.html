@@ -335,25 +335,37 @@
 <!-- SCRIPTS — Padrão Unificado ES Modules + Global Scripts        -->
 <!--  -->
 
-<!-- FASE 1: API Config + Toast (ES Module) -->
+<!-- FASE 1: API Config (ES Module) -->
 <script type="module">
     import { getApiUrl } from '/js/config/api.config.js';
-    import { Toast }     from '/js/ui/toast.module.js';
-    
     window.getApiUrl = getApiUrl;
-    window.Toast = Toast;
+    console.log('✅ FASE 1: getApiUrl pronto');
 </script>
 
-<!-- FASE 2: AuthService (Script Global - carregado ANTES de tudo) -->
+<!-- FASE 2: Toast (ES Module) -->
+<script type="module">
+    import { Toast } from '/js/ui/toast.module.js';
+    window.Toast = Toast;
+    console.log('✅ FASE 2: Toast pronto');
+    setTimeout(() => window.dispatchEvent(new CustomEvent('phase2-ready')), 100);
+</script>
+
+<!-- FASE 3: AuthService (Global) -->
 <script src="/js/services/AuthService.js"></script>
 
-<!-- FASE 3: Serviços Globais -->
+<!-- FASE 4: ModalConfirm (Global + ES Module export) -->
+<script src="/js/ui/ModalConfirm.js"></script>
+
+<!-- FASE 5: ModalEdicao (Global - usa ModalConfirm global) -->
+<script src="/js/ui/ModalEdicao.js"></script>
+
+<!-- FASE 6: Serviços -->
 <script src="/js/services/DanoCuraService.js"></script>
 <script src="/js/ui/ModalDanoCura.js"></script>
 <script src="/js/services/CondicaoService.js"></script>
 <script src="/js/ui/CondicaoUI.js"></script>
 
-<!-- FASE 4: Main (ES Module - Controllers e Inicialização) -->
+<!-- FASE 7: Main (ES Module - carregadores e controllers) -->
 <script type="module" src="/js/main.js"></script>
 
 </body>

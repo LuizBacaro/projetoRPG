@@ -1,6 +1,5 @@
 import { ConfiguracaoController } from './controllers/ConfiguracaoController.js';
 import { ArenaController        } from './controllers/ArenaController.js';
-import { ModalEdicao            } from './ui/ModalEdicao.js';
 import { atualizarModificadorDOM} from './utils/dnd.js';
 
 var app = { controllers: {}, modals: {} };

@@ -87,9 +87,11 @@
 
 </div>
 
-<!--  -->
-<!-- MODAL — Seletor de Tipo                                         -->
-<!--  -->
+<!-- ────────────────────────────────────────────────────────────────── -->
+<!-- MODAIS                                                             -->
+<!-- ────────────────────────────────────────────────────────────────── -->
+
+<!-- MODAL — Seletor de Tipo -->
 <div id="seletorTipo" class="dash-modal-overlay">
     <div class="dash-modal-box" style="max-width:420px">
         <div class="dash-modal-header">
@@ -104,9 +106,7 @@
     </div>
 </div>
 
-<!--  -->
-<!-- MODAL — Cadastro de Jogador                                     -->
-<!--  -->
+<!-- MODAL — Cadastro de Jogador -->
 <div id="modalCadastroJogador" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
@@ -176,9 +176,7 @@
     </div>
 </div>
 
-<!--  -->
-<!-- MODAL — Cadastro de Monstro                                     -->
-<!--  -->
+<!-- MODAL — Cadastro de Monstro -->
 <div id="modalCadastroMonstro" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
@@ -211,10 +209,7 @@
 
                 <div class="dash-form-group">
                     <label>📖 Página de Referência</label>
-                    <input type="text"
-                           name="pagina_referencia"
-                           placeholder="Ex: Livro do Mestre p.137"
-                           maxlength="100" />
+                    <input type="text" name="pagina_referencia" placeholder="Ex: Livro do Mestre p.137" maxlength="100" />
                 </div>
 
                 <div class="dash-form-group">
@@ -256,9 +251,7 @@
     </div>
 </div>
 
-<!--  -->
-<!-- MODAL — Cadastro de NPC                                         -->
-<!--  -->
+<!-- MODAL — Cadastro de NPC -->
 <div id="modalCadastroNPC" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
@@ -328,9 +321,7 @@
     </div>
 </div>
 
-<!--  -->
-<!-- MODAL DE EDIÇÃO                                                 -->
-<!--  -->
+<!-- MODAL DE EDIÇÃO -->
 <div id="modalEdicaoDashboard" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
@@ -342,7 +333,6 @@
                 <input type="hidden" id="dashEditId"   name="id" />
                 <input type="hidden" id="dashEditTipo" name="tipo" />
 
-                <!-- Nível + Pontos -->
                 <div class="dash-form-row">
                     <div class="dash-form-group">
                         <label>Nível</label>
@@ -354,13 +344,11 @@
                     </div>
                 </div>
 
-                <!-- Nome -->
                 <div class="dash-form-group">
                     <label>Nome *</label>
                     <input type="text" id="dashEditNome" name="nome" required placeholder="Nome do combatente" />
                 </div>
 
-                <!-- HP + Iniciativa -->
                 <div class="dash-form-row">
                     <div class="dash-form-group">
                         <label>HP Máximo *</label>
@@ -372,29 +360,21 @@
                     </div>
                 </div>
 
-                <!-- Classe -->
                 <div class="dash-form-group">
                     <label>Classe</label>
                     <input type="text" id="dashEditClasse" name="classe" placeholder="Ex: Guerreiro" />
                 </div>
 
-                <!-- Raça -->
                 <div class="dash-form-group">
                     <label>Raça</label>
                     <input type="text" id="dashEditRaca" name="raca" placeholder="Ex: Elfo, Humano, Anão" />
                 </div>
 
-                <!-- Página de Referência — visível apenas para monstros -->
                 <div class="dash-form-group" id="secaoPaginaReferencia" style="display:none">
                     <label>📖 Página de Referência</label>
-                    <input type="text"
-                        id="dashEditPaginaReferencia"
-                        name="pagina_referencia"
-                        placeholder="Ex: Livro do Mestre p.137"
-                        maxlength="100" />
+                    <input type="text" id="dashEditPaginaReferencia" name="pagina_referencia" placeholder="Ex: Livro do Mestre p.137" maxlength="100" />
                 </div>
 
-                <!-- Defesa -->
                 <p class="dash-section-label">🛡️ Defesa</p>
                 <div class="dash-form-row3">
                     <div class="dash-form-group">
@@ -411,7 +391,6 @@
                     </div>
                 </div>
 
-                <!-- Resistências -->
                 <p class="dash-section-label">⚡ Resistências</p>
                 <div class="dash-form-row3">
                     <div class="dash-form-group">
@@ -428,76 +407,55 @@
                     </div>
                 </div>
 
-                <!-- Atributos D&D -->
                 <p class="dash-section-label">🎲 Atributos D&D</p>
                 <div class="dash-atributos-grid">
                     <div class="dash-atrib-field">
                         <label>FOR</label>
-                        <input type="number" id="dashEditFOR" name="forca"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditFOR" name="forca" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditFOR">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>DES</label>
-                        <input type="number" id="dashEditDES" name="destreza"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditDES" name="destreza" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditDES">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>CON</label>
-                        <input type="number" id="dashEditCON" name="constituicao"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditCON" name="constituicao" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditCON">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>INT</label>
-                        <input type="number" id="dashEditINT" name="inteligencia"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditINT" name="inteligencia" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditINT">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>SAB</label>
-                        <input type="number" id="dashEditSAB" name="sabedoria"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditSAB" name="sabedoria" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditSAB">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>CAR</label>
-                        <input type="number" id="dashEditCAR" name="carisma"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditCAR" name="carisma" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditCAR">+0</div>
                     </div>
                 </div>
 
-                <!-- Foto -->
                 <p class="dash-section-label" style="margin-top:1rem">📷 Foto</p>
                 <div id="dashEditUploadArea">
-                    <div class="dash-upload-area" id="dashEditUploadPlaceholder"
-                         onclick="document.getElementById('dashEditFoto').click()">
+                    <div class="dash-upload-area" id="dashEditUploadPlaceholder" onclick="document.getElementById('dashEditFoto').click()">
                         📷 Clique para trocar a foto
                     </div>
-                    <input type="file" id="dashEditFoto" name="foto"
-                           accept="image/*" style="display:none" />
+                    <input type="file" id="dashEditFoto" name="foto" accept="image/*" style="display:none" />
                     <div id="dashEditUploadPreview" class="dash-upload-preview" style="display:none">
                         <img id="dashEditPreviewImage" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove"
-                                onclick="removerImagemEdicao()">✕</button>
+                        <button type="button" class="dash-upload-remove" onclick="removerImagemEdicao()">✕</button>
                     </div>
                 </div>
 
-                <!-- Ataques — só visível para Jogador -->
                 <div id="secaoAtaquesEdicao" style="display:none">
                     <p class="dash-section-label" style="margin-top:1rem">⚔️ Ataques</p>
-                    <div style="display:grid;
-                                grid-template-columns:1fr 70px 90px 120px 36px;
-                                gap:.4rem;margin-bottom:.4rem;
-                                font-size:.72rem;color:#64748b;">
+                    <div style="display:grid; grid-template-columns:1fr 70px 90px 120px 36px; gap:.4rem; margin-bottom:.4rem; font-size:.72rem; color:#64748b;">
                         <span>Nome</span>
                         <span>Bônus</span>
                         <span>Dano</span>
@@ -505,38 +463,22 @@
                         <span></span>
                     </div>
                     <div id="listaAtaquesEdicao"></div>
-                    <button type="button"
-                            class="btn-dash-cancel"
-                            style="margin-top:.5rem;font-size:.82rem"
-                            onclick="adicionarLinhaAtaque()">
+                    <button type="button" class="btn-dash-cancel" style="margin-top:.5rem;font-size:.82rem" onclick="adicionarLinhaAtaque()">
                         + Adicionar Ataque
                     </button>
                 </div>
 
-                <!-- Ações (Perícias + Salvar + Deletar + Cancelar) -->
                 <div class="dash-modal-actions" style="margin-top: 1.5rem; gap: 0.75rem; flex-wrap: wrap;">
-                    <button 
-                        type="button" 
-                        id="btnPericiasModal" 
-                        class="btn-editar"
-                        onclick="abrirPaginaPericias()">
+                    <button type="button" id="btnPericiasModal" class="btn-editar" onclick="abrirPaginaPericias()">
                         📚 Perícias
                     </button>
-                    <button 
-                        type="submit" 
-                        class="btn-dash-save">
+                    <button type="submit" class="btn-dash-save">
                         💾 Salvar Alterações
                     </button>
-                    <button 
-                        type="button" 
-                        class="btn-dash-delete"
-                        onclick="confirmarDelecao()">
+                    <button type="button" class="btn-dash-delete" onclick="confirmarDelecao()">
                         🗑️ Deletar
                     </button>
-                    <button 
-                        type="button" 
-                        class="btn-dash-cancel"
-                        onclick="fecharModalEdicao()">
+                    <button type="button" class="btn-dash-cancel" onclick="fecharModalEdicao()">
                         Cancelar
                     </button>
                 </div>
@@ -546,27 +488,60 @@
     </div>
 </div>
 
-<!--  -->
-<!-- SCRIPTS — Padrão Unificado ES Modules + Global Scripts        -->
-<!--  -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SCRIPTS — CARREGAMENTO OTIMIZADO                                -->
+<!-- ════════════════════════════════════════════════════════════════ -->
 
-<!-- FASE 1: API Config + Toast (ES Module) -->
-<script type="module">
-    import { getApiUrl } from '/js/config/api.config.js';
-    import { Toast }     from '/js/ui/toast.module.js';
-    
-    window.getApiUrl = getApiUrl;
-    window.Toast = Toast;
+<!-- FASE 1: Configuração Global -->
+<script>
+    window.getApiUrl = function(path) {
+        return 'http://127.0.0.1:8000/api' + (path || '');
+    };
+    console.log('✅ API URL configurada');
 </script>
 
-<!-- FASE 2: AuthService (Script Global - carregado ANTES de tudo) -->
+<!-- FASE 2: AuthService (deve ser carregado antes de tudo) -->
 <script src="/js/services/AuthService.js"></script>
 
-<!-- FASE 3: Serviços de Negócio -->
+<!-- FASE 3: ModalConfirm (deve estar antes de DashboardController) -->
+<script src="/js/ui/ModalConfirm.js"></script>
+
+<!-- FASE 4: Serviços de Negócio -->
 <script src="/js/services/AtaqueService.js"></script>
 
-<!-- FASE 4: Controllers (ES Module) -->
-<script type="module" src="/js/controllers/DashboardController.js"></script>
+<!-- FASE 5: Toast (simples) -->
+<script>
+    class Toast {
+        static show(message, type = 'info') {
+            const container = document.getElementById('toastContainer') || (() => {
+                const div = document.createElement('div');
+                div.id = 'toastContainer';
+                document.body.appendChild(div);
+                return div;
+            })();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type} show`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        static success(msg) { this.show(msg, 'success'); }
+        static error(msg) { this.show(msg, 'error'); }
+        static info(msg) { this.show(msg, 'info'); }
+    }
+    
+    window.Toast = Toast;
+    console.log('✅ Toast configurado');
+</script>
+
+<!-- FASE 6: DashboardController (carregado por último) -->
+<script src="/js/controllers/DashboardController.js"></script>
 
 </body>
 </html>
