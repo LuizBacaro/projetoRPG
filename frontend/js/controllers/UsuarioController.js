@@ -1,7 +1,6 @@
 /**
  * UsuarioController
  * SRP: orquestra a tela de gerenciamento de usuários
- * Carregado via <script> dinâmico — depende de UsuarioService e ModalUsuario
  */
 class UsuarioController {
 
@@ -9,20 +8,15 @@ class UsuarioController {
         this.service  = new UsuarioService();
         this.modal    = new ModalUsuario(this.service, () => this.carregar());
         this.usuarios = [];
-
         this._bindBotoes();
         this.carregar();
         console.log('✅ UsuarioController inicializado');
     }
 
-    // ── Inicialização ─────────────────────────────────────────────────────────
-
     _bindBotoes() {
         document.getElementById('btnNovoUsuario')
             ?.addEventListener('click', () => this.modal.abrirParaCriar());
     }
-
-    // ── Carregamento ──────────────────────────────────────────────────────────
 
     async carregar() {
         try {
@@ -34,8 +28,6 @@ class UsuarioController {
             this._renderizarErro();
         }
     }
-
-    // ── Renderização ─────────────────────────────────────────────────────────
 
     _renderizarTabela() {
         const tbody = document.getElementById('tabelaUsuarios');
@@ -81,8 +73,6 @@ class UsuarioController {
             </tr>`;
     }
 
-    // ── Helpers de badge ─────────────────────────────────────────────────────
-
     _badgePerfil(perfil) {
         const map = {
             administrador: '<span class="badge badge-admin">Administrador</span>',
@@ -98,44 +88,121 @@ class UsuarioController {
             : '<span class="badge badge-inativo">Inativo</span>';
     }
 
-    // Evita XSS ao renderizar dados da API no HTML
     _escapar(str = '') {
         return String(str)
             .replace(/&/g, '&amp;')
-            .replace(/</g, '<')
+            .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
     }
-
-    // ── Ações ─────────────────────────────────────────────────────────────────
 
     async editar(id) {
         try {
             const usuario = await this.service.buscarPorId(id);
             this.modal.abrirParaEditar(usuario);
         } catch (err) {
-            alert(`Erro ao carregar usuário: ${err.message}`);
+            // ✅ CORRIGIDO: Toast em vez de alert()
+            Toast.error('Erro ao carregar usuário: ' + err.message);
         }
     }
 
-    async inativar(id) {
-        if (!confirm('Deseja inativar este usuário? O acesso será bloqueado.')) return;
+    /**
+     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
+     */
+    inativar(id) {
+        this._mostrarModalConfirmacao({
+            icone:          '🚫',
+            titulo:         'Inativar Usuário',
+            texto:          'Deseja inativar este usuário? O acesso será bloqueado.',
+            textoCancelar:  'Cancelar',
+            textoConfirmar: '🚫 Inativar',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar:    () => this._executarInativar(id),
+        });
+    }
+
+    async _executarInativar(id) {
         try {
             await this.service.inativar(id);
             await this.carregar();
         } catch (err) {
-            alert(`Erro ao inativar: ${err.message}`);
+            Toast.error('Erro ao inativar: ' + err.message);
         }
     }
 
-    async reativar(id) {
-        if (!confirm('Deseja reativar este usuário?')) return;
+    /**
+     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
+     */
+    reativar(id) {
+        this._mostrarModalConfirmacao({
+            icone:          '✅',
+            titulo:         'Reativar Usuário',
+            texto:          'Deseja reativar este usuário? O acesso será restaurado.',
+            textoCancelar:  'Cancelar',
+            textoConfirmar: '✅ Reativar',
+            onConfirmar:    () => this._executarReativar(id),
+        });
+    }
+
+    async _executarReativar(id) {
         try {
             await this.service.atualizar(id, { ativo: true });
             await this.carregar();
         } catch (err) {
-            alert(`Erro ao reativar: ${err.message}`);
+            Toast.error('Erro ao reativar: ' + err.message);
         }
+    }
+
+    /**
+     * Modal customizado de confirmação — SRP: apenas DOM
+     */
+    _mostrarModalConfirmacao(opcoes) {
+        const anterior = document.getElementById('_modalConfirmGlobal');
+        if (anterior) anterior.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id        = '_modalConfirmGlobal';
+        overlay.className = 'modal-confirm-overlay';
+        overlay.innerHTML = `
+            <div class="modal-confirm-box">
+                <div class="modal-confirm-header">
+                    <span class="modal-confirm-icone">${opcoes.icone || '⚠️'}</span>
+                    <h3 class="modal-confirm-titulo">${opcoes.titulo || 'Confirmar'}</h3>
+                </div>
+                <p class="modal-confirm-texto">${opcoes.texto || 'Deseja continuar?'}</p>
+                <div class="modal-confirm-botoes">
+                    <button class="modal-confirm-btn modal-confirm-cancelar" id="_confirmCancelar">
+                        ${opcoes.textoCancelar || 'Cancelar'}
+                    </button>
+                    <button class="modal-confirm-btn ${opcoes.classeConfirmar || 'modal-confirm-ok'}" id="_confirmOk">
+                        ${opcoes.textoConfirmar || 'Confirmar'}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+
+        const fechar = () => {
+            overlay.classList.remove('show');
+            setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 250);
+        };
+
+        document.getElementById('_confirmCancelar').addEventListener('click', () => {
+            fechar();
+            if (opcoes.onCancelar) opcoes.onCancelar();
+        });
+        document.getElementById('_confirmOk').addEventListener('click', () => {
+            fechar();
+            if (opcoes.onConfirmar) opcoes.onConfirmar();
+        });
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) fechar(); });
+
+        const onEsc = (e) => {
+            if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); }
+        };
+        document.addEventListener('keydown', onEsc);
     }
 }
 

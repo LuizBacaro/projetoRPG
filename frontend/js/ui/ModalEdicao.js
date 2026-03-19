@@ -1,17 +1,17 @@
 /**
  * Componente de Modal de Edição
- * Princípio SOLID: Single Responsibility - gerenciar modal de edição
+ * SRP: gerenciar modal de edição
  */
-import { CombatenteService } from '../services/CombatenteService.js';
-import { UploadService } from '../services/UploadService.js';
-import { Toast } from './toast.module.js';
+import { CombatenteService }    from '../services/CombatenteService.js';
+import { UploadService }        from '../services/UploadService.js';
+import { Toast }                from './toast.module.js';
 import { atualizarModificadorDOM } from '../utils/dnd.js';
 
 export class ModalEdicao {
     constructor() {
         this.combatenteService = new CombatenteService();
-        this.uploadService = new UploadService();
-        this.combatenteAtual = null;
+        this.uploadService     = new UploadService();
+        this.combatenteAtual   = null;
         this.inicializar();
     }
 
@@ -25,11 +25,8 @@ export class ModalEdicao {
         document.addEventListener('abrirEdicao', async (e) => {
             await this.abrir(e.detail.id);
         });
-
         document.addEventListener('combatenteCriado', () => {
-            if (this.combatenteAtual) {
-                this.carregar(this.combatenteAtual.id);
-            }
+            if (this.combatenteAtual) this.carregar(this.combatenteAtual.id);
         });
     }
 
@@ -43,24 +40,22 @@ export class ModalEdicao {
     }
 
     configurarUpload() {
-        const input = document.getElementById('editFoto');
-        const area = document.getElementById('editUploadArea');
+        const input       = document.getElementById('editFoto');
+        const area        = document.getElementById('editUploadArea');
         const placeholder = document.getElementById('editUploadPlaceholder');
-        const preview = document.getElementById('editUploadPreview');
+        const preview     = document.getElementById('editUploadPreview');
         const previewImage = document.getElementById('editPreviewImage');
-
         if (!input || !area) return;
 
         area.addEventListener('click', () => input.click());
-
         input.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
             try {
                 this.uploadService.criarPreview(file, (dataUrl) => {
-                    previewImage.src = dataUrl;
+                    previewImage.src          = dataUrl;
                     placeholder.style.display = 'none';
-                    preview.style.display = 'block';
+                    preview.style.display     = 'block';
                 });
             } catch (error) {
                 Toast.error(error.message);
@@ -85,22 +80,19 @@ export class ModalEdicao {
             const combatente = await this.combatenteService.obterPorId(combatenteId);
             this.combatenteAtual = combatente;
 
-            // Identificação
-            document.getElementById('editId').value = combatente.id;
-            document.getElementById('editNome').value = combatente.nome;
-            document.getElementById('editHP').value = combatente.hp_maximo;
+            document.getElementById('editId').value        = combatente.id;
+            document.getElementById('editNome').value      = combatente.nome;
+            document.getElementById('editHP').value        = combatente.hp_maximo;
             document.getElementById('editIniciativa').value = combatente.iniciativa;
-            document.getElementById('editClasse').value = combatente.classe;
-            document.getElementById('editTipo').value = combatente.tipo;
-            document.getElementById('editNivel').value = combatente.nivel;
-            document.getElementById('editPontos').value = combatente.pontos;
+            document.getElementById('editClasse').value    = combatente.classe;
+            document.getElementById('editTipo').value      = combatente.tipo;
+            document.getElementById('editNivel').value     = combatente.nivel;
+            document.getElementById('editPontos').value    = combatente.pontos;
 
-            // ✅ Defesa - CA, Toque, Surpresa
-            document.getElementById('editCA').value = combatente.ca ?? 10;
-            document.getElementById('editToque').value = combatente.toque ?? 10;
+            document.getElementById('editCA').value       = combatente.ca       ?? 10;
+            document.getElementById('editToque').value    = combatente.toque    ?? 10;
             document.getElementById('editSurpresa').value = combatente.surpresa ?? 10;
 
-            // Atributos D&D
             document.getElementById('editFOR').value = combatente.forca;
             document.getElementById('editDES').value = combatente.destreza;
             document.getElementById('editCON').value = combatente.constituicao;
@@ -108,29 +100,26 @@ export class ModalEdicao {
             document.getElementById('editSAB').value = combatente.sabedoria;
             document.getElementById('editCAR').value = combatente.carisma;
 
-            // Resistências
             document.getElementById('editFortitude').value = combatente.fortitude ?? 0;
-            document.getElementById('editReflexos').value = combatente.reflexos ?? 0;
-            document.getElementById('editVontade').value = combatente.vontade ?? 0;
+            document.getElementById('editReflexos').value  = combatente.reflexos  ?? 0;
+            document.getElementById('editVontade').value   = combatente.vontade   ?? 0;
 
-            // Atualizar modificadores
-            ['editFOR', 'editDES', 'editCON', 'editINT', 'editSAB', 'editCAR'].forEach(id => {
+            ['editFOR','editDES','editCON','editINT','editSAB','editCAR'].forEach(id => {
                 const input = document.getElementById(id);
                 if (input) atualizarModificadorDOM(input);
             });
 
-            // Preview de foto
-            const placeholder = document.getElementById('editUploadPlaceholder');
-            const preview = document.getElementById('editUploadPreview');
+            const placeholder  = document.getElementById('editUploadPlaceholder');
+            const preview      = document.getElementById('editUploadPreview');
             const previewImage = document.getElementById('editPreviewImage');
 
             if (combatente.foto_url) {
-                previewImage.src = combatente.foto_url;
+                previewImage.src          = combatente.foto_url;
                 placeholder.style.display = 'none';
-                preview.style.display = 'block';
+                preview.style.display     = 'block';
             } else {
                 placeholder.style.display = 'flex';
-                preview.style.display = 'none';
+                preview.style.display     = 'none';
             }
 
         } catch (error) {
@@ -142,7 +131,7 @@ export class ModalEdicao {
     async salvar(form) {
         try {
             const formData = new FormData(form);
-            const id = parseInt(document.getElementById('editId').value);
+            const id       = parseInt(document.getElementById('editId').value);
             await this.combatenteService.atualizar(id, formData);
             Toast.success('Combatente atualizado! ✅');
             this.fechar();
@@ -153,10 +142,24 @@ export class ModalEdicao {
         }
     }
 
-    async deletar() {
+    /**
+     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
+     * SRP: confirmação delegada ao modal — HTTP delegado a _executarDeletar()
+     */
+    deletar() {
         if (!this.combatenteAtual) return;
-        if (!confirm(`Deseja realmente deletar ${this.combatenteAtual.nome}?`)) return;
+        this._mostrarModalConfirmacao({
+            icone:          '🗑️',
+            titulo:         'Deletar Combatente',
+            texto:          `Deseja realmente deletar <strong>${this.combatenteAtual.nome}</strong>? Esta ação não pode ser desfeita.`,
+            textoCancelar:  'Cancelar',
+            textoConfirmar: '🗑️ Deletar',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar:    () => this._executarDeletar(),
+        });
+    }
 
+    async _executarDeletar() {
         try {
             await this.combatenteService.deletar(this.combatenteAtual.id);
             Toast.success('Combatente deletado! 🗑️');
@@ -172,5 +175,59 @@ export class ModalEdicao {
         const modal = document.getElementById('modalEdicao');
         if (modal) modal.classList.remove('show');
         this.combatenteAtual = null;
+    }
+
+    // ──────────────────────────────────────────
+    // Modal customizado de confirmação
+    // SRP: apenas criação e controle do modal DOM
+    // ──────────────────────────────────────────
+
+    _mostrarModalConfirmacao(opcoes) {
+        const anterior = document.getElementById('_modalConfirmGlobal');
+        if (anterior) anterior.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id        = '_modalConfirmGlobal';
+        overlay.className = 'modal-confirm-overlay';
+        overlay.innerHTML = `
+            <div class="modal-confirm-box">
+                <div class="modal-confirm-header">
+                    <span class="modal-confirm-icone">${opcoes.icone || '⚠️'}</span>
+                    <h3 class="modal-confirm-titulo">${opcoes.titulo || 'Confirmar'}</h3>
+                </div>
+                <p class="modal-confirm-texto">${opcoes.texto || 'Deseja continuar?'}</p>
+                <div class="modal-confirm-botoes">
+                    <button class="modal-confirm-btn modal-confirm-cancelar" id="_confirmCancelar">
+                        ${opcoes.textoCancelar || 'Cancelar'}
+                    </button>
+                    <button class="modal-confirm-btn ${opcoes.classeConfirmar || 'modal-confirm-ok'}" id="_confirmOk">
+                        ${opcoes.textoConfirmar || 'Confirmar'}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+
+        const fechar = () => {
+            overlay.classList.remove('show');
+            setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 250);
+        };
+
+        document.getElementById('_confirmCancelar').addEventListener('click', () => {
+            fechar();
+            if (opcoes.onCancelar) opcoes.onCancelar();
+        });
+        document.getElementById('_confirmOk').addEventListener('click', () => {
+            fechar();
+            if (opcoes.onConfirmar) opcoes.onConfirmar();
+        });
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) fechar(); });
+
+        const onEsc = (e) => {
+            if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); }
+        };
+        document.addEventListener('keydown', onEsc);
     }
 }

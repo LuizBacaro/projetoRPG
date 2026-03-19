@@ -140,7 +140,6 @@ const EMOJI_ESCOLA = {
     'Necromancia':'💀','Transmutação':'🔄','Universal':'⭐',
 };
 
-// ✅ NOVO: lista de escolas para o filtro (extraída dinamicamente das magias)
 const ESCOLAS_ORDEM = [
     'Abjuração','Adivinhação','Conjuração','Encantamento',
     'Evocação','Ilusão','Necromancia','Transmutação','Universal'
@@ -154,12 +153,12 @@ class GrimorioController {
         this.token            = token;
         this.magias           = [];
         this.magiasFiltro     = [];
-        this.preparadas       = new Set();      // Set de magia_id preparados
-        this.usadas           = new Set();      // ✅ NOVO: Set de magia_id lançadas hoje
+        this.preparadas       = new Set();
+        this.usadas           = new Set();
         this.slotsDisponiveis = {};
         this.nivelAtivo       = 'todos';
-        this.escolaAtiva      = 'todas';        // ✅ NOVO
-        this.filtroPrepAtivo  = false;          // ✅ NOVO: mostrar só preparadas
+        this.escolaAtiva      = 'todas';
+        this.filtroPrepAtivo  = false;
         this.cardsAbertos     = new Set();
         this._carregado       = false;
         console.log('✅ GrimorioController inicializado — classe:', this.classe);
@@ -189,7 +188,7 @@ class GrimorioController {
         }
 
         this._renderizarPainelSlots();
-        this._renderizarFiltroEscolas();   // ✅ NOVO
+        this._renderizarFiltroEscolas();
         this._renderizarLista();
         this._configurarFiltros();
     }
@@ -200,18 +199,14 @@ class GrimorioController {
         document.body.style.overflow = '';
     }
 
-    /**
-     * Filtra magias por nível + escola + busca + preparadas
-     * SRP: apenas lógica de filtragem
-     */
     filtrar() {
         const busca = document.getElementById('grimorioBusca')?.value.toLowerCase().trim() || '';
 
         this.magiasFiltro = this.magias.filter(m => {
-            const matchNivel   = this.nivelAtivo === 'todos'   || String(m.nivel) === String(this.nivelAtivo);
-            const matchEscola  = this.escolaAtiva === 'todas'  || (m.escola || '') === this.escolaAtiva;  // ✅ NOVO
-            const matchPrep    = !this.filtroPrepAtivo         || this.preparadas.has(m.id);              // ✅ NOVO
-            const matchBusca   = !busca
+            const matchNivel  = this.nivelAtivo === 'todos'  || String(m.nivel) === String(this.nivelAtivo);
+            const matchEscola = this.escolaAtiva === 'todas' || (m.escola || '') === this.escolaAtiva;
+            const matchPrep   = !this.filtroPrepAtivo        || this.preparadas.has(m.id);
+            const matchBusca  = !busca
                 || m.nome.toLowerCase().includes(busca)
                 || (m.escola || '').toLowerCase().includes(busca)
                 || (m.descricao || '').toLowerCase().includes(busca);
@@ -221,21 +216,43 @@ class GrimorioController {
         this._renderizarLista();
     }
 
-    async descansoLongo() {
-        if (!confirm('🌙 Realizar descanso longo?\nIsso resetará todas as magias preparadas e slots usados.')) return;
+    /**
+     * ✅ MELHORADO: modal customizado em vez de confirm() nativo do browser
+     * SRP: orquestra confirmação e reset — lógica HTTP delegada a _executarDescansoLongo()
+     */
+    descansoLongo() {
+        this._mostrarModalConfirmacao({
+            icone:          '🌙',
+            titulo:         'Descanso Longo',
+            texto:          'Isso resetará todas as magias preparadas e slots usados. Deseja continuar?',
+            textoCancelar:  'Cancelar',
+            textoConfirmar: '🌙 Confirmar Descanso',
+            onConfirmar:    () => this._executarDescansoLongo(),
+        });
+    }
+
+    // ──────────────────────────────────────────
+    // PRIVADO — DESCANSO
+    // ──────────────────────────────────────────
+
+    /**
+     * SRP: apenas execução HTTP do descanso — confirmação delegada ao modal
+     */
+    async _executarDescansoLongo() {
         try {
             const url = getApiUrl(`/magias-preparadas/${this.combatente.id}/descanso`);
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json',
+                    'Content-Type':  'application/json',
                 },
                 body: JSON.stringify({ confirmar: true }),
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
             this.preparadas = new Set();
-            this.usadas     = new Set();   // ✅ NOVO
+            this.usadas     = new Set();
             this._calcularSlotsDisponiveis();
             this._renderizarPainelSlots();
             this._renderizarLista();
@@ -244,6 +261,73 @@ class GrimorioController {
             console.error('❌ Erro no descanso longo:', err);
             this._mostrarToast('Erro ao realizar descanso longo.', 'erro');
         }
+    }
+
+    // ──────────────────────────────────────────
+    // PRIVADO — MODAL DE CONFIRMAÇÃO
+    // ──────────────────────────────────────────
+
+    /**
+     * Modal customizado de confirmação — substitui confirm() nativo
+     * SRP: apenas criação e controle do modal DOM
+     * @param {{ icone, titulo, texto, textoCancelar, textoConfirmar, onConfirmar, onCancelar }} opcoes
+     */
+    _mostrarModalConfirmacao(opcoes) {
+        // Remove modal anterior se existir
+        const anterior = document.getElementById('grimorioModalConfirmacao');
+        if (anterior) anterior.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id        = 'grimorioModalConfirmacao';
+        overlay.className = 'grimorio-confirm-overlay';
+        overlay.innerHTML = `
+            <div class="grimorio-confirm-box">
+                <div class="grimorio-confirm-header">
+                    <span class="grimorio-confirm-icone">${opcoes.icone || '⚠️'}</span>
+                    <h3 class="grimorio-confirm-titulo">${opcoes.titulo || 'Confirmar'}</h3>
+                </div>
+                <p class="grimorio-confirm-texto">${opcoes.texto || 'Deseja continuar?'}</p>
+                <div class="grimorio-confirm-botoes">
+                    <button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioConfirmCancelar">
+                        ${opcoes.textoCancelar || 'Cancelar'}
+                    </button>
+                    <button class="grimorio-confirm-btn grimorio-confirm-ok" id="grimorioConfirmOk">
+                        ${opcoes.textoConfirmar || 'Confirmar'}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // Anima entrada
+        requestAnimationFrame(() => overlay.classList.add('show'));
+
+        const fechar = () => {
+            overlay.classList.remove('show');
+            setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 250);
+        };
+
+        document.getElementById('grimorioConfirmCancelar').addEventListener('click', () => {
+            fechar();
+            if (opcoes.onCancelar) opcoes.onCancelar();
+        });
+
+        document.getElementById('grimorioConfirmOk').addEventListener('click', () => {
+            fechar();
+            if (opcoes.onConfirmar) opcoes.onConfirmar();
+        });
+
+        // Fechar ao clicar fora
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) fechar();
+        });
+
+        // Fechar com ESC
+        const onEsc = (e) => {
+            if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); }
+        };
+        document.addEventListener('keydown', onEsc);
     }
 
     // ──────────────────────────────────────────
@@ -279,9 +363,8 @@ class GrimorioController {
             const url = getApiUrl(`/magias-preparadas/${this.combatente.id}`);
             const res = await fetch(url, { headers: { 'Authorization': `Bearer ${this.token}` } });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const lista = await res.json();
+            const lista     = await res.json();
             this.preparadas = new Set(lista.map(p => p.magia_id));
-            // ✅ NOVO: carrega também quais foram lançadas hoje
             this.usadas     = new Set(lista.filter(p => p.usada).map(p => p.magia_id));
             console.log(`✅ Preparadas: ${this.preparadas.size} | Usadas hoje: ${this.usadas.size}`);
         } catch (err) {
@@ -320,7 +403,6 @@ class GrimorioController {
                 return m && Number(m.nivel) === Number(nivelMagia);
             }).length;
 
-            // ✅ NOVO: conta usadas (lançadas) no nível para mostrar no painel
             const usadasNivel = [...this.usadas].filter(magiaId => {
                 const m = this.magias.find(x => x.id === magiaId);
                 return m && Number(m.nivel) === Number(nivelMagia);
@@ -352,10 +434,6 @@ class GrimorioController {
         this._atualizarCard(magiaId, nivelMagia);
     }
 
-    /**
-     * ✅ NOVO: Alterna magia entre usada/não-usada (lançada na arena)
-     * SRP: apenas toggle de uso diário
-     */
     async _toggleUsada(magiaId, nivelMagia) {
         try {
             const url = getApiUrl(`/magias-preparadas/${this.combatente.id}/${magiaId}/usar`);
@@ -410,7 +488,7 @@ class GrimorioController {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json',
+                    'Content-Type':  'application/json',
                 },
                 body: JSON.stringify({ magia_id: magiaId, nivel_slot: nivelMagia }),
             });
@@ -435,7 +513,7 @@ class GrimorioController {
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             this.preparadas.delete(magiaId);
-            this.usadas.delete(magiaId);    // ✅ remove de usadas também
+            this.usadas.delete(magiaId);
             this._mostrarToast('📖 Magia removida da preparação.', 'info');
         } catch (err) {
             console.error('❌ Erro ao desmarcar magia:', err);
@@ -461,7 +539,7 @@ class GrimorioController {
             });
         });
 
-        // ✅ NOVO: Filtro "Preparadas Hoje"
+        // Filtro "Preparadas Hoje"
         const btnPrep = document.getElementById('btnFiltroPreparadas');
         if (btnPrep) {
             btnPrep.replaceWith(btnPrep.cloneNode(true));
@@ -473,7 +551,7 @@ class GrimorioController {
             });
         }
 
-        // Botão descanso longo
+        // ✅ Botão descanso longo — sem confirm() nativo
         const btnDescanso = document.getElementById('btnDescansoLongo');
         if (btnDescanso) {
             btnDescanso.replaceWith(btnDescanso.cloneNode(true));
@@ -482,15 +560,10 @@ class GrimorioController {
         }
     }
 
-    /**
-     * ✅ NOVO: Renderiza botões de filtro por escola dinamicamente
-     * SRP: apenas renderização dos filtros de escola
-     */
     _renderizarFiltroEscolas() {
         const container = document.getElementById('grimorioFiltroEscolas');
         if (!container) return;
 
-        // Extrair escolas presentes nas magias carregadas
         const escolasPresentes = new Set(
             this.magias.map(m => m.escola).filter(Boolean)
         );
@@ -533,7 +606,6 @@ class GrimorioController {
             const cor = s.disponivel === 0 ? '#f87171'
                       : s.preparadas > 0   ? '#facc15'
                       :                      '#4ade80';
-            // ✅ NOVO: mostra usadas no tooltip
             const usadasInfo = s.usadas > 0 ? ` · ${s.usadas} lançada(s)` : '';
             return `
                 <div class="grimorio-slot-box"
@@ -588,7 +660,6 @@ class GrimorioController {
             `;
         }).join('');
 
-        // Bind: checkbox preparar
         lista.querySelectorAll('.grimorio-checkbox').forEach(cb => {
             cb.addEventListener('change', () => {
                 const magiaId  = Number(cb.dataset.magiaId);
@@ -597,7 +668,6 @@ class GrimorioController {
             });
         });
 
-        // ✅ NOVO: Bind: checkbox usada (lançada)
         lista.querySelectorAll('.grimorio-checkbox-usada').forEach(cb => {
             cb.addEventListener('change', () => {
                 const magiaId  = Number(cb.dataset.magiaId);
@@ -606,7 +676,6 @@ class GrimorioController {
             });
         });
 
-        // Bind: expandir card
         lista.querySelectorAll('.grimorio-expandir-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -618,7 +687,7 @@ class GrimorioController {
     _renderizarCard(m) {
         const emoji     = EMOJI_ESCOLA[m.escola] || '📜';
         const preparada = this.preparadas.has(m.id);
-        const usada     = this.usadas.has(m.id);        // ✅ NOVO
+        const usada     = this.usadas.has(m.id);
         const aberto    = this.cardsAbertos.has(m.id);
         const temDano   = m.dano && m.dano.trim();
         const slot      = this.slotsDisponiveis[m.nivel];
@@ -665,7 +734,6 @@ class GrimorioController {
             </div>
         `;
 
-        // ✅ NOVO: checkbox "lançada hoje" — só aparece se a magia está preparada
         const checkboxUsada = preparada ? `
             <label class="grimorio-usada-label" title="${usada ? 'Restaurar magia' : 'Marcar como lançada hoje'}">
                 <input type="checkbox"
@@ -742,7 +810,6 @@ class GrimorioController {
             nome.classList.toggle('usada-nome',     usada);
         }
 
-        // ✅ NOVO: atualizar checkbox usada
         const cbUsada = card.querySelector('.grimorio-checkbox-usada');
         if (cbUsada) {
             cbUsada.checked = usada;
@@ -777,11 +844,14 @@ class GrimorioController {
 
     _mostrarToast(msg, tipo = 'sucesso') {
         const toast = document.createElement('div');
-        toast.className = `grimorio-toast grimorio-toast-${tipo}`;
+        toast.className   = `grimorio-toast grimorio-toast-${tipo}`;
         toast.textContent = msg;
         document.body.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
     }
 
     _mostrarLoading(visivel) {

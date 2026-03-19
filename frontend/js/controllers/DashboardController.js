@@ -372,32 +372,106 @@ class DashboardController {
 
     async _excluirCombatente(id) {
         if (!this._isMestre()) { Toast.error('Acesso restrito.'); return; }
-        if (!confirm('Deseja excluir este combatente?')) return;
-        try {
-            await this.service.deletar(id);
-            Toast.success('Combatente excluido!');
-            this.carregarCombatentes();
-        } catch (err) {
-            Toast.error('Erro ao excluir');
-            console.error(err);
-        }
+        var self = this;
+        this._mostrarModalConfirmacao({
+            icone:          '🗑️',
+            titulo:         'Excluir Combatente',
+            texto:          'Deseja excluir este combatente? Esta ação não pode ser desfeita.',
+            textoCancelar:  'Cancelar',
+            textoConfirmar: '🗑️ Excluir',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar: async function() {
+                try {
+                    await self.service.deletar(id);
+                    Toast.success('Combatente excluido!');
+                    self.carregarCombatentes();
+                } catch (err) {
+                    Toast.error('Erro ao excluir');
+                    console.error(err);
+                }
+            }
+        });
     }
 
+    /**
+     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
+     * Chamado pelo botão "Deletar" dentro do modal de edição
+     */
     async _deletarCombatente() {
         if (!this._isMestre()) { Toast.error('Acesso restrito.'); return; }
         if (!this.combatenteEmEdicao) return;
-        if (!confirm('Deletar ' + this.combatenteEmEdicao.nome + '?')) return;
-        try {
-            await this.service.deletar(this.combatenteEmEdicao.id);
-            Toast.success('Combatente deletado!');
-            this._fecharModal('modalEdicaoDashboard');
-            this.combatenteEmEdicao = null;
-            window.combatenteEmEdicao = null;
-            this.carregarCombatentes();
-        } catch (err) {
-            Toast.error('Erro ao deletar');
-            console.error(err);
+        var self = this;
+        var nome = this.combatenteEmEdicao.nome;
+        this._mostrarModalConfirmacao({
+            icone:          '🗑️',
+            titulo:         'Deletar Combatente',
+            texto:          'Deletar <strong>' + nome + '</strong>? Esta ação não pode ser desfeita.',
+            textoCancelar:  'Cancelar',
+            textoConfirmar: '🗑️ Deletar',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar: async function() {
+                try {
+                    await self.service.deletar(self.combatenteEmEdicao.id);
+                    Toast.success('Combatente deletado!');
+                    self._fecharModal('modalEdicaoDashboard');
+                    self.combatenteEmEdicao   = null;
+                    window.combatenteEmEdicao = null;
+                    self.carregarCombatentes();
+                } catch (err) {
+                    Toast.error('Erro ao deletar');
+                    console.error(err);
+                }
+            }
+        });
+    }
+
+    /**
+     * Modal customizado de confirmação — SRP: apenas DOM
+     * Reutilizável em qualquer ação destrutiva do DashboardController
+     */
+    _mostrarModalConfirmacao(opcoes) {
+        var anterior = document.getElementById('_modalConfirmGlobal');
+        if (anterior) anterior.remove();
+
+        var overlay = document.createElement('div');
+        overlay.id        = '_modalConfirmGlobal';
+        overlay.className = 'modal-confirm-overlay';
+        overlay.innerHTML =
+            '<div class="modal-confirm-box">'
+          + '<div class="modal-confirm-header">'
+          + '<span class="modal-confirm-icone">' + (opcoes.icone || '⚠️') + '</span>'
+          + '<h3 class="modal-confirm-titulo">'  + (opcoes.titulo || 'Confirmar') + '</h3>'
+          + '</div>'
+          + '<p class="modal-confirm-texto">' + (opcoes.texto || 'Deseja continuar?') + '</p>'
+          + '<div class="modal-confirm-botoes">'
+          + '<button class="modal-confirm-btn modal-confirm-cancelar" id="_confirmCancelar">'
+          + (opcoes.textoCancelar || 'Cancelar') + '</button>'
+          + '<button class="modal-confirm-btn ' + (opcoes.classeConfirmar || 'modal-confirm-ok') + '" id="_confirmOk">'
+          + (opcoes.textoConfirmar || 'Confirmar') + '</button>'
+          + '</div></div>';
+
+        document.body.appendChild(overlay);
+        requestAnimationFrame(function() { overlay.classList.add('show'); });
+
+        function fechar() {
+            overlay.classList.remove('show');
+            setTimeout(function() { if (overlay.parentNode) overlay.remove(); }, 250);
         }
+
+        document.getElementById('_confirmCancelar').addEventListener('click', function() {
+            fechar();
+            if (opcoes.onCancelar) opcoes.onCancelar();
+        });
+        document.getElementById('_confirmOk').addEventListener('click', function() {
+            fechar();
+            if (opcoes.onConfirmar) opcoes.onConfirmar();
+        });
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) fechar(); });
+
+        var onEsc = function(e) {
+            if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); }
+        };
+        document.addEventListener('keydown', onEsc);
     }
 
     _renderizarAtaquesEdicao(ataques) {

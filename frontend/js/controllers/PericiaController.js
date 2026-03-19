@@ -245,12 +245,78 @@ export class PericiaController {
         tr.querySelector('.input-total').value = total;
     }
 
+    /**
+     * ✅ CORRIGIDO: modal customizado em vez de confirm() nativo
+     * SRP: confirmação delegada ao modal — limpeza delegada a _executarLimparSelecao()
+     */
     limparSelecao() {
-        if (!confirm('Deseja limpar todas as seleções?')) return;
-        
+        this._mostrarModalConfirmacao({
+            icone:          '🧹',
+            titulo:         'Limpar Seleção',
+            texto:          'Deseja limpar todas as perícias selecionadas?',
+            textoCancelar:  'Cancelar',
+            textoConfirmar: '🧹 Limpar',
+            onConfirmar:    () => this._executarLimparSelecao(),
+        });
+    }
+
+    _executarLimparSelecao() {
         this.periciasSelecionadas.clear();
         this.renderizar();
         NotificationService.mostrarSucesso('✅ Seleção limpa');
+    }
+
+    /**
+     * Modal customizado de confirmação
+     * SRP: apenas criação e controle do modal DOM
+     */
+    _mostrarModalConfirmacao(opcoes) {
+        const anterior = document.getElementById('_modalConfirmGlobal');
+        if (anterior) anterior.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id        = '_modalConfirmGlobal';
+        overlay.className = 'modal-confirm-overlay';
+        overlay.innerHTML = `
+            <div class="modal-confirm-box">
+                <div class="modal-confirm-header">
+                    <span class="modal-confirm-icone">${opcoes.icone || '⚠️'}</span>
+                    <h3 class="modal-confirm-titulo">${opcoes.titulo || 'Confirmar'}</h3>
+                </div>
+                <p class="modal-confirm-texto">${opcoes.texto || 'Deseja continuar?'}</p>
+                <div class="modal-confirm-botoes">
+                    <button class="modal-confirm-btn modal-confirm-cancelar" id="_confirmCancelar">
+                        ${opcoes.textoCancelar || 'Cancelar'}
+                    </button>
+                    <button class="modal-confirm-btn ${opcoes.classeConfirmar || 'modal-confirm-ok'}" id="_confirmOk">
+                        ${opcoes.textoConfirmar || 'Confirmar'}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+
+        const fechar = () => {
+            overlay.classList.remove('show');
+            setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 250);
+        };
+
+        document.getElementById('_confirmCancelar').addEventListener('click', () => {
+            fechar();
+            if (opcoes.onCancelar) opcoes.onCancelar();
+        });
+        document.getElementById('_confirmOk').addEventListener('click', () => {
+            fechar();
+            if (opcoes.onConfirmar) opcoes.onConfirmar();
+        });
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) fechar(); });
+
+        const onEsc = (e) => {
+            if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); }
+        };
+        document.addEventListener('keydown', onEsc);
     }
 
     async salvarPericias() {
