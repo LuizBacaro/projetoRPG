@@ -889,3 +889,73 @@
     background: rgba(251,191,36,0.22);
     color:      #fbbf24;
 }
+
+/* ════════════════════════════════════════════════════════════════════════ */
+/* ⏰ Duração de Condições                                                   */
+/* ════════════════════════════════════════════════════════════════════════ */
+
+/* Modal — Campo de duração */
+.duracao-input-wrapper {
+    display:       flex;
+    align-items:   center;
+    gap:           0.5rem;
+}
+
+.modal-input-duracao {
+    flex:          1;
+    padding:       0.6rem 0.8rem;
+    border-radius: 6px;
+    border:        1px solid rgba(148, 163, 184, 0.3);
+    background:    rgba(15, 15, 35, 0.5);
+    color:         #e2e8f0;
+    font-size:     0.9rem;
+    font-weight:   600;
+}
+
+.modal-input-duracao:focus {
+    outline:       none;
+    border-color:  rgba(201, 168, 76, 0.6);
+    box-shadow:    0 0 0 3px rgba(201, 168, 76, 0.1);
+}
+
+.duracao-hint {
+    font-size:     0.75rem;
+    color:         #94a3b8;
+    font-style:    italic;
+    white-space:   nowrap;
+}
+
+/* Condição com duração — exibir badge de turno */
+.condicao-duracao {
+    font-size:         0.75rem;
+    background:        rgba(239, 68, 68, 0.2);
+    color:             #fca5a5;
+    padding:           0.1rem 0.4rem;
+    border-radius:     3px;
+    margin-left:       0.3rem;
+    font-weight:       700;
+    display:           inline-block;
+}
+
+/* Badge de duração na ordem de iniciativa */
+.badge-condicao-ordem {
+    font-size:         0.65rem;
+    padding:           0.2rem 0.4rem;
+    border-radius:     3px;
+    background:        rgba(148, 163, 184, 0.15);
+    color:             #cbd5e1;
+    border:            1px solid rgba(148, 163, 184, 0.3);
+    font-weight:       600;
+    display:           inline-flex;
+    align-items:       center;
+    justify-content:   center;
+    min-width:         1.8rem;
+    height:            1.4rem;
+}
+
+/* Badge "mais" com duração */
+.badge-condicao-mais {
+    background:        rgba(239, 68, 68, 0.15);
+    color:             #fca5a5;
+    border-color:      rgba(239, 68, 68, 0.3);
+}

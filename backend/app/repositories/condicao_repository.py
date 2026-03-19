@@ -100,3 +100,41 @@ class CondicaoRepository:
         )
         self.db.commit()
         return deleted
+    
+    def atualizar_duracao(self, combatente_id: int, condicao_id: int, nova_duracao: int) -> None:
+        """Atualiza a duração em turnos de uma condição específica"""
+        from ..models.combatente_condicao import CombatenteCondicao
+        
+        cc = self.db.query(CombatenteCondicao).filter(
+            CombatenteCondicao.combatente_id == combatente_id,
+            CombatenteCondicao.condicao_id == condicao_id
+        ).first()
+        
+        if cc:
+            cc.duracao_turnos = nova_duracao
+            self.db.commit()
+
+    # Modificar método aplicar() para aceitar duração:
+    def aplicar(self, combatente_id: int, condicao_id: int, duracao_turnos: int = -1) -> None:
+        """Aplica uma condição a um combatente com duração"""
+        from ..models.combatente_condicao import CombatenteCondicao
+        
+        # Verifica se já existe
+        existente = self.db.query(CombatenteCondicao).filter(
+            CombatenteCondicao.combatente_id == combatente_id,
+            CombatenteCondicao.condicao_id == condicao_id
+        ).first()
+        
+        if existente:
+            # Atualiza duração se já existe
+            existente.duracao_turnos = duracao_turnos
+        else:
+            # Cria nova associação
+            cc = CombatenteCondicao(
+                combatente_id=combatente_id,
+                condicao_id=condicao_id,
+                duracao_turnos=duracao_turnos
+            )
+            self.db.add(cc)
+        
+        self.db.commit()

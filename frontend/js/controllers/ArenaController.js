@@ -90,6 +90,12 @@ export class ArenaController {
         if (idAtual !== null && this._jaAgiram.indexOf(idAtual) === -1) {
             this._jaAgiram.push(idAtual);
         }
+        
+        // ✅ NOVO: Decrementar duração das condições do combatente atual ANTES de passar turno
+        if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
+            this._decrementarDuracaoCondicoes(idAtual);
+        }
+        
         this.turnoAtual++;
         if (this.turnoAtual >= this.combatentes.length) {
             this.turnoAtual  = 0;
@@ -102,6 +108,38 @@ export class ArenaController {
         this._iniciarCronometro();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
+    }
+
+    // ✅ NOVO: Método para decrementar duração das condições
+    async _decrementarDuracaoCondicoes(combatenteId) {
+        try {
+            const url = window.getApiUrl(`/condicoes/combatentes/${combatenteId}/avancar-turno`);
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (!res.ok) {
+                console.warn('⚠️ Erro ao decrementar duração das condições:', res.status);
+                return;
+            }
+            
+            const data = await res.json();
+            const combatente = this.combatentes[this.turnoAtual];
+            
+            // Recarregar condições na UI
+            if (combatente && typeof this.condicaoController !== 'undefined') {
+                await this.condicaoController.carregarCondicoesDoCombatente(combatente.id);
+            }
+            
+            console.log(`⏰ Duração das condições de #${combatenteId} decrementada`);
+        } catch (err) {
+            console.error('❌ Erro ao decrementar condições:', err);
+            // Não quebra o fluxo do jogo — apenas loga o erro
+        }
     }
 
     toggleVisibilidadeStats() {

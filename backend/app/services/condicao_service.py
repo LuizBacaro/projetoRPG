@@ -1,8 +1,7 @@
 """
 Service de Condição (Business Logic)
-Princípio SOLID:
-  SRP - Apenas lógica de negócio de Condição
-  DIP - Depende da abstração CondicaoRepository, não da implementação
+Princípio SOLID: SRP - lógica de negócio de Condição + duração
+DIP - Depende da abstração CondicaoRepository
 """
 from typing import List, Dict
 from ..repositories.condicao_repository import CondicaoRepository
@@ -41,7 +40,7 @@ CONDICOES_SEED = [
 
 class CondicaoService:
     """
-    Service com lógica de negócio para gerenciamento de condições.
+    Service com lógica de negócio para gerenciamento de condições com duração.
     """
 
     def __init__(
@@ -65,20 +64,30 @@ class CondicaoService:
     # ── Condições por combatente ────────────────────────────────────────────────
 
     def listar_condicoes_do_combatente(self, combatente_id: int) -> Dict:
-        """Retorna condições ativas de um combatente"""
+        """Retorna condições ativas de um combatente com duração"""
         self._validar_combatente(combatente_id)
         condicoes = self.condicao_repo.get_condicoes_do_combatente(combatente_id)
-        return {"combatente_id": combatente_id, "condicoes": condicoes}
+        return {
+            "combatente_id": combatente_id,
+            "condicoes": condicoes  # Inclui duracao_turnos de cada condição
+        }
 
-    def aplicar_condicao(self, combatente_id: int, condicao_id: int) -> Dict:
+    def aplicar_condicao(self, combatente_id: int, condicao_id: int, duracao_turnos: int = -1) -> Dict:
         """
-        Aplica uma condição a um combatente.
-        Idempotente — não gera erro se já existia.
+        Aplica uma condição a um combatente com duração opcional.
+        
+        Args:
+            combatente_id: ID do combatente
+            condicao_id: ID da condição
+            duracao_turnos: Duração em turnos (-1 = permanente, 0+ = número de turnos)
+        
+        Retorna: Dict com combatente_id e lista de condições ativas
         """
         self._validar_combatente(combatente_id)
         self._validar_condicao(condicao_id)
 
-        self.condicao_repo.aplicar(combatente_id, condicao_id)
+        # ✅ NOVO: passa duração para o repository
+        self.condicao_repo.aplicar(combatente_id, condicao_id, duracao_turnos)
         condicoes = self.condicao_repo.get_condicoes_do_combatente(combatente_id)
         return {"combatente_id": combatente_id, "condicoes": condicoes}
 
@@ -94,6 +103,50 @@ class CondicaoService:
         self._validar_combatente(combatente_id)
         self.condicao_repo.remover_todas(combatente_id)
         return {"combatente_id": combatente_id, "condicoes": []}
+
+    # ── NOVO: Decremento de duração (arena) ──────────────────────────────────────
+
+    def decrementar_duracao_todas(self, combatente_id: int) -> Dict:
+        """
+        Decrementa a duração de TODAS as condições ativas de um combatente em 1 turno.
+        Remove automaticamente condições que expirarem (duracao_turnos = 0).
+        
+        Chamado em ArenaController.avancarTurno() quando turno passa para outro combatente.
+        
+        Retorna: Dict com combatente_id e condicoes atualizadas
+        """
+        self._validar_combatente(combatente_id)
+
+        # Obter condições atuais
+        condicoes_ativas = self.condicao_repo.get_condicoes_do_combatente(combatente_id)
+        
+        # Iterar e decrementar — remover se expirou
+        for condicao in condicoes_ativas:
+            if condicao.get('duracao_turnos', -1) == -1:
+                # Permanente — não decrementa
+                continue
+            
+            # Decrementar
+            nova_duracao = condicao.get('duracao_turnos', 0) - 1
+            
+            if nova_duracao <= 0:
+                # Expirou — remover
+                self.condicao_repo.remover(
+                    combatente_id,
+                    condicao.get('condicao_id') or condicao.get('id')
+                )
+                print(f"⏰ Condição '{condicao.get('nome')}' expirou para combatente {combatente_id}")
+            else:
+                # Atualizar duração
+                self.condicao_repo.atualizar_duracao(
+                    combatente_id,
+                    condicao.get('condicao_id') or condicao.get('id'),
+                    nova_duracao
+                )
+
+        # Retornar estado atualizado
+        condicoes = self.condicao_repo.get_condicoes_do_combatente(combatente_id)
+        return {"combatente_id": combatente_id, "condicoes": condicoes}
 
     # ── Helpers privados ────────────────────────────────────────────────────────
 

@@ -76,3 +76,18 @@ def remover_todas_condicoes(combatente_id: int, db: Session = Depends(get_db)):
         return service.remover_todas_condicoes(combatente_id)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
+    
+@router.post("/combatentes/{combatente_id}/avancar-turno")
+def avancar_turno_condicoes(combatente_id: int, db: Session = Depends(get_db)):
+    """
+    Decrementa duração de TODAS as condições do combatente em 1 turno.
+    Remove automaticamente condições que expirarem.
+    
+    Chamado por ArenaController quando avancar_turno() é acionado.
+    """
+    service = get_combate_service(db)  # ou use CondicaoService injetado
+    try:
+        result = service.decrementar_duracao_todas(combatente_id)
+        return result
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
