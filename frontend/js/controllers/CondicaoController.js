@@ -17,16 +17,20 @@ export class CondicaoController {
     async carregarCondicoesDoCombatente(combatenteId) {
         this.combatenteAtual = combatenteId;
         try {
+            console.log(`📡 Carregando condições do combatente #${combatenteId}...`);
             const data = await this.service.listarDoCombatente(combatenteId);
+            
             if (typeof modalCondicaoInstance !== 'undefined') {
+                // ✅ Passar callback correto para onRemover
                 modalCondicaoInstance.renderizarCondicoesAtivas(
                     data.condicoes,
                     combatenteId,
                     (cid, condId) => this._removerCondicao(cid, condId)
                 );
             }
+            console.log(`✅ ${data.condicoes.length} condição(ões) carregada(s)`);
         } catch (err) {
-            console.error('Erro ao carregar condições:', err);
+            console.error('❌ Erro ao carregar condições:', err);
         }
     }
 
@@ -37,19 +41,23 @@ export class CondicaoController {
                 modalCondicaoInstance.renderizarBadgesOrdem(cardEl, data.condicoes);
             }
         } catch (err) {
-            console.error('Erro ao atualizar badges:', err);
+            console.error('❌ Erro ao atualizar badges:', err);
         }
     }
 
+    // ✅ REFATORADO: _removerCondicao com async/await
     async _removerCondicao(combatenteId, condicaoId) {
         try {
+            console.log(`🗑️ Removendo condição #${condicaoId} do combatente #${combatenteId}...`);
             const data = await this.service.remover(combatenteId, condicaoId);
+            
             if (typeof modalCondicaoInstance !== 'undefined') {
                 modalCondicaoInstance.renderizarCondicoesAtivas(
                     data.condicoes,
                     combatenteId,
                     (cid, condId) => this._removerCondicao(cid, condId)
                 );
+                
                 const cardOrdem = document.querySelector(
                     `.combatente-ordem-item[data-combatente-id="${combatenteId}"]`
                 );
@@ -57,8 +65,16 @@ export class CondicaoController {
                     modalCondicaoInstance.renderizarBadgesOrdem(cardOrdem, data.condicoes);
                 }
             }
+            
+            if (typeof Toast !== 'undefined') {
+                Toast.success('✅ Condição removida!');
+            }
+            console.log(`✅ Condição #${condicaoId} removida com sucesso`);
         } catch (err) {
-            console.error('Erro ao remover condição:', err);
+            console.error('❌ Erro ao remover condição:', err);
+            if (typeof Toast !== 'undefined') {
+                Toast.error(`Erro ao remover condição: ${err.message}`);
+            }
         }
     }
 }

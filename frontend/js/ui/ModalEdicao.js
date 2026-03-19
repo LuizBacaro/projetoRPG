@@ -1,12 +1,14 @@
 /**
  * ModalEdicao.js
  * SRP: gerenciar modal de edição
+ * ✅ Importa ModalConfirm como módulo ES6
  */
+
 import { CombatenteService }       from '../services/CombatenteService.js';
 import { UploadService }           from '../services/UploadService.js';
 import { Toast }                   from './toast.module.js';
 import { atualizarModificadorDOM } from '../utils/dnd.js';
-import { ModalConfirm }            from './ModalConfirm.js';   // ✅ import centralizado
+import { ModalConfirm }            from './ModalConfirm.js';  // ✅ Import ES6 correto
 
 export class ModalEdicao {
     constructor() {
@@ -143,7 +145,7 @@ export class ModalEdicao {
         }
     }
 
-    // ✅ REFATORADO: usa ModalConfirm centralizado
+    // ✅ REFATORADO: usa ModalConfirm importado
     deletar() {
         if (!this.combatenteAtual) return;
         ModalConfirm.mostrar({

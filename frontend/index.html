@@ -66,7 +66,7 @@
 </head>
 <body>
 
-<!-- ── Tela de Configuração ─────────────────────────────────────────── -->
+<!-- ── Tela de Configuração  -->
 <div id="telaConfiguracao" class="tela ativa">
     <header>
         <div class="header-arena-nav">
@@ -118,7 +118,6 @@
             <span class="rodada-badge">Rodada <strong id="rodadaAtual">1</strong></span>
         </div>
 
-        <!-- ✅ ADICIONA AQUI — chama o window._finalizarCombate que já existe -->
         <button class="btn-encerrar-combate" id="btnEncerrarCombate"
                 onclick="window._finalizarCombate && window._finalizarCombate()">
             🏳️ Encerrar Combate
@@ -161,7 +160,7 @@
     </div>
 </div>
 
-<!-- ── Modal de Edição (mantido — edição de combatente ainda existe na arena) -->
+<!-- ── Modal de Edição ── -->
 <div id="modalEdicao" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -300,7 +299,7 @@
     </div>
 </div>
 
-<!-- ── Modal Dano/Cura ───────────────────────────────────────────────── -->
+<!-- ── Modal Dano/Cura ── -->
 <div id="modalDanoCura" class="modal-dano-overlay">
     <div class="modal-dano-container">
         <div class="modal-dano-header">
@@ -332,23 +331,29 @@
     </div>
 </div>
 
-<!-- ── Scripts ───────────────────────────────────────────────────────── -->
-<!-- 1. api.config — carregado como MODULE para suportar export -->
+<!--  -->
+<!-- SCRIPTS — Padrão Unificado ES Modules + Global Scripts        -->
+<!--  -->
+
+<!-- FASE 1: API Config + Toast (ES Module) -->
 <script type="module">
     import { getApiUrl } from '/js/config/api.config.js';
+    import { Toast }     from '/js/ui/toast.module.js';
+    
     window.getApiUrl = getApiUrl;
+    window.Toast = Toast;
 </script>
 
-<!-- 2. AuthService — global, carregado antes de tudo -->
+<!-- FASE 2: AuthService (Script Global - carregado ANTES de tudo) -->
 <script src="/js/services/AuthService.js"></script>
 
-<!-- 3. Demais serviços globais -->
+<!-- FASE 3: Serviços Globais -->
 <script src="/js/services/DanoCuraService.js"></script>
 <script src="/js/ui/ModalDanoCura.js"></script>
 <script src="/js/services/CondicaoService.js"></script>
 <script src="/js/ui/CondicaoUI.js"></script>
 
-<!-- 4. Main — ES module (ConfiguracaoController, ArenaController, etc.) -->
+<!-- FASE 4: Main (ES Module - Controllers e Inicialização) -->
 <script type="module" src="/js/main.js"></script>
 
 </body>

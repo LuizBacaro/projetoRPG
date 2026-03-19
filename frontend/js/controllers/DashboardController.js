@@ -1,7 +1,7 @@
 /**
  * DashboardController.js
  * ✅ Sem imports ES module — carregado via carregar() no dashboard.html
- * Dependências via window: AuthService, Toast, AtaqueService
+ * Dependências via window: AuthService, Toast, AtaqueService, ModalConfirm
  */
 
 class DashboardController {
@@ -12,6 +12,12 @@ class DashboardController {
         this.filtroAtual        = 'todos';
         this.combatenteEmEdicao = null;
         this.perfil             = (typeof AuthService !== 'undefined') ? AuthService.getPerfil() : 'mestre';
+        
+        // ✅ Validar que ModalConfirm está disponível
+        if (typeof ModalConfirm === 'undefined') {
+            console.error('❌ ModalConfirm não carregado! Verifique se ModalConfirm.js foi importado antes de DashboardController.');
+        }
+        
         this._registrarGlobais();
         this._inicializar();
     }
@@ -56,7 +62,6 @@ class DashboardController {
         window.adicionarLinhaAtaque = function() { self._adicionarLinhaAtaque(); };
         window.removerLinhaAtaque   = function(btn) { btn.closest('.ataque-linha').remove(); };
 
-        // ✅ NOVO: Registrar funções de perícias
         window.abrirPaginaPericias             = function() { self._abrirPaginaPericias(); };
         window.recuperarPericiasDoSessionStorage = function() { self._recuperarPericiasDoSessionStorage(); };
     }
@@ -80,21 +85,17 @@ class DashboardController {
     _aplicarRestricoesPerfil() {
         if (this._isMestre()) return;
 
-        // ✅ Oculta aba Arena para Jogador
         const tabArena = document.querySelector('.nav-tab[data-tab="arena"]');
         if (tabArena) tabArena.style.display = 'none';
 
-        // Oculta filtros de monstro e NPC
         const filtroMonstro = document.querySelector('.filter-btn[data-tipo="monstro"]');
         const filtroNPC     = document.querySelector('.filter-btn[data-tipo="npc"]');
         if (filtroMonstro) filtroMonstro.style.display = 'none';
         if (filtroNPC)     filtroNPC.style.display     = 'none';
 
-        // Oculta botão Novo Combatente
         const btnNovo = document.getElementById('btnNovoCombatente');
         if (btnNovo) btnNovo.style.display = 'none';
 
-        // Oculta cards de resumo de Monstros e NPCs
         const resumoMonstros = document.getElementById('totalMonstros')?.closest('.resumo-card');
         const resumoNPCs     = document.getElementById('totalNPCs')?.closest('.resumo-card');
         if (resumoMonstros) resumoMonstros.style.display = 'none';
@@ -174,7 +175,6 @@ class DashboardController {
                 await self.service.atualizar(id, new FormData(form));
                 await Promise.all([
                     self._salvarAtaquesEdicao(id),
-                    // ✅ _salvarMagiasEdicao REMOVIDO — grimório gerencia os slots
                     self._salvarPericiasEdicao(id),
                 ]);
                 self._fecharModal('modalEdicaoDashboard');
@@ -215,7 +215,6 @@ class DashboardController {
         try {
             var tipo = this.filtroAtual === 'todos' ? null : this.filtroAtual;
 
-            // Jogador: nunca carrega monstros nem NPCs
             if (!this._isMestre() && (tipo === 'monstro' || tipo === 'npc')) tipo = 'jogador';
             if (!this._isMestre() && tipo === null) tipo = 'jogador';
 
@@ -228,6 +227,7 @@ class DashboardController {
         }
     }
 
+    // ✅ REFATORADO: _renderizarTabela com event listeners CORRETOS
     _renderizarTabela(combatentes) {
         var self  = this;
         var tbody = document.getElementById('tabelaCombatentes');
@@ -237,11 +237,10 @@ class DashboardController {
             return;
         }
 
-        // ✅ Oculta colunas HP e Iniciativa para Jogador ver monstro/NPC
         var cabecalho = document.querySelectorAll('.tabela-combatentes th');
         if (cabecalho.length >= 6) {
-            cabecalho[4].style.display = this._isMestre() ? '' : 'none'; // HP Máx
-            cabecalho[5].style.display = this._isMestre() ? '' : 'none'; // Iniciativa
+            cabecalho[4].style.display = this._isMestre() ? '' : 'none';
+            cabecalho[5].style.display = this._isMestre() ? '' : 'none';
         }
 
         var rows = '';
@@ -265,20 +264,38 @@ class DashboardController {
             rows += '<td>';
             rows += '<div class="tabela-acoes">';
             rows += '<button class="btn-acao btn-ver-ficha" data-id="' + c.id + '" data-acao="ver" title="Ver ficha" onclick="window.open(\'/pages/ficha-personagem.html?id=' + c.id + '\', \'_blank\')">👁️</button>';
-            rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="editar" title="Editar">✏️</button>';
+            rows += '<button class="btn-acao btn-editar" data-id="' + c.id + '" data-acao="editar" title="Editar">✏️</button>';
             if (self._isMestre()) {
-                rows += '<button class="btn-acao" data-id="' + c.id + '" data-acao="excluir" title="Excluir">🗑️</button>';
+                rows += '<button class="btn-acao btn-excluir" data-id="' + c.id + '" data-acao="excluir" title="Excluir">🗑️</button>';
             }
             rows += '</div></td></tr>';
         }
         tbody.innerHTML = rows;
 
-        tbody.querySelectorAll('[data-acao="editar"]').forEach(function(btn) {
-            btn.addEventListener('click', function() { self._abrirEdicao(parseInt(btn.dataset.id)); });
+        // ✅ REFATORADO: Vincular listeners APÓS renderizar
+        console.log('📋 Renderizando tabela com ' + combatentes.length + ' combatente(s)...');
+
+        // Botão Editar
+        tbody.querySelectorAll('.btn-editar').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var id = parseInt(btn.dataset.id);
+                console.log('✏️ Clicou em editar combatente #' + id);
+                self._abrirEdicao(id);
+            });
         });
+
+        // Botão Excluir (apenas mestre)
         if (self._isMestre()) {
-            tbody.querySelectorAll('[data-acao="excluir"]').forEach(function(btn) {
-                btn.addEventListener('click', function() { self._excluirCombatente(parseInt(btn.dataset.id)); });
+            tbody.querySelectorAll('.btn-excluir').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var id = parseInt(btn.dataset.id);
+                    console.log('🗑️ Clicou em excluir combatente #' + id);
+                    self._excluirCombatente(id);
+                });
             });
         }
     }
@@ -336,7 +353,6 @@ class DashboardController {
                 if (el) self._calcularModificador(el);
             });
 
-            // ✅ NOVO: Página de referência — visível só para monstros
             var secPagRef   = document.getElementById('secaoPaginaReferencia');
             var inputPagRef = document.getElementById('dashEditPaginaReferencia');
             var isMonstro   = (c.tipo === 'monstro');
@@ -355,7 +371,6 @@ class DashboardController {
                 preview.style.display     = 'none';
             }
 
-            // Ataques: apenas para jogadores
             var secAtaques = document.getElementById('secaoAtaquesEdicao');
             var isJogador  = (c.tipo === 'jogador');
             if (secAtaques) secAtaques.style.display = isJogador ? 'block' : 'none';
@@ -370,10 +385,23 @@ class DashboardController {
         }
     }
 
-     // ✅ REFATORADO: usa ModalConfirm centralizado (carregado via window)
+    // ✅ REFATORADO: _excluirCombatente com validação de ModalConfirm
     async _excluirCombatente(id) {
-        if (!this._isMestre()) { Toast.error('Acesso restrito.'); return; }
+        if (!this._isMestre()) {
+            Toast.error('Acesso restrito.');
+            return;
+        }
+
+        // ✅ Validar que ModalConfirm existe
+        if (typeof ModalConfirm === 'undefined' || typeof ModalConfirm.mostrar !== 'function') {
+            console.error('❌ ModalConfirm não está disponível!');
+            Toast.error('Erro: Modal de confirmação não carregado');
+            return;
+        }
+
         var self = this;
+        console.log('🗑️ Abrindo modal de confirmação para excluir combatente #' + id);
+
         ModalConfirm.mostrar({
             icone:           '🗑️',
             titulo:          'Excluir Combatente',
@@ -382,23 +410,39 @@ class DashboardController {
             classeConfirmar: 'modal-confirm-btn-perigo',
             onConfirmar: async function() {
                 try {
+                    console.log('✅ Confirmado: excluindo combatente #' + id);
                     await self.service.deletar(id);
                     Toast.success('Combatente excluido!');
                     self.carregarCombatentes();
                 } catch (err) {
-                    Toast.error('Erro ao excluir');
+                    Toast.error('Erro ao excluir: ' + err.message);
                     console.error(err);
                 }
             }
         });
     }
 
-    // ✅ REFATORADO: usa ModalConfirm centralizado
+    // ✅ REFATORADO: _deletarCombatente (modal de edição)
     async _deletarCombatente() {
-        if (!this._isMestre()) { Toast.error('Acesso restrito.'); return; }
-        if (!this.combatenteEmEdicao) return;
+        if (!this._isMestre()) {
+            Toast.error('Acesso restrito.');
+            return;
+        }
+
+        if (!this.combatenteEmEdicao) {
+            Toast.error('Nenhum combatente selecionado');
+            return;
+        }
+
+        if (typeof ModalConfirm === 'undefined' || typeof ModalConfirm.mostrar !== 'function') {
+            console.error('❌ ModalConfirm não está disponível!');
+            Toast.error('Erro: Modal de confirmação não carregado');
+            return;
+        }
+
         var self = this;
         var nome = this.combatenteEmEdicao.nome;
+
         ModalConfirm.mostrar({
             icone:           '🗑️',
             titulo:          'Deletar Combatente',
@@ -414,61 +458,11 @@ class DashboardController {
                     window.combatenteEmEdicao = null;
                     self.carregarCombatentes();
                 } catch (err) {
-                    Toast.error('Erro ao deletar');
+                    Toast.error('Erro ao deletar: ' + err.message);
                     console.error(err);
                 }
             }
         });
-    }
-
-
-    /**
-     * Modal customizado de confirmação — SRP: apenas DOM
-     * Reutilizável em qualquer ação destrutiva do DashboardController
-     */
-    _mostrarModalConfirmacao(opcoes) {
-        var anterior = document.getElementById('_modalConfirmGlobal');
-        if (anterior) anterior.remove();
-
-        var overlay = document.createElement('div');
-        overlay.id        = '_modalConfirmGlobal';
-        overlay.className = 'modal-confirm-overlay';
-        overlay.innerHTML =
-            '<div class="modal-confirm-box">'
-          + '<div class="modal-confirm-header">'
-          + '<span class="modal-confirm-icone">' + (opcoes.icone || '⚠️') + '</span>'
-          + '<h3 class="modal-confirm-titulo">'  + (opcoes.titulo || 'Confirmar') + '</h3>'
-          + '</div>'
-          + '<p class="modal-confirm-texto">' + (opcoes.texto || 'Deseja continuar?') + '</p>'
-          + '<div class="modal-confirm-botoes">'
-          + '<button class="modal-confirm-btn modal-confirm-cancelar" id="_confirmCancelar">'
-          + (opcoes.textoCancelar || 'Cancelar') + '</button>'
-          + '<button class="modal-confirm-btn ' + (opcoes.classeConfirmar || 'modal-confirm-ok') + '" id="_confirmOk">'
-          + (opcoes.textoConfirmar || 'Confirmar') + '</button>'
-          + '</div></div>';
-
-        document.body.appendChild(overlay);
-        requestAnimationFrame(function() { overlay.classList.add('show'); });
-
-        function fechar() {
-            overlay.classList.remove('show');
-            setTimeout(function() { if (overlay.parentNode) overlay.remove(); }, 250);
-        }
-
-        document.getElementById('_confirmCancelar').addEventListener('click', function() {
-            fechar();
-            if (opcoes.onCancelar) opcoes.onCancelar();
-        });
-        document.getElementById('_confirmOk').addEventListener('click', function() {
-            fechar();
-            if (opcoes.onConfirmar) opcoes.onConfirmar();
-        });
-        overlay.addEventListener('click', function(e) { if (e.target === overlay) fechar(); });
-
-        var onEsc = function(e) {
-            if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onEsc); }
-        };
-        document.addEventListener('keydown', onEsc);
     }
 
     _renderizarAtaquesEdicao(ataques) {
@@ -510,40 +504,11 @@ class DashboardController {
         await this.ataqueService.salvarAtaques(combatenteId, this._coletarAtaquesEdicao());
     }
 
-    _renderizarMagiasEdicao(slots) {
-        var container = document.getElementById('gridMagiasEdicao');
-        if (!container) return;
-        var html = '';
-        for (var nivel = 0; nivel <= 9; nivel++) {
-            var slot  = slots.find(function(s) { return s.nivel === nivel; }) || null;
-            var total = slot ? slot.total : 0;
-            html += '<div class="magia-edicao-linha">';
-            html += '<span class="magia-nivel-label">Nivel ' + nivel + '</span>';
-            html += '<div style="flex:1">';
-            html += '<input type="number" class="magia-total-input" data-nivel="' + nivel + '" value="' + total + '" min="0" max="20" style="width:100%;padding:.4rem .6rem;border-radius:.35rem;border:1px solid #334155;background:#0f0f23;color:#e2e8f0;font-size:.85rem;box-sizing:border-box" />';
-            html += '</div></div>';
-        }
-        container.innerHTML = html;
-    }
-
-    _coletarMagiasEdicao() {
-        return Array.from(document.querySelectorAll('#gridMagiasEdicao .magia-total-input'))
-            .map(function(input) {
-                return { nivel: parseInt(input.dataset.nivel), total: parseInt(input.value) || 0, usados: 0 };
-            });
-    }
-
-    async _salvarMagiasEdicao(combatenteId) {
-        await this.ataqueService.salvarMagias(combatenteId, this._coletarMagiasEdicao());
-    }
-
-    // ✅ NOVO: Salvar perícias
     async _salvarPericiasEdicao(combatenteId) {
         if (!window.combatenteEmEdicao || !window.combatenteEmEdicao.pericias) {
-            return; // Nenhuma perícia selecionada
+            return;
         }
         try {
-            // Armazenar perícias para recuperação após volta
             sessionStorage.setItem('periciasEdit', JSON.stringify(window.combatenteEmEdicao.pericias));
             sessionStorage.setItem('combatenteEditId', combatenteId);
         } catch (err) {
@@ -551,7 +516,6 @@ class DashboardController {
         }
     }
 
-    // ✅ NOVO: Abrir página de perícias
     _abrirPaginaPericias() {
         if (!this.combatenteEmEdicao || !this.combatenteEmEdicao.id) {
             Toast.error('❌ Selecione um combatente primeiro');
@@ -571,13 +535,6 @@ class DashboardController {
                 pericias: JSON.stringify(pericias)
             });
 
-            console.log('🔗 Navegando para perícias:', {
-                id: id,
-                nome: nome,
-                tipo: tipo,
-                periciasCount: pericias.length
-            });
-
             window.location.href = '/pages/pericias.html?' + params.toString();
         } catch (erro) {
             Toast.error('❌ Erro ao abrir perícias');
@@ -585,7 +542,6 @@ class DashboardController {
         }
     }
 
-    // ✅ NOVO: Recuperar perícias do sessionStorage
     _recuperarPericiasDoSessionStorage() {
         var periciasEdit = sessionStorage.getItem('periciasEdit');
         var combatenteId = sessionStorage.getItem('combatenteEditId');
@@ -594,16 +550,13 @@ class DashboardController {
             try {
                 var pericias = JSON.parse(periciasEdit);
 
-                // Atualizar combatente se for o mesmo
                 if (window.combatenteEmEdicao && window.combatenteEmEdicao.id == combatenteId) {
                     window.combatenteEmEdicao.pericias = pericias;
                     this.combatenteEmEdicao.pericias = pericias;
                     Toast.success('✅ ' + pericias.length + ' perícia(s) carregada(s)');
-
                     console.log('📚 Perícias recuperadas:', pericias);
                 }
 
-                // Limpar sessionStorage
                 sessionStorage.removeItem('periciasEdit');
                 sessionStorage.removeItem('combatenteEditId');
             } catch (erro) {
@@ -615,8 +568,12 @@ class DashboardController {
 
     _abrirModal(id) {
         var el = document.getElementById(id);
-        if (el) el.classList.add('show');
-        else    console.error('Modal nao encontrado: ' + id);
+        if (el) {
+            el.classList.add('show');
+            console.log('📂 Modal aberto: ' + id);
+        } else {
+            console.error('❌ Modal não encontrado: ' + id);
+        }
     }
 
     _fecharModal(id) {
@@ -670,7 +627,7 @@ class DashboardController {
     }
 }
 
-// ── Classes auxiliares 
+// ── Classes auxiliares ──────────────────────────────────────
 
 class CombatenteServiceGlobal {
     _url(path) { return window.getApiUrl('/combatentes' + (path || '')); }

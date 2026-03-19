@@ -1,8 +1,9 @@
 /**
- * ModalCondicao
- * Classe global (sem export) — carregada via <script> no index.html
- * SOLID: SRP - gerencia UI do modal de condição
- * ✅ Trata duracao_turnos undefined/null como permanente
+ * ModalCondicao - VERSÃO CORRIGIDA
+ * Fixes:
+ * 1. Event listener para remover condição (botão ✕)
+ * 2. Callback correto passado para onRemover
+ * 3. Trata duracao_turnos undefined corretamente
  */
 class ModalCondicao {
     constructor(condicaoService, arenaController) {
@@ -55,7 +56,6 @@ class ModalCondicao {
                                 </div>
                                 <div id="condicao-descricao" class="condicao-descricao-preview" style="display:none;"></div>
                                 
-                                <!-- ✅ NOVO: Campo de duração com hint -->
                                 <div class="campo-grupo">
                                     <label for="input-duracao" class="modal-label">⏰ Duração (turnos):</label>
                                     <div class="duracao-input-wrapper">
@@ -124,7 +124,6 @@ class ModalCondicao {
         }
     }
 
-    // ✅ REFATORADO: aplicar com duração
     async aplicar() {
         const condicaoId       = Number(document.getElementById('select-condicao')?.value);
         const durationTurnos   = Number(document.getElementById('input-duracao')?.value ?? -1);
@@ -142,7 +141,6 @@ class ModalCondicao {
         const ids      = Array.from(this.combatentesSelecionados);
 
         try {
-            // ✅ Passar duração_turnos ao aplicar
             await Promise.all(ids.map(cid => 
                 this.condicaoService.aplicar(cid, condicaoId, durationTurnos)
             ));
@@ -168,7 +166,7 @@ class ModalCondicao {
         }
     }
 
-    // ✅ REFATORADO: renderizar com tratamento de undefined
+    // ✅ REFATORADO: renderizar com callback correto para remover
     renderizarCondicoesAtivas(condicoes, combatenteId, onRemover) {
         const container = document.querySelector('.arena-condicoes-lista');
         if (!container) return;
@@ -186,12 +184,10 @@ class ModalCondicao {
             const span     = document.createElement('span');
             span.className = `arena-condicao arena-condicao-${slug}`;
             
-            // ✅ Tratar duracao_turnos undefined/null como permanente
             const duracao = c.duracao_turnos ?? -1;
             const durStr  = duracao === -1 ? 'permanente' : `${duracao} turno(s)`;
             span.title    = `${c.efeito}\n⏰ Duração: ${durStr}`;
             
-            // ✅ Exibir duração na badge se não permanente
             const durBadge = (duracao && duracao !== -1)
                 ? `<span class="condicao-duracao">⏱️${duracao}</span>`
                 : '';
@@ -199,17 +195,27 @@ class ModalCondicao {
             span.innerHTML = `
                 ${c.nome}
                 ${durBadge}
-                <button class="btn-remover-condicao" title="Remover ${c.nome}" data-id="${c.id}">✕</button>
+                <button class="btn-remover-condicao" title="Remover ${c.nome}" data-condicao-id="${c.condicao_id}" data-combatente-id="${combatenteId}">✕</button>
             `;
-            span.querySelector('.btn-remover-condicao').addEventListener('click', (e) => {
-                e.stopPropagation();
-                onRemover(combatenteId, c.id);
-            });
+            
+            // ✅ NOVO: Adicionar event listener ao botão de remover
+            const btnRemover = span.querySelector('.btn-remover-condicao');
+            if (btnRemover) {
+                btnRemover.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log(`🗑️ Removendo condição #${c.condicao_id} do combatente #${combatenteId}`);
+                    if (typeof onRemover === 'function') {
+                        onRemover(combatenteId, c.condicao_id);
+                    } else {
+                        console.error('❌ onRemover não é uma função!');
+                    }
+                });
+            }
+            
             container.appendChild(span);
         });
     }
 
-    // ✅ REFATORADO: badges na ordem de iniciativa com duração
     renderizarBadgesOrdem(cardEl, condicoes) {
         const wrapper = cardEl.querySelector('.badges-condicao-ordem-wrapper');
         if (!wrapper) return;
@@ -298,6 +304,6 @@ class ModalCondicao {
         const durEl  = document.getElementById('input-duracao');
         if (select)  select.value        = '';
         if (descEl) { descEl.textContent = ''; descEl.style.display = 'none'; }
-        if (durEl)   durEl.value         = '-1';  // ✅ Reset duração para permanente
+        if (durEl)   durEl.value         = '-1';
     }
 }

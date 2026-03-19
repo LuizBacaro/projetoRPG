@@ -176,7 +176,9 @@
     </div>
 </div>
 
-<!-- MODAL — Cadastro de Monstro -->
+<!--  -->
+<!-- MODAL — Cadastro de Monstro                                     -->
+<!--  -->
 <div id="modalCadastroMonstro" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
@@ -207,7 +209,6 @@
                     <input type="text" name="raca" placeholder="Ex: Goblinoide, Morto-Vivo" />
                 </div>
 
-                <!-- ✅ NOVO: Página de Referência -->
                 <div class="dash-form-group">
                     <label>📖 Página de Referência</label>
                     <input type="text"
@@ -383,7 +384,7 @@
                     <input type="text" id="dashEditRaca" name="raca" placeholder="Ex: Elfo, Humano, Anão" />
                 </div>
 
-                <!-- ✅ NOVO: Página de Referência — visível apenas para monstros -->
+                <!-- Página de Referência — visível apenas para monstros -->
                 <div class="dash-form-group" id="secaoPaginaReferencia" style="display:none">
                     <label>📖 Página de Referência</label>
                     <input type="text"
@@ -490,7 +491,7 @@
                     </div>
                 </div>
 
-                <!-- ══ ATAQUES — só visível para Jogador ══ -->
+                <!-- Ataques — só visível para Jogador -->
                 <div id="secaoAtaquesEdicao" style="display:none">
                     <p class="dash-section-label" style="margin-top:1rem">⚔️ Ataques</p>
                     <div style="display:grid;
@@ -511,9 +512,8 @@
                         + Adicionar Ataque
                     </button>
                 </div>
-                
 
-                <!-- ══ AÇÕES (Perícias + Salvar + Cancelar) ══ -->
+                <!-- Ações (Perícias + Salvar + Deletar + Cancelar) -->
                 <div class="dash-modal-actions" style="margin-top: 1.5rem; gap: 0.75rem; flex-wrap: wrap;">
                     <button 
                         type="button" 
@@ -546,38 +546,27 @@
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- Scripts — ordem sequencial obrigatória                          -->
-<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  -->
+<!-- SCRIPTS — Padrão Unificado ES Modules + Global Scripts        -->
+<!--  -->
+
+<!-- FASE 1: API Config + Toast (ES Module) -->
 <script type="module">
     import { getApiUrl } from '/js/config/api.config.js';
-    import { Toast     } from '/js/ui/toast.module.js';
-    window.getApiUrl = getApiUrl;
-
-    const carregar = (src) => new Promise((resolve, reject) => {
-        const s  = document.createElement('script');
-        s.src    = src;
-        s.onload = resolve;
-        s.onerror = () => reject(new Error('Falha ao carregar: ' + src));
-        document.body.appendChild(s);
-    });
-
-    await carregar('/js/services/AuthService.js');
-    AuthService.exigirLogin();
-
-    const nomeEl   = document.getElementById('nomeUsuario');
-    const badgeEl  = document.getElementById('badgePerfil');
-    const logoutEl = document.getElementById('btnLogout');
-    if (nomeEl)   nomeEl.textContent  = AuthService.getNome();
-    if (badgeEl)  badgeEl.textContent = AuthService.getPerfil();
-    if (logoutEl) logoutEl.addEventListener('click', () => AuthService.logout());
-    AuthService.configurarVisibilidadeAdmin('linkAdmin');
-
-    await carregar('/js/services/AtaqueService.js');
+    import { Toast }     from '/js/ui/toast.module.js';
     
-    // ✅ ADICIONE ESTA LINHA — Carregar DashboardController
-    await carregar('/js/controllers/DashboardController.js');
+    window.getApiUrl = getApiUrl;
+    window.Toast = Toast;
 </script>
+
+<!-- FASE 2: AuthService (Script Global - carregado ANTES de tudo) -->
+<script src="/js/services/AuthService.js"></script>
+
+<!-- FASE 3: Serviços de Negócio -->
+<script src="/js/services/AtaqueService.js"></script>
+
+<!-- FASE 4: Controllers (ES Module) -->
+<script type="module" src="/js/controllers/DashboardController.js"></script>
 
 </body>
 </html>
