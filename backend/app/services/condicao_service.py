@@ -111,38 +111,41 @@ class CondicaoService:
         Decrementa a duração de TODAS as condições ativas de um combatente em 1 turno.
         Remove automaticamente condições que expirarem (duracao_turnos = 0).
         
-        Chamado em ArenaController.avancarTurno() quando turno passa para outro combatente.
-        
-        Retorna: Dict com combatente_id e condicoes atualizadas
+        ✅ Trata valores NULL/undefined como permanentes (-1)
         """
         self._validar_combatente(combatente_id)
 
-        # Obter condições atuais
         condicoes_ativas = self.condicao_repo.get_condicoes_do_combatente(combatente_id)
         
-        # Iterar e decrementar — remover se expirou
         for condicao in condicoes_ativas:
-            if condicao.get('duracao_turnos', -1) == -1:
-                # Permanente — não decrementa
+            duracao = condicao.get('duracao_turnos')
+            
+            # ✅ Tratar NULL como permanente
+            if duracao is None:
+                duracao = -1
+            
+            # Se permanente (-1), não decrementa
+            if duracao == -1:
                 continue
             
             # Decrementar
-            nova_duracao = condicao.get('duracao_turnos', 0) - 1
+            nova_duracao = duracao - 1
             
             if nova_duracao <= 0:
                 # Expirou — remover
                 self.condicao_repo.remover(
                     combatente_id,
-                    condicao.get('condicao_id') or condicao.get('id')
+                    condicao.get('condicao_id')
                 )
                 print(f"⏰ Condição '{condicao.get('nome')}' expirou para combatente {combatente_id}")
             else:
                 # Atualizar duração
                 self.condicao_repo.atualizar_duracao(
                     combatente_id,
-                    condicao.get('condicao_id') or condicao.get('id'),
+                    condicao.get('condicao_id'),
                     nova_duracao
                 )
+                print(f"⏰ Condição '{condicao.get('nome')}' decrementada: {nova_duracao} turno(s)")
 
         # Retornar estado atualizado
         condicoes = self.condicao_repo.get_condicoes_do_combatente(combatente_id)

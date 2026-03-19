@@ -1,7 +1,8 @@
 /**
  * ModalCondicao
  * Classe global (sem export) — carregada via <script> no index.html
- * SOLID: SRP - gerencia UI do modal de condição com lista de combatentes
+ * SOLID: SRP - gerencia UI do modal de condição
+ * ✅ Trata duracao_turnos undefined/null como permanente
  */
 class ModalCondicao {
     constructor(condicaoService, arenaController) {
@@ -54,7 +55,7 @@ class ModalCondicao {
                                 </div>
                                 <div id="condicao-descricao" class="condicao-descricao-preview" style="display:none;"></div>
                                 
-                                <!-- ✅ NOVO: Campo de duração -->
+                                <!-- ✅ NOVO: Campo de duração com hint -->
                                 <div class="campo-grupo">
                                     <label for="input-duracao" class="modal-label">⏰ Duração (turnos):</label>
                                     <div class="duracao-input-wrapper">
@@ -123,9 +124,10 @@ class ModalCondicao {
         }
     }
 
+    // ✅ REFATORADO: aplicar com duração
     async aplicar() {
         const condicaoId       = Number(document.getElementById('select-condicao')?.value);
-        const durationTurnos   = Number(document.getElementById('input-duracao')?.value ?? -1);  // ✅ NOVO
+        const durationTurnos   = Number(document.getElementById('input-duracao')?.value ?? -1);
 
         if (this.combatentesSelecionados.size === 0) {
             if (typeof Toast !== 'undefined') Toast.error('⚠️ Selecione pelo menos um combatente');
@@ -145,7 +147,6 @@ class ModalCondicao {
                 this.condicaoService.aplicar(cid, condicaoId, durationTurnos)
             ));
 
-            // ✅ Toast com duração info
             const durStr = durationTurnos === -1 ? 'permanente' : `${durationTurnos} turno(s)`;
             if (typeof Toast !== 'undefined') {
                 Toast.success(`🔮 "${condicao?.nome}" (${durStr}) aplicada a ${ids.length} combatente(s)`);
@@ -167,33 +168,35 @@ class ModalCondicao {
         }
     }
 
+    // ✅ REFATORADO: renderizar com tratamento de undefined
     renderizarCondicoesAtivas(condicoes, combatenteId, onRemover) {
         const container = document.querySelector('.arena-condicoes-lista');
         if (!container) return;
 
         container.innerHTML = '';
 
-        if (!condicoes.length) {
+        if (!condicoes || condicoes.length === 0) {
             container.innerHTML = '<span class="arena-condicao-vazia">Nenhuma condição ativa</span>';
             return;
         }
 
         condicoes.forEach(c => {
-            const slug       = c.nome.toLowerCase()
+            const slug     = c.nome.toLowerCase()
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-');
-            const span       = document.createElement('span');
-            span.className   = `arena-condicao arena-condicao-${slug}`;
+            const span     = document.createElement('span');
+            span.className = `arena-condicao arena-condicao-${slug}`;
             
-            // ✅ Mostrar duração no title
-            const durStr     = c.duracao_turnos === -1 ? 'permanente' : `${c.duracao_turnos} turno(s)`;
-            span.title       = `${c.efeito}\n⏰ Duração: ${durStr}`;
+            // ✅ Tratar duracao_turnos undefined/null como permanente
+            const duracao = c.duracao_turnos ?? -1;
+            const durStr  = duracao === -1 ? 'permanente' : `${duracao} turno(s)`;
+            span.title    = `${c.efeito}\n⏰ Duração: ${durStr}`;
             
             // ✅ Exibir duração na badge se não permanente
-            const durBadge   = c.duracao_turnos !== -1 
-                ? `<span class="condicao-duracao">⏱️${c.duracao_turnos}</span>` 
+            const durBadge = (duracao && duracao !== -1)
+                ? `<span class="condicao-duracao">⏱️${duracao}</span>`
                 : '';
             
-            span.innerHTML   = `
+            span.innerHTML = `
                 ${c.nome}
                 ${durBadge}
                 <button class="btn-remover-condicao" title="Remover ${c.nome}" data-id="${c.id}">✕</button>
@@ -206,35 +209,37 @@ class ModalCondicao {
         });
     }
 
+    // ✅ REFATORADO: badges na ordem de iniciativa com duração
     renderizarBadgesOrdem(cardEl, condicoes) {
         const wrapper = cardEl.querySelector('.badges-condicao-ordem-wrapper');
         if (!wrapper) return;
 
         wrapper.innerHTML = '';
-        if (!condicoes.length) return;
+        if (!condicoes || condicoes.length === 0) return;
 
         condicoes.slice(0, 3).forEach(c => {
-            const badge       = document.createElement('span');
-            badge.className   = 'badge-condicao-ordem';
+            const badge = document.createElement('span');
+            badge.className = 'badge-condicao-ordem';
             
-            // ✅ Mostrar duração na badge se não permanente
-            const durDisplay  = c.duracao_turnos !== -1 
-                ? `⏱️${c.duracao_turnos}` 
+            const duracao = c.duracao_turnos ?? -1;
+            const durDisplay = (duracao && duracao !== -1)
+                ? `⏱️${duracao}`
                 : c.nome.slice(0, 3).toUpperCase();
             
             badge.textContent = durDisplay;
-            badge.title       = `${c.nome}${c.duracao_turnos !== -1 ? ` (${c.duracao_turnos} turno(s))` : ''}`;
+            badge.title = `${c.nome}${(duracao && duracao !== -1) ? ` (${duracao} turno(s))` : ' (permanente)'}`;
             wrapper.appendChild(badge);
         });
 
         const extras = condicoes.length - 3;
         if (extras > 0) {
-            const mais       = document.createElement('span');
-            mais.className   = 'badge-condicao-ordem badge-condicao-mais';
+            const mais = document.createElement('span');
+            mais.className = 'badge-condicao-ordem badge-condicao-mais';
             mais.textContent = `+${extras}`;
-            mais.title       = condicoes.slice(3).map(c => 
-                `${c.nome}${c.duracao_turnos !== -1 ? ` (${c.duracao_turnos} turno(s))` : ''}`
-            ).join(', ');
+            mais.title = condicoes.slice(3).map(c => {
+                const duracao = c.duracao_turnos ?? -1;
+                return `${c.nome}${(duracao && duracao !== -1) ? ` (${duracao} turno(s))` : ' (permanente)'}`;
+            }).join(', ');
             wrapper.appendChild(mais);
         }
     }
@@ -290,7 +295,9 @@ class ModalCondicao {
     _limparDescricao() {
         const select = document.getElementById('select-condicao');
         const descEl = document.getElementById('condicao-descricao');
+        const durEl  = document.getElementById('input-duracao');
         if (select)  select.value        = '';
         if (descEl) { descEl.textContent = ''; descEl.style.display = 'none'; }
+        if (durEl)   durEl.value         = '-1';  // ✅ Reset duração para permanente
     }
 }

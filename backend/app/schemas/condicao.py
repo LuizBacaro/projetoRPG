@@ -1,15 +1,15 @@
 """
-Schemas Pydantic para Condição (DTOs)
-Princípio SOLID: SRP - Apenas validação/serialização de Condição
+Schemas de Condição
+Princípio SOLID: DIP - Define contrato de dados
 """
-from pydantic import BaseModel, Field
-from typing import List
+from pydantic import BaseModel
+from typing import List, Optional
 
 
 class CondicaoResponse(BaseModel):
-    """Schema de resposta para Condição"""
-    id:     int
-    nome:   str
+    """Schema para resposta de catálogo de condições"""
+    id: int
+    nome: str
     efeito: str
 
     class Config:
@@ -17,16 +17,25 @@ class CondicaoResponse(BaseModel):
 
 
 class AplicarCondicaoRequest(BaseModel):
-    """Schema para aplicar condição a um combatente"""
-    condicao_id: int = Field(..., gt=0)
+    """
+    ✅ Schema para aplicar condição com duração opcional
+    """
+    condicao_id: int
+    duracao_turnos: Optional[int] = -1  # ✅ NOVO: default permanente (-1)
 
 
 class RemoverCondicaoRequest(BaseModel):
-    """Schema para remover condição de um combatente"""
-    condicao_id: int = Field(..., gt=0)
+    """Schema para remover condição"""
+    condicao_id: int
 
 
 class CondicaoAtivaResponse(BaseModel):
-    """Schema de resposta de condição ativa em um combatente"""
+    """
+    ✅ Schema para condições ativas de um combatente
+    Inclui duracao_turnos
+    """
     combatente_id: int
-    condicoes:     List[CondicaoResponse]
+    condicoes: List[dict]  # Inclui {id, condicao_id, nome, efeito, duracao_turnos}
+
+    class Config:
+        from_attributes = True

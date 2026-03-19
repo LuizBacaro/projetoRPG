@@ -448,14 +448,21 @@ export class ArenaController {
         }
 
         var ataquesHTML = this._renderizarAtaques(c.ataques || []);
-        var magiasHTML  = (c._magiasGrupos && Object.keys(c._magiasGrupos).length > 0)
-            ? this._renderizarMagiasPreparadas(c._magiasGrupos, c.id)
-            : this._renderizarMagias(c.magias_slots || [], c.tipo);
+        
+        // ✅ NOVO: Verificar se tem magias antes de renderizar
+        var temMagias = (c._magiasGrupos && Object.keys(c._magiasGrupos).length > 0) ||
+                        (c.magias_slots && c.magias_slots.length > 0 && 
+                        c.magias_slots.some(function(s) { return s.total > 0; }));
+        
+        var magiasHTML = temMagias
+            ? ((c._magiasGrupos && Object.keys(c._magiasGrupos).length > 0)
+                ? this._renderizarMagiasPreparadas(c._magiasGrupos, c.id)
+                : this._renderizarMagias(c.magias_slots || [], c.tipo))
+            : '';  // ✅ String vazia se não tem magias com slots > 0
 
-        // ✅ badge de página de referência — só para monstros com página definida
         var refBadge = (c.tipo === 'monstro' && c.pagina_referencia)
             ? ' <span class="arena-badge-referencia" title="Referência do livro">📖 '
-              + c.pagina_referencia + '</span>'
+            + c.pagina_referencia + '</span>'
             : '';
 
         var html = '';
@@ -465,27 +472,27 @@ export class ArenaController {
         html += '<div class="arena-header">';
         html += '<div class="arena-header-nome">';
         html += '<h2 class="arena-nome">' + c.nome
-              + ' <span class="arena-nivel">(' + nivel + '° nivel)</span></h2>';
+            + ' <span class="arena-nivel">(' + nivel + '° nivel)</span></h2>';
         html += '<span class="arena-raca-classe">'
-              + (raca ? raca + ' / ' : '') + classe
-              + ' <span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span>'
-              + refBadge   // ✅ badge inline após o tipo
-              + '</span>';
+            + (raca ? raca + ' / ' : '') + classe
+            + ' <span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span>'
+            + refBadge
+            + '</span>';
         html += '</div>';
         html += '<div class="arena-header-acoes">';
         html += '<div class="arena-cronometro-inline">';
         html += '<span class="arena-cronometro-display '
-              + (cronAtivo ? 'cronometro-ativo' : 'cronometro-pausado')
-              + '" id="cronometroDisplay">' + tempoAtual + '</span>';
+            + (cronAtivo ? 'cronometro-ativo' : 'cronometro-pausado')
+            + '" id="cronometroDisplay">' + tempoAtual + '</span>';
         html += '<button id="btnToggleCronometro" class="btn-cronometro '
-              + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar')
-              + '" onclick="window._toggleCronometro()">'
-              + (cronAtivo ? '⏸' : '▶') + '</button>';
+            + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar')
+            + '" onclick="window._toggleCronometro()">'
+            + (cronAtivo ? '⏸' : '▶') + '</button>';
         html += '<button class="btn-cronometro btn-cronometro-reset"'
-              + ' onclick="window._resetarCronometro()">↺</button>';
+            + ' onclick="window._resetarCronometro()">↺</button>';
         html += '</div>';
         html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">'
-              + olhoTxt + '</button>';
+            + olhoTxt + '</button>';
         html += '</div></div>';
 
         // ── Layout principal ──
@@ -502,23 +509,23 @@ export class ArenaController {
         html += '<h3 class="arena-secao-titulo">Resistencias</h3>';
         html += '<div class="arena-resistencias-grid">';
         html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Fort</span>'
-              + '<span class="arena-atributo-valor">' + sinal(fort) + '</span></div>';
+            + '<span class="arena-atributo-valor">' + sinal(fort) + '</span></div>';
         html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Reflex</span>'
-              + '<span class="arena-atributo-valor">' + sinal(reflex) + '</span></div>';
+            + '<span class="arena-atributo-valor">' + sinal(reflex) + '</span></div>';
         html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Vont</span>'
-              + '<span class="arena-atributo-valor">' + sinal(vont) + '</span></div>';
+            + '<span class="arena-atributo-valor">' + sinal(vont) + '</span></div>';
         html += '</div></div>';
         html += '<div class="arena-secao arena-secao-condicoes">';
         html += '<h3 class="arena-secao-titulo">Condicoes</h3>';
         html += '<div class="arena-condicoes-lista">'
-              + '<span class="arena-condicao-vazia">Nenhuma condicao ativa</span></div>';
+            + '<span class="arena-condicao-vazia">Nenhuma condição ativa</span></div>';
         html += '</div>';
         html += '</div></div>';
 
         // Coluna central
         html += '<div class="arena-coluna-central">';
         html += ataquesHTML;
-        html += magiasHTML;
+        html += magiasHTML;  // ✅ Será vazio se não tem magias
         html += '</div>';
 
         // Coluna direita
@@ -527,25 +534,25 @@ export class ArenaController {
         html += '<div class="arena-ca-principal">';
         html += '<span class="arena-defesa-label">CA</span>';
         html += '<span class="arena-ca-valor ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
-              + caValor + '</span>';
+            + caValor + '</span>';
         html += '</div>';
         html += '<div class="arena-defesa-secundaria">';
         html += '<div class="arena-defesa-item"><span class="arena-defesa-label-sm">Surpresa</span>'
-              + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
-              + sValor + '</span></div>';
+            + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
+            + sValor + '</span></div>';
         html += '<div class="arena-defesa-item"><span class="arena-defesa-label-sm">Toque</span>'
-              + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
-              + tValor + '</span></div>';
+            + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
+            + tValor + '</span></div>';
         html += '</div></div>';
         html += '<div class="arena-pv-box">';
         html += '<span class="arena-defesa-label">PV</span>';
         html += '<span class="arena-pv-valor ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
-              + pvValor + '</span>';
+            + pvValor + '</span>';
         html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:'
-              + hpPct + '%;background:' + hpCor + ';"></div></div>';
+            + hpPct + '%;background:' + hpCor + ';"></div></div>';
         html += '</div>';
         html += '<button class="arena-btn-proximo" onclick="window._avancarTurno()">'
-              + 'Encerrar turno</button>';
+            + 'Encerrar turno</button>';
         html += '</div>';  // fim coluna-direita
         html += '</div>';  // fim layout-principal
         html += '</div>';  // fim arena-card
@@ -570,6 +577,79 @@ export class ArenaController {
 
         this._configurarEventosMagias(container);
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
+    }
+
+    // ✅ NOVO: Método para decrementar duração das condições
+    async _decrementarDuracaoCondicoes(combatenteId) {
+        try {
+            console.log(`⏰ Decrementando duração de condições para combatente #${combatenteId}...`);
+            
+            const url = window.getApiUrl(`/condicoes/combatentes/${combatenteId}/avancar-turno`);
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                console.warn('⚠️ Token não encontrado');
+                return;
+            }
+
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (!res.ok) {
+                console.warn(`⚠️ Erro ao decrementar duração: HTTP ${res.status}`);
+                const errMsg = await res.text();
+                console.warn('   Resposta:', errMsg);
+                return;
+            }
+            
+            const data = await res.json();
+            console.log(`✅ Duração decrementada. Condições ativas: ${data.condicoes?.length || 0}`);
+            
+            // Recarregar condições no combatente ativo PRÓXIMO
+            if (this.turnoAtual < this.combatentes.length) {
+                const proximoCombatente = this.combatentes[this.turnoAtual];
+                if (proximoCombatente && typeof this.condicaoController !== 'undefined') {
+                    await this.condicaoController.carregarCondicoesDoCombatente(proximoCombatente.id);
+                }
+            }
+            
+        } catch (err) {
+            console.error('❌ Erro ao decrementar duração das condições:', err);
+            // Não quebra o fluxo do jogo — apenas loga o erro
+        }
+    }
+
+    // ✅ REFATORADO: avancarTurno() com decremento de duração
+    avancarTurno() {
+        var idAtual = this.combatentes[this.turnoAtual]
+            ? this.combatentes[this.turnoAtual].id : null;
+        
+        if (idAtual !== null && this._jaAgiram.indexOf(idAtual) === -1) {
+            this._jaAgiram.push(idAtual);
+        }
+        
+        // ✅ NOVO: Decrementar duração das condições do combatente atual ANTES de passar turno
+        if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
+            this._decrementarDuracaoCondicoes(idAtual);
+        }
+        
+        this.turnoAtual++;
+        if (this.turnoAtual >= this.combatentes.length) {
+            this.turnoAtual  = 0;
+            this.rodadaAtual++;
+            this._jaAgiram   = [];
+            this.atualizarRodada();
+            Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
+        }
+        this._resetarCronometro();
+        this._iniciarCronometro();
+        this.renderizarOrdemIniciativa();
+        this.renderizarCombatenteAtivo();
     }
 
     _configurarEventosMagias(container) {
