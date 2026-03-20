@@ -117,13 +117,27 @@ class CondicaoRepository:
         ).delete()
         self.db.commit()
 
-    def atualizar_duracao(self, combatente_id: int, condicao_id: int, nova_duracao: int) -> None:
-        """Atualiza a duração em turnos de uma condição específica"""
-        cc = self.db.query(CombatenteCondicao).filter(
-            CombatenteCondicao.combatente_id == combatente_id,
-            CombatenteCondicao.condicao_id == condicao_id,
-        ).first()
+    def atualizar_duracao(self, combatente_id: int, condicao_id: int, nova_duracao: int) -> bool:
+        """Atualiza a duração em turnos de uma condição específica
+        
+        Returns:
+            True se atualizado, False se condição não encontrada
+        """
+        try:
+            cc = self.db.query(CombatenteCondicao).filter(
+                CombatenteCondicao.combatente_id == combatente_id,
+                CombatenteCondicao.condicao_id == condicao_id,
+            ).first()
 
-        if cc:
-            cc.duracao_turnos = nova_duracao
-            self.db.commit()
+            if cc:
+                cc.duracao_turnos = nova_duracao
+                self.db.commit()
+                logger.info(f"✅ Duração atualizada: combatente #{combatente_id}, condição #{condicao_id} → {nova_duracao}")
+                return True
+            else:
+                logger.warning(f"⚠️ Condição não encontrada: combatente #{combatente_id}, condição #{condicao_id}")
+                return False
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"❌ Erro ao atualizar duração: {str(e)}")
+            raise

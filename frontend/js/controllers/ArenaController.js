@@ -84,16 +84,17 @@ export class ArenaController {
         await Promise.all(promessas);
     }
 
-    avancarTurno() {
+    async avancarTurno() {  // ← Adicionar async
         var idAtual = this.combatentes[this.turnoAtual]
             ? this.combatentes[this.turnoAtual].id : null;
+        
         if (idAtual !== null && this._jaAgiram.indexOf(idAtual) === -1) {
             this._jaAgiram.push(idAtual);
         }
         
-        // ✅ NOVO: Decrementar duração das condições do combatente atual ANTES de passar turno
+        // ✅ Com AWAIT - espera a resposta da API
         if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
-            this._decrementarDuracaoCondicoes(idAtual);
+            await this._decrementarDuracaoCondicoes(idAtual);  // ← CORRIGIDO!
         }
         
         this.turnoAtual++;
@@ -641,7 +642,7 @@ export class ArenaController {
     }
 
     // ✅ REFATORADO: avancarTurno() com decremento de duração
-    avancarTurno() {
+    async avancarTurno() {
         var idAtual = this.combatentes[this.turnoAtual]
             ? this.combatentes[this.turnoAtual].id : null;
         
@@ -651,7 +652,7 @@ export class ArenaController {
         
         // ✅ NOVO: Decrementar duração das condições do combatente atual ANTES de passar turno
         if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
-            this._decrementarDuracaoCondicoes(idAtual);
+            await this._decrementarDuracaoCondicoes(idAtual); 
         }
         
         this.turnoAtual++;
