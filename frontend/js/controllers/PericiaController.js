@@ -7,7 +7,7 @@ import { API_CONFIG, getApiUrl } from '../config/api.config.js';
 import { NotificationService }   from '../services/NotificationService.js';
 import { CombatenteService }     from '../services/CombatenteService.js';
 import { PericiaService }        from '../services/PericiaService.js';
-import { ModalConfirm }          from '../ui/ModalConfirm.js';   // ✅ import centralizado
+//import { ModalConfirm }          from '../ui/ModalConfirm.js';   // ✅ import centralizado
 
 export class PericiaController {
     constructor() {
