@@ -50,33 +50,22 @@ class CondicaoRepository:
 
     # ── Por combatente ──────────────────────────────────────────────────────
 
-    def get_condicoes_do_combatente(self, combatente_id: int) -> List[Dict]:
-        """
-        Retorna condições ativas de um combatente com duração.
-        ✅ Garante que duracao_turnos é sempre um inteiro (default -1)
-        """
-        query = (
-            self.db.query(CombatenteCondicao, Condicao)
-            .join(Condicao, CombatenteCondicao.condicao_id == Condicao.id)
-            .filter(CombatenteCondicao.combatente_id == combatente_id)
-            .all()
-        )
+    def get_condicoes_do_combatente(self, combatente_id: int) -> list:
+        """Retorna condições ativas com duração"""
+        resultado = []
+        registros = self.db.query(CombatenteCondicao, Condicao).join(
+            Condicao, CombatenteCondicao.condicao_id == Condicao.id
+        ).filter(CombatenteCondicao.combatente_id == combatente_id).all()
 
-        result = []
-        for cc, cond in query:
-            # ✅ Garantir que duracao_turnos é sempre um inteiro (nunca None/undefined)
-            duracao = cc.duracao_turnos if cc.duracao_turnos is not None else -1
-
-            result.append({
-                "id": cc.id,
-                "condicao_id": cond.id,
-                "combatente_id": cc.combatente_id,
-                "nome": cond.nome,
-                "efeito": cond.efeito,
-                "duracao_turnos": int(duracao),  # ✅ Force integer type
+        for cc, c in registros:
+            resultado.append({
+                'id': cc.id,
+                'condicao_id': cc.condicao_id,
+                'nome': c.nome,
+                'efeito': c.efeito,
+                'duracao_turnos': cc.duracao_turnos,  # ✅ Certifique-se que está aqui!
             })
-
-        return result
+        return resultado
 
     def aplicar(self, combatente_id: int, condicao_id: int, duracao_turnos: int = -1) -> None:
         """

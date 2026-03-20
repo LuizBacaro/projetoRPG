@@ -111,14 +111,14 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
-    // ✅ NOVO: Método para decrementar duração das condições
-    // ✅ REFATORADO: Melhor debug do decremento
+    // ✅ CORRETO - SEM /v1 (getApiUrl já adiciona)
     async _decrementarDuracaoCondicoes(combatenteId) {
         try {
             console.log(`⏰ Decrementando duração para combatente #${combatenteId}...`);
             
             const baseUrl = typeof window.getApiUrl === 'function'
                 ? window.getApiUrl(`/condicoes/combatentes/${combatenteId}/avancar-turno`)
+                //                   ↑ SEM /v1 aqui!
                 : `http://localhost:8000/api/v1/condicoes/combatentes/${combatenteId}/avancar-turno`;
             
             const token = localStorage.getItem('token');
@@ -148,7 +148,7 @@ export class ArenaController {
             const data = await res.json();
             console.log(`✅ Duração decrementada:`, data.condicoes);
             
-            // Recarregar condições do combatente ATUAL (que acabou de passar turno)
+            // Recarregar condições do combatente atual
             const combatenteAtual = this.combatentes[this.turnoAtual];
             if (combatenteAtual && typeof this.condicaoController !== 'undefined') {
                 await this.condicaoController.carregarCondicoesDoCombatente(combatenteAtual.id);
@@ -157,7 +157,7 @@ export class ArenaController {
         } catch (err) {
             console.error('❌ Erro ao decrementar:', err);
         }
-    }
+    }    
 
     toggleVisibilidadeStats() {
         this.statsVisiveis = !this.statsVisiveis;
@@ -594,51 +594,6 @@ export class ArenaController {
 
         this._configurarEventosMagias(container);
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
-    }
-
-    // ✅ NOVO: Método para decrementar duração das condições
-    async _decrementarDuracaoCondicoes(combatenteId) {
-        try {
-            console.log(`⏰ Decrementando duração de condições para combatente #${combatenteId}...`);
-            
-            const url = window.getApiUrl(`/condicoes/combatentes/${combatenteId}/avancar-turno`);
-            const token = localStorage.getItem('token');
-            
-            if (!token) {
-                console.warn('⚠️ Token não encontrado');
-                return;
-            }
-
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                }
-            });
-            
-            if (!res.ok) {
-                console.warn(`⚠️ Erro ao decrementar duração: HTTP ${res.status}`);
-                const errMsg = await res.text();
-                console.warn('   Resposta:', errMsg);
-                return;
-            }
-            
-            const data = await res.json();
-            console.log(`✅ Duração decrementada. Condições ativas: ${data.condicoes?.length || 0}`);
-            
-            // Recarregar condições no combatente ativo PRÓXIMO
-            if (this.turnoAtual < this.combatentes.length) {
-                const proximoCombatente = this.combatentes[this.turnoAtual];
-                if (proximoCombatente && typeof this.condicaoController !== 'undefined') {
-                    await this.condicaoController.carregarCondicoesDoCombatente(proximoCombatente.id);
-                }
-            }
-            
-        } catch (err) {
-            console.error('❌ Erro ao decrementar duração das condições:', err);
-            // Não quebra o fluxo do jogo — apenas loga o erro
-        }
     }
 
     // ✅ REFATORADO: avancarTurno() com decremento de duração
