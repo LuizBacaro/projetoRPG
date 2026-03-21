@@ -206,16 +206,26 @@ class GrimorioController {
         const busca = document.getElementById('grimorioBusca')?.value.toLowerCase().trim() || '';
 
         this.magiasFiltro = this.magias.filter(m => {
+            // Normaliza o nível
             const matchNivel = this.nivelAtivo === 'todos' || String(m.nivel) === String(this.nivelAtivo);
-            const matchEscola = this.escolaAtiva === 'todas' || (m.escola || '') === this.escolaAtiva;
+            
+            // ✅ CORRIGIDO: Normaliza a escola da magia ANTES de comparar
+            const escolaMagia = this._normalizarEscola(m.escola);
+            const matchEscola = this.escolaAtiva === 'todas' || escolaMagia === this.escolaAtiva;
+            
+            // Filtro de preparadas
             const matchPrep = !this.filtroPrepAtivo || this.preparadas.has(m.id);
+            
+            // Filtro de busca
             const matchBusca = !busca
                 || m.nome.toLowerCase().includes(busca)
-                || (m.escola || '').toLowerCase().includes(busca)
+                || escolaMagia.toLowerCase().includes(busca)
                 || (m.descricao || '').toLowerCase().includes(busca);
+            
             return matchNivel && matchEscola && matchPrep && matchBusca;
         });
 
+        console.log(`🔍 Magias após filtro: ${this.magiasFiltro.length}`);
         this._renderizarLista();
     }
 
@@ -581,29 +591,25 @@ class GrimorioController {
         console.groupEnd();
     }
 
-    /**
-     * Normaliza nomes de escolas para evitar variações
-     * Trans → Transmutação, Evoc → Evocação, etc.
-     * @private
-     * @param {string} escola
-     * @returns {string}
-     */
     _normalizarEscola(escola) {
         if (!escola) return '';
         
         const mapa = {
-            // Abreviaturas
+            // Abreviaturas simples
             'abjur': 'Abjuração',
             'adiv': 'Adivinhação',
             'conj': 'Conjuração',
             'encan': 'Encantamento',
+            'encant': 'Encantamento',
             'evoc': 'Evocação',
             'ilus': 'Ilusão',
             'necr': 'Necromancia',
             'trans': 'Transmutação',
+            'transm': 'Transmutação',
             'univ': 'Universal',
+            'conjur': 'Conjuração',
             
-            // Variações com colchetes e parênteses
+            // Nomes completos
             'conjuração': 'Conjuração',
             'evocação': 'Evocação',
             'ilusão': 'Ilusão',
@@ -615,14 +621,19 @@ class GrimorioController {
             'universal': 'Universal',
         };
         
-        // Remove colchetes, parênteses e caracteres especiais
+        // Limpa: remove colchetes, parênteses, números, quebras de linha e espaços extras
         const limpo = escola
             .toLowerCase()
-            .replace(/[\[\(\])]*/g, '') // Remove colchetes e parênteses
-            .replace(/[^a-záéíóúâêô]/g, '') // Remove caracteres especiais
+            .replace(/[\[\(\]\)\n]/g, '') // Remove colchetes, parênteses e quebras de linha
+            .replace(/[0-9]/g, '') // Remove números
+            .replace(/\s+/g, '') // Remove todos os espaços
             .trim();
         
-        // Retorna a versão normalizada ou a original em título
+        // Debug
+        if (limpo && limpo !== escola.toLowerCase().trim()) {
+            console.log(`🔤 Normalizando: "${escola}" → "${limpo}" → "${mapa[limpo] || 'UNKNOWN'}"`);
+        }
+        
         return mapa[limpo] || escola.charAt(0).toUpperCase() + escola.slice(1);
     }
 
