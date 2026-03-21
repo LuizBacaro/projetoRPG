@@ -92,7 +92,7 @@ class UsuarioController {
     _escapar(str = '') {
         return String(str)
             .replace(/&/g,  '&amp;')
-            .replace(/</g,  '&lt;')
+            .replace(/</g,  '<')
             .replace(/>/g,  '&gt;')
             .replace(/"/g,  '&quot;');
     }
