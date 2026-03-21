@@ -2,7 +2,7 @@
  * MagiaService.js
  * SRP: Comunicação HTTP exclusivamente com /magias
  * SOLID: DIP — injetável via constructor
- * ✅ FIX: Normaliza classe para uppercase para evitar mismatch
+ * ✅ FIX: Busca por classe em MAIÚSCULA + fallback com filtro correto
  */
 
 import { getApiUrl } from '../config/api.config.js';
@@ -10,15 +10,10 @@ import { getApiUrl } from '../config/api.config.js';
 export class MagiaService {
     constructor(token) {
         this.token = token || localStorage.getItem('token');
-        this._cache = new Map(); // Cache por classe normalizada
+        this._cache = new Map();
         console.log('✅ MagiaService inicializado');
     }
 
-    /**
-     * Headers padrão para requisições
-     * @private
-     * @returns {Object}
-     */
     _headers() {
         const h = { 'Content-Type': 'application/json' };
         if (this.token) h['Authorization'] = `Bearer ${this.token}`;
@@ -26,7 +21,7 @@ export class MagiaService {
     }
 
     /**
-     * Normaliza classe para MAIÚSCULA para evitar mismatch com banco
+     * Normaliza classe para MAIÚSCULA (como está no banco)
      * @private
      * @param {string} classe
      * @returns {string}
@@ -37,46 +32,43 @@ export class MagiaService {
 
     /**
      * Busca magias filtradas por classe
-     * Suporta fallback: se a API não filtrar, busca todas e filtra no frontend
-     * @param {string} classe - Ex: 'Mago', 'Clérigo', 'MAGO'
+     * @param {string} classe - Ex: 'Mago', 'Clérigo' (será convertido para MAIÚSCULA)
      * @returns {Promise<Array>}
      */
     async listarPorClasse(classe) {
+        // ✅ NORMALIZA PARA MAIÚSCULA
         const classeNormalizada = this._normalizarClasse(classe);
 
-        // Verifica cache
         if (this._cache.has(classeNormalizada)) {
             console.log(`🔄 Magias de ${classeNormalizada} recuperadas do cache`);
             return this._cache.get(classeNormalizada);
         }
 
         try {
-            // Tenta com filtro na API
+            // Tenta buscar com filtro na API (classe em MAIÚSCULA)
             const url = getApiUrl(`/magias/?classe=${encodeURIComponent(classeNormalizada)}&limit=500`);
             console.log(`📡 Buscando magias de ${classeNormalizada}...`);
             
             const res = await fetch(url, { headers: this._headers() });
             
             if (!res.ok) {
-                // Se falhar, tenta fallback: busca todas e filtra no frontend
-                console.warn(`⚠️ Filtro por classe falhou (HTTP ${res.status}), usando fallback...`);
+                console.warn(`⚠️ Filtro na API falhou (HTTP ${res.status}), usando fallback...`);
                 return await this._listarTodasEFiltrar(classeNormalizada);
             }
 
             const magias = await res.json();
             
-            // Se retornar vazio, tenta fallback
+            // Se a API retornar vazio, usa fallback
             if (!magias || magias.length === 0) {
                 console.warn(`⚠️ API retornou 0 magias, usando fallback...`);
                 return await this._listarTodasEFiltrar(classeNormalizada);
             }
 
             this._cache.set(classeNormalizada, magias);
-            console.log(`✅ ${magias.length} magias de ${classeNormalizada} carregadas`);
+            console.log(`✅ ${magias.length} magias de ${classeNormalizada} carregadas da API`);
             return magias;
         } catch (err) {
             console.error(`❌ Erro ao buscar magias de ${classeNormalizada}:`, err);
-            // Fallback: tenta buscar todas
             try {
                 return await this._listarTodasEFiltrar(classeNormalizada);
             } catch (fallbackErr) {
@@ -103,10 +95,11 @@ export class MagiaService {
             const todasMagias = await res.json();
             console.log(`📖 Total de magias no banco: ${todasMagias.length}`);
             
-            // Filtra por classe normalizada
+            // ✅ FILTRA COMPARANDO EM MAIÚSCULA
             const magiasFiltradas = todasMagias.filter(m => {
                 if (!m.classe) return false;
-                return m.classe.toUpperCase() === classeNormalizada;
+                const classeDoMagia = m.classe.toUpperCase().trim();
+                return classeDoMagia === classeNormalizada.trim();
             });
             
             this._cache.set(classeNormalizada, magiasFiltradas);
