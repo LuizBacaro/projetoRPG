@@ -67,6 +67,9 @@ class DashboardController {
     }
 
     _inicializar() {
+        // ✅ NOVO: Configurar header do usuário
+        window.AuthService.configurarHeaderUsuario();
+
         this._aplicarRestricoesPerfil();
         this._configurarAbas();
         this._configurarFiltros();

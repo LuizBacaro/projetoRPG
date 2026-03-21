@@ -17,12 +17,22 @@
 
 <!-- ── Header ── -->
 <header class="dashboard-header">
-    <h1>⚔️ Arena TTRPG</h1>
-    <div class="header-usuario">
-        <span id="nomeUsuario"></span>
-        <span id="badgePerfil" class="badge-perfil"></span>
-        <a id="linkAdmin" href="/pages/usuarios.html" class="admin-link" style="display:none">👤 Usuários</a>
-        <button class="btn-logout" id="btnLogout">Sair</button>
+    <div class="header-nav">
+        <!-- TÍTULO E DESCRIÇÃO -->
+        <div class="header-titulo">
+            <h1>📊 Dashboard de Combatentes</h1>
+            <p>Gerencie seus personagens, monstros e NPCs</p>
+        </div>
+
+        <!-- USUÁRIO, PERFIL E AÇÕES -->
+        <div class="header-usuario-container">
+            <div class="header-usuario">
+                <span id="nomeUsuario" class="usuario-nome">👤 Carregando...</span>
+                <span id="badgePerfil" class="badge-perfil">...</span>
+                <a id="linkAdmin" href="/pages/usuarios.html" class="admin-link" style="display:none">👤 Usuários</a>
+                <button class="btn-logout" id="btnLogout">Sair</button>
+            </div>
+        </div>
     </div>
 </header>
 

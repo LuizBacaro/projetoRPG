@@ -13,50 +13,226 @@ body {
     padding: 0;
 }
 
-/* ── Header ── */
+/* ────────────────────────────────────────────────────────────── */
+/* HEADER DO DASHBOARD                                           */
+/* ────────────────────────────────────────────────────────────── */
+
 .dashboard-header {
-    background: #1a1a2e;
-    border-bottom: 1px solid #2d2d44;
-    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border-bottom: 4px solid var(--cor-dourada);
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    flex-wrap: wrap;
 }
 
-.dashboard-header h1 {
-    font-size: 1.3rem;
+.header-titulo {
+    flex: 1;
+    min-width: 250px;
+}
+
+.header-titulo h1 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    font-size: 1.8rem;
     margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.header-titulo p {
+    color: #a78bfa;
+    font-size: 0.9rem;
+    margin: 0.3rem 0 0 0;
+    opacity: 0.9;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* CONTAINER DO USUÁRIO                                          */
+/* ────────────────────────────────────────────────────────────── */
+
+.header-usuario-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .header-usuario {
     display: flex;
     align-items: center;
     gap: 1rem;
+    padding: 0.8rem 1.2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
 }
 
-.badge-perfil {
-    padding: .25rem .75rem;
-    border-radius: 999px;
-    font-size: .75rem;
-    font-weight: 600;
-    background: #7c3aed22;
-    color: #a78bfa;
-    border: 1px solid #7c3aed55;
+.usuario-nome {
+    color: var(--cor-dourada);
+    font-weight: bold;
+    font-size: 0.95rem;
+    white-space: nowrap;
 }
+
+/* ────────────────────────────────────────────────────────────── */
+/* BADGE DE PERFIL                                               */
+/* ────────────────────────────────────────────────────────────── */
+
+.badge-perfil {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* CORES POR PERFIL */
+.badge-perfil.administrador {
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    color: #FFD700;
+    border: 1px solid #FFD700;
+}
+
+.badge-perfil.mestre {
+    background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+    color: #FFD700;
+    border: 1px solid #FFD700;
+}
+
+.badge-perfil.jogador {
+    background: linear-gradient(135deg, #4169E1 0%, #1e3a8a 100%);
+    color: #FFD700;
+    border: 1px solid #FFD700;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* LINK ADMIN                                                     */
+/* ────────────────────────────────────────────────────────────── */
+
+.admin-link {
+    color: var(--cor-dourada);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--cor-dourada);
+    transition: all 0.3s;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.admin-link:hover {
+    background: var(--cor-dourada);
+    color: #1a1410;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* BOTÃO LOGOUT                                                   */
+/* ────────────────────────────────────────────────────────────── */
 
 .btn-logout {
     background: none;
-    border: 1px solid #334155;
-    color: #94a3b8;
-    padding: .4rem .9rem;
-    border-radius: .4rem;
-    cursor: pointer;
-    font-size: .85rem;
-    transition: all .2s;
-}
-.btn-logout:hover { 
-    background: #1e293b;
+    border: 2px solid #e2e8f0;
     color: #e2e8f0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.btn-logout:hover {
+    background: #e2e8f0;
+    color: #1a1410;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+.btn-logout:active {
+    transform: scale(0.95);
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* RESPONSIVO - Mobile                                            */
+/* ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 1rem;
+    }
+
+    .header-nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .header-titulo {
+        text-align: center;
+        width: 100%;
+    }
+
+    .header-titulo h1 {
+        font-size: 1.4rem;
+    }
+
+    .header-usuario-container {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .header-usuario {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-header {
+        padding: 0.8rem;
+    }
+
+    .header-titulo h1 {
+        font-size: 1.2rem;
+    }
+
+    .header-titulo p {
+        font-size: 0.8rem;
+    }
+
+    .header-usuario {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .usuario-nome,
+    .admin-link,
+    .btn-logout {
+        font-size: 0.8rem;
+    }
+
+    .badge-perfil {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
 }
 
 /* ── Nav ── */
