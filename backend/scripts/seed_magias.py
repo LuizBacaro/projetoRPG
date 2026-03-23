@@ -1137,7 +1137,7 @@ def seed_magias(db: Session, force: bool = False) -> dict:
         print(f"🗑️  Tabela limpa.")
 
     todas_magias = (
-        MAGIAS_MAGO + MAGIAS_CLERIGO + MAGIAS_DRUIDA +
+        MAGIAS_MAGO + MAGIAS_CLÉRIGO + MAGIAS_DRUIDA +
         MAGIAS_BARDO + MAGIAS_PALADINO + MAGIAS_RANGER
     )
 
