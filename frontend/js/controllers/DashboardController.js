@@ -581,7 +581,7 @@ class DashboardController {
 // Serviço Global de Combatentes
 class CombatenteServiceGlobal {
     _url(path) {
-        return window.getApiUrl('/v1/combatentes' + (path || '')); 
+        return window.getApiUrl('/combatentes' + (path || '')); 
     }
 
     _headers() {
