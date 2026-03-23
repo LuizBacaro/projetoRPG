@@ -237,21 +237,21 @@ MAGIAS_BARDO = [
 
 MAGIAS_CLÉRIGO = [
     # ── Nível 0 ──
-    ("Criar Água",          0, "Clérigo","Conjuração",  "Criação",    "V, S",     "Curto",    "",                         "Instantânea",        "1 ação padrão", "",          "Nenhum",   False, "Cria 2 galões de água pura por nível."),
-    ("Cura Menor",          0, "Clérigo","Conjuração",  "Cura",       "V, S",     "Toque",    "",                         "Instantânea",        "1 ação padrão", "1d8+1/nível","Vontade", False, "Cura 1d8 + 1/nível (máx +5) PV."),
-    ("Detectar Magia",      0, "Clérigo","Adivinhação", "",           "V, S",     "60 pés",   "Cone de 60 pés",           "Concentração 1 min/nível","1 ação padrão","",       "Nenhum",   False, "Detecta feitiços e itens mágicos em 60 pés."),
-    ("Detectar Veneno",     0, "Clérigo","Adivinhação", "",           "V, S",     "Curto",    "",                         "Instantânea",        "1 ação padrão", "",          "Nenhum",   False, "Detecta veneno em criaturas ou objetos."),
-    ("Guia",                0, "Clérigo","Adivinhação", "",           "V, S",     "Toque",    "",                         "1 minuto",           "1 ação padrão", "",          "Vontade",  False, "+1 de competência em um teste de habilidade."),
-    ("Luz",                 0, "Clérigo","Evocação",    "",           "V, M",     "Toque",    "",                         "10 min/nível",       "1 ação padrão", "",          "Nenhum",   False, "Objeto tocado emite luz por 10 min/nível."),
-    ("Orientação",          0, "Clérigo","Adivinhação", "",           "V, S",     "Toque",    "",                         "1 minuto",           "1 ação padrão", "",          "Vontade",  False, "+1 em próximo ataque, save ou teste de habilidade."),
-    ("Resistência",         0, "Clérigo","Abjuração",   "",           "V, S, M",  "Toque",    "",                         "1 minuto",           "1 ação padrão", "",          "Vontade",  False, "+1 em todos os testes de resistência por 1 minuto."),
+    ("Criar Água",          0, "CLÉRIGO","Conjuração",  "Criação",    "V, S",     "Curto",    "",                         "Instantânea",        "1 ação padrão", "",          "Nenhum",   False, "Cria 2 galões de água pura por nível."),
+    ("Cura Menor",          0, "CLÉRIGO","Conjuração",  "Cura",       "V, S",     "Toque",    "",                         "Instantânea",        "1 ação padrão", "1d8+1/nível","Vontade", False, "Cura 1d8 + 1/nível (máx +5) PV."),
+    ("Detectar Magia",      0, "CLÉRIGO","Adivinhação", "",           "V, S",     "60 pés",   "Cone de 60 pés",           "Concentração 1 min/nível","1 ação padrão","",       "Nenhum",   False, "Detecta feitiços e itens mágicos em 60 pés."),
+    ("Detectar Veneno",     0, "CLÉRIGO","Adivinhação", "",           "V, S",     "Curto",    "",                         "Instantânea",        "1 ação padrão", "",          "Nenhum",   False, "Detecta veneno em criaturas ou objetos."),
+    ("Guia",                0, "CLÉRIGO","Adivinhação", "",           "V, S",     "Toque",    "",                         "1 minuto",           "1 ação padrão", "",          "Vontade",  False, "+1 de competência em um teste de habilidade."),
+    ("Luz",                 0, "CLÉRIGO","Evocação",    "",           "V, M",     "Toque",    "",                         "10 min/nível",       "1 ação padrão", "",          "Nenhum",   False, "Objeto tocado emite luz por 10 min/nível."),
+    ("Orientação",          0, "CLÉRIGO","Adivinhação", "",           "V, S",     "Toque",    "",                         "1 minuto",           "1 ação padrão", "",          "Vontade",  False, "+1 em próximo ataque, save ou teste de habilidade."),
+    ("Resistência",         0, "CLÉRIGO","Abjuração",   "",           "V, S, M",  "Toque",    "",                         "1 minuto",           "1 ação padrão", "",          "Vontade",  False, "+1 em todos os testes de resistência por 1 minuto."),
 
     # ── Nível 1 ──
-    ("Abençoar",            1, "Clérigo","Encantamento","Compulsão",  "V, S, DF", "50 pés",   "Burst de 50 pés",          "1 min/nível",        "1 ação padrão", "",          "Nenhum",   False, "+1 em ataques e salvaguardas contra medo para aliados."),
-    ("Cura Leve",           1, "Clérigo","Conjuração",  "Cura",       "V, S",     "Toque",    "",                         "Instantânea",        "1 ação padrão", "1d8+1/nível","Vontade", False, "Cura 1d8 + 1/nível (máx +5) PV."),
-    ("Detectar Mal",        1, "Clérigo","Adivinhação", "",           "V, S, DF", "60 pés",   "Cone de 60 pés",           "Concentração 10 min/nível","1 ação padrão","",      "Nenhum",   False, "Detecta presença, poder e localização do mal."),
-    ("Escudo da Fé",        1, "Clérigo","Abjuração",   "",           "V, S, M",  "Toque",    "",                         "1 min/nível",        "1 ação padrão", "",          "Vontade",  False, "+2 de deflexão à CA (e +1 a cada 6 níveis)."),
-    ("Proteção contra Mal", 1, "Clérigo","Abjuração",   "",           "V, S, DF", "Toque",    "",                         "1 min/nível",        "1 ação padrão", "",          "Vontade",  False, "+2 CA, +2 saves contra criaturas malignas."),
+    ("Abençoar",            1, "CLÉRIGO","Encantamento","Compulsão",  "V, S, DF", "50 pés",   "Burst de 50 pés",          "1 min/nível",        "1 ação padrão", "",          "Nenhum",   False, "+1 em ataques e salvaguardas contra medo para aliados."),
+    ("Cura Leve",           1, "CLÉRIGO","Conjuração",  "Cura",       "V, S",     "Toque",    "",                         "Instantânea",        "1 ação padrão", "1d8+1/nível","Vontade", False, "Cura 1d8 + 1/nível (máx +5) PV."),
+    ("Detectar Mal",        1, "CLÉRIGO","Adivinhação", "",           "V, S, DF", "60 pés",   "Cone de 60 pés",           "Concentração 10 min/nível","1 ação padrão","",      "Nenhum",   False, "Detecta presença, poder e localização do mal."),
+    ("Escudo da Fé",        1, "CLÉRIGO","Abjuração",   "",           "V, S, M",  "Toque",    "",                         "1 min/nível",        "1 ação padrão", "",          "Vontade",  False, "+2 de deflexão à CA (e +1 a cada 6 níveis)."),
+    ("Proteção contra Mal", 1, "CLÉRIGO","Abjuração",   "",           "V, S, DF", "Toque",    "",                         "1 min/nível",        "1 ação padrão", "",          "Vontade",  False, "+2 CA, +2 saves contra criaturas malignas."),
 
     # ── Nível 2 ──
     ('Acalmar Emoções', 2, 'CLÉRIGO', 'Encant', '', 'V,G,FD', 'Médio 30m+3m/niv', '6m raio', 'Conc 1rod/niv (D)', '1 A.P.', '', 'Não', True, 'Acalma criaturas, anula efeitos de emoção'),
@@ -1137,7 +1137,7 @@ def seed_magias(db: Session, force: bool = False) -> dict:
         print(f"🗑️  Tabela limpa.")
 
     todas_magias = (
-        MAGIAS_MAGO + MAGIAS_CLÉRIGO + MAGIAS_DRUIDA +
+        MAGIAS_MAGO + MAGIAS_CLERIGO + MAGIAS_DRUIDA +
         MAGIAS_BARDO + MAGIAS_PALADINO + MAGIAS_RANGER
     )
 
