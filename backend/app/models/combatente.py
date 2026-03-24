@@ -78,6 +78,12 @@ class Combatente(Base):
         lazy="selectin",
         order_by="MagiaPreparada.nivel_slot",
     )
+    equipamentos = relationship(
+        "EquipamentoJogador",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        foreign_keys="EquipamentoJogador.combatente_id"
+    )
 
     # ── Helpers de domínio ──
     def __repr__(self) -> str:

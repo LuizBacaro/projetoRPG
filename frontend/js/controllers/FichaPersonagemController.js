@@ -6,12 +6,14 @@
  */
 
 import { CombatenteService } from '../services/CombatenteService.js';
+import { EquipamentoService } from '../services/EquipamentoService.js';
 import { getApiUrl } from '../config/api.config.js';
 
 export class FichaPersonagemController {
 
     constructor() {
         this.combatenteService = new CombatenteService();
+        this.equipamentoService = new EquipamentoService();
         this.token             = localStorage.getItem('token');
         this.combatente        = null;
 
@@ -48,12 +50,23 @@ export class FichaPersonagemController {
             this.renderizarAtaques();
             this.renderizarSlotsDeMapia();
             await this.carregarRenderizarPericias(parseInt(combatenteId));
+            await this.carregarRenderizarEquipamentos(parseInt(combatenteId));
+
+            // ── Configurar eventos ──
+            this._configurarEventos();
 
             console.log('✅ Ficha carregada com sucesso');
 
         } catch (error) {
             console.error('❌ Erro ao inicializar ficha:', error);
             this.mostrarErro('Erro ao carregar ficha: ' + error.message);
+        }
+    }
+
+    _configurarEventos() {
+        const btnAdicionar = document.getElementById('btnAdicionarEquipamento');
+        if (btnAdicionar) {
+            btnAdicionar.addEventListener('click', () => this.abrirModalEquipamentos());
         }
     }
 
@@ -481,7 +494,273 @@ export class FichaPersonagemController {
         console.error('❌', mensagem);
         const container = document.getElementById('fichaPericiasLista');
         if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
-    }}// ── Inicializar quando DOM estiver pronto ──
+    }
+
+    async carregarRenderizarEquipamentos(combatenteId) {
+        try {
+            const equipamentos = await this.equipamentoService.listarEquipamentosJogador(combatenteId);
+            console.log('✅ Equipamentos carregados:', equipamentos.length);
+            
+            this.renderizarEquipamentos(equipamentos);
+        } catch (error) {
+            console.error('❌ Erro ao carregar equipamentos:', error);
+            this.mostrarErroEquipamentos('Erro ao carregar equipamentos');
+        }
+    }
+
+    renderizarEquipamentos(equipamentos) {
+        const lista = document.getElementById('fichaEquipamentos');
+        if (!lista) return;
+
+        if (!equipamentos || equipamentos.length === 0) {
+            lista.innerHTML = '<span class="ficha-vazio">Nenhum equipamento cadastrado</span>';
+            return;
+        }
+
+        lista.innerHTML = `
+            <div class="ficha-equipamentos-tabela">
+                <div class="ficha-equipamento-header">
+                    <span>Item</span>
+                    <span>Descrição</span>
+                    <span>Pág. Ref</span>
+                    <span>Qtd</span>
+                    <span>Ação</span>
+                </div>
+                <div class="ficha-equipamentos-lista-items">
+                    ${equipamentos.map(eq => `
+                        <div class="ficha-equipamento-linha">
+                            <span class="ficha-equipamento-nome">${eq.nome}</span>
+                            <span class="ficha-equipamento-desc">${eq.descricao || '—'}</span>
+                            <span class="ficha-equipamento-pag">${eq.pagina_referencia || '—'}</span>
+                            <span class="ficha-equipamento-qtd">${eq.quantidade}</span>
+                            <button class="btn-deletar-eq" data-eq-id="${eq.id}" data-eq-nome="${eq.nome}" title="Deletar ${eq.nome}">🗑️</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // Configurar eventos dos botões de deletar
+        const self = this;
+        lista.querySelectorAll('.btn-deletar-eq').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const eqId = e.target.dataset.eqId;
+                const eqNome = e.target.dataset.eqNome;
+                self.deletarEquipamento(eqId, eqNome);
+            });
+        });
+
+        console.log('✅ Equipamentos renderizados:', equipamentos.length);
+    }
+
+    mostrarErroEquipamentos(mensagem) {
+        console.error('❌', mensagem);
+        const container = document.getElementById('fichaEquipamentos');
+        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+    }
+
+    async abrirModalEquipamentos() {
+        try {
+            const modal = document.getElementById('modalEquipamentos');
+            if (!modal) return;
+
+            // Carregar lista de equipamentos disponíveis
+            const equipamentos = await this.equipamentoService.listarEquipamentos(0, 100);
+            console.log('📦 Equipamentos disponíveis:', equipamentos.length);
+
+            // Armazenar para uso no filtro
+            this.equipamentosDisponiveis = equipamentos;
+            
+            // Renderizar lista inicial
+            this.renderizarListaEquipamentos(equipamentos);
+
+            // Mostrar modal
+            modal.style.display = 'flex';
+
+            // Expor para onclick
+            window._fichaController = this;
+
+        } catch (error) {
+            console.error('❌ Erro ao abrir modal:', error);
+            alert('Erro ao carregar equipamentos');
+        }
+    }
+
+    fecharModalEquipamentos() {
+        const modal = document.getElementById('modalEquipamentos');
+        if (modal) modal.style.display = 'none';
+    }
+
+    renderizarListaEquipamentos(equipamentos) {
+        const lista = document.getElementById('equipamentosLista');
+        if (!lista) return;
+
+        if (!equipamentos || equipamentos.length === 0) {
+            lista.innerHTML = '<p class="equipamentos-vazio">Nenhum equipamento encontrado</p>';
+            return;
+        }
+
+        lista.innerHTML = equipamentos.map(eq => `
+            <div class="equipamento-item">
+                <div class="equipamento-info">
+                    <div class="equipamento-nome">${eq.nome}</div>
+                    <div class="equipamento-desc">${eq.descricao || '—'}</div>
+                    <div class="equipamento-pag">${eq.pagina_referencia || '—'}</div>
+                </div>
+                <button class="equipamento-btn-adicionar" 
+                        onclick="window._fichaController.adicionarEquipamentoClic(${eq.id})">
+                    ➕
+                </button>
+            </div>
+        `).join('');
+    }
+
+    filtrarEquipamentos() {
+        const termo = document.getElementById('equipamentosBusca')?.value || '';
+        const filtrados = this.equipamentoService.filtrarPorBusca(
+            this.equipamentosDisponiveis,
+            termo
+        );
+        this.renderizarListaEquipamentos(filtrados);
+    }
+
+    async adicionarEquipamentoClic(equipamentoId) {
+        try {
+            const qntdInput = document.getElementById('equipamentosQuantidade');
+            const quantidade = parseInt(qntdInput?.value || '1');
+
+            if (!this.combatente?.id) {
+                if (window.NotificationService) {
+                    window.NotificationService.erro('❌ ID do combatente não encontrado');
+                }
+                return;
+            }
+
+            // Pegar o nome do equipamento do modal
+            const eqNomeElement = document.querySelector('#conteudoListar .ficha-equipamento-linha:last-child .ficha-equipamento-nome');
+            const nomeEquipamento = eqNomeElement?.textContent || 'Equipamento';
+
+            await this.equipamentoService.adicionarEquipamento(this.combatente.id, {
+                equipamento_id: equipamentoId,
+                quantidade: quantidade
+            });
+
+            console.log('✅ Equipamento adicionado');
+
+            // Recarregar equipamentos
+            await this.carregarRenderizarEquipamentos(this.combatente.id);
+
+            // Resetar quantidade
+            qntdInput.value = '1';
+
+            // Mostrar notificação de sucesso
+            if (window.NotificationService) {
+                window.NotificationService.sucesso(`✅ Equipamento adicionado ao inventário!`);
+            }
+
+        } catch (error) {
+            console.error('❌ Erro ao adicionar equipamento:', error);
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ Erro ao adicionar equipamento');
+            }
+        }
+    }
+
+    async deletarEquipamento(equipamentoId, nomeEquipamento) {
+        try {
+            if (!confirm(`Tem certeza que deseja deletar "${nomeEquipamento}"?`)) {
+                return;
+            }
+
+            if (!this.combatente?.id) {
+                if (window.NotificationService) {
+                    window.NotificationService.erro('❌ ID do combatente não encontrado');
+                }
+                return;
+            }
+
+            await this.equipamentoService.removerEquipamento(this.combatente.id, equipamentoId);
+
+            console.log('✅ Equipamento removido');
+
+            // Recarregar equipamentos
+            await this.carregarRenderizarEquipamentos(this.combatente.id);
+
+            // Mostrar notificação
+            if (window.NotificationService) {
+                window.NotificationService.sucesso(`✅ ${nomeEquipamento} removido!`);
+            }
+
+        } catch (error) {
+            console.error('❌ Erro ao deletar equipamento:', error);
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ Erro ao remover equipamento');
+            }
+        }
+    }
+
+    abrirAbaListar() {
+        document.getElementById('abaListar').classList.add('ativa');
+        document.getElementById('abaCriar').classList.remove('ativa');
+        document.getElementById('conteudoListar').classList.add('ativo');
+        document.getElementById('conteudoCriar').classList.remove('ativo');
+    }
+
+    abrirAbaCriar() {
+        document.getElementById('abaCriar').classList.add('ativa');
+        document.getElementById('abaListar').classList.remove('ativa');
+        document.getElementById('conteudoCriar').classList.add('ativo');
+        document.getElementById('conteudoListar').classList.remove('ativo');
+    }
+
+    async salvarEquipamentoCustomizado() {
+        try {
+            const nome = document.getElementById('criarNome')?.value || '';
+            const descricao = document.getElementById('criarDescricao')?.value || '';
+            const paginaRef = document.getElementById('criarPaginaRef')?.value || '';
+            const quantidade = parseInt(document.getElementById('criarQuantidade')?.value || '1');
+
+            if (!nome.trim()) {
+                alert('⚠️ Nome do equipamento é obrigatório');
+                return;
+            }
+
+            // Criar equipamento via API
+            const novoEquipamento = await this.equipamentoService.criarEquipamento({
+                nome: nome.trim(),
+                descricao: descricao.trim(),
+                pagina_referencia: paginaRef.trim(),
+                ativo: true
+            });
+
+            console.log('✅ Equipamento criado:', novoEquipamento);
+
+            // Adicionar ao combatente
+            await this.equipamentoService.adicionarEquipamento(this.combatente.id, {
+                equipamento_id: novoEquipamento.id,
+                quantidade: quantidade
+            });
+
+            // Recarregar equipamentos
+            await this.carregarRenderizarEquipamentos(this.combatente.id);
+
+            // Limpar formulário
+            document.getElementById('formCriarEquipamento').reset();
+
+            // Voltar para aba de listar
+            this.abrirAbaListar();
+
+            // Notificação
+            if (window.NotificationService) {
+                window.NotificationService.sucesso(`✅ Equipamento "${nome}" criado e adicionado!`);
+            }
+
+        } catch (error) {
+            console.error('❌ Erro ao criar equipamento:', error);
+            alert('Erro ao criar equipamento: ' + error.message);
+        }
+    }
+}// ── Inicializar quando DOM estiver pronto ──
     document.addEventListener('DOMContentLoaded', async () => {
     const controller = new FichaPersonagemController();
     await controller.inicializar();

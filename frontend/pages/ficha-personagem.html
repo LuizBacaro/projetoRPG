@@ -51,7 +51,13 @@
             </div>
 
             <div class="ficha-secao">
-                <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarEquipamento" 
+                            title="Adicionar equipamento">
+                        ➕ Adicionar
+                    </button>
+                </div>
                 <div id="fichaEquipamentos" class="ficha-equipamentos-lista">
                     <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
                 </div>
@@ -276,6 +282,96 @@
             <div class="grimorio-lista" id="grimorioLista"></div>
         </div>
 
+    </div>
+</div>
+
+<!-- ── Modal Equipamentos ── -->
+<div id="modalEquipamentos" class="equipamentos-overlay" style="display: none;">
+    <div class="equipamentos-container">
+        <!-- HEADER -->
+        <div class="equipamentos-header">
+            <div class="equipamentos-header-esquerda">
+                <span class="equipamentos-icone">🎒</span>
+                <div>
+                    <h2 class="equipamentos-titulo">Gerenciar Equipamentos</h2>
+                    <p class="equipamentos-subtitulo">Adicione itens ao seu inventário</p>
+                </div>
+            </div>
+            <button class="equipamentos-fechar" onclick="window._fichaController && window._fichaController.fecharModalEquipamentos()">✕</button>
+        </div>
+
+        <!-- BUSCA E FILTROS -->
+        <div class="equipamentos-controles">
+            <div class="equipamentos-busca-wrapper">
+                <span class="equipamentos-busca-label">🔍 Buscar</span>
+                <input type="text" id="equipamentosBusca" class="equipamentos-busca"
+                       placeholder="Nome do equipamento..."
+                       oninput="window._fichaController && window._fichaController.filtrarEquipamentos()">
+            </div>
+            <div class="equipamentos-quantidade-wrapper">
+                <label class="equipamentos-label">Quantidade:</label>
+                <input type="number" id="equipamentosQuantidade" class="equipamentos-input-qtd" 
+                       value="1" min="1" max="999">
+            </div>
+        </div>
+
+        <!-- ABAS: Listar ou Criar -->
+        <div class="equipamentos-abas">
+            <button class="equipamentos-aba ativa" id="abaListar" 
+                    onclick="window._fichaController && window._fichaController.abrirAbaListar()">
+                📋 Listar Equipamentos
+            </button>
+            <button class="equipamentos-aba" id="abaCriar" 
+                    onclick="window._fichaController && window._fichaController.abrirAbaCriar()">
+                ➕ Criar Novo
+            </button>
+        </div>
+
+        <!-- CONTEÚDO DINÂMICO (LISTAR ou CRIAR) -->
+        <div class="equipamentos-corpo" id="equipamentosCopo">
+            <!-- ABA: LISTAR -->
+            <div id="conteudoListar" class="equipamentos-conteudo ativo">
+                <div class="equipamentos-loading" id="equipamentosLoading" style="display:none">
+                    <span class="equipamentos-loading-icone">📦</span>
+                    <p>Carregando equipamentos...</p>
+                </div>
+                <div class="equipamentos-lista" id="equipamentosLista"></div>
+            </div>
+
+            <!-- ABA: CRIAR -->
+            <div id="conteudoCriar" class="equipamentos-conteudo">
+                <form id="formCriarEquipamento" class="equipamentos-form">
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Nome do Equipamento</label>
+                        <input type="text" id="criarNome" class="equipamentos-form-input" 
+                               placeholder="Ex: Espada de Aço" required>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Descrição</label>
+                        <textarea id="criarDescricao" class="equipamentos-form-input" 
+                                  placeholder="Ex: Uma espada de aço bem forjada" rows="3"></textarea>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Página de Referência (opcional)</label>
+                        <input type="text" id="criarPaginaRef" class="equipamentos-form-input" 
+                               placeholder="Ex: PHB p.124">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Quantidade</label>
+                        <input type="number" id="criarQuantidade" class="equipamentos-form-input" 
+                               value="1" min="1" max="999" required>
+                    </div>
+
+                    <button type="button" class="equipamentos-btn-salvar" 
+                            onclick="window._fichaController && window._fichaController.salvarEquipamentoCustomizado()">
+                        ✅ Salvar e Adicionar
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

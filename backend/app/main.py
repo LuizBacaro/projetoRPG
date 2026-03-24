@@ -12,11 +12,12 @@ import logging
 
 from .core.config import settings
 from .core.database import engine, Base, SessionLocal, get_db
-from .core.init_db import criar_admin_padrao
-from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias, magias_preparadas
+from .core.init_db import criar_admin_padrao, inicializar_equipamentos
+from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias, magias_preparadas, equipamentos
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
 from .models import usuario as usuario_model
+from .models import equipamento as equipamento_model
 from .models import combatente as combatente_model
 from .models import combate as combate_model
 from .models import condicao as condicao_model
@@ -89,6 +90,7 @@ app.include_router(ataques.router, prefix=settings.API_V1_PREFIX)
 app.include_router(pericias.router, prefix=settings.API_V1_PREFIX)
 app.include_router(magias.router, prefix=settings.API_V1_PREFIX)
 app.include_router(magias_preparadas.router, prefix=settings.API_V1_PREFIX)
+app.include_router(equipamentos.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 
@@ -166,7 +168,8 @@ def _inicializar_banco(db) -> None:
     1. Admin (dependência de tudo)
     2. Condições (globais)
     3. Perícias (globais)
-    4. Combatentes (usam condições)
+    4. Equipamentos (globais)
+    5. Combatentes (usam condições)
 
     Args:
         db: Sessão do banco
@@ -180,7 +183,10 @@ def _inicializar_banco(db) -> None:
     # 3. Popular perícias D&D (global, sem dependências)
     _seed_pericias(db)
     
-    # 4. Popular combatentes iniciais (pode usar condições e perícias)
+    # 4. Popular equipamentos D&D (global, sem dependências)
+    inicializar_equipamentos(db)
+    
+    # 5. Popular combatentes iniciais (pode usar condições e perícias)
     _seed_combatentes(db)
 
 
