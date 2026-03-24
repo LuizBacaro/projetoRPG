@@ -288,6 +288,14 @@ body {
     justify-items: center;
 }
 
+/* Layout alternativo: 2 colunas × 3 linhas para resumo */
+.ficha-atributos-circulo-grid-resumo {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    justify-items: center;
+}
+
 .ficha-atributo-circulo {
     display: flex;
     flex-direction: column;
@@ -530,12 +538,13 @@ body {
 
 .ficha-equipamento-header {
     display: grid;
-    grid-template-columns: 2fr 2fr 1fr 0.5fr;
-    gap: 0.25rem;
-    padding: 0.5rem;
+    grid-template-columns: 1.5fr 2fr 1fr 1fr 50px;
+    gap: 0.5rem;
+    padding: 0.7rem;
     background: rgba(92,58,30,0.15);
     border-radius: 4px;
     align-items: center;
+    font-size: 0.75rem;
 }
 
 .ficha-equipamento-header span {
@@ -550,14 +559,14 @@ body {
 .ficha-equipamentos-lista-items {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.3rem;
 }
 
 .ficha-equipamento-linha {
     display: grid;
-    grid-template-columns: 2fr 2fr 1fr 0.5fr;
-    gap: 0.25rem;
-    padding: 0.5rem;
+    grid-template-columns: 1.5fr 2fr 1fr 1fr 50px;
+    gap: 0.5rem;
+    padding: 0.7rem;
     background: rgba(92,58,30,0.06);
     border: 1px solid rgba(92,58,30,0.2);
     border-radius: 4px;
@@ -572,22 +581,28 @@ body {
 .ficha-equipamento-linha span {
     font-size: 0.78rem;
     color: var(--cor-tinta);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ficha-equipamento-nome {
     font-weight: 700;
     color: var(--cor-madeira);
+    min-width: 0;
 }
 
 .ficha-equipamento-desc {
     font-size: 0.73rem;
     color: var(--cor-tinta-suave);
+    min-width: 0;
 }
 
 .ficha-equipamento-pag {
     font-size: 0.7rem;
     color: var(--cor-tinta-suave);
     text-align: center;
+    min-width: 0;
 }
 
 .ficha-equipamento-qtd {
@@ -1281,6 +1296,89 @@ body::before {
     background: transparent;
     border: none;
     cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.4rem;
+    transition: transform 0.15s, opacity 0.15s;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.btn-deletar-eq:hover {
+    transform: scale(1.15);
+    background: rgba(220, 53, 69, 0.15);
+}
+
+.btn-deletar-eq:active {
+    transform: scale(0.95);
+}
+
+/* ── TALENTOS ── */
+
+.ficha-talentos-lista {
+    width: 100%;
+}
+
+.ficha-talentos-tabela {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ficha-talento-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 0.5fr;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: rgba(201, 168, 76, 0.15);
+    border-radius: 4px;
+    font-weight: 700;
+    color: var(--cor-tinta);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--cor-dourada);
+}
+
+.ficha-talento-linha {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 0.5fr;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: rgba(244, 233, 208, 0.3);
+    border-radius: 4px;
+    align-items: center;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+}
+
+.ficha-talento-linha:hover {
+    background: rgba(244, 233, 208, 0.6);
+    border-left-color: var(--cor-dourada);
+}
+
+.ficha-talento-nome {
+    font-weight: 600;
+    color: var(--cor-tinta);
+}
+
+.ficha-talento-desc {
+    color: var(--cor-tinta-suave);
+    font-size: 0.9rem;
+}
+
+.ficha-talento-pag {
+    color: rgba(44, 26, 14, 0.6);
+    font-size: 0.85rem;
+}
+
+.btn-deletar-tal {
+    background: transparent;
+    border: none;
+    cursor: pointer;
     font-size: 1rem;
     padding: 0.3rem 0.6rem;
     transition: transform 0.15s, opacity 0.15s;
@@ -1290,11 +1388,85 @@ body::before {
     justify-content: center;
 }
 
-.btn-deletar-eq:hover {
+.btn-deletar-tal:hover {
     transform: scale(1.2);
     background: rgba(220, 53, 69, 0.1);
 }
 
-.btn-deletar-eq:active {
+.btn-deletar-tal:active {
     transform: scale(0.95);
+}
+
+/* ── MELHORIA: Lista de Talentos em Grid ── */
+
+.equipamentos-lista-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.equipamentos-card {
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.5), rgba(201, 168, 76, 0.1));
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    box-shadow: 0 2px 8px rgba(92, 58, 30, 0.1);
+}
+
+.equipamentos-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(92, 58, 30, 0.15);
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.7), rgba(201, 168, 76, 0.2));
+    border-color: #d4a574;
+}
+
+.equipamentos-card h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-tinta);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.equipamentos-desc {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--cor-tinta-suave);
+    line-height: 1.4;
+}
+
+.equipamentos-pag {
+    margin: 0;
+    font-size: 0.8rem;
+    color: rgba(44, 26, 14, 0.6);
+    font-style: italic;
+}
+
+.equipamentos-btn-adicionar {
+    align-self: flex-start;
+    background: var(--cor-verde);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+}
+
+.equipamentos-btn-adicionar:hover {
+    background: #2a7a3a;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(42, 122, 58, 0.3);
+}
+
+.equipamentos-btn-adicionar:active {
+    transform: scale(0.98);
 }

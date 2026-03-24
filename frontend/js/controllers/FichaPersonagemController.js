@@ -7,6 +7,7 @@
 
 import { CombatenteService } from '../services/CombatenteService.js';
 import { EquipamentoService } from '../services/EquipamentoService.js';
+import { TalentoService } from '../services/TalentoService.js';
 import { getApiUrl } from '../config/api.config.js';
 
 export class FichaPersonagemController {
@@ -14,6 +15,7 @@ export class FichaPersonagemController {
     constructor() {
         this.combatenteService = new CombatenteService();
         this.equipamentoService = new EquipamentoService();
+        this.talentoService = new TalentoService();
         this.token             = localStorage.getItem('token');
         this.combatente        = null;
 
@@ -51,6 +53,7 @@ export class FichaPersonagemController {
             this.renderizarSlotsDeMapia();
             await this.carregarRenderizarPericias(parseInt(combatenteId));
             await this.carregarRenderizarEquipamentos(parseInt(combatenteId));
+            await this.carregarRenderizarTalentos(parseInt(combatenteId));
 
             // ── Configurar eventos ──
             this._configurarEventos();
@@ -64,9 +67,14 @@ export class FichaPersonagemController {
     }
 
     _configurarEventos() {
-        const btnAdicionar = document.getElementById('btnAdicionarEquipamento');
-        if (btnAdicionar) {
-            btnAdicionar.addEventListener('click', () => this.abrirModalEquipamentos());
+        const btnAdicionarEq = document.getElementById('btnAdicionarEquipamento');
+        if (btnAdicionarEq) {
+            btnAdicionarEq.addEventListener('click', () => this.abrirModalEquipamentos());
+        }
+
+        const btnAdicionarTal = document.getElementById('btnAdicionarTalento');
+        if (btnAdicionarTal) {
+            btnAdicionarTal.addEventListener('click', () => this.abrirModalTalentos());
         }
     }
 
@@ -271,10 +279,18 @@ export class FichaPersonagemController {
         Object.entries(map).forEach(([attr, abrev]) => {
             const valor   = this.combatente[attr] || 10;
             const mod     = Math.floor((valor - 10) / 2);
+            
+            // Renderizar na coluna central
             const elValor = document.getElementById(`ficha${abrev}`);
             const elMod   = document.getElementById(`ficha${abrev}Mod`);
             if (elValor) elValor.textContent = valor;
             if (elMod)   elMod.textContent   = mod >= 0 ? `+${mod}` : `${mod}`;
+            
+            // Renderizar na coluna esquerda (resumo)
+            const elValorResumo = document.getElementById(`ficha${abrev}Resumo`);
+            const elModResumo   = document.getElementById(`ficha${abrev}ModResumo`);
+            if (elValorResumo) elValorResumo.textContent = valor;
+            if (elModResumo)   elModResumo.textContent   = mod >= 0 ? `+${mod}` : `${mod}`;
         });
 
         console.log('✅ Atributos renderizados');
@@ -758,6 +774,278 @@ export class FichaPersonagemController {
         } catch (error) {
             console.error('❌ Erro ao criar equipamento:', error);
             alert('Erro ao criar equipamento: ' + error.message);
+        }
+    }
+
+    // ── TALENTOS ──
+
+    async carregarRenderizarTalentos(combatenteId) {
+        try {
+            const talentos = await this.talentoService.listarTalentosJogador(combatenteId);
+            console.log('✅ Talentos carregados:', talentos.length);
+            
+            this.renderizarTalentos(talentos);
+        } catch (error) {
+            console.error('❌ Erro ao carregar talentos:', error);
+            this.mostrarErroTalentos('Erro ao carregar talentos');
+        }
+    }
+
+    renderizarTalentos(talentos) {
+        const lista = document.getElementById('fichaTalentos');
+        if (!lista) return;
+
+        if (!talentos || talentos.length === 0) {
+            lista.innerHTML = '<span class="ficha-vazio">Nenhum talento cadastrado</span>';
+            return;
+        }
+
+        lista.innerHTML = `
+            <div class="ficha-talentos-tabela">
+                <div class="ficha-talento-header">
+                    <span>Talento</span>
+                    <span>Descrição</span>
+                    <span>Pág. Ref</span>
+                    <span>Ação</span>
+                </div>
+                <div class="ficha-talentos-lista-items">
+                    ${talentos.map(tal => `
+                        <div class="ficha-talento-linha">
+                            <span class="ficha-talento-nome">${tal.nome}</span>
+                            <span class="ficha-talento-desc">${tal.descricao || '—'}</span>
+                            <span class="ficha-talento-pag">${tal.pagina_referencia || '—'}</span>
+                            <button class="btn-deletar-tal" data-tal-id="${tal.id}" data-tal-nome="${tal.nome}" title="Deletar ${tal.nome}">🗑️</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // Configurar eventos dos botões de deletar
+        const self = this;
+        lista.querySelectorAll('.btn-deletar-tal').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const talId = e.target.dataset.talId;
+                const talNome = e.target.dataset.talNome;
+                self.deletarTalento(talId, talNome);
+            });
+        });
+
+        console.log('✅ Talentos renderizados:', talentos.length);
+    }
+
+    mostrarErroTalentos(mensagem) {
+        console.error('❌', mensagem);
+        const container = document.getElementById('fichaTalentos');
+        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+    }
+
+    async abrirModalTalentos() {
+        try {
+            const modal = document.getElementById('modalTalentos');
+            if (!modal) {
+                alert('Modal de talentos não encontrado');
+                return;
+            }
+
+            // Carregar lista de talentos disponíveis
+            const talentos = await this.talentoService.listarTalentos(0, 100);
+            console.log('📦 Talentos disponíveis:', talentos.length);
+
+            // Armazenar para uso no filtro
+            this.talentosDisponiveis = talentos;
+            
+            // Renderizar lista inicial
+            this.renderizarListaTalentos(talentos);
+
+            // Mostrar modal
+            modal.style.display = 'flex';
+
+            // Expor para onclick
+            window._fichaController = this;
+
+        } catch (error) {
+            console.error('❌ Erro ao abrir modal:', error);
+            alert('Erro ao carregar talentos: ' + error.message);
+        }
+    }
+
+    renderizarListaTalentos(talentos) {
+        const container = document.getElementById('conteudoListarTalentos');
+        if (!container) return;
+
+        if (!talentos || talentos.length === 0) {
+            container.innerHTML = '<p class="equipamentos-vazio">Nenhum talento disponível</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="equipamentos-lista-grid">
+                ${talentos.map(tal => `
+                    <div class="equipamentos-card">
+                        <h4>${tal.nome}</h4>
+                        <p class="equipamentos-desc">${tal.descricao || '—'}</p>
+                        <p class="equipamentos-pag">📄 ${tal.pagina_referencia || '—'}</p>
+                        <button class="equipamentos-btn-adicionar" 
+                                onclick="window._fichaController && window._fichaController.adicionarTalentoClic(${tal.id})">
+                            ➕ Adicionar
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        console.log('✅ Lista de talentos renderizada:', talentos.length);
+    }
+
+    filtrarTalentos() {
+        const filtro = document.getElementById('equipamentosFiltro')?.value?.toLowerCase() || '';
+        if (!this.talentosDisponiveis) return;
+
+        const filtrados = this.talentosDisponiveis.filter(tal => 
+            tal.nome.toLowerCase().includes(filtro) || 
+            (tal.descricao && tal.descricao.toLowerCase().includes(filtro))
+        );
+
+        this.renderizarListaTalentos(filtrados);
+    }
+
+    async adicionarTalentoClic(talentoId) {
+        try {
+            if (!this.combatente?.id) {
+                if (window.NotificationService) {
+                    window.NotificationService.erro('❌ ID do combatente não encontrado');
+                }
+                return;
+            }
+
+            await this.talentoService.adicionarTalento(this.combatente.id, {
+                talento_id: talentoId
+            });
+
+            console.log('✅ Talento adicionado');
+
+            // Recarregar talentos
+            await this.carregarRenderizarTalentos(this.combatente.id);
+
+            // Mostrar notificação de sucesso
+            if (window.NotificationService) {
+                window.NotificationService.sucesso(`✅ Talento adicionado!`);
+            }
+
+        } catch (error) {
+            console.error('❌ Erro ao adicionar talento:', error);
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ Erro ao adicionar talento');
+            }
+        }
+    }
+
+    async deletarTalento(talentoId, nomeTalento) {
+        try {
+            if (!confirm(`Tem certeza que deseja deletar "${nomeTalento}"?`)) {
+                return;
+            }
+
+            if (!this.combatente?.id) {
+                if (window.NotificationService) {
+                    window.NotificationService.erro('❌ ID do combatente não encontrado');
+                }
+                return;
+            }
+
+            await this.talentoService.removerTalento(this.combatente.id, talentoId);
+
+            console.log('✅ Talento removido');
+
+            // Recarregar talentos
+            await this.carregarRenderizarTalentos(this.combatente.id);
+
+            // Mostrar notificação
+            if (window.NotificationService) {
+                window.NotificationService.sucesso(`✅ ${nomeTalento} removido!`);
+            }
+
+        } catch (error) {
+            console.error('❌ Erro ao deletar talento:', error);
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ Erro ao remover talento');
+            }
+        }
+    }
+
+    fecharModalTalentos() {
+        const modal = document.getElementById('modalTalentos');
+        if (modal) modal.style.display = 'none';
+    }
+
+    abrirAbaListarTalentos() {
+        const abaLista = document.getElementById('abaListarTalentos');
+        const abaCriar = document.getElementById('abaCriarTalento');
+        if (abaLista) abaLista.classList.add('ativa');
+        if (abaCriar) abaCriar.classList.remove('ativa');
+        
+        const conteudoLista = document.getElementById('conteudoListarTalentos');
+        const conteudoCriar = document.getElementById('conteudoCriarTalento');
+        if (conteudoLista) conteudoLista.classList.add('ativo');
+        if (conteudoCriar) conteudoCriar.classList.remove('ativo');
+    }
+
+    abrirAbaCriarTalento() {
+        const abaLista = document.getElementById('abaListarTalentos');
+        const abaCriar = document.getElementById('abaCriarTalento');
+        if (abaCriar) abaCriar.classList.add('ativa');
+        if (abaLista) abaLista.classList.remove('ativa');
+        
+        const conteudoLista = document.getElementById('conteudoListarTalentos');
+        const conteudoCriar = document.getElementById('conteudoCriarTalento');
+        if (conteudoCriar) conteudoCriar.classList.add('ativo');
+        if (conteudoLista) conteudoLista.classList.remove('ativo');
+    }
+
+    async salvarTalentoCustomizado() {
+        try {
+            const nome = document.getElementById('criarNomeTalento')?.value || '';
+            const descricao = document.getElementById('criarDescricaoTalento')?.value || '';
+            const paginaRef = document.getElementById('criarPaginaRefTalento')?.value || '';
+
+            if (!nome.trim()) {
+                alert('⚠️ Nome do talento é obrigatório');
+                return;
+            }
+
+            // Criar talento via API
+            const novoTalento = await this.talentoService.criarTalento({
+                nome: nome.trim(),
+                descricao: descricao.trim(),
+                pagina_referencia: paginaRef.trim(),
+                ativo: true
+            });
+
+            console.log('✅ Talento criado:', novoTalento);
+
+            // Adicionar ao combatente
+            await this.talentoService.adicionarTalento(this.combatente.id, {
+                talento_id: novoTalento.id
+            });
+
+            // Recarregar talentos
+            await this.carregarRenderizarTalentos(this.combatente.id);
+
+            // Limpar formulário
+            document.getElementById('formCriarTalento').reset();
+
+            // Voltar para aba de listar
+            this.abrirAbaListarTalentos();
+
+            // Notificação
+            if (window.NotificationService) {
+                window.NotificationService.sucesso(`✅ Talento "${nome}" criado e adicionado!`);
+            }
+
+        } catch (error) {
+            console.error('❌ Erro ao criar talento:', error);
+            alert('Erro ao criar talento: ' + error.message);
         }
     }
 }// ── Inicializar quando DOM estiver pronto ──

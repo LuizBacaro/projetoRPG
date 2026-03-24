@@ -50,70 +50,61 @@
                 </div>
             </div>
 
-            <div class="ficha-secao">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
-                    <button class="ficha-btn-adicionar" id="btnAdicionarEquipamento" 
-                            title="Adicionar equipamento">
-                        ➕ Adicionar
-                    </button>
-                </div>
-                <div id="fichaEquipamentos" class="ficha-equipamentos-lista">
-                    <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- COLUNA CENTRAL: atributos + defesa + resistências -->
-        <section class="ficha-coluna-central">
-
+            <!-- Atributos resumo (layout 2 colunas × 3 linhas) -->
             <div class="ficha-secao">
                 <h3 class="ficha-secao-titulo">⚔️ Atributos</h3>
-                <div class="ficha-atributos-circulo-grid">
+                <div class="ficha-atributos-circulo-grid-resumo">
                     <div class="ficha-atributo-circulo" data-id="forca">
                         <div class="circulo-externo">
-                            <span class="circulo-valor" id="fichaFor">10</span>
-                            <span class="circulo-mod"   id="fichaForMod">+0</span>
+                            <span class="circulo-valor" id="fichaForResumo">10</span>
+                            <span class="circulo-mod" id="fichaForModResumo">+0</span>
                         </div>
                         <span class="circulo-label">FOR</span>
                     </div>
                     <div class="ficha-atributo-circulo" data-id="destreza">
                         <div class="circulo-externo">
-                            <span class="circulo-valor" id="fichaDes">10</span>
-                            <span class="circulo-mod"   id="fichaDesMod">+0</span>
+                            <span class="circulo-valor" id="fichaDesResumo">10</span>
+                            <span class="circulo-mod" id="fichaDesModResumo">+0</span>
                         </div>
                         <span class="circulo-label">DES</span>
                     </div>
                     <div class="ficha-atributo-circulo" data-id="constituicao">
                         <div class="circulo-externo">
-                            <span class="circulo-valor" id="fichaCon">10</span>
-                            <span class="circulo-mod"   id="fichaConMod">+0</span>
+                            <span class="circulo-valor" id="fichaConResumo">10</span>
+                            <span class="circulo-mod" id="fichaConModResumo">+0</span>
                         </div>
                         <span class="circulo-label">CON</span>
                     </div>
                     <div class="ficha-atributo-circulo" data-id="inteligencia">
                         <div class="circulo-externo">
-                            <span class="circulo-valor" id="fichaInt">10</span>
-                            <span class="circulo-mod"   id="fichaIntMod">+0</span>
+                            <span class="circulo-valor" id="fichaIntResumo">10</span>
+                            <span class="circulo-mod" id="fichaIntModResumo">+0</span>
                         </div>
                         <span class="circulo-label">INT</span>
                     </div>
                     <div class="ficha-atributo-circulo" data-id="sabedoria">
                         <div class="circulo-externo">
-                            <span class="circulo-valor" id="fichaSab">10</span>
-                            <span class="circulo-mod"   id="fichaSabMod">+0</span>
+                            <span class="circulo-valor" id="fichaSabResumo">10</span>
+                            <span class="circulo-mod" id="fichaSabModResumo">+0</span>
                         </div>
                         <span class="circulo-label">SAB</span>
                     </div>
                     <div class="ficha-atributo-circulo" data-id="carisma">
                         <div class="circulo-externo">
-                            <span class="circulo-valor" id="fichaCar">10</span>
-                            <span class="circulo-mod"   id="fichaCarMod">+0</span>
+                            <span class="circulo-valor" id="fichaCarResumo">10</span>
+                            <span class="circulo-mod" id="fichaCarModResumo">+0</span>
                         </div>
                         <span class="circulo-label">CAR</span>
                     </div>
                 </div>
             </div>
+
+            <!-- Equipamentos foram movidos para a coluna central -->
+
+        </aside>
+
+        <!-- COLUNA CENTRAL: atributos + defesa + resistências -->
+        <section class="ficha-coluna-central">
 
             <div class="ficha-defesa-row">
                 <div class="ficha-defesa-box ficha-ca-box">
@@ -160,6 +151,32 @@
                         <span class="ficha-res-label">Vontade</span>
                         <span id="fichaVont" class="ficha-res-valor">+0</span>
                     </div>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">🌟 Talentos</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarTalento" 
+                            title="Adicionar talento">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaTalentos" class="ficha-talentos-lista">
+                    <span class="ficha-vazio">Nenhum talento cadastrado</span>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarEquipamento" 
+                            title="Adicionar equipamento">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaEquipamentos" class="ficha-equipamentos-lista">
+                    <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
                 </div>
             </div>
 
@@ -367,6 +384,85 @@
 
                     <button type="button" class="equipamentos-btn-salvar" 
                             onclick="window._fichaController && window._fichaController.salvarEquipamentoCustomizado()">
+                        ✅ Salvar e Adicionar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Modal Talentos ── -->
+<div id="modalTalentos" class="equipamentos-overlay" style="display: none;">
+    <div class="equipamentos-container">
+        <!-- HEADER -->
+        <div class="equipamentos-header">
+            <div class="equipamentos-header-esquerda">
+                <span class="equipamentos-icone">🌟</span>
+                <div>
+                    <h2 class="equipamentos-titulo">Gerenciar Talentos</h2>
+                    <p class="equipamentos-subtitulo">Adicione novos talentos ao seu personagem</p>
+                </div>
+            </div>
+            <button class="equipamentos-fechar" onclick="window._fichaController && window._fichaController.fecharModalTalentos()">✕</button>
+        </div>
+
+        <!-- BUSCA E FILTROS -->
+        <div class="equipamentos-controles">
+            <div class="equipamentos-busca-wrapper">
+                <span class="equipamentos-busca-label">🔍 Buscar</span>
+                <input type="text" id="talentosBusca" class="equipamentos-busca"
+                       placeholder="Nome do talento..."
+                       oninput="window._fichaController && window._fichaController.filtrarTalentos()">
+            </div>
+        </div>
+
+        <!-- ABAS: Listar ou Criar -->
+        <div class="equipamentos-abas">
+            <button class="equipamentos-aba ativa" id="abaListarTalentos" 
+                    onclick="window._fichaController && window._fichaController.abrirAbaListarTalentos()">
+                📋 Listar Talentos
+            </button>
+            <button class="equipamentos-aba" id="abaCriarTalento" 
+                    onclick="window._fichaController && window._fichaController.abrirAbaCriarTalento()">
+                ➕ Criar Novo
+            </button>
+        </div>
+
+        <!-- CONTEÚDO DINÂMICO (LISTAR ou CRIAR) -->
+        <div class="equipamentos-corpo" id="talentosCopo">
+            <!-- ABA: LISTAR -->
+            <div id="conteudoListarTalentos" class="equipamentos-conteudo ativo">
+                <div class="equipamentos-loading" id="talentosLoading" style="display:none">
+                    <span class="equipamentos-loading-icone">🌟</span>
+                    <p>Carregando talentos...</p>
+                </div>
+                <div class="equipamentos-lista" id="talentosList"></div>
+            </div>
+
+            <!-- ABA: CRIAR -->
+            <div id="conteudoCriarTalento" class="equipamentos-conteudo">
+                <form id="formCriarTalento" class="equipamentos-form">
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Nome do Talento</label>
+                        <input type="text" id="criarNomeTalento" class="equipamentos-form-input" 
+                               placeholder="Ex: Golpe Poderoso" required>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Descrição</label>
+                        <input type="text" id="criarDescricaoTalento" class="equipamentos-form-input" 
+                               placeholder="Descrição do talento...">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Página de Referência</label>
+                        <input type="text" id="criarPaginaRefTalento" class="equipamentos-form-input" 
+                               placeholder="Ex: PHB p.123">
+                    </div>
+
+                    <button type="button" class="equipamentos-btn-salvar" 
+                            onclick="window._fichaController && window._fichaController.salvarTalentoCustomizado()">
                         ✅ Salvar e Adicionar
                     </button>
                 </form>

@@ -158,3 +158,51 @@ def criar_admin_padrao(db: Session) -> None:
         f"   ⚠️  ALTERE A SENHA IMEDIATAMENTE após primeiro acesso\n"
         f"   📍 Acesse: /pages/usuarios.html"
     )
+
+
+def inicializar_talentos(db: Session) -> None:
+    """
+    Popula os talentos padrão de D&D 3.5 se ainda não existirem.
+    
+    Args:
+        db: Sessão do banco de dados
+    """
+    from ..models.talento import Talento
+    from datetime import datetime
+    
+    # Verificar se já existem talentos
+    count = db.query(Talento).count()
+    if count > 0:
+        logger.info(f"✅ Talentos já existem ({count}). Pulando seed.")
+        return
+    
+    TALENTOS_PADRAO = [
+        ("Golpe Poderoso", "Realiza um ataque com + 2 de dano", "PHB p.95"),
+        ("Ataque Especial", "Permite um ataque extra uma vez por dia", "PHB p.95"),
+        ("Arma Focada", "Aumenta bônus com uma arma específica", "PHB p.93"),
+        ("Especialização de Arma", "Aumenta dano com uma arma específica", "PHB p.93"),
+        ("Lidar com Corda", "Bônus em testes com corda", "PHB p.95"),
+        ("Vitalidade Aumentada", "Aumenta pontos de vida", "PHB p.95"),
+        ("Reflexos Rápidos", "Aproveita a iniciativa melhor", "PHB p.95"),
+        ("Golpe Girante", "Ataque contra múltiplos inimigos", "PHB p.95"),
+        ("Salto Acrobático", "Bônus em testes de acrobacia", "PHB p.93"),
+        ("Esquiva Extraordinária", "Evasão melhorada contra ataques", "PHB p.95"),
+        ("Defesa Aprimorada", "Aumenta CA permanentemente", "PHB p.95"),
+        ("Conjuração Rápida", "Reduz tempo de conjuração", "PHB p.95"),
+        ("Magia Silenciosa", "Conjura sem componentes verbais", "PHB p.95"),
+        ("Magia Imóvel", "Conjura sem componentes somáticos", "PHB p.95"),
+        ("Golpe Certeiro", "Bônus para acertar com armas de melee", "PHB p.95"),
+    ]
+    
+    for nome, descricao, pagina_ref in TALENTOS_PADRAO:
+        talento = Talento(
+            nome=nome,
+            descricao=descricao,
+            pagina_referencia=pagina_ref,
+            ativo=True,
+            criado_em=datetime.utcnow()
+        )
+        db.add(talento)
+    
+    db.commit()
+    print(f"✅ {len(TALENTOS_PADRAO)} talentos inseridos com sucesso!")
