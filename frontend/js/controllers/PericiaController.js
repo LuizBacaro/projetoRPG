@@ -59,13 +59,15 @@ export class PericiaController {
                 const data = await response.json();
                 this.periciasSelecionadas.clear();
                 (data.pericias || []).forEach(pj => {
-                    this.periciasSelecionadas.set(pj.pericia_id, {
+                    const dadosPericia = {
                         id:          pj.id,
                         pericia:     pj.pericia,
                         graduacao:   pj.graduacao       || 0,
                         bonus:       pj.bonus_outros    || 0,
                         modAtributo: pj.modificador_atributo || 0,
-                    });
+                    };
+                    console.log(`🎯 Perícia: ${pj.pericia.nome} | Mod: ${dadosPericia.modAtributo} | Grad: ${dadosPericia.graduacao}`);
+                    this.periciasSelecionadas.set(pj.pericia_id, dadosPericia);
                 });
                 console.log('✅ Perícias selecionadas carregadas:', this.periciasSelecionadas.size);
             }
@@ -119,6 +121,9 @@ export class PericiaController {
             if (selecionada) tr.classList.add('selecionada');
 
             const total = dados ? (dados.graduacao + dados.modAtributo + dados.bonus) : 0;
+            
+            // ✅ SEMPRE calcular o modificador para referência (mesmo sem seleção)
+            const modAtributoCalculado = this.calcularModAtributo(pericia);
 
             tr.innerHTML = `
                 <td class="col-checkbox">
@@ -138,7 +143,7 @@ export class PericiaController {
                                value="${dados ? dados.graduacao : 0}"
                                min="0" max="20" ${!selecionada ? 'disabled' : ''}>
                         <input type="number" class="mod-input-inline"
-                               value="${dados ? dados.modAtributo : 0}" readonly>
+                               value="${dados ? dados.modAtributo : modAtributoCalculado}" readonly>
                         <input type="number" class="mod-input-inline input-bonus"
                                data-pericia-id="${pericia.id}"
                                value="${dados ? dados.bonus : 0}"
@@ -173,13 +178,14 @@ export class PericiaController {
 
     togglePericia(pericia, marcada) {
         if (marcada) {
+            const modAtributo = this.calcularModAtributo(pericia);
             this.periciasSelecionadas.set(pericia.id, {
                 pericia,
                 graduacao:   0,
                 bonus:       0,
-                modAtributo: this.calcularModAtributo(pericia),
+                modAtributo: modAtributo,
             });
-            console.log('➕ Perícia adicionada:', pericia.nome);
+            console.log(`➕ Perícia adicionada: ${pericia.nome} | Mod calculado: ${modAtributo}`);
         } else {
             this.periciasSelecionadas.delete(pericia.id);
             console.log('➖ Perícia removida:', pericia.nome);
@@ -193,8 +199,16 @@ export class PericiaController {
             INT: 'inteligencia', SAB: 'sabedoria', CAR: 'carisma',
         };
         const atributoNome = atributoMap[pericia.atributo];
-        if (!atributoNome || !this.combatente[atributoNome]) return 0;
-        return Math.floor((this.combatente[atributoNome] - 10) / 2);
+        const valorAtributo = this.combatente[atributoNome];
+        
+        if (!atributoNome || !valorAtributo) {
+            console.warn(`⚠️ Atributo "${pericia.atributo}" não mapeado ou combatente sem "${atributoNome}"`);
+            return 0;
+        }
+        
+        const modificador = Math.floor((valorAtributo - 10) / 2);
+        console.log(`📊 ${pericia.nome} (${pericia.atributo}) = (${valorAtributo} - 10) / 2 = ${modificador}`);
+        return modificador;
     }
 
     atualizarTotal(tr, dados) {

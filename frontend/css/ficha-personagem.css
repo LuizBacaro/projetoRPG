@@ -478,9 +478,10 @@ body {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem;
     background: rgba(92,58,30,0.15);
     border-radius: 4px;
+    align-items: center;
 }
 .ficha-ataque-header span {
     font-size: 0.65rem;
@@ -493,19 +494,25 @@ body {
 
 .ficha-ataques-lista { display: flex; flex-direction: column; gap: 0.15rem; }
 
-.ficha-ataque-row {
+/* ✅ Suporta tanto ficha-ataque-row quanto ficha-ataque-linha */
+.ficha-ataque-row,
+.ficha-ataque-linha {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 0.25rem;
-    padding: 0.3rem 0.5rem;
+    padding: 0.5rem;
     background: rgba(92,58,30,0.06);
     border: 1px solid rgba(92,58,30,0.2);
     border-radius: 4px;
     transition: background 0.15s;
+    align-items: center;
 }
-.ficha-ataque-row:hover { background: rgba(92,58,30,0.12); }
-.ficha-ataque-row span  { font-size: 0.78rem; color: var(--cor-tinta); }
-.ficha-ataque-row .ataque-nome { font-weight: 700; color: var(--cor-madeira); }
+.ficha-ataque-row:hover,
+.ficha-ataque-linha:hover { background: rgba(92,58,30,0.12); }
+.ficha-ataque-row span,
+.ficha-ataque-linha span { font-size: 0.78rem; color: var(--cor-tinta); }
+.ficha-ataque-row .ataque-nome,
+.ficha-ataque-linha .ficha-ataque-nome { font-weight: 700; color: var(--cor-madeira); }
 
 .ficha-ataque-vazio {
     font-size: 0.75rem;
