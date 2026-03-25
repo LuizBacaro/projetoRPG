@@ -22,12 +22,21 @@ export class MagiaService {
 
     /**
      * Normaliza classe para MAIÚSCULA (como está no banco)
+     * Mapeia Feiticeiro → Mago (mesmas magias)
      * @private
      * @param {string} classe
      * @returns {string}
      */
     _normalizarClasse(classe) {
-        return classe.toUpperCase();
+        let classNorm = classe.toUpperCase().trim();
+        
+        // Mapear Feiticeiro para Mago (mesmas magias)
+        if (classNorm === 'FEITICEIRO') {
+            console.log('📚 Mapeando Feiticeiro → Mago (mesmas magias)');
+            classNorm = 'MAGO';
+        }
+        
+        return classNorm;
     }
 
     /**
