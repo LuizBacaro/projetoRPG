@@ -419,55 +419,83 @@ class GrimorioController {
 
 
     _calcularSlotsDisponiveis() {
-        const nivel = Math.max(1, Math.min(20, this.combatente.nivel || 1));
-        let classeParaTabela = this.classe;
-        
-        // Feiticeiro usa os mesmos slots que Mago
-        if (classeParaTabela === 'Feiticeiro') {
-            classeParaTabela = 'Mago';
-        }
-        
-        const tabelaClasse = TABELA_MAGIAS_DIA[classeParaTabela];
-
-        if (!tabelaClasse) {
-            console.warn('⚠️ Classe sem tabela de slots:', this.classe);
-            this.slotsDisponiveis = {};
-            return;
-        }
-
-        const linhaNivel = tabelaClasse[nivel - 1] || [];
-        const attrChave = ATRIBUTO_CHAVE[this.classe] || 'inteligencia';
-        const valorAttr = this.combatente[attrChave] || 10;
-        const mod = Math.floor((valorAttr - 10) / 2);
-        const bonusAttr = BONUS_ATRIBUTO[Math.max(0, mod)] || [];
-
         this.slotsDisponiveis = {};
+        
+        // Usar dados reais do banco de dados se disponíveis
+        if (this.combatente.magias_slots && this.combatente.magias_slots.length > 0) {
+            console.log('📊 Usando slots do banco de dados:', this.combatente.magias_slots.length);
+            
+            this.combatente.magias_slots.forEach(slot => {
+                const nivelMagia = slot.nivel;
+                
+                const preparadasNivel = [...this.preparadas].filter(magiaId => {
+                    const m = this.magias.find(x => x.id === magiaId);
+                    return m && Number(m.nivel) === Number(nivelMagia);
+                }).length;
 
-        linhaNivel.forEach((base, nivelMagia) => {
-            if (base === null || base === undefined) return;
+                const usadasNivel = [...this.usadas].filter(magiaId => {
+                    const m = this.magias.find(x => x.id === magiaId);
+                    return m && Number(m.nivel) === Number(nivelMagia);
+                }).length;
 
-            const bonus = nivelMagia > 0 ? (bonusAttr[nivelMagia - 1] || 0) : 0;
-            const total = base + bonus;
+                this.slotsDisponiveis[nivelMagia] = {
+                    total: slot.total,
+                    preparadas: preparadasNivel,
+                    usadas: usadasNivel,
+                    disponivel: slot.total - preparadasNivel,
+                };
+            });
+        } else {
+            // Fallback: calcular baseado em tabela se não houver dados no banco
+            console.log('📊 Calculando slots baseado em tabela');
+            
+            const nivel = Math.max(1, Math.min(20, this.combatente.nivel || 1));
+            let classeParaTabela = this.classe;
+            
+            // Feiticeiro usa os mesmos slots que Mago
+            if (classeParaTabela === 'Feiticeiro') {
+                classeParaTabela = 'Mago';
+            }
+            
+            const tabelaClasse = TABELA_MAGIAS_DIA[classeParaTabela];
 
-            const preparadasNivel = [...this.preparadas].filter(magiaId => {
-                const m = this.magias.find(x => x.id === magiaId);
-                return m && Number(m.nivel) === Number(nivelMagia);
-            }).length;
+            if (!tabelaClasse) {
+                console.warn('⚠️ Classe sem tabela de slots:', this.classe);
+                return;
+            }
 
-            const usadasNivel = [...this.usadas].filter(magiaId => {
-                const m = this.magias.find(x => x.id === magiaId);
-                return m && Number(m.nivel) === Number(nivelMagia);
-            }).length;
+            const linhaNivel = tabelaClasse[nivel - 1] || [];
+            const attrChave = ATRIBUTO_CHAVE[this.classe] || 'inteligencia';
+            const valorAttr = this.combatente[attrChave] || 10;
+            const mod = Math.floor((valorAttr - 10) / 2);
+            const bonusAttr = BONUS_ATRIBUTO[Math.max(0, mod)] || [];
 
-            this.slotsDisponiveis[nivelMagia] = {
-                total,
-                preparadas: preparadasNivel,
-                usadas: usadasNivel,
-                disponivel: total - preparadasNivel,
-            };
-        });
+            linhaNivel.forEach((base, nivelMagia) => {
+                if (base === null || base === undefined) return;
 
-        console.log('📊 Slots calculados:', JSON.stringify(this.slotsDisponiveis));
+                const bonus = nivelMagia > 0 ? (bonusAttr[nivelMagia - 1] || 0) : 0;
+                const total = base + bonus;
+
+                const preparadasNivel = [...this.preparadas].filter(magiaId => {
+                    const m = this.magias.find(x => x.id === magiaId);
+                    return m && Number(m.nivel) === Number(nivelMagia);
+                }).length;
+
+                const usadasNivel = [...this.usadas].filter(magiaId => {
+                    const m = this.magias.find(x => x.id === magiaId);
+                    return m && Number(m.nivel) === Number(nivelMagia);
+                }).length;
+
+                this.slotsDisponiveis[nivelMagia] = {
+                    total,
+                    preparadas: preparadasNivel,
+                    usadas: usadasNivel,
+                    disponivel: total - preparadasNivel,
+                };
+            });
+        }
+
+        console.log('📊 Slots disponíveis:', JSON.stringify(this.slotsDisponiveis));
     }
 
     // 
