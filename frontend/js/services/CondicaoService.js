@@ -44,15 +44,18 @@ class CondicaoService {
         }
     }
 
-    async aplicar(combatenteId, condicaoId) {
+    async aplicar(combatenteId, condicaoId, durationTurnos = -1) {
         try {
-            console.log(`📡 POST aplicar condição ${condicaoId} → combatente ${combatenteId}`);
+            console.log(`📡 POST aplicar condição ${condicaoId} → combatente ${combatenteId} (duração: ${durationTurnos})`);
             const res = await fetch(
                 `${this.baseUrl}/condicoes/combatente/${combatenteId}`,
                 {
                     method:  'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ condicao_id: condicaoId }),
+                    body:    JSON.stringify({ 
+                        condicao_id: condicaoId,
+                        duracao_turnos: durationTurnos
+                    }),
                 }
             );
             if (!res.ok) throw new Error(`HTTP ${res.status}: Erro ao aplicar condição`);
