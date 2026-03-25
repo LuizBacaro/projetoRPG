@@ -726,7 +726,6 @@ export class FichaPersonagemController {
             }
         };
         
-        console.log('🔍 Passando opcoes com onConfirmar:', typeof opcoes.onConfirmar);
         window.ModalConfirm.mostrar(opcoes);
     }
 
@@ -1006,7 +1005,6 @@ export class FichaPersonagemController {
             }
         };
 
-        console.log('🔍 Passando opcoes com onConfirmar:', typeof opcoes.onConfirmar);
         window.ModalConfirm.mostrar(opcoes);
     }
 
