@@ -598,7 +598,9 @@ export class FichaPersonagemController {
 
         } catch (error) {
             console.error('❌ Erro ao abrir modal:', error);
-            alert('Erro ao carregar equipamentos');
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ Erro ao carregar equipamentos');
+            }
         }
     }
 
@@ -683,36 +685,49 @@ export class FichaPersonagemController {
     }
 
     async deletarEquipamento(equipamentoId, nomeEquipamento) {
-        try {
-            if (!confirm(`Tem certeza que deseja deletar "${nomeEquipamento}"?`)) {
-                return;
-            }
-
-            if (!this.combatente?.id) {
-                if (window.NotificationService) {
-                    window.NotificationService.erro('❌ ID do combatente não encontrado');
-                }
-                return;
-            }
-
-            await this.equipamentoService.removerEquipamento(this.combatente.id, equipamentoId);
-
-            console.log('✅ Equipamento removido');
-
-            // Recarregar equipamentos
-            await this.carregarRenderizarEquipamentos(this.combatente.id);
-
-            // Mostrar notificação
+        if (!this.combatente?.id) {
             if (window.NotificationService) {
-                window.NotificationService.sucesso(`✅ ${nomeEquipamento} removido!`);
+                window.NotificationService.erro('❌ ID do combatente não encontrado');
             }
-
-        } catch (error) {
-            console.error('❌ Erro ao deletar equipamento:', error);
-            if (window.NotificationService) {
-                window.NotificationService.erro('❌ Erro ao remover equipamento');
-            }
+            return;
         }
+
+        const self = this;
+        console.log('🗑️ deletarEquipamento chamado com ID:', equipamentoId, 'Nome:', nomeEquipamento);
+
+        // Usar ModalConfirm em vez de confirm()
+        const opcoes = {
+            icone: '🗑️',
+            titulo: 'Deletar Equipamento',
+            texto: `Tem certeza que deseja deletar <strong>"${nomeEquipamento}"</strong>?`,
+            textoConfirmar: '🗑️ Deletar',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar: async () => {
+                try {
+                    console.log('🗑️ Deletando equipamento:', equipamentoId, 'do combatente:', self.combatente.id);
+                    await self.equipamentoService.removerEquipamento(self.combatente.id, equipamentoId);
+
+                    console.log('✅ Equipamento removido');
+
+                    // Recarregar equipamentos
+                    await self.carregarRenderizarEquipamentos(self.combatente.id);
+
+                    // Mostrar notificação
+                    if (window.NotificationService) {
+                        window.NotificationService.sucesso(`✅ ${nomeEquipamento} removido!`);
+                    }
+
+                } catch (error) {
+                    console.error('❌ Erro ao deletar equipamento:', error);
+                    if (window.NotificationService) {
+                        window.NotificationService.erro('❌ Erro ao remover equipamento');
+                    }
+                }
+            }
+        };
+        
+        console.log('🔍 Passando opcoes com onConfirmar:', typeof opcoes.onConfirmar);
+        window.ModalConfirm.mostrar(opcoes);
     }
 
     abrirAbaListar() {
@@ -737,7 +752,9 @@ export class FichaPersonagemController {
             const quantidade = parseInt(document.getElementById('criarQuantidade')?.value || '1');
 
             if (!nome.trim()) {
-                alert('⚠️ Nome do equipamento é obrigatório');
+                if (window.NotificationService) {
+                    window.NotificationService.aviso('⚠️ Nome do equipamento é obrigatório');
+                }
                 return;
             }
 
@@ -773,7 +790,9 @@ export class FichaPersonagemController {
 
         } catch (error) {
             console.error('❌ Erro ao criar equipamento:', error);
-            alert('Erro ao criar equipamento: ' + error.message);
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ Erro ao criar equipamento: ' + error.message);
+            }
         }
     }
 
@@ -844,7 +863,9 @@ export class FichaPersonagemController {
         try {
             const modal = document.getElementById('modalTalentos');
             if (!modal) {
-                alert('Modal de talentos não encontrado');
+                if (window.NotificationService) {
+                    window.NotificationService.erro('❌ Modal de talentos não encontrado');
+                }
                 return;
             }
 
@@ -866,7 +887,9 @@ export class FichaPersonagemController {
 
         } catch (error) {
             console.error('❌ Erro ao abrir modal:', error);
-            alert('Erro ao carregar talentos: ' + error.message);
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ Erro ao carregar talentos: ' + error.message);
+            }
         }
     }
 
@@ -942,36 +965,49 @@ export class FichaPersonagemController {
     }
 
     async deletarTalento(talentoId, nomeTalento) {
-        try {
-            if (!confirm(`Tem certeza que deseja deletar "${nomeTalento}"?`)) {
-                return;
-            }
-
-            if (!this.combatente?.id) {
-                if (window.NotificationService) {
-                    window.NotificationService.erro('❌ ID do combatente não encontrado');
-                }
-                return;
-            }
-
-            await this.talentoService.removerTalento(this.combatente.id, talentoId);
-
-            console.log('✅ Talento removido');
-
-            // Recarregar talentos
-            await this.carregarRenderizarTalentos(this.combatente.id);
-
-            // Mostrar notificação
+        if (!this.combatente?.id) {
             if (window.NotificationService) {
-                window.NotificationService.sucesso(`✅ ${nomeTalento} removido!`);
+                window.NotificationService.erro('❌ ID do combatente não encontrado');
             }
-
-        } catch (error) {
-            console.error('❌ Erro ao deletar talento:', error);
-            if (window.NotificationService) {
-                window.NotificationService.erro('❌ Erro ao remover talento');
-            }
+            return;
         }
+
+        const self = this;
+        console.log('🗑️ deletarTalento chamado com ID:', talentoId, 'Nome:', nomeTalento);
+
+        // Usar ModalConfirm em vez de confirm()
+        const opcoes = {
+            icone: '🗑️',
+            titulo: 'Deletar Talento',
+            texto: `Tem certeza que deseja deletar <strong>"${nomeTalento}"</strong>?`,
+            textoConfirmar: '🗑️ Deletar',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar: async () => {
+                try {
+                    console.log('🗑️ Deletando talento:', talentoId, 'do combatente:', self.combatente.id);
+                    await self.talentoService.removerTalento(self.combatente.id, talentoId);
+
+                    console.log('✅ Talento removido');
+
+                    // Recarregar talentos
+                    await self.carregarRenderizarTalentos(self.combatente.id);
+
+                    // Mostrar notificação
+                    if (window.NotificationService) {
+                        window.NotificationService.sucesso(`✅ ${nomeTalento} removido!`);
+                    }
+
+                } catch (error) {
+                    console.error('❌ Erro ao deletar talento:', error);
+                    if (window.NotificationService) {
+                        window.NotificationService.erro('❌ Erro ao remover talento');
+                    }
+                }
+            }
+        };
+
+        console.log('🔍 Passando opcoes com onConfirmar:', typeof opcoes.onConfirmar);
+        window.ModalConfirm.mostrar(opcoes);
     }
 
     fecharModalTalentos() {
@@ -1010,7 +1046,9 @@ export class FichaPersonagemController {
             const paginaRef = document.getElementById('criarPaginaRefTalento')?.value || '';
 
             if (!nome.trim()) {
-                alert('⚠️ Nome do talento é obrigatório');
+                if (window.NotificationService) {
+                    window.NotificationService.aviso('⚠️ Nome do talento é obrigatório');
+                }
                 return;
             }
 
@@ -1045,7 +1083,9 @@ export class FichaPersonagemController {
 
         } catch (error) {
             console.error('❌ Erro ao criar talento:', error);
-            alert('Erro ao criar talento: ' + error.message);
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ Erro ao criar talento: ' + error.message);
+            }
         }
     }
 }// ── Inicializar quando DOM estiver pronto ──
