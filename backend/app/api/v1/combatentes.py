@@ -250,3 +250,16 @@ def deletar_combatente(
         return {"message": "Combatente deletado com sucesso"}
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/{combatente_id}/inicializar-slots", status_code=200)
+def inicializar_slots(
+    combatente_id: int,
+    db: Session = Depends(get_db)
+):
+    """Inicializa slots de magia para um combatente"""
+    service = get_combatente_service(db)
+    try:
+        return service.inicializar_slots_magia(combatente_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)

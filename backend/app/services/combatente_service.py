@@ -8,6 +8,7 @@ from typing import List, Optional, Dict
 from ..repositories.combatente_repository import CombatenteRepository
 from ..services.file_service import FileService
 from ..models.combatente import Combatente
+from ..models.ataque import MagiaSlot
 from ..exceptions.custom_exceptions import (
     CombatenteNaoEncontrado,
     DadosInvalidos,
@@ -161,4 +162,153 @@ class CombatenteService:
             "hp_atual":  combatente.hp_atual,
             "hp_maximo": combatente.hp_maximo,
             "mensagem":  mensagem,
+        }
+
+    def inicializar_slots_magia(self, combatente_id: int) -> Dict:
+        """Inicializa slots de magia para um combatente baseado em sua classe e nível."""
+        combatente = self.obter_por_id(combatente_id)
+        
+        # Mapeamento de classe -> atributo chave para modificador
+        ATRIBUTO_CHAVE = {
+            'Mago': 'inteligencia',
+            'Feiticeiro': 'carisma',
+            'Clérigo': 'sabedoria',
+            'Druida': 'sabedoria',
+            'Bardo': 'carisma',
+            'Paladino': 'sabedoria',
+            'Ranger': 'sabedoria',
+        }
+        
+        # Tabela de slots por classe e nível
+        TABELA_SLOTS = {
+            'Mago': [
+                [3,1,None,None,None,None,None,None,None,None],
+                [4,2,None,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [4,3,2,None,None,None,None,None,None,None],
+                [4,3,2,1,None,None,None,None,None,None],
+                [4,3,3,2,None,None,None,None,None,None],
+                [4,4,3,2,1,None,None,None,None,None],
+                [4,4,3,3,2,None,None,None,None,None],
+                [4,4,4,3,2,1,None,None,None,None],
+                [4,4,4,3,3,2,None,None,None,None],
+                [4,4,4,4,3,2,1,None,None,None],
+                [4,4,4,4,3,3,2,None,None,None],
+                [4,4,4,4,4,3,2,1,None,None],
+                [4,4,4,4,4,3,3,2,None,None],
+                [4,4,4,4,4,4,3,2,1,None],
+                [4,4,4,4,4,4,3,3,2,None],
+                [4,4,4,4,4,4,4,3,2,1],
+                [4,4,4,4,4,4,4,3,3,2],
+                [4,4,4,4,4,4,4,4,3,3],
+                [4,4,4,4,4,4,4,4,4,4],
+            ],
+            'Feiticeiro': [
+                [3,1,None,None,None,None,None,None,None,None],
+                [4,2,None,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [4,3,2,None,None,None,None,None,None,None],
+                [4,3,2,1,None,None,None,None,None,None],
+                [4,3,3,2,None,None,None,None,None,None],
+                [4,4,3,2,1,None,None,None,None,None],
+                [4,4,3,3,2,None,None,None,None,None],
+                [4,4,4,3,2,1,None,None,None,None],
+                [4,4,4,3,3,2,None,None,None,None],
+                [4,4,4,4,3,2,1,None,None,None],
+                [4,4,4,4,3,3,2,None,None,None],
+                [4,4,4,4,4,3,2,1,None,None],
+                [4,4,4,4,4,3,3,2,None,None],
+                [4,4,4,4,4,4,3,2,1,None],
+                [4,4,4,4,4,4,3,3,2,None],
+                [4,4,4,4,4,4,4,3,2,1],
+                [4,4,4,4,4,4,4,3,3,2],
+                [4,4,4,4,4,4,4,4,3,3],
+                [4,4,4,4,4,4,4,4,4,4],
+            ],
+            'Clérigo': [
+                [3,1,None,None,None,None,None,None,None,None],
+                [4,2,None,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [5,3,2,None,None,None,None,None,None,None],
+                [5,3,2,1,None,None,None,None,None,None],
+                [5,3,3,2,None,None,None,None,None,None],
+                [6,4,3,2,1,None,None,None,None,None],
+                [6,4,3,3,2,None,None,None,None,None],
+                [6,4,4,3,2,1,None,None,None,None],
+                [6,4,4,3,3,2,None,None,None,None],
+                [6,5,4,4,3,2,1,None,None,None],
+                [6,5,4,4,3,3,2,None,None,None],
+                [6,5,5,4,4,3,2,1,None,None],
+                [6,5,5,4,4,3,3,2,None,None],
+                [6,5,5,5,4,4,3,2,1,None],
+                [6,5,5,5,4,4,3,3,2,None],
+                [6,5,5,5,5,4,4,3,2,1],
+                [6,5,5,5,5,4,4,3,3,2],
+                [6,5,5,5,5,5,4,4,3,3],
+                [6,5,5,5,5,5,4,4,4,4],
+            ],
+        }
+        
+        classe = combatente.classe
+        tabla = TABELA_SLOTS.get(classe)
+        
+        if not tabla:
+            raise DadosInvalidos(f"Classe {classe} não suporta slots de magia")
+        
+        nivel = min(max(1, combatente.nivel or 1), 20)
+        linha_slots = tabla[nivel - 1]
+        
+        # Obter modificador do atributo chave
+        atributo_chave = ATRIBUTO_CHAVE.get(classe, 'inteligencia')
+        valor_atributo = getattr(combatente, atributo_chave, 10) or 10
+        modificador = (valor_atributo - 10) // 2
+        
+        # Tabela de bônus por modificador
+        BONUS_ATRIBUTO = {
+            -5: [],
+            -4: [],
+            -3: [],
+            -2: [],
+            -1: [],
+            0: [],
+            1: [1],
+            2: [1],
+            3: [1, 1],
+            4: [1, 1],
+            5: [1, 1, 1],
+        }
+        
+        bonus_list = BONUS_ATRIBUTO.get(modificador, [])
+        
+        # Deletar slots existentes
+        for slot in combatente.magias_slots:
+            self.repository.db.delete(slot)
+        
+        # Criar novos slots
+        slots_criados = []
+        for nivel_magia, base in enumerate(linha_slots):
+            if base is None:
+                continue
+            
+            bonus = bonus_list[nivel_magia - 1] if nivel_magia > 0 and nivel_magia - 1 < len(bonus_list) else 0
+            total_slots = base + bonus
+            
+            novo_slot = MagiaSlot(
+                combatente_id=combatente_id,
+                nivel=nivel_magia,
+                total=total_slots,
+                usados=0
+            )
+            self.repository.db.add(novo_slot)
+            slots_criados.append(novo_slot)
+        
+        self.repository.db.commit()
+        self.repository.db.refresh(combatente)
+        
+        return {
+            "id": combatente_id,
+            "classe": classe,
+            "nivel": nivel,
+            "slots_criados": len(slots_criados),
+            "message": f"Slots inicializados para {combatente.nome}"
         }

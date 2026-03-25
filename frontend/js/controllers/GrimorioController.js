@@ -185,6 +185,10 @@ class GrimorioController {
             this._mostrarLoading(true);
             await this._carregarMagias();
             await this._carregarPreparadas();
+            // Inicializar slots se estiverem vazios
+            if (!this.combatente.magias_slots || this.combatente.magias_slots.length === 0) {
+                await this._inicializarSlots();
+            }
             this._calcularSlotsDisponiveis();
             this._carregado = true;
             this._mostrarLoading(false);
@@ -384,9 +388,46 @@ class GrimorioController {
         }
     }
 
+    async _inicializarSlots() {
+        try {
+            const url = getApiUrl(`/combatentes/${this.combatente.id}/inicializar-slots`);
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${this.token}` }
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            console.log(`✅ Slots inicializados: ${data.slots_criados} slots criados`);
+            // Recarregar combatente para atualizar magias_slots
+            await this._recarregarCombatente();
+        } catch (err) {
+            console.error('❌ Erro ao inicializar slots:', err);
+        }
+    }
+
+    async _recarregarCombatente() {
+        try {
+            const url = getApiUrl(`/combatentes/${this.combatente.id}`);
+            const res = await fetch(url, { headers: { 'Authorization': `Bearer ${this.token}` } });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            this.combatente = await res.json();
+            console.log(`✅ Combatente recarregado: ${this.combatente.magias_slots.length} slots`);
+        } catch (err) {
+            console.error('❌ Erro ao recarregar combatente:', err);
+        }
+    }
+
+
     _calcularSlotsDisponiveis() {
         const nivel = Math.max(1, Math.min(20, this.combatente.nivel || 1));
-        const tabelaClasse = TABELA_MAGIAS_DIA[this.classe];
+        let classeParaTabela = this.classe;
+        
+        // Feiticeiro usa os mesmos slots que Mago
+        if (classeParaTabela === 'Feiticeiro') {
+            classeParaTabela = 'Mago';
+        }
+        
+        const tabelaClasse = TABELA_MAGIAS_DIA[classeParaTabela];
 
         if (!tabelaClasse) {
             console.warn('⚠️ Classe sem tabela de slots:', this.classe);
