@@ -169,6 +169,7 @@ def listar_pericias_classe(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.delete("/{pericia_id}", status_code=status.HTTP_204_NO_CONTENT)
 def deletar_pericia(
     pericia_id: int,
     db: Session = Depends(get_db),
