@@ -212,11 +212,12 @@ def adicionar_pericia_jogador(
             )
             
             # Obtém o combatente para validar pontos disponíveis
-            combatente = service.repository.obter_combatente(combatente_id)
+            from app.models.combatente import Combatente
+            combatente = db.query(Combatente).filter(Combatente.id == combatente_id).first()
             if not combatente:
                 raise ValueError(f"Combatente {combatente_id} não encontrado")
             
-            pontos_disponiveis = combatente.pontos_pericia
+            pontos_disponiveis = combatente.pontos
             if custo_total > pontos_disponiveis:
                 raise ValueError(
                     f"Pontos insuficientes. Necessário: {custo_total}, "
