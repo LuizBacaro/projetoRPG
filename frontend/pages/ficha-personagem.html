@@ -479,68 +479,10 @@
     </div>
 </div>
 
-<!-- MODAL: PERÍCIAS -->
-<div id="modalPericias" class="equipamentos-overlay" style="display: none;">
-    <div class="equipamentos-container">
-        <!-- HEADER -->
-        <div class="equipamentos-header">
-            <div class="equipamentos-header-esquerda">
-                <span class="equipamentos-icone">⚡</span>
-                <div>
-                    <h2 class="equipamentos-titulo">Gerenciar Perícias</h2>
-                    <p class="equipamentos-subtitulo">Adicione perícias do personagem</p>
-                </div>
-            </div>
-            <button class="equipamentos-fechar" onclick="window._fichaController && window._fichaController.fecharModalPericias()">✕</button>
-        </div>
-
-        <!-- BUSCA E FILTROS -->
-        <div class="equipamentos-controles">
-            <div class="equipamentos-busca-wrapper">
-                <span class="equipamentos-busca-label">🔍 Buscar</span>
-                <input type="text" id="periciaBusca" class="equipamentos-busca"
-                       placeholder="Nome da perícia..."
-                       oninput="window._fichaController && window._fichaController.filtrarPericias()">
-            </div>
-        </div>
-
-        <!-- INFORMAÇÕES DE CUSTO -->
-        <div class="equipamentos-info" id="periciaInfoCusto" style="background: #f0f0f0; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
-            <p id="periciaTextoClasse" style="margin: 0; font-size: 0.9em;"></p>
-            <p id="periciaTextoDisponível" style="margin: 5px 0 0 0; font-size: 0.9em; font-weight: bold;"></p>
-        </div>
-
-        <!-- CONTEÚDO DINÂMICO - TABELA -->
-        <div class="equipamentos-corpo" style="overflow: auto;">
-            <div class="equipamentos-loading" id="periciaLoading" style="display:none">
-                <span class="equipamentos-loading-icone">⚡</span>
-                <p>Carregando perícias...</p>
-            </div>
-            <table class="tabela-pericias" id="tabelaPericias" style="display: none; min-width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: #f5f5f5; border-bottom: 2px solid #333;">
-                        <th style="padding: 12px; text-align: left; font-weight: bold; border-right: 1px solid #ddd;">Perícia</th>
-                        <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #ddd; width: 60px;">Atr.</th>
-                        <th style="padding: 12px; text-align: center; font-weight: bold; border-right: 1px solid #ddd; width: 70px;">Custo</th>
-                        <th style="padding: 12px; text-align: center; font-weight: bold; width: 150px;">
-                            <div style="display: grid; grid-template-columns: 50px 50px 50px; gap: 5px; text-align: center;">
-                                <div style="font-size: 0.85em;">Grad.</div>
-                                <div style="font-size: 0.85em;">Bôn.</div>
-                                <div style="font-size: 0.85em;">Add</div>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaPericiasBody">
-                    <tr><td colspan="4" style="text-align: center; padding: 20px;">⏳ Carregando perícias...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
-<script type="module" src="../js/controllers/FichaPersonagemController.js?v=4"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=5"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=2"></script>
 </body>
 </html>
