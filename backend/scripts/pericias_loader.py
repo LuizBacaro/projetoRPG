@@ -4,8 +4,17 @@ Responsável por ler e estruturar dados de perícias do arquivo Excel
 """
 
 import openpyxl
+import unicodedata
 from typing import List, Dict, Set
 from pathlib import Path
+
+
+def remover_acentos(texto: str) -> str:
+    """Remove acentuação de um string"""
+    if not texto:
+        return texto
+    nfd = unicodedata.normalize('NFD', texto)
+    return ''.join(char for char in nfd if unicodedata.category(char) != 'Mn')
 
 
 class PericiaExcelLoader:
@@ -15,7 +24,7 @@ class PericiaExcelLoader:
     """
     
     CLASSES_D_D = {
-        'Bárbaro', 'Bardo', 'Clérigo', 'Druida', 'Feiticeiro', 
+        'Barbaro', 'Bardo', 'Clerico', 'Druida', 'Feiticeiro', 
         'Guerreiro', 'Ladino', 'Mago', 'Monge', 'Paladino', 'Ranger'
     }
     
@@ -92,8 +101,10 @@ class PericiaExcelLoader:
         headers['classes_map'] = {}  # {coluna_idx: nome_classe}
         
         for idx, valor in enumerate(row3):
-            if valor and str(valor).strip() in self.CLASSES_D_D:
-                headers['classes_map'][idx] = str(valor).strip()
+            if valor:
+                classe_normalizada = remover_acentos(str(valor).strip())
+                if classe_normalizada in self.CLASSES_D_D:
+                    headers['classes_map'][idx] = classe_normalizada
         
         return headers
     
