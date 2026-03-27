@@ -78,11 +78,6 @@ export class FichaPersonagemController {
         if (btnAdicionarTal) {
             btnAdicionarTal.addEventListener('click', () => this.abrirModalTalentos());
         }
-
-        const btnAdicionarPer = document.getElementById('btnAdicionarPericia');
-        if (btnAdicionarPer) {
-            btnAdicionarPer.addEventListener('click', () => this.abrirModalPericias());
-        }
     }
 
     // ─────────────────────────────────────────────────────────
@@ -1098,6 +1093,28 @@ export class FichaPersonagemController {
     // PERÍCIAS
     // ─────────────────────────────────────────────────────────
 
+
+    abrirPaginaPericias() {
+        if (!this.combatente?.id) {
+            window.NotificationService?.erro('❌ Selecione um combatente primeiro');
+            return;
+        }
+
+        try {
+            const params = new URLSearchParams({
+                combatente_id: this.combatente.id,
+                nome: this.combatente.nome || 'Desconhecido',
+                tipo: this.combatente.tipo || 'jogador',
+                pericias: JSON.stringify(this.combatente.pericias || [])
+            });
+
+            window.location.href = `/pages/pericias.html?${params.toString()}`;
+        } catch (err) {
+            window.NotificationService?.erro('❌ Erro ao abrir perícias');
+            console.error(err);
+        }
+    }
+
     async abrirModalPericias() {
         try {
             console.log('📖 Abrindo modal de perícias...');
@@ -1232,9 +1249,11 @@ export class FichaPersonagemController {
             item.style.display = visivel ? 'flex' : 'none';
         });
     }
-}// ── Inicializar quando DOM estiver pronto ──
-    document.addEventListener('DOMContentLoaded', async () => {
+}
+
+// ── Inicializar quando DOM estiver pronto ──
+document.addEventListener('DOMContentLoaded', async () => {
     const controller = new FichaPersonagemController();
+    window._fichaController = controller;
     await controller.inicializar();
-    }
-);
+});
