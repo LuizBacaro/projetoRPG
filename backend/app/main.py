@@ -183,7 +183,8 @@ def _inicializar_banco(db) -> None:
     _seed_condicoes(db)
     
     # 3. Popular perícias D&D (global, sem dependências)
-    _seed_pericias(db)
+    # ✅ COMENTADO: Perícias já foram populadas via Excel/SQL direto
+    # _seed_pericias(db)
     
     # 4. Popular equipamentos D&D (global, sem dependências)
     inicializar_equipamentos(db)

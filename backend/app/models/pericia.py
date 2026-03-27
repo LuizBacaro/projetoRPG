@@ -108,7 +108,8 @@ class PericiaJogador(Base):
     
     # ✅ Relacionamentos (certifique-se que back_populates existe em ambos)
     pericia = relationship("Pericia", back_populates="pericia_jogadores")
-    combatente = relationship("Combatente", back_populates="pericias", lazy="select")
+    # ✅ Combatente é carregado pelo back_populates em Combatente.pericias
+    combatente = relationship("Combatente", back_populates="pericias", lazy="select", foreign_keys=[combatente_id])
 
     def __repr__(self):
         return f"<PericiaJogador(combatente_id={self.combatente_id}, pericia_id={self.pericia_id})>"
