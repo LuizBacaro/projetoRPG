@@ -5,7 +5,7 @@ Single Responsibility: Operações de banco de dados
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.models.pericia import Pericia, PericiaJogador
+from app.models.pericia import Pericia, PericiaJogador, PericiaClasse
 from app.schemas.pericia import PericiaCreate, PericiaUpdate, PericiaJogadorCreate, PericiaJogadorUpdate
 
 
@@ -45,6 +45,33 @@ class PericiaRepository:
     def listar_pericias_por_tipo(db: Session, tipo: str) -> list[Pericia]:
         """Lista perícias filtradas por tipo"""
         return db.query(Pericia).filter(Pericia.tipo == tipo).all()
+
+    @staticmethod
+    def listar_pericias_por_classe(db: Session, classe_nome: str) -> list[Pericia]:
+        """Lista perícias padrão de uma classe específica"""
+        return db.query(Pericia).join(
+            PericiaClasse,
+            Pericia.id == PericiaClasse.pericia_id
+        ).filter(
+            PericiaClasse.classe_nome == classe_nome,
+            PericiaClasse.is_default == 1
+        ).all()
+
+    @staticmethod
+    def obter_custo_pericia(db: Session, pericia_id: int, classe_nome: str) -> int:
+        """
+        Obtém o custo de uma perícia para uma classe
+        Retorna: 1 se é perícia de classe, 2 se é fora da classe
+        """
+        pericia_classe = db.query(PericiaClasse).filter(
+            PericiaClasse.pericia_id == pericia_id,
+            PericiaClasse.classe_nome == classe_nome,
+            PericiaClasse.is_default == 1
+        ).first()
+        
+        # Se encontrou, é perícia de classe (custo 1)
+        # Se não encontrou, é perícia fora da classe (custo 2)
+        return 1 if pericia_classe else 2
 
     @staticmethod
     def atualizar_pericia(db: Session, pericia_id: int, pericia: PericiaUpdate) -> Pericia:
@@ -101,6 +128,18 @@ class PericiaJogadorRepository:
         ).first()
 
     @staticmethod
+    def obter_pericia_jogador_por_ids(
+        db: Session, 
+        combatente_id: int, 
+        pericia_id: int
+    ) -> PericiaJogador:
+        """Obtém perícia do jogador por combatente_id e pericia_id"""
+        return db.query(PericiaJogador).filter(
+            PericiaJogador.combatente_id == combatente_id,
+            PericiaJogador.pericia_id == pericia_id
+        ).first()
+
+    @staticmethod
     def atualizar_pericia_jogador(
         db: Session,
         pericia_jogador_id: int,
@@ -131,7 +170,15 @@ class PericiaJogadorRepository:
 
     @staticmethod
     def contar_pontos_gastos(db: Session, combatente_id: int) -> int:
-        """Conta os pontos gastos em perícias"""
+        """Conta os pontos totais gastos em perícias (incluindo penalidades)"""
+        resultado = db.query(func.sum(PericiaJogador.custo_total)).filter(
+            PericiaJogador.combatente_id == combatente_id
+        ).scalar()
+        return resultado or 0
+
+    @staticmethod
+    def contar_graduacoes(db: Session, combatente_id: int) -> int:
+        """Conta os pontos de graduação (sem penalidades)"""
         resultado = db.query(func.sum(PericiaJogador.graduacao)).filter(
             PericiaJogador.combatente_id == combatente_id
         ).scalar()

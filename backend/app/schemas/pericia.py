@@ -32,6 +32,9 @@ class PericiaBase(BaseModel):
     atributo: AtributoEnum
     tipo: TipoPericiaEnum = TipoPericiaEnum.COMUM
     requer_treinamento: int = Field(default=0, ge=0, le=1)
+    especialidade: Optional[str] = None
+    pode_usar_sem_treinamento: int = Field(default=1, ge=0, le=1)
+    sofre_penalidade_armadura: int = Field(default=0, ge=0, le=1)
     pagina_livro: Optional[int] = None
 
 
@@ -47,12 +50,26 @@ class PericiaUpdate(BaseModel):
     atributo: Optional[AtributoEnum] = None
     tipo: Optional[TipoPericiaEnum] = None
     requer_treinamento: Optional[int] = None
+    especialidade: Optional[str] = None
+    pode_usar_sem_treinamento: Optional[int] = None
+    sofre_penalidade_armadura: Optional[int] = None
     pagina_livro: Optional[int] = None
 
 
 class PericiaResponse(PericiaBase):
     """Schema de resposta de perícia"""
     id: int
+    custo_para_classe: Optional[int] = None  # 1 para classe, 2 para fora da classe
+
+    class Config:
+        from_attributes = True
+
+
+class PericiaClasseResponse(BaseModel):
+    """Schema de resposta de associação classe-perícia"""
+    pericia_id: int
+    classe_nome: str
+    is_default: int
 
     class Config:
         from_attributes = True
@@ -62,6 +79,7 @@ class PericiaJogadorBase(BaseModel):
     """Schema base de perícia do jogador"""
     pericia_id: int
     graduacao: int = Field(default=0, ge=0)
+    custo_total: int = Field(default=0, ge=0)
     bonus_outros: float = Field(default=0)
 
 
@@ -73,6 +91,7 @@ class PericiaJogadorCreate(PericiaJogadorBase):
 class PericiaJogadorUpdate(BaseModel):
     """Schema para atualizar perícia do jogador"""
     graduacao: Optional[int] = Field(None, ge=0)
+    custo_total: Optional[int] = Field(None, ge=0)
     bonus_outros: Optional[float] = None
 
 

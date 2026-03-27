@@ -1,77 +1,79 @@
 """
-Seed para popular perícias iniciais
+Seed para popular perícias do Excel: Perícias.xlsx
+Usa pericias_loader.py para ler dados estruturados
 """
 
 from sqlalchemy.orm import Session
-from app.models.pericia import Pericia, TipoPericiaEnum
+from pathlib import Path
+import sys
 
+# Importar loader
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
+from pericias_loader import carregar_pericias
 
-PERICIAS_PADRAO = [
-    # Destreza
-    {"nome": "Acrobacia", "descricao": "Equilibrar-se, saltar, cambalhotas.", "atributo": "DES", "tipo": "comum"},
-    {"nome": "Abrir Fechaduras", "descricao": "Usar ferramentas de ladino.", "atributo": "DES", "tipo": "comum", "requer_treinamento": 1},
-    {"nome": "Cavalgar", "descricao": "Controlar montarias.", "atributo": "DES", "tipo": "comum"},
-    {"nome": "Esconder-se", "descricao": "Ficar fora de vista.", "atributo": "DES", "tipo": "comum"},
-    {"nome": "Furtividade", "descricao": "Mover-se silenciosamente.", "atributo": "DES", "tipo": "comum"},
-    {"nome": "Equilíbrio", "descricao": "Manter-se em pé em superfícies instáveis.", "atributo": "DES", "tipo": "comum"},
-    {"nome": "Usar Cordas", "descricao": "Amarrar e soltar nós.", "atributo": "DES", "tipo": "comum"},
-
-    # Força
-    {"nome": "Escalar", "descricao": "Subir paredes e obstáculos.", "atributo": "FOR", "tipo": "comum"},
-    {"nome": "Natação", "descricao": "Nadar.", "atributo": "FOR", "tipo": "comum"},
-    {"nome": "Saltar", "descricao": "Distância de salto.", "atributo": "FOR", "tipo": "comum"},
-
-    # Inteligência
-    {"nome": "Alquimia", "descricao": "Criar itens alquímicos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
-    {"nome": "Apreciar", "descricao": "Avaliar o valor de itens.", "atributo": "INT", "tipo": "comum"},
-    {"nome": "Decifrar Escrita", "descricao": "Traduzir línguas antigas ou códigos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
-    {"nome": "Falsificação", "descricao": "Criar documentos falsos.", "atributo": "INT", "tipo": "comum"},
-    {"nome": "Identificar Magia", "descricao": "Reconhecer efeitos mágicos.", "atributo": "INT", "tipo": "comum"},
-    {"nome": "Operar Mecanismo", "descricao": "Desativar armadilhas ou dispositivos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
-    {"nome": "Pesquisa", "descricao": "Encontrar informações em bibliotecas.", "atributo": "INT", "tipo": "comum"},
-    {"nome": "Procurar", "descricao": "Achar itens escondidos ou armadilhas.", "atributo": "INT", "tipo": "comum"},
-    
-    # Conhecimento (INT)
-    {"nome": "Conhecimento: Arcano", "descricao": "Magia, monstros mágicos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-    {"nome": "Conhecimento: Arquitetura", "descricao": "Construções e engenharia.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-    {"nome": "Conhecimento: Geografia", "descricao": "Terras, climas.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-    {"nome": "Conhecimento: História", "descricao": "Eventos passados.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-    {"nome": "Conhecimento: Local", "descricao": "Notícias, fofocas.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-    {"nome": "Conhecimento: Natureza", "descricao": "Animais, plantas, clima.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-    {"nome": "Conhecimento: Nobreza", "descricao": "Linhas de sangue, títulos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-    {"nome": "Conhecimento: Plano", "descricao": "Outras dimensões.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-    {"nome": "Conhecimento: Religião", "descricao": "Divindades, ritos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-
-    # Sabedoria
-    {"nome": "Cura", "descricao": "Tratar ferimentos e doenças.", "atributo": "SAB", "tipo": "comum"},
-    {"nome": "Intuição", "descricao": "Perceber mentiras e intenções.", "atributo": "SAB", "tipo": "comum"},
-    {"nome": "Navegação", "descricao": "Orientar-se.", "atributo": "SAB", "tipo": "comum"},
-    {"nome": "Ouvir", "descricao": "Detectar sons.", "atributo": "SAB", "tipo": "comum"},
-    {"nome": "Sobrevivência", "descricao": "Rastrear e viver na natureza.", "atributo": "SAB", "tipo": "comum"},
-    {"nome": "Profissão", "descricao": "Ofício específico.", "atributo": "SAB", "tipo": "profissao"},
-
-    # Carisma
-    {"nome": "Adestrar Animais", "descricao": "Treinar e controlar animais.", "atributo": "CAR", "tipo": "comum", "requer_treinamento": 1},
-    {"nome": "Atuação", "descricao": "Dividida em subcategorias (Canto, Dança, Oratória, Instrumentos).", "atributo": "CAR", "tipo": "performance"},
-    {"nome": "Diplomacia", "descricao": "Negociar e influenciar.", "atributo": "CAR", "tipo": "comum"},
-    {"nome": "Disfarce", "descricao": "Mudar a aparência.", "atributo": "CAR", "tipo": "comum"},
-    {"nome": "Intimidação", "descricao": "Ameaçar e coagir.", "atributo": "CAR", "tipo": "comum"},
-    {"nome": "Uso de Dispositivos Mágicos", "descricao": "Usar itens de classes diferentes.", "atributo": "CAR", "tipo": "comum", "requer_treinamento": 1},
-]
+from app.models.pericia import Pericia, PericiaClasse
 
 
 def seed_pericias(db: Session):
-    """Popula a tabela de perícias"""
+    """
+    Popula a tabela de perícias a partir do Excel
+    Criar perícias + associações com classes
+    """
     # Verificar se já existem perícias
     if db.query(Pericia).first():
-        print("Perícias já existem no banco de dados")
+        print("✅ Perícias já existem no banco de dados, pulando seed")
         return
 
-    pericias = []
-    for pericia_data in PERICIAS_PADRAO:
-        pericia = Pericia(**pericia_data)
-        pericias.append(pericia)
+    # Carregar dados do Excel
+    caminho_excel = Path(__file__).parent.parent.parent.parent / "Perícias.xlsx"
+    print(f"📚 Carregando perícias de {caminho_excel}...")
+    
+    dados = carregar_pericias(str(caminho_excel))
+    pericias_data = dados['pericias']
+    pericia_classe_map = dados['pericia_classe']
+    
+    # Criar perícias
+    print(f"📝 Criando {len(pericias_data)} perícias...")
+    pericias_criadas = {}
+    
+    for pericia_data in pericias_data:
+        pericia = Pericia(
+            nome=pericia_data['nome'],
+            descricao=pericia_data['descricao'],
+            atributo=pericia_data['atributo'],
+            tipo=pericia_data['tipo'],
+            especialidade=pericia_data['especialidade'],
+            requer_treinamento=pericia_data['requer_treinamento'],
+            pode_usar_sem_treinamento=pericia_data['pode_usar_sem_treinamento'],
+            sofre_penalidade_armadura=pericia_data['sofre_penalidade_armadura'],
+        )
         db.add(pericia)
-
+        pericias_criadas[pericia_data['nome']] = pericia
+    
+    db.flush()  # Flush para gerar IDs
+    
+    # Criar associações com classes
+    print(f"🔗 Criando associações classe-perícia...")
+    total_associacoes = 0
+    
+    for pericia_nome, classes_dict in pericia_classe_map.items():
+        pericia = pericias_criadas.get(pericia_nome)
+        if not pericia:
+            print(f"⚠️ Perícia não encontrada: {pericia_nome}")
+            continue
+        
+        for classe_nome, é_default in classes_dict.items():
+            if é_default:  # Só criar para classes que têm X
+                pericia_classe = PericiaClasse(
+                    pericia_id=pericia.id,
+                    classe_nome=classe_nome,
+                    is_default=1  # 1 = é perícia de classe
+                )
+                db.add(pericia_classe)
+                total_associacoes += 1
+    
+    # Commit
     db.commit()
-    print(f"{len(pericias)} perícias foram criadas com sucesso!")
+    print(f"✅ {len(pericias_criadas)} perícias criadas!")
+    print(f"✅ {total_associacoes} associações classe-perícia criadas!")
+    print(f"✅ Seed de perícias concluído com sucesso!")
