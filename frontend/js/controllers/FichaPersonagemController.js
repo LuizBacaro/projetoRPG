@@ -1165,51 +1165,76 @@ export class FichaPersonagemController {
     }
 
     renderizarPericiasParaCompra(pericias) {
-        const lista = document.getElementById('periciasList');
-        if (!lista) return;
+        const tabelaBody = document.getElementById('tabelaPericiasBody');
+        const tabela = document.getElementById('tabelaPericias');
+        
+        if (!tabelaBody || !tabela) return;
 
-        lista.innerHTML = '';
+        tabelaBody.innerHTML = '';
+        
+        if (pericias.length === 0) {
+            tabelaBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Nenhuma perícia disponível</td></tr>';
+            tabela.style.display = 'table';
+            return;
+        }
 
         pericias.forEach(pericia => {
             const custo = pericia.custo_para_classe || 1;
-            const item = document.createElement('div');
-            item.className = 'equipamentos-item';
-            item.innerHTML = `
-                <div style="flex: 1;">
-                    <h4 style="margin: 0 0 5px 0;">${pericia.nome}</h4>
-                    <p style="margin: 0 0 8px 0; font-size: 0.85em; color: #666;">
-                        ${pericia.descricao || 'Sem descrição'}
-                    </p>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <span style="background: #e0e0e0; padding: 4px 8px; border-radius: 3px; font-size: 0.85em;">
-                            Atributo: ${pericia.atributo}
-                        </span>
-                        <span style="background: ${custo === 1 ? '#90EE90' : '#FFB6C1'}; padding: 4px 8px; border-radius: 3px; font-size: 0.85em;">
-                            Custo: ${custo} pt${custo > 1 ? 's' : ''}
-                        </span>
+            const corCusto = custo === 1 ? '#90EE90' : '#FFB6C1';
+            
+            const tr = document.createElement('tr');
+            tr.style.cssText = 'border-bottom: 1px solid #eee; hover-background: #f9f9f9;';
+            tr.innerHTML = `
+                <td style="padding: 12px; border-right: 1px solid #ddd;">
+                    <div style="margin: 0;">
+                        <strong>${pericia.nome}</strong>
+                        <div style="font-size: 0.8em; color: #666; margin-top: 4px;">
+                            ${pericia.descricao || 'Sem descrição'}
+                        </div>
                     </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <input type="number" class="periciaGraduacao" min="1" max="20" value="1" 
-                           style="width: 50px; padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
-                    <button class="equipamentos-btn-adicionar" 
-                            onclick="window._fichaController && window._fichaController.adicionarPericia(${pericia.id}, this)">
-                        ➕
-                    </button>
-                </div>
+                </td>
+                <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd; font-weight: bold;">
+                    ${pericia.atributo}
+                </td>
+                <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">
+                    <span style="background: ${corCusto}; padding: 4px 8px; border-radius: 3px; font-size: 0.9em; font-weight: bold;">
+                        ${custo}
+                    </span>
+                </td>
+                <td style="padding: 12px;">
+                    <div style="display: grid; grid-template-columns: 50px 50px 50px; gap: 5px; align-items: center;">
+                        <input type="number" class="periciaGraduacao" min="1" max="20" value="1" 
+                               data-pericia-id="${pericia.id}"
+                               style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 3px; text-align: center;">
+                        <input type="number" class="pericias-bonus" min="0" max="20" value="0" 
+                               data-pericia-id="${pericia.id}"
+                               style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 3px; text-align: center;">
+                        <button class="btn-adicionar-pericia" 
+                                onclick="window._fichaController && window._fichaController.adicionarPericia(${pericia.id}, this)"
+                                style="width: 100%; padding: 6px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">
+                            ➕
+                        </button>
+                    </div>
+                </td>
             `;
-            lista.appendChild(item);
+            tabelaBody.appendChild(tr);
         });
+
+        tabela.style.display = 'table';
     }
 
     async adicionarPericia(periciaId, btnElement) {
         try {
-            const input = btnElement.parentElement.querySelector('.periciaGraduacao');
-            const graduacao = parseInt(input.value) || 1;
+            const row = btnElement.closest('tr');
+            const inputGraduacao = row.querySelector('.periciaGraduacao');
+            const inputBonus = row.querySelector('.pericias-bonus');
+            
+            const graduacao = parseInt(inputGraduacao.value) || 1;
+            const bonus = parseInt(inputBonus.value) || 0;
 
             const classe = this.combatente?.classe || 'Guerreiro';
 
-            console.log(`📝 Adicionando perícia ${periciaId} com ${graduacao} ponto(s)...`);
+            console.log(`📝 Adicionando perícia ${periciaId} com ${graduacao} grad, ${bonus} bonus...`);
 
             await this.periciaService.adicionarPericia(
                 this.combatente.id,
@@ -1241,12 +1266,12 @@ export class FichaPersonagemController {
 
     filtrarPericias() {
         const termo = document.getElementById('periciaBusca')?.value || '';
-        const itens = document.querySelectorAll('#periciasList .equipamentos-item');
+        const linhas = document.querySelectorAll('#tabelaPericiasBody tr');
 
-        itens.forEach(item => {
-            const nome = item.querySelector('h4')?.textContent.toLowerCase() || '';
-            const visivel = nome.includes(termo.toLowerCase());
-            item.style.display = visivel ? 'flex' : 'none';
+        linhas.forEach(linha => {
+            const nomePericia = linha.querySelector('td:first-child strong')?.textContent.toLowerCase() || '';
+            const visivel = nomePericia.includes(termo.toLowerCase());
+            linha.style.display = visivel ? 'table-row' : 'none';
         });
     }
 }
