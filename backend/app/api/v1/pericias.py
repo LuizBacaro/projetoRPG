@@ -242,7 +242,7 @@ def listar_pericias_jogador(
         
         return PericiaJogadorListResponse(
             pericias=stats["pericias"],
-            total_pontos_gastos=stats["pontos_gastos"],
+            total_pontos_gastos=stats["pontos_gastos_total"],
             pontos_disponiveis=stats["pontos_disponiveis"]
         )
     except Exception as e:
