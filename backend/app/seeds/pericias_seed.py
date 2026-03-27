@@ -11,6 +11,8 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 from pericias_loader import carregar_pericias
 
+# Importar modelos (a importação de Combatente resolve o relacionamento)
+from app.models.combatente import Combatente
 from app.models.pericia import Pericia, PericiaClasse
 
 

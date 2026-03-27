@@ -65,16 +65,28 @@ def listar_pericias(
     skip: int = 0,
     limit: int = 100,
     atributo: str = None,
+    classe: str = None,
     db: Session = Depends(get_db)
 ):
-    """Lista todas as perícias disponíveis"""
+    """Lista todas as perícias disponíveis com custo baseado em classe"""
     try:
         service = PericiaService(db)
         
         if atributo:
-            return service.listar_pericias_por_atributo(atributo)
+            pericias = service.listar_pericias_por_atributo(atributo)
+        else:
+            pericias = service.listar_todas_pericias(skip, limit)
         
-        return service.listar_todas_pericias(skip, limit)
+        # Se classe foi especificada, calcula custo para cada perícia
+        if classe:
+            pericias_com_custo = []
+            for pericia in pericias:
+                custo = service.calcular_custo_pericia(pericia.id, classe)
+                pericia.custo_para_classe = custo
+                pericias_com_custo.append(pericia)
+            return pericias_com_custo
+        
+        return pericias
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -83,14 +95,23 @@ def listar_pericias(
 
 
 @router.get("/{pericia_id}", response_model=PericiaResponse)
-def obter_pericia(pericia_id: int, db: Session = Depends(get_db)):
-    """Obtém uma perícia por ID"""
+def obter_pericia(
+    pericia_id: int,
+    classe: str = None,
+    db: Session = Depends(get_db)
+):
+    """Obtém uma perícia por ID com custo baseado em classe se fornecido"""
     try:
         service = PericiaService(db)
         pericia = service.obter_pericia(pericia_id)
         
         if not pericia:
             raise HTTPException(status_code=404, detail="Perícia não encontrada")
+        
+        # Se classe foi especificada, calcula custo
+        if classe:
+            custo = service.calcular_custo_pericia(pericia_id, classe)
+            pericia.custo_para_classe = custo
         
         return pericia
     except HTTPException:
@@ -123,7 +144,31 @@ def atualizar_pericia(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/{pericia_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.get("/classe/{classe_nome}", response_model=List[PericiaResponse])
+def listar_pericias_classe(
+    classe_nome: str,
+    db: Session = Depends(get_db)
+):
+    """Lista perícias padrão de uma classe com seus custos"""
+    try:
+        service = PericiaService(db)
+        pericias = service.listar_pericias_por_classe(classe_nome)
+        
+        # Calcula custo para cada perícia
+        pericias_com_custo = []
+        for pericia in pericias:
+            custo = service.calcular_custo_pericia(pericia.id, classe_nome)
+            pericia.custo_para_classe = custo
+            pericias_com_custo.append(pericia)
+        
+        return pericias_com_custo
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Erro ao listar perícias da classe: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 def deletar_pericia(
     pericia_id: int,
     db: Session = Depends(get_db),
@@ -148,12 +193,35 @@ def deletar_pericia(
 def adicionar_pericia_jogador(
     combatente_id: int,
     pericia: PericiaJogadorCreate,
+    classe: str = None,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user) if get_current_user else None
 ):
-    """Adiciona uma perícia ao jogador"""
+    """Adiciona uma perícia ao jogador com validação de custo"""
     try:
         service = PericiaService(db)
+        
+        # Se classe foi fornecida, calcula e valida o custo
+        if classe:
+            custo_unitario = service.calcular_custo_pericia(pericia.pericia_id, classe)
+            custo_total = service.calcular_custo_total_graduacao(
+                pericia.pericia_id, 
+                classe, 
+                pericia.graduacao
+            )
+            
+            # Obtém o combatente para validar pontos disponíveis
+            combatente = service.repository.obter_combatente(combatente_id)
+            if not combatente:
+                raise ValueError(f"Combatente {combatente_id} não encontrado")
+            
+            pontos_disponiveis = combatente.pontos_pericia
+            if custo_total > pontos_disponiveis:
+                raise ValueError(
+                    f"Pontos insuficientes. Necessário: {custo_total}, "
+                    f"Disponível: {pontos_disponiveis}"
+                )
+        
         return service.adicionar_pericia_jogador(combatente_id, pericia)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

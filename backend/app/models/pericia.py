@@ -4,11 +4,16 @@ Single Responsibility: Apenas representam a estrutura das perícias
 SOLID: Dependency Injection via Base declarativo centralizado
 """
 
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float, Boolean
 from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
+from typing import TYPE_CHECKING
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.combatente import Combatente
+
 
 
 class AtributoEnum(str, PyEnum):
@@ -103,7 +108,7 @@ class PericiaJogador(Base):
     
     # ✅ Relacionamentos (certifique-se que back_populates existe em ambos)
     pericia = relationship("Pericia", back_populates="pericia_jogadores")
-    combatente = relationship("Combatente", back_populates="pericias")
+    combatente = relationship("Combatente", back_populates="pericias", lazy="select")
 
     def __repr__(self):
         return f"<PericiaJogador(combatente_id={self.combatente_id}, pericia_id={self.pericia_id})>"
