@@ -8,6 +8,7 @@
 import { CombatenteService } from '../services/CombatenteService.js';
 import { EquipamentoService } from '../services/EquipamentoService.js';
 import { TalentoService } from '../services/TalentoService.js';
+import { PericiaService } from '../services/PericiaService.js';
 import { getApiUrl } from '../config/api.config.js';
 
 export class FichaPersonagemController {
@@ -16,6 +17,7 @@ export class FichaPersonagemController {
         this.combatenteService = new CombatenteService();
         this.equipamentoService = new EquipamentoService();
         this.talentoService = new TalentoService();
+        this.periciaService = new PericiaService();
         this.token             = localStorage.getItem('token');
         this.combatente        = null;
 
@@ -75,6 +77,11 @@ export class FichaPersonagemController {
         const btnAdicionarTal = document.getElementById('btnAdicionarTalento');
         if (btnAdicionarTal) {
             btnAdicionarTal.addEventListener('click', () => this.abrirModalTalentos());
+        }
+
+        const btnAdicionarPer = document.getElementById('btnAdicionarPericia');
+        if (btnAdicionarPer) {
+            btnAdicionarPer.addEventListener('click', () => this.abrirModalPericias());
         }
     }
 
@@ -1085,6 +1092,145 @@ export class FichaPersonagemController {
                 window.NotificationService.erro('❌ Erro ao criar talento: ' + error.message);
             }
         }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // PERÍCIAS
+    // ─────────────────────────────────────────────────────────
+
+    async abrirModalPericias() {
+        try {
+            console.log('📖 Abrindo modal de perícias...');
+            
+            const modal = document.getElementById('modalPericias');
+            if (!modal) return;
+
+            modal.style.display = 'flex';
+
+            // Atualizar info de custo
+            const classe = this.combatente?.classe || 'Desconhecida';
+            document.getElementById('periciaTextoClasse').textContent = `Classe: ${classe}`;
+            document.getElementById('periciaTextoDisponível').textContent = `Pontos disponíveis: ${this.combatente?.pontos_pericia || 0}`;
+
+            // Carregar perícias
+            await this.carregarPericias();
+
+        } catch (error) {
+            console.error('❌ Erro ao abrir modal de perícias:', error);
+        }
+    }
+
+    fecharModalPericias() {
+        const modal = document.getElementById('modalPericias');
+        if (modal) modal.style.display = 'none';
+    }
+
+    async carregarPericias() {
+        try {
+            const loading = document.getElementById('periciaLoading');
+            const lista = document.getElementById('periciasList');
+            
+            if (loading) loading.style.display = 'flex';
+            if (lista) lista.innerHTML = '';
+
+            const classe = this.combatente?.classe || 'Guerreiro';
+            const pericias = await this.periciaService.listarPericiasComCusto(classe, 0, 100);
+
+            if (loading) loading.style.display = 'none';
+
+            this.renderizarPericiasParaCompra(pericias);
+
+        } catch (error) {
+            console.error('❌ Erro ao carregar perícias:', error);
+            const lista = document.getElementById('periciasList');
+            if (lista) lista.innerHTML = '<p style="color: red;">Erro ao carregar perícias</p>';
+        }
+    }
+
+    renderizarPericiasParaCompra(pericias) {
+        const lista = document.getElementById('periciasList');
+        if (!lista) return;
+
+        lista.innerHTML = '';
+
+        pericias.forEach(pericia => {
+            const custo = pericia.custo_para_classe || 1;
+            const item = document.createElement('div');
+            item.className = 'equipamentos-item';
+            item.innerHTML = `
+                <div style="flex: 1;">
+                    <h4 style="margin: 0 0 5px 0;">${pericia.nome}</h4>
+                    <p style="margin: 0 0 8px 0; font-size: 0.85em; color: #666;">
+                        ${pericia.descricao || 'Sem descrição'}
+                    </p>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="background: #e0e0e0; padding: 4px 8px; border-radius: 3px; font-size: 0.85em;">
+                            Atributo: ${pericia.atributo}
+                        </span>
+                        <span style="background: ${custo === 1 ? '#90EE90' : '#FFB6C1'}; padding: 4px 8px; border-radius: 3px; font-size: 0.85em;">
+                            Custo: ${custo} pt${custo > 1 ? 's' : ''}
+                        </span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="number" class="periciaGraduacao" min="1" max="20" value="1" 
+                           style="width: 50px; padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
+                    <button class="equipamentos-btn-adicionar" 
+                            onclick="window._fichaController && window._fichaController.adicionarPericia(${pericia.id}, this)">
+                        ➕
+                    </button>
+                </div>
+            `;
+            lista.appendChild(item);
+        });
+    }
+
+    async adicionarPericia(periciaId, btnElement) {
+        try {
+            const input = btnElement.parentElement.querySelector('.periciaGraduacao');
+            const graduacao = parseInt(input.value) || 1;
+
+            const classe = this.combatente?.classe || 'Guerreiro';
+
+            console.log(`📝 Adicionando perícia ${periciaId} com ${graduacao} ponto(s)...`);
+
+            await this.periciaService.adicionarPericia(
+                this.combatente.id,
+                periciaId,
+                graduacao,
+                classe
+            );
+
+            console.log('✅ Perícia adicionada com sucesso!');
+
+            // Recarregar perícias na ficha
+            await this.carregarRenderizarPericias(this.combatente.id);
+
+            // Notificação
+            if (window.NotificationService) {
+                window.NotificationService.sucesso('✅ Perícia adicionada com sucesso!');
+            }
+
+            // Recarregar lista do modal
+            await this.carregarPericias();
+
+        } catch (error) {
+            console.error('❌ Erro ao adicionar perícia:', error);
+            if (window.NotificationService) {
+                window.NotificationService.erro('❌ ' + error.message);
+            }
+        }
+    }
+
+    filtrarPericias() {
+        const termo = document.getElementById('periciaBusca')?.value || '';
+        const itens = document.querySelectorAll('#periciasList .equipamentos-item');
+
+        itens.forEach(item => {
+            const nome = item.querySelector('h4')?.textContent.toLowerCase() || '';
+            const visivel = nome.includes(termo.toLowerCase());
+            item.style.display = visivel ? 'flex' : 'none';
+        });
     }
 }// ── Inicializar quando DOM estiver pronto ──
     document.addEventListener('DOMContentLoaded', async () => {

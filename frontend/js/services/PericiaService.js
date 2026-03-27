@@ -147,4 +147,185 @@ export class PericiaService {
             (p.descricao && p.descricao.toLowerCase().includes(termoLower))
         );
     }
+
+    /**
+     * Lista perícias disponíveis com custo calculado para uma classe
+     * @param {string} classe - Nome da classe (Guerreiro, Mago, etc)
+     * @param {number} skip - Offset para paginação
+     * @param {number} limit - Limite de resultados
+     * @returns {Promise<Array>}
+     */
+    async listarPericiasComCusto(classe, skip = 0, limit = 100) {
+        try {
+            let url = `${this.baseUrl}?skip=${skip}&limit=${limit}&classe=${encodeURIComponent(classe)}`;
+            console.log('📡 GET:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log(`✅ Perícias carregadas para ${classe}:`, data.length);
+            return data;
+
+        } catch (error) {
+            console.error('❌ Erro em listarPericiasComCusto:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Lista perícias padrão de uma classe específica
+     * @param {string} classe - Nome da classe
+     * @returns {Promise<Array>}
+     */
+    async listarPericlassesClasse(classe) {
+        try {
+            const url = `${this.baseUrl}/classe/${encodeURIComponent(classe)}`;
+            console.log('📡 GET:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Classe não encontrada`);
+            }
+
+            const data = await response.json();
+            console.log(`✅ Perícias da classe ${classe}:`, data.length);
+            return data;
+
+        } catch (error) {
+            console.error('❌ Erro em listarPericlasspesClasse:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Adiciona uma perícia ao personagem
+     * @param {number} combatenteId - ID do combatente
+     * @param {number} periciaId - ID da perícia
+     * @param {number} graduacao - Pontos investidos
+     * @param {string} classe - Classe do personagem (para cálculo de custo)
+     * @returns {Promise<Object>}
+     */
+    async adicionarPericia(combatenteId, periciaId, graduacao, classe) {
+        try {
+            let url = `${this.baseUrl}/${combatenteId}/adicionar`;
+            if (classe) {
+                url += `?classe=${encodeURIComponent(classe)}`;
+            }
+
+            const payload = {
+                pericia_id: periciaId,
+                graduacao: graduacao
+            };
+
+            console.log('📡 POST:', url, payload);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || `HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Perícia adicionada:', data);
+            return data;
+
+        } catch (error) {
+            console.error('❌ Erro em adicionarPericia:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Atualiza uma perícia do personagem
+     * @param {number} combatenteId - ID do combatente
+     * @param {number} periciaJogadorId - ID da perícia do jogador
+     * @param {number} graduacao - Novos pontos
+     * @returns {Promise<Object>}
+     */
+    async atualizarPericia(combatenteId, periciaJogadorId, graduacao) {
+        try {
+            const url = `${this.baseUrl}/${combatenteId}/pericia/${periciaJogadorId}`;
+            const payload = { graduacao };
+
+            console.log('📡 PUT:', url, payload);
+
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || `HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Perícia atualizada:', data);
+            return data;
+
+        } catch (error) {
+            console.error('❌ Erro em atualizarPericia:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Remove uma perícia do personagem
+     * @param {number} combatenteId - ID do combatente
+     * @param {number} periciaJogadorId - ID da perícia do jogador
+     * @returns {Promise<void>}
+     */
+    async removerPericia(combatenteId, periciaJogadorId) {
+        try {
+            const url = `${this.baseUrl}/${combatenteId}/pericia/${periciaJogadorId}`;
+            console.log('📡 DELETE:', url);
+
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            console.log('✅ Perícia removida');
+
+        } catch (error) {
+            console.error('❌ Erro em removerPericia:', error);
+            throw error;
+        }
+    }
 }
