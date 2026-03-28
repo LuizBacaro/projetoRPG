@@ -85,7 +85,9 @@ export class PericiaFichaController {
                         this.periciasAdicionadas.set(p.pericia_id, {
                             id: p.id,
                             graduacao: p.graduacao,
-                            bonus: p.bonus_outros || 0
+                            modificador_atributo: p.modificador_atributo || 0,
+                            bonus: p.bonus_outros || 0,
+                            total: (p.graduacao || 0) + (p.modificador_atributo || 0) + (p.bonus_outros || 0)
                         });
                     });
                     console.log(`✅ ${this.periciasAdicionadas.size} perícias já adicionadas`);
@@ -149,21 +151,27 @@ export class PericiaFichaController {
                     </div>
                 </td>
                 <td>
-                    <input type="number" class="pericias-input input-grad" 
+                    <input type="number" class="pericias-input input-grad"
                            data-pericia-id="${pericia.id}"
-                           min="0" max="20" 
+                           min="0" max="20"
                            value="${dados ? dados.graduacao : 0}"
                            ${!adicionada ? 'disabled' : ''}>
                 </td>
                 <td>
-                    <input type="number" class="pericias-input input-bonus" 
+                    <input type="number" class="pericias-input input-bonus"
                            data-pericia-id="${pericia.id}"
-                           min="0" max="20" 
+                           min="0" max="20"
                            value="${dados ? dados.bonus : 0}"
                            ${!adicionada ? 'disabled' : ''}>
                 </td>
+                <td style="text-align: center; font-weight: bold; min-width: 50px;">
+                    ${adicionada
+                        ? `${dados.total}`
+                        : '-'
+                    }
+                </td>
                 <td style="text-align: center;">
-                    ${adicionada 
+                    ${adicionada
                         ? `<button class="pericias-btn-adicionar" onclick="window.periciasFichaController.removerPericia(${pericia.id}, this)">🗑️</button>`
                         : `<button class="pericias-btn-adicionar" onclick="window.periciasFichaController.adicionarPericia(${pericia.id}, this)">➕</button>`
                     }
@@ -202,7 +210,9 @@ export class PericiaFichaController {
             this.periciasAdicionadas.set(periciaId, {
                 id: response.id,
                 graduacao: response.graduacao,
-                bonus: response.bonus_outros || 0
+                modificador_atributo: response.modificador_atributo || 0,
+                bonus: response.bonus_outros || 0,
+                total: (response.graduacao || 0) + (response.modificador_atributo || 0) + (response.bonus_outros || 0)
             });
 
             // Recarregar combatente para atualizar pontos
@@ -235,7 +245,7 @@ export class PericiaFichaController {
             btnElement.textContent = '⏳';
 
             // Chamar API para remover
-            const url = `${this.periciaService.baseUrl}/${this.combatente.id}/remover/${dados.id}`;
+            const url = `${this.periciaService.baseUrl}/${this.combatente.id}/pericia/${dados.id}`;
             const response = await fetch(url, {
                 method: 'DELETE',
                 headers: {
