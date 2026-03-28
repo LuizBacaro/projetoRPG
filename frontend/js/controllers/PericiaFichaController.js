@@ -187,7 +187,79 @@ export class PericiaFichaController {
         });
 
         tabela.style.display = 'table';
+
+        // Adicionar event listeners para atualizar valores
+        this.adicionarEventListenersEdicao();
     }
+
+    adicionarEventListenersEdicao() {
+        const self = this;
+
+        // Event listeners para graduação
+        document.querySelectorAll('.input-grad').forEach(input => {
+            input.addEventListener('change', async function() {
+                const periciaId = parseInt(this.dataset.periciaId);
+                const novaGraduacao = parseInt(this.value) || 0;
+
+                if (self.periciasAdicionadas.has(periciaId)) {
+                    const dados = self.periciasAdicionadas.get(periciaId);
+                    await self.atualizarPericiaNoBackend(
+                        self.combatente.id,
+                        dados.id,
+                        novaGraduacao,
+                        dados.bonus
+                    );
+                }
+            });
+        });
+
+        // Event listeners para bônus
+        document.querySelectorAll('.input-bonus').forEach(input => {
+            input.addEventListener('change', async function() {
+                const periciaId = parseInt(this.dataset.periciaId);
+                const novoBonus = parseFloat(this.value) || 0;
+
+                if (self.periciasAdicionadas.has(periciaId)) {
+                    const dados = self.periciasAdicionadas.get(periciaId);
+                    await self.atualizarPericiaNoBackend(
+                        self.combatente.id,
+                        dados.id,
+                        dados.graduacao,
+                        novoBonus
+                    );
+                }
+            });
+        });
+    }
+
+    async atualizarPericiaNoBackend(combatenteId, periciaJogadorId, graduacao, bonusOutros) {
+        try {
+            const response = await this.periciaService.atualizarPericia(
+                combatenteId,
+                periciaJogadorId,
+                graduacao,
+                bonusOutros
+            );
+
+            // Atualizar o mapa local
+            const periciaId = Array.from(this.periciasAdicionadas).find(
+                ([_, dados]) => dados.id === periciaJogadorId
+            )?.[0];
+
+            if (periciaId) {
+                const dados = this.periciasAdicionadas.get(periciaId);
+                dados.graduacao = graduacao;
+                dados.bonus = bonusOutros;
+                dados.total = (graduacao || 0) + (dados.modificador_atributo || 0) + (bonusOutros || 0);
+            }
+
+            console.log('✅ Perícia atualizada:', response);
+        } catch (error) {
+            console.error('❌ Erro ao atualizar perícia:', error);
+            NotificationService.erro('❌ Erro: ' + error.message);
+            // Re-renderizar para desfazer as mudanças
+            this.renderizar();
+        }
 
     async adicionarPericia(periciaId, btnElement) {
         try {
