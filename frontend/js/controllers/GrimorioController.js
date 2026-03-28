@@ -666,8 +666,10 @@ class GrimorioController {
         const mapa = {
             // Abreviaturas simples
             'abjur': 'Abjuração',
+            'abjru': 'Abjuração',
             'adiv': 'Adivinhação',
             'conj': 'Conjuração',
+            'conjur': 'Conjuração',
             'encan': 'Encantamento',
             'encant': 'Encantamento',
             'evoc': 'Evocação',
@@ -676,7 +678,6 @@ class GrimorioController {
             'trans': 'Transmutação',
             'transm': 'Transmutação',
             'univ': 'Universal',
-            'conjur': 'Conjuração',
             
             // Nomes completos
             'conjuração': 'Conjuração',
@@ -688,22 +689,17 @@ class GrimorioController {
             'abjuração': 'Abjuração',
             'adivinhação': 'Adivinhação',
             'universal': 'Universal',
+            'escola': '',
         };
         
-        // Limpa: remove colchetes, parênteses, números, quebras de linha e espaços extras
-        const limpo = escola
+        // Extrai apenas a escola base: pega tudo antes de [, (, espaço, ponto ou quebra de linha
+        const base = escola
+            .replace(/[\n\r]/g, ' ')
+            .split(/[\[\(\.\s]/)[0]
             .toLowerCase()
-            .replace(/[\[\(\]\)\n]/g, '') // Remove colchetes, parênteses e quebras de linha
-            .replace(/[0-9]/g, '') // Remove números
-            .replace(/\s+/g, '') // Remove todos os espaços
             .trim();
         
-        // Debug
-        if (limpo && limpo !== escola.toLowerCase().trim()) {
-            console.log(`🔤 Normalizando: "${escola}" → "${limpo}" → "${mapa[limpo] || 'UNKNOWN'}"`);
-        }
-        
-        return mapa[limpo] || escola.charAt(0).toUpperCase() + escola.slice(1);
+        return mapa[base] || escola.charAt(0).toUpperCase() + escola.slice(1);
     }
 
     _renderizarFiltroEscolas() {
@@ -871,7 +867,8 @@ class GrimorioController {
     }
 
     _renderizarCard(m) {
-        const emoji = EMOJI_ESCOLA[m.escola] || '📜';
+        const escolaNorm = this._normalizarEscola(m.escola);
+        const emoji = EMOJI_ESCOLA[escolaNorm] || '📜';
         const preparada = this.preparadas.has(m.id);
         const usada = this.usadas.has(m.id);
         const aberto = this.cardsAbertos.has(m.id);
@@ -880,7 +877,7 @@ class GrimorioController {
         const semSlot = slot && !preparada && slot.disponivel <= 0;
 
         const badges = [
-            m.escola ? `<span class="grimorio-badge grimorio-badge-escola">${emoji} ${m.escola}</span>` : '',
+            escolaNorm ? `<span class="grimorio-badge grimorio-badge-escola">${emoji} ${escolaNorm}</span>` : '',
             m.componentes ? `<span class="grimorio-badge grimorio-badge-comp">${m.componentes}</span>` : '',
             temDano ? `<span class="grimorio-badge grimorio-badge-dano">🗡 ${m.dano}</span>` : '',
             m.teste_resistencia && m.teste_resistencia !== 'Nenhum'

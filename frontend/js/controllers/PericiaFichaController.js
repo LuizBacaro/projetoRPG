@@ -308,12 +308,23 @@ export class PericiaFichaController {
         }
     }
 
-    async removerPericia(periciaId, btnElement) {
-        try {
-            if (!confirm('Tem certeza que deseja remover essa perícia?')) {
-                return;
-            }
+    removerPericia(periciaId, btnElement) {
+        const dados = this.periciasAdicionadas.get(periciaId);
+        if (!dados) return;
 
+        ModalConfirm.mostrar({
+            icone: '🗑️',
+            titulo: 'Remover Perícia',
+            texto: 'Tem certeza que deseja remover essa perícia?',
+            textoCancelar: 'Cancelar',
+            textoConfirmar: '🗑️ Remover',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar: () => this._executarRemocao(periciaId, btnElement),
+        });
+    }
+
+    async _executarRemocao(periciaId, btnElement) {
+        try {
             const dados = this.periciasAdicionadas.get(periciaId);
             if (!dados) return;
 
@@ -352,6 +363,8 @@ export class PericiaFichaController {
         } catch (error) {
             console.error('❌ Erro ao remover perícia:', error);
             NotificationService.erro('❌ ' + error.message);
+            btnElement.disabled = false;
+            btnElement.textContent = '🗑️';
         }
     }
 }

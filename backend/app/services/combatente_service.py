@@ -247,6 +247,94 @@ class CombatenteService:
                 [6,5,5,5,5,5,4,4,3,3],
                 [6,5,5,5,5,5,4,4,4,4],
             ],
+            'Druida': [
+                [3,1,None,None,None,None,None,None,None,None],
+                [4,2,None,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [5,3,2,None,None,None,None,None,None,None],
+                [5,3,2,1,None,None,None,None,None,None],
+                [5,3,3,2,None,None,None,None,None,None],
+                [6,4,3,2,1,None,None,None,None,None],
+                [6,4,3,3,2,None,None,None,None,None],
+                [6,4,4,3,2,1,None,None,None,None],
+                [6,4,4,3,3,2,None,None,None,None],
+                [6,5,4,4,3,2,1,None,None,None],
+                [6,5,4,4,3,3,2,None,None,None],
+                [6,5,5,4,4,3,2,1,None,None],
+                [6,5,5,4,4,3,3,2,None,None],
+                [6,5,5,5,4,4,3,2,1,None],
+                [6,5,5,5,4,4,3,3,2,None],
+                [6,5,5,5,5,4,4,3,2,1],
+                [6,5,5,5,5,4,4,3,3,2],
+                [6,5,5,5,5,5,4,4,3,3],
+                [6,5,5,5,5,5,4,4,4,4],
+            ],
+            'Bardo': [
+                [3,1,None,None,None,None,None,None,None,None],
+                [4,2,None,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [4,3,2,None,None,None,None,None,None,None],
+                [4,3,2,1,None,None,None,None,None,None],
+                [4,3,3,2,None,None,None,None,None,None],
+                [4,4,3,2,1,None,None,None,None,None],
+                [4,4,3,3,2,None,None,None,None,None],
+                [4,4,4,3,2,1,None,None,None,None],
+                [4,4,4,3,3,2,None,None,None,None],
+                [4,4,4,4,3,2,1,None,None,None],
+                [4,4,4,4,3,3,2,None,None,None],
+                [4,4,4,4,4,3,2,1,None,None],
+                [4,4,4,4,4,3,3,2,None,None],
+                [4,4,4,4,4,4,3,2,1,None],
+                [4,4,4,4,4,4,3,3,2,None],
+                [4,4,4,4,4,4,4,3,2,1],
+                [4,4,4,4,4,4,4,3,3,2],
+                [4,4,4,4,4,4,4,4,3,3],
+                [4,4,4,4,4,4,4,4,4,4],
+            ],
+            'Paladino': [
+                [None,None,None,None,None,None,None,None,None,None],
+                [None,None,None,None,None,None,None,None,None,None],
+                [3,1,None,None,None,None,None,None,None,None],
+                [3,1,None,None,None,None,None,None,None,None],
+                [4,2,None,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [4,3,2,None,None,None,None,None,None,None],
+                [4,3,2,None,None,None,None,None,None,None],
+                [4,3,2,1,None,None,None,None,None,None],
+                [4,3,3,2,None,None,None,None,None,None],
+                [4,3,3,2,None,None,None,None,None,None],
+                [4,4,3,3,None,None,None,None,None,None],
+                [4,4,3,3,1,None,None,None,None,None],
+                [4,4,3,3,1,None,None,None,None,None],
+                [4,4,4,3,2,None,None,None,None,None],
+                [4,4,4,3,2,None,None,None,None,None],
+                [4,4,4,4,2,1,None,None,None,None],
+                [4,4,4,4,3,1,None,None,None,None],
+                [4,4,4,4,3,2,None,None,None,None],
+            ],
+            'Ranger': [
+                [None,None,None,None,None,None,None,None,None,None],
+                [None,None,None,None,None,None,None,None,None,None],
+                [3,1,None,None,None,None,None,None,None,None],
+                [3,1,None,None,None,None,None,None,None,None],
+                [4,2,None,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [4,2,1,None,None,None,None,None,None,None],
+                [4,3,2,None,None,None,None,None,None,None],
+                [4,3,2,None,None,None,None,None,None,None],
+                [4,3,2,1,None,None,None,None,None,None],
+                [4,3,3,2,None,None,None,None,None,None],
+                [4,3,3,2,None,None,None,None,None,None],
+                [4,4,3,3,None,None,None,None,None,None],
+                [4,4,3,3,1,None,None,None,None,None],
+                [4,4,3,3,1,None,None,None,None,None],
+                [4,4,4,3,2,None,None,None,None,None],
+                [4,4,4,3,2,None,None,None,None,None],
+                [4,4,4,4,2,1,None,None,None,None],
+                [4,4,4,4,3,1,None,None,None,None],
+                [4,4,4,4,3,2,None,None,None,None],
+            ],
         }
         
         classe = combatente.classe
@@ -256,29 +344,36 @@ class CombatenteService:
             raise DadosInvalidos(f"Classe {classe} não suporta slots de magia")
         
         nivel = min(max(1, combatente.nivel or 1), 20)
+        
+        # Verificar se a classe tem slots disponíveis neste nível
         linha_slots = tabla[nivel - 1]
+        tem_slots = any(slot is not None for slot in linha_slots)
+        
+        if not tem_slots:
+            raise DadosInvalidos(f"Classe {classe} não ganha slots de magia até o nível 3. Nível atual: {nivel}")
+        
         
         # Obter modificador do atributo chave
         atributo_chave = ATRIBUTO_CHAVE.get(classe, 'inteligencia')
         valor_atributo = getattr(combatente, atributo_chave, 10) or 10
         modificador = (valor_atributo - 10) // 2
         
-        # Tabela de bônus por modificador
+        # Tabela de bônus por modificador (para níveis 1-9 de magia)
         BONUS_ATRIBUTO = {
-            -5: [],
-            -4: [],
-            -3: [],
-            -2: [],
-            -1: [],
-            0: [],
-            1: [1],
-            2: [1],
-            3: [1, 1],
-            4: [1, 1],
-            5: [1, 1, 1],
+            -5: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            -4: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            -3: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            -2: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            -1: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            0: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            1: [1, 0, 0, 0, 0, 0, 0, 0, 0],
+            2: [1, 0, 0, 0, 0, 0, 0, 0, 0],
+            3: [1, 1, 0, 0, 0, 0, 0, 0, 0],
+            4: [1, 1, 0, 0, 0, 0, 0, 0, 0],
+            5: [1, 1, 1, 0, 0, 0, 0, 0, 0],
         }
         
-        bonus_list = BONUS_ATRIBUTO.get(modificador, [])
+        bonus_list = BONUS_ATRIBUTO.get(modificador, [0, 0, 0, 0, 0, 0, 0, 0, 0])
         
         # Deletar slots existentes
         for slot in combatente.magias_slots:
@@ -290,7 +385,8 @@ class CombatenteService:
             if base is None:
                 continue
             
-            bonus = bonus_list[nivel_magia - 1] if nivel_magia > 0 and nivel_magia - 1 < len(bonus_list) else 0
+            # nivel_magia começa em 0 (slots de nível 0), então acessar bonus_list direto
+            bonus = bonus_list[nivel_magia] if nivel_magia < len(bonus_list) else 0
             total_slots = base + bonus
             
             novo_slot = MagiaSlot(

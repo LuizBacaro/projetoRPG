@@ -37,12 +37,12 @@ def listar_magias(
         # Mapear Feiticeiro para Mago (mesmas magias)
         classe_normalizado = classe.strip()
         if classe_normalizado.upper() == 'FEITICEIRO':
-            classe_normalizado = 'Mago'
-        query = query.filter(Magia.classe == classe_normalizado)
+            classe_normalizado = 'MAGO'
+        query = query.filter(Magia.classe.ilike(classe_normalizado))
     if nivel is not None:
         query = query.filter(Magia.nivel == nivel)
     if escola:
-        query = query.filter(Magia.escola == escola)
+        query = query.filter(Magia.escola.ilike(escola))
     if nome:
         query = query.filter(Magia.nome.ilike(f"%{nome}%"))
 
