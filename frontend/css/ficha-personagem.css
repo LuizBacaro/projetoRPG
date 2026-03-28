@@ -763,6 +763,60 @@ body::before {
     text-align: center;
 }
 
+/* ── Inputs editáveis de perícia ── */
+.ficha-pericia-input {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+    width: 45px;
+    padding: 0.2rem 0.3rem;
+    border: 1px solid var(--cor-madeira-clara);
+    border-radius: 3px;
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.8), rgba(232, 213, 176, 0.8));
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ficha-pericia-input:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 6px rgba(201, 168, 76, 0.3);
+}
+
+.ficha-pericia-input::-webkit-outer-spin-button,
+.ficha-pericia-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ficha-pericia-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.ficha-pericia-total-valor {
+    font-size: 0.78rem;         /* ✅ levemente maior */
+    font-weight: 700;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    min-width: 38px;            /* ✅ aumentado */
+    text-align: right;
+    background: rgba(201,168,76,0.15);
+    padding: 0.2rem 0.5rem;     /* ✅ padding aumentado */
+    border-radius: 4px;
+    flex-shrink: 0;             /* ✅ não encolhe */
+}
+
+.ficha-pericia-total-valor.positivo {
+    color: var(--cor-verde);
+    background: rgba(26, 92, 42, 0.15);
+}
+
+.ficha-pericia-total-valor.negativo {
+    color: var(--cor-vermelho);
+    background: rgba(139, 26, 26, 0.15);
+}
+
 .ficha-pericia-total {
     font-size: 0.88rem;         /* ✅ levemente maior */
     font-weight: 700;
@@ -1165,6 +1219,29 @@ body::before {
 
 .ficha-btn-adicionar:hover {
     background: #2a7a3a;
+}
+
+.ficha-btn-salvar {
+    background: linear-gradient(135deg, var(--cor-azul) 0%, #0f2040 100%);
+    border: 1px solid #4a7abf;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.ficha-btn-salvar:hover {
+    background: linear-gradient(135deg, #2a5a9b 0%, #1a3a6b 100%);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.ficha-btn-salvar:active {
+    transform: translateY(0);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

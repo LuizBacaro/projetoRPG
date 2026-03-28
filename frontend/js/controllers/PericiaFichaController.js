@@ -151,8 +151,8 @@ export class PericiaFichaController {
                 <td>
                     <input type="number" class="pericias-input input-grad" 
                            data-pericia-id="${pericia.id}"
-                           min="1" max="20" 
-                           value="${dados ? dados.graduacao : 1}"
+                           min="0" max="20" 
+                           value="${dados ? dados.graduacao : 0}"
                            ${!adicionada ? 'disabled' : ''}>
                 </td>
                 <td>
@@ -180,7 +180,7 @@ export class PericiaFichaController {
         try {
             const tr = btnElement.closest('tr');
             const inputGrad = tr.querySelector('.input-grad');
-            const graduacao = parseInt(inputGrad.value) || 1;
+            const graduacao = parseInt(inputGrad.value) || 0;
 
             const classe = this.combatente?.classe || 'Guerreiro';
 

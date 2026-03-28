@@ -4,7 +4,7 @@ Single Responsibility: Apenas mapear endpoints HTTP
 SOLID: Dependency Injection via FastAPI
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List
 import logging
@@ -64,8 +64,8 @@ def criar_pericia(
 def listar_pericias(
     skip: int = 0,
     limit: int = 100,
-    atributo: str = None,
-    classe: str = None,
+    atributo: str = Query(None),
+    classe: str = Query(None),
     db: Session = Depends(get_db)
 ):
     """Lista todas as perícias disponíveis com custo baseado em classe"""
@@ -82,8 +82,21 @@ def listar_pericias(
             pericias_com_custo = []
             for pericia in pericias:
                 custo = service.calcular_custo_pericia(pericia.id, classe)
-                pericia.custo_para_classe = custo
-                pericias_com_custo.append(pericia)
+                # Criar um dict com os dados da perícia + custo
+                pericia_dict = {
+                    "id": pericia.id,
+                    "nome": pericia.nome,
+                    "descricao": pericia.descricao,
+                    "atributo": pericia.atributo,
+                    "tipo": pericia.tipo,
+                    "requer_treinamento": pericia.requer_treinamento,
+                    "especialidade": pericia.especialidade,
+                    "pode_usar_sem_treinamento": pericia.pode_usar_sem_treinamento,
+                    "sofre_penalidade_armadura": pericia.sofre_penalidade_armadura,
+                    "pagina_livro": pericia.pagina_livro,
+                    "custo_para_classe": custo
+                }
+                pericias_com_custo.append(pericia_dict)
             return pericias_com_custo
         
         return pericias
@@ -97,7 +110,7 @@ def listar_pericias(
 @router.get("/{pericia_id}", response_model=PericiaResponse)
 def obter_pericia(
     pericia_id: int,
-    classe: str = None,
+    classe: str = Query(None),
     db: Session = Depends(get_db)
 ):
     """Obtém uma perícia por ID com custo baseado em classe se fornecido"""
@@ -111,9 +124,20 @@ def obter_pericia(
         # Se classe foi especificada, calcula custo
         if classe:
             custo = service.calcular_custo_pericia(pericia_id, classe)
-            pericia.custo_para_classe = custo
-        
-        return pericia
+            pericia_dict = {
+                "id": pericia.id,
+                "nome": pericia.nome,
+                "descricao": pericia.descricao,
+                "atributo": pericia.atributo,
+                "tipo": pericia.tipo,
+                "requer_treinamento": pericia.requer_treinamento,
+                "especialidade": pericia.especialidade,
+                "pode_usar_sem_treinamento": pericia.pode_usar_sem_treinamento,
+                "sofre_penalidade_armadura": pericia.sofre_penalidade_armadura,
+                "pagina_livro": pericia.pagina_livro,
+                "custo_para_classe": custo
+            }
+            return pericia_dict
     except HTTPException:
         raise
     except Exception as e:
@@ -194,7 +218,7 @@ def deletar_pericia(
 def adicionar_pericia_jogador(
     combatente_id: int,
     pericia: PericiaJogadorCreate,
-    classe: str = None,
+    classe: str = Query(None),
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user) if get_current_user else None
 ):

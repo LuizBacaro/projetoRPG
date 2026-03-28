@@ -487,11 +487,15 @@ export class FichaPersonagemController {
                     </div>
                     <div class="ficha-pericia-mod">
                         <span class="ficha-pericia-mod-label">Bôn</span>
+                        <span class="ficha-pericia-mod-valor">${pj.bonus_outros >= 0 ? '+' : ''}${pj.bonus_outros || 0}</span>
+                    </div>
+                    <div class="ficha-pericia-mod">
+                        <span class="ficha-pericia-mod-label">Total</span>
+                        <span class="ficha-pericia-total-valor ${total >= 0 ? 'positivo' : 'negativo'}">
+                            ${total >= 0 ? '+' : ''}${total}
+                        </span>
                     </div>
                 </div>
-                <span class="ficha-pericia-total ${total >= 0 ? 'positivo' : 'negativo'}">
-                    ${total >= 0 ? '+' : ''}${total}
-                </span>
             `;
             container.appendChild(item);
         });

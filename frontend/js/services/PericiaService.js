@@ -267,10 +267,13 @@ export class PericiaService {
      * @param {number} graduacao - Novos pontos
      * @returns {Promise<Object>}
      */
-    async atualizarPericia(combatenteId, periciaJogadorId, graduacao) {
+    async atualizarPericia(combatenteId, periciaJogadorId, graduacao, bonusOutros = 0) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/pericia/${periciaJogadorId}`;
-            const payload = { graduacao };
+            const payload = { 
+                graduacao,
+                bonus_outros: bonusOutros
+            };
 
             console.log('📡 PUT:', url, payload);
 
