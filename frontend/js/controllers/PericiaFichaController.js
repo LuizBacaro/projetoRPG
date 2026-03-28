@@ -260,6 +260,7 @@ export class PericiaFichaController {
             // Re-renderizar para desfazer as mudanças
             this.renderizar();
         }
+    }
 
     async adicionarPericia(periciaId, btnElement) {
         try {
