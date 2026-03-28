@@ -152,7 +152,7 @@ class PericiaService:
             PericiaJogador.combatente_id == combatente_id,
             PericiaJogador.pericia_id == pericia_jogador.pericia_id
         ).first()
-        
+
         if pericia_existente:
             raise ValueError("Jogador já possui essa perícia")
 
