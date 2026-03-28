@@ -1,20 +1,25 @@
 """
 Seed simplificado - popula banco de dados
+Usa seed_pericias.py para dados de perícias
 """
 import sys
 from pathlib import Path
-import openpyxl  # ✅ Adicionado
 
 # Adicionar diretório raiz ao path
 backend_dir = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(backend_dir))
+sys.path.insert(0, str(backend_dir / 'scripts'))
 
 print(f"📁 Backend dir: {backend_dir}")
 
 try:
     from app.core.database import SessionLocal, Base, engine
     from app.models.combatente import Combatente
+    from app.models.pericia import Pericia, PericiaClasse
     import app.models.combate  # Importar para criar tabela
+    
+    # Import seed data
+    from seed_pericias import PERICIAS_DATA
     
     print("✅ Imports bem-sucedidos!")
     
@@ -37,135 +42,61 @@ try:
             print("Se quiser resetar, delete o arquivo rpg_arena.db e rode novamente\n")
             
             # Verificar e popular perícias se vazio
-            from app.models.pericia import PericiaClasse, Pericia
-            
             pericia_count = db.query(Pericia).count()
             if pericia_count == 0:
-                print("🔄 Populando perícias do Excel...")
-                excel_path = backend_dir.parent / 'Perícias.xlsx'
+                print("🔄 Populando perícias do seed_pericias.py...")
                 
-                if excel_path.exists():
-                    wb = openpyxl.load_workbook(excel_path)
-                    ws = wb.active
+                pericias_list = []
+                for data in PERICIAS_DATA:
+                    # Check if already exists
+                    if db.query(Pericia).filter(Pericia.nome == data['nome']).first():
+                        continue
                     
-                    # Row 2 has headers
-                    row2 = list(ws.iter_rows(min_row=2, max_row=2, values_only=True))[0]
-                    headers = {}
-                    for idx, valor in enumerate(row2):
-                        if not valor:
-                            continue
-                        valor_lower = str(valor).lower().strip()
-                        if 'perícia' in valor_lower and 'especialização' not in valor_lower:
-                            headers['nome'] = idx
-                        elif 'descrição' in valor_lower:
-                            headers['descricao'] = idx
-                        elif 'atributo' in valor_lower:
-                            headers['atributo'] = idx
-                        elif 'penalidade de armadura' in valor_lower:
-                            headers['sofre_penalidade_armadura'] = idx
-                        elif 'sem treinamento' in valor_lower or 'pode ser utilizada' in valor_lower:
-                            headers['pode_usar_sem_treinamento'] = idx
-                    
-                    # Process data rows
-                    pericias_list = []
-                    for row_idx in range(5, ws.max_row + 1):
-                        row = list(ws.iter_rows(min_row=row_idx, max_row=row_idx, values_only=True))[0]
-                        
-                        nome = row[headers.get('nome', 2)] if headers.get('nome') and len(row) > headers.get('nome') else None
-                        if not nome or not isinstance(nome, str):
-                            continue
-                        
-                        nome = nome.strip()
-                        if not nome:
-                            continue
-                        
-                        # Check if already exists
-                        if db.query(Pericia).filter(Pericia.nome == nome).first():
-                            continue
-                        
-                        # Get field values safely
-                        desc = row[headers.get('descricao', 3)] if headers.get('descricao') and len(row) > headers.get('descricao') else ''
-                        attr = row[headers.get('atributo', -1)] if headers.get('atributo') and len(row) > headers.get('atributo') else 'DES'
-                        pode_usar = 1 if (headers.get('pode_usar_sem_treinamento') and len(row) > headers.get('pode_usar_sem_treinamento') and row[headers.get('pode_usar_sem_treinamento')] == 'Sim') else 0
-                        sofre_pen = 1 if (headers.get('sofre_penalidade_armadura') and len(row) > headers.get('sofre_penalidade_armadura') and row[headers.get('sofre_penalidade_armadura')] == 'Sim') else 0
-                        
-                        pericia = Pericia(
-                            nome=nome,
-                            descricao=desc,
-                            atributo=attr,
-                            tipo='comum',
-                            requer_treinamento=0,
-                            especialidade=None,
-                            pode_usar_sem_treinamento=pode_usar,
-                            sofre_penalidade_armadura=sofre_pen,
-                        )
-                        pericias_list.append(pericia)
-                    
-                    # Add all
-                    db.add_all(pericias_list)
-                    db.commit()
-                    print(f"✅ {len(pericias_list)} perícias criadas!")
-                else:
-                    print(f"⚠️  Excel não encontrado: {excel_path}")
+                    pericia = Pericia(
+                        nome=data['nome'],
+                        descricao=data.get('descricao', ''),
+                        atributo=data.get('atributo', 'DES'),
+                        tipo='comum',
+                        requer_treinamento=0,
+                        especialidade=None,
+                        pode_usar_sem_treinamento=0,
+                        sofre_penalidade_armadura=0,
+                    )
+                    pericias_list.append(pericia)
+                
+                # Add all
+                db.add_all(pericias_list)
+                db.commit()
+                print(f"✅ {len(pericias_list)} perícias criadas!")
             else:
                 print(f"✅ Perícias já populadas ({pericia_count} perícias)")
             
             # Verificar e popular pericias_classes se vazio
             pericia_class_count = db.query(PericiaClasse).count()
             if pericia_class_count == 0:
-                print("🔄 Populando pericias_classes do Excel...")
-                excel_path = backend_dir.parent / 'Perícias.xlsx'
+                print("🔄 Populando pericias_classes do seed_pericias.py...")
                 
-                if excel_path.exists():
-                    wb = openpyxl.load_workbook(excel_path)
-                    ws = wb.active
+                associacoes = []
+                for data in PERICIAS_DATA:
+                    # Find pericia
+                    pericia = db.query(Pericia).filter(Pericia.nome == data['nome']).first()
+                    if not pericia:
+                        continue
                     
-                    # Row 3 tem class names
-                    row3 = list(ws.iter_rows(min_row=3, max_row=3, values_only=True))[0]
-                    classe_columns = {}
-                    
-                    for col_idx in range(6, len(row3)):
-                        classe = row3[col_idx]
-                        if classe and isinstance(classe, str) and classe.strip() and classe.strip() not in ['Todos', '']:
-                            classe_columns[col_idx] = classe.strip()
-                    
-                    # Process data rows
-                    associacoes = []
-                    for row_idx in range(5, ws.max_row + 1):
-                        row = list(ws.iter_rows(min_row=row_idx, max_row=row_idx, values_only=True))[0]
-                        
-                        nome_pericia = row[2] if len(row) > 2 else None
-                        if not nome_pericia or not isinstance(nome_pericia, str):
-                            continue
-                        
-                        nome_pericia = nome_pericia.strip()
-                        if not nome_pericia:
-                            continue
-                        
-                        pericia = db.query(Pericia).filter(Pericia.nome == nome_pericia).first()
-                        if not pericia:
-                            continue
-                        
-                        # Check columns
-                        for col_idx, classe_nome in classe_columns.items():
-                            cell_value = row[col_idx] if len(row) > col_idx else None
-                            if cell_value == 'X':
-                                assoc = PericiaClasse(
-                                    pericia_id=pericia.id,
-                                    classe_nome=classe_nome,
-                                    is_default=1
-                                )
-                                associacoes.append(assoc)
-                    
-                    # Add all
-                    db.add_all(associacoes)
-                    db.commit()
-                    print(f"✅ {len(associacoes)} associações pericias_classes criadas!")
-                else:
-                    print(f"⚠️  Excel não encontrado: {excel_path}")
+                    # Create association for each class
+                    for classe_nome in data.get('classes', []):
+                        assoc = PericiaClasse(
+                            pericia_id=pericia.id,
+                            classe_nome=classe_nome,
+                            is_default=1
+                        )
+                        db.add(assoc)
+                        associacoes.append(assoc)
+
+                db.commit()
+                print(f"✅ {len(associacoes)} associações pericias_classes criadas!")
             else:
                 print(f"✅ pericias_classes já populado ({pericia_class_count} associações)")
-        
         else:
             print("\n🌱 Populando banco de dados...")
             
@@ -228,6 +159,46 @@ try:
             
             db.commit()
             print(f"\n🎉 {len(combatentes_iniciais)} combatentes criados com sucesso!")
+            
+            # Populate pericias
+            print("\n🔄 Populando perícias do seed_pericias.py...")
+            pericias_list = []
+            for data in PERICIAS_DATA:
+                pericia = Pericia(
+                    nome=data['nome'],
+                    descricao=data.get('descricao', ''),
+                    atributo=data.get('atributo', 'DES'),
+                    tipo='comum',
+                    requer_treinamento=0,
+                    especialidade=None,
+                    pode_usar_sem_treinamento=0,
+                    sofre_penalidade_armadura=0,
+                )
+                pericias_list.append(pericia)
+            
+            db.add_all(pericias_list)
+            db.commit()
+            print(f"✅ {len(pericias_list)} perícias criadas!")
+            
+            # Populate pericias_classes
+            print("🔄 Populando pericias_classes do seed_pericias.py...")
+            associacoes = []
+            for data in PERICIAS_DATA:
+                pericia = db.query(Pericia).filter(Pericia.nome == data['nome']).first()
+                if not pericia:
+                    continue
+                
+                for classe_nome in data.get('classes', []):
+                    assoc = PericiaClasse(
+                        pericia_id=pericia.id,
+                        classe_nome=classe_nome,
+                        is_default=1
+                    )
+                    db.add(assoc)
+                    associacoes.append(assoc)
+            
+            db.commit()
+            print(f"✅ {len(associacoes)} associações pericias_classes criadas!")
         
         print("\n" + "=" * 50)
         print("Para iniciar o servidor:")
