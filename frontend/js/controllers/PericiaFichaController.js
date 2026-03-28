@@ -124,7 +124,7 @@ export class PericiaFichaController {
         tbody.innerHTML = '';
 
         if (this.periciasFiltradas.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="pericias-vazio">❌ Nenhuma perícia encontrada</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="pericias-vazio">❌ Nenhuma perícia encontrada</td></tr>';
             tabela.style.display = 'table';
             return;
         }
@@ -155,18 +155,23 @@ export class PericiaFichaController {
                            data-pericia-id="${pericia.id}"
                            min="0" max="20"
                            value="${dados ? dados.graduacao : 0}"
+                           style="text-align: center;"
                            ${!adicionada ? 'disabled' : ''}>
+                </td>
+                <td style="text-align: center; font-weight: bold;">
+                    ${adicionada ? (dados.modificador_atributo >= 0 ? '+' : '') + dados.modificador_atributo.toFixed(0) : '-'}
                 </td>
                 <td>
                     <input type="number" class="pericias-input input-bonus"
                            data-pericia-id="${pericia.id}"
                            min="0" max="20"
                            value="${dados ? dados.bonus : 0}"
+                           style="text-align: center;"
                            ${!adicionada ? 'disabled' : ''}>
                 </td>
                 <td style="text-align: center; font-weight: bold; min-width: 50px;">
                     ${adicionada
-                        ? `${dados.total}`
+                        ? `${dados.total >= 0 ? '+' : ''}${dados.total}`
                         : '-'
                     }
                 </td>
