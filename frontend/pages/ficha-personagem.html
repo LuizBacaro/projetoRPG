@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha do Personagem</title>
     <link rel="stylesheet" href="../css/variables.css">
-    <link rel="stylesheet" href="../css/ficha-personagem.css?v=3">
+    <link rel="stylesheet" href="../css/modais.css">
+    <link rel="stylesheet" href="../css/ficha-personagem.css?v=5">
     <link rel="stylesheet" href="../css/grimorio.css">
 </head>
 <body>
@@ -14,10 +15,10 @@
     <!-- ── Header ── -->
     <header class="ficha-header">
         <div class="ficha-header-esquerda">
-            <button class="btn-voltar" onclick="window.close()">← Voltar</button>
+            <button class="btn-voltar" onclick="window.location.href='/pages/dashboard.html'">← Voltar</button>
         </div>
         <div class="ficha-titulo">
-            <h1 class="ficha-titulo-texto">📜 Ficha do Personagem</h1>
+            <h1 class="ficha-titulo-texto">📜 <span id="fichaHeaderNome">Ficha do Personagem</span></h1>
         </div>
         <div class="ficha-header-direita">
             <!-- ✅ NOVO: Botão Grimório — visível apenas para classes conjuradoras -->
@@ -31,27 +32,10 @@
     <!-- ── Corpo: 3 colunas ── -->
     <main class="ficha-corpo">
 
-        <!-- COLUNA ESQUERDA: foto + identidade + equipamentos -->
+        <!-- COLUNA ESQUERDA: atributos -->
         <aside class="ficha-coluna-esquerda">
-            <div class="ficha-foto-container">
-                <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto">
-                <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
-            </div>
 
-            <div class="ficha-identidade">
-                <h2 id="fichaNome" class="ficha-nome">—</h2>
-                <div class="ficha-meta">
-                    <span id="fichaRaca"   class="ficha-tag ficha-tag-raca">—</span>
-                    <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
-                    <span id="fichaTipo"   class="ficha-tag ficha-tag-tipo">—</span>
-                </div>
-                <div class="ficha-nivel-linha">
-                    <span class="ficha-nivel-label">Nível</span>
-                    <span id="fichaNivel" class="ficha-nivel-valor">—</span>
-                </div>
-            </div>
-
-            <!-- Atributos resumo (layout 2 colunas × 3 linhas) -->
+            <!-- Atributos resumo (3 colunas × 2 linhas) -->
             <div class="ficha-secao">
                 <h3 class="ficha-secao-titulo">⚔️ Atributos</h3>
                 <div class="ficha-atributos-circulo-grid-resumo">
@@ -100,13 +84,45 @@
                 </div>
             </div>
 
-            <!-- Equipamentos foram movidos para a coluna central -->
+            <!-- Resistências -->
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">🛡️ Resistências</h3>
+                <div class="ficha-resistencias-row">
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Fortitude</span>
+                        <span id="fichaFort" class="ficha-res-valor">+0</span>
+                    </div>
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Reflexos</span>
+                        <span id="fichaReflex" class="ficha-res-valor">+0</span>
+                    </div>
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Vontade</span>
+                        <span id="fichaVont" class="ficha-res-valor">+0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Talentos -->
+            <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">🌟 Talentos</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarTalento" 
+                            title="Adicionar talento">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaTalentos" class="ficha-talentos-lista">
+                    <span class="ficha-vazio">Nenhum talento cadastrado</span>
+                </div>
+            </div>
 
         </aside>
 
-        <!-- COLUNA CENTRAL: atributos + defesa + resistências -->
+        <!-- COLUNA CENTRAL: defesa + foto + identidade -->
         <section class="ficha-coluna-central">
 
+            <!-- Defesa: CA / PV / Iniciativa -->
             <div class="ficha-defesa-row">
                 <div class="ficha-defesa-box ficha-ca-box">
                     <span class="ficha-defesa-label">CA</span>
@@ -137,37 +153,31 @@
                 </div>
             </div>
 
-            <div class="ficha-secao">
-                <h3 class="ficha-secao-titulo">🛡️ Resistências</h3>
-                <div class="ficha-resistencias-row">
-                    <div class="ficha-resistencia-box">
-                        <span class="ficha-res-label">Fortitude</span>
-                        <span id="fichaFort" class="ficha-res-valor">+0</span>
-                    </div>
-                    <div class="ficha-resistencia-box">
-                        <span class="ficha-res-label">Reflexos</span>
-                        <span id="fichaReflex" class="ficha-res-valor">+0</span>
-                    </div>
-                    <div class="ficha-resistencia-box">
-                        <span class="ficha-res-label">Vontade</span>
-                        <span id="fichaVont" class="ficha-res-valor">+0</span>
-                    </div>
+            <!-- Foto do personagem -->
+            <div class="ficha-foto-container">
+                <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto">
+                <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
+            </div>
+
+            <!-- Identidade (abaixo da foto) -->
+            <div class="ficha-identidade">
+                <div class="ficha-meta">
+                    <span id="fichaRaca"   class="ficha-tag ficha-tag-raca">—</span>
+                    <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
+                    <span id="fichaTipo"   class="ficha-tag ficha-tag-tipo">—</span>
+                    <span class="ficha-tag ficha-tag-nivel">
+                        <span class="ficha-nivel-label">Nív.</span>
+                        <span id="fichaNivel" class="ficha-nivel-valor">—</span>
+                    </span>
                 </div>
             </div>
 
-            <div class="ficha-secao">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 class="ficha-secao-titulo">🌟 Talentos</h3>
-                    <button class="ficha-btn-adicionar" id="btnAdicionarTalento" 
-                            title="Adicionar talento">
-                        ➕ Adicionar
-                    </button>
-                </div>
-                <div id="fichaTalentos" class="ficha-talentos-lista">
-                    <span class="ficha-vazio">Nenhum talento cadastrado</span>
-                </div>
-            </div>
+        </section>
 
+        <!-- COLUNA DIREITA: equipamentos + ataques + slots resumo + perícias -->
+        <aside class="ficha-coluna-direita">
+
+            <!-- Equipamentos -->
             <div class="ficha-secao">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
@@ -180,11 +190,6 @@
                     <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
                 </div>
             </div>
-
-        </section>
-
-        <!-- COLUNA DIREITA: ataques + slots resumo + perícias -->
-        <aside class="ficha-coluna-direita">
 
             <div class="ficha-secao">
                 <h3 class="ficha-secao-titulo">⚔️ Ataques</h3>
@@ -482,7 +487,8 @@
 </div>
 
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
-<script type="module" src="../js/controllers/FichaPersonagemController.js?v=5"></script>
+<script src="../js/services/NotificationService.js"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=6"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=2"></script>
 </body>
 </html>

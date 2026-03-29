@@ -48,6 +48,7 @@ export class FichaPersonagemController {
 
             // ── Renderizar tudo ──
             this.renderizarIdentidade();
+            this._atualizarHeaderNome();
             this.renderizarAtributos();
             this.renderizarDefesa();
             this.renderizarResistencias();
@@ -247,7 +248,13 @@ export class FichaPersonagemController {
         if (nome)   nome.textContent   = this.combatente.nome;
         if (raca)   raca.textContent   = this.combatente.raca   || '—';
         if (classe) classe.textContent = this.combatente.classe || '—';
-        if (tipo)   tipo.textContent   = this.combatente.tipo   || 'jogador';
+        if (tipo) {
+            const tipoVal = this.combatente.tipo || 'jogador';
+            tipo.textContent = tipoVal;
+            // Remover classes antigas e aplicar classe específica do tipo
+            tipo.classList.remove('ficha-tag-jogador', 'ficha-tag-monstro', 'ficha-tag-npc');
+            tipo.classList.add(`ficha-tag-${tipoVal}`);
+        }
         if (nivel)  nivel.textContent  = this.combatente.nivel  || 1;
 
         if (this.combatente.foto_url) {
@@ -262,6 +269,13 @@ export class FichaPersonagemController {
         }
 
         console.log('✅ Identidade renderizada');
+    }
+
+    _atualizarHeaderNome() {
+        const el = document.getElementById('fichaHeaderNome');
+        if (el && this.combatente?.nome) {
+            el.textContent = this.combatente.nome;
+        }
     }
 
     // ─────────────────────────────────────────────────────────
