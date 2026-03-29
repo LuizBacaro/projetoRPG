@@ -484,11 +484,13 @@ body {
 .ficha-pv-box {
     background: linear-gradient(135deg, #8b1a1a 0%, #5c0f0f 100%);
     border: 2px solid #c94040;
+    justify-content: center;
 }
 
 .ficha-ini-box {
     background: linear-gradient(135deg, var(--cor-madeira) 0%, #3d2410 100%);
     border: 2px solid var(--cor-dourada);
+    justify-content: center;
 }
 
 .ficha-defesa-label {
