@@ -5,6 +5,7 @@ OCP: extensível sem modificar a lógica de negócio
 """
 from sqlalchemy.orm import Session
 from typing import Optional
+from .base import commit_with_rollback
 from ..models.usuario import Usuario, PerfilUsuario
 
 
@@ -35,12 +36,12 @@ class UsuarioRepository:
 
     def criar(self, usuario: Usuario) -> Usuario:
         self.db.add(usuario)
-        self.db.commit()
+        commit_with_rollback(self.db)
         self.db.refresh(usuario)
         return usuario
 
     def atualizar(self, usuario: Usuario) -> Usuario:
-        self.db.commit()
+        commit_with_rollback(self.db)
         self.db.refresh(usuario)
         return usuario
 

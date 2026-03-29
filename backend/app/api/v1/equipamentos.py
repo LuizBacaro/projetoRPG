@@ -21,15 +21,8 @@ from app.schemas.equipamento import (
     EquipamentoJogadorCreate, EquipamentoJogadorListResponse
 )
 
-# ✅ CORRETO: Busque o módulo de segurança
-try:
-    from app.core.security import get_current_user
-except ImportError:
-    try:
-        from app.security import get_current_user
-    except ImportError:
-        async def get_current_user(request=None):
-            return None
+# ✅ CORRETO: Import do módulo de autenticação
+from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +35,7 @@ router = APIRouter(prefix="/equipamentos", tags=["Equipamentos"])
 def criar_equipamento(
     equipamento: EquipamentoCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(get_usuario_atual)
 ):
     """Cria um novo equipamento (Admin only)"""
     try:
@@ -59,7 +52,8 @@ def criar_equipamento(
 def listar_equipamentos(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(get_usuario_atual)
 ):
     """Lista todos os equipamentos disponíveis"""
     try:
@@ -73,7 +67,8 @@ def listar_equipamentos(
 @router.get("/{equipamento_id}", response_model=EquipamentoResponse)
 def obter_equipamento(
     equipamento_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(get_usuario_atual)
 ):
     """Obtém um equipamento específico"""
     try:
@@ -98,7 +93,7 @@ def adicionar_equipamento_jogador(
     combatente_id: int,
     equipamento_jogador: EquipamentoJogadorCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Adiciona um equipamento ao combatente"""
     try:
@@ -114,7 +109,8 @@ def adicionar_equipamento_jogador(
 @router.get("/{combatente_id}/listar", response_model=List[EquipamentoJogadorListResponse])
 def listar_equipamentos_jogador(
     combatente_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Lista todos os equipamentos de um combatente"""
     try:
@@ -130,7 +126,7 @@ def remover_equipamento_jogador(
     combatente_id: int,
     equipamento_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Remove um equipamento do combatente"""
     try:
@@ -153,7 +149,7 @@ def atualizar_quantidade_equipamento(
     equipamento_id: int,
     quantidade: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Atualiza a quantidade de um equipamento"""
     try:

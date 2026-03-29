@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
 from datetime import timedelta
+from typing import Optional
 import logging
 
 from ...core.config import settings
@@ -14,9 +15,10 @@ from ...core.database import SessionLocal
 from ...core.security import (
     hash_senha,
     verificar_senha,
-    criar_token
+    criar_token,
+    decodificar_token,
 )
-from ...core.deps import get_db
+from ...core.deps import get_db, get_usuario_atual
 from ...repositories.usuario_repository import UsuarioRepository
 from ...models.usuario import Usuario
 
@@ -47,6 +49,7 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     """Schema para resposta de autenticação"""
     access_token: str = Field(..., description="JWT token para autenticação")
+    refresh_token: Optional[str] = Field(default=None, description="Refresh token para renovação da sessão")
     token_type: str = Field(default="bearer", description="Tipo do token")
     usuario: dict = Field(..., description="Dados do usuário autenticado")
 
@@ -62,6 +65,11 @@ class TokenResponse(BaseModel):
                 }
             }
         }
+
+
+class RefreshRequest(BaseModel):
+    """Schema para renovação de sessão via refresh token."""
+    refresh_token: str = Field(..., description="Refresh token JWT válido")
 
 
 class UsuarioResponse(BaseModel):
@@ -164,7 +172,14 @@ def login(
     token = criar_token(
         data={"sub": usuario.email},
         secret_key=settings.SECRET_KEY,
-        expires_delta=timedelta(hours=24)
+        expires_delta=timedelta(hours=24),
+        token_type="access",
+    )
+    refresh_token = criar_token(
+        data={"sub": usuario.email},
+        secret_key=settings.SECRET_KEY,
+        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+        token_type="refresh",
     )
 
     logger.info(f"✅ Login bem-sucedido: {usuario.email}")
@@ -172,6 +187,7 @@ def login(
     # ✅ Retorna token + dados do usuário
     return TokenResponse(
         access_token=token,
+        refresh_token=refresh_token,
         token_type="bearer",
         usuario={
             "id": usuario.id,
@@ -206,6 +222,78 @@ def logout():
     }
 
 
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Renovar tokens de autenticação",
+    description="Gera novo access token e novo refresh token (token rotation)"
+)
+def refresh(
+    payload: RefreshRequest,
+    db: Session = Depends(get_db),
+) -> TokenResponse:
+    """Renova a sessão a partir de um refresh token válido."""
+    token_payload = decodificar_token(payload.refresh_token, settings.SECRET_KEY)
+    if token_payload is None or token_payload.get("type") != "refresh":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token inválido ou expirado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    email = token_payload.get("sub")
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token sem usuário",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    repo = UsuarioRepository(db)
+    usuario = repo.buscar_por_email(email)
+
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado",
+        )
+
+    if not usuario.ativo:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Usuário inativo",
+        )
+
+    novo_access_token = criar_token(
+        data={"sub": usuario.email},
+        secret_key=settings.SECRET_KEY,
+        expires_delta=timedelta(hours=24),
+        token_type="access",
+    )
+    novo_refresh_token = criar_token(
+        data={"sub": usuario.email},
+        secret_key=settings.SECRET_KEY,
+        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+        token_type="refresh",
+    )
+
+    logger.info(f"✅ Token renovado com sucesso: {usuario.email}")
+
+    return TokenResponse(
+        access_token=novo_access_token,
+        refresh_token=novo_refresh_token,
+        token_type="bearer",
+        usuario={
+            "id": usuario.id,
+            "email": usuario.email,
+            "nome": usuario.nome,
+            "perfil": usuario.perfil,
+            "ativo": usuario.ativo,
+        },
+    )
+
+
 @router.get(
     "/me",
     response_model=UsuarioResponse,
@@ -213,7 +301,7 @@ def logout():
     description="Retorna os dados do usuário atualmente autenticado"
 )
 def obter_usuario_atual(
-    usuario: Usuario = Depends(get_db)  # ✅ Será injetado pela dependency
+    usuario: Usuario = Depends(get_usuario_atual)
 ):
     """
     Endpoint que retorna dados do usuário logado.

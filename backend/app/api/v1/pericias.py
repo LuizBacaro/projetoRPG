@@ -22,19 +22,8 @@ from app.schemas.pericia import (
     PericiaJogadorListResponse
 )
 
-# ✅ CORRETO: Busque o módulo de segurança (pode estar em outro lugar)
-# Tente importar de onde realmente está em seu projeto
-try:
-    # Opção 1: Se estiver em app/core/security.py
-    from app.core.security import get_current_user
-except ImportError:
-    try:
-        # Opção 2: Se estiver em app/security.py
-        from app.security import get_current_user
-    except ImportError:
-        # Opção 3: Se não existir, criar um dummy (sem autenticação)
-        async def get_current_user(request=None):
-            return None
+# ✅ CORRETO: Import do módulo de autenticação
+from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +36,7 @@ router = APIRouter(prefix="/pericias", tags=["Perícias"])
 def criar_pericia(
     pericia: PericiaCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(get_usuario_atual)
 ):
     """Cria uma nova perícia (Admin only)"""
     try:
@@ -66,7 +55,8 @@ def listar_pericias(
     limit: int = 100,
     atributo: str = Query(None),
     classe: str = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(get_usuario_atual)
 ):
     """Lista todas as perícias disponíveis com custo baseado em classe"""
     try:
@@ -111,7 +101,8 @@ def listar_pericias(
 def obter_pericia(
     pericia_id: int,
     classe: str = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(get_usuario_atual)
 ):
     """Obtém uma perícia por ID com custo baseado em classe se fornecido"""
     try:
@@ -150,7 +141,7 @@ def atualizar_pericia(
     pericia_id: int,
     pericia: PericiaUpdate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(get_usuario_atual)
 ):
     """Atualiza uma perícia (Admin only)"""
     try:
@@ -171,7 +162,8 @@ def atualizar_pericia(
 @router.get("/classe/{classe_nome}", response_model=List[PericiaResponse])
 def listar_pericias_classe(
     classe_nome: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(get_usuario_atual)
 ):
     """Lista perícias padrão de uma classe com seus custos"""
     try:
@@ -197,7 +189,7 @@ def listar_pericias_classe(
 def deletar_pericia(
     pericia_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(get_usuario_atual)
 ):
     """Deleta uma perícia (Admin only)"""
     try:
@@ -220,7 +212,7 @@ def adicionar_pericia_jogador(
     pericia: PericiaJogadorCreate,
     classe: str = Query(None),
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Adiciona uma perícia ao jogador com validação de custo"""
     try:
@@ -259,7 +251,8 @@ def adicionar_pericia_jogador(
 @router.get("/{combatente_id}/listar", response_model=PericiaJogadorListResponse)
 def listar_pericias_jogador(
     combatente_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Lista todas as perícias de um combatente"""
     try:
@@ -282,7 +275,7 @@ def atualizar_pericia_jogador(
     pericia_jogador_id: int,
     pericia: PericiaJogadorUpdate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Atualiza uma perícia do jogador"""
     try:
@@ -305,7 +298,7 @@ def deletar_pericia_jogador(
     combatente_id: int,
     pericia_jogador_id: int,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user) if get_current_user else None
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Deleta uma perícia do jogador"""
     try:
@@ -323,7 +316,8 @@ def deletar_pericia_jogador(
 @router.get("/{combatente_id}/estatisticas")
 def obter_estatisticas_pericias(
     combatente_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente)
 ):
     """Obtém estatísticas de perícias do combatente"""
     try:

@@ -13,6 +13,8 @@ from .config import settings
 from .database import SessionLocal
 from .security import decodificar_token
 from ..repositories.usuario_repository import UsuarioRepository
+from ..models.combatente import Combatente
+from ..models.ataque import MagiaSlot
 from ..models.usuario import PerfilUsuario
 
 logger = logging.getLogger(__name__)
@@ -237,3 +239,95 @@ def requer_jogador(
         )
     logger.info(f"✅ Jogador autorizado: {usuario.email}")
     return usuario
+
+
+def requer_dono_ou_admin_combatente(
+    combatente_id: int,
+    usuario=Depends(get_usuario_atual),
+    db: Session = Depends(get_db),
+) -> "Usuario":
+    """Dependency: garante que o usuário é dono do combatente ou admin."""
+    combatente = db.query(Combatente).filter(Combatente.id == combatente_id).first()
+    if not combatente:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Combatente {combatente_id} não encontrado",
+        )
+
+    if usuario.perfil == PerfilUsuario.ADMINISTRADOR:
+        return usuario
+
+    if combatente.dono_id != usuario.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não tem permissão para acessar este combatente",
+        )
+
+    return usuario
+
+
+def requer_dono_ou_admin_slot_magia(
+    slot_id: int,
+    usuario=Depends(get_usuario_atual),
+    db: Session = Depends(get_db),
+) -> "Usuario":
+    """Dependency: garante acesso por propriedade para endpoints de slot por ID."""
+    slot = db.query(MagiaSlot).filter(MagiaSlot.id == slot_id).first()
+    if not slot:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Slot não encontrado",
+        )
+
+    combatente = db.query(Combatente).filter(Combatente.id == slot.combatente_id).first()
+    if not combatente:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Combatente {slot.combatente_id} não encontrado",
+        )
+
+    if usuario.perfil == PerfilUsuario.ADMINISTRADOR:
+        return usuario
+
+    if combatente.dono_id != usuario.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não tem permissão para alterar este slot",
+        )
+
+    return usuario
+
+
+def validar_combatentes_do_usuario(
+    combatente_ids: list[int],
+    usuario,
+    db: Session,
+) -> None:
+    """Valida lista de combatentes para operações em lote (ex.: iniciar combate)."""
+    if usuario.perfil == PerfilUsuario.ADMINISTRADOR:
+        return
+
+    ids_unicos = list(set(combatente_ids))
+    if not ids_unicos:
+        return
+
+    combatentes = (
+        db.query(Combatente)
+        .filter(Combatente.id.in_(ids_unicos))
+        .all()
+    )
+
+    encontrados = {c.id for c in combatentes}
+    faltantes = [cid for cid in ids_unicos if cid not in encontrados]
+    if faltantes:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Combatentes não encontrados: {faltantes}",
+        )
+
+    sem_acesso = [c.id for c in combatentes if c.dono_id != usuario.id]
+    if sem_acesso:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Sem permissão para os combatentes: {sem_acesso}",
+        )

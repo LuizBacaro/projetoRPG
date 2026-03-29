@@ -9,10 +9,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
 import logging
+from sqlalchemy import inspect, text
 
 from .core.config import settings
 from .core.database import engine, Base, SessionLocal, get_db
 from .core.init_db import criar_admin_padrao, inicializar_equipamentos, inicializar_talentos
+from .core.rate_limit import RateLimitMiddleware
 from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias, magias_preparadas, equipamentos, talentos
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
@@ -59,6 +61,20 @@ app.add_middleware(
     expose_headers=["Content-Length"],
     max_age=600,
 )
+
+if settings.RATE_LIMIT_ENABLED:
+    app.add_middleware(
+        RateLimitMiddleware,
+        api_limit_per_minute=settings.API_RATE_LIMIT_PER_MINUTE,
+        login_limit_per_minute=settings.LOGIN_RATE_LIMIT_PER_MINUTE,
+    )
+    logger.info(
+        "✅ Rate limiting ativo: api=%s/min, login=%s/min",
+        settings.API_RATE_LIMIT_PER_MINUTE,
+        settings.LOGIN_RATE_LIMIT_PER_MINUTE,
+    )
+else:
+    logger.warning("⚠️  Rate limiting desativado")
 
 if _allow_all:
     logger.warning("⚠️  CORS com wildcard '*' — NÃO usar em produção!")
@@ -179,6 +195,10 @@ def _inicializar_banco(db) -> None:
     """
     # 1. Criar admin padrão (precisa ser primeiro)
     criar_admin_padrao(db)
+
+    # 1.1 Garantir coluna de ownership (compatibilidade para bases antigas)
+    _garantir_coluna_dono_id()
+    _garantir_constraints_item_13()
     
     # 2. Popular condições D&D (global, sem dependências)
     _seed_condicoes(db)
@@ -195,6 +215,94 @@ def _inicializar_banco(db) -> None:
     
     # 6. Popular combatentes iniciais (pode usar condições e perícias)
     _seed_combatentes(db)
+
+
+def _garantir_coluna_dono_id() -> None:
+    """Adiciona `combatentes.dono_id` em bases antigas quando a migração não foi aplicada."""
+    inspector = inspect(engine)
+    colunas = {col["name"] for col in inspector.get_columns("combatentes")}
+    if "dono_id" in colunas:
+        return
+
+    logger.warning("⚠️  coluna combatentes.dono_id ausente; aplicando schema guard")
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE combatentes ADD COLUMN dono_id INTEGER"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_combatentes_dono_id ON combatentes (dono_id)"))
+
+        owner_id = conn.execute(
+            text(
+                """
+                SELECT id
+                FROM usuarios
+                WHERE perfil = 'administrador' AND ativo = 1
+                ORDER BY id
+                LIMIT 1
+                """
+            )
+        ).scalar()
+
+        if owner_id is None:
+            owner_id = conn.execute(
+                text("SELECT id FROM usuarios ORDER BY id LIMIT 1")
+            ).scalar()
+
+        if owner_id is not None:
+            conn.execute(
+                text("UPDATE combatentes SET dono_id = :owner_id WHERE dono_id IS NULL"),
+                {"owner_id": owner_id},
+            )
+
+
+def _garantir_constraints_item_13() -> None:
+    """Normaliza dados e garante unicidade para item #13 em bases existentes."""
+    logger.info("🔧 Aplicando guard de integridade do item #13")
+    with engine.begin() as conn:
+        # Normaliza limites de HP
+        conn.execute(text("UPDATE combatentes SET hp_maximo = 1 WHERE hp_maximo IS NULL OR hp_maximo <= 0"))
+        conn.execute(text("UPDATE combatentes SET hp_atual = 0 WHERE hp_atual IS NULL OR hp_atual < 0"))
+        conn.execute(text("UPDATE combatentes SET hp_atual = hp_maximo WHERE hp_atual > hp_maximo"))
+
+        # Normaliza tipo para conjunto fechado permitido
+        conn.execute(
+            text(
+                """
+                UPDATE combatentes
+                SET tipo = LOWER(COALESCE(tipo, 'npc'))
+                WHERE tipo IS NULL OR LOWER(tipo) NOT IN ('jogador', 'monstro', 'npc')
+                """
+            )
+        )
+
+        # Remove duplicatas de magias preparadas mantendo o menor ID
+        conn.execute(
+            text(
+                """
+                DELETE FROM magias_preparadas
+                WHERE id IN (
+                    SELECT id FROM (
+                        SELECT
+                            id,
+                            ROW_NUMBER() OVER (
+                                PARTITION BY combatente_id, magia_id
+                                ORDER BY id
+                            ) AS rn
+                        FROM magias_preparadas
+                    ) t
+                    WHERE t.rn > 1
+                )
+                """
+            )
+        )
+
+        # SQLite/PostgreSQL: índice único para prevenir duplicatas futuras
+        conn.execute(
+            text(
+                """
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_magias_preparadas_combatente_magia
+                ON magias_preparadas (combatente_id, magia_id)
+                """
+            )
+        )
 
 
 def _seed_pericias(db) -> None:

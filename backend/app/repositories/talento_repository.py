@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 from app.models.talento import Talento, TalentoJogador
 from app.schemas.talento import TalentoCreate, TalentoJogadorCreate
+from app.repositories.base import commit_with_rollback
 
 
 class TalentoRepository:
@@ -17,7 +18,7 @@ class TalentoRepository:
         """Cria um novo talento"""
         db_talento = Talento(**talento.dict())
         db.add(db_talento)
-        db.commit()
+        commit_with_rollback(db)
         db.refresh(db_talento)
         return db_talento
 
@@ -44,7 +45,7 @@ class TalentoRepository:
             for key, value in talento_data.items():
                 if value is not None:
                     setattr(db_talento, key, value)
-            db.commit()
+            commit_with_rollback(db)
             db.refresh(db_talento)
         return db_talento
 
@@ -54,7 +55,7 @@ class TalentoRepository:
         db_talento = db.query(Talento).filter(Talento.id == talento_id).first()
         if db_talento:
             db.delete(db_talento)
-            db.commit()
+            commit_with_rollback(db)
             return True
         return False
 
@@ -83,7 +84,7 @@ class TalentoJogadorRepository:
             talento_id=talento_jogador.talento_id
         )
         db.add(db_talento_jogador)
-        db.commit()
+        commit_with_rollback(db)
         db.refresh(db_talento_jogador)
         return db_talento_jogador
 
@@ -106,6 +107,6 @@ class TalentoJogadorRepository:
         
         if db_talento_jogador:
             db.delete(db_talento_jogador)
-            db.commit()
+            commit_with_rollback(db)
             return True
         return False

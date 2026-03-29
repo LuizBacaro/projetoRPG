@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.models.pericia import Pericia, PericiaJogador, PericiaClasse
 from app.models.combatente import Combatente
+from app.repositories.base import commit_with_rollback
 from app.schemas.pericia import (
     PericiaCreate, PericiaUpdate, PericiaJogadorCreate, PericiaJogadorUpdate
 )
@@ -33,7 +34,7 @@ class PericiaService:
         
         db_pericia = Pericia(**pericia.dict())
         self.db.add(db_pericia)
-        self.db.commit()
+        commit_with_rollback(self.db)
         self.db.refresh(db_pericia)
         return db_pericia
 
@@ -73,7 +74,7 @@ class PericiaService:
         for key, value in pericia.dict(exclude_unset=True).items():
             setattr(db_pericia, key, value)
         
-        self.db.commit()
+        commit_with_rollback(self.db)
         self.db.refresh(db_pericia)
         return db_pericia
 
@@ -85,7 +86,7 @@ class PericiaService:
             return False
         
         self.db.delete(db_pericia)
-        self.db.commit()
+        commit_with_rollback(self.db)
         return True
 
     # ========== CÁLCULO DE CUSTOS ==========
@@ -189,7 +190,7 @@ class PericiaService:
         )
         
         self.db.add(db_pericia_jogador)
-        self.db.commit()
+        commit_with_rollback(self.db)
         self.db.refresh(db_pericia_jogador)
         
         return db_pericia_jogador
@@ -222,7 +223,7 @@ class PericiaService:
         for key, value in pericia.dict(exclude_unset=True).items():
             setattr(db_pericia_jogador, key, value)
         
-        self.db.commit()
+        commit_with_rollback(self.db)
         self.db.refresh(db_pericia_jogador)
         return db_pericia_jogador
 
@@ -236,7 +237,7 @@ class PericiaService:
             return False
         
         self.db.delete(db_pericia_jogador)
-        self.db.commit()
+        commit_with_rollback(self.db)
         return True
 
     def obter_estatisticas_pericias(self, combatente_id: int) -> dict:

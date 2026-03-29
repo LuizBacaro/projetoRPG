@@ -6,7 +6,7 @@ SOLID: DIP via Session injetada no constructor
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from .base import BaseRepository
+from .base import BaseRepository, commit_with_rollback
 from ..models.combatente import Combatente
 
 
@@ -27,6 +27,25 @@ class CombatenteRepository(BaseRepository[Combatente]):
         return (
             self.db.query(Combatente)
             .filter(Combatente.tipo == tipo)
+            .all()
+        )
+
+    def get_by_owner(self, dono_id: int) -> List[Combatente]:
+        """Busca combatentes de um dono específico."""
+        return (
+            self.db.query(Combatente)
+            .filter(Combatente.dono_id == dono_id)
+            .all()
+        )
+
+    def get_by_owner_and_tipo(self, dono_id: int, tipo: str) -> List[Combatente]:
+        """Busca combatentes de um dono filtrando por tipo."""
+        return (
+            self.db.query(Combatente)
+            .filter(
+                Combatente.dono_id == dono_id,
+                Combatente.tipo == tipo,
+            )
             .all()
         )
 
@@ -61,5 +80,5 @@ class CombatenteRepository(BaseRepository[Combatente]):
         combatentes = self.get_all()
         for combatente in combatentes:
             combatente.resetar_hp()
-        self.db.commit()
+        commit_with_rollback(self.db)
         return len(combatentes)

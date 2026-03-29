@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.pericia import Pericia, PericiaJogador, PericiaClasse
 from app.schemas.pericia import PericiaCreate, PericiaUpdate, PericiaJogadorCreate, PericiaJogadorUpdate
+from app.repositories.base import commit_with_rollback
 
 
 class PericiaRepository:
@@ -17,7 +18,7 @@ class PericiaRepository:
         """Cria uma nova perícia"""
         db_pericia = Pericia(**pericia.dict())
         db.add(db_pericia)
-        db.commit()
+        commit_with_rollback(db)
         db.refresh(db_pericia)
         return db_pericia
 
@@ -80,7 +81,7 @@ class PericiaRepository:
         if db_pericia:
             for key, value in pericia.dict(exclude_unset=True).items():
                 setattr(db_pericia, key, value)
-            db.commit()
+            commit_with_rollback(db)
             db.refresh(db_pericia)
         return db_pericia
 
@@ -90,7 +91,7 @@ class PericiaRepository:
         db_pericia = db.query(Pericia).filter(Pericia.id == pericia_id).first()
         if db_pericia:
             db.delete(db_pericia)
-            db.commit()
+            commit_with_rollback(db)
             return True
         return False
 
@@ -103,7 +104,7 @@ class PericiaJogadorRepository:
         """Adiciona uma perícia ao jogador"""
         db_pericia_jogador = PericiaJogador(**pericia_jogador.dict())
         db.add(db_pericia_jogador)
-        db.commit()
+        commit_with_rollback(db)
         db.refresh(db_pericia_jogador)
         return db_pericia_jogador
 
@@ -152,7 +153,7 @@ class PericiaJogadorRepository:
         if db_pericia_jogador:
             for key, value in pericia.dict(exclude_unset=True).items():
                 setattr(db_pericia_jogador, key, value)
-            db.commit()
+            commit_with_rollback(db)
             db.refresh(db_pericia_jogador)
         return db_pericia_jogador
 
@@ -164,7 +165,7 @@ class PericiaJogadorRepository:
         ).first()
         if db_pericia_jogador:
             db.delete(db_pericia_jogador)
-            db.commit()
+            commit_with_rollback(db)
             return True
         return False
 

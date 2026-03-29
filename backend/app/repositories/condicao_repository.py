@@ -5,6 +5,7 @@ SRP - Apenas lógica de persistência
 """
 from typing import List, Dict, Optional  # ✅ Adicionar Optional
 from sqlalchemy.orm import Session
+from .base import commit_with_rollback
 
 from ..models.condicao import Condicao
 from ..models.combatente_condicao import CombatenteCondicao
@@ -46,7 +47,7 @@ class CondicaoRepository:
             if not existente:
                 novo = Condicao(nome=data["nome"], efeito=data["efeito"])
                 self.db.add(novo)
-        self.db.commit()
+        commit_with_rollback(self.db)
 
     # ── Por combatente ──────────────────────────────────────────────────────
 
@@ -89,7 +90,7 @@ class CondicaoRepository:
             )
             self.db.add(cc)
 
-        self.db.commit()
+        commit_with_rollback(self.db)
 
     def remover(self, combatente_id: int, condicao_id: int) -> None:
         """Remove uma condição específica de um combatente"""
@@ -97,14 +98,14 @@ class CondicaoRepository:
             CombatenteCondicao.combatente_id == combatente_id,
             CombatenteCondicao.condicao_id == condicao_id,
         ).delete()
-        self.db.commit()
+        commit_with_rollback(self.db)
 
     def remover_todas(self, combatente_id: int) -> None:
         """Remove todas as condições de um combatente"""
         self.db.query(CombatenteCondicao).filter(
             CombatenteCondicao.combatente_id == combatente_id
         ).delete()
-        self.db.commit()
+        commit_with_rollback(self.db)
 
     def atualizar_duracao(self, combatente_id: int, condicao_id: int, nova_duracao: int) -> bool:
         """Atualiza a duração em turnos de uma condição específica
@@ -112,21 +113,14 @@ class CondicaoRepository:
         Returns:
             True se atualizado, False se condição não encontrada
         """
-        try:
-            cc = self.db.query(CombatenteCondicao).filter(
-                CombatenteCondicao.combatente_id == combatente_id,
-                CombatenteCondicao.condicao_id == condicao_id,
-            ).first()
+        cc = self.db.query(CombatenteCondicao).filter(
+            CombatenteCondicao.combatente_id == combatente_id,
+            CombatenteCondicao.condicao_id == condicao_id,
+        ).first()
 
-            if cc:
-                cc.duracao_turnos = nova_duracao
-                self.db.commit()
-                logger.info(f"✅ Duração atualizada: combatente #{combatente_id}, condição #{condicao_id} → {nova_duracao}")
-                return True
-            else:
-                logger.warning(f"⚠️ Condição não encontrada: combatente #{combatente_id}, condição #{condicao_id}")
-                return False
-        except Exception as e:
-            self.db.rollback()
-            logger.error(f"❌ Erro ao atualizar duração: {str(e)}")
-            raise
+        if not cc:
+            return False
+
+        cc.duracao_turnos = nova_duracao
+        commit_with_rollback(self.db)
+        return True

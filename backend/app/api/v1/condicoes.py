@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from ...core.database import get_db
+from ...core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from ...core.dependencies import get_condicao_service, get_combate_service
 from ...schemas.condicao import (
     CondicaoResponse,
@@ -23,7 +24,7 @@ router = APIRouter(prefix="/condicoes", tags=["Condições"])
 # ── Catálogo ────────────────────────────────────────────────────────────────────
 
 @router.get("", response_model=List[CondicaoResponse])
-def listar_condicoes(db: Session = Depends(get_db)):
+def listar_condicoes(db: Session = Depends(get_db), _: object = Depends(get_usuario_atual)):
     """
     ✅ Retorna todas as 25 condições D&D disponíveis
     """
@@ -34,7 +35,7 @@ def listar_condicoes(db: Session = Depends(get_db)):
 # ── Por combatente ───────────────────────────────────────────────────────────────
 
 @router.get("/combatente/{combatente_id}", response_model=CondicaoAtivaResponse)
-def listar_condicoes_combatente(combatente_id: int, db: Session = Depends(get_db)):
+def listar_condicoes_combatente(combatente_id: int, db: Session = Depends(get_db), _: object = Depends(requer_dono_ou_admin_combatente)):
     """
     ✅ Lista condições ativas de um combatente
     Retorna: {combatente_id, condicoes: []}
@@ -51,6 +52,7 @@ def aplicar_condicao(
     combatente_id: int,
     body: AplicarCondicaoRequest,
     db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """
     ✅ Aplica uma condição a um combatente
@@ -70,6 +72,7 @@ def remover_condicao(
     combatente_id: int,
     condicao_id: int,
     db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """
     ✅ Remove uma condição específica de um combatente
@@ -82,7 +85,7 @@ def remover_condicao(
 
 
 @router.delete("/combatente/{combatente_id}", response_model=CondicaoAtivaResponse)
-def remover_todas_condicoes(combatente_id: int, db: Session = Depends(get_db)):
+def remover_todas_condicoes(combatente_id: int, db: Session = Depends(get_db), _: object = Depends(requer_dono_ou_admin_combatente)):
     """
     ✅ Remove todas as condições ativas de um combatente
     """
@@ -94,7 +97,7 @@ def remover_todas_condicoes(combatente_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/combatentes/{combatente_id}/avancar-turno")
-def avancar_turno_condicoes(combatente_id: int, db: Session = Depends(get_db)):
+def avancar_turno_condicoes(combatente_id: int, db: Session = Depends(get_db), _: object = Depends(requer_dono_ou_admin_combatente)):
     """
     ✅ NOVO: Decrementa duração de TODAS as condições do combatente em 1 turno.
     Remove automaticamente condições que expirarem (duracao_turnos = 0).

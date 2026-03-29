@@ -34,37 +34,55 @@
 
 ## 🟡 IMPORTANTE (Arquitetura / Backend)
 
-- [ ] **#6 — Padrões de Export Inconsistentes no Frontend**
-  - Mix de ES6 modules, globals (`window.X`) e CommonJS
-  - `NotificationService.js` causa SyntaxError no console
+- [x] **#6 — Padrões de Export Inconsistentes no Frontend**
+  - `NotificationService.js` — Corrigido: adicionado `window.NotificationService` bridge + carregado como `type="module"` em ficha-personagem.html
+  - `CombateService.js` — Removido (duplicata morta de CondicaoService, nunca importado)
+  - `api.config.module.js` — URL hardcoded corrigida para `window.location.origin`
+  - Padrão híbrido (export + window global) documentado como bridge aceito
 
-- [ ] **#7 — Rotas sem Autenticação**
-  - `GET /combatentes`, `GET /magias` etc expostos sem login
-  - Adicionar `Depends(get_usuario_atual)` nas rotas necessárias
+- [x] **#7 — Rotas sem Autenticação**
+  - Corrigido bug em `auth.py` `/me` — usava `Depends(get_db)` em vez de `Depends(get_usuario_atual)`
+  - Removido dummy `get_current_user` (try/except fallback) de `pericias.py` e `equipamentos.py`
+  - Adicionado `Depends(get_usuario_atual)` em: `combatentes.py` (11), `combate.py` (6), `condicoes.py` (6), `ataques.py` (5), `magias_preparadas.py` (5), `talentos.py` (5), `pericias.py` (11), `equipamentos.py` (7)
+  - Rotas sensíveis de domínio protegidas; públicas intencionais: autenticação e catálogo de magias (read-only)
 
-- [ ] **#8 — Sem Rate Limiting**
-  - Nenhum middleware de proteção contra DoS/brute-force
-  - Implementar slowapi ou similar
+- [x] **#8 — Sem Rate Limiting**
+  - Implementado middleware custom em `app/core/rate_limit.py` (sliding window por IP)
+  - Limite geral na API: `API_RATE_LIMIT_PER_MINUTE` (default 180/min)
+  - Limite específico para `POST /api/v1/auth/login`: `LOGIN_RATE_LIMIT_PER_MINUTE` (default 10/min)
+  - Retorna `429` com `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`
+  - Configurável via `app/core/config.py` (`RATE_LIMIT_ENABLED`, limites por minuto)
 
-- [ ] **#9 — JWT sem Refresh Endpoint**
-  - Token de 24h expira e exige re-login manual
-  - Implementar `/auth/refresh` com rotation de tokens
+- [x] **#9 — JWT sem Refresh Endpoint**
+  - Implementado `POST /auth/refresh` em `auth.py`
+  - `login` agora retorna `access_token` + `refresh_token`
+  - Refresh valida `type=refresh` e emite novo par de tokens (rotation)
+  - Expiração configurável via `REFRESH_TOKEN_EXPIRE_DAYS` em `config.py`
 
-- [ ] **#10 — Sem Verificação de Propriedade (RBAC)**
-  - Qualquer usuário autenticado pode manipular combatentes de outros
-  - Adicionar checks de ownership nas rotas
+- [x] **#10 — Sem Verificação de Propriedade (RBAC)**
+  - Adicionado ownership em `combatentes` com coluna `dono_id` + migration Alembic
+  - Criadas dependências `requer_dono_ou_admin_combatente` e `requer_dono_ou_admin_slot_magia` em `core/deps.py`
+  - Rotas por `combatente_id` agora validam dono/admin (combatentes, ataques, condições, perícias do jogador, equipamentos do jogador, talentos do jogador, magias preparadas)
+  - `listar_combatentes` agora respeita escopo do usuário (admin vê todos; demais veem apenas os próprios)
+  - `combate/iniciar` e `combate/aplicar-dano` validam propriedade para listas/IDs de combatente
 
-- [ ] **#11 — URL da API Hardcoded no Frontend**
-  - `frontend/js/config.js` — Domínio fixo, sem config por ambiente
-  - Usar detecção automática de origem ou variável de build
+- [x] **#11 — URL da API Hardcoded no Frontend**
+  - `api.config.js` — `BASE_URL` alterado para `window.location.origin`
+  - `api.config.module.js` — Idem
+  - `dashboard.html` — `getApiUrl` inline corrigido
+  - Todas as referências `127.0.0.1:8000` / `localhost:8000` eliminadas
 
-- [ ] **#12 — Sem Rollback de Transações**
-  - `db.commit()` direto nos repositories, sem transaction boundary
-  - Operações em massa (resetar HP) podem falhar parcialmente
+- [x] **#12 — Sem Rollback de Transações**
+  - Criado helper transacional `commit_with_rollback()` em `repositories/base.py`
+  - Aplicado em repositories e services que faziam `commit()` direto
+  - `AtaqueRepository.substituir_todos` e `substituir_magias` agora são atômicos (delete+insert em uma única transação)
+  - `CombatenteService` e `PericiaService` migrados para fluxo com rollback automático em caso de falha
 
-- [ ] **#13 — Constraints de Banco Faltando**
-  - `hp_atual` sem limites, `tipo` como string livre
-  - Duplicatas permitidas em MagiaPreparada (sem unique constraint)
+- [x] **#13 — Constraints de Banco Faltando**
+  - `Combatente` agora possui check constraints de integridade (`hp_atual >= 0`, `hp_maximo > 0`, `hp_atual <= hp_maximo`, `tipo` em `jogador|monstro|npc`)
+  - `MagiaPreparada` agora possui unique constraint para (`combatente_id`, `magia_id`)
+  - Startup guard em `main.py` normaliza dados legados e remove duplicatas antes de criar índice único
+  - Migration Alembic adicionada para formalizar as constraints (`c1b7e4d2a9f0_add_data_constraints.py`)
 
 - [ ] **#14 — Potencial N+1 Queries**
   - Padrões de fetch sem batch em repositórios
@@ -78,9 +96,8 @@
   - Login falho, acessos negados não logados
   - Sem audit trail para ações de admin
 
-- [ ] **#17 — CSS Duplicado (pericias_backup.css)**
-  - `pericias_backup.css` ao lado de `pericias.css` — conflito potencial
-  - Remover arquivo morto
+- [x] **#17 — CSS Duplicado (pericias_backup.css)**
+  - `pericias_backup.css` removido — não era referenciado em nenhum HTML
 
 - [ ] **#18 — Dependency Injection Inconsistente**
   - `get_combatente_repository(db=None)` aceita None e tenta `next(get_db())`

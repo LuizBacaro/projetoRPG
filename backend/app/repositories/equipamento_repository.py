@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 from app.models.equipamento import Equipamento, EquipamentoJogador
 from app.schemas.equipamento import EquipamentoCreate, EquipamentoJogadorCreate
+from app.repositories.base import commit_with_rollback
 
 
 class EquipamentoRepository:
@@ -17,7 +18,7 @@ class EquipamentoRepository:
         """Cria um novo equipamento"""
         db_equipamento = Equipamento(**equipamento.dict())
         db.add(db_equipamento)
-        db.commit()
+        commit_with_rollback(db)
         db.refresh(db_equipamento)
         return db_equipamento
 
@@ -44,7 +45,7 @@ class EquipamentoRepository:
             for key, value in equipamento_data.items():
                 if value is not None:
                     setattr(db_equipamento, key, value)
-            db.commit()
+            commit_with_rollback(db)
             db.refresh(db_equipamento)
         return db_equipamento
 
@@ -54,7 +55,7 @@ class EquipamentoRepository:
         db_equipamento = db.query(Equipamento).filter(Equipamento.id == equipamento_id).first()
         if db_equipamento:
             db.delete(db_equipamento)
-            db.commit()
+            commit_with_rollback(db)
             return True
         return False
 
@@ -76,7 +77,7 @@ class EquipamentoJogadorRepository:
         if db_existente:
             # Se já existe, apenas incrementa quantidade
             db_existente.quantidade += equipamento_jogador.quantidade
-            db.commit()
+            commit_with_rollback(db)
             db.refresh(db_existente)
             return db_existente
         
@@ -87,7 +88,7 @@ class EquipamentoJogadorRepository:
             quantidade=equipamento_jogador.quantidade
         )
         db.add(db_equipamento_jogador)
-        db.commit()
+        commit_with_rollback(db)
         db.refresh(db_equipamento_jogador)
         return db_equipamento_jogador
 
@@ -110,7 +111,7 @@ class EquipamentoJogadorRepository:
         
         if db_equipamento_jogador:
             db.delete(db_equipamento_jogador)
-            db.commit()
+            commit_with_rollback(db)
             return True
         return False
 
@@ -126,6 +127,6 @@ class EquipamentoJogadorRepository:
         
         if db_equipamento_jogador:
             db_equipamento_jogador.quantidade = quantidade
-            db.commit()
+            commit_with_rollback(db)
             db.refresh(db_equipamento_jogador)
         return db_equipamento_jogador

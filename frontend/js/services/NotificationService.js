@@ -71,5 +71,8 @@ export class NotificationService {
     }
 }
 
+// Bridge: disponibilizar como global para scripts não-module
+window.NotificationService = NotificationService;
+
 // Inicializar container
 NotificationService.ensureContainer();

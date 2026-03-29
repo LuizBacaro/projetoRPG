@@ -6,6 +6,7 @@ SOLID: DIP via repository injetado no constructor
 from typing import List, Optional, Dict
 
 from ..repositories.combatente_repository import CombatenteRepository
+from ..repositories.base import commit_with_rollback
 from ..services.file_service import FileService
 from ..models.combatente import Combatente
 from ..models.ataque import MagiaSlot
@@ -13,6 +14,7 @@ from ..exceptions.custom_exceptions import (
     CombatenteNaoEncontrado,
     DadosInvalidos,
 )
+from ..models.usuario import PerfilUsuario
 
 
 class CombatenteService:
@@ -23,8 +25,13 @@ class CombatenteService:
 
     # ── CRUD ─────────────────────────────────────────────
 
-    def listar_todos(self, tipo: Optional[str] = None) -> List[Combatente]:
+    def listar_todos(self, tipo: Optional[str] = None, usuario=None) -> List[Combatente]:
         """Lista todos os combatentes, opcionalmente filtrando por tipo."""
+        if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
+            if tipo:
+                return self.repository.get_by_owner_and_tipo(usuario.id, tipo)
+            return self.repository.get_by_owner(usuario.id)
+
         if tipo:
             return self.repository.get_by_tipo(tipo)
         return self.repository.get_all()
@@ -40,10 +47,13 @@ class CombatenteService:
             raise CombatenteNaoEncontrado(combatente_id)
         return combatente
 
-    def criar(self, combatente_data: dict, foto_file=None) -> Combatente:
+    def criar(self, combatente_data: dict, foto_file=None, dono_id: Optional[int] = None) -> Combatente:
         """Cria um novo combatente com foto opcional."""
         if foto_file and hasattr(foto_file, 'filename') and foto_file.filename:
             combatente_data["foto_url"] = self.file_service.salvar_arquivo(foto_file)
+
+        if dono_id is not None:
+            combatente_data["dono_id"] = dono_id
 
         combatente_data["hp_atual"] = combatente_data["hp_maximo"]
         combatente = Combatente(**combatente_data)
@@ -118,8 +128,7 @@ class CombatenteService:
         dano_efetivo = hp_anterior - novo_hp
 
         combatente.hp_atual = novo_hp
-        self.repository.db.commit()
-        self.repository.db.refresh(combatente)
+        self.repository.update(combatente)
 
         mensagem = (
             f"{combatente.nome} foi derrotado! 💀"
@@ -142,8 +151,7 @@ class CombatenteService:
         cura_efetiva = novo_hp - hp_anterior
 
         combatente.hp_atual = novo_hp
-        self.repository.db.commit()
-        self.repository.db.refresh(combatente)
+        self.repository.update(combatente)
 
         mensagem = (
             f"{combatente.nome} já está com HP máximo"
@@ -398,7 +406,7 @@ class CombatenteService:
             self.repository.db.add(novo_slot)
             slots_criados.append(novo_slot)
         
-        self.repository.db.commit()
+        commit_with_rollback(self.repository.db)
         self.repository.db.refresh(combatente)
         
         return {

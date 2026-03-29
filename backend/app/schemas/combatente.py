@@ -97,6 +97,7 @@ class CombatenteUpdate(BaseModel):
 
 class CombatenteResponse(CombatenteBase):
     id:       int
+    dono_id:  Optional[int] = None
     hp_atual: int
     foto_url: Optional[str] = None
     raca:     Optional[str] = ""

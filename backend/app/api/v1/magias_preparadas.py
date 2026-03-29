@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.core.database import get_db
+from app.core.deps import requer_dono_ou_admin_combatente
 from app.models.ataque import MagiaPreparada, MagiaSlot
 from app.models.magia import Magia
 from app.schemas.ataque import (
@@ -33,7 +34,7 @@ def _enriquecer(mp: MagiaPreparada) -> dict:
 
 
 @router.get("/{combatente_id}", response_model=List[MagiaPreparadaResponse])
-def listar_preparadas(combatente_id: int, db: Session = Depends(get_db)):
+def listar_preparadas(combatente_id: int, db: Session = Depends(get_db), _: object = Depends(requer_dono_ou_admin_combatente)):
     registros = (
         db.query(MagiaPreparada)
         .filter(MagiaPreparada.combatente_id == combatente_id)
@@ -47,6 +48,7 @@ def preparar_magia(
     combatente_id: int,
     payload: MagiaPreparadaCreate,
     db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """
     Marca uma magia como preparada.
@@ -86,6 +88,7 @@ def marcar_usada(
     combatente_id: int,
     magia_id: int,
     db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """
     ✅ NOVO: Alterna magia entre usada/não-usada no dia.
@@ -113,6 +116,7 @@ def desmarcar_magia(
     combatente_id: int,
     magia_id: int,
     db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     registro = (
         db.query(MagiaPreparada)
@@ -134,6 +138,7 @@ def descanso_longo(
     combatente_id: int,
     payload: DescansoRequest,
     db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Descanso longo: reseta magias preparadas, usadas e slots."""
     if not payload.confirmar:

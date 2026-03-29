@@ -6,8 +6,10 @@ from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from ...core.database import get_db
+from ...core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from ...core.dependencies import get_combatente_service
 from ...services.combatente_service import CombatenteService
+from ...models.usuario import Usuario
 from ...schemas.combatente import (
     CombatenteResponse,
     HPUpdateRequest,
@@ -23,17 +25,19 @@ router = APIRouter(prefix="/combatentes", tags=["Combatentes"])
 @router.get("", response_model=List[CombatenteResponse])
 def listar_combatentes(
     tipo: Optional[str] = None,
-    db:   Session = Depends(get_db)
+    db:   Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
 ):
     """Lista todos os combatentes ou filtra por tipo"""
     service = get_combatente_service(db)
-    return service.listar_todos(tipo)
+    return service.listar_todos(tipo, usuario=usuario_atual)
 
 
 @router.get("/{combatente_id}", response_model=CombatenteResponse)
 def obter_combatente(
     combatente_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Obtém um combatente específico por ID"""
     service = get_combatente_service(db)
@@ -72,7 +76,8 @@ async def criar_combatente(
     nivel:  int = Form(1),
     pontos: int = Form(0),
     foto: Optional[UploadFile] = File(None),
-    db:   Session = Depends(get_db)
+    db:   Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
 ):
     """Cria um novo combatente"""
     service = get_combatente_service(db)
@@ -100,7 +105,7 @@ async def criar_combatente(
         "pontos":             pontos,
     }
     try:
-        return service.criar(combatente_data, foto)
+        return service.criar(combatente_data, foto, dono_id=usuario_atual.id)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -135,7 +140,8 @@ async def atualizar_combatente(
     nivel:  int = Form(1),
     pontos: int = Form(0),
     foto: Optional[UploadFile] = File(None),
-    db:   Session = Depends(get_db)
+    db:   Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza um combatente existente"""
     service = get_combatente_service(db)
@@ -172,7 +178,8 @@ async def atualizar_combatente(
 def atualizar_hp(
     combatente_id: int,
     hp_data: HPUpdateRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza apenas o HP atual de um combatente"""
     service = get_combatente_service(db)
@@ -186,7 +193,8 @@ def atualizar_hp(
 def atualizar_iniciativa(
     combatente_id: int,
     ini_data: IniciativaUpdateRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza apenas a iniciativa de um combatente"""
     service = get_combatente_service(db)
@@ -200,7 +208,8 @@ def atualizar_iniciativa(
 def aplicar_dano(
     combatente_id: int,
     dano_data: DanoCuraRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Aplica dano a um combatente"""
     service = get_combatente_service(db)
@@ -214,7 +223,8 @@ def aplicar_dano(
 def aplicar_cura(
     combatente_id: int,
     cura_data: DanoCuraRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Aplica cura a um combatente"""
     service = get_combatente_service(db)
@@ -228,7 +238,8 @@ def aplicar_cura(
 def atualizar_parcial(
     combatente_id: int,
     data: dict,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza campos específicos de um combatente"""
     service = get_combatente_service(db)
@@ -241,7 +252,8 @@ def atualizar_parcial(
 @router.delete("/{combatente_id}")
 def deletar_combatente(
     combatente_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Deleta um combatente"""
     service = get_combatente_service(db)
@@ -255,7 +267,8 @@ def deletar_combatente(
 @router.post("/{combatente_id}/inicializar-slots", status_code=200)
 def inicializar_slots(
     combatente_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Inicializa slots de magia para um combatente"""
     service = get_combatente_service(db)

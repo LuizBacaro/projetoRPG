@@ -7,6 +7,7 @@ SOLID: Controllers thin, lógica no Service
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.services.talento_service import TalentoService
 from app.schemas.talento import TalentoCreate, TalentoJogadorCreate, TalentoJogadorListResponse, TalentoResponse
 from typing import List
@@ -20,7 +21,8 @@ router = APIRouter(prefix="/talentos", tags=["talentos"])
 @router.post("/", response_model=TalentoResponse, status_code=status.HTTP_201_CREATED)
 def criar_talento(
     talento: TalentoCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(get_usuario_atual),
 ):
     """Cria um novo talento"""
     try:
@@ -35,7 +37,8 @@ def criar_talento(
 def listar_talentos(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(get_usuario_atual),
 ):
     """Lista todos os talentos disponíveis"""
     try:
@@ -50,7 +53,8 @@ def listar_talentos(
 def adicionar_talento_jogador(
     combatente_id: int,
     talento_jogador: TalentoJogadorCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Adiciona um talento ao combatente"""
     try:
@@ -67,7 +71,8 @@ def adicionar_talento_jogador(
 @router.get("/{combatente_id}/listar", response_model=List[TalentoJogadorListResponse])
 def listar_talentos_jogador(
     combatente_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Lista todos os talentos de um combatente"""
     try:
@@ -82,7 +87,8 @@ def listar_talentos_jogador(
 def remover_talento_jogador(
     combatente_id: int,
     talento_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Remove um talento do combatente"""
     try:

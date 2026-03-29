@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE: int = 5 * 1024 * 1024  # 5MB
     ALLOWED_EXTENSIONS: set = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 
+    # ── Rate Limiting ────────────────────────────────────────────────────────
+    RATE_LIMIT_ENABLED: bool = True
+    API_RATE_LIMIT_PER_MINUTE: int = 180
+    LOGIN_RATE_LIMIT_PER_MINUTE: int = 10
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
     class Config:
         """Configuração de leitura do Pydantic"""
         env_file = ".env"

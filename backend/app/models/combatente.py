@@ -2,17 +2,24 @@
 Model do Combatente (Entity)
 SRP: representa a tabela combatentes + relacionamentos
 """
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, CheckConstraint
 from sqlalchemy.orm import relationship
 from ..core.database import Base
 
 
 class Combatente(Base):
     __tablename__  = "combatentes"
-    __table_args__ = {"extend_existing": True}
+    __table_args__ = (
+        CheckConstraint("hp_atual >= 0", name="ck_combatentes_hp_atual_non_negative"),
+        CheckConstraint("hp_maximo > 0", name="ck_combatentes_hp_maximo_positive"),
+        CheckConstraint("hp_atual <= hp_maximo", name="ck_combatentes_hp_atual_lte_hp_maximo"),
+        CheckConstraint("tipo IN ('jogador', 'monstro', 'npc')", name="ck_combatentes_tipo_valido"),
+        {"extend_existing": True},
+    )
 
     # ── Identificação ──
     id     = Column(Integer, primary_key=True, index=True)
+    dono_id = Column(Integer, nullable=True, index=True)
     nome   = Column(String,  nullable=False)
     tipo   = Column(String,  nullable=False)
     classe = Column(String,  nullable=False)

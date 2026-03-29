@@ -2,7 +2,7 @@
 Models de Ataque, MagiaSlot e MagiaPreparada
 SRP: representa as tabelas no banco
 """
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from ..core.database import Base
@@ -42,7 +42,10 @@ class MagiaPreparada(Base):
     Reseta ao descanso longo.
     """
     __tablename__  = "magias_preparadas"
-    __table_args__ = {"extend_existing": True}
+    __table_args__ = (
+        UniqueConstraint("combatente_id", "magia_id", name="uq_magias_preparadas_combatente_magia"),
+        {"extend_existing": True},
+    )
 
     id            = Column(Integer, primary_key=True, index=True)
     combatente_id = Column(Integer, ForeignKey("combatentes.id", ondelete="CASCADE"), nullable=False)
