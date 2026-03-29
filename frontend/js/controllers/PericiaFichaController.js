@@ -36,9 +36,6 @@ export class PericiaFichaController {
             this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
             console.log('✅ Combatente carregado:', this.combatente.nome);
 
-            // Atualizar header
-            this.atualizarHeader();
-
             // Carregar perícias disponíveis
             const classe = this.combatente.classe || 'Guerreiro';
             this.pericias = await this.periciaService.listarPericiasComCusto(classe, 0, 100);
@@ -46,6 +43,9 @@ export class PericiaFichaController {
 
             // Carregar perícias já adicionadas
             await this.carregarPericiasAdicionadas(parseInt(combatenteId));
+
+            // Atualizar header (após carregar perícias e adicionadas para calcular pontos)
+            this.atualizarHeader();
 
             // Renderizar tabela
             this.periciasFiltradas = [...this.pericias];
@@ -61,11 +61,21 @@ export class PericiaFichaController {
     atualizarHeader() {
         const nome = this.combatente?.nome || 'Desconhecido';
         const classe = this.combatente?.classe || 'Guerreiro';
-        const pontos = this.combatente?.pontos || 0;
+        const pontosGastos = this._calcularPontosGastos();
 
         document.getElementById('pericias-combatente-nome').textContent = nome;
         document.getElementById('pericias-combatente-classe').textContent = classe;
-        document.getElementById('pericias-pontos-disponiveis').textContent = pontos;
+        document.getElementById('pericias-pontos-disponiveis').textContent = pontosGastos;
+    }
+
+    _calcularPontosGastos() {
+        let total = 0;
+        for (const [periciaId, dados] of this.periciasAdicionadas) {
+            const pericia = this.pericias.find(p => p.id === periciaId);
+            const custo = pericia?.custo_para_classe || 1;
+            total += (dados.graduacao || 0) * custo;
+        }
+        return total;
     }
 
     async carregarPericiasAdicionadas(combatenteId) {
