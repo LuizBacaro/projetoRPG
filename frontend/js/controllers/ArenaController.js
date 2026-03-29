@@ -3,6 +3,7 @@ import { CondicaoController    } from './CondicaoController.js';
 import { MagiaSlotService      } from '../services/MagiaSlotService.js';
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js';
 import { Toast } from '/js/ui/toast.module.js';
+import { escapeHtml } from '../utils/formatters.js';
 
 export class ArenaController {
 
@@ -68,7 +69,12 @@ export class ArenaController {
             'Bardo','Paladino','Ranger',
         ]);
         const promessas = this.combatentes
-            .filter(c => c.tipo === 'jogador' && CLASSES_CONJURADORAS.has(c.classe))
+            .filter(c => {
+                var isConj = CLASSES_CONJURADORAS.has(c.classe) ||
+                    (c.magias_slots && c.magias_slots.some(s => s.total > 0));
+                if (isConj) c._isConjurador = true;
+                return isConj;
+            })
             .map(async c => {
                 try {
                     const preparadas    = await this.magiaPreparadaService.listar(c.id);
@@ -368,7 +374,7 @@ export class ArenaController {
             html += '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>';
             html += '<div class="ordem-info">';
             html += '<div class="ordem-nome-linha">';
-            html += '<span class="ordem-nome">' + c.nome + '</span>';
+            html += '<span class="ordem-nome">' + escapeHtml(c.nome) + '</span>';
             if (jaAgiu) html += '<span class="ordem-agiu-badge">✓</span>';
             html += '</div>';
             html += '<div class="ordem-hp-bar">';
@@ -406,7 +412,7 @@ export class ArenaController {
         var c = this.combatentes[this.turnoAtual];
         if (!c) { container.innerHTML = ''; return; }
         container.innerHTML = c.foto_url
-            ? '<img src="' + c.foto_url + '" alt="' + c.nome
+            ? '<img src="' + c.foto_url + '" alt="' + escapeHtml(c.nome)
               + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">'
             : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
     }
@@ -466,16 +472,10 @@ export class ArenaController {
 
         var ataquesHTML = this._renderizarAtaques(c.ataques || []);
         
-        // ✅ NOVO: Verificar se tem magias antes de renderizar
-        var temMagias = (c._magiasGrupos && Object.keys(c._magiasGrupos).length > 0) ||
-                        (c.magias_slots && c.magias_slots.length > 0 && 
-                        c.magias_slots.some(function(s) { return s.total > 0; }));
-        
-        var magiasHTML = temMagias
-            ? ((c._magiasGrupos && Object.keys(c._magiasGrupos).length > 0)
-                ? this._renderizarMagiasPreparadas(c._magiasGrupos, c.id)
-                : this._renderizarMagias(c.magias_slots || [], c.tipo))
-            : '';  // ✅ String vazia se não tem magias com slots > 0
+        // Conjuradores sempre usam estilo "magias preparadas"
+        var magiasHTML = c._isConjurador
+            ? this._renderizarMagiasPreparadas(c._magiasGrupos || {}, c.id)
+            : '';
 
         var refBadge = (c.tipo === 'monstro' && c.pagina_referencia)
             ? ' <span class="arena-badge-referencia" title="Referência do livro">📖 '

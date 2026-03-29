@@ -246,9 +246,9 @@ class DashboardController {
             const iniTexto = podeVerStats ? c.iniciativa : '???';
 
             rows += `<tr>
-                <td><span class="badge badge-${c.tipo}">${c.tipo}</span></td>
-                <td>${c.nome}</td>
-                <td>${c.classe || '-'}</td>
+                <td><span class="badge badge-${c.tipo}">${escapeHtml(c.tipo)}</span></td>
+                <td>${escapeHtml(c.nome)}</td>
+                <td>${escapeHtml(c.classe) || '-'}</td>
                 <td>${c.nivel || 1}</td>
                 <td style="${this._isMestre() ? '' : 'display:none'}">
                     <span class="${podeVerStats ? '' : 'stat-oculto'}">${hpTexto}</span>

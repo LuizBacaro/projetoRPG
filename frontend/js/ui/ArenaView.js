@@ -2,6 +2,8 @@
  * View da Arena de Combate
  * Princípio SOLID: Single Responsibility - apenas renderizar arena
  */
+import { escapeHtml } from '../utils/formatters.js';
+
 export class ArenaView {
     
     /**
@@ -46,16 +48,16 @@ export class ArenaView {
         
         card.innerHTML = `
             ${combatente.foto_url 
-                ? `<img src="${combatente.foto_url}" alt="${combatente.nome}" class="arena-combatente-foto">` 
+                ? `<img src="${combatente.foto_url}" alt="${escapeHtml(combatente.nome)}" class="arena-combatente-foto">` 
                 : '<div class="arena-combatente-foto" style="background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%); display: flex; align-items: center; justify-content: center; font-size: 4rem;">👤</div>'}
             
             <div class="arena-combatente-info">
                 <div class="arena-combatente-header">
-                    <h3>${combatente.nome}</h3>
-                    <span class="badge ${combatente.getBadgeClass()}">${combatente.tipo}</span>
+                    <h3>${escapeHtml(combatente.nome)}</h3>
+                    <span class="badge ${combatente.getBadgeClass()}">${escapeHtml(combatente.tipo)}</span>
                 </div>
                 
-                <p class="combatente-classe">${combatente.classe} - Nível ${combatente.nivel}</p>
+                <p class="combatente-classe">${escapeHtml(combatente.classe)} - Nível ${combatente.nivel}</p>
                 
                 <div class="arena-combatente-hp">
                     <div class="hp-bar">

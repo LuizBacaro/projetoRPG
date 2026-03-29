@@ -6,12 +6,12 @@
 
 class AuthService {
 
-    static TOKEN_KEY   = 'rpg_token';
-    static USUARIO_KEY = 'rpg_usuario';
+    static TOKEN_KEY   = 'token';
+    static USUARIO_KEY = 'usuario';
 
     // ── Token 
     static getToken() {
-        return sessionStorage.getItem(this.TOKEN_KEY);
+        return localStorage.getItem(this.TOKEN_KEY);
     }
 
     static getAuthHeader() {
@@ -26,7 +26,7 @@ class AuthService {
     // ── Usuário 
     static getUsuario() {
         try {
-            return JSON.parse(sessionStorage.getItem(this.USUARIO_KEY)) || null;
+            return JSON.parse(localStorage.getItem(this.USUARIO_KEY)) || null;
         } catch {
             return null;
         }
@@ -42,8 +42,8 @@ class AuthService {
 
     // ── Navegação 
     static logout() {
-        sessionStorage.removeItem(this.TOKEN_KEY);
-        sessionStorage.removeItem(this.USUARIO_KEY);
+        localStorage.removeItem(this.TOKEN_KEY);
+        localStorage.removeItem(this.USUARIO_KEY);
         window.location.href = '/pages/login.html';
     }
 

@@ -43,16 +43,14 @@ app = FastAPI(
 )
 
 # ── Middleware CORS ──────────────────────────────────────────────────────────
-# ✅ CRÍTICO: Configuração correta para desenvolvimento
+# Origens vêm do .env (ALLOWED_ORIGINS) — nunca usar "*" com allow_credentials
+_origins = settings.ALLOWED_ORIGINS
+_allow_all = "*" in _origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:8000",
-        "http://localhost:8000",
-        "http://localhost:3000",
-        "*"  # ⚠️ Em produção, remover e especificar domínios
-    ],
-    allow_credentials=True,
+    allow_origins=_origins if not _allow_all else ["*"],
+    allow_credentials=not _allow_all,  # credentials incompatível com wildcard
     allow_methods=["*"],
     allow_headers=[
         "Content-Type",
@@ -62,7 +60,10 @@ app.add_middleware(
     max_age=600,
 )
 
-logger.info(f"✅ CORS configurado para: {settings.ALLOWED_ORIGINS}")
+if _allow_all:
+    logger.warning("⚠️  CORS com wildcard '*' — NÃO usar em produção!")
+else:
+    logger.info(f"✅ CORS configurado para: {_origins}")
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent

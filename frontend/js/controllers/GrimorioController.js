@@ -7,6 +7,7 @@
 
 import { getApiUrl } from '../config/api.config.js';
 import { MagiaService } from '../services/MagiaService.js';
+import { escapeHtml } from '../utils/formatters.js';
 
 // ── Classes conjuradoras ──
 const CLASSES_CONJURADORAS = new Set([
@@ -877,11 +878,11 @@ class GrimorioController {
         const semSlot = slot && !preparada && slot.disponivel <= 0;
 
         const badges = [
-            escolaNorm ? `<span class="grimorio-badge grimorio-badge-escola">${emoji} ${escolaNorm}</span>` : '',
-            m.componentes ? `<span class="grimorio-badge grimorio-badge-comp">${m.componentes}</span>` : '',
-            temDano ? `<span class="grimorio-badge grimorio-badge-dano">🗡 ${m.dano}</span>` : '',
+            escolaNorm ? `<span class="grimorio-badge grimorio-badge-escola">${emoji} ${escapeHtml(escolaNorm)}</span>` : '',
+            m.componentes ? `<span class="grimorio-badge grimorio-badge-comp">${escapeHtml(m.componentes)}</span>` : '',
+            temDano ? `<span class="grimorio-badge grimorio-badge-dano">🗡 ${escapeHtml(m.dano)}</span>` : '',
             m.teste_resistencia && m.teste_resistencia !== 'Nenhum'
-                ? `<span class="grimorio-badge grimorio-badge-res">🎲 ${m.teste_resistencia}</span>`
+                ? `<span class="grimorio-badge grimorio-badge-res">🎲 ${escapeHtml(m.teste_resistencia)}</span>`
                 : '',
         ].filter(Boolean).join('');
 
@@ -895,7 +896,7 @@ class GrimorioController {
             .map(i => `
                 <div class="grimorio-meta-item">
                     <span class="grimorio-meta-label">${i.label}</span>
-                    <span class="grimorio-meta-valor">${i.valor}</span>
+                    <span class="grimorio-meta-valor">${escapeHtml(i.valor)}</span>
                 </div>
             `)
             .join('');
@@ -904,15 +905,15 @@ class GrimorioController {
             <div class="grimorio-card-detalhes ${aberto ? 'show' : ''}">
                 ${m.sub_escola ? `<div class="grimorio-detalhe-linha">
                     <span class="grimorio-detalhe-chave">Sub-escola</span>
-                    <span class="grimorio-detalhe-valor">${m.sub_escola}</span>
+                    <span class="grimorio-detalhe-valor">${escapeHtml(m.sub_escola)}</span>
                 </div>` : ''}
                 ${temDano ? `<div class="grimorio-detalhe-linha">
                     <span class="grimorio-detalhe-chave">Dano</span>
-                    <span class="grimorio-detalhe-valor grimorio-dano-destaque">${m.dano}</span>
+                    <span class="grimorio-detalhe-valor grimorio-dano-destaque">${escapeHtml(m.dano)}</span>
                 </div>` : ''}
                 ${m.teste_resistencia ? `<div class="grimorio-detalhe-linha">
                     <span class="grimorio-detalhe-chave">Resistência</span>
-                    <span class="grimorio-detalhe-valor">${m.teste_resistencia}</span>
+                    <span class="grimorio-detalhe-valor">${escapeHtml(m.teste_resistencia)}</span>
                 </div>` : ''}
                 <div class="grimorio-detalhe-linha">
                     <span class="grimorio-detalhe-chave">Res. Mágica</span>
@@ -950,10 +951,10 @@ class GrimorioController {
                                ${semSlot ? 'disabled' : ''}>
                         <span class="grimorio-checkbox-custom ${preparada ? 'checked' : ''} ${semSlot ? 'disabled' : ''}"></span>
                     </label>
-                    <span class="grimorio-card-nome ${preparada ? 'preparada-nome' : ''} ${usada ? 'usada-nome' : ''}">${m.nome}</span>
+                    <span class="grimorio-card-nome ${preparada ? 'preparada-nome' : ''} ${usada ? 'usada-nome' : ''}">${escapeHtml(m.nome)}</span>
                     <div class="grimorio-card-badges">${badges}</div>
                 </div>
-                <p class="grimorio-card-descricao">${m.descricao || '—'}</p>
+                <p class="grimorio-card-descricao">${escapeHtml(m.descricao) || '—'}</p>
                 <div class="grimorio-card-meta">${metaItens}</div>
                 ${detalhes}
                 <div class="grimorio-card-rodape">

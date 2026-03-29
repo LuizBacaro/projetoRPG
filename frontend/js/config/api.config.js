@@ -1,5 +1,5 @@
 var IS_PRODUCTION = window.location.hostname === 'arena-de-combate-rpg.com.br';
-var BASE_URL = IS_PRODUCTION ? '' : 'http://localhost:8000';
+var BASE_URL = IS_PRODUCTION ? '' : window.location.origin;
 
 var API_CONFIG = {
     BASE_URL: BASE_URL,

@@ -16,7 +16,7 @@ export class PericiaFichaController {
         this.pericias = [];
         this.periciasFiltradas = [];
         this.periciasAdicionadas = new Map();
-        this.token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        this.token = localStorage.getItem('token');
         console.log('✅ PericiaFichaController inicializado');
     }
 

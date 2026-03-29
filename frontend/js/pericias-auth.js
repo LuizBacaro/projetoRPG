@@ -6,7 +6,7 @@
 
 class PericiaAuthGuard {
     constructor() {
-        this.token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        this.token = localStorage.getItem('token');
         this.combatenteId = new URLSearchParams(window.location.search).get('combatente_id');
         
         this._validar();
@@ -30,16 +30,7 @@ class PericiaAuthGuard {
         }
 
         console.log('✅ Autenticação válida para perícias');
-        this._armazenarDados();
-    }
-
-    _armazenarDados() {
-        // ✅ Garantir que token está em localStorage
-        if (!localStorage.getItem('token') && this.token) {
-            localStorage.setItem('token', this.token);
-        }
-
-        // ✅ Armazenar combatente_id
+        // ✅ Armazenar combatente_id para uso pelos controllers
         localStorage.setItem('combatente_id', this.combatenteId);
     }
 

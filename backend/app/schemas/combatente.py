@@ -2,9 +2,19 @@
 Schemas Pydantic para Combatente (DTOs)
 SRP: apenas serialização/validação
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from .ataque import AtaqueResponse, MagiaSlotResponse, MagiaPreparadaResponse
+import re
+
+_HTML_TAG_RE = re.compile(r'<[^>]+>')
+
+
+def _strip_html(v):
+    """Remove tags HTML de strings para prevenir XSS"""
+    if v is None:
+        return v
+    return _HTML_TAG_RE.sub('', str(v)).strip()
 
 
 class CombatenteBase(BaseModel):
@@ -15,6 +25,11 @@ class CombatenteBase(BaseModel):
 
     # ✅ NOVO: apenas monstros usam, mas aceita em todos os tipos (nullable)
     pagina_referencia: Optional[str] = Field(default="", max_length=100)
+
+    @field_validator('nome', 'classe', 'raca', 'pagina_referencia', mode='before')
+    @classmethod
+    def sanitizar_texto(cls, v):
+        return _strip_html(v)
 
     hp_maximo:  int = Field(..., gt=0)
     iniciativa: int = Field(..., ge=0)
@@ -50,6 +65,11 @@ class CombatenteUpdate(BaseModel):
 
     # ✅ NOVO
     pagina_referencia: Optional[str] = Field(None, max_length=100)
+
+    @field_validator('nome', 'classe', 'raca', 'pagina_referencia', mode='before')
+    @classmethod
+    def sanitizar_texto(cls, v):
+        return _strip_html(v)
 
     hp_atual:   Optional[int] = Field(None, ge=0)
     hp_maximo:  Optional[int] = Field(None, gt=0)

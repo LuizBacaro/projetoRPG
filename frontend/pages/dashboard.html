@@ -547,7 +547,7 @@
 <!-- FASE 1: Configuração Global -->
 <script>
     window.getApiUrl = function(path) {
-        return 'http://127.0.0.1:8000/api/v1' + (path || '');
+        return window.location.origin + '/api/v1' + (path || '');
     };
     console.log('✅ API URL configurada');
 </script>
@@ -592,7 +592,21 @@
     console.log('✅ Toast configurado');
 </script>
 
-<!-- FASE 6: DashboardController (carregado por último) -->
+<!-- FASE 6: Utilitários -->
+<script>
+    function escapeHtml(str) {
+        if (typeof str !== 'string') return str;
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+    window.escapeHtml = escapeHtml;
+</script>
+
+<!-- FASE 7: DashboardController (carregado por último) -->
 <script src="/js/controllers/DashboardController.js"></script>
 
 </body>

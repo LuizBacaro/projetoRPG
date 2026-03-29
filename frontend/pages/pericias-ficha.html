@@ -284,7 +284,7 @@
 
         // Validar token
         function validarAutenticacao() {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = localStorage.getItem('token');
             console.log('🔐 Validando autenticação...');
             console.log('✅ Token encontrado:', !!token);
             
@@ -307,7 +307,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 console.log('🎮 Inicializando PericiaFichaController...');
-                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+                const token = localStorage.getItem('token');
                 if (!token) {
                     throw new Error('Token perdido durante carregamento');
                 }

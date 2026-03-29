@@ -117,7 +117,7 @@ class ModalDanoCura {
                         onchange="modalDanoCuraInstance.toggleCombatente(${c.id})"
                     >
                     <label for="dano-check-${c.id}">
-                        <span class="combatente-nome">${c.nome}</span>
+                        <span class="combatente-nome">${escapeHtml(c.nome)}</span>
                         ${spanHP}
                         <span class="badge badge-${c.tipo.toLowerCase()}">${c.tipo}</span>
                     </label>

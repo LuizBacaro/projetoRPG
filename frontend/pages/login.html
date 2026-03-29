@@ -21,17 +21,19 @@
 
         <div id="erroLogin" class="msg-box msg-erro"></div>
 
-        <div class="form-group">
-            <label>E-mail</label>
-            <input id="inputEmail" type="email" placeholder="seu@email.com" autocomplete="email" />
-        </div>
+        <form id="formLogin" autocomplete="on">
+            <div class="form-group">
+                <label>E-mail</label>
+                <input id="inputEmail" type="email" placeholder="seu@email.com" autocomplete="email" />
+            </div>
 
-        <div class="form-group">
-            <label>Senha</label>
-            <input id="inputSenha" type="password" placeholder="••••••" autocomplete="current-password" />
-        </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input id="inputSenha" type="password" placeholder="••••••" autocomplete="current-password" />
+            </div>
 
-        <button id="btnLogin" class="btn-login">Entrar</button>
+            <button id="btnLogin" type="submit" class="btn-login">Entrar</button>
+        </form>
 
         <div class="divider">ou</div>
 
@@ -59,33 +61,35 @@
         <div id="erroCadastro"  class="msg-box msg-erro"></div>
         <div id="sucessoCadastro" class="msg-box msg-sucesso"></div>
 
-        <div class="form-group">
-            <label>Nome completo *</label>
-            <input id="cadNome" type="text" placeholder="Seu nome" autocomplete="name" />
-        </div>
+        <form id="formCadastro" autocomplete="on">
+            <div class="form-group">
+                <label>Nome completo *</label>
+                <input id="cadNome" type="text" placeholder="Seu nome" autocomplete="name" />
+            </div>
 
-        <div class="form-group">
-            <label>E-mail *</label>
-            <input id="cadEmail" type="email" placeholder="seu@email.com" autocomplete="email" />
-        </div>
+            <div class="form-group">
+                <label>E-mail *</label>
+                <input id="cadEmail" type="email" placeholder="seu@email.com" autocomplete="email" />
+            </div>
 
-        <div class="form-group">
-            <label>Senha * <small style="color:#64748b">(mín. 6 caracteres)</small></label>
-            <input id="cadSenha" type="password" placeholder="••••••" autocomplete="new-password" />
-        </div>
+            <div class="form-group">
+                <label>Senha * <small style="color:#64748b">(mín. 6 caracteres)</small></label>
+                <input id="cadSenha" type="password" placeholder="••••••" autocomplete="new-password" />
+            </div>
 
-        <div class="form-group">
-            <label>Confirmar senha *</label>
-            <input id="cadConfirma" type="password" placeholder="••••••" autocomplete="new-password" />
-        </div>
+            <div class="form-group">
+                <label>Confirmar senha *</label>
+                <input id="cadConfirma" type="password" placeholder="••••••" autocomplete="new-password" />
+            </div>
 
-        <button id="btnSalvarCadastro" class="btn-login" style="margin-top:.25rem">
-            Criar conta
-        </button>
+            <button id="btnSalvarCadastro" type="submit" class="btn-login" style="margin-top:.25rem">
+                Criar conta
+            </button>
 
-        <button id="btnCancelarCadastro" class="btn-cadastro">
-            Cancelar
-        </button>
+            <button id="btnCancelarCadastro" type="button" class="btn-cadastro">
+                Cancelar
+            </button>
+        </form>
 
     </div>
 </div>
@@ -114,8 +118,8 @@
     const sucessoCadastro   = document.getElementById('sucessoCadastro');
 
     // Limpa sessão anterior — login sempre explícito
-    sessionStorage.removeItem('rpg_token');
-    sessionStorage.removeItem('rpg_usuario');
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
@@ -179,8 +183,8 @@
                 return;
             }
 
-            sessionStorage.setItem('rpg_token',   data.access_token);
-            sessionStorage.setItem('rpg_usuario', JSON.stringify(data.usuario));
+            localStorage.setItem('token',    data.access_token);
+            localStorage.setItem('usuario', JSON.stringify(data.usuario));
             window.location.href = '/dashboard';
 
         } catch (err) {
@@ -255,11 +259,11 @@
 
     // ── Eventos ───────────────────────────────────────────────────────────
 
-    // Login
-    btnLogin.addEventListener('click', fazerLogin);
-    [inputEmail, inputSenha].forEach(el =>
-        el.addEventListener('keydown', e => { if (e.key === 'Enter') fazerLogin(); })
-    );
+    // Login via form submit
+    document.getElementById('formLogin').addEventListener('submit', (e) => {
+        e.preventDefault();
+        fazerLogin();
+    });
 
     // Abrir modal de cadastro
     btnAbrirCadastro.addEventListener('click', () => {
@@ -281,11 +285,11 @@
         if (e.target === modalCadastro) fecharModal();
     });
 
-    // Salvar cadastro
-    btnSalvarCadastro.addEventListener('click', fazerCadastro);
-    [cadNome, cadEmail, cadSenha, cadConfirma].forEach(el =>
-        el.addEventListener('keydown', e => { if (e.key === 'Enter') fazerCadastro(); })
-    );
+    // Salvar cadastro via form submit
+    document.getElementById('formCadastro').addEventListener('submit', (e) => {
+        e.preventDefault();
+        fazerCadastro();
+    });
 </script>
 
 </body>

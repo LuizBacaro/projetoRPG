@@ -128,6 +128,11 @@ def criar_admin_padrao(db: Session) -> None:
 
     repo = UsuarioRepository(db)
 
+    # Se credenciais não configuradas, pular criação
+    if not settings.ADMIN_EMAIL or not settings.ADMIN_PASSWORD:
+        logger.info("ℹ️  Credenciais de admin não configuradas no .env — pulando criação")
+        return
+
     # ✅ Verifica se admin já existe
     admin_existe = repo.buscar_por_email(settings.ADMIN_EMAIL)
     if admin_existe:
@@ -146,7 +151,7 @@ def criar_admin_padrao(db: Session) -> None:
 
     repo.criar(admin)
 
-    # ✅ Log seguro (não aparece no stdout em Railway)
+    # ✅ Log seguro — NÃO exibir a senha
     logger.warning(
         f"⚠️  ADMIN CRIADO — Email: {settings.ADMIN_EMAIL} "
         f"— ALTERE A SENHA IMEDIATAMENTE via painel de usuários"
@@ -154,7 +159,6 @@ def criar_admin_padrao(db: Session) -> None:
     print(
         f"✅ Admin criado com sucesso!\n"
         f"   📧 Email: {settings.ADMIN_EMAIL}\n"
-        f"   🔐 Senha: {settings.ADMIN_PASSWORD}\n"
         f"   ⚠️  ALTERE A SENHA IMEDIATAMENTE após primeiro acesso\n"
         f"   📍 Acesse: /pages/usuarios.html"
     )

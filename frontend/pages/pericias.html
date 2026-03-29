@@ -84,7 +84,7 @@
 
     // ✅ VALIDAÇÃO SEGURA: Verificar token ANTES de inicializar
     function validarAutenticacao() {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const token = localStorage.getItem('token');
         
         console.log('🔐 Validando autenticação...');
         console.log('✅ Token encontrado:', !!token);
@@ -113,7 +113,7 @@
             console.log('🎮 Inicializando controller...');
             
             // Validar novamente antes de inicializar
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('Token perdido durante carregamento');
             }

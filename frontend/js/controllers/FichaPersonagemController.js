@@ -10,6 +10,7 @@ import { EquipamentoService } from '../services/EquipamentoService.js';
 import { TalentoService } from '../services/TalentoService.js';
 import { PericiaService } from '../services/PericiaService.js';
 import { getApiUrl } from '../config/api.config.js';
+import { escapeHtml } from '../utils/formatters.js';
 
 export class FichaPersonagemController {
 
@@ -379,9 +380,9 @@ export class FichaPersonagemController {
 
         lista.innerHTML = ataques.map(a => `
             <div class="ficha-ataque-linha">
-                <span class="ficha-ataque-nome">${a.nome || '—'}</span>
-                <span class="ficha-ataque-bonus">${a.bonus_ataque || '+0'}</span>
-                <span class="ficha-ataque-dano">${a.dano || '—'}</span>
+                <span class="ficha-ataque-nome">${escapeHtml(a.nome) || '—'}</span>
+                <span class="ficha-ataque-bonus">${escapeHtml(a.bonus_ataque) || '+0'}</span>
+                <span class="ficha-ataque-dano">${escapeHtml(a.dano) || '—'}</span>
             </div>
         `).join('');
 
@@ -488,8 +489,8 @@ export class FichaPersonagemController {
             item.className = 'ficha-pericia-item';
             item.title     = pj.pericia?.descricao || '';
             item.innerHTML = `
-                <span class="ficha-pericia-nome">${pj.pericia?.nome || '—'}</span>
-                <span class="ficha-pericia-atributo">${pj.pericia?.atributo || '—'}</span>
+                <span class="ficha-pericia-nome">${escapeHtml(pj.pericia?.nome) || '—'}</span>
+                <span class="ficha-pericia-atributo">${escapeHtml(pj.pericia?.atributo) || '—'}</span>
                 <div class="ficha-pericia-mods">
                     <div class="ficha-pericia-mod">
                         <span class="ficha-pericia-mod-label">Gra</span>
@@ -565,11 +566,11 @@ export class FichaPersonagemController {
                 <div class="ficha-equipamentos-lista-items">
                     ${equipamentos.map(eq => `
                         <div class="ficha-equipamento-linha">
-                            <span class="ficha-equipamento-nome">${eq.nome}</span>
-                            <span class="ficha-equipamento-desc">${eq.descricao || '—'}</span>
-                            <span class="ficha-equipamento-pag">${eq.pagina_referencia || '—'}</span>
+                            <span class="ficha-equipamento-nome">${escapeHtml(eq.nome)}</span>
+                            <span class="ficha-equipamento-desc">${escapeHtml(eq.descricao) || '—'}</span>
+                            <span class="ficha-equipamento-pag">${escapeHtml(eq.pagina_referencia) || '—'}</span>
                             <span class="ficha-equipamento-qtd">${eq.quantidade}</span>
-                            <button class="btn-deletar-eq" data-eq-id="${eq.id}" data-eq-nome="${eq.nome}" title="Deletar ${eq.nome}">🗑️</button>
+                            <button class="btn-deletar-eq" data-eq-id="${eq.id}" data-eq-nome="${escapeHtml(eq.nome)}" title="Deletar ${escapeHtml(eq.nome)}">🗑️</button>
                         </div>
                     `).join('')}
                 </div>
@@ -641,9 +642,9 @@ export class FichaPersonagemController {
         lista.innerHTML = equipamentos.map(eq => `
             <div class="equipamento-item">
                 <div class="equipamento-info">
-                    <div class="equipamento-nome">${eq.nome}</div>
-                    <div class="equipamento-desc">${eq.descricao || '—'}</div>
-                    <div class="equipamento-pag">${eq.pagina_referencia || '—'}</div>
+                    <div class="equipamento-nome">${escapeHtml(eq.nome)}</div>
+                    <div class="equipamento-desc">${escapeHtml(eq.descricao) || '—'}</div>
+                    <div class="equipamento-pag">${escapeHtml(eq.pagina_referencia) || '—'}</div>
                 </div>
                 <button class="equipamento-btn-adicionar" 
                         onclick="window._fichaController.adicionarEquipamentoClic(${eq.id})">
@@ -849,10 +850,10 @@ export class FichaPersonagemController {
                 <div class="ficha-talentos-lista-items">
                     ${talentos.map(tal => `
                         <div class="ficha-talento-linha">
-                            <span class="ficha-talento-nome">${tal.nome}</span>
-                            <span class="ficha-talento-desc">${tal.descricao || '—'}</span>
-                            <span class="ficha-talento-pag">${tal.pagina_referencia || '—'}</span>
-                            <button class="btn-deletar-tal" data-tal-id="${tal.id}" data-tal-nome="${tal.nome}" title="Deletar ${tal.nome}">🗑️</button>
+                            <span class="ficha-talento-nome">${escapeHtml(tal.nome)}</span>
+                            <span class="ficha-talento-desc">${escapeHtml(tal.descricao) || '—'}</span>
+                            <span class="ficha-talento-pag">${escapeHtml(tal.pagina_referencia) || '—'}</span>
+                            <button class="btn-deletar-tal" data-tal-id="${tal.id}" data-tal-nome="${escapeHtml(tal.nome)}" title="Deletar ${escapeHtml(tal.nome)}">🗑️</button>
                         </div>
                     `).join('')}
                 </div>
@@ -925,9 +926,9 @@ export class FichaPersonagemController {
             <div class="equipamentos-lista-grid">
                 ${talentos.map(tal => `
                     <div class="equipamentos-card">
-                        <h4>${tal.nome}</h4>
-                        <p class="equipamentos-desc">${tal.descricao || '—'}</p>
-                        <p class="equipamentos-pag">📄 ${tal.pagina_referencia || '—'}</p>
+                        <h4>${escapeHtml(tal.nome)}</h4>
+                        <p class="equipamentos-desc">${escapeHtml(tal.descricao) || '—'}</p>
+                        <p class="equipamentos-pag">📄 ${escapeHtml(tal.pagina_referencia) || '—'}</p>
                         <button class="equipamentos-btn-adicionar" 
                                 onclick="window._fichaController && window._fichaController.adicionarTalentoClic(${tal.id})">
                             ➕ Adicionar
