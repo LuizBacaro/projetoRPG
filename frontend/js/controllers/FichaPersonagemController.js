@@ -237,7 +237,7 @@ export class FichaPersonagemController {
     // ─────────────────────────────────────────────────────────
 
     renderizarIdentidade() {
-        const nome        = document.getElementById('fichaNome');
+        const nomeHeader  = document.getElementById('fichaHeaderNome');
         const raca        = document.getElementById('fichaRaca');
         const classe      = document.getElementById('fichaClasse');
         const tipo        = document.getElementById('fichaTipo');
@@ -245,7 +245,7 @@ export class FichaPersonagemController {
         const placeholder = document.getElementById('fichaFotoPlaceholder');
         const foto        = document.getElementById('fichaFoto');
 
-        if (nome)   nome.textContent   = this.combatente.nome;
+        if (nomeHeader) nomeHeader.textContent = this.combatente.nome;
         if (raca)   raca.textContent   = this.combatente.raca   || '—';
         if (classe) classe.textContent = this.combatente.classe || '—';
         if (tipo) {

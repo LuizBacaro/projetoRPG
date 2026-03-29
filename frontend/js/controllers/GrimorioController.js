@@ -1064,20 +1064,16 @@ class GrimorioController {
 // ── Inicialização ──
 document.addEventListener('DOMContentLoaded', () => {
     const tentarInicializar = setInterval(() => {
-        const nomeEl = document.getElementById('fichaNome');
         const classeEl = document.getElementById('fichaClasse');
+        if (!classeEl) return;
 
-        if (!nomeEl || !classeEl) return;
-
-        const nome = nomeEl.textContent?.trim();
         const classe = classeEl.textContent?.trim();
-
-        if (!nome || nome === '—' || !classe || classe === '—') return;
-
-        clearInterval(tentarInicializar);
+        if (!classe || classe === '—') return;
 
         const combatente = window._fichaController?.combatente;
         if (!combatente) return;
+
+        clearInterval(tentarInicializar);
 
         const token = localStorage.getItem('token');
         const magiaService = new MagiaService(token);
