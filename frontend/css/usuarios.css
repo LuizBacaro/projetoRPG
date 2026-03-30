@@ -156,10 +156,98 @@ body.usuarios-page::before {
     gap: 12px;
 }
 
-.usuarios-btn-voltar,
-.usuarios-btn-novo {
+.usuarios-hero-actions .btn {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
     min-height: 48px;
-    padding-inline: 18px;
+    padding: 0.9rem 1.2rem;
+    border-radius: 16px;
+    text-decoration: none;
+    font-family: var(--fonte-titulo);
+    font-size: 0.88rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease, color 0.22s ease;
+    overflow: hidden;
+}
+
+.usuarios-hero-actions .btn::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+    opacity: 0.9;
+    z-index: -1;
+}
+
+.usuarios-hero-actions .btn::after {
+    content: '';
+    position: absolute;
+    inset: auto -18% -55% auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 68%);
+    opacity: 0.45;
+    z-index: -1;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.usuarios-hero-actions .btn:hover {
+    transform: translateY(-2px);
+}
+
+.usuarios-hero-actions .btn:focus-visible {
+    outline: none;
+    transform: translateY(-1px);
+    box-shadow:
+        0 0 0 2px rgba(9, 16, 28, 0.95),
+        0 0 0 5px rgba(151, 183, 228, 0.45),
+        0 14px 34px rgba(5, 10, 18, 0.36);
+}
+
+.usuarios-hero-actions .btn:hover::after {
+    transform: scale(1.08);
+    opacity: 0.7;
+}
+
+.usuarios-btn-voltar {
+    color: #d7e6fb;
+    border: 1px solid rgba(138, 170, 214, 0.22);
+    background: linear-gradient(135deg, rgba(13, 21, 36, 0.96), rgba(20, 34, 56, 0.9));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.usuarios-btn-voltar:hover {
+    border-color: rgba(166, 196, 235, 0.36);
+    box-shadow: 0 14px 34px rgba(5, 10, 18, 0.36);
+    color: #f1f6ff;
+}
+
+.usuarios-btn-novo {
+    color: #f6ecd0;
+    border: 1px solid rgba(233, 196, 102, 0.34);
+    background: linear-gradient(135deg, rgba(125, 83, 24, 0.92), rgba(186, 134, 44, 0.82));
+    box-shadow:
+        0 18px 40px rgba(122, 82, 18, 0.22),
+        inset 0 1px 0 rgba(255, 244, 214, 0.18);
+}
+
+.usuarios-btn-novo::before {
+    background: linear-gradient(135deg, rgba(255, 248, 220, 0.12), rgba(255, 241, 193, 0.02));
+}
+
+.usuarios-btn-novo:hover {
+    border-color: rgba(247, 215, 131, 0.5);
+    box-shadow:
+        0 20px 44px rgba(122, 82, 18, 0.32),
+        inset 0 1px 0 rgba(255, 244, 214, 0.28);
+    color: #fff7df;
 }
 
 .usuarios-overview {
@@ -403,6 +491,15 @@ body.usuarios-page::before {
     background: rgba(255, 255, 255, 0.06);
 }
 
+.btn-acao:focus-visible {
+    outline: none;
+    transform: translateY(-1px);
+    box-shadow:
+        0 0 0 2px rgba(9, 16, 28, 0.95),
+        0 0 0 5px rgba(151, 183, 228, 0.4),
+        0 8px 18px rgba(5, 12, 22, 0.34);
+}
+
 .btn-acao-editar:hover { border-color: rgba(255, 215, 0, 0.24); }
 .btn-acao-inativar:hover { border-color: rgba(248, 113, 113, 0.24); }
 .btn-acao-reativar:hover { border-color: rgba(74, 222, 128, 0.24); }
@@ -415,7 +512,8 @@ body.usuarios-page::before {
     z-index: 1000;
     justify-content: center;
     align-items: center;
-    padding: 24px;
+    padding: clamp(12px, 2.8vh, 24px);
+    overflow-y: auto;
 }
 
 .modal-overlay.show {
@@ -426,6 +524,24 @@ body.usuarios-page::before {
     width: min(560px, 100%);
     border-radius: 28px;
     padding: 28px;
+    max-height: calc(100vh - clamp(24px, 5.6vh, 48px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.modal-box::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal-box::-webkit-scrollbar-track {
+    background: rgba(9, 15, 24, 0.35);
+    border-radius: 999px;
+}
+
+.modal-box::-webkit-scrollbar-thumb {
+    background: rgba(139, 166, 202, 0.38);
+    border-radius: 999px;
+    border: 2px solid rgba(9, 15, 24, 0.35);
 }
 
 .modal-header-usuarios {
@@ -449,6 +565,14 @@ body.usuarios-page::before {
 
 .modal-close-usuarios:hover {
     background: rgba(255, 255, 255, 0.07);
+}
+
+.modal-close-usuarios:focus-visible {
+    outline: none;
+    border-color: rgba(171, 198, 233, 0.5);
+    box-shadow:
+        0 0 0 2px rgba(8, 14, 24, 0.95),
+        0 0 0 4px rgba(151, 183, 228, 0.42);
 }
 
 .modal-descricao-usuarios {
@@ -495,6 +619,84 @@ body.usuarios-page::before {
     justify-content: flex-end;
     gap: 0.75rem;
     margin-top: 1.5rem;
+    position: sticky;
+    bottom: 0;
+    padding-top: 12px;
+    background: linear-gradient(180deg, rgba(9, 15, 24, 0), rgba(9, 15, 24, 0.88) 38%);
+}
+
+.modal-acoes .btn {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0.8rem 1.15rem;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    font-family: var(--fonte-titulo);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.modal-acoes .btn::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: 13px;
+    z-index: -1;
+}
+
+.modal-acoes .btn:hover {
+    transform: translateY(-1px);
+}
+
+.modal-acoes .btn:focus-visible {
+    outline: none;
+    transform: translateY(-1px);
+    box-shadow:
+        0 0 0 2px rgba(9, 16, 28, 0.95),
+        0 0 0 5px rgba(151, 183, 228, 0.45),
+        0 10px 24px rgba(5, 12, 22, 0.36);
+}
+
+.modal-acoes .btn.btn-secondary {
+    color: #d8e6fb;
+    border-color: rgba(145, 173, 212, 0.24);
+    background: linear-gradient(135deg, rgba(14, 24, 39, 0.95), rgba(20, 34, 54, 0.9));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.modal-acoes .btn.btn-secondary::before {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.01));
+}
+
+.modal-acoes .btn.btn-secondary:hover {
+    border-color: rgba(171, 198, 233, 0.4);
+    color: #f2f7ff;
+    box-shadow: 0 10px 24px rgba(5, 12, 22, 0.36);
+}
+
+.modal-acoes .btn.btn-primary {
+    color: #fff6db;
+    border-color: rgba(235, 198, 112, 0.34);
+    background: linear-gradient(135deg, rgba(125, 84, 28, 0.92), rgba(185, 132, 44, 0.84));
+    box-shadow: 0 12px 30px rgba(121, 80, 19, 0.26), inset 0 1px 0 rgba(255, 243, 207, 0.16);
+}
+
+.modal-acoes .btn.btn-primary::before {
+    background: linear-gradient(135deg, rgba(255, 244, 212, 0.13), rgba(255, 244, 212, 0.02));
+}
+
+.modal-acoes .btn.btn-primary:hover {
+    border-color: rgba(247, 215, 138, 0.5);
+    color: #fffbea;
+    box-shadow: 0 14px 34px rgba(121, 80, 19, 0.34), inset 0 1px 0 rgba(255, 243, 207, 0.26);
 }
 
 @media (max-width: 1120px) {
@@ -548,14 +750,73 @@ body.usuarios-page::before {
 
     .modal-box {
         padding: 22px;
+        max-height: calc(100vh - 24px);
+    }
+
+    .modal-header-usuarios {
+        gap: 12px;
+    }
+
+    .modal-close-usuarios {
+        width: 40px;
+        height: 40px;
     }
 
     .modal-acoes {
         flex-direction: column;
+        margin-top: 1.15rem;
+        gap: 0.65rem;
     }
 
     .modal-acoes .btn {
         width: 100%;
         text-align: center;
+        min-height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-overlay {
+        padding: 12px;
+    }
+
+    .modal-box {
+        border-radius: 16px;
+        padding: 16px;
+        max-height: calc(100vh - 16px);
+    }
+
+    .modal-header-usuarios {
+        margin-bottom: 8px;
+    }
+
+    .modal-descricao-usuarios {
+        margin-bottom: 14px;
+        font-size: 0.9rem;
+        line-height: 1.55;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 0.76rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        min-height: 44px;
+        padding: 0.72rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.92rem;
+    }
+
+    .modal-acoes .btn {
+        min-height: 48px;
+        border-radius: 12px;
+        font-size: 0.78rem;
+        letter-spacing: 0.03em;
     }
 }

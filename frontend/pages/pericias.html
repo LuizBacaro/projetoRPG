@@ -163,11 +163,13 @@
         if (btnVoltar) {
             btnVoltar.addEventListener('click', () => {
                 console.log('⬅️ Voltando...');
-                if (window.history.length > 1) {
-                    window.history.back();
-                } else {
-                    window.location.href = '/pages/dashboard.html';
+                const params = new URLSearchParams(window.location.search);
+                const returnTo = params.get('return_to');
+                if (returnTo) {
+                    window.location.href = decodeURIComponent(returnTo);
+                    return;
                 }
+                window.location.href = '/pages/dashboard.html';
             });
         }
 

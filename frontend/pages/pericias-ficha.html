@@ -228,7 +228,7 @@
             <div style="flex: 1;">
                 <h1 class="ficha-titulo-texto">⚔️ Perícias do Personagem</h1>
             </div>
-            <button class="btn-voltar" onclick="window.history.back()">← Voltar</button>
+            <button class="btn-voltar" id="btnVoltarTopo">← Voltar</button>
         </div>
 
         <!-- INFO DO PERSONAGEM -->
@@ -240,8 +240,7 @@
 
         <!-- BUSCA -->
         <div class="pericias-busca-wrapper">
-            <input type="text" class="pericias-busca" id="pericias-busca" placeholder="🔍 Buscar perícia..." 
-                   oninput="window.periciasFichaController && window.periciasFichaController.filtrar()">
+                 <input type="text" class="pericias-busca" id="pericias-busca" placeholder="🔍 Buscar perícia...">
         </div>
 
         <!-- TABELA -->
@@ -270,7 +269,7 @@
 
         <!-- FOOTER -->
         <div class="pericias-footer">
-            <button class="pericias-btn pericias-btn-voltar" onclick="window.history.back()">
+            <button class="pericias-btn pericias-btn-voltar" id="btnVoltarRodape">
                 ← Voltar para Ficha
             </button>
         </div>
@@ -304,6 +303,24 @@
         const controller = new PericiaFichaController();
         window.periciasFichaController = controller;
 
+        function voltarParaOrigemOuFicha() {
+            const params = new URLSearchParams(window.location.search);
+            const returnTo = params.get('return_to');
+            const combatenteId = params.get('combatente_id');
+
+            if (returnTo) {
+                window.location.href = decodeURIComponent(returnTo);
+                return;
+            }
+
+            if (combatenteId) {
+                window.location.href = `/pages/ficha-personagem.html?id=${combatenteId}`;
+                return;
+            }
+
+            window.location.href = '/pages/dashboard.html';
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 console.log('🎮 Inicializando PericiaFichaController...');
@@ -313,6 +330,26 @@
                 }
                 
                 await controller.inicializar();
+
+                const inputBusca = document.getElementById('pericias-busca');
+                if (inputBusca) {
+                    inputBusca.addEventListener('input', () => {
+                        if (window.periciasFichaController) {
+                            window.periciasFichaController.filtrar();
+                        }
+                    });
+                }
+
+                const btnVoltarTopo = document.getElementById('btnVoltarTopo');
+                if (btnVoltarTopo) {
+                    btnVoltarTopo.addEventListener('click', voltarParaOrigemOuFicha);
+                }
+
+                const btnVoltarRodape = document.getElementById('btnVoltarRodape');
+                if (btnVoltarRodape) {
+                    btnVoltarRodape.addEventListener('click', voltarParaOrigemOuFicha);
+                }
+
                 console.log('✅ Inicialização completa');
             } catch (error) {
                 console.error('❌ Erro fatal:', error);

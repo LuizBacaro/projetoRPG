@@ -1,0 +1,28 @@
+---
+description: "Regras para alteracoes no frontend da Arena: arquitetura mista modulo/global, autenticacao, binds de eventos e qualidade visual."
+applyTo: "frontend/**/*.{html,css,js}"
+---
+
+# Frontend Instructions
+
+- A base e mista: parte usa ES Modules e parte usa scripts globais em `window`.
+- Antes de refatorar, confirme o modo de carregamento do arquivo (modulo vs global).
+- Nao converter para modulo sem controlar toda a cadeia de carregamento.
+
+## API e Auth
+
+- Use `window.getApiUrl(...)` ou helper de config existente; nao hardcode de API sem necessidade.
+- Para auth no frontend, prefira `AuthService.getAuthHeader()` ou `AuthService.getToken()` com fallback consistente.
+- Preserve envio de `Authorization: Bearer <token>` em servicos protegidos.
+
+## Eventos e UI
+
+- Evite novos handlers inline (`onclick`, `onchange`); prefira `addEventListener` em bootstrap/controlador.
+- Em paginas administrativas, prefira `Toast` e `ModalConfirm` aos `alert()` e `confirm()` quando disponiveis.
+- Manter direcao visual forte, intencional e responsiva; evitar UI generica.
+- Reaproveitar tokens de `frontend/css/variables.css` quando possivel.
+
+## Convencoes Locais
+
+- A Arena e sensivel a cache de script; se bug persistir apos patch correto, considerar cache-busting controlado.
+- Na tela de usuarios, manter filtros, badges de estado e acoes de governanca claramente visiveis.

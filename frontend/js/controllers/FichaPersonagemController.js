@@ -1126,7 +1126,8 @@ export class FichaPersonagemController {
 
         try {
             const params = new URLSearchParams({
-                combatente_id: this.combatente.id
+                combatente_id: this.combatente.id,
+                return_to: encodeURIComponent(window.location.pathname + window.location.search)
             });
 
             window.location.href = `/pages/pericias-ficha.html?${params.toString()}`;

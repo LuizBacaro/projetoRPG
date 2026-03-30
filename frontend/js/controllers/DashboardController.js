@@ -93,6 +93,7 @@ class DashboardController {
         this._configurarFormCadastro('formCadastroMonstro', 'monstro', 'modalCadastroMonstro');
         this._configurarFormCadastro('formCadastroNPC', 'npc', 'modalCadastroNPC');
         this._configurarFormEdicao();
+        this._configurarAcoesModaisSemInline();
         this._configurarUpload('');
         this._configurarUpload('Monstro');
         this._configurarUpload('NPC');
@@ -177,6 +178,40 @@ class DashboardController {
         });
     }
 
+    _configurarAcoesModaisSemInline() {
+        const bindClick = (id, handler) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('click', handler);
+        };
+
+        bindClick('btnFecharSeletorTipo', () => this._fecharModal('seletorTipo'));
+        bindClick('btnTipoJogador', () => this.actions.abrirModalCadastro('jogador'));
+        bindClick('btnTipoMonstro', () => this.actions.abrirModalCadastro('monstro'));
+        bindClick('btnTipoNPC', () => this.actions.abrirModalCadastro('npc'));
+
+        bindClick('btnFecharCadastroJogador', () => this._fecharModal('modalCadastroJogador'));
+        bindClick('btnCancelarCadastroJogador', () => this._fecharModal('modalCadastroJogador'));
+        bindClick('btnRemoverImagemJogador', () => this._removerImagem('', false));
+
+        bindClick('btnFecharCadastroMonstro', () => this._fecharModal('modalCadastroMonstro'));
+        bindClick('btnCancelarCadastroMonstro', () => this._fecharModal('modalCadastroMonstro'));
+        bindClick('btnRemoverImagemMonstro', () => this._removerImagem('Monstro', false));
+
+        bindClick('btnFecharCadastroNPC', () => this._fecharModal('modalCadastroNPC'));
+        bindClick('btnCancelarCadastroNPC', () => this._fecharModal('modalCadastroNPC'));
+        bindClick('btnRemoverImagemNPC', () => this._removerImagem('NPC', false));
+
+        bindClick('btnFecharModalEdicao', () => this._fecharModal('modalEdicaoDashboard'));
+        bindClick('btnCancelarEdicao', () => this._fecharModal('modalEdicaoDashboard'));
+        bindClick('btnDeletarCombatenteEdicao', () => this._deletarCombatente());
+        bindClick('btnAdicionarAtaqueEdicao', () => this._adicionarLinhaAtaque());
+        bindClick('btnRemoverImagemEdicao', () => this._removerImagem('', true));
+
+        document.querySelectorAll('.dash-atributo-input').forEach((input) => {
+            input.addEventListener('input', () => this._calcularModificador(input));
+        });
+    }
+
     _configurarFormEdicao() {
         const self = this;
         const form = document.getElementById('formEdicaoDashboard');
@@ -210,8 +245,13 @@ class DashboardController {
 
     _configurarUpload(sufixo) {
         const self = this;
+        const area = document.getElementById('uploadPlaceholder' + sufixo);
         const input = document.getElementById('inputFoto' + sufixo);
         if (!input) return;
+
+        if (area) {
+            area.addEventListener('click', () => input.click());
+        }
         
         input.addEventListener('change', () => {
             self._previewImagem(input, 'uploadPreview' + sufixo, 'previewImage' + sufixo, 'uploadPlaceholder' + sufixo);
@@ -272,7 +312,7 @@ class DashboardController {
                 </td>
                 <td>
                     <div class="tabela-acoes">
-                        <button class="btn-acao btn-ver-ficha" data-id="${c.id}" title="Ver ficha" onclick="window.open('/pages/ficha-personagem.html?id=${c.id}', '_blank')">👁️</button>
+                        <button class="btn-acao btn-ver-ficha" data-id="${c.id}" title="Ver ficha">👁️</button>
                         <button class="btn-acao btn-editar" data-id="${c.id}" title="Editar">✏️</button>
                         ${this._isMestre() ? `<button class="btn-acao btn-excluir" data-id="${c.id}" title="Excluir">🗑️</button>` : ''}
                     </div>
@@ -286,6 +326,17 @@ class DashboardController {
             btn.addEventListener('click', () => {
                 const id = parseInt(btn.dataset.id);
                 self._abrirEdicao(id);
+            });
+        });
+
+        tbody.querySelectorAll('.btn-ver-ficha').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.dataset.id);
+                if (!Number.isFinite(id)) {
+                    Toast.error('Combatente inválido para abrir ficha.');
+                    return;
+                }
+                window.location.href = `/pages/ficha-personagem.html?id=${id}`;
             });
         });
 
@@ -478,8 +529,12 @@ class DashboardController {
             <input type="text" class="ataque-bonus" placeholder="+0" value="${ataque?.bonus_ataque || '+0'}" style="width:70px" />
             <input type="text" class="ataque-dano" placeholder="1d6" value="${ataque?.dano || ''}" style="width:90px" />
             <input type="text" class="ataque-tipo" placeholder="tipo" value="${ataque?.tipo_dano || ''}" style="width:120px" />
-            <button type="button" class="btn-dash-delete" onclick="window.dashboardActions.removerLinhaAtaque(this)">✕</button>
+            <button type="button" class="btn-dash-delete">✕</button>
         `;
+        const btnRemover = div.querySelector('.btn-dash-delete');
+        if (btnRemover) {
+            btnRemover.addEventListener('click', () => div.remove());
+        }
         lista.appendChild(div);
     }
 
@@ -522,7 +577,8 @@ class DashboardController {
                 combatente_id: this.combatenteEmEdicao.id,
                 nome: document.getElementById('dashEditNome')?.value || this.combatenteEmEdicao.nome,
                 tipo: document.getElementById('dashEditTipo')?.value || this.combatenteEmEdicao.tipo,
-                pericias: JSON.stringify(this.combatenteEmEdicao?.pericias || [])
+                pericias: JSON.stringify(this.combatenteEmEdicao?.pericias || []),
+                return_to: encodeURIComponent(window.location.pathname + window.location.search)
             });
 
             window.location.href = `/pages/pericias.html?${params.toString()}`;
