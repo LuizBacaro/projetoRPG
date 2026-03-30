@@ -84,6 +84,7 @@ class DashboardController {
     _inicializar() {
         // ✅ NOVO: Configurar header do usuário
         window.AuthService.configurarHeaderUsuario();
+        this._configurarLinksGovernanca();
 
         this._aplicarRestricoesPerfil();
         this._configurarAbas();
@@ -99,6 +100,13 @@ class DashboardController {
         this._configurarUpload('NPC');
         this._configurarUploadEdicao();
         this.carregarCombatentes();
+    }
+
+    _configurarLinksGovernanca() {
+        const linkMagias = document.getElementById('linkMagias');
+        if (linkMagias) {
+            linkMagias.style.display = this._isMestre() ? '' : 'none';
+        }
     }
 
     _aplicarRestricoesPerfil() {

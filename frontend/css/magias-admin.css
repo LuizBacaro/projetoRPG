@@ -1,0 +1,342 @@
+.magias-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 12% 8%, rgba(74, 144, 217, 0.12), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(201, 168, 76, 0.13), transparent 24%),
+        linear-gradient(165deg, #091224 0%, #101f38 48%, #0b1a31 100%);
+    color: var(--texto-principal);
+    font-family: var(--fonte-texto);
+}
+
+.magias-shell {
+    width: min(1220px, 96vw);
+    margin: 0 auto;
+    padding: 1.8rem 0 2.4rem;
+}
+
+.magias-hero {
+    display: grid;
+    grid-template-columns: 1.2fr .9fr;
+    gap: 1.2rem;
+    background: linear-gradient(145deg, rgba(10, 26, 52, 0.88), rgba(18, 39, 71, 0.72));
+    border: 1px solid rgba(138, 176, 230, 0.28);
+    border-radius: 18px;
+    padding: 1.35rem;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+}
+
+.magias-hero-copy h1 {
+    font-family: var(--fonte-titulo);
+    font-size: clamp(1.55rem, 2.8vw, 2.2rem);
+    color: #f6e8bf;
+}
+
+.magias-hero-copy p {
+    margin-top: .55rem;
+    color: #c1d2ea;
+    line-height: 1.5;
+}
+
+.magias-kicker {
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    color: #9cbbe3;
+    font-size: .72rem;
+}
+
+.magias-hero-side {
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+    justify-content: center;
+}
+
+.magias-admin-card {
+    border: 1px solid rgba(116, 154, 207, 0.3);
+    border-radius: 14px;
+    background: rgba(14, 30, 55, 0.8);
+    padding: .9rem 1rem;
+    display: grid;
+    gap: .15rem;
+}
+
+.magias-admin-label {
+    color: #85a8d5;
+    font-size: .78rem;
+}
+
+.magias-admin-card strong {
+    color: #ffffff;
+    font-size: 1.05rem;
+}
+
+.magias-admin-card span:last-child {
+    color: #c4d7ef;
+    text-transform: capitalize;
+}
+
+.magias-hero-actions {
+    display: flex;
+    gap: .7rem;
+    flex-wrap: wrap;
+}
+
+.magias-overview {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .8rem;
+}
+
+.magias-stat-card {
+    background: rgba(16, 35, 64, 0.86);
+    border: 1px solid rgba(142, 176, 224, 0.22);
+    border-radius: 14px;
+    padding: .85rem 1rem;
+    display: grid;
+    gap: .2rem;
+}
+
+.magias-stat-card strong {
+    font-family: var(--fonte-titulo);
+    font-size: 1.45rem;
+    color: #f7d88f;
+}
+
+.magias-toolbar {
+    margin-top: 1rem;
+    background: rgba(13, 29, 53, 0.83);
+    border: 1px solid rgba(116, 154, 207, 0.24);
+    border-radius: 14px;
+    padding: .95rem;
+    display: grid;
+    gap: .75rem;
+}
+
+.magias-toolbar h2 {
+    font-family: var(--fonte-titulo);
+    color: #d8e6f9;
+    font-size: 1.1rem;
+}
+
+.magias-toolbar-controls {
+    display: grid;
+    grid-template-columns: 1.4fr repeat(4, minmax(120px, 1fr));
+    gap: .7rem;
+}
+
+.magias-field {
+    display: flex;
+    flex-direction: column;
+    gap: .33rem;
+}
+
+.magias-field span {
+    font-size: .76rem;
+    color: #a6c2e5;
+    letter-spacing: .03em;
+}
+
+.magias-field input,
+.magias-field select,
+.magias-form-group input,
+.magias-form-group select,
+.magias-form-group textarea {
+    border: 1px solid rgba(120, 153, 198, 0.34);
+    border-radius: 10px;
+    padding: .55rem .65rem;
+    font-family: var(--fonte-texto);
+    color: #e9f1fb;
+    background: rgba(8, 21, 40, 0.84);
+}
+
+.magias-table-shell {
+    margin-top: 1rem;
+    border: 1px solid rgba(116, 154, 207, 0.24);
+    background: rgba(10, 23, 43, 0.86);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.magias-table-shell table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.magias-table-shell th,
+.magias-table-shell td {
+    padding: .72rem .68rem;
+    border-bottom: 1px solid rgba(93, 127, 175, 0.26);
+    text-align: left;
+    font-size: .9rem;
+}
+
+.magias-table-shell th {
+    color: #97b8de;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .72rem;
+}
+
+.magias-loading {
+    text-align: center;
+    color: #acc5e4;
+    padding: 1.1rem;
+}
+
+.magias-badge {
+    border-radius: 999px;
+    padding: .22rem .58rem;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.magias-badge-ativo {
+    color: #164e63;
+    background: #67e8f9;
+}
+
+.magias-badge-inativo {
+    color: #fef2f2;
+    background: #b91c1c;
+}
+
+.magias-acoes {
+    display: flex;
+    gap: .35rem;
+    flex-wrap: wrap;
+}
+
+.btn-acao {
+    border: 1px solid rgba(122, 155, 202, 0.35);
+    background: rgba(16, 42, 76, 0.86);
+    color: #e1edfc;
+    border-radius: 9px;
+    padding: .35rem .58rem;
+    font-size: .76rem;
+    cursor: pointer;
+}
+
+.btn-acao-danger {
+    border-color: rgba(239, 68, 68, 0.42);
+    background: rgba(127, 29, 29, 0.72);
+}
+
+.magias-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 12, 24, 0.72);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 9998;
+}
+
+.magias-modal-overlay.show {
+    display: flex;
+}
+
+.magias-modal-box {
+    width: min(1050px, 96vw);
+    max-height: 92vh;
+    overflow: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(130, 161, 208, 0.3);
+    background: linear-gradient(160deg, rgba(10, 23, 43, 0.97), rgba(16, 37, 67, 0.94));
+    box-shadow: 0 28px 58px rgba(0, 0, 0, 0.5);
+}
+
+.magias-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .95rem 1rem;
+    border-bottom: 1px solid rgba(99, 131, 180, 0.36);
+}
+
+.magias-modal-header h2 {
+    color: #f4e4b0;
+    font-family: var(--fonte-titulo);
+}
+
+.magias-modal-close {
+    border: none;
+    background: transparent;
+    color: #b4cae8;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.magias-form {
+    padding: .95rem 1rem 1.1rem;
+    display: grid;
+    gap: .72rem;
+}
+
+.magias-form-grid,
+.magias-form-grid-2,
+.magias-form-grid-3 {
+    display: grid;
+    gap: .65rem;
+}
+
+.magias-form-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.magias-form-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.magias-form-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.magias-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: .33rem;
+}
+
+.magias-form-group label {
+    color: #a8c3e5;
+    font-size: .78rem;
+}
+
+.magias-form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.magias-dominio-group {
+    display: none;
+}
+
+.magias-classes-editor {
+    border: 1px dashed rgba(128, 160, 208, 0.42);
+    border-radius: 12px;
+    padding: .6rem;
+    background: rgba(8, 20, 38, 0.75);
+    display: grid;
+    gap: .55rem;
+}
+
+.magias-classe-inputs,
+.magias-classe-item {
+    display: grid;
+    grid-template-columns: 1fr 110px auto;
+    gap: .5rem;
+}
+
+.magias-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .6rem;
+    margin-top: .2rem;
+}
+
+@media (max-width: 980px) {
+    .magias-hero { grid-template-columns: 1fr; }
+    .magias-toolbar-controls { grid-template-columns: 1fr 1fr; }
+    .magias-form-grid,
+    .magias-form-grid-2,
+    .magias-form-grid-3 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+    .magias-overview { grid-template-columns: 1fr; }
+    .magias-toolbar-controls { grid-template-columns: 1fr; }
+}

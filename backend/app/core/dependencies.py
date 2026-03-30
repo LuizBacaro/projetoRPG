@@ -10,7 +10,11 @@ from ..services.combatente_service import CombatenteService
 from ..services.combate_service import CombateService
 from ..services.file_service import FileService
 from ..repositories.condicao_repository import CondicaoRepository
+from ..repositories.magia_repository import MagiaRepository
+from ..repositories.grimorio_repository import GrimorioRepository
 from ..services.condicao_service import CondicaoService
+from ..services.magia_service import MagiaService
+from ..services.grimorio_service import GrimorioService
 
 # ==================== REPOSITORIES ====================
 
@@ -22,6 +26,16 @@ def get_combatente_repository(db: Session = Depends(get_db)) -> CombatenteReposi
 def get_combate_repository(db: Session = Depends(get_db)) -> CombateRepository:
     """Factory para CombateRepository"""
     return CombateRepository(db)
+
+
+def get_magia_repository(db: Session = Depends(get_db)) -> MagiaRepository:
+    """Factory para MagiaRepository"""
+    return MagiaRepository(db)
+
+
+def get_grimorio_repository(db: Session = Depends(get_db)) -> GrimorioRepository:
+    """Factory para GrimorioRepository"""
+    return GrimorioRepository(db)
 
 
 # ==================== SERVICES ====================
@@ -40,6 +54,21 @@ def get_combate_service(
 ) -> CombateService:
     """Factory para CombateService"""
     return CombateService(combate_repo, combatente_repo)
+
+
+def get_magia_service(
+    repository: MagiaRepository = Depends(get_magia_repository),
+) -> MagiaService:
+    """Factory para MagiaService"""
+    return MagiaService(repository)
+
+
+def get_grimorio_service(
+    grimorio_repository: GrimorioRepository = Depends(get_grimorio_repository),
+    magia_repository: MagiaRepository = Depends(get_magia_repository),
+) -> GrimorioService:
+    """Factory para GrimorioService"""
+    return GrimorioService(grimorio_repository, magia_repository)
 
 
 def get_file_service() -> FileService:

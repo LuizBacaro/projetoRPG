@@ -4,41 +4,67 @@ SRP: Endpoints para consulta de magias D&D 3.5
 SOLID: Single Responsibility — apenas roteamento de magias
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.core.catalog_cache import catalog_cache, make_cache_key
 from app.core.config import settings
+from app.core.dependencies import get_magia_service
 from app.core.database import get_db
+from app.core.deps import requer_mestre_ou_admin
 from app.models.magia import Magia
-from app.schemas.magia import MagiaResponse
+from app.repositories.magia_repository import MagiaRepository
+from app.schemas.magia import MagiaResponse, MagiaCreate, MagiaUpdate
+from app.services.magia_service import MagiaService
 
 router = APIRouter(prefix="/magias", tags=["Magias"])
 
 
 def _serialize_magia(magia: Magia) -> dict:
     return {
-        "id": magia.id,
-        "nome": magia.nome,
-        "nivel": magia.nivel,
-        "classe": magia.classe,
-        "escola": magia.escola,
-        "sub_escola": magia.sub_escola,
-        "componentes": magia.componentes,
-        "alcance": magia.alcance,
-        "area_efeito": magia.area_efeito,
-        "duracao": magia.duracao,
-        "tempo_conjuracao": magia.tempo_conjuracao,
-        "dano": magia.dano,
-        "teste_resistencia": magia.teste_resistencia,
-        "resistencia_magica": magia.resistencia_magica,
-        "descricao": magia.descricao,
-        "ativo": magia.ativo,
-        "eh_truque": magia.eh_truque,
-        "tem_dano": magia.tem_dano,
-        "data_criacao": magia.data_criacao,
+        "id": getattr(magia, "id", None),
+        "nome": getattr(magia, "nome", None),
+        "nome_en": getattr(magia, "nome_en", None),
+        "nivel": getattr(magia, "nivel", None),
+        "classe": getattr(magia, "classe", None),
+        "escola": getattr(magia, "escola", None),
+        "sub_escola": getattr(magia, "sub_escola", None),
+        "descritor": getattr(magia, "descritor", None),
+        "componentes": getattr(magia, "componentes", None),
+        "componente_extra": getattr(magia, "componente_extra", None),
+        "alcance": getattr(magia, "alcance", None),
+        "area_efeito": getattr(magia, "area_efeito", None),
+        "duracao": getattr(magia, "duracao", None),
+        "tempo_conjuracao": getattr(magia, "tempo_conjuracao", None),
+        "dano": getattr(magia, "dano", None),
+        "teste_resistencia": getattr(magia, "teste_resistencia", None),
+        "resistencia_magica": getattr(magia, "resistencia_magica", False),
+        "resistencia_magia_texto": getattr(magia, "resistencia_magia_texto", None),
+        "descricao": getattr(magia, "descricao", None),
+        "descricao_en": getattr(magia, "descricao_en", None),
+        "ativo": getattr(magia, "ativo", True),
+        "e_magia_dominio": getattr(magia, "e_magia_dominio", False),
+        "dominios": getattr(magia, "dominios", None),
+        "pagina_referencia": getattr(magia, "pagina_referencia", None),
+        "eh_truque": getattr(magia, "eh_truque", False),
+        "tem_dano": getattr(magia, "tem_dano", False),
+        "classes_niveis": [
+            {"id": cn.id, "classe": cn.classe, "nivel": cn.nivel}
+            for cn in (getattr(magia, "classes_niveis", []) or [])
+        ],
+        "data_criacao": getattr(magia, "data_criacao", None),
     }
+
+
+def _resolve_service(service: Optional[MagiaService], db: Session) -> MagiaService:
+    if isinstance(service, MagiaService):
+        return service
+    return MagiaService(MagiaRepository(db))
+
+
+def _sanitize_query_value(value):
+    return None if hasattr(value, "default") else value
 
 
 @router.get("/", response_model=List[MagiaResponse])
@@ -47,10 +73,14 @@ def listar_magias(
     nivel:  Optional[int] = Query(None, ge=0, le=9, description="Filtrar por nível (0-9)"),
     escola: Optional[str] = Query(None, description="Filtrar por escola de magia"),
     nome:   Optional[str] = Query(None, description="Buscar por nome (parcial)"),
+    componentes: Optional[str] = Query(None, description="Filtrar por componentes (ex: V,S)"),
+    dominio: Optional[str] = Query(None, description="Filtrar por domínio"),
+    ativo: Optional[bool] = Query(None, description="Filtrar por status ativa/inativa"),
     skip:   int = Query(0, ge=0, description="Quantidade de registros para pular"),
     limit:  int = Query(100, ge=1, le=500, description="Quantidade máxima de registros retornados"),
     response: Response = None,
     db:     Session        = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
 ):
     """
     Lista magias com filtros opcionais.
@@ -60,6 +90,14 @@ def listar_magias(
     - GET /api/v1/magias?classe=Clérigo
     - GET /api/v1/magias?nome=bola
     """
+    classe = _sanitize_query_value(classe)
+    nivel = _sanitize_query_value(nivel)
+    escola = _sanitize_query_value(escola)
+    nome = _sanitize_query_value(nome)
+    componentes = _sanitize_query_value(componentes)
+    dominio = _sanitize_query_value(dominio)
+    ativo = _sanitize_query_value(ativo)
+
     classe_normalizado = None
     if classe:
         classe_normalizado = classe.strip()
@@ -72,6 +110,9 @@ def listar_magias(
         nivel=nivel,
         escola=escola,
         nome=nome,
+        componentes=componentes,
+        dominio=dominio,
+        ativo=ativo,
         skip=skip,
         limit=limit,
     )
@@ -85,18 +126,19 @@ def listar_magias(
                 response.headers["X-Limit"] = str(limit)
             return cached["items"]
 
-    query = db.query(Magia).filter(Magia.ativo == True)
-    if classe_normalizado:
-        query = query.filter(Magia.classe.ilike(classe_normalizado))
-    if nivel is not None:
-        query = query.filter(Magia.nivel == nivel)
-    if escola:
-        query = query.filter(Magia.escola.ilike(escola))
-    if nome:
-        query = query.filter(Magia.nome.ilike(f"%{nome}%"))
-
-    total = query.count()
-    items = [_serialize_magia(magia) for magia in query.order_by(Magia.nivel, Magia.nome).offset(skip).limit(limit).all()]
+    srv = _resolve_service(service, db)
+    total, rows = srv.listar_magias(
+        classe=classe_normalizado,
+        nivel=nivel,
+        escola=escola,
+        nome=nome,
+        componentes=componentes,
+        dominio=dominio,
+        ativo=ativo,
+        skip=skip,
+        limit=limit,
+    )
+    items = [_serialize_magia(magia) for magia in rows]
 
     if settings.CACHE_ENABLED:
         catalog_cache.set(
@@ -114,7 +156,10 @@ def listar_magias(
 
 
 @router.get("/classes", response_model=List[str])
-def listar_classes(db: Session = Depends(get_db)):
+def listar_classes(
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+):
     """Retorna lista de classes disponíveis."""
     cache_key = "magias:classes"
     if settings.CACHE_ENABLED:
@@ -122,15 +167,19 @@ def listar_classes(db: Session = Depends(get_db)):
         if cached is not None:
             return cached
 
-    resultado = db.query(Magia.classe).distinct().order_by(Magia.classe).all()
-    classes = [r[0] for r in resultado]
+    srv = _resolve_service(service, db)
+    classes = srv.listar_classes()
     if settings.CACHE_ENABLED:
         catalog_cache.set(cache_key, classes, settings.CACHE_CATALOG_TTL_SECONDS)
     return classes
 
 
 @router.get("/{magia_id}", response_model=MagiaResponse)
-def obter_magia(magia_id: int, db: Session = Depends(get_db)):
+def obter_magia(
+    magia_id: int,
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+):
     """Retorna detalhes de uma magia específica."""
     cache_key = make_cache_key("magias:detail", magia_id=magia_id)
     if settings.CACHE_ENABLED:
@@ -138,11 +187,76 @@ def obter_magia(magia_id: int, db: Session = Depends(get_db)):
         if cached is not None:
             return cached
 
-    magia = db.query(Magia).filter(Magia.id == magia_id).first()
-    if not magia:
-        raise HTTPException(status_code=404, detail="Magia não encontrada")
+    srv = _resolve_service(service, db)
+    magia = srv.obter_por_id(magia_id)
 
     item = _serialize_magia(magia)
     if settings.CACHE_ENABLED:
         catalog_cache.set(cache_key, item, settings.CACHE_CATALOG_TTL_SECONDS)
     return item
+
+
+@router.post("/", response_model=MagiaResponse, status_code=status.HTTP_201_CREATED)
+def criar_magia(
+    payload: MagiaCreate,
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    magia = _resolve_service(service, db).criar(payload)
+    if settings.CACHE_ENABLED:
+        catalog_cache.invalidate_prefix("magias:")
+    return _serialize_magia(magia)
+
+
+@router.put("/{magia_id}", response_model=MagiaResponse)
+def atualizar_magia(
+    magia_id: int,
+    payload: MagiaUpdate,
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    magia = _resolve_service(service, db).atualizar(magia_id, payload)
+    if settings.CACHE_ENABLED:
+        catalog_cache.invalidate_prefix("magias:")
+    return _serialize_magia(magia)
+
+
+@router.patch("/{magia_id}/desativar", response_model=MagiaResponse)
+def desativar_magia(
+    magia_id: int,
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    magia = _resolve_service(service, db).desativar(magia_id)
+    if settings.CACHE_ENABLED:
+        catalog_cache.invalidate_prefix("magias:")
+    return _serialize_magia(magia)
+
+
+@router.patch("/{magia_id}/reativar", response_model=MagiaResponse)
+def reativar_magia(
+    magia_id: int,
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    magia = _resolve_service(service, db).reativar(magia_id)
+    if settings.CACHE_ENABLED:
+        catalog_cache.invalidate_prefix("magias:")
+    return _serialize_magia(magia)
+
+
+@router.delete("/{magia_id}", status_code=status.HTTP_204_NO_CONTENT)
+def excluir_magia(
+    magia_id: int,
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    _resolve_service(service, db).deletar_fisico(magia_id)
+    if settings.CACHE_ENABLED:
+        catalog_cache.invalidate_prefix("magias:")
+    return None

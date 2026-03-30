@@ -17,7 +17,7 @@ from .core.database import engine, Base, SessionLocal, get_db
 from .core.init_db import criar_admin_padrao, inicializar_equipamentos, inicializar_talentos
 from .core.rate_limit import RateLimitMiddleware
 from .core.request_size import RequestSizeLimitMiddleware
-from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias, magias_preparadas, equipamentos, talentos
+from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias, magias_preparadas, equipamentos, talentos, grimorio
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
 from .models import usuario as usuario_model
@@ -30,6 +30,7 @@ from .models import combatente_condicao as pivot_model
 from .models import ataque as ataque_model
 from .models import pericia as pericia_model
 from .models import magia as magia_model
+from .models import grimorio as grimorio_model
 
 logger = logging.getLogger(__name__)
 
@@ -128,6 +129,7 @@ app.include_router(ataques.router, prefix=settings.API_V1_PREFIX)
 app.include_router(pericias.router, prefix=settings.API_V1_PREFIX)
 app.include_router(magias.router, prefix=settings.API_V1_PREFIX)
 app.include_router(magias_preparadas.router, prefix=settings.API_V1_PREFIX)
+app.include_router(grimorio.router, prefix=settings.API_V1_PREFIX)
 app.include_router(equipamentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(talentos.router, prefix=settings.API_V1_PREFIX)
 

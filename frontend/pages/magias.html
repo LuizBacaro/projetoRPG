@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Magias - Admin Arena TTRPG</title>
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/botoes.css" />
+    <link rel="stylesheet" href="/css/magias-admin.css" />
+</head>
+<body class="magias-page">
+    <div class="magias-shell">
+        <header class="magias-hero">
+            <div class="magias-hero-copy">
+                <span class="magias-kicker">Catalogo Arcano</span>
+                <h1>Administracao de Magias</h1>
+                <p>
+                    Gerencie o catalogo principal de magias com criacao, edicao e controle de status.
+                    Esta tela segue os contratos do backend para manter consistencia com Grimorio e Ficha.
+                </p>
+            </div>
+
+            <div class="magias-hero-side">
+                <div class="magias-admin-card">
+                    <span class="magias-admin-label">Sessao ativa</span>
+                    <strong id="nomeAdminAtual">Administrador</strong>
+                    <span id="perfilAdminAtual">administrador</span>
+                </div>
+
+                <div class="magias-hero-actions">
+                    <a href="/dashboard" class="btn btn-secondary">← Dashboard</a>
+                    <button id="btnNovaMagia" class="btn btn-primary">+ Nova Magia</button>
+                </div>
+            </div>
+        </header>
+
+        <section class="magias-overview" aria-label="Resumo do catalogo de magias">
+            <article class="magias-stat-card">
+                <span>Total no recorte</span>
+                <strong id="statTotalMagias">0</strong>
+            </article>
+            <article class="magias-stat-card">
+                <span>Ativas na listagem</span>
+                <strong id="statMagiasAtivas">0</strong>
+            </article>
+            <article class="magias-stat-card">
+                <span>Inativas na listagem</span>
+                <strong id="statMagiasInativas">0</strong>
+            </article>
+        </section>
+
+        <section class="magias-toolbar" aria-label="Filtros de magias">
+            <h2>Filtro de catalogo</h2>
+            <p id="resumoFiltradoMagias">Carregando registros...</p>
+            <div class="magias-toolbar-controls">
+                <label class="magias-field">
+                    <span>Nome</span>
+                    <input id="filtroNomeMagia" type="search" placeholder="Buscar por nome" />
+                </label>
+                <label class="magias-field">
+                    <span>Classe</span>
+                    <select id="filtroClasseMagia"><option value="">Todas</option></select>
+                </label>
+                <label class="magias-field">
+                    <span>Nivel</span>
+                    <select id="filtroNivelMagia">
+                        <option value="">Todos</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                    </select>
+                </label>
+                <label class="magias-field">
+                    <span>Escola</span>
+                    <select id="filtroEscolaMagia">
+                        <option value="">Todas</option>
+                        <option value="Abjuracao">Abjuracao</option>
+                        <option value="Adivinhacao">Adivinhacao</option>
+                        <option value="Conjuracao">Conjuracao</option>
+                        <option value="Encantamento">Encantamento</option>
+                        <option value="Evocacao">Evocacao</option>
+                        <option value="Ilusao">Ilusao</option>
+                        <option value="Necromancia">Necromancia</option>
+                        <option value="Transmutacao">Transmutacao</option>
+                        <option value="Universal">Universal</option>
+                    </select>
+                </label>
+                <label class="magias-field">
+                    <span>Status</span>
+                    <select id="filtroStatusMagia">
+                        <option value="">Todos</option>
+                        <option value="true">Ativa</option>
+                        <option value="false">Inativa</option>
+                    </select>
+                </label>
+            </div>
+        </section>
+
+        <section class="magias-table-shell" aria-label="Tabela de magias">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Escola</th>
+                        <th>Classes/Niveis</th>
+                        <th>Componentes</th>
+                        <th>Status</th>
+                        <th>Acoes</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaMagias">
+                    <tr><td colspan="6" class="magias-loading">Carregando magias...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <div id="modalMagia" class="magias-modal-overlay" aria-hidden="true">
+        <div class="magias-modal-box">
+            <div class="magias-modal-header">
+                <h2 id="modalMagiaTitulo">Nova Magia</h2>
+                <button type="button" id="btnFecharModalMagia" class="magias-modal-close" aria-label="Fechar">×</button>
+            </div>
+
+            <form id="formMagia" class="magias-form">
+                <div class="magias-form-grid-2">
+                    <label class="magias-form-group">
+                        <span>Nome *</span>
+                        <input id="inputNomeMagia" required />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Nome EN</span>
+                        <input id="inputNomeEnMagia" />
+                    </label>
+                </div>
+
+                <div class="magias-form-grid">
+                    <label class="magias-form-group">
+                        <span>Escola *</span>
+                        <select id="inputEscolaMagia" required></select>
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Sub Escola</span>
+                        <input id="inputSubEscolaMagia" />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Descritor</span>
+                        <input id="inputDescritorMagia" />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Pagina de referencia</span>
+                        <input id="inputPaginaReferenciaMagia" type="number" min="1" />
+                    </label>
+                </div>
+
+                <div class="magias-classes-editor">
+                    <label>Classes e niveis *</label>
+                    <div class="magias-classe-inputs">
+                        <select id="novaClasseMagia"></select>
+                        <input id="novoNivelClasseMagia" type="number" min="0" max="9" value="0" />
+                        <button type="button" id="btnAdicionarClasseNivel" class="btn btn-secondary">Adicionar</button>
+                    </div>
+                    <div id="listaClassesNiveis"></div>
+                </div>
+
+                <div class="magias-form-grid-3">
+                    <label class="magias-form-group">
+                        <span>Componentes</span>
+                        <input id="inputComponentesMagia" placeholder="Ex: V,G,M" />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Componente extra</span>
+                        <input id="inputComponenteExtraMagia" />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Dano</span>
+                        <input id="inputDanoMagia" />
+                    </label>
+                </div>
+
+                <div class="magias-form-grid-3">
+                    <label class="magias-form-group">
+                        <span>Tempo de conjuracao</span>
+                        <input id="inputTempoConjuracaoMagia" />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Alcance</span>
+                        <input id="inputAlcanceMagia" />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Area/Efeito</span>
+                        <input id="inputAreaEfeitoMagia" />
+                    </label>
+                </div>
+
+                <div class="magias-form-grid-3">
+                    <label class="magias-form-group">
+                        <span>Duracao</span>
+                        <input id="inputDuracaoMagia" />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Teste de resistencia</span>
+                        <input id="inputTesteResistenciaMagia" />
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Resistencia a magia (texto)</span>
+                        <input id="inputResistenciaTextoMagia" />
+                    </label>
+                </div>
+
+                <div class="magias-form-grid-2">
+                    <label class="magias-form-group">
+                        <span>Descricao PT *</span>
+                        <textarea id="inputDescricaoMagia" required></textarea>
+                    </label>
+                    <label class="magias-form-group">
+                        <span>Descricao EN</span>
+                        <textarea id="inputDescricaoEnMagia"></textarea>
+                    </label>
+                </div>
+
+                <div class="magias-form-grid-2">
+                    <label class="magias-form-group">
+                        <span>
+                            <input id="inputResistenciaMagicaMagia" type="checkbox" />
+                            Resistencia magica
+                        </span>
+                    </label>
+                    <label class="magias-form-group">
+                        <span>
+                            <input id="inputMagiaDominio" type="checkbox" />
+                            Magia de dominio
+                        </span>
+                    </label>
+                </div>
+
+                <label id="grupoDominiosMagia" class="magias-form-group magias-dominio-group">
+                    <span>Dominios</span>
+                    <input id="inputDominiosMagia" placeholder="Ex: Fogo, Sol" />
+                </label>
+
+                <div class="magias-form-actions">
+                    <button type="button" id="btnCancelarModalMagia" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getApiUrl } from '/js/config/api.config.js';
+        import { Toast } from '/js/ui/toast.module.js';
+        import { MagiasAdminController } from '/js/controllers/MagiasAdminController.js';
+
+        window.getApiUrl = getApiUrl;
+        window.Toast = Toast;
+
+        const carregarScriptClassico = (src) => new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.body.appendChild(script);
+        });
+
+        await carregarScriptClassico('/js/services/AuthService.js');
+        window.AuthService.exigirLogin();
+
+        if (!window.AuthService.isMestre()) {
+            Toast.error('Acesso restrito a mestre ou administrador.');
+            window.location.href = '/dashboard';
+            throw new Error('Acesso negado ao modulo de magias.');
+        }
+
+        await carregarScriptClassico('/js/ui/ModalConfirm.js');
+
+        const controller = new MagiasAdminController();
+        controller.init();
+    </script>
+</body>
+</html>

@@ -106,9 +106,21 @@ export class MagiaService {
             
             // ✅ FILTRA COMPARANDO EM MAIÚSCULA
             const magiasFiltradas = todasMagias.filter(m => {
+                const alvo = classeNormalizada.trim();
+
+                if (Array.isArray(m.classes_niveis) && m.classes_niveis.length > 0) {
+                    return m.classes_niveis.some(cn =>
+                        String(cn.classe || '').toUpperCase().trim() === alvo
+                    );
+                }
+
                 if (!m.classe) return false;
-                const classeDoMagia = m.classe.toUpperCase().trim();
-                return classeDoMagia === classeNormalizada.trim();
+                const classesLegacy = String(m.classe)
+                    .toUpperCase()
+                    .split(/[,/;|]/)
+                    .map(v => v.trim())
+                    .filter(Boolean);
+                return classesLegacy.includes(alvo);
             });
             
             this._cache.set(classeNormalizada, magiasFiltradas);

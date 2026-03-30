@@ -4,7 +4,8 @@ SRP: Modelo ORM para Magias D&D 3.5 (PHB)
 SOLID: Single Responsibility — apenas mapeamento de tabela de magias
 """
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import relationship
 from datetime import datetime
 from ..core.database import Base 
 
@@ -25,15 +26,18 @@ class Magia(Base):
 
     # ── Identificação ──
     nome              = Column(String(100), nullable=False, index=True)
+    nome_en           = Column(String(100), nullable=True)
     nivel             = Column(Integer,     nullable=False, index=True)   # 0–9
     classe            = Column(String(50),  nullable=False, index=True)   # Mago, Clérigo, etc.
 
     # ── Escola ──
     escola            = Column(String(50),  nullable=True)
     sub_escola        = Column(String(50),  nullable=True)
+    descritor         = Column(String(200), nullable=True)
 
     # ── Mecânicas ──
     componentes       = Column(String(20),  nullable=True)   # V, S, M, F, DF
+    componente_extra  = Column(String(300), nullable=True)
     alcance           = Column(String(50),  nullable=True)
     area_efeito       = Column(String(100), nullable=True)
     duracao           = Column(String(100), nullable=True)
@@ -43,13 +47,25 @@ class Magia(Base):
     dano              = Column(String(50),  nullable=True)
     teste_resistencia = Column(String(50),  nullable=True)   # Fortitude/Reflexos/Vontade/Nenhum
     resistencia_magica= Column(Boolean,     default=False)
+    resistencia_magia_texto = Column(String(50), nullable=True)
 
     # ── Descrição ──
     descricao         = Column(String(1000), nullable=True)
+    descricao_en      = Column(String(1000), nullable=True)
 
     # ── Metadados ──
     ativo             = Column(Boolean,  default=True)
+    e_magia_dominio   = Column(Boolean, default=False)
+    dominios          = Column(String(250), nullable=True)
+    pagina_referencia = Column(Integer, nullable=True)
     data_criacao      = Column(DateTime, default=datetime.utcnow)
+
+    classes_niveis = relationship(
+        "MagiaClasse",
+        back_populates="magia",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
 
     # ── Properties ──
 
@@ -70,11 +86,14 @@ class Magia(Base):
         return {
             'id':                  self.id,
             'nome':                self.nome,
+            'nome_en':             self.nome_en,
             'nivel':               self.nivel,
             'classe':              self.classe,
             'escola':              self.escola,
             'sub_escola':          self.sub_escola,
+            'descritor':           self.descritor,
             'componentes':         self.componentes,
+            'componente_extra':    self.componente_extra,
             'alcance':             self.alcance,
             'area_efeito':         self.area_efeito,
             'duracao':             self.duracao,
@@ -82,8 +101,13 @@ class Magia(Base):
             'dano':                self.dano,
             'teste_resistencia':   self.teste_resistencia,
             'resistencia_magica':  self.resistencia_magica,
+            'resistencia_magia_texto': self.resistencia_magia_texto,
             'descricao':           self.descricao,
+            'descricao_en':        self.descricao_en,
             'ativo':               self.ativo,
+            'e_magia_dominio':     self.e_magia_dominio,
+            'dominios':            self.dominios,
+            'pagina_referencia':   self.pagina_referencia,
             'eh_truque':           self.eh_truque,
             'tem_dano':            self.tem_dano,
             'data_criacao':        self.data_criacao.isoformat() if self.data_criacao else None,
@@ -98,3 +122,20 @@ class Magia(Base):
             f'classe={self.classe!r}'
             f')>'
         )
+
+
+class MagiaClasse(Base):
+    """Relação N:N simplificada para mapear níveis por classe de uma magia."""
+
+    __tablename__ = "magias_classes"
+    __table_args__ = (
+        UniqueConstraint("magia_id", "classe", name="uq_magias_classes_magia_classe"),
+        {"extend_existing": True},
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    magia_id = Column(Integer, ForeignKey("magias.id", ondelete="CASCADE"), nullable=False, index=True)
+    classe = Column(String(50), nullable=False, index=True)
+    nivel = Column(Integer, nullable=False)
+
+    magia = relationship("Magia", back_populates="classes_niveis")

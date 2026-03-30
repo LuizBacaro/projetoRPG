@@ -1,0 +1,884 @@
+{
+  "document": {
+    "module": "Grimório",
+    "version": "v1",
+    "exported_at": "2026-03-30T18:59:56.340223",
+    "title": "Especificação de Requisitos - Grimório"
+  },
+  "1_informacoes_projeto": {
+    "descricao": "Grimório",
+    "produto": "Grimório",
+    "versao": "v1"
+  },
+  "2_objetivo_escopo": {
+    "objetivo": "Desenvolver um módulo de grimório eletrônico que permita aos jogadores gerenciar as magias conhecidas de seus personagens de D&D 3.5, respeitando as regras de cada classe conjuradora, restrições de alinhamento e domínios divinos, oferecendo uma interface de consulta rápida e organizada.",
+    "escopo_incluido": [
+      "Gerenciamento de magias conhecidas para as classes Clérigo, Druida, Bardo, Ranger, Paladino, Mago e Feiticeiro",
+      "validação automática de compatibilidade de magias com alinhamento e domínios",
+      "adição automática de magias para classes com acesso completo à lista (Clérigo, Druida, Ranger, Paladino)",
+      "seleção manual de magias para classes com conhecimento limitado (Bardo, Feiticeiro, Mago)",
+      "notificação de novas magias disponíveis ao subir de nível",
+      "notificação de troca de magias para Bardo e Feiticeiro",
+      "grimórios separados por classe para personagens multiclasse",
+      "visualização em cards com filtros por título, escola, nível e componentes",
+      "marcação de favoritos",
+      "anotações pessoais por magia",
+      "cálculo de páginas do grimório para Magos."
+    ],
+    "escopo_excluido": [
+      "Gerenciamento de slots de magia por dia",
+      "preparação diária de magias",
+      "classes de prestígio",
+      "limite físico de páginas do grimório de Mago",
+      "cadastro de magias (responsabilidade de outro módulo)",
+      "ficha básica do personagem incluindo alinhamento e domínios (responsabilidade de outro módulo)."
+    ]
+  },
+  "3_personas": {
+    "persona_principal": "",
+    "objetivos_principal": [],
+    "persona_secundaria": "",
+    "objetivos_secundaria": [],
+    "permissoes": []
+  },
+  "4_visao_geral_funcional": {
+    "resumo": "O Grimório é um módulo que centraliza as magias conhecidas de cada personagem conjurador, funcionando como uma referência rápida durante as sessões de jogo. O sistema diferencia o comportamento por classe: classes com acesso completo (Clérigo, Druida, Ranger, Paladino) recebem automaticamente suas magias conforme sobem de nível, enquanto classes com conhecimento limitado (Bardo, Feiticeiro, Mago) selecionam manualmente suas magias. O módulo aplica automaticamente as restrições de alinhamento e domínio para magias divinas, garantindo que apenas magias compatíveis estejam disponíveis. Cada grimório exibe as magias em cards organizados por nível, com filtros avançados e a possibilidade de marcar favoritos e adicionar anotações pessoais.",
+    "conceitos": {
+      "grimorio": "Coleção de magias conhecidas por um personagem para uma classe específica. Personagens multiclasse possuem um grimório por classe conjuradora.",
+      "magia_conhecida": "Magia que o personagem sabe conjurar, originada do catálogo de magias do sistema e adicionada ao grimório.",
+      "magia_de_dominio": "Magia adicional disponível para Clérigos baseada nos dois domínios escolhidos na criação do personagem.",
+      "paginas_grimorio": "Para Magos, cada magia ocupa um número de páginas igual ao seu nível. O total de páginas é exibido como atributo do grimório.",
+      "restricao_dominio": "Regra que impede Clérigos de acessarem magias de domínios opostos aos seus domínios escolhidos.",
+      "restricao_alinhamento": "Regra que impede personagens de conhecerem magias incompatíveis com seu alinhamento moral ou ético.",
+      "classe_acesso_completo": "Clérigo, Druida, Ranger e Paladino - classes que conhecem todas as magias de sua lista para seu nível atual, com adição automática ao grimório.",
+      "classe_conhecimento_limitado": "Bardo, Feiticeiro e Mago - classes que conhecem um número específico de magias, selecionadas manualmente pelo jogador."
+    }
+  },
+  "5_requisitos_funcionais": [
+    {
+      "id": "RF01",
+      "titulo": "Listagem de magias por nível",
+      "descricao": "O sistema deve exibir as magias conhecidas organizadas em seções por nível de magia (0 a 9), mostrando o total de magias em cada nível.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF02",
+      "titulo": "Seção separada para magias de domínio",
+      "descricao": "Para personagens Clérigos, o sistema deve exibir as magias de domínio em uma seção separada das magias gerais, identificando de qual domínio cada magia provém.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF03",
+      "titulo": "Card de magia resumido",
+      "descricao": "Cada magia deve ser exibida em um card contendo: nome, nível, escola, componentes (V, G, M, F, FD, XP), tempo de conjuração e alcance. Ao clicar no card, exibir detalhes completos da magia.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF04",
+      "titulo": "Filtros de busca",
+      "descricao": "O sistema deve permitir filtrar as magias do grimório por: título (busca textual), escola de magia, nível e componentes.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF05",
+      "titulo": "Indicador de favoritos",
+      "descricao": "Magias marcadas como favoritas devem ser destacadas visualmente na listagem e poder ser filtradas separadamente.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF06",
+      "titulo": "Grimórios separados por classe",
+      "descricao": "Para personagens multiclasse, o sistema deve exibir grimórios distintos para cada classe conjuradora, acessíveis por abas ou seletor.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF07",
+      "titulo": "Grimório vazio para classes sem magias",
+      "descricao": "Para Rangers e Paladinos abaixo do nível 4, o grimório deve estar acessível mas vazio, exibindo mensagem informativa sobre quando magias estarão disponíveis.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF08",
+      "titulo": "Adição automática por nível",
+      "descricao": "Quando um personagem de classe com acesso completo sobe de nível, o sistema deve adicionar automaticamente ao grimório todas as magias do novo nível de acesso, respeitando as restrições de alinhamento.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF09",
+      "titulo": "Adição automática de magias de domínio",
+      "descricao": "Para Clérigos, o sistema deve adicionar automaticamente as magias dos domínios escolhidos conforme o personagem atinge o nível de conjurador necessário para cada nível de magia.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF10",
+      "titulo": "Notificação de novas magias",
+      "descricao": "O sistema deve notificar o jogador quando novas magias forem adicionadas automaticamente ao grimório, listando as magias incluídas.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF11",
+      "titulo": "Validação de alinhamento para magias divinas",
+      "descricao": "O sistema deve excluir automaticamente do grimório magias incompatíveis com o alinhamento do personagem, conforme regras de restrição.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF12",
+      "titulo": "Validação de domínios opostos para Clérigos",
+      "descricao": "O sistema deve excluir automaticamente do grimório de Clérigos as magias de domínios opostos aos seus domínios escolhidos.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF13",
+      "titulo": "Interface de seleção de magias",
+      "descricao": "O sistema deve exibir uma interface para selecionar magias do catálogo, mostrando apenas magias disponíveis para a classe e nível do personagem.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF14",
+      "titulo": "Notificação de magias pendentes",
+      "descricao": "Quando o personagem sobe de nível e ganha direito a novas magias conhecidas, o sistema deve notificar o jogador informando quantas magias pode escolher e de quais níveis.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF15",
+      "titulo": "Controle de quantidade de magias",
+      "descricao": "O sistema deve controlar o número máximo de magias conhecidas por nível de magia, de acordo com a tabela de progressão da classe.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF16",
+      "titulo": "Filtros na seleção",
+      "descricao": "A interface de seleção deve permitir filtrar magias disponíveis por título, escola, nível e componentes.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF17",
+      "titulo": "Preview de magia antes de adicionar",
+      "descricao": "O sistema deve permitir visualizar os detalhes completos de uma magia antes de adicioná-la ao grimório.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF18",
+      "titulo": "Notificação de troca disponível",
+      "descricao": "O sistema deve notificar Bardos e Feiticeiros quando atingirem um nível que permite troca de magia conhecida (Feiticeiro: níveis pares a partir do 4º; Bardo: níveis 5, 8, 11, 14, 17 e 20).",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF19",
+      "titulo": "Interface de troca",
+      "descricao": "O sistema deve fornecer uma interface onde o jogador pode selecionar uma magia para remover e outra para adicionar em seu lugar, respeitando as restrições de nível.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF20",
+      "titulo": "Validação de nível na troca",
+      "descricao": "A nova magia selecionada deve ser de nível igual ou inferior à magia removida, e no máximo um nível abaixo do nível mais alto que o personagem pode conjurar.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF21",
+      "titulo": "Histórico de trocas",
+      "descricao": "O sistema deve manter registro das trocas de magias realizadas, informando a magia removida, magia adicionada e nível do personagem no momento da troca.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF22",
+      "titulo": "Marcar/desmarcar favorita",
+      "descricao": "O sistema deve permitir marcar e desmarcar qualquer magia como favorita, com a marcação sendo persistida e visível na listagem.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF23",
+      "titulo": "Adicionar anotações",
+      "descricao": "O sistema deve permitir adicionar, editar e remover anotações pessoais em qualquer magia do grimório, com suporte a texto livre.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF24",
+      "titulo": "Remoção de magia para Mago",
+      "descricao": "Para personagens Mago, o sistema deve permitir remover magias do grimório, simulando a perda ou descarte de páginas do grimório físico.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF25",
+      "titulo": "Confirmação de remoção",
+      "descricao": "Ao remover uma magia, o sistema deve solicitar confirmação do usuário antes de efetuar a operação.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF26",
+      "titulo": "Cálculo automático de páginas",
+      "descricao": "O sistema deve calcular automaticamente o total de páginas do grimório, onde cada magia ocupa um número de páginas igual ao seu nível (mínimo 1 página para truques de nível 0).",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF27",
+      "titulo": "Exibição do total de páginas",
+      "descricao": "O grimório de Mago deve exibir em destaque o total de páginas ocupadas e a contagem de páginas por nível de magia.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF28",
+      "titulo": "Modal de detalhes da magia",
+      "descricao": "Ao clicar em uma magia, o sistema deve exibir um modal ou painel com todas as informações da magia: nome, escola, subescola, descritor, nível por classe, componentes, tempo de conjuração, alcance, alvo/área/efeito, duração, teste de resistência, resistência a magia e descrição completa.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF29",
+      "titulo": "Exibição de anotações pessoais",
+      "descricao": "O modal de detalhes deve incluir as anotações pessoais do jogador para aquela magia, se houver.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF30",
+      "titulo": "Navegação rápida entre magias",
+      "descricao": "O modal deve permitir navegar para a magia anterior ou próxima sem fechar e reabrir.",
+      "criterios_aceite": []
+    }
+  ],
+  "6_requisitos_nao_funcionais": [
+    {
+      "id": "RNF01",
+      "categoria": "PERFORMANCE",
+      "requisito": "A listagem de magias do grimório deve carregar em no máximo 2 segundos, permitindo consulta rápida durante sessões de jogo."
+    }
+  ],
+  "7_regras_negocio_invariantes": [
+    {
+      "id": "rn_001",
+      "descricao": "Personagens com alinhamento 'Bom' não podem conhecer magias dos domínios 'Mal' e 'Destruição'.",
+      "aplica_a": [
+        "req_012"
+      ]
+    },
+    {
+      "id": "rn_002",
+      "descricao": "Personagens com alinhamento 'Mal' não podem conhecer magias dos domínios 'Bom' e 'Cura'.",
+      "aplica_a": [
+        "req_012"
+      ]
+    },
+    {
+      "id": "rn_003",
+      "descricao": "Personagens com alinhamento 'Caótico' não podem conhecer magias do domínio 'Ordem' (Lei).",
+      "aplica_a": [
+        "req_012"
+      ]
+    },
+    {
+      "id": "rn_004",
+      "descricao": "Personagens com alinhamento 'Ordeiro' (Leal) não podem conhecer magias do domínio 'Caos'.",
+      "aplica_a": [
+        "req_012"
+      ]
+    },
+    {
+      "id": "rn_005",
+      "descricao": "Clérigos que possuem o domínio 'Mal' não podem ter acesso a magias do domínio 'Bem', e vice-versa.",
+      "aplica_a": [
+        "req_013"
+      ]
+    },
+    {
+      "id": "rn_006",
+      "descricao": "Clérigos que possuem o domínio 'Ordem' (Lei) não podem ter acesso a magias do domínio 'Caos', e vice-versa.",
+      "aplica_a": [
+        "req_013"
+      ]
+    },
+    {
+      "id": "rn_007",
+      "descricao": "Clérigos que possuem o domínio 'Proteção' não podem ter acesso a magias do domínio 'Destruição', e vice-versa.",
+      "aplica_a": [
+        "req_013"
+      ]
+    },
+    {
+      "id": "rn_008",
+      "descricao": "Rangers e Paladinos só têm acesso a magias a partir do nível 4 de personagem.",
+      "aplica_a": [
+        "req_007",
+        "req_009"
+      ]
+    },
+    {
+      "id": "rn_009",
+      "descricao": "Feiticeiros podem trocar uma magia conhecida por outra em níveis pares a partir do 4º nível. A nova magia deve ser de nível igual ou inferior, e no máximo um nível abaixo do nível mais alto que pode conjurar.",
+      "aplica_a": [
+        "req_019",
+        "req_021"
+      ]
+    },
+    {
+      "id": "rn_010",
+      "descricao": "Bardos podem trocar uma magia conhecida nos níveis 5, 8, 11, 14, 17 e 20. A nova magia deve ser de nível igual ou inferior, e no máximo um nível abaixo do nível mais alto que pode conjurar.",
+      "aplica_a": [
+        "req_019",
+        "req_021"
+      ]
+    },
+    {
+      "id": "rn_011",
+      "descricao": "O número de páginas do grimório de Mago é calculado pela soma dos níveis de todas as magias conhecidas, onde magias de nível 0 ocupam 1 página e demais ocupam páginas iguais ao seu nível.",
+      "aplica_a": [
+        "req_027"
+      ]
+    },
+    {
+      "id": "rn_012",
+      "descricao": "Clérigos e Druidas conhecem automaticamente todas as magias de sua lista para os níveis que podem conjurar, exceto as restritas por alinhamento ou domínio.",
+      "aplica_a": [
+        "req_009"
+      ]
+    },
+    {
+      "id": "rn_013",
+      "descricao": "Clérigos recebem automaticamente uma magia de domínio por nível de magia (0-9) para cada um de seus dois domínios, totalizando 18 magias de domínio no máximo.",
+      "aplica_a": [
+        "req_010"
+      ]
+    },
+    {
+      "id": "rn_014",
+      "descricao": "Personagens multiclasse possuem grimórios independentes para cada classe conjuradora, sem compartilhamento de magias entre eles.",
+      "aplica_a": [
+        "req_006"
+      ]
+    }
+  ],
+  "8_casos_de_uso": [
+    {
+      "id": "uc_001",
+      "titulo": "Consultar Grimório",
+      "descricao": "Jogador acessa o grimório de seu personagem para consultar as magias conhecidas.",
+      "ator_primario": "Jogador (Billy Joe)",
+      "pre_condicoes": [
+        "Jogador está autenticado no sistema",
+        "Personagem possui pelo menos uma classe conjuradora"
+      ],
+      "fluxo_principal": [
+        "Jogador acessa a ficha do personagem",
+        "Jogador seleciona a opção 'Grimório'",
+        "Sistema exibe o grimório da classe conjuradora principal (ou seletor se multiclasse)",
+        "Sistema lista as magias conhecidas organizadas por nível",
+        "Jogador visualiza os cards das magias",
+        "Jogador pode aplicar filtros para refinar a busca",
+        "Jogador clica em uma magia para ver detalhes completos"
+      ],
+      "fluxo_alternativo": [
+        "3a. Se personagem for multiclasse: sistema exibe seletor de classe e jogador escolhe qual grimório visualizar",
+        "4a. Se grimório estiver vazio (Ranger/Paladino < nível 4): sistema exibe mensagem informando quando magias estarão disponíveis",
+        "6a. Se nenhuma magia corresponder aos filtros: sistema exibe mensagem 'Nenhuma magia encontrada'"
+      ],
+      "pos_condicoes": [
+        "Jogador visualizou as magias desejadas"
+      ]
+    },
+    {
+      "id": "uc_002",
+      "titulo": "Receber Magias Automaticamente ao Subir de Nível",
+      "descricao": "Sistema adiciona automaticamente magias ao grimório quando personagem de classe com acesso completo sobe de nível.",
+      "ator_primario": "Sistema",
+      "pre_condicoes": [
+        "Personagem é de classe com acesso completo (Clérigo, Druida, Ranger ou Paladino)",
+        "Personagem acabou de subir de nível",
+        "Novo nível desbloqueia acesso a novo círculo de magias"
+      ],
+      "fluxo_principal": [
+        "Sistema detecta mudança de nível do personagem",
+        "Sistema identifica o novo nível de magia desbloqueado",
+        "Sistema consulta o catálogo de magias da classe",
+        "Sistema aplica filtros de restrição de alinhamento",
+        "Sistema adiciona as magias válidas ao grimório",
+        "Sistema notifica o jogador sobre as novas magias adicionadas"
+      ],
+      "fluxo_alternativo": [
+        "4a. Para Clérigos: sistema também aplica filtros de restrição de domínio",
+        "4b. Para Clérigos: sistema adiciona automaticamente a magia de domínio correspondente ao nível"
+      ],
+      "pos_condicoes": [
+        "Grimório atualizado com novas magias",
+        "Jogador notificado das adições"
+      ]
+    },
+    {
+      "id": "uc_003",
+      "titulo": "Selecionar Nova Magia Conhecida",
+      "descricao": "Jogador de classe com conhecimento limitado seleciona manualmente uma nova magia para adicionar ao grimório.",
+      "ator_primario": "Jogador (Billy Joe)",
+      "pre_condicoes": [
+        "Personagem é de classe com conhecimento limitado (Bardo, Feiticeiro ou Mago)",
+        "Personagem tem slots de magias conhecidas disponíveis"
+      ],
+      "fluxo_principal": [
+        "Jogador acessa o grimório do personagem",
+        "Jogador seleciona opção 'Adicionar Magia'",
+        "Sistema exibe catálogo de magias disponíveis para classe e nível",
+        "Jogador aplica filtros para encontrar magia desejada",
+        "Jogador clica em uma magia para ver preview dos detalhes",
+        "Jogador confirma a adição da magia",
+        "Sistema adiciona a magia ao grimório",
+        "Sistema atualiza contagem de magias conhecidas"
+      ],
+      "fluxo_alternativo": [
+        "3a. Se não houver slots disponíveis: sistema exibe mensagem informando que limite foi atingido",
+        "6a. Jogador cancela e retorna à listagem para escolher outra magia"
+      ],
+      "pos_condicoes": [
+        "Nova magia adicionada ao grimório",
+        "Contador de magias conhecidas atualizado"
+      ]
+    },
+    {
+      "id": "uc_004",
+      "titulo": "Trocar Magia Conhecida",
+      "descricao": "Bardo ou Feiticeiro troca uma magia conhecida por outra ao atingir nível apropriado.",
+      "ator_primario": "Jogador (Billy Joe)",
+      "pre_condicoes": [
+        "Personagem é Bardo ou Feiticeiro",
+        "Personagem atingiu nível que permite troca de magia",
+        "Jogador foi notificado sobre possibilidade de troca"
+      ],
+      "fluxo_principal": [
+        "Jogador acessa notificação de troca disponível",
+        "Sistema exibe interface de troca de magias",
+        "Jogador seleciona a magia que deseja remover",
+        "Sistema exibe magias disponíveis para substituição (respeitando restrições de nível)",
+        "Jogador seleciona a nova magia",
+        "Jogador visualiza preview da nova magia",
+        "Jogador confirma a troca",
+        "Sistema remove a magia antiga e adiciona a nova",
+        "Sistema registra a troca no histórico"
+      ],
+      "fluxo_alternativo": [
+        "7a. Jogador cancela a troca: sistema mantém magias inalteradas",
+        "3a. Jogador decide não trocar nenhuma magia: pode descartar notificação"
+      ],
+      "pos_condicoes": [
+        "Magia antiga removida do grimório",
+        "Nova magia adicionada ao grimório",
+        "Troca registrada no histórico"
+      ]
+    },
+    {
+      "id": "uc_005",
+      "titulo": "Marcar Magia como Favorita",
+      "descricao": "Jogador marca uma magia como favorita para acesso rápido.",
+      "ator_primario": "Jogador (Billy Joe)",
+      "pre_condicoes": [
+        "Jogador está visualizando o grimório",
+        "Grimório possui pelo menos uma magia"
+      ],
+      "fluxo_principal": [
+        "Jogador localiza a magia desejada na listagem",
+        "Jogador clica no ícone de favorito da magia",
+        "Sistema marca a magia como favorita",
+        "Sistema destaca visualmente a magia na listagem"
+      ],
+      "fluxo_alternativo": [
+        "2a. Se magia já é favorita: sistema desmarca a magia como favorita e remove destaque"
+      ],
+      "pos_condicoes": [
+        "Status de favorito da magia atualizado"
+      ]
+    },
+    {
+      "id": "uc_006",
+      "titulo": "Adicionar Anotação a uma Magia",
+      "descricao": "Jogador adiciona uma anotação pessoal a uma magia do grimório.",
+      "ator_primario": "Jogador (Billy Joe)",
+      "pre_condicoes": [
+        "Jogador está visualizando detalhes de uma magia"
+      ],
+      "fluxo_principal": [
+        "Jogador clica na opção 'Adicionar Anotação'",
+        "Sistema exibe campo de texto para anotação",
+        "Jogador digita sua anotação",
+        "Jogador salva a anotação",
+        "Sistema persiste a anotação vinculada à magia no grimório"
+      ],
+      "fluxo_alternativo": [
+        "4a. Jogador cancela: sistema descarta o texto digitado",
+        "1a. Se já existe anotação: jogador pode editar ou remover a anotação existente"
+      ],
+      "pos_condicoes": [
+        "Anotação salva e visível nos detalhes da magia"
+      ]
+    },
+    {
+      "id": "uc_007",
+      "titulo": "Remover Magia do Grimório de Mago",
+      "descricao": "Mago remove uma magia de seu grimório, simulando perda de páginas.",
+      "ator_primario": "Jogador (Billy Joe)",
+      "pre_condicoes": [
+        "Personagem é da classe Mago",
+        "Grimório possui pelo menos uma magia"
+      ],
+      "fluxo_principal": [
+        "Jogador acessa os detalhes da magia que deseja remover",
+        "Jogador clica na opção 'Remover do Grimório'",
+        "Sistema solicita confirmação da operação",
+        "Jogador confirma a remoção",
+        "Sistema remove a magia do grimório",
+        "Sistema atualiza o total de páginas do grimório"
+      ],
+      "fluxo_alternativo": [
+        "4a. Jogador cancela: magia permanece no grimório"
+      ],
+      "pos_condicoes": [
+        "Magia removida do grimório",
+        "Contagem de páginas atualizada"
+      ]
+    }
+  ],
+  "9_interface_usuario": {
+    "tela_001": {
+      "descricao": "Tela principal do grimório exibindo todas as magias conhecidas do personagem para a classe selecionada, organizadas por nível de magia em seções colapsáveis.",
+      "tipo": "listagem",
+      "elementos": [
+        "Seletor de classe (visível apenas para multiclasse)",
+        "Indicador de total de páginas (visível apenas para Mago)",
+        "Barra de filtros: campo de busca por título, dropdown de escola, dropdown de nível, checkboxes de componentes",
+        "Toggle para filtrar apenas favoritas",
+        "Seção separada 'Magias de Domínio' (visível apenas para Clérigo)",
+        "Seções por nível de magia (0 a 9) com contador de magias",
+        "Cards de magia com: nome, ícone de escola, nível, componentes (V/G/M/F/FD/XP), ícone de favorito, indicador de anotação",
+        "Mensagem de grimório vazio (para Ranger/Paladino < nível 4)",
+        "Badge de notificação para magias pendentes ou troca disponível"
+      ],
+      "acoes_disponiveis": [
+        "Selecionar classe (multiclasse)",
+        "Aplicar/limpar filtros",
+        "Expandir/colapsar seção de nível",
+        "Clicar em card para ver detalhes",
+        "Marcar/desmarcar favorita diretamente no card",
+        "Acessar opção de adicionar magia (classes com conhecimento limitado)",
+        "Acessar notificação de troca (Bardo/Feiticeiro)"
+      ]
+    },
+    "tela_002": {
+      "descricao": "Modal ou painel lateral exibindo informações completas de uma magia do grimório, incluindo anotações pessoais do jogador.",
+      "tipo": "formulario",
+      "elementos": [
+        "Nome da magia em destaque",
+        "Badge de escola e subescola",
+        "Descritores da magia",
+        "Nível por classe (lista)",
+        "Componentes detalhados (Verbal, Gestual, Material com descrição, Foco, Foco Divino, Custo em XP)",
+        "Tempo de conjuração",
+        "Alcance",
+        "Alvo, Área ou Efeito",
+        "Duração",
+        "Teste de Resistência",
+        "Resistência a Magia",
+        "Descrição completa da magia",
+        "Seção de anotações pessoais",
+        "Ícone de favorito",
+        "Botões de navegação (anterior/próximo)",
+        "Botão remover (apenas para Mago)"
+      ],
+      "acoes_disponiveis": [
+        "Marcar/desmarcar favorita",
+        "Adicionar/editar/remover anotação",
+        "Navegar para magia anterior",
+        "Navegar para próxima magia",
+        "Remover magia (apenas Mago)",
+        "Fechar modal"
+      ]
+    },
+    "tela_003": {
+      "descricao": "Tela para classes com conhecimento limitado selecionarem novas magias para adicionar ao grimório, exibindo o catálogo de magias disponíveis.",
+      "tipo": "listagem",
+      "elementos": [
+        "Indicador de slots disponíveis por nível",
+        "Barra de filtros: busca por título, dropdown de escola, dropdown de nível, checkboxes de componentes",
+        "Lista de magias disponíveis em cards simplificados",
+        "Indicador visual de magias já conhecidas (desabilitadas)",
+        "Painel de preview da magia selecionada"
+      ],
+      "acoes_disponiveis": [
+        "Aplicar/limpar filtros",
+        "Selecionar magia para preview",
+        "Confirmar adição de magia",
+        "Cancelar e voltar ao grimório"
+      ]
+    },
+    "tela_004": {
+      "descricao": "Tela para Bardos e Feiticeiros realizarem a troca de uma magia conhecida por outra.",
+      "tipo": "formulario",
+      "elementos": [
+        "Instruções sobre regras de troca",
+        "Lista de magias atuais do grimório para seleção de remoção",
+        "Indicador da magia selecionada para remoção",
+        "Lista de magias disponíveis para substituição (filtrada por regras de nível)",
+        "Preview da nova magia",
+        "Resumo da troca: 'Remover [magia X] → Adicionar [magia Y]'"
+      ],
+      "acoes_disponiveis": [
+        "Selecionar magia para remover",
+        "Selecionar magia substituta",
+        "Visualizar preview",
+        "Confirmar troca",
+        "Cancelar troca"
+      ]
+    },
+    "tela_005": {
+      "descricao": "Painel de notificações relacionadas ao grimório, incluindo novas magias adicionadas automaticamente, slots disponíveis para seleção e trocas disponíveis.",
+      "tipo": "listagem",
+      "elementos": [
+        "Lista de notificações com ícone de tipo",
+        "Notificação de magias adicionadas automaticamente com lista",
+        "Notificação de slots de magia disponíveis para seleção",
+        "Notificação de troca de magia disponível",
+        "Indicador de notificações lidas/não lidas"
+      ],
+      "acoes_disponiveis": [
+        "Marcar notificação como lida",
+        "Acessar ação relacionada (ir para seleção, ir para troca)",
+        "Descartar notificação"
+      ]
+    }
+  },
+  "10_dados_integracoes": {
+    "autenticacao": "",
+    "endpoints": []
+  },
+  "11_mensagens_sistema": {
+    "erro": [
+      "Não foi possível adicionar a magia. Limite de magias conhecidas atingido para este nível.",
+      "Esta magia não é compatível com o alinhamento do seu personagem.",
+      "Esta magia pertence a um domínio oposto ao seu. Não pode ser adicionada.",
+      "Não foi possível realizar a troca. A nova magia deve ser de nível {nivel_maximo} ou inferior.",
+      "Erro ao salvar anotação. Tente novamente.",
+      "Não foi possível carregar o grimório. Verifique sua conexão.",
+      "Esta magia já está em seu grimório."
+    ],
+    "alerta": [
+      "Você ainda não tem acesso a magias. Rangers e Paladinos ganham magias a partir do nível 4.",
+      "Você tem {quantidade} slot(s) de magia disponível(is) para seleção.",
+      "Uma troca de magia está disponível! Você pode substituir uma magia conhecida.",
+      "Tem certeza que deseja remover '{nome}' do grimório? Esta ação não poderá ser desfeita.",
+      "Seu grimório de Mago possui {total} páginas.",
+      "Nenhuma magia encontrada com os filtros aplicados."
+    ],
+    "sucesso": [
+      "Magia '{nome}' adicionada ao grimório com sucesso.",
+      "Magia '{nome}' removida do grimório.",
+      "Troca realizada: '{magia_antiga}' substituída por '{magia_nova}'.",
+      "Anotação salva com sucesso.",
+      "Magia '{nome}' marcada como favorita.",
+      "Magia '{nome}' removida dos favoritos.",
+      "{quantidade} novas magias foram adicionadas ao seu grimório!"
+    ]
+  },
+  "12_lgpd_seguranca": {
+    "dados_pessoais": [],
+    "medidas": []
+  },
+  "13_estrutura_dados": {
+    "tab_001": {
+      "nome": "grimorio",
+      "descricao": "Armazena os grimórios de cada personagem, um por classe conjuradora.",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único do grimório"
+        },
+        {
+          "nome": "personagem_id",
+          "tipo": "UUID",
+          "descricao": "Referência ao personagem dono do grimório"
+        },
+        {
+          "nome": "classe_id",
+          "tipo": "UUID",
+          "descricao": "Referência à classe conjuradora do grimório"
+        },
+        {
+          "nome": "total_paginas",
+          "tipo": "INTEGER",
+          "descricao": "Total de páginas ocupadas (calculado, aplicável apenas a Mago)"
+        },
+        {
+          "nome": "criado_em",
+          "tipo": "TIMESTAMP",
+          "descricao": "Data de criação do grimório"
+        },
+        {
+          "nome": "atualizado_em",
+          "tipo": "TIMESTAMP",
+          "descricao": "Data da última atualização"
+        }
+      ],
+      "indices": [
+        "idx_grimorio_personagem (personagem_id)",
+        "idx_grimorio_personagem_classe (personagem_id, classe_id) UNIQUE"
+      ]
+    },
+    "tab_002": {
+      "nome": "grimorio_magia",
+      "descricao": "Relacionamento entre grimórios e magias conhecidas, com dados adicionais específicos do personagem.",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único do registro"
+        },
+        {
+          "nome": "grimorio_id",
+          "tipo": "UUID",
+          "descricao": "Referência ao grimório"
+        },
+        {
+          "nome": "magia_id",
+          "tipo": "UUID",
+          "descricao": "Referência à magia no catálogo"
+        },
+        {
+          "nome": "dominio_id",
+          "tipo": "UUID",
+          "descricao": "Referência ao domínio, se for magia de domínio (nullable)"
+        },
+        {
+          "nome": "favorita",
+          "tipo": "BOOLEAN",
+          "descricao": "Indica se a magia está marcada como favorita"
+        },
+        {
+          "nome": "anotacoes",
+          "tipo": "TEXT",
+          "descricao": "Anotações pessoais do jogador sobre a magia"
+        },
+        {
+          "nome": "adicionada_em",
+          "tipo": "TIMESTAMP",
+          "descricao": "Data em que a magia foi adicionada ao grimório"
+        },
+        {
+          "nome": "origem",
+          "tipo": "ENUM",
+          "descricao": "Origem da adição: AUTOMATICA, SELECAO_MANUAL, TROCA"
+        }
+      ],
+      "indices": [
+        "idx_grimorio_magia_grimorio (grimorio_id)",
+        "idx_grimorio_magia_grimorio_magia (grimorio_id, magia_id) UNIQUE",
+        "idx_grimorio_magia_favorita (grimorio_id, favorita)"
+      ]
+    },
+    "tab_003": {
+      "nome": "grimorio_historico_troca",
+      "descricao": "Histórico de trocas de magias realizadas por Bardos e Feiticeiros.",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único do registro"
+        },
+        {
+          "nome": "grimorio_id",
+          "tipo": "UUID",
+          "descricao": "Referência ao grimório"
+        },
+        {
+          "nome": "magia_removida_id",
+          "tipo": "UUID",
+          "descricao": "Referência à magia que foi removida"
+        },
+        {
+          "nome": "magia_adicionada_id",
+          "tipo": "UUID",
+          "descricao": "Referência à magia que foi adicionada"
+        },
+        {
+          "nome": "nivel_personagem",
+          "tipo": "INTEGER",
+          "descricao": "Nível do personagem no momento da troca"
+        },
+        {
+          "nome": "realizada_em",
+          "tipo": "TIMESTAMP",
+          "descricao": "Data em que a troca foi realizada"
+        }
+      ],
+      "indices": [
+        "idx_historico_troca_grimorio (grimorio_id)"
+      ]
+    },
+    "tab_004": {
+      "nome": "grimorio_notificacao",
+      "descricao": "Notificações pendentes relacionadas ao grimório do personagem.",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único da notificação"
+        },
+        {
+          "nome": "grimorio_id",
+          "tipo": "UUID",
+          "descricao": "Referência ao grimório"
+        },
+        {
+          "nome": "tipo",
+          "tipo": "ENUM",
+          "descricao": "Tipo da notificação: MAGIAS_ADICIONADAS, SELECAO_PENDENTE, TROCA_DISPONIVEL"
+        },
+        {
+          "nome": "dados",
+          "tipo": "JSONB",
+          "descricao": "Dados adicionais da notificação (ex: lista de magias, quantidade de slots)"
+        },
+        {
+          "nome": "lida",
+          "tipo": "BOOLEAN",
+          "descricao": "Indica se a notificação foi lida"
+        },
+        {
+          "nome": "criada_em",
+          "tipo": "TIMESTAMP",
+          "descricao": "Data de criação da notificação"
+        }
+      ],
+      "indices": [
+        "idx_notificacao_grimorio (grimorio_id)",
+        "idx_notificacao_nao_lida (grimorio_id, lida) WHERE lida = false"
+      ]
+    }
+  },
+  "14_referencias": [
+    {
+      "temp_id": "ref_001",
+      "descricao": "Livro do Jogador de Dungeons & Dragons versão 3.5, contendo as regras oficiais de magias, classes conjuradoras, progressão de magias conhecidas e restrições de alinhamento.",
+      "documento": "Player's Handbook D&D 3.5"
+    },
+    {
+      "temp_id": "ref_002",
+      "descricao": "Módulo interno do Arena RPG que contém o cadastro completo de todas as magias disponíveis no sistema, com suas descrições, componentes e metadados.",
+      "documento": "Módulo de Catálogo de Magias"
+    },
+    {
+      "temp_id": "ref_003",
+      "descricao": "Módulo interno do Arena RPG que gerencia os dados básicos do personagem, incluindo alinhamento, classes, níveis e domínios de clérigo.",
+      "documento": "Módulo de Ficha Básica"
+    }
+  ],
+  "15_mapa_integracoes": [],
+  "16_integracao_projeto_existente": {
+    "modulos_dependentes": [],
+    "impactos_integracao": [],
+    "ordem_implantacao": []
+  },
+  "metadata": {
+    "exported_at": "2026-03-30T18:59:56.340223",
+    "exported_by": null,
+    "statistics": {
+      "modules_count": 1,
+      "features_count": 7,
+      "requirements_count": 31,
+      "personas_count": 2
+    },
+    "ai_enhanced": false
+  }
+}
