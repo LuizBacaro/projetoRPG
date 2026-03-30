@@ -466,8 +466,45 @@
 .arena-resistencia-valor { font-size: 0.62rem; color: #f8fafc; font-weight: 700; }     /* ✅ menor *
 
 /* ── Condições ── */
-.arena-secao-condicoes { min-width: 0; }
-.arena-condicoes-lista { display: flex; flex-direction: column; gap: 0.15rem; flex-wrap: wrap; }
+.arena-secao-condicoes {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.arena-secao-condicoes .arena-condicoes-lista {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 0.22rem;
+    min-height: 56px;
+    max-height: 92px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.2rem;
+    border-radius: 6px;
+    border: 1px solid var(--borda-sutil);
+    background: linear-gradient(180deg, rgba(15, 23, 41, 0.86), rgba(12, 19, 33, 0.9));
+}
+
+.arena-secao-condicoes .arena-condicao {
+    max-width: 100%;
+    font-size: 0.66rem;
+    line-height: 1.15;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    transform-origin: center;
+}
+
+.arena-secao-condicoes .arena-condicao:hover {
+    transform: translateY(-1px);
+}
+
+.arena-secao-condicoes .btn-remover-condicao {
+    width: 14px;
+    height: 14px;
+    font-size: 0.54rem;
+}
+
 .arena-condicao-vazia  { font-size: 0.6rem; color: var(--texto-label); font-style: italic; }
 
 /* ── Ações ── */
