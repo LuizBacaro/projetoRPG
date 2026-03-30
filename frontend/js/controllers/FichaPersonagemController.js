@@ -76,6 +76,13 @@ export class FichaPersonagemController {
     }
 
     _configurarEventos() {
+        const btnVoltar = document.getElementById('btnVoltarFicha');
+        if (btnVoltar) {
+            btnVoltar.addEventListener('click', () => {
+                window.location.href = '/pages/dashboard.html';
+            });
+        }
+
         const btnAdicionarEq = document.getElementById('btnAdicionarEquipamento');
         if (btnAdicionarEq) {
             btnAdicionarEq.addEventListener('click', () => this.abrirModalEquipamentos());
@@ -84,6 +91,81 @@ export class FichaPersonagemController {
         const btnAdicionarTal = document.getElementById('btnAdicionarTalento');
         if (btnAdicionarTal) {
             btnAdicionarTal.addEventListener('click', () => this.abrirModalTalentos());
+        }
+
+        const btnGrimorio = document.getElementById('btnGrimorio');
+        if (btnGrimorio) {
+            btnGrimorio.addEventListener('click', () => window._grimorioController?.abrirGrimorio());
+        }
+
+        const btnAbrirGrimorio = document.getElementById('btnAbrirGrimorio');
+        if (btnAbrirGrimorio) {
+            btnAbrirGrimorio.addEventListener('click', () => window._grimorioController?.abrirGrimorio());
+        }
+
+        const btnFecharGrimorio = document.getElementById('btnFecharGrimorio');
+        if (btnFecharGrimorio) {
+            btnFecharGrimorio.addEventListener('click', () => window._grimorioController?.fecharGrimorio());
+        }
+
+        const grimorioBusca = document.getElementById('grimorioBusca');
+        if (grimorioBusca) {
+            grimorioBusca.addEventListener('input', () => window._grimorioController?.filtrar());
+        }
+
+        const btnAbrirPericias = document.getElementById('btnAbrirPericiasFicha');
+        if (btnAbrirPericias) {
+            btnAbrirPericias.addEventListener('click', () => this.abrirPaginaPericias());
+        }
+
+        const btnFecharModalEquipamentos = document.getElementById('btnFecharModalEquipamentos');
+        if (btnFecharModalEquipamentos) {
+            btnFecharModalEquipamentos.addEventListener('click', () => this.fecharModalEquipamentos());
+        }
+
+        const equipamentosBusca = document.getElementById('equipamentosBusca');
+        if (equipamentosBusca) {
+            equipamentosBusca.addEventListener('input', () => this.filtrarEquipamentos());
+        }
+
+        const abaListar = document.getElementById('abaListar');
+        if (abaListar) {
+            abaListar.addEventListener('click', () => this.abrirAbaListar());
+        }
+
+        const abaCriar = document.getElementById('abaCriar');
+        if (abaCriar) {
+            abaCriar.addEventListener('click', () => this.abrirAbaCriar());
+        }
+
+        const btnSalvarEquipamentoCustomizado = document.getElementById('btnSalvarEquipamentoCustomizado');
+        if (btnSalvarEquipamentoCustomizado) {
+            btnSalvarEquipamentoCustomizado.addEventListener('click', () => this.salvarEquipamentoCustomizado());
+        }
+
+        const btnFecharModalTalentos = document.getElementById('btnFecharModalTalentos');
+        if (btnFecharModalTalentos) {
+            btnFecharModalTalentos.addEventListener('click', () => this.fecharModalTalentos());
+        }
+
+        const talentosBusca = document.getElementById('talentosBusca');
+        if (talentosBusca) {
+            talentosBusca.addEventListener('input', () => this.filtrarTalentos());
+        }
+
+        const abaListarTalentos = document.getElementById('abaListarTalentos');
+        if (abaListarTalentos) {
+            abaListarTalentos.addEventListener('click', () => this.abrirAbaListarTalentos());
+        }
+
+        const abaCriarTalento = document.getElementById('abaCriarTalento');
+        if (abaCriarTalento) {
+            abaCriarTalento.addEventListener('click', () => this.abrirAbaCriarTalento());
+        }
+
+        const btnSalvarTalentoCustomizado = document.getElementById('btnSalvarTalentoCustomizado');
+        if (btnSalvarTalentoCustomizado) {
+            btnSalvarTalentoCustomizado.addEventListener('click', () => this.salvarTalentoCustomizado());
         }
     }
 
@@ -619,9 +701,6 @@ export class FichaPersonagemController {
             // Mostrar modal
             modal.style.display = 'flex';
 
-            // Expor para onclick
-            window._fichaController = this;
-
         } catch (error) {
             console.error('❌ Erro ao abrir modal:', error);
             if (window.NotificationService) {
@@ -651,12 +730,20 @@ export class FichaPersonagemController {
                     <div class="equipamento-desc">${escapeHtml(eq.descricao) || '—'}</div>
                     <div class="equipamento-pag">${escapeHtml(eq.pagina_referencia) || '—'}</div>
                 </div>
-                <button class="equipamento-btn-adicionar" 
-                        onclick="window._fichaController.adicionarEquipamentoClic(${eq.id})">
+                <button class="equipamento-btn-adicionar" data-equipamento-id="${eq.id}">
                     ➕
                 </button>
             </div>
         `).join('');
+
+        lista.querySelectorAll('.equipamento-btn-adicionar').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const equipamentoId = Number(btn.dataset.equipamentoId);
+                if (Number.isFinite(equipamentoId)) {
+                    this.adicionarEquipamentoClic(equipamentoId);
+                }
+            });
+        });
     }
 
     filtrarEquipamentos() {
@@ -907,9 +994,6 @@ export class FichaPersonagemController {
             // Mostrar modal
             modal.style.display = 'flex';
 
-            // Expor para onclick
-            window._fichaController = this;
-
         } catch (error) {
             console.error('❌ Erro ao abrir modal:', error);
             if (window.NotificationService) {
@@ -934,8 +1018,7 @@ export class FichaPersonagemController {
                         <h4>${escapeHtml(tal.nome)}</h4>
                         <p class="equipamentos-desc">${escapeHtml(tal.descricao) || '—'}</p>
                         <p class="equipamentos-pag">📄 ${escapeHtml(tal.pagina_referencia) || '—'}</p>
-                        <button class="equipamentos-btn-adicionar" 
-                                onclick="window._fichaController && window._fichaController.adicionarTalentoClic(${tal.id})">
+                        <button class="equipamentos-btn-adicionar" data-talento-id="${tal.id}">
                             ➕ Adicionar
                         </button>
                     </div>
@@ -943,11 +1026,20 @@ export class FichaPersonagemController {
             </div>
         `;
 
+        container.querySelectorAll('.equipamentos-btn-adicionar').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const talentoId = Number(btn.dataset.talentoId);
+                if (Number.isFinite(talentoId)) {
+                    this.adicionarTalentoClic(talentoId);
+                }
+            });
+        });
+
         console.log('✅ Lista de talentos renderizada:', talentos.length);
     }
 
     filtrarTalentos() {
-        const filtro = document.getElementById('equipamentosFiltro')?.value?.toLowerCase() || '';
+        const filtro = document.getElementById('talentosBusca')?.value?.toLowerCase() || '';
         if (!this.talentosDisponiveis) return;
 
         const filtrados = this.talentosDisponiveis.filter(tal => 

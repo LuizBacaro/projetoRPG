@@ -576,6 +576,12 @@ body {
     transform: rotate(90deg);
 }
 
+.dash-modal-close:focus-visible,
+.dash-modal-box button:focus-visible {
+    outline: 2px solid #7c3aed;
+    outline-offset: 2px;
+}
+
 .dash-modal-body { 
     padding: 1.5rem; 
 }

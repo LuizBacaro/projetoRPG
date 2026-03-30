@@ -159,21 +159,38 @@ class DashboardController {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('[type="submit"]');
-            btn.disabled = true;
-            btn.textContent = 'Salvando...';
+            const loadingOptions = {
+                loadingText: 'Salvando...',
+                idleText: `✅ Cadastrar ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`,
+            };
             
             try {
-                const c = await self.service.criar(new FormData(form));
-                Toast.success(`${c.nome} cadastrado com sucesso!`);
-                self._fecharModal(modalId);
-                self._limparForm(form, tipo);
-                self.carregarCombatentes();
+                if (window.AsyncButtonState?.run) {
+                    await window.AsyncButtonState.run(btn, loadingOptions, async () => {
+                        const c = await self.service.criar(new FormData(form));
+                        Toast.success(`${c.nome} cadastrado com sucesso!`);
+                        self._fecharModal(modalId);
+                        self._limparForm(form, tipo);
+                        self.carregarCombatentes();
+                    });
+                } else {
+                    btn.disabled = true;
+                    btn.textContent = loadingOptions.loadingText;
+                    const c = await self.service.criar(new FormData(form));
+                    Toast.success(`${c.nome} cadastrado com sucesso!`);
+                    self._fecharModal(modalId);
+                    self._limparForm(form, tipo);
+                    self.carregarCombatentes();
+                    btn.disabled = false;
+                    btn.textContent = loadingOptions.idleText;
+                }
             } catch (err) {
                 Toast.error(err.message || 'Erro ao cadastrar');
                 console.error(err);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = `✅ Cadastrar ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`;
+                if (!window.AsyncButtonState?.run && btn) {
+                    btn.disabled = false;
+                    btn.textContent = loadingOptions.idleText;
+                }
             }
         });
     }
@@ -220,25 +237,46 @@ class DashboardController {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('[type="submit"]');
-            btn.disabled = true;
-            btn.textContent = 'Salvando...';
+            const loadingOptions = {
+                loadingText: 'Salvando...',
+                idleText: 'Salvar Alterações',
+            };
             
             try {
-                const id = parseInt(document.getElementById('dashEditId').value);
-                await self.service.atualizar(id, new FormData(form));
-                await self._salvarAtaquesEdicao(id);
-                await self._salvarPericiasEdicao(id);
-                
-                self._fecharModal('modalEdicaoDashboard');
-                self.combatenteEmEdicao = null;
-                self.carregarCombatentes();
-                Toast.success('Alterações salvas com sucesso!');
+                if (window.AsyncButtonState?.run) {
+                    await window.AsyncButtonState.run(btn, loadingOptions, async () => {
+                        const id = parseInt(document.getElementById('dashEditId').value);
+                        await self.service.atualizar(id, new FormData(form));
+                        await self._salvarAtaquesEdicao(id);
+                        await self._salvarPericiasEdicao(id);
+
+                        self._fecharModal('modalEdicaoDashboard');
+                        self.combatenteEmEdicao = null;
+                        self.carregarCombatentes();
+                        Toast.success('Alterações salvas com sucesso!');
+                    });
+                } else {
+                    btn.disabled = true;
+                    btn.textContent = loadingOptions.loadingText;
+                    const id = parseInt(document.getElementById('dashEditId').value);
+                    await self.service.atualizar(id, new FormData(form));
+                    await self._salvarAtaquesEdicao(id);
+                    await self._salvarPericiasEdicao(id);
+
+                    self._fecharModal('modalEdicaoDashboard');
+                    self.combatenteEmEdicao = null;
+                    self.carregarCombatentes();
+                    Toast.success('Alterações salvas com sucesso!');
+                    btn.disabled = false;
+                    btn.textContent = loadingOptions.idleText;
+                }
             } catch (err) {
                 Toast.error(err.message || 'Erro ao salvar alterações');
                 console.error(err);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Salvar Alterações';
+                if (!window.AsyncButtonState?.run && btn) {
+                    btn.disabled = false;
+                    btn.textContent = loadingOptions.idleText;
+                }
             }
         });
     }

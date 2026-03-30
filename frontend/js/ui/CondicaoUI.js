@@ -265,7 +265,6 @@ class ModalCondicao {
                     type="checkbox"
                     id="cond-check-${c.id}"
                     value="${c.id}"
-                    onchange="modalCondicaoInstance.toggleCombatente(${c.id})"
                 >
                 <label for="cond-check-${c.id}">
                     <span class="combatente-nome">${c.nome}</span>
@@ -274,6 +273,15 @@ class ModalCondicao {
                 </label>
             </div>
         `).join('');
+
+        container.querySelectorAll('input[type="checkbox"][id^="cond-check-"]').forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                const combatenteId = Number(checkbox.value);
+                if (Number.isFinite(combatenteId)) {
+                    this.toggleCombatente(combatenteId);
+                }
+            });
+        });
     }
 
     _popularSelect() {

@@ -580,12 +580,11 @@ export class ArenaController {
             + '" id="cronometroDisplay">' + tempoAtual + '</span>';
         html += '<button id="btnToggleCronometro" class="btn-cronometro '
             + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar')
-            + '" onclick="window.arenaActions.toggleCronometro()">'
+            + '">'
             + (cronAtivo ? '⏸' : '▶') + '</button>';
-        html += '<button class="btn-cronometro btn-cronometro-reset"'
-            + ' onclick="window.arenaActions.resetarCronometro()">↺</button>';
+        html += '<button class="btn-cronometro btn-cronometro-reset" id="btnResetarCronometro">↺</button>';
         html += '</div>';
-        html += '<button class="btn-toggle-stats" onclick="window.arenaActions.toggleStats()">'
+        html += '<button class="btn-toggle-stats" id="btnToggleStatsArena">'
             + olhoTxt + '</button>';
         html += '</div></div>';
 
@@ -645,7 +644,7 @@ export class ArenaController {
         html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:'
             + hpPct + '%;background:' + hpCor + ';"></div></div>';
         html += '</div>';
-        html += '<button class="arena-btn-proximo" onclick="window.arenaActions.avancarTurno()">'
+        html += '<button class="arena-btn-proximo" id="btnAvancarTurnoArena">'
             + 'Encerrar turno</button>';
         html += '</div>';  // fim coluna-direita
         html += '</div>';  // fim layout-principal
@@ -654,9 +653,35 @@ export class ArenaController {
         container.innerHTML = html;
 
         this._registrarAcoesGlobais();
+        this._configurarControlesCardAtivo(container);
 
         this._configurarEventosMagias(container);
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
+    }
+
+    _configurarControlesCardAtivo(container) {
+        var btnToggleCronometro = container.querySelector('#btnToggleCronometro');
+        if (btnToggleCronometro) {
+            btnToggleCronometro.addEventListener('click', () => this.toggleCronometro());
+        }
+
+        var btnResetarCronometro = container.querySelector('#btnResetarCronometro');
+        if (btnResetarCronometro) {
+            btnResetarCronometro.addEventListener('click', () => {
+                this._resetarCronometro();
+                this._iniciarCronometro();
+            });
+        }
+
+        var btnToggleStatsArena = container.querySelector('#btnToggleStatsArena');
+        if (btnToggleStatsArena) {
+            btnToggleStatsArena.addEventListener('click', () => this.toggleVisibilidadeStats());
+        }
+
+        var btnAvancarTurnoArena = container.querySelector('#btnAvancarTurnoArena');
+        if (btnAvancarTurnoArena) {
+            btnAvancarTurnoArena.addEventListener('click', () => this.avancarTurno());
+        }
     }
 
     _registrarAcoesGlobais() {

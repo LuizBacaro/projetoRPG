@@ -173,6 +173,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    var inputsAtributoEdicao = document.querySelectorAll('.arena-edit-atributo-input');
+    inputsAtributoEdicao.forEach(function(input) {
+        input.addEventListener('input', function() {
+            atualizarModificadorDOM(input);
+        });
+    });
+
     console.log('Arena inicializada com sucesso!');
 });
 

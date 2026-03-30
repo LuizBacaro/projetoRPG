@@ -217,8 +217,9 @@
         if (perfilAdminAtual) perfilAdminAtual.textContent = AuthService.getPerfil() || 'administrador';
 
         if (!AuthService.isAdmin()) {
-            alert('Acesso restrito a Administradores.');
+            Toast.error('Acesso restrito a administradores.');
             window.location.href = '/dashboard';
+            return;
         }
 
         // 2️⃣ Scripts em ordem (cada um depende do anterior)

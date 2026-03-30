@@ -234,27 +234,43 @@ export class PericiaController {
     }
 
     async salvarPericias() {
+        const btnSalvar = document.getElementById('btn-salvar-pericias');
+        const loadingOptions = {
+            loadingText: '⏳ Salvando...',
+            idleText: '💾 Salvar Perícias',
+        };
+
         try {
-            const btnSalvar           = document.getElementById('btn-salvar-pericias');
-            const textoBotaoOriginal  = btnSalvar.textContent;
-            btnSalvar.disabled        = true;
-            btnSalvar.textContent     = '⏳ Salvando...';
+            const executarSalvar = async () => {
+                console.log('💾 Iniciando salvamento de perícias...');
+                await this.removerPericiasNaoSelecionadas();
+                await this.adicionarOuAtualizarPericias();
+                await this.carregarPericicasSelecionadas(this.combatente.id);
+                this.renderizar();
+            };
 
-            console.log('💾 Iniciando salvamento de perícias...');
-            await this.removerPericiasNaoSelecionadas();
-            await this.adicionarOuAtualizarPericias();
-            await this.carregarPericicasSelecionadas(this.combatente.id);
-            this.renderizar();
+            if (window.AsyncButtonState?.run) {
+                await window.AsyncButtonState.run(btnSalvar, loadingOptions, executarSalvar);
+            } else {
+                if (btnSalvar) {
+                    btnSalvar.disabled = true;
+                    btnSalvar.textContent = loadingOptions.loadingText;
+                }
+                await executarSalvar();
+                if (btnSalvar) {
+                    btnSalvar.disabled = false;
+                    btnSalvar.textContent = loadingOptions.idleText;
+                }
+            }
 
-            btnSalvar.disabled    = false;
-            btnSalvar.textContent = textoBotaoOriginal;
             NotificationService.mostrarSucesso('✅ Perícias salvas com sucesso!');
             console.log('✅ Salvamento concluído');
         } catch (error) {
             console.error('❌ Erro ao salvar:', error);
-            const btnSalvar       = document.getElementById('btn-salvar-pericias');
-            btnSalvar.disabled    = false;
-            btnSalvar.textContent = '💾 Salvar Perícias';
+            if (!window.AsyncButtonState?.run && btnSalvar) {
+                btnSalvar.disabled = false;
+                btnSalvar.textContent = loadingOptions.idleText;
+            }
             NotificationService.mostrarErro('Erro: ' + error.message);
         }
     }

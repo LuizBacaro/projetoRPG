@@ -15,15 +15,14 @@
     <!-- ── Header ── -->
     <header class="ficha-header">
         <div class="ficha-header-esquerda">
-            <button class="btn-voltar" onclick="window.location.href='/pages/dashboard.html'">← Voltar</button>
+            <button class="btn-voltar" id="btnVoltarFicha">← Voltar</button>
         </div>
         <div class="ficha-titulo">
             <h1 class="ficha-titulo-texto">📜 <span id="fichaHeaderNome">Ficha do Personagem</span></h1>
         </div>
         <div class="ficha-header-direita">
             <!-- ✅ NOVO: Botão Grimório — visível apenas para classes conjuradoras -->
-            <button class="btn-grimorio" id="btnGrimorio" style="display:none"
-                    onclick="window._grimorioController && window._grimorioController.abrirGrimorio()">
+            <button class="btn-grimorio" id="btnGrimorio" style="display:none">
                 📖 Grimório
             </button>
         </div>
@@ -211,8 +210,7 @@
                 <div class="ficha-magias-grid" id="fichaMagiasGrid">
                     <div class="ficha-magia-vazio">Nenhum slot cadastrado</div>
                 </div>
-                <button class="btn-abrir-grimorio" id="btnAbrirGrimorio"
-                        onclick="window._grimorioController && window._grimorioController.abrirGrimorio()">
+                <button class="btn-abrir-grimorio" id="btnAbrirGrimorio">
                     📖 Abrir Grimório de Magias
                 </button>
             </div>
@@ -220,9 +218,7 @@
             <div class="ficha-secao">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3 class="ficha-secao-titulo">⚡ Perícias</h3>
-                    <button class="ficha-btn-adicionar" 
-                            onclick="window._fichaController && window._fichaController.abrirPaginaPericias()"
-                            title="Adicionar perícia">
+                    <button class="ficha-btn-adicionar" id="btnAbrirPericiasFicha" title="Adicionar perícia">
                         ➕ Adicionar
                     </button>
                 </div>
@@ -254,8 +250,7 @@
                         title="Descanso longo — reseta preparação">
                     🌙 Descanso
                 </button>
-                <button class="grimorio-fechar"
-                        onclick="window._grimorioController && window._grimorioController.fecharGrimorio()">✕</button>
+                <button class="grimorio-fechar" id="btnFecharGrimorio">✕</button>
             </div>
         </div>
 
@@ -269,9 +264,8 @@
             </div>
             <div class="grimorio-busca-wrapper">
                 <span class="grimorio-busca-label">🔍 Buscar</span>
-                <input type="text" id="grimorioBusca" class="grimorio-busca"
-                       placeholder="Nome da magia..."
-                       oninput="window._grimorioController && window._grimorioController.filtrar()">
+                  <input type="text" id="grimorioBusca" class="grimorio-busca"
+                      placeholder="Nome da magia...">
             </div>
         </div>
 
@@ -327,16 +321,15 @@
                     <p class="equipamentos-subtitulo">Adicione itens ao seu inventário</p>
                 </div>
             </div>
-            <button class="equipamentos-fechar" onclick="window._fichaController && window._fichaController.fecharModalEquipamentos()">✕</button>
+            <button class="equipamentos-fechar" id="btnFecharModalEquipamentos">✕</button>
         </div>
 
         <!-- BUSCA E FILTROS -->
         <div class="equipamentos-controles">
             <div class="equipamentos-busca-wrapper">
                 <span class="equipamentos-busca-label">🔍 Buscar</span>
-                <input type="text" id="equipamentosBusca" class="equipamentos-busca"
-                       placeholder="Nome do equipamento..."
-                       oninput="window._fichaController && window._fichaController.filtrarEquipamentos()">
+                  <input type="text" id="equipamentosBusca" class="equipamentos-busca"
+                      placeholder="Nome do equipamento...">
             </div>
             <div class="equipamentos-quantidade-wrapper">
                 <label class="equipamentos-label">Quantidade:</label>
@@ -347,12 +340,10 @@
 
         <!-- ABAS: Listar ou Criar -->
         <div class="equipamentos-abas">
-            <button class="equipamentos-aba ativa" id="abaListar" 
-                    onclick="window._fichaController && window._fichaController.abrirAbaListar()">
+            <button class="equipamentos-aba ativa" id="abaListar">
                 📋 Listar Equipamentos
             </button>
-            <button class="equipamentos-aba" id="abaCriar" 
-                    onclick="window._fichaController && window._fichaController.abrirAbaCriar()">
+            <button class="equipamentos-aba" id="abaCriar">
                 ➕ Criar Novo
             </button>
         </div>
@@ -395,8 +386,7 @@
                                value="1" min="1" max="999" required>
                     </div>
 
-                    <button type="button" class="equipamentos-btn-salvar" 
-                            onclick="window._fichaController && window._fichaController.salvarEquipamentoCustomizado()">
+                    <button type="button" class="equipamentos-btn-salvar" id="btnSalvarEquipamentoCustomizado">
                         ✅ Salvar e Adicionar
                     </button>
                 </form>
@@ -417,27 +407,24 @@
                     <p class="equipamentos-subtitulo">Adicione novos talentos ao seu personagem</p>
                 </div>
             </div>
-            <button class="equipamentos-fechar" onclick="window._fichaController && window._fichaController.fecharModalTalentos()">✕</button>
+            <button class="equipamentos-fechar" id="btnFecharModalTalentos">✕</button>
         </div>
 
         <!-- BUSCA E FILTROS -->
         <div class="equipamentos-controles">
             <div class="equipamentos-busca-wrapper">
                 <span class="equipamentos-busca-label">🔍 Buscar</span>
-                <input type="text" id="talentosBusca" class="equipamentos-busca"
-                       placeholder="Nome do talento..."
-                       oninput="window._fichaController && window._fichaController.filtrarTalentos()">
+                  <input type="text" id="talentosBusca" class="equipamentos-busca"
+                      placeholder="Nome do talento...">
             </div>
         </div>
 
         <!-- ABAS: Listar ou Criar -->
         <div class="equipamentos-abas">
-            <button class="equipamentos-aba ativa" id="abaListarTalentos" 
-                    onclick="window._fichaController && window._fichaController.abrirAbaListarTalentos()">
+            <button class="equipamentos-aba ativa" id="abaListarTalentos">
                 📋 Listar Talentos
             </button>
-            <button class="equipamentos-aba" id="abaCriarTalento" 
-                    onclick="window._fichaController && window._fichaController.abrirAbaCriarTalento()">
+            <button class="equipamentos-aba" id="abaCriarTalento">
                 ➕ Criar Novo
             </button>
         </div>
@@ -474,8 +461,7 @@
                                placeholder="Ex: PHB p.123">
                     </div>
 
-                    <button type="button" class="equipamentos-btn-salvar" 
-                            onclick="window._fichaController && window._fichaController.salvarTalentoCustomizado()">
+                    <button type="button" class="equipamentos-btn-salvar" id="btnSalvarTalentoCustomizado">
                         ✅ Salvar e Adicionar
                     </button>
                 </form>

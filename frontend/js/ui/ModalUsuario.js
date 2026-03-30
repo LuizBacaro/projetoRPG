@@ -131,8 +131,7 @@ class ModalUsuario {
             return;
         }
 
-        // Fallback extremo apenas se nenhum componente visual estiver disponível
-        alert(texto);
+        console.error(texto);
     }
 
     async salvar() {

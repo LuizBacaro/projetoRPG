@@ -187,8 +187,8 @@ export class PericiaFichaController {
                 </td>
                 <td style="text-align: center;">
                     ${adicionada
-                        ? `<button class="pericias-btn-adicionar" onclick="window.periciasFichaController.removerPericia(${pericia.id}, this)">🗑️</button>`
-                        : `<button class="pericias-btn-adicionar" onclick="window.periciasFichaController.adicionarPericia(${pericia.id}, this)">➕</button>`
+                        ? `<button class="pericias-btn-adicionar" data-action="remover" data-pericia-id="${pericia.id}">🗑️</button>`
+                        : `<button class="pericias-btn-adicionar" data-action="adicionar" data-pericia-id="${pericia.id}">➕</button>`
                     }
                 </td>
             `;
@@ -200,6 +200,20 @@ export class PericiaFichaController {
 
         // Adicionar event listeners para atualizar valores
         this.adicionarEventListenersEdicao();
+
+        tbody.querySelectorAll('.pericias-btn-adicionar').forEach((button) => {
+            button.addEventListener('click', () => {
+                const periciaId = Number(button.dataset.periciaId);
+                if (!Number.isFinite(periciaId)) return;
+
+                if (button.dataset.action === 'remover') {
+                    this.removerPericia(periciaId, button);
+                    return;
+                }
+
+                this.adicionarPericia(periciaId, button);
+            });
+        });
     }
 
     adicionarEventListenersEdicao() {

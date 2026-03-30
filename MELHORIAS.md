@@ -206,7 +206,161 @@
 
 | Severidade | Qtde | Status |
 |------------|------|--------|
-| 🔴 Crítico | 5 | — |
-| 🟡 Importante | 15 | — |
-| 🟢 Bom ter | 20 | — |
-| **Total** | **40** | — |
+| 🔴 Crítico | 5 | 5/5 concluídos |
+| 🟡 Importante | 15 | 15/15 concluídos |
+| 🟢 Bom ter | 20 | 20/20 concluídos |
+| **Total** | **40** | **40/40 concluídos** |
+
+---
+
+## ✅ Fechamento do Ciclo 1
+
+- [x] Checklist original concluído integralmente
+- [x] Endurecimento de segurança aplicado no backend e frontend
+- [x] Correções estruturais de auth, cache, uploads, RBAC e paginação estabilizadas
+- [x] Melhorias de UX e resiliência validadas nas telas críticas
+
+> O checklist acima passa a servir como histórico consolidado da rodada principal de hardening + arquitetura.
+
+---
+
+## 🧭 Checklist 2 — Consolidação Pós-Implementação
+
+> Novo checklist para revisão do projeto após a grande rodada de melhorias.  
+> Objetivo: consolidar UX, consistência entre telas, governança de frontend e validação operacional.
+
+### 2.1 Concluído nesta rodada
+
+- [x] **Arena — corrigir 401 em dano/cura/condições por falta de Authorization**
+  - `CondicaoService` e `DanoCuraService` passaram a enviar token JWT corretamente
+
+- [x] **Arena — mitigar carregamento de script antigo por cache do navegador**
+  - `index.html` ajustado com cache-busting controlado para assets críticos
+
+- [x] **Arena — restaurar ação de Encerrar Combate**
+  - Rebind da ação global e migração para listeners explícitos
+
+- [x] **Arena/Dashboard — reduzir dependência de handlers inline**
+  - Dashboard e trechos relevantes da Arena migrados para `addEventListener`
+
+- [x] **Navegação — parar de abrir múltiplas abas entre Dashboard, Ficha e Perícias**
+  - Fluxo padronizado para mesma aba com `return_to` explícito quando necessário
+
+- [x] **Backend — eliminar ruído de `favicon.ico` 404**
+  - Adicionada rota segura para favicon com fallback sem erro visual
+
+- [x] **Usuários — redesign visual e operacional da tela administrativa**
+  - Hero, métricas, filtros, tabela, governança visual e modal revisados
+
+- [x] **Usuários — tornar modal de Novo Usuário responsivo em telas menores**
+  - Modal com `max-height`, scroll interno e ações sempre acessíveis
+
+- [x] **Usuários — substituir alertas crus por feedback no padrão visual do sistema**
+  - Validação e falha de salvamento agora usam `ModalConfirm`/feedback padronizado
+
+- [x] **Usuários — bloquear envio duplo no modal de criação/edição**
+  - Botão `Salvar` entra em estado `Salvando...` e ignora cliques repetidos
+
+- [x] **Acessibilidade visual — refinar foco em botões críticos da tela de usuários**
+  - Estados `:focus-visible` reforçados em hero, modal e ações de tabela
+
+- [x] **Governança de workspace — criar instruções granulares do Copilot por domínio**
+  - Estrutura em `.github/instructions` separada para backend, frontend e migrations
+
+- [x] **Consolidação frontend (parcial) — limpar handlers inline e feedbacks crus no frontend moderno**
+  - Ficha do personagem, perícias da ficha, modal de usuários, modais auxiliares e Arena moderna migrados para listeners explícitos
+  - Restante relevante agora está concentrado majoritariamente no legado de `frontend/script.js`
+
+### 2.2 Checklist de revisão para a próxima etapa
+
+- [x] **Fazer uma varredura final de handlers inline restantes fora de Dashboard/Usuários**
+  - Prioridade para páginas antigas com HTML legado e acoplamento em `window.*`
+  - Estado atual: frontend moderno da Arena/Ficha consolidado; varredura final agora foca só em remanescentes de baixo impacto
+  - Auditoria atual: ocorrências funcionais de `onclick/onchange/oninput` removidas das telas ativas; matches restantes são comentários/documentação
+
+- [x] **Validar e aposentar legado órfão do frontend antigo (fase 1)**
+  - `frontend/pages/arena-combate.html` foi aposentada com redirecionamento explícito para `/arena` (compatibilidade preservada)
+  - README atualizado para sinalizar `arena-combate.html` como legado
+
+- [x] **Validar e aposentar legado órfão do frontend antigo (fase 2)**
+  - `frontend/script.js` removido após validação de ausência de referência ativa em HTML/rotas
+  - Superfície de manutenção reduzida e risco de regressão em código morto eliminado
+
+- [x] **Padronizar feedback visual de erro/aviso em todas as telas administrativas**
+  - Eliminar `alert()` restante e alinhar para `Toast`/`ModalConfirm`
+  - Auditoria atual: `alert()`/`confirm()` funcionais não detectados no frontend ativo
+
+- [ ] **Executar smoke test manual orientado por fluxo principal**
+  - Login → Dashboard → Arena → Ficha → Perícias → Usuários
+  - Pré-validação técnica concluída: suíte backend crítica executada com sucesso (`test_auth_api`, `test_combate_api_history`, `test_security_audit` = 9/9 pass).
+  - Roteiro rápido sugerido:
+    1. Login com perfil admin e confirmar header/perfil corretos.
+    2. Dashboard: listar, filtrar e abrir ficha sem abrir nova aba.
+    3. Arena: iniciar combate, avançar turno e encerrar combate sem erro visual.
+    4. Ficha: abrir/fechar grimório, abrir perícias e voltar mantendo navegação limpa.
+    5. Usuários: abrir modal novo usuário em tela menor, validar botões visíveis e estado "Salvando...".
+    6. Usuários: tentar salvar sem campos obrigatórios e confirmar feedback no padrão visual.
+
+- [x] **Adicionar checklist de regressão visual para responsividade**
+  - Cenários definidos:
+    1. Laptop pequeno (~1366x768): sem corte de header, botões primários visíveis, tabelas com scroll controlado.
+    2. Tablet vertical (~768x1024): modais com ações acessíveis sem overflow fora da viewport.
+    3. Mobile estreito (~360x800): CTA principal por tela acionável sem zoom e sem sobreposição de blocos.
+  - Critérios rápidos por tela crítica:
+    - Arena: painel e ordem de iniciativa utilizáveis sem quebra visual.
+    - Ficha/Perícias: navegação e botões de salvar/voltar sempre alcançáveis.
+    - Usuários: filtros, tabela e modal operáveis com scroll interno.
+
+- [x] **Revisar consistência de navegação entre páginas com botão Voltar**
+  - Auditoria atual: nenhuma ocorrência funcional de `history.back()` detectada no frontend ativo.
+  - Fluxo consolidado com origem controlada por `return_to` nas rotas de Ficha/Perícias.
+
+- [x] **Inventariar pontos ainda sensíveis a cache de script**
+  - Mapa atual:
+    - `index.html` já usa cache-busting em assets críticos da Arena (`?v=20260329*`).
+    - Páginas antigas ainda usam versões heterogêneas (`?v=1`, `?v=5`, `?v=8.0`, etc.).
+    - `sw.js` mantém cache próprio de perícias e exige controle explícito de versão de cache.
+  - Estratégia única definida para próxima rodada:
+    1. Adotar `ASSET_VERSION` único por release e aplicar em todos os assets críticos.
+    2. Versionar também `CACHE_NAME` do service worker com o mesmo identificador da release.
+    3. Documentar checklist de bump de versão no release process (frontend + SW).
+
+- [x] **Definir bateria mínima de testes automatizados para frontend crítico**
+  - Escopo inicial (E2E smoke):
+    1. Login válido/inválido + persistência de sessão.
+    2. Dashboard: listagem e abertura da ficha em mesma aba.
+    3. Arena: iniciar, avançar turno e encerrar combate.
+    4. Usuários: abrir modal, validar campos obrigatórios e estado `Salvando...`.
+  - Estratégia recomendada: suite Playwright enxuta (4-6 cenários), executada por PR de release.
+  - Critério de adoção: bloquear release apenas para falhas em cenários smoke críticos.
+
+- [x] **Padronizar comportamento de loading/disabled em ações assíncronas importantes**
+  - Criado utilitário global `AsyncButtonState` (`frontend/js/utils/async-button.global.js`) com estado unificado (`disabled` + `aria-busy` + texto de loading).
+  - Aplicado em fluxos críticos:
+    1. Dashboard: formulários de cadastro e edição de combatente.
+    2. Perícias: ação de salvar perícias.
+  - Mantido fallback defensivo para operação manual caso o utilitário não esteja disponível em runtime.
+
+- [x] **Revisar modais do projeto para altura máxima, scroll interno e foco acessível**
+  - Hardening aplicado em modais legados e administrativos:
+    1. `frontend/css/modais.css`: overlay com `padding` + `overflow-y` e foco visível em fechar/ações.
+    2. `frontend/css/modal-condicao.css`: overlay com scroll seguro e foco visível em fechar/aplicar/cancelar.
+    3. `frontend/css/login.css`: `modal-box` com `max-height` + scroll interno e close com `:focus-visible`.
+    4. `frontend/css/dashboard.css`: foco visível para close e botões dentro do modal.
+
+- [x] **Montar backlog da versão seguinte com foco em polimento e confiabilidade operacional**
+  - Backlog VNext proposto:
+    - `bugfix`: fechar regressões encontradas no smoke manual (navegação, estados de modal e feedback).
+    - `DX`: unificar estratégia de versionamento de assets e script de bump por release.
+    - `UX`: padronizar loading/disabled em ações assíncronas de Arena, Ficha e Perícias.
+    - `testes`: subir suite mínima E2E smoke e incorporar no fluxo de validação pré-release.
+
+---
+
+## 📌 Próxima Conversa
+
+Quando este checklist 2 começar, a próxima discussão pode partir de três frentes:
+
+1. `Consolidacao frontend`: navegacao, modais, responsividade e remocao de legado inline.
+2. `Confiabilidade`: smoke tests, regressao e cobertura automatizada de fluxos criticos.
+3. `Planejamento de release`: backlog enxuto da proxima versao com prioridades reais.

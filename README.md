@@ -82,8 +82,8 @@ Senha:  admin123  ← altere após o primeiro acesso
               [Combatentes] [Arena]   [Usuários]
                    │          │        (Admin)
                    ▼          ▼
-         /pages/ficha-   /pages/arena-
-         personagem.html combate.html
+         /pages/ficha-       /arena
+         personagem.html   (frontend/index.html)
               │
          [Grimório]    [Perícias]
          (modal)       /pages/pericias.html
@@ -224,13 +224,13 @@ backend/
 
 ```
 frontend/
-├── index.html                     # Redireciona para login
+├── index.html                     # Arena principal (rota /arena)
 │
 ├── pages/                         # 7 páginas HTML
 │   ├── login.html                 #   Tela de login
 │   ├── dashboard.html             #   Gestão de combatentes
 │   ├── ficha-personagem.html      #   Ficha completa do personagem
-│   ├── arena-combate.html         #   Arena de combate em tempo real
+│   ├── arena-combate.html         #   Legado (redireciona para /arena)
 │   ├── pericias.html              #   Alocação de perícias
 │   ├── pericias-ficha.html        #   Perícias (visão ficha)
 │   └── usuarios.html              #   Admin de usuários
