@@ -3,7 +3,7 @@ main.py
 SRP: Entry point da aplicação — orquestra inicialização e rotas
 SOLID: Dependency Injection via contexto FastAPI
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -151,6 +151,15 @@ async def dashboard():
 async def arena():
     """Tela da arena de combate."""
     return FileResponse(str(FRONTEND_DIR / "index.html"))
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    """Serve favicon quando disponível; evita 404 em desenvolvimento."""
+    favicon_path = FRONTEND_DIR / "favicon.ico"
+    if favicon_path.exists():
+        return FileResponse(str(favicon_path))
+    return Response(status_code=204)
 
 
 @app.get("/pericias")

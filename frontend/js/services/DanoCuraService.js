@@ -11,6 +11,21 @@ class DanoCuraService {
         console.log('✅ DanoCuraService inicializado (modo com persistência)');
     }
 
+    _buildHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+
+        if (typeof AuthService !== 'undefined' && typeof AuthService.getAuthHeader === 'function') {
+            return { ...headers, ...AuthService.getAuthHeader() };
+        }
+
+        const token = localStorage.getItem('token');
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+
+        return headers;
+    }
+
     /**
      * Aplica dano a um combatente
      * @param {number} combatenteId - ID do combatente
@@ -21,7 +36,7 @@ class DanoCuraService {
         try {
             const response = await fetch(`${getApiUrl('/combatentes')}/${combatenteId}/dano`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this._buildHeaders(),
                 body: JSON.stringify({ valor: valorDano })
             });
 
@@ -50,7 +65,7 @@ class DanoCuraService {
         try {
             const response = await fetch(`${getApiUrl('/combatentes')}/${combatenteId}/cura`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this._buildHeaders(),
                 body: JSON.stringify({ valor: valorCura })
             });
 
@@ -148,7 +163,7 @@ class DanoCuraService {
                 `${getApiUrl('/combatentes')}/${combatenteId}/hp?hp_atual=${novoHP}`,
                 {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: this._buildHeaders()
                 }
             );
 

@@ -87,6 +87,92 @@ document.addEventListener('DOMContentLoaded', function() {
         else console.error('modalCondicaoInstance nao inicializado');
     };
 
+    window._finalizarCombate = function() {
+        var arena = app.controllers.arena;
+        if (arena && typeof arena.finalizarCombate === 'function') {
+            arena.finalizarCombate();
+            return;
+        }
+        reportDegradedMode('arena-controller', null, 'Acao de encerrar combate indisponivel no momento.');
+    };
+
+    var btnEncerrarCombate = document.getElementById('btnEncerrarCombate');
+    if (btnEncerrarCombate) {
+        btnEncerrarCombate.addEventListener('click', function() {
+            window._finalizarCombate();
+        });
+    }
+
+    var btnAbrirModalDanoCura = document.getElementById('btnAbrirModalDanoCura');
+    if (btnAbrirModalDanoCura) {
+        btnAbrirModalDanoCura.addEventListener('click', function() {
+            window.abrirModalDanoCura();
+        });
+    }
+
+    var btnAbrirModalCondicao = document.getElementById('btnAbrirModalCondicao');
+    if (btnAbrirModalCondicao) {
+        btnAbrirModalCondicao.addEventListener('click', function() {
+            window.abrirModalCondicao();
+        });
+    }
+
+    var btnFecharModalDanoCuraTopo = document.getElementById('btnFecharModalDanoCuraTopo');
+    if (btnFecharModalDanoCuraTopo) {
+        btnFecharModalDanoCuraTopo.addEventListener('click', function() {
+            if (window.modalDanoCuraInstance) {
+                window.modalDanoCuraInstance.fechar();
+            }
+        });
+    }
+
+    var btnCancelarModalDanoCura = document.getElementById('btnCancelarModalDanoCura');
+    if (btnCancelarModalDanoCura) {
+        btnCancelarModalDanoCura.addEventListener('click', function() {
+            if (window.modalDanoCuraInstance) {
+                window.modalDanoCuraInstance.fechar();
+            }
+        });
+    }
+
+    var btnAplicarModalDanoCura = document.getElementById('btnAplicarModalDanoCura');
+    if (btnAplicarModalDanoCura) {
+        btnAplicarModalDanoCura.addEventListener('click', function() {
+            if (window.modalDanoCuraInstance) {
+                window.modalDanoCuraInstance.aplicar();
+            }
+        });
+    }
+
+    var btnFecharModalEdicaoTopo = document.getElementById('btnFecharModalEdicaoTopo');
+    if (btnFecharModalEdicaoTopo) {
+        btnFecharModalEdicaoTopo.addEventListener('click', function() {
+            window.fecharModalEdicao();
+        });
+    }
+
+    var btnCancelarEdicao = document.getElementById('btnCancelarEdicao');
+    if (btnCancelarEdicao) {
+        btnCancelarEdicao.addEventListener('click', function() {
+            window.fecharModalEdicao();
+        });
+    }
+
+    var btnDeletarEdicao = document.getElementById('btnDeletarEdicao');
+    if (btnDeletarEdicao) {
+        btnDeletarEdicao.addEventListener('click', function() {
+            window.confirmarDelecao();
+        });
+    }
+
+    var btnRemoverImagemEdicao = document.getElementById('btnRemoverImagemEdicao');
+    if (btnRemoverImagemEdicao) {
+        btnRemoverImagemEdicao.addEventListener('click', function(event) {
+            event.stopPropagation();
+            window.removerImagemEdicao();
+        });
+    }
+
     console.log('Arena inicializada com sucesso!');
 });
 

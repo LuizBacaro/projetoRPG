@@ -19,9 +19,20 @@ class CondicaoService {
         console.log('✅ CondicaoService inicializado. baseUrl:', this.baseUrl);
     }
 
+    _getAuthHeader() {
+        if (typeof AuthService !== 'undefined' && typeof AuthService.getAuthHeader === 'function') {
+            return AuthService.getAuthHeader();
+        }
+
+        const token = localStorage.getItem('token');
+        return token ? { 'Authorization': `Bearer ${token}` } : {};
+    }
+
     async listarTodas() {
         try {
-            const res = await fetch(`${this.baseUrl}/condicoes`);
+            const res = await fetch(`${this.baseUrl}/condicoes`, {
+                headers: this._getAuthHeader(),
+            });
             if (!res.ok) throw new Error(`HTTP ${res.status}: Erro ao carregar condições`);
             return res.json();
         } catch (error) {
@@ -34,7 +45,10 @@ class CondicaoService {
         try {
             console.log(`📡 GET condições do combatente: ${combatenteId}`);
             const res = await fetch(
-                `${this.baseUrl}/condicoes/combatente/${combatenteId}`
+                `${this.baseUrl}/condicoes/combatente/${combatenteId}`,
+                {
+                    headers: this._getAuthHeader(),
+                }
             );
             if (!res.ok) throw new Error(`HTTP ${res.status}: Erro ao carregar condições do combatente`);
             return res.json();
@@ -51,7 +65,10 @@ class CondicaoService {
                 `${this.baseUrl}/condicoes/combatente/${combatenteId}`,
                 {
                     method:  'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...this._getAuthHeader(),
+                    },
                     body:    JSON.stringify({ 
                         condicao_id: condicaoId,
                         duracao_turnos: durationTurnos
@@ -71,7 +88,10 @@ class CondicaoService {
             console.log(`📡 DELETE condição ${condicaoId} → combatente ${combatenteId}`);
             const res = await fetch(
                 `${this.baseUrl}/condicoes/combatente/${combatenteId}/${condicaoId}`,
-                { method: 'DELETE' }
+                {
+                    method: 'DELETE',
+                    headers: this._getAuthHeader(),
+                }
             );
             if (!res.ok) throw new Error(`HTTP ${res.status}: Erro ao remover condição`);
             return res.json();
@@ -86,7 +106,10 @@ class CondicaoService {
             console.log(`📡 DELETE todas condições → combatente ${combatenteId}`);
             const res = await fetch(
                 `${this.baseUrl}/condicoes/combatente/${combatenteId}`,
-                { method: 'DELETE' }
+                {
+                    method: 'DELETE',
+                    headers: this._getAuthHeader(),
+                }
             );
             if (!res.ok) throw new Error(`HTTP ${res.status}: Erro ao remover todas as condições`);
             return res.json();
