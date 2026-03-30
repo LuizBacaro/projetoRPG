@@ -19,12 +19,14 @@ fichas de personagem interativas e arena de combate em tempo real.
 | `https://arena-de-combate-rpg.com.br` | Aplicação |
 | `https://arena-de-combate-rpg.com.br/docs` | Swagger API |
 
-**Credenciais padrão** (criadas no primeiro startup):
+**Credenciais do admin inicial** (somente se configuradas no `.env`):
 
+```env
+ADMIN_EMAIL=admin@arena-rpg.com.br
+ADMIN_PASSWORD=TroquePorSenhaForte123!
 ```
-E-mail: admin@rpg.com
-Senha:  admin123  ← altere após o primeiro acesso
-```
+
+Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera criado automaticamente.
 
 ---
 

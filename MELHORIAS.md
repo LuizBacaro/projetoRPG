@@ -293,6 +293,12 @@
 - [ ] **Executar smoke test manual orientado por fluxo principal**
   - Login → Dashboard → Arena → Ficha → Perícias → Usuários
   - Pré-validação técnica concluída: suíte backend crítica executada com sucesso (`test_auth_api`, `test_combate_api_history`, `test_security_audit` = 9/9 pass).
+  - Smoke técnico HTTP (ambiente local em `127.0.0.1:8000`) executado:
+    - `200`: `/pages/login.html`, `/pages/dashboard.html`, `/arena`, `/pages/ficha-personagem.html?id=1`, `/pages/pericias.html?id=1`, `/pages/usuarios.html`, `/health`.
+    - `204`: `/favicon.ico` (sem erro visual de 404).
+    - Autenticação validada no ambiente local com `POST /api/v1/auth/login` e `GET /api/v1/auth/me` (`200`).
+    - Script reutilizável criado para repetir essa validação: `backend/scripts/smoke_http.sh`.
+  - Status: smoke técnico concluído; falta apenas validação manual visual/funcional no navegador para fechar este item.
   - Roteiro rápido sugerido:
     1. Login com perfil admin e confirmar header/perfil corretos.
     2. Dashboard: listar, filtrar e abrir ficha sem abrir nova aba.

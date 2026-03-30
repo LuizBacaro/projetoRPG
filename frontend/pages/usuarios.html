@@ -219,7 +219,7 @@
         if (!AuthService.isAdmin()) {
             Toast.error('Acesso restrito a administradores.');
             window.location.href = '/dashboard';
-            return;
+            throw new Error('Acesso restrito: usuario sem perfil administrador.');
         }
 
         // 2️⃣ Scripts em ordem (cada um depende do anterior)
