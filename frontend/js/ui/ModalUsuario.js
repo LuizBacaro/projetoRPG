@@ -13,12 +13,27 @@ class ModalUsuario {
         this.service   = usuarioService;
         this.onSucesso = onSucesso;
         this.usuarioId = null;
+        this.modalEl   = document.getElementById('modalUsuario');
 
         // Bind dos botões do modal
         document.getElementById('btnCancelarModal')
             ?.addEventListener('click', () => this.fechar());
         document.getElementById('btnSalvarModal')
             ?.addEventListener('click', () => this.salvar());
+        document.getElementById('btnFecharModalUsuario')
+            ?.addEventListener('click', () => this.fechar());
+
+        this.modalEl?.addEventListener('click', (event) => {
+            if (event.target === this.modalEl) {
+                this.fechar();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && this.modalEl?.classList.contains('show')) {
+                this.fechar();
+            }
+        });
     }
 
     // ── Abertura ──────────────────────────────────────────────────────────────
@@ -36,11 +51,11 @@ class ModalUsuario {
     }
 
     _abrir() {
-        document.getElementById('modalUsuario').style.display = 'flex';
+        this.modalEl?.classList.add('show');
     }
 
     fechar() {
-        document.getElementById('modalUsuario').style.display = 'none';
+        this.modalEl?.classList.remove('show');
     }
 
     // ── Renderização ─────────────────────────────────────────────────────────
@@ -52,6 +67,9 @@ class ModalUsuario {
         // Título
         document.getElementById('modalUsuarioTitulo').textContent =
             editando ? 'Editar Usuário' : 'Novo Usuário';
+        document.getElementById('modalUsuarioDescricao').textContent = editando
+            ? 'Revise perfil, estado operacional e dados sensíveis deste usuário.'
+            : 'Crie um novo acesso administrativo ou operacional com parâmetros claros.';
 
         // Campos
         document.getElementById('inputNome').value  = usuario.nome  || '';
