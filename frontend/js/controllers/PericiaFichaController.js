@@ -16,8 +16,26 @@ export class PericiaFichaController {
         this.pericias = [];
         this.periciasFiltradas = [];
         this.periciasAdicionadas = new Map();
+        this.operacoesEmAndamento = new Set();
         this.token = localStorage.getItem('token');
         console.log('✅ PericiaFichaController inicializado');
+    }
+
+    _chaveOperacao(tipo, periciaId) {
+        return `${tipo}:${periciaId}`;
+    }
+
+    _iniciarOperacao(tipo, periciaId) {
+        const chave = this._chaveOperacao(tipo, periciaId);
+        if (this.operacoesEmAndamento.has(chave)) {
+            return false;
+        }
+        this.operacoesEmAndamento.add(chave);
+        return true;
+    }
+
+    _finalizarOperacao(tipo, periciaId) {
+        this.operacoesEmAndamento.delete(this._chaveOperacao(tipo, periciaId));
     }
 
     async inicializar() {
@@ -53,7 +71,7 @@ export class PericiaFichaController {
 
         } catch (error) {
             console.error('❌ Erro ao inicializar:', error);
-            NotificationService.erro('❌ ' + error.message);
+            NotificationService.mostrarErro('❌ ' + error.message);
             throw error;
         }
     }
@@ -280,13 +298,17 @@ export class PericiaFichaController {
             console.log('✅ Perícia atualizada:', response);
         } catch (error) {
             console.error('❌ Erro ao atualizar perícia:', error);
-            NotificationService.erro('❌ Erro: ' + error.message);
+            NotificationService.mostrarErro('❌ Erro: ' + error.message);
             // Re-renderizar para desfazer as mudanças
             this.renderizar();
         }
     }
 
     async adicionarPericia(periciaId, btnElement) {
+        if (!this._iniciarOperacao('adicionar', periciaId)) {
+            return;
+        }
+
         try {
             const tr = btnElement.closest('tr');
             const inputGrad = tr.querySelector('.input-grad');
@@ -324,11 +346,17 @@ export class PericiaFichaController {
             // Re-renderizar
             this.renderizar();
 
-            NotificationService.sucesso('✅ Perícia adicionada com sucesso!');
+            NotificationService.mostrarSucesso('✅ Perícia adicionada com sucesso!');
 
         } catch (error) {
             console.error('❌ Erro ao adicionar perícia:', error);
-            NotificationService.erro('❌ ' + error.message);
+            NotificationService.mostrarErro('❌ ' + error.message);
+            if (btnElement && btnElement.isConnected) {
+                btnElement.disabled = false;
+                btnElement.textContent = '➕';
+            }
+        } finally {
+            this._finalizarOperacao('adicionar', periciaId);
         }
     }
 
@@ -348,6 +376,10 @@ export class PericiaFichaController {
     }
 
     async _executarRemocao(periciaId, btnElement) {
+        if (!this._iniciarOperacao('remover', periciaId)) {
+            return;
+        }
+
         try {
             const dados = this.periciasAdicionadas.get(periciaId);
             if (!dados) return;
@@ -382,13 +414,15 @@ export class PericiaFichaController {
             // Re-renderizar
             this.renderizar();
 
-            NotificationService.sucesso('✅ Perícia removida com sucesso!');
+            NotificationService.mostrarSucesso('✅ Perícia removida com sucesso!');
 
         } catch (error) {
             console.error('❌ Erro ao remover perícia:', error);
-            NotificationService.erro('❌ ' + error.message);
+            NotificationService.mostrarErro('❌ ' + error.message);
             btnElement.disabled = false;
             btnElement.textContent = '🗑️';
+        } finally {
+            this._finalizarOperacao('remover', periciaId);
         }
     }
 }

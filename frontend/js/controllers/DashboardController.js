@@ -700,40 +700,50 @@ class CombatenteServiceGlobal {
         return h;
     }
 
+    async _handleResponse(res, fallbackMessage) {
+        if (res.status === 401) {
+            if (typeof AuthService !== 'undefined' && typeof AuthService.logout === 'function') {
+                AuthService.logout();
+            }
+            throw new Error('Token inválido ou expirado. Faça login novamente.');
+        }
+
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(e.detail || fallbackMessage);
+        }
+
+        return res;
+    }
+
     async listar(tipo) {
         const url = tipo ? `${this._url()}?tipo=${tipo}` : this._url();
         const res = await fetch(url, { headers: this._headers() });
-        if (!res.ok) throw new Error('Erro ao carregar combatentes');
+        await this._handleResponse(res, 'Erro ao carregar combatentes');
         return res.json();
     }
 
     async obterPorId(id) {
         const res = await fetch(this._url(`/${id}`), { headers: this._headers() });
-        if (!res.ok) throw new Error('Combatente não encontrado');
+        await this._handleResponse(res, 'Combatente não encontrado');
         return res.json();
     }
 
     async criar(formData) {
         const res = await fetch(this._url(), { method: 'POST', headers: this._headers(), body: formData });
-        if (!res.ok) {
-            const e = await res.json().catch(() => ({}));
-            throw new Error(e.detail || 'Erro ao criar');
-        }
+        await this._handleResponse(res, 'Erro ao criar');
         return res.json();
     }
 
     async atualizar(id, formData) {
         const res = await fetch(this._url(`/${id}`), { method: 'PUT', headers: this._headers(), body: formData });
-        if (!res.ok) {
-            const e = await res.json().catch(() => ({}));
-            throw new Error(e.detail || 'Erro ao atualizar');
-        }
+        await this._handleResponse(res, 'Erro ao atualizar');
         return res.json();
     }
 
     async deletar(id) {
         const res = await fetch(this._url(`/${id}`), { method: 'DELETE', headers: this._headers() });
-        if (!res.ok) throw new Error('Erro ao deletar');
+        await this._handleResponse(res, 'Erro ao deletar');
         return true;
     }
 }

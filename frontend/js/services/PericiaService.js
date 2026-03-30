@@ -246,8 +246,14 @@ export class PericiaService {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || `HTTP ${response.status}`);
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.detail || `HTTP ${response.status}`);
+                }
+
+                const errorText = await response.text().catch(() => '');
+                throw new Error(errorText || `HTTP ${response.status}`);
             }
 
             const data = await response.json();

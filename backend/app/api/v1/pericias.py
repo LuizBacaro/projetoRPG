@@ -33,11 +33,12 @@ router = APIRouter(prefix="/pericias", tags=["Perícias"])
 
 
 def _serialize_pericia(pericia, custo_para_classe=None) -> dict:
+    atributo_normalizado = (pericia.atributo or "").upper() if pericia.atributo else pericia.atributo
     return {
         "id": pericia.id,
         "nome": pericia.nome,
         "descricao": pericia.descricao,
-        "atributo": pericia.atributo,
+        "atributo": atributo_normalizado,
         "tipo": pericia.tipo,
         "requer_treinamento": pericia.requer_treinamento,
         "especialidade": pericia.especialidade,

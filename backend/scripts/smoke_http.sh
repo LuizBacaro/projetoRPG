@@ -3,7 +3,12 @@ set -euo pipefail
 
 BASE_URL="${BASE_URL:-http://127.0.0.1:8000}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@arena-rpg.com.br}"
-ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin123}"
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-${ADMIN_DEFAULT_PASSWORD:-}}"
+
+if [[ -z "$ADMIN_PASSWORD" ]]; then
+  echo "ADMIN_PASSWORD nao definido. Exemplo: ADMIN_PASSWORD='sua_senha' ./backend/scripts/smoke_http.sh"
+  exit 1
+fi
 
 check_url() {
     local url="$1"

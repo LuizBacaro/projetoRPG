@@ -3,7 +3,7 @@ Schemas de Perícia para validação
 Single Responsibility: Apenas validam dados
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from enum import Enum
 
@@ -36,6 +36,13 @@ class PericiaBase(BaseModel):
     pode_usar_sem_treinamento: int = Field(default=1, ge=0, le=1)
     sofre_penalidade_armadura: int = Field(default=0, ge=0, le=1)
     pagina_livro: Optional[int] = None
+
+    @field_validator("atributo", mode="before")
+    @classmethod
+    def normalizar_atributo(cls, v):
+        if isinstance(v, str):
+            return v.upper()
+        return v
 
 
 class PericiaCreate(PericiaBase):

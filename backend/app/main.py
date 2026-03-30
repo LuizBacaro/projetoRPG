@@ -226,6 +226,7 @@ def _inicializar_banco(db) -> None:
         ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
         ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
         ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
+        ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
         ("garantir_constraints_item_13", _garantir_constraints_item_13),
         ("seed_condicoes", lambda: _seed_condicoes(db)),
         ("inicializar_equipamentos", lambda: inicializar_equipamentos(db)),
@@ -282,6 +283,34 @@ def _garantir_coluna_dono_id() -> None:
                 text("UPDATE combatentes SET dono_id = :owner_id WHERE dono_id IS NULL"),
                 {"owner_id": owner_id},
             )
+
+
+def _garantir_colunas_soft_delete() -> None:
+    """Adiciona colunas `deleted_at` em tabelas legadas quando ausentes."""
+    tabelas = [
+        "pericias",
+        "equipamentos",
+        "talentos",
+        "combatentes",
+        "equipamentos_jogador",
+        "talentos_jogador",
+        "pericias_jogador",
+    ]
+
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+
+    with engine.begin() as conn:
+        for tabela in tabelas:
+            if tabela not in tabelas_existentes:
+                continue
+
+            colunas = {col["name"] for col in inspector.get_columns(tabela)}
+            if "deleted_at" in colunas:
+                continue
+
+            logger.warning("⚠️  coluna %s.deleted_at ausente; aplicando schema guard", tabela)
+            conn.execute(text(f"ALTER TABLE {tabela} ADD COLUMN deleted_at DATETIME"))
 
 
 def _garantir_constraints_item_13() -> None:

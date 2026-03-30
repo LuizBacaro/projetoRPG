@@ -68,7 +68,8 @@ class Settings(BaseSettings):
 
     class Config:
         """Configuração de leitura do Pydantic"""
-        env_file = ".env"
+        # Suporta execução tanto na raiz do repo quanto dentro de backend/
+        env_file = (".env", "backend/.env")
         case_sensitive = True
 
     def __init__(self, **data):
