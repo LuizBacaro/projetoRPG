@@ -11,6 +11,11 @@ import { TalentoService } from '../services/TalentoService.js';
 import { PericiaService } from '../services/PericiaService.js';
 import { getApiUrl } from '../config/api.config.js';
 import { escapeHtml } from '../utils/formatters.js';
+import {
+    installGlobalErrorGuards,
+    safeBootstrap,
+    safeBootstrapAsync,
+} from '../utils/graceful-degradation.js';
 
 export class FichaPersonagemController {
 
@@ -1135,7 +1140,18 @@ export class FichaPersonagemController {
 
 // ── Inicializar quando DOM estiver pronto ──
 document.addEventListener('DOMContentLoaded', async () => {
-    const controller = new FichaPersonagemController();
+    installGlobalErrorGuards('ficha-page');
+    const controller = safeBootstrap(
+        'ficha-controller',
+        () => new FichaPersonagemController(),
+        'Falha ao iniciar a ficha do personagem.'
+    );
+    if (!controller) return;
+
     window._fichaController = controller;
-    await controller.inicializar();
+    await safeBootstrapAsync(
+        'ficha-inicializacao',
+        () => controller.inicializar(),
+        'Nao foi possivel carregar os dados completos da ficha.'
+    );
 });

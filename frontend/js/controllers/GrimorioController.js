@@ -8,14 +8,16 @@
 import { getApiUrl } from '../config/api.config.js';
 import { MagiaService } from '../services/MagiaService.js';
 import { escapeHtml } from '../utils/formatters.js';
-
-// ── Classes conjuradoras ──
-const CLASSES_CONJURADORAS = new Set([
-    'Mago', 'Feiticeiro', 'Clérigo', 'Clerigo', 'Druida',
-    'Bardo', 'Paladino', 'Ranger',
-    'mago', 'feiticeiro', 'clérigo', 'clerigo', 'druida',
-    'bardo', 'paladino', 'ranger'
-]);
+import {
+    classeTabelaMagias,
+    isClasseConjuradora,
+    normalizeClasseConjuradora,
+} from '../utils/combat-rules.js';
+import {
+    installGlobalErrorGuards,
+    reportDegradedMode,
+    safeBootstrap,
+} from '../utils/graceful-degradation.js';
 
 const TABELA_MAGIAS_DIA = {
     Mago: [
@@ -339,22 +341,7 @@ class GrimorioController {
     // 
 
     _normalizarClasse(classe) {
-        if (!classe) return '';
-        
-        const classeUpper = classe.toUpperCase();
-        
-        const mapa = {
-            'MAGO': 'Mago',
-            'CLÉRIGO': 'Clérigo',
-            'CLERIGO': 'Clérigo',
-            'FEITICEIRO': 'Feiticeiro',
-            'DRUIDA': 'Druida',
-            'BARDO': 'Bardo',
-            'PALADINO': 'Paladino',
-            'RANGER': 'Ranger',
-        };
-        
-        return mapa[classeUpper] || classeUpper;
+        return normalizeClasseConjuradora(classe) || String(classe || '').trim();
     }
 
     async _carregarMagias() {
@@ -403,6 +390,10 @@ class GrimorioController {
             await this._recarregarCombatente();
         } catch (err) {
             console.error('❌ Erro ao inicializar slots:', err);
+            this._mostrarToast(
+                err.message || `Não foi possível inicializar os slots do combatente #${this.combatente.id}.`,
+                'erro'
+            );
         }
     }
 
@@ -451,12 +442,7 @@ class GrimorioController {
             console.log('📊 Calculando slots baseado em tabela');
             
             const nivel = Math.max(1, Math.min(20, this.combatente.nivel || 1));
-            let classeParaTabela = this.classe;
-            
-            // Feiticeiro usa os mesmos slots que Mago
-            if (classeParaTabela === 'Feiticeiro') {
-                classeParaTabela = 'Mago';
-            }
+            let classeParaTabela = classeTabelaMagias(this.classe) || this.classe;
             
             const tabelaClasse = TABELA_MAGIAS_DIA[classeParaTabela];
 
@@ -537,7 +523,12 @@ class GrimorioController {
             this._atualizarCard(magiaId, nivelMagia);
         } catch (err) {
             console.error('❌ Erro ao marcar usada:', err);
-            this._mostrarToast('Erro ao marcar magia como usada.', 'erro');
+            const magia = this.magias.find(m => m.id === magiaId);
+            const nomeMagia = magia?.nome || `magia #${magiaId}`;
+            this._mostrarToast(
+                err.message || `Não foi possível atualizar o uso de ${nomeMagia}.`,
+                'erro'
+            );
         }
     }
 
@@ -604,7 +595,9 @@ class GrimorioController {
             this._mostrarToast('📖 Magia removida da preparação.', 'info');
         } catch (err) {
             console.error('❌ Erro ao desmarcar magia:', err);
-            this._mostrarToast('Erro ao remover magia.', 'erro');
+            const magia = this.magias.find(m => m.id === magiaId);
+            const nomeMagia = magia?.nome || `magia #${magiaId}`;
+            this._mostrarToast(err.message || `Não foi possível remover ${nomeMagia} da preparação.`, 'erro');
         }
     }
 
@@ -1064,39 +1057,54 @@ class GrimorioController {
 
 // ── Inicialização ──
 document.addEventListener('DOMContentLoaded', () => {
+    installGlobalErrorGuards('grimorio-page');
     const tentarInicializar = setInterval(() => {
-        const classeEl = document.getElementById('fichaClasse');
-        if (!classeEl) return;
+        try {
+            const classeEl = document.getElementById('fichaClasse');
+            if (!classeEl) return;
 
-        const classe = classeEl.textContent?.trim();
-        if (!classe || classe === '—') return;
+            const classe = classeEl.textContent?.trim();
+            if (!classe || classe === '—') return;
 
-        const combatente = window._fichaController?.combatente;
-        if (!combatente) return;
+            const combatente = window._fichaController?.combatente;
+            if (!combatente) return;
 
-        clearInterval(tentarInicializar);
+            clearInterval(tentarInicializar);
 
-        const token = localStorage.getItem('token');
-        const magiaService = new MagiaService(token);
-        
-        window._grimorioController = new GrimorioController(combatente, token, magiaService);
+            const token = localStorage.getItem('token');
+            const magiaService = new MagiaService(token);
 
-        if (CLASSES_CONJURADORAS.has(classe.toLowerCase()) || CLASSES_CONJURADORAS.has(classe)) {
-            const btnHeader = document.getElementById('btnGrimorio');
-            const secaoMagia = document.getElementById('secaoMagias');
-            if (btnHeader) btnHeader.style.display = 'inline-flex';
-            if (secaoMagia) secaoMagia.style.display = 'flex';
+            window._grimorioController = safeBootstrap(
+                'grimorio-controller',
+                () => new GrimorioController(combatente, token, magiaService),
+                'Falha ao iniciar grimorio. A ficha continuara disponivel sem a aba de magias.'
+            );
+            if (!window._grimorioController) return;
+
+            if (isClasseConjuradora(classe)) {
+                const btnHeader = document.getElementById('btnGrimorio');
+                const secaoMagia = document.getElementById('secaoMagias');
+                if (btnHeader) btnHeader.style.display = 'inline-flex';
+                if (secaoMagia) secaoMagia.style.display = 'flex';
+            }
+
+            document.getElementById('modalGrimorio')?.addEventListener('click', e => {
+                if (e.target.id === 'modalGrimorio') window._grimorioController.fecharGrimorio();
+            });
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') window._grimorioController?.fecharGrimorio();
+            });
+
+            console.log('✅ GrimorioController pronto para', classe);
+        } catch (error) {
+            reportDegradedMode(
+                'grimorio-bootstrap',
+                error,
+                'Falha ao carregar grimorio. Os demais recursos da ficha continuam ativos.'
+            );
+            clearInterval(tentarInicializar);
         }
-
-        document.getElementById('modalGrimorio')?.addEventListener('click', e => {
-            if (e.target.id === 'modalGrimorio') window._grimorioController.fecharGrimorio();
-        });
-
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') window._grimorioController?.fecharGrimorio();
-        });
-
-        console.log('✅ GrimorioController pronto para', classe);
     }, 300);
 });
 

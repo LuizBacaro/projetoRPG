@@ -4,16 +4,16 @@ SRP: Schemas Pydantic para serialização de Talentos
 SOLID: Single Responsibility — apenas validação/serialização
 """
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
 
 class TalentoBase(BaseModel):
     """Schema base com campos comuns"""
-    nome: str
-    descricao: Optional[str] = None
-    pagina_referencia: Optional[str] = None
+    nome: str = Field(..., min_length=1, max_length=100)
+    descricao: Optional[str] = Field(default=None, max_length=500)
+    pagina_referencia: Optional[str] = Field(default=None, max_length=50)
     ativo: bool = True
 
 
@@ -55,9 +55,9 @@ class TalentoJogadorResponse(TalentoJogadorBase):
 class TalentoJogadorListResponse(BaseModel):
     """Schema para listagem de talentos do jogador"""
     id: int
-    nome: str
-    descricao: Optional[str] = None
-    pagina_referencia: Optional[str] = None
+    nome: str = Field(..., max_length=100)
+    descricao: Optional[str] = Field(default=None, max_length=500)
+    pagina_referencia: Optional[str] = Field(default=None, max_length=50)
 
     class Config:
         from_attributes = True

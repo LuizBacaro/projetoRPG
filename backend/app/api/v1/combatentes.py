@@ -2,10 +2,8 @@
 Controller/Router de Combatentes
 SRP: Responsável apenas por HTTP routing
 """
-from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException, Query, Response
 from typing import List, Optional
-from ...core.database import get_db
 from ...core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from ...core.dependencies import get_combatente_service
 from ...services.combatente_service import CombatenteService
@@ -25,22 +23,28 @@ router = APIRouter(prefix="/combatentes", tags=["Combatentes"])
 @router.get("", response_model=List[CombatenteResponse])
 def listar_combatentes(
     tipo: Optional[str] = None,
-    db:   Session = Depends(get_db),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=200),
+    response: Response = None,
+    service: CombatenteService = Depends(get_combatente_service),
     usuario_atual: Usuario = Depends(get_usuario_atual),
 ):
     """Lista todos os combatentes ou filtra por tipo"""
-    service = get_combatente_service(db)
-    return service.listar_todos(tipo, usuario=usuario_atual)
+    total = service.contar_todos(tipo, usuario=usuario_atual)
+    if response is not None:
+        response.headers["X-Total-Count"] = str(total)
+        response.headers["X-Skip"] = str(skip)
+        response.headers["X-Limit"] = str(limit)
+    return service.listar_todos(tipo, usuario=usuario_atual, skip=skip, limit=limit)
 
 
 @router.get("/{combatente_id}", response_model=CombatenteResponse)
 def obter_combatente(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Obtém um combatente específico por ID"""
-    service = get_combatente_service(db)
     try:
         return service.obter_por_id(combatente_id)
     except ArenaBaseException as e:
@@ -49,14 +53,14 @@ def obter_combatente(
 
 @router.post("", response_model=CombatenteResponse, status_code=201)
 async def criar_combatente(
-    nome:       str = Form(...),
+    nome:       str = Form(..., max_length=100),
     hp_maximo:  int = Form(...),
     iniciativa: int = Form(...),
-    tipo:       str = Form("jogador"),
-    classe:     str = Form("Aventureiro"),
-    raca:       Optional[str] = Form(None),
+    tipo:       str = Form("jogador", max_length=20),
+    classe:     str = Form("Aventureiro", max_length=50),
+    raca:       Optional[str] = Form(None, max_length=50),
     # ✅ NOVO
-    pagina_referencia: Optional[str] = Form(None),
+    pagina_referencia: Optional[str] = Form(None, max_length=100),
     # Defesa
     ca:         int = Form(10),
     toque:      int = Form(10),
@@ -76,11 +80,10 @@ async def criar_combatente(
     nivel:  int = Form(1),
     pontos: int = Form(0),
     foto: Optional[UploadFile] = File(None),
-    db:   Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     usuario_atual: Usuario = Depends(get_usuario_atual),
 ):
     """Cria um novo combatente"""
-    service = get_combatente_service(db)
     combatente_data = {
         "nome":               nome,
         "tipo":               tipo,
@@ -113,14 +116,14 @@ async def criar_combatente(
 @router.put("/{combatente_id}", response_model=CombatenteResponse)
 async def atualizar_combatente(
     combatente_id: int,
-    nome:          str = Form(...),
+    nome:          str = Form(..., max_length=100),
     hp_maximo:     int = Form(...),
     iniciativa:    int = Form(...),
-    tipo:          str = Form(...),
-    classe:        str = Form("Aventureiro"),
-    raca:          Optional[str] = Form(None),
+    tipo:          str = Form(..., max_length=20),
+    classe:        str = Form("Aventureiro", max_length=50),
+    raca:          Optional[str] = Form(None, max_length=50),
     # ✅ NOVO
-    pagina_referencia: Optional[str] = Form(None),
+    pagina_referencia: Optional[str] = Form(None, max_length=100),
     # Defesa
     ca:       int = Form(10),
     toque:    int = Form(10),
@@ -140,11 +143,10 @@ async def atualizar_combatente(
     nivel:  int = Form(1),
     pontos: int = Form(0),
     foto: Optional[UploadFile] = File(None),
-    db:   Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza um combatente existente"""
-    service = get_combatente_service(db)
     combatente_data = {
         "nome":               nome,
         "tipo":               tipo,
@@ -178,11 +180,10 @@ async def atualizar_combatente(
 def atualizar_hp(
     combatente_id: int,
     hp_data: HPUpdateRequest,
-    db: Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza apenas o HP atual de um combatente"""
-    service = get_combatente_service(db)
     try:
         return service.atualizar_hp(combatente_id, hp_data.hp_atual)
     except ArenaBaseException as e:
@@ -193,11 +194,10 @@ def atualizar_hp(
 def atualizar_iniciativa(
     combatente_id: int,
     ini_data: IniciativaUpdateRequest,
-    db: Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza apenas a iniciativa de um combatente"""
-    service = get_combatente_service(db)
     try:
         return service.atualizar_iniciativa(combatente_id, ini_data.iniciativa)
     except ArenaBaseException as e:
@@ -208,11 +208,10 @@ def atualizar_iniciativa(
 def aplicar_dano(
     combatente_id: int,
     dano_data: DanoCuraRequest,
-    db: Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Aplica dano a um combatente"""
-    service = get_combatente_service(db)
     try:
         return service.aplicar_dano(combatente_id, dano_data.valor)
     except ArenaBaseException as e:
@@ -223,11 +222,10 @@ def aplicar_dano(
 def aplicar_cura(
     combatente_id: int,
     cura_data: DanoCuraRequest,
-    db: Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Aplica cura a um combatente"""
-    service = get_combatente_service(db)
     try:
         return service.aplicar_cura(combatente_id, cura_data.valor)
     except ArenaBaseException as e:
@@ -238,11 +236,10 @@ def aplicar_cura(
 def atualizar_parcial(
     combatente_id: int,
     data: dict,
-    db: Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza campos específicos de um combatente"""
-    service = get_combatente_service(db)
     try:
         return service.atualizar(combatente_id, data)
     except ArenaBaseException as e:
@@ -252,11 +249,10 @@ def atualizar_parcial(
 @router.delete("/{combatente_id}")
 def deletar_combatente(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Deleta um combatente"""
-    service = get_combatente_service(db)
     try:
         service.deletar(combatente_id)
         return {"message": "Combatente deletado com sucesso"}
@@ -267,11 +263,10 @@ def deletar_combatente(
 @router.post("/{combatente_id}/inicializar-slots", status_code=200)
 def inicializar_slots(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
     """Inicializa slots de magia para um combatente"""
-    service = get_combatente_service(db)
     try:
         return service.inicializar_slots_magia(combatente_id)
     except ArenaBaseException as e:

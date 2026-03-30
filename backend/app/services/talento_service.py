@@ -21,6 +21,8 @@ class TalentoService:
         # Verifica se talento já existe
         talento_existente = TalentoRepository.obter_talento_por_nome(self.db, talento.nome)
         if talento_existente:
+            if talento_existente.deleted_at is not None:
+                return TalentoRepository.restaurar_talento(self.db, talento_existente, talento)
             return talento_existente
         
         return TalentoRepository.criar_talento(self.db, talento)
@@ -46,20 +48,19 @@ class TalentoService:
 
     def obter_talentos_jogador(self, combatente_id: int) -> List[TalentoJogadorListResponse]:
         """Obtém todos os talentos de um combatente com detalhes"""
-        talentos_jogador = TalentoJogadorRepository.obter_talentos_jogador(
+        talentos_jogador = TalentoJogadorRepository.obter_talentos_jogador_detalhado(
             self.db, combatente_id
         )
-        
-        resposta = []
-        for tal in talentos_jogador:
-            resposta.append(TalentoJogadorListResponse(
-                id=tal.talento.id,
-                nome=tal.talento.nome,
-                descricao=tal.talento.descricao,
-                pagina_referencia=tal.talento.pagina_referencia
-            ))
-        
-        return resposta
+
+        return [
+            TalentoJogadorListResponse(
+                id=tal["talento_id"],
+                nome=tal["talento_nome"],
+                descricao=tal["talento_descricao"],
+                pagina_referencia=tal["talento_pagina_referencia"],
+            )
+            for tal in talentos_jogador
+        ]
 
     def remover_talento_jogador(self, combatente_id: int, talento_id: int) -> bool:
         """Remove um talento do combatente"""

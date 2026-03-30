@@ -8,9 +8,10 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from ..core.database import Base
+from .mixins import SoftDeleteMixin
 
 
-class Talento(Base):
+class Talento(SoftDeleteMixin, Base):
     """
     Modelo SQLAlchemy para representar um Talento do D&D 3.5.
     
@@ -36,6 +37,7 @@ class Talento(Base):
     # ── Relacionamentos ──
     combatentes = relationship(
         "TalentoJogador",
+        back_populates="talento",
         cascade="all, delete-orphan",
         lazy="selectin"
     )
@@ -61,4 +63,4 @@ class TalentoJogador(Base):
     adicionado_em = Column(DateTime, default=datetime.utcnow)
 
     # ── Relacionamentos ──
-    talento = relationship("Talento", lazy="joined")
+    talento = relationship("Talento", back_populates="combatentes", lazy="joined")

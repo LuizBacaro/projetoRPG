@@ -8,9 +8,10 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from ..core.database import Base
+from .mixins import SoftDeleteMixin
 
 
-class Equipamento(Base):
+class Equipamento(SoftDeleteMixin, Base):
     """
     Modelo SQLAlchemy para representar um Equipamento do D&D 3.5.
     
@@ -36,6 +37,7 @@ class Equipamento(Base):
     # ── Relacionamentos ──
     combatentes = relationship(
         "EquipamentoJogador",
+        back_populates="equipamento",
         cascade="all, delete-orphan",
         lazy="selectin"
     )
@@ -64,4 +66,4 @@ class EquipamentoJogador(Base):
     adicionado_em = Column(DateTime, default=datetime.utcnow)
 
     # ── Relacionamentos ──
-    equipamento = relationship("Equipamento", lazy="joined")
+    equipamento = relationship("Equipamento", back_populates="combatentes", lazy="joined")

@@ -151,5 +151,21 @@ class UsuarioController {
 // ── Instância global ──────────────────────────────────────────────────────────
 let usuarioController;
 (function init() {
-    usuarioController = new UsuarioController();
+    try {
+        usuarioController = new UsuarioController();
+    } catch (error) {
+        console.error('❌ Falha no bootstrap do UsuarioController:', error);
+        const tbody = document.getElementById('tabelaUsuarios');
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center; padding:2rem; color:#f87171;">
+                        ⚠️ Falha ao iniciar gerenciamento de usuarios. Recarregue a pagina.
+                    </td>
+                </tr>`;
+        }
+        if (typeof Toast !== 'undefined' && Toast && typeof Toast.error === 'function') {
+            Toast.error('Falha ao iniciar tela de usuarios.');
+        }
+    }
 })();

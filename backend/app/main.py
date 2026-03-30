@@ -6,6 +6,7 @@ SOLID: Dependency Injection via contexto FastAPI
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
 import logging
@@ -15,6 +16,7 @@ from .core.config import settings
 from .core.database import engine, Base, SessionLocal, get_db
 from .core.init_db import criar_admin_padrao, inicializar_equipamentos, inicializar_talentos
 from .core.rate_limit import RateLimitMiddleware
+from .core.request_size import RequestSizeLimitMiddleware
 from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias, magias_preparadas, equipamentos, talentos
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
@@ -31,9 +33,6 @@ from .models import magia as magia_model
 
 logger = logging.getLogger(__name__)
 
-# ── Criar tabelas ────────────────────────────────────────────────────────────
-Base.metadata.create_all(bind=engine)
-
 # ── Instância FastAPI ────────────────────────────────────────────────────────
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -48,6 +47,21 @@ app = FastAPI(
 # Origens vêm do .env (ALLOWED_ORIGINS) — nunca usar "*" com allow_credentials
 _origins = settings.ALLOWED_ORIGINS
 _allow_all = "*" in _origins
+
+app.add_middleware(
+    RequestSizeLimitMiddleware,
+    max_request_size=settings.MAX_REQUEST_SIZE,
+    max_json_body_size=settings.MAX_JSON_BODY_SIZE,
+)
+
+if settings.GZIP_ENABLED:
+    app.add_middleware(
+        GZipMiddleware,
+        minimum_size=settings.GZIP_MINIMUM_SIZE,
+    )
+    logger.info("✅ GZip ativo: minimum_size=%s bytes", settings.GZIP_MINIMUM_SIZE)
+else:
+    logger.warning("⚠️  GZip desativado")
 
 app.add_middleware(
     CORSMiddleware,
@@ -75,6 +89,12 @@ if settings.RATE_LIMIT_ENABLED:
     )
 else:
     logger.warning("⚠️  Rate limiting desativado")
+
+logger.info(
+    "✅ Request size limits ativos: request=%s bytes, json=%s bytes",
+    settings.MAX_REQUEST_SIZE,
+    settings.MAX_JSON_BODY_SIZE,
+)
 
 if _allow_all:
     logger.warning("⚠️  CORS com wildcard '*' — NÃO usar em produção!")
@@ -193,28 +213,30 @@ def _inicializar_banco(db) -> None:
     Args:
         db: Sessão do banco
     """
-    # 1. Criar admin padrão (precisa ser primeiro)
-    criar_admin_padrao(db)
+    passos = [
+        ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
+        ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
+        ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
+        ("garantir_constraints_item_13", _garantir_constraints_item_13),
+        ("seed_condicoes", lambda: _seed_condicoes(db)),
+        ("inicializar_equipamentos", lambda: inicializar_equipamentos(db)),
+        ("inicializar_talentos", lambda: inicializar_talentos(db)),
+        ("seed_combatentes", lambda: _seed_combatentes(db)),
+    ]
 
-    # 1.1 Garantir coluna de ownership (compatibilidade para bases antigas)
-    _garantir_coluna_dono_id()
-    _garantir_constraints_item_13()
-    
-    # 2. Popular condições D&D (global, sem dependências)
-    _seed_condicoes(db)
-    
-    # 3. Popular perícias D&D (global, sem dependências)
-    # ✅ COMENTADO: Perícias já foram populadas via Excel/SQL direto
-    # _seed_pericias(db)
-    
-    # 4. Popular equipamentos D&D (global, sem dependências)
-    inicializar_equipamentos(db)
-    
-    # 5. Popular talentos D&D (global, sem dependências)
-    inicializar_talentos(db)
-    
-    # 6. Popular combatentes iniciais (pode usar condições e perícias)
-    _seed_combatentes(db)
+    for nome, callback in passos:
+        _executar_passo_startup(nome, callback)
+
+
+def _executar_passo_startup(nome: str, callback) -> None:
+    """Executa um passo de startup com logging consistente e falha explícita."""
+    logger.info("🔄 Startup step: %s", nome)
+    try:
+        callback()
+        logger.info("✅ Startup step concluído: %s", nome)
+    except Exception as exc:
+        logger.exception("❌ Falha no passo de startup '%s'", nome)
+        raise RuntimeError(f"Falha no startup em '{nome}': {exc}") from exc
 
 
 def _garantir_coluna_dono_id() -> None:
@@ -535,13 +557,9 @@ def _seed_condicoes(db) -> None:
     repo = CondicaoRepository(db)
     service = CondicaoService(condicao_repository=repo, combatente_repository=None)
 
-    try:
-        service.inicializar_seed()
-        logger.info("✅ Seed de condições D&D verificado")
-        print("✅ Seed de condições D&D verificado/executado com sucesso!")
-    except Exception as e:
-        logger.warning(f"⚠️  Erro ao popular condições: {str(e)}")
-        print(f"⚠️  Erro ao popular condições: {str(e)}")
+    service.inicializar_seed()
+    logger.info("✅ Seed de condições D&D verificado")
+    print("✅ Seed de condições D&D verificado/executado com sucesso!")
 
 
 # ── Entry point ──────────────────────────────────────────────────────────────

@@ -106,12 +106,12 @@
     <div class="dash-modal-box" style="max-width:420px">
         <div class="dash-modal-header">
             <h2>Selecionar Tipo</h2>
-            <button class="dash-modal-close" onclick="fecharSeletorTipo()">×</button>
+            <button class="dash-modal-close" onclick="window.dashboardActions.fecharSeletorTipo()">×</button>
         </div>
         <div class="seletor-tipo-grid">
-            <button class="btn-tipo-jogador" onclick="abrirModalCadastro('jogador')">🧙 Jogador</button>
-            <button class="btn-tipo-monstro" onclick="abrirModalCadastro('monstro')">👹 Monstro</button>
-            <button class="btn-tipo-npc"     onclick="abrirModalCadastro('npc')">🤝 NPC</button>
+            <button class="btn-tipo-jogador" onclick="window.dashboardActions.abrirModalCadastro('jogador')">🧙 Jogador</button>
+            <button class="btn-tipo-monstro" onclick="window.dashboardActions.abrirModalCadastro('monstro')">👹 Monstro</button>
+            <button class="btn-tipo-npc"     onclick="window.dashboardActions.abrirModalCadastro('npc')">🤝 NPC</button>
         </div>
     </div>
 </div>
@@ -121,7 +121,7 @@
     <div class="dash-modal-box">
         <div class="dash-modal-header">
             <h2>🧙 Novo Jogador</h2>
-            <button class="dash-modal-close" onclick="fecharModalCadastro()">×</button>
+            <button class="dash-modal-close" onclick="window.dashboardActions.fecharModalCadastro()">×</button>
         </div>
         <div class="dash-modal-body">
             <form id="formCadastroJogador" enctype="multipart/form-data">
@@ -185,15 +185,15 @@
                         📷 Clique para adicionar foto
                     </div>
                     <input type="file" id="inputFoto" name="foto" accept="image/*" style="display:none"
-                           onchange="previewImagemUpload(this,'uploadPreview','previewImage','uploadPlaceholder')" />
+                           onchange="window.dashboardActions.previewImagemUpload(this,'uploadPreview','previewImage','uploadPlaceholder')" />
                     <div id="uploadPreview" class="dash-upload-preview" style="display:none">
                         <img id="previewImage" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove" onclick="removerImagem()">✕</button>
+                        <button type="button" class="dash-upload-remove" onclick="window.dashboardActions.removerImagem()">✕</button>
                     </div>
                 </div>
 
                 <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastro()">Cancelar</button>
+                    <button type="button" class="btn-dash-cancel" onclick="window.dashboardActions.fecharModalCadastro()">Cancelar</button>
                     <button type="submit" class="btn-dash-save">✅ Cadastrar Jogador</button>
                 </div>
             </form>
@@ -206,7 +206,7 @@
     <div class="dash-modal-box">
         <div class="dash-modal-header">
             <h2>👹 Novo Monstro</h2>
-            <button class="dash-modal-close" onclick="fecharModalCadastroMonstro()">×</button>
+            <button class="dash-modal-close" onclick="window.dashboardActions.fecharModalCadastroMonstro()">×</button>
         </div>
         <div class="dash-modal-body">
             <form id="formCadastroMonstro" enctype="multipart/form-data">
@@ -275,15 +275,15 @@
                         📷 Clique para adicionar foto
                     </div>
                     <input type="file" id="inputFotoMonstro" name="foto" accept="image/*" style="display:none"
-                           onchange="previewImagemUpload(this,'uploadPreviewMonstro','previewImageMonstro','uploadPlaceholderMonstro')" />
+                           onchange="window.dashboardActions.previewImagemUpload(this,'uploadPreviewMonstro','previewImageMonstro','uploadPlaceholderMonstro')" />
                     <div id="uploadPreviewMonstro" class="dash-upload-preview" style="display:none">
                         <img id="previewImageMonstro" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove" onclick="removerImagemMonstro()">✕</button>
+                        <button type="button" class="dash-upload-remove" onclick="window.dashboardActions.removerImagemMonstro()">✕</button>
                     </div>
                 </div>
 
                 <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastroMonstro()">Cancelar</button>
+                    <button type="button" class="btn-dash-cancel" onclick="window.dashboardActions.fecharModalCadastroMonstro()">Cancelar</button>
                     <button type="submit" class="btn-dash-save">✅ Cadastrar Monstro</button>
                 </div>
             </form>
@@ -296,7 +296,7 @@
     <div class="dash-modal-box">
         <div class="dash-modal-header">
             <h2>🤝 Novo NPC</h2>
-            <button class="dash-modal-close" onclick="fecharModalCadastroNPC()">×</button>
+            <button class="dash-modal-close" onclick="window.dashboardActions.fecharModalCadastroNPC()">×</button>
         </div>
         <div class="dash-modal-body">
             <form id="formCadastroNPC" enctype="multipart/form-data">
@@ -360,15 +360,15 @@
                         📷 Clique para adicionar foto
                     </div>
                     <input type="file" id="inputFotoNPC" name="foto" accept="image/*" style="display:none"
-                           onchange="previewImagemUpload(this,'uploadPreviewNPC','previewImageNPC','uploadPlaceholderNPC')" />
+                           onchange="window.dashboardActions.previewImagemUpload(this,'uploadPreviewNPC','previewImageNPC','uploadPlaceholderNPC')" />
                     <div id="uploadPreviewNPC" class="dash-upload-preview" style="display:none">
                         <img id="previewImageNPC" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove" onclick="removerImagemNPC()">✕</button>
+                        <button type="button" class="dash-upload-remove" onclick="window.dashboardActions.removerImagemNPC()">✕</button>
                     </div>
                 </div>
 
                 <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastroNPC()">Cancelar</button>
+                    <button type="button" class="btn-dash-cancel" onclick="window.dashboardActions.fecharModalCadastroNPC()">Cancelar</button>
                     <button type="submit" class="btn-dash-save">✅ Cadastrar NPC</button>
                 </div>
             </form>
@@ -381,7 +381,7 @@
     <div class="dash-modal-box">
         <div class="dash-modal-header">
             <h2>✏️ Editar Combatente</h2>
-            <button class="dash-modal-close" onclick="fecharModalEdicao()">×</button>
+            <button class="dash-modal-close" onclick="window.dashboardActions.fecharModalEdicao()">×</button>
         </div>
         <div class="dash-modal-body">
             <form id="formEdicaoDashboard" enctype="multipart/form-data">
@@ -466,32 +466,32 @@
                 <div class="dash-atributos-grid">
                     <div class="dash-atrib-field">
                         <label>FOR</label>
-                        <input type="number" id="dashEditFOR" name="forca" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditFOR" name="forca" value="10" min="1" max="30" oninput="window.dashboardActions.atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditFOR">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>DES</label>
-                        <input type="number" id="dashEditDES" name="destreza" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditDES" name="destreza" value="10" min="1" max="30" oninput="window.dashboardActions.atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditDES">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>CON</label>
-                        <input type="number" id="dashEditCON" name="constituicao" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditCON" name="constituicao" value="10" min="1" max="30" oninput="window.dashboardActions.atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditCON">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>INT</label>
-                        <input type="number" id="dashEditINT" name="inteligencia" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditINT" name="inteligencia" value="10" min="1" max="30" oninput="window.dashboardActions.atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditINT">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>SAB</label>
-                        <input type="number" id="dashEditSAB" name="sabedoria" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditSAB" name="sabedoria" value="10" min="1" max="30" oninput="window.dashboardActions.atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditSAB">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>CAR</label>
-                        <input type="number" id="dashEditCAR" name="carisma" value="10" min="1" max="30" oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditCAR" name="carisma" value="10" min="1" max="30" oninput="window.dashboardActions.atualizarModificador(this)" />
                         <div class="dash-atrib-mod" id="modDashEditCAR">+0</div>
                     </div>
                 </div>
@@ -504,7 +504,7 @@
                     <input type="file" id="dashEditFoto" name="foto" accept="image/*" style="display:none" />
                     <div id="dashEditUploadPreview" class="dash-upload-preview" style="display:none">
                         <img id="dashEditPreviewImage" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove" onclick="removerImagemEdicao()">✕</button>
+                        <button type="button" class="dash-upload-remove" onclick="window.dashboardActions.removerImagemEdicao()">✕</button>
                     </div>
                 </div>
 
@@ -518,7 +518,7 @@
                         <span></span>
                     </div>
                     <div id="listaAtaquesEdicao"></div>
-                    <button type="button" class="btn-dash-cancel" style="margin-top:.5rem;font-size:.82rem" onclick="adicionarLinhaAtaque()">
+                    <button type="button" class="btn-dash-cancel" style="margin-top:.5rem;font-size:.82rem" onclick="window.dashboardActions.adicionarLinhaAtaque()">
                         + Adicionar Ataque
                     </button>
                 </div>
@@ -527,10 +527,10 @@
                     <button type="submit" class="btn-dash-save">
                         💾 Salvar Alterações
                     </button>
-                    <button type="button" class="btn-dash-delete" onclick="confirmarDelecao()">
+                    <button type="button" class="btn-dash-delete" onclick="window.dashboardActions.confirmarDelecao()">
                         🗑️ Deletar
                     </button>
-                    <button type="button" class="btn-dash-cancel" onclick="fecharModalEdicao()">
+                    <button type="button" class="btn-dash-cancel" onclick="window.dashboardActions.fecharModalEdicao()">
                         Cancelar
                     </button>
                 </div>
@@ -588,11 +588,11 @@
         static info(msg) { this.show(msg, 'info'); }
     }
     
-    window.Toast = Toast;
     console.log('✅ Toast configurado');
 </script>
 
 <!-- FASE 6: Utilitários -->
+<script src="/js/utils/combat-rules.global.js"></script>
 <script>
     function escapeHtml(str) {
         if (typeof str !== 'string') return str;
@@ -603,7 +603,6 @@
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
     }
-    window.escapeHtml = escapeHtml;
 </script>
 
 <!-- FASE 7: DashboardController (carregado por último) -->

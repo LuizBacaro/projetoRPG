@@ -41,13 +41,24 @@ class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
     FRONTEND_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent / "frontend"
     UPLOADS_DIR: Path = Path(__file__).resolve().parent.parent.parent / "uploads"
+    UPLOADS_BASE_URL: str = "/uploads"
 
     # ── CORS ─────────────────────────────────────────────────────────────────
     ALLOWED_ORIGINS: List[str] = ["*"]
 
     # ── Upload ───────────────────────────────────────────────────────────────
     MAX_FILE_SIZE: int = 5 * 1024 * 1024  # 5MB
+    MAX_REQUEST_SIZE: int = 6 * 1024 * 1024  # 6MB
+    MAX_JSON_BODY_SIZE: int = 1 * 1024 * 1024  # 1MB
     ALLOWED_EXTENSIONS: set = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+    # ── Compressão ───────────────────────────────────────────────────────────
+    GZIP_ENABLED: bool = True
+    GZIP_MINIMUM_SIZE: int = 1000
+
+    # ── Cache ────────────────────────────────────────────────────────────────
+    CACHE_ENABLED: bool = True
+    CACHE_CATALOG_TTL_SECONDS: int = 30
 
     # ── Rate Limiting ────────────────────────────────────────────────────────
     RATE_LIMIT_ENABLED: bool = True

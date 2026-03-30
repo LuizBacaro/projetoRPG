@@ -95,7 +95,7 @@ export class MagiaService {
      */
     async _listarTodasEFiltrar(classeNormalizada) {
         try {
-            const url = getApiUrl('/magias/');
+            const url = getApiUrl('/magias/?limit=500');
             console.log(`📡 Buscando TODAS as magias para fallback...`);
             const res = await fetch(url, { headers: this._headers() });
             

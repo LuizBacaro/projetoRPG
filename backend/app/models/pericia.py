@@ -10,6 +10,7 @@ from enum import Enum as PyEnum
 from typing import TYPE_CHECKING
 
 from app.core.database import Base
+from app.models.mixins import SoftDeleteMixin
 
 if TYPE_CHECKING:
     from app.models.combatente import Combatente
@@ -35,7 +36,7 @@ class TipoPericiaEnum(str, PyEnum):
     PERFORMANCE = "performance"
 
 
-class Pericia(Base):
+class Pericia(SoftDeleteMixin, Base):
     """
     Tabela de perícias disponíveis em D&D 3.5
     Single Responsibility: Armazenar definições de perícias

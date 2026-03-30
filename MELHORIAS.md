@@ -84,95 +84,121 @@
   - Startup guard em `main.py` normaliza dados legados e remove duplicatas antes de criar índice único
   - Migration Alembic adicionada para formalizar as constraints (`c1b7e4d2a9f0_add_data_constraints.py`)
 
-- [ ] **#14 — Potencial N+1 Queries**
-  - Padrões de fetch sem batch em repositórios
-  - `lazy="selectin"` ajuda, mas nem todos os patterns cobertos
+- [x] **#14 — Potencial N+1 Queries**
+  - `PericiaService.obter_custos_pericias()` criado para buscar custo por classe em lote e evitar consulta por item nos endpoints de listagem
+  - `listar_pericias_combatente()` agora usa eager loading de `PericiaJogador.pericia`, evitando N+1 na serialização de perícias do jogador
+  - `api/v1/pericias.py` deixou de recalcular custo com query individual em loops de listagem
 
-- [ ] **#15 — Sem Paginação nas Listas**
-  - `/magias` pode retornar 400+ registros de uma vez
-  - `get_all()` tem params mas sem defaults razoáveis
+- [x] **#15 — Sem Paginação nas Listas**
+  - `/magias`, `/combatentes` e `/usuarios` agora aceitam `skip/limit`, com teto de página e metadados de paginação
+  - `/magias` e `/combatentes` expõem `X-Total-Count`, `X-Skip` e `X-Limit` nos headers sem quebrar o formato atual de resposta
+  - `/usuarios` passou a retornar `total`, `skip` e `limit` corretos no envelope de resposta, sem depender do tamanho da página atual
+  - Frontend de grimório/magias atualizado para usar `limit=500` também no fallback de listagem completa
 
-- [ ] **#16 — Sem Logging de Segurança**
-  - Login falho, acessos negados não logados
-  - Sem audit trail para ações de admin
+- [x] **#16 — Sem Logging de Segurança**
+  - Criado helper central `core/security_audit.py` para logs estruturados de segurança com IP, ator, alvo e motivo
+  - Fluxos de `login`, `refresh`, token ausente/inválido e negações RBAC agora emitem eventos auditáveis
+  - Ações administrativas em `/usuarios` (criar, atualizar, inativar) agora deixam trilha de auditoria em log
 
 - [x] **#17 — CSS Duplicado (pericias_backup.css)**
   - `pericias_backup.css` removido — não era referenciado em nenhum HTML
 
-- [ ] **#18 — Dependency Injection Inconsistente**
-  - `get_combatente_repository(db=None)` aceita None e tenta `next(get_db())`
-  - Deveria usar sempre `Depends(get_db)` do FastAPI
+- [x] **#18 — Dependency Injection Inconsistente**
+  - `core/dependencies.py` deixou de usar `db=None` e `next(get_db())`; factories agora usam `Depends(get_db)` de forma consistente
+  - Rotas de combate, combatentes e condições passaram a receber services por injeção em vez de instanciá-los manualmente
 
-- [ ] **#19 — Sem Limite de Tamanho no Input**
-  - Campos de texto sem `max_length` em algumas rotas/schemas
-  - Sem Content-Length limits no Uvicorn
+- [x] **#19 — Sem Limite de Tamanho no Input**
+  - Criado `RequestSizeLimitMiddleware` com limites distintos para request total e corpo JSON
+  - Schemas e formulários mais expostos (`usuario`, `magia`, `pericia`, `equipamento`, `talento`, `auth`, `combatente`) agora têm `max_length`/limites explícitos
 
-- [ ] **#20 — Startup sem Error Handling**
-  - Se criação de admin falhar, app inicia em estado quebrado silenciosamente
+- [x] **#20 — Startup sem Error Handling**
+  - Startup agora executa etapas com `_executar_passo_startup()` e falha explicitamente com contexto da etapa que quebrou
+  - `seed_condicoes` deixou de engolir exceções e passa a abortar a inicialização quando falha
 
 ---
 
 ## 🟢 BOM TER (Qualidade / UX)
 
-- [ ] **#21 — Sem Soft Delete / Audit Trail**
-  - Dados apagados permanentemente, sem `deleted_at`
+- [x] **#21 — Sem Soft Delete / Audit Trail**
+  - `deleted_at` adicionado para combatentes, perícias, equipamentos e talentos; exclusões principais agora são soft delete
 
-- [ ] **#22 — `.env.example` Faltando**
-  - Novos devs não sabem quais variáveis configurar
+- [x] **#22 — `.env.example` Faltando**
+  - `backend/.env.example` atualizado com todas as variáveis de configuração ativas (projeto, segurança, banco, CORS, upload e rate limit)
 
-- [ ] **#23 — Cobertura de Testes ~15%**
-  - Apenas 2 arquivos de teste, sem testes de auth, upload, integração ou frontend
+- [x] **#23 — Cobertura de Testes ~15%**
+  - Cobertura ampliada com testes de autenticação (`login`, `refresh`, `me`) e upload (`FileService`) em cenários de sucesso e falha
+  - Suíte de backend agora inclui testes de paginação, segurança, soft delete, DI, auth e upload
 
-- [ ] **#24 — Swagger sem Customização**
-  - JWT não documentado no OpenAPI, sem exemplos de request/response
+- [x] **#24 — Swagger sem Customização**
+  - OpenAPI agora documenta `JWTBearer` e exige Bearer token nas rotas protegidas
+  - Endpoints de autenticação ganharam exemplos explícitos de request/response e respostas de erro no Swagger
 
-- [ ] **#25 — Sem Retry/Circuit Breaker no Frontend**
-  - Erro de rede = falha silenciosa
+- [x] **#25 — Sem Retry/Circuit Breaker no Frontend**
+  - `fetch` global agora passa por camada de resiliência com retry exponencial (requisições idempotentes) e circuit breaker para falhas repetidas de rede/5xx
+  - Eventos `api:circuit-open` e `api:circuit-close` expostos para UI reagir a indisponibilidade da API
 
-- [ ] **#26 — Lógica de Tipo Repetida**
-  - `CLASSES_CONJURADORAS`, checks de tipo duplicados em vários controllers
+- [x] **#26 — Lógica de Tipo Repetida**
+  - Regras de tipo/classe centralizadas em `frontend/js/utils/combat-rules.js` e `combat-rules.global.js`
+  - `ArenaController`, `GrimorioController` e `DashboardController` passaram a reutilizar helpers compartilhados em vez de checks duplicados
 
-- [ ] **#27 — Sem Compressão gzip**
-  - Respostas JSON grandes enviadas sem compressão
+- [x] **#27 — Sem Compressão gzip**
+  - `GZipMiddleware` habilitado no backend com `minimum_size` configurável via settings
+  - `.env.example` atualizado com `GZIP_ENABLED` e `GZIP_MINIMUM_SIZE`
 
-- [ ] **#28 — Variáveis Globais Extensivas no Frontend**
-  - `window.AuthService`, `window.Toast` etc poluem namespace global
+- [x] **#28 — Variáveis Globais Extensivas no Frontend**
+  - Ações inline de Dashboard e Arena migradas para namespaces únicos (`window.dashboardActions` e `window.arenaActions`) em vez de múltiplas funções soltas no `window`
+  - Estado de edição no dashboard deixou de usar `window.combatenteEmEdicao`, mantendo estado encapsulado no controller
 
-- [ ] **#29 — Sem Controle de Concorrência no Combate**
-  - Dois usuários podem editar o mesmo combate simultaneamente
+- [x] **#29 — Sem Controle de Concorrência no Combate**
+  - Controle otimista por versão no backend de combate (`versao` no status + validação por cabeçalho `If-Match` em mutações)
+  - API agora retorna `409` para versão desatualizada e `428` quando precondição de versão não é enviada
+  - Frontend legado (`frontend/script.js`) passou a enviar `If-Match` e sincronizar estado automaticamente em caso de conflito
 
-- [ ] **#30 — Admin Recriado a Cada Startup**
-  - Potencial duplicação se check de existência falhar
+- [x] **#30 — Admin Recriado a Cada Startup**
+  - `criar_admin_padrao()` agora normaliza email e faz criação idempotente (rechecagem + fallback em `IntegrityError`)
+  - Em cenário de corrida, se outro processo criar o admin entre o check e o insert, startup continua sem duplicar usuário
 
-- [ ] **#31 — Sem Histórico de Combate**
-  - Resultados não persistidos, sem relatórios ou estatísticas
+- [x] **#31 — Sem Histórico de Combate**
+  - Novo histórico persistido em `combates_historico` com estatísticas consolidadas (rodadas, turnos, vivos/mortos, snapshot final)
+  - Encerramento manual, reset e término por eliminação total agora registram resultado automaticamente
+  - Endpoint `GET /api/v1/combate/historico` adicionado com paginação (`skip/limit`)
 
-- [ ] **#32 — Preparação de Magias sem Validação de Classe**
-  - Pode preparar magias de Clérigo para Mago
+- [x] **#32 — Preparação de Magias sem Validação de Classe**
+  - Endpoint de preparar magia agora valida compatibilidade entre classe do combatente e classe da magia
+  - Normalização de acentos/aliases aplicada (ex.: `Clérigo`/`CLERIGO`, `Feiticeiro` usando lista de `MAGO`)
 
-- [ ] **#33 — URL de Imagem Não Configurável**
-  - Path fixo `/uploads/`, incompatível com CDN
+- [x] **#33 — URL de Imagem Não Configurável**
+  - `FileService` agora gera `foto_url` usando `UPLOADS_BASE_URL` (compatível com CDN) em vez de path fixo
+  - Mantido fallback padrão (`/uploads`) para não quebrar ambiente local existente
 
-- [ ] **#34 — Sem Caching**
-  - Magias, perícias, equipamentos consultados no banco a cada request
+- [x] **#34 — Sem Caching**
+  - Cache em memória com TTL para catálogos de magias, perícias e equipamentos
+  - Invalidação por namespace em escritas de catálogo (perícias/equipamentos)
+  - Chaves de cache consideram filtros/paginação para evitar resposta incorreta
 
-- [ ] **#35 — Migrations sem Backfill**
-  - Colunas novas ficam NULL em registros existentes
+- [x] **#35 — Migrations sem Backfill**
+  - Migration `a35b1f4c9d10_backfill_legacy_nulls` adicionada para preencher nulos legados em colunas novas
+  - Backfill idempotente com checagem de existência de tabela/coluna antes de executar updates
 
-- [ ] **#36 — Uploads Possivelmente no Git**
-  - Verificar `.gitignore` para `backend/uploads/`
+- [x] **#36 — Uploads Possivelmente no Git**
+  - Regras explícitas adicionadas em `.gitignore` para `backend/uploads/` e conteúdo interno
+  - Verificação do índice Git confirma ausência de arquivos de upload rastreados
 
-- [ ] **#37 — Toasts sem Contexto**
-  - "Erro ao buscar slots" sem detalhe de qual magia ou motivo
+- [x] **#37 — Toasts sem Contexto**
+  - Services de slots/preparação agora propagam `HTTP status` + `detail` do backend com contexto (combatente/slot/magia)
+  - Toasts de Arena/Grimório passaram a exibir mensagens acionáveis com nível/magia quando há falha
 
-- [ ] **#38 — Sem Graceful Degradation**
-  - Se um controller falhar, a página inteira quebra
+- [x] **#38 — Sem Graceful Degradation**
+  - Helpers de bootstrap resiliente adicionados para capturar falhas e manter UI em modo degradado
+  - Inicialização protegida em Arena, Dashboard, Ficha, Grimório, Usuários e Perícias com fallback visual/toast
 
-- [ ] **#39 — Estado de Combate em Memória**
-  - Restart do servidor perde combates ativos
+- [x] **#39 — Estado de Combate em Memória**
+  - Fluxo da arena passou a usar endpoints de combate para iniciar/avançar/finalizar/resetar com versão (`If-Match`)
+  - Recuperação automática de combate ativo em carregamento da arena via `GET /combate/status`
 
-- [ ] **#40 — Nomes de Colunas Genéricos**
-  - `nome`, `tipo`, `classe` em várias tabelas dificultam joins
+- [x] **#40 — Nomes de Colunas Genéricos**
+  - Joins críticos migrados para aliases e labels explícitos em repositórios (equipamentos, talentos e condições)
+  - Serviços de listagem passaram a consumir projeções nomeadas, reduzindo ambiguidade sem quebrar schema atual
 
 ---
 

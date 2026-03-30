@@ -5,6 +5,7 @@ Princípio SOLID: SRP - Responsável apenas por upload/delete de arquivos
 import uuid
 import shutil
 from pathlib import Path
+from urllib.parse import urlparse
 from typing import Optional
 from fastapi import UploadFile
 from ..core.config import settings
@@ -30,8 +31,21 @@ class FileService:
     
     def __init__(self):
         self.uploads_dir = settings.UPLOADS_DIR
+        self.uploads_base_url = settings.UPLOADS_BASE_URL
         self.max_file_size = settings.MAX_FILE_SIZE
         self.allowed_extensions = settings.ALLOWED_EXTENSIONS
+
+    def _build_public_url(self, nome_arquivo: str) -> str:
+        base_url = (self.uploads_base_url or "/uploads").strip()
+        if not base_url:
+            base_url = "/uploads"
+        return f"{base_url.rstrip('/')}/{nome_arquivo}"
+
+    @staticmethod
+    def _extract_filename(foto_url: str) -> str:
+        parsed = urlparse(foto_url or "")
+        path = parsed.path or foto_url
+        return Path(path).name
     
     def validar_arquivo(self, file: UploadFile) -> None:
         """
@@ -87,7 +101,7 @@ class FileService:
         with caminho_arquivo.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        return f"/uploads/{nome_arquivo}"
+        return self._build_public_url(nome_arquivo)
     
     def deletar_arquivo(self, foto_url: str) -> bool:
         """
@@ -98,7 +112,9 @@ class FileService:
         
         try:
             # Extrair apenas o nome do arquivo (previne path traversal)
-            nome_arquivo = Path(foto_url).name
+            nome_arquivo = self._extract_filename(foto_url)
+            if not nome_arquivo:
+                return False
             caminho_arquivo = self.uploads_dir / nome_arquivo
 
             # Garantir que o caminho resolvido está DENTRO de uploads_dir

@@ -14,11 +14,11 @@ class UsuarioRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def listar(self, apenas_ativos: bool = False) -> list[Usuario]:
+    def listar(self, apenas_ativos: bool = False, skip: int = 0, limit: int = 50) -> list[Usuario]:
         query = self.db.query(Usuario)
         if apenas_ativos:
             query = query.filter(Usuario.ativo == True)
-        return query.order_by(Usuario.nome).all()
+        return query.order_by(Usuario.nome).offset(skip).limit(limit).all()
 
     def buscar_por_id(self, usuario_id: int) -> Optional[Usuario]:
         return self.db.query(Usuario).filter(Usuario.id == usuario_id).first()
@@ -45,5 +45,8 @@ class UsuarioRepository:
         self.db.refresh(usuario)
         return usuario
 
-    def count(self) -> int:
-        return self.db.query(Usuario).count()
+    def count(self, apenas_ativos: bool = False) -> int:
+        query = self.db.query(Usuario)
+        if apenas_ativos:
+            query = query.filter(Usuario.ativo == True)
+        return query.count()

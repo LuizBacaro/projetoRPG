@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from typing import List
 import logging
 
+from app.core.catalog_cache import catalog_cache, make_cache_key
+from app.core.config import settings
 # ✅ CORRETO: Import do core database
 from app.core.database import get_db
 
@@ -30,6 +32,27 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/pericias", tags=["Perícias"])
 
 
+def _serialize_pericia(pericia, custo_para_classe=None) -> dict:
+    return {
+        "id": pericia.id,
+        "nome": pericia.nome,
+        "descricao": pericia.descricao,
+        "atributo": pericia.atributo,
+        "tipo": pericia.tipo,
+        "requer_treinamento": pericia.requer_treinamento,
+        "especialidade": pericia.especialidade,
+        "pode_usar_sem_treinamento": pericia.pode_usar_sem_treinamento,
+        "sofre_penalidade_armadura": pericia.sofre_penalidade_armadura,
+        "pagina_livro": pericia.pagina_livro,
+        "custo_para_classe": custo_para_classe,
+    }
+
+
+def _invalidar_cache_pericias() -> None:
+    if settings.CACHE_ENABLED:
+        catalog_cache.invalidate_prefix("pericias:")
+
+
 # ========== ENDPOINTS DE PERÍCIAS DISPONÍVEIS ==========
 
 @router.post("/", response_model=PericiaResponse, status_code=status.HTTP_201_CREATED)
@@ -41,7 +64,9 @@ def criar_pericia(
     """Cria uma nova perícia (Admin only)"""
     try:
         service = PericiaService(db)
-        return service.criar_pericia(pericia)
+        pericia_criada = service.criar_pericia(pericia)
+        _invalidar_cache_pericias()
+        return pericia_criada
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -60,6 +85,18 @@ def listar_pericias(
 ):
     """Lista todas as perícias disponíveis com custo baseado em classe"""
     try:
+        cache_key = make_cache_key(
+            "pericias:list",
+            skip=skip,
+            limit=limit,
+            atributo=atributo,
+            classe=classe,
+        )
+        if settings.CACHE_ENABLED:
+            cached = catalog_cache.get(cache_key)
+            if cached is not None:
+                return cached
+
         service = PericiaService(db)
         
         if atributo:
@@ -69,27 +106,23 @@ def listar_pericias(
         
         # Se classe foi especificada, calcula custo para cada perícia
         if classe:
+            custos_por_pericia = service.obter_custos_pericias(
+                [pericia.id for pericia in pericias],
+                classe,
+            )
             pericias_com_custo = []
             for pericia in pericias:
-                custo = service.calcular_custo_pericia(pericia.id, classe)
-                # Criar um dict com os dados da perícia + custo
-                pericia_dict = {
-                    "id": pericia.id,
-                    "nome": pericia.nome,
-                    "descricao": pericia.descricao,
-                    "atributo": pericia.atributo,
-                    "tipo": pericia.tipo,
-                    "requer_treinamento": pericia.requer_treinamento,
-                    "especialidade": pericia.especialidade,
-                    "pode_usar_sem_treinamento": pericia.pode_usar_sem_treinamento,
-                    "sofre_penalidade_armadura": pericia.sofre_penalidade_armadura,
-                    "pagina_livro": pericia.pagina_livro,
-                    "custo_para_classe": custo
-                }
-                pericias_com_custo.append(pericia_dict)
+                pericias_com_custo.append(
+                    _serialize_pericia(pericia, custos_por_pericia.get(pericia.id, 2))
+                )
+            if settings.CACHE_ENABLED:
+                catalog_cache.set(cache_key, pericias_com_custo, settings.CACHE_CATALOG_TTL_SECONDS)
             return pericias_com_custo
-        
-        return pericias
+
+        pericias_serializadas = [_serialize_pericia(pericia) for pericia in pericias]
+        if settings.CACHE_ENABLED:
+            catalog_cache.set(cache_key, pericias_serializadas, settings.CACHE_CATALOG_TTL_SECONDS)
+        return pericias_serializadas
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -106,6 +139,16 @@ def obter_pericia(
 ):
     """Obtém uma perícia por ID com custo baseado em classe se fornecido"""
     try:
+        cache_key = make_cache_key(
+            "pericias:detail",
+            pericia_id=pericia_id,
+            classe=classe,
+        )
+        if settings.CACHE_ENABLED:
+            cached = catalog_cache.get(cache_key)
+            if cached is not None:
+                return cached
+
         service = PericiaService(db)
         pericia = service.obter_pericia(pericia_id)
         
@@ -115,20 +158,15 @@ def obter_pericia(
         # Se classe foi especificada, calcula custo
         if classe:
             custo = service.calcular_custo_pericia(pericia_id, classe)
-            pericia_dict = {
-                "id": pericia.id,
-                "nome": pericia.nome,
-                "descricao": pericia.descricao,
-                "atributo": pericia.atributo,
-                "tipo": pericia.tipo,
-                "requer_treinamento": pericia.requer_treinamento,
-                "especialidade": pericia.especialidade,
-                "pode_usar_sem_treinamento": pericia.pode_usar_sem_treinamento,
-                "sofre_penalidade_armadura": pericia.sofre_penalidade_armadura,
-                "pagina_livro": pericia.pagina_livro,
-                "custo_para_classe": custo
-            }
+            pericia_dict = _serialize_pericia(pericia, custo)
+            if settings.CACHE_ENABLED:
+                catalog_cache.set(cache_key, pericia_dict, settings.CACHE_CATALOG_TTL_SECONDS)
             return pericia_dict
+
+        pericia_dict = _serialize_pericia(pericia)
+        if settings.CACHE_ENABLED:
+            catalog_cache.set(cache_key, pericia_dict, settings.CACHE_CATALOG_TTL_SECONDS)
+        return pericia_dict
     except HTTPException:
         raise
     except Exception as e:
@@ -150,7 +188,8 @@ def atualizar_pericia(
         
         if not pericia_atualizada:
             raise HTTPException(status_code=404, detail="Perícia não encontrada")
-        
+
+        _invalidar_cache_pericias()
         return pericia_atualizada
     except HTTPException:
         raise
@@ -167,16 +206,28 @@ def listar_pericias_classe(
 ):
     """Lista perícias padrão de uma classe com seus custos"""
     try:
+        cache_key = make_cache_key("pericias:classe", classe_nome=classe_nome)
+        if settings.CACHE_ENABLED:
+            cached = catalog_cache.get(cache_key)
+            if cached is not None:
+                return cached
+
         service = PericiaService(db)
         pericias = service.listar_pericias_por_classe(classe_nome)
+        custos_por_pericia = service.obter_custos_pericias(
+            [pericia.id for pericia in pericias],
+            classe_nome,
+        )
         
         # Calcula custo para cada perícia
         pericias_com_custo = []
         for pericia in pericias:
-            custo = service.calcular_custo_pericia(pericia.id, classe_nome)
-            pericia.custo_para_classe = custo
-            pericias_com_custo.append(pericia)
-        
+            pericias_com_custo.append(
+                _serialize_pericia(pericia, custos_por_pericia.get(pericia.id, 2))
+            )
+
+        if settings.CACHE_ENABLED:
+            catalog_cache.set(cache_key, pericias_com_custo, settings.CACHE_CATALOG_TTL_SECONDS)
         return pericias_com_custo
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -194,9 +245,10 @@ def deletar_pericia(
     """Deleta uma perícia (Admin only)"""
     try:
         service = PericiaService(db)
-        
+
         if not service.deletar_pericia(pericia_id):
             raise HTTPException(status_code=404, detail="Perícia não encontrada")
+        _invalidar_cache_pericias()
     except HTTPException:
         raise
     except Exception as e:
@@ -220,7 +272,6 @@ def adicionar_pericia_jogador(
         
         # Se classe foi fornecida, calcula e valida o custo
         if classe:
-            custo_unitario = service.calcular_custo_pericia(pericia.pericia_id, classe)
             custo_total = service.calcular_custo_total_graduacao(
                 pericia.pericia_id, 
                 classe, 

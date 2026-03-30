@@ -23,57 +23,7 @@ if config.config_file_name is not None:
 
 # Importa Base e TODOS os models (com try/except para evitar erros)
 from app.core.database import Base  # noqa: E402
-
-# Importa models que definitivamente existem
-try:
-    from app.models.usuario import Usuario  # noqa: F401
-except ImportError as e:
-    print(f"⚠️ Aviso: Não foi possível importar Usuario: {e}")
-
-try:
-    from app.models.combatente import Combatente  # noqa: F401
-except ImportError as e:
-    print(f"⚠️ Aviso: Não foi possível importar Combatente: {e}")
-
-try:
-    from app.models.magia import Magia  # noqa: F401
-except ImportError as e:
-    print(f"⚠️ Aviso: Não foi possível importar Magia: {e}")
-
-try:
-    from app.models.combate import Combate  # noqa: F401
-except ImportError as e:
-    print(f"⚠️ Aviso: Não foi possível importar Combate: {e}")
-
-try:
-    from app.models.pericia import Pericia  # noqa: F401
-except ImportError as e:
-    print(f"⚠️ Aviso: Não foi possível importar Pericia: {e}")
-
-try:
-    from app.models.condicao import Condicao  # noqa: F401
-except ImportError as e:
-    print(f"⚠️ Aviso: Não foi possível importar Condicao: {e}")
-
-# Importa modelos opcionais
-try:
-    from app.models.combatente_condicao import CombatentCondicao  # noqa: F401
-except (ImportError, AttributeError) as e:
-    print(f"⚠️ Aviso: Não foi possível importar CombatentCondicao: {e}")
-    try:
-        from app.models import combatente_condicao  # noqa: F401
-    except ImportError:
-        pass
-
-try:
-    from app.models.ataque import Ataque  # noqa: F401
-except ImportError:
-    pass
-
-try:
-    from app.models.magia_slot import MagiaSlot  # noqa: F401
-except ImportError:
-    pass
+from app import models as _models  # noqa: F401,E402
 
 # MetaData do Alembic
 target_metadata = Base.metadata

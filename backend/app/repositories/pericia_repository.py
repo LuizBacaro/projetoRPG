@@ -7,11 +7,20 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.pericia import Pericia, PericiaJogador, PericiaClasse
 from app.schemas.pericia import PericiaCreate, PericiaUpdate, PericiaJogadorCreate, PericiaJogadorUpdate
-from app.repositories.base import commit_with_rollback
+from app.repositories.base import apply_not_deleted, commit_with_rollback, soft_delete_entity
 
 
 class PericiaRepository:
     """Operações de banco de dados para perícias"""
+
+    @staticmethod
+    def restaurar_pericia(db: Session, db_pericia: Pericia, pericia: PericiaCreate) -> Pericia:
+        db_pericia.deleted_at = None
+        for key, value in pericia.dict().items():
+            setattr(db_pericia, key, value)
+        commit_with_rollback(db)
+        db.refresh(db_pericia)
+        return db_pericia
 
     @staticmethod
     def criar_pericia(db: Session, pericia: PericiaCreate) -> Pericia:
@@ -25,7 +34,7 @@ class PericiaRepository:
     @staticmethod
     def obter_pericia(db: Session, pericia_id: int) -> Pericia:
         """Obtém uma perícia por ID"""
-        return db.query(Pericia).filter(Pericia.id == pericia_id).first()
+        return apply_not_deleted(db.query(Pericia), Pericia).filter(Pericia.id == pericia_id).first()
 
     @staticmethod
     def obter_pericia_por_nome(db: Session, nome: str) -> Pericia:
@@ -35,28 +44,33 @@ class PericiaRepository:
     @staticmethod
     def listar_pericias(db: Session, skip: int = 0, limit: int = 100) -> list[Pericia]:
         """Lista todas as perícias com paginação"""
-        return db.query(Pericia).offset(skip).limit(limit).all()
+        return apply_not_deleted(db.query(Pericia), Pericia).offset(skip).limit(limit).all()
 
     @staticmethod
     def listar_pericias_por_atributo(db: Session, atributo: str) -> list[Pericia]:
         """Lista perícias filtradas por atributo"""
-        return db.query(Pericia).filter(Pericia.atributo == atributo).all()
+        return apply_not_deleted(db.query(Pericia), Pericia).filter(Pericia.atributo == atributo).all()
 
     @staticmethod
     def listar_pericias_por_tipo(db: Session, tipo: str) -> list[Pericia]:
         """Lista perícias filtradas por tipo"""
-        return db.query(Pericia).filter(Pericia.tipo == tipo).all()
+        return apply_not_deleted(db.query(Pericia), Pericia).filter(Pericia.tipo == tipo).all()
 
     @staticmethod
     def listar_pericias_por_classe(db: Session, classe_nome: str) -> list[Pericia]:
         """Lista perícias padrão de uma classe específica"""
-        return db.query(Pericia).join(
-            PericiaClasse,
-            Pericia.id == PericiaClasse.pericia_id
-        ).filter(
-            PericiaClasse.classe_nome == classe_nome,
-            PericiaClasse.is_default == 1
-        ).all()
+        return (
+            apply_not_deleted(db.query(Pericia), Pericia)
+            .join(
+                PericiaClasse,
+                Pericia.id == PericiaClasse.pericia_id
+            )
+            .filter(
+                PericiaClasse.classe_nome == classe_nome,
+                PericiaClasse.is_default == 1
+            )
+            .all()
+        )
 
     @staticmethod
     def obter_custo_pericia(db: Session, pericia_id: int, classe_nome: str) -> int:
@@ -77,7 +91,7 @@ class PericiaRepository:
     @staticmethod
     def atualizar_pericia(db: Session, pericia_id: int, pericia: PericiaUpdate) -> Pericia:
         """Atualiza uma perícia"""
-        db_pericia = db.query(Pericia).filter(Pericia.id == pericia_id).first()
+        db_pericia = apply_not_deleted(db.query(Pericia), Pericia).filter(Pericia.id == pericia_id).first()
         if db_pericia:
             for key, value in pericia.dict(exclude_unset=True).items():
                 setattr(db_pericia, key, value)
@@ -88,11 +102,9 @@ class PericiaRepository:
     @staticmethod
     def deletar_pericia(db: Session, pericia_id: int) -> bool:
         """Deleta uma perícia"""
-        db_pericia = db.query(Pericia).filter(Pericia.id == pericia_id).first()
+        db_pericia = apply_not_deleted(db.query(Pericia), Pericia).filter(Pericia.id == pericia_id).first()
         if db_pericia:
-            db.delete(db_pericia)
-            commit_with_rollback(db)
-            return True
+            return soft_delete_entity(db, db_pericia)
         return False
 
 

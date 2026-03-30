@@ -4,6 +4,7 @@ SRP: Inicializar banco de dados e seed de dados padrão
 SOLID: Single Responsibility — responsável APENAS por inicialização
 """
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from ..core.config import settings  # ✅ MUDADO: relativa em vez de absoluta
 from ..models.usuario import Usuario, PerfilUsuario
 from .security import hash_senha
@@ -23,7 +24,7 @@ def inicializar_equipamentos(db: Session) -> None:
     from datetime import datetime
     
     # Verificar se já existem equipamentos
-    count = db.query(Equipamento).count()
+    count = db.query(Equipamento).filter(Equipamento.deleted_at.is_(None)).count()
     if count > 0:
         logger.info(f"✅ Equipamentos já existem ({count}). Pulando seed.")
         return
@@ -128,37 +129,49 @@ def criar_admin_padrao(db: Session) -> None:
 
     repo = UsuarioRepository(db)
 
+    admin_email = (settings.ADMIN_EMAIL or "").strip().lower()
+    admin_password = (settings.ADMIN_PASSWORD or "").strip()
+    admin_username = (settings.ADMIN_USERNAME or "Administrador").strip() or "Administrador"
+
     # Se credenciais não configuradas, pular criação
-    if not settings.ADMIN_EMAIL or not settings.ADMIN_PASSWORD:
+    if not admin_email or not admin_password:
         logger.info("ℹ️  Credenciais de admin não configuradas no .env — pulando criação")
         return
 
     # ✅ Verifica se admin já existe
-    admin_existe = repo.buscar_por_email(settings.ADMIN_EMAIL)
+    admin_existe = repo.buscar_por_email(admin_email)
     if admin_existe:
-        logger.info(f"✅ Admin já cadastrado: {settings.ADMIN_EMAIL}")
+        logger.info(f"✅ Admin já cadastrado: {admin_email}")
         return
 
     # ✅ Cria novo admin
     admin = Usuario(
         perfil=PerfilUsuario.ADMINISTRADOR,
-        nome=settings.ADMIN_USERNAME,
-        email=settings.ADMIN_EMAIL,
-        senha_hash=hash_senha(settings.ADMIN_PASSWORD),
+        nome=admin_username,
+        email=admin_email,
+        senha_hash=hash_senha(admin_password),
         ativo=True,
         usuario_responsavel="sistema",
     )
 
-    repo.criar(admin)
+    try:
+        repo.criar(admin)
+    except IntegrityError:
+        # Idempotência em cenários de corrida: outro processo criou o admin no intervalo.
+        admin_existe = repo.buscar_por_email(admin_email)
+        if admin_existe:
+            logger.info(f"✅ Admin já cadastrado por outra transação: {admin_email}")
+            return
+        raise
 
     # ✅ Log seguro — NÃO exibir a senha
     logger.warning(
-        f"⚠️  ADMIN CRIADO — Email: {settings.ADMIN_EMAIL} "
+        f"⚠️  ADMIN CRIADO — Email: {admin_email} "
         f"— ALTERE A SENHA IMEDIATAMENTE via painel de usuários"
     )
     print(
         f"✅ Admin criado com sucesso!\n"
-        f"   📧 Email: {settings.ADMIN_EMAIL}\n"
+        f"   📧 Email: {admin_email}\n"
         f"   ⚠️  ALTERE A SENHA IMEDIATAMENTE após primeiro acesso\n"
         f"   📍 Acesse: /pages/usuarios.html"
     )
@@ -175,7 +188,7 @@ def inicializar_talentos(db: Session) -> None:
     from datetime import datetime
     
     # Verificar se já existem talentos
-    count = db.query(Talento).count()
+    count = db.query(Talento).filter(Talento.deleted_at.is_(None)).count()
     if count > 0:
         logger.info(f"✅ Talentos já existem ({count}). Pulando seed.")
         return

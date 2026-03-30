@@ -6,6 +6,11 @@
 import { PericiaController } from '../controllers/PericiaController.js';
 import { apiConfig } from '../config/api.config.js';
 import { NotificationService } from '../services/NotificationService.js';
+import {
+    installGlobalErrorGuards,
+    safeBootstrap,
+    safeBootstrapAsync,
+} from '../utils/graceful-degradation.js';
 
 console.log('🎮 Carregando página de perícias...');
 
@@ -15,16 +20,28 @@ if (!token) {
     window.location.href = 'login.html';
 }
 
-const controller = new PericiaController(apiConfig);
+let controller = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        await controller.inicializar();
-        setupEventListeners(controller);
-    } catch (error) {
-        console.error('❌ Erro:', error);
-        NotificationService.mostrarErro(error.message);
+    installGlobalErrorGuards('pericias-page');
+    controller = safeBootstrap(
+        'pericias-controller',
+        () => new PericiaController(apiConfig),
+        'Falha ao iniciar modulo de pericias. Recarregue a pagina.'
+    );
+    if (!controller) return;
+
+    const initialized = await safeBootstrapAsync(
+        'pericias-inicializacao',
+        () => controller.inicializar(),
+        'Nao foi possivel carregar dados de pericias para este combatente.'
+    );
+    if (!initialized) {
+        NotificationService.mostrarErro('Nao foi possivel carregar as pericias agora.');
+        return;
     }
+
+    setupEventListeners(controller);
 });
 
 function setupEventListeners(controller) {

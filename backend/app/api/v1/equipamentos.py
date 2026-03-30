@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from typing import List
 import logging
 
+from app.core.catalog_cache import catalog_cache, make_cache_key
+from app.core.config import settings
 # ✅ CORRETO: Import do core database
 from app.core.database import get_db
 
@@ -29,6 +31,22 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/equipamentos", tags=["Equipamentos"])
 
 
+def _serialize_equipamento(equipamento) -> dict:
+    return {
+        "id": equipamento.id,
+        "nome": equipamento.nome,
+        "descricao": equipamento.descricao,
+        "pagina_referencia": equipamento.pagina_referencia,
+        "ativo": equipamento.ativo,
+        "criado_em": equipamento.criado_em,
+    }
+
+
+def _invalidar_cache_equipamentos() -> None:
+    if settings.CACHE_ENABLED:
+        catalog_cache.invalidate_prefix("equipamentos:")
+
+
 # ========== ENDPOINTS DE EQUIPAMENTOS DISPONÍVEIS ==========
 
 @router.post("/", response_model=EquipamentoResponse, status_code=status.HTTP_201_CREATED)
@@ -40,7 +58,9 @@ def criar_equipamento(
     """Cria um novo equipamento (Admin only)"""
     try:
         service = EquipamentoService(db)
-        return service.criar_equipamento(equipamento)
+        equipamento_criado = service.criar_equipamento(equipamento)
+        _invalidar_cache_equipamentos()
+        return equipamento_criado
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -57,8 +77,17 @@ def listar_equipamentos(
 ):
     """Lista todos os equipamentos disponíveis"""
     try:
+        cache_key = make_cache_key("equipamentos:list", skip=skip, limit=limit)
+        if settings.CACHE_ENABLED:
+            cached = catalog_cache.get(cache_key)
+            if cached is not None:
+                return cached
+
         service = EquipamentoService(db)
-        return service.listar_todos_equipamentos(skip, limit)
+        equipamentos = [_serialize_equipamento(eq) for eq in service.listar_todos_equipamentos(skip, limit)]
+        if settings.CACHE_ENABLED:
+            catalog_cache.set(cache_key, equipamentos, settings.CACHE_CATALOG_TTL_SECONDS)
+        return equipamentos
     except Exception as e:
         logger.error(f"Erro ao listar equipamentos: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -72,13 +101,22 @@ def obter_equipamento(
 ):
     """Obtém um equipamento específico"""
     try:
+        cache_key = make_cache_key("equipamentos:detail", equipamento_id=equipamento_id)
+        if settings.CACHE_ENABLED:
+            cached = catalog_cache.get(cache_key)
+            if cached is not None:
+                return cached
+
         service = EquipamentoService(db)
         equipamento = service.obter_equipamento(equipamento_id)
         
         if not equipamento:
             raise HTTPException(status_code=404, detail="Equipamento não encontrado")
         
-        return equipamento
+        equipamento_data = _serialize_equipamento(equipamento)
+        if settings.CACHE_ENABLED:
+            catalog_cache.set(cache_key, equipamento_data, settings.CACHE_CATALOG_TTL_SECONDS)
+        return equipamento_data
     except HTTPException:
         raise
     except Exception as e:

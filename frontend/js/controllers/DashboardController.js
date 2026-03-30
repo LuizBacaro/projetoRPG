@@ -24,7 +24,19 @@ class DashboardController {
         this.ataqueService      = new AtaqueService();
         this.filtroAtual        = 'todos';
         this.combatenteEmEdicao = null;
+        this.actions            = {};
         this.perfil             = AuthService.getPerfil();
+        this.rules              = window.CombatRules || {
+            isTipoRestritoParaMestre: (tipo) => tipo === 'monstro' || tipo === 'npc',
+            tipoPermitidoParaPerfil: (tipo, isMestre) => {
+                if (isMestre) return tipo || null;
+                if (!tipo || tipo === 'monstro' || tipo === 'npc') return 'jogador';
+                return tipo;
+            },
+            countByTipo: (combatentes, tipo) => (combatentes || []).filter(c => c.tipo === tipo).length,
+            isTipoJogador: (tipo) => tipo === 'jogador',
+            isTipoMonstro: (tipo) => tipo === 'monstro',
+        };
 
         this._registrarGlobais();
         this._inicializar();
@@ -37,15 +49,15 @@ class DashboardController {
 
     _registrarGlobais() {
         const self = this;
-        
-        window.fecharModalCadastro        = () => self._fecharModal('modalCadastroJogador');
-        window.fecharModalCadastroMonstro = () => self._fecharModal('modalCadastroMonstro');
-        window.fecharModalCadastroNPC     = () => self._fecharModal('modalCadastroNPC');
-        window.fecharSeletorTipo          = () => self._fecharModal('seletorTipo');
-        window.fecharModalEdicao          = () => self._fecharModal('modalEdicaoDashboard');
 
-        window.abrirModalCadastro = (tipo) => {
-            if (!self._isMestre() && (tipo === 'monstro' || tipo === 'npc')) {
+        this.actions.fecharModalCadastro = () => self._fecharModal('modalCadastroJogador');
+        this.actions.fecharModalCadastroMonstro = () => self._fecharModal('modalCadastroMonstro');
+        this.actions.fecharModalCadastroNPC = () => self._fecharModal('modalCadastroNPC');
+        this.actions.fecharSeletorTipo = () => self._fecharModal('seletorTipo');
+        this.actions.fecharModalEdicao = () => self._fecharModal('modalEdicaoDashboard');
+
+        this.actions.abrirModalCadastro = (tipo) => {
+            if (!self._isMestre() && self.rules.isTipoRestritoParaMestre(tipo)) {
                 Toast.error('Acesso restrito: apenas Mestre pode cadastrar monstros e NPCs.');
                 return;
             }
@@ -54,16 +66,19 @@ class DashboardController {
             self._abrirModal(mapa[tipo]);
         };
 
-        window.confirmarDelecao     = () => self._deletarCombatente();
-        window.atualizarModificador = (input) => self._calcularModificador(input);
-        window.previewImagemUpload  = (input, previewId, imgId, placeholderId) => self._previewImagem(input, previewId, imgId, placeholderId);
-        window.removerImagem        = () => self._removerImagem('', false);
-        window.removerImagemMonstro = () => self._removerImagem('Monstro', false);
-        window.removerImagemNPC     = () => self._removerImagem('NPC', false);
-        window.removerImagemEdicao  = () => self._removerImagem('', true);
-        window.adicionarLinhaAtaque = () => self._adicionarLinhaAtaque();
-        window.removerLinhaAtaque   = (btn) => btn.closest('.ataque-linha').remove();
-        window.abrirPaginaPericias  = () => self._abrirPaginaPericias();
+        this.actions.confirmarDelecao = () => self._deletarCombatente();
+        this.actions.atualizarModificador = (input) => self._calcularModificador(input);
+        this.actions.previewImagemUpload = (input, previewId, imgId, placeholderId) => self._previewImagem(input, previewId, imgId, placeholderId);
+        this.actions.removerImagem = () => self._removerImagem('', false);
+        this.actions.removerImagemMonstro = () => self._removerImagem('Monstro', false);
+        this.actions.removerImagemNPC = () => self._removerImagem('NPC', false);
+        this.actions.removerImagemEdicao = () => self._removerImagem('', true);
+        this.actions.adicionarLinhaAtaque = () => self._adicionarLinhaAtaque();
+        this.actions.removerLinhaAtaque = (btn) => btn.closest('.ataque-linha').remove();
+        this.actions.abrirPaginaPericias = () => self._abrirPaginaPericias();
+
+        // Um único namespace global para ações inline do dashboard.
+        window.dashboardActions = this.actions;
     }
 
     _inicializar() {
@@ -121,7 +136,7 @@ class DashboardController {
         const self = this;
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                if (!self._isMestre() && (btn.dataset.tipo === 'monstro' || btn.dataset.tipo === 'npc')) return;
+                if (!self._isMestre() && self.rules.isTipoRestritoParaMestre(btn.dataset.tipo)) return;
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 self.filtroAtual = btn.dataset.tipo;
@@ -218,8 +233,7 @@ class DashboardController {
     async carregarCombatentes() {
         try {
             let tipo = this.filtroAtual === 'todos' ? null : this.filtroAtual;
-            if (!this._isMestre() && (tipo === 'monstro' || tipo === 'npc')) tipo = 'jogador';
-            if (!this._isMestre() && tipo === null) tipo = 'jogador';
+            tipo = this.rules.tipoPermitidoParaPerfil(tipo, this._isMestre());
 
             const combatentes = await this.service.listar(tipo);
             this._renderizarTabela(combatentes);
@@ -294,22 +308,21 @@ class DashboardController {
         const npcEl = document.getElementById('totalNPCs');
         
         if (totalEl) totalEl.textContent = combatentes.length;
-        if (jogEl) jogEl.textContent = combatentes.filter(c => c.tipo === 'jogador').length;
-        if (monEl) monEl.textContent = combatentes.filter(c => c.tipo === 'monstro').length;
-        if (npcEl) npcEl.textContent = combatentes.filter(c => c.tipo === 'npc').length;
+        if (jogEl) jogEl.textContent = this.rules.countByTipo(combatentes, 'jogador');
+        if (monEl) monEl.textContent = this.rules.countByTipo(combatentes, 'monstro');
+        if (npcEl) npcEl.textContent = this.rules.countByTipo(combatentes, 'npc');
     }
 
     async _abrirEdicao(id) {
         try {
             const c = await this.service.obterPorId(id);
 
-            if (!this._isMestre() && (c.tipo === 'monstro' || c.tipo === 'npc')) {
+            if (!this._isMestre() && this.rules.isTipoRestritoParaMestre(c.tipo)) {
                 Toast.error('Acesso restrito: você não pode editar monstros ou NPCs.');
                 return;
             }
 
             this.combatenteEmEdicao = c;
-            window.combatenteEmEdicao = c;
 
             // Preencher campos
             document.getElementById('dashEditId').value = c.id;
@@ -343,8 +356,8 @@ class DashboardController {
 
             const secPagRef = document.getElementById('secaoPaginaReferencia');
             const inputPagRef = document.getElementById('dashEditPaginaReferencia');
-            if (secPagRef) secPagRef.style.display = c.tipo === 'monstro' ? 'block' : 'none';
-            if (inputPagRef) inputPagRef.value = c.tipo === 'monstro' ? (c.pagina_referencia || '') : '';
+            if (secPagRef) secPagRef.style.display = this.rules.isTipoMonstro(c.tipo) ? 'block' : 'none';
+            if (inputPagRef) inputPagRef.value = this.rules.isTipoMonstro(c.tipo) ? (c.pagina_referencia || '') : '';
 
             const placeholder = document.getElementById('dashEditUploadPlaceholder');
             const preview = document.getElementById('dashEditUploadPreview');
@@ -360,8 +373,8 @@ class DashboardController {
 
             const secAtaques = document.getElementById('secaoAtaquesEdicao');
             if (secAtaques) {
-                secAtaques.style.display = c.tipo === 'jogador' ? 'block' : 'none';
-                if (c.tipo === 'jogador') this._renderizarAtaquesEdicao(c.ataques || []);
+                secAtaques.style.display = this.rules.isTipoJogador(c.tipo) ? 'block' : 'none';
+                if (this.rules.isTipoJogador(c.tipo)) this._renderizarAtaquesEdicao(c.ataques || []);
             }
 
             this._abrirModal('modalEdicaoDashboard');
@@ -465,7 +478,7 @@ class DashboardController {
             <input type="text" class="ataque-bonus" placeholder="+0" value="${ataque?.bonus_ataque || '+0'}" style="width:70px" />
             <input type="text" class="ataque-dano" placeholder="1d6" value="${ataque?.dano || ''}" style="width:90px" />
             <input type="text" class="ataque-tipo" placeholder="tipo" value="${ataque?.tipo_dano || ''}" style="width:120px" />
-            <button type="button" class="btn-dash-delete" onclick="removerLinhaAtaque(this)">✕</button>
+            <button type="button" class="btn-dash-delete" onclick="window.dashboardActions.removerLinhaAtaque(this)">✕</button>
         `;
         lista.appendChild(div);
     }
@@ -488,9 +501,9 @@ class DashboardController {
     }
 
     async _salvarPericiasEdicao(combatenteId) {
-        if (window.combatenteEmEdicao?.pericias) {
+        if (this.combatenteEmEdicao?.pericias) {
             try {
-                sessionStorage.setItem('periciasEdit', JSON.stringify(window.combatenteEmEdicao.pericias));
+                sessionStorage.setItem('periciasEdit', JSON.stringify(this.combatenteEmEdicao.pericias));
                 sessionStorage.setItem('combatenteEditId', combatenteId);
             } catch (err) {
                 console.error('Erro ao salvar perícias:', err);
@@ -509,7 +522,7 @@ class DashboardController {
                 combatente_id: this.combatenteEmEdicao.id,
                 nome: document.getElementById('dashEditNome')?.value || this.combatenteEmEdicao.nome,
                 tipo: document.getElementById('dashEditTipo')?.value || this.combatenteEmEdicao.tipo,
-                pericias: JSON.stringify(window.combatenteEmEdicao?.pericias || [])
+                pericias: JSON.stringify(this.combatenteEmEdicao?.pericias || [])
             });
 
             window.location.href = `/pages/pericias.html?${params.toString()}`;
@@ -631,11 +644,33 @@ class CombatenteServiceGlobal {
     }
 }
 
+function _exibirFallbackDashboard(mensagem) {
+    if (typeof Toast !== 'undefined' && Toast && typeof Toast.error === 'function') {
+        Toast.error(mensagem);
+        return;
+    }
+
+    const id = 'dashboard-degraded-banner';
+    if (document.getElementById(id)) return;
+    const banner = document.createElement('div');
+    banner.id = id;
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;padding:10px 14px;font-size:14px;';
+    banner.textContent = mensagem;
+    document.body.appendChild(banner);
+}
+
+function _inicializarDashboardComResiliencia() {
+    try {
+        window._dashboardController = new DashboardController();
+    } catch (error) {
+        console.error('❌ Falha no bootstrap do DashboardController:', error);
+        _exibirFallbackDashboard('Falha ao iniciar dashboard. Tente recarregar a pagina.');
+    }
+}
+
 // Inicializar após DOM pronto
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        new DashboardController();
-    });
+    document.addEventListener('DOMContentLoaded', _inicializarDashboardComResiliencia);
 } else {
-    new DashboardController();
+    _inicializarDashboardComResiliencia();
 }

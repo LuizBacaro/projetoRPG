@@ -3,7 +3,7 @@ auth.py
 SRP: Rotas de autenticação — login, logout, refresh token
 SOLID: Dependency Injection via deps.py
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
 from datetime import timedelta
@@ -11,13 +11,13 @@ from typing import Optional
 import logging
 
 from ...core.config import settings
-from ...core.database import SessionLocal
 from ...core.security import (
     hash_senha,
     verificar_senha,
     criar_token,
     decodificar_token,
 )
+from ...core.security_audit import log_security_event
 from ...core.deps import get_db, get_usuario_atual
 from ...repositories.usuario_repository import UsuarioRepository
 from ...models.usuario import Usuario
@@ -34,8 +34,8 @@ router = APIRouter(
 
 class LoginRequest(BaseModel):
     """Schema para requisição de login"""
-    email: EmailStr = Field(..., description="Email do usuário")
-    senha: str = Field(..., min_length=6, description="Senha do usuário")
+    email: EmailStr = Field(..., max_length=150, description="Email do usuário")
+    senha: str = Field(..., min_length=6, max_length=128, description="Senha do usuário")
 
     class Config:
         json_schema_extra = {
@@ -69,7 +69,7 @@ class TokenResponse(BaseModel):
 
 class RefreshRequest(BaseModel):
     """Schema para renovação de sessão via refresh token."""
-    refresh_token: str = Field(..., description="Refresh token JWT válido")
+    refresh_token: str = Field(..., min_length=1, max_length=4096, description="Refresh token JWT válido")
 
 
 class UsuarioResponse(BaseModel):
@@ -91,9 +91,33 @@ class UsuarioResponse(BaseModel):
     response_model=TokenResponse,
     status_code=status.HTTP_200_OK,
     summary="Autenticação de usuário",
-    description="Realiza login e retorna JWT token para autenticação"
+    description="Realiza login e retorna access token e refresh token JWT.",
+    responses={
+        200: {
+            "description": "Login efetuado com sucesso",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "access_token": "<jwt_access_token>",
+                        "refresh_token": "<jwt_refresh_token>",
+                        "token_type": "bearer",
+                        "usuario": {
+                            "id": 1,
+                            "email": "admin@arena-rpg.com.br",
+                            "nome": "Administrador",
+                            "perfil": "administrador",
+                            "ativo": True,
+                        },
+                    }
+                }
+            },
+        },
+        401: {"description": "Email/senha inválidos"},
+        403: {"description": "Usuário inativo"},
+    },
 )
 def login(
+    request: Request,
     credentials: LoginRequest,
     db: Session = Depends(get_db)
 ) -> TokenResponse:
@@ -143,6 +167,14 @@ def login(
     # ✅ Busca usuário por email
     usuario = repo.buscar_por_email(credentials.email)
     if not usuario:
+        log_security_event(
+            "login",
+            "failure",
+            request=request,
+            user_email=credentials.email,
+            reason="user_not_found",
+            level=logging.WARNING,
+        )
         logger.warning(f"❌ Login falhou — email não encontrado: {credentials.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -152,6 +184,14 @@ def login(
 
     # ✅ Verifica senha
     if not verificar_senha(credentials.senha, usuario.senha_hash):
+        log_security_event(
+            "login",
+            "failure",
+            request=request,
+            user_email=credentials.email,
+            reason="bad_password",
+            level=logging.WARNING,
+        )
         logger.warning(f"❌ Login falhou — senha incorreta: {credentials.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -161,6 +201,14 @@ def login(
 
     # ✅ Valida se usuário está ativo
     if not usuario.ativo:
+        log_security_event(
+            "login",
+            "blocked",
+            request=request,
+            user_email=credentials.email,
+            reason="inactive_user",
+            level=logging.WARNING,
+        )
         logger.warning(f"⚠️  Login bloqueado — usuário inativo: {credentials.email}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -183,6 +231,7 @@ def login(
     )
 
     logger.info(f"✅ Login bem-sucedido: {usuario.email}")
+    log_security_event("login", "success", request=request, user_email=usuario.email)
 
     # ✅ Retorna token + dados do usuário
     return TokenResponse(
@@ -205,7 +254,7 @@ def login(
     summary="Logout do usuário",
     description="Invalida a sessão do usuário"
 )
-def logout():
+def logout(request: Request):
     """
     Endpoint de logout.
 
@@ -216,6 +265,7 @@ def logout():
         Mensagem de confirmação
     """
     logger.info("✅ Logout realizado")
+    log_security_event("logout", "success", request=request)
     return {
         "message": "Logout realizado com sucesso. Remova o token do cliente.",
         "status": "success"
@@ -227,15 +277,47 @@ def logout():
     response_model=TokenResponse,
     status_code=status.HTTP_200_OK,
     summary="Renovar tokens de autenticação",
-    description="Gera novo access token e novo refresh token (token rotation)"
+    description="Gera novo access token e novo refresh token (token rotation).",
+    responses={
+        200: {
+            "description": "Tokens renovados com sucesso",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "access_token": "<novo_jwt_access_token>",
+                        "refresh_token": "<novo_jwt_refresh_token>",
+                        "token_type": "bearer",
+                        "usuario": {
+                            "id": 1,
+                            "email": "admin@arena-rpg.com.br",
+                            "nome": "Administrador",
+                            "perfil": "administrador",
+                            "ativo": True,
+                        },
+                    }
+                }
+            },
+        },
+        401: {"description": "Refresh token inválido/expirado"},
+        403: {"description": "Usuário inativo"},
+        404: {"description": "Usuário não encontrado"},
+    },
 )
 def refresh(
+    request: Request,
     payload: RefreshRequest,
     db: Session = Depends(get_db),
 ) -> TokenResponse:
     """Renova a sessão a partir de um refresh token válido."""
     token_payload = decodificar_token(payload.refresh_token, settings.SECRET_KEY)
     if token_payload is None or token_payload.get("type") != "refresh":
+        log_security_event(
+            "refresh",
+            "failure",
+            request=request,
+            reason="invalid_refresh_token",
+            level=logging.WARNING,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token inválido ou expirado",
@@ -244,6 +326,13 @@ def refresh(
 
     email = token_payload.get("sub")
     if not email:
+        log_security_event(
+            "refresh",
+            "failure",
+            request=request,
+            reason="missing_subject",
+            level=logging.WARNING,
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token sem usuário",
@@ -254,12 +343,28 @@ def refresh(
     usuario = repo.buscar_por_email(email)
 
     if not usuario:
+        log_security_event(
+            "refresh",
+            "failure",
+            request=request,
+            user_email=email,
+            reason="user_not_found",
+            level=logging.WARNING,
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuário não encontrado",
         )
 
     if not usuario.ativo:
+        log_security_event(
+            "refresh",
+            "blocked",
+            request=request,
+            user_email=email,
+            reason="inactive_user",
+            level=logging.WARNING,
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Usuário inativo",
@@ -279,6 +384,7 @@ def refresh(
     )
 
     logger.info(f"✅ Token renovado com sucesso: {usuario.email}")
+    log_security_event("refresh", "success", request=request, user_email=usuario.email)
 
     return TokenResponse(
         access_token=novo_access_token,
@@ -298,7 +404,26 @@ def refresh(
     "/me",
     response_model=UsuarioResponse,
     summary="Dados do usuário autenticado",
-    description="Retorna os dados do usuário atualmente autenticado"
+    description="Retorna os dados do usuário atualmente autenticado (requer Bearer JWT).",
+    responses={
+        200: {
+            "description": "Usuário autenticado",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "id": 1,
+                        "email": "admin@arena-rpg.com.br",
+                        "nome": "Administrador",
+                        "perfil": "administrador",
+                        "ativo": True,
+                    }
+                }
+            },
+        },
+        401: {"description": "Token ausente/inválido/expirado"},
+        403: {"description": "Usuário inativo"},
+        404: {"description": "Usuário não encontrado"},
+    },
 )
 def obter_usuario_atual(
     usuario: Usuario = Depends(get_usuario_atual)

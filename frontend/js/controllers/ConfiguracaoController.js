@@ -14,7 +14,19 @@ export class ConfiguracaoController {
         this.combatenteService       = new CombatenteService();
         this.combatentesSelecionados = [];
         this.filtroAtual             = 'todos';
+        this.token                   = localStorage.getItem('token');
         this.inicializar();
+    }
+
+    _authHeaders(includeJson = false) {
+        const headers = {};
+        if (includeJson) {
+            headers['Content-Type'] = 'application/json';
+        }
+        if (this.token) {
+            headers['Authorization'] = `Bearer ${this.token}`;
+        }
+        return headers;
     }
 
     // ── Init ──────────────────────────────────────────────────────────────
@@ -174,22 +186,32 @@ export class ConfiguracaoController {
         try {
             console.log('🎯 Iniciando combate com IDs:', this.combatentesSelecionados);
 
-            const combatentesCompletos = await Promise.all(
-                this.combatentesSelecionados.map(id => this.combatenteService.obterPorId(id))
-            );
+            const response = await fetch(getApiUrl('/combate/iniciar'), {
+                method: 'POST',
+                headers: this._authHeaders(true),
+                body: JSON.stringify({ combatente_ids: this.combatentesSelecionados }),
+            });
 
-            if (!combatentesCompletos.length) throw new Error('Erro ao carregar dados');
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.detail || `Erro ao iniciar combate (HTTP ${response.status})`);
+            }
+
+            const statusCombate = await response.json();
+            if (!statusCombate?.ativo) {
+                throw new Error('API não retornou um combate ativo após iniciar.');
+            }
 
             document.getElementById('telaConfiguracao').classList.remove('ativa');
             document.getElementById('telaArena').classList.add('ativa');
 
             document.dispatchEvent(new CustomEvent('iniciarCombate', {
-                detail: { combatentes: combatentesCompletos }
+                detail: { status: statusCombate }
             }));
 
-            Toast.success(`Combate iniciado com ${combatentesCompletos.length} combatentes! ⚔️`);
+            Toast.success(`Combate iniciado com ${statusCombate.combatentes_ids.length} combatentes! ⚔️`);
         } catch (error) {
-            Toast.error('Erro ao iniciar combate');
+            Toast.error(error.message || 'Erro ao iniciar combate');
             console.error(error);
         }
     }

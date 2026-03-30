@@ -25,16 +25,33 @@ class CombatenteService:
 
     # ── CRUD ─────────────────────────────────────────────
 
-    def listar_todos(self, tipo: Optional[str] = None, usuario=None) -> List[Combatente]:
+    def listar_todos(
+        self,
+        tipo: Optional[str] = None,
+        usuario=None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Combatente]:
         """Lista todos os combatentes, opcionalmente filtrando por tipo."""
         if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
             if tipo:
-                return self.repository.get_by_owner_and_tipo(usuario.id, tipo)
-            return self.repository.get_by_owner(usuario.id)
+                return self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
+            return self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
 
         if tipo:
-            return self.repository.get_by_tipo(tipo)
-        return self.repository.get_all()
+            return self.repository.get_by_tipo(tipo, skip=skip, limit=limit)
+        return self.repository.get_all(skip=skip, limit=limit)
+
+    def contar_todos(self, tipo: Optional[str] = None, usuario=None) -> int:
+        """Conta combatentes respeitando escopo do usuário e filtro por tipo."""
+        if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
+            if tipo:
+                return self.repository.count_by_owner_and_tipo(usuario.id, tipo)
+            return self.repository.count_by_owner(usuario.id)
+
+        if tipo:
+            return self.repository.count_by_tipo(tipo)
+        return self.repository.count_all()
 
     def obter_por_id(self, combatente_id: int) -> Combatente:
         """
@@ -92,10 +109,8 @@ class CombatenteService:
         return self.obter_por_id(atualizado.id)
 
     def deletar(self, combatente_id: int) -> bool:
-        """Deleta combatente e sua foto se existir."""
+        """Arquiva combatente via soft delete."""
         combatente = self.obter_por_id(combatente_id)
-        if combatente.foto_url:
-            self.file_service.deletar_arquivo(combatente.foto_url)
         return self.repository.delete(combatente)
 
     # ── HP / Iniciativa ───────────────────────────────────

@@ -404,13 +404,28 @@ function renderizarCombate(data) {
 
 async function aplicarDano(combatenteId, dano) {
     try {
+        if (!combateAtivo?.versao) {
+            await atualizarStatusCombate();
+        }
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (combateAtivo?.versao) {
+            headers['If-Match'] = combateAtivo.versao;
+        }
+
         const response = await fetch(`${API_URL}/combate/aplicar-dano`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({ combatente_id: combatenteId, dano: dano })
         });
-        
-        if (!response.ok) throw new Error('Erro ao aplicar dano');
+
+        if (!response.ok) {
+            if (response.status === 409 || response.status === 428) {
+                await atualizarStatusCombate();
+                throw new Error('O combate foi atualizado por outro usuário. Estado sincronizado, tente novamente.');
+            }
+            throw new Error('Erro ao aplicar dano');
+        }
         
         await atualizarStatusCombate();
         mostrarMensagem(`-${dano} HP aplicado!`, 'info');
@@ -422,11 +437,27 @@ async function aplicarDano(combatenteId, dano) {
 
 async function avancarTurno() {
     try {
+        if (!combateAtivo?.versao) {
+            await atualizarStatusCombate();
+        }
+
+        const headers = {};
+        if (combateAtivo?.versao) {
+            headers['If-Match'] = combateAtivo.versao;
+        }
+
         const response = await fetch(`${API_URL}/combate/avancar-turno`, {
-            method: 'POST'
+            method: 'POST',
+            headers
         });
-        
-        if (!response.ok) throw new Error('Erro ao avançar turno');
+
+        if (!response.ok) {
+            if (response.status === 409 || response.status === 428) {
+                await atualizarStatusCombate();
+                throw new Error('Outro usuário já avançou o turno. Estado sincronizado.');
+            }
+            throw new Error('Erro ao avançar turno');
+        }
         
         await atualizarStatusCombate();
         mostrarMensagem('Turno avançado!', 'success');
@@ -440,11 +471,27 @@ async function finalizarCombate() {
     if (!confirm('Deseja finalizar o combate?')) return;
     
     try {
+        if (!combateAtivo?.versao) {
+            await atualizarStatusCombate();
+        }
+
+        const headers = {};
+        if (combateAtivo?.versao) {
+            headers['If-Match'] = combateAtivo.versao;
+        }
+
         const response = await fetch(`${API_URL}/combate/finalizar`, {
-            method: 'POST'
+            method: 'POST',
+            headers
         });
-        
-        if (!response.ok) throw new Error('Erro ao finalizar combate');
+
+        if (!response.ok) {
+            if (response.status === 409 || response.status === 428) {
+                await atualizarStatusCombate();
+                throw new Error('Conflito ao finalizar: o estado do combate mudou.');
+            }
+            throw new Error('Erro ao finalizar combate');
+        }
         
         combateAtivo = null;
         mostrarMensagem('Combate finalizado!', 'success');

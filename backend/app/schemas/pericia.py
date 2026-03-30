@@ -28,11 +28,11 @@ class TipoPericiaEnum(str, Enum):
 class PericiaBase(BaseModel):
     """Schema base de perícia"""
     nome: str = Field(..., min_length=1, max_length=100)
-    descricao: Optional[str] = None
+    descricao: Optional[str] = Field(default=None, max_length=500)
     atributo: AtributoEnum
     tipo: TipoPericiaEnum = TipoPericiaEnum.COMUM
     requer_treinamento: int = Field(default=0, ge=0, le=1)
-    especialidade: Optional[str] = None
+    especialidade: Optional[str] = Field(default=None, max_length=100)
     pode_usar_sem_treinamento: int = Field(default=1, ge=0, le=1)
     sofre_penalidade_armadura: int = Field(default=0, ge=0, le=1)
     pagina_livro: Optional[int] = None
@@ -45,12 +45,12 @@ class PericiaCreate(PericiaBase):
 
 class PericiaUpdate(BaseModel):
     """Schema para atualização de perícia"""
-    nome: Optional[str] = None
-    descricao: Optional[str] = None
+    nome: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    descricao: Optional[str] = Field(default=None, max_length=500)
     atributo: Optional[AtributoEnum] = None
     tipo: Optional[TipoPericiaEnum] = None
     requer_treinamento: Optional[int] = None
-    especialidade: Optional[str] = None
+    especialidade: Optional[str] = Field(default=None, max_length=100)
     pode_usar_sem_treinamento: Optional[int] = None
     sofre_penalidade_armadura: Optional[int] = None
     pagina_livro: Optional[int] = None

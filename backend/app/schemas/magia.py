@@ -4,27 +4,27 @@ SRP: Schemas Pydantic para serialização de Magias
 SOLID: Single Responsibility — apenas validação/serialização
 """
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
 
 class MagiaBase(BaseModel):
     """Schema base com campos comuns"""
-    nome:               str
+    nome:               str = Field(..., min_length=1, max_length=100)
     nivel:              int
-    classe:             str
-    escola:             Optional[str] = None
-    sub_escola:         Optional[str] = None
-    componentes:        Optional[str] = None
-    alcance:            Optional[str] = None
-    area_efeito:        Optional[str] = None
-    duracao:            Optional[str] = None
-    tempo_conjuracao:   Optional[str] = None
-    dano:               Optional[str] = None
-    teste_resistencia:  Optional[str] = None
+    classe:             str = Field(..., min_length=1, max_length=50)
+    escola:             Optional[str] = Field(default=None, max_length=50)
+    sub_escola:         Optional[str] = Field(default=None, max_length=50)
+    componentes:        Optional[str] = Field(default=None, max_length=20)
+    alcance:            Optional[str] = Field(default=None, max_length=50)
+    area_efeito:        Optional[str] = Field(default=None, max_length=100)
+    duracao:            Optional[str] = Field(default=None, max_length=100)
+    tempo_conjuracao:   Optional[str] = Field(default=None, max_length=50)
+    dano:               Optional[str] = Field(default=None, max_length=50)
+    teste_resistencia:  Optional[str] = Field(default=None, max_length=50)
     resistencia_magica: bool = False
-    descricao:          Optional[str] = None
+    descricao:          Optional[str] = Field(default=None, max_length=1000)
     ativo:              bool = True
 
 
@@ -41,7 +41,7 @@ class MagiaResponse(MagiaBase):
 
 class MagiaFiltro(BaseModel):
     """Schema para filtros de busca de magias"""
-    classe: Optional[str] = None
+    classe: Optional[str] = Field(default=None, max_length=50)
     nivel:  Optional[int] = None
-    escola: Optional[str] = None
-    nome:   Optional[str] = None
+    escola: Optional[str] = Field(default=None, max_length=50)
+    nome:   Optional[str] = Field(default=None, max_length=100)

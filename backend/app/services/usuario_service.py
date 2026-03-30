@@ -27,8 +27,11 @@ class UsuarioService:
 
     # ── CRUD ──────────────────────────────────────────────────────────────────
 
-    def listar(self, apenas_ativos: bool = False) -> list[Usuario]:
-        return self.repo.listar(apenas_ativos=apenas_ativos)
+    def listar(self, apenas_ativos: bool = False, skip: int = 0, limit: int = 50) -> list[Usuario]:
+        return self.repo.listar(apenas_ativos=apenas_ativos, skip=skip, limit=limit)
+
+    def contar(self, apenas_ativos: bool = False) -> int:
+        return self.repo.count(apenas_ativos=apenas_ativos)
 
     def buscar_por_id(self, usuario_id: int) -> Usuario:
         usuario = self.repo.buscar_por_id(usuario_id)

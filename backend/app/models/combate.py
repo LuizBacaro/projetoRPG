@@ -1,7 +1,9 @@
 """
 Model do Combate (Entity)
 """
-from sqlalchemy import Column, Integer, Boolean, JSON
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, Boolean, JSON, DateTime, String
 from typing import List
 from ..core.database import Base
 
@@ -52,3 +54,32 @@ class Combate(Base):
     def obter_total_combatentes(self) -> int:
         """Retorna o total de combatentes no combate"""
         return len(self.combatentes_ids) if self.combatentes_ids else 0
+
+
+class CombateHistorico(Base):
+    """Entidade que representa o resultado de um combate finalizado."""
+
+    __tablename__ = "combates_historico"
+
+    id = Column(Integer, primary_key=True, index=True)
+    combate_id = Column(Integer, nullable=True, index=True)
+    combatentes_ids = Column(JSON, nullable=False)
+
+    total_combatentes = Column(Integer, nullable=False, default=0)
+    total_vivos = Column(Integer, nullable=False, default=0)
+    total_rodadas = Column(Integer, nullable=False, default=0)
+    total_turnos = Column(Integer, nullable=False, default=0)
+
+    vencedor_id = Column(Integer, nullable=True)
+    vencedor_nome = Column(String(120), nullable=True)
+    vencedor_tipo = Column(String(20), nullable=True)
+
+    motivo_encerramento = Column(String(40), nullable=False, default="manual")
+    estatisticas = Column(JSON, nullable=False, default=dict)
+    finalizado_em = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+    def __repr__(self):
+        return (
+            f"<CombateHistorico(id={self.id}, combate_id={self.combate_id}, "
+            f"motivo='{self.motivo_encerramento}')>"
+        )

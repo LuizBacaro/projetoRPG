@@ -5,9 +5,10 @@ SRP: representa a tabela combatentes + relacionamentos
 from sqlalchemy import Column, Integer, String, CheckConstraint
 from sqlalchemy.orm import relationship
 from ..core.database import Base
+from .mixins import SoftDeleteMixin
 
 
-class Combatente(Base):
+class Combatente(SoftDeleteMixin, Base):
     __tablename__  = "combatentes"
     __table_args__ = (
         CheckConstraint("hp_atual >= 0", name="ck_combatentes_hp_atual_non_negative"),

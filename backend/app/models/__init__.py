@@ -9,6 +9,7 @@ from .equipamento import Equipamento, EquipamentoJogador
 from .talento import Talento, TalentoJogador
 from .combatente import Combatente
 from .usuario import Usuario
+from .combate import CombateHistorico
 
 __all__ = [
     "Pericia",
@@ -26,4 +27,5 @@ __all__ = [
     "TalentoJogador",
     "Combatente",
     "Usuario",
+    "CombateHistorico",
 ]

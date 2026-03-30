@@ -4,16 +4,16 @@ SRP: Schemas Pydantic para serialização de Equipamentos
 SOLID: Single Responsibility — apenas validação/serialização
 """
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 
 
 class EquipamentoBase(BaseModel):
     """Schema base com campos comuns"""
-    nome: str
-    descricao: Optional[str] = None
-    pagina_referencia: Optional[str] = None
+    nome: str = Field(..., min_length=1, max_length=100)
+    descricao: Optional[str] = Field(default=None, max_length=500)
+    pagina_referencia: Optional[str] = Field(default=None, max_length=50)
     ativo: bool = True
 
 
@@ -34,7 +34,7 @@ class EquipamentoResponse(EquipamentoBase):
 class EquipamentoJogadorBase(BaseModel):
     """Schema base para equipamento do jogador"""
     equipamento_id: int
-    quantidade: int = 1
+    quantidade: int = Field(default=1, ge=1, le=999)
 
 
 class EquipamentoJogadorCreate(EquipamentoJogadorBase):
@@ -56,9 +56,9 @@ class EquipamentoJogadorResponse(EquipamentoJogadorBase):
 class EquipamentoJogadorListResponse(BaseModel):
     """Schema para listagem de equipamentos do jogador"""
     id: int
-    nome: str
-    descricao: Optional[str] = None
-    pagina_referencia: Optional[str] = None
+    nome: str = Field(..., max_length=100)
+    descricao: Optional[str] = Field(default=None, max_length=500)
+    pagina_referencia: Optional[str] = Field(default=None, max_length=50)
     quantidade: int
 
     class Config:

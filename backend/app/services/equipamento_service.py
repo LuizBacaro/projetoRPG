@@ -30,7 +30,8 @@ class EquipamentoService:
         ).first()
         
         if equipamento_existente:
-            # Se já existe, apenas retorna o existente
+            if equipamento_existente.deleted_at is not None:
+                return EquipamentoRepository.restaurar_equipamento(self.db, equipamento_existente, equipamento)
             return equipamento_existente
         
         return EquipamentoRepository.criar_equipamento(self.db, equipamento)
@@ -45,7 +46,7 @@ class EquipamentoService:
 
     def atualizar_equipamento(self, equipamento_id: int, equipamento_data: dict) -> Optional[Equipamento]:
         """Atualiza um equipamento"""
-        db_equipamento = self.db.query(Equipamento).filter(Equipamento.id == equipamento_id).first()
+        db_equipamento = EquipamentoRepository.obter_equipamento(self.db, equipamento_id)
         
         if not db_equipamento:
             return None
@@ -70,7 +71,7 @@ class EquipamentoService:
             raise ValueError(f"Combatente {combatente_id} não encontrado")
         
         # Verificar se equipamento existe
-        equipamento = self.db.query(Equipamento).filter(Equipamento.id == equipamento_jogador.equipamento_id).first()
+        equipamento = EquipamentoRepository.obter_equipamento(self.db, equipamento_jogador.equipamento_id)
         if not equipamento:
             raise ValueError(f"Equipamento {equipamento_jogador.equipamento_id} não encontrado")
         
@@ -89,21 +90,20 @@ class EquipamentoService:
 
     def obter_equipamentos_jogador(self, combatente_id: int) -> List[EquipamentoJogadorListResponse]:
         """Obtém todos os equipamentos de um combatente com detalhes"""
-        equipamentos_jogador = EquipamentoJogadorRepository.obter_equipamentos_jogador(
+        equipamentos_jogador = EquipamentoJogadorRepository.obter_equipamentos_jogador_detalhado(
             self.db, combatente_id
         )
-        
-        resposta = []
-        for eq in equipamentos_jogador:
-            resposta.append(EquipamentoJogadorListResponse(
-                id=eq.equipamento.id,
-                nome=eq.equipamento.nome,
-                descricao=eq.equipamento.descricao,
-                pagina_referencia=eq.equipamento.pagina_referencia,
-                quantidade=eq.quantidade
-            ))
-        
-        return resposta
+
+        return [
+            EquipamentoJogadorListResponse(
+                id=eq["equipamento_id"],
+                nome=eq["equipamento_nome"],
+                descricao=eq["equipamento_descricao"],
+                pagina_referencia=eq["equipamento_pagina_referencia"],
+                quantidade=eq["jogador_quantidade"],
+            )
+            for eq in equipamentos_jogador
+        ]
 
     def remover_equipamento_jogador(self, combatente_id: int, equipamento_id: int) -> bool:
         """Remove um equipamento do combatente"""

@@ -2,6 +2,9 @@
 api/v1/magias_preparadas.py
 SRP: Endpoints para magias preparadas e usadas por conjurador
 """
+import re
+import unicodedata
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -9,6 +12,7 @@ from typing import List
 from app.core.database import get_db
 from app.core.deps import requer_dono_ou_admin_combatente
 from app.models.ataque import MagiaPreparada, MagiaSlot
+from app.models.combatente import Combatente
 from app.models.magia import Magia
 from app.schemas.ataque import (
     MagiaPreparadaResponse,
@@ -17,6 +21,25 @@ from app.schemas.ataque import (
 )
 
 router = APIRouter(prefix="/magias-preparadas", tags=["Magias Preparadas"])
+
+
+def _normalizar_classe(valor: str) -> str:
+    if not valor:
+        return ""
+    normalizado = unicodedata.normalize("NFD", str(valor))
+    normalizado = "".join(ch for ch in normalizado if unicodedata.category(ch) != "Mn")
+    normalizado = normalizado.strip().upper()
+
+    aliases = {
+        "FEITICEIRO": "MAGO",
+        "PATRULHEIRO": "RANGER",
+    }
+    return aliases.get(normalizado, normalizado)
+
+
+def _classes_magia(valor: str) -> set:
+    partes = [p.strip() for p in re.split(r"[,/;|]", valor or "") if p.strip()]
+    return {_normalizar_classe(parte) for parte in partes}
 
 
 def _enriquecer(mp: MagiaPreparada) -> dict:
@@ -52,12 +75,29 @@ def preparar_magia(
 ):
     """
     Marca uma magia como preparada.
-    Validações: magia existe + sem duplicata.
+    Validações: magia existe + sem duplicata + classe compatível.
     Quantidade de slots é validada no frontend (tabela D&D 3.5).
     """
+    combatente = db.query(Combatente).filter(Combatente.id == combatente_id).first()
+    if not combatente:
+        raise HTTPException(status_code=404, detail="Combatente não encontrado")
+
     magia = db.query(Magia).filter(Magia.id == payload.magia_id).first()
     if not magia:
         raise HTTPException(status_code=404, detail="Magia não encontrada")
+
+    classe_combatente = _normalizar_classe(combatente.classe)
+    classes_permitidas = _classes_magia(magia.classe)
+
+    if classe_combatente not in classes_permitidas:
+        classes_legiveis = ", ".join(sorted(classes_permitidas)) or "N/A"
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Classe incompatível para preparação: {combatente.classe}. "
+                f"Esta magia pertence a: {classes_legiveis}"
+            ),
+        )
 
     ja_preparada = (
         db.query(MagiaPreparada)

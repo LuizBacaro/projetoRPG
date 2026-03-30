@@ -4,14 +4,25 @@ Single Responsibility: Operações de banco de dados
 """
 
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import aliased
 from sqlalchemy import func, and_
 from app.models.equipamento import Equipamento, EquipamentoJogador
 from app.schemas.equipamento import EquipamentoCreate, EquipamentoJogadorCreate
-from app.repositories.base import commit_with_rollback
+from app.repositories.base import apply_not_deleted, commit_with_rollback, soft_delete_entity
 
 
 class EquipamentoRepository:
     """Operações de banco de dados para equipamentos"""
+
+    @staticmethod
+    def restaurar_equipamento(db: Session, db_equipamento: Equipamento, equipamento: EquipamentoCreate) -> Equipamento:
+        db_equipamento.deleted_at = None
+        db_equipamento.ativo = True
+        for key, value in equipamento.dict().items():
+            setattr(db_equipamento, key, value)
+        commit_with_rollback(db)
+        db.refresh(db_equipamento)
+        return db_equipamento
 
     @staticmethod
     def criar_equipamento(db: Session, equipamento: EquipamentoCreate) -> Equipamento:
@@ -25,7 +36,7 @@ class EquipamentoRepository:
     @staticmethod
     def obter_equipamento(db: Session, equipamento_id: int) -> Equipamento:
         """Obtém um equipamento por ID"""
-        return db.query(Equipamento).filter(Equipamento.id == equipamento_id).first()
+        return apply_not_deleted(db.query(Equipamento), Equipamento).filter(Equipamento.id == equipamento_id).first()
 
     @staticmethod
     def obter_equipamento_por_nome(db: Session, nome: str) -> Equipamento:
@@ -35,12 +46,18 @@ class EquipamentoRepository:
     @staticmethod
     def listar_equipamentos(db: Session, skip: int = 0, limit: int = 100) -> list[Equipamento]:
         """Lista todos os equipamentos com paginação"""
-        return db.query(Equipamento).filter(Equipamento.ativo == True).offset(skip).limit(limit).all()
+        return (
+            apply_not_deleted(db.query(Equipamento), Equipamento)
+            .filter(Equipamento.ativo == True)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     @staticmethod
     def atualizar_equipamento(db: Session, equipamento_id: int, equipamento_data: dict) -> Equipamento:
         """Atualiza um equipamento"""
-        db_equipamento = db.query(Equipamento).filter(Equipamento.id == equipamento_id).first()
+        db_equipamento = apply_not_deleted(db.query(Equipamento), Equipamento).filter(Equipamento.id == equipamento_id).first()
         if db_equipamento:
             for key, value in equipamento_data.items():
                 if value is not None:
@@ -52,11 +69,9 @@ class EquipamentoRepository:
     @staticmethod
     def deletar_equipamento(db: Session, equipamento_id: int) -> bool:
         """Deleta um equipamento"""
-        db_equipamento = db.query(Equipamento).filter(Equipamento.id == equipamento_id).first()
+        db_equipamento = apply_not_deleted(db.query(Equipamento), Equipamento).filter(Equipamento.id == equipamento_id).first()
         if db_equipamento:
-            db.delete(db_equipamento)
-            commit_with_rollback(db)
-            return True
+            return soft_delete_entity(db, db_equipamento)
         return False
 
 
@@ -98,6 +113,31 @@ class EquipamentoJogadorRepository:
         return db.query(EquipamentoJogador).filter(
             EquipamentoJogador.combatente_id == combatente_id
         ).all()
+
+    @staticmethod
+    def obter_equipamentos_jogador_detalhado(db: Session, combatente_id: int) -> list[dict]:
+        """Obtém equipamentos do jogador com aliases explícitos para evitar ambiguidade em joins."""
+        eq_jogador = aliased(EquipamentoJogador, name="eq_jogador")
+        eq_catalogo = aliased(Equipamento, name="eq_catalogo")
+
+        rows = (
+            db.query(
+                eq_jogador.equipamento_id.label("equipamento_id"),
+                eq_jogador.quantidade.label("jogador_quantidade"),
+                eq_catalogo.nome.label("equipamento_nome"),
+                eq_catalogo.descricao.label("equipamento_descricao"),
+                eq_catalogo.pagina_referencia.label("equipamento_pagina_referencia"),
+            )
+            .join(eq_catalogo, eq_catalogo.id == eq_jogador.equipamento_id)
+            .filter(
+                eq_jogador.combatente_id == combatente_id,
+                eq_catalogo.deleted_at.is_(None),
+            )
+            .order_by(eq_catalogo.nome.asc())
+            .all()
+        )
+
+        return [dict(row._mapping) for row in rows]
 
     @staticmethod
     def remover_equipamento(db: Session, combatente_id: int, equipamento_id: int) -> bool:

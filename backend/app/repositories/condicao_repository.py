@@ -5,6 +5,7 @@ SRP - Apenas lógica de persistência
 """
 from typing import List, Dict, Optional  # ✅ Adicionar Optional
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import aliased
 from .base import commit_with_rollback
 
 from ..models.condicao import Condicao
@@ -53,20 +54,32 @@ class CondicaoRepository:
 
     def get_condicoes_do_combatente(self, combatente_id: int) -> list:
         """Retorna condições ativas com duração"""
-        resultado = []
-        registros = self.db.query(CombatenteCondicao, Condicao).join(
-            Condicao, CombatenteCondicao.condicao_id == Condicao.id
-        ).filter(CombatenteCondicao.combatente_id == combatente_id).all()
+        cc_alias = aliased(CombatenteCondicao, name="cc")
+        cond_alias = aliased(Condicao, name="cond")
 
-        for cc, c in registros:
-            resultado.append({
-                'id': cc.id,
-                'condicao_id': cc.condicao_id,
-                'nome': c.nome,
-                'efeito': c.efeito,
-                'duracao_turnos': cc.duracao_turnos,  # ✅ Certifique-se que está aqui!
-            })
-        return resultado
+        registros = (
+            self.db.query(
+                cc_alias.id.label("relacao_id"),
+                cc_alias.condicao_id.label("condicao_id"),
+                cc_alias.duracao_turnos.label("duracao_turnos"),
+                cond_alias.nome.label("condicao_nome"),
+                cond_alias.efeito.label("condicao_efeito"),
+            )
+            .join(cond_alias, cc_alias.condicao_id == cond_alias.id)
+            .filter(cc_alias.combatente_id == combatente_id)
+            .all()
+        )
+
+        return [
+            {
+                'id': row.relacao_id,
+                'condicao_id': row.condicao_id,
+                'nome': row.condicao_nome,
+                'efeito': row.condicao_efeito,
+                'duracao_turnos': row.duracao_turnos,
+            }
+            for row in registros
+        ]
 
     def aplicar(self, combatente_id: int, condicao_id: int, duracao_turnos: int = -1) -> None:
         """

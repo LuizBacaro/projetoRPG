@@ -4,6 +4,8 @@ import { MagiaSlotService      } from '../services/MagiaSlotService.js';
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js';
 import { Toast } from '/js/ui/toast.module.js';
 import { escapeHtml } from '../utils/formatters.js';
+import { isClasseConjuradora, isTipoJogador, isTipoMonstro } from '../utils/combat-rules.js';
+import { getApiUrl } from '../config/api.config.js';
 
 export class ArenaController {
 
@@ -20,24 +22,102 @@ export class ArenaController {
         this._cronometroInterval   = null;
         this._cronometroAtivo      = false;
         this._jaAgiram             = [];
+        this._actions              = null;
         this._canal                = new BroadcastChannel('magias-rpg');
+        this.token                 = localStorage.getItem('token');
+        this.combateId             = null;
+        this.versaoCombate         = null;
         this._inicializar();
     }
 
     _inicializar() {
         this.condicaoController.init();
         this._configurarEventos();
+        this._restaurarCombateAtivo();
     }
 
     _configurarEventos() {
         var self = this;
-        document.addEventListener('iniciarCombate', function(e) {
+        document.addEventListener('iniciarCombate', async function(e) {
+            if (e.detail && e.detail.status) {
+                await self._aplicarStatusCombate(e.detail.status);
+                return;
+            }
+
             if (e.detail && e.detail.combatentes) {
                 self.iniciarCombate(e.detail.combatentes);
             } else {
                 Toast.error('Erro: Dados de combatentes invalidos');
             }
         });
+    }
+
+    _headers(includeJson = false, includeVersion = false) {
+        const headers = {};
+        if (includeJson) {
+            headers['Content-Type'] = 'application/json';
+        }
+        if (this.token) {
+            headers['Authorization'] = `Bearer ${this.token}`;
+        }
+        if (includeVersion && this.versaoCombate) {
+            headers['If-Match'] = this.versaoCombate;
+        }
+        return headers;
+    }
+
+    _ordenarCombatentesPorStatus(combatentes, idsOrdenados) {
+        if (!Array.isArray(combatentes) || !Array.isArray(idsOrdenados)) {
+            return combatentes || [];
+        }
+        const mapa = new Map((combatentes || []).map(c => [c.id, c]));
+        return idsOrdenados.map(id => mapa.get(id)).filter(Boolean);
+    }
+
+    async _aplicarStatusCombate(status) {
+        if (!status || !status.ativo) {
+            return;
+        }
+
+        this.combateId = status.id || null;
+        this.versaoCombate = status.versao || null;
+        this.combatentes = this._ordenarCombatentesPorStatus(status.combatentes || [], status.combatentes_ids || []);
+        this.turnoAtual = Number(status.turno_atual || 0);
+        this.rodadaAtual = Number(status.rodada_atual || 1);
+        this._jaAgiram = [];
+
+        await this._carregarMagiasPreparadasTodos();
+
+        const telaArena = document.getElementById('telaArena');
+        const telaConfiguracao = document.getElementById('telaConfiguracao');
+        if (telaConfiguracao) telaConfiguracao.classList.remove('ativa');
+        if (telaArena) telaArena.classList.add('ativa');
+
+        this._resetarCronometro();
+        this._iniciarCronometro();
+        this.atualizarRodada();
+        this.renderizarOrdemIniciativa();
+        this.renderizarCombatenteAtivo();
+    }
+
+    async _restaurarCombateAtivo() {
+        try {
+            const response = await fetch(getApiUrl('/combate/status'), {
+                headers: this._headers(false, false),
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const status = await response.json();
+            if (status?.ativo) {
+                await this._aplicarStatusCombate(status);
+                Toast.info('Combate ativo restaurado apos recarregar a pagina.');
+            }
+        } catch (error) {
+            console.warn('⚠️ Nao foi possivel restaurar combate ativo:', error?.message || error);
+        }
     }
 
     async iniciarCombate(combatentes) {
@@ -62,15 +142,9 @@ export class ArenaController {
     }
 
     async _carregarMagiasPreparadasTodos() {
-        const CLASSES_CONJURADORAS = new Set([
-            'mago','feiticeiro','clérigo','clerigo','druida',
-            'bardo','paladino','ranger',
-            'Mago','Feiticeiro','Clérigo','Clerigo','Druida',
-            'Bardo','Paladino','Ranger',
-        ]);
         const promessas = this.combatentes
             .filter(c => {
-                var isConj = CLASSES_CONJURADORAS.has(c.classe) ||
+                var isConj = isClasseConjuradora(c.classe) ||
                     (c.magias_slots && c.magias_slots.some(s => s.total > 0));
                 if (isConj) c._isConjurador = true;
                 return isConj;
@@ -275,7 +349,9 @@ export class ArenaController {
             this._atualizarUISlot(nivel, slot);
             Toast.success('NIV ' + nivel + ': ' + (slot.total - novoUsados) + '/' + slot.total + ' disponiveis');
         } catch (err) {
-            Toast.error('Erro ao atualizar magia: ' + (err.message || ''));
+            Toast.error(
+                err.message || ('Erro ao atualizar slots de magia no nível ' + nivel + ' para ' + (combatente.nome || 'combatente atual'))
+            );
         }
     }
 
@@ -309,7 +385,8 @@ export class ArenaController {
                 : '↩️ ' + (magiaPrep.magia_nome || 'Magia') + ' restaurada'
             );
         } catch (err) {
-            Toast.error('Erro ao lançar magia: ' + (err.message || ''));
+            var nomeMagia = magiaPrep.magia_nome || ('magia #' + magiaId);
+            Toast.error(err.message || ('Erro ao lançar ' + nomeMagia + ' no nível ' + nivel));
         }
     }
 
@@ -477,7 +554,7 @@ export class ArenaController {
             ? this._renderizarMagiasPreparadas(c._magiasGrupos || {}, c.id)
             : '';
 
-        var refBadge = (c.tipo === 'monstro' && c.pagina_referencia)
+        var refBadge = (isTipoMonstro(c.tipo) && c.pagina_referencia)
             ? ' <span class="arena-badge-referencia" title="Referência do livro">📖 '
             + c.pagina_referencia + '</span>'
             : '';
@@ -503,12 +580,12 @@ export class ArenaController {
             + '" id="cronometroDisplay">' + tempoAtual + '</span>';
         html += '<button id="btnToggleCronometro" class="btn-cronometro '
             + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar')
-            + '" onclick="window._toggleCronometro()">'
+            + '" onclick="window.arenaActions.toggleCronometro()">'
             + (cronAtivo ? '⏸' : '▶') + '</button>';
         html += '<button class="btn-cronometro btn-cronometro-reset"'
-            + ' onclick="window._resetarCronometro()">↺</button>';
+            + ' onclick="window.arenaActions.resetarCronometro()">↺</button>';
         html += '</div>';
-        html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">'
+        html += '<button class="btn-toggle-stats" onclick="window.arenaActions.toggleStats()">'
             + olhoTxt + '</button>';
         html += '</div></div>';
 
@@ -568,7 +645,7 @@ export class ArenaController {
         html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:'
             + hpPct + '%;background:' + hpCor + ';"></div></div>';
         html += '</div>';
-        html += '<button class="arena-btn-proximo" onclick="window._avancarTurno()">'
+        html += '<button class="arena-btn-proximo" onclick="window.arenaActions.avancarTurno()">'
             + 'Encerrar turno</button>';
         html += '</div>';  // fim coluna-direita
         html += '</div>';  // fim layout-principal
@@ -576,24 +653,42 @@ export class ArenaController {
 
         container.innerHTML = html;
 
-        var self = this;
-        window._abrirDanoCura     = function() {
-            if (typeof modalDanoCuraInstance !== 'undefined') modalDanoCuraInstance.abrir(self.combatentes);
-        };
-        window._abrirCondicao     = function() {
-            if (typeof modalCondicaoInstance !== 'undefined') modalCondicaoInstance.abrir();
-            else console.error('modalCondicaoInstance nao inicializado');
-        };
-        window._toggleStats       = function() { self.toggleVisibilidadeStats(); };
-        window._avancarTurno      = function() { self.avancarTurno(); };
-        window._finalizarCombate  = function() { self.finalizarCombate(); };
-        window._toggleCronometro  = function() { self.toggleCronometro(); };
-        window._resetarCronometro = function() {
-            self._resetarCronometro(); self._iniciarCronometro();
-        };
+        this._registrarAcoesGlobais();
 
         this._configurarEventosMagias(container);
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
+    }
+
+    _registrarAcoesGlobais() {
+        if (this._actions) {
+            return;
+        }
+
+        var self = this;
+        this._actions = {
+            abrirDanoCura: function() {
+                if (typeof modalDanoCuraInstance !== 'undefined') {
+                    modalDanoCuraInstance.abrir(self.combatentes);
+                }
+            },
+            abrirCondicao: function() {
+                if (typeof modalCondicaoInstance !== 'undefined') {
+                    modalCondicaoInstance.abrir();
+                } else {
+                    console.error('modalCondicaoInstance nao inicializado');
+                }
+            },
+            toggleStats: function() { self.toggleVisibilidadeStats(); },
+            avancarTurno: function() { self.avancarTurno(); },
+            finalizarCombate: function() { self.finalizarCombate(); },
+            toggleCronometro: function() { self.toggleCronometro(); },
+            resetarCronometro: function() {
+                self._resetarCronometro();
+                self._iniciarCronometro();
+            }
+        };
+
+        window.arenaActions = this._actions;
     }
 
     // ✅ REFATORADO: avancarTurno() com decremento de duração
@@ -609,12 +704,37 @@ export class ArenaController {
         if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
             await this._decrementarDuracaoCondicoes(idAtual); 
         }
-        
+
+        if (this.combateId) {
+            try {
+                const rodadaAnterior = this.rodadaAtual;
+                const response = await fetch(getApiUrl('/combate/avancar-turno'), {
+                    method: 'POST',
+                    headers: this._headers(false, true),
+                });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.detail || `Erro ao avançar turno (HTTP ${response.status})`);
+                }
+
+                const status = await response.json();
+                await this._aplicarStatusCombate(status);
+                if (this.rodadaAtual > rodadaAnterior) {
+                    Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
+                }
+                return;
+            } catch (error) {
+                Toast.error(error.message || 'Erro ao avançar turno');
+                return;
+            }
+        }
+
         this.turnoAtual++;
         if (this.turnoAtual >= this.combatentes.length) {
-            this.turnoAtual  = 0;
+            this.turnoAtual = 0;
             this.rodadaAtual++;
-            this._jaAgiram   = [];
+            this._jaAgiram = [];
             this.atualizarRodada();
             Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
         }
@@ -719,7 +839,7 @@ export class ArenaController {
     }
 
     _renderizarMagias(slots, tipo) {
-        var isJogador = (tipo === 'jogador');
+        var isJogador = isTipoJogador(tipo);
         var self      = this;
         var html      = '<div class="arena-secao">';
         html += '<h3 class="arena-secao-titulo">Controle de Magias</h3>';
@@ -819,13 +939,32 @@ export class ArenaController {
             icone: '🏳️', titulo: 'Encerrar Combate',
             texto: 'Deseja finalizar o combate e voltar para a configuração?',
             textoCancelar: '← Continuar Combate', textoConfirmar: 'Encerrar ✓',
-            onConfirmar: function() {
+            onConfirmar: async function() {
+                if (self.combateId) {
+                    try {
+                        const response = await fetch(getApiUrl('/combate/finalizar'), {
+                            method: 'POST',
+                            headers: self._headers(false, true),
+                        });
+
+                        if (!response.ok) {
+                            const err = await response.json().catch(() => ({}));
+                            throw new Error(err.detail || `Erro ao finalizar combate (HTTP ${response.status})`);
+                        }
+                    } catch (error) {
+                        Toast.error(error.message || 'Erro ao finalizar combate');
+                        return;
+                    }
+                }
+
                 self._pararCronometro();
                 try { self._canal.close(); } catch(e) {}
                 var telaArena        = document.getElementById('telaArena');
                 var telaConfiguracao = document.getElementById('telaConfiguracao');
                 if (telaArena)        telaArena.classList.remove('ativa');
                 if (telaConfiguracao) telaConfiguracao.classList.add('ativa');
+                self.combateId = null;
+                self.versaoCombate = null;
                 Toast.success('Combate finalizado!');
             }
         });
@@ -837,15 +976,34 @@ export class ArenaController {
             icone: '🔄', titulo: 'Resetar Combate',
             texto: 'Deseja resetar o combate? Todos voltarão ao HP máximo.',
             textoCancelar: '← Cancelar', textoConfirmar: 'Resetar ✓',
-            onConfirmar: function() {
-                self.combatentes.forEach(function(c) {
-                    c.hp_atual = c.hp_maximo;
-                    self.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
-                });
+            onConfirmar: async function() {
+                if (self.combateId) {
+                    try {
+                        const response = await fetch(getApiUrl('/combate/resetar'), {
+                            method: 'POST',
+                            headers: self._headers(false, false),
+                        });
+                        if (!response.ok) {
+                            const err = await response.json().catch(() => ({}));
+                            throw new Error(err.detail || `Erro ao resetar combate (HTTP ${response.status})`);
+                        }
+                    } catch (error) {
+                        Toast.error(error.message || 'Erro ao resetar combate');
+                        return;
+                    }
+                } else {
+                    self.combatentes.forEach(function(c) {
+                        c.hp_atual = c.hp_maximo;
+                        self.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
+                    });
+                }
+
                 self.turnoAtual    = 0;
                 self.rodadaAtual   = 1;
                 self.statsVisiveis = false;
                 self._jaAgiram     = [];
+                self.combateId     = null;
+                self.versaoCombate = null;
                 self._resetarCronometro();
                 self._iniciarCronometro();
                 self.atualizarRodada();
