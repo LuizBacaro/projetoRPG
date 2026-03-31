@@ -908,7 +908,7 @@ export class FichaPersonagemController {
         } catch (error) {
             console.error('❌ Erro ao abrir modal:', error);
             if (window.NotificationService) {
-                window.NotificationService.erro('❌ Erro ao carregar equipamentos');
+                window.NotificationService.mostrarErro('❌ Erro ao carregar equipamentos');
             }
         }
     }
@@ -966,7 +966,7 @@ export class FichaPersonagemController {
 
             if (!this.combatente?.id) {
                 if (window.NotificationService) {
-                    window.NotificationService.erro('❌ ID do combatente não encontrado');
+                    window.NotificationService.mostrarErro('❌ ID do combatente não encontrado');
                 }
                 return;
             }
@@ -990,13 +990,13 @@ export class FichaPersonagemController {
 
             // Mostrar notificação de sucesso
             if (window.NotificationService) {
-                window.NotificationService.sucesso(`✅ Equipamento adicionado ao inventário!`);
+                window.NotificationService.mostrarSucesso(`✅ Equipamento adicionado ao inventário!`);
             }
 
         } catch (error) {
             console.error('❌ Erro ao adicionar equipamento:', error);
             if (window.NotificationService) {
-                window.NotificationService.erro('❌ Erro ao adicionar equipamento');
+                window.NotificationService.mostrarErro('❌ Erro ao adicionar equipamento');
             }
         }
     }
@@ -1004,7 +1004,7 @@ export class FichaPersonagemController {
     async deletarEquipamento(equipamentoId, nomeEquipamento) {
         if (!this.combatente?.id) {
             if (window.NotificationService) {
-                window.NotificationService.erro('❌ ID do combatente não encontrado');
+                window.NotificationService.mostrarErro('❌ ID do combatente não encontrado');
             }
             return;
         }
@@ -1031,13 +1031,13 @@ export class FichaPersonagemController {
 
                     // Mostrar notificação
                     if (window.NotificationService) {
-                        window.NotificationService.sucesso(`✅ ${nomeEquipamento} removido!`);
+                        window.NotificationService.mostrarSucesso(`✅ ${nomeEquipamento} removido!`);
                     }
 
                 } catch (error) {
                     console.error('❌ Erro ao deletar equipamento:', error);
                     if (window.NotificationService) {
-                        window.NotificationService.erro('❌ Erro ao remover equipamento');
+                        window.NotificationService.mostrarErro('❌ Erro ao remover equipamento');
                     }
                 }
             }
@@ -1069,7 +1069,7 @@ export class FichaPersonagemController {
 
             if (!nome.trim()) {
                 if (window.NotificationService) {
-                    window.NotificationService.aviso('⚠️ Nome do equipamento é obrigatório');
+                    window.NotificationService.mostrarAviso('⚠️ Nome do equipamento é obrigatório');
                 }
                 return;
             }
@@ -1101,13 +1101,13 @@ export class FichaPersonagemController {
 
             // Notificação
             if (window.NotificationService) {
-                window.NotificationService.sucesso(`✅ Equipamento "${nome}" criado e adicionado!`);
+                window.NotificationService.mostrarSucesso(`✅ Equipamento "${nome}" criado e adicionado!`);
             }
 
         } catch (error) {
             console.error('❌ Erro ao criar equipamento:', error);
             if (window.NotificationService) {
-                window.NotificationService.erro('❌ Erro ao criar equipamento: ' + error.message);
+                window.NotificationService.mostrarErro('❌ Erro ao criar equipamento: ' + error.message);
             }
         }
     }
@@ -1180,7 +1180,7 @@ export class FichaPersonagemController {
             const modal = document.getElementById('modalTalentos');
             if (!modal) {
                 if (window.NotificationService) {
-                    window.NotificationService.erro('❌ Modal de talentos não encontrado');
+                    window.NotificationService.mostrarErro('❌ Modal de talentos não encontrado');
                 }
                 return;
             }
@@ -1201,7 +1201,7 @@ export class FichaPersonagemController {
         } catch (error) {
             console.error('❌ Erro ao abrir modal:', error);
             if (window.NotificationService) {
-                window.NotificationService.erro('❌ Erro ao carregar talentos: ' + error.message);
+                window.NotificationService.mostrarErro('❌ Erro ao carregar talentos: ' + error.message);
             }
         }
     }
@@ -1258,7 +1258,7 @@ export class FichaPersonagemController {
         try {
             if (!this.combatente?.id) {
                 if (window.NotificationService) {
-                    window.NotificationService.erro('❌ ID do combatente não encontrado');
+                    window.NotificationService.mostrarErro('❌ ID do combatente não encontrado');
                 }
                 return;
             }
@@ -1274,13 +1274,13 @@ export class FichaPersonagemController {
 
             // Mostrar notificação de sucesso
             if (window.NotificationService) {
-                window.NotificationService.sucesso(`✅ Talento adicionado!`);
+                window.NotificationService.mostrarSucesso(`✅ Talento adicionado!`);
             }
 
         } catch (error) {
             console.error('❌ Erro ao adicionar talento:', error);
             if (window.NotificationService) {
-                window.NotificationService.erro('❌ Erro ao adicionar talento');
+                window.NotificationService.mostrarErro('❌ Erro ao adicionar talento');
             }
         }
     }
@@ -1288,7 +1288,7 @@ export class FichaPersonagemController {
     async deletarTalento(talentoId, nomeTalento) {
         if (!this.combatente?.id) {
             if (window.NotificationService) {
-                window.NotificationService.erro('❌ ID do combatente não encontrado');
+                window.NotificationService.mostrarErro('❌ ID do combatente não encontrado');
             }
             return;
         }
@@ -1315,13 +1315,13 @@ export class FichaPersonagemController {
 
                     // Mostrar notificação
                     if (window.NotificationService) {
-                        window.NotificationService.sucesso(`✅ ${nomeTalento} removido!`);
+                        window.NotificationService.mostrarSucesso(`✅ ${nomeTalento} removido!`);
                     }
 
                 } catch (error) {
                     console.error('❌ Erro ao deletar talento:', error);
                     if (window.NotificationService) {
-                        window.NotificationService.erro('❌ Erro ao remover talento');
+                        window.NotificationService.mostrarErro('❌ Erro ao remover talento');
                     }
                 }
             }
@@ -1367,7 +1367,7 @@ export class FichaPersonagemController {
 
             if (!nome.trim()) {
                 if (window.NotificationService) {
-                    window.NotificationService.aviso('⚠️ Nome do talento é obrigatório');
+                    window.NotificationService.mostrarAviso('⚠️ Nome do talento é obrigatório');
                 }
                 return;
             }
@@ -1398,13 +1398,13 @@ export class FichaPersonagemController {
 
             // Notificação
             if (window.NotificationService) {
-                window.NotificationService.sucesso(`✅ Talento "${nome}" criado e adicionado!`);
+                window.NotificationService.mostrarSucesso(`✅ Talento "${nome}" criado e adicionado!`);
             }
 
         } catch (error) {
             console.error('❌ Erro ao criar talento:', error);
             if (window.NotificationService) {
-                window.NotificationService.erro('❌ Erro ao criar talento: ' + error.message);
+                window.NotificationService.mostrarErro('❌ Erro ao criar talento: ' + error.message);
             }
         }
     }
