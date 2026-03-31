@@ -161,6 +161,13 @@ Para marcar um RF como concluido, exigir:
   - Mago: sem limite de conhecidas + bloqueio acima do nivel conjuravel.
   - Bardo: limite por nivel + bloqueio acima do nivel conjuravel.
   - Resultado: 6 passed.
+- Refino UX no painel "Adicionar do catálogo da classe":
+  - contador dinamico de resultados e magia selecionada;
+  - atalho de teclado (↑/↓ para navegar e Enter para adicionar);
+  - CTA "Adicionar esta magia" fixo no preview em desktop para reduzir rolagem.
+  - atalhos extras de navegacao (PgUp/PgDn, Home/End) para listas longas;
+  - resumo com posicao da selecao (ex.: 5/87) para orientar o usuario;
+  - protecao contra Enter duplo para evitar adicao repetida acidental.
 
 ### Proxima atualizacao
 - Executar validacao manual final de interface (ficha + grimorio) e consolidar checklist de encerramento.
@@ -171,6 +178,7 @@ Para marcar um RF como concluido, exigir:
 - RF28: modal passou a exibir componentes detalhados com complemento de componente_extra quando houver.
 - Validacao backend concluida: suite completa `backend/tests/test_grimorio_api.py` executada com sucesso.
 - Resultado final: 26 passed em 13.14s.
+- UX do painel de adicao refinada para listas longas com foco em legibilidade e velocidade de selecao.
 
 ## 6) Checklist Manual de Encerramento (UI)
 

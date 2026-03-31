@@ -48,9 +48,13 @@ class GrimorioController {
         this.componenteAtivo = 'todos';
         this.favoritasApenas = false;
         this.magiaAdicionarSelecionadaId = null;
+        this.magiasDisponiveisAdicionar = [];
 
         this.cardsAbertos = new Set();
         this._carregado = false;
+        this._onAdicionarKeydown = null;
+        this._adicionarMagiaEmAndamento = false;
+        this._ultimoAdicionarAt = 0;
     }
 
     async abrirGrimorio() {
@@ -67,7 +71,39 @@ class GrimorioController {
     fecharGrimorio() {
         const overlay = document.getElementById('modalGrimorio');
         if (overlay) overlay.classList.remove('show');
+        this._sincronizarModoPainelAdicionar(false);
         document.body.style.overflow = '';
+    }
+
+    _sincronizarModoPainelAdicionar(ativo) {
+        const overlay = document.getElementById('modalGrimorio');
+        const container = overlay?.querySelector('.grimorio-container');
+        if (!container) return;
+
+        container.classList.toggle('grimorio-container--catalogo', !!ativo);
+    }
+
+    _definirPainelAdicionarVisivel(visivel) {
+        const painel = document.getElementById('grimorioPainelAdicionar');
+        const painelTroca = document.getElementById('grimorioPainelTroca');
+        const painelNotificacoes = document.getElementById('grimorioPainelNotificacoes');
+        if (!painel) return false;
+
+        if (visivel) {
+            painelTroca?.classList.remove('show');
+            painelNotificacoes?.classList.remove('show');
+            painel.classList.add('show');
+            this._sincronizarModoPainelAdicionar(true);
+            this._renderizarPainelAdicionar();
+            setTimeout(() => {
+                document.getElementById('grimorioAdicionarBusca')?.focus();
+            }, 30);
+            return true;
+        }
+
+        painel.classList.remove('show');
+        this._sincronizarModoPainelAdicionar(false);
+        return false;
     }
 
     filtrar() {
@@ -319,6 +355,7 @@ class GrimorioController {
         this._bindComponente();
         this._bindAdicionarMagia();
         this._bindFiltrosAdicionar();
+        this._bindAtalhosAdicionar();
         this._bindTrocaMagia();
         this._bindNotificacoes();
     }
@@ -332,6 +369,7 @@ class GrimorioController {
             const clone = btnAbrir.cloneNode(true);
             btnAbrir.parentNode.replaceChild(clone, btnAbrir);
             clone.addEventListener('click', () => {
+                this._definirPainelAdicionarVisivel(false);
                 painel.classList.toggle('show');
             });
         }
@@ -410,7 +448,7 @@ class GrimorioController {
                     this._mostrarToast('Ranger e Paladino so recebem magias a partir do nivel 4.', 'info');
                     return;
                 }
-                painel.classList.toggle('show');
+                this._definirPainelAdicionarVisivel(!painel.classList.contains('show'));
             });
         }
 
@@ -418,7 +456,7 @@ class GrimorioController {
             const cloneFechar = btnFechar.cloneNode(true);
             btnFechar.parentNode.replaceChild(cloneFechar, btnFechar);
             cloneFechar.addEventListener('click', () => {
-                painel.classList.remove('show');
+                this._definirPainelAdicionarVisivel(false);
             });
         }
     }
@@ -433,6 +471,7 @@ class GrimorioController {
             const clone = btnAbrir.cloneNode(true);
             btnAbrir.parentNode.replaceChild(clone, btnAbrir);
             clone.addEventListener('click', () => {
+                this._definirPainelAdicionarVisivel(false);
                 painel.classList.toggle('show');
             });
         }
@@ -492,12 +531,108 @@ class GrimorioController {
         });
     }
 
+    _bindAtalhosAdicionar() {
+        if (this._onAdicionarKeydown) {
+            document.removeEventListener('keydown', this._onAdicionarKeydown);
+        }
+
+        this._onAdicionarKeydown = (event) => {
+            const painel = document.getElementById('grimorioPainelAdicionar');
+            if (!painel || !painel.classList.contains('show')) return;
+
+            const tecla = event.key;
+            const teclasNavegacao = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', 'Enter', 'Escape'];
+            if (!teclasNavegacao.includes(tecla)) return;
+
+            const alvo = event.target;
+            const digitando = alvo
+                && (alvo.tagName === 'INPUT'
+                    || alvo.tagName === 'TEXTAREA'
+                    || alvo.tagName === 'SELECT'
+                    || alvo.isContentEditable);
+            if (digitando) return;
+
+            const disponiveis = Array.isArray(this.magiasDisponiveisAdicionar)
+                ? this.magiasDisponiveisAdicionar
+                : [];
+
+            if (tecla === 'Escape') {
+                event.preventDefault();
+                this._definirPainelAdicionarVisivel(false);
+                return;
+            }
+
+            if (!disponiveis.length) return;
+
+            const indiceAtual = Math.max(
+                0,
+                disponiveis.findIndex((magia) => Number(magia.id) === Number(this.magiaAdicionarSelecionadaId))
+            );
+
+            if (tecla === 'Enter') {
+                event.preventDefault();
+                const atual = disponiveis[indiceAtual];
+                if (atual) {
+                    this._adicionarMagia(Number(atual.id));
+                }
+                return;
+            }
+
+            event.preventDefault();
+            let proximoIndice = indiceAtual;
+
+            if (tecla === 'Home') proximoIndice = 0;
+            else if (tecla === 'End') proximoIndice = disponiveis.length - 1;
+            else {
+                const delta = tecla === 'ArrowDown' || tecla === 'PageDown' ? 1 : -1;
+                proximoIndice = (indiceAtual + delta + disponiveis.length) % disponiveis.length;
+            }
+
+            const proxima = disponiveis[proximoIndice];
+            if (!proxima) return;
+
+            this.magiaAdicionarSelecionadaId = Number(proxima.id);
+            this._atualizarSelecaoAdicionarUI(this.magiaAdicionarSelecionadaId);
+            this._renderizarPreviewAdicionar(disponiveis, this.magiaAdicionarSelecionadaId);
+            this._atualizarResumoAdicionar(disponiveis, this.magiaAdicionarSelecionadaId);
+
+            const itemSelecionado = document.querySelector(`.grimorio-add-btn-selecionar[data-id="${Number(proxima.id)}"]`);
+            itemSelecionado?.closest('.grimorio-add-item')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        };
+
+        document.addEventListener('keydown', this._onAdicionarKeydown);
+    }
+
+    _atualizarResumoAdicionar(disponiveis, magiaIdSelecionada) {
+        const resumo = document.getElementById('grimorioAdicionarResumo');
+        if (!resumo) return;
+
+        const lista = Array.isArray(disponiveis) ? disponiveis : [];
+        const selecionada = lista.find((magia) => Number(magia.id) === Number(magiaIdSelecionada));
+
+        if (!lista.length) {
+            resumo.textContent = '0 resultados';
+            return;
+        }
+
+        if (!selecionada) {
+            resumo.textContent = `${lista.length} resultado(s)`;
+            return;
+        }
+
+        const posicao = lista.findIndex((magia) => Number(magia.id) === Number(magiaIdSelecionada));
+        const indiceHumano = posicao >= 0 ? posicao + 1 : 1;
+        resumo.textContent = `${lista.length} resultado(s) • ${indiceHumano}/${lista.length} selecionada: ${selecionada.nome || 'Magia'}`;
+    }
+
     _renderizarPainelAdicionar() {
         const lista = document.getElementById('grimorioAdicionarLista');
         const preview = document.getElementById('grimorioAdicionarPreview');
         if (!lista || !preview) return;
 
         if (this._classeSemAcessoMagias()) {
+            this.magiasDisponiveisAdicionar = [];
+            this._atualizarResumoAdicionar([], null);
             lista.innerHTML = '<div class="grimorio-vazio">Ranger e Paladino so podem adicionar magias a partir do nivel 4.</div>';
             preview.innerHTML = '<div class="grimorio-historico-vazio">Sem acesso a magias nesta classe/nível.</div>';
             return;
@@ -543,10 +678,14 @@ class GrimorioController {
         });
 
         if (disponiveis.length === 0) {
+            this.magiasDisponiveisAdicionar = [];
+            this._atualizarResumoAdicionar([], null);
             lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia disponivel para adicionar.</div>';
             preview.innerHTML = '<div class="grimorio-historico-vazio">Nenhuma magia corresponde aos filtros selecionados.</div>';
             return;
         }
+
+        this.magiasDisponiveisAdicionar = disponiveis;
 
         if (!disponiveis.some((magia) => Number(magia.id) === Number(this.magiaAdicionarSelecionadaId))) {
             this.magiaAdicionarSelecionadaId = Number(disponiveis[0].id);
@@ -566,11 +705,34 @@ class GrimorioController {
             button.addEventListener('click', () => {
                 const magiaId = Number(button.dataset.id);
                 this.magiaAdicionarSelecionadaId = magiaId;
+                this._atualizarSelecaoAdicionarUI(magiaId);
                 this._renderizarPreviewAdicionar(disponiveis, magiaId);
+                this._atualizarResumoAdicionar(disponiveis, magiaId);
             });
         });
 
+        this._atualizarSelecaoAdicionarUI(this.magiaAdicionarSelecionadaId);
         this._renderizarPreviewAdicionar(disponiveis, this.magiaAdicionarSelecionadaId);
+        this._atualizarResumoAdicionar(disponiveis, this.magiaAdicionarSelecionadaId);
+    }
+
+    _atualizarSelecaoAdicionarUI(magiaId) {
+        const lista = document.getElementById('grimorioAdicionarLista');
+        if (!lista) return;
+
+        lista.querySelectorAll('.grimorio-add-item').forEach((item) => {
+            item.classList.remove('is-selected');
+        });
+
+        lista.querySelectorAll('.grimorio-add-btn-selecionar').forEach((button) => {
+            button.classList.remove('ativo');
+            const corresponde = Number(button.dataset.id) === Number(magiaId);
+            button.setAttribute('aria-pressed', corresponde ? 'true' : 'false');
+            if (corresponde) {
+                button.classList.add('ativo');
+                button.closest('.grimorio-add-item')?.classList.add('is-selected');
+            }
+        });
     }
 
     _renderizarPreviewAdicionar(disponiveis, magiaId) {
@@ -594,6 +756,7 @@ class GrimorioController {
             </div>
             <div class="grimorio-add-preview-descricao">${escapeHtml((magia.descricao || 'Sem descrição.').slice(0, 320))}</div>
             <button class="grimorio-add-btn grimorio-add-preview-acao" id="btnConfirmarAdicionarPreview">Adicionar esta magia</button>
+            <div class="grimorio-add-preview-hint">Atalhos: setas navegam, PgUp/PgDn alternam, Home/End pulam extremos, Enter adiciona.</div>
         `;
 
         preview.querySelector('#btnConfirmarAdicionarPreview')?.addEventListener('click', async () => {
@@ -1006,6 +1169,13 @@ class GrimorioController {
     }
 
     async _adicionarMagia(magiaId) {
+        if (this._adicionarMagiaEmAndamento) return;
+
+        const agora = Date.now();
+        if (agora - this._ultimoAdicionarAt < 400) return;
+
+        this._adicionarMagiaEmAndamento = true;
+        this._ultimoAdicionarAt = agora;
         try {
             await this.grimorioService.adicionar(this.combatente.id, {
                 magia_id: magiaId,
@@ -1016,6 +1186,8 @@ class GrimorioController {
             await this._recarregarDados();
         } catch (error) {
             this._mostrarToast(error.message || 'Nao foi possivel adicionar a magia.', 'erro');
+        } finally {
+            this._adicionarMagiaEmAndamento = false;
         }
     }
 

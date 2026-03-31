@@ -321,9 +321,12 @@
             <button class="grimorio-btn-descanso" id="btnNotificacoesGrimorio">🔔 Notificações</button>
             <span class="grimorio-troca-badge" id="grimorioTrocaBadge" style="display:none">Troca disponível</span>
             <span class="grimorio-troca-badge" id="grimorioNotificacoesBadge" style="display:none">0</span>
-            <div id="grimorioPainelAdicionar" class="grimorio-painel-adicionar">
+            <div id="grimorioPainelAdicionar" class="grimorio-painel-adicionar grimorio-painel-adicionar-catalogo">
                 <div class="grimorio-painel-header">
-                    <strong>Adicionar do catálogo da classe</strong>
+                    <div class="grimorio-painel-header-meta">
+                        <strong>Adicionar do catálogo da classe</strong>
+                        <span id="grimorioAdicionarResumo" class="grimorio-add-resumo">0 resultados</span>
+                    </div>
                     <button id="btnFecharPainelAdicionar" class="grimorio-fechar-painel">✕</button>
                 </div>
                 <div class="grimorio-add-filtros-grid">
@@ -366,6 +369,7 @@
                         </select>
                     </div>
                 </div>
+                <p class="grimorio-add-dica">Use setas para navegar, Enter para adicionar, PgUp/PgDn para alternar e Home/End para ir aos extremos.</p>
                 <div class="grimorio-add-layout">
                     <div id="grimorioAdicionarLista" class="grimorio-adicionar-lista"></div>
                     <div id="grimorioAdicionarPreview" class="grimorio-add-preview">
