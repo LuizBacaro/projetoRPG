@@ -77,8 +77,63 @@
 
 .magias-hero-actions {
     display: flex;
-    gap: .7rem;
+    gap: .65rem;
     flex-wrap: wrap;
+}
+
+/* ── Botões da hero (Dashboard / Importar / Nova Magia) ── */
+.magias-hero-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .55rem 1.1rem;
+    border-radius: 10px;
+    font-family: var(--fonte-titulo, 'Cinzel', serif);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: filter .18s, transform .15s, box-shadow .18s;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.magias-hero-actions .btn:hover {
+    filter: brightness(1.14);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.magias-hero-actions .btn:active {
+    transform: translateY(0);
+    filter: brightness(.95);
+}
+
+/* Botão secundário — estilo contorno azul */
+.magias-hero-actions .btn-secondary {
+    background: rgba(26, 54, 100, 0.65);
+    border: 1px solid rgba(138, 176, 230, 0.45);
+    color: #c4d9f5;
+}
+
+.magias-hero-actions .btn-secondary:hover {
+    background: rgba(36, 70, 130, 0.8);
+    border-color: rgba(138, 176, 230, 0.75);
+    color: #ddeeff;
+}
+
+/* Botão primário — destaque dourado */
+.magias-hero-actions .btn-primary {
+    background: linear-gradient(135deg, #c9a84c 0%, #9a7528 100%);
+    border: 1px solid rgba(240, 192, 64, 0.5);
+    color: #1a0e06;
+    box-shadow: 0 3px 12px rgba(201, 168, 76, 0.25);
+}
+
+.magias-hero-actions .btn-primary:hover {
+    box-shadow: 0 6px 22px rgba(201, 168, 76, 0.45);
 }
 
 .magias-overview {

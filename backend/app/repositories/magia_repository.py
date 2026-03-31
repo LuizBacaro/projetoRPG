@@ -2,9 +2,17 @@
 
 from __future__ import annotations
 
+import unicodedata
 from typing import Optional, Tuple
 
 from sqlalchemy import asc, desc, func
+
+
+def _normalizar_classe(valor: str) -> str:
+    """Remove acentos e converte para maiúsculo — compatível com SQLite."""
+    normalized = unicodedata.normalize("NFD", str(valor or ""))
+    sem_acentos = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+    return sem_acentos.strip().upper()
 from sqlalchemy.orm import Session, joinedload
 
 from .base import BaseRepository, apply_not_deleted, commit_with_rollback
@@ -97,12 +105,12 @@ class MagiaRepository(BaseRepository[Magia]):
 
     def listar_classes(self) -> list[str]:
         classes_legacy = {
-            row[0].strip().upper()
+            _normalizar_classe(row[0])
             for row in self.db.query(Magia.classe).filter(Magia.classe.isnot(None)).all()
             if row[0] and row[0].strip()
         }
         classes_rel = {
-            row[0].strip().upper()
+            _normalizar_classe(row[0])
             for row in self.db.query(MagiaClasse.classe).distinct().all()
             if row[0] and row[0].strip()
         }
@@ -115,7 +123,7 @@ class MagiaRepository(BaseRepository[Magia]):
         self.db.flush()
         for item in classes_niveis:
             magia.classes_niveis.append(
-                MagiaClasse(classe=item["classe"].strip().upper(), nivel=item["nivel"])
+                MagiaClasse(classe=_normalizar_classe(str(item["classe"])), nivel=item["nivel"])
             )
 
     def has_dependencias(self, magia_id: int) -> bool:

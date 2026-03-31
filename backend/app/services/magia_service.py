@@ -6,6 +6,13 @@ from dataclasses import asdict, is_dataclass
 from typing import Any
 import unicodedata
 
+
+def _normalizar_classe(valor: str) -> str:
+    """Remove acentos e converte para maiúsculo, padronizando nomes de classe para o BD."""
+    normalized = unicodedata.normalize("NFD", str(valor or ""))
+    sem_acentos = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
+    return sem_acentos.strip().upper()
+
 from fastapi import HTTPException
 
 from ..models.magia import Magia
@@ -191,7 +198,7 @@ class MagiaService:
 
         classes = set()
         for item in classes_niveis:
-            classe = str(item.get("classe", "")).strip().upper()
+            classe = _normalizar_classe(str(item.get("classe", "")))
             nivel = item.get("nivel")
             if not classe:
                 raise HTTPException(status_code=422, detail="Classe inválida em classes_niveis")
@@ -248,8 +255,8 @@ class MagiaService:
 
     @staticmethod
     def _gerar_legacy_classes(classes_niveis: list[dict]) -> dict:
-        ordenadas = sorted(classes_niveis, key=lambda x: (x["nivel"], str(x["classe"]).upper()))
-        classe_legacy = ",".join(str(item["classe"]).strip().upper() for item in ordenadas)
+        ordenadas = sorted(classes_niveis, key=lambda x: (x["nivel"], _normalizar_classe(str(x["classe"]))))
+        classe_legacy = ",".join(_normalizar_classe(str(item["classe"])) for item in ordenadas)
         nivel_legacy = ordenadas[0]["nivel"]
         return {"classe": classe_legacy, "nivel": nivel_legacy}
 
