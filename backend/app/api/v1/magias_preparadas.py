@@ -39,7 +39,8 @@ def _normalizar_classe(valor: str) -> str:
 
 def _classes_magia(valor: str) -> set:
     partes = [p.strip() for p in re.split(r"[,/;|]", valor or "") if p.strip()]
-    return {_normalizar_classe(parte) for parte in partes}
+    classes = {_normalizar_classe(parte) for parte in partes}
+    return {classe for classe in classes if classe}
 
 
 def _enriquecer(mp: MagiaPreparada) -> dict:
@@ -86,10 +87,37 @@ def preparar_magia(
     if not magia:
         raise HTTPException(status_code=404, detail="Magia não encontrada")
 
-    classe_combatente = _normalizar_classe(combatente.classe)
-    classes_permitidas = _classes_magia(magia.classe)
+    classes_combatente = _classes_magia(combatente.classe)
+    if not classes_combatente:
+        classe_normalizada = _normalizar_classe(combatente.classe)
+        if classe_normalizada:
+            classes_combatente = {classe_normalizada}
 
-    if classe_combatente not in classes_permitidas:
+    classes_permitidas = {
+        _normalizar_classe(cn.classe)
+        for cn in (getattr(magia, "classes_niveis", None) or [])
+        if _normalizar_classe(cn.classe)
+    }
+    if not classes_permitidas:
+        classes_permitidas = _classes_magia(magia.classe)
+
+    classe_solicitada = _normalizar_classe(payload.classe)
+
+    if classe_solicitada:
+        if classe_solicitada not in classes_combatente:
+            classes_legiveis = ", ".join(sorted(classes_combatente)) or "N/A"
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Classe ativa inválida para este combatente: {payload.classe}. "
+                    f"Disponíveis: {classes_legiveis}"
+                ),
+            )
+        classes_validas_para_preparo = {classe_solicitada}
+    else:
+        classes_validas_para_preparo = classes_combatente
+
+    if not classes_validas_para_preparo.intersection(classes_permitidas):
         classes_legiveis = ", ".join(sorted(classes_permitidas)) or "N/A"
         raise HTTPException(
             status_code=400,

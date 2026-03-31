@@ -115,3 +115,20 @@ def test_preparar_magia_permite_feiticeiro_com_magia_de_mago(prepared_db):
     )
 
     assert response.status_code == 200
+
+
+def test_preparar_magia_permite_combatente_multiclasse_quando_classe_bate(prepared_db):
+    db, db_factory = prepared_db
+    combatente = _criar_combatente(db, classe="Clérigo / Mago")
+    magia = _criar_magia(db, classe="CLÉRIGO")
+    client = _build_client(db_factory)
+
+    response = client.post(
+        f"/api/v1/magias-preparadas/{combatente.id}",
+        json={"magia_id": magia.id, "nivel_slot": 1, "classe": "Clérigo"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["combatente_id"] == combatente.id
+    assert payload["magia_id"] == magia.id

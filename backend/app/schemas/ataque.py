@@ -56,6 +56,7 @@ class MagiasBulkRequest(BaseModel):
 class MagiaPreparadaCreate(BaseModel):
     magia_id:   int
     nivel_slot: int
+    classe:     Optional[str] = None
 
 class MagiaPreparadaResponse(BaseModel):
     id:            int
