@@ -291,7 +291,7 @@ class GrimorioService:
                 classe_norm=classe_norm or _normalizar(combatente.classe),
                 quantidade=adicionadas,
             )
-        return self.grimorio_repo.listar(combatente_id, classe=classe, favorita=favorita)
+        return self.grimorio_repo.listar(combatente_id, classe=classe_norm, favorita=favorita)
 
     def listar_historico_troca(self, combatente_id: int, classe: Optional[str] = None, limit: int = 20):
         classe_norm = _normalizar(classe) if classe else None

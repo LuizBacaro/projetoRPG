@@ -260,6 +260,23 @@ def test_grimorio_auto_adiciona_magias_por_nivel_para_clerigo(grimorio_db):
     assert all(item["origem"] == "AUTO_NIVEL" for item in itens)
 
 
+def test_grimorio_lista_clerigo_com_parametro_acentuado(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clérigo")
+    combatente.nivel = 3
+    db.commit()
+
+    magia_l1 = _criar_magia(db, classe="CLERIGO", nivel=1)
+    client = _build_client(db_factory)
+
+    listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "Clérigo"})
+    assert listar.status_code == 200
+    itens = listar.json()
+    ids = {item["magia_id"] for item in itens}
+
+    assert magia_l1.id in ids
+
+
 def test_grimorio_auto_adicao_nao_duplica_em_listagens_repetidas(grimorio_db):
     db, db_factory = grimorio_db
     combatente = _criar_combatente(db, classe="Druida")
