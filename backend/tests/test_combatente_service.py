@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import Mock, MagicMock
 from app.services.combatente_service import CombatenteService
 from app.models.combatente import Combatente
-from app.exceptions.custom_exceptions import CombatenteNotFoundError
+from app.exceptions.custom_exceptions import CombatenteNaoEncontrado
 
 
 class TestCombatenteService:
@@ -65,7 +65,7 @@ class TestCombatenteService:
         mock_repository.get_by_id.return_value = None
         
         # Act & Assert
-        with pytest.raises(CombatenteNotFoundError):
+        with pytest.raises(CombatenteNaoEncontrado):
             service.obter_por_id(999)
     
     def test_criar_combatente(self, service, mock_repository, mock_file_service):
@@ -81,6 +81,7 @@ class TestCombatenteService:
         
         combatente_criado = Combatente(id=1, hp_atual=100, **combatente_data)
         mock_repository.create.return_value = combatente_criado
+        mock_repository.get_by_id.return_value = combatente_criado
         
         # Act
         resultado = service.criar(combatente_data)
@@ -99,11 +100,10 @@ class TestCombatenteService:
             hp_maximo=85, hp_atual=85, iniciativa=15
         )
         mock_repository.get_by_id.return_value = combatente_mock
-        mock_repository.update.return_value = combatente_mock
         
         # Act
         resultado = service.aplicar_dano(1, 20)
         
         # Assert
-        assert resultado.hp_atual == 65
+        assert resultado['hp_atual'] == 65
         mock_repository.update.assert_called_once()

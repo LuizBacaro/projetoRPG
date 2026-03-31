@@ -25,6 +25,8 @@ class Combatente(SoftDeleteMixin, Base):
     tipo   = Column(String,  nullable=False)
     classe = Column(String,  nullable=False)
     raca   = Column(String,  nullable=True, default="")
+    alinhamento = Column(String, nullable=True, default="")
+    dominios = Column(String, nullable=True, default="")
 
     # ── Referência (apenas monstros) ──
     pagina_referencia = Column(String, nullable=True, default="")  # ✅ NOVO

@@ -4,18 +4,30 @@ SRP: Endpoints para consulta de magias D&D 3.5
 SOLID: Single Responsibility — apenas roteamento de magias
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from io import BytesIO
+
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.core.catalog_cache import catalog_cache, make_cache_key
 from app.core.config import settings
-from app.core.dependencies import get_magia_service
+from app.core.dependencies import get_magia_import_service, get_magia_service
 from app.core.database import get_db
 from app.core.deps import requer_mestre_ou_admin
 from app.models.magia import Magia
 from app.repositories.magia_repository import MagiaRepository
-from app.schemas.magia import MagiaResponse, MagiaCreate, MagiaUpdate
+from app.schemas.magia import (
+    MagiaCreate,
+    MagiaImportConfirmRequest,
+    MagiaImportConfirmResponse,
+    MagiaHistoricoResponse,
+    MagiaImportPreviewResponse,
+    MagiaResponse,
+    MagiaUpdate,
+)
+from app.services.magia_import_service import MagiaImportService
 from app.services.magia_service import MagiaService
 
 router = APIRouter(prefix="/magias", tags=["Magias"])
@@ -76,6 +88,8 @@ def listar_magias(
     componentes: Optional[str] = Query(None, description="Filtrar por componentes (ex: V,S)"),
     dominio: Optional[str] = Query(None, description="Filtrar por domínio"),
     ativo: Optional[bool] = Query(None, description="Filtrar por status ativa/inativa"),
+    sort_by: Optional[str] = Query(None, description="Ordenacao por campo: nome, escola, nivel"),
+    sort_dir: Optional[str] = Query("asc", description="Direcao da ordenacao: asc ou desc"),
     skip:   int = Query(0, ge=0, description="Quantidade de registros para pular"),
     limit:  int = Query(100, ge=1, le=500, description="Quantidade máxima de registros retornados"),
     response: Response = None,
@@ -97,6 +111,8 @@ def listar_magias(
     componentes = _sanitize_query_value(componentes)
     dominio = _sanitize_query_value(dominio)
     ativo = _sanitize_query_value(ativo)
+    sort_by = _sanitize_query_value(sort_by)
+    sort_dir = _sanitize_query_value(sort_dir)
 
     classe_normalizado = None
     if classe:
@@ -113,6 +129,8 @@ def listar_magias(
         componentes=componentes,
         dominio=dominio,
         ativo=ativo,
+        sort_by=sort_by,
+        sort_dir=sort_dir,
         skip=skip,
         limit=limit,
     )
@@ -135,6 +153,8 @@ def listar_magias(
         componentes=componentes,
         dominio=dominio,
         ativo=ativo,
+        sort_by=sort_by,
+        sort_dir=sort_dir,
         skip=skip,
         limit=limit,
     )
@@ -174,6 +194,60 @@ def listar_classes(
     return classes
 
 
+@router.get("/dominios", response_model=List[str])
+def listar_dominios(
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+):
+    cache_key = "magias:dominios"
+    if settings.CACHE_ENABLED:
+        cached = catalog_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+    srv = _resolve_service(service, db)
+    dominios = srv.listar_dominios()
+    if settings.CACHE_ENABLED:
+        catalog_cache.set(cache_key, dominios, settings.CACHE_CATALOG_TTL_SECONDS)
+    return dominios
+
+
+@router.get("/importacao/modelo")
+def baixar_modelo_importacao(
+    service: MagiaImportService = Depends(get_magia_import_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    content = service.gerar_modelo()
+    filename = "modelo_importacao_magias.xlsx"
+    headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
+    return StreamingResponse(
+        BytesIO(content),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers,
+    )
+
+
+@router.post("/importacao/preview", response_model=MagiaImportPreviewResponse)
+async def preview_importacao_magias(
+    arquivo: UploadFile = File(...),
+    service: MagiaImportService = Depends(get_magia_import_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    return await service.criar_preview(arquivo)
+
+
+@router.post("/importacao/confirmar", response_model=MagiaImportConfirmResponse)
+def confirmar_importacao_magias(
+    payload: MagiaImportConfirmRequest,
+    service: MagiaImportService = Depends(get_magia_import_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    result = service.confirmar_importacao(payload.import_id)
+    if settings.CACHE_ENABLED and result.get("importadas", 0) > 0:
+        catalog_cache.invalidate_prefix("magias:")
+    return result
+
+
 @router.get("/{magia_id}", response_model=MagiaResponse)
 def obter_magia(
     magia_id: int,
@@ -201,9 +275,9 @@ def criar_magia(
     payload: MagiaCreate,
     db: Session = Depends(get_db),
     service: Optional[MagiaService] = Depends(get_magia_service),
-    _: object = Depends(requer_mestre_ou_admin),
+    usuario=Depends(requer_mestre_ou_admin),
 ):
-    magia = _resolve_service(service, db).criar(payload)
+    magia = _resolve_service(service, db).criar(payload, usuario_id=getattr(usuario, "id", None))
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return _serialize_magia(magia)
@@ -215,9 +289,13 @@ def atualizar_magia(
     payload: MagiaUpdate,
     db: Session = Depends(get_db),
     service: Optional[MagiaService] = Depends(get_magia_service),
-    _: object = Depends(requer_mestre_ou_admin),
+    usuario=Depends(requer_mestre_ou_admin),
 ):
-    magia = _resolve_service(service, db).atualizar(magia_id, payload)
+    magia = _resolve_service(service, db).atualizar(
+        magia_id,
+        payload,
+        usuario_id=getattr(usuario, "id", None),
+    )
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return _serialize_magia(magia)
@@ -228,9 +306,9 @@ def desativar_magia(
     magia_id: int,
     db: Session = Depends(get_db),
     service: Optional[MagiaService] = Depends(get_magia_service),
-    _: object = Depends(requer_mestre_ou_admin),
+    usuario=Depends(requer_mestre_ou_admin),
 ):
-    magia = _resolve_service(service, db).desativar(magia_id)
+    magia = _resolve_service(service, db).desativar(magia_id, usuario_id=getattr(usuario, "id", None))
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return _serialize_magia(magia)
@@ -241,9 +319,9 @@ def reativar_magia(
     magia_id: int,
     db: Session = Depends(get_db),
     service: Optional[MagiaService] = Depends(get_magia_service),
-    _: object = Depends(requer_mestre_ou_admin),
+    usuario=Depends(requer_mestre_ou_admin),
 ):
-    magia = _resolve_service(service, db).reativar(magia_id)
+    magia = _resolve_service(service, db).reativar(magia_id, usuario_id=getattr(usuario, "id", None))
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return _serialize_magia(magia)
@@ -254,9 +332,21 @@ def excluir_magia(
     magia_id: int,
     db: Session = Depends(get_db),
     service: Optional[MagiaService] = Depends(get_magia_service),
-    _: object = Depends(requer_mestre_ou_admin),
+    usuario=Depends(requer_mestre_ou_admin),
 ):
-    _resolve_service(service, db).deletar_fisico(magia_id)
+    _resolve_service(service, db).deletar_fisico(magia_id, usuario_id=getattr(usuario, "id", None))
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return None
+
+
+@router.get("/{magia_id}/historico", response_model=List[MagiaHistoricoResponse])
+def listar_historico_magia(
+    magia_id: int,
+    limit: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+    _: object = Depends(requer_mestre_ou_admin),
+):
+    return _resolve_service(service, db).listar_historico(magia_id, limit=limit)
+

@@ -17,6 +17,11 @@ import {
     safeBootstrapAsync,
 } from '../utils/graceful-degradation.js';
 
+const DOMINIOS_PERMITIDOS_FALLBACK = [
+    'Ar', 'Bem', 'Caos', 'Conhecimento', 'Cura', 'Destruição', 'Enganação', 'Fogo', 'Força',
+    'Guerra', 'Magia', 'Mal', 'Morte', 'Proteção', 'Sol', 'Sorte', 'Terra', 'Viagem',
+];
+
 export class FichaPersonagemController {
 
     constructor() {
@@ -26,6 +31,7 @@ export class FichaPersonagemController {
         this.periciaService = new PericiaService();
         this.token             = localStorage.getItem('token');
         this.combatente        = null;
+        this.dominiosPermitidos = [...DOMINIOS_PERMITIDOS_FALLBACK];
 
         // ✅ NOVO: canal de escuta arena → ficha
         this._canal = null;
@@ -44,6 +50,7 @@ export class FichaPersonagemController {
             console.log('🎯 Carregando ficha do combatente:', combatenteId);
 
             this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
+            await this._carregarDominiosPermitidos();
 
             // ✅ Expor globalmente para debug no console
             window._fichaController = this;
@@ -91,6 +98,33 @@ export class FichaPersonagemController {
         const btnAdicionarTal = document.getElementById('btnAdicionarTalento');
         if (btnAdicionarTal) {
             btnAdicionarTal.addEventListener('click', () => this.abrirModalTalentos());
+        }
+
+        const btnEditarPerfilMagico = document.getElementById('btnEditarPerfilMagico');
+        if (btnEditarPerfilMagico) {
+            btnEditarPerfilMagico.addEventListener('click', () => this.abrirModalPerfilMagico());
+        }
+
+        const btnFecharModalPerfilMagico = document.getElementById('btnFecharModalPerfilMagico');
+        if (btnFecharModalPerfilMagico) {
+            btnFecharModalPerfilMagico.addEventListener('click', () => this.fecharModalPerfilMagico());
+        }
+
+        const btnCancelarPerfilMagico = document.getElementById('btnCancelarPerfilMagico');
+        if (btnCancelarPerfilMagico) {
+            btnCancelarPerfilMagico.addEventListener('click', () => this.fecharModalPerfilMagico());
+        }
+
+        const btnSalvarPerfilMagico = document.getElementById('btnSalvarPerfilMagico');
+        if (btnSalvarPerfilMagico) {
+            btnSalvarPerfilMagico.addEventListener('click', () => this.salvarPerfilMagico());
+        }
+
+        const modalPerfilMagico = document.getElementById('modalPerfilMagico');
+        if (modalPerfilMagico) {
+            modalPerfilMagico.addEventListener('click', (event) => {
+                if (event.target === modalPerfilMagico) this.fecharModalPerfilMagico();
+            });
         }
 
         const btnGrimorio = document.getElementById('btnGrimorio');
@@ -330,6 +364,8 @@ export class FichaPersonagemController {
         const classe      = document.getElementById('fichaClasse');
         const tipo        = document.getElementById('fichaTipo');
         const nivel       = document.getElementById('fichaNivel');
+        const alinhamento = document.getElementById('fichaAlinhamento');
+        const dominios    = document.getElementById('fichaDominios');
         const placeholder = document.getElementById('fichaFotoPlaceholder');
         const foto        = document.getElementById('fichaFoto');
 
@@ -344,6 +380,8 @@ export class FichaPersonagemController {
             tipo.classList.add(`ficha-tag-${tipoVal}`);
         }
         if (nivel)  nivel.textContent  = this.combatente.nivel  || 1;
+        if (alinhamento) alinhamento.textContent = `Alinhamento: ${this.combatente.alinhamento || '—'}`;
+        if (dominios) dominios.textContent = `Domínios: ${this._formatarDominios(this.combatente.dominios)}`;
 
         if (this.combatente.foto_url) {
             if (foto) {
@@ -357,6 +395,172 @@ export class FichaPersonagemController {
         }
 
         console.log('✅ Identidade renderizada');
+    }
+
+    _formatarDominios(valor) {
+        const texto = String(valor || '').trim();
+        return texto || '—';
+    }
+
+    _getAuthHeader() {
+        if (window.AuthService && typeof window.AuthService.getAuthHeader === 'function') {
+            return window.AuthService.getAuthHeader();
+        }
+        return {};
+    }
+
+    async _carregarDominiosPermitidos() {
+        try {
+            const response = await fetch(getApiUrl('/magias/dominios'), {
+                headers: this._getAuthHeader(),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const dominios = await response.json();
+            if (Array.isArray(dominios) && dominios.length > 0) {
+                this.dominiosPermitidos = dominios
+                    .map((dominio) => String(dominio).trim())
+                    .filter(Boolean);
+            }
+        } catch (error) {
+            console.warn('⚠️ Não foi possível carregar domínios do backend para a ficha:', error);
+            this.dominiosPermitidos = [...DOMINIOS_PERMITIDOS_FALLBACK];
+        }
+
+        this._renderizarListaDominiosPerfil();
+    }
+
+    _renderizarListaDominiosPerfil() {
+        const lista = document.getElementById('listaPerfilDominios');
+        const hint = document.getElementById('hintPerfilDominios');
+
+        if (lista) {
+            lista.innerHTML = this.dominiosPermitidos
+                .map((dominio) => `<option value="${escapeHtml(dominio)}"></option>`)
+                .join('');
+        }
+
+        if (hint) {
+            hint.textContent = `Permitidos: ${this.dominiosPermitidos.join(', ')}. Separe múltiplos domínios por vírgula.`;
+        }
+    }
+
+    abrirModalPerfilMagico() {
+        const modal = document.getElementById('modalPerfilMagico');
+        const inputAlinhamento = document.getElementById('inputPerfilAlinhamento');
+        const inputDominios = document.getElementById('inputPerfilDominios');
+        if (!modal || !this.combatente) return;
+
+        if (inputAlinhamento) inputAlinhamento.value = this.combatente.alinhamento || '';
+        if (inputDominios) inputDominios.value = this.combatente.dominios || '';
+        modal.style.display = 'flex';
+    }
+
+    fecharModalPerfilMagico() {
+        const modal = document.getElementById('modalPerfilMagico');
+        if (modal) modal.style.display = 'none';
+    }
+
+    _normalizarDominiosPerfil(raw) {
+        const itens = String(raw || '')
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean);
+
+        if (!itens.length) return '';
+
+        const mapa = new Map(
+            this.dominiosPermitidos.map((dominio) => [
+                dominio.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
+                dominio,
+            ]),
+        );
+
+        const vistos = new Set();
+        const normalizados = [];
+        const invalidos = [];
+
+        itens.forEach((item) => {
+            const chave = item.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+            const canonico = mapa.get(chave);
+            if (!canonico) {
+                invalidos.push(item);
+                return;
+            }
+            if (vistos.has(chave)) return;
+            vistos.add(chave);
+            normalizados.push(canonico);
+        });
+
+        if (invalidos.length) {
+            throw new Error(`Domínio inválido: ${invalidos.join(', ')}.`);
+        }
+
+        return normalizados.join(', ');
+    }
+
+    _buildFormDataAtualizacaoCombatente(overrides = {}) {
+        const formData = new FormData();
+        const payload = {
+            nome: this.combatente.nome || '',
+            hp_maximo: this.combatente.hp_maximo ?? 1,
+            iniciativa: this.combatente.iniciativa ?? 0,
+            tipo: this.combatente.tipo || 'jogador',
+            classe: this.combatente.classe || 'Aventureiro',
+            raca: this.combatente.raca || '',
+            alinhamento: this.combatente.alinhamento || '',
+            dominios: this.combatente.dominios || '',
+            pagina_referencia: this.combatente.pagina_referencia || '',
+            ca: this.combatente.ca ?? 10,
+            toque: this.combatente.toque ?? 10,
+            surpresa: this.combatente.surpresa ?? 10,
+            forca: this.combatente.forca ?? 10,
+            destreza: this.combatente.destreza ?? 10,
+            constituicao: this.combatente.constituicao ?? 10,
+            inteligencia: this.combatente.inteligencia ?? 10,
+            sabedoria: this.combatente.sabedoria ?? 10,
+            carisma: this.combatente.carisma ?? 10,
+            fortitude: this.combatente.fortitude ?? 0,
+            reflexos: this.combatente.reflexos ?? 0,
+            vontade: this.combatente.vontade ?? 0,
+            nivel: this.combatente.nivel ?? 1,
+            pontos: this.combatente.pontos ?? 0,
+            ...overrides,
+        };
+
+        Object.entries(payload).forEach(([key, value]) => {
+            formData.append(key, value == null ? '' : String(value));
+        });
+        return formData;
+    }
+
+    async salvarPerfilMagico() {
+        if (!this.combatente?.id) return;
+
+        const inputAlinhamento = document.getElementById('inputPerfilAlinhamento');
+        const inputDominios = document.getElementById('inputPerfilDominios');
+        const alinhamento = inputAlinhamento?.value || '';
+
+        try {
+            const dominios = this._normalizarDominiosPerfil(inputDominios?.value || '');
+            const formData = this._buildFormDataAtualizacaoCombatente({ alinhamento, dominios });
+            this.combatente = await this.combatenteService.atualizar(this.combatente.id, formData);
+
+            this.renderizarIdentidade();
+            this.fecharModalPerfilMagico();
+
+            if (window._grimorioController && document.getElementById('modalGrimorio')?.classList.contains('show')) {
+                await window._grimorioController._recarregarDados();
+            }
+
+            window.NotificationService?.sucesso('✅ Perfil mágico atualizado.');
+        } catch (error) {
+            console.error('❌ Erro ao salvar perfil mágico:', error);
+            window.NotificationService?.erro(`❌ ${error.message || 'Erro ao salvar perfil mágico.'}`);
+        }
     }
 
     _atualizarHeaderNome() {

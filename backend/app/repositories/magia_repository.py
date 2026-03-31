@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from typing import Optional, Tuple
 
-from sqlalchemy import func
+from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import Session, joinedload
 
 from .base import BaseRepository, apply_not_deleted, commit_with_rollback
 from ..models.ataque import MagiaPreparada
-from ..models.magia import Magia, MagiaClasse
+from ..models.magia import Magia, MagiaClasse, MagiaHistorico
 
 
 class MagiaRepository(BaseRepository[Magia]):
@@ -35,6 +35,8 @@ class MagiaRepository(BaseRepository[Magia]):
         componentes: Optional[str],
         dominio: Optional[str],
         ativo: Optional[bool],
+        sort_by: Optional[str],
+        sort_dir: Optional[str],
         skip: int,
         limit: int,
     ) -> Tuple[int, list[Magia]]:
@@ -78,7 +80,19 @@ class MagiaRepository(BaseRepository[Magia]):
             query = query.filter(Magia.dominios.ilike(f"%{dominio.strip()}%"))
 
         total = query.count()
-        items = query.order_by(Magia.nivel, Magia.nome).offset(skip).limit(limit).all()
+        sort_column = {
+            "nome": Magia.nome,
+            "escola": Magia.escola,
+            "nivel": Magia.nivel,
+        }.get((sort_by or "").strip().lower())
+
+        direction = (sort_dir or "asc").strip().lower()
+        if sort_column is not None:
+            order_expr = desc(sort_column) if direction == "desc" else asc(sort_column)
+            items = query.order_by(order_expr, Magia.id.asc()).offset(skip).limit(limit).all()
+        else:
+            items = query.order_by(Magia.nivel, Magia.nome, Magia.id.asc()).offset(skip).limit(limit).all()
+
         return total, items
 
     def listar_classes(self) -> list[str]:
@@ -116,3 +130,33 @@ class MagiaRepository(BaseRepository[Magia]):
         commit_with_rollback(self.db)
         self.db.refresh(magia)
         return magia
+
+    def registrar_historico(
+        self,
+        *,
+        magia_id: int | None,
+        usuario_id: int | None,
+        acao: str,
+        dados_anteriores: dict | None,
+        dados_novos: dict | None,
+    ) -> MagiaHistorico:
+        item = MagiaHistorico(
+            magia_id=magia_id,
+            usuario_id=usuario_id,
+            acao=acao,
+            dados_anteriores=dados_anteriores,
+            dados_novos=dados_novos,
+        )
+        self.db.add(item)
+        commit_with_rollback(self.db)
+        self.db.refresh(item)
+        return item
+
+    def listar_historico(self, magia_id: int, *, limit: int = 50) -> list[MagiaHistorico]:
+        return (
+            self.db.query(MagiaHistorico)
+            .filter(MagiaHistorico.magia_id == magia_id)
+            .order_by(MagiaHistorico.criado_em.desc(), MagiaHistorico.id.desc())
+            .limit(limit)
+            .all()
+        )

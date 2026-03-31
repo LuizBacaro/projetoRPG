@@ -111,6 +111,12 @@ class Settings(BaseSettings):
         """Railway gera 'postgres://' mas SQLAlchemy >= 2.0 requer 'postgresql://'"""
         if self.DATABASE_URL.startswith("postgres://"):
             self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        # Resolve caminho relativo SQLite para absoluto baseado em BASE_DIR,
+        # evitando apontamento ao diretório de trabalho quando iniciado fora do backend/.
+        if self.DATABASE_URL.startswith("sqlite:///./"):
+            db_file = self.DATABASE_URL[len("sqlite:///./"):]
+            absolute = self.BASE_DIR / db_file
+            self.DATABASE_URL = f"sqlite:///{absolute}"
 
 
 # Instância global (singleton)

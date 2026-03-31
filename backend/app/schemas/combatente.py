@@ -22,11 +22,13 @@ class CombatenteBase(BaseModel):
     tipo:       str = Field(..., pattern="^(jogador|monstro|npc)$")
     classe:     str = Field(..., min_length=1, max_length=50)
     raca:       Optional[str] = Field(default="", max_length=50)
+    alinhamento: Optional[str] = Field(default="", max_length=30)
+    dominios: Optional[str] = Field(default="", max_length=120)
 
     # ✅ NOVO: apenas monstros usam, mas aceita em todos os tipos (nullable)
     pagina_referencia: Optional[str] = Field(default="", max_length=100)
 
-    @field_validator('nome', 'classe', 'raca', 'pagina_referencia', mode='before')
+    @field_validator('nome', 'classe', 'raca', 'alinhamento', 'dominios', 'pagina_referencia', mode='before')
     @classmethod
     def sanitizar_texto(cls, v):
         return _strip_html(v)
@@ -62,11 +64,13 @@ class CombatenteUpdate(BaseModel):
     tipo:       Optional[str] = Field(None, pattern="^(jogador|monstro|npc)$")
     classe:     Optional[str] = Field(None, min_length=1, max_length=50)
     raca:       Optional[str] = Field(None, max_length=50)
+    alinhamento: Optional[str] = Field(None, max_length=30)
+    dominios: Optional[str] = Field(None, max_length=120)
 
     # ✅ NOVO
     pagina_referencia: Optional[str] = Field(None, max_length=100)
 
-    @field_validator('nome', 'classe', 'raca', 'pagina_referencia', mode='before')
+    @field_validator('nome', 'classe', 'raca', 'alinhamento', 'dominios', 'pagina_referencia', mode='before')
     @classmethod
     def sanitizar_texto(cls, v):
         return _strip_html(v)

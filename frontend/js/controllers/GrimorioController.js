@@ -150,6 +150,8 @@ class GrimorioController {
         this.itensGrimorio = itens.map((item) => {
             const magiaDetalhada = this.catalogoIndex.get(Number(item.magia_id));
             const nivelFallback = Number(item.magia_nivel ?? magiaDetalhada?.nivel ?? 0);
+            const dominioFallback = item.magia_e_magia_dominio ?? magiaDetalhada?.e_magia_dominio ?? false;
+            const dominiosFallback = item.magia_dominios ?? magiaDetalhada?.dominios ?? '';
             const magiaMesclada = {
                 ...(magiaDetalhada || {}),
                 id: Number(item.magia_id),
@@ -157,6 +159,8 @@ class GrimorioController {
                 escola: item.magia_escola || magiaDetalhada?.escola || '',
                 nivel: Number.isNaN(nivelFallback) ? 0 : nivelFallback,
                 componentes: item.magia_componentes || magiaDetalhada?.componentes || '',
+                e_magia_dominio: !!dominioFallback,
+                dominios: dominiosFallback,
                 descricao: magiaDetalhada?.descricao || '',
             };
 
@@ -238,6 +242,27 @@ class GrimorioController {
         }, 0);
 
         paginaEl.textContent = `${totalPaginas}`;
+    }
+
+    _classeSemAcessoMagias() {
+        const classe = this._normalizarClasse(this.classeAtiva);
+        const nivel = Number(this.combatente?.nivel || 1);
+        return (classe === 'Ranger' || classe === 'Paladino') && nivel < 4;
+    }
+
+    _renderizarAvisoClasse() {
+        const avisoEl = document.getElementById('grimorioAvisoClasse');
+        if (!avisoEl) return;
+
+        if (!this._classeSemAcessoMagias()) {
+            avisoEl.style.display = 'none';
+            avisoEl.textContent = '';
+            return;
+        }
+
+        const nivel = Number(this.combatente?.nivel || 1);
+        avisoEl.style.display = 'block';
+        avisoEl.textContent = `Esta classe so recebe acesso a magias no nivel 4. Nivel atual: ${nivel}.`;
     }
 
     _renderizarFiltroEscolas() {
@@ -347,10 +372,24 @@ class GrimorioController {
         const btnFechar = document.getElementById('btnFecharPainelAdicionar');
         const painel = document.getElementById('grimorioPainelAdicionar');
 
+        if (btnAbrir) {
+            const semAcesso = this._classeSemAcessoMagias();
+            btnAbrir.disabled = semAcesso;
+            btnAbrir.title = semAcesso
+                ? 'Disponivel apenas a partir do nivel 4 para Ranger/Paladino'
+                : 'Adicionar magia conhecida';
+            btnAbrir.style.opacity = semAcesso ? '0.5' : '1';
+            btnAbrir.style.cursor = semAcesso ? 'not-allowed' : 'pointer';
+        }
+
         if (btnAbrir && painel) {
             const clone = btnAbrir.cloneNode(true);
             btnAbrir.parentNode.replaceChild(clone, btnAbrir);
             clone.addEventListener('click', () => {
+                if (this._classeSemAcessoMagias()) {
+                    this._mostrarToast('Ranger e Paladino so recebem magias a partir do nivel 4.', 'info');
+                    return;
+                }
                 painel.classList.toggle('show');
             });
         }
@@ -428,6 +467,11 @@ class GrimorioController {
     _renderizarPainelAdicionar() {
         const lista = document.getElementById('grimorioAdicionarLista');
         if (!lista) return;
+
+        if (this._classeSemAcessoMagias()) {
+            lista.innerHTML = '<div class="grimorio-vazio">Ranger e Paladino so podem adicionar magias a partir do nivel 4.</div>';
+            return;
+        }
 
         const termo = (document.getElementById('grimorioAdicionarBusca')?.value || '').toLowerCase().trim();
         const idsExistentes = new Set(this.itensGrimorio.map((item) => Number(item.magia_id)));
@@ -532,8 +576,9 @@ class GrimorioController {
         container.innerHTML = this.notificacoes.map((item) => {
             const classeLida = item.lida ? 'lida' : 'nao-lida';
             const texto = this._textoNotificacao(item);
+            const tipoClasse = this._classeNotificacao(item);
             return `
-                <div class="grimorio-notificacao-item ${classeLida}" data-id="${item.id}">
+                <div class="grimorio-notificacao-item ${classeLida} ${tipoClasse}" data-id="${item.id}">
                     <div class="grimorio-notificacao-topo">
                         <strong>${escapeHtml(item.tipo || 'NOTIFICACAO')}</strong>
                         <span>${new Date(item.criada_em).toLocaleDateString('pt-BR')}</span>
@@ -578,8 +623,17 @@ class GrimorioController {
         });
     }
 
+    _classeNotificacao(item) {
+        if (item?.tipo === 'MAGIAS_ADICIONADAS') return 'grimorio-notificacao-auto';
+        if (item?.tipo === 'SEM_MAGIAS_ATE_NIVEL_4') return 'grimorio-notificacao-bloqueio';
+        return '';
+    }
+
     _textoNotificacao(item) {
         const dados = item.dados || {};
+        if (item.tipo === 'SEM_MAGIAS_ATE_NIVEL_4') {
+            return 'Ranger e Paladino so recebem magias quando alcancam o nivel 4.';
+        }
         if (item.tipo === 'TROCA_DISPONIVEL') {
             return 'Uma troca de magia está disponível para esta classe.';
         }
@@ -618,31 +672,40 @@ class GrimorioController {
         const lista = document.getElementById('grimorioLista');
         if (!lista) return;
 
-        if (this.itensFiltrados.length === 0) {
+        this._renderizarAvisoClasse();
+
+        const classeClerigo = this._classeAtivaEhClerigo();
+        const itensDominio = classeClerigo
+            ? this.itensFiltrados.filter((item) => this._ehMagiaDominio(item))
+            : [];
+        const itensPadrao = classeClerigo
+            ? this.itensFiltrados.filter((item) => !this._ehMagiaDominio(item))
+            : this.itensFiltrados;
+
+        if (itensDominio.length === 0 && itensPadrao.length === 0) {
+            if (this._classeSemAcessoMagias()) {
+                lista.innerHTML = '<div class="grimorio-vazio">Grimorio acessivel, mas sem magias: Ranger e Paladino recebem magias a partir do nivel 4.</div>';
+                return;
+            }
             lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
             return;
         }
 
-        const grupos = new Map();
-        this.itensFiltrados.forEach((item) => {
-            const nivel = Number(item.magia?.nivel || 0);
-            if (!grupos.has(nivel)) grupos.set(nivel, []);
-            grupos.get(nivel).push(item);
-        });
+        const partes = [];
+        if (classeClerigo && itensDominio.length > 0) {
+            partes.push(`
+                <div class="grimorio-grupo grimorio-grupo-dominio">
+                    <div class="grimorio-grupo-titulo">Magias de Dominio <span class="grimorio-grupo-slots">${itensDominio.length} magia(s)</span></div>
+                    ${this._renderizarCardsPorNivel(itensDominio)}
+                </div>
+            `);
+        }
 
-        const html = [...grupos.keys()]
-            .sort((a, b) => a - b)
-            .map((nivel) => {
-                const itens = grupos.get(nivel);
-                return `
-                    <div class="grimorio-grupo">
-                        <div class="grimorio-grupo-titulo">Nivel ${nivel} <span class="grimorio-grupo-slots">${itens.length} magia(s)</span></div>
-                        ${itens.map((item) => this._renderizarCard(item)).join('')}
-                    </div>
-                `;
-            }).join('');
+        if (itensPadrao.length > 0) {
+            partes.push(this._renderizarGruposPorNivel(itensPadrao));
+        }
 
-        lista.innerHTML = html;
+        lista.innerHTML = partes.join('');
 
         lista.querySelectorAll('.grimorio-favorita-btn').forEach((button) => {
             button.addEventListener('click', async (event) => {
@@ -684,12 +747,55 @@ class GrimorioController {
         });
     }
 
+    _renderizarGruposPorNivel(itens) {
+        const grupos = new Map();
+        itens.forEach((item) => {
+            const nivel = Number(item.magia?.nivel || 0);
+            if (!grupos.has(nivel)) grupos.set(nivel, []);
+            grupos.get(nivel).push(item);
+        });
+
+        return [...grupos.keys()]
+            .sort((a, b) => a - b)
+            .map((nivel) => {
+                const itensGrupo = grupos.get(nivel);
+                return `
+                    <div class="grimorio-grupo">
+                        <div class="grimorio-grupo-titulo">Nivel ${nivel} <span class="grimorio-grupo-slots">${itensGrupo.length} magia(s)</span></div>
+                        ${itensGrupo.map((item) => this._renderizarCard(item)).join('')}
+                    </div>
+                `;
+            }).join('');
+    }
+
+    _renderizarCardsPorNivel(itens) {
+        return [...itens]
+            .sort((a, b) => Number(a.magia?.nivel || 0) - Number(b.magia?.nivel || 0))
+            .map((item) => this._renderizarCard(item))
+            .join('');
+    }
+
+    _classeAtivaEhClerigo() {
+        const classe = String(this._normalizarClasse(this.classeAtiva) || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase();
+        return classe === 'clerigo';
+    }
+
+    _ehMagiaDominio(item) {
+        return !!(item?.magia?.e_magia_dominio || item?.magia_e_magia_dominio);
+    }
+
     _renderizarCard(item) {
         const magia = item.magia || {};
         const id = Number(item.magia_id);
         const aberta = this.cardsAbertos.has(id);
         const classeMago = this._normalizarClasse(this.classeAtiva) === 'Mago';
         const escola = this._normalizarEscola(magia.escola || '');
+        const magiaDominio = this._ehMagiaDominio(item);
+        const dominios = String(magia.dominios || item.magia_dominios || '').trim();
 
         const detalhes = `
             <div class="grimorio-card-detalhes ${aberta ? 'show' : ''}">
@@ -713,6 +819,7 @@ class GrimorioController {
                             <span class="grimorio-badge grimorio-badge-escola">${escapeHtml(escola || 'Sem escola')}</span>
                             <span class="grimorio-badge grimorio-badge-comp">N${Number(magia.nivel || 0)} - ${escapeHtml(magia.componentes || '-')}</span>
                             <span class="grimorio-badge grimorio-badge-origem">${escapeHtml(item.origem || 'SELECAO_MANUAL')}</span>
+                            ${magiaDominio ? `<span class="grimorio-badge grimorio-badge-dominio">Dominio${dominios ? `: ${escapeHtml(dominios)}` : ''}</span>` : ''}
                         </div>
                     </div>
                     <div class="grimorio-acoes-card">
@@ -821,6 +928,9 @@ class GrimorioController {
 
     _fecharModalDetalhes() {
         const anterior = document.getElementById('grimorioModalDetalhes');
+        if (anterior?._grimorioKeydownHandler) {
+            document.removeEventListener('keydown', anterior._grimorioKeydownHandler);
+        }
         if (anterior) anterior.remove();
     }
 
@@ -846,6 +956,8 @@ class GrimorioController {
         const componentesDetalhados = COMPONENTES
             .filter((sigla) => componentes.includes(sigla))
             .join(', ') || '-';
+        const posicaoAtual = this.indiceDetalheAtual + 1;
+        const totalItens = this.itensFiltrados.length;
 
         const anterior = document.getElementById('grimorioModalDetalhes');
         if (anterior) anterior.remove();
@@ -856,8 +968,11 @@ class GrimorioController {
         overlay.innerHTML = `
             <div class="grimorio-confirm-box grimorio-detalhe-box">
                 <div class="grimorio-confirm-header">
-                    <span class="grimorio-confirm-icone">✨</span>
-                    <h3 class="grimorio-confirm-titulo">${escapeHtml(magia.nome || `Magia ${item.magia_id}`)}</h3>
+                    <div class="grimorio-detalhe-header-main">
+                        <span class="grimorio-confirm-icone">✨</span>
+                        <h3 class="grimorio-confirm-titulo">${escapeHtml(magia.nome || `Magia ${item.magia_id}`)}</h3>
+                    </div>
+                    <span class="grimorio-detalhe-posicao">${posicaoAtual}/${totalItens}</span>
                 </div>
                 <div class="grimorio-detalhe-grid-modal">
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Escola</span><span class="grimorio-detalhe-valor">${escapeHtml(this._normalizarEscola(magia.escola || '-'))}</span></div>
@@ -909,6 +1024,15 @@ class GrimorioController {
         overlay.addEventListener('click', (event) => {
             if (event.target === overlay) this._fecharModalDetalhes();
         });
+
+        const onKeydown = (event) => {
+            if (event.key === 'Escape') this._fecharModalDetalhes();
+            if (event.key === 'ArrowLeft') this._navegarModalDetalhes(-1);
+            if (event.key === 'ArrowRight') this._navegarModalDetalhes(1);
+        };
+        document.addEventListener('keydown', onKeydown);
+        overlay.dataset.keydownBound = 'true';
+        overlay._grimorioKeydownHandler = onKeydown;
     }
 
     _mostrarModalConfirmacao(opcoes) {

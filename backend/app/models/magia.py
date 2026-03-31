@@ -4,7 +4,7 @@ SRP: Modelo ORM para Magias D&D 3.5 (PHB)
 SOLID: Single Responsibility — apenas mapeamento de tabela de magias
 """
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import JSON, Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from ..core.database import Base 
@@ -139,3 +139,18 @@ class MagiaClasse(Base):
     nivel = Column(Integer, nullable=False)
 
     magia = relationship("Magia", back_populates="classes_niveis")
+
+
+class MagiaHistorico(Base):
+    """Historico de alteracoes aplicadas no catalogo de magias."""
+
+    __tablename__ = "magia_historico"
+    __table_args__ = {"extend_existing": True}
+
+    id = Column(Integer, primary_key=True, index=True)
+    magia_id = Column(Integer, nullable=True, index=True)
+    usuario_id = Column(Integer, nullable=True, index=True)
+    acao = Column(String(20), nullable=False)
+    dados_anteriores = Column(JSON, nullable=True)
+    dados_novos = Column(JSON, nullable=True)
+    criado_em = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)

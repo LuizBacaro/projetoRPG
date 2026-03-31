@@ -132,3 +132,48 @@ def test_magias_atualizar_classes_niveis_recalcula_legado(magias_db):
         ("BARDO", 2),
         ("MAGO", 3),
     ]
+
+
+def test_magias_listar_ordenacao_por_nome_desc(magias_db):
+    _, db_factory = magias_db
+    client = _build_client(db_factory)
+
+    for nome in ["Alpha", "Charlie", "Bravo"]:
+        resp = client.post(
+            "/api/v1/magias",
+            json=_payload(nome, [{"classe": "MAGO", "nivel": 1}]),
+        )
+        assert resp.status_code == 201
+
+    lista = client.get("/api/v1/magias", params={"sort_by": "nome", "sort_dir": "desc", "limit": 20})
+    assert lista.status_code == 200
+
+    nomes = [item["nome"] for item in lista.json()]
+    assert nomes[:3] == ["Charlie", "Bravo", "Alpha"]
+
+
+def test_magias_criar_rejeita_dominio_fora_lista_fixa(magias_db):
+    _, db_factory = magias_db
+    client = _build_client(db_factory)
+
+    payload = _payload("Tempestade Astral", [{"classe": "CLERIGO", "nivel": 4}])
+    payload["e_magia_dominio"] = True
+    payload["dominios"] = "Tempo"
+
+    resp = client.post("/api/v1/magias", json=payload)
+
+    assert resp.status_code == 422
+    assert "Dominio invalido" in resp.json()["detail"]
+
+
+def test_magias_listar_dominios_retorna_lista_fixa(magias_db):
+    _, db_factory = magias_db
+    client = _build_client(db_factory)
+
+    resp = client.get("/api/v1/magias/dominios")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert "Ar" in body
+    assert "Magia" in body
+    assert "Viagem" in body

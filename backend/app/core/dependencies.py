@@ -13,6 +13,7 @@ from ..repositories.condicao_repository import CondicaoRepository
 from ..repositories.magia_repository import MagiaRepository
 from ..repositories.grimorio_repository import GrimorioRepository
 from ..services.condicao_service import CondicaoService
+from ..services.magia_import_service import MagiaImportService
 from ..services.magia_service import MagiaService
 from ..services.grimorio_service import GrimorioService
 
@@ -61,6 +62,13 @@ def get_magia_service(
 ) -> MagiaService:
     """Factory para MagiaService"""
     return MagiaService(repository)
+
+
+def get_magia_import_service(
+    magia_service: MagiaService = Depends(get_magia_service),
+) -> MagiaImportService:
+    """Factory para MagiaImportService"""
+    return MagiaImportService(magia_service)
 
 
 def get_grimorio_service(

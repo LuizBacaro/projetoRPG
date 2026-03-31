@@ -39,6 +39,8 @@ def _serialize(item) -> dict:
         "magia_escola": magia.escola if magia else None,
         "magia_nivel": magia.nivel if magia else None,
         "magia_componentes": magia.componentes if magia else None,
+        "magia_e_magia_dominio": bool(magia.e_magia_dominio) if magia else False,
+        "magia_dominios": magia.dominios if magia else None,
     }
 
 

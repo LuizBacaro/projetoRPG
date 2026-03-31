@@ -43,21 +43,10 @@
                             <span class="circulo-valor" id="fichaForResumo">10</span>
                             <span class="circulo-mod" id="fichaForModResumo">+0</span>
                         </div>
-        <div class="grimorio-indicadores">
-            <div class="grimorio-indicador">
-                <span class="grimorio-indicador-label">Magias Conhecidas</span>
-                <strong id="grimorioTotalMagias">0</strong>
-            </div>
-            <div class="grimorio-indicador">
-                <span class="grimorio-indicador-label">Páginas (Mago)</span>
-                <strong id="grimorioTotalPaginas">-</strong>
-            </div>
-            <div class="grimorio-classe-wrap" id="grimorioClasseWrap" style="display:none">
-                <label for="grimorioClasseSelect" class="grimorio-indicador-label">Classe</label>
-                <select id="grimorioClasseSelect" class="grimorio-classe-select"></select>
-            </div>
-        </div>
-
+                        <span class="circulo-label">FOR</span>
+                    </div>
+                    <div class="ficha-atributo-circulo" data-id="destreza">
+                        <div class="circulo-externo">
                             <span class="circulo-valor" id="fichaDesResumo">10</span>
                             <span class="circulo-mod" id="fichaDesModResumo">+0</span>
                         </div>
@@ -67,7 +56,8 @@
                         <div class="circulo-externo">
                             <span class="circulo-valor" id="fichaConResumo">10</span>
                             <span class="circulo-mod" id="fichaConModResumo">+0</span>
-                <input type="text" id="grimorioBusca" class="grimorio-busca" placeholder="Nome, escola, descricao...">
+                        </div>
+                        <span class="circulo-label">CON</span>
                     </div>
                     <div class="ficha-atributo-circulo" data-id="inteligencia">
                         <div class="circulo-externo">
@@ -86,17 +76,8 @@
                     <div class="ficha-atributo-circulo" data-id="carisma">
                         <div class="circulo-externo">
                             <span class="circulo-valor" id="fichaCarResumo">10</span>
-                    <button class="grimorio-nivel-btn" id="btnFiltroFavoritas">★ Favoritas</button>
-                    <button class="grimorio-nivel-btn" id="btnAdicionarMagiaGrimorio">+ Adicionar Magia</button>
-                    <select id="grimorioFiltroComponente" class="grimorio-componente-select">
-                        <option value="todos">Componentes: Todos</option>
-                        <option value="V">Componente V</option>
-                        <option value="G">Componente G</option>
-                        <option value="M">Componente M</option>
-                        <option value="F">Componente F</option>
-                        <option value="FD">Componente FD</option>
-                        <option value="XP">Componente XP</option>
-                    </select>
+                            <span class="circulo-mod" id="fichaCarModResumo">+0</span>
+                        </div>
                         <span class="circulo-label">CAR</span>
                     </div>
                 </div>
@@ -126,7 +107,6 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3 class="ficha-secao-titulo">🌟 Talentos</h3>
                     <button class="ficha-btn-adicionar" id="btnAdicionarTalento" 
-        <script type="module" src="../js/controllers/GrimorioController.js?v=3"></script>
                         ➕ Adicionar
                     </button>
                 </div>
@@ -183,11 +163,15 @@
                     <span id="fichaRaca"   class="ficha-tag ficha-tag-raca">—</span>
                     <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
                     <span id="fichaTipo"   class="ficha-tag ficha-tag-tipo">—</span>
-                    <span class="ficha-tag ficha-tag-nivel">
                         <span class="ficha-nivel-label">Nív.</span>
                         <span id="fichaNivel" class="ficha-nivel-valor">—</span>
                     </span>
                 </div>
+                <div class="ficha-meta ficha-meta-secundaria">
+                    <span id="fichaAlinhamento" class="ficha-tag ficha-tag-alinhamento">Alinhamento: —</span>
+                    <span id="fichaDominios" class="ficha-tag ficha-tag-dominio">Domínios: —</span>
+                </div>
+                <button id="btnEditarPerfilMagico" class="ficha-btn-editar-identidade" type="button">Editar alinhamento e domínios</button>
             </div>
 
         </section>
@@ -289,6 +273,8 @@
                     placeholder="Nome, escola, descricao...">
             </div>
         </div>
+
+        <div id="grimorioAvisoClasse" class="grimorio-aviso-classe" style="display:none"></div>
 
         <div class="grimorio-filtros">
             <div class="grimorio-filtro-grupo">
@@ -543,9 +529,48 @@
 
 </div>
 
+<div id="modalPerfilMagico" class="ficha-modal-overlay" style="display: none;">
+    <div class="ficha-modal-box ficha-modal-box-curto">
+        <div class="ficha-modal-header">
+            <div>
+                <h3>Perfil divino e moral</h3>
+                <p>Esses dados influenciam as restrições automáticas do grimório.</p>
+            </div>
+            <button id="btnFecharModalPerfilMagico" class="ficha-modal-close" type="button">✕</button>
+        </div>
+        <div class="ficha-modal-body">
+            <label class="ficha-modal-field">
+                <span>Alinhamento</span>
+                <select id="inputPerfilAlinhamento">
+                    <option value="">Não definido</option>
+                    <option value="Leal e Bom">Leal e Bom</option>
+                    <option value="Neutro e Bom">Neutro e Bom</option>
+                    <option value="Caótico e Bom">Caótico e Bom</option>
+                    <option value="Leal e Neutro">Leal e Neutro</option>
+                    <option value="Neutro">Neutro</option>
+                    <option value="Caótico e Neutro">Caótico e Neutro</option>
+                    <option value="Leal e Mal">Leal e Mal</option>
+                    <option value="Neutro e Mal">Neutro e Mal</option>
+                    <option value="Caótico e Mal">Caótico e Mal</option>
+                </select>
+            </label>
+            <label class="ficha-modal-field">
+                <span>Domínios</span>
+                <input id="inputPerfilDominios" list="listaPerfilDominios" placeholder="Ex: Bem, Proteção" />
+                <datalist id="listaPerfilDominios"></datalist>
+                <small id="hintPerfilDominios">Carregando domínios permitidos...</small>
+            </label>
+        </div>
+        <div class="ficha-modal-actions">
+            <button id="btnCancelarPerfilMagico" class="btn-voltar" type="button">Cancelar</button>
+            <button id="btnSalvarPerfilMagico" class="btn-abrir-grimorio" type="button">Salvar perfil</button>
+        </div>
+    </div>
+</div>
+
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
-<script type="module" src="../js/services/NotificationService.js"></script>
-<script type="module" src="../js/controllers/FichaPersonagemController.js?v=6"></script>
+<script type="module" src="../js/services/NotificationService.js?v=28"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=7"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=3"></script>
 </body>
 </html>

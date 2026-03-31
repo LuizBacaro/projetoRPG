@@ -59,6 +59,8 @@ async def criar_combatente(
     tipo:       str = Form("jogador", max_length=20),
     classe:     str = Form("Aventureiro", max_length=50),
     raca:       Optional[str] = Form(None, max_length=50),
+    alinhamento: Optional[str] = Form(None, max_length=30),
+    dominios: Optional[str] = Form(None, max_length=120),
     # ✅ NOVO
     pagina_referencia: Optional[str] = Form(None, max_length=100),
     # Defesa
@@ -89,6 +91,8 @@ async def criar_combatente(
         "tipo":               tipo,
         "classe":             classe,
         "raca":               raca or "",
+        "alinhamento":        alinhamento or "",
+        "dominios":           dominios or "",
         "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
         "hp_maximo":          hp_maximo,
         "iniciativa":         iniciativa,
@@ -122,6 +126,8 @@ async def atualizar_combatente(
     tipo:          str = Form(..., max_length=20),
     classe:        str = Form("Aventureiro", max_length=50),
     raca:          Optional[str] = Form(None, max_length=50),
+    alinhamento: Optional[str] = Form(None, max_length=30),
+    dominios: Optional[str] = Form(None, max_length=120),
     # ✅ NOVO
     pagina_referencia: Optional[str] = Form(None, max_length=100),
     # Defesa
@@ -152,6 +158,8 @@ async def atualizar_combatente(
         "tipo":               tipo,
         "classe":             classe,
         "raca":               raca or "",
+        "alinhamento":        alinhamento or "",
+        "dominios":           dominios or "",
         "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
         "hp_maximo":          hp_maximo,
         "iniciativa":         iniciativa,

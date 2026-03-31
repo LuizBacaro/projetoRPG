@@ -197,6 +197,10 @@ body {
     justify-content: center;
 }
 
+.ficha-meta-secundaria {
+    margin-top: 0.3rem;
+}
+
 .ficha-tag {
     display: inline-block;
     font-size: 0.68rem;
@@ -263,6 +267,136 @@ body {
     font-size: 0.72rem;
     font-weight: 700;
     color: inherit;
+}
+
+.ficha-tag-alinhamento {
+    background: rgba(35, 91, 120, 0.14);
+    color: #5e9fcc;
+    border: 1px solid rgba(35, 91, 120, 0.36);
+}
+
+.ficha-tag-dominio {
+    background: rgba(33, 99, 51, 0.14);
+    color: #68b07a;
+    border: 1px solid rgba(33, 99, 51, 0.36);
+}
+
+.ficha-btn-editar-identidade {
+    margin-top: 0.45rem;
+    align-self: center;
+    border: 1px solid rgba(201, 168, 76, 0.38);
+    background: linear-gradient(135deg, rgba(92, 58, 30, 0.14), rgba(201, 168, 76, 0.12));
+    color: var(--cor-madeira);
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.ficha-btn-editar-identidade:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.ficha-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 8, 4, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 1400;
+}
+
+.ficha-modal-box {
+    width: min(560px, 96vw);
+    background: linear-gradient(145deg, var(--cor-pergaminho), var(--cor-pergaminho-esc));
+    border: 2px solid var(--cor-madeira-clara);
+    border-radius: 16px;
+    box-shadow: var(--sombra-forte);
+    overflow: hidden;
+}
+
+.ficha-modal-box-curto {
+    width: min(520px, 96vw);
+}
+
+.ficha-modal-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem 1rem 0.7rem;
+    border-bottom: 1px solid rgba(92, 58, 30, 0.18);
+}
+
+.ficha-modal-header h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-madeira);
+    font-size: 1rem;
+}
+
+.ficha-modal-header p {
+    margin-top: 0.18rem;
+    color: var(--cor-tinta-suave);
+    font-size: 0.84rem;
+}
+
+.ficha-modal-close {
+    border: 1px solid rgba(92, 58, 30, 0.25);
+    background: rgba(255,255,255,0.35);
+    color: var(--cor-madeira);
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+}
+
+.ficha-modal-body {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.85rem;
+}
+
+.ficha-modal-field {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.ficha-modal-field span {
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    color: var(--cor-madeira);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.ficha-modal-field input,
+.ficha-modal-field select {
+    border: 1px solid rgba(92, 58, 30, 0.28);
+    border-radius: 10px;
+    background: rgba(255, 252, 244, 0.85);
+    color: var(--cor-tinta);
+    padding: 0.7rem 0.8rem;
+    font-family: var(--fonte-texto);
+    font-size: 0.95rem;
+}
+
+.ficha-modal-field small {
+    color: var(--cor-madeira-clara);
+    font-size: 0.76rem;
+    line-height: 1.4;
+}
+
+.ficha-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 0 1rem 1rem;
 }
 
 .ficha-nivel-linha {

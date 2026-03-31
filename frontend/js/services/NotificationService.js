@@ -26,11 +26,21 @@ export class NotificationService {
         this._mostrarToast(mensagem, 'success', duracao);
     }
 
+    // Alias de retrocompatibilidade para código legado.
+    static sucesso(mensagem, duracao = 3000) {
+        this.mostrarSucesso(mensagem, duracao);
+    }
+
     /**
      * Mostra notificação de erro
      */
     static mostrarErro(mensagem, duracao = 5000) {
         this._mostrarToast(mensagem, 'error', duracao);
+    }
+
+    // Alias de retrocompatibilidade para código legado.
+    static erro(mensagem, duracao = 5000) {
+        this.mostrarErro(mensagem, duracao);
     }
 
     /**
@@ -40,11 +50,21 @@ export class NotificationService {
         this._mostrarToast(mensagem, 'warning', duracao);
     }
 
+    // Alias de retrocompatibilidade para código legado.
+    static aviso(mensagem, duracao = 3000) {
+        this.mostrarAviso(mensagem, duracao);
+    }
+
     /**
      * Mostra notificação de informação
      */
     static mostrarInfo(mensagem, duracao = 3000) {
         this._mostrarToast(mensagem, 'info', duracao);
+    }
+
+    // Alias de retrocompatibilidade para código legado.
+    static info(mensagem, duracao = 3000) {
+        this.mostrarInfo(mensagem, duracao);
     }
 
     /**
