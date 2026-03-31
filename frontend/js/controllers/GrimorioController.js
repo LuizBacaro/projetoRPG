@@ -47,6 +47,7 @@ class GrimorioController {
         this.escolaAtiva = 'todas';
         this.componenteAtivo = 'todos';
         this.favoritasApenas = false;
+        this.magiaAdicionarSelecionadaId = null;
 
         this.cardsAbertos = new Set();
         this._carregado = false;
@@ -162,6 +163,11 @@ class GrimorioController {
                 e_magia_dominio: !!dominioFallback,
                 dominios: dominiosFallback,
                 descricao: magiaDetalhada?.descricao || '',
+                sub_escola: magiaDetalhada?.sub_escola || magiaDetalhada?.subescola || '',
+                subescola: magiaDetalhada?.sub_escola || magiaDetalhada?.subescola || '',
+                area_efeito: magiaDetalhada?.area_efeito || magiaDetalhada?.area_efeito_alvo || '',
+                area_efeito_alvo: magiaDetalhada?.area_efeito || magiaDetalhada?.area_efeito_alvo || '',
+                resistencia_magia: magiaDetalhada?.resistencia_magia || magiaDetalhada?.resistencia_magia_texto || '',
             };
 
             return {
@@ -226,6 +232,8 @@ class GrimorioController {
     _renderizarIndicadores() {
         const totalEl = document.getElementById('grimorioTotalMagias');
         const paginaEl = document.getElementById('grimorioTotalPaginas');
+        const paginaNivelWrap = document.getElementById('grimorioPaginasPorNivelWrap');
+        const paginaNivelEl = document.getElementById('grimorioPaginasPorNivel');
         const classeNorm = this._normalizarClasse(this.classeAtiva);
 
         if (totalEl) totalEl.textContent = `${this.itensGrimorio.length}`;
@@ -233,15 +241,27 @@ class GrimorioController {
         if (!paginaEl) return;
         if (classeNorm !== 'Mago') {
             paginaEl.textContent = '-';
+            if (paginaNivelWrap) paginaNivelWrap.style.display = 'none';
+            if (paginaNivelEl) paginaNivelEl.textContent = '-';
             return;
         }
 
+        const paginasPorNivel = new Map();
         const totalPaginas = this.itensGrimorio.reduce((sum, item) => {
             const nivel = Number(item.magia?.nivel || 0);
-            return sum + (nivel <= 0 ? 1 : nivel);
+            const paginas = nivel <= 0 ? 1 : nivel;
+            paginasPorNivel.set(nivel, (paginasPorNivel.get(nivel) || 0) + paginas);
+            return sum + paginas;
         }, 0);
 
         paginaEl.textContent = `${totalPaginas}`;
+        if (paginaNivelWrap) paginaNivelWrap.style.display = 'inline-flex';
+        if (paginaNivelEl) {
+            paginaNivelEl.textContent = [...paginasPorNivel.entries()]
+                .sort((a, b) => a[0] - b[0])
+                .map(([nivel, paginas]) => `N${nivel}: ${paginas}`)
+                .join(' | ');
+        }
     }
 
     _classeSemAcessoMagias() {
@@ -298,7 +318,7 @@ class GrimorioController {
         this._bindFavoritas();
         this._bindComponente();
         this._bindAdicionarMagia();
-        this._bindBuscaAdicionar();
+        this._bindFiltrosAdicionar();
         this._bindTrocaMagia();
         this._bindNotificacoes();
     }
@@ -455,39 +475,81 @@ class GrimorioController {
         }
     }
 
-    _bindBuscaAdicionar() {
-        const input = document.getElementById('grimorioAdicionarBusca');
-        if (!input) return;
+    _bindFiltrosAdicionar() {
+        const filtros = [
+            { id: 'grimorioAdicionarBusca', evento: 'input' },
+            { id: 'grimorioAdicionarEscola', evento: 'change' },
+            { id: 'grimorioAdicionarNivel', evento: 'change' },
+            { id: 'grimorioAdicionarComponente', evento: 'change' },
+        ];
 
-        const clone = input.cloneNode(true);
-        input.parentNode.replaceChild(clone, input);
-        clone.addEventListener('input', () => this._renderizarPainelAdicionar());
+        filtros.forEach(({ id, evento }) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const clone = el.cloneNode(true);
+            el.parentNode.replaceChild(clone, el);
+            clone.addEventListener(evento, () => this._renderizarPainelAdicionar());
+        });
     }
 
     _renderizarPainelAdicionar() {
         const lista = document.getElementById('grimorioAdicionarLista');
-        if (!lista) return;
+        const preview = document.getElementById('grimorioAdicionarPreview');
+        if (!lista || !preview) return;
 
         if (this._classeSemAcessoMagias()) {
             lista.innerHTML = '<div class="grimorio-vazio">Ranger e Paladino so podem adicionar magias a partir do nivel 4.</div>';
+            preview.innerHTML = '<div class="grimorio-historico-vazio">Sem acesso a magias nesta classe/nível.</div>';
             return;
+        }
+
+        const escolaSelect = document.getElementById('grimorioAdicionarEscola');
+        if (escolaSelect) {
+            const escolaAtual = escolaSelect.value || 'todas';
+            const escolas = [...new Set(this.catalogoClasse
+                .map((magia) => this._normalizarEscola(magia.escola || ''))
+                .filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+            escolaSelect.innerHTML = ['<option value="todas">Todas</option>']
+                .concat(escolas.map((escola) => `<option value="${escapeHtml(escola)}">${escapeHtml(escola)}</option>`))
+                .join('');
+            escolaSelect.value = escolas.includes(escolaAtual) ? escolaAtual : 'todas';
         }
 
         const termo = (document.getElementById('grimorioAdicionarBusca')?.value || '').toLowerCase().trim();
+        const escolaFiltro = document.getElementById('grimorioAdicionarEscola')?.value || 'todas';
+        const nivelFiltro = document.getElementById('grimorioAdicionarNivel')?.value || 'todos';
+        const componenteFiltro = document.getElementById('grimorioAdicionarComponente')?.value || 'todos';
         const idsExistentes = new Set(this.itensGrimorio.map((item) => Number(item.magia_id)));
+        const maxNivelConjuravel = this._maxNivelConjuravel(this.classeAtiva, Number(this.combatente?.nivel || 1));
 
         let disponiveis = this.catalogoClasse.filter((magia) => !idsExistentes.has(Number(magia.id)));
+        disponiveis = disponiveis.filter((magia) => Number(magia.nivel || 0) <= maxNivelConjuravel);
 
-        if (termo) {
-            disponiveis = disponiveis.filter((magia) => {
-                const alvo = [magia.nome, magia.escola, magia.componentes].filter(Boolean).join(' ').toLowerCase();
-                return alvo.includes(termo);
-            });
-        }
+        disponiveis = disponiveis.filter((magia) => {
+            const escolaNormalizada = this._normalizarEscola(magia.escola || '');
+            const matchEscola = escolaFiltro === 'todas' || escolaNormalizada === escolaFiltro;
+            const matchNivel = nivelFiltro === 'todos' || String(Number(magia.nivel || 0)) === String(nivelFiltro);
+            const componentes = this._extrairComponentes(magia.componentes || '');
+            const matchComponente = componenteFiltro === 'todos' || componentes.has(String(componenteFiltro).toUpperCase());
+
+            if (!termo) return matchEscola && matchNivel && matchComponente;
+
+            const alvo = [magia.nome, magia.escola, magia.componentes, magia.descricao]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase();
+            return matchEscola && matchNivel && matchComponente && alvo.includes(termo);
+        });
 
         if (disponiveis.length === 0) {
             lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia disponivel para adicionar.</div>';
+            preview.innerHTML = '<div class="grimorio-historico-vazio">Nenhuma magia corresponde aos filtros selecionados.</div>';
             return;
+        }
+
+        if (!disponiveis.some((magia) => Number(magia.id) === Number(this.magiaAdicionarSelecionadaId))) {
+            this.magiaAdicionarSelecionadaId = Number(disponiveis[0].id);
         }
 
         lista.innerHTML = disponiveis.map((magia) => `
@@ -496,16 +558,56 @@ class GrimorioController {
                     <strong>${escapeHtml(magia.nome)}</strong>
                     <span>Nivel ${Number(magia.nivel || 0)} - ${escapeHtml(this._normalizarEscola(magia.escola || ''))}</span>
                 </div>
-                <button class="grimorio-add-btn" data-id="${magia.id}">Adicionar</button>
+                <button class="grimorio-add-btn grimorio-add-btn-selecionar" data-id="${magia.id}">Preview</button>
             </div>
         `).join('');
 
         lista.querySelectorAll('.grimorio-add-btn').forEach((button) => {
-            button.addEventListener('click', async () => {
+            button.addEventListener('click', () => {
                 const magiaId = Number(button.dataset.id);
-                await this._adicionarMagia(magiaId);
+                this.magiaAdicionarSelecionadaId = magiaId;
+                this._renderizarPreviewAdicionar(disponiveis, magiaId);
             });
         });
+
+        this._renderizarPreviewAdicionar(disponiveis, this.magiaAdicionarSelecionadaId);
+    }
+
+    _renderizarPreviewAdicionar(disponiveis, magiaId) {
+        const preview = document.getElementById('grimorioAdicionarPreview');
+        if (!preview) return;
+
+        const magia = (disponiveis || []).find((item) => Number(item.id) === Number(magiaId));
+        if (!magia) {
+            preview.innerHTML = '<div class="grimorio-historico-vazio">Selecione uma magia para visualizar o preview antes de adicionar.</div>';
+            return;
+        }
+
+        preview.innerHTML = `
+            <div class="grimorio-add-preview-titulo">${escapeHtml(magia.nome || 'Magia')}</div>
+            <div class="grimorio-add-preview-grid">
+                <div class="grimorio-add-preview-linha"><span class="grimorio-add-preview-chave">Nivel</span><span class="grimorio-add-preview-valor">${Number(magia.nivel || 0)}</span></div>
+                <div class="grimorio-add-preview-linha"><span class="grimorio-add-preview-chave">Escola</span><span class="grimorio-add-preview-valor">${escapeHtml(this._normalizarEscola(magia.escola || '-'))}</span></div>
+                <div class="grimorio-add-preview-linha"><span class="grimorio-add-preview-chave">Componentes</span><span class="grimorio-add-preview-valor">${escapeHtml(magia.componentes || '-')}</span></div>
+                <div class="grimorio-add-preview-linha"><span class="grimorio-add-preview-chave">Conjuracao</span><span class="grimorio-add-preview-valor">${escapeHtml(magia.tempo_conjuracao || '-')}</span></div>
+                <div class="grimorio-add-preview-linha"><span class="grimorio-add-preview-chave">Alcance</span><span class="grimorio-add-preview-valor">${escapeHtml(magia.alcance || '-')}</span></div>
+            </div>
+            <div class="grimorio-add-preview-descricao">${escapeHtml((magia.descricao || 'Sem descrição.').slice(0, 320))}</div>
+            <button class="grimorio-add-btn grimorio-add-preview-acao" id="btnConfirmarAdicionarPreview">Adicionar esta magia</button>
+        `;
+
+        preview.querySelector('#btnConfirmarAdicionarPreview')?.addEventListener('click', async () => {
+            await this._adicionarMagia(Number(magia.id));
+        });
+    }
+
+    _extrairComponentes(valor) {
+        const partes = String(valor || '')
+            .toUpperCase()
+            .split(/[^A-Z]+/)
+            .map((item) => item.trim())
+            .filter(Boolean);
+        return new Set(partes);
     }
 
     _renderizarPainelTroca() {
@@ -522,12 +624,47 @@ class GrimorioController {
             .join('');
 
         const idsExistentes = new Set(itensClasse.map((item) => Number(item.magia_id)));
-        const disponiveis = this.catalogoClasse.filter((magia) => !idsExistentes.has(Number(magia.id)));
+        const maxNivelConjuravel = this._maxNivelConjuravel(this.classeAtiva, Number(this.combatente?.nivel || 1));
+        const disponiveis = this.catalogoClasse
+            .filter((magia) => !idsExistentes.has(Number(magia.id)))
+            .filter((magia) => Number(magia.nivel || 0) <= maxNivelConjuravel);
         selectAdicionada.innerHTML = ['<option value="">Selecione a magia adicionada</option>']
             .concat(disponiveis.map((magia) => `
                 <option value="${magia.id}">${escapeHtml(magia.nome)} (N${Number(magia.nivel || 0)})</option>
             `))
             .join('');
+    }
+
+    _maxNivelConjuravel(classe, nivelPersonagem) {
+        const classeNorm = String(this._normalizarClasse(classe) || '').toLowerCase();
+        const nivel = Math.max(1, Number(nivelPersonagem || 1));
+
+        if (['clerigo', 'druida', 'mago'].includes(classeNorm)) {
+            return Math.min(9, Math.floor((nivel + 1) / 2));
+        }
+
+        if (['ranger', 'paladino'].includes(classeNorm)) {
+            if (nivel < 4) return 0;
+            return Math.min(4, Math.floor((nivel - 1) / 3));
+        }
+
+        if (classeNorm === 'feiticeiro') {
+            const progressao = {
+                1: 1, 2: 1, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 9: 5, 10: 5,
+                11: 6, 12: 6, 13: 7, 14: 7, 15: 8, 16: 8, 17: 9, 18: 9, 19: 9, 20: 9,
+            };
+            return progressao[Math.min(20, nivel)] || 1;
+        }
+
+        if (classeNorm === 'bardo') {
+            const progressao = {
+                1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 3, 7: 3, 8: 3, 9: 4, 10: 4,
+                11: 4, 12: 5, 13: 5, 14: 5, 15: 6, 16: 6, 17: 6, 18: 6, 19: 6, 20: 6,
+            };
+            return progressao[Math.min(20, nivel)] || 0;
+        }
+
+        return 0;
     }
 
     async _carregarHistoricoTrocas() {
@@ -639,10 +776,30 @@ class GrimorioController {
         }
         if (item.tipo === 'SELECAO_PENDENTE') {
             const qtd = Number(dados.quantidade_pendente || 0);
+            const porNivel = dados.por_nivel && typeof dados.por_nivel === 'object' ? dados.por_nivel : {};
+            const niveis = Object.entries(porNivel)
+                .map(([nivel, quantidade]) => ({ nivel: Number(nivel), quantidade: Number(quantidade || 0) }))
+                .filter((itemNivel) => Number.isFinite(itemNivel.nivel) && itemNivel.quantidade > 0)
+                .sort((a, b) => a.nivel - b.nivel)
+                .map((itemNivel) => `${itemNivel.quantidade} no nível ${itemNivel.nivel}`)
+                .join(', ');
+
+            if (niveis) {
+                return `Você possui ${qtd} magia(s) disponível(is) para seleção (${niveis}).`;
+            }
+
             return `Você possui ${qtd} magia(s) disponível(is) para seleção no catálogo.`;
         }
         if (item.tipo === 'MAGIAS_ADICIONADAS') {
             const qtd = Number(dados.quantidade || 0);
+            const nomes = Array.isArray(dados.magias_nomes)
+                ? dados.magias_nomes.map((nome) => String(nome || '').trim()).filter(Boolean)
+                : [];
+            if (nomes.length > 0) {
+                const resumo = nomes.slice(0, 4).join(', ');
+                const sufixo = nomes.length > 4 ? ` e mais ${nomes.length - 4}` : '';
+                return `${qtd} nova(s) magia(s) foram adicionadas automaticamente ao grimório: ${resumo}${sufixo}.`;
+            }
             return `${qtd} nova(s) magia(s) foram adicionadas automaticamente ao grimório.`;
         }
         return 'Notificação do grimório.';
@@ -828,6 +985,16 @@ class GrimorioController {
                         ${classeMago ? `<button class="grimorio-remover-btn" data-magia-id="${id}" title="Remover">🗑</button>` : ''}
                     </div>
                 </div>
+                <div class="grimorio-card-meta" aria-label="Resumo rapido da magia">
+                    <div class="grimorio-meta-item">
+                        <span class="grimorio-meta-label">Conjuracao</span>
+                        <span class="grimorio-meta-valor">${escapeHtml(magia.tempo_conjuracao || '-')}</span>
+                    </div>
+                    <div class="grimorio-meta-item">
+                        <span class="grimorio-meta-label">Alcance</span>
+                        <span class="grimorio-meta-valor">${escapeHtml(magia.alcance || '-')}</span>
+                    </div>
+                </div>
                 <p class="grimorio-card-descricao">${escapeHtml((magia.descricao || '').slice(0, 200) || 'Sem descricao.')}</p>
                 ${detalhes}
                 <div class="grimorio-card-rodape">
@@ -952,10 +1119,8 @@ class GrimorioController {
 
         const magia = item.magia || {};
         const classeMago = this._normalizarClasse(this.classeAtiva) === 'Mago';
-        const componentes = String(magia.componentes || '').toUpperCase();
-        const componentesDetalhados = COMPONENTES
-            .filter((sigla) => componentes.includes(sigla))
-            .join(', ') || '-';
+        const componentesDetalhados = this._componentesDetalhados(magia);
+        const niveisPorClasse = this._formatarNiveisPorClasse(magia, item);
         const posicaoAtual = this.indiceDetalheAtual + 1;
         const totalItens = this.itensFiltrados.length;
 
@@ -976,17 +1141,18 @@ class GrimorioController {
                 </div>
                 <div class="grimorio-detalhe-grid-modal">
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Escola</span><span class="grimorio-detalhe-valor">${escapeHtml(this._normalizarEscola(magia.escola || '-'))}</span></div>
-                    <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Subescola</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.subescola || '-')}</span></div>
+                    <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Subescola</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.sub_escola || magia.subescola || '-')}</span></div>
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Descritor</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.descritor || '-')}</span></div>
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Nivel</span><span class="grimorio-detalhe-valor">${Number(magia.nivel || 0)}</span></div>
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Classe</span><span class="grimorio-detalhe-valor">${escapeHtml(item.classe || this.classeAtiva || '-')}</span></div>
+                    <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Niveis por classe</span><span class="grimorio-detalhe-valor">${escapeHtml(niveisPorClasse)}</span></div>
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Componentes</span><span class="grimorio-detalhe-valor">${escapeHtml(componentesDetalhados)}</span></div>
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Conjuracao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.tempo_conjuracao || '-')}</span></div>
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Alcance</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.alcance || '-')}</span></div>
-                    <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Alvo/Area</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.area_efeito_alvo || '-')}</span></div>
+                    <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Alvo/Area</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.area_efeito || magia.area_efeito_alvo || '-')}</span></div>
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Duracao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.duracao || '-')}</span></div>
                     <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Resistencia</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.teste_resistencia || '-')}</span></div>
-                    <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">RM</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.resistencia_magia || '-')}</span></div>
+                    <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">RM</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.resistencia_magia || magia.resistencia_magica || magia.resistencia_magia_texto || '-')}</span></div>
                     <div class="grimorio-detalhe-linha grimorio-detalhe-linha-descricao"><span class="grimorio-detalhe-chave">Descricao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.descricao || 'Sem descricao.')}</span></div>
                     <div class="grimorio-detalhe-linha grimorio-detalhe-linha-descricao"><span class="grimorio-detalhe-chave">Anotacoes</span><span class="grimorio-detalhe-valor">${escapeHtml(item.anotacoes || 'Sem anotacoes pessoais.')}</span></div>
                 </div>
@@ -1033,6 +1199,44 @@ class GrimorioController {
         document.addEventListener('keydown', onKeydown);
         overlay.dataset.keydownBound = 'true';
         overlay._grimorioKeydownHandler = onKeydown;
+    }
+
+    _componentesDetalhados(magia) {
+        const mapa = {
+            V: 'Verbal (V)',
+            G: 'Gestual (G)',
+            M: 'Material (M)',
+            F: 'Foco (F)',
+            FD: 'Foco Divino (FD)',
+            XP: 'Custo de XP (XP)',
+        };
+        const componentesRaw = String(magia?.componentes || '').toUpperCase();
+        const componentes = this._extrairComponentes(componentesRaw);
+        const nomes = COMPONENTES
+            .filter((sigla) => componentes.has(sigla))
+            .map((sigla) => mapa[sigla] || sigla);
+        const componenteExtra = String(magia?.componente_extra || '').trim();
+        if (componenteExtra) nomes.push(`Detalhe: ${componenteExtra}`);
+        return nomes.join(', ') || '-';
+    }
+
+    _formatarNiveisPorClasse(magia, item) {
+        const linhas = Array.isArray(magia?.classes_niveis) ? magia.classes_niveis : [];
+        if (linhas.length > 0) {
+            const pares = linhas
+                .map((cn) => ({
+                    classe: this._normalizarClasse(cn?.classe || ''),
+                    nivel: Number(cn?.nivel ?? 0),
+                }))
+                .filter((cn) => cn.classe)
+                .sort((a, b) => a.nivel - b.nivel || a.classe.localeCompare(b.classe, 'pt-BR'))
+                .map((cn) => `${cn.classe} ${cn.nivel}`);
+            if (pares.length > 0) return pares.join(', ');
+        }
+
+        const classeFallback = this._normalizarClasse(item?.classe || this.classeAtiva || '-') || '-';
+        const nivelFallback = Number(magia?.nivel || 0);
+        return `${classeFallback} ${nivelFallback}`;
     }
 
     _mostrarModalConfirmacao(opcoes) {

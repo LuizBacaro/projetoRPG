@@ -354,6 +354,37 @@ def test_grimorio_notifica_magias_adicionadas_automaticamente(grimorio_db):
     assert int((notif.get("dados") or {}).get("quantidade", 0)) >= 1
 
 
+def test_grimorio_notificacao_magias_adicionadas_inclui_nomes(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    db.commit()
+
+    magia = Magia(nome="Luz Sagrada", nivel=1, classe="CLERIGO", ativo=True, descricao="desc")
+    db.add(magia)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia.id, classe="CLERIGO", nivel=1))
+    db.commit()
+
+    client = _build_client(db_factory)
+    listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+    assert listar.status_code == 200
+
+    notificacoes = client.get(
+        f"/api/v1/grimorio/{combatente.id}/notificacoes",
+        params={"classe": "CLERIGO"},
+    )
+    assert notificacoes.status_code == 200
+    itens = notificacoes.json()
+    notif = next((item for item in itens if item["tipo"] == "MAGIAS_ADICIONADAS"), None)
+    assert notif is not None
+
+    dados = notif.get("dados") or {}
+    nomes = dados.get("magias_nomes") or []
+    assert isinstance(nomes, list)
+    assert "Luz Sagrada" in nomes
+
+
 def test_grimorio_limita_magias_conhecidas_feiticeiro_por_nivel(grimorio_db):
     db, db_factory = grimorio_db
     combatente = _criar_combatente(db, classe="Feiticeiro")
@@ -440,6 +471,28 @@ def test_grimorio_mago_nao_aplica_limite_de_conhecidas_por_nivel(grimorio_db):
             json={"magia_id": magia.id, "classe": "MAGO", "origem": "SELECAO_MANUAL"},
         )
         assert resp.status_code == 201
+
+
+def test_grimorio_mago_bloqueia_adicao_acima_nivel_conjuravel(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Mago")
+    combatente.nivel = 1  # max conjuravel = 1
+    db.commit()
+
+    magia_n2 = Magia(nome="Mago N2", nivel=2, classe="MAGO", ativo=True, descricao="desc")
+    db.add(magia_n2)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia_n2.id, classe="MAGO", nivel=2))
+    db.commit()
+
+    client = _build_client(db_factory)
+    resp = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magia_n2.id, "classe": "MAGO", "origem": "SELECAO_MANUAL"},
+    )
+
+    assert resp.status_code == 400
+    assert "nível máximo" in resp.json()["detail"].lower() or "nivel máximo" in resp.json()["detail"].lower()
 
 
 def test_grimorio_filtra_auto_adicao_por_alinhamento_quando_disponivel(grimorio_db):
@@ -551,3 +604,301 @@ def test_grimorio_bloqueia_adicao_manual_por_alinhamento_quando_disponivel(grimo
 
     assert resp.status_code == 400
     assert "alinhamento" in resp.json()["detail"].lower()
+
+
+def test_grimorio_remove_automatico_por_alinhamento_apos_mudanca(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    combatente.alinhamento = "Neutro"
+    db.commit()
+
+    magia_mal = Magia(
+        nome="Magia Permitida Antes da Mudanca",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Mal",
+    )
+    db.add(magia_mal)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia_mal.id, classe="CLERIGO", nivel=1))
+    db.commit()
+
+    client = _build_client(db_factory)
+    criar = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magia_mal.id, "classe": "CLERIGO", "origem": "SELECAO_MANUAL"},
+    )
+    assert criar.status_code == 201
+
+    combatente.alinhamento = "Leal e Bom"
+    db.commit()
+
+    listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+    assert listar.status_code == 200
+    assert all(item["magia_id"] != magia_mal.id for item in listar.json())
+
+
+def test_grimorio_remove_automatico_por_dominio_oposto_apos_mudanca(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    combatente.dominios = "Bem, Protecao"
+    db.commit()
+
+    magia_bem = Magia(
+        nome="Magia Dominio Bem Reconciliacao",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=True,
+        dominios="Bem",
+    )
+    db.add(magia_bem)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia_bem.id, classe="CLERIGO", nivel=1))
+    db.commit()
+
+    client = _build_client(db_factory)
+    criar = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magia_bem.id, "classe": "CLERIGO", "origem": "SELECAO_MANUAL"},
+    )
+    assert criar.status_code == 201
+
+    combatente.dominios = "Mal, Protecao"
+    db.commit()
+
+    listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+    assert listar.status_code == 200
+    assert all(item["magia_id"] != magia_bem.id for item in listar.json())
+
+
+def test_grimorio_notificacao_selecao_pendente_inclui_niveis(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Feiticeiro")
+    combatente.nivel = 4
+    db.commit()
+
+    magia_n0 = Magia(nome="Magia FEITICEIRO N0", nivel=0, classe="FEITICEIRO", ativo=True, descricao="desc")
+    magia_n1 = Magia(nome="Magia FEITICEIRO N1", nivel=1, classe="FEITICEIRO", ativo=True, descricao="desc")
+    magia_n2 = Magia(nome="Magia FEITICEIRO N2", nivel=2, classe="FEITICEIRO", ativo=True, descricao="desc")
+    db.add_all([magia_n0, magia_n1, magia_n2])
+    db.flush()
+    db.add_all([
+        MagiaClasse(magia_id=magia_n0.id, classe="FEITICEIRO", nivel=0),
+        MagiaClasse(magia_id=magia_n1.id, classe="FEITICEIRO", nivel=1),
+        MagiaClasse(magia_id=magia_n2.id, classe="FEITICEIRO", nivel=2),
+    ])
+    db.commit()
+
+    client = _build_client(db_factory)
+    listar = client.get(
+        f"/api/v1/grimorio/{combatente.id}/notificacoes",
+        params={"classe": "FEITICEIRO"},
+    )
+
+    assert listar.status_code == 200
+    itens = listar.json()
+    notif = next((item for item in itens if item["tipo"] == "SELECAO_PENDENTE"), None)
+    assert notif is not None
+
+    dados = notif.get("dados") or {}
+    assert int(dados.get("quantidade_pendente", 0)) > 0
+    por_nivel = dados.get("por_nivel")
+    assert isinstance(por_nivel, dict)
+    assert len(por_nivel) > 0
+
+
+def test_grimorio_clerigo_auto_adiciona_apenas_dominios_escolhidos_no_nivel(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3  # max conjuravel: nivel 2
+    combatente.dominios = "Bem, Protecao"
+    db.commit()
+
+    magia_base = Magia(
+        nome="Magia Clerigo Base",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=False,
+    )
+    magia_bem = Magia(
+        nome="Magia Dominio Bem N1",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=True,
+        dominios="Bem",
+    )
+    magia_protecao = Magia(
+        nome="Magia Dominio Protecao N2",
+        nivel=2,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=True,
+        dominios="Protecao",
+    )
+    magia_mal = Magia(
+        nome="Magia Dominio Mal N1",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=True,
+        dominios="Mal",
+    )
+    magia_guerra = Magia(
+        nome="Magia Dominio Guerra N2",
+        nivel=2,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=True,
+        dominios="Guerra",
+    )
+    db.add_all([magia_base, magia_bem, magia_protecao, magia_mal, magia_guerra])
+    db.flush()
+    db.add_all([
+        MagiaClasse(magia_id=magia_base.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_bem.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_protecao.id, classe="CLERIGO", nivel=2),
+        MagiaClasse(magia_id=magia_mal.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_guerra.id, classe="CLERIGO", nivel=2),
+    ])
+    db.commit()
+
+    client = _build_client(db_factory)
+    listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+
+    assert listar.status_code == 200
+    itens = listar.json()
+    ids = {item["magia_id"] for item in itens}
+
+    assert magia_base.id in ids
+    assert magia_bem.id in ids
+    assert magia_protecao.id in ids
+    assert magia_mal.id not in ids
+    assert magia_guerra.id not in ids
+
+
+def test_grimorio_clerigo_adiciona_magia_de_dominio_ao_subir_nivel(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3  # max conjuravel: nivel 2
+    combatente.dominios = "Bem, Protecao"
+    db.commit()
+
+    magia_bem_n2 = Magia(
+        nome="Magia Dominio Bem N2",
+        nivel=2,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=True,
+        dominios="Bem",
+    )
+    magia_bem_n3 = Magia(
+        nome="Magia Dominio Bem N3",
+        nivel=3,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=True,
+        dominios="Bem",
+    )
+    db.add_all([magia_bem_n2, magia_bem_n3])
+    db.flush()
+    db.add_all([
+        MagiaClasse(magia_id=magia_bem_n2.id, classe="CLERIGO", nivel=2),
+        MagiaClasse(magia_id=magia_bem_n3.id, classe="CLERIGO", nivel=3),
+    ])
+    db.commit()
+
+    client = _build_client(db_factory)
+
+    primeira = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+    assert primeira.status_code == 200
+    ids_primeira = {item["magia_id"] for item in primeira.json()}
+    assert magia_bem_n2.id in ids_primeira
+    assert magia_bem_n3.id not in ids_primeira
+
+    combatente.nivel = 5  # max conjuravel: nivel 3
+    db.commit()
+
+    segunda = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+    assert segunda.status_code == 200
+    itens_segunda = segunda.json()
+    ids_segunda = {item["magia_id"] for item in itens_segunda}
+    assert magia_bem_n3.id in ids_segunda
+
+    item_n3 = next(item for item in itens_segunda if item["magia_id"] == magia_bem_n3.id)
+    assert item_n3["origem"] == "AUTO_NIVEL"
+
+
+def test_grimorio_limita_magias_conhecidas_bardo_por_nivel(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Bardo")
+    combatente.nivel = 5  # limite nivel 2 para Bardo = 3
+    db.commit()
+
+    magias_n2 = [
+        Magia(nome="Bardo N2 A", nivel=2, classe="BARDO", ativo=True, descricao="desc"),
+        Magia(nome="Bardo N2 B", nivel=2, classe="BARDO", ativo=True, descricao="desc"),
+        Magia(nome="Bardo N2 C", nivel=2, classe="BARDO", ativo=True, descricao="desc"),
+        Magia(nome="Bardo N2 D", nivel=2, classe="BARDO", ativo=True, descricao="desc"),
+    ]
+    db.add_all(magias_n2)
+    db.flush()
+    db.add_all([
+        MagiaClasse(magia_id=magias_n2[0].id, classe="BARDO", nivel=2),
+        MagiaClasse(magia_id=magias_n2[1].id, classe="BARDO", nivel=2),
+        MagiaClasse(magia_id=magias_n2[2].id, classe="BARDO", nivel=2),
+        MagiaClasse(magia_id=magias_n2[3].id, classe="BARDO", nivel=2),
+    ])
+    db.commit()
+
+    client = _build_client(db_factory)
+
+    for magia in magias_n2[:3]:
+        resp = client.post(
+            f"/api/v1/grimorio/{combatente.id}",
+            json={"magia_id": magia.id, "classe": "BARDO", "origem": "SELECAO_MANUAL"},
+        )
+        assert resp.status_code == 201
+
+    excedente = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magias_n2[3].id, "classe": "BARDO", "origem": "SELECAO_MANUAL"},
+    )
+    assert excedente.status_code == 409
+    assert "Limite de magias conhecidas" in excedente.json()["detail"]
+
+
+def test_grimorio_bardo_bloqueia_adicao_acima_nivel_conjuravel(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Bardo")
+    combatente.nivel = 4  # max conjuravel = 2
+    db.commit()
+
+    magia_n3 = Magia(nome="Bardo N3", nivel=3, classe="BARDO", ativo=True, descricao="desc")
+    db.add(magia_n3)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia_n3.id, classe="BARDO", nivel=3))
+    db.commit()
+
+    client = _build_client(db_factory)
+    resp = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magia_n3.id, "classe": "BARDO", "origem": "SELECAO_MANUAL"},
+    )
+
+    assert resp.status_code == 400
+    assert "nível máximo" in resp.json()["detail"].lower() or "nivel máximo" in resp.json()["detail"].lower()

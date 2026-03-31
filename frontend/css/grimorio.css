@@ -329,6 +329,77 @@
     overflow-y: auto;
 }
 
+.grimorio-add-filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.grimorio-add-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 0.55rem;
+    align-items: start;
+}
+
+.grimorio-add-preview {
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.5rem;
+    min-height: 180px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.grimorio-add-preview-titulo {
+    color: var(--cor-pergaminho);
+    font-family: var(--fonte-titulo);
+    font-size: 0.78rem;
+    margin-bottom: 0.35rem;
+}
+
+.grimorio-add-preview-grid {
+    display: grid;
+    gap: 0.26rem;
+    margin-bottom: 0.45rem;
+}
+
+.grimorio-add-preview-linha {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 0.4rem;
+    align-items: baseline;
+}
+
+.grimorio-add-preview-chave {
+    font-family: var(--fonte-titulo);
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(201, 168, 76, 0.72);
+}
+
+.grimorio-add-preview-valor {
+    font-size: 0.68rem;
+    color: var(--cor-pergaminho);
+}
+
+.grimorio-add-preview-descricao {
+    margin-top: 0.2rem;
+    border-top: 1px solid rgba(201, 168, 76, 0.18);
+    padding-top: 0.35rem;
+    font-size: 0.67rem;
+    line-height: 1.45;
+    color: rgba(239, 228, 203, 0.85);
+}
+
+.grimorio-add-preview-acao {
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
 .grimorio-add-item {
     display: flex;
     justify-content: space-between;
@@ -366,6 +437,12 @@
     font-family: var(--fonte-titulo);
     font-size: 0.64rem;
     cursor: pointer;
+}
+
+.grimorio-add-btn-selecionar {
+    background: rgba(57, 99, 170, 0.2);
+    border-color: rgba(110, 154, 228, 0.38);
+    color: #bcd7ff;
 }
 
 .grimorio-troca-badge {
@@ -1100,6 +1177,8 @@
     .grimorio-corpo     { padding: 0.6rem 1rem; }
     .grimorio-card-topo { flex-direction: column; gap: 0.35rem; }
     .grimorio-card-badges { justify-content: flex-start; }
+    .grimorio-add-filtros-grid { grid-template-columns: 1fr 1fr; }
+    .grimorio-add-layout { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
     .grimorio-nivel-btn      { font-size: 0.58rem; padding: 0.15rem 0.35rem; }

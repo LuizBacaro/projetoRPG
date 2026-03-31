@@ -251,6 +251,7 @@
             <div class="grimorio-header-acoes">
                 <span class="grimorio-indicador">Total: <strong id="grimorioTotalMagias">0</strong></span>
                 <span class="grimorio-indicador">Páginas (Mago): <strong id="grimorioTotalPaginas">-</strong></span>
+                <span class="grimorio-indicador" id="grimorioPaginasPorNivelWrap" style="display:none">Por nível: <strong id="grimorioPaginasPorNivel">-</strong></span>
                 <button class="grimorio-fechar" id="btnFecharGrimorio">✕</button>
             </div>
         </div>
@@ -325,8 +326,52 @@
                     <strong>Adicionar do catálogo da classe</strong>
                     <button id="btnFecharPainelAdicionar" class="grimorio-fechar-painel">✕</button>
                 </div>
-                <input type="text" id="grimorioAdicionarBusca" class="grimorio-busca" placeholder="Filtrar magias para adicionar...">
-                <div id="grimorioAdicionarLista" class="grimorio-adicionar-lista"></div>
+                <div class="grimorio-add-filtros-grid">
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarBusca">Titulo</label>
+                        <input type="text" id="grimorioAdicionarBusca" class="grimorio-busca" placeholder="Buscar por nome...">
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarEscola">Escola</label>
+                        <select id="grimorioAdicionarEscola" class="grimorio-select-componente">
+                            <option value="todas">Todas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarNivel">Nivel</label>
+                        <select id="grimorioAdicionarNivel" class="grimorio-select-componente">
+                            <option value="todos">Todos</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarComponente">Comp.</label>
+                        <select id="grimorioAdicionarComponente" class="grimorio-select-componente">
+                            <option value="todos">Todos</option>
+                            <option value="V">V</option>
+                            <option value="G">G</option>
+                            <option value="M">M</option>
+                            <option value="F">F</option>
+                            <option value="FD">FD</option>
+                            <option value="XP">XP</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grimorio-add-layout">
+                    <div id="grimorioAdicionarLista" class="grimorio-adicionar-lista"></div>
+                    <div id="grimorioAdicionarPreview" class="grimorio-add-preview">
+                        <div class="grimorio-historico-vazio">Selecione uma magia para visualizar o preview antes de adicionar.</div>
+                    </div>
+                </div>
             </div>
             <div id="grimorioPainelTroca" class="grimorio-painel-adicionar">
                 <div class="grimorio-painel-header">

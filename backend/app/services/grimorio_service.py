@@ -280,17 +280,22 @@ class GrimorioService:
         if not combatente:
             raise HTTPException(status_code=404, detail="Combatente não encontrado")
 
-        adicionadas = self._sincronizar_magias_automaticas(
+        magias_adicionadas = self._sincronizar_magias_automaticas(
             combatente_id,
             classe_norm=classe_norm or _normalizar(combatente.classe),
             nivel_personagem=int(combatente.nivel or 1),
         )
-        if adicionadas > 0:
+        if magias_adicionadas:
             self._registrar_notificacao_magias_adicionadas(
                 combatente_id,
                 classe_norm=classe_norm or _normalizar(combatente.classe),
-                quantidade=adicionadas,
+                magias=magias_adicionadas,
             )
+
+        self._reconciliar_magias_invalidas(
+            combatente_id,
+            classe_norm=classe_norm or _normalizar(combatente.classe),
+        )
         return self.grimorio_repo.listar(combatente_id, classe=classe_norm, favorita=favorita)
 
     def listar_historico_troca(self, combatente_id: int, classe: Optional[str] = None, limit: int = 20):
@@ -310,17 +315,19 @@ class GrimorioService:
             raise HTTPException(status_code=404, detail="Combatente não encontrado")
 
         classe_norm = _normalizar(classe) if classe else _normalizar(combatente.classe)
-        adicionadas = self._sincronizar_magias_automaticas(
+        magias_adicionadas = self._sincronizar_magias_automaticas(
             combatente_id,
             classe_norm=classe_norm,
             nivel_personagem=int(combatente.nivel or 1),
         )
-        if adicionadas > 0:
+        if magias_adicionadas:
             self._registrar_notificacao_magias_adicionadas(
                 combatente_id,
                 classe_norm=classe_norm,
-                quantidade=adicionadas,
+                magias=magias_adicionadas,
             )
+
+        self._reconciliar_magias_invalidas(combatente_id, classe_norm=classe_norm)
         self._garantir_notificacoes_sistema(combatente_id, classe_norm, int(combatente.nivel or 1))
         return self.grimorio_repo.listar_notificacoes(
             combatente_id,
@@ -329,9 +336,113 @@ class GrimorioService:
             limit=limit,
         )
 
-    def _registrar_notificacao_magias_adicionadas(self, combatente_id: int, *, classe_norm: str, quantidade: int) -> None:
-        if quantidade <= 0:
+    def _reconciliar_magias_invalidas(self, combatente_id: int, *, classe_norm: str) -> int:
+        if classe_norm not in _CLASSES_DIVINAS:
+            return 0
+
+        combatente = self.grimorio_repo.get_combatente(combatente_id)
+        if not combatente:
+            return 0
+
+        alinhamento_norm = _alinhamento_do_combatente(combatente)
+        dominios_personagem = _dominios_do_combatente(combatente)
+        itens = self.grimorio_repo.listar(combatente_id, classe=classe_norm, favorita=None)
+
+        removidas = 0
+        for item in itens:
+            magia = item.magia
+            if not magia:
+                continue
+
+            invalida_por_alinhamento = _magia_bloqueada_por_alinhamento(magia, alinhamento_norm)
+            invalida_por_dominio = False
+            invalida_por_dominio_oposto = False
+
+            if classe_norm == "CLERIGO":
+                invalida_por_dominio = not _magia_permitida_por_dominio_de_clerigo(magia, dominios_personagem)
+                invalida_por_dominio_oposto = _magia_bloqueada_por_dominios_opostos(magia, dominios_personagem)
+
+            if invalida_por_alinhamento or invalida_por_dominio or invalida_por_dominio_oposto:
+                self.grimorio_repo.delete(item)
+                removidas += 1
+
+        return removidas
+
+    def _calcular_selecao_pendente_por_nivel(
+        self,
+        combatente_id: int,
+        *,
+        classe_norm: str,
+        nivel_personagem: int,
+    ) -> tuple[int, dict[str, int]]:
+        if classe_norm not in {"FEITICEIRO", "BARDO"}:
+            return 0, {}
+
+        _, magias_classe = self.magia_repo.listar_paginado(
+            classe=classe_norm,
+            nivel=None,
+            escola=None,
+            nome=None,
+            componentes=None,
+            dominio=None,
+            ativo=True,
+            sort_by=None,
+            sort_dir=None,
+            skip=0,
+            limit=500,
+        )
+
+        max_nivel = _max_nivel_magia_conjuravel(classe_norm, nivel_personagem)
+        catalogo_por_nivel = {}
+        for magia in magias_classe:
+            nivel_magia = _nivel_por_classe(magia, classe_norm)
+            if nivel_magia is None or nivel_magia > max_nivel:
+                continue
+            catalogo_por_nivel[nivel_magia] = catalogo_por_nivel.get(nivel_magia, 0) + 1
+
+        conhecidas = self.grimorio_repo.listar(combatente_id, classe=classe_norm, favorita=None)
+        conhecidas_por_nivel = {}
+        for item in conhecidas:
+            nivel_magia = _nivel_por_classe(item.magia, classe_norm)
+            if nivel_magia is None or nivel_magia > max_nivel:
+                continue
+            conhecidas_por_nivel[nivel_magia] = conhecidas_por_nivel.get(nivel_magia, 0) + 1
+
+        por_nivel = {}
+        total = 0
+        for nivel_magia in sorted(catalogo_por_nivel.keys()):
+            limite = _limite_magias_conhecidas(classe_norm, nivel_personagem, nivel_magia)
+            if limite is None:
+                continue
+
+            disponiveis_catalogo = int(catalogo_por_nivel.get(nivel_magia, 0))
+            conhecidas_nivel = int(conhecidas_por_nivel.get(nivel_magia, 0))
+            max_escolhiveis = min(int(limite), disponiveis_catalogo)
+            pendente_nivel = max(max_escolhiveis - conhecidas_nivel, 0)
+            if pendente_nivel <= 0:
+                continue
+
+            por_nivel[str(nivel_magia)] = pendente_nivel
+            total += pendente_nivel
+
+        return total, por_nivel
+
+    def _registrar_notificacao_magias_adicionadas(
+        self,
+        combatente_id: int,
+        *,
+        classe_norm: str,
+        magias: list[dict],
+    ) -> None:
+        if not magias:
             return
+
+        quantidade = len(magias)
+        nomes_novas = [
+            str(item.get("nome") or "").strip()
+            for item in magias
+            if str(item.get("nome") or "").strip()
+        ]
 
         existente = self.grimorio_repo.get_notificacao_aberta_por_tipo(
             combatente_id,
@@ -347,6 +458,18 @@ class GrimorioService:
                     dados = {}
             atual = int(dados.get("quantidade", 0))
             dados["quantidade"] = atual + int(quantidade)
+
+            nomes_existentes = dados.get("magias_nomes")
+            if not isinstance(nomes_existentes, list):
+                nomes_existentes = []
+            nomes_mesclados = []
+            for nome in [*nomes_existentes, *nomes_novas]:
+                texto = str(nome or "").strip()
+                if not texto or texto in nomes_mesclados:
+                    continue
+                nomes_mesclados.append(texto)
+            dados["magias_nomes"] = nomes_mesclados[:20]
+
             existente.dados = json.dumps(dados)
             self.grimorio_repo.update_notificacao(existente)
             return
@@ -356,18 +479,29 @@ class GrimorioService:
                 combatente_id=combatente_id,
                 classe=classe_norm,
                 tipo="MAGIAS_ADICIONADAS",
-                dados=json.dumps({"quantidade": int(quantidade)}),
+                dados=json.dumps(
+                    {
+                        "quantidade": int(quantidade),
+                        "magias_nomes": nomes_novas[:20],
+                    }
+                ),
                 lida=False,
             )
         )
 
-    def _sincronizar_magias_automaticas(self, combatente_id: int, *, classe_norm: str, nivel_personagem: int) -> int:
+    def _sincronizar_magias_automaticas(
+        self,
+        combatente_id: int,
+        *,
+        classe_norm: str,
+        nivel_personagem: int,
+    ) -> list[dict]:
         if classe_norm not in {"CLERIGO", "DRUIDA", "RANGER", "PALADINO"}:
-            return 0
+            return []
 
         max_nivel = _max_nivel_magia_conjuravel(classe_norm, nivel_personagem)
         if max_nivel <= 0:
-            return 0
+            return []
 
         _, magias_classe = self.magia_repo.listar_paginado(
             classe=classe_norm,
@@ -392,7 +526,7 @@ class GrimorioService:
         alinhamento_norm = _alinhamento_do_combatente(combatente)
         dominios_personagem = _dominios_do_combatente(combatente)
 
-        adicionadas = 0
+        adicionadas = []
         for magia in magias_classe:
             nivel_magia = _nivel_por_classe(magia, classe_norm)
             if nivel_magia is None or nivel_magia > max_nivel:
@@ -419,7 +553,13 @@ class GrimorioService:
                 )
             )
             existentes.add(magia.id)
-            adicionadas += 1
+            adicionadas.append(
+                {
+                    "id": int(magia.id),
+                    "nome": str(magia.nome or f"Magia {magia.id}"),
+                    "nivel": int(nivel_magia),
+                }
+            )
 
         return adicionadas
 
@@ -632,32 +772,36 @@ class GrimorioService:
                     )
                 )
 
-        if classe_norm in {"MAGO", "FEITICEIRO", "BARDO"}:
-            magias_classe = self.magia_repo.listar_paginado(
-                classe=classe_norm,
-                nivel=None,
-                escola=None,
-                nome=None,
-                componentes=None,
-                dominio=None,
-                ativo=True,
-                sort_by=None,
-                sort_dir=None,
-                skip=0,
-                limit=500,
-            )[1]
-            total_catalogo = len(magias_classe)
-            total_grimorio = len(self.grimorio_repo.listar(combatente_id, classe=classe_norm, favorita=None))
-            pendentes = max(total_catalogo - total_grimorio, 0)
-            if pendentes > 0 and not self.grimorio_repo.get_notificacao_aberta_por_tipo(
-                combatente_id, classe_norm, "SELECAO_PENDENTE"
-            ):
-                self.grimorio_repo.create_notificacao(
-                    GrimorioNotificacao(
-                        combatente_id=combatente_id,
-                        classe=classe_norm,
-                        tipo="SELECAO_PENDENTE",
-                        dados=json.dumps({"quantidade_pendente": pendentes}),
-                        lida=False,
+        if classe_norm in {"FEITICEIRO", "BARDO"}:
+            pendentes, por_nivel = self._calcular_selecao_pendente_por_nivel(
+                combatente_id,
+                classe_norm=classe_norm,
+                nivel_personagem=nivel_personagem,
+            )
+            notif_pendente = self.grimorio_repo.get_notificacao_aberta_por_tipo(
+                combatente_id,
+                classe_norm,
+                "SELECAO_PENDENTE",
+            )
+
+            if pendentes > 0:
+                dados_payload = {
+                    "quantidade_pendente": int(pendentes),
+                    "por_nivel": por_nivel,
+                }
+                if notif_pendente:
+                    notif_pendente.dados = json.dumps(dados_payload)
+                    self.grimorio_repo.update_notificacao(notif_pendente)
+                else:
+                    self.grimorio_repo.create_notificacao(
+                        GrimorioNotificacao(
+                            combatente_id=combatente_id,
+                            classe=classe_norm,
+                            tipo="SELECAO_PENDENTE",
+                            dados=json.dumps(dados_payload),
+                            lida=False,
+                        )
                     )
-                )
+            elif notif_pendente:
+                notif_pendente.lida = True
+                self.grimorio_repo.update_notificacao(notif_pendente)
