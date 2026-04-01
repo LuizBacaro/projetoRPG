@@ -64,6 +64,11 @@ class UsuarioController {
 
                 if (action === 'reativar') {
                     this.reativar(id);
+                    return;
+                }
+
+                if (action === 'excluir') {
+                    this.excluir(id);
                 }
             });
     }
@@ -173,6 +178,9 @@ class UsuarioController {
                             ? `<button class="btn-acao btn-acao-inativar" data-action="inativar" data-id="${u.id}" title="Inativar usuário"><span>🚫</span><span>Inativar</span></button>`
                             : `<button class="btn-acao btn-acao-reativar" data-action="reativar" data-id="${u.id}" title="Reativar usuário"><span>✅</span><span>Reativar</span></button>`
                         }
+                        <button class="btn-acao btn-acao-excluir" data-action="excluir" data-id="${u.id}" title="Excluir usuário definitivamente">
+                            <span>🗑️</span><span>Excluir</span>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -280,6 +288,27 @@ class UsuarioController {
             await this.carregar();
         } catch (err) {
             Toast.error('Erro ao reativar: ' + err.message);
+        }
+    }
+
+    excluir(id) {
+        ModalConfirm.mostrar({
+            icone:           '🗑️',
+            titulo:          'Excluir Usuário',
+            texto:           'Deseja excluir este usuário definitivamente? Esta ação não pode ser desfeita.',
+            textoConfirmar:  '🗑️ Excluir',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar:     () => this._executarExcluir(id),
+        });
+    }
+
+    async _executarExcluir(id) {
+        try {
+            await this.service.excluir(id);
+            Toast.success('Usuário excluído com sucesso.');
+            await this.carregar();
+        } catch (err) {
+            Toast.error('Erro ao excluir: ' + err.message);
         }
     }
 }

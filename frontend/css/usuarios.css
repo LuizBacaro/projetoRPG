@@ -503,6 +503,7 @@ body.usuarios-page::before {
 .btn-acao-editar:hover { border-color: rgba(255, 215, 0, 0.24); }
 .btn-acao-inativar:hover { border-color: rgba(248, 113, 113, 0.24); }
 .btn-acao-reativar:hover { border-color: rgba(74, 222, 128, 0.24); }
+.btn-acao-excluir:hover { border-color: rgba(239, 68, 68, 0.34); background: rgba(239, 68, 68, 0.1); }
 
 .modal-overlay {
     display: none;

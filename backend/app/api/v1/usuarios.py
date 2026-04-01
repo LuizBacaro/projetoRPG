@@ -92,15 +92,34 @@ def atualizar_usuario(
     return usuario
 
 
+@router.delete("/{usuario_id}/definitivo", status_code=204)
+def excluir_usuario_definitivo(
+    request: Request,
+    usuario_id: int,
+    service: UsuarioService = Depends(get_service),
+    usuario_atual: Usuario = Depends(requer_admin)
+):
+    usuario = service.buscar_por_id(usuario_id)
+    service.excluir_definitivo(usuario_id, usuario_solicitante_id=usuario_atual.id)
+    log_security_event(
+        "user_delete",
+        "success",
+        request=request,
+        actor_email=usuario_atual.email,
+        target=f"usuario:{usuario.id}",
+        details={"email": usuario.email},
+    )
+    return None
+
+
 @router.delete("/{usuario_id}", response_model=UsuarioResponse)
 def inativar_usuario(
     request: Request,
     usuario_id: int,
     service: UsuarioService = Depends(get_service),
-    _: Usuario = Depends(requer_admin)
+    usuario_atual: Usuario = Depends(requer_admin)
 ):
-    usuario_atual = _
-    usuario = service.inativar(usuario_id)
+    usuario = service.inativar(usuario_id, usuario_responsavel=usuario_atual.email)
     log_security_event(
         "user_deactivate",
         "success",

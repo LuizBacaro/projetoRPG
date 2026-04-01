@@ -108,8 +108,30 @@ class UsuarioService {
             headers: this._headers()
         });
 
-        if (res.status === 401) { AuthService?.logout(); return null; }
-        if (!res.ok) throw new Error('Erro ao inativar usuário');
+        if (res.status === 401) {
+            AuthService?.logout();
+            throw new Error('Sessão expirada. Faça login novamente.');
+        }
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(this._extrairMensagemErro(err, 'Erro ao inativar usuário'));
+        }
         return res.json();
+    }
+
+    async excluir(id) {
+        const res = await fetch(this._url(`/${id}/definitivo`), {
+            method:  'DELETE',
+            headers: this._headers()
+        });
+
+        if (res.status === 401) {
+            AuthService?.logout();
+            throw new Error('Sessão expirada. Faça login novamente.');
+        }
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(this._extrairMensagemErro(err, 'Erro ao excluir usuário'));
+        }
     }
 }

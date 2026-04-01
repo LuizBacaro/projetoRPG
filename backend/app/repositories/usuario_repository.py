@@ -45,8 +45,22 @@ class UsuarioRepository:
         self.db.refresh(usuario)
         return usuario
 
+    def excluir(self, usuario: Usuario) -> None:
+        self.db.delete(usuario)
+        commit_with_rollback(self.db)
+
     def count(self, apenas_ativos: bool = False) -> int:
         query = self.db.query(Usuario)
         if apenas_ativos:
             query = query.filter(Usuario.ativo == True)
         return query.count()
+
+    def contar_admins_ativos(self) -> int:
+        return (
+            self.db.query(Usuario)
+            .filter(
+                Usuario.perfil == PerfilUsuario.ADMINISTRADOR,
+                Usuario.ativo == True,
+            )
+            .count()
+        )

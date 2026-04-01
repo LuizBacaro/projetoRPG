@@ -5,7 +5,7 @@ DIP: depende da abstração do repositório
 """
 from fastapi import HTTPException, status
 from ..core.security import hash_senha, verificar_senha
-from ..models.usuario import Usuario
+from ..models.usuario import Usuario, PerfilUsuario
 from ..repositories.usuario_repository import UsuarioRepository
 from ..schemas.usuario import UsuarioCreate, UsuarioUpdate
 
@@ -84,3 +84,23 @@ class UsuarioService:
         usuario.ativo               = False
         usuario.usuario_responsavel = usuario_responsavel
         return self.repo.atualizar(usuario)
+
+    def excluir_definitivo(self, usuario_id: int, usuario_solicitante_id: int) -> None:
+        usuario = self.buscar_por_id(usuario_id)
+
+        if usuario.id == usuario_solicitante_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Você não pode excluir o próprio usuário logado"
+            )
+
+        if (
+            usuario.perfil == PerfilUsuario.ADMINISTRADOR
+            and self.repo.contar_admins_ativos() <= 1
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Não é possível excluir o último administrador ativo"
+            )
+
+        self.repo.excluir(usuario)
