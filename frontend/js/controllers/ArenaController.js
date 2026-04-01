@@ -1,10 +1,10 @@
 import { CombatenteService     } from '../services/CombatenteService.js';
 import { CondicaoController    } from './CondicaoController.js';
 import { MagiaSlotService      } from '../services/MagiaSlotService.js';
-import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js';
+import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260331b';
 import { Toast } from '/js/ui/toast.module.js';
 import { escapeHtml } from '../utils/formatters.js';
-import { isClasseConjuradora, isTipoJogador, isTipoMonstro } from '../utils/combat-rules.js';
+import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots } from '../utils/combat-rules.js?v=20260331a';
 import { getApiUrl } from '../config/api.config.js';
 
 export class ArenaController {
@@ -24,6 +24,11 @@ export class ArenaController {
         this._jaAgiram             = [];
         this._actions              = null;
         this._canal                = new BroadcastChannel('magias-rpg');
+        this._canal.onmessage      = (event) => {
+            if (event?.data?.tipo === 'magia-preparada-atualizada') {
+                this._sincronizarMagiasPreparadasCombatente(event.data.combatenteId);
+            }
+        };
         this.token                 = localStorage.getItem('token');
         this.combateId             = null;
         this.versaoCombate         = null;
@@ -143,25 +148,50 @@ export class ArenaController {
 
     async _carregarMagiasPreparadasTodos() {
         const promessas = this.combatentes
-            .filter(c => {
-                var isConj = isClasseConjuradora(c.classe) ||
-                    (c.magias_slots && c.magias_slots.some(s => s.total > 0));
+            .filter((c) => {
+                c.magias_slots = resolveCombatenteSpellSlots(c);
+                var isConj = isClasseConjuradora(c.classe)
+                    || (c.magias_slots && c.magias_slots.some((s) => Number(s.total || 0) > 0));
                 if (isConj) c._isConjurador = true;
                 return isConj;
             })
-            .map(async c => {
+            .map(async (c) => {
                 try {
-                    const preparadas    = await this.magiaPreparadaService.listar(c.id);
+                    const preparadas = await this.magiaPreparadaService.listar(c.id);
                     c._magiasPreparadas = preparadas;
-                    c._magiasGrupos     = this.magiaPreparadaService.agruparPorNivel(preparadas);
+                    c._magiasGrupos = this.magiaPreparadaService.agruparPorNivel(preparadas, c.magias_slots || []);
                     console.log(`✅ ${c.nome}: ${preparadas.length} magias preparadas`);
                 } catch (err) {
                     console.warn(`⚠️ Sem magias preparadas para ${c.nome}:`, err.message);
                     c._magiasPreparadas = [];
-                    c._magiasGrupos     = {};
+                    c._magiasGrupos = {};
                 }
             });
         await Promise.all(promessas);
+    }
+
+    async _sincronizarMagiasPreparadasCombatente(combatenteId) {
+        if (!combatenteId) return;
+
+        var combatente = this.combatentes.find(function(c) {
+            return Number(c.id) === Number(combatenteId);
+        });
+        if (!combatente) return;
+
+        combatente.magias_slots = resolveCombatenteSpellSlots(combatente);
+
+        try {
+            var preparadas = await this.magiaPreparadaService.listar(combatente.id);
+            combatente._magiasPreparadas = preparadas;
+            combatente._magiasGrupos = this.magiaPreparadaService.agruparPorNivel(preparadas, combatente.magias_slots || []);
+
+            var ativo = this.combatentes[this.turnoAtual];
+            if (ativo && Number(ativo.id) === Number(combatente.id)) {
+                this.renderizarCombatenteAtivo();
+            }
+        } catch (err) {
+            console.warn(`⚠️ Falha ao sincronizar magias preparadas de ${combatente.nome}:`, err.message);
+        }
     }
 
     async avancarTurno() {  // ← Adicionar async

@@ -1101,6 +1101,18 @@
     border: 1px solid rgba(144, 238, 144, 0.42);
 }
 
+.grimorio-badge-origem {
+    background: rgba(34, 66, 115, 0.22);
+    color: #b9d5ff;
+    border: 1px solid rgba(110, 154, 228, 0.38);
+}
+
+.grimorio-badge-preparada {
+    background: rgba(20, 83, 45, 0.28);
+    color: #9df3cd;
+    border: 1px solid rgba(110, 231, 183, 0.42);
+}
+
 /* Descrição */
 .grimorio-card-descricao {
     font-size: 0.78rem;
@@ -1182,6 +1194,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
     margin-top: 0.45rem;
 }
 .grimorio-rodape-direita {
@@ -1208,6 +1222,39 @@
     color: var(--cor-dourada);
     letter-spacing: 0.06em;
     text-shadow: 0 0 6px rgba(201,168,76,0.5);
+}
+
+.grimorio-preparar-btn {
+    border: 1px solid rgba(110, 231, 183, 0.32);
+    background: linear-gradient(135deg, rgba(8, 48, 34, 0.8), rgba(14, 44, 23, 0.56));
+    color: #c6ffe5;
+    border-radius: 8px;
+    padding: 0.28rem 0.6rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.grimorio-preparar-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(16, 52, 34, 0.28);
+    border-color: rgba(110, 231, 183, 0.55);
+}
+
+.grimorio-preparar-btn.ativa {
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.26), rgba(130, 93, 17, 0.24));
+    border-color: rgba(250, 204, 21, 0.55);
+    color: #fff1be;
+}
+
+.grimorio-preparar-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 /* ── Checkbox preparar ── */

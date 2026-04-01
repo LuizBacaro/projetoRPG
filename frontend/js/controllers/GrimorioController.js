@@ -1,5 +1,7 @@
 import { MagiaService } from '../services/MagiaService.js';
 import { GrimorioService } from '../services/GrimorioService.js';
+import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260331b';
+import { getApiUrl } from '../config/api.config.js';
 import { escapeHtml } from '../utils/formatters.js';
 import {
     installGlobalErrorGuards,
@@ -9,7 +11,8 @@ import {
 import {
     isClasseConjuradora,
     normalizeClasseConjuradora,
-} from '../utils/combat-rules.js';
+    resolveCombatenteSpellSlots,
+} from '../utils/combat-rules.js?v=20260331a';
 
 const ESCOLAS_ORDEM = [
     'Abjuracao',
@@ -31,6 +34,13 @@ class GrimorioController {
         this.token = token || localStorage.getItem('token');
         this.magiaService = magiaService || new MagiaService(this.token);
         this.grimorioService = grimorioService || new GrimorioService(this.token);
+        this.magiaPreparadaService = new MagiaPreparadaService(this.token);
+        this._canal = null;
+        try {
+            this._canal = new BroadcastChannel('magias-rpg');
+        } catch (_error) {
+            this._canal = null;
+        }
 
         this.classesConjuradoras = this._extrairClassesConjuradoras(combatente?.classe);
         this.classeAtiva = this.classesConjuradoras[0] || normalizeClasseConjuradora(combatente?.classe) || '';
@@ -38,6 +48,9 @@ class GrimorioController {
         this.itensGrimorio = [];
         this.catalogoClasse = [];
         this.catalogoIndex = new Map();
+        this.magiasPreparadas = [];
+        this.magiasPreparadasMap = new Map();
+        this.slotsDisponiveis = {};
 
         this.itensFiltrados = [];
         this.historicoTrocas = [];
@@ -140,16 +153,19 @@ class GrimorioController {
     async _recarregarDados() {
         this._mostrarLoading(true);
         try {
+            await this._carregarCatalogoClasse();
             await Promise.all([
-                this._carregarCatalogoClasse(),
                 this._carregarItensGrimorio(),
                 this._carregarNotificacoes(),
+                this._carregarMagiasPreparadas(),
             ]);
 
             this._renderizarCabecalho();
             this._renderizarSeletorClasses();
             this._renderizarFiltroEscolas();
             this._renderizarIndicadores();
+            this._atualizarVisibilidadeAcoesClasse();
+            this._renderizarPainelSlots();
             await this._carregarHistoricoTrocas();
             this._renderizarHistoricoTrocas();
             this._renderizarNotificacoes();
@@ -183,36 +199,8 @@ class GrimorioController {
         }
 
         const itens = await this.grimorioService.listar(this.combatente.id, { classe: this.classeAtiva });
-
-        this.itensGrimorio = itens.map((item) => {
-            const magiaDetalhada = this.catalogoIndex.get(Number(item.magia_id));
-            const nivelFallback = Number(item.magia_nivel ?? magiaDetalhada?.nivel ?? 0);
-            const dominioFallback = item.magia_e_magia_dominio ?? magiaDetalhada?.e_magia_dominio ?? false;
-            const dominiosFallback = item.magia_dominios ?? magiaDetalhada?.dominios ?? '';
-            const magiaMesclada = {
-                ...(magiaDetalhada || {}),
-                id: Number(item.magia_id),
-                nome: item.magia_nome || magiaDetalhada?.nome || `Magia ${item.magia_id}`,
-                escola: item.magia_escola || magiaDetalhada?.escola || '',
-                nivel: Number.isNaN(nivelFallback) ? 0 : nivelFallback,
-                componentes: item.magia_componentes || magiaDetalhada?.componentes || '',
-                e_magia_dominio: !!dominioFallback,
-                dominios: dominiosFallback,
-                descricao: magiaDetalhada?.descricao || '',
-                sub_escola: magiaDetalhada?.sub_escola || magiaDetalhada?.subescola || '',
-                subescola: magiaDetalhada?.sub_escola || magiaDetalhada?.subescola || '',
-                area_efeito: magiaDetalhada?.area_efeito || magiaDetalhada?.area_efeito_alvo || '',
-                area_efeito_alvo: magiaDetalhada?.area_efeito || magiaDetalhada?.area_efeito_alvo || '',
-                resistencia_magia: magiaDetalhada?.resistencia_magia || magiaDetalhada?.resistencia_magia_texto || '',
-            };
-
-            return {
-                ...item,
-                magia_id: Number(item.magia_id),
-                favorita: !!item.favorita,
-                magia: magiaMesclada,
-            };
-        });
+        this.itensGrimorio = itens.map((item) => this._mapearItemGrimorio(item));
+        this._mesclarCatalogoDisponivelNoGrimorio();
     }
 
     async _carregarNotificacoes() {
@@ -229,6 +217,203 @@ class GrimorioController {
         } catch (_error) {
             this.notificacoes = [];
         }
+    }
+
+    _mapearItemGrimorio(item, extras = {}) {
+        const magiaDetalhada = this.catalogoIndex.get(Number(item.magia_id ?? item.id));
+        const nivelFallback = Number(item.magia_nivel ?? item.nivel ?? magiaDetalhada?.nivel ?? 0);
+        const dominioFallback = item.magia_e_magia_dominio ?? item.e_magia_dominio ?? magiaDetalhada?.e_magia_dominio ?? false;
+        const dominiosFallback = item.magia_dominios ?? item.dominios ?? magiaDetalhada?.dominios ?? '';
+        const magiaMesclada = {
+            ...(magiaDetalhada || {}),
+            ...(item.magia || {}),
+            id: Number(item.magia_id ?? item.id),
+            nome: item.magia_nome || item.nome || magiaDetalhada?.nome || `Magia ${item.magia_id ?? item.id}`,
+            escola: item.magia_escola || item.escola || magiaDetalhada?.escola || '',
+            nivel: Number.isNaN(nivelFallback) ? 0 : nivelFallback,
+            componentes: item.magia_componentes || item.componentes || magiaDetalhada?.componentes || '',
+            e_magia_dominio: !!dominioFallback,
+            dominios: dominiosFallback,
+            descricao: item.descricao || magiaDetalhada?.descricao || '',
+            sub_escola: item.sub_escola || item.subescola || magiaDetalhada?.sub_escola || magiaDetalhada?.subescola || '',
+            subescola: item.sub_escola || item.subescola || magiaDetalhada?.sub_escola || magiaDetalhada?.subescola || '',
+            area_efeito: item.area_efeito || item.area_efeito_alvo || magiaDetalhada?.area_efeito || magiaDetalhada?.area_efeito_alvo || '',
+            area_efeito_alvo: item.area_efeito || item.area_efeito_alvo || magiaDetalhada?.area_efeito || magiaDetalhada?.area_efeito_alvo || '',
+            resistencia_magia: item.resistencia_magia || magiaDetalhada?.resistencia_magia || magiaDetalhada?.resistencia_magia_texto || '',
+        };
+
+        return {
+            ...item,
+            ...extras,
+            magia_id: Number(item.magia_id ?? item.id),
+            classe: item.classe || this.classeAtiva,
+            favorita: !!item.favorita,
+            anotacoes: item.anotacoes || '',
+            magia: magiaMesclada,
+        };
+    }
+
+    _classePermiteGerenciarConhecidas() {
+        return this._normalizarClasse(this.classeAtiva) === 'Mago';
+    }
+
+    _classeExibeCatalogoCompleto() {
+        const classeNorm = this._normalizarClasse(this.classeAtiva);
+        return classeNorm === 'Bardo' || classeNorm === 'Feiticeiro';
+    }
+
+    _mesclarCatalogoDisponivelNoGrimorio() {
+        if (!this._classeExibeCatalogoCompleto()) return;
+
+        const maxNivelConjuravel = this._maxNivelConjuravel(this.classeAtiva, Number(this.combatente?.nivel || 1));
+        const itensPorId = new Map(this.itensGrimorio.map((item) => [Number(item.magia_id), item]));
+
+        this.catalogoClasse
+            .filter((magia) => Number(magia.nivel || 0) <= maxNivelConjuravel)
+            .forEach((magia) => {
+                const magiaId = Number(magia.id);
+                if (itensPorId.has(magiaId)) return;
+                itensPorId.set(magiaId, this._mapearItemGrimorio(magia, {
+                    magia_id: magiaId,
+                    origem: 'CATALOGO_CLASSE',
+                    _catalogo_expandido: true,
+                }));
+            });
+
+        this.itensGrimorio = [...itensPorId.values()]
+            .sort((a, b) => {
+                const nivelA = Number(a.magia?.nivel || 0);
+                const nivelB = Number(b.magia?.nivel || 0);
+                if (nivelA !== nivelB) return nivelA - nivelB;
+                return String(a.magia?.nome || '').localeCompare(String(b.magia?.nome || ''), 'pt-BR');
+            });
+    }
+
+    async _carregarMagiasPreparadas() {
+        if (!this.combatente?.id) {
+            this.magiasPreparadas = [];
+            this.magiasPreparadasMap = new Map();
+            this.slotsDisponiveis = {};
+            return;
+        }
+
+        try {
+            const preparadas = await this.magiaPreparadaService.listar(this.combatente.id);
+            this.magiasPreparadas = Array.isArray(preparadas) ? preparadas : [];
+        } catch (_error) {
+            this.magiasPreparadas = [];
+        }
+
+        this.magiasPreparadasMap = new Map(
+            this.magiasPreparadas.map((item) => [Number(item.magia_id), item])
+        );
+        if (this.combatente) {
+            this.combatente.magias_preparadas = [...this.magiasPreparadas];
+        }
+        this._hidratarSlotsDisponiveis();
+    }
+
+    _hidratarSlotsDisponiveis() {
+        const slots = resolveCombatenteSpellSlots(this.combatente, this.classeAtiva);
+        const mapa = {};
+
+        if (this.combatente) {
+            this.combatente.magias_slots = slots;
+        }
+
+        slots.forEach((slot) => {
+            const nivel = Number(slot?.nivel || 0);
+            const total = Math.max(0, Number(slot?.total || 0));
+            const preparadas = this.magiasPreparadas.filter((item) => Number(item.nivel_slot || 0) === nivel).length;
+            const usadas = this.magiasPreparadas.filter((item) => Number(item.nivel_slot || 0) === nivel && item.usada).length;
+            mapa[nivel] = {
+                nivel,
+                total,
+                preparadas,
+                usadas,
+                disponivel: Math.max(total - preparadas, 0),
+            };
+        });
+
+        this.slotsDisponiveis = mapa;
+    }
+
+    _renderizarPainelSlots() {
+        const grid = document.querySelector('#modalGrimorio .grimorio-slots-grid');
+        if (!grid) return;
+
+        const slots = Object.values(this.slotsDisponiveis || {})
+            .filter((slot) => Number(slot.total || 0) > 0)
+            .sort((a, b) => a.nivel - b.nivel);
+
+        if (!slots.length) {
+            grid.innerHTML = '<span class="grimorio-slots-vazio">Nenhum slot de magia ativo para esta classe.</span>';
+            return;
+        }
+
+        grid.innerHTML = slots.map((slot) => {
+            const cor = slot.disponivel <= 0 ? '#f87171' : slot.disponivel < slot.total ? '#facc15' : '#4ade80';
+            const label = Number(slot.nivel) === 0 ? 'Truque' : `N${slot.nivel}`;
+            const largura = slot.total > 0 ? Math.max(8, (slot.disponivel / slot.total) * 100) : 0;
+            return `
+                <div class="grimorio-slot-box">
+                    <span class="grimorio-slot-nivel">${label}</span>
+                    <div class="grimorio-slot-barra-wrap">
+                        <div class="grimorio-slot-barra-fill" style="width:${largura}%; background:${cor}"></div>
+                    </div>
+                    <span class="grimorio-slot-contagem" style="color:${cor}">${slot.preparadas}/${slot.total}</span>
+                    <span class="grimorio-slot-usadas">${slot.usadas} usada(s)</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    _atualizarVisibilidadeAcoesClasse() {
+        const wrapAcoes = document.querySelector('#modalGrimorio .grimorio-adicionar-wrap');
+        const acoes = document.querySelector('#modalGrimorio .grimorio-adicionar-acoes');
+        const painelAdicionar = document.getElementById('grimorioPainelAdicionar');
+        const painelTroca = document.getElementById('grimorioPainelTroca');
+        const painelNotificacoes = document.getElementById('grimorioPainelNotificacoes');
+        const mostrarAcoes = this._classePermiteGerenciarConhecidas();
+
+        if (wrapAcoes) {
+            wrapAcoes.style.display = mostrarAcoes ? 'flex' : 'none';
+        }
+
+        if (acoes) {
+            acoes.style.display = mostrarAcoes ? 'flex' : 'none';
+        }
+
+        if (!mostrarAcoes) {
+            painelAdicionar?.classList.remove('show');
+            painelTroca?.classList.remove('show');
+            painelNotificacoes?.classList.remove('show');
+            this._sincronizarModoPainelAdicionar(false);
+        }
+    }
+
+    _obterInfoPreparacao(item) {
+        const magiaId = Number(item?.magia_id ?? item?.id ?? 0);
+        const nivelSlot = Number(item?.magia?.nivel ?? item?.nivel ?? 0);
+        const registro = this.magiasPreparadasMap.get(magiaId) || null;
+        const slot = this.slotsDisponiveis[nivelSlot] || {
+            nivel: nivelSlot,
+            total: 0,
+            preparadas: 0,
+            usadas: 0,
+            disponivel: 0,
+        };
+
+        return {
+            magiaId,
+            nivelSlot,
+            registro,
+            preparada: !!registro,
+            usada: !!registro?.usada,
+            slot,
+            podePreparar: Number(slot.total || 0) > 0,
+            temEspaco: Number(slot.disponivel || 0) > 0 || !!registro,
+        };
     }
 
     _renderizarCabecalho() {
@@ -431,11 +616,14 @@ class GrimorioController {
         const painel = document.getElementById('grimorioPainelAdicionar');
 
         if (btnAbrir) {
-            const semAcesso = this._classeSemAcessoMagias();
+            const permiteAdicionar = this._classePermiteGerenciarConhecidas();
+            const semAcesso = !permiteAdicionar || this._classeSemAcessoMagias();
             btnAbrir.disabled = semAcesso;
-            btnAbrir.title = semAcesso
-                ? 'Disponivel apenas a partir do nivel 4 para Ranger/Paladino'
-                : 'Adicionar magia conhecida';
+            btnAbrir.title = !permiteAdicionar
+                ? 'Somente Mago adiciona magias conhecidas manualmente'
+                : (this._classeSemAcessoMagias()
+                    ? 'Disponivel apenas a partir do nivel 4 para Ranger/Paladino'
+                    : 'Adicionar magia conhecida');
             btnAbrir.style.opacity = semAcesso ? '0.5' : '1';
             btnAbrir.style.cursor = semAcesso ? 'not-allowed' : 'pointer';
         }
@@ -444,6 +632,10 @@ class GrimorioController {
             const clone = btnAbrir.cloneNode(true);
             btnAbrir.parentNode.replaceChild(clone, btnAbrir);
             clone.addEventListener('click', () => {
+                if (!this._classePermiteGerenciarConhecidas()) {
+                    this._mostrarToast('Somente a classe ativa Mago adiciona magias conhecidas manualmente.', 'info');
+                    return;
+                }
                 if (this._classeSemAcessoMagias()) {
                     this._mostrarToast('Ranger e Paladino so recebem magias a partir do nivel 4.', 'info');
                     return;
@@ -629,6 +821,14 @@ class GrimorioController {
         const lista = document.getElementById('grimorioAdicionarLista');
         const preview = document.getElementById('grimorioAdicionarPreview');
         if (!lista || !preview) return;
+
+        if (!this._classePermiteGerenciarConhecidas()) {
+            this.magiasDisponiveisAdicionar = [];
+            this._atualizarResumoAdicionar([], null);
+            lista.innerHTML = '<div class="grimorio-vazio">Somente a classe ativa Mago precisa adicionar magias conhecidas manualmente.</div>';
+            preview.innerHTML = '<div class="grimorio-historico-vazio">As demais classes já consultam ou preparam diretamente as magias disponíveis do dia.</div>';
+            return;
+        }
 
         if (this._classeSemAcessoMagias()) {
             this.magiasDisponiveisAdicionar = [];
@@ -1058,6 +1258,14 @@ class GrimorioController {
             });
         });
 
+        lista.querySelectorAll('.grimorio-preparar-btn').forEach((button) => {
+            button.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                const magiaId = Number(button.dataset.magiaId);
+                await this._togglePreparada(magiaId);
+            });
+        });
+
         lista.querySelectorAll('.grimorio-magia-card').forEach((card) => {
             card.addEventListener('click', (event) => {
                 if (event.target.closest('.grimorio-acoes-card')) return;
@@ -1113,9 +1321,20 @@ class GrimorioController {
         const id = Number(item.magia_id);
         const aberta = this.cardsAbertos.has(id);
         const classeMago = this._normalizarClasse(this.classeAtiva) === 'Mago';
+        const itemPersistido = !item._catalogo_expandido;
         const escola = this._normalizarEscola(magia.escola || '');
         const magiaDominio = this._ehMagiaDominio(item);
         const dominios = String(magia.dominios || item.magia_dominios || '').trim();
+        const preparo = this._obterInfoPreparacao(item);
+        const origemLabel = item._catalogo_expandido ? 'DISPONIVEL_HOJE' : (item.origem || 'SELECAO_MANUAL');
+        const textoPreparar = preparo.preparada
+            ? (preparo.usada ? '↩ Restaurar preparada' : '✅ Preparada hoje')
+            : '🪄 Preparar hoje';
+        const tituloPreparar = !preparo.podePreparar && !preparo.preparada
+            ? 'Sem slot disponível para este nível'
+            : (preparo.preparada
+                ? 'Remover das magias preparadas de hoje'
+                : `Marcar ${magia.nome || 'magia'} como preparada hoje`);
 
         const detalhes = `
             <div class="grimorio-card-detalhes ${aberta ? 'show' : ''}">
@@ -1125,27 +1344,29 @@ class GrimorioController {
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Alcance</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.alcance || '-')}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Duracao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.duracao || '-')}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Resistencia</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.teste_resistencia || '-')}</span></div>
+                <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Preparacao</span><span class="grimorio-detalhe-valor">${preparo.preparada ? `Preparada no nível ${preparo.nivelSlot}${preparo.usada ? ' • já usada hoje' : ''}` : (preparo.podePreparar ? `Slots livres: ${preparo.slot.disponivel}/${preparo.slot.total}` : 'Sem slot disponível para este nível')}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Descricao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.descricao || '-')}</span></div>
                 ${item.anotacoes ? `<div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Anotacoes</span><span class="grimorio-detalhe-valor">${escapeHtml(item.anotacoes)}</span></div>` : ''}
             </div>
         `;
 
         return `
-            <article class="grimorio-magia-card ${item.favorita ? 'favorita' : ''}" data-id="${id}">
+            <article class="grimorio-magia-card ${item.favorita ? 'favorita' : ''} ${preparo.preparada ? 'preparada' : ''} ${preparo.usada ? 'ja-usada' : ''} ${(!preparo.podePreparar && !preparo.preparada) ? 'sem-slot' : ''}" data-id="${id}">
                 <div class="grimorio-card-topo">
                     <div>
-                        <span class="grimorio-card-nome">${escapeHtml(magia.nome || `Magia ${id}`)}</span>
+                        <span class="grimorio-card-nome ${preparo.preparada ? 'preparada-nome' : ''} ${preparo.usada ? 'usada-nome' : ''}">${escapeHtml(magia.nome || `Magia ${id}`)}</span>
                         <div class="grimorio-card-badges">
                             <span class="grimorio-badge grimorio-badge-escola">${escapeHtml(escola || 'Sem escola')}</span>
                             <span class="grimorio-badge grimorio-badge-comp">N${Number(magia.nivel || 0)} - ${escapeHtml(magia.componentes || '-')}</span>
-                            <span class="grimorio-badge grimorio-badge-origem">${escapeHtml(item.origem || 'SELECAO_MANUAL')}</span>
+                            <span class="grimorio-badge grimorio-badge-origem">${escapeHtml(String(origemLabel).replace(/_/g, ' '))}</span>
+                            ${preparo.preparada ? `<span class="grimorio-badge grimorio-badge-preparada">${preparo.usada ? 'Usada hoje' : 'Preparada hoje'}</span>` : ''}
                             ${magiaDominio ? `<span class="grimorio-badge grimorio-badge-dominio">Dominio${dominios ? `: ${escapeHtml(dominios)}` : ''}</span>` : ''}
                         </div>
                     </div>
                     <div class="grimorio-acoes-card">
-                        <button class="grimorio-favorita-btn ${item.favorita ? 'ativa' : ''}" data-magia-id="${id}" title="Favoritar">★</button>
-                        <button class="grimorio-anotacao-btn" data-magia-id="${id}" title="Anotacoes">✎</button>
-                        ${classeMago ? `<button class="grimorio-remover-btn" data-magia-id="${id}" title="Remover">🗑</button>` : ''}
+                        ${itemPersistido ? `<button class="grimorio-favorita-btn ${item.favorita ? 'ativa' : ''}" data-magia-id="${id}" title="Favoritar">★</button>` : ''}
+                        ${itemPersistido ? `<button class="grimorio-anotacao-btn" data-magia-id="${id}" title="Anotacoes">✎</button>` : ''}
+                        ${classeMago && itemPersistido ? `<button class="grimorio-remover-btn" data-magia-id="${id}" title="Remover">🗑</button>` : ''}
                     </div>
                 </div>
                 <div class="grimorio-card-meta" aria-label="Resumo rapido da magia">
@@ -1162,7 +1383,10 @@ class GrimorioController {
                 ${detalhes}
                 <div class="grimorio-card-rodape">
                     <button class="grimorio-expandir-btn" data-id="${id}">${aberta ? '▲ Menos detalhes' : '▼ Ver detalhes'}</button>
-                    ${item.anotacoes ? '<span class="grimorio-preparada-badge">Com anotacoes</span>' : ''}
+                    <div class="grimorio-rodape-direita">
+                        <button class="grimorio-preparar-btn ${preparo.preparada ? 'ativa' : ''}" data-magia-id="${id}" title="${escapeHtml(tituloPreparar)}" ${(!preparo.podePreparar && !preparo.preparada) ? 'disabled' : ''}>${textoPreparar}</button>
+                        ${item.anotacoes ? '<span class="grimorio-preparada-badge">Com anotacoes</span>' : (item._catalogo_expandido ? '<span class="grimorio-preparada-badge">Disponível hoje</span>' : '')}
+                    </div>
                 </div>
             </article>
         `;
@@ -1188,6 +1412,117 @@ class GrimorioController {
             this._mostrarToast(error.message || 'Nao foi possivel adicionar a magia.', 'erro');
         } finally {
             this._adicionarMagiaEmAndamento = false;
+        }
+    }
+
+    async _desmarcarMagiaPreparada(magiaId) {
+        if (typeof this.magiaPreparadaService?.desmarcar === 'function') {
+            return this.magiaPreparadaService.desmarcar(this.combatente.id, magiaId);
+        }
+
+        const res = await fetch(getApiUrl(`/magias-preparadas/${this.combatente.id}/${magiaId}`), {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${this.token}` },
+        });
+
+        if (!res.ok) {
+            let detalhe = 'Nao foi possivel remover a magia das preparadas de hoje.';
+            try {
+                const data = await res.json();
+                if (typeof data?.detail === 'string' && data.detail.trim()) {
+                    detalhe = data.detail.trim();
+                }
+            } catch (_error) {
+                // Mantem mensagem padrao.
+            }
+            throw new Error(detalhe);
+        }
+
+        return true;
+    }
+
+    async _prepararMagiaHoje(magiaId, nivelSlot) {
+        const payload = {
+            magia_id: magiaId,
+            nivel_slot: nivelSlot,
+            classe: this.classeAtiva,
+        };
+
+        if (typeof this.magiaPreparadaService?.preparar === 'function') {
+            return this.magiaPreparadaService.preparar(this.combatente.id, payload);
+        }
+
+        const res = await fetch(getApiUrl(`/magias-preparadas/${this.combatente.id}`), {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this.token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+            let detalhe = 'Nao foi possivel preparar a magia para hoje.';
+            try {
+                const data = await res.json();
+                if (typeof data?.detail === 'string' && data.detail.trim()) {
+                    detalhe = data.detail.trim();
+                }
+            } catch (_error) {
+                // Mantem mensagem padrao.
+            }
+            throw new Error(detalhe);
+        }
+
+        return res.json();
+    }
+
+    async _togglePreparada(magiaId) {
+        const item = this.itensGrimorio.find((entry) => Number(entry.magia_id) === Number(magiaId));
+        if (!item) return;
+
+        const preparo = this._obterInfoPreparacao(item);
+        if (!preparo.podePreparar && !preparo.preparada) {
+            this._mostrarToast('Esta magia não possui slot disponível para ser preparada hoje.', 'info');
+            return;
+        }
+
+        if (!preparo.preparada && !preparo.temEspaco) {
+            this._mostrarToast(`Todos os slots do nível ${preparo.nivelSlot} já foram preenchidos.`, 'info');
+            return;
+        }
+
+        try {
+            if (preparo.preparada) {
+                await this._desmarcarMagiaPreparada(magiaId);
+                this._mostrarToast('Magia removida das preparadas de hoje.', 'sucesso');
+            } else {
+                await this._prepararMagiaHoje(magiaId, preparo.nivelSlot);
+                this._mostrarToast('Magia marcada como preparada para hoje.', 'sucesso');
+            }
+
+            await this._carregarMagiasPreparadas();
+            this._renderizarPainelSlots();
+            this.filtrar();
+            if (document.getElementById('grimorioModalDetalhes')) {
+                this._renderizarModalDetalhes();
+            }
+            this._broadcastPreparacaoAtualizada();
+        } catch (error) {
+            this._mostrarToast(error.message || 'Nao foi possivel atualizar a preparação da magia.', 'erro');
+        }
+    }
+
+    _broadcastPreparacaoAtualizada() {
+        if (!this._canal || !this.combatente?.id) return;
+        try {
+            this._canal.postMessage({
+                tipo: 'magia-preparada-atualizada',
+                combatenteId: this.combatente.id,
+                timestamp: Date.now(),
+            });
+        } catch (_error) {
+            // Broadcast é opcional.
         }
     }
 
@@ -1291,6 +1626,8 @@ class GrimorioController {
 
         const magia = item.magia || {};
         const classeMago = this._normalizarClasse(this.classeAtiva) === 'Mago';
+        const itemPersistido = !item._catalogo_expandido;
+        const preparo = this._obterInfoPreparacao(item);
         const componentesDetalhados = this._componentesDetalhados(magia);
         const niveisPorClasse = this._formatarNiveisPorClasse(magia, item);
         const posicaoAtual = this.indiceDetalheAtual + 1;
@@ -1330,9 +1667,10 @@ class GrimorioController {
                 </div>
                 <div class="grimorio-confirm-botoes grimorio-detalhe-botoes">
                     <button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheAnterior">← Anterior</button>
-                    <button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheFavorita">${item.favorita ? '★ Favorita' : '☆ Favoritar'}</button>
-                    <button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheAnotacao">✎ Anotacoes</button>
-                    ${classeMago ? '<button class="grimorio-confirm-btn grimorio-confirm-ok" id="grimorioDetalheRemover">Remover</button>' : ''}
+                    <button class="grimorio-confirm-btn ${preparo.preparada ? 'grimorio-confirm-ok' : 'grimorio-confirm-cancelar'}" id="grimorioDetalhePreparar" ${(!preparo.podePreparar && !preparo.preparada) ? 'disabled' : ''}>${preparo.preparada ? '✅ Preparada hoje' : '🪄 Preparar hoje'}</button>
+                    ${itemPersistido ? `<button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheFavorita">${item.favorita ? '★ Favorita' : '☆ Favoritar'}</button>` : ''}
+                    ${itemPersistido ? '<button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheAnotacao">✎ Anotacoes</button>' : ''}
+                    ${classeMago && itemPersistido ? '<button class="grimorio-confirm-btn grimorio-confirm-ok" id="grimorioDetalheRemover">Remover</button>' : ''}
                     <button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheProxima">Proxima →</button>
                     <button class="grimorio-confirm-btn grimorio-confirm-ok" id="grimorioDetalheFechar">Fechar</button>
                 </div>
@@ -1343,6 +1681,10 @@ class GrimorioController {
         overlay.querySelector('#grimorioDetalheAnterior')?.addEventListener('click', () => this._navegarModalDetalhes(-1));
         overlay.querySelector('#grimorioDetalheProxima')?.addEventListener('click', () => this._navegarModalDetalhes(1));
         overlay.querySelector('#grimorioDetalheFechar')?.addEventListener('click', () => this._fecharModalDetalhes());
+
+        overlay.querySelector('#grimorioDetalhePreparar')?.addEventListener('click', async () => {
+            await this._togglePreparada(item.magia_id);
+        });
 
         overlay.querySelector('#grimorioDetalheFavorita')?.addEventListener('click', async () => {
             await this._toggleFavorita(item.magia_id);

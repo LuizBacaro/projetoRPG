@@ -54,13 +54,23 @@
         RANGER: 'Ranger'
     };
 
+    function extractConjuradoraClasses(classe) {
+        return Array.from(new Set(
+            String(classe || '')
+                .split(/[\/,;|]+/)
+                .map(function (parte) { return CANONICAL_CLASSES[normalizeText(parte)] || ''; })
+                .filter(Boolean)
+        ));
+    }
+
     function normalizeClasseConjuradora(classe) {
         var normalized = normalizeText(classe);
-        return CANONICAL_CLASSES[normalized] || '';
+        if (CANONICAL_CLASSES[normalized]) return CANONICAL_CLASSES[normalized];
+        return extractConjuradoraClasses(classe)[0] || '';
     }
 
     function isClasseConjuradora(classe) {
-        return !!normalizeClasseConjuradora(classe);
+        return extractConjuradoraClasses(classe).length > 0;
     }
 
     function classeTabelaMagias(classe) {
@@ -77,6 +87,7 @@
         isTipoRestritoParaMestre: isTipoRestritoParaMestre,
         tipoPermitidoParaPerfil: tipoPermitidoParaPerfil,
         countByTipo: countByTipo,
+        extractConjuradoraClasses: extractConjuradoraClasses,
         normalizeClasseConjuradora: normalizeClasseConjuradora,
         isClasseConjuradora: isClasseConjuradora,
         classeTabelaMagias: classeTabelaMagias,

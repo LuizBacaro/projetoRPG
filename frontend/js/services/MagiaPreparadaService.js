@@ -57,6 +57,44 @@ export class MagiaPreparadaService {
         return res.json();
     }
 
+    async preparar(combatenteId, payload) {
+        const res = await fetch(
+            getApiUrl(`/magias-preparadas/${combatenteId}`),
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            }
+        );
+        if (!res.ok) {
+            throw await this._buildHttpError(
+                res,
+                `Erro ao preparar magia para o combatente #${combatenteId}`
+            );
+        }
+        return res.json();
+    }
+
+    async desmarcar(combatenteId, magiaId) {
+        const res = await fetch(
+            getApiUrl(`/magias-preparadas/${combatenteId}/${magiaId}`),
+            {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${this.token}` },
+            }
+        );
+        if (!res.ok) {
+            throw await this._buildHttpError(
+                res,
+                `Erro ao desmarcar magia #${magiaId} do combatente #${combatenteId}`
+            );
+        }
+        return true;
+    }
+
     /**
      * Alterna magia entre usada/não-usada (lançada na arena)
      * SRP: apenas toggle — sem lógica de UI
@@ -87,15 +125,31 @@ export class MagiaPreparadaService {
      * @param {Array} preparadas - lista de MagiaPreparadaResponse
      * @returns {Object} { nivel: { preparadas: [], usadas: number, total: number } }
      */
-    agruparPorNivel(preparadas) {
+    agruparPorNivel(preparadas, slots = []) {
         const grupos = {};
-        preparadas.forEach(p => {
-            const n = p.nivel_slot;
-            if (!grupos[n]) grupos[n] = { preparadas: [], usadas: 0, total: 0 };
+        const mapaSlots = new Map(
+            (Array.isArray(slots) ? slots : []).map((slot) => [
+                Number(slot?.nivel || 0),
+                Math.max(0, Number(slot?.total || 0)),
+            ])
+        );
+
+        preparadas.forEach((p) => {
+            const n = Number(p?.nivel_slot || p?.magia_nivel || 0);
+            if (!grupos[n]) grupos[n] = { preparadas: [], usadas: 0, total: 0, preparadasCount: 0 };
             grupos[n].preparadas.push(p);
-            grupos[n].total++;
-            if (p.usada) grupos[n].usadas++;
+            grupos[n].preparadasCount += 1;
+            if (p.usada) grupos[n].usadas += 1;
         });
+
+        Object.keys(grupos).forEach((nivelKey) => {
+            const nivel = Number(nivelKey);
+            const grupo = grupos[nivel];
+            const totalSlots = Math.max(mapaSlots.get(nivel) || 0, grupo.preparadasCount || 0);
+            grupo.total = totalSlots;
+            grupo.disponiveis = Math.max(totalSlots - grupo.usadas, 0);
+        });
+
         return grupos;
     }
 }

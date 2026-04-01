@@ -16,6 +16,7 @@ import {
     safeBootstrap,
     safeBootstrapAsync,
 } from '../utils/graceful-degradation.js';
+import { resolveCombatenteSpellSlots } from '../utils/combat-rules.js?v=20260331a';
 
 const DOMINIOS_PERMITIDOS_FALLBACK = [
     'Ar', 'Bem', 'Caos', 'Conhecimento', 'Cura', 'Destruição', 'Enganação', 'Fogo', 'Força',
@@ -314,8 +315,12 @@ export class FichaPersonagemController {
             if (!gc || !gc.slotsDisponiveis) return;
 
             if (gc.slotsDisponiveis[nivel]) {
-                gc.slotsDisponiveis[nivel].preparadas = total;
-                gc.slotsDisponiveis[nivel].disponivel = disponiveis;
+                gc.slotsDisponiveis[nivel].total = total;
+                gc.slotsDisponiveis[nivel].usadas = Math.max(0, total - disponiveis);
+                gc.slotsDisponiveis[nivel].disponivel = Math.max(
+                    gc.slotsDisponiveis[nivel].total - gc.slotsDisponiveis[nivel].preparadas,
+                    0
+                );
                 gc._renderizarPainelSlots();
                 console.log(`📖 Grimório: slot nível ${nivel} sincronizado`);
             }
@@ -692,8 +697,12 @@ export class FichaPersonagemController {
             return;
         }
 
-        const slots      = this.combatente.magias_slots || [];
+        const slots = resolveCombatenteSpellSlots(this.combatente);
         const slotsAtivos = slots.filter(s => (s.total || 0) > 0);
+
+        if (this.combatente) {
+            this.combatente.magias_slots = slots;
+        }
 
         console.log('🔮 Todos os slots:', slots);
         console.log('🔮 Slots ativos (total > 0):', slotsAtivos);
