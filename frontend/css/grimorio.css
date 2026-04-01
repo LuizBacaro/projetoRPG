@@ -19,18 +19,23 @@
 
 /* ── Container principal ── */
 .grimorio-container {
-    background: linear-gradient(160deg, #1c1208 0%, #2a1a08 40%, #1c1208 100%);
-    border: 3px solid var(--cor-dourada);
-    border-radius: 16px;
+    background:
+        radial-gradient(circle at top left, rgba(214, 178, 92, 0.14), transparent 18%),
+        radial-gradient(circle at top right, rgba(108, 84, 214, 0.12), transparent 22%),
+        linear-gradient(160deg, #160e06 0%, #241608 36%, #120b05 100%);
+    border: 3px solid rgba(201, 168, 76, 0.92);
+    border-radius: 18px;
     width: min(1240px, calc(100vw - 2rem));
     max-width: 1240px;
     max-height: 95vh;
     display: flex;
     flex-direction: column;
     box-shadow:
-        0 0 60px rgba(201, 168, 76, 0.25),
-        0 20px 60px rgba(0, 0, 0, 0.8),
-        inset 0 1px 0 rgba(201, 168, 76, 0.2);
+        0 0 0 1px rgba(255, 240, 205, 0.06),
+        0 0 72px rgba(201, 168, 76, 0.2),
+        0 24px 70px rgba(0, 0, 0, 0.82),
+        inset 0 1px 0 rgba(255, 236, 184, 0.14),
+        inset 0 -18px 36px rgba(0, 0, 0, 0.18);
     overflow: hidden;
     animation: grimorioAbrir 0.35s ease;
 }
@@ -49,13 +54,28 @@
 
 /* ── Header ── */
 .grimorio-header {
-    background: linear-gradient(135deg, #2a1a08 0%, #3d2410 50%, #2a1a08 100%);
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at left center, rgba(201, 168, 76, 0.16), transparent 28%),
+        linear-gradient(135deg, #281806 0%, #3f2510 48%, #251406 100%);
     border-bottom: 2px solid var(--cor-dourada);
-    padding: 0.85rem 1.5rem;        /* ✅ menos padding vertical */
+    padding: 0.9rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+}
+
+.grimorio-header::after {
+    content: '';
+    position: absolute;
+    left: 1.2rem;
+    right: 1.2rem;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 225, 146, 0.55), transparent);
+    pointer-events: none;
 }
 .grimorio-header-esquerda {
     display: flex;
@@ -127,7 +147,7 @@
     transform: scale(1.1);
 }
 
-/* ── Botão descanso longo ── */
+/* ── Botões arcanos do grimório ── */
 .grimorio-btn-descanso {
     position: relative;
     overflow: hidden;
@@ -141,7 +161,7 @@
     font-size: 0.72rem;
     padding: 0.42rem 0.82rem;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
     letter-spacing: 0.06em;
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.08),
@@ -176,6 +196,37 @@
         0 0 0 1px rgba(108, 70, 168, 0.34),
         0 12px 24px rgba(48, 21, 89, 0.38),
         0 0 22px rgba(146, 93, 225, 0.22);
+}
+
+.grimorio-btn-descanso:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 0 0 1px rgba(84, 52, 132, 0.12);
+}
+
+.grimorio-adicionar-acoes .grimorio-btn-descanso {
+    background:
+        radial-gradient(circle at top left, rgba(120, 188, 255, 0.16), transparent 38%),
+        linear-gradient(135deg, rgba(23, 31, 64, 0.94), rgba(39, 57, 104, 0.88));
+    border-color: rgba(123, 158, 247, 0.42);
+    color: #dde9ff;
+}
+
+.grimorio-adicionar-acoes .grimorio-btn-descanso::after {
+    color: rgba(178, 213, 255, 0.88);
+    text-shadow: 0 0 8px rgba(97, 160, 255, 0.36);
+}
+
+.grimorio-adicionar-acoes .grimorio-btn-descanso:hover {
+    border-color: rgba(158, 196, 255, 0.72);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        0 0 0 1px rgba(80, 112, 176, 0.34),
+        0 12px 24px rgba(20, 31, 69, 0.34),
+        0 0 20px rgba(84, 136, 255, 0.2);
 }
 
 .grimorio-classe-wrap {
@@ -213,8 +264,10 @@
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    padding: 0.6rem 1.5rem;
-    background: rgba(0,0,0,0.25);
+    padding: 0.75rem 1.5rem;
+    background:
+        radial-gradient(circle at top left, rgba(98, 128, 208, 0.08), transparent 32%),
+        linear-gradient(180deg, rgba(0,0,0,0.24), rgba(0,0,0,0.14));
     border-bottom: 1px solid rgba(201,168,76,0.15);
     flex-shrink: 0;
 }
@@ -223,49 +276,56 @@
 .grimorio-slots-painel {
     flex: 1;
     min-width: 0;
+    padding: 0.72rem 0.82rem;
+    border: 1px solid rgba(201, 168, 76, 0.16);
+    border-radius: 14px;
+    background: linear-gradient(165deg, rgba(20, 14, 7, 0.78), rgba(10, 8, 5, 0.62));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 239, 205, 0.05),
+        0 10px 24px rgba(0, 0, 0, 0.18);
 }
 .grimorio-slots-titulo {
     font-family: var(--fonte-titulo);
     font-size: 0.6rem;
-    color: rgba(201,168,76,0.55);
+    color: rgba(201,168,76,0.62);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.38rem;
 }
 .grimorio-slots-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.5rem;
 }
 .grimorio-slots-vazio {
     font-family: var(--fonte-titulo);
     font-size: 0.7rem;
-    color: rgba(201,168,76,0.4);
+    color: rgba(201,168,76,0.42);
     font-style: italic;
 }
 .grimorio-slot-box {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.15rem;
-    min-width: 38px;
+    gap: 0.16rem;
+    min-width: 40px;
 }
 .grimorio-slot-nivel {
     font-family: var(--fonte-titulo);
     font-size: 0.55rem;
-    color: rgba(201,168,76,0.65);
+    color: rgba(201,168,76,0.72);
     text-transform: uppercase;
 }
 .grimorio-slot-barra-wrap {
-    width: 36px;
-    height: 3px;
+    width: 38px;
+    height: 4px;
     background: rgba(255,255,255,0.08);
-    border-radius: 2px;
+    border-radius: 999px;
     overflow: hidden;
 }
 .grimorio-slot-barra-fill {
     height: 100%;
-    border-radius: 2px;
+    border-radius: 999px;
     transition: width 0.3s ease;
 }
 .grimorio-slot-contagem {
@@ -284,29 +344,44 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.28rem;
+    min-width: 228px;
+    padding: 0.62rem 0.72rem;
+    border: 1px solid rgba(201, 168, 76, 0.16);
+    border-radius: 14px;
+    background: linear-gradient(165deg, rgba(15, 12, 18, 0.82), rgba(8, 7, 12, 0.64));
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 10px 24px rgba(0, 0, 0, 0.18);
 }
 .grimorio-busca-label {
     font-family: var(--fonte-titulo);
     font-size: 0.6rem;
-    color: rgba(201,168,76,0.55);
+    color: rgba(201,168,76,0.6);
     text-transform: uppercase;
     letter-spacing: 0.1em;
 }
 .grimorio-busca {
-    background: rgba(0,0,0,0.35);
+    background: rgba(0,0,0,0.38);
     border: 1px solid rgba(201, 168, 76, 0.3);
-    border-radius: 8px;
+    border-radius: 10px;
     color: var(--cor-pergaminho);
     font-family: var(--fonte-texto);
     font-size: 0.82rem;
-    padding: 0.4rem 0.75rem;
+    padding: 0.45rem 0.78rem;
     outline: none;
-    transition: border-color 0.2s;
-    width: 220px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    width: 235px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 .grimorio-busca::placeholder { color: rgba(201,168,76,0.3); }
-.grimorio-busca:focus { border-color: var(--cor-dourada); }
+.grimorio-busca:focus {
+    border-color: var(--cor-dourada);
+    background: rgba(9, 10, 17, 0.9);
+    box-shadow:
+        0 0 0 3px rgba(201, 168, 76, 0.12),
+        0 0 16px rgba(201, 168, 76, 0.12);
+}
 
 .grimorio-aviso-classe {
     margin: 0.55rem 1.5rem 0;
@@ -838,23 +913,30 @@
    ✅ FILTROS COMPACTOS: nível + escola em 2 linhas enxutas
     */
 .grimorio-filtros {
-    padding: 0.5rem 1.5rem;
+    padding: 0.6rem 1.5rem;
     border-bottom: 1px solid rgba(201,168,76,0.15);
-    background: rgba(0,0,0,0.15);
+    background:
+        radial-gradient(circle at top left, rgba(201, 168, 76, 0.08), transparent 24%),
+        linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.1));
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;               /* ✅ gap reduzido */
+    gap: 0.45rem;
     flex-shrink: 0;
 }
 .grimorio-filtro-grupo {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    padding: 0.34rem 0.42rem;
+    border: 1px solid rgba(201, 168, 76, 0.1);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.12);
 }
 .grimorio-filtro-label {
     font-family: var(--fonte-titulo);
     font-size: 0.62rem;
-    color: rgba(201,168,76,0.55);
+    color: rgba(201,168,76,0.58);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     min-width: 42px;
@@ -863,76 +945,78 @@
 .grimorio-niveis {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.25rem;              /* ✅ gap menor */
+    gap: 0.3rem;
 }
 .grimorio-nivel-btn {
-    background: rgba(201,168,76,0.07);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 5px;
-    color: rgba(201,168,76,0.55);
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(255,255,255,0.02));
+    border: 1px solid rgba(201,168,76,0.22);
+    border-radius: 999px;
+    color: rgba(201,168,76,0.62);
     font-family: var(--fonte-titulo);
-    font-size: 0.62rem;        /* ✅ fonte menor */
-    padding: 0.18rem 0.45rem;  /* ✅ padding menor */
+    font-size: 0.62rem;
+    padding: 0.2rem 0.52rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     white-space: nowrap;
 }
 .grimorio-nivel-btn:hover {
     background: rgba(201,168,76,0.18);
     color: var(--cor-dourada);
     border-color: rgba(201,168,76,0.5);
+    transform: translateY(-1px);
 }
 .grimorio-nivel-btn.ativo {
-    background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.12));
+    background: linear-gradient(135deg, rgba(201,168,76,0.26), rgba(201,168,76,0.12));
     border-color: var(--cor-dourada);
     color: var(--cor-dourada);
-    box-shadow: 0 0 6px rgba(201,168,76,0.25);
+    box-shadow: 0 0 10px rgba(201,168,76,0.2);
 }
 
 /* Botão "Preparadas Hoje" */
 .grimorio-btn-preparadas {
     border-color: rgba(250,204,21,0.35) !important;
-    color: rgba(250,204,21,0.6) !important;
+    color: rgba(250,204,21,0.68) !important;
 }
 .grimorio-btn-preparadas.ativo {
     background: rgba(250,204,21,0.12) !important;
     border-color: #facc15 !important;
     color: #facc15 !important;
-    box-shadow: 0 0 7px rgba(250,204,21,0.25) !important;
+    box-shadow: 0 0 10px rgba(250,204,21,0.22) !important;
 }
 
 /* Filtro escola */
 .grimorio-escola-btn {
-    background: rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, rgba(0,0,0,0.2), rgba(255,255,255,0.015));
     border: 1px solid rgba(201,168,76,0.18);
-    border-radius: 5px;
-    color: rgba(201,168,76,0.55);
+    border-radius: 999px;
+    color: rgba(201,168,76,0.58);
     font-family: var(--fonte-titulo);
     font-size: 0.6rem;
-    padding: 0.18rem 0.5rem;
+    padding: 0.2rem 0.55rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     white-space: nowrap;
 }
 .grimorio-escola-btn:hover {
     border-color: rgba(201,168,76,0.45);
     color: var(--cor-dourada);
+    transform: translateY(-1px);
 }
 .grimorio-escola-btn.ativo {
     background: rgba(201,168,76,0.13);
     border-color: var(--cor-dourada);
     color: var(--cor-dourada);
-    box-shadow: 0 0 5px rgba(201,168,76,0.18);
+    box-shadow: 0 0 7px rgba(201,168,76,0.16);
 }
 
 /* 
    ✅ CORPO DA LISTA — flex:1 garante máximo espaço possível
     */
 .grimorio-corpo {
-    flex: 1;                   /* ✅ ocupa TODO o espaço restante */
+    flex: 1;
     overflow-y: auto;
-    padding: 0.85rem 1.5rem;
-    min-height: 0;             /* ✅ crítico para flex funcionar */
+    padding: 0.95rem 1.5rem 1.1rem;
+    min-height: 0;
 }
 
 /* Loading */
@@ -959,11 +1043,19 @@
 /* Nenhum resultado */
 .grimorio-vazio {
     text-align: center;
-    padding: 2rem;
-    color: var(--cor-madeira-clara);
+    padding: 1.35rem 1rem;
+    max-width: 560px;
+    margin: 1rem auto;
+    color: #e7d6ae;
     font-family: var(--fonte-titulo);
     font-size: 0.9rem;
     font-style: italic;
+    border: 1px dashed rgba(201, 168, 76, 0.26);
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at top, rgba(201, 168, 76, 0.08), transparent 55%),
+        linear-gradient(160deg, rgba(27, 19, 9, 0.82), rgba(12, 10, 6, 0.58));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 /* ── Grupos por nível ── */
@@ -1004,41 +1096,63 @@
 
 /* ── Card de magia ── */
 .grimorio-magia-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(201,168,76,0.04) 100%);
+    background:
+        radial-gradient(circle at top right, rgba(114, 165, 255, 0.08), transparent 24%),
+        linear-gradient(135deg, rgba(255,255,255,0.045) 0%, rgba(201,168,76,0.055) 100%);
     border: 1px solid rgba(201,168,76,0.18);
-    border-radius: 10px;
-    padding: 0.75rem 0.9rem;
-    margin-bottom: 0.4rem;
+    border-radius: 14px;
+    padding: 0.82rem 0.95rem;
+    margin-bottom: 0.55rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
     position: relative;
     overflow: hidden;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.03),
+        0 10px 24px rgba(0, 0, 0, 0.16);
 }
 .grimorio-magia-card::before {
     content: '';
     position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: linear-gradient(180deg, var(--cor-dourada), transparent);
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, rgba(255, 219, 130, 0.9), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s ease;
+}
+.grimorio-magia-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255,255,255,0.04), transparent 32%, transparent 68%, rgba(201,168,76,0.05));
+    pointer-events: none;
 }
 .grimorio-magia-card:hover {
-    background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(201,168,76,0.08) 100%);
+    background:
+        radial-gradient(circle at top right, rgba(144, 190, 255, 0.12), transparent 24%),
+        linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(201,168,76,0.09) 100%);
     border-color: rgba(201,168,76,0.4);
-    transform: translateX(3px);
+    transform: translateY(-2px) translateX(2px);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 14px 28px rgba(0, 0, 0, 0.24),
+        0 0 0 1px rgba(201, 168, 76, 0.08);
 }
 .grimorio-magia-card:hover::before { opacity: 1; }
 .grimorio-magia-card.preparada {
-    background: linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.06) 100%);
+    background:
+        radial-gradient(circle at top right, rgba(255, 224, 144, 0.12), transparent 24%),
+        linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.06) 100%);
     border-color: rgba(201,168,76,0.45);
-    box-shadow: 0 0 12px rgba(201,168,76,0.15);
+    box-shadow: 0 0 16px rgba(201,168,76,0.14), 0 12px 24px rgba(0,0,0,0.18);
 }
 .grimorio-magia-card.sem-slot { opacity: 0.5; }
 .grimorio-magia-card.ja-usada {
-    opacity: 0.6;
-    background: linear-gradient(135deg, rgba(248,113,113,0.06) 0%, rgba(248,113,113,0.03) 100%);
-    border-color: rgba(248,113,113,0.25);
+    opacity: 0.66;
+    background: linear-gradient(135deg, rgba(248,113,113,0.07) 0%, rgba(248,113,113,0.035) 100%);
+    border-color: rgba(248,113,113,0.26);
 }
 
 /* Topo do card */
@@ -1046,15 +1160,16 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 0.5rem;
-    margin-bottom: 0.35rem;
+    gap: 0.6rem;
+    margin-bottom: 0.38rem;
 }
 .grimorio-card-nome {
     font-family: var(--fonte-titulo);
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     color: var(--cor-dourada);
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.22;
+    text-wrap: balance;
 }
 .grimorio-card-nome.preparada-nome {
     color: var(--cor-dourada);
@@ -1066,7 +1181,7 @@
 }
 .grimorio-card-badges {
     display: flex;
-    gap: 0.3rem;
+    gap: 0.34rem;
     flex-shrink: 0;
     flex-wrap: wrap;
     justify-content: flex-end;
@@ -1074,18 +1189,26 @@
 
 .grimorio-acoes-card {
     display: flex;
-    gap: 0.28rem;
+    gap: 0.32rem;
     align-items: center;
 }
 
 .grimorio-acoes-card button {
-    width: 25px;
-    height: 25px;
-    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
     border: 1px solid rgba(201, 168, 76, 0.28);
     background: rgba(0, 0, 0, 0.28);
     color: var(--cor-dourada);
     cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.grimorio-acoes-card button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(201, 168, 76, 0.5);
+    background: rgba(201, 168, 76, 0.12);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18);
 }
 
 .grimorio-favorita-btn.ativa {
@@ -1096,13 +1219,13 @@
 
 .grimorio-magia-card.favorita {
     border-color: rgba(250, 204, 21, 0.45);
-    box-shadow: 0 0 12px rgba(250, 204, 21, 0.12);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.1), 0 12px 24px rgba(0,0,0,0.18);
 }
 .grimorio-badge {
     font-family: var(--fonte-titulo);
     font-size: 0.58rem;
     font-weight: 700;
-    padding: 0.12rem 0.4rem;
+    padding: 0.14rem 0.42rem;
     border-radius: 999px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1148,29 +1271,33 @@
 
 /* Descrição */
 .grimorio-card-descricao {
-    font-size: 0.78rem;
-    color: rgba(232,216,185,0.75);
+    font-size: 0.79rem;
+    color: rgba(232,216,185,0.8);
     font-family: var(--fonte-texto);
-    line-height: 1.4;
-    margin-bottom: 0.4rem;
+    line-height: 1.5;
+    margin-bottom: 0.45rem;
 }
 
 /* Meta */
 .grimorio-card-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.3rem;
+    gap: 0.55rem;
+    margin-top: 0.32rem;
 }
 .grimorio-meta-item {
     display: flex;
     flex-direction: column;
-    gap: 0.04rem;
+    gap: 0.05rem;
+    padding: 0.28rem 0.45rem;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.12);
+    background: rgba(0, 0, 0, 0.14);
 }
 .grimorio-meta-label {
     font-family: var(--fonte-titulo);
     font-size: 0.48rem;
-    color: rgba(201,168,76,0.5);
+    color: rgba(201,168,76,0.52);
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
@@ -1242,11 +1369,12 @@
 .grimorio-preparo-inline {
     display: inline-flex;
     align-items: center;
-    gap: 0.28rem;
-    padding: 0.22rem 0.38rem;
+    gap: 0.3rem;
+    padding: 0.24rem 0.42rem;
     border-radius: 999px;
     border: 1px solid rgba(201, 168, 76, 0.22);
-    background: rgba(0, 0, 0, 0.22);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.24), rgba(36, 25, 10, 0.2));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 .grimorio-preparo-inline.is-disabled {
@@ -1265,7 +1393,7 @@
 .grimorio-preparo-step {
     width: 22px;
     height: 22px;
-    border-radius: 6px;
+    border-radius: 7px;
     border: 1px solid rgba(201, 168, 76, 0.28);
     background: rgba(31, 21, 9, 0.72);
     color: var(--cor-dourada);
@@ -1273,6 +1401,13 @@
     font-size: 0.92rem;
     cursor: pointer;
     line-height: 1;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.grimorio-preparo-step:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(201, 168, 76, 0.5);
+    box-shadow: 0 8px 14px rgba(0,0,0,0.18);
 }
 
 .grimorio-preparo-step:disabled {
@@ -1283,7 +1418,7 @@
 .grimorio-preparo-input {
     width: 46px;
     height: 24px;
-    border-radius: 6px;
+    border-radius: 7px;
     border: 1px solid rgba(201, 168, 76, 0.28);
     background: rgba(7, 9, 16, 0.72);
     color: var(--cor-pergaminho);
@@ -1291,6 +1426,13 @@
     font-family: var(--fonte-titulo);
     font-size: 0.74rem;
     font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.grimorio-preparo-input:focus {
+    outline: none;
+    border-color: rgba(201, 168, 76, 0.62);
+    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.12);
 }
 
 .grimorio-expandir-btn {
@@ -1303,9 +1445,12 @@
     padding: 0;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    transition: color 0.2s;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
-.grimorio-expandir-btn:hover { color: var(--cor-dourada); }
+.grimorio-expandir-btn:hover {
+    color: var(--cor-dourada);
+    transform: translateX(1px);
+}
 .grimorio-preparada-badge {
     font-family: var(--fonte-titulo);
     font-size: 0.6rem;
@@ -1316,16 +1461,17 @@
 
 .grimorio-preparar-btn {
     border: 1px solid rgba(110, 231, 183, 0.32);
-    background: linear-gradient(135deg, rgba(8, 48, 34, 0.8), rgba(14, 44, 23, 0.56));
+    background: linear-gradient(135deg, rgba(8, 48, 34, 0.84), rgba(14, 44, 23, 0.58));
     color: #c6ffe5;
-    border-radius: 8px;
-    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
     font-family: var(--fonte-titulo);
     font-size: 0.62rem;
     letter-spacing: 0.05em;
     cursor: pointer;
     transition: all 0.18s ease;
     white-space: nowrap;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 .grimorio-preparar-btn:hover {
@@ -1335,7 +1481,7 @@
 }
 
 .grimorio-preparar-btn.ativa {
-    background: linear-gradient(135deg, rgba(201, 168, 76, 0.26), rgba(130, 93, 17, 0.24));
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.28), rgba(130, 93, 17, 0.26));
     border-color: rgba(250, 204, 21, 0.55);
     color: #fff1be;
 }
@@ -1513,6 +1659,11 @@
         gap: 0.5rem;
         padding: 0.5rem 1rem;
     }
+    .grimorio-slots-painel,
+    .grimorio-busca-wrapper {
+        width: 100%;
+        min-width: 0;
+    }
     .grimorio-busca     { width: 100%; }
     .grimorio-filtros   { padding: 0.4rem 1rem; }
     .grimorio-corpo     { padding: 0.6rem 1rem; }
@@ -1652,13 +1803,26 @@
 }
 
 .grimorio-confirm-btn {
-    padding:       0.55rem 1.25rem;
-    border-radius: 8px;
-    font-size:     0.88rem;
-    font-weight:   600;
-    cursor:        pointer;
-    border:        none;
-    transition:    background 0.15s, transform 0.1s;
+    position: relative;
+    overflow: hidden;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, filter 0.18s ease;
+    font-family: var(--fonte-titulo);
+    letter-spacing: 0.05em;
+}
+
+.grimorio-confirm-btn::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255,255,255,0.07), transparent 60%);
+    pointer-events: none;
 }
 
 .grimorio-confirm-btn:active {
@@ -1666,25 +1830,35 @@
 }
 
 .grimorio-confirm-cancelar {
-    background: rgba(100, 116, 139, 0.2);
-    color:      #94a3b8;
-    border:     1px solid rgba(100, 116, 139, 0.3);
+    background:
+        radial-gradient(circle at top left, rgba(120, 188, 255, 0.15), transparent 40%),
+        linear-gradient(135deg, rgba(19, 28, 56, 0.94), rgba(31, 48, 88, 0.88));
+    color: #d6e4ff;
+    border-color: rgba(123, 158, 247, 0.34);
+    box-shadow: 0 10px 18px rgba(18, 26, 51, 0.24);
 }
 
 .grimorio-confirm-cancelar:hover {
-    background: rgba(100, 116, 139, 0.35);
-    color:      #cbd5e1;
+    transform: translateY(-1px);
+    color: #eef4ff;
+    border-color: rgba(164, 198, 255, 0.62);
+    box-shadow: 0 12px 22px rgba(24, 39, 77, 0.3), 0 0 18px rgba(83, 142, 255, 0.16);
 }
 
 .grimorio-confirm-ok {
-    background: rgba(201, 168, 76, 0.15);
-    color:      #c9a84c;
-    border:     1px solid rgba(201, 168, 76, 0.35);
+    background:
+        radial-gradient(circle at top left, rgba(247, 217, 135, 0.16), transparent 42%),
+        linear-gradient(135deg, rgba(59, 38, 9, 0.94), rgba(108, 72, 18, 0.9));
+    color: #f7e7b1;
+    border-color: rgba(201, 168, 76, 0.4);
+    box-shadow: 0 10px 18px rgba(54, 34, 8, 0.24);
 }
 
 .grimorio-confirm-ok:hover {
-    background: rgba(201, 168, 76, 0.28);
-    color:      #f0c96a;
+    transform: translateY(-1px);
+    color: #fff4cf;
+    border-color: rgba(243, 211, 120, 0.72);
+    box-shadow: 0 12px 22px rgba(74, 47, 8, 0.32), 0 0 18px rgba(201, 168, 76, 0.18);
 }
 
 .grimorio-anotacao-box {
