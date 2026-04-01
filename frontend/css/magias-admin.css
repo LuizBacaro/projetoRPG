@@ -235,6 +235,43 @@
     text-align: center;
 }
 
+.magias-pagination .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .52rem .92rem;
+    min-height: 38px;
+    border-radius: 10px;
+    border: 1px solid rgba(138, 176, 230, 0.45);
+    background: linear-gradient(145deg, rgba(26, 54, 100, 0.72), rgba(19, 40, 78, 0.86));
+    color: #d1e3fb;
+    font-family: var(--fonte-titulo);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: filter .18s, transform .15s, box-shadow .18s;
+    box-shadow: 0 8px 18px rgba(6, 17, 34, 0.28);
+}
+
+.magias-pagination .btn:hover {
+    filter: brightness(1.12);
+    transform: translateY(-2px);
+}
+
+.magias-pagination .btn:active {
+    transform: translateY(0);
+    filter: brightness(.96);
+}
+
+.magias-pagination .btn:disabled {
+    opacity: .48;
+    cursor: not-allowed;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+}
+
 .magias-table-shell th,
 .magias-table-shell td {
     padding: .72rem .68rem;
@@ -280,18 +317,33 @@
 }
 
 .btn-acao {
-    border: 1px solid rgba(122, 155, 202, 0.35);
-    background: rgba(16, 42, 76, 0.86);
-    color: #e1edfc;
-    border-radius: 9px;
-    padding: .35rem .58rem;
-    font-size: .76rem;
+    border: 1px solid rgba(138, 176, 230, 0.45);
+    background: linear-gradient(145deg, rgba(26, 54, 100, 0.72), rgba(19, 40, 78, 0.86));
+    color: #d1e3fb;
+    border-radius: 10px;
+    padding: .36rem .62rem;
+    font-family: var(--fonte-titulo);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
     cursor: pointer;
+    transition: filter .18s, transform .15s, box-shadow .18s;
+    box-shadow: 0 7px 14px rgba(6, 17, 34, 0.24);
+}
+
+.btn-acao:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
 }
 
 .btn-acao-danger {
-    border-color: rgba(239, 68, 68, 0.42);
-    background: rgba(127, 29, 29, 0.72);
+    border-color: rgba(239, 68, 68, 0.56);
+    background: linear-gradient(145deg, rgba(134, 35, 35, 0.9), rgba(99, 26, 26, 0.86));
+    color: #fee2e2;
+}
+
+.btn-acao-danger:hover {
+    filter: brightness(1.1);
 }
 
 .magias-modal-overlay {
@@ -798,4 +850,16 @@
 @media (max-width: 640px) {
     .magias-overview { grid-template-columns: 1fr; }
     .magias-toolbar-controls { grid-template-columns: 1fr; }
+    .magias-pagination {
+        justify-content: stretch;
+        flex-wrap: wrap;
+    }
+    .magias-pagination span {
+        order: -1;
+        min-width: 100%;
+        text-align: left;
+    }
+    .magias-pagination .btn {
+        flex: 1;
+    }
 }
