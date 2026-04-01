@@ -38,8 +38,8 @@ class MagiaSlot(Base):
 class MagiaPreparada(Base):
     """
     Magia preparada para o dia.
-    usada=True → já foi lançada hoje (decrementou slot na arena).
-    Reseta ao descanso longo.
+    `quantidade` representa quantas vezes a magia foi decorada.
+    `usos_realizados` controla quantas dessas cópias já foram gastas na arena.
     """
     __tablename__  = "magias_preparadas"
     __table_args__ = (
@@ -47,12 +47,14 @@ class MagiaPreparada(Base):
         {"extend_existing": True},
     )
 
-    id            = Column(Integer, primary_key=True, index=True)
-    combatente_id = Column(Integer, ForeignKey("combatentes.id", ondelete="CASCADE"), nullable=False)
-    magia_id      = Column(Integer, ForeignKey("magias.id",       ondelete="CASCADE"), nullable=False)
-    nivel_slot    = Column(Integer, nullable=False)
-    usada         = Column(Boolean, nullable=False, default=False)   # ✅ NOVO
-    preparada_em  = Column(DateTime, default=datetime.utcnow)
+    id              = Column(Integer, primary_key=True, index=True)
+    combatente_id   = Column(Integer, ForeignKey("combatentes.id", ondelete="CASCADE"), nullable=False)
+    magia_id        = Column(Integer, ForeignKey("magias.id",       ondelete="CASCADE"), nullable=False)
+    nivel_slot      = Column(Integer, nullable=False)
+    quantidade      = Column(Integer, nullable=False, default=1)
+    usos_realizados = Column(Integer, nullable=False, default=0)
+    usada           = Column(Boolean, nullable=False, default=False)
+    preparada_em    = Column(DateTime, default=datetime.utcnow)
 
     combatente = relationship("Combatente", back_populates="magias_preparadas")
     magia      = relationship("Magia")

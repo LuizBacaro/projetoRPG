@@ -1,6 +1,6 @@
 import { MagiaService } from '../services/MagiaService.js';
 import { GrimorioService } from '../services/GrimorioService.js';
-import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260331b';
+import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { getApiUrl } from '../config/api.config.js';
 import { escapeHtml } from '../utils/formatters.js';
 import {
@@ -50,6 +50,7 @@ class GrimorioController {
         this.catalogoIndex = new Map();
         this.magiasPreparadas = [];
         this.magiasPreparadasMap = new Map();
+        this.preparacaoQuantidadesDraft = new Map();
         this.slotsDisponiveis = {};
 
         this.itensFiltrados = [];
@@ -307,10 +308,55 @@ class GrimorioController {
         this.magiasPreparadasMap = new Map(
             this.magiasPreparadas.map((item) => [Number(item.magia_id), item])
         );
+        this.preparacaoQuantidadesDraft = new Map(
+            this.magiasPreparadas.map((item) => [Number(item.magia_id), this._quantidadePreparada(item)])
+        );
         if (this.combatente) {
             this.combatente.magias_preparadas = [...this.magiasPreparadas];
         }
         this._hidratarSlotsDisponiveis();
+    }
+
+    _quantidadePreparada(registro) {
+        return Math.max(1, Number(registro?.quantidade || 1));
+    }
+
+    _quantidadeUsada(registro) {
+        const quantidade = this._quantidadePreparada(registro);
+        const usos = Number(registro?.usos_realizados ?? (registro?.usada ? 1 : 0) ?? 0);
+        return Math.max(0, Math.min(quantidade, usos));
+    }
+
+    _obterQuantidadePreparacaoRapida(magiaId, preparo) {
+        const draft = this.preparacaoQuantidadesDraft.get(Number(magiaId));
+        const min = preparo?.preparada ? 0 : (preparo?.temEspaco ? 1 : 0);
+        const fallback = preparo?.preparada ? Number(preparo.quantidadeAtual || 0) : min;
+        const max = Math.max(min, Number(preparo?.quantidadeMaxima || fallback || 0));
+        const valorBase = draft ?? fallback;
+        return Math.max(min, Math.min(max, Number(valorBase || 0)));
+    }
+
+    _atualizarQuantidadePreparacaoRapida(magiaId, valor) {
+        const item = this.itensGrimorio.find((entry) => Number(entry.magia_id) === Number(magiaId));
+        if (!item) return 0;
+
+        const preparo = this._obterInfoPreparacao(item);
+        const min = preparo.preparada ? 0 : (preparo.temEspaco ? 1 : 0);
+        const max = Math.max(min, Number(preparo.quantidadeMaxima || min || 0));
+        const valorNumero = Math.trunc(Number(valor));
+        const normalizado = Math.max(min, Math.min(max, Number.isFinite(valorNumero) ? valorNumero : min));
+
+        this.preparacaoQuantidadesDraft.set(Number(magiaId), normalizado);
+        return normalizado;
+    }
+
+    _lerQuantidadePreparacaoCard(magiaId) {
+        const input = document.querySelector(`.grimorio-preparo-input[data-magia-id="${Number(magiaId)}"]`);
+        const valor = this._atualizarQuantidadePreparacaoRapida(magiaId, input?.value);
+        if (input) {
+            input.value = String(valor);
+        }
+        return valor;
     }
 
     _hidratarSlotsDisponiveis() {
@@ -324,8 +370,12 @@ class GrimorioController {
         slots.forEach((slot) => {
             const nivel = Number(slot?.nivel || 0);
             const total = Math.max(0, Number(slot?.total || 0));
-            const preparadas = this.magiasPreparadas.filter((item) => Number(item.nivel_slot || 0) === nivel).length;
-            const usadas = this.magiasPreparadas.filter((item) => Number(item.nivel_slot || 0) === nivel && item.usada).length;
+            const preparadas = this.magiasPreparadas
+                .filter((item) => Number(item.nivel_slot || 0) === nivel)
+                .reduce((soma, item) => soma + this._quantidadePreparada(item), 0);
+            const usadas = this.magiasPreparadas
+                .filter((item) => Number(item.nivel_slot || 0) === nivel)
+                .reduce((soma, item) => soma + this._quantidadeUsada(item), 0);
             mapa[nivel] = {
                 nivel,
                 total,
@@ -403,16 +453,26 @@ class GrimorioController {
             usadas: 0,
             disponivel: 0,
         };
+        const quantidadeAtual = registro ? this._quantidadePreparada(registro) : 0;
+        const usosRealizados = registro ? this._quantidadeUsada(registro) : 0;
+        const quantidadeMaxima = Number(slot.total || 0) > 0
+            ? Math.max(quantidadeAtual, Number(slot.disponivel || 0) + quantidadeAtual)
+            : quantidadeAtual;
 
         return {
             magiaId,
             nivelSlot,
             registro,
-            preparada: !!registro,
-            usada: !!registro?.usada,
+            preparada: quantidadeAtual > 0,
+            usada: usosRealizados > 0,
+            parcialmenteUsada: usosRealizados > 0 && usosRealizados < quantidadeAtual,
+            totalmenteUsada: quantidadeAtual > 0 && usosRealizados >= quantidadeAtual,
+            quantidadeAtual,
+            usosRealizados,
+            quantidadeMaxima,
             slot,
-            podePreparar: Number(slot.total || 0) > 0,
-            temEspaco: Number(slot.disponivel || 0) > 0 || !!registro,
+            podePreparar: Number(slot.total || 0) > 0 || quantidadeAtual > 0,
+            temEspaco: Number(slot.disponivel || 0) > 0 || quantidadeAtual > 0,
         };
     }
 
@@ -538,11 +598,23 @@ class GrimorioController {
         this._bindNiveis();
         this._bindFavoritas();
         this._bindComponente();
+        this._bindDescansoLongo();
         this._bindAdicionarMagia();
         this._bindFiltrosAdicionar();
         this._bindAtalhosAdicionar();
         this._bindTrocaMagia();
         this._bindNotificacoes();
+    }
+
+    _bindDescansoLongo() {
+        const btnDescanso = document.getElementById('btnDescansoLongoGrimorio');
+        if (!btnDescanso) return;
+
+        const clone = btnDescanso.cloneNode(true);
+        btnDescanso.parentNode.replaceChild(clone, btnDescanso);
+        clone.addEventListener('click', () => {
+            this._confirmarDescansoLongo();
+        });
     }
 
     _bindNotificacoes() {
@@ -1258,11 +1330,33 @@ class GrimorioController {
             });
         });
 
+        lista.querySelectorAll('.grimorio-preparo-step').forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const magiaId = Number(button.dataset.magiaId);
+                const delta = Number(button.dataset.delta || 0);
+                const atual = this._lerQuantidadePreparacaoCard(magiaId);
+                const input = document.querySelector(`.grimorio-preparo-input[data-magia-id="${magiaId}"]`);
+                const novoValor = this._atualizarQuantidadePreparacaoRapida(magiaId, atual + delta);
+                if (input) input.value = String(novoValor);
+            });
+        });
+
+        lista.querySelectorAll('.grimorio-preparo-input').forEach((input) => {
+            input.addEventListener('click', (event) => event.stopPropagation());
+            input.addEventListener('input', (event) => {
+                event.stopPropagation();
+                const magiaId = Number(input.dataset.magiaId);
+                input.value = String(this._atualizarQuantidadePreparacaoRapida(magiaId, input.value));
+            });
+        });
+
         lista.querySelectorAll('.grimorio-preparar-btn').forEach((button) => {
             button.addEventListener('click', async (event) => {
                 event.stopPropagation();
                 const magiaId = Number(button.dataset.magiaId);
-                await this._togglePreparada(magiaId);
+                const quantidade = this._lerQuantidadePreparacaoCard(magiaId);
+                await this._togglePreparada(magiaId, quantidade);
             });
         });
 
@@ -1270,6 +1364,8 @@ class GrimorioController {
             card.addEventListener('click', (event) => {
                 if (event.target.closest('.grimorio-acoes-card')) return;
                 if (event.target.closest('.grimorio-expandir-btn')) return;
+                if (event.target.closest('.grimorio-preparo-inline')) return;
+                if (event.target.closest('.grimorio-preparar-btn')) return;
                 this._abrirModalDetalhes(Number(card.dataset.id));
             });
         });
@@ -1327,13 +1423,14 @@ class GrimorioController {
         const dominios = String(magia.dominios || item.magia_dominios || '').trim();
         const preparo = this._obterInfoPreparacao(item);
         const origemLabel = item._catalogo_expandido ? 'DISPONIVEL_HOJE' : (item.origem || 'SELECAO_MANUAL');
+        const quantidadeRapida = this._obterQuantidadePreparacaoRapida(id, preparo);
         const textoPreparar = preparo.preparada
-            ? (preparo.usada ? '↩ Restaurar preparada' : '✅ Preparada hoje')
+            ? `✅ Preparada ×${preparo.quantidadeAtual}`
             : '🪄 Preparar hoje';
-        const tituloPreparar = !preparo.podePreparar && !preparo.preparada
-            ? 'Sem slot disponível para este nível'
+        const tituloPreparar = !preparo.temEspaco && !preparo.preparada
+            ? 'Todos os slots deste nível já foram preenchidos'
             : (preparo.preparada
-                ? 'Remover das magias preparadas de hoje'
+                ? 'Clique para ajustar ou remover a quantidade preparada'
                 : `Marcar ${magia.nome || 'magia'} como preparada hoje`);
 
         const detalhes = `
@@ -1344,14 +1441,14 @@ class GrimorioController {
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Alcance</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.alcance || '-')}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Duracao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.duracao || '-')}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Resistencia</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.teste_resistencia || '-')}</span></div>
-                <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Preparacao</span><span class="grimorio-detalhe-valor">${preparo.preparada ? `Preparada no nível ${preparo.nivelSlot}${preparo.usada ? ' • já usada hoje' : ''}` : (preparo.podePreparar ? `Slots livres: ${preparo.slot.disponivel}/${preparo.slot.total}` : 'Sem slot disponível para este nível')}</span></div>
+                <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Preparacao</span><span class="grimorio-detalhe-valor">${preparo.preparada ? `Preparada ${preparo.quantidadeAtual}x no nível ${preparo.nivelSlot}${preparo.usosRealizados ? ` • ${preparo.usosRealizados} usada(s)` : ''}` : (preparo.podePreparar ? `Slots livres: ${preparo.slot.disponivel}/${preparo.slot.total}` : 'Sem slot disponível para este nível')}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Descricao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.descricao || '-')}</span></div>
                 ${item.anotacoes ? `<div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Anotacoes</span><span class="grimorio-detalhe-valor">${escapeHtml(item.anotacoes)}</span></div>` : ''}
             </div>
         `;
 
         return `
-            <article class="grimorio-magia-card ${item.favorita ? 'favorita' : ''} ${preparo.preparada ? 'preparada' : ''} ${preparo.usada ? 'ja-usada' : ''} ${(!preparo.podePreparar && !preparo.preparada) ? 'sem-slot' : ''}" data-id="${id}">
+            <article class="grimorio-magia-card ${item.favorita ? 'favorita' : ''} ${preparo.preparada ? 'preparada' : ''} ${preparo.usada ? 'ja-usada' : ''} ${(!preparo.temEspaco && !preparo.preparada) ? 'sem-slot' : ''}" data-id="${id}">
                 <div class="grimorio-card-topo">
                     <div>
                         <span class="grimorio-card-nome ${preparo.preparada ? 'preparada-nome' : ''} ${preparo.usada ? 'usada-nome' : ''}">${escapeHtml(magia.nome || `Magia ${id}`)}</span>
@@ -1359,7 +1456,7 @@ class GrimorioController {
                             <span class="grimorio-badge grimorio-badge-escola">${escapeHtml(escola || 'Sem escola')}</span>
                             <span class="grimorio-badge grimorio-badge-comp">N${Number(magia.nivel || 0)} - ${escapeHtml(magia.componentes || '-')}</span>
                             <span class="grimorio-badge grimorio-badge-origem">${escapeHtml(String(origemLabel).replace(/_/g, ' '))}</span>
-                            ${preparo.preparada ? `<span class="grimorio-badge grimorio-badge-preparada">${preparo.usada ? 'Usada hoje' : 'Preparada hoje'}</span>` : ''}
+                            ${preparo.preparada ? `<span class="grimorio-badge grimorio-badge-preparada">${preparo.usosRealizados ? `${preparo.usosRealizados}/${preparo.quantidadeAtual} usada(s)` : `Preparada ×${preparo.quantidadeAtual}`}</span>` : ''}
                             ${magiaDominio ? `<span class="grimorio-badge grimorio-badge-dominio">Dominio${dominios ? `: ${escapeHtml(dominios)}` : ''}</span>` : ''}
                         </div>
                     </div>
@@ -1384,7 +1481,14 @@ class GrimorioController {
                 <div class="grimorio-card-rodape">
                     <button class="grimorio-expandir-btn" data-id="${id}">${aberta ? '▲ Menos detalhes' : '▼ Ver detalhes'}</button>
                     <div class="grimorio-rodape-direita">
-                        <button class="grimorio-preparar-btn ${preparo.preparada ? 'ativa' : ''}" data-magia-id="${id}" title="${escapeHtml(tituloPreparar)}" ${(!preparo.podePreparar && !preparo.preparada) ? 'disabled' : ''}>${textoPreparar}</button>
+                        <div class="grimorio-preparo-inline ${(!preparo.temEspaco && !preparo.preparada) ? 'is-disabled' : ''}" data-magia-id="${id}">
+                            <span class="grimorio-preparo-inline-label">Qtd</span>
+                            <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="-1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>−</button>
+                            <input class="grimorio-preparo-input" data-magia-id="${id}" type="number" min="${preparo.preparada ? 0 : (preparo.temEspaco ? 1 : 0)}" max="${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}" step="1" value="${quantidadeRapida}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>
+                            <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>+</button>
+                            <span class="grimorio-preparo-inline-max">máx ${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}</span>
+                        </div>
+                        <button class="grimorio-preparar-btn ${preparo.preparada ? 'ativa' : ''}" data-magia-id="${id}" title="${escapeHtml(tituloPreparar)}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>${textoPreparar}</button>
                         ${item.anotacoes ? '<span class="grimorio-preparada-badge">Com anotacoes</span>' : (item._catalogo_expandido ? '<span class="grimorio-preparada-badge">Disponível hoje</span>' : '')}
                     </div>
                 </div>
@@ -1441,10 +1545,11 @@ class GrimorioController {
         return true;
     }
 
-    async _prepararMagiaHoje(magiaId, nivelSlot) {
+    async _prepararMagiaHoje(magiaId, nivelSlot, quantidade = 1) {
         const payload = {
             magia_id: magiaId,
             nivel_slot: nivelSlot,
+            quantidade: Math.max(1, Number(quantidade || 1)),
             classe: this.classeAtiva,
         };
 
@@ -1477,7 +1582,7 @@ class GrimorioController {
         return res.json();
     }
 
-    async _togglePreparada(magiaId) {
+    async _togglePreparada(magiaId, quantidadeDesejada = null) {
         const item = this.itensGrimorio.find((entry) => Number(entry.magia_id) === Number(magiaId));
         if (!item) return;
 
@@ -1492,13 +1597,28 @@ class GrimorioController {
             return;
         }
 
+        const usandoQuantidadeCustomizada = quantidadeDesejada !== null && quantidadeDesejada !== undefined;
+        let quantidadeFinal = usandoQuantidadeCustomizada
+            ? Math.max(0, Number(quantidadeDesejada || 0))
+            : (preparo.preparada ? 0 : 1);
+
+        if (usandoQuantidadeCustomizada && quantidadeFinal > preparo.quantidadeMaxima) {
+            quantidadeFinal = preparo.quantidadeMaxima;
+            this._mostrarToast(`Limite ajustado para ${preparo.quantidadeMaxima} preparo(s) neste nível.`, 'info');
+        }
+
         try {
-            if (preparo.preparada) {
+            if (quantidadeFinal <= 0) {
+                if (!preparo.preparada) {
+                    this._mostrarToast('Informe ao menos 1 preparo para esta magia.', 'info');
+                    return;
+                }
                 await this._desmarcarMagiaPreparada(magiaId);
                 this._mostrarToast('Magia removida das preparadas de hoje.', 'sucesso');
             } else {
-                await this._prepararMagiaHoje(magiaId, preparo.nivelSlot);
-                this._mostrarToast('Magia marcada como preparada para hoje.', 'sucesso');
+                await this._prepararMagiaHoje(magiaId, preparo.nivelSlot, quantidadeFinal);
+                const labelQuantidade = quantidadeFinal === 1 ? '1 preparo salvo.' : `${quantidadeFinal} preparos salvos.`;
+                this._mostrarToast(`Magia preparada para hoje • ${labelQuantidade}`, 'sucesso');
             }
 
             await this._carregarMagiasPreparadas();
@@ -1513,17 +1633,59 @@ class GrimorioController {
         }
     }
 
-    _broadcastPreparacaoAtualizada() {
+    _broadcastPreparacaoAtualizada(extra = {}) {
         if (!this._canal || !this.combatente?.id) return;
         try {
             this._canal.postMessage({
                 tipo: 'magia-preparada-atualizada',
                 combatenteId: this.combatente.id,
                 timestamp: Date.now(),
+                ...extra,
             });
         } catch (_error) {
             // Broadcast é opcional.
         }
+    }
+
+    _aplicarDescansoLongoEstadoLocal() {
+        this.magiasPreparadas = [];
+        this.magiasPreparadasMap = new Map();
+        this.preparacaoQuantidadesDraft = new Map();
+
+        if (this.combatente && Array.isArray(this.combatente.magias_slots)) {
+            this.combatente.magias_slots = this.combatente.magias_slots.map((slot) => ({
+                ...slot,
+                usados: 0,
+            }));
+        }
+
+        this._hidratarSlotsDisponiveis();
+        this._renderizarPainelSlots();
+        this.filtrar();
+    }
+
+    _confirmarDescansoLongo() {
+        this._mostrarModalConfirmacao({
+            icone: '🌙',
+            titulo: 'Descanso longo',
+            texto: 'Isso limpará todas as magias preparadas do dia e zerará os usos de slots para que você possa redecorar amanhã. Deseja continuar?',
+            textoConfirmar: 'Confirmar descanso',
+            textoCancelar: 'Cancelar',
+            onConfirmar: async () => {
+                try {
+                    await this.magiaPreparadaService.descansoLongo(this.combatente.id, true);
+                    this._aplicarDescansoLongoEstadoLocal();
+                    await this._recarregarDados();
+                    if (window._fichaController?.renderizarSlotsDeMapia) {
+                        window._fichaController.renderizarSlotsDeMapia();
+                    }
+                    this._broadcastPreparacaoAtualizada({ resetSlots: true, origem: 'descanso-longo' });
+                    this._mostrarToast('Descanso longo realizado. As magias preparadas de hoje foram limpas.', 'sucesso');
+                } catch (error) {
+                    this._mostrarToast(error.message || 'Nao foi possivel realizar o descanso longo.', 'erro');
+                }
+            },
+        });
     }
 
     async _toggleFavorita(magiaId) {
@@ -1632,6 +1794,9 @@ class GrimorioController {
         const niveisPorClasse = this._formatarNiveisPorClasse(magia, item);
         const posicaoAtual = this.indiceDetalheAtual + 1;
         const totalItens = this.itensFiltrados.length;
+        const quantidadeSugerida = preparo.preparada ? preparo.quantidadeAtual : (preparo.temEspaco ? 1 : 0);
+        const limiteQuantidade = Math.max(quantidadeSugerida, preparo.quantidadeMaxima || 0);
+        const textoBotaoPreparar = preparo.preparada ? '💾 Salvar preparo' : '🪄 Preparar hoje';
 
         const anterior = document.getElementById('grimorioModalDetalhes');
         if (anterior) anterior.remove();
@@ -1665,9 +1830,22 @@ class GrimorioController {
                     <div class="grimorio-detalhe-linha grimorio-detalhe-linha-descricao"><span class="grimorio-detalhe-chave">Descricao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.descricao || 'Sem descricao.')}</span></div>
                     <div class="grimorio-detalhe-linha grimorio-detalhe-linha-descricao"><span class="grimorio-detalhe-chave">Anotacoes</span><span class="grimorio-detalhe-valor">${escapeHtml(item.anotacoes || 'Sem anotacoes pessoais.')}</span></div>
                 </div>
+                <div class="grimorio-detalhe-preparo-box ${(!preparo.temEspaco && !preparo.preparada) ? 'is-disabled' : ''}">
+                    <div class="grimorio-detalhe-preparo-topo">
+                        <span class="grimorio-detalhe-preparo-titulo">Preparos de hoje</span>
+                        <span class="grimorio-detalhe-preparo-status">${preparo.preparada ? `${preparo.quantidadeAtual} preparada(s)` : `0/${preparo.slot.total || 0}`}</span>
+                    </div>
+                    <div class="grimorio-detalhe-quantidade-row">
+                        <button class="grimorio-detalhe-stepper" id="grimorioDetalheQtdMenos" type="button" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>−</button>
+                        <input class="grimorio-detalhe-quantidade-input" id="grimorioDetalheQuantidade" type="number" min="0" max="${limiteQuantidade}" step="1" value="${quantidadeSugerida}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>
+                        <button class="grimorio-detalhe-stepper" id="grimorioDetalheQtdMais" type="button" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>+</button>
+                    </div>
+                    <div class="grimorio-detalhe-preparo-ajuda">Máximo neste nível: ${limiteQuantidade}. Se preparar 2x, a Arena exibirá duas cópias da magia.</div>
+                </div>
                 <div class="grimorio-confirm-botoes grimorio-detalhe-botoes">
                     <button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheAnterior">← Anterior</button>
-                    <button class="grimorio-confirm-btn ${preparo.preparada ? 'grimorio-confirm-ok' : 'grimorio-confirm-cancelar'}" id="grimorioDetalhePreparar" ${(!preparo.podePreparar && !preparo.preparada) ? 'disabled' : ''}>${preparo.preparada ? '✅ Preparada hoje' : '🪄 Preparar hoje'}</button>
+                    <button class="grimorio-confirm-btn ${preparo.preparada ? 'grimorio-confirm-ok' : 'grimorio-confirm-cancelar'}" id="grimorioDetalhePreparar" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>${textoBotaoPreparar}</button>
+                    ${preparo.preparada ? '<button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheLimparPreparo">Limpar preparo</button>' : ''}
                     ${itemPersistido ? `<button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheFavorita">${item.favorita ? '★ Favorita' : '☆ Favoritar'}</button>` : ''}
                     ${itemPersistido ? '<button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheAnotacao">✎ Anotacoes</button>' : ''}
                     ${classeMago && itemPersistido ? '<button class="grimorio-confirm-btn grimorio-confirm-ok" id="grimorioDetalheRemover">Remover</button>' : ''}
@@ -1682,8 +1860,42 @@ class GrimorioController {
         overlay.querySelector('#grimorioDetalheProxima')?.addEventListener('click', () => this._navegarModalDetalhes(1));
         overlay.querySelector('#grimorioDetalheFechar')?.addEventListener('click', () => this._fecharModalDetalhes());
 
+        const quantidadeInput = overlay.querySelector('#grimorioDetalheQuantidade');
+        const btnPreparar = overlay.querySelector('#grimorioDetalhePreparar');
+        const limitePreparos = Number(limiteQuantidade || 0);
+        const normalizarQuantidadeInput = () => {
+            if (!quantidadeInput) return 0;
+            const valor = Math.max(0, Math.min(limitePreparos, Number(quantidadeInput.value || 0)));
+            quantidadeInput.value = String(Number.isFinite(valor) ? valor : 0);
+            if (btnPreparar) {
+                if (valor <= 0 && preparo.preparada) btnPreparar.textContent = '🧹 Remover preparo';
+                else if (preparo.preparada) btnPreparar.textContent = '💾 Salvar preparo';
+                else btnPreparar.textContent = '🪄 Preparar hoje';
+            }
+            return valor;
+        };
+
+        overlay.querySelector('#grimorioDetalheQtdMenos')?.addEventListener('click', () => {
+            if (!quantidadeInput) return;
+            quantidadeInput.value = String(Math.max(0, Number(quantidadeInput.value || 0) - 1));
+            normalizarQuantidadeInput();
+        });
+        overlay.querySelector('#grimorioDetalheQtdMais')?.addEventListener('click', () => {
+            if (!quantidadeInput) return;
+            quantidadeInput.value = String(Math.min(limitePreparos, Number(quantidadeInput.value || 0) + 1));
+            normalizarQuantidadeInput();
+        });
+        quantidadeInput?.addEventListener('input', normalizarQuantidadeInput);
+        normalizarQuantidadeInput();
+
         overlay.querySelector('#grimorioDetalhePreparar')?.addEventListener('click', async () => {
-            await this._togglePreparada(item.magia_id);
+            const quantidadeDesejada = normalizarQuantidadeInput();
+            await this._togglePreparada(item.magia_id, quantidadeDesejada);
+        });
+
+        overlay.querySelector('#grimorioDetalheLimparPreparo')?.addEventListener('click', async () => {
+            if (quantidadeInput) quantidadeInput.value = '0';
+            await this._togglePreparada(item.magia_id, 0);
         });
 
         overlay.querySelector('#grimorioDetalheFavorita')?.addEventListener('click', async () => {

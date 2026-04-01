@@ -89,7 +89,9 @@
 .grimorio-header-acoes {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .grimorio-indicador {
@@ -127,22 +129,53 @@
 
 /* ── Botão descanso longo ── */
 .grimorio-btn-descanso {
-    background: rgba(30,20,60,0.5);
-    border: 1px solid rgba(130,80,200,0.4);
-    border-radius: 8px;
-    color: #b49ee0;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at top left, rgba(209, 178, 255, 0.22), transparent 42%),
+        linear-gradient(135deg, rgba(28, 18, 53, 0.96), rgba(56, 29, 96, 0.9));
+    border: 1px solid rgba(175, 128, 255, 0.46);
+    border-radius: 999px;
+    color: #efe3ff;
     font-family: var(--fonte-titulo);
     font-size: 0.72rem;
-    padding: 0.35rem 0.65rem;
+    padding: 0.42rem 0.82rem;
     cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.04em;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+    letter-spacing: 0.06em;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 0 0 1px rgba(84, 52, 132, 0.25),
+        0 8px 18px rgba(30, 14, 60, 0.28);
 }
+
+.grimorio-btn-descanso::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255,255,255,0.06), transparent 55%);
+    pointer-events: none;
+}
+
+.grimorio-btn-descanso::after {
+    content: '✦';
+    margin-left: 0.45rem;
+    font-size: 0.62rem;
+    color: rgba(240, 201, 255, 0.82);
+    text-shadow: 0 0 8px rgba(212, 170, 255, 0.5);
+}
+
 .grimorio-btn-descanso:hover {
-    background: rgba(50,30,100,0.6);
-    border-color: rgba(180,120,255,0.6);
-    color: #d0b8ff;
-    box-shadow: 0 0 10px rgba(130,80,200,0.3);
+    transform: translateY(-1px);
+    border-color: rgba(219, 183, 255, 0.76);
+    color: #fff6ff;
+    filter: saturate(1.08);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        0 0 0 1px rgba(108, 70, 168, 0.34),
+        0 12px 24px rgba(48, 21, 89, 0.38),
+        0 0 22px rgba(146, 93, 225, 0.22);
 }
 
 .grimorio-classe-wrap {
@@ -1202,7 +1235,64 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
+
+.grimorio-preparo-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    padding: 0.22rem 0.38rem;
+    border-radius: 999px;
+    border: 1px solid rgba(201, 168, 76, 0.22);
+    background: rgba(0, 0, 0, 0.22);
+}
+
+.grimorio-preparo-inline.is-disabled {
+    opacity: 0.45;
+}
+
+.grimorio-preparo-inline-label,
+.grimorio-preparo-inline-max {
+    font-family: var(--fonte-titulo);
+    font-size: 0.52rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(232, 216, 185, 0.72);
+}
+
+.grimorio-preparo-step {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    background: rgba(31, 21, 9, 0.72);
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 0.92rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.grimorio-preparo-step:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.grimorio-preparo-input {
+    width: 46px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    background: rgba(7, 9, 16, 0.72);
+    color: var(--cor-pergaminho);
+    text-align: center;
+    font-family: var(--fonte-titulo);
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
 .grimorio-expandir-btn {
     background: none;
     border: none;
@@ -1634,6 +1724,95 @@
 
 .grimorio-detalhe-linha-descricao {
     grid-column: 1 / -1;
+}
+
+.grimorio-detalhe-preparo-box {
+    margin: 0.4rem 0 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    background: linear-gradient(135deg, rgba(29, 19, 8, 0.88), rgba(53, 33, 12, 0.62));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 10px 24px rgba(0,0,0,0.18);
+}
+
+.grimorio-detalhe-preparo-box.is-disabled {
+    opacity: 0.55;
+}
+
+.grimorio-detalhe-preparo-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-bottom: 0.65rem;
+}
+
+.grimorio-detalhe-preparo-titulo {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+}
+
+.grimorio-detalhe-preparo-status {
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    color: #dff9ea;
+    background: rgba(20, 83, 45, 0.28);
+    border: 1px solid rgba(110, 231, 183, 0.32);
+    border-radius: 999px;
+    padding: 0.18rem 0.55rem;
+}
+
+.grimorio-detalhe-quantidade-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.grimorio-detalhe-stepper {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    background: rgba(0, 0, 0, 0.28);
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.grimorio-detalhe-stepper:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(250, 204, 21, 0.55);
+    box-shadow: 0 10px 18px rgba(0,0,0,0.18);
+}
+
+.grimorio-detalhe-stepper:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.grimorio-detalhe-quantidade-input {
+    width: 84px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    background: rgba(7, 9, 16, 0.7);
+    color: var(--cor-pergaminho);
+    text-align: center;
+    font-family: var(--fonte-titulo);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.grimorio-detalhe-preparo-ajuda {
+    margin-top: 0.55rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: rgba(232, 216, 185, 0.78);
 }
 
 .grimorio-detalhe-botoes {

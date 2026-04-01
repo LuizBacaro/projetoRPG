@@ -56,18 +56,21 @@ class MagiasBulkRequest(BaseModel):
 class MagiaPreparadaCreate(BaseModel):
     magia_id:   int
     nivel_slot: int
+    quantidade: int = 1
     classe:     Optional[str] = None
 
 class MagiaPreparadaResponse(BaseModel):
-    id:            int
-    combatente_id: int
-    magia_id:      int
-    nivel_slot:    int
-    usada:         bool              = False    # ✅ NOVO
-    preparada_em:  Optional[datetime] = None
-    magia_nome:    Optional[str]      = None
-    magia_escola:  Optional[str]      = None
-    magia_nivel:   Optional[int]      = None
+    id:              int
+    combatente_id:   int
+    magia_id:        int
+    nivel_slot:      int
+    quantidade:      int               = 1
+    usos_realizados: int               = 0
+    usada:           bool              = False
+    preparada_em:    Optional[datetime] = None
+    magia_nome:      Optional[str]      = None
+    magia_escola:    Optional[str]      = None
+    magia_nivel:     Optional[int]      = None
     class Config:
         from_attributes = True
 

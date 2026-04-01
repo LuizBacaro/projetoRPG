@@ -78,6 +78,27 @@ export class MagiaPreparadaService {
         return res.json();
     }
 
+    async descansoLongo(combatenteId, confirmar = true) {
+        const res = await fetch(
+            getApiUrl(`/magias-preparadas/${combatenteId}/descanso`),
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ confirmar: !!confirmar }),
+            }
+        );
+        if (!res.ok) {
+            throw await this._buildHttpError(
+                res,
+                `Erro ao realizar descanso longo do combatente #${combatenteId}`
+            );
+        }
+        return res.json();
+    }
+
     async desmarcar(combatenteId, magiaId) {
         const res = await fetch(
             getApiUrl(`/magias-preparadas/${combatenteId}/${magiaId}`),
@@ -102,9 +123,10 @@ export class MagiaPreparadaService {
      * @param {number} magiaId
      * @returns {Promise<{usada: boolean}>}
      */
-    async toggleUsada(combatenteId, magiaId) {
+    async toggleUsada(combatenteId, magiaId, action = null) {
+        const sufixo = action ? `?action=${encodeURIComponent(action)}` : '';
         const res = await fetch(
-            getApiUrl(`/magias-preparadas/${combatenteId}/${magiaId}/usar`),
+            getApiUrl(`/magias-preparadas/${combatenteId}/${magiaId}/usar${sufixo}`),
             {
                 method: 'PATCH',
                 headers: { 'Authorization': `Bearer ${this.token}` },
@@ -117,6 +139,25 @@ export class MagiaPreparadaService {
             );
         }
         return res.json();
+    }
+
+    _expandirPreparadas(preparadas = []) {
+        return (Array.isArray(preparadas) ? preparadas : []).flatMap((registro) => {
+            const quantidade = Math.max(1, Number(registro?.quantidade || 1));
+            const usosRealizados = Math.max(
+                0,
+                Math.min(quantidade, Number(registro?.usos_realizados ?? (registro?.usada ? 1 : 0) ?? 0))
+            );
+
+            return Array.from({ length: quantidade }, (_, index) => ({
+                ...registro,
+                quantidade,
+                usos_realizados: usosRealizados,
+                _instanceIndex: index + 1,
+                _instanceTotal: quantidade,
+                usada: index < usosRealizados,
+            }));
+        });
     }
 
     /**
@@ -134,7 +175,7 @@ export class MagiaPreparadaService {
             ])
         );
 
-        preparadas.forEach((p) => {
+        this._expandirPreparadas(preparadas).forEach((p) => {
             const n = Number(p?.nivel_slot || p?.magia_nivel || 0);
             if (!grupos[n]) grupos[n] = { preparadas: [], usadas: 0, total: 0, preparadasCount: 0 };
             grupos[n].preparadas.push(p);

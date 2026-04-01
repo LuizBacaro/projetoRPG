@@ -1,7 +1,7 @@
 import { CombatenteService     } from '../services/CombatenteService.js';
 import { CondicaoController    } from './CondicaoController.js';
 import { MagiaSlotService      } from '../services/MagiaSlotService.js';
-import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260331b';
+import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { Toast } from '/js/ui/toast.module.js';
 import { escapeHtml } from '../utils/formatters.js';
 import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots } from '../utils/combat-rules.js?v=20260331a';
@@ -26,6 +26,16 @@ export class ArenaController {
         this._canal                = new BroadcastChannel('magias-rpg');
         this._canal.onmessage      = (event) => {
             if (event?.data?.tipo === 'magia-preparada-atualizada') {
+                if (event.data?.resetSlots) {
+                    var combatenteReset = this.combatentes.find(function(c) {
+                        return Number(c.id) === Number(event.data.combatenteId);
+                    });
+                    if (combatenteReset && Array.isArray(combatenteReset.magias_slots)) {
+                        combatenteReset.magias_slots = combatenteReset.magias_slots.map(function(slot) {
+                            return { ...slot, usados: 0 };
+                        });
+                    }
+                }
                 this._sincronizarMagiasPreparadasCombatente(event.data.combatenteId);
             }
         };
@@ -394,26 +404,34 @@ export class ArenaController {
         if (btnDevolver) btnDevolver.disabled  = (slot.usados <= 0);
     }
 
-    async _lancarMagiaPreparada(combatenteId, magiaId, nivel) {
-        var combatente = this.combatentes[this.turnoAtual];
+    async _lancarMagiaPreparada(combatenteId, magiaId, nivel, acaoPreparo, instancia) {
+        var combatente = this.combatentes.find(function(c) {
+            return Number(c.id) === Number(combatenteId);
+        }) || this.combatentes[this.turnoAtual];
         if (!combatente) return;
 
         var grupo = (combatente._magiasGrupos || {})[nivel];
         if (!grupo) { Toast.error('Nenhuma magia preparada no nível ' + nivel); return; }
 
-        var magiaPrep = grupo.preparadas.find(function(p) { return p.magia_id === magiaId; });
+        var magiaPrep = grupo.preparadas.find(function(p) {
+            return Number(p.magia_id) === Number(magiaId)
+                && Number(p._instanceIndex || 1) === Number(instancia || 1);
+        }) || grupo.preparadas.find(function(p) { return Number(p.magia_id) === Number(magiaId); });
         if (!magiaPrep) { Toast.error('Magia não encontrada nas preparadas'); return; }
 
         try {
-            var data = await this.magiaPreparadaService.toggleUsada(combatenteId, magiaId);
-            magiaPrep.usada = data.usada;
-            grupo.usadas    = grupo.preparadas.filter(function(p) { return p.usada; }).length;
-            this._atualizarUIPreparada(nivel, grupo, magiaId, data.usada);
-            this._publicarEventoMagia(combatenteId, magiaId, nivel, data.usada, grupo);
-            Toast.success(data.usada
-                ? '🔥 ' + (magiaPrep.magia_nome || 'Magia') + ' lançada!'
-                : '↩️ ' + (magiaPrep.magia_nome || 'Magia') + ' restaurada'
-            );
+            var data = await this.magiaPreparadaService.toggleUsada(combatenteId, magiaId, acaoPreparo || 'usar');
+            await this._sincronizarMagiasPreparadasCombatente(combatenteId);
+
+            var combatenteAtualizado = this.combatentes.find(function(c) {
+                return Number(c.id) === Number(combatenteId);
+            }) || combatente;
+            var grupoAtualizado = (combatenteAtualizado._magiasGrupos || {})[nivel] || grupo;
+
+            this._publicarEventoMagia(combatenteId, magiaId, nivel, data.usada, grupoAtualizado);
+            Toast.success((acaoPreparo === 'restaurar' ? '↩️ ' : '🔥 ')
+                + (magiaPrep.magia_nome || 'Magia')
+                + (acaoPreparo === 'restaurar' ? ' restaurada' : ' lançada!'));
         } catch (err) {
             var nomeMagia = magiaPrep.magia_nome || ('magia #' + magiaId);
             Toast.error(err.message || ('Erro ao lançar ' + nomeMagia + ' no nível ' + nivel));
@@ -814,7 +832,9 @@ export class ArenaController {
                 var combatenteId = parseInt(btn.getAttribute('data-combatente-id'));
                 var magiaId      = parseInt(btn.getAttribute('data-magia-id'));
                 var nivel        = parseInt(btn.getAttribute('data-nivel'));
-                self._lancarMagiaPreparada(combatenteId, magiaId, nivel);
+                var acaoPreparo  = btn.getAttribute('data-acao-preparo') || 'usar';
+                var instancia    = parseInt(btn.getAttribute('data-instancia') || '1');
+                self._lancarMagiaPreparada(combatenteId, magiaId, nivel, acaoPreparo, instancia);
             });
         });
     }
@@ -870,10 +890,15 @@ export class ArenaController {
 
             grupo.preparadas.forEach(function(prep) {
                 var usada = prep.usada;
+                var instanciaAtual = Number(prep._instanceIndex || 1);
+                var instanciaTotal = Number(prep._instanceTotal || 1);
                 html += '<div class="arena-prep-magia-row ' + (usada ? 'arena-prep-usada' : '') + '">';
                 html += '<span class="arena-prep-nome ' + (usada ? 'arena-prep-nome-usada' : '') + '"'
-                      + ' data-magia-id="' + prep.magia_id + '">'
+                      + ' data-magia-id="' + prep.magia_id + '" data-instancia="' + instanciaAtual + '">'
                       + (prep.magia_nome || 'Magia #' + prep.magia_id) + '</span>';
+                if (instanciaTotal > 1) {
+                    html += '<span class="arena-prep-instancia">' + instanciaAtual + '/' + instanciaTotal + '</span>';
+                }
                 if (prep.magia_escola) {
                     html += '<span class="arena-prep-escola">' + prep.magia_escola + '</span>';
                 }
@@ -881,7 +906,9 @@ export class ArenaController {
                       + ' data-combatente-id="' + combatenteId + '"'
                       + ' data-magia-id="' + prep.magia_id + '"'
                       + ' data-nivel="' + nivel + '"'
-                      + ' title="' + (usada ? 'Restaurar magia' : 'Lançar magia') + '">'
+                      + ' data-instancia="' + instanciaAtual + '"'
+                      + ' data-acao-preparo="' + (usada ? 'restaurar' : 'usar') + '"'
+                      + ' title="' + (usada ? 'Restaurar esta cópia' : 'Lançar esta cópia') + '">'
                       + (usada ? '↩️' : '🔥') + '</button>';
                 html += '</div>';
             });

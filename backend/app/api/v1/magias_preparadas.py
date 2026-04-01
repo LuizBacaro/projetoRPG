@@ -7,7 +7,7 @@ import unicodedata
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from app.core.database import get_db
 from app.core.deps import requer_dono_ou_admin_combatente
@@ -43,17 +43,38 @@ def _classes_magia(valor: str) -> set:
     return {classe for classe in classes if classe}
 
 
+def _normalizar_quantidade(valor: Optional[int], padrao: int = 1) -> int:
+    try:
+        quantidade = int(valor if valor is not None else padrao)
+    except (TypeError, ValueError):
+        quantidade = padrao
+    return max(1, quantidade)
+
+
+def _normalizar_usos(mp: MagiaPreparada) -> int:
+    quantidade = _normalizar_quantidade(getattr(mp, "quantidade", 1), 1)
+    try:
+        usos = int(getattr(mp, "usos_realizados", 0) or 0)
+    except (TypeError, ValueError):
+        usos = 0
+    return max(0, min(quantidade, usos))
+
+
 def _enriquecer(mp: MagiaPreparada) -> dict:
+    quantidade = _normalizar_quantidade(getattr(mp, "quantidade", 1), 1)
+    usos_realizados = _normalizar_usos(mp)
     return {
-        "id":            mp.id,
-        "combatente_id": mp.combatente_id,
-        "magia_id":      mp.magia_id,
-        "nivel_slot":    mp.nivel_slot,
-        "preparada_em":  mp.preparada_em,
-        "usada":         mp.usada,          # ✅ NOVO
-        "magia_nome":    mp.magia.nome   if mp.magia else None,
-        "magia_escola":  mp.magia.escola if mp.magia else None,
-        "magia_nivel":   mp.magia.nivel  if mp.magia else None,
+        "id":              mp.id,
+        "combatente_id":   mp.combatente_id,
+        "magia_id":        mp.magia_id,
+        "nivel_slot":      mp.nivel_slot,
+        "quantidade":      quantidade,
+        "usos_realizados": usos_realizados,
+        "preparada_em":    mp.preparada_em,
+        "usada":           bool(usos_realizados > 0 or mp.usada),
+        "magia_nome":      mp.magia.nome   if mp.magia else None,
+        "magia_escola":    mp.magia.escola if mp.magia else None,
+        "magia_nivel":     mp.magia.nivel  if mp.magia else None,
     }
 
 
@@ -75,9 +96,9 @@ def preparar_magia(
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """
-    Marca uma magia como preparada.
-    Validações: magia existe + sem duplicata + classe compatível.
-    Quantidade de slots é validada no frontend (tabela D&D 3.5).
+    Marca uma magia como preparada para o dia.
+    Se a magia já existir, atualiza a quantidade preparada total.
+    Quantidade de slots continua validada principalmente no frontend (tabela D&D 3.5).
     """
     combatente = db.query(Combatente).filter(Combatente.id == combatente_id).first()
     if not combatente:
@@ -127,6 +148,8 @@ def preparar_magia(
             ),
         )
 
+    quantidade_desejada = _normalizar_quantidade(getattr(payload, "quantidade", 1), 1)
+
     ja_preparada = (
         db.query(MagiaPreparada)
         .filter(
@@ -136,13 +159,22 @@ def preparar_magia(
         .first()
     )
     if ja_preparada:
-        raise HTTPException(status_code=400, detail="Magia já está preparada")
+        ja_preparada.nivel_slot = payload.nivel_slot
+        ja_preparada.quantidade = quantidade_desejada
+        ja_preparada.usos_realizados = min(_normalizar_usos(ja_preparada), quantidade_desejada)
+        ja_preparada.usada = ja_preparada.usos_realizados > 0
+        db.commit()
+        db.refresh(ja_preparada)
+        atualizado = db.query(MagiaPreparada).filter(MagiaPreparada.id == ja_preparada.id).first()
+        return _enriquecer(atualizado)
 
     nova = MagiaPreparada(
         combatente_id=combatente_id,
         magia_id=payload.magia_id,
         nivel_slot=payload.nivel_slot,
-        usada=False,                         # ✅ NOVO
+        quantidade=quantidade_desejada,
+        usos_realizados=0,
+        usada=False,
     )
     db.add(nova)
     db.commit()
@@ -155,12 +187,13 @@ def preparar_magia(
 def marcar_usada(
     combatente_id: int,
     magia_id: int,
+    action: Optional[str] = None,
     db: Session = Depends(get_db),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """
-    ✅ NOVO: Alterna magia entre usada/não-usada no dia.
-    Chamado pelo grimório (checkbox) e pela arena (lançar magia).
+    Alterna o consumo/restauração de uma cópia preparada da magia.
+    Quando `action=usar`, consome uma cópia; quando `action=restaurar`, devolve uma.
     """
     registro = (
         db.query(MagiaPreparada)
@@ -173,7 +206,23 @@ def marcar_usada(
     if not registro:
         raise HTTPException(status_code=404, detail="Magia não estava preparada")
 
-    registro.usada = not registro.usada
+    quantidade = _normalizar_quantidade(getattr(registro, "quantidade", 1), 1)
+    usos_realizados = _normalizar_usos(registro)
+    acao = (action or "").strip().lower()
+
+    if acao == "usar":
+        if usos_realizados >= quantidade:
+            raise HTTPException(status_code=400, detail="Todas as cópias preparadas desta magia já foram utilizadas hoje")
+        usos_realizados += 1
+    elif acao == "restaurar":
+        if usos_realizados <= 0:
+            raise HTTPException(status_code=400, detail="Nenhum uso desta magia foi marcado hoje")
+        usos_realizados -= 1
+    else:
+        usos_realizados = usos_realizados - 1 if usos_realizados > 0 else min(quantidade, usos_realizados + 1)
+
+    registro.usos_realizados = usos_realizados
+    registro.usada = usos_realizados > 0
     db.commit()
     db.refresh(registro)
     return _enriquecer(registro)

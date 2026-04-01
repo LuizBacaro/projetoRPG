@@ -219,6 +219,9 @@ export class FichaPersonagemController {
                 if (event.data?.tipo === 'magia-usada') {
                     this._processarEventoMagia(event.data);
                 }
+                if (event.data?.tipo === 'magia-preparada-atualizada' && event.data?.resetSlots) {
+                    this._processarDescansoLongoMagias(event.data);
+                }
             };
             console.log('✅ FichaController: canal sync arena→ficha ativo');
         } catch (err) {
@@ -250,6 +253,21 @@ export class FichaPersonagemController {
         if (window._grimorioController) {
             this._atualizarPainelSlotsGrimorio(payload.nivel, payload.disponiveis, payload.total);
         }
+    }
+
+    _processarDescansoLongoMagias(payload) {
+        if (!this.combatente || this.combatente.id !== payload.combatenteId) {
+            return;
+        }
+
+        if (Array.isArray(this.combatente.magias_slots)) {
+            this.combatente.magias_slots = this.combatente.magias_slots.map((slot) => ({
+                ...slot,
+                usados: 0,
+            }));
+        }
+
+        this.renderizarSlotsDeMapia();
     }
 
     /**
