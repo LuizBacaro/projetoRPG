@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/variables.css">
     <link rel="stylesheet" href="../css/modais.css">
     <link rel="stylesheet" href="../css/ficha-personagem.css?v=5">
-    <link rel="stylesheet" href="../css/grimorio.css?v=20260401h">
+    <link rel="stylesheet" href="../css/grimorio.css?v=20260401i">
 </head>
 <body>
 <div class="ficha-wrapper">
@@ -296,23 +296,25 @@
                     <button class="grimorio-nivel-btn grimorio-btn-preparadas" id="btnFiltroFavoritas">★ Favoritas</button>
                 </div>
             </div>
-            <div class="grimorio-filtro-grupo">
-                <label class="grimorio-filtro-label">Escola</label>
-                <div class="grimorio-niveis" id="grimorioFiltroEscolas">
-                    <!-- Populado dinamicamente -->
+            <div class="grimorio-filtros-secundarios">
+                <div class="grimorio-filtro-grupo grimorio-filtro-grupo--escolas">
+                    <label class="grimorio-filtro-label">Escola</label>
+                    <div class="grimorio-niveis" id="grimorioFiltroEscolas">
+                        <!-- Populado dinamicamente -->
+                    </div>
                 </div>
-            </div>
-            <div class="grimorio-filtro-grupo">
-                <label class="grimorio-filtro-label" for="grimorioFiltroComponente">Comp.</label>
-                <select id="grimorioFiltroComponente" class="grimorio-select-componente">
-                    <option value="todos">Todos</option>
-                    <option value="V">V</option>
-                    <option value="G">G</option>
-                    <option value="M">M</option>
-                    <option value="F">F</option>
-                    <option value="FD">FD</option>
-                    <option value="XP">XP</option>
-                </select>
+                <div class="grimorio-filtro-grupo grimorio-filtro-grupo--componente">
+                    <label class="grimorio-filtro-label" for="grimorioFiltroComponente">Comp.</label>
+                    <select id="grimorioFiltroComponente" class="grimorio-select-componente">
+                        <option value="todos">Todos</option>
+                        <option value="V">V</option>
+                        <option value="G">G</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                        <option value="FD">FD</option>
+                        <option value="XP">XP</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -623,6 +625,6 @@
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
 <script type="module" src="../js/controllers/FichaPersonagemController.js?v=10"></script>
-<script type="module" src="../js/controllers/GrimorioController.js?v=9"></script>
+<script type="module" src="../js/controllers/GrimorioController.js?v=11"></script>
 </body>
 </html>

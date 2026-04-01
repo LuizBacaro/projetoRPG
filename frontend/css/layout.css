@@ -101,8 +101,14 @@ header p {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     padding: 2rem;
+    width: min(1600px, 100%);
     max-width: 1600px;
     margin: 0 auto;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    align-items: stretch;
+    box-sizing: border-box;
 }
 
 /* ── Painéis ── */
@@ -114,6 +120,17 @@ header p {
     padding: 1.5rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.painel-direito {
+    position: relative;
+    background:
+        radial-gradient(circle at top right, rgba(74, 222, 128, 0.08), transparent 22%),
+        linear-gradient(135deg, var(--bg-painel) 0%, var(--bg-painel-interno) 100%);
 }
 
 .painel-esquerdo h2,
@@ -134,6 +151,7 @@ header p {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    flex-shrink: 0;
 }
 
 /* ── Empty state ── */
@@ -145,21 +163,29 @@ header p {
 }
 
 /* ── Botão iniciar combate ── */
-.btn-iniciar {
+.painel-direito .btn-iniciar {
     width: 100%;
-    padding: 1rem;
+    margin-top: 0.9rem;
+    padding: 1rem 1.1rem;
     background: linear-gradient(135deg, var(--cor-sucesso) 0%, #166534 100%);
     border: 2px solid var(--cor-sucesso-claro);
-    border-radius: 10px;
+    border-radius: 12px;
     color: #fff;
     font-family: var(--fonte-titulo);
-    font-size: 1.1rem;
+    font-size: 1.08rem;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s;
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    box-shadow:
+        0 10px 24px rgba(21, 128, 61, 0.24),
+        0 -10px 22px rgba(13, 19, 31, 0.28);
 }
-.btn-iniciar:hover  { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(21,128,61,0.4); }
-.btn-iniciar:active { transform: translateY(0); }
+.painel-direito .btn-iniciar:hover  { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(21,128,61,0.4); }
+.painel-direito .btn-iniciar:active { transform: translateY(0); }
 
 /* ── Header usuario (arena) ── */
 .header-usuario-arena {

@@ -82,7 +82,12 @@
 @media (max-width: 768px) {
 
     /* Configuração — painéis empilham */
-    .container { grid-template-columns: 1fr; }
+    .container {
+        grid-template-columns: 1fr;
+        overflow: auto;
+        padding: 1rem;
+        gap: 1rem;
+    }
 
     /* Arena — wrapper vira coluna */
     .arena-tela-wrapper {

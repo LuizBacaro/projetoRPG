@@ -932,7 +932,36 @@
     border: 1px solid rgba(201, 168, 76, 0.1);
     border-radius: 12px;
     background: rgba(0, 0, 0, 0.12);
+    min-width: 0;
 }
+
+.grimorio-filtros-secundarios {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 210px);
+    gap: 0.55rem;
+    align-items: start;
+}
+
+.grimorio-filtro-grupo--escolas {
+    min-width: 0;
+}
+
+.grimorio-filtro-grupo--escolas .grimorio-niveis {
+    flex: 1;
+    min-width: 0;
+}
+
+.grimorio-filtro-grupo--componente {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.grimorio-filtro-grupo--componente .grimorio-select-componente {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+}
+
 .grimorio-filtro-label {
     font-family: var(--fonte-titulo);
     font-size: 0.62rem;
@@ -1666,6 +1695,8 @@
     }
     .grimorio-busca     { width: 100%; }
     .grimorio-filtros   { padding: 0.4rem 1rem; }
+    .grimorio-filtros-secundarios { grid-template-columns: 1fr; }
+    .grimorio-filtro-grupo--componente { flex-wrap: wrap; }
     .grimorio-corpo     { padding: 0.6rem 1rem; }
     .grimorio-card-topo { flex-direction: column; gap: 0.35rem; }
     .grimorio-card-badges { justify-content: flex-start; }

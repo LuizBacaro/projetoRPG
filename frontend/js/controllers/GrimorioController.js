@@ -571,12 +571,29 @@ class GrimorioController {
         if (!container) return;
 
         const escolas = new Set();
-        this.itensGrimorio.forEach((item) => {
-            const escola = this._normalizarEscola(item.magia?.escola || '');
+        const origens = []
+            .concat(Array.isArray(this.itensGrimorio)
+                ? this.itensGrimorio.map((item) => item?.magia?.escola || item?.magia_escola || item?.escola || '')
+                : [])
+            .concat(Array.isArray(this.catalogoClasse)
+                ? this.catalogoClasse.map((magia) => magia?.escola || '')
+                : []);
+
+        origens.forEach((valor) => {
+            const escola = this._normalizarEscola(valor);
             if (escola) escolas.add(escola);
         });
 
-        const escolasOrdenadas = ESCOLAS_ORDEM.filter((escola) => escolas.has(escola));
+        const escolasOrdenadas = [
+            ...ESCOLAS_ORDEM.filter((escola) => escolas.has(escola)),
+            ...[...escolas]
+                .filter((escola) => !ESCOLAS_ORDEM.includes(escola))
+                .sort((a, b) => a.localeCompare(b, 'pt-BR')),
+        ];
+
+        if (this.escolaAtiva !== 'todas' && !escolas.has(this.escolaAtiva)) {
+            this.escolaAtiva = 'todas';
+        }
 
         container.innerHTML = `
             <button class="grimorio-escola-btn ${this.escolaAtiva === 'todas' ? 'ativo' : ''}" data-escola="todas">Todas</button>
@@ -2077,24 +2094,36 @@ class GrimorioController {
         const base = String(escola || '')
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
+            .replace(/\s+/g, ' ')
             .trim();
 
         if (!base) return '';
 
-        const mapa = {
-            Abjuracao: 'Abjuracao',
-            Adivinhacao: 'Adivinhacao',
-            Conjuracao: 'Conjuracao',
-            Encantamento: 'Encantamento',
-            Evocacao: 'Evocacao',
-            Ilusao: 'Ilusao',
-            Necromancia: 'Necromancia',
-            Transmutacao: 'Transmutacao',
-            Universal: 'Universal',
-        };
+        const baseLower = base.toLowerCase();
+        const valoresIgnorados = new Set(['escola', 'escola de magia', 'sem escola', 'nenhuma', 'n/a', 'null', '-']);
+        if (valoresIgnorados.has(baseLower)) {
+            return '';
+        }
+
+        const aliases = [
+            ['abjur', 'Abjuracao'],
+            ['adiv', 'Adivinhacao'],
+            ['conj', 'Conjuracao'],
+            ['enca', 'Encantamento'],
+            ['evoc', 'Evocacao'],
+            ['ilus', 'Ilusao'],
+            ['necr', 'Necromancia'],
+            ['trans', 'Transmutacao'],
+            ['univ', 'Universal'],
+        ];
+
+        const encontrado = aliases.find(([prefixo]) => baseLower.startsWith(prefixo));
+        if (encontrado) {
+            return encontrado[1];
+        }
 
         const formatado = base.charAt(0).toUpperCase() + base.slice(1).toLowerCase();
-        return mapa[formatado] || formatado;
+        return formatado;
     }
 }
 
