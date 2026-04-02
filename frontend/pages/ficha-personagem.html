@@ -194,6 +194,18 @@
             </div>
 
             <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">🛡️ Armadura/Item de Proteção</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarArmaduraProtecao" title="Adicionar armadura/item de proteção">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaArmadurasProtecao" class="ficha-equipamentos-lista">
+                    <span class="ficha-vazio">Nenhuma armadura/item de proteção cadastrado</span>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
                 <h3 class="ficha-secao-titulo">⚔️ Ataques</h3>
                 <div class="ficha-ataques-tabela">
                     <div class="ficha-ataque-header">
@@ -583,6 +595,93 @@
 
 </div>
 
+<!-- ── Modal Armadura/Item de Proteção ── -->
+<div id="modalArmadurasProtecao" class="equipamentos-overlay" style="display: none;">
+    <div class="equipamentos-container">
+        <div class="equipamentos-header">
+            <div class="equipamentos-header-esquerda">
+                <span class="equipamentos-icone">🛡️</span>
+                <div>
+                    <h2 class="equipamentos-titulo">Gerenciar Armadura/Item de Proteção</h2>
+                    <p class="equipamentos-subtitulo">Itens que impactam a Classe de Armadura do personagem</p>
+                </div>
+            </div>
+            <button class="equipamentos-fechar" id="btnFecharModalArmadurasProtecao">✕</button>
+        </div>
+
+        <div class="equipamentos-controles">
+            <div class="equipamentos-busca-wrapper">
+                <span class="equipamentos-busca-label">🔍 Buscar</span>
+                <input type="text" id="armadurasProtecaoBusca" class="equipamentos-busca" placeholder="Nome ou tipo do item...">
+            </div>
+        </div>
+
+        <div class="equipamentos-abas">
+            <button class="equipamentos-aba ativa" id="abaListarArmadurasProtecao">📋 Listar Itens</button>
+            <button class="equipamentos-aba" id="abaCriarArmaduraProtecao">➕ Criar Novo</button>
+        </div>
+
+        <div class="equipamentos-corpo" id="armadurasProtecaoCopo">
+            <div id="conteudoListarArmadurasProtecao" class="equipamentos-conteudo ativo">
+                <div class="equipamentos-lista" id="armadurasProtecaoLista"></div>
+            </div>
+
+            <div id="conteudoCriarArmaduraProtecao" class="equipamentos-conteudo">
+                <form id="formCriarArmaduraProtecao" class="equipamentos-form">
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Armadura/Item de Proteção</label>
+                        <input type="text" id="criarProtecaoNome" class="equipamentos-form-input" placeholder="Ex: Couraça de Couro" required>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Tipo</label>
+                        <input type="text" id="criarProtecaoTipo" class="equipamentos-form-input" placeholder="Ex: Armadura leve" required>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Bônus na CA</label>
+                        <input type="number" id="criarProtecaoBonusCa" class="equipamentos-form-input" value="0" min="-20" max="30">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">DES Max</label>
+                        <input type="text" id="criarProtecaoDesMax" class="equipamentos-form-input" placeholder="Ex: +4">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Penalidade</label>
+                        <input type="number" id="criarProtecaoPenalidade" class="equipamentos-form-input" value="0" min="-20" max="20">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Falha Arcana</label>
+                        <input type="text" id="criarProtecaoFalhaArcana" class="equipamentos-form-input" placeholder="Ex: 20%">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Deslocamento</label>
+                        <input type="text" id="criarProtecaoDeslocamento" class="equipamentos-form-input" placeholder="Ex: 6m">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Peso</label>
+                        <input type="number" id="criarProtecaoPeso" class="equipamentos-form-input" min="0" step="0.1" placeholder="Ex: 15">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Propriedades Especiais</label>
+                        <textarea id="criarProtecaoPropriedades" class="equipamentos-form-input" rows="3" placeholder="Descreva propriedades especiais..."></textarea>
+                    </div>
+
+                    <button type="button" class="equipamentos-btn-salvar" id="btnSalvarArmaduraProtecaoCustomizada">
+                        ✅ Salvar e Adicionar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="modalPerfilMagico" class="ficha-modal-overlay" style="display: none;">
     <div class="ficha-modal-box ficha-modal-box-curto">
         <div class="ficha-modal-header">
@@ -624,7 +723,7 @@
 
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
-<script type="module" src="../js/controllers/FichaPersonagemController.js?v=10"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=11"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=17"></script>
 </body>
 </html>

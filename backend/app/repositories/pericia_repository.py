@@ -14,9 +14,17 @@ class PericiaRepository:
     """Operações de banco de dados para perícias"""
 
     @staticmethod
+    def _payload_data(payload, exclude_unset: bool = False) -> dict:
+        if hasattr(payload, "model_dump"):
+            return payload.model_dump(exclude_unset=exclude_unset)
+        if exclude_unset:
+            return payload.dict(exclude_unset=True)
+        return payload.dict()
+
+    @staticmethod
     def restaurar_pericia(db: Session, db_pericia: Pericia, pericia: PericiaCreate) -> Pericia:
         db_pericia.deleted_at = None
-        for key, value in pericia.dict().items():
+        for key, value in PericiaRepository._payload_data(pericia).items():
             setattr(db_pericia, key, value)
         commit_with_rollback(db)
         db.refresh(db_pericia)
@@ -25,7 +33,7 @@ class PericiaRepository:
     @staticmethod
     def criar_pericia(db: Session, pericia: PericiaCreate) -> Pericia:
         """Cria uma nova perícia"""
-        db_pericia = Pericia(**pericia.dict())
+        db_pericia = Pericia(**PericiaRepository._payload_data(pericia))
         db.add(db_pericia)
         commit_with_rollback(db)
         db.refresh(db_pericia)
@@ -93,7 +101,7 @@ class PericiaRepository:
         """Atualiza uma perícia"""
         db_pericia = apply_not_deleted(db.query(Pericia), Pericia).filter(Pericia.id == pericia_id).first()
         if db_pericia:
-            for key, value in pericia.dict(exclude_unset=True).items():
+            for key, value in PericiaRepository._payload_data(pericia, exclude_unset=True).items():
                 setattr(db_pericia, key, value)
             commit_with_rollback(db)
             db.refresh(db_pericia)
@@ -114,7 +122,7 @@ class PericiaJogadorRepository:
     @staticmethod
     def adicionar_pericia(db: Session, pericia_jogador: PericiaJogadorCreate) -> PericiaJogador:
         """Adiciona uma perícia ao jogador"""
-        db_pericia_jogador = PericiaJogador(**pericia_jogador.dict())
+        db_pericia_jogador = PericiaJogador(**PericiaRepository._payload_data(pericia_jogador))
         db.add(db_pericia_jogador)
         commit_with_rollback(db)
         db.refresh(db_pericia_jogador)
@@ -163,7 +171,7 @@ class PericiaJogadorRepository:
             PericiaJogador.id == pericia_jogador_id
         ).first()
         if db_pericia_jogador:
-            for key, value in pericia.dict(exclude_unset=True).items():
+            for key, value in PericiaRepository._payload_data(pericia, exclude_unset=True).items():
                 setattr(db_pericia_jogador, key, value)
             commit_with_rollback(db)
             db.refresh(db_pericia_jogador)

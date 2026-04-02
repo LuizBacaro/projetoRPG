@@ -15,10 +15,18 @@ class TalentoRepository:
     """Operações de banco de dados para talentos"""
 
     @staticmethod
+    def _payload_data(payload, exclude_unset: bool = False) -> dict:
+        if hasattr(payload, "model_dump"):
+            return payload.model_dump(exclude_unset=exclude_unset)
+        if exclude_unset:
+            return payload.dict(exclude_unset=True)
+        return payload.dict()
+
+    @staticmethod
     def restaurar_talento(db: Session, db_talento: Talento, talento: TalentoCreate) -> Talento:
         db_talento.deleted_at = None
         db_talento.ativo = True
-        for key, value in talento.dict().items():
+        for key, value in TalentoRepository._payload_data(talento).items():
             setattr(db_talento, key, value)
         commit_with_rollback(db)
         db.refresh(db_talento)
@@ -27,7 +35,7 @@ class TalentoRepository:
     @staticmethod
     def criar_talento(db: Session, talento: TalentoCreate) -> Talento:
         """Cria um novo talento"""
-        db_talento = Talento(**talento.dict())
+        db_talento = Talento(**TalentoRepository._payload_data(talento))
         db.add(db_talento)
         commit_with_rollback(db)
         db.refresh(db_talento)

@@ -15,10 +15,18 @@ class EquipamentoRepository:
     """Operações de banco de dados para equipamentos"""
 
     @staticmethod
+    def _payload_data(payload, exclude_unset: bool = False) -> dict:
+        if hasattr(payload, "model_dump"):
+            return payload.model_dump(exclude_unset=exclude_unset)
+        if exclude_unset:
+            return payload.dict(exclude_unset=True)
+        return payload.dict()
+
+    @staticmethod
     def restaurar_equipamento(db: Session, db_equipamento: Equipamento, equipamento: EquipamentoCreate) -> Equipamento:
         db_equipamento.deleted_at = None
         db_equipamento.ativo = True
-        for key, value in equipamento.dict().items():
+        for key, value in EquipamentoRepository._payload_data(equipamento).items():
             setattr(db_equipamento, key, value)
         commit_with_rollback(db)
         db.refresh(db_equipamento)
@@ -27,7 +35,7 @@ class EquipamentoRepository:
     @staticmethod
     def criar_equipamento(db: Session, equipamento: EquipamentoCreate) -> Equipamento:
         """Cria um novo equipamento"""
-        db_equipamento = Equipamento(**equipamento.dict())
+        db_equipamento = Equipamento(**EquipamentoRepository._payload_data(equipamento))
         db.add(db_equipamento)
         commit_with_rollback(db)
         db.refresh(db_equipamento)

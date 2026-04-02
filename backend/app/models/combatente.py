@@ -94,6 +94,12 @@ class Combatente(SoftDeleteMixin, Base):
         lazy="selectin",
         foreign_keys="EquipamentoJogador.combatente_id"
     )
+    armaduras_protecao = relationship(
+        "ArmaduraProtecaoJogador",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        foreign_keys="ArmaduraProtecaoJogador.combatente_id",
+    )
 
     # ── Helpers de domínio ──
     def __repr__(self) -> str:

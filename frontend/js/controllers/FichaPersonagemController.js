@@ -7,6 +7,7 @@
 
 import { CombatenteService } from '../services/CombatenteService.js';
 import { EquipamentoService } from '../services/EquipamentoService.js';
+import { ArmaduraProtecaoService } from '../services/ArmaduraProtecaoService.js';
 import { TalentoService } from '../services/TalentoService.js';
 import { PericiaService } from '../services/PericiaService.js';
 import { getApiUrl } from '../config/api.config.js';
@@ -28,10 +29,12 @@ export class FichaPersonagemController {
     constructor() {
         this.combatenteService = new CombatenteService();
         this.equipamentoService = new EquipamentoService();
+        this.armaduraProtecaoService = new ArmaduraProtecaoService();
         this.talentoService = new TalentoService();
         this.periciaService = new PericiaService();
         this.token             = localStorage.getItem('token');
         this.combatente        = null;
+        this.bonusCaProtecao   = 0;
         this.dominiosPermitidos = [...DOMINIOS_PERMITIDOS_FALLBACK];
 
         // ✅ NOVO: canal de escuta arena → ficha
@@ -70,6 +73,7 @@ export class FichaPersonagemController {
             this.renderizarSlotsDeMapia();
             await this.carregarRenderizarPericias(parseInt(combatenteId));
             await this.carregarRenderizarEquipamentos(parseInt(combatenteId));
+            await this.carregarRenderizarArmadurasProtecao(parseInt(combatenteId));
             await this.carregarRenderizarTalentos(parseInt(combatenteId));
 
             // ── Configurar eventos ──
@@ -94,6 +98,11 @@ export class FichaPersonagemController {
         const btnAdicionarEq = document.getElementById('btnAdicionarEquipamento');
         if (btnAdicionarEq) {
             btnAdicionarEq.addEventListener('click', () => this.abrirModalEquipamentos());
+        }
+
+        const btnAdicionarProtecao = document.getElementById('btnAdicionarArmaduraProtecao');
+        if (btnAdicionarProtecao) {
+            btnAdicionarProtecao.addEventListener('click', () => this.abrirModalArmadurasProtecao());
         }
 
         const btnAdicionarTal = document.getElementById('btnAdicionarTalento');
@@ -158,9 +167,19 @@ export class FichaPersonagemController {
             btnFecharModalEquipamentos.addEventListener('click', () => this.fecharModalEquipamentos());
         }
 
+        const btnFecharModalArmadurasProtecao = document.getElementById('btnFecharModalArmadurasProtecao');
+        if (btnFecharModalArmadurasProtecao) {
+            btnFecharModalArmadurasProtecao.addEventListener('click', () => this.fecharModalArmadurasProtecao());
+        }
+
         const equipamentosBusca = document.getElementById('equipamentosBusca');
         if (equipamentosBusca) {
             equipamentosBusca.addEventListener('input', () => this.filtrarEquipamentos());
+        }
+
+        const armadurasProtecaoBusca = document.getElementById('armadurasProtecaoBusca');
+        if (armadurasProtecaoBusca) {
+            armadurasProtecaoBusca.addEventListener('input', () => this.filtrarArmadurasProtecao());
         }
 
         const abaListar = document.getElementById('abaListar');
@@ -173,9 +192,24 @@ export class FichaPersonagemController {
             abaCriar.addEventListener('click', () => this.abrirAbaCriar());
         }
 
+        const abaListarArmadurasProtecao = document.getElementById('abaListarArmadurasProtecao');
+        if (abaListarArmadurasProtecao) {
+            abaListarArmadurasProtecao.addEventListener('click', () => this.abrirAbaListarArmadurasProtecao());
+        }
+
+        const abaCriarArmaduraProtecao = document.getElementById('abaCriarArmaduraProtecao');
+        if (abaCriarArmaduraProtecao) {
+            abaCriarArmaduraProtecao.addEventListener('click', () => this.abrirAbaCriarArmaduraProtecao());
+        }
+
         const btnSalvarEquipamentoCustomizado = document.getElementById('btnSalvarEquipamentoCustomizado');
         if (btnSalvarEquipamentoCustomizado) {
             btnSalvarEquipamentoCustomizado.addEventListener('click', () => this.salvarEquipamentoCustomizado());
+        }
+
+        const btnSalvarArmaduraProtecaoCustomizada = document.getElementById('btnSalvarArmaduraProtecaoCustomizada');
+        if (btnSalvarArmaduraProtecaoCustomizada) {
+            btnSalvarArmaduraProtecaoCustomizada.addEventListener('click', () => this.salvarArmaduraProtecaoCustomizada());
         }
 
         const btnFecharModalTalentos = document.getElementById('btnFecharModalTalentos');
@@ -639,7 +673,14 @@ export class FichaPersonagemController {
         const pvFill     = document.getElementById('fichaPvFill');
         const iniciativa = document.getElementById('fichaIniciativa');
 
-        if (ca)       ca.textContent      = this.combatente.ca       ?? 10;
+        const caBase = this.combatente.ca ?? 10;
+        const bonusProtecao = Number(this.bonusCaProtecao || 0);
+        if (ca) {
+            ca.textContent = caBase + bonusProtecao;
+            ca.title = bonusProtecao
+                ? `CA base ${caBase} + bônus de proteção ${bonusProtecao}`
+                : `CA base ${caBase}`;
+        }
         if (toque)    toque.textContent    = this.combatente.toque    ?? 10;
         if (surpresa) surpresa.textContent = this.combatente.surpresa ?? 10;
 
@@ -912,6 +953,219 @@ export class FichaPersonagemController {
         console.error('❌', mensagem);
         const container = document.getElementById('fichaEquipamentos');
         if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+    }
+
+    async carregarRenderizarArmadurasProtecao(combatenteId) {
+        try {
+            const itens = await this.armaduraProtecaoService.listarItensJogador(combatenteId);
+            this.renderizarArmadurasProtecao(itens);
+        } catch (error) {
+            console.error('❌ Erro ao carregar armaduras/itens de proteção:', error);
+            this.mostrarErroArmadurasProtecao('Erro ao carregar armaduras/itens de proteção');
+        }
+    }
+
+    renderizarArmadurasProtecao(itens) {
+        const lista = document.getElementById('fichaArmadurasProtecao');
+        if (!lista) return;
+
+        const colecao = Array.isArray(itens) ? itens : [];
+        this.bonusCaProtecao = colecao.reduce((acc, item) => acc + Number(item.bonus_ca || 0), 0);
+        this.renderizarDefesa();
+
+        if (!colecao.length) {
+            lista.innerHTML = '<span class="ficha-vazio">Nenhuma armadura/item de proteção cadastrado</span>';
+            return;
+        }
+
+        lista.innerHTML = `
+            <div class="ficha-equipamentos-tabela">
+                <div class="ficha-equipamento-header">
+                    <span>Item</span>
+                    <span>Tipo</span>
+                    <span>Bônus CA</span>
+                    <span>Det.</span>
+                    <span>Ação</span>
+                </div>
+                <div class="ficha-equipamentos-lista-items">
+                    ${colecao.map((item) => `
+                        <div class="ficha-equipamento-linha">
+                            <span class="ficha-equipamento-nome">${escapeHtml(item.nome)}</span>
+                            <span class="ficha-equipamento-desc">${escapeHtml(item.tipo) || '—'}</span>
+                            <span class="ficha-equipamento-pag">${Number(item.bonus_ca || 0) >= 0 ? '+' : ''}${Number(item.bonus_ca || 0)}</span>
+                            <span class="ficha-equipamento-desc" title="DES Máx: ${escapeHtml(item.des_max || '—')} | Penalidade: ${Number(item.penalidade || 0)} | Falha Arcana: ${escapeHtml(item.falha_arcana || '—')} | Deslocamento: ${escapeHtml(item.deslocamento || '—')} | Peso: ${item.peso ?? '—'} | Propriedades: ${escapeHtml(item.propriedades_especiais || '—')}">DES ${escapeHtml(item.des_max || '—')} • PEN ${Number(item.penalidade || 0)}</span>
+                            <button class="btn-deletar-eq" data-item-id="${item.id}" data-item-nome="${escapeHtml(item.nome)}" title="Remover ${escapeHtml(item.nome)}">🗑️</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        lista.querySelectorAll('.btn-deletar-eq').forEach((btn) => {
+            btn.addEventListener('click', (event) => {
+                const itemId = Number(event.currentTarget.dataset.itemId);
+                const itemNome = event.currentTarget.dataset.itemNome || 'Item de proteção';
+                this.deletarArmaduraProtecao(itemId, itemNome);
+            });
+        });
+    }
+
+    mostrarErroArmadurasProtecao(mensagem) {
+        const container = document.getElementById('fichaArmadurasProtecao');
+        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+    }
+
+    async abrirModalArmadurasProtecao() {
+        try {
+            const modal = document.getElementById('modalArmadurasProtecao');
+            if (!modal) return;
+
+            const itens = await this.armaduraProtecaoService.listarItens(0, 200);
+            this.armadurasProtecaoDisponiveis = itens;
+            this.renderizarListaArmadurasProtecao(itens);
+            modal.style.display = 'flex';
+        } catch (error) {
+            console.error('❌ Erro ao abrir modal de armaduras/itens de proteção:', error);
+            window.NotificationService?.mostrarErro('❌ Erro ao carregar armaduras/itens de proteção');
+        }
+    }
+
+    fecharModalArmadurasProtecao() {
+        const modal = document.getElementById('modalArmadurasProtecao');
+        if (modal) modal.style.display = 'none';
+    }
+
+    renderizarListaArmadurasProtecao(itens) {
+        const lista = document.getElementById('armadurasProtecaoLista');
+        if (!lista) return;
+
+        if (!itens || !itens.length) {
+            lista.innerHTML = '<p class="equipamentos-vazio">Nenhum item de proteção encontrado</p>';
+            return;
+        }
+
+        lista.innerHTML = itens.map((item) => `
+            <div class="equipamento-item">
+                <div class="equipamento-info">
+                    <div class="equipamento-nome">${escapeHtml(item.nome)}</div>
+                    <div class="equipamento-desc">Tipo: ${escapeHtml(item.tipo || '—')} • Bônus CA: ${Number(item.bonus_ca || 0) >= 0 ? '+' : ''}${Number(item.bonus_ca || 0)}</div>
+                    <div class="equipamento-desc">DES Máx: ${escapeHtml(item.des_max || '—')} • Penalidade: ${Number(item.penalidade || 0)} • Falha Arcana: ${escapeHtml(item.falha_arcana || '—')}</div>
+                    <div class="equipamento-pag">Deslocamento: ${escapeHtml(item.deslocamento || '—')} • Peso: ${item.peso ?? '—'}</div>
+                    <div class="equipamento-desc">${escapeHtml(item.propriedades_especiais || '—')}</div>
+                </div>
+                <button class="equipamento-btn-adicionar" data-item-id="${item.id}">➕</button>
+            </div>
+        `).join('');
+
+        lista.querySelectorAll('.equipamento-btn-adicionar').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const itemId = Number(btn.dataset.itemId);
+                if (Number.isFinite(itemId)) this.adicionarArmaduraProtecaoClic(itemId);
+            });
+        });
+    }
+
+    filtrarArmadurasProtecao() {
+        const termo = document.getElementById('armadurasProtecaoBusca')?.value || '';
+        const filtrados = this.armaduraProtecaoService.filtrarPorBusca(this.armadurasProtecaoDisponiveis || [], termo);
+        this.renderizarListaArmadurasProtecao(filtrados);
+    }
+
+    async adicionarArmaduraProtecaoClic(itemId) {
+        try {
+            if (!this.combatente?.id) {
+                window.NotificationService?.mostrarErro('❌ ID do combatente não encontrado');
+                return;
+            }
+
+            await this.armaduraProtecaoService.adicionarItem(this.combatente.id, itemId);
+            await this.carregarRenderizarArmadurasProtecao(this.combatente.id);
+            window.NotificationService?.mostrarSucesso('✅ Item de proteção adicionado!');
+        } catch (error) {
+            console.error('❌ Erro ao adicionar item de proteção:', error);
+            window.NotificationService?.mostrarErro('❌ Erro ao adicionar item de proteção');
+        }
+    }
+
+    async deletarArmaduraProtecao(itemId, nomeItem) {
+        if (!this.combatente?.id) {
+            window.NotificationService?.mostrarErro('❌ ID do combatente não encontrado');
+            return;
+        }
+
+        window.ModalConfirm.mostrar({
+            icone: '🛡️',
+            titulo: 'Remover Armadura/Item de Proteção',
+            texto: `Tem certeza que deseja remover <strong>"${nomeItem}"</strong>?`,
+            textoConfirmar: '🗑️ Remover',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar: async () => {
+                try {
+                    await this.armaduraProtecaoService.removerItem(this.combatente.id, itemId);
+                    await this.carregarRenderizarArmadurasProtecao(this.combatente.id);
+                    window.NotificationService?.mostrarSucesso(`✅ ${nomeItem} removido!`);
+                } catch (error) {
+                    console.error('❌ Erro ao remover item de proteção:', error);
+                    window.NotificationService?.mostrarErro('❌ Erro ao remover item de proteção');
+                }
+            },
+        });
+    }
+
+    abrirAbaListarArmadurasProtecao() {
+        document.getElementById('abaListarArmadurasProtecao')?.classList.add('ativa');
+        document.getElementById('abaCriarArmaduraProtecao')?.classList.remove('ativa');
+        document.getElementById('conteudoListarArmadurasProtecao')?.classList.add('ativo');
+        document.getElementById('conteudoCriarArmaduraProtecao')?.classList.remove('ativo');
+    }
+
+    abrirAbaCriarArmaduraProtecao() {
+        document.getElementById('abaCriarArmaduraProtecao')?.classList.add('ativa');
+        document.getElementById('abaListarArmadurasProtecao')?.classList.remove('ativa');
+        document.getElementById('conteudoCriarArmaduraProtecao')?.classList.add('ativo');
+        document.getElementById('conteudoListarArmadurasProtecao')?.classList.remove('ativo');
+    }
+
+    async salvarArmaduraProtecaoCustomizada() {
+        try {
+            const nome = document.getElementById('criarProtecaoNome')?.value || '';
+            const tipo = document.getElementById('criarProtecaoTipo')?.value || '';
+            const bonusCa = Number(document.getElementById('criarProtecaoBonusCa')?.value || 0);
+            const desMax = document.getElementById('criarProtecaoDesMax')?.value || '';
+            const penalidade = Number(document.getElementById('criarProtecaoPenalidade')?.value || 0);
+            const falhaArcana = document.getElementById('criarProtecaoFalhaArcana')?.value || '';
+            const deslocamento = document.getElementById('criarProtecaoDeslocamento')?.value || '';
+            const peso = document.getElementById('criarProtecaoPeso')?.value;
+            const propriedadesEspeciais = document.getElementById('criarProtecaoPropriedades')?.value || '';
+
+            if (!nome.trim() || !tipo.trim()) {
+                window.NotificationService?.mostrarAviso('⚠️ Nome e tipo são obrigatórios');
+                return;
+            }
+
+            const novoItem = await this.armaduraProtecaoService.criarItem({
+                nome: nome.trim(),
+                tipo: tipo.trim(),
+                bonus_ca: Number.isFinite(bonusCa) ? bonusCa : 0,
+                des_max: desMax.trim() || null,
+                penalidade: Number.isFinite(penalidade) ? penalidade : 0,
+                falha_arcana: falhaArcana.trim() || null,
+                deslocamento: deslocamento.trim() || null,
+                peso: peso !== '' ? Number(peso) : null,
+                propriedades_especiais: propriedadesEspeciais.trim() || null,
+                ativo: true,
+            });
+
+            await this.armaduraProtecaoService.adicionarItem(this.combatente.id, novoItem.id);
+            await this.carregarRenderizarArmadurasProtecao(this.combatente.id);
+
+            document.getElementById('formCriarArmaduraProtecao')?.reset();
+            this.abrirAbaListarArmadurasProtecao();
+            window.NotificationService?.mostrarSucesso(`✅ Item de proteção "${nome}" criado e adicionado!`);
+        } catch (error) {
+            console.error('❌ Erro ao criar item de proteção:', error);
+            window.NotificationService?.mostrarErro('❌ Erro ao criar item de proteção: ' + error.message);
+        }
     }
 
     async abrirModalEquipamentos() {

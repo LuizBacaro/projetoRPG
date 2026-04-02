@@ -6,6 +6,7 @@ from .combatente_condicao import CombatenteCondicao
 from .magia import Magia, MagiaClasse
 from .ataque import Ataque, MagiaSlot, MagiaPreparada
 from .equipamento import Equipamento, EquipamentoJogador
+from .armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
 from .talento import Talento, TalentoJogador
 from .combatente import Combatente
 from .usuario import Usuario
@@ -25,6 +26,8 @@ __all__ = [
     "MagiaPreparada",
     "Equipamento",
     "EquipamentoJogador",
+    "ArmaduraProtecao",
+    "ArmaduraProtecaoJogador",
     "Talento",
     "TalentoJogador",
     "Combatente",

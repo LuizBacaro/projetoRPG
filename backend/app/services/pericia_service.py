@@ -21,6 +21,14 @@ class PericiaService:
     def __init__(self, db: Session):
         self.db = db
 
+    @staticmethod
+    def _payload_data(payload, exclude_unset: bool = False) -> dict:
+        if hasattr(payload, "model_dump"):
+            return payload.model_dump(exclude_unset=exclude_unset)
+        if exclude_unset:
+            return payload.dict(exclude_unset=True)
+        return payload.dict()
+
     # ========== PERÍCIAS DISPONÍVEIS ==========
 
     def criar_pericia(self, pericia: PericiaCreate) -> Pericia:
@@ -35,7 +43,7 @@ class PericiaService:
                 return PericiaRepository.restaurar_pericia(self.db, pericia_existente, pericia)
             raise ValueError(f"Perícia '{pericia.nome}' já existe")
         
-        db_pericia = Pericia(**pericia.dict())
+        db_pericia = Pericia(**self._payload_data(pericia))
         self.db.add(db_pericia)
         commit_with_rollback(self.db)
         self.db.refresh(db_pericia)
@@ -79,7 +87,7 @@ class PericiaService:
         if not db_pericia:
             return None
         
-        for key, value in pericia.dict(exclude_unset=True).items():
+        for key, value in self._payload_data(pericia, exclude_unset=True).items():
             setattr(db_pericia, key, value)
         
         commit_with_rollback(self.db)
@@ -255,7 +263,7 @@ class PericiaService:
         if not db_pericia_jogador:
             return None
         
-        for key, value in pericia.dict(exclude_unset=True).items():
+        for key, value in self._payload_data(pericia, exclude_unset=True).items():
             setattr(db_pericia_jogador, key, value)
         
         commit_with_rollback(self.db)
