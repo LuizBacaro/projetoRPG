@@ -1298,6 +1298,12 @@
     border: 1px solid rgba(110, 231, 183, 0.42);
 }
 
+.grimorio-badge-conhecida {
+    background: rgba(116, 74, 20, 0.24);
+    color: #ffd27a;
+    border: 1px solid rgba(245, 181, 72, 0.4);
+}
+
 /* Descrição */
 .grimorio-card-descricao {
     font-size: 0.79rem;

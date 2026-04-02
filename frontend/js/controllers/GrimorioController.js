@@ -1468,6 +1468,11 @@ class GrimorioController {
         const preparo = this._obterInfoPreparacao(item);
         const origemLabel = item._catalogo_expandido ? 'DISPONIVEL_HOJE' : (item.origem || 'SELECAO_MANUAL');
         const quantidadeRapida = this._obterQuantidadePreparacaoRapida(id, preparo);
+        const descricaoPreparacao = classeEspontanea
+            ? 'Conjuracao espontanea: use os slots de magia na arena para controlar os usos do dia.'
+            : (preparo.preparada
+                ? `Preparada ${preparo.quantidadeAtual}x no nível ${preparo.nivelSlot}${preparo.usosRealizados ? ` • ${preparo.usosRealizados} usada(s)` : ''}`
+                : (preparo.podePreparar ? `Slots livres: ${preparo.slot.disponivel}/${preparo.slot.total}` : 'Sem slot disponível para este nível'));
         const textoPreparar = preparo.preparada
             ? `✅ Preparada ×${preparo.quantidadeAtual}`
             : '🪄 Preparar hoje';
@@ -1485,7 +1490,7 @@ class GrimorioController {
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Alcance</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.alcance || '-')}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Duracao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.duracao || '-')}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Resistencia</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.teste_resistencia || '-')}</span></div>
-                <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Preparacao</span><span class="grimorio-detalhe-valor">${preparo.preparada ? `Preparada ${preparo.quantidadeAtual}x no nível ${preparo.nivelSlot}${preparo.usosRealizados ? ` • ${preparo.usosRealizados} usada(s)` : ''}` : (preparo.podePreparar ? `Slots livres: ${preparo.slot.disponivel}/${preparo.slot.total}` : 'Sem slot disponível para este nível')}</span></div>
+                <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">${classeEspontanea ? 'Conjuracao' : 'Preparacao'}</span><span class="grimorio-detalhe-valor">${descricaoPreparacao}</span></div>
                 <div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Descricao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.descricao || '-')}</span></div>
                 ${item.anotacoes ? `<div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Anotacoes</span><span class="grimorio-detalhe-valor">${escapeHtml(item.anotacoes)}</span></div>` : ''}
             </div>
@@ -1500,7 +1505,8 @@ class GrimorioController {
                             <span class="grimorio-badge grimorio-badge-escola">${escapeHtml(escola || 'Sem escola')}</span>
                             <span class="grimorio-badge grimorio-badge-comp">N${Number(magia.nivel || 0)} - ${escapeHtml(magia.componentes || '-')}</span>
                             <span class="grimorio-badge grimorio-badge-origem">${escapeHtml(String(origemLabel).replace(/_/g, ' '))}</span>
-                            ${preparo.preparada ? `<span class="grimorio-badge grimorio-badge-preparada">${preparo.usosRealizados ? `${preparo.usosRealizados}/${preparo.quantidadeAtual} usada(s)` : `Preparada ×${preparo.quantidadeAtual}`}</span>` : ''}
+                            ${(!classeEspontanea && preparo.preparada) ? `<span class="grimorio-badge grimorio-badge-preparada">${preparo.usosRealizados ? `${preparo.usosRealizados}/${preparo.quantidadeAtual} usada(s)` : `Preparada ×${preparo.quantidadeAtual}`}</span>` : ''}
+                            ${classeEspontanea ? '<span class="grimorio-badge grimorio-badge-conhecida">Magia conhecida</span>' : ''}
                             ${magiaDominio ? `<span class="grimorio-badge grimorio-badge-dominio">Dominio${dominios ? `: ${escapeHtml(dominios)}` : ''}</span>` : ''}
                         </div>
                     </div>
