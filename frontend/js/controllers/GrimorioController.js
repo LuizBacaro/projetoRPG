@@ -255,7 +255,8 @@ class GrimorioController {
     }
 
     _classePermiteGerenciarConhecidas() {
-        return this._normalizarClasse(this.classeAtiva) === 'Mago';
+        const classeNorm = this._normalizarClasse(this.classeAtiva);
+        return classeNorm === 'Mago' || classeNorm === 'Bardo' || classeNorm === 'Feiticeiro';
     }
 
     _classeExibeCatalogoCompleto() {
@@ -709,7 +710,7 @@ class GrimorioController {
             const semAcesso = !permiteAdicionar || this._classeSemAcessoMagias();
             btnAbrir.disabled = semAcesso;
             btnAbrir.title = !permiteAdicionar
-                ? 'Somente Mago adiciona magias conhecidas manualmente'
+                ? 'Esta classe recebe magias automaticamente — sem seleção manual'
                 : (this._classeSemAcessoMagias()
                     ? 'Disponivel apenas a partir do nivel 4 para Ranger/Paladino'
                     : 'Adicionar magia conhecida');
@@ -722,7 +723,7 @@ class GrimorioController {
             btnAbrir.parentNode.replaceChild(clone, btnAbrir);
             clone.addEventListener('click', () => {
                 if (!this._classePermiteGerenciarConhecidas()) {
-                    this._mostrarToast('Somente a classe ativa Mago adiciona magias conhecidas manualmente.', 'info');
+                    this._mostrarToast('Esta classe recebe magias automaticamente — sem seleção manual.', 'info');
                     return;
                 }
                 if (this._classeSemAcessoMagias()) {
@@ -914,8 +915,8 @@ class GrimorioController {
         if (!this._classePermiteGerenciarConhecidas()) {
             this.magiasDisponiveisAdicionar = [];
             this._atualizarResumoAdicionar([], null);
-            lista.innerHTML = '<div class="grimorio-vazio">Somente a classe ativa Mago precisa adicionar magias conhecidas manualmente.</div>';
-            preview.innerHTML = '<div class="grimorio-historico-vazio">As demais classes já consultam ou preparam diretamente as magias disponíveis do dia.</div>';
+            lista.innerHTML = '<div class="grimorio-vazio">Esta classe recebe magias automaticamente. Apenas Mago, Bardo e Feiticeiro selecionam magias manualmente.</div>';
+            preview.innerHTML = '<div class="grimorio-historico-vazio">As demais classes recebem automaticamente todas as magias do nível ao subir de nível.</div>';
             return;
         }
 
@@ -1434,6 +1435,7 @@ class GrimorioController {
         const id = Number(item.magia_id);
         const aberta = this.cardsAbertos.has(id);
         const classeMago = this._normalizarClasse(this.classeAtiva) === 'Mago';
+        const classeEspontanea = this._classeExibeCatalogoCompleto(); // Bardo/Feiticeiro não preparam magias
         const itemPersistido = !item._catalogo_expandido;
         const escola = this._normalizarEscola(magia.escola || '');
         const magiaDominio = this._ehMagiaDominio(item);
@@ -1497,17 +1499,17 @@ class GrimorioController {
                 ${detalhes}
                 <div class="grimorio-card-rodape">
                     <button class="grimorio-expandir-btn" data-id="${id}">${aberta ? '▲ Menos detalhes' : '▼ Ver detalhes'}</button>
-                    <div class="grimorio-rodape-direita">
-                        <div class="grimorio-preparo-inline ${(!preparo.temEspaco && !preparo.preparada) ? 'is-disabled' : ''}" data-magia-id="${id}">
-                            <span class="grimorio-preparo-inline-label">Qtd</span>
-                            <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="-1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>−</button>
-                            <input class="grimorio-preparo-input" data-magia-id="${id}" type="number" min="${preparo.preparada ? 0 : (preparo.temEspaco ? 1 : 0)}" max="${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}" step="1" value="${quantidadeRapida}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>
-                            <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>+</button>
-                            <span class="grimorio-preparo-inline-max">máx ${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}</span>
-                        </div>
-                        <button class="grimorio-preparar-btn ${preparo.preparada ? 'ativa' : ''}" data-magia-id="${id}" title="${escapeHtml(tituloPreparar)}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>${textoPreparar}</button>
-                        ${item.anotacoes ? '<span class="grimorio-preparada-badge">Com anotacoes</span>' : (item._catalogo_expandido ? '<span class="grimorio-preparada-badge">Disponível hoje</span>' : '')}
-                    </div>
+                        ${!classeEspontanea ? `<div class="grimorio-rodape-direita">
+                            <div class="grimorio-preparo-inline ${(!preparo.temEspaco && !preparo.preparada) ? 'is-disabled' : ''}" data-magia-id="${id}">
+                                <span class="grimorio-preparo-inline-label">Qtd</span>
+                                <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="-1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>−</button>
+                                <input class="grimorio-preparo-input" data-magia-id="${id}" type="number" min="${preparo.preparada ? 0 : (preparo.temEspaco ? 1 : 0)}" max="${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}" step="1" value="${quantidadeRapida}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>
+                                <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>+</button>
+                                <span class="grimorio-preparo-inline-max">máx ${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}</span>
+                            </div>
+                            <button class="grimorio-preparar-btn ${preparo.preparada ? 'ativa' : ''}" data-magia-id="${id}" title="${escapeHtml(tituloPreparar)}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>${textoPreparar}</button>
+                            ${item.anotacoes ? '<span class="grimorio-preparada-badge">Com anotacoes</span>' : (item._catalogo_expandido ? '<span class="grimorio-preparada-badge">Disponível hoje</span>' : '')}
+                        </div>` : ''}
                 </div>
             </article>
         `;

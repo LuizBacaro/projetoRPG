@@ -1,5 +1,5 @@
 import { ConfiguracaoController } from './controllers/ConfiguracaoController.js';
-import { ArenaController        } from './controllers/ArenaController.js?v=20260401b';
+import { ArenaController        } from './controllers/ArenaController.js?v=20260402a';
 import { atualizarModificadorDOM} from './utils/dnd.js';
 import {
     installGlobalErrorGuards,

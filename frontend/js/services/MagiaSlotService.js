@@ -63,6 +63,38 @@ export class MagiaSlotService {
     }
 
     /**
+     * Persiste/atualiza todos os slots de magia de um combatente
+     * @param {number} combatenteId
+     * @param {Array} slots
+     * @returns {Promise<Array>}
+     */
+    async salvarPorCombatente(combatenteId, slots) {
+        const payload = Array.isArray(slots)
+            ? slots.map((slot) => ({
+                nivel: Number(slot?.nivel || 0),
+                total: Math.max(0, Number(slot?.total || 0)),
+                usados: Math.max(0, Number(slot?.usados || 0)),
+            }))
+            : [];
+
+        const res = await fetch(
+            getApiUrl('/combatentes/' + combatenteId + '/magias'),
+            {
+                method: 'PUT',
+                headers: this._headers(),
+                body: JSON.stringify({ slots: payload }),
+            }
+        );
+        if (!res.ok) {
+            throw await this._buildHttpError(
+                res,
+                `Erro ao salvar slots de magia do combatente #${combatenteId}`
+            );
+        }
+        return res.json();
+    }
+
+    /**
      * Atualiza quantidade de slots usados
      * @param {number} slotId
      * @param {number} usados

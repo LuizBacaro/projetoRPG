@@ -1,10 +1,10 @@
 import { CombatenteService     } from '../services/CombatenteService.js';
 import { CondicaoController    } from './CondicaoController.js';
-import { MagiaSlotService      } from '../services/MagiaSlotService.js';
+import { MagiaSlotService      } from '../services/MagiaSlotService.js?v=20260402a';
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { Toast } from '/js/ui/toast.module.js';
 import { escapeHtml } from '../utils/formatters.js';
-import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots } from '../utils/combat-rules.js?v=20260331a';
+import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots, normalizeClasseConjuradora } from '../utils/combat-rules.js?v=20260331a';
 import { getApiUrl } from '../config/api.config.js';
 
 export class ArenaController {
@@ -162,11 +162,35 @@ export class ArenaController {
                 c.magias_slots = resolveCombatenteSpellSlots(c);
                 var isConj = isClasseConjuradora(c.classe)
                     || (c.magias_slots && c.magias_slots.some((s) => Number(s.total || 0) > 0));
-                if (isConj) c._isConjurador = true;
+                if (isConj) {
+                    c._isConjurador = true;
+                    var classeCanon = normalizeClasseConjuradora(c.classe);
+                    if (classeCanon === 'Bardo' || classeCanon === 'Feiticeiro') {
+                        c._isConjuradorEspontaneo = true;
+                    }
+                }
                 return isConj;
             })
             .map(async (c) => {
                 try {
+                    if (c._isConjuradorEspontaneo) {
+                        const possuiSlotSemId = (c.magias_slots || []).some((slot) => {
+                            const id = Number(slot?.id ?? slot?.slot_id ?? 0);
+                            return Number(slot?.total || 0) > 0 && !id;
+                        });
+                        if (possuiSlotSemId) {
+                            c._slotsSyncEmAndamento = true;
+                            try {
+                                const slotsPersistidos = await this.magiaSlotService.salvarPorCombatente(c.id, c.magias_slots || []);
+                                c.magias_slots = resolveCombatenteSpellSlots({ ...c, magias_slots: slotsPersistidos });
+                            } finally {
+                                c._slotsSyncEmAndamento = false;
+                            }
+                        }
+                        c._magiasPreparadas = [];
+                        c._magiasGrupos = {};
+                        return;
+                    }
                     const preparadas = await this.magiaPreparadaService.listar(c.id);
                     c._magiasPreparadas = preparadas;
                     c._magiasGrupos = this.magiaPreparadaService.agruparPorNivel(preparadas, c.magias_slots || []);
@@ -191,6 +215,30 @@ export class ArenaController {
         combatente.magias_slots = resolveCombatenteSpellSlots(combatente);
 
         try {
+            if (combatente._isConjuradorEspontaneo) {
+                const possuiSlotSemId = (combatente.magias_slots || []).some(function(slot) {
+                    var id = Number(slot?.id ?? slot?.slot_id ?? 0);
+                    return Number(slot?.total || 0) > 0 && !id;
+                });
+                if (possuiSlotSemId) {
+                    combatente._slotsSyncEmAndamento = true;
+                    var ativoDuranteSync = this.combatentes[this.turnoAtual];
+                    if (ativoDuranteSync && Number(ativoDuranteSync.id) === Number(combatenteId)) {
+                        this.renderizarCombatenteAtivo();
+                    }
+                    try {
+                        var slotsPersistidos = await this.magiaSlotService.salvarPorCombatente(combatente.id, combatente.magias_slots || []);
+                        combatente.magias_slots = resolveCombatenteSpellSlots({ ...combatente, magias_slots: slotsPersistidos });
+                    } finally {
+                        combatente._slotsSyncEmAndamento = false;
+                    }
+                }
+                var ativoEsp = this.combatentes[this.turnoAtual];
+                if (ativoEsp && Number(ativoEsp.id) === Number(combatenteId)) {
+                    this.renderizarCombatenteAtivo();
+                }
+                return;
+            }
             var preparadas = await this.magiaPreparadaService.listar(combatente.id);
             combatente._magiasPreparadas = preparadas;
             combatente._magiasGrupos = this.magiaPreparadaService.agruparPorNivel(preparadas, combatente.magias_slots || []);
@@ -355,10 +403,6 @@ export class ArenaController {
     // ─── Magias via MagiaSlot (monstros/NPCs) ──────────────
 
     async _alterarUsadosMagia(slotId, nivel, acao) {
-        if (!slotId || slotId === 'null') {
-            Toast.error('Slot de magia nao encontrado para este nivel');
-            return;
-        }
         var combatente = this.combatentes[this.turnoAtual];
         if (!combatente) return;
 
@@ -369,6 +413,15 @@ export class ArenaController {
             }
         }
         if (!slot) return;
+
+        var slotIdNum = Number(slotId);
+        if (!slotIdNum) {
+            slotIdNum = Number(slot.id ?? slot.slot_id ?? 0);
+        }
+        if (!slotIdNum) {
+            Toast.error('Slot de magia ainda nao sincronizado para este nivel');
+            return;
+        }
 
         var novoUsados = slot.usados;
         if (acao === 'aumentar') {
@@ -384,7 +437,7 @@ export class ArenaController {
         }
 
         try {
-            await this.magiaSlotService.atualizarUsados(slotId, novoUsados);
+            await this.magiaSlotService.atualizarUsados(slotIdNum, novoUsados);
             slot.usados = novoUsados;
             this._atualizarUISlot(nivel, slot);
             Toast.success('NIV ' + nivel + ': ' + (slot.total - novoUsados) + '/' + slot.total + ' disponiveis');
@@ -598,9 +651,12 @@ export class ArenaController {
         var ataquesHTML = this._renderizarAtaques(c.ataques || []);
         
         // Conjuradores sempre usam estilo "magias preparadas"
-        var magiasHTML = c._isConjurador
-            ? this._renderizarMagiasPreparadas(c._magiasGrupos || {}, c.id)
-            : '';
+        var magiasHTML = '';
+        if (c._isConjuradorEspontaneo) {
+            magiasHTML = this._renderizarMagias(c.magias_slots || [], c.tipo, '⚡ Slots de Magia', !!c._slotsSyncEmAndamento);
+        } else if (c._isConjurador) {
+            magiasHTML = this._renderizarMagiasPreparadas(c._magiasGrupos || {}, c.id);
+        }
 
         var refBadge = (isTipoMonstro(c.tipo) && c.pagina_referencia)
             ? ' <span class="arena-badge-referencia" title="Referência do livro">📖 '
@@ -920,11 +976,14 @@ export class ArenaController {
         return html;
     }
 
-    _renderizarMagias(slots, tipo) {
+    _renderizarMagias(slots, tipo, titulo, sincronizando) {
         var isJogador = isTipoJogador(tipo);
         var self      = this;
         var html      = '<div class="arena-secao">';
-        html += '<h3 class="arena-secao-titulo">Controle de Magias</h3>';
+        html += '<h3 class="arena-secao-titulo">' + (titulo || 'Controle de Magias') + '</h3>';
+        if (sincronizando) {
+            html += '<div class="arena-magia-vazio"><small>Sincronizando slots para uso na arena...</small></div>';
+        }
         html += '<div class="arena-magias-duas-colunas">';
         html += '<div class="arena-magias-coluna">';
         html += '<div class="arena-magias-coluna-titulo">NIV 0–4</div>';
@@ -946,9 +1005,10 @@ export class ArenaController {
         var total       = slot ? slot.total  : 0;
         var usados      = slot ? slot.usados : 0;
         var disponiveis = total - usados;
-        var slotId      = slot ? slot.id     : null;
-        var disAumentar = (!isJogador || total === 0 || usados >= total) ? 'disabled' : '';
-        var disDiminuir = (!isJogador || total === 0 || usados <= 0)    ? 'disabled' : '';
+        var slotId      = slot ? Number(slot.id ?? slot.slot_id ?? 0) : 0;
+        var semId       = !slotId;
+        var disAumentar = (!isJogador || total === 0 || usados >= total || semId) ? 'disabled' : '';
+        var disDiminuir = (!isJogador || total === 0 || usados <= 0 || semId)    ? 'disabled' : '';
         var linhaClass  = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
 
         var html = '<div class="' + linhaClass + '" data-nivel="' + nivel + '">';
