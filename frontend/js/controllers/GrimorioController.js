@@ -259,9 +259,13 @@ class GrimorioController {
         return classeNorm === 'Mago' || classeNorm === 'Bardo' || classeNorm === 'Feiticeiro';
     }
 
-    _classeExibeCatalogoCompleto() {
+    _classeEhEspontanea() {
         const classeNorm = this._normalizarClasse(this.classeAtiva);
         return classeNorm === 'Bardo' || classeNorm === 'Feiticeiro';
+    }
+
+    _classeExibeCatalogoCompleto() {
+        return false;
     }
 
     _mesclarCatalogoDisponivelNoGrimorio() {
@@ -970,7 +974,7 @@ class GrimorioController {
         if (disponiveis.length === 0) {
             this.magiasDisponiveisAdicionar = [];
             this._atualizarResumoAdicionar([], null);
-            lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia disponivel para adicionar.</div>';
+            lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
             preview.innerHTML = '<div class="grimorio-historico-vazio">Nenhuma magia corresponde aos filtros selecionados.</div>';
             return;
         }
@@ -1031,7 +1035,7 @@ class GrimorioController {
 
         const magia = (disponiveis || []).find((item) => Number(item.id) === Number(magiaId));
         if (!magia) {
-            preview.innerHTML = '<div class="grimorio-historico-vazio">Selecione uma magia para visualizar o preview antes de adicionar.</div>';
+            preview.innerHTML = '<div class="grimorio-historico-vazio">Selecione uma magia para visualizar os detalhes antes de adicionar ao grimorio.</div>';
             return;
         }
 
@@ -1045,8 +1049,8 @@ class GrimorioController {
                 <div class="grimorio-add-preview-linha"><span class="grimorio-add-preview-chave">Alcance</span><span class="grimorio-add-preview-valor">${escapeHtml(magia.alcance || '-')}</span></div>
             </div>
             <div class="grimorio-add-preview-descricao">${escapeHtml((magia.descricao || 'Sem descrição.').slice(0, 320))}</div>
-            <button class="grimorio-add-btn grimorio-add-preview-acao" id="btnConfirmarAdicionarPreview">Adicionar esta magia</button>
-            <div class="grimorio-add-preview-hint">Atalhos: setas navegam, PgUp/PgDn alternam, Home/End pulam extremos, Enter adiciona.</div>
+            <button class="grimorio-add-btn grimorio-add-preview-acao" id="btnConfirmarAdicionarPreview">Adicionar magia conhecida</button>
+            <div class="grimorio-add-preview-hint">Atalhos: setas navegam, PgUp/PgDn alternam, Home/End pulam extremos, Enter adiciona a magia conhecida.</div>
         `;
 
         preview.querySelector('#btnConfirmarAdicionarPreview')?.addEventListener('click', async () => {
@@ -1134,15 +1138,21 @@ class GrimorioController {
     _renderizarHistoricoTrocas() {
         const el = document.getElementById('grimorioHistoricoTroca');
         if (!el) return;
+        const classeEspontanea = this._classeEhEspontanea();
 
         if (!this.historicoTrocas.length) {
-            el.innerHTML = '<div class="grimorio-historico-vazio">Sem historico de troca para esta classe.</div>';
+            el.innerHTML = classeEspontanea
+                ? '<div class="grimorio-historico-vazio">Sem historico de troca de magias conhecidas para esta classe.</div>'
+                : '<div class="grimorio-historico-vazio">Sem historico de troca para esta classe.</div>';
             return;
         }
 
         el.innerHTML = this.historicoTrocas.map((item) => {
             const removida = item.magia_removida_nome || `#${item.magia_removida_id}`;
             const adicionada = item.magia_adicionada_nome || `#${item.magia_adicionada_id}`;
+            if (classeEspontanea) {
+                return `<div class="grimorio-historico-item">Nvl ${item.nivel_personagem}: troca de magia conhecida ${escapeHtml(removida)} -> ${escapeHtml(adicionada)}</div>`;
+            }
             return `<div class="grimorio-historico-item">Nvl ${item.nivel_personagem}: ${escapeHtml(removida)} -> ${escapeHtml(adicionada)}</div>`;
         }).join('');
     }
@@ -1221,11 +1231,14 @@ class GrimorioController {
 
     _textoNotificacao(item) {
         const dados = item.dados || {};
+        const classeEspontanea = this._classeEhEspontanea();
         if (item.tipo === 'SEM_MAGIAS_ATE_NIVEL_4') {
             return 'Ranger e Paladino so recebem magias quando alcancam o nivel 4.';
         }
         if (item.tipo === 'TROCA_DISPONIVEL') {
-            return 'Uma troca de magia está disponível para esta classe.';
+            return classeEspontanea
+                ? 'Uma troca de magia conhecida esta disponivel para esta classe.'
+                : 'Uma troca de magia está disponível para esta classe.';
         }
         if (item.tipo === 'SELECAO_PENDENTE') {
             const qtd = Number(dados.quantidade_pendente || 0);
@@ -1238,10 +1251,14 @@ class GrimorioController {
                 .join(', ');
 
             if (niveis) {
-                return `Você possui ${qtd} magia(s) disponível(is) para seleção (${niveis}).`;
+                return classeEspontanea
+                    ? `Voce possui ${qtd} magia(s) conhecida(s) disponivel(is) para selecao (${niveis}).`
+                    : `Você possui ${qtd} magia(s) disponível(is) para seleção (${niveis}).`;
             }
 
-            return `Você possui ${qtd} magia(s) disponível(is) para seleção no catálogo.`;
+            return classeEspontanea
+                ? `Voce possui ${qtd} magia(s) conhecida(s) disponivel(is) para selecao no catalogo.`
+                : `Você possui ${qtd} magia(s) disponível(is) para seleção no catálogo.`;
         }
         if (item.tipo === 'MAGIAS_ADICIONADAS') {
             const qtd = Number(dados.quantidade || 0);
@@ -1251,9 +1268,13 @@ class GrimorioController {
             if (nomes.length > 0) {
                 const resumo = nomes.slice(0, 4).join(', ');
                 const sufixo = nomes.length > 4 ? ` e mais ${nomes.length - 4}` : '';
-                return `${qtd} nova(s) magia(s) foram adicionadas automaticamente ao grimório: ${resumo}${sufixo}.`;
+                return classeEspontanea
+                    ? `${qtd} nova(s) magia(s) conhecida(s) foram adicionadas ao grimorio: ${resumo}${sufixo}.`
+                    : `${qtd} nova(s) magia(s) foram adicionadas automaticamente ao grimório: ${resumo}${sufixo}.`;
             }
-            return `${qtd} nova(s) magia(s) foram adicionadas automaticamente ao grimório.`;
+            return classeEspontanea
+                ? `${qtd} nova(s) magia(s) conhecida(s) foram adicionadas ao grimorio.`
+                : `${qtd} nova(s) magia(s) foram adicionadas automaticamente ao grimório.`;
         }
         return 'Notificação do grimório.';
     }
@@ -1295,6 +1316,10 @@ class GrimorioController {
         if (itensDominio.length === 0 && itensPadrao.length === 0) {
             if (this._classeSemAcessoMagias()) {
                 lista.innerHTML = '<div class="grimorio-vazio">Grimorio acessivel, mas sem magias: Ranger e Paladino recebem magias a partir do nivel 4.</div>';
+                return;
+            }
+            if (this._classeEhEspontanea() && this.itensGrimorio.length === 0) {
+                lista.innerHTML = '<div class="grimorio-vazio">Voce ainda nao selecionou magias conhecidas. Use o botao Adicionar magia conhecida para montar seu grimorio.</div>';
                 return;
             }
             lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
@@ -1435,7 +1460,7 @@ class GrimorioController {
         const id = Number(item.magia_id);
         const aberta = this.cardsAbertos.has(id);
         const classeMago = this._normalizarClasse(this.classeAtiva) === 'Mago';
-        const classeEspontanea = this._classeExibeCatalogoCompleto(); // Bardo/Feiticeiro não preparam magias
+        const classeEspontanea = this._classeEhEspontanea(); // Bardo/Feiticeiro não preparam magias
         const itemPersistido = !item._catalogo_expandido;
         const escola = this._normalizarEscola(magia.escola || '');
         const magiaDominio = this._ehMagiaDominio(item);
