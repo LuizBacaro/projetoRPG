@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import csv
 import re
 import unicodedata
 import json
 from typing import Optional
+from pathlib import Path
 
 from fastapi import HTTPException
 
@@ -14,7 +16,7 @@ from ..repositories.grimorio_repository import GrimorioRepository
 from ..repositories.magia_repository import MagiaRepository
 
 
-_CLASSES_DIVINAS = {"CLERIGO", "DRUIDA", "RANGER", "PALADINO"}
+_CLASSES_DIVINAS = {"CLERIGO", "DRUIDA", "PALADINO"}
 _PARES_DOMINIOS_OPOSTOS = (
     frozenset({"MAL", "BEM"}),
     frozenset({"LEI", "CAOS"}),
@@ -37,6 +39,116 @@ _DIVINDADES_CURAR_SEMPRE_NEUTRO_OU_BOM = {
     "OBAD HAI",
     "OBAD-HAI",
 }
+
+_CSV_REGRAS_COMPLETO = Path(__file__).resolve().parents[3] / "restricoes_clerigo_completo.csv"
+_RULES_BY_NAME_LEVEL: dict[tuple[str, int], list[dict]] | None = None
+
+
+def _bool_sim(valor: str | None) -> bool:
+    return _normalizar(valor or "") == "SIM"
+
+
+def _carregar_regras_clerigo_csv() -> dict[tuple[str, int], list[dict]]:
+    global _RULES_BY_NAME_LEVEL
+    if _RULES_BY_NAME_LEVEL is not None:
+        return _RULES_BY_NAME_LEVEL
+
+    index: dict[tuple[str, int], list[dict]] = {}
+    if not _CSV_REGRAS_COMPLETO.exists():
+        _RULES_BY_NAME_LEVEL = index
+        return index
+
+    with _CSV_REGRAS_COMPLETO.open("r", encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            nome = str(row.get("nome_magia") or "").strip()
+            nivel_raw = str(row.get("nivel") or "").strip()
+            if not nome or not nivel_raw:
+                continue
+            try:
+                nivel = int(nivel_raw)
+            except ValueError:
+                continue
+
+            row_data = dict(row)
+            row_data["_nome_norm"] = _normalizar(nome)
+            row_data["_dominio_norm"] = _normalizar(row.get("dominio") or "")
+            row_data["_eh_dominio"] = _bool_sim(row.get("eh_magia_dominio"))
+
+            key = (row_data["_nome_norm"], nivel)
+            index.setdefault(key, []).append(row_data)
+
+    _RULES_BY_NAME_LEVEL = index
+    return index
+
+
+def _alinhamento_para_coluna_csv(alinhamento_norm: str | None) -> str | None:
+    if not alinhamento_norm:
+        return None
+
+    a = _normalizar(alinhamento_norm)
+    has_leal = "LEAL" in a or "ORDEIR" in a
+    has_caotico = "CAOT" in a
+    has_bom = "BOM" in a
+    has_mau = "MAU" in a or "MAL" in a
+    has_neutro = "NEUTRO" in a
+
+    if has_leal and has_bom:
+        return "pode_leal_bom"
+    if has_leal and has_neutro:
+        return "pode_leal_neutro"
+    if has_leal and has_mau:
+        return "pode_leal_mau"
+
+    if has_caotico and has_bom:
+        return "pode_caotico_bom"
+    if has_caotico and has_neutro:
+        return "pode_caotico_neutro"
+    if has_caotico and has_mau:
+        return "pode_caotico_mau"
+
+    if has_neutro and has_bom:
+        return "pode_neutro_bom"
+    if has_neutro and has_mau:
+        return "pode_neutro_mau"
+    if has_neutro:
+        return "pode_neutro"
+
+    return None
+
+
+def _csv_rule_for_magia(magia) -> dict | None:
+    try:
+        nivel = int(getattr(magia, "nivel", 0) or 0)
+    except (TypeError, ValueError):
+        nivel = 0
+
+    nome_norm = _normalizar(getattr(magia, "nome", ""))
+    if not nome_norm:
+        return None
+
+    candidatos = _carregar_regras_clerigo_csv().get((nome_norm, nivel), [])
+    if not candidatos:
+        return None
+
+    eh_dominio_magia = bool(getattr(magia, "e_magia_dominio", False))
+    dominios_magia = _dominios_de_magia(magia)
+
+    if eh_dominio_magia:
+        dominio_match = [
+            r for r in candidatos
+            if r.get("_eh_dominio") and (
+                not dominios_magia or r.get("_dominio_norm") in dominios_magia
+            )
+        ]
+        if dominio_match:
+            return dominio_match[0]
+
+    base_match = [r for r in candidatos if not r.get("_eh_dominio")]
+    if base_match:
+        return base_match[0]
+
+    return candidatos[0]
 
 
 def _normalizar(valor: str) -> str:
@@ -66,6 +178,8 @@ def _dominios_de_magia(magia) -> set[str]:
 def _descritor_de_magia(magia) -> set[str]:
     descritores = set()
     texto = _normalizar(getattr(magia, "descritor", ""))
+    nome = _normalizar(getattr(magia, "nome", ""))
+
     if "BEM" in texto:
         descritores.add("BEM")
     if "MAL" in texto:
@@ -75,6 +189,13 @@ def _descritor_de_magia(magia) -> set[str]:
     if "LEI" in texto or "ORDEM" in texto:
         descritores.add("LEI")
         descritores.add("ORDEM")
+
+    # Fallback semântico para catálogos com domínio/descritor ausentes.
+    if "CURA" in nome or "CURAR" in nome:
+        descritores.add("BEM")
+    if "INFLIGIR" in nome:
+        descritores.add("MAL")
+
     return descritores
 
 
@@ -145,8 +266,14 @@ def _dominios_opostos(dominio: str) -> set[str]:
 
 
 def _magia_bloqueada_por_alinhamento(magia, alinhamento_norm: str | None) -> bool:
+    regra_csv = _csv_rule_for_magia(magia)
+    coluna_alinhamento = _alinhamento_para_coluna_csv(alinhamento_norm)
+    bloqueada_por_csv = False
+    if regra_csv and coluna_alinhamento and coluna_alinhamento in regra_csv:
+        bloqueada_por_csv = not _bool_sim(regra_csv.get(coluna_alinhamento))
+
     if not alinhamento_norm:
-        return False
+        return bloqueada_por_csv
 
     moral = _eixo_moral(alinhamento_norm)
     etico = _eixo_etico(alinhamento_norm)
@@ -171,14 +298,25 @@ def _magia_bloqueada_por_alinhamento(magia, alinhamento_norm: str | None) -> boo
         return False
 
     tags = _dominios_de_magia(magia) | _descritor_de_magia(magia)
-    return len(tags & bloqueados) > 0
+    bloqueada_por_tags = len(tags & bloqueados) > 0
+    return bloqueada_por_csv or bloqueada_por_tags
 
 
 def _magia_bloqueada_por_dominios_opostos(magia, dominios_personagem: set[str]) -> bool:
-    if not bool(getattr(magia, "e_magia_dominio", False)) or not dominios_personagem:
+    regra_csv = _csv_rule_for_magia(magia)
+    if regra_csv:
+        opostos_csv = {
+            _normalizar(parte)
+            for parte in _partes_csv(regra_csv.get("dominios_opostos_bloqueiam"))
+            if _normalizar(parte)
+        }
+        if opostos_csv and dominios_personagem:
+            return len(opostos_csv & dominios_personagem) > 0
+
+    if not dominios_personagem:
         return False
 
-    dominios_magia = _dominios_de_magia(magia)
+    dominios_magia = _dominios_de_magia(magia) | _descritor_de_magia(magia)
     if not dominios_magia:
         return False
 
@@ -190,6 +328,23 @@ def _magia_bloqueada_por_dominios_opostos(magia, dominios_personagem: set[str]) 
 
 
 def _magia_permitida_por_dominio_de_clerigo(magia, dominios_personagem: set[str]) -> bool:
+    regra_csv = _csv_rule_for_magia(magia)
+    if regra_csv:
+        exige_dominio = _bool_sim(regra_csv.get("requer_dominio_escolhido"))
+        if not exige_dominio:
+            return True
+
+        dominio_regra = {
+            _normalizar(parte)
+            for parte in _partes_csv(regra_csv.get("dominio"))
+            if _normalizar(parte)
+        }
+        if not dominio_regra:
+            dominio_regra = _dominios_de_magia(magia)
+        if not dominio_regra:
+            return False
+        return len(dominio_regra & dominios_personagem) > 0
+
     if not bool(getattr(magia, "e_magia_dominio", False)):
         return True
     dominios_magia = _dominios_de_magia(magia)
@@ -397,6 +552,97 @@ class GrimorioService:
             classe_norm=classe_norm or _normalizar(combatente.classe),
         )
         return self.grimorio_repo.listar(combatente_id, classe=classe_norm, favorita=favorita)
+
+    def diagnosticar_regras_divinas(self, combatente_id: int, *, classe: Optional[str] = None) -> dict:
+        combatente = self.grimorio_repo.get_combatente(combatente_id)
+        if not combatente:
+            raise HTTPException(status_code=404, detail="Combatente não encontrado")
+
+        classe_norm = _normalizar(classe) if classe else _normalizar(combatente.classe)
+        if classe_norm not in _CLASSES_DIVINAS:
+            raise HTTPException(
+                status_code=400,
+                detail="Diagnóstico disponível apenas para classes divinas (Clérigo, Druida e Paladino)",
+            )
+
+        nivel_personagem = int(combatente.nivel or 1)
+        max_nivel = _max_nivel_magia_conjuravel(classe_norm, nivel_personagem)
+        alinhamento_norm = _alinhamento_do_combatente(combatente)
+        dominios_personagem = _dominios_do_combatente(combatente)
+
+        _, magias_classe = self.magia_repo.listar_paginado(
+            classe=classe_norm,
+            nivel=None,
+            escola=None,
+            nome=None,
+            componentes=None,
+            dominio=None,
+            ativo=True,
+            sort_by=None,
+            sort_dir=None,
+            skip=0,
+            limit=500,
+        )
+
+        ids_no_grimorio = {
+            item.magia_id
+            for item in self.grimorio_repo.listar(combatente_id, classe=classe_norm, favorita=None)
+        }
+
+        itens: list[dict] = []
+        for magia in magias_classe:
+            nivel_magia = _nivel_por_classe(magia, classe_norm)
+            if nivel_magia is None or nivel_magia > max_nivel:
+                continue
+
+            bloqueada_por_alinhamento = _magia_bloqueada_por_alinhamento(magia, alinhamento_norm)
+            bloqueada_por_dominio = False
+            bloqueada_por_dominio_oposto = False
+
+            if classe_norm == "CLERIGO":
+                bloqueada_por_dominio = not _magia_permitida_por_dominio_de_clerigo(magia, dominios_personagem)
+                bloqueada_por_dominio_oposto = _magia_bloqueada_por_dominios_opostos(magia, dominios_personagem)
+
+            motivos = []
+            if bloqueada_por_alinhamento:
+                motivos.append("alinhamento")
+            if bloqueada_por_dominio:
+                motivos.append("dominio_nao_selecionado")
+            if bloqueada_por_dominio_oposto:
+                motivos.append("dominio_oposto")
+
+            permitida = not (bloqueada_por_alinhamento or bloqueada_por_dominio or bloqueada_por_dominio_oposto)
+            itens.append(
+                {
+                    "magia_id": int(magia.id),
+                    "magia_nome": str(magia.nome or f"Magia {magia.id}"),
+                    "magia_nivel": int(nivel_magia),
+                    "classe": classe_norm,
+                    "magia_e_magia_dominio": bool(getattr(magia, "e_magia_dominio", False)),
+                    "magia_dominios": getattr(magia, "dominios", None),
+                    "ja_no_grimorio": int(magia.id) in ids_no_grimorio,
+                    "bloqueada_por_alinhamento": bool(bloqueada_por_alinhamento),
+                    "bloqueada_por_dominio": bool(bloqueada_por_dominio),
+                    "bloqueada_por_dominio_oposto": bool(bloqueada_por_dominio_oposto),
+                    "permitida": bool(permitida),
+                    "motivos_bloqueio": motivos,
+                }
+            )
+
+        itens.sort(key=lambda item: (int(item["magia_nivel"]), _normalizar(item["magia_nome"])))
+
+        total_permitidas = sum(1 for item in itens if item["permitida"])
+        total_bloqueadas = len(itens) - total_permitidas
+        return {
+            "combatente_id": int(combatente_id),
+            "classe": classe_norm,
+            "alinhamento": alinhamento_norm,
+            "dominios_personagem": sorted(dominios_personagem),
+            "total_magias_avaliadas": len(itens),
+            "total_permitidas": int(total_permitidas),
+            "total_bloqueadas": int(total_bloqueadas),
+            "itens": itens,
+        }
 
     def listar_historico_troca(self, combatente_id: int, classe: Optional[str] = None, limit: int = 20):
         classe_norm = _normalizar(classe) if classe else None

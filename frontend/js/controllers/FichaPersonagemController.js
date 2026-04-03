@@ -638,6 +638,27 @@ export class FichaPersonagemController {
         hint.classList.toggle('is-fallback', !veioDoCatalogo);
     }
 
+    /**
+     * ✅ NOVO: Helper centralizado para leitura do perfil divino/moral
+     * SRP: garante mapeamento consistente de divindade, alinhamento, domínios
+     * Evita leitura direta e duplicada em vários pontos do controller
+     * @returns {{ alinhamento: string, divindade: string, dominio1: string, dominio2: string }}
+     */
+    _lerPerfilDivino() {
+        const alinhamento = String(this.combatente?.alinhamento || '').trim();
+        const divindade = String(this.combatente?.divindade || '').trim();
+        
+        const dominioParts = String(this.combatente?.dominios || '')
+            .split(',')
+            .map(item => item.trim())
+            .filter(Boolean);
+        
+        const dominio1 = dominioParts[0] || '';
+        const dominio2 = dominioParts[1] || '';
+        
+        return { alinhamento, divindade, dominio1, dominio2 };
+    }
+
     abrirModalPerfilMagico() {
         const modal = document.getElementById('modalPerfilMagico');
         const inputAlinhamento = document.getElementById('inputPerfilAlinhamento');
@@ -648,16 +669,15 @@ export class FichaPersonagemController {
         if (!modal || !this.combatente) return;
 
         this._renderizarListaDominiosPerfil();
-        if (inputAlinhamento) inputAlinhamento.value = this.combatente.alinhamento || '';
-        if (inputDivindade) inputDivindade.value = this.combatente.divindade || '';
-
-        const [dominio1 = '', dominio2 = ''] = String(this.combatente.dominios || '')
-            .split(',')
-            .map((item) => item.trim())
-            .filter(Boolean);
-
+        
+        // ✅ Usar helper centralizado para ler perfil divino
+        const { alinhamento, divindade, dominio1, dominio2 } = this._lerPerfilDivino();
+        
+        if (inputAlinhamento) inputAlinhamento.value = alinhamento;
+        if (inputDivindade) inputDivindade.value = divindade;
         if (selectDominio1) selectDominio1.value = clerigo ? dominio1 : '';
         if (selectDominio2) selectDominio2.value = clerigo ? dominio2 : '';
+        
         modal.style.display = 'flex';
     }
 

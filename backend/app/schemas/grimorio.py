@@ -77,3 +77,29 @@ class GrimorioNotificacaoResponse(BaseModel):
 
 class GrimorioNotificacaoUpdate(BaseModel):
     lida: bool = True
+
+
+class GrimorioDiagnosticoMagiaResponse(BaseModel):
+    magia_id: int
+    magia_nome: str
+    magia_nivel: int
+    classe: str
+    magia_e_magia_dominio: bool = False
+    magia_dominios: Optional[str] = None
+    ja_no_grimorio: bool = False
+    bloqueada_por_alinhamento: bool = False
+    bloqueada_por_dominio: bool = False
+    bloqueada_por_dominio_oposto: bool = False
+    permitida: bool
+    motivos_bloqueio: list[str] = Field(default_factory=list)
+
+
+class GrimorioDiagnosticoResponse(BaseModel):
+    combatente_id: int
+    classe: str
+    alinhamento: Optional[str] = None
+    dominios_personagem: list[str] = Field(default_factory=list)
+    total_magias_avaliadas: int
+    total_permitidas: int
+    total_bloqueadas: int
+    itens: list[GrimorioDiagnosticoMagiaResponse] = Field(default_factory=list)

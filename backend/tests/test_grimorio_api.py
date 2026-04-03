@@ -508,7 +508,7 @@ def test_grimorio_filtra_auto_adicao_por_alinhamento_quando_disponivel(grimorio_
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Mal",
+        dominios="Mal",
     )
     magia_permitida = Magia(
         nome="Magia Clerigo Neutra",
@@ -589,7 +589,7 @@ def test_grimorio_bloqueia_adicao_manual_por_alinhamento_quando_disponivel(grimo
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Mal",
+        dominios="Mal",
     )
     db.add(magia_bloqueada)
     db.flush()
@@ -619,7 +619,7 @@ def test_grimorio_remove_automatico_por_alinhamento_apos_mudanca(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Mal",
+        dominios="Mal",
     )
     db.add(magia_mal)
     db.flush()
@@ -654,7 +654,7 @@ def test_grimorio_neutro_verdadeiro_bloqueia_todas_tendencias(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Bem",
+        dominios="Bem",
     )
     magia_mal = Magia(
         nome="Magia Mal Neutro",
@@ -662,7 +662,7 @@ def test_grimorio_neutro_verdadeiro_bloqueia_todas_tendencias(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Mal",
+        dominios="Mal",
     )
     magia_ordem = Magia(
         nome="Magia Ordem Neutro",
@@ -670,7 +670,7 @@ def test_grimorio_neutro_verdadeiro_bloqueia_todas_tendencias(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Ordem",
+        dominios="Ordem",
     )
     magia_caos = Magia(
         nome="Magia Caos Neutro",
@@ -678,7 +678,7 @@ def test_grimorio_neutro_verdadeiro_bloqueia_todas_tendencias(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Caos",
+        dominios="Caos",
     )
     magia_neutra = Magia(
         nome="Magia Neutra",
@@ -723,7 +723,7 @@ def test_grimorio_leal_neutro_bloqueia_bem_mal_e_caos(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Bem",
+        dominios="Bem",
     )
     magia_mal = Magia(
         nome="Magia Mal Leal Neutro",
@@ -731,7 +731,7 @@ def test_grimorio_leal_neutro_bloqueia_bem_mal_e_caos(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Mal",
+        dominios="Mal",
     )
     magia_caos = Magia(
         nome="Magia Caos Leal Neutro",
@@ -739,7 +739,7 @@ def test_grimorio_leal_neutro_bloqueia_bem_mal_e_caos(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Caos",
+        dominios="Caos",
     )
     magia_ordem = Magia(
         nome="Magia Ordem Leal Neutro",
@@ -747,7 +747,7 @@ def test_grimorio_leal_neutro_bloqueia_bem_mal_e_caos(grimorio_db):
         classe="CLERIGO",
         ativo=True,
         descricao="desc",
-        descritor="Ordem",
+        dominios="Ordem",
     )
     db.add_all([magia_bem, magia_mal, magia_caos, magia_ordem])
     db.flush()
@@ -1074,3 +1074,235 @@ def test_grimorio_bardo_bloqueia_adicao_acima_nivel_conjuravel(grimorio_db):
 
     assert resp.status_code == 400
     assert "nível máximo" in resp.json()["detail"].lower() or "nivel máximo" in resp.json()["detail"].lower()
+
+
+def test_grimorio_druida_bloqueia_adicao_manual_por_dominio_contrario_ao_alinhamento(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Druida")
+    combatente.nivel = 3
+    combatente.alinhamento = "Leal e Bom"
+    db.commit()
+
+    magia_bloqueada = Magia(
+        nome="Druida Dominio Mal",
+        nivel=1,
+        classe="DRUIDA",
+        ativo=True,
+        descricao="desc",
+        dominios="Mal",
+        e_magia_dominio=False,
+    )
+    db.add(magia_bloqueada)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia_bloqueada.id, classe="DRUIDA", nivel=1))
+    db.commit()
+
+    client = _build_client(db_factory)
+    resp = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magia_bloqueada.id, "classe": "DRUIDA", "origem": "SELECAO_MANUAL"},
+    )
+
+    assert resp.status_code == 400
+    assert "alinhamento" in resp.json()["detail"].lower()
+
+
+def test_grimorio_paladino_bloqueia_adicao_manual_por_dominio_contrario_ao_alinhamento(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Paladino")
+    combatente.nivel = 4
+    combatente.alinhamento = "Leal e Bom"
+    db.commit()
+
+    magia_bloqueada = Magia(
+        nome="Paladino Dominio Mal",
+        nivel=1,
+        classe="PALADINO",
+        ativo=True,
+        descricao="desc",
+        dominios="Mal",
+        e_magia_dominio=False,
+    )
+    db.add(magia_bloqueada)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia_bloqueada.id, classe="PALADINO", nivel=1))
+    db.commit()
+
+    client = _build_client(db_factory)
+    resp = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magia_bloqueada.id, "classe": "PALADINO", "origem": "SELECAO_MANUAL"},
+    )
+
+    assert resp.status_code == 400
+    assert "alinhamento" in resp.json()["detail"].lower()
+
+
+def test_grimorio_clerigo_bloqueia_dominio_oposto_mesmo_nao_sendo_magia_de_dominio(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    combatente.dominios = "Bem, Protecao"
+    db.commit()
+
+    magia_oposta = Magia(
+        nome="Clerigo Dominio Oposto em Magia Base",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        dominios="Mal",
+        e_magia_dominio=False,
+    )
+    db.add(magia_oposta)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia_oposta.id, classe="CLERIGO", nivel=1))
+    db.commit()
+
+    client = _build_client(db_factory)
+    resp = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magia_oposta.id, "classe": "CLERIGO", "origem": "SELECAO_MANUAL"},
+    )
+
+    assert resp.status_code == 400
+    assert "domínio oposto" in resp.json()["detail"].lower() or "dominio oposto" in resp.json()["detail"].lower()
+
+
+def test_grimorio_clerigo_leal_mau_bloqueia_cura_por_regra_semantica(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    combatente.alinhamento = "Leal e Mau"
+    combatente.dominios = "Caos, Mal"
+    db.commit()
+
+    magia_cura = Magia(
+        nome="Cura Leve",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=False,
+    )
+    db.add(magia_cura)
+    db.flush()
+    db.add(MagiaClasse(magia_id=magia_cura.id, classe="CLERIGO", nivel=1))
+    db.commit()
+
+    client = _build_client(db_factory)
+    resp = client.post(
+        f"/api/v1/grimorio/{combatente.id}",
+        json={"magia_id": magia_cura.id, "classe": "CLERIGO", "origem": "SELECAO_MANUAL"},
+    )
+
+    assert resp.status_code == 400
+    assert (
+        "alinhamento" in resp.json()["detail"].lower()
+        or "dominio" in resp.json()["detail"].lower()
+    )
+
+
+@pytest.mark.parametrize(
+    "alinhamento,permitidas",
+    [
+        ("Leal e Bom", {"BEM", "ORDEM"}),
+        ("Leal e Neutro", {"ORDEM"}),
+        ("Leal e Mau", {"MAL", "ORDEM"}),
+        ("Neutro e Bom", {"BEM"}),
+        ("Neutro", set()),
+        ("Neutro e Mau", {"MAL"}),
+        ("Caotico e Bom", {"BEM", "CAOS"}),
+        ("Caotico e Neutro", {"CAOS"}),
+        ("Caotico e Mau", {"MAL", "CAOS"}),
+    ],
+)
+def test_grimorio_matriz_alinhamento_tendencia_divina(grimorio_db, alinhamento, permitidas):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    combatente.alinhamento = alinhamento
+    db.commit()
+
+    magias = {
+        "BEM": Magia(nome=f"Matriz Bem {alinhamento}", nivel=1, classe="CLERIGO", ativo=True, descricao="desc", dominios="Bem"),
+        "MAL": Magia(nome=f"Matriz Mal {alinhamento}", nivel=1, classe="CLERIGO", ativo=True, descricao="desc", dominios="Mal"),
+        "ORDEM": Magia(nome=f"Matriz Ordem {alinhamento}", nivel=1, classe="CLERIGO", ativo=True, descricao="desc", dominios="Ordem"),
+        "CAOS": Magia(nome=f"Matriz Caos {alinhamento}", nivel=1, classe="CLERIGO", ativo=True, descricao="desc", dominios="Caos"),
+    }
+
+    db.add_all(list(magias.values()))
+    db.flush()
+    db.add_all([
+        MagiaClasse(magia_id=magias["BEM"].id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magias["MAL"].id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magias["ORDEM"].id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magias["CAOS"].id, classe="CLERIGO", nivel=1),
+    ])
+    db.commit()
+
+    client = _build_client(db_factory)
+    listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+
+    assert listar.status_code == 200
+    ids = {item["magia_id"] for item in listar.json()}
+
+    for tendencia, magia in magias.items():
+        if tendencia in permitidas:
+            assert magia.id in ids
+        else:
+            assert magia.id not in ids
+
+
+def test_grimorio_diagnostico_retorna_motivos_de_bloqueio_para_clerigo(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    combatente.alinhamento = "Leal e Mau"
+    combatente.dominios = "Caos, Mal"
+    db.commit()
+
+    magia_cura = Magia(
+        nome="Cura Leve",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        e_magia_dominio=False,
+    )
+    magia_mal = Magia(
+        nome="Infligir Ferimentos Leves",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        dominios="Mal",
+        e_magia_dominio=True,
+    )
+    db.add_all([magia_cura, magia_mal])
+    db.flush()
+    db.add_all([
+        MagiaClasse(magia_id=magia_cura.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_mal.id, classe="CLERIGO", nivel=1),
+    ])
+    db.commit()
+
+    client = _build_client(db_factory)
+    resp = client.get(
+        f"/api/v1/grimorio/{combatente.id}/diagnostico",
+        params={"classe": "CLERIGO"},
+    )
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["classe"] == "CLERIGO"
+    assert body["total_magias_avaliadas"] >= 2
+
+    itens = {item["magia_nome"]: item for item in body["itens"]}
+    assert "Cura Leve" in itens
+    assert "Infligir Ferimentos Leves" in itens
+
+    assert itens["Cura Leve"]["permitida"] is False
+    assert "alinhamento" in itens["Cura Leve"]["motivos_bloqueio"]
+
+    assert itens["Infligir Ferimentos Leves"]["permitida"] is True

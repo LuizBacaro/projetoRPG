@@ -1,0 +1,10 @@
+﻿Alinhamento,Magias [BEM] - Pode?,Magias [MAL] - Pode?,Magias [ORDEM] - Pode?,Magias [CAOS] - Pode?,Conversão de Magias
+<strong>LEAL E BOM</strong>,✅ SIM,❌ NÃO,✅ SIM,❌ NÃO,Curar (Obrigatório)
+<strong>LEAL E NEUTRO</strong>,❌ NÃO,❌ NÃO,✅ SIM,❌ NÃO,Escolhe: Curar OU Infligir
+<strong>LEAL E MAU</strong>,❌ NÃO,✅ SIM,✅ SIM,❌ NÃO,Infligir (Obrigatório)
+<strong>NEUTRO E BOM</strong>,✅ SIM,❌ NÃO,❌ NÃO,❌ NÃO,Curar (Obrigatório)
+<strong>NEUTRO (Verdadeiro)</strong>,❌ NÃO,❌ NÃO,❌ NÃO,❌ NÃO,Escolhe: Curar OU Infligir*
+<strong>NEUTRO E MAU</strong>,❌ NÃO,✅ SIM,❌ NÃO,❌ NÃO,Infligir (Obrigatório)
+<strong>CAÓTICO E BOM</strong>,✅ SIM,❌ NÃO,❌ NÃO,✅ SIM,Curar (Obrigatório)
+<strong>CAÓTICO E NEUTRO</strong>,❌ NÃO,❌ NÃO,❌ NÃO,✅ SIM,Escolhe: Curar OU Infligir
+<strong>CAÓTICO E MAU</strong>,❌ NÃO,✅ SIM,❌ NÃO,✅ SIM,Infligir (Obrigatório)

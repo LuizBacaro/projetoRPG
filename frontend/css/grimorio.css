@@ -396,6 +396,24 @@
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
 }
 
+.grimorio-aviso-classe strong {
+    color: #ffe3a5;
+}
+
+.grimorio-aviso-classe--alerta {
+    border-color: rgba(250, 204, 21, 0.35);
+    background: linear-gradient(145deg, rgba(114, 82, 14, 0.38), rgba(63, 43, 8, 0.26));
+    color: #f8e4aa;
+}
+
+.grimorio-aviso-classe--clerigo {
+    border-color: rgba(129, 204, 255, 0.36);
+    background:
+        radial-gradient(circle at top left, rgba(129, 204, 255, 0.16), transparent 42%),
+        linear-gradient(145deg, rgba(22, 49, 73, 0.46), rgba(11, 26, 40, 0.32));
+    color: #d8efff;
+}
+
 .grimorio-adicionar-wrap {
     padding: 0.6rem 1.5rem;
     border-bottom: 1px solid rgba(201, 168, 76, 0.12);
@@ -661,6 +679,46 @@
     font-size: 0.72rem;
     line-height: 1.55;
     color: rgba(239, 228, 203, 0.85);
+}
+
+.grimorio-add-feedback {
+    margin: 0.15rem 0 0.55rem;
+    padding: 0.48rem 0.6rem;
+    border-radius: 9px;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    background: linear-gradient(145deg, rgba(97, 27, 27, 0.45), rgba(56, 18, 18, 0.3));
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+}
+
+.grimorio-add-feedback strong {
+    display: block;
+    color: #ffd4d4;
+    font-family: var(--fonte-titulo);
+    font-size: 0.67rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.grimorio-add-feedback p {
+    margin: 0.24rem 0 0;
+    color: #ffdede;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.grimorio-add-feedback--bloqueio {
+    border-color: rgba(251, 191, 36, 0.42);
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.12), transparent 48%),
+        linear-gradient(145deg, rgba(92, 60, 9, 0.52), rgba(48, 30, 5, 0.35));
+}
+
+.grimorio-add-feedback--bloqueio strong {
+    color: #ffe9b0;
+}
+
+.grimorio-add-feedback--bloqueio p {
+    color: #ffedc4;
 }
 
 .grimorio-add-preview-acao {

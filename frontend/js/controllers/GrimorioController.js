@@ -69,6 +69,7 @@ class GrimorioController {
         this._onAdicionarKeydown = null;
         this._adicionarMagiaEmAndamento = false;
         this._ultimoAdicionarAt = 0;
+        this._feedbackAdicionar = null;
     }
 
     async abrirGrimorio() {
@@ -561,14 +562,84 @@ class GrimorioController {
         if (!avisoEl) return;
 
         if (!this._classeSemAcessoMagias()) {
-            avisoEl.style.display = 'none';
-            avisoEl.textContent = '';
+            if (!this._classeAtivaEhClerigo()) {
+                avisoEl.style.display = 'none';
+                avisoEl.textContent = '';
+                avisoEl.classList.remove('grimorio-aviso-classe--alerta', 'grimorio-aviso-classe--clerigo');
+                return;
+            }
+
+            const alinhamento = escapeHtml(this._formatarAlinhamentoCombatente());
+            const dominios = this._dominiosCombatenteFormatados();
+            const dominiosTexto = dominios.length > 0
+                ? escapeHtml(dominios.join(', '))
+                : 'nenhum informado';
+
+            avisoEl.style.display = 'block';
+            avisoEl.classList.remove('grimorio-aviso-classe--alerta');
+            avisoEl.classList.add('grimorio-aviso-classe--clerigo');
+            avisoEl.innerHTML = `
+                <strong>Regras automaticas de clerigo ativas:</strong>
+                alinhamento <strong>${alinhamento}</strong> •
+                dominios selecionados <strong>${dominiosTexto}</strong> •
+                magias de dominio exigem o dominio correspondente •
+                dominios opostos podem bloquear magias (Bem x Mal, Ordem/Lei x Caos, Protecao x Destruicao).
+            `;
             return;
         }
 
         const nivel = Number(this.combatente?.nivel || 1);
         avisoEl.style.display = 'block';
+        avisoEl.classList.remove('grimorio-aviso-classe--clerigo');
+        avisoEl.classList.add('grimorio-aviso-classe--alerta');
         avisoEl.textContent = `Esta classe so recebe acesso a magias no nivel 4. Nivel atual: ${nivel}.`;
+    }
+
+    _formatarAlinhamentoCombatente() {
+        const bruto = String(this.combatente?.alinhamento || this.combatente?.tendencia || '').trim();
+        if (!bruto) return 'nao informado';
+
+        return bruto
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[\/_-]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .split(' ')
+            .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1).toLowerCase())
+            .join(' ');
+    }
+
+    _dominiosCombatenteFormatados() {
+        const candidatos = [
+            this.combatente?.dominios,
+            this.combatente?.dominio,
+            this.combatente?.dominio_1,
+            this.combatente?.dominio_2,
+            this.combatente?.dominio1,
+            this.combatente?.dominio2,
+        ];
+
+        const unicos = new Map();
+        candidatos.forEach((valor) => {
+            String(valor || '')
+                .split(/[,/;|]/)
+                .map((parte) => parte.trim())
+                .filter(Boolean)
+                .forEach((parte) => {
+                    const chave = parte
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .toLowerCase();
+                    if (!chave) return;
+                    if (unicos.has(chave)) return;
+                    const rotulo = parte.charAt(0).toUpperCase() + parte.slice(1).toLowerCase();
+                    unicos.set(chave, rotulo);
+                });
+        });
+
+        return [...unicos.values()]
+            .sort((a, b) => a.localeCompare(b, 'pt-BR'));
     }
 
     _renderizarFiltroEscolas() {
@@ -911,6 +982,56 @@ class GrimorioController {
         resumo.textContent = `${lista.length} resultado(s) • ${indiceHumano}/${lista.length} selecionada: ${selecionada.nome || 'Magia'}`;
     }
 
+    _normalizarTextoBasico(valor) {
+        return String(valor || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+    }
+
+    _feedbackErroAdicionarPorMensagem(mensagem) {
+        const texto = String(mensagem || '').trim();
+        const normalizado = this._normalizarTextoBasico(texto);
+
+        if (!texto) {
+            return {
+                tipo: 'erro',
+                titulo: 'Falha ao adicionar magia',
+                detalhe: 'Nao foi possivel concluir a inclusao desta magia no grimorio.',
+            };
+        }
+
+        if (normalizado.includes('alinhamento')) {
+            return {
+                tipo: 'bloqueio',
+                titulo: 'Bloqueada por alinhamento',
+                detalhe: 'Esta magia esta vinculada a um dominio que conflita com o alinhamento atual do personagem.',
+            };
+        }
+
+        if (normalizado.includes('dominio oposto')) {
+            return {
+                tipo: 'bloqueio',
+                titulo: 'Bloqueada por dominio oposto',
+                detalhe: 'Esta magia esta associada a dominio oposto a um dos dominios selecionados pelo clerigo.',
+            };
+        }
+
+        if (normalizado.includes('dominio') && normalizado.includes('incompativel')) {
+            return {
+                tipo: 'bloqueio',
+                titulo: 'Dominio nao permitido',
+                detalhe: 'Esta magia exige dominio especifico e o personagem nao possui o dominio necessario.',
+            };
+        }
+
+        return {
+            tipo: 'erro',
+            titulo: 'Falha ao adicionar magia',
+            detalhe: texto,
+        };
+    }
+
     _renderizarPainelAdicionar() {
         const lista = document.getElementById('grimorioAdicionarLista');
         const preview = document.getElementById('grimorioAdicionarPreview');
@@ -1039,8 +1160,21 @@ class GrimorioController {
             return;
         }
 
+        const feedback = this._feedbackAdicionar && Number(this._feedbackAdicionar.magiaId) === Number(magia.id)
+            ? this._feedbackAdicionar
+            : null;
+        const feedbackHtml = feedback
+            ? `
+                <div class="grimorio-add-feedback grimorio-add-feedback--${escapeHtml(feedback.tipo || 'erro')}">
+                    <strong>${escapeHtml(feedback.titulo || 'Falha ao adicionar')}</strong>
+                    <p>${escapeHtml(feedback.detalhe || '')}</p>
+                </div>
+            `
+            : '';
+
         preview.innerHTML = `
             <div class="grimorio-add-preview-titulo">${escapeHtml(magia.nome || 'Magia')}</div>
+            ${feedbackHtml}
             <div class="grimorio-add-preview-grid">
                 <div class="grimorio-add-preview-linha"><span class="grimorio-add-preview-chave">Nivel</span><span class="grimorio-add-preview-valor">${Number(magia.nivel || 0)}</span></div>
                 <div class="grimorio-add-preview-linha"><span class="grimorio-add-preview-chave">Escola</span><span class="grimorio-add-preview-valor">${escapeHtml(this._normalizarEscola(magia.escola || '-'))}</span></div>
@@ -1581,9 +1715,17 @@ class GrimorioController {
                 classe: this.classeAtiva,
                 origem: 'SELECAO_MANUAL',
             });
+            this._feedbackAdicionar = null;
             this._mostrarToast('Magia adicionada ao grimório.', 'sucesso');
             await this._recarregarDados();
         } catch (error) {
+            const feedback = this._feedbackErroAdicionarPorMensagem(error.message || 'Não foi possível adicionar a magia.');
+            this._feedbackAdicionar = {
+                magiaId: Number(magiaId),
+                ...feedback,
+            };
+
+            this._renderizarPreviewAdicionar(this.magiasDisponiveisAdicionar, magiaId);
             this._mostrarToast(error.message || 'Não foi possível adicionar a magia.', 'erro');
         } finally {
             this._adicionarMagiaEmAndamento = false;

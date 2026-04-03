@@ -5,6 +5,7 @@ export class Combatente {
         this.tipo              = data.tipo;
         this.classe            = data.classe;
         this.raca              = data.raca              || '';
+        this.divindade         = data.divindade         || data.deidade || '';
         this.alinhamento       = data.alinhamento       || '';
         this.dominios          = data.dominios          || '';
         this.pagina_referencia = data.pagina_referencia || '';  // ✅ NOVO

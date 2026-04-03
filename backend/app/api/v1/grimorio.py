@@ -10,6 +10,7 @@ from app.core.database import get_db
 from app.core.dependencies import get_grimorio_service
 from app.core.deps import requer_dono_ou_admin_combatente
 from app.schemas.grimorio import (
+    GrimorioDiagnosticoResponse,
     GrimorioHistoricoTrocaResponse,
     GrimorioMagiaCreate,
     GrimorioMagiaResponse,
@@ -73,6 +74,16 @@ def listar_grimorio(
 ):
     itens = service.listar(combatente_id, classe=classe, favorita=favorita)
     return [_serialize(item) for item in itens]
+
+
+@router.get("/{combatente_id}/diagnostico", response_model=GrimorioDiagnosticoResponse)
+def diagnosticar_regras_grimorio(
+    combatente_id: int,
+    classe: Optional[str] = Query(default=None),
+    service: GrimorioService = Depends(get_grimorio_service),
+    _: object = Depends(requer_dono_ou_admin_combatente),
+):
+    return service.diagnosticar_regras_divinas(combatente_id, classe=classe)
 
 
 @router.post("/{combatente_id}", response_model=GrimorioMagiaResponse, status_code=status.HTTP_201_CREATED)
