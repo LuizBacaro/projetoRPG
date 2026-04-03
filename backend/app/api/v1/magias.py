@@ -212,6 +212,24 @@ def listar_dominios(
     return dominios
 
 
+@router.get("/divindades", response_model=List[str])
+def listar_divindades_sugeridas(
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+):
+    cache_key = "magias:divindades"
+    if settings.CACHE_ENABLED:
+        cached = catalog_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+    srv = _resolve_service(service, db)
+    divindades = srv.listar_divindades_sugeridas()
+    if settings.CACHE_ENABLED:
+        catalog_cache.set(cache_key, divindades, settings.CACHE_CATALOG_TTL_SECONDS)
+    return divindades
+
+
 @router.get("/importacao/modelo")
 def baixar_modelo_importacao(
     service: MagiaImportService = Depends(get_magia_import_service),

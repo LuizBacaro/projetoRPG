@@ -15,19 +15,28 @@ from ..repositories.magia_repository import MagiaRepository
 
 
 _CLASSES_DIVINAS = {"CLERIGO", "DRUIDA", "RANGER", "PALADINO"}
-_DOMINIOS_BLOQUEADOS_POR_ALINHAMENTO = {
-    "BOM": {"MAL", "DESTRUICAO"},
-    "MAL": {"BEM", "CURA"},
-    "CAOTICO": {"ORDEM", "LEI"},
-    "ORDEIRO": {"CAOS"},
-    "LEAL": {"CAOS"},
-}
 _PARES_DOMINIOS_OPOSTOS = (
     frozenset({"MAL", "BEM"}),
     frozenset({"LEI", "CAOS"}),
     frozenset({"ORDEM", "CAOS"}),
     frozenset({"PROTECAO", "DESTRUICAO"}),
 )
+
+_DIVINDADES_CURAR_SEMPRE = {
+    "ST CUTHBERT",
+    "ST. CUTHBERT",
+    "SAO CUTHBERT",
+    "SAINT CUTHBERT",
+}
+
+_DIVINDADES_INFLIGIR_SEMPRE_SE_LEAL_OU_NEUTRO = {
+    "WEE JAS",
+}
+
+_DIVINDADES_CURAR_SEMPRE_NEUTRO_OU_BOM = {
+    "OBAD HAI",
+    "OBAD-HAI",
+}
 
 
 def _normalizar(valor: str) -> str:
@@ -75,21 +84,24 @@ def _alinhamento_do_combatente(combatente) -> str | None:
     return normalizado or None
 
 
-def _marcadores_alinhamento(alinhamento_norm: str | None) -> set[str]:
+def _eixo_moral(alinhamento_norm: str | None) -> str | None:
     if not alinhamento_norm:
-        return set()
-
-    marcadores = set()
+        return None
     if "BOM" in alinhamento_norm:
-        marcadores.add("BOM")
-    if "MAL" in alinhamento_norm:
-        marcadores.add("MAL")
+        return "BOM"
+    if "MAL" in alinhamento_norm or "MAU" in alinhamento_norm:
+        return "MAL"
+    return "NEUTRO"
+
+
+def _eixo_etico(alinhamento_norm: str | None) -> str | None:
+    if not alinhamento_norm:
+        return None
     if "CAOT" in alinhamento_norm:
-        marcadores.add("CAOTICO")
+        return "CAOTICO"
     if "ORDEIR" in alinhamento_norm or "LEAL" in alinhamento_norm:
-        marcadores.add("ORDEIRO")
-        marcadores.add("LEAL")
-    return marcadores
+        return "LEAL"
+    return "NEUTRO"
 
 
 def _dominios_do_combatente(combatente) -> set[str]:
@@ -110,6 +122,20 @@ def _dominios_do_combatente(combatente) -> set[str]:
     return dominios
 
 
+def _divindade_do_combatente(combatente) -> str | None:
+    candidatos = (
+        getattr(combatente, "divindade", None),
+        getattr(combatente, "deidade", None),
+        getattr(combatente, "deus", None),
+        getattr(combatente, "patrono", None),
+    )
+    for valor in candidatos:
+        texto = str(valor or "").strip()
+        if texto:
+            return texto
+    return None
+
+
 def _dominios_opostos(dominio: str) -> set[str]:
     opostos = set()
     for par in _PARES_DOMINIOS_OPOSTOS:
@@ -121,9 +147,26 @@ def _dominios_opostos(dominio: str) -> set[str]:
 def _magia_bloqueada_por_alinhamento(magia, alinhamento_norm: str | None) -> bool:
     if not alinhamento_norm:
         return False
+
+    moral = _eixo_moral(alinhamento_norm)
+    etico = _eixo_etico(alinhamento_norm)
+
     bloqueados = set()
-    for marcador in _marcadores_alinhamento(alinhamento_norm):
-        bloqueados.update(_DOMINIOS_BLOQUEADOS_POR_ALINHAMENTO.get(marcador, set()))
+
+    if moral == "BOM":
+        bloqueados.add("MAL")
+    elif moral == "MAL":
+        bloqueados.add("BEM")
+    elif moral == "NEUTRO":
+        bloqueados.update({"BEM", "MAL"})
+
+    if etico == "LEAL":
+        bloqueados.add("CAOS")
+    elif etico == "CAOTICO":
+        bloqueados.update({"ORDEM", "LEI"})
+    elif etico == "NEUTRO":
+        bloqueados.update({"ORDEM", "LEI", "CAOS"})
+
     if not bloqueados:
         return False
 
@@ -153,6 +196,63 @@ def _magia_permitida_por_dominio_de_clerigo(magia, dominios_personagem: set[str]
     if not dominios_personagem or not dominios_magia:
         return False
     return len(dominios_magia & dominios_personagem) > 0
+
+
+def _politica_conversao_clerigo(combatente) -> dict:
+    alinhamento_norm = _alinhamento_do_combatente(combatente)
+    eixo_moral = _eixo_moral(alinhamento_norm)
+    eixo_etico = _eixo_etico(alinhamento_norm)
+
+    divindade = _divindade_do_combatente(combatente)
+    divindade_norm = _normalizar(divindade)
+
+    if divindade_norm in _DIVINDADES_CURAR_SEMPRE:
+        return {
+            "modo": "CURAR_OBRIGATORIO",
+            "fonte": "DIVINDADE",
+            "regra": "St. Cuthbert: clérigos sempre convertem para Curar.",
+            "alinhamento": alinhamento_norm or "",
+            "divindade": divindade or "",
+        }
+
+    if (
+        divindade_norm in _DIVINDADES_INFLIGIR_SEMPRE_SE_LEAL_OU_NEUTRO
+        and eixo_etico in {"LEAL", "NEUTRO"}
+    ):
+        return {
+            "modo": "INFLIGIR_OBRIGATORIO",
+            "fonte": "DIVINDADE",
+            "regra": "Wee Jas: clérigos leais ou neutros convertem para Infligir.",
+            "alinhamento": alinhamento_norm or "",
+            "divindade": divindade or "",
+        }
+
+    if (
+        divindade_norm in _DIVINDADES_CURAR_SEMPRE_NEUTRO_OU_BOM
+        and eixo_moral in {"BOM", "NEUTRO"}
+    ):
+        return {
+            "modo": "CURAR_OBRIGATORIO",
+            "fonte": "DIVINDADE",
+            "regra": "Obad-Hai: clérigos neutros ou bons convertem para Curar.",
+            "alinhamento": alinhamento_norm or "",
+            "divindade": divindade or "",
+        }
+
+    if eixo_moral == "BOM":
+        modo = "CURAR_OBRIGATORIO"
+    elif eixo_moral == "MAL":
+        modo = "INFLIGIR_OBRIGATORIO"
+    else:
+        modo = "ESCOLHER_CURAR_OU_INFLIGIR"
+
+    return {
+        "modo": modo,
+        "fonte": "ALINHAMENTO",
+        "regra": "Conversão divina definida pelo alinhamento do clérigo.",
+        "alinhamento": alinhamento_norm or "",
+        "divindade": divindade or "",
+    }
 
 
 def _nivel_por_classe(magia, classe_norm: str) -> Optional[int]:
@@ -740,6 +840,13 @@ class GrimorioService:
         )
 
     def _garantir_notificacoes_sistema(self, combatente_id: int, classe_norm: str, nivel_personagem: int) -> None:
+        combatente = self.grimorio_repo.get_combatente(combatente_id)
+        if not combatente:
+            return
+
+        if classe_norm == "CLERIGO":
+            self._garantir_notificacao_conversao_divina(combatente_id, classe_norm, combatente)
+
         if classe_norm in {"RANGER", "PALADINO"} and nivel_personagem < 4:
             if not self.grimorio_repo.get_notificacao_aberta_por_tipo(
                 combatente_id, classe_norm, "SEM_MAGIAS_ATE_NIVEL_4"
@@ -805,3 +912,40 @@ class GrimorioService:
             elif notif_pendente:
                 notif_pendente.lida = True
                 self.grimorio_repo.update_notificacao(notif_pendente)
+
+    def _garantir_notificacao_conversao_divina(self, combatente_id: int, classe_norm: str, combatente) -> None:
+        politica = _politica_conversao_clerigo(combatente)
+        payload = {
+            "modo": politica.get("modo"),
+            "fonte": politica.get("fonte"),
+            "regra": politica.get("regra"),
+            "alinhamento": politica.get("alinhamento") or "",
+            "divindade": politica.get("divindade") or "",
+        }
+
+        existente = self.grimorio_repo.get_notificacao_aberta_por_tipo(
+            combatente_id,
+            classe_norm,
+            "CONVERSAO_DIVINA",
+        )
+
+        if existente:
+            try:
+                dados_existentes = json.loads(existente.dados or "{}")
+            except Exception:
+                dados_existentes = {}
+            if dados_existentes == payload:
+                return
+            existente.dados = json.dumps(payload)
+            self.grimorio_repo.update_notificacao(existente)
+            return
+
+        self.grimorio_repo.create_notificacao(
+            GrimorioNotificacao(
+                combatente_id=combatente_id,
+                classe=classe_norm,
+                tipo="CONVERSAO_DIVINA",
+                dados=json.dumps(payload),
+                lida=False,
+            )
+        )

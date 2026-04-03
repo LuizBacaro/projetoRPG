@@ -3,6 +3,8 @@ Service de Combatente (Business Logic)
 SRP: Lógica de negócio de Combatente
 SOLID: DIP via repository injetado no constructor
 """
+import unicodedata
+
 from typing import List, Optional, Dict
 
 from ..repositories.combatente_repository import CombatenteRepository
@@ -72,6 +74,10 @@ class CombatenteService:
         if dono_id is not None:
             combatente_data["dono_id"] = dono_id
 
+        self._aplicar_regras_dominios_por_classe(
+            combatente_data,
+            exigir_dois_dominios_clerigo=False,
+        )
         combatente_data["hp_atual"] = combatente_data["hp_maximo"]
         combatente = Combatente(**combatente_data)
         criado = self.repository.create(combatente)
@@ -100,6 +106,13 @@ class CombatenteService:
             if "hp_atual" not in combatente_data and combatente.hp_maximo > 0:
                 proporcao = combatente.hp_atual / combatente.hp_maximo
                 combatente_data["hp_atual"] = int(novo_max * proporcao)
+
+        self._aplicar_regras_dominios_por_classe(
+            combatente_data,
+            classe_atual=combatente.classe,
+            dominios_atuais=combatente.dominios,
+            exigir_dois_dominios_clerigo=False,
+        )
 
         for key, value in combatente_data.items():
             if hasattr(combatente, key) and value is not None:
@@ -186,6 +199,51 @@ class CombatenteService:
             "hp_maximo": combatente.hp_maximo,
             "mensagem":  mensagem,
         }
+
+    @staticmethod
+    def _normalizar_texto(valor: str) -> str:
+        texto = str(valor or "").strip()
+        return unicodedata.normalize("NFD", texto).encode("ascii", "ignore").decode("ascii").upper()
+
+    def _eh_clerigo(self, classe: str) -> bool:
+        return self._normalizar_texto(classe) == "CLERIGO"
+
+    @staticmethod
+    def _parse_dominios(dominios_raw: str) -> List[str]:
+        itens = [item.strip() for item in str(dominios_raw or "").split(",") if item.strip()]
+        vistos = set()
+        dominios = []
+        for item in itens:
+            key = item.lower()
+            if key in vistos:
+                continue
+            vistos.add(key)
+            dominios.append(item)
+        return dominios
+
+    def _aplicar_regras_dominios_por_classe(
+        self,
+        combatente_data: dict,
+        classe_atual: Optional[str] = None,
+        dominios_atuais: Optional[str] = None,
+        exigir_dois_dominios_clerigo: bool = True,
+    ) -> None:
+        classe_final = combatente_data.get("classe", classe_atual or "")
+
+        if not self._eh_clerigo(classe_final):
+            combatente_data["dominios"] = ""
+            return
+
+        dominios_raw = combatente_data["dominios"] if "dominios" in combatente_data else (dominios_atuais or "")
+        dominios = self._parse_dominios(dominios_raw)
+        if not dominios and not exigir_dois_dominios_clerigo:
+            combatente_data["dominios"] = ""
+            return
+
+        if len(dominios) != 2:
+            raise DadosInvalidos("Clérigo deve escolher exatamente dois domínios")
+
+        combatente_data["dominios"] = ", ".join(dominios)
 
     def inicializar_slots_magia(self, combatente_id: int) -> Dict:
         """Inicializa slots de magia para um combatente baseado em sua classe e nível."""

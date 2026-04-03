@@ -57,6 +57,7 @@ def _combatente_payload(**overrides):
         "tipo": "jogador",
         "classe": "Clérigo",
         "raca": "Humano",
+        "divindade": "St. Cuthbert",
         "alinhamento": "Leal e Bom",
         "dominios": "Cura, Proteção",
         "hp_maximo": "18",
@@ -89,6 +90,7 @@ def test_criar_combatente_retorna_alinhamento_e_dominios(combatentes_db):
     assert response.status_code == 201
     body = response.json()
     assert body["dono_id"] == 77
+    assert body["divindade"] == "St. Cuthbert"
     assert body["alinhamento"] == "Leal e Bom"
     assert body["dominios"] == "Cura, Proteção"
     assert body["hp_atual"] == 18
@@ -104,6 +106,7 @@ def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatent
     atualizar = client.put(
         f"/api/v1/combatentes/{combatente_id}",
         data=_combatente_payload(
+            divindade="Wee Jas",
             alinhamento="Neutro e Bom",
             dominios="Cura, Sol",
             sabedoria="18",
@@ -112,6 +115,7 @@ def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatent
 
     assert atualizar.status_code == 200
     body = atualizar.json()
+    assert body["divindade"] == "Wee Jas"
     assert body["alinhamento"] == "Neutro e Bom"
     assert body["dominios"] == "Cura, Sol"
     assert body["sabedoria"] == 18
@@ -119,5 +123,6 @@ def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatent
     obter = client.get(f"/api/v1/combatentes/{combatente_id}")
 
     assert obter.status_code == 200
+    assert obter.json()["divindade"] == "Wee Jas"
     assert obter.json()["alinhamento"] == "Neutro e Bom"
     assert obter.json()["dominios"] == "Cura, Sol"

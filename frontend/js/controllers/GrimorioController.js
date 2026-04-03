@@ -176,7 +176,7 @@ class GrimorioController {
             this._renderizarPainelTroca();
             this._carregado = true;
         } catch (error) {
-            this._mostrarToast(error.message || 'Nao foi possivel carregar o grimorio.', 'erro');
+            this._mostrarToast(error.message || 'Não foi possível carregar o grimório.', 'erro');
         } finally {
             this._mostrarLoading(false);
         }
@@ -731,7 +731,7 @@ class GrimorioController {
                     return;
                 }
                 if (this._classeSemAcessoMagias()) {
-                    this._mostrarToast('Ranger e Paladino so recebem magias a partir do nivel 4.', 'info');
+                    this._mostrarToast('Ranger e Paladino só recebem magias a partir do nível 4.', 'info');
                     return;
                 }
                 this._definirPainelAdicionarVisivel(!painel.classList.contains('show'));
@@ -794,7 +794,7 @@ class GrimorioController {
                     this._mostrarToast('Troca de magia realizada com sucesso.', 'sucesso');
                     await this._recarregarDados();
                 } catch (error) {
-                    this._mostrarToast(error.message || 'Nao foi possivel realizar a troca.', 'erro');
+                    this._mostrarToast(error.message || 'Não foi possível realizar a troca.', 'erro');
                 }
             });
         }
@@ -1203,7 +1203,7 @@ class GrimorioController {
                     this._renderizarNotificacoes();
                     this._atualizarBadgeTrocaDisponivel();
                 } catch (error) {
-                    this._mostrarToast(error.message || 'Nao foi possivel atualizar a notificacao.', 'erro');
+                    this._mostrarToast(error.message || 'Não foi possível atualizar a notificação.', 'erro');
                 }
             });
         });
@@ -1217,13 +1217,14 @@ class GrimorioController {
                     this._renderizarNotificacoes();
                     this._atualizarBadgeTrocaDisponivel();
                 } catch (error) {
-                    this._mostrarToast(error.message || 'Nao foi possivel descartar a notificacao.', 'erro');
+                    this._mostrarToast(error.message || 'Não foi possível descartar a notificação.', 'erro');
                 }
             });
         });
     }
 
     _classeNotificacao(item) {
+        if (item?.tipo === 'CONVERSAO_DIVINA') return 'grimorio-notificacao-auto';
         if (item?.tipo === 'MAGIAS_ADICIONADAS') return 'grimorio-notificacao-auto';
         if (item?.tipo === 'SEM_MAGIAS_ATE_NIVEL_4') return 'grimorio-notificacao-bloqueio';
         return '';
@@ -1252,12 +1253,12 @@ class GrimorioController {
 
             if (niveis) {
                 return classeEspontanea
-                    ? `Voce possui ${qtd} magia(s) conhecida(s) disponivel(is) para selecao (${niveis}).`
+                    ? `Você possui ${qtd} magia(s) conhecida(s) disponível(is) para seleção (${niveis}).`
                     : `Você possui ${qtd} magia(s) disponível(is) para seleção (${niveis}).`;
             }
 
             return classeEspontanea
-                ? `Voce possui ${qtd} magia(s) conhecida(s) disponivel(is) para selecao no catalogo.`
+                ? `Você possui ${qtd} magia(s) conhecida(s) disponível(is) para seleção no catálogo.`
                 : `Você possui ${qtd} magia(s) disponível(is) para seleção no catálogo.`;
         }
         if (item.tipo === 'MAGIAS_ADICIONADAS') {
@@ -1269,12 +1270,32 @@ class GrimorioController {
                 const resumo = nomes.slice(0, 4).join(', ');
                 const sufixo = nomes.length > 4 ? ` e mais ${nomes.length - 4}` : '';
                 return classeEspontanea
-                    ? `${qtd} nova(s) magia(s) conhecida(s) foram adicionadas ao grimorio: ${resumo}${sufixo}.`
+                    ? `${qtd} nova(s) magia(s) conhecida(s) foram adicionadas ao grimório: ${resumo}${sufixo}.`
                     : `${qtd} nova(s) magia(s) foram adicionadas automaticamente ao grimório: ${resumo}${sufixo}.`;
             }
             return classeEspontanea
-                ? `${qtd} nova(s) magia(s) conhecida(s) foram adicionadas ao grimorio.`
+                ? `${qtd} nova(s) magia(s) conhecida(s) foram adicionadas ao grimório.`
                 : `${qtd} nova(s) magia(s) foram adicionadas automaticamente ao grimório.`;
+        }
+        if (item.tipo === 'CONVERSAO_DIVINA') {
+            const modo = String(dados.modo || '').toUpperCase();
+            const divindade = String(dados.divindade || '').trim();
+            const alinhamento = String(dados.alinhamento || '').trim();
+
+            if (modo === 'CURAR_OBRIGATORIO') {
+                return divindade
+                    ? `Conversão divina: este clérigo deve converter para Curar (${divindade}).`
+                    : 'Conversão divina: este clérigo deve converter para Curar.';
+            }
+            if (modo === 'INFLIGIR_OBRIGATORIO') {
+                return divindade
+                    ? `Conversão divina: este clérigo deve converter para Infligir (${divindade}).`
+                    : 'Conversão divina: este clérigo deve converter para Infligir.';
+            }
+
+            return alinhamento
+                ? `Conversão divina: este clérigo pode escolher Curar ou Infligir (${alinhamento}).`
+                : 'Conversão divina: este clérigo pode escolher Curar ou Infligir.';
         }
         return 'Notificação do grimório.';
     }
@@ -1315,11 +1336,11 @@ class GrimorioController {
 
         if (itensDominio.length === 0 && itensPadrao.length === 0) {
             if (this._classeSemAcessoMagias()) {
-                lista.innerHTML = '<div class="grimorio-vazio">Grimorio acessivel, mas sem magias: Ranger e Paladino recebem magias a partir do nivel 4.</div>';
+                lista.innerHTML = '<div class="grimorio-vazio">Grimório acessível, mas sem magias: Ranger e Paladino recebem magias a partir do nível 4.</div>';
                 return;
             }
             if (this._classeEhEspontanea() && this.itensGrimorio.length === 0) {
-                lista.innerHTML = '<div class="grimorio-vazio">Voce ainda nao selecionou magias conhecidas. Use o botao Adicionar magia conhecida para montar seu grimorio.</div>';
+                lista.innerHTML = '<div class="grimorio-vazio">Você ainda não selecionou magias conhecidas. Use o botão Adicionar magia conhecida para montar seu grimório.</div>';
                 return;
             }
             lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
@@ -1560,10 +1581,10 @@ class GrimorioController {
                 classe: this.classeAtiva,
                 origem: 'SELECAO_MANUAL',
             });
-            this._mostrarToast('Magia adicionada ao grimorio.', 'sucesso');
+            this._mostrarToast('Magia adicionada ao grimório.', 'sucesso');
             await this._recarregarDados();
         } catch (error) {
-            this._mostrarToast(error.message || 'Nao foi possivel adicionar a magia.', 'erro');
+            this._mostrarToast(error.message || 'Não foi possível adicionar a magia.', 'erro');
         } finally {
             this._adicionarMagiaEmAndamento = false;
         }
@@ -1580,14 +1601,14 @@ class GrimorioController {
         });
 
         if (!res.ok) {
-            let detalhe = 'Nao foi possivel remover a magia das preparadas de hoje.';
+            let detalhe = 'Não foi possível remover a magia das preparadas de hoje.';
             try {
                 const data = await res.json();
                 if (typeof data?.detail === 'string' && data.detail.trim()) {
                     detalhe = data.detail.trim();
                 }
             } catch (_error) {
-                // Mantem mensagem padrao.
+                // Mantém mensagem padrão.
             }
             throw new Error(detalhe);
         }
@@ -1617,14 +1638,14 @@ class GrimorioController {
         });
 
         if (!res.ok) {
-            let detalhe = 'Nao foi possivel preparar a magia para hoje.';
+            let detalhe = 'Não foi possível preparar a magia para hoje.';
             try {
                 const data = await res.json();
                 if (typeof data?.detail === 'string' && data.detail.trim()) {
                     detalhe = data.detail.trim();
                 }
             } catch (_error) {
-                // Mantem mensagem padrao.
+                // Mantém mensagem padrão.
             }
             throw new Error(detalhe);
         }
@@ -1679,7 +1700,7 @@ class GrimorioController {
             }
             this._broadcastPreparacaoAtualizada();
         } catch (error) {
-            this._mostrarToast(error.message || 'Nao foi possivel atualizar a preparação da magia.', 'erro');
+            this._mostrarToast(error.message || 'Não foi possível atualizar a preparação da magia.', 'erro');
         }
     }
 
@@ -1732,7 +1753,7 @@ class GrimorioController {
                     this._broadcastPreparacaoAtualizada({ resetSlots: true, origem: 'descanso-longo' });
                     this._mostrarToast('Descanso longo realizado. As magias preparadas de hoje foram limpas.', 'sucesso');
                 } catch (error) {
-                    this._mostrarToast(error.message || 'Nao foi possivel realizar o descanso longo.', 'erro');
+                    this._mostrarToast(error.message || 'Não foi possível realizar o descanso longo.', 'erro');
                 }
             },
         });
@@ -1750,7 +1771,7 @@ class GrimorioController {
             this._mostrarToast(item.favorita ? 'Magia marcada como favorita.' : 'Magia removida dos favoritos.', 'info');
             this.filtrar();
         } catch (error) {
-            this._mostrarToast(error.message || 'Nao foi possivel atualizar favorito.', 'erro');
+            this._mostrarToast(error.message || 'Não foi possível atualizar favorito.', 'erro');
         }
     }
 
@@ -1759,7 +1780,7 @@ class GrimorioController {
         if (!item) return;
 
         this._mostrarModalAnotacoes({
-            titulo: item.magia?.nome || 'Anotacoes da magia',
+            titulo: item.magia?.nome || 'Anotações da magia',
             valorInicial: item.anotacoes || '',
             onSalvar: async (novoTexto) => {
                 try {
@@ -1767,10 +1788,10 @@ class GrimorioController {
                         anotacoes: novoTexto,
                     });
                     item.anotacoes = novoTexto;
-                    this._mostrarToast('Anotacao salva com sucesso.', 'sucesso');
+                    this._mostrarToast('Anotação salva com sucesso.', 'sucesso');
                     this.filtrar();
                 } catch (error) {
-                    this._mostrarToast(error.message || 'Erro ao salvar anotacao.', 'erro');
+                    this._mostrarToast(error.message || 'Erro ao salvar anotação.', 'erro');
                 }
             },
         });
@@ -1783,16 +1804,16 @@ class GrimorioController {
         this._mostrarModalConfirmacao({
             icone: '⚠',
             titulo: 'Remover magia',
-            texto: `Tem certeza que deseja remover '${item.magia?.nome || 'esta magia'}' do grimorio?`,
+            texto: `Tem certeza que deseja remover '${item.magia?.nome || 'esta magia'}' do grimório?`,
             textoConfirmar: 'Remover',
             textoCancelar: 'Cancelar',
             onConfirmar: async () => {
                 try {
                     await this.grimorioService.remover(this.combatente.id, magiaId, this.classeAtiva);
-                    this._mostrarToast('Magia removida do grimorio.', 'sucesso');
+                    this._mostrarToast('Magia removida do grimório.', 'sucesso');
                     await this._recarregarDados();
                 } catch (error) {
-                    this._mostrarToast(error.message || 'Nao foi possivel remover a magia.', 'erro');
+                    this._mostrarToast(error.message || 'Não foi possível remover a magia.', 'erro');
                 }
             },
         });

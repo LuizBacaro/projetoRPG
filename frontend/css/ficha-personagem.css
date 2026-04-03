@@ -392,6 +392,10 @@ body {
     line-height: 1.4;
 }
 
+.ficha-modal-field small.is-fallback {
+    color: #b9770e;
+}
+
 .ficha-modal-actions {
     display: flex;
     justify-content: flex-end;

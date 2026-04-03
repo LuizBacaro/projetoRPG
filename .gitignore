@@ -16,6 +16,7 @@ venv/
 uploads/
 backend/uploads/
 backend/uploads/**
+*.pdf
 
 # IDE
 .vscode/

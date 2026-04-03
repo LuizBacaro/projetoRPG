@@ -59,6 +59,7 @@ async def criar_combatente(
     tipo:       str = Form("jogador", max_length=20),
     classe:     str = Form("Aventureiro", max_length=50),
     raca:       Optional[str] = Form(None, max_length=50),
+    divindade: Optional[str] = Form(None, max_length=80),
     alinhamento: Optional[str] = Form(None, max_length=30),
     dominios: Optional[str] = Form(None, max_length=120),
     # ✅ NOVO
@@ -91,6 +92,7 @@ async def criar_combatente(
         "tipo":               tipo,
         "classe":             classe,
         "raca":               raca or "",
+        "divindade":          divindade or "",
         "alinhamento":        alinhamento or "",
         "dominios":           dominios or "",
         "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
@@ -126,6 +128,7 @@ async def atualizar_combatente(
     tipo:          str = Form(..., max_length=20),
     classe:        str = Form("Aventureiro", max_length=50),
     raca:          Optional[str] = Form(None, max_length=50),
+    divindade: Optional[str] = Form(None, max_length=80),
     alinhamento: Optional[str] = Form(None, max_length=30),
     dominios: Optional[str] = Form(None, max_length=120),
     # ✅ NOVO
@@ -158,6 +161,7 @@ async def atualizar_combatente(
         "tipo":               tipo,
         "classe":             classe,
         "raca":               raca or "",
+        "divindade":          divindade or "",
         "alinhamento":        alinhamento or "",
         "dominios":           dominios or "",
         "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO

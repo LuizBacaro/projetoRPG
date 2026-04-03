@@ -41,6 +41,20 @@ DOMINIOS_FIXOS = {
     "VIAGEM": "Viagem",
 }
 
+DIVINDADES_SUGERIDAS = [
+    "Boccob",
+    "Corellon Larethian",
+    "Ehlonna",
+    "Erythnul",
+    "Heironeous",
+    "Hextor",
+    "Kord",
+    "Nerull",
+    "Obad-Hai",
+    "St. Cuthbert",
+    "Wee Jas",
+]
+
 
 class MagiaService:
     def __init__(self, repository: MagiaRepository):
@@ -69,6 +83,9 @@ class MagiaService:
 
     def listar_dominios(self) -> list[str]:
         return list(DOMINIOS_FIXOS.values())
+
+    def listar_divindades_sugeridas(self) -> list[str]:
+        return list(DIVINDADES_SUGERIDAS)
 
     def obter_por_id(self, magia_id: int) -> Magia:
         magia = self.repository.get_by_id(magia_id)

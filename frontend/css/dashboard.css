@@ -624,6 +624,17 @@ body {
     box-shadow: 0 0 10px rgba(124, 58, 237, 0.2);
 }
 
+.dash-input-hint {
+    margin: .35rem 0 0;
+    font-size: .75rem;
+    color: #34d399;
+    letter-spacing: .02em;
+}
+
+.dash-input-hint.is-fallback {
+    color: #f59e0b;
+}
+
 .dash-form-row  { 
     display: grid; 
     grid-template-columns: 1fr 1fr; 

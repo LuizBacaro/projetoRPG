@@ -610,7 +610,7 @@ def test_grimorio_remove_automatico_por_alinhamento_apos_mudanca(grimorio_db):
     db, db_factory = grimorio_db
     combatente = _criar_combatente(db, classe="Clerigo")
     combatente.nivel = 3
-    combatente.alinhamento = "Neutro"
+    combatente.alinhamento = "Neutro e Mau"
     db.commit()
 
     magia_mal = Magia(
@@ -639,6 +639,135 @@ def test_grimorio_remove_automatico_por_alinhamento_apos_mudanca(grimorio_db):
     listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
     assert listar.status_code == 200
     assert all(item["magia_id"] != magia_mal.id for item in listar.json())
+
+
+def test_grimorio_neutro_verdadeiro_bloqueia_todas_tendencias(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    combatente.alinhamento = "Neutro"
+    db.commit()
+
+    magia_bem = Magia(
+        nome="Magia Bem Neutro",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Bem",
+    )
+    magia_mal = Magia(
+        nome="Magia Mal Neutro",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Mal",
+    )
+    magia_ordem = Magia(
+        nome="Magia Ordem Neutro",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Ordem",
+    )
+    magia_caos = Magia(
+        nome="Magia Caos Neutro",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Caos",
+    )
+    magia_neutra = Magia(
+        nome="Magia Neutra",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+    )
+    db.add_all([magia_bem, magia_mal, magia_ordem, magia_caos, magia_neutra])
+    db.flush()
+    db.add_all([
+        MagiaClasse(magia_id=magia_bem.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_mal.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_ordem.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_caos.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_neutra.id, classe="CLERIGO", nivel=1),
+    ])
+    db.commit()
+
+    client = _build_client(db_factory)
+    listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+
+    assert listar.status_code == 200
+    ids = {item["magia_id"] for item in listar.json()}
+    assert magia_neutra.id in ids
+    assert magia_bem.id not in ids
+    assert magia_mal.id not in ids
+    assert magia_ordem.id not in ids
+    assert magia_caos.id not in ids
+
+
+def test_grimorio_leal_neutro_bloqueia_bem_mal_e_caos(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.nivel = 3
+    combatente.alinhamento = "Leal e Neutro"
+    db.commit()
+
+    magia_bem = Magia(
+        nome="Magia Bem Leal Neutro",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Bem",
+    )
+    magia_mal = Magia(
+        nome="Magia Mal Leal Neutro",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Mal",
+    )
+    magia_caos = Magia(
+        nome="Magia Caos Leal Neutro",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Caos",
+    )
+    magia_ordem = Magia(
+        nome="Magia Ordem Leal Neutro",
+        nivel=1,
+        classe="CLERIGO",
+        ativo=True,
+        descricao="desc",
+        descritor="Ordem",
+    )
+    db.add_all([magia_bem, magia_mal, magia_caos, magia_ordem])
+    db.flush()
+    db.add_all([
+        MagiaClasse(magia_id=magia_bem.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_mal.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_caos.id, classe="CLERIGO", nivel=1),
+        MagiaClasse(magia_id=magia_ordem.id, classe="CLERIGO", nivel=1),
+    ])
+    db.commit()
+
+    client = _build_client(db_factory)
+    listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "CLERIGO"})
+
+    assert listar.status_code == 200
+    ids = {item["magia_id"] for item in listar.json()}
+    assert magia_ordem.id in ids
+    assert magia_bem.id not in ids
+    assert magia_mal.id not in ids
+    assert magia_caos.id not in ids
 
 
 def test_grimorio_remove_automatico_por_dominio_oposto_apos_mudanca(grimorio_db):
@@ -711,6 +840,49 @@ def test_grimorio_notificacao_selecao_pendente_inclui_niveis(grimorio_db):
     por_nivel = dados.get("por_nivel")
     assert isinstance(por_nivel, dict)
     assert len(por_nivel) > 0
+
+
+def test_grimorio_notificacao_conversao_divina_por_alinhamento_neutro(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.alinhamento = "Neutro"
+    db.commit()
+
+    client = _build_client(db_factory)
+    resp = client.get(
+        f"/api/v1/grimorio/{combatente.id}/notificacoes",
+        params={"classe": "CLERIGO"},
+    )
+
+    assert resp.status_code == 200
+    itens = resp.json()
+    notif = next((item for item in itens if item["tipo"] == "CONVERSAO_DIVINA"), None)
+    assert notif is not None
+    assert notif["dados"].get("modo") == "ESCOLHER_CURAR_OU_INFLIGIR"
+    assert notif["dados"].get("fonte") == "ALINHAMENTO"
+
+
+def test_grimorio_notificacao_conversao_divina_por_excecao_wee_jas(monkeypatch, grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Clerigo")
+    combatente.alinhamento = "Leal e Neutro"
+    db.commit()
+
+    from app.services import grimorio_service as grimorio_mod
+    monkeypatch.setattr(grimorio_mod, "_divindade_do_combatente", lambda _c: "Wee Jas")
+
+    client = _build_client(db_factory)
+    resp = client.get(
+        f"/api/v1/grimorio/{combatente.id}/notificacoes",
+        params={"classe": "CLERIGO"},
+    )
+
+    assert resp.status_code == 200
+    itens = resp.json()
+    notif = next((item for item in itens if item["tipo"] == "CONVERSAO_DIVINA"), None)
+    assert notif is not None
+    assert notif["dados"].get("modo") == "INFLIGIR_OBRIGATORIO"
+    assert notif["dados"].get("fonte") == "DIVINDADE"
 
 
 def test_grimorio_clerigo_auto_adiciona_apenas_dominios_escolhidos_no_nivel(grimorio_db):

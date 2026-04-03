@@ -177,3 +177,16 @@ def test_magias_listar_dominios_retorna_lista_fixa(magias_db):
     assert "Ar" in body
     assert "Magia" in body
     assert "Viagem" in body
+
+
+def test_magias_listar_divindades_sugeridas_retorna_lista_fixa(magias_db):
+    _, db_factory = magias_db
+    client = _build_client(db_factory)
+
+    resp = client.get("/api/v1/magias/divindades")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert "Wee Jas" in body
+    assert "St. Cuthbert" in body
+    assert "Obad-Hai" in body

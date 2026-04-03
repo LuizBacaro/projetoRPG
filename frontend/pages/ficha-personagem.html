@@ -169,9 +169,10 @@
                 </div>
                 <div class="ficha-meta ficha-meta-secundaria">
                     <span id="fichaAlinhamento" class="ficha-tag ficha-tag-alinhamento">Alinhamento: —</span>
+                    <span id="fichaDivindade" class="ficha-tag ficha-tag-alinhamento">Divindade: —</span>
                     <span id="fichaDominios" class="ficha-tag ficha-tag-dominio">Domínios: —</span>
                 </div>
-                <button id="btnEditarPerfilMagico" class="ficha-btn-editar-identidade" type="button">Editar alinhamento e domínios</button>
+                <button id="btnEditarPerfilMagico" class="ficha-btn-editar-identidade" type="button">Editar alinhamento, divindade e domínios</button>
             </div>
 
         </section>
@@ -708,22 +709,32 @@
                 </select>
             </label>
             <label class="ficha-modal-field">
+                <span>Divindade</span>
+                <input id="inputPerfilDivindade" list="listaPerfilDivindades" type="text" maxlength="80" placeholder="Ex.: Wee Jas, St. Cuthbert, Obad-Hai" />
+                <datalist id="listaPerfilDivindades"></datalist>
+                <small id="hintPerfilDivindade">Carregando sugestões...</small>
+            </label>
+            <label id="grupoPerfilDominios" class="ficha-modal-field">
                 <span>Domínios</span>
-                <input id="inputPerfilDominios" list="listaPerfilDominios" placeholder="Ex: Bem, Proteção" />
-                <datalist id="listaPerfilDominios"></datalist>
-                <small id="hintPerfilDominios">Carregando domínios permitidos...</small>
+                <select id="selectPerfilDominio1">
+                    <option value="">Selecione o primeiro domínio</option>
+                </select>
+                <select id="selectPerfilDominio2">
+                    <option value="">Selecione o segundo domínio</option>
+                </select>
+                <small id="hintPerfilDominios">Selecione exatamente dois domínios.</small>
             </label>
         </div>
         <div class="ficha-modal-actions">
             <button id="btnCancelarPerfilMagico" class="btn-voltar" type="button">Cancelar</button>
-            <button id="btnSalvarPerfilMagico" class="btn-abrir-grimorio" type="button">Salvar perfil</button>
+            <button id="btnSalvarPerfilMagico" class="btn-abrir-grimorio" type="button">Salvar Perfil</button>
         </div>
     </div>
 </div>
 
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
-<script type="module" src="../js/controllers/FichaPersonagemController.js?v=11"></script>
-<script type="module" src="../js/controllers/GrimorioController.js?v=17"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=18"></script>
+<script type="module" src="../js/controllers/GrimorioController.js?v=18"></script>
 </body>
 </html>

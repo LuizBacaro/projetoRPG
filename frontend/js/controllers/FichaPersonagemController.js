@@ -24,6 +24,20 @@ const DOMINIOS_PERMITIDOS_FALLBACK = [
     'Guerra', 'Magia', 'Mal', 'Morte', 'Proteção', 'Sol', 'Sorte', 'Terra', 'Viagem',
 ];
 
+const DIVINDADES_SUGERIDAS_FALLBACK = [
+    'Boccob',
+    'Corellon Larethian',
+    'Ehlonna',
+    'Erythnul',
+    'Heironeous',
+    'Hextor',
+    'Kord',
+    'Nerull',
+    'Obad-Hai',
+    'St. Cuthbert',
+    'Wee Jas',
+];
+
 export class FichaPersonagemController {
 
     constructor() {
@@ -36,6 +50,8 @@ export class FichaPersonagemController {
         this.combatente        = null;
         this.bonusCaProtecao   = 0;
         this.dominiosPermitidos = [...DOMINIOS_PERMITIDOS_FALLBACK];
+        this.divindadesSugeridas = [...DIVINDADES_SUGERIDAS_FALLBACK];
+        this.fonteDivindades = 'fallback';
 
         // ✅ NOVO: canal de escuta arena → ficha
         this._canal = null;
@@ -54,7 +70,10 @@ export class FichaPersonagemController {
             console.log('🎯 Carregando ficha do combatente:', combatenteId);
 
             this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
-            await this._carregarDominiosPermitidos();
+            await Promise.all([
+                this._carregarDivindadesSugeridas(),
+                this._carregarDominiosPermitidos(),
+            ]);
 
             // ✅ Expor globalmente para debug no console
             window._fichaController = this;
@@ -422,6 +441,7 @@ export class FichaPersonagemController {
         const tipo        = document.getElementById('fichaTipo');
         const nivel       = document.getElementById('fichaNivel');
         const alinhamento = document.getElementById('fichaAlinhamento');
+        const divindade   = document.getElementById('fichaDivindade');
         const dominios    = document.getElementById('fichaDominios');
         const placeholder = document.getElementById('fichaFotoPlaceholder');
         const foto        = document.getElementById('fichaFoto');
@@ -438,7 +458,16 @@ export class FichaPersonagemController {
         }
         if (nivel)  nivel.textContent  = this.combatente.nivel  || 1;
         if (alinhamento) alinhamento.textContent = `Alinhamento: ${this.combatente.alinhamento || '—'}`;
-        if (dominios) dominios.textContent = `Domínios: ${this._formatarDominios(this.combatente.dominios)}`;
+        if (divindade) divindade.textContent = `Divindade: ${this.combatente.divindade || '—'}`;
+        if (dominios) {
+            if (this._ehClasseClerigo()) {
+                dominios.textContent = `Domínios: ${this._formatarDominios(this.combatente.dominios)}`;
+            } else {
+                dominios.textContent = 'Domínios: —';
+            }
+        }
+
+        this._atualizarUIPerfilDominios();
 
         if (this.combatente.foto_url) {
             if (foto) {
@@ -457,6 +486,33 @@ export class FichaPersonagemController {
     _formatarDominios(valor) {
         const texto = String(valor || '').trim();
         return texto || '—';
+    }
+
+    _normalizarClasse(valor) {
+        return String(valor || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toUpperCase();
+    }
+
+    _ehClasseClerigo(classe = this.combatente?.classe) {
+        return this._normalizarClasse(classe) === 'CLERIGO';
+    }
+
+    _atualizarUIPerfilDominios() {
+        const clerigo = this._ehClasseClerigo();
+        const tagDominios = document.getElementById('fichaDominios');
+        const grupoDominios = document.getElementById('grupoPerfilDominios');
+        const btnPerfil = document.getElementById('btnEditarPerfilMagico');
+
+        if (tagDominios) tagDominios.style.display = clerigo ? '' : 'none';
+        if (grupoDominios) grupoDominios.style.display = clerigo ? '' : 'none';
+        if (btnPerfil) {
+            btnPerfil.textContent = clerigo
+                ? 'Editar alinhamento, divindade e domínios'
+                : 'Editar alinhamento e divindade';
+        }
     }
 
     _getAuthHeader() {
@@ -490,29 +546,118 @@ export class FichaPersonagemController {
         this._renderizarListaDominiosPerfil();
     }
 
-    _renderizarListaDominiosPerfil() {
-        const lista = document.getElementById('listaPerfilDominios');
-        const hint = document.getElementById('hintPerfilDominios');
+    async _carregarDivindadesSugeridas() {
+        try {
+            const response = await fetch(getApiUrl('/magias/divindades'), {
+                headers: this._getAuthHeader(),
+            });
 
-        if (lista) {
-            lista.innerHTML = this.dominiosPermitidos
-                .map((dominio) => `<option value="${escapeHtml(dominio)}"></option>`)
-                .join('');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const divindades = await response.json();
+            if (Array.isArray(divindades) && divindades.length > 0) {
+                this.divindadesSugeridas = [...new Set(
+                    divindades
+                        .map((divindade) => String(divindade).trim())
+                        .filter(Boolean),
+                )];
+                this.fonteDivindades = 'catalogo';
+            }
+        } catch (error) {
+            console.warn('⚠️ Não foi possível carregar divindades sugeridas do backend para a ficha:', error);
+            this.divindadesSugeridas = [...DIVINDADES_SUGERIDAS_FALLBACK];
+            this.fonteDivindades = 'fallback';
+        }
+
+        this._renderizarListaDivindadesPerfil();
+        this._atualizarHintDivindadesPerfil();
+    }
+
+    _renderizarListaDominiosPerfil() {
+        const selectDominio1 = document.getElementById('selectPerfilDominio1');
+        const selectDominio2 = document.getElementById('selectPerfilDominio2');
+        const hint = document.getElementById('hintPerfilDominios');
+        const clerigo = this._ehClasseClerigo();
+
+        this._atualizarUIPerfilDominios();
+
+        if (!clerigo) {
+            if (selectDominio1) selectDominio1.innerHTML = '<option value="">Selecione o primeiro domínio</option>';
+            if (selectDominio2) selectDominio2.innerHTML = '<option value="">Selecione o segundo domínio</option>';
+            if (hint) hint.textContent = 'Disponível apenas para personagens da classe Clérigo.';
+            return;
+        }
+
+        const opcoes = this.dominiosPermitidos
+            .map((dominio) => `<option value="${escapeHtml(dominio)}">${escapeHtml(dominio)}</option>`)
+            .join('');
+
+        if (selectDominio1) {
+            selectDominio1.innerHTML = `<option value="">Selecione o primeiro domínio</option>${opcoes}`;
+        }
+        if (selectDominio2) {
+            selectDominio2.innerHTML = `<option value="">Selecione o segundo domínio</option>${opcoes}`;
         }
 
         if (hint) {
-            hint.textContent = `Permitidos: ${this.dominiosPermitidos.join(', ')}. Separe múltiplos domínios por vírgula.`;
+            hint.textContent = `Permitidos: ${this.dominiosPermitidos.join(', ')}. Selecione dois domínios diferentes.`;
         }
+    }
+
+    _renderizarListaDivindadesPerfil() {
+        const lista = document.getElementById('listaPerfilDivindades');
+        if (!lista) return;
+
+        lista.innerHTML = this.divindadesSugeridas
+            .map((divindade) => `<option value="${escapeHtml(divindade)}"></option>`)
+            .join('');
+    }
+
+    _atualizarHintDivindadesPerfil() {
+        const hint = document.getElementById('hintPerfilDivindade');
+        if (!hint) return;
+
+        const total = Array.isArray(this.divindadesSugeridas) ? this.divindadesSugeridas.length : 0;
+        const singular = total === 1;
+        const sufixoQuantidade = `${total} sugest${singular ? 'ão' : 'ões'}`;
+        const sufixoCarga = singular ? 'carregada' : 'carregadas';
+        const sufixoLocal = singular ? 'local ativa' : 'locais ativas';
+        const veioDoCatalogo = this.fonteDivindades === 'catalogo';
+
+        if (total === 0) {
+            hint.textContent = 'Nenhuma sugestão disponível no momento.';
+            hint.classList.toggle('is-fallback', true);
+            return;
+        }
+
+        hint.textContent = veioDoCatalogo
+            ? `${sufixoQuantidade} ${sufixoCarga} do catálogo.`
+            : `${sufixoQuantidade} ${sufixoLocal} (catálogo indisponível no momento).`;
+        hint.classList.toggle('is-fallback', !veioDoCatalogo);
     }
 
     abrirModalPerfilMagico() {
         const modal = document.getElementById('modalPerfilMagico');
         const inputAlinhamento = document.getElementById('inputPerfilAlinhamento');
-        const inputDominios = document.getElementById('inputPerfilDominios');
+        const inputDivindade = document.getElementById('inputPerfilDivindade');
+        const selectDominio1 = document.getElementById('selectPerfilDominio1');
+        const selectDominio2 = document.getElementById('selectPerfilDominio2');
+        const clerigo = this._ehClasseClerigo();
         if (!modal || !this.combatente) return;
 
+        this._renderizarListaDominiosPerfil();
         if (inputAlinhamento) inputAlinhamento.value = this.combatente.alinhamento || '';
-        if (inputDominios) inputDominios.value = this.combatente.dominios || '';
+        if (inputDivindade) inputDivindade.value = this.combatente.divindade || '';
+
+        const [dominio1 = '', dominio2 = ''] = String(this.combatente.dominios || '')
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean);
+
+        if (selectDominio1) selectDominio1.value = clerigo ? dominio1 : '';
+        if (selectDominio2) selectDominio2.value = clerigo ? dominio2 : '';
         modal.style.display = 'flex';
     }
 
@@ -521,13 +666,14 @@ export class FichaPersonagemController {
         if (modal) modal.style.display = 'none';
     }
 
-    _normalizarDominiosPerfil(raw) {
-        const itens = String(raw || '')
-            .split(',')
-            .map((item) => item.trim())
-            .filter(Boolean);
+    _normalizarDominiosPerfilSelecionados(dominio1Raw, dominio2Raw) {
+        if (!this._ehClasseClerigo()) return '';
 
-        if (!itens.length) return '';
+        const itens = [String(dominio1Raw || '').trim(), String(dominio2Raw || '').trim()].filter(Boolean);
+
+        if (itens.length !== 2) {
+            throw new Error('Clérigo deve escolher exatamente dois domínios.');
+        }
 
         const mapa = new Map(
             this.dominiosPermitidos.map((dominio) => [
@@ -556,6 +702,14 @@ export class FichaPersonagemController {
             throw new Error(`Domínio inválido: ${invalidos.join(', ')}.`);
         }
 
+        if (normalizados.length !== 2) {
+            throw new Error('Clérigo deve escolher exatamente dois domínios.');
+        }
+
+        if (normalizados[0] === normalizados[1]) {
+            throw new Error('Selecione dois domínios diferentes.');
+        }
+
         return normalizados.join(', ');
     }
 
@@ -568,6 +722,7 @@ export class FichaPersonagemController {
             tipo: this.combatente.tipo || 'jogador',
             classe: this.combatente.classe || 'Aventureiro',
             raca: this.combatente.raca || '',
+            divindade: this.combatente.divindade || '',
             alinhamento: this.combatente.alinhamento || '',
             dominios: this.combatente.dominios || '',
             pagina_referencia: this.combatente.pagina_referencia || '',
@@ -598,12 +753,18 @@ export class FichaPersonagemController {
         if (!this.combatente?.id) return;
 
         const inputAlinhamento = document.getElementById('inputPerfilAlinhamento');
-        const inputDominios = document.getElementById('inputPerfilDominios');
+        const inputDivindade = document.getElementById('inputPerfilDivindade');
+        const selectDominio1 = document.getElementById('selectPerfilDominio1');
+        const selectDominio2 = document.getElementById('selectPerfilDominio2');
         const alinhamento = inputAlinhamento?.value || '';
+        const divindade = inputDivindade?.value || '';
 
         try {
-            const dominios = this._normalizarDominiosPerfil(inputDominios?.value || '');
-            const formData = this._buildFormDataAtualizacaoCombatente({ alinhamento, dominios });
+            const dominios = this._normalizarDominiosPerfilSelecionados(
+                selectDominio1?.value || '',
+                selectDominio2?.value || '',
+            );
+            const formData = this._buildFormDataAtualizacaoCombatente({ alinhamento, divindade, dominios });
             this.combatente = await this.combatenteService.atualizar(this.combatente.id, formData);
 
             this.renderizarIdentidade();
@@ -613,10 +774,10 @@ export class FichaPersonagemController {
                 await window._grimorioController._recarregarDados();
             }
 
-            window.NotificationService?.sucesso('✅ Perfil mágico atualizado.');
+            window.NotificationService?.sucesso('Perfil mágico atualizado com sucesso.');
         } catch (error) {
             console.error('❌ Erro ao salvar perfil mágico:', error);
-            window.NotificationService?.erro(`❌ ${error.message || 'Erro ao salvar perfil mágico.'}`);
+            window.NotificationService?.erro(error.message || 'Erro ao salvar perfil mágico.');
         }
     }
 

@@ -164,6 +164,12 @@
                 </div>
 
                 <div class="dash-form-group">
+                    <label>Divindade</label>
+                    <input type="text" name="divindade" list="listaDivindadesDashboard" maxlength="80" placeholder="Ex.: St. Cuthbert, Wee Jas, Obad-Hai" />
+                    <p class="dash-input-hint" id="hintDivindadeCadastroJogador">Carregando sugestões...</p>
+                </div>
+
+                <div class="dash-form-group">
                     <label>Nome do Personagem *</label>
                     <input type="text" name="nome" required placeholder="Ex: Aragorn" />
                 </div>
@@ -420,6 +426,12 @@
                     <input type="text" id="dashEditRaca" name="raca" placeholder="Ex: Elfo, Humano, Anão" />
                 </div>
 
+                <div class="dash-form-group">
+                    <label>Divindade</label>
+                    <input type="text" id="dashEditDivindade" name="divindade" list="listaDivindadesDashboard" maxlength="80" placeholder="Ex.: St. Cuthbert, Wee Jas, Obad-Hai" />
+                    <p class="dash-input-hint" id="hintDivindadeEdicao">Carregando sugestões...</p>
+                </div>
+
                 <div class="dash-form-group" id="secaoPaginaReferencia" style="display:none">
                     <label>📖 Página de Referência</label>
                     <input type="text" id="dashEditPaginaReferencia" name="pagina_referencia" placeholder="Ex: Livro do Mestre p.137" maxlength="100" />
@@ -539,6 +551,8 @@
 <!-- SCRIPTS — CARREGAMENTO OTIMIZADO                                -->
 <!-- ════════════════════════════════════════════════════════════════ -->
 
+<datalist id="listaDivindadesDashboard"></datalist>
+
 <!-- FASE 1: Configuração Global -->
 <script>
     window.getApiUrl = function(path) {
@@ -602,7 +616,7 @@
 </script>
 
 <!-- FASE 7: DashboardController (carregado por último) -->
-<script src="/js/controllers/DashboardController.js"></script>
+<script src="/js/controllers/DashboardController.js?v=6"></script>
 
 </body>
 </html>

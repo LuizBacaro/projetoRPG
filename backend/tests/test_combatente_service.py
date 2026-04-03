@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import Mock, MagicMock
 from app.services.combatente_service import CombatenteService
 from app.models.combatente import Combatente
-from app.exceptions.custom_exceptions import CombatenteNaoEncontrado
+from app.exceptions.custom_exceptions import CombatenteNaoEncontrado, DadosInvalidos
 
 
 class TestCombatenteService:
@@ -107,3 +107,129 @@ class TestCombatenteService:
         # Assert
         assert resultado['hp_atual'] == 65
         mock_repository.update.assert_called_once()
+
+    def test_criar_clerigo_exige_exatamente_dois_dominios(self, service, mock_repository):
+        combatente_data = {
+            "nome": "Aela",
+            "tipo": "jogador",
+            "classe": "Clérigo",
+            "dominios": "Bem",
+            "hp_maximo": 18,
+            "iniciativa": 2,
+        }
+
+        with pytest.raises(DadosInvalidos):
+            service.criar(combatente_data)
+
+        mock_repository.create.assert_not_called()
+
+    def test_criar_clerigo_sem_dominios_permitido_no_cadastro_inicial(self, service, mock_repository):
+        combatente_data = {
+            "nome": "Luzia",
+            "tipo": "jogador",
+            "classe": "Clérigo",
+            "hp_maximo": 16,
+            "iniciativa": 1,
+        }
+
+        combatente_criado = Combatente(id=2, hp_atual=16, dominios="", **combatente_data)
+        mock_repository.create.return_value = combatente_criado
+        mock_repository.get_by_id.return_value = combatente_criado
+
+        resultado = service.criar(combatente_data)
+
+        assert resultado.id == 2
+        assert resultado.dominios == ""
+
+    def test_criar_nao_clerigo_limpa_dominios(self, service, mock_repository):
+        combatente_data = {
+            "nome": "Brom",
+            "tipo": "jogador",
+            "classe": "Guerreiro",
+            "dominios": "Bem, Proteção",
+            "hp_maximo": 20,
+            "iniciativa": 1,
+        }
+
+        def _create_side_effect(combatente):
+            combatente.id = 99
+            return combatente
+
+        mock_repository.create.side_effect = _create_side_effect
+        mock_repository.get_by_id.side_effect = lambda _id: Combatente(
+            id=_id,
+            nome="Brom",
+            tipo="jogador",
+            classe="Guerreiro",
+            dominios="",
+            hp_maximo=20,
+            hp_atual=20,
+            iniciativa=1,
+        )
+
+        resultado = service.criar(combatente_data)
+
+        assert resultado.dominios == ""
+
+    def test_atualizar_para_clerigo_sem_dominios_permitido_no_fluxo_generico(self, service, mock_repository):
+        existente = Combatente(
+            id=7,
+            nome="Nira",
+            tipo="jogador",
+            classe="Guerreiro",
+            dominios="",
+            hp_maximo=24,
+            hp_atual=24,
+            iniciativa=3,
+        )
+
+        atualizado = Combatente(
+            id=7,
+            nome="Nira",
+            tipo="jogador",
+            classe="Clérigo",
+            dominios="",
+            hp_maximo=24,
+            hp_atual=24,
+            iniciativa=3,
+        )
+
+        mock_repository.get_by_id.return_value = existente
+        mock_repository.update.side_effect = lambda combatente: combatente
+        mock_repository.get_by_id.side_effect = [existente, atualizado]
+
+        resultado = service.atualizar(7, {"classe": "Clérigo"})
+
+        assert resultado.classe == "Clérigo"
+        assert resultado.dominios == ""
+
+    def test_atualizar_para_nao_clerigo_remove_dominios(self, service, mock_repository):
+        existente = Combatente(
+            id=11,
+            nome="Kael",
+            tipo="jogador",
+            classe="Clérigo",
+            dominios="Bem, Proteção",
+            hp_maximo=30,
+            hp_atual=30,
+            iniciativa=2,
+        )
+
+        atualizado = Combatente(
+            id=11,
+            nome="Kael",
+            tipo="jogador",
+            classe="Guerreiro",
+            dominios="",
+            hp_maximo=30,
+            hp_atual=30,
+            iniciativa=2,
+        )
+
+        mock_repository.get_by_id.return_value = existente
+        mock_repository.update.side_effect = lambda combatente: combatente
+        mock_repository.get_by_id.side_effect = [existente, atualizado]
+
+        resultado = service.atualizar(11, {"classe": "Guerreiro"})
+
+        assert resultado.dominios == ""
