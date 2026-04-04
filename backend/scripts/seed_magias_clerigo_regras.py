@@ -30,8 +30,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CSV_COMPLETO = ROOT / "restricoes_clerigo_completo.csv"
-CSV_REGRAS = ROOT / "restries-de-magias-divinas-por-alinhamento-do-clrigo.csv"
+ASSETS_DIR = ROOT / "backend" / "scripts" / "assets"
+CSV_COMPLETO = ASSETS_DIR / "restricoes_clerigo_completo.csv"
+CSV_REGRAS = ASSETS_DIR / "restricoes_alinhamento_resumo.csv"
 SEED_MAGIAS_FILE = ROOT / "backend" / "scripts" / "seed_magias.py"
 SEED_DOMINIOS_FILE = ROOT / "backend" / "scripts" / "seed_dominios.py"
 OUT_DIR = ROOT / "backend" / "scripts" / "generated"
@@ -470,6 +471,7 @@ def save_outputs(payload: Dict[str, Any]) -> None:
 
 def main() -> None:
     if Path("/tmp/restricoes_clerigo_completo.csv").exists():
+        CSV_COMPLETO.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2("/tmp/restricoes_clerigo_completo.csv", CSV_COMPLETO)
 
     payload = build_seed()

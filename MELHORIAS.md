@@ -363,6 +363,72 @@
 
 ---
 
+## 🧭 Checklist 3 — Regras Divinas do Grimório + Confiabilidade
+
+> Entregue em 03–04/04/2026. Foco em restrições canônicas de magia por alinhamento/domínio,
+> diagnóstico de grimório e correção de modal de perfil divino na ficha.
+
+### 3.1 Regras Divinas — Backend
+
+- [x] **Restrição de magia por alinhamento para classes divinas**
+  - `grimorio_service.py`: função `_magia_bloqueada_por_alinhamento` com lookup no CSV canônico + fallback semântico por nome/descrição
+  - Classes divinas afetadas: `CLERIGO`, `DRUIDA`, `PALADINO` (Ranger excluído após análise de regras)
+  - Cobertura: adição manual, auto-adição por nível e remoção automática retroativa após mudança de alinhamento
+
+- [x] **Restrição de magia por domínio oposto para clérigo**
+  - `grimorio_service.py`: função `_magia_bloqueada_por_dominios_opostos` ampliada para bloquear qualquer magia com tag/semântica de domínio oposto, não apenas magias com flag de domínio
+  - Domínios opostos canônicos: BEM↔MAL, ORDEM↔CAOS
+
+- [x] **Validar comportamento contra matriz canônica de alinhamento**
+  - Matriz 9 alinhamentos × 4 tendências (BEM/MAL/ORDEM/CAOS) implementada como fixtures parametrizadas
+  - Assets canônicos versionados: `restricoes_clerigo_completo.{csv,xlsx}`
+  - Script de seed: `backend/scripts/seed_magias_clerigo_regras.py`
+
+- [x] **Endpoint de diagnóstico de grimório**
+  - `GET /api/v1/grimorio/{combatente_id}/diagnostico?classe=...`
+  - Retorna lista de magias com motivo de bloqueio/permissão por magia
+  - Schemas adicionados: `GrimorioDiagnosticoMagiaResponse`, `GrimorioDiagnosticoResponse`
+  - Método de serviço: `diagnosticar_regras_divinas()`
+
+- [x] **Cobertura de testes backend: 44 → 129 testes passando**
+  - Casos novos: druida/paladino bloqueado por domínio oposto, clérigo bloqueado por semântica de nome, fallback de alinhamento para spells sem tag, full matriz 9 linhas, endpoint diagnóstico
+
+### 3.2 Feedback Visual — Frontend Grimório
+
+- [x] **Notice contextual de regras ativas no grimório do clérigo**
+  - `GrimorioController.js`: aviso exibido quando classe é Clérigo com domínios configurados
+  - `grimorio.css`: estilos para variantes de alerta (info, warn, bloqueio)
+
+- [x] **Feedback de falha ao adicionar magia com motivo de bloqueio**
+  - `GrimorioController.js`: mapeamento de mensagem de erro da API para texto legível
+  - Card de preview identifica visualmente magias bloqueadas antes da tentativa
+
+### 3.3 Modal Perfil Divino — Frontend Ficha
+
+- [x] **Corrigir prefill de "Divindade" ao abrir modal**
+  - `Combatente.js`: campo `divindade` adicionado explicitamente com fallback legado `data.deidade`
+  - Root cause: campo não estava mapeado no construtor do modelo frontend
+
+- [x] **Centralizar leitura do perfil divino**
+  - `FichaPersonagemController.js`: helper `_lerPerfilDivino()` extrai alinhamento, divindade, domínio1, domínio2 de forma segura
+  - `abrirModalPerfilMagico()` refatorado para usar o helper, eliminando leitura direta duplicada
+
+- [x] **Testes unitários do perfil divino (frontend)**
+  - `frontend/test-ficha-perfil-simples.js`: 19 asserções, casos: mapeamento básico, fallback legado, helper com domínios, campos vazios, persistência após update, round-trip modal
+
+### 3.4 CI/CD
+
+- [x] **GitHub Actions: pipeline backend + frontend**
+  - `.github/workflows/ci.yml`: jobs `backend` (pytest, Python 3.9) e `frontend` (Node 18)
+  - Triggers: push e PR em `main`, `master`, `develop`
+
+- [x] **Makefile: `make test` unificado**
+  - `make test`: roda `pytest` + teste JS sequencialmente
+  - `make test-backend` e `make test-frontend` disponíveis individualmente
+  - `make lint`: flake8 opcional se instalado
+
+---
+
 ## 📌 Próxima Conversa
 
 Quando este checklist 2 começar, a próxima discussão pode partir de três frentes:

@@ -49,7 +49,7 @@
       "magia_de_dominio": "Magia adicional disponível para Clérigos baseada nos dois domínios escolhidos na criação do personagem.",
       "paginas_grimorio": "Para Magos, cada magia ocupa um número de páginas igual ao seu nível. O total de páginas é exibido como atributo do grimório.",
       "restricao_dominio": "Regra que impede Clérigos de acessarem magias de domínios opostos aos seus domínios escolhidos.",
-      "restricao_alinhamento": "Regra que impede personagens de conhecerem magias incompatíveis com seu alinhamento moral ou ético.",
+      "restricao_alinhamento": "Regra que impede personagens de conhecerem magias incompatíveis com seu alinhamento moral ou ético (Clérigo, Druida e Paladino).",
       "classe_acesso_completo": "Clérigo, Druida, Ranger e Paladino - classes que conhecem todas as magias de sua lista para seu nível atual, com adição automática ao grimório.",
       "classe_conhecimento_limitado": "Bardo, Feiticeiro e Mago - classes que conhecem um número específico de magias, selecionadas manualmente pelo jogador."
     }
