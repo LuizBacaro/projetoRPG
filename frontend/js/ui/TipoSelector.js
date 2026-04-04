@@ -37,6 +37,11 @@ export class TipoSelector {
                 }
             });
         });
+
+        const btnFechar = modal.querySelector('.modal-close');
+        if (btnFechar) {
+            btnFechar.addEventListener('click', () => this.fechar());
+        }
         
         // Mostrar modal
         setTimeout(() => {
@@ -57,7 +62,7 @@ export class TipoSelector {
             <div class="modal-content" style="max-width: 600px;">
                 <div class="modal-header">
                     <h2>⚔️ Escolha o Tipo de Combatente</h2>
-                    <button class="modal-close" onclick="fecharSeletorTipo()">&times;</button>
+                    <button class="modal-close" type="button">&times;</button>
                 </div>
                 <div style="padding: 2rem; display: flex; flex-direction: column; gap: 1rem;">
                     <button class="tipo-option btn-add-jogador" data-tipo="jogador" style="display: flex; align-items: center; padding: 1.5rem; border-radius: 12px; cursor: pointer; transition: all 0.3s; font-family: var(--fonte-texto); font-size: 1rem; text-align: left;">

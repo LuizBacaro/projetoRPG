@@ -1,7 +1,8 @@
 /*
    CombatenteCard.js
    SRP: renderizar card visual de combatente
-   ✅ HP e Iniciativa ocultados para Monstro/NPC em ambas as listas
+   ✅ HP para Jogadores
+   ✅ Iniciativa para TODOS (Jogadores, NPCs, Monstros)
    ✅ Regra por TIPO — independente do perfil do usuário
 */
 
@@ -11,7 +12,6 @@ export class CombatenteCard {
         const card = document.createElement('div');
         card.className = 'combatente-card' + (selecionado ? ' selecionado' : '');
 
-        // ✅ Apenas jogadores exibem HP e Iniciativa
         const isJogador = combatente.tipo === 'jogador';
 
         card.innerHTML = `
@@ -80,13 +80,16 @@ export class CombatenteCard {
     }
 
     static renderSelecionado(combatente, onRemover, onAtualizarHP, onAtualizarIniciativa) {
-        const card     = document.createElement('div');
+        const card = document.createElement('div');
         card.className = 'combatente-selecionado-card';
 
-        // ✅ Apenas jogadores exibem HP e Iniciativa
+        // ✅ CORRIGIDO: Apenas jogadores exibem HP
         const isJogador = combatente.tipo === 'jogador';
+        
+        // ✅ NOVO: Todos (Jogador, NPC, Monstro) exibem Iniciativa
+        const mostraIniciativa = true;
 
-        // Mestre ainda pode editar HP/Ini de jogadores
+        // Mestre ainda pode editar HP/Ini
         const isMestre = window.AuthService
             ? window.AuthService.isMestre()
             : true;
@@ -106,7 +109,7 @@ export class CombatenteCard {
                         <span>❤️</span>
                         ${isMestre
                             ? `<input type="number"
-                                      class="stat-input"
+                                      class="stat-input stat-input-hp"
                                       value="${combatente.hp_maximo}"
                                       min="1"
                                       data-original="${combatente.hp_maximo}"
@@ -115,38 +118,53 @@ export class CombatenteCard {
                             : `<span>${combatente.hp_maximo}</span>`
                         }
                     </div>
+                ` : ''}
+
+                ${mostraIniciativa ? `
                     <div class="selecionado-stat-ini">
                         <span>🎲</span>
                         ${isMestre
                             ? `<input type="number"
                                       class="stat-input stat-input-ini"
-                                      value="${combatente.iniciativa}"
-                                      title="Iniciativa">`
-                            : `<span>${combatente.iniciativa}</span>`
+                                      value="${combatente.iniciativa || 0}"
+                                      min="-10"
+                                      max="30"
+                                      title="Iniciativa"
+                                      data-combatente-id="${combatente.id}">`
+                            : `<span>${combatente.iniciativa || 0}</span>`
                         }
                     </div>
                 ` : ''}
             </div>
         `;
 
+        // Botão Remover
         card.querySelector('.btn-remover-selecionado')
             .addEventListener('click', (e) => {
                 e.stopPropagation();
                 onRemover(combatente.id);
             });
 
+        // Listener para HP (apenas Jogadores)
         if (isJogador && isMestre) {
-            const inputHP = card.querySelector('input[data-original]');
+            const inputHP = card.querySelector('.stat-input-hp');
             if (inputHP) {
-                inputHP.addEventListener('change', () =>
-                    onAtualizarHP(combatente.id, combatente.hp_atual, parseInt(inputHP.value) || 1)
-                );
+                inputHP.addEventListener('change', () => {
+                    const novoHP = parseInt(inputHP.value) || combatente.hp_maximo;
+                    onAtualizarHP(combatente.id, combatente.hp_atual, novoHP);
+                });
             }
+        }
+
+        // Listener para Iniciativa (TODOS: Jogador, NPC, Monstro)
+        if (mostraIniciativa && isMestre) {
             const inputIni = card.querySelector('.stat-input-ini');
             if (inputIni) {
-                inputIni.addEventListener('change', () =>
-                    onAtualizarIniciativa(combatente.id, parseInt(inputIni.value) || 0)
-                );
+                inputIni.addEventListener('change', () => {
+                    const novaIniciativa = parseInt(inputIni.value) || 0;
+                    console.log(`⚡ Atualizando iniciativa de ${combatente.nome}: ${novaIniciativa}`);
+                    onAtualizarIniciativa(combatente.id, novaIniciativa);
+                });
             }
         }
 

@@ -12,42 +12,136 @@
     <link rel="stylesheet" href="/css/usuarios.css" />
     
 </head>
-<body>
-    <div class="container">
-
-        <div class="page-header">
-            <h1>👤 Gerenciamento de Usuários</h1>
-            <div style="display:flex; gap:.75rem;">
-                <a href="/dashboard" class="btn btn-secondary">← Dashboard</a>
-                <button id="btnNovoUsuario" class="btn btn-primary">+ Novo Usuário</button>
+<body class="usuarios-page">
+    <div class="usuarios-shell">
+        <header class="usuarios-hero">
+            <div class="usuarios-hero-copy">
+                <span class="usuarios-kicker">Painel Administrativo</span>
+                <h1>Governança de Usuários</h1>
+                <p>
+                    Controle perfis, estados de acesso e rastreabilidade operacional em uma superfície
+                    mais clara, mais rápida de ler e mais coerente com o restante da Arena.
+                </p>
             </div>
-        </div>
 
-        <div class="card">
-            <table class="tabela-usuarios">
-                <thead>
-                    <tr>
-                        <th>Perfil</th>
-                        <th>Nome</th>
-                        <th>E-mail</th>
-                        <th>Status</th>
-                        <th>Responsável</th>
-                        <th>Data da Ação</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaUsuarios">
-                    <tr><td colspan="7" style="text-align:center;padding:2rem;">Carregando...</td></tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="usuarios-hero-side">
+                <div class="usuarios-admin-card">
+                    <span class="usuarios-admin-label">Sessão atual</span>
+                    <strong id="nomeAdminAtual">Administrador</strong>
+                    <span id="perfilAdminAtual">administrador</span>
+                </div>
 
+                <div class="usuarios-hero-actions">
+                    <a href="/dashboard" class="btn btn-secondary usuarios-btn-voltar">← Dashboard</a>
+                    <button id="btnNovoUsuario" class="btn btn-primary usuarios-btn-novo">+ Novo Usuário</button>
+                </div>
+            </div>
+        </header>
+
+        <section class="usuarios-overview" aria-label="Resumo de usuários">
+            <article class="usuarios-stat-card usuarios-stat-card-total">
+                <span class="usuarios-stat-label">Total</span>
+                <strong id="statTotalUsuarios">0</strong>
+                <small>base cadastrada</small>
+            </article>
+
+            <article class="usuarios-stat-card usuarios-stat-card-ativos">
+                <span class="usuarios-stat-label">Ativos</span>
+                <strong id="statUsuariosAtivos">0</strong>
+                <small>acesso liberado</small>
+            </article>
+
+            <article class="usuarios-stat-card usuarios-stat-card-governanca">
+                <span class="usuarios-stat-label">Governança</span>
+                <strong id="statUsuariosGovernanca">0</strong>
+                <small>admins + mestres</small>
+            </article>
+
+            <article class="usuarios-stat-card usuarios-stat-card-inativos">
+                <span class="usuarios-stat-label">Inativos</span>
+                <strong id="statUsuariosInativos">0</strong>
+                <small>acesso bloqueado</small>
+            </article>
+        </section>
+
+        <section class="usuarios-toolbar" aria-label="Filtros e busca">
+            <div class="usuarios-toolbar-copy">
+                <span class="usuarios-toolbar-eyebrow">Leitura operacional</span>
+                <h2>Filtrar e revisar</h2>
+                <p id="resumoFiltrado">Carregando registros...</p>
+            </div>
+
+            <div class="usuarios-toolbar-controls">
+                <label class="usuarios-field usuarios-field-busca">
+                    <span>Buscar</span>
+                    <input id="filtroBuscaUsuarios" type="search" placeholder="Nome, e-mail ou responsável" />
+                </label>
+
+                <label class="usuarios-field">
+                    <span>Perfil</span>
+                    <select id="filtroPerfilUsuarios">
+                        <option value="todos">Todos</option>
+                        <option value="administrador">Administradores</option>
+                        <option value="mestre">Mestres</option>
+                        <option value="jogador">Jogadores</option>
+                    </select>
+                </label>
+
+                <label class="usuarios-field">
+                    <span>Status</span>
+                    <select id="filtroStatusUsuarios">
+                        <option value="todos">Todos</option>
+                        <option value="ativo">Ativos</option>
+                        <option value="inativo">Inativos</option>
+                    </select>
+                </label>
+            </div>
+        </section>
+
+        <section class="usuarios-table-shell card">
+            <div class="usuarios-table-header">
+                <div>
+                    <span class="usuarios-table-kicker">Registro administrativo</span>
+                    <h2>Usuários da plataforma</h2>
+                </div>
+                <div class="usuarios-table-note">Alterações críticas devem manter trilha de auditoria e revisão visual clara.</div>
+            </div>
+
+            <div class="tabela-usuarios-container">
+                <table class="tabela-usuarios">
+                    <thead>
+                        <tr>
+                            <th>Perfil</th>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Status</th>
+                            <th>Responsável</th>
+                            <th>Data da Ação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaUsuarios">
+                        <tr><td colspan="7" class="usuarios-loading">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 
     <!-- Modal de cadastro/edição -->
     <div id="modalUsuario" class="modal-overlay">
         <div class="modal-box">
-            <h2 id="modalUsuarioTitulo">Novo Usuário</h2>
+            <div class="modal-header-usuarios">
+                <div>
+                    <span class="modal-kicker-usuarios">Cadastro administrativo</span>
+                    <h2 id="modalUsuarioTitulo">Novo Usuário</h2>
+                </div>
+                <button type="button" id="btnFecharModalUsuario" class="modal-close-usuarios" aria-label="Fechar modal">×</button>
+            </div>
+
+            <p class="modal-descricao-usuarios" id="modalUsuarioDescricao">
+                Defina identidade, nível de acesso e estado operacional do usuário.
+            </p>
 
             <div id="avisoInativo" class="aviso-inativo">
                 ⚠️ Usuário inativo — somente o Status pode ser alterado.
@@ -99,9 +193,11 @@
     -->
     <script type="module">
         import { getApiUrl } from '/js/config/api.config.js';
+        import { Toast } from '/js/ui/toast.module.js';
 
         // Expõe globalmente para os scripts carregados dinamicamente
         window.getApiUrl = getApiUrl;
+        window.Toast = Toast;
 
         const carregar = (src) => new Promise((resolve, reject) => {
             const s     = document.createElement('script');
@@ -115,12 +211,19 @@
         await carregar('/js/services/AuthService.js');
         AuthService.exigirLogin();
 
+        const nomeAdminAtual = document.getElementById('nomeAdminAtual');
+        const perfilAdminAtual = document.getElementById('perfilAdminAtual');
+        if (nomeAdminAtual) nomeAdminAtual.textContent = AuthService.getNome();
+        if (perfilAdminAtual) perfilAdminAtual.textContent = AuthService.getPerfil() || 'administrador';
+
         if (!AuthService.isAdmin()) {
-            alert('Acesso restrito a Administradores.');
+            Toast.error('Acesso restrito a administradores.');
             window.location.href = '/dashboard';
+            throw new Error('Acesso restrito: usuario sem perfil administrador.');
         }
 
         // 2️⃣ Scripts em ordem (cada um depende do anterior)
+        await carregar('/js/ui/ModalConfirm.js');
         await carregar('/js/services/UsuarioService.js');
         await carregar('/js/ui/ModalUsuario.js');
         await carregar('/js/controllers/UsuarioController.js');

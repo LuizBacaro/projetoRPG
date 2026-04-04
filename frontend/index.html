@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arena de Combate TTRPG</title>
     <link rel="stylesheet" href="/css/variables.css">
-    <link rel="stylesheet" href="/css/layout.css">
-    <link rel="stylesheet" href="/css/combatentes.css">
+    <link rel="stylesheet" href="/css/layout.css?v=20260401a">
+    <link rel="stylesheet" href="/css/combatentes.css?v=20260401a">
     <link rel="stylesheet" href="/css/botoes.css">
     <link rel="stylesheet" href="/css/formularios.css">
     <link rel="stylesheet" href="/css/modais.css">
     <link rel="stylesheet" href="/css/arena.css">
     <link rel="stylesheet" href="/css/modal-condicao.css">
-    <link rel="stylesheet" href="/css/responsivo.css">
+    <link rel="stylesheet" href="/css/responsivo.css?v=20260401a">
     <style>
         .header-arena-nav {
             display: flex;
@@ -66,7 +66,7 @@
 </head>
 <body>
 
-<!-- ── Tela de Configuração ─────────────────────────────────────────── -->
+<!-- ── Tela de Configuração  -->
 <div id="telaConfiguracao" class="tela ativa">
     <header>
         <div class="header-arena-nav">
@@ -118,9 +118,7 @@
             <span class="rodada-badge">Rodada <strong id="rodadaAtual">1</strong></span>
         </div>
 
-        <!-- ✅ ADICIONA AQUI — chama o window._finalizarCombate que já existe -->
-        <button class="btn-encerrar-combate" id="btnEncerrarCombate"
-                onclick="window._finalizarCombate && window._finalizarCombate()">
+        <button class="btn-encerrar-combate" id="btnEncerrarCombate">
             🏳️ Encerrar Combate
         </button>
     </header>
@@ -144,8 +142,8 @@
                     <div id="arenaFotoAtivo" class="arena-foto-vertical-container"></div>
                     <div class="arena-lateral-acoes">
                         <div class="arena-lateral-acoes-titulo">Aplicar</div>
-                        <button class="arena-btn-dano-cura" onclick="window.abrirModalDanoCura && window.abrirModalDanoCura()">⚔️ Dano / Cura</button>
-                        <button class="arena-btn-condicao"  onclick="window.abrirModalCondicao && window.abrirModalCondicao()">🔮 Condição</button>
+                        <button class="arena-btn-dano-cura" id="btnAbrirModalDanoCura">⚔️ Dano / Cura</button>
+                        <button class="arena-btn-condicao" id="btnAbrirModalCondicao">🔮 Condição</button>
                     </div>
                 </div>
 
@@ -161,12 +159,12 @@
     </div>
 </div>
 
-<!-- ── Modal de Edição (mantido — edição de combatente ainda existe na arena) -->
+<!-- ── Modal de Edição ── -->
 <div id="modalEdicao" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>✏️ Editar Combatente</h2>
-            <button class="modal-close" onclick="fecharModalEdicao()">×</button>
+            <button class="modal-close" id="btnFecharModalEdicaoTopo">×</button>
         </div>
         <form id="formEdicao" enctype="multipart/form-data">
             <input type="hidden" id="editId" name="id">
@@ -237,7 +235,7 @@
                         </div>
                         <div class="upload-preview-vertical" id="editUploadPreview" style="display:none">
                             <img id="editPreviewImage" src="" alt="Preview">
-                            <button type="button" class="btn-remove-image-vertical" onclick="removerImagemEdicao()">✕</button>
+                            <button type="button" class="btn-remove-image-vertical" id="btnRemoverImagemEdicao">✕</button>
                         </div>
                     </div>
                 </div>
@@ -251,19 +249,19 @@
                             <div class="atributo-field">
                                 <label for="editFOR">FOR</label>
                                 <div class="atributo-circles-container">
-                                    <input type="number" id="editFOR" name="forca" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <input type="number" id="editFOR" name="forca" value="10" min="1" max="30" class="arena-edit-atributo-input">
                                 </div>
                             </div>
                             <div class="atributo-field">
                                 <label for="editDEX">DES</label>
                                 <div class="atributo-circles-container">
-                                    <input type="number" id="editDEX" name="destreza" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <input type="number" id="editDEX" name="destreza" value="10" min="1" max="30" class="arena-edit-atributo-input">
                                 </div>
                             </div>
                             <div class="atributo-field">
                                 <label for="editCON">CON</label>
                                 <div class="atributo-circles-container">
-                                    <input type="number" id="editCON" name="constituicao" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <input type="number" id="editCON" name="constituicao" value="10" min="1" max="30" class="arena-edit-atributo-input">
                                 </div>
                             </div>
                         </div>
@@ -271,19 +269,19 @@
                             <div class="atributo-field">
                                 <label for="editINT">INT</label>
                                 <div class="atributo-circles-container">
-                                    <input type="number" id="editINT" name="inteligencia" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <input type="number" id="editINT" name="inteligencia" value="10" min="1" max="30" class="arena-edit-atributo-input">
                                 </div>
                             </div>
                             <div class="atributo-field">
                                 <label for="editWIS">SAB</label>
                                 <div class="atributo-circles-container">
-                                    <input type="number" id="editWIS" name="sabedoria" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <input type="number" id="editWIS" name="sabedoria" value="10" min="1" max="30" class="arena-edit-atributo-input">
                                 </div>
                             </div>
                             <div class="atributo-field">
                                 <label for="editCHA">CAR</label>
                                 <div class="atributo-circles-container">
-                                    <input type="number" id="editCHA" name="carisma" value="10" min="1" max="30" onchange="atualizarModificador(this)">
+                                    <input type="number" id="editCHA" name="carisma" value="10" min="1" max="30" class="arena-edit-atributo-input">
                                 </div>
                             </div>
                         </div>
@@ -292,20 +290,20 @@
             </div>
 
             <div class="modal-actions">
-                <button type="button" class="btn-secundario" onclick="fecharModalEdicao()">Cancelar</button>
-                <button type="button" class="btn-delete" onclick="confirmarDelecao()">🗑️ Deletar</button>
+                <button type="button" class="btn-secundario" id="btnCancelarEdicao">Cancelar</button>
+                <button type="button" class="btn-delete" id="btnDeletarEdicao">🗑️ Deletar</button>
                 <button type="submit" class="btn-iniciar">💾 Salvar Alterações</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- ── Modal Dano/Cura ───────────────────────────────────────────────── -->
+<!-- ── Modal Dano/Cura ── -->
 <div id="modalDanoCura" class="modal-dano-overlay">
     <div class="modal-dano-container">
         <div class="modal-dano-header">
             <h2>⚔️ Aplicar Dano / Cura</h2>
-            <button class="modal-dano-fechar" onclick="modalDanoCuraInstance.fechar()">✕</button>
+            <button class="modal-dano-fechar" id="btnFecharModalDanoCuraTopo">✕</button>
         </div>
         <div class="modal-dano-body">
             <div class="modal-dano-layout">
@@ -326,30 +324,57 @@
             </div>
         </div>
         <div class="modal-dano-footer">
-            <button class="btn-cancelar-dano" onclick="modalDanoCuraInstance.fechar()">❌ Cancelar</button>
-            <button class="btn-aplicar-dano" onclick="modalDanoCuraInstance.aplicar()">✅ Aplicar Dano / Cura</button>
+            <button class="btn-cancelar-dano" id="btnCancelarModalDanoCura">❌ Cancelar</button>
+            <button class="btn-aplicar-dano" id="btnAplicarModalDanoCura">✅ Aplicar Dano / Cura</button>
         </div>
     </div>
 </div>
 
-<!-- ── Scripts ───────────────────────────────────────────────────────── -->
-<!-- 1. api.config — carregado como MODULE para suportar export -->
+<!--  -->
+<!-- SCRIPTS — Padrão Unificado ES Modules + Global Scripts        -->
+<!--  -->
+
+<!-- FASE 1: API Config (ES Module) -->
 <script type="module">
     import { getApiUrl } from '/js/config/api.config.js';
     window.getApiUrl = getApiUrl;
+    console.log('✅ FASE 1: getApiUrl pronto');
 </script>
 
-<!-- 2. AuthService — global, carregado antes de tudo -->
-<script src="/js/services/AuthService.js"></script>
+<!-- FASE 2: Toast (ES Module) -->
+<script type="module">
+    import { Toast } from '/js/ui/toast.module.js';
+    window.Toast = Toast;
+    console.log('✅ FASE 2: Toast pronto');
+    setTimeout(() => window.dispatchEvent(new CustomEvent('phase2-ready')), 100);
+</script>
 
-<!-- 3. Demais serviços globais -->
-<script src="/js/services/DanoCuraService.js"></script>
-<script src="/js/ui/ModalDanoCura.js"></script>
-<script src="/js/services/CondicaoService.js"></script>
-<script src="/js/ui/CondicaoUI.js"></script>
+<!-- FASE 3: AuthService (Global) -->
+<script src="/js/services/AuthService.js?v=20260329"></script>
 
-<!-- 4. Main — ES module (ConfiguracaoController, ArenaController, etc.) -->
-<script type="module" src="/js/main.js"></script>
+<!-- FASE 4: ModalConfirm (Global + ES Module export) -->
+<script src="/js/ui/ModalConfirm.js"></script>
+
+<!-- FASE 5: ModalEdicao (Global - usa ModalConfirm global) -->
+<script src="/js/ui/ModalEdicao.js"></script>
+
+<!-- FASE 6: Serviços -->
+<script src="/js/services/DanoCuraService.js?v=20260329"></script>
+<script>
+    if (typeof escapeHtml === 'undefined') {
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        }
+        window.escapeHtml = escapeHtml;
+    }
+</script>
+<script src="/js/ui/ModalDanoCura.js?v=20260329"></script>
+<script src="/js/services/CondicaoService.js?v=20260329"></script>
+<script src="/js/ui/CondicaoUI.js?v=20260329"></script>
+
+<!-- FASE 7: Main (ES Module - carregadores e controllers) -->
+<script type="module" src="/js/main.js?v=20260401b"></script>
 
 </body>
 </html>

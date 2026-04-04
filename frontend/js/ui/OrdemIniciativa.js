@@ -2,6 +2,8 @@
  * Componente de Ordem de Iniciativa
  * Princípio SOLID: Single Responsibility - renderizar ordem de iniciativa
  */
+import { escapeHtml } from '../utils/formatters.js';
+
 export class OrdemIniciativa {
     
     /**
@@ -42,7 +44,7 @@ export class OrdemIniciativa {
             item.innerHTML = `
                 ${statusIcon}
                 <div class="ordem-info">
-                    <div class="ordem-nome">${combatente.nome}</div>
+                    <div class="ordem-nome">${escapeHtml(combatente.nome)}</div>
                     <div class="ordem-detalhes">
                         <span class="ordem-iniciativa">Ini: ${combatente.iniciativa}</span>
                         <span class="ordem-hp ${combatente.hp_atual < combatente.hp_maximo * 0.25 ? 'ordem-hp-critical' : ''}">

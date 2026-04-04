@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from ...core.database import get_db
+from ...core.deps import requer_dono_ou_admin_combatente, requer_dono_ou_admin_slot_magia
 from ...repositories.ataque_repository import AtaqueRepository
 from ...repositories.combatente_repository import CombatenteRepository
 from ...services.ataque_service import AtaqueService
@@ -30,7 +31,8 @@ def get_ataque_service(db: Session = Depends(get_db)) -> AtaqueService:
 @router.get("/combatentes/{combatente_id}/ataques",
             response_model=List[AtaqueResponse])
 def listar_ataques(combatente_id: int,
-                   service: AtaqueService = Depends(get_ataque_service)):
+                   service: AtaqueService = Depends(get_ataque_service),
+                   _: object = Depends(requer_dono_ou_admin_combatente)):
     try:
         return service.listar_ataques(combatente_id)
     except CombatenteNaoEncontrado as e:
@@ -41,7 +43,8 @@ def listar_ataques(combatente_id: int,
             response_model=List[AtaqueResponse])
 def salvar_ataques(combatente_id: int,
                    payload: AtaquesBulkRequest,
-                   service: AtaqueService = Depends(get_ataque_service)):
+                   service: AtaqueService = Depends(get_ataque_service),
+                   _: object = Depends(requer_dono_ou_admin_combatente)):
     """Substitui todos os ataques do combatente (bulk replace)."""
     try:
         return service.salvar_ataques(combatente_id, payload.ataques)
@@ -54,7 +57,8 @@ def salvar_ataques(combatente_id: int,
 @router.get("/combatentes/{combatente_id}/magias",
             response_model=List[MagiaSlotResponse])
 def listar_magias(combatente_id: int,
-                  service: AtaqueService = Depends(get_ataque_service)):
+                  service: AtaqueService = Depends(get_ataque_service),
+                  _: object = Depends(requer_dono_ou_admin_combatente)):
     try:
         return service.listar_magias(combatente_id)
     except CombatenteNaoEncontrado as e:
@@ -65,7 +69,8 @@ def listar_magias(combatente_id: int,
             response_model=List[MagiaSlotResponse])
 def salvar_magias(combatente_id: int,
                   payload: MagiasBulkRequest,
-                  service: AtaqueService = Depends(get_ataque_service)):
+                  service: AtaqueService = Depends(get_ataque_service),
+                  _: object = Depends(requer_dono_ou_admin_combatente)):
     """Substitui todos os slots de magia do combatente (bulk replace)."""
     try:
         return service.salvar_magias(combatente_id, payload.slots)
@@ -77,7 +82,8 @@ def salvar_magias(combatente_id: int,
               response_model=MagiaSlotResponse)
 def atualizar_usados(slot_id: int,
                      data: MagiaSlotUpdate,
-                     service: AtaqueService = Depends(get_ataque_service)):
+                     service: AtaqueService = Depends(get_ataque_service),
+                     _: object = Depends(requer_dono_ou_admin_slot_magia)):
     """Atualiza apenas 'usados' de um slot — chamado na arena."""
     slot = service.atualizar_usados(slot_id, data.usados)
     if not slot:

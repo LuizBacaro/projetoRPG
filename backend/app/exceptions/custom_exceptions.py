@@ -35,6 +35,13 @@ class CombateFinalizadoError(ArenaBaseException):
         super().__init__(message, status_code=400)
 
 
+class ConcurrencyConflictError(ArenaBaseException):
+    """Exceção para conflito de concorrência por versão de combate desatualizada."""
+
+    def __init__(self, message: str = "Conflito de concorrência no combate"):
+        super().__init__(message, status_code=409)
+
+
 class InvalidHPError(ArenaBaseException):
     """Exceção para valores de HP inválidos"""
     def __init__(self, message: str = "Valor de HP inválido"):

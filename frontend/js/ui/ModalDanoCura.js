@@ -114,16 +114,24 @@ class ModalDanoCura {
                         type="checkbox"
                         id="dano-check-${c.id}"
                         value="${c.id}"
-                        onchange="modalDanoCuraInstance.toggleCombatente(${c.id})"
                     >
                     <label for="dano-check-${c.id}">
-                        <span class="combatente-nome">${c.nome}</span>
+                        <span class="combatente-nome">${escapeHtml(c.nome)}</span>
                         ${spanHP}
                         <span class="badge badge-${c.tipo.toLowerCase()}">${c.tipo}</span>
                     </label>
                 </div>
             `;
         }).join('');
+
+        container.querySelectorAll('input[type="checkbox"][id^="dano-check-"]').forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                const combatenteId = Number(checkbox.value);
+                if (Number.isFinite(combatenteId)) {
+                    this.toggleCombatente(combatenteId);
+                }
+            });
+        });
     }
 
     // ── Toggle combatente selecionado ─────────────────────────────────────

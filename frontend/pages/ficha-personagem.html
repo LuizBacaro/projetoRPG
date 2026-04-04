@@ -4,205 +4,736 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha do Personagem</title>
-    <link rel="stylesheet" href="../css/ficha-personagem.css">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/modais.css">
+    <link rel="stylesheet" href="../css/ficha-personagem.css?v=5">
+    <link rel="stylesheet" href="../css/grimorio.css?v=20260402a">
 </head>
 <body>
+<div class="ficha-wrapper">
 
-    <div class="ficha-wrapper">
-
-        <!-- ── HEADER ── -->
-        <header class="ficha-header">
-            <div class="ficha-header-esquerda">
-                <button class="btn-voltar" onclick="window.close()">← Voltar</button>
-            </div>
-            <div class="ficha-titulo">
-                <h1 class="ficha-titulo-texto">📜 Ficha do Personagem</h1>
-            </div>
-            <div class="ficha-header-direita"></div>
-        </header>
-
-        <!-- ── CORPO PRINCIPAL ── -->
-        <main class="ficha-corpo">
-
-            <!-- COLUNA ESQUERDA: foto + identidade + perícias -->
-            <aside class="ficha-coluna-esquerda">
-
-                <!-- Foto -->
-                <div class="ficha-foto-container">
-                    <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto">
-                    <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
-                </div>
-
-                <!-- Identidade -->
-                <div class="ficha-identidade">
-                    <h2 id="fichaNome" class="ficha-nome">—</h2>
-                    <div class="ficha-meta">
-                        <span id="fichaRaca" class="ficha-tag ficha-tag-raca">—</span>
-                        <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
-                        <span id="fichaTipo" class="ficha-tag ficha-tag-tipo">—</span>
-                    </div>
-                    <div class="ficha-nivel-linha">
-                        <span class="ficha-nivel-label">Nível</span>
+    <!-- ── Header ── -->
+    <header class="ficha-header">
+        <div class="ficha-header-esquerda">
+            <button class="btn-voltar" id="btnVoltarFicha">← Voltar</button>
+        </div>
+        <div class="ficha-titulo">
+            <h1 class="ficha-titulo-texto">📜 <span id="fichaHeaderNome">Ficha do Personagem</span></h1>
+            <div class="ficha-header-identity">
+                <div class="ficha-meta">
+                    <span id="fichaRaca"   class="ficha-tag ficha-tag-raca">—</span>
+                    <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
+                    <span id="fichaTipo"   class="ficha-tag ficha-tag-tipo">—</span>
+                    <span class="ficha-tag ficha-tag-nivel">
+                        <span class="ficha-nivel-label">Nív.</span>
                         <span id="fichaNivel" class="ficha-nivel-valor">—</span>
+                    </span>
+                </div>
+                <div class="ficha-meta ficha-meta-secundaria">
+                    <span id="fichaAlinhamento" class="ficha-tag ficha-tag-alinhamento">Alinhamento: —</span>
+                    <span id="fichaDivindade"   class="ficha-tag ficha-tag-alinhamento">Divindade: —</span>
+                    <span id="fichaDominios"    class="ficha-tag ficha-tag-dominio">Domínios: —</span>
+                    <button id="btnEditarPerfilMagico" class="ficha-btn-editar-identidade" type="button">✏️ Editar</button>
+                </div>
+            </div>
+        </div>
+        <div class="ficha-header-direita">
+            <!-- ✅ NOVO: Botão Grimório — visível apenas para classes conjuradoras -->
+            <button class="btn-grimorio" id="btnGrimorio" style="display:none">
+                📖 Grimório
+            </button>
+        </div>
+    </header>
+
+    <!-- ── Corpo: 3 colunas ── -->
+    <main class="ficha-corpo">
+
+        <!-- COLUNA ESQUERDA: atributos -->
+        <aside class="ficha-coluna-esquerda">
+
+            <!-- Atributos resumo (3 colunas × 2 linhas) -->
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">⚔️ Atributos</h3>
+                <div class="ficha-atributos-circulo-grid-resumo">
+                    <div class="ficha-atributo-circulo" data-id="forca">
+                        <div class="circulo-externo">
+                            <span class="circulo-valor" id="fichaForResumo">10</span>
+                            <span class="circulo-mod" id="fichaForModResumo">+0</span>
+                        </div>
+                        <span class="circulo-label">FOR</span>
+                    </div>
+                    <div class="ficha-atributo-circulo" data-id="destreza">
+                        <div class="circulo-externo">
+                            <span class="circulo-valor" id="fichaDesResumo">10</span>
+                            <span class="circulo-mod" id="fichaDesModResumo">+0</span>
+                        </div>
+                        <span class="circulo-label">DES</span>
+                    </div>
+                    <div class="ficha-atributo-circulo" data-id="constituicao">
+                        <div class="circulo-externo">
+                            <span class="circulo-valor" id="fichaConResumo">10</span>
+                            <span class="circulo-mod" id="fichaConModResumo">+0</span>
+                        </div>
+                        <span class="circulo-label">CON</span>
+                    </div>
+                    <div class="ficha-atributo-circulo" data-id="inteligencia">
+                        <div class="circulo-externo">
+                            <span class="circulo-valor" id="fichaIntResumo">10</span>
+                            <span class="circulo-mod" id="fichaIntModResumo">+0</span>
+                        </div>
+                        <span class="circulo-label">INT</span>
+                    </div>
+                    <div class="ficha-atributo-circulo" data-id="sabedoria">
+                        <div class="circulo-externo">
+                            <span class="circulo-valor" id="fichaSabResumo">10</span>
+                            <span class="circulo-mod" id="fichaSabModResumo">+0</span>
+                        </div>
+                        <span class="circulo-label">SAB</span>
+                    </div>
+                    <div class="ficha-atributo-circulo" data-id="carisma">
+                        <div class="circulo-externo">
+                            <span class="circulo-valor" id="fichaCarResumo">10</span>
+                            <span class="circulo-mod" id="fichaCarModResumo">+0</span>
+                        </div>
+                        <span class="circulo-label">CAR</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Perícias -->
-                <div class="ficha-secao">
-                    <h3 class="ficha-secao-titulo">⚡ Perícias</h3>
-                    <div id="fichaPericiasLista" class="ficha-pericias-lista">
-                        <span class="ficha-vazio">Nenhuma perícia cadastrada</span>
+            <!-- Defesa: CA / PV / Iniciativa -->
+            <div class="ficha-defesa-row">
+                <div class="ficha-defesa-box ficha-ca-box">
+                    <span class="ficha-defesa-label">CA</span>
+                    <span id="fichaCa" class="ficha-defesa-valor">10</span>
+                    <div class="ficha-ca-detalhes">
+                        <div class="ficha-ca-sub">
+                            <span class="ficha-ca-sub-label">Toque</span>
+                            <span id="fichaToque" class="ficha-ca-sub-valor">10</span>
+                        </div>
+                        <div class="ficha-ca-sub">
+                            <span class="ficha-ca-sub-label">Surpresa</span>
+                            <span id="fichaSurpresa" class="ficha-ca-sub-valor">10</span>
+                        </div>
                     </div>
                 </div>
+                <div class="ficha-defesa-box ficha-pv-box">
+                    <span class="ficha-defesa-label">PV</span>
+                    <span id="fichaPv" class="ficha-defesa-valor ficha-pv-valor">—/—</span>
+                    <div class="ficha-pv-barra-wrap">
+                        <div class="ficha-pv-barra">
+                            <div id="fichaPvFill" class="ficha-pv-fill" style="width:100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ficha-defesa-box ficha-ini-box">
+                    <span class="ficha-defesa-label">Iniciativa</span>
+                    <span id="fichaIniciativa" class="ficha-defesa-valor">+0</span>
+                </div>
+            </div>
 
-                <!-- Equipamentos -->
-                <div class="ficha-secao">
+            <!-- Talentos -->
+            <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">🌟 Talentos</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarTalento" 
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaTalentos" class="ficha-talentos-lista">
+                    <span class="ficha-vazio">Nenhum talento cadastrado</span>
+                </div>
+            </div>
+
+            <!-- Equipamentos -->
+            <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
-                    <div id="fichaEquipamentos" class="ficha-equipamentos-lista">
-                        <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarEquipamento"
+                            title="Adicionar equipamento">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaEquipamentos" class="ficha-equipamentos-lista">
+                    <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- COLUNA CENTRAL: foto + resistências -->
+        <section class="ficha-coluna-central">
+
+            <!-- Foto do personagem -->
+            <div class="ficha-foto-container">
+                <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto">
+                <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
+            </div>
+
+            <!-- Resistências -->
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">🛡️ Resistências</h3>
+                <div class="ficha-resistencias-row">
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Fortitude</span>
+                        <span id="fichaFort" class="ficha-res-valor">+0</span>
+                    </div>
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Reflexos</span>
+                        <span id="fichaReflex" class="ficha-res-valor">+0</span>
+                    </div>
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Vontade</span>
+                        <span id="fichaVont" class="ficha-res-valor">+0</span>
                     </div>
                 </div>
+            </div>
 
-            </aside>
+        </section>
 
-            <!-- COLUNA CENTRAL: atributos + defesa + resistências + condições -->
-            <section class="ficha-coluna-central">
+        <!-- COLUNA DIREITA: armadura + ataques + slots resumo + perícias -->
+        <aside class="ficha-coluna-direita">
 
-                <!-- Atributos em círculos -->
-                <div class="ficha-secao">
-                    <h3 class="ficha-secao-titulo">⚔️ Atributos</h3>
-                    <div class="ficha-atributos-circulo-grid">
-                        <div class="ficha-atributo-circulo" data-id="forca">
-                            <div class="circulo-externo">
-                                <span class="circulo-valor" id="fichaFor">10</span>
-                                <span class="circulo-mod"  id="fichaForMod">+0</span>
-                            </div>
-                            <span class="circulo-label">FOR</span>
-                        </div>
-                        <div class="ficha-atributo-circulo" data-id="destreza">
-                            <div class="circulo-externo">
-                                <span class="circulo-valor" id="fichaDes">10</span>
-                                <span class="circulo-mod"  id="fichaDesMod">+0</span>
-                            </div>
-                            <span class="circulo-label">DES</span>
-                        </div>
-                        <div class="ficha-atributo-circulo" data-id="constituicao">
-                            <div class="circulo-externo">
-                                <span class="circulo-valor" id="fichaCon">10</span>
-                                <span class="circulo-mod"  id="fichaConMod">+0</span>
-                            </div>
-                            <span class="circulo-label">CON</span>
-                        </div>
-                        <div class="ficha-atributo-circulo" data-id="inteligencia">
-                            <div class="circulo-externo">
-                                <span class="circulo-valor" id="fichaInt">10</span>
-                                <span class="circulo-mod"  id="fichaIntMod">+0</span>
-                            </div>
-                            <span class="circulo-label">INT</span>
-                        </div>
-                        <div class="ficha-atributo-circulo" data-id="sabedoria">
-                            <div class="circulo-externo">
-                                <span class="circulo-valor" id="fichaSab">10</span>
-                                <span class="circulo-mod"  id="fichaSabMod">+0</span>
-                            </div>
-                            <span class="circulo-label">SAB</span>
-                        </div>
-                        <div class="ficha-atributo-circulo" data-id="carisma">
-                            <div class="circulo-externo">
-                                <span class="circulo-valor" id="fichaCar">10</span>
-                                <span class="circulo-mod"  id="fichaCarMod">+0</span>
-                            </div>
-                            <span class="circulo-label">CAR</span>
-                        </div>
+            <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">🛡️ Armadura/Item de Proteção</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarArmaduraProtecao" title="Adicionar armadura/item de proteção">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaArmadurasProtecao" class="ficha-equipamentos-lista">
+                    <span class="ficha-vazio">Nenhuma armadura/item de proteção cadastrado</span>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">⚔️ Ataques</h3>
+                <div class="ficha-ataques-tabela">
+                    <div class="ficha-ataque-header">
+                        <span>Nome</span>
+                        <span>Ataque</span>
+                        <span>Dano</span>
+                    </div>
+                    <div id="fichaAtaquesLista" class="ficha-ataques-lista">
+                        <div class="ficha-ataque-vazio">Nenhum ataque cadastrado</div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Defesa: CA + PV -->
-                <div class="ficha-defesa-row">
-                    <div class="ficha-defesa-box ficha-ca-box">
-                        <span class="ficha-defesa-label">CA</span>
-                        <span id="fichaCa" class="ficha-defesa-valor">10</span>
-                        <div class="ficha-ca-detalhes">
-                            <div class="ficha-ca-sub">
-                                <span class="ficha-ca-sub-label">Toque</span>
-                                <span id="fichaToque" class="ficha-ca-sub-valor">10</span>
-                            </div>
-                            <div class="ficha-ca-sub">
-                                <span class="ficha-ca-sub-label">Surpresa</span>
-                                <span id="fichaSurpresa" class="ficha-ca-sub-valor">10</span>
-                            </div>
-                        </div>
-                    </div>
+            <!-- ✅ ATUALIZADO: Slots resumo + botão Grimório integrado -->
+            <div class="ficha-secao" id="secaoMagias" style="display:none">
+                <h3 class="ficha-secao-titulo">✨ Slots de Magia</h3>
+                <div class="ficha-magias-grid" id="fichaMagiasGrid">
+                    <div class="ficha-magia-vazio">Nenhum slot cadastrado</div>
+                </div>
+                <button class="btn-abrir-grimorio" id="btnAbrirGrimorio">
+                    📖 Abrir Grimório de Magias
+                </button>
+            </div>
 
-                    <div class="ficha-defesa-box ficha-pv-box">
-                        <span class="ficha-defesa-label">PV</span>
-                        <span id="fichaPv" class="ficha-defesa-valor ficha-pv-valor">—/—</span>
-                        <div class="ficha-pv-barra-wrap">
-                            <div class="ficha-pv-barra">
-                                <div id="fichaPvFill" class="ficha-pv-fill" style="width:100%"></div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">⚡ Perícias</h3>
+                    <button class="ficha-btn-adicionar" id="btnAbrirPericiasFicha" title="Adicionar perícia">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaPericiasLista" class="ficha-pericias-lista">
+                    <span class="ficha-vazio">Carregando perícias...</span>
+                </div>
+            </div>
 
-                    <div class="ficha-defesa-box ficha-ini-box">
-                        <span class="ficha-defesa-label">Iniciativa</span>
-                        <span id="fichaIniciativa" class="ficha-defesa-valor">+0</span>
+        </aside>
+
+    </main>
+</div>
+
+<!-- ── Modal Grimório ── -->
+<div id="modalGrimorio" class="grimorio-overlay">
+    <div class="grimorio-container">
+
+        <!-- HEADER -->
+        <div class="grimorio-header">
+            <div class="grimorio-header-esquerda">
+                <span class="grimorio-icone">📖</span>
+                <div>
+                    <h2 class="grimorio-titulo">Grimório de Magias</h2>
+                    <p class="grimorio-subtitulo" id="grimorioSubtitulo">—</p>
+                </div>
+            </div>
+            <div class="grimorio-header-acoes">
+                <span class="grimorio-indicador">Total: <strong id="grimorioTotalMagias">0</strong></span>
+                <span class="grimorio-indicador">Páginas (Mago): <strong id="grimorioTotalPaginas">-</strong></span>
+                <span class="grimorio-indicador" id="grimorioPaginasPorNivelWrap" style="display:none">Por nível: <strong id="grimorioPaginasPorNivel">-</strong></span>
+                <button class="grimorio-btn-descanso" id="btnDescansoLongoGrimorio" type="button">🌙 Descanso Longo</button>
+                <button class="grimorio-fechar" id="btnFecharGrimorio">✕</button>
+            </div>
+        </div>
+
+        <div class="grimorio-classe-wrap" id="grimorioClasseWrap" style="display:none">
+            <label for="grimorioClasseSelect">Classe ativa</label>
+            <select id="grimorioClasseSelect" class="grimorio-select-classe"></select>
+        </div>
+
+        <div class="grimorio-topo-controles">
+            <div class="grimorio-slots-painel grimorio-resumo-painel">
+                <div class="grimorio-slots-titulo">Resumo</div>
+                <div class="grimorio-slots-grid">
+                    <span class="grimorio-slots-vazio">Gerencie magias conhecidas, favoritas e anotacoes pessoais.</span>
+                </div>
+            </div>
+            <div class="grimorio-busca-wrapper">
+                <span class="grimorio-busca-label">🔍 Buscar</span>
+                <input type="text" id="grimorioBusca" class="grimorio-busca"
+                    placeholder="Nome, escola, descricao...">
+            </div>
+        </div>
+
+        <div id="grimorioAvisoClasse" class="grimorio-aviso-classe" style="display:none"></div>
+
+        <div class="grimorio-filtros">
+            <div class="grimorio-filtro-grupo">
+                <label class="grimorio-filtro-label">Nível</label>
+                <div class="grimorio-niveis" id="grimorioNiveis">
+                    <button class="grimorio-nivel-btn ativo" data-nivel="todos">Todos</button>
+                    <button class="grimorio-nivel-btn" data-nivel="0">0°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="1">1°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="2">2°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="3">3°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="4">4°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="5">5°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="6">6°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="7">7°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="8">8°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="9">9°</button>
+                    <button class="grimorio-nivel-btn grimorio-btn-preparadas" id="btnFiltroFavoritas">★ Favoritas</button>
+                </div>
+            </div>
+            <div class="grimorio-filtros-secundarios">
+                <div class="grimorio-filtro-grupo grimorio-filtro-grupo--escolas">
+                    <label class="grimorio-filtro-label">Escola</label>
+                    <div class="grimorio-niveis" id="grimorioFiltroEscolas">
+                        <!-- Populado dinamicamente -->
                     </div>
                 </div>
+                <div class="grimorio-filtro-grupo grimorio-filtro-grupo--componente">
+                    <label class="grimorio-filtro-label" for="grimorioFiltroComponente">Comp.</label>
+                    <select id="grimorioFiltroComponente" class="grimorio-select-componente">
+                        <option value="todos">Todos</option>
+                        <option value="V">V</option>
+                        <option value="G">G</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                        <option value="FD">FD</option>
+                        <option value="XP">XP</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-                <!-- Resistências -->
-                <div class="ficha-secao">
-                    <h3 class="ficha-secao-titulo">🛡️ Resistências</h3>
-                    <div class="ficha-resistencias-row">
-                        <div class="ficha-resistencia-box">
-                            <span class="ficha-res-label">Fortitude</span>
-                            <span id="fichaFort" class="ficha-res-valor">+0</span>
-                        </div>
-                        <div class="ficha-resistencia-box">
-                            <span class="ficha-res-label">Reflexos</span>
-                            <span id="fichaReflex" class="ficha-res-valor">+0</span>
-                        </div>
-                        <div class="ficha-resistencia-box">
-                            <span class="ficha-res-label">Vontade</span>
-                            <span id="fichaVont" class="ficha-res-valor">+0</span>
-                        </div>
+        <div class="grimorio-adicionar-wrap">
+            <div class="grimorio-adicionar-acoes">
+                <button class="grimorio-btn-descanso" id="btnAdicionarMagiaGrimorio">➕ Adicionar magia conhecida</button>
+                <button class="grimorio-btn-descanso" id="btnTrocarMagiaGrimorio">🔁 Trocar magia</button>
+                <button class="grimorio-btn-descanso" id="btnNotificacoesGrimorio">🔔 Notificações</button>
+                <span class="grimorio-troca-badge" id="grimorioTrocaBadge" style="display:none">Troca disponível</span>
+                <span class="grimorio-troca-badge" id="grimorioNotificacoesBadge" style="display:none">0</span>
+            </div>
+            <div id="grimorioPainelAdicionar" class="grimorio-painel-adicionar grimorio-painel-adicionar-catalogo">
+                <div class="grimorio-painel-header">
+                    <div class="grimorio-painel-header-meta">
+                        <strong>Adicionar do catálogo da classe</strong>
+                        <span id="grimorioAdicionarResumo" class="grimorio-add-resumo">0 resultados</span>
+                    </div>
+                    <button id="btnFecharPainelAdicionar" class="grimorio-fechar-painel">✕</button>
+                </div>
+                <div class="grimorio-add-filtros-grid">
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarBusca">Titulo</label>
+                        <input type="text" id="grimorioAdicionarBusca" class="grimorio-busca" placeholder="Buscar por nome...">
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarEscola">Escola</label>
+                        <select id="grimorioAdicionarEscola" class="grimorio-select-componente">
+                            <option value="todas">Todas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarNivel">Nivel</label>
+                        <select id="grimorioAdicionarNivel" class="grimorio-select-componente">
+                            <option value="todos">Todos</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarComponente">Comp.</label>
+                        <select id="grimorioAdicionarComponente" class="grimorio-select-componente">
+                            <option value="todos">Todos</option>
+                            <option value="V">V</option>
+                            <option value="G">G</option>
+                            <option value="M">M</option>
+                            <option value="F">F</option>
+                            <option value="FD">FD</option>
+                            <option value="XP">XP</option>
+                        </select>
                     </div>
                 </div>
-
-            </section>
-
-            <!-- COLUNA DIREITA: ataques + magias -->
-            <aside class="ficha-coluna-direita">
-
-                <!-- Ataques -->
-                <div class="ficha-secao">
-                    <h3 class="ficha-secao-titulo">⚔️ Ataques</h3>
-                    <div class="ficha-ataques-tabela">
-                        <div class="ficha-ataque-header">
-                            <span>Nome</span>
-                            <span>Ataque</span>
-                            <span>Dano</span>
-                        </div>
-                        <div id="fichaAtaquesLista" class="ficha-ataques-lista">
-                            <div class="ficha-ataque-vazio">Nenhum ataque cadastrado</div>
-                        </div>
+                <p class="grimorio-add-dica">Use setas para navegar, Enter para adicionar, PgUp/PgDn para alternar e Home/End para ir aos extremos.</p>
+                <div class="grimorio-add-layout">
+                    <div id="grimorioAdicionarLista" class="grimorio-adicionar-lista"></div>
+                    <div id="grimorioAdicionarPreview" class="grimorio-add-preview">
+                        <div class="grimorio-historico-vazio">Selecione uma magia para visualizar o preview antes de adicionar.</div>
                     </div>
                 </div>
-
-                <!-- Magias -->
-                <div class="ficha-secao">
-                    <h3 class="ficha-secao-titulo">✨ Slots de Magia</h3>
-                    <div class="ficha-magias-grid" id="fichaMagiasGrid">
-                        <div class="ficha-magia-vazio">Nenhum slot cadastrado</div>
+            </div>
+            <div id="grimorioPainelTroca" class="grimorio-painel-adicionar">
+                <div class="grimorio-painel-header">
+                    <strong>Trocar magia conhecida</strong>
+                    <button id="btnFecharPainelTroca" class="grimorio-fechar-painel">✕</button>
+                </div>
+                <div class="grimorio-troca-grid">
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioTrocaRemovida">Remover</label>
+                        <select id="grimorioTrocaRemovida" class="grimorio-select-componente"></select>
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioTrocaAdicionada">Adicionar</label>
+                        <select id="grimorioTrocaAdicionada" class="grimorio-select-componente"></select>
                     </div>
                 </div>
+                <button class="grimorio-btn-descanso" id="btnConfirmarTrocaMagia">✅ Confirmar troca</button>
+                <div id="grimorioHistoricoTroca" class="grimorio-historico-troca"></div>
+            </div>
+            <div id="grimorioPainelNotificacoes" class="grimorio-painel-adicionar">
+                <div class="grimorio-painel-header">
+                    <strong>Painel de notificações do grimório</strong>
+                    <button id="btnFecharPainelNotificacoes" class="grimorio-fechar-painel">✕</button>
+                </div>
+                <div id="grimorioListaNotificacoes" class="grimorio-notificacoes-lista"></div>
+            </div>
+        </div>
 
-            </aside>
-
-        </main>
+        <div class="grimorio-corpo" id="grimorioCopo">
+            <div class="grimorio-loading" id="grimorioLoading" style="display:none">
+                <span class="grimorio-loading-icone">🔮</span>
+                <p>Consultando os tomos arcanos...</p>
+            </div>
+            <div class="grimorio-lista" id="grimorioLista"></div>
+        </div>
 
     </div>
+</div>
 
-    <script src="../js/controllers/FichaPersonagemController.js" type="module"></script>
+<!-- ── Modal Equipamentos ── -->
+<div id="modalEquipamentos" class="equipamentos-overlay" style="display: none;">
+    <div class="equipamentos-container">
+        <!-- HEADER -->
+        <div class="equipamentos-header">
+            <div class="equipamentos-header-esquerda">
+                <span class="equipamentos-icone">🎒</span>
+                <div>
+                    <h2 class="equipamentos-titulo">Gerenciar Equipamentos</h2>
+                    <p class="equipamentos-subtitulo">Adicione itens ao seu inventário</p>
+                </div>
+            </div>
+            <button class="equipamentos-fechar" id="btnFecharModalEquipamentos">✕</button>
+        </div>
+
+        <!-- BUSCA E FILTROS -->
+        <div class="equipamentos-controles">
+            <div class="equipamentos-busca-wrapper">
+                <span class="equipamentos-busca-label">🔍 Buscar</span>
+                  <input type="text" id="equipamentosBusca" class="equipamentos-busca"
+                      placeholder="Nome do equipamento...">
+            </div>
+            <div class="equipamentos-quantidade-wrapper">
+                <label class="equipamentos-label">Quantidade:</label>
+                <input type="number" id="equipamentosQuantidade" class="equipamentos-input-qtd" 
+                       value="1" min="1" max="999">
+            </div>
+        </div>
+
+        <!-- ABAS: Listar ou Criar -->
+        <div class="equipamentos-abas">
+            <button class="equipamentos-aba ativa" id="abaListar">
+                📋 Listar Equipamentos
+            </button>
+            <button class="equipamentos-aba" id="abaCriar">
+                ➕ Criar Novo
+            </button>
+        </div>
+
+        <!-- CONTEÚDO DINÂMICO (LISTAR ou CRIAR) -->
+        <div class="equipamentos-corpo" id="equipamentosCopo">
+            <!-- ABA: LISTAR -->
+            <div id="conteudoListar" class="equipamentos-conteudo ativo">
+                <div class="equipamentos-loading" id="equipamentosLoading" style="display:none">
+                    <span class="equipamentos-loading-icone">📦</span>
+                    <p>Carregando equipamentos...</p>
+                </div>
+                <div class="equipamentos-lista" id="equipamentosLista"></div>
+            </div>
+
+            <!-- ABA: CRIAR -->
+            <div id="conteudoCriar" class="equipamentos-conteudo">
+                <form id="formCriarEquipamento" class="equipamentos-form">
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Nome do Equipamento</label>
+                        <input type="text" id="criarNome" class="equipamentos-form-input" 
+                               placeholder="Ex: Espada de Aço" required>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Descrição</label>
+                        <textarea id="criarDescricao" class="equipamentos-form-input" 
+                                  placeholder="Ex: Uma espada de aço bem forjada" rows="3"></textarea>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Página de Referência (opcional)</label>
+                        <input type="text" id="criarPaginaRef" class="equipamentos-form-input" 
+                               placeholder="Ex: PHB p.124">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Quantidade</label>
+                        <input type="number" id="criarQuantidade" class="equipamentos-form-input" 
+                               value="1" min="1" max="999" required>
+                    </div>
+
+                    <button type="button" class="equipamentos-btn-salvar" id="btnSalvarEquipamentoCustomizado">
+                        ✅ Salvar e Adicionar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Modal Talentos ── -->
+<div id="modalTalentos" class="equipamentos-overlay" style="display: none;">
+    <div class="equipamentos-container">
+        <!-- HEADER -->
+        <div class="equipamentos-header">
+            <div class="equipamentos-header-esquerda">
+                <span class="equipamentos-icone">🌟</span>
+                <div>
+                    <h2 class="equipamentos-titulo">Gerenciar Talentos</h2>
+                    <p class="equipamentos-subtitulo">Adicione novos talentos ao seu personagem</p>
+                </div>
+            </div>
+            <button class="equipamentos-fechar" id="btnFecharModalTalentos">✕</button>
+        </div>
+
+        <!-- BUSCA E FILTROS -->
+        <div class="equipamentos-controles">
+            <div class="equipamentos-busca-wrapper">
+                <span class="equipamentos-busca-label">🔍 Buscar</span>
+                  <input type="text" id="talentosBusca" class="equipamentos-busca"
+                      placeholder="Nome do talento...">
+            </div>
+        </div>
+
+        <!-- ABAS: Listar ou Criar -->
+        <div class="equipamentos-abas">
+            <button class="equipamentos-aba ativa" id="abaListarTalentos">
+                📋 Listar Talentos
+            </button>
+            <button class="equipamentos-aba" id="abaCriarTalento">
+                ➕ Criar Novo
+            </button>
+        </div>
+
+        <!-- CONTEÚDO DINÂMICO (LISTAR ou CRIAR) -->
+        <div class="equipamentos-corpo" id="talentosCopo">
+            <!-- ABA: LISTAR -->
+            <div id="conteudoListarTalentos" class="equipamentos-conteudo ativo">
+                <div class="equipamentos-loading" id="talentosLoading" style="display:none">
+                    <span class="equipamentos-loading-icone">🌟</span>
+                    <p>Carregando talentos...</p>
+                </div>
+                <div class="equipamentos-lista" id="talentosList"></div>
+            </div>
+
+            <!-- ABA: CRIAR -->
+            <div id="conteudoCriarTalento" class="equipamentos-conteudo">
+                <form id="formCriarTalento" class="equipamentos-form">
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Nome do Talento</label>
+                        <input type="text" id="criarNomeTalento" class="equipamentos-form-input" 
+                               placeholder="Ex: Golpe Poderoso" required>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Descrição</label>
+                        <input type="text" id="criarDescricaoTalento" class="equipamentos-form-input" 
+                               placeholder="Descrição do talento...">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Página de Referência</label>
+                        <input type="text" id="criarPaginaRefTalento" class="equipamentos-form-input" 
+                               placeholder="Ex: PHB p.123">
+                    </div>
+
+                    <button type="button" class="equipamentos-btn-salvar" id="btnSalvarTalentoCustomizado">
+                        ✅ Salvar e Adicionar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- ── Modal Armadura/Item de Proteção ── -->
+<div id="modalArmadurasProtecao" class="equipamentos-overlay" style="display: none;">
+    <div class="equipamentos-container">
+        <div class="equipamentos-header">
+            <div class="equipamentos-header-esquerda">
+                <span class="equipamentos-icone">🛡️</span>
+                <div>
+                    <h2 class="equipamentos-titulo">Gerenciar Armadura/Item de Proteção</h2>
+                    <p class="equipamentos-subtitulo">Itens que impactam a Classe de Armadura do personagem</p>
+                </div>
+            </div>
+            <button class="equipamentos-fechar" id="btnFecharModalArmadurasProtecao">✕</button>
+        </div>
+
+        <div class="equipamentos-controles">
+            <div class="equipamentos-busca-wrapper">
+                <span class="equipamentos-busca-label">🔍 Buscar</span>
+                <input type="text" id="armadurasProtecaoBusca" class="equipamentos-busca" placeholder="Nome ou tipo do item...">
+            </div>
+        </div>
+
+        <div class="equipamentos-abas">
+            <button class="equipamentos-aba ativa" id="abaListarArmadurasProtecao">📋 Listar Itens</button>
+            <button class="equipamentos-aba" id="abaCriarArmaduraProtecao">➕ Criar Novo</button>
+        </div>
+
+        <div class="equipamentos-corpo" id="armadurasProtecaoCopo">
+            <div id="conteudoListarArmadurasProtecao" class="equipamentos-conteudo ativo">
+                <div class="equipamentos-lista" id="armadurasProtecaoLista"></div>
+            </div>
+
+            <div id="conteudoCriarArmaduraProtecao" class="equipamentos-conteudo">
+                <form id="formCriarArmaduraProtecao" class="equipamentos-form">
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Armadura/Item de Proteção</label>
+                        <input type="text" id="criarProtecaoNome" class="equipamentos-form-input" placeholder="Ex: Couraça de Couro" required>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Tipo</label>
+                        <input type="text" id="criarProtecaoTipo" class="equipamentos-form-input" placeholder="Ex: Armadura leve" required>
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Bônus na CA</label>
+                        <input type="number" id="criarProtecaoBonusCa" class="equipamentos-form-input" value="0" min="-20" max="30">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">DES Max</label>
+                        <input type="text" id="criarProtecaoDesMax" class="equipamentos-form-input" placeholder="Ex: +4">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Penalidade</label>
+                        <input type="number" id="criarProtecaoPenalidade" class="equipamentos-form-input" value="0" min="-20" max="20">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Falha Arcana</label>
+                        <input type="text" id="criarProtecaoFalhaArcana" class="equipamentos-form-input" placeholder="Ex: 20%">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Deslocamento</label>
+                        <input type="text" id="criarProtecaoDeslocamento" class="equipamentos-form-input" placeholder="Ex: 6m">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Peso</label>
+                        <input type="number" id="criarProtecaoPeso" class="equipamentos-form-input" min="0" step="0.1" placeholder="Ex: 15">
+                    </div>
+
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Propriedades Especiais</label>
+                        <textarea id="criarProtecaoPropriedades" class="equipamentos-form-input" rows="3" placeholder="Descreva propriedades especiais..."></textarea>
+                    </div>
+
+                    <button type="button" class="equipamentos-btn-salvar" id="btnSalvarArmaduraProtecaoCustomizada">
+                        ✅ Salvar e Adicionar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalPerfilMagico" class="ficha-modal-overlay" style="display: none;">
+    <div class="ficha-modal-box ficha-modal-box-curto">
+        <div class="ficha-modal-header">
+            <div>
+                <h3>Perfil divino e moral</h3>
+                <p>Esses dados influenciam as restrições automáticas do grimório.</p>
+            </div>
+            <button id="btnFecharModalPerfilMagico" class="ficha-modal-close" type="button">✕</button>
+        </div>
+        <div class="ficha-modal-body">
+            <label class="ficha-modal-field">
+                <span>Alinhamento</span>
+                <select id="inputPerfilAlinhamento">
+                    <option value="">Não definido</option>
+                    <option value="Leal e Bom">Leal e Bom</option>
+                    <option value="Neutro e Bom">Neutro e Bom</option>
+                    <option value="Caótico e Bom">Caótico e Bom</option>
+                    <option value="Leal e Neutro">Leal e Neutro</option>
+                    <option value="Neutro">Neutro</option>
+                    <option value="Caótico e Neutro">Caótico e Neutro</option>
+                    <option value="Leal e Mal">Leal e Mal</option>
+                    <option value="Neutro e Mal">Neutro e Mal</option>
+                    <option value="Caótico e Mal">Caótico e Mal</option>
+                </select>
+            </label>
+            <label class="ficha-modal-field">
+                <span>Divindade</span>
+                <input id="inputPerfilDivindade" list="listaPerfilDivindades" type="text" maxlength="80" placeholder="Ex.: Wee Jas, St. Cuthbert, Obad-Hai" />
+                <datalist id="listaPerfilDivindades"></datalist>
+                <small id="hintPerfilDivindade">Carregando sugestões...</small>
+            </label>
+            <label id="grupoPerfilDominios" class="ficha-modal-field">
+                <span>Domínios</span>
+                <select id="selectPerfilDominio1">
+                    <option value="">Selecione o primeiro domínio</option>
+                </select>
+                <select id="selectPerfilDominio2">
+                    <option value="">Selecione o segundo domínio</option>
+                </select>
+                <small id="hintPerfilDominios">Selecione exatamente dois domínios.</small>
+            </label>
+        </div>
+        <div class="ficha-modal-actions">
+            <button id="btnCancelarPerfilMagico" class="btn-voltar" type="button">Cancelar</button>
+            <button id="btnSalvarPerfilMagico" class="btn-abrir-grimorio" type="button">Salvar Perfil</button>
+        </div>
+    </div>
+</div>
+
+<script src="../js/ui/ModalConfirm.js?v=27"></script>
+<script type="module" src="../js/services/NotificationService.js?v=28"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=18"></script>
+<script type="module" src="../js/controllers/GrimorioController.js?v=18"></script>
 </body>
 </html>

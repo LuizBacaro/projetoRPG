@@ -1,33 +1,64 @@
-import { CombatenteService  } from '../services/CombatenteService.js';
-import { CondicaoController } from './CondicaoController.js';
-import { MagiaSlotService   } from '../services/MagiaSlotService.js';
+import { CombatenteService     } from '../services/CombatenteService.js';
+import { CondicaoController    } from './CondicaoController.js';
+import { MagiaSlotService      } from '../services/MagiaSlotService.js?v=20260402a';
+import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { Toast } from '/js/ui/toast.module.js';
+import { escapeHtml } from '../utils/formatters.js';
+import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots, normalizeClasseConjuradora } from '../utils/combat-rules.js?v=20260331a';
+import { getApiUrl } from '../config/api.config.js';
 
 export class ArenaController {
 
     constructor() {
-        this.combatenteService   = new CombatenteService();
-        this.condicaoController  = new CondicaoController();
-        this.magiaSlotService    = new MagiaSlotService();
-        this.combatentes         = [];
-        this.turnoAtual          = 0;
-        this.rodadaAtual         = 1;
-        this.statsVisiveis       = false;
-        this._cronometroSegundos = 0;
-        this._cronometroInterval = null;
-        this._cronometroAtivo    = false;
-        this._jaAgiram           = [];
+        this.combatenteService     = new CombatenteService();
+        this.condicaoController    = new CondicaoController();
+        this.magiaSlotService      = new MagiaSlotService();
+        this.magiaPreparadaService = new MagiaPreparadaService();
+        this.combatentes           = [];
+        this.turnoAtual            = 0;
+        this.rodadaAtual           = 1;
+        this.statsVisiveis         = false;
+        this._cronometroSegundos   = 0;
+        this._cronometroInterval   = null;
+        this._cronometroAtivo      = false;
+        this._jaAgiram             = [];
+        this._actions              = null;
+        this._canal                = new BroadcastChannel('magias-rpg');
+        this._canal.onmessage      = (event) => {
+            if (event?.data?.tipo === 'magia-preparada-atualizada') {
+                if (event.data?.resetSlots) {
+                    var combatenteReset = this.combatentes.find(function(c) {
+                        return Number(c.id) === Number(event.data.combatenteId);
+                    });
+                    if (combatenteReset && Array.isArray(combatenteReset.magias_slots)) {
+                        combatenteReset.magias_slots = combatenteReset.magias_slots.map(function(slot) {
+                            return { ...slot, usados: 0 };
+                        });
+                    }
+                }
+                this._sincronizarMagiasPreparadasCombatente(event.data.combatenteId);
+            }
+        };
+        this.token                 = localStorage.getItem('token');
+        this.combateId             = null;
+        this.versaoCombate         = null;
         this._inicializar();
     }
 
     _inicializar() {
         this.condicaoController.init();
         this._configurarEventos();
+        this._restaurarCombateAtivo();
     }
 
     _configurarEventos() {
         var self = this;
-        document.addEventListener('iniciarCombate', function(e) {
+        document.addEventListener('iniciarCombate', async function(e) {
+            if (e.detail && e.detail.status) {
+                await self._aplicarStatusCombate(e.detail.status);
+                return;
+            }
+
             if (e.detail && e.detail.combatentes) {
                 self.iniciarCombate(e.detail.combatentes);
             } else {
@@ -36,7 +67,75 @@ export class ArenaController {
         });
     }
 
-    iniciarCombate(combatentes) {
+    _headers(includeJson = false, includeVersion = false) {
+        const headers = {};
+        if (includeJson) {
+            headers['Content-Type'] = 'application/json';
+        }
+        if (this.token) {
+            headers['Authorization'] = `Bearer ${this.token}`;
+        }
+        if (includeVersion && this.versaoCombate) {
+            headers['If-Match'] = this.versaoCombate;
+        }
+        return headers;
+    }
+
+    _ordenarCombatentesPorStatus(combatentes, idsOrdenados) {
+        if (!Array.isArray(combatentes) || !Array.isArray(idsOrdenados)) {
+            return combatentes || [];
+        }
+        const mapa = new Map((combatentes || []).map(c => [c.id, c]));
+        return idsOrdenados.map(id => mapa.get(id)).filter(Boolean);
+    }
+
+    async _aplicarStatusCombate(status) {
+        if (!status || !status.ativo) {
+            return;
+        }
+
+        this.combateId = status.id || null;
+        this.versaoCombate = status.versao || null;
+        this.combatentes = this._ordenarCombatentesPorStatus(status.combatentes || [], status.combatentes_ids || []);
+        this.turnoAtual = Number(status.turno_atual || 0);
+        this.rodadaAtual = Number(status.rodada_atual || 1);
+        this._jaAgiram = [];
+
+        await this._carregarMagiasPreparadasTodos();
+
+        const telaArena = document.getElementById('telaArena');
+        const telaConfiguracao = document.getElementById('telaConfiguracao');
+        if (telaConfiguracao) telaConfiguracao.classList.remove('ativa');
+        if (telaArena) telaArena.classList.add('ativa');
+
+        this._resetarCronometro();
+        this._iniciarCronometro();
+        this.atualizarRodada();
+        this.renderizarOrdemIniciativa();
+        this.renderizarCombatenteAtivo();
+    }
+
+    async _restaurarCombateAtivo() {
+        try {
+            const response = await fetch(getApiUrl('/combate/status'), {
+                headers: this._headers(false, false),
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const status = await response.json();
+            if (status?.ativo) {
+                await this._aplicarStatusCombate(status);
+                Toast.info('Combate ativo restaurado apos recarregar a pagina.');
+            }
+        } catch (error) {
+            console.warn('⚠️ Nao foi possivel restaurar combate ativo:', error?.message || error);
+        }
+    }
+
+    async iniciarCombate(combatentes) {
         if (!combatentes || !Array.isArray(combatentes) || combatentes.length === 0) {
             Toast.error('Nenhum combatente valido para iniciar combate');
             return;
@@ -50,17 +149,122 @@ export class ArenaController {
         this._jaAgiram           = [];
         this._cronometroSegundos = 0;
         this._pararCronometro();
+        await this._carregarMagiasPreparadasTodos();
         this._iniciarCronometro();
         this.atualizarRodada();
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
 
-    avancarTurno() {
-        var idAtual = this.combatentes[this.turnoAtual] ? this.combatentes[this.turnoAtual].id : null;
+    async _carregarMagiasPreparadasTodos() {
+        const promessas = this.combatentes
+            .filter((c) => {
+                c.magias_slots = resolveCombatenteSpellSlots(c);
+                var isConj = isClasseConjuradora(c.classe)
+                    || (c.magias_slots && c.magias_slots.some((s) => Number(s.total || 0) > 0));
+                if (isConj) {
+                    c._isConjurador = true;
+                    var classeCanon = normalizeClasseConjuradora(c.classe);
+                    if (classeCanon === 'Bardo' || classeCanon === 'Feiticeiro') {
+                        c._isConjuradorEspontaneo = true;
+                    }
+                }
+                return isConj;
+            })
+            .map(async (c) => {
+                try {
+                    if (c._isConjuradorEspontaneo) {
+                        const possuiSlotSemId = (c.magias_slots || []).some((slot) => {
+                            const id = Number(slot?.id ?? slot?.slot_id ?? 0);
+                            return Number(slot?.total || 0) > 0 && !id;
+                        });
+                        if (possuiSlotSemId) {
+                            c._slotsSyncEmAndamento = true;
+                            try {
+                                const slotsPersistidos = await this.magiaSlotService.salvarPorCombatente(c.id, c.magias_slots || []);
+                                c.magias_slots = resolveCombatenteSpellSlots({ ...c, magias_slots: slotsPersistidos });
+                            } finally {
+                                c._slotsSyncEmAndamento = false;
+                            }
+                        }
+                        c._magiasPreparadas = [];
+                        c._magiasGrupos = {};
+                        return;
+                    }
+                    const preparadas = await this.magiaPreparadaService.listar(c.id);
+                    c._magiasPreparadas = preparadas;
+                    c._magiasGrupos = this.magiaPreparadaService.agruparPorNivel(preparadas, c.magias_slots || []);
+                    console.log(`✅ ${c.nome}: ${preparadas.length} magias preparadas`);
+                } catch (err) {
+                    console.warn(`⚠️ Sem magias preparadas para ${c.nome}:`, err.message);
+                    c._magiasPreparadas = [];
+                    c._magiasGrupos = {};
+                }
+            });
+        await Promise.all(promessas);
+    }
+
+    async _sincronizarMagiasPreparadasCombatente(combatenteId) {
+        if (!combatenteId) return;
+
+        var combatente = this.combatentes.find(function(c) {
+            return Number(c.id) === Number(combatenteId);
+        });
+        if (!combatente) return;
+
+        combatente.magias_slots = resolveCombatenteSpellSlots(combatente);
+
+        try {
+            if (combatente._isConjuradorEspontaneo) {
+                const possuiSlotSemId = (combatente.magias_slots || []).some(function(slot) {
+                    var id = Number(slot?.id ?? slot?.slot_id ?? 0);
+                    return Number(slot?.total || 0) > 0 && !id;
+                });
+                if (possuiSlotSemId) {
+                    combatente._slotsSyncEmAndamento = true;
+                    var ativoDuranteSync = this.combatentes[this.turnoAtual];
+                    if (ativoDuranteSync && Number(ativoDuranteSync.id) === Number(combatenteId)) {
+                        this.renderizarCombatenteAtivo();
+                    }
+                    try {
+                        var slotsPersistidos = await this.magiaSlotService.salvarPorCombatente(combatente.id, combatente.magias_slots || []);
+                        combatente.magias_slots = resolveCombatenteSpellSlots({ ...combatente, magias_slots: slotsPersistidos });
+                    } finally {
+                        combatente._slotsSyncEmAndamento = false;
+                    }
+                }
+                var ativoEsp = this.combatentes[this.turnoAtual];
+                if (ativoEsp && Number(ativoEsp.id) === Number(combatenteId)) {
+                    this.renderizarCombatenteAtivo();
+                }
+                return;
+            }
+            var preparadas = await this.magiaPreparadaService.listar(combatente.id);
+            combatente._magiasPreparadas = preparadas;
+            combatente._magiasGrupos = this.magiaPreparadaService.agruparPorNivel(preparadas, combatente.magias_slots || []);
+
+            var ativo = this.combatentes[this.turnoAtual];
+            if (ativo && Number(ativo.id) === Number(combatente.id)) {
+                this.renderizarCombatenteAtivo();
+            }
+        } catch (err) {
+            console.warn(`⚠️ Falha ao sincronizar magias preparadas de ${combatente.nome}:`, err.message);
+        }
+    }
+
+    async avancarTurno() {  // ← Adicionar async
+        var idAtual = this.combatentes[this.turnoAtual]
+            ? this.combatentes[this.turnoAtual].id : null;
+        
         if (idAtual !== null && this._jaAgiram.indexOf(idAtual) === -1) {
             this._jaAgiram.push(idAtual);
         }
+        
+        // ✅ Com AWAIT - espera a resposta da API
+        if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
+            await this._decrementarDuracaoCondicoes(idAtual);  // ← CORRIGIDO!
+        }
+        
         this.turnoAtual++;
         if (this.turnoAtual >= this.combatentes.length) {
             this.turnoAtual  = 0;
@@ -69,14 +273,59 @@ export class ArenaController {
             this.atualizarRodada();
             Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
         }
-
-        // ✅ ADICIONA AQUI — reseta e reinicia o cronômetro a cada turno
         this._resetarCronometro();
         this._iniciarCronometro();
-
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
     }
+
+    // ✅ CORRETO - SEM /v1 (getApiUrl já adiciona)
+    async _decrementarDuracaoCondicoes(combatenteId) {
+        try {
+            console.log(`⏰ Decrementando duração para combatente #${combatenteId}...`);
+            
+            const baseUrl = typeof window.getApiUrl === 'function'
+                ? window.getApiUrl(`/condicoes/combatentes/${combatenteId}/avancar-turno`)
+                //                   ↑ SEM /v1 aqui!
+                : `http://localhost:8000/api/v1/condicoes/combatentes/${combatenteId}/avancar-turno`;
+            
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                console.warn('⚠️ Token não encontrado');
+                return;
+            }
+
+            console.log(`📡 POST: ${baseUrl}`);
+            
+            const res = await fetch(baseUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            });
+            
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.warn(`⚠️ HTTP ${res.status}: ${errorText}`);
+                return;
+            }
+            
+            const data = await res.json();
+            console.log(`✅ Duração decrementada:`, data.condicoes);
+            
+            // Recarregar condições do combatente atual
+            const combatenteAtual = this.combatentes[this.turnoAtual];
+            if (combatenteAtual && typeof this.condicaoController !== 'undefined') {
+                await this.condicaoController.carregarCondicoesDoCombatente(combatenteAtual.id);
+            }
+            
+        } catch (err) {
+            console.error('❌ Erro ao decrementar:', err);
+        }
+    }    
 
     toggleVisibilidadeStats() {
         this.statsVisiveis = !this.statsVisiveis;
@@ -95,7 +344,7 @@ export class ArenaController {
         this.renderizarCombatenteAtivo();
     }
 
-    // ─── Cronometro ────────────────────────────────────────
+    // ─── Cronômetro ────────────────────────────────────────
 
     _iniciarCronometro() {
         var self = this;
@@ -124,11 +373,8 @@ export class ArenaController {
     }
 
     toggleCronometro() {
-        if (this._cronometroAtivo) {
-            this._pararCronometro();
-        } else {
-            this._iniciarCronometro();
-        }
+        if (this._cronometroAtivo) this._pararCronometro();
+        else this._iniciarCronometro();
     }
 
     _formatarTempo(segundos) {
@@ -150,51 +396,137 @@ export class ArenaController {
         var btn = document.getElementById('btnToggleCronometro');
         if (!btn) return;
         btn.textContent = this._cronometroAtivo ? '⏸' : '▶';
-        btn.className   = 'btn-cronometro ' + (this._cronometroAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar');
+        btn.className   = 'btn-cronometro ' + (this._cronometroAtivo
+            ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar');
     }
 
-    // ─── Magias: logica funcional ──────────────────────────
+    // ─── Magias via MagiaSlot (monstros/NPCs) ──────────────
 
     async _alterarUsadosMagia(slotId, nivel, acao) {
-        if (!slotId || slotId === 'null') {
-            Toast.error('Slot de magia nao encontrado para este nivel');
-            return;
-        }
         var combatente = this.combatentes[this.turnoAtual];
         if (!combatente) return;
 
         var slot = null;
-        for (var k = 0; k < combatente.magias_slots.length; k++) {
-            if (combatente.magias_slots[k].nivel === nivel) { slot = combatente.magias_slots[k]; break; }
+        for (var k = 0; k < (combatente.magias_slots || []).length; k++) {
+            if (combatente.magias_slots[k].nivel === nivel) {
+                slot = combatente.magias_slots[k]; break;
+            }
         }
         if (!slot) return;
 
+        var slotIdNum = Number(slotId);
+        if (!slotIdNum) {
+            slotIdNum = Number(slot.id ?? slot.slot_id ?? 0);
+        }
+        if (!slotIdNum) {
+            Toast.error('Slot de magia ainda nao sincronizado para este nivel');
+            return;
+        }
+
         var novoUsados = slot.usados;
         if (acao === 'aumentar') {
-            if (slot.usados >= slot.total) { Toast.error('Todos os slots do nivel ' + nivel + ' ja foram usados!'); return; }
+            if (slot.usados >= slot.total) {
+                Toast.error('Todos os slots do nivel ' + nivel + ' ja foram usados!'); return;
+            }
             novoUsados = slot.usados + 1;
         } else {
-            if (slot.usados <= 0) { Toast.error('Nenhum slot usado no nivel ' + nivel); return; }
+            if (slot.usados <= 0) {
+                Toast.error('Nenhum slot usado no nivel ' + nivel); return;
+            }
             novoUsados = slot.usados - 1;
         }
 
         try {
-            await this.magiaSlotService.atualizarUsados(slotId, novoUsados);
+            await this.magiaSlotService.atualizarUsados(slotIdNum, novoUsados);
             slot.usados = novoUsados;
-
-            var spanValor = document.querySelector('.arena-magia-valor[data-nivel="' + nivel + '"]');
-            if (spanValor) spanValor.textContent = (slot.total - novoUsados);   // ✅ mostra disponíveis
-
-            var btnDiminuir = document.querySelector('.arena-magia-btn[data-acao="aumentar"][data-nivel="' + nivel + '"]');
-            var btnAumentar = document.querySelector('.arena-magia-btn[data-acao="diminuir"][data-nivel="' + nivel + '"]');
-            if (btnDiminuir) btnDiminuir.disabled = (novoUsados >= slot.total); // '-' bloqueado se esgotado
-            if (btnAumentar) btnAumentar.disabled = (novoUsados <= 0);          // '+' bloqueado se nada usado
-
-            Toast.success('NIV ' + nivel + ': ' + (slot.total - novoUsados) + '/' + slot.total + ' disponíveis');
+            this._atualizarUISlot(nivel, slot);
+            Toast.success('NIV ' + nivel + ': ' + (slot.total - novoUsados) + '/' + slot.total + ' disponiveis');
         } catch (err) {
-            Toast.error('Erro ao atualizar magia: ' + (err.message || ''));
-            console.error(err);
+            Toast.error(
+                err.message || ('Erro ao atualizar slots de magia no nível ' + nivel + ' para ' + (combatente.nome || 'combatente atual'))
+            );
         }
+    }
+
+    _atualizarUISlot(nivel, slot) {
+        var spanValor   = document.querySelector('.arena-magia-valor[data-nivel="' + nivel + '"]');
+        var btnConsumir = document.querySelector('.arena-magia-btn[data-acao="aumentar"][data-nivel="' + nivel + '"]');
+        var btnDevolver = document.querySelector('.arena-magia-btn[data-acao="diminuir"][data-nivel="' + nivel + '"]');
+        if (spanValor)   spanValor.textContent = (slot.total - slot.usados);
+        if (btnConsumir) btnConsumir.disabled  = (slot.usados >= slot.total);
+        if (btnDevolver) btnDevolver.disabled  = (slot.usados <= 0);
+    }
+
+    async _lancarMagiaPreparada(combatenteId, magiaId, nivel, acaoPreparo, instancia) {
+        var combatente = this.combatentes.find(function(c) {
+            return Number(c.id) === Number(combatenteId);
+        }) || this.combatentes[this.turnoAtual];
+        if (!combatente) return;
+
+        var grupo = (combatente._magiasGrupos || {})[nivel];
+        if (!grupo) { Toast.error('Nenhuma magia preparada no nível ' + nivel); return; }
+
+        var magiaPrep = grupo.preparadas.find(function(p) {
+            return Number(p.magia_id) === Number(magiaId)
+                && Number(p._instanceIndex || 1) === Number(instancia || 1);
+        }) || grupo.preparadas.find(function(p) { return Number(p.magia_id) === Number(magiaId); });
+        if (!magiaPrep) { Toast.error('Magia não encontrada nas preparadas'); return; }
+
+        try {
+            var data = await this.magiaPreparadaService.toggleUsada(combatenteId, magiaId, acaoPreparo || 'usar');
+            await this._sincronizarMagiasPreparadasCombatente(combatenteId);
+
+            var combatenteAtualizado = this.combatentes.find(function(c) {
+                return Number(c.id) === Number(combatenteId);
+            }) || combatente;
+            var grupoAtualizado = (combatenteAtualizado._magiasGrupos || {})[nivel] || grupo;
+
+            this._publicarEventoMagia(combatenteId, magiaId, nivel, data.usada, grupoAtualizado);
+            Toast.success((acaoPreparo === 'restaurar' ? '↩️ ' : '🔥 ')
+                + (magiaPrep.magia_nome || 'Magia')
+                + (acaoPreparo === 'restaurar' ? ' restaurada' : ' lançada!'));
+        } catch (err) {
+            var nomeMagia = magiaPrep.magia_nome || ('magia #' + magiaId);
+            Toast.error(err.message || ('Erro ao lançar ' + nomeMagia + ' no nível ' + nivel));
+        }
+    }
+
+    _publicarEventoMagia(combatenteId, magiaId, nivel, usada, grupo) {
+        try {
+            this._canal.postMessage({
+                tipo:         'magia-usada',
+                combatenteId: combatenteId,
+                magiaId:      magiaId,
+                nivel:        nivel,
+                usada:        usada,
+                disponiveis:  grupo.total - grupo.usadas,
+                total:        grupo.total,
+                timestamp:    Date.now(),
+            });
+        } catch (err) {
+            console.warn('⚠️ BroadcastChannel indisponível:', err.message);
+        }
+    }
+
+    _atualizarUIPreparada(nivel, grupo, magiaId, usada) {
+        var spanDisp = document.querySelector(
+            '.arena-magia-preparada-nivel[data-nivel="' + nivel + '"] .arena-prep-disponiveis'
+        );
+        if (spanDisp) {
+            var disponiveis = grupo.total - grupo.usadas;
+            spanDisp.textContent = disponiveis + '/' + grupo.total;
+            spanDisp.style.color = disponiveis === 0 ? '#f87171'
+                                 : grupo.usadas > 0  ? '#facc15'
+                                 :                     '#4ade80';
+        }
+        var btn = document.querySelector('.arena-prep-btn[data-magia-id="' + magiaId + '"]');
+        if (btn) {
+            btn.textContent = usada ? '↩️' : '🔥';
+            btn.title       = usada ? 'Restaurar magia' : 'Lançar magia';
+            btn.classList.toggle('arena-prep-btn-usada', usada);
+        }
+        var nome = document.querySelector('.arena-prep-nome[data-magia-id="' + magiaId + '"]');
+        if (nome) nome.classList.toggle('arena-prep-nome-usada', usada);
     }
 
     // ─── Render: Ordem de Iniciativa ───────────────────────
@@ -220,7 +552,7 @@ export class ArenaController {
             html += '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>';
             html += '<div class="ordem-info">';
             html += '<div class="ordem-nome-linha">';
-            html += '<span class="ordem-nome">' + c.nome + '</span>';
+            html += '<span class="ordem-nome">' + escapeHtml(c.nome) + '</span>';
             if (jaAgiu) html += '<span class="ordem-agiu-badge">✓</span>';
             html += '</div>';
             html += '<div class="ordem-hp-bar">';
@@ -228,7 +560,8 @@ export class ArenaController {
             html += '</div>';
             html += '<div class="badges-condicao-ordem-wrapper"></div>';
             html += '</div>';
-            html += '<span class="badge ' + self.getBadgeClass(c.tipo) + ' badge-mini">' + self.getEmojiTipo(c.tipo) + '</span>';
+            html += '<span class="badge ' + self.getBadgeClass(c.tipo) + ' badge-mini">'
+                  + self.getEmojiTipo(c.tipo) + '</span>';
             html += '</div>';
         }
         container.innerHTML = html;
@@ -242,12 +575,11 @@ export class ArenaController {
         function next() {
             if (i >= self.combatentes.length) return;
             var c  = self.combatentes[i++];
-            var el = document.querySelector('.combatente-ordem-item[data-combatente-id="' + c.id + '"]');
-            if (el) {
-                self.condicaoController.atualizarBadgesOrdem(el, c.id).then(next);
-            } else {
-                next();
-            }
+            var el = document.querySelector(
+                '.combatente-ordem-item[data-combatente-id="' + c.id + '"]'
+            );
+            if (el) self.condicaoController.atualizarBadgesOrdem(el, c.id).then(next);
+            else    next();
         }
         next();
     }
@@ -258,13 +590,14 @@ export class ArenaController {
         var c = this.combatentes[this.turnoAtual];
         if (!c) { container.innerHTML = ''; return; }
         container.innerHTML = c.foto_url
-            ? '<img src="' + c.foto_url + '" alt="' + c.nome + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">'
+            ? '<img src="' + c.foto_url + '" alt="' + escapeHtml(c.nome)
+              + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">'
             : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
     }
 
     // ─── Render: Combatente Ativo ───────────────────────────
 
-   renderizarCombatenteAtivo() {
+    renderizarCombatenteAtivo() {
         var container = document.getElementById('combatenteAtivoContainer');
         if (!container) return;
 
@@ -276,163 +609,268 @@ export class ArenaController {
         var hpPct = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
         var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
 
-        var ca       = (c.ca        !== null && c.ca        !== undefined) ? c.ca        : 10;
-        var toque    = (c.toque     !== null && c.toque     !== undefined) ? c.toque     : 10;
-        var surpresa = (c.surpresa  !== null && c.surpresa  !== undefined) ? c.surpresa  : 10;
-        var fort     = (c.fortitude !== null && c.fortitude !== undefined) ? c.fortitude : 0;
-        var reflex   = (c.reflexos  !== null && c.reflexos  !== undefined) ? c.reflexos  : 0;
-        var vont     = (c.vontade   !== null && c.vontade   !== undefined) ? c.vontade   : 0;
-        var nivel    = c.nivel  || 1;
-        var classe   = c.classe || 'Aventureiro';
-        var raca     = c.raca   || '';
+        var ca       = c.ca        ?? 10;
+        var toque    = c.toque     ?? 10;
+        var surpresa = c.surpresa  ?? 10;
+        var fort     = c.fortitude ?? 0;
+        var reflex   = c.reflexos  ?? 0;
+        var vont     = c.vontade   ?? 0;
+        var nivel    = c.nivel     || 1;
+        var classe   = c.classe    || 'Aventureiro';
+        var raca     = c.raca      || '';
 
         function mod(val) {
             var m = Math.floor(((val || 10) - 10) / 2);
             return m >= 0 ? ('+' + m) : ('' + m);
         }
-        function sinal(val) {
-            return val >= 0 ? ('+' + val) : ('' + val);
-        }
+        function sinal(val) { return val >= 0 ? ('+' + val) : ('' + val); }
 
-        var pvValor  = this.statsVisiveis ? (c.hp_atual + '/' + c.hp_maximo) : '???/???';
-        var caValor  = this.statsVisiveis ? ca       : '?';
-        var sValor   = this.statsVisiveis ? surpresa : '?';
-        var tValor   = this.statsVisiveis ? toque    : '?';
-        var olhoTxt  = this.statsVisiveis ? 'Ocultar Stats' : 'Revelar Stats';
+        var pvValor = this.statsVisiveis ? (c.hp_atual + '/' + c.hp_maximo) : '???/???';
+        var caValor = this.statsVisiveis ? ca       : '?';
+        var sValor  = this.statsVisiveis ? surpresa : '?';
+        var tValor  = this.statsVisiveis ? toque    : '?';
+        var olhoTxt = this.statsVisiveis ? 'Ocultar Stats' : 'Revelar Stats';
         var cronAtivo  = this._cronometroAtivo;
         var tempoAtual = this._formatarTempo(this._cronometroSegundos);
 
         var atribs = [
-            ['For', c.forca        || 10],
-            ['Des', c.destreza     || 10],
-            ['Con', c.constituicao || 10],
-            ['Int', c.inteligencia || 10],
-            ['Sab', c.sabedoria    || 10],
-            ['Car', c.carisma      || 10]
+            ['For', c.forca        || 10], ['Des', c.destreza     || 10],
+            ['Con', c.constituicao || 10], ['Int', c.inteligencia || 10],
+            ['Sab', c.sabedoria    || 10], ['Car', c.carisma      || 10],
         ];
 
         var atributosHTML = '';
         for (var j = 0; j < atribs.length; j++) {
-            atributosHTML += '<div class="arena-atributo-box">';
-            atributosHTML += '<span class="arena-atributo-nome">' + atribs[j][0] + '</span>';
-            atributosHTML += '<span class="arena-atributo-valor">' + atribs[j][1] + '</span>';
-            atributosHTML += '<span class="arena-atributo-mod">'   + mod(atribs[j][1]) + '</span>';
-            atributosHTML += '</div>';
+            atributosHTML += '<div class="arena-atributo-box">'
+                + '<span class="arena-atributo-nome">'  + atribs[j][0] + '</span>'
+                + '<span class="arena-atributo-valor">' + atribs[j][1] + '</span>'
+                + '<span class="arena-atributo-mod">'   + mod(atribs[j][1]) + '</span>'
+                + '</div>';
         }
 
         var ataquesHTML = this._renderizarAtaques(c.ataques || []);
-        var magiasHTML  = this._renderizarMagias(c.magias_slots || [], c.tipo);
+        
+        // Conjuradores sempre usam estilo "magias preparadas"
+        var magiasHTML = '';
+        if (c._isConjuradorEspontaneo) {
+            magiasHTML = this._renderizarMagias(c.magias_slots || [], c.tipo, '⚡ Slots de Magia', !!c._slotsSyncEmAndamento);
+        } else if (c._isConjurador) {
+            magiasHTML = this._renderizarMagiasPreparadas(c._magiasGrupos || {}, c.id);
+        }
+
+        var refBadge = (isTipoMonstro(c.tipo) && c.pagina_referencia)
+            ? ' <span class="arena-badge-referencia" title="Referência do livro">📖 '
+            + c.pagina_referencia + '</span>'
+            : '';
 
         var html = '';
         html += '<div class="arena-card">';
 
-        // ── Header: nome + cronometro + botoes
+        // ── Header ──
         html += '<div class="arena-header">';
         html += '<div class="arena-header-nome">';
-        html += '<h2 class="arena-nome">' + c.nome + ' <span class="arena-nivel">(' + nivel + '° nivel)</span></h2>';
-        html += '<span class="arena-raca-classe">' + (raca ? raca + ' / ' : '') + classe;
-        html += ' <span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span></span>';
+        html += '<h2 class="arena-nome">' + c.nome
+            + ' <span class="arena-nivel">(' + nivel + '° nivel)</span></h2>';
+        html += '<span class="arena-raca-classe">'
+            + (raca ? raca + ' / ' : '') + classe
+            + ' <span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span>'
+            + refBadge
+            + '</span>';
         html += '</div>';
         html += '<div class="arena-header-acoes">';
         html += '<div class="arena-cronometro-inline">';
-        html += '<span class="arena-cronometro-display ' + (cronAtivo ? 'cronometro-ativo' : 'cronometro-pausado') + '" id="cronometroDisplay">' + tempoAtual + '</span>';
-        html += '<button id="btnToggleCronometro" class="btn-cronometro ' + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar') + '" onclick="window._toggleCronometro()">' + (cronAtivo ? '⏸' : '▶') + '</button>';
-        html += '<button class="btn-cronometro btn-cronometro-reset" onclick="window._resetarCronometro()">↺</button>';
+        html += '<span class="arena-cronometro-display '
+            + (cronAtivo ? 'cronometro-ativo' : 'cronometro-pausado')
+            + '" id="cronometroDisplay">' + tempoAtual + '</span>';
+        html += '<button id="btnToggleCronometro" class="btn-cronometro '
+            + (cronAtivo ? 'btn-cronometro-pausar' : 'btn-cronometro-retomar')
+            + '">'
+            + (cronAtivo ? '⏸' : '▶') + '</button>';
+        html += '<button class="btn-cronometro btn-cronometro-reset" id="btnResetarCronometro">↺</button>';
         html += '</div>';
-        html += '<button class="btn-toggle-stats" onclick="window._toggleStats()">' + olhoTxt + '</button>';
-        // ✅ LINHA REMOVIDA — botão agora está fixo no header-arena do index.html
+        html += '<button class="btn-toggle-stats" id="btnToggleStatsArena">'
+            + olhoTxt + '</button>';
         html += '</div></div>';
 
-        // ── Layout principal: 3 colunas conforme protótipo
+        // ── Layout principal ──
         html += '<div class="arena-layout-principal">';
 
-        // COLUNA ESQUERDA: atributos + resistencias + condicoes lado a lado
+        // Coluna esquerda
         html += '<div class="arena-coluna-esquerda">';
         html += '<div class="arena-linha-info">';
-
-        // Atributos
         html += '<div class="arena-secao arena-secao-atributos">';
         html += '<h3 class="arena-secao-titulo">Atributos</h3>';
         html += '<div class="arena-atributos-grid">' + atributosHTML + '</div>';
         html += '</div>';
-
-        // Resistencias
         html += '<div class="arena-secao arena-secao-resistencias">';
         html += '<h3 class="arena-secao-titulo">Resistencias</h3>';
         html += '<div class="arena-resistencias-grid">';
-        html += '<div class="arena-atributo-box">';
-        html += '<span class="arena-atributo-nome">Fort</span>';
-        html += '<span class="arena-atributo-valor">' + sinal(fort) + '</span>';
-        html += '</div>';
-        html += '<div class="arena-atributo-box">';
-        html += '<span class="arena-atributo-nome">Reflex</span>';
-        html += '<span class="arena-atributo-valor">' + sinal(reflex) + '</span>';
-        html += '</div>';
-        html += '<div class="arena-atributo-box">';
-        html += '<span class="arena-atributo-nome">Vont</span>';
-        html += '<span class="arena-atributo-valor">' + sinal(vont) + '</span>';
+        html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Fort</span>'
+            + '<span class="arena-atributo-valor">' + sinal(fort) + '</span></div>';
+        html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Reflex</span>'
+            + '<span class="arena-atributo-valor">' + sinal(reflex) + '</span></div>';
+        html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Vont</span>'
+            + '<span class="arena-atributo-valor">' + sinal(vont) + '</span></div>';
+        html += '</div></div>';
+        html += '<div class="arena-secao arena-secao-condicoes">';
+        html += '<h3 class="arena-secao-titulo">Condicoes</h3>';
+        html += '<div class="arena-condicoes-lista">'
+            + '<span class="arena-condicao-vazia">Nenhuma condição ativa</span></div>';
         html += '</div>';
         html += '</div></div>';
 
-        // Condicoes
-        html += '<div class="arena-secao arena-secao-condicoes">';
-        html += '<h3 class="arena-secao-titulo">Condicoes</h3>';
-        html += '<div class="arena-condicoes-lista"><span class="arena-condicao-vazia">Nenhuma condicao ativa</span></div>';
-        html += '</div>';
-
-        html += '</div>'; // fim arena-linha-info
-        html += '</div>'; // fim coluna esquerda
-
-        // COLUNA CENTRAL: ataques + magias
+        // Coluna central
         html += '<div class="arena-coluna-central">';
         html += ataquesHTML;
-        html += magiasHTML;
-        html += '</div>'; // fim coluna central
+        html += magiasHTML;  // ✅ Será vazio se não tem magias
+        html += '</div>';
 
-        // COLUNA DIREITA: CA/Surpresa/Toque + PV + encerrar turno
+        // Coluna direita
         html += '<div class="arena-coluna-direita">';
-
         html += '<div class="arena-defesa-box">';
         html += '<div class="arena-ca-principal">';
         html += '<span class="arena-defesa-label">CA</span>';
-        html += '<span class="arena-ca-valor ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">' + caValor + '</span>';
+        html += '<span class="arena-ca-valor ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
+            + caValor + '</span>';
         html += '</div>';
         html += '<div class="arena-defesa-secundaria">';
-        html += '<div class="arena-defesa-item">';
-        html += '<span class="arena-defesa-label-sm">Surpresa</span>';
-        html += '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">' + sValor + '</span>';
-        html += '</div>';
-        html += '<div class="arena-defesa-item">';
-        html += '<span class="arena-defesa-label-sm">Toque</span>';
-        html += '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">' + tValor + '</span>';
-        html += '</div>';
+        html += '<div class="arena-defesa-item"><span class="arena-defesa-label-sm">Surpresa</span>'
+            + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
+            + sValor + '</span></div>';
+        html += '<div class="arena-defesa-item"><span class="arena-defesa-label-sm">Toque</span>'
+            + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
+            + tValor + '</span></div>';
         html += '</div></div>';
-
         html += '<div class="arena-pv-box">';
         html += '<span class="arena-defesa-label">PV</span>';
-        html += '<span class="arena-pv-valor ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">' + pvValor + '</span>';
-        html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:' + hpPct + '%;background:' + hpCor + ';"></div></div>';
+        html += '<span class="arena-pv-valor ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
+            + pvValor + '</span>';
+        html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:'
+            + hpPct + '%;background:' + hpCor + ';"></div></div>';
         html += '</div>';
-
-        html += '<button class="arena-btn-proximo" onclick="window._avancarTurno()">Encerrar turno</button>';
-
-        html += '</div>'; // fim coluna direita
-        html += '</div>'; // fim layout principal
-        html += '</div>'; // fim arena-card
+        html += '<button class="arena-btn-proximo" id="btnAvancarTurnoArena">'
+            + 'Encerrar turno</button>';
+        html += '</div>';  // fim coluna-direita
+        html += '</div>';  // fim layout-principal
+        html += '</div>';  // fim arena-card
 
         container.innerHTML = html;
 
-        var self = this;
-        window._abrirDanoCura     = function() { if (typeof modalDanoCuraInstance !== 'undefined') modalDanoCuraInstance.abrir(self.combatentes); };
-        window._abrirCondicao     = function() { if (typeof modalCondicaoInstance !== 'undefined') modalCondicaoInstance.abrir(); else console.error('modalCondicaoInstance nao inicializado'); };
-        window._toggleStats       = function() { self.toggleVisibilidadeStats(); };
-        window._avancarTurno      = function() { self.avancarTurno(); };
-        window._finalizarCombate  = function() { self.finalizarCombate(); };
-        window._toggleCronometro  = function() { self.toggleCronometro(); };
-        window._resetarCronometro = function() { self._resetarCronometro(); self._iniciarCronometro(); };
+        this._registrarAcoesGlobais();
+        this._configurarControlesCardAtivo(container);
 
         this._configurarEventosMagias(container);
         this.condicaoController.carregarCondicoesDoCombatente(c.id);
+    }
+
+    _configurarControlesCardAtivo(container) {
+        var btnToggleCronometro = container.querySelector('#btnToggleCronometro');
+        if (btnToggleCronometro) {
+            btnToggleCronometro.addEventListener('click', () => this.toggleCronometro());
+        }
+
+        var btnResetarCronometro = container.querySelector('#btnResetarCronometro');
+        if (btnResetarCronometro) {
+            btnResetarCronometro.addEventListener('click', () => {
+                this._resetarCronometro();
+                this._iniciarCronometro();
+            });
+        }
+
+        var btnToggleStatsArena = container.querySelector('#btnToggleStatsArena');
+        if (btnToggleStatsArena) {
+            btnToggleStatsArena.addEventListener('click', () => this.toggleVisibilidadeStats());
+        }
+
+        var btnAvancarTurnoArena = container.querySelector('#btnAvancarTurnoArena');
+        if (btnAvancarTurnoArena) {
+            btnAvancarTurnoArena.addEventListener('click', () => this.avancarTurno());
+        }
+    }
+
+    _registrarAcoesGlobais() {
+        if (this._actions) {
+            return;
+        }
+
+        var self = this;
+        this._actions = {
+            abrirDanoCura: function() {
+                if (typeof modalDanoCuraInstance !== 'undefined') {
+                    modalDanoCuraInstance.abrir(self.combatentes);
+                }
+            },
+            abrirCondicao: function() {
+                if (typeof modalCondicaoInstance !== 'undefined') {
+                    modalCondicaoInstance.abrir();
+                } else {
+                    console.error('modalCondicaoInstance nao inicializado');
+                }
+            },
+            toggleStats: function() { self.toggleVisibilidadeStats(); },
+            avancarTurno: function() { self.avancarTurno(); },
+            finalizarCombate: function() { self.finalizarCombate(); },
+            toggleCronometro: function() { self.toggleCronometro(); },
+            resetarCronometro: function() {
+                self._resetarCronometro();
+                self._iniciarCronometro();
+            }
+        };
+
+        window.arenaActions = this._actions;
+    }
+
+    // ✅ REFATORADO: avancarTurno() com decremento de duração
+    async avancarTurno() {
+        var idAtual = this.combatentes[this.turnoAtual]
+            ? this.combatentes[this.turnoAtual].id : null;
+        
+        if (idAtual !== null && this._jaAgiram.indexOf(idAtual) === -1) {
+            this._jaAgiram.push(idAtual);
+        }
+        
+        // ✅ NOVO: Decrementar duração das condições do combatente atual ANTES de passar turno
+        if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
+            await this._decrementarDuracaoCondicoes(idAtual); 
+        }
+
+        if (this.combateId) {
+            try {
+                const rodadaAnterior = this.rodadaAtual;
+                const response = await fetch(getApiUrl('/combate/avancar-turno'), {
+                    method: 'POST',
+                    headers: this._headers(false, true),
+                });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.detail || `Erro ao avançar turno (HTTP ${response.status})`);
+                }
+
+                const status = await response.json();
+                await this._aplicarStatusCombate(status);
+                if (this.rodadaAtual > rodadaAnterior) {
+                    Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
+                }
+                return;
+            } catch (error) {
+                Toast.error(error.message || 'Erro ao avançar turno');
+                return;
+            }
+        }
+
+        this.turnoAtual++;
+        if (this.turnoAtual >= this.combatentes.length) {
+            this.turnoAtual = 0;
+            this.rodadaAtual++;
+            this._jaAgiram = [];
+            this.atualizarRodada();
+            Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
+        }
+        this._resetarCronometro();
+        this._iniciarCronometro();
+        this.renderizarOrdemIniciativa();
+        this.renderizarCombatenteAtivo();
     }
 
     _configurarEventosMagias(container) {
@@ -445,11 +883,20 @@ export class ArenaController {
                 self._alterarUsadosMagia(slotId, nivel, acao);
             });
         });
+        container.querySelectorAll('.arena-prep-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var combatenteId = parseInt(btn.getAttribute('data-combatente-id'));
+                var magiaId      = parseInt(btn.getAttribute('data-magia-id'));
+                var nivel        = parseInt(btn.getAttribute('data-nivel'));
+                var acaoPreparo  = btn.getAttribute('data-acao-preparo') || 'usar';
+                var instancia    = parseInt(btn.getAttribute('data-instancia') || '1');
+                self._lancarMagiaPreparada(combatenteId, magiaId, nivel, acaoPreparo, instancia);
+            });
+        });
     }
 
     _renderizarAtaques(ataques) {
-        var html = '';
-        html += '<div class="arena-secao">';
+        var html = '<div class="arena-secao">';
         html += '<h3 class="arena-secao-titulo">Ataques</h3>';
         html += '<div class="arena-ataques-lista">';
         html += '<div class="arena-ataque-header"><span>Nome</span><span>Ataque</span><span>Dano</span></div>';
@@ -459,44 +906,94 @@ export class ArenaController {
             for (var i = 0; i < ataques.length; i++) {
                 var a    = ataques[i];
                 var tipo = a.tipo_dano ? ' (' + a.tipo_dano + ')' : '';
-                html += '<div class="arena-ataque-item">';
-                html += '<span>' + a.nome + '</span>';
-                html += '<span>' + a.bonus_ataque + '</span>';
-                html += '<span>' + a.dano + tipo + '</span>';
-                html += '</div>';
+                html += '<div class="arena-ataque-item"><span>' + a.nome + '</span>'
+                      + '<span>' + a.bonus_ataque + '</span>'
+                      + '<span>' + a.dano + tipo + '</span></div>';
             }
         }
         html += '</div></div>';
         return html;
     }
 
-    _renderizarMagias(slots, tipo) {
-        var isJogador = (tipo === 'jogador');
+    _renderizarMagiasPreparadas(grupos, combatenteId) {
+        var niveisOrdenados = Object.keys(grupos).map(Number).sort(function(a, b) { return a - b; });
+
+        if (niveisOrdenados.length === 0) {
+            return '<div class="arena-secao">'
+                 + '<h3 class="arena-secao-titulo">Magias Preparadas</h3>'
+                 + '<div class="arena-magia-vazio">Nenhuma magia preparada hoje.<br>'
+                 + '<small>Abra o Grimório na ficha do personagem.</small></div>'
+                 + '</div>';
+        }
+
+        var html = '<div class="arena-secao">';
+        html += '<h3 class="arena-secao-titulo">🔮 Magias Preparadas</h3>';
+        html += '<div class="arena-magias-preparadas-lista">';
+
+        niveisOrdenados.forEach(function(nivel) {
+            var grupo       = grupos[nivel];
+            var disponiveis = grupo.total - grupo.usadas;
+            var corDisp     = disponiveis === 0 ? '#f87171'
+                            : grupo.usadas > 0  ? '#facc15'
+                            :                     '#4ade80';
+
+            html += '<div class="arena-magia-preparada-nivel" data-nivel="' + nivel + '">';
+            html += '<div class="arena-prep-nivel-header">';
+            html += '<span class="arena-prep-nivel-label">NIV ' + nivel + '</span>';
+            html += '<span class="arena-prep-disponiveis" style="color:' + corDisp + '">'
+                  + disponiveis + '/' + grupo.total + '</span>';
+            html += '</div>';
+
+            grupo.preparadas.forEach(function(prep) {
+                var usada = prep.usada;
+                var instanciaAtual = Number(prep._instanceIndex || 1);
+                var instanciaTotal = Number(prep._instanceTotal || 1);
+                html += '<div class="arena-prep-magia-row ' + (usada ? 'arena-prep-usada' : '') + '">';
+                html += '<span class="arena-prep-nome ' + (usada ? 'arena-prep-nome-usada' : '') + '"'
+                      + ' data-magia-id="' + prep.magia_id + '" data-instancia="' + instanciaAtual + '">'
+                      + (prep.magia_nome || 'Magia #' + prep.magia_id) + '</span>';
+                if (instanciaTotal > 1) {
+                    html += '<span class="arena-prep-instancia">' + instanciaAtual + '/' + instanciaTotal + '</span>';
+                }
+                if (prep.magia_escola) {
+                    html += '<span class="arena-prep-escola">' + prep.magia_escola + '</span>';
+                }
+                html += '<button class="arena-prep-btn ' + (usada ? 'arena-prep-btn-usada' : '') + '"'
+                      + ' data-combatente-id="' + combatenteId + '"'
+                      + ' data-magia-id="' + prep.magia_id + '"'
+                      + ' data-nivel="' + nivel + '"'
+                      + ' data-instancia="' + instanciaAtual + '"'
+                      + ' data-acao-preparo="' + (usada ? 'restaurar' : 'usar') + '"'
+                      + ' title="' + (usada ? 'Restaurar esta cópia' : 'Lançar esta cópia') + '">'
+                      + (usada ? '↩️' : '🔥') + '</button>';
+                html += '</div>';
+            });
+
+            html += '</div>';
+        });
+
+        html += '</div></div>';
+        return html;
+    }
+
+    _renderizarMagias(slots, tipo, titulo, sincronizando) {
+        var isJogador = isTipoJogador(tipo);
         var self      = this;
-        var html      = '';
-
-        html += '<div class="arena-secao">';
-        html += '<h3 class="arena-secao-titulo">Controle de Magias</h3>';
+        var html      = '<div class="arena-secao">';
+        html += '<h3 class="arena-secao-titulo">' + (titulo || 'Controle de Magias') + '</h3>';
+        if (sincronizando) {
+            html += '<div class="arena-magia-vazio"><small>Sincronizando slots para uso na arena...</small></div>';
+        }
         html += '<div class="arena-magias-duas-colunas">';
-
-        // Coluna esquerda: NIV 0 → 4
         html += '<div class="arena-magias-coluna">';
         html += '<div class="arena-magias-coluna-titulo">NIV 0–4</div>';
-        for (var n1 = 0; n1 <= 4; n1++) {
-            html += self._renderizarMagiaLinha(slots, n1, isJogador);
-        }
+        for (var n1 = 0; n1 <= 4; n1++) html += self._renderizarMagiaLinha(slots, n1, isJogador);
         html += '</div>';
-
-        // Coluna direita: NIV 5 → 9
         html += '<div class="arena-magias-coluna">';
         html += '<div class="arena-magias-coluna-titulo">NIV 5–9</div>';
-        for (var n2 = 5; n2 <= 9; n2++) {
-            html += self._renderizarMagiaLinha(slots, n2, isJogador);
-        }
+        for (var n2 = 5; n2 <= 9; n2++) html += self._renderizarMagiaLinha(slots, n2, isJogador);
         html += '</div>';
-
-        html += '</div>';
-        html += '</div>';
+        html += '</div></div>';
         return html;
     }
 
@@ -507,74 +1004,155 @@ export class ArenaController {
         }
         var total       = slot ? slot.total  : 0;
         var usados      = slot ? slot.usados : 0;
-        var disponiveis = total - usados;           // ✅ quantos ainda pode usar
-        var slotId      = slot ? slot.id     : null;
+        var disponiveis = total - usados;
+        var slotId      = slot ? Number(slot.id ?? slot.slot_id ?? 0) : 0;
+        var semId       = !slotId;
+        var disAumentar = (!isJogador || total === 0 || usados >= total || semId) ? 'disabled' : '';
+        var disDiminuir = (!isJogador || total === 0 || usados <= 0 || semId)    ? 'disabled' : '';
+        var linhaClass  = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
 
-        // '-' consome: só disponível se há disponiveis > 0
-        var disAumentar = (!isJogador || total === 0 || usados >= total) ? 'disabled' : '';
-        // '+' devolve: só disponível se há usados > 0
-        var disDiminuir = (!isJogador || total === 0 || usados <= 0)    ? 'disabled' : '';
-
-        var linhaClass = 'arena-magia-linha' + (total === 0 ? ' magia-sem-slot' : '');
-
-        var html = '';
-        html += '<div class="' + linhaClass + '" data-nivel="' + nivel + '">';
+        var html = '<div class="' + linhaClass + '" data-nivel="' + nivel + '">';
         html += '<span class="arena-magia-nivel">NIV ' + nivel + '</span>';
         html += '<div class="arena-magia-controle">';
-
-        // '-' = consome slot (aumenta usados)
-        html += '<button class="arena-magia-btn arena-magia-btn-diminuir" data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '" ' + disAumentar + '>-</button>';
-
-        // ✅ mostra disponíveis / total (ex: 3/5)
+        html += '<button class="arena-magia-btn arena-magia-btn-diminuir"'
+              + ' data-slot-id="' + slotId + '" data-acao="aumentar" data-nivel="' + nivel + '"'
+              + ' ' + disAumentar + '>-</button>';
         html += '<span class="arena-magia-valor" data-nivel="' + nivel + '">' + disponiveis + '</span>';
         html += '<span class="arena-magia-sep">/</span>';
         html += '<span class="arena-magia-total-inline">' + total + '</span>';
-
-        // '+' = devolve slot (diminui usados)
-        html += '<button class="arena-magia-btn arena-magia-btn-aumentar" data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '" ' + disDiminuir + '>+</button>';
-
-        html += '</div>';
-        html += '</div>';
+        html += '<button class="arena-magia-btn arena-magia-btn-aumentar"'
+              + ' data-slot-id="' + slotId + '" data-acao="diminuir" data-nivel="' + nivel + '"'
+              + ' ' + disDiminuir + '>+</button>';
+        html += '</div></div>';
         return html;
     }
+
     calcularModificador(valor) { return Math.floor((valor - 10) / 2); }
 
     getBadgeClass(tipo) {
-        var mapa = { jogador: 'badge-jogador', monstro: 'badge-monstro', npc: 'badge-npc' };
-        return mapa[tipo] || 'badge-default';
+        return { jogador:'badge-jogador', monstro:'badge-monstro', npc:'badge-npc' }[tipo] || 'badge-default';
     }
 
     getEmojiTipo(tipo) {
-        var mapa = { jogador: '🧙', monstro: '👹', npc: '🤝' };
-        return mapa[tipo] || '⚔️';
+        return { jogador:'🧙', monstro:'👹', npc:'🤝' }[tipo] || '⚔️';
     }
 
-    resetarCombate() {
-        if (!confirm('Deseja resetar o combate? Todos voltarao ao HP maximo.')) return;
+    _mostrarModalConfirmacao(opcoes) {
+        var overlay = document.createElement('div');
+        overlay.id        = 'modalConfirmacaoArena';
+        overlay.className = 'arena-modal-overlay';
+        overlay.innerHTML =
+            '<div class="arena-modal-confirmacao">'
+          + '<div class="arena-modal-confirmacao-header">'
+          + '<span class="arena-modal-confirmacao-icone">' + (opcoes.icone || '⚔️') + '</span>'
+          + '<h3 class="arena-modal-confirmacao-titulo">' + (opcoes.titulo || 'Confirmar') + '</h3>'
+          + '</div>'
+          + '<p class="arena-modal-confirmacao-texto">' + (opcoes.texto || 'Deseja continuar?') + '</p>'
+          + '<div class="arena-modal-confirmacao-botoes">'
+          + '<button class="arena-modal-btn arena-modal-btn-cancelar" id="btnModalCancelar">'
+          + (opcoes.textoCancelar || 'Cancelar') + '</button>'
+          + '<button class="arena-modal-btn arena-modal-btn-confirmar" id="btnModalConfirmar">'
+          + (opcoes.textoConfirmar || 'Confirmar') + '</button>'
+          + '</div></div>';
+
+        document.body.appendChild(overlay);
+        requestAnimationFrame(function() { overlay.classList.add('arena-modal-overlay-show'); });
+
         var self = this;
-        this.combatentes.forEach(function(c) {
-            c.hp_atual = c.hp_maximo;
-            self.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
+        function fechar() {
+            overlay.classList.remove('arena-modal-overlay-show');
+            setTimeout(function() {
+                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }, 250);
+        }
+
+        document.getElementById('btnModalCancelar').addEventListener('click', function() {
+            fechar(); if (opcoes.onCancelar) opcoes.onCancelar();
         });
-        this.turnoAtual    = 0;
-        this.rodadaAtual   = 1;
-        this.statsVisiveis = false;
-        this._jaAgiram     = [];
-        this._resetarCronometro();
-        this._iniciarCronometro();
-        this.atualizarRodada();
-        Toast.success('Combate resetado!');
-        this.renderizarOrdemIniciativa();
-        this.renderizarCombatenteAtivo();
+        document.getElementById('btnModalConfirmar').addEventListener('click', function() {
+            fechar(); if (opcoes.onConfirmar) opcoes.onConfirmar();
+        });
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) fechar(); });
     }
 
     finalizarCombate() {
-        if (!confirm('Deseja finalizar o combate e voltar para a configuracao?')) return;
-        this._pararCronometro();
-        var telaArena        = document.getElementById('telaArena');
-        var telaConfiguracao = document.getElementById('telaConfiguracao');
-        if (telaArena)        telaArena.classList.remove('ativa');
-        if (telaConfiguracao) telaConfiguracao.classList.add('ativa');
-        Toast.success('Combate finalizado!');
+        var self = this;
+        this._mostrarModalConfirmacao({
+            icone: '🏳️', titulo: 'Encerrar Combate',
+            texto: 'Deseja finalizar o combate e voltar para a configuração?',
+            textoCancelar: '← Continuar Combate', textoConfirmar: 'Encerrar ✓',
+            onConfirmar: async function() {
+                if (self.combateId) {
+                    try {
+                        const response = await fetch(getApiUrl('/combate/finalizar'), {
+                            method: 'POST',
+                            headers: self._headers(false, true),
+                        });
+
+                        if (!response.ok) {
+                            const err = await response.json().catch(() => ({}));
+                            throw new Error(err.detail || `Erro ao finalizar combate (HTTP ${response.status})`);
+                        }
+                    } catch (error) {
+                        Toast.error(error.message || 'Erro ao finalizar combate');
+                        return;
+                    }
+                }
+
+                self._pararCronometro();
+                try { self._canal.close(); } catch(e) {}
+                var telaArena        = document.getElementById('telaArena');
+                var telaConfiguracao = document.getElementById('telaConfiguracao');
+                if (telaArena)        telaArena.classList.remove('ativa');
+                if (telaConfiguracao) telaConfiguracao.classList.add('ativa');
+                self.combateId = null;
+                self.versaoCombate = null;
+                Toast.success('Combate finalizado!');
+            }
+        });
+    }
+
+    resetarCombate() {
+        var self = this;
+        this._mostrarModalConfirmacao({
+            icone: '🔄', titulo: 'Resetar Combate',
+            texto: 'Deseja resetar o combate? Todos voltarão ao HP máximo.',
+            textoCancelar: '← Cancelar', textoConfirmar: 'Resetar ✓',
+            onConfirmar: async function() {
+                if (self.combateId) {
+                    try {
+                        const response = await fetch(getApiUrl('/combate/resetar'), {
+                            method: 'POST',
+                            headers: self._headers(false, false),
+                        });
+                        if (!response.ok) {
+                            const err = await response.json().catch(() => ({}));
+                            throw new Error(err.detail || `Erro ao resetar combate (HTTP ${response.status})`);
+                        }
+                    } catch (error) {
+                        Toast.error(error.message || 'Erro ao resetar combate');
+                        return;
+                    }
+                } else {
+                    self.combatentes.forEach(function(c) {
+                        c.hp_atual = c.hp_maximo;
+                        self.combatenteService.atualizarHP(c.id, c.hp_maximo).catch(console.error);
+                    });
+                }
+
+                self.turnoAtual    = 0;
+                self.rodadaAtual   = 1;
+                self.statsVisiveis = false;
+                self._jaAgiram     = [];
+                self.combateId     = null;
+                self.versaoCombate = null;
+                self._resetarCronometro();
+                self._iniciarCronometro();
+                self.atualizarRodada();
+                Toast.success('Combate resetado!');
+                self.renderizarOrdemIniciativa();
+                self.renderizarCombatenteAtivo();
+            }
+        });
     }
 }

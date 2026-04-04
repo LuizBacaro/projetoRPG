@@ -17,12 +17,23 @@
 
 <!-- ── Header ── -->
 <header class="dashboard-header">
-    <h1>⚔️ Arena TTRPG</h1>
-    <div class="header-usuario">
-        <span id="nomeUsuario"></span>
-        <span id="badgePerfil" class="badge-perfil"></span>
-        <a id="linkAdmin" href="/pages/usuarios.html" class="admin-link" style="display:none">👤 Usuários</a>
-        <button class="btn-logout" id="btnLogout">Sair</button>
+    <div class="header-nav">
+        <!-- TÍTULO E DESCRIÇÃO -->
+        <div class="header-titulo">
+            <h1>📊 Dashboard de Combatentes</h1>
+            <p>Gerencie seus personagens, monstros e NPCs</p>
+        </div>
+
+        <!-- USUÁRIO, PERFIL E AÇÕES -->
+        <div class="header-usuario-container">
+            <div class="header-usuario">
+                <span id="nomeUsuario" class="usuario-nome">👤 Carregando...</span>
+                <span id="badgePerfil" class="badge-perfil">...</span>
+                <a id="linkAdmin" href="/pages/usuarios.html" class="admin-link" style="display:none">👤 Usuários</a>
+                <a id="linkMagias" href="/pages/magias.html" class="admin-link" style="display:none">📚 Magias</a>
+                <button class="btn-logout" id="btnLogout">Sair</button>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -87,31 +98,31 @@
 
 </div>
 
-<!--  -->
-<!-- MODAL — Seletor de Tipo                                        -->
-<!--  -->
+<!-- ────────────────────────────────────────────────────────────────── -->
+<!-- MODAIS                                                             -->
+<!-- ────────────────────────────────────────────────────────────────── -->
+
+<!-- MODAL — Seletor de Tipo -->
 <div id="seletorTipo" class="dash-modal-overlay">
     <div class="dash-modal-box" style="max-width:420px">
         <div class="dash-modal-header">
             <h2>Selecionar Tipo</h2>
-            <button class="dash-modal-close" onclick="fecharSeletorTipo()">×</button>
+            <button class="dash-modal-close" id="btnFecharSeletorTipo">×</button>
         </div>
         <div class="seletor-tipo-grid">
-            <button class="btn-tipo-jogador" onclick="abrirModalCadastro('jogador')">🧙 Jogador</button>
-            <button class="btn-tipo-monstro" onclick="abrirModalCadastro('monstro')">👹 Monstro</button>
-            <button class="btn-tipo-npc"     onclick="abrirModalCadastro('npc')">🤝 NPC</button>
+            <button class="btn-tipo-jogador" id="btnTipoJogador">🧙 Jogador</button>
+            <button class="btn-tipo-monstro" id="btnTipoMonstro">👹 Monstro</button>
+            <button class="btn-tipo-npc" id="btnTipoNPC">🤝 NPC</button>
         </div>
     </div>
 </div>
 
-<!--  -->
-<!-- MODAL — Cadastro de Jogador                                    -->
-<!--  -->
+<!-- MODAL — Cadastro de Jogador -->
 <div id="modalCadastroJogador" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
             <h2>🧙 Novo Jogador</h2>
-            <button class="dash-modal-close" onclick="fecharModalCadastro()">×</button>
+            <button class="dash-modal-close" id="btnFecharCadastroJogador">×</button>
         </div>
         <div class="dash-modal-body">
             <form id="formCadastroJogador" enctype="multipart/form-data">
@@ -120,7 +131,22 @@
                 <div class="dash-form-row3">
                     <div class="dash-form-group">
                         <label>Classe *</label>
-                        <input type="text" name="classe" required placeholder="Ex: Guerreiro" />
+                        <select name="classe" required>
+                            <option value="">-- Selecione uma classe --</option>
+                            <option value="Artífice">Artífice</option>
+                            <option value="Bárbaro">Bárbaro</option>
+                            <option value="Bardo">Bardo</option>
+                            <option value="Bruxo">Bruxo</option>
+                            <option value="Clérigo">Clérigo</option>
+                            <option value="Druida">Druida</option>
+                            <option value="Feiticeiro">Feiticeiro</option>
+                            <option value="Patrulheiro">Patrulheiro</option>
+                            <option value="Guerreiro">Guerreiro</option>
+                            <option value="Ladino">Ladino</option>
+                            <option value="Mago">Mago</option>
+                            <option value="Monge">Monge</option>
+                            <option value="Paladino">Paladino</option>
+                        </select>
                     </div>
                     <div class="dash-form-group">
                         <label>Nível</label>
@@ -131,10 +157,16 @@
                         <input type="number" name="pontos" value="0" min="0" />
                     </div>
                 </div>
-                <!-- Raça -->
+
                 <div class="dash-form-group">
                     <label>Raça</label>
                     <input type="text" name="raca" placeholder="Ex: Elfo, Humano, Anão" />
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Divindade</label>
+                    <input type="text" name="divindade" list="listaDivindadesDashboard" maxlength="80" placeholder="Ex.: St. Cuthbert, Wee Jas, Obad-Hai" />
+                    <p class="dash-input-hint" id="hintDivindadeCadastroJogador">Carregando sugestões...</p>
                 </div>
 
                 <div class="dash-form-group">
@@ -155,20 +187,18 @@
 
                 <div class="dash-form-group">
                     <label>Foto do Personagem</label>
-                    <div class="dash-upload-area" id="uploadPlaceholder"
-                         onclick="document.getElementById('inputFoto').click()">
+                    <div class="dash-upload-area" id="uploadPlaceholder">
                         📷 Clique para adicionar foto
                     </div>
-                    <input type="file" id="inputFoto" name="foto" accept="image/*" style="display:none"
-                           onchange="previewImagemUpload(this,'uploadPreview','previewImage','uploadPlaceholder')" />
+                    <input type="file" id="inputFoto" name="foto" accept="image/*" style="display:none" />
                     <div id="uploadPreview" class="dash-upload-preview" style="display:none">
                         <img id="previewImage" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove" onclick="removerImagem()">✕</button>
+                        <button type="button" class="dash-upload-remove" id="btnRemoverImagemJogador">✕</button>
                     </div>
                 </div>
 
                 <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastro()">Cancelar</button>
+                    <button type="button" class="btn-dash-cancel" id="btnCancelarCadastroJogador">Cancelar</button>
                     <button type="submit" class="btn-dash-save">✅ Cadastrar Jogador</button>
                 </div>
             </form>
@@ -176,14 +206,12 @@
     </div>
 </div>
 
-<!--  -->
-<!-- MODAL — Cadastro de Monstro                                    -->
-<!--  -->
+<!-- MODAL — Cadastro de Monstro -->
 <div id="modalCadastroMonstro" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
             <h2>👹 Novo Monstro</h2>
-            <button class="dash-modal-close" onclick="fecharModalCadastroMonstro()">×</button>
+            <button class="dash-modal-close" id="btnFecharCadastroMonstro">×</button>
         </div>
         <div class="dash-modal-body">
             <form id="formCadastroMonstro" enctype="multipart/form-data">
@@ -192,7 +220,22 @@
                 <div class="dash-form-row3">
                     <div class="dash-form-group">
                         <label>Tipo/Espécie</label>
-                        <input type="text" name="classe" placeholder="Ex: Humanoide" />
+                        <select name="classe">
+                            <option value="">-- Selecione uma classe --</option>
+                            <option value="Artífice">Artífice</option>
+                            <option value="Bárbaro">Bárbaro</option>
+                            <option value="Bardo">Bardo</option>
+                            <option value="Bruxo">Bruxo</option>
+                            <option value="Clérigo">Clérigo</option>
+                            <option value="Druida">Druida</option>
+                            <option value="Feiticeiro">Feiticeiro</option>
+                            <option value="Patrulheiro">Patrulheiro</option>
+                            <option value="Guerreiro">Guerreiro</option>
+                            <option value="Ladino">Ladino</option>
+                            <option value="Mago">Mago</option>
+                            <option value="Monge">Monge</option>
+                            <option value="Paladino">Paladino</option>
+                        </select>
                     </div>
                     <div class="dash-form-group">
                         <label>Nível</label>
@@ -203,10 +246,15 @@
                         <input type="number" name="pontos" value="0" min="0" />
                     </div>
                 </div>
-                <!-- Raça -->
+
                 <div class="dash-form-group">
                     <label>Raça / Origem</label>
                     <input type="text" name="raca" placeholder="Ex: Goblinoide, Morto-Vivo" />
+                </div>
+
+                <div class="dash-form-group">
+                    <label>📖 Página de Referência</label>
+                    <input type="text" name="pagina_referencia" placeholder="Ex: Livro do Mestre p.137" maxlength="100" />
                 </div>
 
                 <div class="dash-form-group">
@@ -227,20 +275,18 @@
 
                 <div class="dash-form-group">
                     <label>Foto</label>
-                    <div class="dash-upload-area" id="uploadPlaceholderMonstro"
-                         onclick="document.getElementById('inputFotoMonstro').click()">
+                    <div class="dash-upload-area" id="uploadPlaceholderMonstro">
                         📷 Clique para adicionar foto
                     </div>
-                    <input type="file" id="inputFotoMonstro" name="foto" accept="image/*" style="display:none"
-                           onchange="previewImagemUpload(this,'uploadPreviewMonstro','previewImageMonstro','uploadPlaceholderMonstro')" />
+                    <input type="file" id="inputFotoMonstro" name="foto" accept="image/*" style="display:none" />
                     <div id="uploadPreviewMonstro" class="dash-upload-preview" style="display:none">
                         <img id="previewImageMonstro" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove" onclick="removerImagemMonstro()">✕</button>
+                        <button type="button" class="dash-upload-remove" id="btnRemoverImagemMonstro">✕</button>
                     </div>
                 </div>
 
                 <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastroMonstro()">Cancelar</button>
+                    <button type="button" class="btn-dash-cancel" id="btnCancelarCadastroMonstro">Cancelar</button>
                     <button type="submit" class="btn-dash-save">✅ Cadastrar Monstro</button>
                 </div>
             </form>
@@ -248,14 +294,12 @@
     </div>
 </div>
 
-<!--  -->
-<!-- MODAL — Cadastro de NPC                                        -->
-<!--  -->
+<!-- MODAL — Cadastro de NPC -->
 <div id="modalCadastroNPC" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
             <h2>🤝 Novo NPC</h2>
-            <button class="dash-modal-close" onclick="fecharModalCadastroNPC()">×</button>
+            <button class="dash-modal-close" id="btnFecharCadastroNPC">×</button>
         </div>
         <div class="dash-modal-body">
             <form id="formCadastroNPC" enctype="multipart/form-data">
@@ -264,7 +308,22 @@
                 <div class="dash-form-row3">
                     <div class="dash-form-group">
                         <label>Papel/Função</label>
-                        <input type="text" name="classe" placeholder="Ex: Aliado" />
+                        <select name="classe">
+                            <option value="">-- Selecione uma classe --</option>
+                            <option value="Artífice">Artífice</option>
+                            <option value="Bárbaro">Bárbaro</option>
+                            <option value="Bardo">Bardo</option>
+                            <option value="Bruxo">Bruxo</option>
+                            <option value="Clérigo">Clérigo</option>
+                            <option value="Druida">Druida</option>
+                            <option value="Feiticeiro">Feiticeiro</option>
+                            <option value="Patrulheiro">Patrulheiro</option>
+                            <option value="Guerreiro">Guerreiro</option>
+                            <option value="Ladino">Ladino</option>
+                            <option value="Mago">Mago</option>
+                            <option value="Monge">Monge</option>
+                            <option value="Paladino">Paladino</option>
+                        </select>
                     </div>
                     <div class="dash-form-group">
                         <label>Nível</label>
@@ -275,7 +334,7 @@
                         <input type="number" name="pontos" value="0" min="0" />
                     </div>
                 </div>
-                <!-- Raça -->
+
                 <div class="dash-form-group">
                     <label>Raça</label>
                     <input type="text" name="raca" placeholder="Ex: Humano, Halfling" />
@@ -299,20 +358,18 @@
 
                 <div class="dash-form-group">
                     <label>Foto</label>
-                    <div class="dash-upload-area" id="uploadPlaceholderNPC"
-                         onclick="document.getElementById('inputFotoNPC').click()">
+                    <div class="dash-upload-area" id="uploadPlaceholderNPC">
                         📷 Clique para adicionar foto
                     </div>
-                    <input type="file" id="inputFotoNPC" name="foto" accept="image/*" style="display:none"
-                           onchange="previewImagemUpload(this,'uploadPreviewNPC','previewImageNPC','uploadPlaceholderNPC')" />
+                    <input type="file" id="inputFotoNPC" name="foto" accept="image/*" style="display:none" />
                     <div id="uploadPreviewNPC" class="dash-upload-preview" style="display:none">
                         <img id="previewImageNPC" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove" onclick="removerImagemNPC()">✕</button>
+                        <button type="button" class="dash-upload-remove" id="btnRemoverImagemNPC">✕</button>
                     </div>
                 </div>
 
                 <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-cancel" onclick="fecharModalCadastroNPC()">Cancelar</button>
+                    <button type="button" class="btn-dash-cancel" id="btnCancelarCadastroNPC">Cancelar</button>
                     <button type="submit" class="btn-dash-save">✅ Cadastrar NPC</button>
                 </div>
             </form>
@@ -320,21 +377,18 @@
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- MODAL DE EDIÇÃO                                               -->
-<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL DE EDIÇÃO -->
 <div id="modalEdicaoDashboard" class="dash-modal-overlay">
     <div class="dash-modal-box">
         <div class="dash-modal-header">
             <h2>✏️ Editar Combatente</h2>
-            <button class="dash-modal-close" onclick="fecharModalEdicao()">×</button>
+            <button class="dash-modal-close" id="btnFecharModalEdicao">×</button>
         </div>
         <div class="dash-modal-body">
             <form id="formEdicaoDashboard" enctype="multipart/form-data">
                 <input type="hidden" id="dashEditId"   name="id" />
                 <input type="hidden" id="dashEditTipo" name="tipo" />
 
-                <!-- Nível + Pontos -->
                 <div class="dash-form-row">
                     <div class="dash-form-group">
                         <label>Nível</label>
@@ -346,13 +400,11 @@
                     </div>
                 </div>
 
-                <!-- Nome -->
                 <div class="dash-form-group">
                     <label>Nome *</label>
                     <input type="text" id="dashEditNome" name="nome" required placeholder="Nome do combatente" />
                 </div>
 
-                <!-- HP + Iniciativa -->
                 <div class="dash-form-row">
                     <div class="dash-form-group">
                         <label>HP Máximo *</label>
@@ -364,19 +416,27 @@
                     </div>
                 </div>
 
-                <!-- Classe -->
                 <div class="dash-form-group">
                     <label>Classe</label>
                     <input type="text" id="dashEditClasse" name="classe" placeholder="Ex: Guerreiro" />
                 </div>
 
-                <!-- Raça -->
                 <div class="dash-form-group">
                     <label>Raça</label>
                     <input type="text" id="dashEditRaca" name="raca" placeholder="Ex: Elfo, Humano, Anão" />
                 </div>
 
-                <!-- Defesa -->
+                <div class="dash-form-group">
+                    <label>Divindade</label>
+                    <input type="text" id="dashEditDivindade" name="divindade" list="listaDivindadesDashboard" maxlength="80" placeholder="Ex.: St. Cuthbert, Wee Jas, Obad-Hai" />
+                    <p class="dash-input-hint" id="hintDivindadeEdicao">Carregando sugestões...</p>
+                </div>
+
+                <div class="dash-form-group" id="secaoPaginaReferencia" style="display:none">
+                    <label>📖 Página de Referência</label>
+                    <input type="text" id="dashEditPaginaReferencia" name="pagina_referencia" placeholder="Ex: Livro do Mestre p.137" maxlength="100" />
+                </div>
+
                 <p class="dash-section-label">🛡️ Defesa</p>
                 <div class="dash-form-row3">
                     <div class="dash-form-group">
@@ -392,9 +452,7 @@
                         <input type="number" id="dashEditSurpresa" name="surpresa" value="10" min="0" />
                     </div>
                 </div>
-                
 
-                <!-- Resistências -->
                 <p class="dash-section-label">⚡ Resistências</p>
                 <div class="dash-form-row3">
                     <div class="dash-form-group">
@@ -411,76 +469,55 @@
                     </div>
                 </div>
 
-                <!-- Atributos D&D -->
                 <p class="dash-section-label">🎲 Atributos D&D</p>
                 <div class="dash-atributos-grid">
                     <div class="dash-atrib-field">
                         <label>FOR</label>
-                        <input type="number" id="dashEditFOR" name="forca"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditFOR" name="forca" value="10" min="1" max="30" class="dash-atributo-input" />
                         <div class="dash-atrib-mod" id="modDashEditFOR">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>DES</label>
-                        <input type="number" id="dashEditDES" name="destreza"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditDES" name="destreza" value="10" min="1" max="30" class="dash-atributo-input" />
                         <div class="dash-atrib-mod" id="modDashEditDES">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>CON</label>
-                        <input type="number" id="dashEditCON" name="constituicao"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditCON" name="constituicao" value="10" min="1" max="30" class="dash-atributo-input" />
                         <div class="dash-atrib-mod" id="modDashEditCON">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>INT</label>
-                        <input type="number" id="dashEditINT" name="inteligencia"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditINT" name="inteligencia" value="10" min="1" max="30" class="dash-atributo-input" />
                         <div class="dash-atrib-mod" id="modDashEditINT">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>SAB</label>
-                        <input type="number" id="dashEditSAB" name="sabedoria"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditSAB" name="sabedoria" value="10" min="1" max="30" class="dash-atributo-input" />
                         <div class="dash-atrib-mod" id="modDashEditSAB">+0</div>
                     </div>
                     <div class="dash-atrib-field">
                         <label>CAR</label>
-                        <input type="number" id="dashEditCAR" name="carisma"
-                               value="10" min="1" max="30"
-                               oninput="atualizarModificador(this)" />
+                        <input type="number" id="dashEditCAR" name="carisma" value="10" min="1" max="30" class="dash-atributo-input" />
                         <div class="dash-atrib-mod" id="modDashEditCAR">+0</div>
                     </div>
                 </div>
 
-                <!-- Foto -->
                 <p class="dash-section-label" style="margin-top:1rem">📷 Foto</p>
                 <div id="dashEditUploadArea">
-                    <div class="dash-upload-area" id="dashEditUploadPlaceholder"
-                         onclick="document.getElementById('dashEditFoto').click()">
+                    <div class="dash-upload-area" id="dashEditUploadPlaceholder">
                         📷 Clique para trocar a foto
                     </div>
-                    <input type="file" id="dashEditFoto" name="foto"
-                           accept="image/*" style="display:none" />
+                    <input type="file" id="dashEditFoto" name="foto" accept="image/*" style="display:none" />
                     <div id="dashEditUploadPreview" class="dash-upload-preview" style="display:none">
                         <img id="dashEditPreviewImage" src="" alt="Preview" />
-                        <button type="button" class="dash-upload-remove"
-                                onclick="removerImagemEdicao()">✕</button>
+                        <button type="button" class="dash-upload-remove" id="btnRemoverImagemEdicao">✕</button>
                     </div>
                 </div>
 
-                <!-- ══ ATAQUES — só visível para Jogador ══ -->
                 <div id="secaoAtaquesEdicao" style="display:none">
                     <p class="dash-section-label" style="margin-top:1rem">⚔️ Ataques</p>
-                    <div style="display:grid;
-                                grid-template-columns:1fr 70px 90px 120px 36px;
-                                gap:.4rem;margin-bottom:.4rem;
-                                font-size:.72rem;color:#64748b;">
+                    <div style="display:grid; grid-template-columns:1fr 70px 90px 120px 36px; gap:.4rem; margin-bottom:.4rem; font-size:.72rem; color:#64748b;">
                         <span>Nome</span>
                         <span>Bônus</span>
                         <span>Dano</span>
@@ -488,31 +525,21 @@
                         <span></span>
                     </div>
                     <div id="listaAtaquesEdicao"></div>
-                    <button type="button"
-                            class="btn-dash-cancel"
-                            style="margin-top:.5rem;font-size:.82rem"
-                            onclick="adicionarLinhaAtaque()">
+                    <button type="button" class="btn-dash-cancel" style="margin-top:.5rem;font-size:.82rem" id="btnAdicionarAtaqueEdicao">
                         + Adicionar Ataque
                     </button>
                 </div>
 
-                <!-- ══ SLOTS DE MAGIA — só visível para Jogador ══ -->
-                <div id="secaoMagiasEdicao" style="display:none">
-                    <p class="dash-section-label" style="margin-top:1rem">✨ Slots de Magia</p>
-                    <p style="font-size:.78rem;color:#64748b;margin-bottom:.75rem">
-                        Defina o total de slots por nível.
-                        Os usados são controlados em tempo real na Arena.
-                    </p>
-                    <div id="gridMagiasEdicao"></div>
-                </div>
-
-                <!-- Ações -->
-                <div class="dash-modal-actions">
-                    <button type="button" class="btn-dash-cancel"
-                            onclick="fecharModalEdicao()">Cancelar</button>
-                    <button type="button" class="btn-dash-delete"
-                            onclick="confirmarDelecao()">🗑️ Deletar</button>
-                    <button type="submit"  class="btn-dash-save">💾 Salvar Alterações</button>
+                <div class="dash-modal-actions" style="margin-top: 1.5rem; gap: 0.75rem; flex-wrap: wrap;">
+                    <button type="submit" class="btn-dash-save">
+                        💾 Salvar Alterações
+                    </button>
+                    <button type="button" class="btn-dash-delete" id="btnDeletarCombatenteEdicao">
+                        🗑️ Deletar
+                    </button>
+                    <button type="button" class="btn-dash-cancel" id="btnCancelarEdicao">
+                        Cancelar
+                    </button>
                 </div>
 
             </form>
@@ -520,37 +547,76 @@
     </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════ -->
-<!-- Scripts — ordem sequencial obrigatória                        -->
-<!-- ══════════════════════════════════════════════════════════════ -->
-<script type="module">
-    import { getApiUrl } from '/js/config/api.config.js';
-    import { Toast     } from '/js/ui/toast.module.js';   // ✅ AQUI
-    window.getApiUrl = getApiUrl;
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- SCRIPTS — CARREGAMENTO OTIMIZADO                                -->
+<!-- ════════════════════════════════════════════════════════════════ -->
 
-    const carregar = (src) => new Promise((resolve, reject) => {
-        const s  = document.createElement('script');
-        s.src    = src;
-        s.onload = resolve;
-        s.onerror = () => reject(new Error('Falha ao carregar: ' + src));
-        document.body.appendChild(s);
-    });
+<datalist id="listaDivindadesDashboard"></datalist>
 
-    await carregar('/js/services/AuthService.js');
-    AuthService.exigirLogin();
-
-    const nomeEl   = document.getElementById('nomeUsuario');
-    const badgeEl  = document.getElementById('badgePerfil');
-    const logoutEl = document.getElementById('btnLogout');
-    if (nomeEl)   nomeEl.textContent  = AuthService.getNome();
-    if (badgeEl)  badgeEl.textContent = AuthService.getPerfil();
-    if (logoutEl) logoutEl.addEventListener('click', () => AuthService.logout());
-    AuthService.configurarVisibilidadeAdmin('linkAdmin');
-
-    // ✅ Toast já disponível via import acima — não precisa de carregar()
-    await carregar('/js/services/AtaqueService.js');
-    await carregar('/js/controllers/DashboardController.js');
+<!-- FASE 1: Configuração Global -->
+<script>
+    window.getApiUrl = function(path) {
+        return window.location.origin + '/api/v1' + (path || '');
+    };
+    console.log('✅ API URL configurada');
 </script>
+
+<!-- FASE 2: AuthService (deve ser carregado antes de tudo) -->
+<script src="/js/services/AuthService.js"></script>
+
+<!-- FASE 3: ModalConfirm (deve estar antes de DashboardController) -->
+<script src="/js/ui/ModalConfirm.js"></script>
+
+<!-- FASE 4: Serviços de Negócio -->
+<script src="/js/services/AtaqueService.js"></script>
+
+<!-- FASE 5: Toast (simples) -->
+<script>
+    class Toast {
+        static show(message, type = 'info') {
+            const container = document.getElementById('toastContainer') || (() => {
+                const div = document.createElement('div');
+                div.id = 'toastContainer';
+                document.body.appendChild(div);
+                return div;
+            })();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type} show`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        static success(msg) { this.show(msg, 'success'); }
+        static error(msg) { this.show(msg, 'error'); }
+        static info(msg) { this.show(msg, 'info'); }
+    }
+    
+    console.log('✅ Toast configurado');
+</script>
+
+<!-- FASE 6: Utilitários -->
+<script src="/js/utils/combat-rules.global.js"></script>
+<script src="/js/utils/async-button.global.js"></script>
+<script>
+    function escapeHtml(str) {
+        if (typeof str !== 'string') return str;
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+</script>
+
+<!-- FASE 7: DashboardController (carregado por último) -->
+<script src="/js/controllers/DashboardController.js?v=6"></script>
 
 </body>
 </html>

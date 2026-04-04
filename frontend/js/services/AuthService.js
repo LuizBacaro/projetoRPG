@@ -6,12 +6,12 @@
 
 class AuthService {
 
-    static TOKEN_KEY   = 'rpg_token';
-    static USUARIO_KEY = 'rpg_usuario';
+    static TOKEN_KEY   = 'token';
+    static USUARIO_KEY = 'usuario';
 
     // ── Token 
     static getToken() {
-        return sessionStorage.getItem(this.TOKEN_KEY);
+        return localStorage.getItem(this.TOKEN_KEY);
     }
 
     static getAuthHeader() {
@@ -26,7 +26,7 @@ class AuthService {
     // ── Usuário 
     static getUsuario() {
         try {
-            return JSON.parse(sessionStorage.getItem(this.USUARIO_KEY)) || null;
+            return JSON.parse(localStorage.getItem(this.USUARIO_KEY)) || null;
         } catch {
             return null;
         }
@@ -42,8 +42,8 @@ class AuthService {
 
     // ── Navegação 
     static logout() {
-        sessionStorage.removeItem(this.TOKEN_KEY);
-        sessionStorage.removeItem(this.USUARIO_KEY);
+        localStorage.removeItem(this.TOKEN_KEY);
+        localStorage.removeItem(this.USUARIO_KEY);
         window.location.href = '/pages/login.html';
     }
 
@@ -72,6 +72,55 @@ class AuthService {
         if (this.isMestre()) return true;
         return tipo === 'jogador';
     }
+
+    /**
+ * Configura o header do usuário (nome, perfil, visibilidade admin)
+ * ✅ Funciona em qualquer página que tenha os elementos
+ */
+static configurarHeaderUsuario() {
+    const usuario = this.getUsuario();
+    if (!usuario) {
+        console.warn('⚠️ Usuário não encontrado');
+        return;
+    }
+
+    console.log('⚙️ Configurando header do usuário:', usuario.nome);
+
+    // ── NOME DO USUÁRIO ──
+    const nomeEl = document.getElementById('nomeUsuario') || document.getElementById('nomeUsuarioArena');
+    if (nomeEl) {
+        nomeEl.textContent = `👤 ${usuario.nome}`;
+        console.log('✅ Nome do usuário configurado');
+    }
+
+    // ── BADGE DE PERFIL ──
+    const badgeEl = document.getElementById('badgePerfil') || document.getElementById('badgePerfilArena');
+    if (badgeEl) {
+        badgeEl.textContent = usuario.perfil;
+        badgeEl.className = `badge-perfil ${usuario.perfil}`;
+        console.log('✅ Badge de perfil configurado');
+    }
+
+    // ── LINK ADMIN (apenas para administradores) ──
+    const linkAdminEl = document.getElementById('linkAdmin');
+        if (linkAdminEl) {
+            if (this.isAdmin()) {
+                linkAdminEl.style.display = '';
+                console.log('✅ Link admin visível');
+            } else {
+                linkAdminEl.style.display = 'none';
+                console.log('✅ Link admin oculto');
+            }
+        }
+
+        // ── BOTÃO LOGOUT ──
+        const btnLogout = document.getElementById('btnLogout') || document.getElementById('btnLogoutArena');
+        if (btnLogout) {
+            btnLogout.addEventListener('click', () => this.logout());
+            console.log('✅ Evento de logout configurado');
+        }
+    }
+
 }
 
 // ✅ Expõe globalmente — compatível com carregar() do dashboard.html

@@ -1,15 +1,20 @@
 /**
- * Service de Combatente
- * Single Responsibility: comunicação HTTP + conversão para modelo de domínio
+ * CombatenteService.js
+ * SRP: Comunicação HTTP com a API de combatentes
+ * SOLID: DIP - Dependency Injection via constructor (será usado se necessário)
  */
 
 import { getApiUrl } from '../config/api.config.js';
 import { Combatente } from '../models/Combatente.js';
 
 export class CombatenteService {
+    constructor() {
+        this.token = localStorage.getItem('token');
+        console.log('✅ CombatenteService inicializado');
+    }
 
     /**
-     * Converte JSON da API para instância de Combatente (com métodos)
+     * Converte JSON da API para instância de Combatente
      * @param {Object} data - JSON puro da API
      * @returns {Combatente}
      */
@@ -19,7 +24,7 @@ export class CombatenteService {
 
     /**
      * Lista todos os combatentes ou filtra por tipo
-     * @param {string|null} tipo
+     * @param {string|null} tipo - 'jogador', 'monstro', 'npc'
      * @returns {Promise<Combatente[]>}
      */
     async listar(tipo = null) {
@@ -28,35 +33,69 @@ export class CombatenteService {
                 ? `${getApiUrl('/combatentes')}?tipo=${tipo}`
                 : getApiUrl('/combatentes');
 
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Erro ao carregar combatentes');
+            console.log('📡 GET:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
 
             const data = await response.json();
-            return data.map(item => this._toModel(item)); // ✅ converte para Combatente
+            console.log('✅ Combatentes carregados:', data.length);
+            return data.map(item => this._toModel(item));
 
         } catch (error) {
-            console.error('Erro ao listar combatentes:', error);
+            console.error('❌ Erro ao listar combatentes:', error);
             throw error;
         }
     }
 
     /**
-     * Obtém um combatente por ID
+     * Obtém um combatente por ID (FUNÇÃO RENOMEADA PARA CLAREZA)
+     * @param {number} id - ID do combatente
+     * @returns {Promise<Combatente>}
+     */
+    async obterCombatente(id) {
+        try {
+            const url = `${getApiUrl('/combatentes')}/${id}`;
+            console.log('📡 GET:', url);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Combatente não encontrado`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Combatente carregado:', data.nome);
+            return this._toModel(data);
+
+        } catch (error) {
+            console.error('❌ Erro ao obter combatente:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Alias para obterCombatente (compatibilidade)
      * @param {number} id
      * @returns {Promise<Combatente>}
      */
     async obterPorId(id) {
-        try {
-            const response = await fetch(`${getApiUrl('/combatentes')}/${id}`);
-            if (!response.ok) throw new Error('Combatente não encontrado');
-
-            const data = await response.json();
-            return this._toModel(data); // ✅ converte para Combatente
-
-        } catch (error) {
-            console.error('Erro ao obter combatente:', error);
-            throw error;
-        }
+        return this.obterCombatente(id);
     }
 
     /**
@@ -66,8 +105,14 @@ export class CombatenteService {
      */
     async criar(formData) {
         try {
-            const response = await fetch(getApiUrl('/combatentes'), {
+            const url = getApiUrl('/combatentes');
+            console.log('📡 POST:', url);
+
+            const response = await fetch(url, {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                },
                 body: formData
             });
 
@@ -77,24 +122,31 @@ export class CombatenteService {
             }
 
             const data = await response.json();
-            return this._toModel(data); // ✅ converte para Combatente
+            console.log('✅ Combatente criado:', data.nome);
+            return this._toModel(data);
 
         } catch (error) {
-            console.error('Erro ao criar combatente:', error);
+            console.error('❌ Erro ao criar combatente:', error);
             throw error;
         }
     }
 
     /**
-     * Atualiza um combatente
+     * Atualiza um combatente completo
      * @param {number} id
      * @param {FormData} formData
      * @returns {Promise<Combatente>}
      */
     async atualizar(id, formData) {
         try {
-            const response = await fetch(`${getApiUrl('/combatentes')}/${id}`, {
+            const url = `${getApiUrl('/combatentes')}/${id}`;
+            console.log('📡 PUT:', url);
+
+            const response = await fetch(url, {
                 method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                },
                 body: formData
             });
 
@@ -104,10 +156,11 @@ export class CombatenteService {
             }
 
             const data = await response.json();
-            return this._toModel(data); // ✅ converte para Combatente
+            console.log('✅ Combatente atualizado:', data.nome);
+            return this._toModel(data);
 
         } catch (error) {
-            console.error('Erro ao atualizar combatente:', error);
+            console.error('❌ Erro ao atualizar combatente:', error);
             throw error;
         }
     }
@@ -120,19 +173,28 @@ export class CombatenteService {
      */
     async atualizarHP(id, hpAtual) {
         try {
-            const response = await fetch(`${getApiUrl('/combatentes')}/${id}/hp`, {
+            const url = `${getApiUrl('/combatentes')}/${id}/hp`;
+            console.log('📡 PATCH:', url);
+
+            const response = await fetch(url, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
                 body: JSON.stringify({ hp_atual: parseInt(hpAtual) })
             });
 
-            if (!response.ok) throw new Error('Erro ao atualizar HP');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Erro ao atualizar HP`);
+            }
 
             const data = await response.json();
-            return this._toModel(data); // ✅ converte para Combatente
+            console.log('✅ HP atualizado para:', hpAtual);
+            return this._toModel(data);
 
         } catch (error) {
-            console.error('Erro ao atualizar HP:', error);
+            console.error('❌ Erro ao atualizar HP:', error);
             throw error;
         }
     }
@@ -145,19 +207,28 @@ export class CombatenteService {
      */
     async atualizarIniciativa(id, iniciativa) {
         try {
-            const response = await fetch(`${getApiUrl('/combatentes')}/${id}/iniciativa`, {
+            const url = `${getApiUrl('/combatentes')}/${id}/iniciativa`;
+            console.log('📡 PATCH:', url);
+
+            const response = await fetch(url, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
                 body: JSON.stringify({ iniciativa: parseInt(iniciativa) })
             });
 
-            if (!response.ok) throw new Error('Erro ao atualizar iniciativa');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Erro ao atualizar iniciativa`);
+            }
 
             const data = await response.json();
-            return this._toModel(data); // ✅ converte para Combatente
+            console.log('✅ Iniciativa atualizada para:', iniciativa);
+            return this._toModel(data);
 
         } catch (error) {
-            console.error('Erro ao atualizar iniciativa:', error);
+            console.error('❌ Erro ao atualizar iniciativa:', error);
             throw error;
         }
     }
@@ -169,15 +240,25 @@ export class CombatenteService {
      */
     async deletar(id) {
         try {
-            const response = await fetch(`${getApiUrl('/combatentes')}/${id}`, {
-                method: 'DELETE'
+            const url = `${getApiUrl('/combatentes')}/${id}`;
+            console.log('📡 DELETE:', url);
+
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
             });
 
-            if (!response.ok) throw new Error('Erro ao deletar combatente');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Erro ao deletar combatente`);
+            }
+
+            console.log('✅ Combatente deletado');
             return true;
 
         } catch (error) {
-            console.error('Erro ao deletar combatente:', error);
+            console.error('❌ Erro ao deletar combatente:', error);
             throw error;
         }
     }

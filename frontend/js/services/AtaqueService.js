@@ -19,6 +19,30 @@ class AtaqueService {
         return h;
     }
 
+    async _buildHttpError(res, contexto) {
+        var detalhe = '';
+
+        try {
+            var data = await res.clone().json();
+            if (data && typeof data.detail === 'string' && data.detail.trim()) {
+                detalhe = data.detail.trim();
+            }
+        } catch (_) {}
+
+        if (!detalhe) {
+            try {
+                var txt = (await res.text()).trim();
+                if (txt) detalhe = txt;
+            } catch (_) {}
+        }
+
+        return new Error(
+            detalhe
+                ? contexto + ' (HTTP ' + res.status + '): ' + detalhe
+                : contexto + ' (HTTP ' + res.status + ')'
+        );
+    }
+
     // ── Ataques ──────────────────────────────────────────────────
 
     async listarAtaques(combatenteId) {
@@ -27,7 +51,9 @@ class AtaqueService {
             this._url('/combatentes/' + combatenteId + '/ataques'),
             { headers: this._headers() }
         );
-        if (!res.ok) throw new Error('Erro ao buscar ataques');
+        if (!res.ok) {
+            throw await this._buildHttpError(res, 'Erro ao buscar ataques do combatente #' + combatenteId);
+        }
         return res.json();
     }
 
@@ -41,7 +67,9 @@ class AtaqueService {
                 body:    JSON.stringify({ ataques: ataques })
             }
         );
-        if (!res.ok) throw new Error('Erro ao salvar ataques');
+        if (!res.ok) {
+            throw await this._buildHttpError(res, 'Erro ao salvar ataques do combatente #' + combatenteId);
+        }
         return res.json();
     }
 
@@ -53,7 +81,9 @@ class AtaqueService {
             this._url('/combatentes/' + combatenteId + '/magias'),
             { headers: this._headers() }
         );
-        if (!res.ok) throw new Error('Erro ao buscar slots de magia');
+        if (!res.ok) {
+            throw await this._buildHttpError(res, 'Erro ao buscar slots de magia do combatente #' + combatenteId);
+        }
         return res.json();
     }
 
@@ -67,7 +97,12 @@ class AtaqueService {
                 body:    JSON.stringify({ slots: slots })
             }
         );
-        if (!res.ok) throw new Error('Erro ao salvar slots de magia');
+        if (!res.ok) {
+            throw await this._buildHttpError(
+                res,
+                'Erro ao salvar slots de magia do combatente #' + combatenteId
+            );
+        }
         return res.json();
     }
 
@@ -81,7 +116,9 @@ class AtaqueService {
                 body:    JSON.stringify({ usados: usados })
             }
         );
-        if (!res.ok) throw new Error('Erro ao atualizar slot');
+        if (!res.ok) {
+            throw await this._buildHttpError(res, 'Erro ao atualizar slot #' + slotId + ' para ' + usados + ' usados');
+        }
         return res.json();
     }
 }

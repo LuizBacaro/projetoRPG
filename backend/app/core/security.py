@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from jose import JWTError, jwt
+from uuid import uuid4
 import logging
 
 logger = logging.getLogger(__name__)
@@ -39,7 +40,8 @@ def verificar_senha(senha: str, hash_stored: str) -> bool:
 def criar_token(
     data: Dict[str, Any],
     secret_key: str,
-    expires_delta: Optional[timedelta] = None
+    expires_delta: Optional[timedelta] = None,
+    token_type: str = "access"
 ) -> str:
     """Cria um JWT token com payload customizado."""
     to_encode = data.copy()
@@ -49,7 +51,13 @@ def criar_token(
     else:
         expire = datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
 
-    to_encode.update({"exp": expire})
+    to_encode.update(
+        {
+            "exp": expire,
+            "type": token_type,
+            "jti": str(uuid4()),
+        }
+    )
 
     try:
         encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=ALGORITHM)

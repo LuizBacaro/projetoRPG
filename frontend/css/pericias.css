@@ -1,0 +1,503 @@
+/**
+ * pericias.css - Layout de Tabela Unificada
+ * Estilos alinhados com dashboard.css (cores azul/roxo, tipografia padrão)
+ */
+
+/* ────────────────────────────────────────────────────────────── */
+/* CONTAINER PRINCIPAL                                            */
+/* ────────────────────────────────────────────────────────────── */
+
+.pericias-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #0f0f23;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* HEADER                                                         */
+/* ────────────────────────────────────────────────────────────── */
+
+.pericias-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border-bottom: 4px solid #a78bfa;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-voltar {
+    padding: 0.9rem 1.8rem;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #e2e8f0;
+    border: 2px solid #a78bfa;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.btn-voltar:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    box-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+    transform: translateX(-4px);
+}
+
+.header-content {
+    text-align: center;
+    flex: 1;
+}
+
+.header-content h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.2rem;
+    color: #a78bfa;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    font-family: 'Georgia', serif;
+}
+
+.header-content .subtitulo {
+    margin: 0;
+    color: #a78bfa;
+    font-size: 0.95rem;
+    opacity: 0.8;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: right;
+    padding: 1rem;
+    background: rgba(167, 139, 250, 0.1);
+    border-left: 3px solid #a78bfa;
+    border-radius: 6px;
+}
+
+.combatente-nome {
+    color: #a78bfa;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* FILTROS                                                        */
+/* ────────────────────────────────────────────────────────────── */
+
+.filtros-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid #4f46e5;
+    border-radius: 12px;
+}
+
+.filtro-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.7rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid #4f46e5;
+    color: #a78bfa;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.filtro-input::placeholder {
+    color: rgba(167, 139, 250, 0.4);
+}
+
+.btn-filtro {
+    padding: 0.6rem 1rem;
+    background: rgba(79, 70, 229, 0.2);
+    border: 2px solid #4f46e5;
+    color: #a78bfa;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.btn-filtro:hover,
+.btn-filtro.ativo {
+    background: #a78bfa;
+    color: #0f0f23;
+    box-shadow: 0 0 15px rgba(167, 139, 250, 0.4);
+    transform: scale(1.05);
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* CONTAINER DA TABELA                                            */
+/* ────────────────────────────────────────────────────────────── */
+
+.tabela-pericias-container {
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid #4f46e5;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow-x: auto;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* TABELA                                                         */
+/* ────────────────────────────────────────────────────────────── */
+
+.tabela-pericias {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.tabela-pericias thead {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+}
+
+.tabela-pericias thead th {
+    padding: 1rem;
+    color: #e2e8f0;
+    font-weight: bold;
+    text-align: left;
+    border-bottom: 3px solid #a78bfa;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.tabela-pericias tbody tr {
+    border-bottom: 1px solid rgba(79, 70, 229, 0.3);
+    transition: all 0.2s;
+}
+
+.tabela-pericias tbody tr:hover {
+    background: rgba(167, 139, 250, 0.1);
+}
+
+.tabela-pericias tbody tr.selecionada {
+    background: rgba(167, 139, 250, 0.15);
+    border-left: 4px solid #a78bfa;
+}
+
+.tabela-pericias td {
+    padding: 0.8rem;
+    color: #d1d5db;
+    font-size: 0.9rem;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* COLUNAS                                                        */
+/* ────────────────────────────────────────────────────────────── */
+
+.col-checkbox {
+    width: 50px;
+    text-align: center;
+}
+
+.col-nome {
+    min-width: 150px;
+    color: #a78bfa;
+    font-weight: bold;
+}
+
+.col-atributo {
+    width: 80px;
+    text-align: center;
+    background: rgba(79, 70, 229, 0.2);
+    font-weight: bold;
+}
+
+.col-descricao {
+    min-width: 180px;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #a1a5b1;
+}
+
+.col-tipo {
+    width: 90px;
+    text-align: center;
+}
+
+.col-modificadores {
+    width: 280px;
+    text-align: center;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* CHECKBOX                                                       */
+/* ────────────────────────────────────────────────────────────── */
+
+.checkbox-pericia {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    accent-color: #a78bfa;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* BADGE                                                          */
+/* ────────────────────────────────────────────────────────────── */
+
+.badge-tipo {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    background: rgba(167, 139, 250, 0.15);
+    border: 1px solid #a78bfa;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #a78bfa;
+    font-weight: bold;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* CAMPOS DE MODIFICADORES                                        */
+/* ────────────────────────────────────────────────────────────── */
+
+.modificadores-inline {
+    display: grid;
+    grid-template-columns: 60px 60px 60px 60px;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.mod-input-inline {
+    padding: 0.4rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid #4f46e5;
+    color: #a78bfa;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.mod-input-inline:focus {
+    outline: none;
+    border-color: #a78bfa;
+    box-shadow: 0 0 8px rgba(167, 139, 250, 0.3);
+}
+
+.mod-input-inline:read-only {
+    background: rgba(255, 255, 255, 0.05);
+    cursor: not-allowed;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* FOOTER COM BOTÃO SALVAR                                        */
+/* ────────────────────────────────────────────────────────────── */
+
+.pericias-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(135deg, #1a1410 0%, #2c1810 100%);
+    border: 2px solid #4f46e5;
+    border-radius: 12px;
+    border-top: 3px solid #a78bfa;
+}
+
+.btn-salvar-pericias {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #e2e8f0;
+    border: 2px solid #10b981;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-salvar-pericias:hover:not(:disabled) {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-salvar-pericias:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-limpar {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #e2e8f0;
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-limpar:hover {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
+}
+
+.vazio {
+    text-align: center;
+    color: #a1a5b1;
+    font-style: italic;
+    padding: 2rem;
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* RESPONSIVIDADE - TABLET (≤1200px)                              */
+/* ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+    .col-descricao {
+        display: none;
+    }
+
+    .modificadores-inline {
+        grid-template-columns: 50px 50px 50px 50px;
+        gap: 0.3rem;
+    }
+
+    .tabela-pericias th,
+    .tabela-pericias td {
+        padding: 0.6rem;
+    }
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* RESPONSIVIDADE - MOBILE (≤768px)                               */
+/* ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .pericias-wrapper {
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+
+    .pericias-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+
+    .header-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .filtros-container {
+        flex-direction: column;
+    }
+
+    .filtro-input,
+    .btn-filtro {
+        width: 100%;
+    }
+
+    .tabela-pericias {
+        font-size: 0.8rem;
+    }
+
+    .tabela-pericias th,
+    .tabela-pericias td {
+        padding: 0.5rem;
+    }
+
+    .col-nome {
+        min-width: 120px;
+    }
+
+    .col-atributo {
+        width: 60px;
+    }
+
+    .modificadores-inline {
+        grid-template-columns: 45px 45px 45px 45px;
+        gap: 0.2rem;
+    }
+
+    .mod-input-inline {
+        font-size: 0.75rem;
+        padding: 0.3rem;
+    }
+
+    .pericias-footer {
+        flex-direction: column;
+    }
+
+    .btn-salvar-pericias,
+    .btn-limpar {
+        width: 100%;
+    }
+}
+
+/* ────────────────────────────────────────────────────────────── */
+/* RESPONSIVIDADE - MOBILE PEQUENO (≤480px)                       */
+/* ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+    .pericias-wrapper {
+        padding: 0.8rem;
+        gap: 1rem;
+    }
+
+    .pericias-header {
+        padding: 1rem;
+        flex-direction: column;
+    }
+
+    .header-content h1 {
+        font-size: 1.4rem;
+    }
+
+    .tabela-pericias-container {
+        padding: 0.8rem;
+    }
+
+    .col-descricao {
+        display: none;
+    }
+
+    .col-tipo {
+        display: none;
+    }
+
+    .modificadores-inline {
+        grid-template-columns: 40px 40px 40px 40px;
+        gap: 0.2rem;
+    }
+
+    .mod-input-inline {
+        font-size: 0.7rem;
+        padding: 0.25rem;
+    }
+
+    .tabela-pericias th,
+    .tabela-pericias td {
+        padding: 0.4rem;
+    }
+
+    .btn-salvar-pericias,
+    .btn-limpar {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}

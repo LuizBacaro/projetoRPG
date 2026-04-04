@@ -3,6 +3,7 @@
    SRP: APENAS breakpoints responsivos — sem estilos base
    ✅ FASE 1: seletores fantasmas removidos
    ✅ Adicionados seletores reais da arena atual
+   ✅ ATUALIZADO: Painéis esquerdo e direito aumentados
 */
 
 /* ══════════════════════════════════════════════
@@ -16,7 +17,11 @@
         padding: 0.75rem;
     }
 
-    .arena-lateral-panel { min-width: 180px; max-width: 210px; }
+    .arena-lateral-panel { 
+        width: 300px;
+        min-width: 300px; 
+        max-width: 310px; 
+    }
 }
 
 /* ══════════════════════════════════════════════
@@ -24,7 +29,11 @@
 ══════════════════════════════════════════════ */
 @media (max-width: 1100px) {
 
-    .arena-lateral-panel { min-width: 160px; max-width: 190px; }
+    .arena-lateral-panel { 
+        width: 290px;
+        min-width: 290px; 
+        max-width: 300px; 
+    }
 
     .arena-lateral-topo { gap: 0.5rem; }
 }
@@ -34,9 +43,37 @@
 ══════════════════════════════════════════════ */
 @media (max-width: 900px) {
 
-    .arena-lateral-panel { min-width: 140px; max-width: 170px; }
+    .arena-lateral-panel { 
+        width: 270px;
+        min-width: 270px; 
+        max-width: 280px; 
+    }
 
     .arena-lateral-foto-col { display: none; }
+
+    .arena-layout-principal {
+        grid-template-columns: 1fr;
+        gap: 0.45rem;
+    }
+
+    .arena-coluna-esquerda,
+    .arena-coluna-central,
+    .arena-coluna-direita {
+        overflow: visible;
+    }
+
+    .arena-linha-info {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+    }
+
+    .arena-secao-condicoes {
+        grid-column: 1 / -1;
+    }
+
+    .arena-secao-condicoes .arena-condicoes-lista {
+        max-height: 78px;
+    }
 }
 
 /* ══════════════════════════════════════════════
@@ -45,7 +82,12 @@
 @media (max-width: 768px) {
 
     /* Configuração — painéis empilham */
-    .container { grid-template-columns: 1fr; }
+    .container {
+        grid-template-columns: 1fr;
+        overflow: auto;
+        padding: 1rem;
+        gap: 1rem;
+    }
 
     /* Arena — wrapper vira coluna */
     .arena-tela-wrapper {
@@ -76,6 +118,69 @@
     .arena-lateral-foto-col   { display: none; }
 
     .arena-conteudo-principal { width: 100%; overflow-y: visible; }
+
+    .arena-card {
+        padding: 0.6rem;
+    }
+
+    .arena-coluna-central {
+        gap: 0.32rem;
+    }
+
+    .arena-coluna-central .arena-secao {
+        padding-top: 0.08rem;
+    }
+
+    .arena-coluna-central .arena-secao + .arena-secao {
+        margin-top: 0.06rem;
+        padding-top: 0.35rem;
+        border-top: 1px solid rgba(201, 168, 76, 0.18);
+    }
+
+    .arena-magias-preparadas-lista {
+        gap: 0.42rem;
+        max-height: 240px;
+    }
+
+    .arena-linha-info {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+    }
+
+    .arena-secao-condicoes .arena-condicoes-lista {
+        min-height: 48px;
+        max-height: 76px;
+    }
+
+    .arena-secao-condicoes .arena-condicao {
+        font-size: 0.64rem;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: 0.02em;
+    }
+
+    .arena-ataque-header,
+    .arena-ataque-item {
+        grid-template-columns: 1.5fr 0.9fr 1fr;
+        gap: 0.15rem;
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+
+    .arena-ataque-header span {
+        font-size: 0.6rem;
+        line-height: 1.25;
+        letter-spacing: 0.06em;
+    }
+
+    .arena-ataque-item span {
+        font-size: 0.72rem;
+        line-height: 1.3;
+    }
+
+    .arena-ataque-item span:first-child {
+        font-weight: 600;
+    }
 
     /* Condicao modal */
     .condicao-layout {
@@ -168,6 +273,57 @@
     .arena-lateral-panel      { padding: 0.5rem; }
     .arena-lateral-topo       { flex-direction: column; }
     .arena-conteudo-principal { padding: 0.5rem; }
+
+    .arena-card {
+        padding: 0.45rem;
+        border-radius: 10px;
+    }
+
+    .arena-coluna-central {
+        gap: 0.24rem;
+    }
+
+    .arena-coluna-central .arena-secao + .arena-secao {
+        margin-top: 0.04rem;
+        padding-top: 0.28rem;
+    }
+
+    .arena-magias-preparadas-lista {
+        gap: 0.3rem;
+        max-height: 210px;
+    }
+
+    .arena-secao-titulo {
+        font-size: 0.56rem;
+        letter-spacing: 0.08em;
+    }
+
+    .arena-secao-condicoes .arena-condicoes-lista {
+        max-height: 70px;
+        padding: 0.16rem;
+    }
+
+    .arena-secao-condicoes .arena-condicao {
+        font-size: 0.62rem;
+        padding: 0.16rem 0.38rem;
+        line-height: 1.18;
+        letter-spacing: 0.015em;
+    }
+
+    .arena-condicao-vazia {
+        font-size: 0.56rem;
+        line-height: 1.25;
+    }
+
+    .arena-ataque-header,
+    .arena-ataque-item {
+        grid-template-columns: 1.3fr 0.8fr 0.9fr;
+        gap: 0.1rem;
+    }
+
+    .arena-ataque-header span { font-size: 0.58rem; }
+    .arena-ataque-item span   { font-size: 0.68rem; line-height: 1.26; }
+    .arena-ataque-item span:first-child { font-weight: 600; }
 
     /* ── Modal condição ── */
     .modal-condicao-container { width: 95vw; }

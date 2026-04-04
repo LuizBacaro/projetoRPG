@@ -1,7 +1,9 @@
 /**
- * ModalCondicao
- * Classe global (sem export) — carregada via <script> no index.html
- * SOLID: SRP - gerencia UI do modal de condição com lista de combatentes
+ * ModalCondicao - VERSÃO CORRIGIDA
+ * Fixes:
+ * 1. Event listener para remover condição (botão ✕)
+ * 2. Callback correto passado para onRemover
+ * 3. Trata duracao_turnos undefined corretamente
  */
 class ModalCondicao {
     constructor(condicaoService, arenaController) {
@@ -53,6 +55,22 @@ class ModalCondicao {
                                     </select>
                                 </div>
                                 <div id="condicao-descricao" class="condicao-descricao-preview" style="display:none;"></div>
+                                
+                                <div class="campo-grupo">
+                                    <label for="input-duracao" class="modal-label">⏰ Duração (turnos):</label>
+                                    <div class="duracao-input-wrapper">
+                                        <input 
+                                            type="number" 
+                                            id="input-duracao" 
+                                            class="modal-input-duracao"
+                                            value="-1" 
+                                            min="-1"
+                                            max="99"
+                                            title="-1 = permanente, 0+ = número de turnos"
+                                        >
+                                        <span class="duracao-hint">(-1 = permanente)</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -107,7 +125,8 @@ class ModalCondicao {
     }
 
     async aplicar() {
-        const condicaoId = Number(document.getElementById('select-condicao')?.value);
+        const condicaoId       = Number(document.getElementById('select-condicao')?.value);
+        const durationTurnos   = Number(document.getElementById('input-duracao')?.value ?? -1);
 
         if (this.combatentesSelecionados.size === 0) {
             if (typeof Toast !== 'undefined') Toast.error('⚠️ Selecione pelo menos um combatente');
@@ -122,10 +141,13 @@ class ModalCondicao {
         const ids      = Array.from(this.combatentesSelecionados);
 
         try {
-            await Promise.all(ids.map(cid => this.condicaoService.aplicar(cid, condicaoId)));
+            await Promise.all(ids.map(cid => 
+                this.condicaoService.aplicar(cid, condicaoId, durationTurnos)
+            ));
 
+            const durStr = durationTurnos === -1 ? 'permanente' : `${durationTurnos} turno(s)`;
             if (typeof Toast !== 'undefined') {
-                Toast.success(`🔮 "${condicao?.nome}" aplicada a ${ids.length} combatente(s)`);
+                Toast.success(`🔮 "${condicao?.nome}" (${durStr}) aplicada a ${ids.length} combatente(s)`);
             }
 
             if (this.arenaController) {
@@ -144,13 +166,14 @@ class ModalCondicao {
         }
     }
 
+    // ✅ REFATORADO: renderizar com callback correto para remover
     renderizarCondicoesAtivas(condicoes, combatenteId, onRemover) {
         const container = document.querySelector('.arena-condicoes-lista');
         if (!container) return;
 
         container.innerHTML = '';
 
-        if (!condicoes.length) {
+        if (!condicoes || condicoes.length === 0) {
             container.innerHTML = '<span class="arena-condicao-vazia">Nenhuma condição ativa</span>';
             return;
         }
@@ -160,15 +183,35 @@ class ModalCondicao {
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-');
             const span     = document.createElement('span');
             span.className = `arena-condicao arena-condicao-${slug}`;
-            span.title     = c.efeito;
+            
+            const duracao = c.duracao_turnos ?? -1;
+            const durStr  = duracao === -1 ? 'permanente' : `${duracao} turno(s)`;
+            span.title    = `${c.efeito}\n⏰ Duração: ${durStr}`;
+            
+            const durBadge = (duracao && duracao !== -1)
+                ? `<span class="condicao-duracao">⏱️${duracao}</span>`
+                : '';
+            
             span.innerHTML = `
                 ${c.nome}
-                <button class="btn-remover-condicao" title="Remover ${c.nome}" data-id="${c.id}">✕</button>
+                ${durBadge}
+                <button class="btn-remover-condicao" title="Remover ${c.nome}" data-condicao-id="${c.condicao_id}" data-combatente-id="${combatenteId}">✕</button>
             `;
-            span.querySelector('.btn-remover-condicao').addEventListener('click', (e) => {
-                e.stopPropagation();
-                onRemover(combatenteId, c.id);
-            });
+            
+            // ✅ NOVO: Adicionar event listener ao botão de remover
+            const btnRemover = span.querySelector('.btn-remover-condicao');
+            if (btnRemover) {
+                btnRemover.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log(`🗑️ Removendo condição #${c.condicao_id} do combatente #${combatenteId}`);
+                    if (typeof onRemover === 'function') {
+                        onRemover(combatenteId, c.condicao_id);
+                    } else {
+                        console.error('❌ onRemover não é uma função!');
+                    }
+                });
+            }
+            
             container.appendChild(span);
         });
     }
@@ -178,22 +221,31 @@ class ModalCondicao {
         if (!wrapper) return;
 
         wrapper.innerHTML = '';
-        if (!condicoes.length) return;
+        if (!condicoes || condicoes.length === 0) return;
 
         condicoes.slice(0, 3).forEach(c => {
-            const badge       = document.createElement('span');
-            badge.className   = 'badge-condicao-ordem';
-            badge.textContent = c.nome.slice(0, 3).toUpperCase();
-            badge.title       = c.efeito;
+            const badge = document.createElement('span');
+            badge.className = 'badge-condicao-ordem';
+            
+            const duracao = c.duracao_turnos ?? -1;
+            const durDisplay = (duracao && duracao !== -1)
+                ? `⏱️${duracao}`
+                : c.nome.slice(0, 3).toUpperCase();
+            
+            badge.textContent = durDisplay;
+            badge.title = `${c.nome}${(duracao && duracao !== -1) ? ` (${duracao} turno(s))` : ' (permanente)'}`;
             wrapper.appendChild(badge);
         });
 
         const extras = condicoes.length - 3;
         if (extras > 0) {
-            const mais       = document.createElement('span');
-            mais.className   = 'badge-condicao-ordem badge-condicao-mais';
+            const mais = document.createElement('span');
+            mais.className = 'badge-condicao-ordem badge-condicao-mais';
             mais.textContent = `+${extras}`;
-            mais.title       = condicoes.slice(3).map(c => c.nome).join(', ');
+            mais.title = condicoes.slice(3).map(c => {
+                const duracao = c.duracao_turnos ?? -1;
+                return `${c.nome}${(duracao && duracao !== -1) ? ` (${duracao} turno(s))` : ' (permanente)'}`;
+            }).join(', ');
             wrapper.appendChild(mais);
         }
     }
@@ -213,7 +265,6 @@ class ModalCondicao {
                     type="checkbox"
                     id="cond-check-${c.id}"
                     value="${c.id}"
-                    onchange="modalCondicaoInstance.toggleCombatente(${c.id})"
                 >
                 <label for="cond-check-${c.id}">
                     <span class="combatente-nome">${c.nome}</span>
@@ -222,6 +273,15 @@ class ModalCondicao {
                 </label>
             </div>
         `).join('');
+
+        container.querySelectorAll('input[type="checkbox"][id^="cond-check-"]').forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                const combatenteId = Number(checkbox.value);
+                if (Number.isFinite(combatenteId)) {
+                    this.toggleCombatente(combatenteId);
+                }
+            });
+        });
     }
 
     _popularSelect() {
@@ -249,7 +309,9 @@ class ModalCondicao {
     _limparDescricao() {
         const select = document.getElementById('select-condicao');
         const descEl = document.getElementById('condicao-descricao');
+        const durEl  = document.getElementById('input-duracao');
         if (select)  select.value        = '';
         if (descEl) { descEl.textContent = ''; descEl.style.display = 'none'; }
+        if (durEl)   durEl.value         = '-1';
     }
 }

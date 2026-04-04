@@ -38,3 +38,20 @@ export const formatters = {
         return pontos.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 };
+
+/**
+ * Escapa caracteres HTML para prevenir XSS em innerHTML.
+ * Usar sempre que interpolar dados do servidor/usuário em templates HTML.
+ */
+export function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Disponibilizar globalmente para scripts não-module
+window.escapeHtml = escapeHtml;

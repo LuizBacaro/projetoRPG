@@ -1,71 +1,78 @@
 """
-Schemas Pydantic para Ataque e MagiaSlot
-SRP: validação dos dados de entrada e saída
+Schemas Pydantic para Ataque, MagiaSlot e MagiaPreparada
+SRP: apenas serialização/validação
 """
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import datetime
 
 
-# ── Ataque 
+# ── Ataque ──
 
 class AtaqueBase(BaseModel):
-    nome:         str = Field(..., min_length=1, max_length=100)
-    bonus_ataque: str = Field(default="+0", max_length=20)
-    dano:         str = Field(default="1d6",  max_length=30)
-    tipo_dano:    str = Field(default="",     max_length=50)
-
+    nome:         str
+    bonus_ataque: str           = "+0"
+    dano:         str           = "1d6"
+    tipo_dano:    Optional[str] = ""
 
 class AtaqueCreate(AtaqueBase):
     pass
 
-
-class AtaqueUpdate(BaseModel):
-    nome:         Optional[str] = Field(None, min_length=1, max_length=100)
-    bonus_ataque: Optional[str] = Field(None, max_length=20)
-    dano:         Optional[str] = Field(None, max_length=30)
-    tipo_dano:    Optional[str] = Field(None, max_length=50)
-
-
 class AtaqueResponse(AtaqueBase):
     id:            int
     combatente_id: int
-
     class Config:
         from_attributes = True
 
+class AtaquesBulkRequest(BaseModel):
+    ataques: List[AtaqueCreate]
 
-# ── MagiaSlot 
+
+# ── MagiaSlot ──
 
 class MagiaSlotBase(BaseModel):
-    nivel:  int = Field(..., ge=0, le=9)
-    total:  int = Field(default=0, ge=0)
-    usados: int = Field(default=0, ge=0)
-
+    nivel:  int
+    total:  int = 0
+    usados: int = 0
 
 class MagiaSlotCreate(MagiaSlotBase):
     pass
 
-
 class MagiaSlotUpdate(BaseModel):
-    total:  Optional[int] = Field(None, ge=0)
-    usados: Optional[int] = Field(None, ge=0)
-
+    usados: int
 
 class MagiaSlotResponse(MagiaSlotBase):
     id:            int
     combatente_id: int
-
     class Config:
         from_attributes = True
 
-
-# ── Payload para salvar tudo de uma vez (Dashboard) ───────────────────────────
-
-class AtaquesBulkRequest(BaseModel):
-    """Substitui todos os ataques do combatente de uma só vez."""
-    ataques: list[AtaqueCreate] = []
-
-
 class MagiasBulkRequest(BaseModel):
-    """Substitui todos os slots de magia do combatente de uma só vez."""
-    slots: list[MagiaSlotCreate] = []
+    slots: List[MagiaSlotCreate]
+
+
+# ── MagiaPreparada ──
+
+class MagiaPreparadaCreate(BaseModel):
+    magia_id:   int
+    nivel_slot: int
+    quantidade: int = 1
+    classe:     Optional[str] = None
+
+class MagiaPreparadaResponse(BaseModel):
+    id:              int
+    combatente_id:   int
+    magia_id:        int
+    nivel_slot:      int
+    quantidade:      int               = 1
+    usos_realizados: int               = 0
+    usada:           bool              = False
+    preparada_em:    Optional[datetime] = None
+    magia_nome:      Optional[str]      = None
+    magia_escola:    Optional[str]      = None
+    magia_nivel:     Optional[int]      = None
+    class Config:
+        from_attributes = True
+
+class DescansoRequest(BaseModel):
+    confirmar: bool = True

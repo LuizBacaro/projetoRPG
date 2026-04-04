@@ -13,12 +13,29 @@ class ModalUsuario {
         this.service   = usuarioService;
         this.onSucesso = onSucesso;
         this.usuarioId = null;
+        this.modalEl   = document.getElementById('modalUsuario');
+        this.btnSalvar = document.getElementById('btnSalvarModal');
+        this._textoSalvarOriginal = this.btnSalvar?.textContent || 'Salvar';
+        this._salvando = false;
 
         // Bind dos botões do modal
         document.getElementById('btnCancelarModal')
             ?.addEventListener('click', () => this.fechar());
-        document.getElementById('btnSalvarModal')
-            ?.addEventListener('click', () => this.salvar());
+        this.btnSalvar?.addEventListener('click', () => this.salvar());
+        document.getElementById('btnFecharModalUsuario')
+            ?.addEventListener('click', () => this.fechar());
+
+        this.modalEl?.addEventListener('click', (event) => {
+            if (event.target === this.modalEl) {
+                this.fechar();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && this.modalEl?.classList.contains('show')) {
+                this.fechar();
+            }
+        });
     }
 
     // ── Abertura ──────────────────────────────────────────────────────────────
@@ -36,11 +53,11 @@ class ModalUsuario {
     }
 
     _abrir() {
-        document.getElementById('modalUsuario').style.display = 'flex';
+        this.modalEl?.classList.add('show');
     }
 
     fechar() {
-        document.getElementById('modalUsuario').style.display = 'none';
+        this.modalEl?.classList.remove('show');
     }
 
     // ── Renderização ─────────────────────────────────────────────────────────
@@ -52,6 +69,9 @@ class ModalUsuario {
         // Título
         document.getElementById('modalUsuarioTitulo').textContent =
             editando ? 'Editar Usuário' : 'Novo Usuário';
+        document.getElementById('modalUsuarioDescricao').textContent = editando
+            ? 'Revise perfil, estado operacional e dados sensíveis deste usuário.'
+            : 'Crie um novo acesso administrativo ou operacional com parâmetros claros.';
 
         // Campos
         document.getElementById('inputNome').value  = usuario.nome  || '';
@@ -79,12 +99,60 @@ class ModalUsuario {
 
     // ── Salvar ────────────────────────────────────────────────────────────────
 
+    _setEstadoSalvar(salvando) {
+        this._salvando = salvando;
+        if (!this.btnSalvar) return;
+
+        this.btnSalvar.disabled = salvando;
+        this.btnSalvar.textContent = salvando ? 'Salvando...' : this._textoSalvarOriginal;
+        this.btnSalvar.setAttribute('aria-busy', salvando ? 'true' : 'false');
+    }
+
+    _mostrarMensagemPadrao({
+        icone = '⚠️',
+        titulo = 'Atenção',
+        texto = 'Revise as informações e tente novamente.',
+    } = {}) {
+        if (window.ModalConfirm && typeof window.ModalConfirm.mostrar === 'function') {
+            window.ModalConfirm.mostrar({
+                icone,
+                titulo,
+                texto,
+                textoCancelar: 'Fechar',
+                textoConfirmar: 'Entendi',
+                onCancelar: () => {},
+                onConfirmar: () => {},
+            });
+            return;
+        }
+
+        if (window.Toast && typeof window.Toast.error === 'function') {
+            window.Toast.error(texto);
+            return;
+        }
+
+        console.error(texto);
+    }
+
     async salvar() {
+        if (this._salvando) return;
+
         const nome   = document.getElementById('inputNome').value.trim();
         const email  = document.getElementById('inputEmail').value.trim();
         const senha  = document.getElementById('inputSenha').value;
         const perfil = document.getElementById('selectPerfil').value;
         const ativo  = document.getElementById('selectStatus').value === 'ativo';
+
+        if (!this.usuarioId && (!nome || !email || !senha)) {
+            this._mostrarMensagemPadrao({
+                icone: '🧾',
+                titulo: 'Campos obrigatórios',
+                texto: 'Preencha todos os campos obrigatórios: Nome, E-mail e Senha.',
+            });
+            return;
+        }
+
+        this._setEstadoSalvar(true);
 
         try {
             if (this.usuarioId) {
@@ -96,11 +164,7 @@ class ModalUsuario {
                 await this.service.atualizar(this.usuarioId, dados);
 
             } else {
-                // ── Criação: todos os campos são obrigatórios
-                if (!nome || !email || !senha) {
-                    alert('Preencha todos os campos obrigatórios (Nome, E-mail e Senha).');
-                    return;
-                }
+                // ── Criação
                 await this.service.criar({ nome, email, senha, perfil, ativo });
             }
 
@@ -108,7 +172,13 @@ class ModalUsuario {
             this.onSucesso?.();
 
         } catch (erro) {
-            alert(`Erro: ${erro.message}`);
+            this._mostrarMensagemPadrao({
+                icone: '❌',
+                titulo: 'Falha ao salvar usuário',
+                texto: erro?.message ? `Erro: ${erro.message}` : 'Nao foi possivel salvar o usuario.',
+            });
+        } finally {
+            this._setEstadoSalvar(false);
         }
     }
 }

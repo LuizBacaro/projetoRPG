@@ -43,7 +43,7 @@ def _build_engine():
             "pool_size": 5,             # máximo de conexões ativas
             "max_overflow": 10,         # conexões extras sob carga
         })
-        logger.info(f"🟢 Database: PostgreSQL — Railway — Pool Size: 5 + 10")
+        logger.info(f"🟢 Database: PostgreSQL — Neon — Pool Size: 5 + 10")
 
     engine = create_engine(**engine_config)
 

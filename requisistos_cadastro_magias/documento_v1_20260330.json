@@ -1,0 +1,1032 @@
+{
+  "document": {
+    "module": "Magias D&D 3.5",
+    "version": "v1",
+    "exported_at": "2026-03-30T18:12:32.632130",
+    "title": "Especificação de Requisitos - Magias D&D 3.5"
+  },
+  "1_informacoes_projeto": {
+    "descricao": "Magias D&D 3.5",
+    "produto": "Magias D&D 3.5",
+    "versao": "v1"
+  },
+  "2_objetivo_escopo": {
+    "objetivo": "Prover um cadastro completo e estruturado de todas as magias do Livro do Jogador de D&D 3.5, servindo como base de dados para associação a grimórios e fichas de personagens dentro da plataforma Arena RPG.",
+    "escopo_incluido": [
+      "Cadastro, edição, desativação e reativação de magias",
+      "Atributos completos conforme livro original + página de referência",
+      "Suporte bilíngue (PT-BR obrigatório, EN opcional)",
+      "Associação de níveis por classe conjuradora",
+      "Suporte a magias de domínio",
+      "Importação em lote via Excel",
+      "Pesquisa e filtragem avançada",
+      "Histórico de alterações",
+      "Soft delete com proteção de integridade referencial."
+    ],
+    "escopo_excluido": [
+      "Gestão de grimórios e fichas de personagem (módulo separado)",
+      "Cadastro de novas escolas, subescolas ou descritores",
+      "Cadastro de novas classes conjuradoras",
+      "Mecânicas de conjuração e resolução de magias em jogo",
+      "Magias de suplementos além do Livro do Jogador."
+    ]
+  },
+  "3_personas": {
+    "persona_principal": "",
+    "objetivos_principal": [],
+    "persona_secundaria": "",
+    "objetivos_secundaria": [],
+    "permissoes": []
+  },
+  "4_visao_geral_funcional": {
+    "resumo": "O módulo Magias D&D 3.5 é um repositório centralizado para cadastro e consulta de magias do sistema D&D 3.5. Permite que administradores e narradores cadastrem magias manualmente ou via importação Excel, mantendo todos os atributos oficiais do livro. As magias cadastradas ficam disponíveis para seleção em grimórios e fichas de personagem em outros módulos da plataforma. O sistema oferece filtros avançados para localização rápida e mantém histórico completo de alterações.",
+    "conceitos": {
+      "Magia": "Encantamento ou efeito mágico com atributos definidos (escola, nível, componentes, etc.) que pode ser aprendido e conjurado por personagens.",
+      "Domínio": "Especialização divina de Clérigos que concede acesso a magias específicas.",
+      "Grimório": "Coleção de magias de um personagem (tratado em módulo separado).",
+      "Componente": "Requisito necessário para conjurar uma magia (Verbal, Gestual, Material, etc.).",
+      "Escola de Magia": "Categoria que agrupa magias por natureza similar (Abjuração, Evocação, etc.). São 8 escolas fixas.",
+      "Nível de Magia": "Valor numérico (0-9) que indica a complexidade da magia para cada classe conjuradora.",
+      "Classe Conjuradora": "Classe de personagem capaz de conjurar magias (Mago, Clérigo, etc.). Uma magia pode ter níveis diferentes para classes diferentes."
+    }
+  },
+  "5_requisitos_funcionais": [
+    {
+      "id": "RF01",
+      "titulo": "Cadastro de atributos básicos da magia",
+      "descricao": "O sistema deve permitir cadastrar: nome (PT-BR obrigatório, EN opcional), escola de magia (seleção única entre as 8 escolas), subescola (texto opcional), descritor (texto opcional), página de referência no livro (número inteiro opcional).",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF02",
+      "titulo": "Cadastro de níveis por classe",
+      "descricao": "O sistema deve permitir associar a magia a uma ou mais classes conjuradoras (Clérigo, Druida, Bardo, Ranger, Paladino, Mago, Feiticeiro), informando o nível da magia (0-9) para cada classe selecionada.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF03",
+      "titulo": "Cadastro de componentes",
+      "descricao": "O sistema deve permitir selecionar múltiplos componentes: Verbal (V), Gestual (G), Material (M), Foco (F), Foco Divino (FD), Custo de XP (XP). Deve haver um campo texto adicional para descrever componente extra quando necessário (ex: pérola no valor de 100 PO).",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF04",
+      "titulo": "Cadastro de características de conjuração",
+      "descricao": "O sistema deve permitir cadastrar: tempo de conjuração (texto), alcance (texto), área/efeito/alvo (texto), duração (texto), teste de resistência (texto com tipo e efeito), resistência a magia (sim/não/texto).",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF05",
+      "titulo": "Cadastro de descrição da magia",
+      "descricao": "O sistema deve permitir cadastrar a descrição completa da magia em português (obrigatório) e inglês (opcional), com suporte a formatação de texto rica.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF06",
+      "titulo": "Cadastro de magia de domínio",
+      "descricao": "O sistema deve permitir indicar se a magia é de domínio (sim/não). Quando sim, deve exibir campo para informar um ou mais domínios associados.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF07",
+      "titulo": "Validação de campos obrigatórios",
+      "descricao": "O sistema deve validar: nome em português (obrigatório, único), escola (obrigatório), pelo menos uma classe com nível associado (obrigatório), descrição em português (obrigatório).",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF08",
+      "titulo": "Interface separada para cadastro em inglês",
+      "descricao": "O cadastro das informações da magia em inglês (nome e descrição) deve ocorrer em uma aba ou interface distinta da aba de cadastro em português, evitando confusão e garantindo que o preenchimento do idioma principal não seja prejudicado.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF09",
+      "titulo": "Edição completa de atributos",
+      "descricao": "O sistema deve permitir editar todos os atributos da magia, incluindo nome, escola, níveis por classe, componentes, características de conjuração, descrição e informações de domínio.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF10",
+      "titulo": "Registro de histórico de alterações",
+      "descricao": "O sistema deve registrar automaticamente cada alteração realizada, armazenando: usuário responsável, data/hora, campos alterados com valores anterior e novo.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF11",
+      "titulo": "Visualização de histórico",
+      "descricao": "O sistema deve permitir visualizar o histórico completo de alterações de uma magia, ordenado por data decrescente.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF12",
+      "titulo": "Desativação de magia (soft delete)",
+      "descricao": "O sistema deve permitir desativar uma magia, tornando-a invisível nas buscas padrão mas mantendo seus dados e vínculos existentes.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF13",
+      "titulo": "Reativação de magia",
+      "descricao": "O sistema deve permitir reativar uma magia previamente desativada, tornando-a novamente visível nas buscas.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF14",
+      "titulo": "Exclusão física com validação",
+      "descricao": "O sistema deve permitir exclusão física somente de magias que não estejam associadas a nenhum grimório ou ficha de personagem. Caso existam vínculos, a exclusão deve ser bloqueada com mensagem informativa.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF15",
+      "titulo": "Confirmação de exclusão",
+      "descricao": "O sistema deve solicitar confirmação antes de executar exclusão física ou desativação, informando claramente a ação que será realizada.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF16",
+      "titulo": "Upload de arquivo Excel",
+      "descricao": "O sistema deve permitir upload de arquivo Excel (.xlsx, .xls) contendo dados de múltiplas magias para importação em lote.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF17",
+      "titulo": "Modelo de planilha para download",
+      "descricao": "O sistema deve disponibilizar um modelo de planilha Excel para download, com todas as colunas esperadas, exemplos de preenchimento e instruções.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF18",
+      "titulo": "Validação de dados do arquivo",
+      "descricao": "O sistema deve validar cada linha do arquivo verificando: campos obrigatórios, formatos válidos, escolas existentes, classes válidas, níveis dentro do range 0-9.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF19",
+      "titulo": "Importação parcial com relatório",
+      "descricao": "O sistema deve importar todas as linhas válidas e gerar relatório detalhado das linhas com erro, indicando: número da linha, campo com problema e descrição do erro.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF20",
+      "titulo": "Preview antes de confirmar importação",
+      "descricao": "O sistema deve exibir um preview das magias a serem importadas, permitindo que o usuário revise e confirme antes da gravação definitiva.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF21",
+      "titulo": "Busca textual por nome",
+      "descricao": "O sistema deve permitir busca textual pelo nome da magia (português ou inglês), com suporte a busca parcial e insensível a acentos.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF22",
+      "titulo": "Filtro por escola de magia",
+      "descricao": "O sistema deve permitir filtrar magias por uma ou mais escolas de magia selecionadas.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF23",
+      "titulo": "Filtro por classe e nível",
+      "descricao": "O sistema deve permitir filtrar magias por classe conjuradora e/ou nível específico (ex: todas magias de Mago nível 3).",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF24",
+      "titulo": "Filtro por componentes",
+      "descricao": "O sistema deve permitir filtrar magias pelos componentes necessários (ex: magias sem componente material).",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF25",
+      "titulo": "Filtro por domínio",
+      "descricao": "O sistema deve permitir filtrar apenas magias de domínio e/ou por domínio específico.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF26",
+      "titulo": "Filtro por status (ativa/inativa)",
+      "descricao": "O sistema deve permitir filtrar magias por status, com opção para incluir ou não magias desativadas na busca.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF27",
+      "titulo": "Combinação de filtros",
+      "descricao": "O sistema deve permitir combinar múltiplos filtros simultaneamente, aplicando lógica AND entre eles.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF28",
+      "titulo": "Exibição completa de atributos",
+      "descricao": "O sistema deve exibir todos os atributos da magia em layout organizado: nome (ambos idiomas), escola/subescola/descritor, níveis por classe, componentes, tempo de conjuração, alcance, área/efeito/alvo, duração, teste de resistência, RM, descrição completa e página de referência.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF29",
+      "titulo": "Alternância de idioma",
+      "descricao": "O sistema deve permitir alternar a visualização entre português e inglês (quando disponível) com um clique.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF30",
+      "titulo": "Atalho para edição",
+      "descricao": "Para usuários com permissão, a tela de visualização deve oferecer atalho direto para edição da magia.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF31",
+      "titulo": "Lista com colunas principais",
+      "descricao": "O sistema deve exibir lista de magias com colunas: nome, escola, níveis por classe (formato compacto), componentes (ícones), status.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF32",
+      "titulo": "Ordenação por colunas",
+      "descricao": "O sistema deve permitir ordenar a lista por nome, escola ou nível de uma classe específica.",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF33",
+      "titulo": "Paginação",
+      "descricao": "O sistema deve paginar a lista com 20, 50 ou 100 itens por página, conforme preferência do usuário.d",
+      "criterios_aceite": []
+    },
+    {
+      "id": "RF34",
+      "titulo": "Ações rápidas na lista",
+      "descricao": "O sistema deve permitir acessar visualização, edição (se permitido) e desativação/exclusão diretamente da lista.",
+      "criterios_aceite": []
+    }
+  ],
+  "6_requisitos_nao_funcionais": [
+    {
+      "id": "RNF01",
+      "categoria": "USABILIDADE",
+      "requisito": "O formulário de cadastro deve ser responsivo e organizado em seções colapsáveis para facilitar a navegação entre os grupos de atributos."
+    },
+    {
+      "id": "RNF02",
+      "categoria": "PERFORMANCE",
+      "requisito": "O sistema deve suportar importação de até 500 magias por arquivo, exibindo mensagem de erro caso o limite seja excedido."
+    },
+    {
+      "id": "RNF03",
+      "categoria": "PERFORMANCE",
+      "requisito": "A busca deve retornar resultados em até 2 segundos, mesmo com a base completa de magias do livro (~700 magias)."
+    },
+    {
+      "id": "RNF04",
+      "categoria": "USABILIDADE",
+      "requisito": "A visualização deve seguir formatação similar à do livro original, facilitando a familiaridade dos jogadores com a apresentação das informações."
+    }
+  ],
+  "7_regras_negocio_invariantes": [
+    {
+      "id": "rn_001",
+      "descricao": "O nome da magia em português deve ser único no sistema. Não podem existir duas magias com o mesmo nome.",
+      "aplica_a": [
+        "req_001",
+        "req_007"
+      ]
+    },
+    {
+      "id": "rn_002",
+      "descricao": "Toda magia deve estar associada a pelo menos uma classe conjuradora com seu respectivo nível (0 a 9).",
+      "aplica_a": [
+        "req_002",
+        "req_007"
+      ]
+    },
+    {
+      "id": "rn_003",
+      "descricao": "Quando a magia for marcada como 'magia de domínio', é obrigatório informar pelo menos um domínio associado.",
+      "aplica_a": [
+        "req_006"
+      ]
+    },
+    {
+      "id": "rn_004",
+      "descricao": "Uma magia só pode ser excluída fisicamente se não possuir nenhum vínculo com grimórios ou fichas de personagem.",
+      "aplica_a": [
+        "req_014"
+      ]
+    },
+    {
+      "id": "rn_005",
+      "descricao": "Magias desativadas não aparecem nas buscas padrão, mas continuam acessíveis através do filtro de status e mantêm todos os vínculos existentes.",
+      "aplica_a": [
+        "req_012",
+        "req_027"
+      ]
+    },
+    {
+      "id": "rn_006",
+      "descricao": "O nível de uma magia pode variar entre classes. Por exemplo, 'Curar Ferimentos Leves' é nível 1 para Clérigo e Druida, mas nível 1 para Bardo e nível 1 para Paladino e Ranger.",
+      "aplica_a": [
+        "req_002"
+      ]
+    },
+    {
+      "id": "rn_007",
+      "descricao": "As escolas de magia são fixas e limitadas a: Abjuração, Conjuração, Adivinhação, Encantamento, Evocação, Ilusão, Necromancia e Transmutação.",
+      "aplica_a": [
+        "req_001"
+      ]
+    },
+    {
+      "id": "rn_008",
+      "descricao": "As classes conjuradoras são fixas e limitadas a: Clérigo, Druida, Bardo, Ranger, Paladino, Mago e Feiticeiro.",
+      "aplica_a": [
+        "req_002"
+      ]
+    },
+    {
+      "id": "rn_009",
+      "descricao": "A importação via Excel deve processar todas as linhas válidas mesmo que existam linhas com erro, gerando relatório detalhado dos problemas.",
+      "aplica_a": [
+        "req_019"
+      ]
+    },
+    {
+      "id": "rn_010",
+      "descricao": "O campo de descrição em português é obrigatório. O campo em inglês é opcional e pode ser preenchido posteriormente.",
+      "aplica_a": [
+        "req_005",
+        "req_007"
+      ]
+    },
+    {
+      "id": "rn_011",
+      "descricao": "Os domínios disponíveis para magias de domínio são fixos: Água, Animais, Ar, Bem, Caos, Conhecimento, Cura, Destruição, Enganação, Fogo, Força, Guerra, Magia, Mal, Morte, Ordem, Plantas, Proteção, Sol, Sorte, Terra e Viagem. Não é permitido cadastrar novos domínios.",
+      "aplica_a": [
+        "req_006"
+      ]
+    }
+  ],
+  "8_casos_de_uso": [
+    {
+      "id": "uc_001",
+      "titulo": "Cadastrar Nova Magia",
+      "descricao": "Narrador cadastra uma nova magia com todos os atributos necessários.",
+      "ator_primario": "Narrador (Gary Gigax)",
+      "pre_condicoes": [
+        "Usuário autenticado com permissão de cadastro",
+        "Módulo de Magias acessível"
+      ],
+      "fluxo_principal": [
+        "Usuário acessa o módulo de Magias",
+        "Usuário clica em 'Nova Magia'",
+        "Sistema exibe formulário de cadastro organizado em seções",
+        "Usuário preenche nome em português (obrigatório) e inglês (opcional)",
+        "Usuário seleciona escola de magia",
+        "Usuário preenche subescola e descritor (opcionais)",
+        "Usuário adiciona uma ou mais classes com seus respectivos níveis",
+        "Usuário seleciona componentes necessários e descreve componente extra se aplicável",
+        "Usuário preenche características de conjuração (tempo, alcance, área, duração, TR, RM)",
+        "Usuário preenche descrição em português e inglês (opcional)",
+        "Usuário indica se é magia de domínio e informa domínios se aplicável",
+        "Usuário informa página de referência (opcional)",
+        "Usuário clica em 'Salvar'",
+        "Sistema valida campos obrigatórios",
+        "Sistema salva magia e exibe mensagem de sucesso",
+        "Sistema registra criação no histórico"
+      ],
+      "fluxo_alternativo": [
+        "7a. Usuário não adiciona nenhuma classe: Sistema exibe erro 'Informe pelo menos uma classe com nível'",
+        "14a. Nome já existe: Sistema exibe erro 'Já existe uma magia com este nome'",
+        "14b. Campos obrigatórios não preenchidos: Sistema destaca campos e exibe mensagens específicas"
+      ],
+      "pos_condicoes": [
+        "Magia cadastrada e disponível para consulta",
+        "Registro de criação salvo no histórico"
+      ]
+    },
+    {
+      "id": "uc_002",
+      "titulo": "Importar Magias via Excel",
+      "descricao": "Narrador importa múltiplas magias através de arquivo Excel.",
+      "ator_primario": "Narrador (Gary Gigax)",
+      "pre_condicoes": [
+        "Usuário autenticado com permissão de importação",
+        "Arquivo Excel preparado conforme modelo"
+      ],
+      "fluxo_principal": [
+        "Usuário acessa módulo de Magias",
+        "Usuário clica em 'Importar'",
+        "Sistema exibe tela de importação com link para download do modelo",
+        "Usuário faz upload do arquivo Excel",
+        "Sistema valida formato do arquivo",
+        "Sistema processa e valida cada linha do arquivo",
+        "Sistema exibe preview com magias válidas e lista de erros",
+        "Usuário revisa o preview",
+        "Usuário clica em 'Confirmar Importação'",
+        "Sistema importa magias válidas",
+        "Sistema exibe relatório final com quantidade importada e erros"
+      ],
+      "fluxo_alternativo": [
+        "5a. Formato inválido: Sistema exibe erro 'Formato de arquivo não suportado. Use .xlsx ou .xls'",
+        "6a. Arquivo excede 500 linhas: Sistema exibe erro 'Limite de 500 magias por importação excedido'",
+        "7a. Todas as linhas com erro: Sistema exibe apenas relatório de erros, sem opção de confirmar",
+        "9a. Usuário clica em 'Cancelar': Sistema descarta importação e retorna à listagem"
+      ],
+      "pos_condicoes": [
+        "Magias válidas importadas e disponíveis",
+        "Relatório de erros disponível para download"
+      ]
+    },
+    {
+      "id": "uc_003",
+      "titulo": "Pesquisar Magias por Filtros",
+      "descricao": "Jogador ou Narrador localiza magias usando combinação de filtros.",
+      "ator_primario": "Jogador (Billy Joe)",
+      "pre_condicoes": [
+        "Usuário autenticado",
+        "Existem magias cadastradas no sistema"
+      ],
+      "fluxo_principal": [
+        "Usuário acessa módulo de Magias",
+        "Sistema exibe lista de magias com painel de filtros",
+        "Usuário digita termo de busca no campo de texto (opcional)",
+        "Usuário seleciona filtros desejados (escola, classe, nível, componentes, domínio)",
+        "Sistema aplica filtros em tempo real",
+        "Sistema exibe lista filtrada com resultados encontrados",
+        "Usuário clica em uma magia para visualizar detalhes"
+      ],
+      "fluxo_alternativo": [
+        "5a. Nenhum resultado encontrado: Sistema exibe mensagem 'Nenhuma magia encontrada com os filtros selecionados'",
+        "4a. Usuário clica em 'Limpar Filtros': Sistema remove todos os filtros e exibe lista completa"
+      ],
+      "pos_condicoes": [
+        "Resultados exibidos conforme critérios de busca"
+      ]
+    },
+    {
+      "id": "uc_004",
+      "titulo": "Desativar Magia",
+      "descricao": "Narrador desativa uma magia que não deve mais aparecer nas buscas padrão.",
+      "ator_primario": "Narrador (Gary Gigax)",
+      "pre_condicoes": [
+        "Usuário autenticado com permissão de edição",
+        "Magia existe e está ativa"
+      ],
+      "fluxo_principal": [
+        "Usuário localiza a magia na listagem ou busca",
+        "Usuário clica na ação 'Desativar'",
+        "Sistema exibe confirmação: 'Deseja desativar esta magia? Ela não aparecerá mais nas buscas padrão.'",
+        "Usuário confirma",
+        "Sistema desativa a magia (soft delete)",
+        "Sistema exibe mensagem de sucesso",
+        "Sistema registra ação no histórico"
+      ],
+      "fluxo_alternativo": [
+        "4a. Usuário cancela: Sistema mantém magia ativa e retorna à tela anterior"
+      ],
+      "pos_condicoes": [
+        "Magia marcada como inativa",
+        "Magia não aparece em buscas padrão",
+        "Vínculos existentes mantidos"
+      ]
+    },
+    {
+      "id": "uc_005",
+      "titulo": "Excluir Magia Fisicamente",
+      "descricao": "Narrador exclui permanentemente uma magia sem vínculos.",
+      "ator_primario": "Narrador (Gary Gigax)",
+      "pre_condicoes": [
+        "Usuário autenticado com permissão de exclusão",
+        "Magia existe",
+        "Magia não possui vínculos com grimórios ou fichas"
+      ],
+      "fluxo_principal": [
+        "Usuário localiza a magia na listagem",
+        "Usuário clica na ação 'Excluir'",
+        "Sistema verifica se existem vínculos",
+        "Sistema exibe confirmação: 'Esta ação é irreversível. Deseja excluir permanentemente esta magia?'",
+        "Usuário confirma",
+        "Sistema exclui a magia",
+        "Sistema exibe mensagem de sucesso"
+      ],
+      "fluxo_alternativo": [
+        "3a. Magia possui vínculos: Sistema exibe erro 'Esta magia não pode ser excluída pois está vinculada a X grimório(s)/ficha(s). Use a opção Desativar.'"
+      ],
+      "pos_condicoes": [
+        "Magia removida permanentemente do sistema"
+      ]
+    },
+    {
+      "id": "uc_006",
+      "titulo": "Visualizar Detalhes da Magia",
+      "descricao": "Jogador consulta todos os detalhes de uma magia durante sessão de jogo.",
+      "ator_primario": "Jogador (Billy Joe)",
+      "pre_condicoes": [
+        "Usuário autenticado",
+        "Magia existe e está ativa"
+      ],
+      "fluxo_principal": [
+        "Usuário localiza a magia na listagem ou busca",
+        "Usuário clica no nome da magia",
+        "Sistema exibe tela de visualização com todos os atributos",
+        "Usuário consulta informações necessárias",
+        "Usuário clica em 'Voltar' para retornar à listagem"
+      ],
+      "fluxo_alternativo": [
+        "3a. Magia possui tradução em inglês: Usuário pode clicar em 'EN' para alternar idioma",
+        "3b. Usuário tem permissão de edição: Sistema exibe botão 'Editar' na tela de visualização"
+      ],
+      "pos_condicoes": [
+        "Informações da magia exibidas ao usuário"
+      ]
+    }
+  ],
+  "9_interface_usuario": {
+    "tela_001": {
+      "descricao": "Tela principal do módulo com lista paginada de magias, painel de filtros lateral e ações rápidas.",
+      "tipo": "listagem",
+      "elementos": [
+        "Campo de busca por nome",
+        "Painel de filtros colapsável (escola, classe, nível, componentes, domínio, status)",
+        "Tabela com colunas: Nome, Escola, Níveis por Classe, Componentes (ícones), Status",
+        "Indicador de paginação",
+        "Seletor de itens por página (20/50/100)",
+        "Botão 'Nova Magia'",
+        "Botão 'Importar'",
+        "Menu de ações por linha (Visualizar, Editar, Desativar, Excluir)"
+      ],
+      "acoes_disponiveis": [
+        "Buscar por nome",
+        "Aplicar/limpar filtros",
+        "Ordenar por coluna",
+        "Navegar entre páginas",
+        "Abrir cadastro de nova magia",
+        "Abrir importação",
+        "Visualizar magia",
+        "Editar magia",
+        "Desativar/reativar magia",
+        "Excluir magia"
+      ]
+    },
+    "tela_002": {
+      "descricao": "Formulário completo para cadastro ou edição de magia, organizado em seções colapsáveis.",
+      "tipo": "formulario",
+      "elementos": [
+        "Abas de navegação: 'Dados Principais (PT-BR)' e 'Tradução (EN)'",
+        "Seção 'Identificação': campos nome PT-BR, página de referência",
+        "Seção 'Classificação': escola (dropdown), subescola (texto), descritor (texto)",
+        "Seção 'Classes e Níveis': lista editável de classe + nível, botão adicionar classe",
+        "Seção 'Componentes': checkboxes V/G/M/F/FD/XP, campo texto componente extra",
+        "Seção 'Conjuração': campos tempo, alcance, área/efeito/alvo, duração, TR, RM",
+        "Seção 'Domínio': checkbox 'É magia de domínio?', campo múltiplo de domínios (condicional)",
+        "Seção 'Descrição': editor rich text PT-BR",
+        "Aba 'Tradução (EN)': campos nome EN, editor rich text descrição EN",
+        "Botões: Salvar, Cancelar",
+        "Indicador de campos obrigatórios",
+        "Indicador visual de tradução pendente/completa"
+      ],
+      "acoes_disponiveis": [
+        "Preencher campos",
+        "Adicionar/remover classes",
+        "Selecionar componentes",
+        "Expandir/colapsar seções",
+        "Salvar magia",
+        "Cancelar e voltar",
+        "Alternar entre abas PT-BR e EN"
+      ]
+    },
+    "tela_003": {
+      "descricao": "Exibição detalhada de uma magia em formato otimizado para leitura, similar ao layout do livro.",
+      "tipo": "formulario",
+      "elementos": [
+        "Nome da magia (destaque) com indicador de idioma",
+        "Bloco de classificação: escola, subescola, descritor",
+        "Bloco de níveis por classe (formato: 'Mag 3, Clr 4, Drd 4')",
+        "Bloco de componentes com descrição do extra quando houver",
+        "Bloco de conjuração: tempo, alcance, área/efeito/alvo, duração",
+        "Bloco de resistência: TR, RM",
+        "Descrição completa formatada",
+        "Página de referência",
+        "Indicador de domínio e lista de domínios quando aplicável",
+        "Botão alternar idioma (PT/EN)",
+        "Botão Editar (condicional por permissão)",
+        "Botão Voltar"
+      ],
+      "acoes_disponiveis": [
+        "Alternar idioma de visualização",
+        "Acessar edição",
+        "Voltar à listagem"
+      ]
+    },
+    "tela_004": {
+      "descricao": "Tela para upload e processamento de arquivo Excel com magias.",
+      "tipo": "formulario",
+      "elementos": [
+        "Link para download do modelo de planilha",
+        "Área de upload de arquivo (drag and drop)",
+        "Indicador de progresso do processamento",
+        "Preview de magias válidas (tabela resumida)",
+        "Lista de erros encontrados (linha, campo, descrição do erro)",
+        "Contador: X magias válidas, Y erros",
+        "Botão 'Confirmar Importação'",
+        "Botão 'Cancelar'",
+        "Botão 'Baixar Relatório de Erros'"
+      ],
+      "acoes_disponiveis": [
+        "Baixar modelo",
+        "Fazer upload de arquivo",
+        "Revisar preview",
+        "Confirmar importação",
+        "Cancelar importação",
+        "Baixar relatório de erros"
+      ]
+    },
+    "tela_005": {
+      "descricao": "Modal ou seção que exibe o histórico de modificações de uma magia.",
+      "tipo": "listagem",
+      "elementos": [
+        "Lista ordenada por data (mais recente primeiro)",
+        "Para cada entrada: data/hora, usuário, tipo de ação",
+        "Detalhamento de campos alterados com valor anterior e novo",
+        "Filtro por período (opcional)",
+        "Botão fechar/voltar"
+      ],
+      "acoes_disponiveis": [
+        "Visualizar histórico",
+        "Filtrar por período",
+        "Fechar modal"
+      ]
+    }
+  },
+  "10_dados_integracoes": {
+    "autenticacao": "",
+    "endpoints": []
+  },
+  "11_mensagens_sistema": {
+    "erro": [
+      "Já existe uma magia cadastrada com este nome.",
+      "Informe pelo menos uma classe com nível para esta magia.",
+      "O campo '{campo}' é obrigatório.",
+      "Para magias de domínio, é necessário informar ao menos um domínio.",
+      "O nível da magia deve estar entre 0 e 9.",
+      "Esta magia não pode ser excluída pois está vinculada a {X} grimório(s)/ficha(s). Use a opção Desativar.",
+      "Formato de arquivo não suportado. Use arquivos .xlsx ou .xls.",
+      "O arquivo excede o limite de 500 magias por importação.",
+      "Erro na linha {X}: {descrição do erro}.",
+      "Nenhuma magia válida encontrada no arquivo.",
+      "Erro ao processar o arquivo. Verifique se o formato está correto."
+    ],
+    "alerta": [
+      "Esta ação é irreversível. Deseja excluir permanentemente esta magia?",
+      "Deseja desativar esta magia? Ela não aparecerá mais nas buscas padrão, mas os vínculos existentes serão mantidos.",
+      "Existem {X} linha(s) com erro que não serão importadas. Deseja continuar com as {Y} magia(s) válidas?",
+      "Esta magia está desativada e não aparece nas buscas padrão.",
+      "Tradução em inglês não disponível para esta magia."
+    ],
+    "sucesso": [
+      "Magia cadastrada com sucesso.",
+      "Magia atualizada com sucesso.",
+      "Magia desativada com sucesso.",
+      "Magia reativada com sucesso.",
+      "Magia excluída com sucesso.",
+      "Importação concluída: {X} magia(s) importada(s) com sucesso.",
+      "Importação concluída: {X} magia(s) importada(s), {Y} linha(s) com erro."
+    ]
+  },
+  "12_lgpd_seguranca": {
+    "dados_pessoais": [],
+    "medidas": []
+  },
+  "13_estrutura_dados": {
+    "tab_001": {
+      "nome": "magias",
+      "descricao": "Tabela principal que armazena as magias do D&D 3.5",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único da magia"
+        },
+        {
+          "nome": "nome_pt",
+          "tipo": "VARCHAR(200)",
+          "descricao": "Nome da magia em português (obrigatório, único)"
+        },
+        {
+          "nome": "nome_en",
+          "tipo": "VARCHAR(200)",
+          "descricao": "Nome da magia em inglês (opcional)"
+        },
+        {
+          "nome": "escola",
+          "tipo": "VARCHAR(50)",
+          "descricao": "Escola de magia (enum das 8 escolas)"
+        },
+        {
+          "nome": "subescola",
+          "tipo": "VARCHAR(100)",
+          "descricao": "Subescola de magia (opcional)"
+        },
+        {
+          "nome": "descritor",
+          "tipo": "VARCHAR(200)",
+          "descricao": "Descritor da magia (opcional, ex: Fogo, Medo)"
+        },
+        {
+          "nome": "tempo_conjuracao",
+          "tipo": "VARCHAR(100)",
+          "descricao": "Tempo necessário para conjurar"
+        },
+        {
+          "nome": "alcance",
+          "tipo": "VARCHAR(100)",
+          "descricao": "Alcance da magia"
+        },
+        {
+          "nome": "area_efeito_alvo",
+          "tipo": "VARCHAR(200)",
+          "descricao": "Área de efeito, efeito ou alvo da magia"
+        },
+        {
+          "nome": "duracao",
+          "tipo": "VARCHAR(100)",
+          "descricao": "Duração da magia"
+        },
+        {
+          "nome": "teste_resistencia",
+          "tipo": "VARCHAR(150)",
+          "descricao": "Tipo de teste de resistência e efeito"
+        },
+        {
+          "nome": "resistencia_magia",
+          "tipo": "VARCHAR(50)",
+          "descricao": "Se a magia permite resistência a magia"
+        },
+        {
+          "nome": "descricao_pt",
+          "tipo": "TEXT",
+          "descricao": "Descrição completa em português"
+        },
+        {
+          "nome": "descricao_en",
+          "tipo": "TEXT",
+          "descricao": "Descrição completa em inglês (opcional)"
+        },
+        {
+          "nome": "e_magia_dominio",
+          "tipo": "BOOLEAN",
+          "descricao": "Indica se é uma magia de domínio"
+        },
+        {
+          "nome": "pagina_referencia",
+          "tipo": "INTEGER",
+          "descricao": "Número da página no Livro do Jogador"
+        },
+        {
+          "nome": "componente_extra",
+          "tipo": "TEXT",
+          "descricao": "Descrição de componente material/foco específico"
+        },
+        {
+          "nome": "ativo",
+          "tipo": "BOOLEAN",
+          "descricao": "Status da magia (true=ativa, false=desativada)"
+        },
+        {
+          "nome": "criado_em",
+          "tipo": "TIMESTAMP",
+          "descricao": "Data/hora de criação do registro"
+        },
+        {
+          "nome": "criado_por",
+          "tipo": "UUID",
+          "descricao": "ID do usuário que criou o registro"
+        },
+        {
+          "nome": "atualizado_em",
+          "tipo": "TIMESTAMP",
+          "descricao": "Data/hora da última atualização"
+        },
+        {
+          "nome": "atualizado_por",
+          "tipo": "UUID",
+          "descricao": "ID do usuário que fez a última atualização"
+        }
+      ],
+      "indices": [
+        {
+          "nome": "idx_magias_nome_pt",
+          "unico": true,
+          "campos": [
+            "nome_pt"
+          ]
+        },
+        {
+          "nome": "idx_magias_escola",
+          "unico": false,
+          "campos": [
+            "escola"
+          ]
+        },
+        {
+          "nome": "idx_magias_ativo",
+          "unico": false,
+          "campos": [
+            "ativo"
+          ]
+        }
+      ]
+    },
+    "tab_002": {
+      "nome": "magia_componentes",
+      "descricao": "Tabela de relacionamento entre magias e seus componentes",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único"
+        },
+        {
+          "nome": "magia_id",
+          "tipo": "UUID",
+          "descricao": "FK para tabela magias"
+        },
+        {
+          "nome": "componente",
+          "tipo": "VARCHAR(20)",
+          "descricao": "Código do componente (V, G, M, F, FD, XP)"
+        }
+      ],
+      "indices": [
+        {
+          "nome": "idx_magia_componentes_magia",
+          "unico": false,
+          "campos": [
+            "magia_id"
+          ]
+        }
+      ]
+    },
+    "tab_003": {
+      "nome": "magia_niveis_classe",
+      "descricao": "Tabela de relacionamento entre magias e níveis por classe conjuradora",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único"
+        },
+        {
+          "nome": "magia_id",
+          "tipo": "UUID",
+          "descricao": "FK para tabela magias"
+        },
+        {
+          "nome": "classe",
+          "tipo": "VARCHAR(50)",
+          "descricao": "Classe conjuradora (enum das 7 classes)"
+        },
+        {
+          "nome": "nivel",
+          "tipo": "INTEGER",
+          "descricao": "Nível da magia para esta classe (0-9)"
+        }
+      ],
+      "indices": [
+        {
+          "nome": "idx_magia_niveis_magia",
+          "unico": false,
+          "campos": [
+            "magia_id"
+          ]
+        },
+        {
+          "nome": "idx_magia_niveis_classe",
+          "unico": false,
+          "campos": [
+            "classe"
+          ]
+        },
+        {
+          "nome": "uk_magia_classe",
+          "unico": true,
+          "campos": [
+            "magia_id",
+            "classe"
+          ]
+        }
+      ]
+    },
+    "tab_004": {
+      "nome": "magia_dominios",
+      "descricao": "Tabela de relacionamento entre magias de domínio e seus domínios",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único"
+        },
+        {
+          "nome": "magia_id",
+          "tipo": "UUID",
+          "descricao": "FK para tabela magias"
+        },
+        {
+          "nome": "dominio",
+          "tipo": "VARCHAR(100)",
+          "descricao": "Nome do domínio"
+        }
+      ],
+      "indices": [
+        {
+          "nome": "idx_magia_dominios_magia",
+          "unico": false,
+          "campos": [
+            "magia_id"
+          ]
+        }
+      ]
+    },
+    "tab_005": {
+      "nome": "magia_historico",
+      "descricao": "Tabela de histórico de alterações das magias",
+      "campos": [
+        {
+          "nome": "id",
+          "tipo": "UUID",
+          "descricao": "Identificador único"
+        },
+        {
+          "nome": "magia_id",
+          "tipo": "UUID",
+          "descricao": "FK para tabela magias"
+        },
+        {
+          "nome": "usuario_id",
+          "tipo": "UUID",
+          "descricao": "ID do usuário que realizou a ação"
+        },
+        {
+          "nome": "acao",
+          "tipo": "VARCHAR(20)",
+          "descricao": "Tipo de ação (CRIACAO, EDICAO, DESATIVACAO, REATIVACAO, EXCLUSAO)"
+        },
+        {
+          "nome": "dados_anteriores",
+          "tipo": "JSONB",
+          "descricao": "Snapshot dos dados antes da alteração"
+        },
+        {
+          "nome": "dados_novos",
+          "tipo": "JSONB",
+          "descricao": "Snapshot dos dados após a alteração"
+        },
+        {
+          "nome": "criado_em",
+          "tipo": "TIMESTAMP",
+          "descricao": "Data/hora da ação"
+        }
+      ],
+      "indices": [
+        {
+          "nome": "idx_magia_historico_magia",
+          "unico": false,
+          "campos": [
+            "magia_id"
+          ]
+        },
+        {
+          "nome": "idx_magia_historico_data",
+          "unico": false,
+          "campos": [
+            "criado_em"
+          ]
+        }
+      ]
+    }
+  },
+  "14_referencias": [
+    {
+      "temp_id": "ref_001",
+      "descricao": "Fonte primária das magias, contendo todas as informações de referência para atributos, descrições e regras de cada magia.",
+      "documento": "Livro do Jogador D&D 3.5"
+    },
+    {
+      "temp_id": "ref_002",
+      "descricao": "Documento de referência aberto com as regras do sistema D&D 3.5, utilizado para validação e complementação de informações.",
+      "documento": "SRD 3.5 (System Reference Document)"
+    }
+  ],
+  "15_mapa_integracoes": [],
+  "16_integracao_projeto_existente": {
+    "modulos_dependentes": [],
+    "impactos_integracao": [],
+    "ordem_implantacao": []
+  },
+  "metadata": {
+    "exported_at": "2026-03-30T18:12:32.632130",
+    "exported_by": null,
+    "statistics": {
+      "modules_count": 1,
+      "features_count": 7,
+      "requirements_count": 38,
+      "personas_count": 3
+    },
+    "ai_enhanced": false
+  }
+}

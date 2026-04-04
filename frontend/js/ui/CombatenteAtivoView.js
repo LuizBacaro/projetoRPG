@@ -138,7 +138,9 @@ export class CombatenteAtivoView {
             btnDano.addEventListener('click', () => {
                 const valor = parseInt(inputDano.value);
                 if (!valor || valor <= 0) {
-                    alert('Digite um valor válido para aplicar dano');
+                    if (window.Toast?.error) {
+                        window.Toast.error('Digite um valor válido para aplicar dano.');
+                    }
                     return;
                 }
                 onAplicarDano(combatente.id, valor);
@@ -150,7 +152,9 @@ export class CombatenteAtivoView {
             btnCura.addEventListener('click', () => {
                 const valor = parseInt(inputDano.value);
                 if (!valor || valor <= 0) {
-                    alert('Digite um valor válido para aplicar cura');
+                    if (window.Toast?.error) {
+                        window.Toast.error('Digite um valor válido para aplicar cura.');
+                    }
                     return;
                 }
                 onAplicarCura(combatente.id, valor);

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Perícias para D&D 3.5">
+    <meta name="theme-color" content="#8B4513">
+    <title>Perícias - D&D 3.5</title>
+    
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/pericias.css?v=8.0">
+</head>
+<body>
+
+<div class="pericias-wrapper">
+    <!-- HEADER -->
+    <header class="pericias-header">
+        <button id="btn-voltar" class="btn-voltar">← Voltar</button>
+        <div class="header-content">
+            <h1>⚔️ Perícias do Personagem</h1>
+            <p class="subtitulo">D&D 3.5 - Selecione e configure suas perícias</p>
+        </div>
+        <div class="header-info">
+            <span id="combatente-nome" class="combatente-nome">👤 Carregando...</span>
+            <span id="combatente-tipo" class="combatente-tipo">(tipo)</span>
+        </div>
+    </header>
+
+    <!-- FILTROS -->
+    <div class="filtros-container">
+        <input type="text" id="filtro-busca" class="filtro-input" placeholder="🔍 Buscar perícia...">
+        <button class="btn-filtro ativo" data-atributo="">Todas</button>
+        <button class="btn-filtro" data-atributo="FOR">💪 FOR</button>
+        <button class="btn-filtro" data-atributo="DES">🎯 DES</button>
+        <button class="btn-filtro" data-atributo="CON">❤️ CON</button>
+        <button class="btn-filtro" data-atributo="INT">🧠 INT</button>
+        <button class="btn-filtro" data-atributo="SAB">👁️ SAB</button>
+        <button class="btn-filtro" data-atributo="CAR">💬 CAR</button>
+    </div>
+
+    <!-- TABELA DE PERÍCIAS -->
+    <div class="tabela-pericias-container">
+        <table class="tabela-pericias" id="tabela-pericias">
+            <thead>
+                <tr>
+                    <th class="col-checkbox">✓</th>
+                    <th class="col-nome">Perícia</th>
+                    <th class="col-atributo">Atr.</th>
+                    <th class="col-descricao">Descrição</th>
+                    <th class="col-tipo">Tipo</th>
+                    <th class="col-modificadores">
+                        <div style="display: grid; grid-template-columns: 60px 60px 60px 60px; gap: 0.5rem; text-align: center;">
+                            <div>Grad.</div>
+                            <div>Mod.</div>
+                            <div>Bôn.</div>
+                            <div>Total</div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="tbody-pericias">
+                <tr><td colspan="6" class="vazio">⏳ Carregando perícias...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FOOTER COM BOTÕES -->
+    <div class="pericias-footer">
+        <button id="btn-limpar-pericias" class="btn-limpar">🔄 Limpar Seleção</button>
+        <button id="btn-salvar-pericias" class="btn-salvar-pericias">💾 Salvar Perícias</button>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="/js/utils/async-button.global.js"></script>
+
+<!-- ✅ SCRIPT COM VALIDAÇÃO CORRETA -->
+<script type="module">
+    import { PericiaController } from '/js/controllers/PericiaController.js';
+    import { NotificationService } from '/js/services/NotificationService.js';
+
+    console.log('🎬 Script pericias.html carregado');
+
+    // ✅ VALIDAÇÃO SEGURA: Verificar token ANTES de inicializar
+    function validarAutenticacao() {
+        const token = localStorage.getItem('token');
+        
+        console.log('🔐 Validando autenticação...');
+        console.log('✅ Token encontrado:', !!token);
+        
+        if (!token) {
+            console.warn('⚠️ Sem token. Redirecionando para login...');
+            window.location.href = '/pages/login.html?redirect=/pages/pericias.html';
+            return false;
+        }
+        
+        return true;
+    }
+
+    // ✅ Inicializar SOMENTE se autenticado
+    if (!validarAutenticacao()) {
+        // Parar execução se não autenticado
+        throw new Error('Autenticação necessária');
+    }
+
+    const controller = new PericiaController();
+    window.periciaController = controller;
+
+    // ✅ Aguardar DOM completo
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            console.log('🎮 Inicializando controller...');
+            
+            // Validar novamente antes de inicializar
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('Token perdido durante carregamento');
+            }
+            
+            await controller.inicializar();
+            setupEventos(controller);
+            NotificationService.mostrarSucesso('✅ Perícias carregadas!');
+            console.log('✅ PericiaController inicializado com sucesso');
+            
+        } catch (error) {
+            console.error('❌ Erro ao inicializar:', error);
+            NotificationService.mostrarErro('Erro: ' + error.message);
+            
+            // Redirecionar se houver erro de autenticação
+            if (error.message.includes('Autenticação') || error.message.includes('Token')) {
+                setTimeout(() => {
+                    window.location.href = '/pages/login.html?redirect=/pages/pericias.html';
+                }, 2000);
+            }
+        }
+    });
+
+    /**
+     * Setup de eventos da página
+     */
+    function setupEventos(controller) {
+        // Filtros por atributo
+        document.querySelectorAll('.btn-filtro').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('ativo'));
+                btn.classList.add('ativo');
+                controller.filtrarPorAtributo(btn.dataset.atributo);
+                console.log('🔍 Filtro aplicado:', btn.dataset.atributo || 'Todas');
+            });
+        });
+
+        // Busca por termo
+        const inputBusca = document.getElementById('filtro-busca');
+        if (inputBusca) {
+            inputBusca.addEventListener('input', (e) => {
+                controller.buscarPericias(e.target.value);
+            });
+        }
+
+        // Voltar para dashboard
+        const btnVoltar = document.getElementById('btn-voltar');
+        if (btnVoltar) {
+            btnVoltar.addEventListener('click', () => {
+                console.log('⬅️ Voltando...');
+                const params = new URLSearchParams(window.location.search);
+                const returnTo = params.get('return_to');
+                if (returnTo) {
+                    window.location.href = decodeURIComponent(returnTo);
+                    return;
+                }
+                window.location.href = '/pages/dashboard.html';
+            });
+        }
+
+        // Salvar perícias
+        const btnSalvar = document.getElementById('btn-salvar-pericias');
+        if (btnSalvar) {
+            btnSalvar.addEventListener('click', () => {
+                console.log('💾 Salvando perícias...');
+                controller.salvarPericias();
+            });
+        }
+
+        // Limpar seleção
+        const btnLimpar = document.getElementById('btn-limpar-pericias');
+        if (btnLimpar) {
+            btnLimpar.addEventListener('click', () => {
+                console.log('🔄 Limpando seleção...');
+                controller.limparSelecao();
+            });
+        }
+
+        console.log('✅ Eventos configurados');
+    }
+</script>
+
+</body>
+</html>

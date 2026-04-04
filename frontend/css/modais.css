@@ -11,9 +11,11 @@
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
+    padding: 1rem;
     background: rgba(0, 0, 0, 0.8);
     z-index: 1000;
     backdrop-filter: blur(4px);
+    overflow-y: auto;
 }
 
 .modal.show {
@@ -73,6 +75,12 @@
 }
 
 .modal-close:hover { transform: rotate(90deg) scale(1.2); color: #FFED4E; }
+
+.modal-close:focus-visible {
+    outline: 2px solid var(--azul-destaque);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
 
 .modal-content form { padding: 2rem; }
 
@@ -162,6 +170,13 @@
     background: var(--azul-destaque);
     color: #fff;
     transform: scale(1.1);
+}
+
+.modal-dano-fechar:focus-visible,
+.btn-aplicar-dano:focus-visible,
+.btn-cancelar-dano:focus-visible {
+    outline: 2px solid var(--azul-destaque);
+    outline-offset: 2px;
 }
 
 .modal-dano-body {

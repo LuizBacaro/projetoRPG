@@ -1,0 +1,2096 @@
+/*
+ * grimorio.css
+ * Estilo do Grimório de Magias — tema medieval arcano
+ */
+
+/* ── Overlay ── */
+.grimorio-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+}
+.grimorio-overlay.show { display: flex; }
+
+/* ── Container principal ── */
+.grimorio-container {
+    background:
+        radial-gradient(circle at top left, rgba(214, 178, 92, 0.14), transparent 18%),
+        radial-gradient(circle at top right, rgba(108, 84, 214, 0.12), transparent 22%),
+        linear-gradient(160deg, #160e06 0%, #241608 36%, #120b05 100%);
+    border: 3px solid rgba(201, 168, 76, 0.92);
+    border-radius: 18px;
+    width: min(1240px, calc(100vw - 2rem));
+    max-width: 1240px;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow:
+        0 0 0 1px rgba(255, 240, 205, 0.06),
+        0 0 72px rgba(201, 168, 76, 0.2),
+        0 24px 70px rgba(0, 0, 0, 0.82),
+        inset 0 1px 0 rgba(255, 236, 184, 0.14),
+        inset 0 -18px 36px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    animation: grimorioAbrir 0.35s ease;
+}
+
+.grimorio-container--catalogo {
+    width: min(1480px, calc(100vw - 1.25rem));
+    max-width: none;
+    max-height: 97vh;
+    height: 97vh;
+}
+
+@keyframes grimorioAbrir {
+    from { opacity: 0; transform: scale(0.92) translateY(-20px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+/* ── Header ── */
+.grimorio-header {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at left center, rgba(201, 168, 76, 0.16), transparent 28%),
+        linear-gradient(135deg, #281806 0%, #3f2510 48%, #251406 100%);
+    border-bottom: 2px solid var(--cor-dourada);
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.grimorio-header::after {
+    content: '';
+    position: absolute;
+    left: 1.2rem;
+    right: 1.2rem;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 225, 146, 0.55), transparent);
+    pointer-events: none;
+}
+.grimorio-header-esquerda {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.grimorio-icone {
+    font-size: 2rem;               /* ✅ menor */
+    filter: drop-shadow(0 0 8px rgba(201, 168, 76, 0.6));
+    animation: flutuarIcone 3s ease-in-out infinite;
+}
+@keyframes flutuarIcone {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-4px); }
+}
+.grimorio-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 1.3rem;             /* ✅ menor */
+    color: var(--cor-dourada);
+    margin: 0;
+    text-shadow: 0 0 20px rgba(201, 168, 76, 0.5);
+    letter-spacing: 0.08em;
+}
+.grimorio-subtitulo {
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    color: var(--cor-madeira-clara);
+    margin: 0.1rem 0 0;
+    letter-spacing: 0.05em;
+}
+.grimorio-header-acoes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.grimorio-indicador {
+    font-family: var(--fonte-titulo);
+    font-size: 0.66rem;
+    color: var(--cor-madeira-clara);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 8px;
+    padding: 0.2rem 0.45rem;
+    letter-spacing: 0.05em;
+}
+
+.grimorio-indicador strong {
+    color: var(--cor-dourada);
+}
+.grimorio-fechar {
+    background: rgba(201, 168, 76, 0.15);
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 8px;
+    color: var(--cor-dourada);
+    font-size: 1.2rem;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.grimorio-fechar:hover {
+    background: rgba(201, 168, 76, 0.3);
+    transform: scale(1.1);
+}
+
+/* ── Botões arcanos do grimório ── */
+.grimorio-btn-descanso {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at top left, rgba(209, 178, 255, 0.22), transparent 42%),
+        linear-gradient(135deg, rgba(28, 18, 53, 0.96), rgba(56, 29, 96, 0.9));
+    border: 1px solid rgba(175, 128, 255, 0.46);
+    border-radius: 999px;
+    color: #efe3ff;
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    padding: 0.42rem 0.82rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+    letter-spacing: 0.06em;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 0 0 1px rgba(84, 52, 132, 0.25),
+        0 8px 18px rgba(30, 14, 60, 0.28);
+}
+
+.grimorio-btn-descanso::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255,255,255,0.06), transparent 55%);
+    pointer-events: none;
+}
+
+.grimorio-btn-descanso::after {
+    content: '✦';
+    margin-left: 0.45rem;
+    font-size: 0.62rem;
+    color: rgba(240, 201, 255, 0.82);
+    text-shadow: 0 0 8px rgba(212, 170, 255, 0.5);
+}
+
+.grimorio-btn-descanso:hover {
+    transform: translateY(-1px);
+    border-color: rgba(219, 183, 255, 0.76);
+    color: #fff6ff;
+    filter: saturate(1.08);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        0 0 0 1px rgba(108, 70, 168, 0.34),
+        0 12px 24px rgba(48, 21, 89, 0.38),
+        0 0 22px rgba(146, 93, 225, 0.22);
+}
+
+.grimorio-btn-descanso:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 0 0 1px rgba(84, 52, 132, 0.12);
+}
+
+.grimorio-adicionar-acoes .grimorio-btn-descanso {
+    background:
+        radial-gradient(circle at top left, rgba(120, 188, 255, 0.16), transparent 38%),
+        linear-gradient(135deg, rgba(23, 31, 64, 0.94), rgba(39, 57, 104, 0.88));
+    border-color: rgba(123, 158, 247, 0.42);
+    color: #dde9ff;
+}
+
+.grimorio-adicionar-acoes .grimorio-btn-descanso::after {
+    color: rgba(178, 213, 255, 0.88);
+    text-shadow: 0 0 8px rgba(97, 160, 255, 0.36);
+}
+
+.grimorio-adicionar-acoes .grimorio-btn-descanso:hover {
+    border-color: rgba(158, 196, 255, 0.72);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        0 0 0 1px rgba(80, 112, 176, 0.34),
+        0 12px 24px rgba(20, 31, 69, 0.34),
+        0 0 20px rgba(84, 136, 255, 0.2);
+}
+
+.grimorio-classe-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 1.5rem;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.grimorio-classe-wrap label {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    color: rgba(201, 168, 76, 0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.grimorio-select-classe,
+.grimorio-select-componente {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 8px;
+    color: var(--cor-pergaminho);
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    padding: 0.32rem 0.55rem;
+}
+
+/* 
+   ✅ NOVA ZONA TOPO: slots + busca na mesma linha
+    */
+.grimorio-topo-controles {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem 1.5rem;
+    background:
+        radial-gradient(circle at top left, rgba(98, 128, 208, 0.08), transparent 32%),
+        linear-gradient(180deg, rgba(0,0,0,0.24), rgba(0,0,0,0.14));
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    flex-shrink: 0;
+}
+
+/* Painel de slots — ocupa espaço disponível */
+.grimorio-slots-painel {
+    flex: 1;
+    min-width: 0;
+    padding: 0.72rem 0.82rem;
+    border: 1px solid rgba(201, 168, 76, 0.16);
+    border-radius: 14px;
+    background: linear-gradient(165deg, rgba(20, 14, 7, 0.78), rgba(10, 8, 5, 0.62));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 239, 205, 0.05),
+        0 10px 24px rgba(0, 0, 0, 0.18);
+}
+.grimorio-slots-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    color: rgba(201,168,76,0.62);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.38rem;
+}
+.grimorio-slots-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.grimorio-slots-vazio {
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    color: rgba(201,168,76,0.42);
+    font-style: italic;
+}
+.grimorio-slot-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.16rem;
+    min-width: 40px;
+}
+.grimorio-slot-nivel {
+    font-family: var(--fonte-titulo);
+    font-size: 0.55rem;
+    color: rgba(201,168,76,0.72);
+    text-transform: uppercase;
+}
+.grimorio-slot-barra-wrap {
+    width: 38px;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.grimorio-slot-barra-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+.grimorio-slot-contagem {
+    font-family: var(--fonte-titulo);
+    font-size: 0.58rem;
+    font-weight: 700;
+}
+.grimorio-slot-usadas {
+    font-size: 0.52rem;
+    color: #f87171;
+    font-family: var(--fonte-titulo);
+}
+
+/* Busca — lado direito do topo */
+.grimorio-busca-wrapper {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    min-width: 228px;
+    padding: 0.62rem 0.72rem;
+    border: 1px solid rgba(201, 168, 76, 0.16);
+    border-radius: 14px;
+    background: linear-gradient(165deg, rgba(15, 12, 18, 0.82), rgba(8, 7, 12, 0.64));
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 10px 24px rgba(0, 0, 0, 0.18);
+}
+.grimorio-busca-label {
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    color: rgba(201,168,76,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+.grimorio-busca {
+    background: rgba(0,0,0,0.38);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 10px;
+    color: var(--cor-pergaminho);
+    font-family: var(--fonte-texto);
+    font-size: 0.82rem;
+    padding: 0.45rem 0.78rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    width: 235px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.grimorio-busca::placeholder { color: rgba(201,168,76,0.3); }
+.grimorio-busca:focus {
+    border-color: var(--cor-dourada);
+    background: rgba(9, 10, 17, 0.9);
+    box-shadow:
+        0 0 0 3px rgba(201, 168, 76, 0.12),
+        0 0 16px rgba(201, 168, 76, 0.12);
+}
+
+.grimorio-aviso-classe {
+    margin: 0.55rem 1.5rem 0;
+    padding: 0.48rem 0.72rem;
+    border: 1px solid rgba(250, 204, 21, 0.35);
+    border-radius: 10px;
+    background: linear-gradient(145deg, rgba(114, 82, 14, 0.38), rgba(63, 43, 8, 0.26));
+    color: #f8e4aa;
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.grimorio-aviso-classe strong {
+    color: #ffe3a5;
+}
+
+.grimorio-aviso-classe--alerta {
+    border-color: rgba(250, 204, 21, 0.35);
+    background: linear-gradient(145deg, rgba(114, 82, 14, 0.38), rgba(63, 43, 8, 0.26));
+    color: #f8e4aa;
+}
+
+.grimorio-aviso-classe--clerigo {
+    border-color: rgba(129, 204, 255, 0.36);
+    background:
+        radial-gradient(circle at top left, rgba(129, 204, 255, 0.16), transparent 42%),
+        linear-gradient(145deg, rgba(22, 49, 73, 0.46), rgba(11, 26, 40, 0.32));
+    color: #d8efff;
+}
+
+.grimorio-adicionar-wrap {
+    padding: 0.6rem 1.5rem;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.12);
+    background: rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.grimorio-adicionar-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.grimorio-painel-adicionar {
+    display: none;
+    width: 100%;
+    margin-top: 0.65rem;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    border-radius: 12px;
+    padding: 0.7rem;
+    background:
+        radial-gradient(circle at top right, rgba(201, 168, 76, 0.08), transparent 42%),
+        linear-gradient(165deg, rgba(20, 14, 7, 0.9), rgba(12, 9, 4, 0.88));
+    box-shadow:
+        inset 0 1px 0 rgba(201, 168, 76, 0.12),
+        0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.grimorio-painel-adicionar.show {
+    display: block;
+}
+
+.grimorio-container--catalogo .grimorio-adicionar-wrap {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0.55rem 1.25rem 0;
+    gap: 0.55rem;
+    border-bottom: none;
+    background: transparent;
+}
+
+.grimorio-container--catalogo .grimorio-adicionar-acoes {
+    flex-shrink: 0;
+}
+
+.grimorio-container--catalogo .grimorio-corpo {
+    display: none;
+}
+
+/* Filters/topo are for the grimório list — hide them while catalog panel is open */
+.grimorio-container--catalogo .grimorio-filtros {
+    display: none;
+}
+
+.grimorio-container--catalogo .grimorio-painel-adicionar-catalogo.show {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    margin-top: 0;
+    padding: 1rem;
+    border-radius: 18px;
+    border-color: rgba(201, 168, 76, 0.34);
+    background:
+        radial-gradient(circle at top left, rgba(201, 168, 76, 0.12), transparent 32%),
+        linear-gradient(165deg, rgba(17, 12, 6, 0.97), rgba(9, 7, 3, 0.94));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 242, 204, 0.08),
+        0 16px 36px rgba(0, 0, 0, 0.42),
+        0 0 0 1px rgba(201, 168, 76, 0.08);
+}
+
+.grimorio-painel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+}
+
+.grimorio-container--catalogo .grimorio-painel-header {
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.18);
+}
+
+.grimorio-painel-header-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.grimorio-add-resumo {
+    font-family: var(--fonte-texto);
+    font-size: 0.7rem;
+    letter-spacing: 0.01em;
+    color: rgba(239, 228, 203, 0.78);
+}
+
+.grimorio-add-dica {
+    margin: 0 0 0.5rem;
+    font-family: var(--fonte-texto);
+    font-size: 0.68rem;
+    color: rgba(201, 168, 76, 0.65);
+}
+
+.grimorio-container--catalogo .grimorio-add-dica {
+    margin-bottom: 0.75rem;
+}
+
+.grimorio-fechar-painel {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    color: var(--cor-dourada);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.grimorio-fechar-painel:hover {
+    background: rgba(201, 168, 76, 0.2);
+    border-color: rgba(201, 168, 76, 0.5);
+}
+
+.grimorio-adicionar-lista {
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    max-height: min(62vh, 560px);
+    min-height: 360px;
+    overflow-y: auto;
+    padding-right: 0.35rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201, 168, 76, 0.45) rgba(0, 0, 0, 0.2);
+}
+
+.grimorio-container--catalogo .grimorio-adicionar-lista {
+    min-height: 0;
+    height: 100%;
+    max-height: none;
+    padding-right: 0.5rem;
+    padding-bottom: 0.4rem;
+}
+
+.grimorio-adicionar-lista::-webkit-scrollbar {
+    width: 8px;
+}
+
+.grimorio-adicionar-lista::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.24);
+    border-radius: 999px;
+}
+
+.grimorio-adicionar-lista::-webkit-scrollbar-thumb {
+    background: rgba(201, 168, 76, 0.45);
+    border-radius: 999px;
+}
+
+.grimorio-add-filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(130px, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 0.65rem;
+}
+
+.grimorio-container--catalogo .grimorio-add-filtros-grid {
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.8rem;
+}
+
+.grimorio-add-filtros-grid .grimorio-select-componente,
+.grimorio-add-filtros-grid .grimorio-busca {
+    width: 100%;
+    min-height: 34px;
+}
+
+.grimorio-add-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.95fr);
+    gap: 0.7rem;
+    align-items: start;
+}
+
+.grimorio-container--catalogo .grimorio-add-layout {
+    min-height: 0;
+    height: 100%;
+    grid-template-columns: minmax(0, 1.6fr) minmax(360px, 0.9fr);
+    gap: 0.9rem;
+    align-items: stretch;
+}
+
+.grimorio-add-preview {
+    border: 1px solid rgba(201, 168, 76, 0.25);
+    border-radius: 10px;
+    background: linear-gradient(170deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+    padding: 0.65rem;
+    min-height: 360px;
+    max-height: min(62vh, 560px);
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+}
+
+.grimorio-container--catalogo .grimorio-add-preview {
+    min-height: 0;
+    height: 100%;
+    max-height: none;
+    padding: 0.85rem;
+    position: static;
+}
+
+.grimorio-add-preview-titulo {
+    color: var(--cor-pergaminho);
+    font-family: var(--fonte-titulo);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.grimorio-add-preview-grid {
+    display: grid;
+    gap: 0.26rem;
+    margin-bottom: 0.45rem;
+}
+
+.grimorio-add-preview-linha {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 0.4rem;
+    align-items: baseline;
+}
+
+.grimorio-add-preview-chave {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(201, 168, 76, 0.72);
+}
+
+.grimorio-add-preview-valor {
+    font-size: 0.74rem;
+    color: var(--cor-pergaminho);
+}
+
+.grimorio-add-preview-descricao {
+    margin-top: 0.2rem;
+    border-top: 1px solid rgba(201, 168, 76, 0.18);
+    padding-top: 0.45rem;
+    font-size: 0.72rem;
+    line-height: 1.55;
+    color: rgba(239, 228, 203, 0.85);
+}
+
+.grimorio-add-feedback {
+    margin: 0.15rem 0 0.55rem;
+    padding: 0.48rem 0.6rem;
+    border-radius: 9px;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    background: linear-gradient(145deg, rgba(97, 27, 27, 0.45), rgba(56, 18, 18, 0.3));
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+}
+
+.grimorio-add-feedback strong {
+    display: block;
+    color: #ffd4d4;
+    font-family: var(--fonte-titulo);
+    font-size: 0.67rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.grimorio-add-feedback p {
+    margin: 0.24rem 0 0;
+    color: #ffdede;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.grimorio-add-feedback--bloqueio {
+    border-color: rgba(251, 191, 36, 0.42);
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.12), transparent 48%),
+        linear-gradient(145deg, rgba(92, 60, 9, 0.52), rgba(48, 30, 5, 0.35));
+}
+
+.grimorio-add-feedback--bloqueio strong {
+    color: #ffe9b0;
+}
+
+.grimorio-add-feedback--bloqueio p {
+    color: #ffedc4;
+}
+
+.grimorio-add-preview-acao {
+    margin-top: 0.5rem;
+    width: 100%;
+    position: sticky;
+    bottom: 0;
+    box-shadow: 0 -8px 20px rgba(12, 9, 4, 0.85);
+}
+
+.grimorio-add-preview-hint {
+    margin-top: 0.32rem;
+    font-size: 0.64rem;
+    color: rgba(201, 168, 76, 0.68);
+    text-align: center;
+}
+
+.grimorio-add-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.6rem;
+    padding: 0.6rem 0.65rem;
+    border: 1px solid rgba(201, 168, 76, 0.18);
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.grimorio-add-item:hover {
+    border-color: rgba(201, 168, 76, 0.42);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+    transform: translateY(-1px);
+}
+
+.grimorio-add-item.is-selected {
+    border-color: rgba(110, 154, 228, 0.75);
+    box-shadow:
+        0 0 0 1px rgba(110, 154, 228, 0.45),
+        0 8px 22px rgba(34, 66, 115, 0.38);
+    background: linear-gradient(135deg, rgba(44, 83, 150, 0.26), rgba(255, 255, 255, 0.02));
+}
+
+.grimorio-add-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.grimorio-add-info strong {
+    color: var(--cor-pergaminho);
+    font-size: 0.82rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.grimorio-add-info span {
+    color: rgba(201, 168, 76, 0.78);
+    font-family: var(--fonte-titulo);
+    font-size: 0.64rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.grimorio-add-btn {
+    border: 1px solid rgba(201, 168, 76, 0.32);
+    color: var(--cor-dourada);
+    background: rgba(201, 168, 76, 0.1);
+    border-radius: 8px;
+    padding: 0.34rem 0.7rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.66rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+}
+
+.grimorio-add-btn-selecionar {
+    background: rgba(57, 99, 170, 0.2);
+    border-color: rgba(110, 154, 228, 0.38);
+    color: #bcd7ff;
+    min-width: 84px;
+}
+
+.grimorio-add-btn-selecionar:hover,
+.grimorio-add-btn-selecionar.ativo {
+    background: rgba(83, 126, 201, 0.32);
+    border-color: rgba(154, 189, 249, 0.7);
+    color: #e4efff;
+}
+
+.grimorio-add-preview-acao {
+    min-height: 34px;
+}
+
+.grimorio-troca-badge {
+    margin-left: 0.45rem;
+    border: 1px solid rgba(250, 204, 21, 0.4);
+    color: #facc15;
+    background: rgba(250, 204, 21, 0.12);
+    border-radius: 999px;
+    padding: 0.2rem 0.5rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+}
+
+.grimorio-troca-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+    margin: 0.35rem 0 0.55rem;
+}
+
+.grimorio-historico-troca {
+    margin-top: 0.55rem;
+    border-top: 1px solid rgba(201, 168, 76, 0.15);
+    padding-top: 0.5rem;
+    max-height: 150px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+}
+
+.grimorio-historico-item {
+    font-family: var(--fonte-texto);
+    font-size: 0.7rem;
+    color: var(--cor-madeira-clara);
+    padding: 0.25rem 0.35rem;
+    border: 1px solid rgba(201, 168, 76, 0.15);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.grimorio-historico-vazio {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    color: rgba(201, 168, 76, 0.45);
+}
+
+.grimorio-notificacoes-lista {
+    margin-top: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.grimorio-notificacao-item {
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.45rem 0.55rem;
+}
+
+.grimorio-notificacao-item.nao-lida {
+    border-color: rgba(250, 204, 21, 0.45);
+    box-shadow: 0 0 9px rgba(250, 204, 21, 0.12);
+}
+
+.grimorio-notificacao-item.grimorio-notificacao-auto {
+    border-color: rgba(110, 231, 183, 0.45);
+    background: linear-gradient(145deg, rgba(8, 48, 34, 0.72), rgba(13, 29, 23, 0.44));
+    box-shadow: 0 0 18px rgba(52, 211, 153, 0.12);
+}
+
+.grimorio-notificacao-item.grimorio-notificacao-bloqueio {
+    border-color: rgba(251, 191, 36, 0.4);
+    background: linear-gradient(145deg, rgba(74, 53, 11, 0.62), rgba(39, 25, 6, 0.44));
+}
+
+.grimorio-notificacao-item.lida {
+    opacity: 0.82;
+}
+
+.grimorio-notificacao-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.grimorio-notificacao-topo strong {
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+}
+
+.grimorio-notificacao-item.grimorio-notificacao-auto .grimorio-notificacao-topo strong {
+    color: #9df3cd;
+}
+
+.grimorio-notificacao-item.grimorio-notificacao-bloqueio .grimorio-notificacao-topo strong {
+    color: #f7d88f;
+}
+
+.grimorio-notificacao-topo span {
+    color: rgba(201, 168, 76, 0.55);
+    font-family: var(--fonte-titulo);
+    font-size: 0.58rem;
+}
+
+.grimorio-notificacao-item p {
+    margin: 0.32rem 0 0.45rem;
+    color: var(--cor-pergaminho);
+    font-size: 0.74rem;
+    line-height: 1.35;
+}
+
+.grimorio-detalhe-header-main {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.grimorio-detalhe-posicao {
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    border-radius: 999px;
+    padding: 0.22rem 0.48rem;
+    color: var(--cor-dourada);
+    background: rgba(0, 0, 0, 0.25);
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+}
+
+.grimorio-notificacao-acoes {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: flex-end;
+}
+
+.grimorio-notificacao-acoes button {
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    background: rgba(0, 0, 0, 0.28);
+    color: var(--cor-dourada);
+    border-radius: 6px;
+    padding: 0.22rem 0.48rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    cursor: pointer;
+}
+
+/* 
+   ✅ FILTROS COMPACTOS: nível + escola em 2 linhas enxutas
+    */
+.grimorio-filtros {
+    padding: 0.6rem 1.5rem;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    background:
+        radial-gradient(circle at top left, rgba(201, 168, 76, 0.08), transparent 24%),
+        linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.1));
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex-shrink: 0;
+}
+.grimorio-filtro-grupo {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    padding: 0.34rem 0.42rem;
+    border: 1px solid rgba(201, 168, 76, 0.1);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.12);
+    min-width: 0;
+}
+
+.grimorio-filtros-secundarios {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 210px);
+    gap: 0.55rem;
+    align-items: start;
+}
+
+.grimorio-filtro-grupo--escolas {
+    min-width: 0;
+}
+
+.grimorio-filtro-grupo--escolas .grimorio-niveis {
+    flex: 1;
+    min-width: 0;
+}
+
+.grimorio-filtro-grupo--componente {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.grimorio-filtro-grupo--componente .grimorio-select-componente {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+}
+
+.grimorio-filtro-label {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    color: rgba(201,168,76,0.58);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    min-width: 42px;
+    flex-shrink: 0;
+}
+.grimorio-niveis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+.grimorio-nivel-btn {
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(255,255,255,0.02));
+    border: 1px solid rgba(201,168,76,0.22);
+    border-radius: 999px;
+    color: rgba(201,168,76,0.62);
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    padding: 0.2rem 0.52rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.grimorio-nivel-btn:hover {
+    background: rgba(201,168,76,0.18);
+    color: var(--cor-dourada);
+    border-color: rgba(201,168,76,0.5);
+    transform: translateY(-1px);
+}
+.grimorio-nivel-btn.ativo {
+    background: linear-gradient(135deg, rgba(201,168,76,0.26), rgba(201,168,76,0.12));
+    border-color: var(--cor-dourada);
+    color: var(--cor-dourada);
+    box-shadow: 0 0 10px rgba(201,168,76,0.2);
+}
+
+/* Botão "Preparadas Hoje" */
+.grimorio-btn-preparadas {
+    border-color: rgba(250,204,21,0.35) !important;
+    color: rgba(250,204,21,0.68) !important;
+}
+.grimorio-btn-preparadas.ativo {
+    background: rgba(250,204,21,0.12) !important;
+    border-color: #facc15 !important;
+    color: #facc15 !important;
+    box-shadow: 0 0 10px rgba(250,204,21,0.22) !important;
+}
+
+/* Filtro escola */
+.grimorio-escola-btn {
+    background: linear-gradient(135deg, rgba(0,0,0,0.2), rgba(255,255,255,0.015));
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 999px;
+    color: rgba(201,168,76,0.58);
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    padding: 0.2rem 0.55rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.grimorio-escola-btn:hover {
+    border-color: rgba(201,168,76,0.45);
+    color: var(--cor-dourada);
+    transform: translateY(-1px);
+}
+.grimorio-escola-btn.ativo {
+    background: rgba(201,168,76,0.13);
+    border-color: var(--cor-dourada);
+    color: var(--cor-dourada);
+    box-shadow: 0 0 7px rgba(201,168,76,0.16);
+}
+
+/* 
+   ✅ CORPO DA LISTA — flex:1 garante máximo espaço possível
+    */
+.grimorio-corpo {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.95rem 1.5rem 1.1rem;
+    min-height: 0;
+}
+
+/* Loading */
+.grimorio-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    gap: 1rem;
+    color: var(--cor-madeira-clara);
+    font-family: var(--fonte-titulo);
+    font-size: 0.9rem;
+}
+.grimorio-loading-icone {
+    font-size: 3rem;
+    animation: pulsarOrbe 1.5s ease-in-out infinite;
+}
+@keyframes pulsarOrbe {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(201,168,76,0.3)); }
+    50%       { transform: scale(1.15); filter: drop-shadow(0 0 15px rgba(201,168,76,0.7)); }
+}
+
+/* Nenhum resultado */
+.grimorio-vazio {
+    text-align: center;
+    padding: 1.35rem 1rem;
+    max-width: 560px;
+    margin: 1rem auto;
+    color: #e7d6ae;
+    font-family: var(--fonte-titulo);
+    font-size: 0.9rem;
+    font-style: italic;
+    border: 1px dashed rgba(201, 168, 76, 0.26);
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at top, rgba(201, 168, 76, 0.08), transparent 55%),
+        linear-gradient(160deg, rgba(27, 19, 9, 0.82), rgba(12, 10, 6, 0.58));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ── Grupos por nível ── */
+.grimorio-grupo { margin-bottom: 1.25rem; }
+.grimorio-grupo-dominio {
+    background: linear-gradient(135deg, rgba(32, 76, 42, 0.18), rgba(14, 44, 23, 0.22));
+    border: 1px solid rgba(116, 191, 135, 0.35);
+    border-radius: 12px;
+    padding: 0.65rem 0.75rem 0.35rem;
+}
+.grimorio-grupo-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 0.75rem;
+    color: var(--cor-dourada);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.grimorio-grupo-titulo::before {
+    content: '';
+    width: 16px;
+    height: 1px;
+    background: var(--cor-dourada);
+    opacity: 0.5;
+}
+.grimorio-grupo-slots {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    color: rgba(201,168,76,0.55);
+    margin-left: auto;
+    font-weight: normal;
+}
+
+/* ── Card de magia ── */
+.grimorio-magia-card {
+    background:
+        radial-gradient(circle at top right, rgba(114, 165, 255, 0.08), transparent 24%),
+        linear-gradient(135deg, rgba(255,255,255,0.045) 0%, rgba(201,168,76,0.055) 100%);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 14px;
+    padding: 0.82rem 0.95rem;
+    margin-bottom: 0.55rem;
+    cursor: pointer;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.03),
+        0 10px 24px rgba(0, 0, 0, 0.16);
+}
+.grimorio-magia-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, rgba(255, 219, 130, 0.9), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.grimorio-magia-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255,255,255,0.04), transparent 32%, transparent 68%, rgba(201,168,76,0.05));
+    pointer-events: none;
+}
+.grimorio-magia-card:hover {
+    background:
+        radial-gradient(circle at top right, rgba(144, 190, 255, 0.12), transparent 24%),
+        linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(201,168,76,0.09) 100%);
+    border-color: rgba(201,168,76,0.4);
+    transform: translateY(-2px) translateX(2px);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 14px 28px rgba(0, 0, 0, 0.24),
+        0 0 0 1px rgba(201, 168, 76, 0.08);
+}
+.grimorio-magia-card:hover::before { opacity: 1; }
+.grimorio-magia-card.preparada {
+    background:
+        radial-gradient(circle at top right, rgba(255, 224, 144, 0.12), transparent 24%),
+        linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.06) 100%);
+    border-color: rgba(201,168,76,0.45);
+    box-shadow: 0 0 16px rgba(201,168,76,0.14), 0 12px 24px rgba(0,0,0,0.18);
+}
+.grimorio-magia-card.sem-slot { opacity: 0.5; }
+.grimorio-magia-card.ja-usada {
+    opacity: 0.66;
+    background: linear-gradient(135deg, rgba(248,113,113,0.07) 0%, rgba(248,113,113,0.035) 100%);
+    border-color: rgba(248,113,113,0.26);
+}
+
+/* Topo do card */
+.grimorio-card-topo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 0.38rem;
+}
+.grimorio-card-nome {
+    font-family: var(--fonte-titulo);
+    font-size: 0.98rem;
+    color: var(--cor-dourada);
+    font-weight: 700;
+    line-height: 1.22;
+    text-wrap: balance;
+}
+.grimorio-card-nome.preparada-nome {
+    color: var(--cor-dourada);
+    text-shadow: 0 0 10px rgba(201,168,76,0.4);
+}
+.grimorio-card-nome.usada-nome {
+    text-decoration: line-through;
+    color: rgba(248,113,113,0.7);
+}
+.grimorio-card-badges {
+    display: flex;
+    gap: 0.34rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.grimorio-acoes-card {
+    display: flex;
+    gap: 0.32rem;
+    align-items: center;
+}
+
+.grimorio-acoes-card button {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    background: rgba(0, 0, 0, 0.28);
+    color: var(--cor-dourada);
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.grimorio-acoes-card button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(201, 168, 76, 0.5);
+    background: rgba(201, 168, 76, 0.12);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18);
+}
+
+.grimorio-favorita-btn.ativa {
+    color: #facc15;
+    border-color: rgba(250, 204, 21, 0.55);
+    background: rgba(250, 204, 21, 0.15);
+}
+
+.grimorio-magia-card.favorita {
+    border-color: rgba(250, 204, 21, 0.45);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.1), 0 12px 24px rgba(0,0,0,0.18);
+}
+.grimorio-badge {
+    font-family: var(--fonte-titulo);
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 0.14rem 0.42rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+.grimorio-badge-escola {
+    background: rgba(65,105,225,0.2);
+    color: #7b9ef7;
+    border: 1px solid rgba(65,105,225,0.35);
+}
+.grimorio-badge-comp {
+    background: rgba(92,58,30,0.25);
+    color: var(--cor-madeira-clara);
+    border: 1px solid rgba(92,58,30,0.4);
+}
+.grimorio-badge-res {
+    background: rgba(139,26,26,0.2);
+    color: #e07070;
+    border: 1px solid rgba(139,26,26,0.35);
+}
+.grimorio-badge-dano {
+    background: rgba(220,80,20,0.2);
+    color: #e89060;
+    border: 1px solid rgba(220,80,20,0.35);
+}
+.grimorio-badge-dominio {
+    background: rgba(46, 125, 50, 0.22);
+    color: #90ee90;
+    border: 1px solid rgba(144, 238, 144, 0.42);
+}
+
+.grimorio-badge-origem {
+    background: rgba(34, 66, 115, 0.22);
+    color: #b9d5ff;
+    border: 1px solid rgba(110, 154, 228, 0.38);
+}
+
+.grimorio-badge-preparada {
+    background: rgba(20, 83, 45, 0.28);
+    color: #9df3cd;
+    border: 1px solid rgba(110, 231, 183, 0.42);
+}
+
+.grimorio-badge-conhecida {
+    background: rgba(116, 74, 20, 0.24);
+    color: #ffd27a;
+    border: 1px solid rgba(245, 181, 72, 0.4);
+}
+
+/* Descrição */
+.grimorio-card-descricao {
+    font-size: 0.79rem;
+    color: rgba(232,216,185,0.8);
+    font-family: var(--fonte-texto);
+    line-height: 1.5;
+    margin-bottom: 0.45rem;
+}
+
+/* Meta */
+.grimorio-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.32rem;
+}
+.grimorio-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    padding: 0.28rem 0.45rem;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.12);
+    background: rgba(0, 0, 0, 0.14);
+}
+.grimorio-meta-label {
+    font-family: var(--fonte-titulo);
+    font-size: 0.48rem;
+    color: rgba(201,168,76,0.52);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.grimorio-meta-valor {
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 600;
+}
+
+/* Detalhes expandidos */
+.grimorio-card-detalhes {
+    display: none;
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    animation: expandirDetalhes 0.25s ease;
+}
+.grimorio-card-detalhes.show { display: block; }
+@keyframes expandirDetalhes {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.grimorio-detalhe-linha {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    margin-bottom: 0.25rem;
+}
+.grimorio-detalhe-chave {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    color: var(--cor-dourada);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    min-width: 90px;
+    flex-shrink: 0;
+}
+.grimorio-detalhe-valor {
+    font-size: 0.76rem;
+    color: var(--cor-pergaminho);
+    font-family: var(--fonte-texto);
+    line-height: 1.4;
+}
+.grimorio-dano-destaque {
+    font-family: var(--fonte-titulo);
+    font-size: 0.82rem;
+    color: #e07070;
+    font-weight: 700;
+}
+
+/* Rodapé do card */
+.grimorio-card-rodape {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.45rem;
+}
+.grimorio-rodape-direita {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.grimorio-preparo-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.24rem 0.42rem;
+    border-radius: 999px;
+    border: 1px solid rgba(201, 168, 76, 0.22);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.24), rgba(36, 25, 10, 0.2));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.grimorio-preparo-inline.is-disabled {
+    opacity: 0.45;
+}
+
+.grimorio-preparo-inline-label,
+.grimorio-preparo-inline-max {
+    font-family: var(--fonte-titulo);
+    font-size: 0.52rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(232, 216, 185, 0.72);
+}
+
+.grimorio-preparo-step {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    background: rgba(31, 21, 9, 0.72);
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 0.92rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.grimorio-preparo-step:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(201, 168, 76, 0.5);
+    box-shadow: 0 8px 14px rgba(0,0,0,0.18);
+}
+
+.grimorio-preparo-step:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.grimorio-preparo-input {
+    width: 46px;
+    height: 24px;
+    border-radius: 7px;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    background: rgba(7, 9, 16, 0.72);
+    color: var(--cor-pergaminho);
+    text-align: center;
+    font-family: var(--fonte-titulo);
+    font-size: 0.74rem;
+    font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.grimorio-preparo-input:focus {
+    outline: none;
+    border-color: rgba(201, 168, 76, 0.62);
+    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.12);
+}
+
+.grimorio-expandir-btn {
+    background: none;
+    border: none;
+    color: rgba(201,168,76,0.45);
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    cursor: pointer;
+    padding: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+.grimorio-expandir-btn:hover {
+    color: var(--cor-dourada);
+    transform: translateX(1px);
+}
+.grimorio-preparada-badge {
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    color: var(--cor-dourada);
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 6px rgba(201,168,76,0.5);
+}
+
+.grimorio-preparar-btn {
+    border: 1px solid rgba(110, 231, 183, 0.32);
+    background: linear-gradient(135deg, rgba(8, 48, 34, 0.84), rgba(14, 44, 23, 0.58));
+    color: #c6ffe5;
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.grimorio-preparar-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(16, 52, 34, 0.28);
+    border-color: rgba(110, 231, 183, 0.55);
+}
+
+.grimorio-preparar-btn.ativa {
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.28), rgba(130, 93, 17, 0.26));
+    border-color: rgba(250, 204, 21, 0.55);
+    color: #fff1be;
+}
+
+.grimorio-preparar-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* ── Checkbox preparar ── */
+.grimorio-checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.grimorio-checkbox { display: none; }
+.grimorio-checkbox-custom {
+    width: 17px;
+    height: 17px;
+    border: 2px solid rgba(201,168,76,0.3);
+    border-radius: 4px;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.grimorio-checkbox-custom::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background: var(--cor-dourada);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.15s;
+}
+.grimorio-checkbox-custom.checked {
+    border-color: var(--cor-dourada);
+    background: rgba(201,168,76,0.15);
+    box-shadow: 0 0 8px rgba(201,168,76,0.3);
+}
+.grimorio-checkbox-custom.checked::after { opacity: 1; transform: scale(1); }
+.grimorio-checkbox-custom.disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── Checkbox "lançada hoje" ── */
+.grimorio-usada-label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.6rem;
+    color: rgba(248,113,113,0.55);
+    transition: color 0.2s;
+}
+.grimorio-usada-label:hover { color: #f87171; }
+.grimorio-checkbox-usada { display: none; }
+.grimorio-usada-custom {
+    font-size: 0.82rem;
+    opacity: 0.3;
+    transition: all 0.2s;
+    filter: grayscale(1);
+}
+.grimorio-usada-custom.usada {
+    opacity: 1;
+    filter: grayscale(0);
+    animation: pulseFlame 0.4s ease;
+}
+@keyframes pulseFlame {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+.grimorio-usada-texto {
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+}
+
+/* ── Scrollbar ── */
+.grimorio-corpo::-webkit-scrollbar { width: 5px; }
+.grimorio-corpo::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+.grimorio-corpo::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 3px; }
+.grimorio-corpo::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.5); }
+
+/* ── Botão abrir grimório na ficha ── */
+.btn-abrir-grimorio {
+    width: 100%;
+    background: linear-gradient(135deg, #2a1a08 0%, #3d2410 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.6rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 8px rgba(201,168,76,0.4);
+    box-shadow: 0 0 12px rgba(201,168,76,0.15);
+}
+.btn-abrir-grimorio:hover {
+    background: linear-gradient(135deg, #3d2410 0%, #5c3820 100%);
+    box-shadow: 0 0 20px rgba(201,168,76,0.3);
+    transform: translateY(-1px);
+}
+
+/* ── Botão grimório no header da ficha ── */
+.btn-grimorio {
+    background: linear-gradient(135deg, #2a1a08 0%, #3d2410 100%);
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.05em;
+}
+.btn-grimorio:hover {
+    background: linear-gradient(135deg, #3d2410 0%, #5c3820 100%);
+    box-shadow: 0 0 15px rgba(201,168,76,0.35);
+    transform: translateY(-1px);
+}
+
+/* ── Toast ── */
+.grimorio-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 0.65rem 1.1rem;
+    border-radius: 10px;
+    font-family: var(--fonte-titulo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.25s;
+    pointer-events: none;
+    letter-spacing: 0.04em;
+}
+.grimorio-toast.show { opacity: 1; transform: translateY(0); }
+.grimorio-toast-sucesso {
+    background: linear-gradient(135deg, #1a3a1a, #2a4a2a);
+    border: 1px solid #4ade80;
+    color: #4ade80;
+}
+.grimorio-toast-erro {
+    background: linear-gradient(135deg, #3a1a1a, #4a2a2a);
+    border: 1px solid #f87171;
+    color: #f87171;
+}
+.grimorio-toast-info {
+    background: linear-gradient(135deg, #1a1a3a, #2a2a4a);
+    border: 1px solid #818cf8;
+    color: #818cf8;
+}
+
+/* ── Responsividade ── */
+@media (max-width: 768px) {
+    .grimorio-container { max-height: 96vh; border-radius: 12px; }
+    .grimorio-header    { padding: 0.75rem 1rem; }
+    .grimorio-titulo    { font-size: 1.1rem; }
+    .grimorio-icone     { font-size: 1.6rem; }
+    .grimorio-topo-controles {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+    .grimorio-slots-painel,
+    .grimorio-busca-wrapper {
+        width: 100%;
+        min-width: 0;
+    }
+    .grimorio-busca     { width: 100%; }
+    .grimorio-filtros   { padding: 0.4rem 1rem; }
+    .grimorio-filtros-secundarios { grid-template-columns: 1fr; }
+    .grimorio-filtro-grupo--componente { flex-wrap: wrap; }
+    .grimorio-corpo     { padding: 0.6rem 1rem; }
+    .grimorio-card-topo { flex-direction: column; gap: 0.35rem; }
+    .grimorio-card-badges { justify-content: flex-start; }
+    .grimorio-add-filtros-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    .grimorio-add-layout {
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
+    }
+    .grimorio-container--catalogo {
+        width: calc(100vw - 1rem);
+        max-height: 98vh;
+        height: 98vh;
+    }
+    .grimorio-container--catalogo .grimorio-filtros {
+        display: flex;
+    }
+    .grimorio-container--catalogo .grimorio-adicionar-wrap {
+        flex: initial;
+        padding: 0.5rem 1rem 0;
+    }
+    .grimorio-container--catalogo .grimorio-corpo {
+        display: block;
+    }
+    .grimorio-container--catalogo .grimorio-painel-adicionar-catalogo.show {
+        height: auto;
+    }
+    .grimorio-container--catalogo .grimorio-add-filtros-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    .grimorio-container--catalogo .grimorio-adicionar-lista,
+    .grimorio-container--catalogo .grimorio-add-preview {
+        min-height: 240px;
+        max-height: 320px;
+        height: auto;
+    }
+    .grimorio-adicionar-lista,
+    .grimorio-add-preview {
+        min-height: 240px;
+        max-height: 300px;
+    }
+    .grimorio-add-preview {
+        position: static;
+    }
+    .grimorio-add-preview-acao {
+        position: static;
+        box-shadow: none;
+    }
+}
+@media (max-width: 480px) {
+    .grimorio-nivel-btn      { font-size: 0.58rem; padding: 0.15rem 0.35rem; }
+    .grimorio-card-nome      { font-size: 0.88rem; }
+    .grimorio-card-descricao { font-size: 0.74rem; }
+    .grimorio-busca          { width: 100%; }
+    .grimorio-add-filtros-grid {
+        grid-template-columns: 1fr;
+    }
+    .grimorio-container--catalogo .grimorio-add-filtros-grid {
+        grid-template-columns: 1fr;
+    }
+    .grimorio-add-item {
+        grid-template-columns: 1fr;
+    }
+    .grimorio-add-btn-selecionar {
+        width: 100%;
+    }
+}
+
+/* ── Modal de confirmação customizado (substitui confirm() nativo) ── */
+.grimorio-confirm-overlay {
+    position:        fixed;
+    inset:           0;
+    background:      rgba(0, 0, 0, 0.65);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    z-index:         9999;
+    opacity:         0;
+    transition:      opacity 0.2s ease;
+}
+
+.grimorio-confirm-overlay.show {
+    opacity: 1;
+}
+
+.grimorio-confirm-box {
+    background:    #1e293b;
+    border:        1px solid rgba(201, 168, 76, 0.25);
+    border-radius: 12px;
+    padding:       2rem;
+    max-width:     380px;
+    width:         90%;
+    box-shadow:    0 20px 60px rgba(0, 0, 0, 0.6);
+    transform:     translateY(-12px);
+    transition:    transform 0.2s ease;
+}
+
+.grimorio-confirm-overlay.show .grimorio-confirm-box {
+    transform: translateY(0);
+}
+
+.grimorio-confirm-header {
+    display:         flex;
+    align-items:     center;
+    gap:             0.75rem;
+    margin-bottom:   1rem;
+}
+
+.grimorio-confirm-icone {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.grimorio-confirm-titulo {
+    font-size:   1.1rem;
+    font-weight: 700;
+    color:       #f1f5f9;
+    margin:      0;
+}
+
+.grimorio-confirm-texto {
+    color:         #94a3b8;
+    font-size:     0.9rem;
+    line-height:   1.6;
+    margin-bottom: 1.5rem;
+}
+
+.grimorio-confirm-botoes {
+    display:   flex;
+    gap:       0.75rem;
+    justify-content: flex-end;
+}
+
+.grimorio-confirm-btn {
+    position: relative;
+    overflow: hidden;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, filter 0.18s ease;
+    font-family: var(--fonte-titulo);
+    letter-spacing: 0.05em;
+}
+
+.grimorio-confirm-btn::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255,255,255,0.07), transparent 60%);
+    pointer-events: none;
+}
+
+.grimorio-confirm-btn:active {
+    transform: scale(0.97);
+}
+
+.grimorio-confirm-cancelar {
+    background:
+        radial-gradient(circle at top left, rgba(120, 188, 255, 0.15), transparent 40%),
+        linear-gradient(135deg, rgba(19, 28, 56, 0.94), rgba(31, 48, 88, 0.88));
+    color: #d6e4ff;
+    border-color: rgba(123, 158, 247, 0.34);
+    box-shadow: 0 10px 18px rgba(18, 26, 51, 0.24);
+}
+
+.grimorio-confirm-cancelar:hover {
+    transform: translateY(-1px);
+    color: #eef4ff;
+    border-color: rgba(164, 198, 255, 0.62);
+    box-shadow: 0 12px 22px rgba(24, 39, 77, 0.3), 0 0 18px rgba(83, 142, 255, 0.16);
+}
+
+.grimorio-confirm-ok {
+    background:
+        radial-gradient(circle at top left, rgba(247, 217, 135, 0.16), transparent 42%),
+        linear-gradient(135deg, rgba(59, 38, 9, 0.94), rgba(108, 72, 18, 0.9));
+    color: #f7e7b1;
+    border-color: rgba(201, 168, 76, 0.4);
+    box-shadow: 0 10px 18px rgba(54, 34, 8, 0.24);
+}
+
+.grimorio-confirm-ok:hover {
+    transform: translateY(-1px);
+    color: #fff4cf;
+    border-color: rgba(243, 211, 120, 0.72);
+    box-shadow: 0 12px 22px rgba(74, 47, 8, 0.32), 0 0 18px rgba(201, 168, 76, 0.18);
+}
+
+.grimorio-anotacao-box {
+    max-width: 520px;
+}
+
+.grimorio-anotacao-texto {
+    width: 100%;
+    resize: vertical;
+    min-height: 130px;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    background: rgba(0, 0, 0, 0.24);
+    color: var(--cor-pergaminho);
+    font-family: var(--fonte-texto);
+    margin-bottom: 0.8rem;
+}
+
+.grimorio-detalhe-overlay {
+    z-index: 10020;
+}
+
+.grimorio-detalhe-box {
+    max-width: 900px;
+    width: min(95vw, 900px);
+    max-height: 88vh;
+    overflow-y: auto;
+}
+
+.grimorio-detalhe-grid-modal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem 0.8rem;
+    margin-bottom: 0.9rem;
+}
+
+.grimorio-detalhe-linha-descricao {
+    grid-column: 1 / -1;
+}
+
+.grimorio-detalhe-preparo-box {
+    margin: 0.4rem 0 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    background: linear-gradient(135deg, rgba(29, 19, 8, 0.88), rgba(53, 33, 12, 0.62));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 10px 24px rgba(0,0,0,0.18);
+}
+
+.grimorio-detalhe-preparo-box.is-disabled {
+    opacity: 0.55;
+}
+
+.grimorio-detalhe-preparo-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-bottom: 0.65rem;
+}
+
+.grimorio-detalhe-preparo-titulo {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-dourada);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+}
+
+.grimorio-detalhe-preparo-status {
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    color: #dff9ea;
+    background: rgba(20, 83, 45, 0.28);
+    border: 1px solid rgba(110, 231, 183, 0.32);
+    border-radius: 999px;
+    padding: 0.18rem 0.55rem;
+}
+
+.grimorio-detalhe-quantidade-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.grimorio-detalhe-stepper {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    background: rgba(0, 0, 0, 0.28);
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.grimorio-detalhe-stepper:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(250, 204, 21, 0.55);
+    box-shadow: 0 10px 18px rgba(0,0,0,0.18);
+}
+
+.grimorio-detalhe-stepper:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.grimorio-detalhe-quantidade-input {
+    width: 84px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    background: rgba(7, 9, 16, 0.7);
+    color: var(--cor-pergaminho);
+    text-align: center;
+    font-family: var(--fonte-titulo);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.grimorio-detalhe-preparo-ajuda {
+    margin-top: 0.55rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: rgba(232, 216, 185, 0.78);
+}
+
+.grimorio-detalhe-botoes {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+    .grimorio-detalhe-grid-modal {
+        grid-template-columns: 1fr;
+    }
+}

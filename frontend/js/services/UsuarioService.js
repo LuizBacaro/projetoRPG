@@ -5,6 +5,33 @@
  */
 class UsuarioService {
 
+    _extrairMensagemErro(errPayload, fallback) {
+        if (!errPayload) return fallback;
+
+        if (typeof errPayload.detail === 'string' && errPayload.detail.trim()) {
+            return errPayload.detail;
+        }
+
+        if (Array.isArray(errPayload.detail) && errPayload.detail.length > 0) {
+            const mensagens = errPayload.detail.map((item) => {
+                if (!item || typeof item !== 'object') return null;
+
+                const loc = Array.isArray(item.loc)
+                    ? item.loc.filter((p) => p !== 'body').join('.')
+                    : '';
+                const msg = item.msg || 'valor inválido';
+
+                return loc ? `${loc}: ${msg}` : msg;
+            }).filter(Boolean);
+
+            if (mensagens.length > 0) {
+                return mensagens.join(' | ');
+            }
+        }
+
+        return fallback;
+    }
+
     // Monta headers com Content-Type e JWT
     _headers() {
         const headers = { 'Content-Type': 'application/json' };
@@ -52,7 +79,7 @@ class UsuarioService {
         }
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.detail || 'Erro ao criar usuário');
+            throw new Error(this._extrairMensagemErro(err, 'Erro ao criar usuário'));
         }
         return res.json();
     }
@@ -70,7 +97,7 @@ class UsuarioService {
         }
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.detail || 'Erro ao atualizar usuário');
+            throw new Error(this._extrairMensagemErro(err, 'Erro ao atualizar usuário'));
         }
         return res.json();
     }
@@ -81,8 +108,30 @@ class UsuarioService {
             headers: this._headers()
         });
 
-        if (res.status === 401) { AuthService?.logout(); return null; }
-        if (!res.ok) throw new Error('Erro ao inativar usuário');
+        if (res.status === 401) {
+            AuthService?.logout();
+            throw new Error('Sessão expirada. Faça login novamente.');
+        }
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(this._extrairMensagemErro(err, 'Erro ao inativar usuário'));
+        }
         return res.json();
+    }
+
+    async excluir(id) {
+        const res = await fetch(this._url(`/${id}/definitivo`), {
+            method:  'DELETE',
+            headers: this._headers()
+        });
+
+        if (res.status === 401) {
+            AuthService?.logout();
+            throw new Error('Sessão expirada. Faça login novamente.');
+        }
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(this._extrairMensagemErro(err, 'Erro ao excluir usuário'));
+        }
     }
 }

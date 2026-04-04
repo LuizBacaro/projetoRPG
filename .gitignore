@@ -14,7 +14,20 @@ venv/
 
 # Uploads locais
 uploads/
+backend/uploads/
+backend/uploads/**
+*.pdf
 
 # IDE
 .vscode/
 .idea/
+
+# Scripts: artefatos gerados em runtime (não versionar)
+backend/scripts/generated/
+
+# Assets binários gerados: manter apenas CSVs de referência, não JSONs grandes
+backend/scripts/assets/*.json
+backend/scripts/assets/*.xlsx
+
+# Temp de validacao e runners
+/tmp/*.copilot.*

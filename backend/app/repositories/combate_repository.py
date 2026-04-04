@@ -1,11 +1,9 @@
-"""
-Repository específico para Combate
-Princípio SOLID: SRP - Responsável apenas por acesso a dados de Combate
-"""
-from typing import Optional
+"""Repository específico para Combate e histórico."""
+
+from typing import List, Optional
 from sqlalchemy.orm import Session
-from .base import BaseRepository
-from ..models.combate import Combate
+from .base import BaseRepository, commit_with_rollback
+from ..models.combate import Combate, CombateHistorico
 
 
 class CombateRepository(BaseRepository[Combate]):
@@ -35,5 +33,23 @@ class CombateRepository(BaseRepository[Combate]):
         for combate in combates_ativos:
             combate.finalizar()
         
-        self.db.commit()
+        commit_with_rollback(self.db)
         return count
+
+    def criar_historico(self, historico: CombateHistorico) -> CombateHistorico:
+        self.db.add(historico)
+        commit_with_rollback(self.db)
+        self.db.refresh(historico)
+        return historico
+
+    def listar_historico(self, skip: int = 0, limit: int = 20) -> List[CombateHistorico]:
+        return (
+            self.db.query(CombateHistorico)
+            .order_by(CombateHistorico.finalizado_em.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    def contar_historico(self) -> int:
+        return self.db.query(CombateHistorico).count()

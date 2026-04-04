@@ -52,17 +52,32 @@ body {
     background: linear-gradient(135deg, var(--cor-madeira) 0%, #3d2410 100%);
     border: var(--borda-ornamental);
     border-radius: 12px;
-    padding: 0.75rem 1.5rem;
+    padding: 0.6rem 1.5rem;
     box-shadow: var(--sombra-forte);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ornamento sutil no header */
+.ficha-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 10% 50%, rgba(201,168,76,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 90% 50%, rgba(201,168,76,0.12) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .ficha-titulo-texto {
     font-family: var(--fonte-titulo);
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     color: var(--cor-dourada);
     text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     margin: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .btn-voltar {
@@ -82,9 +97,10 @@ body {
 /* ── Corpo: 3 colunas ── */
 .ficha-corpo {
     display: grid;
-    grid-template-columns: 280px 1fr 300px;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 1rem;
     flex: 1;
+    align-items: start;
 }
 
 /* 
@@ -96,17 +112,27 @@ body {
     gap: 1rem;
 }
 
-/* Foto */
+/* Foto — ocupa toda a largura da coluna central */
 .ficha-foto-container {
     position: relative;
     width: 100%;
     aspect-ratio: 3/4;
     border-radius: 12px;
     overflow: hidden;
-    border: 4px solid var(--cor-dourada);
+    border: 3px solid var(--cor-dourada);
     box-shadow: var(--sombra-forte),
-                inset 0 0 20px rgba(201,168,76,0.15);
+                inset 0 0 30px rgba(201,168,76,0.12);
     background: linear-gradient(180deg, var(--cor-pergaminho-esc), var(--cor-madeira));
+}
+
+/* Frame decorativo na foto */
+.ficha-foto-container::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 8px;
+    pointer-events: none;
 }
 
 .ficha-foto {
@@ -129,16 +155,68 @@ body {
     opacity: 0.4;
 }
 
-/* Identidade */
+/* ── Título no header: nameplate completo ── */
+.ficha-titulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.ficha-header-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+/* Tags e botão editar sobre fundo escuro do header */
+.ficha-header .ficha-meta {
+    justify-content: center;
+}
+
+.ficha-header .ficha-tag {
+    filter: brightness(1.3);
+}
+
+.ficha-header .ficha-btn-editar-identidade {
+    color: var(--cor-dourada);
+    border-color: rgba(201, 168, 76, 0.45);
+    background: rgba(201, 168, 76, 0.08);
+    margin-top: 0;
+}
+
+.ficha-header .ficha-btn-editar-identidade:hover {
+    background: rgba(201, 168, 76, 0.18);
+    color: var(--cor-dourada-brilho);
+}
+
+/* Identidade — mantida como fallback (não mais usada na view principal) */
 .ficha-identidade {
     background: linear-gradient(135deg, var(--cor-pergaminho) 0%, var(--cor-pergaminho-esc) 100%);
     border: 2px solid var(--cor-madeira-clara);
     border-radius: 10px;
-    padding: 0.85rem 1rem;
+    padding: 0.75rem 0.85rem;
     box-shadow: var(--sombra-suave);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    position: relative;
+    text-align: center;
+}
+
+/* Linha dourada superior decorativa */
+.ficha-identidade::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cor-dourada), transparent);
+    border-radius: 1px;
 }
 
 .ficha-nome {
@@ -157,34 +235,230 @@ body {
     justify-content: center;
 }
 
-.ficha-tag {
-    font-size: 0.68rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-family: var(--fonte-titulo);
-    letter-spacing: 0.05em;
+.ficha-meta-secundaria {
+    margin-top: 0.3rem;
 }
 
-.ficha-tag-raca    { background: rgba(92,58,30,0.15); color: var(--cor-madeira); border: 1px solid var(--cor-madeira-clara); }
-.ficha-tag-classe  { background: rgba(26,58,107,0.15); color: var(--cor-azul); border: 1px solid var(--cor-azul); }
-.ficha-tag-tipo    { background: rgba(201,168,76,0.2); color: #7a5c0a; border: 1px solid var(--cor-dourada); }
+.ficha-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-family: var(--fonte-titulo);
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.ficha-tag-raca {
+    background: rgba(180, 120, 60, 0.15);
+    color: #c9a84c;
+    border: 1px solid rgba(180, 120, 60, 0.4);
+}
+
+.ficha-tag-classe {
+    background: rgba(65, 105, 225, 0.15);
+    color: #7b9ef7;
+    border: 1px solid rgba(65, 105, 225, 0.4);
+}
+
+.ficha-tag-jogador {
+    background: rgba(26, 58, 107, 0.18);
+    color: #4a7abf;
+    border: 1px solid rgba(26, 58, 107, 0.45);
+}
+
+.ficha-tag-monstro {
+    background: rgba(139, 26, 26, 0.15);
+    color: #c45c5c;
+    border: 1px solid rgba(139, 26, 26, 0.45);
+}
+
+.ficha-tag-npc {
+    background: rgba(26, 92, 42, 0.15);
+    color: #4a9e5c;
+    border: 1px solid rgba(26, 92, 42, 0.45);
+}
+
+.ficha-tag-tipo {
+    background: rgba(92, 58, 30, 0.12);
+    color: var(--cor-madeira-clara);
+    border: 1px solid rgba(92, 58, 30, 0.35);
+}
+
+.ficha-tag-nivel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(201,168,76,0.15);
+    color: var(--cor-dourada);
+    border: 1px solid rgba(201,168,76,0.4);
+}
+
+.ficha-tag-nivel .ficha-nivel-label {
+    font-size: 0.62rem;
+    color: inherit;
+    opacity: 0.75;
+}
+
+.ficha-tag-nivel .ficha-nivel-valor {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: inherit;
+}
+
+.ficha-tag-alinhamento {
+    background: rgba(35, 91, 120, 0.14);
+    color: #5e9fcc;
+    border: 1px solid rgba(35, 91, 120, 0.36);
+}
+
+.ficha-tag-dominio {
+    background: rgba(33, 99, 51, 0.14);
+    color: #68b07a;
+    border: 1px solid rgba(33, 99, 51, 0.36);
+}
+
+.ficha-btn-editar-identidade {
+    margin-top: 0.45rem;
+    align-self: center;
+    border: 1px solid rgba(201, 168, 76, 0.38);
+    background: linear-gradient(135deg, rgba(92, 58, 30, 0.14), rgba(201, 168, 76, 0.12));
+    color: var(--cor-madeira);
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.ficha-btn-editar-identidade:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.ficha-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 8, 4, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 1400;
+}
+
+.ficha-modal-box {
+    width: min(560px, 96vw);
+    background: linear-gradient(145deg, var(--cor-pergaminho), var(--cor-pergaminho-esc));
+    border: 2px solid var(--cor-madeira-clara);
+    border-radius: 16px;
+    box-shadow: var(--sombra-forte);
+    overflow: hidden;
+}
+
+.ficha-modal-box-curto {
+    width: min(520px, 96vw);
+}
+
+.ficha-modal-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem 1rem 0.7rem;
+    border-bottom: 1px solid rgba(92, 58, 30, 0.18);
+}
+
+.ficha-modal-header h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-madeira);
+    font-size: 1rem;
+}
+
+.ficha-modal-header p {
+    margin-top: 0.18rem;
+    color: var(--cor-tinta-suave);
+    font-size: 0.84rem;
+}
+
+.ficha-modal-close {
+    border: 1px solid rgba(92, 58, 30, 0.25);
+    background: rgba(255,255,255,0.35);
+    color: var(--cor-madeira);
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+}
+
+.ficha-modal-body {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.85rem;
+}
+
+.ficha-modal-field {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.ficha-modal-field span {
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    color: var(--cor-madeira);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.ficha-modal-field input,
+.ficha-modal-field select {
+    border: 1px solid rgba(92, 58, 30, 0.28);
+    border-radius: 10px;
+    background: rgba(255, 252, 244, 0.85);
+    color: var(--cor-tinta);
+    padding: 0.7rem 0.8rem;
+    font-family: var(--fonte-texto);
+    font-size: 0.95rem;
+}
+
+.ficha-modal-field small {
+    color: var(--cor-madeira-clara);
+    font-size: 0.76rem;
+    line-height: 1.4;
+}
+
+.ficha-modal-field small.is-fallback {
+    color: #b9770e;
+}
+
+.ficha-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 0 1rem 1rem;
+}
 
 .ficha-nivel-linha {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(92,58,30,0.08);
+    border-radius: 6px;
 }
 .ficha-nivel-label {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: var(--cor-tinta-suave);
     font-family: var(--fonte-titulo);
     text-transform: uppercase;
     letter-spacing: 0.1em;
 }
 .ficha-nivel-valor {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--cor-madeira);
     font-family: var(--fonte-titulo);
@@ -195,60 +469,48 @@ body {
     background: linear-gradient(135deg, var(--cor-pergaminho) 0%, var(--cor-pergaminho-esc) 100%);
     border: 2px solid var(--cor-madeira-clara);
     border-radius: 10px;
-    padding: 0.85rem 1rem;
+    padding: 0.75rem 0.85rem;
     box-shadow: var(--sombra-suave);
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.55rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Borda superior sutil nas seções */
+.ficha-secao::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cor-dourada), rgba(201,168,76,0.3), var(--cor-dourada));
+    opacity: 0.5;
 }
 
 .ficha-secao-titulo {
     font-family: var(--fonte-titulo);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: var(--cor-madeira);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    padding-bottom: 0.4rem;
-    border-bottom: 2px solid var(--cor-dourada);
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--cor-dourada);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .ficha-vazio {
     font-size: 0.75rem;
     color: var(--cor-madeira-clara);
     font-style: italic;
-}
-
-/* ── Perícias ── */
-.ficha-pericias-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 0.18rem;
-    max-height: 320px;
-    overflow-y: auto;
-}
-
-.ficha-pericia-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.2rem 0.5rem;
-    background: rgba(92,58,30,0.06);
-    border-radius: 4px;
-    border-left: 3px solid var(--cor-dourada);
-    transition: background 0.15s;
-}
-.ficha-pericia-item:hover { background: rgba(92,58,30,0.12); }
-
-.ficha-pericia-nome  { font-size: 0.72rem; color: var(--cor-tinta); }
-.ficha-pericia-valor {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--cor-madeira);
-    font-family: var(--fonte-titulo);
-    min-width: 28px;
-    text-align: right;
+    padding: 0.5rem;
+    text-align: center;
 }
 
 /* ── Equipamentos ── */
@@ -289,6 +551,14 @@ body {
     justify-items: center;
 }
 
+/* Layout alternativo: 3 colunas × 2 linhas para resumo */
+.ficha-atributos-circulo-grid-resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    justify-items: center;
+}
+
 .ficha-atributo-circulo {
     display: flex;
     flex-direction: column;
@@ -297,18 +567,18 @@ body {
 }
 
 .circulo-externo {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, var(--cor-pergaminho), var(--cor-pergaminho-esc));
-    border: 3px solid var(--cor-dourada);
-    box-shadow: 0 4px 12px rgba(44,26,14,0.3),
+    border: 2px solid var(--cor-dourada);
+    box-shadow: 0 3px 10px rgba(44,26,14,0.3),
                 inset 0 2px 6px rgba(201,168,76,0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.05rem;
+    gap: 0;
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
 }
@@ -328,14 +598,14 @@ body {
 
 .circulo-valor {
     font-family: var(--fonte-titulo);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--cor-madeira);
     line-height: 1;
 }
 
 .circulo-mod {
-    font-size: 0.78rem;
+    font-size: 0.68rem;
     color: var(--cor-tinta-suave);
     font-family: var(--fonte-titulo);
     line-height: 1;
@@ -343,11 +613,11 @@ body {
 
 .circulo-label {
     font-family: var(--fonte-titulo);
-    font-size: 0.75rem;
+    font-size: 0.62rem;
     font-weight: 700;
     color: var(--cor-madeira);
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.1em;
 }
 
 /* ── Defesa: CA / PV / Iniciativa ── */
@@ -359,12 +629,27 @@ body {
 
 .ficha-defesa-box {
     border-radius: 10px;
-    padding: 0.85rem 0.75rem;
+    padding: 0.7rem 0.6rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.3rem;
     box-shadow: var(--sombra-suave);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Reflexo de luz nos boxes de defesa */
+.ficha-defesa-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent);
+    pointer-events: none;
+    border-radius: 10px 10px 0 0;
 }
 
 .ficha-ca-box {
@@ -375,11 +660,13 @@ body {
 .ficha-pv-box {
     background: linear-gradient(135deg, #8b1a1a 0%, #5c0f0f 100%);
     border: 2px solid #c94040;
+    justify-content: center;
 }
 
 .ficha-ini-box {
     background: linear-gradient(135deg, var(--cor-madeira) 0%, #3d2410 100%);
     border: 2px solid var(--cor-dourada);
+    justify-content: center;
 }
 
 .ficha-defesa-label {
@@ -393,14 +680,16 @@ body {
 
 .ficha-defesa-valor {
     font-family: var(--fonte-titulo);
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: #fff;
     line-height: 1;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    position: relative;
+    z-index: 1;
 }
 
-.ficha-pv-valor { font-size: 1.4rem; }
+.ficha-pv-valor { font-size: 1.25rem; position: relative; z-index: 1; }
 
 .ficha-ca-detalhes {
     display: flex;
@@ -436,15 +725,18 @@ body {
     background: radial-gradient(circle at 35% 35%, var(--cor-pergaminho), var(--cor-pergaminho-esc));
     border: 2px solid var(--cor-madeira-clara);
     border-radius: 8px;
-    padding: 0.6rem 0.4rem;
+    padding: 0.5rem 0.4rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.2rem;
     box-shadow: var(--sombra-suave);
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
-.ficha-resistencia-box:hover { transform: translateY(-2px); }
+.ficha-resistencia-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44,26,14,0.25);
+}
 
 .ficha-res-label {
     font-family: var(--fonte-titulo);
@@ -468,6 +760,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    min-width: 0;
+    width: 100%;        /* ✅ ocupa o 1fr inteiro */
 }
 
 /* ── Ataques ── */
@@ -477,9 +771,10 @@ body {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem;
     background: rgba(92,58,30,0.15);
     border-radius: 4px;
+    align-items: center;
 }
 .ficha-ataque-header span {
     font-size: 0.65rem;
@@ -492,19 +787,25 @@ body {
 
 .ficha-ataques-lista { display: flex; flex-direction: column; gap: 0.15rem; }
 
-.ficha-ataque-row {
+/* ✅ Suporta tanto ficha-ataque-row quanto ficha-ataque-linha */
+.ficha-ataque-row,
+.ficha-ataque-linha {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 0.25rem;
-    padding: 0.3rem 0.5rem;
+    padding: 0.5rem;
     background: rgba(92,58,30,0.06);
     border: 1px solid rgba(92,58,30,0.2);
     border-radius: 4px;
     transition: background 0.15s;
+    align-items: center;
 }
-.ficha-ataque-row:hover { background: rgba(92,58,30,0.12); }
-.ficha-ataque-row span  { font-size: 0.78rem; color: var(--cor-tinta); }
-.ficha-ataque-row .ataque-nome { font-weight: 700; color: var(--cor-madeira); }
+.ficha-ataque-row:hover,
+.ficha-ataque-linha:hover { background: rgba(92,58,30,0.12); }
+.ficha-ataque-row span,
+.ficha-ataque-linha span { font-size: 0.78rem; color: var(--cor-tinta); }
+.ficha-ataque-row .ataque-nome,
+.ficha-ataque-linha .ficha-ataque-nome { font-weight: 700; color: var(--cor-madeira); }
 
 .ficha-ataque-vazio {
     font-size: 0.75rem;
@@ -513,11 +814,93 @@ body {
     padding: 0.3rem 0.5rem;
 }
 
-/* ── Magias: 2 colunas ── */
+/* ── EQUIPAMENTOS ── */
+.ficha-equipamentos-tabela {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+}
+
+.ficha-equipamento-header {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1fr 1fr 50px;
+    gap: 0.5rem;
+    padding: 0.7rem;
+    background: rgba(92,58,30,0.15);
+    border-radius: 4px;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.ficha-equipamento-header span {
+    font-size: 0.65rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.ficha-equipamentos-lista-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.ficha-equipamento-linha {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1fr 1fr 50px;
+    gap: 0.5rem;
+    padding: 0.7rem;
+    background: rgba(92,58,30,0.06);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 4px;
+    transition: background 0.15s;
+    align-items: center;
+}
+
+.ficha-equipamento-linha:hover {
+    background: rgba(92,58,30,0.12);
+}
+
+.ficha-equipamento-linha span {
+    font-size: 0.78rem;
+    color: var(--cor-tinta);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ficha-equipamento-nome {
+    font-weight: 700;
+    color: var(--cor-madeira);
+    min-width: 0;
+}
+
+.ficha-equipamento-desc {
+    font-size: 0.73rem;
+    color: var(--cor-tinta-suave);
+    min-width: 0;
+}
+
+.ficha-equipamento-pag {
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+    text-align: center;
+    min-width: 0;
+}
+
+.ficha-equipamento-qtd {
+    text-align: center;
+    font-weight: 600;
+    color: var(--cor-verde);
+}
+
+/* ── Magias: grid responsivo ── */
 .ficha-magias-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.4rem;
+    gap: 0.35rem;
 }
 
 .ficha-magia-row {
@@ -573,47 +956,1542 @@ body::before {
 }
 .ficha-wrapper { position: relative; z-index: 1; }
 
-/* ── Tags de identidade ── */
-.ficha-tag {
-    display: inline-block;
-    padding: 0.2rem 0.65rem;
-    border-radius: 999px;
-    font-size: 0.78rem;
+/* ========== PERÍCIAS DINÂMICAS ========== */
+
+.ficha-pericias-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    /* Altura dinâmica, scrollable */
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.2rem;
+}
+
+.ficha-pericia-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(135deg, rgba(92,58,30,0.08) 0%, rgba(92,58,30,0.04) 100%);
+    border-radius: 6px;
+    border-left: 4px solid var(--cor-dourada);
+    transition: all 0.2s;
+    position: relative;
+    min-width: 0;        /* ✅ CRÍTICO — permite flex encolher */
+    overflow: hidden;
+    gap: 0.4rem;
+    width: 100%;         /* ✅ garante largura total */
+    box-sizing: border-box;
+}
+
+.ficha-pericia-item:hover {
+    background: linear-gradient(135deg, rgba(92,58,30,0.15) 0%, rgba(92,58,30,0.08) 100%);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(44,26,14,0.2);
+}
+
+.ficha-pericia-nome {
+    flex: 1;
+    font-size: 0.82rem;         /* ✅ levemente maior */
+    color: var(--cor-tinta);
     font-weight: 600;
-    letter-spacing: 0.3px;
+    font-family: var(--fonte-texto);
+    /* ✅ Evita overflow do nome */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    padding-right: 0.4rem;
 }
 
-/* ✅ Raça — estava faltando */
-.ficha-tag-raca {
-    background: rgba(180, 120, 60, 0.15);
-    color: #c9a84c;
-    border: 1px solid rgba(180, 120, 60, 0.4);
+.ficha-pericia-atributo {
+    font-size: 0.65rem;
+    color: var(--cor-madeira-clara);
+    font-family: var(--fonte-titulo);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0 0.5rem;
+    letter-spacing: 0.05em;
+    min-width: 35px;
+    text-align: center;
+    flex-shrink: 0;             /* ✅ não encolhe */
 }
 
-/* Classe */
-.ficha-tag-classe {
-    background: rgba(65, 105, 225, 0.15);
-    color: #7b9ef7;
-    border: 1px solid rgba(65, 105, 225, 0.4);
+.ficha-pericia-mods {
+    display: flex;
+    gap: 0.5rem;                /* ✅ gap maior para respirar */
+    align-items: center;
+    flex-shrink: 0;             /* ✅ não encolhe */
 }
 
-/* ── Tipo: Jogador ── */
-.ficha-tag-jogador {
-    background: rgba(26, 58, 107, 0.18);
-    color: #4a7abf;                          /* ✅ azul medieval */
-    border: 1px solid rgba(26, 58, 107, 0.45);
+.ficha-pericia-mod {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.08rem;
 }
 
-/* ── Tipo: Monstro ── */
-.ficha-tag-monstro {
-    background: rgba(139, 26, 26, 0.15);
-    color: #c45c5c;                          /* ✅ vermelho escarlate suave */
-    border: 1px solid rgba(139, 26, 26, 0.45);
+.ficha-pericia-mod-label {
+    font-size: 0.5rem;
+    color: var(--cor-tinta-suave);
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-/* ── Tipo: NPC ── */
-.ficha-tag-npc {
+.ficha-pericia-mod-valor {
+    font-size: 0.78rem;         /* ✅ levemente maior */
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+    min-width: 30px;            /* ✅ aumentado */
+    text-align: center;
+}
+
+/* ── Inputs editáveis de perícia ── */
+.ficha-pericia-input {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+    width: 45px;
+    padding: 0.2rem 0.3rem;
+    border: 1px solid var(--cor-madeira-clara);
+    border-radius: 3px;
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.8), rgba(232, 213, 176, 0.8));
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ficha-pericia-input:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 6px rgba(201, 168, 76, 0.3);
+}
+
+.ficha-pericia-input::-webkit-outer-spin-button,
+.ficha-pericia-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ficha-pericia-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.ficha-pericia-total-valor {
+    font-size: 0.78rem;         /* ✅ levemente maior */
+    font-weight: 700;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    min-width: 38px;            /* ✅ aumentado */
+    text-align: right;
+    background: rgba(201,168,76,0.15);
+    padding: 0.2rem 0.5rem;     /* ✅ padding aumentado */
+    border-radius: 4px;
+    flex-shrink: 0;             /* ✅ não encolhe */
+}
+
+.ficha-pericia-total-valor.positivo {
+    color: var(--cor-verde);
     background: rgba(26, 92, 42, 0.15);
-    color: #4a9e5c;                          /* ✅ verde floresta */
-    border: 1px solid rgba(26, 92, 42, 0.45);
+}
+
+.ficha-pericia-total-valor.negativo {
+    color: var(--cor-vermelho);
+    background: rgba(139, 26, 26, 0.15);
+}
+
+.ficha-pericia-total {
+    font-size: 0.88rem;         /* ✅ levemente maior */
+    font-weight: 700;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    min-width: 38px;            /* ✅ aumentado */
+    text-align: right;
+    background: rgba(201,168,76,0.15);
+    padding: 0.2rem 0.5rem;     /* ✅ padding aumentado */
+    border-radius: 4px;
+    flex-shrink: 0;             /* ✅ não encolhe */
+}
+
+/* ── Seção de magias — botão grimório ── */
+.btn-abrir-grimorio {
+    margin-top: 0.25rem;
+    width: 100%;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+
+@media (max-width: 1200px) {
+    .ficha-corpo {
+        /* ✅ Mantém proporção */
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .ficha-pericia-mod-valor {
+        font-size: 0.72rem;
+        min-width: 26px;
+    }
+
+    .ficha-pericia-total {
+        min-width: 34px;
+    }
+}
+
+@media (max-width: 992px) {
+    .ficha-corpo {
+        grid-template-columns: 1fr;
+    }
+
+    .ficha-coluna-esquerda,
+    .ficha-coluna-central,
+    .ficha-coluna-direita {
+        width: 100%;
+    }
+
+    .ficha-pericias-lista {
+        max-height: 300px;
+    }
+
+    .ficha-pericia-nome {
+        white-space: normal;    /* ✅ em mobile pode quebrar linha */
+    }
+}
+
+@media (max-width: 768px) {
+    .ficha-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .ficha-titulo-texto {
+        font-size: 1.2rem;
+    }
+
+    .ficha-pericia-item {
+        padding: 0.4rem 0.5rem;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+    }
+
+    .ficha-pericia-nome {
+        flex: 1 1 100%;
+        margin-bottom: 0.2rem;
+        white-space: normal;
+    }
+
+    .ficha-pericia-atributo {
+        min-width: 30px;
+        font-size: 0.62rem;
+    }
+
+    .ficha-pericia-mod-valor {
+        font-size: 0.68rem;
+        min-width: 24px;
+    }
+
+    .ficha-pericia-total {
+        font-size: 0.8rem;
+        min-width: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ficha-pericias-lista {
+        max-height: 250px;
+    }
+
+    .ficha-pericia-item {
+        padding: 0.35rem 0.4rem;
+    }
+
+    .ficha-pericia-nome {
+        font-size: 0.75rem;
+    }
+
+    .ficha-pericia-atributo {
+        font-size: 0.58rem;
+        margin: 0 0.3rem;
+    }
+
+    .ficha-pericia-mods {
+        gap: 0.25rem;
+    }
+
+    .ficha-pericia-mod-label {
+        font-size: 0.48rem;
+    }
+
+    .ficha-pericia-total {
+        font-size: 0.75rem;
+    }
+}
+
+/* ── Sincronização arena → ficha: animação de pulse ── */
+@keyframes slotPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(201,168,76,0.7); }
+    50%  { box-shadow: 0 0 0 8px rgba(201,168,76,0); }
+    100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+}
+
+.ficha-slot-pulse {
+    animation: slotPulse 0.6s ease-out;
+}
+
+.ficha-slot-esgotado {
+    opacity: 0.55;
+    border-color: rgba(248,113,113,0.4) !important;
+}
+
+.ficha-slot-esgotado .ficha-magia-usados,
+.ficha-slot-esgotado .ficha-slot-disponiveis {
+    color: #f87171 !important;
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODAL DE EQUIPAMENTOS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.equipamentos-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(2px);
+}
+
+.equipamentos-container {
+    background: var(--cor-pergaminho);
+    border: 3px solid var(--cor-dourada);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    width: 90%;
+    max-height: 85vh;
+    box-shadow: 0 12px 60px rgba(44, 26, 14, 0.8);
+    overflow: hidden;
+}
+
+.equipamentos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(139,94,60,0.15));
+    border-bottom: 2px solid var(--cor-dourada);
+}
+
+.equipamentos-header-esquerda {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.equipamentos-icone {
+    font-size: 2rem;
+}
+
+.equipamentos-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 1.2rem;
+    color: var(--cor-madeira);
+    margin: 0;
+}
+
+.equipamentos-subtitulo {
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+    margin: 0;
+    font-style: italic;
+}
+
+.equipamentos-fechar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--cor-madeira);
+    transition: color 0.15s;
+}
+
+.equipamentos-fechar:hover {
+    color: var(--cor-vermelho);
+}
+
+.equipamentos-controles {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(92,58,30,0.06);
+    border-bottom: 1px solid rgba(92,58,30,0.2);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.equipamentos-busca-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.equipamentos-busca-label {
+    font-size: 0.65rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+}
+
+.equipamentos-busca {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgba(92,58,30,0.3);
+    border-radius: 4px;
+    font-family: var(--fonte-texto);
+    font-size: 0.8rem;
+    background: white;
+    color: var(--cor-tinta);
+    transition: border-color 0.15s;
+}
+
+.equipamentos-busca:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 8px rgba(201,168,76,0.3);
+}
+
+.equipamentos-quantidade-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.equipamentos-label {
+    font-size: 0.65rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+}
+
+.equipamentos-input-qtd {
+    width: 80px;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgba(92,58,30,0.3);
+    border-radius: 4px;
+    font-family: var(--fonte-texto);
+    font-size: 0.8rem;
+    background: white;
+    color: var(--cor-tinta);
+}
+
+.equipamentos-corpo {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--cor-pergaminho);
+}
+
+.equipamentos-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamentos-loading-icone {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.equipamentos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.equipamento-item {
+    padding: 0.8rem;
+    background: rgba(92,58,30,0.08);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.equipamento-item:hover {
+    background: rgba(92,58,30,0.14);
+    border-color: var(--cor-dourada);
+    box-shadow: 0 2px 8px rgba(201,168,76,0.2);
+}
+
+.equipamento-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.equipamento-nome {
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-size: 0.85rem;
+    font-family: var(--fonte-titulo);
+}
+
+.equipamento-desc {
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamento-pag {
+    font-size: 0.65rem;
+    color: var(--cor-tinta-suave);
+    font-style: italic;
+}
+
+.equipamento-btn-adicionar {
+    background: var(--cor-verde);
+    border: none;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.equipamento-btn-adicionar:hover {
+    background: #2a7a3a;
+}
+
+.ficha-btn-adicionar {
+    background: var(--cor-verde);
+    border: none;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: background 0.15s;
+}
+
+.ficha-btn-adicionar:hover {
+    background: #2a7a3a;
+}
+
+.ficha-btn-salvar {
+    background: linear-gradient(135deg, var(--cor-azul) 0%, #0f2040 100%);
+    border: 1px solid #4a7abf;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.ficha-btn-salvar:hover {
+    background: linear-gradient(135deg, #2a5a9b 0%, #1a3a6b 100%);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.ficha-btn-salvar:active {
+    transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ABAS DO MODAL DE EQUIPAMENTOS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.equipamentos-abas {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(92,58,30,0.08);
+    border-bottom: 1px solid rgba(92,58,30,0.2);
+}
+
+.equipamentos-aba {
+    padding: 0.6rem 1rem;
+    background: rgba(92,58,30,0.1);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.75rem;
+    color: var(--cor-madeira);
+    transition: all 0.15s;
+}
+
+.equipamentos-aba:hover {
+    background: rgba(92,58,30,0.2);
+    border-color: var(--cor-dourada);
+}
+
+.equipamentos-aba.ativa {
+    background: var(--cor-dourada);
+    color: var(--cor-pergaminho);
+    border-color: var(--cor-dourada);
+}
+
+.equipamentos-conteudo {
+    display: none;
+    overflow-y: auto;
+    flex: 1;
+    padding: 1rem;
+}
+
+.equipamentos-conteudo.ativo {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FORMULÁRIO DE CRIAR EQUIPAMENTO
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.equipamentos-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.equipamentos-form-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.equipamentos-form-label {
+    font-size: 0.7rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.equipamentos-form-input {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid rgba(92,58,30,0.3);
+    border-radius: 4px;
+    font-family: var(--fonte-texto);
+    font-size: 0.8rem;
+    background: rgba(244,233,208,0.8);
+    color: var(--cor-tinta);
+    transition: all 0.15s;
+}
+
+.equipamentos-form-input:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    background: white;
+    box-shadow: 0 0 8px rgba(201,168,76,0.3);
+}
+
+.equipamentos-form-input::placeholder {
+    color: rgba(44,26,14,0.5);
+    font-style: italic;
+}
+
+.equipamentos-btn-salvar {
+    align-self: flex-start;
+    padding: 0.6rem 1.2rem;
+    background: var(--cor-verde);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: background 0.15s;
+    margin-top: 0.5rem;
+}
+
+.equipamentos-btn-salvar:hover {
+    background: #2a7a3a;
+}
+
+.equipamentos-btn-salvar:active {
+    transform: scale(0.98);
+}
+
+.equipamentos-vazio {
+    text-align: center;
+    padding: 2rem;
+    color: var(--cor-tinta-suave);
+    font-style: italic;
+}
+
+.btn-deletar-eq {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.4rem;
+    transition: transform 0.15s, opacity 0.15s;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.btn-deletar-eq:hover {
+    transform: scale(1.15);
+    background: rgba(220, 53, 69, 0.15);
+}
+
+.btn-deletar-eq:active {
+    transform: scale(0.95);
+}
+
+/* ── TALENTOS ── */
+
+.ficha-talentos-lista {
+    width: 100%;
+}
+
+.ficha-talentos-tabela {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ficha-talento-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 0.5fr;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: rgba(201, 168, 76, 0.15);
+    border-radius: 4px;
+    font-weight: 700;
+    color: var(--cor-tinta);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--cor-dourada);
+}
+
+.ficha-talento-linha {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 0.5fr;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: rgba(244, 233, 208, 0.3);
+    border-radius: 4px;
+    align-items: center;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+}
+
+.ficha-talento-linha:hover {
+    background: rgba(244, 233, 208, 0.6);
+    border-left-color: var(--cor-dourada);
+}
+
+.ficha-talento-nome {
+    font-weight: 600;
+    color: var(--cor-tinta);
+}
+
+.ficha-talento-desc {
+    color: var(--cor-tinta-suave);
+    font-size: 0.9rem;
+}
+
+.ficha-talento-pag {
+    color: rgba(44, 26, 14, 0.6);
+    font-size: 0.85rem;
+}
+
+.btn-deletar-tal {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+    transition: transform 0.15s, opacity 0.15s;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-deletar-tal:hover {
+    transform: scale(1.2);
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.btn-deletar-tal:active {
+    transform: scale(0.95);
+}
+
+/* ── MELHORIA: Lista de Talentos em Grid ── */
+
+.equipamentos-lista-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.equipamentos-card {
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.5), rgba(201, 168, 76, 0.1));
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    box-shadow: 0 2px 8px rgba(92, 58, 30, 0.1);
+}
+
+.equipamentos-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(92, 58, 30, 0.15);
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.7), rgba(201, 168, 76, 0.2));
+    border-color: #d4a574;
+}
+
+.equipamentos-card h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-tinta);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.equipamentos-desc {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--cor-tinta-suave);
+    line-height: 1.4;
+}
+
+.equipamentos-pag {
+    margin: 0;
+    font-size: 0.8rem;
+    color: rgba(44, 26, 14, 0.6);
+    font-style: italic;
+}
+
+.equipamentos-btn-adicionar {
+    align-self: flex-start;
+    background: var(--cor-verde);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+}
+
+.equipamentos-btn-adicionar:hover {
+    background: #2a7a3a;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(42, 122, 58, 0.3);
+}
+
+.equipamentos-btn-adicionar:active {
+    transform: scale(0.98);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLOTS DE MAGIA — Barras de progresso na ficha
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ficha-slot-linha {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.45rem 0.6rem;
+    background: linear-gradient(135deg, rgba(26,58,107,0.10) 0%, rgba(26,58,107,0.04) 100%);
+    border-radius: 6px;
+    border-left: 3px solid var(--cor-azul);
+    transition: all 0.2s;
+}
+
+.ficha-slot-linha:hover {
+    background: linear-gradient(135deg, rgba(26,58,107,0.16) 0%, rgba(26,58,107,0.08) 100%);
+    transform: translateX(2px);
+}
+
+.ficha-slot-linha.ficha-slot-esgotado {
+    border-left-color: #f87171;
+}
+
+.ficha-slot-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ficha-slot-nivel {
+    font-family: var(--fonte-titulo);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--cor-tinta);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ficha-slot-contagem {
+    font-family: var(--fonte-titulo);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--cor-azul);
+}
+
+.ficha-slot-barra-wrap {
+    height: 5px;
+    background: rgba(26,58,107,0.12);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ficha-slot-barra-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease, background 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BOTÕES GRIMÓRIO
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn-grimorio {
+    background: linear-gradient(135deg, #1a3a6b 0%, #0f2040 100%);
+    border: 2px solid #4a7abf;
+    border-radius: 8px;
+    color: #e2eaf5;
+    font-family: var(--fonte-titulo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+}
+
+.btn-grimorio:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26,58,107,0.4);
+}
+
+.btn-abrir-grimorio {
+    background: linear-gradient(135deg, #1a3a6b 0%, #0f2040 100%);
+    border: 2px solid #4a7abf;
+    border-radius: 8px;
+    color: #e2eaf5;
+    font-family: var(--fonte-titulo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    letter-spacing: 0.05em;
+    margin-top: 0.4rem;
+    width: 100%;
+}
+
+.btn-abrir-grimorio:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26,58,107,0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VISUAL POLISH — Animações, Atmosfera, Micro-interações
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Keyframes ── */
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes headerGoldShimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+@keyframes parchmentGrain {
+    0%, 100% { transform: translate(0, 0); }
+    10%  { transform: translate(-1px, -1px); }
+    30%  { transform: translate(1px, 0); }
+    50%  { transform: translate(-1px, 1px); }
+    70%  { transform: translate(0, -1px); }
+    90%  { transform: translate(1px, 1px); }
+}
+
+@keyframes sheen {
+    0%   { left: -100%; }
+    100% { left: 200%; }
+}
+
+@keyframes pvPulseGlow {
+    0%, 100% { box-shadow: 0 0 4px rgba(255,64,64,0.3); }
+    50%      { box-shadow: 0 0 12px rgba(255,64,64,0.6); }
+}
+
+@keyframes circleFloatIn {
+    from { opacity: 0; transform: scale(0.6) rotate(-8deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes goldBorderFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes subtleFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
+}
+
+@keyframes candleFlicker {
+    0%, 100% { opacity: 0.04; }
+    25%      { opacity: 0.06; }
+    50%      { opacity: 0.03; }
+    75%      { opacity: 0.07; }
+}
+
+/* ── 2. Atmospheric Background ── */
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        /* Vinheta dramática */
+        radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%),
+        /* Brilho dourado de tocha no canto */
+        radial-gradient(ellipse at 15% 15%, rgba(201,168,76,0.06) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 85%, rgba(139,26,26,0.04) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+    animation: candleFlicker 4s ease-in-out infinite;
+}
+
+/* Grão de textura sutil sobre o fundo */
+body {
+    background-image:
+        radial-gradient(ellipse at center, #2c1a0e 0%, #1a0e06 100%);
+    background-attachment: fixed;
+}
+
+/* ── 3. Page Entrance: Staggered Reveals ── */
+
+.ficha-header {
+    animation: fadeIn 0.5s ease-out both;
+}
+
+.ficha-coluna-esquerda {
+    animation: slideInLeft 0.6s ease-out 0.15s both;
+}
+
+.ficha-coluna-central {
+    animation: fadeInUp 0.6s ease-out 0.25s both;
+}
+
+.ficha-coluna-direita {
+    animation: slideInRight 0.6s ease-out 0.35s both;
+}
+
+/* Cada seção dentro das colunas anima escalonadamente */
+.ficha-coluna-esquerda .ficha-secao:nth-child(1) { animation: fadeInUp 0.5s ease-out 0.2s both; }
+.ficha-coluna-esquerda .ficha-secao:nth-child(2) { animation: fadeInUp 0.5s ease-out 0.3s both; }
+.ficha-coluna-esquerda .ficha-secao:nth-child(3) { animation: fadeInUp 0.5s ease-out 0.4s both; }
+.ficha-coluna-esquerda .ficha-defesa-row          { animation: fadeInUp 0.5s ease-out 0.25s both; }
+
+.ficha-coluna-direita .ficha-secao:nth-child(1) { animation: fadeInUp 0.5s ease-out 0.4s both; }
+.ficha-coluna-direita .ficha-secao:nth-child(2) { animation: fadeInUp 0.5s ease-out 0.5s both; }
+.ficha-coluna-direita .ficha-secao:nth-child(3) { animation: fadeInUp 0.5s ease-out 0.6s both; }
+.ficha-coluna-direita .ficha-secao:nth-child(4) { animation: fadeInUp 0.5s ease-out 0.7s both; }
+
+/* Círculos dos atributos entram com escala + rotação */
+.ficha-atributo-circulo:nth-child(1) { animation: circleFloatIn 0.5s ease-out 0.3s both; }
+.ficha-atributo-circulo:nth-child(2) { animation: circleFloatIn 0.5s ease-out 0.38s both; }
+.ficha-atributo-circulo:nth-child(3) { animation: circleFloatIn 0.5s ease-out 0.46s both; }
+.ficha-atributo-circulo:nth-child(4) { animation: circleFloatIn 0.5s ease-out 0.54s both; }
+.ficha-atributo-circulo:nth-child(5) { animation: circleFloatIn 0.5s ease-out 0.62s both; }
+.ficha-atributo-circulo:nth-child(6) { animation: circleFloatIn 0.5s ease-out 0.70s both; }
+
+/* ── 4. Header: Gold Shimmer Border ── */
+
+.ficha-header {
+    border-image: linear-gradient(
+        90deg,
+        var(--cor-dourada) 0%,
+        var(--cor-dourada-brilho) 25%,
+        var(--cor-dourada) 50%,
+        rgba(201,168,76,0.4) 75%,
+        var(--cor-dourada) 100%
+    ) 1;
+    border-width: 2px;
+    border-style: solid;
+    background-size: 200% 100%;
+}
+
+.ficha-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--cor-dourada-brilho) 30%,
+        var(--cor-dourada) 50%,
+        var(--cor-dourada-brilho) 70%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: headerGoldShimmer 4s ease-in-out infinite;
+}
+
+/* ── 5. Photo Frame: Corner Ornaments + Glow ── */
+
+.ficha-foto-container {
+    position: relative;
+    transition: box-shadow 0.4s ease;
+}
+
+.ficha-foto-container:hover {
+    box-shadow:
+        var(--sombra-forte),
+        inset 0 0 30px rgba(201,168,76,0.12),
+        0 0 25px rgba(201,168,76,0.15);
+}
+
+/* Cantos ornamentais do frame */
+.ficha-foto-container::before {
+    content: '✦';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 0.7rem;
+    color: var(--cor-dourada);
+    opacity: 0.5;
+    z-index: 2;
+    text-shadow: 0 0 6px rgba(201,168,76,0.4);
+    pointer-events: none;
+}
+
+/* ── 6. Defense Boxes: Animated Sheen ── */
+
+.ficha-defesa-box {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+
+.ficha-defesa-box:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow:
+        var(--sombra-suave),
+        0 8px 24px rgba(0,0,0,0.3);
+}
+
+/* Sheen brilhante ao hover */
+.ficha-defesa-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.08),
+        transparent
+    );
+    transition: none;
+    pointer-events: none;
+}
+
+.ficha-defesa-box:hover::after {
+    animation: sheen 0.6s ease-out forwards;
+}
+
+/* CA box: brilho azul ao hover */
+.ficha-ca-box:hover {
+    box-shadow:
+        var(--sombra-suave),
+        0 0 20px rgba(74,122,191,0.3);
+}
+
+/* PV box: pulso vermelho */
+.ficha-pv-box:hover {
+    box-shadow:
+        var(--sombra-suave),
+        0 0 20px rgba(201,64,64,0.3);
+}
+
+/* PV barra: gradiente animado */
+.ficha-pv-fill {
+    background: linear-gradient(90deg, #ff6b6b, #ff4040, #ff6b6b);
+    background-size: 200% 100%;
+    animation: goldBorderFlow 3s ease-in-out infinite;
+}
+
+/* ── 7. Attribute Circles: Glow & Interaction ── */
+
+.circulo-externo {
+    cursor: default;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.circulo-externo:hover {
+    transform: scale(1.12);
+    box-shadow:
+        0 6px 20px rgba(201,168,76,0.35),
+        inset 0 2px 8px rgba(201,168,76,0.25),
+        0 0 16px rgba(201,168,76,0.2);
+}
+
+/* Valor do atributo pulsa levemente no hover */
+.circulo-externo:hover .circulo-valor {
+    color: var(--cor-dourada);
+    text-shadow: 0 0 6px rgba(201,168,76,0.4);
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+/* ── 8. Sections: Gold Border Shimmer + Hover ── */
+
+.ficha-secao {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ficha-secao:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        var(--sombra-suave),
+        0 6px 20px rgba(44,26,14,0.15);
+}
+
+/* Borda dourada animada no topo das seções */
+.ficha-secao::after {
+    background: linear-gradient(
+        90deg,
+        var(--cor-dourada),
+        var(--cor-dourada-brilho),
+        var(--cor-dourada),
+        rgba(201,168,76,0.3),
+        var(--cor-dourada)
+    );
+    background-size: 200% 100%;
+    animation: goldBorderFlow 6s ease-in-out infinite;
+    height: 2px;
+    opacity: 0.7;
+}
+
+/* ── 9. Identity Card: Subtle Hover Glow ── */
+
+.ficha-identidade {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ficha-identidade:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        var(--sombra-suave),
+        0 0 16px rgba(201,168,76,0.1);
+}
+
+.ficha-nome {
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.ficha-identidade:hover .ficha-nome {
+    color: var(--cor-dourada);
+    text-shadow: 0 1px 8px rgba(201,168,76,0.3);
+}
+
+/* ── 10. Tags: Hover Interactions ── */
+
+.ficha-tag {
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.ficha-tag:hover {
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.ficha-tag-raca:hover {
+    background: rgba(180, 120, 60, 0.25);
+    border-color: rgba(180, 120, 60, 0.6);
+}
+
+.ficha-tag-classe:hover {
+    background: rgba(65, 105, 225, 0.25);
+    border-color: rgba(65, 105, 225, 0.6);
+}
+
+/* ── 11. Resistência Boxes: Enhanced Hover ── */
+
+.ficha-resistencia-box {
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+}
+
+.ficha-resistencia-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(44,26,14,0.2);
+    border-color: var(--cor-dourada);
+}
+
+.ficha-resistencia-box:hover .ficha-res-valor {
+    color: var(--cor-dourada);
+    text-shadow: 0 0 4px rgba(201,168,76,0.3);
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+/* ── 12. Slot de Magia: Enhanced Bars ── */
+
+.ficha-slot-barra-fill {
+    background: linear-gradient(90deg, #4a7abf, #60a5e8, #4a7abf);
+    background-size: 200% 100%;
+    animation: goldBorderFlow 3s ease-in-out infinite;
+}
+
+.ficha-slot-linha.ficha-slot-esgotado .ficha-slot-barra-fill {
+    background: linear-gradient(90deg, #f87171, #ef4444, #f87171);
+    background-size: 200% 100%;
+}
+
+/* ── 13. Botão Voltar: Sofisticado ── */
+
+.btn-voltar {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.btn-voltar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+    pointer-events: none;
+}
+
+.btn-voltar:hover::after {
+    transform: translateX(100%);
+}
+
+/* ── 14. Botões Grimório: Glow Mágico ── */
+
+.btn-grimorio,
+.btn-abrir-grimorio {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-grimorio:hover,
+.btn-abrir-grimorio:hover {
+    box-shadow:
+        0 4px 12px rgba(26,58,107,0.4),
+        0 0 20px rgba(74,122,191,0.2);
+}
+
+.btn-grimorio::before,
+.btn-abrir-grimorio::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, transparent 30%, rgba(74,122,191,0.15) 50%, transparent 70%);
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+.btn-grimorio:hover::before,
+.btn-abrir-grimorio:hover::before {
+    animation: sheen 0.8s ease-out forwards;
+}
+
+/* ── 15. Perícia Items: Stagger Entrance ── */
+
+.ficha-pericia-item {
+    animation: fadeInUp 0.3s ease-out both;
+}
+
+.ficha-pericia-item:nth-child(1)  { animation-delay: 0.4s; }
+.ficha-pericia-item:nth-child(2)  { animation-delay: 0.44s; }
+.ficha-pericia-item:nth-child(3)  { animation-delay: 0.48s; }
+.ficha-pericia-item:nth-child(4)  { animation-delay: 0.52s; }
+.ficha-pericia-item:nth-child(5)  { animation-delay: 0.56s; }
+.ficha-pericia-item:nth-child(6)  { animation-delay: 0.60s; }
+.ficha-pericia-item:nth-child(7)  { animation-delay: 0.64s; }
+.ficha-pericia-item:nth-child(8)  { animation-delay: 0.68s; }
+.ficha-pericia-item:nth-child(9)  { animation-delay: 0.72s; }
+.ficha-pericia-item:nth-child(10) { animation-delay: 0.76s; }
+
+/* Hover mais expressivo nas perícias */
+.ficha-pericia-item:hover {
+    border-left-color: var(--cor-dourada-brilho);
+}
+
+.ficha-pericia-item:hover .ficha-pericia-nome {
+    color: var(--cor-madeira);
+    text-shadow: 0 0 1px rgba(92,58,30,0.2);
+}
+
+/* ── 16. Equipamento Items: Hover Refinado ── */
+
+.ficha-equip-item {
+    transition: all 0.2s ease;
+}
+
+.ficha-equip-item:hover {
+    background: rgba(92,58,30,0.12);
+    border-left-color: var(--cor-dourada);
+    transform: translateX(3px);
+}
+
+/* ── 17. Ataque Rows: Hover Aprimorado ── */
+
+.ficha-ataque-row:hover,
+.ficha-ataque-linha:hover {
+    background: rgba(92,58,30,0.12);
+    border-color: var(--cor-dourada);
+    box-shadow: 0 2px 8px rgba(44,26,14,0.1);
+}
+
+/* ── 18. Talento Rows: Gold Accent ── */
+
+.ficha-talento-linha:hover {
+    box-shadow: 0 2px 10px rgba(201,168,76,0.15);
+}
+
+/* ── 19. Scrollbar: More Atmospheric ── */
+
+::-webkit-scrollbar-track {
+    background: rgba(44,26,14,0.08);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--cor-madeira-clara), var(--cor-madeira));
+    border-radius: 4px;
+    border: 1px solid rgba(201,168,76,0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--cor-dourada), var(--cor-madeira));
+}
+
+/* ── 20. Focus States: Acessibilidade Medieval ── */
+
+*:focus-visible {
+    outline: 2px solid var(--cor-dourada);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ── 21. Print: Sem animações ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ── 22. Defesa valor: Número sutil flutuante ── */
+
+.ficha-defesa-valor {
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
+}
+
+.ficha-defesa-box:hover .ficha-defesa-valor {
+    transform: scale(1.08);
+    text-shadow: 0 2px 12px rgba(255,255,255,0.3), 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ── 23. Nível Linha: Hover ── */
+
+.ficha-nivel-linha {
+    transition: background 0.2s ease;
+}
+
+.ficha-nivel-linha:hover {
+    background: rgba(201,168,76,0.15);
+}
+
+.ficha-nivel-linha:hover .ficha-nivel-valor {
+    color: var(--cor-dourada);
+    transition: color 0.2s;
+}
+
+/* ── 24. Seção Titulo: Icon bounce ao hover da seção ── */
+
+.ficha-secao:hover .ficha-secao-titulo {
+    color: var(--cor-dourada);
+    transition: color 0.2s;
 }

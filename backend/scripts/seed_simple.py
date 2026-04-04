@@ -1,5 +1,6 @@
 """
 Seed simplificado - popula banco de dados
+Usa seed_pericias.py para dados de perícias
 """
 import sys
 from pathlib import Path
@@ -7,13 +8,18 @@ from pathlib import Path
 # Adicionar diretório raiz ao path
 backend_dir = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(backend_dir))
+sys.path.insert(0, str(backend_dir / 'scripts'))
 
 print(f"📁 Backend dir: {backend_dir}")
 
 try:
     from app.core.database import SessionLocal, Base, engine
     from app.models.combatente import Combatente
+    from app.models.pericia import Pericia, PericiaClasse
     import app.models.combate  # Importar para criar tabela
+    
+    # Import seed data
+    from seed_pericias import PERICIAS_DATA
     
     print("✅ Imports bem-sucedidos!")
     
@@ -34,6 +40,63 @@ try:
             print("\n⚠️  Banco já possui dados!")
             print("Continuando sem limpar (mantenha os dados existentes)")
             print("Se quiser resetar, delete o arquivo rpg_arena.db e rode novamente\n")
+            
+            # Verificar e popular perícias se vazio
+            pericia_count = db.query(Pericia).count()
+            if pericia_count == 0:
+                print("🔄 Populando perícias do seed_pericias.py...")
+                
+                pericias_list = []
+                for data in PERICIAS_DATA:
+                    # Check if already exists
+                    if db.query(Pericia).filter(Pericia.nome == data['nome']).first():
+                        continue
+                    
+                    pericia = Pericia(
+                        nome=data['nome'],
+                        descricao=data.get('descricao', ''),
+                        atributo=data.get('atributo', 'DES'),
+                        tipo='comum',
+                        requer_treinamento=0,
+                        especialidade=None,
+                        pode_usar_sem_treinamento=0,
+                        sofre_penalidade_armadura=0,
+                    )
+                    pericias_list.append(pericia)
+                
+                # Add all
+                db.add_all(pericias_list)
+                db.commit()
+                print(f"✅ {len(pericias_list)} perícias criadas!")
+            else:
+                print(f"✅ Perícias já populadas ({pericia_count} perícias)")
+            
+            # Verificar e popular pericias_classes se vazio
+            pericia_class_count = db.query(PericiaClasse).count()
+            if pericia_class_count == 0:
+                print("🔄 Populando pericias_classes do seed_pericias.py...")
+                
+                associacoes = []
+                for data in PERICIAS_DATA:
+                    # Find pericia
+                    pericia = db.query(Pericia).filter(Pericia.nome == data['nome']).first()
+                    if not pericia:
+                        continue
+                    
+                    # Create association for each class
+                    for classe_nome in data.get('classes', []):
+                        assoc = PericiaClasse(
+                            pericia_id=pericia.id,
+                            classe_nome=classe_nome,
+                            is_default=1
+                        )
+                        db.add(assoc)
+                        associacoes.append(assoc)
+
+                db.commit()
+                print(f"✅ {len(associacoes)} associações pericias_classes criadas!")
+            else:
+                print(f"✅ pericias_classes já populado ({pericia_class_count} associações)")
         else:
             print("\n🌱 Populando banco de dados...")
             
@@ -96,6 +159,46 @@ try:
             
             db.commit()
             print(f"\n🎉 {len(combatentes_iniciais)} combatentes criados com sucesso!")
+            
+            # Populate pericias
+            print("\n🔄 Populando perícias do seed_pericias.py...")
+            pericias_list = []
+            for data in PERICIAS_DATA:
+                pericia = Pericia(
+                    nome=data['nome'],
+                    descricao=data.get('descricao', ''),
+                    atributo=data.get('atributo', 'DES'),
+                    tipo='comum',
+                    requer_treinamento=0,
+                    especialidade=None,
+                    pode_usar_sem_treinamento=0,
+                    sofre_penalidade_armadura=0,
+                )
+                pericias_list.append(pericia)
+            
+            db.add_all(pericias_list)
+            db.commit()
+            print(f"✅ {len(pericias_list)} perícias criadas!")
+            
+            # Populate pericias_classes
+            print("🔄 Populando pericias_classes do seed_pericias.py...")
+            associacoes = []
+            for data in PERICIAS_DATA:
+                pericia = db.query(Pericia).filter(Pericia.nome == data['nome']).first()
+                if not pericia:
+                    continue
+                
+                for classe_nome in data.get('classes', []):
+                    assoc = PericiaClasse(
+                        pericia_id=pericia.id,
+                        classe_nome=classe_nome,
+                        is_default=1
+                    )
+                    db.add(assoc)
+                    associacoes.append(assoc)
+            
+            db.commit()
+            print(f"✅ {len(associacoes)} associações pericias_classes criadas!")
         
         print("\n" + "=" * 50)
         print("Para iniciar o servidor:")

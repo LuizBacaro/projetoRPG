@@ -2,7 +2,7 @@
 Schemas Pydantic de Usuário
 SRP: validação e serialização de dados de usuário
 """
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from datetime import datetime
 from ..models.usuario import PerfilUsuario
@@ -11,8 +11,8 @@ import re
 
 class UsuarioBase(BaseModel):
     perfil: PerfilUsuario
-    nome:   str
-    email:  str
+    nome:   str = Field(..., min_length=1, max_length=100)
+    email:  str = Field(..., min_length=3, max_length=150)
 
     @field_validator("nome")
     @classmethod
@@ -31,7 +31,7 @@ class UsuarioBase(BaseModel):
 
 
 class UsuarioCreate(UsuarioBase):
-    senha: str
+    senha: str = Field(..., min_length=6, max_length=128)
     ativo: bool = True
 
     @field_validator("senha")
@@ -44,9 +44,9 @@ class UsuarioCreate(UsuarioBase):
 
 class UsuarioUpdate(BaseModel):
     perfil: Optional[PerfilUsuario] = None
-    nome:   Optional[str]           = None
-    email:  Optional[str]           = None
-    senha:  Optional[str]           = None
+    nome:   Optional[str]           = Field(default=None, min_length=1, max_length=100)
+    email:  Optional[str]           = Field(default=None, min_length=3, max_length=150)
+    senha:  Optional[str]           = Field(default=None, min_length=6, max_length=128)
     ativo:  Optional[bool]          = None
 
     @field_validator("email")
@@ -78,4 +78,6 @@ class UsuarioResponse(UsuarioBase):
 
 class UsuarioListResponse(BaseModel):
     total:    int
+    skip:     int
+    limit:    int
     usuarios: list[UsuarioResponse]

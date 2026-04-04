@@ -40,8 +40,11 @@
     flex-direction: column;
     gap: 0.4rem;
     overflow-y: auto;
-    max-height: calc(100vh - 260px);
+    flex: 1;
+    min-height: 0;
+    max-height: none;
     padding-right: 0.25rem;
+    scrollbar-gutter: stable;
 }
 
 .lista-combatentes::-webkit-scrollbar       { width: 6px; }
@@ -327,11 +330,15 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    max-height: 420px;
+    flex: 1;
+    min-height: 0;
+    max-height: none;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 0.3rem;
-    margin-bottom: 1rem;
+    padding-bottom: 0.3rem;
+    margin-bottom: 0;
+    scrollbar-gutter: stable;
 }
 
 .lista-selecionados::-webkit-scrollbar       { width: 6px; }
