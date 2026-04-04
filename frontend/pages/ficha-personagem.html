@@ -19,6 +19,23 @@
         </div>
         <div class="ficha-titulo">
             <h1 class="ficha-titulo-texto">📜 <span id="fichaHeaderNome">Ficha do Personagem</span></h1>
+            <div class="ficha-header-identity">
+                <div class="ficha-meta">
+                    <span id="fichaRaca"   class="ficha-tag ficha-tag-raca">—</span>
+                    <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
+                    <span id="fichaTipo"   class="ficha-tag ficha-tag-tipo">—</span>
+                    <span class="ficha-tag ficha-tag-nivel">
+                        <span class="ficha-nivel-label">Nív.</span>
+                        <span id="fichaNivel" class="ficha-nivel-valor">—</span>
+                    </span>
+                </div>
+                <div class="ficha-meta ficha-meta-secundaria">
+                    <span id="fichaAlinhamento" class="ficha-tag ficha-tag-alinhamento">Alinhamento: —</span>
+                    <span id="fichaDivindade"   class="ficha-tag ficha-tag-alinhamento">Divindade: —</span>
+                    <span id="fichaDominios"    class="ficha-tag ficha-tag-dominio">Domínios: —</span>
+                    <button id="btnEditarPerfilMagico" class="ficha-btn-editar-identidade" type="button">✏️ Editar</button>
+                </div>
+            </div>
         </div>
         <div class="ficha-header-direita">
             <!-- ✅ NOVO: Botão Grimório — visível apenas para classes conjuradoras -->
@@ -83,43 +100,6 @@
                 </div>
             </div>
 
-            <!-- Resistências -->
-            <div class="ficha-secao">
-                <h3 class="ficha-secao-titulo">🛡️ Resistências</h3>
-                <div class="ficha-resistencias-row">
-                    <div class="ficha-resistencia-box">
-                        <span class="ficha-res-label">Fortitude</span>
-                        <span id="fichaFort" class="ficha-res-valor">+0</span>
-                    </div>
-                    <div class="ficha-resistencia-box">
-                        <span class="ficha-res-label">Reflexos</span>
-                        <span id="fichaReflex" class="ficha-res-valor">+0</span>
-                    </div>
-                    <div class="ficha-resistencia-box">
-                        <span class="ficha-res-label">Vontade</span>
-                        <span id="fichaVont" class="ficha-res-valor">+0</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Talentos -->
-            <div class="ficha-secao">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 class="ficha-secao-titulo">🌟 Talentos</h3>
-                    <button class="ficha-btn-adicionar" id="btnAdicionarTalento" 
-                        ➕ Adicionar
-                    </button>
-                </div>
-                <div id="fichaTalentos" class="ficha-talentos-lista">
-                    <span class="ficha-vazio">Nenhum talento cadastrado</span>
-                </div>
-            </div>
-
-        </aside>
-
-        <!-- COLUNA CENTRAL: defesa + foto + identidade -->
-        <section class="ficha-coluna-central">
-
             <!-- Defesa: CA / PV / Iniciativa -->
             <div class="ficha-defesa-row">
                 <div class="ficha-defesa-box ficha-ca-box">
@@ -151,40 +131,24 @@
                 </div>
             </div>
 
-            <!-- Foto do personagem -->
-            <div class="ficha-foto-container">
-                <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto">
-                <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
-            </div>
-
-            <!-- Identidade (abaixo da foto) -->
-            <div class="ficha-identidade">
-                <div class="ficha-meta">
-                    <span id="fichaRaca"   class="ficha-tag ficha-tag-raca">—</span>
-                    <span id="fichaClasse" class="ficha-tag ficha-tag-classe">—</span>
-                    <span id="fichaTipo"   class="ficha-tag ficha-tag-tipo">—</span>
-                        <span class="ficha-nivel-label">Nív.</span>
-                        <span id="fichaNivel" class="ficha-nivel-valor">—</span>
-                    </span>
+            <!-- Talentos -->
+            <div class="ficha-secao">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">🌟 Talentos</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarTalento" 
+                        ➕ Adicionar
+                    </button>
                 </div>
-                <div class="ficha-meta ficha-meta-secundaria">
-                    <span id="fichaAlinhamento" class="ficha-tag ficha-tag-alinhamento">Alinhamento: —</span>
-                    <span id="fichaDivindade" class="ficha-tag ficha-tag-alinhamento">Divindade: —</span>
-                    <span id="fichaDominios" class="ficha-tag ficha-tag-dominio">Domínios: —</span>
+                <div id="fichaTalentos" class="ficha-talentos-lista">
+                    <span class="ficha-vazio">Nenhum talento cadastrado</span>
                 </div>
-                <button id="btnEditarPerfilMagico" class="ficha-btn-editar-identidade" type="button">Editar alinhamento, divindade e domínios</button>
             </div>
-
-        </section>
-
-        <!-- COLUNA DIREITA: equipamentos + ataques + slots resumo + perícias -->
-        <aside class="ficha-coluna-direita">
 
             <!-- Equipamentos -->
             <div class="ficha-secao">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
-                    <button class="ficha-btn-adicionar" id="btnAdicionarEquipamento" 
+                    <button class="ficha-btn-adicionar" id="btnAdicionarEquipamento"
                             title="Adicionar equipamento">
                         ➕ Adicionar
                     </button>
@@ -193,6 +157,41 @@
                     <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
                 </div>
             </div>
+
+        </aside>
+
+        <!-- COLUNA CENTRAL: foto + resistências -->
+        <section class="ficha-coluna-central">
+
+            <!-- Foto do personagem -->
+            <div class="ficha-foto-container">
+                <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto">
+                <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
+            </div>
+
+            <!-- Resistências -->
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">🛡️ Resistências</h3>
+                <div class="ficha-resistencias-row">
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Fortitude</span>
+                        <span id="fichaFort" class="ficha-res-valor">+0</span>
+                    </div>
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Reflexos</span>
+                        <span id="fichaReflex" class="ficha-res-valor">+0</span>
+                    </div>
+                    <div class="ficha-resistencia-box">
+                        <span class="ficha-res-label">Vontade</span>
+                        <span id="fichaVont" class="ficha-res-valor">+0</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- COLUNA DIREITA: armadura + ataques + slots resumo + perícias -->
+        <aside class="ficha-coluna-direita">
 
             <div class="ficha-secao">
                 <div style="display: flex; justify-content: space-between; align-items: center;">

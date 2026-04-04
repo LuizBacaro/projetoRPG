@@ -3,7 +3,9 @@
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104-green)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
-![Railway](https://img.shields.io/badge/Deploy-Railway-purple)
+![Vercel](https://img.shields.io/badge/Frontend-Vercel-black)
+![Render](https://img.shields.io/badge/API-Render-46E3B7)
+![Neon](https://img.shields.io/badge/DB-Neon-00E5B4)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 Plataforma web fullstack para gerenciamento de combates de **D&D 3.5** (Tabletop RPG),
@@ -121,7 +123,9 @@ Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera c
 ### Infraestrutura
 | Serviço | Uso |
 |---|---|
-| **Railway** | Backend + PostgreSQL gerenciado |
+| **Vercel** | Frontend estático (HTML/CSS/JS) — CDN global |
+| **Render.com** | Backend FastAPI (processo persistente, uploads) |
+| **Neon** | PostgreSQL gerenciado (serverless, connection pooling) |
 | **Cloudflare** | DNS + CDN |
 | **Registro.br** | Domínio |
 
@@ -528,28 +532,58 @@ pytest tests/ -v --cov=app
 
 ## 🌐 Deploy em Produção
 
-### Infraestrutura
+### Arquitetura
 
 ```
-Registro.br (domínio) → Cloudflare (DNS + CDN) → Railway (FastAPI + PostgreSQL)
+Registro.br (domínio) → Cloudflare (DNS + CDN) → Vercel (frontend)
+                                                 → Render.com (API FastAPI) → Neon (PostgreSQL)
 ```
 
-### Railway
+### Passo a Passo
 
-Deploy automático a cada push na branch de produção. O Railway detecta o `Procfile`:
+#### 1. Banco de Dados — Neon
+1. Crie conta em [neon.tech](https://neon.tech) (gratuito)
+2. Crie um projeto → copie a **Connection string** (painel: Connection Details)
+3. Guarde a URL no formato: `postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require`
 
-```
-web: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
-```
+#### 2. Backend — Render.com
+1. Crie conta em [render.com](https://render.com) → New → **Web Service**
+2. Conecte o repositório GitHub
+3. Configure:
+   - **Root Directory**: `backend`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - **Python Version**: `3.11`
+4. Adicione as variáveis de ambiente:
 
-**Variáveis de ambiente no Railway:**
-
-| Variável | Descrição |
+| Variável | Valor |
 |---|---|
-| `DATABASE_URL` | URL do PostgreSQL (gerada pelo Railway) |
-| `SECRET_KEY` | Chave para JWT |
-| `PROJECT_NAME` | Arena de Combate TTRPG |
-| `ALLOWED_ORIGINS` | `["https://arena-de-combate-rpg.com.br"]` |
+| `DATABASE_URL` | Connection string do Neon |
+| `SECRET_KEY` | `python -c "import secrets; print(secrets.token_hex(32))"` |
+| `ENVIRONMENT` | `production` |
+| `ADMIN_EMAIL` | seu e-mail de admin |
+| `ADMIN_PASSWORD` | senha forte |
+| `ALLOWED_ORIGINS` | `["https://arena-de-combate-rpg.com.br","https://seu-app.vercel.app"]` |
+
+5. Após o deploy, copie a URL do Render (ex: `https://arena-rpg-api.onrender.com`)
+6. Atualize `frontend/js/config.js` com essa URL na linha de produção
+
+#### 3. Frontend — Vercel
+1. Crie conta em [vercel.com](https://vercel.com) → New Project → importe o repositório
+2. **Não altere** o diretório raiz — o `vercel.json` na raiz já configura tudo
+3. Nenhuma variável de ambiente necessária (frontend é estático)
+4. Após deploy, Vercel gera uma URL `.vercel.app`
+
+#### 4. Domínio Próprio (Registro.br → Cloudflare → Vercel)
+1. No **Cloudflare**: adicione registro `CNAME` apontando `arena-de-combate-rpg.com.br` para `cname.vercel-dns.com`
+2. No **Vercel**: Project Settings → Domains → adicione `arena-de-combate-rpg.com.br`
+3. Atualize `ALLOWED_ORIGINS` no Render para incluir o domínio final
+
+#### 5. Anti-sleep no Render (gratuito)
+O Render free tier dorme após 15 min de inatividade. Para evitar cold start:
+1. Crie conta gratuita em [uptimerobot.com](https://uptimerobot.com)
+2. New Monitor → HTTP(S) → URL: `https://arena-rpg-api.onrender.com/health`
+3. Intervalo: **14 minutos** — mantém a API sempre acordada
 
 ---
 

@@ -6,8 +6,9 @@ const CONFIG = {
             return 'http://localhost:8000';
         }
 
-        // ✅ URL do Railway (domínio próprio após DNS propagar)
-        return 'https://arena-de-combate-rpg.com.br';
+        // ✅ API no Render — separada do frontend (Vercel)
+        // Substitua pela URL gerada pelo Render ao criar o serviço
+        return 'https://arena-de-combate-rpg-api.onrender.com';
     })(),
 
     API_VERSION: '/api',
