@@ -314,7 +314,7 @@ def _garantir_colunas_soft_delete() -> None:
                 continue
 
             logger.warning("⚠️  coluna %s.deleted_at ausente; aplicando schema guard", tabela)
-            conn.execute(text(f"ALTER TABLE {tabela} ADD COLUMN deleted_at DATETIME"))
+            conn.execute(text(f"ALTER TABLE {tabela} ADD COLUMN deleted_at TIMESTAMP"))
 
 
 def _garantir_constraints_item_13() -> None:
