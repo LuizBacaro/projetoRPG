@@ -4,9 +4,11 @@
  * SOLID: Dependency Injection do token, abstração da URL
  */
 
+import { getApiUrl } from '../config/api.config.js';
+
 export class TalentoService {
     constructor() {
-        this.baseUrl = 'http://localhost:8000/api/v1/talentos';
+        this.baseUrl = getApiUrl('/talentos');
         this.token = localStorage.getItem('token');
         console.log('✅ TalentoService inicializado');
     }

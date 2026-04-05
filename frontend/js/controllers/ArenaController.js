@@ -284,10 +284,7 @@ export class ArenaController {
         try {
             console.log(`⏰ Decrementando duração para combatente #${combatenteId}...`);
             
-            const baseUrl = typeof window.getApiUrl === 'function'
-                ? window.getApiUrl(`/condicoes/combatentes/${combatenteId}/avancar-turno`)
-                //                   ↑ SEM /v1 aqui!
-                : `http://localhost:8000/api/v1/condicoes/combatentes/${combatenteId}/avancar-turno`;
+            const baseUrl = getApiUrl(`/condicoes/combatentes/${combatenteId}/avancar-turno`);
             
             const token = localStorage.getItem('token');
             

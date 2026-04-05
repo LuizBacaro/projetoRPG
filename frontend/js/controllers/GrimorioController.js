@@ -1473,8 +1473,14 @@ class GrimorioController {
                 lista.innerHTML = '<div class="grimorio-vazio">Grimório acessível, mas sem magias: Ranger e Paladino recebem magias a partir do nível 4.</div>';
                 return;
             }
-            if (this._classeEhEspontanea() && this.itensGrimorio.length === 0) {
-                lista.innerHTML = '<div class="grimorio-vazio">Você ainda não selecionou magias conhecidas. Use o botão Adicionar magia conhecida para montar seu grimório.</div>';
+            if (this.itensGrimorio.length === 0) {
+                if (this._classeEhEspontanea()) {
+                    lista.innerHTML = '<div class="grimorio-vazio">Você ainda não selecionou magias conhecidas. Use o botão <strong>Adicionar magia conhecida</strong> para montar seu grimório.</div>';
+                } else if (this._classePermiteGerenciarConhecidas()) {
+                    lista.innerHTML = '<div class="grimorio-vazio">Seu grimório está vazio. Use o botão <strong>Adicionar magia conhecida</strong> para registrar as magias que seu personagem aprendeu.</div>';
+                } else {
+                    lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
+                }
                 return;
             }
             lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
