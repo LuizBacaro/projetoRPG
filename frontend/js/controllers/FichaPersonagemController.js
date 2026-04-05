@@ -17,7 +17,7 @@ import {
     safeBootstrap,
     safeBootstrapAsync,
 } from '../utils/graceful-degradation.js';
-import { resolveCombatenteSpellSlots } from '../utils/combat-rules.js?v=20260331a';
+import { resolveCombatenteSpellSlots, isClasseConjuradora } from '../utils/combat-rules.js?v=20260331a';
 
 const DOMINIOS_PERMITIDOS_FALLBACK = [
     'Ar', 'Bem', 'Caos', 'Conhecimento', 'Cura', 'Destruição', 'Enganação', 'Fogo', 'Força',
@@ -1033,8 +1033,9 @@ export class FichaPersonagemController {
         console.log('🔮 Todos os slots:', slots);
         console.log('🔮 Slots ativos (total > 0):', slotsAtivos);
 
-        if (secao && this.combatente.tipo === 'jogador') {
-            secao.style.display = 'flex';
+        if (secao) {
+            const temMagia = this.combatente.tipo === 'jogador' && isClasseConjuradora(this.combatente.classe);
+            secao.style.display = temMagia ? 'flex' : 'none';
         }
 
         if (slotsAtivos.length === 0) {
