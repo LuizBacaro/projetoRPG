@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     MAX_JSON_BODY_SIZE: int = 1 * 1024 * 1024  # 1MB
     ALLOWED_EXTENSIONS: set = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
 
+    # ── Cloudinary (armazenamento de imagens em produção) ─────────────────────
+    CLOUDINARY_CLOUD_NAME: str = ""
+    CLOUDINARY_API_KEY: str = ""
+    CLOUDINARY_API_SECRET: str = ""
+
     # ── Compressão ───────────────────────────────────────────────────────────
     GZIP_ENABLED: bool = True
     GZIP_MINIMUM_SIZE: int = 1000
