@@ -89,6 +89,27 @@
         gap: 1rem;
     }
 
+    /* ── Tabela responsiva: scroll horizontal em vez de cortar ── */
+    .tabela-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0.4rem;
+    }
+
+    .tabela-combatentes {
+        min-width: 560px; /* garante que os botões de ação nunca somem */
+    }
+
+    .tabela-combatentes td {
+        padding: 0.55rem 0.7rem;
+        font-size: 0.82rem;
+    }
+
+    .tabela-combatentes th {
+        padding: 0.55rem 0.7rem;
+        font-size: 0.75rem;
+    }
+
     /* Arena — wrapper vira coluna */
     .arena-tela-wrapper {
         flex-direction: column;

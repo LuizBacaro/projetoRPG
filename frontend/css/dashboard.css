@@ -202,6 +202,47 @@ body {
         justify-content: center;
         gap: 0.8rem;
     }
+
+    /* ── Tabela responsiva ── */
+    .tabela-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0.4rem;
+    }
+
+    .tabela-combatentes {
+        min-width: 580px;
+    }
+
+    .tabela-combatentes td {
+        padding: 0.55rem 0.65rem;
+        font-size: 0.82rem;
+        white-space: nowrap;
+    }
+
+    .tabela-combatentes th {
+        padding: 0.5rem 0.65rem;
+        font-size: 0.75rem;
+    }
+
+    /* resumo cards: 2x2 em vez de 4 colunas */
+    .resumo-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* toolbar empilha */
+    .lista-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtros-tipo {
+        flex-wrap: wrap;
+    }
+
+    .btn-novo {
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
