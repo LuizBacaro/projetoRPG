@@ -107,6 +107,28 @@ export class FichaPersonagemController {
     }
 
     _configurarEventos() {
+        const btnEditarAtaques = document.getElementById('btnEditarAtaques');
+        if (btnEditarAtaques) {
+            btnEditarAtaques.addEventListener('click', () => this._abrirEditorAtaques());
+        }
+
+        const btnAdicionarLinhaAtaque = document.getElementById('btnAdicionarLinhaAtaque');
+        if (btnAdicionarLinhaAtaque) {
+            btnAdicionarLinhaAtaque.addEventListener('click', () => this._adicionarLinhaAtaqueEditor());
+        }
+
+        const btnSalvarAtaques = document.getElementById('btnSalvarAtaques');
+        if (btnSalvarAtaques) {
+            btnSalvarAtaques.addEventListener('click', () => this._salvarAtaques());
+        }
+
+        const btnCancelarAtaques = document.getElementById('btnCancelarAtaques');
+        if (btnCancelarAtaques) {
+            btnCancelarAtaques.addEventListener('click', () => {
+                document.getElementById('fichaAtaquesEditor').style.display = 'none';
+            });
+        }
+
         const btnVoltar = document.getElementById('btnVoltarFicha');
         if (btnVoltar) {
             btnVoltar.addEventListener('click', () => {
@@ -923,6 +945,70 @@ export class FichaPersonagemController {
         `).join('');
 
         console.log('✅ Ataques renderizados:', ataques.length);
+    }
+
+    _abrirEditorAtaques() {
+        const editor = document.getElementById('fichaAtaquesEditor');
+        const listaEl = document.getElementById('fichaAtaquesEditorLista');
+        if (!editor || !listaEl) return;
+
+        listaEl.innerHTML = '';
+        const ataques = this.combatente.ataques || [];
+        if (ataques.length === 0) {
+            this._adicionarLinhaAtaqueEditor();
+        } else {
+            ataques.forEach(a => this._adicionarLinhaAtaqueEditor(a));
+        }
+        editor.style.display = 'block';
+    }
+
+    _adicionarLinhaAtaqueEditor(ataque = {}) {
+        const lista = document.getElementById('fichaAtaquesEditorLista');
+        if (!lista) return;
+        const div = document.createElement('div');
+        div.className = 'ataque-linha';
+        div.style.cssText = 'display:grid; grid-template-columns:1fr 70px 90px 120px 36px; gap:.4rem; margin-bottom:.3rem;';
+        div.innerHTML = `
+            <input type="text" class="ataque-nome ficha-input-ataque" placeholder="Nome" value="${escapeHtml(ataque.nome || '')}" style="padding:.3rem .4rem; border:1px solid #334155; background:#0f172a; color:#e2e8f0; border-radius:4px; font-size:.82rem;">
+            <input type="text" class="ataque-bonus ficha-input-ataque" placeholder="+0" value="${escapeHtml(ataque.bonus_ataque || '+0')}" style="padding:.3rem .4rem; border:1px solid #334155; background:#0f172a; color:#e2e8f0; border-radius:4px; font-size:.82rem;">
+            <input type="text" class="ataque-dano ficha-input-ataque" placeholder="1d6" value="${escapeHtml(ataque.dano || '')}" style="padding:.3rem .4rem; border:1px solid #334155; background:#0f172a; color:#e2e8f0; border-radius:4px; font-size:.82rem;">
+            <input type="text" class="ataque-tipo ficha-input-ataque" placeholder="tipo" value="${escapeHtml(ataque.tipo_dano || '')}" style="padding:.3rem .4rem; border:1px solid #334155; background:#0f172a; color:#e2e8f0; border-radius:4px; font-size:.82rem;">
+            <button type="button" style="background:#ef4444; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:.8rem;">✕</button>
+        `;
+        div.querySelector('button').addEventListener('click', () => div.remove());
+        lista.appendChild(div);
+    }
+
+    _coletarAtaquesEditor() {
+        return Array.from(document.querySelectorAll('#fichaAtaquesEditorLista .ataque-linha'))
+            .map(l => ({
+                nome: l.querySelector('.ataque-nome').value.trim(),
+                bonus_ataque: l.querySelector('.ataque-bonus').value.trim() || '+0',
+                dano: l.querySelector('.ataque-dano').value.trim() || '1d6',
+                tipo_dano: l.querySelector('.ataque-tipo').value.trim(),
+            }))
+            .filter(a => a.nome);
+    }
+
+    async _salvarAtaques() {
+        const combatenteId = this.combatente?.id;
+        if (!combatenteId) return;
+        const ataques = this._coletarAtaquesEditor();
+        try {
+            const res = await fetch(getApiUrl(`/combatentes/${combatenteId}/ataques`), {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+                body: JSON.stringify({ ataques }),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            this.combatente.ataques = ataques;
+            this.renderizarAtaques();
+            document.getElementById('fichaAtaquesEditor').style.display = 'none';
+            console.log('✅ Ataques salvos:', ataques.length);
+        } catch (err) {
+            console.error('❌ Erro ao salvar ataques:', err);
+            alert('Erro ao salvar ataques: ' + err.message);
+        }
     }
 
     // ─────────────────────────────────────────────────────────

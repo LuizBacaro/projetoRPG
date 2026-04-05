@@ -61,6 +61,7 @@ class GrimorioController {
         this.escolaAtiva = 'todas';
         this.componenteAtivo = 'todos';
         this.favoritasApenas = false;
+        this.preparadasApenas = false;
         this.magiaAdicionarSelecionadaId = null;
         this.magiasDisponiveisAdicionar = [];
 
@@ -135,8 +136,9 @@ class GrimorioController {
                 || String(magia.componentes || '').toUpperCase().includes(this.componenteAtivo);
 
             const matchFavorita = !this.favoritasApenas || !!item.favorita;
+            const matchPreparada = !this.preparadasApenas || this.magiasPreparadasMap.has(Number(item.magia_id));
 
-            if (!busca) return matchNivel && matchEscola && matchComponente && matchFavorita;
+            if (!busca) return matchNivel && matchEscola && matchComponente && matchFavorita && matchPreparada;
 
             const alvoBusca = [
                 magia.nome,
@@ -146,7 +148,7 @@ class GrimorioController {
                 item.anotacoes,
             ].filter(Boolean).join(' ').toLowerCase();
 
-            return matchNivel && matchEscola && matchComponente && matchFavorita && alvoBusca.includes(busca);
+            return matchNivel && matchEscola && matchComponente && matchFavorita && matchPreparada && alvoBusca.includes(busca);
         });
 
         this._renderizarLista();
@@ -517,6 +519,8 @@ class GrimorioController {
         novoSelect.addEventListener('change', async (event) => {
             this.classeAtiva = event.target.value;
             this.cardsAbertos.clear();
+            this.favoritasApenas = false;
+            this.preparadasApenas = false;
             await this._recarregarDados();
             this._configurarFiltros();
         });
@@ -696,6 +700,7 @@ class GrimorioController {
     _configurarFiltros() {
         this._bindNiveis();
         this._bindFavoritas();
+        this._bindPreparadas();
         this._bindComponente();
         this._bindDescansoLongo();
         this._bindAdicionarMagia();
@@ -762,6 +767,26 @@ class GrimorioController {
         clone.addEventListener('click', () => {
             this.favoritasApenas = !this.favoritasApenas;
             clone.classList.toggle('ativo', this.favoritasApenas);
+            this.filtrar();
+        });
+    }
+
+    _bindPreparadas() {
+        const btn = document.getElementById('btnFiltroPreparagas');
+        if (!btn) return;
+
+        // Mostra o botão apenas para classes que preparam magias (não-espontâneas)
+        const classeNorm = String(this._normalizarClasse(this.classeAtiva) || '')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+        const classesQuePrep = ['clerigo', 'mago', 'druida', 'ranger', 'paladino'];
+        btn.style.display = classesQuePrep.includes(classeNorm) ? '' : 'none';
+
+        const clone = btn.cloneNode(true);
+        btn.parentNode.replaceChild(clone, btn);
+        clone.classList.toggle('ativo', this.preparadasApenas);
+        clone.addEventListener('click', () => {
+            this.preparadasApenas = !this.preparadasApenas;
+            clone.classList.toggle('ativo', this.preparadasApenas);
             this.filtrar();
         });
     }

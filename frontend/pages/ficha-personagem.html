@@ -207,7 +207,10 @@
             </div>
 
             <div class="ficha-secao">
-                <h3 class="ficha-secao-titulo">⚔️ Ataques</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="ficha-secao-titulo">⚔️ Ataques</h3>
+                    <button class="ficha-btn-adicionar" id="btnEditarAtaques" title="Editar ataques">✏️ Editar</button>
+                </div>
                 <div class="ficha-ataques-tabela">
                     <div class="ficha-ataque-header">
                         <span>Nome</span>
@@ -216,6 +219,17 @@
                     </div>
                     <div id="fichaAtaquesLista" class="ficha-ataques-lista">
                         <div class="ficha-ataque-vazio">Nenhum ataque cadastrado</div>
+                    </div>
+                </div>
+                <div id="fichaAtaquesEditor" style="display:none; margin-top:.75rem">
+                    <div style="display:grid; grid-template-columns:1fr 70px 90px 120px 36px; gap:.4rem; margin-bottom:.4rem; font-size:.72rem; color:#64748b;">
+                        <span>Nome</span><span>Bônus</span><span>Dano</span><span>Tipo</span><span></span>
+                    </div>
+                    <div id="fichaAtaquesEditorLista"></div>
+                    <div style="display:flex; gap:.5rem; margin-top:.5rem">
+                        <button class="ficha-btn-adicionar" id="btnAdicionarLinhaAtaque">+ Adicionar</button>
+                        <button class="ficha-btn-adicionar" id="btnSalvarAtaques" style="background:#22c55e; color:#fff">💾 Salvar</button>
+                        <button class="ficha-btn-adicionar" id="btnCancelarAtaques" style="background:#64748b; color:#fff">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -307,6 +321,7 @@
                     <button class="grimorio-nivel-btn" data-nivel="8">8°</button>
                     <button class="grimorio-nivel-btn" data-nivel="9">9°</button>
                     <button class="grimorio-nivel-btn grimorio-btn-preparadas" id="btnFiltroFavoritas">★ Favoritas</button>
+                    <button class="grimorio-nivel-btn grimorio-btn-preparadas" id="btnFiltroPreparagas" style="display:none">🕯️ Preparadas</button>
                 </div>
             </div>
             <div class="grimorio-filtros-secundarios">
@@ -734,7 +749,7 @@
 
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
-<script type="module" src="../js/controllers/FichaPersonagemController.js?v=19"></script>
-<script type="module" src="../js/controllers/GrimorioController.js?v=19"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=20"></script>
+<script type="module" src="../js/controllers/GrimorioController.js?v=20"></script>
 </body>
 </html>
