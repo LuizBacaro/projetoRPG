@@ -591,6 +591,8 @@ O Render free tier dorme após 15 min de inatividade. Para evitar cold start:
 3. Schedule: `*/10 * * * *` (a cada 10 min) — mantém a API sempre acordada
 4. O endpoint `/health` retorna 200 instantaneamente sem tocar no banco
 
+> ℹ️ Job já configurado em produção: [console.cron-job.org/jobs](https://console.cron-job.org/jobs)
+
 ---
 
 ## 👤 Autor

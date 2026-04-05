@@ -125,6 +125,7 @@ Tentativa com UptimeRobot (monitoramento gratuito a cada 5min). Funcionou parcia
 ```
 URL: https://projetorpg-7ih3.onrender.com/health
 Schedule: */10 * * * *
+Console: https://console.cron-job.org/jobs
 ```
 
 **Resultado:** ✅ Render mantido acordado 24h. Cold start eliminado.
