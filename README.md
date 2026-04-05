@@ -127,8 +127,9 @@ Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera c
 | Serviço | Uso |
 |---|---|
 | **Vercel** | Frontend estático (HTML/CSS/JS) — CDN global |
-| **Render.com** | Backend FastAPI (processo persistente, uploads) |
+| **Render.com** | Backend FastAPI (processo persistente) |
 | **Neon** | PostgreSQL gerenciado (serverless, connection pooling) |
+| **Cloudinary** | Armazenamento de imagens de personagens — CDN global permanente |
 | **Cloudflare** | DNS + CDN |
 | **Registro.br** | Domínio |
 
@@ -202,7 +203,7 @@ backend/
 │   │   ├── pericia_service.py
 │   │   ├── equipamento_service.py
 │   │   ├── talento_service.py
-│   │   └── file_service.py        #   Upload de imagens
+│   │   └── file_service.py        #   Upload de imagens (local dev / Cloudinary prod)
 │   │
 │   ├── schemas/                   # Pydantic DTOs (request/response)
 │   ├── seeds/                     # Dados iniciais (condições, admin)

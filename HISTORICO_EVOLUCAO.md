@@ -247,6 +247,34 @@ this.baseUrl = getApiUrl('/talentos');
 
 ---
 
+### [2026] Imagens de personagem — filesystem efêmero → Cloudinary CDN
+**Problema:** Foto salva em um dispositivo não renderizava em outros dispositivos/navegadores.
+
+**Root cause:** `foto_url` armazenava um caminho relativo `/uploads/<uuid>.jpg` no disco local do container Render. O Render free tier tem filesystem **efêmero** — arquivos são apagados a cada deploy ou restart. Além disso, outros dispositivos acessavam via Vercel (`arena-de-combate-rpg.com.br`) que não serve a rota `/uploads/*`; a URL relativa não resolvia para o Render.
+
+**O que mudou:**
+- `FileService` ganhou roteamento automático:
+  - **Produção** (`CLOUDINARY_*` configurado): upload para Cloudinary, retorna URL HTTPS absoluta e permanente (`https://res.cloudinary.com/...`)
+  - **Desenvolvimento** (sem Cloudinary): mantém comportamento anterior com filesystem local
+- `config.py`: adicionadas `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `requirements.txt`: adicionado `cloudinary==1.41.0`
+- `deletar_arquivo()`: detecta URL absoluta (Cloudinary) vs relativa (local) e roteia adequadamente
+
+**Variáveis de ambiente a configurar no Render:**
+```
+CLOUDINARY_CLOUD_NAME=<cloud-name>
+CLOUDINARY_API_KEY=<api-key>
+CLOUDINARY_API_SECRET=<api-secret>
+```
+
+**Resultado:** ✅ `foto_url` salva no Neon passa a ser URL CDN global permanente. Funciona em qualquer dispositivo, navegador, rede.
+
+**Trade-off:** Cloudinary free tier = 25 GB storage + 25 GB bandwidth/mês. Mais que suficiente para o volume atual.
+
+**Como reverter:** Remover as env vars `CLOUDINARY_*` do Render. O `FileService` volta ao filesystem local automaticamente. Fotos existentes (URLs Cloudinary) continuarão acessíveis pois o Cloudinary ainda tem os arquivos; só novos uploads irão para disco local.
+
+---
+
 ### [2026] secaoMagias — visível para não-conjuradores
 **Problema:** Seção de slots de magia aparecia para Guerreiro, Bárbaro, Ladino etc.
 
