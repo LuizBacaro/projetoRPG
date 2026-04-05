@@ -266,7 +266,13 @@ class GrimorioController {
     }
 
     _classeExibeCatalogoCompleto() {
-        return false;
+        const classeNorm = String(this._normalizarClasse(this.classeAtiva) || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase();
+        // Clérigo e Druida têm acesso automático a todas as magias do nível
+        return classeNorm === 'clerigo' || classeNorm === 'druida';
     }
 
     _mesclarCatalogoDisponivelNoGrimorio() {

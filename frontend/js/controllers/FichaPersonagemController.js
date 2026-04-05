@@ -8,7 +8,7 @@
 import { CombatenteService } from '../services/CombatenteService.js';
 import { EquipamentoService } from '../services/EquipamentoService.js';
 import { ArmaduraProtecaoService } from '../services/ArmaduraProtecaoService.js';
-import { TalentoService } from '../services/TalentoService.js';
+import { TalentoService } from '../services/TalentoService.js?v=2';
 import { PericiaService } from '../services/PericiaService.js';
 import { getApiUrl } from '../config/api.config.js';
 import { escapeHtml } from '../utils/formatters.js';
