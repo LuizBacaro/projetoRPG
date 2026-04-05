@@ -6,9 +6,8 @@ const CONFIG = {
             return 'http://localhost:8000';
         }
 
-        // ✅ API no Render — separada do frontend (Vercel)
-        // Substitua pela URL gerada pelo Render ao criar o serviço
-        return 'https://arena-de-combate-rpg-api.onrender.com';
+        // Backend e frontend servidos pelo mesmo serviço Render — mesmo origin
+        return '';
     })(),
 
     API_VERSION: '/api',
