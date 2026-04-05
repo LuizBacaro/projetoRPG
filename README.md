@@ -51,8 +51,9 @@ Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera c
 - Boxes de defesa (CA, PV com barra, Iniciativa)
 - Resistências (Fortitude, Reflexos, Vontade)
 - Talentos e Equipamentos com CRUD
-- Perícias com cálculo automático de modificadores
-- Slots de magia por nível com barras de progresso
+- Perícias com cálculo automático de modificadores e custo por classe (1 pt = classe, 2 pts = fora da classe)
+- Editor inline de ataques (adicionar/remover diretamente na ficha)
+- Slots de magia por nível com barras de progresso (visível apenas para classes conjuradoras)
 - Sincronização em tempo real via `BroadcastChannel` com a Arena
 
 ### Arena de Combate
@@ -66,6 +67,8 @@ Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera c
 - Catálogo de ~400+ magias D&D 3.5 (todas as classes)
 - Filtros por nível (0-9), escola e busca por nome
 - Tabelas de slots por classe (Mago, Clérigo, Druida, Bardo, Paladino, Ranger)
+- Clérigo e Druida exibem catálogo completo automaticamente
+- Filtro "Preparadas" para classes que preparam magias (Clérigo, Mago, Druida, Ranger, Paladino)
 - Preparação diária de magias com controle de uso
 - Descanso longo: reset automático de slots e preparações
 
@@ -109,7 +112,7 @@ Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera c
 | passlib + bcrypt | — | Hash de senhas |
 | Uvicorn | 0.24.0 | Servidor ASGI |
 | SQLite | — | Banco de dev local |
-| PostgreSQL | — | Banco de produção (Railway) |
+| PostgreSQL | — | Banco de produção (Neon) |
 
 ### Frontend
 | Tecnologia | Uso |
@@ -155,7 +158,7 @@ backend/
 │   │   ├── ataques.py             #   Ataques corpo-a-corpo/distância
 │   │   ├── magias.py              #   Catálogo de ~400 magias
 │   │   ├── magias_preparadas.py   #   Preparação diária + descanso
-│   │   ├── pericias.py            #   37 perícias D&D 3.5
+│   │   ├── pericias.py            #   54 perícias D&D 3.5 com custo por classe
 │   │   ├── talentos.py            #   Talentos/feats
 │   │   └── equipamentos.py        #   Inventário
 │   │
@@ -207,7 +210,7 @@ backend/
 │
 ├── scripts/                       # Seeds de dados D&D
 │   ├── seed_magias.py             #   ~400+ magias todas as classes
-│   ├── seed_pericias.py           #   37 perícias
+│   ├── seed_pericias.py           #   54 perícias + associações por classe
 │   ├── seed_equipamentos.py       #   Equipamentos (PHB p.120-126)
 │   ├── seed_database.py           #   Combatentes de exemplo
 │   └── seed_dominios.py           #   Domínios de clérigo
@@ -356,8 +359,9 @@ Magia (~400+ registros)
 Condicao (25 condições D&D 3.5)
 └── nome, descricao, icone
 
-Pericia (37 perícias D&D 3.5)
-└── nome, atributo (FOR/DES/CON/INT/SAB/CAR)
+Pericia (54 perícias D&D 3.5)
+├── nome, atributo (FOR/DES/CON/INT/SAB/CAR)
+└── ──(N:N) PericiaClasse → classe_nome, is_default (custo 1 = da classe / 2 = fora)
 ```
 
 ---
@@ -405,6 +409,7 @@ Pericia (37 perícias D&D 3.5)
 |---|---|---|---|
 | `GET` | `/combatentes/{id}/ataques` | ✅ | Listar ataques |
 | `POST` | `/combatentes/{id}/ataques` | ✅ | Adicionar (bulk) |
+| `PUT` | `/combatentes/{id}/ataques` | ✅ | Substituir lista completa (editor inline) |
 | `DELETE` | `/ataques/{id}` | ✅ | Remover ataque |
 
 ### Magias (`/api/v1/magias`)
@@ -581,9 +586,10 @@ Registro.br (domínio) → Cloudflare (DNS + CDN) → Vercel (frontend)
 
 #### 5. Anti-sleep no Render (gratuito)
 O Render free tier dorme após 15 min de inatividade. Para evitar cold start:
-1. Crie conta gratuita em [uptimerobot.com](https://uptimerobot.com)
-2. New Monitor → HTTP(S) → URL: `https://arena-rpg-api.onrender.com/health`
-3. Intervalo: **14 minutos** — mantém a API sempre acordada
+1. Crie conta gratuita em [cron-job.org](https://cron-job.org)
+2. Novo cron job → URL: `https://projetorpg-7ih3.onrender.com/health`
+3. Schedule: `*/10 * * * *` (a cada 10 min) — mantém a API sempre acordada
+4. O endpoint `/health` retorna 200 instantaneamente sem tocar no banco
 
 ---
 
