@@ -5,6 +5,7 @@ SOLID: DIP via Session injetada no constructor
 """
 from typing import List, Optional
 from sqlalchemy.orm import Session
+import sqlalchemy as sa
 
 from .base import BaseRepository, apply_not_deleted, commit_with_rollback
 from ..models.combatente import Combatente
@@ -87,12 +88,18 @@ class CombatenteRepository(BaseRepository[Combatente]):
         )
 
     def get_vivos_by_ids(self, combatente_ids: List[int]) -> List[Combatente]:
-        """Busca combatentes vivos (hp_atual > 0) de uma lista de IDs."""
+        """
+        Busca combatentes vivos de uma lista de IDs.
+        D&D 3.5: monstros morrem a 0 HP; jogadores/NPCs morrem a -10 HP.
+        """
         return (
             apply_not_deleted(self.db.query(Combatente), Combatente)
             .filter(
                 Combatente.id.in_(combatente_ids),
-                Combatente.hp_atual > 0,
+                sa.or_(
+                    sa.and_(Combatente.tipo == 'monstro', Combatente.hp_atual > 0),
+                    sa.and_(Combatente.tipo.in_(['jogador', 'npc']), Combatente.hp_atual > -10),
+                ),
             )
             .all()
         )

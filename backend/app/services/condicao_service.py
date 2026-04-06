@@ -35,6 +35,9 @@ CONDICOES_SEED = [
     {"nome": "Paralisado",     "efeito": "Fica rígido e incapaz de agir. CA cerde bônus de Destreza. Opositores têm +4 e podem aplicar golpe de misericórdia."},
     {"nome": "Sangrando",      "efeito": "Perde 1 PV por rodada até receber cura ou ser estabilizado (Primeiros Socorros CD 15)."},
     {"nome": "Surdo",          "efeito": "-4 em testes de iniciativa. 20% de falha em conjuração com componentes verbais."},
+    # ── Condições automáticas de HP (D&D 3.5) ─────────────────────────────
+    {"nome": "Inconsciente",   "efeito": "HP igual a 0. Incapaz de agir. Estável, mas inconsciente — sem perder HP por rodada. Pode ser acordado com cura."},
+    {"nome": "Morrendo",       "efeito": "HP entre -1 e -9. Incapacitado e sangrando — perde 1 PV por rodada sem socorro. Pode ser estabilizado com Primeiros Socorros (CD 15) ou cura mágica. Morre ao atingir -10 HP."},
 ]
 
 

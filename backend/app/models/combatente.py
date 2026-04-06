@@ -11,7 +11,7 @@ from .mixins import SoftDeleteMixin
 class Combatente(SoftDeleteMixin, Base):
     __tablename__  = "combatentes"
     __table_args__ = (
-        CheckConstraint("hp_atual >= 0", name="ck_combatentes_hp_atual_non_negative"),
+        CheckConstraint("hp_atual >= -10", name="ck_combatentes_hp_atual_minimum"),
         CheckConstraint("hp_maximo > 0", name="ck_combatentes_hp_maximo_positive"),
         CheckConstraint("hp_atual <= hp_maximo", name="ck_combatentes_hp_atual_lte_hp_maximo"),
         CheckConstraint("tipo IN ('jogador', 'monstro', 'npc')", name="ck_combatentes_tipo_valido"),
@@ -106,11 +106,20 @@ class Combatente(SoftDeleteMixin, Base):
     def __repr__(self) -> str:
         return f"<Combatente(id={self.id}, nome='{self.nome}', tipo='{self.tipo}')>"
 
-    def esta_vivo(self)    -> bool: return self.hp_atual > 0
-    def esta_critico(self) -> bool: return self.hp_atual < self.hp_maximo * 0.25
+    def esta_vivo(self) -> bool:
+        """Monstros morrem a 0 HP; Jogadores e NPCs morrem a -10 HP (D&D 3.5)."""
+        if self.tipo == 'monstro':
+            return self.hp_atual > 0
+        return self.hp_atual > -10
+
+    def esta_critico(self) -> bool: return 0 < self.hp_atual < self.hp_maximo * 0.25
 
     def aplicar_dano(self, dano: int) -> int:
-        self.hp_atual = max(0, self.hp_atual - dano)
+        """Aplica dano. Monstros não ficam negativos; jogadores/NPCs chegam até -10."""
+        if self.tipo == 'monstro':
+            self.hp_atual = max(0, self.hp_atual - dano)
+        else:
+            self.hp_atual = max(-10, self.hp_atual - dano)
         return self.hp_atual
 
     def curar(self, cura: int) -> int:

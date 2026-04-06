@@ -17,9 +17,9 @@ export class CombatenteAtivoView {
             return;
         }
         
-        const isMorto = combatente.hp_atual <= 0;
-        const isCritico = combatente.hp_atual < combatente.hp_maximo * 0.25;
-        const hpPercent = (combatente.hp_atual / combatente.hp_maximo) * 100;
+        const isMorto = combatente.tipo === 'monstro' ? combatente.hp_atual <= 0 : combatente.hp_atual <= -10;
+        const isCritico = combatente.hp_atual > 0 && combatente.hp_atual < combatente.hp_maximo * 0.25;
+        const hpPercent = (Math.max(0, combatente.hp_atual) / combatente.hp_maximo) * 100;
         
         // Cor da barra de HP
         let corHP = '#32CD32'; // Verde

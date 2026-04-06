@@ -8,7 +8,7 @@ export const formatters = {
      * Formata HP com indicador de crítico
      */
     formatarHP(hpAtual, hpMaximo) {
-        const percentual = (hpAtual / hpMaximo) * 100;
+        const percentual = (Math.max(0, hpAtual) / hpMaximo) * 100;
         const isCritico = percentual < 25;
         
         return {

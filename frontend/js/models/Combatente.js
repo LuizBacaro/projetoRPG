@@ -32,8 +32,11 @@ export class Combatente {
         this.magias_preparadas = Array.isArray(data.magias_preparadas) ? data.magias_preparadas : [];
     }
 
-    estaVivo()    { return this.hp_atual > 0; }
-    estaCritico() { return this.hp_atual < this.hp_maximo * 0.25; }
+    estaVivo() {
+        if (this.tipo === 'monstro') return this.hp_atual > 0;
+        return this.hp_atual > -10;
+    }
+    estaCritico() { return this.hp_atual > 0 && this.hp_atual < this.hp_maximo * 0.25; }
 
     calcularModificador(atributo) {
         var valor = this[atributo] || 10;
@@ -45,6 +48,6 @@ export class Combatente {
         return mod >= 0 ? ('+' + mod) : ('' + mod);
     }
 
-    getHPPercentual() { return (this.hp_atual / this.hp_maximo) * 100; }
+    getHPPercentual() { return (Math.max(0, this.hp_atual) / this.hp_maximo) * 100; }
     getBadgeClass()   { return 'badge-' + this.tipo; }
 }

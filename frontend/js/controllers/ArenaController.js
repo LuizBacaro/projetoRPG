@@ -533,9 +533,9 @@ export class ArenaController {
             var c      = this.combatentes[i];
             var ativo  = (i === this.turnoAtual);
             var jaAgiu = (this._jaAgiram.indexOf(c.id) !== -1);
-            var hpPct  = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
+            var hpPct  = Math.max(0, Math.min(100, (c.hp_atual / c.hp_maximo) * 100));
             var hpCor  = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
-            var morto  = (c.hp_atual <= 0);
+            var morto  = (c.tipo === 'monstro') ? (c.hp_atual <= 0) : (c.hp_atual <= -10);
             var cls    = 'combatente-ordem-item';
             if (ativo)  cls += ' ativo';
             if (morto)  cls += ' morto';
@@ -599,7 +599,7 @@ export class ArenaController {
 
         this.renderizarFotoAtivo();
 
-        var hpPct = Math.min(100, (c.hp_atual / c.hp_maximo) * 100);
+        var hpPct = Math.max(0, Math.min(100, (c.hp_atual / c.hp_maximo) * 100));
         var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
 
         var ca       = c.ca        ?? 10;

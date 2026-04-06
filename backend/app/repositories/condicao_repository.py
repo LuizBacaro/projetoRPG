@@ -39,6 +39,10 @@ class CondicaoRepository:
         """Retorna uma condição por ID"""
         return self.db.query(Condicao).filter(Condicao.id == condicao_id).first()
 
+    def get_by_nome(self, nome: str) -> Optional[Condicao]:
+        """Retorna uma condição pelo nome exato."""
+        return self.db.query(Condicao).filter(Condicao.nome == nome).first()
+
     def seed(self, condicoes_data: List[Dict]) -> None:
         """Popula a tabela com as 25 condições padrão D&D"""
         for data in condicoes_data:

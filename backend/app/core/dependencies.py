@@ -41,12 +41,18 @@ def get_grimorio_repository(db: Session = Depends(get_db)) -> GrimorioRepository
 
 # ==================== SERVICES ====================
 
+def get_condicao_repository(db: Session = Depends(get_db)) -> CondicaoRepository:
+    """Factory para CondicaoRepository"""
+    return CondicaoRepository(db)
+
+
 def get_combatente_service(
     repository: CombatenteRepository = Depends(get_combatente_repository),
+    condicao_repo: CondicaoRepository = Depends(get_condicao_repository),
 ) -> CombatenteService:
     """Factory para CombatenteService"""
     file_service = FileService()
-    return CombatenteService(repository, file_service)
+    return CombatenteService(repository, file_service, condicao_repo)
 
 
 def get_combate_service(

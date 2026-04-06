@@ -26,7 +26,7 @@ export class OrdemIniciativa {
         
         combatentesOrdenados.forEach((combatente, index) => {
             const isAtivo = combatente.id === combate.combatente_ativo_id;
-            const isMorto = combatente.hp_atual <= 0;
+            const isMorto = combatente.tipo === 'monstro' ? combatente.hp_atual <= 0 : combatente.hp_atual <= -10;
             
             const item = document.createElement('div');
             item.className = `ordem-item ${isAtivo ? 'ordem-ativo' : ''} ${isMorto ? 'ordem-morto' : ''}`;

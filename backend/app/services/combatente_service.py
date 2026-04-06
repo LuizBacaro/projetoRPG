@@ -8,6 +8,7 @@ import unicodedata
 from typing import List, Optional, Dict
 
 from ..repositories.combatente_repository import CombatenteRepository
+from ..repositories.condicao_repository import CondicaoRepository
 from ..repositories.base import commit_with_rollback
 from ..services.file_service import FileService
 from ..models.combatente import Combatente
@@ -18,12 +19,22 @@ from ..exceptions.custom_exceptions import (
 )
 from ..models.usuario import PerfilUsuario
 
+# Nomes canônicos das condições automáticas de HP (D&D 3.5)
+_CONDICAO_INCONSCIENTE = "Inconsciente"
+_CONDICAO_MORRENDO     = "Morrendo"
+
 
 class CombatenteService:
 
-    def __init__(self, repository: CombatenteRepository, file_service: FileService):
-        self.repository   = repository
-        self.file_service = file_service
+    def __init__(
+        self,
+        repository: CombatenteRepository,
+        file_service: FileService,
+        condicao_repository: Optional[CondicaoRepository] = None,
+    ):
+        self.repository        = repository
+        self.file_service      = file_service
+        self.condicao_repo     = condicao_repository
 
     # ── CRUD ─────────────────────────────────────────────
 
@@ -145,30 +156,29 @@ class CombatenteService:
     def aplicar_dano(self, combatente_id: int, valor: int) -> Dict:
         """
         Aplica dano ao combatente.
-        SRP: validação + cálculo + persistência aqui; serialização em _response_dano_cura.
+        - Monstros: morrem a 0 HP (não ficam negativos).
+        - Jogadores/NPCs: chegam a -10 HP (morte) ou ficam no range -1 a -9 (morrendo).
+        Aplica condições automáticas Inconsciente/Morrendo conforme D&D 3.5.
         """
         if valor <= 0:
             raise DadosInvalidos("Valor de dano deve ser maior que zero")
 
-        combatente   = self.obter_por_id(combatente_id)
-        hp_anterior  = combatente.hp_atual
-        novo_hp      = max(0, combatente.hp_atual - valor)
-        dano_efetivo = hp_anterior - novo_hp
-
-        combatente.hp_atual = novo_hp
+        combatente  = self.obter_por_id(combatente_id)
+        hp_anterior = combatente.hp_atual
+        # aplicar_dano() no model já respeita as regras por tipo
+        novo_hp     = combatente.aplicar_dano(valor)
         self.repository.update(combatente)
 
-        mensagem = (
-            f"{combatente.nome} foi derrotado! 💀"
-            if novo_hp == 0
-            else f"{combatente.nome} sofreu {dano_efetivo} de dano"
-        )
+        # Atualiza condições automáticas de HP
+        self._sincronizar_estado_hp(combatente)
+
+        mensagem = self._mensagem_dano(combatente, hp_anterior, hp_anterior - novo_hp)
         return self._response_dano_cura(combatente, mensagem)
 
     def aplicar_cura(self, combatente_id: int, valor: int) -> Dict:
         """
         Aplica cura ao combatente.
-        SRP: validação + cálculo + persistência aqui; serialização em _response_dano_cura.
+        Remove condições Morrendo/Inconsciente se HP sobe acima de 0.
         """
         if valor <= 0:
             raise DadosInvalidos("Valor de cura deve ser maior que zero")
@@ -181,12 +191,88 @@ class CombatenteService:
         combatente.hp_atual = novo_hp
         self.repository.update(combatente)
 
+        # Atualiza condições automáticas de HP
+        self._sincronizar_estado_hp(combatente)
+
         mensagem = (
             f"{combatente.nome} já está com HP máximo"
             if cura_efetiva == 0
             else f"{combatente.nome} recuperou {cura_efetiva} HP"
         )
         return self._response_dano_cura(combatente, mensagem)
+
+    def _sincronizar_estado_hp(self, combatente: Combatente) -> None:
+        """
+        Aplica ou remove condições Inconsciente/Morrendo com base no HP atual.
+        Execução silenciosa — falha de lookup de condição não interrompe o fluxo.
+        """
+        if self.condicao_repo is None:
+            return
+
+        hp      = combatente.hp_atual
+        tipo    = combatente.tipo
+        cid     = combatente.id
+
+        id_inconsciente = self._id_condicao(_CONDICAO_INCONSCIENTE)
+        id_morrendo     = self._id_condicao(_CONDICAO_MORRENDO)
+
+        if tipo == 'monstro':
+            # Monstros não recebem Inconsciente/Morrendo — morrem diretamente.
+            if id_inconsciente:
+                self.condicao_repo.remover(cid, id_inconsciente)
+            if id_morrendo:
+                self.condicao_repo.remover(cid, id_morrendo)
+            return
+
+        # Jogador / NPC
+        if hp > 0:
+            # Vivo e consciente — remove ambas as condições
+            if id_inconsciente:
+                self.condicao_repo.remover(cid, id_inconsciente)
+            if id_morrendo:
+                self.condicao_repo.remover(cid, id_morrendo)
+        elif hp == 0:
+            # Inconsciente mas estável
+            if id_morrendo:
+                self.condicao_repo.remover(cid, id_morrendo)
+            if id_inconsciente:
+                self.condicao_repo.aplicar(cid, id_inconsciente, duracao_turnos=-1)
+        elif -10 < hp < 0:
+            # Morrendo (-1 a -9)
+            if id_inconsciente:
+                self.condicao_repo.remover(cid, id_inconsciente)
+            if id_morrendo:
+                self.condicao_repo.aplicar(cid, id_morrendo, duracao_turnos=-1)
+        else:
+            # Morto (hp <= -10) — remove condições de processo
+            if id_inconsciente:
+                self.condicao_repo.remover(cid, id_inconsciente)
+            if id_morrendo:
+                self.condicao_repo.remover(cid, id_morrendo)
+
+    def _id_condicao(self, nome: str) -> Optional[int]:
+        """Retorna o ID de uma condição pelo nome, ou None se não existir."""
+        try:
+            condicao = self.condicao_repo.get_by_nome(nome)
+            return condicao.id if condicao else None
+        except Exception:
+            return None
+
+    def _mensagem_dano(self, combatente: Combatente, hp_anterior: int, dano_efetivo: int) -> str:
+        hp = combatente.hp_atual
+        tipo = combatente.tipo
+        if tipo == 'monstro':
+            if hp <= 0:
+                return f"{combatente.nome} foi derrotado! 💀"
+            return f"{combatente.nome} sofreu {dano_efetivo} de dano"
+        # Jogador / NPC
+        if hp <= -10:
+            return f"{combatente.nome} morreu! ☠️"
+        if hp < 0:
+            return f"{combatente.nome} está morrendo! ({hp} HP) 🩸"
+        if hp == 0:
+            return f"{combatente.nome} caiu inconsciente! 😵"
+        return f"{combatente.nome} sofreu {dano_efetivo} de dano"
 
     # ── Helpers privados ──────────────────────────────────
 

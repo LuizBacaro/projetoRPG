@@ -29,7 +29,7 @@ export class Combate {
      * Conta combatentes vivos
      */
     contarVivos() {
-        return this.combatentes.filter(c => c.hp_atual > 0).length;
+        return this.combatentes.filter(c => c.estaVivo()).length;
     }
     
     /**
