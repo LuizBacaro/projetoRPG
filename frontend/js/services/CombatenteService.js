@@ -10,7 +10,6 @@ import { Combatente } from '../models/Combatente.js';
 export class CombatenteService {
     constructor() {
         this.token = localStorage.getItem('token');
-        console.log('✅ CombatenteService inicializado');
     }
 
     /**
@@ -33,7 +32,6 @@ export class CombatenteService {
                 ? `${getApiUrl('/combatentes')}?tipo=${tipo}`
                 : getApiUrl('/combatentes');
 
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -48,7 +46,6 @@ export class CombatenteService {
             }
 
             const data = await response.json();
-            console.log('✅ Combatentes carregados:', data.length);
             return data.map(item => this._toModel(item));
 
         } catch (error) {
@@ -65,7 +62,6 @@ export class CombatenteService {
     async obterCombatente(id) {
         try {
             const url = `${getApiUrl('/combatentes')}/${id}`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -80,7 +76,6 @@ export class CombatenteService {
             }
 
             const data = await response.json();
-            console.log('✅ Combatente carregado:', data.nome);
             return this._toModel(data);
 
         } catch (error) {
@@ -106,7 +101,6 @@ export class CombatenteService {
     async criar(formData) {
         try {
             const url = getApiUrl('/combatentes');
-            console.log('📡 POST:', url);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -122,7 +116,6 @@ export class CombatenteService {
             }
 
             const data = await response.json();
-            console.log('✅ Combatente criado:', data.nome);
             return this._toModel(data);
 
         } catch (error) {
@@ -140,7 +133,6 @@ export class CombatenteService {
     async atualizar(id, formData) {
         try {
             const url = `${getApiUrl('/combatentes')}/${id}`;
-            console.log('📡 PUT:', url);
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -156,7 +148,6 @@ export class CombatenteService {
             }
 
             const data = await response.json();
-            console.log('✅ Combatente atualizado:', data.nome);
             return this._toModel(data);
 
         } catch (error) {
@@ -174,7 +165,6 @@ export class CombatenteService {
     async atualizarHP(id, hpAtual) {
         try {
             const url = `${getApiUrl('/combatentes')}/${id}/hp`;
-            console.log('📡 PATCH:', url);
 
             const response = await fetch(url, {
                 method: 'PATCH',
@@ -190,7 +180,6 @@ export class CombatenteService {
             }
 
             const data = await response.json();
-            console.log('✅ HP atualizado para:', hpAtual);
             return this._toModel(data);
 
         } catch (error) {
@@ -208,7 +197,6 @@ export class CombatenteService {
     async atualizarIniciativa(id, iniciativa) {
         try {
             const url = `${getApiUrl('/combatentes')}/${id}/iniciativa`;
-            console.log('📡 PATCH:', url);
 
             const response = await fetch(url, {
                 method: 'PATCH',
@@ -224,7 +212,6 @@ export class CombatenteService {
             }
 
             const data = await response.json();
-            console.log('✅ Iniciativa atualizada para:', iniciativa);
             return this._toModel(data);
 
         } catch (error) {
@@ -241,7 +228,6 @@ export class CombatenteService {
     async deletar(id) {
         try {
             const url = `${getApiUrl('/combatentes')}/${id}`;
-            console.log('📡 DELETE:', url);
 
             const response = await fetch(url, {
                 method: 'DELETE',
@@ -254,7 +240,6 @@ export class CombatenteService {
                 throw new Error(`HTTP ${response.status}: Erro ao deletar combatente`);
             }
 
-            console.log('✅ Combatente deletado');
             return true;
 
         } catch (error) {

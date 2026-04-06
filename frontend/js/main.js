@@ -10,7 +10,6 @@ import {
 var app = { controllers: {}, modals: {} };
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Arena de Combate TTRPG - Iniciando...');
     installGlobalErrorGuards('arena');
 
     if (typeof AuthService !== 'undefined') {
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof DanoCuraService !== 'undefined' && typeof ModalDanoCura !== 'undefined') {
         try {
             window.modalDanoCuraInstance = new ModalDanoCura(new DanoCuraService(), app.controllers.arena);
-            console.log('Modal de Dano/Cura inicializado');
         } catch (e) {
             reportDegradedMode('modal-dano-cura', e, 'Falha ao iniciar modal de dano/cura.');
         }
@@ -52,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof ModalCondicao !== 'undefined' && typeof CondicaoService !== 'undefined') {
         try {
             window.modalCondicaoInstance = new ModalCondicao(new CondicaoService('/api'), app.controllers.arena);
-            console.log('Modal de Condicao inicializado');
         } catch (e) {
             reportDegradedMode('modal-condicao', e, 'Falha ao iniciar modal de condicoes.');
         }
@@ -180,7 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    console.log('Arena inicializada com sucesso!');
 });
 
 function _exibirUsuarioHeader() {

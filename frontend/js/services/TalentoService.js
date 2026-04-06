@@ -10,7 +10,6 @@ export class TalentoService {
     constructor() {
         this.baseUrl = getApiUrl('/talentos');
         this.token = localStorage.getItem('token');
-        console.log('✅ TalentoService inicializado');
     }
 
     /**
@@ -22,7 +21,6 @@ export class TalentoService {
     async listarTalentos(skip = 0, limit = 100) {
         try {
             const url = `${this.baseUrl}?skip=${skip}&limit=${limit}`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 headers: {
@@ -36,7 +34,6 @@ export class TalentoService {
             }
 
             const data = await response.json();
-            console.log('✅ Talentos carregados:', data.length);
             return data;
 
         } catch (error) {
@@ -53,7 +50,6 @@ export class TalentoService {
     async listarTalentosJogador(combatenteId) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/listar`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 headers: {
@@ -67,7 +63,6 @@ export class TalentoService {
             }
 
             const data = await response.json();
-            console.log('✅ Talentos do jogador carregados:', data.length);
             return data;
 
         } catch (error) {
@@ -84,7 +79,6 @@ export class TalentoService {
     async criarTalento(talento) {
         try {
             const url = this.baseUrl;
-            console.log('📡 POST:', url, talento);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -100,7 +94,6 @@ export class TalentoService {
             }
 
             const data = await response.json();
-            console.log('✅ Talento criado:', data.nome);
             return data;
 
         } catch (error) {
@@ -118,7 +111,6 @@ export class TalentoService {
     async adicionarTalento(combatenteId, talentoJogador) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/adicionar`;
-            console.log('📡 POST:', url, talentoJogador);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -134,7 +126,6 @@ export class TalentoService {
             }
 
             const data = await response.json();
-            console.log('✅ Talento adicionado:', data.nome);
             return data;
 
         } catch (error) {
@@ -152,7 +143,6 @@ export class TalentoService {
     async removerTalento(combatenteId, talentoId) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/remover/${talentoId}`;
-            console.log('📡 DELETE:', url);
 
             const response = await fetch(url, {
                 method: 'DELETE',
@@ -166,7 +156,6 @@ export class TalentoService {
                 throw new Error(`HTTP ${response.status}: Erro ao remover talento`);
             }
 
-            console.log('✅ Talento removido');
 
         } catch (error) {
             console.error('❌ Erro em removerTalento:', error);

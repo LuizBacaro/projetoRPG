@@ -8,7 +8,6 @@
 class DanoCuraService {
 
     constructor() {
-        console.log('✅ DanoCuraService inicializado (modo com persistência)');
     }
 
     _buildHeaders() {
@@ -46,7 +45,6 @@ class DanoCuraService {
             }
 
             const resultado = await response.json();
-            console.log(`💥 ${resultado.mensagem}`);
             return resultado;
 
         } catch (erro) {
@@ -75,7 +73,6 @@ class DanoCuraService {
             }
 
             const resultado = await response.json();
-            console.log(`💚 ${resultado.mensagem}`);
             return resultado;
 
         } catch (erro) {
@@ -95,7 +92,6 @@ class DanoCuraService {
             throw new Error('Valor de dano inválido');
         }
 
-        console.log(`⚔️ Aplicando ${valorDano} de dano a ${combatenteIds.length} combatente(s)`);
 
         const promessas = combatenteIds.map(id => this.aplicarDano(id, valorDano));
 
@@ -118,7 +114,6 @@ class DanoCuraService {
             throw new Error('Valor de cura inválido');
         }
 
-        console.log(`💚 Aplicando ${valorCura} de cura a ${combatenteIds.length} combatente(s)`);
 
         const promessas = combatenteIds.map(id => this.aplicarCura(id, valorCura));
 

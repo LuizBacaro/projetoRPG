@@ -194,7 +194,6 @@ export class ArenaController {
                     const preparadas = await this.magiaPreparadaService.listar(c.id);
                     c._magiasPreparadas = preparadas;
                     c._magiasGrupos = this.magiaPreparadaService.agruparPorNivel(preparadas, c.magias_slots || []);
-                    console.log(`✅ ${c.nome}: ${preparadas.length} magias preparadas`);
                 } catch (err) {
                     console.warn(`⚠️ Sem magias preparadas para ${c.nome}:`, err.message);
                     c._magiasPreparadas = [];
@@ -282,7 +281,6 @@ export class ArenaController {
     // ✅ CORRETO - SEM /v1 (getApiUrl já adiciona)
     async _decrementarDuracaoCondicoes(combatenteId) {
         try {
-            console.log(`⏰ Decrementando duração para combatente #${combatenteId}...`);
             
             const baseUrl = getApiUrl(`/condicoes/combatentes/${combatenteId}/avancar-turno`);
             
@@ -293,7 +291,6 @@ export class ArenaController {
                 return;
             }
 
-            console.log(`📡 POST: ${baseUrl}`);
             
             const res = await fetch(baseUrl, {
                 method: 'POST',
@@ -311,7 +308,6 @@ export class ArenaController {
             }
             
             const data = await res.json();
-            console.log(`✅ Duração decrementada:`, data.condicoes);
             
             // Recarregar condições do combatente atual
             const combatenteAtual = this.combatentes[this.turnoAtual];

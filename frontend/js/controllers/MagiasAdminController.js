@@ -1260,7 +1260,6 @@ class MagiasAdminController {
             return;
         }
         if (type === 'error') console.error(message);
-        else console.log(message);
     }
 }
 

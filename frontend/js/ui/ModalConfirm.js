@@ -103,9 +103,7 @@ class ModalConfirm {
             overlay.classList.add('show');
         });
 
-        console.log('📋 Modal confirmação aberto:', opcoes.titulo);
     }
 }
 
 window.ModalConfirm = ModalConfirm;
-console.log('✅ ModalConfirm registrado em window');

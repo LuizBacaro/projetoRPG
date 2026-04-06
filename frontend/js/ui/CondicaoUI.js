@@ -24,7 +24,6 @@ class ModalCondicao {
     async _carregarCatalogo() {
         try {
             this.todasCondicoes = await this.condicaoService.listarTodas();
-            console.log('✅ Catálogo de condições carregado:', this.todasCondicoes.length);
         } catch (err) {
             console.error('❌ Erro ao carregar catálogo:', err);
         }
@@ -203,7 +202,6 @@ class ModalCondicao {
             if (btnRemover) {
                 btnRemover.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    console.log(`🗑️ Removendo condição #${c.condicao_id} do combatente #${combatenteId}`);
                     if (typeof onRemover === 'function') {
                         onRemover(combatenteId, c.condicao_id);
                     } else {

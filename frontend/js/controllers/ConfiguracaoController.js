@@ -184,7 +184,6 @@ export class ConfiguracaoController {
         }
 
         try {
-            console.log('🎯 Iniciando combate com IDs:', this.combatentesSelecionados);
 
             const response = await fetch(getApiUrl('/combate/iniciar'), {
                 method: 'POST',

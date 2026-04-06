@@ -18,7 +18,6 @@ export class PericiaFichaController {
         this.periciasAdicionadas = new Map();
         this.operacoesEmAndamento = new Set();
         this.token = localStorage.getItem('token');
-        console.log('✅ PericiaFichaController inicializado');
     }
 
     _chaveOperacao(tipo, periciaId) {
@@ -48,16 +47,13 @@ export class PericiaFichaController {
                 throw new Error('ID do combatente não fornecido na URL');
             }
 
-            console.log('🎯 Carregando combatente:', combatenteId);
             
             // Carregar combatente
             this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
-            console.log('✅ Combatente carregado:', this.combatente.nome);
 
             // Carregar perícias disponíveis
             const classe = this.combatente.classe || 'Guerreiro';
             this.pericias = await this.periciaService.listarPericiasComCusto(classe, 0, 100);
-            console.log(`✅ Perícias carregadas: ${this.pericias.length}`);
 
             // Carregar perícias já adicionadas
             await this.carregarPericiasAdicionadas(parseInt(combatenteId));
@@ -118,7 +114,6 @@ export class PericiaFichaController {
                             total: (p.graduacao || 0) + (p.modificador_atributo || 0) + (p.bonus_outros || 0)
                         });
                     });
-                    console.log(`✅ ${this.periciasAdicionadas.size} perícias já adicionadas`);
                 }
             }
         } catch (error) {
@@ -295,7 +290,6 @@ export class PericiaFichaController {
                 dados.total = (graduacao || 0) + (dados.modificador_atributo || 0) + (bonusOutros || 0);
             }
 
-            console.log('✅ Perícia atualizada:', response);
         } catch (error) {
             console.error('❌ Erro ao atualizar perícia:', error);
             NotificationService.mostrarErro('❌ Erro: ' + error.message);
@@ -316,7 +310,6 @@ export class PericiaFichaController {
 
             const classe = this.combatente?.classe || 'Guerreiro';
 
-            console.log(`📝 Adicionando perícia ${periciaId} com ${graduacao} graduação...`);
 
             btnElement.disabled = true;
             btnElement.textContent = '⏳';
@@ -328,7 +321,6 @@ export class PericiaFichaController {
                 classe
             );
 
-            console.log('✅ Perícia adicionada:', response);
 
             // Marcar como adicionada
             this.periciasAdicionadas.set(periciaId, {
@@ -384,7 +376,6 @@ export class PericiaFichaController {
             const dados = this.periciasAdicionadas.get(periciaId);
             if (!dados) return;
 
-            console.log(`🗑️ Removendo perícia ${periciaId}...`);
 
             btnElement.disabled = true;
             btnElement.textContent = '⏳';
@@ -402,7 +393,6 @@ export class PericiaFichaController {
                 throw new Error(`HTTP ${response.status}`);
             }
 
-            console.log('✅ Perícia removida');
 
             // Remover do mapa
             this.periciasAdicionadas.delete(periciaId);

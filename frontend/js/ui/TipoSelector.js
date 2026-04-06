@@ -7,7 +7,6 @@ export class TipoSelector {
      * Mostra o seletor de tipo
      */
     static mostrar(callback) {
-        console.log('🎯 TipoSelector.mostrar() chamado');
         
         // Remover modal anterior se existir
         const modalAntigo = document.getElementById('modalSeletorTipo');
@@ -19,16 +18,13 @@ export class TipoSelector {
         const modal = this.criarModal();
         document.body.appendChild(modal);
         
-        console.log('✅ Modal seletor criado e adicionado ao DOM');
         
         // Configurar eventos
         const botoes = modal.querySelectorAll('.tipo-option');
-        console.log(`📍 Encontrados ${botoes.length} botões no modal`);
         
         botoes.forEach((botao) => {
             botao.addEventListener('click', () => {
                 const tipo = botao.dataset.tipo;
-                console.log(`✅ Clique no botão tipo: ${tipo}`);
                 
                 this.fechar();
                 
@@ -46,7 +42,6 @@ export class TipoSelector {
         // Mostrar modal
         setTimeout(() => {
             modal.classList.add('show');
-            console.log('✅ Modal seletor exibido');
         }, 50);
     }
     
@@ -99,7 +94,6 @@ export class TipoSelector {
      * Fecha o modal
      */
     static fechar() {
-        console.log('🚪 Fechando modal seletor');
         const modal = document.getElementById('modalSeletorTipo');
         if (modal) {
             modal.classList.remove('show');

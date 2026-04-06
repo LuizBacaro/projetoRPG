@@ -11,13 +11,11 @@ export class CondicaoController {
     }
 
     init() {
-        console.log('✅ CondicaoController inicializado');
     }
 
     async carregarCondicoesDoCombatente(combatenteId) {
         this.combatenteAtual = combatenteId;
         try {
-            console.log(`📡 Carregando condições do combatente #${combatenteId}...`);
             const data = await this.service.listarDoCombatente(combatenteId);
             
             if (typeof modalCondicaoInstance !== 'undefined') {
@@ -28,7 +26,6 @@ export class CondicaoController {
                     (cid, condId) => this._removerCondicao(cid, condId)
                 );
             }
-            console.log(`✅ ${data.condicoes.length} condição(ões) carregada(s)`);
         } catch (err) {
             console.error('❌ Erro ao carregar condições:', err);
         }
@@ -48,7 +45,6 @@ export class CondicaoController {
     // ✅ REFATORADO: _removerCondicao com async/await
     async _removerCondicao(combatenteId, condicaoId) {
         try {
-            console.log(`🗑️ Removendo condição #${condicaoId} do combatente #${combatenteId}...`);
             const data = await this.service.remover(combatenteId, condicaoId);
             
             if (typeof modalCondicaoInstance !== 'undefined') {
@@ -69,7 +65,6 @@ export class CondicaoController {
             if (typeof Toast !== 'undefined') {
                 Toast.success('✅ Condição removida!');
             }
-            console.log(`✅ Condição #${condicaoId} removida com sucesso`);
         } catch (err) {
             console.error('❌ Erro ao remover condição:', err);
             if (typeof Toast !== 'undefined') {

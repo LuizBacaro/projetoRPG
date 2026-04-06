@@ -162,7 +162,6 @@ export class CombatenteCard {
             if (inputIni) {
                 inputIni.addEventListener('change', () => {
                     const novaIniciativa = parseInt(inputIni.value) || 0;
-                    console.log(`⚡ Atualizando iniciativa de ${combatente.nome}: ${novaIniciativa}`);
                     onAtualizarIniciativa(combatente.id, novaIniciativa);
                 });
             }

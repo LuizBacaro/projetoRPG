@@ -84,13 +84,11 @@ static configurarHeaderUsuario() {
         return;
     }
 
-    console.log('⚙️ Configurando header do usuário:', usuario.nome);
 
     // ── NOME DO USUÁRIO ──
     const nomeEl = document.getElementById('nomeUsuario') || document.getElementById('nomeUsuarioArena');
     if (nomeEl) {
         nomeEl.textContent = `👤 ${usuario.nome}`;
-        console.log('✅ Nome do usuário configurado');
     }
 
     // ── BADGE DE PERFIL ──
@@ -98,7 +96,6 @@ static configurarHeaderUsuario() {
     if (badgeEl) {
         badgeEl.textContent = usuario.perfil;
         badgeEl.className = `badge-perfil ${usuario.perfil}`;
-        console.log('✅ Badge de perfil configurado');
     }
 
     // ── LINK ADMIN (apenas para administradores) ──
@@ -106,10 +103,8 @@ static configurarHeaderUsuario() {
         if (linkAdminEl) {
             if (this.isAdmin()) {
                 linkAdminEl.style.display = '';
-                console.log('✅ Link admin visível');
             } else {
                 linkAdminEl.style.display = 'none';
-                console.log('✅ Link admin oculto');
             }
         }
 
@@ -117,7 +112,6 @@ static configurarHeaderUsuario() {
         const btnLogout = document.getElementById('btnLogout') || document.getElementById('btnLogoutArena');
         if (btnLogout) {
             btnLogout.addEventListener('click', () => this.logout());
-            console.log('✅ Evento de logout configurado');
         }
     }
 

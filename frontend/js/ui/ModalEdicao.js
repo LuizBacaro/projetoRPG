@@ -73,7 +73,6 @@ class ModalEdicao {
 
     async carregar(combatenteId) {
         try {
-            console.log('Carregando combatente #' + combatenteId);
             this.combatenteAtual = { id: combatenteId };
         } catch (error) {
             console.error('Erro ao carregar combatente:', error);
@@ -139,4 +138,3 @@ class ModalEdicao {
 
 // ✅ Instanciar globalmente (SEM EXPORT)
 window.modalEdicaoInstance = new ModalEdicao();
-console.log('✅ ModalEdicao instanciado globalmente');

@@ -17,7 +17,6 @@ class UsuarioController {
         this._bindBotoes();
         this._bindTabelaAcoes();
         this.carregar();
-        console.log('✅ UsuarioController inicializado');
     }
 
     _bindBotoes() {

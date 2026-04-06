@@ -142,14 +142,12 @@ class ModalDanoCura {
         } else {
             this.combatentesSelecionados.add(combatenteId);
         }
-        console.log('✅ Combatentes selecionados:', Array.from(this.combatentesSelecionados));
     }
 
     // ── Aplicar dano ou cura ──────────────────────────────────────────────
 
     async aplicar() {
         try {
-            console.log('🎯 Iniciando aplicação de dano/cura...');
 
             const dano = parseInt(document.getElementById('inputDanoModal').value) || 0;
             const cura = parseInt(document.getElementById('inputCuraModal').value) || 0;

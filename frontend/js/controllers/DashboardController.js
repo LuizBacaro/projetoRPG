@@ -56,7 +56,6 @@ class DashboardController {
 
         this._registrarGlobais();
         this._inicializar();
-        console.log('✅ DashboardController inicializado');
     }
 
     _isMestre() {
@@ -491,7 +490,6 @@ class DashboardController {
             });
         }
 
-        console.log(`📋 Renderizando tabela com ${combatentes.length} combatente(s)...`);
     }
 
     _atualizarResumo(combatentes) {

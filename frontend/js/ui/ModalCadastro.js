@@ -26,7 +26,6 @@ export class ModalCadastro {
             this.formId = 'formCadastroNPC';   // ← NPC todo maiúsculo
         }
         
-        console.log(`🎬 ModalCadastro criado para tipo: ${tipo}`, {
             modalId: this.modalId,
             formId: this.formId
         });
@@ -53,7 +52,6 @@ export class ModalCadastro {
             return;
         }
         
-        console.log(`✅ Formulário configurado: ${this.formId}`);
         
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -132,12 +130,10 @@ export class ModalCadastro {
      * Abre o modal
      */
     abrir() {
-        console.log(`📂 Tentando abrir modal: ${this.modalId}`);
         const modal = document.getElementById(this.modalId);
         
         if (modal) {
             modal.classList.add('show');
-            console.log(`✅ Modal ${this.modalId} aberto`);
         } else {
             console.error(`❌ Modal não encontrado: ${this.modalId}`);
         }

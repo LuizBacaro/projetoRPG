@@ -12,7 +12,6 @@ import {
     safeBootstrapAsync,
 } from '../utils/graceful-degradation.js';
 
-console.log('🎮 Carregando página de perícias...');
 
 const token = localStorage.getItem('token');
 if (!token) {

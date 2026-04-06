@@ -57,7 +57,6 @@ export class FichaPersonagemController {
         this._canal = null;
         this._configurarCanalSync();
 
-        console.log('✅ FichaPersonagemController inicializado');
     }
 
     async inicializar() {
@@ -67,7 +66,6 @@ export class FichaPersonagemController {
 
             if (!combatenteId) throw new Error('ID do combatente não fornecido');
 
-            console.log('🎯 Carregando ficha do combatente:', combatenteId);
 
             this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
             await Promise.all([
@@ -78,9 +76,6 @@ export class FichaPersonagemController {
             // ✅ Expor globalmente para debug no console
             window._fichaController = this;
 
-            console.log('✅ Combatente carregado:', this.combatente.nome);
-            console.log('📦 magias_slots recebidos:', this.combatente.magias_slots);
-            console.log('⚔️ ataques recebidos:', this.combatente.ataques);
 
             // ── Renderizar tudo ──
             this.renderizarIdentidade();
@@ -98,7 +93,6 @@ export class FichaPersonagemController {
             // ── Configurar eventos ──
             this._configurarEventos();
 
-            console.log('✅ Ficha carregada com sucesso');
 
         } catch (error) {
             console.error('❌ Erro ao inicializar ficha:', error);
@@ -298,7 +292,6 @@ export class FichaPersonagemController {
                     this._processarDescansoLongoMagias(event.data);
                 }
             };
-            console.log('✅ FichaController: canal sync arena→ficha ativo');
         } catch (err) {
             console.warn('⚠️ BroadcastChannel indisponível:', err.message);
         }
@@ -316,7 +309,6 @@ export class FichaPersonagemController {
             return;
         }
 
-        console.log('📡 Sync magia recebida na ficha:', payload);
 
         // 1. Atualiza painel de slots na ficha
         this._atualizarPainelSlotsFicha(payload.nivel, payload.disponiveis, payload.total);
@@ -392,7 +384,6 @@ export class FichaPersonagemController {
             fill.style.background = cor;
         }
 
-        console.log(`📊 Slot nível ${nivel} atualizado: ${disponiveis}/${total}`);
     }
 
     /**
@@ -415,7 +406,6 @@ export class FichaPersonagemController {
                     0
                 );
                 gc._renderizarPainelSlots();
-                console.log(`📖 Grimório: slot nível ${nivel} sincronizado`);
             }
         } catch (err) {
             console.warn('⚠️ Erro ao sincronizar grimório:', err.message);
@@ -502,7 +492,6 @@ export class FichaPersonagemController {
             if (placeholder) placeholder.textContent = emojiMap[this.combatente.tipo] || '⚔️';
         }
 
-        console.log('✅ Identidade renderizada');
     }
 
     _formatarDominios(valor) {
@@ -880,7 +869,6 @@ export class FichaPersonagemController {
             if (elModResumo)   elModResumo.textContent   = mod >= 0 ? `+${mod}` : `${mod}`;
         });
 
-        console.log('✅ Atributos renderizados');
     }
 
     // ─────────────────────────────────────────────────────────
@@ -920,7 +908,6 @@ export class FichaPersonagemController {
             iniciativa.textContent = ini >= 0 ? `+${ini}` : `${ini}`;
         }
 
-        console.log('✅ Defesa renderizada');
     }
 
     // ─────────────────────────────────────────────────────────
@@ -937,7 +924,6 @@ export class FichaPersonagemController {
         if (reflex) reflex.textContent = fmt(this.combatente.reflexos  || 0);
         if (vont)   vont.textContent   = fmt(this.combatente.vontade   || 0);
 
-        console.log('✅ Resistências renderizadas');
     }
 
     // ─────────────────────────────────────────────────────────
@@ -963,7 +949,6 @@ export class FichaPersonagemController {
             </div>
         `).join('');
 
-        console.log('✅ Ataques renderizados:', ataques.length);
     }
 
     _abrirEditorAtaques() {
@@ -1023,7 +1008,6 @@ export class FichaPersonagemController {
             this.combatente.ataques = ataques;
             this.renderizarAtaques();
             document.getElementById('fichaAtaquesEditor').style.display = 'none';
-            console.log('✅ Ataques salvos:', ataques.length);
         } catch (err) {
             console.error('❌ Erro ao salvar ataques:', err);
             alert('Erro ao salvar ataques: ' + err.message);
@@ -1049,8 +1033,6 @@ export class FichaPersonagemController {
             this.combatente.magias_slots = slots;
         }
 
-        console.log('🔮 Todos os slots:', slots);
-        console.log('🔮 Slots ativos (total > 0):', slotsAtivos);
 
         if (secao) {
             const temMagia = this.combatente.tipo === 'jogador' && isClasseConjuradora(this.combatente.classe);
@@ -1059,7 +1041,6 @@ export class FichaPersonagemController {
 
         if (slotsAtivos.length === 0) {
             grid.innerHTML = '<div class="ficha-magia-vazio">Nenhum slot cadastrado</div>';
-            console.log('ℹ️ Nenhum slot de magia ativo');
             return;
         }
 
@@ -1089,7 +1070,6 @@ export class FichaPersonagemController {
             `;
         }).join('');
 
-        console.log('✅ Slots de magia renderizados:', slotsAtivos.length);
     }
 
     // ─────────────────────────────────────────────────────────
@@ -1110,7 +1090,6 @@ export class FichaPersonagemController {
 
             const data    = await res.json();
             const pericias = data.pericias || [];
-            console.log('✅ Perícias carregadas:', pericias.length);
             this.renderizarPericiasNaFicha(pericias);
 
         } catch (error) {
@@ -1161,7 +1140,6 @@ export class FichaPersonagemController {
             container.appendChild(item);
         });
 
-        console.log('✅ Perícias renderizadas:', pericias.length);
     }
 
     renderizarPericiasVazias() {
@@ -1182,7 +1160,6 @@ export class FichaPersonagemController {
     async carregarRenderizarEquipamentos(combatenteId) {
         try {
             const equipamentos = await this.equipamentoService.listarEquipamentosJogador(combatenteId);
-            console.log('✅ Equipamentos carregados:', equipamentos.length);
             
             this.renderizarEquipamentos(equipamentos);
         } catch (error) {
@@ -1233,7 +1210,6 @@ export class FichaPersonagemController {
             });
         });
 
-        console.log('✅ Equipamentos renderizados:', equipamentos.length);
     }
 
     mostrarErroEquipamentos(mensagem) {
@@ -1462,7 +1438,6 @@ export class FichaPersonagemController {
 
             // Carregar lista de equipamentos disponíveis
             const equipamentos = await this.equipamentoService.listarEquipamentos(0, 100);
-            console.log('📦 Equipamentos disponíveis:', equipamentos.length);
 
             // Armazenar para uso no filtro
             this.equipamentosDisponiveis = equipamentos;
@@ -1548,7 +1523,6 @@ export class FichaPersonagemController {
                 quantidade: quantidade
             });
 
-            console.log('✅ Equipamento adicionado');
 
             // Recarregar equipamentos
             await this.carregarRenderizarEquipamentos(this.combatente.id);
@@ -1578,7 +1552,6 @@ export class FichaPersonagemController {
         }
 
         const self = this;
-        console.log('🗑️ deletarEquipamento chamado com ID:', equipamentoId, 'Nome:', nomeEquipamento);
 
         // Usar ModalConfirm em vez de confirm()
         const opcoes = {
@@ -1589,10 +1562,8 @@ export class FichaPersonagemController {
             classeConfirmar: 'modal-confirm-btn-perigo',
             onConfirmar: async () => {
                 try {
-                    console.log('🗑️ Deletando equipamento:', equipamentoId, 'do combatente:', self.combatente.id);
                     await self.equipamentoService.removerEquipamento(self.combatente.id, equipamentoId);
 
-                    console.log('✅ Equipamento removido');
 
                     // Recarregar equipamentos
                     await self.carregarRenderizarEquipamentos(self.combatente.id);
@@ -1650,7 +1621,6 @@ export class FichaPersonagemController {
                 ativo: true
             });
 
-            console.log('✅ Equipamento criado:', novoEquipamento);
 
             // Adicionar ao combatente
             await this.equipamentoService.adicionarEquipamento(this.combatente.id, {
@@ -1685,7 +1655,6 @@ export class FichaPersonagemController {
     async carregarRenderizarTalentos(combatenteId) {
         try {
             const talentos = await this.talentoService.listarTalentosJogador(combatenteId);
-            console.log('✅ Talentos carregados:', talentos.length);
             
             this.renderizarTalentos(talentos);
         } catch (error) {
@@ -1734,7 +1703,6 @@ export class FichaPersonagemController {
             });
         });
 
-        console.log('✅ Talentos renderizados:', talentos.length);
     }
 
     mostrarErroTalentos(mensagem) {
@@ -1755,7 +1723,6 @@ export class FichaPersonagemController {
 
             // Carregar lista de talentos disponíveis
             const talentos = await this.talentoService.listarTalentos(0, 100);
-            console.log('📦 Talentos disponíveis:', talentos.length);
 
             // Armazenar para uso no filtro
             this.talentosDisponiveis = talentos;
@@ -1807,7 +1774,6 @@ export class FichaPersonagemController {
             });
         });
 
-        console.log('✅ Lista de talentos renderizada:', talentos.length);
     }
 
     filtrarTalentos() {
@@ -1835,7 +1801,6 @@ export class FichaPersonagemController {
                 talento_id: talentoId
             });
 
-            console.log('✅ Talento adicionado');
 
             // Recarregar talentos
             await this.carregarRenderizarTalentos(this.combatente.id);
@@ -1862,7 +1827,6 @@ export class FichaPersonagemController {
         }
 
         const self = this;
-        console.log('🗑️ deletarTalento chamado com ID:', talentoId, 'Nome:', nomeTalento);
 
         // Usar ModalConfirm em vez de confirm()
         const opcoes = {
@@ -1873,10 +1837,8 @@ export class FichaPersonagemController {
             classeConfirmar: 'modal-confirm-btn-perigo',
             onConfirmar: async () => {
                 try {
-                    console.log('🗑️ Deletando talento:', talentoId, 'do combatente:', self.combatente.id);
                     await self.talentoService.removerTalento(self.combatente.id, talentoId);
 
-                    console.log('✅ Talento removido');
 
                     // Recarregar talentos
                     await self.carregarRenderizarTalentos(self.combatente.id);
@@ -1948,7 +1910,6 @@ export class FichaPersonagemController {
                 ativo: true
             });
 
-            console.log('✅ Talento criado:', novoTalento);
 
             // Adicionar ao combatente
             await this.talentoService.adicionarTalento(this.combatente.id, {

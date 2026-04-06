@@ -10,7 +10,6 @@ export class PericiaService {
     constructor() {
         this.token = localStorage.getItem('token');
         this.baseUrl = getApiUrl('/pericias');
-        console.log('✅ PericiaService inicializado');
     }
 
     /**
@@ -25,7 +24,6 @@ export class PericiaService {
             let url = `${this.baseUrl}?skip=${skip}&limit=${limit}`;
             if (atributo) url += `&atributo=${atributo.toUpperCase()}`;
 
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -40,7 +38,6 @@ export class PericiaService {
             }
 
             const data = await response.json();
-            console.log('✅ Perícias carregadas:', data.length);
             return data;
 
         } catch (error) {
@@ -57,7 +54,6 @@ export class PericiaService {
     async obterPericia(periciaId) {
         try {
             const url = `${this.baseUrl}/${periciaId}`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -72,7 +68,6 @@ export class PericiaService {
             }
 
             const data = await response.json();
-            console.log('✅ Perícia obtida:', data.nome);
             return data;
 
         } catch (error) {
@@ -158,7 +153,6 @@ export class PericiaService {
     async listarPericiasComCusto(classe, skip = 0, limit = 100) {
         try {
             let url = `${this.baseUrl}?skip=${skip}&limit=${limit}&classe=${encodeURIComponent(classe)}`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -173,7 +167,6 @@ export class PericiaService {
             }
 
             const data = await response.json();
-            console.log(`✅ Perícias carregadas para ${classe}:`, data.length);
             return data;
 
         } catch (error) {
@@ -190,7 +183,6 @@ export class PericiaService {
     async listarPericlassesClasse(classe) {
         try {
             const url = `${this.baseUrl}/classe/${encodeURIComponent(classe)}`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -205,7 +197,6 @@ export class PericiaService {
             }
 
             const data = await response.json();
-            console.log(`✅ Perícias da classe ${classe}:`, data.length);
             return data;
 
         } catch (error) {
@@ -234,7 +225,6 @@ export class PericiaService {
                 graduacao: graduacao
             };
 
-            console.log('📡 POST:', url, payload);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -257,7 +247,6 @@ export class PericiaService {
             }
 
             const data = await response.json();
-            console.log('✅ Perícia adicionada:', data);
             return data;
 
         } catch (error) {
@@ -281,7 +270,6 @@ export class PericiaService {
                 bonus_outros: bonusOutros
             };
 
-            console.log('📡 PUT:', url, payload);
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -298,7 +286,6 @@ export class PericiaService {
             }
 
             const data = await response.json();
-            console.log('✅ Perícia atualizada:', data);
             return data;
 
         } catch (error) {
@@ -316,7 +303,6 @@ export class PericiaService {
     async removerPericia(combatenteId, periciaJogadorId) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/pericia/${periciaJogadorId}`;
-            console.log('📡 DELETE:', url);
 
             const response = await fetch(url, {
                 method: 'DELETE',
@@ -330,7 +316,6 @@ export class PericiaService {
                 throw new Error(`HTTP ${response.status}`);
             }
 
-            console.log('✅ Perícia removida');
 
         } catch (error) {
             console.error('❌ Erro em removerPericia:', error);

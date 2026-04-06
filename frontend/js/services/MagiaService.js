@@ -11,7 +11,6 @@ export class MagiaService {
     constructor(token) {
         this.token = token || localStorage.getItem('token');
         this._cache = new Map();
-        console.log('✅ MagiaService inicializado');
     }
 
     _headers() {
@@ -32,7 +31,6 @@ export class MagiaService {
         
         // Mapear Feiticeiro para Mago (mesmas magias)
         if (classNorm === 'FEITICEIRO') {
-            console.log('📚 Mapeando Feiticeiro → Mago (mesmas magias)');
             classNorm = 'MAGO';
         }
         
@@ -49,14 +47,12 @@ export class MagiaService {
         const classeNormalizada = this._normalizarClasse(classe);
 
         if (this._cache.has(classeNormalizada)) {
-            console.log(`🔄 Magias de ${classeNormalizada} recuperadas do cache`);
             return this._cache.get(classeNormalizada);
         }
 
         try {
             // Tenta buscar com filtro na API (classe em MAIÚSCULA)
             const url = getApiUrl(`/magias/?classe=${encodeURIComponent(classeNormalizada)}&limit=500`);
-            console.log(`📡 Buscando magias de ${classeNormalizada}...`);
             
             const res = await fetch(url, { headers: this._headers() });
             
@@ -74,7 +70,6 @@ export class MagiaService {
             }
 
             this._cache.set(classeNormalizada, magias);
-            console.log(`✅ ${magias.length} magias de ${classeNormalizada} carregadas da API`);
             return magias;
         } catch (err) {
             console.error(`❌ Erro ao buscar magias de ${classeNormalizada}:`, err);
@@ -96,13 +91,11 @@ export class MagiaService {
     async _listarTodasEFiltrar(classeNormalizada) {
         try {
             const url = getApiUrl('/magias/?limit=500');
-            console.log(`📡 Buscando TODAS as magias para fallback...`);
             const res = await fetch(url, { headers: this._headers() });
             
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             
             const todasMagias = await res.json();
-            console.log(`📖 Total de magias no banco: ${todasMagias.length}`);
             
             // ✅ FILTRA COMPARANDO EM MAIÚSCULA
             const magiasFiltradas = todasMagias.filter(m => {
@@ -124,7 +117,6 @@ export class MagiaService {
             });
             
             this._cache.set(classeNormalizada, magiasFiltradas);
-            console.log(`✅ ${magiasFiltradas.length} magias de ${classeNormalizada} filtradas no frontend`);
             return magiasFiltradas;
         } catch (err) {
             console.error(`❌ Erro ao filtrar magias:`, err);
@@ -150,7 +142,6 @@ export class MagiaService {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             
             const magia = await res.json();
-            console.log(`✅ Magia ID ${magiaId} carregada`);
             return magia;
         } catch (err) {
             console.error(`❌ Erro ao buscar magia ID ${magiaId}:`, err);
@@ -163,6 +154,5 @@ export class MagiaService {
      */
     limparCache() {
         this._cache.clear();
-        console.log('🗑️ Cache de MagiaService limpo');
     }
 }

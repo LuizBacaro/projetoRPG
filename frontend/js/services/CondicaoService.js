@@ -16,7 +16,6 @@ class CondicaoService {
 
     constructor() {
         this.baseUrl = _getCondicaoBaseUrl();
-        console.log('✅ CondicaoService inicializado. baseUrl:', this.baseUrl);
     }
 
     _getAuthHeader() {
@@ -43,7 +42,6 @@ class CondicaoService {
 
     async listarDoCombatente(combatenteId) {
         try {
-            console.log(`📡 GET condições do combatente: ${combatenteId}`);
             const res = await fetch(
                 `${this.baseUrl}/condicoes/combatente/${combatenteId}`,
                 {
@@ -60,7 +58,6 @@ class CondicaoService {
 
     async aplicar(combatenteId, condicaoId, durationTurnos = -1) {
         try {
-            console.log(`📡 POST aplicar condição ${condicaoId} → combatente ${combatenteId} (duração: ${durationTurnos})`);
             const res = await fetch(
                 `${this.baseUrl}/condicoes/combatente/${combatenteId}`,
                 {
@@ -85,7 +82,6 @@ class CondicaoService {
 
     async remover(combatenteId, condicaoId) {
         try {
-            console.log(`📡 DELETE condição ${condicaoId} → combatente ${combatenteId}`);
             const res = await fetch(
                 `${this.baseUrl}/condicoes/combatente/${combatenteId}/${condicaoId}`,
                 {
@@ -103,7 +99,6 @@ class CondicaoService {
 
     async removerTodas(combatenteId) {
         try {
-            console.log(`📡 DELETE todas condições → combatente ${combatenteId}`);
             const res = await fetch(
                 `${this.baseUrl}/condicoes/combatente/${combatenteId}`,
                 {

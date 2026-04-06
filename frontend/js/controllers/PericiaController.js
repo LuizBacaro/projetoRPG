@@ -20,7 +20,6 @@ export class PericiaController {
         this.periciasFiltradasAtualmente = [];
         this.periciasSelecionadas        = new Map();
         this.token = localStorage.getItem('token');
-        console.log('✅ PericiaController inicializado');
     }
 
     async inicializar() {
@@ -29,7 +28,6 @@ export class PericiaController {
             const combatenteId = params.get('id') || params.get('combatente_id');
             if (!combatenteId) throw new Error('ID do combatente não fornecido');
 
-            console.log('🎯 Carregando combatente:', combatenteId);
             this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
             this.atualizarHeaderCombatente();
 
@@ -38,7 +36,6 @@ export class PericiaController {
 
             await this.carregarPericicasSelecionadas(parseInt(combatenteId));
             this.renderizar();
-            console.log('✅ Inicialização completa');
         } catch (error) {
             console.error('❌ Erro ao inicializar:', error);
             throw error;
@@ -66,10 +63,8 @@ export class PericiaController {
                         bonus:       pj.bonus_outros    || 0,
                         modAtributo: pj.modificador_atributo || 0,
                     };
-                    console.log(`🎯 Perícia: ${pj.pericia.nome} | Mod: ${dadosPericia.modAtributo} | Grad: ${dadosPericia.graduacao}`);
                     this.periciasSelecionadas.set(pj.pericia_id, dadosPericia);
                 });
-                console.log('✅ Perícias selecionadas carregadas:', this.periciasSelecionadas.size);
             }
         } catch (error) {
             console.warn('⚠️ Nenhuma perícia selecionada encontrada');
@@ -173,7 +168,6 @@ export class PericiaController {
             }
         });
 
-        console.log('✅ Tabela renderizada');
     }
 
     togglePericia(pericia, marcada) {
@@ -185,10 +179,8 @@ export class PericiaController {
                 bonus:       0,
                 modAtributo: modAtributo,
             });
-            console.log(`➕ Perícia adicionada: ${pericia.nome} | Mod calculado: ${modAtributo}`);
         } else {
             this.periciasSelecionadas.delete(pericia.id);
-            console.log('➖ Perícia removida:', pericia.nome);
         }
         this.renderizar();
     }
@@ -207,7 +199,6 @@ export class PericiaController {
         }
         
         const modificador = Math.floor((valorAtributo - 10) / 2);
-        console.log(`📊 ${pericia.nome} (${pericia.atributo}) = (${valorAtributo} - 10) / 2 = ${modificador}`);
         return modificador;
     }
 
@@ -242,7 +233,6 @@ export class PericiaController {
 
         try {
             const executarSalvar = async () => {
-                console.log('💾 Iniciando salvamento de perícias...');
                 await this.removerPericiasNaoSelecionadas();
                 await this.adicionarOuAtualizarPericias();
                 await this.carregarPericicasSelecionadas(this.combatente.id);
@@ -264,7 +254,6 @@ export class PericiaController {
             }
 
             NotificationService.mostrarSucesso('✅ Perícias salvas com sucesso!');
-            console.log('✅ Salvamento concluído');
         } catch (error) {
             console.error('❌ Erro ao salvar:', error);
             if (!window.AsyncButtonState?.run && btnSalvar) {
@@ -288,7 +277,6 @@ export class PericiaController {
             const periciasAtuals = data.pericias || [];
             for (const pj of periciasAtuals) {
                 if (!this.periciasSelecionadas.has(pj.pericia_id)) {
-                    console.log(`🗑️ Removendo perícia: ${pj.pericia.nome}`);
                     await this.removerPericiaAPI(pj.id);
                 }
             }
@@ -320,11 +308,9 @@ export class PericiaController {
             if (periciaAtual) {
                 if (periciaAtual.graduacao !== dadosLocal.graduacao ||
                     periciaAtual.bonus_outros !== dadosLocal.bonus) {
-                    console.log(`✏️ Atualizando perícia: ${dadosLocal.pericia.nome}`);
                     await this.atualizarPericiaAPI(periciaAtual.id, dadosLocal);
                 }
             } else {
-                console.log(`➕ Adicionando perícia: ${dadosLocal.pericia.nome}`);
                 await this.adicionarPericiaAPI(periciaId, dadosLocal);
             }
         }

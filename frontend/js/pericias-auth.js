@@ -13,7 +13,6 @@ class PericiaAuthGuard {
     }
 
     _validar() {
-        console.log('🔐 Validando autenticação para perícias...');
         
         // ✅ Verificar token
         if (!this.token) {
@@ -29,7 +28,6 @@ class PericiaAuthGuard {
             return;
         }
 
-        console.log('✅ Autenticação válida para perícias');
         // ✅ Armazenar combatente_id para uso pelos controllers
         localStorage.setItem('combatente_id', this.combatenteId);
     }

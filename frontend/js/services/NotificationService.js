@@ -14,7 +14,6 @@ export class NotificationService {
             container.id = 'toast-container';
             container.className = 'toast-container';
             document.body.appendChild(container);
-            console.log('✅ Toast container criado');
         }
         return container;
     }
@@ -78,7 +77,6 @@ export class NotificationService {
         toast.textContent = mensagem;
 
         container.appendChild(toast);
-        console.log(`📢 Toast ${tipo}:`, mensagem);
 
         // Animar entrada
         setTimeout(() => toast.classList.add('show'), 10);

@@ -10,7 +10,6 @@ export class EquipamentoService {
     constructor() {
         this.token = localStorage.getItem('token');
         this.baseUrl = getApiUrl('/equipamentos');
-        console.log('✅ EquipamentoService inicializado');
     }
 
     /**
@@ -22,7 +21,6 @@ export class EquipamentoService {
     async listarEquipamentos(skip = 0, limit = 100) {
         try {
             const url = `${this.baseUrl}?skip=${skip}&limit=${limit}`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -37,7 +35,6 @@ export class EquipamentoService {
             }
 
             const data = await response.json();
-            console.log(`✅ Equipamentos carregados: ${data.length}`);
             return data;
 
         } catch (error) {
@@ -54,7 +51,6 @@ export class EquipamentoService {
     async obterEquipamento(equipamentoId) {
         try {
             const url = `${this.baseUrl}/${equipamentoId}`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -69,7 +65,6 @@ export class EquipamentoService {
             }
 
             const data = await response.json();
-            console.log('✅ Equipamento obtido:', data.nome);
             return data;
 
         } catch (error) {
@@ -86,7 +81,6 @@ export class EquipamentoService {
     async criarEquipamento(equipamento) {
         try {
             const url = this.baseUrl;
-            console.log('📡 POST:', url, equipamento);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -102,7 +96,6 @@ export class EquipamentoService {
             }
 
             const data = await response.json();
-            console.log('✅ Equipamento criado:', data.nome);
             return data;
 
         } catch (error) {
@@ -119,7 +112,6 @@ export class EquipamentoService {
     async listarEquipamentosJogador(combatenteId) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/listar`;
-            console.log('📡 GET:', url);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -134,7 +126,6 @@ export class EquipamentoService {
             }
 
             const data = await response.json();
-            console.log(`✅ Equipamentos do jogador carregados: ${data.length}`);
             return data;
 
         } catch (error) {
@@ -152,7 +143,6 @@ export class EquipamentoService {
     async adicionarEquipamento(combatenteId, equipamentoJogador) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/adicionar`;
-            console.log('📡 POST:', url, equipamentoJogador);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -168,7 +158,6 @@ export class EquipamentoService {
             }
 
             const data = await response.json();
-            console.log('✅ Equipamento adicionado:', data.nome);
             return data;
 
         } catch (error) {
@@ -186,7 +175,6 @@ export class EquipamentoService {
     async removerEquipamento(combatenteId, equipamentoId) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/remover/${equipamentoId}`;
-            console.log('📡 DELETE:', url);
 
             const response = await fetch(url, {
                 method: 'DELETE',
@@ -200,7 +188,6 @@ export class EquipamentoService {
                 throw new Error(`HTTP ${response.status}: Erro ao remover equipamento`);
             }
 
-            console.log('✅ Equipamento removido');
             return null;
 
         } catch (error) {
@@ -219,7 +206,6 @@ export class EquipamentoService {
     async atualizarQuantidade(combatenteId, equipamentoId, quantidade) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/quantidade/${equipamentoId}?quantidade=${quantidade}`;
-            console.log('📡 PUT:', url);
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -234,7 +220,6 @@ export class EquipamentoService {
             }
 
             const data = await response.json();
-            console.log('✅ Quantidade atualizada');
             return data;
 
         } catch (error) {
