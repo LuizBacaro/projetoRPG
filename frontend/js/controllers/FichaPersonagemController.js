@@ -522,6 +522,25 @@ export class FichaPersonagemController {
         return this._normalizarClasse(classe) === 'CLERIGO';
     }
 
+    /**
+     * Normaliza um nome de domínio bruto (vindo do banco) para a forma canônica
+     * em `this.dominiosPermitidos`, usando comparação sem acento/maiúsculas.
+     * Retorna o valor original se não encontrar correspondência.
+     * @param {string} raw
+     * @returns {string}
+     */
+    _canonicalizarDominio(raw) {
+        if (!raw) return '';
+        const chave = String(raw).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
+        const mapa = new Map(
+            this.dominiosPermitidos.map(d => [
+                d.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase(),
+                d,
+            ])
+        );
+        return mapa.get(chave) || raw;
+    }
+
     _atualizarUIPerfilDominios() {
         const clerigo = this._ehClasseClerigo();
         const tagDominios = document.getElementById('fichaDominios');
@@ -697,8 +716,8 @@ export class FichaPersonagemController {
         
         if (inputAlinhamento) inputAlinhamento.value = alinhamento;
         if (inputDivindade) inputDivindade.value = divindade;
-        if (selectDominio1) selectDominio1.value = clerigo ? dominio1 : '';
-        if (selectDominio2) selectDominio2.value = clerigo ? dominio2 : '';
+        if (selectDominio1) selectDominio1.value = clerigo ? this._canonicalizarDominio(dominio1) : '';
+        if (selectDominio2) selectDominio2.value = clerigo ? this._canonicalizarDominio(dominio2) : '';
         
         modal.style.display = 'flex';
     }
