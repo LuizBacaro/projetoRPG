@@ -812,15 +812,17 @@ def test_grimorio_notificacao_selecao_pendente_inclui_niveis(grimorio_db):
     combatente.nivel = 4
     db.commit()
 
-    magia_n0 = Magia(nome="Magia FEITICEIRO N0", nivel=0, classe="FEITICEIRO", ativo=True, descricao="desc")
-    magia_n1 = Magia(nome="Magia FEITICEIRO N1", nivel=1, classe="FEITICEIRO", ativo=True, descricao="desc")
-    magia_n2 = Magia(nome="Magia FEITICEIRO N2", nivel=2, classe="FEITICEIRO", ativo=True, descricao="desc")
+    # Em produção, magias de Feiticeiro são armazenadas com classe="MAGO"
+    # (Feiticeiro compartilha a lista do Mago em D&D 3.5).
+    magia_n0 = Magia(nome="Magia FEITICEIRO N0", nivel=0, classe="MAGO", ativo=True, descricao="desc")
+    magia_n1 = Magia(nome="Magia FEITICEIRO N1", nivel=1, classe="MAGO", ativo=True, descricao="desc")
+    magia_n2 = Magia(nome="Magia FEITICEIRO N2", nivel=2, classe="MAGO", ativo=True, descricao="desc")
     db.add_all([magia_n0, magia_n1, magia_n2])
     db.flush()
     db.add_all([
-        MagiaClasse(magia_id=magia_n0.id, classe="FEITICEIRO", nivel=0),
-        MagiaClasse(magia_id=magia_n1.id, classe="FEITICEIRO", nivel=1),
-        MagiaClasse(magia_id=magia_n2.id, classe="FEITICEIRO", nivel=2),
+        MagiaClasse(magia_id=magia_n0.id, classe="MAGO", nivel=0),
+        MagiaClasse(magia_id=magia_n1.id, classe="MAGO", nivel=1),
+        MagiaClasse(magia_id=magia_n2.id, classe="MAGO", nivel=2),
     ])
     db.commit()
 

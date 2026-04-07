@@ -17,6 +17,18 @@ from ..repositories.magia_repository import MagiaRepository
 
 
 _CLASSES_DIVINAS = {"CLERIGO", "DRUIDA", "PALADINO"}
+
+# Em D&D 3.5, Feiticeiro usa a mesma lista de magias do Mago.
+# O banco de dados armazena as magias com class="MAGO"; este alias
+# resolve a compatibilidade sem precisar re-seeder todas as magias.
+_SPELL_LIST_ALIASES: dict[str, str] = {
+    "FEITICEIRO": "MAGO",
+}
+
+
+def _alias_lista_magias(classe_norm: str) -> str:
+    """Retorna a classe canônica da lista de magias (ex: FEITICEIRO → MAGO)."""
+    return _SPELL_LIST_ALIASES.get(classe_norm, classe_norm)
 _PARES_DOMINIOS_OPOSTOS = (
     frozenset({"MAL", "BEM"}),
     frozenset({"LEI", "CAOS"}),
@@ -411,14 +423,19 @@ def _politica_conversao_clerigo(combatente) -> dict:
 
 
 def _nivel_por_classe(magia, classe_norm: str) -> Optional[int]:
-    for cn in (magia.classes_niveis or []):
-        if _normalizar(cn.classe) == classe_norm:
-            return int(cn.nivel)
+    alias = _SPELL_LIST_ALIASES.get(classe_norm)
+    buscar_em = [classe_norm] if not alias else [classe_norm, alias]
+
+    for busca in buscar_em:
+        for cn in (magia.classes_niveis or []):
+            if _normalizar(cn.classe) == busca:
+                return int(cn.nivel)
 
     classes_legacy = [p.strip() for p in re.split(r"[,/;|]", magia.classe or "") if p.strip()]
-    for classe in classes_legacy:
-        if _normalizar(classe) == classe_norm:
-            return int(magia.nivel)
+    for busca in buscar_em:
+        for classe in classes_legacy:
+            if _normalizar(classe) == busca:
+                return int(magia.nivel)
     return None
 
 
@@ -725,7 +742,7 @@ class GrimorioService:
             return 0, {}
 
         _, magias_classe = self.magia_repo.listar_paginado(
-            classe=classe_norm,
+            classe=_alias_lista_magias(classe_norm),
             nivel=None,
             escola=None,
             nome=None,
@@ -938,11 +955,12 @@ class GrimorioService:
         if not magia:
             raise HTTPException(status_code=404, detail="Magia não encontrada")
 
-        classes_permitidas = {c.classe for c in (magia.classes_niveis or [])}
+        classes_permitidas = {_normalizar(c.classe) for c in (magia.classes_niveis or [])}
         if not classes_permitidas:
             classes_permitidas = _classes_legacy(magia.classe)
 
-        if classe_norm not in classes_permitidas:
+        alias = _SPELL_LIST_ALIASES.get(classe_norm)
+        if classe_norm not in classes_permitidas and not (alias and alias in classes_permitidas):
             raise HTTPException(status_code=400, detail="Magia incompatível com a classe informada")
 
         nivel_personagem = int(combatente.nivel or 1)
