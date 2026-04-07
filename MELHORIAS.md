@@ -594,9 +594,11 @@ A cada chamada ao endpoint de notificações são disparadas internamente:
 
 #### 🟢 Baixa Prioridade
 
-- [ ] **P8 — Skeleton loader visual durante carregamento do Grimório e Ficha**
-  - Feedback visual imediato enquanto os requests estão em andamento
-  - Prioridade apenas após P1–P4 implementados (reduz janela de espera real primeiro)
+- [x] **P8 — Skeleton loader visual durante carregamento do Grimório e Ficha**
+  - `frontend/css/skeleton.css` criado com animação shimmer e variantes para ficha (azul) e grimório (dourado)
+  - `FichaPersonagemController._mostrarSkeletonFicha()`: injeta `.sk-item` com círculo + linhas nos containers `fichaTalentos`, `fichaEquipamentos`, `fichaArmadurasProtecao` e `fichaPericiasLista` antes do `Promise.all`
+  - `GrimorioController._mostrarLoading(true)`: injeta 6 `.sk-card-grimorio` no `grimorioLista` ao abrir; substituídos pelo `filtrar()` após os dados chegarem
+  - `FichaPersonagemController.js?v=24`, `GrimorioController.js?v=22`
 
 - [ ] **P9 — Avaliar migração de infraestrutura para região mais próxima do Brasil**
   - Ver seção **5. Análise Railway vs Render** abaixo

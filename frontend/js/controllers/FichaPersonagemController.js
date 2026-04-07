@@ -85,6 +85,9 @@ export class FichaPersonagemController {
             this.renderizarResistencias();
             this.renderizarAtaques();
             this.renderizarSlotsDeMapia();
+
+            // ── Skeleton enquanto os 4 requests paralelos carregam ──
+            this._mostrarSkeletonFicha();
             await Promise.all([
                 this.carregarRenderizarPericias(parseInt(combatenteId)),
                 this.carregarRenderizarEquipamentos(parseInt(combatenteId)),
@@ -1147,6 +1150,43 @@ export class FichaPersonagemController {
     renderizarPericiasVazias() {
         const container = document.getElementById('fichaPericiasLista');
         if (container) container.innerHTML = '<span class="ficha-vazio">Nenhuma perícia selecionada</span>';
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // SKELETON LOADER
+    // ─────────────────────────────────────────────────────────
+
+    _mostrarSkeletonFicha() {
+        // Item genérico: ícone circular + duas linhas de texto
+        const itemSkeleton = (largura1 = 'w-3-4', largura2 = 'w-1-2') => `
+            <div class="sk-item">
+                <div class="sk-circle"></div>
+                <div class="sk-item-body">
+                    <div class="sk-line ${largura1}"></div>
+                    <div class="sk-line ${largura2} sm"></div>
+                </div>
+            </div>`;
+
+        // Linha simples (perícias)
+        const linhaSkeleton = (largura1 = 'w-full', largura2 = 'w-1-3') => `
+            <div class="sk-item">
+                <div class="sk-item-body">
+                    <div class="sk-line ${largura1}"></div>
+                    <div class="sk-line ${largura2} sm"></div>
+                </div>
+            </div>`;
+
+        const mapas = [
+            { id: 'fichaTalentos',          html: [itemSkeleton(), itemSkeleton('w-1-2', 'w-1-3'), itemSkeleton()].join('') },
+            { id: 'fichaEquipamentos',      html: [itemSkeleton(), itemSkeleton('w-3-4', 'w-1-2'), itemSkeleton('w-1-2', 'w-1-3')].join('') },
+            { id: 'fichaArmadurasProtecao', html: [itemSkeleton(), itemSkeleton('w-1-2', 'w-1-3')].join('') },
+            { id: 'fichaPericiasLista',     html: [linhaSkeleton(), linhaSkeleton('w-3-4', 'w-1-2'), linhaSkeleton(), linhaSkeleton('w-1-2', 'w-1-3'), linhaSkeleton()].join('') },
+        ];
+
+        mapas.forEach(({ id, html }) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = html;
+        });
     }
 
     // ─────────────────────────────────────────────────────────

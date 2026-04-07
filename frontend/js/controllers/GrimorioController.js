@@ -2304,10 +2304,37 @@ class GrimorioController {
     }
 
     _mostrarLoading(visivel) {
-        const el = document.getElementById('grimorioLoading');
+        const el    = document.getElementById('grimorioLoading');
         const lista = document.getElementById('grimorioLista');
-        if (el) el.style.display = visivel ? 'flex' : 'none';
-        if (lista) lista.style.display = visivel ? 'none' : 'block';
+        if (visivel) {
+            if (el)    el.style.display = 'none'; // spinner substituído pelo skeleton
+            if (lista) lista.innerHTML  = this._gerarSkeletonGrimorio();
+        } else {
+            if (el)    el.style.display = 'none';
+            // lista.innerHTML será sobrescrito pelo filtrar() logo em seguida
+        }
+    }
+
+    _gerarSkeletonGrimorio() {
+        const card = (l1 = 'w-3-4', l2 = 'w-1-2') => `
+            <div class="sk-card-grimorio">
+                <div class="sk-item">
+                    <div class="sk-circle"></div>
+                    <div class="sk-item-body">
+                        <div class="sk-line ${l1} lg"></div>
+                        <div class="sk-line ${l2} sm"></div>
+                    </div>
+                    <div class="sk-line w-1-3 sm" style="flex-shrink:0"></div>
+                </div>
+            </div>`;
+        return `<div class="sk-grimorio-grade">${[
+            card(),
+            card('w-1-2', 'w-1-3'),
+            card('w-3-4', 'w-1-2'),
+            card(),
+            card('w-3-4', 'w-1-3'),
+            card('w-1-2', 'w-1-2'),
+        ].join('')}</div>`;
     }
 
     _normalizarClasse(classe) {
