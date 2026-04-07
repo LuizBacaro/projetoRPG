@@ -85,10 +85,12 @@ export class FichaPersonagemController {
             this.renderizarResistencias();
             this.renderizarAtaques();
             this.renderizarSlotsDeMapia();
-            await this.carregarRenderizarPericias(parseInt(combatenteId));
-            await this.carregarRenderizarEquipamentos(parseInt(combatenteId));
-            await this.carregarRenderizarArmadurasProtecao(parseInt(combatenteId));
-            await this.carregarRenderizarTalentos(parseInt(combatenteId));
+            await Promise.all([
+                this.carregarRenderizarPericias(parseInt(combatenteId)),
+                this.carregarRenderizarEquipamentos(parseInt(combatenteId)),
+                this.carregarRenderizarArmadurasProtecao(parseInt(combatenteId)),
+                this.carregarRenderizarTalentos(parseInt(combatenteId)),
+            ]);
 
             // ── Configurar eventos ──
             this._configurarEventos();

@@ -162,6 +162,7 @@ class GrimorioController {
                 this._carregarItensGrimorio(),
                 this._carregarNotificacoes(),
                 this._carregarMagiasPreparadas(),
+                this._carregarHistoricoTrocas(),
             ]);
 
             this._renderizarCabecalho();
@@ -170,7 +171,6 @@ class GrimorioController {
             this._renderizarIndicadores();
             this._atualizarVisibilidadeAcoesClasse();
             this._renderizarPainelSlots();
-            await this._carregarHistoricoTrocas();
             this._renderizarHistoricoTrocas();
             this._renderizarNotificacoes();
             this._atualizarBadgeTrocaDisponivel();

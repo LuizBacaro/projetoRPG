@@ -429,10 +429,158 @@
 
 ---
 
-## 📌 Próxima Conversa
+## 🧭 Checklist 4 — Performance em Produção
 
-Quando este checklist 2 começar, a próxima discussão pode partir de três frentes:
+> Diagnóstico realizado em 04/2026. Foco em latência percebida pelo usuário no Brasil acessando
+> backend no Render (Virginia) + Neon PostgreSQL (EUA). Cada request serial acumula ~250–500ms
+> de round-trip intercontinental.
 
-1. `Consolidacao frontend`: navegacao, modais, responsividade e remocao de legado inline.
-2. `Confiabilidade`: smoke tests, regressao e cobertura automatizada de fluxos criticos.
-3. `Planejamento de release`: backlog enxuto da proxima versao com prioridades reais.
+### 4.1 Contexto do Diagnóstico
+
+- Latência base por request API: **250–500ms** (Brasil → Virginia EUA)
+- Cold start do Render free tier: **+5–10s** após 15 min de inatividade (mitigado pelo cron `/health` a cada 10 min)
+- Cache em memória (`CatalogCache`, TTL=30s) **perdido em cada restart** do Render
+- Pool de conexões configurado: `pool_size=5`, `max_overflow=10`, `pool_pre_ping=True` ✅
+- GZip ativo com `minimum_size=1000` ✅
+
+### 4.2 Waterfall ao Abrir o Grimório (~1,6–2,5s total)
+
+Sequência atual (5 requests):
+1. `_carregarCatalogoClasse()` → `GET /magias/?classe=MAGO&limit=500` — **SERIAL, bloqueia o resto** (~400ms)
+2. `_carregarItensGrimorio()` → `GET /grimorio/{id}` (~300ms) — em `Promise.all`
+3. `_carregarNotificacoes()` → `GET /grimorio/{id}/notificacoes` (~400ms+) — em `Promise.all`
+4. `_carregarMagiasPreparadas()` → `GET /magias-preparadas/{id}` (~300ms) — em `Promise.all`
+5. `_carregarHistoricoTrocas()` → `GET /grimorio/{id}/historico` (~250ms) — **SERIAL, após o `Promise.all`**
+
+### 4.3 Operações Extras em `listar_notificacoes` (request mais pesado)
+
+A cada chamada ao endpoint de notificações são disparadas internamente:
+- `_sincronizar_magias_automaticas()` → `listar_paginado(limit=500)` + `grimorio.listar()`
+- `_reconciliar_magias_invalidas()` → `grimorio.listar()` novamente
+- `_garantir_notificacoes_sistema()` → `listar_paginado(limit=500)` **de novo**
+- = **2× `listar_paginado(limit=500)` no mesmo request** + 2× `grimorio.listar()`
+
+### 4.4 Checklist de Melhorias
+
+#### 🔴 Alta Prioridade
+
+- [x] **P1 — Paralelizar carregamento inicial da Ficha do Personagem**
+  - Arquivo: `frontend/js/controllers/FichaPersonagemController.js`
+  - Problema: `inicializar()` chama 4 métodos em sequência com `await` serial
+    ```js
+    await this.carregarRenderizarPericias(id);          // ~350ms
+    await this.carregarRenderizarEquipamentos(id);      // ~300ms
+    await this.carregarRenderizarArmadurasProtecao(id); // ~300ms
+    await this.carregarRenderizarTalentos(id);          // ~300ms
+    ```
+  - Fix: substituir por `Promise.all([...])` — reduz de ~1,25s para ~350ms
+  - Risco: baixo (requests independentes, sem dependência entre si)
+
+- [ ] **P2 — Mover `_carregarCatalogoClasse` para dentro do `Promise.all` no Grimório**
+  - ⚠️ **Bloqueado:** `_carregarItensGrimorio` usa `this.catalogoIndex` e `this.catalogoClasse` internamente (`_mapearItemGrimorio` + `_mesclarCatalogoDisponivelNoGrimorio`). Para paralelizar, seria necessário separar o merge do fetch — refatoração maior.
+  - Arquivo: `frontend/js/controllers/GrimorioController.js`, método `_recarregarDados()`
+  - Problema: `await this._carregarCatalogoClasse()` executa antes do `Promise.all`, adicionando ~400ms seriais
+  - Fix: incluir `this._carregarCatalogoClasse()` dentro do `Promise.all` junto com os demais
+  - Risco: baixo (catálogo não é dependência dos outros requests no `Promise.all`)
+
+- [ ] **P3 — Cache de catálogo de magias entre aberturas do Grimório**
+  - Arquivo: `frontend/js/services/MagiaService.js`
+  - Problema: `MagiaService` é reinstanciado a cada abertura do grimório → cache `Map` interno destruído
+  - Fix: mover instância para `window._magiaService` (singleton de sessão) ou usar `sessionStorage` para o catálogo por classe
+  - Impacto: elimina 1 request de ~400ms em todas as reaberturas do grimório
+
+- [x] **P4 — Aumentar TTL do cache de catálogos de 30s para 300s**
+  - Arquivo: `backend/app/core/config.py`, variável `CACHE_CATALOG_TTL_SECONDS`
+  - Problema: TTL=30s é muito curto para dados que raramente mudam (magias, perícias)
+  - Fix: `CACHE_CATALOG_TTL_SECONDS: int = 300` (5 minutos)
+  - Env var: adicionar `CACHE_CATALOG_TTL_SECONDS=300` no Render e `.env.example`
+  - Risco: dados de catálogo levam até 5 min para refletir edições manuais no banco (aceitável)
+
+#### 🟡 Média Prioridade
+
+- [ ] **P5 — Separar sincronização automática do endpoint de notificações**
+  - Arquivo: `backend/app/services/grimorio_service.py`, método `listar_notificacoes()`
+  - Problema: sincronização (_sincronizar_magias_automaticas + _reconciliar_magias_invalidas) roda em todo GET de notificações
+  - Fix opção A: executar sincronização apenas se `force_sync=True` (query param)
+  - Fix opção B: sincronizar apenas 1× por sessão com flag no backend (ex: `_ultima_sync` por combatente com TTL)
+  - Fix opção C: mover sincronização para evento de abertura do grimório (`POST /grimorio/{id}/sync`)
+  - Impacto estimado: reduz endpoint de notificações de ~400ms para ~150ms
+
+- [ ] **P6 — Eliminar duplo `listar_paginado(limit=500)` no mesmo request de notificações**
+  - Arquivo: `backend/app/services/grimorio_service.py`
+  - Problema: `_sincronizar_magias_automaticas()` e `_garantir_notificacoes_sistema()` ambas chamam `listar_paginado(limit=500)` no mesmo request
+  - Fix: extrair `magias_catalogo = await listar_paginado(limit=500)` uma vez e passar como parâmetro para ambas
+  - Impacto: elimina 1 query extra de catálogo por request de notificações
+
+- [x] **P7 — Mover `_carregarHistoricoTrocas` para dentro do `Promise.all` no Grimório**
+  - Arquivo: `frontend/js/controllers/GrimorioController.js`, método `_recarregarDados()`
+  - Problema: histórico é carregado após o `Promise.all` em sequência serial
+  - Fix: incluir no `Promise.all` (histórico não depende dos outros dados)
+  - Risco: baixo
+
+#### 🟢 Baixa Prioridade
+
+- [ ] **P8 — Skeleton loader visual durante carregamento do Grimório e Ficha**
+  - Feedback visual imediato enquanto os requests estão em andamento
+  - Prioridade apenas após P1–P4 implementados (reduz janela de espera real primeiro)
+
+- [ ] **P9 — Avaliar migração de infraestrutura para região mais próxima do Brasil**
+  - Ver seção **5. Análise Railway vs Render** abaixo
+  - Candidatos: Railway São Paulo (AWS sa-east-1) + Supabase São Paulo
+  - Impacto potencial: reduzir latência de ~350ms para ~80ms por request
+
+### 4.5 Resumo de Ganhos Estimados
+
+| # | Melhoria | Redução estimada | Esforço |
+|---|----------|-----------------|---------|
+| P1 | Ficha: 4 requests seriais → `Promise.all` | ~900ms → ~350ms | Baixo |
+| P2 | Grimório: catálogo serial → paralelo | +400ms eliminados | Baixo |
+| P3 | Cache singleton MagiaService | +400ms na reabertura | Baixo |
+| P4 | TTL cache 30s → 300s | reduz cold cache | Muito Baixo |
+| P5 | Sync lazy em notificações | ~250ms por request | Médio |
+| P6 | Eliminar 2ª query catálogo | ~150ms por sync | Baixo |
+| P7 | Histórico: serial → paralelo | ~250ms eliminados | Baixo |
+
+---
+
+## 🛤️ Análise: Railway vs Render (Para Futuro)
+
+### Gargalo Principal
+
+O custo dominante de latência hoje é **distância Brasil → Virginia EUA (~300–500ms por request)**,
+não a capacidade computacional do servidor. Isso afeta Render, Railway EUA e qualquer opção
+em US-East igualmente.
+
+### Opções de Infraestrutura
+
+| Plano | Região disponível BR | Cold start | Custo/mês | Latência Brasil |
+|-------|---------------------|-----------|-----------|----------------|
+| Render free tier | ❌ (só US/EU) | ~5–10s | $0 | ~350ms base |
+| Render starter | ❌ (só US/EU) | sem sleep 24h | $7 | ~350ms base |
+| Railway Starter | ✅ **São Paulo (sa-east-1)** | sem sleep | $5 uso | **~80ms base** |
+| Fly.io | ✅ São Paulo (GRU) | ~2s (scale to 0) | $0–$3 | **~80ms base** |
+| Koyeb | ✅ São Paulo | sem sleep | ~$0–$3 | **~80ms base** |
+
+### Benefício do Railway (São Paulo)
+
+- Latência de ~300–500ms → ~60–100ms por request (4–5× menor)
+- Sem cold start no plano Starter ($5/mês por uso — paga pelo que usar)
+- Deploy por push de branch (igual ao Render)
+- Suporta variáveis de ambiente, Dockerfile ou buildpack automático
+- **Limitação:** Neon PostgreSQL ainda fica em US-East-2 → cada query ao banco adiciona ~200ms
+  mesmo com backend em São Paulo
+
+### Solução Completa (Backend + DB em BR)
+
+Para eliminar totalmente a latência, seria necessário migrar o banco também:
+- **Supabase** — PostgreSQL serverless com região São Paulo (`sa-east-1`) no plano gratuito
+- **Neon** — ainda sem região São Paulo (apenas US-East, EU-Central, AWS AP-Southeast)
+- Migração: exportar dump do Neon → importar no Supabase + ajustar `DATABASE_URL`
+- Alembic funciona da mesma forma com Supabase (PostgreSQL padrão)
+
+### Recomendação
+
+> Se a latência for prioridade real: **Railway São Paulo + Supabase São Paulo** = solução completa.
+> Se quiser testar com custo mínimo: mover só o backend para **Railway São Paulo** já reduz
+> tempo de resposta em ~2× para requests sem query pesada (health, token, cache hit).
+> Render continua sendo a opção zero-custo se performance não for crítica agora.

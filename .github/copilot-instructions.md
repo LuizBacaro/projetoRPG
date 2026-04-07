@@ -2,6 +2,10 @@
 
 Este workspace usa instrucoes granulares por dominio em `.github/instructions`.
 
+## Idioma
+
+- **Sempre responder em Portugues (Brasil)** em todas as mensagens, explicacoes e comentarios de codigo.
+
 ## Escopo Geral
 
 - Projeto fullstack TTRPG com backend FastAPI/SQLAlchemy e frontend HTML/CSS/JavaScript vanilla.

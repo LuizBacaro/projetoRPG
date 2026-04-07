@@ -63,7 +63,7 @@ class Settings(BaseSettings):
 
     # ── Cache ────────────────────────────────────────────────────────────────
     CACHE_ENABLED: bool = True
-    CACHE_CATALOG_TTL_SECONDS: int = 30
+    CACHE_CATALOG_TTL_SECONDS: int = 300
 
     # ── Rate Limiting ────────────────────────────────────────────────────────
     RATE_LIMIT_ENABLED: bool = True
