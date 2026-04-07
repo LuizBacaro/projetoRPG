@@ -2370,7 +2370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!classeEl) return;
 
             const classe = classeEl.textContent?.trim();
-            if (!classe || classe === '-') return;
+            if (!classe || classe === '-' || classe === '—') return;
 
             const combatente = window._fichaController?.combatente;
             if (!combatente) return;
