@@ -21,7 +21,7 @@ def inicializar_equipamentos(db: Session) -> None:
         db: Sessão do banco de dados
     """
     from ..models.equipamento import Equipamento
-    from datetime import datetime
+    from datetime import datetime, timezone
     
     # Verificar se já existem equipamentos
     count = db.query(Equipamento).filter(Equipamento.deleted_at.is_(None)).count()
@@ -105,7 +105,7 @@ def inicializar_equipamentos(db: Session) -> None:
             descricao=descricao,
             pagina_referencia=pag_ref,
             ativo=True,
-            criado_em=datetime.utcnow()
+            criado_em=datetime.now(timezone.utc)
         )
         db.add(equipamento)
     
@@ -185,7 +185,7 @@ def inicializar_talentos(db: Session) -> None:
         db: Sessão do banco de dados
     """
     from ..models.talento import Talento
-    from datetime import datetime
+    from datetime import datetime, timezone
     
     # Verificar se já existem talentos
     count = db.query(Talento).filter(Talento.deleted_at.is_(None)).count()
@@ -217,7 +217,7 @@ def inicializar_talentos(db: Session) -> None:
             descricao=descricao,
             pagina_referencia=pagina_ref,
             ativo=True,
-            criado_em=datetime.utcnow()
+            criado_em=datetime.now(timezone.utc)
         )
         db.add(talento)
     

@@ -3,7 +3,7 @@ Repository genérico (Generic Repository Pattern)
 Implementa DIP - Dependency Inversion Principle
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Generic, TypeVar, Type, List, Optional
 from sqlalchemy.orm import Query, Session
 from ..core.database import Base
@@ -36,7 +36,7 @@ def soft_delete_entity(db: Session, entity: ModelType) -> bool:
         commit_with_rollback(db)
         return True
 
-    entity.deleted_at = datetime.utcnow()
+    entity.deleted_at = datetime.now(timezone.utc)
     if hasattr(entity, "ativo"):
         entity.ativo = False
     commit_with_rollback(db)

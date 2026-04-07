@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from threading import Lock
 from typing import Any
@@ -404,7 +404,7 @@ class MagiaImportService:
 		with self._lock:
 			self._drafts[import_id] = ImportDraft(
 				rows=rows,
-				expires_at=datetime.utcnow() + timedelta(minutes=IMPORT_TTL_MINUTES),
+				expires_at=datetime.now(timezone.utc) + timedelta(minutes=IMPORT_TTL_MINUTES),
 			)
 		return import_id
 
@@ -417,7 +417,7 @@ class MagiaImportService:
 		return draft.rows
 
 	def _limpar_expirados(self) -> None:
-		now = datetime.utcnow()
+		now = datetime.now(timezone.utc)
 		with self._lock:
 			expirados = [key for key, draft in self._drafts.items() if draft.expires_at <= now]
 			for key in expirados:

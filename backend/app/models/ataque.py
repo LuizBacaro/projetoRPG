@@ -4,7 +4,7 @@ SRP: representa as tabelas no banco
 """
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from ..core.database import Base
 
 
@@ -54,7 +54,7 @@ class MagiaPreparada(Base):
     quantidade      = Column(Integer, nullable=False, default=1)
     usos_realizados = Column(Integer, nullable=False, default=0)
     usada           = Column(Boolean, nullable=False, default=False)
-    preparada_em    = Column(DateTime, default=datetime.utcnow)
+    preparada_em    = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     combatente = relationship("Combatente", back_populates="magias_preparadas")
     magia      = relationship("Magia")

@@ -6,7 +6,7 @@ SOLID: Single Responsibility — apenas mapeamento de tabela de magias
 
 from sqlalchemy import JSON, Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from ..core.database import Base 
 
 
@@ -58,7 +58,7 @@ class Magia(Base):
     e_magia_dominio   = Column(Boolean, default=False)
     dominios          = Column(String(250), nullable=True)
     pagina_referencia = Column(Integer, nullable=True)
-    data_criacao      = Column(DateTime, default=datetime.utcnow)
+    data_criacao      = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     classes_niveis = relationship(
         "MagiaClasse",
@@ -153,4 +153,4 @@ class MagiaHistorico(Base):
     acao = Column(String(20), nullable=False)
     dados_anteriores = Column(JSON, nullable=True)
     dados_novos = Column(JSON, nullable=True)
-    criado_em = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)

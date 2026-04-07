@@ -6,7 +6,7 @@ SOLID: Single Responsibility — apenas mapeamento de tabela de equipamentos
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from ..core.database import Base
 from .mixins import SoftDeleteMixin
 
@@ -31,7 +31,7 @@ class Equipamento(SoftDeleteMixin, Base):
     pagina_referencia  = Column(String(50),  nullable=True)  # Ex: "PHB p.123"
 
     # ── Metadata ──
-    criado_em = Column(DateTime, default=datetime.utcnow)
+    criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     ativo     = Column(Boolean, default=True, index=True)
 
     # ── Relacionamentos ──
@@ -63,7 +63,7 @@ class EquipamentoJogador(Base):
     quantidade = Column(Integer, default=1)
 
     # ── Metadata ──
-    adicionado_em = Column(DateTime, default=datetime.utcnow)
+    adicionado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # ── Relacionamentos ──
     equipamento = relationship("Equipamento", back_populates="combatentes", lazy="joined")

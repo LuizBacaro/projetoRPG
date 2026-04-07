@@ -2,18 +2,12 @@
 
 from __future__ import annotations
 
-import unicodedata
 from typing import Optional, Tuple
 
 from sqlalchemy import asc, desc, func
-
-
-def _normalizar_classe(valor: str) -> str:
-    """Remove acentos e converte para maiúsculo — compatível com SQLite."""
-    normalized = unicodedata.normalize("NFD", str(valor or ""))
-    sem_acentos = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
-    return sem_acentos.strip().upper()
 from sqlalchemy.orm import Session, joinedload
+
+from ..core.text_utils import normalizar_classe as _normalizar_classe
 
 from .base import BaseRepository, apply_not_deleted, commit_with_rollback
 from ..models.ataque import MagiaPreparada

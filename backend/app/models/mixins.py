@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime
 
@@ -9,7 +9,7 @@ class SoftDeleteMixin:
     deleted_at = Column(DateTime, nullable=True, index=True)
 
     def soft_delete(self) -> None:
-        self.deleted_at = datetime.utcnow()
+        self.deleted_at = datetime.now(timezone.utc)
 
     def restore(self) -> None:
         self.deleted_at = None

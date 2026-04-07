@@ -6,6 +6,7 @@ import csv
 import re
 import unicodedata
 import json
+from datetime import datetime, timezone
 from typing import Optional
 from pathlib import Path
 
@@ -17,6 +18,11 @@ from ..repositories.magia_repository import MagiaRepository
 
 
 _CLASSES_DIVINAS = {"CLERIGO", "DRUIDA", "PALADINO"}
+
+# Intervalo mínimo entre sincronizações automáticas do grimório por combatente (segundos).
+# Evita rodar 2-3 queries extras a cada GET /notificações em chamadas rápidas consecutivas.
+_SYNC_INTERVAL_SECONDS = 30
+_sync_last: dict[int, datetime] = {}  # combatente_id → última sincronização
 
 # Em D&D 3.5, Feiticeiro usa a mesma lista de magias do Mago.
 # O banco de dados armazena as magias com class="MAGO"; este alias
@@ -672,26 +678,38 @@ class GrimorioService:
         classe: Optional[str] = None,
         apenas_nao_lidas: bool = False,
         limit: int = 30,
+        force_sync: bool = True,
     ):
         combatente = self.grimorio_repo.get_combatente(combatente_id)
         if not combatente:
             raise HTTPException(status_code=404, detail="Combatente não encontrado")
 
         classe_norm = _normalizar(classe) if classe else _normalizar(combatente.classe)
-        magias_adicionadas = self._sincronizar_magias_automaticas(
-            combatente_id,
-            classe_norm=classe_norm,
-            nivel_personagem=int(combatente.nivel or 1),
+
+        # Só sincroniza se force_sync=True ou se o intervalo mínimo passou
+        agora = datetime.now(timezone.utc)
+        ultima = _sync_last.get(combatente_id)
+        deve_sincronizar = force_sync or (
+            ultima is None
+            or (agora - ultima).total_seconds() >= _SYNC_INTERVAL_SECONDS
         )
-        if magias_adicionadas:
-            self._registrar_notificacao_magias_adicionadas(
+
+        if deve_sincronizar:
+            _sync_last[combatente_id] = agora
+            magias_adicionadas = self._sincronizar_magias_automaticas(
                 combatente_id,
                 classe_norm=classe_norm,
-                magias=magias_adicionadas,
+                nivel_personagem=int(combatente.nivel or 1),
             )
+            if magias_adicionadas:
+                self._registrar_notificacao_magias_adicionadas(
+                    combatente_id,
+                    classe_norm=classe_norm,
+                    magias=magias_adicionadas,
+                )
+            self._reconciliar_magias_invalidas(combatente_id, classe_norm=classe_norm)
+            self._garantir_notificacoes_sistema(combatente_id, classe_norm, int(combatente.nivel or 1))
 
-        self._reconciliar_magias_invalidas(combatente_id, classe_norm=classe_norm)
-        self._garantir_notificacoes_sistema(combatente_id, classe_norm, int(combatente.nivel or 1))
         return self.grimorio_repo.listar_notificacoes(
             combatente_id,
             classe=classe_norm,

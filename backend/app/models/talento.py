@@ -6,7 +6,7 @@ SOLID: Single Responsibility — apenas mapeamento de tabela de talentos
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from ..core.database import Base
 from .mixins import SoftDeleteMixin
 
@@ -31,7 +31,7 @@ class Talento(SoftDeleteMixin, Base):
     pagina_referencia  = Column(String(50),  nullable=True)  # Ex: "PHB p.123"
 
     # ── Metadata ──
-    criado_em = Column(DateTime, default=datetime.utcnow)
+    criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     ativo     = Column(Boolean, default=True, index=True)
 
     # ── Relacionamentos ──
@@ -60,7 +60,7 @@ class TalentoJogador(Base):
     talento_id      = Column(Integer, ForeignKey('talentos.id', ondelete='CASCADE'), nullable=False, index=True)
 
     # ── Metadata ──
-    adicionado_em = Column(DateTime, default=datetime.utcnow)
+    adicionado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # ── Relacionamentos ──
     talento = relationship("Talento", back_populates="combatentes", lazy="joined")

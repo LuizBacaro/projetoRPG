@@ -217,6 +217,7 @@ class GrimorioController {
             this.notificacoes = await this.grimorioService.listarNotificacoes(this.combatente.id, {
                 classe: this.classeAtiva,
                 limit: 25,
+                forceSync: !this._carregado,  // false em recargas internas (leve); true na primeira abertura
             });
         } catch (_error) {
             this.notificacoes = [];
@@ -2378,7 +2379,12 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(tentarInicializar);
 
             const token = localStorage.getItem('token');
-            const magiaService = new MagiaService(token);
+            // Singleton por token — preserva cache de catálogo entre re-aberturas do grimório
+            if (!window._magiaServiceSingleton || window._magiaServiceSingleton._token !== token) {
+                window._magiaServiceSingleton = new MagiaService(token);
+                window._magiaServiceSingleton._token = token;
+            }
+            const magiaService = window._magiaServiceSingleton;
             const grimorioService = new GrimorioService(token);
 
             window._grimorioController = safeBootstrap(

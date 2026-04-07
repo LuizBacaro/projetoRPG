@@ -6,7 +6,6 @@ SOLID: Single Responsibility — apenas seed de magias
 
 import os
 import sys
-import unicodedata
 
 # ── Adicionar raiz ao path ──
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -14,12 +13,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from sqlalchemy.orm import Session
 from app.models.magia import Magia
 from app.core.database import SessionLocal
-
-
-def _norm_classe(valor: str) -> str:
-    """Remove acentos e converte para maiúsculo (ex: 'CLÉRIGO' → 'CLERIGO')."""
-    nfkd = unicodedata.normalize("NFD", str(valor or ""))
-    return "".join(c for c in nfkd if unicodedata.category(c) != "Mn").strip().upper()
+from app.core.text_utils import normalizar_classe as _norm_classe
 
 
 # ══════════════════════════════════════════════════════════════

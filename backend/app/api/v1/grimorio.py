@@ -187,6 +187,7 @@ def listar_notificacoes_grimorio(
     classe: Optional[str] = Query(default=None),
     apenas_nao_lidas: bool = Query(default=False),
     limit: int = Query(default=30, ge=1, le=100),
+    force_sync: bool = Query(default=True, description="Passa false para polling leve sem sincronização automática"),
     service: GrimorioService = Depends(get_grimorio_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
@@ -195,6 +196,7 @@ def listar_notificacoes_grimorio(
         classe=classe,
         apenas_nao_lidas=apenas_nao_lidas,
         limit=limit,
+        force_sync=force_sync,
     )
     return [_serialize_notificacao(item) for item in itens]
 

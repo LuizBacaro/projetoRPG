@@ -224,6 +224,80 @@
 
 ---
 
+## 🧭 Checklist 5 — Consolidação Técnica (Abril/2026)
+
+> Análise realizada em 07/04/2026 após varredura completa do codebase pós-Ciclo 1.
+> Foco em: débitos técnicos de Python/SQLAlchemy, duplicações de código, deploy seguro e micro-otimizações.
+
+### 🔴 Crítico
+
+- [x] **C4 — `alembic upgrade head` ausente no deploy**
+  - `Procfile` só sobe o uvicorn; migrations Alembic nunca são aplicadas em produção
+  - Fix: `web: alembic upgrade head && uvicorn backend.app.main:app ...`
+
+- [x] **C2 — Swagger/OpenAPI exposto em produção**
+  - `docs_url="/api/docs"` e `redoc_url="/api/redoc"` ativos em todos os ambientes
+  - Fix: condicionar a `settings.ENVIRONMENT != "production"` (setar `None` em prod)
+
+- [x] **C1 — `datetime.utcnow()` deprecado em 20+ lugares**
+  - Afeta models, repositories, services e security.py
+  - Fix: substituir por `datetime.now(timezone.utc)` + importar `timezone` de `datetime`
+
+- [ ] **C3 — `@app.on_event("startup")` deprecado no FastAPI 0.93+**
+  - Será removido em versões futuras do FastAPI
+  - Fix: migrar para `@asynccontextmanager` + `app = FastAPI(lifespan=lifespan)`
+
+### 🟡 Importante
+
+- [x] **I11 — Arquivos mortos no repositório**
+  - `backend/app/models/magia-bkp.py` — backup manual com código ativo duplicado
+  - `backend/alembic_migrations/env copy.py` — cópia obsoleta do env.py
+  - Fix: remover os dois arquivos
+
+- [x] **I4 — `/health` não verifica conexão com banco**
+  - Retorna `{"status": "ok"}` sem consultar o banco
+  - Fix: adicionar `db.execute(text("SELECT 1"))` no health check
+
+- [x] **I1 — `_normalizar_classe` duplicada em 3 arquivos**
+  - `api/v1/magias_preparadas.py`, `repositories/magia_repository.py`, `services/magia_service.py`
+  - Fix: centralizar em `app/core/text_utils.py` e importar nos 3 lugares
+
+- [ ] **I2 — Lógica de negócio no router `magias_preparadas.py`**
+  - Funções `_normalizar_classe`, `_classes_magia`, `_normalizar_quantidade`, `_enriquecer` no arquivo de rota
+  - Fix: extrair para `services/magia_preparada_service.py`
+
+- [x] **P5 — Sincronização automática em todo GET de notificações**
+  - `listar_notificacoes()` roda `_sincronizar_magias_automaticas + _reconciliar` em cada request
+  - Fix: sincronizar apenas se `force_sync=True` ou 1× por sessão com flag de TTL
+
+- [x] **P6 — Duplo `listar_paginado(limit=500)` no mesmo request de notificações**
+  - `_sincronizar_magias_automaticas()` e `_garantir_notificacoes_sistema()` buscam catálogo separadamente
+  - Fix: extrair uma busca só e passar como parâmetro para ambas
+
+### 🟢 Bom ter
+
+- [x] **P3 — Cache singleton de `MagiaService` no frontend**
+  - Instância destruída a cada abertura do grimório; cache `Map` interno perdido
+  - Fix: mover para `window._magiaServiceSingleton` ou `sessionStorage`
+
+- [x] **B5 — `finalizar_todos` itera combates em Python**
+  - Loop Python para marcar cada combate como inativo
+  - Fix: `UPDATE combates SET ativo = false WHERE ativo = true` (SQL único)
+
+- [x] **B3 — Índices compostos ausentes em `grimorio_notificacoes`**
+  - Queries por `(combatente_id, classe, lida)` e `(combatente_id, tipo)` sem índice composto
+  - Fix: migration Alembic com `Index('ix_...', col1, col2, col3)`
+
+- [ ] **B1 — `declarative_base()` de import deprecado**
+  - `from sqlalchemy.ext.declarative import declarative_base` → legado desde SQLAlchemy 1.4
+  - Fix: `from sqlalchemy.orm import DeclarativeBase`
+
+- [ ] **P2 — Paralelizar `_carregarCatalogoClasse` no Grimório** *(Bloqueado)*
+  - `_carregarItensGrimorio` depende de `catalogoIndex` → refatoração maior necessária
+  - Fix futuro: separar o merge do fetch para permitir paralelização no `Promise.all`
+
+---
+
 ## 🧭 Checklist 2 — Consolidação Pós-Implementação
 
 > Novo checklist para revisão do projeto após a grande rodada de melhorias.  
@@ -483,7 +557,7 @@ A cada chamada ao endpoint de notificações são disparadas internamente:
   - Fix: incluir `this._carregarCatalogoClasse()` dentro do `Promise.all` junto com os demais
   - Risco: baixo (catálogo não é dependência dos outros requests no `Promise.all`)
 
-- [ ] **P3 — Cache de catálogo de magias entre aberturas do Grimório**
+- [x] **P3 — Cache de catálogo de magias entre aberturas do Grimório**
   - Arquivo: `frontend/js/services/MagiaService.js`
   - Problema: `MagiaService` é reinstanciado a cada abertura do grimório → cache `Map` interno destruído
   - Fix: mover instância para `window._magiaService` (singleton de sessão) ou usar `sessionStorage` para o catálogo por classe
@@ -498,7 +572,7 @@ A cada chamada ao endpoint de notificações são disparadas internamente:
 
 #### 🟡 Média Prioridade
 
-- [ ] **P5 — Separar sincronização automática do endpoint de notificações**
+- [x] **P5 — Separar sincronização automática do endpoint de notificações**
   - Arquivo: `backend/app/services/grimorio_service.py`, método `listar_notificacoes()`
   - Problema: sincronização (_sincronizar_magias_automaticas + _reconciliar_magias_invalidas) roda em todo GET de notificações
   - Fix opção A: executar sincronização apenas se `force_sync=True` (query param)
@@ -506,7 +580,7 @@ A cada chamada ao endpoint de notificações são disparadas internamente:
   - Fix opção C: mover sincronização para evento de abertura do grimório (`POST /grimorio/{id}/sync`)
   - Impacto estimado: reduz endpoint de notificações de ~400ms para ~150ms
 
-- [ ] **P6 — Eliminar duplo `listar_paginado(limit=500)` no mesmo request de notificações**
+- [x] **P6 — Eliminar duplo `listar_paginado(limit=500)` no mesmo request de notificações**
   - Arquivo: `backend/app/services/grimorio_service.py`
   - Problema: `_sincronizar_magias_automaticas()` e `_garantir_notificacoes_sistema()` ambas chamam `listar_paginado(limit=500)` no mesmo request
   - Fix: extrair `magias_catalogo = await listar_paginado(limit=500)` uma vez e passar como parâmetro para ambas

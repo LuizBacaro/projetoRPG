@@ -1,7 +1,7 @@
 """
 Model do Combate (Entity)
 """
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Column, Integer, Boolean, JSON, DateTime, String
 from typing import List
@@ -76,7 +76,7 @@ class CombateHistorico(Base):
 
     motivo_encerramento = Column(String(40), nullable=False, default="manual")
     estatisticas = Column(JSON, nullable=False, default=dict)
-    finalizado_em = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    finalizado_em = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), index=True)
 
     def __repr__(self):
         return (

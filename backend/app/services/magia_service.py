@@ -4,16 +4,10 @@ from __future__ import annotations
 
 from dataclasses import asdict, is_dataclass
 from typing import Any
-import unicodedata
-
-
-def _normalizar_classe(valor: str) -> str:
-    """Remove acentos e converte para maiúsculo, padronizando nomes de classe para o BD."""
-    normalized = unicodedata.normalize("NFD", str(valor or ""))
-    sem_acentos = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
-    return sem_acentos.strip().upper()
 
 from fastapi import HTTPException
+
+from ..core.text_utils import normalizar_classe as _normalizar_classe
 
 from ..models.magia import Magia
 from ..repositories.base import commit_with_rollback
@@ -227,9 +221,7 @@ class MagiaService:
 
     @staticmethod
     def _normalizar_texto(value: str) -> str:
-        normalized = unicodedata.normalize("NFD", str(value or ""))
-        sem_acentos = "".join(ch for ch in normalized if unicodedata.category(ch) != "Mn")
-        return sem_acentos.strip().upper()
+        return _normalizar_classe(value)
 
     @classmethod
     def normalizar_dominios(cls, dominios_raw: str) -> str:

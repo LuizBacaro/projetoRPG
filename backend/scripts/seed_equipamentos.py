@@ -76,7 +76,7 @@ def seed_equipamentos(db):
     Popula a tabela de equipamentos com dados padrão.
     """
     from app.models.equipamento import Equipamento
-    from datetime import datetime
+    from datetime import datetime, timezone
     
     # Verificar se já existem equipamentos
     count = db.query(Equipamento).count()
@@ -92,7 +92,7 @@ def seed_equipamentos(db):
             descricao=descricao,
             pagina_referencia=pag_ref,
             ativo=True,
-            criado_em=datetime.utcnow()
+            criado_em=datetime.now(timezone.utc)
         )
         db.add(equipamento)
     

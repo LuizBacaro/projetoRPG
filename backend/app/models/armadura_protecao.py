@@ -3,7 +3,7 @@ armadura_protecao.py
 SRP: modelos ORM para catálogo e vínculo de armaduras/itens de proteção do personagem
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -28,7 +28,7 @@ class ArmaduraProtecao(Base):
     peso = Column(Float, nullable=True)
     propriedades_especiais = Column(String(600), nullable=True)
     ativo = Column(Boolean, nullable=False, default=True, index=True)
-    criado_em = Column(DateTime, nullable=False, default=datetime.utcnow)
+    criado_em = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
 
     combatentes = relationship(
         "ArmaduraProtecaoJogador",
@@ -47,6 +47,6 @@ class ArmaduraProtecaoJogador(Base):
     id = Column(Integer, primary_key=True, index=True)
     combatente_id = Column(Integer, ForeignKey("combatentes.id", ondelete="CASCADE"), nullable=False, index=True)
     item_id = Column(Integer, ForeignKey("armaduras_protecao.id", ondelete="CASCADE"), nullable=False, index=True)
-    adicionado_em = Column(DateTime, nullable=False, default=datetime.utcnow)
+    adicionado_em = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
 
     item = relationship("ArmaduraProtecao", back_populates="combatentes", lazy="joined")

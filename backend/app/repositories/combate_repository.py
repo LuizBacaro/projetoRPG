@@ -1,6 +1,7 @@
 """Repository específico para Combate e histórico."""
 
 from typing import List, Optional
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 from .base import BaseRepository, commit_with_rollback
 from ..models.combate import Combate, CombateHistorico
@@ -24,17 +25,17 @@ class CombateRepository(BaseRepository[Combate]):
     
     def finalizar_todos(self) -> int:
         """
-        Finaliza todos os combates ativos
-        Retorna o número de combates finalizados
+        Finaliza todos os combates ativos com um único UPDATE.
+        Retorna o número de combates finalizados.
         """
-        combates_ativos = self.db.query(Combate).filter(Combate.ativo == True).all()
-        count = len(combates_ativos)
-        
-        for combate in combates_ativos:
-            combate.finalizar()
-        
+        result = self.db.execute(
+            update(Combate)
+            .where(Combate.ativo == True)
+            .values(ativo=False)
+            .execution_options(synchronize_session="fetch")
+        )
         commit_with_rollback(self.db)
-        return count
+        return result.rowcount
 
     def criar_historico(self, historico: CombateHistorico) -> CombateHistorico:
         self.db.add(historico)

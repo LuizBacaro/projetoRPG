@@ -3,7 +3,6 @@ api/v1/magias_preparadas.py
 SRP: Endpoints para magias preparadas e usadas por conjurador
 """
 import re
-import unicodedata
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -20,27 +19,9 @@ from app.schemas.ataque import (
     DescansoRequest,
 )
 
+from app.core.text_utils import normalizar_classe_acesso as _normalizar_classe, classes_magia as _classes_magia
+
 router = APIRouter(prefix="/magias-preparadas", tags=["Magias Preparadas"])
-
-
-def _normalizar_classe(valor: str) -> str:
-    if not valor:
-        return ""
-    normalizado = unicodedata.normalize("NFD", str(valor))
-    normalizado = "".join(ch for ch in normalizado if unicodedata.category(ch) != "Mn")
-    normalizado = normalizado.strip().upper()
-
-    aliases = {
-        "FEITICEIRO": "MAGO",
-        "PATRULHEIRO": "RANGER",
-    }
-    return aliases.get(normalizado, normalizado)
-
-
-def _classes_magia(valor: str) -> set:
-    partes = [p.strip() for p in re.split(r"[,/;|]", valor or "") if p.strip()]
-    classes = {_normalizar_classe(parte) for parte in partes}
-    return {classe for classe in classes if classe}
 
 
 def _normalizar_quantidade(valor: Optional[int], padrao: int = 1) -> int:

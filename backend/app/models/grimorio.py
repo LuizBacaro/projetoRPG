@@ -1,8 +1,8 @@
 """Modelos do Grimório de magias conhecidas por combatente/classe."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from ..core.database import Base
@@ -22,7 +22,7 @@ class GrimorioMagia(Base):
     favorita = Column(Boolean, nullable=False, default=False)
     anotacoes = Column(Text, nullable=True)
     origem = Column(String(30), nullable=False, default="SELECAO_MANUAL")
-    adicionada_em = Column(DateTime, default=datetime.utcnow, nullable=False)
+    adicionada_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     combatente = relationship("Combatente", lazy="joined")
     magia = relationship("Magia", lazy="joined")
@@ -37,7 +37,7 @@ class GrimorioHistoricoTroca(Base):
     magia_removida_id = Column(Integer, ForeignKey("magias.id", ondelete="RESTRICT"), nullable=False, index=True)
     magia_adicionada_id = Column(Integer, ForeignKey("magias.id", ondelete="RESTRICT"), nullable=False, index=True)
     nivel_personagem = Column(Integer, nullable=False)
-    realizada_em = Column(DateTime, default=datetime.utcnow, nullable=False)
+    realizada_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     combatente = relationship("Combatente", lazy="joined")
     magia_removida = relationship("Magia", foreign_keys=[magia_removida_id], lazy="joined")
@@ -53,6 +53,13 @@ class GrimorioNotificacao(Base):
     tipo = Column(String(40), nullable=False, index=True)
     dados = Column(Text, nullable=True)
     lida = Column(Boolean, nullable=False, default=False)
-    criada_em = Column(DateTime, default=datetime.utcnow, nullable=False)
+    criada_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     combatente = relationship("Combatente", lazy="joined")
+
+    __table_args__ = (
+        # Query mais frequente: listar notificações por combatente+classe filtrando lidas/não-lidas
+        Index("ix_grimorio_notificacoes_comb_classe_lida", "combatente_id", "classe", "lida"),
+        # Query de deduplicação: buscar notificação aberta por tipo para evitar duplicatas
+        Index("ix_grimorio_notificacoes_comb_classe_tipo", "combatente_id", "classe", "tipo"),
+    )

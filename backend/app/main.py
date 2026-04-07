@@ -40,9 +40,9 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description="API para gerenciamento de combates TTRPG",
-    openapi_url="/api/openapi.json",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc"
+    openapi_url="/api/openapi.json" if settings.ENVIRONMENT != "production" else None,
+    docs_url="/api/docs" if settings.ENVIRONMENT != "production" else None,
+    redoc_url="/api/redoc" if settings.ENVIRONMENT != "production" else None,
 )
 
 # ── Middleware CORS ──────────────────────────────────────────────────────────
@@ -176,9 +176,19 @@ async def pericias_page():
 
 @app.get("/health")
 async def health():
-    """Verificar saúde da API."""
+    """Verificar saúde da API e conectividade com o banco."""
+    db = SessionLocal()
+    try:
+        db.execute(text("SELECT 1"))
+        db_status = "ok"
+    except Exception as exc:
+        logger.error("Health check falhou na conexão com banco: %s", exc)
+        db_status = "error"
+    finally:
+        db.close()
     return {
-        "status": "ok",
+        "status": "ok" if db_status == "ok" else "degraded",
+        "db": db_status,
         "environment": settings.ENVIRONMENT,
         "version": settings.VERSION,
         "cors_enabled": True
