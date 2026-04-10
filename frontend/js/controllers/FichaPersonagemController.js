@@ -52,6 +52,7 @@ export class FichaPersonagemController {
         this.dominiosPermitidos = [...DOMINIOS_PERMITIDOS_FALLBACK];
         this.divindadesSugeridas = [...DIVINDADES_SUGERIDAS_FALLBACK];
         this.fonteDivindades = 'fallback';
+        this._dadosDivinosCarregados = false;
 
         // ✅ NOVO: canal de escuta arena → ficha
         this._canal = null;
@@ -68,10 +69,6 @@ export class FichaPersonagemController {
 
 
             this.combatente = await this.combatenteService.obterCombatente(parseInt(combatenteId));
-            await Promise.all([
-                this._carregarDivindadesSugeridas(),
-                this._carregarDominiosPermitidos(),
-            ]);
 
             // ✅ Expor globalmente para debug no console
             window._fichaController = this;
@@ -702,6 +699,15 @@ export class FichaPersonagemController {
         const selectDominio2 = document.getElementById('selectPerfilDominio2');
         const clerigo = this._ehClasseClerigo();
         if (!modal || !this.combatente) return;
+
+        // Lazy load: abre imediatamente com valores fallback/cache, atualiza dropdowns em background
+        if (!this._dadosDivinosCarregados) {
+            this._dadosDivinosCarregados = true;
+            Promise.all([
+                this._carregarDivindadesSugeridas(),
+                this._carregarDominiosPermitidos(),
+            ]).catch(() => { /* fallback já está no estado */ });
+        }
 
         this._renderizarListaDominiosPerfil();
         

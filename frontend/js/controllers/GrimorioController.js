@@ -157,13 +157,26 @@ class GrimorioController {
     async _recarregarDados() {
         this._mostrarLoading(true);
         try {
-            await this._carregarCatalogoClasse();
-            await Promise.all([
-                this._carregarItensGrimorio(),
+            // Busca catálogo e itens do grimório em paralelo com os demais endpoints —
+            // o processing (mapear + mesclar) ocorre após o Promise.all, quando catalogoIndex já está pronto
+            const itensRawPromise = (this.combatente?.id && this.classeAtiva)
+                ? this.grimorioService.listar(this.combatente.id, { classe: this.classeAtiva })
+                : Promise.resolve([]);
+
+            const [itensRaw] = await Promise.all([
+                itensRawPromise,
+                this._carregarCatalogoClasse(),
                 this._carregarNotificacoes(),
                 this._carregarMagiasPreparadas(),
                 this._carregarHistoricoTrocas(),
             ]);
+
+            if (this.combatente?.id && this.classeAtiva) {
+                this.itensGrimorio = itensRaw.map((item) => this._mapearItemGrimorio(item));
+                this._mesclarCatalogoDisponivelNoGrimorio();
+            } else {
+                this.itensGrimorio = [];
+            }
 
             this._renderizarCabecalho();
             this._renderizarSeletorClasses();
