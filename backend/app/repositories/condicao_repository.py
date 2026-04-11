@@ -21,6 +21,10 @@ class CondicaoRepository:
     def __init__(self, db: Session):
         self.db = db
 
+    def commit(self) -> None:
+        """Executa commit explícito para fluxos em lote."""
+        commit_with_rollback(self.db)
+
     # ── Catálogo ────────────────────────────────────────────────────────────
 
     def get_all(self) -> List[Dict]:
@@ -85,7 +89,13 @@ class CondicaoRepository:
             for row in registros
         ]
 
-    def aplicar(self, combatente_id: int, condicao_id: int, duracao_turnos: int = -1) -> None:
+    def aplicar(
+        self,
+        combatente_id: int,
+        condicao_id: int,
+        duracao_turnos: int = -1,
+        commit: bool = True,
+    ) -> None:
         """
         Aplica uma condição a um combatente com duração.
         ✅ Idempotente — atualiza duração se já existe
@@ -107,24 +117,33 @@ class CondicaoRepository:
             )
             self.db.add(cc)
 
-        commit_with_rollback(self.db)
+        if commit:
+            commit_with_rollback(self.db)
 
-    def remover(self, combatente_id: int, condicao_id: int) -> None:
+    def remover(self, combatente_id: int, condicao_id: int, commit: bool = True) -> None:
         """Remove uma condição específica de um combatente"""
         self.db.query(CombatenteCondicao).filter(
             CombatenteCondicao.combatente_id == combatente_id,
             CombatenteCondicao.condicao_id == condicao_id,
         ).delete()
-        commit_with_rollback(self.db)
+        if commit:
+            commit_with_rollback(self.db)
 
-    def remover_todas(self, combatente_id: int) -> None:
+    def remover_todas(self, combatente_id: int, commit: bool = True) -> None:
         """Remove todas as condições de um combatente"""
         self.db.query(CombatenteCondicao).filter(
             CombatenteCondicao.combatente_id == combatente_id
         ).delete()
-        commit_with_rollback(self.db)
+        if commit:
+            commit_with_rollback(self.db)
 
-    def atualizar_duracao(self, combatente_id: int, condicao_id: int, nova_duracao: int) -> bool:
+    def atualizar_duracao(
+        self,
+        combatente_id: int,
+        condicao_id: int,
+        nova_duracao: int,
+        commit: bool = True,
+    ) -> bool:
         """Atualiza a duração em turnos de uma condição específica
         
         Returns:
@@ -139,5 +158,6 @@ class CondicaoRepository:
             return False
 
         cc.duracao_turnos = nova_duracao
-        commit_with_rollback(self.db)
+        if commit:
+            commit_with_rollback(self.db)
         return True

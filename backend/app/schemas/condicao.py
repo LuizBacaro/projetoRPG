@@ -2,7 +2,7 @@
 Schemas de Condição
 Princípio SOLID: DIP - Define contrato de dados
 """
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
@@ -22,6 +22,19 @@ class AplicarCondicaoRequest(BaseModel):
     """
     condicao_id: int
     duracao_turnos: Optional[int] = -1  # ✅ NOVO: default permanente (-1)
+
+
+class AplicarCondicaoMassaRequest(BaseModel):
+    combatente_ids: List[int] = Field(..., min_length=1)
+    condicao_id: int
+    duracao_turnos: int = -1
+
+
+class AplicarCondicaoMassaResponse(BaseModel):
+    combatente_ids: List[int]
+    total_aplicados: int
+    condicao_id: int
+    duracao_turnos: int
 
 
 class RemoverCondicaoRequest(BaseModel):

@@ -20,11 +20,21 @@ class TestCombatenteService:
     def mock_file_service(self):
         """Mock do file service"""
         return Mock()
+
+    @pytest.fixture
+    def mock_condicao_repository(self):
+        """Mock do repository de condições"""
+        return Mock()
     
     @pytest.fixture
     def service(self, mock_repository, mock_file_service):
         """Instância do service com mocks"""
         return CombatenteService(mock_repository, mock_file_service)
+
+    @pytest.fixture
+    def service_com_condicoes(self, mock_repository, mock_file_service, mock_condicao_repository):
+        """Instância do service com integração de condições"""
+        return CombatenteService(mock_repository, mock_file_service, mock_condicao_repository)
     
     def test_listar_todos(self, service, mock_repository):
         """Testa listagem de todos os combatentes"""
@@ -107,6 +117,38 @@ class TestCombatenteService:
         # Assert
         assert resultado['hp_atual'] == 65
         mock_repository.update.assert_called_once()
+
+    def test_sincronizar_estado_hp_faz_commit_unico(self, service_com_condicoes, mock_condicao_repository):
+        combatente = Combatente(
+            id=1,
+            nome="Theron",
+            tipo="jogador",
+            classe="Guerreiro",
+            hp_maximo=85,
+            hp_atual=0,
+            iniciativa=15,
+        )
+
+        mock_condicao_repository.get_by_nome.side_effect = [
+            Mock(id=10),
+            Mock(id=20),
+        ]
+
+        service_com_condicoes._sincronizar_estado_hp(combatente)
+
+        mock_condicao_repository.remover.assert_called_once_with(1, 20, commit=False)
+        mock_condicao_repository.aplicar.assert_called_once_with(1, 10, duracao_turnos=-1, commit=False)
+        mock_condicao_repository.commit.assert_called_once()
+
+    def test_cache_id_condicao_evitar_lookup_repetido(self, service_com_condicoes, mock_condicao_repository):
+        mock_condicao_repository.get_by_nome.return_value = Mock(id=99)
+
+        primeiro = service_com_condicoes._id_condicao("Inconsciente")
+        segundo = service_com_condicoes._id_condicao("Inconsciente")
+
+        assert primeiro == 99
+        assert segundo == 99
+        mock_condicao_repository.get_by_nome.assert_called_once_with("Inconsciente")
 
     def test_criar_clerigo_exige_exatamente_dois_dominios(self, service, mock_repository):
         combatente_data = {

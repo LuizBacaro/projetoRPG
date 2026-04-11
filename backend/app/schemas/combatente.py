@@ -133,6 +133,19 @@ class DanoCuraRequest(BaseModel):
     class Config:
         json_schema_extra = {"example": {"valor": 10}}
 
+
+class DanoCuraMassaRequest(BaseModel):
+    combatente_ids: List[int] = Field(..., min_length=1)
+    valor: int = Field(..., gt=0)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "combatente_ids": [1, 2, 3],
+                "valor": 10,
+            }
+        }
+
 class DanoCuraResponse(BaseModel):
     id:        int
     nome:      str
@@ -141,3 +154,8 @@ class DanoCuraResponse(BaseModel):
     mensagem:  str
     class Config:
         from_attributes = True
+
+
+class DanoCuraMassaResponse(BaseModel):
+    resultados: List[DanoCuraResponse]
+    total: int

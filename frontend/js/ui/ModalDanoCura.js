@@ -35,6 +35,7 @@ class ModalDanoCura {
         this.arenaController         = arenaController;
         this.modalElement            = null;
         this.combatentesSelecionados = new Set();
+        this._aplicando              = false;
         this.inicializar();
     }
 
@@ -147,6 +148,10 @@ class ModalDanoCura {
     // ── Aplicar dano ou cura ──────────────────────────────────────────────
 
     async aplicar() {
+        if (this._aplicando) {
+            return;
+        }
+
         try {
 
             const dano = parseInt(document.getElementById('inputDanoModal').value) || 0;
@@ -167,32 +172,41 @@ class ModalDanoCura {
             const ids   = Array.from(this.combatentesSelecionados);
             const tipo  = validacao.tipo;   // 'dano' | 'cura'
             const valor = validacao.valor;
+            const btnAplicar = document.getElementById('btnAplicarModalDanoCura');
 
-            if (tipo === 'dano') {
-                await this.danoCuraService.aplicarDanoEmMassa(ids, valor);
-            } else {
-                await this.danoCuraService.aplicarCuraEmMassa(ids, valor);
-            }
+            this._aplicando = true;
+            if (btnAplicar) btnAplicar.disabled = true;
 
-            // Sincroniza HP nos combatentes locais do ArenaController
-            ids.forEach(id => {
-                const c = this.arenaController.combatentes.find(x => x.id === id);
-                if (!c) return;
-
+            try {
                 if (tipo === 'dano') {
-                    c.hp_atual = Math.max(0, c.hp_atual - valor);
+                    await this.danoCuraService.aplicarDanoEmMassa(ids, valor);
                 } else {
-                    c.hp_atual = Math.min(c.hp_maximo, c.hp_atual + valor);
+                    await this.danoCuraService.aplicarCuraEmMassa(ids, valor);
                 }
-            });
 
-            // Atualiza a interface da arena
-            this.arenaController.atualizarInterface();
+                // Sincroniza HP nos combatentes locais do ArenaController
+                ids.forEach(id => {
+                    const c = this.arenaController.combatentes.find(x => x.id === id);
+                    if (!c) return;
 
-            const emoji = tipo === 'dano' ? '⚔️' : '💚';
-            mostrarToast(`${emoji} ${tipo === 'dano' ? 'Dano' : 'Cura'} de ${valor} aplicado!`, 'success');
+                    if (tipo === 'dano') {
+                        c.hp_atual = Math.max(0, c.hp_atual - valor);
+                    } else {
+                        c.hp_atual = Math.min(c.hp_maximo, c.hp_atual + valor);
+                    }
+                });
 
-            this.fechar();
+                // Atualiza a interface da arena sem recarregar badges de condição
+                this.arenaController.atualizarInterfaceRapidaDanoCura(ids);
+
+                const emoji = tipo === 'dano' ? '⚔️' : '💚';
+                mostrarToast(`${emoji} ${tipo === 'dano' ? 'Dano' : 'Cura'} de ${valor} aplicado!`, 'success');
+
+                this.fechar();
+            } finally {
+                this._aplicando = false;
+                if (btnAplicar) btnAplicar.disabled = false;
+            }
 
         } catch (erro) {
             console.error('❌ Erro ao aplicar dano/cura:', erro);

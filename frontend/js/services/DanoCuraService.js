@@ -25,6 +25,19 @@ class DanoCuraService {
         return headers;
     }
 
+    async _extrairMensagemErro(response, fallbackMessage) {
+        try {
+            const errorData = await response.json();
+            if (errorData && typeof errorData.detail === 'string' && errorData.detail.trim()) {
+                return errorData.detail;
+            }
+        } catch (_) {
+            // Ignora erro de parse para manter fallback resiliente
+        }
+
+        return `HTTP ${response.status}: ${fallbackMessage}`;
+    }
+
     /**
      * Aplica dano a um combatente
      * @param {number} combatenteId - ID do combatente
@@ -40,8 +53,7 @@ class DanoCuraService {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Erro ao aplicar dano');
+                throw new Error(await this._extrairMensagemErro(response, 'Erro ao aplicar dano'));
             }
 
             const resultado = await response.json();
@@ -68,8 +80,7 @@ class DanoCuraService {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Erro ao aplicar cura');
+                throw new Error(await this._extrairMensagemErro(response, 'Erro ao aplicar cura'));
             }
 
             const resultado = await response.json();
@@ -92,11 +103,24 @@ class DanoCuraService {
             throw new Error('Valor de dano inválido');
         }
 
-
-        const promessas = combatenteIds.map(id => this.aplicarDano(id, valorDano));
-
         try {
-            return await Promise.all(promessas);
+            const response = await fetch(`${getApiUrl('/combatentes')}/dano/massa`, {
+                method: 'POST',
+                headers: this._buildHeaders(),
+                body: JSON.stringify({ combatente_ids: combatenteIds, valor: valorDano })
+            });
+
+            if (response.ok) {
+                const resultado = await response.json();
+                return Array.isArray(resultado?.resultados) ? resultado.resultados : [];
+            }
+
+            if (response.status === 404 || response.status === 405) {
+                console.warn('⚠️ Endpoint batch de dano indisponível, aplicando fallback por combatente');
+                return Promise.all(combatenteIds.map(id => this.aplicarDano(id, valorDano)));
+            }
+
+            throw new Error(await this._extrairMensagemErro(response, 'Erro ao aplicar dano em massa'));
         } catch (erro) {
             console.error('❌ Erro ao aplicar dano em massa:', erro);
             throw erro;
@@ -114,11 +138,24 @@ class DanoCuraService {
             throw new Error('Valor de cura inválido');
         }
 
-
-        const promessas = combatenteIds.map(id => this.aplicarCura(id, valorCura));
-
         try {
-            return await Promise.all(promessas);
+            const response = await fetch(`${getApiUrl('/combatentes')}/cura/massa`, {
+                method: 'POST',
+                headers: this._buildHeaders(),
+                body: JSON.stringify({ combatente_ids: combatenteIds, valor: valorCura })
+            });
+
+            if (response.ok) {
+                const resultado = await response.json();
+                return Array.isArray(resultado?.resultados) ? resultado.resultados : [];
+            }
+
+            if (response.status === 404 || response.status === 405) {
+                console.warn('⚠️ Endpoint batch de cura indisponível, aplicando fallback por combatente');
+                return Promise.all(combatenteIds.map(id => this.aplicarCura(id, valorCura)));
+            }
+
+            throw new Error(await this._extrairMensagemErro(response, 'Erro ao aplicar cura em massa'));
         } catch (erro) {
             console.error('❌ Erro ao aplicar cura em massa:', erro);
             throw erro;
