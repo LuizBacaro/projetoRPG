@@ -49,6 +49,10 @@ def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
+    except HTTPException:
+        # Erros HTTP esperados (ex.: token inválido/expirado) não são falhas de BD.
+        db.rollback()
+        raise
     except Exception as e:
         logger.error(f"❌ Erro na sessão do BD: {str(e)}")
         db.rollback()

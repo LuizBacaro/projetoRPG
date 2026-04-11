@@ -3,6 +3,7 @@ database.py
 SRP: Configuração SQLAlchemy — gerenciar conexão com banco de dados
 SOLID: Configuração centralizada por ambiente (SQLite/PostgreSQL)
 """
+from fastapi import HTTPException
 from sqlalchemy import create_engine, event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -94,6 +95,10 @@ def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
+    except HTTPException:
+        # Erros HTTP esperados (ex.: 401/403 de autenticação) não são falhas de BD.
+        db.rollback()
+        raise
     except Exception as e:
         logger.error(f"❌ Erro na sessão do BD: {str(e)}")
         db.rollback()

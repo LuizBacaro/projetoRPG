@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (typeof ModalCondicao !== 'undefined' && typeof CondicaoService !== 'undefined') {
         try {
-            window.modalCondicaoInstance = new ModalCondicao(new CondicaoService('/api'), app.controllers.arena);
+            window.modalCondicaoInstance = new ModalCondicao(new CondicaoService(), app.controllers.arena);
         } catch (e) {
             reportDegradedMode('modal-condicao', e, 'Falha ao iniciar modal de condicoes.');
         }

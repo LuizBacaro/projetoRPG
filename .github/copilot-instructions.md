@@ -12,6 +12,21 @@ Este workspace usa instrucoes granulares por dominio em `.github/instructions`.
 - Priorize mudancas pequenas e de causa raiz; evite reformatacao ampla sem necessidade.
 - Nao reverta mudancas existentes do usuario sem solicitacao explicita.
 
+## Protocolo Obrigatorio de Implementacao
+
+- Antes de qualquer refatoracao estetica/estrutural, priorizar validacao e preservacao dos requisitos funcionais do fluxo afetado.
+- Antes de implementar qualquer melhoria/correcao/feature, revisar o contexto em `README.md` e as instrucoes em `.github/instructions/*.md` aplicaveis ao dominio alterado.
+- Quando a mudanca tocar arquitetura, infraestrutura, deploy, dados, fluxo critico ou decisoes historicas, consultar tambem `HISTORICO_EVOLUCAO.md` antes da implementacao.
+- Em tarefas com uso de skills, agentes ou instrucoes especializadas, manter o mesmo protocolo de leitura de contexto documental antes de codar.
+- Sempre priorizar reuso e modularidade: evitar duplicacao de regras, centralizar fonte de verdade e preservar contratos existentes.
+- Aplicar SOLID e Clean Code em toda alteracao:
+	- funcoes/metodos curtos com responsabilidade unica (SRP);
+	- baixo acoplamento e alta coesao;
+	- nomes claros e semanticos;
+	- evitar logica duplicada e efeitos colaterais ocultos;
+	- minimizar breaking changes e manter compatibilidade quando possivel.
+- Ao concluir mudancas em fluxos sensiveis, validar impacto e registrar risco residual quando nao houver cobertura automatizada suficiente.
+
 ## Infra de Producao
 
 - **Frontend:** Vercel (estatico, CDN global) — dominio `arena-de-combate-rpg.com.br` via Cloudflare

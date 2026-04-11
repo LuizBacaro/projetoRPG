@@ -324,6 +324,21 @@ frontend/
 
 ---
 
+## ✅ Checklist Obrigatório (PR)
+
+Antes de implementar ou aprovar qualquer melhoria/correção/feature, validar:
+
+- [ ] Requisitos funcionais do fluxo impactado foram verificados e priorizados antes de qualquer refatoração.
+- [ ] Leitura do contexto funcional no `README.md` (fluxo afetado + contratos existentes).
+- [ ] Leitura das instruções aplicáveis em `.github/instructions/*.md` (backend, frontend e/ou migrations).
+- [ ] Quando a mudança envolver arquitetura, infra, deploy, dados ou fluxo crítico, leitura do `HISTORICO_EVOLUCAO.md`.
+- [ ] Reuso e modularidade preservados: sem duplicação de regra e com fonte de verdade única.
+- [ ] Aplicação de SOLID/Clean Code: SRP, baixo acoplamento, alta coesão, nomes claros e sem efeitos colaterais ocultos.
+- [ ] Compatibilidade preservada: evitar breaking changes em API/contratos sem necessidade explícita.
+- [ ] Em fluxos sensíveis (auth, cache, listagens, migrations, startup), impacto validado e risco residual documentado quando faltar teste automatizado.
+
+---
+
 ## 🗄️ Modelo de Dados
 
 ```

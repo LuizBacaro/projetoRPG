@@ -46,7 +46,6 @@ export class FichaPersonagemController {
         this.armaduraProtecaoService = new ArmaduraProtecaoService();
         this.talentoService = new TalentoService();
         this.periciaService = new PericiaService();
-        this.token             = localStorage.getItem('token');
         this.combatente        = null;
         this.bonusCaProtecao   = 0;
         this.dominiosPermitidos = [...DOMINIOS_PERMITIDOS_FALLBACK];
@@ -57,6 +56,14 @@ export class FichaPersonagemController {
         this._canal = null;
         this._configurarCanalSync();
 
+    }
+
+    get token() {
+        return localStorage.getItem('token');
+    }
+
+    set token(_value) {
+        // Compatibilidade: token sempre lido ao vivo do localStorage.
     }
 
     async inicializar() {

@@ -12,6 +12,14 @@ export class CombatenteService {
         this.token = localStorage.getItem('token');
     }
 
+    get token() {
+        return localStorage.getItem('token');
+    }
+
+    set token(_value) {
+        // Compatibilidade: evita token congelado no constructor legado.
+    }
+
     /**
      * Converte JSON da API para instância de Combatente
      * @param {Object} data - JSON puro da API

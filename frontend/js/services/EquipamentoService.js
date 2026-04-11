@@ -12,6 +12,14 @@ export class EquipamentoService {
         this.baseUrl = getApiUrl('/equipamentos');
     }
 
+    get token() {
+        return localStorage.getItem('token');
+    }
+
+    set token(_value) {
+        // Compatibilidade: evita token congelado no constructor legado.
+    }
+
     /**
      * Lista todos os equipamentos disponíveis
      * @param {number} skip - Offset para paginação
