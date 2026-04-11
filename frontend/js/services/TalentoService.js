@@ -12,6 +12,14 @@ export class TalentoService {
         this.token = localStorage.getItem('token');
     }
 
+    get token() {
+        return localStorage.getItem('token');
+    }
+
+    set token(_value) {
+        // Compatibilidade: evita token congelado no constructor legado.
+    }
+
     /**
      * Lista todos os talentos disponíveis
      * @param {number} skip

@@ -10,6 +10,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
 import logging
+import unicodedata
 from sqlalchemy import inspect, text
 
 from .core.config import settings
@@ -243,6 +244,8 @@ def _inicializar_banco(db) -> None:
         ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
         ("garantir_constraints_item_13", _garantir_constraints_item_13),
         ("seed_condicoes", lambda: _seed_condicoes(db)),
+        ("seed_pericias", lambda: _seed_pericias(db)),
+        ("seed_pericias_classes", lambda: _seed_pericias_classes(db)),
         ("inicializar_equipamentos", lambda: inicializar_equipamentos(db)),
         ("inicializar_talentos", lambda: inicializar_talentos(db)),
         ("seed_combatentes", lambda: _seed_combatentes(db)),
@@ -468,6 +471,86 @@ def _seed_pericias(db) -> None:
         db.rollback()
         logger.error(f"❌ Erro ao popular perícias: {str(e)}")
         print(f"❌ Erro ao popular perícias: {str(e)}")
+        raise
+
+
+def _normalizar_nome_pericia(valor: str) -> str:
+    """Normaliza nomes para casar perícias entre fontes de seed diferentes."""
+    if not valor:
+        return ""
+
+    texto = unicodedata.normalize("NFKD", valor)
+    texto = "".join(ch for ch in texto if not unicodedata.combining(ch))
+    texto = texto.lower().strip()
+    texto = "".join(ch if ch.isalnum() else " " for ch in texto)
+    return " ".join(texto.split())
+
+
+def _seed_pericias_classes(db) -> None:
+    """
+    Popula `pericias_classes` de forma idempotente para habilitar custo por classe.
+    """
+    from .models.pericia import Pericia, PericiaClasse
+    from scripts.seed_pericias import PERICIAS_DATA
+
+    try:
+        associacoes_antes = db.query(PericiaClasse).count()
+
+        pericias_db = db.query(Pericia.id, Pericia.nome).all()
+        if not pericias_db:
+            logger.info("ℹ️ Sem perícias cadastradas; seed_pericias_classes ignorado")
+            print("ℹ️ Sem perícias cadastradas; seed_pericias_classes ignorado")
+            return
+
+        mapa_por_nome = {
+            _normalizar_nome_pericia(nome): pericia_id
+            for pericia_id, nome in pericias_db
+        }
+
+        registros_novos = 0
+        nao_mapeadas = 0
+
+        for pericia in PERICIAS_DATA:
+            pericia_id = mapa_por_nome.get(_normalizar_nome_pericia(pericia.get("nome", "")))
+            if pericia_id is None:
+                nao_mapeadas += 1
+                continue
+
+            for classe_nome in pericia.get("classes", []):
+                existente = db.query(PericiaClasse.id).filter(
+                    PericiaClasse.pericia_id == pericia_id,
+                    PericiaClasse.classe_nome == classe_nome,
+                    PericiaClasse.is_default == 1,
+                ).first()
+                if existente:
+                    continue
+
+                db.add(
+                    PericiaClasse(
+                        pericia_id=pericia_id,
+                        classe_nome=classe_nome,
+                        is_default=1,
+                    )
+                )
+                registros_novos += 1
+
+        db.commit()
+        logger.info(
+            "✅ pericias_classes: %s -> %s (+%s), %s perícias sem match",
+            associacoes_antes,
+            associacoes_antes + registros_novos,
+            registros_novos,
+            nao_mapeadas,
+        )
+        print(
+            f"✅ pericias_classes: {associacoes_antes} -> {associacoes_antes + registros_novos} "
+            f"(+{registros_novos}) "
+            f"({nao_mapeadas} perícias sem match)"
+        )
+    except Exception as e:
+        db.rollback()
+        logger.error("❌ Erro ao popular pericias_classes: %s", str(e))
+        print(f"❌ Erro ao popular pericias_classes: {str(e)}")
         raise
 
 

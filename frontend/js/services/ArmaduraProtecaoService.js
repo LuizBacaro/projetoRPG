@@ -6,6 +6,14 @@ export class ArmaduraProtecaoService {
         this.baseUrl = getApiUrl('/armaduras_protecao');
     }
 
+    get token() {
+        return localStorage.getItem('token');
+    }
+
+    set token(_value) {
+        // Compatibilidade: evita token congelado no constructor legado.
+    }
+
     _headers() {
         return {
             'Content-Type': 'application/json',

@@ -12,6 +12,14 @@ export class PericiaService {
         this.baseUrl = getApiUrl('/pericias');
     }
 
+    get token() {
+        return localStorage.getItem('token');
+    }
+
+    set token(_value) {
+        // Compatibilidade: evita token congelado no constructor legado.
+    }
+
     /**
      * Lista todas as perícias disponíveis
      * @param {number} skip - Offset para paginação

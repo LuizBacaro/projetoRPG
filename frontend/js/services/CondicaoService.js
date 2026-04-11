@@ -5,12 +5,7 @@
  * ✅ CORRIGIDO: baseUrl agora aponta para /api/v1
  */
 
-const _getCondicaoBaseUrl = () => {
-    const isProduction = !['localhost', '127.0.0.1'].includes(window.location.hostname);
-    return isProduction
-        ? '/api/v1'
-        : 'http://127.0.0.1:8000/api/v1';   // ✅ /api → /api/v1
-};
+const _getCondicaoBaseUrl = () => window.getApiUrl('');
 
 class CondicaoService {
 

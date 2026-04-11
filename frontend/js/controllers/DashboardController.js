@@ -662,20 +662,51 @@ class DashboardController {
     _adicionarLinhaAtaque(ataque) {
         const lista = document.getElementById('listaAtaquesEdicao');
         if (!lista) return;
-        
+
+        const dados = {
+            nome: ataque?.nome || '',
+            bonus: ataque?.bonus_ataque || '+0',
+            dano: ataque?.dano || '',
+            tipo: ataque?.tipo_dano || '',
+        };
+
         const div = document.createElement('div');
         div.className = 'ataque-linha';
-        div.innerHTML = `
-            <input type="text" class="ataque-nome" placeholder="Nome" value="${ataque?.nome || ''}" />
-            <input type="text" class="ataque-bonus" placeholder="+0" value="${ataque?.bonus_ataque || '+0'}" style="width:70px" />
-            <input type="text" class="ataque-dano" placeholder="1d6" value="${ataque?.dano || ''}" style="width:90px" />
-            <input type="text" class="ataque-tipo" placeholder="tipo" value="${ataque?.tipo_dano || ''}" style="width:120px" />
-            <button type="button" class="btn-dash-delete">✕</button>
-        `;
-        const btnRemover = div.querySelector('.btn-dash-delete');
-        if (btnRemover) {
-            btnRemover.addEventListener('click', () => div.remove());
-        }
+
+        const inputNome = document.createElement('input');
+        inputNome.type = 'text';
+        inputNome.className = 'ataque-nome';
+        inputNome.placeholder = 'Nome';
+        inputNome.value = dados.nome;
+
+        const inputBonus = document.createElement('input');
+        inputBonus.type = 'text';
+        inputBonus.className = 'ataque-bonus';
+        inputBonus.placeholder = '+0';
+        inputBonus.value = dados.bonus;
+        inputBonus.style.width = '70px';
+
+        const inputDano = document.createElement('input');
+        inputDano.type = 'text';
+        inputDano.className = 'ataque-dano';
+        inputDano.placeholder = '1d6';
+        inputDano.value = dados.dano;
+        inputDano.style.width = '90px';
+
+        const inputTipo = document.createElement('input');
+        inputTipo.type = 'text';
+        inputTipo.className = 'ataque-tipo';
+        inputTipo.placeholder = 'tipo';
+        inputTipo.value = dados.tipo;
+        inputTipo.style.width = '120px';
+
+        const btnRemover = document.createElement('button');
+        btnRemover.type = 'button';
+        btnRemover.className = 'btn-dash-delete';
+        btnRemover.textContent = '✕';
+        btnRemover.addEventListener('click', () => div.remove());
+
+        div.append(inputNome, inputBonus, inputDano, inputTipo, btnRemover);
         lista.appendChild(div);
     }
 
