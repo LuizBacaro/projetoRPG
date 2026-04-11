@@ -21,14 +21,56 @@ export class GrimorioService {
         return encoded ? `?${encoded}` : '';
     }
 
-    async listar(combatenteId, { classe, favorita } = {}) {
-        const query = this._query({ classe, favorita });
+    _clampLimit(limit) {
+        const limitNumerico = Number(limit);
+        if (!Number.isFinite(limitNumerico)) return undefined;
+        return Math.min(200, Math.max(1, Math.trunc(limitNumerico)));
+    }
+
+    async listar(combatenteId, {
+        classe,
+        favorita,
+        nome,
+        nivel,
+        escola,
+        componentes,
+        magia_ids,
+        skip,
+        limit,
+    } = {}) {
+        const skipSeguro = Number.isFinite(Number(skip)) ? Math.max(0, Math.trunc(Number(skip))) : undefined;
+        const limitSeguro = this._clampLimit(limit);
+
+        const query = this._query({
+            classe,
+            favorita,
+            nome,
+            nivel,
+            escola,
+            componentes,
+            magia_ids,
+            skip: skipSeguro,
+            limit: limitSeguro,
+        });
         const url = getApiUrl(`/grimorio/${combatenteId}${query}`);
         const response = await fetch(url, { headers: this._headers() });
         if (!response.ok) {
             throw new Error(`Falha ao carregar grimorio (HTTP ${response.status})`);
         }
-        return response.json();
+
+        const items = await response.json();
+        const totalHeader = Number(response.headers.get('X-Total-Count'));
+        const skipHeader = Number(response.headers.get('X-Skip'));
+        const limitHeader = Number(response.headers.get('X-Limit'));
+
+        return {
+            items: Array.isArray(items) ? items : [],
+            total: Number.isFinite(totalHeader) ? totalHeader : (Array.isArray(items) ? items.length : 0),
+            skip: Number.isFinite(skipHeader) ? skipHeader : Number(skipSeguro || 0),
+            limit: Number.isFinite(limitHeader)
+                ? limitHeader
+                : Number(limitSeguro || (Array.isArray(items) ? items.length : 0)),
+        };
     }
 
     async adicionar(combatenteId, payload) {

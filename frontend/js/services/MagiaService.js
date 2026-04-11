@@ -27,7 +27,10 @@ export class MagiaService {
      * @returns {string}
      */
     _normalizarClasse(classe) {
-        let classNorm = classe.toUpperCase().trim();
+        const valorBase = String(classe || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+        let classNorm = valorBase.toUpperCase().trim();
         
         // Mapear Feiticeiro para Mago (mesmas magias)
         if (classNorm === 'FEITICEIRO') {
@@ -51,17 +54,14 @@ export class MagiaService {
         }
 
         try {
-            // Tenta buscar com filtro na API (classe em MAIÚSCULA)
-            const url = getApiUrl(`/magias/?classe=${encodeURIComponent(classeNormalizada)}&limit=500`);
-            
-            const res = await fetch(url, { headers: this._headers() });
-            
-            if (!res.ok) {
-                console.warn(`⚠️ Filtro na API falhou (HTTP ${res.status}), usando fallback...`);
+            const pagina = await this.listarPorClassePaginado(classeNormalizada, { skip: 0, limit: 500 });
+
+            if (!pagina || !Array.isArray(pagina.items)) {
+                console.warn('⚠️ Filtro na API paginada falhou, usando fallback...');
                 return await this._listarTodasEFiltrar(classeNormalizada);
             }
 
-            const magias = await res.json();
+            const magias = pagina.items;
             
             // Se a API retornar vazio, usa fallback
             if (!magias || magias.length === 0) {
@@ -82,6 +82,54 @@ export class MagiaService {
         }
     }
 
+    async listarPorClassePaginado(classe, {
+        nome,
+        nivel,
+        escola,
+        componentes,
+        skip = 0,
+        limit = 20,
+    } = {}) {
+        const classeNormalizada = this._normalizarClasse(classe);
+        const query = new URLSearchParams();
+        query.set('classe', classeNormalizada);
+
+        if (nome !== undefined && nome !== null && String(nome).trim() !== '') {
+            query.set('nome', String(nome).trim());
+        }
+        if (nivel !== undefined && nivel !== null && String(nivel).trim() !== '' && String(nivel) !== 'todos') {
+            query.set('nivel', String(nivel));
+        }
+        if (escola !== undefined && escola !== null && String(escola).trim() !== '' && String(escola) !== 'todas') {
+            query.set('escola', String(escola).trim());
+        }
+        if (componentes !== undefined && componentes !== null && String(componentes).trim() !== '' && String(componentes) !== 'todos') {
+            query.set('componentes', String(componentes).trim());
+        }
+
+        query.set('skip', String(Math.max(0, Number(skip || 0))));
+        query.set('limit', String(Math.max(1, Number(limit || 20))));
+
+        const url = getApiUrl(`/magias/?${query.toString()}`);
+        const res = await fetch(url, { headers: this._headers() });
+
+        if (!res.ok) {
+            throw new Error(`Falha ao carregar magias paginadas (HTTP ${res.status})`);
+        }
+
+        const items = await res.json();
+        const totalHeader = Number(res.headers.get('X-Total-Count'));
+        const skipHeader = Number(res.headers.get('X-Skip'));
+        const limitHeader = Number(res.headers.get('X-Limit'));
+
+        return {
+            items: Array.isArray(items) ? items : [],
+            total: Number.isFinite(totalHeader) ? totalHeader : (Array.isArray(items) ? items.length : 0),
+            skip: Number.isFinite(skipHeader) ? skipHeader : Math.max(0, Number(skip || 0)),
+            limit: Number.isFinite(limitHeader) ? limitHeader : Math.max(1, Number(limit || 20)),
+        };
+    }
+
     /**
      * Fallback: busca todas as magias e filtra por classe no frontend
      * @private
@@ -99,19 +147,18 @@ export class MagiaService {
             
             // ✅ FILTRA COMPARANDO EM MAIÚSCULA
             const magiasFiltradas = todasMagias.filter(m => {
-                const alvo = classeNormalizada.trim();
+                const alvo = this._normalizarClasse(classeNormalizada);
 
                 if (Array.isArray(m.classes_niveis) && m.classes_niveis.length > 0) {
                     return m.classes_niveis.some(cn =>
-                        String(cn.classe || '').toUpperCase().trim() === alvo
+                        this._normalizarClasse(cn.classe || '') === alvo
                     );
                 }
 
                 if (!m.classe) return false;
                 const classesLegacy = String(m.classe)
-                    .toUpperCase()
                     .split(/[,/;|]/)
-                    .map(v => v.trim())
+                    .map(v => this._normalizarClasse(v))
                     .filter(Boolean);
                 return classesLegacy.includes(alvo);
             });

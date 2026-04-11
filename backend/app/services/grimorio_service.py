@@ -552,29 +552,64 @@ class GrimorioService:
         self.grimorio_repo = grimorio_repo
         self.magia_repo = magia_repo
 
-    def listar(self, combatente_id: int, classe: Optional[str] = None, favorita: Optional[bool] = None):
+    def _preparar_listagem(self, combatente_id: int, classe: Optional[str] = None) -> Optional[str]:
         classe_norm = _normalizar(classe) if classe else None
         combatente = self.grimorio_repo.get_combatente(combatente_id)
         if not combatente:
             raise HTTPException(status_code=404, detail="Combatente não encontrado")
 
+        classe_referencia = classe_norm or _normalizar(combatente.classe)
+        nivel_personagem = int(combatente.nivel or 1)
+
         magias_adicionadas = self._sincronizar_magias_automaticas(
             combatente_id,
-            classe_norm=classe_norm or _normalizar(combatente.classe),
-            nivel_personagem=int(combatente.nivel or 1),
+            classe_norm=classe_referencia,
+            nivel_personagem=nivel_personagem,
         )
         if magias_adicionadas:
             self._registrar_notificacao_magias_adicionadas(
                 combatente_id,
-                classe_norm=classe_norm or _normalizar(combatente.classe),
+                classe_norm=classe_referencia,
                 magias=magias_adicionadas,
             )
 
         self._reconciliar_magias_invalidas(
             combatente_id,
-            classe_norm=classe_norm or _normalizar(combatente.classe),
+            classe_norm=classe_referencia,
         )
+        return classe_norm
+
+    def listar(self, combatente_id: int, classe: Optional[str] = None, favorita: Optional[bool] = None):
+        classe_norm = self._preparar_listagem(combatente_id, classe=classe)
         return self.grimorio_repo.listar(combatente_id, classe=classe_norm, favorita=favorita)
+
+    def listar_paginado(
+        self,
+        combatente_id: int,
+        *,
+        nome: Optional[str] = None,
+        nivel: Optional[int] = None,
+        escola: Optional[str] = None,
+        componentes: Optional[str] = None,
+        magia_ids: Optional[list[int]] = None,
+        classe: Optional[str] = None,
+        favorita: Optional[bool] = None,
+        skip: int = 0,
+        limit: Optional[int] = None,
+    ) -> tuple[int, list[GrimorioMagia]]:
+        classe_norm = self._preparar_listagem(combatente_id, classe=classe)
+        return self.grimorio_repo.listar_paginado(
+            combatente_id,
+            nome=nome,
+            nivel=nivel,
+            escola=escola,
+            componentes=componentes,
+            magia_ids=magia_ids,
+            classe=classe_norm,
+            favorita=favorita,
+            skip=skip,
+            limit=limit,
+        )
 
     def diagnosticar_regras_divinas(self, combatente_id: int, *, classe: Optional[str] = None) -> dict:
         combatente = self.grimorio_repo.get_combatente(combatente_id)
