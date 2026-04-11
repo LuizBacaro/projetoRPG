@@ -1145,6 +1145,50 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
+.grimorio-paginacao {
+    margin-top: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+}
+
+.grimorio-paginacao-adicionar {
+    margin-top: 0.65rem;
+    justify-content: flex-end;
+}
+
+.grimorio-paginacao-btn {
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    background: rgba(201, 168, 76, 0.11);
+    color: var(--cor-dourada);
+    border-radius: 8px;
+    padding: 0.32rem 0.7rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.grimorio-paginacao-btn:hover:not(:disabled) {
+    border-color: rgba(201, 168, 76, 0.62);
+    background: rgba(201, 168, 76, 0.2);
+}
+
+.grimorio-paginacao-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.grimorio-paginacao-info {
+    font-family: var(--fonte-titulo);
+    font-size: 0.68rem;
+    color: rgba(239, 228, 203, 0.88);
+    letter-spacing: 0.04em;
+}
+
 /* ── Grupos por nível ── */
 .grimorio-grupo { margin-bottom: 1.25rem; }
 .grimorio-grupo-dominio {

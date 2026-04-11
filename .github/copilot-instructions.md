@@ -49,6 +49,39 @@ Este workspace usa instrucoes granulares por dominio em `.github/instructions`.
 - Migrations Alembic: `.github/instructions/migrations.instructions.md`
 - Historico de evolucao: `HISTORICO_EVOLUCAO.md` (infra + features ao longo do tempo)
 
+## Orquestracao de Agentes
+
+- Agente coordenador recomendado: `Fullstack Orchestrator` em `.github/agents/fullstack-orchestrator.agent.md`.
+- Agente complementar para features com contrato entre camadas: `Fullstack API Contract Orchestrator` em `.github/agents/fullstack-api-contract-orchestrator.agent.md`.
+- Especialistas recomendados:
+	- `Backend FastAPI Specialist`
+	- `Frontend Arena Specialist`
+	- `Database and Migrations Specialist`
+	- `PostgreSQL Database Administrator` para estado real do banco em execucao
+- Fluxo esperado para demandas multi-area:
+	1. Classificar a solicitacao por dominio.
+	2. Delegar para especialistas em paralelo apenas quando nao houver dependencia direta.
+	3. Tratar schema e persistencia antes de consolidar impactos em backend/frontend quando necessario.
+	4. Consolidar contratos, validacao e risco residual em uma resposta unica.
+
+## Prompts Reutilizaveis
+
+- Prompt recomendado para novas funcionalidades: `.github/prompts/nova-feature-fullstack.prompt.md`.
+- Use esse prompt quando quiser iniciar uma feature com triagem automatica por dominio e consolidacao final pelo orquestrador.
+- Prompt para investigacao e correcao de bugs: `.github/prompts/correcao-bug-fullstack.prompt.md`.
+- Prompt para refatoracao incremental e segura: `.github/prompts/refatoracao-segura-por-dominio.prompt.md`.
+- Prompt para revisao tecnica antes de merge: `.github/prompts/auditoria-pre-merge-fullstack.prompt.md`.
+- Prompt para mudancas de schema com seguranca de rollout: `.github/prompts/migration-segura.prompt.md`.
+- Prompt para validar prontidao de deploy: `.github/prompts/deploy-readiness-fullstack.prompt.md`.
+- Prompt para investigar gargalos de performance: `.github/prompts/investigacao-performance-fullstack.prompt.md`.
+
+## Hooks
+
+- Hooks de workspace ficam em `.github/hooks`.
+- Hook atual: `operational-safety.json`.
+- Objetivo atual do hook: pedir atencao extra antes de comandos potencialmente destrutivos em terminal ou modificacoes SQL sensiveis.
+- Hooks devem permanecer pequenos, auditaveis e focados em enforcement real; nao usar hooks para duplicar instrucoes textuais.
+
 ## Estado Atual do Banco (Neon producao)
 
 - `pericias_classes`: populada com 175 associacoes (11 classes x pericias D&D 3.5)

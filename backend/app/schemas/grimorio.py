@@ -33,6 +33,10 @@ class GrimorioMagiaResponse(BaseModel):
     magia_componentes: Optional[str] = None
     magia_e_magia_dominio: bool = False
     magia_dominios: Optional[str] = None
+    descricao: Optional[str] = None
+    sub_escola: Optional[str] = None
+    area_efeito: Optional[str] = None
+    resistencia_magia: Optional[str] = None
 
     class Config:
         from_attributes = True

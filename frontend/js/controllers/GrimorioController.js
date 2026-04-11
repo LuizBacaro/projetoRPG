@@ -64,6 +64,22 @@ class GrimorioController {
         this.preparadasApenas = false;
         this.magiaAdicionarSelecionadaId = null;
         this.magiasDisponiveisAdicionar = [];
+        this.itensFiltradosPagina = [];
+
+        this.paginacaoLista = {
+            page: 1,
+            pageSize: 12,
+            total: 0,
+            totalPages: 1,
+        };
+
+        this.paginacaoAdicionar = {
+            page: 1,
+            pageSize: 18,
+            total: 0,
+            totalPages: 1,
+            requestId: 0,
+        };
 
         this.cardsAbertos = new Set();
         this._carregado = false;
@@ -71,6 +87,9 @@ class GrimorioController {
         this._adicionarMagiaEmAndamento = false;
         this._ultimoAdicionarAt = 0;
         this._feedbackAdicionar = null;
+        this._debounceBuscaAdicionar = null;
+        this._assinaturaFiltrosAdicionar = '';
+        this._assinaturaFiltrosLista = '';
     }
 
     async abrirGrimorio() {
@@ -87,6 +106,10 @@ class GrimorioController {
     fecharGrimorio() {
         const overlay = document.getElementById('modalGrimorio');
         if (overlay) overlay.classList.remove('show');
+        if (this._debounceBuscaAdicionar) {
+            clearTimeout(this._debounceBuscaAdicionar);
+            this._debounceBuscaAdicionar = null;
+        }
         this._sincronizarModoPainelAdicionar(false);
         document.body.style.overflow = '';
     }
@@ -110,6 +133,7 @@ class GrimorioController {
             painelNotificacoes?.classList.remove('show');
             painel.classList.add('show');
             this._sincronizarModoPainelAdicionar(true);
+            this.paginacaoAdicionar.page = 1;
             this._renderizarPainelAdicionar();
             setTimeout(() => {
                 document.getElementById('grimorioAdicionarBusca')?.focus();
@@ -124,6 +148,20 @@ class GrimorioController {
 
     filtrar() {
         const busca = (document.getElementById('grimorioBusca')?.value || '').toLowerCase().trim();
+        const assinaturaAtual = [
+            busca,
+            this.nivelAtivo,
+            this.escolaAtiva,
+            this.componenteAtivo,
+            this.favoritasApenas ? '1' : '0',
+            this.preparadasApenas ? '1' : '0',
+            this.itensGrimorio.length,
+        ].join('|');
+
+        if (this._assinaturaFiltrosLista !== assinaturaAtual) {
+            this.paginacaoLista.page = 1;
+            this._assinaturaFiltrosLista = assinaturaAtual;
+        }
 
         this.itensFiltrados = this.itensGrimorio.filter((item) => {
             const magia = item.magia || {};
@@ -151,7 +189,63 @@ class GrimorioController {
             return matchNivel && matchEscola && matchComponente && matchFavorita && matchPreparada && alvoBusca.includes(busca);
         });
 
+        this._sincronizarPaginacaoLista();
         this._renderizarLista();
+    }
+
+    _sincronizarPaginacaoLista() {
+        const total = this.itensFiltrados.length;
+        const pageSize = Math.max(1, Number(this.paginacaoLista.pageSize || 12));
+        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        const pageAtual = Math.min(Math.max(1, Number(this.paginacaoLista.page || 1)), totalPages);
+        const inicio = (pageAtual - 1) * pageSize;
+        const fim = inicio + pageSize;
+
+        this.paginacaoLista.total = total;
+        this.paginacaoLista.totalPages = totalPages;
+        this.paginacaoLista.page = pageAtual;
+        this.itensFiltradosPagina = this.itensFiltrados.slice(inicio, fim);
+    }
+
+    _renderizarControlesPaginacaoLista() {
+        const total = Number(this.paginacaoLista.total || 0);
+        if (total <= 0) return '';
+
+        const paginaAtual = Number(this.paginacaoLista.page || 1);
+        const totalPaginas = Number(this.paginacaoLista.totalPages || 1);
+        const anteriorDesabilitado = paginaAtual <= 1 ? 'disabled' : '';
+        const proximaDesabilitada = paginaAtual >= totalPaginas ? 'disabled' : '';
+
+        return `
+            <div class="grimorio-paginacao" id="grimorioPaginacaoLista" aria-label="Paginacao da lista do grimorio">
+                <button class="grimorio-paginacao-btn" id="grimorioPaginaAnterior" ${anteriorDesabilitado}>Anterior</button>
+                <span class="grimorio-paginacao-info">Pagina ${paginaAtual} de ${totalPaginas}</span>
+                <button class="grimorio-paginacao-btn" id="grimorioPaginaProxima" ${proximaDesabilitada}>Proxima</button>
+            </div>
+        `;
+    }
+
+    _bindPaginacaoLista() {
+        const btnAnterior = document.getElementById('grimorioPaginaAnterior');
+        const btnProxima = document.getElementById('grimorioPaginaProxima');
+
+        if (btnAnterior) {
+            btnAnterior.addEventListener('click', () => {
+                if (this.paginacaoLista.page <= 1) return;
+                this.paginacaoLista.page -= 1;
+                this._sincronizarPaginacaoLista();
+                this._renderizarLista();
+            });
+        }
+
+        if (btnProxima) {
+            btnProxima.addEventListener('click', () => {
+                if (this.paginacaoLista.page >= this.paginacaoLista.totalPages) return;
+                this.paginacaoLista.page += 1;
+                this._sincronizarPaginacaoLista();
+                this._renderizarLista();
+            });
+        }
     }
 
     async _recarregarDados() {
@@ -215,7 +309,12 @@ class GrimorioController {
             return;
         }
 
-        const itens = await this.grimorioService.listar(this.combatente.id, { classe: this.classeAtiva });
+        const pagina = await this.grimorioService.listar(this.combatente.id, {
+            classe: this.classeAtiva,
+            skip: 0,
+            limit: 200,
+        });
+        const itens = Array.isArray(pagina?.items) ? pagina.items : [];
         this.itensGrimorio = itens.map((item) => this._mapearItemGrimorio(item));
         this._mesclarCatalogoDisponivelNoGrimorio();
     }
@@ -929,7 +1028,24 @@ class GrimorioController {
             if (!el) return;
             const clone = el.cloneNode(true);
             el.parentNode.replaceChild(clone, el);
-            clone.addEventListener(evento, () => this._renderizarPainelAdicionar());
+
+            if (id === 'grimorioAdicionarBusca') {
+                clone.addEventListener(evento, () => {
+                    if (this._debounceBuscaAdicionar) {
+                        clearTimeout(this._debounceBuscaAdicionar);
+                    }
+                    this._debounceBuscaAdicionar = setTimeout(() => {
+                        this.paginacaoAdicionar.page = 1;
+                        this._renderizarPainelAdicionar();
+                    }, 250);
+                });
+                return;
+            }
+
+            clone.addEventListener(evento, () => {
+                this.paginacaoAdicionar.page = 1;
+                this._renderizarPainelAdicionar();
+            });
         });
     }
 
@@ -971,6 +1087,22 @@ class GrimorioController {
                 disponiveis.findIndex((magia) => Number(magia.id) === Number(this.magiaAdicionarSelecionadaId))
             );
 
+            if (tecla === 'PageDown') {
+                if (this.paginacaoAdicionar.page < this.paginacaoAdicionar.totalPages) {
+                    this.paginacaoAdicionar.page += 1;
+                    this._renderizarPainelAdicionar();
+                }
+                return;
+            }
+
+            if (tecla === 'PageUp') {
+                if (this.paginacaoAdicionar.page > 1) {
+                    this.paginacaoAdicionar.page -= 1;
+                    this._renderizarPainelAdicionar();
+                }
+                return;
+            }
+
             if (tecla === 'Enter') {
                 event.preventDefault();
                 const atual = disponiveis[indiceAtual];
@@ -986,7 +1118,7 @@ class GrimorioController {
             if (tecla === 'Home') proximoIndice = 0;
             else if (tecla === 'End') proximoIndice = disponiveis.length - 1;
             else {
-                const delta = tecla === 'ArrowDown' || tecla === 'PageDown' ? 1 : -1;
+                const delta = tecla === 'ArrowDown' ? 1 : -1;
                 proximoIndice = (indiceAtual + delta + disponiveis.length) % disponiveis.length;
             }
 
@@ -1005,26 +1137,30 @@ class GrimorioController {
         document.addEventListener('keydown', this._onAdicionarKeydown);
     }
 
-    _atualizarResumoAdicionar(disponiveis, magiaIdSelecionada) {
+    _atualizarResumoAdicionar(disponiveis, magiaIdSelecionada, metadados = {}) {
         const resumo = document.getElementById('grimorioAdicionarResumo');
         if (!resumo) return;
 
         const lista = Array.isArray(disponiveis) ? disponiveis : [];
         const selecionada = lista.find((magia) => Number(magia.id) === Number(magiaIdSelecionada));
+        const total = Number(metadados.total || lista.length || 0);
+        const paginaAtual = Number(metadados.paginaAtual || this.paginacaoAdicionar.page || 1);
+        const totalPaginas = Number(metadados.totalPaginas || this.paginacaoAdicionar.totalPages || 1);
+        const sufixoPaginacao = ` • Pagina ${paginaAtual}/${totalPaginas}`;
 
         if (!lista.length) {
-            resumo.textContent = '0 resultados';
+            resumo.textContent = `${total} resultado(s)${sufixoPaginacao}`;
             return;
         }
 
         if (!selecionada) {
-            resumo.textContent = `${lista.length} resultado(s)`;
+            resumo.textContent = `${total} resultado(s)${sufixoPaginacao}`;
             return;
         }
 
         const posicao = lista.findIndex((magia) => Number(magia.id) === Number(magiaIdSelecionada));
         const indiceHumano = posicao >= 0 ? posicao + 1 : 1;
-        resumo.textContent = `${lista.length} resultado(s) • ${indiceHumano}/${lista.length} selecionada: ${selecionada.nome || 'Magia'}`;
+        resumo.textContent = `${total} resultado(s)${sufixoPaginacao} • ${indiceHumano}/${lista.length} da pagina: ${selecionada.nome || 'Magia'}`;
     }
 
     _normalizarTextoBasico(valor) {
@@ -1078,23 +1214,36 @@ class GrimorioController {
     }
 
     _renderizarPainelAdicionar() {
+        this._renderizarPainelAdicionarAsync().catch((error) => {
+            this._mostrarToast(error.message || 'Nao foi possivel carregar o catalogo de magias.', 'erro');
+        });
+    }
+
+    async _renderizarPainelAdicionarAsync() {
         const lista = document.getElementById('grimorioAdicionarLista');
         const preview = document.getElementById('grimorioAdicionarPreview');
+        const paginacaoWrap = document.getElementById('grimorioPaginacaoAdicionar');
         if (!lista || !preview) return;
 
         if (!this._classePermiteGerenciarConhecidas()) {
             this.magiasDisponiveisAdicionar = [];
+            this.paginacaoAdicionar.total = 0;
+            this.paginacaoAdicionar.totalPages = 1;
             this._atualizarResumoAdicionar([], null);
             lista.innerHTML = '<div class="grimorio-vazio">Esta classe recebe magias automaticamente. Apenas Mago, Bardo e Feiticeiro selecionam magias manualmente.</div>';
             preview.innerHTML = '<div class="grimorio-historico-vazio">As demais classes recebem automaticamente todas as magias do nível ao subir de nível.</div>';
+            if (paginacaoWrap) paginacaoWrap.innerHTML = '';
             return;
         }
 
         if (this._classeSemAcessoMagias()) {
             this.magiasDisponiveisAdicionar = [];
+            this.paginacaoAdicionar.total = 0;
+            this.paginacaoAdicionar.totalPages = 1;
             this._atualizarResumoAdicionar([], null);
             lista.innerHTML = '<div class="grimorio-vazio">Ranger e Paladino so podem adicionar magias a partir do nivel 4.</div>';
             preview.innerHTML = '<div class="grimorio-historico-vazio">Sem acesso a magias nesta classe/nível.</div>';
+            if (paginacaoWrap) paginacaoWrap.innerHTML = '';
             return;
         }
 
@@ -1111,37 +1260,69 @@ class GrimorioController {
             escolaSelect.value = escolas.includes(escolaAtual) ? escolaAtual : 'todas';
         }
 
-        const termo = (document.getElementById('grimorioAdicionarBusca')?.value || '').toLowerCase().trim();
+        const termo = (document.getElementById('grimorioAdicionarBusca')?.value || '').trim();
         const escolaFiltro = document.getElementById('grimorioAdicionarEscola')?.value || 'todas';
         const nivelFiltro = document.getElementById('grimorioAdicionarNivel')?.value || 'todos';
         const componenteFiltro = document.getElementById('grimorioAdicionarComponente')?.value || 'todos';
+        const assinaturaFiltros = [termo.toLowerCase(), escolaFiltro, nivelFiltro, componenteFiltro].join('|');
+        if (this._assinaturaFiltrosAdicionar !== assinaturaFiltros) {
+            this.paginacaoAdicionar.page = 1;
+            this._assinaturaFiltrosAdicionar = assinaturaFiltros;
+        }
+
         const idsExistentes = new Set(this.itensGrimorio.map((item) => Number(item.magia_id)));
         const maxNivelConjuravel = this._maxNivelConjuravel(this.classeAtiva, Number(this.combatente?.nivel || 1));
+        const pageSize = Math.max(1, Number(this.paginacaoAdicionar.pageSize || 18));
+        const pageAtual = Math.max(1, Number(this.paginacaoAdicionar.page || 1));
+        const skip = (pageAtual - 1) * pageSize;
 
-        let disponiveis = this.catalogoClasse.filter((magia) => !idsExistentes.has(Number(magia.id)));
-        disponiveis = disponiveis.filter((magia) => Number(magia.nivel || 0) <= maxNivelConjuravel);
+        const requestId = ++this.paginacaoAdicionar.requestId;
+        lista.innerHTML = '<div class="grimorio-vazio">Consultando catálogo...</div>';
+        if (paginacaoWrap) {
+            paginacaoWrap.innerHTML = '<span class="grimorio-paginacao-info">Carregando página...</span>';
+        }
 
-        disponiveis = disponiveis.filter((magia) => {
-            const escolaNormalizada = this._normalizarEscola(magia.escola || '');
-            const matchEscola = escolaFiltro === 'todas' || escolaNormalizada === escolaFiltro;
-            const matchNivel = nivelFiltro === 'todos' || String(Number(magia.nivel || 0)) === String(nivelFiltro);
-            const componentes = this._extrairComponentes(magia.componentes || '');
-            const matchComponente = componenteFiltro === 'todos' || componentes.has(String(componenteFiltro).toUpperCase());
-
-            if (!termo) return matchEscola && matchNivel && matchComponente;
-
-            const alvo = [magia.nome, magia.escola, magia.componentes, magia.descricao]
-                .filter(Boolean)
-                .join(' ')
-                .toLowerCase();
-            return matchEscola && matchNivel && matchComponente && alvo.includes(termo);
+        const pagina = await this.magiaService.listarPorClassePaginado(this.classeAtiva, {
+            nome: termo,
+            nivel: nivelFiltro,
+            escola: escolaFiltro,
+            componentes: componenteFiltro,
+            skip,
+            limit: pageSize,
         });
+
+        if (requestId !== this.paginacaoAdicionar.requestId) {
+            return;
+        }
+
+        const totalBackend = Math.max(0, Number(pagina?.total || 0));
+        const totalPaginas = Math.max(1, Math.ceil(totalBackend / pageSize));
+        this.paginacaoAdicionar.total = totalBackend;
+        this.paginacaoAdicionar.totalPages = totalPaginas;
+
+        if (this.paginacaoAdicionar.page > totalPaginas) {
+            this.paginacaoAdicionar.page = totalPaginas;
+            this._renderizarPainelAdicionar();
+            return;
+        }
+
+        let disponiveis = Array.isArray(pagina?.items) ? pagina.items : [];
+        disponiveis = disponiveis.filter((magia) => !idsExistentes.has(Number(magia.id)));
+        disponiveis = disponiveis.filter((magia) => Number(magia.nivel || 0) <= maxNivelConjuravel);
 
         if (disponiveis.length === 0) {
             this.magiasDisponiveisAdicionar = [];
-            this._atualizarResumoAdicionar([], null);
+            this._atualizarResumoAdicionar([], null, {
+                total: this.paginacaoAdicionar.total,
+                paginaAtual: this.paginacaoAdicionar.page,
+                totalPaginas: this.paginacaoAdicionar.totalPages,
+            });
             lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
             preview.innerHTML = '<div class="grimorio-historico-vazio">Nenhuma magia corresponde aos filtros selecionados.</div>';
+            if (paginacaoWrap) {
+                paginacaoWrap.innerHTML = this._renderizarControlesPaginacaoAdicionar();
+                this._bindPaginacaoAdicionar();
+            }
             return;
         }
 
@@ -1173,7 +1354,50 @@ class GrimorioController {
 
         this._atualizarSelecaoAdicionarUI(this.magiaAdicionarSelecionadaId);
         this._renderizarPreviewAdicionar(disponiveis, this.magiaAdicionarSelecionadaId);
-        this._atualizarResumoAdicionar(disponiveis, this.magiaAdicionarSelecionadaId);
+        this._atualizarResumoAdicionar(disponiveis, this.magiaAdicionarSelecionadaId, {
+            total: this.paginacaoAdicionar.total,
+            paginaAtual: this.paginacaoAdicionar.page,
+            totalPaginas: this.paginacaoAdicionar.totalPages,
+        });
+
+        if (paginacaoWrap) {
+            paginacaoWrap.innerHTML = this._renderizarControlesPaginacaoAdicionar();
+            this._bindPaginacaoAdicionar();
+        }
+    }
+
+    _renderizarControlesPaginacaoAdicionar() {
+        const paginaAtual = Number(this.paginacaoAdicionar.page || 1);
+        const totalPaginas = Number(this.paginacaoAdicionar.totalPages || 1);
+        const desabilitaAnterior = paginaAtual <= 1 ? 'disabled' : '';
+        const desabilitaProxima = paginaAtual >= totalPaginas ? 'disabled' : '';
+
+        return `
+            <button class="grimorio-paginacao-btn" id="grimorioAdicionarPaginaAnterior" ${desabilitaAnterior}>Anterior</button>
+            <span class="grimorio-paginacao-info">Pagina ${paginaAtual} de ${totalPaginas}</span>
+            <button class="grimorio-paginacao-btn" id="grimorioAdicionarPaginaProxima" ${desabilitaProxima}>Proxima</button>
+        `;
+    }
+
+    _bindPaginacaoAdicionar() {
+        const btnAnterior = document.getElementById('grimorioAdicionarPaginaAnterior');
+        const btnProxima = document.getElementById('grimorioAdicionarPaginaProxima');
+
+        if (btnAnterior) {
+            btnAnterior.addEventListener('click', () => {
+                if (this.paginacaoAdicionar.page <= 1) return;
+                this.paginacaoAdicionar.page -= 1;
+                this._renderizarPainelAdicionar();
+            });
+        }
+
+        if (btnProxima) {
+            btnProxima.addEventListener('click', () => {
+                if (this.paginacaoAdicionar.page >= this.paginacaoAdicionar.totalPages) return;
+                this.paginacaoAdicionar.page += 1;
+                this._renderizarPainelAdicionar();
+            });
+        }
     }
 
     _atualizarSelecaoAdicionarUI(magiaId) {
@@ -1504,14 +1728,17 @@ class GrimorioController {
         if (!lista) return;
 
         this._renderizarAvisoClasse();
+        this._sincronizarPaginacaoLista();
+
+        const itensPagina = this.itensFiltradosPagina;
 
         const classeClerigo = this._classeAtivaEhClerigo();
         const itensDominio = classeClerigo
-            ? this.itensFiltrados.filter((item) => this._ehMagiaDominio(item))
+            ? itensPagina.filter((item) => this._ehMagiaDominio(item))
             : [];
         const itensPadrao = classeClerigo
-            ? this.itensFiltrados.filter((item) => !this._ehMagiaDominio(item))
-            : this.itensFiltrados;
+            ? itensPagina.filter((item) => !this._ehMagiaDominio(item))
+            : itensPagina;
 
         if (itensDominio.length === 0 && itensPadrao.length === 0) {
             if (this._classeSemAcessoMagias()) {
@@ -1520,9 +1747,9 @@ class GrimorioController {
             }
             if (this.itensGrimorio.length === 0) {
                 if (this._classeEhEspontanea()) {
-                    lista.innerHTML = '<div class="grimorio-vazio">Você ainda não selecionou magias conhecidas. Use o botão <strong>Adicionar magia conhecida</strong> para montar seu grimório.</div>';
+                    lista.innerHTML = '<div class="grimorio-vazio">Voce ainda nao selecionou magias conhecidas. Use o botao <strong>Adicionar magia conhecida</strong> para montar seu grimorio.</div>';
                 } else if (this._classePermiteGerenciarConhecidas()) {
-                    lista.innerHTML = '<div class="grimorio-vazio">Seu grimório está vazio. Use o botão <strong>Adicionar magia conhecida</strong> para registrar as magias que seu personagem aprendeu.</div>';
+                    lista.innerHTML = '<div class="grimorio-vazio">Seu grimorio esta vazio. Use o botao <strong>Adicionar magia conhecida</strong> para registrar as magias que seu personagem aprendeu.</div>';
                 } else {
                     lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
                 }
@@ -1546,7 +1773,9 @@ class GrimorioController {
             partes.push(this._renderizarGruposPorNivel(itensPadrao));
         }
 
+        partes.push(this._renderizarControlesPaginacaoLista());
         lista.innerHTML = partes.join('');
+        this._bindPaginacaoLista();
 
         lista.querySelectorAll('.grimorio-favorita-btn').forEach((button) => {
             button.addEventListener('click', async (event) => {

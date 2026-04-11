@@ -63,8 +63,25 @@ def _criar_combatente(db, *, classe: str) -> Combatente:
     return combatente
 
 
-def _criar_magia(db, *, classe: str, nivel: int = 1) -> Magia:
-    magia = Magia(nome=f"Magia {classe}", nivel=nivel, classe=classe, ativo=True, descricao="desc")
+def _criar_magia(
+    db,
+    *,
+    classe: str,
+    nivel: int = 1,
+    nome: str | None = None,
+    escola: str | None = None,
+    componentes: str | None = None,
+    descricao: str | None = None,
+) -> Magia:
+    magia = Magia(
+        nome=nome or f"Magia {classe}",
+        nivel=nivel,
+        classe=classe,
+        ativo=True,
+        escola=escola,
+        componentes=componentes,
+        descricao=descricao or "desc",
+    )
     db.add(magia)
     db.flush()
     db.add(MagiaClasse(magia_id=magia.id, classe=classe, nivel=nivel))
@@ -88,10 +105,55 @@ def test_grimorio_crud_basico(grimorio_db):
     assert body["magia_id"] == magia.id
     assert body["magia_e_magia_dominio"] is False
     assert body["magia_dominios"] is None
+    assert body["descricao"] == "desc"
+    assert body["resistencia_magia"] is None
 
     listar = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "MAGO"})
     assert listar.status_code == 200
     assert len(listar.json()) == 1
+    assert listar.headers["X-Total-Count"] == "1"
+    assert listar.headers["X-Skip"] == "0"
+    assert listar.headers["X-Limit"] == "1"
+
+
+def test_grimorio_lista_paginada_preserva_corpo_e_headers(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Mago")
+    client = _build_client(db_factory)
+
+    magias = [
+        _criar_magia(db, classe="MAGO", nome="Magia MAGO 1"),
+        _criar_magia(db, classe="MAGO", nome="Magia MAGO 2"),
+        _criar_magia(db, classe="MAGO", nome="Magia MAGO 3"),
+    ]
+
+    for magia in magias:
+        criar = client.post(
+            f"/api/v1/grimorio/{combatente.id}",
+            json={"magia_id": magia.id, "classe": "MAGO", "origem": "SELECAO_MANUAL"},
+        )
+        assert criar.status_code == 201
+
+    listar_completo = client.get(f"/api/v1/grimorio/{combatente.id}", params={"classe": "MAGO"})
+    assert listar_completo.status_code == 200
+    assert isinstance(listar_completo.json(), list)
+    assert len(listar_completo.json()) == 3
+    assert listar_completo.headers["X-Total-Count"] == "3"
+    assert listar_completo.headers["X-Skip"] == "0"
+    assert listar_completo.headers["X-Limit"] == "3"
+
+    listar_paginado = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "skip": 1, "limit": 1},
+    )
+    assert listar_paginado.status_code == 200
+    body = listar_paginado.json()
+    assert isinstance(body, list)
+    assert len(body) == 1
+    assert body[0]["magia_nome"] == "Magia MAGO 2"
+    assert listar_paginado.headers["X-Total-Count"] == "3"
+    assert listar_paginado.headers["X-Skip"] == "1"
+    assert listar_paginado.headers["X-Limit"] == "1"
 
     atualizar = client.patch(
         f"/api/v1/grimorio/{combatente.id}/{magia.id}",
@@ -106,6 +168,135 @@ def test_grimorio_crud_basico(grimorio_db):
         params={"classe": "MAGO"},
     )
     assert remover.status_code == 204
+
+
+def test_grimorio_lista_filtra_por_campos_e_magia_ids(grimorio_db):
+    db, db_factory = grimorio_db
+    combatente = _criar_combatente(db, classe="Mago")
+    client = _build_client(db_factory)
+
+    magia_evocacao = _criar_magia(
+        db,
+        classe="MAGO",
+        nivel=3,
+        nome="Bola de Fogo",
+        escola="Evocacao",
+        componentes="V,S,M",
+        descricao="Explosao de fogo em area",
+    )
+    magia_transmutacao = _criar_magia(
+        db,
+        classe="MAGO",
+        nivel=2,
+        nome="Pele Rochosa",
+        escola="Transmutacao",
+        componentes="V,S",
+        descricao="Fortalece a pele com runas antigas",
+    )
+    magia_ilusao = _criar_magia(
+        db,
+        classe="MAGO",
+        nivel=1,
+        nome="Imagem Silenciosa",
+        escola="Ilusao",
+        componentes="V,S,F",
+        descricao="Cria uma imagem ilusoria controlada",
+    )
+
+    for magia in (magia_evocacao, magia_transmutacao, magia_ilusao):
+        criar = client.post(
+            f"/api/v1/grimorio/{combatente.id}",
+            json={"magia_id": magia.id, "classe": "MAGO", "origem": "SELECAO_MANUAL"},
+        )
+        assert criar.status_code == 201
+
+    atualizar = client.patch(
+        f"/api/v1/grimorio/{combatente.id}/{magia_transmutacao.id}",
+        params={"classe": "MAGO"},
+        json={"favorita": True, "anotacoes": "Runas para chefe final"},
+    )
+    assert atualizar.status_code == 200
+
+    filtrar_nome_magia = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "nome": "bola"},
+    )
+    assert filtrar_nome_magia.status_code == 200
+    assert [item["magia_id"] for item in filtrar_nome_magia.json()] == [magia_evocacao.id]
+
+    filtrar_nome_escola = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "nome": "transmut"},
+    )
+    assert filtrar_nome_escola.status_code == 200
+    assert [item["magia_id"] for item in filtrar_nome_escola.json()] == [magia_transmutacao.id]
+
+    filtrar_nome_descricao = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "nome": "ilusoria"},
+    )
+    assert filtrar_nome_descricao.status_code == 200
+    assert [item["magia_id"] for item in filtrar_nome_descricao.json()] == [magia_ilusao.id]
+
+    filtrar_nome_anotacoes = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "nome": "runas"},
+    )
+    assert filtrar_nome_anotacoes.status_code == 200
+    assert [item["magia_id"] for item in filtrar_nome_anotacoes.json()] == [magia_transmutacao.id]
+
+    filtrar_nivel = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "nivel": 2},
+    )
+    assert filtrar_nivel.status_code == 200
+    assert [item["magia_id"] for item in filtrar_nivel.json()] == [magia_transmutacao.id]
+
+    filtrar_escola = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "escola": "Ilusao"},
+    )
+    assert filtrar_escola.status_code == 200
+    assert [item["magia_id"] for item in filtrar_escola.json()] == [magia_ilusao.id]
+
+    filtrar_componentes = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "componentes": "M"},
+    )
+    assert filtrar_componentes.status_code == 200
+    assert [item["magia_id"] for item in filtrar_componentes.json()] == [magia_evocacao.id]
+
+    filtrar_favorita = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "favorita": True},
+    )
+    assert filtrar_favorita.status_code == 200
+    assert [item["magia_id"] for item in filtrar_favorita.json()] == [magia_transmutacao.id]
+
+    filtrar_ids_csv = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params={"classe": "MAGO", "magia_ids": f"{magia_evocacao.id},{magia_ilusao.id}"},
+    )
+    assert filtrar_ids_csv.status_code == 200
+    assert {item["magia_id"] for item in filtrar_ids_csv.json()} == {magia_evocacao.id, magia_ilusao.id}
+
+    filtrar_ids_lista = client.get(
+        f"/api/v1/grimorio/{combatente.id}",
+        params=[
+            ("classe", "MAGO"),
+            ("magia_ids", str(magia_transmutacao.id)),
+            ("magia_ids", str(magia_ilusao.id)),
+            ("skip", "0"),
+            ("limit", "1"),
+        ],
+    )
+    assert filtrar_ids_lista.status_code == 200
+    body = filtrar_ids_lista.json()
+    assert len(body) == 1
+    assert body[0]["magia_id"] == magia_transmutacao.id
+    assert filtrar_ids_lista.headers["X-Total-Count"] == "2"
+    assert filtrar_ids_lista.headers["X-Skip"] == "0"
+    assert filtrar_ids_lista.headers["X-Limit"] == "1"
 
 
 def test_grimorio_bloqueia_classe_incompativel(grimorio_db):

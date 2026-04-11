@@ -4,24 +4,102 @@ from __future__ import annotations
 
 from typing import Optional
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from .base import commit_with_rollback
 from ..models.combatente import Combatente
 from ..models.grimorio import GrimorioMagia, GrimorioHistoricoTroca, GrimorioNotificacao
+from ..models.magia import Magia
 
 
 class GrimorioRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def listar(self, combatente_id: int, classe: Optional[str] = None, favorita: Optional[bool] = None):
+    def _query_listar(self, combatente_id: int, classe: Optional[str] = None, favorita: Optional[bool] = None):
         query = self.db.query(GrimorioMagia).filter(GrimorioMagia.combatente_id == combatente_id)
         if classe:
             query = query.filter(GrimorioMagia.classe == classe.strip().upper())
         if favorita is not None:
             query = query.filter(GrimorioMagia.favorita == favorita)
+        return query
+
+    def _aplicar_filtros_magia(
+        self,
+        query,
+        *,
+        nome: Optional[str] = None,
+        nivel: Optional[int] = None,
+        escola: Optional[str] = None,
+        componentes: Optional[str] = None,
+        magia_ids: Optional[list[int]] = None,
+    ):
+        precisa_join_magia = any(
+            valor is not None and valor != []
+            for valor in (nome, nivel, escola, componentes, magia_ids)
+        )
+        if precisa_join_magia:
+            query = query.join(GrimorioMagia.magia)
+
+        if nome:
+            termo = f"%{nome.strip()}%"
+            query = query.filter(
+                or_(
+                    Magia.nome.ilike(termo),
+                    Magia.escola.ilike(termo),
+                    Magia.descricao.ilike(termo),
+                    Magia.componentes.ilike(termo),
+                    GrimorioMagia.anotacoes.ilike(termo),
+                )
+            )
+
+        if nivel is not None:
+            query = query.filter(Magia.nivel == nivel)
+
+        if escola:
+            query = query.filter(Magia.escola.ilike(escola.strip()))
+
+        if componentes:
+            query = query.filter(Magia.componentes.ilike(f"%{componentes.strip()}%"))
+
+        if magia_ids:
+            query = query.filter(GrimorioMagia.magia_id.in_(magia_ids))
+
+        return query
+
+    def listar(self, combatente_id: int, classe: Optional[str] = None, favorita: Optional[bool] = None):
+        query = self._query_listar(combatente_id, classe=classe, favorita=favorita)
         return query.order_by(GrimorioMagia.classe, GrimorioMagia.id).all()
+
+    def listar_paginado(
+        self,
+        combatente_id: int,
+        *,
+        nome: Optional[str] = None,
+        nivel: Optional[int] = None,
+        escola: Optional[str] = None,
+        componentes: Optional[str] = None,
+        magia_ids: Optional[list[int]] = None,
+        classe: Optional[str] = None,
+        favorita: Optional[bool] = None,
+        skip: int = 0,
+        limit: Optional[int] = None,
+    ) -> tuple[int, list[GrimorioMagia]]:
+        query = self._query_listar(combatente_id, classe=classe, favorita=favorita)
+        query = self._aplicar_filtros_magia(
+            query,
+            nome=nome,
+            nivel=nivel,
+            escola=escola,
+            componentes=componentes,
+            magia_ids=magia_ids,
+        )
+        total = query.count()
+        query = query.order_by(GrimorioMagia.classe, GrimorioMagia.id).offset(skip)
+        if limit is not None:
+            query = query.limit(limit)
+        return total, query.all()
 
     def listar_historico_troca(self, combatente_id: int, classe: Optional[str] = None, limit: int = 20):
         query = self.db.query(GrimorioHistoricoTroca).filter(

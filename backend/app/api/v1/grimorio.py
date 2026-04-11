@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from typing import Optional
 import json
 
@@ -25,6 +25,26 @@ from app.services.grimorio_service import GrimorioService
 router = APIRouter(prefix="/grimorio", tags=["Grimório"])
 
 
+def _parse_magia_ids(values: Optional[list[str]]) -> Optional[list[int]]:
+    if not values:
+        return None
+
+    tokens: list[str] = []
+    for value in values:
+        for token in str(value or "").split(","):
+            token = token.strip()
+            if token:
+                tokens.append(token)
+
+    if not tokens:
+        return None
+
+    try:
+        return list(dict.fromkeys(int(token) for token in tokens))
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail="magia_ids deve conter apenas inteiros") from exc
+
+
 def _serialize(item) -> dict:
     magia = item.magia
     return {
@@ -42,6 +62,10 @@ def _serialize(item) -> dict:
         "magia_componentes": magia.componentes if magia else None,
         "magia_e_magia_dominio": bool(magia.e_magia_dominio) if magia else False,
         "magia_dominios": magia.dominios if magia else None,
+        "descricao": magia.descricao if magia else None,
+        "sub_escola": magia.sub_escola if magia else None,
+        "area_efeito": magia.area_efeito if magia else None,
+        "resistencia_magia": magia.resistencia_magia_texto if magia else None,
     }
 
 
@@ -67,13 +91,38 @@ def _serialize_notificacao(item) -> dict:
 @router.get("/{combatente_id}", response_model=list[GrimorioMagiaResponse])
 def listar_grimorio(
     combatente_id: int,
+    nome: Optional[str] = Query(default=None),
+    nivel: Optional[int] = Query(default=None, ge=0, le=9),
+    escola: Optional[str] = Query(default=None),
+    componentes: Optional[str] = Query(default=None),
+    magia_ids: Optional[list[str]] = Query(default=None),
     classe: Optional[str] = Query(default=None),
     favorita: Optional[bool] = Query(default=None),
+    skip: int = Query(default=0, ge=0),
+    limit: Optional[int] = Query(default=None, ge=1, le=200),
+    response: Response = None,
     service: GrimorioService = Depends(get_grimorio_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
-    itens = service.listar(combatente_id, classe=classe, favorita=favorita)
-    return [_serialize(item) for item in itens]
+    magia_ids_parseados = _parse_magia_ids(magia_ids)
+    total, itens = service.listar_paginado(
+        combatente_id,
+        nome=nome,
+        nivel=nivel,
+        escola=escola,
+        componentes=componentes,
+        magia_ids=magia_ids_parseados,
+        classe=classe,
+        favorita=favorita,
+        skip=skip,
+        limit=limit,
+    )
+    payload = [_serialize(item) for item in itens]
+    if response is not None:
+        response.headers["X-Total-Count"] = str(total)
+        response.headers["X-Skip"] = str(skip)
+        response.headers["X-Limit"] = str(limit if limit is not None else len(payload))
+    return payload
 
 
 @router.get("/{combatente_id}/diagnostico", response_model=GrimorioDiagnosticoResponse)
