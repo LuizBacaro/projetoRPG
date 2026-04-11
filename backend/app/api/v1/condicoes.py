@@ -12,6 +12,8 @@ from ...services.condicao_service import CondicaoService
 from ...schemas.condicao import (
     CondicaoResponse,
     AplicarCondicaoRequest,
+    AplicarCondicaoMassaRequest,
+    AplicarCondicaoMassaResponse,
     RemoverCondicaoRequest,
     CondicaoAtivaResponse,
 )
@@ -59,6 +61,24 @@ def aplicar_condicao(
         # ✅ Passar duração se fornecida, senão default -1 (permanente)
         duracao = getattr(body, 'duracao_turnos', -1) or -1
         return service.aplicar_condicao(combatente_id, body.condicao_id, duracao)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/combatentes/aplicar", response_model=AplicarCondicaoMassaResponse)
+def aplicar_condicao_combatentes(
+    body: AplicarCondicaoMassaRequest,
+    service: CondicaoService = Depends(get_condicao_service),
+    usuario_atual: object = Depends(get_usuario_atual),
+):
+    """Aplica uma condição para múltiplos combatentes em lote."""
+    try:
+        return service.aplicar_condicao_em_lote(
+            body.combatente_ids,
+            body.condicao_id,
+            body.duracao_turnos,
+            usuario_atual,
+        )
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

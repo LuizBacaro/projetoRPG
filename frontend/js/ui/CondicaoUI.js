@@ -12,6 +12,7 @@ class ModalCondicao {
         this.todasCondicoes          = [];
         this.combatentesSelecionados = new Set();
         this.modalElement            = null;
+        this._aplicando              = false;
         this._inicializar();
     }
 
@@ -124,6 +125,10 @@ class ModalCondicao {
     }
 
     async aplicar() {
+        if (this._aplicando) {
+            return;
+        }
+
         const condicaoId       = Number(document.getElementById('select-condicao')?.value);
         const durationTurnos   = Number(document.getElementById('input-duracao')?.value ?? -1);
 
@@ -138,27 +143,34 @@ class ModalCondicao {
 
         const condicao = this.todasCondicoes.find(c => c.id === condicaoId);
         const ids      = Array.from(this.combatentesSelecionados);
+        const btnAplicar = document.getElementById('btn-aplicar-condicao');
 
         try {
-            await Promise.all(ids.map(cid => 
-                this.condicaoService.aplicar(cid, condicaoId, durationTurnos)
-            ));
+            this._aplicando = true;
+            if (btnAplicar) btnAplicar.disabled = true;
 
-            const durStr = durationTurnos === -1 ? 'permanente' : `${durationTurnos} turno(s)`;
-            if (typeof Toast !== 'undefined') {
-                Toast.success(`🔮 "${condicao?.nome}" (${durStr}) aplicada a ${ids.length} combatente(s)`);
-            }
+            try {
+                await this.condicaoService.aplicarEmMassa(ids, condicaoId, durationTurnos);
 
-            if (this.arenaController) {
-                const ativo = this.arenaController.combatentes[this.arenaController.turnoAtual];
-                if (ativo) {
-                    await this.arenaController.condicaoController
-                        .carregarCondicoesDoCombatente(ativo.id);
+                const durStr = durationTurnos === -1 ? 'permanente' : `${durationTurnos} turno(s)`;
+                if (typeof Toast !== 'undefined') {
+                    Toast.success(`🔮 "${condicao?.nome}" (${durStr}) aplicada a ${ids.length} combatente(s)`);
                 }
-                await this.arenaController._atualizarBadgesOrdemTodos();
-            }
 
-            this.fechar();
+                if (this.arenaController) {
+                    const ativo = this.arenaController.combatentes[this.arenaController.turnoAtual];
+                    if (ativo) {
+                        await this.arenaController.condicaoController
+                            .carregarCondicoesDoCombatente(ativo.id);
+                    }
+                    await this.arenaController._atualizarBadgesOrdemTodos();
+                }
+
+                this.fechar();
+            } finally {
+                this._aplicando = false;
+                if (btnAplicar) btnAplicar.disabled = false;
+            }
         } catch (err) {
             console.error('❌ Erro ao aplicar condição:', err);
             if (typeof Toast !== 'undefined') Toast.error(`❌ Erro: ${err.message}`);

@@ -126,3 +126,50 @@ def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatent
     assert obter.json()["divindade"] == "Wee Jas"
     assert obter.json()["alinhamento"] == "Neutro e Bom"
     assert obter.json()["dominios"] == "Cura, Sol"
+
+
+def test_aplicar_dano_massa_sucesso(combatentes_db):
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    c1 = client.post("/api/v1/combatentes", data=_combatente_payload(nome="Aldren"))
+    c2 = client.post("/api/v1/combatentes", data=_combatente_payload(nome="Borin"))
+    ids = [c1.json()["id"], c2.json()["id"]]
+
+    response = client.post(
+        "/api/v1/combatentes/dano/massa",
+        json={"combatente_ids": ids, "valor": 5},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total"] == 2
+    assert len(body["resultados"]) == 2
+    assert {item["id"] for item in body["resultados"]} == set(ids)
+    assert all(item["hp_atual"] == 13 for item in body["resultados"])
+
+
+def test_aplicar_cura_massa_sucesso(combatentes_db):
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    c1 = client.post("/api/v1/combatentes", data=_combatente_payload(nome="Aldren"))
+    c2 = client.post("/api/v1/combatentes", data=_combatente_payload(nome="Borin"))
+    ids = [c1.json()["id"], c2.json()["id"]]
+
+    client.post(
+        "/api/v1/combatentes/dano/massa",
+        json={"combatente_ids": ids, "valor": 7},
+    )
+
+    response = client.post(
+        "/api/v1/combatentes/cura/massa",
+        json={"combatente_ids": ids, "valor": 3},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total"] == 2
+    assert len(body["resultados"]) == 2
+    assert {item["id"] for item in body["resultados"]} == set(ids)
+    assert all(item["hp_atual"] == 14 for item in body["resultados"])

@@ -94,14 +94,19 @@ export class ArenaController {
             return;
         }
 
+        const possuiCombatentesCompletos = Array.isArray(status.combatentes);
+        const statusResumidoSemCombatentes = status.resumido === true && !possuiCombatentesCompletos;
+
         this.combateId = status.id || null;
         this.versaoCombate = status.versao || null;
-        this.combatentes = this._ordenarCombatentesPorStatus(status.combatentes || [], status.combatentes_ids || []);
         this.turnoAtual = Number(status.turno_atual || 0);
         this.rodadaAtual = Number(status.rodada_atual || 1);
-        this._jaAgiram = [];
 
-        await this._carregarMagiasPreparadasTodos();
+        if (!statusResumidoSemCombatentes) {
+            this.combatentes = this._ordenarCombatentesPorStatus(status.combatentes || [], status.combatentes_ids || []);
+            this._jaAgiram = [];
+            await this._carregarMagiasPreparadasTodos();
+        }
 
         const telaArena = document.getElementById('telaArena');
         const telaConfiguracao = document.getElementById('telaConfiguracao');
@@ -251,17 +256,12 @@ export class ArenaController {
         }
     }
 
-    async avancarTurno() {  // ← Adicionar async
+    async avancarTurno() {
         var idAtual = this.combatentes[this.turnoAtual]
             ? this.combatentes[this.turnoAtual].id : null;
         
         if (idAtual !== null && this._jaAgiram.indexOf(idAtual) === -1) {
             this._jaAgiram.push(idAtual);
-        }
-        
-        // ✅ Com AWAIT - espera a resposta da API
-        if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
-            await this._decrementarDuracaoCondicoes(idAtual);  // ← CORRIGIDO!
         }
         
         this.turnoAtual++;
@@ -312,7 +312,9 @@ export class ArenaController {
             // Recarregar condições do combatente atual
             const combatenteAtual = this.combatentes[this.turnoAtual];
             if (combatenteAtual && typeof this.condicaoController !== 'undefined') {
-                await this.condicaoController.carregarCondicoesDoCombatente(combatenteAtual.id);
+                await this.condicaoController.carregarCondicoesDoCombatente(combatenteAtual.id, {
+                    forcarRefresh: true,
+                });
             }
             
         } catch (err) {
@@ -335,6 +337,19 @@ export class ArenaController {
     atualizarInterface() {
         this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
+    }
+
+    atualizarInterfaceRapidaDanoCura(combatentesAfetados) {
+        var idsAfetados = new Set((combatentesAfetados || []).map(function(id) {
+            return Number(id);
+        }));
+
+        this.renderizarOrdemIniciativa({ atualizarBadges: false });
+
+        var ativo = this.combatentes[this.turnoAtual];
+        if (ativo && idsAfetados.has(Number(ativo.id))) {
+            this.renderizarCombatenteAtivo();
+        }
     }
 
     // ─── Cronômetro ────────────────────────────────────────
@@ -524,9 +539,10 @@ export class ArenaController {
 
     // ─── Render: Ordem de Iniciativa ───────────────────────
 
-    renderizarOrdemIniciativa() {
+    renderizarOrdemIniciativa(opcoes = {}) {
         var container = document.getElementById('ordemIniciativaContainer');
         if (!container) return;
+        var atualizarBadges = opcoes.atualizarBadges !== false;
         var self = this;
         var html = '';
         for (var i = 0; i < this.combatentes.length; i++) {
@@ -559,22 +575,30 @@ export class ArenaController {
         }
         container.innerHTML = html;
         this.renderizarFotoAtivo();
-        this._atualizarBadgesOrdemTodos();
+        if (atualizarBadges) {
+            this._atualizarBadgesOrdemTodos();
+        }
     }
 
-    _atualizarBadgesOrdemTodos() {
-        var self = this;
-        var i = 0;
-        function next() {
-            if (i >= self.combatentes.length) return;
-            var c  = self.combatentes[i++];
-            var el = document.querySelector(
-                '.combatente-ordem-item[data-combatente-id="' + c.id + '"]'
-            );
-            if (el) self.condicaoController.atualizarBadgesOrdem(el, c.id).then(next);
-            else    next();
+    async _atualizarBadgesOrdemTodos() {
+        var tamanhoLote = 4;
+
+        for (var i = 0; i < this.combatentes.length; i += tamanhoLote) {
+            var lote = this.combatentes.slice(i, i + tamanhoLote);
+
+            await Promise.all(lote.map(async (c) => {
+                var el = document.querySelector(
+                    '.combatente-ordem-item[data-combatente-id="' + c.id + '"]'
+                );
+                if (!el) return;
+
+                try {
+                    await this.condicaoController.atualizarBadgesOrdem(el, c.id);
+                } catch (err) {
+                    console.warn('⚠️ Falha ao atualizar badge de condição:', c.id, err?.message || err);
+                }
+            }));
         }
-        next();
     }
 
     renderizarFotoAtivo() {
@@ -813,7 +837,7 @@ export class ArenaController {
         window.arenaActions = this._actions;
     }
 
-    // ✅ REFATORADO: avancarTurno() com decremento de duração
+    // Fluxo principal usa apenas /combate/avancar-turno para avancar e decrementar condicoes.
     async avancarTurno() {
         var idAtual = this.combatentes[this.turnoAtual]
             ? this.combatentes[this.turnoAtual].id : null;
@@ -822,15 +846,10 @@ export class ArenaController {
             this._jaAgiram.push(idAtual);
         }
         
-        // ✅ NOVO: Decrementar duração das condições do combatente atual ANTES de passar turno
-        if (idAtual !== null && typeof this.condicaoController !== 'undefined') {
-            await this._decrementarDuracaoCondicoes(idAtual); 
-        }
-
         if (this.combateId) {
             try {
                 const rodadaAnterior = this.rodadaAtual;
-                const response = await fetch(getApiUrl('/combate/avancar-turno'), {
+                const response = await fetch(getApiUrl('/combate/avancar-turno?resumido=true'), {
                     method: 'POST',
                     headers: this._headers(false, true),
                 });
@@ -843,6 +862,7 @@ export class ArenaController {
                 const status = await response.json();
                 await this._aplicarStatusCombate(status);
                 if (this.rodadaAtual > rodadaAnterior) {
+                    this._jaAgiram = [];
                     Toast.success('Rodada ' + this.rodadaAtual + ' iniciada!');
                 }
                 return;

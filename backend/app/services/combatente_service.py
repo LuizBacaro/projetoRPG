@@ -14,6 +14,7 @@ from ..services.file_service import FileService
 from ..models.combatente import Combatente
 from ..models.ataque import MagiaSlot
 from ..exceptions.custom_exceptions import (
+    ArenaBaseException,
     CombatenteNaoEncontrado,
     DadosInvalidos,
 )
@@ -35,6 +36,7 @@ class CombatenteService:
         self.repository        = repository
         self.file_service      = file_service
         self.condicao_repo     = condicao_repository
+        self._condicao_id_cache: Dict[str, int] = {}
 
     # ── CRUD ─────────────────────────────────────────────
 
@@ -201,6 +203,42 @@ class CombatenteService:
         )
         return self._response_dano_cura(combatente, mensagem)
 
+    def aplicar_dano_massa(self, combatente_ids: List[int], valor: int, usuario) -> Dict:
+        """Aplica dano em lote validando ownership por combatente."""
+        if valor <= 0:
+            raise DadosInvalidos("Valor de dano deve ser maior que zero")
+        if not combatente_ids:
+            raise DadosInvalidos("Lista de combatentes não pode ser vazia")
+
+        ids_unicos = list(dict.fromkeys(combatente_ids))
+        for combatente_id in ids_unicos:
+            combatente = self.obter_por_id(combatente_id)
+            self._validar_acesso_combatente(combatente, usuario)
+
+        resultados = [self.aplicar_dano(combatente_id, valor) for combatente_id in ids_unicos]
+        return {
+            "resultados": resultados,
+            "total": len(resultados),
+        }
+
+    def aplicar_cura_massa(self, combatente_ids: List[int], valor: int, usuario) -> Dict:
+        """Aplica cura em lote validando ownership por combatente."""
+        if valor <= 0:
+            raise DadosInvalidos("Valor de cura deve ser maior que zero")
+        if not combatente_ids:
+            raise DadosInvalidos("Lista de combatentes não pode ser vazia")
+
+        ids_unicos = list(dict.fromkeys(combatente_ids))
+        for combatente_id in ids_unicos:
+            combatente = self.obter_por_id(combatente_id)
+            self._validar_acesso_combatente(combatente, usuario)
+
+        resultados = [self.aplicar_cura(combatente_id, valor) for combatente_id in ids_unicos]
+        return {
+            "resultados": resultados,
+            "total": len(resultados),
+        }
+
     def _sincronizar_estado_hp(self, combatente: Combatente) -> None:
         """
         Aplica ou remove condições Inconsciente/Morrendo com base no HP atual.
@@ -215,48 +253,85 @@ class CombatenteService:
 
         id_inconsciente = self._id_condicao(_CONDICAO_INCONSCIENTE)
         id_morrendo     = self._id_condicao(_CONDICAO_MORRENDO)
+        houve_mudanca = False
 
         if tipo == 'monstro':
             # Monstros não recebem Inconsciente/Morrendo — morrem diretamente.
-            if id_inconsciente:
-                self.condicao_repo.remover(cid, id_inconsciente)
-            if id_morrendo:
-                self.condicao_repo.remover(cid, id_morrendo)
+            if id_inconsciente is not None:
+                self.condicao_repo.remover(cid, id_inconsciente, commit=False)
+                houve_mudanca = True
+            if id_morrendo is not None:
+                self.condicao_repo.remover(cid, id_morrendo, commit=False)
+                houve_mudanca = True
+            if houve_mudanca:
+                self.condicao_repo.commit()
             return
 
         # Jogador / NPC
         if hp > 0:
             # Vivo e consciente — remove ambas as condições
-            if id_inconsciente:
-                self.condicao_repo.remover(cid, id_inconsciente)
-            if id_morrendo:
-                self.condicao_repo.remover(cid, id_morrendo)
+            if id_inconsciente is not None:
+                self.condicao_repo.remover(cid, id_inconsciente, commit=False)
+                houve_mudanca = True
+            if id_morrendo is not None:
+                self.condicao_repo.remover(cid, id_morrendo, commit=False)
+                houve_mudanca = True
         elif hp == 0:
             # Inconsciente mas estável
-            if id_morrendo:
-                self.condicao_repo.remover(cid, id_morrendo)
-            if id_inconsciente:
-                self.condicao_repo.aplicar(cid, id_inconsciente, duracao_turnos=-1)
+            if id_morrendo is not None:
+                self.condicao_repo.remover(cid, id_morrendo, commit=False)
+                houve_mudanca = True
+            if id_inconsciente is not None:
+                self.condicao_repo.aplicar(cid, id_inconsciente, duracao_turnos=-1, commit=False)
+                houve_mudanca = True
         elif -10 < hp < 0:
             # Morrendo (-1 a -9)
-            if id_inconsciente:
-                self.condicao_repo.remover(cid, id_inconsciente)
-            if id_morrendo:
-                self.condicao_repo.aplicar(cid, id_morrendo, duracao_turnos=-1)
+            if id_inconsciente is not None:
+                self.condicao_repo.remover(cid, id_inconsciente, commit=False)
+                houve_mudanca = True
+            if id_morrendo is not None:
+                self.condicao_repo.aplicar(cid, id_morrendo, duracao_turnos=-1, commit=False)
+                houve_mudanca = True
         else:
             # Morto (hp <= -10) — remove condições de processo
-            if id_inconsciente:
-                self.condicao_repo.remover(cid, id_inconsciente)
-            if id_morrendo:
-                self.condicao_repo.remover(cid, id_morrendo)
+            if id_inconsciente is not None:
+                self.condicao_repo.remover(cid, id_inconsciente, commit=False)
+                houve_mudanca = True
+            if id_morrendo is not None:
+                self.condicao_repo.remover(cid, id_morrendo, commit=False)
+                houve_mudanca = True
+
+        if houve_mudanca:
+            self.condicao_repo.commit()
 
     def _id_condicao(self, nome: str) -> Optional[int]:
         """Retorna o ID de uma condição pelo nome, ou None se não existir."""
+        if nome in self._condicao_id_cache:
+            return self._condicao_id_cache[nome]
+
         try:
             condicao = self.condicao_repo.get_by_nome(nome)
-            return condicao.id if condicao else None
+            if condicao:
+                self._condicao_id_cache[nome] = condicao.id
+                return condicao.id
+            return None
         except Exception:
             return None
+
+    def _validar_acesso_combatente(self, combatente: Combatente, usuario) -> None:
+        """Garante acesso apenas ao dono, exceto perfil administrador."""
+        if usuario is None:
+            raise ArenaBaseException("Usuário autenticado é obrigatório", status_code=401)
+
+        perfil = getattr(usuario, "perfil", None)
+        if perfil == PerfilUsuario.ADMINISTRADOR or perfil == PerfilUsuario.ADMINISTRADOR.value:
+            return
+
+        if combatente.dono_id != getattr(usuario, "id", None):
+            raise ArenaBaseException(
+                "Sem permissão para alterar este combatente",
+                status_code=403,
+            )
 
     def _mensagem_dano(self, combatente: Combatente, hp_anterior: int, dano_efetivo: int) -> str:
         hp = combatente.hp_atual

@@ -22,6 +22,19 @@ class CondicaoService {
         return token ? { 'Authorization': `Bearer ${token}` } : {};
     }
 
+    async _extrairMensagemErro(res, fallbackMessage) {
+        try {
+            const errorData = await res.json();
+            if (errorData && typeof errorData.detail === 'string' && errorData.detail.trim()) {
+                return errorData.detail;
+            }
+        } catch (_) {
+            // Mantem fallback de mensagem quando resposta nao e JSON valido
+        }
+
+        return `HTTP ${res.status}: ${fallbackMessage}`;
+    }
+
     async listarTodas() {
         try {
             const res = await fetch(`${this.baseUrl}/condicoes`, {
@@ -67,10 +80,55 @@ class CondicaoService {
                     }),
                 }
             );
-            if (!res.ok) throw new Error(`HTTP ${res.status}: Erro ao aplicar condição`);
+            if (!res.ok) {
+                throw new Error(await this._extrairMensagemErro(res, 'Erro ao aplicar condição'));
+            }
             return res.json();
         } catch (error) {
             console.error('❌ CondicaoService.aplicar:', error);
+            throw error;
+        }
+    }
+
+    async aplicarEmMassa(combatenteIds, condicaoId, duracaoTurnos = -1) {
+        try {
+            const res = await fetch(
+                `${this.baseUrl}/condicoes/combatentes/aplicar`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...this._getAuthHeader(),
+                    },
+                    body: JSON.stringify({
+                        combatente_ids: combatenteIds,
+                        condicao_id: condicaoId,
+                        duracao_turnos: duracaoTurnos,
+                    }),
+                }
+            );
+
+            if (res.ok) {
+                return res.json();
+            }
+
+            if (res.status === 404 || res.status === 405) {
+                console.warn('⚠️ Endpoint batch de condições indisponível, aplicando fallback por combatente');
+                await Promise.all(
+                    combatenteIds.map((id) => this.aplicar(id, condicaoId, duracaoTurnos))
+                );
+
+                return {
+                    combatente_ids: combatenteIds,
+                    total_aplicados: combatenteIds.length,
+                    condicao_id: condicaoId,
+                    duracao_turnos: duracaoTurnos,
+                };
+            }
+
+            throw new Error(await this._extrairMensagemErro(res, 'Erro ao aplicar condição em massa'));
+        } catch (error) {
+            console.error('❌ CondicaoService.aplicarEmMassa:', error);
             throw error;
         }
     }

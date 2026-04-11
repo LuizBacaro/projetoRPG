@@ -2,7 +2,7 @@
 Service de Combate (Business Logic)
 Princípio SOLID: SRP - Lógica de negócio de Combate
 """
-from typing import List, Dict, Any, Optional  # ← ADICIONAR Optional aqui
+from typing import List, Dict, Any, Optional
 from ..repositories.combate_repository import CombateRepository
 from ..repositories.combatente_repository import CombatenteRepository
 from ..models.combate import Combate, CombateHistorico
@@ -124,18 +124,16 @@ class CombateService:
 
         return self.combate_repo.criar_historico(historico)
     
-    def obter_status_combate(self) -> Dict[str, Any]:
-        """
-        Obtém o status completo do combate ativo
-        """
-        combate = self.obter_combate_ativo()
-        
+    def montar_status_combate(self, combate: Optional[Combate], incluir_combatentes: bool = True) -> Dict[str, Any]:
+        """Monta payload de status com base em um combate já carregado."""
         if not combate:
-            return {"ativo": False, "message": "Nenhum combate ativo"}
-        
-        combatentes = self.combatente_repo.get_by_ids(combate.combatentes_ids)
-        
-        return {
+            return {
+                "ativo": False,
+                "message": "Nenhum combate ativo",
+                "resumido": not incluir_combatentes,
+            }
+
+        payload = {
             "id": combate.id,
             "combatentes_ids": combate.combatentes_ids,
             "turno_atual": combate.turno_atual,
@@ -143,10 +141,22 @@ class CombateService:
             "versao": self.gerar_versao(combate),
             "ativo": combate.ativo,
             "combatente_ativo_id": combate.obter_combatente_ativo_id(),
-            "combatentes": combatentes
         }
+
+        if incluir_combatentes:
+            payload["combatentes"] = self.combatente_repo.get_by_ids(combate.combatentes_ids)
+
+        payload["resumido"] = not incluir_combatentes
+        return payload
+
+    def obter_status_combate(self, incluir_combatentes: bool = True) -> Dict[str, Any]:
+        """
+        Obtém o status completo do combate ativo
+        """
+        combate = self.obter_combate_ativo()
+        return self.montar_status_combate(combate, incluir_combatentes=incluir_combatentes)
     
-    def avancar_turno(self, expected_version: Optional[str]) -> Combate:
+    def avancar_turno(self, expected_version: Optional[str], condicao_service: Optional[Any] = None) -> Combate:
         """
         Avança para o próximo turno
         """
@@ -156,6 +166,10 @@ class CombateService:
             raise CombateNotFoundError("Nenhum combate ativo")
 
         self.validar_versao(expected_version, combate)
+
+        combatente_ativo_id = combate.obter_combatente_ativo_id()
+        if condicao_service and combatente_ativo_id is not None:
+            condicao_service.decrementar_duracao_todas(combatente_ativo_id)
         
         # Verificar se todos estão mortos
         combatentes_vivos = self.combatente_repo.get_vivos_by_ids(combate.combatentes_ids)

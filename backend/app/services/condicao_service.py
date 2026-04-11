@@ -6,7 +6,8 @@ DIP - Depende da abstração CondicaoRepository
 from typing import List, Dict
 from ..repositories.condicao_repository import CondicaoRepository
 from ..repositories.combatente_repository import CombatenteRepository
-from ..exceptions.custom_exceptions import CombatenteNaoEncontrado
+from ..exceptions.custom_exceptions import ArenaBaseException, CombatenteNaoEncontrado, DadosInvalidos
+from ..models.usuario import PerfilUsuario
 
 # ── Seed das 25 condições da planilha Condies-D&D.xlsx ────────────────────────
 CONDICOES_SEED = [
@@ -94,6 +95,42 @@ class CondicaoService:
         condicoes = self.condicao_repo.get_condicoes_do_combatente(combatente_id)
         return {"combatente_id": combatente_id, "condicoes": condicoes}
 
+    def aplicar_condicao_em_lote(
+        self,
+        combatente_ids: List[int],
+        condicao_id: int,
+        duracao_turnos: int,
+        usuario,
+    ) -> Dict:
+        """Aplica uma condição em vários combatentes com commit único ao final."""
+        if not combatente_ids:
+            raise DadosInvalidos("Lista de combatentes não pode ser vazia")
+
+        self._validar_condicao(condicao_id)
+        ids_unicos = list(dict.fromkeys(combatente_ids))
+
+        for combatente_id in ids_unicos:
+            combatente = self.combatente_repo.get_by_id(combatente_id)
+            if not combatente:
+                raise CombatenteNaoEncontrado(combatente_id)
+            self._validar_acesso_combatente(combatente, usuario)
+
+        for combatente_id in ids_unicos:
+            self.condicao_repo.aplicar(
+                combatente_id,
+                condicao_id,
+                duracao_turnos,
+                commit=False,
+            )
+
+        self.condicao_repo.commit()
+        return {
+            "combatente_ids": ids_unicos,
+            "total_aplicados": len(ids_unicos),
+            "condicao_id": condicao_id,
+            "duracao_turnos": duracao_turnos,
+        }
+
     def remover_condicao(self, combatente_id: int, condicao_id: int) -> Dict:
         """Remove uma condição específica de um combatente"""
         self._validar_combatente(combatente_id)
@@ -119,6 +156,7 @@ class CondicaoService:
         self._validar_combatente(combatente_id)
 
         condicoes_ativas = self.condicao_repo.get_condicoes_do_combatente(combatente_id)
+        houve_mudanca = False
         
         for condicao in condicoes_ativas:
             duracao = condicao.get('duracao_turnos')
@@ -138,17 +176,22 @@ class CondicaoService:
                 # Expirou — remover
                 self.condicao_repo.remover(
                     combatente_id,
-                    condicao.get('condicao_id')
+                    condicao.get('condicao_id'),
+                    commit=False,
                 )
-                print(f"⏰ Condição '{condicao.get('nome')}' expirou para combatente {combatente_id}")
+                houve_mudanca = True
             else:
                 # Atualizar duração
                 self.condicao_repo.atualizar_duracao(
                     combatente_id,
                     condicao.get('condicao_id'),
-                    nova_duracao
+                    nova_duracao,
+                    commit=False,
                 )
-                print(f"⏰ Condição '{condicao.get('nome')}' decrementada: {nova_duracao} turno(s)")
+                houve_mudanca = True
+
+        if houve_mudanca:
+            self.condicao_repo.commit()
 
         # Retornar estado atualizado
         condicoes = self.condicao_repo.get_condicoes_do_combatente(combatente_id)
@@ -164,5 +207,19 @@ class CondicaoService:
     def _validar_condicao(self, condicao_id: int) -> None:
         condicao = self.condicao_repo.get_by_id(condicao_id)
         if not condicao:
-            from ..exceptions.custom_exceptions import DadosInvalidos
             raise DadosInvalidos(f"Condição {condicao_id} não encontrada")
+
+    def _validar_acesso_combatente(self, combatente, usuario) -> None:
+        """Garante acesso apenas ao dono, exceto perfil administrador."""
+        if usuario is None:
+            raise ArenaBaseException("Usuário autenticado é obrigatório", status_code=401)
+
+        perfil = getattr(usuario, "perfil", None)
+        if perfil == PerfilUsuario.ADMINISTRADOR or perfil == PerfilUsuario.ADMINISTRADOR.value:
+            return
+
+        if combatente.dono_id != getattr(usuario, "id", None):
+            raise ArenaBaseException(
+                "Sem permissão para alterar este combatente",
+                status_code=403,
+            )

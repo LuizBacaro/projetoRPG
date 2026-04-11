@@ -13,7 +13,9 @@ from ...schemas.combatente import (
     HPUpdateRequest,
     IniciativaUpdateRequest,
     DanoCuraRequest,
-    DanoCuraResponse
+    DanoCuraResponse,
+    DanoCuraMassaRequest,
+    DanoCuraMassaResponse,
 )
 from ...exceptions.custom_exceptions import ArenaBaseException
 
@@ -240,6 +242,40 @@ def aplicar_cura(
     """Aplica cura a um combatente"""
     try:
         return service.aplicar_cura(combatente_id, cura_data.valor)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/dano/massa", response_model=DanoCuraMassaResponse)
+def aplicar_dano_massa(
+    dano_data: DanoCuraMassaRequest,
+    service: CombatenteService = Depends(get_combatente_service),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
+):
+    """Aplica dano em lote para múltiplos combatentes."""
+    try:
+        return service.aplicar_dano_massa(
+            dano_data.combatente_ids,
+            dano_data.valor,
+            usuario_atual,
+        )
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/cura/massa", response_model=DanoCuraMassaResponse)
+def aplicar_cura_massa(
+    cura_data: DanoCuraMassaRequest,
+    service: CombatenteService = Depends(get_combatente_service),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
+):
+    """Aplica cura em lote para múltiplos combatentes."""
+    try:
+        return service.aplicar_cura_massa(
+            cura_data.combatente_ids,
+            cura_data.valor,
+            usuario_atual,
+        )
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

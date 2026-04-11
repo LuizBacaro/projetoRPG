@@ -7,9 +7,10 @@ from sqlalchemy.orm import Session
 
 from ...core.database import get_db
 from ...core.deps import get_usuario_atual, validar_combatentes_do_usuario
-from ...core.dependencies import get_combate_service, get_combatente_service
+from ...core.dependencies import get_combate_service, get_combatente_service, get_condicao_service
 from ...services.combate_service import CombateService
 from ...services.combatente_service import CombatenteService
+from ...services.condicao_service import CondicaoService
 from ...models.usuario import Usuario
 from ...schemas.combate import (
     IniciarCombateRequest,
@@ -41,9 +42,13 @@ def iniciar_combate(
 
 
 @router.get("/status")
-def status_combate(service: CombateService = Depends(get_combate_service), _: object = Depends(get_usuario_atual)):
+def status_combate(
+    resumido: bool = Query(False),
+    service: CombateService = Depends(get_combate_service),
+    _: object = Depends(get_usuario_atual),
+):
     """Obtém o status do combate ativo"""
-    return service.obter_status_combate()
+    return service.obter_status_combate(incluir_combatentes=not resumido)
 
 
 @router.get("/historico", response_model=CombateHistoricoListResponse)
@@ -59,15 +64,16 @@ def listar_historico(
 
 @router.post("/avancar-turno")
 def avancar_turno(
+    resumido: bool = Query(False),
     service: CombateService = Depends(get_combate_service),
+    condicao_service: CondicaoService = Depends(get_condicao_service),
     if_match: str = Header(default=None, alias="If-Match"),
     _: object = Depends(get_usuario_atual),
 ):
     """Avança para o próximo turno"""
     try:
-        service.avancar_turno(if_match)
-        status = service.obter_status_combate()
-        return status
+        combate = service.avancar_turno(if_match, condicao_service=condicao_service)
+        return service.montar_status_combate(combate, incluir_combatentes=not resumido)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
