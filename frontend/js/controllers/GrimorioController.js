@@ -1,5 +1,5 @@
-import { MagiaService } from '../services/MagiaService.js';
-import { GrimorioService } from '../services/GrimorioService.js';
+import { MagiaService } from '../services/MagiaService.js?v=20260411b';
+import { GrimorioService } from '../services/GrimorioService.js?v=20260411b';
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { getApiUrl } from '../config/api.config.js';
 import { escapeHtml } from '../utils/formatters.js';

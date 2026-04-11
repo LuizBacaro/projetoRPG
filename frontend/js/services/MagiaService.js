@@ -82,6 +82,18 @@ export class MagiaService {
         }
     }
 
+    async ListaMagiaPorClasse(classe) {
+        return this.listarPorClasse(classe);
+    }
+
+    async listarMagiaPorClasse(classe) {
+        return this.listarPorClasse(classe);
+    }
+
+    async listarMagiasPorClasse(classe) {
+        return this.listarPorClasse(classe);
+    }
+
     async listarPorClassePaginado(classe, {
         nome,
         nivel,
@@ -128,6 +140,18 @@ export class MagiaService {
             skip: Number.isFinite(skipHeader) ? skipHeader : Math.max(0, Number(skip || 0)),
             limit: Number.isFinite(limitHeader) ? limitHeader : Math.max(1, Number(limit || 20)),
         };
+    }
+
+    async ListaMagiaPorClassePaginado(classe, filtros = {}) {
+        return this.listarPorClassePaginado(classe, filtros);
+    }
+
+    async listarMagiaPorClassePaginado(classe, filtros = {}) {
+        return this.listarPorClassePaginado(classe, filtros);
+    }
+
+    async listarMagiasPorClassePaginado(classe, filtros = {}) {
+        return this.listarPorClassePaginado(classe, filtros);
     }
 
     /**
