@@ -265,8 +265,12 @@ class GrimorioController {
                 this._carregarHistoricoTrocas(),
             ]);
 
+            const itensLista = Array.isArray(itensRaw)
+                ? itensRaw
+                : (Array.isArray(itensRaw?.items) ? itensRaw.items : []);
+
             if (this.combatente?.id && this.classeAtiva) {
-                this.itensGrimorio = itensRaw.map((item) => this._mapearItemGrimorio(item));
+                this.itensGrimorio = itensLista.map((item) => this._mapearItemGrimorio(item));
                 this._mesclarCatalogoDisponivelNoGrimorio();
             } else {
                 this.itensGrimorio = [];
