@@ -23,6 +23,7 @@ export class ArenaController {
         this._cronometroAtivo      = false;
         this._jaAgiram             = [];
         this._actions              = null;
+        this._cardAtivoRenderState = null;
         this._canal                = new BroadcastChannel('magias-rpg');
         this._canal.onmessage      = (event) => {
             if (event?.data?.tipo === 'magia-preparada-atualizada') {
@@ -43,6 +44,168 @@ export class ArenaController {
         this.combateId             = null;
         this.versaoCombate         = null;
         this._inicializar();
+    }
+
+    _obterAssinaturaOrdemIniciativa() {
+        return this.combatentes.map(function(c) {
+            return String(c.id);
+        }).join('|');
+    }
+
+    _capturarBadgesOrdemExistentes(container) {
+        var badgesPorId = new Map();
+        if (!container) {
+            return badgesPorId;
+        }
+
+        var wrappers = container.querySelectorAll('.combatente-ordem-item[data-combatente-id] .badges-condicao-ordem-wrapper');
+        wrappers.forEach(function(wrapper) {
+            var item = wrapper.closest('.combatente-ordem-item[data-combatente-id]');
+            if (!item) {
+                return;
+            }
+            badgesPorId.set(String(item.dataset.combatenteId), wrapper.innerHTML);
+        });
+
+        return badgesPorId;
+    }
+
+    _renderizarItemOrdemHTML(combatente, indice) {
+        var ativo = (indice === this.turnoAtual);
+        var jaAgiu = (this._jaAgiram.indexOf(combatente.id) !== -1);
+        var hpPct = Math.max(0, Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100));
+        var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
+        var morto = (combatente.tipo === 'monstro') ? (combatente.hp_atual <= 0) : (combatente.hp_atual <= -10);
+        var cls = 'combatente-ordem-item';
+
+        if (ativo) cls += ' ativo';
+        if (morto) cls += ' morto';
+        if (jaAgiu) cls += ' ja-agiu';
+
+        var html = '';
+        html += '<div class="' + cls + '" data-combatente-id="' + combatente.id + '">';
+        html += '<span class="ordem-iniciativa-valor">' + combatente.iniciativa + '</span>';
+        html += '<div class="ordem-info">';
+        html += '<div class="ordem-nome-linha">';
+        html += '<span class="ordem-nome">' + escapeHtml(combatente.nome) + '</span>';
+        if (jaAgiu) html += '<span class="ordem-agiu-badge">✓</span>';
+        html += '</div>';
+        html += '<div class="ordem-hp-bar">';
+        html += '<div class="ordem-hp-fill" style="width:' + hpPct + '%;background:' + hpCor + ';"></div>';
+        html += '</div>';
+        html += '<div class="badges-condicao-ordem-wrapper"></div>';
+        html += '</div>';
+        html += '<span class="badge ' + this.getBadgeClass(combatente.tipo) + ' badge-mini">'
+              + this.getEmojiTipo(combatente.tipo) + '</span>';
+        html += '</div>';
+
+        return html;
+    }
+
+    _reaplicarBadgesOrdem(container, badgesPorId) {
+        if (!container || !(badgesPorId instanceof Map) || badgesPorId.size === 0) {
+            return;
+        }
+
+        var self = this;
+        badgesPorId.forEach(function(html, combatenteId) {
+            var wrapper = container.querySelector(
+                '.combatente-ordem-item[data-combatente-id="' + combatenteId + '"] .badges-condicao-ordem-wrapper'
+            );
+            if (!wrapper) {
+                return;
+            }
+            wrapper.innerHTML = html;
+        });
+    }
+
+    _podeAtualizarOrdemIncremental(container) {
+        if (!container || container.children.length !== this.combatentes.length) {
+            return false;
+        }
+
+        for (var i = 0; i < this.combatentes.length; i++) {
+            var item = container.children[i];
+            if (!item || String(item.dataset.combatenteId) !== String(this.combatentes[i].id)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    _atualizarItemOrdemExistente(item, combatente, indice) {
+        if (!item) {
+            return;
+        }
+
+        var ativo = (indice === this.turnoAtual);
+        var jaAgiu = (this._jaAgiram.indexOf(combatente.id) !== -1);
+        var hpPct = Math.max(0, Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100));
+        var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
+        var morto = (combatente.tipo === 'monstro') ? (combatente.hp_atual <= 0) : (combatente.hp_atual <= -10);
+
+        item.dataset.combatenteId = String(combatente.id);
+        item.classList.toggle('ativo', ativo);
+        item.classList.toggle('morto', morto);
+        item.classList.toggle('ja-agiu', jaAgiu);
+
+        var iniciativaEl = item.querySelector('.ordem-iniciativa-valor');
+        if (iniciativaEl) {
+            iniciativaEl.textContent = String(combatente.iniciativa);
+        }
+
+        var nomeEl = item.querySelector('.ordem-nome');
+        if (nomeEl) {
+            nomeEl.textContent = combatente.nome || '';
+        }
+
+        var nomeLinhaEl = item.querySelector('.ordem-nome-linha');
+        if (nomeLinhaEl) {
+            var badgeAgiuEl = nomeLinhaEl.querySelector('.ordem-agiu-badge');
+            if (jaAgiu && !badgeAgiuEl) {
+                badgeAgiuEl = document.createElement('span');
+                badgeAgiuEl.className = 'ordem-agiu-badge';
+                badgeAgiuEl.textContent = '✓';
+                nomeLinhaEl.appendChild(badgeAgiuEl);
+            }
+            if (!jaAgiu && badgeAgiuEl) {
+                badgeAgiuEl.remove();
+            }
+        }
+
+        var hpFillEl = item.querySelector('.ordem-hp-fill');
+        if (hpFillEl) {
+            hpFillEl.style.width = hpPct + '%';
+            hpFillEl.style.background = hpCor;
+        }
+
+        var tipoBadgeEl = item.querySelector('.badge-mini');
+        if (tipoBadgeEl) {
+            tipoBadgeEl.className = 'badge ' + this.getBadgeClass(combatente.tipo) + ' badge-mini';
+            tipoBadgeEl.textContent = this.getEmojiTipo(combatente.tipo);
+        }
+    }
+
+    _renderizarOrdemIniciativaCompleta(container, atualizarBadges) {
+        var badgesPreservadas = atualizarBadges ? new Map() : this._capturarBadgesOrdemExistentes(container);
+        var html = '';
+
+        for (var i = 0; i < this.combatentes.length; i++) {
+            html += this._renderizarItemOrdemHTML(this.combatentes[i], i);
+        }
+
+        container.innerHTML = html;
+
+        if (!atualizarBadges) {
+            this._reaplicarBadgesOrdem(container, badgesPreservadas);
+        }
+    }
+
+    _atualizarOrdemIniciativaIncremental(container) {
+        for (var i = 0; i < this.combatentes.length; i++) {
+            this._atualizarItemOrdemExistente(container.children[i], this.combatentes[i], i);
+        }
     }
 
     _inicializar() {
@@ -96,6 +259,7 @@ export class ArenaController {
 
         const possuiCombatentesCompletos = Array.isArray(status.combatentes);
         const statusResumidoSemCombatentes = status.resumido === true && !possuiCombatentesCompletos;
+        const turnoAnterior = Number(this.turnoAtual || 0);
 
         this.combateId = status.id || null;
         this.versaoCombate = status.versao || null;
@@ -116,7 +280,31 @@ export class ArenaController {
         this._resetarCronometro();
         this._iniciarCronometro();
         this.atualizarRodada();
-        this.renderizarOrdemIniciativa();
+
+        if (statusResumidoSemCombatentes) {
+            this.renderizarOrdemIniciativa({ atualizarBadges: false });
+
+            const idsParaAtualizar = new Set();
+            const combatenteAnterior = this.combatentes[turnoAnterior];
+            const combatenteAtual = this.combatentes[this.turnoAtual];
+
+            if (combatenteAnterior && combatenteAnterior.id != null) {
+                idsParaAtualizar.add(Number(combatenteAnterior.id));
+            }
+            if (combatenteAtual && combatenteAtual.id != null) {
+                idsParaAtualizar.add(Number(combatenteAtual.id));
+            }
+
+            await Promise.all(Array.from(idsParaAtualizar).map((combatenteId) => {
+                return this._atualizarBadgeOrdemCombatente(combatenteId, {
+                    usarCache: false,
+                    forcarRefresh: true,
+                });
+            }));
+        } else {
+            this.renderizarOrdemIniciativa();
+        }
+
         this.renderizarCombatenteAtivo();
     }
 
@@ -226,10 +414,7 @@ export class ArenaController {
                 });
                 if (possuiSlotSemId) {
                     combatente._slotsSyncEmAndamento = true;
-                    var ativoDuranteSync = this.combatentes[this.turnoAtual];
-                    if (ativoDuranteSync && Number(ativoDuranteSync.id) === Number(combatenteId)) {
-                        this.renderizarCombatenteAtivo();
-                    }
+                    this._renderizarCardAtivoSeAtual(combatenteId, { carregarCondicoes: false });
                     try {
                         var slotsPersistidos = await this.magiaSlotService.salvarPorCombatente(combatente.id, combatente.magias_slots || []);
                         combatente.magias_slots = resolveCombatenteSpellSlots({ ...combatente, magias_slots: slotsPersistidos });
@@ -237,23 +422,30 @@ export class ArenaController {
                         combatente._slotsSyncEmAndamento = false;
                     }
                 }
-                var ativoEsp = this.combatentes[this.turnoAtual];
-                if (ativoEsp && Number(ativoEsp.id) === Number(combatenteId)) {
-                    this.renderizarCombatenteAtivo();
-                }
+                this._renderizarCardAtivoSeAtual(combatenteId, { carregarCondicoes: false });
                 return;
             }
             var preparadas = await this.magiaPreparadaService.listar(combatente.id);
             combatente._magiasPreparadas = preparadas;
             combatente._magiasGrupos = this.magiaPreparadaService.agruparPorNivel(preparadas, combatente.magias_slots || []);
 
-            var ativo = this.combatentes[this.turnoAtual];
-            if (ativo && Number(ativo.id) === Number(combatente.id)) {
-                this.renderizarCombatenteAtivo();
-            }
+            this._renderizarCardAtivoSeAtual(combatente.id, { carregarCondicoes: false });
         } catch (err) {
             console.warn(`⚠️ Falha ao sincronizar magias preparadas de ${combatente.nome}:`, err.message);
         }
+    }
+
+    _renderizarCardAtivoSeAtual(combatenteId, opcoes = {}) {
+        var ativoAtual = this.combatentes[this.turnoAtual];
+        if (!ativoAtual) {
+            return;
+        }
+
+        if (Number(ativoAtual.id) !== Number(combatenteId)) {
+            return;
+        }
+
+        this.renderizarCombatenteAtivo(opcoes);
     }
 
     async avancarTurno() {
@@ -324,7 +516,6 @@ export class ArenaController {
 
     toggleVisibilidadeStats() {
         this.statsVisiveis = !this.statsVisiveis;
-        this.renderizarOrdemIniciativa();
         this.renderizarCombatenteAtivo();
         Toast.success(this.statsVisiveis ? 'Stats visiveis' : 'Stats ocultos');
     }
@@ -543,37 +734,13 @@ export class ArenaController {
         var container = document.getElementById('ordemIniciativaContainer');
         if (!container) return;
         var atualizarBadges = opcoes.atualizarBadges !== false;
-        var self = this;
-        var html = '';
-        for (var i = 0; i < this.combatentes.length; i++) {
-            var c      = this.combatentes[i];
-            var ativo  = (i === this.turnoAtual);
-            var jaAgiu = (this._jaAgiram.indexOf(c.id) !== -1);
-            var hpPct  = Math.max(0, Math.min(100, (c.hp_atual / c.hp_maximo) * 100));
-            var hpCor  = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
-            var morto  = (c.tipo === 'monstro') ? (c.hp_atual <= 0) : (c.hp_atual <= -10);
-            var cls    = 'combatente-ordem-item';
-            if (ativo)  cls += ' ativo';
-            if (morto)  cls += ' morto';
-            if (jaAgiu) cls += ' ja-agiu';
 
-            html += '<div class="' + cls + '" data-combatente-id="' + c.id + '">';
-            html += '<span class="ordem-iniciativa-valor">' + c.iniciativa + '</span>';
-            html += '<div class="ordem-info">';
-            html += '<div class="ordem-nome-linha">';
-            html += '<span class="ordem-nome">' + escapeHtml(c.nome) + '</span>';
-            if (jaAgiu) html += '<span class="ordem-agiu-badge">✓</span>';
-            html += '</div>';
-            html += '<div class="ordem-hp-bar">';
-            html += '<div class="ordem-hp-fill" style="width:' + hpPct + '%;background:' + hpCor + ';"></div>';
-            html += '</div>';
-            html += '<div class="badges-condicao-ordem-wrapper"></div>';
-            html += '</div>';
-            html += '<span class="badge ' + self.getBadgeClass(c.tipo) + ' badge-mini">'
-                  + self.getEmojiTipo(c.tipo) + '</span>';
-            html += '</div>';
+        if (this._podeAtualizarOrdemIncremental(container)) {
+            this._atualizarOrdemIniciativaIncremental(container);
+        } else {
+            this._renderizarOrdemIniciativaCompleta(container, atualizarBadges);
         }
-        container.innerHTML = html;
+
         this.renderizarFotoAtivo();
         if (atualizarBadges) {
             this._atualizarBadgesOrdemTodos();
@@ -587,17 +754,21 @@ export class ArenaController {
             var lote = this.combatentes.slice(i, i + tamanhoLote);
 
             await Promise.all(lote.map(async (c) => {
-                var el = document.querySelector(
-                    '.combatente-ordem-item[data-combatente-id="' + c.id + '"]'
-                );
-                if (!el) return;
-
-                try {
-                    await this.condicaoController.atualizarBadgesOrdem(el, c.id);
-                } catch (err) {
-                    console.warn('⚠️ Falha ao atualizar badge de condição:', c.id, err?.message || err);
-                }
+                await this._atualizarBadgeOrdemCombatente(c.id, { usarCache: true });
             }));
+        }
+    }
+
+    async _atualizarBadgeOrdemCombatente(combatenteId, opcoes = {}) {
+        var el = document.querySelector(
+            '.combatente-ordem-item[data-combatente-id="' + combatenteId + '"]'
+        );
+        if (!el) return;
+
+        try {
+            await this.condicaoController.atualizarBadgesOrdem(el, combatenteId, opcoes);
+        } catch (err) {
+            console.warn('⚠️ Falha ao atualizar badge de condição:', combatenteId, err?.message || err);
         }
     }
 
@@ -605,21 +776,320 @@ export class ArenaController {
         var container = document.getElementById('arenaFotoAtivo');
         if (!container) return;
         var c = this.combatentes[this.turnoAtual];
-        if (!c) { container.innerHTML = ''; return; }
-        container.innerHTML = c.foto_url
-            ? '<img src="' + c.foto_url + '" alt="' + escapeHtml(c.nome)
-              + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">'
-            : '<div class="arena-foto-vertical-placeholder">' + this.getEmojiTipo(c.tipo) + '</div>';
+        if (!c) {
+            container.replaceChildren();
+            delete container.dataset.fotoKey;
+            return;
+        }
+
+        var fotoKey = [String(c.id || ''), c.foto_url || '', c.nome || '', c.tipo || ''].join('|');
+        if (container.dataset.fotoKey === fotoKey) {
+            return;
+        }
+
+        container.dataset.fotoKey = fotoKey;
+
+        if (c.foto_url) {
+            var imagem = container.querySelector('img[data-role="arena-foto-ativo"]');
+            if (!imagem) {
+                imagem = document.createElement('img');
+                imagem.setAttribute('data-role', 'arena-foto-ativo');
+                imagem.style.width = '100%';
+                imagem.style.height = '100%';
+                imagem.style.objectFit = 'cover';
+                imagem.style.borderRadius = '8px';
+                container.replaceChildren(imagem);
+            }
+            imagem.src = c.foto_url;
+            imagem.alt = c.nome || '';
+            return;
+        }
+
+        var placeholder = container.querySelector('.arena-foto-vertical-placeholder');
+        if (!placeholder) {
+            placeholder = document.createElement('div');
+            placeholder.className = 'arena-foto-vertical-placeholder';
+            container.replaceChildren(placeholder);
+        }
+        placeholder.textContent = this.getEmojiTipo(c.tipo);
+    }
+
+    _obterAssinaturaMagiasCardAtivo(combatente) {
+        if (!combatente) {
+            return 'sem-magias';
+        }
+
+        if (combatente._isConjuradorEspontaneo) {
+            return 'slots:' + (combatente.magias_slots || []).map(function(slot) {
+                return [
+                    Number(slot?.nivel ?? -1),
+                    Number(slot?.total ?? 0),
+                    Number(slot?.usados ?? 0),
+                    Number(slot?.id ?? slot?.slot_id ?? 0),
+                ].join(':');
+            }).join('|');
+        }
+
+        if (combatente._isConjurador) {
+            return 'preparadas:' + Object.keys(combatente._magiasGrupos || {})
+                .sort(function(a, b) { return Number(a) - Number(b); })
+                .map(function(nivel) {
+                    var grupo = combatente._magiasGrupos[nivel] || {};
+                    var preparadas = (grupo.preparadas || []).map(function(prep) {
+                        return [
+                            Number(prep?.magia_id ?? 0),
+                            prep?.usada ? '1' : '0',
+                            Number(prep?._instanceIndex ?? 1),
+                            Number(prep?._instanceTotal ?? 1),
+                        ].join(':');
+                    }).join(',');
+                    return [
+                        Number(nivel),
+                        Number(grupo.total ?? 0),
+                        Number(grupo.usadas ?? 0),
+                        preparadas,
+                    ].join(':');
+                }).join('|');
+        }
+
+        return 'sem-magias';
+    }
+
+    _obterAssinaturaEstruturalCardAtivo(combatente) {
+        if (!combatente) {
+            return null;
+        }
+
+        var ataquesAssinatura = (combatente.ataques || []).map(function(ataque) {
+            return String(ataque?.id ?? ataque?.nome ?? '');
+        }).join('|');
+        var modoMagia = combatente._isConjuradorEspontaneo
+            ? 'slots'
+            : (combatente._isConjurador ? 'preparadas' : 'nenhum');
+
+        return [
+            String(combatente.id || ''),
+            modoMagia,
+            ataquesAssinatura,
+            this._obterAssinaturaMagiasCardAtivo(combatente),
+        ].join('::');
+    }
+
+    _atualizarEstadoRenderCardAtivo(combatente) {
+        this._cardAtivoRenderState = combatente ? {
+            combatenteId: Number(combatente.id),
+            estruturaKey: this._obterAssinaturaEstruturalCardAtivo(combatente),
+        } : null;
+    }
+
+    _podeAtualizarCardAtivoIncremental(container, combatente) {
+        if (!container || !combatente || !this._cardAtivoRenderState) {
+            return false;
+        }
+
+        if (Number(this._cardAtivoRenderState.combatenteId) !== Number(combatente.id)) {
+            return false;
+        }
+
+        if (this._cardAtivoRenderState.estruturaKey !== this._obterAssinaturaEstruturalCardAtivo(combatente)) {
+            return false;
+        }
+
+        return Boolean(
+            container.querySelector('.arena-card')
+            && container.querySelector('.arena-nome-text')
+            && container.querySelector('.arena-raca-classe')
+            && container.querySelector('.arena-pv-valor')
+            && container.querySelector('.arena-hp-fill')
+            && container.querySelector('.arena-condicoes-lista')
+        );
+    }
+
+    _renderizarMetaCombatenteAtivo(combatente) {
+        var raca = combatente.raca || '';
+        var classe = combatente.classe || 'Aventureiro';
+        var refBadge = (isTipoMonstro(combatente.tipo) && combatente.pagina_referencia)
+            ? ' <span class="arena-badge-referencia" title="Referência do livro">📖 '
+            + escapeHtml(String(combatente.pagina_referencia)) + '</span>'
+            : '';
+
+        return escapeHtml(raca ? (raca + ' / ') : '')
+            + escapeHtml(classe)
+            + ' <span class="badge ' + this.getBadgeClass(combatente.tipo) + '">'
+            + escapeHtml(String(combatente.tipo || '')) + '</span>'
+            + refBadge;
+    }
+
+    _atualizarCabecalhoCardAtivo(container, combatente) {
+        var nomeEl = container.querySelector('.arena-nome-text');
+        if (nomeEl) {
+            nomeEl.textContent = combatente.nome || '';
+        }
+
+        var nivelEl = container.querySelector('.arena-nivel');
+        if (nivelEl) {
+            nivelEl.textContent = '(' + (combatente.nivel || 1) + '° nivel)';
+        }
+
+        var metaEl = container.querySelector('.arena-raca-classe');
+        if (metaEl) {
+            metaEl.innerHTML = this._renderizarMetaCombatenteAtivo(combatente);
+        }
+    }
+
+    _atualizarDefesasCardAtivo(container, combatente) {
+        var hpPct = Math.max(0, Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100));
+        var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
+        var statsVisiveis = this.statsVisiveis;
+        var pvValor = statsVisiveis
+            ? ((combatente.hp_atual ?? 0) + '/' + (combatente.hp_maximo ?? 0))
+            : '???/???';
+
+        var pvEl = container.querySelector('.arena-pv-valor');
+        if (pvEl) {
+            pvEl.textContent = pvValor;
+            pvEl.classList.toggle('hp-oculto', !statsVisiveis);
+        }
+
+        var hpFillEl = container.querySelector('.arena-hp-fill');
+        if (hpFillEl) {
+            hpFillEl.style.width = hpPct + '%';
+            hpFillEl.style.background = hpCor;
+        }
+
+        var caEl = container.querySelector('.arena-ca-valor');
+        if (caEl) {
+            caEl.textContent = statsVisiveis ? String(combatente.ca ?? 10) : '?';
+            caEl.classList.toggle('hp-oculto', !statsVisiveis);
+        }
+
+        var surpresaEl = container.querySelector('[data-role="defesa-surpresa"]');
+        if (surpresaEl) {
+            surpresaEl.textContent = statsVisiveis ? String(combatente.surpresa ?? 10) : '?';
+            surpresaEl.classList.toggle('hp-oculto', !statsVisiveis);
+        }
+
+        var toqueEl = container.querySelector('[data-role="defesa-toque"]');
+        if (toqueEl) {
+            toqueEl.textContent = statsVisiveis ? String(combatente.toque ?? 10) : '?';
+            toqueEl.classList.toggle('hp-oculto', !statsVisiveis);
+        }
+    }
+
+    _atualizarAtributosCardAtivo(container, combatente) {
+        var self = this;
+        var atributos = {
+            forca: combatente.forca || 10,
+            destreza: combatente.destreza || 10,
+            constituicao: combatente.constituicao || 10,
+            inteligencia: combatente.inteligencia || 10,
+            sabedoria: combatente.sabedoria || 10,
+            carisma: combatente.carisma || 10,
+        };
+
+        Object.keys(atributos).forEach(function(chave) {
+            var valor = atributos[chave];
+            var valorEl = container.querySelector('[data-atributo="' + chave + '"] .arena-atributo-valor');
+            var modEl = container.querySelector('[data-atributo="' + chave + '"] .arena-atributo-mod');
+            if (valorEl) {
+                valorEl.textContent = String(valor);
+            }
+            if (modEl) {
+                var modificador = self.calcularModificador(valor);
+                modEl.textContent = modificador >= 0 ? ('+' + modificador) : String(modificador);
+            }
+        });
+    }
+
+    _atualizarResistenciasCardAtivo(container, combatente) {
+        ['fortitude', 'reflexos', 'vontade'].forEach(function(chave) {
+            var valor = Number(combatente[chave] ?? 0);
+            var el = container.querySelector('[data-resistencia="' + chave + '"] .arena-atributo-valor');
+            if (el) {
+                el.textContent = valor >= 0 ? ('+' + valor) : String(valor);
+            }
+        });
+    }
+
+    _atualizarControlesBasicosCardAtivo(container) {
+        var btnToggleStatsArena = container.querySelector('#btnToggleStatsArena');
+        if (btnToggleStatsArena) {
+            btnToggleStatsArena.textContent = this.statsVisiveis ? 'Ocultar Stats' : 'Revelar Stats';
+        }
+
+        var displayCronometro = container.querySelector('#cronometroDisplay');
+        if (displayCronometro) {
+            displayCronometro.classList.toggle('cronometro-ativo', this._cronometroAtivo);
+            displayCronometro.classList.toggle('cronometro-pausado', !this._cronometroAtivo);
+        }
+
+        this._atualizarDisplayCronometro();
+        this._atualizarBotaoCronometro();
+    }
+
+    _atualizarPlaceholderCondicoesCardAtivo(container) {
+        var lista = container.querySelector('.arena-condicoes-lista');
+        if (!lista) {
+            return;
+        }
+
+        var possuiCondicoes = Array.from(lista.children).some(function(filho) {
+            return !filho.classList.contains('arena-condicao-vazia');
+        });
+        var placeholder = lista.querySelector('.arena-condicao-vazia');
+
+        if (possuiCondicoes) {
+            if (placeholder) {
+                placeholder.remove();
+            }
+            return;
+        }
+
+        if (!placeholder) {
+            placeholder = document.createElement('span');
+            placeholder.className = 'arena-condicao-vazia';
+            placeholder.textContent = 'Nenhuma condição ativa';
+            lista.replaceChildren(placeholder);
+            return;
+        }
+
+        if (lista.children.length > 1) {
+            lista.replaceChildren(placeholder);
+        }
+    }
+
+    _atualizarCardAtivoIncremental(container, combatente) {
+        this.renderizarFotoAtivo();
+        this._atualizarCabecalhoCardAtivo(container, combatente);
+        this._atualizarDefesasCardAtivo(container, combatente);
+        this._atualizarAtributosCardAtivo(container, combatente);
+        this._atualizarResistenciasCardAtivo(container, combatente);
+        this._atualizarControlesBasicosCardAtivo(container);
+        this._atualizarPlaceholderCondicoesCardAtivo(container);
+        this._atualizarEstadoRenderCardAtivo(combatente);
     }
 
     // ─── Render: Combatente Ativo ───────────────────────────
 
-    renderizarCombatenteAtivo() {
+    renderizarCombatenteAtivo(opcoes = {}) {
+        var carregarCondicoes = opcoes.carregarCondicoes !== false;
         var container = document.getElementById('combatenteAtivoContainer');
         if (!container) return;
 
         var c = this.combatentes[this.turnoAtual];
-        if (!c) return;
+        if (!c) {
+            container.replaceChildren();
+            this._atualizarEstadoRenderCardAtivo(null);
+            return;
+        }
+
+        if (this._podeAtualizarCardAtivoIncremental(container, c)) {
+            this._atualizarCardAtivoIncremental(container, c);
+            if (carregarCondicoes) {
+                this.condicaoController.carregarCondicoesDoCombatente(c.id);
+            }
+            return;
+        }
 
         this.renderizarFotoAtivo();
 
@@ -633,8 +1103,6 @@ export class ArenaController {
         var reflex   = c.reflexos  ?? 0;
         var vont     = c.vontade   ?? 0;
         var nivel    = c.nivel     || 1;
-        var classe   = c.classe    || 'Aventureiro';
-        var raca     = c.raca      || '';
 
         function mod(val) {
             var m = Math.floor(((val || 10) - 10) / 2);
@@ -658,7 +1126,9 @@ export class ArenaController {
 
         var atributosHTML = '';
         for (var j = 0; j < atribs.length; j++) {
-            atributosHTML += '<div class="arena-atributo-box">'
+            atributosHTML += '<div class="arena-atributo-box" data-atributo="'
+                + ({ For:'forca', Des:'destreza', Con:'constituicao', Int:'inteligencia', Sab:'sabedoria', Car:'carisma' })[atribs[j][0]]
+                + '">'
                 + '<span class="arena-atributo-nome">'  + atribs[j][0] + '</span>'
                 + '<span class="arena-atributo-valor">' + atribs[j][1] + '</span>'
                 + '<span class="arena-atributo-mod">'   + mod(atribs[j][1]) + '</span>'
@@ -675,24 +1145,15 @@ export class ArenaController {
             magiasHTML = this._renderizarMagiasPreparadas(c._magiasGrupos || {}, c.id);
         }
 
-        var refBadge = (isTipoMonstro(c.tipo) && c.pagina_referencia)
-            ? ' <span class="arena-badge-referencia" title="Referência do livro">📖 '
-            + c.pagina_referencia + '</span>'
-            : '';
-
         var html = '';
         html += '<div class="arena-card">';
 
         // ── Header ──
         html += '<div class="arena-header">';
         html += '<div class="arena-header-nome">';
-        html += '<h2 class="arena-nome">' + c.nome
-            + ' <span class="arena-nivel">(' + nivel + '° nivel)</span></h2>';
-        html += '<span class="arena-raca-classe">'
-            + (raca ? raca + ' / ' : '') + classe
-            + ' <span class="badge ' + this.getBadgeClass(c.tipo) + '">' + c.tipo + '</span>'
-            + refBadge
-            + '</span>';
+        html += '<h2 class="arena-nome"><span class="arena-nome-text">' + escapeHtml(c.nome || '')
+            + '</span> <span class="arena-nivel">(' + nivel + '° nivel)</span></h2>';
+        html += '<span class="arena-raca-classe">' + this._renderizarMetaCombatenteAtivo(c) + '</span>';
         html += '</div>';
         html += '<div class="arena-header-acoes">';
         html += '<div class="arena-cronometro-inline">';
@@ -722,11 +1183,11 @@ export class ArenaController {
         html += '<div class="arena-secao arena-secao-resistencias">';
         html += '<h3 class="arena-secao-titulo">Resistencias</h3>';
         html += '<div class="arena-resistencias-grid">';
-        html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Fort</span>'
+        html += '<div class="arena-atributo-box" data-resistencia="fortitude"><span class="arena-atributo-nome">Fort</span>'
             + '<span class="arena-atributo-valor">' + sinal(fort) + '</span></div>';
-        html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Reflex</span>'
+        html += '<div class="arena-atributo-box" data-resistencia="reflexos"><span class="arena-atributo-nome">Reflex</span>'
             + '<span class="arena-atributo-valor">' + sinal(reflex) + '</span></div>';
-        html += '<div class="arena-atributo-box"><span class="arena-atributo-nome">Vont</span>'
+        html += '<div class="arena-atributo-box" data-resistencia="vontade"><span class="arena-atributo-nome">Vont</span>'
             + '<span class="arena-atributo-valor">' + sinal(vont) + '</span></div>';
         html += '</div></div>';
         html += '<div class="arena-secao arena-secao-condicoes">';
@@ -752,10 +1213,10 @@ export class ArenaController {
         html += '</div>';
         html += '<div class="arena-defesa-secundaria">';
         html += '<div class="arena-defesa-item"><span class="arena-defesa-label-sm">Surpresa</span>'
-            + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
+            + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '" data-role="defesa-surpresa">'
             + sValor + '</span></div>';
         html += '<div class="arena-defesa-item"><span class="arena-defesa-label-sm">Toque</span>'
-            + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
+            + '<span class="arena-defesa-valor-sm ' + (this.statsVisiveis ? '' : 'hp-oculto') + '" data-role="defesa-toque">'
             + tValor + '</span></div>';
         html += '</div></div>';
         html += '<div class="arena-pv-box">';
@@ -777,7 +1238,10 @@ export class ArenaController {
         this._configurarControlesCardAtivo(container);
 
         this._configurarEventosMagias(container);
-        this.condicaoController.carregarCondicoesDoCombatente(c.id);
+        this._atualizarEstadoRenderCardAtivo(c);
+        if (carregarCondicoes) {
+            this.condicaoController.carregarCondicoesDoCombatente(c.id);
+        }
     }
 
     _configurarControlesCardAtivo(container) {
@@ -1118,6 +1582,7 @@ export class ArenaController {
                 var telaConfiguracao = document.getElementById('telaConfiguracao');
                 if (telaArena)        telaArena.classList.remove('ativa');
                 if (telaConfiguracao) telaConfiguracao.classList.add('ativa');
+                self._atualizarEstadoRenderCardAtivo(null);
                 self.combateId = null;
                 self.versaoCombate = null;
                 Toast.success('Combate finalizado!');

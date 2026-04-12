@@ -163,7 +163,16 @@ class ModalCondicao {
                         await this.arenaController.condicaoController
                             .carregarCondicoesDoCombatente(ativo.id);
                     }
-                    await this.arenaController._atualizarBadgesOrdemTodos();
+                    if (typeof this.arenaController._atualizarBadgeOrdemCombatente === 'function') {
+                        await Promise.all(ids.map((combatenteId) => {
+                            return this.arenaController._atualizarBadgeOrdemCombatente(combatenteId, {
+                                usarCache: false,
+                                forcarRefresh: true,
+                            });
+                        }));
+                    } else {
+                        await this.arenaController._atualizarBadgesOrdemTodos();
+                    }
                 }
 
                 this.fechar();

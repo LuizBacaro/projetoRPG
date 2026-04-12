@@ -73,10 +73,11 @@ export class CondicaoController {
         }
     }
 
-    async atualizarBadgesOrdem(cardEl, combatenteId) {
+    async atualizarBadgesOrdem(cardEl, combatenteId, opcoes = {}) {
         try {
             const data = await this._obterCondicoesCombatente(combatenteId, {
-                usarCache: true,
+                usarCache: opcoes.usarCache !== false,
+                forcarRefresh: opcoes.forcarRefresh === true,
             });
             if (typeof modalCondicaoInstance !== 'undefined') {
                 modalCondicaoInstance.renderizarBadgesOrdem(cardEl, data.condicoes);
