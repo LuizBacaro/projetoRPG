@@ -53,6 +53,7 @@ Este workspace usa instrucoes granulares por dominio em `.github/instructions`.
 
 - Agente coordenador recomendado: `Fullstack Orchestrator` em `.github/agents/fullstack-orchestrator.agent.md`.
 - Agente complementar para features com contrato entre camadas: `Fullstack API Contract Orchestrator` em `.github/agents/fullstack-api-contract-orchestrator.agent.md`.
+- Agente especializado em levantamento de requisitos a partir de livros/PDFs/regras: `RPG Requirements Analyst` em `.github/agents/rpg-requirements-analyst.agent.md`.
 - Especialistas recomendados:
 	- `Backend FastAPI Specialist`
 	- `Frontend Arena Specialist`
@@ -74,6 +75,7 @@ Este workspace usa instrucoes granulares por dominio em `.github/instructions`.
 - Prompt para mudancas de schema com seguranca de rollout: `.github/prompts/migration-segura.prompt.md`.
 - Prompt para validar prontidao de deploy: `.github/prompts/deploy-readiness-fullstack.prompt.md`.
 - Prompt para investigar gargalos de performance: `.github/prompts/investigacao-performance-fullstack.prompt.md`.
+- Prompt para levantamento de requisitos a partir de livros, PDFs ou regras de negocio: `.github/prompts/levantamento-requisitos-rpg.prompt.md`.
 
 ## Hooks
 

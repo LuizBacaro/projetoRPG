@@ -76,6 +76,7 @@ Exemplos deste workspace:
 - `Database and Migrations Specialist`
 - `PostgreSQL Database Administrator`
 - `JavaScript Project Auditor`
+- `RPG Requirements Analyst`
 
 Cada agente define, por exemplo:
 
@@ -174,6 +175,7 @@ No projeto, existem skills como:
 - `javascript-audit`
 - `pdf`
 - `postgresql`
+- `rpg-requirements-analysis`
 
 Em geral, uma skill faz sentido quando:
 
@@ -201,6 +203,7 @@ Exemplos atuais:
 - `Migration Segura`
 - `Deploy Readiness Fullstack`
 - `Investigacao Performance Fullstack`
+- `Levantamento Requisitos RPG`
 
 Em vez de escrever tudo do zero no chat, voce pode usar um prompt como ponto de partida.
 
@@ -257,6 +260,25 @@ Hoje, a governanca deste projeto esta distribuida assim:
 ## Exemplo de Uso do Orquestrador
 
 ### Exemplo 1: feature nova completa
+
+### Exemplo 2: levantamento de requisitos a partir de livro ou PDF
+
+Use o prompt `Levantamento Requisitos RPG` ou o agente `RPG Requirements Analyst`.
+
+Exemplo:
+
+```text
+/Levantamento Requisitos RPG
+Analisar as regras de companheiro animal no Livro do Jogador de D&D 3.5 e transformar isso em requisitos funcionais, regras de negocio, criterios de aceite e impacto tecnico para a plataforma.
+```
+
+Comportamento esperado:
+
+1. Delimitar fonte, capitulo e escopo da mecanica.
+2. Separar regra oficial, interpretacao operacional e decisao de produto.
+3. Estruturar requisitos funcionais, regras de negocio e requisitos tecnicos.
+4. Mapear impacto em frontend, backend, banco e testes.
+5. Sinalizar ambiguidades antes da implementacao.
 
 Pedido no chat:
 

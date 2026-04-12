@@ -1,7 +1,7 @@
 ---
 description: "Use quando precisar implementar, revisar ou corrigir backend FastAPI, SQLAlchemy, services, repositories, rotas API, autenticacao JWT, validacoes Pydantic ou testes backend relacionados."
 name: "Backend FastAPI Specialist"
-tools: [read, search, edit, execute, todo]
+tools: [read, search, edit, execute, todo, agent]
 agents: []
 user-invocable: true
 ---

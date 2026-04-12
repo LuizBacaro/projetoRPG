@@ -36,6 +36,12 @@ Usar quando for preciso verificar ou operar no estado real do PostgreSQL em exec
 - `JavaScript Project Auditor`
 Usar para auditoria ampla do codigo JavaScript, hotspots, riscos e roadmap tecnico.
 
+- `RPG Requirements Analyst`
+Usar quando for preciso transformar regras de livro, PDFs, documentos e mecanicas de D&D 3.5/TTRPG em requisitos funcionais, regras de negocio, criterios de aceite e impacto tecnico para a plataforma.
+
+- `PDF Explore Specialist`
+Usar quando for preciso extrair texto, tabelas e informacoes de PDFs com suporte a terminal e fallback OCR em PDFs escaneados.
+
 ## Regras de Orquestracao
 
 - O orquestrador deve classificar primeiro a demanda por dominio.
@@ -43,6 +49,7 @@ Usar para auditoria ampla do codigo JavaScript, hotspots, riscos e roadmap tecni
 - Se houver mudanca de schema, tratar persistencia antes da consolidacao completa de backend e frontend.
 - Consolidar conflitos de contrato entre camadas antes de responder.
 - Preservar autenticacao real, autorizacao por perfil, `getApiUrl()` no frontend e contratos existentes quando possivel.
+- Quando o `RPG Requirements Analyst` receber pedido de execucao, deve preparar handoff estruturado e delegar ao `Fullstack Orchestrator`.
 
 ## Prompts Reutilizaveis
 
@@ -53,6 +60,12 @@ Usar para auditoria ampla do codigo JavaScript, hotspots, riscos e roadmap tecni
 - Migration segura: [.github/prompts/migration-segura.prompt.md](.github/prompts/migration-segura.prompt.md)
 - Deploy readiness: [.github/prompts/deploy-readiness-fullstack.prompt.md](.github/prompts/deploy-readiness-fullstack.prompt.md)
 - Investigacao de performance: [.github/prompts/investigacao-performance-fullstack.prompt.md](.github/prompts/investigacao-performance-fullstack.prompt.md)
+- Levantamento de requisitos RPG: [.github/prompts/levantamento-requisitos-rpg.prompt.md](.github/prompts/levantamento-requisitos-rpg.prompt.md)
+
+## Skills Especializadas
+
+- `rpg-requirements-analysis`
+Workflow para transformar texto de regra, PDF ou documento em especificacao acionavel, separando regra da fonte, interpretacao operacional e decisao de produto.
 
 ## Hooks
 
@@ -103,6 +116,17 @@ Implementar preparacao de magias por circulo com novo payload entre ficha, API e
 ### Estado real do banco
 
 Use `PostgreSQL Database Administrator` quando precisar confirmar schema real, dados existentes, indices, performance ou executar operacoes SQL auditaveis.
+
+### Levantamento de requisitos a partir de livro ou PDF
+
+Use o prompt `Levantamento Requisitos RPG` ou o agente `RPG Requirements Analyst`.
+
+Exemplo de pedido:
+
+```text
+/Levantamento Requisitos RPG
+Analisar as regras de familiars no Livro do Jogador de D&D 3.5 e transformar isso em requisitos funcionais, regras de negocio, impacto tecnico e criterios de aceite para a plataforma.
+```
 
 ## Observacoes
 

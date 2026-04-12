@@ -51,21 +51,43 @@ class MagiaRepository(BaseRepository[Magia]):
 
         if classe:
             classe_norm = classe.strip().upper()
-            query = query.filter(
-                (func.upper(Magia.classe).like(f"%{classe_norm}%"))
-                | Magia.classes_niveis.any(func.upper(MagiaClasse.classe) == classe_norm)
+            # Prioriza a fonte normalizada (magias_classes) quando houver dados para a classe.
+            classe_rel_disponivel = (
+                self.db.query(MagiaClasse.id)
+                .filter(func.upper(MagiaClasse.classe) == classe_norm)
+                .first()
+                is not None
             )
+
+            if classe_rel_disponivel:
+                query = query.filter(
+                    Magia.classes_niveis.any(func.upper(MagiaClasse.classe) == classe_norm)
+                )
+            else:
+                # Fallback para compatibilidade com dados legados em Magia.classe.
+                query = query.filter(func.upper(Magia.classe).like(f"%{classe_norm}%"))
 
         if nivel is not None:
             if classe:
                 classe_norm = classe.strip().upper()
-                query = query.filter(
-                    Magia.classes_niveis.any(
-                        (func.upper(MagiaClasse.classe) == classe_norm)
-                        & (MagiaClasse.nivel == nivel)
-                    )
-                    | ((Magia.nivel == nivel) & (func.upper(Magia.classe).like(f"%{classe_norm}%")))
+                classe_rel_disponivel = (
+                    self.db.query(MagiaClasse.id)
+                    .filter(func.upper(MagiaClasse.classe) == classe_norm)
+                    .first()
+                    is not None
                 )
+
+                if classe_rel_disponivel:
+                    query = query.filter(
+                        Magia.classes_niveis.any(
+                            (func.upper(MagiaClasse.classe) == classe_norm)
+                            & (MagiaClasse.nivel == nivel)
+                        )
+                    )
+                else:
+                    query = query.filter(
+                        (Magia.nivel == nivel) & (func.upper(Magia.classe).like(f"%{classe_norm}%"))
+                    )
             else:
                 query = query.filter((Magia.nivel == nivel) | Magia.classes_niveis.any(MagiaClasse.nivel == nivel))
 

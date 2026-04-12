@@ -160,7 +160,9 @@
 
                 <div class="dash-form-group">
                     <label>Raça</label>
-                    <input type="text" name="raca" placeholder="Ex: Elfo, Humano, Anão" />
+                    <select id="cadastroJogadorRacaSelect" data-raca-select data-raca-key="jogador"></select>
+                    <input type="hidden" name="raca" id="cadastroJogadorRacaFinal" data-raca-final data-raca-key="jogador" />
+                    <input type="text" id="cadastroJogadorRacaCustom" data-raca-custom data-raca-key="jogador" placeholder="Informe a raça" style="display:none" />
                 </div>
 
                 <div class="dash-form-group">
@@ -337,7 +339,9 @@
 
                 <div class="dash-form-group">
                     <label>Raça</label>
-                    <input type="text" name="raca" placeholder="Ex: Humano, Halfling" />
+                    <select id="cadastroNpcRacaSelect" data-raca-select data-raca-key="npc"></select>
+                    <input type="hidden" name="raca" id="cadastroNpcRacaFinal" data-raca-final data-raca-key="npc" />
+                    <input type="text" id="cadastroNpcRacaCustom" data-raca-custom data-raca-key="npc" placeholder="Informe a raça" style="display:none" />
                 </div>
 
                 <div class="dash-form-group">
@@ -423,7 +427,9 @@
 
                 <div class="dash-form-group">
                     <label>Raça</label>
-                    <input type="text" id="dashEditRaca" name="raca" placeholder="Ex: Elfo, Humano, Anão" />
+                    <select id="dashEditRacaSelect" data-raca-select data-raca-key="edicao"></select>
+                    <input type="hidden" id="dashEditRaca" name="raca" data-raca-final data-raca-key="edicao" />
+                    <input type="text" id="dashEditRacaCustom" data-raca-custom data-raca-key="edicao" placeholder="Informe a raça" style="display:none" />
                 </div>
 
                 <div class="dash-form-group">
@@ -603,6 +609,7 @@
 <!-- FASE 6: Utilitários -->
 <script src="/js/utils/combat-rules.global.js"></script>
 <script src="/js/utils/async-button.global.js"></script>
+<script src="/js/utils/racas-phb.global.js?v=1"></script>
 <script>
     function escapeHtml(str) {
         if (typeof str !== 'string') return str;
@@ -616,7 +623,7 @@
 </script>
 
 <!-- FASE 7: DashboardController (carregado por último) -->
-<script src="/js/controllers/DashboardController.js?v=7"></script>
+<script src="/js/controllers/DashboardController.js?v=9"></script>
 
 </body>
 </html>

@@ -1,7 +1,7 @@
 ---
 description: "Use quando precisar coordenar novas funcionalidades, correcoes transversais ou tarefas que envolvam backend, frontend, banco de dados, migrations ou multiplos dominios. Atua como agente orquestrador, decompoe a demanda e delega para os agentes especialistas responsaveis."
 name: "Fullstack Orchestrator"
-tools: [read, search, todo, agent]
+tools: [read, search, edit, execute, todo, agent]
 agents: ["Backend FastAPI Specialist", "Frontend Arena Specialist", "Database and Migrations Specialist", "PostgreSQL Database Administrator", "JavaScript Project Auditor"]
 user-invocable: true
 ---
