@@ -1,7 +1,7 @@
 ---
 description: "Use quando precisar alterar schema, criar migrations Alembic, ajustar models SQLAlchemy, preparar backfill, revisar compatibilidade de banco entre SQLite e PostgreSQL ou analisar impacto de dados em funcionalidades novas."
 name: "Database and Migrations Specialist"
-tools: [read, search, edit, execute, todo]
+tools: [read, search, edit, execute, todo, agent]
 agents: []
 user-invocable: true
 ---

@@ -39,6 +39,9 @@ Usar para auditoria ampla do codigo JavaScript, hotspots, riscos e roadmap tecni
 - `RPG Requirements Analyst`
 Usar quando for preciso transformar regras de livro, PDFs, documentos e mecanicas de D&D 3.5/TTRPG em requisitos funcionais, regras de negocio, criterios de aceite e impacto tecnico para a plataforma.
 
+- `PDF Explore Specialist`
+Usar quando for preciso extrair texto, tabelas e informacoes de PDFs com suporte a terminal e fallback OCR em PDFs escaneados.
+
 ## Regras de Orquestracao
 
 - O orquestrador deve classificar primeiro a demanda por dominio.
@@ -46,6 +49,7 @@ Usar quando for preciso transformar regras de livro, PDFs, documentos e mecanica
 - Se houver mudanca de schema, tratar persistencia antes da consolidacao completa de backend e frontend.
 - Consolidar conflitos de contrato entre camadas antes de responder.
 - Preservar autenticacao real, autorizacao por perfil, `getApiUrl()` no frontend e contratos existentes quando possivel.
+- Quando o `RPG Requirements Analyst` receber pedido de execucao, deve preparar handoff estruturado e delegar ao `Fullstack Orchestrator`.
 
 ## Prompts Reutilizaveis
 

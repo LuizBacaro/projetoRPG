@@ -1,7 +1,7 @@
 ---
 description: "Use quando precisar implementar, revisar ou corrigir frontend HTML, CSS e JavaScript vanilla da Arena, incluindo dashboard, ficha de personagem, grimorio, autenticacao no cliente, integracao com API e responsividade."
 name: "Frontend Arena Specialist"
-tools: [read, search, edit, execute, todo]
+tools: [read, search, edit, execute, todo, agent]
 agents: []
 user-invocable: true
 ---

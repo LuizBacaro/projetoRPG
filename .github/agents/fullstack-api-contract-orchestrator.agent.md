@@ -1,7 +1,7 @@
 ---
 description: "Use quando a demanda envolver uma feature fullstack com contrato entre frontend, backend e persistencia, exigindo alinhamento de payload, validacoes, respostas, migracoes e compatibilidade entre camadas."
 name: "Fullstack API Contract Orchestrator"
-tools: [read, search, todo, agent]
+tools: [read, search, edit, execute, todo, agent]
 agents: ["Backend FastAPI Specialist", "Frontend Arena Specialist", "Database and Migrations Specialist"]
 user-invocable: true
 ---
