@@ -48,6 +48,10 @@ class CombatenteService:
         limit: int = 100,
     ) -> List[Combatente]:
         """Lista todos os combatentes, opcionalmente filtrando por tipo."""
+        if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
+            # Jogador enxerga apenas combatentes do tipo jogador na plataforma.
+            return self.repository.get_by_tipo("jogador", skip=skip, limit=limit)
+
         if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
             if tipo:
                 return self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
@@ -59,6 +63,9 @@ class CombatenteService:
 
     def contar_todos(self, tipo: Optional[str] = None, usuario=None) -> int:
         """Conta combatentes respeitando escopo do usuário e filtro por tipo."""
+        if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
+            return self.repository.count_by_tipo("jogador")
+
         if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
             if tipo:
                 return self.repository.count_by_owner_and_tipo(usuario.id, tipo)

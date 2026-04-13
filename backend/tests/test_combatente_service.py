@@ -5,6 +5,7 @@ import pytest
 from unittest.mock import Mock, MagicMock
 from app.services.combatente_service import CombatenteService
 from app.models.combatente import Combatente
+from app.models.usuario import PerfilUsuario
 from app.exceptions.custom_exceptions import CombatenteNaoEncontrado, DadosInvalidos
 
 
@@ -52,6 +53,22 @@ class TestCombatenteService:
         assert len(resultado) == 2
         assert resultado[0].nome == "Theron"
         mock_repository.get_all.assert_called_once()
+
+    def test_listar_todos_para_jogador_retorna_apenas_tipo_jogador(self, service, mock_repository):
+        class _UsuarioDummy:
+            perfil = PerfilUsuario.JOGADOR
+            id = 42
+
+        combatentes_mock = [
+            Combatente(id=1, nome="Theron", tipo="jogador", classe="Guerreiro", hp_maximo=85, hp_atual=85, iniciativa=15)
+        ]
+        mock_repository.get_by_tipo.return_value = combatentes_mock
+
+        resultado = service.listar_todos(usuario=_UsuarioDummy(), tipo="monstro")
+
+        assert len(resultado) == 1
+        assert resultado[0].tipo == "jogador"
+        mock_repository.get_by_tipo.assert_called_once_with("jogador", skip=0, limit=100)
     
     def test_obter_por_id_sucesso(self, service, mock_repository):
         """Testa obter combatente por ID - sucesso"""

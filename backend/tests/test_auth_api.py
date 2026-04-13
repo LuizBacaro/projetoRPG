@@ -79,6 +79,44 @@ def test_login_sucesso_retorna_tokens(auth_db):
     assert payload["usuario"]["email"] == "ok@example.com"
 
 
+def test_registro_publico_cria_jogador(auth_db):
+    _, test_db_factory = auth_db
+    client = _build_client(test_db_factory)
+
+    response = client.post(
+        "/api/v1/auth/registro",
+        json={
+            "nome": "Novo Jogador",
+            "email": "novo_jogador@example.com",
+            "senha": "SenhaSegura123",
+        },
+    )
+
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["email"] == "novo_jogador@example.com"
+    assert payload["perfil"] == "jogador"
+    assert payload["ativo"] is True
+
+
+def test_registro_publico_rejeita_email_duplicado(auth_db):
+    test_db, test_db_factory = auth_db
+    _create_user(test_db, email="duplicado@example.com", senha="SenhaSegura123")
+    client = _build_client(test_db_factory)
+
+    response = client.post(
+        "/api/v1/auth/registro",
+        json={
+            "nome": "Outro Jogador",
+            "email": "duplicado@example.com",
+            "senha": "SenhaSegura123",
+        },
+    )
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "E-mail já cadastrado"
+
+
 def test_login_falha_com_senha_incorreta(auth_db):
     test_db, test_db_factory = auth_db
     _create_user(test_db, email="badpass@example.com", senha="SenhaSegura123")

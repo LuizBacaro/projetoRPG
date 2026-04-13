@@ -20,7 +20,7 @@ from ...core.security import (
 from ...core.security_audit import log_security_event
 from ...core.deps import get_db, get_usuario_atual
 from ...repositories.usuario_repository import UsuarioRepository
-from ...models.usuario import Usuario
+from ...models.usuario import Usuario, PerfilUsuario
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +82,22 @@ class UsuarioResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class RegistroRequest(BaseModel):
+    """Schema para cadastro público de nova conta jogador."""
+    nome: str = Field(..., min_length=1, max_length=100)
+    email: EmailStr = Field(..., max_length=150)
+    senha: str = Field(..., min_length=6, max_length=128)
+
+
+class RegistroResponse(BaseModel):
+    """Schema de resposta do cadastro público."""
+    id: int
+    nome: str
+    email: str
+    perfil: str
+    ativo: bool
 
 
 # ── Rotas ────────────────────────────────────────────────────────────────────
@@ -270,6 +286,66 @@ def logout(request: Request):
         "message": "Logout realizado com sucesso. Remova o token do cliente.",
         "status": "success"
     }
+
+
+@router.post(
+    "/registro",
+    response_model=RegistroResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Cadastro público de jogador",
+    description="Cria uma nova conta com perfil jogador para acesso à plataforma.",
+    responses={
+        201: {"description": "Conta criada com sucesso"},
+        409: {"description": "E-mail já cadastrado"},
+    },
+)
+def registrar(
+    request: Request,
+    payload: RegistroRequest,
+    db: Session = Depends(get_db),
+) -> RegistroResponse:
+    repo = UsuarioRepository(db)
+
+    existente = repo.buscar_por_email(payload.email)
+    if existente:
+        log_security_event(
+            "register",
+            "failure",
+            request=request,
+            user_email=payload.email,
+            reason="email_already_exists",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="E-mail já cadastrado",
+        )
+
+    novo_usuario = Usuario(
+        perfil=PerfilUsuario.JOGADOR,
+        nome=payload.nome.strip(),
+        email=payload.email.strip().lower(),
+        senha_hash=hash_senha(payload.senha),
+        ativo=True,
+        usuario_responsavel="auto-registro",
+    )
+
+    usuario = repo.criar(novo_usuario)
+    log_security_event(
+        "register",
+        "success",
+        request=request,
+        user_email=usuario.email,
+        target=f"usuario:{usuario.id}",
+    )
+
+    return RegistroResponse(
+        id=usuario.id,
+        nome=usuario.nome,
+        email=usuario.email,
+        perfil=usuario.perfil.value if hasattr(usuario.perfil, "value") else str(usuario.perfil),
+        ativo=usuario.ativo,
+    )
 
 
 @router.post(
