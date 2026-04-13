@@ -29,5 +29,18 @@ backend/scripts/generated/
 backend/scripts/assets/*.json
 backend/scripts/assets/*.xlsx
 
+# Backups e dumps de banco — nunca versionar (podem conter credenciais)
+*.dump
+*.sql.gz
+*.backup
+*_backup.sql
+*_backup.dump
+*_producao_*.json
+neon_*.dump
+
+# Scripts temporários de sessão
+tmp_*.py
+tmp_*.sh
+
 # Temp de validacao e runners
 /tmp/*.copilot.*

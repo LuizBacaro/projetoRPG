@@ -136,6 +136,41 @@ Console: https://console.cron-job.org/jobs
 
 ---
 
+### [2025-04] Migração de banco: Neon Virginia (us-east-1) → Neon Oregon (us-west-2)
+**O que era:**
+- Neon PostgreSQL em `AWS us-east-1 (N. Virginia)` — `ep-wispy-mud-amh7ojw7`
+- Render backend em `gcp-us-west1 (Oregon)`
+- Latência cross-region de ~70ms por query entre as duas pontas dos EUA
+
+**O que mudou:**
+- Novo projeto Neon criado em `AWS us-west-2 (Oregon)` — `ep-bold-night-ak4zfe7p`
+- Dados migrados via `pg_dump` (custom format, 177K) + `pg_restore` para o novo projeto
+- `DATABASE_URL` no Render atualizada para o endpoint Oregon
+- `search_path` do role `neondb_owner` fixado em `public` via `ALTER ROLE`
+
+**Motivo:** Backend (Render / Oregon) e banco (Neon / Virginia) estavam em extremos opostos dos EUA. Co-localizar elimina ~70ms de latência por query — impacto direto em endpoints pesados em consultas (ficha, grimório, listagens).
+
+**Dados migrados:**
+- 5 usuarios ✅
+- 16 combatentes ✅
+- 1035 magias ✅
+- 54 pericias ✅
+- 27 condicoes ✅
+
+**Resultado:** ✅ Migração concluída. Dados validados no Oregon. Backend redirecionado.
+
+**Rollback:** `DATABASE_URL` do Render pode ser revertida para a URL Virginia abaixo. O banco Virginia deve ser mantido por ≥7 dias antes de descontinuar.
+```
+postgresql://neondb_owner:npg_a1STdxLH7qlP@ep-wispy-mud-amh7ojw7-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+```
+
+**Nova URL Oregon:**
+```
+postgresql://neondb_owner:npg_ZQ3u2OrfcqYs@ep-bold-night-ak4zfe7p-pooler.c-3.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+```
+
+---
+
 ## Python / Runtime
 
 ---

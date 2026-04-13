@@ -31,7 +31,7 @@ Este workspace usa instrucoes granulares por dominio em `.github/instructions`.
 
 - **Frontend:** Vercel (estatico, CDN global) — dominio `arena-de-combate-rpg.com.br` via Cloudflare
 - **Backend:** Render.com (free tier) — `https://projetorpg-7ih3.onrender.com` — branch `feature/salva`
-- **Banco:** Neon PostgreSQL `quiet-rain-00826948` — serverless, connection pooling
+- **Banco:** Neon PostgreSQL `ep-bold-night-ak4zfe7p` (us-west-2 Oregon) — serverless, connection pooling — co-localizado com o Render backend
 - **Imagens:** Cloudinary — `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` como env vars no Render
 - **Anti-sleep:** cron-job.org `*/10 * * * *` → `GET /health` (evita cold start do Render free tier)
 - **Deploy:** merge `feature/responsivo` → `feature/salva` aciona deploy automatico no Render
