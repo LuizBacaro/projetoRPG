@@ -153,6 +153,61 @@ git push origin produtiva
 
 ---
 
+## 7.1️⃣ Regra Permanente: Atualizações de Catálogo/Seed Persistido
+
+Aplicar esta seção sempre que houver mudanças em dados base da plataforma, por exemplo:
+
+- magias
+- magias por classe
+- perícias
+- talentos
+- equipamentos
+- condições
+
+### Quando isso se aplica
+
+Se a mudança altera listas mantidas no banco e não apenas lógica da API/frontend, o deploy no Render sozinho **não** atualiza a produção.
+
+### Riscos principais
+
+| Risco | Impacto | Mitigação |
+|------|---------|-----------|
+| Fazer deploy no Render sem atualizar o Neon | catálogo antigo continua em produção | executar atualização de dados no banco após ou durante o rollout |
+| Rodar seed destrutivo com limpeza total (`force=True`, `DELETE`, `TRUNCATE`) | quebra de referências por `magia_id`/IDs persistidos em grimório, histórico e preparações | preferir upsert idempotente ou patch SQL/Python direcionado |
+| Recriar registros com novos IDs | inconsistência em tabelas relacionadas | nunca apagar catálogo produtivo sem plano explícito de migração de FKs |
+| Atualizar banco sem validar API | UI continua consultando dados antigos em cache ou sem contrato esperado | validar endpoint real após atualização |
+
+### Procedimento seguro
+
+1. Identificar se a mudança é apenas código ou também dados persistidos.
+2. Confirmar se existe seed automático no startup. Se não existir, planejar execução manual no Neon/produção.
+3. Evitar reseed destrutivo em produção.
+4. Preferir uma destas abordagens:
+   - script idempotente de upsert
+   - patch SQL com `INSERT ... WHERE NOT EXISTS`
+   - update pontual preservando IDs existentes
+5. Executar primeiro em ambiente local/homologação com snapshot compatível.
+6. Em produção, atualizar o banco e depois validar endpoints críticos.
+7. Registrar no deploy quais tabelas foram alteradas e se houve risco de FK.
+
+### Checklist obrigatório para mudanças deste tipo
+
+- [ ] A mudança altera catálogo persistido no banco, não só código
+- [ ] Foi confirmado se o startup da API executa ou não esse seed
+- [ ] O procedimento produtivo **não** apaga dados base com FKs ativas
+- [ ] Existe estratégia idempotente para inserir/atualizar apenas os itens necessários
+- [ ] Foram mapeadas tabelas dependentes do catálogo alterado
+- [ ] Foi validado ao menos um endpoint real após atualização no banco
+- [ ] O rollout foi documentado com comando/script usado no banco
+
+### Caso atual: novas magias de Clérigo
+
+- `seed_magias.py` não roda automaticamente no startup da API.
+- A versão atual do seed com `force=True` limpa `magias` e não deve ser usada em produção.
+- A atualização correta deve ser feita no Neon com inserção/atualização pontual das novas magias de Clérigo, preservando IDs e relações existentes.
+
+---
+
 ## 8️⃣ Rollback (Se Necessário)
 
 **Se algo der errado em produção:**
