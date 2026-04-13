@@ -80,7 +80,23 @@ export class CombatenteService {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: Combatente não encontrado`);
+                let detail = '';
+                try {
+                    const errorData = await response.json();
+                    detail = (errorData && errorData.detail) ? String(errorData.detail) : '';
+                } catch {
+                    detail = '';
+                }
+
+                if (response.status === 403) {
+                    throw new Error(`HTTP 403: Sem permissão para acessar este personagem${detail ? ` (${detail})` : ''}`);
+                }
+
+                if (response.status === 404) {
+                    throw new Error(`HTTP 404: Personagem não encontrado${detail ? ` (${detail})` : ''}`);
+                }
+
+                throw new Error(`HTTP ${response.status}: ${detail || 'Erro ao obter personagem'}`);
             }
 
             const data = await response.json();

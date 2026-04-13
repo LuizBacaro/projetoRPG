@@ -5,7 +5,7 @@
  * ✅ NOVO: BroadcastChannel sync arena→ficha em tempo real
  */
 
-import { CombatenteService } from '../services/CombatenteService.js';
+import { CombatenteService } from '../services/CombatenteService.js?v=2';
 import { EquipamentoService } from '../services/EquipamentoService.js';
 import { ArmaduraProtecaoService } from '../services/ArmaduraProtecaoService.js';
 import { TalentoService } from '../services/TalentoService.js?v=2';
