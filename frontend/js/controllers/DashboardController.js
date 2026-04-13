@@ -208,11 +208,11 @@ class DashboardController {
     _aplicarRestricoesPerfil() {
         if (this._isMestre()) return;
 
+        // Jogador vê o botão '+ Novo Combatente' (abre direto o modal de jogador)
         const elementos = [
             { query: '.nav-tab[data-tab="arena"]', id: null },
             { query: '.filter-btn[data-tipo="monstro"]', id: null },
             { query: '.filter-btn[data-tipo="npc"]', id: null },
-            { id: 'btnNovoCombatente', query: null },
             { id: 'totalMonstros', closest: '.resumo-card', query: null },
             { id: 'totalNPCs', closest: '.resumo-card', query: null }
         ];
@@ -252,7 +252,13 @@ class DashboardController {
 
     _configurarBotaoNovo() {
         const btn = document.getElementById('btnNovoCombatente');
-        if (btn) btn.addEventListener('click', () => this._abrirModal('seletorTipo'));
+        if (!btn) return;
+        if (this._isMestre()) {
+            btn.addEventListener('click', () => this._abrirModal('seletorTipo'));
+        } else {
+            // Jogador cria apenas personagem do tipo jogador — sem seletor de tipo
+            btn.addEventListener('click', () => this._abrirModal('modalCadastroJogador'));
+        }
     }
 
     _configurarFormCadastro(formId, tipo, modalId) {
