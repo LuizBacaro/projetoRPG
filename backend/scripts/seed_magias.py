@@ -4,6 +4,7 @@ SRP: Popular a tabela de magias com dados do D&D 3.5 PHB
 SOLID: Single Responsibility — apenas seed de magias
 """
 
+import argparse
 import os
 import sys
 
@@ -1143,6 +1144,138 @@ MAGIAS_MAGO = [
     ('Sombras', 9, 'MAGO', 'Ilus', '', 'V,G', 'Texto', 'Texto', 'Texto', '1 AP', '', 'Não', True, 'Como Conjuração de sombras, mas até 8º nível e\n80% real'),
 ]
 
+def _todas_magias() -> list[tuple]:
+    return (
+        MAGIAS_MAGO + MAGIAS_CLÉRIGO + MAGIAS_DRUIDA +
+        MAGIAS_BARDO + MAGIAS_PALADINO + MAGIAS_RANGER
+    )
+
+
+def _normalizar_classes(classes: list[str] | None) -> set[str] | None:
+    if not classes:
+        return None
+    normalizadas = {_norm_classe(classe.strip()) for classe in classes if classe and classe.strip()}
+    return normalizadas or None
+
+
+def _normalizar_niveis(niveis: list[int] | None) -> set[int] | None:
+    if not niveis:
+        return None
+    normalizados = {int(n) for n in niveis}
+    return normalizados or None
+
+
+def _converter_resistencia_magica(valor) -> bool:
+    if isinstance(valor, str):
+        return valor.strip().lower() in ('sim', 'true', '1', 'yes')
+    return bool(valor)
+
+
+def _dados_magia_para_payload(dados: tuple) -> dict:
+    return {
+        'nome': dados[0],
+        'nivel': dados[1],
+        'classe': _norm_classe(dados[2]),
+        'escola': dados[3] or None,
+        'sub_escola': dados[4] or None,
+        'componentes': dados[5] or None,
+        'alcance': dados[6] or None,
+        'area_efeito': dados[7] or None,
+        'duracao': dados[8] or None,
+        'tempo_conjuracao': dados[9] or None,
+        'dano': dados[10] or None,
+        'teste_resistencia': dados[11] or None,
+        'resistencia_magica': _converter_resistencia_magica(dados[12]),
+        'descricao': dados[13],
+        'ativo': True,
+    }
+
+
+def sincronizar_magias(
+    db: Session,
+    classes: list[str] | None = None,
+    niveis: list[int] | None = None,
+    dry_run: bool = False,
+) -> dict:
+    classes_normalizadas = _normalizar_classes(classes)
+    niveis_normalizados = _normalizar_niveis(niveis)
+    stats = {
+        'inseridas': 0,
+        'atualizadas': 0,
+        'inalteradas': 0,
+        'duplicadas_seed': 0,
+        'erros': 0,
+        'total': 0,
+        'dry_run': dry_run,
+    }
+
+    query = db.query(Magia).order_by(Magia.id.asc())
+    if classes_normalizadas:
+        query = query.filter(Magia.classe.in_(classes_normalizadas))
+    if niveis_normalizados:
+        query = query.filter(Magia.nivel.in_(niveis_normalizados))
+
+    existentes: dict[tuple[str, int, str], Magia] = {}
+    for magia in query.all():
+        chave = (magia.nome, magia.nivel, magia.classe)
+        existentes.setdefault(chave, magia)
+
+    vistos_seed: set[tuple[str, int, str]] = set()
+
+    try:
+        for dados in _todas_magias():
+            payload = _dados_magia_para_payload(dados)
+            if classes_normalizadas and payload['classe'] not in classes_normalizadas:
+                continue
+            if niveis_normalizados and payload['nivel'] not in niveis_normalizados:
+                continue
+
+            chave = (payload['nome'], payload['nivel'], payload['classe'])
+            if chave in vistos_seed:
+                stats['duplicadas_seed'] += 1
+                continue
+
+            vistos_seed.add(chave)
+            stats['total'] += 1
+            existente = existentes.get(chave)
+
+            if existente is None:
+                db.add(Magia(**payload))
+                stats['inseridas'] += 1
+                continue
+
+            alterado = False
+            for campo, valor in payload.items():
+                if getattr(existente, campo) != valor:
+                    setattr(existente, campo, valor)
+                    alterado = True
+
+            if alterado:
+                stats['atualizadas'] += 1
+            else:
+                stats['inalteradas'] += 1
+
+        if dry_run:
+            db.rollback()
+            print('🧪 Dry-run concluído sem persistir alterações.')
+        else:
+            db.commit()
+            print('✅ Sincronização concluída com sucesso.')
+    except Exception as exc:
+        db.rollback()
+        stats['erros'] += 1
+        print(f'❌ Erro na sincronização: {exc}')
+
+    print(
+        '\n📊 Sync de magias: '
+        f"{stats['inseridas']} inseridas | "
+        f"{stats['atualizadas']} atualizadas | "
+        f"{stats['inalteradas']} inalteradas | "
+        f"{stats['duplicadas_seed']} duplicadas no seed"
+    )
+    return stats
+
+
 def seed_magias(db: Session, force: bool = False) -> dict:
     stats = {'inseridas': 0, 'ignoradas': 0, 'erros': 0, 'total': 0}
 
@@ -1157,10 +1290,7 @@ def seed_magias(db: Session, force: bool = False) -> dict:
         db.commit()
         print(f"🗑️  Tabela limpa.")
 
-    todas_magias = (
-        MAGIAS_MAGO + MAGIAS_CLÉRIGO + MAGIAS_DRUIDA +
-        MAGIAS_BARDO + MAGIAS_PALADINO + MAGIAS_RANGER
-    )
+    todas_magias = _todas_magias()
 
     stats['total'] = len(todas_magias)
     LOTE = 50
@@ -1169,10 +1299,7 @@ def seed_magias(db: Session, force: bool = False) -> dict:
         lote = todas_magias[i:i + LOTE]
         try:
             for dados in lote:
-                # ✅ CORRIGIDO: converte "Sim"/strings para bool correto
-                res_magica = dados[12]
-                if isinstance(res_magica, str):
-                    res_magica = res_magica.strip().lower() in ('sim', 'true', '1', 'yes')
+                res_magica = _converter_resistencia_magica(dados[12])
 
                 magia = Magia(
                     nome               = dados[0],
@@ -1204,10 +1331,38 @@ def seed_magias(db: Session, force: bool = False) -> dict:
     return stats
 
 
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description='Seed e sincronização do catálogo de magias.')
+    parser.add_argument('--force', action='store_true', help='Apaga e recria toda a tabela de magias.')
+    parser.add_argument(
+        '--sync',
+        action='store_true',
+        help='Sincroniza o catálogo preservando IDs existentes e inserindo apenas faltantes.',
+    )
+    parser.add_argument(
+        '--classes',
+        type=str,
+        help='Lista separada por vírgula de classes a sincronizar, ex: CLERIGO,DRUIDA.',
+    )
+    parser.add_argument(
+        '--niveis',
+        type=str,
+        help='Lista separada por vírgula de níveis a sincronizar, ex: 0,1.',
+    )
+    parser.add_argument('--dry-run', action='store_true', help='Executa a sincronização sem persistir alterações.')
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
+    args = _parse_args()
+    classes = [parte.strip() for parte in args.classes.split(',')] if args.classes else None
+    niveis = [int(parte.strip()) for parte in args.niveis.split(',')] if args.niveis else None
     db = SessionLocal()
     try:
-        resultado = seed_magias(db, force=True)
+        if args.sync or classes or niveis or args.dry_run:
+            resultado = sincronizar_magias(db, classes=classes, niveis=niveis, dry_run=args.dry_run)
+        else:
+            resultado = seed_magias(db, force=args.force)
         print(f"\n📊 Total: {resultado}")
     finally:
         db.close()
