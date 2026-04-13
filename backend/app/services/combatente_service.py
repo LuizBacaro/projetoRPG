@@ -48,12 +48,13 @@ class CombatenteService:
         limit: int = 100,
     ) -> List[Combatente]:
         """Lista todos os combatentes, opcionalmente filtrando por tipo."""
+        # Jogador enxerga apenas seus próprios combatentes (qualquer tipo)
         if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
-            # Jogador enxerga apenas os próprios combatentes do tipo jogador.
-            if tipo and tipo != "jogador":
-                return []
-            return self.repository.get_by_owner_and_tipo(usuario.id, "jogador", skip=skip, limit=limit)
+            if tipo:
+                return self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
+            return self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
 
+        # Mestre/user comum enxerga seus próprios (com filtro de tipo se aplicável)
         if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
             if tipo:
                 return self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
@@ -65,11 +66,13 @@ class CombatenteService:
 
     def contar_todos(self, tipo: Optional[str] = None, usuario=None) -> int:
         """Conta combatentes respeitando escopo do usuário e filtro por tipo."""
+        # Jogador conta apenas seus próprios combatentes (qualquer tipo)
         if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
-            if tipo and tipo != "jogador":
-                return 0
-            return self.repository.count_by_owner_and_tipo(usuario.id, "jogador")
+            if tipo:
+                return self.repository.count_by_owner_and_tipo(usuario.id, tipo)
+            return self.repository.count_by_owner(usuario.id)
 
+        # Mestre/user comum conta seus próprios (com filtro de tipo se aplicável)
         if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
             if tipo:
                 return self.repository.count_by_owner_and_tipo(usuario.id, tipo)
