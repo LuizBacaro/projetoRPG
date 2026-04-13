@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from sqlalchemy.orm import Session
-from app.models.magia import Magia
+from app.models.magia import Magia, MagiaClasse
 from app.core.database import SessionLocal
 from app.core.text_utils import normalizar_classe as _norm_classe
 
@@ -1240,20 +1240,36 @@ def sincronizar_magias(
             existente = existentes.get(chave)
 
             if existente is None:
-                db.add(Magia(**payload))
+                nova = Magia(**payload)
+                db.add(nova)
+                db.flush()
                 stats['inseridas'] += 1
-                continue
-
-            alterado = False
-            for campo, valor in payload.items():
-                if getattr(existente, campo) != valor:
-                    setattr(existente, campo, valor)
-                    alterado = True
-
-            if alterado:
-                stats['atualizadas'] += 1
+                magia_obj = nova
             else:
-                stats['inalteradas'] += 1
+                alterado = False
+                for campo, valor in payload.items():
+                    if getattr(existente, campo) != valor:
+                        setattr(existente, campo, valor)
+                        alterado = True
+
+                if alterado:
+                    stats['atualizadas'] += 1
+                else:
+                    stats['inalteradas'] += 1
+                magia_obj = existente
+
+            # Upsert em magias_classes para garantir visibilidade na rota primária do repositório
+            mc = db.query(MagiaClasse).filter_by(
+                magia_id=magia_obj.id, classe=payload['classe']
+            ).first()
+            if mc is None:
+                db.add(MagiaClasse(
+                    magia_id=magia_obj.id,
+                    classe=payload['classe'],
+                    nivel=payload['nivel'],
+                ))
+            elif mc.nivel != payload['nivel']:
+                mc.nivel = payload['nivel']
 
         if dry_run:
             db.rollback()
