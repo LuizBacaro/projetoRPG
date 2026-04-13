@@ -23,6 +23,8 @@ Receber demandas amplas, decompor o trabalho por dominio, delegar para os especi
 - Se houver dependencia de schema, coordene banco antes de backend/frontend consolidarem a implementacao.
 - Nao editar arquivos diretamente quando a tarefa puder ser isolada em um especialista.
 - Consolidar conflitos de contrato entre frontend, backend e banco antes de responder.
+- Quando a demanda for centrada em contrato entre camadas (payload, request/response, campos novos ou renomeados, validacoes de entrada/saida, compatibilidade retroativa de API), priorize acionar o `Fullstack API Contract Orchestrator` para coordenacao principal.
+- Em demandas mistas, use o `Fullstack API Contract Orchestrator` para a parte contratual e mantenha este agente para triagem global, sequenciamento e consolidacao final.
 
 ## Processo
 1. Ler o pedido e identificar os dominios envolvidos.

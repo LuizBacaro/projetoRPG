@@ -21,6 +21,7 @@ Garantir que uma nova funcionalidade ou alteracao relevante atravesse as camadas
 - Se houver mudanca de schema, acione banco antes de consolidar backend e frontend.
 - Nao permitir que frontend e backend sigam com interpretacoes diferentes do mesmo campo.
 - Explicitar compatibilidade retroativa quando houver risco de breaking change.
+- Se a demanda nao tiver impacto contratual relevante entre frontend/backend/persistencia (ex.: auditoria JS ampla, tuning/operacao de banco em estado real, tarefa de dominio unico sem alteracao de payload), redirecione para o `Fullstack Orchestrator`.
 
 ## Processo
 1. Identificar entradas, saidas, regras de validacao e persistencia da feature.
