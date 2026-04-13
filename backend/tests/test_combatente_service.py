@@ -62,13 +62,18 @@ class TestCombatenteService:
         combatentes_mock = [
             Combatente(id=1, nome="Theron", tipo="jogador", classe="Guerreiro", hp_maximo=85, hp_atual=85, iniciativa=15)
         ]
-        mock_repository.get_by_tipo.return_value = combatentes_mock
+        mock_repository.get_by_owner_and_tipo.return_value = combatentes_mock
 
         resultado = service.listar_todos(usuario=_UsuarioDummy(), tipo="monstro")
 
-        assert len(resultado) == 1
-        assert resultado[0].tipo == "jogador"
-        mock_repository.get_by_tipo.assert_called_once_with("jogador", skip=0, limit=100)
+        assert resultado == []
+        mock_repository.get_by_owner_and_tipo.assert_not_called()
+
+        resultado_jogador = service.listar_todos(usuario=_UsuarioDummy(), tipo="jogador")
+
+        assert len(resultado_jogador) == 1
+        assert resultado_jogador[0].tipo == "jogador"
+        mock_repository.get_by_owner_and_tipo.assert_called_once_with(42, "jogador", skip=0, limit=100)
     
     def test_obter_por_id_sucesso(self, service, mock_repository):
         """Testa obter combatente por ID - sucesso"""
