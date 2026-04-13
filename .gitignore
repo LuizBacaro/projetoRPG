@@ -17,6 +17,8 @@ uploads/
 backend/uploads/
 backend/uploads/**
 *.pdf
+# ✅ EXCEÇÃO: Livro de referência D&D 3.5 (sem DRM, uso educacional)
+!D&D3_5_livro_jogador.pdf
 
 # IDE
 .vscode/
@@ -44,3 +46,16 @@ tmp_*.sh
 
 # Temp de validacao e runners
 /tmp/*.copilot.*
+
+# Scripts de extração PDF (artefatos de teste)
+extract_*.py
+find_*.py
+
+# Arquivos acidentais gerados em tempo de edição (caracters especiais, espaços, etc)
+"(Mending, Ler Magias)"
+".py', 'r') as f:"
+"= all_text.split('n')"
+"orted([m[0] for m in"
+pdf:
+e:
+"tra primeiras"
