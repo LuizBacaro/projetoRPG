@@ -549,6 +549,29 @@ cd backend
 pytest tests/ -v --cov=app
 ```
 
+### Backup e Restore de Personagens
+
+Para preservar os personagens salvos no banco atual e reimportar depois em um banco recriado:
+
+```bash
+# Exportar snapshot completo dos personagens ativos
+DATABASE_URL="postgresql://..." make backup-personagens \
+     SNAPSHOT=backend/scripts/generated/personagens_producao.json
+
+# Restaurar em outro banco ja migrado
+DATABASE_URL="postgresql://..." make restore-personagens \
+     SNAPSHOT=backend/scripts/generated/personagens_producao.json
+
+# Se o banco de destino ja tiver personagens com a mesma chave natural,
+# execute o comando direto para sobrescrever relacionamentos existentes
+cd backend
+python3 -m scripts.restore_personagens_snapshot \
+     --input ../backend/scripts/generated/personagens_producao.json \
+     --replace-existing
+```
+
+O snapshot inclui combatentes e relacionamentos associados: ataques, slots de magia, magias preparadas, pericias, equipamentos, armaduras/protecao, condicoes e dados de grimorio. Para uso recorrente em producao, gere o JSON e versione esse arquivo em local seguro fora do banco.
+
 ---
 
 ## 🌐 Deploy em Produção

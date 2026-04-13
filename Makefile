@@ -1,8 +1,9 @@
-PYTHON ?= python
+PYTHON ?= python3
 NODE   ?= node
 BASE_URL ?= http://localhost:8000
+SNAPSHOT ?= backend/scripts/generated/personagens_snapshot.json
 
-.PHONY: test test-backend test-frontend test-e2e lint
+.PHONY: test test-backend test-frontend test-e2e lint backup-personagens restore-personagens
 
 ## Roda toda a suite de testes (backend + frontend)
 test: test-backend test-frontend
@@ -25,3 +26,12 @@ lint:
 	@command -v flake8 > /dev/null && \
 	  cd backend && flake8 app --max-line-length=120 --extend-ignore=E501 || \
 	  echo "flake8 não instalado — pulando lint"
+
+## Gera snapshot JSON completo dos personagens do banco configurado em DATABASE_URL
+backup-personagens:
+	cd backend && $(PYTHON) -m scripts.export_personagens_snapshot --output ../$(SNAPSHOT)
+
+## Restaura snapshot JSON completo dos personagens no banco configurado em DATABASE_URL
+## Uso: make restore-personagens SNAPSHOT=backend/scripts/generated/arquivo.json
+restore-personagens:
+	cd backend && $(PYTHON) -m scripts.restore_personagens_snapshot --input ../$(SNAPSHOT)
