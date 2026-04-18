@@ -19,26 +19,59 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Adicionar novos campos à tabela equipamentos
-    op.add_column('equipamentos', sa.Column('categoria', sa.String(50), nullable=True))
-    op.add_column('equipamentos', sa.Column('subcategoria', sa.String(100), nullable=True))
-    op.add_column('equipamentos', sa.Column('custo', sa.String(50), nullable=True))
-    op.add_column('equipamentos', sa.Column('dano_pequeno', sa.String(20), nullable=True))
-    op.add_column('equipamentos', sa.Column('dano_medio', sa.String(20), nullable=True))
-    op.add_column('equipamentos', sa.Column('critico', sa.String(20), nullable=True))
-    op.add_column('equipamentos', sa.Column('alcance_incremento', sa.String(50), nullable=True))
-    op.add_column('equipamentos', sa.Column('peso', sa.String(20), nullable=True))
-    op.add_column('equipamentos', sa.Column('tipo_dano', sa.String(50), nullable=True))
+    """Adiciona novos campos à tabela equipamentos."""
+    
+    # Listar campos a adicionar
+    campos = [
+        ('categoria', sa.String(50)),
+        ('subcategoria', sa.String(100)),
+        ('custo', sa.String(50)),
+        ('dano_pequeno', sa.String(20)),
+        ('dano_medio', sa.String(20)),
+        ('critico', sa.String(20)),
+        ('alcance_incremento', sa.String(50)),
+        ('peso', sa.String(20)),
+        ('tipo_dano', sa.String(50)),
+    ]
+    
+    # Adicionar cada coluna
+    # SQLite e PostgreSQL lidam com "coluna já existe" de formas diferentes
+    # Por isso fazemos um try/except por coluna
+    for nome_campo, tipo in campos:
+        try:
+            op.add_column('equipamentos', sa.Column(nome_campo, tipo, nullable=True))
+        except Exception as e:
+            # Silenciar erros "coluna já existe" - compatível com SQLite e PostgreSQL
+            erro_str = str(e).lower()
+            if "duplicate column" in erro_str or "already exists" in erro_str:
+                pass  # Coluna já existe, tudo bem
+            else:
+                raise  # Re-raise se for outro tipo de erro
 
 
 def downgrade() -> None:
-    # Remover novos campos da tabela equipamentos
-    op.drop_column('equipamentos', 'tipo_dano')
-    op.drop_column('equipamentos', 'peso')
-    op.drop_column('equipamentos', 'alcance_incremento')
-    op.drop_column('equipamentos', 'critico')
-    op.drop_column('equipamentos', 'dano_medio')
-    op.drop_column('equipamentos', 'dano_pequeno')
-    op.drop_column('equipamentos', 'custo')
-    op.drop_column('equipamentos', 'subcategoria')
-    op.drop_column('equipamentos', 'categoria')
+    """Remove novos campos da tabela equipamentos."""
+    
+    # Campos a remover (na ordem inversa)
+    campos_remover = [
+        'tipo_dano',
+        'peso',
+        'alcance_incremento',
+        'critico',
+        'dano_medio',
+        'dano_pequeno',
+        'custo',
+        'subcategoria',
+        'categoria',
+    ]
+    
+    for nome_campo in campos_remover:
+        try:
+            op.drop_column('equipamentos', nome_campo)
+        except Exception as e:
+            # Silenciar erros "coluna não existe"
+            erro_str = str(e).lower()
+            if "no such column" in erro_str or "does not exist" in erro_str:
+                pass  # Coluna não existe, tudo bem
+            else:
+                raise  # Re-raise se for outro tipo de erro

@@ -229,6 +229,9 @@ def _executar_alembic_migrations() -> None:
     """
     Executa as migrations do Alembic automaticamente no startup.
     SRP: Garante que o schema esteja sempre atualizado.
+    
+    IMPORTANTE: Deve rodar APÓS create_all(), pois migrations fazem ALTER TABLE
+    e precisam que as tabelas já existam.
     """
     try:
         from alembic.config import Config
@@ -238,7 +241,7 @@ def _executar_alembic_migrations() -> None:
         ini_path = backend_root / "alembic.ini"
         
         if not ini_path.exists():
-            logger.warning(f"⚠️  alembic.ini não encontrado em {ini_path} — pulando migrations")
+            logger.warning(f"⚠️  alembic.ini não encontrado em {ini_path}")
             return
         
         # Configurar Alembic
@@ -246,33 +249,40 @@ def _executar_alembic_migrations() -> None:
         database_url = os.environ.get("DATABASE_URL", "sqlite:///./rpg_arena.db")
         cfg.set_main_option("sqlalchemy.url", database_url)
         
+        logger.info(f"🔄 Executando migrations Alembic...")
+        
         # Executar upgrade até head
-        command.upgrade(cfg, "head")
-        logger.info("✅ Migrations do Alembic aplicadas com sucesso")
+        try:
+            command.upgrade(cfg, "head")
+            logger.info("✅ Migrations do Alembic aplicadas com sucesso até HEAD")
+        except Exception as migration_error:
+            # Logar o erro mas não falhar o startup
+            # As tabelas já foram criadas via create_all(), então funciona mesmo sem todas as migrations
+            logger.warning(f"⚠️  Erro ao aplicar migrations (mas continuando): {str(migration_error)[:200]}")
         
     except Exception as e:
-        logger.warning(f"⚠️  Erro ao executar migrations do Alembic: {str(e)}")
-        # Não falha o startup se as migrations falharem — SQLAlchemy create_all() ainda rodará
-        pass
+        logger.warning(f"⚠️  Erro ao executar setup de migrations: {type(e).__name__}: {str(e)[:200]}")
+        # Não falhar - create_all() já garantiu as tabelas
 
 
 def _inicializar_banco(db) -> None:
     """
     SRP: Orquestra a inicialização completa do banco.
     Ordem importa:
-    1. Migrations do Alembic (schema)
-    2. Admin (dependência de tudo)
-    3. Condições (globais)
-    4. Perícias (globais)
-    5. Equipamentos (globais)
-    6. Combatentes (usam condições)
+    1. Criar tabelas (create_all) - base para tudo
+    2. Migrations do Alembic - ALTER TABLE
+    3. Admin (dependência de tudo)
+    4. Condições (globais)
+    5. Perícias (globais)
+    6. Equipamentos (globais)
+    7. Combatentes (usam condições)
 
     Args:
         db: Sessão do banco
     """
     passos = [
-        ("executar_alembic_migrations", _executar_alembic_migrations),
         ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
+        ("executar_alembic_migrations", _executar_alembic_migrations),
         ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
         ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
         ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
