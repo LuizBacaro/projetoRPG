@@ -30,6 +30,26 @@ if str(BACKEND_DIR) not in sys.path:
 from app.core.database import SessionLocal  # noqa: E402
 from app.models.talento import Talento  # noqa: E402
 
+# Nomes do seed em `init_db.inicializar_talentos` → nome exato no JSON (talentos_importacao_limpo.json).
+# Só entram pares com correspondência razoável no LdJ; nomes sem entrada ficam só com o upsert geral por nome igual.
+MAPEAMENTO_SEED_PARA_JSON: dict[str, str | None] = {
+    "Golpe Poderoso": "Ataque Poderoso¹",
+    "Ataque Especial": None,  # não há entrada clara no JSON (nome genérico do seed)
+    "Arma Focada": "Foco em Arma¹²",
+    "Especialização de Arma": "Especialização em Arma¹²",
+    "Lidar com Corda": "Mãos Leves",  # aproximação: bônus em Usar Cordas no mesmo bloco de perícias
+    "Vitalidade Aumentada": "Vitalidade³",
+    "Reflexos Rápidos": "Reflexos Rápidos",
+    "Golpe Girante": "Ataque Giratório¹",
+    "Salto Acrobático": "Acrobático",
+    "Esquiva Extraordinária": "Mobilidade¹",
+    "Defesa Aprimorada": "Esquiva¹",
+    "Conjuração Rápida": "Acelerar Magia",
+    "Magia Silenciosa": "Magia Silenciosa",
+    "Magia Imóvel": "Magia Sem Gestos",
+    "Golpe Certeiro": "Acuidade com Arma¹²",
+}
+
 
 def _trunc(s: str | None, max_len: int) -> str | None:
     if s is None:
@@ -38,6 +58,51 @@ def _trunc(s: str | None, max_len: int) -> str | None:
     if len(s) <= max_len:
         return s
     return s[: max_len - 1] + "…"
+
+
+def _indice_por_nome_json(rows: list[dict]) -> dict[str, dict]:
+    out: dict[str, dict] = {}
+    for row in rows:
+        n = row.get("nome")
+        if isinstance(n, str) and n.strip():
+            out[n.strip()] = row
+    return out
+
+
+def _aplicar_mapeamento_seed(
+    db,
+    rows: list[dict],
+) -> tuple[int, list[str]]:
+    """Copia benefício/pré-requisitos/seção do JSON para linhas criadas pelo seed (nome diferente)."""
+    idx = _indice_por_nome_json(rows)
+    atualizados = 0
+    avisos: list[str] = []
+
+    for seed_nome, json_nome in MAPEAMENTO_SEED_PARA_JSON.items():
+        if not json_nome:
+            continue
+        if json_nome not in idx:
+            avisos.append(f"Nome JSON não encontrado no arquivo: {json_nome!r} (seed {seed_nome!r})")
+            continue
+
+        talento = (
+            db.query(Talento)
+            .filter(Talento.nome == seed_nome, Talento.deleted_at.is_(None))
+            .first()
+        )
+        if not talento:
+            avisos.append(f"Seed não encontrado no banco: {seed_nome!r}")
+            continue
+
+        src = idx[json_nome]
+        talento.descricao = _trunc(src.get("beneficios") or src.get("descricao"), 1000)
+        talento.prerequisitos = _trunc(src.get("prerequisitos"), 500)
+        talento.secao = _trunc(src.get("secao"), 200)
+        talento.pagina_referencia = _trunc(src.get("pagina_referencia"), 50) or talento.pagina_referencia
+        talento.ativo = True
+        atualizados += 1
+
+    return atualizados, avisos
 
 
 def main() -> int:
@@ -96,8 +161,13 @@ def main() -> int:
                 )
                 criados += 1
 
+        enriquecidos, avisos_map = _aplicar_mapeamento_seed(db, rows)
+
         db.commit()
         print(f"✅ Importação concluída: {criados} criados, {atualizados} atualizados (total JSON: {len(rows)})")
+        print(f"✅ Enriquecimento seed→catálogo: {enriquecidos} linhas do seed alinhadas ao JSON por nome equivalente.")
+        for msg in avisos_map:
+            print(f"⚠️  {msg}")
         return 0
     except Exception as e:
         db.rollback()
