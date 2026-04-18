@@ -7,14 +7,13 @@
     }
   ],
   "routes": [
-    { "src": "/",              "dest": "/pages/login.html" },
-    { "src": "/arena",         "dest": "/arena.html" },
-    { "src": "/pages/(.*)",    "dest": "/pages/$1" },
-    { "src": "/css/(.*)",      "dest": "/css/$1" },
-    { "src": "/js/(.*)",       "dest": "/js/$1" },
-    { "src": "/sw.js",         "dest": "/sw.js" },
-    { "src": "/api/(.*)",      "dest": "https://projetorpg-7ih3.onrender.com/api/$1" },
-    { "src": "/health",        "dest": "https://projetorpg-7ih3.onrender.com/health" },
-    { "src": "/(.*)",          "dest": "/$1" }
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/arena", "dest": "/arena.html" },
+    { "src": "/pages/(.*)", "dest": "/pages/$1" },
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/js/(.*)", "dest": "/js/$1" },
+    { "src": "/sw.js", "dest": "/sw.js" },
+    { "src": "/api/(.*)", "dest": "https://projetorpg-7ih3.onrender.com/api/$1" },
+    { "src": "/health", "dest": "https://projetorpg-7ih3.onrender.com/health" }
   ]
 }
