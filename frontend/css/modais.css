@@ -382,3 +382,40 @@
     .btn-aplicar-dano,
     .btn-cancelar-dano    { width: 100%; text-align: center; }
 }
+
+/* ── Páginação para modais ── */
+.talentos-paginacao {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem;
+    border-top: 1px solid var(--borda-painel);
+    margin-top: 1rem;
+}
+
+.btn-carregar-mais {
+    background: linear-gradient(135deg, var(--azul-destaque) 0%, var(--azul-secundario) 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-carregar-mais:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-carregar-mais:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-carregar-mais:active:not(:disabled) {
+    transform: translateY(0);
+}

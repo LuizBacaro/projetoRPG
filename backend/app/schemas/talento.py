@@ -12,8 +12,10 @@ from datetime import datetime
 class TalentoBase(BaseModel):
     """Schema base com campos comuns"""
     nome: str = Field(..., min_length=1, max_length=100)
-    descricao: Optional[str] = Field(default=None, max_length=500)
+    descricao: Optional[str] = Field(default=None, max_length=1000)
     pagina_referencia: Optional[str] = Field(default=None, max_length=50)
+    prerequisitos: Optional[str] = Field(default=None, max_length=500)
+    secao: Optional[str] = Field(default=None, max_length=200)
     ativo: bool = True
 
 
@@ -56,8 +58,10 @@ class TalentoJogadorListResponse(BaseModel):
     """Schema para listagem de talentos do jogador"""
     id: int
     nome: str = Field(..., max_length=100)
-    descricao: Optional[str] = Field(default=None, max_length=500)
+    descricao: Optional[str] = Field(default=None, max_length=1000)
     pagina_referencia: Optional[str] = Field(default=None, max_length=50)
+    prerequisitos: Optional[str] = Field(default=None, max_length=500)
+    secao: Optional[str] = Field(default=None, max_length=200)
 
     class Config:
         from_attributes = True

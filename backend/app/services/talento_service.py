@@ -43,7 +43,9 @@ class TalentoService:
             id=talento.id,
             nome=talento.nome,
             descricao=talento.descricao,
-            pagina_referencia=talento.pagina_referencia
+            pagina_referencia=talento.pagina_referencia,
+            prerequisitos=talento.prerequisitos,
+            secao=talento.secao
         )
 
     def obter_talentos_jogador(self, combatente_id: int) -> List[TalentoJogadorListResponse]:
@@ -58,6 +60,8 @@ class TalentoService:
                 nome=tal["talento_nome"],
                 descricao=tal["talento_descricao"],
                 pagina_referencia=tal["talento_pagina_referencia"],
+                prerequisitos=tal.get("talento_prerequisitos"),
+                secao=tal.get("talento_secao"),
             )
             for tal in talentos_jogador
         ]
