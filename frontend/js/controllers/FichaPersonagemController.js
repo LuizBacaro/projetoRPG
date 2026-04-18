@@ -1783,27 +1783,27 @@ export class FichaPersonagemController {
                 ${talentos.map(tal => `
                     <div class="ficha-talento-card">
                         <div class="ficha-talento-card-header">
-                            <h4 class="ficha-talento-card-title">${escapeHtml(tal.nome)}</h4>
+                            <h4 class="ficha-talento-card-title">${tal.nome || 'N/A'}</h4>
                         </div>
                         
                         <div class="ficha-talento-card-body">
                             ${tal.descricao ? `
                                 <div class="ficha-talento-card-field">
                                     <span class="ficha-talento-card-label">Benefício</span>
-                                    <p class="ficha-talento-card-value">${escapeHtml(tal.descricao)}</p>
+                                    <p class="ficha-talento-card-value">${tal.descricao}</p>
                                 </div>
                             ` : ''}
                             
                             ${tal.pagina_referencia ? `
                                 <div class="ficha-talento-card-field">
                                     <span class="ficha-talento-card-label">Página</span>
-                                    <p class="ficha-talento-card-value">${escapeHtml(tal.pagina_referencia)}</p>
+                                    <p class="ficha-talento-card-value">${tal.pagina_referencia}</p>
                                 </div>
                             ` : ''}
                         </div>
                         
                         <div class="ficha-talento-card-footer">
-                            <button class="btn-deletar-tal" data-tal-id="${tal.id}" data-tal-nome="${escapeHtml(tal.nome)}" title="Deletar ${escapeHtml(tal.nome)}">🗑️</button>
+                            <button class="btn-deletar-tal" data-tal-id="${tal.id}" data-tal-nome="${tal.nome || 'N/A'}" title="Deletar ${tal.nome || 'N/A'}">🗑️</button>
                         </div>
                     </div>
                 `).join('')}
