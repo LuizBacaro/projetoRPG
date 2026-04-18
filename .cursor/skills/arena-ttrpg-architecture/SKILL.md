@@ -46,6 +46,16 @@ description: >-
 - Autenticação: JWT no `localStorage`; serviços usam `Authorization` onde aplicável.
 - `getApiUrl('/...')` para todos os endpoints da API v1.
 
+## Catálogo de talentos (LdJ)
+
+- Fonte canónica: **`talentos_importacao_limpo.json`** na raiz do repo (109+ entradas).
+- **Bases novas (vazias):** `inicializar_talentos` em `init_db.py` importa esse JSON (via `talentos_catalog_seed.py`).
+- **Produção já com seed antigo (15 linhas):** não é sobrescrita no startup. No servidor (Neon/Render), a partir de `backend/`:
+  - `python scripts/importar_talentos_catalogo_json.py` — upsert por nome;
+  - `python scripts/importar_talentos_catalogo_json.py --remover-legado` — idem + soft-delete de linhas legadas **não usadas** em fichas;
+  - ou `python scripts/desativar_talentos_fora_catalogo.py` após o import.
+- Listagem na API: `order_by(nome)` — a primeira página começa por ordem alfabética do nome (ex. “Acelerar Magia” antes de “Arma…”).
+
 ## Referência rápida de ficheiros
 
 | Área | Caminhos |
@@ -55,3 +65,4 @@ description: >-
 | Rate limit | `backend/app/core/rate_limit.py` |
 | Config front API | `frontend/js/config/api.config.js`, `api-url-global.js` |
 | Arena (If-Match) | `frontend/js/controllers/ArenaController.js` |
+| Catálogo talentos | `talentos_importacao_limpo.json`, `backend/app/core/talentos_catalog_seed.py`, `backend/scripts/importar_talentos_catalogo_json.py` |

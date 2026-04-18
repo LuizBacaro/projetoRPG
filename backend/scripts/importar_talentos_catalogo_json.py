@@ -8,16 +8,16 @@ Uso (Neon / produção):
 Uso (SQLite local):
   cd backend && python scripts/importar_talentos_catalogo_json.py
 
+Opções:
+  --remover-legado  Soft-delete de talentos que não estão no JSON e não estão em uso em fichas.
+
 Faz upsert por `nome`: insere novos e atualiza descricao/prerequisitos/secao dos existentes.
-Não remove talentos que só existem no banco (ex.: seed mínimo antigo).
 """
 
 from __future__ import annotations
 
 import argparse
-import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -28,81 +28,14 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from app.core.database import SessionLocal  # noqa: E402
-from app.models.talento import Talento  # noqa: E402
-
-# Nomes do seed em `init_db.inicializar_talentos` → nome exato no JSON (talentos_importacao_limpo.json).
-# Só entram pares com correspondência razoável no LdJ; nomes sem entrada ficam só com o upsert geral por nome igual.
-MAPEAMENTO_SEED_PARA_JSON: dict[str, str | None] = {
-    "Golpe Poderoso": "Ataque Poderoso¹",
-    "Ataque Especial": None,  # não há entrada clara no JSON (nome genérico do seed)
-    "Arma Focada": "Foco em Arma¹²",
-    "Especialização de Arma": "Especialização em Arma¹²",
-    "Lidar com Corda": "Mãos Leves",  # aproximação: bônus em Usar Cordas no mesmo bloco de perícias
-    "Vitalidade Aumentada": "Vitalidade³",
-    "Reflexos Rápidos": "Reflexos Rápidos",
-    "Golpe Girante": "Ataque Giratório¹",
-    "Salto Acrobático": "Acrobático",
-    "Esquiva Extraordinária": "Mobilidade¹",
-    "Defesa Aprimorada": "Esquiva¹",
-    "Conjuração Rápida": "Acelerar Magia",
-    "Magia Silenciosa": "Magia Silenciosa",
-    "Magia Imóvel": "Magia Sem Gestos",
-    "Golpe Certeiro": "Acuidade com Arma¹²",
-}
-
-
-def _trunc(s: str | None, max_len: int) -> str | None:
-    if s is None:
-        return None
-    s = str(s).strip()
-    if len(s) <= max_len:
-        return s
-    return s[: max_len - 1] + "…"
-
-
-def _indice_por_nome_json(rows: list[dict]) -> dict[str, dict]:
-    out: dict[str, dict] = {}
-    for row in rows:
-        n = row.get("nome")
-        if isinstance(n, str) and n.strip():
-            out[n.strip()] = row
-    return out
-
-
-def _aplicar_mapeamento_seed(
-    db,
-    rows: list[dict],
-) -> tuple[int, list[str]]:
-    """Copia benefício/pré-requisitos/seção do JSON para linhas criadas pelo seed (nome diferente)."""
-    idx = _indice_por_nome_json(rows)
-    atualizados = 0
-    avisos: list[str] = []
-
-    for seed_nome, json_nome in MAPEAMENTO_SEED_PARA_JSON.items():
-        if not json_nome:
-            continue
-        if json_nome not in idx:
-            avisos.append(f"Nome JSON não encontrado no arquivo: {json_nome!r} (seed {seed_nome!r})")
-            continue
-
-        talento = (
-            db.query(Talento)
-            .filter(Talento.nome == seed_nome, Talento.deleted_at.is_(None))
-            .first()
-        )
-        if not talento:
-            avisos.append(f"Seed não encontrado no banco: {seed_nome!r}")
-            continue
-
-        src = idx[json_nome]
-        talento.descricao = _trunc(src.get("beneficios") or src.get("descricao"), 1000)
-        talento.prerequisitos = _trunc(src.get("prerequisitos"), 500)
-        talento.secao = _trunc(src.get("secao"), 200)
-        talento.pagina_referencia = _trunc(src.get("pagina_referencia"), 50) or talento.pagina_referencia
-        talento.ativo = True
-        atualizados += 1
-
-    return atualizados, avisos
+from app.core.talentos_catalog_seed import (  # noqa: E402
+    aplicar_mapeamento_seed_antigo,
+    default_json_path,
+    desativar_talentos_fora_do_catalogo,
+    load_rows_from_json,
+    nomes_catalogo,
+    upsert_talentos_from_rows,
+)
 
 
 def main() -> int:
@@ -110,64 +43,41 @@ def main() -> int:
     parser.add_argument(
         "--json",
         type=Path,
-        default=DEFAULT_JSON,
+        default=None,
         help=f"Caminho do JSON (default: {DEFAULT_JSON})",
+    )
+    parser.add_argument(
+        "--remover-legado",
+        action="store_true",
+        help="Remove (soft-delete) talentos ativos que não estão no JSON e não têm uso em talentos_jogador.",
     )
     args = parser.parse_args()
 
-    path: Path = args.json
+    path: Path = args.json or default_json_path()
     if not path.is_file():
         print(f"❌ Arquivo não encontrado: {path}")
         return 1
 
-    with path.open(encoding="utf-8") as f:
-        rows: list[dict] = json.load(f)
-
+    rows = load_rows_from_json(path)
     db = SessionLocal()
-    criados = 0
-    atualizados = 0
     try:
-        for row in rows:
-            nome = _trunc(row.get("nome"), 100)
-            if not nome:
-                continue
+        criados, atualizados = upsert_talentos_from_rows(db, rows)
+        enriquecidos, avisos_map = aplicar_mapeamento_seed_antigo(db, rows)
 
-            descricao = _trunc(row.get("beneficios") or row.get("descricao"), 1000)
-            prerequisitos = _trunc(row.get("prerequisitos"), 500)
-            secao = _trunc(row.get("secao"), 200)
-            pagina = _trunc(row.get("pagina_referencia"), 50)
-
-            q = db.query(Talento).filter(Talento.nome == nome, Talento.deleted_at.is_(None))
-            existing = q.first()
-
-            if existing:
-                existing.descricao = descricao
-                existing.prerequisitos = prerequisitos or existing.prerequisitos
-                existing.secao = secao or existing.secao
-                existing.pagina_referencia = pagina or existing.pagina_referencia
-                existing.ativo = True
-                atualizados += 1
-            else:
-                db.add(
-                    Talento(
-                        nome=nome,
-                        descricao=descricao,
-                        prerequisitos=prerequisitos,
-                        secao=secao,
-                        pagina_referencia=pagina or None,
-                        ativo=True,
-                        criado_em=datetime.now(timezone.utc),
-                    )
-                )
-                criados += 1
-
-        enriquecidos, avisos_map = _aplicar_mapeamento_seed(db, rows)
+        removidos = 0
+        avisos_legado: list[str] = []
+        if args.remover_legado:
+            removidos, avisos_legado = desativar_talentos_fora_do_catalogo(db, nomes_catalogo(rows))
 
         db.commit()
         print(f"✅ Importação concluída: {criados} criados, {atualizados} atualizados (total JSON: {len(rows)})")
         print(f"✅ Enriquecimento seed→catálogo: {enriquecidos} linhas do seed alinhadas ao JSON por nome equivalente.")
         for msg in avisos_map:
             print(f"⚠️  {msg}")
+        if args.remover_legado:
+            print(f"✅ Talentos legados removidos (soft-delete): {removidos}")
+            for msg in avisos_legado:
+                print(f"ℹ️  {msg}")
         return 0
     except Exception as e:
         db.rollback()

@@ -94,20 +94,31 @@ def criar_admin_padrao(db: Session) -> None:
 
 def inicializar_talentos(db: Session) -> None:
     """
-    Popula os talentos padrão de D&D 3.5 se ainda não existirem.
-    
-    Args:
-        db: Sessão do banco de dados
+    Popula o catálogo de talentos (LdJ) a partir de `talentos_importacao_limpo.json`
+    na raiz do repositório, se o banco ainda estiver vazio.
+
+    Bases já povoadas com o seed antigo (15 linhas) não são alteradas aqui —
+    use `python scripts/importar_talentos_catalogo_json.py` e
+    `python scripts/desativar_talentos_fora_catalogo.py` no Neon/Render.
     """
-    from ..models.talento import Talento
     from datetime import datetime, timezone
-    
-    # Verificar se já existem talentos
+
+    from ..models.talento import Talento
+    from .talentos_catalog_seed import default_json_path, seed_catalogo_inicial_vazio
+
     count = db.query(Talento).filter(Talento.deleted_at.is_(None)).count()
     if count > 0:
-        logger.info(f"✅ Talentos já existem ({count}). Pulando seed.")
+        logger.info("✅ Talentos já existem (%s). Pulando seed inicial do catálogo.", count)
         return
-    
+
+    json_path = default_json_path()
+    if json_path.is_file():
+        if seed_catalogo_inicial_vazio(db, json_path=json_path):
+            return
+
+    # Fallback: seed mínimo só se o JSON não estiver no deploy
+    logger.warning("Catálogo JSON ausente em %s — usando seed mínimo de desenvolvimento.", json_path)
+
     TALENTOS_PADRAO = [
         ("Golpe Poderoso", "Realiza um ataque com + 2 de dano", "PHB p.95"),
         ("Ataque Especial", "Permite um ataque extra uma vez por dia", "PHB p.95"),
@@ -125,16 +136,16 @@ def inicializar_talentos(db: Session) -> None:
         ("Magia Imóvel", "Conjura sem componentes somáticos", "PHB p.95"),
         ("Golpe Certeiro", "Bônus para acertar com armas de melee", "PHB p.95"),
     ]
-    
+
     for nome, descricao, pagina_ref in TALENTOS_PADRAO:
-        talento = Talento(
-            nome=nome,
-            descricao=descricao,
-            pagina_referencia=pagina_ref,
-            ativo=True,
-            criado_em=datetime.now(timezone.utc)
+        db.add(
+            Talento(
+                nome=nome,
+                descricao=descricao,
+                pagina_referencia=pagina_ref,
+                ativo=True,
+                criado_em=datetime.now(timezone.utc),
+            )
         )
-        db.add(talento)
-    
     db.commit()
-    print(f"✅ {len(TALENTOS_PADRAO)} talentos inseridos com sucesso!")
+    print(f"✅ {len(TALENTOS_PADRAO)} talentos (seed mínimo) inseridos — prefira o JSON no repositório.")

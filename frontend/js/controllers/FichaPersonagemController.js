@@ -1769,7 +1769,6 @@ export class FichaPersonagemController {
     }
 
     renderizarTalentos(talentos) {
-        console.log('🎯 renderizarTalentos chamado com:', talentos);
         const lista = document.getElementById('fichaTalentos');
         if (!lista) {
             console.error('❌ Elemento fichaTalentos não encontrado');
@@ -1777,12 +1776,9 @@ export class FichaPersonagemController {
         }
 
         if (!talentos || talentos.length === 0) {
-            console.log('📭 Nenhum talento encontrado');
             lista.innerHTML = '<span class="ficha-vazio">Nenhum talento cadastrado</span>';
             return;
         }
-
-        console.log('✅ Renderizando', talentos.length, 'talentos em cards');
 
         // Usar layout de cards em grid como os equipamentos no modal
         lista.innerHTML = `
