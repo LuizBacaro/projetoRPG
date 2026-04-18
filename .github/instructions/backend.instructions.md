@@ -26,3 +26,10 @@ applyTo: "backend/**/*.py"
 
 - Nao introduza fallback permissivo para usuario atual.
 - Nao remova verificacoes de perfil (`admin`, `mestre`, `jogador`) sem razao funcional clara.
+
+## Catalogo de talentos (producao vs local)
+
+- O startup `inicializar_talentos` so insere um **seed minimo** (~15 linhas) se a tabela estiver vazia; Neon em producao costuma ficar so com esse subconjunto.
+- O catálogo completo do LdJ esta em `talentos_importacao_limpo.json` na raiz do repo; desenvolvimento local costuma ter sido preenchido via esse arquivo ou import manual.
+- Para **alinhar producao** ao catálogo completo: `cd backend && DATABASE_URL=... python scripts/importar_talentos_catalogo_json.py` (upsert por nome).
+- Listagens de talentos devem usar **ordem estável** (ex.: `nome` ASC) para paginacao consistente entre SQLite e Postgres.

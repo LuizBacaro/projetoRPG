@@ -5,7 +5,7 @@ Single Responsibility: Operações de banco de dados
 
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import aliased
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, asc
 from app.models.talento import Talento, TalentoJogador
 from app.schemas.talento import TalentoCreate, TalentoJogadorCreate
 from app.repositories.base import apply_not_deleted, commit_with_rollback, soft_delete_entity
@@ -57,6 +57,7 @@ class TalentoRepository:
         return (
             apply_not_deleted(db.query(Talento), Talento)
             .filter(Talento.ativo == True)
+            .order_by(asc(Talento.nome))
             .offset(skip)
             .limit(limit)
             .all()
