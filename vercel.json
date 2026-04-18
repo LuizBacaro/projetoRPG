@@ -5,6 +5,8 @@
   "installCommand": "echo 'static'",
   "outputDirectory": "frontend",
   "rewrites": [
+    { "source": "/dashboard", "destination": "/pages/dashboard.html" },
+    { "source": "/pericias", "destination": "/pages/pericias.html" },
     { "source": "/arena", "destination": "/arena.html" }
   ]
 }
