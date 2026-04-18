@@ -1,6 +1,6 @@
 /**
  * CondicaoService
- * Classe global (sem export) — carregada via <script> no index.html
+ * Classe global (sem export) — carregada via <script> na arena (arena.html)
  * SOLID: SRP - apenas comunicação HTTP com a API de condições
  * ✅ CORRIGIDO: baseUrl agora aponta para /api/v1
  */

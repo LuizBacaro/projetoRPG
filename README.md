@@ -90,7 +90,7 @@ Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera c
                    │          │        (Admin)
                    ▼          ▼
          /pages/ficha-       /arena
-         personagem.html   (frontend/index.html)
+         personagem.html   (frontend/arena.html)
               │
          [Grimório]    [Perícias]
          (modal)       /pages/pericias.html
@@ -234,7 +234,7 @@ backend/
 
 ```
 frontend/
-├── index.html                     # Arena principal (rota /arena)
+├── arena.html                     # Arena principal (rota /arena)
 │
 ├── pages/                         # 7 páginas HTML
 │   ├── login.html                 #   Tela de login

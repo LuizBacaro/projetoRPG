@@ -156,7 +156,7 @@ async def dashboard():
 @app.get("/arena")
 async def arena():
     """Tela da arena de combate."""
-    return FileResponse(str(FRONTEND_DIR / "index.html"))
+    return FileResponse(str(FRONTEND_DIR / "arena.html"))
 
 
 @app.get("/favicon.ico", include_in_schema=False)
