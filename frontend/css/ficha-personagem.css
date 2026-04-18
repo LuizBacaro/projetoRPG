@@ -1965,6 +1965,105 @@ body::before {
     }
 }
 
+/* ── Modal talentos: lista em linhas (um bloco por talento, mais legível que grid de cards) ── */
+.equipamentos-lista.talentos-lista-linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.talento-linha {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.75rem 1rem;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid rgba(180, 140, 70, 0.55);
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.65), rgba(232, 213, 176, 0.28));
+    box-shadow: 0 1px 4px rgba(92, 58, 30, 0.08);
+    box-sizing: border-box;
+}
+
+.talento-linha-conteudo {
+    flex: 1;
+    min-width: 0;
+}
+
+.talento-linha-cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.75rem;
+    margin-bottom: 0.2rem;
+}
+
+.talento-linha-nome {
+    font-family: var(--fonte-titulo, Georgia, serif);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cor-tinta, #2c1a0e);
+    line-height: 1.25;
+}
+
+.talento-linha-secao {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: rgba(120, 80, 30, 0.95);
+    padding: 0.12rem 0.45rem;
+    border-radius: 4px;
+    background: rgba(201, 168, 76, 0.28);
+    border: 1px solid rgba(180, 140, 70, 0.45);
+}
+
+.talento-linha-beneficio,
+.talento-linha-pre {
+    margin: 0.2rem 0 0;
+    font-size: 0.84rem;
+    line-height: 1.4;
+    color: rgba(44, 26, 14, 0.88);
+}
+
+.talento-linha-pre {
+    font-size: 0.8rem;
+    color: rgba(44, 26, 14, 0.72);
+}
+
+.talento-linha-rotulo {
+    font-weight: 600;
+    color: rgba(44, 26, 14, 0.55);
+    margin-right: 0.25rem;
+}
+
+.talento-linha-acao {
+    flex-shrink: 0;
+    align-self: center;
+    white-space: nowrap;
+}
+
+.talentos-paginacao--lista {
+    width: 100%;
+    margin-top: 0.35rem;
+}
+
+@media (max-width: 560px) {
+    .talento-linha {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .talento-linha-acao {
+        align-self: stretch;
+        width: 100%;
+    }
+}
+
 .equipamentos-card {
     background: linear-gradient(135deg, rgba(244, 233, 208, 0.7), rgba(232, 213, 176, 0.35));
     border: 2px solid var(--cor-dourada);

@@ -1898,41 +1898,37 @@ export class FichaPersonagemController {
             return;
         }
 
-        /* Cards diretos em #talentosList (já tem .equipamentos-lista-grid); evita grid aninhado */
+        /* Lista em linhas (#talentosList usa .talentos-lista-linhas no HTML) */
         container.innerHTML = `
-                ${talentos.map(tal => `
-                    <div class="item-card">
-                        <div class="item-card-header">
-                            <h4 class="item-card-title">${escapeHtml(tal.nome || tal.talento || 'N/A')}</h4>
-                            ${tal.secao || tal.section ? `<span class="item-card-badge">${escapeHtml(tal.secao || tal.section)}</span>` : ''}
-                        </div>
-                        
-                        <div class="item-card-body">
+                ${talentos.map((tal) => {
+                    const secaoTxt = String(tal.secao || tal.section || '').trim();
+                    const preRaw = tal.prerequisitos ?? tal.prerequisites;
+                    const preTxt =
+                        preRaw == null || String(preRaw).trim() === ''
+                            ? '—'
+                            : this._formatarPreRequisitos(preRaw);
+                    const nome = escapeHtml(tal.nome || tal.talento || 'N/A');
+                    return `
+                    <article class="talento-linha">
+                        <div class="talento-linha-conteudo">
+                            <div class="talento-linha-cabecalho">
+                                <span class="talento-linha-nome">${nome}</span>
+                                <span class="talento-linha-secao">${escapeHtml(secaoTxt || '—')}</span>
+                            </div>
                             ${tal.descricao ? `
-                                <div class="item-card-field">
-                                    <span class="item-card-label">Benefício</span>
-                                    <p class="item-card-value">${escapeHtml(tal.descricao)}</p>
-                                </div>
+                                <p class="talento-linha-beneficio"><span class="talento-linha-rotulo">Benefício:</span> ${escapeHtml(tal.descricao)}</p>
                             ` : ''}
-                            
-                            ${(tal.prerequisitos || tal.prerequisites) ? `
-                                <div class="item-card-field">
-                                    <span class="item-card-label">Pré-requisitos</span>
-                                    <p class="item-card-value">${escapeHtml(this._formatarPreRequisitos(tal.prerequisitos || tal.prerequisites))}</p>
-                                </div>
-                            ` : ''}
+                            <p class="talento-linha-pre"><span class="talento-linha-rotulo">Pré-requisitos:</span> ${escapeHtml(preTxt)}</p>
                         </div>
-                        
-                        <div class="item-card-footer">
-                            <button class="item-btn-primary" data-talento-id="${tal.id}">
-                                ➕ Adicionar
-                            </button>
-                        </div>
-                    </div>
-                `).join('')}
+                        <button type="button" class="talento-linha-acao item-btn-primary" data-talento-id="${tal.id}">
+                            ➕ Adicionar
+                        </button>
+                    </article>
+                `;
+                }).join('')}
                 
                 ${!this.talentosCarregados ? `
-                    <div class="talentos-paginacao">
+                    <div class="talentos-paginacao talentos-paginacao--lista">
                         <button id="btnCarregarMaisTalentos" class="btn-carregar-mais">
                             Carregar Mais Talentos
                         </button>
@@ -1940,7 +1936,7 @@ export class FichaPersonagemController {
                 ` : ''}
         `;
 
-        container.querySelectorAll('.item-btn-primary').forEach((btn) => {
+        container.querySelectorAll('.talento-linha-acao').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const talentoId = Number(btn.dataset.talentoId);
                 if (Number.isFinite(talentoId)) {

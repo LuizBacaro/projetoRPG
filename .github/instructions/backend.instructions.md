@@ -31,5 +31,5 @@ applyTo: "backend/**/*.py"
 
 - O startup `inicializar_talentos` so insere um **seed minimo** (~15 linhas) se a tabela estiver vazia; Neon em producao costuma ficar so com esse subconjunto.
 - O catálogo completo do LdJ esta em `talentos_importacao_limpo.json` na raiz do repo; desenvolvimento local costuma ter sido preenchido via esse arquivo ou import manual.
-- Para **alinhar producao** ao catálogo completo: `cd backend && DATABASE_URL=... python scripts/importar_talentos_catalogo_json.py` (upsert por nome).
+- Para **alinhar producao** ao catálogo completo: `cd backend && DATABASE_URL=... python scripts/importar_talentos_catalogo_json.py` (upsert por nome + fase opcional que copia benefício/seção do JSON para linhas do **seed** com nome antigo, via `MAPEAMENTO_SEED_PARA_JSON` no script).
 - Listagens de talentos devem usar **ordem estável** (ex.: `nome` ASC) para paginacao consistente entre SQLite e Postgres.
