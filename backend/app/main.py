@@ -225,6 +225,85 @@ async def startup_event():
 
 # ── Funções de Inicialização ─────────────────────────────────────────────────
 
+def _obter_revisoes_alembic_atuais() -> list[str]:
+    """
+    Lê os valores atuais de alembic_version no banco.
+    Retorna uma lista de revisões; se a tabela não existir, retorna lista vazia.
+    """
+    try:
+        with engine.connect() as conn:
+            resultado = conn.execute(text("SELECT version_num FROM alembic_version"))
+            return [row[0] for row in resultado.fetchall()]
+    except Exception:
+        return []
+
+
+def _revisao_e_ancestral(script, ancestor: str, descendant: str) -> bool:
+    """Verifica se 'ancestor' é ancestral de 'descendant' no grafo Alembic."""
+    if ancestor == descendant:
+        return True
+
+    visitadas = set()
+    pilha = [descendant]
+
+    while pilha:
+        atual = pilha.pop()
+        if atual in visitadas:
+            continue
+        visitadas.add(atual)
+
+        rev_obj = script.get_revision(atual)
+        if not rev_obj:
+            continue
+
+        down_rev = rev_obj.down_revision
+        if down_rev is None:
+            continue
+
+        if isinstance(down_rev, tuple):
+            pilha.extend([rev for rev in down_rev if rev is not None])
+        else:
+            pilha.append(down_rev)
+
+        if ancestor in visitadas:
+            return True
+
+    return False
+
+
+def _normalizar_alembic_multilinha(cfg, command) -> None:
+    """
+    Detecta múltiplas linhas em alembic_version e, se seguro, normaliza para o head.
+    """
+    revisoes = _obter_revisoes_alembic_atuais()
+    if len(revisoes) <= 1:
+        return
+
+    from alembic.script import ScriptDirectory
+
+    script = ScriptDirectory.from_config(cfg)
+    heads = script.get_heads()
+    if len(heads) != 1:
+        raise RuntimeError(
+            "Estado Alembic com várias cabeças no repositório. "
+            f"Heads detectados: {heads}."
+        )
+
+    head = heads[0]
+    if not all(_revisao_e_ancestral(script, rev, head) for rev in revisoes):
+        raise RuntimeError(
+            "Não foi possível normalizar o estado Alembic com várias revisões atuais. "
+            f"Revisões atuais: {revisoes}."
+        )
+
+    logger.warning(
+        "⚠️  Detectado estado Alembic multi-head em alembic_version: %s",
+        revisoes,
+    )
+    command.stamp(cfg, head)
+    logger.warning("✅ Alembic normalizado para head: %s", head)
+
+
 def _executar_alembic_migrations() -> None:
     """
     Executa as migrations do Alembic automaticamente no startup.
@@ -253,7 +332,10 @@ def _executar_alembic_migrations() -> None:
         cfg.set_main_option("sqlalchemy.url", database_url)
         
         logger.info(f"🔄 Executando migrations Alembic...")
-        
+
+        # Normalizar possíveis múltiplas linhas na tabela alembic_version
+        _normalizar_alembic_multilinha(cfg, command)
+
         # Executar upgrade até head
         try:
             command.upgrade(cfg, "head")
