@@ -12,6 +12,7 @@ from pathlib import Path
 import logging
 import unicodedata
 from sqlalchemy import inspect, text
+import os
 
 from .core.config import settings
 from .core.database import engine, Base, SessionLocal, get_db
@@ -224,20 +225,53 @@ async def startup_event():
 
 # ── Funções de Inicialização ─────────────────────────────────────────────────
 
+def _executar_alembic_migrations() -> None:
+    """
+    Executa as migrations do Alembic automaticamente no startup.
+    SRP: Garante que o schema esteja sempre atualizado.
+    """
+    try:
+        from alembic.config import Config
+        from alembic import command
+        
+        backend_root = Path(__file__).parent.parent
+        ini_path = backend_root / "alembic.ini"
+        
+        if not ini_path.exists():
+            logger.warning(f"⚠️  alembic.ini não encontrado em {ini_path} — pulando migrations")
+            return
+        
+        # Configurar Alembic
+        cfg = Config(str(ini_path))
+        database_url = os.environ.get("DATABASE_URL", "sqlite:///./rpg_arena.db")
+        cfg.set_main_option("sqlalchemy.url", database_url)
+        
+        # Executar upgrade até head
+        command.upgrade(cfg, "head")
+        logger.info("✅ Migrations do Alembic aplicadas com sucesso")
+        
+    except Exception as e:
+        logger.warning(f"⚠️  Erro ao executar migrations do Alembic: {str(e)}")
+        # Não falha o startup se as migrations falharem — SQLAlchemy create_all() ainda rodará
+        pass
+
+
 def _inicializar_banco(db) -> None:
     """
     SRP: Orquestra a inicialização completa do banco.
     Ordem importa:
-    1. Admin (dependência de tudo)
-    2. Condições (globais)
-    3. Perícias (globais)
-    4. Equipamentos (globais)
-    5. Combatentes (usam condições)
+    1. Migrations do Alembic (schema)
+    2. Admin (dependência de tudo)
+    3. Condições (globais)
+    4. Perícias (globais)
+    5. Equipamentos (globais)
+    6. Combatentes (usam condições)
 
     Args:
         db: Sessão do banco
     """
     passos = [
+        ("executar_alembic_migrations", _executar_alembic_migrations),
         ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
         ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
         ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
