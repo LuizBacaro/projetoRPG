@@ -43,8 +43,16 @@ MAPEAMENTO_SEED_PARA_JSON: dict[str, str | None] = {
 
 
 def default_json_path() -> Path:
-    """Raiz do repo / talentos_importacao_limpo.json (BASE_DIR = pasta backend)."""
-    return settings.BASE_DIR.parent / "talentos_importacao_limpo.json"
+    """
+    Preferência: raiz do repositório; fallback: pasta `backend/` (deploys que não incluem a raiz).
+    """
+    root = settings.BASE_DIR.parent / "talentos_importacao_limpo.json"
+    beside_backend = settings.BASE_DIR / "talentos_importacao_limpo.json"
+    if root.is_file():
+        return root
+    if beside_backend.is_file():
+        return beside_backend
+    return root
 
 
 def _trunc(s: str | None, max_len: int) -> str | None:
@@ -183,26 +191,51 @@ def desativar_talentos_fora_do_catalogo(db: "Session", nomes_validos: set[str]) 
     return removidos, avisos
 
 
-def seed_catalogo_inicial_vazio(db: "Session", json_path: Path | None = None) -> bool:
+def sincronizar_catalogo_talentos_desde_json(
+    db: "Session",
+    json_path: Path | None = None,
+    *,
+    remover_legado: bool = True,
+) -> bool:
     """
-    Se o banco não tem talentos, popula a partir do JSON (deploy novo / SQLite vazio).
-    Retorna True se populou.
+    Upsert completo a partir de `talentos_importacao_limpo.json` (gerado pela planilha LdJ).
+
+    Em cada startup do servidor alinha Neon/Render ao repositório, como o seed de equipamentos.
+    Opcionalmente remove (soft-delete) linhas ativas que não estão no JSON e não têm uso em fichas.
     """
     path = json_path or default_json_path()
     if not path.is_file():
-        logger.warning("Catálogo JSON não encontrado em %s — use seed mínimo legado em init_db.", path)
+        logger.warning("Catálogo JSON não encontrado em %s — talentos não sincronizados.", path)
         return False
+
     rows = load_rows_from_json(path)
     criados, atualizados = upsert_talentos_from_rows(db, rows)
-    enriquecidos, avisos = aplicar_mapeamento_seed_antigo(db, rows)
+    enriquecidos, avisos_map = aplicar_mapeamento_seed_antigo(db, rows)
+
+    removidos = 0
+    avisos_legado: list[str] = []
+    if remover_legado:
+        removidos, avisos_legado = desativar_talentos_fora_do_catalogo(db, nomes_catalogo(rows))
+
     db.commit()
     logger.info(
-        "Catálogo de talentos (JSON): %s criados, %s atualizados; mapeamento seed: %s",
+        "Catálogo talentos: +%s novos, %s atualizados; mapeamento seed: %s; legado removido: %s",
         criados,
         atualizados,
         enriquecidos,
+        removidos,
     )
-    for a in avisos:
-        logger.info("talentos catalog: %s", a)
-    print(f"✅ {criados + atualizados} talentos do catálogo JSON (novos: {criados}, atualizados: {atualizados})")
+    for a in avisos_map:
+        logger.debug("talentos mapeamento: %s", a)
+    for a in avisos_legado:
+        logger.info("talentos legado: %s", a)
+    print(
+        f"✅ Catálogo talentos (LdJ): {criados} novos, {atualizados} atualizados"
+        + (f", {removidos} legados ocultados" if removidos else "")
+    )
     return True
+
+
+def seed_catalogo_inicial_vazio(db: "Session", json_path: Path | None = None) -> bool:
+    """Compat: delega para sincronização completa (nome legado)."""
+    return sincronizar_catalogo_talentos_desde_json(db, json_path=json_path, remover_legado=True)

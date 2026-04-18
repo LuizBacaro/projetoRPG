@@ -48,13 +48,11 @@ description: >-
 
 ## Catálogo de talentos (LdJ)
 
-- Fonte canónica: **`talentos_importacao_limpo.json`** na raiz do repo (109+ entradas).
-- **Bases novas (vazias):** `inicializar_talentos` em `init_db.py` importa esse JSON (via `talentos_catalog_seed.py`).
-- **Produção já com seed antigo (15 linhas):** não é sobrescrita no startup. No servidor (Neon/Render), a partir de `backend/`:
-  - `python scripts/importar_talentos_catalogo_json.py` — upsert por nome;
-  - `python scripts/importar_talentos_catalogo_json.py --remover-legado` — idem + soft-delete de linhas legadas **não usadas** em fichas;
-  - ou `python scripts/desativar_talentos_fora_catalogo.py` após o import.
-- Listagem na API: `order_by(nome)` — a primeira página começa por ordem alfabética do nome (ex. “Acelerar Magia” antes de “Arma…”).
+- **Planilha:** `Tabela_5-1_Talentos_LdJ.xlsx` → gerar JSON com `python processar_talentos_excel.py` → **`talentos_importacao_limpo.json`** (commit no git).
+- **Startup:** `inicializar_talentos` **sincroniza sempre** com esse JSON (upsert + soft-delete de legado não usado em fichas), como equipamentos. Após deploy no Render, reiniciar o serviço aplica o catálogo novo.
+- **Caminho do JSON:** raiz do repo ou, em alternativa, `backend/talentos_importacao_limpo.json`.
+- **CLI manual (opcional):** `python scripts/importar_talentos_catalogo_json.py [--remover-legado]`.
+- Listagem na API: `order_by(nome)`.
 
 ## Referência rápida de ficheiros
 

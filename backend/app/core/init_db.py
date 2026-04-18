@@ -94,29 +94,30 @@ def criar_admin_padrao(db: Session) -> None:
 
 def inicializar_talentos(db: Session) -> None:
     """
-    Popula o catálogo de talentos (LdJ) a partir de `talentos_importacao_limpo.json`
-    na raiz do repositório, se o banco ainda estiver vazio.
+    Sincroniza o catálogo LdJ com `talentos_importacao_limpo.json` (raiz do repo),
+    gerado por `processar_talentos_excel.py` a partir de `Tabela_5-1_Talentos_LdJ.xlsx`.
 
-    Bases já povoadas com o seed antigo (15 linhas) não são alteradas aqui —
-    use `python scripts/importar_talentos_catalogo_json.py` e
-    `python scripts/desativar_talentos_fora_catalogo.py` no Neon/Render.
+    Em cada startup: upsert por nome + remove legado fora do JSON (soft-delete se não usado em fichas).
+    Se o JSON não existir no deploy, usa seed mínimo só quando a tabela está vazia.
     """
     from datetime import datetime, timezone
 
     from ..models.talento import Talento
-    from .talentos_catalog_seed import default_json_path, seed_catalogo_inicial_vazio
-
-    count = db.query(Talento).filter(Talento.deleted_at.is_(None)).count()
-    if count > 0:
-        logger.info("✅ Talentos já existem (%s). Pulando seed inicial do catálogo.", count)
-        return
+    from .talentos_catalog_seed import default_json_path, sincronizar_catalogo_talentos_desde_json
 
     json_path = default_json_path()
     if json_path.is_file():
-        if seed_catalogo_inicial_vazio(db, json_path=json_path):
-            return
+        sincronizar_catalogo_talentos_desde_json(db, json_path=json_path, remover_legado=True)
+        return
 
-    # Fallback: seed mínimo só se o JSON não estiver no deploy
+    # Fallback: seed mínimo só se o JSON não estiver no deploy e tabela vazia
+    count = db.query(Talento).filter(Talento.deleted_at.is_(None)).count()
+    if count > 0:
+        logger.warning(
+            "Sem talentos_importacao_limpo.json e já existem %s talentos — não alterando.", count
+        )
+        return
+
     logger.warning("Catálogo JSON ausente em %s — usando seed mínimo de desenvolvimento.", json_path)
 
     TALENTOS_PADRAO = [
