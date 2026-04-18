@@ -1898,8 +1898,8 @@ export class FichaPersonagemController {
             return;
         }
 
+        /* Cards diretos em #talentosList (já tem .equipamentos-lista-grid); evita grid aninhado */
         container.innerHTML = `
-            <div class="equipamentos-lista-grid">
                 ${talentos.map(tal => `
                     <div class="item-card">
                         <div class="item-card-header">
@@ -1932,13 +1932,12 @@ export class FichaPersonagemController {
                 `).join('')}
                 
                 ${!this.talentosCarregados ? `
-                    <div class="talentos-paginacao" style="grid-column: 1 / -1;">
+                    <div class="talentos-paginacao">
                         <button id="btnCarregarMaisTalentos" class="btn-carregar-mais">
                             Carregar Mais Talentos
                         </button>
                     </div>
                 ` : ''}
-            </div>
         `;
 
         container.querySelectorAll('.item-btn-primary').forEach((btn) => {

@@ -1,176 +1,226 @@
 """
-Script para processar planilha Excel de equipamentos D&D 3.5
-Gera seed atualizado com novos campos da tabela 7-5
+Script para processar planilha Excel de equipamentos D&D 3.5 (Tabela 7-5).
+Gera backend/scripts/seed_equipamentos.py com EQUIPAMENTOS_DADOS e seed_equipamentos().
+Usa openpyxl (sem dependência de pandas).
 """
 
-import pandas as pd
-import json
+from __future__ import annotations
+
+import re
 from pathlib import Path
 
-def processar_planilha_equipamentos():
-    """Processa a planilha Excel e retorna dados estruturados"""
+from openpyxl import load_workbook
 
-    # Caminho da planilha
-    planilha_path = Path('Tabela_7-5_Armas_EQUIPAMENTOS.xlsx')
+PLANILHA_PATH = Path("Tabela_7-5_Armas_EQUIPAMENTOS.xlsx")
+OUTPUT_PATH = Path("backend/scripts/seed_equipamentos.py")
 
-    if not planilha_path.exists():
-        raise FileNotFoundError(f"Planilha não encontrada: {planilha_path}")
 
-    # Ler planilha (header=3 para começar da linha 4, 0-indexed)
-    df = pd.read_excel(planilha_path, header=3)
+def _cell(row: tuple, idx: int):
+    if idx >= len(row):
+        return None
+    v = row[idx]
+    if v is None:
+        return None
+    s = str(v).strip()
+    return s if s else None
 
-    # Filtrar linhas válidas
-    df_clean = df.dropna(subset=['Arma']).copy()
 
-    # Remover linhas de notas
-    df_clean = df_clean[~df_clean['Categoria'].str.contains(r'^[¹²³⁴⁵]', na=False, regex=True)]
-    df_clean = df_clean[~df_clean['Categoria'].str.contains('Notas da tabela', na=False)]
-    df_clean = df_clean[~df_clean['Arma'].str.contains(r'^[¹²³⁴⁵]', na=False, regex=True)]
+def processar_planilha_equipamentos() -> list[dict]:
+    """Lê a planilha (cabeçalho na linha 4) e retorna lista de dicts compatível com o modelo Equipamento."""
+    if not PLANILHA_PATH.exists():
+        raise FileNotFoundError(f"Planilha não encontrada: {PLANILHA_PATH}")
 
-    # Remover linhas completamente vazias
-    df_clean = df_clean.dropna(how='all')
+    wb = load_workbook(PLANILHA_PATH, data_only=True)
+    ws = wb.active
 
-    print(f"📊 Processando {len(df_clean)} equipamentos válidos")
+    header_row = 4
+    rows = list(ws.iter_rows(min_row=header_row, max_row=header_row, values_only=True))[0]
+    headers = [str(c).strip() if c is not None else "" for c in rows]
 
-    # Converter para lista de dicionários
-    equipamentos = []
-    for _, row in df_clean.iterrows():
+    # Índices esperados (mesma ordem do Excel atual)
+    idx = {name: i for i, name in enumerate(headers)}
+
+    def col(name: str) -> int:
+        if name not in idx:
+            raise KeyError(f"Coluna '{name}' não encontrada. Cabeçalhos: {headers}")
+        return idx[name]
+
+    equipamentos: list[dict] = []
+
+    for row in ws.iter_rows(min_row=header_row + 1, values_only=True):
+        arma = _cell(row, col("Arma"))
+        if not arma:
+            continue
+
+        categoria = _cell(row, col("Categoria"))
+        if categoria and re.search(r"^[¹²³⁴⁵]", categoria):
+            continue
+        if categoria and "Notas da tabela" in categoria:
+            continue
+        if re.search(r"^[¹²³⁴⁵]", arma):
+            continue
+
+        def norm(v: str | None, empty_as_none: bool = True) -> str | None:
+            if v is None or v == "—":
+                return None if empty_as_none else v
+            return v
+
         equipamento = {
-            'nome': str(row['Arma']).strip(),
-            'categoria': str(row['Categoria']).strip() if pd.notna(row['Categoria']) else None,
-            'subcategoria': str(row['Subcategoria']).strip() if pd.notna(row['Subcategoria']) and row['Subcategoria'] != '—' else None,
-            'custo': str(row['Custo']).strip() if pd.notna(row['Custo']) and row['Custo'] != '—' else None,
-            'dano_pequeno': str(row['Dano (P)']).strip() if pd.notna(row['Dano (P)']) and row['Dano (P)'] != '—' else None,
-            'dano_medio': str(row['Dano (M)']).strip() if pd.notna(row['Dano (M)']) and row['Dano (M)'] != '—' else None,
-            'critico': str(row['Crítico']).strip() if pd.notna(row['Crítico']) and row['Crítico'] != '—' else None,
-            'alcance_incremento': str(row['Alcance / incremento']).strip() if pd.notna(row['Alcance / incremento']) and row['Alcance / incremento'] != '—' else None,
-            'peso': str(row['Peso']).strip() if pd.notna(row['Peso']) and row['Peso'] != '—' else None,
-            'tipo_dano': str(row['Tipo de dano']).strip() if pd.notna(row['Tipo de dano']) and row['Tipo de dano'] != '—' else None,
-            'pagina_referencia': 'PHB p.120-126',  # Página padrão da tabela de armas
-            'ativo': True
+            "nome": arma,
+            "categoria": norm(categoria),
+            "subcategoria": norm(_cell(row, col("Subcategoria"))),
+            "custo": norm(_cell(row, col("Custo"))),
+            "dano_pequeno": norm(_cell(row, col("Dano (P)"))),
+            "dano_medio": norm(_cell(row, col("Dano (M)"))),
+            "critico": norm(_cell(row, col("Crítico"))),
+            "alcance_incremento": norm(_cell(row, col("Alcance / incremento"))),
+            "peso": norm(_cell(row, col("Peso"))),
+            "tipo_dano": norm(_cell(row, col("Tipo de dano"))),
+            "pagina_referencia": "PHB p.120-126",
+            "ativo": True,
         }
         equipamentos.append(equipamento)
 
+    print(f"📊 Processando {len(equipamentos)} equipamentos válidos")
     return equipamentos
 
-def gerar_seed_script(equipamentos):
-    """Gera o script de seed atualizado"""
 
-    # Template do script
-    template = '''"""
-Seed de equipamentos D&D 3.5 atualizado com dados da Tabela 7-5
-Gerado automaticamente a partir da planilha Excel
-"""
+def _py_repr_dict(d: dict) -> str:
+    """Gera literal Python para um dict (strings com repr)."""
+    lines = ["    {"]
+    for key, value in d.items():
+        if value is None:
+            lines.append(f"        {key!r}: None,")
+        elif isinstance(value, bool):
+            lines.append(f"        {key!r}: {value},")
+        elif isinstance(value, str):
+            lines.append(f"        {key!r}: {value!r},")
+        else:
+            lines.append(f"        {key!r}: {value},")
+    lines.append("    },")
+    return "\n".join(lines)
 
-EQUIPAMENTOS_PADRAO = [
-{equipamentos_list}
-]
 
-EQUIPAMENTOS_DADOS = [
-{equipamentos_dados}
-]
+def gerar_seed_script(equipamentos: list[dict]) -> str:
+    blocos = "\n".join(_py_repr_dict(eq) for eq in equipamentos)
 
-def seed_equipamentos(db):
+    # Template estático (sem f-string) para não confundir chaves com interpolação.
+    return (
+        '"""\n'
+        "Seed de equipamentos D&D 3.5 — Tabela 7-5 (armas).\n"
+        "Gerado automaticamente por processar_equipamentos_excel.py a partir da planilha Excel.\n"
+        "Não editar EQUIPAMENTOS_DADOS à mão; regenere o arquivo com o script.\n"
+        '"""\n\n'
+        "from datetime import datetime, timezone\n\n"
+        "EQUIPAMENTOS_DADOS = [\n"
+        f"{blocos}\n"
+        "]\n\n"
+        r'''
+def _montar_descricao(eq: dict) -> str | None:
+    """Resumo curto para o campo legado descricao (UI / listagens)."""
+    partes = []
+    if eq.get("categoria"):
+        partes.append(eq["categoria"])
+    if eq.get("subcategoria"):
+        partes.append(eq["subcategoria"])
+    if eq.get("custo"):
+        partes.append(f"Custo: {eq['custo']}")
+    if eq.get("dano_medio"):
+        partes.append(f"Dano (M): {eq['dano_medio']}")
+    if eq.get("tipo_dano"):
+        partes.append(eq["tipo_dano"])
+    return "; ".join(partes) if partes else None
+
+
+def seed_equipamentos(db) -> None:
     """
-    Popula a tabela de equipamentos com dados da Tabela 7-5.
+    Sincroniza o catálogo com a Tabela 7-5.
+
+    - Remove entradas legadas (sem categoria) não usadas em equipamentos_jogador.
+    - Para cada item da planilha: insere ou atualiza por nome (entre ativos).
     """
-    from app.models.equipamento import Equipamento
-    from datetime import datetime, timezone
+    from app.models.equipamento import Equipamento, EquipamentoJogador
 
-    # Verificar se já existem equipamentos
-    count = db.query(Equipamento).count()
-    if count > 0:
-        print(f"✅ Equipamentos já existem ({{count}}). Pulando seed.")
-        return
+    usados = {
+        row[0]
+        for row in db.query(EquipamentoJogador.equipamento_id).distinct().all()
+        if row[0] is not None
+    }
 
-    print("📦 Iniciando seed de equipamentos da Tabela 7-5...")
+    legado = (
+        db.query(Equipamento)
+        .filter(Equipamento.deleted_at.is_(None), Equipamento.categoria.is_(None))
+        .all()
+    )
+    removidos = 0
+    for eq in legado:
+        if eq.id not in usados:
+            db.delete(eq)
+            removidos += 1
+    if removidos:
+        db.flush()
+        print(f"🧹 Removidos {removidos} equipamentos legados (sem categoria, não referenciados).")
 
-    for equipamento_data in EQUIPAMENTOS_DADOS:
-        equipamento = Equipamento(
-            nome=equipamento_data['nome'],
-            categoria=equipamento_data.get('categoria'),
-            subcategoria=equipamento_data.get('subcategoria'),
-            custo=equipamento_data.get('custo'),
-            dano_pequeno=equipamento_data.get('dano_pequeno'),
-            dano_medio=equipamento_data.get('dano_medio'),
-            critico=equipamento_data.get('critico'),
-            alcance_incremento=equipamento_data.get('alcance_incremento'),
-            peso=equipamento_data.get('peso'),
-            tipo_dano=equipamento_data.get('tipo_dano'),
-            pagina_referencia=equipamento_data.get('pagina_referencia'),
-            ativo=equipamento_data.get('ativo', True),
-            criado_em=datetime.now(timezone.utc)
+    inseridos = 0
+    atualizados = 0
+
+    for data in EQUIPAMENTOS_DADOS:
+        nome = data["nome"]
+        descricao = _montar_descricao(data)
+        row = (
+            db.query(Equipamento)
+            .filter(Equipamento.nome == nome, Equipamento.deleted_at.is_(None))
+            .first()
         )
-        db.add(equipamento)
+        campos = {
+            "descricao": descricao,
+            "categoria": data.get("categoria"),
+            "subcategoria": data.get("subcategoria"),
+            "custo": data.get("custo"),
+            "dano_pequeno": data.get("dano_pequeno"),
+            "dano_medio": data.get("dano_medio"),
+            "critico": data.get("critico"),
+            "alcance_incremento": data.get("alcance_incremento"),
+            "peso": data.get("peso"),
+            "tipo_dano": data.get("tipo_dano"),
+            "pagina_referencia": data.get("pagina_referencia"),
+            "ativo": data.get("ativo", True),
+        }
+        if row:
+            for k, v in campos.items():
+                setattr(row, k, v)
+            atualizados += 1
+        else:
+            db.add(
+                Equipamento(
+                    nome=nome,
+                    **campos,
+                    criado_em=datetime.now(timezone.utc),
+                )
+            )
+            inseridos += 1
 
     db.commit()
-    print(f"✅ {{len(EQUIPAMENTOS_DADOS)}} equipamentos inseridos com sucesso!")
+    try:
+        from app.core.config import settings
+        from app.core.catalog_cache import catalog_cache
+
+        if settings.CACHE_ENABLED:
+            catalog_cache.invalidate_prefix("equipamentos:")
+    except Exception:
+        pass
+    print(
+        f"✅ Catálogo Tabela 7-5 sincronizado: +{inseridos} inseridos, "
+        f"{atualizados} atualizados (total planilha: {len(EQUIPAMENTOS_DADOS)})."
+    )
 '''
-
-    # Gerar lista formatada para EQUIPAMENTOS_PADRAO (formato antigo)
-    equipamentos_padrao = []
-    for eq in equipamentos[:10]:  # Apenas primeiros 10 para compatibilidade
-        nome = eq['nome']
-        desc_parts = []
-        if eq.get('categoria'):
-            desc_parts.append(f"Categoria: {eq['categoria']}")
-        if eq.get('custo'):
-            desc_parts.append(f"Custo: {eq['custo']}")
-        if eq.get('dano_medio'):
-            desc_parts.append(f"Dano: {eq['dano_medio']}")
-        descricao = "; ".join(desc_parts) if desc_parts else "Equipamento D&D 3.5"
-        pag_ref = eq.get('pagina_referencia', 'PHB p.120-126')
-
-        equipamentos_padrao.append(f"    (\"{nome}\", \"{descricao}\", \"{pag_ref}\"),")
-
-    equipamentos_padrao_str = "\n".join(equipamentos_padrao)
-
-    # Gerar lista completa para EQUIPAMENTOS_DADOS
-    equipamentos_dados = []
-    for eq in equipamentos:
-        eq_str = "    {\n"
-        for key, value in eq.items():
-            if value is None:
-                eq_str += f"        '{key}': None,\n"
-            elif isinstance(value, str):
-                eq_str += f"        '{key}': \"{value}\",\n"
-            else:
-                eq_str += f"        '{key}': {value},\n"
-        eq_str = eq_str.rstrip(',\n') + "\n    },"
-        equipamentos_dados.append(eq_str)
-
-    equipamentos_dados_str = "\n".join(equipamentos_dados)
-
-    # Preencher template
-    script_content = template.format(
-        equipamentos_list=equipamentos_padrao_str,
-        equipamentos_dados=equipamentos_dados_str
     )
 
-    return script_content
 
 if __name__ == "__main__":
-    try:
-        # Processar planilha
-        equipamentos = processar_planilha_equipamentos()
-
-        # Gerar script de seed
-        seed_script = gerar_seed_script(equipamentos)
-
-        # Salvar script
-        output_path = Path('backend/scripts/seed_equipamentos_atualizado.py')
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(seed_script)
-
-        print(f"✅ Script de seed gerado: {output_path}")
-        print(f"📊 {len(equipamentos)} equipamentos processados")
-
-        # Mostrar preview
-        print("\n🔍 Preview dos primeiros 3 equipamentos:")
-        for i, eq in enumerate(equipamentos[:3]):
-            print(f"  {i+1}. {eq['nome']} ({eq.get('categoria', 'N/A')})")
-
-    except Exception as e:
-        print(f"❌ Erro: {e}")
-        import traceback
-        traceback.print_exc()
+    equipamentos = processar_planilha_equipamentos()
+    if not equipamentos:
+        raise SystemExit("Nenhum equipamento válido na planilha.")
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_PATH.write_text(gerar_seed_script(equipamentos), encoding="utf-8")
+    print(f"✅ Gerado: {OUTPUT_PATH} ({len(equipamentos)} itens)")

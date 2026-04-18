@@ -1422,7 +1422,8 @@ body::before {
     to { transform: rotate(360deg); }
 }
 
-.equipamentos-lista {
+/* Lista em coluna só quando NÃO for grid (evita empate de especificidade com .equipamentos-lista-grid) */
+.equipamentos-lista:not(.equipamentos-lista-grid) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -1934,14 +1935,34 @@ body::before {
     transform: scale(0.95);
 }
 
-/* ── MELHORIA: Lista de Talentos em Grid ── */
+/* ── Grid de cards no modal (talentos / armaduras): especificidade dupla ──
+   O mesmo elemento costuma ter equipamentos-lista + equipamentos-lista-grid.
+   Sem o seletor composto, .equipamentos-lista { flex } empatava com .equipamentos-lista-grid
+   e o último no arquivo nem sempre vencia (cache / ordem de folhas). */
 
-.equipamentos-lista-grid {
+.equipamentos-lista.equipamentos-lista-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
     padding: 0;
     width: 100%;
+    max-width: 100%;
+    align-content: start;
+    box-sizing: border-box;
+}
+
+.equipamentos-lista.equipamentos-lista-grid > .item-card {
+    min-width: 0;
+}
+
+.equipamentos-lista.equipamentos-lista-grid > .talentos-paginacao {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+    .equipamentos-lista.equipamentos-lista-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .equipamentos-card {
