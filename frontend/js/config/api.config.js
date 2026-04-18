@@ -1,7 +1,9 @@
-// Mesmo domínio com e sem www — evita BASE_URL diferente entre apex e www (divergência vs local).
+// Vercel @vercel/static legado não aplica rewrites para /api — a API vai direto ao Render (CORS em ALLOWED_ORIGINS).
 var _h = window.location.hostname;
 var IS_PRODUCTION = _h === 'arena-de-combate-rpg.com.br' || _h === 'www.arena-de-combate-rpg.com.br';
-var BASE_URL = IS_PRODUCTION ? '' : window.location.origin;
+var USE_RENDER_API_ORIGIN = IS_PRODUCTION || _h.endsWith('.vercel.app');
+var RENDER_API_ORIGIN = 'https://projetorpg-7ih3.onrender.com';
+var BASE_URL = USE_RENDER_API_ORIGIN ? RENDER_API_ORIGIN : window.location.origin;
 
 var API_CONFIG = {
     BASE_URL: BASE_URL,

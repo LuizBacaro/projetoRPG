@@ -7,7 +7,9 @@
 const _hostname = window.location.hostname;
 const IS_PRODUCTION =
     _hostname === 'arena-de-combate-rpg.com.br' || _hostname === 'www.arena-de-combate-rpg.com.br';
-const BASE_URL = IS_PRODUCTION ? '' : window.location.origin;
+const USE_RENDER_API_ORIGIN = IS_PRODUCTION || _hostname.endsWith('.vercel.app');
+const RENDER_API_ORIGIN = 'https://projetorpg-7ih3.onrender.com';
+const BASE_URL = USE_RENDER_API_ORIGIN ? RENDER_API_ORIGIN : window.location.origin;
 
 const API_CONFIG = {
     BASE_URL: BASE_URL,
