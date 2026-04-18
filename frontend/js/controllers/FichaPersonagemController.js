@@ -1777,24 +1777,36 @@ export class FichaPersonagemController {
             return;
         }
 
+        // Usar layout de cards em grid como os equipamentos no modal
         lista.innerHTML = `
-            <div class="ficha-talentos-tabela">
-                <div class="ficha-talento-header">
-                    <span>Talento</span>
-                    <span>Descrição</span>
-                    <span>Pág. Ref</span>
-                    <span>Ação</span>
-                </div>
-                <div class="ficha-talentos-lista-items">
-                    ${talentos.map(tal => `
-                        <div class="ficha-talento-linha">
-                            <span class="ficha-talento-nome">${escapeHtml(tal.nome)}</span>
-                            <span class="ficha-talento-desc">${escapeHtml(tal.descricao) || '—'}</span>
-                            <span class="ficha-talento-pag">${escapeHtml(tal.pagina_referencia) || '—'}</span>
+            <div class="ficha-talentos-grid">
+                ${talentos.map(tal => `
+                    <div class="ficha-talento-card">
+                        <div class="ficha-talento-card-header">
+                            <h4 class="ficha-talento-card-title">${escapeHtml(tal.nome)}</h4>
+                        </div>
+                        
+                        <div class="ficha-talento-card-body">
+                            ${tal.descricao ? `
+                                <div class="ficha-talento-card-field">
+                                    <span class="ficha-talento-card-label">Benefício</span>
+                                    <p class="ficha-talento-card-value">${escapeHtml(tal.descricao)}</p>
+                                </div>
+                            ` : ''}
+                            
+                            ${tal.pagina_referencia ? `
+                                <div class="ficha-talento-card-field">
+                                    <span class="ficha-talento-card-label">Página</span>
+                                    <p class="ficha-talento-card-value">${escapeHtml(tal.pagina_referencia)}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="ficha-talento-card-footer">
                             <button class="btn-deletar-tal" data-tal-id="${tal.id}" data-tal-nome="${escapeHtml(tal.nome)}" title="Deletar ${escapeHtml(tal.nome)}">🗑️</button>
                         </div>
-                    `).join('')}
-                </div>
+                    </div>
+                `).join('')}
             </div>
         `;
 
