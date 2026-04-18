@@ -72,9 +72,12 @@ app.add_middleware(
     allow_origins=_origins if not _allow_all else ["*"],
     allow_credentials=not _allow_all,  # credentials incompatível com wildcard
     allow_methods=["*"],
+    # Incluir If-Match: a Arena envia em POST de combate; sem isto o preflight CORS falha (400) em produção.
     allow_headers=[
         "Content-Type",
-        "Authorization"
+        "Authorization",
+        "If-Match",
+        "If-None-Match",
     ],
     expose_headers=["Content-Length"],
     max_age=600,

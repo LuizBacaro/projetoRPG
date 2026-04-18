@@ -12,6 +12,7 @@ Este `AGENTS.md` existe como resumo operacional e guia de uso para o time.
 - Priorizar mudancas pequenas, de causa raiz e com baixo risco de regressao.
 - Antes de implementar, ler contexto em [README.md](README.md) e instrucoes aplicaveis em [.github/instructions](.github/instructions).
 - Em tarefas que toquem arquitetura, deploy, dados, schema ou decisoes historicas, consultar [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md).
+- Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill do projeto em [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md) — habilite essa skill no Cursor para o agente carregar esse contexto.
 
 ## Agentes
 

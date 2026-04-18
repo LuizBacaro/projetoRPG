@@ -72,6 +72,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
 
+        # Preflight CORS não deve contar no limite nem receber 429 sem headers CORS (browser bloqueia a rota).
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         # Não limita arquivos estáticos e docs.
         if not path.startswith("/api/"):
             return await call_next(request)
