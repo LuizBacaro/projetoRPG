@@ -13,6 +13,8 @@
     { "src": "/css/(.*)",      "dest": "/frontend/css/$1" },
     { "src": "/js/(.*)",       "dest": "/frontend/js/$1" },
     { "src": "/sw.js",         "dest": "/frontend/sw.js" },
+    { "src": "/api/(.*)",      "dest": "https://projetorpg-7ih3.onrender.com/api/$1" },
+    { "src": "/health",        "dest": "https://projetorpg-7ih3.onrender.com/health" },
     { "src": "/(.*)",          "dest": "/frontend/$1" }
   ]
 }

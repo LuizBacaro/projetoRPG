@@ -28,7 +28,8 @@ export class TalentoService {
      */
     async listarTalentos(skip = 0, limit = 100) {
         try {
-            const url = `${this.baseUrl}?skip=${skip}&limit=${limit}`;
+            // Barra final evita redirect 307 do FastAPI (/talentos → /talentos/) em alguns proxies.
+            const url = `${getApiUrl('/talentos/')}?skip=${skip}&limit=${limit}`;
 
             const response = await fetch(url, {
                 headers: {

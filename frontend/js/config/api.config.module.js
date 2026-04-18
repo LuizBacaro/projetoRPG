@@ -4,7 +4,9 @@
  * SRP: Exportar apenas para módulos
  */
 
-const IS_PRODUCTION = window.location.hostname === 'arena-de-combate-rpg.com.br';
+const _hostname = window.location.hostname;
+const IS_PRODUCTION =
+    _hostname === 'arena-de-combate-rpg.com.br' || _hostname === 'www.arena-de-combate-rpg.com.br';
 const BASE_URL = IS_PRODUCTION ? '' : window.location.origin;
 
 const API_CONFIG = {

@@ -1,4 +1,6 @@
-var IS_PRODUCTION = window.location.hostname === 'arena-de-combate-rpg.com.br';
+// Mesmo domínio com e sem www — evita BASE_URL diferente entre apex e www (divergência vs local).
+var _h = window.location.hostname;
+var IS_PRODUCTION = _h === 'arena-de-combate-rpg.com.br' || _h === 'www.arena-de-combate-rpg.com.br';
 var BASE_URL = IS_PRODUCTION ? '' : window.location.origin;
 
 var API_CONFIG = {
