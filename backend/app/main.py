@@ -247,6 +247,7 @@ def _inicializar_banco(db) -> None:
         ("seed_pericias", lambda: _seed_pericias(db)),
         ("seed_pericias_classes", lambda: _seed_pericias_classes(db)),
         ("inicializar_equipamentos", lambda: inicializar_equipamentos(db)),
+        ("seed_armaduras_protecao", lambda: _seed_armaduras_protecao(db)),
         ("inicializar_talentos", lambda: inicializar_talentos(db)),
         ("seed_combatentes", lambda: _seed_combatentes(db)),
     ]
@@ -471,6 +472,30 @@ def _seed_pericias(db) -> None:
         db.rollback()
         logger.error(f"❌ Erro ao popular perícias: {str(e)}")
         print(f"❌ Erro ao popular perícias: {str(e)}")
+        raise
+
+
+def _seed_armaduras_protecao(db) -> None:
+    """
+    Popula catálogo de armaduras/escudos da Tabela 7-6 se estiver vazio.
+    """
+    from .models.armadura_protecao import ArmaduraProtecao
+    from scripts.seed_armaduras_protecao import seed_armaduras_protecao
+
+    try:
+        count = db.query(ArmaduraProtecao).count()
+        if count > 0:
+            logger.info("✅ %s armaduras/proteções já existem no banco", count)
+            print(f"✅ {count} armaduras/proteções já existem no banco de dados")
+            return
+
+        logger.info("🔄 Populando armaduras/proteções (Tabela 7-6)...")
+        print("🔄 Populando banco com armaduras/proteções da Tabela 7-6...")
+        seed_armaduras_protecao(db)
+    except Exception as e:
+        db.rollback()
+        logger.error("❌ Erro ao popular armaduras/proteções: %s", str(e))
+        print(f"❌ Erro ao popular armaduras/proteções: {str(e)}")
         raise
 
 
