@@ -1436,8 +1436,7 @@ body::before {
     cursor: pointer;
     transition: all 0.15s;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     gap: 0.5rem;
 }
 
@@ -1451,7 +1450,15 @@ body::before {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.3rem;
+}
+
+.equipamento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .equipamento-nome {
@@ -1459,17 +1466,28 @@ body::before {
     color: var(--cor-madeira);
     font-size: 0.85rem;
     font-family: var(--fonte-titulo);
+    margin: 0;
+    flex: 1;
 }
 
 .equipamento-desc {
     font-size: 0.7rem;
     color: var(--cor-tinta-suave);
+    line-height: 1.3;
 }
 
 .equipamento-pag {
     font-size: 0.65rem;
     color: var(--cor-tinta-suave);
     font-style: italic;
+}
+
+.equipamento-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
 }
 
 .equipamento-btn-adicionar {
@@ -1482,8 +1500,32 @@ body::before {
     font-family: var(--fonte-titulo);
     font-size: 0.7rem;
     font-weight: 700;
-    transition: background 0.15s;
+    transition: all 0.15s;
     white-space: nowrap;
+    align-self: flex-end;
+}
+
+.equipamento-btn-adicionar:hover {
+    background: #2a7a3a;
+    box-shadow: 0 2px 6px rgba(42, 122, 58, 0.3);
+}
+
+.equipamento-btn-deletar {
+    background: var(--cor-vermelho, #c44536);
+    border: none;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-weight: 700;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.equipamento-btn-deletar:hover {
+    background: #a63a28;
+    box-shadow: 0 2px 6px rgba(196, 69, 54, 0.3);
 }
 
 .equipamento-detalhes {
@@ -1873,79 +1915,88 @@ body::before {
    ────────────────────────────────────────────────────────────── */
 
 .talento-card {
-    background: linear-gradient(135deg, rgba(244, 233, 208, 0.4), rgba(232, 213, 176, 0.2));
-    border: 2px solid var(--cor-dourada);
-    border-radius: 8px;
-    padding: 1.2rem;
-    transition: all 0.2s ease;
+    padding: 0.8rem;
+    background: rgba(92,58,30,0.08);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-    box-shadow: 0 2px 8px rgba(92, 58, 30, 0.1);
-    position: relative;
+    gap: 0.5rem;
 }
 
 .talento-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(92, 58, 30, 0.15);
-    background: linear-gradient(135deg, rgba(244, 233, 208, 0.6), rgba(232, 213, 176, 0.35));
-    border-color: #d4a574;
+    background: rgba(92,58,30,0.14);
+    border-color: var(--cor-dourada);
+    box-shadow: 0 2px 8px rgba(201,168,76,0.2);
 }
 
 .talento-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 0.8rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 2px solid var(--cor-dourada);
 }
 
 .talento-nome {
     margin: 0;
-    font-size: 1.14rem;
-    font-weight: 800;
-    color: var(--cor-tinta);
-    flex: 1 1 auto;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-size: 0.85rem;
+    font-family: var(--fonte-titulo);
+    flex: 1;
     line-height: 1.25;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .talento-secao {
     display: inline-block;
     background: var(--cor-dourada);
     color: var(--cor-tinta);
-    padding: 0.35rem 0.8rem;
-    border-radius: 12px;
-    font-size: 0.72rem;
-    font-weight: 800;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.3px;
     white-space: nowrap;
     border: 1px solid #a87d30;
-    box-shadow: 0 2px 4px rgba(92, 58, 30, 0.2);
-    margin-top: 0.2rem;
+    box-shadow: 0 1px 2px rgba(92, 58, 30, 0.15);
 }
 
 .talento-info {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin: 0.5rem 0;
+    gap: 0.3rem;
+    margin: 0;
     flex: 1;
 }
 
 .talento-card .equipamentos-btn-adicionar {
     align-self: flex-end;
-    margin-top: 0.5rem;
+    margin-top: 0.3rem;
 }
 
 .talento-campo {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.2rem;
+}
+
+.talento-label {
+    font-size: 0.65rem;
+    color: var(--cor-tinta-suave);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.talento-valor {
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+    line-height: 1.3;
+    margin: 0;
 }
 
 .talento-label {

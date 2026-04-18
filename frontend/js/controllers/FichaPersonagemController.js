@@ -1377,15 +1377,36 @@ export class FichaPersonagemController {
         }
 
         lista.innerHTML = itens.map((item) => `
-            <div class="equipamento-item">
-                <div class="equipamento-info">
-                    <div class="equipamento-nome">${escapeHtml(item.nome)}</div>
-                    <div class="equipamento-desc">Tipo: ${escapeHtml(item.tipo || '—')} • Bônus CA: ${Number(item.bonus_ca || 0) >= 0 ? '+' : ''}${Number(item.bonus_ca || 0)}</div>
-                    <div class="equipamento-desc">DES Máx: ${escapeHtml(item.des_max || '—')} • Penalidade: ${Number(item.penalidade || 0)} • Falha Arcana: ${escapeHtml(item.falha_arcana || '—')}</div>
-                    <div class="equipamento-pag">Deslocamento: ${escapeHtml(item.deslocamento || '—')} • Peso: ${item.peso ?? '—'}</div>
-                    <div class="equipamento-desc">${escapeHtml(item.propriedades_especiais || '—')}</div>
+            <div class="item-card">
+                <div class="item-card-header">
+                    <h4 class="item-card-title">${escapeHtml(item.nome)}</h4>
+                    ${item.tipo ? `<span class="item-card-badge">${escapeHtml(item.tipo)}</span>` : ''}
                 </div>
-                <button class="equipamento-btn-adicionar" data-item-id="${item.id}">➕</button>
+                <div class="item-card-body">
+                    <div class="item-card-field">
+                        <span class="item-card-label">Bônus CA</span>
+                        <p class="item-card-value">${Number(item.bonus_ca || 0) >= 0 ? '+' : ''}${Number(item.bonus_ca || 0)}</p>
+                    </div>
+                    <div class="item-card-field">
+                        <span class="item-card-label">DES Máx / Penalidade</span>
+                        <p class="item-card-value">${escapeHtml(item.des_max || '—')} / ${Number(item.penalidade || 0)}</p>
+                    </div>
+                    <div class="item-card-field">
+                        <span class="item-card-label">Falha Arcana</span>
+                        <p class="item-card-value">${escapeHtml(item.falha_arcana || '—')}</p>
+                    </div>
+                    <div class="item-card-field">
+                        <span class="item-card-label">Deslocamento / Peso</span>
+                        <p class="item-card-value">${escapeHtml(item.deslocamento || '—')} / ${item.peso ?? '—'}</p>
+                    </div>
+                    <div class="item-card-field">
+                        <span class="item-card-label">Propriedades</span>
+                        <p class="item-card-value">${escapeHtml(item.propriedades_especiais || '—')}</p>
+                    </div>
+                </div>
+                <div class="item-card-footer">
+                    <button class="item-btn-primary" data-item-id="${item.id}">➕ Adicionar</button>
+                </div>
             </div>
         `).join('');
 
@@ -1542,15 +1563,23 @@ export class FichaPersonagemController {
         lista.innerHTML = equipamentos.map(eq => `
             <div class="equipamento-item">
                 <div class="equipamento-info">
-                    <div class="equipamento-nome">${escapeHtml(eq.nome)}</div>
-                    <div class="equipamento-detalhes">
-                        ${eq.categoria ? `<span class="equipamento-categoria">${escapeHtml(eq.categoria)}</span>` : ''}
-                        ${eq.custo ? `<span class="equipamento-custo">Custo: ${escapeHtml(eq.custo)}</span>` : ''}
-                        ${eq.dano_medio ? `<span class="equipamento-dano">Dano: ${escapeHtml(eq.dano_medio)}</span>` : ''}
-                        ${eq.critico ? `<span class="equipamento-critico">Crítico: ${escapeHtml(eq.critico)}</span>` : ''}
-                        ${eq.peso ? `<span class="equipamento-peso">Peso: ${escapeHtml(eq.peso)}</span>` : ''}
-                        ${eq.tipo_dano ? `<span class="equipamento-tipo">Tipo: ${escapeHtml(eq.tipo_dano)}</span>` : ''}
+                    <div class="equipamento-header">
+                        <div class="equipamento-nome">${escapeHtml(eq.nome)}</div>
+                        <div class="equipamento-detalhes">
+                            ${eq.categoria ? `<span class="equipamento-categoria">${escapeHtml(eq.categoria)}</span>` : ''}
+                            ${eq.subcategoria ? `<span class="equipamento-categoria">${escapeHtml(eq.subcategoria)}</span>` : ''}
+                        </div>
                     </div>
+                    <div class="equipamento-detalhes">
+                        ${eq.dano_pequeno ? `<span class="equipamento-dano">Dano (Pequeno): ${escapeHtml(eq.dano_pequeno)}</span>` : ''}
+                        ${eq.dano_medio ? `<span class="equipamento-dano">Dano (Médio): ${escapeHtml(eq.dano_medio)}</span>` : ''}
+                        ${eq.tipo_dano ? `<span class="equipamento-tipo">Tipo: ${escapeHtml(eq.tipo_dano)}</span>` : ''}
+                        ${eq.critico ? `<span class="equipamento-critico">Crítico: ${escapeHtml(eq.critico)}</span>` : ''}
+                        ${eq.alcance_incremento ? `<span class="equipamento-tipo">Alcance: ${escapeHtml(eq.alcance_incremento)}</span>` : ''}
+                        ${eq.peso ? `<span class="equipamento-peso">Peso: ${escapeHtml(eq.peso)}</span>` : ''}
+                    </div>
+                    ${eq.custo ? `<div class="equipamento-desc">Custo: ${escapeHtml(eq.custo)}</div>` : ''}
+                    ${eq.descricao ? `<div class="equipamento-desc">${escapeHtml(eq.descricao)}</div>` : ''}
                     <div class="equipamento-pag">${escapeHtml(eq.pagina_referencia) || '—'}</div>
                 </div>
                 <button class="equipamento-btn-adicionar" data-equipamento-id="${eq.id}">
@@ -1840,7 +1869,7 @@ export class FichaPersonagemController {
     }
 
     renderizarListaTalentos(talentos) {
-        const container = document.getElementById('conteudoListarTalentos');
+        const container = document.getElementById('talentosList');
         if (!container) return;
 
         if (!talentos || talentos.length === 0) {
@@ -1851,41 +1880,38 @@ export class FichaPersonagemController {
         container.innerHTML = `
             <div class="equipamentos-lista-grid">
                 ${talentos.map(tal => `
-                    <div class="equipamentos-card talento-card">
-                        <div class="talento-header">
-                            <h4 class="talento-nome">${escapeHtml(tal.nome || tal.talento || 'N/A')}</h4>
-                            ${tal.secao || tal.section ? `<span class="talento-secao">${escapeHtml(tal.secao || tal.section)}</span>` : ''}
+                    <div class="item-card">
+                        <div class="item-card-header">
+                            <h4 class="item-card-title">${escapeHtml(tal.nome || tal.talento || 'N/A')}</h4>
+                            ${tal.secao || tal.section ? `<span class="item-card-badge">${escapeHtml(tal.secao || tal.section)}</span>` : ''}
                         </div>
                         
-                        <div class="talento-info">
+                        <div class="item-card-body">
                             ${tal.descricao ? `
-                                <div class="talento-campo">
-                                    <span class="talento-label">Benefícios:</span>
-                                    <p class="talento-valor">${escapeHtml(tal.descricao)}</p>
+                                <div class="item-card-field">
+                                    <span class="item-card-label">Benefício</span>
+                                    <p class="item-card-value">${escapeHtml(tal.descricao)}</p>
                                 </div>
                             ` : ''}
                             
-                            ${tal.beneficios ? `
-                                <div class="talento-campo">
-                                    <span class="talento-label">Benefícios:</span>
-                                    <p class="talento-valor">${escapeHtml(tal.beneficios)}</p>
+                            ${(tal.prerequisitos || tal.prerequisites) ? `
+                                <div class="item-card-field">
+                                    <span class="item-card-label">Pré-requisitos</span>
+                                    <p class="item-card-value">${escapeHtml(this._formatarPreRequisitos(tal.prerequisitos || tal.prerequisites))}</p>
                                 </div>
                             ` : ''}
-                            
-                            <div class="talento-campo">
-                                <span class="talento-label">Pré-requisitos:</span>
-                                <p class="talento-valor">${escapeHtml(this._formatarPreRequisitos(tal.prerequisitos || tal.prerequisites))}</p>
-                            </div>
                         </div>
                         
-                        <button class="equipamentos-btn-adicionar" data-talento-id="${tal.id}">
-                            ➕ Adicionar
-                        </button>
+                        <div class="item-card-footer">
+                            <button class="item-btn-primary" data-talento-id="${tal.id}">
+                                ➕ Adicionar
+                            </button>
+                        </div>
                     </div>
                 `).join('')}
                 
                 ${!this.talentosCarregados ? `
-                    <div class="talentos-paginacao">
+                    <div class="talentos-paginacao" style="grid-column: 1 / -1;">
                         <button id="btnCarregarMaisTalentos" class="btn-carregar-mais">
                             Carregar Mais Talentos
                         </button>
@@ -1894,7 +1920,7 @@ export class FichaPersonagemController {
             </div>
         `;
 
-        container.querySelectorAll('.equipamentos-btn-adicionar').forEach((btn) => {
+        container.querySelectorAll('.item-btn-primary').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const talentoId = Number(btn.dataset.talentoId);
                 if (Number.isFinite(talentoId)) {
