@@ -1,9 +1,13 @@
-// Vercel @vercel/static legado não aplica rewrites para /api — a API vai direto ao Render (CORS em ALLOWED_ORIGINS).
-var _h = window.location.hostname;
+// API em produção: sempre origem do Render, exceto em dev local (evita /api no Vercel → 404). CORS: ALLOWED_ORIGINS no Render.
+var _h = typeof window !== 'undefined' ? window.location.hostname : '';
+var IS_LOCAL =
+    _h === 'localhost' ||
+    _h === '127.0.0.1' ||
+    _h === '[::1]' ||
+    _h.endsWith('.localhost');
 var IS_PRODUCTION = _h === 'arena-de-combate-rpg.com.br' || _h === 'www.arena-de-combate-rpg.com.br';
-var USE_RENDER_API_ORIGIN = IS_PRODUCTION || _h.endsWith('.vercel.app');
 var RENDER_API_ORIGIN = 'https://projetorpg-7ih3.onrender.com';
-var BASE_URL = USE_RENDER_API_ORIGIN ? RENDER_API_ORIGIN : window.location.origin;
+var BASE_URL = IS_LOCAL ? window.location.origin : RENDER_API_ORIGIN;
 
 var API_CONFIG = {
     BASE_URL: BASE_URL,

@@ -97,7 +97,7 @@
 
 <!-- ── Scripts ───────────────────────────────────────────────────────────── -->
 <script type="module">
-    import { getApiUrl } from '/js/config/api.config.js';
+    import { getApiUrl } from '/js/config/api.config.js?v=20260418';
 
     // ── Elementos de Login ────────────────────────────────────────────────
     const btnLogin   = document.getElementById('btnLogin');
@@ -183,10 +183,15 @@
                 data = await res.json();
             } else {
                 const text = await res.text();
-                console.error('Resposta não-JSON do login:', res.status, text.slice(0, 200));
+                console.error(
+                    'Resposta não-JSON do login:',
+                    getApiUrl('/auth/login'),
+                    res.status,
+                    text.slice(0, 200)
+                );
                 mostrarErroLogin(
                     res.status === 404
-                        ? 'API indisponível (verifique proxy /api no Vercel).'
+                        ? 'Não encontramos a API neste endereço. Faça um recarregamento forçado (Ctrl+Shift+R) e confira o deploy.'
                         : 'Servidor retornou resposta inválida. Tente de novo em instantes.'
                 );
                 return;

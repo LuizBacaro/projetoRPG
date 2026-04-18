@@ -4,12 +4,16 @@
  * SRP: Exportar apenas para módulos
  */
 
-const _hostname = window.location.hostname;
+const _hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+const IS_LOCAL =
+    _hostname === 'localhost' ||
+    _hostname === '127.0.0.1' ||
+    _hostname === '[::1]' ||
+    _hostname.endsWith('.localhost');
 const IS_PRODUCTION =
     _hostname === 'arena-de-combate-rpg.com.br' || _hostname === 'www.arena-de-combate-rpg.com.br';
-const USE_RENDER_API_ORIGIN = IS_PRODUCTION || _hostname.endsWith('.vercel.app');
 const RENDER_API_ORIGIN = 'https://projetorpg-7ih3.onrender.com';
-const BASE_URL = USE_RENDER_API_ORIGIN ? RENDER_API_ORIGIN : window.location.origin;
+const BASE_URL = IS_LOCAL ? window.location.origin : RENDER_API_ORIGIN;
 
 const API_CONFIG = {
     BASE_URL: BASE_URL,
