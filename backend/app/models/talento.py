@@ -27,8 +27,10 @@ class Talento(SoftDeleteMixin, Base):
 
     # ── Identificação ──
     nome               = Column(String(100), nullable=False, index=True)
-    descricao          = Column(String(500), nullable=True)
+    descricao          = Column(String(1000), nullable=True)
     pagina_referencia  = Column(String(50),  nullable=True)  # Ex: "PHB p.123"
+    prerequisitos      = Column(String(500), nullable=True)  # Pré-requisitos do talento
+    secao              = Column(String(200), nullable=True)  # Seção/categoria (ex: "Talentos Comuns")
 
     # ── Metadata ──
     criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc))

@@ -35,8 +35,8 @@ def _validate_directory_structure() -> None:
         logger.error("❌ Erro: 'alembic.ini' não encontrado na raiz do backend. Certifique-se de estar no diretório correto.")
         sys.exit(1)
 
-    if not os.path.isdir(os.path.join(backend_root, 'alembic')):
-        logger.error("❌ Erro: Diretório 'alembic/' não encontrado. Execute 'alembic init alembic' se ainda não o fez.")
+    if not os.path.isdir(os.path.join(backend_root, 'alembic_migrations')):
+        logger.error("❌ Erro: Diretório 'alembic_migrations/' não encontrado. Execute 'alembic init alembic_migrations' se ainda não o fez.")
         sys.exit(1)
 
     if not os.path.isdir(os.path.join(backend_root, 'app')):

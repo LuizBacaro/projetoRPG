@@ -130,6 +130,8 @@ class TalentoJogadorRepository:
                 tal_catalogo.nome.label("talento_nome"),
                 tal_catalogo.descricao.label("talento_descricao"),
                 tal_catalogo.pagina_referencia.label("talento_pagina_referencia"),
+                tal_catalogo.prerequisitos.label("talento_prerequisitos"),
+                tal_catalogo.secao.label("talento_secao"),
             )
             .join(tal_catalogo, tal_catalogo.id == tal_jogador.talento_id)
             .filter(

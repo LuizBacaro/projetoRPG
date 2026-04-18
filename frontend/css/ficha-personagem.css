@@ -1274,8 +1274,8 @@ body::before {
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    max-width: 900px;
-    width: 90%;
+    max-width: 1020px;
+    width: 92%;
     max-height: 85vh;
     box-shadow: 0 12px 60px rgba(44, 26, 14, 0.8);
     overflow: hidden;
@@ -1486,8 +1486,39 @@ body::before {
     white-space: nowrap;
 }
 
-.equipamento-btn-adicionar:hover {
-    background: #2a7a3a;
+.equipamento-detalhes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamento-categoria {
+    background: rgba(201,168,76,0.1);
+    color: var(--cor-dourada);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 0.65rem;
+}
+
+.equipamento-custo,
+.equipamento-dano,
+.equipamento-critico,
+.equipamento-peso,
+.equipamento-tipo {
+    font-size: 0.65rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamento-custo::before,
+.equipamento-dano::before,
+.equipamento-critico::before,
+.equipamento-peso::before,
+.equipamento-tipo::before {
+    content: "• ";
+    color: var(--cor-dourada);
 }
 
 .ficha-btn-adicionar {
@@ -1764,21 +1795,24 @@ body::before {
 
 .equipamentos-lista-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1rem;
-    padding: 1rem;
+    padding: 0;
+    width: 100%;
 }
 
 .equipamentos-card {
-    background: linear-gradient(135deg, rgba(244, 233, 208, 0.5), rgba(201, 168, 76, 0.1));
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.7), rgba(232, 213, 176, 0.35));
     border: 2px solid var(--cor-dourada);
-    border-radius: 8px;
-    padding: 1.2rem;
+    border-radius: 10px;
+    padding: 1.4rem;
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-    box-shadow: 0 2px 8px rgba(92, 58, 30, 0.1);
+    gap: 1rem;
+    box-shadow: 0 4px 16px rgba(92, 58, 30, 0.12);
+    width: 100%;
+    max-width: 100%;
 }
 
 .equipamentos-card:hover {
@@ -1832,6 +1866,106 @@ body::before {
 
 .equipamentos-btn-adicionar:active {
     transform: scale(0.98);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   CARD DE TALENTO — Estendido com pré-requisitos e benefícios
+   ────────────────────────────────────────────────────────────── */
+
+.talento-card {
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.4), rgba(232, 213, 176, 0.2));
+    border: 2px solid var(--cor-dourada);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    box-shadow: 0 2px 8px rgba(92, 58, 30, 0.1);
+    position: relative;
+}
+
+.talento-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(92, 58, 30, 0.15);
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.6), rgba(232, 213, 176, 0.35));
+    border-color: #d4a574;
+}
+
+.talento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--cor-dourada);
+}
+
+.talento-nome {
+    margin: 0;
+    font-size: 1.14rem;
+    font-weight: 800;
+    color: var(--cor-tinta);
+    flex: 1 1 auto;
+    line-height: 1.25;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.talento-secao {
+    display: inline-block;
+    background: var(--cor-dourada);
+    color: var(--cor-tinta);
+    padding: 0.35rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+    border: 1px solid #a87d30;
+    box-shadow: 0 2px 4px rgba(92, 58, 30, 0.2);
+    margin-top: 0.2rem;
+}
+
+.talento-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0.5rem 0;
+    flex: 1;
+}
+
+.talento-card .equipamentos-btn-adicionar {
+    align-self: flex-end;
+    margin-top: 0.5rem;
+}
+
+.talento-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.talento-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--cor-dourada);
+    letter-spacing: 0.5px;
+}
+
+.talento-valor {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--cor-tinta);
+    line-height: 1.5;
+    padding: 0.6rem 0.8rem;
+    background: rgba(244, 233, 208, 0.5);
+    border-left: 3px solid var(--cor-dourada);
+    border-radius: 4px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

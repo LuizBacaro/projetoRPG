@@ -57,6 +57,12 @@ export class FichaPersonagemController {
         this._canal = null;
         this._configurarCanalSync();
 
+        // ✅ NOVO: paginação para talentos
+        this.talentosDisponiveis = [];
+        this.talentosSkip = 0;
+        this.talentosLimit = 20;
+        this.talentosCarregados = false;
+
     }
 
     get token() {
@@ -537,6 +543,14 @@ export class FichaPersonagemController {
             ])
         );
         return mapa.get(chave) || raw;
+    }
+
+    _formatarPreRequisitos(valor) {
+        const raw = String(valor ?? '').trim();
+        if (!raw || raw.toLowerCase() === 'none') {
+            return 'N/A';
+        }
+        return raw;
     }
 
     _atualizarUIPerfilDominios() {
@@ -1529,7 +1543,14 @@ export class FichaPersonagemController {
             <div class="equipamento-item">
                 <div class="equipamento-info">
                     <div class="equipamento-nome">${escapeHtml(eq.nome)}</div>
-                    <div class="equipamento-desc">${escapeHtml(eq.descricao) || '—'}</div>
+                    <div class="equipamento-detalhes">
+                        ${eq.categoria ? `<span class="equipamento-categoria">${escapeHtml(eq.categoria)}</span>` : ''}
+                        ${eq.custo ? `<span class="equipamento-custo">Custo: ${escapeHtml(eq.custo)}</span>` : ''}
+                        ${eq.dano_medio ? `<span class="equipamento-dano">Dano: ${escapeHtml(eq.dano_medio)}</span>` : ''}
+                        ${eq.critico ? `<span class="equipamento-critico">Crítico: ${escapeHtml(eq.critico)}</span>` : ''}
+                        ${eq.peso ? `<span class="equipamento-peso">Peso: ${escapeHtml(eq.peso)}</span>` : ''}
+                        ${eq.tipo_dano ? `<span class="equipamento-tipo">Tipo: ${escapeHtml(eq.tipo_dano)}</span>` : ''}
+                    </div>
                     <div class="equipamento-pag">${escapeHtml(eq.pagina_referencia) || '—'}</div>
                 </div>
                 <button class="equipamento-btn-adicionar" data-equipamento-id="${eq.id}">
@@ -1776,14 +1797,16 @@ export class FichaPersonagemController {
                 return;
             }
 
-            // Carregar lista de talentos disponíveis
-            const talentos = await this.talentoService.listarTalentos(0, 100);
+            // Reset paginação
+            this.talentosSkip = 0;
+            this.talentosDisponiveis = [];
+            this.talentosCarregados = false;
 
-            // Armazenar para uso no filtro
-            this.talentosDisponiveis = talentos;
-            
+            // Carregar primeira página
+            await this._carregarMaisTalentos();
+
             // Renderizar lista inicial
-            this.renderizarListaTalentos(talentos);
+            this.renderizarListaTalentos(this.talentosDisponiveis);
 
             // Mostrar modal
             modal.style.display = 'flex';
@@ -1791,8 +1814,28 @@ export class FichaPersonagemController {
         } catch (error) {
             console.error('❌ Erro ao abrir modal:', error);
             if (window.NotificationService) {
-                window.NotificationService.mostrarErro('❌ Erro ao carregar talentos: ' + error.message);
+                window.NotificationService.mostrarErro('❌ Erro ao carregar talentos');
             }
+        }
+    }
+
+    async _carregarMaisTalentos() {
+        try {
+            const novosTalentos = await this.talentoService.listarTalentos(this.talentosSkip, this.talentosLimit);
+            
+            if (novosTalentos.length > 0) {
+                this.talentosDisponiveis = [...this.talentosDisponiveis, ...novosTalentos];
+                this.talentosSkip += this.talentosLimit;
+            }
+            
+            // Se carregou menos que o limite, significa que chegamos ao fim
+            if (novosTalentos.length < this.talentosLimit) {
+                this.talentosCarregados = true;
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar mais talentos:', error);
+            throw error;
         }
     }
 
@@ -1808,15 +1851,46 @@ export class FichaPersonagemController {
         container.innerHTML = `
             <div class="equipamentos-lista-grid">
                 ${talentos.map(tal => `
-                    <div class="equipamentos-card">
-                        <h4>${escapeHtml(tal.nome)}</h4>
-                        <p class="equipamentos-desc">${escapeHtml(tal.descricao) || '—'}</p>
-                        <p class="equipamentos-pag">📄 ${escapeHtml(tal.pagina_referencia) || '—'}</p>
+                    <div class="equipamentos-card talento-card">
+                        <div class="talento-header">
+                            <h4 class="talento-nome">${escapeHtml(tal.nome || tal.talento || 'N/A')}</h4>
+                            ${tal.secao || tal.section ? `<span class="talento-secao">${escapeHtml(tal.secao || tal.section)}</span>` : ''}
+                        </div>
+                        
+                        <div class="talento-info">
+                            ${tal.descricao ? `
+                                <div class="talento-campo">
+                                    <span class="talento-label">Benefícios:</span>
+                                    <p class="talento-valor">${escapeHtml(tal.descricao)}</p>
+                                </div>
+                            ` : ''}
+                            
+                            ${tal.beneficios ? `
+                                <div class="talento-campo">
+                                    <span class="talento-label">Benefícios:</span>
+                                    <p class="talento-valor">${escapeHtml(tal.beneficios)}</p>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="talento-campo">
+                                <span class="talento-label">Pré-requisitos:</span>
+                                <p class="talento-valor">${escapeHtml(this._formatarPreRequisitos(tal.prerequisitos || tal.prerequisites))}</p>
+                            </div>
+                        </div>
+                        
                         <button class="equipamentos-btn-adicionar" data-talento-id="${tal.id}">
                             ➕ Adicionar
                         </button>
                     </div>
                 `).join('')}
+                
+                ${!this.talentosCarregados ? `
+                    <div class="talentos-paginacao">
+                        <button id="btnCarregarMaisTalentos" class="btn-carregar-mais">
+                            Carregar Mais Talentos
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         `;
 
@@ -1829,10 +1903,44 @@ export class FichaPersonagemController {
             });
         });
 
+        // Configurar botão de carregar mais
+        const btnCarregarMais = container.querySelector('#btnCarregarMaisTalentos');
+        if (btnCarregarMais) {
+            btnCarregarMais.addEventListener('click', async () => {
+                try {
+                    btnCarregarMais.disabled = true;
+                    btnCarregarMais.textContent = 'Carregando...';
+                    
+                    await this._carregarMaisTalentos();
+                    this.renderizarListaTalentos(this.talentosDisponiveis);
+                    
+                } catch (error) {
+                    console.error('❌ Erro ao carregar mais talentos:', error);
+                    if (window.NotificationService) {
+                        window.NotificationService.mostrarErro('❌ Erro ao carregar mais talentos');
+                    }
+                    btnCarregarMais.disabled = false;
+                    btnCarregarMais.textContent = 'Carregar Mais Talentos';
+                }
+            });
+        }
+
     }
 
-    filtrarTalentos() {
+    async filtrarTalentos() {
         const filtro = document.getElementById('talentosBusca')?.value?.toLowerCase() || '';
+        
+        // Se há filtro e ainda não carregamos todos os talentos, carregar tudo primeiro
+        if (filtro && !this.talentosCarregados) {
+            try {
+                while (!this.talentosCarregados) {
+                    await this._carregarMaisTalentos();
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar todos os talentos para filtro:', error);
+            }
+        }
+
         if (!this.talentosDisponiveis) return;
 
         const filtrados = this.talentosDisponiveis.filter(tal => 
