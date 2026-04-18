@@ -559,13 +559,9 @@
 
 <datalist id="listaDivindadesDashboard"></datalist>
 
-<!-- FASE 1: Configuração Global -->
-<script>
-    window.getApiUrl = function(path) {
-        return window.location.origin + '/api/v1' + (path || '');
-    };
-    console.log('✅ API URL configurada');
-</script>
+<!-- FASE 1: API → mesma origem que api.config.js (Render fora de localhost); síncrono antes dos scripts abaixo -->
+<script src="/js/config/api-url-global.js"></script>
+<script type="module" src="/js/config/api.config.js"></script>
 
 <!-- FASE 2: AuthService (deve ser carregado antes de tudo) -->
 <script src="/js/services/AuthService.js"></script>
