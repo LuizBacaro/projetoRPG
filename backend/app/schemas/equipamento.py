@@ -14,6 +14,18 @@ class EquipamentoBase(BaseModel):
     nome: str = Field(..., min_length=1, max_length=100)
     descricao: Optional[str] = Field(default=None, max_length=500)
     pagina_referencia: Optional[str] = Field(default=None, max_length=50)
+    
+    # Novos campos da Tabela 7-5
+    categoria: Optional[str] = Field(default=None, max_length=50)
+    subcategoria: Optional[str] = Field(default=None, max_length=100)
+    custo: Optional[str] = Field(default=None, max_length=50)
+    dano_pequeno: Optional[str] = Field(default=None, max_length=20)
+    dano_medio: Optional[str] = Field(default=None, max_length=20)
+    critico: Optional[str] = Field(default=None, max_length=20)
+    alcance_incremento: Optional[str] = Field(default=None, max_length=50)
+    peso: Optional[str] = Field(default=None, max_length=20)
+    tipo_dano: Optional[str] = Field(default=None, max_length=50)
+    
     ativo: bool = True
 
 

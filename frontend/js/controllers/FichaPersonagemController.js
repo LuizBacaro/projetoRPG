@@ -1543,7 +1543,14 @@ export class FichaPersonagemController {
             <div class="equipamento-item">
                 <div class="equipamento-info">
                     <div class="equipamento-nome">${escapeHtml(eq.nome)}</div>
-                    <div class="equipamento-desc">${escapeHtml(eq.descricao) || '—'}</div>
+                    <div class="equipamento-detalhes">
+                        ${eq.categoria ? `<span class="equipamento-categoria">${escapeHtml(eq.categoria)}</span>` : ''}
+                        ${eq.custo ? `<span class="equipamento-custo">Custo: ${escapeHtml(eq.custo)}</span>` : ''}
+                        ${eq.dano_medio ? `<span class="equipamento-dano">Dano: ${escapeHtml(eq.dano_medio)}</span>` : ''}
+                        ${eq.critico ? `<span class="equipamento-critico">Crítico: ${escapeHtml(eq.critico)}</span>` : ''}
+                        ${eq.peso ? `<span class="equipamento-peso">Peso: ${escapeHtml(eq.peso)}</span>` : ''}
+                        ${eq.tipo_dano ? `<span class="equipamento-tipo">Tipo: ${escapeHtml(eq.tipo_dano)}</span>` : ''}
+                    </div>
                     <div class="equipamento-pag">${escapeHtml(eq.pagina_referencia) || '—'}</div>
                 </div>
                 <button class="equipamento-btn-adicionar" data-equipamento-id="${eq.id}">

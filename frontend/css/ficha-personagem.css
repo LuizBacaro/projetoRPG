@@ -1486,8 +1486,39 @@ body::before {
     white-space: nowrap;
 }
 
-.equipamento-btn-adicionar:hover {
-    background: #2a7a3a;
+.equipamento-detalhes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamento-categoria {
+    background: rgba(201,168,76,0.1);
+    color: var(--cor-dourada);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 0.65rem;
+}
+
+.equipamento-custo,
+.equipamento-dano,
+.equipamento-critico,
+.equipamento-peso,
+.equipamento-tipo {
+    font-size: 0.65rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamento-custo::before,
+.equipamento-dano::before,
+.equipamento-critico::before,
+.equipamento-peso::before,
+.equipamento-tipo::before {
+    content: "• ";
+    color: var(--cor-dourada);
 }
 
 .ficha-btn-adicionar {
