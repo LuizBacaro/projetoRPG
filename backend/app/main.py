@@ -380,6 +380,7 @@ def _inicializar_banco(db) -> None:
         ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
         ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
         ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
+        ("garantir_colunas_catalogo_equipamentos", _garantir_colunas_catalogo_equipamentos),
         ("garantir_constraints_item_13", _garantir_constraints_item_13),
         ("seed_condicoes", lambda: _seed_condicoes(db)),
         ("seed_pericias", lambda: _seed_pericias(db)),
@@ -519,6 +520,43 @@ def _garantir_constraints_item_13() -> None:
                 """
             )
         )
+
+
+def _garantir_colunas_catalogo_equipamentos() -> None:
+    """
+    Garante colunas do catálogo estendido de equipamentos em bases legadas.
+
+    Cenário alvo: banco com alembic_version marcado em revisão avançada,
+    mas sem execução efetiva da migration de expansão de `equipamentos`.
+    """
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "equipamentos" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("equipamentos")}
+    colunas_esperadas = {
+        "categoria": "VARCHAR(50)",
+        "subcategoria": "VARCHAR(100)",
+        "custo": "VARCHAR(50)",
+        "dano_pequeno": "VARCHAR(20)",
+        "dano_medio": "VARCHAR(20)",
+        "critico": "VARCHAR(20)",
+        "alcance_incremento": "VARCHAR(50)",
+        "peso": "VARCHAR(20)",
+        "tipo_dano": "VARCHAR(50)",
+    }
+
+    with engine.begin() as conn:
+        for coluna, tipo_sql in colunas_esperadas.items():
+            if coluna in colunas_existentes:
+                continue
+
+            logger.warning(
+                "⚠️  coluna equipamentos.%s ausente; aplicando schema guard",
+                coluna,
+            )
+            conn.execute(text(f"ALTER TABLE equipamentos ADD COLUMN {coluna} {tipo_sql}"))
 
 
 def _seed_pericias(db) -> None:
