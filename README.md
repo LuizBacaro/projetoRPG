@@ -609,8 +609,7 @@ Registro.br (domínio) → Cloudflare (DNS + CDN) → Vercel (frontend)
 | `ADMIN_PASSWORD` | senha forte |
 | `ALLOWED_ORIGINS` | `["https://arena-de-combate-rpg.com.br","https://seu-app.vercel.app"]` |
 
-5. Após o deploy, copie a URL do Render (ex: `https://arena-rpg-api.onrender.com`)
-6. Atualize `frontend/js/config.js` com essa URL na linha de produção
+5. Após o deploy, copie a URL do Render (ex.: `https://projetorpg-7ih3.onrender.com`) — o `vercel.json` já referencia o proxy `/api` para essa API; não é obrigatório hardcodar URL no frontend.
 
 #### 3. Frontend — Vercel
 1. Crie conta em [vercel.com](https://vercel.com) → New Project → importe o repositório
@@ -631,6 +630,29 @@ O Render free tier dorme após 15 min de inatividade. Para evitar cold start:
 4. O endpoint `/health` retorna 200 instantaneamente sem tocar no banco
 
 > ℹ️ Job já configurado em produção: [console.cron-job.org/jobs](https://console.cron-job.org/jobs)
+
+---
+
+### Alterações no código: o que você precisa fazer para refletir em produção
+
+Existem **dois lugares** onde o código “sobe”: **Vercel** (site: HTML, CSS, JS) e **Render** (API Python). O domínio **`www.arena-de-combate-rpg.com.br`** precisa ser atendido pelo **Vercel**. Se o DNS mandar o tráfego para o **Render**, você verá HTML antigo mesmo com deploy novo no Render — a API atualiza, a interface não.
+
+| O que você mudou | Onde fazer deploy | O que fazer na prática |
+|------------------|-------------------|-------------------------|
+| `frontend/`, `vercel.json`, páginas `.html` | **Vercel** | `git push` na branch ligada ao Vercel (ex.: `feature/salva`) → esperar o deploy **Ready** no painel Vercel. |
+| `backend/`, API FastAPI | **Render** | `git push` → deploy automático no Render (ou redeploy manual). |
+| Dados no Postgres | **Neon** | Scripts SQL ou `importar_talentos_catalogo.py` com `DATABASE_URL` do Neon (não é deploy). |
+
+**Checklist para o site público mostrar sua alteração de frontend**
+
+1. Subir o commit: `git push origin <sua-branch-de-produção>`.
+2. Abrir [Vercel](https://vercel.com) → seu projeto → **Deployments** → confirmar **Ready** no commit certo.
+3. Confirmar que **`arena-de-combate-rpg.com.br`** (e `www`) está em **Settings → Domains** desse mesmo projeto Vercel.
+4. No **Cloudflare** (DNS): `www` deve ser **CNAME** para `cname.vercel-dns.com` (como na documentação do Vercel). **Não** use o mesmo hostname apontando para o Render se quiser o frontend do Vercel.
+5. O `vercel.json` já encaminha `/api` e `/health` para a API no Render — o navegador continua em `https://seu-dominio` e as chamadas vão para a API.
+6. Se ainda aparecer versão antiga: **Cloudflare → Caching → Purge Everything** (uma vez) e testar em aba anônima.
+
+**Como conferir rapidamente:** a URL **`https://projeto-rpg-two.vercel.app`** (projeto no Vercel) deve mostrar o mesmo HTML novo; se o **www** estiver diferente, o problema é **DNS** (domínio não está no Vercel).
 
 ---
 
