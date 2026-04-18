@@ -381,6 +381,8 @@ def _inicializar_banco(db) -> None:
         ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
         ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
         ("garantir_colunas_catalogo_equipamentos", _garantir_colunas_catalogo_equipamentos),
+        ("garantir_colunas_talentos", _garantir_colunas_talentos),
+        ("garantir_colunas_armaduras_protecao", _garantir_colunas_armaduras_protecao),
         ("garantir_constraints_item_13", _garantir_constraints_item_13),
         ("seed_condicoes", lambda: _seed_condicoes(db)),
         ("seed_pericias", lambda: _seed_pericias(db)),
@@ -557,6 +559,65 @@ def _garantir_colunas_catalogo_equipamentos() -> None:
                 coluna,
             )
             conn.execute(text(f"ALTER TABLE equipamentos ADD COLUMN {coluna} {tipo_sql}"))
+
+
+def _garantir_colunas_talentos() -> None:
+    """Garante colunas de talentos que podem faltar em banco legado ou incompleto."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "talentos" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("talentos")}
+    colunas_esperadas = {
+        "prerequisitos": "VARCHAR(500)",
+        "secao": "VARCHAR(200)",
+    }
+
+    with engine.begin() as conn:
+        for coluna, tipo_sql in colunas_esperadas.items():
+            if coluna in colunas_existentes:
+                continue
+
+            logger.warning(
+                "⚠️  coluna talentos.%s ausente; aplicando schema guard",
+                coluna,
+            )
+            conn.execute(text(f"ALTER TABLE talentos ADD COLUMN {coluna} {tipo_sql}"))
+
+
+def _garantir_colunas_armaduras_protecao() -> None:
+    """Garante colunas da tabela armaduras_protecao em banco legado ou incompleto."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "armaduras_protecao" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("armaduras_protecao")}
+    colunas_esperadas = {
+        "nome": "VARCHAR(120)",
+        "tipo": "VARCHAR(60)",
+        "bonus_ca": "INTEGER",
+        "des_max": "VARCHAR(20)",
+        "penalidade": "INTEGER",
+        "falha_arcana": "VARCHAR(20)",
+        "deslocamento": "VARCHAR(40)",
+        "peso": "FLOAT",
+        "propriedades_especiais": "VARCHAR(600)",
+        "ativo": "BOOLEAN",
+        "criado_em": "TIMESTAMP",
+    }
+
+    with engine.begin() as conn:
+        for coluna, tipo_sql in colunas_esperadas.items():
+            if coluna in colunas_existentes:
+                continue
+
+            logger.warning(
+                "⚠️  coluna armaduras_protecao.%s ausente; aplicando schema guard",
+                coluna,
+            )
+            conn.execute(text(f"ALTER TABLE armaduras_protecao ADD COLUMN {coluna} {tipo_sql}"))
 
 
 def _seed_pericias(db) -> None:
