@@ -177,7 +177,20 @@
                 body:    JSON.stringify({ email, senha })
             });
 
-            const data = await res.json();
+            const ct = res.headers.get('Content-Type') || '';
+            let data;
+            if (ct.includes('application/json')) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                console.error('Resposta não-JSON do login:', res.status, text.slice(0, 200));
+                mostrarErroLogin(
+                    res.status === 404
+                        ? 'API indisponível (verifique proxy /api no Vercel).'
+                        : 'Servidor retornou resposta inválida. Tente de novo em instantes.'
+                );
+                return;
+            }
 
             if (!res.ok) {
                 mostrarErroLogin(data.detail || 'E-mail ou senha incorretos.');
