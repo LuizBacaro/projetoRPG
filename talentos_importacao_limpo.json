@@ -1,0 +1,765 @@
+[
+  {
+    "nome": "Acrobático",
+    "beneficios": "+2 de bônus nos testes de Saltar e Acrobacia",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Acuidade com Arma¹²",
+    "beneficios": "Aplica o modificador de Des (em vez de For) para ataques corporais com armas leves",
+    "prerequisitos": "Usar arma, bônus base de ataque +1",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Afinidade com Animais",
+    "beneficios": "+2 de bônus nos testes de Adestrar Animais e Cavalgar",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ágil",
+    "beneficios": "+2 de bônus nos testes de Equilíbrio e Arte da Fuga",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Aptidão Mágica",
+    "beneficios": "+2 de bônus nos testes de Identificar Magia e Usar Instrumento Mágico",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ataque Desarmado Aprimorado¹",
+    "beneficios": "Considerado armado quando estiver desarmado",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Agarrar Aprimorado¹",
+    "beneficios": "+4 de bônus nos testes de Agarrar e não provoca ataques de oportunidade",
+    "prerequisitos": "Des 13, Ataque Desarmado Aprimorado",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Desviar Objetos¹",
+    "beneficios": "Desvia um ataque à distância por rodada",
+    "prerequisitos": "Des 13, Ataque Desarmado Aprimorado",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Apanhar Objetos¹",
+    "beneficios": "Apanha uma arma arremessada ou projétil",
+    "prerequisitos": "Des 15, Desviar Objetos, Ataque Desarmado Aprimorado",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ataque Atordoante¹",
+    "beneficios": "Atordoa a vítima com um ataque desarmado",
+    "prerequisitos": "Des 13, Sab 13, Ataque Desarmado Aprimorado, bônus base de ataque +8",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ataque Poderoso¹",
+    "beneficios": "Substitui bônus de ataque por dano (máximo: bônus base de ataque)",
+    "prerequisitos": "For 13",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Trespassar¹",
+    "beneficios": "Desfere um ataque corporal extra depois de imobilizar um oponente",
+    "prerequisitos": "Ataque Poderoso",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Trespassar Maior¹",
+    "beneficios": "Trespassar sem limite de ataques por rodada",
+    "prerequisitos": "Trespassar, Ataque Poderoso, bônus base de ataque +4",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Encontrão Aprimorado¹",
+    "beneficios": "+4 de bônus nas tentativas de encontrão e não provoca ataques de oportunidade",
+    "prerequisitos": "Ataque Poderoso",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Atropelar Aprimorado¹",
+    "beneficios": "+4 de bônus nas tentativas de atropelar e não provoca ataques de oportunidade",
+    "prerequisitos": "Ataque Poderoso",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Separar Aprimorado¹",
+    "beneficios": "+4 de bônus nas tentativas de Separar e não provoca ataques de oportunidade",
+    "prerequisitos": "Ataque Poderoso",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Atlético",
+    "beneficios": "+2 de bônus nos testes de Escalar e Natação",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Auto-Suficiente",
+    "beneficios": "+2 de bônus nos testes de Cura e Sobrevivência",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Combate Montado¹",
+    "beneficios": "Evita os ataques contra a montaria com um teste de Cavalgar",
+    "prerequisitos": "1 graduação em Cavalgar",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Arquearia Montada¹",
+    "beneficios": "Sofre metade das penalidades nos ataques à distância realizados sobre montarias",
+    "prerequisitos": "Combate Montado",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Investida Montada¹",
+    "beneficios": "Pode se deslocar antes e depois de uma investida montada",
+    "prerequisitos": "Combate Montado",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Investida Implacável¹",
+    "beneficios": "Investidas montadas causam dano dobrado",
+    "prerequisitos": "Combate Montado, Investida Montada",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Pisotear¹",
+    "beneficios": "A vítima não pode evitar um atropelamento montada",
+    "prerequisitos": "Combate Montado",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Combater com Duas Armas¹",
+    "beneficios": "Reduz -2 nas penalidades para combater com duas armas",
+    "prerequisitos": "Des 15",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Bloqueio Ambidestro¹",
+    "beneficios": "A arma da mão inábil concede +1 de bônus de escudo na CA",
+    "prerequisitos": "Combater com Duas Armas",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Combater com Duas Armas Aprimorado¹",
+    "beneficios": "Adquire um segundo ataque com a mão inábil",
+    "prerequisitos": "Des 17, Combater com Duas Armas, bônus base de ataque +6",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Combater com Duas Armas Maior¹",
+    "beneficios": "Adquire um terceiro ataque com a mão inábil",
+    "prerequisitos": "Des 19, Combater com Duas Armas Aprimorado, Combater com Duas Armas, bônus base de ataque +11",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Contramágica Aprimorada",
+    "beneficios": "Contramágica com magias da mesma escola",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Corrida",
+    "beneficios": "Percorre 5 vezes o deslocamento padrão, +4 de bônus nos testes de Saltar no final de uma corrida",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Dedos Lépidos",
+    "beneficios": "+2 de bônus nos teste de Operar Mecanismos e Abrir Fechaduras",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Diligente",
+    "beneficios": "+2 de bônus nos teste de Avaliação e Decifrar Escrita",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Dominar Magia²",
+    "beneficios": "Capaz de preparar as magias escolhidas sem um grimório",
+    "prerequisitos": "1° nível de mago",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Especialização em Combate¹",
+    "beneficios": "Substitui bônus de ataque por CA (máximo 5 pontos)",
+    "prerequisitos": "Int 13",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Desarme Aprimorado¹",
+    "beneficios": "+4 de bônus nas tentativas de desarme e não provoca ataques de oportunidade",
+    "prerequisitos": "Especialização em Combate",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Fintar Aprimorado¹",
+    "beneficios": "Fintar em combate é uma ação de movimento",
+    "prerequisitos": "Especialização em Combate",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Imobilização Aprimorada¹",
+    "beneficios": "+4 de bônus nas tentativas de imobilização e não provoca ataques de oportunidade",
+    "prerequisitos": "Especialização em Combate",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ataque Giratório¹",
+    "beneficios": "Realiza um ataque corporal contra cada oponente dentro do alcance",
+    "prerequisitos": "Des 13, Especialização em Combate, Esquiva, Mobilidade, Ataque em Movimento, bônus base de ataque +4",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Esquiva¹",
+    "beneficios": "+1 de bônus de esquiva na CA contra um adversário à sua escolha",
+    "prerequisitos": "Des 13",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Mobilidade¹",
+    "beneficios": "+4 de bônus de esquiva na CA contra ataques de oportunidade",
+    "prerequisitos": "Esquiva",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ataque em Movimento¹",
+    "beneficios": "Capaz de deslocar antes e depois do ataque",
+    "prerequisitos": "Mobilidade, bônus base de ataque +4",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Expulsão Adicional³",
+    "beneficios": "4 tentativas diárias adicionais de Expulsar/Fascinar",
+    "prerequisitos": "Habilidade de expulsar ou fascinar criaturas",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Expulsão Aprimorada",
+    "beneficios": "+1 nível efetivo para testes de expulsão",
+    "prerequisitos": "Habilidade de expulsar ou fascinar criaturas",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Foco em Arma¹²",
+    "beneficios": "+1 de bônus nas jogadas de ataque com a arma escolhida",
+    "prerequisitos": "Usar a arma, bônus base de ataque +1",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Especialização em Arma¹²",
+    "beneficios": "+2 de bônus no dano com a arma escolhida",
+    "prerequisitos": "Usar a arma, Foco em Arma, 4° nível de guerreiro",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Foco em Arma Maior¹²",
+    "beneficios": "+2 de bônus nas jogadas de ataque com a arma escolhida",
+    "prerequisitos": "Usar a arma, Foco em Arma na arma, 8° nível de guerreiro",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Especialização em Arma Maior¹²",
+    "beneficios": "+4 de bônus no dano com a arma escolhida",
+    "prerequisitos": "Usar a arma, Foco em Arma Maior, Foco em Arma, Especialização em Arma, 12° nível de guerreiro",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Foco em Magia²",
+    "beneficios": "+1 de bônus na CD dos testes de resistência contra uma escola de magia específica",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Foco em Magia Maior²",
+    "beneficios": "+1 de bônus na CD dos testes de resistência contra uma escola de magia específica",
+    "prerequisitos": "Foco em Magia na escola",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Foco em Perícia²",
+    "beneficios": "+3 de bônus nos teste da perícia escolhida",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Fortitude Maior",
+    "beneficios": "+2 de bônus nos teste de resistência de Fortitude",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Fraudulento",
+    "beneficios": "+2 de bônus nos teste de Disfarces e Falsificação",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ignorar Componentes Materiais",
+    "beneficios": "Conjura magias ignorando os componentes materiais",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Iniciativa Aprimorada¹",
+    "beneficios": "+4 de bônus nos testes de Iniciativa",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Investigador",
+    "beneficios": "+2 de bônus nos testes de Obter Informação e Procurar",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Liderança",
+    "beneficios": "Atrai parceiros e seguidores",
+    "prerequisitos": "6° nível de personagem",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Lutar às Cegas¹",
+    "beneficios": "Jogar novamente chance de falha por camuflagem",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Magia Natural",
+    "beneficios": "Capaz de lançar magias na forma selvagem",
+    "prerequisitos": "Sab 13, Habilidade Forma Selvagem",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Magia Penetrante",
+    "beneficios": "+2 de bônus nos testes de conjurador contra Resistência à Magia",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Magia Penetrante Maior",
+    "beneficios": "+4 de bônus nos testes de conjurador contra Resistência à Magia",
+    "prerequisitos": "Magia Penetrante",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Magia em Combate",
+    "beneficios": "+4 de bônus nos teste de Concentração para conjurar na defensiva",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Mãos Leves",
+    "beneficios": "+2 de bônus nos teste de Prestidigitação e Usar Cordas",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Negociador",
+    "beneficios": "+2 de bônus nos teste de Diplomacia e Sentir Motivação",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Persuasivo",
+    "beneficios": "+2 de bônus nos teste de Blefar e Intimidar",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Potencializar Invocação",
+    "beneficios": "As criaturas invocadas recebem +4 For e +4 Cons",
+    "prerequisitos": "Foco em Magia (conjuração)",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Prontidão",
+    "beneficios": "+2 de bônus nos testes de Ouvir e Observar",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Rapidez de Recarga¹",
+    "beneficios": "Recarrega bestas mais rapidamente",
+    "prerequisitos": "Usar Arma Simples (besta)",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Rastrear",
+    "beneficios": "Utiliza Sobrevivência para rastrear",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Reflexos em Combate¹",
+    "beneficios": "Ataques de oportunidade adicionais",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Reflexos Rápidos",
+    "beneficios": "+2 de bônus nos testes de resistência de Reflexos",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Saque Rápido¹",
+    "beneficios": "Saca uma arma branca como ação livre",
+    "prerequisitos": "Bônus base de ataque +1",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Sorrateiro",
+    "beneficios": "+2 nos testes de Esconder-se e Furtividade",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Sucesso Decisivo Aprimorado¹²",
+    "beneficios": "Dobra a margem de ameaça da arma",
+    "prerequisitos": "Usar a arma, bônus base de ataque +8",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Tiro Certeiro¹",
+    "beneficios": "+1 de bônus nos ataques à distância e dano contra alvos num raio de 9 metros",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Tiro Preciso¹",
+    "beneficios": "Anula a penalidade por disparar contra um adversário em combate corporal com um aliado (-4)",
+    "prerequisitos": "Tiro Certeiro",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Tiro Rápido¹",
+    "beneficios": "Um ataque à distância adicional por rodada",
+    "prerequisitos": "Des 13, Tiro Certeiro",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Tiro Longo¹",
+    "beneficios": "Aumenta o incremento de distância em 50% ou 100%",
+    "prerequisitos": "Tiro Certeiro",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Tiro em Movimento¹",
+    "beneficios": "Pode se deslocar antes e depois de um ataque à distância",
+    "prerequisitos": "Des 13, Esquiva, Mobilidade, Tiro Certeiro, bônus base de ataque +4",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Tiro Múltiplo¹",
+    "beneficios": "Dispara duas ou mais flechas simultaneamente",
+    "prerequisitos": "Des 17, Tiro Certeiro, Tiro Rápido, bônus base de ataque +6",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Tiro Preciso Aprimorado¹",
+    "beneficios": "Ignorar qualquer cobertura ou camuflagem (exceto total) para ataques à distância",
+    "prerequisitos": "Des 19, Tiro Certeiro, Tiro Preciso, bônus base de ataque +11",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Tolerância",
+    "beneficios": "+4 de bônus nos testes para resistir ao dano por contusão",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Duro de Matar",
+    "beneficios": "Permanece consciente entre -1 e -9 PV",
+    "prerequisitos": "Tolerância",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Usar Arma Comum²",
+    "beneficios": "Não sofre penalidade nos ataques com uma arma comum específica",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Usar Arma Exótica¹²",
+    "beneficios": "Não sofre penalidade nos ataques com uma arma exótica específica",
+    "prerequisitos": "Bônus base de ataque +1",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Usar Armas Simples",
+    "beneficios": "Não sofre penalidades nos ataques com armas simples",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Usar Armadura (leve)",
+    "beneficios": "Não sofre penalidade de armadura nas jogadas de ataque",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Usar Armadura (média)",
+    "beneficios": "Não sofre penalidade de armadura nas jogadas de ataque",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Usar Armadura (pesada)",
+    "beneficios": "Não sofre penalidade de armadura nas jogadas de ataque",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Usar Escudo",
+    "beneficios": "Não sofre penalidade de armadura nas jogadas de ataque",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ataque com Escudo Aprimorado¹",
+    "beneficios": "Conserva o bônus do escudo na CA quando ataca com ele",
+    "prerequisitos": "Usar Escudo",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Usar Escudo de Corpo",
+    "beneficios": "Não sofre penalidade de armadura nas jogadas de ataque",
+    "prerequisitos": "Usar Escudo",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Vitalidade³",
+    "beneficios": "+3 pontos de vida",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Vontade de Ferro",
+    "beneficios": "+2 de bônus nos testes de resistência de Vontade",
+    "prerequisitos": "-",
+    "secao": "Talentos Comuns",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Criar Armaduras e Armas Mágicas",
+    "beneficios": "Criar armas, armaduras e escudos mágicos",
+    "prerequisitos": "5° nível de conjurador",
+    "secao": "Talentos de Criação de Item",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Criar Bastão",
+    "beneficios": "Criar bastões mágicos",
+    "prerequisitos": "9° nível de conjurador",
+    "secao": "Talentos de Criação de Item",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Criar Cajado",
+    "beneficios": "Criar cajados mágicos",
+    "prerequisitos": "12° nível de conjurador",
+    "secao": "Talentos de Criação de Item",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Criar Item Maravilhoso",
+    "beneficios": "Criar itens mágicos maravilhosos",
+    "prerequisitos": "3° nível de conjurador",
+    "secao": "Talentos de Criação de Item",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Criar Varinha",
+    "beneficios": "Criar varinhas mágicas",
+    "prerequisitos": "5° nível de conjurador",
+    "secao": "Talentos de Criação de Item",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Escrever Pergaminho",
+    "beneficios": "Criar pergaminhos mágicos",
+    "prerequisitos": "1° nível de conjurador",
+    "secao": "Talentos de Criação de Item",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Forjar Anel",
+    "beneficios": "Criar anéis mágicos",
+    "prerequisitos": "12° nível de conjurador",
+    "secao": "Talentos de Criação de Item",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Preparar Poção",
+    "beneficios": "Criar poções mágicas",
+    "prerequisitos": "3° nível de conjurador",
+    "secao": "Talentos de Criação de Item",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Acelerar Magia",
+    "beneficios": "Conjura a magia como ação livre",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Ampliar Magia",
+    "beneficios": "Dobre a área da magia",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Aumentar Magia",
+    "beneficios": "Dobra o alcance da magia",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Elevar Magia",
+    "beneficios": "Conjura a magia num nível mais elevado",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Estender Magia",
+    "beneficios": "Dobra a duração da magia",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Magia Sem Gestos",
+    "beneficios": "Ignora os componentes gestuais da magia",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Magia Silenciosa",
+    "beneficios": "Ignora os componentes verbais da magia",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Maximizar Magia",
+    "beneficios": "Maximiza todas as variáveis numéricas dos efeitos da magia",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  },
+  {
+    "nome": "Potencializar Magia",
+    "beneficios": "Aumenta em 50% todas as variáveis numéricas dos efeitos da magia",
+    "prerequisitos": "-",
+    "secao": "Talentos Metamágicos",
+    "pagina_referencia": ""
+  }
+]
