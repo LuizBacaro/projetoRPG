@@ -232,6 +232,10 @@ def _executar_alembic_migrations() -> None:
     
     IMPORTANTE: Deve rodar APÓS create_all(), pois migrations fazem ALTER TABLE
     e precisam que as tabelas já existam.
+    
+    TODO: Falhas de migration devem abortar o startup. Não podemos seguir com um
+    banco parcialmente migrado, pois isso causa erros de coluna faltante em
+    etapas subsequentes.
     """
     try:
         from alembic.config import Config
@@ -241,8 +245,7 @@ def _executar_alembic_migrations() -> None:
         ini_path = backend_root / "alembic.ini"
         
         if not ini_path.exists():
-            logger.warning(f"⚠️  alembic.ini não encontrado em {ini_path}")
-            return
+            raise FileNotFoundError(f"alembic.ini não encontrado em {ini_path}")
         
         # Configurar Alembic
         cfg = Config(str(ini_path))
@@ -256,13 +259,22 @@ def _executar_alembic_migrations() -> None:
             command.upgrade(cfg, "head")
             logger.info("✅ Migrations do Alembic aplicadas com sucesso até HEAD")
         except Exception as migration_error:
-            # Logar o erro mas não falhar o startup
-            # As tabelas já foram criadas via create_all(), então funciona mesmo sem todas as migrations
-            logger.warning(f"⚠️  Erro ao aplicar migrations (mas continuando): {str(migration_error)[:200]}")
-        
+            logger.error(
+                "❌ Falha ao aplicar migrations do Alembic: %s",
+                str(migration_error)[:200]
+            )
+            raise RuntimeError(
+                "Falha ao aplicar migrations do Alembic. "
+                "Verifique o estado do banco e o histórico de migrations." 
+                f"Detalhes: {migration_error}"
+            ) from migration_error
     except Exception as e:
-        logger.warning(f"⚠️  Erro ao executar setup de migrations: {type(e).__name__}: {str(e)[:200]}")
-        # Não falhar - create_all() já garantiu as tabelas
+        logger.error(
+            "❌ Erro ao executar setup de migrations: %s: %s",
+            type(e).__name__,
+            str(e)[:200]
+        )
+        raise
 
 
 def _inicializar_banco(db) -> None:
