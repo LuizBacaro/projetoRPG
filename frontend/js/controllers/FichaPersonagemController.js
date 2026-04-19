@@ -22,7 +22,7 @@ import {
     isClasseConjuradora,
     normalizeClasseConjuradora,
     textoSlotsClerigoBreakdown,
-} from '../utils/combat-rules.js?v=20260418d';
+} from '../utils/combat-rules.js?v=20260419a';
 
 const DOMINIOS_PERMITIDOS_FALLBACK = [
     'Ar', 'Bem', 'Caos', 'Conhecimento', 'Cura', 'Destruição', 'Enganação', 'Fogo', 'Força',

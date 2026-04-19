@@ -4,7 +4,7 @@ import { MagiaSlotService      } from '../services/MagiaSlotService.js?v=2026040
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { Toast } from '/js/ui/toast.module.js';
 import { escapeHtml } from '../utils/formatters.js';
-import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots, normalizeClasseConjuradora } from '../utils/combat-rules.js?v=20260418d';
+import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots, normalizeClasseConjuradora } from '../utils/combat-rules.js?v=20260419a';
 import { getApiUrl } from '../config/api.config.js';
 
 export class ArenaController {

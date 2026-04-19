@@ -13,7 +13,7 @@ import {
     normalizeClasseConjuradora,
     resolveCombatenteSpellSlots,
     textoSlotsClerigoBreakdown,
-} from '../utils/combat-rules.js?v=20260418d';
+} from '../utils/combat-rules.js?v=20260419a';
 
 const ESCOLAS_ORDEM = [
     'Abjuracao',

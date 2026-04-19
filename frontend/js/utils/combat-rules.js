@@ -394,15 +394,22 @@ function resolveCombatenteSpellSlots(combatente, classe = null) {
         const totalExistente = Math.max(0, Number(slot?.total || 0));
         const totalCalculado = Math.max(0, Number(atual.total || 0));
         const usados = Math.max(0, Number(slot?.usados || atual.usados || 0));
+        // Clérigo: total_normal + total_dominio vêm da tabela; não preservar totais antigos do banco
+        // (ex.: truques com +1 domínio errado) via Math.max com a API.
+        const temBreakdownClerigo =
+            atual.total_normal != null && atual.total_dominio != null;
+        const totalMesclado = temBreakdownClerigo
+            ? totalCalculado
+            : Math.max(totalExistente, totalCalculado);
 
         mapa.set(nivel, {
             ...atual,
             ...slot,
             nivel,
-            total: Math.max(totalExistente, totalCalculado),
+            total: totalMesclado,
             total_normal: atual.total_normal,
             total_dominio: atual.total_dominio,
-            usados: Math.min(Math.max(totalExistente, totalCalculado), usados),
+            usados: Math.min(totalMesclado, usados),
             origem: totalExistente > 0 || slot?.id ? 'api' : atual.origem,
         });
     });
