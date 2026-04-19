@@ -24,7 +24,7 @@ from ..models.usuario import PerfilUsuario
 _CONDICAO_INCONSCIENTE = "Inconsciente"
 _CONDICAO_MORRENDO     = "Morrendo"
 
-# Clérigo: magias por dia (Normal) + domínio — Magias por dia clerigo.xlsx (C = nv. 0; D–E em diante = nv. 1+)
+# Clérigo: magias por dia (Normal) + domínio — Magias por dia clerigo.xlsx (C = nv. 0 só truques; D–E = nv. 1 Normal/Domínio; truques sem slot de domínio)
 _CLERIC_SPELLS_PER_DAY_NORMAL = [
     [3, 1, None, None, None, None, None, None, None, None],
     [4, 2, None, None, None, None, None, None, None, None],
@@ -49,26 +49,26 @@ _CLERIC_SPELLS_PER_DAY_NORMAL = [
 ]
 
 _CLERIC_SPELLS_PER_DAY_DOMINIO = [
-    [1, 1, None, None, None, None, None, None, None, None],
-    [1, 1, None, None, None, None, None, None, None, None],
-    [1, 1, 1, None, None, None, None, None, None, None],
-    [1, 1, 1, None, None, None, None, None, None, None],
-    [1, 1, 1, 1, None, None, None, None, None, None],
-    [1, 1, 1, 1, None, None, None, None, None, None],
-    [1, 1, 1, 1, 1, None, None, None, None, None],
-    [1, 1, 1, 1, 1, None, None, None, None, None],
-    [1, 1, 1, 1, 1, 1, None, None, None, None],
-    [1, 1, 1, 1, 1, 1, None, None, None, None],
-    [1, 1, 1, 1, 1, 1, 1, None, None, None],
-    [1, 1, 1, 1, 1, 1, 1, None, None, None],
-    [1, 1, 1, 1, 1, 1, 1, 1, None, None],
-    [1, 1, 1, 1, 1, 1, 1, 1, None, None],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, None],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, None],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 1, None, None, None, None, None, None, None, None],
+    [0, 1, None, None, None, None, None, None, None, None],
+    [0, 1, 1, None, None, None, None, None, None, None],
+    [0, 1, 1, None, None, None, None, None, None, None],
+    [0, 1, 1, 1, None, None, None, None, None, None],
+    [0, 1, 1, 1, None, None, None, None, None, None],
+    [0, 1, 1, 1, 1, None, None, None, None, None],
+    [0, 1, 1, 1, 1, None, None, None, None, None],
+    [0, 1, 1, 1, 1, 1, None, None, None, None],
+    [0, 1, 1, 1, 1, 1, None, None, None, None],
+    [0, 1, 1, 1, 1, 1, 1, None, None, None],
+    [0, 1, 1, 1, 1, 1, 1, None, None, None],
+    [0, 1, 1, 1, 1, 1, 1, 1, None, None],
+    [0, 1, 1, 1, 1, 1, 1, 1, None, None],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, None],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, None],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
 # Magias adicionais por modificador do atributo de conjuração (níveis 0–9). Fonte: tabela1-1_mod_habilidades_e_magias.xlsx
