@@ -2070,19 +2070,36 @@ body::before {
     }
 }
 
-/* ── Modal equipamentos (catálogo Tabela 7-5): campos por linha, sem texto duplicado ── */
+/* ── Modal equipamentos (catálogo Tabela 7-5): duas colunas (custo/danos | crítico/alcance/peso) ── */
 .equipamento-catalogo-linha .equipamento-spec-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
     margin: 0.45rem 0 0;
     width: 100%;
 }
 
+.equipamento-catalogo-linha .equipamento-spec-grid--unica {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-grid--duas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 1rem;
+    align-items: start;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
 .equipamento-catalogo-linha .equipamento-spec-par {
     display: grid;
-    grid-template-columns: minmax(7.25rem, 10rem) 1fr;
-    gap: 0.35rem 0.65rem;
+    grid-template-columns: minmax(6.5rem, 9.25rem) 1fr;
+    gap: 0.35rem 0.5rem;
     align-items: baseline;
     font-size: 0.82rem;
     line-height: 1.35;
@@ -2104,6 +2121,12 @@ body::before {
 
 .equipamento-catalogo-linha .equipamento-pag-ref {
     margin: 0.5rem 0 0;
+}
+
+@media (max-width: 560px) {
+    .equipamento-catalogo-linha .equipamento-spec-grid--duas {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {

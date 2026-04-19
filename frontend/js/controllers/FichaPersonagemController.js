@@ -1285,15 +1285,34 @@ export class FichaPersonagemController {
         if (!pares.length) {
             return '<p class="talento-linha-pre equipamento-spec-vazio">—</p>';
         }
-        return `<div class="equipamento-spec-grid" role="list">${pares
-            .map(
-                ([lbl, val]) => `
+
+        const blocoPar = ([lbl, val]) => `
             <div class="equipamento-spec-par" role="listitem">
                 <span class="equipamento-spec-lbl">${escapeHtml(lbl)}</span>
                 <span class="equipamento-spec-val">${escapeHtml(String(val))}</span>
-            </div>`
-            )
-            .join('')}</div>`;
+            </div>`;
+
+        let colEsq;
+        let colDir;
+        if (pares.length < 4) {
+            colEsq = pares;
+            colDir = [];
+        } else if (pares.length === 4) {
+            colEsq = pares.slice(0, 2);
+            colDir = pares.slice(2);
+        } else {
+            colEsq = pares.slice(0, 4);
+            colDir = pares.slice(4);
+        }
+
+        if (!colDir.length) {
+            return `<div class="equipamento-spec-grid equipamento-spec-grid--unica" role="list">${colEsq.map(blocoPar).join('')}</div>`;
+        }
+
+        return `<div class="equipamento-spec-grid equipamento-spec-grid--duas">
+            <div class="equipamento-spec-col" role="list">${colEsq.map(blocoPar).join('')}</div>
+            <div class="equipamento-spec-col" role="list">${colDir.map(blocoPar).join('')}</div>
+        </div>`;
     }
 
     renderizarEquipamentos(equipamentos) {
