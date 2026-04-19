@@ -1,3 +1,9 @@
+function _attr1a30(data, key, def = 10) {
+    const v = Number(data[key]);
+    if (!Number.isFinite(v)) return def;
+    return Math.min(30, Math.max(1, Math.round(v)));
+}
+
 export class Combatente {
     constructor(data) {
         this.id                = data.id;
@@ -21,12 +27,12 @@ export class Combatente {
         this.fortitude         = data.fortitude         !== undefined ? data.fortitude         : 0;
         this.reflexos          = data.reflexos          !== undefined ? data.reflexos          : 0;
         this.vontade           = data.vontade           !== undefined ? data.vontade           : 0;
-        this.forca             = data.forca             || 10;
-        this.destreza          = data.destreza          || 10;
-        this.constituicao      = data.constituicao      || 10;
-        this.inteligencia      = data.inteligencia      || 10;
-        this.sabedoria         = data.sabedoria         || 10;
-        this.carisma           = data.carisma           || 10;
+        this.forca             = _attr1a30(data, 'forca', 10);
+        this.destreza          = _attr1a30(data, 'destreza', 10);
+        this.constituicao      = _attr1a30(data, 'constituicao', 10);
+        this.inteligencia      = _attr1a30(data, 'inteligencia', 10);
+        this.sabedoria         = _attr1a30(data, 'sabedoria', 10);
+        this.carisma           = _attr1a30(data, 'carisma', 10);
         this.ataques           = Array.isArray(data.ataques)           ? data.ataques           : [];
         this.magias_slots      = Array.isArray(data.magias_slots)      ? data.magias_slots      : [];
         this.magias_preparadas = Array.isArray(data.magias_preparadas) ? data.magias_preparadas : [];

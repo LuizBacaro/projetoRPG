@@ -23,7 +23,7 @@ import {
     normalizeClasseConjuradora,
     textoSlotsClerigoBreakdown,
 } from '../utils/combat-rules.js?v=20260419a';
-import { modificadorPericiaPorAtributo } from '../utils/dnd.js?v=20260420a';
+import { modificadorPericiaPreferindoDomFicha } from '../utils/dnd.js?v=20260420b';
 
 const DOMINIOS_PERMITIDOS_FALLBACK = [
     'Ar', 'Bem', 'Caos', 'Conhecimento', 'Cura', 'Destruição', 'Enganação', 'Fogo', 'Força',
@@ -1177,7 +1177,7 @@ export class FichaPersonagemController {
 
         container.innerHTML = '';
         pericias.forEach(pj => {
-            const modAtr = modificadorPericiaPorAtributo(this.combatente, pj.pericia?.atributo);
+            const modAtr = modificadorPericiaPreferindoDomFicha(this.combatente, pj.pericia?.atributo);
             const total = pj.graduacao + modAtr + (pj.bonus_outros || 0);
             const item  = document.createElement('div');
             item.className = 'ficha-pericia-item';

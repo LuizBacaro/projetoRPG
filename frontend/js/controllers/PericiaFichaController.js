@@ -7,7 +7,7 @@
 import { CombatenteService } from '../services/CombatenteService.js';
 import { PericiaService } from '../services/PericiaService.js';
 import { NotificationService } from '../services/NotificationService.js';
-import { modificadorPericiaPorAtributo } from '../utils/dnd.js?v=20260420a';
+import { modificadorPericiaPorAtributo } from '../utils/dnd.js?v=20260420b';
 
 export class PericiaFichaController {
     constructor() {

@@ -7,7 +7,7 @@ import { API_CONFIG, getApiUrl } from '../config/api.config.js';
 import { NotificationService }   from '../services/NotificationService.js';
 import { CombatenteService }     from '../services/CombatenteService.js';
 import { PericiaService }        from '../services/PericiaService.js';
-import { modificadorPericiaPorAtributo } from '../utils/dnd.js?v=20260420a';
+import { modificadorPericiaPorAtributo } from '../utils/dnd.js?v=20260420b';
 //import { ModalConfirm }          from '../ui/ModalConfirm.js';   // ✅ import centralizado
 
 export class PericiaController {
