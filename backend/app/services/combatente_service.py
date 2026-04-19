@@ -24,6 +24,132 @@ from ..models.usuario import PerfilUsuario
 _CONDICAO_INCONSCIENTE = "Inconsciente"
 _CONDICAO_MORRENDO     = "Morrendo"
 
+# Clérigo: magias por dia (Normal) + domínio — Magias por dia clerigo.xlsx (C = nv. 0; D–E em diante = nv. 1+)
+_CLERIC_SPELLS_PER_DAY_NORMAL = [
+    [3, 1, None, None, None, None, None, None, None, None],
+    [4, 2, None, None, None, None, None, None, None, None],
+    [5, 2, 1, None, None, None, None, None, None, None],
+    [5, 3, 2, None, None, None, None, None, None, None],
+    [5, 3, 2, 1, None, None, None, None, None, None],
+    [6, 3, 3, 2, None, None, None, None, None, None],
+    [6, 4, 3, 2, 1, None, None, None, None, None],
+    [6, 4, 3, 3, 2, None, None, None, None, None],
+    [6, 4, 4, 3, 2, 1, None, None, None, None],
+    [6, 4, 4, 3, 3, 2, None, None, None, None],
+    [6, 5, 4, 4, 3, 2, 1, None, None, None],
+    [6, 5, 4, 4, 3, 3, 2, None, None, None],
+    [6, 5, 5, 4, 4, 3, 2, 1, None, None],
+    [6, 5, 5, 4, 4, 3, 3, 2, None, None],
+    [6, 5, 5, 5, 4, 4, 3, 2, 1, None],
+    [6, 5, 5, 5, 4, 4, 3, 3, 2, None],
+    [6, 5, 5, 5, 5, 4, 4, 3, 2, 1],
+    [6, 5, 5, 5, 5, 4, 4, 3, 3, 2],
+    [6, 5, 5, 5, 5, 5, 4, 4, 3, 3],
+    [6, 5, 5, 5, 5, 5, 4, 4, 4, 4],
+]
+
+_CLERIC_SPELLS_PER_DAY_DOMINIO = [
+    [1, 1, None, None, None, None, None, None, None, None],
+    [1, 1, None, None, None, None, None, None, None, None],
+    [1, 1, 1, None, None, None, None, None, None, None],
+    [1, 1, 1, None, None, None, None, None, None, None],
+    [1, 1, 1, 1, None, None, None, None, None, None],
+    [1, 1, 1, 1, None, None, None, None, None, None],
+    [1, 1, 1, 1, 1, None, None, None, None, None],
+    [1, 1, 1, 1, 1, None, None, None, None, None],
+    [1, 1, 1, 1, 1, 1, None, None, None, None],
+    [1, 1, 1, 1, 1, 1, None, None, None, None],
+    [1, 1, 1, 1, 1, 1, 1, None, None, None],
+    [1, 1, 1, 1, 1, 1, 1, None, None, None],
+    [1, 1, 1, 1, 1, 1, 1, 1, None, None],
+    [1, 1, 1, 1, 1, 1, 1, 1, None, None],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, None],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, None],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+]
+
+# Magias adicionais por modificador do atributo de conjuração (níveis 0–9). Fonte: tabela1-1_mod_habilidades_e_magias.xlsx
+_SPELL_BONUS_BY_MODIFIER = {
+    -5: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    -4: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    -3: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    -2: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    -1: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    0: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    1: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    2: (1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    3: (1, 1, 0, 0, 0, 0, 0, 0, 0, 0),
+    4: (1, 1, 1, 0, 0, 0, 0, 0, 0, 0),
+    5: (1, 1, 1, 1, 0, 0, 0, 0, 0, 0),
+    6: (1, 1, 1, 1, 1, 0, 0, 0, 0, 0),
+    7: (1, 1, 1, 1, 1, 1, 0, 0, 0, 0),
+    8: (1, 1, 1, 1, 1, 1, 1, 0, 0, 0),
+    9: (1, 1, 1, 1, 1, 1, 1, 1, 0, 0),
+    10: (1, 1, 1, 1, 1, 1, 1, 1, 1, 0),
+    11: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    12: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    13: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    14: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    15: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    16: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    17: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    18: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    19: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    20: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    21: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    22: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    23: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    24: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    25: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    26: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    27: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    28: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    29: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    30: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    31: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    32: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    33: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    34: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    35: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    36: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    37: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    38: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    39: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    40: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    41: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    42: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    43: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    44: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+    45: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+}
+
+
+def _bonus_magias_por_modificador(mod: int) -> List[int]:
+    m = max(-5, min(45, int(mod)))
+    return list(_SPELL_BONUS_BY_MODIFIER[m])
+
+
+def _linha_slots_clerigo(nivel_personagem: int, modificador_sab: int) -> List[Optional[int]]:
+    """Uma linha por nível de magia (0–9): totais = normal + domínio + bônus por atributo (Tabela 1-1)."""
+    idx = max(1, min(20, nivel_personagem)) - 1
+    n_row = _CLERIC_SPELLS_PER_DAY_NORMAL[idx]
+    d_row = _CLERIC_SPELLS_PER_DAY_DOMINIO[idx]
+    bonus = _bonus_magias_por_modificador(modificador_sab)
+
+    linha: List[Optional[int]] = [None] * 10
+    for sl in range(10):
+        raw_n = n_row[sl]
+        raw_d = d_row[sl]
+        if raw_n is None and raw_d is None:
+            continue
+        b_attr = bonus[sl] if sl < len(bonus) else 0
+        total = (raw_n or 0) + (raw_d or 0) + b_attr
+        linha[sl] = total
+    return linha
+
 
 class CombatenteService:
 
@@ -424,7 +550,7 @@ class CombatenteService:
         """Inicializa slots de magia para um combatente baseado em sua classe e nível."""
         combatente = self.obter_por_id(combatente_id)
         
-        # Mapeamento de classe -> atributo chave para modificador
+        # Magias adicionais (Tabela 1-1): INT Mago; CAR Feiticeiro/Bardo; SAB Clérigo/Druida/Paladino/Ranger
         ATRIBUTO_CHAVE = {
             'Mago': 'inteligencia',
             'Feiticeiro': 'carisma',
@@ -480,28 +606,6 @@ class CombatenteService:
                 [4,4,4,4,4,4,4,3,3,2],
                 [4,4,4,4,4,4,4,4,3,3],
                 [4,4,4,4,4,4,4,4,4,4],
-            ],
-            'Clérigo': [
-                [3,1,None,None,None,None,None,None,None,None],
-                [4,2,None,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [5,3,2,None,None,None,None,None,None,None],
-                [5,3,2,1,None,None,None,None,None,None],
-                [5,3,3,2,None,None,None,None,None,None],
-                [6,4,3,2,1,None,None,None,None,None],
-                [6,4,3,3,2,None,None,None,None,None],
-                [6,4,4,3,2,1,None,None,None,None],
-                [6,4,4,3,3,2,None,None,None,None],
-                [6,5,4,4,3,2,1,None,None,None],
-                [6,5,4,4,3,3,2,None,None,None],
-                [6,5,5,4,4,3,2,1,None,None],
-                [6,5,5,4,4,3,3,2,None,None],
-                [6,5,5,5,4,4,3,2,1,None],
-                [6,5,5,5,4,4,3,3,2,None],
-                [6,5,5,5,5,4,4,3,2,1],
-                [6,5,5,5,5,4,4,3,3,2],
-                [6,5,5,5,5,5,4,4,3,3],
-                [6,5,5,5,5,5,4,4,4,4],
             ],
             'Druida': [
                 [3,1,None,None,None,None,None,None,None,None],
@@ -595,42 +699,28 @@ class CombatenteService:
         
         classe = combatente.classe
         tabla = TABELA_SLOTS.get(classe)
-        
-        if not tabla:
-            raise DadosInvalidos(f"Classe {classe} não suporta slots de magia")
-        
+
         nivel = min(max(1, combatente.nivel or 1), 20)
-        
+
+        atributo_chave = ATRIBUTO_CHAVE.get(classe, "inteligencia")
+        valor_atributo = getattr(combatente, atributo_chave, 10) or 10
+        modificador = (valor_atributo - 10) // 2
+
+        if classe == "Clérigo":
+            linha_slots = _linha_slots_clerigo(nivel, modificador)
+        else:
+            if not tabla:
+                raise DadosInvalidos(f"Classe {classe} não suporta slots de magia")
+            linha_slots = tabla[nivel - 1]
+
         # Verificar se a classe tem slots disponíveis neste nível
-        linha_slots = tabla[nivel - 1]
         tem_slots = any(slot is not None for slot in linha_slots)
         
         if not tem_slots:
             raise DadosInvalidos(f"Classe {classe} não ganha slots de magia até o nível 3. Nível atual: {nivel}")
-        
-        
-        # Obter modificador do atributo chave
-        atributo_chave = ATRIBUTO_CHAVE.get(classe, 'inteligencia')
-        valor_atributo = getattr(combatente, atributo_chave, 10) or 10
-        modificador = (valor_atributo - 10) // 2
-        
-        # Tabela de bônus por modificador (para níveis 1-9 de magia)
-        BONUS_ATRIBUTO = {
-            -5: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            -4: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            -3: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            -2: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            -1: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            0: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            1: [1, 0, 0, 0, 0, 0, 0, 0, 0],
-            2: [1, 0, 0, 0, 0, 0, 0, 0, 0],
-            3: [1, 1, 0, 0, 0, 0, 0, 0, 0],
-            4: [1, 1, 0, 0, 0, 0, 0, 0, 0],
-            5: [1, 1, 1, 0, 0, 0, 0, 0, 0],
-        }
-        
-        bonus_list = BONUS_ATRIBUTO.get(modificador, [0, 0, 0, 0, 0, 0, 0, 0, 0])
-        
+
+        bonus_row = _bonus_magias_por_modificador(modificador)
+
         # Deletar slots existentes
         for slot in combatente.magias_slots:
             self.repository.db.delete(slot)
@@ -640,11 +730,13 @@ class CombatenteService:
         for nivel_magia, base in enumerate(linha_slots):
             if base is None:
                 continue
-            
-            # nivel_magia começa em 0 (slots de nível 0), então acessar bonus_list direto
-            bonus = bonus_list[nivel_magia] if nivel_magia < len(bonus_list) else 0
-            total_slots = base + bonus
-            
+
+            if classe == "Clérigo":
+                total_slots = int(base)
+            else:
+                b = bonus_row[nivel_magia] if nivel_magia < len(bonus_row) else 0
+                total_slots = base + b
+
             novo_slot = MagiaSlot(
                 combatente_id=combatente_id,
                 nivel=nivel_magia,
