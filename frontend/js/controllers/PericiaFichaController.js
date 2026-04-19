@@ -7,6 +7,7 @@
 import { CombatenteService } from '../services/CombatenteService.js';
 import { PericiaService } from '../services/PericiaService.js';
 import { NotificationService } from '../services/NotificationService.js';
+import { modificadorPericiaPorAtributo } from '../utils/dnd.js?v=20260420a';
 
 export class PericiaFichaController {
     constructor() {
@@ -106,12 +107,14 @@ export class PericiaFichaController {
                 const data = await response.json();
                 if (data.pericias && Array.isArray(data.pericias)) {
                     data.pericias.forEach(p => {
+                        const def = this.pericias.find((pp) => pp.id === p.pericia_id);
+                        const mod = modificadorPericiaPorAtributo(this.combatente, def?.atributo);
                         this.periciasAdicionadas.set(p.pericia_id, {
                             id: p.id,
                             graduacao: p.graduacao,
-                            modificador_atributo: p.modificador_atributo || 0,
+                            modificador_atributo: mod,
                             bonus: p.bonus_outros || 0,
-                            total: (p.graduacao || 0) + (p.modificador_atributo || 0) + (p.bonus_outros || 0)
+                            total: (p.graduacao || 0) + mod + (p.bonus_outros || 0),
                         });
                     });
                 }
@@ -157,6 +160,7 @@ export class PericiaFichaController {
             const isClasse = custo === 1;
             const adicionada = this.periciasAdicionadas.has(pericia.id);
             const dados = adicionada ? this.periciasAdicionadas.get(pericia.id) : null;
+            const modAtr = modificadorPericiaPorAtributo(this.combatente, pericia.atributo);
 
             const tr = document.createElement('tr');
             tr.dataset.periciaId = pericia.id;
@@ -182,7 +186,7 @@ export class PericiaFichaController {
                            ${!adicionada ? 'disabled' : ''}>
                 </td>
                 <td style="text-align: center; font-weight: bold;">
-                    ${adicionada ? (dados.modificador_atributo >= 0 ? '+' : '') + dados.modificador_atributo.toFixed(0) : '-'}
+                    ${adicionada ? (modAtr >= 0 ? '+' : '') + modAtr : '-'}
                 </td>
                 <td>
                     <input type="number" class="pericias-input input-bonus"
@@ -194,7 +198,7 @@ export class PericiaFichaController {
                 </td>
                 <td style="text-align: center; font-weight: bold; min-width: 50px;">
                     ${adicionada
-                        ? `${dados.total >= 0 ? '+' : ''}${dados.total}`
+                        ? `${(dados.graduacao + modAtr + (dados.bonus || 0)) >= 0 ? '+' : ''}${dados.graduacao + modAtr + (dados.bonus || 0)}`
                         : '-'
                     }
                 </td>
@@ -285,9 +289,12 @@ export class PericiaFichaController {
 
             if (periciaId) {
                 const dados = this.periciasAdicionadas.get(periciaId);
+                const def = this.pericias.find((p) => p.id === periciaId);
+                const mod = modificadorPericiaPorAtributo(this.combatente, def?.atributo);
                 dados.graduacao = graduacao;
                 dados.bonus = bonusOutros;
-                dados.total = (graduacao || 0) + (dados.modificador_atributo || 0) + (bonusOutros || 0);
+                dados.modificador_atributo = mod;
+                dados.total = (graduacao || 0) + mod + (bonusOutros || 0);
             }
 
         } catch (error) {
@@ -322,13 +329,16 @@ export class PericiaFichaController {
             );
 
 
-            // Marcar como adicionada
+            const periciaDef = this.pericias.find((p) => p.id === periciaId);
+            const mod = modificadorPericiaPorAtributo(this.combatente, periciaDef?.atributo);
+
+            // Marcar como adicionada (Mod. sempre derivado dos atributos atuais da ficha)
             this.periciasAdicionadas.set(periciaId, {
                 id: response.id,
                 graduacao: response.graduacao,
-                modificador_atributo: response.modificador_atributo || 0,
+                modificador_atributo: mod,
                 bonus: response.bonus_outros || 0,
-                total: (response.graduacao || 0) + (response.modificador_atributo || 0) + (response.bonus_outros || 0)
+                total: (response.graduacao || 0) + mod + (response.bonus_outros || 0),
             });
 
             // Recarregar combatente para atualizar pontos

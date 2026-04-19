@@ -20,6 +20,31 @@ export function caBasePorDestreza(valorDestreza) {
     return 10 + Math.floor((des - 10) / 2);
 }
 
+/** Código da perícia (coluna Atr.) → campo no combatente */
+const ATRIBUTO_PERICIA_PARA_CAMPO = {
+    FOR: 'forca',
+    DES: 'destreza',
+    CON: 'constituicao',
+    INT: 'inteligencia',
+    SAB: 'sabedoria',
+    CAR: 'carisma',
+};
+
+/**
+ * Modificador de perícia a partir do atributo associado (FOR/DES/…) e da ficha atual.
+ * Não usar o valor persistido em pericia_jogador — pode ficar defasado se os atributos mudarem.
+ */
+export function modificadorPericiaPorAtributo(combatente, atributoCodigo) {
+    if (!combatente) return 0;
+    const key = String(atributoCodigo ?? '').trim().toUpperCase();
+    const campo = ATRIBUTO_PERICIA_PARA_CAMPO[key];
+    if (!campo) return 0;
+    const raw = combatente[campo];
+    const n = parseInt(raw, 10);
+    const valor = Number.isFinite(n) ? Math.min(30, Math.max(1, n)) : 10;
+    return Math.floor((valor - 10) / 2);
+}
+
 /**
  * Formata modificador com sinal (+/-)
  */

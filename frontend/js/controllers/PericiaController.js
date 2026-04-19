@@ -7,6 +7,7 @@ import { API_CONFIG, getApiUrl } from '../config/api.config.js';
 import { NotificationService }   from '../services/NotificationService.js';
 import { CombatenteService }     from '../services/CombatenteService.js';
 import { PericiaService }        from '../services/PericiaService.js';
+import { modificadorPericiaPorAtributo } from '../utils/dnd.js?v=20260420a';
 //import { ModalConfirm }          from '../ui/ModalConfirm.js';   // ✅ import centralizado
 
 export class PericiaController {
@@ -56,12 +57,13 @@ export class PericiaController {
                 const data = await response.json();
                 this.periciasSelecionadas.clear();
                 (data.pericias || []).forEach(pj => {
+                    const modAtr = modificadorPericiaPorAtributo(this.combatente, pj.pericia?.atributo);
                     const dadosPericia = {
                         id:          pj.id,
                         pericia:     pj.pericia,
                         graduacao:   pj.graduacao       || 0,
                         bonus:       pj.bonus_outros    || 0,
-                        modAtributo: pj.modificador_atributo || 0,
+                        modAtributo: modAtr,
                     };
                     this.periciasSelecionadas.set(pj.pericia_id, dadosPericia);
                 });
@@ -172,7 +174,7 @@ export class PericiaController {
 
     togglePericia(pericia, marcada) {
         if (marcada) {
-            const modAtributo = this.calcularModAtributo(pericia);
+            const modAtributo = modificadorPericiaPorAtributo(this.combatente, pericia.atributo);
             this.periciasSelecionadas.set(pericia.id, {
                 pericia,
                 graduacao:   0,
@@ -186,20 +188,7 @@ export class PericiaController {
     }
 
     calcularModAtributo(pericia) {
-        const atributoMap = {
-            FOR: 'forca', DES: 'destreza', CON: 'constituicao',
-            INT: 'inteligencia', SAB: 'sabedoria', CAR: 'carisma',
-        };
-        const atributoNome = atributoMap[pericia.atributo];
-        const valorAtributo = this.combatente[atributoNome];
-        
-        if (!atributoNome || !valorAtributo) {
-            console.warn(`⚠️ Atributo "${pericia.atributo}" não mapeado ou combatente sem "${atributoNome}"`);
-            return 0;
-        }
-        
-        const modificador = Math.floor((valorAtributo - 10) / 2);
-        return modificador;
+        return modificadorPericiaPorAtributo(this.combatente, pericia?.atributo);
     }
 
     atualizarTotal(tr, dados) {
