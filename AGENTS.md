@@ -13,6 +13,7 @@ Este `AGENTS.md` existe como resumo operacional e guia de uso para o time.
 - Antes de implementar, ler contexto em [README.md](README.md) e instrucoes aplicaveis em [.github/instructions](.github/instructions).
 - Em tarefas que toquem arquitetura, deploy, dados, schema ou decisoes historicas, consultar [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md).
 - Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill do projeto em [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md) — habilite essa skill no Cursor para o agente carregar esse contexto.
+- Conjuração D&D 3.5 (atributo por classe, Tabela 1-1, clérigo, troca Bardo/Feiticeiro): documentação em [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
 
 ## Agentes
 
@@ -67,6 +68,9 @@ Usar quando for preciso extrair texto, tabelas e informacoes de PDFs com suporte
 
 - `rpg-requirements-analysis`
 Workflow para transformar texto de regra, PDF ou documento em especificacao acionavel, separando regra da fonte, interpretacao operacional e decisao de produto.
+
+- `dnd-spellcasting-conventions` ([.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md))
+Atributo de conjuração por classe, Tabela 1-1, planilhas Excel, clérigo (domínio), troca de magias Bardo/Feiticeiro e pontos de código.
 
 ## Hooks
 

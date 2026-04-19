@@ -7,11 +7,13 @@ SOLID: Single Responsibility — apenas seed de magias
 import argparse
 import os
 import sys
+import unicodedata
 
 # ── Adicionar raiz ao path ──
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from sqlalchemy.orm import Session
+
 from app.models.magia import Magia, MagiaClasse
 from app.core.database import SessionLocal
 from app.core.text_utils import normalizar_classe as _norm_classe
@@ -1171,9 +1173,34 @@ def _converter_resistencia_magica(valor) -> bool:
     return bool(valor)
 
 
+def _norm_nome_magia(nome: str) -> str:
+    """NFC + trim — evita duplicatas por variantes Unicode do mesmo nome."""
+    return unicodedata.normalize("NFC", (nome or "").strip())
+
+
+def _chave_nome_magia(nome: str) -> str:
+    """Chave estável para igualdade de nome (NFC + casefold — não usar SQL lower() com acentos)."""
+    return _norm_nome_magia(nome).casefold()
+
+
+def _magia_por_nome_ci(db: Session, nome: str) -> Magia | None:
+    """Uma magia por nome (case-insensitive, NFC), conforme uq_magias_nome."""
+    alvo = _chave_nome_magia(nome)
+    if not alvo:
+        return None
+    exato = _norm_nome_magia(nome)
+    hit = db.query(Magia).filter(Magia.nome == exato).first()
+    if hit:
+        return hit
+    for m in db.query(Magia).all():
+        if _chave_nome_magia(m.nome) == alvo:
+            return m
+    return None
+
+
 def _dados_magia_para_payload(dados: tuple) -> dict:
     return {
-        'nome': dados[0],
+        'nome': _norm_nome_magia(dados[0] or ''),
         'nivel': dados[1],
         'classe': _norm_classe(dados[2]),
         'escola': dados[3] or None,
@@ -1209,16 +1236,10 @@ def sincronizar_magias(
         'dry_run': dry_run,
     }
 
-    query = db.query(Magia).order_by(Magia.id.asc())
-    if classes_normalizadas:
-        query = query.filter(Magia.classe.in_(classes_normalizadas))
-    if niveis_normalizados:
-        query = query.filter(Magia.nivel.in_(niveis_normalizados))
-
-    existentes: dict[tuple[str, int, str], Magia] = {}
-    for magia in query.all():
-        chave = (magia.nome, magia.nivel, magia.classe)
-        existentes.setdefault(chave, magia)
+    # Índice por nome (minúsculo): uma linha em `magias` por nome — listas por classe ficam em magias_classes.
+    existentes: dict[str, Magia] = {}
+    for magia in db.query(Magia).order_by(Magia.id.asc()).all():
+        existentes.setdefault(_norm_nome_magia(magia.nome).lower(), magia)
 
     vistos_seed: set[tuple[str, int, str]] = set()
 
@@ -1237,7 +1258,8 @@ def sincronizar_magias(
 
             vistos_seed.add(chave)
             stats['total'] += 1
-            existente = existentes.get(chave)
+            nl = _norm_nome_magia(payload['nome']).lower()
+            existente = existentes.get(nl)
 
             if existente is None:
                 nova = Magia(**payload)
@@ -1245,20 +1267,11 @@ def sincronizar_magias(
                 db.flush()
                 stats['inseridas'] += 1
                 magia_obj = nova
+                existentes[nl] = nova
             else:
-                alterado = False
-                for campo, valor in payload.items():
-                    if getattr(existente, campo) != valor:
-                        setattr(existente, campo, valor)
-                        alterado = True
-
-                if alterado:
-                    stats['atualizadas'] += 1
-                else:
-                    stats['inalteradas'] += 1
                 magia_obj = existente
 
-            # Upsert em magias_classes para garantir visibilidade na rota primária do repositório
+            # Upsert em magias_classes — fonte primária para filtro por classe na API
             mc = db.query(MagiaClasse).filter_by(
                 magia_id=magia_obj.id, classe=payload['classe']
             ).first()
@@ -1268,8 +1281,13 @@ def sincronizar_magias(
                     classe=payload['classe'],
                     nivel=payload['nivel'],
                 ))
+                stats['atualizadas'] += 1
             elif mc.nivel != payload['nivel']:
-                mc.nivel = payload['nivel']
+                mc.nivel = max(int(mc.nivel), int(payload['nivel']))
+                stats['atualizadas'] += 1
+            else:
+                stats['inalteradas'] += 1
+            db.flush()
 
         if dry_run:
             db.rollback()
@@ -1293,7 +1311,13 @@ def sincronizar_magias(
 
 
 def seed_magias(db: Session, force: bool = False) -> dict:
-    stats = {'inseridas': 0, 'ignoradas': 0, 'erros': 0, 'total': 0}
+    stats = {
+        'inseridas': 0,
+        'vinculos_classe': 0,
+        'ignoradas': 0,
+        'erros': 0,
+        'total': 0,
+    }
 
     total_existente = db.query(Magia).count()
     if total_existente > 0 and not force:
@@ -1304,7 +1328,7 @@ def seed_magias(db: Session, force: bool = False) -> dict:
     if force and total_existente > 0:
         db.query(Magia).delete()
         db.commit()
-        print(f"🗑️  Tabela limpa.")
+        print("🗑️  Tabela limpa.")
 
     todas_magias = _todas_magias()
 
@@ -1312,30 +1336,52 @@ def seed_magias(db: Session, force: bool = False) -> dict:
     LOTE = 50
 
     for i in range(0, len(todas_magias), LOTE):
-        lote = todas_magias[i:i + LOTE]
+        lote = todas_magias[i : i + LOTE]
         try:
             for dados in lote:
+                nome = _norm_nome_magia(dados[0] or '')
+                if not nome:
+                    continue
+                nivel = dados[1]
+                classe_c = _norm_classe(dados[2])
                 res_magica = _converter_resistencia_magica(dados[12])
 
-                magia = Magia(
-                    nome               = dados[0],
-                    nivel              = dados[1],
-                    classe             = _norm_classe(dados[2]),
-                    escola             = dados[3] or None,
-                    sub_escola         = dados[4] or None,
-                    componentes        = dados[5] or None,
-                    alcance            = dados[6] or None,
-                    area_efeito        = dados[7] or None,
-                    duracao            = dados[8] or None,
-                    tempo_conjuracao   = dados[9] or None,
-                    dano               = dados[10] or None,
-                    teste_resistencia  = dados[11] or None,
-                    resistencia_magica = res_magica,  # ✅ bool correto
-                    descricao          = dados[13],
-                    ativo              = True,
+                magia = _magia_por_nome_ci(db, nome)
+                if magia is None:
+                    magia = Magia(
+                        nome=nome,
+                        nivel=nivel,
+                        classe=classe_c,
+                        escola=dados[3] or None,
+                        sub_escola=dados[4] or None,
+                        componentes=dados[5] or None,
+                        alcance=dados[6] or None,
+                        area_efeito=dados[7] or None,
+                        duracao=dados[8] or None,
+                        tempo_conjuracao=dados[9] or None,
+                        dano=dados[10] or None,
+                        teste_resistencia=dados[11] or None,
+                        resistencia_magica=res_magica,
+                        descricao=dados[13],
+                        ativo=True,
+                    )
+                    db.add(magia)
+                    db.flush()
+                    stats['inseridas'] += 1
+
+                mc = (
+                    db.query(MagiaClasse)
+                    .filter_by(magia_id=magia.id, classe=classe_c)
+                    .first()
                 )
-                db.add(magia)
-                stats['inseridas'] += 1
+                if mc is None:
+                    db.add(MagiaClasse(magia_id=magia.id, classe=classe_c, nivel=nivel))
+                    stats['vinculos_classe'] += 1
+                elif mc.nivel != nivel:
+                    # Seed pode repetir (nome,classe) com níveis distintos; a PK permite 1 nível/classe.
+                    mc.nivel = max(int(mc.nivel), int(nivel))
+                db.flush()
+
             db.commit()
             print(f"✅ Lote {i // LOTE + 1}: {min(i + LOTE, len(todas_magias))}/{stats['total']}")
         except Exception as e:
@@ -1343,7 +1389,10 @@ def seed_magias(db: Session, force: bool = False) -> dict:
             stats['erros'] += len(lote)
             print(f"❌ Erro no lote {i // LOTE + 1}: {e}")
 
-    print(f"\n🎲 Seed finalizado: {stats['inseridas']} inseridas | {stats['erros']} erros")
+    print(
+        f"\n🎲 Seed finalizado: {stats['inseridas']} magias novas | "
+        f"{stats['vinculos_classe']} vínculos classe | {stats['erros']} erros"
+    )
     return stats
 
 

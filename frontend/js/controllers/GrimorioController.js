@@ -1,4 +1,4 @@
-import { MagiaService } from '../services/MagiaService.js?v=20260411b';
+import { MagiaService } from '../services/MagiaService.js?v=20260419b';
 import { GrimorioService } from '../services/GrimorioService.js?v=20260411b';
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { getApiUrl } from '../config/api.config.js';

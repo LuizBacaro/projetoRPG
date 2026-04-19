@@ -1,7 +1,7 @@
 from fastapi import Response
 
 from app.api.v1.magias import listar_magias
-from app.models.magia import Magia
+from app.models.magia import Magia, MagiaClasse
 from app.models.usuario import PerfilUsuario, Usuario
 from app.repositories.usuario_repository import UsuarioRepository
 
@@ -38,6 +38,39 @@ def test_listar_magias_aplica_paginacao_e_headers(test_db):
     assert response.headers["x-total-count"] == "3"
     assert response.headers["x-skip"] == "1"
     assert response.headers["x-limit"] == "1"
+
+
+def test_listar_magias_filtra_classe_com_acento_sqlite(test_db):
+    """
+    SQLite upper('Clérigo') não vira CLERIGO; o repositório deve comparar com normalização Python.
+    """
+    m = Magia(nome="Cura Ferimentos Leves", nivel=1, classe="CLERIGO", ativo=True)
+    test_db.add(m)
+    test_db.flush()
+    test_db.add(MagiaClasse(magia_id=m.id, classe="Clérigo", nivel=1))
+    test_db.commit()
+
+    response = Response()
+    resultado = listar_magias(
+        classe="CLERIGO",
+        nivel=None,
+        escola=None,
+        nome=None,
+        componentes=None,
+        dominio=None,
+        ativo=None,
+        sort_by=None,
+        sort_dir="asc",
+        skip=0,
+        limit=50,
+        response=response,
+        db=test_db,
+    )
+
+    assert len(resultado) == 1
+    item = resultado[0]
+    nome = item["nome"] if isinstance(item, dict) else item.nome
+    assert nome == "Cura Ferimentos Leves"
 
 
 def test_usuario_repository_lista_e_conta_com_paginacao(test_db):
