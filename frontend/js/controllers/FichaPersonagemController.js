@@ -1831,6 +1831,11 @@ export class FichaPersonagemController {
             return;
         }
 
+        const mostrarExcluirCatalogo =
+            typeof window !== 'undefined' && typeof window.AuthService?.isAdmin === 'function'
+                ? window.AuthService.isAdmin()
+                : false;
+
         lista.innerHTML = `${equipamentos.map((eq) => {
             const catParts = [eq.categoria, eq.subcategoria].filter(Boolean).map((s) => String(s).trim());
             const secaoTxt = catParts.length ? catParts.join(' · ') : '—';
@@ -1838,6 +1843,9 @@ export class FichaPersonagemController {
                 eq.pagina_referencia && String(eq.pagina_referencia).trim() !== ''
                     ? `<p class="talento-linha-pre equipamento-pag-ref"><span class="talento-linha-rotulo">Referência:</span> ${escapeHtml(eq.pagina_referencia)}</p>`
                     : '';
+            const btnRemoverCatalogo = mostrarExcluirCatalogo
+                ? `<button type="button" class="talento-linha-acao item-btn-danger" data-equipamento-id="${eq.id}" data-acao-catalogo="remover" title="Remove este item do catálogo global para todos os jogadores">🗑️ Catálogo</button>`
+                : '';
             return `
             <article class="talento-linha equipamento-catalogo-linha">
                 <div class="talento-linha-conteudo">
@@ -1848,7 +1856,10 @@ export class FichaPersonagemController {
                     ${this._htmlSpecEquipamentoCatalogo(eq)}
                     ${pagBloco}
                 </div>
-                <button type="button" class="talento-linha-acao item-btn-primary" data-equipamento-id="${eq.id}">➕ Adicionar</button>
+                <div class="equipamento-catalogo-acoes">
+                    <button type="button" class="talento-linha-acao item-btn-primary" data-equipamento-id="${eq.id}">➕ Adicionar</button>
+                    ${btnRemoverCatalogo}
+                </div>
             </article>`;
         }).join('')}
             ${mostrarMais ? `
@@ -1859,12 +1870,23 @@ export class FichaPersonagemController {
                 </div>` : ''}
         `;
 
-        lista.querySelectorAll('.talento-linha-acao[data-equipamento-id]').forEach((btn) => {
+        lista.querySelectorAll('.equipamento-catalogo-acoes .item-btn-primary[data-equipamento-id]').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const equipamentoId = Number(btn.dataset.equipamentoId);
                 if (Number.isFinite(equipamentoId)) {
                     this.adicionarEquipamentoClic(equipamentoId);
                 }
+            });
+        });
+
+        lista.querySelectorAll('.equipamento-catalogo-acoes .item-btn-danger[data-acao-catalogo="remover"]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const equipamentoId = Number(btn.dataset.equipamentoId);
+                if (!Number.isFinite(equipamentoId)) return;
+                const nome =
+                    (this.equipamentosDisponiveis || []).find((e) => Number(e.id) === equipamentoId)?.nome ||
+                    'Equipamento';
+                this.confirmarRemocaoEquipamentoCatalogo(equipamentoId, nome);
             });
         });
 
@@ -1950,6 +1972,49 @@ export class FichaPersonagemController {
                 window.NotificationService.mostrarErro('❌ Erro ao adicionar equipamento');
             }
         }
+    }
+
+    /**
+     * Admin: remove o item do catálogo global (não afeta apenas a ficha atual).
+     */
+    confirmarRemocaoEquipamentoCatalogo(equipamentoId, nomeEquipamento) {
+        const self = this;
+        const opcoes = {
+            icone: '🗑️',
+            titulo: 'Remover do catálogo',
+            texto:
+                `Isso remove <strong>"${escapeHtml(nomeEquipamento)}"</strong> do catálogo global ` +
+                '(soft delete). Não é possível desfazer pela interface. Continuar?',
+            textoConfirmar: 'Remover do catálogo',
+            classeConfirmar: 'modal-confirm-btn-perigo',
+            onConfirmar: async () => {
+                try {
+                    await self.equipamentoService.deletarEquipamentoDoCatalogo(equipamentoId);
+                    self.equipamentosDisponiveis = (self.equipamentosDisponiveis || []).filter(
+                        (e) => Number(e.id) !== Number(equipamentoId)
+                    );
+                    const termo = document.getElementById('equipamentosBusca')?.value || '';
+                    const filtrados = self.equipamentoService.filtrarPorBusca(
+                        self.equipamentosDisponiveis,
+                        termo
+                    );
+                    self.renderizarListaEquipamentos(filtrados);
+                    if (window.NotificationService) {
+                        window.NotificationService.mostrarSucesso(`✅ "${nomeEquipamento}" removido do catálogo.`);
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao remover equipamento do catálogo:', error);
+                    const msg =
+                        error?.message && String(error.message).trim() !== ''
+                            ? error.message
+                            : 'Erro ao remover do catálogo';
+                    if (window.NotificationService) {
+                        window.NotificationService.mostrarErro(`❌ ${msg}`);
+                    }
+                }
+            },
+        };
+        window.ModalConfirm.mostrar(opcoes);
     }
 
     async deletarEquipamento(equipamentoId, nomeEquipamento) {

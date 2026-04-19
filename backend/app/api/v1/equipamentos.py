@@ -24,7 +24,7 @@ from app.schemas.equipamento import (
 )
 
 # ✅ CORRETO: Import do módulo de autenticação
-from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.core.deps import get_usuario_atual, requer_admin, requer_dono_ou_admin_combatente
 
 logger = logging.getLogger(__name__)
 
@@ -130,6 +130,29 @@ def obter_equipamento(
         raise
     except Exception as e:
         logger.error(f"Erro ao obter equipamento: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/catalogo/{equipamento_id}", status_code=status.HTTP_204_NO_CONTENT)
+def deletar_equipamento_catalogo(
+    equipamento_id: int,
+    db: Session = Depends(get_db),
+    _: object = Depends(requer_admin),
+):
+    """
+    Remove do catálogo (soft delete) um equipamento por ID.
+    Evita ambiguidade com rotas /{combatente_id}/... — use o prefixo /catalogo/.
+    """
+    try:
+        service = EquipamentoService(db)
+        if not service.deletar_equipamento(equipamento_id):
+            raise HTTPException(status_code=404, detail="Equipamento não encontrado")
+        _invalidar_cache_equipamentos()
+        return None
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erro ao deletar equipamento do catálogo: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

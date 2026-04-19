@@ -113,6 +113,44 @@ export class EquipamentoService {
     }
 
     /**
+     * Remove um item do catálogo global (soft delete). Apenas administrador.
+     * @param {number} equipamentoId
+     * @returns {Promise<void>}
+     */
+    async deletarEquipamentoDoCatalogo(equipamentoId) {
+        try {
+            const url = `${this.baseUrl}/catalogo/${equipamentoId}`;
+
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok && response.status !== 204) {
+                let detail = `HTTP ${response.status}`;
+                try {
+                    const err = await response.json();
+                    if (err.detail !== undefined) {
+                        detail = typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail);
+                    }
+                } catch {
+                    /* ignore */
+                }
+                throw new Error(detail);
+            }
+
+            return null;
+
+        } catch (error) {
+            console.error('❌ Erro em deletarEquipamentoDoCatalogo:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Lista equipamentos de um combatente
      * @param {number} combatenteId
      * @returns {Promise<Array>}

@@ -2053,6 +2053,23 @@ body::before {
     white-space: nowrap;
 }
 
+.equipamento-catalogo-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+    .equipamento-catalogo-acoes {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+}
+
 .talentos-paginacao--lista {
     width: 100%;
     margin-top: 0.35rem;
