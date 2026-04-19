@@ -2361,6 +2361,25 @@ body::before {
     color: var(--cor-azul);
 }
 
+.ficha-magias-legenda-clerigo {
+    margin: 0 0 0.55rem;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: rgba(44, 26, 14, 0.72);
+    background: rgba(26, 58, 107, 0.08);
+    border-radius: 6px;
+    border-left: 3px solid var(--cor-azul);
+}
+
+.ficha-slot-cleric-origem {
+    margin: 0;
+    font-size: 0.68rem;
+    line-height: 1.3;
+    color: rgba(44, 26, 14, 0.62);
+    font-weight: 600;
+}
+
 .ficha-slot-barra-wrap {
     height: 5px;
     background: rgba(26,58,107,0.12);

@@ -297,6 +297,27 @@
     flex-wrap: wrap;
     gap: 0.5rem;
 }
+.grimorio-slots-legenda-clerigo {
+    width: 100%;
+    flex-basis: 100%;
+    margin: 0 0 0.45rem;
+    padding: 0.38rem 0.5rem;
+    font-size: 0.62rem;
+    line-height: 1.35;
+    color: rgba(201, 168, 76, 0.78);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(201, 168, 76, 0.2);
+}
+.grimorio-slot-origem {
+    display: block;
+    max-width: 72px;
+    text-align: center;
+    font-size: 0.48rem;
+    line-height: 1.2;
+    color: rgba(201, 168, 76, 0.55);
+    font-weight: 600;
+}
 .grimorio-slots-vazio {
     font-family: var(--fonte-titulo);
     font-size: 0.7rem;

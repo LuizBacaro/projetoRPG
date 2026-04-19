@@ -17,7 +17,12 @@ import {
     safeBootstrap,
     safeBootstrapAsync,
 } from '../utils/graceful-degradation.js';
-import { resolveCombatenteSpellSlots, isClasseConjuradora } from '../utils/combat-rules.js?v=20260331a';
+import {
+    resolveCombatenteSpellSlots,
+    isClasseConjuradora,
+    normalizeClasseConjuradora,
+    textoSlotsClerigoBreakdown,
+} from '../utils/combat-rules.js?v=20260418d';
 
 const DOMINIOS_PERMITIDOS_FALLBACK = [
     'Ar', 'Bem', 'Caos', 'Conhecimento', 'Cura', 'Destruição', 'Enganação', 'Fogo', 'Força',
@@ -1076,6 +1081,7 @@ export class FichaPersonagemController {
 
         const slots = resolveCombatenteSpellSlots(this.combatente);
         const slotsAtivos = slots.filter(s => (s.total || 0) > 0);
+        const ehClerigo = normalizeClasseConjuradora(this.combatente?.classe) === 'Clérigo';
 
         if (this.combatente) {
             this.combatente.magias_slots = slots;
@@ -1085,6 +1091,14 @@ export class FichaPersonagemController {
         if (secao) {
             const temMagia = this.combatente.tipo === 'jogador' && isClasseConjuradora(this.combatente.classe);
             secao.style.display = temMagia ? 'flex' : 'none';
+        }
+
+        const legendaClerigo = document.getElementById('fichaMagiasLegendaClerigo');
+        if (legendaClerigo) {
+            const mostrarLegenda = ehClerigo && slotsAtivos.length > 0;
+            legendaClerigo.style.display = mostrarLegenda ? 'block' : 'none';
+            if (mostrarLegenda) legendaClerigo.removeAttribute('hidden');
+            else legendaClerigo.setAttribute('hidden', '');
         }
 
         if (slotsAtivos.length === 0) {
@@ -1103,12 +1117,17 @@ export class FichaPersonagemController {
 
             const corBarra = pct > 50 ? '#4ade80' : pct > 25 ? '#facc15' : '#f87171';
 
+            const linhaClerigo = ehClerigo && textoSlotsClerigoBreakdown(slot)
+                ? `<p class="ficha-slot-cleric-origem">${textoSlotsClerigoBreakdown(slot)}</p>`
+                : '';
+
             return `
                 <div class="ficha-slot-linha">
                     <div class="ficha-slot-topo">
                         <span class="ficha-slot-nivel">${labelNivel}</span>
                         <span class="ficha-slot-contagem">${disponiveis}/${total}</span>
                     </div>
+                    ${linhaClerigo}
                     <div class="ficha-slot-barra-wrap">
                         <div class="ficha-slot-barra-fill"
                             style="width:${pct}%; background:${corBarra}">

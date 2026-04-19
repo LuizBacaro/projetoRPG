@@ -12,7 +12,8 @@ import {
     isClasseConjuradora,
     normalizeClasseConjuradora,
     resolveCombatenteSpellSlots,
-} from '../utils/combat-rules.js?v=20260331a';
+    textoSlotsClerigoBreakdown,
+} from '../utils/combat-rules.js?v=20260418d';
 
 const ESCOLAS_ORDEM = [
     'Abjuracao',
@@ -510,6 +511,8 @@ class GrimorioController {
             mapa[nivel] = {
                 nivel,
                 total,
+                total_normal: slot.total_normal,
+                total_dominio: slot.total_dominio,
                 preparadas,
                 usadas,
                 disponivel: Math.max(total - preparadas, 0),
@@ -532,13 +535,22 @@ class GrimorioController {
             return;
         }
 
-        grid.innerHTML = slots.map((slot) => {
+        const ehClerigo = normalizeClasseConjuradora(this.classeAtiva) === 'Clérigo';
+        const legendaClerigo = ehClerigo
+            ? `<p class="grimorio-slots-legenda-clerigo">Clérigo: cada nível mostra <strong>magias por dia</strong> (com <strong>magias adicionais</strong> pelo modificador de Sabedoria — Tabela 1-1) <strong>+ slots de domínio</strong>. O total à direita é a soma dos dois.</p>`
+            : '';
+
+        grid.innerHTML = legendaClerigo + slots.map((slot) => {
             const cor = slot.disponivel <= 0 ? '#f87171' : slot.disponivel < slot.total ? '#facc15' : '#4ade80';
             const label = Number(slot.nivel) === 0 ? 'Truque' : `N${slot.nivel}`;
             const largura = slot.total > 0 ? Math.max(8, (slot.disponivel / slot.total) * 100) : 0;
+            const origem = ehClerigo && textoSlotsClerigoBreakdown(slot)
+                ? `<span class="grimorio-slot-origem">${textoSlotsClerigoBreakdown(slot)}</span>`
+                : '';
             return `
                 <div class="grimorio-slot-box">
                     <span class="grimorio-slot-nivel">${label}</span>
+                    ${origem}
                     <div class="grimorio-slot-barra-wrap">
                         <div class="grimorio-slot-barra-fill" style="width:${largura}%; background:${cor}"></div>
                     </div>
