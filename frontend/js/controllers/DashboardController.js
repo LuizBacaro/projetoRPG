@@ -397,7 +397,12 @@ class DashboardController {
         bindClick('btnRemoverImagemEdicao', () => this._removerImagem('', true));
 
         document.querySelectorAll('.dash-atributo-input').forEach((input) => {
-            input.addEventListener('input', () => this._calcularModificador(input));
+            input.addEventListener('input', () => {
+                this._calcularModificador(input);
+                if (input.id === 'dashEditDES') {
+                    this._preencherCaSugeridaPorDestrezaEdicao();
+                }
+            });
         });
     }
 
@@ -619,7 +624,6 @@ class DashboardController {
             document.getElementById('dashEditNivel').value = c.nivel || 1;
             document.getElementById('dashEditPontos').value = c.pontos || 0;
 
-            document.getElementById('dashEditCA').value = c.ca ?? 10;
             document.getElementById('dashEditToque').value = c.toque ?? 10;
             document.getElementById('dashEditSurpresa').value = c.surpresa ?? 10;
             document.getElementById('dashEditFortitude').value = c.fortitude ?? 0;
@@ -637,6 +641,8 @@ class DashboardController {
                 const el = document.getElementById(fid);
                 if (el) this._calcularModificador(el);
             });
+
+            this._preencherCaSugeridaPorDestrezaEdicao();
 
             const secPagRef = document.getElementById('secaoPaginaReferencia');
             const inputPagRef = document.getElementById('dashEditPaginaReferencia');
@@ -898,6 +904,19 @@ class DashboardController {
         const modId = 'mod' + input.id.charAt(0).toUpperCase() + input.id.slice(1);
         const span = document.getElementById(modId);
         if (span) span.textContent = mod >= 0 ? `+${mod}` : `${mod}`;
+    }
+
+    /**
+     * CA no modal de edição: 10 + modificador de Destreza (base sem armadura).
+     */
+    _preencherCaSugeridaPorDestrezaEdicao() {
+        const elDes = document.getElementById('dashEditDES');
+        const elCa = document.getElementById('dashEditCA');
+        if (!elDes || !elCa) return;
+        const d = parseInt(elDes.value, 10);
+        const des = Number.isFinite(d) ? Math.min(30, Math.max(1, d)) : 10;
+        const mod = Math.floor((des - 10) / 2);
+        elCa.value = String(10 + mod);
     }
 
     _limparForm(form, tipo) {

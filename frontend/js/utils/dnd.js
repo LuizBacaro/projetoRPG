@@ -11,6 +11,16 @@ export function calcularModificador(valor) {
 }
 
 /**
+ * CA base (sem armadura): 10 + modificador de Destreza.
+ * @param {number} valorDestreza valor do atributo DES (1–30)
+ */
+export function caBasePorDestreza(valorDestreza) {
+    const d = parseInt(valorDestreza, 10);
+    const des = Number.isFinite(d) ? Math.min(30, Math.max(1, d)) : 10;
+    return 10 + Math.floor((des - 10) / 2);
+}
+
+/**
  * Formata modificador com sinal (+/-)
  */
 export function formatarModificador(valor) {
