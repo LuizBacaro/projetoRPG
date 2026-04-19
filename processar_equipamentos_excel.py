@@ -65,6 +65,14 @@ def processar_planilha_equipamentos() -> list[dict]:
                 return None if empty_as_none else v
             return v
 
+        # Colunas A–J da planilha (linha 4 = cabeçalho): sem coluna de página no arquivo atual.
+        pagina_ref = None
+        for nome_col in ("Página", "Pág.", "Pág", "Referência", "PHB"):
+            if nome_col in idx:
+                pagina_ref = norm(_cell(row, col(nome_col)))
+                if pagina_ref:
+                    break
+
         equipamento = {
             "nome": arma,
             "categoria": norm(categoria),
@@ -76,7 +84,7 @@ def processar_planilha_equipamentos() -> list[dict]:
             "alcance_incremento": norm(_cell(row, col("Alcance / incremento"))),
             "peso": norm(_cell(row, col("Peso"))),
             "tipo_dano": norm(_cell(row, col("Tipo de dano"))),
-            "pagina_referencia": "PHB p.120-126",
+            "pagina_referencia": pagina_ref,
             "ativo": True,
         }
         equipamentos.append(equipamento)
@@ -117,19 +125,8 @@ def gerar_seed_script(equipamentos: list[dict]) -> str:
         "]\n\n"
         r'''
 def _montar_descricao(eq: dict) -> str | None:
-    """Resumo curto para o campo legado descricao (UI / listagens)."""
-    partes = []
-    if eq.get("categoria"):
-        partes.append(eq["categoria"])
-    if eq.get("subcategoria"):
-        partes.append(eq["subcategoria"])
-    if eq.get("custo"):
-        partes.append(f"Custo: {eq['custo']}")
-    if eq.get("dano_medio"):
-        partes.append(f"Dano (M): {eq['dano_medio']}")
-    if eq.get("tipo_dano"):
-        partes.append(eq["tipo_dano"])
-    return "; ".join(partes) if partes else None
+    """Campo legado: a UI usa colunas estruturadas; evitar duplicar o que já está nos campos."""
+    return None
 
 
 def seed_equipamentos(db) -> None:

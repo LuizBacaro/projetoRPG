@@ -85,7 +85,16 @@ class EquipamentoService:
             nome=equipamento.nome,
             descricao=equipamento.descricao,
             pagina_referencia=equipamento.pagina_referencia,
-            quantidade=eq_jogador.quantidade
+            quantidade=eq_jogador.quantidade,
+            categoria=equipamento.categoria,
+            subcategoria=equipamento.subcategoria,
+            custo=equipamento.custo,
+            dano_pequeno=equipamento.dano_pequeno,
+            dano_medio=equipamento.dano_medio,
+            critico=equipamento.critico,
+            alcance_incremento=equipamento.alcance_incremento,
+            peso=equipamento.peso,
+            tipo_dano=equipamento.tipo_dano,
         )
 
     def obter_equipamentos_jogador(self, combatente_id: int) -> List[EquipamentoJogadorListResponse]:
@@ -101,6 +110,15 @@ class EquipamentoService:
                 descricao=eq["equipamento_descricao"],
                 pagina_referencia=eq["equipamento_pagina_referencia"],
                 quantidade=eq["jogador_quantidade"],
+                categoria=eq.get("equipamento_categoria"),
+                subcategoria=eq.get("equipamento_subcategoria"),
+                custo=eq.get("equipamento_custo"),
+                dano_pequeno=eq.get("equipamento_dano_pequeno"),
+                dano_medio=eq.get("equipamento_dano_medio"),
+                critico=eq.get("equipamento_critico"),
+                alcance_incremento=eq.get("equipamento_alcance_incremento"),
+                peso=eq.get("equipamento_peso"),
+                tipo_dano=eq.get("equipamento_tipo_dano"),
             )
             for eq in equipamentos_jogador
         ]

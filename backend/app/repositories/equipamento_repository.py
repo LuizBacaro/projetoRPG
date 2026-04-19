@@ -135,6 +135,15 @@ class EquipamentoJogadorRepository:
                 eq_catalogo.nome.label("equipamento_nome"),
                 eq_catalogo.descricao.label("equipamento_descricao"),
                 eq_catalogo.pagina_referencia.label("equipamento_pagina_referencia"),
+                eq_catalogo.categoria.label("equipamento_categoria"),
+                eq_catalogo.subcategoria.label("equipamento_subcategoria"),
+                eq_catalogo.custo.label("equipamento_custo"),
+                eq_catalogo.dano_pequeno.label("equipamento_dano_pequeno"),
+                eq_catalogo.dano_medio.label("equipamento_dano_medio"),
+                eq_catalogo.critico.label("equipamento_critico"),
+                eq_catalogo.alcance_incremento.label("equipamento_alcance_incremento"),
+                eq_catalogo.peso.label("equipamento_peso"),
+                eq_catalogo.tipo_dano.label("equipamento_tipo_dano"),
             )
             .join(eq_catalogo, eq_catalogo.id == eq_jogador.equipamento_id)
             .filter(

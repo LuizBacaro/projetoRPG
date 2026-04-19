@@ -18,7 +18,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': None,
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -32,7 +32,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -46,7 +46,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '3 m',
         'peso': '0,5 kg',
         'tipo_dano': 'Perfurante ou cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -60,7 +60,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -74,7 +74,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -88,7 +88,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '2 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -102,7 +102,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -116,7 +116,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '3 m',
         'peso': '1,5 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -130,7 +130,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '6 m',
         'peso': '1,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -144,7 +144,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '4 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -158,7 +158,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '3 kg',
         'tipo_dano': 'Concussão e perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -172,7 +172,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '2 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -186,7 +186,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '6 m',
         'peso': '3 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -200,7 +200,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '4,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -214,7 +214,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '9 m',
         'peso': '1 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -228,7 +228,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '24 m',
         'peso': '2 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -242,7 +242,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -256,7 +256,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '36 m',
         'peso': '4 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -270,7 +270,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -284,7 +284,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '6 m',
         'peso': '0,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -298,7 +298,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '15 m',
         'peso': '0 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -312,7 +312,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '2,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -326,7 +326,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': 'especial',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -340,7 +340,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': 'especial',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -354,7 +354,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': 'especial',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -368,7 +368,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -382,7 +382,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -396,7 +396,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1,5 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -410,7 +410,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '3 m',
         'peso': '1 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -424,7 +424,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '6 m',
         'peso': '1 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -438,7 +438,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -452,7 +452,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -466,7 +466,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '2 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -480,7 +480,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': 'especial',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -494,7 +494,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': 'especial',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -508,7 +508,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '2 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -522,7 +522,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '3 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -536,7 +536,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '2,5 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -550,7 +550,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '2,5 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -564,7 +564,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '3 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -578,7 +578,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -592,7 +592,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '3 m',
         'peso': '2 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -606,7 +606,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '11 kg',
         'tipo_dano': 'Perfurante ou cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -620,7 +620,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '4 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -634,7 +634,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '4 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -648,7 +648,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '4 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -662,7 +662,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '10 kg',
         'tipo_dano': 'Perfurante ou cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -676,7 +676,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '10 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -690,7 +690,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '11 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -704,7 +704,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '10 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -718,7 +718,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '11 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -732,7 +732,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '10 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -746,7 +746,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '11 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -760,7 +760,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '18 m',
         'peso': '1 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -774,7 +774,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -788,7 +788,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '21 m',
         'peso': '1 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -802,7 +802,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -816,7 +816,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '30 m',
         'peso': '1,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -830,7 +830,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -844,7 +844,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '33 m',
         'peso': '1,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -858,7 +858,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -872,7 +872,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -886,7 +886,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -900,7 +900,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '3 m',
         'peso': '0,5 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -914,7 +914,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -928,7 +928,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '1 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -942,7 +942,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '3 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -956,7 +956,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '4 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -970,7 +970,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '10 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -984,7 +984,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '10 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -998,7 +998,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '12,5 kg',
         'tipo_dano': 'Cortante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1012,7 +1012,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '10 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1026,7 +1026,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '3 kg',
         'tipo_dano': 'Concussão e perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1040,7 +1040,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '11 kg',
         'tipo_dano': 'Cortante ou perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1054,7 +1054,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '24 m',
         'peso': '3 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1068,7 +1068,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1082,7 +1082,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '36 m',
         'peso': '11 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1096,7 +1096,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1110,7 +1110,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '9 m',
         'peso': '1 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1124,7 +1124,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': None,
         'peso': '0,5 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1138,7 +1138,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '3 m',
         'peso': '1 kg',
         'tipo_dano': 'Concussão',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1152,7 +1152,7 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '3 m',
         'peso': '3 kg',
         'tipo_dano': None,
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
     {
@@ -1166,26 +1166,15 @@ EQUIPAMENTOS_DADOS = [
         'alcance_incremento': '3 m',
         'peso': '0,25 kg',
         'tipo_dano': 'Perfurante',
-        'pagina_referencia': 'PHB p.120-126',
+        'pagina_referencia': None,
         'ativo': True,
     },
 ]
 
 
 def _montar_descricao(eq: dict) -> str | None:
-    """Resumo curto para o campo legado descricao (UI / listagens)."""
-    partes = []
-    if eq.get("categoria"):
-        partes.append(eq["categoria"])
-    if eq.get("subcategoria"):
-        partes.append(eq["subcategoria"])
-    if eq.get("custo"):
-        partes.append(f"Custo: {eq['custo']}")
-    if eq.get("dano_medio"):
-        partes.append(f"Dano (M): {eq['dano_medio']}")
-    if eq.get("tipo_dano"):
-        partes.append(eq["tipo_dano"])
-    return "; ".join(partes) if partes else None
+    """Campo legado: a UI usa colunas estruturadas; evitar duplicar o que já está nos campos."""
+    return None
 
 
 def seed_equipamentos(db) -> None:

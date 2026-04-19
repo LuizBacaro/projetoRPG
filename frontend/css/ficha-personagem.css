@@ -1987,6 +1987,12 @@ body::before {
     background: linear-gradient(135deg, rgba(244, 233, 208, 0.65), rgba(232, 213, 176, 0.28));
     box-shadow: 0 1px 4px rgba(92, 58, 30, 0.08);
     box-sizing: border-box;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.talento-linha:hover {
+    border-color: rgba(201, 168, 76, 0.75);
+    box-shadow: 0 2px 10px rgba(201, 168, 76, 0.18);
 }
 
 .talento-linha-conteudo {
@@ -2061,6 +2067,52 @@ body::before {
     .talento-linha-acao {
         align-self: stretch;
         width: 100%;
+    }
+}
+
+/* ── Modal equipamentos (catálogo Tabela 7-5): campos por linha, sem texto duplicado ── */
+.equipamento-catalogo-linha .equipamento-spec-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0.45rem 0 0;
+    width: 100%;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-par {
+    display: grid;
+    grid-template-columns: minmax(7.25rem, 10rem) 1fr;
+    gap: 0.35rem 0.65rem;
+    align-items: baseline;
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-lbl {
+    font-weight: 600;
+    color: rgba(44, 26, 14, 0.52);
+}
+
+.equipamento-catalogo-linha .equipamento-spec-val {
+    color: rgba(44, 26, 14, 0.9);
+    word-break: break-word;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-vazio {
+    margin: 0.35rem 0 0;
+}
+
+.equipamento-catalogo-linha .equipamento-pag-ref {
+    margin: 0.5rem 0 0;
+}
+
+@media (max-width: 480px) {
+    .equipamento-catalogo-linha .equipamento-spec-par {
+        grid-template-columns: 1fr;
+    }
+
+    .equipamento-catalogo-linha .equipamento-spec-lbl {
+        margin-bottom: -0.15rem;
     }
 }
 

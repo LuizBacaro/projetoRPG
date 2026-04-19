@@ -66,12 +66,22 @@ class EquipamentoJogadorResponse(EquipamentoJogadorBase):
 
 
 class EquipamentoJogadorListResponse(BaseModel):
-    """Schema para listagem de equipamentos do jogador"""
+    """Schema para listagem de equipamentos do jogador (catálogo + quantidade na ficha)."""
     id: int
     nome: str = Field(..., max_length=100)
     descricao: Optional[str] = Field(default=None, max_length=500)
     pagina_referencia: Optional[str] = Field(default=None, max_length=50)
     quantidade: int
+    # Campos do catálogo Tabela 7-5 (mesma origem do modal de escolha)
+    categoria: Optional[str] = Field(default=None, max_length=50)
+    subcategoria: Optional[str] = Field(default=None, max_length=100)
+    custo: Optional[str] = Field(default=None, max_length=50)
+    dano_pequeno: Optional[str] = Field(default=None, max_length=20)
+    dano_medio: Optional[str] = Field(default=None, max_length=20)
+    critico: Optional[str] = Field(default=None, max_length=20)
+    alcance_incremento: Optional[str] = Field(default=None, max_length=50)
+    peso: Optional[str] = Field(default=None, max_length=20)
+    tipo_dano: Optional[str] = Field(default=None, max_length=50)
 
     class Config:
         from_attributes = True

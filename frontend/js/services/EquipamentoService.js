@@ -246,9 +246,25 @@ export class EquipamentoService {
         if (!termo || termo.trim() === '') return equipamentos;
 
         const termoLower = termo.toLowerCase();
-        return equipamentos.filter(e =>
-            e.nome.toLowerCase().includes(termoLower) ||
-            (e.descricao && e.descricao.toLowerCase().includes(termoLower))
-        );
+        return equipamentos.filter((e) => {
+            const blob = [
+                e.nome,
+                e.descricao,
+                e.categoria,
+                e.subcategoria,
+                e.custo,
+                e.dano_pequeno,
+                e.dano_medio,
+                e.tipo_dano,
+                e.critico,
+                e.alcance_incremento,
+                e.peso,
+                e.pagina_referencia,
+            ]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase();
+            return blob.includes(termoLower);
+        });
     }
 }

@@ -63,6 +63,18 @@ export class FichaPersonagemController {
         this.talentosLimit = 20;
         this.talentosCarregados = false;
 
+        // Paginação modais: equipamentos e armaduras (catálogo)
+        this.equipamentosSkip = 0;
+        this.equipamentosLimit = 20;
+        this.equipamentosCarregados = false;
+
+        this.armadurasProtecaoSkip = 0;
+        this.armadurasProtecaoLimit = 20;
+        this.armadurasProtecaoCarregados = false;
+
+        this.equipamentosDisponiveis = [];
+        this.armadurasProtecaoDisponiveis = [];
+
     }
 
     get token() {
@@ -224,12 +236,16 @@ export class FichaPersonagemController {
 
         const equipamentosBusca = document.getElementById('equipamentosBusca');
         if (equipamentosBusca) {
-            equipamentosBusca.addEventListener('input', () => this.filtrarEquipamentos());
+            equipamentosBusca.addEventListener('input', () => {
+                void this.filtrarEquipamentos();
+            });
         }
 
         const armadurasProtecaoBusca = document.getElementById('armadurasProtecaoBusca');
         if (armadurasProtecaoBusca) {
-            armadurasProtecaoBusca.addEventListener('input', () => this.filtrarArmadurasProtecao());
+            armadurasProtecaoBusca.addEventListener('input', () => {
+                void this.filtrarArmadurasProtecao();
+            });
         }
 
         const abaListar = document.getElementById('abaListar');
@@ -1237,6 +1253,49 @@ export class FichaPersonagemController {
         }
     }
 
+    /**
+     * Resumo curto na tabela da ficha (Tabela 7-5: dano M, tipo, custo).
+     */
+    _resumoEquipamentoInventario(eq) {
+        const parts = [eq.dano_medio, eq.tipo_dano, eq.custo].filter(
+            (v) => v != null && String(v).trim() !== ''
+        );
+        if (parts.length) {
+            return parts.map((p) => escapeHtml(String(p))).join(' · ');
+        }
+        if (eq.descricao && String(eq.descricao).trim() !== '') {
+            return escapeHtml(eq.descricao);
+        }
+        return '—';
+    }
+
+    /**
+     * Grade de campos do catálogo (modal), alinhada às colunas da planilha — sem duplicar descricao.
+     */
+    _htmlSpecEquipamentoCatalogo(eq) {
+        const pares = [
+            ['Custo', eq.custo],
+            ['Dano (P)', eq.dano_pequeno],
+            ['Dano (M)', eq.dano_medio],
+            ['Tipo de dano', eq.tipo_dano],
+            ['Crítico', eq.critico],
+            ['Alcance / incremento', eq.alcance_incremento],
+            ['Peso', eq.peso],
+        ].filter(([, v]) => v != null && String(v).trim() !== '');
+        if (!pares.length) {
+            return '<p class="talento-linha-pre equipamento-spec-vazio">—</p>';
+        }
+        return `<div class="equipamento-spec-grid" role="list">${pares
+            .map(
+                ([lbl, val]) => `
+            <div class="equipamento-spec-par" role="listitem">
+                <span class="equipamento-spec-lbl">${escapeHtml(lbl)}</span>
+                <span class="equipamento-spec-val">${escapeHtml(String(val))}</span>
+            </div>`
+            )
+            .join('')}</div>`;
+    }
+
     renderizarEquipamentos(equipamentos) {
         const lista = document.getElementById('fichaEquipamentos');
         if (!lista) return;
@@ -1250,21 +1309,26 @@ export class FichaPersonagemController {
             <div class="ficha-equipamentos-tabela">
                 <div class="ficha-equipamento-header">
                     <span>Item</span>
-                    <span>Descrição</span>
-                    <span>Pág. Ref</span>
+                    <span>Resumo</span>
+                    <span>Pág.</span>
                     <span>Qtd</span>
                     <span>Ação</span>
                 </div>
                 <div class="ficha-equipamentos-lista-items">
-                    ${equipamentos.map(eq => `
+                    ${equipamentos.map((eq) => {
+                        const pag =
+                            eq.pagina_referencia && String(eq.pagina_referencia).trim() !== ''
+                                ? escapeHtml(eq.pagina_referencia)
+                                : '—';
+                        return `
                         <div class="ficha-equipamento-linha">
                             <span class="ficha-equipamento-nome">${escapeHtml(eq.nome)}</span>
-                            <span class="ficha-equipamento-desc">${escapeHtml(eq.descricao) || '—'}</span>
-                            <span class="ficha-equipamento-pag">${escapeHtml(eq.pagina_referencia) || '—'}</span>
+                            <span class="ficha-equipamento-desc">${this._resumoEquipamentoInventario(eq)}</span>
+                            <span class="ficha-equipamento-pag">${pag}</span>
                             <span class="ficha-equipamento-qtd">${eq.quantidade}</span>
                             <button class="btn-deletar-eq" data-eq-id="${eq.id}" data-eq-nome="${escapeHtml(eq.nome)}" title="Deletar ${escapeHtml(eq.nome)}">🗑️</button>
-                        </div>
-                    `).join('')}
+                        </div>`;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -1352,13 +1416,46 @@ export class FichaPersonagemController {
             const modal = document.getElementById('modalArmadurasProtecao');
             if (!modal) return;
 
-            const itens = await this.armaduraProtecaoService.listarItens(0, 200);
-            this.armadurasProtecaoDisponiveis = itens;
-            this.renderizarListaArmadurasProtecao(itens);
+            const busca = document.getElementById('armadurasProtecaoBusca');
+            if (busca) busca.value = '';
+
+            this.armadurasProtecaoSkip = 0;
+            this.armadurasProtecaoDisponiveis = [];
+            this.armadurasProtecaoCarregados = false;
+
+            await this._carregarMaisArmadurasProtecao();
+
+            const filtrados = this.armaduraProtecaoService.filtrarPorBusca(
+                this.armadurasProtecaoDisponiveis,
+                ''
+            );
+            this.renderizarListaArmadurasProtecao(filtrados);
+
             modal.style.display = 'flex';
         } catch (error) {
             console.error('❌ Erro ao abrir modal de armaduras/itens de proteção:', error);
             window.NotificationService?.mostrarErro('❌ Erro ao carregar armaduras/itens de proteção');
+        }
+    }
+
+    async _carregarMaisArmadurasProtecao() {
+        try {
+            const novos = await this.armaduraProtecaoService.listarItens(
+                this.armadurasProtecaoSkip,
+                this.armadurasProtecaoLimit
+            );
+
+            if (novos.length > 0) {
+                this.armadurasProtecaoDisponiveis = [...this.armadurasProtecaoDisponiveis, ...novos];
+                this.armadurasProtecaoSkip += this.armadurasProtecaoLimit;
+            }
+
+            if (novos.length < this.armadurasProtecaoLimit) {
+                this.armadurasProtecaoCarregados = true;
+            }
+        } catch (error) {
+            console.error('❌ Erro ao carregar mais itens de proteção:', error);
+            throw error;
         }
     }
 
@@ -1371,56 +1468,129 @@ export class FichaPersonagemController {
         const lista = document.getElementById('armadurasProtecaoLista');
         if (!lista) return;
 
+        const filtroAtivo = String(document.getElementById('armadurasProtecaoBusca')?.value || '').trim();
+        const mostrarMais = !this.armadurasProtecaoCarregados && !filtroAtivo;
+
         if (!itens || !itens.length) {
-            lista.innerHTML = '<p class="equipamentos-vazio">Nenhum item de proteção encontrado</p>';
+            const temItensCarregados = (this.armadurasProtecaoDisponiveis || []).length > 0;
+            const msg = temItensCarregados && filtroAtivo
+                ? '<p class="equipamentos-vazio">Nenhum item corresponde à busca.</p>'
+                : '<p class="equipamentos-vazio">Nenhum item de proteção encontrado</p>';
+            lista.innerHTML = `${msg}${
+                mostrarMais
+                    ? `
+                <div class="talentos-paginacao talentos-paginacao--lista">
+                    <button id="btnCarregarMaisArmadurasProtecao" type="button" class="btn-carregar-mais">
+                        Carregar mais itens
+                    </button>
+                </div>`
+                    : ''
+            }`;
+            const btnCarregarMais = lista.querySelector('#btnCarregarMaisArmadurasProtecao');
+            if (btnCarregarMais) {
+                btnCarregarMais.addEventListener('click', async () => {
+                    try {
+                        btnCarregarMais.disabled = true;
+                        btnCarregarMais.textContent = 'Carregando...';
+                        await this._carregarMaisArmadurasProtecao();
+                        const termo = document.getElementById('armadurasProtecaoBusca')?.value || '';
+                        const filtrados = this.armaduraProtecaoService.filtrarPorBusca(
+                            this.armadurasProtecaoDisponiveis,
+                            termo
+                        );
+                        this.renderizarListaArmadurasProtecao(filtrados);
+                    } catch (error) {
+                        console.error('❌ Erro ao carregar mais itens de proteção:', error);
+                        window.NotificationService?.mostrarErro('❌ Erro ao carregar mais itens');
+                        btnCarregarMais.disabled = false;
+                        btnCarregarMais.textContent = 'Carregar mais itens';
+                    }
+                });
+            }
             return;
         }
 
-        lista.innerHTML = itens.map((item) => `
-            <div class="item-card">
-                <div class="item-card-header">
-                    <h4 class="item-card-title">${escapeHtml(item.nome)}</h4>
-                    ${item.tipo ? `<span class="item-card-badge">${escapeHtml(item.tipo)}</span>` : ''}
+        lista.innerHTML = `${itens.map((item) => {
+            const tipoTxt = String(item.tipo || '').trim();
+            const bonus = `${Number(item.bonus_ca || 0) >= 0 ? '+' : ''}${Number(item.bonus_ca || 0)}`;
+            const detalhes = [
+                item.des_max != null && String(item.des_max).trim() !== '' ? `DES máx ${escapeHtml(item.des_max)}` : null,
+                `Pen ${Number(item.penalidade || 0)}`,
+                item.falha_arcana ? `Falha arc. ${escapeHtml(item.falha_arcana)}` : null,
+                item.deslocamento ? `Desloc. ${escapeHtml(item.deslocamento)}` : null,
+                item.peso != null && item.peso !== '' ? `Peso ${escapeHtml(String(item.peso))}` : null,
+                item.propriedades_especiais ? escapeHtml(item.propriedades_especiais) : null,
+            ].filter(Boolean).join(' · ');
+            return `
+            <article class="talento-linha">
+                <div class="talento-linha-conteudo">
+                    <div class="talento-linha-cabecalho">
+                        <span class="talento-linha-nome">${escapeHtml(item.nome)}</span>
+                        <span class="talento-linha-secao">${escapeHtml(tipoTxt || '—')}</span>
+                    </div>
+                    <p class="talento-linha-beneficio"><span class="talento-linha-rotulo">Bônus CA:</span> ${bonus}</p>
+                    <p class="talento-linha-pre"><span class="talento-linha-rotulo">Detalhes:</span> ${detalhes || '—'}</p>
                 </div>
-                <div class="item-card-body">
-                    <div class="item-card-field">
-                        <span class="item-card-label">Bônus CA</span>
-                        <p class="item-card-value">${Number(item.bonus_ca || 0) >= 0 ? '+' : ''}${Number(item.bonus_ca || 0)}</p>
-                    </div>
-                    <div class="item-card-field">
-                        <span class="item-card-label">DES Máx / Penalidade</span>
-                        <p class="item-card-value">${escapeHtml(item.des_max || '—')} / ${Number(item.penalidade || 0)}</p>
-                    </div>
-                    <div class="item-card-field">
-                        <span class="item-card-label">Falha Arcana</span>
-                        <p class="item-card-value">${escapeHtml(item.falha_arcana || '—')}</p>
-                    </div>
-                    <div class="item-card-field">
-                        <span class="item-card-label">Deslocamento / Peso</span>
-                        <p class="item-card-value">${escapeHtml(item.deslocamento || '—')} / ${item.peso ?? '—'}</p>
-                    </div>
-                    <div class="item-card-field">
-                        <span class="item-card-label">Propriedades</span>
-                        <p class="item-card-value">${escapeHtml(item.propriedades_especiais || '—')}</p>
-                    </div>
-                </div>
-                <div class="item-card-footer">
-                    <button class="item-btn-primary" data-item-id="${item.id}">➕ Adicionar</button>
-                </div>
-            </div>
-        `).join('');
+                <button type="button" class="talento-linha-acao item-btn-primary" data-item-id="${item.id}">➕ Adicionar</button>
+            </article>`;
+        }).join('')}
+            ${mostrarMais ? `
+                <div class="talentos-paginacao talentos-paginacao--lista">
+                    <button id="btnCarregarMaisArmadurasProtecao" type="button" class="btn-carregar-mais">
+                        Carregar mais itens
+                    </button>
+                </div>` : ''}
+        `;
 
-        lista.querySelectorAll('.equipamento-btn-adicionar').forEach((btn) => {
+        lista.querySelectorAll('.talento-linha-acao[data-item-id]').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const itemId = Number(btn.dataset.itemId);
                 if (Number.isFinite(itemId)) this.adicionarArmaduraProtecaoClic(itemId);
             });
         });
+
+        const btnCarregarMais = lista.querySelector('#btnCarregarMaisArmadurasProtecao');
+        if (btnCarregarMais) {
+            btnCarregarMais.addEventListener('click', async () => {
+                try {
+                    btnCarregarMais.disabled = true;
+                    btnCarregarMais.textContent = 'Carregando...';
+
+                    await this._carregarMaisArmadurasProtecao();
+                    const termo = document.getElementById('armadurasProtecaoBusca')?.value || '';
+                    const filtrados = this.armaduraProtecaoService.filtrarPorBusca(
+                        this.armadurasProtecaoDisponiveis,
+                        termo
+                    );
+                    this.renderizarListaArmadurasProtecao(filtrados);
+                } catch (error) {
+                    console.error('❌ Erro ao carregar mais itens de proteção:', error);
+                    window.NotificationService?.mostrarErro('❌ Erro ao carregar mais itens');
+                    btnCarregarMais.disabled = false;
+                    btnCarregarMais.textContent = 'Carregar mais itens';
+                }
+            });
+        }
     }
 
-    filtrarArmadurasProtecao() {
+    async filtrarArmadurasProtecao() {
         const termo = document.getElementById('armadurasProtecaoBusca')?.value || '';
-        const filtrados = this.armaduraProtecaoService.filtrarPorBusca(this.armadurasProtecaoDisponiveis || [], termo);
+        const filtroAtivo = termo.trim();
+
+        if (filtroAtivo && !this.armadurasProtecaoCarregados) {
+            try {
+                while (!this.armadurasProtecaoCarregados) {
+                    await this._carregarMaisArmadurasProtecao();
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar itens de proteção para filtro:', error);
+            }
+        }
+
+        const filtrados = this.armaduraProtecaoService.filtrarPorBusca(
+            this.armadurasProtecaoDisponiveis || [],
+            termo
+        );
         this.renderizarListaArmadurasProtecao(filtrados);
     }
 
@@ -1526,16 +1696,21 @@ export class FichaPersonagemController {
             const modal = document.getElementById('modalEquipamentos');
             if (!modal) return;
 
-            // Carregar lista de equipamentos disponíveis
-            const equipamentos = await this.equipamentoService.listarEquipamentos(0, 100);
+            const busca = document.getElementById('equipamentosBusca');
+            if (busca) busca.value = '';
 
-            // Armazenar para uso no filtro
-            this.equipamentosDisponiveis = equipamentos;
-            
-            // Renderizar lista inicial
-            this.renderizarListaEquipamentos(equipamentos);
+            this.equipamentosSkip = 0;
+            this.equipamentosDisponiveis = [];
+            this.equipamentosCarregados = false;
 
-            // Mostrar modal
+            await this._carregarMaisEquipamentos();
+
+            const filtrados = this.equipamentoService.filtrarPorBusca(
+                this.equipamentosDisponiveis,
+                ''
+            );
+            this.renderizarListaEquipamentos(filtrados);
+
             modal.style.display = 'flex';
 
         } catch (error) {
@@ -1543,6 +1718,27 @@ export class FichaPersonagemController {
             if (window.NotificationService) {
                 window.NotificationService.mostrarErro('❌ Erro ao carregar equipamentos');
             }
+        }
+    }
+
+    async _carregarMaisEquipamentos() {
+        try {
+            const novos = await this.equipamentoService.listarEquipamentos(
+                this.equipamentosSkip,
+                this.equipamentosLimit
+            );
+
+            if (novos.length > 0) {
+                this.equipamentosDisponiveis = [...this.equipamentosDisponiveis, ...novos];
+                this.equipamentosSkip += this.equipamentosLimit;
+            }
+
+            if (novos.length < this.equipamentosLimit) {
+                this.equipamentosCarregados = true;
+            }
+        } catch (error) {
+            console.error('❌ Erro ao carregar mais equipamentos:', error);
+            throw error;
         }
     }
 
@@ -1555,40 +1751,77 @@ export class FichaPersonagemController {
         const lista = document.getElementById('equipamentosLista');
         if (!lista) return;
 
+        const filtroAtivo = String(document.getElementById('equipamentosBusca')?.value || '').trim();
+        const mostrarMais = !this.equipamentosCarregados && !filtroAtivo;
+
         if (!equipamentos || equipamentos.length === 0) {
-            lista.innerHTML = '<p class="equipamentos-vazio">Nenhum equipamento encontrado</p>';
+            const temItensCarregados = (this.equipamentosDisponiveis || []).length > 0;
+            const msg = temItensCarregados && filtroAtivo
+                ? '<p class="equipamentos-vazio">Nenhum equipamento corresponde à busca.</p>'
+                : '<p class="equipamentos-vazio">Nenhum equipamento encontrado</p>';
+            lista.innerHTML = `${msg}${
+                mostrarMais
+                    ? `
+                <div class="talentos-paginacao talentos-paginacao--lista">
+                    <button id="btnCarregarMaisEquipamentos" type="button" class="btn-carregar-mais">
+                        Carregar mais equipamentos
+                    </button>
+                </div>`
+                    : ''
+            }`;
+            const btnCarregarMais = lista.querySelector('#btnCarregarMaisEquipamentos');
+            if (btnCarregarMais) {
+                btnCarregarMais.addEventListener('click', async () => {
+                    try {
+                        btnCarregarMais.disabled = true;
+                        btnCarregarMais.textContent = 'Carregando...';
+                        await this._carregarMaisEquipamentos();
+                        const termo = document.getElementById('equipamentosBusca')?.value || '';
+                        const filtrados = this.equipamentoService.filtrarPorBusca(
+                            this.equipamentosDisponiveis,
+                            termo
+                        );
+                        this.renderizarListaEquipamentos(filtrados);
+                    } catch (error) {
+                        console.error('❌ Erro ao carregar mais equipamentos:', error);
+                        window.NotificationService?.mostrarErro('❌ Erro ao carregar mais equipamentos');
+                        btnCarregarMais.disabled = false;
+                        btnCarregarMais.textContent = 'Carregar mais equipamentos';
+                    }
+                });
+            }
             return;
         }
 
-        lista.innerHTML = equipamentos.map(eq => `
-            <div class="equipamento-item">
-                <div class="equipamento-info">
-                    <div class="equipamento-header">
-                        <div class="equipamento-nome">${escapeHtml(eq.nome)}</div>
-                        <div class="equipamento-detalhes">
-                            ${eq.categoria ? `<span class="equipamento-categoria">${escapeHtml(eq.categoria)}</span>` : ''}
-                            ${eq.subcategoria ? `<span class="equipamento-categoria">${escapeHtml(eq.subcategoria)}</span>` : ''}
-                        </div>
+        lista.innerHTML = `${equipamentos.map((eq) => {
+            const catParts = [eq.categoria, eq.subcategoria].filter(Boolean).map((s) => String(s).trim());
+            const secaoTxt = catParts.length ? catParts.join(' · ') : '—';
+            const pagBloco =
+                eq.pagina_referencia && String(eq.pagina_referencia).trim() !== ''
+                    ? `<p class="talento-linha-pre equipamento-pag-ref"><span class="talento-linha-rotulo">Referência:</span> ${escapeHtml(eq.pagina_referencia)}</p>`
+                    : '';
+            return `
+            <article class="talento-linha equipamento-catalogo-linha">
+                <div class="talento-linha-conteudo">
+                    <div class="talento-linha-cabecalho">
+                        <span class="talento-linha-nome">${escapeHtml(eq.nome)}</span>
+                        <span class="talento-linha-secao">${escapeHtml(secaoTxt)}</span>
                     </div>
-                    <div class="equipamento-detalhes">
-                        ${eq.dano_pequeno ? `<span class="equipamento-dano">Dano (Pequeno): ${escapeHtml(eq.dano_pequeno)}</span>` : ''}
-                        ${eq.dano_medio ? `<span class="equipamento-dano">Dano (Médio): ${escapeHtml(eq.dano_medio)}</span>` : ''}
-                        ${eq.tipo_dano ? `<span class="equipamento-tipo">Tipo: ${escapeHtml(eq.tipo_dano)}</span>` : ''}
-                        ${eq.critico ? `<span class="equipamento-critico">Crítico: ${escapeHtml(eq.critico)}</span>` : ''}
-                        ${eq.alcance_incremento ? `<span class="equipamento-tipo">Alcance: ${escapeHtml(eq.alcance_incremento)}</span>` : ''}
-                        ${eq.peso ? `<span class="equipamento-peso">Peso: ${escapeHtml(eq.peso)}</span>` : ''}
-                    </div>
-                    ${eq.custo ? `<div class="equipamento-desc">Custo: ${escapeHtml(eq.custo)}</div>` : ''}
-                    ${eq.descricao ? `<div class="equipamento-desc">${escapeHtml(eq.descricao)}</div>` : ''}
-                    <div class="equipamento-pag">${escapeHtml(eq.pagina_referencia) || '—'}</div>
+                    ${this._htmlSpecEquipamentoCatalogo(eq)}
+                    ${pagBloco}
                 </div>
-                <button class="equipamento-btn-adicionar" data-equipamento-id="${eq.id}">
-                    ➕
-                </button>
-            </div>
-        `).join('');
+                <button type="button" class="talento-linha-acao item-btn-primary" data-equipamento-id="${eq.id}">➕ Adicionar</button>
+            </article>`;
+        }).join('')}
+            ${mostrarMais ? `
+                <div class="talentos-paginacao talentos-paginacao--lista">
+                    <button id="btnCarregarMaisEquipamentos" type="button" class="btn-carregar-mais">
+                        Carregar mais equipamentos
+                    </button>
+                </div>` : ''}
+        `;
 
-        lista.querySelectorAll('.equipamento-btn-adicionar').forEach((btn) => {
+        lista.querySelectorAll('.talento-linha-acao[data-equipamento-id]').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const equipamentoId = Number(btn.dataset.equipamentoId);
                 if (Number.isFinite(equipamentoId)) {
@@ -1596,12 +1829,47 @@ export class FichaPersonagemController {
                 }
             });
         });
+
+        const btnCarregarMais = lista.querySelector('#btnCarregarMaisEquipamentos');
+        if (btnCarregarMais) {
+            btnCarregarMais.addEventListener('click', async () => {
+                try {
+                    btnCarregarMais.disabled = true;
+                    btnCarregarMais.textContent = 'Carregando...';
+
+                    await this._carregarMaisEquipamentos();
+                    const termo = document.getElementById('equipamentosBusca')?.value || '';
+                    const filtrados = this.equipamentoService.filtrarPorBusca(
+                        this.equipamentosDisponiveis,
+                        termo
+                    );
+                    this.renderizarListaEquipamentos(filtrados);
+                } catch (error) {
+                    console.error('❌ Erro ao carregar mais equipamentos:', error);
+                    window.NotificationService?.mostrarErro('❌ Erro ao carregar mais equipamentos');
+                    btnCarregarMais.disabled = false;
+                    btnCarregarMais.textContent = 'Carregar mais equipamentos';
+                }
+            });
+        }
     }
 
-    filtrarEquipamentos() {
+    async filtrarEquipamentos() {
         const termo = document.getElementById('equipamentosBusca')?.value || '';
+        const filtroAtivo = termo.trim();
+
+        if (filtroAtivo && !this.equipamentosCarregados) {
+            try {
+                while (!this.equipamentosCarregados) {
+                    await this._carregarMaisEquipamentos();
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar equipamentos para filtro:', error);
+            }
+        }
+
         const filtrados = this.equipamentoService.filtrarPorBusca(
-            this.equipamentosDisponiveis,
+            this.equipamentosDisponiveis || [],
             termo
         );
         this.renderizarListaEquipamentos(filtrados);
@@ -1619,25 +1887,23 @@ export class FichaPersonagemController {
                 return;
             }
 
-            // Pegar o nome do equipamento do modal
-            const eqNomeElement = document.querySelector('#conteudoListar .ficha-equipamento-linha:last-child .ficha-equipamento-nome');
-            const nomeEquipamento = eqNomeElement?.textContent || 'Equipamento';
+            const nomeEquipamento =
+                (this.equipamentosDisponiveis || []).find((e) => Number(e.id) === Number(equipamentoId))?.nome ||
+                'Equipamento';
 
             await this.equipamentoService.adicionarEquipamento(this.combatente.id, {
                 equipamento_id: equipamentoId,
                 quantidade: quantidade
             });
 
-
-            // Recarregar equipamentos
             await this.carregarRenderizarEquipamentos(this.combatente.id);
 
-            // Resetar quantidade
             qntdInput.value = '1';
 
-            // Mostrar notificação de sucesso
             if (window.NotificationService) {
-                window.NotificationService.mostrarSucesso(`✅ Equipamento adicionado ao inventário!`);
+                window.NotificationService.mostrarSucesso(
+                    `✅ ${nomeEquipamento} adicionado ao inventário!`
+                );
             }
 
         } catch (error) {
