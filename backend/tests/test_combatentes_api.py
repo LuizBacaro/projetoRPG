@@ -1,3 +1,5 @@
+import json
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import pytest
@@ -195,6 +197,24 @@ def test_criar_combatente_preenche_bonus_base_ataque_por_classe_e_nivel(combaten
     assert body["fortitude"] == 7
     assert body["reflexos"] == 3
     assert body["vontade"] == 5
+
+
+def test_habilidades_especiais_incluem_todos_os_niveis_ate_o_atual(combatentes_db):
+    """Coluna Especial: acumula linhas do 1° ao nível do personagem (não só o nível atual)."""
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    response = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(classe="Guerreiro", nivel="6"),
+    )
+    assert response.status_code == 201
+    raw = response.json().get("habilidades_especiais") or ""
+    grupos = json.loads(raw)
+    assert isinstance(grupos, list)
+    niveis = {item["nivel"] for item in grupos if isinstance(item, dict)}
+    # Catálogo Guerreiro: talentos em 1°, 2°, 4° e 6°; 3° e 5° são "-"
+    assert niveis == {1, 2, 4, 6}
 
 
 def test_atualizar_combatente_recalcula_bonus_base_ataque_quando_classe_ou_nivel_mudam(combatentes_db):

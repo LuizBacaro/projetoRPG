@@ -291,7 +291,6 @@ def calcular_habilidades_especiais_por_nivel(classe: str | None, nivel: int | No
         return []
 
     por_nivel: list[dict] = []
-    vistos_globais: set[str] = set()
 
     for row in rows:
         if not isinstance(row, dict):
@@ -299,24 +298,25 @@ def calcular_habilidades_especiais_por_nivel(classe: str | None, nivel: int | No
         values = [str(v).strip() for v in row.values() if str(v).strip()]
         if not values:
             continue
-        idx = _index_nivel(values, nivel_val)
-        if idx is None:
+        encontrado = _encontrar_indice_e_nivel_linha(values)
+        if encontrado is None:
+            continue
+        idx, nivel_row = encontrado
+        if nivel_row < 1 or nivel_row > nivel_val:
             continue
         especial = _extrair_especial(values, idx)
         if not especial:
             continue
-        nivel_row = _parse_nivel(values[idx])
-        if nivel_row is None:
-            continue
         habilidades_nivel: list[str] = []
+        vistos_no_nivel: set[str] = set()
         for item in re.split(r"[,;]", especial):
             talento = item.strip()
             if not talento or talento in {"-", "—"}:
                 continue
             key = talento.lower()
-            if key in vistos_globais:
+            if key in vistos_no_nivel:
                 continue
-            vistos_globais.add(key)
+            vistos_no_nivel.add(key)
             habilidades_nivel.append(talento)
         if habilidades_nivel:
             por_nivel.append({"nivel": nivel_row, "habilidades": habilidades_nivel})
@@ -325,11 +325,18 @@ def calcular_habilidades_especiais_por_nivel(classe: str | None, nivel: int | No
 
 
 def calcular_habilidades_especiais(classe: str | None, nivel: int | None) -> list[str]:
+    """Lista única (ordem de aparição) para fallback legado `a | b`; use `*_por_nivel` para o detalhe por nível."""
     grouped = calcular_habilidades_especiais_por_nivel(classe, nivel)
     flat: list[str] = []
+    vistos: set[str] = set()
     for item in grouped:
         for habilidade in item.get("habilidades", []):
-            flat.append(str(habilidade))
+            h = str(habilidade)
+            key = h.lower()
+            if key in vistos:
+                continue
+            vistos.add(key)
+            flat.append(h)
     return flat
 
 
@@ -359,6 +366,15 @@ def _parse_nivel(value: str) -> int | None:
     if not m:
         return None
     return int(m.group(1))
+
+
+def _encontrar_indice_e_nivel_linha(values: list[str]) -> tuple[int, int] | None:
+    """Localiza a primeira célula que indica o nível da linha (ex.: `6°`)."""
+    for idx, raw in enumerate(values):
+        nivel = _parse_nivel(raw)
+        if nivel is not None:
+            return (idx, nivel)
+    return None
 
 
 def _normalizar_bonus(raw: str) -> str:
