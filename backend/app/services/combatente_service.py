@@ -13,6 +13,7 @@ from ..repositories.base import commit_with_rollback
 from ..services.file_service import FileService
 from ..models.combatente import Combatente
 from ..models.ataque import MagiaSlot
+from ..core.bonus_base_ataque import calcular_bonus_base_ataque, calcular_resistencias_base
 from ..exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
@@ -231,6 +232,7 @@ class CombatenteService:
             combatente_data,
             exigir_dois_dominios_clerigo=False,
         )
+        self._preencher_bonus_base_ataque(combatente_data)
         combatente_data["hp_atual"] = combatente_data["hp_maximo"]
         combatente = Combatente(**combatente_data)
         criado = self.repository.create(combatente)
@@ -266,6 +268,7 @@ class CombatenteService:
             dominios_atuais=combatente.dominios,
             exigir_dois_dominios_clerigo=False,
         )
+        self._preencher_bonus_base_ataque(combatente_data, combatente_atual=combatente)
 
         for key, value in combatente_data.items():
             if hasattr(combatente, key) and value is not None:
@@ -273,6 +276,70 @@ class CombatenteService:
 
         atualizado = self.repository.update(combatente)
         return self.obter_por_id(atualizado.id)
+
+    def _preencher_bonus_base_ataque(
+        self,
+        combatente_data: dict,
+        combatente_atual: Optional[Combatente] = None,
+    ) -> None:
+        classe = combatente_data.get("classe")
+        nivel = combatente_data.get("nivel")
+
+        if classe is None and combatente_atual is not None:
+            classe = combatente_atual.classe
+        if nivel is None and combatente_atual is not None:
+            nivel = combatente_atual.nivel
+
+        bba = calcular_bonus_base_ataque(classe, nivel)
+        combatente_data["bonus_base_ataque"] = bba or ""
+        saves = calcular_resistencias_base(classe, nivel)
+        if saves is not None:
+            fortitude, reflexos, vontade = saves
+            combatente_data["fortitude_base"] = fortitude
+            combatente_data["reflexos_base"] = reflexos
+            combatente_data["vontade_base"] = vontade
+
+        self._recalcular_resistencias_totais(combatente_data, combatente_atual=combatente_atual)
+
+    def _recalcular_resistencias_totais(
+        self,
+        combatente_data: dict,
+        combatente_atual: Optional[Combatente] = None,
+    ) -> None:
+        fort_base = self._obter_valor_int(combatente_data, "fortitude_base", combatente_atual, default=0)
+        reflex_base = self._obter_valor_int(combatente_data, "reflexos_base", combatente_atual, default=0)
+        vontade_base = self._obter_valor_int(combatente_data, "vontade_base", combatente_atual, default=0)
+
+        con = self._obter_valor_int(combatente_data, "constituicao", combatente_atual, default=10)
+        des = self._obter_valor_int(combatente_data, "destreza", combatente_atual, default=10)
+        sab = self._obter_valor_int(combatente_data, "sabedoria", combatente_atual, default=10)
+
+        combatente_data["fortitude"] = fort_base + self._modificador_atributo(con)
+        combatente_data["reflexos"] = reflex_base + self._modificador_atributo(des)
+        combatente_data["vontade"] = vontade_base + self._modificador_atributo(sab)
+
+    @staticmethod
+    def _modificador_atributo(valor: int) -> int:
+        return (valor - 10) // 2
+
+    @staticmethod
+    def _obter_valor_int(
+        combatente_data: dict,
+        key: str,
+        combatente_atual: Optional[Combatente],
+        default: int,
+    ) -> int:
+        if key in combatente_data and combatente_data[key] is not None:
+            try:
+                return int(combatente_data[key])
+            except (TypeError, ValueError):
+                return default
+        if combatente_atual is not None:
+            try:
+                return int(getattr(combatente_atual, key))
+            except (TypeError, ValueError, AttributeError):
+                return default
+        return default
 
     def deletar(self, combatente_id: int) -> bool:
         """Arquiva combatente via soft delete."""

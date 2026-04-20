@@ -173,3 +173,49 @@ def test_aplicar_cura_massa_sucesso(combatentes_db):
     assert len(body["resultados"]) == 2
     assert {item["id"] for item in body["resultados"]} == set(ids)
     assert all(item["hp_atual"] == 14 for item in body["resultados"])
+
+
+def test_criar_combatente_preenche_bonus_base_ataque_por_classe_e_nivel(combatentes_db):
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    response = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(classe="Guerreiro", nivel="6"),
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["bonus_base_ataque"] == "+6/+1"
+    assert body["fortitude_base"] == 5
+    assert body["reflexos_base"] == 2
+    assert body["vontade_base"] == 2
+    assert body["fortitude"] == 7
+    assert body["reflexos"] == 3
+    assert body["vontade"] == 5
+
+
+def test_atualizar_combatente_recalcula_bonus_base_ataque_quando_classe_ou_nivel_mudam(combatentes_db):
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    criado = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(classe="Bardo", nivel="8"),
+    )
+    assert criado.status_code == 201
+    combatente_id = criado.json()["id"]
+    assert criado.json()["bonus_base_ataque"] == "+6/+1"
+
+    atualizado = client.put(
+        f"/api/v1/combatentes/{combatente_id}",
+        data=_combatente_payload(classe="Mago", nivel="8"),
+    )
+    assert atualizado.status_code == 200
+    assert atualizado.json()["bonus_base_ataque"] == "+4"
+    assert atualizado.json()["fortitude_base"] == 2
+    assert atualizado.json()["reflexos_base"] == 2
+    assert atualizado.json()["vontade_base"] == 6
+    assert atualizado.json()["fortitude"] == 4
+    assert atualizado.json()["reflexos"] == 3
+    assert atualizado.json()["vontade"] == 9

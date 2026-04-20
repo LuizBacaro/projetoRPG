@@ -6,7 +6,10 @@ SOLID: Single Responsibility — responsável APENAS por inicialização
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from ..core.config import settings  # ✅ MUDADO: relativa em vez de absoluta
+from .bonus_base_ataque import calcular_bonus_base_ataque, calcular_resistencias_base
+from .classes_tables_catalog import initialize_classes_tables_catalog
 from ..models.usuario import Usuario, PerfilUsuario
+from ..models.combatente import Combatente
 from .security import hash_senha
 import logging
 
@@ -150,3 +153,72 @@ def inicializar_talentos(db: Session) -> None:
         )
     db.commit()
     print(f"✅ {len(TALENTOS_PADRAO)} talentos (seed mínimo) inseridos — prefira o JSON no repositório.")
+
+
+def inicializar_catalogo_tabelas_classes() -> None:
+    """
+    Inicialização opt-in do catálogo de classes.
+
+    Sem side effects de banco; apenas valida carregamento quando habilitado.
+    """
+    initialize_classes_tables_catalog()
+
+
+def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
+    """
+    Recalcula e persiste BBA de combatentes existentes.
+
+    Mantém consistência para registros antigos criados antes da introdução
+    do campo `bonus_base_ataque`.
+    """
+    combatentes = db.query(Combatente).filter(Combatente.deleted_at.is_(None)).all()
+    atualizados = 0
+
+    for combatente in combatentes:
+        novo_bba = calcular_bonus_base_ataque(combatente.classe, combatente.nivel) or ""
+        novas_resistencias = calcular_resistencias_base(combatente.classe, combatente.nivel)
+        mudou = False
+
+        if (combatente.bonus_base_ataque or "") != novo_bba:
+            combatente.bonus_base_ataque = novo_bba
+            mudou = True
+
+        if novas_resistencias is not None:
+            nova_fortitude, novo_reflexos, nova_vontade = novas_resistencias
+            if combatente.fortitude_base != nova_fortitude:
+                combatente.fortitude_base = nova_fortitude
+                mudou = True
+            if combatente.reflexos_base != novo_reflexos:
+                combatente.reflexos_base = novo_reflexos
+                mudou = True
+            if combatente.vontade_base != nova_vontade:
+                combatente.vontade_base = nova_vontade
+                mudou = True
+
+            fort_total = nova_fortitude + _modificador_atributo(combatente.constituicao)
+            reflex_total = novo_reflexos + _modificador_atributo(combatente.destreza)
+            vontade_total = nova_vontade + _modificador_atributo(combatente.sabedoria)
+
+            if combatente.fortitude != fort_total:
+                combatente.fortitude = fort_total
+                mudou = True
+            if combatente.reflexos != reflex_total:
+                combatente.reflexos = reflex_total
+                mudou = True
+            if combatente.vontade != vontade_total:
+                combatente.vontade = vontade_total
+                mudou = True
+
+        if mudou:
+            atualizados += 1
+
+    if atualizados:
+        db.commit()
+        logger.info("✅ Progressão base (BBA/TRs) sincronizada para %s combatente(s).", atualizados)
+
+
+def _modificador_atributo(valor: int | None) -> int:
+    try:
+        return (int(valor) - 10) // 2
+    except (TypeError, ValueError):
+        return 0

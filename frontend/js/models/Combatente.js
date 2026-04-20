@@ -21,12 +21,16 @@ export class Combatente {
         this.foto_url          = data.foto_url;
         this.nivel             = data.nivel             || 1;
         this.pontos            = data.pontos            || 0;
+        this.bonus_base_ataque = data.bonus_base_ataque || '';
         this.ca                = data.ca                !== undefined ? data.ca                : 10;
         this.toque             = data.toque             !== undefined ? data.toque             : 10;
         this.surpresa          = data.surpresa          !== undefined ? data.surpresa          : 10;
         this.fortitude         = data.fortitude         !== undefined ? data.fortitude         : 0;
         this.reflexos          = data.reflexos          !== undefined ? data.reflexos          : 0;
         this.vontade           = data.vontade           !== undefined ? data.vontade           : 0;
+        this.fortitude_base    = data.fortitude_base    !== undefined ? data.fortitude_base    : this.fortitude;
+        this.reflexos_base     = data.reflexos_base     !== undefined ? data.reflexos_base     : this.reflexos;
+        this.vontade_base      = data.vontade_base      !== undefined ? data.vontade_base      : this.vontade;
         this.forca             = _attr1a30(data, 'forca', 10);
         this.destreza          = _attr1a30(data, 'destreza', 10);
         this.constituicao      = _attr1a30(data, 'constituicao', 10);

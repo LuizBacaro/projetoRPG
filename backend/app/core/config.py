@@ -64,6 +64,8 @@ class Settings(BaseSettings):
     # ── Cache ────────────────────────────────────────────────────────────────
     CACHE_ENABLED: bool = True
     CACHE_CATALOG_TTL_SECONDS: int = 300
+    CLASSES_TABLES_CATALOG_ENABLED: bool = False
+    CLASSES_TABLES_CATALOG_PATH: str = "docs/dados/tabelas_classes_catalogo.json"
 
     # ── Rate Limiting ────────────────────────────────────────────────────────
     RATE_LIMIT_ENABLED: bool = True

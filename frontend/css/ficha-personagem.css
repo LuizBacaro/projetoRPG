@@ -753,6 +753,33 @@ body {
     color: var(--cor-madeira);
 }
 
+.ficha-res-breakdown {
+    font-size: 0.62rem;
+    color: var(--cor-madeira-clara);
+    text-align: center;
+    line-height: 1.2;
+}
+
+.ficha-defesa-label-com-ajuda {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+}
+
+.ficha-help-icon {
+    font-size: 0.64rem;
+    color: rgba(120, 84, 45, 0.65);
+    opacity: 0.85;
+    cursor: help;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    user-select: none;
+}
+
+.ficha-help-icon:hover {
+    color: rgba(120, 84, 45, 0.9);
+    opacity: 1;
+}
+
 /* 
    COLUNA DIREITA
     */

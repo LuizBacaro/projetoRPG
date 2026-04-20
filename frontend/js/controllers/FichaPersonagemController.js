@@ -936,6 +936,8 @@ export class FichaPersonagemController {
         const pv         = document.getElementById('fichaPv');
         const pvFill     = document.getElementById('fichaPvFill');
         const iniciativa = document.getElementById('fichaIniciativa');
+        const bba        = document.getElementById('fichaBba');
+        const bbaBreakdown = document.getElementById('fichaBbaBreakdown');
 
         const caBase = this.combatente.ca ?? 10;
         const bonusProtecao = Number(this.bonusCaProtecao || 0);
@@ -961,6 +963,23 @@ export class FichaPersonagemController {
             const ini = this.combatente.iniciativa || 0;
             iniciativa.textContent = ini >= 0 ? `+${ini}` : `${ini}`;
         }
+        if (bba) {
+            const bbaTexto = this.combatente.bonus_base_ataque || '+0';
+            bba.textContent = bbaTexto;
+            bba.title = 'BBA define ataques iterativos: a cada +5 no bônus base, você ganha um ataque adicional com -5.';
+            if (bbaBreakdown) {
+                const ataques = String(bbaTexto)
+                    .split('/')
+                    .map((p) => p.trim())
+                    .filter(Boolean);
+                const qtdAtaques = Math.max(1, ataques.length);
+                const pluralAtaques = qtdAtaques === 1 ? 'ataque' : 'ataques';
+                const classe = this.combatente.classe || '—';
+                const nivel = this.combatente.nivel || 1;
+                bbaBreakdown.textContent = `Classe ${classe} • Nível ${nivel} • ${qtdAtaques} ${pluralAtaques}`;
+                bbaBreakdown.title = 'Ataques iterativos em D&D 3.5: +5 no BBA concede um ataque extra com penalidade de -5.';
+            }
+        }
 
     }
 
@@ -972,11 +991,35 @@ export class FichaPersonagemController {
         const fort   = document.getElementById('fichaFort');
         const reflex = document.getElementById('fichaReflex');
         const vont   = document.getElementById('fichaVont');
+        const fortBreakdown = document.getElementById('fichaFortBreakdown');
+        const reflexBreakdown = document.getElementById('fichaReflexBreakdown');
+        const vontBreakdown = document.getElementById('fichaVontBreakdown');
 
         const fmt = v => v >= 0 ? `+${v}` : `${v}`;
-        if (fort)   fort.textContent   = fmt(this.combatente.fortitude || 0);
-        if (reflex) reflex.textContent = fmt(this.combatente.reflexos  || 0);
-        if (vont)   vont.textContent   = fmt(this.combatente.vontade   || 0);
+        if (fort) {
+            fort.textContent = fmt(this.combatente.fortitude || 0);
+            fort.title = `Base: ${fmt(this.combatente.fortitude_base || 0)}`;
+            if (fortBreakdown) {
+                const modCon = Math.floor(((this.combatente.constituicao ?? 10) - 10) / 2);
+                fortBreakdown.textContent = `Base ${fmt(this.combatente.fortitude_base || 0)} • CON ${fmt(modCon)}`;
+            }
+        }
+        if (reflex) {
+            reflex.textContent = fmt(this.combatente.reflexos || 0);
+            reflex.title = `Base: ${fmt(this.combatente.reflexos_base || 0)}`;
+            if (reflexBreakdown) {
+                const modDes = Math.floor(((this.combatente.destreza ?? 10) - 10) / 2);
+                reflexBreakdown.textContent = `Base ${fmt(this.combatente.reflexos_base || 0)} • DES ${fmt(modDes)}`;
+            }
+        }
+        if (vont) {
+            vont.textContent = fmt(this.combatente.vontade || 0);
+            vont.title = `Base: ${fmt(this.combatente.vontade_base || 0)}`;
+            if (vontBreakdown) {
+                const modSab = Math.floor(((this.combatente.sabedoria ?? 10) - 10) / 2);
+                vontBreakdown.textContent = `Base ${fmt(this.combatente.vontade_base || 0)} • SAB ${fmt(modSab)}`;
+            }
+        }
 
     }
 

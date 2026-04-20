@@ -54,6 +54,9 @@ class Combatente(SoftDeleteMixin, Base):
     carisma      = Column(Integer, default=10)
 
     # ── Resistências ──
+    fortitude_base = Column(Integer, default=0)
+    reflexos_base  = Column(Integer, default=0)
+    vontade_base   = Column(Integer, default=0)
     fortitude = Column(Integer, default=0)
     reflexos  = Column(Integer, default=0)
     vontade   = Column(Integer, default=0)
@@ -61,6 +64,7 @@ class Combatente(SoftDeleteMixin, Base):
     # ── Progressão ──
     nivel  = Column(Integer, default=1)
     pontos = Column(Integer, default=0)
+    bonus_base_ataque = Column(String, nullable=True, default="")
 
     # ── Relacionamentos ──
     ataques = relationship(

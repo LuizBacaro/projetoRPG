@@ -16,10 +16,31 @@ import os
 
 from .core.config import settings
 from .core.database import engine, Base, SessionLocal, get_db
-from .core.init_db import criar_admin_padrao, inicializar_equipamentos, inicializar_talentos
+from .core.init_db import (
+    criar_admin_padrao,
+    inicializar_catalogo_tabelas_classes,
+    inicializar_equipamentos,
+    sincronizar_bonus_base_ataque_combatentes,
+    inicializar_talentos,
+)
 from .core.rate_limit import RateLimitMiddleware
 from .core.request_size import RequestSizeLimitMiddleware
-from .api.v1 import combatentes, combate, condicoes, usuarios, auth, ataques, pericias, magias, magias_preparadas, equipamentos, talentos, grimorio, armaduras_protecao
+from .api.v1 import (
+    armaduras_protecao,
+    ataques,
+    auth,
+    combate,
+    combatentes,
+    condicoes,
+    equipamentos,
+    grimorio,
+    magias,
+    magias_preparadas,
+    pericias,
+    tabelas_classes,
+    talentos,
+    usuarios,
+)
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
 from .models import usuario as usuario_model
@@ -139,6 +160,7 @@ app.include_router(grimorio.router, prefix=settings.API_V1_PREFIX)
 app.include_router(equipamentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(armaduras_protecao.router, prefix=settings.API_V1_PREFIX)
 app.include_router(talentos.router, prefix=settings.API_V1_PREFIX)
+app.include_router(tabelas_classes.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 
@@ -384,6 +406,8 @@ def _inicializar_banco(db) -> None:
         ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
         ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
         ("garantir_colunas_catalogo_equipamentos", _garantir_colunas_catalogo_equipamentos),
+        ("garantir_coluna_bonus_base_ataque", _garantir_coluna_bonus_base_ataque),
+        ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
         ("garantir_colunas_talentos", _garantir_colunas_talentos),
         ("garantir_colunas_armaduras_protecao", _garantir_colunas_armaduras_protecao),
         ("garantir_constraints_item_13", _garantir_constraints_item_13),
@@ -393,6 +417,8 @@ def _inicializar_banco(db) -> None:
         ("inicializar_equipamentos", lambda: inicializar_equipamentos(db)),
         ("seed_armaduras_protecao", lambda: _seed_armaduras_protecao(db)),
         ("inicializar_talentos", lambda: inicializar_talentos(db)),
+        ("sincronizar_bonus_base_ataque_combatentes", lambda: sincronizar_bonus_base_ataque_combatentes(db)),
+        ("inicializar_catalogo_tabelas_classes", inicializar_catalogo_tabelas_classes),
         ("seed_combatentes", lambda: _seed_combatentes(db)),
     ]
 
@@ -587,6 +613,44 @@ def _garantir_colunas_talentos() -> None:
                 coluna,
             )
             conn.execute(text(f"ALTER TABLE talentos ADD COLUMN {coluna} {tipo_sql}"))
+
+
+def _garantir_coluna_bonus_base_ataque() -> None:
+    """Garante a coluna `combatentes.bonus_base_ataque` em bancos legados."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "combatentes" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("combatentes")}
+    if "bonus_base_ataque" in colunas_existentes:
+        return
+
+    logger.warning("⚠️  coluna combatentes.bonus_base_ataque ausente; aplicando schema guard")
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE combatentes ADD COLUMN bonus_base_ataque VARCHAR(30)"))
+
+
+def _garantir_colunas_resistencia_base() -> None:
+    """Garante colunas base de resistência em bancos legados."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "combatentes" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("combatentes")}
+    colunas_esperadas = {
+        "fortitude_base": "INTEGER",
+        "reflexos_base": "INTEGER",
+        "vontade_base": "INTEGER",
+    }
+
+    with engine.begin() as conn:
+        for coluna, tipo_sql in colunas_esperadas.items():
+            if coluna in colunas_existentes:
+                continue
+            logger.warning("⚠️  coluna combatentes.%s ausente; aplicando schema guard", coluna)
+            conn.execute(text(f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql}"))
 
 
 def _garantir_colunas_armaduras_protecao() -> None:
