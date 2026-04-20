@@ -223,13 +223,31 @@ def _extrair_coluna_bba(values: list[str], level_idx: int) -> str | None:
 
 
 def _extrair_resistencias(values: list[str], level_idx: int) -> tuple[int, int, int] | None:
-    # Após o nível vem BBA e depois as três TRs base (Fort/Ref/Vont).
+    """
+    Após o marcador de nível: BBA, Fortitude, Reflexos, Vontade (e depois texto da coluna Especial).
+
+    Preferência: leitura posicional (evita confundir dois '+0' quando o primeiro é BBA e o segundo é Fort).
+    Fallback: heurística antiga (primeiro token com formato de BBA).
+    """
     tokens = values[level_idx + 1 :]
     if not tokens:
         return None
 
-    bba_idx = None
+    if len(tokens) >= 4:
+        fort_ref_vont: list[int] = []
+        ok = True
+        for i in range(1, 4):
+            m = re.match(r"^[+]?(-?\d+)$", tokens[i])
+            if not m:
+                ok = False
+                break
+            fort_ref_vont.append(int(m.group(1)))
+        if ok:
+            return (fort_ref_vont[0], fort_ref_vont[1], fort_ref_vont[2])
+
+    # Fallback: localizar coluna de BBA e as três TRs subsequentes
     pattern_bba = re.compile(r"^[+]?\d+(?:/[+]?\d+)*$")
+    bba_idx = None
     for idx, token in enumerate(tokens):
         if pattern_bba.match(token):
             bba_idx = idx
