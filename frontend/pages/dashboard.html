@@ -181,11 +181,8 @@
                         <label>HP Máximo *</label>
                         <input type="number" name="hp_maximo" required min="1" placeholder="Ex: 100" />
                     </div>
-                    <div class="dash-form-group">
-                        <label>Iniciativa *</label>
-                        <input type="number" name="iniciativa" required placeholder="Ex: 15" />
-                    </div>
                 </div>
+                <input type="hidden" name="iniciativa" value="0" />
 
                 <div class="dash-form-group">
                     <label>Foto do Personagem</label>
@@ -414,7 +411,7 @@
                         <label>HP Máximo *</label>
                         <input type="number" id="dashEditHP" name="hp_maximo" required min="1" />
                     </div>
-                    <div class="dash-form-group">
+                    <div class="dash-form-group" id="dashEditGrupoIniciativa">
                         <label>Iniciativa *</label>
                         <input type="number" id="dashEditIniciativa" name="iniciativa" required />
                     </div>

@@ -13,7 +13,12 @@ from ..repositories.base import commit_with_rollback
 from ..services.file_service import FileService
 from ..models.combatente import Combatente
 from ..models.ataque import MagiaSlot
-from ..core.bonus_base_ataque import calcular_bonus_base_ataque, calcular_resistencias_base
+from ..models.talento import Talento, TalentoJogador
+from ..core.bonus_base_ataque import (
+    calcular_bonus_base_ataque,
+    calcular_habilidades_especiais,
+    calcular_resistencias_base,
+)
 from ..exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
@@ -178,18 +183,30 @@ class CombatenteService:
         # Jogador enxerga apenas seus próprios combatentes (qualquer tipo)
         if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
             if tipo:
-                return self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
-            return self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
+                combatentes = self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
+                self._sincronizar_progressao_em_memoria(combatentes)
+                return combatentes
+            combatentes = self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
+            self._sincronizar_progressao_em_memoria(combatentes)
+            return combatentes
 
         # Mestre/user comum enxerga seus próprios (com filtro de tipo se aplicável)
         if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
             if tipo:
-                return self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
-            return self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
+                combatentes = self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
+                self._sincronizar_progressao_em_memoria(combatentes)
+                return combatentes
+            combatentes = self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
+            self._sincronizar_progressao_em_memoria(combatentes)
+            return combatentes
 
         if tipo:
-            return self.repository.get_by_tipo(tipo, skip=skip, limit=limit)
-        return self.repository.get_all(skip=skip, limit=limit)
+            combatentes = self.repository.get_by_tipo(tipo, skip=skip, limit=limit)
+            self._sincronizar_progressao_em_memoria(combatentes)
+            return combatentes
+        combatentes = self.repository.get_all(skip=skip, limit=limit)
+        self._sincronizar_progressao_em_memoria(combatentes)
+        return combatentes
 
     def contar_todos(self, tipo: Optional[str] = None, usuario=None) -> int:
         """Conta combatentes respeitando escopo do usuário e filtro por tipo."""
@@ -218,6 +235,7 @@ class CombatenteService:
         combatente = self.repository.get_by_id(combatente_id)
         if not combatente:
             raise CombatenteNaoEncontrado(combatente_id)
+        self._sincronizar_progressao_em_memoria([combatente])
         return combatente
 
     def criar(self, combatente_data: dict, foto_file=None, dono_id: Optional[int] = None) -> Combatente:
@@ -232,6 +250,7 @@ class CombatenteService:
             combatente_data,
             exigir_dois_dominios_clerigo=False,
         )
+        self._aplicar_regra_iniciativa_por_tipo(combatente_data)
         self._preencher_bonus_base_ataque(combatente_data)
         combatente_data["hp_atual"] = combatente_data["hp_maximo"]
         combatente = Combatente(**combatente_data)
@@ -268,6 +287,7 @@ class CombatenteService:
             dominios_atuais=combatente.dominios,
             exigir_dois_dominios_clerigo=False,
         )
+        self._aplicar_regra_iniciativa_por_tipo(combatente_data, combatente_atual=combatente)
         self._preencher_bonus_base_ataque(combatente_data, combatente_atual=combatente)
 
         for key, value in combatente_data.items():
@@ -292,6 +312,8 @@ class CombatenteService:
 
         bba = calcular_bonus_base_ataque(classe, nivel)
         combatente_data["bonus_base_ataque"] = bba or ""
+        habilidades = calcular_habilidades_especiais(classe, nivel)
+        combatente_data["habilidades_especiais"] = " | ".join(habilidades) if habilidades else ""
         saves = calcular_resistencias_base(classe, nivel)
         if saves is not None:
             fortitude, reflexos, vontade = saves
@@ -340,6 +362,78 @@ class CombatenteService:
             except (TypeError, ValueError, AttributeError):
                 return default
         return default
+
+    def _sincronizar_progressao_em_memoria(self, combatentes: List[Combatente]) -> None:
+        """
+        Corrige registros legados em leitura quando progressão ainda não foi persistida.
+        Evita exibir BBA '+0' para classes/níveis válidos.
+        """
+        precisa_commit = False
+        for combatente in combatentes:
+            payload = {
+                "tipo": combatente.tipo,
+                "classe": combatente.classe,
+                "nivel": combatente.nivel,
+                "iniciativa": combatente.iniciativa,
+                "constituicao": combatente.constituicao,
+                "destreza": combatente.destreza,
+                "sabedoria": combatente.sabedoria,
+                "fortitude_base": combatente.fortitude_base,
+                "reflexos_base": combatente.reflexos_base,
+                "vontade_base": combatente.vontade_base,
+            }
+            self._aplicar_regra_iniciativa_por_tipo(payload, combatente_atual=combatente)
+            self._preencher_bonus_base_ataque(payload, combatente_atual=combatente)
+            campos = (
+                "iniciativa",
+                "bonus_base_ataque",
+                "habilidades_especiais",
+                "fortitude_base",
+                "reflexos_base",
+                "vontade_base",
+                "fortitude",
+                "reflexos",
+                "vontade",
+            )
+            for campo in campos:
+                novo = payload.get(campo)
+                atual = getattr(combatente, campo, None)
+                if novo != atual:
+                    setattr(combatente, campo, novo)
+                    precisa_commit = True
+        if precisa_commit:
+            commit_with_rollback(self.repository.db)
+
+    def _aplicar_regra_iniciativa_por_tipo(
+        self,
+        combatente_data: dict,
+        combatente_atual: Optional[Combatente] = None,
+    ) -> None:
+        tipo = (combatente_data.get("tipo") or (combatente_atual.tipo if combatente_atual else "") or "").lower()
+        if tipo != "jogador":
+            return
+        des = self._obter_valor_int(combatente_data, "destreza", combatente_atual, default=10)
+        bonus_talento = self._bonus_iniciativa_aprimorada(combatente_atual.id) if combatente_atual else 0
+        # Regra base D&D 3.5: Iniciativa = modificador de Destreza.
+        # Talento Iniciativa Aprimorada concede +4 adicional.
+        combatente_data["iniciativa"] = self._modificador_atributo(des) + bonus_talento
+
+    def _bonus_iniciativa_aprimorada(self, combatente_id: int) -> int:
+        nomes = (
+            self.repository.db.query(Talento.nome)
+            .join(TalentoJogador, TalentoJogador.talento_id == Talento.id)
+            .filter(
+                TalentoJogador.combatente_id == combatente_id,
+                Talento.deleted_at.is_(None),
+            )
+            .all()
+        )
+        for (nome,) in nomes:
+            chave = unicodedata.normalize("NFD", str(nome or ""))
+            chave = "".join(ch for ch in chave if unicodedata.category(ch) != "Mn")
+            if chave.strip().upper() == "INICIATIVA APRIMORADA":
+                return 4
+        return 0
 
     def deletar(self, combatente_id: int) -> bool:
         """Arquiva combatente via soft delete."""

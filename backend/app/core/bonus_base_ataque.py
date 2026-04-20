@@ -64,7 +64,7 @@ _SAVE_PROGRESSION_BY_CLASS: dict[str, tuple[str, str, str]] = {
 
 
 def calcular_bonus_base_ataque(classe: str | None, nivel: int | None) -> str | None:
-    classe_norm = normalizar_classe(classe or "")
+    classe_norm = _resolver_chave_classe(classe or "")
     if not classe_norm:
         return None
     if nivel is None:
@@ -84,7 +84,7 @@ def calcular_bonus_base_ataque(classe: str | None, nivel: int | None) -> str | N
 
 
 def calcular_resistencias_base(classe: str | None, nivel: int | None) -> tuple[int, int, int] | None:
-    classe_norm = normalizar_classe(classe or "")
+    classe_norm = _resolver_chave_classe(classe or "")
     if not classe_norm or nivel is None:
         return None
     nivel_val = max(1, min(20, int(nivel)))
@@ -248,6 +248,94 @@ def _extrair_resistencias(values: list[str], level_idx: int) -> tuple[int, int, 
     if len(numeric_tokens) < 3:
         return None
     return (numeric_tokens[0], numeric_tokens[1], numeric_tokens[2])
+
+
+def _resolver_chave_classe(classe: str) -> str:
+    """
+    Resolve chave de classe canônica mesmo quando o texto vem com ruído
+    (ex.: sufixos, observações ou formatos legados).
+    """
+    base = normalizar_classe(classe or "")
+    if base in _TABLE_BY_CLASS or base in _PROGRESSION_BY_CLASS:
+        return base
+
+    # Fallback por contenção: escolhe a maior chave encontrada no texto.
+    # Ex.: "GUERREIRO (HUMANO)" -> "GUERREIRO"
+    candidates = [
+        key for key in _TABLE_BY_CLASS.keys()
+        if key and key in base
+    ]
+    if not candidates:
+        return base
+    return max(candidates, key=len)
+
+
+def calcular_habilidades_especiais(classe: str | None, nivel: int | None) -> list[str]:
+    classe_norm = _resolver_chave_classe(classe or "")
+    if not classe_norm or nivel is None:
+        return []
+    nivel_val = max(1, min(20, int(nivel)))
+    table_number = _TABLE_BY_CLASS.get(classe_norm)
+    if table_number is None:
+        return []
+
+    payload = _load_catalog()
+    tables = payload.get("tables", [])
+    if not isinstance(tables, list):
+        return []
+    target = next((t for t in tables if t.get("table_number") == table_number), None)
+    if not isinstance(target, dict):
+        return []
+    rows = target.get("rows", [])
+    if not isinstance(rows, list):
+        return []
+
+    habilidades: list[str] = []
+    vistos: set[str] = set()
+
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        values = [str(v).strip() for v in row.values() if str(v).strip()]
+        if not values:
+            continue
+        idx = _index_nivel(values, nivel_val)
+        if idx is None:
+            continue
+        especial = _extrair_especial(values, idx)
+        if not especial:
+            continue
+        for item in re.split(r"[,;]", especial):
+            talento = item.strip()
+            if not talento or talento in {"-", "—"}:
+                continue
+            key = talento.lower()
+            if key in vistos:
+                continue
+            vistos.add(key)
+            habilidades.append(talento)
+    return habilidades
+
+
+def _extrair_especial(values: list[str], level_idx: int) -> str | None:
+    after = values[level_idx + 1 :]
+    if not after:
+        return None
+
+    # Prioriza token com texto descritivo (não numérico), que normalmente é a coluna Especial.
+    candidates = []
+    for token in after:
+        if token in {"-", "—"}:
+            continue
+        if re.match(r"^[+]?\d+(?:/[+]?\d+)*$", token):
+            continue
+        if re.match(r"^[+]?\d+$", token):
+            continue
+        if re.search(r"[A-Za-zÀ-ÿ]", token):
+            candidates.append(token)
+    if not candidates:
+        return None
+    return candidates[0]
 
 
 def _normalizar_bonus(raw: str) -> str:

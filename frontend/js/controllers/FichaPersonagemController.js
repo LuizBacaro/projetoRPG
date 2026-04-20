@@ -80,6 +80,7 @@ export class FichaPersonagemController {
 
         this.equipamentosDisponiveis = [];
         this.armadurasProtecaoDisponiveis = [];
+        this.talentosJogador = [];
 
     }
 
@@ -111,6 +112,7 @@ export class FichaPersonagemController {
             this.renderizarAtributos();
             this.renderizarDefesa();
             this.renderizarResistencias();
+            this.renderizarHabilidadesEspeciais();
             this.renderizarAtaques();
             this.renderizarSlotsDeMapia();
 
@@ -936,6 +938,7 @@ export class FichaPersonagemController {
         const pv         = document.getElementById('fichaPv');
         const pvFill     = document.getElementById('fichaPvFill');
         const iniciativa = document.getElementById('fichaIniciativa');
+        const iniciativaBreakdown = document.getElementById('fichaIniciativaBreakdown');
         const bba        = document.getElementById('fichaBba');
         const bbaBreakdown = document.getElementById('fichaBbaBreakdown');
 
@@ -962,9 +965,22 @@ export class FichaPersonagemController {
         if (iniciativa) {
             const ini = this.combatente.iniciativa || 0;
             iniciativa.textContent = ini >= 0 ? `+${ini}` : `${ini}`;
+            if (iniciativaBreakdown) {
+                const modDes = this._calcularModificador(this.combatente.destreza ?? 10);
+                const bonusTalento = this._bonusIniciativaTalento();
+                const bonusOutros = ini - modDes - bonusTalento;
+                const partes = [`DES ${modDes >= 0 ? `+${modDes}` : modDes}`];
+                if (bonusTalento !== 0) {
+                    partes.push(`talento ${bonusTalento >= 0 ? `+${bonusTalento}` : bonusTalento}`);
+                }
+                if (bonusOutros !== 0) {
+                    partes.push(`outros ${bonusOutros >= 0 ? `+${bonusOutros}` : bonusOutros}`);
+                }
+                iniciativaBreakdown.textContent = partes.join(' + ').replace(/\+ -/g, '- ');
+            }
         }
         if (bba) {
-            const bbaTexto = this.combatente.bonus_base_ataque || '+0';
+            const bbaTexto = this._resolverBbaFicha();
             bba.textContent = bbaTexto;
             bba.title = 'BBA define ataques iterativos: a cada +5 no bônus base, você ganha um ataque adicional com -5.';
             if (bbaBreakdown) {
@@ -981,6 +997,53 @@ export class FichaPersonagemController {
             }
         }
 
+    }
+
+    _bonusIniciativaTalento() {
+        const talentos = Array.isArray(this.talentosJogador) ? this.talentosJogador : [];
+        for (const talento of talentos) {
+            const nome = String(talento?.nome || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim()
+                .toUpperCase();
+            if (nome === 'INICIATIVA APRIMORADA') return 4;
+        }
+        return 0;
+    }
+
+    _resolverBbaFicha() {
+        const bbaApi = String(this.combatente?.bonus_base_ataque || '').trim();
+        if (bbaApi) return bbaApi;
+        return this._calcularBbaPorClasseNivel(
+            this.combatente?.classe,
+            Number(this.combatente?.nivel || 1),
+        );
+    }
+
+    _calcularBbaPorClasseNivel(classe, nivel) {
+        const cls = String(classe || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toUpperCase();
+        const nvl = Math.max(1, Math.min(20, Number.isFinite(nivel) ? nivel : 1));
+
+        const good = new Set(['BARBARO', 'GUERREIRO', 'PALADINO', 'RANGER', 'PATRULHEIRO']);
+        const medium = new Set(['BARDO', 'CLERIGO', 'DRUIDA', 'LADINO', 'MONGE']);
+        const poor = new Set(['MAGO', 'FEITICEIRO']);
+
+        let total = 0;
+        if (good.has(cls)) total = nvl;
+        else if (medium.has(cls)) total = Math.floor((3 * nvl) / 4);
+        else if (poor.has(cls)) total = Math.floor(nvl / 2);
+        else return '+0';
+
+        const ataques = [];
+        for (let atual = total; atual >= 1; atual -= 5) {
+            ataques.push(`+${atual}`);
+        }
+        return ataques.length ? ataques.join('/') : '+0';
     }
 
     // ─────────────────────────────────────────────────────────
@@ -1021,6 +1084,27 @@ export class FichaPersonagemController {
             }
         }
 
+    }
+
+    renderizarHabilidadesEspeciais() {
+        const container = document.getElementById('fichaHabilidadesEspeciais');
+        if (!container) return;
+        const raw = String(this.combatente?.habilidades_especiais || '').trim();
+        if (!raw) {
+            container.innerHTML = '<span class="ficha-vazio">Nenhuma habilidade especial mapeada para classe/nível atual.</span>';
+            return;
+        }
+        const itens = raw
+            .split('|')
+            .map((item) => item.trim())
+            .filter(Boolean);
+        if (!itens.length) {
+            container.innerHTML = '<span class="ficha-vazio">Nenhuma habilidade especial mapeada para classe/nível atual.</span>';
+            return;
+        }
+        container.innerHTML = itens
+            .map((item) => `<div class="ficha-habilidade-especial-item">${escapeHtml(item)}</div>`)
+            .join('');
     }
 
     // ─────────────────────────────────────────────────────────
@@ -2174,8 +2258,9 @@ export class FichaPersonagemController {
     async carregarRenderizarTalentos(combatenteId) {
         try {
             const talentos = await this.talentoService.listarTalentosJogador(combatenteId);
-            
+            this.talentosJogador = talentos || [];
             this.renderizarTalentos(talentos);
+            this.renderizarDefesa();
         } catch (error) {
             console.error('❌ Erro ao carregar talentos:', error);
             this.mostrarErroTalentos('Erro ao carregar talentos');

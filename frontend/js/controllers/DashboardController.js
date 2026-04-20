@@ -401,6 +401,7 @@ class DashboardController {
                 this._calcularModificador(input);
                 if (input.id === 'dashEditDES') {
                     this._preencherCaSugeridaPorDestrezaEdicao();
+                    this._preencherIniciativaSugeridaPorDestrezaEdicao();
                 }
             });
         });
@@ -643,6 +644,7 @@ class DashboardController {
             });
 
             this._preencherCaSugeridaPorDestrezaEdicao();
+            this._aplicarRegraIniciativaEdicao(c.tipo);
 
             const secPagRef = document.getElementById('secaoPaginaReferencia');
             const inputPagRef = document.getElementById('dashEditPaginaReferencia');
@@ -917,6 +919,35 @@ class DashboardController {
         const des = Number.isFinite(d) ? Math.min(30, Math.max(1, d)) : 10;
         const mod = Math.floor((des - 10) / 2);
         elCa.value = String(10 + mod);
+    }
+
+    _aplicarRegraIniciativaEdicao(tipo) {
+        const grupoIniciativa = document.getElementById('dashEditGrupoIniciativa');
+        const inputIniciativa = document.getElementById('dashEditIniciativa');
+        const ehJogador = this.rules.isTipoJogador(tipo);
+        if (!grupoIniciativa || !inputIniciativa) return;
+
+        if (ehJogador) {
+            grupoIniciativa.style.display = 'none';
+            inputIniciativa.required = false;
+            this._preencherIniciativaSugeridaPorDestrezaEdicao();
+            return;
+        }
+
+        grupoIniciativa.style.display = '';
+        inputIniciativa.required = true;
+    }
+
+    _preencherIniciativaSugeridaPorDestrezaEdicao() {
+        if (!this.combatenteEmEdicao || !this.rules.isTipoJogador(this.combatenteEmEdicao.tipo)) return;
+        const elDes = document.getElementById('dashEditDES');
+        const elIni = document.getElementById('dashEditIniciativa');
+        if (!elDes || !elIni) return;
+        const d = parseInt(elDes.value, 10);
+        const des = Number.isFinite(d) ? Math.min(30, Math.max(1, d)) : 10;
+        const mod = Math.floor((des - 10) / 2);
+        // Regra base D&D 3.5: iniciativa = mod DES (+ talentos/itens em etapa futura)
+        elIni.value = String(mod);
     }
 
     _limparForm(form, tipo) {

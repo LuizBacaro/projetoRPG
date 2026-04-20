@@ -22,6 +22,7 @@ export class Combatente {
         this.nivel             = data.nivel             || 1;
         this.pontos            = data.pontos            || 0;
         this.bonus_base_ataque = data.bonus_base_ataque || '';
+        this.habilidades_especiais = data.habilidades_especiais || '';
         this.ca                = data.ca                !== undefined ? data.ca                : 10;
         this.toque             = data.toque             !== undefined ? data.toque             : 10;
         this.surpresa          = data.surpresa          !== undefined ? data.surpresa          : 10;

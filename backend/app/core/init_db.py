@@ -6,7 +6,11 @@ SOLID: Single Responsibility — responsável APENAS por inicialização
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from ..core.config import settings  # ✅ MUDADO: relativa em vez de absoluta
-from .bonus_base_ataque import calcular_bonus_base_ataque, calcular_resistencias_base
+from .bonus_base_ataque import (
+    calcular_bonus_base_ataque,
+    calcular_habilidades_especiais,
+    calcular_resistencias_base,
+)
 from .classes_tables_catalog import initialize_classes_tables_catalog
 from ..models.usuario import Usuario, PerfilUsuario
 from ..models.combatente import Combatente
@@ -176,11 +180,16 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
 
     for combatente in combatentes:
         novo_bba = calcular_bonus_base_ataque(combatente.classe, combatente.nivel) or ""
+        habilidades = calcular_habilidades_especiais(combatente.classe, combatente.nivel)
+        habilidades_txt = " | ".join(habilidades) if habilidades else ""
         novas_resistencias = calcular_resistencias_base(combatente.classe, combatente.nivel)
         mudou = False
 
         if (combatente.bonus_base_ataque or "") != novo_bba:
             combatente.bonus_base_ataque = novo_bba
+            mudou = True
+        if (combatente.habilidades_especiais or "") != habilidades_txt:
+            combatente.habilidades_especiais = habilidades_txt
             mudou = True
 
         if novas_resistencias is not None:
@@ -207,6 +216,22 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
                 mudou = True
             if combatente.vontade != vontade_total:
                 combatente.vontade = vontade_total
+                mudou = True
+        else:
+            # Classes sem mapeamento no catálogo/fallback: preservar totais legados
+            # e preencher base de forma derivada para evitar nulls em responses.
+            base_fort = (combatente.fortitude or 0) - _modificador_atributo(combatente.constituicao)
+            base_ref = (combatente.reflexos or 0) - _modificador_atributo(combatente.destreza)
+            base_vont = (combatente.vontade or 0) - _modificador_atributo(combatente.sabedoria)
+
+            if combatente.fortitude_base is None:
+                combatente.fortitude_base = base_fort
+                mudou = True
+            if combatente.reflexos_base is None:
+                combatente.reflexos_base = base_ref
+                mudou = True
+            if combatente.vontade_base is None:
+                combatente.vontade_base = base_vont
                 mudou = True
 
         if mudou:

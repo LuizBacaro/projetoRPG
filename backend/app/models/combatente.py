@@ -65,6 +65,7 @@ class Combatente(SoftDeleteMixin, Base):
     nivel  = Column(Integer, default=1)
     pontos = Column(Integer, default=0)
     bonus_base_ataque = Column(String, nullable=True, default="")
+    habilidades_especiais = Column(String, nullable=True, default="")
 
     # ── Relacionamentos ──
     ataques = relationship(

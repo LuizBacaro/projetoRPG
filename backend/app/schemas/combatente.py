@@ -111,9 +111,10 @@ class CombatenteResponse(CombatenteBase):
     # ✅ NOVO: exposto no response para o frontend exibir na ficha/arena
     pagina_referencia: Optional[str] = ""
     bonus_base_ataque: Optional[str] = ""
-    fortitude_base: int = 0
-    reflexos_base: int = 0
-    vontade_base: int = 0
+    habilidades_especiais: Optional[str] = ""
+    fortitude_base: Optional[int] = 0
+    reflexos_base: Optional[int] = 0
+    vontade_base: Optional[int] = 0
 
     ataques:           List[AtaqueResponse]         = []
     magias_slots:      List[MagiaSlotResponse]      = []

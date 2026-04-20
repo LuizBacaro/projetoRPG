@@ -8,6 +8,7 @@ from sqlalchemy.pool import StaticPool
 from app.api.v1.combatentes import router as combatentes_router
 from app.core.database import Base, get_db
 from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.models.talento import Talento, TalentoJogador
 
 
 class _UsuarioDummy:
@@ -187,6 +188,7 @@ def test_criar_combatente_preenche_bonus_base_ataque_por_classe_e_nivel(combaten
     assert response.status_code == 201
     body = response.json()
     assert body["bonus_base_ataque"] == "+6/+1"
+    assert "Talento Adicional" in (body.get("habilidades_especiais") or "")
     assert body["fortitude_base"] == 5
     assert body["reflexos_base"] == 2
     assert body["vontade_base"] == 2
@@ -213,9 +215,35 @@ def test_atualizar_combatente_recalcula_bonus_base_ataque_quando_classe_ou_nivel
     )
     assert atualizado.status_code == 200
     assert atualizado.json()["bonus_base_ataque"] == "+4"
+    habilidades = atualizado.json().get("habilidades_especiais") or ""
+    assert isinstance(habilidades, str)
     assert atualizado.json()["fortitude_base"] == 2
     assert atualizado.json()["reflexos_base"] == 2
     assert atualizado.json()["vontade_base"] == 6
     assert atualizado.json()["fortitude"] == 4
     assert atualizado.json()["reflexos"] == 3
     assert atualizado.json()["vontade"] == 9
+
+
+def test_jogador_com_iniciativa_aprimorada_recebe_bonus_na_iniciativa(combatentes_db):
+    db, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    criado = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(classe="Guerreiro", nivel="4", destreza="14"),
+    )
+    assert criado.status_code == 201
+    combatente_id = criado.json()["id"]
+
+    talento = Talento(nome="Iniciativa Aprimorada", descricao="+4 em iniciativa", ativo=True)
+    db.add(talento)
+    db.flush()
+    db.add(TalentoJogador(combatente_id=combatente_id, talento_id=talento.id))
+    db.commit()
+
+    obter = client.get(f"/api/v1/combatentes/{combatente_id}")
+    assert obter.status_code == 200
+    body = obter.json()
+    # DES 14 => +2; Iniciativa Aprimorada => +4; total esperado = +6
+    assert body["iniciativa"] == 6

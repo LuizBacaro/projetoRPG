@@ -407,6 +407,7 @@ def _inicializar_banco(db) -> None:
         ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
         ("garantir_colunas_catalogo_equipamentos", _garantir_colunas_catalogo_equipamentos),
         ("garantir_coluna_bonus_base_ataque", _garantir_coluna_bonus_base_ataque),
+        ("garantir_coluna_habilidades_especiais", _garantir_coluna_habilidades_especiais),
         ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
         ("garantir_colunas_talentos", _garantir_colunas_talentos),
         ("garantir_colunas_armaduras_protecao", _garantir_colunas_armaduras_protecao),
@@ -629,6 +630,22 @@ def _garantir_coluna_bonus_base_ataque() -> None:
     logger.warning("⚠️  coluna combatentes.bonus_base_ataque ausente; aplicando schema guard")
     with engine.begin() as conn:
         conn.execute(text("ALTER TABLE combatentes ADD COLUMN bonus_base_ataque VARCHAR(30)"))
+
+
+def _garantir_coluna_habilidades_especiais() -> None:
+    """Garante a coluna `combatentes.habilidades_especiais` em bancos legados."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "combatentes" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("combatentes")}
+    if "habilidades_especiais" in colunas_existentes:
+        return
+
+    logger.warning("⚠️  coluna combatentes.habilidades_especiais ausente; aplicando schema guard")
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE combatentes ADD COLUMN habilidades_especiais VARCHAR(2000)"))
 
 
 def _garantir_colunas_resistencia_base() -> None:

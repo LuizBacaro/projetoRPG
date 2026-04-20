@@ -780,6 +780,22 @@ body {
     opacity: 1;
 }
 
+.ficha-habilidades-especiais-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ficha-habilidade-especial-item {
+    font-size: 0.78rem;
+    color: var(--cor-madeira);
+    background: rgba(92, 58, 30, 0.08);
+    border: 1px solid rgba(92, 58, 30, 0.2);
+    border-radius: 6px;
+    padding: 0.4rem 0.5rem;
+    line-height: 1.3;
+}
+
 /* 
    COLUNA DIREITA
     */
