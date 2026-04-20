@@ -1,0 +1,272 @@
+{
+  "source": "Características especiais.xlsx",
+  "generated_at": "2026-04-20T18:37:01.486309+00:00",
+  "total_racas": 7,
+  "racas": [
+    {
+      "slug": "humanos",
+      "nome": "Humanos",
+      "modificadores_habilidade": [],
+      "tamanho": "Médio",
+      "deslocamento_metros": 9,
+      "idiomas_iniciais": [
+        "Comum"
+      ],
+      "talentos_especiais": [
+        "1 talento adicional a escolha"
+      ],
+      "habilidades_especiais": [
+        "4 pontos de perícia no 1º nível",
+        "1 ponto de perícia a cada nível subsequente"
+      ],
+      "resistencias": [],
+      "modificadores_ataque": [],
+      "modificadores_defesa": [],
+      "modificadores_pericia": [],
+      "classe_favorecida": "Qualquer uma"
+    },
+    {
+      "slug": "anoes",
+      "nome": "Anões",
+      "modificadores_habilidade": [
+        {
+          "atributo": "constituicao",
+          "valor": 2
+        },
+        {
+          "atributo": "carisma",
+          "valor": -2
+        }
+      ],
+      "tamanho": "Médio",
+      "deslocamento_metros": 6,
+      "idiomas_iniciais": [
+        "Comum",
+        "Anão"
+      ],
+      "talentos_especiais": [
+        "Usar arma exótica (machado de guerra anão)",
+        "Usar arma exótica (urgrosh)"
+      ],
+      "habilidades_especiais": [
+        "Visão no escuro"
+      ],
+      "resistencias": [
+        "+4 para resistir a encontrão",
+        "+2 resistência a venenos",
+        "+2 resistência a magias e efeitos similares a magia",
+        "+2 procurar (pedras e alvenaria)"
+      ],
+      "modificadores_ataque": [
+        "+1 ataque contra orcs e goblinóides"
+      ],
+      "modificadores_defesa": [
+        "+4 CA contra gigantes"
+      ],
+      "modificadores_pericia": [
+        "+2 avaliação (pedras ou metais)",
+        "+2 ofícios (pedras ou metais)"
+      ],
+      "classe_favorecida": "Guerreiro"
+    },
+    {
+      "slug": "elfos",
+      "nome": "Elfos",
+      "modificadores_habilidade": [
+        {
+          "atributo": "destreza",
+          "valor": 2
+        },
+        {
+          "atributo": "constituicao",
+          "valor": -2
+        }
+      ],
+      "tamanho": "Médio",
+      "deslocamento_metros": 9,
+      "idiomas_iniciais": [
+        "Comum",
+        "Élfico"
+      ],
+      "talentos_especiais": [
+        "Usar arma comum (espada longa)",
+        "Usar arma comum (sabre)",
+        "Usar arma comum (arco longo)",
+        "Usar arma comum (arco curto)"
+      ],
+      "habilidades_especiais": [
+        "Visão na penumbra",
+        "Não precisa dormir, apenas ficar em transe por 4 horas",
+        "Rolagem passiva de procurar portas secretas há 1,5m de distância"
+      ],
+      "resistencias": [
+        "Imunidade a magias de sono",
+        "+2 resistência a encantamentos"
+      ],
+      "modificadores_ataque": [],
+      "modificadores_defesa": [],
+      "modificadores_pericia": [
+        "+2 ouvir",
+        "+2 procurar",
+        "+2 observar"
+      ],
+      "classe_favorecida": "Mago"
+    },
+    {
+      "slug": "gnomos",
+      "nome": "Gnomos",
+      "modificadores_habilidade": [
+        {
+          "atributo": "constituicao",
+          "valor": 2
+        },
+        {
+          "atributo": "forca",
+          "valor": -2
+        }
+      ],
+      "tamanho": "Pequeno",
+      "deslocamento_metros": 6,
+      "idiomas_iniciais": [
+        "Comum",
+        "Gnomo"
+      ],
+      "talentos_especiais": [
+        "Usar arma exótica (martelo gnomo com gancho)"
+      ],
+      "habilidades_especiais": [
+        "Visão na penumbra",
+        "+1 na CA para resistir a uma ilusão feita pelo personagem",
+        "Falar com animais (1/dia - mamíferos terrestres - 1 minuto)",
+        "Se Carisma tiver Carisma > 10, ganha 1/dia:",
+        "Globo de luz",
+        "Som fantasma",
+        "Prestidigitação"
+      ],
+      "resistencias": [
+        "+2 contra ilusões"
+      ],
+      "modificadores_ataque": [
+        "+1 ataque contra criaturas médias ou maiores",
+        "+1 ataque contra kobolds e goblinóides"
+      ],
+      "modificadores_defesa": [
+        "+1 CA contra criaturas médias ou maiores",
+        "+4 CA contra gigantes"
+      ],
+      "modificadores_pericia": [
+        "+4 esconder-se",
+        "+2 ouvir",
+        "+2 ofícios (alquimia)"
+      ],
+      "classe_favorecida": "Bardo"
+    },
+    {
+      "slug": "meio-elfos",
+      "nome": "Meio-elfos",
+      "modificadores_habilidade": [],
+      "tamanho": "Médio",
+      "deslocamento_metros": 9,
+      "idiomas_iniciais": [
+        "Comum",
+        "Élfico"
+      ],
+      "talentos_especiais": [],
+      "habilidades_especiais": [
+        "Visão na penumbra",
+        "Sangue élfico"
+      ],
+      "resistencias": [
+        "Imunidade a magias de sono",
+        "+2 resistência a encantamentos"
+      ],
+      "modificadores_ataque": [],
+      "modificadores_defesa": [],
+      "modificadores_pericia": [
+        "+1 ouvir",
+        "+1 procurar",
+        "+1 observar",
+        "+2 diplomacia",
+        "+2 obter informações"
+      ],
+      "classe_favorecida": "Qualquer uma"
+    },
+    {
+      "slug": "meio-orcs",
+      "nome": "Meio-orcs",
+      "modificadores_habilidade": [
+        {
+          "atributo": "forca",
+          "valor": 2
+        },
+        {
+          "atributo": "inteligencia",
+          "valor": -2
+        },
+        {
+          "atributo": "carisma",
+          "valor": -2
+        }
+      ],
+      "tamanho": "Médio",
+      "deslocamento_metros": 9,
+      "idiomas_iniciais": [
+        "Comum",
+        "Orc"
+      ],
+      "talentos_especiais": [],
+      "habilidades_especiais": [
+        "Visão no escuro",
+        "Sangue orc"
+      ],
+      "resistencias": [],
+      "modificadores_ataque": [],
+      "modificadores_defesa": [],
+      "modificadores_pericia": [],
+      "classe_favorecida": "Bárbaro"
+    },
+    {
+      "slug": "halfling",
+      "nome": "Halfling",
+      "modificadores_habilidade": [
+        {
+          "atributo": "destreza",
+          "valor": 2
+        },
+        {
+          "atributo": "forca",
+          "valor": -2
+        }
+      ],
+      "tamanho": "Pequeno",
+      "deslocamento_metros": 6,
+      "idiomas_iniciais": [
+        "Comum",
+        "Halfling"
+      ],
+      "talentos_especiais": [],
+      "habilidades_especiais": [],
+      "resistencias": [
+        "+1 resistência fortitude (saving throw)",
+        "+1 resistência reflexos  (saving throw)",
+        "+1 resistência vontade  (saving throw)",
+        "+2 resistência contra medo"
+      ],
+      "modificadores_ataque": [
+        "+1 ataque contra criaturas médias ou maiores",
+        "+1 ataque com armas de arremesso e fundas"
+      ],
+      "modificadores_defesa": [
+        "+1 CA contra criaturas médias ou maiores"
+      ],
+      "modificadores_pericia": [
+        "+4 esconder-se",
+        "+2 escalar",
+        "+2 saltar",
+        "+2 furtividade",
+        "+2 ouvir"
+      ],
+      "classe_favorecida": "Ladino"
+    }
+  ]
+}

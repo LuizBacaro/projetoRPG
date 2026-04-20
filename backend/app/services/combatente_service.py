@@ -21,6 +21,7 @@ from ..core.bonus_base_ataque import (
     calcular_habilidades_especiais_por_nivel,
     calcular_resistencias_base,
 )
+from ..core.racas_catalog import get_raca_by_slug_or_name
 from ..exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
@@ -187,9 +188,11 @@ class CombatenteService:
             if tipo:
                 combatentes = self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
                 self._sincronizar_progressao_em_memoria(combatentes)
+                self._enriquecer_dados_raciais_em_memoria(combatentes)
                 return combatentes
             combatentes = self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
             self._sincronizar_progressao_em_memoria(combatentes)
+            self._enriquecer_dados_raciais_em_memoria(combatentes)
             return combatentes
 
         # Mestre/user comum enxerga seus próprios (com filtro de tipo se aplicável)
@@ -197,17 +200,21 @@ class CombatenteService:
             if tipo:
                 combatentes = self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
                 self._sincronizar_progressao_em_memoria(combatentes)
+                self._enriquecer_dados_raciais_em_memoria(combatentes)
                 return combatentes
             combatentes = self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
             self._sincronizar_progressao_em_memoria(combatentes)
+            self._enriquecer_dados_raciais_em_memoria(combatentes)
             return combatentes
 
         if tipo:
             combatentes = self.repository.get_by_tipo(tipo, skip=skip, limit=limit)
             self._sincronizar_progressao_em_memoria(combatentes)
+            self._enriquecer_dados_raciais_em_memoria(combatentes)
             return combatentes
         combatentes = self.repository.get_all(skip=skip, limit=limit)
         self._sincronizar_progressao_em_memoria(combatentes)
+        self._enriquecer_dados_raciais_em_memoria(combatentes)
         return combatentes
 
     def contar_todos(self, tipo: Optional[str] = None, usuario=None) -> int:
@@ -238,6 +245,7 @@ class CombatenteService:
         if not combatente:
             raise CombatenteNaoEncontrado(combatente_id)
         self._sincronizar_progressao_em_memoria([combatente])
+        self._enriquecer_dados_raciais_em_memoria([combatente])
         return combatente
 
     def criar(self, combatente_data: dict, foto_file=None, dono_id: Optional[int] = None) -> Combatente:
@@ -252,6 +260,7 @@ class CombatenteService:
             combatente_data,
             exigir_dois_dominios_clerigo=False,
         )
+        self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=None)
         self._aplicar_regra_iniciativa_por_tipo(combatente_data)
         self._preencher_bonus_base_ataque(combatente_data)
         combatente_data["hp_atual"] = combatente_data["hp_maximo"]
@@ -289,6 +298,7 @@ class CombatenteService:
             dominios_atuais=combatente.dominios,
             exigir_dois_dominios_clerigo=False,
         )
+        self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=combatente)
         self._aplicar_regra_iniciativa_por_tipo(combatente_data, combatente_atual=combatente)
         self._preencher_bonus_base_ataque(combatente_data, combatente_atual=combatente)
 
@@ -380,6 +390,8 @@ class CombatenteService:
             payload = {
                 "tipo": combatente.tipo,
                 "classe": combatente.classe,
+                "raca": combatente.raca,
+                "raca_slug": getattr(combatente, "raca_slug", ""),
                 "nivel": combatente.nivel,
                 "iniciativa": combatente.iniciativa,
                 "constituicao": combatente.constituicao,
@@ -389,9 +401,12 @@ class CombatenteService:
                 "reflexos_base": combatente.reflexos_base,
                 "vontade_base": combatente.vontade_base,
             }
+            self._aplicar_predefinicoes_raciais(payload, combatente_atual=combatente)
             self._aplicar_regra_iniciativa_por_tipo(payload, combatente_atual=combatente)
             self._preencher_bonus_base_ataque(payload, combatente_atual=combatente)
             campos = (
+                "raca",
+                "raca_slug",
                 "iniciativa",
                 "bonus_base_ataque",
                 "habilidades_especiais",
@@ -410,6 +425,81 @@ class CombatenteService:
                     precisa_commit = True
         if precisa_commit:
             commit_with_rollback(self.repository.db)
+
+    def _aplicar_predefinicoes_raciais(
+        self,
+        combatente_data: dict,
+        combatente_atual: Optional[Combatente] = None,
+    ) -> None:
+        raca_nova = get_raca_by_slug_or_name(
+            combatente_data.get("raca_slug") or combatente_data.get("raca")
+        )
+        raca_atual = None
+        if combatente_atual is not None:
+            raca_atual = get_raca_by_slug_or_name(
+                getattr(combatente_atual, "raca_slug", None) or getattr(combatente_atual, "raca", None)
+            )
+
+        if raca_nova is None and combatente_atual is not None:
+            # Mantém valores persistidos quando não há alteração de raça.
+            combatente_data["raca_slug"] = getattr(combatente_atual, "raca_slug", "") or ""
+            return
+
+        if raca_nova is None:
+            return
+
+        slug_novo = str(raca_nova.get("slug") or "")
+        slug_atual = str((raca_atual or {}).get("slug") or "")
+        if slug_novo == slug_atual:
+            combatente_data["raca_slug"] = slug_novo
+            combatente_data["raca"] = str(raca_nova.get("nome") or combatente_data.get("raca") or "")
+            return
+
+        delta = {k: 0 for k in ("forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma")}
+        for mod in (raca_nova.get("modificadores_habilidade") or []):
+            atr = str(mod.get("atributo") or "")
+            if atr in delta:
+                delta[atr] += int(mod.get("valor") or 0)
+        for mod in ((raca_atual or {}).get("modificadores_habilidade") or []):
+            atr = str(mod.get("atributo") or "")
+            if atr in delta:
+                delta[atr] -= int(mod.get("valor") or 0)
+
+        for atr, ajuste in delta.items():
+            if ajuste == 0:
+                continue
+            valor_base = self._obter_valor_int(combatente_data, atr, combatente_atual, default=10)
+            combatente_data[atr] = max(1, min(30, valor_base + ajuste))
+
+        combatente_data["raca_slug"] = slug_novo
+        combatente_data["raca"] = str(raca_nova.get("nome") or combatente_data.get("raca") or "")
+
+    def _enriquecer_dados_raciais_em_memoria(self, combatentes: List[Combatente]) -> None:
+        for combatente in combatentes:
+            raca = get_raca_by_slug_or_name(
+                getattr(combatente, "raca_slug", None) or getattr(combatente, "raca", None)
+            )
+            if not raca:
+                setattr(combatente, "tamanho_racial", "")
+                setattr(combatente, "deslocamento_racial_metros", None)
+                setattr(combatente, "idiomas_raciais", [])
+                setattr(combatente, "passivos_raciais", [])
+                continue
+
+            talentos = [str(x).strip() for x in (raca.get("talentos_especiais") or []) if str(x).strip()]
+            habilidades = [str(x).strip() for x in (raca.get("habilidades_especiais") or []) if str(x).strip()]
+            resistencias = [str(x).strip() for x in (raca.get("resistencias") or []) if str(x).strip()]
+            mods_ataque = [str(x).strip() for x in (raca.get("modificadores_ataque") or []) if str(x).strip()]
+            mods_defesa = [str(x).strip() for x in (raca.get("modificadores_defesa") or []) if str(x).strip()]
+            mods_pericia = [str(x).strip() for x in (raca.get("modificadores_pericia") or []) if str(x).strip()]
+            passivos = talentos + habilidades + resistencias + mods_ataque + mods_defesa + mods_pericia
+
+            setattr(combatente, "raca_slug", str(raca.get("slug") or getattr(combatente, "raca_slug", "")))
+            setattr(combatente, "raca", str(raca.get("nome") or getattr(combatente, "raca", "")))
+            setattr(combatente, "tamanho_racial", str(raca.get("tamanho") or ""))
+            setattr(combatente, "deslocamento_racial_metros", raca.get("deslocamento_metros"))
+            setattr(combatente, "idiomas_raciais", [str(x) for x in (raca.get("idiomas_iniciais") or []) if str(x).strip()])
+            setattr(combatente, "passivos_raciais", passivos)
 
     def _aplicar_regra_iniciativa_por_tipo(
         self,

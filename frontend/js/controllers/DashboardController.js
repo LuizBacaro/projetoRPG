@@ -42,6 +42,9 @@ class DashboardController {
         this.perfil              = AuthService.getPerfil();
         this.divindadesSugeridas = [...DIVINDADES_SUGERIDAS_FALLBACK];
         this.fonteDivindades     = 'fallback';
+        this.racasDisponiveis    = [];
+        this.racaSlugPorNome     = new Map();
+        this.racaDetalheCache    = new Map();
         this.rules               = window.CombatRules || {
             isTipoRestritoParaMestre: (tipo) => tipo === 'monstro' || tipo === 'npc',
             tipoPermitidoParaPerfil: (tipo, isMestre) => {
@@ -109,6 +112,7 @@ class DashboardController {
         this._configurarFiltros();
         this._configurarBotaoNovo();
         this._configurarCombosRaca();
+        this._carregarRacasCatalogo();
         this._configurarFormCadastro('formCadastroJogador', 'jogador', 'modalCadastroJogador');
         this._configurarFormCadastro('formCadastroMonstro', 'monstro', 'modalCadastroMonstro');
         this._configurarFormCadastro('formCadastroNPC', 'npc', 'modalCadastroNPC');
@@ -308,49 +312,109 @@ class DashboardController {
 
     _configurarCombosRaca() {
         const combos = [
-            { selectId: 'cadastroJogadorRacaSelect', finalId: 'cadastroJogadorRacaFinal', customId: 'cadastroJogadorRacaCustom' },
-            { selectId: 'cadastroNpcRacaSelect', finalId: 'cadastroNpcRacaFinal', customId: 'cadastroNpcRacaCustom' },
-            { selectId: 'dashEditRacaSelect', finalId: 'dashEditRaca', customId: 'dashEditRacaCustom' },
+            { selectId: 'cadastroJogadorRacaSelect', finalId: 'cadastroJogadorRacaFinal', customId: 'cadastroJogadorRacaCustom', previewId: 'cadastroJogadorRacaPreview' },
+            { selectId: 'cadastroNpcRacaSelect', finalId: 'cadastroNpcRacaFinal', customId: 'cadastroNpcRacaCustom', previewId: 'cadastroNpcRacaPreview' },
+            { selectId: 'dashEditRacaSelect', finalId: 'dashEditRaca', customId: 'dashEditRacaCustom', previewId: 'dashEditRacaPreview' },
         ];
 
         combos.forEach((cfg) => {
             const selectEl = document.getElementById(cfg.selectId);
             const finalEl = document.getElementById(cfg.finalId);
             const customEl = document.getElementById(cfg.customId);
+            const previewEl = document.getElementById(cfg.previewId);
 
             if (!selectEl || !finalEl || !customEl) return;
 
-            if (window.RacasPHB?.preencherSelect) {
-                window.RacasPHB.preencherSelect(selectEl, {
-                    incluirVazio: true,
-                    textoVazio: '-- Selecione uma raça --',
-                    incluirOutro: true,
-                });
-            }
+            const slugEl = document.getElementById(cfg.selectId.replace('Select', 'Slug'));
+            this._preencherSelectRaca(selectEl);
+            selectEl.addEventListener('change', () => this._atualizarCampoRaca(selectEl, finalEl, customEl, slugEl, previewEl));
+            customEl.addEventListener('input', () => this._atualizarCampoRaca(selectEl, finalEl, customEl, slugEl, previewEl));
 
-            selectEl.addEventListener('change', () => this._atualizarCampoRaca(selectEl, finalEl, customEl));
-            customEl.addEventListener('input', () => this._atualizarCampoRaca(selectEl, finalEl, customEl));
-
-            this._atualizarCampoRaca(selectEl, finalEl, customEl, true);
+            this._atualizarCampoRaca(selectEl, finalEl, customEl, slugEl, previewEl, true);
         });
     }
 
-    _atualizarCampoRaca(selectEl, finalEl, customEl, limparCustom = false) {
+    _preencherSelectRaca(selectEl) {
+        if (!selectEl) return;
+        const valorAtual = String(selectEl.value || '');
+        const valorOutro = '__OUTRO__';
+        const racas = this._listarRacasParaSelect();
+        selectEl.innerHTML = '';
+        const opVazio = document.createElement('option');
+        opVazio.value = '';
+        opVazio.textContent = '-- Selecione uma raça --';
+        selectEl.appendChild(opVazio);
+        racas.forEach((raca) => {
+            const op = document.createElement('option');
+            op.value = raca.nome;
+            op.textContent = raca.nome;
+            selectEl.appendChild(op);
+        });
+        const opOutro = document.createElement('option');
+        opOutro.value = valorOutro;
+        opOutro.textContent = 'Outro';
+        selectEl.appendChild(opOutro);
+        if ([...selectEl.options].some((opt) => opt.value === valorAtual)) {
+            selectEl.value = valorAtual;
+        }
+    }
+
+    _listarRacasParaSelect() {
+        if (Array.isArray(this.racasDisponiveis) && this.racasDisponiveis.length) {
+            return this.racasDisponiveis;
+        }
+        const fallback = window.RacasPHB?.listar?.() || [];
+        return fallback.map((nome) => ({
+            nome: String(nome || '').trim(),
+            slug: String(nome || '').trim(),
+        })).filter((item) => item.nome);
+    }
+
+    async _carregarRacasCatalogo() {
+        try {
+            const response = await fetch(window.getApiUrl('/racas'), {
+                headers: this._getAuthHeader(),
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            const racas = Array.isArray(data) ? data : [];
+            this.racasDisponiveis = racas
+                .map((item) => ({
+                    nome: String(item?.nome || '').trim(),
+                    slug: String(item?.slug || '').trim(),
+                }))
+                .filter((item) => item.nome && item.slug);
+            this.racaSlugPorNome = new Map(this.racasDisponiveis.map((item) => [item.nome, item.slug]));
+            this._configurarCombosRaca();
+        } catch (error) {
+            console.warn('⚠️ Não foi possível carregar catálogo de raças pela API:', error);
+        }
+    }
+
+    _atualizarCampoRaca(selectEl, finalEl, customEl, slugEl = null, previewEl = null, limparCustom = false) {
         if (!selectEl || !finalEl || !customEl) return;
 
-        const valorOutro = window.RacasPHB?.valorOutro?.() || '__OUTRO__';
+        const valorOutro = '__OUTRO__';
         const selecionouOutro = selectEl.value === valorOutro;
 
         if (selecionouOutro) {
             customEl.style.display = 'block';
             if (limparCustom) customEl.value = '';
             finalEl.value = String(customEl.value || '').trim();
+            if (slugEl) slugEl.value = '';
+            this._renderizarPreviewRaca(previewEl, null);
             return;
         }
 
         if (limparCustom) customEl.value = '';
         customEl.style.display = 'none';
-        finalEl.value = String(selectEl.value || '').trim();
+        const nomeRaca = String(selectEl.value || '').trim();
+        finalEl.value = nomeRaca;
+        const slug = this.racaSlugPorNome.get(nomeRaca) || '';
+        if (slugEl) {
+            slugEl.value = slug;
+        }
+        this._renderizarPreviewRaca(previewEl, slug || null);
     }
 
     _sincronizarCamposRaca(form, limparCustom = false) {
@@ -363,8 +427,114 @@ class DashboardController {
 
             const finalEl = form.querySelector(`[data-raca-final][data-raca-key="${key}"]`);
             const customEl = form.querySelector(`[data-raca-custom][data-raca-key="${key}"]`);
-            this._atualizarCampoRaca(selectEl, finalEl, customEl, limparCustom);
+            const slugEl = form.querySelector(`[data-raca-slug][data-raca-key="${key}"]`);
+            const previewEl = form.querySelector(`#${key === 'jogador' ? 'cadastroJogadorRacaPreview' : key === 'npc' ? 'cadastroNpcRacaPreview' : 'dashEditRacaPreview'}`);
+            this._atualizarCampoRaca(selectEl, finalEl, customEl, slugEl, previewEl, limparCustom);
         });
+    }
+
+    async _obterDetalheRacaPorSlug(slug) {
+        const key = String(slug || '').trim();
+        if (!key) return null;
+        if (this.racaDetalheCache.has(key)) return this.racaDetalheCache.get(key);
+        try {
+            const response = await fetch(window.getApiUrl(`/racas/${encodeURIComponent(key)}`), {
+                headers: this._getAuthHeader(),
+            });
+            if (!response.ok) return null;
+            const detail = await response.json();
+            this.racaDetalheCache.set(key, detail);
+            return detail;
+        } catch (_err) {
+            return null;
+        }
+    }
+
+    async _renderizarPreviewRaca(previewEl, slug) {
+        if (!previewEl) return;
+
+        const setEmpty = (msg, isFallback = false) => {
+            previewEl.classList.toggle('is-fallback', Boolean(isFallback));
+            previewEl.replaceChildren();
+            const p = document.createElement('p');
+            p.className = 'dash-raca-preview-empty';
+            p.textContent = msg;
+            previewEl.appendChild(p);
+        };
+
+        if (!slug) {
+            setEmpty('Selecione uma raça para ver pré-definições.');
+            return;
+        }
+
+        const detail = await this._obterDetalheRacaPorSlug(slug);
+        if (!detail) {
+            setEmpty('Pré-definições indisponíveis para esta raça.', true);
+            return;
+        }
+
+        previewEl.classList.remove('is-fallback');
+        previewEl.replaceChildren();
+
+        const inner = document.createElement('div');
+        inner.className = 'dash-raca-preview-inner';
+
+        const modsRow = document.createElement('div');
+        modsRow.className = 'dash-raca-preview-line dash-raca-preview-line--mods';
+        const modsLabel = document.createElement('span');
+        modsLabel.className = 'dash-raca-preview-k';
+        modsLabel.textContent = 'Atributos';
+        modsRow.appendChild(modsLabel);
+
+        const modsWrap = document.createElement('div');
+        modsWrap.className = 'dash-raca-preview-badges';
+        const mods = Array.isArray(detail.modificadores_habilidade) ? detail.modificadores_habilidade : [];
+        if (!mods.length) {
+            const muted = document.createElement('span');
+            muted.className = 'dash-raca-preview-muted';
+            muted.textContent = '—';
+            modsWrap.appendChild(muted);
+        } else {
+            mods.forEach((m) => {
+                const v = Number(m?.valor);
+                const attr = String(m?.atributo || '').toUpperCase();
+                const b = document.createElement('span');
+                b.className = 'dash-raca-badge';
+                if (v > 0) b.classList.add('dash-raca-badge--pos');
+                else if (v < 0) b.classList.add('dash-raca-badge--neg');
+                else b.classList.add('dash-raca-badge--zero');
+                b.textContent = `${v >= 0 ? '+' : ''}${v} ${attr}`;
+                modsWrap.appendChild(b);
+            });
+        }
+        modsRow.appendChild(modsWrap);
+        inner.appendChild(modsRow);
+
+        const addLinha = (rotulo, texto) => {
+            const line = document.createElement('div');
+            line.className = 'dash-raca-preview-line';
+            const k = document.createElement('span');
+            k.className = 'dash-raca-preview-k';
+            k.textContent = rotulo;
+            const v = document.createElement('span');
+            v.className = 'dash-raca-preview-v';
+            v.textContent = texto;
+            line.appendChild(k);
+            line.appendChild(v);
+            inner.appendChild(line);
+        };
+
+        addLinha('Tamanho', detail.tamanho ? String(detail.tamanho) : '—');
+        const deslocamento = Number.isFinite(Number(detail.deslocamento_metros))
+            ? `${detail.deslocamento_metros} m`
+            : '—';
+        addLinha('Deslocamento', deslocamento);
+        const idiomas = Array.isArray(detail.idiomas_iniciais) && detail.idiomas_iniciais.length
+            ? detail.idiomas_iniciais.join(', ')
+            : '—';
+        addLinha('Idiomas', idiomas);
+
+        previewEl.appendChild(inner);
     }
 
     _configurarAcoesModaisSemInline() {
@@ -602,11 +772,13 @@ class DashboardController {
             const editRaceFinal = document.getElementById('dashEditRaca');
             const editRaceCustom = document.getElementById('dashEditRacaCustom');
             const raceValue = String(c.raca || '').trim();
+            const raceSlug = String(c.raca_slug || '').trim();
 
             if (editRaceSelect && editRaceFinal && editRaceCustom) {
-                const valorOutro = window.RacasPHB?.valorOutro?.() || '__OUTRO__';
-                const knownRaces = window.RacasPHB?.listar?.() || [];
+                const valorOutro = '__OUTRO__';
+                const knownRaces = this._listarRacasParaSelect().map((item) => item.nome);
                 const isKnownRace = knownRaces.includes(raceValue);
+                const editRaceSlug = document.getElementById('dashEditRacaSlug');
 
                 if (!raceValue) {
                     editRaceSelect.value = '';
@@ -619,7 +791,12 @@ class DashboardController {
                     editRaceCustom.value = raceValue;
                 }
 
-                this._atualizarCampoRaca(editRaceSelect, editRaceFinal, editRaceCustom, false);
+                const preview = document.getElementById('dashEditRacaPreview');
+                this._atualizarCampoRaca(editRaceSelect, editRaceFinal, editRaceCustom, editRaceSlug, preview, false);
+                if (editRaceSlug && raceSlug) {
+                    editRaceSlug.value = raceSlug;
+                    this._renderizarPreviewRaca(preview, raceSlug);
+                }
             }
             document.getElementById('dashEditDivindade').value = c.divindade || '';
             document.getElementById('dashEditNivel').value = c.nivel || 1;

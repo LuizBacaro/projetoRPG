@@ -11,6 +11,7 @@ export class Combatente {
         this.tipo              = data.tipo;
         this.classe            = data.classe;
         this.raca              = data.raca              || '';
+        this.raca_slug         = data.raca_slug         || '';
         this.divindade         = data.divindade         || data.deidade || '';
         this.alinhamento       = data.alinhamento       || '';
         this.dominios          = data.dominios          || '';
@@ -23,6 +24,10 @@ export class Combatente {
         this.pontos            = data.pontos            || 0;
         this.bonus_base_ataque = data.bonus_base_ataque || '';
         this.habilidades_especiais = data.habilidades_especiais || '';
+        this.tamanho_racial = data.tamanho_racial || '';
+        this.deslocamento_racial_metros = data.deslocamento_racial_metros ?? null;
+        this.idiomas_raciais = Array.isArray(data.idiomas_raciais) ? data.idiomas_raciais : [];
+        this.passivos_raciais = Array.isArray(data.passivos_raciais) ? data.passivos_raciais : [];
         this.ca                = data.ca                !== undefined ? data.ca                : 10;
         this.toque             = data.toque             !== undefined ? data.toque             : 10;
         this.surpresa          = data.surpresa          !== undefined ? data.surpresa          : 10;

@@ -37,6 +37,7 @@ from .api.v1 import (
     magias,
     magias_preparadas,
     pericias,
+    racas,
     tabelas_classes,
     talentos,
     usuarios,
@@ -161,6 +162,7 @@ app.include_router(equipamentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(armaduras_protecao.router, prefix=settings.API_V1_PREFIX)
 app.include_router(talentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tabelas_classes.router, prefix=settings.API_V1_PREFIX)
+app.include_router(racas.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 
@@ -408,6 +410,7 @@ def _inicializar_banco(db) -> None:
         ("garantir_colunas_catalogo_equipamentos", _garantir_colunas_catalogo_equipamentos),
         ("garantir_coluna_bonus_base_ataque", _garantir_coluna_bonus_base_ataque),
         ("garantir_coluna_habilidades_especiais", _garantir_coluna_habilidades_especiais),
+        ("garantir_coluna_raca_slug", _garantir_coluna_raca_slug),
         ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
         ("garantir_colunas_talentos", _garantir_colunas_talentos),
         ("garantir_colunas_armaduras_protecao", _garantir_colunas_armaduras_protecao),
@@ -646,6 +649,22 @@ def _garantir_coluna_habilidades_especiais() -> None:
     logger.warning("⚠️  coluna combatentes.habilidades_especiais ausente; aplicando schema guard")
     with engine.begin() as conn:
         conn.execute(text("ALTER TABLE combatentes ADD COLUMN habilidades_especiais VARCHAR(2000)"))
+
+
+def _garantir_coluna_raca_slug() -> None:
+    """Garante a coluna `combatentes.raca_slug` em bancos legados."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "combatentes" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("combatentes")}
+    if "raca_slug" in colunas_existentes:
+        return
+
+    logger.warning("⚠️  coluna combatentes.raca_slug ausente; aplicando schema guard")
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE combatentes ADD COLUMN raca_slug VARCHAR(80)"))
 
 
 def _garantir_colunas_resistencia_base() -> None:

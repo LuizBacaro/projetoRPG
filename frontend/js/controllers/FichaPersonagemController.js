@@ -113,6 +113,7 @@ export class FichaPersonagemController {
             this.renderizarDefesa();
             this.renderizarResistencias();
             this.renderizarHabilidadesEspeciais();
+            this.renderizarCaracteristicasRaciais();
             this.renderizarAtaques();
             this.renderizarSlotsDeMapia();
 
@@ -1116,6 +1117,39 @@ export class FichaPersonagemController {
                     <span>${escapeHtml(item.habilidades.join(', '))}</span>
                 </div>
             `)
+            .join('');
+    }
+
+    renderizarCaracteristicasRaciais() {
+        const container = document.getElementById('fichaCaracteristicasRaciais');
+        if (!container) return;
+
+        const itens = [];
+        if (this.combatente?.tamanho_racial) {
+            itens.push(`Tamanho: ${this.combatente.tamanho_racial}`);
+        }
+        if (Number.isFinite(Number(this.combatente?.deslocamento_racial_metros))) {
+            itens.push(`Deslocamento: ${this.combatente.deslocamento_racial_metros}m`);
+        }
+        const idiomas = Array.isArray(this.combatente?.idiomas_raciais) ? this.combatente.idiomas_raciais : [];
+        if (idiomas.length) {
+            itens.push(`Idiomas: ${idiomas.join(', ')}`);
+        }
+        const passivos = Array.isArray(this.combatente?.passivos_raciais) ? this.combatente.passivos_raciais : [];
+        itens.push(...passivos);
+
+        const unicos = [];
+        for (const item of itens.map((x) => String(x).trim()).filter(Boolean)) {
+            if (!unicos.includes(item)) unicos.push(item);
+        }
+
+        if (!unicos.length) {
+            container.innerHTML = '<span class="ficha-vazio">Nenhuma característica racial mapeada para esta raça.</span>';
+            return;
+        }
+
+        container.innerHTML = unicos
+            .map((item) => `<div class="ficha-habilidade-especial-item">${escapeHtml(item)}</div>`)
             .join('');
     }
 

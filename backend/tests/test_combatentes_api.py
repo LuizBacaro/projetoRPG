@@ -247,3 +247,32 @@ def test_jogador_com_iniciativa_aprimorada_recebe_bonus_na_iniciativa(combatente
     body = obter.json()
     # DES 14 => +2; Iniciativa Aprimorada => +4; total esperado = +6
     assert body["iniciativa"] == 6
+
+
+def test_criar_combatente_aplica_predefinicoes_raciais_basicas(combatentes_db):
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    response = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(
+            raca="Elfos",
+            forca="10",
+            destreza="10",
+            constituicao="10",
+            inteligencia="10",
+            sabedoria="10",
+            carisma="10",
+        ),
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["raca"] == "Elfos"
+    assert body["raca_slug"] == "elfos"
+    assert body["destreza"] == 12
+    assert body["constituicao"] == 8
+    assert body["tamanho_racial"] == "Médio"
+    assert body["deslocamento_racial_metros"] == 9
+    assert "Comum" in body["idiomas_raciais"]
+    assert isinstance(body["passivos_raciais"], list)

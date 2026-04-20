@@ -13,6 +13,7 @@ Este `AGENTS.md` existe como resumo operacional e guia de uso para o time.
 - Antes de implementar, ler contexto em [README.md](README.md) e instrucoes aplicaveis em [.github/instructions](.github/instructions).
 - Em tarefas que toquem arquitetura, deploy, dados, schema ou decisoes historicas, consultar [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md).
 - Para evolucoes da ficha por classe/nivel (BBA, resistencias, iniciativa e habilidades especiais), consultar [docs/progressao-classes-bba-resistencias-habilidades.md](docs/progressao-classes-bba-resistencias-habilidades.md).
+- Para pre-definicoes por raca e catalogo racial normalizado, consultar [docs/predefinicoes-raciais-contrato.md](docs/predefinicoes-raciais-contrato.md) e `docs/dados/racas_caracteristicas_catalogo.json`.
 - Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill do projeto em [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md) — habilite essa skill no Cursor para o agente carregar esse contexto.
 - Conjuração D&D 3.5 (atributo por classe, Tabela 1-1, clérigo, troca Bardo/Feiticeiro): documentação em [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
 

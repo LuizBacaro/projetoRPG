@@ -676,6 +676,115 @@ body {
     color: #f59e0b;
 }
 
+/* Pré-visualização de raça (badges + linhas) */
+.dash-raca-preview {
+    margin: .4rem 0 0;
+    padding: .5rem .65rem;
+    border-radius: .4rem;
+    border: 1px solid #33415588;
+    background: linear-gradient(145deg, #0c1220 0%, #0f172a 100%);
+}
+
+.dash-raca-preview.is-fallback {
+    border-color: #b4530933;
+}
+
+.dash-raca-preview-empty {
+    margin: 0;
+    font-size: .75rem;
+    color: #94a3b8;
+    letter-spacing: .02em;
+}
+
+.dash-raca-preview-inner {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+}
+
+.dash-raca-preview-line {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    align-items: start;
+    gap: .5rem .65rem;
+    font-size: .72rem;
+    line-height: 1.35;
+}
+
+.dash-raca-preview-line--mods {
+    grid-template-columns: 5.5rem 1fr;
+}
+
+.dash-raca-preview-k {
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-size: .62rem;
+    padding-top: .15rem;
+}
+
+.dash-raca-preview-v {
+    color: #cbd5e1;
+    word-break: break-word;
+}
+
+.dash-raca-preview-muted {
+    color: #64748b;
+    font-size: .72rem;
+}
+
+.dash-raca-preview-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .28rem;
+}
+
+.dash-raca-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: .1rem .42rem;
+    border-radius: .28rem;
+    font-size: .68rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    border: 1px solid transparent;
+}
+
+.dash-raca-badge--pos {
+    background: rgba(52, 211, 153, 0.12);
+    color: #6ee7b7;
+    border-color: rgba(52, 211, 153, 0.35);
+}
+
+.dash-raca-badge--neg {
+    background: rgba(248, 113, 113, 0.1);
+    color: #fca5a5;
+    border-color: rgba(248, 113, 113, 0.32);
+}
+
+.dash-raca-badge--zero {
+    background: rgba(148, 163, 184, 0.1);
+    color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.28);
+}
+
+@media (max-width: 480px) {
+    .dash-raca-preview-line {
+        grid-template-columns: 1fr;
+        gap: .2rem;
+    }
+
+    .dash-raca-preview-line--mods {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-raca-preview-k {
+        padding-top: 0;
+    }
+}
+
 .dash-form-row  { 
     display: grid; 
     grid-template-columns: 1fr 1fr; 

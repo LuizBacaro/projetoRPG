@@ -22,6 +22,7 @@ class CombatenteBase(BaseModel):
     tipo:       str = Field(..., pattern="^(jogador|monstro|npc)$")
     classe:     str = Field(..., min_length=1, max_length=50)
     raca:       Optional[str] = Field(default="", max_length=50)
+    raca_slug:  Optional[str] = Field(default="", max_length=80)
     divindade: Optional[str] = Field(default="", max_length=80)
     alinhamento: Optional[str] = Field(default="", max_length=30)
     dominios: Optional[str] = Field(default="", max_length=120)
@@ -29,7 +30,7 @@ class CombatenteBase(BaseModel):
     # ✅ NOVO: apenas monstros usam, mas aceita em todos os tipos (nullable)
     pagina_referencia: Optional[str] = Field(default="", max_length=100)
 
-    @field_validator('nome', 'classe', 'raca', 'divindade', 'alinhamento', 'dominios', 'pagina_referencia', mode='before')
+    @field_validator('nome', 'classe', 'raca', 'raca_slug', 'divindade', 'alinhamento', 'dominios', 'pagina_referencia', mode='before')
     @classmethod
     def sanitizar_texto(cls, v):
         return _strip_html(v)
@@ -65,6 +66,7 @@ class CombatenteUpdate(BaseModel):
     tipo:       Optional[str] = Field(None, pattern="^(jogador|monstro|npc)$")
     classe:     Optional[str] = Field(None, min_length=1, max_length=50)
     raca:       Optional[str] = Field(None, max_length=50)
+    raca_slug:  Optional[str] = Field(None, max_length=80)
     divindade: Optional[str] = Field(None, max_length=80)
     alinhamento: Optional[str] = Field(None, max_length=30)
     dominios: Optional[str] = Field(None, max_length=120)
@@ -72,7 +74,7 @@ class CombatenteUpdate(BaseModel):
     # ✅ NOVO
     pagina_referencia: Optional[str] = Field(None, max_length=100)
 
-    @field_validator('nome', 'classe', 'raca', 'divindade', 'alinhamento', 'dominios', 'pagina_referencia', mode='before')
+    @field_validator('nome', 'classe', 'raca', 'raca_slug', 'divindade', 'alinhamento', 'dominios', 'pagina_referencia', mode='before')
     @classmethod
     def sanitizar_texto(cls, v):
         return _strip_html(v)
@@ -112,6 +114,10 @@ class CombatenteResponse(CombatenteBase):
     pagina_referencia: Optional[str] = ""
     bonus_base_ataque: Optional[str] = ""
     habilidades_especiais: Optional[str] = ""
+    tamanho_racial: Optional[str] = ""
+    deslocamento_racial_metros: Optional[int] = None
+    idiomas_raciais: List[str] = []
+    passivos_raciais: List[str] = []
     fortitude_base: Optional[int] = 0
     reflexos_base: Optional[int] = 0
     vontade_base: Optional[int] = 0

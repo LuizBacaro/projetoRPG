@@ -162,7 +162,9 @@
                     <label>Raça</label>
                     <select id="cadastroJogadorRacaSelect" data-raca-select data-raca-key="jogador"></select>
                     <input type="hidden" name="raca" id="cadastroJogadorRacaFinal" data-raca-final data-raca-key="jogador" />
+                    <input type="hidden" name="raca_slug" id="cadastroJogadorRacaSlug" data-raca-slug data-raca-key="jogador" />
                     <input type="text" id="cadastroJogadorRacaCustom" data-raca-custom data-raca-key="jogador" placeholder="Informe a raça" style="display:none" />
+                    <div class="dash-raca-preview" id="cadastroJogadorRacaPreview" aria-live="polite"></div>
                 </div>
 
                 <div class="dash-form-group">
@@ -338,7 +340,9 @@
                     <label>Raça</label>
                     <select id="cadastroNpcRacaSelect" data-raca-select data-raca-key="npc"></select>
                     <input type="hidden" name="raca" id="cadastroNpcRacaFinal" data-raca-final data-raca-key="npc" />
+                    <input type="hidden" name="raca_slug" id="cadastroNpcRacaSlug" data-raca-slug data-raca-key="npc" />
                     <input type="text" id="cadastroNpcRacaCustom" data-raca-custom data-raca-key="npc" placeholder="Informe a raça" style="display:none" />
+                    <div class="dash-raca-preview" id="cadastroNpcRacaPreview" aria-live="polite"></div>
                 </div>
 
                 <div class="dash-form-group">
@@ -426,7 +430,9 @@
                     <label>Raça</label>
                     <select id="dashEditRacaSelect" data-raca-select data-raca-key="edicao"></select>
                     <input type="hidden" id="dashEditRaca" name="raca" data-raca-final data-raca-key="edicao" />
+                    <input type="hidden" id="dashEditRacaSlug" name="raca_slug" data-raca-slug data-raca-key="edicao" />
                     <input type="text" id="dashEditRacaCustom" data-raca-custom data-raca-key="edicao" placeholder="Informe a raça" style="display:none" />
+                    <div class="dash-raca-preview" id="dashEditRacaPreview" aria-live="polite"></div>
                 </div>
 
                 <div class="dash-form-group">
@@ -616,7 +622,7 @@
 </script>
 
 <!-- FASE 7: DashboardController (carregado por último) -->
-<script src="/js/controllers/DashboardController.js?v=12"></script>
+<script src="/js/controllers/DashboardController.js?v=15"></script>
 
 </body>
 </html>
