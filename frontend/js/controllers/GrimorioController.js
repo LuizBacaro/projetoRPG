@@ -334,7 +334,9 @@ class GrimorioController {
             this.notificacoes = await this.grimorioService.listarNotificacoes(this.combatente.id, {
                 classe: this.classeAtiva,
                 limit: 25,
-                forceSync: !this._carregado,  // false em recargas internas (leve); true na primeira abertura
+                // Evita corrida com /grimorio (que já sincroniza automaticamente)
+                // e elimina 500 intermitente por concorrência em ambiente local.
+                forceSync: false,
             });
         } catch (_error) {
             this.notificacoes = [];
