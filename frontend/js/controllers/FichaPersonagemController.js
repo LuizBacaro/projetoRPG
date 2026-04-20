@@ -5,7 +5,7 @@
  * ✅ NOVO: BroadcastChannel sync arena→ficha em tempo real
  */
 
-import { CombatenteService } from '../services/CombatenteService.js?v=2';
+import { CombatenteService } from '../services/CombatenteService.js?v=3';
 import { EquipamentoService } from '../services/EquipamentoService.js';
 import { ArmaduraProtecaoService } from '../services/ArmaduraProtecaoService.js';
 import { TalentoService } from '../services/TalentoService.js?v=3';
@@ -131,6 +131,10 @@ export class FichaPersonagemController {
 
         } catch (error) {
             console.error('❌ Erro ao inicializar ficha:', error);
+            const msg = String(error?.message || '');
+            if (msg.includes('401')) {
+                return;
+            }
             this.mostrarErro('Erro ao carregar ficha: ' + error.message);
         }
     }
@@ -1012,6 +1016,12 @@ export class FichaPersonagemController {
         return 0;
     }
 
+    _calcularModificador(valorAtributo) {
+        const valor = Number(valorAtributo ?? 10);
+        if (!Number.isFinite(valor)) return 0;
+        return Math.floor((valor - 10) / 2);
+    }
+
     _resolverBbaFicha() {
         const bbaApi = String(this.combatente?.bonus_base_ataque || '').trim();
         if (bbaApi) return bbaApi;
@@ -1094,17 +1104,44 @@ export class FichaPersonagemController {
             container.innerHTML = '<span class="ficha-vazio">Nenhuma habilidade especial mapeada para classe/nível atual.</span>';
             return;
         }
-        const itens = raw
-            .split('|')
-            .map((item) => item.trim())
-            .filter(Boolean);
-        if (!itens.length) {
+        const agrupadas = this._normalizarHabilidadesEspeciais(raw);
+        if (!agrupadas.length) {
             container.innerHTML = '<span class="ficha-vazio">Nenhuma habilidade especial mapeada para classe/nível atual.</span>';
             return;
         }
-        container.innerHTML = itens
-            .map((item) => `<div class="ficha-habilidade-especial-item">${escapeHtml(item)}</div>`)
+        container.innerHTML = agrupadas
+            .map((item) => `
+                <div class="ficha-habilidade-especial-item">
+                    <span class="ficha-habilidade-especial-nivel">Nível ${item.nivel}:</span>
+                    <span>${escapeHtml(item.habilidades.join(', '))}</span>
+                </div>
+            `)
             .join('');
+    }
+
+    _normalizarHabilidadesEspeciais(raw) {
+        try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                return parsed
+                    .map((item) => ({
+                        nivel: Number(item?.nivel || 0),
+                        habilidades: Array.isArray(item?.habilidades)
+                            ? item.habilidades.map((h) => String(h).trim()).filter(Boolean)
+                            : [],
+                    }))
+                    .filter((item) => item.nivel > 0 && item.habilidades.length > 0)
+                    .sort((a, b) => a.nivel - b.nivel);
+            }
+        } catch (_err) {
+            // Compatibilidade com formato legado string separado por pipe.
+        }
+        const legacy = raw
+            .split('|')
+            .map((item) => item.trim())
+            .filter(Boolean);
+        if (!legacy.length) return [];
+        return [{ nivel: Number(this.combatente?.nivel || 1), habilidades: legacy }];
     }
 
     // ─────────────────────────────────────────────────────────

@@ -12,6 +12,7 @@ Este `AGENTS.md` existe como resumo operacional e guia de uso para o time.
 - Priorizar mudancas pequenas, de causa raiz e com baixo risco de regressao.
 - Antes de implementar, ler contexto em [README.md](README.md) e instrucoes aplicaveis em [.github/instructions](.github/instructions).
 - Em tarefas que toquem arquitetura, deploy, dados, schema ou decisoes historicas, consultar [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md).
+- Para evolucoes da ficha por classe/nivel (BBA, resistencias, iniciativa e habilidades especiais), consultar [docs/progressao-classes-bba-resistencias-habilidades.md](docs/progressao-classes-bba-resistencias-habilidades.md).
 - Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill do projeto em [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md) — habilite essa skill no Cursor para o agente carregar esse contexto.
 - Conjuração D&D 3.5 (atributo por classe, Tabela 1-1, clérigo, troca Bardo/Feiticeiro): documentação em [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
 
@@ -71,6 +72,9 @@ Workflow para transformar texto de regra, PDF ou documento em especificacao acio
 
 - `dnd-spellcasting-conventions` ([.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md))
 Atributo de conjuração por classe, Tabela 1-1, planilhas Excel, clérigo (domínio), troca de magias Bardo/Feiticeiro e pontos de código.
+
+- `class-progression-conventions` ([.cursor/skills/class-progression-conventions/SKILL.md](.cursor/skills/class-progression-conventions/SKILL.md))
+Convenções de progressão por classe na ficha (BBA, resistências, iniciativa e habilidades especiais) com contrato entre backend/frontend/banco e compatibilidade legada.
 
 ## Hooks
 

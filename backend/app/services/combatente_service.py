@@ -4,6 +4,7 @@ SRP: Lógica de negócio de Combatente
 SOLID: DIP via repository injetado no constructor
 """
 import unicodedata
+import json
 
 from typing import List, Optional, Dict
 
@@ -17,6 +18,7 @@ from ..models.talento import Talento, TalentoJogador
 from ..core.bonus_base_ataque import (
     calcular_bonus_base_ataque,
     calcular_habilidades_especiais,
+    calcular_habilidades_especiais_por_nivel,
     calcular_resistencias_base,
 )
 from ..exceptions.custom_exceptions import (
@@ -312,8 +314,13 @@ class CombatenteService:
 
         bba = calcular_bonus_base_ataque(classe, nivel)
         combatente_data["bonus_base_ataque"] = bba or ""
-        habilidades = calcular_habilidades_especiais(classe, nivel)
-        combatente_data["habilidades_especiais"] = " | ".join(habilidades) if habilidades else ""
+        habilidades_grouped = calcular_habilidades_especiais_por_nivel(classe, nivel)
+        if habilidades_grouped:
+            combatente_data["habilidades_especiais"] = json.dumps(habilidades_grouped, ensure_ascii=False)
+        else:
+            # Compatibilidade com registros legados sem agrupamento.
+            habilidades = calcular_habilidades_especiais(classe, nivel)
+            combatente_data["habilidades_especiais"] = " | ".join(habilidades) if habilidades else ""
         saves = calcular_resistencias_base(classe, nivel)
         if saves is not None:
             fortitude, reflexos, vontade = saves

@@ -29,6 +29,14 @@ export class CombatenteService {
         return new Combatente(data);
     }
 
+    _tratar401(response) {
+        if (response.status !== 401) return false;
+        if (typeof window !== 'undefined' && window.AuthService && typeof window.AuthService.logout === 'function') {
+            window.AuthService.logout();
+        }
+        return true;
+    }
+
     /**
      * Lista todos os combatentes ou filtra por tipo
      * @param {string|null} tipo - 'jogador', 'monstro', 'npc'
@@ -50,6 +58,9 @@ export class CombatenteService {
             });
 
             if (!response.ok) {
+                if (this._tratar401(response)) {
+                    throw new Error('HTTP 401: Token inválido ou expirado');
+                }
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
@@ -86,6 +97,10 @@ export class CombatenteService {
                     detail = (errorData && errorData.detail) ? String(errorData.detail) : '';
                 } catch {
                     detail = '';
+                }
+
+                if (this._tratar401(response)) {
+                    throw new Error(`HTTP 401: ${detail || 'Token inválido ou expirado'}`);
                 }
 
                 if (response.status === 403) {

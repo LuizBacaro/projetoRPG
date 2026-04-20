@@ -270,7 +270,7 @@ def _resolver_chave_classe(classe: str) -> str:
     return max(candidates, key=len)
 
 
-def calcular_habilidades_especiais(classe: str | None, nivel: int | None) -> list[str]:
+def calcular_habilidades_especiais_por_nivel(classe: str | None, nivel: int | None) -> list[dict]:
     classe_norm = _resolver_chave_classe(classe or "")
     if not classe_norm or nivel is None:
         return []
@@ -290,8 +290,8 @@ def calcular_habilidades_especiais(classe: str | None, nivel: int | None) -> lis
     if not isinstance(rows, list):
         return []
 
-    habilidades: list[str] = []
-    vistos: set[str] = set()
+    por_nivel: list[dict] = []
+    vistos_globais: set[str] = set()
 
     for row in rows:
         if not isinstance(row, dict):
@@ -305,16 +305,32 @@ def calcular_habilidades_especiais(classe: str | None, nivel: int | None) -> lis
         especial = _extrair_especial(values, idx)
         if not especial:
             continue
+        nivel_row = _parse_nivel(values[idx])
+        if nivel_row is None:
+            continue
+        habilidades_nivel: list[str] = []
         for item in re.split(r"[,;]", especial):
             talento = item.strip()
             if not talento or talento in {"-", "—"}:
                 continue
             key = talento.lower()
-            if key in vistos:
+            if key in vistos_globais:
                 continue
-            vistos.add(key)
-            habilidades.append(talento)
-    return habilidades
+            vistos_globais.add(key)
+            habilidades_nivel.append(talento)
+        if habilidades_nivel:
+            por_nivel.append({"nivel": nivel_row, "habilidades": habilidades_nivel})
+    por_nivel.sort(key=lambda item: item["nivel"])
+    return por_nivel
+
+
+def calcular_habilidades_especiais(classe: str | None, nivel: int | None) -> list[str]:
+    grouped = calcular_habilidades_especiais_por_nivel(classe, nivel)
+    flat: list[str] = []
+    for item in grouped:
+        for habilidade in item.get("habilidades", []):
+            flat.append(str(habilidade))
+    return flat
 
 
 def _extrair_especial(values: list[str], level_idx: int) -> str | None:
@@ -336,6 +352,13 @@ def _extrair_especial(values: list[str], level_idx: int) -> str | None:
     if not candidates:
         return None
     return candidates[0]
+
+
+def _parse_nivel(value: str) -> int | None:
+    m = re.match(r"^(\d+)\s*[°ºo]?$", str(value).strip())
+    if not m:
+        return None
+    return int(m.group(1))
 
 
 def _normalizar_bonus(raw: str) -> str:

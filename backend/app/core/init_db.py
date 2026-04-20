@@ -9,8 +9,10 @@ from ..core.config import settings  # ✅ MUDADO: relativa em vez de absoluta
 from .bonus_base_ataque import (
     calcular_bonus_base_ataque,
     calcular_habilidades_especiais,
+    calcular_habilidades_especiais_por_nivel,
     calcular_resistencias_base,
 )
+import json
 from .classes_tables_catalog import initialize_classes_tables_catalog
 from ..models.usuario import Usuario, PerfilUsuario
 from ..models.combatente import Combatente
@@ -180,8 +182,12 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
 
     for combatente in combatentes:
         novo_bba = calcular_bonus_base_ataque(combatente.classe, combatente.nivel) or ""
-        habilidades = calcular_habilidades_especiais(combatente.classe, combatente.nivel)
-        habilidades_txt = " | ".join(habilidades) if habilidades else ""
+        habilidades_grouped = calcular_habilidades_especiais_por_nivel(combatente.classe, combatente.nivel)
+        if habilidades_grouped:
+            habilidades_txt = json.dumps(habilidades_grouped, ensure_ascii=False)
+        else:
+            habilidades = calcular_habilidades_especiais(combatente.classe, combatente.nivel)
+            habilidades_txt = " | ".join(habilidades) if habilidades else ""
         novas_resistencias = calcular_resistencias_base(combatente.classe, combatente.nivel)
         mudou = False
 
