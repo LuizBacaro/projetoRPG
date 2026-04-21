@@ -24,6 +24,7 @@ import {
     textoSlotsClerigoBreakdown,
 } from '../utils/combat-rules.js?v=20260419a';
 import { modificadorPericiaPreferindoDomFicha } from '../utils/dnd.js?v=20260420b';
+import { resolverBonusRaciaisPorPericia } from '../utils/pericia-racial.js?v=20260421a';
 
 const DOMINIOS_PERMITIDOS_FALLBACK = [
     'Ar', 'Bem', 'Caos', 'Conhecimento', 'Cura', 'Destruição', 'Enganação', 'Fogo', 'Força',
@@ -1572,12 +1573,28 @@ export class FichaPersonagemController {
         }
 
         container.innerHTML = '';
+
+        // Catálogo mínimo com {id,nome} a partir do payload do jogador, para
+        // casar os bônus raciais declarados pela raça com as perícias da ficha.
+        const catalogoPericias = pericias
+            .map((pj) => ({ id: pj.pericia?.id, nome: pj.pericia?.nome }))
+            .filter((p) => p.id && p.nome);
+        const bonusRacialPorId = resolverBonusRaciaisPorPericia(
+            this.combatente,
+            catalogoPericias,
+        );
+
         pericias.forEach(pj => {
             const modAtr = modificadorPericiaPreferindoDomFicha(this.combatente, pj.pericia?.atributo);
-            const total = pj.graduacao + modAtr + (pj.bonus_outros || 0);
+            const bonusOutros = pj.bonus_outros || 0;
+            const bonusRacial = bonusRacialPorId.get(pj.pericia?.id) || 0;
+            const total = pj.graduacao + modAtr + bonusOutros + bonusRacial;
             const item  = document.createElement('div');
             item.className = 'ficha-pericia-item';
             item.title     = pj.pericia?.descricao || '';
+            const racialHtml = bonusRacial
+                ? `<span class="ficha-pericia-mod-valor">+${bonusRacial}</span>`
+                : `<span class="ficha-pericia-mod-valor">—</span>`;
             item.innerHTML = `
                 <span class="ficha-pericia-nome">${escapeHtml(pj.pericia?.nome) || '—'}</span>
                 <span class="ficha-pericia-atributo">${escapeHtml(pj.pericia?.atributo) || '—'}</span>
@@ -1590,9 +1607,13 @@ export class FichaPersonagemController {
                         <span class="ficha-pericia-mod-label">Atr</span>
                         <span class="ficha-pericia-mod-valor">${modAtr >= 0 ? '+' : ''}${modAtr}</span>
                     </div>
+                    <div class="ficha-pericia-mod" title="Bônus racial aplicado automaticamente">
+                        <span class="ficha-pericia-mod-label">Rac</span>
+                        ${racialHtml}
+                    </div>
                     <div class="ficha-pericia-mod">
                         <span class="ficha-pericia-mod-label">Bôn</span>
-                        <span class="ficha-pericia-mod-valor">${pj.bonus_outros >= 0 ? '+' : ''}${pj.bonus_outros || 0}</span>
+                        <span class="ficha-pericia-mod-valor">${bonusOutros >= 0 ? '+' : ''}${bonusOutros}</span>
                     </div>
                     <div class="ficha-pericia-mod">
                         <span class="ficha-pericia-mod-label">Total</span>
