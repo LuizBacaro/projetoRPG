@@ -67,10 +67,6 @@ async def criar_combatente(
     dominios: Optional[str] = Form(None, max_length=120),
     # ✅ NOVO
     pagina_referencia: Optional[str] = Form(None, max_length=100),
-    # Defesa
-    ca:         int = Form(10),
-    toque:      int = Form(10),
-    surpresa:   int = Form(10),
     # Atributos D&D
     forca:        int = Form(10),
     destreza:     int = Form(10),
@@ -78,13 +74,14 @@ async def criar_combatente(
     inteligencia: int = Form(10),
     sabedoria:    int = Form(10),
     carisma:      int = Form(10),
-    # Resistências
-    fortitude: int = Form(0),
-    reflexos:  int = Form(0),
-    vontade:   int = Form(0),
     # Progressão
     nivel:  int = Form(1),
     pontos: int = Form(0),
+    # Economia
+    pc: int = Form(0),
+    pp: int = Form(0),
+    po: int = Form(0),
+    pl: int = Form(0),
     foto: Optional[UploadFile] = File(None),
     service: CombatenteService = Depends(get_combatente_service),
     usuario_atual: Usuario = Depends(get_usuario_atual),
@@ -102,20 +99,18 @@ async def criar_combatente(
         "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
         "hp_maximo":          hp_maximo,
         "iniciativa":         iniciativa,
-        "ca":                 ca,
-        "toque":              toque,
-        "surpresa":           surpresa,
         "forca":              forca,
         "destreza":           destreza,
         "constituicao":       constituicao,
         "inteligencia":       inteligencia,
         "sabedoria":          sabedoria,
         "carisma":            carisma,
-        "fortitude":          fortitude,
-        "reflexos":           reflexos,
-        "vontade":            vontade,
         "nivel":              nivel,
         "pontos":             pontos,
+        "pc":                 pc,
+        "pp":                 pp,
+        "po":                 po,
+        "pl":                 pl,
     }
     try:
         return service.criar(combatente_data, foto, dono_id=usuario_atual.id)
@@ -138,10 +133,6 @@ async def atualizar_combatente(
     dominios: Optional[str] = Form(None, max_length=120),
     # ✅ NOVO
     pagina_referencia: Optional[str] = Form(None, max_length=100),
-    # Defesa
-    ca:       int = Form(10),
-    toque:    int = Form(10),
-    surpresa: int = Form(10),
     # Atributos D&D
     forca:        int = Form(10),
     destreza:     int = Form(10),
@@ -149,13 +140,14 @@ async def atualizar_combatente(
     inteligencia: int = Form(10),
     sabedoria:    int = Form(10),
     carisma:      int = Form(10),
-    # Resistências
-    fortitude: int = Form(0),
-    reflexos:  int = Form(0),
-    vontade:   int = Form(0),
     # Progressão
     nivel:  int = Form(1),
     pontos: int = Form(0),
+    # Economia
+    pc: int = Form(0),
+    pp: int = Form(0),
+    po: int = Form(0),
+    pl: int = Form(0),
     foto: Optional[UploadFile] = File(None),
     service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
@@ -173,20 +165,18 @@ async def atualizar_combatente(
         "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
         "hp_maximo":          hp_maximo,
         "iniciativa":         iniciativa,
-        "ca":                 ca,
-        "toque":              toque,
-        "surpresa":           surpresa,
         "forca":              forca,
         "destreza":           destreza,
         "constituicao":       constituicao,
         "inteligencia":       inteligencia,
         "sabedoria":          sabedoria,
         "carisma":            carisma,
-        "fortitude":          fortitude,
-        "reflexos":           reflexos,
-        "vontade":            vontade,
         "nivel":              nivel,
         "pontos":             pontos,
+        "pc":                 pc,
+        "pp":                 pp,
+        "po":                 po,
+        "pl":                 pl,
     }
     try:
         return service.atualizar(combatente_id, combatente_data, foto)

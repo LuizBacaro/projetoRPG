@@ -1,6 +1,6 @@
 # Progressao de Classes na Ficha (BBA, Resistencias e Habilidades Especiais)
 
-Este documento consolida a implantacao da progressao automatica por classe/nivel na plataforma Arena TTRPG.
+Este documento consolida a implantacao da progressao automatica por classe/nivel e defesas derivadas na plataforma Arena TTRPG.
 
 ## Objetivo
 
@@ -8,6 +8,7 @@ Implementar, de ponta a ponta, o consumo das tabelas de classe (D&D 3.5) para pr
 
 - BBA (Bonus Base de Ataque), incluindo ataques iterativos.
 - Resistencias (Fortitude, Reflexos, Vontade) com separacao entre base e total.
+- Defesas (CA, Toque, Surpresa) calculadas automaticamente.
 - Iniciativa para jogadores conforme regra de Destreza e talento.
 - Habilidades Especiais por classe, com exibicao agrupada por nivel.
 
@@ -36,6 +37,7 @@ Arquivo: `backend/app/services/combatente_service.py`
 - Na criacao/atualizacao:
   - recalcula BBA;
   - recalcula resistencias base e total;
+  - recalcula defesas (`ca`, `toque`, `surpresa`);
   - aplica regra de iniciativa para jogador (`mod DES + bonus de talento`);
   - preenche `habilidades_especiais`.
 - Persistencia de `habilidades_especiais`:
@@ -50,7 +52,29 @@ Arquivo: `backend/app/core/init_db.py`
 - `sincronizar_bonus_base_ataque_combatentes` atualiza dados legados:
   - BBA,
   - resistencias base/total,
+  - defesas (CA/Toque/Surpresa),
   - habilidades especiais.
+
+### Armadura/Item de Protecao e defesa
+
+Arquivos:
+
+- `backend/app/services/armadura_protecao_service.py`
+- `backend/app/services/combatente_service.py`
+- `backend/app/api/v1/armaduras_protecao.py`
+
+Regras:
+
+- O `bonus_ca` usado para defesa vem dos itens vinculados em `armaduras_protecao_jogador`.
+- Incremento/decremento:
+  - ao adicionar item de protecao, o bonus entra no total;
+  - ao remover item, o bonus sai do total.
+- Recalculo automatico e persistente:
+  - `toque = 10 + mod DES`
+  - `surpresa = 10 + bonus_ca_total_itens`
+  - `ca = 10 + mod DES + bonus_ca_total_itens`
+- Fallback legado:
+  - quando nao ha itens vinculados, o backend preserva compatibilidade usando `ca` persistida para inferir bonus legado.
 
 ### Schema guard
 
@@ -110,6 +134,16 @@ Implementacoes:
   - Fortitude usa CON;
   - Reflexos usa DES;
   - Vontade usa SAB.
+- Defesas:
+  - Toque usa apenas Destreza (`10 + mod DES`);
+  - Surpresa usa apenas bonus de armadura (`10 + bonus_ca_total_itens`);
+  - CA usa Destreza + armadura (`10 + mod DES + bonus_ca_total_itens`).
+- Fonte do bonus de armadura:
+  - campo `bonus_ca` de cada item em `Armadura/Item de Protecao`.
+  - soma de todos os itens ativos vinculados ao combatente.
+- Fluxo incremental:
+  - adicionar item aumenta `surpresa/ca` imediatamente;
+  - remover item reduz `surpresa/ca` imediatamente.
 - Jogador:
   - Iniciativa = modificador de Destreza.
   - Talento "Iniciativa Aprimorada" concede +4 adicional.
@@ -128,6 +162,8 @@ Coberturas atuais relevantes:
 
 - BBA calculado por classe/nivel.
 - Resistencias base e total.
+- Defesas recalculadas por DES + bonus de armadura.
+- Add/remove de item de protecao incrementa/decrementa `surpresa` e `ca`.
 - Recalculo ao trocar classe/nivel.
 - Bonus de iniciativa por talento.
 

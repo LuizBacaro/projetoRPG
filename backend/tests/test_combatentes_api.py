@@ -10,6 +10,7 @@ from sqlalchemy.pool import StaticPool
 from app.api.v1.combatentes import router as combatentes_router
 from app.core.database import Base, get_db
 from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
 from app.models.talento import Talento, TalentoJogador
 
 
@@ -97,6 +98,30 @@ def test_criar_combatente_retorna_alinhamento_e_dominios(combatentes_db):
     assert body["alinhamento"] == "Leal e Bom"
     assert body["dominios"] == "Cura, Proteção"
     assert body["hp_atual"] == 18
+    assert body["pc"] == 0
+    assert body["pp"] == 0
+    assert body["po"] == 0
+    assert body["pl"] == 0
+
+
+def test_atualizar_combatente_persiste_campos_dinheiro(combatentes_db):
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    criado = client.post("/api/v1/combatentes", data=_combatente_payload())
+    assert criado.status_code == 201
+    combatente_id = criado.json()["id"]
+
+    atualizar = client.put(
+        f"/api/v1/combatentes/{combatente_id}",
+        data=_combatente_payload(pc="11", pp="22", po="33", pl="44"),
+    )
+    assert atualizar.status_code == 200
+    body = atualizar.json()
+    assert body["pc"] == 11
+    assert body["pp"] == 22
+    assert body["po"] == 33
+    assert body["pl"] == 44
 
 
 def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatentes_db):
@@ -197,6 +222,61 @@ def test_criar_combatente_preenche_bonus_base_ataque_por_classe_e_nivel(combaten
     assert body["fortitude"] == 7
     assert body["reflexos"] == 3
     assert body["vontade"] == 5
+
+
+def test_defesas_sao_recalculadas_automaticamente_por_destreza_e_armadura(combatentes_db):
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    # DES 14 => mod +2. Sem armadura explícita na criação, bônus de armadura = 0.
+    response = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(
+            classe="Guerreiro",
+            nivel="4",
+            destreza="14",
+        ),
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["toque"] == 12      # 10 + mod DES
+    assert body["surpresa"] == 10   # 10 + bônus de armadura (inicialmente 0)
+    assert body["ca"] == 12         # 10 + mod DES + bônus de armadura (0)
+
+
+def test_defesas_usam_bonus_ca_de_armadura_item_protecao(combatentes_db):
+    db, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    criado = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(
+            classe="Guerreiro",
+            nivel="4",
+            destreza="14",  # mod +2
+        ),
+    )
+    assert criado.status_code == 201
+    combatente_id = criado.json()["id"]
+
+    item = ArmaduraProtecao(
+        nome="Cota de Malha + Escudo",
+        tipo="Armadura",
+        bonus_ca=6,
+        ativo=True,
+    )
+    db.add(item)
+    db.flush()
+    db.add(ArmaduraProtecaoJogador(combatente_id=combatente_id, item_id=item.id))
+    db.commit()
+
+    obter = client.get(f"/api/v1/combatentes/{combatente_id}")
+    assert obter.status_code == 200
+    body = obter.json()
+    assert body["toque"] == 12      # 10 + mod DES
+    assert body["surpresa"] == 16   # 10 + bônus de armadura (item)
+    assert body["ca"] == 18         # 10 + mod DES + bônus de armadura
 
 
 def test_habilidades_especiais_incluem_todos_os_niveis_ate_o_atual(combatentes_db):

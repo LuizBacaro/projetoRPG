@@ -434,6 +434,31 @@ body {
     color: #b9770e;
 }
 
+.ficha-modal-money-total {
+    display: block;
+    margin-top: 0.1rem;
+    color: var(--cor-madeira);
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.ficha-btn-cancelar-dinheiro {
+    background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%);
+    border: 1px solid rgba(92, 58, 30, 0.45);
+    color: #fff7ed;
+    font-family: var(--fonte-titulo);
+    font-size: 0.82rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+.ficha-btn-cancelar-dinheiro:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+}
+
 .ficha-modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -778,6 +803,48 @@ body {
 .ficha-help-icon:hover {
     color: rgba(120, 84, 45, 0.9);
     opacity: 1;
+}
+
+.ficha-help-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.ficha-raciais-count {
+    min-width: 1rem;
+    height: 1rem;
+    padding: 0 0.2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(120, 84, 45, 0.35);
+    background: rgba(120, 84, 45, 0.14);
+    color: rgba(120, 84, 45, 0.9);
+    font-size: 0.55rem;
+    font-weight: 700;
+    line-height: 1rem;
+    text-align: center;
+}
+
+.ficha-raciais-count.is-empty {
+    display: none;
+}
+
+.ficha-defesa-popup-btn {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.22rem;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
 }
 
 .ficha-habilidades-especiais-lista {

@@ -1,6 +1,6 @@
 ---
 name: class-progression-conventions
-description: Implementa e evolui progressao de classe na Arena TTRPG (BBA, resistencias, iniciativa e habilidades especiais) com contrato backend/frontend/banco e compatibilidade legada. Use quando alterar ficha por classe/nivel, parser de tabelas de classe, ou campos de progressao em combatentes.
+description: Implementa e evolui progressao da ficha na Arena TTRPG (BBA, resistencias, defesas, iniciativa e habilidades especiais) com contrato backend/frontend/banco e compatibilidade legada. Use quando alterar ficha por classe/nivel, parser de tabelas de classe, campos de progressao em combatentes ou regras de armadura/item de protecao.
 ---
 
 # Class Progression Conventions
@@ -11,8 +11,10 @@ Use esta skill quando a demanda envolver qualquer regra de progressao por classe
 
 - BBA (`bonus_base_ataque`)
 - Resistencias base e total (`*_base`, `fortitude/reflexos/vontade`)
+- Defesas automaticas (`ca`, `toque`, `surpresa`)
 - Iniciativa automatica para jogador (DES + talentos)
 - Habilidades Especiais por classe
+- Integracao de `bonus_ca` de Armadura/Item de Protecao
 - Consumo do catalogo `docs/dados/tabelas_classes_catalogo.json`
 
 ## Referencia obrigatoria
@@ -22,6 +24,8 @@ Antes de editar, leia:
 - `docs/progressao-classes-bba-resistencias-habilidades.md`
 - `backend/app/core/bonus_base_ataque.py`
 - `backend/app/services/combatente_service.py`
+- `backend/app/services/armadura_protecao_service.py`
+- `backend/app/api/v1/armaduras_protecao.py`
 - `frontend/js/controllers/FichaPersonagemController.js`
 
 ## Contrato e persistencia
@@ -45,12 +49,19 @@ Antes de editar, leia:
 
 - BBA deve vir do catalogo por classe/nivel; fallback por progressao canonica quando faltar dado.
 - Resistencias totais = base + modificador de atributo (CON, DES, SAB).
+- Defesas:
+  - `toque = 10 + mod DES`
+  - `surpresa = 10 + bonus_ca_total_itens`
+  - `ca = 10 + mod DES + bonus_ca_total_itens`
+- Bonus de armadura vem de `bonus_ca` dos itens vinculados em Armadura/Item de Protecao.
+- Add/remove de item deve incrementar/decrementar imediatamente `surpresa` e `ca`.
 - Jogador: `iniciativa = mod DES + bonus de talento` (Iniciativa Aprimorada = +4).
 - Habilidades especiais devem aceitar formato agrupado por nivel e manter compatibilidade com string legada.
 
 ## Checklist de implementacao
 
 - [ ] Atualizou regra no backend sem duplicar logica no frontend.
+- [ ] Recalculou defesa ao adicionar/remover item de protecao.
 - [ ] Preservou dados legados (schema guard/backfill/sincronizacao em memoria).
 - [ ] Atualizou DTO/model frontend se novo campo estiver no payload.
 - [ ] Atualizou UI da ficha sem poluicao visual.
@@ -60,7 +71,9 @@ Antes de editar, leia:
 ## Validacao minima
 
 - `pytest backend/tests/test_combatentes_api.py -q`
+- `pytest backend/tests/test_armaduras_protecao_api.py -q`
 - Verificar na ficha:
   - BBA exibido corretamente (incluindo iterativos)
+  - Toque/Surpresa/CA coerentes com DES e itens de protecao
   - breakdown de iniciativa transparente
   - bloco de habilidades especiais consistente com classe/nivel

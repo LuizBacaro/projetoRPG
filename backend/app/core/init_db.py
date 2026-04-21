@@ -223,6 +223,7 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
             if combatente.vontade != vontade_total:
                 combatente.vontade = vontade_total
                 mudou = True
+
         else:
             # Classes sem mapeamento no catálogo/fallback: preservar totais legados
             # e preencher base de forma derivada para evitar nulls em responses.
@@ -239,6 +240,22 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
             if combatente.vontade_base is None:
                 combatente.vontade_base = base_vont
                 mudou = True
+
+        # Defesa automática: Toque/Surpresa/CA
+        mod_des = _modificador_atributo(combatente.destreza)
+        bonus_armadura = max(0, int(combatente.ca or 10) - (10 + mod_des))
+        novo_toque = 10 + mod_des
+        nova_surpresa = 10 + bonus_armadura
+        nova_ca = 10 + mod_des + bonus_armadura
+        if combatente.toque != novo_toque:
+            combatente.toque = novo_toque
+            mudou = True
+        if combatente.surpresa != nova_surpresa:
+            combatente.surpresa = nova_surpresa
+            mudou = True
+        if combatente.ca != nova_ca:
+            combatente.ca = nova_ca
+            mudou = True
 
         if mudou:
             atualizados += 1

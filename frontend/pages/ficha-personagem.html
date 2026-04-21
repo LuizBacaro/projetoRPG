@@ -145,6 +145,32 @@
                     <span id="fichaBba" class="ficha-defesa-valor">+0</span>
                     <span id="fichaBbaBreakdown" class="ficha-res-breakdown">Classe — • Nível 1 • 1 ataque</span>
                 </div>
+                <div class="ficha-defesa-box ficha-ini-box">
+                    <button
+                        id="btnAbrirCaracteristicasRaciais"
+                        type="button"
+                        class="ficha-defesa-popup-btn"
+                        title="Abrir traços raciais"
+                        aria-label="Abrir traços raciais"
+                    >
+                        <span class="ficha-defesa-label">Traços Raciais</span>
+                        <span id="fichaRaciaisCount" class="ficha-defesa-valor">0</span>
+                        <span id="fichaRaciaisResumo" class="ficha-res-breakdown">Clique para ver</span>
+                    </button>
+                </div>
+                <div class="ficha-defesa-box ficha-ini-box">
+                    <button
+                        id="btnAbrirModalDinheiro"
+                        type="button"
+                        class="ficha-defesa-popup-btn"
+                        title="Abrir dinheiro do personagem"
+                        aria-label="Abrir dinheiro do personagem"
+                    >
+                        <span class="ficha-defesa-label">Dinheiro</span>
+                        <span id="fichaDinheiroPo" class="ficha-defesa-valor">PO 0</span>
+                        <span id="fichaDinheiroResumo" class="ficha-res-breakdown">PC 0 • PP 0 • PL 0</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Talentos -->
@@ -211,13 +237,6 @@
                 <h3 class="ficha-secao-titulo">✨ Habilidades Especiais</h3>
                 <div id="fichaHabilidadesEspeciais" class="ficha-habilidades-especiais-lista">
                     <span class="ficha-vazio">Nenhuma habilidade especial mapeada.</span>
-                </div>
-            </div>
-
-            <div class="ficha-secao">
-                <h3 class="ficha-secao-titulo">🧬 Características Raciais</h3>
-                <div id="fichaCaracteristicasRaciais" class="ficha-habilidades-especiais-lista">
-                    <span class="ficha-vazio">Nenhuma característica racial mapeada.</span>
                 </div>
             </div>
 
@@ -783,10 +802,65 @@
     </div>
 </div>
 
+<div id="modalCaracteristicasRaciais" class="ficha-modal-overlay" style="display: none;">
+    <div class="ficha-modal-box ficha-modal-box-curto">
+        <div class="ficha-modal-header">
+            <div>
+                <h3>🧬 Traços Raciais</h3>
+                <p id="modalCaracteristicasRaciaisSubtitulo">Resumo da raça atual do personagem (não é progressão de classe).</p>
+            </div>
+            <button id="btnFecharModalCaracteristicasRaciais" class="ficha-modal-close" type="button">✕</button>
+        </div>
+        <div class="ficha-modal-body">
+            <div id="modalCaracteristicasRaciaisConteudo" class="ficha-habilidades-especiais-lista">
+                <span class="ficha-vazio">Nenhuma característica racial mapeada.</span>
+            </div>
+        </div>
+        <div class="ficha-modal-actions">
+            <button id="btnFecharModalCaracteristicasRaciaisRodape" class="ficha-btn-cancelar" type="button">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalDinheiro" class="ficha-modal-overlay" style="display: none;">
+    <div class="ficha-modal-box ficha-modal-box-curto">
+        <div class="ficha-modal-header">
+            <div>
+                <h3>💰 Dinheiro</h3>
+                <p>Edite as moedas do personagem. Os valores ficam salvos na ficha.</p>
+            </div>
+            <button id="btnFecharModalDinheiro" class="ficha-modal-close" type="button">✕</button>
+        </div>
+        <div class="ficha-modal-body">
+            <label class="ficha-modal-field">
+                <span>PC</span>
+                <input id="inputDinheiroPC" type="number" min="0" step="1" value="0" />
+            </label>
+            <label class="ficha-modal-field">
+                <span>PP</span>
+                <input id="inputDinheiroPP" type="number" min="0" step="1" value="0" />
+            </label>
+            <label class="ficha-modal-field">
+                <span>PO</span>
+                <input id="inputDinheiroPO" type="number" min="0" step="1" value="0" />
+            </label>
+            <label class="ficha-modal-field">
+                <span>PL</span>
+                <input id="inputDinheiroPL" type="number" min="0" step="1" value="0" />
+            </label>
+            <small id="modalDinheiroTotalPo" class="ficha-modal-money-total">Total equivalente: PO 0</small>
+        </div>
+        <div class="ficha-modal-actions">
+            <button id="btnCancelarModalDinheiro" class="ficha-btn-cancelar ficha-btn-cancelar-dinheiro" type="button">Cancelar</button>
+            <button id="btnSalvarModalDinheiro" class="ficha-btn-salvar" type="button">Salvar</button>
+        </div>
+    </div>
+</div>
+
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
 <script src="../js/services/AuthService.js"></script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
-<script type="module" src="../js/controllers/FichaPersonagemController.js?v=48"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=57"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=20260420c"></script>
 </body>
 </html>

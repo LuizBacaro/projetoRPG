@@ -412,6 +412,7 @@ def _inicializar_banco(db) -> None:
         ("garantir_coluna_habilidades_especiais", _garantir_coluna_habilidades_especiais),
         ("garantir_coluna_raca_slug", _garantir_coluna_raca_slug),
         ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
+        ("garantir_colunas_dinheiro", _garantir_colunas_dinheiro),
         ("garantir_colunas_talentos", _garantir_colunas_talentos),
         ("garantir_colunas_armaduras_protecao", _garantir_colunas_armaduras_protecao),
         ("garantir_constraints_item_13", _garantir_constraints_item_13),
@@ -687,6 +688,28 @@ def _garantir_colunas_resistencia_base() -> None:
                 continue
             logger.warning("⚠️  coluna combatentes.%s ausente; aplicando schema guard", coluna)
             conn.execute(text(f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql}"))
+
+
+def _garantir_colunas_dinheiro() -> None:
+    """Garante colunas de moedas em bancos legados."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "combatentes" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("combatentes")}
+    colunas_esperadas = {
+        "pc": "INTEGER",
+        "pp": "INTEGER",
+        "po": "INTEGER",
+        "pl": "INTEGER",
+    }
+    with engine.begin() as conn:
+        for coluna, tipo_sql in colunas_esperadas.items():
+            if coluna in colunas_existentes:
+                continue
+            logger.warning("⚠️  coluna combatentes.%s ausente; aplicando schema guard", coluna)
+            conn.execute(text(f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql} DEFAULT 0"))
 
 
 def _garantir_colunas_armaduras_protecao() -> None:

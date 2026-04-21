@@ -43,6 +43,12 @@ class Combatente(SoftDeleteMixin, Base):
     toque    = Column(Integer, default=10)
     surpresa = Column(Integer, default=10)
 
+    # ── Economia (moedas) ──
+    pc = Column(Integer, default=0)  # peça de cobre
+    pp = Column(Integer, default=0)  # peça de prata
+    po = Column(Integer, default=0)  # peça de ouro
+    pl = Column(Integer, default=0)  # peça de platina
+
     # ── Visual ──
     foto_url = Column(String, nullable=True)
 

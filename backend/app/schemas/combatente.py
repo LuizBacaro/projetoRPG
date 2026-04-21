@@ -41,6 +41,10 @@ class CombatenteBase(BaseModel):
     ca:       int = Field(default=10, ge=0, le=50)
     toque:    int = Field(default=10, ge=0, le=50)
     surpresa: int = Field(default=10, ge=0, le=50)
+    pc:       int = Field(default=0, ge=0)
+    pp:       int = Field(default=0, ge=0)
+    po:       int = Field(default=0, ge=0)
+    pl:       int = Field(default=0, ge=0)
 
     forca:        int = Field(default=10, ge=1, le=30)
     destreza:     int = Field(default=10, ge=1, le=30)
@@ -87,6 +91,10 @@ class CombatenteUpdate(BaseModel):
     ca:       Optional[int] = Field(None, ge=0, le=50)
     toque:    Optional[int] = Field(None, ge=0, le=50)
     surpresa: Optional[int] = Field(None, ge=0, le=50)
+    pc:       Optional[int] = Field(None, ge=0)
+    pp:       Optional[int] = Field(None, ge=0)
+    po:       Optional[int] = Field(None, ge=0)
+    pl:       Optional[int] = Field(None, ge=0)
 
     forca:        Optional[int] = Field(None, ge=1, le=30)
     destreza:     Optional[int] = Field(None, ge=1, le=30)

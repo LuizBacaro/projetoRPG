@@ -31,6 +31,10 @@ export class Combatente {
         this.ca                = data.ca                !== undefined ? data.ca                : 10;
         this.toque             = data.toque             !== undefined ? data.toque             : 10;
         this.surpresa          = data.surpresa          !== undefined ? data.surpresa          : 10;
+        this.pc                = data.pc                !== undefined ? data.pc                : 0;
+        this.pp                = data.pp                !== undefined ? data.pp                : 0;
+        this.po                = data.po                !== undefined ? data.po                : 0;
+        this.pl                = data.pl                !== undefined ? data.pl                : 0;
         this.fortitude         = data.fortitude         !== undefined ? data.fortitude         : 0;
         this.reflexos          = data.reflexos          !== undefined ? data.reflexos          : 0;
         this.vontade           = data.vontade           !== undefined ? data.vontade           : 0;

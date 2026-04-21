@@ -50,6 +50,7 @@ class ArmaduraProtecaoService:
             raise ValueError(f"Item de proteção {payload.item_id} não encontrado")
 
         ArmaduraProtecaoJogadorRepository.adicionar_item(self.db, combatente_id, payload)
+        self._recalcular_defesas_com_item_protecao(combatente)
 
         return ArmaduraProtecaoJogadorListResponse(
             id=item.id,
@@ -83,8 +84,31 @@ class ArmaduraProtecaoService:
         ]
 
     def remover_item_jogador(self, combatente_id: int, item_id: int) -> bool:
-        return ArmaduraProtecaoJogadorRepository.remover_item(self.db, combatente_id, item_id)
+        removido = ArmaduraProtecaoJogadorRepository.remover_item(self.db, combatente_id, item_id)
+        if not removido:
+            return False
+        combatente = self.db.query(Combatente).filter(Combatente.id == combatente_id).first()
+        if combatente:
+            self._recalcular_defesas_com_item_protecao(combatente)
+        return True
 
     def bonus_ca_total(self, combatente_id: int) -> int:
         itens = ArmaduraProtecaoJogadorRepository.listar_detalhado(self.db, combatente_id)
         return sum(int(row.get("item_bonus_ca") or 0) for row in itens)
+
+    def _recalcular_defesas_com_item_protecao(self, combatente: Combatente) -> None:
+        """
+        Aplica regra incremental/decremental baseada nos itens atuais:
+        - Toque = 10 + mod DES
+        - Surpresa = 10 + bônus CA total dos itens
+        - CA = 10 + mod DES + bônus CA total dos itens
+        """
+        des = int(getattr(combatente, "destreza", 10) or 10)
+        mod_des = (des - 10) // 2
+        bonus_armadura = self.bonus_ca_total(combatente.id)
+        combatente.toque = 10 + mod_des
+        combatente.surpresa = 10 + bonus_armadura
+        combatente.ca = 10 + mod_des + bonus_armadura
+        self.db.add(combatente)
+        self.db.commit()
+        self.db.refresh(combatente)

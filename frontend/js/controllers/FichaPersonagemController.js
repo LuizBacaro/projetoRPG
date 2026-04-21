@@ -111,6 +111,7 @@ export class FichaPersonagemController {
             this._atualizarHeaderNome();
             this.renderizarAtributos();
             this.renderizarDefesa();
+            this.renderizarDinheiro();
             this.renderizarResistencias();
             this.renderizarHabilidadesEspeciais();
             this.renderizarCaracteristicasRaciais();
@@ -189,6 +190,10 @@ export class FichaPersonagemController {
         if (btnEditarPerfilMagico) {
             btnEditarPerfilMagico.addEventListener('click', () => this.abrirModalPerfilMagico());
         }
+        const btnAbrirCaracteristicasRaciais = document.getElementById('btnAbrirCaracteristicasRaciais');
+        if (btnAbrirCaracteristicasRaciais) {
+            btnAbrirCaracteristicasRaciais.addEventListener('click', () => this.abrirModalCaracteristicasRaciais());
+        }
 
         const btnFecharModalPerfilMagico = document.getElementById('btnFecharModalPerfilMagico');
         if (btnFecharModalPerfilMagico) {
@@ -209,6 +214,46 @@ export class FichaPersonagemController {
         if (modalPerfilMagico) {
             modalPerfilMagico.addEventListener('click', (event) => {
                 if (event.target === modalPerfilMagico) this.fecharModalPerfilMagico();
+            });
+        }
+        const btnFecharModalCaracteristicasRaciais = document.getElementById('btnFecharModalCaracteristicasRaciais');
+        if (btnFecharModalCaracteristicasRaciais) {
+            btnFecharModalCaracteristicasRaciais.addEventListener('click', () => this.fecharModalCaracteristicasRaciais());
+        }
+        const btnFecharModalCaracteristicasRaciaisRodape = document.getElementById('btnFecharModalCaracteristicasRaciaisRodape');
+        if (btnFecharModalCaracteristicasRaciaisRodape) {
+            btnFecharModalCaracteristicasRaciaisRodape.addEventListener('click', () => this.fecharModalCaracteristicasRaciais());
+        }
+        const modalCaracteristicasRaciais = document.getElementById('modalCaracteristicasRaciais');
+        if (modalCaracteristicasRaciais) {
+            modalCaracteristicasRaciais.addEventListener('click', (event) => {
+                if (event.target === modalCaracteristicasRaciais) this.fecharModalCaracteristicasRaciais();
+            });
+        }
+        const btnAbrirModalDinheiro = document.getElementById('btnAbrirModalDinheiro');
+        if (btnAbrirModalDinheiro) {
+            btnAbrirModalDinheiro.addEventListener('click', () => this.abrirModalDinheiro());
+        }
+        const btnFecharModalDinheiro = document.getElementById('btnFecharModalDinheiro');
+        if (btnFecharModalDinheiro) {
+            btnFecharModalDinheiro.addEventListener('click', () => this.fecharModalDinheiro());
+        }
+        const btnCancelarModalDinheiro = document.getElementById('btnCancelarModalDinheiro');
+        if (btnCancelarModalDinheiro) {
+            btnCancelarModalDinheiro.addEventListener('click', () => this.fecharModalDinheiro());
+        }
+        const btnSalvarModalDinheiro = document.getElementById('btnSalvarModalDinheiro');
+        if (btnSalvarModalDinheiro) {
+            btnSalvarModalDinheiro.addEventListener('click', () => this.salvarModalDinheiro());
+        }
+        ['inputDinheiroPC', 'inputDinheiroPP', 'inputDinheiroPO', 'inputDinheiroPL'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', () => this._atualizarTotalDinheiroPo());
+        });
+        const modalDinheiro = document.getElementById('modalDinheiro');
+        if (modalDinheiro) {
+            modalDinheiro.addEventListener('click', (event) => {
+                if (event.target === modalDinheiro) this.fecharModalDinheiro();
             });
         }
 
@@ -840,6 +885,10 @@ export class FichaPersonagemController {
             ca: this.combatente.ca ?? 10,
             toque: this.combatente.toque ?? 10,
             surpresa: this.combatente.surpresa ?? 10,
+            pc: this.combatente.pc ?? 0,
+            pp: this.combatente.pp ?? 0,
+            po: this.combatente.po ?? 0,
+            pl: this.combatente.pl ?? 0,
             forca: this.combatente.forca ?? 10,
             destreza: this.combatente.destreza ?? 10,
             constituicao: this.combatente.constituicao ?? 10,
@@ -948,6 +997,7 @@ export class FichaPersonagemController {
         const bbaBreakdown = document.getElementById('fichaBbaBreakdown');
 
         const caBase = this.combatente.ca ?? 10;
+        const surpresaBase = this.combatente.surpresa ?? 10;
         const bonusProtecao = Number(this.bonusCaProtecao || 0);
         if (ca) {
             ca.textContent = caBase + bonusProtecao;
@@ -956,7 +1006,12 @@ export class FichaPersonagemController {
                 : `CA base ${caBase}`;
         }
         if (toque)    toque.textContent    = this.combatente.toque    ?? 10;
-        if (surpresa) surpresa.textContent = this.combatente.surpresa ?? 10;
+        if (surpresa) {
+            surpresa.textContent = surpresaBase + bonusProtecao;
+            surpresa.title = bonusProtecao
+                ? `Surpresa base ${surpresaBase} + bônus de proteção ${bonusProtecao}`
+                : `Surpresa base ${surpresaBase}`;
+        }
 
         if (pv) pv.textContent = `${this.combatente.hp_atual ?? 0}/${this.combatente.hp_maximo ?? 0}`;
 
@@ -1121,9 +1176,93 @@ export class FichaPersonagemController {
     }
 
     renderizarCaracteristicasRaciais() {
-        const container = document.getElementById('fichaCaracteristicasRaciais');
-        if (!container) return;
+        // Conteúdo racial é exibido em modal; aqui atualizamos o badge de contagem no botão.
+        const countEl = document.getElementById('fichaRaciaisCount');
+        const resumoEl = document.getElementById('fichaRaciaisResumo');
+        if (!countEl) return;
+        const total = this._coletarCaracteristicasRaciais().length;
+        countEl.textContent = String(total);
+        if (resumoEl) {
+            resumoEl.textContent = total > 0 ? 'Clique para ver' : 'Sem dados';
+        }
+    }
 
+    renderizarDinheiro() {
+        const poEl = document.getElementById('fichaDinheiroPo');
+        const resumoEl = document.getElementById('fichaDinheiroResumo');
+        const pc = Number(this.combatente?.pc || 0);
+        const pp = Number(this.combatente?.pp || 0);
+        const po = Number(this.combatente?.po || 0);
+        const pl = Number(this.combatente?.pl || 0);
+        if (poEl) poEl.textContent = `PO ${po}`;
+        if (resumoEl) resumoEl.textContent = `PC ${pc} • PP ${pp} • PL ${pl}`;
+    }
+
+    abrirModalDinheiro() {
+        const modal = document.getElementById('modalDinheiro');
+        if (!modal || !this.combatente) return;
+        const setVal = (id, v) => {
+            const el = document.getElementById(id);
+            if (el) el.value = String(Math.max(0, Number(v || 0)));
+        };
+        setVal('inputDinheiroPC', this.combatente.pc);
+        setVal('inputDinheiroPP', this.combatente.pp);
+        setVal('inputDinheiroPO', this.combatente.po);
+        setVal('inputDinheiroPL', this.combatente.pl);
+        this._atualizarTotalDinheiroPo();
+        modal.style.display = 'flex';
+    }
+
+    fecharModalDinheiro() {
+        const modal = document.getElementById('modalDinheiro');
+        if (modal) modal.style.display = 'none';
+    }
+
+    async salvarModalDinheiro() {
+        if (!this.combatente?.id) return;
+        const getVal = (id) => {
+            const el = document.getElementById(id);
+            return Math.max(0, Number.parseInt(el?.value ?? '0', 10) || 0);
+        };
+        const pc = getVal('inputDinheiroPC');
+        const pp = getVal('inputDinheiroPP');
+        const po = getVal('inputDinheiroPO');
+        const pl = getVal('inputDinheiroPL');
+        try {
+            const formData = this._buildFormDataAtualizacaoCombatente({ pc, pp, po, pl });
+            await this.combatenteService.atualizar(this.combatente.id, formData);
+            // Recarrega do backend para garantir estado persistido (evita falso positivo visual).
+            this.combatente = await this.combatenteService.obterCombatente(this.combatente.id);
+            this.renderizarDinheiro();
+            this.fecharModalDinheiro();
+            window.NotificationService?.sucesso('Dinheiro atualizado com sucesso.');
+        } catch (error) {
+            console.error('❌ Erro ao salvar dinheiro:', error);
+            window.NotificationService?.erro(error.message || 'Erro ao salvar dinheiro.');
+        }
+    }
+
+    _atualizarTotalDinheiroPo() {
+        const getVal = (id) => {
+            const el = document.getElementById(id);
+            return Math.max(0, Number.parseInt(el?.value ?? '0', 10) || 0);
+        };
+        const pc = getVal('inputDinheiroPC');
+        const pp = getVal('inputDinheiroPP');
+        const po = getVal('inputDinheiroPO');
+        const pl = getVal('inputDinheiroPL');
+        // D&D 3.5: 10 pc = 1 pp; 10 pp = 1 po; 10 po = 1 pl.
+        const totalPo = po + (pp / 10) + (pc / 100) + (pl * 10);
+        const totalEl = document.getElementById('modalDinheiroTotalPo');
+        if (!totalEl) return;
+        const txt = totalPo.toLocaleString('pt-BR', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        });
+        totalEl.textContent = `Total equivalente: PO ${txt}`;
+    }
+
+    _coletarCaracteristicasRaciais() {
         const itens = [];
         if (this.combatente?.tamanho_racial) {
             itens.push(`Tamanho: ${this.combatente.tamanho_racial}`);
@@ -1142,15 +1281,36 @@ export class FichaPersonagemController {
         for (const item of itens.map((x) => String(x).trim()).filter(Boolean)) {
             if (!unicos.includes(item)) unicos.push(item);
         }
+        return unicos;
+    }
 
-        if (!unicos.length) {
-            container.innerHTML = '<span class="ficha-vazio">Nenhuma característica racial mapeada para esta raça.</span>';
-            return;
+    abrirModalCaracteristicasRaciais() {
+        const modal = document.getElementById('modalCaracteristicasRaciais');
+        const subtitulo = document.getElementById('modalCaracteristicasRaciaisSubtitulo');
+        const conteudo = document.getElementById('modalCaracteristicasRaciaisConteudo');
+        if (!modal || !conteudo) return;
+
+        const raca = String(this.combatente?.raca || '').trim();
+        if (subtitulo) {
+            subtitulo.textContent = raca
+                ? `Resumo da raça ${raca} (não é progressão de classe).`
+                : 'Resumo da raça atual do personagem (não é progressão de classe).';
         }
 
-        container.innerHTML = unicos
-            .map((item) => `<div class="ficha-habilidade-especial-item">${escapeHtml(item)}</div>`)
-            .join('');
+        const itens = this._coletarCaracteristicasRaciais();
+        if (!itens.length) {
+            conteudo.innerHTML = '<span class="ficha-vazio">Nenhuma característica racial mapeada para esta raça.</span>';
+        } else {
+            conteudo.innerHTML = itens
+                .map((item) => `<div class="ficha-habilidade-especial-item">${escapeHtml(item)}</div>`)
+                .join('');
+        }
+        modal.style.display = 'flex';
+    }
+
+    fecharModalCaracteristicasRaciais() {
+        const modal = document.getElementById('modalCaracteristicasRaciais');
+        if (modal) modal.style.display = 'none';
     }
 
     _normalizarHabilidadesEspeciais(raw) {

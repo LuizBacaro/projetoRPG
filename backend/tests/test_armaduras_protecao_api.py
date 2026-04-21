@@ -121,6 +121,10 @@ def test_armaduras_protecao_fluxo_jogador_adicionar_listar_bonus_e_remover(api_d
     bonus = client.get(f"/api/v1/armaduras_protecao/{combatente.id}/bonus-ca")
     assert bonus.status_code == 200
     assert bonus.json()["bonus_ca_total"] == 2
+    api_db_session.refresh(combatente)
+    assert combatente.toque == 10
+    assert combatente.surpresa == 12
+    assert combatente.ca == 12
 
     remover = client.delete(f"/api/v1/armaduras_protecao/{combatente.id}/remover/{item_id}")
     assert remover.status_code == 204
@@ -128,3 +132,7 @@ def test_armaduras_protecao_fluxo_jogador_adicionar_listar_bonus_e_remover(api_d
     bonus_final = client.get(f"/api/v1/armaduras_protecao/{combatente.id}/bonus-ca")
     assert bonus_final.status_code == 200
     assert bonus_final.json()["bonus_ca_total"] == 0
+    api_db_session.refresh(combatente)
+    assert combatente.toque == 10
+    assert combatente.surpresa == 10
+    assert combatente.ca == 10

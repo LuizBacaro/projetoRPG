@@ -14,6 +14,7 @@ from ..repositories.base import commit_with_rollback
 from ..services.file_service import FileService
 from ..models.combatente import Combatente
 from ..models.ataque import MagiaSlot
+from ..models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
 from ..models.talento import Talento, TalentoJogador
 from ..core.bonus_base_ataque import (
     calcular_bonus_base_ataque,
@@ -261,6 +262,7 @@ class CombatenteService:
             exigir_dois_dominios_clerigo=False,
         )
         self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=None)
+        self._recalcular_defesas(combatente_data, combatente_atual=None)
         self._aplicar_regra_iniciativa_por_tipo(combatente_data)
         self._preencher_bonus_base_ataque(combatente_data)
         combatente_data["hp_atual"] = combatente_data["hp_maximo"]
@@ -299,6 +301,7 @@ class CombatenteService:
             exigir_dois_dominios_clerigo=False,
         )
         self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=combatente)
+        self._recalcular_defesas(combatente_data, combatente_atual=combatente)
         self._aplicar_regra_iniciativa_por_tipo(combatente_data, combatente_atual=combatente)
         self._preencher_bonus_base_ataque(combatente_data, combatente_atual=combatente)
 
@@ -357,6 +360,43 @@ class CombatenteService:
         combatente_data["reflexos"] = reflex_base + self._modificador_atributo(des)
         combatente_data["vontade"] = vontade_base + self._modificador_atributo(sab)
 
+    def _recalcular_defesas(
+        self,
+        combatente_data: dict,
+        combatente_atual: Optional[Combatente] = None,
+    ) -> None:
+        """
+        Regras automáticas de defesa:
+        - Toque = 10 + modificador de Destreza
+        - Surpresa = 10 + bônus de armadura
+        - CA = 10 + modificador de Destreza + bônus de armadura
+        """
+        des = self._obter_valor_int(combatente_data, "destreza", combatente_atual, default=10)
+        mod_des = self._modificador_atributo(des)
+        bonus_armadura = self._bonus_ca_armadura_total(combatente_atual)
+        if bonus_armadura <= 0:
+            # Fallback para preservar dados legados sem itens vinculados.
+            ca_atual = self._obter_valor_int(combatente_data, "ca", combatente_atual, default=10 + mod_des)
+            bonus_armadura = max(0, ca_atual - (10 + mod_des))
+
+        combatente_data["toque"] = 10 + mod_des
+        combatente_data["surpresa"] = 10 + bonus_armadura
+        combatente_data["ca"] = 10 + mod_des + bonus_armadura
+
+    def _bonus_ca_armadura_total(self, combatente_atual: Optional[Combatente]) -> int:
+        if combatente_atual is None or not getattr(combatente_atual, "id", None):
+            return 0
+        total = (
+            self.repository.db.query(ArmaduraProtecao.bonus_ca)
+            .join(ArmaduraProtecaoJogador, ArmaduraProtecaoJogador.item_id == ArmaduraProtecao.id)
+            .filter(
+                ArmaduraProtecaoJogador.combatente_id == combatente_atual.id,
+                ArmaduraProtecao.ativo.is_(True),
+            )
+            .all()
+        )
+        return sum(int(v or 0) for (v,) in total)
+
     @staticmethod
     def _modificador_atributo(valor: int) -> int:
         return (valor - 10) // 2
@@ -394,6 +434,9 @@ class CombatenteService:
                 "raca_slug": getattr(combatente, "raca_slug", ""),
                 "nivel": combatente.nivel,
                 "iniciativa": combatente.iniciativa,
+                "ca": combatente.ca,
+                "toque": combatente.toque,
+                "surpresa": combatente.surpresa,
                 "constituicao": combatente.constituicao,
                 "destreza": combatente.destreza,
                 "sabedoria": combatente.sabedoria,
@@ -402,11 +445,15 @@ class CombatenteService:
                 "vontade_base": combatente.vontade_base,
             }
             self._aplicar_predefinicoes_raciais(payload, combatente_atual=combatente)
+            self._recalcular_defesas(payload, combatente_atual=combatente)
             self._aplicar_regra_iniciativa_por_tipo(payload, combatente_atual=combatente)
             self._preencher_bonus_base_ataque(payload, combatente_atual=combatente)
             campos = (
                 "raca",
                 "raca_slug",
+                "ca",
+                "toque",
+                "surpresa",
                 "iniciativa",
                 "bonus_base_ataque",
                 "habilidades_especiais",
