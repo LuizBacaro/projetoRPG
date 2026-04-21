@@ -149,6 +149,9 @@ class CombatenteResponse(CombatenteBase):
     deslocamento_racial_metros: Optional[int] = None
     idiomas_raciais: List[str] = []
     passivos_raciais: List[str] = []
+    # Linhas canônicas de bônus racial em perícia (catálogo de raças), sem misturar
+    # resistências/ataque/CA. Usado pela UI de perícias para aplicar bônus automático.
+    modificadores_pericia: List[str] = []
     fortitude_base: Optional[int] = 0
     reflexos_base: Optional[int] = 0
     vontade_base: Optional[int] = 0

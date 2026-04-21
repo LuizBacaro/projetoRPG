@@ -5,6 +5,7 @@ SOLID: DIP via repository injetado no constructor
 """
 import unicodedata
 import json
+import re
 
 from typing import List, Optional, Dict
 
@@ -620,6 +621,7 @@ class CombatenteService:
                 setattr(combatente, "deslocamento_racial_metros", None)
                 setattr(combatente, "idiomas_raciais", [])
                 setattr(combatente, "passivos_raciais", [])
+                setattr(combatente, "modificadores_pericia", [])
                 continue
 
             talentos = [str(x).strip() for x in (raca.get("talentos_especiais") or []) if str(x).strip()]
@@ -628,6 +630,11 @@ class CombatenteService:
             mods_ataque = [str(x).strip() for x in (raca.get("modificadores_ataque") or []) if str(x).strip()]
             mods_defesa = [str(x).strip() for x in (raca.get("modificadores_defesa") or []) if str(x).strip()]
             mods_pericia = [str(x).strip() for x in (raca.get("modificadores_pericia") or []) if str(x).strip()]
+            # Catálogo legado: em algumas raças o bônus de Procurar veio em "resistências".
+            for item in resistencias:
+                if re.match(r"^\+\d+\s+procurar\b", item, flags=re.IGNORECASE):
+                    if item not in mods_pericia:
+                        mods_pericia.append(item)
             passivos = talentos + habilidades + resistencias + mods_ataque + mods_defesa + mods_pericia
 
             setattr(combatente, "raca_slug", str(raca.get("slug") or getattr(combatente, "raca_slug", "")))
@@ -636,6 +643,7 @@ class CombatenteService:
             setattr(combatente, "deslocamento_racial_metros", raca.get("deslocamento_metros"))
             setattr(combatente, "idiomas_raciais", [str(x) for x in (raca.get("idiomas_iniciais") or []) if str(x).strip()])
             setattr(combatente, "passivos_raciais", passivos)
+            setattr(combatente, "modificadores_pericia", mods_pericia)
 
     def _aplicar_regra_iniciativa_por_tipo(
         self,

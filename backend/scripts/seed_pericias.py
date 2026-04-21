@@ -1,8 +1,13 @@
 """
 seed_pericias.py
 
-Propósito: Popular a tabela de perícias com dados do D&D 3.5
-Gerado automaticamente do Perícias.xlsx
+Propósito: Popular a tabela de perícias com dados do D&D 3.5 (Tabela 4-3 — Perícias, Livro do Jogador).
+
+Notas:
+- Os nomes seguem a lista canônica da Tabela 4-3 (incluindo as especialidades de Conhecimento).
+- A ordem da lista é alfabética (idêntica à do livro).
+- Atuação aparece no livro como uma linha; a especialidade (canto, dança, instrumento etc.) é
+  escolhida na ficha do personagem e registrada como descrição, sem gerar linhas separadas.
 """
 
 # PERICIAS_DATA
@@ -39,56 +44,8 @@ PERICIAS_DATA = [
         "classes": ["Bardo", "Ladino", "Monge"],
     },
     {
-        "nome": "Atua\u00e7\u00e3o (canto)",
-        "descricao": "Entreter ou impressionar cantando baladas, c\u00e2nticos ou melodias. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
-        "atributo": "Car",
-        "classes": ["Bardo", "Ladino", "Monge"],
-    },
-    {
-        "nome": "Atua\u00e7\u00e3o (dan\u00e7a)",
-        "descricao": "Entreter ou impressionar dan\u00e7ando ballet, valsa ou outro tipo de dan\u00e7a. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
-        "atributo": "Car",
-        "classes": ["Bardo", "Ladino", "Monge"],
-    },
-    {
-        "nome": "Atua\u00e7\u00e3o (dramaturgia)",
-        "descricao": "Entreter ou impressionar interpretando pe\u00e7as teatrais alegres ou tristes, ou fazendo m\u00edmicas. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
-        "atributo": "Car",
-        "classes": ["Bardo", "Ladino", "Monge"],
-    },
-    {
-        "nome": "Atua\u00e7\u00e3o (humor)",
-        "descricao": "Entreter ou impressionar contando piadas ou fazendo palha\u00e7adas. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
-        "atributo": "Car",
-        "classes": ["Bardo", "Ladino", "Monge"],
-    },
-    {
-        "nome": "Atua\u00e7\u00e3o (instrumentos de corda)",
-        "descricao": "Entreter ou impressionar com m\u00fasica, usando instrumentos como rabeca, harpa, ala\u00fade, bandolim. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
-        "atributo": "Car",
-        "classes": ["Bardo", "Ladino", "Monge"],
-    },
-    {
-        "nome": "Atua\u00e7\u00e3o (instrumentos de percuss\u00e3o)",
-        "descricao": "Entreter ou impressionar com m\u00fasica, usando instrumentos como sinos, carrilh\u00e3o, tambores, gongo. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
-        "atributo": "Car",
-        "classes": ["Bardo", "Ladino", "Monge"],
-    },
-    {
-        "nome": "Atua\u00e7\u00e3o (instrumentos de sopro)",
-        "descricao": "Entreter ou impressionar com m\u00fasica, usando instrumentos como flauta, flauta de p\u00e3, flauta doce, charamela,\ntrompete. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
-        "atributo": "Car",
-        "classes": ["Bardo", "Ladino", "Monge"],
-    },
-    {
-        "nome": "Atua\u00e7\u00e3o (instrumentos de teclas)",
-        "descricao": "Entreter ou impressionar com m\u00fasica, usando instrumentos como espineta, piano, \u00f3rg\u00e3o de tubos. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
-        "atributo": "Car",
-        "classes": ["Bardo", "Ladino", "Monge"],
-    },
-    {
-        "nome": "Atua\u00e7\u00e3o (orat\u00f3ria)",
-        "descricao": "Entreter ou impressionar contando hist\u00f3rias ou palestrando sobre um tema qualquer. Pode render dinheiro, fama, acesso social, ou servir de base para efeitos de classe (ex.: m\u00fasica de bardo).",
+        "nome": "Atua\u00e7\u00e3o",
+        "descricao": "Entreter ou impressionar uma plateia usando uma forma de arte escolhida no momento do teste (canto, dan\u00e7a, dramaturgia, humor, instrumentos de corda/percuss\u00e3o/sopro/teclas ou orat\u00f3ria). Pode render dinheiro, fama ou acesso social, e serve de base para efeitos de classe (ex.: m\u00fasica de bardo).",
         "atributo": "Car",
         "classes": ["Bardo", "Ladino", "Monge"],
     },
@@ -153,12 +110,6 @@ PERICIAS_DATA = [
         "classes": ["Mago", "Ranger"],
     },
     {
-        "nome": "Conhecimento (monstros)",
-        "descricao": "Saber acad\u00eamico e erudito sobre monstros. Serve para lembrar fatos, identificar caracter\u00edsticas, e interpretar pistas sobre monstros e suas caracter\u00edsticas.",
-        "atributo": "Int",
-        "classes": ["Mago"],
-    },
-    {
         "nome": "Conhecimento (natureza)",
         "descricao": "Saber acad\u00eamico e erudito sobre natureza. Serve para lembrar fatos, identificar detalhes sobre a fauna e flora, e interpretar pistas sobre: animais, fadas, gigantes, human\u00f3ides monstruosos, plantas, esta\u00e7\u00f5es\ne ciclos, clima, insetos.",
         "atributo": "Int",
@@ -181,12 +132,6 @@ PERICIAS_DATA = [
         "descricao": "Saber acad\u00eamico e erudito sobre religi\u00e3o e ritos clericais. Serve para lembrar fatos, identificar ritos, criaturas/assuntos, e interpretar pistas sobre: divindades, hist\u00f3ria m\u00edtica, tradi\u00e7\u00f5es eclesi\u00e1sticas, s\u00edmbolos as\ngrados, mortos-vivos.",
         "atributo": "Int",
         "classes": ["Cl\u00e9rigo", "Mago", "Monge", "Paladino"],
-    },
-    {
-        "nome": "Conhecimento",
-        "descricao": "Saber acad\u00eamico e erudito em uma \u00e1rea espec\u00edfica a ser escolhida. Serve para lembrar fatos, identificar criaturas/assuntos, e interpretar pistas hist\u00f3ricas ou m\u00edsticas sobre o tema escolhido.",
-        "atributo": "Int",
-        "classes": ["Bardo", "Mago"],
     },
     {
         "nome": "Cura",
@@ -229,6 +174,24 @@ PERICIAS_DATA = [
         "descricao": "Evitar ser visto usando cobertura, sombras e distra\u00e7\u00f5es. Normalmente exige algum tipo de oculta\u00e7\u00e3o/cobertura; testes s\u00e3o resistidos por Observar e podem ser refeitos conforme voc\u00ea se move ou a situa\u00e7\u00e3o muda.",
         "atributo": "Des",
         "classes": ["Bardo", "Ladino", "Monge", "Ranger"],
+    },
+    {
+        "nome": "Falar Idioma",
+        "descricao": "Aprende idiomas adicionais: cada gradua\u00e7\u00e3o representa um idioma que voc\u00ea fala e entende fluentemente. No livro n\u00e3o h\u00e1 teste de per\u00edcia padr\u00e3o para falar; o atributo (INT) na ficha segue a conven\u00e7\u00e3o SRD.",
+        "atributo": "Int",
+        "classes": [
+            "B\u00e1rbaro",
+            "Bardo",
+            "Cl\u00e9rigo",
+            "Druida",
+            "Feiticeiro",
+            "Guerreiro",
+            "Ladino",
+            "Mago",
+            "Monge",
+            "Paladino",
+            "Ranger",
+        ],
     },
     {
         "nome": "Falsifica\u00e7\u00e3o",
@@ -333,11 +296,11 @@ PERICIAS_DATA = [
         "classes": ["Ladino", "Ranger"],
     },
     {
-        "nome": "Usar Intrumento M\u00e1gico",
+        "nome": "Usar Instrumento M\u00e1gico",
         "descricao": "Ativar itens m\u00e1gicos sem atender pr\u00e9-requisitos (classe, lista de magias, alinhamento etc.). Normalmente envolve testes espec\u00edficos por tipo de item e falhas podem impedir novas tentativas por um tempo.",
         "atributo": "Car",
         "classes": ["Bardo", "Ladino"],
     },
 ]
 
-# Total: 54 perícias
+# Total: 45 perícias (Tabela 4-3 do Livro do Jogador D&D 3.5, página 55)

@@ -54,19 +54,30 @@ class PericiaService:
         return apply_not_deleted(self.db.query(Pericia), Pericia).filter(Pericia.id == pericia_id).first()
 
     def listar_todas_pericias(self, skip: int = 0, limit: int = 100) -> List[Pericia]:
-        """Lista todas as perícias disponíveis"""
-        return apply_not_deleted(self.db.query(Pericia), Pericia).offset(skip).limit(limit).all()
+        """Lista todas as perícias disponíveis (ordem alfabética — espelha a Tabela 4-3 do livro)."""
+        return (
+            apply_not_deleted(self.db.query(Pericia), Pericia)
+            .order_by(Pericia.nome.asc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def listar_pericias_por_atributo(self, atributo: str) -> List[Pericia]:
-        """Lista perícias filtradas por atributo"""
+        """Lista perícias filtradas por atributo (ordem alfabética)."""
         atributos_validos = ["FOR", "DES", "CON", "INT", "SAB", "CAR"]
         if atributo.upper() not in atributos_validos:
             raise ValueError(f"Atributo '{atributo}' inválido")
-        
-        return apply_not_deleted(self.db.query(Pericia), Pericia).filter(Pericia.atributo == atributo.upper()).all()
+
+        return (
+            apply_not_deleted(self.db.query(Pericia), Pericia)
+            .filter(Pericia.atributo == atributo.upper())
+            .order_by(Pericia.nome.asc())
+            .all()
+        )
 
     def listar_pericias_por_classe(self, classe_nome: str) -> List[Pericia]:
-        """Lista perícias padrão de uma classe D&D"""
+        """Lista perícias padrão de uma classe D&D (ordem alfabética)."""
         return (
             apply_not_deleted(self.db.query(Pericia), Pericia)
             .join(
@@ -77,6 +88,7 @@ class PericiaService:
                 PericiaClasse.classe_nome == classe_nome,
                 PericiaClasse.is_default == 1
             )
+            .order_by(Pericia.nome.asc())
             .all()
         )
 

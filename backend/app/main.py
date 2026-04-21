@@ -750,89 +750,50 @@ def _garantir_colunas_armaduras_protecao() -> None:
 
 def _seed_pericias(db) -> None:
     """
-    Popula as perícias D&D 3.5 se não existirem.
-    
-    SRP: Apenas popula perícias
-    
-    Args:
-        db: Sessão do banco
+    Garante que as perícias da Tabela 4-3 (D&D 3.5, Livro do Jogador p. 55) existam no banco.
+
+    Idempotente: insere apenas as perícias canônicas que ainda não estão na tabela,
+    usando `scripts.seed_pericias.PERICIAS_DATA` como única fonte de verdade.
+    As reconciliações de nomes legados (ex.: "Acrobacia" → "Acrobacias") ficam a
+    cargo das migrações Alembic — este seed não renomeia nada.
     """
     from .models.pericia import Pericia
-    
+    from scripts.seed_pericias import PERICIAS_DATA
+
     try:
-        # Verificar se já existem perícias
-        pericia_count = db.query(Pericia).count()
-        if pericia_count > 0:
-            logger.info(f"✅ {pericia_count} perícias já existem no banco")
-            print(f"✅ {pericia_count} perícias já existem no banco de dados")
-            return
-        
-        logger.info("🔄 Populando perícias D&D 3.5...")
-        print("🔄 Populando banco de dados com perícias D&D 3.5...")
-        
-        # Lista completa de perícias D&D 3.5
-        pericias_iniciais = [
-            # ========== DESTREZA ==========
-            {"nome": "Acrobacia", "descricao": "Equilibrar-se, saltar, cambalhotas.", "atributo": "DES", "tipo": "comum"},
-            {"nome": "Abrir Fechaduras", "descricao": "Usar ferramentas de ladino.", "atributo": "DES", "tipo": "comum", "requer_treinamento": 1},
-            {"nome": "Cavalgar", "descricao": "Controlar montarias.", "atributo": "DES", "tipo": "comum"},
-            {"nome": "Esconder-se", "descricao": "Ficar fora de vista.", "atributo": "DES", "tipo": "comum"},
-            {"nome": "Furtividade", "descricao": "Mover-se silenciosamente.", "atributo": "DES", "tipo": "comum"},
-            {"nome": "Equilíbrio", "descricao": "Manter-se em pé em superfícies instáveis.", "atributo": "DES", "tipo": "comum"},
-            {"nome": "Usar Cordas", "descricao": "Amarrar e soltar nós.", "atributo": "DES", "tipo": "comum"},
-            
-            # ========== FORÇA ==========
-            {"nome": "Escalar", "descricao": "Subir paredes e obstáculos.", "atributo": "FOR", "tipo": "comum"},
-            {"nome": "Natação", "descricao": "Nadar.", "atributo": "FOR", "tipo": "comum"},
-            {"nome": "Saltar", "descricao": "Distância de salto.", "atributo": "FOR", "tipo": "comum"},
-            
-            # ========== INTELIGÊNCIA ==========
-            {"nome": "Alquimia", "descricao": "Criar itens alquímicos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
-            {"nome": "Apreciar", "descricao": "Avaliar o valor de itens.", "atributo": "INT", "tipo": "comum"},
-            {"nome": "Decifrar Escrita", "descricao": "Traduzir línguas antigas ou códigos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
-            {"nome": "Falsificação", "descricao": "Criar documentos falsos.", "atributo": "INT", "tipo": "comum"},
-            {"nome": "Identificar Magia", "descricao": "Reconhecer efeitos mágicos.", "atributo": "INT", "tipo": "comum"},
-            {"nome": "Operar Mecanismo", "descricao": "Desativar armadilhas ou dispositivos.", "atributo": "INT", "tipo": "comum", "requer_treinamento": 1},
-            {"nome": "Pesquisa", "descricao": "Encontrar informações em bibliotecas.", "atributo": "INT", "tipo": "comum"},
-            {"nome": "Procurar", "descricao": "Achar itens escondidos ou armadilhas.", "atributo": "INT", "tipo": "comum"},
-            
-            # ========== CONHECIMENTO (INT) ==========
-            {"nome": "Conhecimento: Arcano", "descricao": "Magia, monstros mágicos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            {"nome": "Conhecimento: Arquitetura", "descricao": "Construções e engenharia.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            {"nome": "Conhecimento: Geografia", "descricao": "Terras, climas.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            {"nome": "Conhecimento: História", "descricao": "Eventos passados.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            {"nome": "Conhecimento: Local", "descricao": "Notícias, fofocas.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            {"nome": "Conhecimento: Natureza", "descricao": "Animais, plantas, clima.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            {"nome": "Conhecimento: Nobreza", "descricao": "Linhas de sangue, títulos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            {"nome": "Conhecimento: Plano", "descricao": "Outras dimensões.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            {"nome": "Conhecimento: Religião", "descricao": "Divindades, ritos.", "atributo": "INT", "tipo": "conhecimento", "requer_treinamento": 1},
-            
-            # ========== SABEDORIA ==========
-            {"nome": "Cura", "descricao": "Tratar ferimentos e doenças.", "atributo": "SAB", "tipo": "comum"},
-            {"nome": "Intuição", "descricao": "Perceber mentiras e intenções.", "atributo": "SAB", "tipo": "comum"},
-            {"nome": "Navegação", "descricao": "Orientar-se.", "atributo": "SAB", "tipo": "comum"},
-            {"nome": "Ouvir", "descricao": "Detectar sons.", "atributo": "SAB", "tipo": "comum"},
-            {"nome": "Sobrevivência", "descricao": "Rastrear e viver na natureza.", "atributo": "SAB", "tipo": "comum"},
-            {"nome": "Profissão", "descricao": "Ofício específico.", "atributo": "SAB", "tipo": "profissao"},
-            
-            # ========== CARISMA ==========
-            {"nome": "Adestrar Animais", "descricao": "Treinar e controlar animais.", "atributo": "CAR", "tipo": "comum", "requer_treinamento": 1},
-            {"nome": "Atuação", "descricao": "Canto, dança, oratória, instrumentos.", "atributo": "CAR", "tipo": "performance"},
-            {"nome": "Diplomacia", "descricao": "Negociar e influenciar.", "atributo": "CAR", "tipo": "comum"},
-            {"nome": "Disfarce", "descricao": "Mudar a aparência.", "atributo": "CAR", "tipo": "comum"},
-            {"nome": "Intimidação", "descricao": "Ameaçar e coagir.", "atributo": "CAR", "tipo": "comum"},
-            {"nome": "Uso de Dispositivos Mágicos", "descricao": "Usar itens de classes diferentes.", "atributo": "CAR", "tipo": "comum", "requer_treinamento": 1},
-        ]
-        
-        # Inserir perícias
-        for pericia_data in pericias_iniciais:
-            pericia = Pericia(**pericia_data)
-            db.add(pericia)
-        
-        db.commit()
-        logger.info(f"✅ {len(pericias_iniciais)} perícias D&D 3.5 inseridas com sucesso")
-        print(f"✅ {len(pericias_iniciais)} perícias D&D 3.5 inseridas com sucesso!")
-        
+        existentes = {nome for (nome,) in db.query(Pericia.nome).all()}
+        criadas: list[str] = []
+
+        for pericia_data in PERICIAS_DATA:
+            nome = pericia_data["nome"]
+            if nome in existentes:
+                continue
+
+            atributo_raw = str(pericia_data.get("atributo") or "").strip()
+            atributo_norm = atributo_raw[:3].upper() if atributo_raw else "DES"
+
+            db.add(
+                Pericia(
+                    nome=nome,
+                    descricao=pericia_data.get("descricao") or "",
+                    atributo=atributo_norm,
+                    tipo="comum",
+                    especialidade=None,
+                    requer_treinamento=0,
+                    pode_usar_sem_treinamento=1,
+                    sofre_penalidade_armadura=0,
+                )
+            )
+            criadas.append(nome)
+
+        if criadas:
+            db.commit()
+            logger.info("✅ %s perícias canônicas inseridas (Tabela 4-3)", len(criadas))
+            print(f"✅ {len(criadas)} perícias canônicas inseridas (Tabela 4-3)")
+        else:
+            logger.info("✅ Perícias da Tabela 4-3 já presentes (%s existentes)", len(existentes))
+            print(f"✅ Perícias da Tabela 4-3 já presentes ({len(existentes)} existentes)")
+
     except Exception as e:
         db.rollback()
         logger.error(f"❌ Erro ao popular perícias: {str(e)}")

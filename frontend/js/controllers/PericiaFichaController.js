@@ -44,7 +44,7 @@ export class PericiaFichaController {
     _parseLinhaBonusRacialPericia(linha) {
         const texto = String(linha || '').trim();
         if (!texto) return null;
-        const m = texto.match(/^\+?(\d+)\s+(.+)$/);
+        const m = texto.match(/^\s*\+?\s*(\d+)\s+(.+)$/);
         if (!m) return null;
         const bonus = parseInt(m[1], 10);
         if (!Number.isFinite(bonus) || bonus <= 0) return null;
@@ -57,12 +57,66 @@ export class PericiaFichaController {
         };
     }
 
+    _tokensSingularEquivalente(a, b) {
+        if (!a || !b) return false;
+        if (a === b) return true;
+        if (a.length > 4 && a.endsWith('s') && a.slice(0, -1) === b) return true;
+        if (b.length > 4 && b.endsWith('s') && b.slice(0, -1) === a) return true;
+        return false;
+    }
+
+    /**
+     * Correspondência estrita entre o nome da perícia no catálogo racial e a
+     * definição na tabela — evita falsos positivos do `includes` (ex.: substrings).
+     */
+    _matchAlvoPericia(alvoNorm, pNorm) {
+        if (!alvoNorm || !pNorm) return false;
+        const a = alvoNorm.replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+        const b = pNorm.replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+        if (a === b) return true;
+        const pa = a.split(' ').filter(Boolean);
+        const pb = b.split(' ').filter(Boolean);
+        if (!pa.length || !pb.length) return false;
+        if (pa.length === 1 && pb.length === 1) {
+            return this._tokensSingularEquivalente(pa[0], pb[0]);
+        }
+        if (
+            pa[0] !== pb[0] &&
+            !this._tokensSingularEquivalente(pa[0], pb[0])
+        ) {
+            return false;
+        }
+        // Catálogo com especialização (ex.: "+2 procurar (pedras e alvenaria)")
+        // vs perícia base "Procurar".
+        if (pb.length === 1 && pa.length >= 1) {
+            return this._tokensSingularEquivalente(pa[0], pb[0]);
+        }
+        if (pa.length === 1 && pb.length >= 1) {
+            return this._tokensSingularEquivalente(pa[0], pb[0]);
+        }
+        const restA = pa.slice(1).join(' ');
+        const restB = pb.slice(1).join(' ');
+        if (restA === restB) return true;
+        if (restA.startsWith(restB) || restB.startsWith(restA)) return true;
+        if (restA.length > 4 && restA.endsWith('s') && restA.slice(0, -1) === restB) {
+            return true;
+        }
+        if (restB.length > 4 && restB.endsWith('s') && restB.slice(0, -1) === restA) {
+            return true;
+        }
+        return false;
+    }
+
     _resolverBonusRaciaisPorPericia() {
         const mapa = new Map();
-        const passivos = Array.isArray(this.combatente?.passivos_raciais)
-            ? this.combatente.passivos_raciais
-            : [];
-        if (!passivos.length || !this.pericias.length) return mapa;
+        const fontes =
+            Array.isArray(this.combatente?.modificadores_pericia) &&
+            this.combatente.modificadores_pericia.length
+                ? this.combatente.modificadores_pericia
+                : Array.isArray(this.combatente?.passivos_raciais)
+                  ? this.combatente.passivos_raciais
+                  : [];
+        if (!fontes.length || !this.pericias.length) return mapa;
 
         const periciasNormalizadas = this.pericias.map((p) => ({
             id: p.id,
@@ -70,20 +124,15 @@ export class PericiaFichaController {
             normal: this._normalizarNomePericiaLoose(p.nome),
         }));
 
-        for (const passivo of passivos) {
-            const parsed = this._parseLinhaBonusRacialPericia(passivo);
+        for (const linha of fontes) {
+            const parsed = this._parseLinhaBonusRacialPericia(linha);
             if (!parsed) continue;
             const alvo = parsed.alvoBase;
             if (!alvo) continue;
 
-            const candidatos = periciasNormalizadas.filter((p) => {
-                if (!p.normal) return false;
-                return (
-                    p.normal === alvo ||
-                    p.normal.includes(alvo) ||
-                    alvo.includes(p.normal)
-                );
-            });
+            const candidatos = periciasNormalizadas.filter((p) =>
+                this._matchAlvoPericia(alvo, p.normal)
+            );
             if (!candidatos.length) continue;
 
             for (const cand of candidatos) {
@@ -91,6 +140,10 @@ export class PericiaFichaController {
             }
         }
         return mapa;
+    }
+
+    _bonusRacialPara(periciaId) {
+        return this.bonusRacialPorPericiaId.get(periciaId) || 0;
     }
 
     _chaveOperacao(tipo, periciaId) {
@@ -182,12 +235,17 @@ export class PericiaFichaController {
                     data.pericias.forEach(p => {
                         const def = this.pericias.find((pp) => pp.id === p.pericia_id);
                         const mod = modificadorPericiaPorAtributo(this.combatente, def?.atributo);
+                        const rac = this._bonusRacialPara(p.pericia_id);
                         this.periciasAdicionadas.set(p.pericia_id, {
                             id: p.id,
                             graduacao: p.graduacao,
                             modificador_atributo: mod,
                             bonus: p.bonus_outros || 0,
-                            total: (p.graduacao || 0) + mod + (p.bonus_outros || 0),
+                            total:
+                                (p.graduacao || 0) +
+                                mod +
+                                (p.bonus_outros || 0) +
+                                rac,
                         });
                     });
                 }
@@ -274,7 +332,8 @@ export class PericiaFichaController {
                     <input type="number" class="pericias-input input-bonus"
                            data-pericia-id="${pericia.id}"
                            min="0" max="20"
-                           value="${bonusOutros}"
+                           value="${bonusOutros ? bonusOutros : ''}"
+                           placeholder="0"
                            style="text-align: center;"
                            title="Bônus adicionais (itens, magia, talentos etc.)"
                            ${!adicionada ? 'disabled' : ''}>
@@ -374,10 +433,12 @@ export class PericiaFichaController {
                 const dados = this.periciasAdicionadas.get(periciaId);
                 const def = this.pericias.find((p) => p.id === periciaId);
                 const mod = modificadorPericiaPorAtributo(this.combatente, def?.atributo);
+                const rac = this._bonusRacialPara(periciaId);
                 dados.graduacao = graduacao;
                 dados.bonus = bonusOutros;
                 dados.modificador_atributo = mod;
-                dados.total = (graduacao || 0) + mod + (bonusOutros || 0);
+                dados.total =
+                    (graduacao || 0) + mod + (bonusOutros || 0) + rac;
             }
 
         } catch (error) {
@@ -416,12 +477,17 @@ export class PericiaFichaController {
             const mod = modificadorPericiaPorAtributo(this.combatente, periciaDef?.atributo);
 
             // Marcar como adicionada (Mod. sempre derivado dos atributos atuais da ficha)
+            const rac = this._bonusRacialPara(periciaId);
             this.periciasAdicionadas.set(periciaId, {
                 id: response.id,
                 graduacao: response.graduacao,
                 modificador_atributo: mod,
                 bonus: response.bonus_outros || 0,
-                total: (response.graduacao || 0) + mod + (response.bonus_outros || 0),
+                total:
+                    (response.graduacao || 0) +
+                    mod +
+                    (response.bonus_outros || 0) +
+                    rac,
             });
 
             // Recarregar combatente para atualizar pontos
