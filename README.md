@@ -14,7 +14,7 @@ fichas de personagem interativas e arena de combate em tempo real.
 
 ---
 
-## 🌐 Produção
+## 🌐 Produção:
 
 | URL | Descrição |
 |---|---|
