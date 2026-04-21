@@ -23,6 +23,7 @@ from ..core.bonus_base_ataque import (
     calcular_resistencias_base,
 )
 from ..core.racas_catalog import get_raca_by_slug_or_name
+from ..core.habilidades_especiais_catalog import resolver_por_texto as _resolver_habilidade_por_texto
 from ..exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
@@ -190,10 +191,12 @@ class CombatenteService:
                 combatentes = self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
                 self._sincronizar_progressao_em_memoria(combatentes)
                 self._enriquecer_dados_raciais_em_memoria(combatentes)
+                self._enriquecer_habilidades_especiais_em_memoria(combatentes)
                 return combatentes
             combatentes = self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
             self._sincronizar_progressao_em_memoria(combatentes)
             self._enriquecer_dados_raciais_em_memoria(combatentes)
+            self._enriquecer_habilidades_especiais_em_memoria(combatentes)
             return combatentes
 
         # Mestre/user comum enxerga seus próprios (com filtro de tipo se aplicável)
@@ -202,20 +205,24 @@ class CombatenteService:
                 combatentes = self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
                 self._sincronizar_progressao_em_memoria(combatentes)
                 self._enriquecer_dados_raciais_em_memoria(combatentes)
+                self._enriquecer_habilidades_especiais_em_memoria(combatentes)
                 return combatentes
             combatentes = self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
             self._sincronizar_progressao_em_memoria(combatentes)
             self._enriquecer_dados_raciais_em_memoria(combatentes)
+            self._enriquecer_habilidades_especiais_em_memoria(combatentes)
             return combatentes
 
         if tipo:
             combatentes = self.repository.get_by_tipo(tipo, skip=skip, limit=limit)
             self._sincronizar_progressao_em_memoria(combatentes)
             self._enriquecer_dados_raciais_em_memoria(combatentes)
+            self._enriquecer_habilidades_especiais_em_memoria(combatentes)
             return combatentes
         combatentes = self.repository.get_all(skip=skip, limit=limit)
         self._sincronizar_progressao_em_memoria(combatentes)
         self._enriquecer_dados_raciais_em_memoria(combatentes)
+        self._enriquecer_habilidades_especiais_em_memoria(combatentes)
         return combatentes
 
     def contar_todos(self, tipo: Optional[str] = None, usuario=None) -> int:
@@ -247,6 +254,7 @@ class CombatenteService:
             raise CombatenteNaoEncontrado(combatente_id)
         self._sincronizar_progressao_em_memoria([combatente])
         self._enriquecer_dados_raciais_em_memoria([combatente])
+        self._enriquecer_habilidades_especiais_em_memoria([combatente])
         return combatente
 
     def criar(self, combatente_data: dict, foto_file=None, dono_id: Optional[int] = None) -> Combatente:
@@ -520,6 +528,87 @@ class CombatenteService:
 
         combatente_data["raca_slug"] = slug_novo
         combatente_data["raca"] = str(raca_nova.get("nome") or combatente_data.get("raca") or "")
+
+    def _enriquecer_habilidades_especiais_em_memoria(
+        self, combatentes: List[Combatente]
+    ) -> None:
+        """
+        Constrói `habilidades_especiais_detalhadas` a partir do JSON em
+        `habilidades_especiais`. Resolve cada habilidade contra o catálogo
+        canônico (`docs/dados/habilidades_especiais_catalogo.json`) para
+        anexar descrição oficial. Falhas de resolução não derrubam o campo —
+        apenas deixam `slug`/`descricao` vazios, preservando `raw` como fallback.
+        """
+        for combatente in combatentes:
+            raw_value = getattr(combatente, "habilidades_especiais", None) or ""
+            agrupadas: list[dict] = []
+            if isinstance(raw_value, str) and raw_value.strip():
+                try:
+                    parsed = json.loads(raw_value)
+                except (ValueError, TypeError):
+                    parsed = None
+
+                if isinstance(parsed, list):
+                    for item in parsed:
+                        if not isinstance(item, dict):
+                            continue
+                        nivel = int(item.get("nivel") or 0)
+                        habilidades_raw = item.get("habilidades") or []
+                        if not isinstance(habilidades_raw, list) or nivel <= 0:
+                            continue
+                        agrupadas.append(
+                            {
+                                "nivel": nivel,
+                                "habilidades": [
+                                    str(h).strip()
+                                    for h in habilidades_raw
+                                    if str(h).strip()
+                                ],
+                            }
+                        )
+                else:
+                    # formato legado "a | b"
+                    legado = [
+                        part.strip()
+                        for part in raw_value.split("|")
+                        if part.strip()
+                    ]
+                    if legado:
+                        agrupadas.append(
+                            {
+                                "nivel": int(getattr(combatente, "nivel", 1) or 1),
+                                "habilidades": legado,
+                            }
+                        )
+
+            detalhadas: list[dict] = []
+            for grupo in agrupadas:
+                itens_enriquecidos: list[dict] = []
+                for texto in grupo["habilidades"]:
+                    canon = _resolver_habilidade_por_texto(texto)
+                    if canon:
+                        itens_enriquecidos.append(
+                            {
+                                "raw": texto,
+                                "slug": str(canon.get("slug") or ""),
+                                "titulo": str(canon.get("titulo") or ""),
+                                "descricao": str(canon.get("descricao") or ""),
+                            }
+                        )
+                    else:
+                        itens_enriquecidos.append(
+                            {
+                                "raw": texto,
+                                "slug": "",
+                                "titulo": "",
+                                "descricao": "",
+                            }
+                        )
+                detalhadas.append(
+                    {"nivel": grupo["nivel"], "habilidades": itens_enriquecidos}
+                )
+
+            setattr(combatente, "habilidades_especiais_detalhadas", detalhadas)
 
     def _enriquecer_dados_raciais_em_memoria(self, combatentes: List[Combatente]) -> None:
         for combatente in combatentes:

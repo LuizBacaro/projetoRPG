@@ -111,6 +111,27 @@ class CombatenteUpdate(BaseModel):
     pontos: Optional[int] = Field(None, ge=0)
 
 
+class HabilidadeEspecialEnriquecida(BaseModel):
+    """Representação canônica de uma habilidade especial para a ficha.
+
+    - `raw` preserva o texto como extraído da tabela de classe/raça
+      (ex.: "Fúria (1/dia)"), garantindo fallback visual quando o
+      catálogo não conhece a habilidade.
+    - `slug`, `titulo` e `descricao` vêm do catálogo canônico
+      (docs/dados/habilidades_especiais_catalogo.json) quando a
+      resolução foi bem-sucedida; caso contrário ficam vazios.
+    """
+    raw: str = ""
+    slug: str = ""
+    titulo: str = ""
+    descricao: str = ""
+
+
+class HabilidadesEspeciaisNivel(BaseModel):
+    nivel: int = 0
+    habilidades: List[HabilidadeEspecialEnriquecida] = []
+
+
 class CombatenteResponse(CombatenteBase):
     id:       int
     dono_id:  Optional[int] = None
@@ -122,6 +143,8 @@ class CombatenteResponse(CombatenteBase):
     pagina_referencia: Optional[str] = ""
     bonus_base_ataque: Optional[str] = ""
     habilidades_especiais: Optional[str] = ""
+    # Novo campo enriquecido; fallback legado permanece em `habilidades_especiais`.
+    habilidades_especiais_detalhadas: List[HabilidadesEspeciaisNivel] = []
     tamanho_racial: Optional[str] = ""
     deslocamento_racial_metros: Optional[int] = None
     idiomas_raciais: List[str] = []

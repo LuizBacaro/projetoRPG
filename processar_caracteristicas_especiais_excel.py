@@ -1,182 +1,121 @@
 """
-Gera catálogo racial normalizado a partir da planilha
-"Características especiais.xlsx".
+Gera o catálogo racial normalizado a partir da planilha
+`Características especiais.xlsx` (ou `Características especiais_v2.xlsx`).
+
+Uso:
+    python processar_caracteristicas_especiais_excel.py
+    python processar_caracteristicas_especiais_excel.py --source "Características especiais_v2.xlsx"
+    python processar_caracteristicas_especiais_excel.py --source <planilha> --output <json>
+
+A lógica de parsing está em `scripts/racas_catalog_pipeline.py` e a validação
+em `scripts/racas_catalog_validator.py`. Este arquivo é apenas o ponto de
+entrada operacional.
 """
 
 from __future__ import annotations
 
-import json
-import re
-import unicodedata
-from datetime import datetime, timezone
+import argparse
 from pathlib import Path
-from typing import Any
 
-from openpyxl import load_workbook
-
-
-PLANILHA_PATH = Path("Características especiais.xlsx")
-OUTPUT_PATH = Path("docs/dados/racas_caracteristicas_catalogo.json")
-
-_ATTR_ALIASES = {
-    "FORCA": "forca",
-    "DESTREZA": "destreza",
-    "CONSTITUICAO": "constituicao",
-    "INTELIGENCIA": "inteligencia",
-    "SABEDORIA": "sabedoria",
-    "CARISMA": "carisma",
-}
+from scripts.racas_catalog_pipeline import (
+    ParseResult,
+    RacasCatalogExporter,
+    RacasCatalogPipeline,
+    RacasNormalizer,
+    RacasWorkbookReader,
+)
+from scripts.racas_catalog_validator import validate_records
 
 
-def _sem_acentos(valor: str) -> str:
-    normal = unicodedata.normalize("NFD", valor)
-    return "".join(ch for ch in normal if unicodedata.category(ch) != "Mn")
+DEFAULT_SOURCE = Path("Características especiais.xlsx")
+DEFAULT_OUTPUT = Path("docs/dados/racas_caracteristicas_catalogo.json")
 
 
-def _slug(valor: str) -> str:
-    base = _sem_acentos(str(valor or "")).lower().strip()
-    base = re.sub(r"[^a-z0-9]+", "-", base)
-    return base.strip("-")
-
-
-def _texto_limpo(valor: Any) -> str:
-    if valor is None:
-        return ""
-    texto = str(valor).strip()
-    if texto.lower() in {"nan", "none"}:
-        return ""
-    return texto
-
-
-def _lista_linhas(valor: Any) -> list[str]:
-    texto = _texto_limpo(valor)
-    if not texto or texto == "-":
-        return []
-    linhas = []
-    for parte in texto.replace("\r", "\n").split("\n"):
-        item = parte.strip()
-        if not item:
-            continue
-        if item.startswith("-"):
-            item = item[1:].strip()
-        if item:
-            linhas.append(item)
-    return linhas
-
-
-def _lista_separada_por_pontoevirgula(valor: Any) -> list[str]:
-    texto = _texto_limpo(valor)
-    if not texto or texto == "-":
-        return []
-    return [p.strip() for p in texto.split(";") if p.strip()]
-
-
-def _parse_deslocamento_metros(valor: Any) -> int | None:
-    texto = _texto_limpo(valor).lower()
-    if not texto:
-        return None
-    m = re.search(r"(\d+)", texto)
-    return int(m.group(1)) if m else None
-
-
-def _parse_modificadores_habilidade(valor: Any) -> list[dict[str, Any]]:
-    texto = _texto_limpo(valor)
-    if not texto or texto == "-":
-        return []
-    normal = _sem_acentos(texto).upper()
-    tokens = re.split(r"[;,]", normal)
-    saida: list[dict[str, Any]] = []
-    for token in tokens:
-        item = token.strip()
-        if not item:
-            continue
-        m = re.match(r"([+-]\d+)\s+([A-Z ]+)$", item)
-        if not m:
-            continue
-        valor_num = int(m.group(1))
-        attr_raw = re.sub(r"\s+", " ", m.group(2).strip())
-        attr = _ATTR_ALIASES.get(attr_raw)
-        if not attr:
-            continue
-        saida.append(
-            {
-                "atributo": attr,
-                "valor": valor_num,
-            }
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Processa a planilha de características raciais e gera o catálogo "
+            "canônico em JSON."
         )
-    return saida
+    )
+    parser.add_argument(
+        "--source",
+        type=Path,
+        default=DEFAULT_SOURCE,
+        help="Caminho da planilha de origem (.xlsx).",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_OUTPUT,
+        help="Caminho do JSON de saída.",
+    )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Falha com código 1 se houver qualquer warning ou erro de validação.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Processa a planilha sem escrever o JSON (útil para checagem).",
+    )
+    return parser.parse_args()
 
 
-def processar_planilha() -> dict[str, Any]:
-    if not PLANILHA_PATH.exists():
-        raise FileNotFoundError(f"Arquivo não encontrado: {PLANILHA_PATH}")
+def _relatar_warnings(resultado: ParseResult) -> int:
+    if not resultado.warnings:
+        print("ℹ️  Parser executado sem warnings.")
+        return 0
+    print(f"⚠️  {len(resultado.warnings)} warning(s) durante o parsing:")
+    for warn in resultado.warnings:
+        alvo = warn.raca or "(geral)"
+        detalhe = f" [{warn.token!r}]" if warn.token else ""
+        print(f"   - [{alvo}] {warn.campo}: {warn.mensagem}{detalhe}")
+    return len(resultado.warnings)
 
-    wb = load_workbook(PLANILHA_PATH, data_only=True)
-    if "Raças" not in wb.sheetnames:
-        raise ValueError("Aba 'Raças' não encontrada na planilha.")
 
-    ws = wb["Raças"]
-    headers_row = 3
-    headers = [_texto_limpo(c.value) for c in ws[headers_row]]
-    idx = {nome: i for i, nome in enumerate(headers) if nome}
-
-    racas: list[dict[str, Any]] = []
-    for row_number in range(headers_row + 1, ws.max_row + 1):
-        row = [c.value for c in ws[row_number]]
-        nome = _texto_limpo(row[idx["Raça"]]) if "Raça" in idx else ""
-        if not nome:
-            continue
-
-        registro = {
-            "slug": _slug(nome),
-            "nome": nome,
-            "modificadores_habilidade": _parse_modificadores_habilidade(
-                row[idx.get("Modificadores de habilidades", -1)] if "Modificadores de habilidades" in idx else ""
-            ),
-            "tamanho": _texto_limpo(row[idx.get("Tamanho", -1)]) if "Tamanho" in idx else "",
-            "deslocamento_metros": _parse_deslocamento_metros(
-                row[idx.get("Deslocamento", -1)] if "Deslocamento" in idx else ""
-            ),
-            "idiomas_iniciais": _lista_separada_por_pontoevirgula(
-                row[idx.get("Idiomas iniciais", -1)] if "Idiomas iniciais" in idx else ""
-            ),
-            "talentos_especiais": _lista_linhas(
-                row[idx.get("Talentos especiais", -1)] if "Talentos especiais" in idx else ""
-            ),
-            "habilidades_especiais": _lista_linhas(
-                row[idx.get("Habilidades especiais", -1)] if "Habilidades especiais" in idx else ""
-            ),
-            "resistencias": _lista_linhas(
-                row[idx.get("Resistências", -1)] if "Resistências" in idx else ""
-            ),
-            "modificadores_ataque": _lista_linhas(
-                row[idx.get("Modificadores de ataque", -1)] if "Modificadores de ataque" in idx else ""
-            ),
-            "modificadores_defesa": _lista_linhas(
-                row[idx.get("Modificadores de defesa", -1)] if "Modificadores de defesa" in idx else ""
-            ),
-            "modificadores_pericia": _lista_linhas(
-                row[idx.get("Modificadores de perícia", -1)] if "Modificadores de perícia" in idx else ""
-            ),
-            "classe_favorecida": _texto_limpo(
-                row[idx.get("Classe favorecida", -1)] if "Classe favorecida" in idx else ""
-            ),
-        }
-        racas.append(registro)
-
-    return {
-        "source": str(PLANILHA_PATH),
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "total_racas": len(racas),
-        "racas": racas,
-    }
+def _relatar_validacao(resultado: ParseResult) -> tuple[int, int]:
+    issues = validate_records(resultado.racas)
+    errors = [i for i in issues if i.level == "error"]
+    warnings = [i for i in issues if i.level == "warning"]
+    for issue in warnings:
+        print(f"⚠️  {issue.message}")
+    for issue in errors:
+        print(f"❌ {issue.message}")
+    return len(errors), len(warnings)
 
 
 def main() -> int:
-    payload = processar_planilha()
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"✅ Catálogo racial gerado: {OUTPUT_PATH} ({payload['total_racas']} raças)")
+    args = _parse_args()
+
+    exporter = None if args.dry_run else RacasCatalogExporter(args.output)
+    pipeline = RacasCatalogPipeline(
+        reader=RacasWorkbookReader(args.source),
+        normalizer=RacasNormalizer(),
+        exporter=exporter,
+    )
+    resultado = pipeline.run()
+
+    qt_warn_parser = _relatar_warnings(resultado)
+    qt_err_val, qt_warn_val = _relatar_validacao(resultado)
+
+    if args.dry_run:
+        print(
+            f"🔎 Dry-run concluído ({len(resultado.racas)} raça(s) lidas de "
+            f"{args.source})."
+        )
+    else:
+        print(
+            f"✅ Catálogo racial gerado: {args.output} "
+            f"({len(resultado.racas)} raça(s))"
+        )
+
+    if qt_err_val > 0:
+        return 1
+    if args.strict and (qt_warn_parser > 0 or qt_warn_val > 0):
+        print("❌ Modo --strict: warnings tratados como erro.")
+        return 1
     return 0
 
 

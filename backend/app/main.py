@@ -34,6 +34,7 @@ from .api.v1 import (
     condicoes,
     equipamentos,
     grimorio,
+    habilidades_especiais,
     magias,
     magias_preparadas,
     pericias,
@@ -163,6 +164,7 @@ app.include_router(armaduras_protecao.router, prefix=settings.API_V1_PREFIX)
 app.include_router(talentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tabelas_classes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(racas.router, prefix=settings.API_V1_PREFIX)
+app.include_router(habilidades_especiais.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 

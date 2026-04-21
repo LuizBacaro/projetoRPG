@@ -17,8 +17,80 @@ export class PericiaFichaController {
         this.pericias = [];
         this.periciasFiltradas = [];
         this.periciasAdicionadas = new Map();
+        this.bonusRacialPorPericiaId = new Map();
         this.operacoesEmAndamento = new Set();
         this.token = localStorage.getItem('token');
+    }
+
+    _normalizarTexto(valor) {
+        return String(valor || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9() ]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    _normalizarNomePericiaLoose(valor) {
+        const base = this._normalizarTexto(valor).replace(/\([^)]*\)/g, ' ').trim();
+        return base
+            .split(' ')
+            .map((tok) => (tok.length > 4 && tok.endsWith('s') ? tok.slice(0, -1) : tok))
+            .join(' ')
+            .trim();
+    }
+
+    _parseLinhaBonusRacialPericia(linha) {
+        const texto = String(linha || '').trim();
+        if (!texto) return null;
+        const m = texto.match(/^\+?(\d+)\s+(.+)$/);
+        if (!m) return null;
+        const bonus = parseInt(m[1], 10);
+        if (!Number.isFinite(bonus) || bonus <= 0) return null;
+        const rawNome = String(m[2] || '').trim();
+        if (!rawNome) return null;
+        const semParenteses = rawNome.replace(/\([^)]*\)/g, ' ').trim();
+        return {
+            bonus,
+            alvoBase: this._normalizarNomePericiaLoose(semParenteses),
+        };
+    }
+
+    _resolverBonusRaciaisPorPericia() {
+        const mapa = new Map();
+        const passivos = Array.isArray(this.combatente?.passivos_raciais)
+            ? this.combatente.passivos_raciais
+            : [];
+        if (!passivos.length || !this.pericias.length) return mapa;
+
+        const periciasNormalizadas = this.pericias.map((p) => ({
+            id: p.id,
+            nome: p.nome,
+            normal: this._normalizarNomePericiaLoose(p.nome),
+        }));
+
+        for (const passivo of passivos) {
+            const parsed = this._parseLinhaBonusRacialPericia(passivo);
+            if (!parsed) continue;
+            const alvo = parsed.alvoBase;
+            if (!alvo) continue;
+
+            const candidatos = periciasNormalizadas.filter((p) => {
+                if (!p.normal) return false;
+                return (
+                    p.normal === alvo ||
+                    p.normal.includes(alvo) ||
+                    alvo.includes(p.normal)
+                );
+            });
+            if (!candidatos.length) continue;
+
+            for (const cand of candidatos) {
+                mapa.set(cand.id, (mapa.get(cand.id) || 0) + parsed.bonus);
+            }
+        }
+        return mapa;
     }
 
     _chaveOperacao(tipo, periciaId) {
@@ -55,6 +127,7 @@ export class PericiaFichaController {
             // Carregar perícias disponíveis
             const classe = this.combatente.classe || 'Guerreiro';
             this.pericias = await this.periciaService.listarPericiasComCusto(classe, 0, 100);
+            this.bonusRacialPorPericiaId = this._resolverBonusRaciaisPorPericia();
 
             // Carregar perícias já adicionadas
             await this.carregarPericiasAdicionadas(parseInt(combatenteId));
@@ -150,7 +223,7 @@ export class PericiaFichaController {
         tbody.innerHTML = '';
 
         if (this.periciasFiltradas.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="pericias-vazio">❌ Nenhuma perícia encontrada</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="pericias-vazio">❌ Nenhuma perícia encontrada</td></tr>';
             tabela.style.display = 'table';
             return;
         }
@@ -161,6 +234,9 @@ export class PericiaFichaController {
             const adicionada = this.periciasAdicionadas.has(pericia.id);
             const dados = adicionada ? this.periciasAdicionadas.get(pericia.id) : null;
             const modAtr = modificadorPericiaPorAtributo(this.combatente, pericia.atributo);
+            const bonusRacial = this.bonusRacialPorPericiaId.get(pericia.id) || 0;
+            const bonusOutros = dados ? (dados.bonus || 0) : 0;
+            const totalExibido = adicionada ? (dados.graduacao + modAtr + bonusOutros + bonusRacial) : null;
 
             const tr = document.createElement('tr');
             tr.dataset.periciaId = pericia.id;
@@ -188,17 +264,24 @@ export class PericiaFichaController {
                 <td style="text-align: center; font-weight: bold;">
                     ${adicionada ? (modAtr >= 0 ? '+' : '') + modAtr : '-'}
                 </td>
+                <td style="text-align: center;" title="${bonusRacial ? 'Bônus automático da raça' : ''}">
+                    ${bonusRacial
+                        ? `<span class="pericias-badge-racial">+${bonusRacial}</span>`
+                        : '<span class="pericias-badge-racial vazio">—</span>'
+                    }
+                </td>
                 <td>
                     <input type="number" class="pericias-input input-bonus"
                            data-pericia-id="${pericia.id}"
                            min="0" max="20"
-                           value="${dados ? dados.bonus : 0}"
+                           value="${bonusOutros}"
                            style="text-align: center;"
+                           title="Bônus adicionais (itens, magia, talentos etc.)"
                            ${!adicionada ? 'disabled' : ''}>
                 </td>
                 <td style="text-align: center; font-weight: bold; min-width: 50px;">
                     ${adicionada
-                        ? `${(dados.graduacao + modAtr + (dados.bonus || 0)) >= 0 ? '+' : ''}${dados.graduacao + modAtr + (dados.bonus || 0)}`
+                        ? `${totalExibido >= 0 ? '+' : ''}${totalExibido}`
                         : '-'
                     }
                 </td>
@@ -258,7 +341,7 @@ export class PericiaFichaController {
         document.querySelectorAll('.input-bonus').forEach(input => {
             input.addEventListener('change', async function() {
                 const periciaId = parseInt(this.dataset.periciaId);
-                const novoBonus = parseFloat(this.value) || 0;
+                const novoBonusOutros = parseFloat(this.value) || 0;
 
                 if (self.periciasAdicionadas.has(periciaId)) {
                     const dados = self.periciasAdicionadas.get(periciaId);
@@ -266,7 +349,7 @@ export class PericiaFichaController {
                         self.combatente.id,
                         dados.id,
                         dados.graduacao,
-                        novoBonus
+                        novoBonusOutros
                     );
                 }
             });

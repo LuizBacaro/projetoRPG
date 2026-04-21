@@ -24,6 +24,9 @@ export class Combatente {
         this.pontos            = data.pontos            || 0;
         this.bonus_base_ataque = data.bonus_base_ataque || '';
         this.habilidades_especiais = data.habilidades_especiais || '';
+        this.habilidades_especiais_detalhadas = Array.isArray(data.habilidades_especiais_detalhadas)
+            ? data.habilidades_especiais_detalhadas
+            : [];
         this.tamanho_racial = data.tamanho_racial || '';
         this.deslocamento_racial_metros = data.deslocamento_racial_metros ?? null;
         this.idiomas_raciais = Array.isArray(data.idiomas_raciais) ? data.idiomas_raciais : [];

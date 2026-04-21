@@ -4,9 +4,22 @@ Este documento descreve o contrato recomendado para usar o catalogo de racas em 
 
 ## Fonte canonica
 
-- Planilha: `Caracteristicas especiais.xlsx` (aba `Raças`)
-- Gerador: `processar_caracteristicas_especiais_excel.py`
-- Saida: `docs/dados/racas_caracteristicas_catalogo.json`
+- Planilhas suportadas:
+  - `Características especiais.xlsx` (aba `Raças`)
+  - `Características especiais_v2.xlsx` (aba `Raças`, com delimitadores adicionais por quebra de linha)
+- Gerador (entrypoint): `processar_caracteristicas_especiais_excel.py`
+  - Uso: `python processar_caracteristicas_especiais_excel.py --source <planilha> --output <json>`
+  - Flags: `--dry-run` (não escreve arquivo), `--strict` (falha em qualquer warning).
+- Pipeline modular (SRP):
+  - `scripts/racas_catalog_pipeline.py`: `RacasWorkbookReader`, `RacasNormalizer`, `RacasCatalogExporter`, `RacasCatalogPipeline`.
+  - `scripts/racas_catalog_validator.py`: `validate_records` com níveis `error`/`warning`.
+- Saida: `docs/dados/racas_caracteristicas_catalogo.json`.
+
+### Robustez de parsing
+
+- Modificadores de habilidade aceitam `;`, `,` ou quebras de linha como separadores.
+- Tokens não reconhecidos geram `ParseWarning` estruturado (sem perda silenciosa).
+- Cabeçalhos obrigatórios (`Raça`) são validados; cabeçalhos opcionais ausentes emitem warning.
 
 ## Estrutura do catalogo JSON
 

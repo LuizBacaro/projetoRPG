@@ -36,6 +36,9 @@
         }
 
         .pericias-tabela thead th {
+            position: sticky;
+            top: 0;
+            z-index: 3;
             padding: 12px;
             text-align: left;
             font-family: 'Cinzel', serif;
@@ -44,6 +47,8 @@
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #5c3a1e 0%, #3d2410 100%);
+            box-shadow: 0 1px 0 rgba(201, 168, 76, 0.25);
         }
 
         .pericias-tabela tbody tr {
@@ -121,6 +126,28 @@
         .pericias-input:disabled {
             background: #e8d5b0;
             cursor: not-allowed;
+        }
+
+        .pericias-badge-racial {
+            display: inline-block;
+            min-width: 34px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(26, 92, 42, 0.55);
+            background: rgba(46, 125, 50, 0.14);
+            color: #1a5c2a;
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+            font-size: 0.78rem;
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .pericias-badge-racial.vazio {
+            border-color: rgba(92, 58, 30, 0.25);
+            background: rgba(92, 58, 30, 0.07);
+            color: rgba(61, 36, 16, 0.75);
+            font-weight: 600;
         }
 
         .pericias-btn-adicionar {
@@ -221,6 +248,24 @@
             font-style: italic;
             font-family: 'IM Fell English', serif;
         }
+
+        @media (max-width: 980px) {
+            .pericias-descricao {
+                display: none;
+            }
+
+            .pericias-tabela thead th,
+            .pericias-tabela td {
+                padding: 10px 8px;
+                font-size: 0.82rem;
+            }
+
+            .pericias-input {
+                width: 46px;
+                padding: 4px;
+                font-size: 0.82rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -253,18 +298,19 @@
             <table class="pericias-tabela" id="pericias-tabela" style="display: none;">
                 <thead>
                     <tr>
-                        <th style="width: 35%;">Perícia</th>
-                        <th style="width: 8%;">Atr.</th>
+                        <th style="width: 31%;">Perícia</th>
+                        <th style="width: 7%;">Atr.</th>
                         <th style="width: 10%;">Custo</th>
                         <th style="width: 8%;">Grad.</th>
-                        <th style="width: 8%;">Mod.</th>
+                        <th style="width: 7%;">Mod.</th>
+                        <th style="width: 8%;">Racial</th>
                         <th style="width: 8%;">Bôn.</th>
                         <th style="width: 8%;">Total</th>
                         <th style="width: 7%;">Ação</th>
                     </tr>
                 </thead>
                 <tbody id="pericias-tbody">
-                    <tr><td colspan="6" class="pericias-vazio">Carregando perícias...</td></tr>
+                    <tr><td colspan="9" class="pericias-vazio">Carregando perícias...</td></tr>
                 </tbody>
             </table>
         </div>

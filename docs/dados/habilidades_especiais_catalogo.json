@@ -1,0 +1,145 @@
+{
+  "source": "Características especiais_v2.xlsx",
+  "generated_at": "2026-04-21T15:16:12.026007+00:00",
+  "total_habilidades": 23,
+  "habilidades": [
+    {
+      "slug": "analfabetismo",
+      "titulo": "Analfabetismo",
+      "descricao": "Não sabe ler e escrever. Para aprender a ler e escrever nos idiomas conhecidos, deve gastar 2 pontos na perícia \"Ler e escrever\"",
+      "aliases": []
+    },
+    {
+      "slug": "conhecimento-de-bardo",
+      "titulo": "Conhecimento de bardo",
+      "descricao": "Pode realizar um teste especial de conhecimento de bardo, com um bônus equivalente ao seu nível na classe + modificador de Inteligência, para determinar se conhece alguma informação relevante sobre as pessoas notáveis da região, seus itens lendários ou seus lugares famosos. Se o bardo tiver 5 graduações em Conhecimento (história), ele recebe +2 de bônus nesse teste.",
+      "aliases": []
+    },
+    {
+      "slug": "esquiva-sobrenatural",
+      "titulo": "Esquiva sobrenatural",
+      "descricao": "Conserva seu bônus de Destreza na CA (se houver), mesmo em situações de surpresa ou contra ataques de um oponente invisível.",
+      "aliases": []
+    },
+    {
+      "slug": "esquiva-sobrenatural-aprimorada",
+      "titulo": "Esquiva sobrenatural aprimorada",
+      "descricao": "Não pode ser flanqueado, nem sofrer ataque furtivo por estar flanqueado (ladrões 4 níveis acima ainda conseguem executar o ataque furtivo).",
+      "aliases": []
+    },
+    {
+      "slug": "furia",
+      "titulo": "Fúria",
+      "descricao": "+4 de bônus de Força e Constituição e +2 de bônus de moral nos testes de resistência de Vontade, mas sofre -2 de penalidade na CA por (3 + modificador de constiuição ajustado) turnos. Pode ser utilizado 1 vez por combate. Ao se encerrar, fica exausto (-2 de Força, -2 de Destreza, incapaz de correr) até o fim do combate.",
+      "aliases": []
+    },
+    {
+      "slug": "furia-incansavel",
+      "titulo": "Fúria incansável",
+      "descricao": "Após retornar da Fúria, o personagem não fica mais exausto.",
+      "aliases": []
+    },
+    {
+      "slug": "furia-maior",
+      "titulo": "Fúria maior",
+      "descricao": "+6 de bônus de Força e Constituição e +3 de bônus de moral nos testes de resistência de Vontade, mas sofre -2 de penalidade na CA por (3 + modificador de constiuição ajustado) turnos. Pode ser utilizado 1 vez por combate. Ao se encerrar, fica exausto (-2 de Força, -2 de Destreza, incapaz de correr) até o fim do combate.",
+      "aliases": []
+    },
+    {
+      "slug": "furia-poderosa",
+      "titulo": "Fúria poderosa",
+      "descricao": "+8 de bônus de Força e Constituição e +4 de bônus de moral nos testes de resistência de Vontade, mas sofre -2 de penalidade na CA por (3 + modificador de constiuição ajustado) turnos. Pode ser utilizado 1 vez por combate. Ao se encerrar, fica exausto (-2 de Força, -2 de Destreza, incapaz de correr) até o fim do combate.",
+      "aliases": []
+    },
+    {
+      "slug": "ligacao-com-pedras",
+      "titulo": "Ligação com pedras",
+      "descricao": "+2 de bônus em testes de Procurar para identificar trabalhos incomuns de alvenaria, como paredes deslizantes, armadilhas de pedra, construções recentes etc. Rolagem passiva de procurar trabalhos incomuns em pedras e alvenarias há 3m de distância.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-fascinar",
+      "titulo": "Música de bardo: fascinar",
+      "descricao": "Todas as criaturas até 27 metros que puderem enxergar, ver e ouvir o bardo, e que o bardo puder enxergar, devem resistir a um teste de vontade (CD é o resultado de Atuação do bardo) ou se sentará tranquilamente e ouvirá a música do bardo enquanto ele continuar tocando e concentrado. Alvos: 1 no 1º nível do bardo, 2 no 4º nível do bardo, 3 no 7º nível do bardo etc. Duração: 1 rodada por nível do bardo (depende da atuação continuar). Combate ou perigo neutraliza o efeito. Pré-requisito: 3 graduações em Atuação.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-inspirar-competencia",
+      "titulo": "Música de bardo: inspirar competência",
+      "descricao": "Todas as criaturas (exceto o próprio bardo) puderem enxergar e ouvir o bardo cantar recebem +2 nos testes de uma perícia a escolha do bardo. Alvos: Um aliado. Duração: Até 2 minutos (depende da atuação continuar). Pré-requisito: 9 graduações em Atuação.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-inspirar-coragem",
+      "titulo": "Música de bardo: inspirar coragem",
+      "descricao": "Todas as criaturas puderem ouvir o bardo cantar recebem +1 de resistência contra Encantamentos e Medo e nas jogadas de ataque e dano. Alvos: Todos os aliados na área que puderem ouvir a canção. Duração: 5 rodadas após o bardo parar de cantar. +2 no 8º nível, +3 no 14º nível e +4 no 20º nível. Pré-requisito: 3 graduações em Atuação.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-inspirar-grandeza",
+      "titulo": "Música de bardo: inspirar grandeza",
+      "descricao": "Todas as criaturas em até 9 metros que puderem ouvir o bardo cantar recebem 2D10 de vida, os pontos de vida temporários desses dados, + 2 em jogadas de ataque e + 1 nos testes de resistência de Fortitude. Alvos: Um aliado ou o próprio bardo. 2 aliados no 12º nível, 3 aliados no 15º nível e 4 aliados no 18º nível. Duração: 5 rodadas após o bardo parar de cantar. Pré-requisito: 12 graduações em Atuação.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-inspirar-heroismo",
+      "titulo": "Música de bardo: inspirar heroísmo",
+      "descricao": "Todas as criaturas (incluindo o próprio bardo) puderem ouvir o bardo cantar recebem +2 nos testes de resistências e +4 na CA. Alvos: Um aliado (2 aliados no 18º nível do bardo). Duração: 5 rodadas após o bardo parar de cantar. Pré-requisito: 18 graduações em Atuação.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-melodia-da-libertacao",
+      "titulo": "Música de bardo: melodia da libertação",
+      "descricao": "A criatura encantada num raio de até 9 metros que não seja o próprio bardo poderá ser alvo de uma magia de Cancelar encantamentos ao ouvir a música por 1 minuto de forma initerrupta. Alvos: Um criatura. Duração: imediata (após 1 minuto). Pré-requisito: 15 graduações em Atuação.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-protecao",
+      "titulo": "Música de bardo: proteção",
+      "descricao": "Todas as criaturas até 9 metros podem usar o teste de Atuação do bardo para resistir a um ataque mágico sônico ou dependente de idioma. Alvos: Todos na área. Duração: 10 rodadas (depende da atuação continuar). Pré-requisito: 3 graduações em Atuação.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-sugestao",
+      "titulo": "Música de bardo: sugestão",
+      "descricao": "A criatura já fascinada pela música do bardo deve fazer um teste de resistência (CD é 10 + 1/2 nível do bardo + modificador de carisma do bardo) ou será vítima da magia Sugestão. Alvos: Uma criatura já fascinada. Duração: 1 hora/nível . Pré-requisito: 9 graduações em Atuação. O uso dessa música não subtrai o total de músicas por dia do bardo.",
+      "aliases": []
+    },
+    {
+      "slug": "musica-de-bardo-sugestao-em-massa",
+      "titulo": "Música de bardo: sugestão em massa",
+      "descricao": "Todas as criaturas já fascinadas pela música do bardo deve fazer um teste de resistência (CD é 10 + 1/2 nível do bardo + modificador de carisma do bardo) ou serão vítimas da magia Sugestão. Alvos: Todas as criaturas já fascinadas. Duração: 1 hora/nível . Pré-requisito: 21 graduações em Atuação. O uso dessa música não subtrai o total de músicas por dia do bardo.",
+      "aliases": []
+    },
+    {
+      "slug": "reducao-de-dano-x",
+      "titulo": "Redução de dano X/-",
+      "descricao": "Reduz o dano causado em (nível do bônus) pontos sempre que o personagem sofrer um ataque de uma arma ou ataque natural.",
+      "aliases": []
+    },
+    {
+      "slug": "sentir-armadilhas",
+      "titulo": "Sentir armadilhas",
+      "descricao": "+(nível do bônus) nos testes de resistência de Reflexos realizados para evitar armadilhas e +(nível do bônus) de bônus de esquiva na CA contra ataques desferidos por armadilhas.",
+      "aliases": []
+    },
+    {
+      "slug": "visao-na-penumbra",
+      "titulo": "Visão na penumbra",
+      "descricao": "Enxerga duas vezes mais longe sob a luz das estrelas, da lua, de tochas ou outras condições de iluminação precária.",
+      "aliases": []
+    },
+    {
+      "slug": "visao-no-escuro",
+      "titulo": "Visão no escuro",
+      "descricao": "Consegue enxergar até 18 metros no escuro em preto e branco.",
+      "aliases": []
+    },
+    {
+      "slug": "vontade-inabalavel",
+      "titulo": "Vontade inabalável",
+      "descricao": "+4 de bônus nos testes de resistência de Vontade para resistir a magias de encantamento quando estiver em Fúria.",
+      "aliases": []
+    }
+  ]
+}

@@ -442,7 +442,7 @@ body {
     font-weight: 700;
 }
 
-.ficha-btn-cancelar-dinheiro {
+.ficha-btn-cancelar {
     background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%);
     border: 1px solid rgba(92, 58, 30, 0.45);
     color: #fff7ed;
@@ -454,7 +454,7 @@ body {
     transition: transform 0.15s ease, filter 0.2s ease;
 }
 
-.ficha-btn-cancelar-dinheiro:hover {
+.ficha-btn-cancelar:hover {
     transform: translateY(-1px);
     filter: brightness(1.08);
 }
@@ -861,6 +861,16 @@ body {
     border-radius: 6px;
     padding: 0.4rem 0.5rem;
     line-height: 1.3;
+}
+
+.ficha-habilidade-especial-chip[title] {
+    border-bottom: 1px dotted rgba(92, 58, 30, 0.55);
+    cursor: help;
+}
+
+.ficha-habilidade-especial-chip[title]:hover {
+    background: rgba(92, 58, 30, 0.12);
+    border-radius: 3px;
 }
 
 .ficha-habilidade-especial-nivel {

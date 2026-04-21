@@ -1155,6 +1155,32 @@ export class FichaPersonagemController {
     renderizarHabilidadesEspeciais() {
         const container = document.getElementById('fichaHabilidadesEspeciais');
         if (!container) return;
+
+        // Preferência: campo enriquecido vindo do catálogo canônico.
+        // Fallback: JSON/legado persistido em `habilidades_especiais`.
+        const detalhadas = Array.isArray(this.combatente?.habilidades_especiais_detalhadas)
+            ? this.combatente.habilidades_especiais_detalhadas
+            : [];
+
+        if (detalhadas.length) {
+            container.innerHTML = detalhadas
+                .map((grupo) => {
+                    const itens = Array.isArray(grupo?.habilidades) ? grupo.habilidades : [];
+                    if (!itens.length) return '';
+                    const spans = itens
+                        .map((h) => this._renderHabilidadeEnriquecida(h))
+                        .join(', ');
+                    return `
+                        <div class="ficha-habilidade-especial-item">
+                            <span class="ficha-habilidade-especial-nivel">Nível ${Number(grupo.nivel || 0)}:</span>
+                            <span>${spans}</span>
+                        </div>
+                    `;
+                })
+                .join('');
+            return;
+        }
+
         const raw = String(this.combatente?.habilidades_especiais || '').trim();
         if (!raw) {
             container.innerHTML = '<span class="ficha-vazio">Nenhuma habilidade especial mapeada para classe/nível atual.</span>';
@@ -1173,6 +1199,18 @@ export class FichaPersonagemController {
                 </div>
             `)
             .join('');
+    }
+
+    _renderHabilidadeEnriquecida(habilidade) {
+        const raw = String(habilidade?.raw || '').trim();
+        const titulo = String(habilidade?.titulo || '').trim();
+        const descricao = String(habilidade?.descricao || '').trim();
+        const rotulo = raw || titulo;
+        if (!rotulo) return '';
+        if (!descricao) {
+            return `<span class="ficha-habilidade-especial-chip">${escapeHtml(rotulo)}</span>`;
+        }
+        return `<span class="ficha-habilidade-especial-chip" data-slug="${escapeHtml(habilidade.slug || '')}" title="${escapeHtml(descricao)}">${escapeHtml(rotulo)}</span>`;
     }
 
     renderizarCaracteristicasRaciais() {
