@@ -31,19 +31,30 @@ const DOMINIOS_PERMITIDOS_FALLBACK = [
     'Guerra', 'Magia', 'Mal', 'Morte', 'Proteção', 'Sol', 'Sorte', 'Terra', 'Viagem',
 ];
 
-const DIVINDADES_SUGERIDAS_FALLBACK = [
-    'Boccob',
-    'Corellon Larethian',
-    'Ehlonna',
-    'Erythnul',
-    'Heironeous',
-    'Hextor',
-    'Kord',
-    'Nerull',
-    'Obad-Hai',
-    'St. Cuthbert',
-    'Wee Jas',
-];
+// Fallback do catalogo de divindades (Tabela 3-7 do Livro do Jogador 3.5).
+// Usado apenas quando o endpoint /magias/divindades/catalogo estiver offline.
+// Campos: { nome, titulo, label, tendencia, dominios }
+const DIVINDADES_CATALOGO_FALLBACK = [
+    { nome: 'Heironeous',         titulo: 'Deus do Heroísmo',          tendencia: 'Leal e Bom',       dominios: ['Bem', 'Ordem', 'Guerra'] },
+    { nome: 'Moradin',            titulo: 'Deus dos Anões',            tendencia: 'Leal e Bom',       dominios: ['Terra', 'Bem', 'Ordem', 'Proteção'] },
+    { nome: 'Yondalla',           titulo: 'Deusa dos Halflings',       tendencia: 'Leal e Bom',       dominios: ['Bem', 'Ordem', 'Proteção'] },
+    { nome: 'Ehlonna',            titulo: 'Deusa das Florestas',       tendencia: 'Neutro e Bom',     dominios: ['Animal', 'Bem', 'Planta', 'Sol'] },
+    { nome: 'Garl Glittergold',   titulo: 'Deus dos Gnomos',           tendencia: 'Neutro e Bom',     dominios: ['Bem', 'Proteção', 'Enganação'] },
+    { nome: 'Pelor',              titulo: 'Deus do Sol',               tendencia: 'Neutro e Bom',     dominios: ['Bem', 'Cura', 'Força', 'Sol'] },
+    { nome: 'Corellon Larethian', titulo: 'Deus dos Elfos',            tendencia: 'Caótico e Bom',    dominios: ['Caos', 'Bem', 'Proteção', 'Guerra'] },
+    { nome: 'Kord',               titulo: 'Deus da Força',             tendencia: 'Caótico e Bom',    dominios: ['Caos', 'Bem', 'Sorte', 'Força'] },
+    { nome: 'Wee Jas',            titulo: 'Deusa da Morte e da Magia', tendencia: 'Leal e Neutro',    dominios: ['Morte', 'Ordem', 'Magia'] },
+    { nome: 'St. Cuthbert',       titulo: 'Deus da Retribuição',       tendencia: 'Leal e Neutro',    dominios: ['Destruição', 'Ordem', 'Proteção', 'Força'] },
+    { nome: 'Boccob',             titulo: 'Deus da Magia',             tendencia: 'Neutro',           dominios: ['Conhecimento', 'Magia', 'Enganação'] },
+    { nome: 'Fharlanghn',         titulo: 'Deus das Estradas',         tendencia: 'Neutro',           dominios: ['Sorte', 'Proteção', 'Viagem'] },
+    { nome: 'Obad-Hai',           titulo: 'Deus da Natureza',          tendencia: 'Neutro',           dominios: ['Ar', 'Animal', 'Terra', 'Fogo', 'Planta', 'Água'] },
+    { nome: 'Olidammara',         titulo: 'Deus dos Ladrões',          tendencia: 'Caótico e Neutro', dominios: ['Caos', 'Sorte', 'Enganação'] },
+    { nome: 'Hextor',             titulo: 'Deus da Tirania',           tendencia: 'Leal e Mau',       dominios: ['Destruição', 'Mal', 'Ordem', 'Guerra'] },
+    { nome: 'Nerull',             titulo: 'Deus da Morte',             tendencia: 'Neutro e Mau',     dominios: ['Morte', 'Mal', 'Enganação', 'Guerra'] },
+    { nome: 'Vecna',              titulo: 'Deus dos Segredos',         tendencia: 'Neutro e Mau',     dominios: ['Mal', 'Conhecimento', 'Magia'] },
+    { nome: 'Erythnul',           titulo: 'Deus da Matança',           tendencia: 'Caótico e Mau',    dominios: ['Caos', 'Mal', 'Enganação', 'Guerra'] },
+    { nome: 'Gruumsh',            titulo: 'Deus dos Orcs',             tendencia: 'Caótico e Mau',    dominios: ['Caos', 'Mal', 'Força', 'Guerra'] },
+].map((item) => ({ ...item, label: `${item.nome}, ${item.titulo}` }));
 
 export class FichaPersonagemController {
 
@@ -56,7 +67,7 @@ export class FichaPersonagemController {
         this.combatente        = null;
         this.bonusCaProtecao   = 0;
         this.dominiosPermitidos = [...DOMINIOS_PERMITIDOS_FALLBACK];
-        this.divindadesSugeridas = [...DIVINDADES_SUGERIDAS_FALLBACK];
+        this.divindadesCatalogo = DIVINDADES_CATALOGO_FALLBACK.map((item) => ({ ...item }));
         this.fonteDivindades = 'fallback';
         this._dadosDivinosCarregados = false;
 
@@ -560,7 +571,7 @@ export class FichaPersonagemController {
         }
         if (nivel)  nivel.textContent  = this.combatente.nivel  || 1;
         if (alinhamento) alinhamento.textContent = `Alinhamento: ${this.combatente.alinhamento || '—'}`;
-        if (divindade) divindade.textContent = `Divindade: ${this.combatente.divindade || '—'}`;
+        if (divindade) divindade.textContent = `Divindade: ${this._formatarDivindadeExibicao(this.combatente.divindade)}`;
         if (dominios) {
             if (this._ehClasseClerigo()) {
                 dominios.textContent = `Domínios: ${this._formatarDominios(this.combatente.dominios)}`;
@@ -676,7 +687,7 @@ export class FichaPersonagemController {
 
     async _carregarDivindadesSugeridas() {
         try {
-            const response = await fetch(getApiUrl('/magias/divindades'), {
+            const response = await fetch(getApiUrl('/magias/divindades/catalogo'), {
                 headers: this._getAuthHeader(),
             });
 
@@ -684,23 +695,59 @@ export class FichaPersonagemController {
                 throw new Error(`HTTP ${response.status}`);
             }
 
-            const divindades = await response.json();
-            if (Array.isArray(divindades) && divindades.length > 0) {
-                this.divindadesSugeridas = [...new Set(
-                    divindades
-                        .map((divindade) => String(divindade).trim())
-                        .filter(Boolean),
-                )];
+            const catalogo = await response.json();
+            if (Array.isArray(catalogo) && catalogo.length > 0) {
+                this.divindadesCatalogo = catalogo
+                    .map((item) => ({
+                        nome: String(item?.nome || '').trim(),
+                        titulo: String(item?.titulo || '').trim(),
+                        label: String(item?.label || '').trim() || `${String(item?.nome || '').trim()}, ${String(item?.titulo || '').trim()}`,
+                        tendencia: String(item?.tendencia || '').trim(),
+                        dominios: Array.isArray(item?.dominios)
+                            ? item.dominios.map((d) => String(d).trim()).filter(Boolean)
+                            : [],
+                        descricao: String(item?.descricao || '').trim(),
+                    }))
+                    .filter((item) => item.nome);
                 this.fonteDivindades = 'catalogo';
             }
         } catch (error) {
-            console.warn('⚠️ Não foi possível carregar divindades sugeridas do backend para a ficha:', error);
-            this.divindadesSugeridas = [...DIVINDADES_SUGERIDAS_FALLBACK];
+            console.warn('⚠️ Não foi possível carregar o catálogo de divindades do backend para a ficha:', error);
+            this.divindadesCatalogo = DIVINDADES_CATALOGO_FALLBACK.map((item) => ({ ...item }));
             this.fonteDivindades = 'fallback';
         }
 
         this._renderizarListaDivindadesPerfil();
         this._atualizarHintDivindadesPerfil();
+    }
+
+    /**
+     * Localiza uma divindade no catálogo por nome ou label (case/acento-insensitive).
+     * @param {string} valor
+     * @returns {object|null}
+     */
+    _buscarDivindadePorNome(valor) {
+        if (!valor) return null;
+        const chave = String(valor).normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+        if (!chave) return null;
+        const match = (this.divindadesCatalogo || []).find((item) => {
+            const chaveNome = String(item.nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+            const chaveLabel = String(item.label || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+            return chaveNome === chave || chaveLabel === chave;
+        });
+        return match || null;
+    }
+
+    /**
+     * Formata a divindade para exibição, preferindo "Nome, Título" quando conhecida.
+     * @param {string} valor
+     * @returns {string}
+     */
+    _formatarDivindadeExibicao(valor) {
+        const texto = String(valor || '').trim();
+        if (!texto) return '—';
+        const encontrada = this._buscarDivindadePorNome(texto);
+        return encontrada ? encontrada.label : texto;
     }
 
     _renderizarListaDominiosPerfil() {
@@ -735,34 +782,48 @@ export class FichaPersonagemController {
     }
 
     _renderizarListaDivindadesPerfil() {
-        const lista = document.getElementById('listaPerfilDivindades');
-        if (!lista) return;
+        const select = document.getElementById('selectPerfilDivindade');
+        if (!select) return;
 
-        lista.innerHTML = this.divindadesSugeridas
-            .map((divindade) => `<option value="${escapeHtml(divindade)}"></option>`)
-            .join('');
+        const valorAtual = String(this.combatente?.divindade || '').trim();
+        const existente = this._buscarDivindadePorNome(valorAtual);
+
+        const opcoes = [];
+        opcoes.push('<option value="">Nenhuma / Não aplicável</option>');
+
+        // Preserva valor legado/personalizado que nao esta no catalogo
+        if (valorAtual && !existente) {
+            opcoes.push(
+                `<option value="${escapeHtml(valorAtual)}">${escapeHtml(valorAtual)} (personalizada)</option>`
+            );
+        }
+
+        (this.divindadesCatalogo || []).forEach((item) => {
+            opcoes.push(
+                `<option value="${escapeHtml(item.nome)}">${escapeHtml(item.label)}</option>`
+            );
+        });
+
+        select.innerHTML = opcoes.join('');
+        select.value = existente ? existente.nome : valorAtual;
     }
 
     _atualizarHintDivindadesPerfil() {
         const hint = document.getElementById('hintPerfilDivindade');
         if (!hint) return;
 
-        const total = Array.isArray(this.divindadesSugeridas) ? this.divindadesSugeridas.length : 0;
-        const singular = total === 1;
-        const sufixoQuantidade = `${total} sugest${singular ? 'ão' : 'ões'}`;
-        const sufixoCarga = singular ? 'carregada' : 'carregadas';
-        const sufixoLocal = singular ? 'local ativa' : 'locais ativas';
+        const total = Array.isArray(this.divindadesCatalogo) ? this.divindadesCatalogo.length : 0;
         const veioDoCatalogo = this.fonteDivindades === 'catalogo';
 
         if (total === 0) {
-            hint.textContent = 'Nenhuma sugestão disponível no momento.';
+            hint.textContent = 'Nenhuma divindade disponível no momento.';
             hint.classList.toggle('is-fallback', true);
             return;
         }
 
         hint.textContent = veioDoCatalogo
-            ? `${sufixoQuantidade} ${sufixoCarga} do catálogo.`
-            : `${sufixoQuantidade} ${sufixoLocal} (catálogo indisponível no momento).`;
+            ? `${total} divindades carregadas do catálogo (Tabela 3-7).`
+            : `${total} divindades em cache local (catálogo offline no momento).`;
         hint.classList.toggle('is-fallback', !veioDoCatalogo);
     }
 
@@ -790,7 +851,7 @@ export class FichaPersonagemController {
     abrirModalPerfilMagico() {
         const modal = document.getElementById('modalPerfilMagico');
         const inputAlinhamento = document.getElementById('inputPerfilAlinhamento');
-        const inputDivindade = document.getElementById('inputPerfilDivindade');
+        const selectDivindade = document.getElementById('selectPerfilDivindade');
         const selectDominio1 = document.getElementById('selectPerfilDominio1');
         const selectDominio2 = document.getElementById('selectPerfilDominio2');
         const clerigo = this._ehClasseClerigo();
@@ -806,15 +867,19 @@ export class FichaPersonagemController {
         }
 
         this._renderizarListaDominiosPerfil();
-        
+        this._renderizarListaDivindadesPerfil();
+
         // ✅ Usar helper centralizado para ler perfil divino
         const { alinhamento, divindade, dominio1, dominio2 } = this._lerPerfilDivino();
-        
+
         if (inputAlinhamento) inputAlinhamento.value = alinhamento;
-        if (inputDivindade) inputDivindade.value = divindade;
+        if (selectDivindade) {
+            const encontrada = this._buscarDivindadePorNome(divindade);
+            selectDivindade.value = encontrada ? encontrada.nome : divindade;
+        }
         if (selectDominio1) selectDominio1.value = clerigo ? this._canonicalizarDominio(dominio1) : '';
         if (selectDominio2) selectDominio2.value = clerigo ? this._canonicalizarDominio(dominio2) : '';
-        
+
         modal.style.display = 'flex';
     }
 
@@ -870,6 +935,36 @@ export class FichaPersonagemController {
         return normalizados.join(', ');
     }
 
+    /**
+     * Valida (pre-submit) se os dominios escolhidos pertencem a divindade do catalogo.
+     * A validacao definitiva tambem acontece no backend (CombatenteService).
+     * @param {string} divindade
+     * @param {string} dominiosCsv
+     */
+    _validarDominiosContraDivindade(divindade, dominiosCsv) {
+        if (!this._ehClasseClerigo()) return;
+        if (!divindade || !dominiosCsv) return;
+
+        const encontrada = this._buscarDivindadePorNome(divindade);
+        if (!encontrada) return; // divindade fora do catalogo → nao ha como validar
+
+        const normalizar = (s) => String(s || '')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .trim().toLowerCase();
+
+        const permitidas = new Set((encontrada.dominios || []).map(normalizar));
+        const escolhidas = dominiosCsv.split(',').map((item) => item.trim()).filter(Boolean);
+        const invalidos = escolhidas.filter((d) => !permitidas.has(normalizar(d)));
+
+        if (invalidos.length) {
+            const permitidosTxt = (encontrada.dominios || []).join(', ');
+            throw new Error(
+                `Divindade "${encontrada.label}" não permite o(s) domínio(s): ${invalidos.join(', ')}. `
+                + `Domínios aceitos: ${permitidosTxt}.`
+            );
+        }
+    }
+
     _buildFormDataAtualizacaoCombatente(overrides = {}) {
         const formData = new FormData();
         const payload = {
@@ -914,17 +1009,18 @@ export class FichaPersonagemController {
         if (!this.combatente?.id) return;
 
         const inputAlinhamento = document.getElementById('inputPerfilAlinhamento');
-        const inputDivindade = document.getElementById('inputPerfilDivindade');
+        const selectDivindade = document.getElementById('selectPerfilDivindade');
         const selectDominio1 = document.getElementById('selectPerfilDominio1');
         const selectDominio2 = document.getElementById('selectPerfilDominio2');
         const alinhamento = inputAlinhamento?.value || '';
-        const divindade = inputDivindade?.value || '';
+        const divindade = (selectDivindade?.value || '').trim();
 
         try {
             const dominios = this._normalizarDominiosPerfilSelecionados(
                 selectDominio1?.value || '',
                 selectDominio2?.value || '',
             );
+            this._validarDominiosContraDivindade(divindade, dominios);
             const formData = this._buildFormDataAtualizacaoCombatente({ alinhamento, divindade, dominios });
             this.combatente = await this.combatenteService.atualizar(this.combatente.id, formData);
 

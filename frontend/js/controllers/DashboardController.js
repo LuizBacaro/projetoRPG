@@ -2,21 +2,10 @@
  * DashboardController.js
  * SOLID: SRP - gerencia apenas dashboard de combatentes
  * Dependências globais: AuthService, Toast, ModalConfirm, AtaqueService
+ *
+ * Nota: a escolha/edicao de Divindade foi movida para a ficha do personagem.
+ * O dashboard apenas preserva o valor ja gravado atraves de um input hidden.
  */
-
-const DIVINDADES_SUGERIDAS_FALLBACK = [
-    'Boccob',
-    'Corellon Larethian',
-    'Ehlonna',
-    'Erythnul',
-    'Heironeous',
-    'Hextor',
-    'Kord',
-    'Nerull',
-    'Obad-Hai',
-    'St. Cuthbert',
-    'Wee Jas',
-];
 
 class DashboardController {
 
@@ -40,8 +29,6 @@ class DashboardController {
         this.combatenteEmEdicao = null;
         this.actions             = {};
         this.perfil              = AuthService.getPerfil();
-        this.divindadesSugeridas = [...DIVINDADES_SUGERIDAS_FALLBACK];
-        this.fonteDivindades     = 'fallback';
         this.racasDisponiveis    = [];
         this.racaSlugPorNome     = new Map();
         this.racaDetalheCache    = new Map();
@@ -102,9 +89,6 @@ class DashboardController {
     _inicializar() {
         // ✅ NOVO: Configurar header do usuário
         window.AuthService.configurarHeaderUsuario();
-        this._renderizarListaDivindades();
-        this._atualizarHintDivindades();
-        this._carregarDivindadesSugeridas();
         this._configurarLinksGovernanca();
 
         this._aplicarRestricoesPerfil();
@@ -132,74 +116,6 @@ class DashboardController {
             if (token) h.Authorization = `Bearer ${token}`;
         }
         return h;
-    }
-
-    async _carregarDivindadesSugeridas() {
-        try {
-            const response = await fetch(window.getApiUrl('/magias/divindades'), {
-                headers: this._getAuthHeader(),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const divindades = await response.json();
-            if (Array.isArray(divindades) && divindades.length > 0) {
-                this.divindadesSugeridas = [...new Set(
-                    divindades
-                        .map((divindade) => String(divindade).trim())
-                        .filter(Boolean),
-                )];
-                this.fonteDivindades = 'catalogo';
-            }
-        } catch (error) {
-            console.warn('⚠️ Não foi possível carregar divindades sugeridas no dashboard:', error);
-            this.divindadesSugeridas = [...DIVINDADES_SUGERIDAS_FALLBACK];
-            this.fonteDivindades = 'fallback';
-        }
-
-        this._renderizarListaDivindades();
-        this._atualizarHintDivindades();
-    }
-
-    _renderizarListaDivindades() {
-        const lista = document.getElementById('listaDivindadesDashboard');
-        if (!lista) return;
-
-        lista.innerHTML = this.divindadesSugeridas
-            .map((divindade) => `<option value="${escapeHtml(divindade)}"></option>`)
-            .join('');
-    }
-
-    _atualizarHintDivindades() {
-        const hintCadastro = document.getElementById('hintDivindadeCadastroJogador');
-        const hintEdicao = document.getElementById('hintDivindadeEdicao');
-        const veioDoCatalogo = this.fonteDivindades === 'catalogo';
-        const total = Array.isArray(this.divindadesSugeridas) ? this.divindadesSugeridas.length : 0;
-        const singular = total === 1;
-        const sufixoQuantidade = `${total} sugest${singular ? 'ão' : 'ões'}`;
-        const sufixoCarga = singular ? 'carregada' : 'carregadas';
-        const sufixoLocal = singular ? 'local ativa' : 'locais ativas';
-
-        if (total === 0) {
-            [hintCadastro, hintEdicao].forEach((hint) => {
-                if (!hint) return;
-                hint.textContent = 'Nenhuma sugestão disponível no momento.';
-                hint.classList.toggle('is-fallback', true);
-            });
-            return;
-        }
-
-        const texto = veioDoCatalogo
-            ? `${sufixoQuantidade} ${sufixoCarga} do catálogo.`
-            : `${sufixoQuantidade} ${sufixoLocal} (catálogo indisponível no momento).`;
-
-        [hintCadastro, hintEdicao].forEach((hint) => {
-            if (!hint) return;
-            hint.textContent = texto;
-            hint.classList.toggle('is-fallback', !veioDoCatalogo);
-        });
     }
 
     _configurarLinksGovernanca() {

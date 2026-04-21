@@ -25,6 +25,7 @@ from ..core.bonus_base_ataque import (
 )
 from ..core.racas_catalog import get_raca_by_slug_or_name
 from ..core.habilidades_especiais_catalog import resolver_por_texto as _resolver_habilidade_por_texto
+from ..core import divindades_catalogo as _divindades_catalogo
 from ..exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
@@ -307,6 +308,7 @@ class CombatenteService:
             combatente_data,
             classe_atual=combatente.classe,
             dominios_atuais=combatente.dominios,
+            divindade_atual=combatente.divindade,
             exigir_dois_dominios_clerigo=False,
         )
         self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=combatente)
@@ -929,6 +931,7 @@ class CombatenteService:
         combatente_data: dict,
         classe_atual: Optional[str] = None,
         dominios_atuais: Optional[str] = None,
+        divindade_atual: Optional[str] = None,
         exigir_dois_dominios_clerigo: bool = True,
     ) -> None:
         classe_final = combatente_data.get("classe", classe_atual or "")
@@ -945,6 +948,26 @@ class CombatenteService:
 
         if len(dominios) != 2:
             raise DadosInvalidos("Clérigo deve escolher exatamente dois domínios")
+
+        # Validacao contra o catalogo da Tabela 3-7: se a divindade estiver
+        # catalogada, os dois dominios devem pertencer a sua lista.
+        divindade = combatente_data.get("divindade")
+        if divindade is None:
+            divindade = divindade_atual or ""
+        divindade = str(divindade).strip()
+        if divindade:
+            permitidos = _divindades_catalogo.dominios_permitidos(divindade)
+            if permitidos is not None:
+                invalidos = _divindades_catalogo.validar_dominios_para_divindade(
+                    divindade, dominios
+                )
+                if invalidos:
+                    permitidos_txt = ", ".join(permitidos)
+                    invalidos_txt = ", ".join(invalidos)
+                    raise DadosInvalidos(
+                        f"Divindade '{divindade}' não permite o(s) domínio(s): "
+                        f"{invalidos_txt}. Domínios aceitos: {permitidos_txt}."
+                    )
 
         combatente_data["dominios"] = ", ".join(dominios)
 

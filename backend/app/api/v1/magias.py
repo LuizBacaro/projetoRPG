@@ -230,6 +230,29 @@ def listar_divindades_sugeridas(
     return divindades
 
 
+@router.get("/divindades/catalogo")
+def listar_divindades_catalogo(
+    db: Session = Depends(get_db),
+    service: Optional[MagiaService] = Depends(get_magia_service),
+):
+    """Catalogo rico de divindades (Tabela 3-7 do Livro do Jogador 3.5).
+
+    Cada item traz: nome, titulo, label ('Nome, Titulo'), tendencia,
+    dominios (lista canonica) e descricao curta.
+    """
+    cache_key = "magias:divindades:catalogo"
+    if settings.CACHE_ENABLED:
+        cached = catalog_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+    srv = _resolve_service(service, db)
+    catalogo = srv.listar_divindades_catalogo()
+    if settings.CACHE_ENABLED:
+        catalog_cache.set(cache_key, catalogo, settings.CACHE_CATALOG_TTL_SECONDS)
+    return catalogo
+
+
 @router.get("/importacao/modelo")
 def baixar_modelo_importacao(
     service: MagiaImportService = Depends(get_magia_import_service),

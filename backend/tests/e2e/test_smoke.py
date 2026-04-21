@@ -146,9 +146,9 @@ def test_modal_perfil_divino_preenche_divindade(page: Page):
     modal = page.locator("#modalPerfilMagico")
     expect(modal).to_be_visible()
 
-    # Campo de divindade existe (não verifica valor específico pois depende do dado)
-    input_divindade = page.locator("#inputPerfilDivindade")
-    expect(input_divindade).to_be_visible()
+    # Campo de divindade existe (agora é um <select> alimentado pelo catálogo da Tabela 3-7)
+    select_divindade = page.locator("#selectPerfilDivindade")
+    expect(select_divindade).to_be_visible()
 
 
 def test_modal_perfil_salva_e_persiste(page: Page):

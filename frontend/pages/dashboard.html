@@ -168,12 +168,6 @@
                 </div>
 
                 <div class="dash-form-group">
-                    <label>Divindade</label>
-                    <input type="text" name="divindade" list="listaDivindadesDashboard" maxlength="80" placeholder="Ex.: St. Cuthbert, Wee Jas, Obad-Hai" />
-                    <p class="dash-input-hint" id="hintDivindadeCadastroJogador">Carregando sugestões...</p>
-                </div>
-
-                <div class="dash-form-group">
                     <label>Nome do Personagem *</label>
                     <input type="text" name="nome" required placeholder="Ex: Aragorn" />
                 </div>
@@ -435,11 +429,9 @@
                     <div class="dash-raca-preview" id="dashEditRacaPreview" aria-live="polite"></div>
                 </div>
 
-                <div class="dash-form-group">
-                    <label>Divindade</label>
-                    <input type="text" id="dashEditDivindade" name="divindade" list="listaDivindadesDashboard" maxlength="80" placeholder="Ex.: St. Cuthbert, Wee Jas, Obad-Hai" />
-                    <p class="dash-input-hint" id="hintDivindadeEdicao">Carregando sugestões...</p>
-                </div>
+                <!-- Divindade agora e editada somente na ficha do personagem.
+                     Mantemos um input oculto para preservar o valor existente no update. -->
+                <input type="hidden" id="dashEditDivindade" name="divindade" />
 
                 <div class="dash-form-group" id="secaoPaginaReferencia" style="display:none">
                     <label>📖 Página de Referência</label>
@@ -527,8 +519,6 @@
 <!-- ════════════════════════════════════════════════════════════════ -->
 <!-- SCRIPTS — CARREGAMENTO OTIMIZADO                                -->
 <!-- ════════════════════════════════════════════════════════════════ -->
-
-<datalist id="listaDivindadesDashboard"></datalist>
 
 <!-- FASE 1: API → mesma origem que api.config.js (Render fora de localhost); síncrono antes dos scripts abaixo -->
 <script src="/js/config/api-url-global.js"></script>

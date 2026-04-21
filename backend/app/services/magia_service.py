@@ -8,6 +8,7 @@ from typing import Any
 from fastapi import HTTPException
 
 from ..core.text_utils import normalizar_classe as _normalizar_classe
+from ..core import divindades_catalogo as _divindades_catalogo
 
 from ..models.magia import Magia
 from ..repositories.base import commit_with_rollback
@@ -34,20 +35,6 @@ DOMINIOS_FIXOS = {
     "TERRA": "Terra",
     "VIAGEM": "Viagem",
 }
-
-DIVINDADES_SUGERIDAS = [
-    "Boccob",
-    "Corellon Larethian",
-    "Ehlonna",
-    "Erythnul",
-    "Heironeous",
-    "Hextor",
-    "Kord",
-    "Nerull",
-    "Obad-Hai",
-    "St. Cuthbert",
-    "Wee Jas",
-]
 
 
 class MagiaService:
@@ -79,7 +66,12 @@ class MagiaService:
         return list(DOMINIOS_FIXOS.values())
 
     def listar_divindades_sugeridas(self) -> list[str]:
-        return list(DIVINDADES_SUGERIDAS)
+        """Nomes canonicos das divindades (retrocompatibilidade com /magias/divindades)."""
+        return _divindades_catalogo.listar_nomes()
+
+    def listar_divindades_catalogo(self) -> list[dict]:
+        """Catalogo rico (nome, titulo, label, tendencia, dominios, descricao)."""
+        return _divindades_catalogo.listar_catalogo()
 
     def obter_por_id(self, magia_id: int) -> Magia:
         magia = self.repository.get_by_id(magia_id)

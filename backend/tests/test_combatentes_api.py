@@ -61,9 +61,10 @@ def _combatente_payload(**overrides):
         "tipo": "jogador",
         "classe": "Clérigo",
         "raca": "Humano",
+        # St. Cuthbert (Tabela 3-7): Destruição, Ordem, Proteção, Força
         "divindade": "St. Cuthbert",
         "alinhamento": "Leal e Bom",
-        "dominios": "Cura, Proteção",
+        "dominios": "Proteção, Força",
         "hp_maximo": "18",
         "iniciativa": "1",
         "ca": "16",
@@ -96,7 +97,7 @@ def test_criar_combatente_retorna_alinhamento_e_dominios(combatentes_db):
     assert body["dono_id"] == 77
     assert body["divindade"] == "St. Cuthbert"
     assert body["alinhamento"] == "Leal e Bom"
-    assert body["dominios"] == "Cura, Proteção"
+    assert body["dominios"] == "Proteção, Força"
     assert body["hp_atual"] == 18
     assert body["pc"] == 0
     assert body["pp"] == 0
@@ -134,9 +135,10 @@ def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatent
     atualizar = client.put(
         f"/api/v1/combatentes/{combatente_id}",
         data=_combatente_payload(
+            # Wee Jas (Tabela 3-7): Morte, Ordem, Magia
             divindade="Wee Jas",
             alinhamento="Neutro e Bom",
-            dominios="Cura, Sol",
+            dominios="Morte, Magia",
             sabedoria="18",
         ),
     )
@@ -145,7 +147,7 @@ def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatent
     body = atualizar.json()
     assert body["divindade"] == "Wee Jas"
     assert body["alinhamento"] == "Neutro e Bom"
-    assert body["dominios"] == "Cura, Sol"
+    assert body["dominios"] == "Morte, Magia"
     assert body["sabedoria"] == 18
 
     obter = client.get(f"/api/v1/combatentes/{combatente_id}")
@@ -153,7 +155,7 @@ def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatent
     assert obter.status_code == 200
     assert obter.json()["divindade"] == "Wee Jas"
     assert obter.json()["alinhamento"] == "Neutro e Bom"
-    assert obter.json()["dominios"] == "Cura, Sol"
+    assert obter.json()["dominios"] == "Morte, Magia"
 
 
 def test_aplicar_dano_massa_sucesso(combatentes_db):
