@@ -1419,22 +1419,50 @@ body::before {
         font-size: 1.2rem;
     }
 
+    /* Flex em coluna evita bug de linhas de grid “colapsadas” / sobrepostas em Chrome Android */
     .ficha-pericia-item {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
         padding: 0.55rem 0.65rem;
         gap: 0.45rem;
-        flex-wrap: wrap;
-        min-height: auto;
+        min-height: min-content;
+        overflow: visible;
     }
 
     .ficha-pericia-nome {
-        flex: 1 1 100%;
-        margin-bottom: 0.2rem;
+        width: 100%;
+        margin-bottom: 0;
+        padding-right: 0;
         white-space: normal;
+        flex: none;
     }
 
     .ficha-pericia-atributo {
         min-width: 30px;
+        margin: 0;
         font-size: 0.62rem;
+        align-self: flex-start;
+        text-align: left;
+    }
+
+    .ficha-pericia-mods {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.4rem;
+        padding-left: 0;
+        flex-shrink: 0;
+    }
+
+    .ficha-pericia-mod {
+        min-width: 0;
+    }
+
+    .ficha-pericias-lista {
+        gap: 0.7rem;
+        -webkit-overflow-scrolling: touch;
     }
 
     .ficha-pericia-mod-valor {
@@ -1446,6 +1474,26 @@ body::before {
         font-size: 0.8rem;
         min-width: 32px;
     }
+
+    .ficha-secao-header {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+
+    .ficha-secao-header .ficha-secao-titulo {
+        flex: 1 1 100%;
+        padding-bottom: 0.25rem;
+    }
+
+    .ficha-secao-header .ficha-btn-adicionar {
+        margin-left: auto;
+    }
+
+    /* overflow:hidden na seção cortava / empilhava lista longa em alguns WebViews */
+    .ficha-secao.ficha-secao-pericias {
+        overflow: visible;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1454,7 +1502,12 @@ body::before {
     }
 
     .ficha-pericia-item {
-        padding: 0.35rem 0.4rem;
+        padding: 0.42rem 0.48rem;
+        gap: 0.38rem;
+    }
+
+    .ficha-pericias-lista {
+        gap: 0.65rem;
     }
 
     .ficha-pericia-nome {
@@ -1463,11 +1516,10 @@ body::before {
 
     .ficha-pericia-atributo {
         font-size: 0.58rem;
-        margin: 0 0.3rem;
     }
 
     .ficha-pericia-mods {
-        gap: 0.45rem;
+        gap: 0.28rem;
     }
 
     .ficha-pericia-mod-label {
@@ -1828,6 +1880,13 @@ body::before {
 
 .ficha-btn-adicionar:hover {
     background: #2a7a3a;
+}
+
+.ficha-secao-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
 }
 
 .ficha-btn-salvar {
@@ -3141,22 +3200,24 @@ body {
     animation: sheen 0.8s ease-out forwards;
 }
 
-/* ── 15. Perícia Items: Stagger Entrance ── */
+/* ── 15. Perícia Items: Stagger Entrance (só desktop — transform em mobile + scroll costuma “empilhar” itens) ── */
 
-.ficha-pericia-item {
-    animation: fadeInUp 0.3s ease-out both;
+@media (min-width: 769px) {
+    .ficha-pericia-item {
+        animation: fadeInUp 0.3s ease-out both;
+    }
+
+    .ficha-pericia-item:nth-child(1)  { animation-delay: 0.4s; }
+    .ficha-pericia-item:nth-child(2)  { animation-delay: 0.44s; }
+    .ficha-pericia-item:nth-child(3)  { animation-delay: 0.48s; }
+    .ficha-pericia-item:nth-child(4)  { animation-delay: 0.52s; }
+    .ficha-pericia-item:nth-child(5)  { animation-delay: 0.56s; }
+    .ficha-pericia-item:nth-child(6)  { animation-delay: 0.60s; }
+    .ficha-pericia-item:nth-child(7)  { animation-delay: 0.64s; }
+    .ficha-pericia-item:nth-child(8)  { animation-delay: 0.68s; }
+    .ficha-pericia-item:nth-child(9)  { animation-delay: 0.72s; }
+    .ficha-pericia-item:nth-child(10) { animation-delay: 0.76s; }
 }
-
-.ficha-pericia-item:nth-child(1)  { animation-delay: 0.4s; }
-.ficha-pericia-item:nth-child(2)  { animation-delay: 0.44s; }
-.ficha-pericia-item:nth-child(3)  { animation-delay: 0.48s; }
-.ficha-pericia-item:nth-child(4)  { animation-delay: 0.52s; }
-.ficha-pericia-item:nth-child(5)  { animation-delay: 0.56s; }
-.ficha-pericia-item:nth-child(6)  { animation-delay: 0.60s; }
-.ficha-pericia-item:nth-child(7)  { animation-delay: 0.64s; }
-.ficha-pericia-item:nth-child(8)  { animation-delay: 0.68s; }
-.ficha-pericia-item:nth-child(9)  { animation-delay: 0.72s; }
-.ficha-pericia-item:nth-child(10) { animation-delay: 0.76s; }
 
 /* Hover mais expressivo nas perícias */
 .ficha-pericia-item:hover {
