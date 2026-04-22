@@ -17,8 +17,23 @@ Este catalogo alimenta:
 
 from __future__ import annotations
 
-from typing import Iterable, List, Optional, TypedDict
+from typing import Any, Iterable, List, Optional, Sequence, Tuple, TypedDict
 import unicodedata
+
+
+# ---------------------------------------------------------------------------
+# Constantes de alinhamento (regra do "um passo" D&D 3.5)
+# ---------------------------------------------------------------------------
+
+# Domínios cujo alinhamento intrínseco é incompatível com a tendência oposta
+# do personagem/clérigo. (PHB 3.5 — um clérigo não pode escolher domínio
+# cujo descritor conflite com o próprio alinhamento.)
+DOMINIO_EIXO_ALINHAMENTO = {
+    "bem": ("moral", 1),    # exige não-Mau
+    "mal": ("moral", -1),   # exige não-Bom
+    "ordem": ("ordem", 1),  # exige não-Caótico
+    "caos": ("ordem", -1),  # exige não-Leal
+}
 
 
 class DivindadeCatalogo(TypedDict):
@@ -205,47 +220,122 @@ def _key(valor: str) -> str:
 
 
 def listar_catalogo() -> List[DivindadeCatalogo]:
-    """Retorna copia do catalogo (evita mutacao acidental)."""
+    """Retorna copia do catalogo OFICIAL (sem customizadas)."""
     return [dict(item) for item in DIVINDADES]  # type: ignore[misc]
 
 
+def _normalizar_custom(entrada: Any) -> Optional[DivindadeCatalogo]:
+    """Converte um registro de DivindadeCustom (ORM, dict ou schema) em
+    DivindadeCatalogo. Retorna None se nao tiver nome."""
+    if entrada is None:
+        return None
+
+    def _get(key: str, default: Any = None) -> Any:
+        if isinstance(entrada, dict):
+            return entrada.get(key, default)
+        return getattr(entrada, key, default)
+
+    nome = str(_get("nome", "") or "").strip()
+    if not nome:
+        return None
+    titulo = str(_get("titulo", "") or "").strip()
+    tendencia = str(_get("tendencia", "") or "").strip()
+    descricao = _get("descricao", "") or ""
+    dominios_raw = _get("dominios", []) or []
+    if isinstance(dominios_raw, str):
+        dominios = [item.strip() for item in dominios_raw.split(",") if item.strip()]
+    else:
+        dominios = [str(item).strip() for item in dominios_raw if str(item).strip()]
+    label = f"{nome}, {titulo}" if titulo else nome
+    return {
+        "nome": nome,
+        "titulo": titulo,
+        "label": label,
+        "tendencia": tendencia,
+        "dominios": dominios,
+        "descricao": str(descricao).strip(),
+    }
+
+
+def listar_catalogo_completo(
+    customizadas: Optional[Sequence[Any]] = None,
+) -> List[DivindadeCatalogo]:
+    """Retorna o catalogo oficial acrescido das divindades customizadas
+    (passadas pelo service). Customizadas com nome duplicado em relacao ao
+    catalogo oficial sao ignoradas (oficial tem prioridade)."""
+    base = listar_catalogo()
+    if not customizadas:
+        return base
+    chaves = {_key(item["nome"]) for item in base}
+    for bruto in customizadas:
+        normalizado = _normalizar_custom(bruto)
+        if not normalizado:
+            continue
+        chave = _key(normalizado["nome"])
+        if chave in chaves:
+            continue
+        base.append(normalizado)
+        chaves.add(chave)
+    return base
+
+
 def listar_nomes() -> List[str]:
-    """Retorna apenas os nomes canonicos (uso historico em /magias/divindades)."""
+    """Retorna apenas os nomes canonicos do catalogo oficial."""
     return [item["nome"] for item in DIVINDADES]
 
 
 def listar_labels() -> List[str]:
-    """Retorna labels 'Nome, Titulo' para exibicao em UI."""
+    """Retorna labels 'Nome, Titulo' do catalogo oficial."""
     return [item["label"] for item in DIVINDADES]
 
 
-def buscar_por_nome(nome: str) -> Optional[DivindadeCatalogo]:
-    """Localiza uma divindade por nome ou label (tolerante a acento/caixa)."""
+def buscar_por_nome(
+    nome: str,
+    customizadas: Optional[Sequence[Any]] = None,
+) -> Optional[DivindadeCatalogo]:
+    """Localiza uma divindade por nome ou label no catalogo oficial e, opcionalmente,
+    nas customizadas fornecidas. Tolerante a acento/caixa."""
     if not nome:
         return None
     chave = _key(nome)
     for item in DIVINDADES:
         if _key(item["nome"]) == chave or _key(item["label"]) == chave:
             return dict(item)  # type: ignore[return-value]
+    if customizadas:
+        for bruto in customizadas:
+            normalizado = _normalizar_custom(bruto)
+            if not normalizado:
+                continue
+            if _key(normalizado["nome"]) == chave or _key(normalizado["label"]) == chave:
+                return normalizado
     return None
 
 
-def dominios_permitidos(nome: str) -> Optional[List[str]]:
-    """Retorna lista de dominios canonicos permitidos para a divindade, ou None se nao catalogada."""
-    item = buscar_por_nome(nome)
+def dominios_permitidos(
+    nome: str,
+    customizadas: Optional[Sequence[Any]] = None,
+) -> Optional[List[str]]:
+    """Retorna a lista de dominios canonicos permitidos para a divindade,
+    considerando catalogo oficial + customizadas passadas. None = nao catalogada."""
+    item = buscar_por_nome(nome, customizadas=customizadas)
     if not item:
         return None
     return list(item["dominios"])
 
 
-def validar_dominios_para_divindade(nome: str, dominios: Iterable[str]) -> List[str]:
+def validar_dominios_para_divindade(
+    nome: str,
+    dominios: Iterable[str],
+    customizadas: Optional[Sequence[Any]] = None,
+) -> List[str]:
     """
     Valida se os dominios informados pertencem a lista da divindade.
 
     Retorna a lista de dominios invalidos (nomes exatos informados).
-    Se a divindade nao estiver no catalogo, retorna [] (sem validacao).
+    Se a divindade nao estiver no catalogo (oficial + customizadas), retorna []
+    (sem validacao — sera tratada como divindade homebrew fora do sistema).
     """
-    permitidos = dominios_permitidos(nome)
+    permitidos = dominios_permitidos(nome, customizadas=customizadas)
     if permitidos is None:
         return []
 
@@ -254,5 +344,126 @@ def validar_dominios_para_divindade(nome: str, dominios: Iterable[str]) -> List[
     for item in dominios:
         chave = _key(item)
         if chave and chave not in chaves_permitidas:
+            invalidos.append(str(item).strip())
+    return invalidos
+
+
+# ---------------------------------------------------------------------------
+# Helpers de alinhamento (filtros em cascata)
+# ---------------------------------------------------------------------------
+
+
+def parse_alinhamento(valor: str) -> Optional[Tuple[int, int]]:
+    """
+    Converte uma tendencia ("Leal e Bom", "Caotico e Mau", "Neutro", ...) em
+    um par (eixo_ordem, eixo_moral) onde cada eixo vale:
+
+    * eixo_ordem : 1 = Leal, 0 = Neutro, -1 = Caotico
+    * eixo_moral : 1 = Bom,  0 = Neutro, -1 = Mau
+
+    Retorna None quando nao consegue interpretar o valor (ex.: string vazia).
+    Aceita "Mal" e "Mau" como sinonimos.
+    """
+    chave = _key(valor)
+    if not chave:
+        return None
+
+    # "Neutro" puro = (0, 0)
+    if chave in {"neutro", "verdadeiro neutro", "neutro neutro"}:
+        return (0, 0)
+
+    ordem = 0
+    moral = 0
+
+    if "leal" in chave:
+        ordem = 1
+    elif "caotico" in chave:
+        ordem = -1
+
+    if "bom" in chave or "bem" in chave:
+        moral = 1
+    elif "mau" in chave or "mal" in chave:
+        moral = -1
+
+    # Caso textos como "Leal e Neutro" / "Neutro e Bom" / "Caotico e Neutro"
+    # o eixo nao-mencionado fica em 0 (Neutro). Se NADA casou, devolve None.
+    if ordem == 0 and moral == 0 and "neutro" not in chave:
+        return None
+    return (ordem, moral)
+
+
+def alinhamento_compativel(tendencia_divindade: str, alinhamento_personagem: str) -> bool:
+    """
+    Regra "um passo" (PHB 3.5): um adorador/clerigo pode diferir da divindade
+    em, no maximo, um passo em cada um dos eixos (ordem/moral).
+
+    Se qualquer um dos alinhamentos nao for interpretavel, retorna True (nao
+    bloqueia o usuario por falta de dado).
+    """
+    a = parse_alinhamento(tendencia_divindade)
+    b = parse_alinhamento(alinhamento_personagem)
+    if a is None or b is None:
+        return True
+    return abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
+
+
+def filtrar_por_alinhamento(
+    alinhamento_personagem: str,
+    customizadas: Optional[Sequence[Any]] = None,
+) -> List[DivindadeCatalogo]:
+    """
+    Retorna as divindades compativeis com o alinhamento informado (regra do
+    um passo), considerando catalogo oficial + customizadas opcionais.
+    Se o alinhamento nao for interpretavel, retorna o catalogo completo.
+    """
+    catalogo = listar_catalogo_completo(customizadas)
+    parsed = parse_alinhamento(alinhamento_personagem)
+    if parsed is None:
+        return catalogo
+    return [
+        item
+        for item in catalogo
+        if alinhamento_compativel(item["tendencia"], alinhamento_personagem)
+    ]
+
+
+def dominios_proibidos_por_alinhamento(alinhamento_personagem: str) -> List[str]:
+    """
+    Retorna nomes canonicos (em minusculo, sem acento) dos dominios
+    incompativeis com o alinhamento informado.
+
+    Regra PHB 3.5: clerigo nao pode escolher dominio cujo descritor
+    alinhamental seja oposto ao dele. Um passo de folga NAO se aplica aqui -
+    a incompatibilidade e direta (Bem vs Mal, Ordem vs Caos).
+    """
+    parsed = parse_alinhamento(alinhamento_personagem)
+    if parsed is None:
+        return []
+    ordem_p, moral_p = parsed
+    proibidos: List[str] = []
+    for nome_dominio, (eixo, sinal) in DOMINIO_EIXO_ALINHAMENTO.items():
+        valor = moral_p if eixo == "moral" else ordem_p
+        # O dominio "Bem" (sinal=+1) e proibido se moral_p < 0 (Mau).
+        # O dominio "Mal" (sinal=-1) e proibido se moral_p > 0 (Bom).
+        # Idem para Ordem/Caos no eixo de ordem.
+        if valor != 0 and (valor * sinal) < 0:
+            proibidos.append(nome_dominio)
+    return proibidos
+
+
+def validar_dominios_contra_alinhamento(
+    alinhamento_personagem: str, dominios: Iterable[str]
+) -> List[str]:
+    """
+    Retorna a lista de dominios informados que sao incompativeis com o
+    alinhamento do personagem (ex.: personagem "Leal e Bom" escolhendo
+    dominio "Mal" ou "Caos"). Se o alinhamento for desconhecido, retorna [].
+    """
+    proibidos = set(dominios_proibidos_por_alinhamento(alinhamento_personagem))
+    if not proibidos:
+        return []
+    invalidos: List[str] = []
+    for item in dominios:
+        if _key(item) in proibidos:
             invalidos.append(str(item).strip())
     return invalidos

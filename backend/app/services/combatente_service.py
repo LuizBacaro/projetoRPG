@@ -309,6 +309,7 @@ class CombatenteService:
             classe_atual=combatente.classe,
             dominios_atuais=combatente.dominios,
             divindade_atual=combatente.divindade,
+            alinhamento_atual=combatente.alinhamento,
             exigir_dois_dominios_clerigo=False,
         )
         self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=combatente)
@@ -926,15 +927,56 @@ class CombatenteService:
             dominios.append(item)
         return dominios
 
+    def _carregar_divindades_custom(self) -> list:
+        """Lista de divindades customizadas (passada ao catalogo).
+        Retorna lista vazia se a tabela ainda nao existir (tolera migrations atrasadas)."""
+        try:
+            from ..repositories.divindade_custom_repository import (
+                DivindadeCustomRepository,
+            )
+            return DivindadeCustomRepository(self.repository.db).listar()
+        except Exception:  # noqa: BLE001 — defensivo para ambiente de testes
+            return []
+
     def _aplicar_regras_dominios_por_classe(
         self,
         combatente_data: dict,
         classe_atual: Optional[str] = None,
         dominios_atuais: Optional[str] = None,
         divindade_atual: Optional[str] = None,
+        alinhamento_atual: Optional[str] = None,
         exigir_dois_dominios_clerigo: bool = True,
     ) -> None:
         classe_final = combatente_data.get("classe", classe_atual or "")
+
+        # Alinhamento (preferencia: payload -> valor atual). Usado nas duas
+        # validacoes: divindade x alinhamento e dominios alinhamentais.
+        alinhamento = combatente_data.get("alinhamento")
+        if alinhamento is None:
+            alinhamento = alinhamento_atual or ""
+        alinhamento = str(alinhamento).strip()
+
+        # Customizadas: carregadas uma unica vez por chamada.
+        customizadas = self._carregar_divindades_custom()
+
+        # Divindade x alinhamento (regra do "um passo"): aplica-se tambem a
+        # nao-clerigos que escolhem uma divindade catalogada (oficial ou custom).
+        divindade = combatente_data.get("divindade")
+        if divindade is None:
+            divindade = divindade_atual or ""
+        divindade = str(divindade).strip()
+        if divindade and alinhamento:
+            divindade_info = _divindades_catalogo.buscar_por_nome(
+                divindade, customizadas=customizadas
+            )
+            if divindade_info and not _divindades_catalogo.alinhamento_compativel(
+                divindade_info["tendencia"], alinhamento
+            ):
+                raise DadosInvalidos(
+                    f"Alinhamento '{alinhamento}' é incompatível com a divindade "
+                    f"'{divindade_info['label']}' (tendência {divindade_info['tendencia']}). "
+                    "A diferença em cada eixo (ordem/moral) deve ser de no máximo um passo."
+                )
 
         if not self._eh_clerigo(classe_final):
             combatente_data["dominios"] = ""
@@ -949,17 +991,16 @@ class CombatenteService:
         if len(dominios) != 2:
             raise DadosInvalidos("Clérigo deve escolher exatamente dois domínios")
 
-        # Validacao contra o catalogo da Tabela 3-7: se a divindade estiver
-        # catalogada, os dois dominios devem pertencer a sua lista.
-        divindade = combatente_data.get("divindade")
-        if divindade is None:
-            divindade = divindade_atual or ""
-        divindade = str(divindade).strip()
+        # Validacao contra o catalogo (oficial + customizadas): se a divindade
+        # estiver catalogada (em qualquer das duas), os dois dominios devem
+        # pertencer a sua lista.
         if divindade:
-            permitidos = _divindades_catalogo.dominios_permitidos(divindade)
+            permitidos = _divindades_catalogo.dominios_permitidos(
+                divindade, customizadas=customizadas
+            )
             if permitidos is not None:
                 invalidos = _divindades_catalogo.validar_dominios_para_divindade(
-                    divindade, dominios
+                    divindade, dominios, customizadas=customizadas
                 )
                 if invalidos:
                     permitidos_txt = ", ".join(permitidos)
@@ -968,6 +1009,20 @@ class CombatenteService:
                         f"Divindade '{divindade}' não permite o(s) domínio(s): "
                         f"{invalidos_txt}. Domínios aceitos: {permitidos_txt}."
                     )
+
+        # Dominios alinhamentais (Bem/Mal/Ordem/Caos) precisam casar com o
+        # alinhamento do clerigo: um clerigo Bom nao pode ter o dominio Mal,
+        # e assim por diante.
+        if alinhamento:
+            conflitantes = _divindades_catalogo.validar_dominios_contra_alinhamento(
+                alinhamento, dominios
+            )
+            if conflitantes:
+                proibidos_txt = ", ".join(conflitantes)
+                raise DadosInvalidos(
+                    f"Domínio(s) {proibidos_txt} é(são) incompatível(is) com "
+                    f"o alinhamento '{alinhamento}'."
+                )
 
         combatente_data["dominios"] = ", ".join(dominios)
 

@@ -1316,3 +1316,158 @@ body {
         gap: 0.5rem;
     }
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+   Toolbar + botão "+ Nova Divindade"
+   ────────────────────────────────────────────────────────────────────── */
+
+.toolbar-acoes {
+    display: flex;
+    gap: .6rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-novo-divindade {
+    background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+    box-shadow: 0 2px 8px rgba(180, 83, 9, 0.35);
+}
+.btn-novo-divindade:hover {
+    background: linear-gradient(135deg, #92400e 0%, #78350f 100%);
+    box-shadow: 0 4px 12px rgba(180, 83, 9, 0.5);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   Modal de Divindades de Campanha
+   ────────────────────────────────────────────────────────────────────── */
+
+#modalDivindadeCustom .dash-modal-box {
+    max-width: 640px;
+}
+
+.dash-divcustom-info {
+    margin: 0 0 1rem 0;
+    padding: .6rem .8rem;
+    background: rgba(124, 58, 237, 0.08);
+    border-left: 3px solid #7c3aed;
+    border-radius: .3rem;
+    font-size: .82rem;
+    line-height: 1.45;
+    color: #cbd5e1;
+}
+
+.dash-divcustom-form .dash-form-row {
+    gap: .8rem;
+}
+
+.dash-divcustom-hint {
+    margin: 0 0 .5rem 0;
+    font-size: .75rem;
+    color: #94a3b8;
+}
+
+.dash-divcustom-dominios {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: .35rem .6rem;
+    padding: .6rem .75rem;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: .4rem;
+    max-height: 190px;
+    overflow-y: auto;
+}
+
+.dash-divcustom-dominio-item {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .82rem;
+    color: #e2e8f0;
+    cursor: pointer;
+}
+
+.dash-divcustom-dominio-item input[type="checkbox"] {
+    accent-color: #7c3aed;
+    cursor: pointer;
+}
+
+.dash-divcustom-sep {
+    margin: 1.25rem 0 1rem 0;
+    border: none;
+    border-top: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+.dash-divcustom-titulo {
+    font-size: .95rem;
+    color: #e2e8f0;
+    margin: 0 0 .6rem 0;
+}
+
+.dash-divcustom-listagem {
+    display: grid;
+    gap: .55rem;
+}
+
+.dash-divcustom-vazio {
+    margin: 0;
+    padding: .6rem;
+    color: #94a3b8;
+    font-size: .82rem;
+    text-align: center;
+}
+
+.dash-divcustom-card {
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(124, 58, 237, 0.22);
+    border-radius: .45rem;
+    padding: .6rem .8rem;
+}
+
+.dash-divcustom-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .6rem;
+    color: #f1f5f9;
+}
+
+.dash-divcustom-card-head strong {
+    font-size: .92rem;
+    letter-spacing: .02em;
+}
+
+.btn-dash-delete-div {
+    background: transparent;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    color: #fca5a5;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: .85rem;
+    line-height: 1;
+    transition: all .15s ease;
+}
+.btn-dash-delete-div:hover {
+    background: rgba(220, 38, 38, 0.15);
+    color: #fee2e2;
+    transform: scale(1.05);
+}
+
+.dash-divcustom-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .15rem 1.1rem;
+    font-size: .78rem;
+    color: #cbd5e1;
+    margin-top: .3rem;
+}
+
+.dash-divcustom-card-desc {
+    margin: .35rem 0 0 0;
+    font-size: .78rem;
+    line-height: 1.4;
+    color: #94a3b8;
+    font-style: italic;
+}

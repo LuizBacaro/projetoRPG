@@ -63,7 +63,10 @@
                 <button class="filter-btn" data-tipo="monstro">Monstros</button>
                 <button class="filter-btn" data-tipo="npc">NPCs</button>
             </div>
-            <button class="btn-novo" id="btnNovoCombatente">+ Novo Combatente</button>
+            <div class="toolbar-acoes">
+                <button class="btn-novo btn-novo-divindade" id="btnNovaDivindade" style="display:none" title="Criar uma divindade de campanha">+ Nova Divindade</button>
+                <button class="btn-novo" id="btnNovoCombatente">+ Novo Combatente</button>
+            </div>
         </div>
 
         <div class="tabela-wrapper">
@@ -376,6 +379,79 @@
     </div>
 </div>
 
+<!-- MODAL — Divindades de Campanha (Mestre/Admin) -->
+<div id="modalDivindadeCustom" class="dash-modal-overlay">
+    <div class="dash-modal-box">
+        <div class="dash-modal-header">
+            <h2>⛩️ Divindades de Campanha</h2>
+            <button class="dash-modal-close" id="btnFecharDivindadeCustom">×</button>
+        </div>
+        <div class="dash-modal-body">
+            <p class="dash-divcustom-info">
+                Divindades aqui cadastradas aparecem como opção na ficha dos personagens,
+                ao lado do catálogo oficial (Tabela 3-7). Apenas Mestres/Administradores
+                podem criar e remover entradas.
+            </p>
+
+            <form id="formDivindadeCustom" class="dash-divcustom-form" autocomplete="off">
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>Nome *</label>
+                        <input type="text" id="divCustomNome" name="nome" required maxlength="100" placeholder="Ex.: Saerun" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Título</label>
+                        <input type="text" id="divCustomTitulo" name="titulo" maxlength="200" placeholder="Ex.: Deus da Alvorada" />
+                    </div>
+                </div>
+
+                <div class="dash-form-row">
+                    <div class="dash-form-group">
+                        <label>Tendência/Alinhamento *</label>
+                        <select id="divCustomTendencia" name="tendencia" required>
+                            <option value="">-- Selecione a tendência --</option>
+                            <option value="Leal e Bom">Leal e Bom</option>
+                            <option value="Neutro e Bom">Neutro e Bom</option>
+                            <option value="Caótico e Bom">Caótico e Bom</option>
+                            <option value="Leal e Neutro">Leal e Neutro</option>
+                            <option value="Neutro">Neutro</option>
+                            <option value="Caótico e Neutro">Caótico e Neutro</option>
+                            <option value="Leal e Mau">Leal e Mau</option>
+                            <option value="Neutro e Mau">Neutro e Mau</option>
+                            <option value="Caótico e Mau">Caótico e Mau</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Domínios *</label>
+                    <p class="dash-divcustom-hint">
+                        Selecione os domínios que a divindade concede aos seus clérigos (até 6 recomendado).
+                    </p>
+                    <div id="divCustomDominiosLista" class="dash-divcustom-dominios" role="group" aria-label="Domínios disponíveis"></div>
+                </div>
+
+                <div class="dash-form-group">
+                    <label>Descrição</label>
+                    <textarea id="divCustomDescricao" name="descricao" rows="2" maxlength="500" placeholder="Breve descrição (opcional)"></textarea>
+                </div>
+
+                <div class="dash-modal-actions">
+                    <button type="button" class="btn-dash-cancel" id="btnCancelarDivindadeCustom">Cancelar</button>
+                    <button type="submit" class="btn-dash-save" id="btnSalvarDivindadeCustom">✅ Adicionar Divindade</button>
+                </div>
+            </form>
+
+            <hr class="dash-divcustom-sep" />
+
+            <h3 class="dash-divcustom-titulo">Divindades de campanha cadastradas</h3>
+            <div id="divCustomListagem" class="dash-divcustom-listagem" aria-live="polite">
+                <p class="dash-divcustom-vazio">Carregando…</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL DE EDIÇÃO -->
 <div id="modalEdicaoDashboard" class="dash-modal-overlay">
     <div class="dash-modal-box">
@@ -580,7 +656,8 @@
 </script>
 
 <!-- FASE 7: DashboardController (carregado por último) -->
-<script src="/js/controllers/DashboardController.js?v=16"></script>
+<script src="/js/services/DivindadeCustomService.js?v=1"></script>
+<script src="/js/controllers/DashboardController.js?v=17"></script>
 
 </body>
 </html>

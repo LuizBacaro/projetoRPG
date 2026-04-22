@@ -32,6 +32,7 @@ from .api.v1 import (
     combate,
     combatentes,
     condicoes,
+    divindades_custom,
     equipamentos,
     grimorio,
     habilidades_especiais,
@@ -157,6 +158,7 @@ app.include_router(condicoes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(ataques.router, prefix=settings.API_V1_PREFIX)
 app.include_router(pericias.router, prefix=settings.API_V1_PREFIX)
 app.include_router(magias.router, prefix=settings.API_V1_PREFIX)
+app.include_router(divindades_custom.router, prefix=settings.API_V1_PREFIX)
 app.include_router(magias_preparadas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(grimorio.router, prefix=settings.API_V1_PREFIX)
 app.include_router(equipamentos.router, prefix=settings.API_V1_PREFIX)

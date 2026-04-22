@@ -25,10 +25,16 @@ class DashboardController {
 
         this.service            = new CombatenteServiceGlobal();
         this.ataqueService      = new AtaqueService();
+        this.divindadeService   = (typeof DivindadeCustomService !== 'undefined')
+            ? new DivindadeCustomService()
+            : null;
         this.filtroAtual        = 'todos';
         this.combatenteEmEdicao = null;
         this.actions             = {};
         this.perfil              = AuthService.getPerfil();
+        // Cache local das divindades do catalogo oficial (carregado sob demanda ao
+        // abrir o modal "Nova Divindade"). Usado para popular o select de domínios.
+        this._dominiosCatalogoCache = null;
         this.racasDisponiveis    = [];
         this.racaSlugPorNome     = new Map();
         this.racaDetalheCache    = new Map();
@@ -106,6 +112,7 @@ class DashboardController {
         this._configurarUpload('Monstro');
         this._configurarUpload('NPC');
         this._configurarUploadEdicao();
+        this._configurarDivindadesCustom();
         this.carregarCombatentes();
     }
 
@@ -122,6 +129,10 @@ class DashboardController {
         const linkMagias = document.getElementById('linkMagias');
         if (linkMagias) {
             linkMagias.style.display = this._isMestre() ? '' : 'none';
+        }
+        const btnNovaDiv = document.getElementById('btnNovaDivindade');
+        if (btnNovaDiv) {
+            btnNovaDiv.style.display = this._isMestre() ? '' : 'none';
         }
     }
 
@@ -944,6 +955,209 @@ class DashboardController {
             console.error(err);
         }
     }
+
+    // ─── Divindades de Campanha (Mestre/Admin) ────────────────────────────
+
+    _configurarDivindadesCustom() {
+        if (!this._isMestre()) return;
+
+        const btnAbrir = document.getElementById('btnNovaDivindade');
+        const btnFechar = document.getElementById('btnFecharDivindadeCustom');
+        const btnCancelar = document.getElementById('btnCancelarDivindadeCustom');
+        const form = document.getElementById('formDivindadeCustom');
+
+        if (btnAbrir) {
+            btnAbrir.addEventListener('click', () => this._abrirModalDivindades());
+        }
+        if (btnFechar) {
+            btnFechar.addEventListener('click', () => this._fecharModal('modalDivindadeCustom'));
+        }
+        if (btnCancelar) {
+            btnCancelar.addEventListener('click', () => this._fecharModal('modalDivindadeCustom'));
+        }
+        if (form) {
+            form.addEventListener('submit', (ev) => this._salvarDivindadeCustom(ev));
+        }
+    }
+
+    async _abrirModalDivindades() {
+        this._abrirModal('modalDivindadeCustom');
+        await this._carregarDominiosParaModalDivindades();
+        await this._recarregarListaDivindadesCustom();
+    }
+
+    async _carregarDominiosParaModalDivindades() {
+        const container = document.getElementById('divCustomDominiosLista');
+        if (!container) return;
+        if (this._dominiosCatalogoCache) {
+            this._renderizarCheckboxesDominios(container, this._dominiosCatalogoCache);
+            return;
+        }
+
+        try {
+            const res = await fetch(window.getApiUrl('/magias/dominios'), {
+                headers: this._getAuthHeader(),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const dominios = await res.json();
+            const fallback = ['Animal', 'Planta', 'Ordem', 'Agua'];
+            const uniao = Array.from(new Set([...(dominios || []), ...fallback])).sort(
+                (a, b) => String(a).localeCompare(String(b), 'pt-BR')
+            );
+            this._dominiosCatalogoCache = uniao;
+            this._renderizarCheckboxesDominios(container, uniao);
+        } catch (err) {
+            console.warn('⚠️ Não foi possível carregar domínios do backend:', err);
+            const fallback = [
+                'Ar', 'Animal', 'Bem', 'Caos', 'Conhecimento', 'Cura', 'Destruicao',
+                'Enganacao', 'Fogo', 'Forca', 'Guerra', 'Magia', 'Mal', 'Morte',
+                'Ordem', 'Planta', 'Protecao', 'Sol', 'Sorte', 'Terra', 'Viagem', 'Agua',
+            ].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+            this._dominiosCatalogoCache = fallback;
+            this._renderizarCheckboxesDominios(container, fallback);
+        }
+    }
+
+    _renderizarCheckboxesDominios(container, dominios) {
+        const html = (dominios || []).map((dominio) => {
+            const val = escapeHtml(String(dominio));
+            return `
+                <label class="dash-divcustom-dominio-item">
+                    <input type="checkbox" name="dominios" value="${val}" />
+                    <span>${val}</span>
+                </label>`;
+        }).join('');
+        container.innerHTML = html || '<p class="dash-divcustom-vazio">Nenhum domínio disponível.</p>';
+    }
+
+    _coletarDominiosSelecionados() {
+        const checks = document.querySelectorAll('#divCustomDominiosLista input[type="checkbox"]:checked');
+        return Array.from(checks).map((c) => c.value).filter(Boolean);
+    }
+
+    async _salvarDivindadeCustom(ev) {
+        ev.preventDefault();
+        if (!this.divindadeService) {
+            Toast.error('Serviço de divindades indisponível.');
+            return;
+        }
+        const nome = document.getElementById('divCustomNome')?.value?.trim() || '';
+        const titulo = document.getElementById('divCustomTitulo')?.value?.trim() || '';
+        const tendencia = document.getElementById('divCustomTendencia')?.value?.trim() || '';
+        const descricao = document.getElementById('divCustomDescricao')?.value?.trim() || '';
+        const dominios = this._coletarDominiosSelecionados();
+
+        if (!nome) {
+            Toast.error('Informe o nome da divindade.');
+            return;
+        }
+        if (!tendencia) {
+            Toast.error('Selecione a tendência/alinhamento.');
+            return;
+        }
+        if (dominios.length === 0) {
+            Toast.error('Selecione ao menos um domínio.');
+            return;
+        }
+
+        const btn = document.getElementById('btnSalvarDivindadeCustom');
+        if (btn) btn.disabled = true;
+        try {
+            await this.divindadeService.criar({
+                nome,
+                titulo,
+                tendencia,
+                dominios,
+                descricao: descricao || null,
+            });
+            Toast.success(`Divindade '${nome}' adicionada com sucesso!`);
+            document.getElementById('formDivindadeCustom')?.reset();
+            this._coletarDominiosSelecionados(); // apenas para consistência
+            await this._recarregarListaDivindadesCustom();
+        } catch (err) {
+            console.error('❌ Erro ao criar divindade custom:', err);
+            Toast.error(err?.message || 'Erro ao criar divindade.');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    async _recarregarListaDivindadesCustom() {
+        const box = document.getElementById('divCustomListagem');
+        if (!box || !this.divindadeService) return;
+        box.innerHTML = '<p class="dash-divcustom-vazio">Carregando…</p>';
+
+        let itens = [];
+        try {
+            itens = await this.divindadeService.listarCustomizadas();
+        } catch (err) {
+            console.error('❌ Erro ao listar divindades custom:', err);
+            box.innerHTML = `<p class="dash-divcustom-vazio">${escapeHtml(err?.message || 'Erro ao carregar.')}</p>`;
+            return;
+        }
+
+        if (!Array.isArray(itens) || itens.length === 0) {
+            box.innerHTML = '<p class="dash-divcustom-vazio">Nenhuma divindade de campanha cadastrada ainda.</p>';
+            return;
+        }
+
+        const html = itens.map((item) => {
+            const id = Number(item.id);
+            const label = escapeHtml(item.label || item.nome || '');
+            const tendencia = escapeHtml(item.tendencia || '');
+            const dominios = Array.isArray(item.dominios) ? item.dominios.map(escapeHtml).join(', ') : '';
+            const descricao = escapeHtml(item.descricao || '');
+            return `
+                <div class="dash-divcustom-card" data-id="${id}">
+                    <div class="dash-divcustom-card-head">
+                        <strong>${label}</strong>
+                        <button type="button" class="btn-dash-delete-div" data-delete-div="${id}" title="Excluir divindade">✕</button>
+                    </div>
+                    <div class="dash-divcustom-card-meta">
+                        <span><b>Tendência:</b> ${tendencia || '—'}</span>
+                        <span><b>Domínios:</b> ${dominios || '—'}</span>
+                    </div>
+                    ${descricao ? `<p class="dash-divcustom-card-desc">${descricao}</p>` : ''}
+                </div>`;
+        }).join('');
+        box.innerHTML = html;
+
+        box.querySelectorAll('[data-delete-div]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const id = Number(btn.getAttribute('data-delete-div'));
+                if (Number.isFinite(id)) this._confirmarExclusaoDivindade(id, btn);
+            });
+        });
+    }
+
+    async _confirmarExclusaoDivindade(divindadeId, botaoOrigem) {
+        const card = botaoOrigem?.closest('.dash-divcustom-card');
+        const nomeLabel = card?.querySelector('strong')?.textContent || 'esta divindade';
+        const confirmar = async () => {
+            try {
+                await this.divindadeService.deletar(divindadeId);
+                Toast.success('Divindade removida.');
+                await this._recarregarListaDivindadesCustom();
+            } catch (err) {
+                console.error('❌ Erro ao excluir divindade:', err);
+                Toast.error(err?.message || 'Erro ao excluir divindade.');
+            }
+        };
+
+        if (typeof ModalConfirm !== 'undefined' && typeof ModalConfirm.show === 'function') {
+            ModalConfirm.show({
+                titulo: 'Excluir divindade',
+                mensagem: `Remover "${nomeLabel}" do catálogo de campanha?`,
+                textoConfirmar: 'Excluir',
+                textoCancelar: 'Cancelar',
+                onConfirmar: confirmar,
+            });
+        } else if (window.confirm(`Remover "${nomeLabel}" do catálogo de campanha?`)) {
+            await confirmar();
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
 
     _abrirModal(id) {
         const el = document.getElementById(id);

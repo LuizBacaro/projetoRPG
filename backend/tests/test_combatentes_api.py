@@ -105,6 +105,47 @@ def test_criar_combatente_retorna_alinhamento_e_dominios(combatentes_db):
     assert body["pl"] == 0
 
 
+def test_criar_combatente_rejeita_divindade_incompativel_com_alinhamento(combatentes_db):
+    """Regra do 1-passo: Leal e Bom não pode escolher Gruumsh (Caótico e Mau)."""
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    payload = _combatente_payload(
+        divindade="Gruumsh",
+        alinhamento="Leal e Bom",
+        dominios="Proteção, Força",
+    )
+    response = client.post("/api/v1/combatentes", data=payload)
+
+    assert response.status_code == 400
+    detalhe = response.json().get("detail", "")
+    assert "alinhamento" in detalhe.lower()
+    assert "gruumsh" in detalhe.lower()
+
+
+def test_criar_combatente_rejeita_dominio_alinhamental_conflitante(combatentes_db):
+    """Clérigo Leal e Bom não pode ter o domínio Mal.
+
+    Usamos uma divindade fora do catálogo (Tabela 3-7) para isolar a
+    validação: a divindade em si não impõe lista de domínios, mas a regra
+    alinhamental bloqueia o clérigo "Leal e Bom" de tomar Mal/Caos.
+    """
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    payload = _combatente_payload(
+        divindade="Deusa Caseira da Campanha",  # não catalogada
+        alinhamento="Leal e Bom",
+        dominios="Mal, Ordem",
+    )
+    response = client.post("/api/v1/combatentes", data=payload)
+
+    assert response.status_code == 400
+    detalhe = response.json().get("detail", "")
+    assert "mal" in detalhe.lower()
+    assert "alinhamento" in detalhe.lower()
+
+
 def test_atualizar_combatente_persiste_campos_dinheiro(combatentes_db):
     _, db_factory = combatentes_db
     client = _build_client(db_factory)

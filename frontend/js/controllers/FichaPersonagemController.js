@@ -750,6 +750,113 @@ export class FichaPersonagemController {
         return encontrada ? encontrada.label : texto;
     }
 
+    // ─────────────────────────────────────────────────────────
+    // Helpers de alinhamento (regra "um passo" D&D 3.5)
+    // Mantem paridade com backend/app/core/divindades_catalogo.py
+    // ─────────────────────────────────────────────────────────
+
+    _normalizarTexto(valor) {
+        return String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+    }
+
+    /**
+     * Converte uma tendência ("Leal e Bom", "Caótico e Mal", "Neutro", ...) em
+     * [eixoOrdem, eixoMoral] com valores 1 / 0 / -1. Retorna null se indefinida.
+     * Trata "Mal" e "Mau" como sinônimos.
+     */
+    _parseAlinhamento(valor) {
+        const chave = this._normalizarTexto(valor);
+        if (!chave) return null;
+        if (chave === 'neutro' || chave === 'verdadeiro neutro' || chave === 'neutro neutro') {
+            return [0, 0];
+        }
+        let ordem = 0;
+        let moral = 0;
+        if (chave.includes('leal')) ordem = 1;
+        else if (chave.includes('caotico')) ordem = -1;
+        if (chave.includes('bom') || chave.includes('bem')) moral = 1;
+        else if (chave.includes('mau') || chave.includes('mal')) moral = -1;
+        if (ordem === 0 && moral === 0 && !chave.includes('neutro')) return null;
+        return [ordem, moral];
+    }
+
+    /** True se a divindade é compatível com o alinhamento (1-step rule). */
+    _alinhamentoCompativelComDivindade(tendencia, alinhamento) {
+        const a = this._parseAlinhamento(tendencia);
+        const b = this._parseAlinhamento(alinhamento);
+        if (!a || !b) return true;
+        return Math.abs(a[0] - b[0]) <= 1 && Math.abs(a[1] - b[1]) <= 1;
+    }
+
+    /**
+     * Conjunto de chaves canônicas (sem acento, minúsculas) dos domínios de
+     * alinhamento proibidos pelo alinhamento do personagem (Bem/Mal/Ordem/Caos).
+     */
+    _chavesDominiosProibidosPorAlinhamento(alinhamento) {
+        const parsed = this._parseAlinhamento(alinhamento);
+        if (!parsed) return new Set();
+        const [ordem, moral] = parsed;
+        const proibidos = new Set();
+        // Eixo moral: Bem exige não-Mau; Mal exige não-Bom.
+        if (moral > 0) proibidos.add('mal');
+        if (moral < 0) proibidos.add('bem');
+        // Eixo ordem: Ordem exige não-Caótico; Caos exige não-Leal.
+        if (ordem > 0) proibidos.add('caos');
+        if (ordem < 0) proibidos.add('ordem');
+        return proibidos;
+    }
+
+    /**
+     * Lê o alinhamento efetivamente em edição no modal (se aberto) ou o
+     * persistido no combatente como fallback.
+     */
+    _lerAlinhamentoEmEdicao() {
+        const input = document.getElementById('inputPerfilAlinhamento');
+        if (input && typeof input.value === 'string' && input.value.trim()) {
+            return input.value.trim();
+        }
+        return String(this.combatente?.alinhamento || '').trim();
+    }
+
+    /**
+     * Lê a divindade efetivamente em edição no modal (se aberto) ou a
+     * persistida no combatente como fallback.
+     */
+    _lerDivindadeEmEdicao() {
+        const select = document.getElementById('selectPerfilDivindade');
+        if (select && typeof select.value === 'string' && select.value.trim()) {
+            return select.value.trim();
+        }
+        return String(this.combatente?.divindade || '').trim();
+    }
+
+    /**
+     * Calcula a lista de domínios disponíveis para o <select> considerando:
+     *   1. Domínios permitidos globalmente (this.dominiosPermitidos).
+     *   2. Se houver divindade catalogada selecionada → interseção com os
+     *      domínios dela (nomes canônicos do Livro do Jogador).
+     *   3. Remove domínios alinhamentais proibidos pelo alinhamento do
+     *      personagem (ex.: "Mal" e "Caos" para um clérigo Leal e Bom).
+     */
+    _computarDominiosDisponiveis(alinhamento, divindade) {
+        const base = Array.isArray(this.dominiosPermitidos)
+            ? this.dominiosPermitidos.slice()
+            : [];
+        let candidatos = base;
+
+        const divindadeInfo = this._buscarDivindadePorNome(divindade);
+        if (divindadeInfo && Array.isArray(divindadeInfo.dominios) && divindadeInfo.dominios.length) {
+            const chavesDoDeus = new Set(divindadeInfo.dominios.map((d) => this._normalizarTexto(d)));
+            candidatos = base.filter((dominio) => chavesDoDeus.has(this._normalizarTexto(dominio)));
+        }
+
+        const proibidos = this._chavesDominiosProibidosPorAlinhamento(alinhamento);
+        if (proibidos.size > 0) {
+            candidatos = candidatos.filter((dominio) => !proibidos.has(this._normalizarTexto(dominio)));
+        }
+        return candidatos;
+    }
+
     _renderizarListaDominiosPerfil() {
         const selectDominio1 = document.getElementById('selectPerfilDominio1');
         const selectDominio2 = document.getElementById('selectPerfilDominio2');
@@ -765,19 +872,48 @@ export class FichaPersonagemController {
             return;
         }
 
-        const opcoes = this.dominiosPermitidos
+        const alinhamento = this._lerAlinhamentoEmEdicao();
+        const divindade = this._lerDivindadeEmEdicao();
+        const divindadeInfo = this._buscarDivindadePorNome(divindade);
+        const disponiveis = this._computarDominiosDisponiveis(alinhamento, divindade);
+
+        const opcoes = disponiveis
             .map((dominio) => `<option value="${escapeHtml(dominio)}">${escapeHtml(dominio)}</option>`)
             .join('');
 
         if (selectDominio1) {
+            const valorAtual = selectDominio1.value;
             selectDominio1.innerHTML = `<option value="">Selecione o primeiro domínio</option>${opcoes}`;
+            if (valorAtual && disponiveis.some((d) => this._normalizarTexto(d) === this._normalizarTexto(valorAtual))) {
+                selectDominio1.value = valorAtual;
+            } else {
+                selectDominio1.value = '';
+            }
         }
         if (selectDominio2) {
+            const valorAtual = selectDominio2.value;
             selectDominio2.innerHTML = `<option value="">Selecione o segundo domínio</option>${opcoes}`;
+            if (valorAtual && disponiveis.some((d) => this._normalizarTexto(d) === this._normalizarTexto(valorAtual))) {
+                selectDominio2.value = valorAtual;
+            } else {
+                selectDominio2.value = '';
+            }
         }
 
         if (hint) {
-            hint.textContent = `Permitidos: ${this.dominiosPermitidos.join(', ')}. Selecione dois domínios diferentes.`;
+            if (!disponiveis.length) {
+                hint.textContent = divindadeInfo
+                    ? `Nenhum domínio de "${divindadeInfo.label}" é compatível com o alinhamento "${alinhamento || '—'}".`
+                    : 'Nenhum domínio disponível para o alinhamento atual.';
+            } else if (divindadeInfo) {
+                hint.textContent = `Permitidos por ${divindadeInfo.label}`
+                    + (alinhamento ? ` e alinhamento "${alinhamento}"` : '')
+                    + `: ${disponiveis.join(', ')}. Selecione dois domínios diferentes.`;
+            } else if (alinhamento) {
+                hint.textContent = `Permitidos para o alinhamento "${alinhamento}": ${disponiveis.join(', ')}.`;
+            } else {
+                hint.textContent = `Permitidos: ${disponiveis.join(', ')}. Selecione dois domínios diferentes.`;
+            }
         }
     }
 
@@ -785,20 +921,36 @@ export class FichaPersonagemController {
         const select = document.getElementById('selectPerfilDivindade');
         if (!select) return;
 
-        const valorAtual = String(this.combatente?.divindade || '').trim();
+        const alinhamento = this._lerAlinhamentoEmEdicao();
+        const valorSelectAtual = (select.value && select.value.trim()) || '';
+        const valorCombatente = String(this.combatente?.divindade || '').trim();
+        const valorAtual = valorSelectAtual || valorCombatente;
         const existente = this._buscarDivindadePorNome(valorAtual);
+
+        const catalogoFiltrado = (this.divindadesCatalogo || []).filter((item) =>
+            this._alinhamentoCompativelComDivindade(item.tendencia, alinhamento)
+        );
 
         const opcoes = [];
         opcoes.push('<option value="">Nenhuma / Não aplicável</option>');
 
-        // Preserva valor legado/personalizado que nao esta no catalogo
+        // Preserva valor legado/personalizado fora do catálogo
         if (valorAtual && !existente) {
             opcoes.push(
                 `<option value="${escapeHtml(valorAtual)}">${escapeHtml(valorAtual)} (personalizada)</option>`
             );
         }
 
-        (this.divindadesCatalogo || []).forEach((item) => {
+        // Preserva divindade catalogada atual mesmo quando incompatível com o
+        // alinhamento escolhido — marca como "(fora do alinhamento)" para o
+        // usuário saber que precisa trocar uma das duas coisas antes de salvar.
+        if (existente && !catalogoFiltrado.some((item) => item.nome === existente.nome)) {
+            opcoes.push(
+                `<option value="${escapeHtml(existente.nome)}">${escapeHtml(existente.label)} (fora do alinhamento)</option>`
+            );
+        }
+
+        catalogoFiltrado.forEach((item) => {
             opcoes.push(
                 `<option value="${escapeHtml(item.nome)}">${escapeHtml(item.label)}</option>`
             );
@@ -821,9 +973,25 @@ export class FichaPersonagemController {
             return;
         }
 
-        hint.textContent = veioDoCatalogo
-            ? `${total} divindades carregadas do catálogo (Tabela 3-7).`
-            : `${total} divindades em cache local (catálogo offline no momento).`;
+        const alinhamento = this._lerAlinhamentoEmEdicao();
+        const compativeis = alinhamento
+            ? (this.divindadesCatalogo || []).filter((item) =>
+                this._alinhamentoCompativelComDivindade(item.tendencia, alinhamento))
+            : this.divindadesCatalogo;
+        const quantidade = compativeis.length;
+
+        let textoBase;
+        if (alinhamento) {
+            textoBase = quantidade
+                ? `${quantidade} de ${total} divindades compatíveis com o alinhamento "${alinhamento}" (regra do um passo).`
+                : `Nenhuma divindade do catálogo é compatível com "${alinhamento}".`;
+        } else {
+            textoBase = veioDoCatalogo
+                ? `${total} divindades carregadas do catálogo (Tabela 3-7).`
+                : `${total} divindades em cache local (catálogo offline no momento).`;
+        }
+
+        hint.textContent = textoBase;
         hint.classList.toggle('is-fallback', !veioDoCatalogo);
     }
 
@@ -866,21 +1034,53 @@ export class FichaPersonagemController {
             ]).catch(() => { /* fallback já está no estado */ });
         }
 
-        this._renderizarListaDominiosPerfil();
-        this._renderizarListaDivindadesPerfil();
-
         // ✅ Usar helper centralizado para ler perfil divino
         const { alinhamento, divindade, dominio1, dominio2 } = this._lerPerfilDivino();
 
+        // Preenche o alinhamento ANTES do render dos selects em cascata,
+        // para que o filtro já considere o alinhamento atual do personagem.
         if (inputAlinhamento) inputAlinhamento.value = alinhamento;
+
+        this._renderizarListaDivindadesPerfil();
         if (selectDivindade) {
             const encontrada = this._buscarDivindadePorNome(divindade);
             selectDivindade.value = encontrada ? encontrada.nome : divindade;
         }
+        this._atualizarHintDivindadesPerfil();
+
+        this._renderizarListaDominiosPerfil();
         if (selectDominio1) selectDominio1.value = clerigo ? this._canonicalizarDominio(dominio1) : '';
         if (selectDominio2) selectDominio2.value = clerigo ? this._canonicalizarDominio(dominio2) : '';
 
+        this._ligarListenersCascataPerfilMagico();
         modal.style.display = 'flex';
+    }
+
+    /**
+     * Registra (idempotentemente) os listeners que propagam as mudanças de
+     * alinhamento/divindade para os outros selects:
+     *   alinhamento → filtra divindades e domínios
+     *   divindade   → filtra domínios
+     */
+    _ligarListenersCascataPerfilMagico() {
+        const inputAlinhamento = document.getElementById('inputPerfilAlinhamento');
+        const selectDivindade = document.getElementById('selectPerfilDivindade');
+
+        if (inputAlinhamento && !inputAlinhamento.dataset.cascataLigada) {
+            inputAlinhamento.addEventListener('change', () => {
+                this._renderizarListaDivindadesPerfil();
+                this._atualizarHintDivindadesPerfil();
+                this._renderizarListaDominiosPerfil();
+            });
+            inputAlinhamento.dataset.cascataLigada = '1';
+        }
+
+        if (selectDivindade && !selectDivindade.dataset.cascataLigada) {
+            selectDivindade.addEventListener('change', () => {
+                this._renderizarListaDominiosPerfil();
+            });
+            selectDivindade.dataset.cascataLigada = '1';
+        }
     }
 
     fecharModalPerfilMagico() {
@@ -936,33 +1136,70 @@ export class FichaPersonagemController {
     }
 
     /**
-     * Valida (pre-submit) se os dominios escolhidos pertencem a divindade do catalogo.
-     * A validacao definitiva tambem acontece no backend (CombatenteService).
+     * Valida (pre-submit) a coerência entre alinhamento, divindade e domínios.
+     * A validação definitiva acontece no backend (CombatenteService), mas
+     * aqui ganhamos feedback imediato para o usuário.
+     *
+     * @param {string} alinhamento
      * @param {string} divindade
      * @param {string} dominiosCsv
      */
-    _validarDominiosContraDivindade(divindade, dominiosCsv) {
-        if (!this._ehClasseClerigo()) return;
-        if (!divindade || !dominiosCsv) return;
-
-        const encontrada = this._buscarDivindadePorNome(divindade);
-        if (!encontrada) return; // divindade fora do catalogo → nao ha como validar
-
-        const normalizar = (s) => String(s || '')
-            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-            .trim().toLowerCase();
-
-        const permitidas = new Set((encontrada.dominios || []).map(normalizar));
-        const escolhidas = dominiosCsv.split(',').map((item) => item.trim()).filter(Boolean);
-        const invalidos = escolhidas.filter((d) => !permitidas.has(normalizar(d)));
-
-        if (invalidos.length) {
-            const permitidosTxt = (encontrada.dominios || []).join(', ');
-            throw new Error(
-                `Divindade "${encontrada.label}" não permite o(s) domínio(s): ${invalidos.join(', ')}. `
-                + `Domínios aceitos: ${permitidosTxt}.`
-            );
+    _validarPerfilMagico(alinhamento, divindade, dominiosCsv) {
+        // 1. Alinhamento × divindade (regra do um passo)
+        if (alinhamento && divindade) {
+            const encontrada = this._buscarDivindadePorNome(divindade);
+            if (encontrada && !this._alinhamentoCompativelComDivindade(encontrada.tendencia, alinhamento)) {
+                throw new Error(
+                    `Alinhamento "${alinhamento}" é incompatível com a divindade "${encontrada.label}" `
+                    + `(tendência ${encontrada.tendencia}). A diferença em cada eixo (ordem/moral) deve ser `
+                    + 'de no máximo um passo.'
+                );
+            }
         }
+
+        if (!this._ehClasseClerigo()) return;
+        if (!dominiosCsv) return;
+
+        const escolhidas = dominiosCsv.split(',').map((item) => item.trim()).filter(Boolean);
+        const normalizar = (s) => this._normalizarTexto(s);
+
+        // 2. Domínios × divindade catalogada
+        if (divindade) {
+            const encontrada = this._buscarDivindadePorNome(divindade);
+            if (encontrada) {
+                const permitidas = new Set((encontrada.dominios || []).map(normalizar));
+                const invalidos = escolhidas.filter((d) => !permitidas.has(normalizar(d)));
+                if (invalidos.length) {
+                    const permitidosTxt = (encontrada.dominios || []).join(', ');
+                    throw new Error(
+                        `Divindade "${encontrada.label}" não permite o(s) domínio(s): ${invalidos.join(', ')}. `
+                        + `Domínios aceitos: ${permitidosTxt}.`
+                    );
+                }
+            }
+        }
+
+        // 3. Domínios alinhamentais (Bem/Mal/Ordem/Caos) × alinhamento do clérigo
+        if (alinhamento) {
+            const proibidos = this._chavesDominiosProibidosPorAlinhamento(alinhamento);
+            if (proibidos.size) {
+                const conflitantes = escolhidas.filter((d) => proibidos.has(normalizar(d)));
+                if (conflitantes.length) {
+                    throw new Error(
+                        `Domínio(s) ${conflitantes.join(', ')} é(são) incompatível(is) com o `
+                        + `alinhamento "${alinhamento}".`
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Alias retrocompatível: mantém a assinatura antiga usada em testes/util.
+     * @deprecated use _validarPerfilMagico()
+     */
+    _validarDominiosContraDivindade(divindade, dominiosCsv) {
+        this._validarPerfilMagico(this._lerAlinhamentoEmEdicao(), divindade, dominiosCsv);
     }
 
     _buildFormDataAtualizacaoCombatente(overrides = {}) {
@@ -1020,7 +1257,7 @@ export class FichaPersonagemController {
                 selectDominio1?.value || '',
                 selectDominio2?.value || '',
             );
-            this._validarDominiosContraDivindade(divindade, dominios);
+            this._validarPerfilMagico(alinhamento, divindade, dominios);
             const formData = this._buildFormDataAtualizacaoCombatente({ alinhamento, divindade, dominios });
             this.combatente = await this.combatenteService.atualizar(this.combatente.id, formData);
 

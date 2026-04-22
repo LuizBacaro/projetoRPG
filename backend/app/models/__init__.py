@@ -12,6 +12,7 @@ from .combatente import Combatente
 from .usuario import Usuario
 from .combate import CombateHistorico
 from .grimorio import GrimorioMagia, GrimorioHistoricoTroca, GrimorioNotificacao
+from .divindade_custom import DivindadeCustom
 
 __all__ = [
     "Pericia",
@@ -36,4 +37,5 @@ __all__ = [
     "GrimorioMagia",
     "GrimorioHistoricoTroca",
     "GrimorioNotificacao",
+    "DivindadeCustom",
 ]

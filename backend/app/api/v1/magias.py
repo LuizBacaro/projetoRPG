@@ -27,6 +27,7 @@ from app.schemas.magia import (
     MagiaResponse,
     MagiaUpdate,
 )
+from app.services.divindade_custom_service import build_divindade_custom_service
 from app.services.magia_import_service import MagiaImportService
 from app.services.magia_service import MagiaService
 
@@ -217,17 +218,19 @@ def listar_divindades_sugeridas(
     db: Session = Depends(get_db),
     service: Optional[MagiaService] = Depends(get_magia_service),
 ):
+    """Lista apenas os nomes canonicos (oficial + customizadas).
+    Retrocompatibilidade — o endpoint novo e `/magias/divindades/catalogo`."""
     cache_key = "magias:divindades"
     if settings.CACHE_ENABLED:
         cached = catalog_cache.get(cache_key)
         if cached is not None:
             return cached
 
-    srv = _resolve_service(service, db)
-    divindades = srv.listar_divindades_sugeridas()
+    unificado = build_divindade_custom_service(db).listar_catalogo_unificado()
+    nomes = [item["nome"] for item in unificado]
     if settings.CACHE_ENABLED:
-        catalog_cache.set(cache_key, divindades, settings.CACHE_CATALOG_TTL_SECONDS)
-    return divindades
+        catalog_cache.set(cache_key, nomes, settings.CACHE_CATALOG_TTL_SECONDS)
+    return nomes
 
 
 @router.get("/divindades/catalogo")
@@ -235,10 +238,9 @@ def listar_divindades_catalogo(
     db: Session = Depends(get_db),
     service: Optional[MagiaService] = Depends(get_magia_service),
 ):
-    """Catalogo rico de divindades (Tabela 3-7 do Livro do Jogador 3.5).
-
-    Cada item traz: nome, titulo, label ('Nome, Titulo'), tendencia,
-    dominios (lista canonica) e descricao curta.
+    """Catalogo rico de divindades: oficial (Tabela 3-7) + customizadas da
+    campanha. Cada item traz: nome, titulo, label ('Nome, Titulo'), tendencia,
+    dominios (lista canonica), descricao curta e `origem` ('oficial' | 'custom').
     """
     cache_key = "magias:divindades:catalogo"
     if settings.CACHE_ENABLED:
@@ -246,11 +248,13 @@ def listar_divindades_catalogo(
         if cached is not None:
             return cached
 
-    srv = _resolve_service(service, db)
-    catalogo = srv.listar_divindades_catalogo()
+    # Nota: listar_divindades_catalogo() retorna apenas o catalogo oficial.
+    # O endpoint unifica com as customizadas para que o frontend nao precise
+    # fazer duas chamadas (oficial + /divindades/custom).
+    unificado = build_divindade_custom_service(db).listar_catalogo_unificado()
     if settings.CACHE_ENABLED:
-        catalog_cache.set(cache_key, catalogo, settings.CACHE_CATALOG_TTL_SECONDS)
-    return catalogo
+        catalog_cache.set(cache_key, unificado, settings.CACHE_CATALOG_TTL_SECONDS)
+    return unificado
 
 
 @router.get("/importacao/modelo")

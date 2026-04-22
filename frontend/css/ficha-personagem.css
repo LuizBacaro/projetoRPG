@@ -352,11 +352,25 @@ body {
 
 .ficha-modal-box {
     width: min(560px, 96vw);
-    background: linear-gradient(145deg, var(--cor-pergaminho), var(--cor-pergaminho-esc));
+    background:
+        linear-gradient(145deg, var(--cor-pergaminho), var(--cor-pergaminho-esc)),
+        radial-gradient(circle at top right, rgba(168, 125, 66, 0.1), transparent 60%);
     border: 2px solid var(--cor-madeira-clara);
-    border-radius: 16px;
-    box-shadow: var(--sombra-forte);
+    border-radius: 14px;
+    box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.55),
+        inset 0 0 0 1px rgba(255, 244, 214, 0.35);
     overflow: hidden;
+    position: relative;
+}
+
+.ficha-modal-box::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(92, 58, 30, 0.25);
+    border-radius: 10px;
+    pointer-events: none;
 }
 
 .ficha-modal-box-curto {
@@ -367,42 +381,69 @@ body {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    align-items: flex-start;
-    padding: 1rem 1rem 0.7rem;
-    border-bottom: 1px solid rgba(92, 58, 30, 0.18);
+    align-items: center;
+    padding: 0.85rem 1.1rem 0.8rem;
+    border-bottom: 1px solid rgba(92, 58, 30, 0.22);
+    background: linear-gradient(180deg, rgba(168, 125, 66, 0.14), transparent 85%);
+}
+
+.ficha-modal-header > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
 }
 
 .ficha-modal-header h3 {
     font-family: var(--fonte-titulo);
     color: var(--cor-madeira);
-    font-size: 1rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    margin: 0;
 }
 
 .ficha-modal-header p {
-    margin-top: 0.18rem;
+    margin: 0;
     color: var(--cor-tinta-suave);
-    font-size: 0.84rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
 }
 
 .ficha-modal-close {
-    border: 1px solid rgba(92, 58, 30, 0.25);
-    background: rgba(255,255,255,0.35);
+    flex-shrink: 0;
+    border: 1px solid rgba(92, 58, 30, 0.35);
+    background: rgba(255, 252, 244, 0.55);
     color: var(--cor-madeira);
-    border-radius: 10px;
-    width: 36px;
-    height: 36px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ficha-modal-close:hover {
+    background: rgba(124, 45, 18, 0.9);
+    color: #fff7ed;
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(124, 45, 18, 0.35);
 }
 
 .ficha-modal-body {
-    padding: 0.95rem 1rem;
+    padding: 1rem 1.1rem 0.3rem;
     display: grid;
-    gap: 0.85rem;
+    gap: 0.95rem;
 }
 
 .ficha-modal-field {
     display: grid;
-    gap: 0.35rem;
+    gap: 0.4rem;
 }
 
 .ficha-modal-field span {
@@ -410,18 +451,65 @@ body {
     font-size: 0.72rem;
     color: var(--cor-madeira);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.1em;
 }
 
 .ficha-modal-field input,
-.ficha-modal-field select {
-    border: 1px solid rgba(92, 58, 30, 0.28);
-    border-radius: 10px;
-    background: rgba(255, 252, 244, 0.85);
+.ficha-modal-field select,
+.ficha-modal-field textarea {
+    border: 1px solid rgba(92, 58, 30, 0.38);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 252, 244, 0.95), rgba(244, 230, 197, 0.85));
     color: var(--cor-tinta);
-    padding: 0.7rem 0.8rem;
+    padding: 0.65rem 0.85rem;
     font-family: var(--fonte-texto);
     font-size: 0.95rem;
+    box-shadow: inset 0 1px 3px rgba(92, 58, 30, 0.15);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.ficha-modal-field input:hover,
+.ficha-modal-field select:hover,
+.ficha-modal-field textarea:hover {
+    border-color: rgba(92, 58, 30, 0.6);
+}
+
+.ficha-modal-field input:focus,
+.ficha-modal-field select:focus,
+.ficha-modal-field textarea:focus {
+    outline: none;
+    border-color: var(--cor-madeira);
+    box-shadow:
+        inset 0 1px 3px rgba(92, 58, 30, 0.15),
+        0 0 0 3px rgba(168, 125, 66, 0.28);
+    background: linear-gradient(180deg, #fff7e6, #f5e3b7);
+}
+
+/* Select estilo pergaminho D&D com seta customizada dourada */
+.ficha-modal-field select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image:
+        linear-gradient(180deg, rgba(255, 252, 244, 0.95), rgba(244, 230, 197, 0.85)),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%235c3a1e' d='M6 8L0 0h12z'/></svg>");
+    background-repeat: no-repeat, no-repeat;
+    background-position: 0 0, right 0.85rem center;
+    background-size: auto, 11px 7px;
+    padding-right: 2.15rem;
+    cursor: pointer;
+}
+
+.ficha-modal-field select:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ficha-modal-field select option {
+    background: var(--cor-pergaminho);
+    color: var(--cor-tinta);
+    font-family: var(--fonte-texto);
 }
 
 .ficha-modal-field small {
@@ -444,26 +532,45 @@ body {
 
 .ficha-btn-cancelar {
     background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%);
-    border: 1px solid rgba(92, 58, 30, 0.45);
+    border: 1px solid rgba(92, 58, 30, 0.55);
     color: #fff7ed;
     font-family: var(--fonte-titulo);
-    font-size: 0.82rem;
-    padding: 0.5rem 0.9rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.55rem 1.05rem;
+    min-height: 38px;
     border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.15s ease, filter 0.2s ease;
+    transition: transform 0.15s ease, filter 0.2s ease, box-shadow 0.15s ease;
+    box-shadow: 0 2px 6px rgba(92, 58, 30, 0.3);
 }
 
 .ficha-btn-cancelar:hover {
     transform: translateY(-1px);
     filter: brightness(1.08);
+    box-shadow: 0 3px 10px rgba(124, 45, 18, 0.4);
 }
 
 .ficha-modal-actions {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 0.65rem;
-    padding: 0 1rem 1rem;
+    padding: 0.85rem 1.1rem 1.05rem;
+    border-top: 1px solid rgba(92, 58, 30, 0.18);
+    background: linear-gradient(0deg, rgba(168, 125, 66, 0.08), transparent);
+}
+
+/* Padroniza altura/estilo do botao Salvar dentro dos modais da ficha */
+.ficha-modal-actions .ficha-btn-salvar {
+    font-family: var(--fonte-titulo);
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.55rem 1.15rem;
+    min-height: 38px;
+    border-radius: 8px;
 }
 
 .ficha-nivel-linha {
