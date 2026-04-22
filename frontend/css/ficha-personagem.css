@@ -1189,14 +1189,20 @@ body::before {
 .ficha-wrapper { position: relative; z-index: 1; }
 
 /* ========== PERÍCIAS DINÂMICAS ========== */
+/* Layout único (todas as larguras): nome → atributo → grade de modificadores */
+
+.ficha-secao.ficha-secao-pericias {
+    overflow: visible;
+}
 
 .ficha-pericias-lista {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.7rem;
     /* Altura dinâmica, scrollable */
     max-height: 500px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 0.35rem 0.45rem 0.5rem 0.1rem;
     scroll-padding-block: 0.25rem;
 }
@@ -1207,19 +1213,20 @@ body::before {
 
 .ficha-pericia-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
     padding: 0.65rem 0.85rem;
-    min-height: 2.85rem;
+    min-height: min-content;
     background: linear-gradient(135deg, rgba(92,58,30,0.08) 0%, rgba(92,58,30,0.04) 100%);
     border-radius: 8px;
     border-left: 4px solid var(--cor-dourada);
     transition: all 0.2s;
     position: relative;
-    min-width: 0;        /* ✅ CRÍTICO — permite flex encolher */
-    overflow: hidden;
-    gap: 0.55rem;
-    width: 100%;         /* ✅ garante largura total */
+    min-width: 0;
+    overflow: visible;
+    gap: 0.5rem;
+    width: 100%;
     box-sizing: border-box;
     box-shadow: 0 1px 0 rgba(92, 58, 30, 0.06);
 }
@@ -1231,18 +1238,16 @@ body::before {
 }
 
 .ficha-pericia-nome {
-    flex: 1;
+    width: 100%;
+    flex: none;
     font-size: 0.84rem;
     line-height: 1.35;
     color: var(--cor-tinta);
     font-weight: 600;
     font-family: var(--fonte-texto);
-    /* ✅ Evita overflow do nome */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
     min-width: 0;
-    padding-right: 0.5rem;
+    padding-right: 0;
 }
 
 .ficha-pericia-atributo {
@@ -1251,19 +1256,21 @@ body::before {
     font-family: var(--fonte-titulo);
     font-weight: 700;
     text-transform: uppercase;
-    margin: 0 0.55rem;
+    margin: 0;
     letter-spacing: 0.06em;
-    min-width: 38px;
-    text-align: center;
-    flex-shrink: 0;             /* ✅ não encolhe */
+    min-width: 2rem;
+    text-align: left;
+    align-self: flex-start;
 }
 
 .ficha-pericia-mods {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-end;
-    flex-shrink: 0;             /* ✅ não encolhe */
-    padding-left: 0.15rem;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: 100%;
+    gap: 0.45rem;
+    align-items: end;
+    flex-shrink: 0;
+    padding-left: 0;
 }
 
 .ficha-pericia-mod {
@@ -1272,7 +1279,7 @@ body::before {
     align-items: center;
     justify-content: flex-end;
     gap: 0.2rem;
-    min-width: 2.25rem;
+    min-width: 0;
 }
 
 .ficha-pericia-mod-label {
@@ -1402,10 +1409,6 @@ body::before {
     .ficha-pericias-lista {
         max-height: 300px;
     }
-
-    .ficha-pericia-nome {
-        white-space: normal;    /* ✅ em mobile pode quebrar linha */
-    }
 }
 
 @media (max-width: 768px) {
@@ -1419,50 +1422,17 @@ body::before {
         font-size: 1.2rem;
     }
 
-    /* Flex em coluna evita bug de linhas de grid “colapsadas” / sobrepostas em Chrome Android */
     .ficha-pericia-item {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
         padding: 0.55rem 0.65rem;
         gap: 0.45rem;
-        min-height: min-content;
-        overflow: visible;
-    }
-
-    .ficha-pericia-nome {
-        width: 100%;
-        margin-bottom: 0;
-        padding-right: 0;
-        white-space: normal;
-        flex: none;
     }
 
     .ficha-pericia-atributo {
-        min-width: 30px;
-        margin: 0;
         font-size: 0.62rem;
-        align-self: flex-start;
-        text-align: left;
     }
 
     .ficha-pericia-mods {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 0.4rem;
-        padding-left: 0;
-        flex-shrink: 0;
-    }
-
-    .ficha-pericia-mod {
-        min-width: 0;
-    }
-
-    .ficha-pericias-lista {
-        gap: 0.7rem;
-        -webkit-overflow-scrolling: touch;
     }
 
     .ficha-pericia-mod-valor {
@@ -1489,25 +1459,17 @@ body::before {
     .ficha-secao-header .ficha-btn-adicionar {
         margin-left: auto;
     }
-
-    /* overflow:hidden na seção cortava / empilhava lista longa em alguns WebViews */
-    .ficha-secao.ficha-secao-pericias {
-        overflow: visible;
-    }
 }
 
 @media (max-width: 480px) {
     .ficha-pericias-lista {
         max-height: 250px;
+        gap: 0.65rem;
     }
 
     .ficha-pericia-item {
         padding: 0.42rem 0.48rem;
         gap: 0.38rem;
-    }
-
-    .ficha-pericias-lista {
-        gap: 0.65rem;
     }
 
     .ficha-pericia-nome {
