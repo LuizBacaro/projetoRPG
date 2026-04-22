@@ -12,11 +12,35 @@ class DivindadeCustomService {
     }
 
     _getAuthHeader() {
-        if (typeof AuthService !== 'undefined' && typeof AuthService.getAuthHeader === 'function') {
-            return AuthService.getAuthHeader();
+        if (typeof window !== 'undefined' && window.AuthService && typeof window.AuthService.getToken === 'function') {
+            const token = window.AuthService.getToken();
+            if (token) return { 'Authorization': `Bearer ${token}` };
         }
         const token = localStorage.getItem('token');
         return token ? { 'Authorization': `Bearer ${token}` } : {};
+    }
+
+    async _request(path, options = {}, fallbackMessage = 'Erro na operação') {
+        const res = await fetch(`${this.baseUrl}${path}`, {
+            ...(options || {}),
+            headers: {
+                ...(options?.headers || {}),
+                ...this._getAuthHeader(),
+            },
+        });
+
+        if (res.status === 401) {
+            if (typeof window !== 'undefined' && window.AuthService && typeof window.AuthService.logout === 'function') {
+                window.AuthService.logout();
+            }
+            throw new Error('Token inválido ou expirado. Faça login novamente.');
+        }
+
+        if (!res.ok) {
+            throw new Error(await this._extrairMensagemErro(res, fallbackMessage));
+        }
+
+        return res;
     }
 
     async _extrairMensagemErro(res, fallback) {
@@ -33,45 +57,29 @@ class DivindadeCustomService {
 
     /** Lista apenas as divindades customizadas (criadas pelo Mestre). */
     async listarCustomizadas() {
-        const res = await fetch(`${this.baseUrl}/divindades/custom`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...this._getAuthHeader(),
-            },
-        });
-        if (!res.ok) {
-            throw new Error(await this._extrairMensagemErro(res, 'Erro ao listar divindades customizadas'));
-        }
+        const res = await this._request('/divindades/custom', {
+            headers: { 'Content-Type': 'application/json' },
+        }, 'Erro ao listar divindades customizadas');
         return res.json();
     }
 
     /** Lista catalogo unificado (oficial + customizadas) com `origem` em cada item. */
     async listarCatalogoUnificado() {
-        const res = await fetch(`${this.baseUrl}/magias/divindades/catalogo`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...this._getAuthHeader(),
-            },
-        });
-        if (!res.ok) {
-            throw new Error(await this._extrairMensagemErro(res, 'Erro ao carregar catálogo de divindades'));
-        }
+        const res = await this._request('/magias/divindades/catalogo', {
+            headers: { 'Content-Type': 'application/json' },
+        }, 'Erro ao carregar catálogo de divindades');
         return res.json();
     }
 
     /** Cria uma divindade de campanha (Mestre/Admin). */
     async criar(payload) {
-        const res = await fetch(`${this.baseUrl}/divindades/custom`, {
+        const res = await this._request('/divindades/custom', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                ...this._getAuthHeader(),
             },
             body: JSON.stringify(payload || {}),
-        });
-        if (!res.ok) {
-            throw new Error(await this._extrairMensagemErro(res, 'Erro ao criar divindade'));
-        }
+        }, 'Erro ao criar divindade');
         return res.json();
     }
 
@@ -79,8 +87,16 @@ class DivindadeCustomService {
     async deletar(divindadeId) {
         const res = await fetch(`${this.baseUrl}/divindades/custom/${encodeURIComponent(divindadeId)}`, {
             method: 'DELETE',
-            headers: this._getAuthHeader(),
+            headers: {
+                ...this._getAuthHeader(),
+            },
         });
+        if (res.status === 401) {
+            if (typeof window !== 'undefined' && window.AuthService && typeof window.AuthService.logout === 'function') {
+                window.AuthService.logout();
+            }
+            throw new Error('Token inválido ou expirado. Faça login novamente.');
+        }
         if (!res.ok && res.status !== 204) {
             throw new Error(await this._extrairMensagemErro(res, 'Erro ao excluir divindade'));
         }

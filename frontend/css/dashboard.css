@@ -1368,28 +1368,71 @@ body {
 
 .dash-divcustom-dominios {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: .35rem .6rem;
-    padding: .6rem .75rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .5rem;
+    padding: .75rem;
     background: rgba(15, 23, 42, 0.55);
     border: 1px solid rgba(124, 58, 237, 0.25);
     border-radius: .4rem;
-    max-height: 190px;
+    max-height: 220px;
     overflow-y: auto;
+    align-items: stretch;
 }
 
 .dash-divcustom-dominio-item {
     display: flex;
     align-items: center;
-    gap: .4rem;
-    font-size: .82rem;
-    color: #e2e8f0;
+    gap: .45rem;
+    font-size: .8rem;
+    color: #e5e7eb;
     cursor: pointer;
+    background: rgba(15, 23, 42, 0.82);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: .42rem;
+    padding: .38rem .5rem;
+    min-height: 34px;
+    box-sizing: border-box;
+    transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+}
+
+.dash-divcustom-dominio-item:hover {
+    border-color: rgba(167, 139, 250, 0.8);
+    background: rgba(30, 41, 59, 0.95);
+    transform: translateY(-1px);
+}
+
+.dash-divcustom-dominio-item span {
+    overflow-wrap: anywhere;
+    line-height: 1.25;
 }
 
 .dash-divcustom-dominio-item input[type="checkbox"] {
     accent-color: #7c3aed;
     cursor: pointer;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 16px;
+    height: 16px;
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.dash-divcustom-dominio-item input[type="checkbox"]:checked + span {
+    color: #ddd6fe;
+    font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .dash-divcustom-dominios {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .dash-divcustom-dominios {
+        grid-template-columns: 1fr;
+    }
 }
 
 .dash-divcustom-sep {
