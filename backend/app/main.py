@@ -3,7 +3,7 @@ main.py
 SRP: Entry point da aplicação — orquestra inicialização e rotas
 SOLID: Dependency Injection via contexto FastAPI
 """
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -60,6 +60,7 @@ from .models import magia as magia_model
 from .models import grimorio as grimorio_model
 
 logger = logging.getLogger(__name__)
+CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
 
 # ── Instância FastAPI ────────────────────────────────────────────────────────
 app = FastAPI(
@@ -226,6 +227,19 @@ async def health():
         "version": settings.VERSION,
         "cors_enabled": True
     }
+
+
+@app.get("/health/ping", include_in_schema=False)
+async def health_ping(token: str | None = Query(default=None)):
+    """
+    Endpoint leve para cron externo.
+    - Não acessa banco
+    - Retorna 204 (sem body)
+    - Se CRON_PING_TOKEN estiver configurado, exige ?token=...
+    """
+    if CRON_PING_TOKEN and token != CRON_PING_TOKEN:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return Response(status_code=204)
 
 
 # ── Startup Event ────────────────────────────────────────────────────────────
