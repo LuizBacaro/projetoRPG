@@ -30,6 +30,7 @@ export class Combatente {
         this.tamanho_racial = data.tamanho_racial || '';
         this.deslocamento_racial_metros = data.deslocamento_racial_metros ?? null;
         this.idiomas_raciais = Array.isArray(data.idiomas_raciais) ? data.idiomas_raciais : [];
+        this.idiomas_customizados = Array.isArray(data.idiomas_customizados) ? data.idiomas_customizados : [];
         this.passivos_raciais = Array.isArray(data.passivos_raciais) ? data.passivos_raciais : [];
         this.modificadores_pericia = Array.isArray(data.modificadores_pericia)
             ? data.modificadores_pericia

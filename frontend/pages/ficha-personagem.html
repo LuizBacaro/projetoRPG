@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/variables.css">
     <link rel="stylesheet" href="../css/modais.css">
     <link rel="stylesheet" href="../css/skeleton.css?v=1">
-    <link rel="stylesheet" href="../css/ficha-personagem.css?v=17">
+    <link rel="stylesheet" href="../css/ficha-personagem.css?v=18">
     <link rel="stylesheet" href="../css/item-card-unified.css">
     <link rel="stylesheet" href="../css/grimorio.css?v=20260418a">
     <link rel="stylesheet" href="../css/responsivo.css">
@@ -237,6 +237,24 @@
                 <h3 class="ficha-secao-titulo">✨ Habilidades Especiais</h3>
                 <div id="fichaHabilidadesEspeciais" class="ficha-habilidades-especiais-lista">
                     <span class="ficha-vazio">Nenhuma habilidade especial mapeada.</span>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">🌐 IDIOMAS</h3>
+                <div class="ficha-idiomas-form">
+                    <input
+                        id="inputNovoIdiomaFicha"
+                        type="text"
+                        class="ficha-modal-input"
+                        placeholder="Ex.: Anão, Élfico, Dracônico"
+                    />
+                    <button class="ficha-btn-adicionar" id="btnAdicionarIdiomaFicha" title="Adicionar idioma">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaIdiomas" class="ficha-idiomas-lista">
+                    <span class="ficha-vazio">Nenhum idioma cadastrado.</span>
                 </div>
             </div>
 
@@ -861,7 +879,7 @@
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
 <script src="../js/services/AuthService.js"></script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
-<script type="module" src="../js/controllers/FichaPersonagemController.js?v=58"></script>
+<script type="module" src="../js/controllers/FichaPersonagemController.js?v=61"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=20260420c"></script>
 </body>
 </html>

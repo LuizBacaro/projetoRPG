@@ -93,6 +93,7 @@ export class FichaPersonagemController {
         this.equipamentosDisponiveis = [];
         this.armadurasProtecaoDisponiveis = [];
         this.talentosJogador = [];
+        this.idiomasFichaDraft = [];
 
     }
 
@@ -126,6 +127,7 @@ export class FichaPersonagemController {
             this.renderizarDinheiro();
             this.renderizarResistencias();
             this.renderizarHabilidadesEspeciais();
+            this.renderizarIdiomas();
             this.renderizarCaracteristicasRaciais();
             this.renderizarAtaques();
             this.renderizarSlotsDeMapia();
@@ -196,6 +198,19 @@ export class FichaPersonagemController {
         const btnAdicionarTal = document.getElementById('btnAdicionarTalento');
         if (btnAdicionarTal) {
             btnAdicionarTal.addEventListener('click', () => this.abrirModalTalentos());
+        }
+        const btnAdicionarIdiomaFicha = document.getElementById('btnAdicionarIdiomaFicha');
+        if (btnAdicionarIdiomaFicha) {
+            btnAdicionarIdiomaFicha.addEventListener('click', () => this.adicionarIdiomaFicha());
+        }
+        const inputNovoIdiomaFicha = document.getElementById('inputNovoIdiomaFicha');
+        if (inputNovoIdiomaFicha) {
+            inputNovoIdiomaFicha.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    this.adicionarIdiomaFicha();
+                }
+            });
         }
 
         const btnEditarPerfilMagico = document.getElementById('btnEditarPerfilMagico');
@@ -560,7 +575,7 @@ export class FichaPersonagemController {
         const foto        = document.getElementById('fichaFoto');
 
         if (nomeHeader) nomeHeader.textContent = this.combatente.nome;
-        if (raca)   raca.textContent   = this.combatente.raca   || '—';
+        if (raca)   raca.textContent   = this._normalizarNomeRacaParaExibicao(this.combatente.raca) || '—';
         if (classe) classe.textContent = this.combatente.classe || '—';
         if (tipo) {
             const tipoVal = this.combatente.tipo || 'jogador';
@@ -1233,6 +1248,11 @@ export class FichaPersonagemController {
             vontade: this.combatente.vontade ?? 0,
             nivel: this.combatente.nivel ?? 1,
             pontos: this.combatente.pontos ?? 0,
+            idiomas_customizados: JSON.stringify(
+                Array.isArray(this.combatente.idiomas_customizados)
+                    ? this.combatente.idiomas_customizados
+                    : [],
+            ),
             ...overrides,
         };
 
@@ -1547,6 +1567,166 @@ export class FichaPersonagemController {
         return `<span class="ficha-habilidade-especial-chip" data-slug="${escapeHtml(habilidade.slug || '')}" title="${escapeHtml(descricao)}">${escapeHtml(rotulo)}</span>`;
     }
 
+    _normalizarNomeRacaParaExibicao(nomeRaca) {
+        const nome = String(nomeRaca || '').trim();
+        if (!nome) return '';
+        const mapaSingular = {
+            humanos: 'Humano',
+            elfos: 'Elfo',
+            anoes: 'Anão',
+            'anões': 'Anão',
+            halflings: 'Halfling',
+            gnomos: 'Gnomo',
+            meioelfos: 'Meio-elfo',
+            'meio-elfos': 'Meio-elfo',
+            meioorcs: 'Meio-orc',
+            'meio-orcs': 'Meio-orc',
+        };
+        const chave = nome.toLowerCase();
+        return mapaSingular[chave] || nome;
+    }
+
+    _extrairIdiomasDePassivosRaciais() {
+        const passivos = Array.isArray(this.combatente?.passivos_raciais) ? this.combatente.passivos_raciais : [];
+        const encontrados = [];
+        passivos.forEach((item) => {
+            const texto = String(item || '').trim();
+            if (!texto) return;
+            const match = texto.match(/^idiomas?\s*:\s*(.+)$/i);
+            if (!match || !match[1]) return;
+            match[1]
+                .split(',')
+                .map((idioma) => String(idioma || '').trim())
+                .filter(Boolean)
+                .forEach((idioma) => encontrados.push(idioma));
+        });
+        return encontrados;
+    }
+
+    _obterIdiomasConhecidos() {
+        const idiomasBase = this._obterIdiomasBaseRaciais();
+        const idiomasExtras = Array.isArray(this.combatente?.idiomas_customizados)
+            ? this.combatente.idiomas_customizados
+            : [];
+        const unicos = [];
+        [...idiomasBase, ...idiomasExtras]
+            .forEach((idioma) => {
+                const jaExiste = unicos.some((existente) => existente.localeCompare(idioma, 'pt-BR', { sensitivity: 'accent' }) === 0);
+                if (!jaExiste) unicos.push(idioma);
+            });
+        return unicos;
+    }
+
+    _obterIdiomasBaseRaciais() {
+        // A API envia `idiomas_raciais` já mesclado (catálogo + extras). Para saber o que é
+        // "só racial", removemos uma ocorrência de cada item persistido em `idiomas_customizados`.
+        const merged = Array.isArray(this.combatente?.idiomas_raciais)
+            ? this.combatente.idiomas_raciais.map((x) => String(x || '').trim()).filter(Boolean)
+            : [];
+        const custom = Array.isArray(this.combatente?.idiomas_customizados)
+            ? this.combatente.idiomas_customizados.map((x) => String(x || '').trim()).filter(Boolean)
+            : [];
+        const racialApenas = [...merged];
+        for (const c of custom) {
+            const idx = racialApenas.findIndex(
+                (x) => x.localeCompare(c, 'pt-BR', { sensitivity: 'accent' }) === 0,
+            );
+            if (idx >= 0) racialApenas.splice(idx, 1);
+        }
+        const idiomasPassivos = this._extrairIdiomasDePassivosRaciais();
+        const unicos = [];
+        [...racialApenas, ...idiomasPassivos].forEach((idioma) => {
+            const jaExiste = unicos.some(
+                (existente) => existente.localeCompare(idioma, 'pt-BR', { sensitivity: 'accent' }) === 0,
+            );
+            if (!jaExiste) unicos.push(idioma);
+        });
+        return unicos;
+    }
+
+    renderizarIdiomas() {
+        if (!Array.isArray(this.idiomasFichaDraft) || !this.idiomasFichaDraft.length) {
+            this.idiomasFichaDraft = this._obterIdiomasConhecidos();
+        }
+        const container = document.getElementById('fichaIdiomas');
+        if (!container) return;
+        if (!this.idiomasFichaDraft.length) {
+            container.innerHTML = '<span class="ficha-vazio">Nenhum idioma cadastrado.</span>';
+            return;
+        }
+        container.innerHTML = this.idiomasFichaDraft
+            .map((idioma) => `
+                <span class="ficha-idioma-chip">
+                    ${escapeHtml(idioma)}
+                    <button class="ficha-idioma-remover" data-idioma-remove="${escapeHtml(idioma)}" title="Remover idioma" aria-label="Remover idioma ${escapeHtml(idioma)}">✕</button>
+                </span>
+            `)
+            .join('');
+        container.querySelectorAll('[data-idioma-remove]').forEach((btn) => {
+            btn.addEventListener('click', () => this.removerIdiomaFicha(btn.getAttribute('data-idioma-remove')));
+        });
+    }
+
+    async adicionarIdiomaFicha() {
+        const input = document.getElementById('inputNovoIdiomaFicha');
+        if (!input) return;
+        const idioma = String(input.value || '').trim();
+        if (!idioma) return;
+        const jaExiste = this.idiomasFichaDraft.some(
+            (item) => item.localeCompare(idioma, 'pt-BR', { sensitivity: 'accent' }) === 0,
+        );
+        if (jaExiste) {
+            window.NotificationService?.info?.('Esse idioma já está na lista.');
+            return;
+        }
+        const draftAnterior = [...this.idiomasFichaDraft];
+        this.idiomasFichaDraft.push(idioma);
+        input.value = '';
+        this.renderizarIdiomas();
+        try {
+            await this._persistirIdiomasExtrasFicha();
+        } catch (_err) {
+            this.idiomasFichaDraft = draftAnterior;
+            this.renderizarIdiomas();
+        }
+    }
+
+    async removerIdiomaFicha(idioma) {
+        const alvo = String(idioma || '').trim();
+        if (!alvo) return;
+        const draftAnterior = [...this.idiomasFichaDraft];
+        this.idiomasFichaDraft = this.idiomasFichaDraft.filter(
+            (item) => item.localeCompare(alvo, 'pt-BR', { sensitivity: 'accent' }) !== 0,
+        );
+        this.renderizarIdiomas();
+        try {
+            await this._persistirIdiomasExtrasFicha();
+        } catch (_err) {
+            this.idiomasFichaDraft = draftAnterior;
+            this.renderizarIdiomas();
+        }
+    }
+
+    async _persistirIdiomasExtrasFicha() {
+        if (!this.combatente?.id) return;
+        try {
+            const idiomasBase = this._obterIdiomasBaseRaciais();
+            const idiomasExtras = this.idiomasFichaDraft.filter(
+                (idioma) => !idiomasBase.some((base) => base.localeCompare(idioma, 'pt-BR', { sensitivity: 'accent' }) === 0),
+            );
+            const formData = this._buildFormDataAtualizacaoCombatente({
+                idiomas_customizados: JSON.stringify(idiomasExtras),
+            });
+            this.combatente = await this.combatenteService.atualizar(this.combatente.id, formData);
+            this.idiomasFichaDraft = this._obterIdiomasConhecidos();
+            this.renderizarIdiomas();
+        } catch (error) {
+            console.error('❌ Erro ao salvar idiomas da ficha:', error);
+            window.NotificationService?.erro(error.message || 'Não foi possível salvar os idiomas.');
+            throw error;
+        }
+    }
+
     renderizarCaracteristicasRaciais() {
         // Conteúdo racial é exibido em modal; aqui atualizamos o badge de contagem no botão.
         const countEl = document.getElementById('fichaRaciaisCount');
@@ -1662,7 +1842,7 @@ export class FichaPersonagemController {
         const conteudo = document.getElementById('modalCaracteristicasRaciaisConteudo');
         if (!modal || !conteudo) return;
 
-        const raca = String(this.combatente?.raca || '').trim();
+        const raca = this._normalizarNomeRacaParaExibicao(this.combatente?.raca);
         if (subtitulo) {
             subtitulo.textContent = raca
                 ? `Resumo da raça ${raca} (não é progressão de classe).`

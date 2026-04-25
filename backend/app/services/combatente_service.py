@@ -271,6 +271,7 @@ class CombatenteService:
             combatente_data,
             exigir_dois_dominios_clerigo=False,
         )
+        self._normalizar_idiomas_customizados(combatente_data, combatente_atual=None)
         self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=None)
         self._recalcular_defesas(combatente_data, combatente_atual=None)
         self._aplicar_regra_iniciativa_por_tipo(combatente_data)
@@ -312,6 +313,7 @@ class CombatenteService:
             alinhamento_atual=combatente.alinhamento,
             exigir_dois_dominios_clerigo=False,
         )
+        self._normalizar_idiomas_customizados(combatente_data, combatente_atual=combatente)
         self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=combatente)
         self._recalcular_defesas(combatente_data, combatente_atual=combatente)
         self._aplicar_regra_iniciativa_por_tipo(combatente_data, combatente_atual=combatente)
@@ -616,13 +618,17 @@ class CombatenteService:
 
     def _enriquecer_dados_raciais_em_memoria(self, combatentes: List[Combatente]) -> None:
         for combatente in combatentes:
+            idiomas_customizados = self._parse_idiomas_customizados(
+                getattr(combatente, "idiomas_customizados", "")
+            )
             raca = get_raca_by_slug_or_name(
                 getattr(combatente, "raca_slug", None) or getattr(combatente, "raca", None)
             )
             if not raca:
                 setattr(combatente, "tamanho_racial", "")
                 setattr(combatente, "deslocamento_racial_metros", None)
-                setattr(combatente, "idiomas_raciais", [])
+                setattr(combatente, "idiomas_raciais", idiomas_customizados)
+                setattr(combatente, "idiomas_customizados", idiomas_customizados)
                 setattr(combatente, "passivos_raciais", [])
                 setattr(combatente, "modificadores_pericia", [])
                 continue
@@ -644,9 +650,65 @@ class CombatenteService:
             setattr(combatente, "raca", str(raca.get("nome") or getattr(combatente, "raca", "")))
             setattr(combatente, "tamanho_racial", str(raca.get("tamanho") or ""))
             setattr(combatente, "deslocamento_racial_metros", raca.get("deslocamento_metros"))
-            setattr(combatente, "idiomas_raciais", [str(x) for x in (raca.get("idiomas_iniciais") or []) if str(x).strip()])
+            idiomas_raciais = [str(x) for x in (raca.get("idiomas_iniciais") or []) if str(x).strip()]
+            idiomas_totais = idiomas_raciais.copy()
+            for idioma in idiomas_customizados:
+                if idioma not in idiomas_totais:
+                    idiomas_totais.append(idioma)
+            setattr(combatente, "idiomas_raciais", idiomas_totais)
+            setattr(combatente, "idiomas_customizados", idiomas_customizados)
             setattr(combatente, "passivos_raciais", passivos)
             setattr(combatente, "modificadores_pericia", mods_pericia)
+
+    def _normalizar_idiomas_customizados(
+        self,
+        combatente_data: dict,
+        combatente_atual: Optional[Combatente] = None,
+    ) -> None:
+        if "idiomas_customizados" not in combatente_data:
+            if combatente_atual is not None:
+                combatente_data["idiomas_customizados"] = getattr(combatente_atual, "idiomas_customizados", "") or ""
+            return
+
+        valor = combatente_data.get("idiomas_customizados")
+        if valor is None:
+            if combatente_atual is not None:
+                combatente_data["idiomas_customizados"] = getattr(combatente_atual, "idiomas_customizados", "") or ""
+            else:
+                combatente_data["idiomas_customizados"] = ""
+            return
+
+        idiomas = self._parse_idiomas_customizados(valor)
+        combatente_data["idiomas_customizados"] = json.dumps(idiomas, ensure_ascii=False) if idiomas else ""
+
+    def _parse_idiomas_customizados(self, valor) -> list[str]:
+        if valor is None:
+            return []
+        if isinstance(valor, list):
+            bruto = valor
+        else:
+            texto = str(valor).strip()
+            if not texto:
+                return []
+            try:
+                parsed = json.loads(texto)
+            except (TypeError, ValueError):
+                parsed = None
+            if isinstance(parsed, list):
+                bruto = parsed
+            elif isinstance(parsed, str):
+                bruto = [parsed]
+            else:
+                bruto = [x.strip() for x in texto.split(",")]
+
+        unicos: list[str] = []
+        for item in bruto:
+            idioma = str(item or "").strip()
+            if not idioma:
+                continue
+            if idioma not in unicos:
+                unicos.append(idioma)
+        return unicos
 
     def _aplicar_regra_iniciativa_por_tipo(
         self,

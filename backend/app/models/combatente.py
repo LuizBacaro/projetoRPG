@@ -26,6 +26,7 @@ class Combatente(SoftDeleteMixin, Base):
     classe = Column(String,  nullable=False)
     raca   = Column(String,  nullable=True, default="")
     raca_slug = Column(String, nullable=True, default="")
+    idiomas_customizados = Column(String, nullable=True, default="")
     divindade = Column(String, nullable=True, default="")
     alinhamento = Column(String, nullable=True, default="")
     dominios = Column(String, nullable=True, default="")

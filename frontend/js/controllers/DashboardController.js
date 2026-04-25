@@ -274,7 +274,7 @@ class DashboardController {
         racas.forEach((raca) => {
             const op = document.createElement('option');
             op.value = raca.nome;
-            op.textContent = raca.nome;
+            op.textContent = this._normalizarNomeRacaParaExibicao(raca.nome);
             selectEl.appendChild(op);
         });
         const opOutro = document.createElement('option');
@@ -295,6 +295,25 @@ class DashboardController {
             nome: String(nome || '').trim(),
             slug: String(nome || '').trim(),
         })).filter((item) => item.nome);
+    }
+
+    _normalizarNomeRacaParaExibicao(nomeRaca) {
+        const nome = String(nomeRaca || '').trim();
+        if (!nome) return '';
+        const mapaSingular = {
+            humanos: 'Humano',
+            elfos: 'Elfo',
+            anoes: 'Anão',
+            'anões': 'Anão',
+            halflings: 'Halfling',
+            gnomos: 'Gnomo',
+            meioelfos: 'Meio-elfo',
+            'meio-elfos': 'Meio-elfo',
+            meioorcs: 'Meio-orc',
+            'meio-orcs': 'Meio-orc',
+        };
+        const chave = nome.toLowerCase();
+        return mapaSingular[chave] || nome;
     }
 
     async _carregarRacasCatalogo() {
