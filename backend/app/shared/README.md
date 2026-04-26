@@ -2,7 +2,8 @@
 
 Pacote do **Auth Hub** e utilitários **realmente transversais** à plataforma
 (constantes, convenções). A reorganização multi-jogo está descrita em
-`docs/arquitetura-multi-jogo.md`.
+`docs/arquitetura-multi-jogo.md`. **Roteiro** das próximas melhorias (rotas,
+hub → `shared`, Postgres, produto): `docs/roteiro-melhorias-arquitetura.md`.
 
 ## Estado vigente (abr/2026)
 

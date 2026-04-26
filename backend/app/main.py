@@ -1117,7 +1117,7 @@ def _seed_condicoes(db) -> None:
         db: Sessão do banco
     """
     from .games.dnd35.repositories.condicao_repository import CondicaoRepository
-    from .services.condicao_service import CondicaoService
+    from .games.dnd35.services.condicao_service import CondicaoService
 
     repo = CondicaoRepository(db)
     service = CondicaoService(condicao_repository=repo, combatente_repository=None)

@@ -308,6 +308,9 @@ históricos acima.
 > `dnd35.*`), consolidação do hub em `app/shared/`, e eventual redução de
 > re-exports em `app.api.v1` quando o registo em `main.py` apontar só para
 > `games/dnd35/api/v1`.
+>
+> **Roteiro detalhado (fases, critérios de saída, riscos):**
+> [roteiro-melhorias-arquitetura.md](./roteiro-melhorias-arquitetura.md).
 
 ### Frontend
 
