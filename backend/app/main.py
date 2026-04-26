@@ -19,6 +19,7 @@ from .core.database import engine, Base, SessionLocal, get_db
 from .core.init_db import (
     criar_admin_padrao,
     inicializar_catalogo_jogos,
+    inicializar_catalogo_magias_se_vazio,
     inicializar_catalogo_tabelas_classes,
     inicializar_equipamentos,
     garantir_membership_dnd35_para_usuarios_legados,
@@ -479,6 +480,7 @@ def _inicializar_banco(db) -> None:
         ("inicializar_equipamentos", lambda: inicializar_equipamentos(db)),
         ("seed_armaduras_protecao", lambda: _seed_armaduras_protecao(db)),
         ("inicializar_talentos", lambda: inicializar_talentos(db)),
+        ("inicializar_catalogo_magias_se_vazio", lambda: inicializar_catalogo_magias_se_vazio(db)),
         ("sincronizar_bonus_base_ataque_combatentes", lambda: sincronizar_bonus_base_ataque_combatentes(db)),
         ("inicializar_catalogo_tabelas_classes", inicializar_catalogo_tabelas_classes),
         ("inicializar_catalogo_jogos", lambda: inicializar_catalogo_jogos(db)),

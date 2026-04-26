@@ -79,6 +79,10 @@ class Settings(BaseSettings):
     # log sem bloquear — preserva tokens legados durante o rollout.
     MULTI_GAME_STRICT_MODE: bool = False
 
+    # Se True e a tabela `magias` estiver vazia, o startup executa `scripts/seed_magias.py`
+    # (PHB completo — pode levar ~30s). Em SQLite vazio o seed roda sempre sem esta flag.
+    SEED_MAGIAS_ON_EMPTY: bool = False
+
     class Config:
         """Configuração de leitura do Pydantic"""
         # Suporta execução tanto na raiz do repo quanto dentro de backend/

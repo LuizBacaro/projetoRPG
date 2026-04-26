@@ -405,6 +405,51 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
         logger.info("✅ Progressão base (BBA/TRs) sincronizada para %s combatente(s).", atualizados)
 
 
+def inicializar_catalogo_magias_se_vazio(db: Session) -> None:
+    """
+    Garante catálogo PHB em `magias` / `magias_classes` quando o banco está vazio.
+
+    - **SQLite (dev):** se `magias` estiver vazia, executa `scripts/seed_magias.py` no startup
+      (primeira subida pode levar ~20–40s).
+    - **PostgreSQL / outros:** só popula automaticamente se `SEED_MAGIAS_ON_EMPTY=1` no `.env`;
+      caso contrário apenas avisa — use `cd backend && python scripts/seed_magias.py` manualmente.
+    """
+    from app.games.dnd35.models.magia import Magia
+    from scripts.seed_magias import seed_magias
+
+    try:
+        total = db.query(Magia).count()
+    except Exception as exc:  # pragma: no cover - schema ainda não pronto
+        logger.warning("Não foi possível verificar tabela magias: %s", exc)
+        return
+
+    if total > 0:
+        return
+
+    url = (settings.DATABASE_URL or "").lower()
+    is_sqlite = "sqlite" in url
+    if not is_sqlite and not settings.SEED_MAGIAS_ON_EMPTY:
+        msg = (
+            "Tabela `magias` vazia — grimório e escolas ficam vazios. "
+            "Execute no servidor: cd backend && python scripts/seed_magias.py "
+            "ou defina SEED_MAGIAS_ON_EMPTY=1 uma vez no .env e reinicie."
+        )
+        logger.warning(msg)
+        print(f"⚠️  {msg}")
+        return
+
+    logger.info("Tabela magias vazia — executando seed PHB (aguarde ~20–40s)…")
+    print("📚 Populando catálogo de magias (primeira execução pode demorar)…")
+    try:
+        seed_magias(db, force=False)
+        logger.info("✅ Catálogo de magias (seed PHB) concluído.")
+        print("✅ Catálogo de magias inicializado.")
+    except Exception as exc:
+        logger.exception("Falha ao executar seed_magias: %s", exc)
+        print(f"❌ Falha ao popular magias: {exc}")
+        raise
+
+
 def _modificador_atributo(valor: int | None) -> int:
     try:
         return (int(valor) - 10) // 2
