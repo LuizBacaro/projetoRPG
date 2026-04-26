@@ -45,7 +45,7 @@ class DashboardController {
         this.campanhas           = [];
         this.sessoesCampanha     = [];
         this.sessaoEmEdicaoId    = null;
-        this.filtroTipoParticipanteCampanha = 'todos';
+        this.filtroTipoParticipanteCampanha = this._lerFiltroTipoParticipanteCampanhaPersistido();
         this.personagensDisponiveisCampanha = [];
         this.campanhaEmEdicaoId  = null;
         this.snapshotCampanhaEmEdicao = null;
@@ -744,11 +744,16 @@ class DashboardController {
             inputBuscaPersonagem.addEventListener('input', () => this._renderizarChecklistPersonagensCampanha());
         }
         if (filtrosTipo) {
+            const tipoInicial = this.filtroTipoParticipanteCampanha || 'todos';
+            filtrosTipo.querySelectorAll('[data-campanha-tipo]').forEach((btn) => {
+                btn.classList.toggle('active', btn.getAttribute('data-campanha-tipo') === tipoInicial);
+            });
             filtrosTipo.querySelectorAll('[data-campanha-tipo]').forEach((btn) => {
                 btn.addEventListener('click', () => {
                     filtrosTipo.querySelectorAll('[data-campanha-tipo]').forEach((b) => b.classList.remove('active'));
                     btn.classList.add('active');
                     this.filtroTipoParticipanteCampanha = btn.getAttribute('data-campanha-tipo') || 'todos';
+                    this._persistirFiltroTipoParticipanteCampanha(this.filtroTipoParticipanteCampanha);
                     this._renderizarChecklistPersonagensCampanha();
                 });
             });
@@ -985,6 +990,25 @@ class DashboardController {
         }
     }
 
+    _lerFiltroTipoParticipanteCampanhaPersistido() {
+        try {
+            const valor = localStorage.getItem('dashboard:campanha-participantes-tipo');
+            if (valor === 'jogador' || valor === 'monstro' || valor === 'npc') return valor;
+            return 'todos';
+        } catch (_err) {
+            return 'todos';
+        }
+    }
+
+    _persistirFiltroTipoParticipanteCampanha(valor) {
+        try {
+            const permitido = valor === 'jogador' || valor === 'monstro' || valor === 'npc' ? valor : 'todos';
+            localStorage.setItem('dashboard:campanha-participantes-tipo', permitido);
+        } catch (_err) {
+            // ignore storage errors
+        }
+    }
+
     _renderizarCampanhas() {
         const lista = document.getElementById('listaCampanhas');
         if (!lista) return;
@@ -1169,6 +1193,7 @@ class DashboardController {
         const inputBuscaPersonagem = document.getElementById('campanhaPersonagensBusca');
         if (inputBuscaPersonagem) inputBuscaPersonagem.value = '';
         this.filtroTipoParticipanteCampanha = 'todos';
+        this._persistirFiltroTipoParticipanteCampanha('todos');
         const filtrosTipo = document.getElementById('campanhaPersonagensTipoFiltros');
         if (filtrosTipo) {
             filtrosTipo.querySelectorAll('[data-campanha-tipo]').forEach((btn) => {
