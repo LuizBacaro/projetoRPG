@@ -1374,6 +1374,44 @@ body {
     color: #cbd5e1;
 }
 
+.campanhas-subabas {
+    display: flex;
+    gap: .45rem;
+    margin-bottom: .75rem;
+    flex-wrap: wrap;
+}
+
+.campanhas-subaba-btn {
+    border: 1px solid rgba(148, 163, 184, .45);
+    background: rgba(15, 23, 42, .5);
+    color: #cbd5e1;
+    padding: .4rem .7rem;
+    border-radius: .5rem;
+    font-size: .84rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s ease;
+}
+
+.campanhas-subaba-btn:hover {
+    border-color: rgba(250, 204, 21, .6);
+    color: #fde68a;
+}
+
+.campanhas-subaba-btn.active {
+    background: rgba(250, 204, 21, .16);
+    border-color: rgba(250, 204, 21, .75);
+    color: #fde68a;
+}
+
+.campanhas-subaba-pane {
+    display: none;
+}
+
+.campanhas-subaba-pane.active {
+    display: block;
+}
+
 .dash-divcustom-form .dash-form-row {
     gap: .8rem;
 }

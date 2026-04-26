@@ -116,10 +116,11 @@ class CampanhaService:
         personagens = self.combatente_repository.get_by_ids(ids)
         if len(personagens) != len(ids):
             raise ArenaBaseException("Alguns personagens nao foram encontrados", status_code=404)
-        invalidos = [p.nome for p in personagens if str((p.tipo or "")).lower() != "jogador"]
+        tipos_permitidos = {"jogador", "monstro", "npc"}
+        invalidos = [p.nome for p in personagens if str((p.tipo or "")).lower() not in tipos_permitidos]
         if invalidos:
             raise ArenaBaseException(
-                "Apenas personagens do tipo jogador podem ser associados a campanhas",
+                "Apenas personagens do tipo jogador, monstro ou npc podem ser associados a campanhas",
                 status_code=422,
             )
 

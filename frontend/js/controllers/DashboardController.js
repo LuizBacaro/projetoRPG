@@ -45,6 +45,7 @@ class DashboardController {
         this.campanhas           = [];
         this.sessoesCampanha     = [];
         this.sessaoEmEdicaoId    = null;
+        this.filtroTipoParticipanteCampanha = 'todos';
         this.personagensDisponiveisCampanha = [];
         this.campanhaEmEdicaoId  = null;
         this.snapshotCampanhaEmEdicao = null;
@@ -125,6 +126,7 @@ class DashboardController {
         this._configurarUploadEdicao();
         this._configurarDivindadesCustom();
         this._configurarFecharPainelCampanhas();
+        this._configurarSubAbasCampanhas();
         this._configurarCampanhas();
         this.carregarCombatentes();
     }
@@ -702,6 +704,7 @@ class DashboardController {
         const formSessao = document.getElementById('formSessaoCampanha');
         if (!form || !lista) return;
         const inputBuscaPersonagem = document.getElementById('campanhaPersonagensBusca');
+        const filtrosTipo = document.getElementById('campanhaPersonagensTipoFiltros');
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -739,6 +742,16 @@ class DashboardController {
         }
         if (inputBuscaPersonagem) {
             inputBuscaPersonagem.addEventListener('input', () => this._renderizarChecklistPersonagensCampanha());
+        }
+        if (filtrosTipo) {
+            filtrosTipo.querySelectorAll('[data-campanha-tipo]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    filtrosTipo.querySelectorAll('[data-campanha-tipo]').forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.filtroTipoParticipanteCampanha = btn.getAttribute('data-campanha-tipo') || 'todos';
+                    this._renderizarChecklistPersonagensCampanha();
+                });
+            });
         }
         form.addEventListener('input', () => this._atualizarEstadoEdicaoCampanha());
         form.addEventListener('change', () => this._atualizarEstadoEdicaoCampanha());
@@ -785,6 +798,46 @@ class DashboardController {
 
         this._carregarCampanhas();
         this._carregarSessoesCampanha();
+    }
+
+    _configurarSubAbasCampanhas() {
+        if (!this._isMestre()) return;
+        const container = document.getElementById('campanhasSubAbas');
+        if (!container) return;
+        const ativar = (alvo) => {
+            const subaba = alvo === 'sessoes' ? 'sessoes' : 'cadastro';
+            container.querySelectorAll('[data-campanhas-subaba]').forEach((btn) => {
+                btn.classList.toggle('active', btn.getAttribute('data-campanhas-subaba') === subaba);
+            });
+            const paneCadastro = document.getElementById('campanhasSubabaCadastro');
+            const paneSessoes = document.getElementById('campanhasSubabaSessoes');
+            if (paneCadastro) paneCadastro.classList.toggle('active', subaba === 'cadastro');
+            if (paneSessoes) paneSessoes.classList.toggle('active', subaba === 'sessoes');
+            this._persistirSubAbaCampanhas(subaba);
+        };
+        ativar(this._lerSubAbaCampanhasPersistida());
+        container.querySelectorAll('[data-campanhas-subaba]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                ativar(btn.getAttribute('data-campanhas-subaba'));
+            });
+        });
+    }
+
+    _lerSubAbaCampanhasPersistida() {
+        try {
+            const valor = localStorage.getItem('dashboard:campanhas-subaba');
+            return valor === 'sessoes' ? 'sessoes' : 'cadastro';
+        } catch (_err) {
+            return 'cadastro';
+        }
+    }
+
+    _persistirSubAbaCampanhas(valor) {
+        try {
+            localStorage.setItem('dashboard:campanhas-subaba', valor === 'sessoes' ? 'sessoes' : 'cadastro');
+        } catch (_err) {
+            // ignore storage errors
+        }
     }
 
     async _carregarCampanhas() {
@@ -1012,7 +1065,10 @@ class DashboardController {
                 // Em caso de falha, mantém a lista já carregada na tela.
             }
         }
-        this.personagensDisponiveisCampanha = (personagensFonte || []).filter((item) => item.tipo === 'jogador');
+        const tiposPermitidosCampanha = new Set(['jogador', 'monstro', 'npc']);
+        this.personagensDisponiveisCampanha = (personagensFonte || []).filter((item) =>
+            tiposPermitidosCampanha.has(String(item.tipo || '').toLowerCase())
+        );
         this._renderizarChecklistPersonagensCampanha();
     }
 
@@ -1021,7 +1077,10 @@ class DashboardController {
         if (!container) return;
         const idsSelecionados = new Set(this._coletarPersonagensCampanhaSelecionados());
         const filtro = String(document.getElementById('campanhaPersonagensBusca')?.value || '').trim().toLowerCase();
+        const filtroTipo = this.filtroTipoParticipanteCampanha || 'todos';
         const personagens = (this.personagensDisponiveisCampanha || []).filter((item) => {
+            const tipo = String(item.tipo || '').toLowerCase();
+            if (filtroTipo !== 'todos' && tipo !== filtroTipo) return false;
             if (!filtro) return true;
             const nome = String(item.nome || '').toLowerCase();
             return nome.includes(filtro);
@@ -1029,16 +1088,20 @@ class DashboardController {
         if (!personagens.length) {
             const vazio = filtro
                 ? 'Nenhum personagem encontrado para este filtro.'
-                : 'Nenhum personagem jogador disponível.';
+                : 'Nenhum personagem disponível.';
             container.innerHTML = `<div class="campanha-personagens-vazio">${vazio}</div>`;
             return;
         }
         container.innerHTML = personagens.map((personagem) => {
             const checked = idsSelecionados.has(personagem.id) ? 'checked' : '';
+            const tipoLabel = String(personagem.tipo || '').toLowerCase();
+            const tipoExibicao = tipoLabel
+                ? tipoLabel.charAt(0).toUpperCase() + tipoLabel.slice(1)
+                : 'Personagem';
             return `
                 <label class="campanha-personagem-item">
                     <input type="checkbox" data-personagem-id="${personagem.id}" ${checked} />
-                    <span class="campanha-personagem-nome">${escapeHtml(personagem.nome)} (Nv ${personagem.nivel || 1})</span>
+                    <span class="campanha-personagem-nome">${escapeHtml(personagem.nome)} (${tipoExibicao} • Nv ${personagem.nivel || 1})</span>
                 </label>
             `;
         }).join('');
@@ -1105,6 +1168,13 @@ class DashboardController {
         }
         const inputBuscaPersonagem = document.getElementById('campanhaPersonagensBusca');
         if (inputBuscaPersonagem) inputBuscaPersonagem.value = '';
+        this.filtroTipoParticipanteCampanha = 'todos';
+        const filtrosTipo = document.getElementById('campanhaPersonagensTipoFiltros');
+        if (filtrosTipo) {
+            filtrosTipo.querySelectorAll('[data-campanha-tipo]').forEach((btn) => {
+                btn.classList.toggle('active', btn.getAttribute('data-campanha-tipo') === 'todos');
+            });
+        }
         this._limparSelectPersonagensCampanha();
     }
 
