@@ -1,8 +1,4 @@
-"""Endpoints do Grimório (D&D 3.5).
-
-Localização: `app.games.dnd35.api.v1.grimorio`. Shim em `app.api.v1.grimorio`
-durante a reorganização multi-jogo.
-"""
+"""Endpoints do Grimório (D&D 3.5) — canônico em `app.games.dnd35.api.v1.grimorio` (registrado em `app.main`)."""
 
 from __future__ import annotations
 

@@ -37,17 +37,19 @@ from .api.v1 import (
     combatentes,
     condicoes,
     divindades_custom,
-    equipamentos,
     games,
-    grimorio,
-    habilidades_especiais,
     magias,
     magias_preparadas,
     pericias,
-    racas,
-    tabelas_classes,
-    talentos,
     usuarios,
+)
+from .games.dnd35.api.v1 import (
+    equipamentos as dnd35_equipamentos,
+    grimorio as dnd35_grimorio,
+    habilidades_especiais as dnd35_habilidades_especiais,
+    racas as dnd35_racas,
+    tabelas_classes as dnd35_tabelas_classes,
+    talentos as dnd35_talentos,
 )
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
@@ -194,13 +196,13 @@ app.include_router(pericias.router, prefix=settings.API_V1_PREFIX)
 app.include_router(magias.router, prefix=settings.API_V1_PREFIX)
 app.include_router(divindades_custom.router, prefix=settings.API_V1_PREFIX)
 app.include_router(magias_preparadas.router, prefix=settings.API_V1_PREFIX)
-app.include_router(grimorio.router, prefix=settings.API_V1_PREFIX)
-app.include_router(equipamentos.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_grimorio.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_equipamentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(armaduras_protecao.router, prefix=settings.API_V1_PREFIX)
-app.include_router(talentos.router, prefix=settings.API_V1_PREFIX)
-app.include_router(tabelas_classes.router, prefix=settings.API_V1_PREFIX)
-app.include_router(racas.router, prefix=settings.API_V1_PREFIX)
-app.include_router(habilidades_especiais.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_talentos.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_tabelas_classes.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_racas.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_habilidades_especiais.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 

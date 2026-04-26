@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.api.v1.racas import router as racas_router
+from app.games.dnd35.api.v1.racas import router as racas_router
 
 
 def _client() -> TestClient:

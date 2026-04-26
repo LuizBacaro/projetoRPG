@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.api.v1.tabelas_classes import router as tabelas_classes_router
+from app.games.dnd35.api.v1.tabelas_classes import router as tabelas_classes_router
 from app.core.catalog_cache import catalog_cache
 from app.core.config import settings
 from app.core.deps import get_usuario_atual

@@ -1,8 +1,7 @@
 """
 Endpoints read-only do catálogo de tabelas de classes (experimental) — D&D 3.5.
 
-Localização: `app.games.dnd35.api.v1.tabelas_classes`. Shim em
-`app.api.v1.tabelas_classes` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.tabelas_classes` (registrado em `app.main`).
 """
 
 from __future__ import annotations

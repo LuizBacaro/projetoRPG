@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
 
-from app.api.v1.grimorio import router as grimorio_router
+from app.games.dnd35.api.v1.grimorio import router as grimorio_router
 from app.core.database import Base, get_db
 from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.games.dnd35.models.combatente import Combatente

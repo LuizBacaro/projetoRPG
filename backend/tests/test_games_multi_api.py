@@ -172,6 +172,7 @@ def test_post_selecionar_dnd35_emite_claims_no_jwt(hub_db):
     assert payload is not None
     assert payload.get("game_slug") == "dnd35"
     assert payload.get("perfil_no_jogo") == PerfilUsuario.JOGADOR.value
+    assert payload.get("profile") == PerfilUsuario.JOGADOR.value
 
 
 def test_post_selecionar_jogo_em_breve_retorna_409(hub_db):

@@ -223,7 +223,10 @@ flowchart LR
 
 - **Token global compartilhado**: HS256 com mesma `SECRET_KEY` entre Auth Hub
   e cada game-service. Claims: `sub`, `game_slug`, `perfil_no_jogo`, `exp`,
-  `type`, `jti`.
+  `type`, `jti`. Após `POST /games/selecionar`, o payload inclui também
+  **`profile`**, espelho de `perfil_no_jogo` (vocabulário alinhado a planos
+  multi-repo / game-services futuros; o backend continua a usar
+  `perfil_no_jogo` como campo canónico em API e BD).
 - **Auto-enroll em D&D 3.5**: enquanto for o único jogo disponível, qualquer
   conta nova ou legada é vinculada automaticamente, evitando UX de "sem acesso
   a nenhum jogo" durante a Fase 1.
@@ -235,6 +238,17 @@ flowchart LR
   seu service. O Auth Hub só conhece identidade global e mapeamento usuário ↔
   jogo. Tudo que é `Combatente`, `Campanha`, `Magia`, `Ficha`, etc. permanece
   100% no D&D 3.5 e não é compartilhado entre jogos.
+
+## Visão multi-repo (evolução física)
+
+O monólito atual já cumpre as **Fases 1–4** in-place (ver secções acima). A
+separação em pastas `apps/auth-hub`, `apps/game-dnd35`, etc. é o **próximo
+salto** de deploy (Fase 5), descrito de forma acionável em:
+
+- [apps/README.md](../apps/README.md) — mapa “plano → código hoje” no repositório.
+- [packages/README.md](../packages/README.md) — pacotes partilhados opcionais
+  (`common-ui`, `common-infra`) reservados para quando existir mais de um
+  frontend ou cliente HTTP partilhado.
 
 ## Convenção de pastas multi-jogo
 

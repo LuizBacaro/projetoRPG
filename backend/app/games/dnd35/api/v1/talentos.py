@@ -1,8 +1,7 @@
 """
 Router HTTP de Talentos (D&D 3.5)
 
-Localização: `app.games.dnd35.api.v1.talentos`. Shim em
-`app.api.v1.talentos` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.talentos` (registrado em `app.main`).
 
 NOTA: ainda **não** declara `requer_game_dnd35` (paridade com o original).
 """

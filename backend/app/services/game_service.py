@@ -148,11 +148,14 @@ class GameService:
                 detail=f"Seu acesso ao jogo '{game.nome}' está desativado.",
             )
 
+        perfil = membership.perfil_no_jogo
         novo_access_token = criar_token(
             data={
                 "sub": usuario.email,
                 "game_slug": game.slug,
-                "perfil_no_jogo": membership.perfil_no_jogo,
+                "perfil_no_jogo": perfil,
+                # Alias alinhado a docs de arquitetura multi-repo (`profile` = papel no jogo ativo).
+                "profile": perfil,
             },
             secret_key=settings.SECRET_KEY,
             expires_delta=timedelta(hours=24),
@@ -162,7 +165,8 @@ class GameService:
             data={
                 "sub": usuario.email,
                 "game_slug": game.slug,
-                "perfil_no_jogo": membership.perfil_no_jogo,
+                "perfil_no_jogo": perfil,
+                "profile": perfil,
             },
             secret_key=settings.SECRET_KEY,
             expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),

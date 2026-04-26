@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.api.v1.equipamentos import router as equipamentos_router
+from app.games.dnd35.api.v1.equipamentos import router as equipamentos_router
 from app.api.v1.magias import router as magias_router
 from app.api.v1.pericias import router as pericias_router
 from app.core.catalog_cache import catalog_cache

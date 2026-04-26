@@ -2,11 +2,8 @@
 Router de Equipamentos (D&D 3.5)
 SRP: apenas mapear endpoints HTTP do domínio "equipamentos" do D&D 3.5.
 
-Localização: este router pertence ao pacote `app.games.dnd35.api.v1`
-porque os endpoints expõem dados específicos do PHB 3.5 (Tabela 7-5).
-Existe um shim em `app.api.v1.equipamentos` que re-exporta este `router`
-durante a reorganização multi-jogo, para manter o registro em
-`app.main` funcionando sem alteração imediata.
+Endpoints PHB 3.5 (Tabela 7-5); canônico em `app.games.dnd35.api.v1.equipamentos`
+(registrado em `app.main`).
 
 NOTA: ao contrário de outros routers de D&D 3.5, este ainda não usa o
 guard `requer_game_dnd35`. A próxima onda de revisão deste domínio deve

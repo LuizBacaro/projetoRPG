@@ -2,9 +2,7 @@
 Router de Habilidades Especiais (D&D 3.5)
 SRP: apenas mapear endpoints HTTP do catálogo de habilidades especiais.
 
-Localização: este router pertence ao pacote `app.games.dnd35.api.v1`.
-Existe um shim em `app.api.v1.habilidades_especiais` que re-exporta o
-`router` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.habilidades_especiais` (registrado em `app.main`).
 
 NOTA: este router ainda **não** declara `requer_game_dnd35`. Avaliar
 adicionar numa onda futura para alinhar com os demais routers de

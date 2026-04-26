@@ -40,7 +40,8 @@ Fase A (rotas / api.v1)  →  Fase B (hub → app.shared)  →  Fase C (Postgres
 
 **Inventário (A.0):** [fase-a-inventario-routers.md](./fase-a-inventario-routers.md)
 — tabela *router → origem hoje → alvo*, comandos `grep`/`rg` e impacto em
-`backend/tests/`.
+`backend/tests/`. **A.1:** `racas` e `tabelas_classes`. **A.2:** `habilidades_especiais`,
+`talentos`, `equipamentos`, `grimorio` (ver histórico no mesmo doc).
 
 **Problema:** vários módulos em `app/api/v1/` re-exportam o `router` (e por
 vezes helpers de DI) definidos em `app/games/dnd35/api/v1/`, o que duplica

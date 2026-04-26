@@ -2,9 +2,7 @@
 Router de Raças (D&D 3.5)
 SRP: apenas mapear endpoints HTTP do catálogo de raças.
 
-Localização: este router pertence ao pacote `app.games.dnd35.api.v1`.
-Existe um shim em `app.api.v1.racas` que re-exporta o `router` durante
-a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.racas` (registrado em `app.main`).
 
 NOTA: este router ainda **não** declara `requer_game_dnd35` (paridade
 com o original).
