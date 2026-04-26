@@ -197,6 +197,7 @@ flowchart LR
   - "Multi-jogo: tokens sem game_slug" — `count` de
     `game_slug_required` por hora.
   - "Multi-jogo: tokens cruzados" — `count` de `game_slug_mismatch`.
+- **Logs brutos (Render):** filtrar por `game_slug_required`, `game_slug_mismatch` ou texto `X-Game-Slug-Required`; após subir `MULTI_GAME_STRICT_MODE=true`, monitorar picos de **409** nos paths `/api/v1/combatentes`, `/api/v1/campanhas`, `/api/v1/grimorio`, etc.
 
 #### 5.C — Separação física futura (não-bloqueante)
 
@@ -334,6 +335,13 @@ __all__ = ["DivindadeCustom"]
 Isso permite que call sites legados continuem funcionando enquanto a
 migração avança. Quando todos os imports apontarem para o novo path,
 os shims podem ser removidos em PR de limpeza.
+
+### Plano de retirada dos shims (incremental)
+
+1. **Por domínio:** escolher um shim (ex.: `app.models.combatente`) e correr `rg "from app\.models\.combatente"` (e variantes) até zero; então apagar o ficheiro shim e fixar imports restantes num PR pequeno.  
+2. **Testes:** `get_db` é um único callable (`app.core.database.get_db`, re-exportado em `app.core.deps`). Basta `dependency_overrides[get_db]` com o símbolo importado do mesmo módulo que a rota usa, ou sempre `app.core.database.get_db`.  
+3. **Auth Hub em `app/shared/`:** mover `usuario`, `game`, `auth`, `games` conforme tabela em `backend/app/shared/README.md`; cada movimento = shim no path antigo até `rg` zerar.  
+4. **Front shell:** páginas globais (`login`, seletor) podem deixar de importar `getApiUrl` de `games/dnd35/js/config/` quando existir módulo mínimo em `frontend/js/shared/` que só resolva a base da API (hoje a origem Render já está em `frontend/js/shared/render-api-origin.js`).
 
 ## Próximas ondas da reorganização (planejadas)
 

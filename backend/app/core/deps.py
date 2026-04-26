@@ -7,14 +7,15 @@ from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.requests import Request
 from sqlalchemy.orm import Session
-from typing import Generator, Optional
+from typing import Optional
 import logging
 
 from .config import settings
-from .database import SessionLocal
+from .database import get_db
 from .security import decodificar_token
 from .security_audit import log_security_event
 from ..repositories.usuario_repository import UsuarioRepository
+from ..shared.constants import GAME_SLUG_DND35
 from ..models.combatente import Combatente
 from ..models.ataque import MagiaSlot
 from ..models.usuario import PerfilUsuario
@@ -28,40 +29,11 @@ bearer_scheme = HTTPBearer(
     auto_error=False,
 )
 
+# `get_db` vem só de `database.py` — um único objeto para `Depends(get_db)` em todo o app.
+# Re-exportado aqui para quem importa de `app.core.deps` (auth, etc.).
 
-def get_db() -> Generator[Session, None, None]:
-    """
-    Dependency: Fornece sessão do banco de dados para cada request.
-
-    Características:
-    - Cria nova sessão por request
-    - Garante fechamento mesmo com erro
-    - Type hints para IDE support
-
-    Yields:
-        Session SQLAlchemy
-
-    Example:
-        @app.get("/")
-        def minha_rota(db: Session = Depends(get_db)):
-            pass
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    except HTTPException:
-        # Erros HTTP esperados (ex.: token inválido/expirado) não são falhas de BD.
-        db.rollback()
-        raise
-    except Exception as e:
-        logger.error(f"❌ Erro na sessão do BD: {str(e)}")
-        db.rollback()
-        raise
-    finally:
-        db.close()
-
-
-GAME_SLUG_DNDD35 = "dnd35"
+# Alias histórico (nome com typo) — preferir GAME_SLUG_DND35 em código novo.
+GAME_SLUG_DNDD35 = GAME_SLUG_DND35
 
 
 def extrair_game_slug_do_token(request: Request) -> Optional[str]:
@@ -245,11 +217,11 @@ def requer_game_dnd35(
     slug = extrair_game_slug_do_token(request)
 
     if not settings.MULTI_GAME_STRICT_MODE:
-        if slug and slug != GAME_SLUG_DNDD35:
+        if slug and slug != GAME_SLUG_DND35:
             logger.warning(
                 "⚠️  Acesso a endpoint D&D 3.5 com game_slug='%s' (esperado '%s')",
                 slug,
-                GAME_SLUG_DNDD35,
+                GAME_SLUG_DND35,
             )
         return usuario
 
@@ -268,10 +240,10 @@ def requer_game_dnd35(
                 "Sessão sem jogo selecionado. Volte ao seletor de jogo "
                 "para entrar no D&D 3.5."
             ),
-            headers={"X-Game-Slug-Required": GAME_SLUG_DNDD35},
+            headers={"X-Game-Slug-Required": GAME_SLUG_DND35},
         )
 
-    if slug != GAME_SLUG_DNDD35:
+    if slug != GAME_SLUG_DND35:
         log_security_event(
             "game_slug_mismatch",
             "denied",
@@ -285,9 +257,9 @@ def requer_game_dnd35(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=(
                 f"Token vinculado ao jogo '{slug}'. Este endpoint pertence "
-                f"ao D&D 3.5 ('{GAME_SLUG_DNDD35}')."
+                f"ao D&D 3.5 ('{GAME_SLUG_DND35}')."
             ),
-            headers={"X-Game-Slug-Required": GAME_SLUG_DNDD35},
+            headers={"X-Game-Slug-Required": GAME_SLUG_DND35},
         )
 
     return usuario

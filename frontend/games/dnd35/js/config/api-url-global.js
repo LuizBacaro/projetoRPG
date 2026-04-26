@@ -1,6 +1,7 @@
 /**
  * getApiUrl síncrono para páginas que carregam scripts clássicos antes de módulos ES.
- * Mantém a mesma regra de origem que api.config.js (local → origin; caso contrário → Render).
+ * Origem em produção: deve coincidir com `frontend/js/shared/render-api-origin.js`
+ * (não dá para importar ESM aqui; ao mudar o host da API, atualiza os dois ficheiros).
  */
 (function (global) {
     var h = global.location.hostname;

@@ -9,8 +9,9 @@ Pacote do **Auth Hub** + utilitários globais da plataforma.
 
 ## O que pertence aqui
 
-| Subpasta-alvo            | Conteúdo                                                         |
+| Item / subpasta-alvo     | Conteúdo                                                         |
 |--------------------------|------------------------------------------------------------------|
+| `constants.py` (já)    | Constantes do hub (`GAME_SLUG_DND35`, …) — usado por `deps` e `game_service`. |
 | `shared/core/`           | `config.py`, `database.py`, `deps.py`, `security.py`, `security_audit.py`, `rate_limit.py`, `request_size.py`, `catalog_cache.py`, `logging` |
 | `shared/models/`         | `usuario.py`, `game.py`, `mixins.py`                             |
 | `shared/schemas/`        | `usuario.py`, `game.py`, tokens                                  |

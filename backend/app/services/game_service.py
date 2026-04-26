@@ -15,6 +15,7 @@ from fastapi import HTTPException, status
 
 from ..core.config import settings
 from ..core.security import criar_token
+from ..shared.constants import GAME_SLUG_DND35
 from ..models.game import Game, UserGameMembership
 from ..models.usuario import Usuario
 from ..repositories.game_repository import (
@@ -31,9 +32,6 @@ from ..schemas.game import (
     MembershipAdminUpdate,
     PERFIS_VALIDOS_NO_JOGO,
 )
-
-
-GAME_SLUG_PADRAO = "dnd35"
 
 
 class GameService:
@@ -78,12 +76,12 @@ class GameService:
         não estiver no catálogo (estado anômalo).
         """
         existente = self.memberships.buscar_por_usuario_e_slug(
-            usuario.id, GAME_SLUG_PADRAO
+            usuario.id, GAME_SLUG_DND35
         )
         if existente is not None:
             return existente
 
-        game = self.games.get_by_slug(GAME_SLUG_PADRAO)
+        game = self.games.get_by_slug(GAME_SLUG_DND35)
         if game is None:
             return None
 
@@ -132,7 +130,7 @@ class GameService:
 
         par = self.memberships.buscar_por_usuario_e_slug(usuario.id, slug)
         if par is None:
-            if slug == GAME_SLUG_PADRAO:
+            if slug == GAME_SLUG_DND35:
                 par = self.garantir_membership_padrao(usuario)
             if par is None:
                 raise HTTPException(

@@ -1,4 +1,5 @@
 // API em produção: sempre origem do Render, exceto em dev local (evita /api no Vercel → 404). CORS: ALLOWED_ORIGINS no Render.
+import { RENDER_API_ORIGIN as RENDER_API_ORIGIN_SHARED } from '/js/shared/render-api-origin.js';
 var _h = typeof window !== 'undefined' ? window.location.hostname : '';
 var IS_LOCAL =
     _h === 'localhost' ||
@@ -6,7 +7,7 @@ var IS_LOCAL =
     _h === '[::1]' ||
     _h.endsWith('.localhost');
 var IS_PRODUCTION = _h === 'arena-de-combate-rpg.com.br' || _h === 'www.arena-de-combate-rpg.com.br';
-var RENDER_API_ORIGIN = 'https://projetorpg-7ih3.onrender.com';
+var RENDER_API_ORIGIN = RENDER_API_ORIGIN_SHARED;
 var BASE_URL = IS_LOCAL ? window.location.origin : RENDER_API_ORIGIN;
 
 var API_CONFIG = {

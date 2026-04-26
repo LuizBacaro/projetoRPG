@@ -22,10 +22,10 @@ Valores **como estão hoje no código / README** — se mudares o serviço no Re
 | Uso | URL |
 |-----|-----|
 | Origem da API (usada pelo front fora de `localhost`) | `https://projetorpg-7ih3.onrender.com` |
-| Swagger / OpenAPI | `https://projetorpg-7ih3.onrender.com/docs` |
-| Health (se exposto) | `https://projetorpg-7ih3.onrender.com/health` |
+| Swagger / OpenAPI (se `ENVIRONMENT` ≠ `production`) | `https://projetorpg-7ih3.onrender.com/api/docs` e JSON em `/api/openapi.json` |
+| Health | `https://projetorpg-7ih3.onrender.com/health` |
 
-**Código:** a origem fixa do Render está em `frontend/games/dnd35/js/config/api.config.js` (`RENDER_API_ORIGIN`). Se criares **outro** Web Service ou URL no Render, **altera esse valor** e faz deploy do front (Vercel) para o browser voltar a bater na API certa.
+**Código:** a origem fixa do Render está em `frontend/js/shared/render-api-origin.js` (importada por `games/dnd35/js/config/api.config.js`). O IIFE `api-url-global.js` **não** pode importar ES modules; mantém o mesmo URL — ao mudar o host, atualiza **ambos** ou vê o comentário no topo de `api-url-global.js`. Se criares **outro** Web Service no Render, altera a constante e faz deploy do front (Vercel).
 
 ### Preview do Vercel (`*.vercel.app`)
 
@@ -56,7 +56,15 @@ Valores **como estão hoje no código / README** — se mudares o serviço no Re
    - `ALLOWED_ORIGINS` — JSON com o domínio do **Vercel** e o site (ex.: `https://arena-de-combate-rpg.com.br`, `https://www.…`).  
    - `MULTI_GAME_STRICT_MODE` — manter **`false`** até fazer smoke com login + seletor de jogo + token com `game_slug`. Só ativa `true` quando quiseres bloqueio rígido D&D 3.5.
 
-3. **Catálogo de magias (grimório)**  
+### 1.b Rollout `MULTI_GAME_STRICT_MODE` (checklist)
+
+1. Deploy com `MULTI_GAME_STRICT_MODE=false` (modo permissivo) já aplicado no código atual.  
+2. Nos **logs do Render**, filtrar avisos `game_slug` / `Acesso a endpoint D&D 3.5` — deve tender a zero após os utilizadores passarem pelo seletor de jogo.  
+3. Smoke manual: login → seletor → D&D 3.5 → `GET /api/v1/combatentes` (ou dashboard) com token que tenha `game_slug` no JWT.  
+4. Opcional: métricas ou contagens por hora de `409` com header `X-Game-Slug-Required` nos routers com `requer_game_dnd35` (esperado zero em regime estável).  
+5. Só então: `MULTI_GAME_STRICT_MODE=true` — tokens antigos sem `game_slug` passam a receber **409**; o front já redireciona ao seletor.
+
+4. **Catálogo de magias (grimório)**  
    Se a tabela `magias` estiver **vazia** no Postgres:  
    - **Uma vez:** no Render, shell ou job one-off, a partir da pasta `backend/`:  
      `python scripts/seed_magias.py`  
@@ -116,7 +124,7 @@ Substitui `https://arena-de-combate-rpg.com.br` pelo teu domínio real se for di
 | 4 | Arena — configuração | `…/arena` ou `…/games/dnd35/arena.html` — lista de combatentes carrega |
 | 5 | Ficha + grimório | Abrir uma ficha conjuradora — grimório com magias e filtros por escola |
 
-**Swagger (API no Render):** `https://projetorpg-7ih3.onrender.com/docs` (não depende do domínio do site no Vercel).
+**Documentação OpenAPI / Swagger (FastAPI):** no `main.py`, com `ENVIRONMENT != production`, a UI fica em **`/api/docs`** e o JSON em **`/api/openapi.json`** (na mesma origem da API, ex.: `https://projetorpg-7ih3.onrender.com/api/docs`). Com `ENVIRONMENT=production` **as rotas de doc podem estar desligadas** por defeito — confirma a variável no Render ou usa um ambiente de staging. Não confundir com `/docs` antigo se o teu reverse proxy tiver outro mapeamento.
 
 **Teste rápido de API (opcional):** no browser ou `curl` (catálogo público, normalmente sem token):
 
@@ -146,4 +154,4 @@ Deve devolver um **JSON array** com itens se a tabela `magias` estiver populada 
 
 ---
 
-*Última atualização: URLs alinhadas a `README.md`, `api.config.js` (Render) e fluxo Neon + Render + Vercel. Atualiza este ficheiro se mudares domínio, nome do serviço ou URL de preview.*
+*Última atualização: URLs, origem da API (`frontend/js/shared/render-api-origin.js`), Swagger por `ENVIRONMENT`, rollout `MULTI_GAME_STRICT_MODE` e fluxo Neon + Render + Vercel.*
