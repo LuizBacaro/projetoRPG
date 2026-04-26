@@ -21,6 +21,8 @@ fichas de personagem interativas e arena de combate em tempo real.
 | `https://arena-de-combate-rpg.com.br` | Aplicação |
 | `https://arena-de-combate-rpg.com.br/docs` | Swagger API |
 
+Checklist de deploy e smoke test (Neon, Render, Vercel): **[docs/runbook-deploy-smoke.md](docs/runbook-deploy-smoke.md)**.
+
 **Credenciais do admin inicial** — definidas no `backend/.env` (veja `backend/.env.example`). No **primeiro startup** do backend, se ambas estiverem preenchidas, é criado um usuário administrador com esse e-mail e senha.
 
 ```env
