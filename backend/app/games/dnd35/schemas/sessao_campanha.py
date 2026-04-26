@@ -1,10 +1,4 @@
-"""
-Schemas Pydantic de Sessão de Campanha (D&D 3.5)
-
-Localização: este módulo pertence ao pacote `app.games.dnd35.schemas`.
-Existe um shim em `app.schemas.sessao_campanha` que re-exporta as
-classes durante a reorganização multi-jogo.
-"""
+"""Schemas Pydantic de Sessão de Campanha (D&D 3.5) — canônico em `app.games.dnd35.schemas.sessao_campanha`."""
 
 from datetime import datetime
 

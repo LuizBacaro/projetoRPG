@@ -3,9 +3,9 @@ Testes unitários para CombateService
 """
 import pytest
 from unittest.mock import Mock
-from app.services.combate_service import CombateService
-from app.models.combate import Combate
-from app.models.combatente import Combatente
+from app.games.dnd35.services.combate_service import CombateService
+from app.games.dnd35.models.combate import Combate
+from app.games.dnd35.models.combatente import Combatente
 from app.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombateJaAtivoError,

@@ -1,9 +1,4 @@
-"""
-Schemas Pydantic de Talentos (D&D 3.5)
-
-Localização: `app.games.dnd35.schemas.talento`. Shim em
-`app.schemas.talento` durante a reorganização multi-jogo.
-"""
+"""Schemas Pydantic de Talentos (D&D 3.5) — canônico em `app.games.dnd35.schemas.talento`."""
 
 from datetime import datetime
 from typing import Optional

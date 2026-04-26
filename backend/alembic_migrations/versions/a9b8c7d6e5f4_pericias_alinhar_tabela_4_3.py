@@ -58,7 +58,7 @@ _RESTORE_OBSOLETAS = {
 
 
 def _garantir_falar_idioma(session: Session) -> None:
-    from app.models.pericia import Pericia, PericiaClasse
+    from app.games.dnd35.models.pericia import Pericia, PericiaClasse
 
     row = session.query(Pericia).filter(Pericia.nome == "Falar Idioma").first()
     if row is None:
@@ -95,7 +95,7 @@ def upgrade() -> None:
     bind = op.get_bind()
     session = Session(bind=bind)
     try:
-        from app.models.pericia import Pericia, PericiaClasse, PericiaJogador
+        from app.games.dnd35.models.pericia import Pericia, PericiaClasse, PericiaJogador
 
         p_inst = session.query(Pericia).filter(Pericia.nome == "Usar Intrumento Mágico").first()
         if p_inst is not None:
@@ -126,7 +126,7 @@ def downgrade() -> None:
     bind = op.get_bind()
     session = Session(bind=bind)
     try:
-        from app.models.pericia import Pericia, PericiaClasse, PericiaJogador
+        from app.games.dnd35.models.pericia import Pericia, PericiaClasse, PericiaJogador
 
         p_inst = session.query(Pericia).filter(Pericia.nome == "Usar Instrumento Mágico").first()
         if p_inst is not None:

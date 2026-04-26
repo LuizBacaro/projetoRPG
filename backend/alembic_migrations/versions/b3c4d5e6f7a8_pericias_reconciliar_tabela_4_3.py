@@ -73,7 +73,7 @@ _ATUACAO_ESPECIALIDADES: tuple[str, ...] = (
 
 
 def _pericia_em_uso(session: Session, pericia_id: int) -> bool:
-    from app.models.pericia import PericiaJogador
+    from app.games.dnd35.models.pericia import PericiaJogador
 
     return (
         session.query(PericiaJogador.id)
@@ -84,7 +84,7 @@ def _pericia_em_uso(session: Session, pericia_id: int) -> bool:
 
 
 def _soft_delete_se_ocioso(session: Session, pericia) -> bool:
-    from app.models.pericia import PericiaClasse
+    from app.games.dnd35.models.pericia import PericiaClasse
 
     if _pericia_em_uso(session, pericia.id):
         return False
@@ -101,7 +101,7 @@ def _migrar_referencias_jogador(session: Session, origem_id: int, destino_id: in
     Se o jogador já possuir a perícia de destino, o registro de origem é descartado
     (evita violar o índice único implícito combatente_id × pericia_id).
     """
-    from app.models.pericia import PericiaJogador
+    from app.games.dnd35.models.pericia import PericiaJogador
 
     atualizados = 0
     origens = (
@@ -129,7 +129,7 @@ def _migrar_referencias_jogador(session: Session, origem_id: int, destino_id: in
 
 
 def _copiar_associacoes_classe(session: Session, origem_id: int, destino_id: int) -> None:
-    from app.models.pericia import PericiaClasse
+    from app.games.dnd35.models.pericia import PericiaClasse
 
     ja_existentes = {
         c.classe_nome
@@ -159,7 +159,7 @@ def upgrade() -> None:
     try:
         from scripts.seed_pericias import PERICIAS_DATA  # noqa: WPS433
 
-        from app.models.pericia import Pericia, PericiaClasse
+        from app.games.dnd35.models.pericia import Pericia, PericiaClasse
 
         # 1) Renomes legados → canônicos. Se a canônica já existir,
         # migramos referências de jogador/classe e removemos a legada.
@@ -269,7 +269,7 @@ def downgrade() -> None:
     bind = op.get_bind()
     session = Session(bind=bind)
     try:
-        from app.models.pericia import Pericia
+        from app.games.dnd35.models.pericia import Pericia
 
         for nome_antigo, nome_novo in _RENAMES_LEGADOS:
             p = session.query(Pericia).filter(Pericia.nome == nome_novo).first()

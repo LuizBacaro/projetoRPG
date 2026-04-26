@@ -1,10 +1,7 @@
 """
-Schemas Pydantic de Habilidade Especial (D&D 3.5)
+Schemas Pydantic de Habilidade Especial (D&D 3.5).
 
-Localização: este módulo pertence ao pacote `app.games.dnd35.schemas`
-porque habilidades especiais são uma referência exclusiva do PHB 3.5.
-Existe um shim em `app.schemas.habilidade_especial` que re-exporta as
-classes durante a reorganização multi-jogo.
+Referência PHB 3.5; canônico em `app.games.dnd35.schemas.habilidade_especial`.
 """
 
 from __future__ import annotations

@@ -13,9 +13,9 @@ from typing import List, Optional
 from app.core.database import get_db
 from app.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
 from app.games.dnd35.models.ataque import MagiaPreparada, MagiaSlot
-from app.models.combatente import Combatente
+from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.magia import Magia
-from app.schemas.ataque import (
+from app.games.dnd35.schemas.ataque import (
     MagiaPreparadaResponse,
     MagiaPreparadaCreate,
     DescansoRequest,

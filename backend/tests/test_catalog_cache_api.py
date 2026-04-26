@@ -10,8 +10,8 @@ from app.core.catalog_cache import catalog_cache
 from app.core.database import get_db
 from app.core.deps import get_usuario_atual
 from app.core.config import settings
-from app.services.equipamento_service import EquipamentoService
-from app.services.pericia_service import PericiaService
+from app.games.dnd35.services.equipamento_service import EquipamentoService
+from app.games.dnd35.services.pericia_service import PericiaService
 
 
 def _with_cache_enabled():

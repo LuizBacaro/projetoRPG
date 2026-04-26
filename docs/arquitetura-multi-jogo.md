@@ -16,12 +16,16 @@ descreve a operação e a separação física futura em apps independentes.
 > `apps/frontend-dnd35` e `apps/game-dnd35/backend` continua planejada,
 > mas é independente da entrega funcional multi-jogo.
 >
-> **Reorganização de pastas em curso (abr/2026):** o repositório passou
-> a expor visualmente as fronteiras de cada jogo via `backend/app/games/`
-> e `frontend/games/` (ver "Convenção de pastas multi-jogo" mais abaixo).
-> A migração dos arquivos é feita em PRs pequenos por domínio, com shims
-> de compatibilidade nos paths antigos para não quebrar imports legados.
-> O domínio `divindades_custom` foi migrado como POC.
+> **Reorganização de pastas (abr/2026):** o D&D 3.5 está sob
+> `backend/app/games/dnd35/` e o frontend por jogo em `frontend/games/`
+> (ver "Convenção de pastas multi-jogo"). A migração foi feita por ondas;
+> **não** existem mais ficheiros-shim por domínio em `app.models.<x>` /
+> `app.schemas.<x>` para esse jogo — imports de domínio apontam para
+> `app.games.dnd35.models|schemas|...`. O pacote `app.models` continua a
+> agregar modelos D&D 3.5 no `__init__.py` (metadata/migrations) e a
+> hospedar o hub (`usuario`, `game`, `mixins`). `app.schemas` ficou só com
+> `usuario`, `auth` e `game`. Vários `app.api.v1.*` ainda re-exportam o
+> mesmo `router` definido em `games/dnd35/api/v1` para manter URLs estáveis.
 
 ## Visão geral
 
@@ -234,36 +238,41 @@ flowchart LR
 
 ## Convenção de pastas multi-jogo
 
-A reorganização adotada deixa explícito, no próprio repositório, qual
-código pertence a cada sistema de RPG. Convive com a estrutura legada
-via shims de re-export, então pode ser feita incrementalmente sem
-quebrar imports.
+A reorganização deixa explícito qual código pertence a cada sistema de RPG.
+O domínio D&D 3.5 vive em `games/dnd35/`; o Auth Hub e utilitários globais
+ainda estão sob `app/core`, `app/models`, `app/schemas`, etc., com evolução
+gradual documentada em `backend/app/shared/README.md`.
 
-### Backend
+### Backend (layout vigente)
 
 ```
 backend/app/
-    main.py                       (registra routers de shared/ e games/*)
-    shared/                       Auth Hub + utilitários globais (alvo)
-        core/                     config, database, deps, security, ...
-        models/                   usuario, game, mixins
-        schemas/
-        repositories/
-        services/
-        api/v1/                   auth, usuarios, games
-        exceptions/
+    main.py                       (monta app; regista routers hub + games/*)
+    core/                         config, database, deps, security, mixins, ...
+    models/                       Hub: usuario, game, mixins; __init__.py
+                                  re-exporta modelos D&D 3.5 (metadata/Alembic)
+    schemas/                      Hub: usuario, auth, game
+    repositories/                 Hub: usuario, game (+ base.py)
+    services/                     Hub: usuario, game (+ serviços legados se houver)
+    api/v1/                       auth, usuarios, games; re-export de routers dnd35
+    shared/                       constants.py + README (alvo de consolidação do hub)
     games/
-        dnd35/                    Backend D&D 3.5 (em produção)
-            core/                 deps específicos (requer_game_dnd35), parsers
+        dnd35/                    D&D 3.5 em produção
             models/
             schemas/
             repositories/
             services/
             api/v1/
+            catalogs/
             seeds/
-        dnd5e/                    EM BREVE (pacote vazio reservado)
-        gurps/                    EM BREVE (pacote vazio reservado)
+        dnd5e/                    reservado (em breve)
+        gurps/                    reservado (em breve)
 ```
+
+Alvo de médio prazo (não bloqueante): concentrar Auth Hub sob `app/shared/`
+(`core`, `models`, `schemas`, …) como na versão anterior deste doc — hoje
+só existe `app/shared/` mínimo; o restante do hub permanece nos paths
+históricos acima.
 
 > Hoje, **onze** blocos estão fisicamente migrados em `games/dnd35/`:
 >
@@ -292,14 +301,13 @@ backend/app/
 >     `/condicoes`, ataques/slots e `/armaduras_protecao`) — 10ª onda.
 > 11. **`combatente*`** (model, schemas, repositório, `CombatenteService` e
 >     router `/combatentes`) — 11ª onda (**ficha**, nó central de FKs).
->     `SoftDeleteMixin` foi extraído para `app/core/mixins.py` e
->     `app.models.mixins` virou shim, evitando import circular entre shims
->     e `games/dnd35/models`.
+>     `SoftDeleteMixin` está em `app/core/mixins.py`; `app.models.mixins`
+>     mantém apenas re-export para compatibilidade com imports antigos.
 >
-> Os caminhos antigos dos domínios migrados permanecem como shims que
-> re-exportam os novos paths. Próximo passo estrutural sugerido na doc:
-> **Schemas Postgres** (`auth.*`, `dnd35.*`) ou PR de limpeza consolidando
-> imports diretos em `games/dnd35/`.
+> Próximos passos estruturais sugeridos: **schemas Postgres** (`auth.*`,
+> `dnd35.*`), consolidação do hub em `app/shared/`, e eventual redução de
+> re-exports em `app.api.v1` quando o registo em `main.py` apontar só para
+> `games/dnd35/api/v1`.
 
 ### Frontend
 
@@ -320,28 +328,31 @@ frontend/
 > do jogo, dando feedback visual ao usuário e mantendo a pasta de cada
 > sistema futuro visível para o desenvolvedor.
 
-### Shims de compatibilidade
+### Shims e re-exports ainda relevantes
 
-Quando um módulo é movido para `games/<slug>/...`, o caminho antigo é
-mantido como `[SHIM DE COMPATIBILIDADE]` que apenas re-exporta do novo
-local. Exemplo (`backend/app/models/divindade_custom.py`):
+- **`app.models.mixins`** — re-export fino de `SoftDeleteMixin` a partir de
+  `app.core.mixins` (imports legados).
+- **`app.models.__init__.py`** — agrega imports dos modelos D&D 3.5 a partir de
+  `app.games.dnd35.models.*` para que `Base.metadata` e o Alembic vejam todas
+  as tabelas; **não** substitui ficheiros `app.models.combatente` etc. (esses
+  shims por módulo foram removidos).
+- **`app.api.v1.*`** — alguns módulos importam e re-exportam o `router` (e
+  ocasionalmente helpers de DI) definidos em `games/dnd35/api/v1`, mantendo
+  paths HTTP `/api/v1/...` estáveis.
 
-```python
-"""[SHIM] Re-exporta DivindadeCustom do novo path."""
-from ..games.dnd35.models.divindade_custom import DivindadeCustom
-__all__ = ["DivindadeCustom"]
-```
+### Plano de limpeza / próximos incrementos
 
-Isso permite que call sites legados continuem funcionando enquanto a
-migração avança. Quando todos os imports apontarem para o novo path,
-os shims podem ser removidos em PR de limpeza.
-
-### Plano de retirada dos shims (incremental)
-
-1. **Por domínio:** escolher um shim (ex.: `app.models.combatente`) e correr `rg "from app\.models\.combatente"` (e variantes) até zero; então apagar o ficheiro shim e fixar imports restantes num PR pequeno.  
-2. **Testes:** `get_db` é um único callable (`app.core.database.get_db`, re-exportado em `app.core.deps`). Basta `dependency_overrides[get_db]` com o símbolo importado do mesmo módulo que a rota usa, ou sempre `app.core.database.get_db`.  
-3. **Auth Hub em `app/shared/`:** mover `usuario`, `game`, `auth`, `games` conforme tabela em `backend/app/shared/README.md`; cada movimento = shim no path antigo até `rg` zerar.  
-4. **Front shell:** páginas globais (`login`, seletor) podem deixar de importar `getApiUrl` de `games/dnd35/js/config/` quando existir módulo mínimo em `frontend/js/shared/` que só resolva a base da API (hoje a origem Render já está em `frontend/js/shared/render-api-origin.js`).
+1. **Feito (D&D 3.5):** retirar ficheiros-shim `app.models.<domínio>` e
+  `app.schemas.<domínio>`; apontar código e testes para `app.games.dnd35.*`.
+2. **Testes:** `get_db` é um único callable (`app.core.database.get_db`,
+   re-exportado em `app.core.deps`). Usar `dependency_overrides[get_db]` com o
+   mesmo símbolo que a rota injeta, ou sempre `app.core.database.get_db`.
+3. **Auth Hub em `app/shared/`:** mover `usuario`, `game`, `auth`, `games`
+   conforme `backend/app/shared/README.md`; cada movimento pode usar shim no
+   path antigo até `rg` zerar.
+4. **Front shell:** páginas globais (`login`, seletor) alinhadas a
+   `frontend/js/shared/` (ex.: `render-api-origin-boot.js` e
+   `render-api-origin.js` para origem da API em Render).
 
 ## Próximas ondas da reorganização (planejadas)
 
@@ -375,33 +386,36 @@ os shims podem ser removidos em PR de limpeza.
    repositórios, service, router `/pericias` e `seeds/pericias_seed`).
 8. **Onda backend "tabelas de classe"** — ✅ concluída
    (`catalogs/classes_tables_catalog`, schemas, `TabelasClassesService`,
-   router `/tabelas-classes`; shims em `app.core.classes_tables_catalog`
-   e paths legados).
+   router `/tabelas-classes`; loaders legados em `app.core` podem ainda
+   delegar para o catálogo em `games/dnd35` — ver código).
 9. **Onda backend "magia"** — ✅ concluída
    (`Magia`/`MagiaClasse`/`MagiaHistorico`, grimório, schemas, repositórios,
    services, routers `/magias`, `/grimorio`, `/magias-preparadas`;
-   `MagiaSlot`/`MagiaPreparada` migraram na onda **combate** para
-   `games/dnd35/models/ataque.py`, com shim em `app.models.ataque`).
+   `MagiaSlot`/`MagiaPreparada` estão em `games/dnd35/models/ataque.py`
+   (onda combate), importados de `app.games.dnd35.models.ataque`).
 10. **Onda backend "combate"** — ✅ concluída (`combate`,
     `combatente_condicao`, `condicao`, `ataque` incluindo
     `MagiaSlot`/`MagiaPreparada`, `armadura_protecao`; routers
     `/combate`, `/condicoes`, ataques/slots, `/armaduras_protecao`).
 11. **Onda backend "ficha"** — ✅ concluída (`Combatente`, repositório,
-   service, router `/combatentes`; shims nos paths legados;
-   `SoftDeleteMixin` em `app/core/mixins.py`; shim `app.api.v1.combate`
-   re-exporta também `get_combate_service`, `get_condicao_service` e
-   `get_usuario_atual` para overrides em testes).
+    service, router `/combatentes`; `SoftDeleteMixin` em
+    `app/core/mixins.py`; `app.api.v1.combate` pode re-exportar
+    `get_combate_service`, `get_condicao_service` e `get_usuario_atual`
+    para overrides em testes).
 12. **Onda frontend D&D 3.5** — ✅ concluída
    (`frontend/games/dnd35/` com `pages/`, `css/`, `js/`, `arena.html`;
    shell global em `frontend/pages/` — login + seletor + stubs de redirect;
    `vercel.json` com rewrites para `/dashboard`, `/arena`, `/pericias`;
    backend monta `/games/dnd35` em `main.py`).
 
-Cada onda deve seguir o padrão da POC `divindades_custom`:
-- Criar arquivos novos em `games/dnd35/...`
-- Transformar arquivo antigo em shim que re-exporta
-- Rodar a suíte de testes do domínio
-- PR pequeno e revisável de forma isolada
+Cada onda nova deve seguir o padrão estabelecido após a POC
+`divindades_custom`:
+- Implementar domínio em `games/<slug>/...` (models, schemas, services,
+  `api/v1`).
+- Atualizar `main.py`, `dependencies` e testes para importar só paths
+  canónicos do jogo (sem criar ficheiro-shim `app.models.<domínio>`).
+- Rodar a suíte de testes do domínio e regressão geral.
+- PR pequeno e revisável de forma isolada.
 
 ## Pontos de extensão para novos jogos
 

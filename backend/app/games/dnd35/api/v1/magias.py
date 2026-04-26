@@ -31,7 +31,7 @@ from app.games.dnd35.schemas.magia import (
 )
 from app.games.dnd35.services.magia_import_service import MagiaImportService
 from app.games.dnd35.services.magia_service import MagiaService
-from app.services.divindade_custom_service import build_divindade_custom_service
+from app.games.dnd35.services.divindade_custom_service import build_divindade_custom_service
 
 router = APIRouter(prefix="/magias", tags=["Magias"])
 

@@ -1,9 +1,4 @@
-"""
-Model ORM de Talentos (D&D 3.5)
-
-Localização: `app.games.dnd35.models.talento`. Shim em
-`app.models.talento` durante a reorganização multi-jogo.
-"""
+"""Model ORM de Talentos (D&D 3.5) — canônico em `app.games.dnd35.models.talento`."""
 
 from datetime import datetime, timezone
 

@@ -16,8 +16,8 @@ from .security import decodificar_token
 from .security_audit import log_security_event
 from ..repositories.usuario_repository import UsuarioRepository
 from ..shared.constants import GAME_SLUG_DND35
-from ..models.combatente import Combatente
-from ..models.ataque import MagiaSlot
+from ..games.dnd35.models.combatente import Combatente
+from ..games.dnd35.models.ataque import MagiaSlot
 from ..models.usuario import PerfilUsuario
 
 logger = logging.getLogger(__name__)

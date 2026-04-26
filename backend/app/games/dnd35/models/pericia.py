@@ -1,9 +1,4 @@
-"""
-Modelos de Perícia (D&D 3.5)
-
-Localização: `app.games.dnd35.models.pericia`. Shim em
-`app.models.pericia` durante a reorganização multi-jogo.
-"""
+"""Modelos de Perícia (D&D 3.5) — canônico em `app.games.dnd35.models.pericia`."""
 
 from enum import Enum as PyEnum
 from typing import TYPE_CHECKING

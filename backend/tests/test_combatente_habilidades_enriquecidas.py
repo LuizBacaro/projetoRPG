@@ -11,8 +11,8 @@ from __future__ import annotations
 import json
 from unittest.mock import Mock
 
-from app.services.combatente_service import CombatenteService
-from app.models.combatente import Combatente
+from app.games.dnd35.services.combatente_service import CombatenteService
+from app.games.dnd35.models.combatente import Combatente
 
 
 def _service_com_mocks() -> CombatenteService:

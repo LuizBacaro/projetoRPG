@@ -2,10 +2,7 @@
 Model de Sessão de Campanha (D&D 3.5)
 SRP: representa o resumo textual de cada sessão jogada de uma campanha.
 
-Localização: este model pertence ao pacote `app.games.dnd35.models`
-porque sessões pertencem ao fluxo de campanhas D&D 3.5. Existe um shim
-em `app.models.sessao_campanha` que apenas re-exporta a classe durante
-a reorganização multi-jogo.
+Sessões de campanha D&D 3.5; canônico em `app.games.dnd35.models.sessao_campanha`.
 """
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String

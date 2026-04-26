@@ -1,6 +1,6 @@
-from app.models.combatente import Combatente
-from app.models.pericia import Pericia, PericiaClasse, PericiaJogador
-from app.services.pericia_service import PericiaService
+from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.models.pericia import Pericia, PericiaClasse, PericiaJogador
+from app.games.dnd35.services.pericia_service import PericiaService
 
 
 def test_obter_custos_pericias_em_lote(test_db):

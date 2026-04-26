@@ -123,7 +123,7 @@ Backend do sistema **Dungeons & Dragons 3.5**.
 
   `MagiaSlot` e `MagiaPreparada` vivem em `games/dnd35/models/ataque.py`
   (onda **combate**). O router `/magias-preparadas` importa esses models
-  desse pacote; `app.models.ataque` permanece como shim.
+  desse módulo (`app.games.dnd35.models.ataque`).
 
   O router `/magias` ainda **não** declara `requer_game_dnd35` (paridade
   com o original). `/grimorio` e `/magias-preparadas` mantêm o guard.
@@ -136,8 +136,8 @@ Backend do sistema **Dungeons & Dragons 3.5**.
   - schemas, repositórios, services e routers `/combate`, `/condicoes`,
     rotas de ataques/slots (`/combatentes/.../ataques`, `.../magias`,
     `/magias_slots/...`) e `/armaduras_protecao`
-  - Shims em `app.models`, `app.schemas`, `app.repositories`, `app.services`,
-    `app.api.v1` para imports legados
+  - Código canônico em `games/dnd35/`; `app.api.v1` pode ainda re-exportar
+    o mesmo `router` para URLs estáveis (`app.games.dnd35.api.v1.*`).
 
 - **`combatente/`** (11ª onda — **ficha**, nó central):
   - `models/combatente.py` (`Combatente`)
@@ -147,10 +147,8 @@ Backend do sistema **Dungeons & Dragons 3.5**.
   - `services/combatente_service.py` (`CombatenteService`; enriquecimento
     racial persiste `idiomas_customizados` na coluna como JSON)
   - `api/v1/combatentes.py` (router `/combatentes`)
-  - Shims em `app.models`, `app.schemas`, `app.repositories`, `app.services`,
-    `app.api.v1` para imports legados
-  - `app/core/mixins.py` — `SoftDeleteMixin`; `app.models.mixins` re-exporta
-    (evita import circular com shims de `combatente`)
+  - `app/core/mixins.py` define `SoftDeleteMixin`; `app.models.mixins` só
+    re-exporta por compatibilidade com imports antigos.
 
 O router `/combatentes` mantém `requer_game_dnd35` como na migração.
 
@@ -160,8 +158,8 @@ O router `/combatentes` mantém `requer_game_dnd35` como na migração.
 # Dentro do próprio pacote dnd35:
 from ..models.divindade_custom import DivindadeCustom
 
-# Cruzando para o Auth Hub (shared):
-from ....shared.core.deps import get_usuario_atual, requer_game_dnd35
+# Cruzando para o hub (vigente: `app.core`; alvo: `app.shared.core`):
+from .....core.deps import get_usuario_atual, requer_game_dnd35
 ```
 
 ## Guard de jogo

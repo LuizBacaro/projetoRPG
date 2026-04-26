@@ -26,9 +26,9 @@ if str(BACKEND_DIR) not in sys.path:
 from sqlalchemy.orm import Session  # noqa: E402
 
 from app.core.database import SessionLocal  # noqa: E402
-from app.models.equipamento import Equipamento, EquipamentoJogador  # noqa: E402
+from app.games.dnd35.models.equipamento import Equipamento, EquipamentoJogador  # noqa: E402
 from app.repositories.base import apply_not_deleted  # noqa: E402
-from app.repositories.equipamento_repository import EquipamentoRepository  # noqa: E402
+from app.games.dnd35.repositories.equipamento_repository import EquipamentoRepository  # noqa: E402
 
 DEFAULT_NOMES = (
     "Espada Longa",

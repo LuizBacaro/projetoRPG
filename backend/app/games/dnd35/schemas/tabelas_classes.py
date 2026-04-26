@@ -1,9 +1,4 @@
-"""
-Schemas para catálogo de tabelas de classes (read-only) — D&D 3.5.
-
-Localização: `app.games.dnd35.schemas.tabelas_classes`. Shim em
-`app.schemas.tabelas_classes` durante a reorganização multi-jogo.
-"""
+"""Schemas do catálogo de tabelas de classes (read-only, D&D 3.5) — `app.games.dnd35.schemas.tabelas_classes`."""
 
 from __future__ import annotations
 

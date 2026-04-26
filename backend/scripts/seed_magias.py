@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from sqlalchemy.orm import Session
 
-from app.models.magia import Magia, MagiaClasse
+from app.games.dnd35.models.magia import Magia, MagiaClasse
 from app.core.database import SessionLocal
 from app.core.text_utils import normalizar_classe as _norm_classe
 

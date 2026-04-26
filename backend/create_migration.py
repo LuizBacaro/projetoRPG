@@ -17,12 +17,12 @@ sys.path.insert(0, str(backend_root))
 # Imports dos models
 from app.core.database import Base
 from app.models.usuario import Usuario
-from app.models.combatente import Combatente
-from app.models.magia import Magia
-from app.models.combate import Combate
-from app.models.pericia import Pericia
-from app.models.condicao import Condicao
-from app.models.combatente_condicao import CombatenteCondicao
+from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.models.magia import Magia
+from app.games.dnd35.models.combate import Combate
+from app.games.dnd35.models.pericia import Pericia
+from app.games.dnd35.models.condicao import Condicao
+from app.games.dnd35.models.combatente_condicao import CombatenteCondicao
 
 from sqlalchemy import inspect, MetaData, create_engine
 import sqlite3

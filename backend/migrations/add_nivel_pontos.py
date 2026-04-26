@@ -24,8 +24,8 @@ def criar_tabelas():
     
     try:
         from app.core.database import Base, engine
-        import app.models.combatente
-        import app.models.combate
+        import app.games.dnd35.models.combatente
+        import app.games.dnd35.models.combate
         
         Base.metadata.create_all(bind=engine)
         print("✅ Tabelas criadas/verificadas com sucesso!")

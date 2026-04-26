@@ -1,9 +1,9 @@
-from app.models.combatente import Combatente
-from app.models.equipamento import Equipamento, EquipamentoJogador
-from app.models.pericia import Pericia
-from app.repositories.combatente_repository import CombatenteRepository
-from app.services.equipamento_service import EquipamentoService
-from app.services.pericia_service import PericiaService
+from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.models.equipamento import Equipamento, EquipamentoJogador
+from app.games.dnd35.models.pericia import Pericia
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.services.equipamento_service import EquipamentoService
+from app.games.dnd35.services.pericia_service import PericiaService
 
 
 def test_combatente_repository_soft_delete_remove_da_listagem(test_db):

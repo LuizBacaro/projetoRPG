@@ -21,7 +21,7 @@ from ...core.security_audit import log_security_event
 from ...core.deps import get_db, get_usuario_atual
 from ...repositories.usuario_repository import UsuarioRepository
 from ...models.usuario import Usuario, PerfilUsuario
-from ...models.campanha import Campanha
+from ...games.dnd35.models.campanha import Campanha
 
 logger = logging.getLogger(__name__)
 

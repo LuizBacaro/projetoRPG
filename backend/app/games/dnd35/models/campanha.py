@@ -2,11 +2,8 @@
 Model de Campanha (D&D 3.5)
 SRP: representa campanhas criadas por mestres e seus personagens associados.
 
-Localização: este model pertence ao pacote `app.games.dnd35.models`
-porque o conceito de "Campanha" aqui carrega regras D&D 3.5 (mestre,
-personagens-combatentes, sessões com resumo D&D). Existe um shim em
-`app.models.campanha` que apenas re-exporta a classe durante a
-reorganização multi-jogo.
+Canônico em `app.games.dnd35.models.campanha` (campanhas D&D 3.5: mestre,
+personagens-combatentes, sessões com resumo D&D).
 """
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String

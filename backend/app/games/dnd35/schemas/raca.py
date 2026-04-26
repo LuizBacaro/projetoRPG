@@ -1,10 +1,4 @@
-"""
-Schemas Pydantic de Raça (D&D 3.5)
-
-Localização: este módulo pertence ao pacote `app.games.dnd35.schemas`.
-Existe um shim em `app.schemas.raca` que re-exporta as classes durante
-a reorganização multi-jogo.
-"""
+"""Schemas Pydantic de Raça (D&D 3.5) — canônico em `app.games.dnd35.schemas.raca`."""
 
 from __future__ import annotations
 

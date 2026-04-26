@@ -693,7 +693,8 @@
 <!-- SCRIPTS — CARREGAMENTO OTIMIZADO                                -->
 <!-- ════════════════════════════════════════════════════════════════ -->
 
-<!-- FASE 1: API → mesma origem que api.config.js (Render fora de localhost); síncrono antes dos scripts abaixo -->
+<!-- FASE 1: origem da API (uma string em boot) → getApiUrl síncrono → módulo com fetch resiliente -->
+<script src="/js/shared/render-api-origin-boot.js"></script>
 <script src="/games/dnd35/js/config/api-url-global.js"></script>
 <script type="module" src="/games/dnd35/js/config/api.config.js"></script>
 

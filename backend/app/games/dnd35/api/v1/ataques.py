@@ -26,7 +26,7 @@ from app.games.dnd35.schemas.ataque import (
     MagiasBulkRequest,
 )
 from app.games.dnd35.services.ataque_service import AtaqueService
-from app.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 
 router = APIRouter(
     tags=["Ataques e Magias"],

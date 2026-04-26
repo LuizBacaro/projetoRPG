@@ -15,7 +15,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
 from app.core.database import SessionLocal, engine
-from app.models.talento import Talento
+from app.games.dnd35.models.talento import Talento
 
 
 def _validar_e_normalizar_talento(talento_data: dict) -> dict:

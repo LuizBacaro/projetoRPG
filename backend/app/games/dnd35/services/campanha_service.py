@@ -12,7 +12,7 @@ from app.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.games.dnd35.models.campanha import Campanha
 from app.games.dnd35.repositories.campanha_repository import CampanhaRepository
 from app.repositories.base import commit_with_rollback
-from app.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 
 
 class CampanhaService:

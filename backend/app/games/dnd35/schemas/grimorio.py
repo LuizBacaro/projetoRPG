@@ -1,8 +1,4 @@
-"""Schemas do Grimório (D&D 3.5).
-
-Localização: `app.games.dnd35.schemas.grimorio`. Shim em `app.schemas.grimorio`
-durante a reorganização multi-jogo.
-"""
+"""Schemas do Grimório (D&D 3.5) — canônico em `app.games.dnd35.schemas.grimorio`."""
 
 from datetime import datetime
 from typing import Optional

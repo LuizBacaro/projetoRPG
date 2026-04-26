@@ -14,9 +14,9 @@ print(f"📁 Backend dir: {backend_dir}")
 
 try:
     from app.core.database import SessionLocal, Base, engine
-    from app.models.combatente import Combatente
-    from app.models.pericia import Pericia, PericiaClasse
-    import app.models.combate  # Importar para criar tabela
+    from app.games.dnd35.models.combatente import Combatente
+    from app.games.dnd35.models.pericia import Pericia, PericiaClasse
+    import app.games.dnd35.models.combate  # Importar para criar tabela
     
     # Import seed data
     from seed_pericias import PERICIAS_DATA

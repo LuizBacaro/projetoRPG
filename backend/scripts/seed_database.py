@@ -9,8 +9,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.core.database import SessionLocal
-from app.repositories.combatente_repository import CombatenteRepository
-from app.models.combatente import Combatente
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.models.combatente import Combatente
 
 
 def seed():

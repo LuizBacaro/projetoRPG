@@ -19,7 +19,7 @@ if str(ROOT) not in sys.path:
 
 from app.core.bonus_base_ataque import calcular_bonus_base_ataque, calcular_resistencias_base
 from app.core.database import SessionLocal
-from app.models.combatente import Combatente
+from app.games.dnd35.models.combatente import Combatente
 
 
 @dataclass

@@ -4,10 +4,10 @@ from app.core.dependencies import (
     get_combatente_repository,
     get_combatente_service,
 )
-from app.repositories.combate_repository import CombateRepository
-from app.repositories.combatente_repository import CombatenteRepository
-from app.services.combate_service import CombateService
-from app.services.combatente_service import CombatenteService
+from app.games.dnd35.repositories.combate_repository import CombateRepository
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.services.combate_service import CombateService
+from app.games.dnd35.services.combatente_service import CombatenteService
 
 
 def test_dependency_factories_reutilizam_objetos_injetados(test_db):

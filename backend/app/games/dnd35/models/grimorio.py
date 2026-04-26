@@ -1,7 +1,6 @@
 """Modelos do Grimório de magias conhecidas por combatente/classe (D&D 3.5).
 
-Localização: `app.games.dnd35.models.grimorio`. Shim em `app.models.grimorio`
-durante a reorganização multi-jogo.
+Canônico: `app.games.dnd35.models.grimorio`.
 """
 
 from datetime import datetime, timezone

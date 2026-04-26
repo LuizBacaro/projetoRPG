@@ -1,9 +1,4 @@
-"""
-Schemas Pydantic de Magias (D&D 3.5).
-
-Localização: `app.games.dnd35.schemas.magia`. Shim em `app.schemas.magia`
-durante a reorganização multi-jogo.
-"""
+"""Schemas Pydantic de Magias (D&D 3.5) — canônico em `app.games.dnd35.schemas.magia`."""
 
 from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List

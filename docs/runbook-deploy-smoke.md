@@ -25,7 +25,7 @@ Valores **como estão hoje no código / README** — se mudares o serviço no Re
 | Swagger / OpenAPI (se `ENVIRONMENT` ≠ `production`) | `https://projetorpg-7ih3.onrender.com/api/docs` e JSON em `/api/openapi.json` |
 | Health | `https://projetorpg-7ih3.onrender.com/health` |
 
-**Código:** a origem fixa do Render está em `frontend/js/shared/render-api-origin.js` (importada por `games/dnd35/js/config/api.config.js`). O IIFE `api-url-global.js` **não** pode importar ES modules; mantém o mesmo URL — ao mudar o host, atualiza **ambos** ou vê o comentário no topo de `api-url-global.js`. Se criares **outro** Web Service no Render, altera a constante e faz deploy do front (Vercel).
+**Código:** a origem fixa do Render está **só** em `frontend/js/shared/render-api-origin-boot.js` (script clássico). `render-api-origin.js` e `api.config.js` leem `window.__ARENA_RENDER_API_ORIGIN__`; `api-url-global.js` também. Incluir o boot **antes** de qualquer módulo que use a API (ver `dashboard.html`, `login.html`, etc.). Ao mudar o host, edita só o boot e faz deploy do front (Vercel).
 
 ### Preview do Vercel (`*.vercel.app`)
 
@@ -154,4 +154,4 @@ Deve devolver um **JSON array** com itens se a tabela `magias` estiver populada 
 
 ---
 
-*Última atualização: URLs, origem da API (`frontend/js/shared/render-api-origin.js`), Swagger por `ENVIRONMENT`, rollout `MULTI_GAME_STRICT_MODE` e fluxo Neon + Render + Vercel.*
+*Última atualização: URLs, origem da API (`frontend/js/shared/render-api-origin-boot.js`), Swagger por `ENVIRONMENT`, rollout `MULTI_GAME_STRICT_MODE` e fluxo Neon + Render + Vercel.*

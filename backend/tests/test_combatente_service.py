@@ -13,8 +13,8 @@ def _mock_repo_db_chain(mock_repository: Mock) -> None:
     chain.join.return_value = chain
     chain.filter.return_value = chain
     chain.all.return_value = []
-from app.services.combatente_service import CombatenteService
-from app.models.combatente import Combatente
+from app.games.dnd35.services.combatente_service import CombatenteService
+from app.games.dnd35.models.combatente import Combatente
 from app.models.usuario import PerfilUsuario
 from app.exceptions.custom_exceptions import CombatenteNaoEncontrado, DadosInvalidos
 

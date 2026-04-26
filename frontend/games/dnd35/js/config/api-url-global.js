@@ -1,7 +1,6 @@
 /**
  * getApiUrl síncrono para páginas que carregam scripts clássicos antes de módulos ES.
- * Origem em produção: deve coincidir com `frontend/js/shared/render-api-origin.js`
- * (não dá para importar ESM aqui; ao mudar o host da API, atualiza os dois ficheiros).
+ * Exige `render-api-origin-boot.js` antes deste ficheiro (define `window.__ARENA_RENDER_API_ORIGIN__`).
  */
 (function (global) {
     var h = global.location.hostname;
@@ -10,7 +9,12 @@
         h === '127.0.0.1' ||
         h === '[::1]' ||
         (h.endsWith && h.endsWith('.localhost'));
-    var RENDER_API_ORIGIN = 'https://projetorpg-7ih3.onrender.com';
+    var RENDER_API_ORIGIN = global.__ARENA_RENDER_API_ORIGIN__;
+    if (!RENDER_API_ORIGIN) {
+        throw new Error(
+            'Arena: carregue /js/shared/render-api-origin-boot.js antes de api-url-global.js'
+        );
+    }
     var base = isLocal ? global.location.origin : RENDER_API_ORIGIN;
 
     global.getApiUrl = function (path) {

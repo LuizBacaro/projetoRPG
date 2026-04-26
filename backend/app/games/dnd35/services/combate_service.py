@@ -13,7 +13,7 @@ from app.exceptions.custom_exceptions import (
 )
 from app.games.dnd35.models.combate import Combate, CombateHistorico
 from app.games.dnd35.repositories.combate_repository import CombateRepository
-from app.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 
 
 class CombateService:

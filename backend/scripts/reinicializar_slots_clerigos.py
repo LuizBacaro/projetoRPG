@@ -19,11 +19,11 @@ backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, backend_dir)
 
 from app.core.database import SessionLocal  # noqa: E402
-from app.models.combatente import Combatente  # noqa: E402
+from app.games.dnd35.models.combatente import Combatente  # noqa: E402
 from app.repositories.base import apply_not_deleted  # noqa: E402
-from app.repositories.combatente_repository import CombatenteRepository  # noqa: E402
-from app.repositories.condicao_repository import CondicaoRepository  # noqa: E402
-from app.services.combatente_service import CombatenteService  # noqa: E402
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository  # noqa: E402
+from app.games.dnd35.repositories.condicao_repository import CondicaoRepository  # noqa: E402
+from app.games.dnd35.services.combatente_service import CombatenteService  # noqa: E402
 from app.services.file_service import FileService  # noqa: E402
 
 

@@ -1,9 +1,4 @@
-"""
-Modelo ORM de Magias D&D 3.5 (PHB).
-
-Localização: `app.games.dnd35.models.magia`. Shim em `app.models.magia`
-durante a reorganização multi-jogo.
-"""
+"""Modelo ORM de Magias D&D 3.5 (PHB) — canônico em `app.games.dnd35.models.magia`."""
 
 from datetime import datetime, timezone
 

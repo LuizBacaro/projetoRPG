@@ -23,8 +23,8 @@ from app.games.dnd35.schemas.combate import (
 )
 from app.games.dnd35.services.combate_service import CombateService
 from app.models.usuario import Usuario
-from app.services.combatente_service import CombatenteService
-from app.services.condicao_service import CondicaoService
+from app.games.dnd35.services.combatente_service import CombatenteService
+from app.games.dnd35.services.condicao_service import CondicaoService
 
 router = APIRouter(
     prefix="/combate",

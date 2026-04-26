@@ -52,20 +52,20 @@ from .api.v1 import (
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
 from .models import usuario as usuario_model
-from .models import equipamento as equipamento_model
-from .models import armadura_protecao as armadura_protecao_model
-from .models import talento as talento_model
-from .models import combatente as combatente_model
-from .models import combate as combate_model
-from .models import condicao as condicao_model
-from .models import combatente_condicao as pivot_model
-from .models import ataque as ataque_model
-from .models import pericia as pericia_model
-from .models import magia as magia_model
-from .models import grimorio as grimorio_model
-from .models import campanha as campanha_model
-from .models import sessao_campanha as sessao_campanha_model
 from .models import game as game_model
+from .games.dnd35.models import equipamento as equipamento_model
+from .games.dnd35.models import armadura_protecao as armadura_protecao_model
+from .games.dnd35.models import talento as talento_model
+from .games.dnd35.models import combatente as combatente_model
+from .games.dnd35.models import combate as combate_model
+from .games.dnd35.models import condicao as condicao_model
+from .games.dnd35.models import combatente_condicao as pivot_model
+from .games.dnd35.models import ataque as ataque_model
+from .games.dnd35.models import pericia as pericia_model
+from .games.dnd35.models import magia as magia_model
+from .games.dnd35.models import grimorio as grimorio_model
+from .games.dnd35.models import campanha as campanha_model
+from .games.dnd35.models import sessao_campanha as sessao_campanha_model
 
 logger = logging.getLogger(__name__)
 CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
@@ -836,7 +836,7 @@ def _seed_pericias(db) -> None:
     As reconciliações de nomes legados (ex.: "Acrobacia" → "Acrobacias") ficam a
     cargo das migrações Alembic — este seed não renomeia nada.
     """
-    from .models.pericia import Pericia
+    from .games.dnd35.models.pericia import Pericia
     from scripts.seed_pericias import PERICIAS_DATA
 
     try:
@@ -884,7 +884,7 @@ def _seed_armaduras_protecao(db) -> None:
     """
     Popula catálogo de armaduras/escudos da Tabela 7-6 se estiver vazio.
     """
-    from .models.armadura_protecao import ArmaduraProtecao
+    from .games.dnd35.models.armadura_protecao import ArmaduraProtecao
     from scripts.seed_armaduras_protecao import seed_armaduras_protecao
 
     try:
@@ -920,7 +920,7 @@ def _seed_pericias_classes(db) -> None:
     """
     Popula `pericias_classes` de forma idempotente para habilitar custo por classe.
     """
-    from .models.pericia import Pericia, PericiaClasse
+    from .games.dnd35.models.pericia import Pericia, PericiaClasse
     from scripts.seed_pericias import PERICIAS_DATA
 
     try:
@@ -991,8 +991,8 @@ def _seed_combatentes(db) -> None:
     Args:
         db: Sessão do banco
     """
-    from .repositories.combatente_repository import CombatenteRepository
-    from .models.combatente import Combatente
+    from .games.dnd35.repositories.combatente_repository import CombatenteRepository
+    from .games.dnd35.models.combatente import Combatente
 
     repo = CombatenteRepository(db)
     if repo.count() > 0:
@@ -1116,7 +1116,7 @@ def _seed_condicoes(db) -> None:
     Args:
         db: Sessão do banco
     """
-    from .repositories.condicao_repository import CondicaoRepository
+    from .games.dnd35.repositories.condicao_repository import CondicaoRepository
     from .services.condicao_service import CondicaoService
 
     repo = CondicaoRepository(db)

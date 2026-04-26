@@ -11,8 +11,8 @@ from app.api.v1.armaduras_protecao import router as armaduras_router
 from app.core.database import Base
 from app.core.database import get_db
 from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
-from app.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador  # noqa: F401
-from app.models.combatente import Combatente
+from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador  # noqa: F401
+from app.games.dnd35.models.combatente import Combatente
 
 
 @pytest.fixture(scope="function")

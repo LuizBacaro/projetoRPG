@@ -4,26 +4,28 @@ Injeção de dependências
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from .database import get_db
-from ..repositories.combatente_repository import CombatenteRepository
-from ..repositories.combate_repository import CombateRepository
-from ..services.combatente_service import CombatenteService
-from ..services.combate_service import CombateService
+from ..games.dnd35.repositories.combatente_repository import CombatenteRepository
+from ..games.dnd35.repositories.combate_repository import CombateRepository
+from ..games.dnd35.services.combatente_service import CombatenteService
+from ..games.dnd35.services.combate_service import CombateService
 from ..services.file_service import FileService
-from ..repositories.condicao_repository import CondicaoRepository
-from ..repositories.magia_repository import MagiaRepository
-from ..repositories.grimorio_repository import GrimorioRepository
-from ..repositories.campanha_repository import CampanhaRepository
-from ..repositories.sessao_campanha_repository import SessaoCampanhaRepository
+from ..games.dnd35.repositories.condicao_repository import CondicaoRepository
+from ..games.dnd35.repositories.magia_repository import MagiaRepository
+from ..games.dnd35.repositories.grimorio_repository import GrimorioRepository
+from ..games.dnd35.repositories.campanha_repository import CampanhaRepository
+from ..games.dnd35.repositories.sessao_campanha_repository import (
+    SessaoCampanhaRepository,
+)
 from ..repositories.game_repository import (
     GameRepository,
     UserGameMembershipRepository,
 )
-from ..services.condicao_service import CondicaoService
-from ..services.magia_import_service import MagiaImportService
-from ..services.magia_service import MagiaService
-from ..services.grimorio_service import GrimorioService
-from ..services.campanha_service import CampanhaService
-from ..services.sessao_campanha_service import SessaoCampanhaService
+from ..games.dnd35.services.condicao_service import CondicaoService
+from ..games.dnd35.services.magia_import_service import MagiaImportService
+from ..games.dnd35.services.magia_service import MagiaService
+from ..games.dnd35.services.grimorio_service import GrimorioService
+from ..games.dnd35.services.campanha_service import CampanhaService
+from ..games.dnd35.services.sessao_campanha_service import SessaoCampanhaService
 from ..services.game_service import GameService
 
 # ==================== REPOSITORIES ====================

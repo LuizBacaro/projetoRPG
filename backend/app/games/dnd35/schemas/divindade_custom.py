@@ -2,9 +2,7 @@
 Schemas de DivindadeCustom (D&D 3.5)
 SRP: define contrato de entrada/saida das divindades de campanha.
 
-Localização: pertence a `app.games.dnd35.schemas`. Existe um shim em
-`app.schemas.divindade_custom` que re-exporta estes schemas durante a
-reorganização multi-jogo.
+Canônico: `app.games.dnd35.schemas.divindade_custom`.
 """
 from datetime import datetime
 from typing import List, Optional

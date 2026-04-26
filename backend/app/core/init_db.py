@@ -15,7 +15,7 @@ from .bonus_base_ataque import (
 import json
 from .classes_tables_catalog import initialize_classes_tables_catalog
 from ..models.usuario import Usuario, PerfilUsuario
-from ..models.combatente import Combatente
+from ..games.dnd35.models.combatente import Combatente
 from ..models.game import Game, UserGameMembership
 from .security import hash_senha
 import logging
@@ -251,7 +251,7 @@ def inicializar_talentos(db: Session) -> None:
     """
     from datetime import datetime, timezone
 
-    from ..models.talento import Talento
+    from ..games.dnd35.models.talento import Talento
     from .talentos_catalog_seed import default_json_path, sincronizar_catalogo_talentos_desde_json
 
     json_path = default_json_path()

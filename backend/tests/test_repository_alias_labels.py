@@ -1,15 +1,17 @@
-from app.models.combatente import Combatente
-from app.models.condicao import Condicao
-from app.models.combatente_condicao import CombatenteCondicao
-from app.models.equipamento import Equipamento
-from app.models.talento import Talento
-from app.repositories.condicao_repository import CondicaoRepository
-from app.repositories.equipamento_repository import EquipamentoJogadorRepository
-from app.repositories.talento_repository import TalentoJogadorRepository
-from app.schemas.equipamento import EquipamentoJogadorCreate
-from app.schemas.talento import TalentoJogadorCreate
-from app.services.equipamento_service import EquipamentoService
-from app.services.talento_service import TalentoService
+from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.models.condicao import Condicao
+from app.games.dnd35.models.combatente_condicao import CombatenteCondicao
+from app.games.dnd35.models.equipamento import Equipamento
+from app.games.dnd35.models.talento import Talento
+from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
+from app.games.dnd35.repositories.equipamento_repository import (
+    EquipamentoJogadorRepository,
+)
+from app.games.dnd35.repositories.talento_repository import TalentoJogadorRepository
+from app.games.dnd35.schemas.equipamento import EquipamentoJogadorCreate
+from app.games.dnd35.schemas.talento import TalentoJogadorCreate
+from app.games.dnd35.services.equipamento_service import EquipamentoService
+from app.games.dnd35.services.talento_service import TalentoService
 
 
 def _criar_combatente(test_db):

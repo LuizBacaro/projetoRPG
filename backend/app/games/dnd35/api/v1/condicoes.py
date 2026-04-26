@@ -20,7 +20,7 @@ from app.games.dnd35.schemas.condicao import (
     CondicaoAtivaResponse,
     CondicaoResponse,
 )
-from app.services.condicao_service import CondicaoService
+from app.games.dnd35.services.condicao_service import CondicaoService
 
 router = APIRouter(prefix="/condicoes", tags=["Condições"])
 

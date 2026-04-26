@@ -19,16 +19,16 @@ if str(BACKEND_DIR) not in sys.path:
 import app.models  # noqa: F401
 from app.core.config import settings
 from app.core.database import SessionLocal
-from app.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
-from app.models.ataque import Ataque, MagiaPreparada, MagiaSlot
-from app.models.combatente import Combatente
-from app.models.combatente_condicao import CombatenteCondicao
-from app.models.condicao import Condicao
-from app.models.equipamento import Equipamento, EquipamentoJogador
-from app.models.grimorio import GrimorioHistoricoTroca, GrimorioMagia, GrimorioNotificacao
-from app.models.magia import Magia
-from app.models.pericia import Pericia, PericiaJogador
-from app.models.talento import Talento, TalentoJogador
+from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
+from app.games.dnd35.models.ataque import Ataque, MagiaPreparada, MagiaSlot
+from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.models.combatente_condicao import CombatenteCondicao
+from app.games.dnd35.models.condicao import Condicao
+from app.games.dnd35.models.equipamento import Equipamento, EquipamentoJogador
+from app.games.dnd35.models.grimorio import GrimorioHistoricoTroca, GrimorioMagia, GrimorioNotificacao
+from app.games.dnd35.models.magia import Magia
+from app.games.dnd35.models.pericia import Pericia, PericiaJogador
+from app.games.dnd35.models.talento import Talento, TalentoJogador
 
 
 SNAPSHOT_VERSION = 1

@@ -9,17 +9,14 @@ Observacoes:
     como List[str].
   * `nome` deve ser unico (case-insensitive) dentro das customizadas.
 
-Localização: este model pertence ao pacote `app.games.dnd35` porque
-divindades caseiras são uma regra exclusiva do sistema D&D 3.5. Existe
-um shim de compatibilidade em `app.models.divindade_custom` que apenas
-re-exporta esta classe enquanto a reorganização multi-jogo está em curso.
+Divindades de campanha D&D 3.5; canônico em `app.games.dnd35.models.divindade_custom`.
 """
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-# Base do SQLAlchemy continua no Auth Hub (shared) durante a transição.
+# Declarative Base única do processo (`app.core.database`) — hub e jogos partilham a mesma MetaData.
 from ....core.database import Base
 
 

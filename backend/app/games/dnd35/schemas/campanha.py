@@ -1,10 +1,4 @@
-"""
-Schemas Pydantic de Campanha (D&D 3.5)
-
-Localização: este módulo pertence ao pacote `app.games.dnd35.schemas`.
-Existe um shim em `app.schemas.campanha` que re-exporta as classes
-durante a reorganização multi-jogo.
-"""
+"""Schemas Pydantic de Campanha (D&D 3.5) — canônico em `app.games.dnd35.schemas.campanha`."""
 
 import re
 from datetime import datetime

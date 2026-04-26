@@ -2,10 +2,7 @@
 Model de Equipamento (D&D 3.5)
 SRP: Modelo ORM para equipamentos do D&D 3.5 (PHB capítulo 7).
 
-Localização: este model pertence ao pacote `app.games.dnd35.models`
-porque equipamentos do PHB 3.5 são uma regra exclusiva do sistema D&D 3.5.
-Existe um shim em `app.models.equipamento` que apenas re-exporta as
-classes durante a reorganização multi-jogo.
+Equipamentos PHB 3.5; canônico em `app.games.dnd35.models.equipamento`.
 """
 
 from datetime import datetime, timezone

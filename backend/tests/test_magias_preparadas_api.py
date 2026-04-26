@@ -8,9 +8,9 @@ from sqlalchemy.orm import sessionmaker
 from app.api.v1.magias_preparadas import router as magias_preparadas_router
 from app.core.database import Base, get_db
 from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
-from app.models.ataque import MagiaSlot
-from app.models.combatente import Combatente
-from app.models.magia import Magia
+from app.games.dnd35.models.ataque import MagiaSlot
+from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.models.magia import Magia
 
 
 @pytest.fixture(scope="function")

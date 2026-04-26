@@ -2,7 +2,7 @@
 
 from unittest.mock import Mock
 
-from app.services.condicao_service import CondicaoService
+from app.games.dnd35.services.condicao_service import CondicaoService
 
 
 class TestCondicaoService:

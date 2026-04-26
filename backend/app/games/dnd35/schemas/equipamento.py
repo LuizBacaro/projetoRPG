@@ -1,11 +1,8 @@
 """
 Schemas Pydantic de Equipamento (D&D 3.5)
-SRP: validação e serialização de equipamentos do D&D 3.5.
+SRP: validação e serialização de equipamentos (PHB 3.5, Tabela 7-5).
 
-Localização: este módulo pertence ao pacote `app.games.dnd35.schemas`
-porque os campos descritos correspondem à Tabela 7-5 do PHB 3.5.
-Existe um shim em `app.schemas.equipamento` que apenas re-exporta as
-classes durante a reorganização multi-jogo.
+Canônico: `app.games.dnd35.schemas.equipamento`.
 """
 
 from datetime import datetime

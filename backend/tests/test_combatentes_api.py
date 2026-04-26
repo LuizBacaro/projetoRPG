@@ -10,8 +10,8 @@ from sqlalchemy.pool import StaticPool
 from app.api.v1.combatentes import router as combatentes_router
 from app.core.database import Base, get_db
 from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
-from app.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
-from app.models.talento import Talento, TalentoJogador
+from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
+from app.games.dnd35.models.talento import Talento, TalentoJogador
 
 
 class _UsuarioDummy:

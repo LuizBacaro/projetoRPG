@@ -1,9 +1,4 @@
-"""
-Schemas de Perícia (D&D 3.5)
-
-Localização: `app.games.dnd35.schemas.pericia`. Shim em
-`app.schemas.pericia` durante a reorganização multi-jogo.
-"""
+"""Schemas de Perícia (D&D 3.5) — canônico em `app.games.dnd35.schemas.pericia`."""
 
 from enum import Enum
 from typing import List, Optional

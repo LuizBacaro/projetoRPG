@@ -62,6 +62,6 @@ description: >-
 | API routers | `backend/app/api/v1/*.py` |
 | Config / CORS | `backend/app/main.py`, `backend/app/core/config.py` |
 | Rate limit | `backend/app/core/rate_limit.py` |
-| Config front API | `frontend/js/shared/render-api-origin.js` (origem Render), `frontend/games/dnd35/js/config/api.config.js`, `api-url-global.js` (IIFE legado — manter URL alinhada ao shared) |
+| Config front API | `frontend/js/shared/render-api-origin-boot.js` (única string da URL), `render-api-origin.js`, `games/dnd35/js/config/api.config.js`, `api-url-global.js` (IIFE — exige boot antes) |
 | Arena (If-Match) | `frontend/games/dnd35/js/controllers/ArenaController.js` |
 | Catálogo talentos | `talentos_importacao_limpo.json`, `backend/app/core/talentos_catalog_seed.py`, `backend/scripts/importar_talentos_catalogo_json.py` |

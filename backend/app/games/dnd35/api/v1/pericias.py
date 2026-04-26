@@ -306,7 +306,7 @@ def adicionar_pericia_jogador(
                 pericia.graduacao,
             )
 
-            from app.models.combatente import Combatente
+            from app.games.dnd35.models.combatente import Combatente
 
             combatente = (
                 db.query(Combatente).filter(Combatente.id == combatente_id).first()
