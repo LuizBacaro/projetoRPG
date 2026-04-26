@@ -17,7 +17,7 @@ if str(_SCRIPTS) not in sys.path:
 
 from pericias_loader import carregar_pericias  # noqa: E402
 
-from app.models.combatente import Combatente  # noqa: F401 — resolve relacionamentos
+from app.games.dnd35.models.combatente import Combatente  # noqa: F401 — resolve relacionamentos
 from app.games.dnd35.models.pericia import Pericia, PericiaClasse
 
 

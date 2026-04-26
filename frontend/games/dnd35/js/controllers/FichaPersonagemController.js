@@ -5,7 +5,7 @@
  * ✅ NOVO: BroadcastChannel sync arena→ficha em tempo real
  */
 
-import { CombatenteService } from '../services/CombatenteService.js?v=4';
+import { CombatenteService } from '/games/dnd35/js/services/CombatenteService.js?v=20260427a';
 import { EquipamentoService } from '../services/EquipamentoService.js';
 import { ArmaduraProtecaoService } from '../services/ArmaduraProtecaoService.js';
 import { TalentoService } from '../services/TalentoService.js?v=3';

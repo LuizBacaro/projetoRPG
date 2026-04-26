@@ -3,10 +3,16 @@
    SRP: estilos exclusivos da tela pós-login de seleção de jogo.
 */
 
+/* Fundo uniforme (igual ao PNG / login.css) — html evita faixa noutra cor no overscroll */
+html {
+    background-color: #0f0f23;
+}
+
 body {
     align-items: stretch;
     justify-content: stretch;
     padding: 2rem 1rem 3rem;
+    background-color: #0f0f23;
 }
 
 .seletor-shell {
@@ -42,12 +48,96 @@ body {
 .seletor-conta {
     display: flex;
     align-items: center;
-    gap: .8rem;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
-.seletor-usuario {
-    color: #cbd5e1;
-    font-size: .9rem;
+/* Cartão de conta — alinhado ao painel do header do dashboard (borda dourada + Cinzel) */
+.seletor-usuario-card {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.45rem 0.85rem 0.45rem 0.55rem;
+    max-width: min(100%, 320px);
+    background: rgba(255, 255, 255, 0.06);
+    border: 2px solid var(--cor-dourada, #ffd700);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.seletor-usuario-avatar {
+    font-size: 1.35rem;
+    line-height: 1;
+    flex-shrink: 0;
+    opacity: 0.92;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.seletor-usuario-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+    text-align: left;
+}
+
+.seletor-usuario-linha1 {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+}
+
+.seletor-usuario-nome {
+    font-family: var(--fonte-titulo, 'Cinzel', serif);
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--cor-dourada, #ffd700);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.seletor-usuario-email {
+    font-family: var(--fonte-texto, 'Philosopher', sans-serif);
+    font-size: 0.72rem;
+    color: var(--texto-secundario, #94a3b8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.01em;
+}
+
+.seletor-usuario-email:empty {
+    display: none;
+}
+
+.seletor-badge-perfil {
+    flex-shrink: 0;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border: 1px solid var(--cor-dourada, #ffd700);
+}
+
+.seletor-badge-perfil.administrador {
+    background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+    color: #ffd700;
+}
+
+.seletor-badge-perfil.mestre {
+    background: linear-gradient(135deg, #32cd32 0%, #228b22 100%);
+    color: #ffd700;
+}
+
+.seletor-badge-perfil.jogador {
+    background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
+    color: #ffd700;
 }
 
 .seletor-link-secundario {
@@ -241,7 +331,12 @@ body {
     display: none;
 }
 
-/* ── Hub visual (logos) ─────────────────────────────────────────────────── */
+/* ── Hub visual (logos + órbita) ─────────────────────────────────────────── */
+/*
+ * Cor do fundo na viewport (bordas da janela): login.css → body { background: #0f0f23 }
+ *   Hex: #0f0f23  |  RGB: rgb(15, 15, 35)  |  HSL: hsl(240, 40%, 10%)
+ * Exportar arte com este tom (ou transparência real) evita “caixa” no logo central.
+ */
 
 @keyframes hub-central-float {
     0%,
@@ -263,56 +358,178 @@ body {
     }
 }
 
+@keyframes hub-orbit-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mantém ícones na vertical enquanto o anel gira (usa --slot-angle de cada .hub-orbit-slot) */
+@keyframes hub-orbit-counter-upright {
+    from {
+        transform: translate(-50%, -50%) rotate(calc(-1 * var(--slot-angle))) rotate(0deg);
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(calc(-1 * var(--slot-angle))) rotate(-360deg);
+    }
+}
+
 .hub-principal {
     margin: 0.5rem 0 2rem;
     text-align: center;
 }
 
 .hub-tagline {
-    color: #94a3b8;
-    font-size: 0.95rem;
-    margin-bottom: 1.25rem;
+    color: #cbd5e1;
+    font-size: 1.02rem;
+    line-height: 1.45;
+    margin: 0 auto 1.75rem;
+    max-width: 26rem;
+    padding: 0 0.5rem;
 }
 
 .hub-orbit {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.25rem;
-    max-width: 520px;
+    display: block;
+    width: 100%;
+    max-width: 760px;
     margin: 0 auto;
 }
 
-.hub-central-wrap {
-    order: -1;
-    display: flex;
-    justify-content: center;
+/* Palco: logo ao centro; raio grande o suficiente para os satélites não colarem no logo */
+.hub-orbit-stage {
+    position: relative;
+    width: min(96vw, 640px);
+    aspect-ratio: 1;
+    margin: 1rem auto 2.25rem;
+    isolation: isolate;
+    /* Metade do logo (~) + metade do ícone + folga — evita sobreposição visual */
+    --hub-orbit-r: min(50vw, 244px);
 }
 
+.hub-orbit-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+    /* Mantém #0f0f23 homogéneo; halo muito ténue só no centro */
+    background: radial-gradient(
+        ellipse 72% 70% at 50% 48%,
+        rgba(124, 58, 237, 0.05) 0%,
+        transparent 50%
+    );
+}
+
+.hub-orbit-ring {
+    position: absolute;
+    inset: 4%;
+    border-radius: 50%;
+    border: 2px dashed rgba(167, 139, 250, 0.42);
+    box-shadow:
+        inset 0 0 48px rgba(15, 15, 35, 0.5),
+        0 0 0 1px rgba(124, 58, 237, 0.12),
+        0 0 36px rgba(124, 58, 237, 0.08);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hub-orbit-spinner {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    animation: hub-orbit-spin 96s linear infinite;
+}
+
+.hub-orbit-slot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    transform: rotate(var(--slot-angle)) translateY(calc(-1 * var(--hub-orbit-r)));
+    pointer-events: none;
+}
+
+.hub-orbit-counter {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: auto;
+    z-index: 1;
+    animation: hub-orbit-counter-upright 96s linear infinite;
+}
+
+/* Por baixo do .hub-orbit-spinner (z-index) para os botões ficarem à frente do PNG */
+.hub-central-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    background: transparent;
+}
+
+/* Suaviza cantos do quadrado do ficheiro sem esconder o escudo (máscara radial) */
 .hub-central {
-    width: min(72vw, 280px);
+    width: min(68vw, 340px);
     height: auto;
     max-width: 100%;
     display: block;
-    filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.45));
-    pointer-events: none;
+    background: transparent;
+    object-fit: contain;
+    -webkit-mask-image: radial-gradient(
+        ellipse 78% 76% at 50% 50%,
+        #000 82%,
+        transparent 100%
+    );
+    mask-image: radial-gradient(
+        ellipse 78% 76% at 50% 50%,
+        #000 82%,
+        transparent 100%
+    );
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    filter:
+        drop-shadow(0 12px 32px rgba(15, 15, 35, 0.6))
+        drop-shadow(0 0 52px rgba(124, 58, 237, 0.16));
     user-select: none;
     animation: hub-central-float 5s ease-in-out infinite;
 }
 
-.hub-column {
+.hub-satellite-cluster {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: clamp(1rem, 5vw, 2rem);
+    gap: 0.45rem;
 }
 
-.hub-column--esq,
-.hub-column--dir {
-    width: 100%;
+.hub-satellite-label {
+    font-family: var(--fonte-texto, "Philosopher", sans-serif);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: #e2e8f0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+    white-space: nowrap;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+}
+
+.hub-satellite:disabled ~ .hub-satellite-label {
+    color: #94a3b8;
+    text-shadow: none;
 }
 
 .hub-satellite {
@@ -322,38 +539,56 @@ body {
     cursor: pointer;
     border-radius: 50%;
     line-height: 0;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    transition: box-shadow 0.28s ease, filter 0.28s ease;
 }
 
 .hub-satellite img {
-    width: min(34vw, 152px);
+    width: min(34vw, 148px);
     height: auto;
     display: block;
     border-radius: 50%;
+    transition:
+        transform 0.28s cubic-bezier(0.34, 1.2, 0.64, 1),
+        filter 0.28s ease;
 }
 
 .hub-satellite--dnd5e img.hub-img-dd5 {
     border-radius: 50%;
     object-fit: cover;
     aspect-ratio: 1;
-    width: min(34vw, 152px);
-    height: min(34vw, 152px);
+    width: min(34vw, 148px);
+    height: min(34vw, 148px);
 }
 
 .hub-satellite:not(:disabled) img {
     animation: hub-satellite-pulse 4s ease-in-out infinite;
 }
 
-.hub-column--dir .hub-satellite:nth-child(2):not(:disabled) img {
-    animation-delay: 0.9s;
+.hub-orbit-slot:nth-child(2) .hub-satellite:not(:disabled) img {
+    animation-delay: 0.6s;
 }
 
-.hub-satellite:hover:not(:disabled) {
-    transform: scale(1.07);
+.hub-orbit-slot:nth-child(3) .hub-satellite:not(:disabled) img {
+    animation-delay: 1.1s;
+}
+
+.hub-satellite:hover:not(:disabled) img,
+.hub-satellite:focus-visible:not(:disabled) img {
+    animation: none;
+    transform: scale(1.42);
+    filter:
+        drop-shadow(0 12px 30px rgba(0, 0, 0, 0.55))
+        brightness(1.18)
+        contrast(1.1)
+        saturate(1.08);
+}
+
+.hub-satellite:hover:not(:disabled),
+.hub-satellite:focus-visible:not(:disabled) {
     box-shadow:
-        0 0 0 3px rgba(124, 58, 237, 0.5),
-        0 16px 44px rgba(0, 0, 0, 0.38);
-    z-index: 1;
+        0 0 0 4px rgba(167, 139, 250, 0.55),
+        0 16px 44px rgba(0, 0, 0, 0.42);
+    z-index: 4;
 }
 
 .hub-satellite:focus-visible {
@@ -372,43 +607,38 @@ body {
     animation: none;
 }
 
+.hub-orbit-stage:hover .hub-orbit-spinner,
+.hub-orbit-stage:hover .hub-orbit-counter {
+    animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hub-orbit-spinner,
+    .hub-orbit-counter,
+    .hub-central,
+    .hub-satellite:not(:disabled) img {
+        animation: none !important;
+    }
+}
+
 @media (min-width: 720px) {
-    .hub-orbit {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: center;
-        max-width: 980px;
-        gap: clamp(0.75rem, 2.5vw, 2rem);
-    }
-
-    .hub-central-wrap {
-        order: 0;
-        flex: 0 0 auto;
-    }
-
-    .hub-column {
-        flex-direction: column;
-        width: auto;
-        flex: 0 0 auto;
-        gap: 1.1rem;
-    }
-
-    .hub-column--esq {
-        min-width: min(22vw, 180px);
-    }
-
-    .hub-column--dir {
-        min-width: min(22vw, 180px);
+    .hub-orbit-stage {
+        --hub-orbit-r: min(38vw, 312px);
+        width: min(92vw, 720px);
     }
 
     .hub-central {
-        width: min(36vw, 300px);
+        width: min(42vw, 420px);
     }
 
     .hub-satellite img,
     .hub-satellite--dnd5e img.hub-img-dd5 {
-        width: min(20vw, 156px);
-        height: min(20vw, 156px);
+        width: min(24vw, 172px);
+        height: min(24vw, 172px);
+    }
+
+    .hub-satellite-label {
+        font-size: 0.85rem;
     }
 }
 

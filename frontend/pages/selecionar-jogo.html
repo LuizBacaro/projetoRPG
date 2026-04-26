@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Escolha o jogo — Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/dnd35/css/login.css" />
-    <link rel="stylesheet" href="/games/dnd35/css/selecionar-jogo.css?v=20260426c" />
+    <link rel="stylesheet" href="/games/dnd35/css/selecionar-jogo.css?v=20260428c" />
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
 </head>
 <body>
@@ -18,7 +19,16 @@
             <p>Escolha o sistema que você quer jogar agora.</p>
         </div>
         <div class="seletor-conta">
-            <span id="seletorUsuario" class="seletor-usuario">—</span>
+            <div id="seletorUsuarioCard" class="seletor-usuario-card" aria-live="polite">
+                <span class="seletor-usuario-avatar" aria-hidden="true">👤</span>
+                <div class="seletor-usuario-info">
+                    <div class="seletor-usuario-linha1">
+                        <span id="seletorUsuarioNome" class="seletor-usuario-nome">—</span>
+                        <span id="seletorUsuarioBadge" class="seletor-badge-perfil" hidden></span>
+                    </div>
+                    <span id="seletorUsuarioEmail" class="seletor-usuario-email"></span>
+                </div>
+            </div>
             <button id="btnSair" type="button" class="seletor-link-secundario">Sair</button>
         </div>
     </header>
@@ -31,25 +41,48 @@
         <section class="hub-principal" aria-label="Escolha da plataforma de jogo">
             <p class="hub-tagline">Toque no sistema que deseja abrir agora.</p>
             <div class="hub-orbit">
-                <div class="hub-column hub-column--esq">
-                    <button type="button" id="btnHubDnd35" class="hub-satellite hub-satellite--dnd35" disabled
-                            title="Abrir D&amp;D 3.5" aria-label="Abrir plataforma Dungeons &amp; Dragons 3.5">
-                        <img src="/assets/brand/logo_dd35_redondo.png" alt="" width="160" height="160" decoding="async" />
-                    </button>
-                </div>
-                <div class="hub-central-wrap">
-                    <img src="/assets/brand/logo_central.png" class="hub-central" width="280" height="280"
-                         alt="Arena TTRPG" decoding="async" />
-                </div>
-                <div class="hub-column hub-column--dir">
-                    <button type="button" id="btnHubDnd5e" class="hub-satellite hub-satellite--dnd5e" disabled
-                            title="D&amp;D 5e (em breve)" aria-label="Abrir página D&amp;D 5e em breve">
-                        <img src="/assets/brand/logo_dd5.png" alt="" width="160" height="160" decoding="async" class="hub-img-dd5" />
-                    </button>
-                    <button type="button" id="btnHubGurps" class="hub-satellite hub-satellite--gurps" disabled
-                            title="Abrir GURPS" aria-label="Abrir plataforma GURPS">
-                        <img src="/assets/brand/logo_gurps_classico_redondo.png" alt="" width="160" height="160" decoding="async" />
-                    </button>
+                <div class="hub-orbit-stage">
+                    <div class="hub-orbit-ring" aria-hidden="true"></div>
+                    <!-- Logo por baixo do anel de botões (evita o PNG “cortar” os ícones) -->
+                    <div class="hub-central-wrap">
+                        <img src="/assets/brand/logo_v5.png" class="hub-central" width="512" height="512"
+                             alt="Arena TTRPG" decoding="async" />
+                    </div>
+                    <div class="hub-orbit-spinner">
+                        <div class="hub-orbit-slot" style="--slot-angle: -90deg;">
+                            <div class="hub-orbit-counter">
+                                <div class="hub-satellite-cluster">
+                                    <button type="button" id="btnHubDnd35" class="hub-satellite hub-satellite--dnd35" disabled
+                                            title="Abrir D&amp;D 3.5" aria-label="Abrir plataforma Dungeons &amp; Dragons 3.5">
+                                        <img src="/assets/brand/logo_dd35_redondo.png" alt="" width="160" height="160" decoding="async" />
+                                    </button>
+                                    <span class="hub-satellite-label">D&amp;D 3.5</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hub-orbit-slot" style="--slot-angle: 30deg;">
+                            <div class="hub-orbit-counter">
+                                <div class="hub-satellite-cluster">
+                                    <button type="button" id="btnHubDnd5e" class="hub-satellite hub-satellite--dnd5e" disabled
+                                            title="D&amp;D 5e (em breve)" aria-label="Abrir página D&amp;D 5e em breve">
+                                        <img src="/assets/brand/logo_dd5.png" alt="" width="160" height="160" decoding="async" class="hub-img-dd5" />
+                                    </button>
+                                    <span class="hub-satellite-label">D&amp;D 5e</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hub-orbit-slot" style="--slot-angle: 150deg;">
+                            <div class="hub-orbit-counter">
+                                <div class="hub-satellite-cluster">
+                                    <button type="button" id="btnHubGurps" class="hub-satellite hub-satellite--gurps" disabled
+                                            title="Abrir GURPS" aria-label="Abrir plataforma GURPS">
+                                        <img src="/assets/brand/logo_gurps_classico_redondo.png" alt="" width="160" height="160" decoding="async" />
+                                    </button>
+                                    <span class="hub-satellite-label">GURPS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -81,7 +114,9 @@
     const elLista = document.getElementById('seletorLista');
     const elErro = document.getElementById('seletorErro');
     const elAviso = document.getElementById('seletorAviso');
-    const elUsuario = document.getElementById('seletorUsuario');
+    const elUsuarioNome = document.getElementById('seletorUsuarioNome');
+    const elUsuarioEmail = document.getElementById('seletorUsuarioEmail');
+    const elUsuarioBadge = document.getElementById('seletorUsuarioBadge');
     const btnSair = document.getElementById('btnSair');
     const btnHubDnd35 = document.getElementById('btnHubDnd35');
     const btnHubDnd5e = document.getElementById('btnHubDnd5e');
@@ -127,13 +162,43 @@
         return token;
     }
 
+    function rotuloPerfilSeletor(perfil) {
+        const p = String(perfil || '').toLowerCase();
+        if (p === 'administrador') return 'Admin';
+        if (p === 'mestre') return 'Mestre';
+        if (p === 'jogador') return 'Jogador';
+        return '';
+    }
+
+    function classePerfilSeletor(perfil) {
+        const p = String(perfil || '').toLowerCase();
+        if (p === 'administrador' || p === 'mestre' || p === 'jogador') return p;
+        return '';
+    }
+
     function pintarUsuario() {
         const usuario = lerUsuarioLocal();
-        if (!usuario) return;
-        const partes = [];
-        if (usuario.nome) partes.push(usuario.nome);
-        if (usuario.email) partes.push(`<${usuario.email}>`);
-        elUsuario.textContent = partes.join(' ');
+        if (!usuario) {
+            elUsuarioNome.textContent = '—';
+            elUsuarioEmail.textContent = '';
+            elUsuarioBadge.hidden = true;
+            elUsuarioBadge.textContent = '';
+            elUsuarioBadge.className = 'seletor-badge-perfil';
+            return;
+        }
+        elUsuarioNome.textContent = (usuario.nome && String(usuario.nome).trim()) || 'Usuário';
+        elUsuarioEmail.textContent = (usuario.email && String(usuario.email).trim()) || '';
+        const rotulo = rotuloPerfilSeletor(usuario.perfil);
+        const cls = classePerfilSeletor(usuario.perfil);
+        if (rotulo && cls) {
+            elUsuarioBadge.textContent = rotulo;
+            elUsuarioBadge.className = `seletor-badge-perfil ${cls}`;
+            elUsuarioBadge.hidden = false;
+        } else {
+            elUsuarioBadge.hidden = true;
+            elUsuarioBadge.textContent = '';
+            elUsuarioBadge.className = 'seletor-badge-perfil';
+        }
     }
 
     function escapar(texto) {

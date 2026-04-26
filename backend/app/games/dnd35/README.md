@@ -9,7 +9,7 @@ Backend do sistema **Dungeons & Dragons 3.5**.
 
 | Domínio         | Escopo (models / routers)                                                  |
 |-----------------|----------------------------------------------------------------------------|
-| **ficha**       | Combatente, Raca, Talento, HabilidadesEspeciais, TabelasClasses, Pericia   |
+| **ficha**       | `Combatente` (11ª onda); raça, talento, habilidades, tabelas e perícia já migrados em ondas anteriores |
 | **combate**     | Combate, CombatenteCondicao, Condicao, Ataque, ArmaduraProtecao           |
 | **magia**       | Magia, Grimório, API preparadas (`MagiaSlot`/`MagiaPreparada` em `ataque`) |
 | **campanha**    | Campanha, SessaoCampanha                                                   |
@@ -139,8 +139,20 @@ Backend do sistema **Dungeons & Dragons 3.5**.
   - Shims em `app.models`, `app.schemas`, `app.repositories`, `app.services`,
     `app.api.v1` para imports legados
 
-Os demais arquivos D&D 3.5 relevantes à **ficha** (`combatente`, etc.)
-continuam em `backend/app/{models,api/v1,...}/` até a próxima onda.
+- **`combatente/`** (11ª onda — **ficha**, nó central):
+  - `models/combatente.py` (`Combatente`)
+  - `schemas/combatente.py` (incl. `CombatenteResponse` com validação de
+    `idiomas_customizados` a partir da coluna JSON/string)
+  - `repositories/combatente_repository.py` (`CombatenteRepository`)
+  - `services/combatente_service.py` (`CombatenteService`; enriquecimento
+    racial persiste `idiomas_customizados` na coluna como JSON)
+  - `api/v1/combatentes.py` (router `/combatentes`)
+  - Shims em `app.models`, `app.schemas`, `app.repositories`, `app.services`,
+    `app.api.v1` para imports legados
+  - `app/core/mixins.py` — `SoftDeleteMixin`; `app.models.mixins` re-exporta
+    (evita import circular com shims de `combatente`)
+
+O router `/combatentes` mantém `requer_game_dnd35` como na migração.
 
 ## Convenção de imports (regras D&D 3.5)
 

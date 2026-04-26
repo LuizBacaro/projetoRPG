@@ -21,14 +21,15 @@ fichas de personagem interativas e arena de combate em tempo real.
 | `https://arena-de-combate-rpg.com.br` | Aplicação |
 | `https://arena-de-combate-rpg.com.br/docs` | Swagger API |
 
-**Credenciais do admin inicial** (somente se configuradas no `.env`):
+**Credenciais do admin inicial** — definidas no `backend/.env` (veja `backend/.env.example`). No **primeiro startup** do backend, se ambas estiverem preenchidas, é criado um usuário administrador com esse e-mail e senha.
 
 ```env
 ADMIN_EMAIL=admin@arena-rpg.com.br
 ADMIN_PASSWORD=TroquePorSenhaForte123!
+ADMIN_USERNAME=Administrador
 ```
 
-Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera criado automaticamente.
+Para **testes locais**, copie o exemplo: com `ADMIN_EMAIL` e `ADMIN_PASSWORD` preenchidos (como no bloco acima), ao subir o `uvicorn` o admin é criado se ainda não existir — use **esse e-mail e essa senha** no login. Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem **vazios**, o admin **não** é criado; aí precisa criar um usuário por outro meio ou preencher o `.env` e reiniciar.
 
 ---
 
@@ -80,20 +81,20 @@ Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera c
 /  (raiz)
 └── redireciona para ──► /pages/login.html
                               │
-                         [Login JWT]
+                         [Login JWT → seletor de jogo]
                               │
                               ▼
-                      /pages/dashboard.html
+                      /dashboard              ← vercel.json → games/dnd35/pages/dashboard.html
                    ┌──────────┼───────────┐
                    │          │           │
               [Combatentes] [Arena]   [Usuários]
                    │          │        (Admin)
                    ▼          ▼
-         /pages/ficha-       /arena
-         personagem.html   (frontend/arena.html)
+         /pages/ficha-       /arena      ← vercel.json → games/dnd35/arena.html
+         personagem.html
               │
          [Grimório]    [Perícias]
-         (modal)       /pages/pericias.html
+         (modal)       /pericias         ← vercel.json → games/dnd35/pages/pericias.html
 ```
 
 ---
@@ -137,6 +138,8 @@ Se `ADMIN_EMAIL` ou `ADMIN_PASSWORD` estiverem vazios, o admin padrao nao sera c
 
 ## 🏛️ Arquitetura
 
+**Multi-jogo e modularização D&D 3.5:** conta global, `game_slug` no JWT, guards e a reorganização do backend em `backend/app/games/dnd35/` (com shims nos paths legados) estão descritos em [`docs/arquitetura-multi-jogo.md`](docs/arquitetura-multi-jogo.md). A **11ª onda** migrou o domínio **ficha** (`Combatente` e router `/combatentes`); o inventário por onda e convenções de import vivem em [`backend/app/games/dnd35/README.md`](backend/app/games/dnd35/README.md).
+
 **Clean Architecture + SOLID** — separação estrita em 4 camadas:
 
 ```
@@ -148,85 +151,50 @@ Routes (API) → Services (regras de negócio) → Repositories (acesso a dados)
 ```
 backend/
 ├── app/
-│   ├── main.py                    # Entry point + CORS + seeds + rotas estáticas
+│   ├── main.py                    # Entry point: CORS, seeds, montagem dos routers em api/v1
 │   │
-│   ├── api/v1/                    # 12 Routers HTTP (SRP por domínio)
-│   │   ├── auth.py                #   Login, logout, refresh JWT
-│   │   ├── usuarios.py            #   CRUD de usuários
-│   │   ├── combatentes.py         #   CRUD combatentes + upload de foto
-│   │   ├── combate.py             #   Iniciar, avançar turno/rodada, dano/cura
-│   │   ├── condicoes.py           #   25 condições D&D
-│   │   ├── ataques.py             #   Ataques corpo-a-corpo/distância
-│   │   ├── magias.py              #   Catálogo de ~400 magias
-│   │   ├── magias_preparadas.py   #   Preparação diária + descanso
-│   │   ├── pericias.py            #   54 perícias D&D 3.5 com custo por classe
-│   │   ├── talentos.py            #   Talentos/feats
-│   │   └── equipamentos.py        #   Inventário
+│   ├── games/                     # Código por sistema de RPG (multi-jogo)
+│   │   ├── dnd35/                 # D&D 3.5 — implementação canônica (ondas 1–11; ver games/dnd35/README.md)
+│   │   │   ├── api/v1/            # Routers FastAPI do jogo (combatentes, combate, grimorio, magias, …)
+│   │   │   ├── models/            # ORM por domínio (combatente, magia, combate, equipamento, …)
+│   │   │   ├── schemas/           # Pydantic (request/response) alinhados aos models
+│   │   │   ├── repositories/      # Acesso a dados (DIP)
+│   │   │   ├── services/          # Regras de negócio D&D 3.5
+│   │   │   ├── catalogs/          # Loaders PHB (raças, talentos, tabelas de classe, habilidades especiais)
+│   │   │   └── seeds/             # ex.: pericias_seed
+│   │   ├── dnd5e/                 # Reservado (em breve)
+│   │   └── gurps/                 # Reservado (em breve)
 │   │
-│   ├── core/                      # Infraestrutura
-│   │   ├── config.py              #   Settings via Pydantic + .env
-│   │   ├── database.py            #   Engine + sessão SQLAlchemy
-│   │   ├── security.py            #   JWT — geração e validação
-│   │   ├── deps.py                #   Dependências FastAPI (get_usuario_atual)
-│   │   ├── dependencies.py        #   Factory de services com injeção
-│   │   └── init_db.py             #   Seed do admin padrão
+│   ├── api/v1/                    # Onde o main registra os routers
+│   │   ├── auth.py                # Hub — login, refresh JWT (implementação neste pacote)
+│   │   ├── usuarios.py            # Hub — CRUD utilizadores
+│   │   ├── games.py               # Hub — catálogo de jogos + POST selecionar (`game_slug` no token)
+│   │   └── …                      # D&D 3.5: em regra [SHIM] — reexportam `router` de `games.dnd35.api.v1.*`
+│   │                              # (combatentes, campanhas, combate, condicoes, divindades_custom,
+│   │                              #  equipamentos, grimorio, habilidades_especiais, magias,
+│   │                              #  magias_preparadas, pericias, racas, tabelas_classes, talentos,
+│   │                              #  armaduras_protecao, ataques)
 │   │
-│   ├── models/                    # 11 modelos SQLAlchemy
-│   │   ├── usuario.py             #   Perfis: admin/mestre/jogador
-│   │   ├── combatente.py          #   Ficha completa D&D
-│   │   ├── combate.py             #   Encontro ativo (JSON combatentes_ids)
-│   │   ├── ataque.py              #   Ataques vinculados a combatente
-│   │   ├── magia.py               #   Catálogo de magias (nome, nível, escola, classe)
-│   │   ├── pericia.py             #   Perícias D&D 3.5
-│   │   ├── condicao.py            #   25 condições
-│   │   ├── combatente_condicao.py #   N:N com duração em turnos
-│   │   ├── equipamento.py         #   Itens de inventário
-│   │   └── talento.py             #   Feats/talentos
+│   ├── core/                      # Infraestrutura partilhada
+│   │   ├── config.py              # Settings via Pydantic + .env
+│   │   ├── database.py            # Engine + sessão SQLAlchemy
+│   │   ├── security.py            # JWT
+│   │   ├── deps.py                # get_usuario_atual, requer_game_dnd35, …
+│   │   ├── dependencies.py        # Factories de services (get_combate_service, …)
+│   │   ├── mixins.py              # SoftDeleteMixin (models D&D 3.5 importam daqui)
+│   │   └── init_db.py             # Seeds admin, catálogo de jogos, memberships legados, …
 │   │
-│   ├── repositories/              # Acesso a dados (DIP)
-│   │   ├── base.py                #   BaseRepository[T] genérico
-│   │   ├── usuario_repository.py
-│   │   ├── combatente_repository.py
-│   │   ├── combate_repository.py
-│   │   ├── ataque_repository.py
-│   │   ├── condicao_repository.py
-│   │   ├── pericia_repository.py
-│   │   ├── equipamento_repository.py
-│   │   └── talento_repository.py
-│   │
-│   ├── services/                  # Regras de negócio (SRP)
-│   │   ├── usuario_service.py
-│   │   ├── combatente_service.py
-│   │   ├── combate_service.py
-│   │   ├── ataque_service.py
-│   │   ├── condicao_service.py
-│   │   ├── pericia_service.py
-│   │   ├── equipamento_service.py
-│   │   ├── talento_service.py
-│   │   └── file_service.py        #   Upload de imagens (local dev / Cloudinary prod)
-│   │
-│   ├── schemas/                   # Pydantic DTOs (request/response)
-│   ├── seeds/                     # Dados iniciais (condições, admin)
+│   ├── models/                    # usuario, game (hub); demais → shims → games/dnd35/models
+│   ├── schemas/                   # usuario, game, auth (hub); demais → shims → games/dnd35/schemas
+│   ├── repositories/              # usuario_repository, game_repository (hub); demais → shims
+│   ├── services/                  # usuario_service, game_service, file_service (hub); demais → shims
+│   ├── seeds/                     # Legado + suporte a seeds (ver também games/dnd35/seeds)
+│   ├── shared/                    # README / placeholder (futura separação Auth Hub vs jogo)
 │   └── exceptions/                # Exceções customizadas
 │
-├── scripts/                       # Seeds de dados D&D
-│   ├── seed_magias.py             #   ~400+ magias todas as classes
-│   ├── seed_pericias.py           #   54 perícias + associações por classe
-│   ├── seed_equipamentos.py       #   Equipamentos (PHB p.120-126)
-│   ├── seed_database.py           #   Combatentes de exemplo
-│   └── seed_dominios.py           #   Domínios de clérigo
-│
-├── alembic_migrations/            # Migrações de schema
-│   └── versions/
-│       ├── 001_initial_schema.py
-│       ├── 002_add_pagina_referencia.py
-│       └── 630072bd328c_add_new_spell_columns.py
-│
-├── tests/                         # Testes unitários (pytest)
-│   ├── conftest.py                #   SQLite in-memory fixture
-│   ├── test_combate_service.py
-│   └── test_combatente_service.py
-│
+├── scripts/                       # Scripts de seed/import (magias, perícias, equipamentos, …)
+├── alembic_migrations/versions/   # Migrações Alembic (histórico versionado)
+├── tests/                         # pytest (domínio + API; e2e opcional em tests/e2e com Playwright)
 └── requirements.txt
 ```
 
@@ -234,85 +202,29 @@ backend/
 
 ```
 frontend/
-├── arena.html                     # Arena principal (rota /arena)
+├── pages/                         # Shell global — URLs /pages/*.html
+│   ├── login.html, selecionar-jogo.html
+│   ├── ficha-personagem.html, magias.html, usuarios.html, …
+│   └── …                          # Outras telas ainda servidas desta pasta
 │
-├── pages/                         # 7 páginas HTML
-│   ├── login.html                 #   Tela de login
-│   ├── dashboard.html             #   Gestão de combatentes
-│   ├── ficha-personagem.html      #   Ficha completa do personagem
-│   ├── arena-combate.html         #   Legado (redireciona para /arena)
-│   ├── pericias.html              #   Alocação de perícias
-│   ├── pericias-ficha.html        #   Perícias (visão ficha)
-│   └── usuarios.html              #   Admin de usuários
+├── games/                         # Bundle por jogo (multi-jogo)
+│   ├── dnd35/                     # D&D 3.5 — arena, dashboard e perícias canônicos no deploy
+│   │   ├── arena.html             #   Vercel: rewrite /arena → /games/dnd35/arena.html
+│   │   ├── pages/                 #   dashboard, pericias, ficha, magias, … (ex.: /dashboard → …/dashboard.html)
+│   │   ├── js/                    #   controllers/, services/, ui/, utils/, config/
+│   │   └── css/                   #   Estilos do jogo (layout, arena, ficha, …)
+│   ├── dnd5e/em-breve.html        #   Placeholder “em breve”
+│   └── gurps/em-breve.html        #   idem
 │
-├── js/
-│   ├── config.js                  # Detecção automática dev/prod
-│   ├── main.js                    # Entry point
-│   │
-│   ├── controllers/               # 9 controllers (SRP por página)
-│   │   ├── ArenaController.js     #   Orquestração de combate
-│   │   ├── DashboardController.js #   CRUD combatentes + filtros
-│   │   ├── FichaPersonagemController.js  # Ficha interativa
-│   │   ├── GrimorioController.js  #   Preparação de magias
-│   │   ├── PericiaController.js   #   Tabela de perícias
-│   │   ├── PericiaFichaController.js
-│   │   ├── CondicaoController.js  #   Gerenciamento de condições
-│   │   ├── ConfiguracaoController.js
-│   │   └── UsuarioController.js   #   CRUD usuários
-│   │
-│   ├── services/                  # 15 services HTTP
-│   │   ├── AuthService.js         #   JWT, perfil, sessão
-│   │   ├── CombatenteService.js   #   CRUD combatentes
-│   │   ├── CombateService.js      #   Fluxo de combate
-│   │   ├── MagiaService.js        #   Consulta de magias
-│   │   ├── MagiaSlotService.js    #   Slots por nível
-│   │   ├── MagiaPreparadaService.js  # Magias preparadas
-│   │   ├── CondicaoService.js     #   Condições D&D
-│   │   ├── AtaqueService.js       #   Ataques
-│   │   ├── EquipamentoService.js  #   Inventário
-│   │   ├── TalentoService.js      #   Talentos
-│   │   ├── PericiaService.js      #   Perícias
-│   │   ├── DanoCuraService.js     #   Dano/cura
-│   │   ├── UsuarioService.js      #   CRUD usuários
-│   │   ├── UploadService.js       #   Upload de imagens
-│   │   └── NotificationService.js #   Toast notifications
-│   │
-│   ├── ui/                        # 14 componentes visuais
-│   │   ├── ModalCadastro.js       #   Modal de criação
-│   │   ├── ModalEdicao.js         #   Modal de edição
-│   │   ├── ModalDanoCura.js       #   Aplicar dano/cura
-│   │   ├── ModalCondicao... (UI)  #   Modal de condições
-│   │   ├── ModalConfirm.js        #   Confirmação genérica
-│   │   ├── ModalUsuario.js        #   CRUD usuário em modal
-│   │   ├── CombatenteCard.js      #   Card de combatente
-│   │   ├── CombatenteAtivoView.js #   Combatente ativo na arena
-│   │   ├── ArenaView.js           #   UI principal da arena
-│   │   ├── ArenaAtaquesMagias.js  #   Painel de ataques e magias
-│   │   ├── OrdemIniciativa.js     #   Lista de iniciativa
-│   │   ├── CondicaoUI.js          #   Badges de condições
-│   │   ├── TipoSelector.js        #   Filtro por tipo
-│   │   └── Toast.js               #   Notificações toast
-│   │
-│   ├── models/                    # Entidades do domínio
-│   ├── utils/                     # Utilitários
-│   └── config/                    # Configurações
-│
-├── css/                           # Estilos temáticos (medieval)
-│   ├── variables.css              #   Tokens de design + reset
-│   ├── layout.css                 #   Layout base
-│   ├── ficha-personagem.css       #   Ficha do personagem (~2300 linhas)
-│   ├── grimorio.css               #   Grimório de magias
-│   ├── arena.css                  #   Arena de combate
-│   ├── dashboard.css              #   Dashboard
-│   ├── pericias.css               #   Tela de perícias
-│   ├── modais.css                 #   Modais genéricos
-│   ├── responsivo.css             #   Media queries
-│   └── ...                        #   Outros componentes
-│
+├── assets/brand/                  # Logos do seletor (hub)
+├── arena.html                     # Raiz (legado ou espelho; produção usa rewrite em vercel.json)
+├── index.html
 └── sw.js                          # Service Worker (cache offline)
 ```
 
-**Multi-jogo (shell global):** páginas como `pages/login.html` e `pages/selecionar-jogo.html` ficam em `frontend/pages/`. Os **logos do hub** da tela “Escolha o jogo” (Arena central + D&D 3.5, D&D 5e, GURPS) estão apenas em **`frontend/assets/brand/`** e são referenciados como `/assets/brand/*.png`. Em desenvolvimento com FastAPI, a pasta é montada em `/assets`; no Vercel entram no deploy porque `outputDirectory` é `frontend/`.
+**Rotas curtas (Vercel):** em `vercel.json`, `/dashboard`, `/arena` e `/pericias` apontam para arquivos em `frontend/games/dnd35/`. O **shell** (login, escolha de jogo) permanece em `frontend/pages/`. Logos do hub em **`frontend/assets/brand/`** (`/assets/brand/*.png`); com FastAPI em dev a pasta é montada em `/assets`; no deploy o `outputDirectory` é `frontend/`.
+
+**Assets compartilhados:** as páginas **em breve** (`games/dnd5e`, `games/gurps`) importam o toast de **`/games/dnd35/js/ui/toast.module.js`** (mesmo pacote D&D 3.5). A pasta **`frontend/css/`** na raiz, se existir clone antigo, não é usada pelos HTML atuais.
 
 ### Princípios SOLID Aplicados
 
@@ -527,9 +439,12 @@ pip install -r requirements.txt
 
 # 3. Variáveis de ambiente
 cp .env.example .env
-# Edite .env:
+# Edite .env no mínimo:
 #   DATABASE_URL=sqlite:///./rpg_arena.db
-#   SECRET_KEY=sua-chave-secreta-aqui
+#   SECRET_KEY=sua-chave-secreta-aqui   # em dev pode ficar vazio (gerada ao arrancar)
+#   ADMIN_EMAIL=admin@arena-rpg.com.br
+#   ADMIN_PASSWORD=TroquePorSenhaForte123!
+# (sem ADMIN_EMAIL + ADMIN_PASSWORD o usuário admin não é criado no startup)
 
 # 4. Rodar seeds (opcional — popula magias, perícias, equipamentos)
 python -m scripts.seed_magias

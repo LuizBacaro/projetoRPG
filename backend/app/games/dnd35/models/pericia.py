@@ -12,10 +12,10 @@ from sqlalchemy import Column, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
-from app.models.mixins import SoftDeleteMixin
+from app.core.mixins import SoftDeleteMixin
 
 if TYPE_CHECKING:
-    from app.models.combatente import Combatente
+    from app.games.dnd35.models.combatente import Combatente
 
 
 class AtributoEnum(str, PyEnum):

@@ -17,7 +17,7 @@ from app.games.dnd35.schemas.pericia import (
     PericiaJogadorUpdate,
     PericiaUpdate,
 )
-from app.models.combatente import Combatente
+from app.games.dnd35.models.combatente import Combatente
 from app.repositories.base import (
     apply_not_deleted,
     commit_with_rollback,

@@ -22,7 +22,7 @@ from app.games.dnd35.schemas.equipamento import (
     EquipamentoJogadorCreate,
     EquipamentoJogadorListResponse,
 )
-from app.models.combatente import Combatente
+from app.games.dnd35.models.combatente import Combatente
 
 
 class EquipamentoService:

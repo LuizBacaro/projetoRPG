@@ -17,7 +17,7 @@ from app.games.dnd35.schemas.armadura_protecao import (
     ArmaduraProtecaoJogadorCreate,
     ArmaduraProtecaoJogadorListResponse,
 )
-from app.models.combatente import Combatente
+from app.games.dnd35.models.combatente import Combatente
 
 
 class ArmaduraProtecaoService:

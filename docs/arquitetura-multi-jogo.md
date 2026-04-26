@@ -264,8 +264,7 @@ backend/app/
         gurps/                    EM BREVE (pacote vazio reservado)
 ```
 
-> Hoje, dez domínios estão fisicamente migrados em
-> `games/dnd35/`:
+> Hoje, **onze** blocos estão fisicamente migrados em `games/dnd35/`:
 >
 > 1. **`divindade_custom*`** — 1ª onda (POC).
 > 2. **`equipamento*`** (`Equipamento`, `EquipamentoJogador` e o router
@@ -290,11 +289,16 @@ backend/app/
 >     `CombateHistorico`, `Condicao`, `CombatenteCondicao`,
 >     `ArmaduraProtecao`, repositórios, services, routers `/combate`,
 >     `/condicoes`, ataques/slots e `/armaduras_protecao`) — 10ª onda.
+> 11. **`combatente*`** (model, schemas, repositório, `CombatenteService` e
+>     router `/combatentes`) — 11ª onda (**ficha**, nó central de FKs).
+>     `SoftDeleteMixin` foi extraído para `app/core/mixins.py` e
+>     `app.models.mixins` virou shim, evitando import circular entre shims
+>     e `games/dnd35/models`.
 >
-> Os demais arquivos D&D 3.5 (ficha/`combatente`, etc.) continuam em
-> `app/{models,api/v1,core,...}`. Os caminhos antigos dos domínios já
-> migrados foram convertidos em shims que re-exportam dos novos paths.
-> A onda seguinte sugerida é a **ficha** (`combatente`).
+> Os caminhos antigos dos domínios migrados permanecem como shims que
+> re-exportam os novos paths. Próximo passo estrutural sugerido na doc:
+> **Schemas Postgres** (`auth.*`, `dnd35.*`) ou PR de limpeza consolidando
+> imports diretos em `games/dnd35/`.
 
 ### Frontend
 
@@ -374,8 +378,11 @@ os shims podem ser removidos em PR de limpeza.
     `combatente_condicao`, `condicao`, `ataque` incluindo
     `MagiaSlot`/`MagiaPreparada`, `armadura_protecao`; routers
     `/combate`, `/condicoes`, ataques/slots, `/armaduras_protecao`).
-11. **Onda backend "ficha"** — `combatente` (último por ser o nó
-   central das FKs).
+11. **Onda backend "ficha"** — ✅ concluída (`Combatente`, repositório,
+   service, router `/combatentes`; shims nos paths legados;
+   `SoftDeleteMixin` em `app/core/mixins.py`; shim `app.api.v1.combate`
+   re-exporta também `get_combate_service`, `get_condicao_service` e
+   `get_usuario_atual` para overrides em testes).
 12. **Onda frontend D&D 3.5** — ✅ concluída
    (`frontend/games/dnd35/` com `pages/`, `css/`, `js/`, `arena.html`;
    shell global em `frontend/pages/` — login + seletor + stubs de redirect;

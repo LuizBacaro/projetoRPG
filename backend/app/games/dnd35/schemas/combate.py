@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from app.schemas.combatente import CombatenteResponse
+from app.games.dnd35.schemas.combatente import CombatenteResponse
 
 
 class IniciarCombateRequest(BaseModel):

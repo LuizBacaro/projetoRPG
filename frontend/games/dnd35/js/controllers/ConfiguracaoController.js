@@ -3,10 +3,10 @@
  * SRP: orquestrar apenas a tela de configuração de combate
  * Edição de combatentes foi movida para o Dashboard
  */
-import { CombatenteService }    from '../services/CombatenteService.js';
-import { CombatenteCard }       from '../ui/CombatenteCard.js';
-import { Toast } from '../ui/toast.module.js';
-import { getApiUrl }            from '../config/api.config.js';
+import { CombatenteService }    from '/games/dnd35/js/services/CombatenteService.js?v=20260427a';
+import { CombatenteCard }       from '/games/dnd35/js/ui/CombatenteCard.js';
+import { Toast } from '/games/dnd35/js/ui/toast.module.js';
+import { getApiUrl }            from '/games/dnd35/js/config/api.config.js';
 
 export class ConfiguracaoController {
 

@@ -1,15 +1,9 @@
-from datetime import datetime, timezone
+"""[SHIM DE COMPATIBILIDADE] app.models.mixins
 
-from sqlalchemy import Column, DateTime
+`SoftDeleteMixin` foi movido para `app.core.mixins` para evitar import
+circular com `app.models` ao carregar modelos em `app.games.dnd35.models`.
+"""
 
+from app.core.mixins import SoftDeleteMixin
 
-class SoftDeleteMixin:
-    """Adiciona suporte simples a soft delete com timestamp."""
-
-    deleted_at = Column(DateTime, nullable=True, index=True)
-
-    def soft_delete(self) -> None:
-        self.deleted_at = datetime.now(timezone.utc)
-
-    def restore(self) -> None:
-        self.deleted_at = None
+__all__ = ["SoftDeleteMixin"]

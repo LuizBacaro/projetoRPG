@@ -17,6 +17,7 @@ Este `AGENTS.md` existe como resumo operacional e guia de uso para o time.
 - Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill do projeto em [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md) — habilite essa skill no Cursor para o agente carregar esse contexto.
 - Conjuração D&D 3.5 (atributo por classe, Tabela 1-1, clérigo, troca Bardo/Feiticeiro): documentação em [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
 - Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pós-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
+- Admin em dev: `ADMIN_EMAIL` + `ADMIN_PASSWORD` em `backend/.env` (exemplo em `backend/.env.example`); `criar_admin_padrao` no startup só cria se ambos estiverem definidos — ver secção de credenciais no [README.md](README.md).
 
 ## Agentes
 

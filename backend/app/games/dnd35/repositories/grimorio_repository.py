@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.games.dnd35.models.grimorio import GrimorioHistoricoTroca, GrimorioMagia, GrimorioNotificacao
 from app.games.dnd35.models.magia import Magia
-from app.models.combatente import Combatente
+from app.games.dnd35.models.combatente import Combatente
 from app.repositories.base import commit_with_rollback
 
 

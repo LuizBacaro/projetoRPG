@@ -3,6 +3,16 @@ Testes unitários para CombatenteService
 """
 import pytest
 from unittest.mock import Mock, MagicMock
+
+
+def _mock_repo_db_chain(mock_repository: Mock) -> None:
+    """CombatenteService usa repository.db.query(...) para bônus de armadura."""
+    mock_repository.db = MagicMock()
+    chain = MagicMock()
+    mock_repository.db.query.return_value = chain
+    chain.join.return_value = chain
+    chain.filter.return_value = chain
+    chain.all.return_value = []
 from app.services.combatente_service import CombatenteService
 from app.models.combatente import Combatente
 from app.models.usuario import PerfilUsuario
@@ -15,7 +25,9 @@ class TestCombatenteService:
     @pytest.fixture
     def mock_repository(self):
         """Mock do repository"""
-        return Mock()
+        mock = Mock()
+        _mock_repo_db_chain(mock)
+        return mock
     
     @pytest.fixture
     def mock_file_service(self):

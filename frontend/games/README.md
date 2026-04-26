@@ -22,10 +22,13 @@ frontend/games/<slug>/
 
 ## Estado atual
 
-- `dnd35/` — andaime; conteúdo real ainda vive em
-  `frontend/{pages,css,js}/`. Será migrado em PR isolado depois que o
-  backend de D&D 3.5 estiver totalmente extraído para
-  `backend/app/games/dnd35/`.
+- `dnd35/` — bundle em uso: `arena.html`, `pages/` (dashboard, perícias,
+  ficha, magias, …), `js/` e `css/`. O `vercel.json` na raiz do repo
+  reescreve `/dashboard`, `/arena` e `/pericias` para estes arquivos.
+  O shell (`login`, seletor) em `frontend/pages/` também importa assets
+  deste pacote (`/games/dnd35/css/...`, `.../js/config/...`). As páginas
+  **em breve** (`dnd5e/`, `gurps/`) reutilizam o mesmo
+  `/games/dnd35/js/ui/toast.module.js`.
 - `dnd5e/em-breve.html` — página de placeholder com identidade visual
   D&D 5e ("Em breve").
 - `gurps/em-breve.html` — página de placeholder com identidade visual

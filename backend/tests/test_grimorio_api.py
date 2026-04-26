@@ -48,11 +48,12 @@ def _build_client(test_db_factory):
     return TestClient(app)
 
 
-def _criar_combatente(db, *, classe: str) -> Combatente:
+def _criar_combatente(db, *, classe: str, nivel: int = 1) -> Combatente:
     combatente = Combatente(
         nome="Teste",
         tipo="jogador",
         classe=classe,
+        nivel=nivel,
         hp_maximo=20,
         hp_atual=20,
         iniciativa=2,
@@ -172,7 +173,8 @@ def test_grimorio_lista_paginada_preserva_corpo_e_headers(grimorio_db):
 
 def test_grimorio_lista_filtra_por_campos_e_magia_ids(grimorio_db):
     db, db_factory = grimorio_db
-    combatente = _criar_combatente(db, classe="Mago")
+    # Mago nível 5 conjura até 3º nível; o teste inclui magias de nível 2 e 3.
+    combatente = _criar_combatente(db, classe="Mago", nivel=5)
     client = _build_client(db_factory)
 
     magia_evocacao = _criar_magia(
