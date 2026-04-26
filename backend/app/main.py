@@ -29,6 +29,7 @@ from .api.v1 import (
     armaduras_protecao,
     ataques,
     auth,
+    campanhas,
     combate,
     combatentes,
     condicoes,
@@ -58,6 +59,8 @@ from .models import ataque as ataque_model
 from .models import pericia as pericia_model
 from .models import magia as magia_model
 from .models import grimorio as grimorio_model
+from .models import campanha as campanha_model
+from .models import sessao_campanha as sessao_campanha_model
 
 logger = logging.getLogger(__name__)
 CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
@@ -152,6 +155,7 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 # ── Rotas da API v1 ──────────────────────────────────────────────────────────
 # Ordem importa: dependências primeiro
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(usuarios.router, prefix=settings.API_V1_PREFIX)
 app.include_router(combatentes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(combate.router, prefix=settings.API_V1_PREFIX)
@@ -428,6 +432,7 @@ def _inicializar_banco(db) -> None:
         ("garantir_colunas_catalogo_equipamentos", _garantir_colunas_catalogo_equipamentos),
         ("garantir_coluna_bonus_base_ataque", _garantir_coluna_bonus_base_ataque),
         ("garantir_coluna_habilidades_especiais", _garantir_coluna_habilidades_especiais),
+        ("garantir_coluna_campanha_id", _garantir_coluna_campanha_id),
         ("garantir_coluna_raca_slug", _garantir_coluna_raca_slug),
         ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
         ("garantir_colunas_dinheiro", _garantir_colunas_dinheiro),
@@ -668,6 +673,23 @@ def _garantir_coluna_habilidades_especiais() -> None:
     logger.warning("⚠️  coluna combatentes.habilidades_especiais ausente; aplicando schema guard")
     with engine.begin() as conn:
         conn.execute(text("ALTER TABLE combatentes ADD COLUMN habilidades_especiais VARCHAR(2000)"))
+
+
+def _garantir_coluna_campanha_id() -> None:
+    """Garante a coluna `combatentes.campanha_id` em bancos legados."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "combatentes" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("combatentes")}
+    if "campanha_id" in colunas_existentes:
+        return
+
+    logger.warning("⚠️  coluna combatentes.campanha_id ausente; aplicando schema guard")
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE combatentes ADD COLUMN campanha_id INTEGER"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_combatentes_campanha_id ON combatentes (campanha_id)"))
 
 
 def _garantir_coluna_raca_slug() -> None:

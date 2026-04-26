@@ -13,6 +13,8 @@ from .usuario import Usuario
 from .combate import CombateHistorico
 from .grimorio import GrimorioMagia, GrimorioHistoricoTroca, GrimorioNotificacao
 from .divindade_custom import DivindadeCustom
+from .campanha import Campanha
+from .sessao_campanha import SessaoCampanha
 
 __all__ = [
     "Pericia",
@@ -38,4 +40,6 @@ __all__ = [
     "GrimorioHistoricoTroca",
     "GrimorioNotificacao",
     "DivindadeCustom",
+    "Campanha",
+    "SessaoCampanha",
 ]

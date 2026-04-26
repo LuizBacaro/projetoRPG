@@ -64,7 +64,8 @@ body {
     font-weight: 500;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: .65rem .9rem;
     border-radius: .4rem;
@@ -75,7 +76,8 @@ body {
     outline: none;
     transition: border-color .2s;
 }
-.form-group input:focus { border-color: #7c3aed; }
+.form-group input:focus,
+.form-group select:focus { border-color: #7c3aed; }
 
 /* ── Botão principal ── */
 .btn-login {
@@ -203,6 +205,13 @@ body {
     font-size: .82rem;
     color: #a78bfa;
     margin-bottom: 1.1rem;
+}
+
+.cadastro-campanha-hint {
+    display: block;
+    margin-top: .4rem;
+    font-size: .75rem;
+    color: #94a3b8;
 }
 
 /* ── Responsividade ── */

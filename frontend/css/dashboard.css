@@ -362,6 +362,24 @@ body {
     gap: .5rem; 
 }
 
+.filtros-escopo {
+    display: flex;
+    gap: .4rem;
+}
+
+.filter-btn-escopo {
+    border-style: dashed;
+}
+
+.escopo-empty-indicator {
+    font-size: .78rem;
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, .45);
+    background: rgba(251, 191, 36, .12);
+    border-radius: 999px;
+    padding: .22rem .55rem;
+}
+
 .filter-btn {
     padding: .4rem .9rem;
     border-radius: .4rem;
@@ -1513,4 +1531,70 @@ body {
     line-height: 1.4;
     color: #94a3b8;
     font-style: italic;
+}
+
+.campanha-personagens-checklist {
+    min-height: 120px;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid #334155;
+    border-radius: .45rem;
+    background: #0f0f23;
+    padding: .45rem;
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+}
+
+.dash-form-group #campanhaPersonagensBusca {
+    margin-bottom: .45rem;
+}
+
+.campanha-personagem-item {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .35rem .45rem;
+    border-radius: .35rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.campanha-personagem-item:hover {
+    background: #1e293b;
+    border-color: #475569;
+}
+
+.campanha-personagem-item input[type="checkbox"] {
+    accent-color: #7c3aed;
+}
+
+.campanha-personagem-nome {
+    color: #e2e8f0;
+    font-size: .86rem;
+}
+
+.campanha-personagens-vazio {
+    color: #94a3b8;
+    font-size: .82rem;
+    padding: .35rem .2rem;
+}
+
+.campanha-edicao-badge {
+    margin: 0 0 .8rem 0;
+    padding: .5rem .75rem;
+    border-radius: .4rem;
+    border: 1px solid rgba(167, 139, 250, 0.45);
+    background: rgba(124, 58, 237, 0.15);
+    color: #e9d5ff;
+    font-size: .82rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+.campanha-edicao-badge.is-dirty {
+    border-color: rgba(251, 191, 36, 0.65);
+    background: rgba(245, 158, 11, 0.16);
+    color: #fde68a;
 }

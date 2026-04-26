@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/css/combatentes.css" />
     <link rel="stylesheet" href="/css/formularios.css" />
     <link rel="stylesheet" href="/css/modais.css" />
-    <link rel="stylesheet" href="../css/dashboard.css?v=19">
+    <link rel="stylesheet" href="../css/dashboard.css?v=21">
     <link rel="stylesheet" href="/css/responsivo.css" />
 </head>
 <body>
@@ -40,6 +40,7 @@
 <!-- ── Navegação ── -->
 <nav class="dashboard-nav">
     <button class="nav-tab active" data-tab="combatentes">⚔️ Combatentes</button>
+    <button class="nav-tab" data-tab="campanhas">📜 Campanhas</button>
     <button class="nav-tab" data-tab="arena">🏟️ Arena</button>
 </nav>
 
@@ -63,6 +64,11 @@
                 <button class="filter-btn" data-tipo="monstro">Monstros</button>
                 <button class="filter-btn" data-tipo="npc">NPCs</button>
             </div>
+            <div class="filtros-escopo" id="filtroEscopoMestre" style="display:none">
+                <button class="filter-btn filter-btn-escopo active" data-escopo="todos">Todos</button>
+                <button class="filter-btn filter-btn-escopo" data-escopo="meus">Meus</button>
+            </div>
+            <span id="indicadorEscopoMestreVazio" class="escopo-empty-indicator" style="display:none"></span>
             <div class="toolbar-acoes">
                 <button class="btn-novo btn-novo-divindade" id="btnNovaDivindade" style="display:none" title="Criar uma divindade de campanha">+ Nova Divindade</button>
                 <button class="btn-novo" id="btnNovoCombatente">+ Novo Combatente</button>
@@ -86,6 +92,81 @@
                     <tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b">Carregando...</td></tr>
                 </tbody>
             </table>
+        </div>
+    </section>
+
+    <section class="tab-section" id="tab-campanhas">
+        <div id="campanhasPainelToggle" style="display:none; margin-bottom:.75rem;">
+            <button type="button" class="btn-dash-save" id="btnReabrirPainelCampanhas">↩ Reabrir painel de campanhas</button>
+        </div>
+        <div class="dash-modal-box" id="painelCampanhasMestre" style="max-width: none;">
+            <div class="dash-modal-header">
+                <h2>📜 Campanhas do Mestre</h2>
+                <button type="button" class="dash-modal-close" id="btnFecharPainelCampanhas" title="Fechar painel de campanhas">×</button>
+            </div>
+            <div class="dash-modal-body">
+                <p class="dash-divcustom-info">
+                    Cadastre campanhas e associe personagens jogadores ja criados.
+                </p>
+                <form id="formCampanha" class="dash-divcustom-form" autocomplete="off">
+                    <input id="campanhaIdEdicao" type="hidden" />
+                    <div id="campanhaEdicaoBadge" class="campanha-edicao-badge" style="display:none"></div>
+                    <div class="dash-form-group">
+                        <label>Nome da Campanha *</label>
+                        <input id="campanhaNome" type="text" maxlength="120" required placeholder="Ex: A Sombra de Vhalor" />
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Descricao</label>
+                        <textarea id="campanhaDescricao" rows="2" maxlength="500" placeholder="Resumo da campanha (opcional)"></textarea>
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Personagens da Campanha</label>
+                        <input id="campanhaPersonagensBusca" type="text" placeholder="Buscar personagem..." />
+                        <div id="campanhaPersonagens" class="campanha-personagens-checklist" aria-label="Seleção de personagens"></div>
+                    </div>
+                    <div class="dash-modal-actions">
+                        <button id="btnCancelarEdicaoCampanha" type="button" class="btn-dash-cancel" style="display:none">Cancelar Edição</button>
+                        <button id="btnSalvarCampanha" type="submit" class="btn-dash-save">✅ Criar Campanha</button>
+                    </div>
+                </form>
+
+                <hr class="dash-divcustom-sep" />
+                <h3 class="dash-divcustom-titulo">Campanhas cadastradas</h3>
+                <div id="listaCampanhas" class="dash-divcustom-listagem">
+                    <p class="dash-divcustom-vazio">Carregando campanhas...</p>
+                </div>
+
+                <hr class="dash-divcustom-sep" />
+                <h3 class="dash-divcustom-titulo">Sessões da Campanha</h3>
+                <p class="dash-divcustom-info">
+                    Registre um resumo de cada sessão e escolha se ele fica visível para jogadores.
+                </p>
+                <form id="formSessaoCampanha" class="dash-divcustom-form" autocomplete="off">
+                    <input id="sessaoIdEdicao" type="hidden" />
+                    <div id="sessaoEdicaoBadge" class="campanha-edicao-badge" style="display:none"></div>
+                    <div class="dash-form-group">
+                        <label>Campanha *</label>
+                        <select id="sessaoCampanhaId" required>
+                            <option value="">Selecione a campanha</option>
+                        </select>
+                    </div>
+                    <div class="dash-form-group">
+                        <label>Resumo da sessão *</label>
+                        <textarea id="sessaoResumo" rows="3" maxlength="4000" required placeholder="Resumo dos acontecimentos da sessão..."></textarea>
+                    </div>
+                    <label class="campanha-personagem-item">
+                        <input id="sessaoVisivelJogadores" type="checkbox" />
+                        <span class="campanha-personagem-nome">Disponibilizar este resumo para jogadores</span>
+                    </label>
+                    <div class="dash-modal-actions">
+                        <button id="btnCancelarEdicaoSessao" type="button" class="btn-dash-cancel" style="display:none">Cancelar Edição</button>
+                        <button id="btnSalvarSessaoCampanha" type="submit" class="btn-dash-save">📝 Registrar Sessão</button>
+                    </div>
+                </form>
+                <div id="listaSessoesCampanha" class="dash-divcustom-listagem">
+                    <p class="dash-divcustom-vazio">Carregando sessões...</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -657,7 +738,8 @@
 
 <!-- FASE 7: DashboardController (carregado por último) -->
 <script src="/js/services/DivindadeCustomService.js?v=2"></script>
-<script src="/js/controllers/DashboardController.js?v=18"></script>
+<script src="/js/services/CampanhaService.js?v=2"></script>
+<script src="/js/controllers/DashboardController.js?v=26"></script>
 
 </body>
 </html>

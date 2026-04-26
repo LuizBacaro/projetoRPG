@@ -28,7 +28,11 @@ class DashboardController {
         this.divindadeService   = (typeof DivindadeCustomService !== 'undefined')
             ? new DivindadeCustomService()
             : null;
+        this.campanhaService    = (typeof CampanhaService !== 'undefined')
+            ? new CampanhaService()
+            : null;
         this.filtroAtual        = 'todos';
+        this.escopoMestre       = this._lerEscopoMestrePersistido();
         this.combatenteEmEdicao = null;
         this.actions             = {};
         this.perfil              = AuthService.getPerfil();
@@ -38,6 +42,12 @@ class DashboardController {
         this.racasDisponiveis    = [];
         this.racaSlugPorNome     = new Map();
         this.racaDetalheCache    = new Map();
+        this.campanhas           = [];
+        this.sessoesCampanha     = [];
+        this.sessaoEmEdicaoId    = null;
+        this.personagensDisponiveisCampanha = [];
+        this.campanhaEmEdicaoId  = null;
+        this.snapshotCampanhaEmEdicao = null;
         this.rules               = window.CombatRules || {
             isTipoRestritoParaMestre: (tipo) => tipo === 'monstro' || tipo === 'npc',
             tipoPermitidoParaPerfil: (tipo, isMestre) => {
@@ -100,6 +110,7 @@ class DashboardController {
         this._aplicarRestricoesPerfil();
         this._configurarAbas();
         this._configurarFiltros();
+        this._configurarFiltroEscopo();
         this._configurarBotaoNovo();
         this._configurarCombosRaca();
         this._carregarRacasCatalogo();
@@ -113,6 +124,8 @@ class DashboardController {
         this._configurarUpload('NPC');
         this._configurarUploadEdicao();
         this._configurarDivindadesCustom();
+        this._configurarFecharPainelCampanhas();
+        this._configurarCampanhas();
         this.carregarCombatentes();
     }
 
@@ -133,6 +146,10 @@ class DashboardController {
         const btnNovaDiv = document.getElementById('btnNovaDivindade');
         if (btnNovaDiv) {
             btnNovaDiv.style.display = this._isMestre() ? '' : 'none';
+        }
+        const tabCampanhas = document.querySelector('.nav-tab[data-tab="campanhas"]');
+        if (tabCampanhas) {
+            tabCampanhas.style.display = this._isMestre() ? '' : 'none';
         }
     }
 
@@ -170,15 +187,75 @@ class DashboardController {
 
     _configurarFiltros() {
         const self = this;
-        document.querySelectorAll('.filter-btn').forEach(btn => {
+        document.querySelectorAll('.filter-btn[data-tipo]').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (!self._isMestre() && self.rules.isTipoRestritoParaMestre(btn.dataset.tipo)) return;
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.filter-btn[data-tipo]').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 self.filtroAtual = btn.dataset.tipo;
                 self.carregarCombatentes();
             });
         });
+    }
+
+    _configurarFiltroEscopo() {
+        const container = document.getElementById('filtroEscopoMestre');
+        if (!container) return;
+        if (!this._isMestre()) {
+            container.style.display = 'none';
+            return;
+        }
+        container.style.display = '';
+        this._atualizarEstadoBotoesEscopo();
+
+        container.querySelectorAll('[data-escopo]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                container.querySelectorAll('[data-escopo]').forEach((b) => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.escopoMestre = btn.getAttribute('data-escopo') || 'todos';
+                this._persistirEscopoMestre(this.escopoMestre);
+                this.carregarCombatentes();
+            });
+        });
+    }
+
+    _atualizarEstadoBotoesEscopo() {
+        const container = document.getElementById('filtroEscopoMestre');
+        if (!container) return;
+        const alvo = this.escopoMestre === 'meus' ? 'meus' : 'todos';
+        container.querySelectorAll('[data-escopo]').forEach((b) => b.classList.remove('active'));
+        const btnInicial = container.querySelector(`[data-escopo="${alvo}"]`);
+        if (btnInicial) btnInicial.classList.add('active');
+    }
+
+    _atualizarIndicadorEscopoVazio(combatentes) {
+        const indicador = document.getElementById('indicadorEscopoMestreVazio');
+        if (!indicador || !this._isMestre()) return;
+        const semResultados = this.escopoMestre === 'meus' && Array.isArray(combatentes) && combatentes.length === 0;
+        if (!semResultados) {
+            indicador.style.display = 'none';
+            indicador.textContent = '';
+            return;
+        }
+        indicador.textContent = 'Escopo "Meus": 0 combatentes.';
+        indicador.style.display = '';
+    }
+
+    _lerEscopoMestrePersistido() {
+        try {
+            const valor = localStorage.getItem('dashboard:escopo-mestre');
+            return valor === 'meus' ? 'meus' : 'todos';
+        } catch (_err) {
+            return 'todos';
+        }
+    }
+
+    _persistirEscopoMestre(valor) {
+        try {
+            localStorage.setItem('dashboard:escopo-mestre', valor === 'meus' ? 'meus' : 'todos');
+        } catch (_err) {
+            // sem falha para modo privado/storage indisponível
+        }
     }
 
     _configurarBotaoNovo() {
@@ -606,13 +683,473 @@ class DashboardController {
         try {
             let tipo = this.filtroAtual === 'todos' ? null : this.filtroAtual;
             tipo = this.rules.tipoPermitidoParaPerfil(tipo, this._isMestre());
-
-            const combatentes = await this.service.listar(tipo);
+            const somenteMeus = this._isMestre() && this.escopoMestre === 'meus';
+            const combatentes = await this.service.listar(tipo, somenteMeus);
             this._renderizarTabela(combatentes);
             this._atualizarResumo(combatentes);
+            this._atualizarIndicadorEscopoVazio(combatentes);
+            await this._atualizarSelectPersonagensCampanha(combatentes);
         } catch (err) {
             Toast.error('Erro ao carregar combatentes');
             console.error(err);
+        }
+    }
+
+    _configurarCampanhas() {
+        if (!this._isMestre() || !this.campanhaService) return;
+        const form = document.getElementById('formCampanha');
+        const lista = document.getElementById('listaCampanhas');
+        const formSessao = document.getElementById('formSessaoCampanha');
+        if (!form || !lista) return;
+        const inputBuscaPersonagem = document.getElementById('campanhaPersonagensBusca');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const nome = (document.getElementById('campanhaNome')?.value || '').trim();
+            const descricao = (document.getElementById('campanhaDescricao')?.value || '').trim();
+            const personagemIds = this._coletarPersonagensCampanhaSelecionados();
+            if (!nome) {
+                Toast.error('Informe o nome da campanha.');
+                return;
+            }
+            try {
+                const emEdicao = Boolean(this.campanhaEmEdicaoId);
+                const payload = {
+                    nome,
+                    descricao,
+                    personagem_ids: personagemIds,
+                };
+                if (this.campanhaEmEdicaoId) {
+                    await this.campanhaService.atualizar(this.campanhaEmEdicaoId, payload);
+                } else {
+                    await this.campanhaService.criar(payload);
+                }
+                this._resetFormCampanha();
+                await this._carregarCampanhas();
+                await this.carregarCombatentes();
+                Toast.success(emEdicao ? 'Campanha atualizada com sucesso!' : 'Campanha criada com sucesso!');
+            } catch (error) {
+                Toast.error(error.message || 'Erro ao salvar campanha');
+            }
+        });
+
+        const btnCancelarEdicao = document.getElementById('btnCancelarEdicaoCampanha');
+        if (btnCancelarEdicao) {
+            btnCancelarEdicao.addEventListener('click', () => this._resetFormCampanha());
+        }
+        if (inputBuscaPersonagem) {
+            inputBuscaPersonagem.addEventListener('input', () => this._renderizarChecklistPersonagensCampanha());
+        }
+        form.addEventListener('input', () => this._atualizarEstadoEdicaoCampanha());
+        form.addEventListener('change', () => this._atualizarEstadoEdicaoCampanha());
+        if (formSessao) {
+            const btnCancelarSessao = document.getElementById('btnCancelarEdicaoSessao');
+            if (btnCancelarSessao) {
+                btnCancelarSessao.addEventListener('click', () => this._resetFormSessaoCampanha());
+            }
+            formSessao.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const campanhaId = Number(document.getElementById('sessaoCampanhaId')?.value || 0);
+                const resumo = String(document.getElementById('sessaoResumo')?.value || '').trim();
+                const visivel = Boolean(document.getElementById('sessaoVisivelJogadores')?.checked);
+                if (!Number.isFinite(campanhaId) || campanhaId <= 0) {
+                    Toast.error('Selecione uma campanha para a sessão.');
+                    return;
+                }
+                if (!resumo) {
+                    Toast.error('Informe o resumo da sessão.');
+                    return;
+                }
+                try {
+                    const emEdicao = Boolean(this.sessaoEmEdicaoId);
+                    if (emEdicao) {
+                        await this.campanhaService.atualizarSessao(this.sessaoEmEdicaoId, {
+                            resumo,
+                            visivel_jogadores: visivel,
+                        });
+                    } else {
+                        await this.campanhaService.criarSessao({
+                            campanha_id: campanhaId,
+                            resumo,
+                            visivel_jogadores: visivel,
+                        });
+                    }
+                    this._resetFormSessaoCampanha();
+                    await this._carregarSessoesCampanha();
+                    Toast.success(emEdicao ? 'Sessão atualizada com sucesso!' : 'Sessão registrada com sucesso!');
+                } catch (error) {
+                    Toast.error(error.message || 'Erro ao registrar sessão');
+                }
+            });
+        }
+
+        this._carregarCampanhas();
+        this._carregarSessoesCampanha();
+    }
+
+    async _carregarCampanhas() {
+        if (!this.campanhaService || !this._isMestre()) return;
+        const lista = document.getElementById('listaCampanhas');
+        if (!lista) return;
+        lista.innerHTML = '<p class="dash-divcustom-vazio">Carregando campanhas...</p>';
+        try {
+            const campanhas = await this.campanhaService.listar();
+            this.campanhas = Array.isArray(campanhas) ? campanhas : [];
+            this._renderizarCampanhas();
+            this._atualizarSelectCampanhasSessao();
+        } catch (error) {
+            lista.innerHTML = `<p class="dash-divcustom-vazio">${escapeHtml(error.message || 'Erro ao carregar campanhas')}</p>`;
+        }
+    }
+
+    async _carregarSessoesCampanha() {
+        if (!this.campanhaService || !this._isMestre()) return;
+        const lista = document.getElementById('listaSessoesCampanha');
+        if (!lista) return;
+        lista.innerHTML = '<p class="dash-divcustom-vazio">Carregando sessões...</p>';
+        try {
+            const sessoes = await this.campanhaService.listarSessoes();
+            this.sessoesCampanha = Array.isArray(sessoes) ? sessoes : [];
+            this._renderizarSessoesCampanha();
+        } catch (error) {
+            lista.innerHTML = `<p class="dash-divcustom-vazio">${escapeHtml(error.message || 'Erro ao carregar sessões')}</p>`;
+        }
+    }
+
+    _atualizarSelectCampanhasSessao() {
+        const select = document.getElementById('sessaoCampanhaId');
+        if (!select) return;
+        const valorAtual = String(select.value || '');
+        select.innerHTML = '<option value="">Selecione a campanha</option>';
+        (this.campanhas || []).forEach((campanha) => {
+            const opt = document.createElement('option');
+            opt.value = String(campanha.id);
+            opt.textContent = campanha.nome || `Campanha #${campanha.id}`;
+            select.appendChild(opt);
+        });
+        if ([...select.options].some((opt) => opt.value === valorAtual)) {
+            select.value = valorAtual;
+        }
+    }
+
+    _renderizarSessoesCampanha() {
+        const lista = document.getElementById('listaSessoesCampanha');
+        if (!lista) return;
+        if (!this.sessoesCampanha.length) {
+            lista.innerHTML = '<p class="dash-divcustom-vazio">Nenhuma sessão registrada.</p>';
+            return;
+        }
+        lista.innerHTML = this.sessoesCampanha.map((sessao) => `
+            <div class="dash-divcustom-card">
+                <div class="dash-divcustom-card-head">
+                    <strong>${escapeHtml(sessao.campanha_nome || 'Campanha')}</strong>
+                    <div style="display:flex; gap:.35rem;">
+                        <span class="badge ${sessao.visivel_jogadores ? 'badge-jogador' : 'badge-npc'}">${sessao.visivel_jogadores ? 'Visível aos jogadores' : 'Privada do mestre'}</span>
+                        <button type="button" class="btn-dash-cancel" data-sessao-edit="${sessao.id}" title="Editar sessão">Editar</button>
+                        <button type="button" class="btn-dash-delete-div" data-sessao-delete="${sessao.id}" title="Excluir sessão">✕</button>
+                    </div>
+                </div>
+                <div class="dash-divcustom-card-meta">
+                    <span><b>Registrada em:</b> ${this._formatarDataSessao(sessao.created_at)}</span>
+                </div>
+                <p class="dash-divcustom-card-desc">${escapeHtml(sessao.resumo || '')}</p>
+            </div>
+        `).join('');
+        lista.querySelectorAll('[data-sessao-edit]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const sessaoId = Number(btn.getAttribute('data-sessao-edit'));
+                if (!Number.isFinite(sessaoId)) return;
+                const sessao = this.sessoesCampanha.find((item) => item.id === sessaoId);
+                if (!sessao) return;
+                this._preencherFormSessaoParaEdicao(sessao);
+            });
+        });
+        lista.querySelectorAll('[data-sessao-delete]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const sessaoId = Number(btn.getAttribute('data-sessao-delete'));
+                if (!Number.isFinite(sessaoId)) return;
+                try {
+                    await this.campanhaService.deletarSessao(sessaoId);
+                    await this._carregarSessoesCampanha();
+                    Toast.success('Sessão removida.');
+                } catch (error) {
+                    Toast.error(error.message || 'Erro ao remover sessão');
+                }
+            });
+        });
+    }
+
+    _preencherFormSessaoParaEdicao(sessao) {
+        this.sessaoEmEdicaoId = sessao.id;
+        const inputId = document.getElementById('sessaoIdEdicao');
+        const selectCampanha = document.getElementById('sessaoCampanhaId');
+        const inputResumo = document.getElementById('sessaoResumo');
+        const inputVisivel = document.getElementById('sessaoVisivelJogadores');
+        const btnSalvar = document.getElementById('btnSalvarSessaoCampanha');
+        const btnCancelar = document.getElementById('btnCancelarEdicaoSessao');
+        const badge = document.getElementById('sessaoEdicaoBadge');
+        if (inputId) inputId.value = String(sessao.id);
+        if (selectCampanha) selectCampanha.value = String(sessao.campanha_id || '');
+        if (inputResumo) inputResumo.value = sessao.resumo || '';
+        if (inputVisivel) inputVisivel.checked = Boolean(sessao.visivel_jogadores);
+        if (btnSalvar) btnSalvar.textContent = '💾 Salvar Sessão';
+        if (btnCancelar) btnCancelar.style.display = '';
+        if (badge) {
+            badge.textContent = `✏️ Editando sessão: ${sessao.campanha_nome || 'Campanha'}`;
+            badge.style.display = '';
+        }
+        selectCampanha?.focus();
+    }
+
+    _resetFormSessaoCampanha() {
+        this.sessaoEmEdicaoId = null;
+        const form = document.getElementById('formSessaoCampanha');
+        const inputId = document.getElementById('sessaoIdEdicao');
+        const btnSalvar = document.getElementById('btnSalvarSessaoCampanha');
+        const btnCancelar = document.getElementById('btnCancelarEdicaoSessao');
+        const badge = document.getElementById('sessaoEdicaoBadge');
+        if (form) form.reset();
+        if (inputId) inputId.value = '';
+        if (btnSalvar) btnSalvar.textContent = '📝 Registrar Sessão';
+        if (btnCancelar) btnCancelar.style.display = 'none';
+        if (badge) {
+            badge.style.display = 'none';
+            badge.textContent = '';
+        }
+    }
+
+    _formatarDataSessao(valor) {
+        if (!valor) return '—';
+        const data = new Date(valor);
+        if (Number.isNaN(data.getTime())) return '—';
+        try {
+            return new Intl.DateTimeFormat('pt-BR', {
+                dateStyle: 'short',
+                timeStyle: 'short',
+            }).format(data);
+        } catch (_err) {
+            return data.toLocaleString('pt-BR');
+        }
+    }
+
+    _renderizarCampanhas() {
+        const lista = document.getElementById('listaCampanhas');
+        if (!lista) return;
+        if (!this.campanhas.length) {
+            lista.innerHTML = '<p class="dash-divcustom-vazio">Nenhuma campanha cadastrada.</p>';
+            return;
+        }
+
+        lista.innerHTML = this.campanhas.map((campanha) => `
+            <div class="dash-divcustom-card">
+                <div class="dash-divcustom-card-head">
+                    <strong>${escapeHtml(campanha.nome || '')}</strong>
+                    <div style="display:flex; gap:.35rem;">
+                        <button
+                            type="button"
+                            class="btn-dash-cancel"
+                            data-campanha-edit="${campanha.id}"
+                            title="Editar campanha"
+                        >Editar</button>
+                        <button
+                            type="button"
+                            class="btn-dash-delete-div"
+                            data-campanha-delete="${campanha.id}"
+                            title="Excluir campanha"
+                        >✕</button>
+                    </div>
+                </div>
+                <div class="dash-divcustom-card-meta">
+                    <span><b>Personagens:</b> ${Number(campanha.total_personagens || 0)}</span>
+                </div>
+                ${campanha.descricao ? `<p class="dash-divcustom-card-desc">${escapeHtml(campanha.descricao)}</p>` : ''}
+            </div>
+        `).join('');
+
+        lista.querySelectorAll('[data-campanha-delete]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const campanhaId = Number(btn.getAttribute('data-campanha-delete'));
+                if (!Number.isFinite(campanhaId)) return;
+                try {
+                    await this.campanhaService.deletar(campanhaId);
+                    await this._carregarCampanhas();
+                    await this.carregarCombatentes();
+                    Toast.success('Campanha removida.');
+                } catch (error) {
+                    Toast.error(error.message || 'Erro ao remover campanha');
+                }
+            });
+        });
+
+        lista.querySelectorAll('[data-campanha-edit]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const campanhaId = Number(btn.getAttribute('data-campanha-edit'));
+                if (!Number.isFinite(campanhaId)) return;
+                const campanha = this.campanhas.find((item) => item.id === campanhaId);
+                if (!campanha) return;
+                this._preencherFormCampanhaParaEdicao(campanha);
+            });
+        });
+    }
+
+    _coletarPersonagensCampanhaSelecionados() {
+        const container = document.getElementById('campanhaPersonagens');
+        if (!container) return [];
+        return Array.from(container.querySelectorAll('input[type="checkbox"][data-personagem-id]:checked'))
+            .map((el) => Number(el.getAttribute('data-personagem-id')))
+            .filter((id) => Number.isFinite(id) && id > 0);
+    }
+
+    async _atualizarSelectPersonagensCampanha(combatentes) {
+        if (!this._isMestre()) return;
+        const container = document.getElementById('campanhaPersonagens');
+        if (!container) return;
+        let personagensFonte = Array.isArray(combatentes) ? combatentes : [];
+        if (this.escopoMestre === 'meus') {
+            try {
+                personagensFonte = await this.service.listar('jogador', false);
+            } catch (_err) {
+                // Em caso de falha, mantém a lista já carregada na tela.
+            }
+        }
+        this.personagensDisponiveisCampanha = (personagensFonte || []).filter((item) => item.tipo === 'jogador');
+        this._renderizarChecklistPersonagensCampanha();
+    }
+
+    _renderizarChecklistPersonagensCampanha() {
+        const container = document.getElementById('campanhaPersonagens');
+        if (!container) return;
+        const idsSelecionados = new Set(this._coletarPersonagensCampanhaSelecionados());
+        const filtro = String(document.getElementById('campanhaPersonagensBusca')?.value || '').trim().toLowerCase();
+        const personagens = (this.personagensDisponiveisCampanha || []).filter((item) => {
+            if (!filtro) return true;
+            const nome = String(item.nome || '').toLowerCase();
+            return nome.includes(filtro);
+        });
+        if (!personagens.length) {
+            const vazio = filtro
+                ? 'Nenhum personagem encontrado para este filtro.'
+                : 'Nenhum personagem jogador disponível.';
+            container.innerHTML = `<div class="campanha-personagens-vazio">${vazio}</div>`;
+            return;
+        }
+        container.innerHTML = personagens.map((personagem) => {
+            const checked = idsSelecionados.has(personagem.id) ? 'checked' : '';
+            return `
+                <label class="campanha-personagem-item">
+                    <input type="checkbox" data-personagem-id="${personagem.id}" ${checked} />
+                    <span class="campanha-personagem-nome">${escapeHtml(personagem.nome)} (Nv ${personagem.nivel || 1})</span>
+                </label>
+            `;
+        }).join('');
+    }
+
+    _limparSelectPersonagensCampanha() {
+        const container = document.getElementById('campanhaPersonagens');
+        if (container) {
+            container.querySelectorAll('input[type="checkbox"][data-personagem-id]').forEach((el) => {
+                el.checked = false;
+            });
+        }
+    }
+
+    _preencherFormCampanhaParaEdicao(campanha) {
+        this.campanhaEmEdicaoId = campanha.id;
+        const inputId = document.getElementById('campanhaIdEdicao');
+        const inputNome = document.getElementById('campanhaNome');
+        const inputDescricao = document.getElementById('campanhaDescricao');
+        const btnSalvar = document.getElementById('btnSalvarCampanha');
+        const btnCancelar = document.getElementById('btnCancelarEdicaoCampanha');
+        const badgeEdicao = document.getElementById('campanhaEdicaoBadge');
+        const container = document.getElementById('campanhaPersonagens');
+
+        if (inputId) inputId.value = String(campanha.id);
+        if (inputNome) inputNome.value = campanha.nome || '';
+        if (inputDescricao) inputDescricao.value = campanha.descricao || '';
+        if (btnSalvar) btnSalvar.textContent = '💾 Salvar Campanha';
+        if (btnCancelar) btnCancelar.style.display = '';
+        if (badgeEdicao) {
+            badgeEdicao.textContent = `✏️ Editando campanha: ${campanha.nome || ''}`;
+            badgeEdicao.style.display = '';
+            badgeEdicao.classList.remove('is-dirty');
+        }
+
+        const idsSelecionados = new Set((campanha.personagem_ids || []).map((id) => Number(id)));
+        if (container) {
+            container.querySelectorAll('input[type="checkbox"][data-personagem-id]').forEach((el) => {
+                const id = Number(el.getAttribute('data-personagem-id'));
+                el.checked = idsSelecionados.has(id);
+            });
+        }
+        this.snapshotCampanhaEmEdicao = this._capturarEstadoFormCampanha();
+        this._atualizarEstadoEdicaoCampanha();
+        inputNome?.focus();
+    }
+
+    _resetFormCampanha() {
+        this.campanhaEmEdicaoId = null;
+        this.snapshotCampanhaEmEdicao = null;
+        const form = document.getElementById('formCampanha');
+        const inputId = document.getElementById('campanhaIdEdicao');
+        const btnSalvar = document.getElementById('btnSalvarCampanha');
+        const btnCancelar = document.getElementById('btnCancelarEdicaoCampanha');
+        const badgeEdicao = document.getElementById('campanhaEdicaoBadge');
+        if (form) form.reset();
+        if (inputId) inputId.value = '';
+        if (btnSalvar) btnSalvar.textContent = '✅ Criar Campanha';
+        if (btnCancelar) btnCancelar.style.display = 'none';
+        if (badgeEdicao) {
+            badgeEdicao.textContent = '';
+            badgeEdicao.style.display = 'none';
+            badgeEdicao.classList.remove('is-dirty');
+        }
+        const inputBuscaPersonagem = document.getElementById('campanhaPersonagensBusca');
+        if (inputBuscaPersonagem) inputBuscaPersonagem.value = '';
+        this._limparSelectPersonagensCampanha();
+    }
+
+    _configurarFecharPainelCampanhas() {
+        if (!this._isMestre()) return;
+        const btnFechar = document.getElementById('btnFecharPainelCampanhas');
+        const btnReabrir = document.getElementById('btnReabrirPainelCampanhas');
+        const painel = document.getElementById('painelCampanhasMestre');
+        const toggle = document.getElementById('campanhasPainelToggle');
+        if (!painel || !toggle) return;
+        if (!btnFechar) return;
+        btnFechar.addEventListener('click', () => {
+            painel.style.display = 'none';
+            toggle.style.display = '';
+        });
+        if (btnReabrir) {
+            btnReabrir.addEventListener('click', () => {
+                painel.style.display = '';
+                toggle.style.display = 'none';
+            });
+        }
+    }
+
+    _capturarEstadoFormCampanha() {
+        const inputNome = document.getElementById('campanhaNome');
+        const inputDescricao = document.getElementById('campanhaDescricao');
+        const personagemIds = this._coletarPersonagensCampanhaSelecionados().sort((a, b) => a - b);
+        return JSON.stringify({
+            nome: (inputNome?.value || '').trim(),
+            descricao: (inputDescricao?.value || '').trim(),
+            personagem_ids: personagemIds,
+        });
+    }
+
+    _atualizarEstadoEdicaoCampanha() {
+        const badgeEdicao = document.getElementById('campanhaEdicaoBadge');
+        if (!badgeEdicao || !this.campanhaEmEdicaoId || !this.snapshotCampanhaEmEdicao) return;
+        const atual = this._capturarEstadoFormCampanha();
+        const dirty = atual !== this.snapshotCampanhaEmEdicao;
+        badgeEdicao.classList.toggle('is-dirty', dirty);
+        if (dirty) {
+            badgeEdicao.textContent = '✏️ Editando campanha (alteracoes nao salvas)';
+        } else {
+            const campanha = this.campanhas.find((item) => item.id === this.campanhaEmEdicaoId);
+            badgeEdicao.textContent = `✏️ Editando campanha: ${campanha?.nome || ''}`;
         }
     }
 
@@ -621,7 +1158,10 @@ class DashboardController {
         const tbody = document.getElementById('tabelaCombatentes');
 
         if (!combatentes.length) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b">Nenhum combatente cadastrado.</td></tr>';
+            const mensagemVazio = (this._isMestre() && this.escopoMestre === 'meus')
+                ? 'Nenhum combatente encontrado no escopo "Meus".'
+                : 'Nenhum combatente cadastrado.';
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b">${mensagemVazio}</td></tr>`;
             return;
         }
 
@@ -1298,8 +1838,12 @@ class CombatenteServiceGlobal {
         return res;
     }
 
-    async listar(tipo) {
-        const url = tipo ? `${this._url()}?tipo=${tipo}` : this._url();
+    async listar(tipo, somenteMeus = false) {
+        const params = new URLSearchParams();
+        if (tipo) params.set('tipo', tipo);
+        if (somenteMeus) params.set('meus', 'true');
+        const query = params.toString();
+        const url = query ? `${this._url()}?${query}` : this._url();
         const res = await fetch(url, { headers: this._headers() });
         await this._handleResponse(res, 'Erro ao carregar combatentes');
         return res.json();

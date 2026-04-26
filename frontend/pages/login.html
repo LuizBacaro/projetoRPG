@@ -55,7 +55,7 @@
         </div>
 
         <div class="perfil-info">
-            🎮 Sua conta será criada com o perfil <strong>Jogador</strong>.
+            <span id="perfilInfoTexto">🎮 Sua conta será criada com o perfil <strong>Jogador</strong>.</span>
             O Administrador pode alterar o perfil depois se necessário.
         </div>
 
@@ -81,6 +81,20 @@
             <div class="form-group">
                 <label>Confirmar senha *</label>
                 <input id="cadConfirma" type="password" placeholder="••••••" autocomplete="new-password" />
+            </div>
+
+            <div class="form-group">
+                <label>Perfil *</label>
+                <select id="cadPerfil">
+                    <option value="jogador" selected>Jogador</option>
+                    <option value="mestre">Mestre</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="grupoCampanhaInicial" style="display:none">
+                <label>Nome da campanha inicial *</label>
+                <input id="cadCampanhaNome" type="text" placeholder="Ex: As Crônicas de Arkan" />
+                <small class="cadastro-campanha-hint">Você poderá editar ou excluir essa campanha depois na aba de Campanhas.</small>
             </div>
 
             <button id="btnSalvarCadastro" type="submit" class="btn-login" style="margin-top:.25rem">
@@ -115,6 +129,10 @@
     const cadEmail          = document.getElementById('cadEmail');
     const cadSenha          = document.getElementById('cadSenha');
     const cadConfirma       = document.getElementById('cadConfirma');
+    const cadPerfil         = document.getElementById('cadPerfil');
+    const cadCampanhaNome   = document.getElementById('cadCampanhaNome');
+    const grupoCampanhaInicial = document.getElementById('grupoCampanhaInicial');
+    const perfilInfoTexto   = document.getElementById('perfilInfoTexto');
     const erroCadastro      = document.getElementById('erroCadastro');
     const sucessoCadastro   = document.getElementById('sucessoCadastro');
 
@@ -150,8 +168,26 @@
         cadEmail.value    = '';
         cadSenha.value    = '';
         cadConfirma.value = '';
+        cadPerfil.value   = 'jogador';
+        cadCampanhaNome.value = '';
+        atualizarFormularioCadastroPorPerfil();
         erroCadastro.style.display    = 'none';
         sucessoCadastro.style.display = 'none';
+    }
+
+    function atualizarFormularioCadastroPorPerfil() {
+        const perfil = cadPerfil.value;
+        const ehMestre = perfil === 'mestre';
+        if (grupoCampanhaInicial) {
+            grupoCampanhaInicial.style.display = ehMestre ? '' : 'none';
+        }
+        if (perfilInfoTexto) {
+            if (ehMestre) {
+                perfilInfoTexto.innerHTML = '🛡️ Sua conta será criada com o perfil <strong>Mestre</strong>.';
+            } else {
+                perfilInfoTexto.innerHTML = '🎮 Sua conta será criada com o perfil <strong>Jogador</strong>.';
+            }
+        }
     }
 
     // ── Login ─────────────────────────────────────────────────────────────
@@ -222,6 +258,8 @@
         const email    = cadEmail.value.trim();
         const senha    = cadSenha.value;
         const confirma = cadConfirma.value;
+        const perfil   = cadPerfil.value;
+        const campanhaNome = cadCampanhaNome.value.trim();
 
         // Validações no cliente
         if (!nome || !email || !senha || !confirma) {
@@ -236,6 +274,10 @@
             mostrarErroCadastro('As senhas não coincidem.');
             return;
         }
+        if (perfil === 'mestre' && !campanhaNome) {
+            mostrarErroCadastro('Informe o nome da campanha inicial para perfil Mestre.');
+            return;
+        }
 
         btnSalvarCadastro.disabled    = true;
         btnSalvarCadastro.textContent = 'Criando conta...';
@@ -244,7 +286,13 @@
             const res = await fetch(getApiUrl('/auth/registro'), {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ nome, email, senha })
+                body:    JSON.stringify({
+                    nome,
+                    email,
+                    senha,
+                    perfil,
+                    campanha_nome: perfil === 'mestre' ? campanhaNome : null,
+                })
             });
 
             const data = await res.json();
@@ -287,9 +335,12 @@
     // Abrir modal de cadastro
     btnAbrirCadastro.addEventListener('click', () => {
         limparCadastro();
+        atualizarFormularioCadastroPorPerfil();
         modalCadastro.classList.add('show');
         cadNome.focus();
     });
+
+    cadPerfil.addEventListener('change', atualizarFormularioCadastroPorPerfil);
 
     // Fechar modal
     const fecharModal = () => {

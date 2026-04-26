@@ -12,10 +12,14 @@ from ..services.file_service import FileService
 from ..repositories.condicao_repository import CondicaoRepository
 from ..repositories.magia_repository import MagiaRepository
 from ..repositories.grimorio_repository import GrimorioRepository
+from ..repositories.campanha_repository import CampanhaRepository
+from ..repositories.sessao_campanha_repository import SessaoCampanhaRepository
 from ..services.condicao_service import CondicaoService
 from ..services.magia_import_service import MagiaImportService
 from ..services.magia_service import MagiaService
 from ..services.grimorio_service import GrimorioService
+from ..services.campanha_service import CampanhaService
+from ..services.sessao_campanha_service import SessaoCampanhaService
 
 # ==================== REPOSITORIES ====================
 
@@ -37,6 +41,15 @@ def get_magia_repository(db: Session = Depends(get_db)) -> MagiaRepository:
 def get_grimorio_repository(db: Session = Depends(get_db)) -> GrimorioRepository:
     """Factory para GrimorioRepository"""
     return GrimorioRepository(db)
+
+
+def get_campanha_repository(db: Session = Depends(get_db)) -> CampanhaRepository:
+    """Factory para CampanhaRepository"""
+    return CampanhaRepository(db)
+
+def get_sessao_campanha_repository(db: Session = Depends(get_db)) -> SessaoCampanhaRepository:
+    """Factory para SessaoCampanhaRepository"""
+    return SessaoCampanhaRepository(db)
 
 
 # ==================== SERVICES ====================
@@ -83,6 +96,22 @@ def get_grimorio_service(
 ) -> GrimorioService:
     """Factory para GrimorioService"""
     return GrimorioService(grimorio_repository, magia_repository)
+
+
+def get_campanha_service(
+    campanha_repository: CampanhaRepository = Depends(get_campanha_repository),
+    combatente_repository: CombatenteRepository = Depends(get_combatente_repository),
+) -> CampanhaService:
+    """Factory para CampanhaService"""
+    return CampanhaService(campanha_repository, combatente_repository)
+
+
+def get_sessao_campanha_service(
+    sessao_repository: SessaoCampanhaRepository = Depends(get_sessao_campanha_repository),
+    campanha_repository: CampanhaRepository = Depends(get_campanha_repository),
+) -> SessaoCampanhaService:
+    """Factory para SessaoCampanhaService"""
+    return SessaoCampanhaService(sessao_repository, campanha_repository)
 
 
 def get_file_service() -> FileService:

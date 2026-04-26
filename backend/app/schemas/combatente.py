@@ -26,6 +26,7 @@ class CombatenteBase(BaseModel):
     divindade: Optional[str] = Field(default="", max_length=80)
     alinhamento: Optional[str] = Field(default="", max_length=30)
     dominios: Optional[str] = Field(default="", max_length=120)
+    campanha_id: Optional[int] = Field(default=None, ge=1)
 
     # ✅ NOVO: apenas monstros usam, mas aceita em todos os tipos (nullable)
     pagina_referencia: Optional[str] = Field(default="", max_length=100)
@@ -74,6 +75,7 @@ class CombatenteUpdate(BaseModel):
     divindade: Optional[str] = Field(None, max_length=80)
     alinhamento: Optional[str] = Field(None, max_length=30)
     dominios: Optional[str] = Field(None, max_length=120)
+    campanha_id: Optional[int] = Field(default=None, ge=1)
 
     # ✅ NOVO
     pagina_referencia: Optional[str] = Field(None, max_length=100)
@@ -141,6 +143,7 @@ class CombatenteResponse(CombatenteBase):
 
     # ✅ NOVO: exposto no response para o frontend exibir na ficha/arena
     pagina_referencia: Optional[str] = ""
+    campanha_nome: Optional[str] = ""
     bonus_base_ataque: Optional[str] = ""
     habilidades_especiais: Optional[str] = ""
     # Novo campo enriquecido; fallback legado permanece em `habilidades_especiais`.

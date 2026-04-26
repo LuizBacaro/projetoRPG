@@ -9,6 +9,7 @@ import sqlalchemy as sa
 
 from .base import BaseRepository, apply_not_deleted, commit_with_rollback
 from ..models.combatente import Combatente
+from ..models.campanha import Campanha
 
 
 class CombatenteRepository(BaseRepository[Combatente]):
@@ -77,6 +78,76 @@ class CombatenteRepository(BaseRepository[Combatente]):
                 Combatente.tipo == tipo,
             )
             .count()
+        )
+
+    def get_by_owner_or_campanha_mestre(self, mestre_id: int, skip: int = 0, limit: int = 100) -> List[Combatente]:
+        """Busca combatentes do mestre (por dono) ou vinculados às campanhas dele."""
+        return (
+            apply_not_deleted(self.db.query(Combatente), Combatente)
+            .outerjoin(Campanha, Combatente.campanha_id == Campanha.id)
+            .filter(
+                sa.or_(
+                    Combatente.dono_id == mestre_id,
+                    Campanha.mestre_id == mestre_id,
+                )
+            )
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    def get_by_owner_or_campanha_mestre_and_tipo(
+        self,
+        mestre_id: int,
+        tipo: str,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[Combatente]:
+        """Busca combatentes do mestre por tipo (dono ou campanha do mestre)."""
+        return (
+            apply_not_deleted(self.db.query(Combatente), Combatente)
+            .outerjoin(Campanha, Combatente.campanha_id == Campanha.id)
+            .filter(
+                Combatente.tipo == tipo,
+                sa.or_(
+                    Combatente.dono_id == mestre_id,
+                    Campanha.mestre_id == mestre_id,
+                ),
+            )
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    def count_by_owner_or_campanha_mestre(self, mestre_id: int) -> int:
+        """Conta combatentes do mestre (dono ou em campanhas do mestre)."""
+        return (
+            apply_not_deleted(self.db.query(sa.func.count(sa.distinct(Combatente.id))), Combatente)
+            .outerjoin(Campanha, Combatente.campanha_id == Campanha.id)
+            .filter(
+                sa.or_(
+                    Combatente.dono_id == mestre_id,
+                    Campanha.mestre_id == mestre_id,
+                )
+            )
+            .scalar()
+            or 0
+        )
+
+    def count_by_owner_or_campanha_mestre_and_tipo(self, mestre_id: int, tipo: str) -> int:
+        """Conta combatentes do mestre por tipo (dono ou em campanhas do mestre)."""
+        return (
+            apply_not_deleted(self.db.query(sa.func.count(sa.distinct(Combatente.id))), Combatente)
+            .outerjoin(Campanha, Combatente.campanha_id == Campanha.id)
+            .filter(
+                Combatente.tipo == tipo,
+                sa.or_(
+                    Combatente.dono_id == mestre_id,
+                    Campanha.mestre_id == mestre_id,
+                ),
+            )
+            .scalar()
+            or 0
         )
 
     def get_by_ids(self, combatente_ids: List[int]) -> List[Combatente]:

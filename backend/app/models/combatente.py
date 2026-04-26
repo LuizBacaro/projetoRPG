@@ -2,7 +2,7 @@
 Model do Combatente (Entity)
 SRP: representa a tabela combatentes + relacionamentos
 """
-from sqlalchemy import Column, Integer, String, CheckConstraint
+from sqlalchemy import Column, Integer, String, CheckConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 from ..core.database import Base
 from .mixins import SoftDeleteMixin
@@ -21,6 +21,7 @@ class Combatente(SoftDeleteMixin, Base):
     # ── Identificação ──
     id     = Column(Integer, primary_key=True, index=True)
     dono_id = Column(Integer, nullable=True, index=True)
+    campanha_id = Column(Integer, ForeignKey("campanhas.id"), nullable=True, index=True)
     nome   = Column(String,  nullable=False)
     tipo   = Column(String,  nullable=False)
     classe = Column(String,  nullable=False)
@@ -114,6 +115,7 @@ class Combatente(SoftDeleteMixin, Base):
         lazy="selectin",
         foreign_keys="ArmaduraProtecaoJogador.combatente_id",
     )
+    campanha = relationship("Campanha", back_populates="personagens", lazy="joined")
 
     # ── Helpers de domínio ──
     def __repr__(self) -> str:

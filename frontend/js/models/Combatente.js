@@ -15,6 +15,7 @@ export class Combatente {
         this.divindade         = data.divindade         || data.deidade || '';
         this.alinhamento       = data.alinhamento       || '';
         this.dominios          = data.dominios          || '';
+        this.campanha_nome     = data.campanha_nome     || '';
         this.pagina_referencia = data.pagina_referencia || '';  // ✅ NOVO
         this.hp_atual          = data.hp_atual;
         this.hp_maximo         = data.hp_maximo;

@@ -21,6 +21,7 @@ from ...core.security_audit import log_security_event
 from ...core.deps import get_db, get_usuario_atual
 from ...repositories.usuario_repository import UsuarioRepository
 from ...models.usuario import Usuario, PerfilUsuario
+from ...models.campanha import Campanha
 
 logger = logging.getLogger(__name__)
 
@@ -85,10 +86,12 @@ class UsuarioResponse(BaseModel):
 
 
 class RegistroRequest(BaseModel):
-    """Schema para cadastro público de nova conta jogador."""
+    """Schema para cadastro público de nova conta."""
     nome: str = Field(..., min_length=1, max_length=100)
     email: EmailStr = Field(..., max_length=150)
     senha: str = Field(..., min_length=6, max_length=128)
+    perfil: str = Field(default=PerfilUsuario.JOGADOR.value, pattern="^(jogador|mestre)$")
+    campanha_nome: Optional[str] = Field(default=None, max_length=120)
 
 
 class RegistroResponse(BaseModel):
@@ -292,8 +295,8 @@ def logout(request: Request):
     "/registro",
     response_model=RegistroResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Cadastro público de jogador",
-    description="Cria uma nova conta com perfil jogador para acesso à plataforma.",
+    summary="Cadastro público de jogador/mestre",
+    description="Cria nova conta com perfil jogador ou mestre. Para mestre, exige nome da primeira campanha.",
     responses={
         201: {"description": "Conta criada com sucesso"},
         409: {"description": "E-mail já cadastrado"},
@@ -305,7 +308,6 @@ def registrar(
     db: Session = Depends(get_db),
 ) -> RegistroResponse:
     repo = UsuarioRepository(db)
-
     existente = repo.buscar_por_email(payload.email)
     if existente:
         log_security_event(
@@ -321,16 +323,41 @@ def registrar(
             detail="E-mail já cadastrado",
         )
 
+    perfil_solicitado = payload.perfil.strip().lower()
+    perfil = PerfilUsuario.MESTRE if perfil_solicitado == PerfilUsuario.MESTRE.value else PerfilUsuario.JOGADOR
+    campanha_nome = (payload.campanha_nome or "").strip()
+    if perfil == PerfilUsuario.MESTRE and not campanha_nome:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Nome da campanha é obrigatório para cadastro como mestre",
+        )
+
     novo_usuario = Usuario(
-        perfil=PerfilUsuario.JOGADOR,
+        perfil=perfil,
         nome=payload.nome.strip(),
         email=payload.email.strip().lower(),
         senha_hash=hash_senha(payload.senha),
         ativo=True,
         usuario_responsavel="auto-registro",
     )
+    try:
+        db.add(novo_usuario)
+        db.flush()
+        if perfil == PerfilUsuario.MESTRE:
+            db.add(
+                Campanha(
+                    mestre_id=novo_usuario.id,
+                    nome=campanha_nome,
+                    descricao="Campanha inicial criada no cadastro do mestre.",
+                )
+            )
+        db.commit()
+        db.refresh(novo_usuario)
+    except Exception:
+        db.rollback()
+        raise
 
-    usuario = repo.criar(novo_usuario)
+    usuario = novo_usuario
     log_security_event(
         "register",
         "success",

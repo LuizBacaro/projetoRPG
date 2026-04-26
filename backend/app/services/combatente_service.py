@@ -185,49 +185,45 @@ class CombatenteService:
         usuario=None,
         skip: int = 0,
         limit: int = 100,
+        apenas_meus: bool = False,
     ) -> List[Combatente]:
         """Lista todos os combatentes, opcionalmente filtrando por tipo."""
+        def _enriquecer(combatentes: List[Combatente]) -> List[Combatente]:
+            self._sincronizar_progressao_em_memoria(combatentes)
+            self._enriquecer_dados_raciais_em_memoria(combatentes)
+            self._enriquecer_habilidades_especiais_em_memoria(combatentes)
+            for combatente in combatentes:
+                campanha = getattr(combatente, "campanha", None)
+                setattr(combatente, "campanha_nome", getattr(campanha, "nome", "") if campanha else "")
+            return combatentes
+
         # Jogador enxerga apenas seus próprios combatentes (qualquer tipo)
         if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
             if tipo:
-                combatentes = self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
-                self._sincronizar_progressao_em_memoria(combatentes)
-                self._enriquecer_dados_raciais_em_memoria(combatentes)
-                self._enriquecer_habilidades_especiais_em_memoria(combatentes)
-                return combatentes
-            combatentes = self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
-            self._sincronizar_progressao_em_memoria(combatentes)
-            self._enriquecer_dados_raciais_em_memoria(combatentes)
-            self._enriquecer_habilidades_especiais_em_memoria(combatentes)
-            return combatentes
+                return _enriquecer(self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit))
+            return _enriquecer(self.repository.get_by_owner(usuario.id, skip=skip, limit=limit))
 
-        # Mestre/user comum enxerga seus próprios (com filtro de tipo se aplicável)
-        if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
+        if usuario and apenas_meus:
+            if usuario.perfil == PerfilUsuario.MESTRE:
+                if tipo:
+                    return _enriquecer(
+                        self.repository.get_by_owner_or_campanha_mestre_and_tipo(
+                            usuario.id,
+                            tipo,
+                            skip=skip,
+                            limit=limit,
+                        )
+                    )
+                return _enriquecer(self.repository.get_by_owner_or_campanha_mestre(usuario.id, skip=skip, limit=limit))
             if tipo:
-                combatentes = self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit)
-                self._sincronizar_progressao_em_memoria(combatentes)
-                self._enriquecer_dados_raciais_em_memoria(combatentes)
-                self._enriquecer_habilidades_especiais_em_memoria(combatentes)
-                return combatentes
-            combatentes = self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
-            self._sincronizar_progressao_em_memoria(combatentes)
-            self._enriquecer_dados_raciais_em_memoria(combatentes)
-            self._enriquecer_habilidades_especiais_em_memoria(combatentes)
-            return combatentes
+                return _enriquecer(self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit))
+            return _enriquecer(self.repository.get_by_owner(usuario.id, skip=skip, limit=limit))
 
         if tipo:
-            combatentes = self.repository.get_by_tipo(tipo, skip=skip, limit=limit)
-            self._sincronizar_progressao_em_memoria(combatentes)
-            self._enriquecer_dados_raciais_em_memoria(combatentes)
-            self._enriquecer_habilidades_especiais_em_memoria(combatentes)
-            return combatentes
-        combatentes = self.repository.get_all(skip=skip, limit=limit)
-        self._sincronizar_progressao_em_memoria(combatentes)
-        self._enriquecer_dados_raciais_em_memoria(combatentes)
-        self._enriquecer_habilidades_especiais_em_memoria(combatentes)
-        return combatentes
+            return _enriquecer(self.repository.get_by_tipo(tipo, skip=skip, limit=limit))
+        return _enriquecer(self.repository.get_all(skip=skip, limit=limit))
 
-    def contar_todos(self, tipo: Optional[str] = None, usuario=None) -> int:
+    def contar_todos(self, tipo: Optional[str] = None, usuario=None, apenas_meus: bool = False) -> int:
         """Conta combatentes respeitando escopo do usuário e filtro por tipo."""
         # Jogador conta apenas seus próprios combatentes (qualquer tipo)
         if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
@@ -235,8 +231,11 @@ class CombatenteService:
                 return self.repository.count_by_owner_and_tipo(usuario.id, tipo)
             return self.repository.count_by_owner(usuario.id)
 
-        # Mestre/user comum conta seus próprios (com filtro de tipo se aplicável)
-        if usuario and usuario.perfil != PerfilUsuario.ADMINISTRADOR:
+        if usuario and apenas_meus:
+            if usuario.perfil == PerfilUsuario.MESTRE:
+                if tipo:
+                    return self.repository.count_by_owner_or_campanha_mestre_and_tipo(usuario.id, tipo)
+                return self.repository.count_by_owner_or_campanha_mestre(usuario.id)
             if tipo:
                 return self.repository.count_by_owner_and_tipo(usuario.id, tipo)
             return self.repository.count_by_owner(usuario.id)
@@ -257,6 +256,8 @@ class CombatenteService:
         self._sincronizar_progressao_em_memoria([combatente])
         self._enriquecer_dados_raciais_em_memoria([combatente])
         self._enriquecer_habilidades_especiais_em_memoria([combatente])
+        campanha = getattr(combatente, "campanha", None)
+        setattr(combatente, "campanha_nome", getattr(campanha, "nome", "") if campanha else "")
         return combatente
 
     def criar(self, combatente_data: dict, foto_file=None, dono_id: Optional[int] = None) -> Combatente:
@@ -931,7 +932,12 @@ class CombatenteService:
             raise ArenaBaseException("Usuário autenticado é obrigatório", status_code=401)
 
         perfil = getattr(usuario, "perfil", None)
-        if perfil == PerfilUsuario.ADMINISTRADOR or perfil == PerfilUsuario.ADMINISTRADOR.value:
+        if perfil in (
+            PerfilUsuario.ADMINISTRADOR,
+            PerfilUsuario.ADMINISTRADOR.value,
+            PerfilUsuario.MESTRE,
+            PerfilUsuario.MESTRE.value,
+        ):
             return
 
         if combatente.dono_id != getattr(usuario, "id", None):

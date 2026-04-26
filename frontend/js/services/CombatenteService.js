@@ -5,7 +5,7 @@
  */
 
 import { getApiUrl } from '../config/api.config.js';
-import { Combatente } from '../models/Combatente.js';
+import { Combatente } from '../models/Combatente.js?v=2';
 
 export class CombatenteService {
     constructor() {

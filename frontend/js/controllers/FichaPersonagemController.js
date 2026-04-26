@@ -5,7 +5,7 @@
  * ✅ NOVO: BroadcastChannel sync arena→ficha em tempo real
  */
 
-import { CombatenteService } from '../services/CombatenteService.js?v=3';
+import { CombatenteService } from '../services/CombatenteService.js?v=4';
 import { EquipamentoService } from '../services/EquipamentoService.js';
 import { ArmaduraProtecaoService } from '../services/ArmaduraProtecaoService.js';
 import { TalentoService } from '../services/TalentoService.js?v=3';
@@ -570,6 +570,7 @@ export class FichaPersonagemController {
         const nivel       = document.getElementById('fichaNivel');
         const alinhamento = document.getElementById('fichaAlinhamento');
         const divindade   = document.getElementById('fichaDivindade');
+        const campanha    = document.getElementById('fichaCampanha');
         const dominios    = document.getElementById('fichaDominios');
         const placeholder = document.getElementById('fichaFotoPlaceholder');
         const foto        = document.getElementById('fichaFoto');
@@ -587,6 +588,7 @@ export class FichaPersonagemController {
         if (nivel)  nivel.textContent  = this.combatente.nivel  || 1;
         if (alinhamento) alinhamento.textContent = `Alinhamento: ${this.combatente.alinhamento || '—'}`;
         if (divindade) divindade.textContent = `Divindade: ${this._formatarDivindadeExibicao(this.combatente.divindade)}`;
+        if (campanha) campanha.textContent = `Campanha: ${this.combatente.campanha_nome || '—'}`;
         if (dominios) {
             if (this._ehClasseClerigo()) {
                 dominios.textContent = `Domínios: ${this._formatarDominios(this.combatente.dominios)}`;

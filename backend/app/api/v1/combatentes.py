@@ -25,6 +25,7 @@ router = APIRouter(prefix="/combatentes", tags=["Combatentes"])
 @router.get("", response_model=List[CombatenteResponse])
 def listar_combatentes(
     tipo: Optional[str] = None,
+    meus: bool = Query(False),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=200),
     response: Response = None,
@@ -32,12 +33,18 @@ def listar_combatentes(
     usuario_atual: Usuario = Depends(get_usuario_atual),
 ):
     """Lista todos os combatentes ou filtra por tipo"""
-    total = service.contar_todos(tipo, usuario=usuario_atual)
+    total = service.contar_todos(tipo, usuario=usuario_atual, apenas_meus=meus)
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)
         response.headers["X-Limit"] = str(limit)
-    return service.listar_todos(tipo, usuario=usuario_atual, skip=skip, limit=limit)
+    return service.listar_todos(
+        tipo,
+        usuario=usuario_atual,
+        skip=skip,
+        limit=limit,
+        apenas_meus=meus,
+    )
 
 
 @router.get("/{combatente_id}", response_model=CombatenteResponse)
@@ -66,6 +73,7 @@ async def criar_combatente(
     divindade: Optional[str] = Form(None, max_length=80),
     alinhamento: Optional[str] = Form(None, max_length=30),
     dominios: Optional[str] = Form(None, max_length=120),
+    campanha_id: Optional[int] = Form(None),
     # ✅ NOVO
     pagina_referencia: Optional[str] = Form(None, max_length=100),
     # Atributos D&D
@@ -98,6 +106,7 @@ async def criar_combatente(
         "divindade":          divindade or "",
         "alinhamento":        alinhamento or "",
         "dominios":           dominios or "",
+        "campanha_id":        campanha_id,
         "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
         "hp_maximo":          hp_maximo,
         "iniciativa":         iniciativa,
@@ -134,6 +143,7 @@ async def atualizar_combatente(
     divindade: Optional[str] = Form(None, max_length=80),
     alinhamento: Optional[str] = Form(None, max_length=30),
     dominios: Optional[str] = Form(None, max_length=120),
+    campanha_id: Optional[int] = Form(None),
     # ✅ NOVO
     pagina_referencia: Optional[str] = Form(None, max_length=100),
     # Atributos D&D
@@ -166,6 +176,7 @@ async def atualizar_combatente(
         "divindade":          divindade or "",
         "alinhamento":        alinhamento or "",
         "dominios":           dominios or "",
+        "campanha_id":        campanha_id,
         "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
         "hp_maximo":          hp_maximo,
         "iniciativa":         iniciativa,

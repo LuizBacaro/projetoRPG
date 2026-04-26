@@ -325,7 +325,7 @@ def requer_dono_ou_admin_combatente(
     usuario=Depends(get_usuario_atual),
     db: Session = Depends(get_db),
 ) -> "Usuario":
-    """Dependency: garante que o usuário é dono do combatente ou admin."""
+    """Dependency: garante que o usuário é dono do combatente ou admin/mestre."""
     combatente = db.query(Combatente).filter(Combatente.id == combatente_id).first()
     if not combatente:
         raise HTTPException(
@@ -333,7 +333,7 @@ def requer_dono_ou_admin_combatente(
             detail=f"Combatente {combatente_id} não encontrado",
         )
 
-    if usuario.perfil == PerfilUsuario.ADMINISTRADOR:
+    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
         return usuario
 
     if combatente.dono_id != usuario.id:
@@ -375,7 +375,7 @@ def requer_dono_ou_admin_slot_magia(
             detail=f"Combatente {slot.combatente_id} não encontrado",
         )
 
-    if usuario.perfil == PerfilUsuario.ADMINISTRADOR:
+    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
         return usuario
 
     if combatente.dono_id != usuario.id:
@@ -402,7 +402,7 @@ def validar_combatentes_do_usuario(
     db: Session,
 ) -> None:
     """Valida lista de combatentes para operações em lote (ex.: iniciar combate)."""
-    if usuario.perfil == PerfilUsuario.ADMINISTRADOR:
+    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
         return
 
     ids_unicos = list(set(combatente_ids))
