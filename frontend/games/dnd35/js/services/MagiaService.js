@@ -62,11 +62,17 @@ export class MagiaService {
             }
 
             const magias = pagina.items;
-            
-            // Se a API retornar vazio, usa fallback
+
+            // Catálogo vazio na API (sem dados importados) ou filtro sem match → tenta fallback
             if (!magias || magias.length === 0) {
-                console.warn(`⚠️ API retornou 0 magias, usando fallback...`);
-                return await this._listarTodasEFiltrar(classeNormalizada);
+                const fallback = await this._listarTodasEFiltrar(classeNormalizada);
+                if (!fallback.length) {
+                    console.info(
+                        '[MagiaService] Catálogo vazio ou sem magias para a classe; ' +
+                        'importe magias (admin) ou verifique a classe do personagem.'
+                    );
+                }
+                return fallback;
             }
 
             this._cache.set(classeNormalizada, magias);
@@ -129,14 +135,19 @@ export class MagiaService {
             throw new Error(`Falha ao carregar magias paginadas (HTTP ${res.status})`);
         }
 
-        const items = await res.json();
+        const body = await res.json();
+        const items = Array.isArray(body)
+            ? body
+            : (Array.isArray(body?.items) ? body.items : []);
         const totalHeader = Number(res.headers.get('X-Total-Count'));
         const skipHeader = Number(res.headers.get('X-Skip'));
         const limitHeader = Number(res.headers.get('X-Limit'));
 
         return {
-            items: Array.isArray(items) ? items : [],
-            total: Number.isFinite(totalHeader) ? totalHeader : (Array.isArray(items) ? items.length : 0),
+            items,
+            total: Number.isFinite(totalHeader)
+                ? totalHeader
+                : (Array.isArray(items) ? items.length : 0),
             skip: Number.isFinite(skipHeader) ? skipHeader : Math.max(0, Number(skip || 0)),
             limit: Number.isFinite(limitHeader) ? limitHeader : Math.max(1, Number(limit || 20)),
         };
@@ -167,8 +178,9 @@ export class MagiaService {
             
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             
-            const todasMagias = await res.json();
-            
+            const raw = await res.json();
+            const todasMagias = Array.isArray(raw) ? raw : (Array.isArray(raw?.items) ? raw.items : []);
+
             // ✅ FILTRA COMPARANDO EM MAIÚSCULA
             const magiasFiltradas = todasMagias.filter(m => {
                 const alvo = this._normalizarClasse(classeNormalizada);

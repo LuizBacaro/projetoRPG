@@ -4,8 +4,8 @@
  * SOLID: DIP - Dependency Injection via constructor (será usado se necessário)
  */
 
-import { getApiUrl } from '/games/dnd35/js/config/api.config.js';
-import { Combatente } from '/games/dnd35/js/models/Combatente.js?v=2';
+import { getApiUrl } from '../config/api.config.js';
+import { Combatente } from '../models/Combatente.js';
 
 export class CombatenteService {
     constructor() {

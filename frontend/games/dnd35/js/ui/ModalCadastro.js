@@ -2,7 +2,7 @@
  * Componente de Modal de Cadastro
  * Princípio SOLID: Single Responsibility - gerenciar modais de cadastro
  */
-import { CombatenteService } from '/games/dnd35/js/services/CombatenteService.js?v=20260427a';
+import { CombatenteService } from '../services/CombatenteService.js';
 import { UploadService } from '../services/UploadService.js';
 import { Toast } from './toast.module.js';
 import { atualizarModificadorDOM } from '../utils/dnd.js?v=20260420b';

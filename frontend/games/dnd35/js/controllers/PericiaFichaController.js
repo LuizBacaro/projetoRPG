@@ -4,7 +4,7 @@
  * Calcula custos baseado em classe (1 ponto se da classe, 2 se não é)
  */
 
-import { CombatenteService } from '/games/dnd35/js/services/CombatenteService.js?v=20260427a';
+import { CombatenteService } from '../services/CombatenteService.js';
 import { PericiaService } from '../services/PericiaService.js';
 import { NotificationService } from '../services/NotificationService.js';
 import { modificadorPericiaPorAtributo } from '../utils/dnd.js?v=20260420b';

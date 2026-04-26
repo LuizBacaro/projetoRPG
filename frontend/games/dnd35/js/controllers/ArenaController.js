@@ -1,11 +1,11 @@
-import { CombatenteService     } from '/games/dnd35/js/services/CombatenteService.js?v=20260427a';
-import { CondicaoController    } from '/games/dnd35/js/controllers/CondicaoController.js';
-import { MagiaSlotService      } from '/games/dnd35/js/services/MagiaSlotService.js?v=20260402a';
-import { MagiaPreparadaService } from '/games/dnd35/js/services/MagiaPreparadaService.js?v=20260401b';
-import { Toast } from '/games/dnd35/js/ui/toast.module.js';
-import { escapeHtml } from '/games/dnd35/js/utils/formatters.js';
-import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots, normalizeClasseConjuradora } from '/games/dnd35/js/utils/combat-rules.js?v=20260419a';
-import { getApiUrl } from '/games/dnd35/js/config/api.config.js';
+import { CombatenteService     } from '../services/CombatenteService.js';
+import { CondicaoController    } from './CondicaoController.js';
+import { MagiaSlotService      } from '../services/MagiaSlotService.js?v=20260402a';
+import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
+import { Toast } from '../ui/toast.module.js';
+import { escapeHtml } from '../utils/formatters.js';
+import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots, normalizeClasseConjuradora } from '../utils/combat-rules.js?v=20260419a';
+import { getApiUrl } from '../config/api.config.js';
 
 export class ArenaController {
 

@@ -14,6 +14,7 @@ from typing import List, Optional
 
 from app.core.catalog_cache import catalog_cache, make_cache_key
 from app.core.config import settings
+from app.core.text_utils import normalizar_classe_acesso
 from app.core.dependencies import get_magia_import_service, get_magia_service
 from app.core.database import get_db
 from app.core.deps import requer_mestre_ou_admin
@@ -116,11 +117,11 @@ def listar_magias(
     sort_by = _sanitize_query_value(sort_by)
     sort_dir = _sanitize_query_value(sort_dir)
 
+    # Mesma normalização do repositório (acentos, maiúsculas, Feiticeiro→Mago, Patrulheiro→Ranger)
     classe_normalizado = None
-    if classe:
-        classe_normalizado = classe.strip()
-        if classe_normalizado.upper() == "FEITICEIRO":
-            classe_normalizado = "MAGO"
+    if classe and str(classe).strip():
+        token = normalizar_classe_acesso(str(classe).strip())
+        classe_normalizado = token or None
 
     cache_key = make_cache_key(
         "magias:list",
