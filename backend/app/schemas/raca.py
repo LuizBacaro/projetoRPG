@@ -1,27 +1,22 @@
-from __future__ import annotations
+"""[SHIM DE COMPATIBILIDADE] app.schemas.raca
 
-from pydantic import BaseModel
+Este módulo existe apenas para manter os imports legados funcionando
+após a migração dos schemas de raça do D&D 3.5 para
+`app.games.dnd35.schemas.raca`.
 
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.schemas.raca` diretamente. Quando todos os call sites
+estiverem usando o novo path, este shim pode ser removido.
+"""
 
-class RacaModificadorAtributo(BaseModel):
-    atributo: str
-    valor: int
+from app.games.dnd35.schemas.raca import (
+    RacaDetalheResponse,
+    RacaModificadorAtributo,
+    RacaResumoResponse,
+)
 
-
-class RacaResumoResponse(BaseModel):
-    slug: str
-    nome: str
-    tamanho: str | None = None
-    deslocamento_metros: int | None = None
-    classe_favorecida: str | None = None
-
-
-class RacaDetalheResponse(RacaResumoResponse):
-    modificadores_habilidade: list[RacaModificadorAtributo] = []
-    idiomas_iniciais: list[str] = []
-    talentos_especiais: list[str] = []
-    habilidades_especiais: list[str] = []
-    resistencias: list[str] = []
-    modificadores_ataque: list[str] = []
-    modificadores_defesa: list[str] = []
-    modificadores_pericia: list[str] = []
+__all__ = [
+    "RacaModificadorAtributo",
+    "RacaResumoResponse",
+    "RacaDetalheResponse",
+]

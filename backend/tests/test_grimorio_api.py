@@ -1061,7 +1061,7 @@ def test_grimorio_notificacao_conversao_divina_por_excecao_wee_jas(monkeypatch, 
     combatente.alinhamento = "Leal e Neutro"
     db.commit()
 
-    from app.services import grimorio_service as grimorio_mod
+    from app.games.dnd35.services import grimorio_service as grimorio_mod
     monkeypatch.setattr(grimorio_mod, "_divindade_do_combatente", lambda _c: "Wee Jas")
 
     client = _build_client(db_factory)

@@ -1,44 +1,19 @@
 """
-Model de Divindade Custom (Entity)
-SRP: Entidade que representa uma divindade criada pelo Mestre para a campanha,
-somando-se ao catalogo oficial D&D 3.5 (Tabela 3-7).
+[SHIM DE COMPATIBILIDADE] app.models.divindade_custom
 
-Observacoes:
-  * `dominios` e armazenado em CSV ("Bem, Protecao, Guerra") por simplicidade
-    e compatibilidade com o restante do projeto. O service normaliza/expoe
-    como List[str].
-  * `nome` deve ser unico (case-insensitive) dentro das customizadas.
+O model real foi movido para `app.games.dnd35.models.divindade_custom`
+como parte da reorganização multi-jogo (ver
+`docs/arquitetura-multi-jogo.md`, Fase 5).
+
+Este módulo apenas re-exporta `DivindadeCustom` para preservar imports
+legados como:
+
+    from app.models.divindade_custom import DivindadeCustom
+    from ..models.divindade_custom import DivindadeCustom
+
+Quando todos os call sites apontarem direto para `app.games.dnd35.models`,
+este arquivo pode ser removido.
 """
-from datetime import datetime
+from ..games.dnd35.models.divindade_custom import DivindadeCustom
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import relationship
-
-from ..core.database import Base
-
-
-class DivindadeCustom(Base):
-    """Divindade customizada de campanha, criada por um Mestre/Administrador."""
-
-    __tablename__ = "divindades_custom"
-    __table_args__ = {"extend_existing": True}
-
-    id = Column(Integer, primary_key=True, index=True)
-    nome = Column(String(100), nullable=False, unique=True, index=True)
-    titulo = Column(String(200), nullable=False, default="")
-    tendencia = Column(String(50), nullable=False)
-    dominios = Column(Text, nullable=False, default="")
-    descricao = Column(Text, nullable=True)
-
-    criado_por_id = Column(
-        Integer,
-        ForeignKey("usuarios.id", ondelete="SET NULL"),
-        nullable=True,
-        index=True,
-    )
-    criado_em = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    criado_por = relationship("Usuario", foreign_keys=[criado_por_id])
-
-    def __repr__(self) -> str:  # pragma: no cover - representacao
-        return f"<DivindadeCustom(id={self.id}, nome='{self.nome}')>"
+__all__ = ["DivindadeCustom"]

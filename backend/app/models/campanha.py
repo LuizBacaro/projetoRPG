@@ -1,33 +1,14 @@
+"""[SHIM DE COMPATIBILIDADE] app.models.campanha
+
+Este módulo existe apenas para manter os imports legados funcionando
+após a migração do domínio "campanha" do D&D 3.5 para a estrutura
+modular `app.games.dnd35.*`.
+
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.models.campanha` diretamente. Quando todos os call
+sites estiverem usando o novo path, este shim pode ser removido.
 """
-Model de Campanha
-SRP: representa campanhas criadas por mestres e seus personagens associados.
-"""
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 
-from ..core.database import Base
+from app.games.dnd35.models.campanha import Campanha
 
-
-class Campanha(Base):
-    __tablename__ = "campanhas"
-
-    id = Column(Integer, primary_key=True, index=True)
-    mestre_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
-    nome = Column(String(120), nullable=False)
-    descricao = Column(String(500), nullable=True, default="")
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False,
-    )
-
-    personagens = relationship("Combatente", back_populates="campanha", lazy="selectin")
-    sessoes = relationship(
-        "SessaoCampanha",
-        back_populates="campanha",
-        lazy="selectin",
-        cascade="all, delete-orphan",
-    )
+__all__ = ["Campanha"]

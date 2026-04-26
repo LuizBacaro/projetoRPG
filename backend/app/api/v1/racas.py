@@ -1,34 +1,15 @@
-from __future__ import annotations
+"""[SHIM DE COMPATIBILIDADE] app.api.v1.racas
 
-from fastapi import APIRouter, HTTPException
+Este módulo existe apenas para manter o registro do router em
+`app.main` funcionando após a migração do domínio "raças" do D&D 3.5
+para a estrutura modular `app.games.dnd35.*`.
 
-from ...core.racas_catalog import get_raca_by_slug_or_name, list_racas
-from ...schemas.raca import RacaDetalheResponse, RacaResumoResponse
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.api.v1.racas` diretamente. Quando o registro de
+routers em `app.main` for atualizado para apontar para o novo path,
+este shim pode ser removido.
+"""
 
-router = APIRouter(prefix="/racas", tags=["Raças"])
+from app.games.dnd35.api.v1.racas import router
 
-
-@router.get("", response_model=list[RacaResumoResponse])
-def listar_racas() -> list[RacaResumoResponse]:
-    payload = []
-    for item in list_racas():
-        if not isinstance(item, dict):
-            continue
-        payload.append(
-            RacaResumoResponse(
-                slug=str(item.get("slug") or ""),
-                nome=str(item.get("nome") or ""),
-                tamanho=item.get("tamanho"),
-                deslocamento_metros=item.get("deslocamento_metros"),
-                classe_favorecida=item.get("classe_favorecida"),
-            )
-        )
-    return payload
-
-
-@router.get("/{raca_slug}", response_model=RacaDetalheResponse)
-def obter_raca(raca_slug: str) -> RacaDetalheResponse:
-    found = get_raca_by_slug_or_name(raca_slug)
-    if not found:
-        raise HTTPException(status_code=404, detail="Raça não encontrada")
-    return RacaDetalheResponse(**found)
+__all__ = ["router"]

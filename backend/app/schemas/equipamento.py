@@ -1,87 +1,30 @@
+"""[SHIM DE COMPATIBILIDADE] app.schemas.equipamento
+
+Este módulo existe apenas para manter os imports legados funcionando
+após a migração do domínio "equipamento" do D&D 3.5 para a estrutura
+modular `app.games.dnd35.*`.
+
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.schemas.equipamento` diretamente. Quando todos os
+call sites estiverem usando o novo path, este shim pode ser removido.
 """
-schemas/equipamento.py
-SRP: Schemas Pydantic para serialização de Equipamentos
-SOLID: Single Responsibility — apenas validação/serialização
-"""
 
-from pydantic import BaseModel, Field
-from typing import Optional, List
-from datetime import datetime
+from app.games.dnd35.schemas.equipamento import (
+    EquipamentoBase,
+    EquipamentoCreate,
+    EquipamentoJogadorBase,
+    EquipamentoJogadorCreate,
+    EquipamentoJogadorListResponse,
+    EquipamentoJogadorResponse,
+    EquipamentoResponse,
+)
 
-
-class EquipamentoBase(BaseModel):
-    """Schema base com campos comuns"""
-    nome: str = Field(..., min_length=1, max_length=100)
-    descricao: Optional[str] = Field(default=None, max_length=500)
-    pagina_referencia: Optional[str] = Field(default=None, max_length=50)
-    
-    # Novos campos da Tabela 7-5
-    categoria: Optional[str] = Field(default=None, max_length=50)
-    subcategoria: Optional[str] = Field(default=None, max_length=100)
-    custo: Optional[str] = Field(default=None, max_length=50)
-    dano_pequeno: Optional[str] = Field(default=None, max_length=20)
-    dano_medio: Optional[str] = Field(default=None, max_length=20)
-    critico: Optional[str] = Field(default=None, max_length=20)
-    alcance_incremento: Optional[str] = Field(default=None, max_length=50)
-    peso: Optional[str] = Field(default=None, max_length=20)
-    tipo_dano: Optional[str] = Field(default=None, max_length=50)
-    
-    ativo: bool = True
-
-
-class EquipamentoCreate(EquipamentoBase):
-    """Schema para criação de equipamentos"""
-    pass
-
-
-class EquipamentoResponse(EquipamentoBase):
-    """Schema de resposta — inclui campos gerados pelo banco"""
-    id: int
-    criado_em: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-
-
-class EquipamentoJogadorBase(BaseModel):
-    """Schema base para equipamento do jogador"""
-    equipamento_id: int
-    quantidade: int = Field(default=1, ge=1, le=999)
-
-
-class EquipamentoJogadorCreate(EquipamentoJogadorBase):
-    """Schema para adicionar equipamento ao jogador"""
-    pass
-
-
-class EquipamentoJogadorResponse(EquipamentoJogadorBase):
-    """Schema de resposta completa"""
-    id: int
-    combatente_id: int
-    equipamento: EquipamentoResponse
-    adicionado_em: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-
-
-class EquipamentoJogadorListResponse(BaseModel):
-    """Schema para listagem de equipamentos do jogador (catálogo + quantidade na ficha)."""
-    id: int
-    nome: str = Field(..., max_length=100)
-    descricao: Optional[str] = Field(default=None, max_length=500)
-    pagina_referencia: Optional[str] = Field(default=None, max_length=50)
-    quantidade: int
-    # Campos do catálogo Tabela 7-5 (mesma origem do modal de escolha)
-    categoria: Optional[str] = Field(default=None, max_length=50)
-    subcategoria: Optional[str] = Field(default=None, max_length=100)
-    custo: Optional[str] = Field(default=None, max_length=50)
-    dano_pequeno: Optional[str] = Field(default=None, max_length=20)
-    dano_medio: Optional[str] = Field(default=None, max_length=20)
-    critico: Optional[str] = Field(default=None, max_length=20)
-    alcance_incremento: Optional[str] = Field(default=None, max_length=50)
-    peso: Optional[str] = Field(default=None, max_length=20)
-    tipo_dano: Optional[str] = Field(default=None, max_length=50)
-
-    class Config:
-        from_attributes = True
+__all__ = [
+    "EquipamentoBase",
+    "EquipamentoCreate",
+    "EquipamentoResponse",
+    "EquipamentoJogadorBase",
+    "EquipamentoJogadorCreate",
+    "EquipamentoJogadorResponse",
+    "EquipamentoJogadorListResponse",
+]

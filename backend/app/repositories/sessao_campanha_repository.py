@@ -1,33 +1,17 @@
+"""[SHIM DE COMPATIBILIDADE] app.repositories.sessao_campanha_repository
+
+Este módulo existe apenas para manter os imports legados funcionando
+após a migração do domínio "campanha" do D&D 3.5 para a estrutura
+modular `app.games.dnd35.*`.
+
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.repositories.sessao_campanha_repository` diretamente.
+Quando todos os call sites estiverem usando o novo path, este shim
+pode ser removido.
 """
-Repository para Sessao de Campanha.
-"""
-from typing import List, Optional
 
-from sqlalchemy.orm import Session
+from app.games.dnd35.repositories.sessao_campanha_repository import (
+    SessaoCampanhaRepository,
+)
 
-from .base import BaseRepository
-from ..models.campanha import Campanha
-from ..models.sessao_campanha import SessaoCampanha
-
-
-class SessaoCampanhaRepository(BaseRepository[SessaoCampanha]):
-    def __init__(self, db: Session):
-        super().__init__(SessaoCampanha, db)
-
-    def listar_por_mestre(self, mestre_id: int) -> List[SessaoCampanha]:
-        return (
-            self.db.query(SessaoCampanha)
-            .join(Campanha, SessaoCampanha.campanha_id == Campanha.id)
-            .filter(Campanha.mestre_id == mestre_id)
-            .order_by(SessaoCampanha.created_at.desc(), SessaoCampanha.id.desc())
-            .all()
-        )
-
-    def obter_por_id_e_mestre(self, sessao_id: int, mestre_id: int) -> Optional[SessaoCampanha]:
-        return (
-            self.db.query(SessaoCampanha)
-            .join(Campanha, SessaoCampanha.campanha_id == Campanha.id)
-            .filter(SessaoCampanha.id == sessao_id)
-            .filter(Campanha.mestre_id == mestre_id)
-            .first()
-        )
+__all__ = ["SessaoCampanhaRepository"]

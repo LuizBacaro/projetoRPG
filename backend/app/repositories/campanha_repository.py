@@ -1,29 +1,15 @@
+"""[SHIM DE COMPATIBILIDADE] app.repositories.campanha_repository
+
+Este módulo existe apenas para manter os imports legados funcionando
+após a migração do domínio "campanha" do D&D 3.5 para a estrutura
+modular `app.games.dnd35.*`.
+
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.repositories.campanha_repository` diretamente.
+Quando todos os call sites estiverem usando o novo path, este shim
+pode ser removido.
 """
-Repository para Campanha
-"""
-from typing import List, Optional
 
-from sqlalchemy.orm import Session
+from app.games.dnd35.repositories.campanha_repository import CampanhaRepository
 
-from .base import BaseRepository
-from ..models.campanha import Campanha
-
-
-class CampanhaRepository(BaseRepository[Campanha]):
-    def __init__(self, db: Session):
-        super().__init__(Campanha, db)
-
-    def listar_por_mestre(self, mestre_id: int) -> List[Campanha]:
-        return (
-            self.db.query(Campanha)
-            .filter(Campanha.mestre_id == mestre_id)
-            .order_by(Campanha.nome.asc())
-            .all()
-        )
-
-    def obter_por_id_e_mestre(self, campanha_id: int, mestre_id: int) -> Optional[Campanha]:
-        return (
-            self.db.query(Campanha)
-            .filter(Campanha.id == campanha_id, Campanha.mestre_id == mestre_id)
-            .first()
-        )
+__all__ = ["CampanhaRepository"]

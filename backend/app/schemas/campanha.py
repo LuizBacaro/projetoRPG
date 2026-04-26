@@ -1,54 +1,24 @@
+"""[SHIM DE COMPATIBILIDADE] app.schemas.campanha
+
+Este módulo existe apenas para manter os imports legados funcionando
+após a migração do domínio "campanha" do D&D 3.5 para a estrutura
+modular `app.games.dnd35.*`.
+
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.schemas.campanha` diretamente. Quando todos os call
+sites estiverem usando o novo path, este shim pode ser removido.
 """
-Schemas Pydantic para Campanhas
-"""
-from datetime import datetime
-from typing import List, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from app.games.dnd35.schemas.campanha import (
+    CampanhaBase,
+    CampanhaCreate,
+    CampanhaResponse,
+    CampanhaUpdate,
+)
 
-import re
-
-_HTML_TAG_RE = re.compile(r"<[^>]+>")
-
-
-def _strip_html(v):
-    if v is None:
-        return v
-    return _HTML_TAG_RE.sub("", str(v)).strip()
-
-
-class CampanhaBase(BaseModel):
-    nome: str = Field(..., min_length=2, max_length=120)
-    descricao: Optional[str] = Field(default="", max_length=500)
-
-    @field_validator("nome", "descricao", mode="before")
-    @classmethod
-    def sanitizar_texto(cls, v):
-        return _strip_html(v)
-
-
-class CampanhaCreate(CampanhaBase):
-    personagem_ids: List[int] = []
-
-
-class CampanhaUpdate(BaseModel):
-    nome: Optional[str] = Field(default=None, min_length=2, max_length=120)
-    descricao: Optional[str] = Field(default=None, max_length=500)
-    personagem_ids: Optional[List[int]] = None
-
-    @field_validator("nome", "descricao", mode="before")
-    @classmethod
-    def sanitizar_texto(cls, v):
-        return _strip_html(v)
-
-
-class CampanhaResponse(CampanhaBase):
-    id: int
-    mestre_id: int
-    created_at: datetime
-    updated_at: datetime
-    total_personagens: int = 0
-    personagem_ids: List[int] = []
-
-    class Config:
-        from_attributes = True
+__all__ = [
+    "CampanhaBase",
+    "CampanhaCreate",
+    "CampanhaUpdate",
+    "CampanhaResponse",
+]

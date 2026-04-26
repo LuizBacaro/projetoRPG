@@ -441,8 +441,8 @@
             document.body.appendChild(script);
         });
 
-        await carregarScriptClassico('/js/services/AuthService.js');
-        window.AuthService.exigirLogin();
+        await carregarScriptClassico('/js/services/AuthService.js?v=20260426b');
+        window.AuthService.exigirJogo('dnd35');
 
         if (!window.AuthService.isMestre()) {
             Toast.error('Acesso restrito a mestre ou administrador.');

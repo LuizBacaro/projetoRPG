@@ -1,0 +1,242 @@
+/*
+   selecionar-jogo.css
+   SRP: estilos exclusivos da tela pós-login de seleção de jogo.
+*/
+
+body {
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 2rem 1rem 3rem;
+}
+
+.seletor-shell {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.seletor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.seletor-logo h1 {
+    font-size: 1.7rem;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.seletor-logo p {
+    color: #94a3b8;
+    margin-top: .35rem;
+    font-size: .9rem;
+}
+
+.seletor-conta {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+}
+
+.seletor-usuario {
+    color: #cbd5e1;
+    font-size: .9rem;
+}
+
+.seletor-link-secundario {
+    background: transparent;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: .45rem .8rem;
+    border-radius: .5rem;
+    cursor: pointer;
+    font-size: .85rem;
+}
+
+.seletor-link-secundario:hover {
+    border-color: #7c3aed;
+    color: #c4b5fd;
+}
+
+.seletor-corpo {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.seletor-loading {
+    color: #94a3b8;
+    text-align: center;
+    padding: 1rem;
+}
+
+.seletor-lista {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.seletor-vazio {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #94a3b8;
+    padding: 2rem;
+    background: #1a1a2e;
+    border: 1px dashed #334155;
+    border-radius: .75rem;
+}
+
+.seletor-card {
+    background: #1a1a2e;
+    border: 1px solid #2d2d44;
+    border-radius: .8rem;
+    padding: 1.1rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    gap: .7rem 1rem;
+    align-items: start;
+    transition: border-color .15s ease, transform .15s ease;
+}
+
+.seletor-card:hover {
+    border-color: #7c3aed;
+    transform: translateY(-1px);
+}
+
+.seletor-card-bloqueado {
+    opacity: .68;
+}
+
+.seletor-card-bloqueado:hover {
+    transform: none;
+    border-color: #2d2d44;
+}
+
+.seletor-card-icone {
+    font-size: 2.2rem;
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+.seletor-card-corpo {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+}
+
+.seletor-card-header {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+}
+
+.seletor-card-header h3 {
+    font-size: 1.05rem;
+    color: #e2e8f0;
+}
+
+.seletor-card-descricao {
+    color: #94a3b8;
+    font-size: .85rem;
+    line-height: 1.4;
+}
+
+.seletor-card-meta {
+    display: flex;
+    gap: .4rem;
+    flex-wrap: wrap;
+    margin-top: .1rem;
+}
+
+.seletor-pill {
+    display: inline-block;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #cbd5e1;
+    border-radius: 999px;
+    padding: .15rem .55rem;
+    font-size: .72rem;
+}
+
+.seletor-pill-ativo {
+    border-color: #16a34a;
+    color: #4ade80;
+}
+
+.seletor-status {
+    font-size: .7rem;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+.seletor-status-disponivel {
+    color: #4ade80;
+    border-color: #166534;
+    background: rgba(22, 101, 52, .15);
+}
+
+.seletor-status-em_breve {
+    color: #facc15;
+    border-color: #854d0e;
+    background: rgba(133, 77, 14, .18);
+}
+
+.seletor-status-manutencao {
+    color: #f87171;
+    border-color: #991b1b;
+    background: rgba(153, 27, 27, .18);
+}
+
+.seletor-card-acao {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-jogo {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
+    border: none;
+    padding: .55rem 1.1rem;
+    border-radius: .55rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: .9rem;
+    transition: opacity .15s ease;
+}
+
+.btn-jogo:hover:not(:disabled) {
+    opacity: .9;
+}
+
+.btn-jogo:disabled {
+    cursor: not-allowed;
+    opacity: .55;
+}
+
+.seletor-rodape {
+    color: #64748b;
+    font-size: .8rem;
+    text-align: center;
+    padding-top: .5rem;
+}
+
+.msg-info {
+    background: rgba(30, 58, 138, .25);
+    color: #93c5fd;
+    border: 1px solid #1e3a8a;
+    padding: .7rem .9rem;
+    border-radius: .55rem;
+    display: none;
+}

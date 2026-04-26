@@ -16,6 +16,7 @@ Este `AGENTS.md` existe como resumo operacional e guia de uso para o time.
 - Para pre-definicoes por raca e catalogo racial normalizado, consultar [docs/predefinicoes-raciais-contrato.md](docs/predefinicoes-raciais-contrato.md) e `docs/dados/racas_caracteristicas_catalogo.json`.
 - Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill do projeto em [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md) — habilite essa skill no Cursor para o agente carregar esse contexto.
 - Conjuração D&D 3.5 (atributo por classe, Tabela 1-1, clérigo, troca Bardo/Feiticeiro): documentação em [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
+- Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pós-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
 
 ## Agentes
 

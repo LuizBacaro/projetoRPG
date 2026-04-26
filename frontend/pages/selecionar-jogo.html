@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escolha o jogo — Arena TTRPG</title>
+    <link rel="stylesheet" href="/css/login.css" />
+    <link rel="stylesheet" href="/css/selecionar-jogo.css?v=20260426" />
+    <link rel="stylesheet" href="/css/responsivo.css" />
+</head>
+<body>
+
+<div class="seletor-shell">
+
+    <header class="seletor-header">
+        <div class="seletor-logo">
+            <h1>⚔️ Arena TTRPG</h1>
+            <p>Escolha o sistema que você quer jogar agora.</p>
+        </div>
+        <div class="seletor-conta">
+            <span id="seletorUsuario" class="seletor-usuario">—</span>
+            <button id="btnSair" type="button" class="seletor-link-secundario">Sair</button>
+        </div>
+    </header>
+
+    <section class="seletor-corpo">
+
+        <div id="seletorErro" class="msg-box msg-erro"></div>
+        <div id="seletorAviso" class="msg-box msg-info"></div>
+
+        <div id="seletorLoading" class="seletor-loading">Carregando jogos disponíveis…</div>
+
+        <ul id="seletorLista" class="seletor-lista" aria-live="polite"></ul>
+
+        <p class="seletor-rodape">
+            Mais sistemas em breve: cada jogo terá seu próprio backend, banco e
+            frontend, mantendo sua conta global.
+        </p>
+    </section>
+</div>
+
+<script type="module">
+    import { getApiUrl } from '/js/config/api.config.js?v=20260426';
+
+    const STORAGE_TOKEN = 'token';
+    const STORAGE_REFRESH = 'refresh_token';
+    const STORAGE_USUARIO = 'usuario';
+    const STORAGE_GAME_SLUG = 'game_slug_ativo';
+    const STORAGE_GAME_NOME = 'game_nome_ativo';
+
+    const elLoading = document.getElementById('seletorLoading');
+    const elLista = document.getElementById('seletorLista');
+    const elErro = document.getElementById('seletorErro');
+    const elAviso = document.getElementById('seletorAviso');
+    const elUsuario = document.getElementById('seletorUsuario');
+    const btnSair = document.getElementById('btnSair');
+
+    function exibirErro(msg) {
+        elErro.textContent = msg;
+        elErro.style.display = 'block';
+    }
+
+    function ocultarErro() {
+        elErro.style.display = 'none';
+    }
+
+    function exibirAviso(msg) {
+        elAviso.textContent = msg;
+        elAviso.style.display = 'block';
+    }
+
+    function ocultarAviso() {
+        elAviso.style.display = 'none';
+    }
+
+    function lerUsuarioLocal() {
+        try {
+            const raw = localStorage.getItem(STORAGE_USUARIO);
+            return raw ? JSON.parse(raw) : null;
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function exigirToken() {
+        const token = localStorage.getItem(STORAGE_TOKEN);
+        if (!token) {
+            window.location.href = '/pages/login.html';
+            return null;
+        }
+        return token;
+    }
+
+    function pintarUsuario() {
+        const usuario = lerUsuarioLocal();
+        if (!usuario) return;
+        const partes = [];
+        if (usuario.nome) partes.push(usuario.nome);
+        if (usuario.email) partes.push(`<${usuario.email}>`);
+        elUsuario.textContent = partes.join(' ');
+    }
+
+    function escapar(texto) {
+        return String(texto || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function rotuloStatus(status) {
+        if (status === 'disponivel') return 'Disponível';
+        if (status === 'em_breve') return 'Em breve';
+        if (status === 'manutencao') return 'Em manutenção';
+        return status || '—';
+    }
+
+    function destinoPorSlug(slug) {
+        if (slug === 'dnd35') return '/dashboard';
+        return null;
+    }
+
+    /**
+     * Para jogos com status `em_breve`, retornamos a página-casca local
+     * do próprio jogo. Isso dá feedback visual ao usuário (em vez de
+     * apenas um botão desabilitado) e mantém visível, no repositório, a
+     * pasta de cada sistema futuro (frontend/games/<slug>/).
+     */
+    function destinoEmBrevePorSlug(slug) {
+        if (slug === 'gurps') return '/games/gurps/em-breve.html?from=seletor';
+        if (slug === 'dnd5e') return '/games/dnd5e/em-breve.html?from=seletor';
+        return null;
+    }
+
+    function renderizar(jogos, memberships, slugAtivo) {
+        elLista.innerHTML = '';
+        if (!Array.isArray(jogos) || jogos.length === 0) {
+            elLista.innerHTML = '<li class="seletor-vazio">Nenhum jogo cadastrado ainda.</li>';
+            return;
+        }
+
+        const memberPorSlug = new Map(
+            (memberships || []).map((m) => [m.game_slug, m])
+        );
+
+        jogos.forEach((jogo) => {
+            const member = memberPorSlug.get(jogo.slug);
+            const isAtivo = slugAtivo && slugAtivo === jogo.slug;
+            const disponivel = jogo.status === 'disponivel';
+
+            const li = document.createElement('li');
+            li.className = 'seletor-card' + (disponivel ? '' : ' seletor-card-bloqueado');
+
+            li.innerHTML = `
+                <div class="seletor-card-icone">${escapar(jogo.icone || '🎲')}</div>
+                <div class="seletor-card-corpo">
+                    <div class="seletor-card-header">
+                        <h3>${escapar(jogo.nome)}</h3>
+                        <span class="seletor-status seletor-status-${escapar(jogo.status)}">${escapar(rotuloStatus(jogo.status))}</span>
+                    </div>
+                    <p class="seletor-card-descricao">${escapar(jogo.descricao || '')}</p>
+                    <div class="seletor-card-meta">
+                        ${member ? `<span class="seletor-pill">Perfil: ${escapar(member.perfil_no_jogo)}</span>` : ''}
+                        ${isAtivo ? '<span class="seletor-pill seletor-pill-ativo">Ativo</span>' : ''}
+                    </div>
+                </div>
+                <div class="seletor-card-acao">
+                    <button type="button"
+                            class="btn-jogo"
+                            data-slug="${escapar(jogo.slug)}"
+                            data-status="${escapar(jogo.status)}">
+                        ${disponivel ? 'Entrar' : 'Em breve →'}
+                    </button>
+                </div>
+            `;
+            elLista.appendChild(li);
+        });
+
+        elLista.querySelectorAll('button[data-slug]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const slug = btn.dataset.slug;
+                const status = btn.dataset.status;
+                if (status === 'disponivel') {
+                    selecionarJogo(slug, btn);
+                    return;
+                }
+                const destinoEmBreve = destinoEmBrevePorSlug(slug);
+                if (destinoEmBreve) {
+                    window.location.href = destinoEmBreve;
+                } else {
+                    exibirAviso(`O jogo '${slug}' ainda não tem página de casca. Avisaremos quando estiver pronto.`);
+                }
+            });
+        });
+    }
+
+    async function carregar() {
+        const token = exigirToken();
+        if (!token) return;
+
+        ocultarErro();
+        elLoading.style.display = 'block';
+        try {
+            const res = await fetch(getApiUrl('/games'), {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem(STORAGE_TOKEN);
+                window.location.href = '/pages/login.html';
+                return;
+            }
+
+            const data = await res.json();
+            if (!res.ok) {
+                exibirErro(data.detail || 'Não foi possível carregar o catálogo de jogos.');
+                return;
+            }
+
+            renderizar(data.jogos || [], data.memberships || [], data.game_slug_ativo);
+
+            if (!Array.isArray(data.memberships) || data.memberships.length === 0) {
+                exibirAviso(
+                    'Sua conta ainda não tem acesso a nenhum jogo. Solicite ao administrador da plataforma.'
+                );
+            } else {
+                ocultarAviso();
+            }
+        } catch (err) {
+            exibirErro('Erro de conexão com o servidor.');
+            console.error(err);
+        } finally {
+            elLoading.style.display = 'none';
+        }
+    }
+
+    async function selecionarJogo(slug, botao) {
+        ocultarErro();
+        const token = exigirToken();
+        if (!token) return;
+
+        const original = botao.textContent;
+        botao.disabled = true;
+        botao.textContent = 'Entrando…';
+
+        try {
+            const res = await fetch(getApiUrl('/games/selecionar'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ game_slug: slug }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                exibirErro(data.detail || 'Não foi possível entrar nesse jogo.');
+                return;
+            }
+
+            localStorage.setItem(STORAGE_TOKEN, data.access_token);
+            if (data.refresh_token) {
+                localStorage.setItem(STORAGE_REFRESH, data.refresh_token);
+            }
+            if (data.usuario) {
+                localStorage.setItem(STORAGE_USUARIO, JSON.stringify(data.usuario));
+            }
+            localStorage.setItem(STORAGE_GAME_SLUG, data.game_slug);
+            if (data.game_nome) {
+                localStorage.setItem(STORAGE_GAME_NOME, data.game_nome);
+            }
+
+            const destino = destinoPorSlug(data.game_slug);
+            if (destino) {
+                window.location.href = destino;
+            } else {
+                exibirAviso(
+                    `O jogo '${slug}' ainda não tem frontend dedicado. Aguarde a próxima fase.`
+                );
+            }
+        } catch (err) {
+            exibirErro('Erro de conexão com o servidor.');
+            console.error(err);
+        } finally {
+            botao.disabled = false;
+            botao.textContent = original;
+        }
+    }
+
+    function sair() {
+        localStorage.removeItem(STORAGE_TOKEN);
+        localStorage.removeItem(STORAGE_REFRESH);
+        localStorage.removeItem(STORAGE_USUARIO);
+        localStorage.removeItem(STORAGE_GAME_SLUG);
+        localStorage.removeItem(STORAGE_GAME_NOME);
+        window.location.href = '/pages/login.html';
+    }
+
+    btnSair.addEventListener('click', sair);
+
+    pintarUsuario();
+    carregar();
+</script>
+
+</body>
+</html>

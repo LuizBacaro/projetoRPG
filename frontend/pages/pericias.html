@@ -97,7 +97,15 @@
             window.location.href = '/pages/login.html?redirect=/pages/pericias.html';
             return false;
         }
-        
+
+        // Multi-jogo: pericias pertence ao stack D&D 3.5.
+        const gameSlugAtivo = localStorage.getItem('game_slug_ativo');
+        if (gameSlugAtivo !== 'dnd35') {
+            console.warn('⚠️ Sem game_slug ativo. Redirecionando para seletor...');
+            window.location.href = '/pages/selecionar-jogo.html';
+            return false;
+        }
+
         return true;
     }
 

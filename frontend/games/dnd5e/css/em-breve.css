@@ -1,0 +1,161 @@
+/*
+ * frontend/games/dnd5e/css/em-breve.css
+ * Identidade visual da casca D&D 5e — paleta vermelho-bronze (clássico
+ * 5e), distinta do D&D 3.5 (vermelho-dourado) e do GURPS (azul-cinza).
+ */
+
+:root {
+    --dnd5e-bg: #1a0e0a;
+    --dnd5e-card: #271611;
+    --dnd5e-border: #5a2e1f;
+    --dnd5e-accent: #c0392b;
+    --dnd5e-accent-strong: #e8624f;
+    --dnd5e-text: #f4e8d8;
+    --dnd5e-muted: #b39885;
+}
+
+body.em-breve-dnd5e {
+    background:
+        radial-gradient(ellipse at 20% 10%, rgba(192, 57, 43, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, rgba(192, 57, 43, 0.06) 0%, transparent 55%),
+        var(--dnd5e-bg);
+    color: var(--dnd5e-text);
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.em-breve-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.em-breve-card {
+    width: 100%;
+    max-width: 640px;
+    background: linear-gradient(180deg, var(--dnd5e-card) 0%, #1d100c 100%);
+    border: 1px solid var(--dnd5e-border);
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    text-align: center;
+}
+
+.em-breve-icone {
+    font-size: 4rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 4px 14px rgba(192, 57, 43, 0.4));
+}
+
+.em-breve-kicker {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--dnd5e-accent);
+    background: rgba(192, 57, 43, 0.1);
+    border: 1px solid rgba(192, 57, 43, 0.25);
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    margin-bottom: 1.25rem;
+}
+
+.em-breve-titulo {
+    font-size: 2.6rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem 0;
+    color: var(--dnd5e-accent-strong);
+    letter-spacing: 0.02em;
+}
+
+.em-breve-descricao {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--dnd5e-muted);
+    margin: 0 0 2rem 0;
+}
+
+.em-breve-descricao strong {
+    color: var(--dnd5e-text);
+    font-weight: 600;
+}
+
+.em-breve-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 2rem auto;
+    text-align: left;
+    max-width: 480px;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.em-breve-lista li {
+    position: relative;
+    padding: 0.75rem 1rem 0.75rem 2.25rem;
+    background: rgba(192, 57, 43, 0.05);
+    border: 1px solid rgba(192, 57, 43, 0.15);
+    border-radius: 8px;
+    color: var(--dnd5e-text);
+    font-size: 0.92rem;
+}
+
+.em-breve-lista li::before {
+    content: '✦';
+    position: absolute;
+    left: 0.85rem;
+    top: 0.78rem;
+    color: var(--dnd5e-accent);
+    font-size: 0.95rem;
+}
+
+.em-breve-lista code {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    color: var(--dnd5e-accent-strong);
+}
+
+.em-breve-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.85rem;
+    margin-bottom: 2rem;
+}
+
+.em-breve-rodape {
+    color: var(--dnd5e-muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.em-breve-link {
+    color: var(--dnd5e-accent);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(192, 57, 43, 0.35);
+}
+
+.em-breve-link:hover {
+    color: var(--dnd5e-accent-strong);
+}
+
+@media (max-width: 520px) {
+    .em-breve-card {
+        padding: 2.25rem 1.5rem;
+    }
+    .em-breve-titulo {
+        font-size: 2rem;
+    }
+    .em-breve-icone {
+        font-size: 3.25rem;
+    }
+}

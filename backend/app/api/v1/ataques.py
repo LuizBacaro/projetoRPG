@@ -6,7 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from ...core.database import get_db
-from ...core.deps import requer_dono_ou_admin_combatente, requer_dono_ou_admin_slot_magia
+from ...core.deps import (
+    requer_dono_ou_admin_combatente,
+    requer_dono_ou_admin_slot_magia,
+    requer_game_dnd35,
+)
 from ...repositories.ataque_repository import AtaqueRepository
 from ...repositories.combatente_repository import CombatenteRepository
 from ...services.ataque_service import AtaqueService
@@ -16,7 +20,10 @@ from ...schemas.ataque import (
 )
 from ...exceptions.custom_exceptions import CombatenteNaoEncontrado
 
-router = APIRouter(tags=["Ataques e Magias"])
+router = APIRouter(
+    tags=["Ataques e Magias"],
+    dependencies=[Depends(requer_game_dnd35)],
+)
 
 
 def get_ataque_service(db: Session = Depends(get_db)) -> AtaqueService:

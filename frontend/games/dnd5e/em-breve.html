@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D&amp;D 5e — em breve | Arena TTRPG</title>
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/botoes.css" />
+    <link rel="stylesheet" href="/games/dnd5e/css/em-breve.css" />
+</head>
+<body class="em-breve em-breve-dnd5e" data-game="dnd5e">
+
+    <main class="em-breve-shell">
+        <div class="em-breve-card">
+            <div class="em-breve-icone" aria-hidden="true">🛡️</div>
+
+            <span class="em-breve-kicker">Próximo sistema</span>
+            <h1 class="em-breve-titulo">D&amp;D 5e</h1>
+
+            <p class="em-breve-descricao">
+                <strong>Implantaremos em breve!</strong>
+                <br />
+                O D&amp;D 5e terá seu próprio backend, banco de dados e
+                bundle visual dentro da Arena, com ficha simplificada,
+                proficiências e regras 5e.
+            </p>
+
+            <ul class="em-breve-lista">
+                <li>Stack independente em <code>backend/app/games/dnd5e/</code></li>
+                <li>Frontend dedicado em <code>frontend/games/dnd5e/</code></li>
+                <li>Sua conta global continua a mesma — basta selecionar o jogo</li>
+            </ul>
+
+            <div class="em-breve-acoes">
+                <a href="/pages/selecionar-jogo.html" class="btn btn-primary">
+                    ← Voltar ao seletor de jogo
+                </a>
+                <a href="/dashboard" class="btn btn-secondary">
+                    Continuar no D&amp;D 3.5
+                </a>
+            </div>
+
+            <p class="em-breve-rodape">
+                Acompanhe o progresso na seção
+                <a href="/" class="em-breve-link">Arena TTRPG</a>.
+            </p>
+        </div>
+    </main>
+
+    <script type="module">
+        import { Toast } from '/js/ui/toast.module.js';
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') === 'seletor') {
+            Toast.info('D&D 5e ainda não está disponível — voltamos quando estiver pronto.');
+        }
+    </script>
+
+</body>
+</html>

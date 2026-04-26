@@ -366,6 +366,12 @@ def registrar(
         target=f"usuario:{usuario.id}",
     )
 
+    # Multi-jogo: o auto-enroll do novo usuário no jogo padrão (D&D 3.5)
+    # acontece on-demand quando ele acessa GET /api/v1/games e/ou
+    # POST /api/v1/games/selecionar com slug=dnd35 (ver `GameService`).
+    # Isso evita acoplar o cadastro ao serviço de jogos e mantém o registro
+    # leve e auditável.
+
     return RegistroResponse(
         id=usuario.id,
         nome=usuario.nome,

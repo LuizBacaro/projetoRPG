@@ -1,26 +1,14 @@
+"""[SHIM DE COMPATIBILIDADE] app.models.sessao_campanha
+
+Este módulo existe apenas para manter os imports legados funcionando
+após a migração do domínio "campanha" do D&D 3.5 para a estrutura
+modular `app.games.dnd35.*`.
+
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.models.sessao_campanha` diretamente. Quando todos os
+call sites estiverem usando o novo path, este shim pode ser removido.
 """
-Model de Sessao de Campanha.
-"""
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 
-from ..core.database import Base
+from app.games.dnd35.models.sessao_campanha import SessaoCampanha
 
-
-class SessaoCampanha(Base):
-    __tablename__ = "campanhas_sessoes"
-
-    id = Column(Integer, primary_key=True, index=True)
-    campanha_id = Column(Integer, ForeignKey("campanhas.id"), nullable=False, index=True)
-    resumo = Column(String(4000), nullable=False)
-    visivel_jogadores = Column(Boolean, nullable=False, default=False, server_default="0")
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False,
-    )
-
-    campanha = relationship("Campanha", back_populates="sessoes", lazy="joined")
+__all__ = ["SessaoCampanha"]

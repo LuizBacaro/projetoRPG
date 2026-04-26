@@ -1,6 +1,6 @@
 from fastapi import Response
 
-from app.api.v1.magias import listar_magias
+from app.games.dnd35.api.v1.magias import listar_magias
 from app.models.magia import Magia, MagiaClasse
 from app.models.usuario import PerfilUsuario, Usuario
 from app.repositories.usuario_repository import UsuarioRepository

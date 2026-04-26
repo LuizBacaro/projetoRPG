@@ -73,6 +73,12 @@ class Settings(BaseSettings):
     LOGIN_RATE_LIMIT_PER_MINUTE: int = 10
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # ── Multi-jogo ───────────────────────────────────────────────────────────
+    # Quando True, endpoints específicos do D&D 3.5 exigem `game_slug=dnd35`
+    # no token. Quando False (padrão até a Fase 2 estabilizar), apenas registra
+    # log sem bloquear — preserva tokens legados durante o rollout.
+    MULTI_GAME_STRICT_MODE: bool = False
+
     class Config:
         """Configuração de leitura do Pydantic"""
         # Suporta execução tanto na raiz do repo quanto dentro de backend/

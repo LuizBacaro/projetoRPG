@@ -878,7 +878,12 @@
 </div>
 
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
-<script src="../js/services/AuthService.js"></script>
+<script src="../js/services/AuthService.js?v=20260426b"></script>
+<script>
+    if (window.AuthService) {
+        window.AuthService.exigirJogo('dnd35');
+    }
+</script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
 <script type="module" src="../js/controllers/FichaPersonagemController.js?v=62"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=20260420c"></script>

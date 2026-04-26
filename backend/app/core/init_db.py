@@ -16,6 +16,7 @@ import json
 from .classes_tables_catalog import initialize_classes_tables_catalog
 from ..models.usuario import Usuario, PerfilUsuario
 from ..models.combatente import Combatente
+from ..models.game import Game, UserGameMembership
 from .security import hash_senha
 import logging
 
@@ -99,6 +100,145 @@ def criar_admin_padrao(db: Session) -> None:
         f"   ⚠️  ALTERE A SENHA IMEDIATAMENTE após primeiro acesso\n"
         f"   📍 Acesse: /pages/usuarios.html"
     )
+
+
+GAME_CATALOG_SEED = [
+    {
+        "slug": "dnd35",
+        "nome": "D&D 3.5 — Arena TTRPG",
+        "descricao": (
+            "Sistema completo da Arena TTRPG com regras de combate, magias, "
+            "ficha por classe e gerenciamento de campanhas no D&D 3.5."
+        ),
+        "status": "disponivel",
+        "icone": "🐉",
+        "ordem": 10,
+    },
+    {
+        "slug": "dnd5e",
+        "nome": "D&D 5e",
+        "descricao": (
+            "Sistema D&D 5e com ficha simplificada e proficiências. "
+            "Em breve: stack independente."
+        ),
+        "status": "em_breve",
+        "icone": "🛡️",
+        "ordem": 20,
+    },
+    {
+        "slug": "gurps",
+        "nome": "GURPS",
+        "descricao": (
+            "Sistema genérico GURPS com pontos de personagem e vantagens. "
+            "Em breve: stack independente."
+        ),
+        "status": "em_breve",
+        "icone": "⚙️",
+        "ordem": 30,
+    },
+]
+
+
+def inicializar_catalogo_jogos(db: Session) -> None:
+    """
+    Sincroniza o catálogo global de jogos suportados pela plataforma.
+
+    Idempotente: insere jogos novos e atualiza metadados (nome, descrição,
+    status, ícone, ordem) sem quebrar memberships já existentes.
+    """
+    try:
+        existentes = {g.slug: g for g in db.query(Game).all()}
+        criados = 0
+        atualizados = 0
+
+        for entrada in GAME_CATALOG_SEED:
+            slug = entrada["slug"]
+            game = existentes.get(slug)
+            if game is None:
+                db.add(
+                    Game(
+                        slug=slug,
+                        nome=entrada["nome"],
+                        descricao=entrada.get("descricao", ""),
+                        status=entrada.get("status", "disponivel"),
+                        icone=entrada.get("icone", ""),
+                        ordem=int(entrada.get("ordem", 0)),
+                    )
+                )
+                criados += 1
+                continue
+
+            mudou = False
+            for campo in ("nome", "descricao", "status", "icone", "ordem"):
+                novo = entrada.get(campo)
+                if novo is not None and getattr(game, campo) != novo:
+                    setattr(game, campo, novo)
+                    mudou = True
+            if mudou:
+                atualizados += 1
+
+        if criados or atualizados:
+            db.commit()
+            logger.info(
+                "✅ games_catalog: %s criados, %s atualizados", criados, atualizados
+            )
+        else:
+            logger.info("✅ games_catalog já sincronizado (%s jogos)", len(existentes))
+    except Exception:
+        db.rollback()
+        raise
+
+
+def garantir_membership_dnd35_para_usuarios_legados(db: Session) -> None:
+    """
+    Para todos os usuários ativos sem nenhum membership, cria automaticamente o
+    membership do jogo `dnd35` com o perfil global do usuário. Garante que a
+    base legada continue acessando o D&D 3.5 sem precisar passar por seleção
+    explícita de jogo.
+    """
+    try:
+        dnd35 = db.query(Game).filter(Game.slug == "dnd35").first()
+        if dnd35 is None:
+            logger.warning(
+                "garantir_membership_dnd35_para_usuarios_legados: jogo dnd35 ausente; "
+                "pulando enrolamento."
+            )
+            return
+
+        ja_com_membership = {
+            uid for (uid,) in db.query(UserGameMembership.usuario_id).distinct()
+        }
+
+        usuarios = db.query(Usuario).filter(Usuario.ativo == True).all()  # noqa: E712
+        criados = 0
+        for usuario in usuarios:
+            if usuario.id in ja_com_membership:
+                continue
+            perfil_valor = (
+                usuario.perfil.value
+                if hasattr(usuario.perfil, "value")
+                else str(usuario.perfil)
+            )
+            db.add(
+                UserGameMembership(
+                    usuario_id=usuario.id,
+                    game_id=dnd35.id,
+                    perfil_no_jogo=perfil_valor,
+                    ativo=True,
+                )
+            )
+            criados += 1
+
+        if criados:
+            db.commit()
+            logger.info(
+                "✅ Auto-enroll dnd35: %s usuário(s) legados vinculados", criados
+            )
+        else:
+            logger.info("✅ Auto-enroll dnd35: nenhum usuário legado pendente")
+    except Exception:
+        db.rollback()
+        raise
 
 
 def inicializar_talentos(db: Session) -> None:

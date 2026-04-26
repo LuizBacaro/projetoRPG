@@ -29,8 +29,10 @@
             <div class="header-usuario">
                 <span id="nomeUsuario" class="usuario-nome">👤 Carregando...</span>
                 <span id="badgePerfil" class="badge-perfil">...</span>
+                <span id="badgeJogoAtivo" class="badge-jogo" style="display:none"></span>
                 <a id="linkAdmin" href="/pages/usuarios.html" class="admin-link" style="display:none">👤 Usuários</a>
                 <a id="linkMagias" href="/pages/magias.html" class="admin-link" style="display:none">📚 Magias</a>
+                <button type="button" class="btn-logout" id="btnTrocarJogo" title="Voltar ao seletor de jogo">🎲 Trocar jogo</button>
                 <button class="btn-logout" id="btnLogout">Sair</button>
             </div>
         </div>
@@ -696,7 +698,14 @@
 <script type="module" src="/js/config/api.config.js"></script>
 
 <!-- FASE 2: AuthService (deve ser carregado antes de tudo) -->
-<script src="/js/services/AuthService.js"></script>
+<script src="/js/services/AuthService.js?v=20260426b"></script>
+<script>
+    // Multi-jogo: dashboard pertence ao stack D&D 3.5; redireciona se o
+    // usuário não selecionou esse jogo (ou ainda está sem game_slug ativo).
+    if (window.AuthService) {
+        window.AuthService.exigirJogo('dnd35');
+    }
+</script>
 
 <!-- FASE 3: ModalConfirm (deve estar antes de DashboardController) -->
 <script src="/js/ui/ModalConfirm.js"></script>

@@ -18,8 +18,10 @@ from .core.config import settings
 from .core.database import engine, Base, SessionLocal, get_db
 from .core.init_db import (
     criar_admin_padrao,
+    inicializar_catalogo_jogos,
     inicializar_catalogo_tabelas_classes,
     inicializar_equipamentos,
+    garantir_membership_dnd35_para_usuarios_legados,
     sincronizar_bonus_base_ataque_combatentes,
     inicializar_talentos,
 )
@@ -35,6 +37,7 @@ from .api.v1 import (
     condicoes,
     divindades_custom,
     equipamentos,
+    games,
     grimorio,
     habilidades_especiais,
     magias,
@@ -61,6 +64,7 @@ from .models import magia as magia_model
 from .models import grimorio as grimorio_model
 from .models import campanha as campanha_model
 from .models import sessao_campanha as sessao_campanha_model
+from .models import game as game_model
 
 logger = logging.getLogger(__name__)
 CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
@@ -155,6 +159,7 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 # ── Rotas da API v1 ──────────────────────────────────────────────────────────
 # Ordem importa: dependências primeiro
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(games.router, prefix=settings.API_V1_PREFIX)
 app.include_router(campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(usuarios.router, prefix=settings.API_V1_PREFIX)
 app.include_router(combatentes.router, prefix=settings.API_V1_PREFIX)
@@ -181,6 +186,12 @@ logger.info("✅ Rotas da API v1 registradas com sucesso")
 async def root():
     """Raiz redireciona para login."""
     return FileResponse(str(FRONTEND_DIR / "pages" / "login.html"))
+
+
+@app.get("/selecionar-jogo")
+async def selecionar_jogo():
+    """Seletor de jogo pós-autenticação (Auth Hub)."""
+    return FileResponse(str(FRONTEND_DIR / "pages" / "selecionar-jogo.html"))
 
 
 @app.get("/dashboard")
@@ -447,6 +458,11 @@ def _inicializar_banco(db) -> None:
         ("inicializar_talentos", lambda: inicializar_talentos(db)),
         ("sincronizar_bonus_base_ataque_combatentes", lambda: sincronizar_bonus_base_ataque_combatentes(db)),
         ("inicializar_catalogo_tabelas_classes", inicializar_catalogo_tabelas_classes),
+        ("inicializar_catalogo_jogos", lambda: inicializar_catalogo_jogos(db)),
+        (
+            "garantir_membership_dnd35_para_usuarios_legados",
+            lambda: garantir_membership_dnd35_para_usuarios_legados(db),
+        ),
         ("seed_combatentes", lambda: _seed_combatentes(db)),
     ]
 

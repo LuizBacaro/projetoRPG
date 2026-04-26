@@ -1,0 +1,165 @@
+/*
+ * frontend/games/gurps/css/em-breve.css
+ * Identidade visual da casca GURPS — paleta cinza-azulada (sistema
+ * "técnico/universal"), distinta do D&D 3.5 (vermelho-dourado).
+ *
+ * SRP: estilos exclusivos da página "GURPS — em breve".
+ */
+
+:root {
+    /* Paleta GURPS (independente das vars globais por enquanto) */
+    --gurps-bg: #0c1220;
+    --gurps-card: #131b2e;
+    --gurps-border: #2b3a55;
+    --gurps-accent: #5fa8d3;
+    --gurps-accent-strong: #8ec5e6;
+    --gurps-text: #e2ecf6;
+    --gurps-muted: #95a3b8;
+}
+
+body.em-breve-gurps {
+    background:
+        radial-gradient(ellipse at 20% 10%, rgba(95, 168, 211, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, rgba(95, 168, 211, 0.04) 0%, transparent 55%),
+        var(--gurps-bg);
+    color: var(--gurps-text);
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.em-breve-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.em-breve-card {
+    width: 100%;
+    max-width: 640px;
+    background: linear-gradient(180deg, var(--gurps-card) 0%, #0f1626 100%);
+    border: 1px solid var(--gurps-border);
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    text-align: center;
+}
+
+.em-breve-icone {
+    font-size: 4rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 4px 12px rgba(95, 168, 211, 0.35));
+}
+
+.em-breve-kicker {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gurps-accent);
+    background: rgba(95, 168, 211, 0.08);
+    border: 1px solid rgba(95, 168, 211, 0.2);
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    margin-bottom: 1.25rem;
+}
+
+.em-breve-titulo {
+    font-size: 2.6rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem 0;
+    color: var(--gurps-accent-strong);
+    letter-spacing: 0.02em;
+}
+
+.em-breve-descricao {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--gurps-muted);
+    margin: 0 0 2rem 0;
+}
+
+.em-breve-descricao strong {
+    color: var(--gurps-text);
+    font-weight: 600;
+}
+
+.em-breve-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 2rem auto;
+    text-align: left;
+    max-width: 480px;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.em-breve-lista li {
+    position: relative;
+    padding: 0.75rem 1rem 0.75rem 2.25rem;
+    background: rgba(95, 168, 211, 0.04);
+    border: 1px solid rgba(95, 168, 211, 0.12);
+    border-radius: 8px;
+    color: var(--gurps-text);
+    font-size: 0.92rem;
+}
+
+.em-breve-lista li::before {
+    content: '◆';
+    position: absolute;
+    left: 0.85rem;
+    top: 0.78rem;
+    color: var(--gurps-accent);
+    font-size: 0.85rem;
+}
+
+.em-breve-lista code {
+    background: rgba(0, 0, 0, 0.35);
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    color: var(--gurps-accent-strong);
+}
+
+.em-breve-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.85rem;
+    margin-bottom: 2rem;
+}
+
+.em-breve-rodape {
+    color: var(--gurps-muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.em-breve-link {
+    color: var(--gurps-accent);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(95, 168, 211, 0.3);
+}
+
+.em-breve-link:hover {
+    color: var(--gurps-accent-strong);
+}
+
+/* Responsivo */
+@media (max-width: 520px) {
+    .em-breve-card {
+        padding: 2.25rem 1.5rem;
+    }
+    .em-breve-titulo {
+        font-size: 2rem;
+    }
+    .em-breve-icone {
+        font-size: 3.25rem;
+    }
+}

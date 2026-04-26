@@ -6,7 +6,11 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ...core.database import get_db
-from ...core.deps import get_usuario_atual, validar_combatentes_do_usuario
+from ...core.deps import (
+    get_usuario_atual,
+    validar_combatentes_do_usuario,
+    requer_game_dnd35,
+)
 from ...core.dependencies import get_combate_service, get_combatente_service, get_condicao_service
 from ...services.combate_service import CombateService
 from ...services.combatente_service import CombatenteService
@@ -21,7 +25,11 @@ from ...schemas.combate import (
 from ...exceptions.custom_exceptions import ArenaBaseException
 
 
-router = APIRouter(prefix="/combate", tags=["Combate"])
+router = APIRouter(
+    prefix="/combate",
+    tags=["Combate"],
+    dependencies=[Depends(requer_game_dnd35)],
+)
 
 
 @router.post("/iniciar")

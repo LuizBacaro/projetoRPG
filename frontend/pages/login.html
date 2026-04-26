@@ -239,8 +239,14 @@
             }
 
             localStorage.setItem('token',    data.access_token);
+            if (data.refresh_token) {
+                localStorage.setItem('refresh_token', data.refresh_token);
+            }
             localStorage.setItem('usuario', JSON.stringify(data.usuario));
-            window.location.href = '/dashboard';
+            // Multi-jogo: o usuário escolhe o sistema antes de entrar no app.
+            // O dashboard só é acessado após selecionar um jogo (game_slug no token).
+            localStorage.removeItem('game_slug_ativo');
+            window.location.href = '/pages/selecionar-jogo.html';
 
         } catch (err) {
             mostrarErroLogin('Erro de conexão com o servidor.');

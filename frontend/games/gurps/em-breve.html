@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GURPS — em breve | Arena TTRPG</title>
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/botoes.css" />
+    <link rel="stylesheet" href="/games/gurps/css/em-breve.css" />
+</head>
+<body class="em-breve em-breve-gurps" data-game="gurps">
+
+    <main class="em-breve-shell">
+        <div class="em-breve-card">
+            <div class="em-breve-icone" aria-hidden="true">⚙️</div>
+
+            <span class="em-breve-kicker">Próximo sistema</span>
+            <h1 class="em-breve-titulo">GURPS</h1>
+
+            <p class="em-breve-descricao">
+                <strong>Implantaremos em breve!</strong>
+                <br />
+                O GURPS terá seu próprio backend, banco de dados e bundle
+                visual dentro da Arena, com regras de pontos de personagem,
+                vantagens e desvantagens.
+            </p>
+
+            <ul class="em-breve-lista">
+                <li>Stack independente em <code>backend/app/games/gurps/</code></li>
+                <li>Frontend dedicado em <code>frontend/games/gurps/</code></li>
+                <li>Sua conta global continua a mesma — basta selecionar o jogo</li>
+            </ul>
+
+            <div class="em-breve-acoes">
+                <a href="/pages/selecionar-jogo.html" class="btn btn-primary">
+                    ← Voltar ao seletor de jogo
+                </a>
+                <a href="/dashboard" class="btn btn-secondary">
+                    Continuar no D&D 3.5
+                </a>
+            </div>
+
+            <p class="em-breve-rodape">
+                Acompanhe o progresso na seção
+                <a href="/" class="em-breve-link">Arena TTRPG</a>.
+            </p>
+        </div>
+    </main>
+
+    <script type="module">
+        import { Toast } from '/js/ui/toast.module.js';
+        // Mensagem leve quando a página é aberta a partir do seletor
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') === 'seletor') {
+            Toast.info('GURPS ainda não está disponível — voltamos quando estiver pronto.');
+        }
+    </script>
+
+</body>
+</html>

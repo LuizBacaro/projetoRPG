@@ -10,7 +10,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.core.deps import (
+    get_usuario_atual,
+    requer_dono_ou_admin_combatente,
+    requer_game_dnd35,
+)
 from app.schemas.armadura_protecao import (
     ArmaduraProtecaoCreate,
     ArmaduraProtecaoJogadorCreate,
@@ -22,7 +26,11 @@ from app.services.armadura_protecao_service import ArmaduraProtecaoService
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/armaduras_protecao", tags=["Armaduras/Proteção"])
+router = APIRouter(
+    prefix="/armaduras_protecao",
+    tags=["Armaduras/Proteção"],
+    dependencies=[Depends(requer_game_dnd35)],
+)
 
 
 @router.post("/", response_model=ArmaduraProtecaoResponse, status_code=status.HTTP_201_CREATED)

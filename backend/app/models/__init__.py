@@ -15,6 +15,7 @@ from .grimorio import GrimorioMagia, GrimorioHistoricoTroca, GrimorioNotificacao
 from .divindade_custom import DivindadeCustom
 from .campanha import Campanha
 from .sessao_campanha import SessaoCampanha
+from .game import Game, UserGameMembership
 
 __all__ = [
     "Pericia",
@@ -42,4 +43,6 @@ __all__ = [
     "DivindadeCustom",
     "Campanha",
     "SessaoCampanha",
+    "Game",
+    "UserGameMembership",
 ]

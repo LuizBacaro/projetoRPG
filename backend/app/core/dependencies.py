@@ -14,12 +14,17 @@ from ..repositories.magia_repository import MagiaRepository
 from ..repositories.grimorio_repository import GrimorioRepository
 from ..repositories.campanha_repository import CampanhaRepository
 from ..repositories.sessao_campanha_repository import SessaoCampanhaRepository
+from ..repositories.game_repository import (
+    GameRepository,
+    UserGameMembershipRepository,
+)
 from ..services.condicao_service import CondicaoService
 from ..services.magia_import_service import MagiaImportService
 from ..services.magia_service import MagiaService
 from ..services.grimorio_service import GrimorioService
 from ..services.campanha_service import CampanhaService
 from ..services.sessao_campanha_service import SessaoCampanhaService
+from ..services.game_service import GameService
 
 # ==================== REPOSITORIES ====================
 
@@ -123,3 +128,24 @@ def get_condicao_service(db: Session = Depends(get_db)) -> CondicaoService:
     condicao_repo   = CondicaoRepository(db)
     combatente_repo = CombatenteRepository(db)
     return CondicaoService(condicao_repo, combatente_repo)
+
+
+# ==================== GAMES (Auth Hub multi-jogo) ====================
+
+def get_game_repository(db: Session = Depends(get_db)) -> GameRepository:
+    return GameRepository(db)
+
+
+def get_user_game_membership_repository(
+    db: Session = Depends(get_db),
+) -> UserGameMembershipRepository:
+    return UserGameMembershipRepository(db)
+
+
+def get_game_service(
+    games: GameRepository = Depends(get_game_repository),
+    memberships: UserGameMembershipRepository = Depends(
+        get_user_game_membership_repository
+    ),
+) -> GameService:
+    return GameService(games, memberships)

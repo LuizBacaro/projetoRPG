@@ -4,7 +4,11 @@ SRP: Responsável apenas por HTTP routing
 """
 from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException, Query, Response
 from typing import List, Optional
-from ...core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from ...core.deps import (
+    get_usuario_atual,
+    requer_dono_ou_admin_combatente,
+    requer_game_dnd35,
+)
 from ...core.dependencies import get_combatente_service
 from ...services.combatente_service import CombatenteService
 from ...models.usuario import Usuario
@@ -19,7 +23,11 @@ from ...schemas.combatente import (
 )
 from ...exceptions.custom_exceptions import ArenaBaseException
 
-router = APIRouter(prefix="/combatentes", tags=["Combatentes"])
+router = APIRouter(
+    prefix="/combatentes",
+    tags=["Combatentes"],
+    dependencies=[Depends(requer_game_dnd35)],
+)
 
 
 @router.get("", response_model=List[CombatenteResponse])

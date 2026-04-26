@@ -1,43 +1,15 @@
-from __future__ import annotations
+"""[SHIM DE COMPATIBILIDADE] app.api.v1.habilidades_especiais
 
-from fastapi import APIRouter, HTTPException
+Este módulo existe apenas para manter o registro do router em
+`app.main` funcionando após a migração do domínio "habilidades
+especiais" do D&D 3.5 para a estrutura modular `app.games.dnd35.*`.
 
-from ...core.habilidades_especiais_catalog import (
-    get_habilidade_by_slug,
-    list_habilidades,
-)
-from ...schemas.habilidade_especial import (
-    HabilidadeEspecialDetalhe,
-    HabilidadeEspecialResumo,
-)
+Não adicione lógica nova aqui. Para alterações, edite
+`app.games.dnd35.api.v1.habilidades_especiais` diretamente. Quando o
+registro de routers em `app.main` for atualizado para apontar para o
+novo path, este shim pode ser removido.
+"""
 
+from app.games.dnd35.api.v1.habilidades_especiais import router
 
-router = APIRouter(prefix="/habilidades-especiais", tags=["Habilidades Especiais"])
-
-
-@router.get("", response_model=list[HabilidadeEspecialResumo])
-def listar_habilidades_especiais() -> list[HabilidadeEspecialResumo]:
-    payload: list[HabilidadeEspecialResumo] = []
-    for item in list_habilidades():
-        if not isinstance(item, dict):
-            continue
-        payload.append(
-            HabilidadeEspecialResumo(
-                slug=str(item.get("slug") or ""),
-                titulo=str(item.get("titulo") or ""),
-            )
-        )
-    return payload
-
-
-@router.get("/{slug}", response_model=HabilidadeEspecialDetalhe)
-def obter_habilidade_especial(slug: str) -> HabilidadeEspecialDetalhe:
-    found = get_habilidade_by_slug(slug)
-    if not found:
-        raise HTTPException(status_code=404, detail="Habilidade especial não encontrada")
-    return HabilidadeEspecialDetalhe(
-        slug=str(found.get("slug") or ""),
-        titulo=str(found.get("titulo") or ""),
-        descricao=str(found.get("descricao") or ""),
-        aliases=list(found.get("aliases") or []),
-    )
+__all__ = ["router"]

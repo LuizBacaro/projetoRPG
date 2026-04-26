@@ -61,6 +61,27 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
+GAME_SLUG_DNDD35 = "dnd35"
+
+
+def extrair_game_slug_do_token(request: Request) -> Optional[str]:
+    """
+    Lê o claim `game_slug` do token Bearer, se houver. Retorna None quando o
+    token não traz o claim (compatibilidade com tokens antigos pré-multi-jogo).
+    """
+    auth_header = request.headers.get("authorization") or ""
+    partes = auth_header.split()
+    if len(partes) != 2 or partes[0].lower() != "bearer":
+        return None
+    payload = decodificar_token(partes[1], settings.SECRET_KEY)
+    if not payload:
+        return None
+    slug = payload.get("game_slug")
+    if isinstance(slug, str) and slug.strip():
+        return slug.strip().lower()
+    return None
+
+
 def extrair_token_do_header(request: Request) -> Optional[str]:
     """
     Extrai o token Bearer do header Authorization.
@@ -203,6 +224,72 @@ def get_usuario_atual(
         )
 
     logger.info(f"✅ Acesso autorizado: {email}")
+    return usuario
+
+
+def requer_game_dnd35(
+    request: Request,
+    usuario=Depends(get_usuario_atual),
+) -> "Usuario":
+    """
+    Garante que o token Bearer carrega o claim `game_slug=dnd35` quando o
+    modo estrito multi-jogo está ativo (`settings.MULTI_GAME_STRICT_MODE`).
+
+    Comportamento:
+      - Modo estrito off (padrão até estabilizar): apenas registra divergência
+        em log (compatível com tokens antigos sem `game_slug`).
+      - Modo estrito on: retorna 409 quando `game_slug` ausente (token antigo)
+        e 403 quando `game_slug` diverge de `dnd35`. O frontend redireciona
+        para o seletor de jogo (header `X-Game-Slug-Required`).
+    """
+    slug = extrair_game_slug_do_token(request)
+
+    if not settings.MULTI_GAME_STRICT_MODE:
+        if slug and slug != GAME_SLUG_DNDD35:
+            logger.warning(
+                "⚠️  Acesso a endpoint D&D 3.5 com game_slug='%s' (esperado '%s')",
+                slug,
+                GAME_SLUG_DNDD35,
+            )
+        return usuario
+
+    if slug is None:
+        log_security_event(
+            "game_slug_required",
+            "denied",
+            request=request,
+            user_email=getattr(usuario, "email", None),
+            reason="missing_game_slug_claim",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Sessão sem jogo selecionado. Volte ao seletor de jogo "
+                "para entrar no D&D 3.5."
+            ),
+            headers={"X-Game-Slug-Required": GAME_SLUG_DNDD35},
+        )
+
+    if slug != GAME_SLUG_DNDD35:
+        log_security_event(
+            "game_slug_mismatch",
+            "denied",
+            request=request,
+            user_email=getattr(usuario, "email", None),
+            target=f"game_slug:{slug}",
+            reason="wrong_game_slug",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"Token vinculado ao jogo '{slug}'. Este endpoint pertence "
+                f"ao D&D 3.5 ('{GAME_SLUG_DNDD35}')."
+            ),
+            headers={"X-Game-Slug-Required": GAME_SLUG_DNDD35},
+        )
+
     return usuario
 
 

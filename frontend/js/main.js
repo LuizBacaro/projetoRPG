@@ -180,6 +180,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function _exibirUsuarioHeader() {
+    if (typeof AuthService.configurarHeaderUsuario === 'function') {
+        AuthService.configurarHeaderUsuario();
+        return;
+    }
     var nomeEl   = document.getElementById('nomeUsuarioArena');
     var badgeEl  = document.getElementById('badgePerfilArena');
     var logoutEl = document.getElementById('btnLogoutArena');

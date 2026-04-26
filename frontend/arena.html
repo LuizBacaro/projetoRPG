@@ -77,7 +77,9 @@
             <div class="header-usuario-arena">
                 <span id="nomeUsuarioArena"></span>
                 <span id="badgePerfilArena" class="badge-perfil-arena"></span>
+                <span id="badgeJogoAtivoArena" class="badge-jogo" style="display:none"></span>
                 <a href="/dashboard" class="btn-voltar-dashboard">⬅ Dashboard</a>
+                <button class="btn-logout-arena" id="btnTrocarJogoArena" title="Voltar ao seletor de jogo">🎲 Trocar jogo</button>
                 <button class="btn-logout-arena" id="btnLogoutArena">Sair</button>
             </div>
         </div>
@@ -350,7 +352,12 @@
 </script>
 
 <!-- FASE 3: AuthService (Global) -->
-<script src="/js/services/AuthService.js?v=20260329"></script>
+<script src="/js/services/AuthService.js?v=20260426b"></script>
+<script>
+    if (window.AuthService) {
+        window.AuthService.exigirJogo('dnd35');
+    }
+</script>
 
 <!-- FASE 4: ModalConfirm (Global + ES Module export) -->
 <script src="/js/ui/ModalConfirm.js"></script>
