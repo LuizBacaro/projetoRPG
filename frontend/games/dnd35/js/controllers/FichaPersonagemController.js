@@ -181,7 +181,7 @@ export class FichaPersonagemController {
         const btnVoltar = document.getElementById('btnVoltarFicha');
         if (btnVoltar) {
             btnVoltar.addEventListener('click', () => {
-                window.location.href = '/pages/dashboard.html';
+                window.location.href = '/games/dnd35/pages/dashboard.html';
             });
         }
 
@@ -3460,7 +3460,7 @@ export class FichaPersonagemController {
                 return_to: encodeURIComponent(window.location.pathname + window.location.search)
             });
 
-            window.location.href = `/pages/pericias-ficha.html?${params.toString()}`;
+            window.location.href = `/games/dnd35/pages/pericias-ficha.html?${params.toString()}`;
         } catch (err) {
             window.NotificationService?.erro('❌ Erro ao abrir perícias');
             console.error(err);

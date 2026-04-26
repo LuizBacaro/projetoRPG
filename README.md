@@ -312,6 +312,8 @@ frontend/
 └── sw.js                          # Service Worker (cache offline)
 ```
 
+**Multi-jogo (shell global):** páginas como `pages/login.html` e `pages/selecionar-jogo.html` ficam em `frontend/pages/`. Os **logos do hub** da tela “Escolha o jogo” (Arena central + D&D 3.5, D&D 5e, GURPS) estão apenas em **`frontend/assets/brand/`** e são referenciados como `/assets/brand/*.png`. Em desenvolvimento com FastAPI, a pasta é montada em `/assets`; no Vercel entram no deploy porque `outputDirectory` é `frontend/`.
+
 ### Princípios SOLID Aplicados
 
 | Princípio | Aplicação |

@@ -2,7 +2,7 @@ import { CombatenteService     } from '../services/CombatenteService.js';
 import { CondicaoController    } from './CondicaoController.js';
 import { MagiaSlotService      } from '../services/MagiaSlotService.js?v=20260402a';
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
-import { Toast } from '/js/ui/toast.module.js';
+import { Toast } from '/games/dnd35/js/ui/toast.module.js';
 import { escapeHtml } from '../utils/formatters.js';
 import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots, normalizeClasseConjuradora } from '../utils/combat-rules.js?v=20260419a';
 import { getApiUrl } from '../config/api.config.js';

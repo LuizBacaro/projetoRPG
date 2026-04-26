@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arena de Combate TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css">
+    <link rel="stylesheet" href="/games/dnd35/css/layout.css?v=20260401a">
+    <link rel="stylesheet" href="/games/dnd35/css/combatentes.css?v=20260401a">
+    <link rel="stylesheet" href="/games/dnd35/css/botoes.css">
+    <link rel="stylesheet" href="/games/dnd35/css/formularios.css">
+    <link rel="stylesheet" href="/games/dnd35/css/modais.css">
+    <link rel="stylesheet" href="/games/dnd35/css/arena.css">
+    <link rel="stylesheet" href="/games/dnd35/css/modal-condicao.css">
+    <link rel="stylesheet" href="/games/dnd35/css/responsivo.css?v=20260401a">
+    <style>
+        .header-arena-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .btn-voltar-dashboard {
+            background: none;
+            border: 1px solid #4338ca55;
+            color: #a78bfa;
+            padding: .4rem .9rem;
+            border-radius: .4rem;
+            cursor: pointer;
+            font-size: .82rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            transition: background .2s;
+        }
+        .btn-voltar-dashboard:hover { background: #4338ca22; }
+        .header-usuario-arena {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-left: auto;
+            font-size: .85rem;
+            color: #94a3b8;
+        }
+        .badge-perfil-arena {
+            padding: .2rem .6rem;
+            border-radius: 999px;
+            font-size: .72rem;
+            font-weight: 600;
+            background: #7c3aed22;
+            color: #a78bfa;
+            border: 1px solid #7c3aed55;
+        }
+        .btn-logout-arena {
+            background: none;
+            border: 1px solid #334155;
+            color: #64748b;
+            padding: .3rem .7rem;
+            border-radius: .4rem;
+            cursor: pointer;
+            font-size: .78rem;
+        }
+        .btn-logout-arena:hover { background: #1e293b; color: #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<!-- ── Tela de Configuração  -->
+<div id="telaConfiguracao" class="tela ativa">
+    <header>
+        <div class="header-arena-nav">
+            <div>
+                <h1>⚔️ Arena de Combate - Configuração</h1>
+                <p>Selecione os combatentes e configure a ordem de iniciativa</p>
+            </div>
+            <div class="header-usuario-arena">
+                <span id="nomeUsuarioArena"></span>
+                <span id="badgePerfilArena" class="badge-perfil-arena"></span>
+                <span id="badgeJogoAtivoArena" class="badge-jogo" style="display:none"></span>
+                <a href="/dashboard" class="btn-voltar-dashboard">⬅ Dashboard</a>
+                <button class="btn-logout-arena" id="btnTrocarJogoArena" title="Voltar ao seletor de jogo">🎲 Trocar jogo</button>
+                <button class="btn-logout-arena" id="btnLogoutArena">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="painel-esquerdo">
+            <h2>Personagens Disponíveis</h2>
+            <div class="filters">
+                <button class="filter-btn active" data-tipo="todos">Todos</button>
+                <button class="filter-btn" data-tipo="jogador">Jogadores</button>
+                <button class="filter-btn" data-tipo="monstro">Monstros</button>
+                <button class="filter-btn" data-tipo="npc">NPCs</button>
+            </div>
+            <div id="listaCombatentes" class="lista-combatentes"></div>
+        </div>
+
+        <div class="painel-direito">
+            <div class="header-selecionados">
+                <h2>Combatentes Selecionados (<span id="contadorSelecionados">0</span>)</h2>
+            </div>
+            <div id="combatentesSelecionados" class="lista-selecionados">
+                <div class="empty-state">
+                    <p>Nenhum combatente selecionado</p>
+                    <small>Clique nos personagens ao lado para adicionar</small>
+                </div>
+            </div>
+            <button id="btnIniciarCombate" class="btn-iniciar">Iniciar Combate</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Tela da Arena ─────────────────────────────────── -->
+<div id="telaArena" class="tela">
+    <header class="header-arena">
+        <div class="header-arena-titulo">
+            <h1>⚔️ Arena de Combate - Em Progresso</h1>
+            <span class="rodada-badge">Rodada <strong id="rodadaAtual">1</strong></span>
+        </div>
+
+        <button class="btn-encerrar-combate" id="btnEncerrarCombate">
+            🏳️ Encerrar Combate
+        </button>
+    </header>
+
+    <div class="arena-tela-wrapper">
+
+        <!-- Painel lateral esquerdo -->
+        <div class="arena-lateral-panel">
+
+            <!-- Linha com iniciativa À ESQUERDA e foto À DIREITA -->
+            <div class="arena-lateral-topo">
+
+                <!-- Coluna iniciativa -->
+                <div class="arena-lateral-iniciativa">
+                    <div class="arena-ordem-titulo">📋 Iniciativa</div>
+                    <div id="ordemIniciativaContainer"></div>
+                </div>
+
+                <!-- Coluna foto + botoes -->
+                <div class="arena-lateral-foto-col">
+                    <div id="arenaFotoAtivo" class="arena-foto-vertical-container"></div>
+                    <div class="arena-lateral-acoes">
+                        <div class="arena-lateral-acoes-titulo">Aplicar</div>
+                        <button class="arena-btn-dano-cura" id="btnAbrirModalDanoCura">⚔️ Dano / Cura</button>
+                        <button class="arena-btn-condicao" id="btnAbrirModalCondicao">🔮 Condição</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Conteúdo principal -->
+        <div class="arena-conteudo-principal">
+            <div id="combatenteAtivoContainer"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Modal de Edição ── -->
+<div id="modalEdicao" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>✏️ Editar Combatente</h2>
+            <button class="modal-close" id="btnFecharModalEdicaoTopo">×</button>
+        </div>
+        <form id="formEdicao" enctype="multipart/form-data">
+            <input type="hidden" id="editId" name="id">
+            <input type="hidden" id="editTipo" name="tipo">
+
+            <div class="nivel-pontos-container">
+                <div class="nivel-field">
+                    <label for="editNivel">NÍVEL</label>
+                    <div class="nivel-circle-container">
+                        <input type="number" id="editNivel" name="nivel" value="1" min="1" max="20" class="nivel-input">
+                    </div>
+                </div>
+                <div class="pontos-field">
+                    <label for="editPontos">PONTOS</label>
+                    <input type="number" id="editPontos" name="pontos" value="0" min="0" class="pontos-input" placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="editNome">Nome *</label>
+                <input type="text" id="editNome" name="nome" required placeholder="Nome do combatente">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editHP">HP Máximo *</label>
+                    <input type="number" id="editHP" name="hp_maximo" required min="1" placeholder="Ex: 100">
+                </div>
+                <div class="form-group">
+                    <label for="editIniciativa">Iniciativa *</label>
+                    <input type="number" id="editIniciativa" name="iniciativa" required placeholder="Ex: 15">
+                </div>
+            </div>
+
+            <div class="resistencias-container">
+                <div class="form-group">
+                    <label class="atributos-label">🛡️ DEFESA</label>
+                </div>
+                <div class="resistencias-grid">
+                    <div class="resistencia-field">
+                        <label for="editCA">CA</label>
+                        <input type="number" id="editCA" name="ca" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="editToque">Toque</label>
+                        <input type="number" id="editToque" name="toque" value="10" min="0" max="50">
+                    </div>
+                    <div class="resistencia-field">
+                        <label for="editSurpresa">Surpresa</label>
+                        <input type="number" id="editSurpresa" name="surpresa" value="10" min="0" max="50">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="editClasse">Classe</label>
+                <input type="text" id="editClasse" name="classe" placeholder="Ex: Guerreiro">
+            </div>
+
+            <div class="foto-atributos-container">
+                <div class="form-group foto-vertical">
+                    <label>Foto</label>
+                    <div class="upload-area-vertical" id="editUploadArea">
+                        <input type="file" id="editFoto" name="foto" accept="image/*" style="display:none">
+                        <div class="upload-placeholder-vertical" id="editUploadPlaceholder">
+                            <span class="upload-icon">📷</span>
+                            <p>Clique para upload</p>
+                        </div>
+                        <div class="upload-preview-vertical" id="editUploadPreview" style="display:none">
+                            <img id="editPreviewImage" src="" alt="Preview">
+                            <button type="button" class="btn-remove-image-vertical" id="btnRemoverImagemEdicao">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="atributos-container">
+                    <div class="form-group">
+                        <label class="atributos-label">🛡️ ATRIBUTOS D&D</label>
+                    </div>
+                    <div class="atributos-duas-colunas">
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="editFOR">FOR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editFOR" name="forca" value="10" min="1" max="30" class="arena-edit-atributo-input">
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="editDEX">DES</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editDEX" name="destreza" value="10" min="1" max="30" class="arena-edit-atributo-input">
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="editCON">CON</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editCON" name="constituicao" value="10" min="1" max="30" class="arena-edit-atributo-input">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="atributos-coluna">
+                            <div class="atributo-field">
+                                <label for="editINT">INT</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editINT" name="inteligencia" value="10" min="1" max="30" class="arena-edit-atributo-input">
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="editWIS">SAB</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editWIS" name="sabedoria" value="10" min="1" max="30" class="arena-edit-atributo-input">
+                                </div>
+                            </div>
+                            <div class="atributo-field">
+                                <label for="editCHA">CAR</label>
+                                <div class="atributo-circles-container">
+                                    <input type="number" id="editCHA" name="carisma" value="10" min="1" max="30" class="arena-edit-atributo-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" id="btnCancelarEdicao">Cancelar</button>
+                <button type="button" class="btn-delete" id="btnDeletarEdicao">🗑️ Deletar</button>
+                <button type="submit" class="btn-iniciar">💾 Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ── Modal Dano/Cura ── -->
+<div id="modalDanoCura" class="modal-dano-overlay">
+    <div class="modal-dano-container">
+        <div class="modal-dano-header">
+            <h2>⚔️ Aplicar Dano / Cura</h2>
+            <button class="modal-dano-fechar" id="btnFecharModalDanoCuraTopo">✕</button>
+        </div>
+        <div class="modal-dano-body">
+            <div class="modal-dano-layout">
+                <div class="dano-combatentes-selecao">
+                    <h3>🎯 Selecionar Combatentes:</h3>
+                    <div id="listaCombatentesDanoCura" class="lista-checkbox-combatentes"></div>
+                </div>
+                <div class="dano-valores-aplicacao">
+                    <div class="campo-grupo">
+                        <label for="inputDanoModal" class="modal-label">⚔️ Dano:</label>
+                        <input type="number" id="inputDanoModal" class="input-valor-modal" min="0" placeholder="0" value="0">
+                    </div>
+                    <div class="campo-grupo">
+                        <label for="inputCuraModal" class="modal-label">💚 Cura:</label>
+                        <input type="number" id="inputCuraModal" class="input-valor-modal" min="0" placeholder="0" value="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-dano-footer">
+            <button class="btn-cancelar-dano" id="btnCancelarModalDanoCura">❌ Cancelar</button>
+            <button class="btn-aplicar-dano" id="btnAplicarModalDanoCura">✅ Aplicar Dano / Cura</button>
+        </div>
+    </div>
+</div>
+
+<!--  -->
+<!-- SCRIPTS — Padrão Unificado ES Modules + Global Scripts        -->
+<!--  -->
+
+<!-- FASE 1: API Config (ES Module) -->
+<script type="module">
+    import { getApiUrl } from '/games/dnd35/js/config/api.config.js';
+    window.getApiUrl = getApiUrl;
+    console.log('✅ FASE 1: getApiUrl pronto');
+</script>
+
+<!-- FASE 2: Toast (ES Module) -->
+<script type="module">
+    import { Toast } from '/games/dnd35/js/ui/toast.module.js';
+    window.Toast = Toast;
+    console.log('✅ FASE 2: Toast pronto');
+    setTimeout(() => window.dispatchEvent(new CustomEvent('phase2-ready')), 100);
+</script>
+
+<!-- FASE 3: AuthService (Global) -->
+<script src="/games/dnd35/js/services/AuthService.js?v=20260426b"></script>
+<script>
+    if (window.AuthService) {
+        window.AuthService.exigirJogo('dnd35');
+    }
+</script>
+
+<!-- FASE 4: ModalConfirm (Global + ES Module export) -->
+<script src="/games/dnd35/js/ui/ModalConfirm.js"></script>
+
+<!-- FASE 5: ModalEdicao (Global - usa ModalConfirm global) -->
+<script src="/games/dnd35/js/ui/ModalEdicao.js"></script>
+
+<!-- FASE 6: Serviços -->
+<script src="/games/dnd35/js/services/DanoCuraService.js?v=20260411c"></script>
+<script>
+    if (typeof escapeHtml === 'undefined') {
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        }
+        window.escapeHtml = escapeHtml;
+    }
+</script>
+<script src="/games/dnd35/js/ui/ModalDanoCura.js?v=20260411a"></script>
+<script src="/games/dnd35/js/services/CondicaoService.js?v=20260411c"></script>
+<script src="/games/dnd35/js/ui/CondicaoUI.js?v=20260411d"></script>
+
+<!-- FASE 7: Main (ES Module - carregadores e controllers) -->
+<script type="module" src="/games/dnd35/js/main.js?v=20260411g"></script>
+
+</body>
+</html>

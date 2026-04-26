@@ -17,7 +17,7 @@ description: >-
 
 ## Origem da API no browser (`getApiUrl`)
 
-- Lógica canónica: `frontend/js/config/api.config.js` — `BASE_URL` = origin local só em **localhost / 127.0.0.1 / ::1 / *.localhost**; caso contrário usa a origem do **Render** + `/api/v1`.
+- Lógica canónica: `frontend/games/dnd35/js/config/api.config.js` — `BASE_URL` = origin local só em **localhost / 127.0.0.1 / ::1 / *.localhost**; caso contrário usa a origem do **Render** + `/api/v1`.
 - Páginas com **scripts clássicos** que rodam antes de módulos (ex.: `pages/dashboard.html`) carregam **`/js/config/api-url-global.js`** primeiro para definir `window.getApiUrl` síncrono; depois pode importar `api.config.js` como módulo para resiliência do `fetch`.
 - **Não** sobrescrever `window.getApiUrl` com `window.location.origin + '/api/v1'` em produção: isso aponta para o **Vercel**, onde `/api/*` não existe → 404.
 
@@ -25,14 +25,15 @@ description: >-
 
 - `outputDirectory`: `frontend`; build mínimo (`echo 'static'`).
 - **Rewrites** alinham atalhos do FastAPI local com ficheiros reais:
-  - `/dashboard` → `/pages/dashboard.html`
-  - `/pericias` → `/pages/pericias.html`
-  - `/arena` → `/arena.html`
-- Ficheiros em `frontend/pages/` expõem-se como `/pages/...`.
+  - `/dashboard` → `/games/dnd35/pages/dashboard.html`
+  - `/pericias` → `/games/dnd35/pages/pericias.html`
+  - `/arena` → `/games/dnd35/arena.html`
+- Bundle D&D 3.5 em `frontend/games/dnd35/` (servido em `/games/dnd35/...`).
+- Shell global: `frontend/pages/login.html`, `selecionar-jogo.html` e stubs de redirect em `/pages/*.html`.
 
 ## Backend: rotas de página vs API
 
-- `main.py` serve `/`, `/dashboard`, `/arena`, `/pericias` como ficheiros do `frontend/` quando se usa só o uvicorn.
+- `main.py` serve `/`, `/dashboard`, `/arena`, `/pericias` e monta estáticos em `/games/dnd35` a partir de `frontend/games/dnd35/` quando se usa só o uvicorn.
 - Na Internet, com front no Vercel, essas rotas “bonitas” no FastAPI **não** são vistas pelo utilizador do site; no Vercel os **rewrites** cumprem o mesmo papel.
 
 ## CORS (produção)
@@ -61,6 +62,6 @@ description: >-
 | API routers | `backend/app/api/v1/*.py` |
 | Config / CORS | `backend/app/main.py`, `backend/app/core/config.py` |
 | Rate limit | `backend/app/core/rate_limit.py` |
-| Config front API | `frontend/js/config/api.config.js`, `api-url-global.js` |
-| Arena (If-Match) | `frontend/js/controllers/ArenaController.js` |
+| Config front API | `frontend/games/dnd35/js/config/api.config.js`, `api-url-global.js` |
+| Arena (If-Match) | `frontend/games/dnd35/js/controllers/ArenaController.js` |
 | Catálogo talentos | `talentos_importacao_limpo.json`, `backend/app/core/talentos_catalog_seed.py`, `backend/scripts/importar_talentos_catalogo_json.py` |

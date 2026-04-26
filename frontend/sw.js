@@ -1,19 +1,18 @@
 /**
- * Service Worker - Cache de Perícias
- * Permite que o usuário acesse as perícias mesmo offline
+ * Service Worker - Cache de Perícias (D&D 3.5)
+ * Caminhos alinhados ao bundle em /games/dnd35/
  */
 
-const CACHE_NAME = 'pericias-v1';
+const CACHE_NAME = 'pericias-v2-dnd35';
 const urlsToCache = [
-    '/pericias.html',
-    '/css/variables.css',
-    '/css/layout.css',
-    '/css/style.css',
-    '/css/pericias.css',
-    '/services/PericiaService.js'
+    '/games/dnd35/pages/pericias.html',
+    '/games/dnd35/css/variables.css',
+    '/games/dnd35/css/layout.css',
+    '/games/dnd35/css/style.css',
+    '/games/dnd35/css/pericias.css',
+    '/games/dnd35/js/services/PericiaService.js'
 ];
 
-// Instalar Service Worker
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
@@ -22,7 +21,6 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// Usar cache quando disponível
 self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request).then((response) => {
@@ -31,7 +29,6 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-// Limpar cache antigo
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {

@@ -11,7 +11,7 @@ body {
 
 .seletor-shell {
     width: 100%;
-    max-width: 960px;
+    max-width: 1040px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -239,4 +239,200 @@ body {
     padding: .7rem .9rem;
     border-radius: .55rem;
     display: none;
+}
+
+/* ── Hub visual (logos) ─────────────────────────────────────────────────── */
+
+@keyframes hub-central-float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes hub-satellite-pulse {
+    0%,
+    100% {
+        filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.35));
+    }
+    50% {
+        filter: drop-shadow(0 6px 20px rgba(124, 58, 237, 0.25));
+    }
+}
+
+.hub-principal {
+    margin: 0.5rem 0 2rem;
+    text-align: center;
+}
+
+.hub-tagline {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+}
+
+.hub-orbit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.hub-central-wrap {
+    order: -1;
+    display: flex;
+    justify-content: center;
+}
+
+.hub-central {
+    width: min(72vw, 280px);
+    height: auto;
+    max-width: 100%;
+    display: block;
+    filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.45));
+    pointer-events: none;
+    user-select: none;
+    animation: hub-central-float 5s ease-in-out infinite;
+}
+
+.hub-column {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1rem, 5vw, 2rem);
+}
+
+.hub-column--esq,
+.hub-column--dir {
+    width: 100%;
+}
+
+.hub-satellite {
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 50%;
+    line-height: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.hub-satellite img {
+    width: min(34vw, 152px);
+    height: auto;
+    display: block;
+    border-radius: 50%;
+}
+
+.hub-satellite--dnd5e img.hub-img-dd5 {
+    border-radius: 50%;
+    object-fit: cover;
+    aspect-ratio: 1;
+    width: min(34vw, 152px);
+    height: min(34vw, 152px);
+}
+
+.hub-satellite:not(:disabled) img {
+    animation: hub-satellite-pulse 4s ease-in-out infinite;
+}
+
+.hub-column--dir .hub-satellite:nth-child(2):not(:disabled) img {
+    animation-delay: 0.9s;
+}
+
+.hub-satellite:hover:not(:disabled) {
+    transform: scale(1.07);
+    box-shadow:
+        0 0 0 3px rgba(124, 58, 237, 0.5),
+        0 16px 44px rgba(0, 0, 0, 0.38);
+    z-index: 1;
+}
+
+.hub-satellite:focus-visible {
+    outline: 2px solid #c4b5fd;
+    outline-offset: 4px;
+}
+
+.hub-satellite:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    filter: grayscale(0.75);
+    box-shadow: none;
+}
+
+.hub-satellite:disabled img {
+    animation: none;
+}
+
+@media (min-width: 720px) {
+    .hub-orbit {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        max-width: 980px;
+        gap: clamp(0.75rem, 2.5vw, 2rem);
+    }
+
+    .hub-central-wrap {
+        order: 0;
+        flex: 0 0 auto;
+    }
+
+    .hub-column {
+        flex-direction: column;
+        width: auto;
+        flex: 0 0 auto;
+        gap: 1.1rem;
+    }
+
+    .hub-column--esq {
+        min-width: min(22vw, 180px);
+    }
+
+    .hub-column--dir {
+        min-width: min(22vw, 180px);
+    }
+
+    .hub-central {
+        width: min(36vw, 300px);
+    }
+
+    .hub-satellite img,
+    .hub-satellite--dnd5e img.hub-img-dd5 {
+        width: min(20vw, 156px);
+        height: min(20vw, 156px);
+    }
+}
+
+/* Catálogo expandido */
+.seletor-catalogo-detalhe {
+    margin-top: 0.5rem;
+    border: 1px solid #2d2d44;
+    border-radius: 0.65rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(15, 23, 42, 0.35);
+}
+
+.seletor-catalogo-detalhe summary {
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    list-style-position: outside;
+}
+
+.seletor-catalogo-detalhe summary:hover {
+    color: #cbd5e1;
+}
+
+.seletor-catalogo-detalhe[open] summary {
+    margin-bottom: 0.75rem;
+    color: #e2e8f0;
 }

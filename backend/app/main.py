@@ -143,14 +143,37 @@ else:
 # ── Paths ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = BASE_DIR.parent / "frontend"
+DND35_FRONTEND_DIR = FRONTEND_DIR / "games" / "dnd35"
 UPLOADS_DIR = settings.UPLOADS_DIR
 
 # ── Static Files ─────────────────────────────────────────────────────────────
 if FRONTEND_DIR.exists():
-    app.mount("/css", StaticFiles(directory=str(FRONTEND_DIR / "css")), name="css")
-    app.mount("/js", StaticFiles(directory=str(FRONTEND_DIR / "js")), name="js")
+    if DND35_FRONTEND_DIR.is_dir():
+        app.mount(
+            "/games/dnd35",
+            StaticFiles(directory=str(DND35_FRONTEND_DIR)),
+            name="dnd35_frontend",
+        )
+        logger.info("✅ Frontend D&D 3.5 montado em: %s", DND35_FRONTEND_DIR)
+    else:
+        logger.warning("⚠️  Pasta D&D 3.5 ausente: %s", DND35_FRONTEND_DIR)
+    # Cascas "em breve" dos outros jogos (seletor → /games/<slug>/em-breve.html)
+    for _slug in ("gurps", "dnd5e"):
+        _game_dir = FRONTEND_DIR / "games" / _slug
+        if _game_dir.is_dir():
+            app.mount(
+                f"/games/{_slug}",
+                StaticFiles(directory=str(_game_dir)),
+                name=f"{_slug}_frontend",
+            )
+            logger.info("✅ Frontend %s montado em: %s", _slug, _game_dir)
+    # Shell global (login, seletor de jogo, redirects legados /pages/*.html)
     app.mount("/pages", StaticFiles(directory=str(FRONTEND_DIR / "pages")), name="pages")
-    logger.info(f"✅ Frontend montado em: {FRONTEND_DIR}")
+    _assets_dir = FRONTEND_DIR / "assets"
+    if _assets_dir.is_dir():
+        app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="frontend_assets")
+        logger.info("✅ Assets estáticos montados em /assets → %s", _assets_dir)
+    logger.info(f"✅ Frontend raiz: {FRONTEND_DIR}")
 else:
     logger.warning(f"⚠️  Frontend não encontrado em: {FRONTEND_DIR}")
 
@@ -197,13 +220,13 @@ async def selecionar_jogo():
 @app.get("/dashboard")
 async def dashboard():
     """Dashboard após autenticação."""
-    return FileResponse(str(FRONTEND_DIR / "pages" / "dashboard.html"))
+    return FileResponse(str(DND35_FRONTEND_DIR / "pages" / "dashboard.html"))
 
 
 @app.get("/arena")
 async def arena():
     """Tela da arena de combate."""
-    return FileResponse(str(FRONTEND_DIR / "arena.html"))
+    return FileResponse(str(DND35_FRONTEND_DIR / "arena.html"))
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -218,7 +241,7 @@ async def favicon():
 @app.get("/pericias")
 async def pericias_page():
     """Tela de perícias do personagem."""
-    return FileResponse(str(FRONTEND_DIR / "pages" / "pericias.html"))
+    return FileResponse(str(DND35_FRONTEND_DIR / "pages" / "pericias.html"))
 
 
 # ── Health Check ─────────────────────────────────────────────────────────────

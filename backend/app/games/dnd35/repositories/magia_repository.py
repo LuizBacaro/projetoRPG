@@ -15,7 +15,7 @@ from app.core.text_utils import classes_magia
 from app.core.text_utils import normalizar_classe as _normalizar_classe
 from app.core.text_utils import normalizar_classe_acesso
 from app.games.dnd35.models.magia import Magia, MagiaClasse, MagiaHistorico
-from app.models.ataque import MagiaPreparada
+from app.games.dnd35.models.ataque import MagiaPreparada
 from app.repositories.base import BaseRepository, apply_not_deleted, commit_with_rollback
 
 

@@ -1,7 +1,7 @@
 /*
  * MembershipsAdminController.js
  * SRP: orquestra o painel admin de memberships multi-jogo na tela
- * `/pages/usuarios.html`.
+ * `/games/dnd35/pages/usuarios.html`.
  *
  * Reutiliza:
  *   - window.MembershipsAdminService → cliente HTTP

@@ -1303,7 +1303,7 @@ class DashboardController {
                     Toast.error('Combatente inválido para abrir ficha.');
                     return;
                 }
-                window.location.href = `/pages/ficha-personagem.html?id=${id}`;
+                window.location.href = `/games/dnd35/pages/ficha-personagem.html?id=${id}`;
             });
         });
 
@@ -1603,7 +1603,7 @@ class DashboardController {
                 return_to: encodeURIComponent(window.location.pathname + window.location.search)
             });
 
-            window.location.href = `/pages/pericias.html?${params.toString()}`;
+            window.location.href = `/games/dnd35/pages/pericias.html?${params.toString()}`;
         } catch (err) {
             Toast.error('❌ Erro ao abrir perícias');
             console.error(err);

@@ -34,7 +34,7 @@ class PericiaAuthGuard {
 
     _redirecionar() {
         console.warn('⚠️ Redirecionando para login...');
-        window.location.href = '/login.html?redirect=/pages/pericias.html';
+        window.location.href = '/pages/login.html?redirect=/games/dnd35/pages/pericias.html';
     }
 
     static validar() {

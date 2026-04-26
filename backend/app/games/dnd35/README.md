@@ -121,16 +121,26 @@ Backend do sistema **Dungeons & Dragons 3.5**.
     ajustado para a profundidade de `games/dnd35/services/`)
   - `api/v1/magias.py`, `api/v1/grimorio.py`, `api/v1/magias_preparadas.py`
 
-  `MagiaSlot` e `MagiaPreparada` permanecem em `app.models.ataque` (onda
-  **combate**/ficha). O router `/magias-preparadas` importa esses models
-  do path legado.
+  `MagiaSlot` e `MagiaPreparada` vivem em `games/dnd35/models/ataque.py`
+  (onda **combate**). O router `/magias-preparadas` importa esses models
+  desse pacote; `app.models.ataque` permanece como shim.
 
   O router `/magias` ainda **não** declara `requer_game_dnd35` (paridade
   com o original). `/grimorio` e `/magias-preparadas` mantêm o guard.
 
-Os demais arquivos continuam em `backend/app/{api/v1,models,schemas,
-repositories,services,core}/` e serão migrados em ondas futuras
-(ficha, combate, etc.).
+- `combate/` (10ª onda):
+  - `models/ataque.py` (`Ataque`, `MagiaSlot`, `MagiaPreparada`)
+  - `models/combate.py` (`Combate`, `CombateHistorico`)
+  - `models/condicao.py`, `models/combatente_condicao.py`
+  - `models/armadura_protecao.py` (`ArmaduraProtecao`, `ArmaduraProtecaoJogador`)
+  - schemas, repositórios, services e routers `/combate`, `/condicoes`,
+    rotas de ataques/slots (`/combatentes/.../ataques`, `.../magias`,
+    `/magias_slots/...`) e `/armaduras_protecao`
+  - Shims em `app.models`, `app.schemas`, `app.repositories`, `app.services`,
+    `app.api.v1` para imports legados
+
+Os demais arquivos D&D 3.5 relevantes à **ficha** (`combatente`, etc.)
+continuam em `backend/app/{models,api/v1,...}/` até a próxima onda.
 
 ## Convenção de imports (regras D&D 3.5)
 

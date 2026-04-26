@@ -264,7 +264,7 @@ backend/app/
         gurps/                    EM BREVE (pacote vazio reservado)
 ```
 
-> Hoje, nove domínios estão fisicamente migrados em
+> Hoje, dez domínios estão fisicamente migrados em
 > `games/dnd35/`:
 >
 > 1. **`divindade_custom*`** — 1ª onda (POC).
@@ -286,13 +286,15 @@ backend/app/
 > 9. **`magia*`** (models `Magia`/`MagiaClasse`/`MagiaHistorico`, grimório,
 >    schemas, repositórios, `MagiaService`/`MagiaImportService`/`GrimorioService`,
 >    routers `/magias`, `/grimorio`, `/magias-preparadas`) — 9ª onda.
->    `MagiaSlot`/`MagiaPreparada` seguem em `ataque` até a onda combate.
+> 10. **`combate*`** (`Ataque`, `MagiaSlot`, `MagiaPreparada`, `Combate`,
+>     `CombateHistorico`, `Condicao`, `CombatenteCondicao`,
+>     `ArmaduraProtecao`, repositórios, services, routers `/combate`,
+>     `/condicoes`, ataques/slots e `/armaduras_protecao`) — 10ª onda.
 >
-> Os demais arquivos D&D 3.5 continuam em
+> Os demais arquivos D&D 3.5 (ficha/`combatente`, etc.) continuam em
 > `app/{models,api/v1,core,...}`. Os caminhos antigos dos domínios já
 > migrados foram convertidos em shims que re-exportam dos novos paths.
-> As ondas seguintes (combate, ficha, etc.) serão feitas em PRs
-> separados.
+> A onda seguinte sugerida é a **ficha** (`combatente`).
 
 ### Frontend
 
@@ -302,7 +304,7 @@ frontend/
     css/                          (legacy: tudo junto)
     js/                           (legacy: services/controllers misturados)
     games/                        Bundle visual por jogo (alvo)
-        dnd35/                    EM CONSTRUÇÃO (README placeholder)
+        dnd35/                    Bundle D&D 3.5 (HTML/CSS/JS migrados)
         dnd5e/em-breve.html       Casca visual "em breve"
         gurps/em-breve.html       Casca visual "em breve"
 ```
@@ -366,16 +368,19 @@ os shims podem ser removidos em PR de limpeza.
 9. **Onda backend "magia"** — ✅ concluída
    (`Magia`/`MagiaClasse`/`MagiaHistorico`, grimório, schemas, repositórios,
    services, routers `/magias`, `/grimorio`, `/magias-preparadas`;
-   `MagiaSlot`/`MagiaPreparada` permanecem em `ataque` até a onda combate).
-10. **Onda backend "combate"** — `combate`, `combatente_condicao`,
-   `condicao`, `ataque` (inclui `MagiaSlot`/`MagiaPreparada`),
-   `armadura_protecao` (próxima onda sugerida).
+   `MagiaSlot`/`MagiaPreparada` migraram na onda **combate** para
+   `games/dnd35/models/ataque.py`, com shim em `app.models.ataque`).
+10. **Onda backend "combate"** — ✅ concluída (`combate`,
+    `combatente_condicao`, `condicao`, `ataque` incluindo
+    `MagiaSlot`/`MagiaPreparada`, `armadura_protecao`; routers
+    `/combate`, `/condicoes`, ataques/slots, `/armaduras_protecao`).
 11. **Onda backend "ficha"** — `combatente` (último por ser o nó
    central das FKs).
-12. **Onda frontend D&D 3.5** — mover `pages/{dashboard,arena-combate,
-   ficha-personagem,magias,pericias,pericias-ficha}.html`, `arena.html`
-   e CSS/JS específicos para `frontend/games/dnd35/`. Atualizar
-   rewrites no `vercel.json`. Adicionar redirect 301 dos paths legados.
+12. **Onda frontend D&D 3.5** — ✅ concluída
+   (`frontend/games/dnd35/` com `pages/`, `css/`, `js/`, `arena.html`;
+   shell global em `frontend/pages/` — login + seletor + stubs de redirect;
+   `vercel.json` com rewrites para `/dashboard`, `/arena`, `/pericias`;
+   backend monta `/games/dnd35` em `main.py`).
 
 Cada onda deve seguir o padrão da POC `divindades_custom`:
 - Criar arquivos novos em `games/dnd35/...`

@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Escolha o jogo — Arena TTRPG</title>
-    <link rel="stylesheet" href="/css/login.css" />
-    <link rel="stylesheet" href="/css/selecionar-jogo.css?v=20260426" />
-    <link rel="stylesheet" href="/css/responsivo.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/login.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/selecionar-jogo.css?v=20260426c" />
+    <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
 </head>
 <body>
 
@@ -28,9 +28,38 @@
         <div id="seletorErro" class="msg-box msg-erro"></div>
         <div id="seletorAviso" class="msg-box msg-info"></div>
 
+        <section class="hub-principal" aria-label="Escolha da plataforma de jogo">
+            <p class="hub-tagline">Toque no sistema que deseja abrir agora.</p>
+            <div class="hub-orbit">
+                <div class="hub-column hub-column--esq">
+                    <button type="button" id="btnHubDnd35" class="hub-satellite hub-satellite--dnd35" disabled
+                            title="Abrir D&amp;D 3.5" aria-label="Abrir plataforma Dungeons &amp; Dragons 3.5">
+                        <img src="/assets/brand/logo_dd35_redondo.png" alt="" width="160" height="160" decoding="async" />
+                    </button>
+                </div>
+                <div class="hub-central-wrap">
+                    <img src="/assets/brand/logo_central.png" class="hub-central" width="280" height="280"
+                         alt="Arena TTRPG" decoding="async" />
+                </div>
+                <div class="hub-column hub-column--dir">
+                    <button type="button" id="btnHubDnd5e" class="hub-satellite hub-satellite--dnd5e" disabled
+                            title="D&amp;D 5e (em breve)" aria-label="Abrir página D&amp;D 5e em breve">
+                        <img src="/assets/brand/logo_dd5.png" alt="" width="160" height="160" decoding="async" class="hub-img-dd5" />
+                    </button>
+                    <button type="button" id="btnHubGurps" class="hub-satellite hub-satellite--gurps" disabled
+                            title="Abrir GURPS" aria-label="Abrir plataforma GURPS">
+                        <img src="/assets/brand/logo_gurps_classico_redondo.png" alt="" width="160" height="160" decoding="async" />
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <div id="seletorLoading" class="seletor-loading">Carregando jogos disponíveis…</div>
 
-        <ul id="seletorLista" class="seletor-lista" aria-live="polite"></ul>
+        <details class="seletor-catalogo-detalhe">
+            <summary>Ver catálogo completo de jogos</summary>
+            <ul id="seletorLista" class="seletor-lista" aria-live="polite"></ul>
+        </details>
 
         <p class="seletor-rodape">
             Mais sistemas em breve: cada jogo terá seu próprio backend, banco e
@@ -40,7 +69,7 @@
 </div>
 
 <script type="module">
-    import { getApiUrl } from '/js/config/api.config.js?v=20260426';
+    import { getApiUrl } from '/games/dnd35/js/config/api.config.js?v=20260426';
 
     const STORAGE_TOKEN = 'token';
     const STORAGE_REFRESH = 'refresh_token';
@@ -54,6 +83,13 @@
     const elAviso = document.getElementById('seletorAviso');
     const elUsuario = document.getElementById('seletorUsuario');
     const btnSair = document.getElementById('btnSair');
+    const btnHubDnd35 = document.getElementById('btnHubDnd35');
+    const btnHubDnd5e = document.getElementById('btnHubDnd5e');
+    const btnHubGurps = document.getElementById('btnHubGurps');
+
+    let catalogoJogos = [];
+    let catalogoMemberships = [];
+    let catalogoSlugAtivo = null;
 
     function exibirErro(msg) {
         elErro.textContent = msg;
@@ -132,10 +168,35 @@
         return null;
     }
 
+    function jogoPorSlug(slug) {
+        return catalogoJogos.find((j) => j.slug === slug);
+    }
+
+    function atualizarBotoesHub() {
+        const j35 = jogoPorSlug('dnd35');
+        const j5 = jogoPorSlug('dnd5e');
+        const g = jogoPorSlug('gurps');
+        btnHubDnd35.disabled = !(j35 && j35.status === 'disponivel');
+        btnHubDnd5e.disabled = !(
+            j5 && (j5.status === 'disponivel' || j5.status === 'em_breve')
+        );
+        if (j5 && j5.status === 'manutencao') btnHubDnd5e.disabled = true;
+        btnHubGurps.disabled = !(
+            g && (g.status === 'disponivel' || g.status === 'em_breve')
+        );
+        if (g && g.status === 'manutencao') btnHubGurps.disabled = true;
+        if (j35 && j35.status === 'manutencao') btnHubDnd35.disabled = true;
+    }
+
     function renderizar(jogos, memberships, slugAtivo) {
+        catalogoJogos = Array.isArray(jogos) ? jogos : [];
+        catalogoMemberships = Array.isArray(memberships) ? memberships : [];
+        catalogoSlugAtivo = slugAtivo || null;
+
         elLista.innerHTML = '';
         if (!Array.isArray(jogos) || jogos.length === 0) {
             elLista.innerHTML = '<li class="seletor-vazio">Nenhum jogo cadastrado ainda.</li>';
+            atualizarBotoesHub();
             return;
         }
 
@@ -192,6 +253,8 @@
                 }
             });
         });
+
+        atualizarBotoesHub();
     }
 
     async function carregar() {
@@ -240,9 +303,16 @@
         const token = exigirToken();
         if (!token) return;
 
-        const original = botao.textContent;
+        const temImg = !!botao.querySelector('img');
+        const originalText = botao.textContent;
+        const originalHtml = temImg ? botao.innerHTML : null;
         botao.disabled = true;
-        botao.textContent = 'Entrando…';
+        if (temImg) {
+            botao.style.opacity = '0.55';
+            botao.style.pointerEvents = 'none';
+        } else {
+            botao.textContent = 'Entrando…';
+        }
 
         try {
             const res = await fetch(getApiUrl('/games/selecionar'), {
@@ -286,7 +356,13 @@
             console.error(err);
         } finally {
             botao.disabled = false;
-            botao.textContent = original;
+            if (temImg && originalHtml != null) {
+                botao.innerHTML = originalHtml;
+                botao.style.opacity = '';
+                botao.style.pointerEvents = '';
+            } else {
+                botao.textContent = originalText;
+            }
         }
     }
 
@@ -300,6 +376,53 @@
     }
 
     btnSair.addEventListener('click', sair);
+
+    btnHubDnd35.addEventListener('click', () => {
+        const j = jogoPorSlug('dnd35');
+        if (!j || j.status !== 'disponivel') {
+            exibirAviso('D&D 3.5 não está disponível no momento.');
+            return;
+        }
+        selecionarJogo('dnd35', btnHubDnd35);
+    });
+
+    btnHubDnd5e.addEventListener('click', () => {
+        const j = jogoPorSlug('dnd5e');
+        if (!j) {
+            exibirAviso('D&D 5e não consta no catálogo.');
+            return;
+        }
+        if (j.status === 'disponivel') {
+            selecionarJogo('dnd5e', btnHubDnd5e);
+            return;
+        }
+        if (j.status === 'em_breve') {
+            const dest = destinoEmBrevePorSlug('dnd5e');
+            if (dest) window.location.href = dest;
+            else exibirAviso('Página D&D 5e em construção.');
+            return;
+        }
+        exibirAviso('D&D 5e não está disponível no momento.');
+    });
+
+    btnHubGurps.addEventListener('click', () => {
+        const j = jogoPorSlug('gurps');
+        if (!j) {
+            exibirAviso('GURPS não consta no catálogo.');
+            return;
+        }
+        if (j.status === 'disponivel') {
+            selecionarJogo('gurps', btnHubGurps);
+            return;
+        }
+        if (j.status === 'em_breve') {
+            const dest = destinoEmBrevePorSlug('gurps');
+            if (dest) window.location.href = dest;
+            else exibirAviso('Página GURPS em construção.');
+            return;
+        }
+        exibirAviso('GURPS não está disponível no momento.');
+    });
 
     pintarUsuario();
     carregar();
