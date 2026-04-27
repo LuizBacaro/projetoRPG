@@ -6,7 +6,7 @@ from unittest.mock import Mock
 from app.games.dnd35.services.combate_service import CombateService
 from app.games.dnd35.models.combate import Combate
 from app.games.dnd35.models.combatente import Combatente
-from app.exceptions.custom_exceptions import (
+from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombateJaAtivoError,
     CombateNotFoundError,

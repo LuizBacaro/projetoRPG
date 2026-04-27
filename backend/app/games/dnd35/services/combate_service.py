@@ -4,7 +4,7 @@ Princípio SOLID: SRP - Lógica de negócio de Combate
 """
 from typing import Any, Dict, List, Optional
 
-from app.exceptions.custom_exceptions import (
+from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombateFinalizadoError,
     CombateJaAtivoError,

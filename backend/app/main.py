@@ -26,30 +26,30 @@ from .core.init_db import (
     sincronizar_bonus_base_ataque_combatentes,
     inicializar_talentos,
 )
-from .core.rate_limit import RateLimitMiddleware
-from .core.request_size import RequestSizeLimitMiddleware
-from .api.v1 import (
-    armaduras_protecao,
-    ataques,
+from .shared.core.rate_limit import RateLimitMiddleware
+from .shared.core.request_size import RequestSizeLimitMiddleware
+from .shared.api.v1 import (
     auth,
-    campanhas,
-    combate,
-    combatentes,
-    condicoes,
-    divindades_custom,
     games,
-    magias,
-    magias_preparadas,
-    pericias,
     usuarios,
 )
 from .games.dnd35.api.v1 import (
+    armaduras_protecao as dnd35_armaduras_protecao,
+    divindades_custom as dnd35_divindades_custom,
+    ataques as dnd35_ataques,
+    campanhas as dnd35_campanhas,
+    combate as dnd35_combate,
+    combatentes as dnd35_combatentes,
+    condicoes as dnd35_condicoes,
     equipamentos as dnd35_equipamentos,
     grimorio as dnd35_grimorio,
     habilidades_especiais as dnd35_habilidades_especiais,
     racas as dnd35_racas,
     tabelas_classes as dnd35_tabelas_classes,
     talentos as dnd35_talentos,
+    magias as dnd35_magias,
+    magias_preparadas as dnd35_magias_preparadas,
+    pericias as dnd35_pericias,
 )
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
@@ -186,19 +186,19 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 # Ordem importa: dependências primeiro
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(games.router, prefix=settings.API_V1_PREFIX)
-app.include_router(campanhas.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(usuarios.router, prefix=settings.API_V1_PREFIX)
-app.include_router(combatentes.router, prefix=settings.API_V1_PREFIX)
-app.include_router(combate.router, prefix=settings.API_V1_PREFIX)
-app.include_router(condicoes.router, prefix=settings.API_V1_PREFIX)
-app.include_router(ataques.router, prefix=settings.API_V1_PREFIX)
-app.include_router(pericias.router, prefix=settings.API_V1_PREFIX)
-app.include_router(magias.router, prefix=settings.API_V1_PREFIX)
-app.include_router(divindades_custom.router, prefix=settings.API_V1_PREFIX)
-app.include_router(magias_preparadas.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_combatentes.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_combate.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_condicoes.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_ataques.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_pericias.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_magias.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_divindades_custom.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_magias_preparadas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_grimorio.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_equipamentos.router, prefix=settings.API_V1_PREFIX)
-app.include_router(armaduras_protecao.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_armaduras_protecao.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_talentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_tabelas_classes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_racas.router, prefix=settings.API_V1_PREFIX)

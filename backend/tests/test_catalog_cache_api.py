@@ -4,11 +4,11 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.games.dnd35.api.v1.equipamentos import router as equipamentos_router
-from app.api.v1.magias import router as magias_router
-from app.api.v1.pericias import router as pericias_router
-from app.core.catalog_cache import catalog_cache
+from app.games.dnd35.api.v1.magias import router as magias_router
+from app.games.dnd35.api.v1.pericias import router as pericias_router
+from app.shared.core.catalog_cache import catalog_cache
 from app.core.database import get_db
-from app.core.deps import get_usuario_atual
+from app.shared.core.deps import get_usuario_atual
 from app.core.config import settings
 from app.games.dnd35.services.equipamento_service import EquipamentoService
 from app.games.dnd35.services.pericia_service import PericiaService

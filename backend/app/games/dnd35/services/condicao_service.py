@@ -5,9 +5,9 @@ DIP - Depende da abstração CondicaoRepository
 """
 from typing import Dict, List
 
-from app.exceptions.custom_exceptions import ArenaBaseException, CombatenteNaoEncontrado, DadosInvalidos
+from app.shared.exceptions.custom_exceptions import ArenaBaseException, CombatenteNaoEncontrado, DadosInvalidos
 from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
-from app.models.usuario import PerfilUsuario
+from app.shared.models.usuario import PerfilUsuario
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 
 # ── Seed das 25 condições da planilha Condies-D&D.xlsx ────────────────────────

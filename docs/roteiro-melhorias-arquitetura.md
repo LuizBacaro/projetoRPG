@@ -41,7 +41,10 @@ Fase A (rotas / api.v1)  →  Fase B (hub → app.shared)  →  Fase C (Postgres
 **Inventário (A.0):** [fase-a-inventario-routers.md](./fase-a-inventario-routers.md)
 — tabela *router → origem hoje → alvo*, comandos `grep`/`rg` e impacto em
 `backend/tests/`. **A.1:** `racas` e `tabelas_classes`. **A.2:** `habilidades_especiais`,
-`talentos`, `equipamentos`, `grimorio` (ver histórico no mesmo doc).
+`talentos`, `equipamentos`, `grimorio`. **A.3:** `campanhas`, `combatentes`,
+`condicoes`, `ataques`. **A.4:** `pericias`, `magias`, `divindades_custom`,
+`magias_preparadas`, `armaduras_protecao`. **A.5:** `combate` (migração de
+testes/overrides para `app.core.*` e remoção do shim).
 
 **Problema:** vários módulos em `app/api/v1/` re-exportam o `router` (e por
 vezes helpers de DI) definidos em `app/games/dnd35/api/v1/`, o que duplica
@@ -84,6 +87,23 @@ andaime (`constants.py` + README).
 **Meta:** tabela em `backend/app/shared/README.md` cumprida — código de
 identidade, sessão, jogos e infra partilhada vive sob `app/shared/...`,
 com imports de aplicação a apontar para o novo path.
+
+**Progresso atual (abr/2026):**
+
+- `shared/exceptions/custom_exceptions.py` consolidado com shim em
+  `app.exceptions.custom_exceptions`.
+- `shared/core` já canónico para `catalog_cache`, `request_size`, `rate_limit`,
+  `security_audit`, `security` e `deps`, com shims em `app.core.*`.
+- `shared/models` já canónico para `usuario.py` e `game.py`, com shims em
+  `app.models.usuario` e `app.models.game`.
+- `shared/repositories` já canónico para `usuario_repository.py` e
+  `game_repository.py`, com shims em `app.repositories.*`.
+- `shared/services` já canónico para `usuario_service.py` e
+  `game_service.py`, com shims em `app.services.*`.
+- `shared/api/v1` já canónico para `auth.py`, `usuarios.py` e `games.py`,
+  com shims em `app.api.v1.*`.
+- Próximo foco: camadas hub de contratos (`app.schemas/*`) e eventual
+  consolidação de `config/database` conforme estratégia de risco da fase.
 
 **Tarefas sugeridas (incremental)**
 

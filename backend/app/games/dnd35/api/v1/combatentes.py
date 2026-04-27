@@ -7,12 +7,12 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile
 
 from app.core.dependencies import get_combatente_service
-from app.core.deps import (
+from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_combatente,
     requer_game_dnd35,
 )
-from app.exceptions.custom_exceptions import ArenaBaseException
+from app.shared.exceptions.custom_exceptions import ArenaBaseException
 from app.games.dnd35.schemas.combatente import (
     CombatenteResponse,
     DanoCuraMassaRequest,
@@ -23,7 +23,7 @@ from app.games.dnd35.schemas.combatente import (
     IniciativaUpdateRequest,
 )
 from app.games.dnd35.services.combatente_service import CombatenteService
-from app.models.usuario import Usuario
+from app.shared.models.usuario import Usuario
 
 router = APIRouter(
     prefix="/combatentes",

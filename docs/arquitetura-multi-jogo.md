@@ -362,8 +362,9 @@ frontend/
 1. **Feito (D&D 3.5):** retirar ficheiros-shim `app.models.<domínio>` e
   `app.schemas.<domínio>`; apontar código e testes para `app.games.dnd35.*`.
 2. **Testes:** `get_db` é um único callable (`app.core.database.get_db`,
-   re-exportado em `app.core.deps`). Usar `dependency_overrides[get_db]` com o
-   mesmo símbolo que a rota injeta, ou sempre `app.core.database.get_db`.
+   re-exportado em `app.shared.core.deps` e `app.core.deps`). Usar
+   `dependency_overrides[get_db]` com o mesmo símbolo que a rota injeta, ou
+   sempre `app.core.database.get_db`.
 3. **Auth Hub em `app/shared/`:** mover `usuario`, `game`, `auth`, `games`
    conforme `backend/app/shared/README.md`; cada movimento pode usar shim no
    path antigo até `rg` zerar.

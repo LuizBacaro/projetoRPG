@@ -13,7 +13,7 @@ from app.games.dnd35.models.armadura_protecao import (
 )
 from app.games.dnd35.models.talento import Talento, TalentoJogador
 from app.games.dnd35.models.combatente import Combatente
-from .usuario import Usuario, PerfilUsuario
+from app.shared.models.usuario import Usuario, PerfilUsuario
 from app.games.dnd35.models.combate import Combate, CombateHistorico
 from app.games.dnd35.models.grimorio import (
     GrimorioMagia,
@@ -23,7 +23,7 @@ from app.games.dnd35.models.grimorio import (
 from app.games.dnd35.models.divindade_custom import DivindadeCustom
 from app.games.dnd35.models.campanha import Campanha
 from app.games.dnd35.models.sessao_campanha import SessaoCampanha
-from .game import Game, UserGameMembership
+from app.shared.models.game import Game, UserGameMembership
 
 __all__ = [
     "Pericia",

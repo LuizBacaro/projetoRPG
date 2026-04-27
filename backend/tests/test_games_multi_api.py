@@ -16,10 +16,10 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.games import router as games_router
 from app.core.config import settings
 from app.core.database import Base, get_db
-from app.core.deps import get_usuario_atual, requer_game_dnd35
-from app.core.security import decodificar_token, hash_senha
-from app.models.game import Game, UserGameMembership
-from app.models.usuario import PerfilUsuario, Usuario
+from app.shared.core.deps import get_usuario_atual, requer_game_dnd35
+from app.shared.core.security import decodificar_token, hash_senha
+from app.shared.models.game import Game, UserGameMembership
+from app.shared.models.usuario import PerfilUsuario, Usuario
 from app.shared.constants import GAME_SLUG_DND35
 
 
@@ -259,7 +259,7 @@ def test_requer_game_strict_off_aceita_token_sem_game_slug(monkeypatch):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", False)
     app = _build_strict_probe_app()
     client = TestClient(app)
-    from app.core.security import criar_token
+    from app.shared.core.security import criar_token
 
     token = criar_token(
         data={"sub": "dummy@test"},
@@ -276,7 +276,7 @@ def test_requer_game_strict_on_sem_game_slug_409(monkeypatch):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
     app = _build_strict_probe_app()
     client = TestClient(app)
-    from app.core.security import criar_token
+    from app.shared.core.security import criar_token
 
     token = criar_token(
         data={"sub": "dummy@test"},
@@ -293,7 +293,7 @@ def test_requer_game_strict_on_slug_errado_403(monkeypatch):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
     app = _build_strict_probe_app()
     client = TestClient(app)
-    from app.core.security import criar_token
+    from app.shared.core.security import criar_token
 
     token = criar_token(
         data={"sub": "dummy@test", "game_slug": "dnd5e"},
@@ -309,7 +309,7 @@ def test_requer_game_strict_on_dnd35_ok(monkeypatch):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
     app = _build_strict_probe_app()
     client = TestClient(app)
-    from app.core.security import criar_token
+    from app.shared.core.security import criar_token
 
     token = criar_token(
         data={"sub": "dummy@test", "game_slug": "dnd35"},

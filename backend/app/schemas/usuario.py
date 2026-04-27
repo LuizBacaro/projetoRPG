@@ -5,7 +5,7 @@ SRP: validação e serialização de dados de usuário
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from datetime import datetime
-from ..models.usuario import PerfilUsuario
+from ..shared.models.usuario import PerfilUsuario
 import re
 
 

@@ -17,7 +17,7 @@ from app.core.bonus_base_ataque import (
     calcular_resistencias_base,
 )
 from app.core.racas_catalog import get_raca_by_slug_or_name
-from app.exceptions.custom_exceptions import (
+from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
     DadosInvalidos,
@@ -31,7 +31,7 @@ from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.talento import Talento, TalentoJogador
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
-from app.models.usuario import PerfilUsuario
+from app.shared.models.usuario import PerfilUsuario
 from app.repositories.base import commit_with_rollback
 from app.services.file_service import FileService
 

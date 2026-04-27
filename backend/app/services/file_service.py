@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 from typing import Optional
 from fastapi import UploadFile
 from ..core.config import settings
-from ..exceptions.custom_exceptions import InvalidFileError
+from ..shared.exceptions.custom_exceptions import InvalidFileError
 import logging
 
 logger = logging.getLogger(__name__)

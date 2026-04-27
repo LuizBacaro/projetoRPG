@@ -5,9 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.v1.condicoes import router as condicoes_router
+from app.games.dnd35.api.v1.condicoes import router as condicoes_router
 from app.core.database import Base, get_db
-from app.core.deps import get_usuario_atual
+from app.shared.core.deps import get_usuario_atual
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.condicao import Condicao
 from app.games.dnd35.models.combatente_condicao import CombatenteCondicao

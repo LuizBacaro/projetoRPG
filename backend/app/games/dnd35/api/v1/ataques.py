@@ -2,8 +2,7 @@
 Router de Ataques e Magias
 SRP: apenas roteamento HTTP para ataques e slots de magia
 
-Implementação em `app.games.dnd35.api.v1.ataques`; shim em
-`app.api.v1.ataques` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.ataques` (registrado em `app.main`).
 """
 from typing import List
 
@@ -11,12 +10,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.deps import (
+from app.shared.core.deps import (
     requer_dono_ou_admin_combatente,
     requer_dono_ou_admin_slot_magia,
     requer_game_dnd35,
 )
-from app.exceptions.custom_exceptions import CombatenteNaoEncontrado
+from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 from app.games.dnd35.repositories.ataque_repository import AtaqueRepository
 from app.games.dnd35.schemas.ataque import (
     AtaqueResponse,

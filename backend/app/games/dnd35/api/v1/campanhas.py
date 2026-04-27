@@ -2,10 +2,7 @@
 Router de Campanhas (D&D 3.5)
 SRP: apenas mapear endpoints HTTP do domínio "campanhas".
 
-Localização: este router pertence ao pacote `app.games.dnd35.api.v1`.
-Existe um shim em `app.api.v1.campanhas` que re-exporta o `router`
-durante a reorganização multi-jogo, para manter o registro em
-`app.main` funcionando sem alteração imediata.
+Canônico em `app.games.dnd35.api.v1.campanhas` (registrado em `app.main`).
 
 Já declara o guard `requer_game_dnd35` (paridade com o original).
 """
@@ -16,8 +13,8 @@ from app.core.dependencies import (
     get_campanha_service,
     get_sessao_campanha_service,
 )
-from app.core.deps import requer_game_dnd35, requer_mestre_ou_admin
-from app.exceptions.custom_exceptions import ArenaBaseException
+from app.shared.core.deps import requer_game_dnd35, requer_mestre_ou_admin
+from app.shared.exceptions.custom_exceptions import ArenaBaseException
 from app.games.dnd35.schemas.campanha import (
     CampanhaCreate,
     CampanhaResponse,

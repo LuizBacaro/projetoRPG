@@ -2,7 +2,7 @@ import logging
 
 from starlette.requests import Request
 
-from app.core.security_audit import get_client_ip, log_security_event
+from app.shared.core.security_audit import get_client_ip, log_security_event
 
 
 def test_get_client_ip_prioriza_x_forwarded_for():

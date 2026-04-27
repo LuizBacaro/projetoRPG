@@ -17,10 +17,10 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.catalog_cache import catalog_cache, make_cache_key
+from app.shared.core.catalog_cache import catalog_cache, make_cache_key
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.deps import (
+from app.shared.core.deps import (
     get_usuario_atual,
     requer_admin,
     requer_dono_ou_admin_combatente,

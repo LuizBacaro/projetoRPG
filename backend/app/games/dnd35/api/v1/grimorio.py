@@ -8,7 +8,7 @@ import json
 
 from app.core.database import get_db
 from app.core.dependencies import get_grimorio_service
-from app.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
+from app.shared.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
 from app.games.dnd35.schemas.grimorio import (
     GrimorioDiagnosticoResponse,
     GrimorioHistoricoTrocaResponse,

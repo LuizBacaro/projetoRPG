@@ -2,8 +2,7 @@
 Router de Armadura/Item de Proteção
 SRP: mapear endpoints HTTP
 
-Implementação em `app.games.dnd35.api.v1.armaduras_protecao`; shim em
-`app.api.v1.armaduras_protecao` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.armaduras_protecao` (registrado em `app.main`).
 """
 
 import logging
@@ -13,7 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.deps import (
+from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_combatente,
     requer_game_dnd35,

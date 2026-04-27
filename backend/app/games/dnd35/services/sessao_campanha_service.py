@@ -8,7 +8,7 @@ a classe durante a reorganização multi-jogo.
 
 from typing import List
 
-from app.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
+from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.games.dnd35.models.sessao_campanha import SessaoCampanha
 from app.games.dnd35.repositories.campanha_repository import CampanhaRepository
 from app.games.dnd35.repositories.sessao_campanha_repository import (

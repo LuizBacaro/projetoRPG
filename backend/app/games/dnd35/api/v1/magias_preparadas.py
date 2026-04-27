@@ -1,8 +1,7 @@
 """
 Endpoints de magias preparadas (D&D 3.5).
 
-Localização: `app.games.dnd35.api.v1.magias_preparadas`. Shim em
-`app.api.v1.magias_preparadas` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.magias_preparadas` (registrado em `app.main`).
 """
 import re
 
@@ -11,7 +10,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.core.database import get_db
-from app.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
+from app.shared.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
 from app.games.dnd35.models.ataque import MagiaPreparada, MagiaSlot
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.magia import Magia

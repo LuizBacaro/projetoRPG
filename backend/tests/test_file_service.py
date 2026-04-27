@@ -3,7 +3,7 @@ from pathlib import Path
 
 from fastapi import UploadFile
 
-from app.exceptions.custom_exceptions import InvalidFileError
+from app.shared.exceptions.custom_exceptions import InvalidFileError
 from app.services.file_service import FileService
 
 

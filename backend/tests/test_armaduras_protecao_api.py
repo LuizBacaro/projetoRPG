@@ -7,10 +7,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.v1.armaduras_protecao import router as armaduras_router
+from app.games.dnd35.api.v1.armaduras_protecao import router as armaduras_router
 from app.core.database import Base
 from app.core.database import get_db
-from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador  # noqa: F401
 from app.games.dnd35.models.combatente import Combatente
 

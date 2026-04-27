@@ -1,8 +1,7 @@
 """
 Router de Perícias (D&D 3.5)
 
-Localização: `app.games.dnd35.api.v1.pericias`. Shim em
-`app.api.v1.pericias` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.pericias` (registrado em `app.main`).
 
 NOTA: ainda **não** declara `requer_game_dnd35` (paridade com o original).
 """
@@ -13,10 +12,10 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.core.catalog_cache import catalog_cache, make_cache_key
+from app.shared.core.catalog_cache import catalog_cache, make_cache_key
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.games.dnd35.schemas.pericia import (
     PericiaCreate,
     PericiaJogadorCreate,

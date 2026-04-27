@@ -9,9 +9,7 @@ SRP: exposicao HTTP do catalogo customizado criado pelo Mestre.
 Como sao divindades de campanha, qualquer jogador precisa enxergar para
 escolher na ficha; apenas a criacao/remocao e restrita.
 
-Localização: este router pertence ao pacote `app.games.dnd35.api.v1`.
-Existe um shim em `app.api.v1.divindades_custom` que re-exporta o
-`router` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.divindades_custom` (registrado em `app.main`).
 """
 from typing import Any, Dict, List
 
@@ -28,7 +26,7 @@ from ...schemas.divindade_custom import (
 )
 
 # Auth Hub e cache global ainda vivem fora de games/dnd35/.
-from .....core.catalog_cache import catalog_cache
+from .....shared.core.catalog_cache import catalog_cache
 from .....core.config import settings
 from .....core.database import get_db
 from .....core.deps import (
@@ -36,7 +34,7 @@ from .....core.deps import (
     requer_mestre_ou_admin,
     requer_game_dnd35,
 )
-from .....exceptions.custom_exceptions import ArenaBaseException
+from .....shared.exceptions.custom_exceptions import ArenaBaseException
 
 
 router = APIRouter(

@@ -1248,7 +1248,7 @@ def seed_equipamentos(db) -> None:
     db.commit()
     try:
         from app.core.config import settings
-        from app.core.catalog_cache import catalog_cache
+        from app.shared.core.catalog_cache import catalog_cache
 
         if settings.CACHE_ENABLED:
             catalog_cache.invalidate_prefix("equipamentos:")

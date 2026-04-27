@@ -1,8 +1,7 @@
 """
 Endpoints do catálogo de magias (D&D 3.5).
 
-Localização: `app.games.dnd35.api.v1.magias`. Shim em `app.api.v1.magias`
-durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.magias` (registrado em `app.main`).
 """
 
 from io import BytesIO
@@ -12,12 +11,12 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from app.core.catalog_cache import catalog_cache, make_cache_key
+from app.shared.core.catalog_cache import catalog_cache, make_cache_key
 from app.core.config import settings
 from app.core.text_utils import normalizar_classe_acesso
 from app.core.dependencies import get_magia_import_service, get_magia_service
 from app.core.database import get_db
-from app.core.deps import requer_mestre_ou_admin
+from app.shared.core.deps import requer_mestre_ou_admin
 from app.games.dnd35.models.magia import Magia
 from app.games.dnd35.repositories.magia_repository import MagiaRepository
 from app.games.dnd35.schemas.magia import (

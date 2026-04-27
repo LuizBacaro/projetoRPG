@@ -18,7 +18,7 @@ from ..models.divindade_custom import DivindadeCustom
 from ..repositories.divindade_custom_repository import DivindadeCustomRepository
 
 from ....core import divindades_catalogo as _divindades_catalogo
-from ....exceptions.custom_exceptions import DadosInvalidos
+from ....shared.exceptions.custom_exceptions import DadosInvalidos
 from .magia_service import DOMINIOS_FIXOS
 
 

@@ -3,16 +3,15 @@ Router de Condições
 Princípio SOLID: SRP - Apenas HTTP routing de Condição
 DIP - Depende de get_condicao_service (abstração)
 
-Implementação em `app.games.dnd35.api.v1.condicoes`; shim em
-`app.api.v1.condicoes` durante a reorganização multi-jogo.
+Canônico em `app.games.dnd35.api.v1.condicoes` (registrado em `app.main`).
 """
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_condicao_service
-from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
-from app.exceptions.custom_exceptions import ArenaBaseException
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.shared.exceptions.custom_exceptions import ArenaBaseException
 from app.games.dnd35.schemas.condicao import (
     AplicarCondicaoMassaRequest,
     AplicarCondicaoMassaResponse,

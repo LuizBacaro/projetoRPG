@@ -7,11 +7,11 @@ from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
 
 from app.api.v1.auth import router as auth_router
-from app.core.deps import get_db
-from app.core.security import criar_token, hash_senha
+from app.shared.core.deps import get_db
+from app.shared.core.security import criar_token, hash_senha
 from app.core.config import settings
 from app.core.database import Base
-from app.models.usuario import PerfilUsuario, Usuario
+from app.shared.models.usuario import PerfilUsuario, Usuario
 
 
 @pytest.fixture(scope="function")

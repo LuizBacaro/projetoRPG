@@ -2,8 +2,8 @@ from fastapi import Response
 
 from app.games.dnd35.api.v1.magias import listar_magias
 from app.games.dnd35.models.magia import Magia, MagiaClasse
-from app.models.usuario import PerfilUsuario, Usuario
-from app.repositories.usuario_repository import UsuarioRepository
+from app.shared.models.usuario import PerfilUsuario, Usuario
+from app.shared.repositories.usuario_repository import UsuarioRepository
 
 
 def test_listar_magias_aplica_paginacao_e_headers(test_db):

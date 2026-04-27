@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.api.v1.combate import router as combate_router
+from app.games.dnd35.api.v1.combate import router as combate_router
 
 
 class _FakeCombateService:
@@ -36,7 +36,8 @@ def test_listar_historico_endpoint_retorna_payload_paginado():
 
     fake_service = _FakeCombateService()
 
-    from app.api.v1.combate import get_combate_service, get_usuario_atual
+    from app.core.dependencies import get_combate_service
+    from app.shared.core.deps import get_usuario_atual
 
     app.dependency_overrides[get_combate_service] = lambda: fake_service
     app.dependency_overrides[get_usuario_atual] = lambda: object()

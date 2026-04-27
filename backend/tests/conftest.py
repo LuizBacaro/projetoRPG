@@ -5,6 +5,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.core.database import Base
+import app.models  # noqa: F401 - registra mappers/tabelas no metadata global
 
 
 @pytest.fixture(scope="function")

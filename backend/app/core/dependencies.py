@@ -16,7 +16,7 @@ from ..games.dnd35.repositories.campanha_repository import CampanhaRepository
 from ..games.dnd35.repositories.sessao_campanha_repository import (
     SessaoCampanhaRepository,
 )
-from ..repositories.game_repository import (
+from ..shared.repositories.game_repository import (
     GameRepository,
     UserGameMembershipRepository,
 )
@@ -26,7 +26,7 @@ from ..games.dnd35.services.magia_service import MagiaService
 from ..games.dnd35.services.grimorio_service import GrimorioService
 from ..games.dnd35.services.campanha_service import CampanhaService
 from ..games.dnd35.services.sessao_campanha_service import SessaoCampanhaService
-from ..services.game_service import GameService
+from ..shared.services.game_service import GameService
 
 # ==================== REPOSITORIES ====================
 

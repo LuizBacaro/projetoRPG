@@ -4,7 +4,7 @@ SRP: regras de negócio para ataques e slots de magia
 """
 from typing import List
 
-from app.exceptions.custom_exceptions import CombatenteNaoEncontrado
+from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 from app.games.dnd35.models.ataque import Ataque, MagiaSlot
 from app.games.dnd35.repositories.ataque_repository import AtaqueRepository
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository

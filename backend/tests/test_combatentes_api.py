@@ -7,9 +7,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.v1.combatentes import router as combatentes_router
+from app.games.dnd35.api.v1.combatentes import router as combatentes_router
 from app.core.database import Base, get_db
-from app.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
 from app.games.dnd35.models.talento import Talento, TalentoJogador
 

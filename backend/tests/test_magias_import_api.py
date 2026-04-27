@@ -5,9 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.v1.magias import router as magias_router
+from app.games.dnd35.api.v1.magias import router as magias_router
 from app.core.database import Base, get_db
-from app.core.deps import get_usuario_atual, requer_mestre_ou_admin
+from app.shared.core.deps import get_usuario_atual, requer_mestre_ou_admin
 from app.games.dnd35.services.magia_import_service import MagiaImportService
 
 

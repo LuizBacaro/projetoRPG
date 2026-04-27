@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.core.request_size import RequestSizeLimitMiddleware
+from app.shared.core.request_size import RequestSizeLimitMiddleware
 
 
 def _build_app() -> FastAPI:

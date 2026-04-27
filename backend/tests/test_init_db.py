@@ -1,9 +1,9 @@
 from sqlalchemy.exc import IntegrityError
 
 from app.core.init_db import criar_admin_padrao
-from app.core.security import verificar_senha
-from app.models.usuario import PerfilUsuario, Usuario
-from app.repositories.usuario_repository import UsuarioRepository
+from app.shared.core.security import verificar_senha
+from app.shared.models.usuario import PerfilUsuario, Usuario
+from app.shared.repositories.usuario_repository import UsuarioRepository
 
 
 def test_criar_admin_padrao_cria_quando_nao_existe(test_db, monkeypatch):

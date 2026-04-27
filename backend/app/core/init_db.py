@@ -5,7 +5,7 @@ SOLID: Single Responsibility — responsável APENAS por inicialização
 """
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from ..core.config import settings  # ✅ MUDADO: relativa em vez de absoluta
+from ..core.config import settings
 from .bonus_base_ataque import (
     calcular_bonus_base_ataque,
     calcular_habilidades_especiais,
@@ -14,10 +14,10 @@ from .bonus_base_ataque import (
 )
 import json
 from .classes_tables_catalog import initialize_classes_tables_catalog
-from ..models.usuario import Usuario, PerfilUsuario
+from ..shared.models.usuario import Usuario, PerfilUsuario
 from ..games.dnd35.models.combatente import Combatente
-from ..models.game import Game, UserGameMembership
-from .security import hash_senha
+from ..shared.models.game import Game, UserGameMembership
+from ..shared.core.security import hash_senha
 import logging
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ def criar_admin_padrao(db: Session) -> None:
     Args:
         db: Sessão do banco de dados
     """
-    from ..repositories.usuario_repository import UsuarioRepository
+    from ..shared.repositories.usuario_repository import UsuarioRepository
 
     repo = UsuarioRepository(db)
 
