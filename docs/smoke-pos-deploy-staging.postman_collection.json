@@ -1,0 +1,235 @@
+{
+  "info": {
+    "_postman_id": "7cb4dd62-31c1-4c0f-b4ea-8c3f2f9b5bc1",
+    "name": "Arena TTRPG - Smoke Pos Deploy (Staging)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Colecao de smoke pos-deploy para staging, com variaveis isoladas (stg_*)."
+  },
+  "variable": [
+    {
+      "key": "stg_api_base_url",
+      "value": "https://<staging-api-url>"
+    },
+    {
+      "key": "stg_admin_email",
+      "value": "<staging_admin_email>"
+    },
+    {
+      "key": "stg_admin_password",
+      "value": "<staging_admin_password>"
+    },
+    {
+      "key": "stg_access_token",
+      "value": ""
+    },
+    {
+      "key": "stg_refresh_token",
+      "value": ""
+    },
+    {
+      "key": "stg_game_access_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Docs (staging)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{stg_api_base_url}}/api/docs",
+          "host": [
+            "{{stg_api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "docs"
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 - Login (staging)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const data = pm.response.json();",
+              "if (data.access_token) pm.collectionVariables.set('stg_access_token', data.access_token);",
+              "if (data.refresh_token) pm.collectionVariables.set('stg_refresh_token', data.refresh_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{stg_admin_email}}\",\n  \"senha\": \"{{stg_admin_password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{stg_api_base_url}}/api/v1/auth/login",
+          "host": [
+            "{{stg_api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 - Refresh (staging)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refresh_token\": \"{{stg_refresh_token}}\"\n}"
+        },
+        "url": {
+          "raw": "{{stg_api_base_url}}/api/v1/auth/refresh",
+          "host": [
+            "{{stg_api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "refresh"
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 - Games (staging)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{stg_access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{stg_api_base_url}}/api/v1/games",
+          "host": [
+            "{{stg_api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "games"
+          ]
+        }
+      }
+    },
+    {
+      "name": "05 - Selecionar jogo dnd35 (staging)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const data = pm.response.json();",
+              "if (data.access_token) pm.collectionVariables.set('stg_game_access_token', data.access_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{stg_access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"game_slug\": \"dnd35\"\n}"
+        },
+        "url": {
+          "raw": "{{stg_api_base_url}}/api/v1/games/selecionar",
+          "host": [
+            "{{stg_api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "games",
+            "selecionar"
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 - Combatentes (staging)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{stg_game_access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{stg_api_base_url}}/api/v1/combatentes",
+          "host": [
+            "{{stg_api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "combatentes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "07 - Campanhas (staging)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{stg_game_access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{stg_api_base_url}}/api/v1/campanhas",
+          "host": [
+            "{{stg_api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "campanhas"
+          ]
+        }
+      }
+    }
+  ]
+}

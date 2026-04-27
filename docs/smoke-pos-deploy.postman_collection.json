@@ -1,0 +1,272 @@
+{
+  "info": {
+    "_postman_id": "b6b3aa25-2a5e-4c5d-8d67-5a7ec5f5de11",
+    "name": "Arena TTRPG - Smoke Pos Deploy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Colecao de smoke pos-deploy (auth, games e rotas criticas D&D 3.5)."
+  },
+  "variable": [
+    {
+      "key": "api_base_url",
+      "value": "https://projetorpg-7ih3.onrender.com"
+    },
+    {
+      "key": "admin_email",
+      "value": "<admin_email>"
+    },
+    {
+      "key": "admin_password",
+      "value": "<admin_password>"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "game_access_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Docs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_base_url}}/api/docs",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "docs"
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 - Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const data = pm.response.json();",
+              "if (data.access_token) pm.collectionVariables.set('access_token', data.access_token);",
+              "if (data.refresh_token) pm.collectionVariables.set('refresh_token', data.refresh_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"senha\": \"{{admin_password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{api_base_url}}/api/v1/auth/login",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 - Refresh",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+        },
+        "url": {
+          "raw": "{{api_base_url}}/api/v1/auth/refresh",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "refresh"
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 - Games (catalogo autenticado)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api_base_url}}/api/v1/games",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "games"
+          ]
+        }
+      }
+    },
+    {
+      "name": "05 - Selecionar jogo dnd35",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const data = pm.response.json();",
+              "if (data.access_token) pm.collectionVariables.set('game_access_token', data.access_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"game_slug\": \"dnd35\"\n}"
+        },
+        "url": {
+          "raw": "{{api_base_url}}/api/v1/games/selecionar",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "games",
+            "selecionar"
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 - Combatentes (rota critica)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{game_access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api_base_url}}/api/v1/combatentes",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "combatentes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "07 - Campanhas (rota critica alternativa)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{game_access_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api_base_url}}/api/v1/campanhas",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "campanhas"
+          ]
+        }
+      }
+    },
+    {
+      "name": "08 - Auth me sem token (controle)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_base_url}}/api/v1/auth/me",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "09 - Games sem token (controle)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_base_url}}/api/v1/games",
+          "host": [
+            "{{api_base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "games"
+          ]
+        }
+      }
+    }
+  ]
+}

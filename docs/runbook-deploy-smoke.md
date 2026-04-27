@@ -3,6 +3,9 @@
 Guia curto em **português (Brasil)** para deploy seguro da Arena TTRPG (API no **Render**, banco no **Neon**, front no **Vercel** ou domínio próprio). Não substitui backup completo nem revisão de código; evita esquecimentos comuns.
 
 **Referências:** `README.md` (URLs de produção), `FIX_MIGRATIONS_STARTUP.md` (Alembic no startup), `docs/arquitetura-multi-jogo.md` (multi-jogo), `backend/.env.example`.
+Coleção pronta de comandos: `docs/smoke-pos-deploy-curl.md`.
+Coleção Postman (importável): `docs/smoke-pos-deploy.postman_collection.json`.
+Coleção Postman dedicada a staging (variáveis `stg_*`): `docs/smoke-pos-deploy-staging.postman_collection.json`.
 
 ---
 
