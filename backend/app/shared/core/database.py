@@ -40,20 +40,28 @@ def _build_engine():
         # PostgreSQL: após a migration `fase_c_schemas_auth_dnd35`, tabelas ficam em
         # `auth` e `dnd35`. Os modelos usam nomes não qualificados; sem search_path o
         # Postgres só resolve `public` e falha com "relation does not exist".
+        #
+        # Não usar `connect_args["options"]=-csearch_path=...`: o pooler da Neon rejeita
+        # search_path no pacote de startup. Ajustar com SET após conectar (Neon docs).
         engine_config.update({
             "pool_pre_ping": True,      # testa conexão antes de usar
             "pool_recycle": 300,        # recicla a cada 5 min
             "pool_size": 5,             # máximo de conexões ativas
             "max_overflow": 10,         # conexões extras sob carga
-            "connect_args": {
-                "options": "-csearch_path=auth,dnd35,public",
-            },
         })
         logger.info(
-            "🟢 Database: PostgreSQL — search_path=auth,dnd35,public — Pool 5+10"
+            "🟢 Database: PostgreSQL — SET search_path após connect (auth,dnd35,public)"
         )
 
     engine = create_engine(**engine_config)
+
+    if not is_sqlite:
+
+        @event.listens_for(engine, "connect")
+        def _postgres_set_search_path(dbapi_conn, connection_record):
+            cur = dbapi_conn.cursor()
+            cur.execute("SET search_path TO auth, dnd35, public")
+            cur.close()
 
     # ✅ ADICIONADO — listener para melhor logging (opcional)
     if settings.ENVIRONMENT == "development":

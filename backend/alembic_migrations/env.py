@@ -8,7 +8,7 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
-from sqlalchemy import create_engine, engine_from_config, pool
+from sqlalchemy import create_engine, engine_from_config, pool, text
 from alembic import context
 
 # Configuração do sys.path
@@ -59,13 +59,7 @@ def run_migrations_online() -> None:
     configuration["sqlalchemy.url"] = url
 
     if url.startswith("postgresql"):
-        connectable = create_engine(
-            url,
-            poolclass=pool.NullPool,
-            connect_args={
-                "options": "-csearch_path=auth,dnd35,public",
-            },
-        )
+        connectable = create_engine(url, poolclass=pool.NullPool)
     else:
         connectable = engine_from_config(
             configuration,
@@ -74,6 +68,9 @@ def run_migrations_online() -> None:
         )
 
     with connectable.connect() as connection:
+        if url.startswith("postgresql"):
+            # Neon pooler rejeita search_path em startup; SET após conectar (igual app).
+            connection.execute(text("SET search_path TO auth, dnd35, public"))
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
