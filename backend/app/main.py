@@ -172,6 +172,10 @@ if FRONTEND_DIR.exists():
             logger.info("✅ Frontend %s montado em: %s", _slug, _game_dir)
     # Shell global (login, seletor de jogo, redirects legados /pages/*.html)
     app.mount("/pages", StaticFiles(directory=str(FRONTEND_DIR / "pages")), name="pages")
+    _js_dir = FRONTEND_DIR / "js"
+    if _js_dir.is_dir():
+        app.mount("/js", StaticFiles(directory=str(_js_dir)), name="frontend_js")
+        logger.info("✅ JS estático montado em /js → %s", _js_dir)
     _assets_dir = FRONTEND_DIR / "assets"
     if _assets_dir.is_dir():
         app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="frontend_assets")

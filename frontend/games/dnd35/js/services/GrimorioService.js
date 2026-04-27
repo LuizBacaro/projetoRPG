@@ -140,7 +140,7 @@ export class GrimorioService {
     }
 
     async listarNotificacoes(combatenteId, { classe, apenasNaoLidas = false, limit = 30, forceSync = false } = {}) {
-        const query = this._query({ classe, apenas_nao_lidas: apenasNaoLidas, limit, force_sync: forceSync || undefined });
+        const query = this._query({ classe, apenas_nao_lidas: apenasNaoLidas, limit, force_sync: forceSync });
         const url = getApiUrl(`/grimorio/${combatenteId}/notificacoes${query}`);
         const response = await fetch(url, { headers: this._headers() });
         if (!response.ok) {
