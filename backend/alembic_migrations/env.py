@@ -8,7 +8,7 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import create_engine, engine_from_config, pool
 from alembic import context
 
 # Configuração do sys.path
@@ -54,14 +54,24 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Modo online."""
+    url = _get_database_url()
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = _get_database_url()
+    configuration["sqlalchemy.url"] = url
 
-    connectable = engine_from_config(
-        configuration,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    if url.startswith("postgresql"):
+        connectable = create_engine(
+            url,
+            poolclass=pool.NullPool,
+            connect_args={
+                "options": "-csearch_path=auth,dnd35,public",
+            },
+        )
+    else:
+        connectable = engine_from_config(
+            configuration,
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
 
     with connectable.connect() as connection:
         context.configure(

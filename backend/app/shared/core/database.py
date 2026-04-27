@@ -37,14 +37,21 @@ def _build_engine():
         engine_config["connect_args"] = {"check_same_thread": False}
         logger.info(f"🔵 Database: SQLite — {settings.DATABASE_URL}")
     else:
-        # PostgreSQL em Railway
+        # PostgreSQL: após a migration `fase_c_schemas_auth_dnd35`, tabelas ficam em
+        # `auth` e `dnd35`. Os modelos usam nomes não qualificados; sem search_path o
+        # Postgres só resolve `public` e falha com "relation does not exist".
         engine_config.update({
             "pool_pre_ping": True,      # testa conexão antes de usar
             "pool_recycle": 300,        # recicla a cada 5 min
             "pool_size": 5,             # máximo de conexões ativas
             "max_overflow": 10,         # conexões extras sob carga
+            "connect_args": {
+                "options": "-csearch_path=auth,dnd35,public",
+            },
         })
-        logger.info(f"🟢 Database: PostgreSQL — Neon — Pool Size: 5 + 10")
+        logger.info(
+            "🟢 Database: PostgreSQL — search_path=auth,dnd35,public — Pool 5+10"
+        )
 
     engine = create_engine(**engine_config)
 

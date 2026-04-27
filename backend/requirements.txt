@@ -28,7 +28,8 @@ aiofiles==23.2.1
 passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
 
-email-validator==2.1.0
+# 2.1.0 foi yanked no PyPI (python_requires); 2.1.1 corrige metadados.
+email-validator==2.1.1
 
 python-jose[cryptography]
 
