@@ -3,16 +3,20 @@ main.py
 SRP: Entry point da aplicação — orquestra inicialização e rotas
 SOLID: Dependency Injection via contexto FastAPI
 """
+import asyncio
+import logging
+import os
+import threading
+import unicodedata
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException, Query, Response
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse
-from pathlib import Path
-import logging
-import unicodedata
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import inspect, text
-import os
+from starlette.requests import Request
 
 from .shared.core.config import settings
 from .shared.core.database import engine, Base, SessionLocal, get_db
@@ -72,6 +76,11 @@ from .games.dnd35.models import sessao_campanha as sessao_campanha_model
 logger = logging.getLogger(__name__)
 CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
 
+# Inicialização pesada do BD (Alembic + seeds). Em production corre em background
+# para o Render não dar timeout no deploy (health check antes do fim do startup).
+_db_startup_done = threading.Event()
+
+
 # ── Instância FastAPI ────────────────────────────────────────────────────────
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -81,6 +90,23 @@ app = FastAPI(
     docs_url="/api/docs" if settings.ENVIRONMENT != "production" else None,
     redoc_url="/api/redoc" if settings.ENVIRONMENT != "production" else None,
 )
+
+
+@app.middleware("http")
+async def _readiness_middleware(request: Request, call_next):
+    """
+    Em production, /api/* fica 503 até `_inicializar_banco` concluir (startup em background).
+    OPTIONS passa (CORS preflight). /health/live e /health/ping não passam por /api.
+    """
+    if settings.ENVIRONMENT == "production" and not _db_startup_done.is_set():
+        path = request.url.path or ""
+        if path.startswith("/api") and request.method != "OPTIONS":
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "Inicialização do banco em curso; tente em instantes."},
+            )
+    return await call_next(request)
+
 
 # ── Middleware CORS ──────────────────────────────────────────────────────────
 # Origens vêm do .env (ALLOWED_ORIGINS) — nunca usar "*" com allow_credentials
@@ -253,6 +279,15 @@ async def pericias_page():
 
 # ── Health Check ─────────────────────────────────────────────────────────────
 
+@app.get("/health/live", include_in_schema=False)
+async def health_live():
+    """
+    Liveness sem I/O: use como **Health Check Path** no Render para evitar timeout
+    no deploy enquanto migrations/seeds correm em background (production).
+    """
+    return {"status": "live"}
+
+
 @app.get("/health")
 async def health():
     """Verificar saúde da API e conectividade com o banco."""
@@ -292,25 +327,55 @@ async def health_ping(token: str | None = Query(default=None)):
 @app.on_event("startup")
 async def startup_event():
     """
-    Inicializa aplicação:
-    1. Cria admin padrão
-    2. Popula combatentes iniciais
-    3. Popula condições D&D
-    4. Popula perícias D&D
+    Inicializa aplicação (migrations, seeds, admin).
+
+    Em **production** o trabalho corre em thread via `asyncio.to_thread` para o
+    processo aceitar conexões de imediato — configure no Render o health check
+    em `/health/live`. Em development mantém-se síncrono (comportamento anterior).
     """
-    db = SessionLocal()
+
+    def _run_init_sync() -> None:
+        db = SessionLocal()
+        try:
+            _inicializar_banco(db)
+        finally:
+            db.close()
+
+    async def _run_init_async() -> None:
+        await asyncio.to_thread(_run_init_sync)
+        _db_startup_done.set()
+
     try:
-        _inicializar_banco(db)
-        logger.info("✅ Aplicação inicializada com sucesso")
-        print("=" * 60)
-        print("✅ API INICIADA COM SUCESSO")
-        print("=" * 60)
+        if settings.ENVIRONMENT == "production":
+
+            def _log_task_fail(t: asyncio.Task) -> None:
+                try:
+                    exc = t.exception()
+                except asyncio.CancelledError:
+                    return
+                if exc is not None:
+                    logger.exception("❌ Falha na inicialização do banco (background): %s", exc)
+
+            task = asyncio.create_task(_run_init_async())
+            task.add_done_callback(_log_task_fail)
+            await asyncio.sleep(0)  # dá ao loop uma oportunidade de arrancar a task
+            logger.info(
+                "Startup production: BD a inicializar em background — "
+                "Health check no Render: /health/live; /api fica 503 até concluir."
+            )
+            print("=" * 60)
+            print("✅ API A ACEITAR TRÁFEGO — BD a inicializar em background")
+            print("=" * 60)
+        else:
+            await _run_init_async()
+            logger.info("✅ Aplicação inicializada com sucesso")
+            print("=" * 60)
+            print("✅ API INICIADA COM SUCESSO")
+            print("=" * 60)
     except Exception as e:
         logger.error(f"❌ Erro durante startup: {str(e)}")
         print(f"❌ Erro durante startup: {str(e)}")
         raise
-    finally:
-        db.close()
 
 
 # ── Funções de Inicialização ─────────────────────────────────────────────────
