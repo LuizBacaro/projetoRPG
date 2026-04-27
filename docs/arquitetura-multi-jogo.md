@@ -378,7 +378,8 @@ frontend/
    de manutenção em prod e backup confirmado. Não foi feito junto com
    a reorganização de pastas porque schemas Postgres não funcionam em
    SQLite local sem ginástica adicional, e misturar os dois mascara
-   bugs. Plano técnico:
+   bugs. Plano técnico (detalhado em
+   [`fase-c-adr-schemas-postgres.md`](./fase-c-adr-schemas-postgres.md)):
    - Migration Alembic que faz `CREATE SCHEMA auth; CREATE SCHEMA dnd35;`
      e `ALTER TABLE ... SET SCHEMA ...` para cada tabela.
    - `__table_args__ = {"schema": "..."}` nos models, com switch

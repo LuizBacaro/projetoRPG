@@ -164,6 +164,10 @@ mitigar com um módulo por PR.
 
 ## Fase C — Schemas Postgres (`auth`, `dnd35`)
 
+**ADR/Runbook desta fase:** [fase-c-adr-schemas-postgres.md](./fase-c-adr-schemas-postgres.md)  
+**Inventário técnico inicial:** [fase-c-inventario-tecnico-schemas.md](./fase-c-inventario-tecnico-schemas.md)  
+**Runbook operacional (staging):** [fase-c-runbook-execucao-staging.md](./fase-c-runbook-execucao-staging.md)
+
 **Problema:** todas as tabelas no `public` (ou schema default); separação
 lógica auth vs jogo exige disciplina em código e complica futuro multi-DB.
 
