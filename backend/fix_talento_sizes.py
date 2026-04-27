@@ -1,7 +1,7 @@
 """
 Script para corrigir tamanho das colunas na tabela talentos
 """
-from app.core.database import engine
+from app.shared.core.database import engine
 from sqlalchemy import text
 
 

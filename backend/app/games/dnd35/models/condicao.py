@@ -4,7 +4,7 @@ Princípio SOLID: SRP - Entidade responsável apenas por representar uma Condiç
 """
 from sqlalchemy import Column, Integer, String, Text
 
-from app.core.database import Base
+from app.shared.core.database import Base
 
 
 class Condicao(Base):

@@ -6,7 +6,7 @@ Implementa DIP - Dependency Inversion Principle
 from datetime import datetime, timezone
 from typing import Generic, TypeVar, Type, List, Optional
 from sqlalchemy.orm import Query, Session
-from ..core.database import Base
+from ..shared.core.database import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 

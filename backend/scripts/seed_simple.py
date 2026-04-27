@@ -13,7 +13,7 @@ sys.path.insert(0, str(backend_dir / 'scripts'))
 print(f"📁 Backend dir: {backend_dir}")
 
 try:
-    from app.core.database import SessionLocal, Base, engine
+    from app.shared.core.database import SessionLocal, Base, engine
     from app.games.dnd35.models.combatente import Combatente
     from app.games.dnd35.models.pericia import Pericia, PericiaClasse
     import app.games.dnd35.models.combate  # Importar para criar tabela

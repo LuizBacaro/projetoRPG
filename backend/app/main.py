@@ -14,8 +14,8 @@ import unicodedata
 from sqlalchemy import inspect, text
 import os
 
-from .core.config import settings
-from .core.database import engine, Base, SessionLocal, get_db
+from .shared.core.config import settings
+from .shared.core.database import engine, Base, SessionLocal, get_db
 from .core.init_db import (
     criar_admin_padrao,
     inicializar_catalogo_jogos,

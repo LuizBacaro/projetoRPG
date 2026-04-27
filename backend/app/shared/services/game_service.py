@@ -13,7 +13,7 @@ from typing import List, Optional, Tuple
 
 from fastapi import HTTPException, status
 
-from ...core.config import settings
+from ...shared.core.config import settings
 from ..core.security import criar_token
 from ..constants import GAME_SLUG_DND35
 from ..models.game import Game, UserGameMembership
@@ -22,7 +22,7 @@ from ..repositories.game_repository import (
     GameRepository,
     UserGameMembershipRepository,
 )
-from ...schemas.game import (
+from ..schemas.game import (
     GameResponse,
     UserGameMembershipResponse,
     TokenComJogoResponse,

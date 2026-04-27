@@ -9,7 +9,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
+from app.shared.core.database import get_db
 from app.shared.core.deps import (
     requer_dono_ou_admin_combatente,
     requer_dono_ou_admin_slot_magia,

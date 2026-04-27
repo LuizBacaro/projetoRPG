@@ -27,7 +27,7 @@ DEFAULT_JSON = REPO_ROOT / "talentos_importacao_limpo.json"
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-from app.core.database import SessionLocal  # noqa: E402
+from app.shared.core.database import SessionLocal  # noqa: E402
 from app.core.talentos_catalog_seed import (  # noqa: E402
     aplicar_mapeamento_seed_antigo,
     default_json_path,

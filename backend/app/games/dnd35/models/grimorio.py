@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 
-from app.core.database import Base
+from app.shared.core.database import Base
 
 
 class GrimorioMagia(Base):

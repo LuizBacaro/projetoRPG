@@ -4,7 +4,7 @@ SRP: representa a entidade usuário no banco de dados
 """
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum as SAEnum
 from sqlalchemy.sql import func
-from ...core.database import Base
+from ...shared.core.database import Base
 import enum
 
 

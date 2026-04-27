@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 from typing import Optional
 import logging
 
-from ...core.config import settings
-from ...core.database import get_db
+from ...shared.core.config import settings
+from ...shared.core.database import get_db
 from .security import decodificar_token
 from .security_audit import log_security_event
 from ...shared.repositories.usuario_repository import UsuarioRepository

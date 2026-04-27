@@ -18,7 +18,7 @@ import sys
 backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, backend_dir)
 
-from app.core.database import SessionLocal  # noqa: E402
+from app.shared.core.database import SessionLocal  # noqa: E402
 from app.games.dnd35.models.combatente import Combatente  # noqa: E402
 from app.repositories.base import apply_not_deleted  # noqa: E402
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository  # noqa: E402

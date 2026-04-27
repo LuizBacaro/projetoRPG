@@ -15,7 +15,7 @@ backend_root = Path(__file__).parent
 sys.path.insert(0, str(backend_root))
 
 # Imports dos models
-from app.core.database import Base
+from app.shared.core.database import Base
 from app.shared.models.usuario import Usuario
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.magia import Magia

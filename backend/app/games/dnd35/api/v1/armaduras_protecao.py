@@ -11,7 +11,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
+from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_combatente,

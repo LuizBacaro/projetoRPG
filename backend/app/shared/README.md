@@ -7,11 +7,11 @@ hub → `shared`, Postgres, produto): `docs/roteiro-melhorias-arquitetura.md`.
 
 ## Estado vigente (abr/2026)
 
-- O **código do hub** (config, database, deps, security, `Usuario`, `Game`,
-  rotas `auth` / `usuarios` / `games`, etc.) continua majoritariamente nos
-  paths históricos: `app/core/`, `app/models/` (com `mixins.py` e `__init__.py`
-  que também agrega modelos D&D 3.5 para metadata/Alembic),
-  `app/schemas/`, `app/repositories/`, `app/services/`, `app/api/v1/`.
+- O **código do hub** já está canônico em `app/shared/` (`core`, `models`,
+  `schemas`, `repositories`, `services`, `api/v1`, `exceptions`).
+- Os paths históricos (`app/core`, `app/models`, `app/schemas`,
+  `app/repositories`, `app/services`, `app/api/v1`) foram mantidos como shims
+  para compatibilidade durante o rollout.
 - `app/models/usuario.py` e `app/models/game.py` já são shims; os modelos
   canónicos vivem em `app/shared/models/usuario.py` e
   `app/shared/models/game.py`.
@@ -20,15 +20,18 @@ hub → `shared`, Postgres, produto): `docs/roteiro-melhorias-arquitetura.md`.
   vivem em `app/shared/repositories/`.
 - `app/services/usuario_service.py` e `app/services/game_service.py` já são
   shims; os services canónicos vivem em `app/shared/services/`.
+- `app/schemas/usuario.py`, `app/schemas/game.py` e `app/schemas/auth.py` já
+  são shims; os schemas canónicos do hub vivem em `app/shared/schemas/`.
 - `app/api/v1/auth.py`, `app/api/v1/usuarios.py` e `app/api/v1/games.py` já
   são shims; os routers canónicos do hub vivem em `app/shared/api/v1/`.
 - **`app/shared/`** já contém `constants.py`, `shared/exceptions/custom_exceptions.py`
   e módulos em `shared/core/` (`catalog_cache.py`, `request_size.py`,
-  `rate_limit.py`, `security_audit.py`, `security.py`, `deps.py`) em uso
-  pelo backend; os paths legados `app.exceptions.custom_exceptions`,
-  `app.core.catalog_cache`, `app.core.request_size`, `app.core.rate_limit`,
-  `app.core.security_audit`, `app.core.security` e `app.core.deps` foram
-  mantidos como shims.
+  `rate_limit.py`, `security_audit.py`, `security.py`, `deps.py`,
+  `config.py`, `database.py`) em uso pelo backend; os paths legados
+  `app.exceptions.custom_exceptions`, `app.core.catalog_cache`,
+  `app.core.request_size`, `app.core.rate_limit`, `app.core.security_audit`,
+  `app.core.security`, `app.core.deps`, `app.core.config` e
+  `app.core.database` foram mantidos como shims.
   O restante da árvore continua em migração incremental.
 - **D&D 3.5** vive em `app/games/dnd35/` (`models`, `schemas`, `repositories`,
   `services`, `api/v1`, …). Não há ficheiros-shim por domínio em
@@ -64,7 +67,7 @@ hub → `shared`, Postgres, produto): `docs/roteiro-melhorias-arquitetura.md`.
 ```python
 from app.shared.core.deps import get_usuario_atual
 from app.shared.models.usuario import Usuario
-from app.services.game_service import GameService
+from app.shared.services.game_service import GameService
 ```
 
 **Alvo** (quando o módulo tiver sido movido para `app/shared/...`):

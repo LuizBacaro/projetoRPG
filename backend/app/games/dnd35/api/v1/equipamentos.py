@@ -18,8 +18,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.shared.core.catalog_cache import catalog_cache, make_cache_key
-from app.core.config import settings
-from app.core.database import get_db
+from app.shared.core.config import settings
+from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_admin,

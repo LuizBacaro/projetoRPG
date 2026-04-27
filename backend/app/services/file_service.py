@@ -12,7 +12,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from typing import Optional
 from fastapi import UploadFile
-from ..core.config import settings
+from ..shared.core.config import settings
 from ..shared.exceptions.custom_exceptions import InvalidFileError
 import logging
 

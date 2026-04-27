@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, JSON, String
 
-from app.core.database import Base
+from app.shared.core.database import Base
 
 
 class Combate(Base):

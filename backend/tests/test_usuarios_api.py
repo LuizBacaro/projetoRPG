@@ -7,11 +7,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.api.v1.usuarios import router as usuarios_router
-from app.core.database import get_db
+from app.shared.api.v1.usuarios import router as usuarios_router
+from app.shared.core.database import get_db
 from app.shared.core.deps import requer_admin
 from app.shared.core.security import hash_senha
-from app.core.database import Base
+from app.shared.core.database import Base
 from app.shared.models.usuario import PerfilUsuario, Usuario
 
 

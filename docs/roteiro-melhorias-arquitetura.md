@@ -88,12 +88,17 @@ andaime (`constants.py` + README).
 identidade, sessão, jogos e infra partilhada vive sob `app/shared/...`,
 com imports de aplicação a apontar para o novo path.
 
+**Status:** concluída (abr/2026) com compatibilidade via shims em `app.core.*`,
+`app.models.*`, `app.schemas.*`, `app.repositories.*`, `app.services.*` e
+`app.api.v1.*`.
+
 **Progresso atual (abr/2026):**
 
 - `shared/exceptions/custom_exceptions.py` consolidado com shim em
   `app.exceptions.custom_exceptions`.
 - `shared/core` já canónico para `catalog_cache`, `request_size`, `rate_limit`,
-  `security_audit`, `security` e `deps`, com shims em `app.core.*`.
+  `security_audit`, `security`, `deps`, `config` e `database`, com shims em
+  `app.core.*`.
 - `shared/models` já canónico para `usuario.py` e `game.py`, com shims em
   `app.models.usuario` e `app.models.game`.
 - `shared/repositories` já canónico para `usuario_repository.py` e
@@ -102,8 +107,9 @@ com imports de aplicação a apontar para o novo path.
   `game_service.py`, com shims em `app.services.*`.
 - `shared/api/v1` já canónico para `auth.py`, `usuarios.py` e `games.py`,
   com shims em `app.api.v1.*`.
-- Próximo foco: camadas hub de contratos (`app.schemas/*`) e eventual
-  consolidação de `config/database` conforme estratégia de risco da fase.
+- `shared/schemas` já canónico para `usuario.py`, `game.py` e `auth.py`,
+  com shims em `app.schemas.*`.
+- Próximo foco: governança de retirada de shims e preparação da Fase C.
 
 **Tarefas sugeridas (incremental)**
 
@@ -132,6 +138,24 @@ com imports de aplicação a apontar para o novo path.
 - Testes e arranque local (`uvicorn`) OK.
 - `backend/app/shared/README.md` atualizado com estado “hub migrado” e
   exemplos de import finais.
+
+**Checklist de saída executado (abr/2026):**
+
+- `pytest backend/tests --ignore=backend/tests/e2e` verde.
+- Smoke de runtime: `GET /api/docs` (200), `GET /api/v1/auth/me` (401 sem token),
+  `GET /api/v1/games` (401 sem token).
+- Registro canônico consolidado em `app/shared/{core,models,schemas,repositories,services,api}`.
+- Paths legados preservados como shims para rollout incremental.
+
+**Política de depreciação dos shims (proposta para próximos PRs):**
+
+- Não remover shim no mesmo PR da migração canônica.
+- Remover shim apenas quando:
+  - `rg` não retornar uso interno do path legado; e
+  - houver ao menos 1 ciclo estável de testes/deploy após a migração; e
+  - a remoção estiver documentada em changelog/roteiro.
+- Prioridade de remoção: `app.api.v1.*` e `app.services.*` primeiro, depois
+  `app.repositories.*` / `app.schemas.*`, mantendo `app.core.*` por último.
 
 **Riscos:** import circular (`deps` ↔ `models`); tempo de branch longa —
 mitigar com um módulo por PR.

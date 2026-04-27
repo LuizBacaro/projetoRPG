@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-from app.core.database import Base
+from app.shared.core.database import Base
 from app.core.mixins import SoftDeleteMixin
 
 if TYPE_CHECKING:

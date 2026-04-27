@@ -7,7 +7,7 @@ Canônico em `app.games.dnd35.api.v1.combate` (registrado em `app.main`).
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
+from app.shared.core.database import get_db
 from app.core.dependencies import get_combate_service, get_combatente_service, get_condicao_service
 from app.shared.core.deps import (
     get_usuario_atual,

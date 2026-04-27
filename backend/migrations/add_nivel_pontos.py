@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlalchemy import create_engine, text
-from app.core.config import settings
+from app.shared.core.config import settings
 
 
 def verificar_tabela_existe(conn):
@@ -23,7 +23,7 @@ def criar_tabelas():
     print("🔍 Verificando se tabelas existem...")
     
     try:
-        from app.core.database import Base, engine
+        from app.shared.core.database import Base, engine
         import app.games.dnd35.models.combatente
         import app.games.dnd35.models.combate
         

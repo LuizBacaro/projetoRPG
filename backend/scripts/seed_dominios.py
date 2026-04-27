@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 from sqlalchemy.orm import Session
 from app.models.dominio import Dominio  # Assumindo que Dominio é o modelo SQLAlchemy
-from app.core.database import SessionLocal
+from app.shared.core.database import SessionLocal
 
 # --- DADOS DOS DOMÍNIOS (Extraídos das abas 13-20 do magias.xlsx) ---
 

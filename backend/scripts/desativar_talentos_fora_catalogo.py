@@ -19,7 +19,7 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-from app.core.database import SessionLocal  # noqa: E402
+from app.shared.core.database import SessionLocal  # noqa: E402
 from app.core.talentos_catalog_seed import (  # noqa: E402
     default_json_path,
     desativar_talentos_fora_do_catalogo,

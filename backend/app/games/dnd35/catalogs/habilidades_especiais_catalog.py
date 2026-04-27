@@ -29,7 +29,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from app.core.config import settings
+from app.shared.core.config import settings
 
 
 _DEFAULT_PATH = "docs/dados/habilidades_especiais_catalogo.json"

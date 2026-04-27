@@ -17,8 +17,8 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 import app.models  # noqa: F401
-from app.core.config import settings
-from app.core.database import SessionLocal
+from app.shared.core.config import settings
+from app.shared.core.database import SessionLocal
 from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
 from app.games.dnd35.models.ataque import Ataque, MagiaPreparada, MagiaSlot
 from app.games.dnd35.models.combatente import Combatente

@@ -8,7 +8,7 @@ from pathlib import Path
 # Adicionar app ao path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.core.database import SessionLocal
+from app.shared.core.database import SessionLocal
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 from app.games.dnd35.models.combatente import Combatente
 

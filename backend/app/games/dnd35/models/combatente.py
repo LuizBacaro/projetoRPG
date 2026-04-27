@@ -5,7 +5,7 @@ SRP: representa a tabela combatentes + relacionamentos
 from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.core.database import Base
+from app.shared.core.database import Base
 from app.core.mixins import SoftDeleteMixin
 
 

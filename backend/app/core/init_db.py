@@ -5,7 +5,7 @@ SOLID: Single Responsibility — responsável APENAS por inicialização
 """
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from ..core.config import settings
+from ..shared.core.config import settings
 from .bonus_base_ataque import (
     calcular_bonus_base_ataque,
     calcular_habilidades_especiais,

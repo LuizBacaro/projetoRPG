@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlalchemy import create_engine, text
-from app.core.config import settings
+from app.shared.core.config import settings
 
 
 def migrate():

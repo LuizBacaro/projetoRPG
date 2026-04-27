@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import and_
 
-from app.core.config import settings
+from app.shared.core.config import settings
 from app.games.dnd35.models.talento import Talento, TalentoJogador
 
 if TYPE_CHECKING:

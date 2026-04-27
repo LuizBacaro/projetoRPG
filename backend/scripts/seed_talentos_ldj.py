@@ -14,7 +14,7 @@ from sqlalchemy import text
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
-from app.core.database import SessionLocal, engine
+from app.shared.core.database import SessionLocal, engine
 from app.games.dnd35.models.talento import Talento
 
 

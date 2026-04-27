@@ -1,7 +1,7 @@
 """
 Script de migração para adicionar campos CA, TOQUE e SURPRESA
 """
-from app.core.database import engine
+from app.shared.core.database import engine
 from sqlalchemy import text
 
 

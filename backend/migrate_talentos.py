@@ -1,7 +1,7 @@
 """
 Script para adicionar campos prerequisitos e secao à tabela talentos
 """
-from app.core.database import engine
+from app.shared.core.database import engine
 from sqlalchemy import text
 
 

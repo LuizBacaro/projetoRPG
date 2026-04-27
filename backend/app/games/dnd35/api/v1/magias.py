@@ -12,10 +12,10 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.shared.core.catalog_cache import catalog_cache, make_cache_key
-from app.core.config import settings
+from app.shared.core.config import settings
 from app.core.text_utils import normalizar_classe_acesso
 from app.core.dependencies import get_magia_import_service, get_magia_service
-from app.core.database import get_db
+from app.shared.core.database import get_db
 from app.shared.core.deps import requer_mestre_ou_admin
 from app.games.dnd35.models.magia import Magia
 from app.games.dnd35.repositories.magia_repository import MagiaRepository

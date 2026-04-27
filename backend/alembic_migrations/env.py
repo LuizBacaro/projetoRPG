@@ -22,7 +22,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Importa Base e TODOS os models (com try/except para evitar erros)
-from app.core.database import Base  # noqa: E402
+from app.shared.core.database import Base  # noqa: E402
 from app import models as _models  # noqa: F401,E402
 
 # MetaData do Alembic

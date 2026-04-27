@@ -11,7 +11,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.shared.core.catalog_cache import catalog_cache, make_cache_key
-from app.core.config import settings
+from app.shared.core.config import settings
 from app.shared.core.deps import get_usuario_atual
 from app.games.dnd35.schemas.tabelas_classes import (
     TabelaClassesResponse,

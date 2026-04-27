@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
-from app.core.database import Base
+from app.shared.core.database import Base
 
 
 class Magia(Base):

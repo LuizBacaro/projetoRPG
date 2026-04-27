@@ -4,7 +4,7 @@ Relacionamento N:N entre Combatente e Condição COM duração em turnos.
 """
 from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint
 
-from app.core.database import Base
+from app.shared.core.database import Base
 
 
 class CombatenteCondicao(Base):

@@ -7,7 +7,7 @@ from fastapi import HTTPException, status
 from ..core.security import hash_senha, verificar_senha
 from ..models.usuario import Usuario, PerfilUsuario
 from ..repositories.usuario_repository import UsuarioRepository
-from ...schemas.usuario import UsuarioCreate, UsuarioUpdate
+from ..schemas.usuario import UsuarioCreate, UsuarioUpdate
 
 
 class UsuarioService:
