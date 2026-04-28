@@ -136,7 +136,7 @@ def seed_equipamentos(db) -> None:
     - Remove entradas legadas (sem categoria) não usadas em equipamentos_jogador.
     - Para cada item da planilha: insere ou atualiza por nome (entre ativos).
     """
-    from app.models.equipamento import Equipamento, EquipamentoJogador
+    from app.games.dnd35.models.equipamento import Equipamento, EquipamentoJogador
 
     usados = {
         row[0]

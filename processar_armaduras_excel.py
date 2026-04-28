@@ -146,7 +146,7 @@ Gerado automaticamente a partir da planilha Excel.
 
 from datetime import datetime, timezone
 
-from app.models.armadura_protecao import ArmaduraProtecao
+from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao
 
 
 ARMADURAS_PROTECAO_DADOS = [

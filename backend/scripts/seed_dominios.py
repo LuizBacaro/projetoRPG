@@ -9,13 +9,13 @@ focando exclusivamente na inserção e atualização dos registros de domínios.
 import os
 import sys
 import json
-from typing import List, Tuple, Dict, Any
+from typing import NoReturn
 
 # Adiciona o diretório raiz do projeto ao PATH para permitir imports relativos
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from sqlalchemy.orm import Session
-from app.models.dominio import Dominio  # Assumindo que Dominio é o modelo SQLAlchemy
+
 from app.shared.core.database import SessionLocal
 
 # --- DADOS DOS DOMÍNIOS (Extraídos das abas 13-20 do magias.xlsx) ---
@@ -1032,71 +1032,20 @@ ALL_DOMAINS = [
     DOMINIO_VIAGEM,
 ]
 
-def seed_dominios(db: Session, force: bool = False) -> Dict[str, int]:
+def seed_dominios(_db: Session, _force: bool = False) -> NoReturn:
     """
-    Popula a tabela de domínios no banco de dados.
+    Dados de referência permanecem em ``ALL_DOMAINS`` neste ficheiro.
 
-    Args:
-        db (Session): A sessão do banco de dados.
-        force (bool): Se True, limpa a tabela antes de inserir.
-
-    Returns:
-        Dict[str, int]: Um dicionário com estatísticas da operação (inseridos, ignorados, erros, total).
+    O schema atual **não** inclui tabela/modelo ORM ``Dominio``; domínios de
+    clérigo estão modelados nas magias (ex.: colunas ``dominios`` /
+    ``e_magia_dominio``) e seeds PHB em ``scripts/seed_magias.py`` / pipelines
+    associados. Não executar este módulo como seed até existir migração + modelo
+    alinhados, se for reintroduzido.
     """
-    stats = {'inseridos': 0, 'ignorados': 0, 'erros': 0, 'total': len(ALL_DOMAINS)}
-    batch_size = 10
-    current_batch = []
-
-    print(f"✨ Iniciando o processo de seed para Domínios (total: {stats['total']})...")
-
-    try:
-        if force:
-            print("🗑️ Forçando a limpeza da tabela 'dominios'...")
-            db.query(Dominio).delete()
-            db.commit()
-            print("✅ Tabela 'dominios' limpa com sucesso.")
-        else:
-            if db.query(Dominio).first():
-                print("⚠️ Tabela 'dominios' já populada. Use 'force=True' para limpar e recriar.")
-                stats['ignorados'] = stats['total']
-                return stats
-
-        for i, dominio_data in enumerate(ALL_DOMAINS):
-            nome, poderes_concedidos, magias_por_nivel_list, descricao_geral = dominio_data
-            
-            # Converte a lista de magias para JSON string para armazenamento
-            magias_json = json.dumps(magias_por_nivel_list, ensure_ascii=False)
-
-            dominio_obj = Dominio(
-                nome=nome,
-                poderes_concedidos=poderes_concedidos,
-                magias_por_nivel=magias_json,
-                descricao_geral=descricao_geral
-            )
-            current_batch.append(dominio_obj)
-
-            if len(current_batch) >= batch_size:
-                db.add_all(current_batch)
-                db.commit()
-                stats['inseridos'] += len(current_batch)
-                print(f"➡️ Inseridos {stats['inseridos']}/{stats['total']} domínios. Lote commitado.")
-                current_batch = []
-
-        # Commit de quaisquer itens restantes no último lote
-        if current_batch:
-            db.add_all(current_batch)
-            db.commit()
-            stats['inseridos'] += len(current_batch)
-            print(f"➡️ Inseridos {stats['inseridos']}/{stats['total']} domínios. Último lote commitado.")
-
-        print(f"🎉 Processo de seed de Domínios concluído com sucesso!")
-
-    except Exception as e:
-        db.rollback()
-        print(f"❌ Erro durante o seed de domínios: {e}")
-        stats['erros'] = stats['total'] - stats['inseridos']
-    finally:
-        return stats
+    raise NotImplementedError(
+        "seed_dominios: não há tabela `dominios` nem modelo `Dominio` no projeto atual. "
+        "Use os seeds de magias / PHB; ver docstring do módulo."
+    )
 
 if __name__ == "__main__":
     db_session = None
@@ -1109,6 +1058,8 @@ if __name__ == "__main__":
         print(f"Domínios inseridos: {result['inseridos']}")
         print(f"Domínios ignorados: {result['ignorados']}")
         print(f"Erros: {result['erros']}")
+    except NotImplementedError as e:
+        print(f"ℹ️  {e}")
     except Exception as e:
         print(f"Fatal error in main execution: {e}")
     finally:

@@ -12,7 +12,8 @@ hub → `shared`, Postgres, produto): `docs/roteiro-melhorias-arquitetura.md`.
 - Os shims duplicados do hub em `app/schemas/*`, `app/api/v1/{auth,games,usuarios}.py`,
   `app/repositories/{game,usuario}_repository.py`, `app/services/{game,usuario}_service.py`,
   `app/models/{usuario,game}.py`, `app/models/mixins.py`, `app/seeds/pericias_seed.py`
-  e `app/exceptions/custom_exceptions.py` foram **removidos** (confirmado com `rg` + testes).
+  e `app/exceptions/custom_exceptions.py` foram **removidos**; o pacote vazio
+  `app/exceptions/` foi retirado (confirmado com `rg` + testes).
 - `app/api/v1/` contém apenas `__init__.py` (agregador legado); `app.main` importa
   o hub de `app.shared.api.v1` e regista modelos hub via `app.shared.models` quando
   necessário.
