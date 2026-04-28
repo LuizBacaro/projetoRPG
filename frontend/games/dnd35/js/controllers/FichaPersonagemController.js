@@ -769,7 +769,7 @@ export class FichaPersonagemController {
 
     // ─────────────────────────────────────────────────────────
     // Helpers de alinhamento (regra "um passo" D&D 3.5)
-    // Mantem paridade com backend/app/core/divindades_catalogo.py
+    // Mantem paridade com backend/app/games/dnd35/catalogs/divindades_catalogo.py
     // ─────────────────────────────────────────────────────────
 
     _normalizarTexto(valor) {

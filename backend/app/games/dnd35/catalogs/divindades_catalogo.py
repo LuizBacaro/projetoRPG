@@ -1,5 +1,7 @@
 """
-Catalogo das divindades D&D 3.5 — Tabela 3-7 (Livro do Jogador).
+Catálogo das divindades D&D 3.5 — Tabela 3-7 (Livro do Jogador).
+
+Canónico: `app.games.dnd35.catalogs.divindades_catalogo`.
 
 Fonte: tabelas_classes_excel/Tabela_3-7_Deuses.xlsx
 

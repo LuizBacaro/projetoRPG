@@ -11,9 +11,11 @@ from typing import Optional, Set, Tuple
 from sqlalchemy import asc, desc, false, func
 from sqlalchemy.orm import Session, joinedload
 
-from app.core.text_utils import classes_magia
-from app.core.text_utils import normalizar_classe as _normalizar_classe
-from app.core.text_utils import normalizar_classe_acesso
+from app.games.dnd35.text_utils import (
+    classes_magia,
+    normalizar_classe as _normalizar_classe,
+    normalizar_classe_acesso,
+)
 from app.games.dnd35.models.magia import Magia, MagiaClasse, MagiaHistorico
 from app.games.dnd35.models.ataque import MagiaPreparada
 from app.repositories.base import BaseRepository, apply_not_deleted, commit_with_rollback

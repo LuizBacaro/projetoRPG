@@ -3,7 +3,7 @@ Injeção de dependências
 """
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from .database import get_db
+from ..shared.core.database import get_db
 from ..games.dnd35.repositories.combatente_repository import CombatenteRepository
 from ..games.dnd35.repositories.combate_repository import CombateRepository
 from ..games.dnd35.services.combatente_service import CombatenteService

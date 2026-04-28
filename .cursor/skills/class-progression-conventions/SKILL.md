@@ -22,7 +22,7 @@ Use esta skill quando a demanda envolver qualquer regra de progressao por classe
 Antes de editar, leia:
 
 - `docs/progressao-classes-bba-resistencias-habilidades.md`
-- `backend/app/core/bonus_base_ataque.py`
+- `backend/app/games/dnd35/bonus_base_ataque.py`
 - `backend/app/services/combatente_service.py`
 - `backend/app/services/armadura_protecao_service.py`
 - `backend/app/api/v1/armaduras_protecao.py`
@@ -31,7 +31,7 @@ Antes de editar, leia:
 ## Contrato e persistencia
 
 1. **Backend primeiro**
-   - Novas regras ficam centralizadas em `backend/app/core/bonus_base_ataque.py`.
+   - Novas regras ficam centralizadas em `backend/app/games/dnd35/bonus_base_ataque.py`.
    - O service `CombatenteService` deve ser a unica camada que aplica/calcula progressao no CRUD.
 
 2. **Schema e compatibilidade**
@@ -39,7 +39,7 @@ Antes de editar, leia:
      - model (`backend/app/models/combatente.py`)
      - schema response (`backend/app/schemas/combatente.py`)
      - schema guard em `backend/app/main.py` para banco legado
-     - sincronizacao de legado em `backend/app/core/init_db.py`
+     - sincronizacao de legado em `backend/app/games/dnd35/sync_progressao_combatentes.py` (startup em `main.py`)
 
 3. **Frontend resiliente**
    - A ficha deve renderizar formato novo e fallback legado quando aplicavel.

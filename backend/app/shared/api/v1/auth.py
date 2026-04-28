@@ -10,7 +10,7 @@ from datetime import timedelta
 from typing import Optional
 import logging
 
-from ....core.config import settings
+from ...core.config import settings
 from ...core.security import (
     hash_senha,
     verificar_senha,

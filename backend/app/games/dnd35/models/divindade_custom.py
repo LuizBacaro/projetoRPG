@@ -16,8 +16,8 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-# Declarative Base única do processo (`app.core.database`) — hub e jogos partilham a mesma MetaData.
-from ....core.database import Base
+# Declarative Base única do processo (`app.shared.core.database`) — hub e jogos partilham a mesma MetaData.
+from ....shared.core.database import Base
 
 
 class DivindadeCustom(Base):

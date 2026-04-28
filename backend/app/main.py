@@ -8,6 +8,7 @@ import logging
 import os
 import threading
 import unicodedata
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Response
@@ -20,16 +21,16 @@ from starlette.requests import Request
 
 from .shared.core.config import settings
 from .shared.core.database import engine, Base, SessionLocal, get_db
-from .core.init_db import (
-    criar_admin_padrao,
-    inicializar_catalogo_jogos,
+from .games.dnd35.legacy_membership import garantir_membership_dnd35_para_usuarios_legados
+from .games.dnd35.startup_seeds import (
     inicializar_catalogo_magias_se_vazio,
     inicializar_catalogo_tabelas_classes,
     inicializar_equipamentos,
-    garantir_membership_dnd35_para_usuarios_legados,
-    sincronizar_bonus_base_ataque_combatentes,
     inicializar_talentos,
 )
+from .games.dnd35.sync_progressao_combatentes import sincronizar_bonus_base_ataque_combatentes
+from .shared.startup.admin_default import criar_admin_padrao
+from .shared.startup.game_catalog import inicializar_catalogo_jogos
 from .shared.core.rate_limit import RateLimitMiddleware
 from .shared.core.request_size import RequestSizeLimitMiddleware
 from .shared.api.v1 import (
@@ -57,8 +58,8 @@ from .games.dnd35.api.v1 import (
 )
 
 # Importar models para criação de tabelas (ordem importa para ForeignKey)
-from .models import usuario as usuario_model
-from .models import game as game_model
+from .shared.models import usuario as usuario_model
+from .shared.models import game as game_model
 from .games.dnd35.models import equipamento as equipamento_model
 from .games.dnd35.models import armadura_protecao as armadura_protecao_model
 from .games.dnd35.models import talento as talento_model
@@ -81,6 +82,61 @@ CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
 _db_startup_done = threading.Event()
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Inicializa aplicação (migrations, seeds, admin).
+
+    Em **production** o trabalho corre em thread via `asyncio.to_thread` para o
+    processo aceitar conexões de imediato — configure no Render o health check
+    em `/health/live`. Em development mantém-se síncrono (comportamento anterior).
+    """
+    def _run_init_sync() -> None:
+        db = SessionLocal()
+        try:
+            _inicializar_banco(db)
+        finally:
+            db.close()
+
+    async def _run_init_async() -> None:
+        await asyncio.to_thread(_run_init_sync)
+        _db_startup_done.set()
+
+    try:
+        if settings.ENVIRONMENT == "production":
+
+            def _log_task_fail(t: asyncio.Task) -> None:
+                try:
+                    exc = t.exception()
+                except asyncio.CancelledError:
+                    return
+                if exc is not None:
+                    logger.exception("❌ Falha na inicialização do banco (background): %s", exc)
+
+            task = asyncio.create_task(_run_init_async())
+            task.add_done_callback(_log_task_fail)
+            await asyncio.sleep(0)  # dá ao loop uma oportunidade de arrancar a task
+            logger.info(
+                "Startup production: BD a inicializar em background — "
+                "Health check no Render: /health/live; /api fica 503 até concluir."
+            )
+            print("=" * 60)
+            print("✅ API A ACEITAR TRÁFEGO — BD a inicializar em background")
+            print("=" * 60)
+        else:
+            await _run_init_async()
+            logger.info("✅ Aplicação inicializada com sucesso")
+            print("=" * 60)
+            print("✅ API INICIADA COM SUCESSO")
+            print("=" * 60)
+    except Exception as e:
+        logger.error("❌ Erro durante startup: %s", e)
+        print(f"❌ Erro durante startup: {str(e)}")
+        raise
+
+    yield
+
+
 # ── Instância FastAPI ────────────────────────────────────────────────────────
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -89,6 +145,7 @@ app = FastAPI(
     openapi_url="/api/openapi.json" if settings.ENVIRONMENT != "production" else None,
     docs_url="/api/docs" if settings.ENVIRONMENT != "production" else None,
     redoc_url="/api/redoc" if settings.ENVIRONMENT != "production" else None,
+    lifespan=lifespan,
 )
 
 
@@ -320,62 +377,6 @@ async def health_ping(token: str | None = Query(default=None)):
     if CRON_PING_TOKEN and token != CRON_PING_TOKEN:
         raise HTTPException(status_code=403, detail="Forbidden")
     return Response(status_code=204)
-
-
-# ── Startup Event ────────────────────────────────────────────────────────────
-
-@app.on_event("startup")
-async def startup_event():
-    """
-    Inicializa aplicação (migrations, seeds, admin).
-
-    Em **production** o trabalho corre em thread via `asyncio.to_thread` para o
-    processo aceitar conexões de imediato — configure no Render o health check
-    em `/health/live`. Em development mantém-se síncrono (comportamento anterior).
-    """
-
-    def _run_init_sync() -> None:
-        db = SessionLocal()
-        try:
-            _inicializar_banco(db)
-        finally:
-            db.close()
-
-    async def _run_init_async() -> None:
-        await asyncio.to_thread(_run_init_sync)
-        _db_startup_done.set()
-
-    try:
-        if settings.ENVIRONMENT == "production":
-
-            def _log_task_fail(t: asyncio.Task) -> None:
-                try:
-                    exc = t.exception()
-                except asyncio.CancelledError:
-                    return
-                if exc is not None:
-                    logger.exception("❌ Falha na inicialização do banco (background): %s", exc)
-
-            task = asyncio.create_task(_run_init_async())
-            task.add_done_callback(_log_task_fail)
-            await asyncio.sleep(0)  # dá ao loop uma oportunidade de arrancar a task
-            logger.info(
-                "Startup production: BD a inicializar em background — "
-                "Health check no Render: /health/live; /api fica 503 até concluir."
-            )
-            print("=" * 60)
-            print("✅ API A ACEITAR TRÁFEGO — BD a inicializar em background")
-            print("=" * 60)
-        else:
-            await _run_init_async()
-            logger.info("✅ Aplicação inicializada com sucesso")
-            print("=" * 60)
-            print("✅ API INICIADA COM SUCESSO")
-            print("=" * 60)
-    except Exception as e:
-        logger.error(f"❌ Erro durante startup: {str(e)}")
-        print(f"❌ Erro durante startup: {str(e)}")
-        raise
 
 
 # ── Funções de Inicialização ─────────────────────────────────────────────────

@@ -17,7 +17,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from app.core.bonus_base_ataque import calcular_bonus_base_ataque, calcular_resistencias_base
+from app.games.dnd35.bonus_base_ataque import (
+    calcular_bonus_base_ataque,
+    calcular_resistencias_base,
+)
 from app.shared.core.database import SessionLocal
 from app.games.dnd35.models.combatente import Combatente
 

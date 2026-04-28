@@ -1,3 +1,5 @@
+"""Mixins SQLAlchemy partilhados (hub e jogos)."""
+
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime

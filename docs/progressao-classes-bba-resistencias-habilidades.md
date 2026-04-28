@@ -16,13 +16,13 @@ Implementar, de ponta a ponta, o consumo das tabelas de classe (D&D 3.5) para pr
 
 - Catalogo consolidado: `docs/dados/tabelas_classes_catalogo.json`.
 - Planilhas de origem: pasta `tabelas_classes_excel/`.
-- Mapeamento de classes para tabelas: `backend/app/core/bonus_base_ataque.py` (`_TABLE_BY_CLASS`).
+- Mapeamento de classes para tabelas: `backend/app/games/dnd35/bonus_base_ataque.py` (`_TABLE_BY_CLASS`).
 
 ## Backend
 
 ### Motor de progressao
 
-Arquivo: `backend/app/core/bonus_base_ataque.py`
+Arquivo: `backend/app/games/dnd35/bonus_base_ataque.py`
 
 - `calcular_bonus_base_ataque(classe, nivel)`: tenta catalogo e aplica fallback por progressao.
 - `calcular_resistencias_base(classe, nivel)`: tenta catalogo e aplica fallback por progressao de TR.
@@ -47,7 +47,8 @@ Arquivo: `backend/app/services/combatente_service.py`
 
 ### Inicializacao e backfill
 
-Arquivo: `backend/app/core/init_db.py`
+Implementacao: `backend/app/games/dnd35/sync_progressao_combatentes.py`  
+Arranque: `backend/app/main.py` importa diretamente este módulo.
 
 - `sincronizar_bonus_base_ataque_combatentes` atualiza dados legados:
   - BBA,

@@ -47,11 +47,11 @@
   - Rotas sensíveis de domínio protegidas; públicas intencionais: autenticação e catálogo de magias (read-only)
 
 - [x] **#8 — Sem Rate Limiting**
-  - Implementado middleware custom em `app/core/rate_limit.py` (sliding window por IP)
+  - Implementado middleware custom em `app/shared/core/rate_limit.py` (sliding window por IP)
   - Limite geral na API: `API_RATE_LIMIT_PER_MINUTE` (default 180/min)
   - Limite específico para `POST /api/v1/auth/login`: `LOGIN_RATE_LIMIT_PER_MINUTE` (default 10/min)
   - Retorna `429` com `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`
-  - Configurável via `app/core/config.py` (`RATE_LIMIT_ENABLED`, limites por minuto)
+  - Configurável via `app/shared/core/config.py` (`RATE_LIMIT_ENABLED`, limites por minuto)
 
 - [x] **#9 — JWT sem Refresh Endpoint**
   - Implementado `POST /auth/refresh` em `auth.py`
@@ -61,7 +61,7 @@
 
 - [x] **#10 — Sem Verificação de Propriedade (RBAC)**
   - Adicionado ownership em `combatentes` com coluna `dono_id` + migration Alembic
-  - Criadas dependências `requer_dono_ou_admin_combatente` e `requer_dono_ou_admin_slot_magia` em `core/deps.py`
+  - Criadas dependências `requer_dono_ou_admin_combatente` e `requer_dono_ou_admin_slot_magia` em `app/shared/core/deps.py`
   - Rotas por `combatente_id` agora validam dono/admin (combatentes, ataques, condições, perícias do jogador, equipamentos do jogador, talentos do jogador, magias preparadas)
   - `listar_combatentes` agora respeita escopo do usuário (admin vê todos; demais veem apenas os próprios)
   - `combate/iniciar` e `combate/aplicar-dano` validam propriedade para listas/IDs de combatente
@@ -96,7 +96,7 @@
   - Frontend de grimório/magias atualizado para usar `limit=500` também no fallback de listagem completa
 
 - [x] **#16 — Sem Logging de Segurança**
-  - Criado helper central `core/security_audit.py` para logs estruturados de segurança com IP, ator, alvo e motivo
+  - Criado helper central `app/shared/core/security_audit.py` para logs estruturados de segurança com IP, ator, alvo e motivo
   - Fluxos de `login`, `refresh`, token ausente/inválido e negações RBAC agora emitem eventos auditáveis
   - Ações administrativas em `/usuarios` (criar, atualizar, inativar) agora deixam trilha de auditoria em log
 
@@ -243,9 +243,9 @@
   - Afeta models, repositories, services e security.py
   - Fix: substituir por `datetime.now(timezone.utc)` + importar `timezone` de `datetime`
 
-- [ ] **C3 — `@app.on_event("startup")` deprecado no FastAPI 0.93+**
-  - Será removido em versões futuras do FastAPI
-  - Fix: migrar para `@asynccontextmanager` + `app = FastAPI(lifespan=lifespan)`
+- [x] **C3 — `@app.on_event("startup")` deprecado no FastAPI 0.93+**
+  - Fix aplicado: `lifespan` com `@asynccontextmanager` em `backend/app/main.py` +
+    `FastAPI(..., lifespan=lifespan)`.
 
 ### 🟡 Importante
 
@@ -260,7 +260,7 @@
 
 - [x] **I1 — `_normalizar_classe` duplicada em 3 arquivos**
   - `api/v1/magias_preparadas.py`, `repositories/magia_repository.py`, `services/magia_service.py`
-  - Fix: centralizar em `app/core/text_utils.py` e importar nos 3 lugares
+  - Fix: centralizar em `app/games/dnd35/text_utils.py` e importar nos 3 lugares
 
 - [ ] **I2 — Lógica de negócio no router `magias_preparadas.py`**
   - Funções `_normalizar_classe`, `_classes_magia`, `_normalizar_quantidade`, `_enriquecer` no arquivo de rota

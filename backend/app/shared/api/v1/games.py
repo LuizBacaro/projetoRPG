@@ -12,10 +12,10 @@ from fastapi import APIRouter, Depends, status
 
 from ...core.deps import get_usuario_atual, extrair_token_do_header, requer_admin
 from ...core.security import decodificar_token
-from ....core.config import settings
-from ....core.dependencies import get_game_service
+from ...core.config import settings
+from app.core.dependencies import get_game_service
 from ...models.usuario import Usuario
-from ....schemas.game import (
+from ...schemas.game import (
     CatalogoJogosResponse,
     SelecaoJogoRequest,
     TokenComJogoResponse,

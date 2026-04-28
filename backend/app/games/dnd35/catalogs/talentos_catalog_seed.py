@@ -4,8 +4,7 @@ Catálogo de talentos (LdJ, D&D 3.5) — fonte única para seed e importação C
 O arquivo `talentos_importacao_limpo.json` na raiz do repositório é a fonte
 canónica.
 
-Localização: `app.games.dnd35.catalogs.talentos_catalog_seed`. Shim em
-`app.core.talentos_catalog_seed` durante a reorganização multi-jogo.
+Localização: `app.games.dnd35.catalogs.talentos_catalog_seed` (scripts/CLI e seed).
 """
 
 from __future__ import annotations
@@ -26,7 +25,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-# Nomes do seed legado em init_db (antigo) → nome exato no JSON.
+# Nomes do seed legado (lista mínima antiga) → nome exato no JSON.
 MAPEAMENTO_SEED_PARA_JSON: dict[str, str | None] = {
     "Golpe Poderoso": "Ataque Poderoso¹",
     "Ataque Especial": None,

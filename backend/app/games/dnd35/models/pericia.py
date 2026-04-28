@@ -7,7 +7,7 @@ from sqlalchemy import Column, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from app.shared.core.database import Base
-from app.core.mixins import SoftDeleteMixin
+from app.shared.core.mixins import SoftDeleteMixin
 
 if TYPE_CHECKING:
     from app.games.dnd35.models.combatente import Combatente

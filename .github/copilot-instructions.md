@@ -35,6 +35,7 @@ Este workspace usa instrucoes granulares por dominio em `.github/instructions`.
 - **Imagens:** Cloudinary — `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` como env vars no Render
 - **Anti-sleep:** cron-job.org `*/10 * * * *` → `GET /health` (evita cold start do Render free tier)
 - **Deploy:** merge `feature/responsivo` → `feature/salva` aciona deploy automatico no Render
+- **Dados em producao (critico):** antes de alterar `DATABASE_URL`, rodar migrations destrutivas ou mudar schemas em prod, consultar `PRE_DEPLOY_CHECKLIST.md` (secao Protecao de dados em producao), a skill `.cursor/skills/arena-producao-dados-neon-render/SKILL.md` e o bullet correspondente em `AGENTS.md`. No Render, health de startup: `GET /health/live`; monitoramento continuo: `GET /health`.
 
 ## Convencoes de Versionamento Frontend
 

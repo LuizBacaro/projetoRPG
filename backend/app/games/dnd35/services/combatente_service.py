@@ -9,14 +9,14 @@ import re
 
 from typing import List, Optional, Dict
 
-from app.core import divindades_catalogo as _divindades_catalogo
-from app.core.bonus_base_ataque import (
+from app.games.dnd35.catalogs import divindades_catalogo as _divindades_catalogo
+from app.games.dnd35.bonus_base_ataque import (
     calcular_bonus_base_ataque,
     calcular_habilidades_especiais,
     calcular_habilidades_especiais_por_nivel,
     calcular_resistencias_base,
 )
-from app.core.racas_catalog import get_raca_by_slug_or_name
+from app.games.dnd35.catalogs.racas_catalog import get_raca_by_slug_or_name
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,

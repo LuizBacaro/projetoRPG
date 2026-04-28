@@ -1,15 +1,15 @@
 from sqlalchemy.exc import IntegrityError
 
-from app.core.init_db import criar_admin_padrao
+from app.shared.startup.admin_default import criar_admin_padrao
 from app.shared.core.security import verificar_senha
 from app.shared.models.usuario import PerfilUsuario, Usuario
 from app.shared.repositories.usuario_repository import UsuarioRepository
 
 
 def test_criar_admin_padrao_cria_quando_nao_existe(test_db, monkeypatch):
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_EMAIL", "admin@arena.test")
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_PASSWORD", "SenhaForte123")
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_USERNAME", "Admin Teste")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_EMAIL", "admin@arena.test")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_PASSWORD", "SenhaForte123")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_USERNAME", "Admin Teste")
 
     criar_admin_padrao(test_db)
 
@@ -21,9 +21,9 @@ def test_criar_admin_padrao_cria_quando_nao_existe(test_db, monkeypatch):
 
 
 def test_criar_admin_padrao_nao_duplica_em_execucoes_repetidas(test_db, monkeypatch):
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_EMAIL", "admin@arena.test")
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_PASSWORD", "SenhaForte123")
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_USERNAME", "Admin Teste")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_EMAIL", "admin@arena.test")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_PASSWORD", "SenhaForte123")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_USERNAME", "Admin Teste")
 
     criar_admin_padrao(test_db)
     criar_admin_padrao(test_db)
@@ -33,9 +33,9 @@ def test_criar_admin_padrao_nao_duplica_em_execucoes_repetidas(test_db, monkeypa
 
 
 def test_criar_admin_padrao_idempotente_em_race_condition(test_db, monkeypatch):
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_EMAIL", "admin@arena.test")
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_PASSWORD", "SenhaForte123")
-    monkeypatch.setattr("app.core.init_db.settings.ADMIN_USERNAME", "Admin Teste")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_EMAIL", "admin@arena.test")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_PASSWORD", "SenhaForte123")
+    monkeypatch.setattr("app.shared.startup.admin_default.settings.ADMIN_USERNAME", "Admin Teste")
 
     def _criar_com_race(self, usuario):
         existente = self.db.query(Usuario).filter(Usuario.email == usuario.email).first()

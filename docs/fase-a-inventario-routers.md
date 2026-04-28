@@ -3,7 +3,7 @@
 **Data:** abril de 2026  
 **Objetivo:** mapear o que `app.main` monta hoje, de onde vem cada `router` e
 qual o **alvo** da Fase A ([roteiro-melhorias-arquitetura.md](./roteiro-melhorias-arquitetura.md)):
-registo canónico a partir de `app.games.dnd35.api.v1` (e hub em `app.api.v1`),
+registo canónico a partir de `app.games.dnd35.api.v1` (hub em **`app.shared.api.v1`**),
 reduzindo shims finos sem alterar URLs sob `settings.API_V1_PREFIX` (tipicamente
 `/api/v1`).
 
@@ -22,8 +22,8 @@ reduzindo shims finos sem alterar URLs sob `settings.API_V1_PREFIX` (tipicamente
 **Como reproduzir / atualizar este inventário** (a partir da raiz do repo):
 
 ```bash
-# Re-exports D&D 3.5 em app/api/v1
-grep -R "from app\.games\.dnd35\.api\.v1\|from \.\.\.games\.dnd35\.api" backend/app/api/v1 --include='*.py'
+# app/api/v1: hoje só `__init__.py` (agregador legado); sem re-exports D&D 3.5
+ls backend/app/api/v1
 
 # Onde os testes ainda importam app.api.v1.* (impacto ao mudar main/tests)
 grep -R "from app\.api\.v1\." backend/tests --include='*.py'
@@ -35,9 +35,8 @@ grep "include_router" backend/app/main.py
 Com `ripgrep` instalado:
 
 ```bash
-rg "from app\.games\.dnd35\.api\.v1|from \.\.\.games\.dnd35\.api" backend/app/api/v1 -g '*.py'
-rg "from app\.api\.v1\." backend/tests -g '*.py'
 rg "include_router" backend/app/main.py
+rg "from app\.shared\.api\.v1" backend/tests backend/app -g '*.py'
 ```
 
 ---
@@ -46,16 +45,16 @@ rg "include_router" backend/app/main.py
 
 Colunas:
 
-- **Módulo:** pacote importado em `app/main.py` (`from .api.v1 import …`).
+- **Módulo:** pacote importado em `app/main.py` (`from .shared.api.v1 import …` para o hub).
 - **Prefixo HTTP:** `prefix=` do `APIRouter` canónico (D&D 3.5) ou nota; sempre montado com `settings.API_V1_PREFIX` no `include_router`.
 - **Origem hoje:** onde está o `router` que `main` usa.
 - **Alvo Fase A (sugerido):** onde o registo deveria passar a “pensar” primeiro; shims só se houver justificação (testes, compat).
 
-| Módulo (`app.api.v1`) | Prefixo HTTP (router canónico) | Origem hoje | Alvo Fase A (sugerido) |
+| Módulo (`app.shared.api.v1`) | Prefixo HTTP (router canónico) | Origem hoje | Alvo Fase A (sugerido) |
 |----------------------|----------------------------------|-------------|-------------------------|
-| `auth` | `/auth` (tags em `auth.py`) | `app.api.v1.auth` — router definido no hub | Manter `app.api.v1.auth` (hub; futuro `app.shared.api.v1.auth`) |
-| `games` | `/games` (+ sub-rotas) | `app.api.v1.games` — hub | Manter `app.api.v1.games` |
-| `usuarios` | `/usuarios` | `app.api.v1.usuarios` — hub | Manter `app.api.v1.usuarios` |
+| `auth` | `/auth` (tags em `auth.py`) | **`app.shared.api.v1.auth`** (hub canónico) | Manter |
+| `games` | `/games` (+ sub-rotas) | **`app.shared.api.v1.games`** | Manter |
+| `usuarios` | `/usuarios` | **`app.shared.api.v1.usuarios`** | Manter |
 | `campanhas` | `/campanhas` | ~~Shim~~ → **`app.main` / `games.dnd35.api.v1.campanhas`** (A.3) | Manter (feito) |
 | `combatentes` | `/combatentes` | ~~Shim~~ → **`app.main` / `games.dnd35.api.v1.combatentes`** (A.3) | Manter (feito) |
 | `combate` | `/combate` | ~~Shim especial~~ → **`app.main` / `games.dnd35.api.v1.combate`** (A.5) | Manter (feito) |
@@ -73,22 +72,22 @@ Colunas:
 | `racas` | `/racas` | ~~Shim `app.api.v1`~~ → **`app.main` importa `games.dnd35.api.v1.racas`** (A.1) | Manter (feito) |
 | `habilidades_especiais` | `/habilidades-especiais` | ~~Shim~~ → **`app.main` / `games.dnd35.api.v1.habilidades_especiais`** (A.2) | Manter (feito) |
 
-**Resumo:** a Fase A foi concluída. Em `app/api/v1` restam apenas módulos
-do **hub** (`auth`, `games`, `usuarios`) e o agregador legado `__init__.py`.
-Todos os routers D&D 3.5 são registados a partir de
-`app.games.dnd35.api.v1` em `app.main`.
+**Resumo:** a Fase A foi concluída. O **hub** vive em `app.shared.api.v1`
+(`auth`, `games`, `usuarios`); `app/api/v1/` ficou só com `__init__.py`
+(agregador legado, sem routers de hub). Todos os routers D&D 3.5 são
+registados a partir de `app.games.dnd35.api.v1` em `app.main`.
 
 ---
 
 ## Impacto em testes (`backend/tests`)
 
-Ficheiros que importam `app.api.v1.*` (abril/2026):
+Ficheiros que importam o hub (abril/2026 — paths canónicos):
 
 | Ficheiro de teste | Importa |
 |-------------------|---------|
-| `test_auth_api.py` | `app.api.v1.auth` |
-| `test_games_multi_api.py` | `auth`, `games` |
-| `test_usuarios_api.py` | `usuarios` |
+| `test_auth_api.py` | `app.shared.api.v1.auth` |
+| `test_games_multi_api.py` | `app.shared.api.v1.auth`, `app.shared.api.v1.games` |
+| `test_usuarios_api.py` | `app.shared.api.v1.usuarios` |
 | `test_combatentes_api.py` | `app.games.dnd35.api.v1.combatentes` (desde A.3) |
 | `test_combate_api_history.py` | `router` em `app.games.dnd35.api.v1.combate`; overrides em `app.core.*` (desde A.5) |
 | `test_combate_api_avancar_turno.py` | `router` em `app.games.dnd35.api.v1.combate`; overrides em `app.core.*` (desde A.5) |

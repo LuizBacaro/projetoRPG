@@ -1,6 +1,7 @@
 """
-text_utils.py
-Utilitários de normalização de texto compartilhados entre services, repositories e routers.
+Normalização de texto para classes e listas de magia (D&D 3.5).
+
+Usado por routers, repositórios e services do pacote `app.games.dnd35`.
 """
 import re
 import unicodedata

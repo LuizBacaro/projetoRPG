@@ -21,11 +21,16 @@ descreve a operação e a separação física futura em apps independentes.
 > (ver "Convenção de pastas multi-jogo"). A migração foi feita por ondas;
 > **não** existem mais ficheiros-shim por domínio em `app.models.<x>` /
 > `app.schemas.<x>` para esse jogo — imports de domínio apontam para
-> `app.games.dnd35.models|schemas|...`. O pacote `app.models` continua a
-> agregar modelos D&D 3.5 no `__init__.py` (metadata/migrations) e a
-> hospedar o hub (`usuario`, `game`, `mixins`). `app.schemas` ficou só com
-> `usuario`, `auth` e `game`. Vários `app.api.v1.*` ainda re-exportam o
-> mesmo `router` definido em `games/dnd35/api/v1` para manter URLs estáveis.
+> `app.games.dnd35.models|schemas|...`. O pacote `app.models` agrega
+> modelos D&D 3.5 no `__init__.py` (metadata/migrations). O **Auth Hub**
+> (usuario, game, auth, routers `/auth`, `/games`, `/usuarios`) vive em
+> `app.shared.*` (canónico). Os shims finos em `app/schemas`, `app/api/v1`
+> (auth/games/usuarios), `app/repositories/*`, `app/services/*` (hub),
+> `app/models/{usuario,game}.py`, `app/seeds/pericias_seed.py`,
+> `app/exceptions/custom_exceptions.py` e `app/models/mixins.py` foram
+> removidos após `rg`/testes; `app/api/v1/` ficou só com o agregador
+> `__init__.py` (router vazio legado). Rotas D&D 3.5 registam-se a partir de
+> `app.games.dnd35.api.v1` em `app.main`.
 
 ## Visão geral
 
@@ -59,10 +64,11 @@ flowchart LR
 - Service: `app/services/game_service.py`.
 - Rotas: `GET /api/v1/games`, `POST /api/v1/games/selecionar`.
 - Seed automático no startup:
-  - `inicializar_catalogo_jogos` — popula `dnd35` (disponível) + `dnd5e`/`gurps`
-    (em breve).
-  - `garantir_membership_dnd35_para_usuarios_legados` — vincula usuários
-    existentes ao D&D 3.5 sem precisar reentrar.
+  - `inicializar_catalogo_jogos` (`app/shared/startup/game_catalog.py`) —
+    popula `dnd35` (disponível) + `dnd5e`/`gurps` (em breve).
+  - `garantir_membership_dnd35_para_usuarios_legados`
+    (`app/games/dnd35/legacy_membership.py`) — vincula usuários existentes ao
+    D&D 3.5 sem precisar reentrar.
 - JWT: `POST /games/selecionar` reemite o `access_token` com claim
   `game_slug` e `perfil_no_jogo`. O `decodificar_token` aceita tokens com ou
   sem o claim, mantendo compatibilidade com sessões antigas.
@@ -253,23 +259,24 @@ salto** de deploy (Fase 5), descrito de forma acionável em:
 ## Convenção de pastas multi-jogo
 
 A reorganização deixa explícito qual código pertence a cada sistema de RPG.
-O domínio D&D 3.5 vive em `games/dnd35/`; o Auth Hub e utilitários globais
-ainda estão sob `app/core`, `app/models`, `app/schemas`, etc., com evolução
-gradual documentada em `backend/app/shared/README.md`.
+O domínio D&D 3.5 vive em `games/dnd35/`. O **Auth Hub** e a infra partilhada
+(JWT, BD, deps, rate limit, `SoftDeleteMixin`, etc.) estão em **`app/shared/`**;
+`app/core/` concentra só DI (`dependencies.py`); o startup importa os passos
+canónicos em `main.py` (`shared/startup/`, `games/dnd35/`). Regras e utilitários
+D&D 3.5 (BBA, catálogos, `text_utils`, …) estão em **`app/games/dnd35/`**.
+Ver `backend/app/shared/README.md`.
 
 ### Backend (layout vigente)
 
 ```
 backend/app/
     main.py                       (monta app; regista routers hub + games/*)
-    core/                         config, database, deps, security, mixins, ...
-    models/                       Hub: usuario, game, mixins; __init__.py
-                                  re-exporta modelos D&D 3.5 (metadata/Alembic)
-    schemas/                      Hub: usuario, auth, game
-    repositories/                 Hub: usuario, game (+ base.py)
-    services/                     Hub: usuario, game (+ serviços legados se houver)
-    api/v1/                       auth, usuarios, games; re-export de routers dnd35
-    shared/                       constants.py + README (alvo de consolidação do hub)
+    core/                         dependencies
+    models/                       __init__.py agrega modelos D&D 3.5 (metadata/Alembic)
+    repositories/                 base.py (+ legado mínimo)
+    services/                     file_service e legado mínimo
+    api/v1/                       __init__.py (agregador legado; sem routers hub)
+    shared/                       Auth Hub: core/, models/, schemas/, api/v1/, …
     games/
         dnd35/                    D&D 3.5 em produção
             models/
@@ -277,7 +284,10 @@ backend/app/
             repositories/
             services/
             api/v1/
-            catalogs/
+            catalogs/               (divindades oficiais, raças, talentos, …)
+            text_utils.py           (normalização classe/magia D&D 3.5)
+            bonus_base_ataque.py    (BBA, resistências base, habilidades especiais)
+            sync_progressao_combatentes.py  (backfill BBA/TRs/CA em combatentes)
             seeds/
         dnd5e/                    reservado (em breve)
         gurps/                    reservado (em breve)
@@ -303,7 +313,7 @@ históricos acima.
 > 6. **`talento*`** (models, schemas, repositórios, service, router
 >    `/talentos` e `talentos_catalog_seed`) — 6ª onda.
 > 7. **`pericia*`** (models, schemas, repositórios, service, router
->    `/pericias` e `seeds/pericias_seed`) — 7ª onda.
+>    `/pericias` e seed `app.games.dnd35.seeds.pericias_seed`) — 7ª onda.
 > 8. **`tabelas_classes*`** (catálogo `classes_tables_catalog`, schemas,
 >    service e router `/tabelas-classes`) — 8ª onda.
 > 9. **`magia*`** (models `Magia`/`MagiaClasse`/`MagiaHistorico`, grimório,
@@ -315,8 +325,8 @@ históricos acima.
 >     `/condicoes`, ataques/slots e `/armaduras_protecao`) — 10ª onda.
 > 11. **`combatente*`** (model, schemas, repositório, `CombatenteService` e
 >     router `/combatentes`) — 11ª onda (**ficha**, nó central de FKs).
->     `SoftDeleteMixin` está em `app/core/mixins.py`; `app.models.mixins`
->     mantém apenas re-export para compatibilidade com imports antigos.
+>     `SoftDeleteMixin` está em `app/shared/core/mixins.py`; modelos D&D 3.5
+>     importam-no a partir daí (sem shim em `app.models.mixins`).
 >
 > Próximos passos estruturais sugeridos: **schemas Postgres** (`auth.*`,
 > `dnd35.*`), consolidação do hub em `app/shared/`, e eventual redução de
@@ -347,27 +357,28 @@ frontend/
 
 ### Shims e re-exports ainda relevantes
 
-- **`app.models.mixins`** — re-export fino de `SoftDeleteMixin` a partir de
-  `app.core.mixins` (imports legados).
 - **`app.models.__init__.py`** — agrega imports dos modelos D&D 3.5 a partir de
   `app.games.dnd35.models.*` para que `Base.metadata` e o Alembic vejam todas
   as tabelas; **não** substitui ficheiros `app.models.combatente` etc. (esses
   shims por módulo foram removidos).
-- **`app.api.v1.*`** — alguns módulos importam e re-exportam o `router` (e
-  ocasionalmente helpers de DI) definidos em `games/dnd35/api/v1`, mantendo
-  paths HTTP `/api/v1/...` estáveis.
+- **`app.core.*`** — `dependencies.py` (factories FastAPI). Arranque de BD em
+  `main.py` (`shared/startup/`, `games/dnd35/`). Configuração, BD, deps de
+  plataforma e cache de catálogo preferem **`app.shared.core.*`** em código novo;
+  ver `backend/app/shared/README.md`.
 
 ### Plano de limpeza / próximos incrementos
 
 1. **Feito (D&D 3.5):** retirar ficheiros-shim `app.models.<domínio>` e
   `app.schemas.<domínio>`; apontar código e testes para `app.games.dnd35.*`.
-2. **Testes:** `get_db` é um único callable (`app.core.database.get_db`,
-   re-exportado em `app.shared.core.deps` e `app.core.deps`). Usar
-   `dependency_overrides[get_db]` com o mesmo símbolo que a rota injeta, ou
-   sempre `app.core.database.get_db`.
-3. **Auth Hub em `app/shared/`:** mover `usuario`, `game`, `auth`, `games`
-   conforme `backend/app/shared/README.md`; cada movimento pode usar shim no
-   path antigo até `rg` zerar.
+2. **Feito (hub):** shims de `app/schemas`, `app/api/v1` (hub), repositórios e
+   services do hub, `app/models/{usuario,game}.py`, `app/models/mixins.py`,
+   `app/seeds/pericias_seed`, `app/exceptions/custom_exceptions` removidos;
+   `main` importa modelos hub via `app.shared.models`.
+3. **Testes:** `get_db` canónico em `app.shared.core.database.get_db`
+   (re-exportado em `app.shared.core.deps`). Os shims finos
+   `app.core.{database,config,catalog_cache,deps}` foram removidos; usar só
+   `app.shared.core.*` para esse núcleo. Preferir `dependency_overrides` no
+   mesmo símbolo que a rota injeta.
 4. **Front shell:** páginas globais (`login`, seletor) alinhadas a
    `frontend/js/shared/` (ex.: `render-api-origin-boot.js` e
    `render-api-origin.js` para origem da API em Render).
@@ -402,7 +413,8 @@ frontend/
    router `/talentos` e `talentos_catalog_seed` em `catalogs/`).
 7. **Onda backend "perícia"** — ✅ concluída
    (models `Pericia`/`PericiaClasse`/`PericiaJogador`, schemas,
-   repositórios, service, router `/pericias` e `seeds/pericias_seed`).
+   repositórios, service, router `/pericias` e
+   `app.games.dnd35.seeds.pericias_seed`).
 8. **Onda backend "tabelas de classe"** — ✅ concluída
    (`catalogs/classes_tables_catalog`, schemas, `TabelasClassesService`,
    router `/tabelas-classes`; loaders legados em `app.core` podem ainda
@@ -418,7 +430,7 @@ frontend/
     `/combate`, `/condicoes`, ataques/slots, `/armaduras_protecao`).
 11. **Onda backend "ficha"** — ✅ concluída (`Combatente`, repositório,
     service, router `/combatentes`; `SoftDeleteMixin` em
-    `app/core/mixins.py`; `app.api.v1.combate` pode re-exportar
+    `app/shared/core/mixins.py`; `app.core.dependencies` expõe
     `get_combate_service`, `get_condicao_service` e `get_usuario_atual`
     para overrides em testes).
 12. **Onda frontend D&D 3.5** — ✅ concluída
@@ -441,8 +453,8 @@ Cada onda nova deve seguir o padrão estabelecido após a POC
 Para adicionar um novo jogo (ex.: D&D 5e):
 
 1. **Catálogo backend:** inserir entrada em `GAME_CATALOG_SEED`
-   (`backend/app/core/init_db.py`) com `status="em_breve"` enquanto a
-   stack ainda não estiver pronta.
+   (`backend/app/shared/startup/game_catalog.py`) com `status="em_breve"`
+   enquanto a stack ainda não estiver pronta.
 2. **Casca visual:** criar `frontend/games/<slug>/em-breve.html` +
    `frontend/games/<slug>/css/em-breve.css` com identidade visual
    própria (paleta de cor distinta para o usuário não confundir jogos).

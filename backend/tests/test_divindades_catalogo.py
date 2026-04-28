@@ -1,6 +1,6 @@
 """Testes unitarios dos helpers do catalogo de divindades (Tabela 3-7)."""
 
-from app.core import divindades_catalogo as cat
+from app.games.dnd35.catalogs import divindades_catalogo as cat
 
 
 # ---------------------------------------------------------------------------

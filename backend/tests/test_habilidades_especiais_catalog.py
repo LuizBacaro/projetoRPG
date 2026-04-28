@@ -13,7 +13,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.games.dnd35.api.v1.habilidades_especiais import router as habilidades_router
-from app.core.habilidades_especiais_catalog import (
+from app.games.dnd35.catalogs.habilidades_especiais_catalog import (
     get_habilidade_by_slug,
     list_habilidades,
     resolver_por_texto,

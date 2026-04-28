@@ -1,5 +1,7 @@
 """
-Cálculo de Bônus Base de Ataque (BBA) para classes D&D.
+Cálculo de Bônus Base de Ataque (BBA) para classes D&D 3.5.
+
+Canónico: `app.games.dnd35.bonus_base_ataque`.
 
 Fonte primária: catálogo consolidado em `docs/dados/tabelas_classes_catalogo.json`.
 Fallback: progressões padrão (boa/média/ruim) para manter robustez caso o catálogo
@@ -13,8 +15,9 @@ import json
 from pathlib import Path
 import re
 
-from .config import settings
-from .text_utils import normalizar_classe
+from app.shared.core.config import settings
+
+from app.games.dnd35.text_utils import normalizar_classe
 
 _TABLE_BY_CLASS: dict[str, int] = {
     "BARBARO": 3,

@@ -7,50 +7,38 @@ hub → `shared`, Postgres, produto): `docs/roteiro-melhorias-arquitetura.md`.
 
 ## Estado vigente (abr/2026)
 
-- O **código do hub** já está canônico em `app/shared/` (`core`, `models`,
+- O **código do hub** está canônico em `app/shared/` (`core`, `models`,
   `schemas`, `repositories`, `services`, `api/v1`, `exceptions`).
-- Os paths históricos (`app/core`, `app/models`, `app/schemas`,
-  `app/repositories`, `app/services`, `app/api/v1`) foram mantidos como shims
-  para compatibilidade durante o rollout.
-- `app/models/usuario.py` e `app/models/game.py` já são shims; os modelos
-  canónicos vivem em `app/shared/models/usuario.py` e
-  `app/shared/models/game.py`.
-- `app/repositories/usuario_repository.py` e
-  `app/repositories/game_repository.py` já são shims; os repositórios canónicos
-  vivem em `app/shared/repositories/`.
-- `app/services/usuario_service.py` e `app/services/game_service.py` já são
-  shims; os services canónicos vivem em `app/shared/services/`.
-- `app/schemas/usuario.py`, `app/schemas/game.py` e `app/schemas/auth.py` já
-  são shims; os schemas canónicos do hub vivem em `app/shared/schemas/`.
-- `app/api/v1/auth.py`, `app/api/v1/usuarios.py` e `app/api/v1/games.py` já
-  são shims; os routers canónicos do hub vivem em `app/shared/api/v1/`.
-- **`app/shared/`** já contém `constants.py`, `shared/exceptions/custom_exceptions.py`
-  e módulos em `shared/core/` (`catalog_cache.py`, `request_size.py`,
-  `rate_limit.py`, `security_audit.py`, `security.py`, `deps.py`,
-  `config.py`, `database.py`) em uso pelo backend; os paths legados
-  `app.exceptions.custom_exceptions`, `app.core.catalog_cache`,
-  `app.core.request_size`, `app.core.rate_limit`, `app.core.security_audit`,
-  `app.core.security`, `app.core.deps`, `app.core.config` e
-  `app.core.database` foram mantidos como shims.
-  O restante da árvore continua em migração incremental.
-- **D&D 3.5** vive em `app/games/dnd35/` (`models`, `schemas`, `repositories`,
-  `services`, `api/v1`, …). Não há ficheiros-shim por domínio em
-  `app.models.combatente` ou `app.schemas.campanha`; imports de domínio
-  apontam para `app.games.dnd35.*`. Re-exports finos que ainda fazem sentido:
-  `app.models.mixins` → `app.core.mixins`, e alguns `app.api.v1.*` que
-  expõem o mesmo `router` definido em `games/dnd35/api/v1`.
+- Os shims duplicados do hub em `app/schemas/*`, `app/api/v1/{auth,games,usuarios}.py`,
+  `app/repositories/{game,usuario}_repository.py`, `app/services/{game,usuario}_service.py`,
+  `app/models/{usuario,game}.py`, `app/models/mixins.py`, `app/seeds/pericias_seed.py`
+  e `app/exceptions/custom_exceptions.py` foram **removidos** (confirmado com `rg` + testes).
+- `app/api/v1/` contém apenas `__init__.py` (agregador legado); `app.main` importa
+  o hub de `app.shared.api.v1` e regista modelos hub via `app.shared.models` quando
+  necessário.
+- **`app.shared.core.*`** é o import canónico para config, BD, deps de plataforma,
+  segurança, cache de catálogo, rate limit e request size. Os re-exports finos
+  `app.core.{config,database,catalog_cache,deps}` foram removidos; **`app.core`**
+  mantém `dependencies.py`. O startup da API importa seeds em `main.py` a partir
+  de `shared/startup/` e `games/dnd35/`.
+  Segurança JWT, auditoria, rate limit e limite de payload estão só em
+  `app.shared.core.{security,security_audit,rate_limit,request_size}`.
+- **D&D 3.5** vive em `app/games/dnd35/`. Não há shims por domínio em
+  `app.models.*` / `app.schemas.*` para o jogo; imports de domínio apontam para
+  `app.games.dnd35.*`. `SoftDeleteMixin` importa-se de **`app.shared.core.mixins`**.
 
 ## Alvo (após consolidação do hub)
 
 | Item / subpasta-alvo   | Conteúdo |
 |------------------------|----------|
 | `shared/constants.py` (já) | Constantes do hub (`GAME_SLUG_DND35`, …) — usado por `deps` e `game_service`. |
-| `shared/core/`         | `config.py`, `database.py`, `deps.py`, `security.py`, `security_audit.py`, `rate_limit.py`, `request_size.py`, `catalog_cache.py`, logging |
-| `shared/models/`       | `usuario.py`, `game.py` (canónicos) + futuro `mixins.py` |
+| `shared/core/`         | `config.py`, `database.py`, `deps.py`, `security.py`, `security_audit.py`, `rate_limit.py`, `request_size.py`, `catalog_cache.py`, `mixins.py`, logging |
+| `shared/models/`       | `usuario.py`, `game.py` (canónicos) |
 | `shared/schemas/`      | `usuario.py`, `game.py`, contratos de tokens |
 | `shared/repositories/` | `usuario_repository.py`, `game_repository.py`, `base.py` |
 | `shared/services/`     | `usuario_service.py`, `game_service.py` |
 | `shared/api/v1/`       | `auth.py`, `usuarios.py`, `games.py` |
+| `shared/startup/`      | `game_catalog.py`, `admin_default.py` (arranque de BD / admin; testes em `backend/tests/test_admin_default.py`) |
 | `shared/exceptions/`   | `custom_exceptions.py`, `http_errors.py` |
 
 ## O que NÃO pertence ao hub
@@ -70,17 +58,9 @@ from app.shared.models.usuario import Usuario
 from app.shared.services.game_service import GameService
 ```
 
-**Alvo** (quando o módulo tiver sido movido para `app/shared/...`):
-
-```python
-from app.shared.core.deps import get_usuario_atual
-from app.shared.models.usuario import Usuario
-from app.shared.services.game_service import GameService
-```
-
-Dentro de `games/dnd35`, o hub costuma ser alcançado com imports relativos
-para `app` (ex.: `.....shared.core.deps` a partir de `api/v1/`). Ver exemplos em
-`backend/app/games/dnd35/README.md`.
+Dentro de `games/dnd35`, o hub costuma ser alcançado com imports relativos até
+`app` e depois `shared` (ex.: `.....shared.core.deps` a partir de `api/v1/`).
+Ver exemplos em `backend/app/games/dnd35/README.md`.
 
 ## Migração incremental do hub
 
@@ -89,3 +69,36 @@ re-export mínimo no path antigo (`app.core.*`, `app.models.*`, …) até não
 restarem imports ao path legado (`rg` / testes). Isso **não** se aplica ao
 padrão antigo de um shim **por domínio de jogo** em `app.models.*` — esse
 padrão foi retirado para D&D 3.5 em favor de `app.games.dnd35.*`.
+
+### Inventário rápido (próxima limpeza)
+
+**Conteúdo atual de `backend/app/core/`** (abr/2026):
+
+| Ficheiro | Papel |
+|----------|--------|
+| `dependencies.py` | Factories FastAPI (repositórios, services D&D 3.5 + hub) |
+
+BBA, resistências de salvamento base e habilidades especiais por nível:
+**`app.games.dnd35.bonus_base_ataque`**. Catálogos D&D 3.5 em
+**`app.games.dnd35.catalogs`**. Normalização de texto (classes/magias):
+**`app.games.dnd35.text_utils`**. **`SoftDeleteMixin`**: **`app.shared.core.mixins`**.
+
+Na raiz do repo, com `rg` instalado:
+
+```bash
+rg 'from app\.core\.' backend -g '*.py'
+rg 'app\.core\.(security|rate_limit|request_size|security_audit)' backend -g '*.py'
+```
+
+A segunda linha deve continuar vazia. Objetivo incremental: reduzir a primeira
+sem mexer em `dependencies.py` até eventual refator maior.
+
+### `app.core.dependencies` (porque ainda não mudou de pasta)
+
+- É o **único agregador de factories** `Depends(...)` para FastAPI: repositórios e
+  services do hub **e** de D&D 3.5 num único módulo importável por rotas.
+- Mover para `app.shared` implica repartir ou duplicar factories “só de jogo” vs
+  “só de hub”, revisar **dezenas** de routers e todos os
+  `dependency_overrides` nos testes — PR de alto risco.
+- **Convenção:** em rotas novas, importar de `app.core.dependencies` (caminho
+  estável) até existir ADR para `app.shared.dependencies` ou pacote por jogo.

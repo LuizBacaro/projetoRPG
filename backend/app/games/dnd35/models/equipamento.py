@@ -11,7 +11,7 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.shared.core.database import Base
-from app.core.mixins import SoftDeleteMixin
+from app.shared.core.mixins import SoftDeleteMixin
 
 
 class Equipamento(SoftDeleteMixin, Base):

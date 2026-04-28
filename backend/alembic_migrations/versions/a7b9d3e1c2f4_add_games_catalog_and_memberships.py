@@ -8,7 +8,7 @@ Introduz a camada multi-jogo da plataforma:
 - `games_catalog`: catálogo global de sistemas de RPG suportados
 - `user_game_memberships`: vínculo de cada usuário com cada jogo (perfil/ativo)
 
-Mantém o D&D 3.5 como único jogo inicial via seed posterior em `init_db`.
+Mantém o D&D 3.5 como único jogo inicial via seed posterior (`game_catalog` / `main`).
 Não toca em tabelas existentes — é aditiva e segura para rollout.
 """
 from typing import Sequence, Union

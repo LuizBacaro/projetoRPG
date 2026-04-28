@@ -80,36 +80,40 @@ importar demasiado de `games` antes do hub estar explícito.
 
 ## Fase B — Consolidação do Auth Hub em `app/shared/`
 
-**Problema:** o hub continua disperso em `app/core`, `app/models`, `app/schemas`,
-`app/repositories`, `app/services`, `app/api/v1`; `app/shared/` é ainda
-andaime (`constants.py` + README).
+**Problema (histórico):** o hub estava disperso em `app/core`, `app/models`,
+`app/schemas`, `app/repositories`, `app/services`, `app/api/v1`.
 
 **Meta:** tabela em `backend/app/shared/README.md` cumprida — código de
 identidade, sessão, jogos e infra partilhada vive sob `app/shared/...`,
 com imports de aplicação a apontar para o novo path.
 
-**Status:** concluída (abr/2026) com compatibilidade via shims em `app.core.*`,
-`app.models.*`, `app.schemas.*`, `app.repositories.*`, `app.services.*` e
-`app.api.v1.*`.
+**Status:** concluída (abr/2026). Os shims finos do hub em `app/schemas/*`,
+`app/api/v1/{auth,games,usuarios}.py`, `app/repositories/{game,usuario}_repository.py`,
+`app/services/{game,usuario}_service.py`, `app/models/{usuario,game}.py`,
+`app/models/mixins.py`, `app/seeds/pericias_seed.py` e
+`app/exceptions/custom_exceptions.py` foram **removidos** após `rg` e testes;
+`app.main` importa os módulos hub via `app.shared.models`; rotas hub usam
+`app.shared.core.*` onde aplicável (ex.: `shared/api/v1`, `divindades_custom`).
 
 **Progresso atual (abr/2026):**
 
-- `shared/exceptions/custom_exceptions.py` consolidado com shim em
-  `app.exceptions.custom_exceptions`.
-- `shared/core` já canónico para `catalog_cache`, `request_size`, `rate_limit`,
-  `security_audit`, `security`, `deps`, `config` e `database`, com shims em
-  `app.core.*`.
-- `shared/models` já canónico para `usuario.py` e `game.py`, com shims em
-  `app.models.usuario` e `app.models.game`.
-- `shared/repositories` já canónico para `usuario_repository.py` e
-  `game_repository.py`, com shims em `app.repositories.*`.
-- `shared/services` já canónico para `usuario_service.py` e
-  `game_service.py`, com shims em `app.services.*`.
-- `shared/api/v1` já canónico para `auth.py`, `usuarios.py` e `games.py`,
-  com shims em `app.api.v1.*`.
-- `shared/schemas` já canónico para `usuario.py`, `game.py` e `auth.py`,
-  com shims em `app.schemas.*`.
-- Próximo foco: governança de retirada de shims e preparação da Fase C.
+- `shared/exceptions/custom_exceptions.py` canónico (path `app.exceptions.*` removido).
+- `shared/core` canónico para `catalog_cache`, `request_size`, `rate_limit`,
+  `security_audit`, `security`, `deps`, `config` e `database`; os shims
+  `app.core.{config,database,catalog_cache,deps}` foram removidos; também
+  `app.core.{security,security_audit,rate_limit,request_size}` (canónico em
+  `app.shared.core.*`). Re-exports de catálogos D&D 3.5 em `app.core.*` foram
+  removidos; `divindades_catalogo`, `text_utils`, `mixins` e `bonus_base_ataque`
+  passaram a `games/dnd35/catalogs`, `games/dnd35/text_utils`, `shared/core/mixins`
+  e `games/dnd35/bonus_base_ataque` (abr/2026). Em `app.core` permanece só
+  `dependencies`; o startup importa-se em `main.py` a partir de
+  `shared/startup/*`, `games/dnd35/legacy_membership.py`,
+  `games/dnd35/sync_progressao_combatentes.py`, `games/dnd35/startup_seeds.py`.
+- `shared/models`, `shared/repositories`, `shared/services`, `shared/api/v1`,
+  `shared/schemas` — canónicos; paths duplicados do hub em `app/` foram
+  retirados.
+- Próximo foco: reduzir imports restantes de `app.core.*` fora de
+  `app.core.dependencies`, e preparação da Fase C.
 
 **Tarefas sugeridas (incremental)**
 
@@ -126,7 +130,7 @@ com imports de aplicação a apontar para o novo path.
    D&D 3.5 para `Base.metadata` / Alembic. Opções:
    - **Manter:** barrel em `app.models` importa de `games.dnd35.models` (estado
      atual; simples).
-   - **Explicitar em `main.py` / `init_db`:** importar side-effect só os
+   - **Explicitar em `main.py`:** importar side-effect só os
      modelos necessários ao metadata, e afunilar `app.models` ao hub.
    Escolher uma estratégia **antes** da Fase C e registar em ADR curto ou
    neste doc.
@@ -145,17 +149,20 @@ com imports de aplicação a apontar para o novo path.
 - Smoke de runtime: `GET /api/docs` (200), `GET /api/v1/auth/me` (401 sem token),
   `GET /api/v1/games` (401 sem token).
 - Registro canônico consolidado em `app/shared/{core,models,schemas,repositories,services,api}`.
-- Paths legados preservados como shims para rollout incremental.
+- Shims do **hub** em `app/schemas`, `app/api/v1` (routers), repositórios/services
+  do hub, `app/models/{usuario,game}`, `mixins` shim, `app/seeds/pericias_seed`,
+  `app.exceptions` removidos; `app.core.*` mantido só para DI (`dependencies`).
 
-**Política de depreciação dos shims (proposta para próximos PRs):**
+**Política de depreciação dos shims (próximos PRs):**
 
 - Não remover shim no mesmo PR da migração canônica.
 - Remover shim apenas quando:
   - `rg` não retornar uso interno do path legado; e
   - houver ao menos 1 ciclo estável de testes/deploy após a migração; e
   - a remoção estiver documentada em changelog/roteiro.
-- Prioridade de remoção: `app.api.v1.*` e `app.services.*` primeiro, depois
-  `app.repositories.*` / `app.schemas.*`, mantendo `app.core.*` por último.
+- **Restante:** shims em `app.core` para config/BD/deps/segurança/rate-limit/payload
+  e re-exports de catálogos removidos (abr/2026); preservar `app.core.dependencies`
+  até eventual migração.
 
 **Riscos:** import circular (`deps` ↔ `models`); tempo de branch longa —
 mitigar com um módulo por PR.

@@ -71,7 +71,8 @@ Valores **como estão hoje no código / README** — se mudares o serviço no Re
    Se a tabela `magias` estiver **vazia** no Postgres:  
    - **Uma vez:** no Render, shell ou job one-off, a partir da pasta `backend/`:  
      `python scripts/seed_magias.py`  
-   - **Ou** definir `SEED_MAGIAS_ON_EMPTY=1` no `.env` **só no primeiro arranque** com BD vazio (o startup pode demorar ~20–40 s). Em SQLite local vazio, o próprio startup já tenta popular — ver `init_db.py`.
+   - **Ou** definir `SEED_MAGIAS_ON_EMPTY=1` no `.env` **só no primeiro arranque** com BD vazio (o startup pode demorar ~20–40 s). Em SQLite local vazio, o próprio startup já tenta popular — ver
+`app/games/dnd35/startup_seeds.py` (import em `main.py`).
 
 ---
 

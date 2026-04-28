@@ -4,9 +4,7 @@ Loader do catálogo canônico de raças (D&D 3.5).
 Fonte: `docs/dados/racas_caracteristicas_catalogo.json`, gerado pelo
 pipeline de planilhas do projeto.
 
-Localização: este módulo pertence ao pacote `app.games.dnd35.catalogs`.
-Existe um shim em `app.core.racas_catalog` que re-exporta os símbolos
-durante a reorganização multi-jogo.
+Localização: `app.games.dnd35.catalogs`.
 """
 
 from __future__ import annotations

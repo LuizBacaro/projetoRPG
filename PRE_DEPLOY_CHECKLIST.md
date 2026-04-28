@@ -6,6 +6,42 @@
 
 ---
 
+## 🔒 Proteção de dados em produção (Neon + Render) — obrigatório
+
+> Nenhum processo elimina erro humano a 100%; isto define o **mínimo** para não apontar produção para o lugar errado e ter **como recuperar** quando algo falhar.
+
+### Regras fixas
+
+1. **`DATABASE_URL` no Render (serviço de produção)**  
+   - Deve apontar **somente** para o Postgres de produção no Neon (branch definido com o time, em geral `production`).  
+   - **Nunca** colar no Render uma connection string do `.env` local, de homologação ou de outro projeto Neon sem conferir no painel: **host** (`*.neon.tech`), **projeto** e **branch**.
+
+2. **Staging antes de produção**  
+   - Ter **outro** `DATABASE_URL` (branch `staging` / projeto separado) ligado a um **outro** deploy (outro Web Service ou preview) e só promover para produção o **mesmo commit** depois de smoke (login, combatentes, grimório, etc.).
+
+3. **Neon — antes de migration pesada ou deploy grande**  
+   - Usar **Backup & Restore**: snapshot manual ou restore point-in-time quando existir.  
+   - Saber a **janela de PITR** do plano (ex.: poucas horas no free); fora disso só **backup externo** (`pg_dump` guardado fora do Neon).
+
+4. **Render — health do deploy**  
+   - Caminho recomendado: **`/health/live`** (não depende do Postgres no primeiro probe).  
+   - **`/health`** (com teste ao BD) continua boa para monitorização **depois** que a API estabilizou.
+
+5. **Migrations e seeds**  
+   - Revisar PR: evitar `DROP` / `TRUNCATE` em dados de negócio sem plano de migração de dados.  
+   - Não rodar em produção seeds com `force=True` que apaguem catálogo (ver **§ 7.1** abaixo).
+
+### Checklist rápido (antes de cada deploy em produção)
+
+- [ ] No Render, confirmei que `DATABASE_URL` é o do Neon **de produção** (projeto + branch corretos).
+- [ ] O mesmo commit já foi validado em **staging** (ou cópia do schema), quando existir fluxo.
+- [ ] Sei até **quando** o restore no tempo do Neon ainda cobre o horário atual, se precisar desfazer algo.
+- [ ] (Recomendado) Backup: snapshot Neon ou `pg_dump` com data no nome.
+
+**Skill Cursor (para o agente carregar este contexto):** [.cursor/skills/arena-producao-dados-neon-render/SKILL.md](.cursor/skills/arena-producao-dados-neon-render/SKILL.md)
+
+---
+
 ## 1️⃣ Validação Neon (Produção)
 
 | Item | Status | Detalhes |
@@ -52,7 +88,7 @@
 |------|--------|--------|
 | Neon PostgreSQL | ✅ | 17 migrations, 1035 magias_classes, 11 índices |
 | Render deploy webhook | ✅ | Ativo em feature/salva → produtiva |
-| Verificador health | ✅ | `/health` responde corretamente |
+| Verificador health | ✅ | Deploy: `/health/live`; monitor: `/health` (com BD) |
 | Variáveis de ambiente | ✅ | CLOUDINARY_* configuradas em Render |
 
 **Resumo Infra**: ✅ **Anti-sleep, pooling, e secrets OK**

@@ -1,8 +1,7 @@
 """
 Seed para popular perícias do Excel: Perícias.xlsx (D&D 3.5)
 
-Localização: `app.games.dnd35.seeds.pericias_seed`. Shim em
-`app.seeds.pericias_seed` durante a reorganização multi-jogo.
+Módulo canónico: `app.games.dnd35.seeds.pericias_seed`.
 """
 
 from pathlib import Path

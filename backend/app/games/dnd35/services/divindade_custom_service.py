@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from ..models.divindade_custom import DivindadeCustom
 from ..repositories.divindade_custom_repository import DivindadeCustomRepository
 
-from ....core import divindades_catalogo as _divindades_catalogo
+from ..catalogs import divindades_catalogo as _divindades_catalogo
 from ....shared.exceptions.custom_exceptions import DadosInvalidos
 from .magia_service import DOMINIOS_FIXOS
 
@@ -152,7 +152,7 @@ class DivindadeCustomService:
         (magia service) aos dominios que aparecem nas divindades oficiais
         (ex.: Animal, Planta, Ordem, Agua). Usa o _key do catalogo para
         normalizacao tolerante a acento."""
-        from ....core.divindades_catalogo import _key
+        from ..catalogs.divindades_catalogo import _key
 
         mapa: Dict[str, str] = {}
         for canonico in DOMINIOS_FIXOS.values():
@@ -165,7 +165,7 @@ class DivindadeCustomService:
         return mapa
 
     def _normalizar_dominios(self, dominios_in: Any) -> List[str]:
-        from ....core.divindades_catalogo import _key
+        from ..catalogs.divindades_catalogo import _key
 
         if isinstance(dominios_in, str):
             bruto = [item.strip() for item in dominios_in.split(",")]

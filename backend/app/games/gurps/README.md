@@ -9,7 +9,7 @@ sistema planejado e onde ele vai morar.
 ## Quando começar a implementar
 
 1. Marcar `gurps` como `disponivel` em `GAME_CATALOG_SEED`
-   (`backend/app/core/init_db.py`).
+   (`backend/app/shared/startup/game_catalog.py`).
 2. Adicionar destino em `destinoPorSlug()` no
    `frontend/pages/selecionar-jogo.html`.
 3. Criar guard `requer_game_gurps` em `backend/app/core/deps.py`

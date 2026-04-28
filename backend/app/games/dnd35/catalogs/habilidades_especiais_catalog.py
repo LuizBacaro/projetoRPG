@@ -5,10 +5,7 @@ Fonte: `docs/dados/habilidades_especiais_catalogo.json`, gerado por
 `processar_habilidades_especiais_excel.py` a partir da aba
 `Habilidades especiais` da planilha `Características especiais_v2.xlsx`.
 
-Localização: este módulo pertence ao pacote
-`app.games.dnd35.catalogs` por ser um catálogo do PHB 3.5. Existe um
-shim em `app.core.habilidades_especiais_catalog` que re-exporta os
-símbolos durante a reorganização multi-jogo.
+Localização: `app.games.dnd35.catalogs` (PHB 3.5).
 
 Responsabilidades (SRP):
 - Resolver o caminho do artefato considerando layouts de deploy

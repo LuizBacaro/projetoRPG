@@ -20,7 +20,10 @@ from app.games.dnd35.schemas.ataque import (
     DescansoRequest,
 )
 
-from app.core.text_utils import normalizar_classe_acesso as _normalizar_classe, classes_magia as _classes_magia
+from app.games.dnd35.text_utils import (
+    classes_magia as _classes_magia,
+    normalizar_classe_acesso as _normalizar_classe,
+)
 
 router = APIRouter(
     prefix="/magias-preparadas",

@@ -1,8 +1,7 @@
 """
 Catálogo de tabelas de classes (experimental e opt-in) — D&D 3.5.
 
-Localização: `app.games.dnd35.catalogs.classes_tables_catalog`. Shim em
-`app.core.classes_tables_catalog` durante a reorganização multi-jogo.
+Localização: `app.games.dnd35.catalogs.classes_tables_catalog`.
 
 Este módulo não altera comportamento funcional de APIs existentes.
 Ele apenas carrega e valida minimamente o JSON consolidado quando habilitado

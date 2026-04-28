@@ -4,13 +4,13 @@ SRP: apenas rotas HTTP para usuários
 """
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
-from ....core.database import get_db
+from ...core.database import get_db
 from ...core.deps import requer_admin, get_usuario_atual
 from ...models.usuario import Usuario
 from ...core.security_audit import log_security_event
 from ...repositories.usuario_repository import UsuarioRepository
 from ...services.usuario_service import UsuarioService
-from ....schemas.usuario import (
+from ...schemas.usuario import (
     UsuarioCreate, UsuarioUpdate, UsuarioResponse, UsuarioListResponse
 )
 

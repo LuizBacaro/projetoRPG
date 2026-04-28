@@ -20,11 +20,12 @@ O que NÃO entra aqui:
     backend/app/games/<slug>/.
 
 Estado atual da migração:
-  Esta pasta é um ANDAIME. Os arquivos ainda vivem em backend/app/{core,
-  models, schemas, repositories, services, api/v1, exceptions}/. A
-  reorganização será feita em PRs pequenos por domínio para não quebrar
-  imports em massa. Veja docs/arquitetura-multi-jogo.md (Fase 5) para o
-  plano completo.
+  O Auth Hub e a infra partilhada (config, BD, deps, segurança, routers
+  /auth /games /usuarios) estão consolidados em `app/shared/`. Código de jogo
+  (D&D 3.5) vive em `app/games/dnd35/`. `app/core/` concentra DI
+  (`dependencies.py`); o arranque de BD importa-se em `main.py` a partir de
+  `app.shared.startup.*` e `app.games.dnd35.*`. Ver docs/arquitetura-multi-jogo.md
+  e `backend/app/shared/README.md`.
 
 Convenção de imports (após a reorganização):
   from ...shared.core.deps import get_usuario_atual

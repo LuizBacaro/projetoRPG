@@ -50,8 +50,7 @@ Backend do sistema **Dungeons & Dragons 3.5**.
     `requer_game_dnd35`, mantido na migração)
 
 - `habilidade_especial/` (4ª onda):
-  - `catalogs/habilidades_especiais_catalog.py` (loader do JSON
-    canônico; substitui o antigo `app.core.habilidades_especiais_catalog`)
+  - `catalogs/habilidades_especiais_catalog.py` (loader do JSON canônico)
   - `schemas/habilidade_especial.py`
   - `api/v1/habilidades_especiais.py` (router
     `/habilidades-especiais`)
@@ -64,8 +63,7 @@ Backend do sistema **Dungeons & Dragons 3.5**.
 
 - `raca/` (5ª onda):
   - `catalogs/racas_catalog.py` (loader do JSON
-    `racas_caracteristicas_catalogo.json`; substitui o antigo
-    `app.core.racas_catalog`)
+    `racas_caracteristicas_catalogo.json`)
   - `schemas/raca.py`
   - `api/v1/racas.py` (router `/racas`)
 
@@ -80,8 +78,7 @@ Backend do sistema **Dungeons & Dragons 3.5**.
   - `services/talento_service.py` (`TalentoService`)
   - `api/v1/talentos.py` (router `/talentos`)
   - `catalogs/talentos_catalog_seed.py` (seed/sincronização LdJ a
-    partir de `talentos_importacao_limpo.json`; substitui o antigo
-    `app.core.talentos_catalog_seed`)
+    partir de `talentos_importacao_limpo.json`)
 
   O router ainda **não** declara `requer_game_dnd35` (paridade com o
   original).
@@ -100,8 +97,7 @@ Backend do sistema **Dungeons & Dragons 3.5**.
 
 - `tabelas_classes/` (8ª onda):
   - `catalogs/classes_tables_catalog.py` (loader do JSON
-    `docs/dados/tabelas_classes_catalogo.json`; substitui o antigo
-    `app.core.classes_tables_catalog`)
+    `docs/dados/tabelas_classes_catalogo.json`)
   - `schemas/tabelas_classes.py`
   - `services/tabelas_classes_service.py` (`TabelasClassesService`)
   - `api/v1/tabelas_classes.py` (router `/tabelas-classes`, opt-in por
@@ -136,8 +132,8 @@ Backend do sistema **Dungeons & Dragons 3.5**.
   - schemas, repositórios, services e routers `/combate`, `/condicoes`,
     rotas de ataques/slots (`/combatentes/.../ataques`, `.../magias`,
     `/magias_slots/...`) e `/armaduras_protecao`
-  - Código canônico em `games/dnd35/`; `app.api.v1` pode ainda re-exportar
-    o mesmo `router` para URLs estáveis (`app.games.dnd35.api.v1.*`).
+  - Código canônico em `games/dnd35/`; rotas registadas em `app.main` a partir de
+    `app.games.dnd35.api.v1.*`.
 
 - **`combatente/`** (11ª onda — **ficha**, nó central):
   - `models/combatente.py` (`Combatente`)
@@ -147,8 +143,7 @@ Backend do sistema **Dungeons & Dragons 3.5**.
   - `services/combatente_service.py` (`CombatenteService`; enriquecimento
     racial persiste `idiomas_customizados` na coluna como JSON)
   - `api/v1/combatentes.py` (router `/combatentes`)
-  - `app/core/mixins.py` define `SoftDeleteMixin`; `app.models.mixins` só
-    re-exporta por compatibilidade com imports antigos.
+  - `app/shared/core/mixins.py` define `SoftDeleteMixin` (import nos models).
 
 O router `/combatentes` mantém `requer_game_dnd35` como na migração.
 
@@ -158,8 +153,8 @@ O router `/combatentes` mantém `requer_game_dnd35` como na migração.
 # Dentro do próprio pacote dnd35:
 from ..models.divindade_custom import DivindadeCustom
 
-# Cruzando para o hub (vigente: `app.core`; alvo: `app.shared.core`):
-from .....core.deps import get_usuario_atual, requer_game_dnd35
+# Cruzando para o hub (canónico: `app.shared.core`):
+from .....shared.core.deps import get_usuario_atual, requer_game_dnd35
 ```
 
 ## Guard de jogo

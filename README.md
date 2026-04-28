@@ -184,7 +184,7 @@ backend/
 │   │   ├── deps.py                # get_usuario_atual, requer_game_dnd35, …
 │   │   ├── dependencies.py        # Factories de services (get_combate_service, …)
 │   │   ├── mixins.py              # SoftDeleteMixin (models D&D 3.5 importam daqui)
-│   │   └── init_db.py             # Seeds admin, catálogo de jogos, memberships legados, …
+│   │   # Seeds de arranque: `main.py` → `app/shared/startup/`, `app/games/dnd35/`
 │   │
 │   ├── models/                    # usuario, game (hub); demais → shims → games/dnd35/models
 │   ├── schemas/                   # usuario, game, auth (hub); demais → shims → games/dnd35/schemas

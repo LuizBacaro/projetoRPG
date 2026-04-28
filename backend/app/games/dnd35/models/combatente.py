@@ -6,7 +6,7 @@ from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.shared.core.database import Base
-from app.core.mixins import SoftDeleteMixin
+from app.shared.core.mixins import SoftDeleteMixin
 
 
 class Combatente(SoftDeleteMixin, Base):

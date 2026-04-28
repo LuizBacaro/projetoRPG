@@ -25,11 +25,11 @@ from ...schemas.divindade_custom import (
     DivindadeCustomResponse,
 )
 
-# Auth Hub e cache global ainda vivem fora de games/dnd35/.
+# Auth Hub, BD e cache global: `app.shared.core.*` (canónico).
 from .....shared.core.catalog_cache import catalog_cache
-from .....core.config import settings
-from .....core.database import get_db
-from .....core.deps import (
+from .....shared.core.config import settings
+from .....shared.core.database import get_db
+from .....shared.core.deps import (
     get_usuario_atual,
     requer_mestre_ou_admin,
     requer_game_dnd35,
