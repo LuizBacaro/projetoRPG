@@ -94,13 +94,14 @@ async def lifespan(app: FastAPI):
     def _run_init_sync() -> None:
         db = SessionLocal()
         try:
-            _inicializar_banco(db)
+            _inicializar_banco_critico(db)
+            _db_startup_done.set()
+            _inicializar_banco_pos_ready(db)
         finally:
             db.close()
 
     async def _run_init_async() -> None:
         await asyncio.to_thread(_run_init_sync)
-        _db_startup_done.set()
 
     try:
         if settings.ENVIRONMENT == "production":
@@ -117,11 +118,11 @@ async def lifespan(app: FastAPI):
             task.add_done_callback(_log_task_fail)
             await asyncio.sleep(0)  # dá ao loop uma oportunidade de arrancar a task
             logger.info(
-                "Startup production: BD a inicializar em background — "
-                "Health check no Render: /health/live; /api fica 503 até concluir."
+                "Startup production: init crítico em background e pós-ready assíncrono — "
+                "health check no Render: /health/live; /api libera após fase crítica."
             )
             print("=" * 60)
-            print("✅ API A ACEITAR TRÁFEGO — BD a inicializar em background")
+            print("✅ API A ACEITAR TRÁFEGO — fase crítica do BD em progresso")
             print("=" * 60)
         else:
             await _run_init_async()
@@ -152,7 +153,7 @@ app = FastAPI(
 @app.middleware("http")
 async def _readiness_middleware(request: Request, call_next):
     """
-    Em production, /api/* fica 503 até `_inicializar_banco` concluir (startup em background).
+    Em production, /api/* fica 503 até a fase crítica de startup concluir.
     OPTIONS passa (CORS preflight). /health/live e /health/ping não passam por /api.
     """
     if settings.ENVIRONMENT == "production" and not _db_startup_done.is_set():
@@ -515,24 +516,30 @@ def _executar_alembic_migrations() -> None:
         raise
 
 
-def _inicializar_banco(db) -> None:
+def _inicializar_banco_critico(db) -> None:
     """
-    SRP: Orquestra a inicialização completa do banco.
+    SRP: Orquestra a inicialização crítica do banco (gate para liberar /api em produção).
+
     Ordem importa:
     1. Criar tabelas (create_all) - base para tudo
-    2. Migrations do Alembic - ALTER TABLE
-    3. Admin (dependência de tudo)
-    4. Condições (globais)
-    5. Perícias (globais)
-    6. Equipamentos (globais)
-    7. Combatentes (usam condições)
+    2. Migrations do Alembic (opcional por setting)
+    3. Admin + guards de schema + catálogo de jogos + memberships legados
 
     Args:
         db: Sessão do banco
     """
     passos = [
         ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
-        ("executar_alembic_migrations", _executar_alembic_migrations),
+    ]
+    if settings.STARTUP_RUN_ALEMBIC:
+        passos.append(("executar_alembic_migrations", _executar_alembic_migrations))
+    else:
+        logger.info(
+            "⏭️ Pulando Alembic no startup da app (STARTUP_RUN_ALEMBIC=0); "
+            "espera-se migração prévia no processo de deploy."
+        )
+
+    passos.extend([
         ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
         ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
         ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
@@ -546,6 +553,23 @@ def _inicializar_banco(db) -> None:
         ("garantir_colunas_talentos", _garantir_colunas_talentos),
         ("garantir_colunas_armaduras_protecao", _garantir_colunas_armaduras_protecao),
         ("garantir_constraints_item_13", _garantir_constraints_item_13),
+        ("inicializar_catalogo_jogos", lambda: inicializar_catalogo_jogos(db)),
+        (
+            "garantir_membership_dnd35_para_usuarios_legados",
+            lambda: garantir_membership_dnd35_para_usuarios_legados(db),
+        ),
+    ])
+
+    for nome, callback in passos:
+        _executar_passo_startup(nome, callback)
+
+
+def _inicializar_banco_pos_ready(db) -> None:
+    """
+    Passos não críticos para liberar API de login/negócio.
+    Em produção rodam após a fase crítica ter marcado readiness.
+    """
+    passos = [
         ("seed_condicoes", lambda: _seed_condicoes(db)),
         ("seed_pericias", lambda: _seed_pericias(db)),
         ("seed_pericias_classes", lambda: _seed_pericias_classes(db)),
@@ -555,11 +579,6 @@ def _inicializar_banco(db) -> None:
         ("inicializar_catalogo_magias_se_vazio", lambda: inicializar_catalogo_magias_se_vazio(db)),
         ("sincronizar_bonus_base_ataque_combatentes", lambda: sincronizar_bonus_base_ataque_combatentes(db)),
         ("inicializar_catalogo_tabelas_classes", inicializar_catalogo_tabelas_classes),
-        ("inicializar_catalogo_jogos", lambda: inicializar_catalogo_jogos(db)),
-        (
-            "garantir_membership_dnd35_para_usuarios_legados",
-            lambda: garantir_membership_dnd35_para_usuarios_legados(db),
-        ),
         ("seed_combatentes", lambda: _seed_combatentes(db)),
     ]
 

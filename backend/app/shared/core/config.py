@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List
 import secrets
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,9 @@ class Settings(BaseSettings):
     # Se True e a tabela `magias` estiver vazia, o startup executa `scripts/seed_magias.py`
     # (PHB completo — pode levar ~30s). Em SQLite vazio o seed roda sempre sem esta flag.
     SEED_MAGIAS_ON_EMPTY: bool = False
+    # Controla se a API deve rodar Alembic também no startup da app.
+    # Em produção (Render/Procfile), normalmente já roda antes de subir o uvicorn.
+    STARTUP_RUN_ALEMBIC: bool = True
 
     class Config:
         """Configuração de leitura do Pydantic"""
@@ -92,6 +96,10 @@ class Settings(BaseSettings):
     def __init__(self, **data):
         """Inicializa e valida configurações"""
         super().__init__(**data)
+        if "STARTUP_RUN_ALEMBIC" not in os.environ and self.ENVIRONMENT == "production":
+            # Em produção padrão seguro para evitar migração duplicada
+            # quando o Procfile já executa `alembic upgrade head`.
+            self.STARTUP_RUN_ALEMBIC = False
         self._validar_seguranca()
         self._criar_diretorios()
         self._normalizar_database_url()
