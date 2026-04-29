@@ -79,6 +79,8 @@ class Settings(BaseSettings):
     # no token. Quando False (padrão até a Fase 2 estabilizar), apenas registra
     # log sem bloquear — preserva tokens legados durante o rollout.
     MULTI_GAME_STRICT_MODE: bool = False
+    # Frontend: permite auto-entrada no último jogo válido ao abrir o seletor.
+    AUTO_ENTER_LAST_GAME: bool = True
 
     # Se True e a tabela `magias` estiver vazia, o startup executa `scripts/seed_magias.py`
     # (PHB completo — pode levar ~30s). Em SQLite vazio o seed roda sempre sem esta flag.

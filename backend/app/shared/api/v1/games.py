@@ -67,6 +67,7 @@ def listar_catalogo(
         jogos=catalogo,
         memberships=memberships,
         game_slug_ativo=game_slug_ativo,
+        auto_enter_last_game=settings.AUTO_ENTER_LAST_GAME,
         server_time=datetime.now(timezone.utc),
     )
 

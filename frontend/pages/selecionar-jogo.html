@@ -46,7 +46,7 @@
                     <!-- Logo por baixo do anel de botões (evita o PNG “cortar” os ícones) -->
                     <div class="hub-central-wrap">
                         <img src="/assets/brand/logo_v5.png" class="hub-central" width="512" height="512"
-                             alt="Arena TTRPG" decoding="async" />
+                             alt="Arena TTRPG" decoding="async" fetchpriority="high" />
                     </div>
                     <div class="hub-orbit-spinner">
                         <div class="hub-orbit-slot" style="--slot-angle: -90deg;">
@@ -54,7 +54,16 @@
                                 <div class="hub-satellite-cluster">
                                     <button type="button" id="btnHubDnd35" class="hub-satellite hub-satellite--dnd35" disabled
                                             title="Abrir D&amp;D 3.5" aria-label="Abrir plataforma Dungeons &amp; Dragons 3.5">
-                                        <img src="/assets/brand/logo_dd35_redondo.png" alt="" width="160" height="160" decoding="async" />
+                                        <img
+                                            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                                            data-src="/assets/brand/logo_dd35_redondo.png"
+                                            alt=""
+                                            width="160"
+                                            height="160"
+                                            decoding="async"
+                                            loading="lazy"
+                                            fetchpriority="low"
+                                        />
                                     </button>
                                     <span class="hub-satellite-label">D&amp;D 3.5</span>
                                 </div>
@@ -65,7 +74,17 @@
                                 <div class="hub-satellite-cluster">
                                     <button type="button" id="btnHubDnd5e" class="hub-satellite hub-satellite--dnd5e" disabled
                                             title="D&amp;D 5e (em breve)" aria-label="Abrir página D&amp;D 5e em breve">
-                                        <img src="/assets/brand/logo_dd5.png" alt="" width="160" height="160" decoding="async" class="hub-img-dd5" />
+                                        <img
+                                            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                                            data-src="/assets/brand/logo_dd5.png"
+                                            alt=""
+                                            width="160"
+                                            height="160"
+                                            decoding="async"
+                                            loading="lazy"
+                                            fetchpriority="low"
+                                            class="hub-img-dd5"
+                                        />
                                     </button>
                                     <span class="hub-satellite-label">D&amp;D 5e</span>
                                 </div>
@@ -76,7 +95,16 @@
                                 <div class="hub-satellite-cluster">
                                     <button type="button" id="btnHubGurps" class="hub-satellite hub-satellite--gurps" disabled
                                             title="Abrir GURPS" aria-label="Abrir plataforma GURPS">
-                                        <img src="/assets/brand/logo_gurps_classico_redondo.png" alt="" width="160" height="160" decoding="async" />
+                                        <img
+                                            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+                                            data-src="/assets/brand/logo_gurps_classico_redondo.png"
+                                            alt=""
+                                            width="160"
+                                            height="160"
+                                            decoding="async"
+                                            loading="lazy"
+                                            fetchpriority="low"
+                                        />
                                     </button>
                                     <span class="hub-satellite-label">GURPS</span>
                                 </div>
@@ -88,6 +116,10 @@
         </section>
 
         <div id="seletorLoading" class="seletor-loading">Carregando jogos disponíveis…</div>
+        <div id="autoEntradaHint" class="seletor-auto-hint" role="status" aria-live="polite" hidden>
+            <span id="autoEntradaHintTexto"></span>
+            <button id="btnCancelarAutoEntrada" type="button">Trocar jogo</button>
+        </div>
 
         <details class="seletor-catalogo-detalhe">
             <summary>Ver catálogo completo de jogos</summary>
@@ -115,6 +147,9 @@
     const elLista = document.getElementById('seletorLista');
     const elErro = document.getElementById('seletorErro');
     const elAviso = document.getElementById('seletorAviso');
+    const elAutoEntradaHint = document.getElementById('autoEntradaHint');
+    const elAutoEntradaHintTexto = document.getElementById('autoEntradaHintTexto');
+    const btnCancelarAutoEntrada = document.getElementById('btnCancelarAutoEntrada');
     const elUsuarioNome = document.getElementById('seletorUsuarioNome');
     const elUsuarioEmail = document.getElementById('seletorUsuarioEmail');
     const elUsuarioBadge = document.getElementById('seletorUsuarioBadge');
@@ -126,6 +161,46 @@
     let catalogoJogos = [];
     let catalogoMemberships = [];
     let catalogoSlugAtivo = null;
+    let logosOrbitaisCarregadas = false;
+    const queryParams = new URLSearchParams(window.location.search);
+    const forcarSelecaoManual = queryParams.get('manual') === '1';
+    let autoEnterFeatureEnabled = true;
+    let autoEntradaCancelada = false;
+    let autoEntradaTimer = null;
+
+    function carregarLogosOrbitais() {
+        if (logosOrbitaisCarregadas) return;
+        logosOrbitaisCarregadas = true;
+        document.querySelectorAll('img[data-src]').forEach((img) => {
+            const src = img.getAttribute('data-src');
+            if (!src) return;
+            img.src = src;
+            img.removeAttribute('data-src');
+        });
+    }
+
+    function atualizarLoading(msg, ativo = false) {
+        if (msg) {
+            elLoading.textContent = msg;
+        }
+        elLoading.style.display = '';
+        elLoading.classList.toggle('is-busy', !!ativo);
+    }
+
+    function ocultarLoading() {
+        elLoading.classList.remove('is-busy');
+        elLoading.style.display = 'none';
+    }
+
+    function mostrarHintAutoEntrada(msg) {
+        elAutoEntradaHintTexto.textContent = msg;
+        elAutoEntradaHint.hidden = false;
+    }
+
+    function ocultarHintAutoEntrada() {
+        elAutoEntradaHint.hidden = true;
+        elAutoEntradaHintTexto.textContent = '';
+    }
 
     function exibirErro(msg) {
         elErro.textContent = msg;
@@ -238,6 +313,19 @@
         return catalogoJogos.find((j) => j.slug === slug);
     }
 
+    function membroPorSlug(slug) {
+        return (catalogoMemberships || []).find((m) => m.game_slug === slug) || null;
+    }
+
+    function botaoPorSlug(slug) {
+        return (
+            document.querySelector(`button[data-slug="${slug}"]`) ||
+            (slug === 'dnd35' ? btnHubDnd35 : null) ||
+            (slug === 'dnd5e' ? btnHubDnd5e : null) ||
+            (slug === 'gurps' ? btnHubGurps : null)
+        );
+    }
+
     function atualizarBotoesHub() {
         const j35 = jogoPorSlug('dnd35');
         const j5 = jogoPorSlug('dnd5e');
@@ -328,7 +416,7 @@
         if (!token) return;
 
         ocultarErro();
-        elLoading.style.display = 'block';
+        atualizarLoading('Carregando jogos disponíveis…', false);
         try {
             const res = await fetch(getApiUrl('/games'), {
                 method: 'GET',
@@ -347,7 +435,45 @@
                 return;
             }
 
+            autoEnterFeatureEnabled = data.auto_enter_last_game !== false;
+
             renderizar(data.jogos || [], data.memberships || [], data.game_slug_ativo);
+
+            const ultimoSlug = localStorage.getItem(STORAGE_GAME_SLUG);
+            const jogoUltimo = ultimoSlug ? jogoPorSlug(ultimoSlug) : null;
+            const membershipUltimo = ultimoSlug ? membroPorSlug(ultimoSlug) : null;
+            const podeAutoEntrar = (
+                autoEnterFeatureEnabled &&
+                !forcarSelecaoManual &&
+                !!ultimoSlug &&
+                !!jogoUltimo &&
+                jogoUltimo.status === 'disponivel' &&
+                !!membershipUltimo
+            );
+            if (podeAutoEntrar) {
+                autoEntradaCancelada = false;
+                mostrarHintAutoEntrada(`Entrando automaticamente em ${jogoUltimo.nome || ultimoSlug}…`);
+                await new Promise((resolve) => {
+                    autoEntradaTimer = window.setTimeout(resolve, 1500);
+                });
+                ocultarHintAutoEntrada();
+                autoEntradaTimer = null;
+                if (autoEntradaCancelada) {
+                    ocultarLoading();
+                    exibirAviso('Autoentrada cancelada. Escolha manualmente o jogo.');
+                    return;
+                }
+                atualizarLoading(`Entrando automaticamente em ${jogoUltimo.nome || ultimoSlug}…`, true);
+                await selecionarJogo(ultimoSlug, botaoPorSlug(ultimoSlug), { auto: true });
+                return;
+            }
+
+            // Carrega logos pesadas após os dados críticos da tela.
+            if (typeof window.requestIdleCallback === 'function') {
+                window.requestIdleCallback(() => carregarLogosOrbitais(), { timeout: 500 });
+            } else {
+                setTimeout(() => carregarLogosOrbitais(), 0);
+            }
 
             if (!Array.isArray(data.memberships) || data.memberships.length === 0) {
                 exibirAviso(
@@ -360,24 +486,30 @@
             exibirErro('Erro de conexão com o servidor.');
             console.error(err);
         } finally {
-            elLoading.style.display = 'none';
+            ocultarLoading();
         }
     }
 
-    async function selecionarJogo(slug, botao) {
+    async function selecionarJogo(slug, botao, opts = {}) {
         ocultarErro();
         const token = exigirToken();
-        if (!token) return;
+        if (!token) return false;
 
-        const temImg = !!botao.querySelector('img');
-        const originalText = botao.textContent;
-        const originalHtml = temImg ? botao.innerHTML : null;
-        botao.disabled = true;
-        if (temImg) {
-            botao.style.opacity = '0.55';
-            botao.style.pointerEvents = 'none';
-        } else {
-            botao.textContent = 'Entrando…';
+        const botaoSeguro = botao || botaoPorSlug(slug);
+        const temImg = !!botaoSeguro?.querySelector?.('img');
+        const originalText = botaoSeguro?.textContent || '';
+        const originalHtml = temImg ? botaoSeguro.innerHTML : null;
+        if (botaoSeguro) {
+            botaoSeguro.disabled = true;
+        }
+        if (opts.auto) {
+            atualizarLoading('Entrando no jogo…', true);
+        }
+        if (botaoSeguro && temImg) {
+            botaoSeguro.style.opacity = '0.55';
+            botaoSeguro.style.pointerEvents = 'none';
+        } else if (botaoSeguro) {
+            botaoSeguro.textContent = 'Entrando…';
         }
 
         try {
@@ -394,7 +526,7 @@
 
             if (!res.ok) {
                 exibirErro(data.detail || 'Não foi possível entrar nesse jogo.');
-                return;
+                return false;
             }
 
             localStorage.setItem(STORAGE_TOKEN, data.access_token);
@@ -412,22 +544,30 @@
             const destino = destinoPorSlug(data.game_slug);
             if (destino) {
                 window.location.href = destino;
+                return true;
             } else {
                 exibirAviso(
                     `O jogo '${slug}' ainda não tem frontend dedicado. Aguarde a próxima fase.`
                 );
+                return false;
             }
         } catch (err) {
             exibirErro('Erro de conexão com o servidor.');
             console.error(err);
+            return false;
         } finally {
-            botao.disabled = false;
-            if (temImg && originalHtml != null) {
-                botao.innerHTML = originalHtml;
-                botao.style.opacity = '';
-                botao.style.pointerEvents = '';
-            } else {
-                botao.textContent = originalText;
+            if (botaoSeguro) {
+                botaoSeguro.disabled = false;
+            }
+            if (botaoSeguro && temImg && originalHtml != null) {
+                botaoSeguro.innerHTML = originalHtml;
+                botaoSeguro.style.opacity = '';
+                botaoSeguro.style.pointerEvents = '';
+            } else if (botaoSeguro) {
+                botaoSeguro.textContent = originalText;
+            }
+            if (opts.auto) {
+                ocultarLoading();
             }
         }
     }
@@ -442,6 +582,16 @@
     }
 
     btnSair.addEventListener('click', sair);
+    btnCancelarAutoEntrada.addEventListener('click', () => {
+        autoEntradaCancelada = true;
+        if (autoEntradaTimer) {
+            window.clearTimeout(autoEntradaTimer);
+            autoEntradaTimer = null;
+            ocultarHintAutoEntrada();
+            ocultarLoading();
+            exibirAviso('Autoentrada cancelada. Escolha manualmente o jogo.');
+        }
+    });
 
     btnHubDnd35.addEventListener('click', () => {
         const j = jogoPorSlug('dnd35');

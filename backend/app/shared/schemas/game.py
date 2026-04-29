@@ -63,6 +63,7 @@ class CatalogoJogosResponse(BaseModel):
     jogos: List[GameResponse]
     memberships: List[UserGameMembershipResponse]
     game_slug_ativo: Optional[str] = None
+    auto_enter_last_game: bool = True
     server_time: datetime
 
 

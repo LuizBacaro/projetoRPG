@@ -244,9 +244,8 @@
                 localStorage.setItem('refresh_token', data.refresh_token);
             }
             localStorage.setItem('usuario', JSON.stringify(data.usuario));
-            // Multi-jogo: o usuário escolhe o sistema antes de entrar no app.
-            // O dashboard só é acessado após selecionar um jogo (game_slug no token).
-            localStorage.removeItem('game_slug_ativo');
+            // Multi-jogo: preserva o último jogo ativo para auto-entrada no seletor
+            // quando ainda houver membership válido.
             window.location.href = '/pages/selecionar-jogo.html';
 
         } catch (err) {
