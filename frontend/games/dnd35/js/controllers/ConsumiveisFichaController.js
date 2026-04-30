@@ -29,10 +29,16 @@ class ConsumiveisFichaController {
         document.getElementById('abaListarConsumiveis')?.addEventListener('click', () => this.abrirAbaListarConsumiveis());
         document.getElementById('abaCriarConsumivel')?.addEventListener('click', () => this.abrirAbaCriarConsumivel());
         document.querySelectorAll('[data-filtro-consumivel]').forEach((btn) => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 this.filtroTipo = String(btn.dataset.filtroConsumivel || 'todos').toLowerCase();
                 document.querySelectorAll('[data-filtro-consumivel]').forEach((b) => b.classList.remove('ativo'));
                 btn.classList.add('ativo');
+                // Para evitar falso "vazio" por paginação, carrega tudo ao aplicar filtro específico.
+                if (this.filtroTipo !== 'todos' && !this.catalogoCarregadoCompleto) {
+                    while (!this.catalogoCarregadoCompleto) {
+                        await this._carregarMaisConsumiveis();
+                    }
+                }
                 this.renderizarCatalogo();
             });
         });

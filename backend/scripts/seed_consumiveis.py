@@ -7744,10 +7744,31 @@ def seed_consumiveis(db) -> None:
     from app.games.dnd35.models.consumivel import ConsumivelJogador
     from app.shared.core.config import settings
 
-    dados_seed = CONSUMIVEIS_DADOS
+    nomes_legacy_remover = {
+        "Permite que uma magia de até 4º nível seja 77–81 invocar criaturas VII",
+        "Supondo que nenhum componente material 71–76 alterar forma",
+        "Supondo uma área equivalente a um cubo 32–37 portal",
+        "XP. 67–70 sombras",
+        "invocar criaturas VII",
+        "alterar forma",
+        "portal",
+    }
+
+    # Oculta entradas legadas do catálogo sem apagar histórico em fichas.
+    # Mantemos deleted_at nulo para não quebrar consumíveis já vinculados ao jogador.
+    (
+        db.query(Consumivel)
+        .filter(Consumivel.nome.in_(nomes_legacy_remover), Consumivel.deleted_at.is_(None))
+        .update({"ativo": False}, synchronize_session=False)
+    )
+
+    dados_seed = [
+        d for d in CONSUMIVEIS_DADOS
+        if d.get("nome") not in nomes_legacy_remover
+    ]
     if settings.ENVIRONMENT == "production":
         dados_seed = [
-            d for d in CONSUMIVEIS_DADOS
+            d for d in dados_seed
             if (d.get("categoria") or "").strip().lower() != "pergaminho"
         ]
 
