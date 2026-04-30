@@ -7742,8 +7742,16 @@ CONSUMIVEIS_DADOS = [
 def seed_consumiveis(db) -> None:
     from app.games.dnd35.models.consumivel import Consumivel
     from app.games.dnd35.models.consumivel import ConsumivelJogador
+    from app.shared.core.config import settings
 
-    nomes_seed = {d["nome"] for d in CONSUMIVEIS_DADOS}
+    dados_seed = CONSUMIVEIS_DADOS
+    if settings.ENVIRONMENT == "production":
+        dados_seed = [
+            d for d in CONSUMIVEIS_DADOS
+            if (d.get("categoria") or "").strip().lower() != "pergaminho"
+        ]
+
+    nomes_seed = {d["nome"] for d in dados_seed}
     usados = {
         row[0]
         for row in db.query(ConsumivelJogador.consumivel_id).distinct().all()
@@ -7764,7 +7772,7 @@ def seed_consumiveis(db) -> None:
 
     inseridos = 0
     atualizados = 0
-    for data in CONSUMIVEIS_DADOS:
+    for data in dados_seed:
         row = (
             db.query(Consumivel)
             .filter(Consumivel.nome == data["nome"], Consumivel.deleted_at.is_(None))
@@ -7796,5 +7804,5 @@ def seed_consumiveis(db) -> None:
     db.commit()
     print(
         f"✅ Catálogo de consumíveis sincronizado: +{inseridos} inseridos, "
-        f"{atualizados} atualizados, {removidos} removidos (total: {len(CONSUMIVEIS_DADOS)})."
+        f"{atualizados} atualizados, {removidos} removidos (total: {len(dados_seed)})."
     )
