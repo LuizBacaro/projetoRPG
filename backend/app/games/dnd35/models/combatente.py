@@ -110,6 +110,12 @@ class Combatente(SoftDeleteMixin, Base):
         lazy="selectin",
         foreign_keys="EquipamentoJogador.combatente_id"
     )
+    consumiveis = relationship(
+        "ConsumivelJogador",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        foreign_keys="ConsumivelJogador.combatente_id",
+    )
     armaduras_protecao = relationship(
         "ArmaduraProtecaoJogador",
         cascade="all, delete-orphan",

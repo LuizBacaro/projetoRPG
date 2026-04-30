@@ -1095,7 +1095,7 @@ body {
 
 .ficha-equipamento-header {
     display: grid;
-    grid-template-columns: 1.5fr 2fr 1fr 1fr 50px;
+    grid-template-columns: 2.3fr 1.2fr 1fr 0.8fr 50px;
     gap: 0.5rem;
     padding: 0.7rem;
     background: rgba(92,58,30,0.15);
@@ -1121,7 +1121,7 @@ body {
 
 .ficha-equipamento-linha {
     display: grid;
-    grid-template-columns: 1.5fr 2fr 1fr 1fr 50px;
+    grid-template-columns: 2.3fr 1.2fr 1fr 0.8fr 50px;
     gap: 0.5rem;
     padding: 0.7rem;
     background: rgba(92,58,30,0.06);
@@ -1166,6 +1166,29 @@ body {
     text-align: center;
     font-weight: 600;
     color: var(--cor-verde);
+}
+
+.consumiveis-filtros {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin: -0.2rem 0 0.55rem;
+}
+
+.consumiveis-filtro-btn {
+    border: 1px solid rgba(92, 58, 30, 0.45);
+    background: rgba(92, 58, 30, 0.08);
+    color: var(--cor-tinta);
+    border-radius: 999px;
+    padding: 0.28rem 0.7rem;
+    font-size: 0.74rem;
+    cursor: pointer;
+}
+
+.consumiveis-filtro-btn.ativo {
+    background: rgba(124, 58, 237, 0.16);
+    border-color: rgba(124, 58, 237, 0.55);
+    color: #4c1d95;
 }
 
 /* ── Magias: grid responsivo ── */

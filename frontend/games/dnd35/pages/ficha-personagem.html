@@ -201,6 +201,18 @@
                 </div>
             </div>
 
+            <div class="ficha-secao">
+                <div class="ficha-secao-header">
+                    <h3 class="ficha-secao-titulo">🧪 Consumíveis</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarConsumivel" title="Adicionar consumível">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaConsumiveis" class="ficha-equipamentos-lista">
+                    <span class="ficha-vazio">Nenhum consumível cadastrado</span>
+                </div>
+            </div>
+
         </aside>
 
         <!-- COLUNA CENTRAL: foto + resistências -->
@@ -877,6 +889,83 @@
     </div>
 </div>
 
+<div id="modalConsumiveis" class="equipamentos-overlay" style="display: none;">
+    <div class="equipamentos-container">
+        <div class="equipamentos-header">
+            <div class="equipamentos-header-esquerda">
+                <span class="equipamentos-icone">🧪</span>
+                <div>
+                    <h2 class="equipamentos-titulo">Gerenciar Consumíveis</h2>
+                    <p class="equipamentos-subtitulo">Poções, óleos, pergaminhos e outros itens de uso único</p>
+                </div>
+            </div>
+            <button class="equipamentos-fechar" id="btnFecharModalConsumiveis">✕</button>
+        </div>
+        <div class="equipamentos-controles">
+            <div class="equipamentos-busca-wrapper">
+                <span class="equipamentos-busca-label">🔍 Buscar</span>
+                <input type="text" id="consumiveisBusca" class="equipamentos-busca" placeholder="Nome do consumível...">
+            </div>
+            <div class="equipamentos-quantidade-wrapper">
+                <label class="equipamentos-label">Quantidade:</label>
+                <input type="number" id="consumiveisQuantidade" class="equipamentos-input-qtd" value="1" min="1" max="999">
+            </div>
+        </div>
+        <div class="consumiveis-filtros">
+            <button type="button" class="consumiveis-filtro-btn ativo" data-filtro-consumivel="todos">Todos</button>
+            <button type="button" class="consumiveis-filtro-btn" data-filtro-consumivel="poção">Poções</button>
+            <button type="button" class="consumiveis-filtro-btn" data-filtro-consumivel="óleo">Óleos</button>
+            <button type="button" class="consumiveis-filtro-btn" data-filtro-consumivel="pergaminho">Pergaminhos</button>
+        </div>
+
+        <div class="equipamentos-abas">
+            <button class="equipamentos-aba ativa" id="abaListarConsumiveis">📋 Listar Consumíveis</button>
+            <button class="equipamentos-aba" id="abaCriarConsumivel">➕ Criar Novo</button>
+        </div>
+
+        <div class="equipamentos-corpo">
+            <div id="conteudoListarConsumiveis" class="equipamentos-conteudo ativo">
+                <div class="equipamentos-lista talentos-lista-linhas" id="consumiveisLista"></div>
+            </div>
+            <div id="conteudoCriarConsumivel" class="equipamentos-conteudo">
+                <form id="formCriarConsumivel" class="equipamentos-form">
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Nome do Consumível</label>
+                        <input type="text" id="criarNomeConsumivel" class="equipamentos-form-input" placeholder="Ex: Poção de Curar Ferimentos Leves" required>
+                    </div>
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Descrição</label>
+                        <textarea id="criarDescricaoConsumivel" class="equipamentos-form-input" rows="2"></textarea>
+                    </div>
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Categoria</label>
+                        <input type="text" id="criarCategoriaConsumivel" class="equipamentos-form-input" placeholder="Ex: Poção">
+                    </div>
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Tipo</label>
+                        <input type="text" id="criarTipoConsumivel" class="equipamentos-form-input" placeholder="Ex: Arcana">
+                    </div>
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Custo</label>
+                        <input type="text" id="criarCustoConsumivel" class="equipamentos-form-input" placeholder="Ex: 50 PO">
+                    </div>
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Peso</label>
+                        <input type="text" id="criarPesoConsumivel" class="equipamentos-form-input" placeholder="Ex: —">
+                    </div>
+                    <div class="equipamentos-form-grupo">
+                        <label class="equipamentos-form-label">Página de Referência</label>
+                        <input type="text" id="criarPaginaRefConsumivel" class="equipamentos-form-input" placeholder="Ex: Livro do Mestre p.230">
+                    </div>
+                    <button type="button" class="equipamentos-btn-salvar" id="btnSalvarConsumivelCustomizado">
+                        ✅ Salvar e Adicionar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/js/shared/render-api-origin-boot.js"></script>
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
 <script src="../js/services/AuthService.js?v=20260426b"></script>
@@ -887,6 +976,7 @@
 </script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
 <script type="module" src="../js/controllers/FichaPersonagemController.js?v=62"></script>
+<script type="module" src="../js/controllers/ConsumiveisFichaController.js?v=1"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=20260420c"></script>
 </body>
 </html>

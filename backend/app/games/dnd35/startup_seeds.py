@@ -30,6 +30,18 @@ def inicializar_equipamentos(db: Session) -> None:
     seed_equipamentos(db)
 
 
+def inicializar_consumiveis(db: Session) -> None:
+    """
+    Sincroniza o catálogo de consumíveis (poções/óleos/pergaminhos) a partir do seed gerado.
+
+    Dados em `backend/scripts/seed_consumiveis.py` (regenerar com
+    `python processar_consumiveis_excel.py` na raiz do projeto).
+    """
+    from scripts.seed_consumiveis import seed_consumiveis
+
+    seed_consumiveis(db)
+
+
 def inicializar_talentos(db: Session) -> None:
     """
     Sincroniza o catálogo LdJ com `talentos_importacao_limpo.json` (raiz do repo),

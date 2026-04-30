@@ -25,6 +25,7 @@ from .games.dnd35.legacy_membership import garantir_membership_dnd35_para_usuari
 from .games.dnd35.startup_seeds import (
     inicializar_catalogo_magias_se_vazio,
     inicializar_catalogo_tabelas_classes,
+    inicializar_consumiveis,
     inicializar_equipamentos,
     inicializar_talentos,
 )
@@ -47,6 +48,7 @@ from .games.dnd35.api.v1 import (
     combatentes as dnd35_combatentes,
     condicoes as dnd35_condicoes,
     equipamentos as dnd35_equipamentos,
+    consumiveis as dnd35_consumiveis,
     grimorio as dnd35_grimorio,
     habilidades_especiais as dnd35_habilidades_especiais,
     racas as dnd35_racas,
@@ -61,6 +63,7 @@ from .games.dnd35.api.v1 import (
 from .shared.models import usuario as usuario_model
 from .shared.models import game as game_model
 from .games.dnd35.models import equipamento as equipamento_model
+from .games.dnd35.models import consumivel as consumivel_model
 from .games.dnd35.models import armadura_protecao as armadura_protecao_model
 from .games.dnd35.models import talento as talento_model
 from .games.dnd35.models import combatente as combatente_model
@@ -286,6 +289,7 @@ app.include_router(dnd35_divindades_custom.router, prefix=settings.API_V1_PREFIX
 app.include_router(dnd35_magias_preparadas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_grimorio.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_equipamentos.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_consumiveis.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_armaduras_protecao.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_talentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_tabelas_classes.router, prefix=settings.API_V1_PREFIX)
@@ -574,6 +578,7 @@ def _inicializar_banco_pos_ready(db) -> None:
         ("seed_pericias", lambda: _seed_pericias(db)),
         ("seed_pericias_classes", lambda: _seed_pericias_classes(db)),
         ("inicializar_equipamentos", lambda: inicializar_equipamentos(db)),
+        ("inicializar_consumiveis", lambda: inicializar_consumiveis(db)),
         ("seed_armaduras_protecao", lambda: _seed_armaduras_protecao(db)),
         ("inicializar_talentos", lambda: inicializar_talentos(db)),
         ("inicializar_catalogo_magias_se_vazio", lambda: inicializar_catalogo_magias_se_vazio(db)),
@@ -638,9 +643,11 @@ def _garantir_colunas_soft_delete() -> None:
     tabelas = [
         "pericias",
         "equipamentos",
+        "consumiveis",
         "talentos",
         "combatentes",
         "equipamentos_jogador",
+        "consumiveis_jogador",
         "talentos_jogador",
         "pericias_jogador",
     ]
