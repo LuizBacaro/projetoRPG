@@ -125,10 +125,6 @@
         </section>
 
         <div id="seletorLoading" class="seletor-loading">Carregando jogos disponíveis…</div>
-        <div id="autoEntradaHint" class="seletor-auto-hint" role="status" aria-live="polite" hidden>
-            <span id="autoEntradaHintTexto"></span>
-            <button id="btnCancelarAutoEntrada" type="button">Trocar jogo</button>
-        </div>
 
         <details class="seletor-catalogo-detalhe">
             <summary>Ver catálogo completo de jogos</summary>
@@ -156,9 +152,6 @@
     const elLista = document.getElementById('seletorLista');
     const elErro = document.getElementById('seletorErro');
     const elAviso = document.getElementById('seletorAviso');
-    const elAutoEntradaHint = document.getElementById('autoEntradaHint');
-    const elAutoEntradaHintTexto = document.getElementById('autoEntradaHintTexto');
-    const btnCancelarAutoEntrada = document.getElementById('btnCancelarAutoEntrada');
     const elUsuarioNome = document.getElementById('seletorUsuarioNome');
     const elUsuarioEmail = document.getElementById('seletorUsuarioEmail');
     const elUsuarioBadge = document.getElementById('seletorUsuarioBadge');
@@ -174,8 +167,6 @@
     const queryParams = new URLSearchParams(window.location.search);
     const forcarSelecaoManual = queryParams.get('manual') === '1';
     let autoEnterFeatureEnabled = true;
-    let autoEntradaCancelada = false;
-    let autoEntradaTimer = null;
 
     function carregarLogosOrbitais() {
         if (logosOrbitaisCarregadas) return;
@@ -223,16 +214,6 @@
     function ocultarLoading() {
         elLoading.classList.remove('is-busy');
         elLoading.style.display = 'none';
-    }
-
-    function mostrarHintAutoEntrada(msg) {
-        elAutoEntradaHintTexto.textContent = msg;
-        elAutoEntradaHint.hidden = false;
-    }
-
-    function ocultarHintAutoEntrada() {
-        elAutoEntradaHint.hidden = true;
-        elAutoEntradaHintTexto.textContent = '';
     }
 
     function exibirErro(msg) {
@@ -484,18 +465,6 @@
                 !!membershipUltimo
             );
             if (podeAutoEntrar) {
-                autoEntradaCancelada = false;
-                mostrarHintAutoEntrada(`Entrando automaticamente em ${jogoUltimo.nome || ultimoSlug}…`);
-                await new Promise((resolve) => {
-                    autoEntradaTimer = window.setTimeout(resolve, 1500);
-                });
-                ocultarHintAutoEntrada();
-                autoEntradaTimer = null;
-                if (autoEntradaCancelada) {
-                    ocultarLoading();
-                    exibirAviso('Autoentrada cancelada. Escolha manualmente o jogo.');
-                    return;
-                }
                 atualizarLoading(`Entrando automaticamente em ${jogoUltimo.nome || ultimoSlug}…`, true);
                 await selecionarJogo(ultimoSlug, botaoPorSlug(ultimoSlug), { auto: true });
                 return;
@@ -615,16 +584,6 @@
     }
 
     btnSair.addEventListener('click', sair);
-    btnCancelarAutoEntrada.addEventListener('click', () => {
-        autoEntradaCancelada = true;
-        if (autoEntradaTimer) {
-            window.clearTimeout(autoEntradaTimer);
-            autoEntradaTimer = null;
-            ocultarHintAutoEntrada();
-            ocultarLoading();
-            exibirAviso('Autoentrada cancelada. Escolha manualmente o jogo.');
-        }
-    });
 
     btnHubDnd35.addEventListener('click', () => {
         const j = jogoPorSlug('dnd35');

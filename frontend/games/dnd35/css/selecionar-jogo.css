@@ -172,33 +172,6 @@ body {
     font-weight: 600;
 }
 
-.seletor-auto-hint {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    background: rgba(30, 41, 59, 0.75);
-    border: 1px solid #475569;
-    border-radius: 0.65rem;
-    color: #e2e8f0;
-    font-size: 0.88rem;
-    padding: 0.55rem 0.8rem;
-}
-
-.seletor-auto-hint button {
-    border: 1px solid #7c3aed;
-    background: transparent;
-    color: #c4b5fd;
-    border-radius: 999px;
-    padding: 0.25rem 0.65rem;
-    cursor: pointer;
-    font-size: 0.78rem;
-}
-
-.seletor-auto-hint button:hover {
-    background: rgba(124, 58, 237, 0.18);
-}
-
 .seletor-lista {
     list-style: none;
     display: grid;
