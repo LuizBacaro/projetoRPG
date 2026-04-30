@@ -7766,7 +7766,7 @@ def seed_consumiveis(db) -> None:
         d for d in CONSUMIVEIS_DADOS
         if d.get("nome") not in nomes_legacy_remover
     ]
-    if settings.ENVIRONMENT == "production":
+    if settings.ENVIRONMENT == "production" and not settings.CONSUMIVEIS_SEED_PERGAMINHOS:
         dados_seed = [
             d for d in dados_seed
             if (d.get("categoria") or "").strip().lower() != "pergaminho"

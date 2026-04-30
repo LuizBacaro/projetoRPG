@@ -89,6 +89,10 @@ class Settings(BaseSettings):
     # Em produção (Render/Procfile), normalmente já roda antes de subir o uvicorn.
     STARTUP_RUN_ALEMBIC: bool = True
 
+    # Catálogo de consumíveis (seed): em produção, se False, não sincroniza pergaminhos
+    # (apenas poções/óleos). True = catálogo completo como em desenvolvimento.
+    CONSUMIVEIS_SEED_PERGAMINHOS: bool = True
+
     class Config:
         """Configuração de leitura do Pydantic"""
         # Suporta execução tanto na raiz do repo quanto dentro de backend/
