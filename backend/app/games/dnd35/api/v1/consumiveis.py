@@ -39,10 +39,19 @@ def criar_consumivel(
 def listar_consumiveis(
     skip: int = 0,
     limit: int = 100,
+    tipo: str | None = None,
+    categoria: str | None = None,
+    busca: str | None = None,
     db: Session = Depends(get_db),
     _: object = Depends(get_usuario_atual),
 ):
-    return ConsumivelService(db).listar(skip, limit)
+    return ConsumivelService(db).listar(
+        skip,
+        limit,
+        tipo=tipo,
+        categoria=categoria,
+        busca=busca,
+    )
 
 
 @router.get("/{consumivel_id}", response_model=ConsumivelResponse)

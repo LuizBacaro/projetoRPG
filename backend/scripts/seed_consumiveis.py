@@ -4607,7 +4607,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': '° Nível 48–49 identificação',
+        'nome': 'identificação',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -4617,7 +4617,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 14–16 controlar o clima',
+        'nome': 'controlar o clima',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -4627,7 +4627,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 36–39 imobilizar monstro',
+        'nome': 'imobilizar monstro',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -4637,7 +4637,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 45–48 esfera telecinética',
+        'nome': 'esfera telecinética',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -4647,7 +4647,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 61 modificar memória',
+        'nome': 'modificar memória',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -6477,7 +6477,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'm. 38–46 cura completa em massa',
+        'nome': 'cura completa em massa',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -6707,7 +6707,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'o mal/o bem/a ordem 91–92 invocar enxames',
+        'nome': 'invocar enxames',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -7677,7 +7677,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 01–02 criar mortos vivos menores',
+        'nome': 'criar mortos vivos menores',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -7687,7 +7687,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 18 esfriar metal',
+        'nome': 'esfriar metal',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -7697,7 +7697,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 54–55 milagre',
+        'nome': 'milagre',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -7707,7 +7707,7 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 79 símbolo do sono',
+        'nome': 'símbolo do sono',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -7717,7 +7717,17 @@ CONSUMIVEIS_DADOS = [
         'ativo': True,
     },
     {
-        'nome': 'º Nível 86–90 raio de sol',
+        'nome': 'invocar criaturas VII',
+        'descricao': None,
+        'pagina_referencia': 'Livro do Mestre p.238-242',
+        'categoria': 'Pergaminho',
+        'tipo': 'Divina',
+        'custo': '2.275 PO',
+        'peso': None,
+        'ativo': True,
+    },
+    {
+        'nome': 'raio de sol',
         'descricao': None,
         'pagina_referencia': 'Livro do Mestre p.238-242',
         'categoria': 'Pergaminho',
@@ -7748,10 +7758,7 @@ def seed_consumiveis(db) -> None:
         "Permite que uma magia de até 4º nível seja 77–81 invocar criaturas VII",
         "Supondo que nenhum componente material 71–76 alterar forma",
         "Supondo uma área equivalente a um cubo 32–37 portal",
-        "XP. 67–70 sombras",
-        "invocar criaturas VII",
-        "alterar forma",
-        "portal",
+        "XP. 67–70 sombras"
     }
 
     # Oculta entradas legadas do catálogo sem apagar histórico em fichas.
@@ -7772,12 +7779,101 @@ def seed_consumiveis(db) -> None:
             if (d.get("categoria") or "").strip().lower() != "pergaminho"
         ]
 
-    nomes_seed = {d["nome"] for d in dados_seed}
+    def _norm(v: str | None) -> str:
+        return (v or "").strip().lower()
+
+    def _assinatura(
+        *,
+        nome: str | None,
+        descricao: str | None,
+        pagina_referencia: str | None,
+        categoria: str | None,
+        tipo: str | None,
+        custo: str | None,
+        peso: str | None,
+    ) -> tuple[str, str, str, str, str, str, str]:
+        return (
+            _norm(nome),
+            _norm(descricao),
+            _norm(pagina_referencia),
+            _norm(categoria),
+            _norm(tipo),
+            _norm(custo),
+            _norm(peso),
+        )
+
+    assinaturas_seed = {
+        _assinatura(
+            nome=d.get("nome"),
+            descricao=d.get("descricao"),
+            pagina_referencia=d.get("pagina_referencia"),
+            categoria=d.get("categoria"),
+            tipo=d.get("tipo"),
+            custo=d.get("custo"),
+            peso=d.get("peso"),
+        )
+        for d in dados_seed
+    }
     usados = {
         row[0]
         for row in db.query(ConsumivelJogador.consumivel_id).distinct().all()
         if row[0] is not None
     }
+
+    def _deduplicar_catalogo() -> None:
+        # Deduplica catálogo por assinatura completa, preservando referências de fichas.
+        catalogo_ativo = (
+            db.query(Consumivel)
+            .filter(Consumivel.deleted_at.is_(None))
+            .all()
+        )
+        grupos_por_assinatura: dict[tuple[str, str, str, str, str, str, str], list[Consumivel]] = {}
+        for item in catalogo_ativo:
+            sig = _assinatura(
+                nome=item.nome,
+                descricao=item.descricao,
+                pagina_referencia=item.pagina_referencia,
+                categoria=item.categoria,
+                tipo=item.tipo,
+                custo=item.custo,
+                peso=item.peso,
+            )
+            grupos_por_assinatura.setdefault(sig, []).append(item)
+
+        for itens in grupos_por_assinatura.values():
+            if len(itens) <= 1:
+                continue
+            itens_sorted = sorted(itens, key=lambda x: x.id)
+            usados_grupo = [it for it in itens_sorted if it.id in usados]
+            manter = usados_grupo[0] if usados_grupo else itens_sorted[0]
+            for duplicado in itens_sorted:
+                if duplicado.id == manter.id:
+                    continue
+                refs = (
+                    db.query(ConsumivelJogador)
+                    .filter(ConsumivelJogador.consumivel_id == duplicado.id)
+                    .all()
+                )
+                for ref in refs:
+                    alvo = (
+                        db.query(ConsumivelJogador)
+                        .filter(
+                            ConsumivelJogador.combatente_id == ref.combatente_id,
+                            ConsumivelJogador.consumivel_id == manter.id,
+                        )
+                        .first()
+                    )
+                    if alvo:
+                        alvo.quantidade += ref.quantidade
+                        db.delete(ref)
+                    else:
+                        ref.consumivel_id = manter.id
+                db.delete(duplicado)
+
+        db.flush()
+
+    _deduplicar_catalogo()
+
     legado = (
         db.query(Consumivel)
         .filter(Consumivel.deleted_at.is_(None))
@@ -7785,7 +7881,16 @@ def seed_consumiveis(db) -> None:
     )
     removidos = 0
     for item in legado:
-        if item.nome not in nomes_seed and item.id not in usados:
+        sig_item = _assinatura(
+            nome=item.nome,
+            descricao=item.descricao,
+            pagina_referencia=item.pagina_referencia,
+            categoria=item.categoria,
+            tipo=item.tipo,
+            custo=item.custo,
+            peso=item.peso,
+        )
+        if sig_item not in assinaturas_seed and item.id not in usados:
             db.delete(item)
             removidos += 1
     if removidos:
@@ -7794,16 +7899,28 @@ def seed_consumiveis(db) -> None:
     inseridos = 0
     atualizados = 0
     for data in dados_seed:
-        row = (
+        tipo_seed = (data.get("tipo") or "").strip()
+        categoria_seed = (data.get("categoria") or "").strip()
+        candidatos = (
             db.query(Consumivel)
-            .filter(Consumivel.nome == data["nome"], Consumivel.deleted_at.is_(None))
-            .first()
+            .filter(
+                Consumivel.nome == data["nome"],
+                Consumivel.deleted_at.is_(None),
+            )
+            .all()
+        )
+        row = next(
+            (
+                c for c in candidatos
+                if _norm(c.tipo) == _norm(tipo_seed) and _norm(c.categoria) == _norm(categoria_seed)
+            ),
+            None,
         )
         campos = {
             "descricao": data.get("descricao"),
             "pagina_referencia": data.get("pagina_referencia"),
-            "categoria": data.get("categoria"),
-            "tipo": data.get("tipo"),
+            "categoria": categoria_seed or None,
+            "tipo": tipo_seed or None,
             "custo": data.get("custo"),
             "peso": data.get("peso"),
             "ativo": data.get("ativo", True),
@@ -7821,6 +7938,8 @@ def seed_consumiveis(db) -> None:
                 )
             )
             inseridos += 1
+
+    _deduplicar_catalogo()
 
     db.commit()
     print(

@@ -16,8 +16,29 @@ export class ConsumivelService {
         };
     }
 
-    async listarConsumiveis(skip = 0, limit = 100) {
-        const res = await fetch(`${this.baseUrl}?skip=${skip}&limit=${limit}`, {
+    async listarConsumiveis({
+        skip = 0,
+        limit = 100,
+        filtroTipo = 'todos',
+        busca = '',
+    } = {}) {
+        const params = new URLSearchParams();
+        params.set('skip', String(skip));
+        params.set('limit', String(limit));
+
+        const filtro = String(filtroTipo || 'todos').toLowerCase();
+        if (filtro === 'poção' || filtro === 'óleo') {
+            params.set('tipo', filtro);
+        } else if (filtro === 'pergaminho') {
+            params.set('categoria', 'Pergaminho');
+        }
+
+        const termoBusca = String(busca || '').trim();
+        if (termoBusca) {
+            params.set('busca', termoBusca);
+        }
+
+        const res = await fetch(`${this.baseUrl}?${params.toString()}`, {
             method: 'GET',
             headers: this._headers(),
         });

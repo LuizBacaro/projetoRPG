@@ -1,4 +1,4 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session, aliased
 
 from app.games.dnd35.models.consumivel import Consumivel, ConsumivelJogador
@@ -31,15 +31,43 @@ class ConsumivelRepository:
         return db.query(Consumivel).filter(Consumivel.nome == nome).first()
 
     @staticmethod
-    def listar(db: Session, skip: int, limit: int) -> list[Consumivel]:
-        return (
+    def listar(
+        db: Session,
+        skip: int,
+        limit: int,
+        tipo: str | None = None,
+        categoria: str | None = None,
+        busca: str | None = None,
+    ) -> list[Consumivel]:
+        query = (
             apply_not_deleted(db.query(Consumivel), Consumivel)
             .filter(Consumivel.ativo == True)  # noqa: E712
-            .order_by(Consumivel.nome.asc())
-            .offset(skip)
-            .limit(limit)
-            .all()
         )
+
+        tipo_norm = (tipo or "").strip().lower()
+        categoria_norm = (categoria or "").strip().lower()
+        busca_norm = (busca or "").strip()
+
+        if tipo_norm:
+            query = query.filter(Consumivel.tipo.ilike(tipo_norm))
+
+        if categoria_norm:
+            query = query.filter(Consumivel.categoria.ilike(f"%{categoria_norm}%"))
+
+        if busca_norm:
+            termo = f"%{busca_norm}%"
+            query = query.filter(
+                or_(
+                    Consumivel.nome.ilike(termo),
+                    Consumivel.descricao.ilike(termo),
+                    Consumivel.categoria.ilike(termo),
+                    Consumivel.tipo.ilike(termo),
+                    Consumivel.custo.ilike(termo),
+                    Consumivel.pagina_referencia.ilike(termo),
+                )
+            )
+
+        return query.order_by(Consumivel.nome.asc()).offset(skip).limit(limit).all()
 
     @staticmethod
     def deletar(db: Session, consumivel_id: int) -> bool:

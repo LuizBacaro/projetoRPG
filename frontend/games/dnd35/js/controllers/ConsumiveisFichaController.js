@@ -10,6 +10,8 @@ class ConsumiveisFichaController {
         this.catalogoLimit = 30;
         this.catalogoCarregadoCompleto = false;
         this.filtroTipo = 'todos';
+        this.cacheCatalogo = new Map();
+        this._filtroRequestSeq = 0;
     }
 
     async inicializar() {
@@ -33,13 +35,7 @@ class ConsumiveisFichaController {
                 this.filtroTipo = String(btn.dataset.filtroConsumivel || 'todos').toLowerCase();
                 document.querySelectorAll('[data-filtro-consumivel]').forEach((b) => b.classList.remove('ativo'));
                 btn.classList.add('ativo');
-                // Para evitar falso "vazio" por paginação, carrega tudo ao aplicar filtro específico.
-                if (this.filtroTipo !== 'todos' && !this.catalogoCarregadoCompleto) {
-                    while (!this.catalogoCarregadoCompleto) {
-                        await this._carregarMaisConsumiveis();
-                    }
-                }
-                this.renderizarCatalogo();
+                await this._recarregarCatalogoComFiltros();
             });
         });
         document.getElementById('modalConsumiveis')?.addEventListener('click', (e) => {
@@ -82,12 +78,13 @@ class ConsumiveisFichaController {
         this.catalogoSkip = 0;
         this.catalogoCarregadoCompleto = false;
         this.filtroTipo = 'todos';
+        this.cacheCatalogo.clear();
         const inputBusca = document.getElementById('consumiveisBusca');
         if (inputBusca) inputBusca.value = '';
         document.querySelectorAll('[data-filtro-consumivel]').forEach((b) => {
             b.classList.toggle('ativo', String(b.dataset.filtroConsumivel || 'todos').toLowerCase() === 'todos');
         });
-        await this._carregarMaisConsumiveis();
+        await this._recarregarCatalogoComFiltros();
         this.renderizarCatalogo();
         this.abrirAbaListarConsumiveis();
         modal.style.display = 'flex';
@@ -100,20 +97,9 @@ class ConsumiveisFichaController {
 
     renderizarCatalogo() {
         const lista = document.getElementById('consumiveisLista');
-        const termo = document.getElementById('consumiveisBusca')?.value || '';
         if (!lista) return;
-        const itens = this.service
-            .filtrarPorBusca(this.catalogo, termo)
-            .filter((it) => {
-                if (this.filtroTipo === 'todos') return true;
-                const tipo = String(it.tipo || '').toLowerCase();
-                if (this.filtroTipo === 'pergaminho') {
-                    return String(it.categoria || '').toLowerCase().includes('pergaminho');
-                }
-                return tipo === this.filtroTipo;
-            });
-        const filtroAtivo = String(termo).trim();
-        const podeCarregarMais = !this.catalogoCarregadoCompleto && !filtroAtivo;
+        const itens = this.catalogo;
+        const podeCarregarMais = !this.catalogoCarregadoCompleto;
         if (!itens.length) {
             lista.innerHTML = `<p class="equipamentos-vazio">Nenhum consumível encontrado</p>${
                 podeCarregarMais
@@ -160,23 +146,56 @@ class ConsumiveisFichaController {
 
     async _carregarMaisConsumiveis() {
         if (this.catalogoCarregadoCompleto) return;
-        const novos = await this.service.listarConsumiveis(this.catalogoSkip, this.catalogoLimit);
+        const termo = String(document.getElementById('consumiveisBusca')?.value || '').trim();
+        const novos = await this.service.listarConsumiveis({
+            skip: this.catalogoSkip,
+            limit: this.catalogoLimit,
+            filtroTipo: this.filtroTipo,
+            busca: termo,
+        });
         if (novos.length > 0) {
             this.catalogo = [...this.catalogo, ...novos];
-            this.catalogoSkip += this.catalogoLimit;
+            this.catalogoSkip += novos.length;
         }
         if (novos.length < this.catalogoLimit) {
             this.catalogoCarregadoCompleto = true;
         }
+        this._salvarCacheCatalogoAtual();
     }
 
     async filtrarCatalogo() {
-        const termo = document.getElementById('consumiveisBusca')?.value || '';
-        if (termo.trim() && !this.catalogoCarregadoCompleto) {
-            while (!this.catalogoCarregadoCompleto) {
-                await this._carregarMaisConsumiveis();
-            }
+        await this._recarregarCatalogoComFiltros();
+    }
+
+    _cacheKeyAtual() {
+        const termo = String(document.getElementById('consumiveisBusca')?.value || '').trim().toLowerCase();
+        return `${this.filtroTipo}::${termo}`;
+    }
+
+    _salvarCacheCatalogoAtual() {
+        this.cacheCatalogo.set(this._cacheKeyAtual(), {
+            itens: [...this.catalogo],
+            skip: this.catalogoSkip,
+            carregadoCompleto: this.catalogoCarregadoCompleto,
+        });
+    }
+
+    async _recarregarCatalogoComFiltros() {
+        const requestSeq = ++this._filtroRequestSeq;
+        const cache = this.cacheCatalogo.get(this._cacheKeyAtual());
+        if (cache) {
+            this.catalogo = [...cache.itens];
+            this.catalogoSkip = cache.skip;
+            this.catalogoCarregadoCompleto = cache.carregadoCompleto;
+            this.renderizarCatalogo();
+            return;
         }
+
+        this.catalogo = [];
+        this.catalogoSkip = 0;
+        this.catalogoCarregadoCompleto = false;
+        await this._carregarMaisConsumiveis();
+        if (requestSeq !== this._filtroRequestSeq) return;
         this.renderizarCatalogo();
     }
 

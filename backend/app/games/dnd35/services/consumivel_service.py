@@ -30,8 +30,22 @@ class ConsumivelService:
             return existente
         return ConsumivelRepository.criar(self.db, payload.model_dump())
 
-    def listar(self, skip: int, limit: int):
-        return ConsumivelRepository.listar(self.db, skip, limit)
+    def listar(
+        self,
+        skip: int,
+        limit: int,
+        tipo: str | None = None,
+        categoria: str | None = None,
+        busca: str | None = None,
+    ):
+        return ConsumivelRepository.listar(
+            self.db,
+            skip,
+            limit,
+            tipo=tipo,
+            categoria=categoria,
+            busca=busca,
+        )
 
     def obter(self, consumivel_id: int):
         return ConsumivelRepository.obter(self.db, consumivel_id)
