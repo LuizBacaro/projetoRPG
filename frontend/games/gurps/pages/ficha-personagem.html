@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha de personagem — GURPS · Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/layout.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=22" />
+    <link rel="stylesheet" href="../css/gurps-dashboard.css" />
+    <link rel="stylesheet" href="../css/ficha-gurps.css?v=20260501f" />
+</head>
+<body class="ficha-gurps-body">
+
+<header class="dashboard-header gurps-dash-header">
+    <div class="header-nav">
+        <div class="header-titulo">
+            <h1>📋 Ficha GURPS</h1>
+            <p>Arena TTRPG · sistema genérico — edição de personagem</p>
+        </div>
+        <div class="header-usuario-container">
+            <div class="header-usuario">
+                <span id="nomeUsuario" class="usuario-nome">…</span>
+                <span id="badgeJogo" class="badge-jogo-gurps">GURPS</span>
+                <a href="dashboard.html" class="btn-logout gurps-header-link-dash">📊 Dashboard</a>
+                <button type="button" class="btn-logout" id="btnTrocarJogo" title="Voltar ao seletor de jogo">🎲 Trocar jogo</button>
+                <button type="button" class="btn-logout" id="btnLogout">Sair</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="ficha-outer">
+    <article class="ficha-sheet">
+        <div class="ficha-sheet-head">
+            <h1 class="ficha-brand">GURPS</h1>
+            <p class="ficha-subbrand">Ficha de personagem</p>
+            <span id="fg_titulo_sub"></span>
+        </div>
+
+        <!-- Identidade (planilha: topo) -->
+        <section class="ficha-identity">
+            <div class="ficha-cell">
+                <span class="ficha-label">Personagem</span>
+                <input id="fg_nome" type="text" required autocomplete="off" />
+            </div>
+            <div class="ficha-cell">
+                <span class="ficha-label">Jogador</span>
+                <input id="fg_jogador_leitura" type="text" readonly tabindex="-1" title="Preenchido pela conta logada" />
+            </div>
+            <div class="ficha-cell">
+                <span class="ficha-label">Conceito</span>
+                <input id="fg_conceito" type="text" />
+            </div>
+            <div class="ficha-cell">
+                <span class="ficha-label">Criação / data</span>
+                <input id="fg_criacao" type="text" placeholder="ex.: 2026-05-01" autocomplete="off" />
+            </div>
+            <div class="ficha-cell">
+                <span class="ficha-label">Aparência (idade, etc.)</span>
+                <input id="fg_idade" type="text" placeholder="ex.: 34 anos, elegante" />
+            </div>
+            <div class="ficha-cell">
+                <span class="ficha-label">XP total (espelho)</span>
+                <div id="fg_xp_top_mirror" style="padding:0.4rem;background:#fffef8;font-weight:800;text-align:center;border-top:1px solid #ccc">0</div>
+            </div>
+            <div class="ficha-cell ficha-cell--wide">
+                <span class="ficha-label">Aparência / status / reputação (notas)</span>
+                <textarea id="fg_aparencia_long" rows="2" placeholder="Texto livre (salvo só neste navegador até integrarmos à API)."></textarea>
+            </div>
+            <div class="ficha-cell ficha-cell--reação">
+                <span class="ficha-label">Reação</span>
+                <input id="fg_reacao" type="text" placeholder="+4/+2" />
+            </div>
+        </section>
+
+        <div class="ficha-main">
+            <!-- Coluna esquerda: atributos, carga, armas, vantagens -->
+            <div class="ficha-col ficha-col--left">
+                <section class="ficha-block">
+                    <h2 class="ficha-block-title">Atributos básicos &amp; características</h2>
+                    <div class="ficha-block-body">
+                        <div class="ficha-attr-grid">
+                            <div class="ficha-attr-pair">
+                                <div class="ficha-attr-pair-header"><span></span><span>Valor</span><span>XP</span></div>
+                                <div class="ficha-attr-row"><strong>ST</strong><input id="fg_st_valor" type="number" value="10" /><input id="fg_st_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>DX</strong><input id="fg_dx_valor" type="number" value="10" /><input id="fg_dx_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>IQ</strong><input id="fg_iq_valor" type="number" value="10" /><input id="fg_iq_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>HT</strong><input id="fg_ht_valor" type="number" value="10" /><input id="fg_ht_custo" type="number" value="0" /></div>
+                            </div>
+                            <div class="ficha-attr-pair">
+                                <div class="ficha-attr-pair-header"><span></span><span>Valor</span><span>XP</span></div>
+                                <div class="ficha-attr-row"><strong>PV</strong><input id="fg_hp_valor" type="number" value="10" /><input id="fg_hp_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>PER</strong><input id="fg_per_valor" type="number" value="10" /><input id="fg_per_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>VON</strong><input id="fg_will_valor" type="number" value="10" /><input id="fg_will_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>FAD</strong><input id="fg_fp_valor" type="number" value="10" /><input id="fg_fp_custo" type="number" value="0" /></div>
+                            </div>
+                        </div>
+                        <p class="ficha-hint">PV/FAD atuais (combate):</p>
+                        <div class="ficha-weapons-row">
+                            <div><label>PV atual</label><input id="fg_hp_atual" type="number" placeholder="máx." /></div>
+                            <div><label>FAD atual</label><input id="fg_fp_atual" type="number" placeholder="máx." /></div>
+                            <div><label>Iniciativa</label><input id="fg_iniciativa" type="number" value="0" /></div>
+                        </div>
+                        <div class="ficha-combat-strip">
+                            <div class="ficha-combat-cell"><label>Vel. bás.</label><input id="fg_vel_valor" type="text" value="5.00" /></div>
+                            <div class="ficha-combat-cell"><label>Desl. bás.</label><input id="fg_mov_valor" type="number" value="5" /></div>
+                            <div class="ficha-combat-cell"><label>Golpe (GOLP)</label><input id="fg_dano_imp" type="text" placeholder="1d-1" /></div>
+                            <div class="ficha-combat-cell"><label>Balanço (BAL)</label><input id="fg_dano_bal" type="text" placeholder="1d+1" /></div>
+                        </div>
+                        <div class="ficha-combat-strip ficha-combat-strip--second">
+                            <div class="ficha-combat-cell"><label>Esquiva</label><input id="fg_esquiva" type="number" value="0" /></div>
+                            <div class="ficha-combat-cell"><label>Aparar</label><input id="fg_aparar" type="number" value="0" /></div>
+                            <div class="ficha-combat-cell"><label>Bloqueio</label><input id="fg_bloqueio" type="text" placeholder="—" /></div>
+                            <div class="ficha-combat-cell"><label>Escudo</label><input id="fg_escudo" type="text" placeholder="—" title="Campo local (navegador)" /></div>
+                        </div>
+                        <input type="hidden" id="fg_vel_custo" value="0" />
+                        <input type="hidden" id="fg_mov_custo" value="0" />
+                    </div>
+                </section>
+
+                <section class="ficha-block">
+                    <h2 class="ficha-block-title">Nível de carga</h2>
+                    <div class="ficha-block-body">
+                        <table class="ficha-enc-table">
+                            <thead>
+                                <tr><th>Nível</th><th>FP</th><th>Desl.</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>0 Nenhuma</td><td><input type="text" class="ficha-local-enc" data-enc="0" placeholder="—" /></td><td><input type="text" class="ficha-local-enc-d" data-enc="0" placeholder="—" /></td></tr>
+                                <tr><td>1 Leve</td><td><input type="text" class="ficha-local-enc" data-enc="1" /></td><td><input type="text" class="ficha-local-enc-d" data-enc="1" /></td></tr>
+                                <tr><td>2 Média</td><td><input type="text" class="ficha-local-enc" data-enc="2" /></td><td><input type="text" class="ficha-local-enc-d" data-enc="2" /></td></tr>
+                                <tr><td>3 Pesada</td><td><input type="text" class="ficha-local-enc" data-enc="3" /></td><td><input type="text" class="ficha-local-enc-d" data-enc="3" /></td></tr>
+                                <tr><td>4 Muito pesada</td><td><input type="text" class="ficha-local-enc" data-enc="4" /></td><td><input type="text" class="ficha-local-enc-d" data-enc="4" /></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="ficha-block">
+                    <h2 class="ficha-block-title">Arma em uso (resumo)</h2>
+                    <div class="ficha-block-body ficha-weapons-row">
+                        <div><label>GOLP</label><input type="text" class="ficha-local-arma" id="fg_arma_golp" /></div>
+                        <div><label>BAL</label><input type="text" class="ficha-local-arma" id="fg_arma_bal" /></div>
+                        <div><label>NH</label><input type="text" class="ficha-local-arma" id="fg_arma_nh" /></div>
+                    </div>
+                </section>
+
+                <section class="ficha-block">
+                    <h2 class="ficha-block-title">Vantagens, desvantagens &amp; peculiaridades</h2>
+                    <div class="ficha-block-body">
+                        <p class="ficha-hint">Vantagens (nome + XP)</p>
+                        <div class="ficha-lines-toolbar">
+                            <button type="button" class="ficha-btn ficha-btn--ghost" onclick="fgAddVant()">+ Vantagem</button>
+                        </div>
+                        <div id="fg_vant_wrap"></div>
+                        <p class="ficha-hint">Desvantagens (nome + XP; valores negativos)</p>
+                        <div class="ficha-lines-toolbar">
+                            <button type="button" class="ficha-btn ficha-btn--ghost" onclick="fgAddDesv()">+ Desvantagem</button>
+                        </div>
+                        <div id="fg_desv_wrap"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Centro: locais de acerto + resumo de pontos -->
+            <div class="ficha-col ficha-col--center">
+                <section class="ficha-block">
+                    <h2 class="ficha-block-title">Locais de acerto (RD / PV)</h2>
+                    <div class="ficha-block-body ficha-silhouette">
+                        <p class="ficha-hint">RD/PV por local — dados só neste navegador.</p>
+                        <div class="ficha-hit-regioes" aria-label="Locais de acerto">
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Crânio</span><span class="ficha-hit-mod">−7</span></div><input type="text" class="ficha-local-hit" data-part="cranio" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Olhos</span><span class="ficha-hit-mod">−9</span></div><input type="text" class="ficha-local-hit" data-part="olhos" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Rosto</span><span class="ficha-hit-mod">−5</span></div><input type="text" class="ficha-local-hit" data-part="rosto" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Pescoço</span><span class="ficha-hit-mod">−6</span></div><input type="text" class="ficha-local-hit" data-part="pescoco" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Torso</span><span class="ficha-hit-mod">0 (−3 órg.)</span></div><input type="text" class="ficha-local-hit" data-part="torso" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Virilha</span><span class="ficha-hit-mod">−3</span></div><input type="text" class="ficha-local-hit" data-part="virilha" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Braço</span><span class="ficha-hit-mod">−2 (−4)</span></div><input type="text" class="ficha-local-hit" data-part="braco" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Mão</span><span class="ficha-hit-mod">−4 (−8)</span></div><input type="text" class="ficha-local-hit" data-part="mao" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Perna</span><span class="ficha-hit-mod">−2</span></div><input type="text" class="ficha-local-hit" data-part="perna" placeholder="RD / PV" autocomplete="off" /></div>
+                            <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Pé</span><span class="ficha-hit-mod">−4</span></div><input type="text" class="ficha-local-hit" data-part="pe" placeholder="RD / PV" autocomplete="off" /></div>
+                        </div>
+                        <div class="ficha-combat-notes">
+                            <strong>Referência rápida:</strong> choque, desmaio, morte e atordoamento seguem as regras do livro. Penalidades ao acerto são lembrete; ajuste pela campanha.
+                        </div>
+                    </div>
+                </section>
+                <section class="ficha-block">
+                    <h2 class="ficha-block-title">Resumo dos pontos</h2>
+                    <div class="ficha-block-body">
+                        <table class="ficha-points-table">
+                            <thead>
+                                <tr><th>Categoria</th><th>Pontos</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Atributos (primários + secundários)</td><td><input id="fg_pt_attr" type="number" value="0" /></td></tr>
+                                <tr><td>Perícias</td><td><input id="fg_pt_per" type="number" value="0" /></td></tr>
+                                <tr><td>Vantagens</td><td><input id="fg_pt_vant" type="number" value="0" /></td></tr>
+                                <tr><td>Magias</td><td><input id="fg_pt_magias" type="number" value="0" readonly title="Somente visual; API em breve" /></td></tr>
+                                <tr><td>Desvantagens</td><td><input id="fg_pt_desv" type="number" value="0" /></td></tr>
+                                <tr><td>Peculiaridades</td><td><input id="fg_pt_pec" type="number" value="0" readonly /></td></tr>
+                                <tr><td>Familiaridade cultural</td><td><input id="fg_pt_cult" type="number" value="0" readonly /></td></tr>
+                                <tr><td>Outros</td><td><input id="fg_pt_outros" type="number" value="0" readonly /></td></tr>
+                                <tr class="ficha-points-total-row"><td>Total de pontos</td><td><input id="fg_pt_total" type="number" value="0" /></td></tr>
+                            </tbody>
+                        </table>
+                        <p class="ficha-hint">O campo “XP total” no topo e esta linha usam o mesmo valor ao salvar (API).</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Direita: retrato (maior) + perícias + equipamento -->
+            <div class="ficha-col ficha-col--right">
+                <section class="ficha-block ficha-block--portrait">
+                    <h2 class="ficha-block-title">Retrato</h2>
+                    <div class="ficha-block-body">
+                        <div class="ficha-portrait-toolbar">
+                            <input
+                                type="file"
+                                id="fg_portrait_file"
+                                class="ficha-portrait-file-input"
+                                accept="image/jpeg,image/png,image/webp,image/gif"
+                            />
+                            <label for="fg_portrait_file" class="ficha-btn ficha-btn--ghost">Enviar imagem</label>
+                            <button type="button" class="ficha-btn ficha-btn--ghost" id="fg_portrait_clear">Remover</button>
+                        </div>
+                        <p class="ficha-hint ficha-portrait-hint" id="fg_portrait_hint_noid" hidden>
+                            Sem ficha salva: escolha a imagem e salve o personagem — o retrato sobe logo após a criação.
+                        </p>
+                        <div class="ficha-portrait-frame" id="fg_portrait_box">
+                            <img id="fg_portrait_img" alt="" hidden />
+                            <span class="ficha-portrait-placeholder" id="fg_portrait_ph">Ilustração do personagem</span>
+                        </div>
+                    </div>
+                </section>
+                <section class="ficha-block">
+                    <h2 class="ficha-block-title">Perícias</h2>
+                    <div class="ficha-block-body" style="overflow-x:auto">
+                        <table class="ficha-skills-table">
+                            <thead>
+                                <tr>
+                                    <th>Perícia</th>
+                                    <th>Tipo</th>
+                                    <th>NH</th>
+                                    <th>XP</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="fg_per_wrap"></tbody>
+                        </table>
+                        <div class="ficha-lines-toolbar" style="margin-top:0.5rem">
+                            <button type="button" class="ficha-btn ficha-btn--ghost" onclick="fgAddPer()">+ Perícia</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="ficha-block">
+                    <h2 class="ficha-block-title">Equipamentos</h2>
+                    <div class="ficha-block-body">
+                        <textarea id="fg_equipamento" class="ficha-equip-area" placeholder="Lista de equipamento (salvo neste navegador)."></textarea>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <footer class="ficha-footer-bar">
+            <div class="ficha-footer-meta">
+                <label>Tipo <select id="fg_tipo">
+                    <option value="jogador">Jogador</option>
+                    <option value="monstro">Monstro</option>
+                    <option value="npc">NPC</option>
+                </select></label>
+                <label>Campanha (id) <input id="fg_campanha_id" type="number" min="1" placeholder="opcional" /></label>
+            </div>
+            <button type="button" class="ficha-btn ficha-btn--gold" id="btnSalvarFicha">Salvar ficha</button>
+        </footer>
+    </article>
+</div>
+
+<script src="/js/shared/render-api-origin-boot.js"></script>
+<script src="/games/dnd35/js/config/api-url-global.js"></script>
+<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/ui/Toast.js"></script>
+<script>
+    if (!AuthService.exigirJogo('gurps')) {}
+</script>
+<script src="../js/services/GurpsPersonagemService.js"></script>
+<script src="../js/pages/ficha-gurps.js?v=20260501e"></script>
+</body>
+</html>

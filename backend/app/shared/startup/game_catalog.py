@@ -41,10 +41,10 @@ GAME_CATALOG_SEED = [
         "slug": "gurps",
         "nome": "GURPS",
         "descricao": (
-            "Sistema genérico GURPS com pontos de personagem e vantagens. "
-            "Em breve: stack independente."
+            "Sistema genérico GURPS com pontos de personagem, vantagens, "
+            "desvantagens e perícias — ficha e Arena na plataforma."
         ),
-        "status": "em_breve",
+        "status": "disponivel",
         "icone": "⚙️",
         "ordem": 30,
     },

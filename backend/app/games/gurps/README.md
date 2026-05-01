@@ -1,29 +1,25 @@
-# `backend/app/games/gurps/` — EM BREVE
+# `backend/app/games/gurps/` — GURPS
 
-Backend do sistema **GURPS**. Reservado.
+Backend do sistema **GURPS** na plataforma multi-jogo.
 
-Status atual: **andaime visual**. Não há código de regras GURPS ainda; a
-pasta existe para deixar evidente, no repositório, que GURPS é um próximo
-sistema planejado e onde ele vai morar.
+## API (`/api/v1/gurps/...`)
 
-## Quando começar a implementar
+| Prefixo | Descrição |
+|--------|-----------|
+| `/gurps/personagens` | CRUD da ficha (atributos, vantagens, desvantagens, perícias, totais de pontos). |
+| `/gurps/campanhas` | Campanhas (mestre/admin). |
+| `/gurps/combate` | Arena: iniciar / status / avançar turno / finalizar (lista de IDs separada do combate D&D 3.5). |
 
-1. Marcar `gurps` como `disponivel` em `GAME_CATALOG_SEED`
-   (`backend/app/shared/startup/game_catalog.py`).
-2. Adicionar destino em `destinoPorSlug()` no
-   `frontend/pages/selecionar-jogo.html`.
-3. Criar guard `requer_game_gurps` em `backend/app/core/deps.py`
-   (espelho de `requer_game_dnd35`).
-4. Replicar a estrutura de `backend/app/games/dnd35/`:
-   - `api/v1/` — routers (ficha, atributos, vantagens/desvantagens, …)
-   - `core/` — deps específicos, parsers de tabelas
-   - `models/` — entidades ORM
-   - `repositories/`, `schemas/`, `services/`, `seeds/`
-5. Aplicar `dependencies=[Depends(requer_game_gurps)]` em todos os
-   routers do pacote.
-6. Registrar os routers em `app/main.py`.
-7. Substituir a casca do frontend (`frontend/games/gurps/em-breve.html`)
-   pelas páginas reais do jogo.
+Todas as rotas usam `dependencies=[Depends(requer_game_gurps)]` — com `MULTI_GAME_STRICT_MODE=true`, o JWT deve trazer `game_slug=gurps`.
 
-> Enquanto este pacote estiver vazio, o frontend mostra apenas a página
-> "GURPS — em breve" para qualquer usuário que selecione esse jogo.
+## Persistência
+
+Migration: `b1a2c3d4e5f6_add_gurps_core_tables.py` — tabelas `gurps_campanhas`, `gurps_personagens`, filhos de lista (`gurps_personagem_*`) e `gurps_combates`.
+
+## Frontend
+
+Páginas em `frontend/games/gurps/pages/` (`dashboard.html`, `ficha-personagem.html`), servidas em `/games/gurps/...`.
+
+## Catálogo
+
+`gurps` está **disponível** no seed em `app/shared/startup/game_catalog.py`. Membership é criado automaticamente com os slugs em `AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS` (`app/shared/constants.py`).

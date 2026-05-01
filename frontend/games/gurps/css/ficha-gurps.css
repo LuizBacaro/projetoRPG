@@ -1,0 +1,798 @@
+/**
+ * Ficha GURPS — layout tipo planilha oficial + paleta livros (Basic Set, Fantasy, PT).
+ * Referência visual: preto/dourado/verde-oliva em molduras; área útil clara com grelha.
+ */
+
+:root {
+    /* Contraste na área papel: strong (ST…) mais escuro; demais rótulos um tom acima */
+    --ficha-text-strong: #0c0e09;
+    --ficha-text-label: #2a3026;
+    --ficha-text-soft: #3e463a;
+
+    --gurps-black: #0a0a0a;
+    --gurps-ink: #111;
+    --gurps-paper: #f6f3eb;
+    --gurps-paper-dim: #ebe6d9;
+    --gurps-green-deep: #1e2a18;
+    --gurps-green-banner: #2f3e26;
+    --gurps-green-muted: #3b4d31;
+    --gurps-gold: #d4af37;
+    --gurps-gold-bright: #e8c547;
+    --gurps-gold-dim: #9a7b2c;
+    --gurps-tan: #c5b358;
+    --gurps-border: #1a1a1a;
+    --gurps-danger: #8b2942;
+    --gurps-radius: 2px;
+    --gurps-font-sans: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+    --gurps-font-serif: Georgia, "Times New Roman", Times, serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Fundo e tipografia base vêm de gurps-dashboard.css + variables (Cinzel/Philosopher). */
+body.ficha-gurps-body {
+    margin: 0;
+    min-height: 100vh;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.ficha-outer {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.25rem 0.75rem 2.5rem;
+}
+
+/* Folha principal (papel) */
+.ficha-sheet {
+    background: var(--gurps-paper);
+    border: 3px solid var(--gurps-border);
+    box-shadow:
+        0 0 0 1px var(--gurps-tan),
+        0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.ficha-sheet-head {
+    text-align: center;
+    padding: 0.85rem 0.5rem 0.6rem;
+    border-bottom: 3px double var(--gurps-border);
+    background: linear-gradient(180deg, #fff 0%, var(--gurps-paper) 100%);
+}
+
+.ficha-brand {
+    margin: 0;
+    font-family: var(--gurps-font-serif);
+    font-weight: 800;
+    font-size: clamp(1.75rem, 5vw, 2.35rem);
+    letter-spacing: 0.25em;
+    color: var(--gurps-green-banner);
+    text-shadow: 1px 1px 0 var(--gurps-gold-dim);
+}
+
+.ficha-subbrand {
+    margin: 0.2rem 0 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ficha-text-soft);
+}
+
+/* Cabeçalho identidade — grelha tipo formulário */
+.ficha-identity {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: 2px solid var(--gurps-border);
+}
+
+@media (max-width: 720px) {
+    .ficha-identity {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ficha-cell {
+    border-right: 1px solid var(--gurps-border);
+    border-bottom: 1px solid var(--gurps-border);
+    display: flex;
+    flex-direction: column;
+    min-height: 2.5rem;
+}
+
+.ficha-cell:last-child {
+    border-right: none;
+}
+
+.ficha-cell--wide {
+    grid-column: 1 / -1;
+}
+
+.ficha-cell--reação {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    max-width: 140px;
+    margin-left: auto;
+    border-left: 2px solid var(--gurps-border);
+}
+
+@media (max-width: 720px) {
+    .ficha-cell--reação {
+        grid-column: 1;
+        grid-row: auto;
+        max-width: none;
+        margin-left: 0;
+    }
+}
+
+.ficha-label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--gurps-black);
+    color: #fff;
+    padding: 0.2rem 0.35rem;
+    border-bottom: 1px solid var(--gurps-border);
+}
+
+.ficha-cell input,
+.ficha-cell select,
+.ficha-cell textarea {
+    flex: 1;
+    border: none;
+    padding: 0.35rem 0.45rem;
+    font: inherit;
+    background: #fffef8;
+    width: 100%;
+    min-height: 1.75rem;
+}
+
+.ficha-cell textarea {
+    min-height: 3.2rem;
+    resize: vertical;
+}
+
+.ficha-cell--reação .ficha-label {
+    background: var(--gurps-green-banner);
+    color: var(--gurps-gold-bright);
+}
+
+/* Grelha principal 3 colunas — esquerda atributos, centro resumo/silhueta, direita retrato largo */
+.ficha-main {
+    display: grid;
+    grid-template-columns: minmax(220px, 28%) minmax(200px, 30%) minmax(260px, 42%);
+    gap: 0;
+    border-bottom: 2px solid var(--gurps-border);
+}
+
+@media (max-width: 1024px) {
+    .ficha-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ficha-col {
+    border-right: 2px solid var(--gurps-border);
+    vertical-align: top;
+}
+
+.ficha-col:last-child {
+    border-right: none;
+}
+
+/* Blocos com título invertido (faixa preta) */
+.ficha-block {
+    border-bottom: 2px solid var(--gurps-border);
+}
+
+.ficha-block:last-child {
+    border-bottom: none;
+}
+
+.ficha-block-title {
+    margin: 0;
+    padding: 0.28rem 0.45rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--gurps-black);
+    color: #fff;
+    border-bottom: 1px solid var(--gurps-border);
+}
+
+.ficha-block-body {
+    padding: 0.45rem;
+    background: var(--gurps-paper);
+}
+
+/* Atributos ST DX IQ HT + secundários */
+.ficha-attr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+@media (max-width: 520px) {
+    .ficha-attr-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ficha-attr-pair {
+    border: 1px solid var(--gurps-border);
+    margin: -1px 0 0 -1px;
+}
+
+.ficha-attr-pair-header {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr 1fr;
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: var(--gurps-paper-dim);
+    border-bottom: 1px solid var(--gurps-border);
+}
+
+.ficha-attr-pair-header span {
+    padding: 0.15rem 0.25rem;
+    text-align: center;
+    border-left: 1px solid var(--gurps-border);
+    color: var(--ficha-text-label);
+}
+
+.ficha-attr-pair-header span:first-child {
+    border-left: none;
+    text-align: left;
+    padding-left: 0.35rem;
+}
+
+.ficha-attr-row {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr 1fr;
+    align-items: stretch;
+}
+
+.ficha-attr-row strong {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--ficha-text-strong);
+    background: #c8c4b4;
+    border-right: 1px solid var(--gurps-border);
+    text-shadow: none;
+}
+
+.ficha-attr-row input {
+    border: none;
+    border-left: 1px solid var(--gurps-border);
+    text-align: center;
+    padding: 0.3rem;
+    font: inherit;
+    background: #fffef8;
+    width: 100%;
+}
+
+/* Linha combate: 4+4 caixas */
+.ficha-combat-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 0.35rem;
+    border: 1px solid var(--gurps-border);
+}
+
+.ficha-combat-strip--second {
+    border-top: none;
+}
+
+.ficha-combat-cell {
+    border-right: 1px solid var(--gurps-border);
+    border-bottom: 1px solid var(--gurps-border);
+}
+
+.ficha-combat-cell:last-child {
+    border-right: none;
+}
+
+.ficha-combat-cell label {
+    display: block;
+    font-size: 0.55rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+    background: var(--gurps-paper-dim);
+    padding: 0.12rem;
+    border-bottom: 1px solid var(--gurps-border);
+    color: var(--ficha-text-label);
+}
+
+.ficha-combat-cell input {
+    width: 100%;
+    border: none;
+    text-align: center;
+    padding: 0.28rem;
+    font: inherit;
+    background: #fff;
+}
+
+/* Retrato — coluna direita maior (paridade visual com D&D 3.5) */
+.ficha-portrait-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0 0.35rem 0.5rem;
+}
+
+.ficha-portrait-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.ficha-portrait-hint {
+    margin: 0 0.35rem 0.45rem !important;
+    font-size: 0.58rem !important;
+}
+
+.ficha-col--right .ficha-portrait-frame {
+    margin: 0.35rem 0.45rem 0.55rem;
+    aspect-ratio: 3 / 4;
+    width: 100%;
+    max-width: 100%;
+    min-height: min(420px, 52vh);
+    max-height: none;
+    border: 3px solid var(--gurps-border);
+    background: repeating-linear-gradient(
+        45deg,
+        #ddd 0,
+        #ddd 2px,
+        #eee 2px,
+        #eee 4px
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.ficha-portrait-frame {
+    margin: 0.45rem;
+    aspect-ratio: 3 / 4;
+    max-height: 220px;
+    border: 3px solid var(--gurps-border);
+    background: repeating-linear-gradient(
+        45deg,
+        #ddd 0,
+        #ddd 2px,
+        #eee 2px,
+        #eee 4px
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.ficha-portrait-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ficha-portrait-placeholder {
+    font-size: 0.65rem;
+    color: var(--ficha-text-soft);
+    text-align: center;
+    padding: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Carga — tabela compacta; inputs estreitos para caber na coluna */
+.ficha-enc-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 0.58rem;
+}
+
+.ficha-enc-table th,
+.ficha-enc-table td {
+    border: 1px solid var(--gurps-border);
+    padding: 0.08rem 0.12rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.ficha-enc-table td:first-child {
+    text-align: left;
+    font-size: 0.54rem;
+    line-height: 1.2;
+    width: 46%;
+    word-break: break-word;
+}
+
+.ficha-enc-table th:nth-child(2),
+.ficha-enc-table th:nth-child(3) {
+    width: 27%;
+}
+
+.ficha-enc-table input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-height: 1.05rem;
+    padding: 0.04rem 0.12rem;
+    font-size: 0.54rem;
+    line-height: 1.2;
+    border: 1px solid #b8b4a8;
+    background: #fffef8;
+    text-align: center;
+}
+
+.ficha-enc-table th {
+    background: var(--gurps-paper-dim);
+    font-weight: 800;
+    color: var(--ficha-text-label);
+}
+
+.ficha-sheet .ficha-enc-table td:first-child {
+    color: var(--ficha-text-label);
+}
+
+/* Locais de acerto: cartões editáveis por região */
+.ficha-hit-regioes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.25rem, 1fr));
+    gap: 0.35rem;
+    margin-top: 0.2rem;
+}
+
+.ficha-hit-card {
+    border: 1px solid var(--gurps-border);
+    padding: 0.28rem 0.32rem;
+    background: #faf8f2;
+}
+
+.ficha-hit-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin-bottom: 0.18rem;
+    font-size: 0.58rem;
+}
+
+.ficha-hit-name {
+    font-weight: 800;
+    color: var(--ficha-text-label);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.ficha-hit-mod {
+    font-weight: 700;
+    color: var(--ficha-text-soft);
+    white-space: nowrap;
+    font-size: 0.52rem;
+}
+
+.ficha-hit-card .ficha-local-hit {
+    width: 100%;
+    border: 1px solid #b8b4a8;
+    padding: 0.12rem 0.22rem;
+    font-size: 0.58rem;
+    background: #fffef8;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Armas linha */
+.ficha-weapons-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+}
+
+.ficha-weapons-row label {
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.12rem;
+    color: var(--ficha-text-label);
+}
+
+.ficha-weapons-row input {
+    width: 100%;
+    border: 1px solid var(--gurps-border);
+    padding: 0.25rem;
+    font: inherit;
+}
+
+/* Vantagens / desvantagens — linhas */
+.ficha-lines-toolbar {
+    display: flex;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.ficha-linha {
+    display: grid;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+    align-items: center;
+}
+
+.ficha-linha.fg-row-vant,
+.ficha-linha.fg-row-desv {
+    grid-template-columns: 1fr 4rem 2rem;
+}
+
+.ficha-linha.fg-row-per {
+    grid-template-columns: 1fr 3.5rem 3rem 3.5rem 2rem;
+}
+
+@media (max-width: 520px) {
+    .ficha-linha.fg-row-per {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.ficha-linha input {
+    border: 1px solid var(--gurps-border);
+    padding: 0.22rem 0.3rem;
+    font: inherit;
+    background: #fffef8;
+}
+
+/* Silhueta + locais */
+.ficha-silhouette {
+    padding: 0.35rem;
+}
+
+.ficha-hit {
+    border: 1px solid var(--gurps-border);
+    padding: 0.2rem;
+    background: #faf8f2;
+}
+
+.ficha-hit label {
+    display: block;
+    font-weight: 800;
+    margin-bottom: 0.15rem;
+    color: var(--ficha-text-label);
+}
+
+.ficha-hit input {
+    width: 100%;
+    border: 1px solid #ccc;
+    font: inherit;
+    padding: 0.1rem;
+    text-align: center;
+}
+
+.ficha-combat-notes {
+    margin-top: 0.45rem;
+    padding: 0.35rem;
+    font-size: 0.58rem;
+    border: 1px dashed var(--gurps-border);
+    background: #faf8f2;
+    color: var(--ficha-text-soft);
+}
+
+.ficha-combat-notes strong {
+    color: var(--ficha-text-label);
+}
+
+/* Perícias tabela */
+.ficha-skills-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+}
+
+.ficha-skills-table th {
+    background: var(--gurps-black);
+    color: #fff;
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.35rem;
+    text-align: left;
+    border: 1px solid var(--gurps-border);
+}
+
+.ficha-skills-table td {
+    border: 1px solid var(--gurps-border);
+    padding: 0;
+    vertical-align: middle;
+}
+
+.ficha-skills-table .ficha-skill-row-editor {
+    display: contents;
+}
+
+.ficha-skills-table .ficha-skill-row-editor td input {
+    width: 100%;
+    border: none;
+    padding: 0.25rem 0.35rem;
+    font: inherit;
+    background: #fffef8;
+}
+
+/* Equipamento */
+.ficha-equip-area {
+    width: 100%;
+    min-height: 6rem;
+    border: 1px solid var(--gurps-border);
+    padding: 0.35rem;
+    font: inherit;
+    background: #fffef8;
+    resize: vertical;
+}
+
+/* Resumo pontos */
+.ficha-points-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+}
+
+.ficha-points-table th,
+.ficha-points-table td {
+    border: 1px solid var(--gurps-border);
+    padding: 0.25rem 0.35rem;
+}
+
+.ficha-points-table th {
+    background: var(--gurps-green-banner);
+    color: var(--gurps-gold-bright);
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+.ficha-points-table td:last-child {
+    width: 4.5rem;
+    text-align: right;
+}
+
+.ficha-sheet .ficha-points-table td:first-child {
+    color: var(--ficha-text-label);
+    font-weight: 600;
+}
+
+.ficha-sheet .ficha-points-total-row td:first-child {
+    color: var(--ficha-text-strong);
+    font-weight: 800;
+}
+
+.ficha-points-table input {
+    width: 100%;
+    border: none;
+    text-align: right;
+    font: inherit;
+    background: transparent;
+    padding: 0.1rem;
+}
+
+.ficha-points-total-row td {
+    font-weight: 800;
+    background: var(--gurps-paper-dim);
+}
+
+/* Botões tema GURPS */
+.ficha-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.75rem;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border: 2px solid var(--gurps-tan);
+    background: linear-gradient(180deg, var(--gurps-green-muted) 0%, var(--gurps-green-deep) 100%);
+    color: var(--gurps-gold-bright);
+    clip-path: polygon(
+        0.35rem 0,
+        calc(100% - 0.35rem) 0,
+        100% 0.35rem,
+        100% calc(100% - 0.35rem),
+        calc(100% - 0.35rem) 100%,
+        0.35rem 100%,
+        0 calc(100% - 0.35rem),
+        0 0.35rem
+    );
+}
+
+.ficha-btn:hover {
+    filter: brightness(1.08);
+}
+
+.ficha-btn--gold {
+    background: linear-gradient(180deg, #5c4a1a 0%, #3d3210 100%);
+    color: #fff;
+}
+
+.ficha-btn--ghost {
+    background: transparent;
+    color: var(--gurps-gold);
+    border-color: var(--gurps-gold-dim);
+}
+
+.ficha-btn--icon {
+    padding: 0.2rem 0.45rem;
+    min-width: 1.75rem;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+.ficha-footer-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.75rem;
+    background: linear-gradient(90deg, var(--gurps-green-deep), var(--gurps-green-banner));
+    border-top: 2px solid var(--gurps-tan);
+}
+
+.ficha-footer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.72rem;
+    color: #e8e0c8;
+}
+
+.ficha-footer-meta label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.ficha-footer-meta input,
+.ficha-footer-meta select {
+    border: 1px solid var(--gurps-tan);
+    background: #fffef8;
+    padding: 0.2rem 0.35rem;
+    font: inherit;
+}
+
+.ficha-hint {
+    font-size: 0.62rem;
+    color: var(--ficha-text-soft);
+    margin: 0.25rem 0 0;
+}
+
+/* Título dinâmico ao lado da marca */
+#fg_titulo_sub {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gurps-danger);
+    margin-top: 0.25rem;
+    letter-spacing: 0.04em;
+}

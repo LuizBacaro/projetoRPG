@@ -306,8 +306,19 @@
         return status || '—';
     }
 
+    /** Normaliza slug do token/API (evita falha de redirect por espaços/caixa). */
+    function normalizarSlugJogo(slug) {
+        return String(slug || '').trim().toLowerCase();
+    }
+
+    /**
+     * Destino após POST /games/selecionar bem-sucedido.
+     * Manter em sincronia com pastas em frontend/games/<slug>/.
+     */
     function destinoPorSlug(slug) {
-        if (slug === 'dnd35') return '/dashboard';
+        const s = normalizarSlugJogo(slug);
+        if (s === 'dnd35') return '/dashboard';
+        if (s === 'gurps') return '/games/gurps/pages/dashboard.html';
         return null;
     }
 
@@ -543,16 +554,16 @@
                 localStorage.setItem(STORAGE_GAME_NOME, data.game_nome);
             }
 
-            const destino = destinoPorSlug(data.game_slug);
+            const slugEfetivo = normalizarSlugJogo(data.game_slug) || normalizarSlugJogo(slug);
+            const destino = destinoPorSlug(slugEfetivo);
             if (destino) {
                 window.location.href = destino;
                 return true;
-            } else {
-                exibirAviso(
-                    `O jogo '${slug}' ainda não tem frontend dedicado. Aguarde a próxima fase.`
-                );
-                return false;
             }
+            exibirAviso(
+                `O jogo '${slugEfetivo || slug}' ainda não tem rota de entrada configurada em destinoPorSlug().`
+            );
+            return false;
         } catch (err) {
             exibirErro('Erro de conexão com o servidor.');
             console.error(err);

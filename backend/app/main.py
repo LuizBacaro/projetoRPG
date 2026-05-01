@@ -39,6 +39,9 @@ from .shared.api.v1 import (
     games,
     usuarios,
 )
+from .games.gurps.api.v1 import campanhas as gurps_campanhas
+from .games.gurps.api.v1 import combate as gurps_combate
+from .games.gurps.api.v1 import personagens as gurps_personagens
 from .games.dnd35.api.v1 import (
     armaduras_protecao as dnd35_armaduras_protecao,
     divindades_custom as dnd35_divindades_custom,
@@ -76,6 +79,9 @@ from .games.dnd35.models import magia as magia_model
 from .games.dnd35.models import grimorio as grimorio_model
 from .games.dnd35.models import campanha as campanha_model
 from .games.dnd35.models import sessao_campanha as sessao_campanha_model
+from .games.gurps.models import campanha as gurps_campanha_model
+from .games.gurps.models import combate as gurps_combate_model
+from .games.gurps.models import personagem as gurps_personagem_model
 
 logger = logging.getLogger(__name__)
 CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
@@ -295,6 +301,9 @@ app.include_router(dnd35_talentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_tabelas_classes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_racas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_habilidades_especiais.router, prefix=settings.API_V1_PREFIX)
+app.include_router(gurps_personagens.router, prefix=settings.API_V1_PREFIX)
+app.include_router(gurps_campanhas.router, prefix=settings.API_V1_PREFIX)
+app.include_router(gurps_combate.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 

@@ -52,7 +52,7 @@ def listar_catalogo(
 ) -> CatalogoJogosResponse:
     catalogo = service.listar_catalogo()
 
-    service.garantir_membership_padrao(usuario)
+    service.garantir_auto_enroll_memberships(usuario)
 
     memberships = service.listar_memberships(usuario)
 

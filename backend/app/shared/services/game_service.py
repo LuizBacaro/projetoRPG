@@ -2,11 +2,11 @@
 Service da camada multi-jogo.
 SRP: orquestra catálogo de jogos, memberships e troca de jogo ativo.
 
-Política atual (Fase 1):
-- Apenas o jogo `dnd35` está com status `disponivel`. Os demais aparecem no
-  seletor com `em_breve` e o backend recusa selecioná-los.
-- Membership do usuário com `dnd35` é criado on-demand caso o auto-enroll de
-  startup não tenha alcançado o usuário (ex.: registro novo).
+Política multi-jogo:
+- Jogos `disponiveis` no catálogo podem ser selecionados; `em_breve` continua
+  bloqueado em `selecionar_jogo`.
+- Membership é criado on-demand para slugs em `AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS`
+  (ex.: `dnd35`, `gurps`) quando o usuário entra no jogo ou carrega o catálogo.
 """
 from datetime import timedelta
 from typing import List, Optional, Tuple
@@ -15,7 +15,7 @@ from fastapi import HTTPException, status
 
 from ...shared.core.config import settings
 from ..core.security import criar_token
-from ..constants import GAME_SLUG_DND35
+from ..constants import AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS, GAME_SLUG_DND35
 from ..models.game import Game, UserGameMembership
 from ..models.usuario import Usuario
 from ..repositories.game_repository import (
@@ -67,21 +67,14 @@ class GameService:
 
     # ── Auto-enroll para registros novos ────────────────────────────────
 
-    def garantir_membership_padrao(
-        self, usuario: Usuario
+    def _garantir_membership_para_slug(
+        self, usuario: Usuario, slug: str
     ) -> Optional[Tuple[UserGameMembership, Game]]:
-        """
-        Garante que o usuário tenha um membership ativo no jogo padrão (D&D 3.5).
-        Retorna a tupla (membership, game) se houver — ou None se o jogo padrão
-        não estiver no catálogo (estado anômalo).
-        """
-        existente = self.memberships.buscar_por_usuario_e_slug(
-            usuario.id, GAME_SLUG_DND35
-        )
+        existente = self.memberships.buscar_por_usuario_e_slug(usuario.id, slug)
         if existente is not None:
             return existente
 
-        game = self.games.get_by_slug(GAME_SLUG_DND35)
+        game = self.games.get_by_slug(slug)
         if game is None:
             return None
 
@@ -99,6 +92,19 @@ class GameService:
             )
         )
         return novo, game
+
+    def garantir_membership_padrao(
+        self, usuario: Usuario
+    ) -> Optional[Tuple[UserGameMembership, Game]]:
+        """
+        Garante membership no jogo padrão D&D 3.5 (compatível com chamadas legadas).
+        """
+        return self._garantir_membership_para_slug(usuario, GAME_SLUG_DND35)
+
+    def garantir_auto_enroll_memberships(self, usuario: Usuario) -> None:
+        """Cria memberships em jogos com auto-enroll (D&D 3.5, GURPS, …)."""
+        for slug in AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS:
+            self._garantir_membership_para_slug(usuario, slug)
 
     # ── Seleção de jogo ─────────────────────────────────────────────────
 
@@ -130,8 +136,8 @@ class GameService:
 
         par = self.memberships.buscar_por_usuario_e_slug(usuario.id, slug)
         if par is None:
-            if slug == GAME_SLUG_DND35:
-                par = self.garantir_membership_padrao(usuario)
+            if slug in AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS:
+                par = self._garantir_membership_para_slug(usuario, slug)
             if par is None:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,

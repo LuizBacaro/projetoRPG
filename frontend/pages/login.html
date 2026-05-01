@@ -244,8 +244,11 @@
                 localStorage.setItem('refresh_token', data.refresh_token);
             }
             localStorage.setItem('usuario', JSON.stringify(data.usuario));
-            // Multi-jogo: preserva o último jogo ativo para auto-entrada no seletor
-            // quando ainda houver membership válido.
+            // Multi-jogo: após um login novo, não carregar jogo anterior — o usuário
+            // deve passar pelo hub de escolha (`selecionar-jogo`). O auto-entrada no
+            // seletor só usa `game_slug_ativo` quando já existia na mesma sessão.
+            localStorage.removeItem('game_slug_ativo');
+            localStorage.removeItem('game_nome_ativo');
             window.location.href = '/pages/selecionar-jogo.html';
 
         } catch (err) {

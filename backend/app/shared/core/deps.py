@@ -15,8 +15,9 @@ from ...shared.core.database import get_db
 from .security import decodificar_token
 from .security_audit import log_security_event
 from ...shared.repositories.usuario_repository import UsuarioRepository
-from ..constants import GAME_SLUG_DND35
+from ..constants import GAME_SLUG_DND35, GAME_SLUG_GURPS
 from ...games.dnd35.models.combatente import Combatente
+from ...games.gurps.models.personagem import GurpsPersonagem
 from ...games.dnd35.models.ataque import MagiaSlot
 from ..models.usuario import PerfilUsuario
 
@@ -265,6 +266,62 @@ def requer_game_dnd35(
     return usuario
 
 
+def requer_game_gurps(
+    request: Request,
+    usuario=Depends(get_usuario_atual),
+) -> "Usuario":
+    """Garante `game_slug=gurps` quando `MULTI_GAME_STRICT_MODE` está ativo."""
+    slug = extrair_game_slug_do_token(request)
+
+    if not settings.MULTI_GAME_STRICT_MODE:
+        if slug and slug != GAME_SLUG_GURPS:
+            logger.warning(
+                "⚠️  Acesso a endpoint GURPS com game_slug='%s' (esperado '%s')",
+                slug,
+                GAME_SLUG_GURPS,
+            )
+        return usuario
+
+    if slug is None:
+        log_security_event(
+            "game_slug_required",
+            "denied",
+            request=request,
+            user_email=getattr(usuario, "email", None),
+            reason="missing_game_slug_claim",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Sessão sem jogo selecionado. Volte ao seletor de jogo "
+                "para entrar no GURPS."
+            ),
+            headers={"X-Game-Slug-Required": GAME_SLUG_GURPS},
+        )
+
+    if slug != GAME_SLUG_GURPS:
+        log_security_event(
+            "game_slug_mismatch",
+            "denied",
+            request=request,
+            user_email=getattr(usuario, "email", None),
+            target=f"game_slug:{slug}",
+            reason="wrong_game_slug",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"Token vinculado ao jogo '{slug}'. Este endpoint pertence "
+                f"ao GURPS ('{GAME_SLUG_GURPS}')."
+            ),
+            headers={"X-Game-Slug-Required": GAME_SLUG_GURPS},
+        )
+
+    return usuario
+
+
 def requer_admin(
     request: Request,
     usuario = Depends(get_usuario_atual)
@@ -497,3 +554,82 @@ def validar_combatentes_do_usuario(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Sem permissão para os combatentes: {sem_acesso}",
         )
+
+
+def validar_gurps_personagens_do_usuario(
+    personagem_ids: list[int],
+    usuario,
+    db: Session,
+) -> None:
+    """Valida lista de personagens GURPS para operações em lote (ex.: combate)."""
+    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+        return
+
+    ids_unicos = list(set(personagem_ids))
+    if not ids_unicos:
+        return
+
+    personagens = (
+        db.query(GurpsPersonagem).filter(GurpsPersonagem.id.in_(ids_unicos)).all()
+    )
+
+    encontrados = {p.id for p in personagens}
+    faltantes = [pid for pid in ids_unicos if pid not in encontrados]
+    if faltantes:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Personagens não encontrados: {faltantes}",
+        )
+
+    sem_acesso = [p.id for p in personagens if p.dono_id != usuario.id]
+    if sem_acesso:
+        log_security_event(
+            "gurps_personagem_batch_access",
+            "denied",
+            user_email=usuario.email,
+            target="gurps_personagens",
+            reason="not_owner",
+            details={"personagem_ids": sem_acesso},
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Sem permissão para os personagens: {sem_acesso}",
+        )
+
+
+def requer_dono_ou_admin_gurps_personagem(
+    personagem_id: int,
+    request: Request,
+    usuario=Depends(get_usuario_atual),
+    db: Session = Depends(get_db),
+) -> "Usuario":
+    """Garante que o usuário é dono do personagem GURPS ou mestre/admin."""
+    personagem = (
+        db.query(GurpsPersonagem).filter(GurpsPersonagem.id == personagem_id).first()
+    )
+    if not personagem:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Personagem {personagem_id} não encontrado",
+        )
+
+    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+        return usuario
+
+    if personagem.dono_id != usuario.id:
+        log_security_event(
+            "gurps_personagem_access",
+            "denied",
+            request=request,
+            user_email=usuario.email,
+            target=f"gurps_personagem:{personagem_id}",
+            reason="not_owner",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não tem permissão para acessar este personagem",
+        )
+
+    return usuario

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard GURPS — Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/layout.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=22" />
+    <link rel="stylesheet" href="../css/gurps-dashboard.css" />
+    <link rel="stylesheet" href="../css/gurps-arena.css" />
+</head>
+<body>
+
+<header class="dashboard-header gurps-dash-header">
+    <div class="header-nav">
+        <div class="header-titulo">
+            <h1>⚙️ GURPS — Arena</h1>
+            <p>Combatentes (personagens), campanhas e arena de iniciativa.</p>
+        </div>
+        <div class="header-usuario-container">
+            <div class="header-usuario">
+                <span id="nomeUsuario" class="usuario-nome">…</span>
+                <span id="badgeJogo" class="badge-jogo-gurps">GURPS</span>
+                <button type="button" class="btn-logout" id="btnTrocarJogo" title="Voltar ao seletor de jogo">🎲 Trocar jogo</button>
+                <button type="button" class="btn-logout" id="btnLogout">Sair</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav class="dashboard-nav gurps-dash-nav" role="tablist">
+    <button type="button" class="nav-tab active" data-tab="combatentes">⚔️ Combatentes</button>
+    <button type="button" class="nav-tab" data-tab="campanhas">📜 Campanhas</button>
+    <button type="button" class="nav-tab" data-tab="arena">🏟️ Arena</button>
+</nav>
+
+<div class="dashboard-body gurps-dash-body">
+
+    <section class="tab-section active" id="tab-combatentes">
+        <div class="gurps-dash-card">
+            <h2 class="gurps-dash-card-title">Combatentes</h2>
+            <div class="gurps-dash-toolbar">
+                <a class="gurps-btn-novo" href="ficha-personagem.html">+ Nova ficha</a>
+                <label class="filter-chip">
+                    <input type="checkbox" id="chkMeus" />
+                    Só meus
+                </label>
+            </div>
+            <div class="tabela-wrapper">
+                <table class="tabela-combatentes">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Nome</th>
+                            <th>Pontos</th>
+                            <th>PV</th>
+                            <th>Ini</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblPersonagens">
+                        <tr><td colspan="6" class="cell-muted">Carregando…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="tab-section" id="tab-campanhas">
+        <div class="gurps-dash-card">
+            <h2 class="gurps-dash-card-title">Campanhas</h2>
+            <div id="campanhasJogador" class="gurps-dash-msg gurps-dash-msg--info" hidden>
+                Campanhas são gerenciadas pelo mestre. Peça ao mestre para vincular sua ficha.
+            </div>
+            <div id="campanhasMestre" hidden>
+                <div class="gurps-dash-toolbar">
+                    <input id="cmpNome" class="gurps-dash-field" type="text" placeholder="Nome da campanha" autocomplete="off" />
+                    <button type="button" class="gurps-btn-campanha" id="btnCmpCriar">+ Campanha</button>
+                </div>
+                <div class="tabela-wrapper">
+                    <table class="tabela-combatentes">
+                        <thead>
+                            <tr><th>Nome</th><th>Personagens</th><th></th></tr>
+                        </thead>
+                        <tbody id="tblCampanhas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tab-section" id="tab-arena">
+        <div class="gurps-dash-card">
+            <h2 class="gurps-dash-card-title">Arena</h2>
+
+            <div id="gurpsArenaSetup" class="gurps-arena-setup">
+                <p class="gurps-dash-msg gurps-dash-msg--warn">
+                    Marque os combatentes abaixo (estilo cartão) e inicie o combate. Com o combate ativo, o painel central mostra o personagem da vez, PV/FAD, atributos e perícias — avançar turno só altera a ordem, como no protótipo da arena.
+                </p>
+                <div class="gurps-arena-actions">
+                    <button type="button" class="gurps-btn-primary" id="btnCombIniciar">Iniciar combate</button>
+                </div>
+                <p style="margin:0.75rem 0 0;font-size:0.82rem;color:var(--texto-secundario)">Participantes</p>
+                <div id="arenaPick" class="gurps-arena-pick-grid" role="group" aria-label="Seleção de combatentes"></div>
+            </div>
+
+            <div id="gurpsArenaActive" class="gurps-arena-active" hidden>
+                <div class="gurps-arena-active-bar">
+                    <span class="gurps-arena-round">
+                        Rodada <strong id="arenaRodada">1</strong>
+                        · Turno <strong id="arenaTurnoIdx">0</strong>
+                    </span>
+                    <button type="button" class="gurps-arena-end-combat" id="btnCombFinalizarBar">Encerrar combate</button>
+                </div>
+                <div class="gurps-arena-active-layout">
+                    <aside class="gurps-arena-ini-sidebar" aria-label="Ordem de iniciativa">
+                        <h3>Ordem de iniciativa</h3>
+                        <ul id="arenaIniList" class="gurps-arena-ini-list"></ul>
+                    </aside>
+                    <div class="gurps-arena-main">
+                        <div class="gurps-arena-char-top">
+                            <div class="gurps-arena-char-name-block">
+                                <h3 id="arenaCharNome">—</h3>
+                                <p id="arenaCharConceito" class="gurps-arena-sub">—</p>
+                            </div>
+                            <div class="gurps-arena-reacao" id="arenaCharReacao" title="Reação">Reação —</div>
+                            <div class="gurps-arena-resource gurps-arena-resource--fad" id="arenaCharFad">
+                                <small>FAD</small>
+                                <span id="arenaCharFadVal">—</span>
+                            </div>
+                            <div class="gurps-arena-resource gurps-arena-resource--pv" id="arenaCharPv">
+                                <small>PV</small>
+                                <span id="arenaCharPvVal">—</span>
+                            </div>
+                        </div>
+                        <div class="gurps-arena-char-grid">
+                            <div class="gurps-arena-portrait-col">
+                                <div class="gurps-arena-portrait-wrap" id="arenaPortraitWrap">
+                                    <img id="arenaCharImg" alt="" hidden />
+                                    <span id="arenaCharImgPh" class="gurps-arena-portrait-ph">Sem retrato</span>
+                                </div>
+                                <div class="gurps-arena-quick-actions" aria-label="Aplicar efeitos ao personagem ativo">
+                                    <span class="gurps-arena-quick-title">Aplicar</span>
+                                    <div class="gurps-arena-quick-btns">
+                                        <button type="button" class="gurps-arena-qa gurps-arena-qa--heal" id="arenaBtnDanoCura">Dano / Cura</button>
+                                        <button type="button" class="gurps-arena-qa gurps-arena-qa--cond" id="arenaBtnCondicao">Condição</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gurps-arena-attrs">
+                                <h4>Atributos</h4>
+                                <div class="gurps-arena-attr-tiles" id="arenaAttrTiles"></div>
+                                <div class="gurps-arena-move" id="arenaMove">Vel / Desl. —</div>
+                            </div>
+                            <div class="gurps-arena-defenses">
+                                <h4>Defesas</h4>
+                                <ul id="arenaDefList"></ul>
+                            </div>
+                            <div class="gurps-arena-skills-wrap">
+                                <h4>Perícias</h4>
+                                <ul id="arenaPerList" class="gurps-arena-per-list"></ul>
+                            </div>
+                        </div>
+                        <div class="gurps-arena-notes-placeholder">
+                            Quadro para futuras condições, efeitos e notas de combate (integração com regras GURPS em etapas seguintes).
+                        </div>
+                        <div class="gurps-arena-turn-actions">
+                            <button type="button" class="gurps-btn-primary gurps-arena-btn-turn" id="btnCombAvancarActive">Encerrar turno</button>
+                        </div>
+                    </div>
+                </div>
+                <details class="gurps-arena-debug">
+                    <summary>Estado bruto (debug)</summary>
+                    <pre id="arenaStatus" class="gurps-arena-status">{}</pre>
+                </details>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="/js/shared/render-api-origin-boot.js"></script>
+<script src="/games/dnd35/js/config/api-url-global.js"></script>
+<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/ui/Toast.js"></script>
+<script>
+    if (!AuthService.exigirJogo('gurps')) {}
+</script>
+<script src="../js/services/GurpsPersonagemService.js"></script>
+<script src="../js/services/GurpsCampanhaService.js"></script>
+<script src="../js/services/GurpsCombateService.js"></script>
+<script>
+(function () {
+    const perfil = AuthService.getPerfil();
+    const isMestre = perfil === 'mestre' || perfil === 'administrador';
+    const ps = new GurpsPersonagemService();
+    const cs = new GurpsCampanhaService();
+    const kb = new GurpsCombateService();
+    let cacheLista = [];
+
+    function classeBadgeTipo(tipo) {
+        const t = String(tipo || '').toLowerCase();
+        if (t === 'monstro') return 'badge-monstro';
+        if (t === 'npc') return 'badge-npc';
+        return 'badge-jogador';
+    }
+
+    function tab(name) {
+        document.querySelectorAll('.gurps-dash-nav .nav-tab').forEach((b) => {
+            b.classList.toggle('active', b.dataset.tab === name);
+        });
+        document.querySelectorAll('.tab-section').forEach((p) => {
+            p.classList.toggle('active', p.id === 'tab-' + name);
+        });
+        if (name === 'arena') refreshArena();
+        if (name === 'campanhas' && isMestre) loadCampanhas();
+    }
+
+    document.querySelectorAll('.gurps-dash-nav .nav-tab').forEach((b) => {
+        b.addEventListener('click', () => tab(b.dataset.tab));
+    });
+
+    document.getElementById('btnTrocarJogo').addEventListener('click', () => {
+        if (AuthService.trocarJogo) AuthService.trocarJogo();
+    });
+
+    async function loadPersonagens() {
+        const meus = document.getElementById('chkMeus').checked;
+        try {
+            const rows = await ps.listar({ meus, limit: 200 });
+            cacheLista = rows;
+            const tb = document.getElementById('tblPersonagens');
+            if (!rows.length) {
+                tb.innerHTML = '<tr><td colspan="6" class="cell-muted">Nenhum personagem ainda.</td></tr>';
+                return;
+            }
+            tb.innerHTML = rows.map((r) => `
+                <tr>
+                    <td><span class="badge ${classeBadgeTipo(r.tipo)}">${escapeHtml(r.tipo)}</span></td>
+                    <td>${escapeHtml(r.nome)}</td>
+                    <td>${r.pontos_total ?? 0}</td>
+                    <td>${r.pvs_atual ?? ''}/${r.pvs_valor ?? ''}</td>
+                    <td>${r.iniciativa ?? 0}</td>
+                    <td><a class="gurps-link-ficha" href="ficha-personagem.html?id=${r.id}">Ficha</a></td>
+                </tr>
+            `).join('');
+            renderArenaPick();
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao carregar');
+        }
+    }
+
+    function escapeHtml(s) {
+        return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function resolveMediaUrl(u) {
+        if (!u) return '';
+        const s = String(u);
+        if (s.startsWith('http://') || s.startsWith('https://')) return s;
+        if (s.startsWith('/')) return window.location.origin + s;
+        return s;
+    }
+
+    function bindPickCards() {
+        document.querySelectorAll('.gurps-arena-pick-card').forEach((card) => {
+            const cb = card.querySelector('.pick-pers');
+            if (!cb) return;
+            const sync = () => card.classList.toggle('is-picked', cb.checked);
+            cb.addEventListener('change', sync);
+            sync();
+        });
+    }
+
+    function renderArenaPick() {
+        const host = document.getElementById('arenaPick');
+        if (!cacheLista.length) {
+            host.innerHTML = '<p style="grid-column:1/-1;color:var(--texto-secundario);font-size:0.88rem">Nenhum personagem para selecionar.</p>';
+            return;
+        }
+        host.innerHTML = cacheLista.map((r) => {
+            const foto = r.foto_url
+                ? `<img src="${escapeHtml(resolveMediaUrl(r.foto_url))}" alt="">`
+                : '<span class="gurps-arena-pick-ph" aria-hidden="true">?</span>';
+            return `
+            <label class="gurps-arena-pick-card">
+                <input type="checkbox" class="pick-pers" value="${r.id}" />
+                <span class="gurps-sr-only">${escapeHtml(r.nome)}</span>
+                <span class="gurps-arena-pick-card-body">
+                    ${foto}
+                    <span class="gurps-arena-pick-name">${escapeHtml(r.nome)}</span>
+                    <span class="gurps-arena-pick-meta">Ini ${r.iniciativa ?? 0} · ${escapeHtml(r.tipo)}</span>
+                </span>
+            </label>`;
+        }).join('');
+        bindPickCards();
+    }
+
+    function renderArenaActive(st) {
+        const ids = st.personagens_ids || [];
+        const list = st.personagens || [];
+        const byId = {};
+        list.forEach((p) => { byId[p.id] = p; });
+        const activeId = st.personagem_ativo_id;
+
+        const ul = document.getElementById('arenaIniList');
+        ul.innerHTML = ids.length
+            ? ids.map((pid, idx) => {
+                const p = byId[pid];
+                const nome = p ? p.nome : `#${pid}`;
+                const cls = pid === activeId ? 'is-active' : '';
+                return `<li class="${cls}"><span class="ini-num">${idx + 1}.</span>${escapeHtml(nome)}</li>`;
+            }).join('')
+            : '<li>—</li>';
+
+        const p = (activeId != null && byId[activeId]) ? byId[activeId] : (list[0] || null);
+        if (!p) {
+            document.getElementById('arenaCharNome').textContent = '—';
+            document.getElementById('arenaCharConceito').textContent = '—';
+            return;
+        }
+
+        document.getElementById('arenaCharNome').textContent = p.nome || '—';
+        document.getElementById('arenaCharConceito').textContent = (p.conceito && String(p.conceito).trim()) ? p.conceito : '—';
+        const reac = (p.reacao && String(p.reacao).trim()) ? String(p.reacao).trim() : '—';
+        document.getElementById('arenaCharReacao').textContent = 'Reação ' + reac;
+
+        const pvsA = p.pvs_atual != null ? p.pvs_atual : p.pvs_valor;
+        const pvsM = p.pvs_valor != null ? p.pvs_valor : '—';
+        document.getElementById('arenaCharPvVal').textContent = `${pvsA} / ${pvsM}`;
+
+        const fadA = p.fadiga_atual != null ? p.fadiga_atual : p.fadiga_valor;
+        const fadM = p.fadiga_valor != null ? p.fadiga_valor : '—';
+        document.getElementById('arenaCharFadVal').textContent = `${fadA} / ${fadM}`;
+
+        const img = document.getElementById('arenaCharImg');
+        const ph = document.getElementById('arenaCharImgPh');
+        if (p.foto_url) {
+            img.src = resolveMediaUrl(p.foto_url);
+            img.hidden = false;
+            ph.hidden = true;
+        } else {
+            img.removeAttribute('src');
+            img.hidden = true;
+            ph.hidden = false;
+        }
+
+        const tiles = document.getElementById('arenaAttrTiles');
+        const mk = (k, v) => `<div class="gurps-arena-attr-tile"><span>${k}</span>${v != null ? v : '—'}</div>`;
+        tiles.innerHTML = [
+            mk('ST', p.st_valor),
+            mk('DX', p.dx_valor),
+            mk('IQ', p.iq_valor),
+            mk('HT', p.ht_valor),
+            mk('PER', p.percepcao_valor),
+            mk('VON', p.vontade_valor),
+        ].join('');
+
+        const vel = p.velocidade_valor != null ? p.velocidade_valor : '—';
+        const mov = p.deslocamento_valor != null ? p.deslocamento_valor : '—';
+        document.getElementById('arenaMove').textContent = `Vel / Desl. ${vel} / ${mov}`;
+
+        const bloq = (p.bloqueio && String(p.bloqueio).trim()) ? String(p.bloqueio).trim() : '—';
+        document.getElementById('arenaDefList').innerHTML = [
+            `<li>Esquiva ${p.esquiva ?? '—'}</li>`,
+            `<li>Aparar ${p.aparar ?? '—'}</li>`,
+            `<li>Bloqueio ${escapeHtml(bloq)}</li>`,
+        ].join('');
+
+        const pers = (p.pericias || []).slice(0, 12);
+        document.getElementById('arenaPerList').innerHTML = pers.length
+            ? pers.map((x) => `<li><span>${escapeHtml(x.nome)}</span><span>${x.nh ?? '—'}</span></li>`).join('')
+            : '<li style="border:none;color:var(--texto-secundario)">Nenhuma perícia</li>';
+
+        document.getElementById('arenaRodada').textContent = String(st.rodada_atual ?? 1);
+        document.getElementById('arenaTurnoIdx').textContent = String(st.turno_atual ?? 0);
+    }
+
+    async function refreshArena() {
+        const pre = document.getElementById('arenaStatus');
+        const setup = document.getElementById('gurpsArenaSetup');
+        const active = document.getElementById('gurpsArenaActive');
+        try {
+            const st = await kb.status(false);
+            if (pre) pre.textContent = JSON.stringify(st, null, 2);
+            if (st.ativo) {
+                setup.hidden = true;
+                active.hidden = false;
+                renderArenaActive(st);
+            } else {
+                setup.hidden = false;
+                active.hidden = true;
+                renderArenaPick();
+            }
+        } catch (e) {
+            if (pre) pre.textContent = e.message || String(e);
+        }
+    }
+
+    document.getElementById('chkMeus').addEventListener('change', loadPersonagens);
+
+    document.getElementById('btnCombIniciar').addEventListener('click', async () => {
+        const ids = Array.from(document.querySelectorAll('.pick-pers:checked')).map((x) => Number(x.value));
+        if (!ids.length) {
+            Toast.error('Marque ao menos um personagem');
+            return;
+        }
+        try {
+            const st0 = await kb.status(true);
+            if (st0.ativo) {
+                const ok = confirm(
+                    'Já existe um combate GURPS ativo (ex.: sessão anterior). Finalizar o combate anterior e iniciar um novo com os personagens selecionados?'
+                );
+                if (!ok) return;
+                await kb.finalizar();
+            }
+            await kb.iniciar(ids);
+            Toast.success('Combate iniciado');
+            await refreshArena();
+        } catch (e) {
+            Toast.error(e.message || 'Falha ao iniciar');
+        }
+    });
+    document.getElementById('btnCombAvancarActive').addEventListener('click', async () => {
+        try {
+            await kb.avancarTurno();
+            await refreshArena();
+        } catch (e) {
+            Toast.error(e.message || 'Falha');
+        }
+    });
+    document.getElementById('btnCombFinalizarBar').addEventListener('click', async () => {
+        try {
+            await kb.finalizar();
+            Toast.success('Combate finalizado');
+            await refreshArena();
+        } catch (e) {
+            Toast.error(e.message || 'Falha');
+        }
+    });
+
+    document.getElementById('arenaBtnDanoCura').addEventListener('click', () => {
+        Toast.info('Dano / Cura: em breve — ajuste de PV e FAD pela API da arena.');
+    });
+    document.getElementById('arenaBtnCondicao').addEventListener('click', () => {
+        Toast.info('Condições de combate: em breve — marcas como atordoado, agarrado, etc.');
+    });
+
+    async function loadCampanhas() {
+        try {
+            const rows = await cs.listar();
+            const tb = document.getElementById('tblCampanhas');
+            tb.innerHTML = rows.map((c) => `
+                <tr>
+                    <td>${escapeHtml(c.nome)}</td>
+                    <td>${(c.personagem_ids || []).length}</td>
+                    <td><button type="button" class="gurps-btn-ghost" data-del="${c.id}">Excluir</button></td>
+                </tr>
+            `).join('');
+            tb.querySelectorAll('[data-del]').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Excluir campanha?')) return;
+                    try {
+                        await cs.deletar(Number(btn.dataset.del));
+                        Toast.success('Removida');
+                        loadCampanhas();
+                    } catch (e) {
+                        Toast.error(e.message);
+                    }
+                });
+            });
+        } catch (e) {
+            Toast.error(e.message || 'Erro campanhas');
+        }
+    }
+
+    document.getElementById('btnCmpCriar').addEventListener('click', async () => {
+        const nome = document.getElementById('cmpNome').value.trim();
+        if (!nome) return Toast.error('Nome da campanha');
+        try {
+            await cs.criar({ nome, descricao: '', personagem_ids: [] });
+            document.getElementById('cmpNome').value = '';
+            Toast.success('Campanha criada');
+            loadCampanhas();
+        } catch (e) {
+            Toast.error(e.message);
+        }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout && AuthService.logout());
+    AuthService.configurarHeaderUsuario();
+
+    if (isMestre) {
+        document.getElementById('campanhasMestre').hidden = false;
+    } else {
+        document.getElementById('campanhasJogador').hidden = false;
+    }
+
+    loadPersonagens().finally(() => refreshArena());
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,405 @@
+/**
+ * Dashboard GURPS — herda tipografia/cards do D&D 3.5 (layout + dashboard)
+ * e aplica acabamento Basic Set / Fantasy (oliva, dourado, pergaminho escuro).
+ */
+
+:root {
+    --gurps-dash-olive: #2f3e26;
+    --gurps-dash-olive-deep: #1e2a18;
+    --gurps-dash-gold: #d4af37;
+    --gurps-dash-gold-bright: #e8c547;
+    --gurps-dash-tan: #c5b358;
+    --gurps-dash-panel: #141c12;
+    --gurps-dash-panel-inner: #0f160d;
+    --gurps-dash-border: #3b4d31;
+}
+
+body {
+    background: radial-gradient(ellipse 130% 90% at 50% -10%, #2a3528 0%, #0d120b 42%, #050705 100%);
+    color: var(--texto-principal);
+    font-family: var(--fonte-texto);
+}
+
+/* layout.css define `header` genérico (centralizado); dashboard usa faixa full-width */
+header.dashboard-header {
+    text-align: initial;
+}
+
+/* Cabeçalho: madeira/oliva + filete dourado (eco da ficha) */
+.dashboard-header.gurps-dash-header {
+    background: linear-gradient(145deg, var(--gurps-dash-olive-deep) 0%, #0f1a0c 55%, #0a0f08 100%);
+    border-bottom: 3px solid var(--gurps-dash-tan);
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(212, 175, 55, 0.12);
+}
+
+.gurps-dash-header .header-titulo h1 {
+    font-family: var(--fonte-titulo);
+    color: var(--gurps-dash-gold-bright);
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.85);
+}
+
+.gurps-dash-header .header-titulo p {
+    color: rgba(232, 197, 71, 0.72);
+    font-size: 0.95rem;
+}
+
+.gurps-dash-header .header-usuario {
+    border-color: var(--gurps-dash-gold);
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(59, 77, 49, 0.6);
+}
+
+.gurps-dash-header .usuario-nome {
+    color: var(--gurps-dash-gold);
+}
+
+.badge-jogo-gurps {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gurps-dash-olive-deep);
+    background: linear-gradient(180deg, var(--gurps-dash-gold-bright) 0%, var(--gurps-dash-gold) 100%);
+    border: 1px solid #5c4a1a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.gurps-dash-header .btn-logout {
+    border-color: rgba(212, 175, 55, 0.55);
+    color: var(--texto-principal);
+}
+
+.gurps-dash-header .btn-logout:hover {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--gurps-dash-gold);
+    color: var(--gurps-dash-gold-bright);
+}
+
+a.gurps-header-link-dash {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Abas — destaque dourado em vez de roxo */
+.dashboard-nav.gurps-dash-nav {
+    background: linear-gradient(180deg, #121a0f 0%, #0c1109 100%);
+    border-bottom: 1px solid var(--gurps-dash-border);
+}
+
+.gurps-dash-nav .nav-tab {
+    font-family: var(--fonte-texto);
+    color: #8fa68a;
+}
+
+.gurps-dash-nav .nav-tab:hover {
+    color: #dce8d8;
+}
+
+.gurps-dash-nav .nav-tab.active {
+    color: var(--gurps-dash-gold-bright);
+    border-bottom-color: var(--gurps-dash-gold);
+    text-shadow: 0 0 12px rgba(232, 197, 71, 0.25);
+}
+
+/* Corpo + cartões de conteúdo */
+.dashboard-body.gurps-dash-body {
+    max-width: 1280px;
+    padding: 1.75rem 1.5rem 3rem;
+}
+
+.gurps-dash-card {
+    background: linear-gradient(145deg, var(--gurps-dash-panel) 0%, var(--gurps-dash-panel-inner) 100%);
+    border: 1px solid var(--gurps-dash-border);
+    border-radius: 12px;
+    padding: 1.35rem 1.5rem;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(212, 175, 55, 0.06);
+}
+
+.gurps-dash-card-title {
+    font-family: var(--fonte-titulo);
+    font-size: 1.05rem;
+    color: var(--gurps-dash-gold);
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(59, 77, 49, 0.85);
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Toolbar */
+.gurps-dash-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+}
+
+.gurps-dash-toolbar label.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--gurps-dash-border);
+    background: rgba(0, 0, 0, 0.25);
+    color: #c5d4c0;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.gurps-dash-toolbar label.filter-chip:hover {
+    border-color: var(--gurps-dash-gold-dim, #9a7b2c);
+    background: rgba(47, 62, 38, 0.35);
+}
+
+.gurps-dash-toolbar label.filter-chip input {
+    accent-color: var(--gurps-dash-gold);
+}
+
+a.gurps-btn-novo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: linear-gradient(145deg, #3d522f 0%, var(--gurps-dash-olive) 50%, #243018 100%);
+    border: 2px solid var(--gurps-dash-tan);
+    color: var(--gurps-dash-gold-bright);
+    padding: 0.55rem 1.2rem;
+    border-radius: 8px;
+    font-family: var(--fonte-titulo);
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: filter 0.2s, transform 0.15s;
+}
+
+a.gurps-btn-novo:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+/* Tabela — eco .tabela-combatentes com moldura GURPS */
+.gurps-dash-body .tabela-wrapper {
+    background: linear-gradient(180deg, #161f14 0%, #0f160d 100%);
+    border: 1px solid var(--gurps-dash-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.gurps-dash-body .tabela-combatentes th {
+    background: linear-gradient(180deg, var(--gurps-dash-olive-deep) 0%, #0f1a0c 100%);
+    color: rgba(232, 197, 71, 0.75);
+    border-bottom: 1px solid var(--gurps-dash-border);
+}
+
+.gurps-dash-body .tabela-combatentes td {
+    border-bottom: 1px solid rgba(59, 77, 49, 0.45);
+    color: #e8eee4;
+}
+
+.gurps-dash-body .tabela-combatentes tbody tr:hover td {
+    background: rgba(47, 62, 38, 0.35);
+}
+
+.gurps-dash-body .tabela-combatentes .cell-muted {
+    color: var(--texto-secundario);
+}
+
+/* Link Ficha */
+a.gurps-link-ficha {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--gurps-dash-olive-deep);
+    background: linear-gradient(180deg, var(--gurps-dash-gold-bright) 0%, #a88a2a 100%);
+    border: 1px solid #5c4a1a;
+    transition: filter 0.2s;
+}
+
+a.gurps-link-ficha:hover {
+    filter: brightness(1.1);
+}
+
+/* Campanhas */
+.gurps-dash-field {
+    min-width: 220px;
+    padding: 0.5rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--gurps-dash-border);
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--texto-principal);
+    font-family: var(--fonte-texto);
+    font-size: 0.95rem;
+}
+
+.gurps-dash-field::placeholder {
+    color: #6b7d66;
+}
+
+.gurps-dash-field:focus {
+    outline: none;
+    border-color: var(--gurps-dash-gold);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+}
+
+button.gurps-btn-campanha {
+    background: linear-gradient(145deg, #3d522f 0%, var(--gurps-dash-olive) 100%);
+    border: 2px solid var(--gurps-dash-tan);
+    color: var(--gurps-dash-gold-bright);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-family: var(--fonte-titulo);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+button.gurps-btn-campanha:hover {
+    filter: brightness(1.12);
+}
+
+button.gurps-btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    color: #dce8d8;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+button.gurps-btn-ghost:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--gurps-dash-gold);
+    color: var(--gurps-dash-gold-bright);
+}
+
+/* Mensagens */
+.gurps-dash-msg {
+    padding: 0.85rem 1.1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    font-size: 0.92rem;
+    border: 1px solid transparent;
+}
+
+.gurps-dash-msg--info {
+    background: rgba(30, 58, 138, 0.25);
+    border-color: rgba(96, 165, 250, 0.35);
+    color: #bfdbfe;
+}
+
+.gurps-dash-msg--warn {
+    background: rgba(120, 53, 15, 0.28);
+    border-color: rgba(251, 191, 36, 0.35);
+    color: #fde68a;
+}
+
+/* Arena */
+.gurps-pick-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 0.75rem 0 1rem;
+    padding: 0.5rem 0.25rem;
+}
+
+.gurps-pick-list label {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    cursor: pointer;
+    color: #d5e0d0;
+    font-size: 0.9rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.gurps-pick-list label:hover {
+    background: rgba(47, 62, 38, 0.4);
+}
+
+.gurps-pick-list small {
+    color: var(--texto-secundario);
+}
+
+.gurps-arena-status {
+    font-family: ui-monospace, "Cascadia Code", monospace;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    background: #0a0d09;
+    color: #a8c4a0;
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    border: 1px solid var(--gurps-dash-border);
+    white-space: pre-wrap;
+    max-height: 280px;
+    overflow: auto;
+    margin: 0;
+}
+
+.gurps-arena-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+button.gurps-btn-primary {
+    background: linear-gradient(145deg, #3d522f 0%, var(--gurps-dash-olive) 100%);
+    border: 2px solid var(--gurps-dash-tan);
+    color: var(--gurps-dash-gold-bright);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-family: var(--fonte-titulo);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+button.gurps-btn-primary:hover {
+    filter: brightness(1.12);
+}
+
+button.gurps-btn-secondary {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--gurps-dash-border);
+    color: #dce8d8;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+button.gurps-btn-secondary:hover {
+    border-color: var(--gurps-dash-gold);
+    color: var(--gurps-dash-gold-bright);
+}
+
+/* Badge tipo (reuso cores D&D com borda dourada suave) */
+.gurps-dash-body .badge {
+    border: 1px solid rgba(212, 175, 55, 0.25);
+}

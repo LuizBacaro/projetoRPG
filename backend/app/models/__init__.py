@@ -24,6 +24,14 @@ from app.games.dnd35.models.divindade_custom import DivindadeCustom
 from app.games.dnd35.models.campanha import Campanha
 from app.games.dnd35.models.sessao_campanha import SessaoCampanha
 from app.shared.models.game import Game, UserGameMembership
+from app.games.gurps.models.campanha import GurpsCampanha
+from app.games.gurps.models.combate import GurpsCombate
+from app.games.gurps.models.personagem import (
+    GurpsPersonagem,
+    GurpsPersonagemDesvantagem,
+    GurpsPersonagemPericia,
+    GurpsPersonagemVantagem,
+)
 
 __all__ = [
     "Pericia",
@@ -55,4 +63,10 @@ __all__ = [
     "SessaoCampanha",
     "Game",
     "UserGameMembership",
+    "GurpsCampanha",
+    "GurpsCombate",
+    "GurpsPersonagem",
+    "GurpsPersonagemVantagem",
+    "GurpsPersonagemDesvantagem",
+    "GurpsPersonagemPericia",
 ]

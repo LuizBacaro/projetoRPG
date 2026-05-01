@@ -16,6 +16,12 @@ from ..games.dnd35.repositories.campanha_repository import CampanhaRepository
 from ..games.dnd35.repositories.sessao_campanha_repository import (
     SessaoCampanhaRepository,
 )
+from ..games.gurps.repositories.campanha_repository import GurpsCampanhaRepository
+from ..games.gurps.repositories.combate_repository import GurpsCombateRepository
+from ..games.gurps.repositories.personagem_repository import GurpsPersonagemRepository
+from ..games.gurps.services.campanha_service import GurpsCampanhaService
+from ..games.gurps.services.combate_service import GurpsCombateService
+from ..games.gurps.services.personagem_service import GurpsPersonagemService
 from ..shared.repositories.game_repository import (
     GameRepository,
     UserGameMembershipRepository,
@@ -151,3 +157,44 @@ def get_game_service(
     ),
 ) -> GameService:
     return GameService(games, memberships)
+
+
+# ==================== GURPS ====================
+
+
+def get_gurps_personagem_repository(
+    db: Session = Depends(get_db),
+) -> GurpsPersonagemRepository:
+    return GurpsPersonagemRepository(db)
+
+
+def get_gurps_campanha_repository(
+    db: Session = Depends(get_db),
+) -> GurpsCampanhaRepository:
+    return GurpsCampanhaRepository(db)
+
+
+def get_gurps_combate_repository(
+    db: Session = Depends(get_db),
+) -> GurpsCombateRepository:
+    return GurpsCombateRepository(db)
+
+
+def get_gurps_personagem_service(
+    repository: GurpsPersonagemRepository = Depends(get_gurps_personagem_repository),
+) -> GurpsPersonagemService:
+    return GurpsPersonagemService(repository)
+
+
+def get_gurps_campanha_service(
+    campanha_repository: GurpsCampanhaRepository = Depends(get_gurps_campanha_repository),
+    personagem_repository: GurpsPersonagemRepository = Depends(get_gurps_personagem_repository),
+) -> GurpsCampanhaService:
+    return GurpsCampanhaService(campanha_repository, personagem_repository)
+
+
+def get_gurps_combate_service(
+    combate_repo: GurpsCombateRepository = Depends(get_gurps_combate_repository),
+    personagem_repo: GurpsPersonagemRepository = Depends(get_gurps_personagem_repository),
+) -> GurpsCombateService:
+    return GurpsCombateService(combate_repo, personagem_repo)
