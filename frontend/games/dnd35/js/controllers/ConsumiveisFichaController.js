@@ -53,6 +53,44 @@ class ConsumiveisFichaController {
         return nomeOriginal;
     }
 
+    _agruparPergaminhosDuplicados(itens) {
+        const mapa = new Map();
+        for (const item of itens) {
+            const categoria = String(item?.categoria || '').toLowerCase();
+            if (!categoria.includes('pergaminho')) {
+                mapa.set(`__${item.id}`, { ...item, tipo_exibicao: item.tipo || '—' });
+                continue;
+            }
+
+            const nome = String(item?.nome || '').trim().toLowerCase();
+            const custo = String(item?.custo || '').trim().toLowerCase();
+            const chave = `pergaminho::${nome}::${custo}`;
+            const existente = mapa.get(chave);
+            if (!existente) {
+                mapa.set(chave, {
+                    ...item,
+                    tipos_set: new Set([String(item?.tipo || '').trim()]),
+                });
+                continue;
+            }
+            if (item?.id < existente.id) {
+                existente.id = item.id;
+            }
+            existente.tipos_set.add(String(item?.tipo || '').trim());
+        }
+
+        return Array.from(mapa.values()).map((item) => {
+            const tipos = item.tipos_set
+                ? Array.from(item.tipos_set).filter(Boolean)
+                : [String(item?.tipo || '').trim()].filter(Boolean);
+            const tipoExibicao = tipos.length > 1 ? `${tipos.join(' ou ')}` : (tipos[0] || '—');
+            return {
+                ...item,
+                tipo_exibicao: tipoExibicao,
+            };
+        });
+    }
+
     async carregarInventario() {
         const lista = document.getElementById('fichaConsumiveis');
         if (!lista) return;
@@ -98,7 +136,7 @@ class ConsumiveisFichaController {
     renderizarCatalogo() {
         const lista = document.getElementById('consumiveisLista');
         if (!lista) return;
-        const itens = this.catalogo;
+        const itens = this._agruparPergaminhosDuplicados(this.catalogo);
         const podeCarregarMais = !this.catalogoCarregadoCompleto;
         if (!itens.length) {
             lista.innerHTML = `<p class="equipamentos-vazio">Nenhum consumível encontrado</p>${
@@ -122,7 +160,7 @@ class ConsumiveisFichaController {
             }
             return;
         }
-        lista.innerHTML = `${itens.map((it) => `<article class="talento-linha"><div class="talento-linha-conteudo"><div class="talento-linha-cabecalho"><span class="talento-linha-nome">${escapeHtml(this._nomeExibicaoConsumivel(it))}</span><span class="talento-linha-secao">${escapeHtml(it.categoria || '—')}</span></div><p class="talento-linha-beneficio"><span class="talento-linha-rotulo">Tipo:</span> ${escapeHtml(it.tipo || '—')}</p><p class="talento-linha-pre"><span class="talento-linha-rotulo">Custo:</span> ${escapeHtml(it.custo || '—')} ${it.pagina_referencia ? `• <span class="talento-linha-rotulo">Ref:</span> ${escapeHtml(it.pagina_referencia)}` : ''}</p></div><button type="button" class="talento-linha-acao item-btn-primary" data-add-id="${it.id}">➕ Adicionar</button></article>`).join('')}
+        lista.innerHTML = `${itens.map((it) => `<article class="talento-linha"><div class="talento-linha-conteudo"><div class="talento-linha-cabecalho"><span class="talento-linha-nome">${escapeHtml(this._nomeExibicaoConsumivel(it))}</span><span class="talento-linha-secao">${escapeHtml(it.categoria || '—')}</span></div><p class="talento-linha-beneficio"><span class="talento-linha-rotulo">Tipo:</span> ${escapeHtml(it.tipo_exibicao || it.tipo || '—')}</p><p class="talento-linha-pre"><span class="talento-linha-rotulo">Custo:</span> ${escapeHtml(it.custo || '—')} ${it.pagina_referencia ? `• <span class="talento-linha-rotulo">Ref:</span> ${escapeHtml(it.pagina_referencia)}` : ''}</p></div><button type="button" class="talento-linha-acao item-btn-primary" data-add-id="${it.id}">➕ Adicionar</button></article>`).join('')}
             ${podeCarregarMais ? `
                 <div class="talentos-paginacao talentos-paginacao--lista">
                     <button id="btnCarregarMaisConsumiveis" type="button" class="btn-carregar-mais">
