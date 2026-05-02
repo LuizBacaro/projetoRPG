@@ -10,7 +10,7 @@ from app.games.gurps.models.personagem import (
     GurpsPersonagemPericia,
     GurpsPersonagemVantagem,
 )
-from app.games.gurps.repositories.personagem_repository import GurpsPersonagemRepository
+from app.games.gurps.ports import GurpsPersonagemRepositoryProtocol
 from app.games.gurps.schemas.personagem import (
     GurpsPersonagemCreate,
     GurpsPersonagemResponse,
@@ -23,7 +23,7 @@ from app.shared.models.usuario import PerfilUsuario, Usuario
 
 
 class GurpsPersonagemService:
-    def __init__(self, repo: GurpsPersonagemRepository):
+    def __init__(self, repo: GurpsPersonagemRepositoryProtocol):
         self.repo = repo
 
     @staticmethod

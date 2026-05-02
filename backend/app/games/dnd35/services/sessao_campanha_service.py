@@ -10,17 +10,14 @@ from typing import List
 
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.games.dnd35.models.sessao_campanha import SessaoCampanha
-from app.games.dnd35.repositories.campanha_repository import CampanhaRepository
-from app.games.dnd35.repositories.sessao_campanha_repository import (
-    SessaoCampanhaRepository,
-)
+from app.games.dnd35.ports import CampanhaRepositoryProtocol, SessaoCampanhaRepositoryProtocol
 
 
 class SessaoCampanhaService:
     def __init__(
         self,
-        sessao_repository: SessaoCampanhaRepository,
-        campanha_repository: CampanhaRepository,
+        sessao_repository: SessaoCampanhaRepositoryProtocol,
+        campanha_repository: CampanhaRepositoryProtocol,
     ):
         self.sessao_repository = sessao_repository
         self.campanha_repository = campanha_repository
@@ -95,4 +92,4 @@ class SessaoCampanhaService:
         )
         if not sessao:
             raise ArenaBaseException("Sessão não encontrada", status_code=404)
-        self.sessao_repository.delete(sessao_id)
+        self.sessao_repository.delete(sessao)

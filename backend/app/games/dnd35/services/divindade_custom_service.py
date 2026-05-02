@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy.orm import Session
 
 from ..models.divindade_custom import DivindadeCustom
+from ..ports.divindade_custom import DivindadeCustomRepositoryProtocol
 from ..repositories.divindade_custom_repository import DivindadeCustomRepository
 
 from ..catalogs import divindades_catalogo as _divindades_catalogo
@@ -43,7 +44,7 @@ TENDENCIAS_VALIDAS = {
 
 
 class DivindadeCustomService:
-    def __init__(self, repository: DivindadeCustomRepository):
+    def __init__(self, repository: DivindadeCustomRepositoryProtocol):
         self.repository = repository
 
     # ─── Leitura ────────────────────────────────────────────────────────────

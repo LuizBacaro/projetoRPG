@@ -6,13 +6,13 @@ DIP: depende da abstração do repositório
 from fastapi import HTTPException, status
 from ..core.security import hash_senha, verificar_senha
 from ..models.usuario import Usuario, PerfilUsuario
-from ..repositories.usuario_repository import UsuarioRepository
+from ..ports import UsuarioRepositoryProtocol
 from ..schemas.usuario import UsuarioCreate, UsuarioUpdate
 
 
 class UsuarioService:
 
-    def __init__(self, repository: UsuarioRepository):
+    def __init__(self, repository: UsuarioRepositoryProtocol):
         self.repo = repository
 
     # ── Regras de negócio ─────────────────────────────────────────────────────

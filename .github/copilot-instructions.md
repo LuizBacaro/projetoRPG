@@ -99,6 +99,11 @@ Este workspace usa instrucoes granulares por dominio em `.github/instructions`.
 - Nunca armazene imagens apenas no filesystem do Render — e efemero e perdido em cada deploy/restart.
 - Ao deletar combatente com foto, `FileService.deletar_arquivo()` lida com ambos os casos automaticamente.
 
+## Repositorios e Protocols (backend)
+
+- Novos ou alterados servicos que injetam repositorio devem alinhar-se aos `Protocol` em `backend/app/shared/ports/` (hub) e `backend/app/games/<jogo>/ports/` (por jogo), conforme [docs/ports-repositorios-servicos.md](../docs/ports-repositorios-servicos.md).
+- O repositorio concreto nao precisa herdar o `Protocol`; o construtor do servico e que deve ser anotado com o contrato.
+
 ## Convencoes Transversais
 
 - Preserve autenticacao real e autorizacao por perfil; nao introduza atalhos permissivos.

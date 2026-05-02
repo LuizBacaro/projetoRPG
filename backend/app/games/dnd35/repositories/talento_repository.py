@@ -5,6 +5,8 @@ Localização: `app.games.dnd35.repositories.talento_repository`. Shim em
 `app.repositories.talento_repository` durante a reorganização multi-jogo.
 """
 
+from typing import Optional
+
 from sqlalchemy import and_, asc
 from sqlalchemy.orm import Session, aliased
 
@@ -20,6 +22,9 @@ from app.repositories.base import (
 class TalentoRepository:
     """Operações de banco de dados para talentos"""
 
+    def __init__(self, db: Session):
+        self.db = db
+
     @staticmethod
     def _payload_data(payload, exclude_unset: bool = False) -> dict:
         if hasattr(payload, "model_dump"):
@@ -28,48 +33,39 @@ class TalentoRepository:
             return payload.dict(exclude_unset=True)
         return payload.dict()
 
-    @staticmethod
-    def restaurar_talento(
-        db: Session, db_talento: Talento, talento: TalentoCreate
-    ) -> Talento:
+    def restaurar_talento(self, db_talento: Talento, talento: TalentoCreate) -> Talento:
         db_talento.deleted_at = None
         db_talento.ativo = True
-        for key, value in TalentoRepository._payload_data(talento).items():
+        for key, value in self._payload_data(talento).items():
             setattr(db_talento, key, value)
-        commit_with_rollback(db)
-        db.refresh(db_talento)
+        commit_with_rollback(self.db)
+        self.db.refresh(db_talento)
         return db_talento
 
-    @staticmethod
-    def criar_talento(db: Session, talento: TalentoCreate) -> Talento:
+    def criar_talento(self, talento: TalentoCreate) -> Talento:
         """Cria um novo talento"""
-        db_talento = Talento(**TalentoRepository._payload_data(talento))
-        db.add(db_talento)
-        commit_with_rollback(db)
-        db.refresh(db_talento)
+        db_talento = Talento(**self._payload_data(talento))
+        self.db.add(db_talento)
+        commit_with_rollback(self.db)
+        self.db.refresh(db_talento)
         return db_talento
 
-    @staticmethod
-    def obter_talento(db: Session, talento_id: int) -> Talento:
+    def obter_talento(self, talento_id: int) -> Optional[Talento]:
         """Obtém um talento por ID"""
         return (
-            apply_not_deleted(db.query(Talento), Talento)
+            apply_not_deleted(self.db.query(Talento), Talento)
             .filter(Talento.id == talento_id)
             .first()
         )
 
-    @staticmethod
-    def obter_talento_por_nome(db: Session, nome: str) -> Talento:
+    def obter_talento_por_nome(self, nome: str) -> Optional[Talento]:
         """Obtém um talento por nome"""
-        return db.query(Talento).filter(Talento.nome == nome).first()
+        return self.db.query(Talento).filter(Talento.nome == nome).first()
 
-    @staticmethod
-    def listar_talentos(
-        db: Session, skip: int = 0, limit: int = 100
-    ) -> list[Talento]:
+    def listar_talentos(self, skip: int = 0, limit: int = 100) -> list[Talento]:
         """Lista todos os talentos com paginação"""
         return (
-            apply_not_deleted(db.query(Talento), Talento)
+            apply_not_deleted(self.db.query(Talento), Talento)
             .filter(Talento.ativo == True)  # noqa: E712
             .order_by(asc(Talento.nome))
             .offset(skip)
@@ -77,13 +73,10 @@ class TalentoRepository:
             .all()
         )
 
-    @staticmethod
-    def atualizar_talento(
-        db: Session, talento_id: int, talento_data: dict
-    ) -> Talento:
+    def atualizar_talento(self, talento_id: int, talento_data: dict) -> Optional[Talento]:
         """Atualiza um talento"""
         db_talento = (
-            apply_not_deleted(db.query(Talento), Talento)
+            apply_not_deleted(self.db.query(Talento), Talento)
             .filter(Talento.id == talento_id)
             .first()
         )
@@ -91,35 +84,36 @@ class TalentoRepository:
             for key, value in talento_data.items():
                 if value is not None:
                     setattr(db_talento, key, value)
-            commit_with_rollback(db)
-            db.refresh(db_talento)
+            commit_with_rollback(self.db)
+            self.db.refresh(db_talento)
         return db_talento
 
-    @staticmethod
-    def deletar_talento(db: Session, talento_id: int) -> bool:
+    def deletar_talento(self, talento_id: int) -> bool:
         """Deleta um talento"""
         db_talento = (
-            apply_not_deleted(db.query(Talento), Talento)
+            apply_not_deleted(self.db.query(Talento), Talento)
             .filter(Talento.id == talento_id)
             .first()
         )
         if db_talento:
-            return soft_delete_entity(db, db_talento)
+            return soft_delete_entity(self.db, db_talento)
         return False
 
 
 class TalentoJogadorRepository:
     """Operações de banco de dados para talentos do jogador"""
 
-    @staticmethod
+    def __init__(self, db: Session):
+        self.db = db
+
     def adicionar_talento(
-        db: Session,
+        self,
         combatente_id: int,
         talento_jogador: TalentoJogadorCreate,
     ) -> TalentoJogador:
         """Adiciona um talento ao combatente"""
         db_existente = (
-            db.query(TalentoJogador)
+            self.db.query(TalentoJogador)
             .filter(
                 and_(
                     TalentoJogador.combatente_id == combatente_id,
@@ -136,32 +130,26 @@ class TalentoJogadorRepository:
             combatente_id=combatente_id,
             talento_id=talento_jogador.talento_id,
         )
-        db.add(db_talento_jogador)
-        commit_with_rollback(db)
-        db.refresh(db_talento_jogador)
+        self.db.add(db_talento_jogador)
+        commit_with_rollback(self.db)
+        self.db.refresh(db_talento_jogador)
         return db_talento_jogador
 
-    @staticmethod
-    def obter_talentos_jogador(
-        db: Session, combatente_id: int
-    ) -> list[TalentoJogador]:
+    def obter_talentos_jogador(self, combatente_id: int) -> list[TalentoJogador]:
         """Obtém todos os talentos de um combatente"""
         return (
-            db.query(TalentoJogador)
+            self.db.query(TalentoJogador)
             .filter(TalentoJogador.combatente_id == combatente_id)
             .all()
         )
 
-    @staticmethod
-    def obter_talentos_jogador_detalhado(
-        db: Session, combatente_id: int
-    ) -> list[dict]:
+    def obter_talentos_jogador_detalhado(self, combatente_id: int) -> list[dict]:
         """Obtém talentos do jogador com aliases explícitos para evitar ambiguidade em joins."""
         tal_jogador = aliased(TalentoJogador, name="tal_jogador")
         tal_catalogo = aliased(Talento, name="tal_catalogo")
 
         rows = (
-            db.query(
+            self.db.query(
                 tal_jogador.talento_id.label("talento_id"),
                 tal_catalogo.nome.label("talento_nome"),
                 tal_catalogo.descricao.label("talento_descricao"),
@@ -180,13 +168,10 @@ class TalentoJogadorRepository:
 
         return [dict(row._mapping) for row in rows]
 
-    @staticmethod
-    def remover_talento(
-        db: Session, combatente_id: int, talento_id: int
-    ) -> bool:
+    def remover_talento(self, combatente_id: int, talento_id: int) -> bool:
         """Remove um talento do combatente"""
         db_talento_jogador = (
-            db.query(TalentoJogador)
+            self.db.query(TalentoJogador)
             .filter(
                 and_(
                     TalentoJogador.combatente_id == combatente_id,
@@ -197,7 +182,7 @@ class TalentoJogadorRepository:
         )
 
         if db_talento_jogador:
-            db.delete(db_talento_jogador)
-            commit_with_rollback(db)
+            self.db.delete(db_talento_jogador)
+            commit_with_rollback(self.db)
             return True
         return False

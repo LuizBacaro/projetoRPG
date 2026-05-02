@@ -3,7 +3,7 @@ AtaqueRepository
 SRP: acesso a dados de Ataque e MagiaSlot
 DIP: depende da abstração Session, não de implementação concreta
 """
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -74,7 +74,7 @@ class AtaqueRepository:
             self.db.refresh(s)
         return novos
 
-    def atualizar_usados(self, slot_id: int, usados: int) -> MagiaSlot:
+    def atualizar_usados(self, slot_id: int, usados: int) -> Optional[MagiaSlot]:
         """Atualiza apenas o campo 'usados' de um slot (usado na arena)."""
         slot = self.db.query(MagiaSlot).filter(MagiaSlot.id == slot_id).first()
         if slot:

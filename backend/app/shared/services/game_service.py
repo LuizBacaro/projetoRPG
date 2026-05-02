@@ -18,10 +18,7 @@ from ..core.security import criar_token
 from ..constants import AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS, GAME_SLUG_DND35
 from ..models.game import Game, UserGameMembership
 from ..models.usuario import Usuario
-from ..repositories.game_repository import (
-    GameRepository,
-    UserGameMembershipRepository,
-)
+from ..ports import GameRepositoryProtocol, UserGameMembershipRepositoryProtocol
 from ..schemas.game import (
     GameResponse,
     UserGameMembershipResponse,
@@ -37,8 +34,8 @@ from ..schemas.game import (
 class GameService:
     def __init__(
         self,
-        game_repository: GameRepository,
-        membership_repository: UserGameMembershipRepository,
+        game_repository: GameRepositoryProtocol,
+        membership_repository: UserGameMembershipRepositoryProtocol,
     ):
         self.games = game_repository
         self.memberships = membership_repository

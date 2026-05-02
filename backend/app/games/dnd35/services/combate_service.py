@@ -12,8 +12,10 @@ from app.shared.exceptions.custom_exceptions import (
     ConcurrencyConflictError,
 )
 from app.games.dnd35.models.combate import Combate, CombateHistorico
-from app.games.dnd35.repositories.combate_repository import CombateRepository
-from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.ports import (
+    CombatenteRepositoryForCombateProtocol,
+    CombateRepositoryProtocol,
+)
 
 
 class CombateService:
@@ -23,8 +25,8 @@ class CombateService:
 
     def __init__(
         self,
-        combate_repository: CombateRepository,
-        combatente_repository: CombatenteRepository,
+        combate_repository: CombateRepositoryProtocol,
+        combatente_repository: CombatenteRepositoryForCombateProtocol,
     ):
         self.combate_repo = combate_repository
         self.combatente_repo = combatente_repository

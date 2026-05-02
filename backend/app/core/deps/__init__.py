@@ -10,6 +10,9 @@ Rotas e código legado podem continuar a importar de ``app.core.dependencies``.
 """
 
 from .dnd35 import (
+    get_armadura_protecao_jogador_repository,
+    get_armadura_protecao_repository,
+    get_armadura_protecao_service,
     get_campanha_repository,
     get_campanha_service,
     get_combate_repository,
@@ -18,13 +21,26 @@ from .dnd35 import (
     get_combatente_service,
     get_condicao_repository,
     get_condicao_service,
+    get_consumivel_jogador_repository,
+    get_consumivel_repository,
+    get_consumivel_service,
+    get_divindade_custom_repository,
+    get_equipamento_jogador_repository,
+    get_equipamento_repository,
+    get_equipamento_service,
     get_grimorio_repository,
     get_grimorio_service,
     get_magia_import_service,
     get_magia_repository,
     get_magia_service,
+    get_pericia_jogador_repository,
+    get_pericia_repository,
+    get_pericia_service,
     get_sessao_campanha_repository,
     get_sessao_campanha_service,
+    get_talento_jogador_repository,
+    get_talento_repository,
+    get_talento_service,
 )
 from .file_storage import get_file_service
 from .gurps import (
@@ -42,6 +58,9 @@ from .hub import (
 )
 
 __all__ = [
+    "get_armadura_protecao_jogador_repository",
+    "get_armadura_protecao_repository",
+    "get_armadura_protecao_service",
     "get_campanha_repository",
     "get_campanha_service",
     "get_combate_repository",
@@ -50,6 +69,13 @@ __all__ = [
     "get_combatente_service",
     "get_condicao_repository",
     "get_condicao_service",
+    "get_consumivel_jogador_repository",
+    "get_consumivel_repository",
+    "get_consumivel_service",
+    "get_divindade_custom_repository",
+    "get_equipamento_jogador_repository",
+    "get_equipamento_repository",
+    "get_equipamento_service",
     "get_file_service",
     "get_game_repository",
     "get_game_service",
@@ -64,7 +90,13 @@ __all__ = [
     "get_magia_import_service",
     "get_magia_repository",
     "get_magia_service",
+    "get_pericia_jogador_repository",
+    "get_pericia_repository",
+    "get_pericia_service",
     "get_sessao_campanha_repository",
     "get_sessao_campanha_service",
+    "get_talento_jogador_repository",
+    "get_talento_repository",
+    "get_talento_service",
     "get_user_game_membership_repository",
 ]

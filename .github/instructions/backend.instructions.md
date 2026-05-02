@@ -17,6 +17,12 @@ applyTo: "backend/**/*.py"
 - Quando aplicavel, mantenha headers de paginacao: `X-Total-Count`, `X-Skip`, `X-Limit`.
 - Evite breaking changes em schema de request/response sem necessidade explicita.
 
+## Repositorios e `Protocol` (DIP)
+
+- Servicos devem depender de **contratos** (`typing.Protocol`) quando ja existirem em `app.shared.ports` ou `app.games.<jogo>.ports`, nao da classe concreta do repositorio no construtor.
+- Ao criar fluxo novo ou estender persistencia: definir/atualizar o `Protocol` com a **superficie realmente usada** pelo servico; reexportar no `__init__.py` do pacote `ports`.
+- Convencoes, inventario e proximos passos: [docs/ports-repositorios-servicos.md](../../docs/ports-repositorios-servicos.md).
+
 ## Qualidade e Testes
 
 - Preserve compatibilidade com testes FastAPI que usam SQLite em memoria com `StaticPool`.

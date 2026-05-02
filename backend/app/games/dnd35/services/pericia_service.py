@@ -5,80 +5,69 @@ Localização: `app.games.dnd35.services.pericia_service`. Shim em
 `app.services.pericia_service` durante a reorganização multi-jogo.
 """
 
+from __future__ import annotations
+
 from typing import Dict, List, Optional
 
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
-from app.games.dnd35.models.pericia import Pericia, PericiaClasse, PericiaJogador
-from app.games.dnd35.repositories.pericia_repository import PericiaRepository
+from app.games.dnd35.models.pericia import Pericia, PericiaJogador
+from app.games.dnd35.ports.pericias import (
+    PericiaJogadorRepositoryProtocol,
+    PericiaRepositoryProtocol,
+)
+from app.games.dnd35.ports.repositories import CombatenteGetByIdProtocol
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.repositories.pericia_repository import (
+    PericiaJogadorRepository,
+    PericiaRepository,
+)
 from app.games.dnd35.schemas.pericia import (
     PericiaCreate,
     PericiaJogadorCreate,
     PericiaJogadorUpdate,
     PericiaUpdate,
 )
-from app.games.dnd35.models.combatente import Combatente
-from app.repositories.base import (
-    apply_not_deleted,
-    commit_with_rollback,
-    soft_delete_entity,
-)
 
 
 class PericiaService:
     """Serviço de lógica de negócio para perícias"""
 
-    def __init__(self, db: Session):
+    def __init__(
+        self,
+        db: Session,
+        *,
+        pericia_repository: Optional[PericiaRepositoryProtocol] = None,
+        pericia_jogador_repository: Optional[PericiaJogadorRepositoryProtocol] = None,
+        combatente_repository: Optional[CombatenteGetByIdProtocol] = None,
+    ):
         self.db = db
-
-    @staticmethod
-    def _payload_data(payload, exclude_unset: bool = False) -> dict:
-        if hasattr(payload, "model_dump"):
-            return payload.model_dump(exclude_unset=exclude_unset)
-        if exclude_unset:
-            return payload.dict(exclude_unset=True)
-        return payload.dict()
+        self._pericia = pericia_repository or PericiaRepository(db)
+        self._pj = pericia_jogador_repository or PericiaJogadorRepository(db)
+        self._combatente = combatente_repository or CombatenteRepository(db)
 
     # ========== PERÍCIAS DISPONÍVEIS ==========
 
     def criar_pericia(self, pericia: PericiaCreate) -> Pericia:
         """Cria uma nova perícia"""
-        pericia_existente = (
-            self.db.query(Pericia).filter(Pericia.nome == pericia.nome).first()
-        )
+        pericia_existente = self._pericia.obter_pericia_por_nome(pericia.nome)
 
         if pericia_existente:
             if pericia_existente.deleted_at is not None:
-                return PericiaRepository.restaurar_pericia(
-                    self.db, pericia_existente, pericia
-                )
+                return self._pericia.restaurar_pericia(pericia_existente, pericia)
             raise ValueError(f"Perícia '{pericia.nome}' já existe")
 
-        db_pericia = Pericia(**self._payload_data(pericia))
-        self.db.add(db_pericia)
-        commit_with_rollback(self.db)
-        self.db.refresh(db_pericia)
-        return db_pericia
+        return self._pericia.criar_pericia(pericia)
 
     def obter_pericia(self, pericia_id: int) -> Optional[Pericia]:
         """Obtém uma perícia por ID"""
-        return (
-            apply_not_deleted(self.db.query(Pericia), Pericia)
-            .filter(Pericia.id == pericia_id)
-            .first()
-        )
+        return self._pericia.obter_pericia(pericia_id)
 
     def listar_todas_pericias(
         self, skip: int = 0, limit: int = 100
     ) -> List[Pericia]:
         """Lista todas as perícias disponíveis (ordem alfabética — espelha a Tabela 4-3 do livro)."""
-        return (
-            apply_not_deleted(self.db.query(Pericia), Pericia)
-            .order_by(Pericia.nome.asc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        return self._pericia.listar_pericias(skip=skip, limit=limit)
 
     def listar_pericias_por_atributo(self, atributo: str) -> List[Pericia]:
         """Lista perícias filtradas por atributo (ordem alfabética)."""
@@ -86,58 +75,21 @@ class PericiaService:
         if atributo.upper() not in atributos_validos:
             raise ValueError(f"Atributo '{atributo}' inválido")
 
-        return (
-            apply_not_deleted(self.db.query(Pericia), Pericia)
-            .filter(Pericia.atributo == atributo.upper())
-            .order_by(Pericia.nome.asc())
-            .all()
-        )
+        return self._pericia.listar_pericias_por_atributo(atributo.upper())
 
     def listar_pericias_por_classe(self, classe_nome: str) -> List[Pericia]:
         """Lista perícias padrão de uma classe D&D (ordem alfabética)."""
-        return (
-            apply_not_deleted(self.db.query(Pericia), Pericia)
-            .join(PericiaClasse, Pericia.id == PericiaClasse.pericia_id)
-            .filter(
-                PericiaClasse.classe_nome == classe_nome,
-                PericiaClasse.is_default == 1,
-            )
-            .order_by(Pericia.nome.asc())
-            .all()
-        )
+        return self._pericia.listar_pericias_por_classe(classe_nome)
 
     def atualizar_pericia(
         self, pericia_id: int, pericia: PericiaUpdate
     ) -> Optional[Pericia]:
         """Atualiza uma perícia"""
-        db_pericia = (
-            apply_not_deleted(self.db.query(Pericia), Pericia)
-            .filter(Pericia.id == pericia_id)
-            .first()
-        )
-
-        if not db_pericia:
-            return None
-
-        for key, value in self._payload_data(pericia, exclude_unset=True).items():
-            setattr(db_pericia, key, value)
-
-        commit_with_rollback(self.db)
-        self.db.refresh(db_pericia)
-        return db_pericia
+        return self._pericia.atualizar_pericia(pericia_id, pericia)
 
     def deletar_pericia(self, pericia_id: int) -> bool:
         """Deleta uma perícia"""
-        db_pericia = (
-            apply_not_deleted(self.db.query(Pericia), Pericia)
-            .filter(Pericia.id == pericia_id)
-            .first()
-        )
-
-        if not db_pericia:
-            return False
-
-        return soft_delete_entity(self.db, db_pericia)
+        return self._pericia.deletar_pericia(pericia_id)
 
     # ========== CÁLCULO DE CUSTOS ==========
 
@@ -146,40 +98,13 @@ class PericiaService:
         Calcula o custo de uma perícia para uma classe
         Retorna: 1 se é perícia de classe, 2 se é fora da classe
         """
-        pericia_classe = (
-            self.db.query(PericiaClasse)
-            .filter(
-                PericiaClasse.pericia_id == pericia_id,
-                PericiaClasse.classe_nome == classe_nome,
-                PericiaClasse.is_default == 1,
-            )
-            .first()
-        )
-
-        return 1 if pericia_classe else 2
+        return self._pericia.obter_custo_pericia(pericia_id, classe_nome)
 
     def obter_custos_pericias(
         self, pericia_ids: List[int], classe_nome: str
     ) -> Dict[int, int]:
         """Busca em lote os custos das perícias para uma classe."""
-        if not pericia_ids:
-            return {}
-
-        pericias_de_classe = {
-            pericia_id
-            for (pericia_id,) in self.db.query(PericiaClasse.pericia_id)
-            .filter(
-                PericiaClasse.pericia_id.in_(pericia_ids),
-                PericiaClasse.classe_nome == classe_nome,
-                PericiaClasse.is_default == 1,
-            )
-            .all()
-        }
-
-        return {
-            pericia_id: 1 if pericia_id in pericias_de_classe else 2
-            for pericia_id in pericia_ids
-        }
+        return self._pericia.obter_custos_pericias(pericia_ids, classe_nome)
 
     def calcular_custo_total_graduacao(
         self,
@@ -202,36 +127,20 @@ class PericiaService:
         pericia_jogador: PericiaJogadorCreate,
     ) -> PericiaJogador:
         """Adiciona uma perícia ao jogador"""
-        combatente = (
-            self.db.query(Combatente)
-            .filter(
-                Combatente.id == combatente_id,
-                Combatente.deleted_at.is_(None),
-            )
-            .first()
-        )
+        combatente = self._combatente.get_by_id(combatente_id)
 
         if not combatente:
             raise ValueError(f"Combatente com ID {combatente_id} não existe")
 
-        pericia = (
-            apply_not_deleted(self.db.query(Pericia), Pericia)
-            .filter(Pericia.id == pericia_jogador.pericia_id)
-            .first()
-        )
+        pericia = self._pericia.obter_pericia(pericia_jogador.pericia_id)
 
         if not pericia:
             raise ValueError(
                 f"Perícia com ID {pericia_jogador.pericia_id} não existe"
             )
 
-        pericia_existente = (
-            self.db.query(PericiaJogador)
-            .filter(
-                PericiaJogador.combatente_id == combatente_id,
-                PericiaJogador.pericia_id == pericia_jogador.pericia_id,
-            )
-            .first()
+        pericia_existente = self._pj.obter_pericia_jogador_por_ids(
+            combatente_id, pericia_jogador.pericia_id
         )
 
         if pericia_existente:
@@ -265,36 +174,19 @@ class PericiaService:
             bonus_outros=pericia_jogador.bonus_outros or 0,
         )
 
-        self.db.add(db_pericia_jogador)
-        commit_with_rollback(self.db)
-        self.db.refresh(db_pericia_jogador)
-
-        return db_pericia_jogador
+        return self._pj.persistir_novo_vinculo(db_pericia_jogador)
 
     def obter_pericia_jogador(
         self, pericia_jogador_id: int
     ) -> Optional[PericiaJogador]:
         """Obtém uma perícia específica do jogador"""
-        return (
-            self.db.query(PericiaJogador)
-            .filter(PericiaJogador.id == pericia_jogador_id)
-            .first()
-        )
+        return self._pj.obter_pericia_jogador(pericia_jogador_id)
 
     def listar_pericias_combatente(
         self, combatente_id: int
     ) -> List[PericiaJogador]:
         """Lista todas as perícias de um combatente"""
-        return (
-            self.db.query(PericiaJogador)
-            .options(joinedload(PericiaJogador.pericia))
-            .join(Pericia, Pericia.id == PericiaJogador.pericia_id)
-            .filter(
-                PericiaJogador.combatente_id == combatente_id,
-                Pericia.deleted_at.is_(None),
-            )
-            .all()
-        )
+        return self._pj.listar_pericias_combatente_com_pericia(combatente_id)
 
     def atualizar_pericia_jogador(
         self,
@@ -302,36 +194,11 @@ class PericiaService:
         pericia: PericiaJogadorUpdate,
     ) -> Optional[PericiaJogador]:
         """Atualiza uma perícia do jogador"""
-        db_pericia_jogador = (
-            self.db.query(PericiaJogador)
-            .filter(PericiaJogador.id == pericia_jogador_id)
-            .first()
-        )
-
-        if not db_pericia_jogador:
-            return None
-
-        for key, value in self._payload_data(pericia, exclude_unset=True).items():
-            setattr(db_pericia_jogador, key, value)
-
-        commit_with_rollback(self.db)
-        self.db.refresh(db_pericia_jogador)
-        return db_pericia_jogador
+        return self._pj.atualizar_pericia_jogador(pericia_jogador_id, pericia)
 
     def deletar_pericia_jogador(self, pericia_jogador_id: int) -> bool:
         """Deleta uma perícia do jogador"""
-        db_pericia_jogador = (
-            self.db.query(PericiaJogador)
-            .filter(PericiaJogador.id == pericia_jogador_id)
-            .first()
-        )
-
-        if not db_pericia_jogador:
-            return False
-
-        self.db.delete(db_pericia_jogador)
-        commit_with_rollback(self.db)
-        return True
+        return self._pj.deletar_pericia_jogador(pericia_jogador_id)
 
     def obter_estatisticas_pericias(self, combatente_id: int) -> dict:
         """Obtém estatísticas de perícias do combatente"""
@@ -340,14 +207,7 @@ class PericiaService:
         pontos_gastos_total = sum(p.custo_total for p in pericias)
         pontos_apenas_graduacao = sum(p.graduacao for p in pericias)
 
-        combatente = (
-            self.db.query(Combatente)
-            .filter(
-                Combatente.id == combatente_id,
-                Combatente.deleted_at.is_(None),
-            )
-            .first()
-        )
+        combatente = self._combatente.get_by_id(combatente_id)
 
         if not combatente:
             raise ValueError(f"Combatente {combatente_id} não encontrado")

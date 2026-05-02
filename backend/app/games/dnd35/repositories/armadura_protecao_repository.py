@@ -14,26 +14,25 @@ from app.repositories.base import commit_with_rollback
 
 
 class ArmaduraProtecaoRepository:
-    @staticmethod
-    def criar_item(db: Session, item: ArmaduraProtecaoCreate) -> ArmaduraProtecao:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def criar_item(self, item: ArmaduraProtecaoCreate) -> ArmaduraProtecao:
         db_item = ArmaduraProtecao(**item.model_dump())
-        db.add(db_item)
-        commit_with_rollback(db)
-        db.refresh(db_item)
+        self.db.add(db_item)
+        commit_with_rollback(self.db)
+        self.db.refresh(db_item)
         return db_item
 
-    @staticmethod
-    def obter_por_id(db: Session, item_id: int) -> Optional[ArmaduraProtecao]:
-        return db.query(ArmaduraProtecao).filter(ArmaduraProtecao.id == item_id).first()
+    def obter_por_id(self, item_id: int) -> Optional[ArmaduraProtecao]:
+        return self.db.query(ArmaduraProtecao).filter(ArmaduraProtecao.id == item_id).first()
 
-    @staticmethod
-    def obter_por_nome(db: Session, nome: str) -> Optional[ArmaduraProtecao]:
-        return db.query(ArmaduraProtecao).filter(ArmaduraProtecao.nome == nome).first()
+    def obter_por_nome(self, nome: str) -> Optional[ArmaduraProtecao]:
+        return self.db.query(ArmaduraProtecao).filter(ArmaduraProtecao.nome == nome).first()
 
-    @staticmethod
-    def listar(db: Session, skip: int = 0, limit: int = 100) -> list[ArmaduraProtecao]:
+    def listar(self, skip: int = 0, limit: int = 100) -> list[ArmaduraProtecao]:
         return (
-            db.query(ArmaduraProtecao)
+            self.db.query(ArmaduraProtecao)
             .filter(ArmaduraProtecao.ativo == True)
             .order_by(ArmaduraProtecao.nome.asc())
             .offset(skip)
@@ -43,14 +42,16 @@ class ArmaduraProtecaoRepository:
 
 
 class ArmaduraProtecaoJogadorRepository:
-    @staticmethod
+    def __init__(self, db: Session):
+        self.db = db
+
     def adicionar_item(
-        db: Session,
+        self,
         combatente_id: int,
         payload: ArmaduraProtecaoJogadorCreate,
     ) -> ArmaduraProtecaoJogador:
         db_existente = (
-            db.query(ArmaduraProtecaoJogador)
+            self.db.query(ArmaduraProtecaoJogador)
             .filter(
                 and_(
                     ArmaduraProtecaoJogador.combatente_id == combatente_id,
@@ -66,18 +67,17 @@ class ArmaduraProtecaoJogadorRepository:
             combatente_id=combatente_id,
             item_id=payload.item_id,
         )
-        db.add(db_item)
-        commit_with_rollback(db)
-        db.refresh(db_item)
+        self.db.add(db_item)
+        commit_with_rollback(self.db)
+        self.db.refresh(db_item)
         return db_item
 
-    @staticmethod
-    def listar_detalhado(db: Session, combatente_id: int) -> list[dict]:
+    def listar_detalhado(self, combatente_id: int) -> list[dict]:
         rel = aliased(ArmaduraProtecaoJogador, name="rel")
         item = aliased(ArmaduraProtecao, name="item")
 
         rows = (
-            db.query(
+            self.db.query(
                 rel.item_id.label("item_id"),
                 item.nome.label("item_nome"),
                 item.tipo.label("item_tipo"),
@@ -97,10 +97,9 @@ class ArmaduraProtecaoJogadorRepository:
 
         return [dict(row._mapping) for row in rows]
 
-    @staticmethod
-    def remover_item(db: Session, combatente_id: int, item_id: int) -> bool:
+    def remover_item(self, combatente_id: int, item_id: int) -> bool:
         db_item = (
-            db.query(ArmaduraProtecaoJogador)
+            self.db.query(ArmaduraProtecaoJogador)
             .filter(
                 and_(
                     ArmaduraProtecaoJogador.combatente_id == combatente_id,
@@ -112,6 +111,6 @@ class ArmaduraProtecaoJogadorRepository:
         if not db_item:
             return False
 
-        db.delete(db_item)
-        commit_with_rollback(db)
+        self.db.delete(db_item)
+        commit_with_rollback(self.db)
         return True

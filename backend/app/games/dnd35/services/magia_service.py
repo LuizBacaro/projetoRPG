@@ -14,7 +14,7 @@ from fastapi import HTTPException
 from app.games.dnd35.catalogs import divindades_catalogo as _divindades_catalogo
 from app.games.dnd35.text_utils import normalizar_classe as _normalizar_classe
 from app.games.dnd35.models.magia import Magia
-from app.games.dnd35.repositories.magia_repository import MagiaRepository
+from app.games.dnd35.ports import MagiaRepositoryProtocol
 from app.repositories.base import commit_with_rollback
 
 
@@ -41,7 +41,7 @@ DOMINIOS_FIXOS = {
 
 
 class MagiaService:
-    def __init__(self, repository: MagiaRepository):
+    def __init__(self, repository: MagiaRepositoryProtocol):
         self.repository = repository
 
     def listar_magias(self, **kwargs):

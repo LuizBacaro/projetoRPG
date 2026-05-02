@@ -36,8 +36,7 @@ def test_equipamento_service_lista_com_alias_labels(test_db):
     test_db.commit()
     test_db.refresh(equipamento)
 
-    EquipamentoJogadorRepository.adicionar_equipamento(
-        test_db,
+    EquipamentoJogadorRepository(test_db).adicionar_equipamento(
         combatente.id,
         EquipamentoJogadorCreate(equipamento_id=equipamento.id, quantidade=2),
     )
@@ -58,8 +57,7 @@ def test_talento_service_lista_com_alias_labels(test_db):
     test_db.commit()
     test_db.refresh(talento)
 
-    TalentoJogadorRepository.adicionar_talento(
-        test_db,
+    TalentoJogadorRepository(test_db).adicionar_talento(
         combatente.id,
         TalentoJogadorCreate(talento_id=talento.id),
     )

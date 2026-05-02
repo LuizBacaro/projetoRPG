@@ -8,6 +8,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao
+from app.games.dnd35.ports import ArmaduraProtecaoCatalogProtocol, ArmaduraProtecaoJogadorLinksProtocol
 from app.games.dnd35.repositories.armadura_protecao_repository import (
     ArmaduraProtecaoJogadorRepository,
     ArmaduraProtecaoRepository,
@@ -21,20 +22,28 @@ from app.games.dnd35.models.combatente import Combatente
 
 
 class ArmaduraProtecaoService:
-    def __init__(self, db: Session):
+    def __init__(
+        self,
+        db: Session,
+        *,
+        catalog: Optional[ArmaduraProtecaoCatalogProtocol] = None,
+        jogador_links: Optional[ArmaduraProtecaoJogadorLinksProtocol] = None,
+    ):
         self.db = db
+        self._catalog = catalog or ArmaduraProtecaoRepository(db)
+        self._jogador = jogador_links or ArmaduraProtecaoJogadorRepository(db)
 
     def criar_item(self, item: ArmaduraProtecaoCreate) -> ArmaduraProtecao:
         existente = self.db.query(ArmaduraProtecao).filter(ArmaduraProtecao.nome == item.nome).first()
         if existente:
             return existente
-        return ArmaduraProtecaoRepository.criar_item(self.db, item)
+        return self._catalog.criar_item(item)
 
     def listar_itens(self, skip: int = 0, limit: int = 100) -> list[ArmaduraProtecao]:
-        return ArmaduraProtecaoRepository.listar(self.db, skip, limit)
+        return self._catalog.listar(skip, limit)
 
     def obter_item(self, item_id: int) -> Optional[ArmaduraProtecao]:
-        return ArmaduraProtecaoRepository.obter_por_id(self.db, item_id)
+        return self._catalog.obter_por_id(item_id)
 
     def adicionar_item_jogador(
         self,
@@ -45,11 +54,11 @@ class ArmaduraProtecaoService:
         if not combatente:
             raise ValueError(f"Combatente {combatente_id} não encontrado")
 
-        item = ArmaduraProtecaoRepository.obter_por_id(self.db, payload.item_id)
+        item = self._catalog.obter_por_id(payload.item_id)
         if not item or not item.ativo:
             raise ValueError(f"Item de proteção {payload.item_id} não encontrado")
 
-        ArmaduraProtecaoJogadorRepository.adicionar_item(self.db, combatente_id, payload)
+        self._jogador.adicionar_item(combatente_id, payload)
         self._recalcular_defesas_com_item_protecao(combatente)
 
         return ArmaduraProtecaoJogadorListResponse(
@@ -66,7 +75,7 @@ class ArmaduraProtecaoService:
         )
 
     def listar_itens_jogador(self, combatente_id: int) -> list[ArmaduraProtecaoJogadorListResponse]:
-        itens = ArmaduraProtecaoJogadorRepository.listar_detalhado(self.db, combatente_id)
+        itens = self._jogador.listar_detalhado(combatente_id)
         return [
             ArmaduraProtecaoJogadorListResponse(
                 id=row["item_id"],
@@ -84,7 +93,7 @@ class ArmaduraProtecaoService:
         ]
 
     def remover_item_jogador(self, combatente_id: int, item_id: int) -> bool:
-        removido = ArmaduraProtecaoJogadorRepository.remover_item(self.db, combatente_id, item_id)
+        removido = self._jogador.remover_item(combatente_id, item_id)
         if not removido:
             return False
         combatente = self.db.query(Combatente).filter(Combatente.id == combatente_id).first()
@@ -93,7 +102,7 @@ class ArmaduraProtecaoService:
         return True
 
     def bonus_ca_total(self, combatente_id: int) -> int:
-        itens = ArmaduraProtecaoJogadorRepository.listar_detalhado(self.db, combatente_id)
+        itens = self._jogador.listar_detalhado(combatente_id)
         return sum(int(row.get("item_bonus_ca") or 0) for row in itens)
 
     def _recalcular_defesas_com_item_protecao(self, combatente: Combatente) -> None:

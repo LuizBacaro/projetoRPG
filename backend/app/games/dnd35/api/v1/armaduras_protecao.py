@@ -9,9 +9,8 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 
-from app.shared.core.database import get_db
+from app.core.dependencies import get_armadura_protecao_service
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_combatente,
@@ -38,11 +37,10 @@ router = APIRouter(
 @router.post("/", response_model=ArmaduraProtecaoResponse, status_code=status.HTTP_201_CREATED)
 def criar_item(
     payload: ArmaduraProtecaoCreate,
-    db: Session = Depends(get_db),
+    service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
     _: object = Depends(get_usuario_atual),
 ):
     try:
-        service = ArmaduraProtecaoService(db)
         return service.criar_item(payload)
     except Exception as exc:
         logger.error("Erro ao criar item de proteção: %s", exc)
@@ -53,11 +51,10 @@ def criar_item(
 def listar_itens(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db),
+    service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
     _: object = Depends(get_usuario_atual),
 ):
     try:
-        service = ArmaduraProtecaoService(db)
         return service.listar_itens(skip, limit)
     except Exception as exc:
         logger.error("Erro ao listar itens de proteção: %s", exc)
@@ -67,11 +64,10 @@ def listar_itens(
 @router.get("/item/{item_id}", response_model=ArmaduraProtecaoResponse)
 def obter_item(
     item_id: int,
-    db: Session = Depends(get_db),
+    service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
     _: object = Depends(get_usuario_atual),
 ):
     try:
-        service = ArmaduraProtecaoService(db)
         item = service.obter_item(item_id)
         if not item:
             raise HTTPException(status_code=404, detail="Item de proteção não encontrado")
@@ -91,11 +87,10 @@ def obter_item(
 def adicionar_item_jogador(
     combatente_id: int,
     payload: ArmaduraProtecaoJogadorCreate,
-    db: Session = Depends(get_db),
+    service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     try:
-        service = ArmaduraProtecaoService(db)
         return service.adicionar_item_jogador(combatente_id, payload)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
@@ -107,11 +102,10 @@ def adicionar_item_jogador(
 @router.get("/{combatente_id}/listar", response_model=List[ArmaduraProtecaoJogadorListResponse])
 def listar_itens_jogador(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     try:
-        service = ArmaduraProtecaoService(db)
         return service.listar_itens_jogador(combatente_id)
     except Exception as exc:
         logger.error("Erro ao listar itens de proteção do jogador: %s", exc)
@@ -122,11 +116,10 @@ def listar_itens_jogador(
 def remover_item_jogador(
     combatente_id: int,
     item_id: int,
-    db: Session = Depends(get_db),
+    service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     try:
-        service = ArmaduraProtecaoService(db)
         removido = service.remover_item_jogador(combatente_id, item_id)
         if not removido:
             raise HTTPException(status_code=404, detail="Item de proteção do jogador não encontrado")
@@ -141,11 +134,10 @@ def remover_item_jogador(
 @router.get("/{combatente_id}/bonus-ca", response_model=BonusCaResponse)
 def obter_bonus_ca_total(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     try:
-        service = ArmaduraProtecaoService(db)
         return BonusCaResponse(bonus_ca_total=service.bonus_ca_total(combatente_id))
     except Exception as exc:
         logger.error("Erro ao calcular bônus total de CA: %s", exc)

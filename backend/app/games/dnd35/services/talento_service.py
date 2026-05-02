@@ -5,10 +5,11 @@ Localização: `app.games.dnd35.services.talento_service`. Shim em
 `app.services.talento_service` durante a reorganização multi-jogo.
 """
 
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
+from app.games.dnd35.ports import TalentoCatalogProtocol, TalentoJogadorLinksProtocol
 from app.games.dnd35.repositories.talento_repository import (
     TalentoJogadorRepository,
     TalentoRepository,
@@ -23,26 +24,30 @@ from app.games.dnd35.schemas.talento import (
 class TalentoService:
     """Lógica de negócio para talentos"""
 
-    def __init__(self, db: Session):
+    def __init__(
+        self,
+        db: Session,
+        *,
+        catalog: Optional[TalentoCatalogProtocol] = None,
+        jogador_links: Optional[TalentoJogadorLinksProtocol] = None,
+    ):
         self.db = db
+        self._catalog = catalog or TalentoRepository(db)
+        self._jogador = jogador_links or TalentoJogadorRepository(db)
 
     def criar_talento(self, talento: TalentoCreate):
         """Cria um novo talento"""
-        talento_existente = TalentoRepository.obter_talento_por_nome(
-            self.db, talento.nome
-        )
+        talento_existente = self._catalog.obter_talento_por_nome(talento.nome)
         if talento_existente:
             if talento_existente.deleted_at is not None:
-                return TalentoRepository.restaurar_talento(
-                    self.db, talento_existente, talento
-                )
+                return self._catalog.restaurar_talento(talento_existente, talento)
             return talento_existente
 
-        return TalentoRepository.criar_talento(self.db, talento)
+        return self._catalog.criar_talento(talento)
 
     def listar_talentos(self, skip: int = 0, limit: int = 100):
         """Lista todos os talentos"""
-        return TalentoRepository.listar_talentos(self.db, skip, limit)
+        return self._catalog.listar_talentos(skip, limit)
 
     def adicionar_talento_jogador(
         self,
@@ -50,17 +55,13 @@ class TalentoService:
         talento_jogador: TalentoJogadorCreate,
     ) -> TalentoJogadorListResponse:
         """Adiciona um talento ao combatente e retorna resposta serializada"""
-        talento = TalentoRepository.obter_talento(
-            self.db, talento_jogador.talento_id
-        )
+        talento = self._catalog.obter_talento(talento_jogador.talento_id)
         if not talento:
             raise ValueError(
                 f"Talento com ID {talento_jogador.talento_id} não encontrado"
             )
 
-        TalentoJogadorRepository.adicionar_talento(
-            self.db, combatente_id, talento_jogador
-        )
+        self._jogador.adicionar_talento(combatente_id, talento_jogador)
 
         return TalentoJogadorListResponse(
             id=talento.id,
@@ -75,11 +76,7 @@ class TalentoService:
         self, combatente_id: int
     ) -> List[TalentoJogadorListResponse]:
         """Obtém todos os talentos de um combatente com detalhes"""
-        talentos_jogador = (
-            TalentoJogadorRepository.obter_talentos_jogador_detalhado(
-                self.db, combatente_id
-            )
-        )
+        talentos_jogador = self._jogador.obter_talentos_jogador_detalhado(combatente_id)
 
         return [
             TalentoJogadorListResponse(
@@ -97,6 +94,4 @@ class TalentoService:
         self, combatente_id: int, talento_id: int
     ) -> bool:
         """Remove um talento do combatente"""
-        return TalentoJogadorRepository.remover_talento(
-            self.db, combatente_id, talento_id
-        )
+        return self._jogador.remover_talento(combatente_id, talento_id)

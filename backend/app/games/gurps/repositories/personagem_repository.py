@@ -96,8 +96,7 @@ class GurpsPersonagemRepository(BaseRepository[GurpsPersonagem]):
             .all()
         )
 
-    @staticmethod
-    def ordenar_por_iniciativa(personagens: List[GurpsPersonagem]) -> List[GurpsPersonagem]:
+    def ordenar_por_iniciativa(self, personagens: List[GurpsPersonagem]) -> List[GurpsPersonagem]:
         return sorted(
             personagens,
             key=lambda p: (p.iniciativa or 0, p.nome or ""),

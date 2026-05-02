@@ -2,17 +2,20 @@
 AtaqueService
 SRP: regras de negócio para ataques e slots de magia
 """
-from typing import List
+from typing import List, Optional
 
 from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 from app.games.dnd35.models.ataque import Ataque, MagiaSlot
-from app.games.dnd35.repositories.ataque_repository import AtaqueRepository
-from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.ports import AtaqueRepositoryProtocol, CombatenteRepositoryForAtaqueProtocol
 
 
 class AtaqueService:
 
-    def __init__(self, ataque_repo: AtaqueRepository, combatente_repo: CombatenteRepository):
+    def __init__(
+        self,
+        ataque_repo: AtaqueRepositoryProtocol,
+        combatente_repo: CombatenteRepositoryForAtaqueProtocol,
+    ):
         self.ataque_repo = ataque_repo
         self.combatente_repo = combatente_repo
 
@@ -50,6 +53,6 @@ class AtaqueService:
         dados = [{"nivel": s.nivel, "total": s.total, "usados": s.usados} for s in slots_data if s.total >= 0]
         return self.ataque_repo.substituir_magias(combatente_id, dados)
 
-    def atualizar_usados(self, slot_id: int, usados: int) -> MagiaSlot:
+    def atualizar_usados(self, slot_id: int, usados: int) -> Optional[MagiaSlot]:
         """Incrementa/decrementa usados de um slot na arena."""
         return self.ataque_repo.atualizar_usados(slot_id, usados)

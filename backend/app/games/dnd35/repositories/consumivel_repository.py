@@ -9,30 +9,42 @@ from app.repositories.base import (
 )
 
 
+def _variantes_texto_unicode_para_filtro(valor: str) -> list[str]:
+    """
+    Gera variantes de capitalização em Python (Unicode-aware).
+    SQLite compara ILIKE/LIKE sem folding correto fora de ASCII — ex.: 'óleo' não
+    casa com coluna 'Óleo'. Igualdade exata com variantes resolve dev/prod.
+    """
+    s = (valor or "").strip()
+    if not s:
+        return []
+    candidatos = {s, s.title(), s.capitalize(), s.upper()}
+    return [c for c in candidatos if c]
+
+
 class ConsumivelRepository:
-    @staticmethod
-    def criar(db: Session, payload: dict) -> Consumivel:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def criar(self, payload: dict) -> Consumivel:
         obj = Consumivel(**payload)
-        db.add(obj)
-        commit_with_rollback(db)
-        db.refresh(obj)
+        self.db.add(obj)
+        commit_with_rollback(self.db)
+        self.db.refresh(obj)
         return obj
 
-    @staticmethod
-    def obter(db: Session, consumivel_id: int) -> Consumivel | None:
+    def obter(self, consumivel_id: int) -> Consumivel | None:
         return (
-            apply_not_deleted(db.query(Consumivel), Consumivel)
+            apply_not_deleted(self.db.query(Consumivel), Consumivel)
             .filter(Consumivel.id == consumivel_id)
             .first()
         )
 
-    @staticmethod
-    def obter_por_nome(db: Session, nome: str) -> Consumivel | None:
-        return db.query(Consumivel).filter(Consumivel.nome == nome).first()
+    def obter_por_nome(self, nome: str) -> Consumivel | None:
+        return self.db.query(Consumivel).filter(Consumivel.nome == nome).first()
 
-    @staticmethod
     def listar(
-        db: Session,
+        self,
         skip: int,
         limit: int,
         tipo: str | None = None,
@@ -40,7 +52,7 @@ class ConsumivelRepository:
         busca: str | None = None,
     ) -> list[Consumivel]:
         query = (
-            apply_not_deleted(db.query(Consumivel), Consumivel)
+            apply_not_deleted(self.db.query(Consumivel), Consumivel)
             .filter(Consumivel.ativo == True)  # noqa: E712
         )
 
@@ -49,10 +61,24 @@ class ConsumivelRepository:
         busca_norm = (busca or "").strip()
 
         if tipo_norm:
-            query = query.filter(Consumivel.tipo.ilike(tipo_norm))
+            query = query.filter(
+                or_(
+                    *[
+                        Consumivel.tipo == v
+                        for v in _variantes_texto_unicode_para_filtro(tipo_norm)
+                    ]
+                )
+            )
 
         if categoria_norm:
-            query = query.filter(Consumivel.categoria.ilike(f"%{categoria_norm}%"))
+            query = query.filter(
+                or_(
+                    *[
+                        Consumivel.categoria.ilike(f"%{v}%")
+                        for v in _variantes_texto_unicode_para_filtro(categoria_norm)
+                    ]
+                )
+            )
 
         if busca_norm:
             termo = f"%{busca_norm}%"
@@ -69,21 +95,22 @@ class ConsumivelRepository:
 
         return query.order_by(Consumivel.nome.asc()).offset(skip).limit(limit).all()
 
-    @staticmethod
-    def deletar(db: Session, consumivel_id: int) -> bool:
-        item = ConsumivelRepository.obter(db, consumivel_id)
+    def deletar(self, consumivel_id: int) -> bool:
+        item = self.obter(consumivel_id)
         if not item:
             return False
-        return soft_delete_entity(db, item)
+        return soft_delete_entity(self.db, item)
 
 
 class ConsumivelJogadorRepository:
-    @staticmethod
+    def __init__(self, db: Session):
+        self.db = db
+
     def adicionar(
-        db: Session, combatente_id: int, consumivel_id: int, quantidade: int
+        self, combatente_id: int, consumivel_id: int, quantidade: int
     ) -> ConsumivelJogador:
         existente = (
-            db.query(ConsumivelJogador)
+            self.db.query(ConsumivelJogador)
             .filter(
                 and_(
                     ConsumivelJogador.combatente_id == combatente_id,
@@ -94,8 +121,8 @@ class ConsumivelJogadorRepository:
         )
         if existente:
             existente.quantidade += quantidade
-            commit_with_rollback(db)
-            db.refresh(existente)
+            commit_with_rollback(self.db)
+            self.db.refresh(existente)
             return existente
 
         obj = ConsumivelJogador(
@@ -103,17 +130,16 @@ class ConsumivelJogadorRepository:
             consumivel_id=consumivel_id,
             quantidade=quantidade,
         )
-        db.add(obj)
-        commit_with_rollback(db)
-        db.refresh(obj)
+        self.db.add(obj)
+        commit_with_rollback(self.db)
+        self.db.refresh(obj)
         return obj
 
-    @staticmethod
-    def listar_detalhado(db: Session, combatente_id: int) -> list[dict]:
+    def listar_detalhado(self, combatente_id: int) -> list[dict]:
         cj = aliased(ConsumivelJogador, name="cj")
         c = aliased(Consumivel, name="c")
         rows = (
-            db.query(
+            self.db.query(
                 cj.consumivel_id.label("consumivel_id"),
                 cj.quantidade.label("jogador_quantidade"),
                 c.nome.label("consumivel_nome"),
@@ -131,10 +157,9 @@ class ConsumivelJogadorRepository:
         )
         return [dict(r._mapping) for r in rows]
 
-    @staticmethod
-    def remover(db: Session, combatente_id: int, consumivel_id: int) -> bool:
+    def remover(self, combatente_id: int, consumivel_id: int) -> bool:
         obj = (
-            db.query(ConsumivelJogador)
+            self.db.query(ConsumivelJogador)
             .filter(
                 and_(
                     ConsumivelJogador.combatente_id == combatente_id,
@@ -145,6 +170,6 @@ class ConsumivelJogadorRepository:
         )
         if not obj:
             return False
-        db.delete(obj)
-        commit_with_rollback(db)
+        self.db.delete(obj)
+        commit_with_rollback(self.db)
         return True

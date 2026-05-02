@@ -6,9 +6,8 @@ DIP - Depende da abstração CondicaoRepository
 from typing import Dict, List
 
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, CombatenteNaoEncontrado, DadosInvalidos
-from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
+from app.games.dnd35.ports import CombatenteRepositoryProtocol, CondicaoRepositoryProtocol
 from app.shared.models.usuario import PerfilUsuario
-from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 
 # ── Seed das 25 condições da planilha Condies-D&D.xlsx ────────────────────────
 CONDICOES_SEED = [
@@ -50,8 +49,8 @@ class CondicaoService:
 
     def __init__(
         self,
-        condicao_repository: CondicaoRepository,
-        combatente_repository: CombatenteRepository,
+        condicao_repository: CondicaoRepositoryProtocol,
+        combatente_repository: CombatenteRepositoryProtocol,
     ):
         self.condicao_repo = condicao_repository
         self.combatente_repo = combatente_repository

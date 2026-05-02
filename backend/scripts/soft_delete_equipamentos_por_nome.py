@@ -87,7 +87,7 @@ def main() -> int:
             if args.dry_run:
                 print(f"[dry-run] removeria {nome!r} (id={eq.id})")
                 continue
-            if EquipamentoRepository.deletar_equipamento(db, eq.id):
+            if EquipamentoRepository(db).deletar_equipamento(eq.id):
                 removidos += 1
                 print(f"✅ Soft-delete: {nome!r} (id={eq.id})")
             else:

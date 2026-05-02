@@ -3,8 +3,10 @@
 from typing import Any, Dict, List, Optional
 
 from app.games.gurps.models.combate import GurpsCombate
-from app.games.gurps.repositories.combate_repository import GurpsCombateRepository
-from app.games.gurps.repositories.personagem_repository import GurpsPersonagemRepository
+from app.games.gurps.ports import (
+    GurpsCombateRepositoryProtocol,
+    GurpsPersonagemRepositoryProtocol,
+)
 from app.games.gurps.schemas.personagem import GurpsPersonagemResponse
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
@@ -16,8 +18,8 @@ from app.shared.exceptions.custom_exceptions import (
 class GurpsCombateService:
     def __init__(
         self,
-        combate_repo: GurpsCombateRepository,
-        personagem_repo: GurpsPersonagemRepository,
+        combate_repo: GurpsCombateRepositoryProtocol,
+        personagem_repo: GurpsPersonagemRepositoryProtocol,
     ):
         self.combate_repo = combate_repo
         self.personagem_repo = personagem_repo

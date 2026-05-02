@@ -29,8 +29,9 @@ from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraP
 from app.games.dnd35.models.ataque import MagiaSlot
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.talento import Talento, TalentoJogador
-from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
-from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
+from app.games.dnd35.ports import CombatenteRepositoryProtocol, CondicaoRepositoryProtocol
+from app.games.dnd35.ports.divindade_custom import DivindadeCustomRepositoryProtocol
+from app.games.dnd35.repositories.divindade_custom_repository import DivindadeCustomRepository
 from app.shared.models.usuario import PerfilUsuario
 from app.repositories.base import commit_with_rollback
 from app.services.file_service import FileService
@@ -170,13 +171,17 @@ class CombatenteService:
 
     def __init__(
         self,
-        repository: CombatenteRepository,
+        repository: CombatenteRepositoryProtocol,
         file_service: FileService,
-        condicao_repository: Optional[CondicaoRepository] = None,
+        condicao_repository: Optional[CondicaoRepositoryProtocol] = None,
+        divindade_custom_repository: Optional[DivindadeCustomRepositoryProtocol] = None,
     ):
         self.repository        = repository
         self.file_service      = file_service
         self.condicao_repo     = condicao_repository
+        self._divindade_custom = divindade_custom_repository or DivindadeCustomRepository(
+            repository.db
+        )
         self._condicao_id_cache: Dict[str, int] = {}
 
     # ── CRUD ─────────────────────────────────────────────
@@ -1014,10 +1019,7 @@ class CombatenteService:
         """Lista de divindades customizadas (passada ao catalogo).
         Retorna lista vazia se a tabela ainda nao existir (tolera migrations atrasadas)."""
         try:
-            from app.games.dnd35.repositories.divindade_custom_repository import (
-                DivindadeCustomRepository,
-            )
-            return DivindadeCustomRepository(self.repository.db).listar()
+            return self._divindade_custom.listar()
         except Exception:  # noqa: BLE001 — defensivo para ambiente de testes
             return []
 

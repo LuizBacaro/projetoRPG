@@ -2,8 +2,8 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 
+from app.core.dependencies import get_consumivel_service
 from app.games.dnd35.schemas.consumivel import (
     ConsumivelCreate,
     ConsumivelJogadorCreate,
@@ -11,7 +11,7 @@ from app.games.dnd35.schemas.consumivel import (
     ConsumivelResponse,
 )
 from app.games.dnd35.services.consumivel_service import ConsumivelService
-from app.shared.core.database import get_db
+from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_admin,
@@ -26,11 +26,11 @@ router = APIRouter(prefix="/consumiveis", tags=["Consumiveis"])
 @router.post("/", response_model=ConsumivelResponse, status_code=status.HTTP_201_CREATED)
 def criar_consumivel(
     payload: ConsumivelCreate,
-    db: Session = Depends(get_db),
+    service: ConsumivelService = Depends(get_consumivel_service),
     _: object = Depends(get_usuario_atual),
 ):
     try:
-        return ConsumivelService(db).criar(payload)
+        return service.criar(payload)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -42,10 +42,10 @@ def listar_consumiveis(
     tipo: str | None = None,
     categoria: str | None = None,
     busca: str | None = None,
-    db: Session = Depends(get_db),
+    service: ConsumivelService = Depends(get_consumivel_service),
     _: object = Depends(get_usuario_atual),
 ):
-    return ConsumivelService(db).listar(
+    return service.listar(
         skip,
         limit,
         tipo=tipo,
@@ -57,10 +57,10 @@ def listar_consumiveis(
 @router.get("/{consumivel_id}", response_model=ConsumivelResponse)
 def obter_consumivel(
     consumivel_id: int,
-    db: Session = Depends(get_db),
+    service: ConsumivelService = Depends(get_consumivel_service),
     _: object = Depends(get_usuario_atual),
 ):
-    item = ConsumivelService(db).obter(consumivel_id)
+    item = service.obter(consumivel_id)
     if not item:
         raise HTTPException(status_code=404, detail="Consumível não encontrado")
     return item
@@ -69,10 +69,10 @@ def obter_consumivel(
 @router.delete("/catalogo/{consumivel_id}", status_code=status.HTTP_204_NO_CONTENT)
 def deletar_consumivel_catalogo(
     consumivel_id: int,
-    db: Session = Depends(get_db),
+    service: ConsumivelService = Depends(get_consumivel_service),
     _: object = Depends(requer_admin),
 ):
-    if not ConsumivelService(db).deletar(consumivel_id):
+    if not service.deletar(consumivel_id):
         raise HTTPException(status_code=404, detail="Consumível não encontrado")
     return None
 
@@ -85,11 +85,13 @@ def deletar_consumivel_catalogo(
 def adicionar_consumivel_jogador(
     combatente_id: int,
     payload: ConsumivelJogadorCreate,
-    db: Session = Depends(get_db),
+    service: ConsumivelService = Depends(get_consumivel_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     try:
-        return ConsumivelService(db).adicionar_jogador(combatente_id, payload)
+        return service.adicionar_jogador(combatente_id, payload)
+    except CombatenteNaoEncontrado as e:
+        raise HTTPException(status_code=404, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -100,10 +102,13 @@ def adicionar_consumivel_jogador(
 )
 def listar_consumiveis_jogador(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: ConsumivelService = Depends(get_consumivel_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
-    return ConsumivelService(db).listar_jogador(combatente_id)
+    try:
+        return service.listar_jogador(combatente_id)
+    except CombatenteNaoEncontrado as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @router.delete(
@@ -113,10 +118,13 @@ def listar_consumiveis_jogador(
 def remover_consumivel_jogador(
     combatente_id: int,
     consumivel_id: int,
-    db: Session = Depends(get_db),
+    service: ConsumivelService = Depends(get_consumivel_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
-    ok = ConsumivelService(db).remover_jogador(combatente_id, consumivel_id)
+    try:
+        ok = service.remover_jogador(combatente_id, consumivel_id)
+    except CombatenteNaoEncontrado as e:
+        raise HTTPException(status_code=404, detail=str(e))
     if not ok:
         raise HTTPException(status_code=404, detail="Consumível do jogador não encontrado")
     return None

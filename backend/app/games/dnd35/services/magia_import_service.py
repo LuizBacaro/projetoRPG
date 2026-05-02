@@ -16,8 +16,8 @@ import unicodedata
 
 from fastapi import HTTPException, UploadFile
 
+from app.games.dnd35.ports.magias import MagiaCriacaoParaImportProtocol
 from app.games.dnd35.schemas.magia import MagiaImportErro
-from app.games.dnd35.services.magia_service import MagiaService
 
 
 MAX_IMPORT_ROWS = 500
@@ -81,7 +81,7 @@ class MagiaImportService:
 	_drafts: dict[str, ImportDraft] = {}
 	_lock = Lock()
 
-	def __init__(self, magia_service: MagiaService):
+	def __init__(self, magia_service: MagiaCriacaoParaImportProtocol):
 		self.magia_service = magia_service
 
 	def gerar_modelo(self) -> bytes:

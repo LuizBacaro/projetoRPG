@@ -15,11 +15,10 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 
+from app.core.dependencies import get_equipamento_service
 from app.shared.core.catalog_cache import catalog_cache, make_cache_key
 from app.shared.core.config import settings
-from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_admin,
@@ -71,12 +70,11 @@ def _invalidar_cache_equipamentos() -> None:
 )
 def criar_equipamento(
     equipamento: EquipamentoCreate,
-    db: Session = Depends(get_db),
+    service: EquipamentoService = Depends(get_equipamento_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Cria um novo equipamento (Admin only)"""
     try:
-        service = EquipamentoService(db)
         equipamento_criado = service.criar_equipamento(equipamento)
         _invalidar_cache_equipamentos()
         return equipamento_criado
@@ -91,7 +89,7 @@ def criar_equipamento(
 def listar_equipamentos(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db),
+    service: EquipamentoService = Depends(get_equipamento_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Lista todos os equipamentos disponíveis"""
@@ -102,7 +100,6 @@ def listar_equipamentos(
             if cached is not None:
                 return cached
 
-        service = EquipamentoService(db)
         equipamentos = [
             _serialize_equipamento(eq)
             for eq in service.listar_todos_equipamentos(skip, limit)
@@ -120,7 +117,7 @@ def listar_equipamentos(
 @router.get("/{equipamento_id}", response_model=EquipamentoResponse)
 def obter_equipamento(
     equipamento_id: int,
-    db: Session = Depends(get_db),
+    service: EquipamentoService = Depends(get_equipamento_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Obtém um equipamento específico"""
@@ -133,7 +130,6 @@ def obter_equipamento(
             if cached is not None:
                 return cached
 
-        service = EquipamentoService(db)
         equipamento = service.obter_equipamento(equipamento_id)
 
         if not equipamento:
@@ -157,7 +153,7 @@ def obter_equipamento(
 )
 def deletar_equipamento_catalogo(
     equipamento_id: int,
-    db: Session = Depends(get_db),
+    service: EquipamentoService = Depends(get_equipamento_service),
     _: object = Depends(requer_admin),
 ):
     """
@@ -165,7 +161,6 @@ def deletar_equipamento_catalogo(
     Evita ambiguidade com rotas /{combatente_id}/... — use o prefixo /catalogo/.
     """
     try:
-        service = EquipamentoService(db)
         if not service.deletar_equipamento(equipamento_id):
             raise HTTPException(status_code=404, detail="Equipamento não encontrado")
         _invalidar_cache_equipamentos()
@@ -188,12 +183,11 @@ def deletar_equipamento_catalogo(
 def adicionar_equipamento_jogador(
     combatente_id: int,
     equipamento_jogador: EquipamentoJogadorCreate,
-    db: Session = Depends(get_db),
+    service: EquipamentoService = Depends(get_equipamento_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Adiciona um equipamento ao combatente"""
     try:
-        service = EquipamentoService(db)
         return service.adicionar_equipamento_jogador(
             combatente_id, equipamento_jogador
         )
@@ -210,12 +204,11 @@ def adicionar_equipamento_jogador(
 )
 def listar_equipamentos_jogador(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: EquipamentoService = Depends(get_equipamento_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Lista todos os equipamentos de um combatente"""
     try:
-        service = EquipamentoService(db)
         return service.obter_equipamentos_jogador(combatente_id)
     except Exception as e:
         logger.error(f"Erro ao listar equipamentos do jogador: {str(e)}")
@@ -229,13 +222,11 @@ def listar_equipamentos_jogador(
 def remover_equipamento_jogador(
     combatente_id: int,
     equipamento_id: int,
-    db: Session = Depends(get_db),
+    service: EquipamentoService = Depends(get_equipamento_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Remove um equipamento do combatente"""
     try:
-        service = EquipamentoService(db)
-
         if not service.remover_equipamento_jogador(combatente_id, equipamento_id):
             raise HTTPException(
                 status_code=404, detail="Equipamento do jogador não encontrado"
@@ -254,12 +245,11 @@ def atualizar_quantidade_equipamento(
     combatente_id: int,
     equipamento_id: int,
     quantidade: int,
-    db: Session = Depends(get_db),
+    service: EquipamentoService = Depends(get_equipamento_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza a quantidade de um equipamento"""
     try:
-        service = EquipamentoService(db)
         result = service.atualizar_quantidade_equipamento(
             combatente_id, equipamento_id, quantidade
         )

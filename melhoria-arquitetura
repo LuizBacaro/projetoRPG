@@ -1,0 +1,69 @@
+Para o **projetoRPG / Arena**, “arquitetura mais limpa” no sentido SOLID + manutenção + modularidade + reuso não é um único diagrama fixo: é **onde pões fronteiras** e **como dependes** (direção das setas). Abaixo fica um alvo coerente com o que já tens (`shared/`, `games/dnd35/`, `core/dependencies`) e com o que ainda custa (DI gigante, barrels, scripts).
+
+---
+
+### 1. Camadas e responsabilidades (SRP + “quem pode chamar quem”)
+
+| Camada | Papel | Regra de ouro |
+|--------|--------|----------------|
+| **API (routers)** | HTTP, status, deps, validação de entrada | Não contém regras de jogo nem SQL; chama **services** ou **casos de uso**. |
+| **Services / use cases** | Orquestra repositórios, transações, políticas | Único sítio para “fluxo” (ex.: criar combatente + side effects). |
+| **Repositories** | Persistência, queries, `commit`/`rollback` onde fizer sentido | Não conhecem FastAPI; podem usar helpers partilhados (`commit_with_rollback`, soft delete). |
+| **Models (ORM)** | Tabelas e invariantes de BD | Sem regras de negócio pesadas (evita “modelo gordo” difícil de testar). |
+| **Domínio puro (opcional mas ideal)** | Entidades/regras sem SQLAlchemy | Testável sem BD; hoje grande parte está “dentro” de services — evolução gradual. |
+
+**Multi-jogo:** tudo que for “plataforma” (user, game, JWT, membership) fica em **`app.shared.*`**. Tudo que for “regras D&D 3.5” fica em **`app.games.dnd35.*`**. O `shared` **não** importa de `games.dnd35` (evita acoplamento inverso).
+
+---
+
+### 2. SOLID no teu contexto (curto e aplicável)
+
+- **S — Responsabilidade única:** um ficheiro = um motivo para mudar (ex.: `CombatenteService` não mistura parsing de Excel).
+- **O — Aberto/fechado:** extensões por **novo jogo** (`games/dnd5e`) ou **nova estratégia** (ex.: interface “resolvedor de CA”) em vez de `if slug == "dnd35"` espalhado.
+- **L — Substituição de Liskov:** contratos estáveis em **schemas Pydantic** e interfaces de serviço; testes com `dependency_overrides` garantem que mocks respeitam o contrato.
+- **I — Interfaces pequenas:** preferir `GrimorioReader` + `GrimorioWriter` a uma “God interface”.
+- **D — Inversão de dependências:** rotas e serviços dependem de **abstrações** (protocols / ABCs) onde hoje às vezes importas implementações concretas; o `app.core.dependencies` pode ir **afunilando** factories para isso.
+
+---
+
+### 3. Modularidade máxima (o que “fechar” no pacote do jogo)
+
+Trata cada jogo como **plugin**:
+
+- `games/<slug>/api`, `services`, `repositories`, `models`, `schemas`, `catalogs`, `seeds`
+- **Contrato mínimo** com a plataforma: slug, rotas registadas no `main`, guards (`requer_game_<slug>`), eventualmente um `GameModule` que expõe `register_routes(app)`.
+
+Assim, D&D 5e ou GURPS **não reescrevem** auth nem `Game` — **reutilizam** o hub.
+
+---
+
+### 4. Reuso real (evitar reescrever código)
+
+1. **Kernel partilhado** — já tens pedaços bons: `shared/core`, `shared/exceptions`, `repositories/base.py`. Direção: **mais** utilitários genéricos aqui (paginação, filtros soft-delete, erros HTTP mapeados).
+2. **Padrão “porta + adaptador”** onde dói — Cloudinary, ficheiros, caches: interface no `shared`, implementação injetável.
+3. **Catálogos e seeds** — dados estáticos em JSON/Python gerado + **uma** função de sync idempotente (como talentos/equipamentos), em vez de lógica duplicada em scripts e API.
+4. **Evitar cópia entre jogo e hub** — regra: se duas features precisam do mesmo trecho, sobe para `shared` **só** se for agnóstico de sistema; senão, extrai para `games/dnd35/core` ou `games/common` (se um dia existir).
+
+---
+
+### 5. O `app/models/__init__.py` no meio disto tudo
+
+Não é “anti-SOLID” por si: é **infra de registo de metadata** (Alembic/testes). A versão “mais limpa” seria renomear a intenção (`orm_registry` / `db_models`) para não confundir com “modelo de domínio”, mas isso é **clareza**, não correção moral. O SRP aqui é: *“este módulo só existe para carregar mapeamentos no `Base.metadata`”*.
+
+---
+
+### 6. Roteiro pragmático (por ordem de ROI)
+
+1. **Manter** fronteira `shared` ↔ `games/*` sem imports cruzados errados.  
+2. **Afinar** `dependencies.py`: agrupar por domínio (hub vs dnd35) ou ficheiros `deps_combate.py` etc., sem mudar URLs da API.  
+3. **Introduzir protocols** nos sítios com mais mocks/test pain (ex.: `CombatenteRepositoryProtocol`).  
+4. **Extrair casos de uso** dos services mais grandes (ficheiros > ~400 linhas ou muitas responsabilidades).  
+5. **Documentar** num ADR curto: “estrutura de pacotes + regra de imports” — evita decisões implícitas em PRs futuros.
+
+---
+
+### Resumo em uma frase
+
+A arquitetura “mais limpa” para o Arena é: **hub estável e reutilizável em `shared`, cada jogo isolado em `games/<slug>`, routers finos, serviços como orquestração, repositórios como persistência, dependências sempre injetadas para cima — e reuso feito subindo código agnóstico de sistema, não copiando entre jogos.**
+
+Se quiseres o próximo passo **concreto no código**, o melhor ganho com diff pequeno costuma ser: **partir `dependencies.py` por domínio** ou **definir 2–3 `Protocol`s** nos serviços mais testados — diz qual preferes e seguimos nessa linha.

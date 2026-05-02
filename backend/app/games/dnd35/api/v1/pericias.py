@@ -10,12 +10,12 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
 
+from app.core.dependencies import get_combatente_repository, get_pericia_service
 from app.shared.core.catalog_cache import catalog_cache, make_cache_key
 from app.shared.core.config import settings
-from app.shared.core.database import get_db
 from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 from app.games.dnd35.schemas.pericia import (
     PericiaCreate,
     PericiaJogadorCreate,
@@ -64,12 +64,11 @@ def _invalidar_cache_pericias() -> None:
 )
 def criar_pericia(
     pericia: PericiaCreate,
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Cria uma nova perícia (Admin only)"""
     try:
-        service = PericiaService(db)
         pericia_criada = service.criar_pericia(pericia)
         _invalidar_cache_pericias()
         return pericia_criada
@@ -86,7 +85,7 @@ def listar_pericias(
     limit: int = 100,
     atributo: str = Query(None),
     classe: str = Query(None),
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Lista todas as perícias disponíveis com custo baseado em classe"""
@@ -102,8 +101,6 @@ def listar_pericias(
             cached = catalog_cache.get(cache_key)
             if cached is not None:
                 return cached
-
-        service = PericiaService(db)
 
         if atributo:
             pericias = service.listar_pericias_por_atributo(atributo)
@@ -151,7 +148,7 @@ def listar_pericias(
 def obter_pericia(
     pericia_id: int,
     classe: str = Query(None),
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Obtém uma perícia por ID com custo baseado em classe se fornecido"""
@@ -166,7 +163,6 @@ def obter_pericia(
             if cached is not None:
                 return cached
 
-        service = PericiaService(db)
         pericia = service.obter_pericia(pericia_id)
 
         if not pericia:
@@ -198,12 +194,11 @@ def obter_pericia(
 def atualizar_pericia(
     pericia_id: int,
     pericia: PericiaUpdate,
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Atualiza uma perícia (Admin only)"""
     try:
-        service = PericiaService(db)
         pericia_atualizada = service.atualizar_pericia(pericia_id, pericia)
 
         if not pericia_atualizada:
@@ -221,7 +216,7 @@ def atualizar_pericia(
 @router.get("/classe/{classe_nome}", response_model=List[PericiaResponse])
 def listar_pericias_classe(
     classe_nome: str,
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Lista perícias padrão de uma classe com seus custos"""
@@ -232,7 +227,6 @@ def listar_pericias_classe(
             if cached is not None:
                 return cached
 
-        service = PericiaService(db)
         pericias = service.listar_pericias_por_classe(classe_nome)
         custos_por_pericia = service.obter_custos_pericias(
             [pericia.id for pericia in pericias],
@@ -262,13 +256,11 @@ def listar_pericias_classe(
 @router.delete("/{pericia_id}", status_code=status.HTTP_204_NO_CONTENT)
 def deletar_pericia(
     pericia_id: int,
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(get_usuario_atual),
 ):
     """Deleta uma perícia (Admin only)"""
     try:
-        service = PericiaService(db)
-
         if not service.deletar_pericia(pericia_id):
             raise HTTPException(status_code=404, detail="Perícia não encontrada")
         _invalidar_cache_pericias()
@@ -291,13 +283,12 @@ def adicionar_pericia_jogador(
     combatente_id: int,
     pericia: PericiaJogadorCreate,
     classe: str = Query(None),
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
+    combatente_repo: CombatenteRepository = Depends(get_combatente_repository),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Adiciona uma perícia ao jogador com validação de custo"""
     try:
-        service = PericiaService(db)
-
         if classe:
             custo_total = service.calcular_custo_total_graduacao(
                 pericia.pericia_id,
@@ -305,11 +296,7 @@ def adicionar_pericia_jogador(
                 pericia.graduacao,
             )
 
-            from app.games.dnd35.models.combatente import Combatente
-
-            combatente = (
-                db.query(Combatente).filter(Combatente.id == combatente_id).first()
-            )
+            combatente = combatente_repo.get_by_id(combatente_id)
             if not combatente:
                 raise ValueError(f"Combatente {combatente_id} não encontrado")
 
@@ -333,12 +320,11 @@ def adicionar_pericia_jogador(
 )
 def listar_pericias_jogador(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Lista todas as perícias de um combatente"""
     try:
-        service = PericiaService(db)
         stats = service.obter_estatisticas_pericias(combatente_id)
 
         return PericiaJogadorListResponse(
@@ -359,12 +345,11 @@ def atualizar_pericia_jogador(
     combatente_id: int,
     pericia_jogador_id: int,
     pericia: PericiaJogadorUpdate,
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza uma perícia do jogador"""
     try:
-        service = PericiaService(db)
         pericia_atualizada = service.atualizar_pericia_jogador(
             pericia_jogador_id, pericia
         )
@@ -389,13 +374,11 @@ def atualizar_pericia_jogador(
 def deletar_pericia_jogador(
     combatente_id: int,
     pericia_jogador_id: int,
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Deleta uma perícia do jogador"""
     try:
-        service = PericiaService(db)
-
         if not service.deletar_pericia_jogador(pericia_jogador_id):
             raise HTTPException(
                 status_code=404, detail="Perícia do jogador não encontrada"
@@ -410,12 +393,11 @@ def deletar_pericia_jogador(
 @router.get("/{combatente_id}/estatisticas")
 def obter_estatisticas_pericias(
     combatente_id: int,
-    db: Session = Depends(get_db),
+    service: PericiaService = Depends(get_pericia_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Obtém estatísticas de perícias do combatente"""
     try:
-        service = PericiaService(db)
         return service.obter_estatisticas_pericias(combatente_id)
     except Exception as e:
         logger.error(f"Erro ao obter estatísticas: {str(e)}")

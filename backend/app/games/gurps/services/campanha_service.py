@@ -3,8 +3,10 @@
 from typing import List
 
 from app.games.gurps.models.campanha import GurpsCampanha
-from app.games.gurps.repositories.campanha_repository import GurpsCampanhaRepository
-from app.games.gurps.repositories.personagem_repository import GurpsPersonagemRepository
+from app.games.gurps.ports import (
+    GurpsCampanhaRepositoryProtocol,
+    GurpsPersonagemRepositoryProtocol,
+)
 from app.repositories.base import commit_with_rollback
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 
@@ -12,8 +14,8 @@ from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInv
 class GurpsCampanhaService:
     def __init__(
         self,
-        campanha_repository: GurpsCampanhaRepository,
-        personagem_repository: GurpsPersonagemRepository,
+        campanha_repository: GurpsCampanhaRepositoryProtocol,
+        personagem_repository: GurpsPersonagemRepositoryProtocol,
     ):
         self.campanha_repository = campanha_repository
         self.personagem_repository = personagem_repository

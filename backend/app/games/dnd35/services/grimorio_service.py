@@ -13,8 +13,7 @@ from pathlib import Path
 from fastapi import HTTPException
 
 from app.games.dnd35.models.grimorio import GrimorioHistoricoTroca, GrimorioMagia, GrimorioNotificacao
-from app.games.dnd35.repositories.grimorio_repository import GrimorioRepository
-from app.games.dnd35.repositories.magia_repository import MagiaRepository
+from app.games.dnd35.ports import GrimorioRepositoryProtocol, MagiaRepositoryProtocol
 
 
 _CLASSES_DIVINAS = {"CLERIGO", "DRUIDA", "PALADINO"}
@@ -549,7 +548,9 @@ def _limite_magias_conhecidas(classe_norm: str, nivel_personagem: int, nivel_mag
 
 
 class GrimorioService:
-    def __init__(self, grimorio_repo: GrimorioRepository, magia_repo: MagiaRepository):
+    def __init__(
+        self, grimorio_repo: GrimorioRepositoryProtocol, magia_repo: MagiaRepositoryProtocol
+    ):
         self.grimorio_repo = grimorio_repo
         self.magia_repo = magia_repo
 

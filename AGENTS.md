@@ -18,6 +18,7 @@ Este `AGENTS.md` existe como resumo operacional e guia de uso para o time.
 - Protecao de dados em producao (Neon branch, `DATABASE_URL`, PITR/snapshots, staging antes de prod, health `/health/live`): checklist em [PRE_DEPLOY_CHECKLIST.md](PRE_DEPLOY_CHECKLIST.md) (secao **Protecao de dados**) e skill [.cursor/skills/arena-producao-dados-neon-render/SKILL.md](.cursor/skills/arena-producao-dados-neon-render/SKILL.md) — habilite em deploy, migrations, `.env` de Render ou incidentes de banco.
 - Conjuração D&D 3.5 (atributo por classe, Tabela 1-1, clérigo, troca Bardo/Feiticeiro): documentação em [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
 - Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pós-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
+- Contratos de repositório para serviços (`typing.Protocol`, pacotes `ports` no backend): [docs/ports-repositorios-servicos.md](docs/ports-repositorios-servicos.md).
 - Admin em dev: `ADMIN_EMAIL` + `ADMIN_PASSWORD` em `backend/.env` (exemplo em `backend/.env.example`); `criar_admin_padrao` no startup só cria se ambos estiverem definidos — ver secção de credenciais no [README.md](README.md).
 
 ## Agentes

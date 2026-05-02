@@ -3,7 +3,6 @@ Endpoints de magias preparadas (D&D 3.5).
 
 Canônico em `app.games.dnd35.api.v1.magias_preparadas` (registrado em `app.main`).
 """
-import re
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -11,9 +10,10 @@ from typing import List, Optional
 
 from app.shared.core.database import get_db
 from app.shared.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
-from app.games.dnd35.models.ataque import MagiaPreparada, MagiaSlot
+from app.games.dnd35.models.ataque import MagiaPreparada
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.magia import Magia
+from app.games.dnd35.repositories.magia_preparada_repository import MagiaPreparadaRepository
 from app.games.dnd35.schemas.ataque import (
     MagiaPreparadaResponse,
     MagiaPreparadaCreate,
@@ -69,11 +69,8 @@ def _enriquecer(mp: MagiaPreparada) -> dict:
 
 @router.get("/{combatente_id}", response_model=List[MagiaPreparadaResponse])
 def listar_preparadas(combatente_id: int, db: Session = Depends(get_db), _: object = Depends(requer_dono_ou_admin_combatente)):
-    registros = (
-        db.query(MagiaPreparada)
-        .filter(MagiaPreparada.combatente_id == combatente_id)
-        .all()
-    )
+    repo = MagiaPreparadaRepository(db)
+    registros = repo.listar_por_combatente(combatente_id)
     return [_enriquecer(r) for r in registros]
 
 
@@ -89,6 +86,7 @@ def preparar_magia(
     Se a magia já existir, atualiza a quantidade preparada total.
     Quantidade de slots continua validada principalmente no frontend (tabela D&D 3.5).
     """
+    repo = MagiaPreparadaRepository(db)
     combatente = db.query(Combatente).filter(Combatente.id == combatente_id).first()
     if not combatente:
         raise HTTPException(status_code=404, detail="Combatente não encontrado")
@@ -139,22 +137,13 @@ def preparar_magia(
 
     quantidade_desejada = _normalizar_quantidade(getattr(payload, "quantidade", 1), 1)
 
-    ja_preparada = (
-        db.query(MagiaPreparada)
-        .filter(
-            MagiaPreparada.combatente_id == combatente_id,
-            MagiaPreparada.magia_id      == payload.magia_id,
-        )
-        .first()
-    )
+    ja_preparada = repo.obter_por_combatente_e_magia(combatente_id, payload.magia_id)
     if ja_preparada:
         ja_preparada.nivel_slot = payload.nivel_slot
         ja_preparada.quantidade = quantidade_desejada
         ja_preparada.usos_realizados = min(_normalizar_usos(ja_preparada), quantidade_desejada)
         ja_preparada.usada = ja_preparada.usos_realizados > 0
-        db.commit()
-        db.refresh(ja_preparada)
-        atualizado = db.query(MagiaPreparada).filter(MagiaPreparada.id == ja_preparada.id).first()
+        atualizado = repo.commit_refresh(ja_preparada)
         return _enriquecer(atualizado)
 
     nova = MagiaPreparada(
@@ -165,11 +154,8 @@ def preparar_magia(
         usos_realizados=0,
         usada=False,
     )
-    db.add(nova)
-    db.commit()
-    db.refresh(nova)
-    nova = db.query(MagiaPreparada).filter(MagiaPreparada.id == nova.id).first()
-    return _enriquecer(nova)
+    carregada = repo.add_commit_refresh(nova)
+    return _enriquecer(carregada)
 
 
 @router.patch("/{combatente_id}/{magia_id}/usar", response_model=MagiaPreparadaResponse)
@@ -184,14 +170,8 @@ def marcar_usada(
     Alterna o consumo/restauração de uma cópia preparada da magia.
     Quando `action=usar`, consome uma cópia; quando `action=restaurar`, devolve uma.
     """
-    registro = (
-        db.query(MagiaPreparada)
-        .filter(
-            MagiaPreparada.combatente_id == combatente_id,
-            MagiaPreparada.magia_id      == magia_id,
-        )
-        .first()
-    )
+    repo = MagiaPreparadaRepository(db)
+    registro = repo.obter_por_combatente_e_magia(combatente_id, magia_id)
     if not registro:
         raise HTTPException(status_code=404, detail="Magia não estava preparada")
 
@@ -212,9 +192,8 @@ def marcar_usada(
 
     registro.usos_realizados = usos_realizados
     registro.usada = usos_realizados > 0
-    db.commit()
-    db.refresh(registro)
-    return _enriquecer(registro)
+    atualizado = repo.commit_refresh(registro)
+    return _enriquecer(atualizado)
 
 
 @router.delete("/{combatente_id}/{magia_id}", status_code=204)
@@ -224,19 +203,12 @@ def desmarcar_magia(
     db: Session = Depends(get_db),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
-    registro = (
-        db.query(MagiaPreparada)
-        .filter(
-            MagiaPreparada.combatente_id == combatente_id,
-            MagiaPreparada.magia_id      == magia_id,
-        )
-        .first()
-    )
+    repo = MagiaPreparadaRepository(db)
+    registro = repo.obter_por_combatente_e_magia(combatente_id, magia_id)
     if not registro:
         raise HTTPException(status_code=404, detail="Magia não estava preparada")
 
-    db.delete(registro)
-    db.commit()
+    repo.delete(registro)
 
 
 @router.post("/{combatente_id}/descanso", status_code=200)
@@ -250,17 +222,10 @@ def descanso_longo(
     if not payload.confirmar:
         raise HTTPException(status_code=400, detail="Confirmação necessária")
 
-    deletadas = (
-        db.query(MagiaPreparada)
-        .filter(MagiaPreparada.combatente_id == combatente_id)
-        .delete()
-    )
-
-    db.query(MagiaSlot).filter(
-        MagiaSlot.combatente_id == combatente_id
-    ).update({"usados": 0})
-
-    db.commit()
+    repo = MagiaPreparadaRepository(db)
+    deletadas = repo.delete_all_por_combatente(combatente_id)
+    repo.reset_slots_usados(combatente_id)
+    repo.commit()
 
     return {
         "message":              "Descanso longo realizado com sucesso",

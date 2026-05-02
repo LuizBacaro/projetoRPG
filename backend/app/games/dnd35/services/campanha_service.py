@@ -10,16 +10,15 @@ from typing import List
 
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.games.dnd35.models.campanha import Campanha
-from app.games.dnd35.repositories.campanha_repository import CampanhaRepository
+from app.games.dnd35.ports import CampanhaRepositoryProtocol, CombatenteRepositoryProtocol
 from app.repositories.base import commit_with_rollback
-from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 
 
 class CampanhaService:
     def __init__(
         self,
-        campanha_repository: CampanhaRepository,
-        combatente_repository: CombatenteRepository,
+        campanha_repository: CampanhaRepositoryProtocol,
+        combatente_repository: CombatenteRepositoryProtocol,
     ):
         self.campanha_repository = campanha_repository
         self.combatente_repository = combatente_repository
