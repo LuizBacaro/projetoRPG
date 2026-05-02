@@ -2,10 +2,48 @@
 
 from __future__ import annotations
 
+import json
 from decimal import Decimal
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+# Limite do blob JSON em UTF-8 (proteção contra payloads enormes).
+GURPS_EXTRAS_MAX_JSON_BYTES = 65_536
+# Versão do formato documentado em `extras` (chave "v"); migrar leitura no futuro conforme necessário.
+GURPS_EXTRAS_FORMAT_VERSION = 1
+
+_GURPS_EXTRAS_OPENAPI_EXAMPLE: Dict[str, Any] = {
+    "v": GURPS_EXTRAS_FORMAT_VERSION,
+    "criacao": "2026-05-01",
+    "aparencia_long": "Alto, capa verde.",
+    "equipamento": "Espada larga, poções.",
+    "escudo": "+2",
+    "enc": {"nenhuma": {"fp": "0", "d": "—"}, "leve": {"fp": "", "d": ""}},
+    "hit": {"cranio": "4", "torso": "0 / 10"},
+    "arma": {"golp": "sw+1", "bal": "thr", "nh": "14"},
+}
+
+
+def validar_extras_json_serializavel_e_tamanho(ex: Any) -> Dict[str, Any]:
+    if not isinstance(ex, dict):
+        raise ValueError("extras deve ser um objeto JSON (dicionário)")
+    try:
+        raw = json.dumps(ex, ensure_ascii=False)
+    except (TypeError, ValueError) as e:
+        raise ValueError("extras contém valores não serializáveis em JSON") from e
+    if len(raw.encode("utf-8")) > GURPS_EXTRAS_MAX_JSON_BYTES:
+        raise ValueError(
+            f"extras excede {GURPS_EXTRAS_MAX_JSON_BYTES} bytes após serialização UTF-8"
+        )
+    return ex
+
+
+def normalizar_extras_para_gravacao(ex: Dict[str, Any]) -> Dict[str, Any]:
+    """Garante chave `v` para evolução futura do formato; não sobrescreve `v` enviada pelo cliente."""
+    out = dict(ex)
+    out.setdefault("v", GURPS_EXTRAS_FORMAT_VERSION)
+    return out
 
 
 class GurpsVantagemLinha(BaseModel):
@@ -78,6 +116,19 @@ class GurpsPersonagemCreate(GurpsPersonagemBase):
     vantagens: List[GurpsVantagemLinha] = Field(default_factory=list)
     desvantagens: List[GurpsDesvantagemLinha] = Field(default_factory=list)
     pericias: List[GurpsPericiaLinha] = Field(default_factory=list)
+    extras: Dict[str, Any] = Field(
+        default_factory=dict,
+        description=(
+            "Campos livres da ficha (encargo `enc`, locais de acerto `hit`, equipamento, notas). "
+            "Inclua `v` (inteiro) como versão do formato; o servidor define `v=1` se omitido."
+        ),
+        json_schema_extra={"example": _GURPS_EXTRAS_OPENAPI_EXAMPLE},
+    )
+
+    @field_validator("extras")
+    @classmethod
+    def _extras_validar_create(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        return validar_extras_json_serializavel_e_tamanho(v)
 
 
 class GurpsPersonagemUpdate(BaseModel):
@@ -126,6 +177,18 @@ class GurpsPersonagemUpdate(BaseModel):
     vantagens: Optional[List[GurpsVantagemLinha]] = None
     desvantagens: Optional[List[GurpsDesvantagemLinha]] = None
     pericias: Optional[List[GurpsPericiaLinha]] = None
+    extras: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Substitui o objeto extras inteiro quando enviado.",
+        json_schema_extra={"example": _GURPS_EXTRAS_OPENAPI_EXAMPLE},
+    )
+
+    @field_validator("extras")
+    @classmethod
+    def _extras_validar_update(cls, v: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        if v is None:
+            return None
+        return validar_extras_json_serializavel_e_tamanho(v)
 
 
 class GurpsPersonagemResponse(GurpsPersonagemBase):
@@ -136,6 +199,12 @@ class GurpsPersonagemResponse(GurpsPersonagemBase):
     foto_url: Optional[str] = None
     pvs_atual: int
     fadiga_atual: int
+    extras: Dict[str, Any] = Field(
+        default_factory=dict,
+        validation_alias="extras_json",
+        description="JSON livre persistido na ficha; ver campo homônimo em Create.",
+        json_schema_extra={"example": _GURPS_EXTRAS_OPENAPI_EXAMPLE},
+    )
     vantagens: List[GurpsVantagemLinha] = Field(default_factory=list)
     desvantagens: List[GurpsDesvantagemLinha] = Field(default_factory=list)
     pericias: List[GurpsPericiaLinha] = Field(default_factory=list)

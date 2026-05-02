@@ -7,6 +7,7 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Integer,
+    JSON,
     Numeric,
     String,
 )
@@ -68,6 +69,8 @@ class GurpsPersonagem(Base):
     pontos_desvantagens = Column(Integer, nullable=False, default=0)
     pontos_pericias = Column(Integer, nullable=False, default=0)
     pontos_total = Column(Integer, nullable=False, default=0)
+    # Encargo, locais de acerto, equipamento livre, notas — JSON livre (contrato na ficha).
+    extras_json = Column(JSON, nullable=False, default=dict)
 
     campanha = relationship("GurpsCampanha", back_populates="personagens")
     vantagens = relationship(

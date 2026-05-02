@@ -15,6 +15,7 @@ from app.games.gurps.schemas.personagem import (
     GurpsPersonagemCreate,
     GurpsPersonagemResponse,
     GurpsPersonagemUpdate,
+    normalizar_extras_para_gravacao,
 )
 from app.repositories.base import commit_with_rollback
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
@@ -158,6 +159,9 @@ class GurpsPersonagemService:
             pontos_desvantagens=payload.pontos_desvantagens,
             pontos_pericias=payload.pontos_pericias,
             pontos_total=payload.pontos_total,
+            extras_json=normalizar_extras_para_gravacao(
+                payload.extras if isinstance(payload.extras, dict) else {}
+            ),
         )
         for v in payload.vantagens or []:
             ent.vantagens.append(
@@ -190,9 +194,14 @@ class GurpsPersonagemService:
         list_v = data.pop("vantagens", None)
         list_d = data.pop("desvantagens", None)
         list_p = data.pop("pericias", None)
+        extras = data.pop("extras", None)
 
         for key, val in data.items():
             setattr(ent, key, val)
+        if extras is not None:
+            ent.extras_json = normalizar_extras_para_gravacao(
+                extras if isinstance(extras, dict) else {}
+            )
 
         if list_v is not None:
             ent.vantagens.clear()

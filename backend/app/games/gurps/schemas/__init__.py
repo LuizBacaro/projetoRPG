@@ -5,6 +5,8 @@ from app.games.gurps.schemas.campanha import (
 )
 from app.games.gurps.schemas.combate import GurpsIniciarCombateRequest
 from app.games.gurps.schemas.personagem import (
+    GURPS_EXTRAS_FORMAT_VERSION,
+    GURPS_EXTRAS_MAX_JSON_BYTES,
     GurpsPersonagemCreate,
     GurpsPersonagemResponse,
     GurpsPersonagemUpdate,
@@ -15,6 +17,8 @@ __all__ = [
     "GurpsCampanhaResponse",
     "GurpsCampanhaUpdate",
     "GurpsIniciarCombateRequest",
+    "GURPS_EXTRAS_FORMAT_VERSION",
+    "GURPS_EXTRAS_MAX_JSON_BYTES",
     "GurpsPersonagemCreate",
     "GurpsPersonagemResponse",
     "GurpsPersonagemUpdate",

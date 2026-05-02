@@ -12,6 +12,7 @@ from app.games.dnd35.models.armadura_protecao import (
     ArmaduraProtecaoJogador,
 )
 from app.games.dnd35.models.talento import Talento, TalentoJogador
+from app.games.dnd35.models.consumivel import Consumivel, ConsumivelJogador
 from app.games.dnd35.models.combatente import Combatente
 from app.shared.models.usuario import Usuario, PerfilUsuario
 from app.games.dnd35.models.combate import Combate, CombateHistorico
@@ -50,6 +51,8 @@ __all__ = [
     "ArmaduraProtecaoJogador",
     "Talento",
     "TalentoJogador",
+    "Consumivel",
+    "ConsumivelJogador",
     "Combatente",
     "Usuario",
     "PerfilUsuario",

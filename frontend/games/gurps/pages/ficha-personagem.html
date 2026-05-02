@@ -66,7 +66,7 @@
             </div>
             <div class="ficha-cell ficha-cell--wide">
                 <span class="ficha-label">Aparência / status / reputação (notas)</span>
-                <textarea id="fg_aparencia_long" rows="2" placeholder="Texto livre (salvo só neste navegador até integrarmos à API)."></textarea>
+                <textarea id="fg_aparencia_long" rows="2" placeholder="Texto livre (salvo na ficha ao clicar em Salvar)."></textarea>
             </div>
             <div class="ficha-cell ficha-cell--reação">
                 <span class="ficha-label">Reação</span>
@@ -112,7 +112,7 @@
                             <div class="ficha-combat-cell"><label>Esquiva</label><input id="fg_esquiva" type="number" value="0" /></div>
                             <div class="ficha-combat-cell"><label>Aparar</label><input id="fg_aparar" type="number" value="0" /></div>
                             <div class="ficha-combat-cell"><label>Bloqueio</label><input id="fg_bloqueio" type="text" placeholder="—" /></div>
-                            <div class="ficha-combat-cell"><label>Escudo</label><input id="fg_escudo" type="text" placeholder="—" title="Campo local (navegador)" /></div>
+                            <div class="ficha-combat-cell"><label>Escudo</label><input id="fg_escudo" type="text" placeholder="—" title="Salvo na ficha (extras)" /></div>
                         </div>
                         <input type="hidden" id="fg_vel_custo" value="0" />
                         <input type="hidden" id="fg_mov_custo" value="0" />
@@ -168,7 +168,7 @@
                 <section class="ficha-block">
                     <h2 class="ficha-block-title">Locais de acerto (RD / PV)</h2>
                     <div class="ficha-block-body ficha-silhouette">
-                        <p class="ficha-hint">RD/PV por local — dados só neste navegador.</p>
+                        <p class="ficha-hint">RD/PV por local — incluído em “Salvar ficha” (campo extras na API).</p>
                         <div class="ficha-hit-regioes" aria-label="Locais de acerto">
                             <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Crânio</span><span class="ficha-hit-mod">−7</span></div><input type="text" class="ficha-local-hit" data-part="cranio" placeholder="RD / PV" autocomplete="off" /></div>
                             <div class="ficha-hit-card"><div class="ficha-hit-card-head"><span class="ficha-hit-name">Olhos</span><span class="ficha-hit-mod">−9</span></div><input type="text" class="ficha-local-hit" data-part="olhos" placeholder="RD / PV" autocomplete="off" /></div>
@@ -258,7 +258,7 @@
                 <section class="ficha-block">
                     <h2 class="ficha-block-title">Equipamentos</h2>
                     <div class="ficha-block-body">
-                        <textarea id="fg_equipamento" class="ficha-equip-area" placeholder="Lista de equipamento (salvo neste navegador)."></textarea>
+                        <textarea id="fg_equipamento" class="ficha-equip-area" placeholder="Lista de equipamento (salvo na ficha ao clicar em Salvar)."></textarea>
                     </div>
                 </section>
             </div>
@@ -286,6 +286,6 @@
     if (!AuthService.exigirJogo('gurps')) {}
 </script>
 <script src="../js/services/GurpsPersonagemService.js"></script>
-<script src="../js/pages/ficha-gurps.js?v=20260501e"></script>
+<script src="../js/pages/ficha-gurps.js?v=20260501h"></script>
 </body>
 </html>

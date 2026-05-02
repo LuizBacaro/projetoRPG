@@ -105,7 +105,7 @@
         if (m) m.textContent = v;
     }
 
-    function salvarLocal() {
+    function buildExtrasPayload() {
         const enc = {};
         document.querySelectorAll('.ficha-local-enc').forEach((inp) => {
             const k = inp.getAttribute('data-enc');
@@ -122,7 +122,7 @@
             const p = inp.getAttribute('data-part');
             if (p) hit[p] = inp.value;
         });
-        const payload = {
+        return {
             criacao: str('#fg_criacao'),
             aparencia_long: el('#fg_aparencia_long')?.value || '',
             equipamento: el('#fg_equipamento')?.value || '',
@@ -135,59 +135,91 @@
                 nh: str('#fg_arma_nh'),
             },
         };
+    }
+
+    function salvarLocal() {
         try {
-            localStorage.setItem(localKey(), JSON.stringify(payload));
+            localStorage.setItem(localKey(), JSON.stringify(buildExtrasPayload()));
         } catch (e) {
             console.warn('localStorage ficha', e);
         }
+    }
+
+    function applyExtrasPayload(o) {
+        if (!o || typeof o !== 'object') return;
+        if (o.criacao != null) setVal('#fg_criacao', o.criacao);
+        if (o.aparencia_long != null && el('#fg_aparencia_long')) {
+            el('#fg_aparencia_long').value = o.aparencia_long;
+        }
+        if (o.equipamento != null && el('#fg_equipamento')) {
+            el('#fg_equipamento').value = o.equipamento;
+        }
+        if (o.escudo != null) setVal('#fg_escudo', o.escudo);
+        if (o.arma) {
+            setVal('#fg_arma_golp', o.arma.golp);
+            setVal('#fg_arma_bal', o.arma.bal);
+            setVal('#fg_arma_nh', o.arma.nh);
+        }
+        if (o.enc) {
+            Object.keys(o.enc).forEach((k) => {
+                const row = o.enc[k];
+                const a = document.querySelector(`.ficha-local-enc[data-enc="${k}"]`);
+                const b = document.querySelector(`.ficha-local-enc-d[data-enc="${k}"]`);
+                if (a && row.fp != null) a.value = row.fp;
+                if (b && row.d != null) b.value = row.d;
+            });
+        }
+        if (o.hit) {
+            const hit = { ...o.hit };
+            const mig = [
+                ['cabeca', 'cranio'],
+                ['tronco', 'torso'],
+                ['bracos', 'braco'],
+                ['pernas', 'perna'],
+                ['extrem', 'mao'],
+            ];
+            mig.forEach(([antigo, novo]) => {
+                if (hit[antigo] != null && hit[antigo] !== '' && (hit[novo] == null || hit[novo] === '')) {
+                    hit[novo] = hit[antigo];
+                }
+            });
+            Object.keys(hit).forEach((p) => {
+                const inp = document.querySelector(`.ficha-local-hit[data-part="${p}"]`);
+                if (inp && hit[p] != null) inp.value = hit[p];
+            });
+        }
+    }
+
+    /** True se nada foi salvo ainda no servidor (migração localStorage → API). */
+    function extrasServidorVazio(ex) {
+        if (!ex || typeof ex !== 'object') return true;
+        /* Já persistido no servidor (versão de formato); não sobrescrever com localStorage. */
+        if (Object.prototype.hasOwnProperty.call(ex, 'v')) return false;
+        const t = (v) => (v == null ? '' : String(v)).trim();
+        if (t(ex.criacao)) return false;
+        if (t(ex.aparencia_long)) return false;
+        if (t(ex.equipamento)) return false;
+        if (t(ex.escudo)) return false;
+        if (ex.arma && (t(ex.arma.golp) || t(ex.arma.bal) || t(ex.arma.nh))) return false;
+        if (ex.enc && typeof ex.enc === 'object') {
+            const encTem = Object.keys(ex.enc).some((k) => {
+                const row = ex.enc[k];
+                return row && (t(row.fp) || t(row.d));
+            });
+            if (encTem) return false;
+        }
+        if (ex.hit && typeof ex.hit === 'object') {
+            const hitTem = Object.keys(ex.hit).some((k) => t(ex.hit[k]));
+            if (hitTem) return false;
+        }
+        return true;
     }
 
     function carregarLocal() {
         try {
             const raw = localStorage.getItem(localKey());
             if (!raw) return;
-            const o = JSON.parse(raw);
-            if (o.criacao != null) setVal('#fg_criacao', o.criacao);
-            if (o.aparencia_long != null && el('#fg_aparencia_long')) {
-                el('#fg_aparencia_long').value = o.aparencia_long;
-            }
-            if (o.equipamento != null && el('#fg_equipamento')) {
-                el('#fg_equipamento').value = o.equipamento;
-            }
-            if (o.escudo != null) setVal('#fg_escudo', o.escudo);
-            if (o.arma) {
-                setVal('#fg_arma_golp', o.arma.golp);
-                setVal('#fg_arma_bal', o.arma.bal);
-                setVal('#fg_arma_nh', o.arma.nh);
-            }
-            if (o.enc) {
-                Object.keys(o.enc).forEach((k) => {
-                    const row = o.enc[k];
-                    const a = document.querySelector(`.ficha-local-enc[data-enc="${k}"]`);
-                    const b = document.querySelector(`.ficha-local-enc-d[data-enc="${k}"]`);
-                    if (a && row.fp != null) a.value = row.fp;
-                    if (b && row.d != null) b.value = row.d;
-                });
-            }
-            if (o.hit) {
-                const hit = { ...o.hit };
-                const mig = [
-                    ['cabeca', 'cranio'],
-                    ['tronco', 'torso'],
-                    ['bracos', 'braco'],
-                    ['pernas', 'perna'],
-                    ['extrem', 'mao'],
-                ];
-                mig.forEach(([antigo, novo]) => {
-                    if (hit[antigo] != null && hit[antigo] !== '' && (hit[novo] == null || hit[novo] === '')) {
-                        hit[novo] = hit[antigo];
-                    }
-                });
-                Object.keys(hit).forEach((p) => {
-                    const inp = document.querySelector(`.ficha-local-hit[data-part="${p}"]`);
-                    if (inp && hit[p] != null) inp.value = hit[p];
-                });
-            }
+            applyExtrasPayload(JSON.parse(raw));
         } catch (e) {
             console.warn('carregarLocal', e);
         }
@@ -248,6 +280,7 @@
             vantagens: coletasVantagens(),
             desvantagens: coletasDesvantagens(),
             pericias: coletasPericias(),
+            extras: buildExtrasPayload(),
         };
     }
 
@@ -434,7 +467,13 @@
             const p = await svc.obter(Number(id));
             preencher(p);
             el('#fg_titulo_sub').textContent = p.nome ? ` — ${p.nome}` : '';
-            carregarLocal();
+            const ex = p.extras && typeof p.extras === 'object' ? p.extras : {};
+            applyExtrasPayload(ex);
+            if (extrasServidorVazio(ex)) {
+                carregarLocal();
+            } else {
+                salvarLocal();
+            }
         } catch (e) {
             Toast.error(e.message || 'Erro ao carregar');
         }
