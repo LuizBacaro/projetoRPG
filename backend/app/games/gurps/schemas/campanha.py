@@ -20,6 +20,12 @@ class GurpsCampanhaUpdate(BaseModel):
     personagem_ids: Optional[List[int]] = None
 
 
+class GurpsCampanhaAssociarPersonagens(BaseModel):
+    """Corpo de POST /campanhas/{id}/personagens — adiciona vínculos sem remover os já associados."""
+
+    personagem_ids: List[int] = Field(default_factory=list)
+
+
 class GurpsCampanhaResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

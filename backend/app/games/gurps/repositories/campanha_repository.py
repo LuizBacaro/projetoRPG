@@ -20,6 +20,18 @@ class GurpsCampanhaRepository(BaseRepository[GurpsCampanha]):
             .all()
         )
 
+    def listar_todas(self) -> List[GurpsCampanha]:
+        return (
+            self.db.query(GurpsCampanha).order_by(GurpsCampanha.nome.asc()).all()
+        )
+
+    def obter_por_id(self, campanha_id: int) -> Optional[GurpsCampanha]:
+        return (
+            self.db.query(GurpsCampanha)
+            .filter(GurpsCampanha.id == campanha_id)
+            .first()
+        )
+
     def obter_por_id_e_mestre(
         self, campanha_id: int, mestre_id: int
     ) -> Optional[GurpsCampanha]:

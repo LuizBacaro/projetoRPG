@@ -29,3 +29,9 @@ class GurpsCampanha(Base):
         back_populates="campanha",
         lazy="selectin",
     )
+    sessoes = relationship(
+        "GurpsSessaoCampanha",
+        back_populates="campanha",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+    )

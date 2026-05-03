@@ -109,6 +109,33 @@ def test_mestre_put_substitui_personagens_da_campanha(gurps_mestre_e_jogadores_d
     assert c_jog.get(f"/api/v1/gurps/personagens/{p2}").json()["campanha_id"] == cid
 
 
+def test_mestre_post_personagens_adiciona_sem_remover_existentes(
+    gurps_mestre_e_jogadores_db,
+):
+    """POST /personagens só associa os ids enviados; mantém os já na campanha."""
+    SessionLocal, mestre, j1, _ = gurps_mestre_e_jogadores_db
+    c_jog = _client_campanhas(SessionLocal, _usuario(j1))
+    c_mestre = _client_campanhas(SessionLocal, _usuario(mestre))
+
+    p1 = _criar_personagem(c_jog, "Um")
+    p2 = _criar_personagem(c_jog, "Dois")
+    p3 = _criar_personagem(c_jog, "Tres")
+    r0 = c_mestre.post(
+        "/api/v1/gurps/campanhas",
+        json={"nome": "Mesa add", "personagem_ids": [p1]},
+    )
+    assert r0.status_code == 201, r0.text
+    cid = r0.json()["id"]
+
+    r = c_mestre.post(
+        f"/api/v1/gurps/campanhas/{cid}/personagens",
+        json={"personagem_ids": [p2, p3]},
+    )
+    assert r.status_code == 200, r.text
+    ids = set(r.json()["personagem_ids"])
+    assert ids == {p1, p2, p3}
+
+
 def test_mestre_delete_campanha_libera_personagens(gurps_mestre_e_jogadores_db):
     SessionLocal, mestre, j1, _ = gurps_mestre_e_jogadores_db
     c_jog = _client_campanhas(SessionLocal, _usuario(j1))

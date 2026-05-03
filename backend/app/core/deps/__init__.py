@@ -50,6 +50,8 @@ from .gurps import (
     get_gurps_combate_service,
     get_gurps_personagem_repository,
     get_gurps_personagem_service,
+    get_gurps_sessao_campanha_repository,
+    get_gurps_sessao_campanha_service,
 )
 from .hub import (
     get_game_repository,
@@ -87,6 +89,8 @@ __all__ = [
     "get_gurps_combate_service",
     "get_gurps_personagem_repository",
     "get_gurps_personagem_service",
+    "get_gurps_sessao_campanha_repository",
+    "get_gurps_sessao_campanha_service",
     "get_magia_import_service",
     "get_magia_repository",
     "get_magia_service",

@@ -66,4 +66,3 @@ Não é “anti-SOLID” por si: é **infra de registo de metadata** (Alembic/te
 
 A arquitetura “mais limpa” para o Arena é: **hub estável e reutilizável em `shared`, cada jogo isolado em `games/<slug>`, routers finos, serviços como orquestração, repositórios como persistência, dependências sempre injetadas para cima — e reuso feito subindo código agnóstico de sistema, não copiando entre jogos.**
 
-Se quiseres o próximo passo **concreto no código**, o melhor ganho com diff pequeno costuma ser: **partir `dependencies.py` por domínio** ou **definir 2–3 `Protocol`s** nos serviços mais testados — diz qual preferes e seguimos nessa linha.

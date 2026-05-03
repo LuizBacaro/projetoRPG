@@ -70,21 +70,86 @@
     <section class="tab-section" id="tab-campanhas">
         <div class="gurps-dash-card">
             <h2 class="gurps-dash-card-title">Campanhas</h2>
-            <div id="campanhasJogador" class="gurps-dash-msg gurps-dash-msg--info" hidden>
-                Campanhas são gerenciadas pelo mestre. Peça ao mestre para vincular sua ficha.
+            <div id="campanhasJogador" hidden>
+                <p class="gurps-dash-msg gurps-dash-msg--info" style="margin-top:0">
+                    Campanhas são organizadas pelo mestre. Quando sua ficha estiver vinculada a uma mesa, os resumos que o mestre disponibilizar aparecem abaixo.
+                </p>
+                <h3 class="dash-divcustom-titulo">Resumos de sessão (leitura)</h3>
+                <div id="listaSessoesJogadorGurps" class="dash-divcustom-listagem">
+                    <p class="dash-divcustom-vazio">Carregando…</p>
+                </div>
             </div>
             <div id="campanhasMestre" hidden>
-                <div class="gurps-dash-toolbar">
-                    <input id="cmpNome" class="gurps-dash-field" type="text" placeholder="Nome da campanha" autocomplete="off" />
-                    <button type="button" class="gurps-btn-campanha" id="btnCmpCriar">+ Campanha</button>
+                <div id="gurpsCampanhasSubAbas" class="campanhas-subabas">
+                    <button type="button" class="campanhas-subaba-btn active" data-gurps-campanhas-subaba="cadastro">Cadastro de campanhas</button>
+                    <button type="button" class="campanhas-subaba-btn" data-gurps-campanhas-subaba="sessoes">Registro de sessões</button>
                 </div>
-                <div class="tabela-wrapper">
-                    <table class="tabela-combatentes">
-                        <thead>
-                            <tr><th>Nome</th><th>Personagens</th><th></th></tr>
-                        </thead>
-                        <tbody id="tblCampanhas"></tbody>
-                    </table>
+                <div id="gurpsCampanhasSubabaCadastro" class="campanhas-subaba-pane active">
+                    <p class="dash-divcustom-info" style="margin-top:0">
+                        Cadastre campanhas e associe combatentes já criados (jogador, monstro ou NPC), como no fluxo de Campanhas do D&amp;D 3.5.
+                    </p>
+                    <form id="formCampanha" class="dash-divcustom-form" autocomplete="off">
+                        <input id="campanhaIdEdicao" type="hidden" />
+                        <div id="campanhaEdicaoBadge" class="campanha-edicao-badge" style="display:none"></div>
+                        <div class="dash-form-group">
+                            <label>Nome da campanha *</label>
+                            <input id="campanhaNome" type="text" maxlength="120" required placeholder="Ex.: Operação Aurora" />
+                        </div>
+                        <div class="dash-form-group">
+                            <label>Descrição</label>
+                            <textarea id="campanhaDescricao" rows="2" maxlength="500" placeholder="Resumo (opcional)"></textarea>
+                        </div>
+                        <div class="dash-form-group">
+                            <label>Participantes</label>
+                            <input id="campanhaPersonagensBusca" type="text" placeholder="Buscar personagem..." />
+                            <div id="campanhaPersonagensTipoFiltros" class="filtros-escopo">
+                                <button type="button" class="filter-btn filter-btn-escopo active" data-campanha-tipo="todos">Todos</button>
+                                <button type="button" class="filter-btn filter-btn-escopo" data-campanha-tipo="jogador">Jogadores</button>
+                                <button type="button" class="filter-btn filter-btn-escopo" data-campanha-tipo="monstro">Monstros</button>
+                                <button type="button" class="filter-btn filter-btn-escopo" data-campanha-tipo="npc">NPCs</button>
+                            </div>
+                            <div id="campanhaPersonagens" class="campanha-personagens-checklist" aria-label="Seleção de personagens"></div>
+                        </div>
+                        <div class="dash-modal-actions">
+                            <button id="btnCancelarEdicaoCampanha" type="button" class="btn-dash-cancel" style="display:none">Cancelar edição</button>
+                            <button id="btnSalvarCampanha" type="submit" class="btn-dash-save">Criar campanha</button>
+                        </div>
+                    </form>
+                    <hr class="dash-divcustom-sep" />
+                    <h3 class="dash-divcustom-titulo">Campanhas cadastradas</h3>
+                    <div id="listaCampanhas" class="dash-divcustom-listagem">
+                        <p class="dash-divcustom-vazio">Carregando campanhas…</p>
+                    </div>
+                </div>
+                <div id="gurpsCampanhasSubabaSessoes" class="campanhas-subaba-pane">
+                    <p class="dash-divcustom-info" style="margin-top:0">
+                        Registre o resumo de cada sessão e marque se os jogadores da mesa podem ler este texto no dashboard.
+                    </p>
+                    <form id="formSessaoCampanhaGurps" class="dash-divcustom-form" autocomplete="off">
+                        <input id="sessaoIdEdicaoGurps" type="hidden" />
+                        <div id="sessaoEdicaoBadgeGurps" class="campanha-edicao-badge" style="display:none"></div>
+                        <div class="dash-form-group">
+                            <label>Campanha *</label>
+                            <select id="sessaoCampanhaIdGurps" required>
+                                <option value="">Selecione a campanha</option>
+                            </select>
+                        </div>
+                        <div class="dash-form-group">
+                            <label>Resumo da sessão *</label>
+                            <textarea id="sessaoResumoGurps" rows="3" maxlength="4000" required placeholder="Resumo dos acontecimentos…"></textarea>
+                        </div>
+                        <label class="campanha-personagem-item">
+                            <input id="sessaoVisivelJogadoresGurps" type="checkbox" />
+                            <span class="campanha-personagem-nome">Disponibilizar este resumo para jogadores com ficha nesta campanha</span>
+                        </label>
+                        <div class="dash-modal-actions">
+                            <button id="btnCancelarEdicaoSessaoGurps" type="button" class="btn-dash-cancel" style="display:none">Cancelar edição</button>
+                            <button id="btnSalvarSessaoCampanhaGurps" type="submit" class="btn-dash-save">Registrar sessão</button>
+                        </div>
+                    </form>
+                    <div id="listaSessoesCampanhaGurps" class="dash-divcustom-listagem">
+                        <p class="dash-divcustom-vazio">Carregando sessões…</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -197,6 +262,12 @@
     const cs = new GurpsCampanhaService();
     const kb = new GurpsCombateService();
     let cacheLista = [];
+    let campanhasCache = [];
+    let campanhaEmEdicaoId = null;
+    let personagensDisponiveisCampanha = [];
+    let filtroTipoParticipanteCampanha = 'todos';
+    let sessoesCampanhaCache = [];
+    let sessaoEmEdicaoIdGurps = null;
 
     function classeBadgeTipo(tipo) {
         const t = String(tipo || '').toLowerCase();
@@ -213,7 +284,10 @@
             p.classList.toggle('active', p.id === 'tab-' + name);
         });
         if (name === 'arena') refreshArena();
-        if (name === 'campanhas' && isMestre) loadCampanhas();
+        if (name === 'campanhas') {
+            if (isMestre) carregarAbaCampanhas();
+            else carregarResumosJogadorGurps();
+        }
     }
 
     document.querySelectorAll('.gurps-dash-nav .nav-tab').forEach((b) => {
@@ -450,52 +524,440 @@
         Toast.info('Condições de combate: em breve — marcas como atordoado, agarrado, etc.');
     });
 
-    async function loadCampanhas() {
-        try {
-            const rows = await cs.listar();
-            const tb = document.getElementById('tblCampanhas');
-            tb.innerHTML = rows.map((c) => `
-                <tr>
-                    <td>${escapeHtml(c.nome)}</td>
-                    <td>${(c.personagem_ids || []).length}</td>
-                    <td><button type="button" class="gurps-btn-ghost" data-del="${c.id}">Excluir</button></td>
-                </tr>
-            `).join('');
-            tb.querySelectorAll('[data-del]').forEach((btn) => {
-                btn.addEventListener('click', async () => {
-                    if (!confirm('Excluir campanha?')) return;
-                    try {
-                        await cs.deletar(Number(btn.dataset.del));
-                        Toast.success('Removida');
-                        loadCampanhas();
-                    } catch (e) {
-                        Toast.error(e.message);
-                    }
-                });
+    function coletarPersonagensCampanhaSelecionados() {
+        const container = document.getElementById('campanhaPersonagens');
+        if (!container) return [];
+        return Array.from(container.querySelectorAll('input[type="checkbox"][data-personagem-id]:checked'))
+            .map((el) => Number(el.getAttribute('data-personagem-id')))
+            .filter((id) => Number.isFinite(id) && id > 0);
+    }
+
+    function renderizarChecklistPersonagensCampanha(idsPreset) {
+        const container = document.getElementById('campanhaPersonagens');
+        if (!container) return;
+        const idsSelecionados = idsPreset instanceof Set
+            ? idsPreset
+            : new Set(coletarPersonagensCampanhaSelecionados());
+        const filtro = String(document.getElementById('campanhaPersonagensBusca')?.value || '').trim().toLowerCase();
+        const filtroTipo = filtroTipoParticipanteCampanha || 'todos';
+        const personagens = (personagensDisponiveisCampanha || []).filter((item) => {
+            const tipo = String(item.tipo || '').toLowerCase();
+            if (filtroTipo !== 'todos' && tipo !== filtroTipo) return false;
+            if (!filtro) return true;
+            const nome = String(item.nome || '').toLowerCase();
+            return nome.includes(filtro);
+        });
+        if (!personagens.length) {
+            const vazio = filtro
+                ? 'Nenhum personagem encontrado para este filtro.'
+                : 'Nenhum personagem disponível.';
+            container.innerHTML = `<div class="campanha-personagens-vazio">${escapeHtml(vazio)}</div>`;
+            return;
+        }
+        container.innerHTML = personagens.map((personagem) => {
+            const checked = idsSelecionados.has(personagem.id) ? 'checked' : '';
+            const tipoLabel = String(personagem.tipo || '').toLowerCase();
+            const tipoExibicao = tipoLabel
+                ? tipoLabel.charAt(0).toUpperCase() + tipoLabel.slice(1)
+                : 'Personagem';
+            const pts = personagem.pontos_total != null ? personagem.pontos_total : 0;
+            return `
+                <label class="campanha-personagem-item">
+                    <input type="checkbox" data-personagem-id="${personagem.id}" ${checked} />
+                    <span class="campanha-personagem-nome">${escapeHtml(personagem.nome)} (${tipoExibicao} • ${pts} pts)</span>
+                </label>
+            `;
+        }).join('');
+    }
+
+    function renderizarListaCampanhas() {
+        const lista = document.getElementById('listaCampanhas');
+        if (!lista) return;
+        if (!campanhasCache.length) {
+            lista.innerHTML = '<p class="dash-divcustom-vazio">Nenhuma campanha cadastrada.</p>';
+            return;
+        }
+        lista.innerHTML = campanhasCache.map((campanha) => `
+            <div class="dash-divcustom-card">
+                <div class="dash-divcustom-card-head">
+                    <strong>${escapeHtml(campanha.nome || '')}</strong>
+                    <div style="display:flex; gap:.35rem;">
+                        <button type="button" class="btn-dash-cancel" data-campanha-edit="${campanha.id}" title="Editar campanha">Editar</button>
+                        <button type="button" class="btn-dash-delete-div" data-campanha-delete="${campanha.id}" title="Excluir campanha">✕</button>
+                    </div>
+                </div>
+                <div class="dash-divcustom-card-meta">
+                    <span><b>Personagens:</b> ${Number(campanha.total_personagens || 0)}</span>
+                </div>
+                ${campanha.descricao ? `<p class="dash-divcustom-card-desc">${escapeHtml(campanha.descricao)}</p>` : ''}
+            </div>
+        `).join('');
+
+        lista.querySelectorAll('[data-campanha-delete]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const campanhaId = Number(btn.getAttribute('data-campanha-delete'));
+                if (!Number.isFinite(campanhaId)) return;
+                if (!confirm('Excluir esta campanha?')) return;
+                try {
+                    await cs.deletar(campanhaId);
+                    Toast.success('Campanha removida.');
+                    await carregarAbaCampanhas();
+                    await loadPersonagens();
+                } catch (e) {
+                    Toast.error(e.message || 'Erro ao remover campanha');
+                }
             });
+        });
+
+        lista.querySelectorAll('[data-campanha-edit]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const campanhaId = Number(btn.getAttribute('data-campanha-edit'));
+                if (!Number.isFinite(campanhaId)) return;
+                const campanha = campanhasCache.find((c) => c.id === campanhaId);
+                if (!campanha) return;
+                preencherFormCampanhaEdicao(campanha);
+            });
+        });
+    }
+
+    function resetFormCampanha() {
+        campanhaEmEdicaoId = null;
+        const form = document.getElementById('formCampanha');
+        const badge = document.getElementById('campanhaEdicaoBadge');
+        const btnCancel = document.getElementById('btnCancelarEdicaoCampanha');
+        const btnSalvar = document.getElementById('btnSalvarCampanha');
+        if (form) form.reset();
+        if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
+        if (btnCancel) btnCancel.style.display = 'none';
+        if (btnSalvar) btnSalvar.textContent = 'Criar campanha';
+        renderizarChecklistPersonagensCampanha(new Set());
+    }
+
+    function preencherFormCampanhaEdicao(campanha) {
+        campanhaEmEdicaoId = campanha.id;
+        const inputNome = document.getElementById('campanhaNome');
+        const inputDesc = document.getElementById('campanhaDescricao');
+        const badge = document.getElementById('campanhaEdicaoBadge');
+        const btnCancel = document.getElementById('btnCancelarEdicaoCampanha');
+        const btnSalvar = document.getElementById('btnSalvarCampanha');
+        if (inputNome) inputNome.value = campanha.nome || '';
+        if (inputDesc) inputDesc.value = campanha.descricao || '';
+        if (badge) {
+            badge.textContent = `Editando: ${campanha.nome || ''}`;
+            badge.style.display = '';
+        }
+        if (btnCancel) btnCancel.style.display = '';
+        if (btnSalvar) btnSalvar.textContent = 'Salvar campanha';
+        const ids = new Set((campanha.personagem_ids || []).map((x) => Number(x)));
+        renderizarChecklistPersonagensCampanha(ids);
+        inputNome?.focus();
+    }
+
+    function gurpsCampanhasSubabaAtiva() {
+        const btn = document.querySelector('#gurpsCampanhasSubAbas .campanhas-subaba-btn.active');
+        return (btn && btn.dataset.gurpsCampanhasSubaba) || 'cadastro';
+    }
+
+    function aplicarSubabaCampanhasGurps(sub) {
+        const wrap = document.getElementById('gurpsCampanhasSubAbas');
+        if (!wrap) return;
+        wrap.querySelectorAll('[data-gurps-campanhas-subaba]').forEach((b) => {
+            b.classList.toggle('active', b.dataset.gurpsCampanhasSubaba === sub);
+        });
+        document.getElementById('gurpsCampanhasSubabaCadastro')?.classList.toggle('active', sub === 'cadastro');
+        document.getElementById('gurpsCampanhasSubabaSessoes')?.classList.toggle('active', sub === 'sessoes');
+        try {
+            localStorage.setItem('dashboard:gurps-campanhas-subaba', sub);
+        } catch (_err) {}
+    }
+
+    function configurarSubAbasCampanhasGurps() {
+        const wrap = document.getElementById('gurpsCampanhasSubAbas');
+        if (!wrap) return;
+        let inicial = 'cadastro';
+        try {
+            if (localStorage.getItem('dashboard:gurps-campanhas-subaba') === 'sessoes') inicial = 'sessoes';
+        } catch (_err) {}
+        aplicarSubabaCampanhasGurps(inicial);
+        wrap.querySelectorAll('[data-gurps-campanhas-subaba]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const sub = btn.dataset.gurpsCampanhasSubaba || 'cadastro';
+                aplicarSubabaCampanhasGurps(sub);
+                if (sub === 'sessoes') {
+                    atualizarSelectCampanhasSessaoGurps();
+                    carregarSessoesMestreGurps();
+                }
+            });
+        });
+    }
+
+    function formatarDataSessaoGurps(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return escapeHtml(String(iso));
+        return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    function atualizarSelectCampanhasSessaoGurps() {
+        const select = document.getElementById('sessaoCampanhaIdGurps');
+        if (!select) return;
+        const v = select.value;
+        select.innerHTML = '<option value="">Selecione a campanha</option>';
+        (campanhasCache || []).forEach((c) => {
+            const opt = document.createElement('option');
+            opt.value = String(c.id);
+            opt.textContent = c.nome || `Campanha #${c.id}`;
+            select.appendChild(opt);
+        });
+        if (v && [...select.options].some((o) => o.value === v)) select.value = v;
+    }
+
+    async function carregarSessoesMestreGurps() {
+        const lista = document.getElementById('listaSessoesCampanhaGurps');
+        if (lista) lista.innerHTML = '<p class="dash-divcustom-vazio">Carregando sessões…</p>';
+        try {
+            const rows = await cs.listarSessoes();
+            sessoesCampanhaCache = Array.isArray(rows) ? rows : [];
+            renderizarListaSessoesMestreGurps();
         } catch (e) {
-            Toast.error(e.message || 'Erro campanhas');
+            Toast.error(e.message || 'Erro ao carregar sessões');
+            if (lista) lista.innerHTML = `<p class="dash-divcustom-vazio">${escapeHtml(e.message || 'Erro')}</p>`;
         }
     }
 
-    document.getElementById('btnCmpCriar').addEventListener('click', async () => {
-        const nome = document.getElementById('cmpNome').value.trim();
-        if (!nome) return Toast.error('Nome da campanha');
-        try {
-            await cs.criar({ nome, descricao: '', personagem_ids: [] });
-            document.getElementById('cmpNome').value = '';
-            Toast.success('Campanha criada');
-            loadCampanhas();
-        } catch (e) {
-            Toast.error(e.message);
+    function resetFormSessaoGurps() {
+        sessaoEmEdicaoIdGurps = null;
+        const form = document.getElementById('formSessaoCampanhaGurps');
+        const badge = document.getElementById('sessaoEdicaoBadgeGurps');
+        const btnC = document.getElementById('btnCancelarEdicaoSessaoGurps');
+        const btnS = document.getElementById('btnSalvarSessaoCampanhaGurps');
+        if (form) form.reset();
+        if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
+        if (btnC) btnC.style.display = 'none';
+        if (btnS) btnS.textContent = 'Registrar sessão';
+    }
+
+    function preencherFormSessaoGurps(sessao) {
+        sessaoEmEdicaoIdGurps = sessao.id;
+        const sel = document.getElementById('sessaoCampanhaIdGurps');
+        const ta = document.getElementById('sessaoResumoGurps');
+        const vis = document.getElementById('sessaoVisivelJogadoresGurps');
+        const badge = document.getElementById('sessaoEdicaoBadgeGurps');
+        const btnC = document.getElementById('btnCancelarEdicaoSessaoGurps');
+        const btnS = document.getElementById('btnSalvarSessaoCampanhaGurps');
+        if (sel) sel.value = String(sessao.campanha_id || '');
+        if (ta) ta.value = sessao.resumo || '';
+        if (vis) vis.checked = Boolean(sessao.visivel_jogadores);
+        if (badge) {
+            badge.textContent = `Editando sessão: ${sessao.campanha_nome || 'Campanha'}`;
+            badge.style.display = '';
         }
-    });
+        if (btnC) btnC.style.display = '';
+        if (btnS) btnS.textContent = 'Salvar sessão';
+        ta?.focus();
+    }
+
+    function renderizarListaSessoesMestreGurps() {
+        const lista = document.getElementById('listaSessoesCampanhaGurps');
+        if (!lista) return;
+        if (!sessoesCampanhaCache.length) {
+            lista.innerHTML = '<p class="dash-divcustom-vazio">Nenhuma sessão registrada.</p>';
+            return;
+        }
+        lista.innerHTML = sessoesCampanhaCache.map((sessao) => `
+            <div class="dash-divcustom-card">
+                <div class="dash-divcustom-card-head">
+                    <strong>${escapeHtml(sessao.campanha_nome || 'Campanha')}</strong>
+                    <div style="display:flex; gap:.35rem; align-items:center; flex-wrap:wrap;">
+                        <span class="badge ${sessao.visivel_jogadores ? 'badge-jogador' : 'badge-npc'}">${sessao.visivel_jogadores ? 'Visível aos jogadores' : 'Privada'}</span>
+                        <button type="button" class="btn-dash-cancel" data-sessao-gurps-edit="${sessao.id}" title="Editar sessão">Editar</button>
+                        <button type="button" class="btn-dash-delete-div" data-sessao-gurps-delete="${sessao.id}" title="Excluir sessão">✕</button>
+                    </div>
+                </div>
+                <div class="dash-divcustom-card-meta">
+                    <span><b>Registrada:</b> ${formatarDataSessaoGurps(sessao.created_at)}</span>
+                </div>
+                <p class="dash-divcustom-card-desc">${escapeHtml(sessao.resumo || '')}</p>
+            </div>
+        `).join('');
+
+        lista.querySelectorAll('[data-sessao-gurps-delete]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const id = Number(btn.getAttribute('data-sessao-gurps-delete'));
+                if (!Number.isFinite(id) || !confirm('Excluir este registro de sessão?')) return;
+                try {
+                    await cs.deletarSessao(id);
+                    Toast.success('Sessão removida.');
+                    await carregarSessoesMestreGurps();
+                } catch (e) {
+                    Toast.error(e.message || 'Erro ao excluir');
+                }
+            });
+        });
+        lista.querySelectorAll('[data-sessao-gurps-edit]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const id = Number(btn.getAttribute('data-sessao-gurps-edit'));
+                if (!Number.isFinite(id)) return;
+                const sessao = sessoesCampanhaCache.find((s) => s.id === id);
+                if (!sessao) return;
+                preencherFormSessaoGurps(sessao);
+            });
+        });
+    }
+
+    async function carregarResumosJogadorGurps() {
+        const lista = document.getElementById('listaSessoesJogadorGurps');
+        if (!lista) return;
+        lista.innerHTML = '<p class="dash-divcustom-vazio">Carregando…</p>';
+        try {
+            const rows = await cs.listarSessoesVisiveis();
+            const arr = Array.isArray(rows) ? rows : [];
+            if (!arr.length) {
+                lista.innerHTML = '<p class="dash-divcustom-vazio">Nenhum resumo disponível. Peça ao mestre para vincular sua ficha e marcar a sessão como visível.</p>';
+                return;
+            }
+            lista.innerHTML = arr.map((sessao) => `
+                <div class="dash-divcustom-card">
+                    <div class="dash-divcustom-card-head">
+                        <strong>${escapeHtml(sessao.campanha_nome || 'Campanha')}</strong>
+                        <span class="badge badge-jogador">Leitura</span>
+                    </div>
+                    <div class="dash-divcustom-card-meta">
+                        <span><b>Registrada:</b> ${formatarDataSessaoGurps(sessao.created_at)}</span>
+                    </div>
+                    <p class="dash-divcustom-card-desc">${escapeHtml(sessao.resumo || '')}</p>
+                </div>
+            `).join('');
+        } catch (e) {
+            lista.innerHTML = `<p class="dash-divcustom-vazio">${escapeHtml(e.message || 'Erro ao carregar')}</p>`;
+        }
+    }
+
+    async function carregarAbaCampanhas() {
+        const lista = document.getElementById('listaCampanhas');
+        if (lista) lista.innerHTML = '<p class="dash-divcustom-vazio">Carregando campanhas…</p>';
+        try {
+            const tiposOk = new Set(['jogador', 'monstro', 'npc']);
+            const [campanhas, todosPers] = await Promise.all([
+                cs.listar(),
+                ps.listar({ meus: false, limit: 500 }),
+            ]);
+            campanhasCache = Array.isArray(campanhas) ? campanhas : [];
+            personagensDisponiveisCampanha = (Array.isArray(todosPers) ? todosPers : []).filter((p) =>
+                tiposOk.has(String(p.tipo || '').toLowerCase())
+            );
+            renderizarChecklistPersonagensCampanha();
+            renderizarListaCampanhas();
+            if (gurpsCampanhasSubabaAtiva() === 'sessoes') {
+                atualizarSelectCampanhasSessaoGurps();
+                await carregarSessoesMestreGurps();
+            }
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao carregar campanhas');
+            if (lista) lista.innerHTML = `<p class="dash-divcustom-vazio">${escapeHtml(e.message || 'Erro')}</p>`;
+        }
+    }
+
+    function configurarUiCampanhasMestre() {
+        configurarSubAbasCampanhasGurps();
+        const busca = document.getElementById('campanhaPersonagensBusca');
+        const filtros = document.getElementById('campanhaPersonagensTipoFiltros');
+        const form = document.getElementById('formCampanha');
+        if (busca) {
+            busca.addEventListener('input', () => renderizarChecklistPersonagensCampanha());
+        }
+        if (filtros) {
+            filtros.querySelectorAll('[data-campanha-tipo]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    filtros.querySelectorAll('[data-campanha-tipo]').forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filtroTipoParticipanteCampanha = btn.getAttribute('data-campanha-tipo') || 'todos';
+                    renderizarChecklistPersonagensCampanha();
+                });
+            });
+        }
+        document.getElementById('btnCancelarEdicaoCampanha')?.addEventListener('click', () => resetFormCampanha());
+        if (form) {
+            form.addEventListener('submit', async (ev) => {
+                ev.preventDefault();
+                const nome = (document.getElementById('campanhaNome')?.value || '').trim();
+                const descricao = (document.getElementById('campanhaDescricao')?.value || '').trim();
+                const personagemIds = coletarPersonagensCampanhaSelecionados();
+                if (!nome) {
+                    Toast.error('Informe o nome da campanha.');
+                    return;
+                }
+                try {
+                    if (campanhaEmEdicaoId) {
+                        await cs.atualizar(campanhaEmEdicaoId, {
+                            nome,
+                            descricao,
+                            personagem_ids: personagemIds,
+                        });
+                        Toast.success('Campanha atualizada.');
+                    } else {
+                        await cs.criar({
+                            nome,
+                            descricao,
+                            personagem_ids: personagemIds,
+                        });
+                        Toast.success('Campanha criada.');
+                    }
+                    resetFormCampanha();
+                    await carregarAbaCampanhas();
+                    await loadPersonagens();
+                } catch (e) {
+                    Toast.error(e.message || 'Erro ao salvar campanha');
+                }
+            });
+        }
+
+        const formSess = document.getElementById('formSessaoCampanhaGurps');
+        document.getElementById('btnCancelarEdicaoSessaoGurps')?.addEventListener('click', () => resetFormSessaoGurps());
+        if (formSess) {
+            formSess.addEventListener('submit', async (ev) => {
+                ev.preventDefault();
+                const campanhaId = Number(document.getElementById('sessaoCampanhaIdGurps')?.value || 0);
+                const resumo = String(document.getElementById('sessaoResumoGurps')?.value || '').trim();
+                const visivel = Boolean(document.getElementById('sessaoVisivelJogadoresGurps')?.checked);
+                if (!Number.isFinite(campanhaId) || campanhaId <= 0) {
+                    Toast.error('Selecione uma campanha.');
+                    return;
+                }
+                if (!resumo) {
+                    Toast.error('Informe o resumo da sessão.');
+                    return;
+                }
+                try {
+                    if (sessaoEmEdicaoIdGurps) {
+                        await cs.atualizarSessao(sessaoEmEdicaoIdGurps, {
+                            resumo,
+                            visivel_jogadores: visivel,
+                        });
+                        Toast.success('Sessão atualizada.');
+                    } else {
+                        await cs.criarSessao({
+                            campanha_id: campanhaId,
+                            resumo,
+                            visivel_jogadores: visivel,
+                        });
+                        Toast.success('Sessão registrada.');
+                    }
+                    resetFormSessaoGurps();
+                    await carregarSessoesMestreGurps();
+                } catch (e) {
+                    Toast.error(e.message || 'Erro ao salvar sessão');
+                }
+            });
+        }
+    }
 
     document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout && AuthService.logout());
     AuthService.configurarHeaderUsuario();
 
     if (isMestre) {
         document.getElementById('campanhasMestre').hidden = false;
+        configurarUiCampanhasMestre();
     } else {
         document.getElementById('campanhasJogador').hidden = false;
     }

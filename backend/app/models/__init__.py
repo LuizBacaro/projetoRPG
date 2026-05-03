@@ -26,6 +26,7 @@ from app.games.dnd35.models.campanha import Campanha
 from app.games.dnd35.models.sessao_campanha import SessaoCampanha
 from app.shared.models.game import Game, UserGameMembership
 from app.games.gurps.models.campanha import GurpsCampanha
+from app.games.gurps.models.sessao_campanha import GurpsSessaoCampanha
 from app.games.gurps.models.combate import GurpsCombate
 from app.games.gurps.models.personagem import (
     GurpsPersonagem,
@@ -67,6 +68,7 @@ __all__ = [
     "Game",
     "UserGameMembership",
     "GurpsCampanha",
+    "GurpsSessaoCampanha",
     "GurpsCombate",
     "GurpsPersonagem",
     "GurpsPersonagemVantagem",
