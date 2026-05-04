@@ -1,0 +1,2388 @@
+{
+  "meta": {
+    "fonte_pdf": "GURPS 4E - Módulo Básico - Personagens.pdf",
+    "paginas_vantagens": [
+      40,
+      117
+    ],
+    "paginas_desvantagens": [
+      122,
+      161
+    ],
+    "paginas_pericias": [
+      175,
+      228
+    ],
+    "nota": "Extração heurística (pdftotext) + curadoria automática (símbolos de rodapé, OCR pontual, dedupe)."
+  },
+  "vantagens": [
+    {
+      "nome": "Apagado",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Apetrechos",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Ataque Adicional V",
+      "custo_texto": "25 pontos/nível"
+    },
+    {
+      "nome": "Ataque Constritivo",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Ataque Inato",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Atirador",
+      "custo_texto": "25 pontos"
+    },
+    {
+      "nome": "Atribulação",
+      "custo_texto": "10 pontos/nível"
+    },
+    {
+      "nome": "Audição Discriminatória",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Audição Parabólica",
+      "custo_texto": "4 pontos/nível"
+    },
+    {
+      "nome": "Audição Subsônica",
+      "custo_texto": "0 ou 5 pontos"
+    },
+    {
+      "nome": "Boa Forma",
+      "custo_texto": "5 ou 15 pontos"
+    },
+    {
+      "nome": "Boca Adicional",
+      "custo_texto": "5 pontos/boca"
+    },
+    {
+      "nome": "Bom Senso",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Braços Adicionais",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Cabeça Adicional",
+      "custo_texto": "15 pontos/cabeça"
+    },
+    {
+      "nome": "Cálculos Instantâneos",
+      "custo_texto": "2 ou 5 pontos"
+    },
+    {
+      "nome": "Camaleão",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Caminhar no Ar",
+      "custo_texto": "20 pontos"
+    },
+    {
+      "nome": "Carisma",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Cibernética",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Clarisenciência",
+      "custo_texto": "50 pontos"
+    },
+    {
+      "nome": "Consumo Reduzido",
+      "custo_texto": "2 pontos/nível"
+    },
+    {
+      "nome": "Clericato",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Contatos",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Controle da Mente",
+      "custo_texto": "50 pontos"
+    },
+    {
+      "nome": "Controle do Metabolismo",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Controle Térmico",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Crescimento",
+      "custo_texto": "10 pontos/nível"
+    },
+    {
+      "nome": "Defesas Ampliadas",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Desenvolvedor",
+      "custo_texto": "25 ou 50 pontos"
+    },
+    {
+      "nome": "Deslocamento Ampliado",
+      "custo_texto": "20 pontos/nível"
+    },
+    {
+      "nome": "Destemor",
+      "custo_texto": "2 pontos/nível"
+    },
+    {
+      "nome": "Destino",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Elevada",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Detectar",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Difícil de Subjugar",
+      "custo_texto": "2 pontos/nível"
+    },
+    {
+      "nome": "Digestão Universal",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Dobra",
+      "custo_texto": "100 pontos"
+    },
+    {
+      "nome": "Dominação",
+      "custo_texto": "20 pontos"
+    },
+    {
+      "nome": "Duplicação",
+      "custo_texto": "35 pontos/cópia"
+    },
+    {
+      "nome": "Durabilidade Sobrenatural",
+      "custo_texto": "150 pontos"
+    },
+    {
+      "nome": "Duro de Matar",
+      "custo_texto": "2 pontos/nível"
+    },
+    {
+      "nome": "Elo Mental",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Empatia com Espíritos",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Empatia com Plantas",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Encolhimento",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Equilíbrio Perfeito",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Característico",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Escavação",
+      "custo_texto": "30 pontos + 5 pontos/ponto de"
+    },
+    {
+      "nome": "Escorregadio",
+      "custo_texto": "2 pontos/nível"
+    },
+    {
+      "nome": "Espinhos",
+      "custo_texto": "1 ou 3 pontos"
+    },
+    {
+      "nome": "Estática Psíquica §",
+      "custo_texto": "30 pontos"
+    },
+    {
+      "nome": "Fala Subaquática",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Fala Ultrassônica",
+      "custo_texto": "0 ou 10 pontos"
+    },
+    {
+      "nome": "Falar com Plantas",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Favor r",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Flexibilidade",
+      "custo_texto": "5 ou 15 pontos"
+    },
+    {
+      "nome": "Forma de Sombras",
+      "custo_texto": "50 pontos"
+    },
+    {
+      "nome": "Flexibilidade: O personagem recebe",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Garras",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Contato",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Hermafromorfo",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Idade Imutável",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Inércia Temporal",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Insubstancialidade",
+      "custo_texto": "80 pontos"
+    },
+    {
+      "nome": "Interposição",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Intuição",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Investidura de Poder",
+      "custo_texto": "10 pontos/nível"
+    },
+    {
+      "nome": "Invisibilidade",
+      "custo_texto": "40 pontos"
+    },
+    {
+      "nome": "Lacrado",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Língua Ferina i",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Longevidade SP",
+      "custo_texto": "2 pontos"
+    },
+    {
+      "nome": "Memória Fotográfica",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Mente Digital",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Metamorfose",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Forma Alternativa",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Morfose",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Mordida de Vampiro",
+      "custo_texto": "30 pontos + 5 pontos/PV"
+    },
+    {
+      "nome": "Noção do Perigo §",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Ampliada M",
+      "custo_texto": "45 pontos"
+    },
+    {
+      "nome": "Obscurecer",
+      "custo_texto": "2 pontos/nível"
+    },
+    {
+      "nome": "Olfato Discriminatório",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Oráculo",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Alterado M",
+      "custo_texto": "100 pontos/nível"
+    },
+    {
+      "nome": "Paladar Discriminatório",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Patronos",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Pele Elástica (&",
+      "custo_texto": "20 pontos"
+    },
+    {
+      "nome": "Pendulear",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Permissão de Segurança",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Pernas Adicionais",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Possessão M",
+      "custo_texto": "100 pontos"
+    },
+    {
+      "nome": "Precognição",
+      "custo_texto": "25 pontos"
+    },
+    {
+      "nome": "Propósito Maior §",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Psicometria",
+      "custo_texto": "20 pontos"
+    },
+    {
+      "nome": "Pulmões com Filtro",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Queda de Gato",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Rastreamento Ampliado",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Reconhecimento Social",
+      "custo_texto": "5 pontos/+l de reação"
+    },
+    {
+      "nome": "Consciência",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Regeneração",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Resistência a Dano",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "(ex., uma RD 10 tem uma bateria de",
+      "custo_texto": "10 pontos). Depois que essa bateria es­"
+    },
+    {
+      "nome": "Resistente SP",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Restaurar Membros",
+      "custo_texto": "40 pontos"
+    },
+    {
+      "nome": "Retenção",
+      "custo_texto": "2 pontos/nível"
+    },
+    {
+      "nome": "Saltador §",
+      "custo_texto": "100 pontos"
+    },
+    {
+      "nome": "Senso de Direção",
+      "custo_texto": "5 ou 10 pontos"
+    },
+    {
+      "nome": "Monitoramento VQ",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Sentido de Vibração",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Sentido Protegido",
+      "custo_texto": "5 pontos/sentido"
+    },
+    {
+      "nome": "Sentidos Aguçados V",
+      "custo_texto": "2 pontos/nível"
+    },
+    {
+      "nome": "Silêncio",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Sonda Mental M",
+      "custo_texto": "20 pontos"
+    },
+    {
+      "nome": "Super Escalada",
+      "custo_texto": "3 pontos/nível"
+    },
+    {
+      "nome": "Super Salto",
+      "custo_texto": "10 pontos/nível"
+    },
+    {
+      "nome": "V antagens",
+      "custo_texto": "0 ou 5 pontos"
+    },
+    {
+      "nome": "Talento",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Telecinese",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Telecomunicação",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Aliados relacionados como Títeres por",
+      "custo_texto": "10 pontos. Esses custos se aplicam ape­"
+    },
+    {
+      "nome": "Tolerância a Ferimentos",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Tolerância à Radiação",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Custo",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Ultravisão",
+      "custo_texto": "0 ou 10 pontos"
+    },
+    {
+      "nome": "Ver o Invisível",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Versátil",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Vida Extra M",
+      "custo_texto": "25 pontos/vida"
+    },
+    {
+      "nome": "Vínculo Especial",
+      "custo_texto": "5 pontos"
+    },
+    {
+      "nome": "Visão 360 Graus SPt",
+      "custo_texto": "25 pontos"
+    },
+    {
+      "nome": "Visão Telescópica",
+      "custo_texto": "5 pontos/nível"
+    },
+    {
+      "nome": "Visão Penetrante",
+      "custo_texto": "10 pontos/nível"
+    },
+    {
+      "nome": "Visão Periférica V",
+      "custo_texto": "15 pontos"
+    },
+    {
+      "nome": "Visualização",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Voo",
+      "custo_texto": "40 pontos"
+    },
+    {
+      "nome": "Voz Melodiosa §",
+      "custo_texto": "10 pontos"
+    },
+    {
+      "nome": "Acompanhamento",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Base Sensorial",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Cíclico",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Cone",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Cósmica",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Efeito Colateral",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Fogo Contínuo",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Guiado ou Teleguiado",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Imprecação",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Perigo",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Prazo Estendido",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Acesso",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Ataque Corpo a Corpo",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Atraso",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Bombardeio",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Custa Fadiga",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Desvantagem Temporária",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Tempo Alterado em 24 pontos (para",
+      "custo_texto": "76 pontos), não em 30 pontos (para"
+    },
+    {
+      "nome": "Efeito Incômodo",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Inconstante",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Mitigador",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Pacto",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Requer Preparo",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Requer Recarga",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Resistível",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Sempre Ativa",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Uso Limitado",
+      "custo_texto": "Variável"
+    }
+  ],
+  "desvantagens": [
+    {
+      "nome": "Altruísmo",
+      "custo_texto": "-5 pontos *"
+    },
+    {
+      "nome": "Assustar Animais",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Autodestruição",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Avareza",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Aversão 9",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Barulhento",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Bioquímica Incomum",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Briguento fl",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Sobrenaturais",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Cegueira V",
+      "custo_texto": "-50 pontos"
+    },
+    {
+      "nome": "Cegueira Noturna V",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Complexo de Culpa",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Confuso",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Consumo Ampliado V",
+      "custo_texto": "-10 pontos/nível"
+    },
+    {
+      "nome": "Pós-Combate",
+      "custo_texto": "-5 pontos*"
+    },
+    {
+      "nome": "Corcunda",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Covardia",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Credulidade",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Curiosidade",
+      "custo_texto": "-5 pontos*"
+    },
+    {
+      "nome": "Daltonismo",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Dependência",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Dependentes r",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Depressão Crônica",
+      "custo_texto": "-15 pontos*"
+    },
+    {
+      "nome": "Desatento",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Personalidade",
+      "custo_texto": "-15 pontos*"
+    },
+    {
+      "nome": "Destino",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Dislexia",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Disopia",
+      "custo_texto": "-25 pontos"
+    },
+    {
+      "nome": "Disosmia V",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Distração §",
+      "custo_texto": "-15 pontos"
+    },
+    {
+      "nome": "Distúrbio Neurológico V",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Doença Contagiosa V",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Dor Crônica V",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Dorminhoco",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Rara (ex.: uma poção especial):",
+      "custo_texto": "-15 pontos."
+    },
+    {
+      "nome": "Duro de Ouvido",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Elétrico",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Enjoo SP",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Enjoo Temporal",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Entorpecido SP",
+      "custo_texto": "-20 pontos"
+    },
+    {
+      "nome": "Epilepsia SP",
+      "custo_texto": "-30 pontos"
+    },
+    {
+      "nome": "Enjoo Espacial SP",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Vida Reduzida",
+      "custo_texto": "-10 pontos/nível"
+    },
+    {
+      "nome": "Fanatismo §",
+      "custo_texto": "-15 pontos"
+    },
+    {
+      "nome": "Ferido",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Flashbacks",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Fobias",
+      "custo_texto": "Variável\"'"
+    },
+    {
+      "nome": "Forma de Sombras",
+      "custo_texto": "-20 pontos"
+    },
+    {
+      "nome": "Fragilidade",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Gagueira",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Gula",
+      "custo_texto": "-5 pontos*"
+    },
+    {
+      "nome": "Hemofilia V",
+      "custo_texto": "-30 pontos"
+    },
+    {
+      "nome": "Honestidade",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Horizontal Sff",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Identidade Secreta",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Impulsividade",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Incapaz de Aprender",
+      "custo_texto": "-30 pontos"
+    },
+    {
+      "nome": "Incapaz de Sentir Prazer Sr",
+      "custo_texto": "-15 pontos"
+    },
+    {
+      "nome": "Inimigos",
+      "custo_texto": "-5 pontos*"
+    },
+    {
+      "nome": "Indulgente",
+      "custo_texto": "-15 pontos*"
+    },
+    {
+      "nome": "Ingênuo",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Isso faz dele um Inimigo equilibrado de",
+      "custo_texto": "-10 pontos. Se ele for mais capacitado que"
+    },
+    {
+      "nome": "Inveja",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Invertebrado",
+      "custo_texto": "-20 pontos"
+    },
+    {
+      "nome": "Irritabilidade",
+      "custo_texto": "-10 pontos*"
+    },
+    {
+      "nome": "Lunático",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Sobrenatural",
+      "custo_texto": "-15 pontos"
+    },
+    {
+      "nome": "Maneta (Um Braço)",
+      "custo_texto": "-20 pontos"
+    },
+    {
+      "nome": "Maldição Divina",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "“Você nunca mais dormirá à noite”,",
+      "custo_texto": "-10 pontos), um acontecimento trági­"
+    },
+    {
+      "nome": "Maneta (Uma Mão)",
+      "custo_texto": "-15 pontos"
+    },
+    {
+      "nome": "Maníaco-Depressivo",
+      "custo_texto": "-20 pontos"
+    },
+    {
+      "nome": "Manutenção",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Mão Fraca",
+      "custo_texto": "-5 pontos/nível"
+    },
+    {
+      "nome": "Mau Cheiro V",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "D esv antag ens",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Mordida Fraca SPt",
+      "custo_texto": "-2 pontos"
+    },
+    {
+      "nome": "Noturno",
+      "custo_texto": "-20 pontos"
+    },
+    {
+      "nome": "Reduzido",
+      "custo_texto": "-100 pontos"
+    },
+    {
+      "nome": "Pesadelos §",
+      "custo_texto": "-5 pontos*"
+    },
+    {
+      "nome": "Piromania",
+      "custo_texto": "-5 pontos*"
+    },
+    {
+      "nome": "Pouca Empatia",
+      "custo_texto": "-20 pontos"
+    },
+    {
+      "nome": "Refeição Demorada",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Reprogramável M",
+      "custo_texto": "-10 pontos"
+    },
+    {
+      "nome": "Muito Comum (grama, metal):",
+      "custo_texto": "-15 pontos."
+    },
+    {
+      "nome": "Sadismo",
+      "custo_texto": "-15 pontos*"
+    },
+    {
+      "nome": "Sanguinolência",
+      "custo_texto": "-10 pontos\"'"
+    },
+    {
+      "nome": "Profundidade V",
+      "custo_texto": "-15 pontos"
+    },
+    {
+      "nome": "Sem Pernas",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Semiereto",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Sono Complementar V",
+      "custo_texto": "-5 pontos*"
+    },
+    {
+      "nome": "Sono Leve SP",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Sonolento SPG",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Supersensitivo",
+      "custo_texto": "-15 pontos"
+    },
+    {
+      "nome": "Ampliado",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Surdez",
+      "custo_texto": "-20 pontos"
+    },
+    {
+      "nome": "Suscetível",
+      "custo_texto": "Variável"
+    },
+    {
+      "nome": "Muito Comum (ex.: Doença, Veneno):",
+      "custo_texto": "-4 pontos/redutor de -1 nos testes de HT."
+    },
+    {
+      "nome": "Tetraplégico V",
+      "custo_texto": "-80 pontos"
+    },
+    {
+      "nome": "Único",
+      "custo_texto": "-5 pontos"
+    },
+    {
+      "nome": "Veracidade §",
+      "custo_texto": "-5 pontos*"
+    },
+    {
+      "nome": "Viciado em Trabalho",
+      "custo_texto": "-5 pontos"
+    }
+  ],
+  "pericias": [
+    {
+      "nome": "Acrobacia",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Adivinhação",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Administração",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Alquimia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
+      "nome": "Alvenaria",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Análise da Informação/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Análise de Mercado",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Aparar Armas de Projétil",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Arco",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Arma de Arremessof",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Armadilhas/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Armas de Feixe/NTf",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Armas de Fogo/NTf",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Arqueiro Zen",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Arqueologia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "ArmeiroíNTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Arquitetura/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Apetrechos",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Arremessador de Lança",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Arremesso",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Arrombamento/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Arte da Invisibilidade",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Arte do Arremesso",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Arte Erótica",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Artilharia/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Artista",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Assuntos Atuais/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Astronomia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Ataque Inato",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Atuação",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Auto-Hipnose",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Besta",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Bioengenbaria/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Biologia/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
+      "nome": "Bloqueio Mental",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Boémia",
+      "atributo_base": "ht",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Boleadeira",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Boxe",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Caminhada",
+      "atributo_base": "ht",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Camuflagem",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Canhoneiro/NTf",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Capa",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Captação",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Canto",
+      "atributo_base": "ht",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Carpintaria",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Carregamento",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Carroceirof",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Cartografia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Cavalgarf",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Ciclismo",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Ciência Estranha",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Cirurgia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
+      "nome": "Comércio",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Composição Musical",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Condução/NTf",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Conhecimento do Terrenof",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Conhecimento Oculto",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Connoisseurf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Eletrônico/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Contrabando",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Contabilidade",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Controle da Respiração",
+      "atributo_base": "ht",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Involuntárias",
+      "atributo_base": "ht",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Carregamen to/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Corrida",
+      "atributo_base": "ht",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Costura/NT",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Criminologia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Crip tografia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Cultivo/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Dança",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Culinária",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Desenho de Símbolosf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Deslumbrar",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Cativar",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Despertar Emoção",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Persuadir",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Sugerir",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "P e r íc ia s",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Detecção de Mentiras",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Diagnose/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Digitação",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Diplomacia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "DisfarceíNTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Dissimulação",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Economia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "EletricistaíNT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Encenação de Combate",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "EngenhariaíNTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Engolidor de Fogo",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Entrada Forçada",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Escalada",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Escrita",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Escudo",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Esportes",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Esqui",
+      "atributo_base": "ht",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Estratégiaf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Exorcismo",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Explosivos/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Falcoaria",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Falsificação/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Falsificação de Dinheiro/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Farmãcia/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Filosofiaf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Finanças",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Ferreiro/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Física/NT",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
+      "nome": "Fisiologia/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Força Mental",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Fotografia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Fuga",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Funda",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Furtividade",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Garrote",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "GeografíaíNTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Geologia/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Golpe Debilitante",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Golpe Poderoso",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Computador/NT",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
+      "nome": "Heráldica",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Hipnotismo",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Históriaf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Influência Musical",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Instrumentos Musicaisf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Interrogatório",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Intimidação",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Jardinagem",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Joalheiro/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Jogos de Azar",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Jogos de Entretenimentof",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Judô",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Jurisprudência",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Kiai",
+      "atributo_base": "ht",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Lábia",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Lança de Justa",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Lavagem Cerebral/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Leitura Dinâmica",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Levantamento",
+      "atributo_base": "ht",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Liderança",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Linguística",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Literatura",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Luta Greco-Romana",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Magia Ritualísticaf",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Manejo de Barcos/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Maquinista/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Manha",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Marinhagem/NT",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Materiais Perigosos/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Matemática/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "MecânicaíNTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Medicina/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Meditação",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Mendicância",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Medicina Alternativa",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Mergulho/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Metalurgia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Meteorologia/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Mímica/Pantomima",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Montaria",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Natação",
+      "atributo_base": "ht",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Naturalistaf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Navegação/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Observação",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Observador Avançado",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Ocultismo",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Eletrônicos/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Computadores/NT",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Oratória",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Paleontologia/NTf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Paraquedismo/NT",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Patinação",
+      "atributo_base": "ht",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Pedagogia",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Passos Leves",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Percepção do Corpo",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Performance em Grupo",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Perícia Abrangentef",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Barman",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Perseguição",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Pilotagem/NTf",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Pescaria",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Pesquisa/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Poesia",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Política",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Pontos de Pressão",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Pontos Secretos",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Postura Imóvel",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Prestidigitação",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Primeiros Socorros/NT",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "LíquidosíNTf",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Propaganda/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Prospecção/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Psicologia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Quimica/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Pré-definido: D X-6, Surrupiar-5 ou",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Queda Livre",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Revistar",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Rede",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Remo/Vela/NTf",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Ritual Religioso",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Sacar Rápido",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Sobrevivênciaf",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Sobrevivência Urbana",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Sociologia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "SoldadoíNT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Soltar",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Sonhos",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Submarino/NTf",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Sumo",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Surrupiar",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Tática",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Teologiaf",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Trabalhos em Couro",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Trato Socialf",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Especial/NT",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Ventriloquismo",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Veterinária/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Voo",
+      "atributo_base": "ht",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "VenefícioíNT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Zarabatana",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    }
+  ]
+}

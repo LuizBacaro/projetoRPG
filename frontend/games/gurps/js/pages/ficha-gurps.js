@@ -266,8 +266,70 @@
     function tipoFromCatalogSkill(s) {
         if (!s) return '';
         const b = String(s.atributo_base || '').toUpperCase();
-        const d = s.dificuldade === 'F' ? 'F' : s.dificuldade === 'D' ? 'D' : 'M';
+        const dRaw = String(s.dificuldade || 'M');
+        const d = dRaw === 'F' ? 'F' : dRaw === 'D' || dRaw === 'VD' ? 'D' : 'M';
         return `${b}/${d}`;
+    }
+
+    function parseTipoPericia(tipoRaw) {
+        const raw = String(tipoRaw || '').trim().toUpperCase();
+        if (!raw) return null;
+        const [attrRaw, difRaw] = raw.split('/').map((x) => String(x || '').trim());
+        const attrMap = { ST: 'st', DX: 'dx', IQ: 'iq', HT: 'ht', PER: 'per', VON: 'will' };
+        const attrKey = attrMap[attrRaw];
+        if (!attrKey) return null;
+        const dif = difRaw === 'F' || difRaw === 'D' || difRaw === 'VD' ? 'D' : 'M';
+        return { attrKey, dif };
+    }
+
+    function valorAtributoParaPericia(attrKey) {
+        if (attrKey === 'st') return Math.trunc(num('#fg_st_valor', 10));
+        if (attrKey === 'dx') return Math.trunc(num('#fg_dx_valor', 10));
+        if (attrKey === 'iq') return Math.trunc(num('#fg_iq_valor', 10));
+        if (attrKey === 'ht') return Math.trunc(num('#fg_ht_valor', 10));
+        if (attrKey === 'per') return Math.trunc(num('#fg_per_valor', 10));
+        if (attrKey === 'will') return Math.trunc(num('#fg_will_valor', 10));
+        return 10;
+    }
+
+    function custoPericiaPorNh(attr, dif, nh) {
+        if (!Number.isFinite(attr) || !Number.isFinite(nh)) return 0;
+        const rel = nh - attr;
+        // GURPS 4e: progressão por dificuldade.
+        const mapM = new Map([[-1, 1], [0, 2], [1, 4]]);
+        const mapD = new Map([[-2, 1], [-1, 2], [0, 4], [1, 8]]);
+        const map = dif === 'D' ? mapD : mapM;
+        if (map.has(rel)) return map.get(rel);
+        const minRel = dif === 'D' ? -2 : -1;
+        if (rel < minRel) return 0;
+        const baseCost = dif === 'D' ? 8 : 4;
+        const extraSteps = rel - 1;
+        return baseCost + Math.max(0, extraSteps) * 4;
+    }
+
+    function recalcularCustoLinhaPericia(row) {
+        if (!row) return;
+        const tipoInp = row.querySelector('.fg-per-tipo');
+        const nhInp = row.querySelector('.fg-per-nh');
+        const custoInp = row.querySelector('.fg-per-custo');
+        if (!tipoInp || !nhInp || !custoInp) return;
+        const info = parseTipoPericia(tipoInp.value);
+        const nh = Number(nhInp.value || 0);
+        if (!info || !Number.isFinite(nh)) {
+            tipoInp.classList.add('is-invalid');
+            tipoInp.title = 'Use formato como DX/M, IQ/D, HT/M, ST/D, PER/M ou VON/M';
+            custoInp.value = '0';
+            return;
+        }
+        tipoInp.classList.remove('is-invalid');
+        tipoInp.removeAttribute('title');
+        const attr = valorAtributoParaPericia(info.attrKey);
+        custoInp.value = String(custoPericiaPorNh(attr, info.dif, Math.trunc(nh)));
+    }
+
+    function recalcularCustosPericiasVisiveis() {
+        document.querySelectorAll('.fg-row-per').forEach(recalcularCustoLinhaPericia);
+        atualizarResumoPontosListas();
     }
 
     async function popularDatalistsLite() {
@@ -292,20 +354,182 @@
         }
     }
 
+    function applyCatalogCostToInput(custoInp, item) {
+        if (!custoInp || !item) return;
+        if (item.custo != null && item.custo !== '') {
+            custoInp.value = String(item.custo);
+            return;
+        }
+        if (item.custo_texto) {
+            const m = String(item.custo_texto).match(/-?\d+/);
+            if (m) custoInp.value = m[0];
+        }
+    }
+
+    function normText(v) {
+        return String(v || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase();
+    }
+
+    function findCatalogItemSmart(list, typedName) {
+        if (!Array.isArray(list) || !typedName) return null;
+        const q = normText(typedName);
+        if (!q) return null;
+        const exact = list.find((x) => normText(x?.nome) === q);
+        if (exact) return exact;
+        const starts = list.filter((x) => normText(x?.nome).startsWith(q));
+        if (starts.length === 1) return starts[0];
+        return null;
+    }
+
+    const autoState = {
+        root: null,
+        input: null,
+        items: [],
+        active: -1,
+    };
+
+    function ensureAutocompleteRoot() {
+        if (autoState.root) return autoState.root;
+        const root = document.createElement('div');
+        root.className = 'fg-autocomplete';
+        root.hidden = true;
+        document.body.appendChild(root);
+        autoState.root = root;
+        return root;
+    }
+
+    function hideAutocomplete() {
+        const root = ensureAutocompleteRoot();
+        root.hidden = true;
+        root.innerHTML = '';
+        autoState.input = null;
+        autoState.items = [];
+        autoState.active = -1;
+    }
+
+    function getAutocompleteSource(input) {
+        const cat = window.__gurpsLiteCatalogo;
+        if (!cat || !input) return [];
+        if (input.classList.contains('fg-per-nome')) return cat.pericias || [];
+        if (input.classList.contains('fg-vant-nome')) return cat.vantagens || [];
+        if (input.classList.contains('fg-desv-nome')) return cat.desvantagens || [];
+        return [];
+    }
+
+    function getAutocompleteMatches(input) {
+        const q = normText(input?.value);
+        if (!q) return [];
+        const src = getAutocompleteSource(input);
+        return src
+            .map((it) => ({ item: it, key: normText(it?.nome) }))
+            .filter((x) => x.key.includes(q))
+            .sort((a, b) => {
+                const ap = xStarts(a.key, q) ? 0 : 1;
+                const bp = xStarts(b.key, q) ? 0 : 1;
+                if (ap !== bp) return ap - bp;
+                return a.item.nome.localeCompare(b.item.nome, 'pt-BR');
+            })
+            .slice(0, 8)
+            .map((x) => x.item);
+    }
+
+    function xStarts(x, q) {
+        return String(x || '').startsWith(String(q || ''));
+    }
+
+    function positionAutocomplete(input) {
+        const root = ensureAutocompleteRoot();
+        const rect = input.getBoundingClientRect();
+        root.style.left = `${window.scrollX + rect.left}px`;
+        root.style.top = `${window.scrollY + rect.bottom + 2}px`;
+        root.style.width = `${rect.width}px`;
+    }
+
+    function renderAutocomplete(input, items) {
+        const root = ensureAutocompleteRoot();
+        autoState.input = input;
+        autoState.items = items;
+        autoState.active = -1;
+        if (!items.length) {
+            hideAutocomplete();
+            return;
+        }
+        const metaLine = (it) => {
+            if (input.classList.contains('fg-per-nome')) {
+                return `Tipo ${tipoFromCatalogSkill(it)}`;
+            }
+            const custoLabel = it?.custo_texto || (it?.custo != null ? String(it.custo) : '—');
+            return `Custo ${custoLabel}`;
+        };
+        const escHtml = (s) => String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        const hiName = (name) => {
+            const q = String(input?.value || '').trim();
+            if (!q) return escHtml(name);
+            const idx = String(name || '').toLowerCase().indexOf(q.toLowerCase());
+            if (idx < 0) return escHtml(name);
+            const a = String(name).slice(0, idx);
+            const b = String(name).slice(idx, idx + q.length);
+            const c = String(name).slice(idx + q.length);
+            return `${escHtml(a)}<mark>${escHtml(b)}</mark>${escHtml(c)}`;
+        };
+        root.innerHTML = items
+            .map((it, i) => (
+                `<button type="button" class="fg-autocomplete-item" data-idx="${i}">` +
+                `<span class="fg-autocomplete-main">${hiName(it.nome)}</span>` +
+                `<span class="fg-autocomplete-meta">${metaLine(it)}</span>` +
+                `</button>`
+            ))
+            .join('');
+        positionAutocomplete(input);
+        root.hidden = false;
+    }
+
+    function applyAutocompleteSelection(input, itemName) {
+        if (!input || !itemName) return;
+        input.value = itemName;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        hideAutocomplete();
+    }
+
+    function moveAutocompleteActive(delta) {
+        if (!autoState.items.length || !autoState.root || autoState.root.hidden) return;
+        autoState.active += delta;
+        if (autoState.active < 0) autoState.active = autoState.items.length - 1;
+        if (autoState.active >= autoState.items.length) autoState.active = 0;
+        autoState.root.querySelectorAll('.fg-autocomplete-item').forEach((btn, i) => {
+            btn.classList.toggle('is-active', i === autoState.active);
+        });
+    }
+
     function wireCatalogRowVant(row) {
         const nome = row.querySelector('.fg-vant-nome');
         if (!nome || nome.dataset.gurpsCatBound) return;
         nome.dataset.gurpsCatBound = '1';
         nome.setAttribute('list', 'dlGurpsLiteVantagens');
-        nome.addEventListener('change', () => {
+        const fillCost = () => {
             const cat = window.__gurpsLiteCatalogo;
             if (!cat?.vantagens) return;
             const n = nome.value.trim();
-            const item = cat.vantagens.find((x) => x.nome === n);
-            if (!item || item.custo == null) return;
+            const item = findCatalogItemSmart(cat.vantagens, n);
+            if (!item) return;
             const custoInp = row.querySelector('.fg-vant-custo');
-            if (custoInp) custoInp.value = String(item.custo);
-        });
+            applyCatalogCostToInput(custoInp, item);
+            atualizarResumoPontosListas();
+        };
+        nome.addEventListener('change', fillCost);
+        nome.addEventListener('blur', fillCost);
+        nome.addEventListener('input', fillCost);
+        row.querySelector('.fg-vant-custo')?.addEventListener('input', atualizarResumoPontosListas);
     }
 
     function wireCatalogRowDesv(row) {
@@ -313,15 +537,20 @@
         if (!nome || nome.dataset.gurpsCatBound) return;
         nome.dataset.gurpsCatBound = '1';
         nome.setAttribute('list', 'dlGurpsLiteDesvantagens');
-        nome.addEventListener('change', () => {
+        const fillCost = () => {
             const cat = window.__gurpsLiteCatalogo;
             if (!cat?.desvantagens) return;
             const n = nome.value.trim();
-            const item = cat.desvantagens.find((x) => x.nome === n);
-            if (!item || item.custo == null) return;
+            const item = findCatalogItemSmart(cat.desvantagens, n);
+            if (!item) return;
             const custoInp = row.querySelector('.fg-desv-custo');
-            if (custoInp) custoInp.value = String(item.custo);
-        });
+            applyCatalogCostToInput(custoInp, item);
+            atualizarResumoPontosListas();
+        };
+        nome.addEventListener('change', fillCost);
+        nome.addEventListener('blur', fillCost);
+        nome.addEventListener('input', fillCost);
+        row.querySelector('.fg-desv-custo')?.addEventListener('input', atualizarResumoPontosListas);
     }
 
     function wireCatalogRowPer(row) {
@@ -329,14 +558,27 @@
         if (!nome || nome.dataset.gurpsCatBound) return;
         nome.dataset.gurpsCatBound = '1';
         nome.setAttribute('list', 'dlGurpsLitePericias');
-        nome.addEventListener('change', () => {
+        const fillType = () => {
             const cat = window.__gurpsLiteCatalogo;
             if (!cat?.pericias) return;
             const n = nome.value.trim();
-            const item = cat.pericias.find((x) => x.nome === n);
+            const item = findCatalogItemSmart(cat.pericias, n);
             if (!item) return;
             const tipoInp = row.querySelector('.fg-per-tipo');
             if (tipoInp) tipoInp.value = tipoFromCatalogSkill(item);
+            recalcularCustoLinhaPericia(row);
+            atualizarResumoPontosListas();
+        };
+        nome.addEventListener('change', fillType);
+        nome.addEventListener('blur', fillType);
+        nome.addEventListener('input', fillType);
+        row.querySelector('.fg-per-tipo')?.addEventListener('input', () => {
+            recalcularCustoLinhaPericia(row);
+            atualizarResumoPontosListas();
+        });
+        row.querySelector('.fg-per-nh')?.addEventListener('input', () => {
+            recalcularCustoLinhaPericia(row);
+            atualizarResumoPontosListas();
         });
     }
 
@@ -350,6 +592,30 @@
         const v = el('#fg_pt_total')?.value ?? '0';
         const m = el('#fg_xp_top_mirror');
         if (m) m.textContent = v;
+    }
+
+    function atualizarResumoPontosListas() {
+        const soma = (selector) => Array.from(document.querySelectorAll(selector))
+            .reduce((acc, inp) => {
+                const n = Number(inp.value || 0);
+                return acc + (Number.isFinite(n) ? n : 0);
+            }, 0);
+        const per = soma('.fg-per-custo');
+        const vant = soma('.fg-vant-custo');
+        const desv = soma('.fg-desv-custo');
+        const setValNum = (sel, value) => {
+            const inp = el(sel);
+            if (inp) inp.value = String(Math.trunc(value));
+        };
+        setValNum('#fg_pt_per', per);
+        setValNum('#fg_pt_vant', vant);
+        setValNum('#fg_pt_desv', desv);
+        const totalInp = el('#fg_pt_total');
+        if (totalInp) {
+            const attr = Number(el('#fg_pt_attr')?.value || 0) || 0;
+            totalInp.value = String(Math.trunc(attr + per + vant + desv));
+        }
+        syncXpMirror();
     }
 
     function buildExtrasPayload() {
@@ -574,9 +840,13 @@
             '<input class="fg-vant-nome" type="text" placeholder="Vantagem" />' +
             '<input class="fg-vant-custo" type="number" value="0" />' +
             '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button>';
-        d.querySelector('button').addEventListener('click', () => d.remove());
+        d.querySelector('button').addEventListener('click', () => {
+            d.remove();
+            atualizarResumoPontosListas();
+        });
         w.appendChild(d);
         wireCatalogRowVant(d);
+        atualizarResumoPontosListas();
     }
 
     function addRowDesv() {
@@ -588,9 +858,13 @@
             '<input class="fg-desv-nome" type="text" placeholder="Desvantagem" />' +
             '<input class="fg-desv-custo" type="number" value="0" />' +
             '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button>';
-        d.querySelector('button').addEventListener('click', () => d.remove());
+        d.querySelector('button').addEventListener('click', () => {
+            d.remove();
+            atualizarResumoPontosListas();
+        });
         w.appendChild(d);
         wireCatalogRowDesv(d);
+        atualizarResumoPontosListas();
     }
 
     function addRowPer() {
@@ -602,11 +876,16 @@
             '<td><input class="fg-per-nome" type="text" placeholder="Perícia" /></td>' +
             '<td><input class="fg-per-tipo" type="text" placeholder="DX/M" /></td>' +
             '<td><input class="fg-per-nh" type="number" value="10" /></td>' +
-            '<td><input class="fg-per-custo" type="number" value="0" /></td>' +
+            '<td><input class="fg-per-custo" type="number" value="0" readonly tabindex="-1" /></td>' +
             '<td><button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button></td>';
-        tr.querySelector('button').addEventListener('click', () => tr.remove());
+        tr.querySelector('button').addEventListener('click', () => {
+            tr.remove();
+            atualizarResumoPontosListas();
+        });
         tb.appendChild(tr);
         wireCatalogRowPer(tr);
+        recalcularCustoLinhaPericia(tr);
+        atualizarResumoPontosListas();
     }
 
     window.fgAddVant = addRowVant;
@@ -695,6 +974,8 @@
             }
         });
         rewireAllCatalogRows();
+        recalcularCustosPericiasVisiveis();
+        atualizarResumoPontosListas();
     }
 
     function preencherJogador() {
@@ -712,6 +993,7 @@
             addRowPer();
             carregarLocal();
             aplicarDerivadosGurpsLiteFicha();
+            atualizarResumoPontosListas();
             syncXpMirror();
             return;
         }
@@ -783,6 +1065,8 @@
         el('#fg_dx_valor')?.addEventListener('input', aplicarDerivadosGurpsLiteFicha);
         el('#fg_st_valor')?.addEventListener('input', onStValorInput);
         el('#fg_iq_valor')?.addEventListener('input', aplicarDerivadosGurpsLiteFicha);
+        ['#fg_st_valor', '#fg_dx_valor', '#fg_iq_valor', '#fg_ht_valor', '#fg_per_valor', '#fg_will_valor']
+            .forEach((sel) => el(sel)?.addEventListener('input', recalcularCustosPericiasVisiveis));
         ['#fg_hp_valor', '#fg_fp_valor', '#fg_will_valor', '#fg_per_valor'].forEach((sel) => {
             el(sel)?.addEventListener('input', aplicarDerivadosGurpsLiteFicha);
         });
@@ -812,5 +1096,74 @@
         document.querySelectorAll('.ficha-local-enc, .ficha-local-enc-d, .ficha-local-hit, .ficha-local-arma, #fg_aparencia_long, #fg_equipamento, #fg_escudo, #fg_criacao').forEach((elem) => {
             elem.addEventListener('change', salvarLocal);
         });
+
+        document.addEventListener('focusin', (ev) => {
+            const inp = ev.target;
+            if (!(inp instanceof HTMLInputElement)) return;
+            if (!inp.classList.contains('fg-per-nome') && !inp.classList.contains('fg-vant-nome') && !inp.classList.contains('fg-desv-nome')) {
+                hideAutocomplete();
+                return;
+            }
+            const matches = getAutocompleteMatches(inp);
+            renderAutocomplete(inp, matches);
+        });
+
+        document.addEventListener('input', (ev) => {
+            const inp = ev.target;
+            if (!(inp instanceof HTMLInputElement)) return;
+            if (!inp.classList.contains('fg-per-nome') && !inp.classList.contains('fg-vant-nome') && !inp.classList.contains('fg-desv-nome')) return;
+            const matches = getAutocompleteMatches(inp);
+            renderAutocomplete(inp, matches);
+        });
+
+        document.addEventListener('keydown', (ev) => {
+            const inp = ev.target;
+            if (!(inp instanceof HTMLInputElement)) return;
+            if (inp !== autoState.input) return;
+            if (autoState.root?.hidden) return;
+            if (ev.key === 'ArrowDown') {
+                ev.preventDefault();
+                moveAutocompleteActive(1);
+            } else if (ev.key === 'ArrowUp') {
+                ev.preventDefault();
+                moveAutocompleteActive(-1);
+            } else if (ev.key === 'Enter') {
+                if (autoState.active >= 0 && autoState.items[autoState.active]) {
+                    ev.preventDefault();
+                    applyAutocompleteSelection(inp, autoState.items[autoState.active].nome);
+                }
+            } else if (ev.key === 'Escape') {
+                hideAutocomplete();
+            }
+        });
+
+        document.addEventListener('mousedown', (ev) => {
+            const tgt = ev.target;
+            if (!(tgt instanceof HTMLElement)) return;
+            if (tgt.closest('.fg-autocomplete')) return;
+            if (tgt.classList.contains('fg-per-nome') || tgt.classList.contains('fg-vant-nome') || tgt.classList.contains('fg-desv-nome')) return;
+            hideAutocomplete();
+        });
+
+        document.addEventListener('click', (ev) => {
+            const btn = ev.target instanceof HTMLElement ? ev.target.closest('.fg-autocomplete-item') : null;
+            if (!btn || !(btn instanceof HTMLButtonElement)) return;
+            const idx = Number(btn.dataset.idx || -1);
+            const item = idx >= 0 ? autoState.items[idx] : null;
+            if (!item || !autoState.input) return;
+            applyAutocompleteSelection(autoState.input, item.nome);
+        });
+
+        window.addEventListener('resize', () => {
+            if (autoState.input && autoState.root && !autoState.root.hidden) {
+                positionAutocomplete(autoState.input);
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            if (autoState.input && autoState.root && !autoState.root.hidden) {
+                positionAutocomplete(autoState.input);
+            }
+        }, true);
     });
 })();

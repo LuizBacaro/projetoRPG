@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/layout.css" />
     <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=22" />
     <link rel="stylesheet" href="../css/gurps-dashboard.css" />
-    <link rel="stylesheet" href="../css/ficha-gurps.css?v=20260504a" />
+    <link rel="stylesheet" href="../css/ficha-gurps.css?v=20260504f" />
 </head>
 <body class="ficha-gurps-body">
 
@@ -149,12 +149,12 @@
                 <section class="ficha-block">
                     <h2 class="ficha-block-title">Vantagens, desvantagens &amp; peculiaridades</h2>
                     <div class="ficha-block-body">
-                        <p class="ficha-hint">Vantagens (nome + XP)</p>
+                        <p class="ficha-hint">Vantagens (catálogo + custo preenchido automático)</p>
                         <div class="ficha-lines-toolbar">
                             <button type="button" class="ficha-btn ficha-btn--ghost" onclick="fgAddVant()">+ Vantagem</button>
                         </div>
                         <div id="fg_vant_wrap"></div>
-                        <p class="ficha-hint">Desvantagens (nome + XP; valores negativos)</p>
+                        <p class="ficha-hint">Desvantagens (catálogo + custo preenchido automático)</p>
                         <div class="ficha-lines-toolbar">
                             <button type="button" class="ficha-btn ficha-btn--ghost" onclick="fgAddDesv()">+ Desvantagem</button>
                         </div>
@@ -236,7 +236,8 @@
                 </section>
                 <section class="ficha-block">
                     <h2 class="ficha-block-title">Perícias</h2>
-                    <div class="ficha-block-body ficha-block-body--scroll-x">
+                    <div class="ficha-block-body">
+                        <p class="ficha-hint">NH e Tipo recalculam XP automaticamente.</p>
                         <table class="ficha-skills-table">
                             <thead>
                                 <tr>
@@ -290,6 +291,6 @@
     if (!AuthService.exigirJogo('gurps')) {}
 </script>
 <script src="../js/services/GurpsPersonagemService.js"></script>
-<script src="../js/pages/ficha-gurps.js?v=20260504g"></script>
+<script src="../js/pages/ficha-gurps.js?v=20260504n"></script>
 </body>
 </html>

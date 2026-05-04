@@ -3,6 +3,7 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
+from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_file_service, get_gurps_personagem_service
 from app.games.gurps.catalogs.lite_catalog import carregar_catalogo_lite_ficha
@@ -12,6 +13,7 @@ from app.games.gurps.schemas.personagem import (
     GurpsPersonagemUpdate,
 )
 from app.games.gurps.services.personagem_service import GurpsPersonagemService
+from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_gurps_personagem,
@@ -61,9 +63,12 @@ def catalogo_pericias_lite(
 
 
 @router.get("/catalogo/lite-ficha")
-def catalogo_lite_ficha(_: Usuario = Depends(get_usuario_atual)):
+def catalogo_lite_ficha(
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_usuario_atual),
+):
     """Perícias, vantagens e desvantagens (curadoria Lite) + meta de custos em pontos (Basic Set) para a ficha."""
-    return carregar_catalogo_lite_ficha()
+    return carregar_catalogo_lite_ficha(db)
 
 
 @router.get("/{personagem_id}", response_model=GurpsPersonagemResponse)

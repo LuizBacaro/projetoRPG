@@ -1,6 +1,6 @@
 """Sessão de campanha GURPS — resumo por mesa e visibilidade para jogadores."""
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, false
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -19,7 +19,7 @@ class GurpsSessaoCampanha(Base):
     )
     resumo = Column(String(4000), nullable=False)
     visivel_jogadores = Column(
-        Boolean, nullable=False, default=False, server_default="0"
+        Boolean, nullable=False, default=False, server_default=false()
     )
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

@@ -12,6 +12,8 @@ from fastapi.testclient import TestClient
 
 from app.core.dependencies import get_file_service
 from app.games.gurps.api.v1.personagens import router as gurps_personagens_router
+from app.games.gurps.catalogs.lite_catalog import montar_catalogo_de_arquivos
+from app.games.gurps.repositories.catalogo_ficha_repository import repopular_catalogo_ficha_de_arquivos
 from app.games.gurps.schemas.personagem import GURPS_EXTRAS_MAX_JSON_BYTES
 from app.services.file_service import FileService
 from app.shared.core.database import get_db
@@ -432,12 +434,35 @@ def test_catalogo_lite_ficha_retorna_pericias_vantagens_desvantagens(gurps_perso
     r = client.get("/api/v1/gurps/personagens/catalogo/lite-ficha")
     assert r.status_code == 200, r.text
     body = r.json()
-    assert isinstance(body.get("pericias"), list) and len(body["pericias"]) >= 1
-    assert isinstance(body.get("vantagens"), list) and len(body["vantagens"]) >= 1
-    assert isinstance(body.get("desvantagens"), list) and len(body["desvantagens"]) >= 1
+    assert isinstance(body.get("pericias"), list) and len(body["pericias"]) >= 50
+    assert isinstance(body.get("vantagens"), list) and len(body["vantagens"]) >= 50
+    assert isinstance(body.get("desvantagens"), list) and len(body["desvantagens"]) >= 50
     assert body["pericias"][0].get("nome")
     assert "meta" in body and "custos_atributos" in body["meta"]
     assert "custos_pontos_fonte" in body["meta"]
+    assert "fonte_listas_personagens_pdf" in body["meta"]
+
+
+def test_catalogo_lite_ficha_via_banco_apos_seed(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    esperado = montar_catalogo_de_arquivos()
+    db = SessionLocal()
+    try:
+        repopular_catalogo_ficha_de_arquivos(db)
+        db.commit()
+    finally:
+        db.close()
+
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.get("/api/v1/gurps/personagens/catalogo/lite-ficha")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert len(body["pericias"]) == len(esperado["pericias"])
+    assert {p["nome"] for p in body["pericias"]} == {p["nome"] for p in esperado["pericias"]}
+    assert len(body["vantagens"]) == len(esperado["vantagens"])
+    assert len(body["desvantagens"]) == len(esperado["desvantagens"])
+    assert "custos_atributos" in body["meta"]
+    assert "fonte_listas_personagens_pdf" in body["meta"]
 
 
 def test_criar_rejeita_pericia_lite_sem_pre_requisito(gurps_personagens_db):

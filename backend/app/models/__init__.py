@@ -28,6 +28,11 @@ from app.shared.models.game import Game, UserGameMembership
 from app.games.gurps.models.campanha import GurpsCampanha
 from app.games.gurps.models.sessao_campanha import GurpsSessaoCampanha
 from app.games.gurps.models.combate import GurpsCombate
+from app.games.gurps.models.catalogo_ficha import (
+    GurpsCatalogoFichaDesvantagem,
+    GurpsCatalogoFichaPericia,
+    GurpsCatalogoFichaVantagem,
+)
 from app.games.gurps.models.personagem import (
     GurpsPersonagem,
     GurpsPersonagemDesvantagem,
@@ -74,4 +79,7 @@ __all__ = [
     "GurpsPersonagemVantagem",
     "GurpsPersonagemDesvantagem",
     "GurpsPersonagemPericia",
+    "GurpsCatalogoFichaVantagem",
+    "GurpsCatalogoFichaDesvantagem",
+    "GurpsCatalogoFichaPericia",
 ]
