@@ -441,6 +441,8 @@ def test_catalogo_lite_ficha_retorna_pericias_vantagens_desvantagens(gurps_perso
     assert "meta" in body and "custos_atributos" in body["meta"]
     assert "custos_pontos_fonte" in body["meta"]
     assert "fonte_listas_personagens_pdf" in body["meta"]
+    assert body["meta"].get("catalogo_listas_origem") == "arquivos_json"
+    assert body["meta"].get("catalogo_listas_counts", {}).get("pericias", 0) >= 50
 
 
 def test_catalogo_lite_ficha_via_banco_apos_seed(gurps_personagens_db):
@@ -463,6 +465,7 @@ def test_catalogo_lite_ficha_via_banco_apos_seed(gurps_personagens_db):
     assert len(body["desvantagens"]) == len(esperado["desvantagens"])
     assert "custos_atributos" in body["meta"]
     assert "fonte_listas_personagens_pdf" in body["meta"]
+    assert body["meta"].get("catalogo_listas_origem") == "postgres"
 
 
 def test_criar_rejeita_pericia_lite_sem_pre_requisito(gurps_personagens_db):

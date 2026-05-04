@@ -7,12 +7,15 @@ para perícias / vantagens / desvantagens e mantém `meta` (custos Basic, fontes
 from __future__ import annotations
 
 import json
+import logging
 import re
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 _DIR = Path(__file__).resolve().parent
 _CATALOGO_LITE_PATH = _DIR / "gurps_lite_catalogo.json"
@@ -104,13 +107,41 @@ def montar_catalogo_de_arquivos() -> dict[str, Any]:
     return out
 
 
+def _anexar_meta_diagnostico_listas(out: dict[str, Any], origem: str) -> None:
+    """Ajuda a diagnosticar produção: listas vêm do Postgres ou dos JSON no deploy."""
+    meta = out.setdefault("meta", {})
+    meta["catalogo_listas_origem"] = origem
+    meta["catalogo_listas_counts"] = {
+        "pericias": len(out.get("pericias") or []),
+        "vantagens": len(out.get("vantagens") or []),
+        "desvantagens": len(out.get("desvantagens") or []),
+    }
+    meta["catalogo_sumario_pdf_presente"] = _SUMARIO_PERSONAGENS_PATH.is_file()
+
+
 def carregar_catalogo_lite_ficha(db: Session | None = None) -> dict[str, Any]:
     if db is not None:
-        from app.games.gurps.repositories.catalogo_ficha_repository import (
-            GurpsCatalogoFichaRepository,
-        )
+        try:
+            from app.games.gurps.repositories.catalogo_ficha_repository import (
+                GurpsCatalogoFichaRepository,
+            )
 
-        repo = GurpsCatalogoFichaRepository(db)
-        if repo.catalogo_populado():
-            return repo.resposta_api_catalogo()
-    return montar_catalogo_de_arquivos()
+            repo = GurpsCatalogoFichaRepository(db)
+            if repo.catalogo_populado():
+                out = repo.resposta_api_catalogo()
+                _anexar_meta_diagnostico_listas(out, "postgres")
+                return out
+        except Exception as exc:
+            # Migração ainda não aplicada, schema diferente, etc. — evita 500 + “falso CORS” no browser.
+            logger.warning(
+                "Catálogo GURPS lite-ficha: falha ao usar Postgres (%s); usando JSON embarcado.",
+                exc,
+                exc_info=True,
+            )
+            out = montar_catalogo_de_arquivos()
+            _anexar_meta_diagnostico_listas(out, "arquivos_json")
+            out.setdefault("meta", {})["catalogo_listas_fallback_de_db"] = True
+            return out
+    out = montar_catalogo_de_arquivos()
+    _anexar_meta_diagnostico_listas(out, "arquivos_json")
+    return out
