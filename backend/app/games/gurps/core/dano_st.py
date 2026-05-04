@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Tuple
 
 # Faixa prática da tabela para a ficha Lite no Arena.
+# Manter alinhada a `frontend/games/gurps/js/pages/ficha-gurps.js` (`GURPS_ST_DANO_THR_SW`).
 _ST_DAMAGE_TABLE: dict[int, Tuple[str, str]] = {
     1: ("1d-6", "1d-5"),
     2: ("1d-6", "1d-5"),

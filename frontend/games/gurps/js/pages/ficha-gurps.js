@@ -99,6 +99,141 @@
         return Number.isFinite(n) ? n : null;
     }
 
+    /**
+     * Tabela ST → (thr, sw) — espelho de `backend/app/games/gurps/core/dano_st.py` (`dano_thr_sw_por_st`).
+     */
+    const GURPS_ST_DANO_THR_SW = {
+        1: ['1d-6', '1d-5'],
+        2: ['1d-6', '1d-5'],
+        3: ['1d-5', '1d-4'],
+        4: ['1d-5', '1d-4'],
+        5: ['1d-4', '1d-3'],
+        6: ['1d-4', '1d-3'],
+        7: ['1d-3', '1d-2'],
+        8: ['1d-3', '1d-2'],
+        9: ['1d-2', '1d-1'],
+        10: ['1d-2', '1d'],
+        11: ['1d-1', '1d+1'],
+        12: ['1d-1', '1d+2'],
+        13: ['1d', '2d-1'],
+        14: ['1d', '2d'],
+        15: ['1d+1', '2d+1'],
+        16: ['1d+1', '2d+2'],
+        17: ['1d+2', '3d-1'],
+        18: ['1d+2', '3d'],
+        19: ['2d-1', '3d+1'],
+        20: ['2d-1', '3d+2'],
+        21: ['2d', '4d-1'],
+        22: ['2d', '4d'],
+        23: ['2d+1', '4d+1'],
+        24: ['2d+1', '4d+2'],
+        25: ['2d+2', '5d-1'],
+        26: ['2d+2', '5d'],
+        27: ['3d-1', '5d+1'],
+        28: ['3d-1', '5d+1'],
+        29: ['3d', '5d+2'],
+        30: ['3d', '6d-1'],
+    };
+
+    function danoThrSwPorSt(st) {
+        let s = Math.trunc(Number(st));
+        if (!Number.isFinite(s) || s < 1) s = 1;
+        else if (s > 30) s = 30;
+        return GURPS_ST_DANO_THR_SW[s];
+    }
+
+    function aplicarDanoThrSwPorSt() {
+        const st = num('#fg_st_valor', 10);
+        const pair = danoThrSwPorSt(st);
+        if (!pair) return;
+        const [thr, sw] = pair;
+        const imp = el('#fg_dano_imp');
+        const bal = el('#fg_dano_bal');
+        if (imp) imp.value = thr;
+        if (bal) bal.value = sw;
+    }
+
+    /** Lite: PV máx = ST; PV atual = min(atual, novo máx) se preenchido (como `personagem_service.atualizar`). */
+    function aplicarPvMaxPorSt() {
+        if (num('#fg_hp_custo', 0) > 0) return;
+        const st = Math.trunc(num('#fg_st_valor', 10));
+        if (!Number.isFinite(st)) return;
+        const hpVal = el('#fg_hp_valor');
+        if (hpVal) hpVal.value = String(st);
+        const hpAt = el('#fg_hp_atual');
+        if (hpAt && hpAt.value !== '') {
+            const cur = Number(hpAt.value);
+            if (Number.isFinite(cur)) hpAt.value = String(Math.min(cur, st));
+        }
+    }
+
+    /** Lite: FAD máx = HT; FAD atual = min(atual, novo máx) se preenchido. */
+    function aplicarFadMaxPorHt() {
+        if (num('#fg_fp_custo', 0) > 0) return;
+        const ht = Math.trunc(num('#fg_ht_valor', 10));
+        if (!Number.isFinite(ht)) return;
+        const fpVal = el('#fg_fp_valor');
+        if (fpVal) fpVal.value = String(ht);
+        const fpAt = el('#fg_fp_atual');
+        if (fpAt && fpAt.value !== '') {
+            const cur = Number(fpAt.value);
+            if (Number.isFinite(cur)) fpAt.value = String(Math.min(cur, ht));
+        }
+    }
+
+    /** Lite: Vontade = IQ; Percepção = IQ (só se custo XP da linha = 0). */
+    function aplicarVonPerPorIq() {
+        const iq = Math.trunc(num('#fg_iq_valor', 10));
+        if (!Number.isFinite(iq)) return;
+        if (num('#fg_will_custo', 0) === 0) {
+            const w = el('#fg_will_valor');
+            if (w) w.value = String(iq);
+        }
+        if (num('#fg_per_custo', 0) === 0) {
+            const p = el('#fg_per_valor');
+            if (p) p.value = String(iq);
+        }
+    }
+
+    function onStValorInput() {
+        aplicarDanoThrSwPorSt();
+        aplicarPvMaxPorSt();
+    }
+
+    function onHtValorInput() {
+        aplicarVelocidadeBasicaDerivada();
+        aplicarFadMaxPorHt();
+    }
+
+    /**
+     * GURPS Lite (igual ao backend):
+     * VB = (HT + DX) / 4; deslocamento = floor(VB); esquiva = floor(VB) + 3.
+     * Não sobrescreve se `velocidade_custo` > 0 (VB comprado com pontos).
+     */
+    function aplicarVelocidadeBasicaDerivada() {
+        if (num('#fg_vel_custo', 0) > 0) return;
+        const ht = num('#fg_ht_valor', 10);
+        const dx = num('#fg_dx_valor', 10);
+        const vb = (ht + dx) / 4;
+        if (!Number.isFinite(vb)) return;
+        const velInp = el('#fg_vel_valor');
+        if (velInp) velInp.value = vb.toFixed(2);
+        const mov = Math.floor(vb + 1e-9);
+        const movInp = el('#fg_mov_valor');
+        if (movInp) movInp.value = String(mov);
+        const esqInp = el('#fg_esquiva');
+        if (esqInp) esqInp.value = String(mov + 3);
+    }
+
+    /** Recalcula na ficha o que o backend deriva (Lite). */
+    function aplicarDerivadosGurpsLiteFicha() {
+        aplicarVelocidadeBasicaDerivada();
+        aplicarDanoThrSwPorSt();
+        aplicarPvMaxPorSt();
+        aplicarFadMaxPorHt();
+        aplicarVonPerPorIq();
+    }
+
     function syncXpMirror() {
         const v = el('#fg_pt_total')?.value ?? '0';
         const m = el('#fg_xp_top_mirror');
@@ -460,6 +595,7 @@
             addRowDesv();
             addRowPer();
             carregarLocal();
+            aplicarDerivadosGurpsLiteFicha();
             syncXpMirror();
             return;
         }
@@ -525,6 +661,10 @@
         carregar();
         el('#btnSalvarFicha')?.addEventListener('click', salvar);
         el('#fg_pt_total')?.addEventListener('input', syncXpMirror);
+        el('#fg_ht_valor')?.addEventListener('input', onHtValorInput);
+        el('#fg_dx_valor')?.addEventListener('input', aplicarVelocidadeBasicaDerivada);
+        el('#fg_st_valor')?.addEventListener('input', onStValorInput);
+        el('#fg_iq_valor')?.addEventListener('input', aplicarVonPerPorIq);
         /* btnTrocarJogo / btnLogout: configurarHeaderUsuario() já associa quando há usuário */
 
         el('#fg_portrait_file')?.addEventListener('change', (ev) => {

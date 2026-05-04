@@ -210,6 +210,23 @@ body.ficha-gurps-body {
     background: var(--gurps-paper);
 }
 
+.ficha-block-body--scroll-x {
+    overflow-x: auto;
+}
+
+.ficha-block-body--scroll-x .ficha-lines-toolbar {
+    margin-top: 0.5rem;
+}
+
+/* Espelho de XP no topo da identidade (read-only) */
+.ficha-xp-mirror {
+    padding: 0.4rem;
+    background: #fffef8;
+    font-weight: 800;
+    text-align: center;
+    border-top: 1px solid #ccc;
+}
+
 /* Atributos ST DX IQ HT + secundários */
 .ficha-attr-grid {
     display: grid;

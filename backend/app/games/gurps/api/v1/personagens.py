@@ -32,7 +32,7 @@ def listar(
     tipo: Optional[str] = None,
     meus: bool = Query(False),
     skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=200),
+    limit: int = Query(100, ge=1, le=500),
     response: Response = None,
     service: GurpsPersonagemService = Depends(get_gurps_personagem_service),
     usuario_atual: Usuario = Depends(get_usuario_atual),

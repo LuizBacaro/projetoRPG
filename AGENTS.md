@@ -1,25 +1,75 @@
 # Governanca Operacional de Agentes
 
-Este arquivo resume como o time deve usar os agentes e prompts deste workspace.
+Este arquivo e a **fonte normativa principal** de instrucoes do projeto para humanos e agentes (Cursor, GitHub Copilot, etc.).
 
-Fonte normativa principal de instrucoes do projeto: [.github/copilot-instructions.md](.github/copilot-instructions.md).
-Instrucoes detalhadas por dominio: [.github/instructions](.github/instructions).
-Este `AGENTS.md` existe como resumo operacional e guia de uso para o time.
+- **Regras por dominio (codigo, migrations, frontend):** [.github/instructions](.github/instructions) — sempre aplicar o ficheiro correspondente a area alterada.
+- **Entrada para o GitHub Copilot:** [.github/copilot-instructions.md](.github/copilot-instructions.md) e apenas um **indicador** que aponta para este `AGENTS.md`; nao duplicar aqui normas longas.
 
-## Escopo
+## Idioma
+
+- **Sempre responder em Portugues (Brasil)** em todas as mensagens, explicacoes e comentarios de codigo.
+
+## Escopo geral
 
 - Projeto fullstack TTRPG com backend FastAPI/SQLAlchemy e frontend HTML/CSS/JavaScript vanilla.
 - Priorizar mudancas pequenas, de causa raiz e com baixo risco de regressao.
+- Nao reverter mudancas existentes do usuario sem solicitacao explicita.
 - Antes de implementar, ler contexto em [README.md](README.md) e instrucoes aplicaveis em [.github/instructions](.github/instructions).
 - Em tarefas que toquem arquitetura, deploy, dados, schema ou decisoes historicas, consultar [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md).
+
+## Protocolo obrigatorio de implementacao
+
+- Antes de qualquer refatoracao estetica/estrutural, priorizar validacao e preservacao dos requisitos funcionais do fluxo afetado.
+- Em tarefas com uso de skills, agentes ou instrucoes especializadas, manter o mesmo protocolo de leitura de contexto documental antes de codar.
+- Sempre priorizar reuso e modularidade: evitar duplicacao de regras, centralizar fonte de verdade e preservar contratos existentes.
+- Aplicar SOLID e Clean Code em toda alteracao:
+	- funcoes/metodos curtos com responsabilidade unica (SRP);
+	- baixo acoplamento e alta coesao;
+	- nomes claros e semanticos;
+	- evitar logica duplicada e efeitos colaterais ocultos;
+	- minimizar breaking changes e manter compatibilidade quando possivel.
+- Ao concluir mudancas em fluxos sensiveis, validar impacto e registrar risco residual quando nao houver cobertura automatizada suficiente.
+
+## Infra de producao
+
+- **Frontend:** Vercel (estatico, CDN global) — dominio `arena-de-combate-rpg.com.br` via Cloudflare
+- **Backend:** Render.com (free tier) — `https://projetorpg-7ih3.onrender.com` — branch `feature/salva`
+- **Banco:** Neon PostgreSQL `ep-bold-night-ak4zfe7p` (us-west-2 Oregon) — serverless, connection pooling — co-localizado com o Render backend
+- **Imagens:** Cloudinary — `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` como env vars no Render
+- **Anti-sleep:** cron-job.org `*/10 * * * *` → `GET /health` (evita cold start do Render free tier)
+- **Deploy:** merge `feature/responsivo` → `feature/salva` aciona deploy automatico no Render
+- **Dados em producao (critico):** antes de alterar `DATABASE_URL`, rodar migrations destrutivas ou mudar schemas em prod, consultar [PRE_DEPLOY_CHECKLIST.md](PRE_DEPLOY_CHECKLIST.md) (secao Protecao de dados em producao), a skill [.cursor/skills/arena-producao-dados-neon-render/SKILL.md](.cursor/skills/arena-producao-dados-neon-render/SKILL.md) e o bullet correspondente abaixo. No Render, health de startup: `GET /health/live`; monitoramento continuo: `GET /health`.
+
+## Convencoes de versionamento frontend
+
+- Scripts com cache-busting explicito: `?v=<numero>` nos imports de HTML.
+- Ao modificar qualquer controller/service, incrementar o `?v=` correspondente no HTML (ver comentarios nos ficheiros ou historico recente para o valor atual).
+
+## Onde estao as regras especificas
+
+- Backend Python: [.github/instructions/backend.instructions.md](.github/instructions/backend.instructions.md)
+- Frontend Web: [.github/instructions/frontend.instructions.md](.github/instructions/frontend.instructions.md)
+- Migrations Alembic: [.github/instructions/migrations.instructions.md](.github/instructions/migrations.instructions.md)
+- Historico de evolucao: [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md)
+
+## Referencias por tema (leitura antes de codar)
+
 - Para evolucoes da ficha por classe/nivel (BBA, resistencias, defesas CA/Toque/Surpresa, iniciativa e habilidades especiais), consultar [docs/progressao-classes-bba-resistencias-habilidades.md](docs/progressao-classes-bba-resistencias-habilidades.md).
 - Para pre-definicoes por raca e catalogo racial normalizado, consultar [docs/predefinicoes-raciais-contrato.md](docs/predefinicoes-raciais-contrato.md) e `docs/dados/racas_caracteristicas_catalogo.json`.
-- Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill do projeto em [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md) — habilite essa skill no Cursor para o agente carregar esse contexto.
-- Protecao de dados em producao (Neon branch, `DATABASE_URL`, PITR/snapshots, staging antes de prod, health `/health/live`): checklist em [PRE_DEPLOY_CHECKLIST.md](PRE_DEPLOY_CHECKLIST.md) (secao **Protecao de dados**) e skill [.cursor/skills/arena-producao-dados-neon-render/SKILL.md](.cursor/skills/arena-producao-dados-neon-render/SKILL.md) — habilite em deploy, migrations, `.env` de Render ou incidentes de banco.
-- Conjuração D&D 3.5 (atributo por classe, Tabela 1-1, clérigo, troca Bardo/Feiticeiro): documentação em [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
-- Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pós-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
-- Contratos de repositório para serviços (`typing.Protocol`, pacotes `ports` no backend): [docs/ports-repositorios-servicos.md](docs/ports-repositorios-servicos.md).
-- Admin em dev: `ADMIN_EMAIL` + `ADMIN_PASSWORD` em `backend/.env` (exemplo em `backend/.env.example`); `criar_admin_padrao` no startup só cria se ambos estiverem definidos — ver secção de credenciais no [README.md](README.md).
+- Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md).
+- Protecao de dados em producao (Neon branch, `DATABASE_URL`, PITR/snapshots, staging antes de prod, health `/health/live`): [PRE_DEPLOY_CHECKLIST.md](PRE_DEPLOY_CHECKLIST.md) (secao **Protecao de dados**) e skill [.cursor/skills/arena-producao-dados-neon-render/SKILL.md](.cursor/skills/arena-producao-dados-neon-render/SKILL.md).
+- Conjuracao D&D 3.5 (atributo por classe, Tabela 1-1, clerigo, troca Bardo/Feiticeiro): [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
+- Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pos-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
+- Contratos de repositorio para servicos (`typing.Protocol`, pacotes `ports` no backend): [docs/ports-repositorios-servicos.md](docs/ports-repositorios-servicos.md).
+- GURPS 4E (ficha + arena, Lite primeiro): skill [.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md](.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md) e checklist em [melhoria-arquitetura](melhoria-arquitetura) (secao 7).
+- Admin em dev: `ADMIN_EMAIL` + `ADMIN_PASSWORD` em `backend/.env` (exemplo em `backend/.env.example`); `criar_admin_padrao` no startup so cria se ambos estiverem definidos — ver secao de credenciais no [README.md](README.md).
+
+## Orquestracao de agentes (definicoes)
+
+- Agente coordenador recomendado: `Fullstack Orchestrator` em [.github/agents/fullstack-orchestrator.agent.md](.github/agents/fullstack-orchestrator.agent.md).
+- Agente complementar para features com contrato entre camadas: `Fullstack API Contract Orchestrator` em [.github/agents/fullstack-api-contract-orchestrator.agent.md](.github/agents/fullstack-api-contract-orchestrator.agent.md).
+- Agente especializado em levantamento de requisitos a partir de livros/PDFs/regras: `RPG Requirements Analyst` em [.github/agents/rpg-requirements-analyst.agent.md](.github/agents/rpg-requirements-analyst.agent.md).
+- Especialistas recomendados: ver secao **Agentes** abaixo; ficheiros em [.github/agents](.github/agents).
 
 ## Agentes
 
@@ -58,6 +108,11 @@ Usar quando for preciso extrair texto, tabelas e informacoes de PDFs com suporte
 - Consolidar conflitos de contrato entre camadas antes de responder.
 - Preservar autenticacao real, autorizacao por perfil, `getApiUrl()` no frontend e contratos existentes quando possivel.
 - Quando o `RPG Requirements Analyst` receber pedido de execucao, deve preparar handoff estruturado e delegar ao `Fullstack Orchestrator`.
+- Fluxo esperado para demandas multi-area:
+	1. Classificar a solicitacao por dominio.
+	2. Delegar para especialistas em paralelo apenas quando nao houver dependencia direta.
+	3. Tratar schema e persistencia antes de consolidar impactos em backend/frontend quando necessario.
+	4. Consolidar contratos, validacao e risco residual em uma resposta unica.
 
 ## Prompts Reutilizaveis
 
@@ -76,10 +131,10 @@ Usar quando for preciso extrair texto, tabelas e informacoes de PDFs com suporte
 Workflow para transformar texto de regra, PDF ou documento em especificacao acionavel, separando regra da fonte, interpretacao operacional e decisao de produto.
 
 - `dnd-spellcasting-conventions` ([.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md))
-Atributo de conjuração por classe, Tabela 1-1, planilhas Excel, clérigo (domínio), troca de magias Bardo/Feiticeiro e pontos de código.
+Atributo de conjuracao por classe, Tabela 1-1, planilhas Excel, clerigo (dominio), troca de magias Bardo/Feiticeiro e pontos de codigo.
 
 - `class-progression-conventions` ([.cursor/skills/class-progression-conventions/SKILL.md](.cursor/skills/class-progression-conventions/SKILL.md))
-Convenções de progressão por classe na ficha (BBA, resistências, defesas, iniciativa e habilidades especiais), incluindo regra de `bonus_ca` de Armadura/Item de Proteção, com contrato entre backend/frontend/banco e compatibilidade legada.
+Convencoes de progressao por classe na ficha (BBA, resistencias, defesas, iniciativa e habilidades especiais), incluindo regra de `bonus_ca` de Armadura/Item de Protecao, com contrato entre backend/frontend/banco e compatibilidade legada.
 
 ## Hooks
 
@@ -87,6 +142,36 @@ Convenções de progressão por classe na ficha (BBA, resistências, defesas, in
 - Hook atual: [.github/hooks/operational-safety.json](.github/hooks/operational-safety.json)
 - Script do hook: [.github/hooks/scripts/pre_tool_use_guard.py](.github/hooks/scripts/pre_tool_use_guard.py)
 - Papel atual: aumentar seguranca operacional antes de comandos destrutivos de terminal e modificacoes SQL sensiveis.
+- Hooks devem permanecer pequenos, auditaveis e focados em enforcement real; nao usar hooks para duplicar instrucoes textuais.
+
+## Estado de referencia do banco (producao)
+
+*Snapshot indicativo; validar no ambiente real quando for critico.*
+
+- `pericias_classes`: populada com 175 associacoes (11 classes x pericias D&D 3.5)
+- Custo de pericias: 1 pt (da classe) / 2 pts (fora da classe) — calculado via `obter_custos_pericias()`
+- Seeds aplicados em producao: magias (~400+), pericias (54), pericias_classes (175), condicoes (25)
+
+## Armazenamento de imagens
+
+- `FileService` roteia automaticamente: Cloudinary quando `CLOUDINARY_*` configurado (producao), filesystem local senao (dev).
+- `foto_url` no banco armazena URL HTTPS absoluta do Cloudinary em producao (ex: `https://res.cloudinary.com/...`).
+- Em dev local, `foto_url` armazena URL relativa `/uploads/<uuid>.ext` — normal, nao confundir com bug.
+- Nunca armazene imagens apenas no filesystem do Render — e efemero e perdido em cada deploy/restart.
+- Ao deletar combatente com foto, `FileService.deletar_arquivo()` lida com ambos os casos automaticamente.
+
+## Repositorios e protocols (backend)
+
+- Novos ou alterados servicos que injetam repositorio devem alinhar-se aos `Protocol` em `backend/app/shared/ports/` (hub) e `backend/app/games/<jogo>/ports/` (por jogo), conforme [docs/ports-repositorios-servicos.md](docs/ports-repositorios-servicos.md).
+- O repositorio concreto nao precisa herdar o `Protocol`; o construtor do servico e que deve ser anotado com o contrato.
+
+## Convencoes transversais
+
+- Preserve autenticacao real e autorizacao por perfil; nao introduza atalhos permissivos.
+- Ao mexer em fluxos criticos (auth, cache, listagens, migrations), valide o impacto e informe risco residual quando nao houver teste automatizado.
+- Para textos de interface, prefira portugues consistente com o restante do produto.
+- `isClasseConjuradora()` de `combat-rules.js` e a fonte de verdade para quais classes tem magia — usar em vez de listas manuais.
+- `getApiUrl()` de `api.config.js` e obrigatorio em todos os services/controllers do frontend; nunca hardcode localhost ou URL de producao.
 
 ## Fluxo Recomendado
 
@@ -142,7 +227,7 @@ Exemplo de pedido:
 Analisar as regras de familiars no Livro do Jogador de D&D 3.5 e transformar isso em requisitos funcionais, regras de negocio, impacto tecnico e criterios de aceite para a plataforma.
 ```
 
-## Observacoes
+## Manutencao desta governanca
 
-- Este arquivo resume a governanca operacional; detalhes de implementacao e restricoes continuam centralizados em [.github/copilot-instructions.md](.github/copilot-instructions.md) e nos arquivos de [.github/instructions](.github/instructions).
-- Se o time decidir migrar a governanca principal para `AGENTS.md`, o ideal e reduzir ou remover a duplicidade com o `copilot-instructions.md` em uma etapa dedicada.
+- Alterar normas, listas e protocolos **neste** `AGENTS.md` (e em `.github/instructions/` por dominio).
+- Manter `.github/copilot-instructions.md` como entrada minima; nao voltar a duplicar paragrafos longos la.

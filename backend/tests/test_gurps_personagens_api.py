@@ -229,6 +229,14 @@ def test_post_segunda_foto_remove_arquivo_anterior(gurps_personagens_db, monkeyp
     assert (tmp_path / Path(url2).name).is_file()
 
 
+def test_listar_aceita_limit_500_para_campanhas_e_dashboard(gurps_personagens_db):
+    """UI de campanhas pede limit=500; acima do teto antigo (200) gerava 422."""
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.get("/api/v1/gurps/personagens", params={"limit": 500})
+    assert r.status_code == 200, r.text
+
+
 def test_jogador_lista_apenas_próprios(gurps_personagens_db):
     SessionLocal, u1, u2 = gurps_personagens_db
     c1 = _build_client(SessionLocal, _usuario(u1))

@@ -219,7 +219,7 @@
                                                 <option value="agachado">Agachado</option>
                                                 <option value="deitado">Deitado</option>
                                             </select>
-                                            <button type="button" class="gurps-arena-qa" id="arenaBtnAplicarPostura">Aplicar</button>
+                                            <button type="button" class="gurps-arena-qa gurps-arena-qa--postura" id="arenaBtnAplicarPostura">Aplicar</button>
                                         </div>
                                     </div>
                                 </div>
@@ -258,57 +258,60 @@
 <dialog id="arenaActionModal" class="gurps-arena-action-modal">
     <form method="dialog" id="arenaActionForm" class="gurps-arena-action-form">
         <h3 class="gurps-arena-action-title">Ação de combate</h3>
-        <label class="gurps-arena-action-label">
-            <span>Ação</span>
-            <select id="arenaActionType">
-                <option value="ataque">Ataque</option>
-                <option value="cura">Cura</option>
-            </select>
-        </label>
-        <label class="gurps-arena-action-label">
-            <span>Alvo</span>
-            <select id="arenaActionTarget"></select>
-        </label>
-        <label id="arenaFieldNh" class="gurps-arena-action-label">
-            <span>NH de ataque</span>
-            <input id="arenaActionNh" type="number" min="1" max="30" value="12" />
-        </label>
-        <label id="arenaFieldTipoAtaque" class="gurps-arena-action-label">
-            <span>Tipo de ataque</span>
-            <select id="arenaActionTipoAtaque">
-                <option value="arma">Arma</option>
-                <option value="soco">Soco</option>
-                <option value="chute">Chute</option>
-            </select>
-        </label>
-        <label id="arenaFieldTipoDefesa" class="gurps-arena-action-label">
-            <span>Defesa do alvo</span>
-            <select id="arenaActionTipoDefesa">
-                <option value="auto">Auto (melhor)</option>
-                <option value="esquiva">Esquiva</option>
-                <option value="aparar">Aparar</option>
-                <option value="bloqueio">Bloqueio</option>
-            </select>
-        </label>
-        <label id="arenaFieldExpr" class="gurps-arena-action-label">
-            <span>Expressão de dano (opcional)</span>
-            <input id="arenaActionExpr" type="text" placeholder="1d+2" />
-        </label>
-        <label id="arenaFieldCura" class="gurps-arena-action-label gurps-arena-action-field-hidden">
-            <span>PV de cura</span>
-            <input id="arenaActionCura" type="number" min="1" value="5" />
-        </label>
-        <div id="arenaActionResult" class="gurps-arena-action-result gurps-arena-action-result-hidden"></div>
+        <p class="gurps-arena-action-lead">Personagem ativo vs. alvo; rolagens e resultado aparecem abaixo.</p>
+        <div class="gurps-arena-action-fields">
+            <label class="gurps-arena-action-label">
+                <span>Ação</span>
+                <select id="arenaActionType" class="gurps-arena-action-control">
+                    <option value="ataque">Ataque</option>
+                    <option value="cura">Cura</option>
+                </select>
+            </label>
+            <label class="gurps-arena-action-label">
+                <span>Alvo</span>
+                <select id="arenaActionTarget" class="gurps-arena-action-control"></select>
+            </label>
+            <label id="arenaFieldNh" class="gurps-arena-action-label">
+                <span>NH de ataque</span>
+                <input id="arenaActionNh" class="gurps-arena-action-control" type="number" min="1" max="30" value="12" />
+            </label>
+            <label id="arenaFieldTipoAtaque" class="gurps-arena-action-label">
+                <span>Tipo de ataque</span>
+                <select id="arenaActionTipoAtaque" class="gurps-arena-action-control">
+                    <option value="arma">Arma</option>
+                    <option value="soco">Soco</option>
+                    <option value="chute">Chute</option>
+                </select>
+            </label>
+            <label id="arenaFieldTipoDefesa" class="gurps-arena-action-label">
+                <span>Defesa do alvo</span>
+                <select id="arenaActionTipoDefesa" class="gurps-arena-action-control">
+                    <option value="auto">Auto (melhor)</option>
+                    <option value="esquiva">Esquiva</option>
+                    <option value="aparar">Aparar</option>
+                    <option value="bloqueio">Bloqueio</option>
+                </select>
+            </label>
+            <label id="arenaFieldExpr" class="gurps-arena-action-label">
+                <span>Expressão de dano (opcional)</span>
+                <input id="arenaActionExpr" class="gurps-arena-action-control" type="text" placeholder="ex.: 1d+2" autocomplete="off" />
+            </label>
+            <label id="arenaFieldCura" class="gurps-arena-action-label" hidden>
+                <span>PV de cura</span>
+                <input id="arenaActionCura" class="gurps-arena-action-control" type="number" min="1" value="5" />
+            </label>
+        </div>
+        <div id="arenaActionResult" class="gurps-arena-action-result gurps-arena-action-result-hidden" role="status" aria-live="polite"></div>
         <div class="gurps-arena-action-history-wrap">
             <strong class="gurps-arena-action-history-title">Últimas ações</strong>
             <ul id="arenaActionHistory" class="gurps-arena-action-history-list">
                 <li class="gurps-arena-action-history-empty">Sem ações ainda.</li>
             </ul>
         </div>
-        <div class="dash-modal-actions gurps-arena-action-buttons">
-            <button type="button" class="btn-dash-cancel" id="arenaActionCancel">Cancelar</button>
-            <button type="submit" class="btn-dash-save">Aplicar</button>
-            <button type="submit" class="btn-dash-save" id="arenaActionApplyClose">Aplicar e fechar</button>
+        <div class="gurps-arena-action-buttons">
+            <button type="button" class="gurps-arena-action-btn gurps-arena-action-btn--ghost" id="arenaActionCancel">Cancelar</button>
+            <button type="submit" class="gurps-arena-action-btn gurps-arena-action-btn--primary">Aplicar</button>
+            <button type="submit" class="gurps-arena-action-btn gurps-arena-action-btn--primary" id="arenaActionApplyClose">Aplicar e fechar</button>
         </div>
     </form>
 </dialog>
@@ -607,12 +610,15 @@
     function syncCamposModalArena() {
         const tipo = document.getElementById('arenaActionType')?.value || 'ataque';
         const isAtaque = tipo === 'ataque';
-        document.getElementById('arenaFieldNh').style.display = isAtaque ? 'grid' : 'none';
-        document.getElementById('arenaFieldTipoAtaque').style.display = isAtaque ? 'grid' : 'none';
-        document.getElementById('arenaFieldTipoDefesa').style.display = isAtaque ? 'grid' : 'none';
-        document.getElementById('arenaFieldExpr').style.display = isAtaque ? 'grid' : 'none';
-        const fieldCura = document.getElementById('arenaFieldCura');
-        if (fieldCura) fieldCura.classList.toggle('gurps-arena-action-field-hidden', isAtaque);
+        const setHidden = (id, h) => {
+            const n = document.getElementById(id);
+            if (n) n.hidden = h;
+        };
+        setHidden('arenaFieldNh', !isAtaque);
+        setHidden('arenaFieldTipoAtaque', !isAtaque);
+        setHidden('arenaFieldTipoDefesa', !isAtaque);
+        setHidden('arenaFieldExpr', !isAtaque);
+        setHidden('arenaFieldCura', isAtaque);
     }
 
     function setResultadoModalArena(texto, sucesso = false) {

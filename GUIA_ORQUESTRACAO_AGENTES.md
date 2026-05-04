@@ -39,7 +39,8 @@ Neste workspace, a pasta `.github` foi usada para centralizar:
 
 Estrutura principal:
 
-- `.github/copilot-instructions.md`
+- `AGENTS.md` (raiz): governanca normativa principal para agentes
+- `.github/copilot-instructions.md`: entrada minima para o GitHub Copilot (aponta para `AGENTS.md`)
 - `.github/instructions/`
 - `.github/agents/`
 - `.github/prompts/`
@@ -153,7 +154,7 @@ Instructions sao regras textuais que orientam o comportamento do agente.
 
 No projeto, existem dois niveis principais:
 
-- `.github/copilot-instructions.md`: regras gerais do workspace;
+- `AGENTS.md`: regras gerais e orquestracao do workspace (fonte principal);
 - `.github/instructions/*.md`: regras por dominio.
 
 Exemplos deste projeto:
@@ -250,8 +251,8 @@ Use este mapa mental:
 
 Hoje, a governanca deste projeto esta distribuida assim:
 
-- fonte normativa principal: `.github/copilot-instructions.md`;
-- resumo operacional do time: `AGENTS.md`;
+- fonte normativa principal: `AGENTS.md` (raiz);
+- entrada GitHub Copilot: `.github/copilot-instructions.md` (indicador; nao duplicar `AGENTS.md`);
 - regras por dominio: `.github/instructions/`;
 - especialistas e coordenadores: `.github/agents/`;
 - atalhos de entrada: `.github/prompts/`;
@@ -321,7 +322,7 @@ Fluxo esperado:
 - O runtime do Copilot e quem decide e executa o fluxo.
 - Nem toda tarefa obrigatoriamente precisara de subagentes.
 - Hooks nao devem virar uma segunda camada de instrucoes longas.
-- `AGENTS.md` neste projeto e um resumo operacional, nao a fonte normativa principal.
+- `AGENTS.md` na raiz e a **fonte normativa principal**; `.github/copilot-instructions.md` e apenas entrada para o Copilot e nao deve duplicar normas longas.
 
 ## Recomendacao de Uso Diario
 
@@ -337,8 +338,8 @@ Para o dia a dia do time:
 
 - [README.md](README.md)
 - [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md)
-- [AGENTS.md](AGENTS.md)
-- [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- [AGENTS.md](AGENTS.md) — governanca principal
+- [.github/copilot-instructions.md](.github/copilot-instructions.md) — stub para Copilot
 - [.github/instructions](.github/instructions)
 - [.github/agents](.github/agents)
 - [.github/prompts](.github/prompts)

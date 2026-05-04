@@ -128,7 +128,7 @@ A arquitetura “mais limpa” para o Arena é: **hub estável e reutilizável e
 ### Andamento de implementação (execução)
 
 - Concluídos: **G0.1**, **G0.2**, **G1.1**, **G1.2**, **G1.3**, **G1.4**, **G1.5**, **G2.1**, **G2.2**, **G2.3**, **G3.1**, **G3.2**, **G3.3**, **G3.4**, **G3.5**, **G4.1**, **G4.2**, **G4.3**, **G4.4**, **G5.1**, **G5.2**.
-- Próximo recomendado: fechar pendências de UX da arena (histórico curto de ações e refinos visuais do modal).
+- Próximo recomendado: mapear a **Ficha Aprimorada** (PDF) para colunas SQL vs `extras_json` (§7 abaixo); abrir ou sincronizar as issues do §7.1 no GitHub/Notion, se ainda não existirem. Refinos visuais pontuais na ficha/arena são opcionais pós-checklist.
 
 ### Cruzamento com a “Ficha Aprimorada” (PDF no repo)
 
