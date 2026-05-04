@@ -5,6 +5,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
 
 from app.core.dependencies import get_file_service, get_gurps_personagem_service
+from app.games.gurps.catalogs.lite_catalog import carregar_catalogo_lite_ficha
 from app.games.gurps.schemas.personagem import (
     GurpsPersonagemCreate,
     GurpsPersonagemResponse,
@@ -57,6 +58,12 @@ def catalogo_pericias_lite(
     _: Usuario = Depends(get_usuario_atual),
 ):
     return {"itens": service.catalogo_pericias_lite()}
+
+
+@router.get("/catalogo/lite-ficha")
+def catalogo_lite_ficha(_: Usuario = Depends(get_usuario_atual)):
+    """Perícias, vantagens e desvantagens (curadoria Lite) + meta de custos em pontos (Basic Set) para a ficha."""
+    return carregar_catalogo_lite_ficha()
 
 
 @router.get("/{personagem_id}", response_model=GurpsPersonagemResponse)

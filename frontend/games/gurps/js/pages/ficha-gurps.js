@@ -155,7 +155,7 @@
 
     /** Lite: PV máx = ST; PV atual = min(atual, novo máx) se preenchido (como `personagem_service.atualizar`). */
     function aplicarPvMaxPorSt() {
-        if (num('#fg_hp_custo', 0) > 0) return;
+        if (num('#fg_hp_custo', 0) !== 0) return;
         const st = Math.trunc(num('#fg_st_valor', 10));
         if (!Number.isFinite(st)) return;
         const hpVal = el('#fg_hp_valor');
@@ -169,7 +169,7 @@
 
     /** Lite: FAD máx = HT; FAD atual = min(atual, novo máx) se preenchido. */
     function aplicarFadMaxPorHt() {
-        if (num('#fg_fp_custo', 0) > 0) return;
+        if (num('#fg_fp_custo', 0) !== 0) return;
         const ht = Math.trunc(num('#fg_ht_valor', 10));
         if (!Number.isFinite(ht)) return;
         const fpVal = el('#fg_fp_valor');
@@ -179,6 +179,35 @@
             const cur = Number(fpAt.value);
             if (Number.isFinite(cur)) fpAt.value = String(Math.min(cur, ht));
         }
+    }
+
+    /**
+     * Custos em pontos — GURPS 4e Basic Set (Módulo Personagens / Characters):
+     * ST/HT ±10 por nível vs 10; DX/IQ ±20; PV vs ST ×2; PF vs HT ×3; Vontade/Percepção vs IQ ×5.
+     * Roda após sync “grátis” de PV/FAD/VON/PER para recalcular `*_custo` e refletir desvios.
+     */
+    function aplicarCustosXpBasicSet() {
+        const st = Math.trunc(num('#fg_st_valor', 10));
+        const dx = Math.trunc(num('#fg_dx_valor', 10));
+        const iq = Math.trunc(num('#fg_iq_valor', 10));
+        const ht = Math.trunc(num('#fg_ht_valor', 10));
+        const hp = Math.trunc(num('#fg_hp_valor', 10));
+        const fp = Math.trunc(num('#fg_fp_valor', 10));
+        const will = Math.trunc(num('#fg_will_valor', 10));
+        const per = Math.trunc(num('#fg_per_valor', 10));
+        const setC = (sel, v) => {
+            const n = el(sel);
+            if (n) n.value = String(v);
+        };
+        if (![st, dx, iq, ht].every(Number.isFinite)) return;
+        setC('#fg_st_custo', (st - 10) * 10);
+        setC('#fg_ht_custo', (ht - 10) * 10);
+        setC('#fg_dx_custo', (dx - 10) * 20);
+        setC('#fg_iq_custo', (iq - 10) * 20);
+        if (Number.isFinite(hp)) setC('#fg_hp_custo', (hp - st) * 2);
+        if (Number.isFinite(fp)) setC('#fg_fp_custo', (fp - ht) * 3);
+        if (Number.isFinite(will)) setC('#fg_will_custo', (will - iq) * 5);
+        if (Number.isFinite(per)) setC('#fg_per_custo', (per - iq) * 5);
     }
 
     /** Lite: Vontade = IQ; Percepção = IQ (só se custo XP da linha = 0). */
@@ -196,13 +225,11 @@
     }
 
     function onStValorInput() {
-        aplicarDanoThrSwPorSt();
-        aplicarPvMaxPorSt();
+        aplicarDerivadosGurpsLiteFicha();
     }
 
     function onHtValorInput() {
-        aplicarVelocidadeBasicaDerivada();
-        aplicarFadMaxPorHt();
+        aplicarDerivadosGurpsLiteFicha();
     }
 
     /**
@@ -227,11 +254,96 @@
 
     /** Recalcula na ficha o que o backend deriva (Lite). */
     function aplicarDerivadosGurpsLiteFicha() {
-        aplicarVelocidadeBasicaDerivada();
-        aplicarDanoThrSwPorSt();
+        /* Sincronizar valores “grátis” antes de recalcular XP (evita custo negativo ao subir ST/IQ). */
         aplicarPvMaxPorSt();
         aplicarFadMaxPorHt();
         aplicarVonPerPorIq();
+        aplicarCustosXpBasicSet();
+        aplicarVelocidadeBasicaDerivada();
+        aplicarDanoThrSwPorSt();
+    }
+
+    function tipoFromCatalogSkill(s) {
+        if (!s) return '';
+        const b = String(s.atributo_base || '').toUpperCase();
+        const d = s.dificuldade === 'F' ? 'F' : s.dificuldade === 'D' ? 'D' : 'M';
+        return `${b}/${d}`;
+    }
+
+    async function popularDatalistsLite() {
+        try {
+            const data = await svc.catalogoLiteFicha();
+            const fill = (id, names) => {
+                const dl = el(id);
+                if (!dl) return;
+                dl.innerHTML = '';
+                names.forEach((n) => {
+                    const o = document.createElement('option');
+                    o.value = n;
+                    dl.appendChild(o);
+                });
+            };
+            fill('#dlGurpsLitePericias', (data.pericias || []).map((x) => x.nome));
+            fill('#dlGurpsLiteVantagens', (data.vantagens || []).map((x) => x.nome));
+            fill('#dlGurpsLiteDesvantagens', (data.desvantagens || []).map((x) => x.nome));
+            window.__gurpsLiteCatalogo = data;
+        } catch (e) {
+            console.warn('Catálogo Lite', e);
+        }
+    }
+
+    function wireCatalogRowVant(row) {
+        const nome = row.querySelector('.fg-vant-nome');
+        if (!nome || nome.dataset.gurpsCatBound) return;
+        nome.dataset.gurpsCatBound = '1';
+        nome.setAttribute('list', 'dlGurpsLiteVantagens');
+        nome.addEventListener('change', () => {
+            const cat = window.__gurpsLiteCatalogo;
+            if (!cat?.vantagens) return;
+            const n = nome.value.trim();
+            const item = cat.vantagens.find((x) => x.nome === n);
+            if (!item || item.custo == null) return;
+            const custoInp = row.querySelector('.fg-vant-custo');
+            if (custoInp) custoInp.value = String(item.custo);
+        });
+    }
+
+    function wireCatalogRowDesv(row) {
+        const nome = row.querySelector('.fg-desv-nome');
+        if (!nome || nome.dataset.gurpsCatBound) return;
+        nome.dataset.gurpsCatBound = '1';
+        nome.setAttribute('list', 'dlGurpsLiteDesvantagens');
+        nome.addEventListener('change', () => {
+            const cat = window.__gurpsLiteCatalogo;
+            if (!cat?.desvantagens) return;
+            const n = nome.value.trim();
+            const item = cat.desvantagens.find((x) => x.nome === n);
+            if (!item || item.custo == null) return;
+            const custoInp = row.querySelector('.fg-desv-custo');
+            if (custoInp) custoInp.value = String(item.custo);
+        });
+    }
+
+    function wireCatalogRowPer(row) {
+        const nome = row.querySelector('.fg-per-nome');
+        if (!nome || nome.dataset.gurpsCatBound) return;
+        nome.dataset.gurpsCatBound = '1';
+        nome.setAttribute('list', 'dlGurpsLitePericias');
+        nome.addEventListener('change', () => {
+            const cat = window.__gurpsLiteCatalogo;
+            if (!cat?.pericias) return;
+            const n = nome.value.trim();
+            const item = cat.pericias.find((x) => x.nome === n);
+            if (!item) return;
+            const tipoInp = row.querySelector('.fg-per-tipo');
+            if (tipoInp) tipoInp.value = tipoFromCatalogSkill(item);
+        });
+    }
+
+    function rewireAllCatalogRows() {
+        document.querySelectorAll('.fg-row-vant').forEach(wireCatalogRowVant);
+        document.querySelectorAll('.fg-row-desv').forEach(wireCatalogRowDesv);
+        document.querySelectorAll('.fg-row-per').forEach(wireCatalogRowPer);
     }
 
     function syncXpMirror() {
@@ -464,6 +576,7 @@
             '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button>';
         d.querySelector('button').addEventListener('click', () => d.remove());
         w.appendChild(d);
+        wireCatalogRowVant(d);
     }
 
     function addRowDesv() {
@@ -477,6 +590,7 @@
             '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button>';
         d.querySelector('button').addEventListener('click', () => d.remove());
         w.appendChild(d);
+        wireCatalogRowDesv(d);
     }
 
     function addRowPer() {
@@ -492,6 +606,7 @@
             '<td><button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button></td>';
         tr.querySelector('button').addEventListener('click', () => tr.remove());
         tb.appendChild(tr);
+        wireCatalogRowPer(tr);
     }
 
     window.fgAddVant = addRowVant;
@@ -579,6 +694,7 @@
                 r.querySelector('.fg-per-custo').value = v.custo;
             }
         });
+        rewireAllCatalogRows();
     }
 
     function preencherJogador() {
@@ -610,6 +726,7 @@
             } else {
                 salvarLocal();
             }
+            aplicarDerivadosGurpsLiteFicha();
         } catch (e) {
             Toast.error(e.message || 'Erro ao carregar');
         }
@@ -656,15 +773,19 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         AuthService.configurarHeaderUsuario();
-        carregar();
+        await popularDatalistsLite();
+        await carregar();
         el('#btnSalvarFicha')?.addEventListener('click', salvar);
         el('#fg_pt_total')?.addEventListener('input', syncXpMirror);
         el('#fg_ht_valor')?.addEventListener('input', onHtValorInput);
-        el('#fg_dx_valor')?.addEventListener('input', aplicarVelocidadeBasicaDerivada);
+        el('#fg_dx_valor')?.addEventListener('input', aplicarDerivadosGurpsLiteFicha);
         el('#fg_st_valor')?.addEventListener('input', onStValorInput);
-        el('#fg_iq_valor')?.addEventListener('input', aplicarVonPerPorIq);
+        el('#fg_iq_valor')?.addEventListener('input', aplicarDerivadosGurpsLiteFicha);
+        ['#fg_hp_valor', '#fg_fp_valor', '#fg_will_valor', '#fg_per_valor'].forEach((sel) => {
+            el(sel)?.addEventListener('input', aplicarDerivadosGurpsLiteFicha);
+        });
         /* btnTrocarJogo / btnLogout: configurarHeaderUsuario() já associa quando há usuário */
 
         el('#fg_portrait_file')?.addEventListener('change', (ev) => {

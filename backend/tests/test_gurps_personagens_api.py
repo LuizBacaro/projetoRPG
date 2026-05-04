@@ -425,6 +425,21 @@ def test_catalogo_pericias_lite_disponivel(gurps_personagens_db):
     assert "Medicina" in nomes
 
 
+def test_catalogo_lite_ficha_retorna_pericias_vantagens_desvantagens(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.get("/api/v1/gurps/personagens/catalogo/lite-ficha")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert isinstance(body.get("pericias"), list) and len(body["pericias"]) >= 1
+    assert isinstance(body.get("vantagens"), list) and len(body["vantagens"]) >= 1
+    assert isinstance(body.get("desvantagens"), list) and len(body["desvantagens"]) >= 1
+    assert body["pericias"][0].get("nome")
+    assert "meta" in body and "custos_atributos" in body["meta"]
+    assert "custos_pontos_fonte" in body["meta"]
+
+
 def test_criar_rejeita_pericia_lite_sem_pre_requisito(gurps_personagens_db):
     SessionLocal, u1, _ = gurps_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))

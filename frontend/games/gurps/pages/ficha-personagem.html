@@ -83,17 +83,17 @@
                         <div class="ficha-attr-grid">
                             <div class="ficha-attr-pair">
                                 <div class="ficha-attr-pair-header"><span></span><span>Valor</span><span>XP</span></div>
-                                <div class="ficha-attr-row"><strong>ST</strong><input id="fg_st_valor" type="number" value="10" title="Ao mudar, GOLP e BAL seguem a tabela Lite (igual ao backend)." /><input id="fg_st_custo" type="number" value="0" /></div>
-                                <div class="ficha-attr-row"><strong>DX</strong><input id="fg_dx_valor" type="number" value="10" /><input id="fg_dx_custo" type="number" value="0" /></div>
-                                <div class="ficha-attr-row"><strong>IQ</strong><input id="fg_iq_valor" type="number" value="10" title="Com XP VON/PER = 0, atualiza Vontade e Percepção (Lite)." /><input id="fg_iq_custo" type="number" value="0" /></div>
-                                <div class="ficha-attr-row"><strong>HT</strong><input id="fg_ht_valor" type="number" value="10" title="Afeta VB com DX, FAD (se XP FAD=0) e limita FAD atual." /><input id="fg_ht_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>ST</strong><input id="fg_st_valor" type="number" value="10" title="Ao mudar, GOLP e BAL seguem a tabela Lite (igual ao backend)." /><input id="fg_st_custo" type="number" value="0" title="Basic Set: ±10 pts por nível acima/abaixo de 10 (recalculado ao mudar o valor)." readonly tabindex="-1" /></div>
+                                <div class="ficha-attr-row"><strong>DX</strong><input id="fg_dx_valor" type="number" value="10" /><input id="fg_dx_custo" type="number" value="0" title="Basic Set: ±20 pts por nível acima/abaixo de 10." readonly tabindex="-1" /></div>
+                                <div class="ficha-attr-row"><strong>IQ</strong><input id="fg_iq_valor" type="number" value="10" title="Com custo VON/PER = 0 (após recálculo Basic), Vontade e Percepção acompanham o IQ (regra Lite na ficha)." /><input id="fg_iq_custo" type="number" value="0" title="Basic Set: ±20 pts por nível acima/abaixo de 10." readonly tabindex="-1" /></div>
+                                <div class="ficha-attr-row"><strong>HT</strong><input id="fg_ht_valor" type="number" value="10" title="Afeta VB com DX, FAD (se custo FAD = 0) e limita FAD atual." /><input id="fg_ht_custo" type="number" value="0" title="Basic Set: ±10 pts por nível acima/abaixo de 10." readonly tabindex="-1" /></div>
                             </div>
                             <div class="ficha-attr-pair">
                                 <div class="ficha-attr-pair-header"><span></span><span>Valor</span><span>XP</span></div>
-                                <div class="ficha-attr-row"><strong>PV</strong><input id="fg_hp_valor" type="number" value="10" title="Lite: = ST se XP em PV for 0; PV atual limitado ao novo máx ao mudar ST." /><input id="fg_hp_custo" type="number" value="0" title="Se &gt; 0, PV não é sobrescrito ao mudar ST." /></div>
-                                <div class="ficha-attr-row"><strong>PER</strong><input id="fg_per_valor" type="number" value="10" title="Lite: = IQ com XP em PER = 0; atualiza ao mudar IQ." /><input id="fg_per_custo" type="number" value="0" title="Se &gt; 0, PER não segue IQ automaticamente." /></div>
-                                <div class="ficha-attr-row"><strong>VON</strong><input id="fg_will_valor" type="number" value="10" title="Lite: = IQ com XP em VON = 0; atualiza ao mudar IQ." /><input id="fg_will_custo" type="number" value="0" title="Se &gt; 0, VON não segue IQ automaticamente." /></div>
-                                <div class="ficha-attr-row"><strong>FAD</strong><input id="fg_fp_valor" type="number" value="10" title="Lite: = HT se XP em FAD for 0; FAD atual limitado ao novo máx ao mudar HT." /><input id="fg_fp_custo" type="number" value="0" title="Se &gt; 0, FAD não é sobrescrito ao mudar HT." /></div>
+                                <div class="ficha-attr-row"><strong>PV</strong><input id="fg_hp_valor" type="number" value="10" title="= ST quando custo PV = 0; PV atual limitado ao novo máx ao mudar ST." /><input id="fg_hp_custo" type="number" value="0" title="Basic Set: 2 pts por PV acima/abaixo do ST (custo ≠ 0: PV não acompanha ST ao mudar ST)." readonly tabindex="-1" /></div>
+                                <div class="ficha-attr-row"><strong>PER</strong><input id="fg_per_valor" type="number" value="10" title="= IQ quando custo PER = 0; atualiza ao mudar IQ." /><input id="fg_per_custo" type="number" value="0" title="Basic Set: 5 pts por ponto acima/abaixo do IQ." readonly tabindex="-1" /></div>
+                                <div class="ficha-attr-row"><strong>VON</strong><input id="fg_will_valor" type="number" value="10" title="= IQ quando custo VON = 0; atualiza ao mudar IQ." /><input id="fg_will_custo" type="number" value="0" title="Basic Set: 5 pts por ponto acima/abaixo do IQ." readonly tabindex="-1" /></div>
+                                <div class="ficha-attr-row"><strong>FAD</strong><input id="fg_fp_valor" type="number" value="10" title="= HT quando custo FAD = 0; FAD atual limitado ao novo máx ao mudar HT." /><input id="fg_fp_custo" type="number" value="0" title="Basic Set: 3 pts por PF acima/abaixo do HT." readonly tabindex="-1" /></div>
                             </div>
                         </div>
                         <p class="ficha-hint">PV/FAD atuais (combate):</p>
@@ -278,6 +278,10 @@
     </article>
 </div>
 
+<datalist id="dlGurpsLitePericias"></datalist>
+<datalist id="dlGurpsLiteVantagens"></datalist>
+<datalist id="dlGurpsLiteDesvantagens"></datalist>
+
 <script src="/js/shared/render-api-origin-boot.js"></script>
 <script src="/games/dnd35/js/config/api-url-global.js"></script>
 <script src="/games/dnd35/js/services/AuthService.js"></script>
@@ -286,6 +290,6 @@
     if (!AuthService.exigirJogo('gurps')) {}
 </script>
 <script src="../js/services/GurpsPersonagemService.js"></script>
-<script src="../js/pages/ficha-gurps.js?v=20260504e"></script>
+<script src="../js/pages/ficha-gurps.js?v=20260504g"></script>
 </body>
 </html>

@@ -83,4 +83,10 @@ class GurpsPersonagemService {
         });
         return this._handleResponse(res, 'Erro ao enviar retrato');
     }
+
+    /** Catálogo Lite (JSON) para autocomplete de perícias / vantagens / desvantagens na ficha. */
+    async catalogoLiteFicha() {
+        const res = await fetch(this._url('/catalogo/lite-ficha'), { headers: this._headers(false) });
+        return this._handleResponse(res, 'Erro ao carregar catálogo Lite');
+    }
 }
