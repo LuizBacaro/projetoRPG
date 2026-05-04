@@ -66,3 +66,144 @@ Não é “anti-SOLID” por si: é **infra de registo de metadata** (Alembic/te
 
 A arquitetura “mais limpa” para o Arena é: **hub estável e reutilizável em `shared`, cada jogo isolado em `games/<slug>`, routers finos, serviços como orquestração, repositórios como persistência, dependências sempre injetadas para cima — e reuso feito subindo código agnóstico de sistema, não copiando entre jogos.**
 
+---
+
+## 7. GURPS 4E — checklist de implementação (ficha + arena)
+
+**Fonte de requisitos:** skill `.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md` (derivada do *Módulo Básico Lite* + *Personagens*, sem copiar texto dos PDFs).
+
+**Legenda:** ✅ critério objetivo de aceite; **Onda** = ordem sugerida (menor número primeiro).
+
+### Onda 0 — Decisão de produto (bloqueante)
+
+| ID | Item | Aceite |
+|----|------|--------|
+| **G0.1** | Ordem na arena | ✅ Documentar: ordem padrão = **Velocidade básica** (desempate DX, depois aleatório). Campo `iniciativa` vira derivado, override opcional, ou deprecado. |
+| **G0.2** | Escopo de regras | ✅ “Lite primeiro”: combate e ficha mínimos alinhados ao Lite; livro *Personagens* só em tickets explícitos (catálogos grandes). |
+
+### Onda 1 — Ficha: derivações canônicas (backend + UI)
+
+| ID | RF | Item | Aceite |
+|----|-----|------|--------|
+| **G1.1** | RF-F05 | Dano thr/swing por ST | ✅ Tabela Lite ST→GDP/BAL codificada; ficha e API expõem par (ex. `1d` / `2d-1`); opcionalmente persistir ou só calcular. |
+| **G1.2** | RF-F06 | Esquiva | ✅ Esquiva = VB + 3 (fração de VB ignorada na esquiva, conforme Lite); recalcular ao mudar HT/DX se VB mudar. |
+| **G1.3** | RF-F02 | PV / PF base | ✅ Defaults: PV máx = ST, PF máx = HT quando sem modificadores; UI mostra coerência com colunas existentes. |
+| **G1.4** | RF-F03 | Von / Per | ✅ Defaults IQ; edição continua permitida; documentar no OpenAPI/help da ficha. |
+| **G1.5** | RF-F04 | VB e deslocamento | ✅ VB = (HT+DX)/4 sem arredondar à toa; deslocamento exibido como na regra escolhida (Lite); tooltip ou doc “como calculamos”. |
+
+### Onda 2 — Resolução (motor de jogo reutilizável)
+
+| ID | RF | Item | Aceite |
+|----|-----|------|--------|
+| **G2.1** | RF-R01 | Rolagem 3d6 | ✅ Função única (front ou `shared` TS + testes; opcional endpoint dev): total, sucesso/falha vs NH, margem, regras 3–4 / 17–18 do Lite. |
+| **G2.2** | RF-R02 | Nível efetivo | ✅ API ou helper: `nh_base + soma(modificadores)` como alvo do 3d6. |
+| **G2.3** | RF-R03 | Dado de dano | ✅ Parser `Nd+M`, rolar e retornar total; hook para RD depois. |
+
+### Onda 3 — Arena GURPS (fluxo de combate Lite)
+
+| ID | RF | Item | Aceite |
+|----|-----|------|--------|
+| **G3.1** | RF-A01 | Iniciativa / ordem | ✅ Ao iniciar combate, ordenar por VB desc.; persistir ordem no estado do combate; desempate DX depois regra G0.1. |
+| **G3.2** | RF-A02 | Manobra por turno | ✅ Estado guarda manobra atual por combatente; troca só no turno; efeito em defesas conforme manobra (mínimo: Fazer Nada, Ataque, Defesa Total). |
+| **G3.3** | RF-A03 | Ataque → defesa → dano | ✅ Fluxo mínimo: escolher alvo, rolar ataque (G2.1), defesa ativa do alvo, se falhar aplicar dano (G2.3) em `pvs_atual`. |
+| **G3.4** | RF-A04 | Múltiplas defesas | ✅ Penalidade cumulativa configurável ou fixa Lite; documentar constante. |
+| **G3.5** | RF-A05 | Postura | ✅ Mínimo: em pé / agachado / deitado com mods de ataque/defesa/alvo/mov do Lite (tabela resumida na UI). |
+
+### Onda 4 — Conteúdo e ficha rica
+
+| ID | RF | Item | Aceite |
+|----|-----|------|--------|
+| **G4.1** | RF-F09 | Combate sem armas | ✅ Soco/chute com dano derivado e NH mínimo (DX ou perícia quando existir). |
+| **G4.2** | RF-F10 / F11 | Defesas + equipamento | ✅ Aparar/Bloqueio ligados a perícia/escudo estruturado; RD de armadura no fluxo de dano. |
+| **G4.3** | RF-F07 / F08 | Catálogo | ✅ Subconjunto **Lite** de perícias; V/D como lista + validação de pré-requisitos (fase posterior ao Lite). |
+| **G4.4** | RF-F12 | extras_json | ✅ Mapa documentado (README curto ou comentário no schema): o que migra para coluna quando estável. |
+
+### Onda 5 — Condicionais avançadas
+
+| ID | RF | Item | Aceite |
+|----|-----|------|--------|
+| **G5.1** | RF-A06 | Fadiga em combate | ✅ Regras de esforço/surtos conforme mesa (após PV/dano estável). |
+| **G5.2** | RF-A07 | Lesão / atordoamento / morte | ✅ Estados e recuperação HT alinhados ao Lite; integrar com manobra Fazer Nada. |
+
+### Cruzamento com a “Ficha Aprimorada” (PDF no repo)
+
+- Abrir `GURPS 4E - Ficha de Personagem (Aprimorada 1).pdf` e marcar cada bloco: **coluna SQL** | **extras_json** | **ainda não existe**.
+- Priorizar mover para colunas o que entrar em **G1**–**G3** (cálculo e combate).
+
+### Prompt rápido para agente
+
+> Implementa o próximo item do **§7 GURPS** em `melhoria-arquitetura`, na ordem das ondas. Obedece `.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md`. Não copiar texto dos PDFs. Preserva contratos `GurpsPersonagem*` e testes; migrations só quando necessário.
+
+---
+
+### 7.1 Mapeamento para issues (GitHub / Notion)
+
+**Objetivo:** cada linha abaixo vira **uma issue** com o mesmo **ID** (`G0.1` … `G5.2`) no título, para rastreio cruzado com esta checklist.
+
+#### Convenção
+
+| Campo | Valor sugerido |
+|--------|----------------|
+| **Título** | `[GURPS G1.1] Dano thr/swing por ST (RF-F05)` — sempre `GURPS` + ID + nome curto + `(RF-…)` |
+| **Labels** | `gurps`, `onda-N` (0–5), e uma de área: `ficha` \| `arena` \| `motor` \| `produto` \| `conteúdo` |
+| **Épico (milestone ou pai Notion)** | `GURPS — Onda 0 (decisões)` … `GURPS — Onda 5 (avançado)` |
+| **Corpo mínimo** | Colar o bloco *template* no fim desta secção; preencher **Aceite** copiando da tabela da onda correspondente. |
+
+#### Lista de issues (título pronto)
+
+| ID | Título da issue | Labels (exemplo) | Depende de |
+|----|-------------------|------------------|------------|
+| G0.1 | `[GURPS G0.1] Ordem na arena: VB + desempates (RF-A01)` | `gurps`, `onda-0`, `produto`, `arena` | — |
+| G0.2 | `[GURPS G0.2] Escopo: Lite primeiro; Personagens em tickets` | `gurps`, `onda-0`, `produto` | — |
+| G1.1 | `[GURPS G1.1] Tabela ST → dano thr/swing na ficha e API (RF-F05)` | `gurps`, `onda-1`, `ficha`, `backend` | G0.2 |
+| G1.2 | `[GURPS G1.2] Esquiva = VB+3; recalcular com HT/DX (RF-F06)` | `gurps`, `onda-1`, `ficha`, `backend` | G1.5 |
+| G1.3 | `[GURPS G1.3] PV/PF máx default ST/HT sem mods (RF-F02)` | `gurps`, `onda-1`, `ficha` | — |
+| G1.4 | `[GURPS G1.4] Von/Per default IQ + doc OpenAPI/UI (RF-F03)` | `gurps`, `onda-1`, `ficha` | — |
+| G1.5 | `[GURPS G1.5] VB (HT+DX)/4 e deslocamento Lite na UI (RF-F04)` | `gurps`, `onda-1`, `ficha` | — |
+| G2.1 | `[GURPS G2.1] Motor rolagem 3d6 + margem + críticos Lite (RF-R01)` | `gurps`, `onda-2`, `motor` | — |
+| G2.2 | `[GURPS G2.2] Nível efetivo NH + modificadores (RF-R02)` | `gurps`, `onda-2`, `motor` | G2.1 |
+| G2.3 | `[GURPS G2.3] Parser/rolo Nd+M e total de dano (RF-R03)` | `gurps`, `onda-2`, `motor` | — |
+| G3.1 | `[GURPS G3.1] Ordenar combatentes por VB + desempate (RF-A01)` | `gurps`, `onda-3`, `arena` | G0.1, G1.5 |
+| G3.2 | `[GURPS G3.2] Estado de manobra por turno (mínimo Lite) (RF-A02)` | `gurps`, `onda-3`, `arena` | G3.1 |
+| G3.3 | `[GURPS G3.3] Fluxo ataque → defesa → dano em PV (RF-A03)` | `gurps`, `onda-3`, `arena` | G2.1, G2.3, G3.2 |
+| G3.4 | `[GURPS G3.4] Penalidade múltiplas defesas (RF-A04)` | `gurps`, `onda-3`, `arena` | G3.3 |
+| G3.5 | `[GURPS G3.5] Postura em pé/agachado/deitado + mods (RF-A05)` | `gurps`, `onda-3`, `arena` | G3.3 |
+| G4.1 | `[GURPS G4.1] Combate sem armas soco/chute (RF-F09)` | `gurps`, `onda-4`, `ficha`, `arena` | G1.1, G2.x |
+| G4.2 | `[GURPS G4.2] Aparar/bloqueio + RD armadura no dano (RF-F10/F11)` | `gurps`, `onda-4`, `ficha`, `arena` | G3.3 |
+| G4.3 | `[GURPS G4.3] Catálogo Lite perícias + V/D e pré-reqs (RF-F07/F08)` | `gurps`, `onda-4`, `conteúdo` | G0.2 |
+| G4.4 | `[GURPS G4.4] Documentar extras_json e migração p/ colunas (RF-F12)` | `gurps`, `onda-4`, `ficha`, `docs` | — |
+| G5.1 | `[GURPS G5.1] Fadiga em combate esforço/surtos (RF-A06)` | `gurps`, `onda-5`, `arena` | G3.3 |
+| G5.2 | `[GURPS G5.2] Lesão/atordoamento/morte + Fazer Nada (RF-A07)` | `gurps`, `onda-5`, `arena` | G3.2, G3.3 |
+
+#### Template de corpo (GitHub ou Notion)
+
+```markdown
+## Contexto
+Arena TTRPG — GURPS 4E (Lite primeiro). Ver skill `.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md`.
+
+## ID
+<!-- ex.: G1.1 -->
+
+## Critérios de aceite
+<!-- copiar da tabela da onda em §7 -->
+
+## Fora de escopo
+Não copiar texto dos PDFs; não expandir para regras fora do Lite sem ticket.
+
+## Verificação
+- [ ] Testes ou smoke manual indicados no PR
+- [ ] Contrato API / migração se aplicável
+```
+
+#### Criar no GitHub (local)
+
+Com [GitHub CLI](https://cli.github.com/) autenticado:
+
+```bash
+gh issue create --title "[GURPS G1.1] …" --label "gurps,onda-1,ficha" --body-file issue-body.md
+```
+
+#### Notion
+
+Criar uma **database de tarefas** (ou usar a existente): propriedades **ID** (texto `G1.1`), **Onda** (número), **RF** (texto), **Estado**, **Depende** (relação). Duplicar uma linha por issue usando a coluna **Título da issue** acima.
+

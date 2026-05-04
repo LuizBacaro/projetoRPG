@@ -9,6 +9,7 @@ __pycache__/
 *.pyc
 *.pyo
 .venv/
+.venv_pdf/
 venv/
 *.egg-info/
 
@@ -23,6 +24,9 @@ backend/uploads/**
 # IDE
 .vscode/
 .idea/
+
+# Extrações locais de PDF (pdftotext); não versionar trechos grandes
+docs/_extracted/
 
 # Scripts: artefatos gerados em runtime (não versionar)
 backend/scripts/generated/
