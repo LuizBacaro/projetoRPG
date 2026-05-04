@@ -13,6 +13,16 @@ import os
 
 logger = logging.getLogger(__name__)
 
+# Produção: front está no Registro.br (apex + www). Mescladas em ALLOWED_ORIGINS se faltarem no Render.
+_ARENA_FRONTEND_ORIGINS_PROD: tuple[str, ...] = (
+    "https://arena-de-combate-rpg.com.br",
+    "https://www.arena-de-combate-rpg.com.br",
+)
+
+
+def _norm_cors_origin(url: str) -> str:
+    return (url or "").strip().rstrip("/")
+
 
 class Settings(BaseSettings):
     """
@@ -46,6 +56,29 @@ class Settings(BaseSettings):
 
     # ── CORS ─────────────────────────────────────────────────────────────────
     ALLOWED_ORIGINS: List[str] = ["*"]
+
+    @model_validator(mode="after")
+    def _merge_arena_cors_origins(self):
+        """Em produção, garante apex + www do domínio Arena no CORS (evita bloqueio só com `www`)."""
+        if "*" in self.ALLOWED_ORIGINS:
+            return self
+        seen: set[str] = set()
+        merged: list[str] = []
+        for raw in self.ALLOWED_ORIGINS:
+            n = _norm_cors_origin(str(raw))
+            if not n or n in seen:
+                continue
+            seen.add(n)
+            merged.append(n)
+        if self.ENVIRONMENT == "production":
+            for raw in _ARENA_FRONTEND_ORIGINS_PROD:
+                n = _norm_cors_origin(raw)
+                if n not in seen:
+                    seen.add(n)
+                    merged.append(n)
+                    logger.info("CORS: origem Arena adicionada automaticamente em produção: %s", n)
+        self.ALLOWED_ORIGINS = merged
+        return self
 
     # ── Upload ───────────────────────────────────────────────────────────────
     MAX_FILE_SIZE: int = 5 * 1024 * 1024  # 5MB
