@@ -42,6 +42,7 @@ from .shared.api.v1 import (
 from .games.gurps.api.v1 import campanhas as gurps_campanhas
 from .games.gurps.api.v1 import combate as gurps_combate
 from .games.gurps.api.v1 import personagens as gurps_personagens
+from .games.gurps.api.v1 import rolagens as gurps_rolagens
 from .games.dnd35.api.v1 import (
     armaduras_protecao as dnd35_armaduras_protecao,
     divindades_custom as dnd35_divindades_custom,
@@ -304,6 +305,7 @@ app.include_router(dnd35_habilidades_especiais.router, prefix=settings.API_V1_PR
 app.include_router(gurps_personagens.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_combate.router, prefix=settings.API_V1_PREFIX)
+app.include_router(gurps_rolagens.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 

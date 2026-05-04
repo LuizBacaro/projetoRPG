@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
+from app.games.gurps.core.ordem_combate import ordenar_personagens_para_turno_gurps
 from app.games.gurps.models.personagem import GurpsPersonagem
 from app.repositories.base import BaseRepository
 
@@ -96,9 +97,5 @@ class GurpsPersonagemRepository(BaseRepository[GurpsPersonagem]):
             .all()
         )
 
-    def ordenar_por_iniciativa(self, personagens: List[GurpsPersonagem]) -> List[GurpsPersonagem]:
-        return sorted(
-            personagens,
-            key=lambda p: (p.iniciativa or 0, p.nome or ""),
-            reverse=True,
-        )
+    def ordenar_para_turno_gurps(self, personagens: List[GurpsPersonagem]) -> List[GurpsPersonagem]:
+        return ordenar_personagens_para_turno_gurps(personagens)

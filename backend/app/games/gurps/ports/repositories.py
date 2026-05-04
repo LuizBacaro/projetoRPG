@@ -38,6 +38,6 @@ class GurpsPersonagemRepositoryProtocol(Protocol):
 
     def get_by_ids(self, ids: List[int]) -> List[GurpsPersonagem]: ...
 
-    def ordenar_por_iniciativa(
+    def ordenar_para_turno_gurps(
         self, personagens: List[GurpsPersonagem]
     ) -> List[GurpsPersonagem]: ...

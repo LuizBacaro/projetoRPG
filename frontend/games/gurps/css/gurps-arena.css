@@ -396,6 +396,108 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
+.gurps-arena-postura-control {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+}
+
+.gurps-arena-postura-label {
+    font-size: 0.78rem;
+    color: var(--texto-secundario);
+}
+
+.gurps-arena-postura-row {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.gurps-arena-postura-select {
+    flex: 1;
+}
+
+.gurps-arena-action-history-wrap {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.gurps-arena-action-history-title {
+    font-size: 0.85rem;
+    color: #9fb0c3;
+}
+
+.gurps-arena-action-history-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.82rem;
+    color: #c7d2dd;
+}
+
+.gurps-arena-action-history-empty {
+    opacity: 0.75;
+}
+
+.gurps-arena-action-history-time {
+    color: #e8cd85;
+}
+
+.gurps-arena-action-history-time.is-success {
+    color: #76d39b;
+}
+
+.gurps-arena-action-modal {
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 460px;
+    width: 95%;
+}
+
+.gurps-arena-action-form {
+    padding: 1rem;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.gurps-arena-action-title {
+    margin: 0;
+}
+
+.gurps-arena-action-label {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.gurps-arena-action-field-hidden {
+    display: none;
+}
+
+.gurps-arena-action-result {
+    padding: 0.6rem 0.7rem;
+    border-radius: 8px;
+    background: #0f1720;
+    border: 1px solid #2a3441;
+    font-size: 0.88rem;
+}
+
+.gurps-arena-action-result-hidden {
+    display: none;
+}
+
+.gurps-arena-action-result.is-success {
+    border-color: #1f7a4a;
+}
+
+.gurps-arena-action-result.is-warning {
+    border-color: #7a5a1f;
+}
+
+.gurps-arena-action-buttons {
+    margin-top: 0.25rem;
+}
+
 .gurps-arena-attrs h4,
 .gurps-arena-defenses h4,
 .gurps-arena-skills-wrap h4 {

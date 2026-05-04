@@ -58,11 +58,17 @@ def _app_mesa_jwt_auth(SessionLocal):
     return app
 
 
-def _criar_personagem(client: TestClient, nome: str, iniciativa: int = 0) -> int:
-    r = client.post(
-        "/api/v1/gurps/personagens",
-        json={"nome": nome, "tipo": "jogador", "iniciativa": iniciativa, "extras": {}},
-    )
+def _criar_personagem(
+    client: TestClient,
+    nome: str,
+    iniciativa: int = 0,
+    *,
+    velocidade_valor: float | None = None,
+) -> int:
+    body: dict = {"nome": nome, "tipo": "jogador", "iniciativa": iniciativa, "extras": {}}
+    if velocidade_valor is not None:
+        body["velocidade_valor"] = velocidade_valor
+    r = client.post("/api/v1/gurps/personagens", json=body)
     assert r.status_code == 201, r.text
     return r.json()["id"]
 
@@ -74,8 +80,8 @@ def test_mestre_cria_campanha_e_inicia_combate_com_personagens_do_jogador(
     c_jog = _client_mesa(SessionLocal, _usuario(j1))
     c_mestre = _client_mesa(SessionLocal, _usuario(mestre))
 
-    p_lento = _criar_personagem(c_jog, "Escudeiro", iniciativa=5)
-    p_rapido = _criar_personagem(c_jog, "Cavaleiro", iniciativa=12)
+    p_lento = _criar_personagem(c_jog, "Escudeiro", velocidade_valor=4.75)
+    p_rapido = _criar_personagem(c_jog, "Cavaleiro", velocidade_valor=6.0)
 
     r_camp = c_mestre.post(
         "/api/v1/gurps/campanhas",

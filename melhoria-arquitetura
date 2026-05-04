@@ -125,6 +125,11 @@ A arquitetura “mais limpa” para o Arena é: **hub estável e reutilizável e
 | **G5.1** | RF-A06 | Fadiga em combate | ✅ Regras de esforço/surtos conforme mesa (após PV/dano estável). |
 | **G5.2** | RF-A07 | Lesão / atordoamento / morte | ✅ Estados e recuperação HT alinhados ao Lite; integrar com manobra Fazer Nada. |
 
+### Andamento de implementação (execução)
+
+- Concluídos: **G0.1**, **G0.2**, **G1.1**, **G1.2**, **G1.3**, **G1.4**, **G1.5**, **G2.1**, **G2.2**, **G2.3**, **G3.1**, **G3.2**, **G3.3**, **G3.4**, **G3.5**, **G4.1**, **G4.2**, **G4.3**, **G4.4**, **G5.1**, **G5.2**.
+- Próximo recomendado: fechar pendências de UX da arena (histórico curto de ações e refinos visuais do modal).
+
 ### Cruzamento com a “Ficha Aprimorada” (PDF no repo)
 
 - Abrir `GURPS 4E - Ficha de Personagem (Aprimorada 1).pdf` e marcar cada bloco: **coluna SQL** | **extras_json** | **ainda não existe**.

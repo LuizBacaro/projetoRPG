@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import inspect
 
 
 revision: str = "f7a8b9c0d1e2"
@@ -18,6 +19,13 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    inspector = inspect(bind)
+    tabelas = set(inspector.get_table_names())
+
+    if "gurps_campanhas_sessoes" in tabelas:
+        return
+
     op.create_table(
         "gurps_campanhas_sessoes",
         sa.Column("id", sa.Integer(), nullable=False),
@@ -63,6 +71,12 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    bind = op.get_bind()
+    inspector = inspect(bind)
+    tabelas = set(inspector.get_table_names())
+    if "gurps_campanhas_sessoes" not in tabelas:
+        return
+
     op.drop_index(
         "ix_gurps_campanhas_sessoes_campanha_id",
         table_name="gurps_campanhas_sessoes",

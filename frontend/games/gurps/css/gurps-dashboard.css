@@ -314,6 +314,10 @@ button.gurps-btn-ghost:hover {
     color: #fde68a;
 }
 
+.gurps-mt-0 {
+    margin-top: 0;
+}
+
 /* Arena */
 .gurps-pick-list {
     display: flex;
@@ -365,6 +369,33 @@ button.gurps-btn-ghost:hover {
     flex-wrap: wrap;
     gap: 0.6rem;
     margin-bottom: 1rem;
+}
+
+.gurps-arena-participantes-label {
+    margin: 0.75rem 0 0;
+    font-size: 0.82rem;
+    color: var(--texto-secundario);
+}
+
+.gurps-arena-empty-pick {
+    grid-column: 1 / -1;
+    color: var(--texto-secundario);
+    font-size: 0.88rem;
+}
+
+.gurps-arena-per-list-empty {
+    border: none;
+    color: var(--texto-secundario);
+}
+
+.gurps-inline-actions-row {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.gurps-inline-actions-row--wrap {
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 button.gurps-btn-primary {

@@ -52,7 +52,7 @@ Reexportar símbolos públicos no `__init__.py` do pacote `ports` com `__all__`.
 
 **`app.games.gurps.ports`**
 
-- `GurpsPersonagemRepositoryProtocol` (inclui `get_by_ids` e `ordenar_por_iniciativa` para campanha/combate)
+- `GurpsPersonagemRepositoryProtocol` (inclui `get_by_ids` e `ordenar_para_turno_gurps` para campanha/combate)
 - `GurpsCampanhaRepositoryProtocol`
 - `GurpsCombateRepositoryProtocol`
 

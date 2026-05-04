@@ -91,8 +91,8 @@
                             <div class="ficha-attr-pair">
                                 <div class="ficha-attr-pair-header"><span></span><span>Valor</span><span>XP</span></div>
                                 <div class="ficha-attr-row"><strong>PV</strong><input id="fg_hp_valor" type="number" value="10" /><input id="fg_hp_custo" type="number" value="0" /></div>
-                                <div class="ficha-attr-row"><strong>PER</strong><input id="fg_per_valor" type="number" value="10" /><input id="fg_per_custo" type="number" value="0" /></div>
-                                <div class="ficha-attr-row"><strong>VON</strong><input id="fg_will_valor" type="number" value="10" /><input id="fg_will_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>PER</strong><input id="fg_per_valor" type="number" value="10" title="Quando omitido, assume IQ (regra Lite)." /><input id="fg_per_custo" type="number" value="0" /></div>
+                                <div class="ficha-attr-row"><strong>VON</strong><input id="fg_will_valor" type="number" value="10" title="Quando omitido, assume IQ (regra Lite)." /><input id="fg_will_custo" type="number" value="0" /></div>
                                 <div class="ficha-attr-row"><strong>FAD</strong><input id="fg_fp_valor" type="number" value="10" /><input id="fg_fp_custo" type="number" value="0" /></div>
                             </div>
                         </div>
@@ -100,16 +100,16 @@
                         <div class="ficha-weapons-row">
                             <div><label>PV atual</label><input id="fg_hp_atual" type="number" placeholder="máx." /></div>
                             <div><label>FAD atual</label><input id="fg_fp_atual" type="number" placeholder="máx." /></div>
-                            <div><label>Iniciativa</label><input id="fg_iniciativa" type="number" value="0" /></div>
+                            <div><label title="Nota na ficha; a arena ordena por Vel. bás. (e DX em empate)">Iniciativa</label><input id="fg_iniciativa" type="number" value="0" /></div>
                         </div>
                         <div class="ficha-combat-strip">
-                            <div class="ficha-combat-cell"><label>Vel. bás.</label><input id="fg_vel_valor" type="text" value="5.00" /></div>
-                            <div class="ficha-combat-cell"><label>Desl. bás.</label><input id="fg_mov_valor" type="number" value="5" /></div>
-                            <div class="ficha-combat-cell"><label>Golpe (GOLP)</label><input id="fg_dano_imp" type="text" placeholder="1d-1" /></div>
-                            <div class="ficha-combat-cell"><label>Balanço (BAL)</label><input id="fg_dano_bal" type="text" placeholder="1d+1" /></div>
+                            <div class="ficha-combat-cell"><label title="Calculada por (HT + DX) / 4 quando não preenchida">Vel. bás.</label><input id="fg_vel_valor" type="text" value="5.00" /></div>
+                            <div class="ficha-combat-cell"><label title="Quando omitido, usa a parte inteira da Vel. bás.">Desl. bás.</label><input id="fg_mov_valor" type="number" value="5" /></div>
+                            <div class="ficha-combat-cell"><label title="Quando omitido, backend calcula por ST (tabela Lite)">Golpe (GOLP)</label><input id="fg_dano_imp" type="text" placeholder="1d-1" /></div>
+                            <div class="ficha-combat-cell"><label title="Quando omitido, backend calcula por ST (tabela Lite)">Balanço (BAL)</label><input id="fg_dano_bal" type="text" placeholder="1d+1" /></div>
                         </div>
                         <div class="ficha-combat-strip ficha-combat-strip--second">
-                            <div class="ficha-combat-cell"><label>Esquiva</label><input id="fg_esquiva" type="number" value="0" /></div>
+                            <div class="ficha-combat-cell"><label title="Quando omitida, backend usa floor(VB) + 3 (Lite)">Esquiva</label><input id="fg_esquiva" type="number" value="0" /></div>
                             <div class="ficha-combat-cell"><label>Aparar</label><input id="fg_aparar" type="number" value="0" /></div>
                             <div class="ficha-combat-cell"><label>Bloqueio</label><input id="fg_bloqueio" type="text" placeholder="—" /></div>
                             <div class="ficha-combat-cell"><label>Escudo</label><input id="fg_escudo" type="text" placeholder="—" title="Salvo na ficha (extras)" /></div>

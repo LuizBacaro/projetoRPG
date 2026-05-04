@@ -248,3 +248,203 @@ def test_jogador_lista_apenas_próprios(gurps_personagens_db):
     nomes2 = {p["nome"] for p in r2.json()}
     assert "P2" in nomes2
     assert "P1" not in nomes2
+
+
+def test_criar_calcula_vb_e_deslocamento_quando_omitidos(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="Calc", dx_valor=12, ht_valor=10),
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert float(body["velocidade_valor"]) == pytest.approx(5.5)
+    assert body["deslocamento_valor"] == 5
+
+
+def test_patch_ht_dx_recalcula_vb_e_deslocamento_quando_nao_override(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    pid = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="Recalc", dx_valor=10, ht_valor=10),
+    ).json()["id"]
+
+    r = client.patch(
+        f"/api/v1/gurps/personagens/{pid}",
+        json={"dx_valor": 14, "ht_valor": 10},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert float(body["velocidade_valor"]) == pytest.approx(6.0)
+    assert body["deslocamento_valor"] == 6
+
+
+def test_criar_default_pv_fad_por_st_ht_quando_omitidos(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="PVFAD", st_valor=12, ht_valor=11),
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["pvs_valor"] == 12
+    assert body["fadiga_valor"] == 11
+    assert body["pvs_atual"] == 12
+    assert body["fadiga_atual"] == 11
+
+
+def test_patch_st_ht_recalcula_maximos_sem_override(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    pid = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="RecalcPVFAD", st_valor=10, ht_valor=10),
+    ).json()["id"]
+
+    client.patch(
+        f"/api/v1/gurps/personagens/{pid}",
+        json={"pvs_atual": 6, "fadiga_atual": 5},
+    )
+    r = client.patch(f"/api/v1/gurps/personagens/{pid}", json={"st_valor": 8, "ht_valor": 9})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["pvs_valor"] == 8
+    assert body["fadiga_valor"] == 9
+    assert body["pvs_atual"] == 6
+    assert body["fadiga_atual"] == 5
+
+
+def test_criar_default_von_per_por_iq_quando_omitidos(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="VonPer", iq_valor=13),
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["vontade_valor"] == 13
+    assert body["percepcao_valor"] == 13
+
+
+def test_patch_iq_recalcula_von_per_sem_override(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    pid = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="RecalcIQ", iq_valor=10),
+    ).json()["id"]
+
+    r = client.patch(f"/api/v1/gurps/personagens/{pid}", json={"iq_valor": 14})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["vontade_valor"] == 14
+    assert body["percepcao_valor"] == 14
+
+
+def test_criar_default_esquiva_por_vb_quando_omitida(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="EsquivaDefault", velocidade_valor=6.75),
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["esquiva"] == 9  # floor(6.75) + 3
+
+
+def test_patch_vb_recalcula_esquiva_sem_override(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    pid = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="EsquivaRecalc", velocidade_valor=5.0),
+    ).json()["id"]
+
+    r = client.patch(f"/api/v1/gurps/personagens/{pid}", json={"velocidade_valor": 7.25})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["esquiva"] == 10  # floor(7.25) + 3
+
+
+def test_criar_default_dano_por_st_quando_omitido(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="DanoST", st_valor=13),
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["dano_impacto"] == "1d"
+    assert body["dano_balanco"] == "2d-1"
+
+
+def test_patch_st_recalcula_dano_sem_override(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    pid = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(nome="DanoRecalc", st_valor=10),
+    ).json()["id"]
+
+    r = client.patch(f"/api/v1/gurps/personagens/{pid}", json={"st_valor": 15})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["dano_impacto"] == "1d+1"
+    assert body["dano_balanco"] == "2d+1"
+
+
+def test_catalogo_pericias_lite_disponivel(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.get("/api/v1/gurps/personagens/catalogo/pericias-lite")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert isinstance(body.get("itens"), list)
+    nomes = {x.get("nome") for x in body["itens"]}
+    assert "Briga" in nomes
+    assert "Medicina" in nomes
+
+
+def test_criar_rejeita_pericia_lite_sem_pre_requisito(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(
+            nome="Sem prereq",
+            iq_valor=10,
+            pericias=[{"nome": "Medicina", "tipo": "D", "nh": 10, "custo": 1}],
+        ),
+    )
+    assert r.status_code in (400, 422), r.text
+    assert "medicina" in str(r.json().get("detail", "")).lower()
+
+
+def test_criar_aceita_pericia_lite_com_pre_requisito(gurps_personagens_db):
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.post(
+        "/api/v1/gurps/personagens",
+        json=_payload_criar(
+            nome="Com prereq",
+            iq_valor=12,
+            pericias=[{"nome": "Medicina", "tipo": "D", "nh": 12, "custo": 2}],
+        ),
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert any(p["nome"] == "Medicina" for p in body.get("pericias", []))

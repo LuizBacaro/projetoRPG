@@ -23,6 +23,10 @@ _GURPS_EXTRAS_OPENAPI_EXAMPLE: Dict[str, Any] = {
     "hit": {"cranio": "4", "torso": "0 / 10"},
     "arma": {"golp": "sw+1", "bal": "thr", "nh": "14"},
 }
+# Convenção de evolução (G4.4):
+# - `extras` guarda campos ainda não canonizados em coluna.
+# - quando um campo fica estável e vira regra de negócio central,
+#   migrar para coluna SQL com fallback de leitura por uma janela.
 
 
 def validar_extras_json_serializavel_e_tamanho(ex: Any) -> Dict[str, Any]:
@@ -76,7 +80,13 @@ class GurpsPersonagemBase(BaseModel):
     reacao: Optional[str] = Field(None, max_length=40)
     idade: Optional[str] = Field(None, max_length=80)
     campanha_id: Optional[int] = None
-    iniciativa: int = 0
+    iniciativa: int = Field(
+        0,
+        description=(
+            "Campo legado na ficha; não define ordem de turno. "
+            "Na arena GURPS a ordem segue Velocidade básica (velocidade_valor), depois DX, depois sorteio."
+        ),
+    )
 
     st_custo: int = 0
     st_valor: int = 10
@@ -87,24 +97,57 @@ class GurpsPersonagemBase(BaseModel):
     ht_custo: int = 0
     ht_valor: int = 10
     vontade_custo: int = 0
-    vontade_valor: int = 10
+    vontade_valor: int = Field(
+        10,
+        description="Vontade. Quando omitido, o backend assume IQ (Lite).",
+    )
     percepcao_custo: int = 0
-    percepcao_valor: int = 10
+    percepcao_valor: int = Field(
+        10,
+        description="Percepção. Quando omitido, o backend assume IQ (Lite).",
+    )
     pvs_custo: int = 0
-    pvs_valor: int = 10
+    pvs_valor: int = Field(
+        10,
+        description="PV máximo. Quando omitido, o backend assume ST (Lite).",
+    )
     pvs_atual: Optional[int] = None
     fadiga_custo: int = 0
-    fadiga_valor: int = 10
+    fadiga_valor: int = Field(
+        10,
+        description="Fadiga máxima (PF). Quando omitido, o backend assume HT (Lite).",
+    )
     fadiga_atual: Optional[int] = None
     velocidade_custo: int = 0
-    velocidade_valor: Decimal = Field(default=Decimal("5.00"))
+    velocidade_valor: Decimal = Field(
+        default=Decimal("5.00"),
+        description=(
+            "Velocidade básica (VB). Quando omitido, o backend calcula por (HT + DX) / 4."
+        ),
+    )
     deslocamento_custo: int = 0
-    deslocamento_valor: int = 5
-    esquiva: int = 0
+    deslocamento_valor: int = Field(
+        5,
+        description=(
+            "Deslocamento básico. Quando omitido, o backend usa a parte inteira da VB."
+        ),
+    )
+    esquiva: int = Field(
+        0,
+        description="Esquiva. Quando omitida, o backend calcula como floor(VB) + 3 (Lite).",
+    )
     aparar: int = 0
     bloqueio: Optional[str] = Field(None, max_length=20)
-    dano_impacto: Optional[str] = Field(None, max_length=40)
-    dano_balanco: Optional[str] = Field(None, max_length=40)
+    dano_impacto: Optional[str] = Field(
+        None,
+        max_length=40,
+        description="GDP/thr. Quando omitido, backend calcula pela tabela de ST (Lite).",
+    )
+    dano_balanco: Optional[str] = Field(
+        None,
+        max_length=40,
+        description="BAL/sw. Quando omitido, backend calcula pela tabela de ST (Lite).",
+    )
     pontos_atributos: int = 0
     pontos_vantagens: int = 0
     pontos_desvantagens: int = 0
@@ -138,7 +181,12 @@ class GurpsPersonagemUpdate(BaseModel):
     reacao: Optional[str] = Field(None, max_length=40)
     idade: Optional[str] = Field(None, max_length=80)
     campanha_id: Optional[int] = None
-    iniciativa: Optional[int] = None
+    iniciativa: Optional[int] = Field(
+        None,
+        description=(
+            "Legado; ordem de turno na arena usa velocidade_valor (VB), DX e sorteio, não este campo."
+        ),
+    )
     foto_url: Optional[str] = Field(None, max_length=500)
 
     st_custo: Optional[int] = None

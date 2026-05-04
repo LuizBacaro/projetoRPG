@@ -16,7 +16,7 @@
     <div class="header-nav">
         <div class="header-titulo">
             <h1>⚙️ GURPS — Arena</h1>
-            <p>Combatentes (personagens), campanhas e arena de iniciativa.</p>
+            <p>Combatentes (personagens), campanhas e arena (ordem de turno por Velocidade básica, GURPS).</p>
         </div>
         <div class="header-usuario-container">
             <div class="header-usuario">
@@ -55,7 +55,7 @@
                             <th>Nome</th>
                             <th>Pontos</th>
                             <th>PV</th>
-                            <th>Ini</th>
+                            <th>VB</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -71,7 +71,7 @@
         <div class="gurps-dash-card">
             <h2 class="gurps-dash-card-title">Campanhas</h2>
             <div id="campanhasJogador" hidden>
-                <p class="gurps-dash-msg gurps-dash-msg--info" style="margin-top:0">
+                <p class="gurps-dash-msg gurps-dash-msg--info gurps-mt-0">
                     Campanhas são organizadas pelo mestre. Quando sua ficha estiver vinculada a uma mesa, os resumos que o mestre disponibilizar aparecem abaixo.
                 </p>
                 <h3 class="dash-divcustom-titulo">Resumos de sessão (leitura)</h3>
@@ -85,12 +85,12 @@
                     <button type="button" class="campanhas-subaba-btn" data-gurps-campanhas-subaba="sessoes">Registro de sessões</button>
                 </div>
                 <div id="gurpsCampanhasSubabaCadastro" class="campanhas-subaba-pane active">
-                    <p class="dash-divcustom-info" style="margin-top:0">
+                    <p class="dash-divcustom-info gurps-mt-0">
                         Cadastre campanhas e associe combatentes já criados (jogador, monstro ou NPC), como no fluxo de Campanhas do D&amp;D 3.5.
                     </p>
                     <form id="formCampanha" class="dash-divcustom-form" autocomplete="off">
                         <input id="campanhaIdEdicao" type="hidden" />
-                        <div id="campanhaEdicaoBadge" class="campanha-edicao-badge" style="display:none"></div>
+                        <div id="campanhaEdicaoBadge" class="campanha-edicao-badge" hidden></div>
                         <div class="dash-form-group">
                             <label>Nome da campanha *</label>
                             <input id="campanhaNome" type="text" maxlength="120" required placeholder="Ex.: Operação Aurora" />
@@ -111,7 +111,7 @@
                             <div id="campanhaPersonagens" class="campanha-personagens-checklist" aria-label="Seleção de personagens"></div>
                         </div>
                         <div class="dash-modal-actions">
-                            <button id="btnCancelarEdicaoCampanha" type="button" class="btn-dash-cancel" style="display:none">Cancelar edição</button>
+                            <button id="btnCancelarEdicaoCampanha" type="button" class="btn-dash-cancel" hidden>Cancelar edição</button>
                             <button id="btnSalvarCampanha" type="submit" class="btn-dash-save">Criar campanha</button>
                         </div>
                     </form>
@@ -122,12 +122,12 @@
                     </div>
                 </div>
                 <div id="gurpsCampanhasSubabaSessoes" class="campanhas-subaba-pane">
-                    <p class="dash-divcustom-info" style="margin-top:0">
+                    <p class="dash-divcustom-info gurps-mt-0">
                         Registre o resumo de cada sessão e marque se os jogadores da mesa podem ler este texto no dashboard.
                     </p>
                     <form id="formSessaoCampanhaGurps" class="dash-divcustom-form" autocomplete="off">
                         <input id="sessaoIdEdicaoGurps" type="hidden" />
-                        <div id="sessaoEdicaoBadgeGurps" class="campanha-edicao-badge" style="display:none"></div>
+                        <div id="sessaoEdicaoBadgeGurps" class="campanha-edicao-badge" hidden></div>
                         <div class="dash-form-group">
                             <label>Campanha *</label>
                             <select id="sessaoCampanhaIdGurps" required>
@@ -143,7 +143,7 @@
                             <span class="campanha-personagem-nome">Disponibilizar este resumo para jogadores com ficha nesta campanha</span>
                         </label>
                         <div class="dash-modal-actions">
-                            <button id="btnCancelarEdicaoSessaoGurps" type="button" class="btn-dash-cancel" style="display:none">Cancelar edição</button>
+                            <button id="btnCancelarEdicaoSessaoGurps" type="button" class="btn-dash-cancel" hidden>Cancelar edição</button>
                             <button id="btnSalvarSessaoCampanhaGurps" type="submit" class="btn-dash-save">Registrar sessão</button>
                         </div>
                     </form>
@@ -166,7 +166,7 @@
                 <div class="gurps-arena-actions">
                     <button type="button" class="gurps-btn-primary" id="btnCombIniciar">Iniciar combate</button>
                 </div>
-                <p style="margin:0.75rem 0 0;font-size:0.82rem;color:var(--texto-secundario)">Participantes</p>
+                <p class="gurps-arena-participantes-label">Participantes</p>
                 <div id="arenaPick" class="gurps-arena-pick-grid" role="group" aria-label="Seleção de combatentes"></div>
             </div>
 
@@ -179,8 +179,8 @@
                     <button type="button" class="gurps-arena-end-combat" id="btnCombFinalizarBar">Encerrar combate</button>
                 </div>
                 <div class="gurps-arena-active-layout">
-                    <aside class="gurps-arena-ini-sidebar" aria-label="Ordem de iniciativa">
-                        <h3>Ordem de iniciativa</h3>
+                    <aside class="gurps-arena-ini-sidebar" aria-label="Ordem de turno por Velocidade básica">
+                        <h3>Ordem de turno (VB)</h3>
                         <ul id="arenaIniList" class="gurps-arena-ini-list"></ul>
                     </aside>
                     <div class="gurps-arena-main">
@@ -210,6 +210,17 @@
                                     <div class="gurps-arena-quick-btns">
                                         <button type="button" class="gurps-arena-qa gurps-arena-qa--heal" id="arenaBtnDanoCura">Dano / Cura</button>
                                         <button type="button" class="gurps-arena-qa gurps-arena-qa--cond" id="arenaBtnCondicao">Condição</button>
+                                    </div>
+                                    <div class="gurps-arena-postura-control">
+                                        <label for="arenaPosturaSelect" class="gurps-arena-postura-label">Postura</label>
+                                        <div class="gurps-arena-postura-row">
+                                            <select id="arenaPosturaSelect" class="gurps-arena-postura-select">
+                                                <option value="em_pe">Em pé</option>
+                                                <option value="agachado">Agachado</option>
+                                                <option value="deitado">Deitado</option>
+                                            </select>
+                                            <button type="button" class="gurps-arena-qa" id="arenaBtnAplicarPostura">Aplicar</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -244,6 +255,64 @@
     </section>
 </div>
 
+<dialog id="arenaActionModal" class="gurps-arena-action-modal">
+    <form method="dialog" id="arenaActionForm" class="gurps-arena-action-form">
+        <h3 class="gurps-arena-action-title">Ação de combate</h3>
+        <label class="gurps-arena-action-label">
+            <span>Ação</span>
+            <select id="arenaActionType">
+                <option value="ataque">Ataque</option>
+                <option value="cura">Cura</option>
+            </select>
+        </label>
+        <label class="gurps-arena-action-label">
+            <span>Alvo</span>
+            <select id="arenaActionTarget"></select>
+        </label>
+        <label id="arenaFieldNh" class="gurps-arena-action-label">
+            <span>NH de ataque</span>
+            <input id="arenaActionNh" type="number" min="1" max="30" value="12" />
+        </label>
+        <label id="arenaFieldTipoAtaque" class="gurps-arena-action-label">
+            <span>Tipo de ataque</span>
+            <select id="arenaActionTipoAtaque">
+                <option value="arma">Arma</option>
+                <option value="soco">Soco</option>
+                <option value="chute">Chute</option>
+            </select>
+        </label>
+        <label id="arenaFieldTipoDefesa" class="gurps-arena-action-label">
+            <span>Defesa do alvo</span>
+            <select id="arenaActionTipoDefesa">
+                <option value="auto">Auto (melhor)</option>
+                <option value="esquiva">Esquiva</option>
+                <option value="aparar">Aparar</option>
+                <option value="bloqueio">Bloqueio</option>
+            </select>
+        </label>
+        <label id="arenaFieldExpr" class="gurps-arena-action-label">
+            <span>Expressão de dano (opcional)</span>
+            <input id="arenaActionExpr" type="text" placeholder="1d+2" />
+        </label>
+        <label id="arenaFieldCura" class="gurps-arena-action-label gurps-arena-action-field-hidden">
+            <span>PV de cura</span>
+            <input id="arenaActionCura" type="number" min="1" value="5" />
+        </label>
+        <div id="arenaActionResult" class="gurps-arena-action-result gurps-arena-action-result-hidden"></div>
+        <div class="gurps-arena-action-history-wrap">
+            <strong class="gurps-arena-action-history-title">Últimas ações</strong>
+            <ul id="arenaActionHistory" class="gurps-arena-action-history-list">
+                <li class="gurps-arena-action-history-empty">Sem ações ainda.</li>
+            </ul>
+        </div>
+        <div class="dash-modal-actions gurps-arena-action-buttons">
+            <button type="button" class="btn-dash-cancel" id="arenaActionCancel">Cancelar</button>
+            <button type="submit" class="btn-dash-save">Aplicar</button>
+            <button type="submit" class="btn-dash-save" id="arenaActionApplyClose">Aplicar e fechar</button>
+        </div>
+    </form>
+</dialog>
+
 <script src="/js/shared/render-api-origin-boot.js"></script>
 <script src="/games/dnd35/js/config/api-url-global.js"></script>
 <script src="/games/dnd35/js/services/AuthService.js"></script>
@@ -268,6 +337,8 @@
     let filtroTipoParticipanteCampanha = 'todos';
     let sessoesCampanhaCache = [];
     let sessaoEmEdicaoIdGurps = null;
+    let arenaStatusCache = null;
+    let arenaActionHistory = [];
 
     function classeBadgeTipo(tipo) {
         const t = String(tipo || '').toLowerCase();
@@ -314,7 +385,7 @@
                     <td>${escapeHtml(r.nome)}</td>
                     <td>${r.pontos_total ?? 0}</td>
                     <td>${r.pvs_atual ?? ''}/${r.pvs_valor ?? ''}</td>
-                    <td>${r.iniciativa ?? 0}</td>
+                    <td>${r.velocidade_valor ?? '—'}</td>
                     <td><a class="gurps-link-ficha" href="ficha-personagem.html?id=${r.id}">Ficha</a></td>
                 </tr>
             `).join('');
@@ -353,7 +424,7 @@
     function renderArenaPick() {
         const host = document.getElementById('arenaPick');
         if (!cacheLista.length) {
-            host.innerHTML = '<p style="grid-column:1/-1;color:var(--texto-secundario);font-size:0.88rem">Nenhum personagem para selecionar.</p>';
+            host.innerHTML = '<p class="gurps-arena-empty-pick">Nenhum personagem para selecionar.</p>';
             return;
         }
         host.innerHTML = cacheLista.map((r) => {
@@ -367,7 +438,7 @@
                 <span class="gurps-arena-pick-card-body">
                     ${foto}
                     <span class="gurps-arena-pick-name">${escapeHtml(r.nome)}</span>
-                    <span class="gurps-arena-pick-meta">Ini ${r.iniciativa ?? 0} · ${escapeHtml(r.tipo)}</span>
+                    <span class="gurps-arena-pick-meta">VB ${r.velocidade_valor ?? '—'} · ${escapeHtml(r.tipo)}</span>
                 </span>
             </label>`;
         }).join('');
@@ -387,7 +458,8 @@
                 const p = byId[pid];
                 const nome = p ? p.nome : `#${pid}`;
                 const cls = pid === activeId ? 'is-active' : '';
-                return `<li class="${cls}"><span class="ini-num">${idx + 1}.</span>${escapeHtml(nome)}</li>`;
+                const vb = p && p.velocidade_valor != null ? p.velocidade_valor : '—';
+                return `<li class="${cls}"><span class="ini-num">${idx + 1}.</span> <span class="ini-meta">${escapeHtml(String(vb))} — ${escapeHtml(nome)}</span></li>`;
             }).join('')
             : '<li>—</li>';
 
@@ -436,19 +508,25 @@
 
         const vel = p.velocidade_valor != null ? p.velocidade_valor : '—';
         const mov = p.deslocamento_valor != null ? p.deslocamento_valor : '—';
-        document.getElementById('arenaMove').textContent = `Vel / Desl. ${vel} / ${mov}`;
+        const movEfetivo = p.deslocamento_efetivo != null ? p.deslocamento_efetivo : mov;
+        const manobra = p.manobra_atual ? String(p.manobra_atual).replace('_', ' ') : 'fazer nada';
+        const postura = p.postura_atual ? String(p.postura_atual).replace('_', ' ') : 'em pe';
+        document.getElementById('arenaMove').textContent = `Vel / Desl. ${vel} / ${movEfetivo} · Manobra: ${manobra} · Postura: ${postura}`;
+        const posturaSelect = document.getElementById('arenaPosturaSelect');
+        if (posturaSelect && p.postura_atual) posturaSelect.value = p.postura_atual;
 
         const bloq = (p.bloqueio && String(p.bloqueio).trim()) ? String(p.bloqueio).trim() : '—';
         document.getElementById('arenaDefList').innerHTML = [
-            `<li>Esquiva ${p.esquiva ?? '—'}</li>`,
+            `<li>Esquiva ${p.esquiva_efetiva ?? p.esquiva ?? '—'}</li>`,
             `<li>Aparar ${p.aparar ?? '—'}</li>`,
             `<li>Bloqueio ${escapeHtml(bloq)}</li>`,
+            `<li>Mod postura: ataque ${p.mod_ataque_postura ?? 0} / alvo ${p.mod_alvo_postura ?? 0}</li>`,
         ].join('');
 
         const pers = (p.pericias || []).slice(0, 12);
         document.getElementById('arenaPerList').innerHTML = pers.length
             ? pers.map((x) => `<li><span>${escapeHtml(x.nome)}</span><span>${x.nh ?? '—'}</span></li>`).join('')
-            : '<li style="border:none;color:var(--texto-secundario)">Nenhuma perícia</li>';
+            : '<li class="gurps-arena-per-list-empty">Nenhuma perícia</li>';
 
         document.getElementById('arenaRodada').textContent = String(st.rodada_atual ?? 1);
         document.getElementById('arenaTurnoIdx').textContent = String(st.turno_atual ?? 0);
@@ -460,6 +538,7 @@
         const active = document.getElementById('gurpsArenaActive');
         try {
             const st = await kb.status(false);
+            arenaStatusCache = st;
             if (pre) pre.textContent = JSON.stringify(st, null, 2);
             if (st.ativo) {
                 setup.hidden = true;
@@ -517,11 +596,184 @@
         }
     });
 
-    document.getElementById('arenaBtnDanoCura').addEventListener('click', () => {
-        Toast.info('Dano / Cura: em breve — ajuste de PV e FAD pela API da arena.');
+    function preencherAlvosModalArena(st) {
+        const select = document.getElementById('arenaActionTarget');
+        if (!select) return;
+        const ativoId = st.personagem_ativo_id;
+        const lista = (st.personagens || []).filter((p) => p.id !== ativoId);
+        select.innerHTML = lista.map((p) => `<option value="${p.id}">${escapeHtml(p.nome || `#${p.id}`)}</option>`).join('');
+    }
+
+    function syncCamposModalArena() {
+        const tipo = document.getElementById('arenaActionType')?.value || 'ataque';
+        const isAtaque = tipo === 'ataque';
+        document.getElementById('arenaFieldNh').style.display = isAtaque ? 'grid' : 'none';
+        document.getElementById('arenaFieldTipoAtaque').style.display = isAtaque ? 'grid' : 'none';
+        document.getElementById('arenaFieldTipoDefesa').style.display = isAtaque ? 'grid' : 'none';
+        document.getElementById('arenaFieldExpr').style.display = isAtaque ? 'grid' : 'none';
+        const fieldCura = document.getElementById('arenaFieldCura');
+        if (fieldCura) fieldCura.classList.toggle('gurps-arena-action-field-hidden', isAtaque);
+    }
+
+    function setResultadoModalArena(texto, sucesso = false) {
+        const box = document.getElementById('arenaActionResult');
+        if (!box) return;
+        if (!texto) {
+            box.classList.add('gurps-arena-action-result-hidden');
+            box.classList.remove('is-success', 'is-warning');
+            box.textContent = '';
+            return;
+        }
+        box.classList.remove('gurps-arena-action-result-hidden');
+        box.classList.toggle('is-success', !!sucesso);
+        box.classList.toggle('is-warning', !sucesso);
+        box.textContent = texto;
+    }
+
+    function pushHistoricoAcaoArena(texto, sucesso = false) {
+        if (!texto) return;
+        const when = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        arenaActionHistory.unshift({ texto, sucesso, when });
+        arenaActionHistory = arenaActionHistory.slice(0, 3);
+        renderHistoricoAcaoArena();
+    }
+
+    function renderHistoricoAcaoArena() {
+        const ul = document.getElementById('arenaActionHistory');
+        if (!ul) return;
+        if (!arenaActionHistory.length) {
+            ul.innerHTML = '<li class="gurps-arena-action-history-empty">Sem ações ainda.</li>';
+            return;
+        }
+        ul.innerHTML = arenaActionHistory
+            .map((x) => {
+                const cls = x.sucesso
+                    ? 'gurps-arena-action-history-time is-success'
+                    : 'gurps-arena-action-history-time';
+                return `<li><span class="${cls}">[${x.when}]</span> ${escapeHtml(x.texto)}</li>`;
+            })
+            .join('');
+    }
+
+    document.getElementById('arenaActionType')?.addEventListener('change', syncCamposModalArena);
+    document.getElementById('arenaActionCancel')?.addEventListener('click', () => {
+        document.getElementById('arenaActionModal')?.close();
     });
-    document.getElementById('arenaBtnCondicao').addEventListener('click', () => {
-        Toast.info('Condições de combate: em breve — marcas como atordoado, agarrado, etc.');
+
+    document.getElementById('arenaBtnDanoCura').addEventListener('click', async () => {
+        const st = arenaStatusCache;
+        if (!st || !st.ativo) {
+            Toast.error('Nenhum combate ativo.');
+            return;
+        }
+        const ativoId = st.personagem_ativo_id;
+        const lista = st.personagens || [];
+        const alvos = lista.filter((p) => p.id !== ativoId);
+        if (!alvos.length) {
+            Toast.error('Sem alvo válido.');
+            return;
+        }
+        const ativo = (st.personagens || []).find((p) => p.id === st.personagem_ativo_id);
+        const danoPadrao = ativo && ativo.dano_impacto ? String(ativo.dano_impacto).trim() : '';
+        const exprInput = document.getElementById('arenaActionExpr');
+        if (exprInput) exprInput.value = danoPadrao;
+        setResultadoModalArena('');
+        preencherAlvosModalArena(st);
+        syncCamposModalArena();
+        document.getElementById('arenaActionModal')?.showModal();
+    });
+
+    document.getElementById('arenaActionForm')?.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        const submitterId = ev.submitter?.id || '';
+        const closeAfterApply = submitterId === 'arenaActionApplyClose';
+        const st = arenaStatusCache;
+        if (!st || !st.ativo) {
+            Toast.error('Nenhum combate ativo.');
+            return;
+        }
+        const tipo = document.getElementById('arenaActionType')?.value || 'ataque';
+        const alvoId = Number(document.getElementById('arenaActionTarget')?.value || '');
+        if (!Number.isFinite(alvoId) || alvoId <= 0) {
+            Toast.error('Alvo inválido.');
+            return;
+        }
+        try {
+            if (tipo === 'cura') {
+                const cura = Number(document.getElementById('arenaActionCura')?.value || '0');
+                if (!Number.isFinite(cura) || cura <= 0) {
+                    Toast.error('Valor de cura inválido.');
+                    return;
+                }
+                const out = await kb.ajustarPv({ alvo_id: alvoId, delta_pv: Math.floor(cura) });
+                const msg = `Cura aplicada: +${out.delta_pv} PV (PV ${out.pvs_alvo_antes} → ${out.pvs_alvo_depois}).`;
+                setResultadoModalArena(msg, true);
+                pushHistoricoAcaoArena(msg, true);
+                Toast.success(`Cura aplicada: +${out.delta_pv} PV.`);
+            } else {
+                const nhAtaque = Number(document.getElementById('arenaActionNh')?.value || '0');
+                if (!Number.isFinite(nhAtaque) || nhAtaque < 1 || nhAtaque > 30) {
+                    Toast.error('NH inválido.');
+                    return;
+                }
+                const exprRaw = String(document.getElementById('arenaActionExpr')?.value || '').trim();
+                const tipoAtaque = String(document.getElementById('arenaActionTipoAtaque')?.value || 'arma');
+                const tipoDefesa = String(document.getElementById('arenaActionTipoDefesa')?.value || 'auto');
+                const payload = { alvo_id: alvoId, nh_ataque: nhAtaque, tipo_ataque: tipoAtaque, tipo_defesa: tipoDefesa };
+                if (exprRaw) payload.expressao_dano = exprRaw;
+                const out = await kb.ataque(payload);
+                if (!out.ataque?.sucesso) {
+                    const msg = `Ataque errou (${out.ataque?.total}).`;
+                    setResultadoModalArena(msg);
+                    pushHistoricoAcaoArena(msg);
+                    Toast.info(`Ataque errou (${out.ataque?.total}).`);
+                } else if (out.defesa?.sucesso) {
+                    const defesaValor = out.defesa?.valor_efetivo ?? out.defesa?.esquiva_efetiva;
+                    const msg = `Alvo defendeu com ${out.defesa?.tipo || 'defesa'} (${out.defesa?.total} <= ${defesaValor}).`;
+                    setResultadoModalArena(msg);
+                    pushHistoricoAcaoArena(msg);
+                    Toast.info(`Alvo defendeu com ${out.defesa?.tipo || 'defesa'}.`);
+                } else {
+                    const bruto = out.dano?.total_bruto ?? out.dano?.total ?? 0;
+                    const rd = out.dano?.rd_aplicada ?? 0;
+                    const liquido = out.dano?.total_liquido ?? out.dano?.total ?? 0;
+                    const msg = `Dano ${liquido} aplicado (bruto ${bruto}, RD ${rd}) · PV ${out.pvs_alvo_antes} → ${out.pvs_alvo_depois}.`;
+                    setResultadoModalArena(msg, true);
+                    pushHistoricoAcaoArena(msg, true);
+                    Toast.success(`Dano ${liquido} aplicado ao alvo.`);
+                }
+            }
+            await refreshArena();
+            if (closeAfterApply) {
+                document.getElementById('arenaActionModal')?.close();
+            }
+        } catch (e) {
+            setResultadoModalArena(`Erro: ${e.message || 'falha na ação'}`);
+            Toast.error(e.message || 'Falha na ação de combate.');
+        }
+    });
+    document.getElementById('arenaBtnCondicao').addEventListener('click', async () => {
+        Toast.info('Use o seletor de postura abaixo para mudar em pé/agachado/deitado.');
+    });
+
+    document.getElementById('arenaBtnAplicarPostura')?.addEventListener('click', async () => {
+        const st = arenaStatusCache;
+        if (!st || !st.ativo) {
+            Toast.error('Nenhum combate ativo.');
+            return;
+        }
+        const postura = String(document.getElementById('arenaPosturaSelect')?.value || 'em_pe').trim().toLowerCase();
+        if (!['em_pe', 'agachado', 'deitado'].includes(postura)) {
+            Toast.error('Postura inválida. Use: em_pe, agachado ou deitado.');
+            return;
+        }
+        try {
+            await kb.definirPostura({ postura });
+            Toast.success(`Postura definida: ${postura.replace('_', ' ')}.`);
+            await refreshArena();
+        } catch (e) {
+            Toast.error(e.message || 'Falha ao definir postura.');
+        }
     });
 
     function coletarPersonagensCampanhaSelecionados() {
@@ -581,7 +833,7 @@
             <div class="dash-divcustom-card">
                 <div class="dash-divcustom-card-head">
                     <strong>${escapeHtml(campanha.nome || '')}</strong>
-                    <div style="display:flex; gap:.35rem;">
+                    <div class="gurps-inline-actions-row">
                         <button type="button" class="btn-dash-cancel" data-campanha-edit="${campanha.id}" title="Editar campanha">Editar</button>
                         <button type="button" class="btn-dash-delete-div" data-campanha-delete="${campanha.id}" title="Excluir campanha">✕</button>
                     </div>
@@ -627,8 +879,8 @@
         const btnCancel = document.getElementById('btnCancelarEdicaoCampanha');
         const btnSalvar = document.getElementById('btnSalvarCampanha');
         if (form) form.reset();
-        if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
-        if (btnCancel) btnCancel.style.display = 'none';
+        if (badge) { badge.hidden = true; badge.textContent = ''; }
+        if (btnCancel) btnCancel.hidden = true;
         if (btnSalvar) btnSalvar.textContent = 'Criar campanha';
         renderizarChecklistPersonagensCampanha(new Set());
     }
@@ -644,9 +896,9 @@
         if (inputDesc) inputDesc.value = campanha.descricao || '';
         if (badge) {
             badge.textContent = `Editando: ${campanha.nome || ''}`;
-            badge.style.display = '';
+            badge.hidden = false;
         }
-        if (btnCancel) btnCancel.style.display = '';
+        if (btnCancel) btnCancel.hidden = false;
         if (btnSalvar) btnSalvar.textContent = 'Salvar campanha';
         const ids = new Set((campanha.personagem_ids || []).map((x) => Number(x)));
         renderizarChecklistPersonagensCampanha(ids);
@@ -732,8 +984,8 @@
         const btnC = document.getElementById('btnCancelarEdicaoSessaoGurps');
         const btnS = document.getElementById('btnSalvarSessaoCampanhaGurps');
         if (form) form.reset();
-        if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
-        if (btnC) btnC.style.display = 'none';
+        if (badge) { badge.hidden = true; badge.textContent = ''; }
+        if (btnC) btnC.hidden = true;
         if (btnS) btnS.textContent = 'Registrar sessão';
     }
 
@@ -750,9 +1002,9 @@
         if (vis) vis.checked = Boolean(sessao.visivel_jogadores);
         if (badge) {
             badge.textContent = `Editando sessão: ${sessao.campanha_nome || 'Campanha'}`;
-            badge.style.display = '';
+            badge.hidden = false;
         }
-        if (btnC) btnC.style.display = '';
+        if (btnC) btnC.hidden = false;
         if (btnS) btnS.textContent = 'Salvar sessão';
         ta?.focus();
     }
@@ -768,7 +1020,7 @@
             <div class="dash-divcustom-card">
                 <div class="dash-divcustom-card-head">
                     <strong>${escapeHtml(sessao.campanha_nome || 'Campanha')}</strong>
-                    <div style="display:flex; gap:.35rem; align-items:center; flex-wrap:wrap;">
+                    <div class="gurps-inline-actions-row gurps-inline-actions-row--wrap">
                         <span class="badge ${sessao.visivel_jogadores ? 'badge-jogador' : 'badge-npc'}">${sessao.visivel_jogadores ? 'Visível aos jogadores' : 'Privada'}</span>
                         <button type="button" class="btn-dash-cancel" data-sessao-gurps-edit="${sessao.id}" title="Editar sessão">Editar</button>
                         <button type="button" class="btn-dash-delete-div" data-sessao-gurps-delete="${sessao.id}" title="Excluir sessão">✕</button>

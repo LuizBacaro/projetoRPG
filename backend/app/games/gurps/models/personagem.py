@@ -35,6 +35,7 @@ class GurpsPersonagem(Base):
     reacao = Column(String(40), nullable=True, default="")
     idade = Column(String(80), nullable=True, default="")
     foto_url = Column(String(500), nullable=True)
+    # Legado / anotação na ficha; ordem de turno na arena usa velocidade_valor (VB) + DX + sorteio (G0.1).
     iniciativa = Column(Integer, nullable=False, default=0)
 
     st_custo = Column(Integer, nullable=False, default=0)

@@ -62,6 +62,7 @@ O **Módulo Personagens** amplia: custos em pontos, centenas de vantagens/desvan
 ## Requisitos funcionais — Arena de combate (RF-A)
 
 - **RF-A01** — **Ordem de combate:** iniciativa da arena deve refletir **Velocidade básica** (e desempates DX, depois aleatório), não um campo “iniciativa” arbitrário persistido, **a menos** que a campanha use regra opcional — documentar decisão de produto.
+  - **Decisão G0.1 (Arena TTRPG):** ordem na arena GURPS usa `velocidade_valor` (VB) decrescente, depois `dx_valor`, depois `random` por combate. O campo `iniciativa` na ficha é legado/anotação e **não** entra na ordenação (ver `ordenar_personagens_para_turno_gurps`).
 - **RF-A02** — **Turno:** um combatente escolhe **manobra** por turno; estado atual da manobra afeta defesas ativas e movimento até o próximo turno.
 - **RF-A03** — **Ataque:** escolher alvo em alcance; rolar ataque vs NH; alvo rola defesa ativa; se falhar, aplicar dano aos PV (e efeitos).
 - **RF-A04** — **Múltiplas defesas:** aplicar penalidade cumulativa conforme regra GURPS usada na mesa (parâmetro configurável se necessário).

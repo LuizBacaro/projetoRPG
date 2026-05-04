@@ -51,6 +51,14 @@ def listar(
     )
 
 
+@router.get("/catalogo/pericias-lite")
+def catalogo_pericias_lite(
+    service: GurpsPersonagemService = Depends(get_gurps_personagem_service),
+    _: Usuario = Depends(get_usuario_atual),
+):
+    return {"itens": service.catalogo_pericias_lite()}
+
+
 @router.get("/{personagem_id}", response_model=GurpsPersonagemResponse)
 def obter(
     personagem_id: int,

@@ -62,4 +62,31 @@ class GurpsCombateService {
         });
         return this._handleResponse(res, 'Erro ao finalizar combate');
     }
+
+    async ataque(payload) {
+        const res = await fetch(this._url('/ataque'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload || {}),
+        });
+        return this._handleResponse(res, 'Erro ao executar ataque');
+    }
+
+    async ajustarPv(payload) {
+        const res = await fetch(this._url('/ajustar-pv'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload || {}),
+        });
+        return this._handleResponse(res, 'Erro ao ajustar PV');
+    }
+
+    async definirPostura(payload) {
+        const res = await fetch(this._url('/postura-atual'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload || {}),
+        });
+        return this._handleResponse(res, 'Erro ao definir postura');
+    }
 }
