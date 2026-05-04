@@ -194,7 +194,7 @@
                                 <tr><th>Categoria</th><th>Pontos</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>Atributos (primários + secundários)</td><td><input id="fg_pt_attr" type="number" value="0" /></td></tr>
+                                <tr><td>Atributos (primários + secundários)</td><td><input id="fg_pt_attr" type="number" value="0" readonly tabindex="-1" title="Soma automática dos XP da grade (ST/DX/IQ/HT, PV, PER, VON, FAD, VB/Desl. se comprados)." /></td></tr>
                                 <tr><td>Perícias</td><td><input id="fg_pt_per" type="number" value="0" /></td></tr>
                                 <tr><td>Vantagens</td><td><input id="fg_pt_vant" type="number" value="0" /></td></tr>
                                 <tr><td>Magias</td><td><input id="fg_pt_magias" type="number" value="0" readonly title="Somente visual; API em breve" /></td></tr>
@@ -291,6 +291,6 @@
     if (!AuthService.exigirJogo('gurps')) {}
 </script>
 <script src="../js/services/GurpsPersonagemService.js"></script>
-<script src="../js/pages/ficha-gurps.js?v=20260504n"></script>
+<script src="../js/pages/ficha-gurps.js?v=20260504p"></script>
 </body>
 </html>

@@ -252,6 +252,28 @@
         if (esqInp) esqInp.value = String(mov + 3);
     }
 
+    /** Soma XP da grade (ST/DX/IQ/HT + PV/PER/VON/FAD + VB/Desl. se comprados) → campo “Atributos” do resumo. */
+    function sincronizarPontosAtributosResumo() {
+        const custos = [
+            '#fg_st_custo',
+            '#fg_dx_custo',
+            '#fg_iq_custo',
+            '#fg_ht_custo',
+            '#fg_hp_custo',
+            '#fg_per_custo',
+            '#fg_will_custo',
+            '#fg_fp_custo',
+            '#fg_vel_custo',
+            '#fg_mov_custo',
+        ];
+        let sum = 0;
+        custos.forEach((sel) => {
+            sum += num(sel, 0);
+        });
+        const inp = el('#fg_pt_attr');
+        if (inp) inp.value = String(Math.trunc(sum));
+    }
+
     /** Recalcula na ficha o que o backend deriva (Lite). */
     function aplicarDerivadosGurpsLiteFicha() {
         /* Sincronizar valores “grátis” antes de recalcular XP (evita custo negativo ao subir ST/IQ). */
@@ -261,6 +283,8 @@
         aplicarCustosXpBasicSet();
         aplicarVelocidadeBasicaDerivada();
         aplicarDanoThrSwPorSt();
+        sincronizarPontosAtributosResumo();
+        atualizarResumoPontosListas();
     }
 
     function tipoFromCatalogSkill(s) {
@@ -374,6 +398,32 @@
             .toLowerCase();
     }
 
+    /** Mesma regra de `normText`, sem `trim` — para mapear caractere a caractere. */
+    function normCharFold(c) {
+        return String(c || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+    }
+
+    /**
+     * Monta string normalizada (acentos removidos) e mapa índice na normalizada → índice na string original.
+     * Ex.: "ação" + query "acao" → match cobre índices originais 0..3.
+     */
+    function buildNormIndexMap(original) {
+        const s = String(original || '');
+        let norm = '';
+        const normToOrigStart = [];
+        for (let i = 0; i < s.length; i += 1) {
+            const part = normCharFold(s[i]);
+            for (let j = 0; j < part.length; j += 1) {
+                normToOrigStart.push(i);
+                norm += part[j];
+            }
+        }
+        return { norm, normToOrigStart };
+    }
+
     function findCatalogItemSmart(list, typedName) {
         if (!Array.isArray(list) || !typedName) return null;
         const q = normText(typedName);
@@ -472,13 +522,19 @@
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
         const hiName = (name) => {
-            const q = String(input?.value || '').trim();
-            if (!q) return escHtml(name);
-            const idx = String(name || '').toLowerCase().indexOf(q.toLowerCase());
-            if (idx < 0) return escHtml(name);
-            const a = String(name).slice(0, idx);
-            const b = String(name).slice(idx, idx + q.length);
-            const c = String(name).slice(idx + q.length);
+            const nameStr = String(name || '');
+            const q = normText(input?.value);
+            if (!q) return escHtml(nameStr);
+            const { norm, normToOrigStart } = buildNormIndexMap(nameStr);
+            const nIdx = norm.indexOf(q);
+            if (nIdx < 0) return escHtml(nameStr);
+            const lastNorm = nIdx + q.length - 1;
+            if (lastNorm >= normToOrigStart.length) return escHtml(nameStr);
+            const origStart = normToOrigStart[nIdx];
+            const origEnd = normToOrigStart[lastNorm] + 1;
+            const a = nameStr.slice(0, origStart);
+            const b = nameStr.slice(origStart, origEnd);
+            const c = nameStr.slice(origEnd);
             return `${escHtml(a)}<mark>${escHtml(b)}</mark>${escHtml(c)}`;
         };
         root.innerHTML = items
@@ -975,7 +1031,6 @@
         });
         rewireAllCatalogRows();
         recalcularCustosPericiasVisiveis();
-        atualizarResumoPontosListas();
     }
 
     function preencherJogador() {
@@ -993,8 +1048,6 @@
             addRowPer();
             carregarLocal();
             aplicarDerivadosGurpsLiteFicha();
-            atualizarResumoPontosListas();
-            syncXpMirror();
             return;
         }
         try {
