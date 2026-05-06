@@ -31,10 +31,16 @@ class PericiaRepository:
     @staticmethod
     def _payload_data(payload, exclude_unset: bool = False) -> dict:
         if hasattr(payload, "model_dump"):
-            return payload.model_dump(exclude_unset=exclude_unset)
-        if exclude_unset:
-            return payload.dict(exclude_unset=True)
-        return payload.dict()
+            data = payload.model_dump(exclude_unset=exclude_unset)
+        elif exclude_unset:
+            data = payload.dict(exclude_unset=True)
+        else:
+            data = payload.dict()
+
+        if "destaque_arena" in data:
+            data["destaque_arena"] = 1 if bool(data["destaque_arena"]) else 0
+
+        return data
 
     def restaurar_pericia(self, db_pericia: Pericia, pericia: PericiaCreate) -> Pericia:
         db_pericia.deleted_at = None
