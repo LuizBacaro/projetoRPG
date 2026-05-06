@@ -5,6 +5,8 @@ import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20
 import { Toast } from '../ui/toast.module.js';
 import { escapeHtml } from '../utils/formatters.js';
 import { isClasseConjuradora, isTipoJogador, isTipoMonstro, resolveCombatenteSpellSlots, normalizeClasseConjuradora } from '../utils/combat-rules.js?v=20260419a';
+import { modificadorPericiaPreferindoDomFicha } from '../utils/dnd.js';
+import { resolverBonusRaciaisPorPericia } from '../utils/pericia-racial.js';
 import { getApiUrl } from '../config/api.config.js';
 
 export class ArenaController {
@@ -1083,6 +1085,10 @@ export class ArenaController {
             return this._periciasDestaqueCache.get(id);
         }
 
+        var combatente = this.combatentes.find(function(c) {
+            return Number(c.id) === id;
+        });
+
         try {
             var response = await fetch(getApiUrl('/pericias/' + id + '/listar'), {
                 headers: this._headers(false, false),
@@ -1092,13 +1098,17 @@ export class ArenaController {
             }
             var data = await response.json();
             var pericias = Array.isArray(data?.pericias) ? data.pericias : [];
+            var bonusRacialPorId = resolverBonusRaciaisPorPericia(combatente, pericias);
             var selecionadas = pericias.filter(function(pj) {
                 return Boolean(pj?.destaque_arena);
             }).map(function(pj) {
                 var nome = String(pj?.pericia?.nome || '').trim();
+                var modAtr = modificadorPericiaPreferindoDomFicha(combatente, pj?.pericia?.atributo);
+                var bonusRacial = bonusRacialPorId.get(pj?.pericia?.id) || 0;
                 var valor = Number(pj?.graduacao || 0)
-                    + Number(pj?.modificador_atributo || 0)
-                    + Number(pj?.bonus_outros || 0);
+                    + Number(modAtr || 0)
+                    + Number(pj?.bonus_outros || 0)
+                    + Number(bonusRacial || 0);
                 return {
                     nome: nome || 'Perícia',
                     total: valor,
