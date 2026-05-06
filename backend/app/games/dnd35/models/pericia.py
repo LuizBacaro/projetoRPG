@@ -109,6 +109,7 @@ class PericiaJogador(Base):
     custo_total = Column(Integer, default=0)
     modificador_atributo = Column(Float, default=0)
     bonus_outros = Column(Float, default=0)
+    destaque_arena = Column(Integer, default=0)
 
     pericia = relationship("Pericia", back_populates="pericia_jogadores")
     combatente = relationship(

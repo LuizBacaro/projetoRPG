@@ -26,6 +26,7 @@ from app.games.dnd35.schemas.pericia import (
     PericiaUpdate,
 )
 from app.games.dnd35.services.pericia_service import PericiaService
+from app.shared.models.usuario import PerfilUsuario, Usuario
 
 logger = logging.getLogger(__name__)
 
@@ -346,10 +347,19 @@ def atualizar_pericia_jogador(
     pericia_jogador_id: int,
     pericia: PericiaJogadorUpdate,
     service: PericiaService = Depends(get_pericia_service),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
     """Atualiza uma perícia do jogador"""
     try:
+        if pericia.destaque_arena is not None:
+            perfil = getattr(usuario_atual, "perfil", None)
+            perfil_valor = perfil.value if hasattr(perfil, "value") else str(perfil or "")
+            if perfil_valor not in (PerfilUsuario.MESTRE.value, PerfilUsuario.ADMINISTRADOR.value):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Somente mestre ou administrador pode destacar perícias para a arena.",
+                )
         pericia_atualizada = service.atualizar_pericia_jogador(
             pericia_jogador_id, pericia
         )

@@ -43,6 +43,7 @@ export class ArenaController {
         this.token                 = localStorage.getItem('token');
         this.combateId             = null;
         this.versaoCombate         = null;
+        this._periciasDestaqueCache = new Map();
         this._inicializar();
     }
 
@@ -1064,12 +1065,72 @@ export class ArenaController {
         this._atualizarDefesasCardAtivo(container, combatente);
         this._atualizarAtributosCardAtivo(container, combatente);
         this._atualizarResistenciasCardAtivo(container, combatente);
+        this._renderizarPericiasDestaqueNoCard(container, combatente);
         this._atualizarControlesBasicosCardAtivo(container);
         this._atualizarPlaceholderCondicoesCardAtivo(container);
         this._atualizarEstadoRenderCardAtivo(combatente);
     }
 
     // ─── Render: Combatente Ativo ───────────────────────────
+
+    async _carregarPericiasDestaque(combatenteId) {
+        var id = Number(combatenteId || 0);
+        if (!id) {
+            return [];
+        }
+
+        if (this._periciasDestaqueCache.has(id)) {
+            return this._periciasDestaqueCache.get(id);
+        }
+
+        try {
+            var response = await fetch(getApiUrl('/pericias/' + id + '/listar'), {
+                headers: this._headers(false, false),
+            });
+            if (!response.ok) {
+                return [];
+            }
+            var data = await response.json();
+            var pericias = Array.isArray(data?.pericias) ? data.pericias : [];
+            var selecionadas = pericias.filter(function(pj) {
+                return Boolean(pj?.destaque_arena);
+            }).map(function(pj) {
+                var nome = String(pj?.pericia?.nome || '').trim();
+                var valor = Number(pj?.graduacao || 0)
+                    + Number(pj?.modificador_atributo || 0)
+                    + Number(pj?.bonus_outros || 0);
+                return {
+                    nome: nome || 'Perícia',
+                    total: valor,
+                };
+            });
+            this._periciasDestaqueCache.set(id, selecionadas);
+            return selecionadas;
+        } catch (_err) {
+            return [];
+        }
+    }
+
+    _renderizarPericiasDestaqueNoCard(container, combatente) {
+        var target = container.querySelector('.arena-pericias-destaque-lista');
+        if (!target) {
+            return;
+        }
+
+        target.innerHTML = '<span class="arena-condicao-vazia">Carregando perícias destacadas...</span>';
+        this._carregarPericiasDestaque(combatente.id).then(function(pericias) {
+            if (!Array.isArray(pericias) || pericias.length === 0) {
+                target.innerHTML = '<span class="arena-condicao-vazia">Nenhuma perícia destacada</span>';
+                return;
+            }
+            var html = pericias.map(function(item) {
+                var total = Number(item.total || 0);
+                var totalTxt = (total >= 0 ? '+' : '') + total;
+                return '<span class="arena-condicao-badge">' + escapeHtml(item.nome) + ' (' + totalTxt + ')</span>';
+            }).join('');
+            target.innerHTML = html;
+        });
+    }
 
     renderizarCombatenteAtivo(opcoes = {}) {
         var carregarCondicoes = opcoes.carregarCondicoes !== false;
@@ -1195,6 +1256,12 @@ export class ArenaController {
         html += '<div class="arena-condicoes-lista">'
             + '<span class="arena-condicao-vazia">Nenhuma condição ativa</span></div>';
         html += '</div>';
+        html += '<div class="arena-secao arena-secao-condicoes">';
+        html += '<h3 class="arena-secao-titulo">Perícias de Destaque</h3>';
+        html += '<div class="arena-pericias-destaque-lista">';
+        html += '<span class="arena-condicao-vazia">Carregando perícias destacadas...</span>';
+        html += '</div>';
+        html += '</div>';
         html += '</div></div>';
 
         // Coluna central
@@ -1238,6 +1305,7 @@ export class ArenaController {
         this._configurarControlesCardAtivo(container);
 
         this._configurarEventosMagias(container);
+        this._renderizarPericiasDestaqueNoCard(container, c);
         this._atualizarEstadoRenderCardAtivo(c);
         if (carregarCondicoes) {
             this.condicaoController.carregarCondicoesDoCombatente(c.id);

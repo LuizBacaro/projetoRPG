@@ -172,6 +172,7 @@ class PericiaService:
             custo_total=custo_total,
             modificador_atributo=float(modificador),
             bonus_outros=pericia_jogador.bonus_outros or 0,
+            destaque_arena=1 if bool(pericia_jogador.destaque_arena) else 0,
         )
 
         return self._pj.persistir_novo_vinculo(db_pericia_jogador)

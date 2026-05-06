@@ -94,6 +94,7 @@ export class FichaPersonagemController {
         this.armadurasProtecaoDisponiveis = [];
         this.talentosJogador = [];
         this.idiomasFichaDraft = [];
+        this._perfilAtual = this._obterPerfilAtual();
 
     }
 
@@ -103,6 +104,24 @@ export class FichaPersonagemController {
 
     set token(_value) {
         // Compatibilidade: token sempre lido ao vivo do localStorage.
+    }
+
+    _obterPerfilAtual() {
+        try {
+            if (window.AuthService && typeof window.AuthService.getPerfil === 'function') {
+                return String(window.AuthService.getPerfil() || '').toLowerCase();
+            }
+            const usuarioRaw = localStorage.getItem('usuario');
+            if (!usuarioRaw) return '';
+            const usuario = JSON.parse(usuarioRaw);
+            return String(usuario?.perfil || '').toLowerCase();
+        } catch (_err) {
+            return '';
+        }
+    }
+
+    _podeDestacarPericiaArena() {
+        return this._perfilAtual === 'mestre' || this._perfilAtual === 'administrador';
     }
 
     async inicializar() {
@@ -2099,6 +2118,7 @@ export class FichaPersonagemController {
             catalogoPericias,
         );
 
+        const podeDestacar = this._podeDestacarPericiaArena();
         pericias.forEach(pj => {
             const modAtr = modificadorPericiaPreferindoDomFicha(this.combatente, pj.pericia?.atributo);
             const bonusOutros = pj.bonus_outros || 0;
@@ -2107,11 +2127,29 @@ export class FichaPersonagemController {
             const item  = document.createElement('div');
             item.className = 'ficha-pericia-item';
             item.title     = pj.pericia?.descricao || '';
+            const destaqueArena = Boolean(pj.destaque_arena);
             const racialHtml = bonusRacial
                 ? `<span class="ficha-pericia-mod-valor">+${bonusRacial}</span>`
                 : `<span class="ficha-pericia-mod-valor">—</span>`;
+            const destaqueHtml = podeDestacar
+                ? `<label class="ficha-pericia-arena-toggle" title="Exibir esta perícia na arena">
+                        <span class="ficha-pericia-mod-label">Arena</span>
+                        <input
+                            type="checkbox"
+                            class="ficha-pericia-destaque-arena"
+                            data-combatente-id="${this.combatente?.id || 0}"
+                            data-pericia-jogador-id="${pj.id}"
+                            data-graduacao="${pj.graduacao || 0}"
+                            data-bonus-outros="${bonusOutros || 0}"
+                            ${destaqueArena ? 'checked' : ''}
+                        />
+                    </label>`
+                : '';
             item.innerHTML = `
-                <span class="ficha-pericia-nome">${escapeHtml(pj.pericia?.nome) || '—'}</span>
+                <span class="ficha-pericia-nome">
+                    <span class="ficha-pericia-nome-texto">${escapeHtml(pj.pericia?.nome) || '—'}</span>
+                    ${destaqueHtml}
+                </span>
                 <span class="ficha-pericia-atributo">${escapeHtml(pj.pericia?.atributo) || '—'}</span>
                 <div class="ficha-pericia-mods">
                     <div class="ficha-pericia-mod">
@@ -2141,6 +2179,45 @@ export class FichaPersonagemController {
             container.appendChild(item);
         });
 
+        if (podeDestacar) {
+            this._configurarEventosDestaquePericiaArena();
+        }
+
+    }
+
+    _configurarEventosDestaquePericiaArena() {
+        const toggles = document.querySelectorAll('.ficha-pericia-destaque-arena');
+        toggles.forEach((toggle) => {
+            toggle.addEventListener('change', async () => {
+                const periciaJogadorId = Number(toggle.dataset.periciaJogadorId || 0);
+                if (!periciaJogadorId) return;
+                const checked = Boolean(toggle.checked);
+                const graduacaoAtual = Number(toggle.dataset.graduacao || 0);
+                const bonusOutrosAtual = Number(toggle.dataset.bonusOutros || 0);
+                toggle.disabled = true;
+                try {
+                    await this.periciaService.atualizarPericia(
+                        Number(this.combatente?.id || 0),
+                        periciaJogadorId,
+                        graduacaoAtual,
+                        bonusOutrosAtual,
+                        checked,
+                    );
+                    window.NotificationService?.sucesso?.(
+                        checked
+                            ? 'Perícia destacada para a arena.'
+                            : 'Perícia removida da arena.',
+                    );
+                } catch (error) {
+                    toggle.checked = !checked;
+                    window.NotificationService?.erro?.(
+                        error?.message || 'Não foi possível atualizar destaque da perícia.',
+                    );
+                } finally {
+                    toggle.disabled = false;
+                }
+            });
+        });
     }
 
     renderizarPericiasVazias() {

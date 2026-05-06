@@ -567,6 +567,7 @@ def _inicializar_banco_critico(db) -> None:
         ("garantir_colunas_dinheiro", _garantir_colunas_dinheiro),
         ("garantir_colunas_talentos", _garantir_colunas_talentos),
         ("garantir_colunas_armaduras_protecao", _garantir_colunas_armaduras_protecao),
+        ("garantir_coluna_pericia_destaque_arena", _garantir_coluna_pericia_destaque_arena),
         ("garantir_constraints_item_13", _garantir_constraints_item_13),
         ("inicializar_catalogo_jogos", lambda: inicializar_catalogo_jogos(db)),
         (
@@ -934,6 +935,22 @@ def _garantir_colunas_armaduras_protecao() -> None:
                 coluna,
             )
             conn.execute(text(f"ALTER TABLE armaduras_protecao ADD COLUMN {coluna} {tipo_sql}"))
+
+
+def _garantir_coluna_pericia_destaque_arena() -> None:
+    """Garante a coluna de destaque para exibição de perícias na arena."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "pericia_jogadores" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("pericia_jogadores")}
+    if "destaque_arena" in colunas_existentes:
+        return
+
+    logger.warning("⚠️  coluna pericia_jogadores.destaque_arena ausente; aplicando schema guard")
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE pericia_jogadores ADD COLUMN destaque_arena INTEGER DEFAULT 0"))
 
 
 def _seed_pericias(db) -> None:

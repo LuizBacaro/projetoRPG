@@ -270,13 +270,16 @@ export class PericiaService {
      * @param {number} graduacao - Novos pontos
      * @returns {Promise<Object>}
      */
-    async atualizarPericia(combatenteId, periciaJogadorId, graduacao, bonusOutros = 0) {
+    async atualizarPericia(combatenteId, periciaJogadorId, graduacao, bonusOutros = 0, destaqueArena = null) {
         try {
             const url = `${this.baseUrl}/${combatenteId}/pericia/${periciaJogadorId}`;
             const payload = { 
                 graduacao,
                 bonus_outros: bonusOutros
             };
+            if (destaqueArena !== null && destaqueArena !== undefined) {
+                payload.destaque_arena = Boolean(destaqueArena);
+            }
 
 
             const response = await fetch(url, {

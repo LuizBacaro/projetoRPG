@@ -92,6 +92,7 @@ class PericiaJogadorBase(BaseModel):
     graduacao: int = Field(default=0, ge=0)
     custo_total: int = Field(default=0, ge=0)
     bonus_outros: float = Field(default=0)
+    destaque_arena: bool = Field(default=False)
 
 
 class PericiaJogadorCreate(PericiaJogadorBase):
@@ -106,6 +107,7 @@ class PericiaJogadorUpdate(BaseModel):
     graduacao: Optional[int] = Field(None, ge=0)
     custo_total: Optional[int] = Field(None, ge=0)
     bonus_outros: Optional[float] = None
+    destaque_arena: Optional[bool] = None
 
 
 class PericiaJogadorResponse(PericiaJogadorBase):
