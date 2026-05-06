@@ -212,3 +212,197 @@ gh issue create --title "[GURPS G1.1] …" --label "gurps,onda-1,ficha" --body-f
 
 Criar uma **database de tarefas** (ou usar a existente): propriedades **ID** (texto `G1.1`), **Onda** (número), **RF** (texto), **Estado**, **Depende** (relação). Duplicar uma linha por issue usando a coluna **Título da issue** acima.
 
+---
+
+## 8. Roadmap de melhoria contínua (4 frentes)
+
+Objetivo deste bloco: manter um plano único e rastreável para estabilizar produção, reduzir latência, acelerar novos jogos e preparar monetização sem comprometer dados.
+
+### 8.1 Estabilidade (0 a 4 semanas)
+
+**Meta:** remover incidentes de produção (500/CORS mascarado), padronizar checagens pós-deploy e aumentar segurança operacional de banco.
+
+#### Escopo imediato
+
+- Deploy do backend com meta de diagnóstico no `catalogo/lite-ficha`.
+- Checagem manual em produção via Network para validar origem e contagens do catálogo.
+- Rotina de backup Neon antes de seed/migration grande.
+- Smoke pós-deploy com endpoints de saúde e catálogo autenticado.
+- Revisão de modo estrito multi-jogo e fluxo de token em produção.
+
+#### Checklist de execução
+
+- [ ] Deploy contendo `meta.catalogo_listas_origem`, `meta.catalogo_listas_counts` e fallback seguro.
+- [ ] Validar `GET /api/v1/gurps/personagens/catalogo/lite-ficha` em produção com token GURPS.
+- [ ] Registrar evidência (sem token) do trecho `meta` da resposta.
+- [ ] Confirmar `GET /health/live` (startup/deploy) e `GET /health` (operação contínua).
+- [ ] Antes de mudança de schema/seed relevante: criar branch de backup no Neon + `pg_dump`.
+- [ ] Validar `DATABASE_URL` de produção no Render apontando para branch correta no Neon.
+- [ ] Revisar `MULTI_GAME_STRICT_MODE` e tratamento de 409 no front para não falhar silenciosamente.
+
+#### Critério de pronto
+
+- 7 dias sem erro 500 recorrente no catálogo GURPS em produção.
+- Evidência de `meta.catalogo_listas_origem` conhecida (`postgres` ou `arquivos_json`) com contagens coerentes.
+- Procedimento de backup pré-mudança documentado e repetível.
+
+### 8.2 Velocidade (paralelo, após diagnóstico)
+
+**Meta:** reduzir tempo percebido de carregamento e latência p95 dos endpoints mais acessados.
+
+#### Escopo
+
+- Avaliar plano pago no Render para reduzir cold start.
+- Medir p95 antes/depois da mudança de infraestrutura.
+- Otimizar consultas e índices nos endpoints críticos.
+- Introduzir cache curto para leituras idempotentes (catálogos), com invalidação explícita.
+
+#### Checklist de execução
+
+- [ ] Baseline de latência (p50/p95/p99) para: grimório, listas e personagem.
+- [ ] Comparar baseline com ambiente após upgrade de plano no Render.
+- [ ] Levantar queries lentas e planos de execução no Postgres.
+- [ ] Criar/ajustar índices com rollback plan para cada alteração.
+- [ ] Implementar cache TTL curto em catálogo (`lite-ficha`) com chave por versão/origem.
+- [ ] Definir gatilho de invalidação (deploy, seed, alteração de catálogo).
+
+#### Critério de pronto
+
+- p95 reduzido de forma mensurável nos três endpoints críticos.
+- Cold start fora do caminho crítico de uso diário.
+- Cache com invalidação previsível e sem inconsistência funcional.
+
+### 8.3 Novo jogo (médio prazo)
+
+**Meta:** transformar o padrão atual em um pipeline replicável por `game_slug`.
+
+#### Escopo
+
+- Contrato mínimo por jogo (rotas, seeds, front, autenticação por `game_slug`).
+- Staging dedicado com branch de banco e deploy automatizado.
+- Testes mínimos de contrato por jogo, seguindo padrão GURPS catálogo.
+
+#### Checklist de execução
+
+- [ ] Criar documento de contrato por `game_slug` (API, payloads, permissões, seeds).
+- [ ] Definir template de módulo de jogo (`api`, `services`, `repositories`, `schemas`, `catalogs`).
+- [ ] Provisionar staging isolado (Render + Neon branch).
+- [ ] Pipeline de deploy automático para staging a cada merge em branch de integração.
+- [ ] Suite mínima de contrato por jogo (health, autenticação, catálogo/listas essenciais).
+
+#### Critério de pronto
+
+- Onboarding de novo jogo com checklist única e sem decisões ad hoc.
+- Staging validando mudanças antes de produção.
+- Contratos mínimos automatizados para evitar regressões cross-game.
+
+### 8.4 Monetização (após estabilização)
+
+**Meta:** habilitar receita com baixo risco técnico e governança de uso.
+
+#### Escopo
+
+- Planos/assinatura (Stripe ou equivalente) com feature flags.
+- Limites por plano (campanhas, uploads, recursos premium).
+- Observabilidade de uso para precificação e evolução do produto.
+
+#### Checklist de execução
+
+- [ ] Definir planos, benefícios e limites por recurso.
+- [ ] Implementar camada de feature flags por tenant/usuário/plano.
+- [ ] Integrar cobrança (checkout, webhook, cancelamento, estado de assinatura).
+- [ ] Aplicar limites técnicos por plano com mensagens claras no front.
+- [ ] Instrumentar eventos: login, criação de ficha, início de combate, uso de uploads.
+- [ ] Painel de métricas de adoção e custo por recurso.
+
+#### Critério de pronto
+
+- Fluxo de cobrança auditável de ponta a ponta.
+- Limites aplicados de forma consistente entre backend e frontend.
+- Dados de uso suficientes para iteração de pricing.
+
+### 8.5 Dependências e ordem sugerida
+
+1. Estabilidade (8.1) inicia imediatamente e bloqueia mudanças sensíveis em produção.
+2. Velocidade (8.2) roda em paralelo após o diagnóstico inicial de estabilidade.
+3. Novo jogo (8.3) depende de estabilidade operacional e contrato consolidado.
+4. Monetização (8.4) inicia quando estabilidade e observabilidade mínima estiverem maduras.
+
+### 8.6 Próximo passo prático (execução curta)
+
+Após o próximo deploy com correções de catálogo:
+
+1. Executar `GET /api/v1/gurps/personagens/catalogo/lite-ficha` em produção com token GURPS.
+2. Copiar apenas o objeto `meta` (sem token) e anexar no registro operacional.
+3. Classificar a causa operacional:
+   - `catalogo_listas_origem = postgres`: foco em qualidade/latência de consulta.
+   - `catalogo_listas_origem = arquivos_json`: foco em migração/seed/estado do banco.
+4. Abrir tarefas derivadas da causa encontrada antes de avançar para outras frentes.
+
+### 8.7 Backlog operacional (issues prontas)
+
+**Objetivo:** transformar as 4 frentes em tarefas rastreáveis com ordem de execução, prioridade e tamanho.
+
+#### Convenção
+
+- **ID:** `RM-EST-*` (Estabilidade), `RM-VEL-*` (Velocidade), `RM-NJG-*` (Novo jogo), `RM-MON-*` (Monetização).
+- **Prioridade:** `P0` (urgente), `P1` (alta), `P2` (média), `P3` (baixa).
+- **Estimativa:** `S` (até 1 dia), `M` (2 a 4 dias), `L` (5+ dias).
+- **Status inicial sugerido:** `Todo`.
+
+#### Lista de issues (título pronto + execução)
+
+| ID | Título da issue | Frente | Prioridade | Estimativa | Depende de |
+|----|------------------|--------|------------|------------|------------|
+| RM-EST-01 | `[RM-EST-01] Deploy backend com meta de diagnóstico no catálogo Lite` | Estabilidade | P0 | S | — |
+| RM-EST-02 | `[RM-EST-02] Validar em produção o meta de catalogo/lite-ficha (Network)` | Estabilidade | P0 | S | RM-EST-01 |
+| RM-EST-03 | `[RM-EST-03] Padronizar smoke pós-deploy (/health/live e /catalogo/lite-ficha)` | Estabilidade | P0 | S | RM-EST-01 |
+| RM-EST-04 | `[RM-EST-04] Formalizar backup Neon pré-migration (branch + pg_dump)` | Estabilidade | P0 | M | — |
+| RM-EST-05 | `[RM-EST-05] Revisar MULTI_GAME_STRICT_MODE e tratamento de 409 no front` | Estabilidade | P1 | M | RM-EST-01 |
+| RM-EST-06 | `[RM-EST-06] Validar DATABASE_URL de produção e branch Neon ativo` | Estabilidade | P0 | S | — |
+| RM-VEL-01 | `[RM-VEL-01] Coletar baseline de latência p50/p95/p99 (grimório/listas/personagem)` | Velocidade | P1 | M | RM-EST-02 |
+| RM-VEL-02 | `[RM-VEL-02] Comparar p95 antes/depois de upgrade Render` | Velocidade | P1 | M | RM-VEL-01 |
+| RM-VEL-03 | `[RM-VEL-03] Levantar queries lentas e plano de índices no Postgres` | Velocidade | P1 | M | RM-VEL-01 |
+| RM-VEL-04 | `[RM-VEL-04] Implementar otimizações de índice/query nos endpoints críticos` | Velocidade | P1 | L | RM-VEL-03 |
+| RM-VEL-05 | `[RM-VEL-05] Implementar cache TTL curto para catálogos com invalidação explícita` | Velocidade | P2 | M | RM-EST-02 |
+| RM-NJG-01 | `[RM-NJG-01] Definir contrato padrão por game_slug (rotas, seeds, front, auth)` | Novo jogo | P1 | M | RM-EST-03 |
+| RM-NJG-02 | `[RM-NJG-02] Criar template de módulo de jogo reutilizável` | Novo jogo | P2 | L | RM-NJG-01 |
+| RM-NJG-03 | `[RM-NJG-03] Provisionar staging isolado (Render + Neon branch)` | Novo jogo | P1 | M | RM-EST-04 |
+| RM-NJG-04 | `[RM-NJG-04] Automatizar deploy para staging por branch de integração` | Novo jogo | P2 | M | RM-NJG-03 |
+| RM-NJG-05 | `[RM-NJG-05] Criar testes mínimos de contrato por jogo` | Novo jogo | P1 | L | RM-NJG-01 |
+| RM-MON-01 | `[RM-MON-01] Definir catálogo de planos e limites por recurso` | Monetização | P2 | M | RM-EST-03 |
+| RM-MON-02 | `[RM-MON-02] Implementar feature flags por plano/tenant` | Monetização | P2 | L | RM-MON-01 |
+| RM-MON-03 | `[RM-MON-03] Integrar cobrança (checkout + webhook + estado de assinatura)` | Monetização | P2 | L | RM-MON-01 |
+| RM-MON-04 | `[RM-MON-04] Aplicar limites técnicos por plano no backend/frontend` | Monetização | P2 | L | RM-MON-02 |
+| RM-MON-05 | `[RM-MON-05] Instrumentar eventos de uso para precificação` | Monetização | P1 | M | RM-EST-03 |
+| RM-MON-06 | `[RM-MON-06] Criar painel de métricas de adoção e custo por recurso` | Monetização | P2 | M | RM-MON-05 |
+
+#### Sequência sugerida (primeiras 2 semanas)
+
+1. **Semana 1 (estabilidade):** `RM-EST-01`, `RM-EST-02`, `RM-EST-03`, `RM-EST-06`.
+2. **Semana 1 (governança de dados):** `RM-EST-04`.
+3. **Semana 2 (hardening):** `RM-EST-05` + início de `RM-VEL-01`.
+4. **Semana 2 (performance):** `RM-VEL-03` e decisão sobre `RM-VEL-02`.
+
+#### Template curto de issue
+
+```markdown
+## Contexto
+Relacionado ao roadmap §8 em `melhoria-arquitetura`.
+
+## Objetivo
+<!-- Descrever o resultado esperado da tarefa -->
+
+## Escopo
+- [ ] Item 1
+- [ ] Item 2
+
+## Critérios de aceite
+- [ ] Critério funcional validado
+- [ ] Smoke/teste executado
+- [ ] Evidência anexada (logs/prints/JSON sem dados sensíveis)
+
+## Dependências
+<!-- IDs: ex. RM-EST-01 -->
+```
+
