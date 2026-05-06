@@ -1,10 +1,10 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, master, develop, feature/salva]
   pull_request:
-    branches: [main, master, develop]
+    branches: [main, master, develop, feature/salva]
   workflow_dispatch:
     inputs:
       run_e2e:
@@ -16,7 +16,7 @@ on:
 
 jobs:
   # ──────────────────────────────────────────
-  # Backend: pytest completo
+  # Backend: linting, formatação, testes e segurança
   # ──────────────────────────────────────────
   backend:
     name: Backend Tests (Python 3.11)
@@ -38,11 +38,30 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run pytest
-        run: python -m pytest tests/ -q --tb=short --ignore=tests/e2e --cov=app --cov-report=term-missing
+      - name: Lint and format code
+        run: |
+          pip install black flake8 isort
+          black --check --diff app/ tests/
+          flake8 app/ tests/ --max-line-length=88 --extend-ignore=E203,W503
+          isort --check-only --diff app/ tests/
+
+      - name: Security scan
+        run: |
+          pip install safety bandit
+          safety check
+          bandit -r app/ -f json -o bandit-report.json || true
+
+      - name: Run pytest with coverage
+        run: python -m pytest tests/ -q --tb=short --ignore=tests/e2e --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=80
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./backend/coverage.xml
+          flags: backend
 
   # ──────────────────────────────────────────
-  # Frontend: testes unitários JS
+  # Frontend: testes unitários JS e linting básico
   # ──────────────────────────────────────────
   frontend:
     name: Frontend Tests (Node 18)
@@ -59,6 +78,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
+          cache: npm
+
+      - name: Install ESLint (if package.json exists)
+        run: npm install eslint --save-dev || true
+
+      - name: Lint JavaScript files
+        run: npx eslint js/ --ext .js || echo "ESLint not configured, skipping"
 
       - name: Run frontend unit tests
         run: node test-ficha-perfil-simples.js
@@ -111,3 +137,44 @@ jobs:
           BASE_URL: http://localhost:8000
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL || 'admin@arena.local' }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'admin123' }}
+
+  # ──────────────────────────────────────────
+  # Deploy para Staging (apenas em push para develop)
+  # ──────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Backend to Render (Staging)
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_STAGING }}
+
+      - name: Deploy Frontend to Vercel (Staging)
+        run: |
+          npm install -g vercel
+          vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
+        working-directory: frontend
+
+  # ──────────────────────────────────────────
+  # Notificações em caso de falha
+  # ──────────────────────────────────────────
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [backend, frontend, e2e]
+    if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
