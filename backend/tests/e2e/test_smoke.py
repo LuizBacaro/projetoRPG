@@ -10,7 +10,7 @@ Cobre os 4 cenários críticos definidos no MELHORIAS.md #Checklist3/3.4:
 
 Pré-requisitos:
   - API rodando em BASE_URL (padrão: http://localhost:8000)
-  - Usuário admin existente (configurado via env ADMIN_EMAIL / ADMIN_PASSWORD)
+  - Usuário admin com acesso ao jogo dnd35 (env ADMIN_EMAIL / ADMIN_PASSWORD; catálogo + auto-enroll no startup)
   - `pip install playwright pytest-playwright` + `playwright install chromium`
 
 Execução:
@@ -20,6 +20,7 @@ Execução:
 """
 
 import os
+import re
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -31,6 +32,10 @@ ADMIN_PASS = os.getenv(
 )  # padrão só para ambiente de dev/CI isolado
 FRONTEND = BASE_URL  # arquivos estáticos servidos pelo mesmo servidor
 
+# Após login o hub multi-jogo (`selecionar-jogo.html`) exige escolher D&D 3.5;
+# `destinoPorSlug('dnd35')` redireciona para `/dashboard` (canónico), não `/pages/dashboard.html`.
+_DASHBOARD_URL_RE = re.compile(r".*(/dashboard/?$|/pages/dashboard\.html$)")
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -38,14 +43,19 @@ FRONTEND = BASE_URL  # arquivos estáticos servidos pelo mesmo servidor
 
 
 def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
-    """Navega para login e autentica."""
+    """Navega para login, autentica, escolhe D&D 3.5 no hub e aguarda o dashboard."""
     page.goto(f"{FRONTEND}/pages/login.html")
     page.wait_for_load_state("networkidle")
     page.fill("#inputEmail", email)
     page.fill("#inputSenha", senha)
     page.click("#btnLogin")
-    # Aguarda redirecionamento ou elemento de dashboard
-    page.wait_for_url(f"**/dashboard.html", timeout=8000)
+    page.wait_for_url("**/selecionar-jogo.html**", timeout=20000)
+    page.wait_for_load_state("networkidle")
+    hub_dnd = page.locator("#btnHubDnd35")
+    hub_dnd.wait_for(state="visible", timeout=10000)
+    expect(hub_dnd).to_be_enabled(timeout=20000)
+    hub_dnd.click()
+    page.wait_for_url(_DASHBOARD_URL_RE, timeout=20000)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -54,9 +64,9 @@ def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
 
 
 def test_login_valido(page: Page):
-    """Login com credenciais válidas redireciona para dashboard."""
+    """Login válido passa pelo hub de jogos e termina no dashboard D&D 3.5."""
     fazer_login(page)
-    expect(page).to_have_url(f"{FRONTEND}/pages/dashboard.html")
+    expect(page).to_have_url(_DASHBOARD_URL_RE)
 
 
 def test_login_invalido_exibe_erro(page: Page):
