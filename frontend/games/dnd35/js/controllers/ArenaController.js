@@ -905,6 +905,7 @@ export class ArenaController {
             modoMagia,
             ataquesAssinatura,
             this._obterAssinaturaMagiasCardAtivo(combatente),
+            isTipoMonstro(combatente.tipo) ? 'sem-hpbar' : 'com-hpbar',
         ].join('::');
     }
 
@@ -928,12 +929,13 @@ export class ArenaController {
             return false;
         }
 
+        var precisaBarraHp = !isTipoMonstro(combatente.tipo);
         return Boolean(
             container.querySelector('.arena-card')
             && container.querySelector('.arena-nome-text')
             && container.querySelector('.arena-raca-classe')
             && container.querySelector('.arena-pv-valor')
-            && container.querySelector('.arena-hp-fill')
+            && (!precisaBarraHp || container.querySelector('.arena-hp-fill'))
             && container.querySelector('.arena-condicoes-lista')
         );
     }
@@ -1366,8 +1368,10 @@ export class ArenaController {
             + 'title="Pontos negativos antes da morte (D&D 3.5: morre em -10)">'
             + escapeHtml(pvMorrendoTexto) + '</span>';
         html += '</div>';
-        html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:'
-            + hpPct + '%;background:' + hpCor + ';"></div></div>';
+        if (!ehMonstroAtivo) {
+            html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:'
+                + hpPct + '%;background:' + hpCor + ';"></div></div>';
+        }
         html += '</div>';
         html += '<button class="arena-btn-proximo" id="btnAvancarTurnoArena">'
             + 'Encerrar turno</button>';
