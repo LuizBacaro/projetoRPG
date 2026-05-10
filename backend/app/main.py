@@ -17,7 +17,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import inspect, text
-from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError, StatementError
 
 from .shared.exceptions.custom_exceptions import ArenaBaseException
 
@@ -214,6 +214,19 @@ async def _handle_arena_exception(request: Request, exc: ArenaBaseException) -> 
     )
 
 
+@app.exception_handler(StatementError)
+async def _handle_statement_error(request: Request, exc: StatementError) -> JSONResponse:
+    """Erros SQLAlchemy envolvendo o statement (ex.: IntegrityError em `.orig`)."""
+    orig = getattr(exc, "orig", None)
+    if isinstance(orig, IntegrityError):
+        return await _handle_integrity_error(request, orig)  # type: ignore[misc]
+    logger.exception("StatementError em %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Erro ao executar operação no banco. Veja os logs do servidor."},
+    )
+
+
 @app.exception_handler(IntegrityError)
 async def _handle_integrity_error(request: Request, exc: IntegrityError) -> JSONResponse:
     """Violação de constraint (CHECK / UNIQUE / FK) → 409 com detalhe seguro.
@@ -299,8 +312,15 @@ async def _handle_uncaught_exception(request: Request, exc: Exception) -> JSONRe
     )
 
 
-# ── Middleware CORS ──────────────────────────────────────────────────────────
+# ── Middleware CORS / limite / gzip / rate limit ─────────────────────────────
 # Origens vêm do .env (ALLOWED_ORIGINS) — nunca usar "*" com allow_credentials
+#
+# Ordem (último add_middleware = mais externo na pilha Starlette):
+#   CORS → RateLimit → GZip → RequestSize → … → app
+# Assim, respostas geradas *sem* passar pelo restante da pilha (ex.: 429 do
+# RateLimitMiddleware que retorna JSON sem `call_next`) ainda passam pelo
+# CORSMiddleware e recebem `Access-Control-Allow-Origin` — evita "Failed to
+# fetch" no browser por falta de CORS em erros 4xx/5xx.
 _origins = settings.ALLOWED_ORIGINS
 _allow_all = "*" in _origins
 
@@ -319,6 +339,20 @@ if settings.GZIP_ENABLED:
 else:
     logger.warning("⚠️  GZip desativado")
 
+if settings.RATE_LIMIT_ENABLED:
+    app.add_middleware(
+        RateLimitMiddleware,
+        api_limit_per_minute=settings.API_RATE_LIMIT_PER_MINUTE,
+        login_limit_per_minute=settings.LOGIN_RATE_LIMIT_PER_MINUTE,
+    )
+    logger.info(
+        "✅ Rate limiting ativo: api=%s/min, login=%s/min",
+        settings.API_RATE_LIMIT_PER_MINUTE,
+        settings.LOGIN_RATE_LIMIT_PER_MINUTE,
+    )
+else:
+    logger.warning("⚠️  Rate limiting desativado")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins if not _allow_all else ["*"],
@@ -334,20 +368,6 @@ app.add_middleware(
     expose_headers=["Content-Length"],
     max_age=600,
 )
-
-if settings.RATE_LIMIT_ENABLED:
-    app.add_middleware(
-        RateLimitMiddleware,
-        api_limit_per_minute=settings.API_RATE_LIMIT_PER_MINUTE,
-        login_limit_per_minute=settings.LOGIN_RATE_LIMIT_PER_MINUTE,
-    )
-    logger.info(
-        "✅ Rate limiting ativo: api=%s/min, login=%s/min",
-        settings.API_RATE_LIMIT_PER_MINUTE,
-        settings.LOGIN_RATE_LIMIT_PER_MINUTE,
-    )
-else:
-    logger.warning("⚠️  Rate limiting desativado")
 
 logger.info(
     "✅ Request size limits ativos: request=%s bytes, json=%s bytes",
@@ -813,6 +833,17 @@ def _garantir_constraints_item_13() -> None:
     """
     logger.info("🔧 Aplicando guard de integridade do item #13")
     with engine.begin() as conn:
+        # Postgres: remove constraint legada `hp_atual >= 0` se ainda existir
+        # (ex.: migration c4e8d2a9f1b3 não aplicada ou deploy parcial). Sem isto,
+        # dano que leva PJ a HP negativo gera IntegrityError → 500.
+        if engine.dialect.name == "postgresql":
+            conn.execute(
+                text(
+                    'ALTER TABLE combatentes DROP CONSTRAINT IF EXISTS '
+                    '"ck_combatentes_hp_atual_non_negative"'
+                )
+            )
+
         conn.execute(text("UPDATE combatentes SET hp_maximo = 1 WHERE hp_maximo IS NULL OR hp_maximo <= 0"))
         conn.execute(text("UPDATE combatentes SET hp_atual = 0 WHERE hp_atual IS NULL"))
         conn.execute(text("UPDATE combatentes SET hp_atual = -10 WHERE hp_atual < -10"))
