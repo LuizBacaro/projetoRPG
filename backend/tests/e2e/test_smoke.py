@@ -25,16 +25,26 @@ import re
 import pytest
 from playwright.sync_api import Page, expect
 
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@arena.local")
-ADMIN_PASS = os.getenv(
-    "ADMIN_PASSWORD", "admin123"
-)  # padrão só para ambiente de dev/CI isolado
+
+def _env_ou_padrao(key: str, default: str) -> str:
+    """Como os secrets do GitHub vêm como string vazia se ausentes, getenv('K','d') não basta."""
+    raw = os.environ.get(key)
+    if raw is None:
+        return default
+    stripped = raw.strip()
+    return default if stripped == "" else stripped
+
+
+BASE_URL = _env_ou_padrao("BASE_URL", "http://localhost:8000")
+ADMIN_EMAIL = _env_ou_padrao("ADMIN_EMAIL", "admin@arena.local")
+ADMIN_PASS = _env_ou_padrao("ADMIN_PASSWORD", "admin123")
 FRONTEND = BASE_URL  # arquivos estáticos servidos pelo mesmo servidor
 
 # Após login o hub multi-jogo (`selecionar-jogo.html`) exige escolher D&D 3.5;
 # `destinoPorSlug('dnd35')` redireciona para `/dashboard` (canónico), não `/pages/dashboard.html`.
 _DASHBOARD_URL_RE = re.compile(r".*(/dashboard/?$|/pages/dashboard\.html$)")
+# Glob tipo `**/selecionar-jogo.html**` falhou no Playwright CI; regex na URL completa é fiável.
+_SELETOR_JOGO_RE = re.compile(r"selecionar-jogo\.html")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -45,17 +55,17 @@ _DASHBOARD_URL_RE = re.compile(r".*(/dashboard/?$|/pages/dashboard\.html$)")
 def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
     """Navega para login, autentica, escolhe D&D 3.5 no hub e aguarda o dashboard."""
     page.goto(f"{FRONTEND}/pages/login.html")
-    page.wait_for_load_state("networkidle")
+    page.wait_for_load_state("domcontentloaded")
     page.fill("#inputEmail", email)
     page.fill("#inputSenha", senha)
-    page.click("#btnLogin")
-    page.wait_for_url("**/selecionar-jogo.html**", timeout=20000)
-    page.wait_for_load_state("networkidle")
+    with page.expect_navigation(timeout=30000, url=_SELETOR_JOGO_RE):
+        page.click("#btnLogin")
+    page.wait_for_load_state("domcontentloaded")
     hub_dnd = page.locator("#btnHubDnd35")
-    hub_dnd.wait_for(state="visible", timeout=10000)
-    expect(hub_dnd).to_be_enabled(timeout=20000)
-    hub_dnd.click()
-    page.wait_for_url(_DASHBOARD_URL_RE, timeout=20000)
+    hub_dnd.wait_for(state="visible", timeout=15000)
+    expect(hub_dnd).to_be_enabled(timeout=30000)
+    with page.expect_navigation(timeout=30000, url=_DASHBOARD_URL_RE):
+        hub_dnd.click()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
