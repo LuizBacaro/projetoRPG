@@ -40,6 +40,19 @@ from app.services.file_service import FileService
 _CONDICAO_INCONSCIENTE = "Inconsciente"
 _CONDICAO_MORRENDO     = "Morrendo"
 
+
+def _normalizar_nome_talento(nome: str | None) -> str:
+    """Normaliza nome de talento para comparação tolerante.
+
+    Remove acentuação, sufixos como ``¹``/``²`` e símbolos não-letra; mantém só
+    letras e espaços em caixa alta. Garante match mesmo quando o catálogo grava
+    ``Iniciativa Aprimorada¹`` (com superescrito) e a regra compara sem ele.
+    """
+    chave = unicodedata.normalize("NFD", str(nome or ""))
+    chave = "".join(ch for ch in chave if unicodedata.category(ch) != "Mn")
+    chave = re.sub(r"[^A-Za-z\s]", "", chave)
+    return " ".join(chave.split()).upper()
+
 # Clérigo: magias por dia (Normal) + domínio — Magias por dia clerigo.xlsx (C = nv. 0 só truques; D–E = nv. 1 Normal/Domínio; truques sem slot de domínio)
 _CLERIC_SPELLS_PER_DAY_NORMAL = [
     [3, 1, None, None, None, None, None, None, None, None],
@@ -756,9 +769,7 @@ class CombatenteService:
             .all()
         )
         for (nome,) in nomes:
-            chave = unicodedata.normalize("NFD", str(nome or ""))
-            chave = "".join(ch for ch in chave if unicodedata.category(ch) != "Mn")
-            if chave.strip().upper() == "INICIATIVA APRIMORADA":
+            if _normalizar_nome_talento(nome) == "INICIATIVA APRIMORADA":
                 return 4
         return 0
 
@@ -770,9 +781,15 @@ class CombatenteService:
     # ── HP / Iniciativa ───────────────────────────────────
 
     def atualizar_hp(self, combatente_id: int, novo_hp: int) -> Combatente:
-        """Atualiza HP atual, clampado entre 0 e hp_maximo."""
+        """Atualiza HP atual respeitando D&D 3.5.
+
+        - Monstros: clamp [0, hp_maximo].
+        - Jogadores e NPCs: clamp [-10, hp_maximo] (faixa de morrendo/morto).
+        """
         combatente = self.obter_por_id(combatente_id)
-        combatente.hp_atual = max(0, min(novo_hp, combatente.hp_maximo))
+        teto = combatente.hp_maximo
+        piso = 0 if combatente.tipo == "monstro" else -10
+        combatente.hp_atual = max(piso, min(novo_hp, teto))
         return self.repository.update(combatente)
 
     def atualizar_iniciativa(self, combatente_id: int, nova_iniciativa: int) -> Combatente:

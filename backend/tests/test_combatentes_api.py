@@ -392,6 +392,29 @@ def test_jogador_com_iniciativa_aprimorada_recebe_bonus_na_iniciativa(combatente
     assert body["iniciativa"] == 6
 
 
+def test_iniciativa_aprimorada_com_sufixo_unicode_aplica_bonus(combatentes_db):
+    """Catálogo grava 'Iniciativa Aprimorada¹'; comparação deve ignorar símbolos."""
+    db, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    criado = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(classe="Guerreiro", nivel="4", destreza="14"),
+    )
+    assert criado.status_code == 201
+    combatente_id = criado.json()["id"]
+
+    talento = Talento(nome="Iniciativa Aprimorada¹", descricao="+4 iniciativa", ativo=True)
+    db.add(talento)
+    db.flush()
+    db.add(TalentoJogador(combatente_id=combatente_id, talento_id=talento.id))
+    db.commit()
+
+    obter = client.get(f"/api/v1/combatentes/{combatente_id}")
+    assert obter.status_code == 200
+    assert obter.json()["iniciativa"] == 6  # DES +2 + talento +4
+
+
 def test_criar_combatente_aplica_predefinicoes_raciais_basicas(combatentes_db):
     _, db_factory = combatentes_db
     client = _build_client(db_factory)

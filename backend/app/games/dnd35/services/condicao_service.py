@@ -210,12 +210,17 @@ class CondicaoService:
             raise DadosInvalidos(f"Condição {condicao_id} não encontrada")
 
     def _validar_acesso_combatente(self, combatente, usuario) -> None:
-        """Garante acesso apenas ao dono, exceto perfil administrador."""
+        """Libera dono, administrador e mestre — alinhado com CombatenteService."""
         if usuario is None:
             raise ArenaBaseException("Usuário autenticado é obrigatório", status_code=401)
 
         perfil = getattr(usuario, "perfil", None)
-        if perfil == PerfilUsuario.ADMINISTRADOR or perfil == PerfilUsuario.ADMINISTRADOR.value:
+        if perfil in (
+            PerfilUsuario.ADMINISTRADOR,
+            PerfilUsuario.ADMINISTRADOR.value,
+            PerfilUsuario.MESTRE,
+            PerfilUsuario.MESTRE.value,
+        ):
             return
 
         if combatente.dono_id != getattr(usuario, "id", None):

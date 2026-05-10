@@ -76,9 +76,10 @@ export class ArenaController {
     _renderizarItemOrdemHTML(combatente, indice) {
         var ativo = (indice === this.turnoAtual);
         var jaAgiu = (this._jaAgiram.indexOf(combatente.id) !== -1);
+        var ehMonstro = isTipoMonstro(combatente.tipo);
         var hpPct = Math.max(0, Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100));
         var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
-        var morto = (combatente.tipo === 'monstro') ? (combatente.hp_atual <= 0) : (combatente.hp_atual <= -10);
+        var morto = ehMonstro ? (combatente.hp_atual <= 0) : (combatente.hp_atual <= -10);
         var cls = 'combatente-ordem-item';
 
         if (ativo) cls += ' ativo';
@@ -93,9 +94,12 @@ export class ArenaController {
         html += '<span class="ordem-nome">' + escapeHtml(combatente.nome) + '</span>';
         if (jaAgiu) html += '<span class="ordem-agiu-badge">✓</span>';
         html += '</div>';
-        html += '<div class="ordem-hp-bar">';
-        html += '<div class="ordem-hp-fill" style="width:' + hpPct + '%;background:' + hpCor + ';"></div>';
-        html += '</div>';
+        // Monstro: oculta barra de HP (mestre vê estado pelas badges/painel).
+        if (!ehMonstro) {
+            html += '<div class="ordem-hp-bar">';
+            html += '<div class="ordem-hp-fill" style="width:' + hpPct + '%;background:' + hpCor + ';"></div>';
+            html += '</div>';
+        }
         html += '<div class="badges-condicao-ordem-wrapper"></div>';
         html += '</div>';
         html += '<span class="badge ' + this.getBadgeClass(combatente.tipo) + ' badge-mini">'
@@ -144,9 +148,10 @@ export class ArenaController {
 
         var ativo = (indice === this.turnoAtual);
         var jaAgiu = (this._jaAgiram.indexOf(combatente.id) !== -1);
+        var ehMonstro = isTipoMonstro(combatente.tipo);
         var hpPct = Math.max(0, Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100));
         var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
-        var morto = (combatente.tipo === 'monstro') ? (combatente.hp_atual <= 0) : (combatente.hp_atual <= -10);
+        var morto = ehMonstro ? (combatente.hp_atual <= 0) : (combatente.hp_atual <= -10);
 
         item.dataset.combatenteId = String(combatente.id);
         item.classList.toggle('ativo', ativo);
@@ -177,10 +182,35 @@ export class ArenaController {
             }
         }
 
-        var hpFillEl = item.querySelector('.ordem-hp-fill');
-        if (hpFillEl) {
-            hpFillEl.style.width = hpPct + '%';
-            hpFillEl.style.background = hpCor;
+        // Sincroniza visibilidade da barra de HP conforme tipo do combatente.
+        var barraExistente = item.querySelector('.ordem-hp-bar');
+        if (ehMonstro) {
+            if (barraExistente) barraExistente.remove();
+        } else {
+            if (!barraExistente) {
+                var ordemInfoEl = item.querySelector('.ordem-info');
+                if (ordemInfoEl) {
+                    var novaBarra = document.createElement('div');
+                    novaBarra.className = 'ordem-hp-bar';
+                    var fillEl = document.createElement('div');
+                    fillEl.className = 'ordem-hp-fill';
+                    fillEl.style.width = hpPct + '%';
+                    fillEl.style.background = hpCor;
+                    novaBarra.appendChild(fillEl);
+                    var badgesWrapperEl = ordemInfoEl.querySelector('.badges-condicao-ordem-wrapper');
+                    if (badgesWrapperEl) {
+                        ordemInfoEl.insertBefore(novaBarra, badgesWrapperEl);
+                    } else {
+                        ordemInfoEl.appendChild(novaBarra);
+                    }
+                }
+            } else {
+                var hpFillEl = barraExistente.querySelector('.ordem-hp-fill');
+                if (hpFillEl) {
+                    hpFillEl.style.width = hpPct + '%';
+                    hpFillEl.style.background = hpCor;
+                }
+            }
         }
 
         var tipoBadgeEl = item.querySelector('.badge-mini');
@@ -941,17 +971,35 @@ export class ArenaController {
     }
 
     _atualizarDefesasCardAtivo(container, combatente) {
-        var hpPct = Math.max(0, Math.min(100, (combatente.hp_atual / combatente.hp_maximo) * 100));
+        var hpAtualBruto = combatente.hp_atual ?? 0;
+        var hpAtualVisivel = Math.max(0, hpAtualBruto);
+        var hpMaximo = combatente.hp_maximo ?? 0;
+        var hpPct = Math.max(0, Math.min(100, (hpAtualBruto / (hpMaximo || 1)) * 100));
         var hpCor = hpPct > 50 ? '#4CAF50' : (hpPct > 25 ? '#FF9800' : '#F44336');
         var statsVisiveis = this.statsVisiveis;
+        var ehMonstro = isTipoMonstro(combatente.tipo);
         var pvValor = statsVisiveis
-            ? ((combatente.hp_atual ?? 0) + '/' + (combatente.hp_maximo ?? 0))
+            ? (hpAtualVisivel + '/' + hpMaximo)
             : '???/???';
 
         var pvEl = container.querySelector('.arena-pv-valor');
         if (pvEl) {
             pvEl.textContent = pvValor;
             pvEl.classList.toggle('hp-oculto', !statsVisiveis);
+        }
+
+        // Contador de "morrendo" (-1 a -9): só visível para PJ/NPC com HP negativo e stats revelados.
+        var pvMorrendoEl = container.querySelector('[data-role="pv-morrendo"]');
+        if (pvMorrendoEl) {
+            var mostrarMorrendo = (
+                statsVisiveis
+                && !ehMonstro
+                && Number.isFinite(hpAtualBruto)
+                && hpAtualBruto < 0
+                && hpAtualBruto > -10
+            );
+            pvMorrendoEl.classList.toggle('arena-pv-morrendo-oculto', !mostrarMorrendo);
+            pvMorrendoEl.textContent = mostrarMorrendo ? ('⚠ ' + hpAtualBruto + '/-10') : '';
         }
 
         var hpFillEl = container.querySelector('.arena-hp-fill');
@@ -1181,7 +1229,18 @@ export class ArenaController {
         }
         function sinal(val) { return val >= 0 ? ('+' + val) : ('' + val); }
 
-        var pvValor = this.statsVisiveis ? (c.hp_atual + '/' + c.hp_maximo) : '???/???';
+        // PV principal nunca mostra negativo: faixa "morrendo" tem contador próprio.
+        var hpAtualVisivel = Math.max(0, c.hp_atual ?? 0);
+        var pvValor = this.statsVisiveis ? (hpAtualVisivel + '/' + c.hp_maximo) : '???/???';
+        var ehMonstroAtivo = isTipoMonstro(c.tipo);
+        var mostrarMorrendoInicial = (
+            this.statsVisiveis
+            && !ehMonstroAtivo
+            && Number.isFinite(c.hp_atual)
+            && c.hp_atual < 0
+            && c.hp_atual > -10
+        );
+        var pvMorrendoTexto = mostrarMorrendoInicial ? ('⚠ ' + c.hp_atual + '/-10') : '';
         var caValor = this.statsVisiveis ? ca       : '?';
         var sValor  = this.statsVisiveis ? surpresa : '?';
         var tValor  = this.statsVisiveis ? toque    : '?';
@@ -1298,8 +1357,15 @@ export class ArenaController {
         html += '</div></div>';
         html += '<div class="arena-pv-box">';
         html += '<span class="arena-defesa-label">PV</span>';
+        html += '<div class="arena-pv-linha">';
         html += '<span class="arena-pv-valor ' + (this.statsVisiveis ? '' : 'hp-oculto') + '">'
             + pvValor + '</span>';
+        html += '<span class="arena-pv-morrendo'
+            + (mostrarMorrendoInicial ? '' : ' arena-pv-morrendo-oculto')
+            + '" data-role="pv-morrendo" '
+            + 'title="Pontos negativos antes da morte (D&D 3.5: morre em -10)">'
+            + escapeHtml(pvMorrendoTexto) + '</span>';
+        html += '</div>';
         html += '<div class="arena-hp-bar"><div class="arena-hp-fill" style="width:'
             + hpPct + '%;background:' + hpCor + ';"></div></div>';
         html += '</div>';

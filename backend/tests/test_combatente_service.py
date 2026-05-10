@@ -161,6 +161,38 @@ class TestCombatenteService:
         assert resultado['hp_atual'] == 65
         mock_repository.update.assert_called_once()
 
+    def test_atualizar_hp_jogador_aceita_negativo_ate_menos_dez(self, service, mock_repository):
+        """Jogador pode descer até -10 (D&D 3.5: morrendo/morto)."""
+        combatente_mock = Combatente(
+            id=1, nome="Theron", tipo="jogador", classe="Guerreiro",
+            hp_maximo=20, hp_atual=5, iniciativa=10,
+        )
+        mock_repository.get_by_id.return_value = combatente_mock
+        mock_repository.update.return_value = combatente_mock
+
+        service.atualizar_hp(1, -8)
+        assert combatente_mock.hp_atual == -8
+
+        # Não desce abaixo de -10 mesmo com input mais negativo
+        service.atualizar_hp(1, -50)
+        assert combatente_mock.hp_atual == -10
+
+        # Acima de hp_maximo é capado
+        service.atualizar_hp(1, 999)
+        assert combatente_mock.hp_atual == 20
+
+    def test_atualizar_hp_monstro_clampa_no_zero(self, service, mock_repository):
+        """Monstro continua morrendo a 0 — não fica negativo via atualização direta."""
+        combatente_mock = Combatente(
+            id=2, nome="Goblin", tipo="monstro", classe="Goblin",
+            hp_maximo=8, hp_atual=4, iniciativa=12,
+        )
+        mock_repository.get_by_id.return_value = combatente_mock
+        mock_repository.update.return_value = combatente_mock
+
+        service.atualizar_hp(2, -5)
+        assert combatente_mock.hp_atual == 0
+
     def test_sincronizar_estado_hp_faz_commit_unico(self, service_com_condicoes, mock_condicao_repository):
         combatente = Combatente(
             id=1,

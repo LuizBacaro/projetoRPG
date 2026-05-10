@@ -670,6 +670,36 @@
 }
 .arena-pv-valor { font-size: 1.15rem; font-weight: 700; color: #f0abfc; line-height: 1; }
 
+/* Linha "PV/PVmáx ⚠ -X/-10" — main + counter de morrendo lado a lado */
+.arena-pv-linha {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Contador de morrendo (D&D 3.5: -1 a -9 = morrendo; -10 = morto) */
+.arena-pv-morrendo {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fecaca;
+    background: rgba(220, 38, 38, 0.28);
+    border: 1px solid rgba(248, 113, 113, 0.65);
+    border-radius: 4px;
+    padding: 0.12rem 0.38rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    animation: arena-pv-morrendo-pulse 1.6s ease-in-out infinite;
+}
+.arena-pv-morrendo-oculto { display: none; }
+
+@keyframes arena-pv-morrendo-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.45); }
+    50%      { box-shadow: 0 0 6px 1px rgba(248, 113, 113, 0.65); }
+}
+
 .arena-hp-bar  { width: 100%; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
 .arena-hp-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
 
