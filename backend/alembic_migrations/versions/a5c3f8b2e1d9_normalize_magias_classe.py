@@ -35,48 +35,29 @@ _ACENTO_PARA_NORM = {
 
 
 def _normalize_classe_explicit(bind, table: str) -> None:
-    """Sem extensão unaccent: substituições conhecidas (mesmo critério do ramo SQLite)."""
+    """
+    Substituições conhecidas em todas as bases.
+
+    Não usamos unaccent nem CREATE EXTENSION no Postgres: se algum comando falha,
+    a transação inteira entra em estado abortado; um try/except não corrige isso
+    sem SAVEPOINT — o próximo revision falha com InFailedSqlTransaction.
+    """
     for acentuado, normalizado in _ACENTO_PARA_NORM.items():
-        if acentuado != normalizado:
+        if acentuado == normalizado:
+            continue
+        variants = {acentuado, acentuado.upper(), acentuado.lower()}
+        for acc in variants:
             bind.execute(
                 sa.text(f"UPDATE {table} SET classe = :norm WHERE classe = :acc"),
-                {"norm": normalizado, "acc": acentuado},
+                {"norm": normalizado, "acc": acc},
             )
-
-
-def _normalize_classe_postgres(bind, table: str) -> None:
-    """
-    unaccent() só existe após CREATE EXTENSION unaccent (pacote contrib).
-    CI / instâncias novas não têm a extensão por padrão; hosts geridos podem
-    negar CREATE EXTENSION — nesse caso usa o mapa explícito.
-    """
-    try:
-        bind.execute(sa.text("CREATE EXTENSION IF NOT EXISTS unaccent"))
-        bind.execute(
-            sa.text(
-                f"UPDATE {table} "
-                "SET classe = upper(unaccent(classe)) "
-                "WHERE classe IS NOT NULL "
-                "  AND classe != upper(unaccent(classe))"
-            )
-        )
-    except Exception:
-        _normalize_classe_explicit(bind, table)
 
 
 def upgrade() -> None:
     bind = op.get_bind()
 
-    # Normaliza classe em magias: substitui versões acentuadas pela forma sem acento.
-    if bind.dialect.name == "postgresql":
-        _normalize_classe_postgres(bind, "magias")
-    else:
-        _normalize_classe_explicit(bind, "magias")
-
-    if bind.dialect.name == "postgresql":
-        _normalize_classe_postgres(bind, "magias_classes")
-    else:
-        _normalize_classe_explicit(bind, "magias_classes")
+    _normalize_classe_explicit(bind, "magias")
+    _normalize_classe_explicit(bind, "magias_classes")
 
 
 def downgrade() -> None:
