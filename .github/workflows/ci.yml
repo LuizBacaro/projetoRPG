@@ -221,6 +221,9 @@ jobs:
         env:
           SECRET_KEY: ci-test-secret-key-32chars-minimum!
           DATABASE_URL: sqlite:///./test_e2e.db
+          # SQLite vazio: a cadeia Alembic incremental não cria magias/equipamentos do zero;
+          # create_all no startup (STARTUP_RUN_ALEMBIC=0) alinha com o job migrations em Postgres.
+          STARTUP_RUN_ALEMBIC: "0"
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
@@ -246,7 +249,6 @@ jobs:
 
     env:
       RENDER_DEPLOY_HOOK_STAGING: ${{ secrets.RENDER_DEPLOY_HOOK_STAGING }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -261,6 +263,8 @@ jobs:
 
       - name: Deploy Frontend to Vercel (Staging)
         working-directory: frontend
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           if [ -z "${VERCEL_TOKEN:-}" ]; then
             echo "::warning::VERCEL_TOKEN não definido — deploy front staging ignorado."
