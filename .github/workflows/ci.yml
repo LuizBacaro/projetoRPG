@@ -205,7 +205,7 @@ jobs:
 
       - name: Start API server
         run: |
-          cp ../.env.example .env 2>/dev/null || true
+          # Não copiar .env.example: define admin@arena-rpg.com.br e conflita com o smoke (admin@arena.local / admin123).
           export ADMIN_EMAIL="${ADMIN_EMAIL:-admin@arena.local}"
           export ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin123}"
           uvicorn app.main:app --host 0.0.0.0 --port 8000 &

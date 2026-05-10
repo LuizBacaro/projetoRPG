@@ -43,8 +43,8 @@ FRONTEND = BASE_URL  # arquivos estáticos servidos pelo mesmo servidor
 # Após login o hub multi-jogo (`selecionar-jogo.html`) exige escolher D&D 3.5;
 # `destinoPorSlug('dnd35')` redireciona para `/dashboard` (canónico), não `/pages/dashboard.html`.
 _DASHBOARD_URL_RE = re.compile(r".*(/dashboard/?$|/pages/dashboard\.html$)")
-# Glob tipo `**/selecionar-jogo.html**` falhou no Playwright CI; regex na URL completa é fiável.
-_SELETOR_JOGO_RE = re.compile(r"selecionar-jogo\.html")
+# `expect_navigation(..., url=...)` espera até `load` por defeito — páginas com recursos pendentes podem nunca disparar load.
+_SELETOR_JOGO_RE = re.compile(r".*selecionar-jogo\.html(\?.*)?$")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -58,14 +58,14 @@ def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
     page.wait_for_load_state("domcontentloaded")
     page.fill("#inputEmail", email)
     page.fill("#inputSenha", senha)
-    with page.expect_navigation(timeout=30000, url=_SELETOR_JOGO_RE):
-        page.click("#btnLogin")
+    page.click("#btnLogin")
+    page.wait_for_url(_SELETOR_JOGO_RE, timeout=30000, wait_until="domcontentloaded")
     page.wait_for_load_state("domcontentloaded")
     hub_dnd = page.locator("#btnHubDnd35")
     hub_dnd.wait_for(state="visible", timeout=15000)
     expect(hub_dnd).to_be_enabled(timeout=30000)
-    with page.expect_navigation(timeout=30000, url=_DASHBOARD_URL_RE):
-        hub_dnd.click()
+    hub_dnd.click()
+    page.wait_for_url(_DASHBOARD_URL_RE, timeout=30000, wait_until="domcontentloaded")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
