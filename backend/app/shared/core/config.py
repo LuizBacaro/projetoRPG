@@ -142,6 +142,32 @@ class Settings(BaseSettings):
         self._validar_seguranca()
         self._criar_diretorios()
         self._normalizar_database_url()
+        self._validar_database_url_ambiente()
+
+    def _validar_database_url_ambiente(self) -> None:
+        """
+        Evita subir API em staging/produção sem Postgres (ex.: default SQLite),
+        o que gera migrations falhando e estado inconsistente no Render.
+        """
+        if self.ENVIRONMENT not in ("production", "staging"):
+            return
+        url = (self.DATABASE_URL or "").strip().lower()
+        if "sqlite" in url:
+            raise ValueError(
+                "Em produção ou staging, DATABASE_URL deve apontar para PostgreSQL (ex.: Neon). "
+                "Detectado SQLite — configure DATABASE_URL no Render antes do deploy."
+            )
+        if not url.startswith("postgresql"):
+            preview = (
+                f"{self.DATABASE_URL[:48]}..."
+                if len(self.DATABASE_URL) > 48
+                else self.DATABASE_URL
+            )
+            raise ValueError(
+                "Em produção ou staging, DATABASE_URL deve usar postgresql:// "
+                "(Railway/Neon podem entregar postgres://; o app normaliza para postgresql://). "
+                f"URL atual não é PostgreSQL: {preview}"
+            )
 
     def _validar_seguranca(self) -> None:
         """Valida configurações críticas de segurança"""
