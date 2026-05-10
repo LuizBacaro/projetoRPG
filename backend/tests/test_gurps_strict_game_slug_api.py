@@ -68,7 +68,10 @@ def test_strict_game_slug_errado_retorna_403(gurps_personagens_db, monkeypatch):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert r.status_code == 403
-    assert GAME_SLUG_GURPS in r.json().get("detail", "") or "gurps" in r.json().get("detail", "").lower()
+    assert (
+        GAME_SLUG_GURPS in r.json().get("detail", "")
+        or "gurps" in r.json().get("detail", "").lower()
+    )
 
 
 def test_strict_game_slug_gurps_permite_listar(gurps_personagens_db, monkeypatch):
@@ -90,7 +93,9 @@ def test_strict_game_slug_gurps_permite_listar(gurps_personagens_db, monkeypatch
     assert isinstance(r.json(), list)
 
 
-def test_strict_campanhas_sem_game_slug_retorna_409(gurps_mestre_e_jogadores_db, monkeypatch):
+def test_strict_campanhas_sem_game_slug_retorna_409(
+    gurps_mestre_e_jogadores_db, monkeypatch
+):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
 
     SessionLocal, mestre, _, _ = gurps_mestre_e_jogadores_db
@@ -108,7 +113,9 @@ def test_strict_campanhas_sem_game_slug_retorna_409(gurps_mestre_e_jogadores_db,
     assert r.status_code == 409
 
 
-def test_strict_combate_status_sem_game_slug_retorna_409(gurps_personagens_db, monkeypatch):
+def test_strict_combate_status_sem_game_slug_retorna_409(
+    gurps_personagens_db, monkeypatch
+):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
 
     SessionLocal, u1, _ = gurps_personagens_db
@@ -126,7 +133,9 @@ def test_strict_combate_status_sem_game_slug_retorna_409(gurps_personagens_db, m
     assert r.status_code == 409
 
 
-def test_strict_campanhas_com_slug_gurps_permite_mestre(gurps_mestre_e_jogadores_db, monkeypatch):
+def test_strict_campanhas_com_slug_gurps_permite_mestre(
+    gurps_mestre_e_jogadores_db, monkeypatch
+):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
 
     SessionLocal, mestre, _, _ = gurps_mestre_e_jogadores_db
@@ -145,7 +154,9 @@ def test_strict_campanhas_com_slug_gurps_permite_mestre(gurps_mestre_e_jogadores
     assert isinstance(r.json(), list)
 
 
-def test_strict_post_campanha_sem_game_slug_retorna_409(gurps_mestre_e_jogadores_db, monkeypatch):
+def test_strict_post_campanha_sem_game_slug_retorna_409(
+    gurps_mestre_e_jogadores_db, monkeypatch
+):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
 
     SessionLocal, mestre, _, _ = gurps_mestre_e_jogadores_db
@@ -164,7 +175,9 @@ def test_strict_post_campanha_sem_game_slug_retorna_409(gurps_mestre_e_jogadores
     assert r.status_code == 409
 
 
-def test_strict_post_campanha_com_slug_gurps_cria_201(gurps_mestre_e_jogadores_db, monkeypatch):
+def test_strict_post_campanha_com_slug_gurps_cria_201(
+    gurps_mestre_e_jogadores_db, monkeypatch
+):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
 
     SessionLocal, mestre, _, _ = gurps_mestre_e_jogadores_db

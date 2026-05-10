@@ -9,7 +9,6 @@ from types import ModuleType
 
 import pytest
 
-
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -64,9 +63,7 @@ class TestSplitTokens:
             (None, []),
         ],
     )
-    def test_delimitadores_default(
-        self, entrada: object, esperado: list[str]
-    ) -> None:
+    def test_delimitadores_default(self, entrada: object, esperado: list[str]) -> None:
         assert split_tokens(entrada) == esperado
 
     def test_delimitador_customizado(self) -> None:

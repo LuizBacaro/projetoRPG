@@ -3,10 +3,13 @@ Repositório de Usuário
 SRP: apenas acesso ao banco de dados para a entidade Usuario
 OCP: extensível sem modificar a lógica de negócio
 """
-from sqlalchemy.orm import Session
+
 from typing import Optional
+
+from sqlalchemy.orm import Session
+
 from ...repositories.base import commit_with_rollback
-from ..models.usuario import Usuario, PerfilUsuario
+from ..models.usuario import PerfilUsuario, Usuario
 
 
 class UsuarioRepository:
@@ -14,7 +17,9 @@ class UsuarioRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def listar(self, apenas_ativos: bool = False, skip: int = 0, limit: int = 50) -> list[Usuario]:
+    def listar(
+        self, apenas_ativos: bool = False, skip: int = 0, limit: int = 50
+    ) -> list[Usuario]:
         query = self.db.query(Usuario)
         if apenas_ativos:
             query = query.filter(Usuario.ativo == True)

@@ -11,11 +11,6 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.dependencies import get_armadura_protecao_service
-from app.shared.core.deps import (
-    get_usuario_atual,
-    requer_dono_ou_admin_combatente,
-    requer_game_dnd35,
-)
 from app.games.dnd35.schemas.armadura_protecao import (
     ArmaduraProtecaoCreate,
     ArmaduraProtecaoJogadorCreate,
@@ -24,6 +19,11 @@ from app.games.dnd35.schemas.armadura_protecao import (
     BonusCaResponse,
 )
 from app.games.dnd35.services.armadura_protecao_service import ArmaduraProtecaoService
+from app.shared.core.deps import (
+    get_usuario_atual,
+    requer_dono_ou_admin_combatente,
+    requer_game_dnd35,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,9 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=ArmaduraProtecaoResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=ArmaduraProtecaoResponse, status_code=status.HTTP_201_CREATED
+)
 def criar_item(
     payload: ArmaduraProtecaoCreate,
     service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
@@ -70,7 +72,9 @@ def obter_item(
     try:
         item = service.obter_item(item_id)
         if not item:
-            raise HTTPException(status_code=404, detail="Item de proteção não encontrado")
+            raise HTTPException(
+                status_code=404, detail="Item de proteção não encontrado"
+            )
         return item
     except HTTPException:
         raise
@@ -99,7 +103,9 @@ def adicionar_item_jogador(
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@router.get("/{combatente_id}/listar", response_model=List[ArmaduraProtecaoJogadorListResponse])
+@router.get(
+    "/{combatente_id}/listar", response_model=List[ArmaduraProtecaoJogadorListResponse]
+)
 def listar_itens_jogador(
     combatente_id: int,
     service: ArmaduraProtecaoService = Depends(get_armadura_protecao_service),
@@ -112,7 +118,9 @@ def listar_itens_jogador(
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@router.delete("/{combatente_id}/remover/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{combatente_id}/remover/{item_id}", status_code=status.HTTP_204_NO_CONTENT
+)
 def remover_item_jogador(
     combatente_id: int,
     item_id: int,
@@ -122,7 +130,9 @@ def remover_item_jogador(
     try:
         removido = service.remover_item_jogador(combatente_id, item_id)
         if not removido:
-            raise HTTPException(status_code=404, detail="Item de proteção do jogador não encontrado")
+            raise HTTPException(
+                status_code=404, detail="Item de proteção do jogador não encontrado"
+            )
         return None
     except HTTPException:
         raise

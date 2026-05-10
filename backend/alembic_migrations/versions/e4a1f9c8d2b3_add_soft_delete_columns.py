@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.exc import NoSuchTableError
 
 
 # revision identifiers, used by Alembic.
@@ -18,22 +19,38 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _tabela_existe(tabela: str) -> bool:
+    try:
+        bind = op.get_bind()
+        return tabela in sa.inspect(bind).get_table_names()
+    except Exception:
+        return False
+
+
 def _coluna_existe(tabela: str, coluna: str) -> bool:
-    bind = op.get_bind()
-    inspector = sa.inspect(bind)
-    colunas = [c["name"] for c in inspector.get_columns(tabela)]
-    return coluna in colunas
+    try:
+        bind = op.get_bind()
+        inspector = sa.inspect(bind)
+        colunas = [c["name"] for c in inspector.get_columns(tabela)]
+        return coluna in colunas
+    except NoSuchTableError:
+        return False
 
 
 def _indice_existe(tabela: str, indice: str) -> bool:
-    bind = op.get_bind()
-    inspector = sa.inspect(bind)
-    indices = [i["name"] for i in inspector.get_indexes(tabela)]
-    return indice in indices
+    try:
+        bind = op.get_bind()
+        inspector = sa.inspect(bind)
+        indices = [i["name"] for i in inspector.get_indexes(tabela)]
+        return indice in indices
+    except NoSuchTableError:
+        return False
 
 
 def upgrade() -> None:
     for tabela in ("combatentes", "equipamentos", "talentos", "pericias"):
+        if not _tabela_existe(tabela):
+            continue
         if not _coluna_existe(tabela, "deleted_at"):
             op.add_column(tabela, sa.Column("deleted_at", sa.DateTime(), nullable=True))
 
@@ -44,6 +61,8 @@ def upgrade() -> None:
         "pericias": "ix_pericias_deleted_at",
     }
     for tabela, indice in indices.items():
+        if not _tabela_existe(tabela):
+            continue
         if not _indice_existe(tabela, indice):
             op.create_index(indice, tabela, ["deleted_at"], unique=False)
 
@@ -56,9 +75,13 @@ def downgrade() -> None:
         "pericias": "ix_pericias_deleted_at",
     }
     for tabela, indice in indices.items():
+        if not _tabela_existe(tabela):
+            continue
         if _indice_existe(tabela, indice):
             op.drop_index(indice, table_name=tabela)
 
     for tabela in ("combatentes", "equipamentos", "talentos", "pericias"):
+        if not _tabela_existe(tabela):
+            continue
         if _coluna_existe(tabela, "deleted_at"):
             op.drop_column(tabela, "deleted_at")

@@ -5,30 +5,33 @@ Princípio SOLID: SRP - Responsável apenas por upload/delete de arquivos
 Em produção (CLOUDINARY_* configurado): usa Cloudinary CDN — URLs absolutas e permanentes.
 Em desenvolvimento: salva no filesystem local (UPLOADS_DIR).
 """
-import uuid
+
+import logging
 import re
 import shutil
+import uuid
 from pathlib import Path
-from urllib.parse import urlparse
 from typing import Optional
+from urllib.parse import urlparse
+
 from fastapi import UploadFile
+
 from ..shared.core.config import settings
 from ..shared.exceptions.custom_exceptions import InvalidFileError
-import logging
 
 logger = logging.getLogger(__name__)
 
 # Assinaturas mágicas (magic bytes) para tipos de imagem permitidos
 _MAGIC_BYTES = {
-    b'\xff\xd8\xff': '.jpg',      # JPEG
-    b'\x89PNG\r\n\x1a\n': '.png', # PNG
-    b'GIF87a': '.gif',             # GIF87
-    b'GIF89a': '.gif',             # GIF89
-    b'RIFF': '.webp',              # WebP (RIFF container)
+    b"\xff\xd8\xff": ".jpg",  # JPEG
+    b"\x89PNG\r\n\x1a\n": ".png",  # PNG
+    b"GIF87a": ".gif",  # GIF87
+    b"GIF89a": ".gif",  # GIF89
+    b"RIFF": ".webp",  # WebP (RIFF container)
 }
 
 # Regex para detectar componente de versão em URL Cloudinary (ex: v1234567890)
-_CLOUDINARY_VERSION_RE = re.compile(r'^v\d+$')
+_CLOUDINARY_VERSION_RE = re.compile(r"^v\d+$")
 
 
 class FileService:
@@ -56,6 +59,7 @@ class FileService:
     def _init_cloudinary(self) -> None:
         """Configura o SDK do Cloudinary com as credenciais de settings."""
         import cloudinary
+
         cloudinary.config(
             cloud_name=settings.CLOUDINARY_CLOUD_NAME,
             api_key=settings.CLOUDINARY_API_KEY,
@@ -85,9 +89,9 @@ class FileService:
         try:
             parsed = urlparse(foto_url)
             # path: /<cloud>/image/upload[/v<version>]/<public_id>.<ext>
-            parts = parsed.path.lstrip('/').split('/')
-            upload_idx = parts.index('upload')
-            after = parts[upload_idx + 1:]
+            parts = parsed.path.lstrip("/").split("/")
+            upload_idx = parts.index("upload")
+            after = parts[upload_idx + 1 :]
             # Pula componente de versão opcional
             if after and _CLOUDINARY_VERSION_RE.match(after[0]):
                 after = after[1:]
@@ -95,7 +99,7 @@ class FileService:
                 return None
             # Remove extensão do último segmento
             after[-1] = Path(after[-1]).stem
-            return '/'.join(after)
+            return "/".join(after)
         except (ValueError, IndexError):
             return None
 
@@ -121,8 +125,8 @@ class FileService:
                 tipo_real = ext
                 break
         # WebP: RIFF + tamanho + WEBP
-        if header[:4] == b'RIFF' and header[8:12] == b'WEBP':
-            tipo_real = '.webp'
+        if header[:4] == b"RIFF" and header[8:12] == b"WEBP":
+            tipo_real = ".webp"
 
         if tipo_real is None:
             raise InvalidFileError(
@@ -160,6 +164,7 @@ class FileService:
     def _salvar_cloudinary(self, file: UploadFile) -> str:
         """Faz upload para Cloudinary e retorna URL HTTPS permanente."""
         import cloudinary.uploader
+
         public_id = f"combatentes/{uuid.uuid4()}"
         result = cloudinary.uploader.upload(
             file.file,
@@ -167,7 +172,7 @@ class FileService:
             resource_type="image",
             overwrite=False,
         )
-        return result['secure_url']
+        return result["secure_url"]
 
     def deletar_arquivo(self, foto_url: str) -> bool:
         """
@@ -209,13 +214,14 @@ class FileService:
     def _deletar_cloudinary(self, foto_url: str) -> bool:
         """Deleta imagem do Cloudinary via public_id extraído da URL."""
         import cloudinary.uploader
+
         public_id = self._extract_cloudinary_public_id(foto_url)
         if not public_id:
             logger.warning("⚠️ Não foi possível extrair public_id de: %s", foto_url)
             return False
         try:
             result = cloudinary.uploader.destroy(public_id)
-            return result.get('result') == 'ok'
+            return result.get("result") == "ok"
         except Exception as e:
             logger.error("Erro ao deletar do Cloudinary: %s", e)
             return False

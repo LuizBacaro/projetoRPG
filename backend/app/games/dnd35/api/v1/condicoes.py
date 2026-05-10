@@ -5,13 +5,12 @@ DIP - Depende de get_condicao_service (abstração)
 
 Canônico em `app.games.dnd35.api.v1.condicoes` (registrado em `app.main`).
 """
+
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.dependencies import get_condicao_service
-from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
-from app.shared.exceptions.custom_exceptions import ArenaBaseException
 from app.games.dnd35.schemas.condicao import (
     AplicarCondicaoMassaRequest,
     AplicarCondicaoMassaResponse,
@@ -20,6 +19,8 @@ from app.games.dnd35.schemas.condicao import (
     CondicaoResponse,
 )
 from app.games.dnd35.services.condicao_service import CondicaoService
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.shared.exceptions.custom_exceptions import ArenaBaseException
 
 router = APIRouter(prefix="/condicoes", tags=["Condições"])
 
@@ -94,7 +95,9 @@ def aplicar_condicao_combatentes(
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
 
-@router.delete("/combatente/{combatente_id}/{condicao_id}", response_model=CondicaoAtivaResponse)
+@router.delete(
+    "/combatente/{combatente_id}/{condicao_id}", response_model=CondicaoAtivaResponse
+)
 def remover_condicao(
     combatente_id: int,
     condicao_id: int,

@@ -51,10 +51,9 @@ class ConsumivelRepository:
         categoria: str | None = None,
         busca: str | None = None,
     ) -> list[Consumivel]:
-        query = (
-            apply_not_deleted(self.db.query(Consumivel), Consumivel)
-            .filter(Consumivel.ativo == True)  # noqa: E712
-        )
+        query = apply_not_deleted(self.db.query(Consumivel), Consumivel).filter(
+            Consumivel.ativo == True
+        )  # noqa: E712
 
         tipo_norm = (tipo or "").strip().lower()
         categoria_norm = (categoria or "").strip().lower()

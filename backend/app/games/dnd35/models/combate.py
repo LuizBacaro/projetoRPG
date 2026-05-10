@@ -1,9 +1,10 @@
 """
 Model do Combate (Entity)
 """
+
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, JSON, String
+from sqlalchemy import JSON, Boolean, Column, DateTime, Integer, String
 
 from app.shared.core.database import Base
 
@@ -12,6 +13,7 @@ class Combate(Base):
     """
     Entidade que representa um combate ativo
     """
+
     __tablename__ = "combates"
     __table_args__ = {"extend_existing": True}
 
@@ -76,7 +78,9 @@ class CombateHistorico(Base):
 
     motivo_encerramento = Column(String(40), nullable=False, default="manual")
     estatisticas = Column(JSON, nullable=False, default=dict)
-    finalizado_em = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), index=True)
+    finalizado_em = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), index=True
+    )
 
     def __repr__(self):
         return (

@@ -2,6 +2,7 @@
 Schemas de Condição
 Princípio SOLID: DIP - Define contrato de dados
 """
+
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -9,6 +10,7 @@ from pydantic import BaseModel, Field
 
 class CondicaoResponse(BaseModel):
     """Schema para resposta de catálogo de condições"""
+
     id: int
     nome: str
     efeito: str
@@ -21,6 +23,7 @@ class AplicarCondicaoRequest(BaseModel):
     """
     ✅ Schema para aplicar condição com duração opcional
     """
+
     condicao_id: int
     duracao_turnos: Optional[int] = -1  # ✅ NOVO: default permanente (-1)
 
@@ -40,6 +43,7 @@ class AplicarCondicaoMassaResponse(BaseModel):
 
 class RemoverCondicaoRequest(BaseModel):
     """Schema para remover condição"""
+
     condicao_id: int
 
 
@@ -48,6 +52,7 @@ class CondicaoAtivaResponse(BaseModel):
     ✅ Schema para condições ativas de um combatente
     Inclui duracao_turnos
     """
+
     combatente_id: int
     condicoes: List[dict]  # Inclui {id, condicao_id, nome, efeito, duracao_turnos}
 

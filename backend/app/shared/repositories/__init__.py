@@ -1,7 +1,7 @@
 """Repositórios canônicos do Auth Hub em `app.shared.repositories`."""
 
-from .usuario_repository import UsuarioRepository
 from .game_repository import GameRepository, UserGameMembershipRepository
+from .usuario_repository import UsuarioRepository
 
 __all__ = [
     "UsuarioRepository",

@@ -12,9 +12,6 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.core.dependencies import get_combatente_repository, get_pericia_service
-from app.shared.core.catalog_cache import catalog_cache, make_cache_key
-from app.shared.core.config import settings
-from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 from app.games.dnd35.schemas.pericia import (
     PericiaCreate,
@@ -26,6 +23,9 @@ from app.games.dnd35.schemas.pericia import (
     PericiaUpdate,
 )
 from app.games.dnd35.services.pericia_service import PericiaService
+from app.shared.core.catalog_cache import catalog_cache, make_cache_key
+from app.shared.core.config import settings
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.shared.models.usuario import PerfilUsuario, Usuario
 
 logger = logging.getLogger(__name__)
@@ -60,9 +60,7 @@ def _invalidar_cache_pericias() -> None:
 # ========== ENDPOINTS DE PERÍCIAS DISPONÍVEIS ==========
 
 
-@router.post(
-    "/", response_model=PericiaResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/", response_model=PericiaResponse, status_code=status.HTTP_201_CREATED)
 def criar_pericia(
     pericia: PericiaCreate,
     service: PericiaService = Depends(get_pericia_service),
@@ -116,9 +114,7 @@ def listar_pericias(
             pericias_com_custo = []
             for pericia in pericias:
                 pericias_com_custo.append(
-                    _serialize_pericia(
-                        pericia, custos_por_pericia.get(pericia.id, 2)
-                    )
+                    _serialize_pericia(pericia, custos_por_pericia.get(pericia.id, 2))
                 )
             if settings.CACHE_ENABLED:
                 catalog_cache.set(
@@ -128,9 +124,7 @@ def listar_pericias(
                 )
             return pericias_com_custo
 
-        pericias_serializadas = [
-            _serialize_pericia(pericia) for pericia in pericias
-        ]
+        pericias_serializadas = [_serialize_pericia(pericia) for pericia in pericias]
         if settings.CACHE_ENABLED:
             catalog_cache.set(
                 cache_key,
@@ -316,9 +310,7 @@ def adicionar_pericia_jogador(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get(
-    "/{combatente_id}/listar", response_model=PericiaJogadorListResponse
-)
+@router.get("/{combatente_id}/listar", response_model=PericiaJogadorListResponse)
 def listar_pericias_jogador(
     combatente_id: int,
     service: PericiaService = Depends(get_pericia_service),
@@ -354,8 +346,13 @@ def atualizar_pericia_jogador(
     try:
         if pericia.destaque_arena is not None:
             perfil = getattr(usuario_atual, "perfil", None)
-            perfil_valor = perfil.value if hasattr(perfil, "value") else str(perfil or "")
-            if perfil_valor not in (PerfilUsuario.MESTRE.value, PerfilUsuario.ADMINISTRADOR.value):
+            perfil_valor = (
+                perfil.value if hasattr(perfil, "value") else str(perfil or "")
+            )
+            if perfil_valor not in (
+                PerfilUsuario.MESTRE.value,
+                PerfilUsuario.ADMINISTRADOR.value,
+            ):
                 raise HTTPException(
                     status_code=403,
                     detail="Somente mestre ou administrador pode destacar perícias para a arena.",

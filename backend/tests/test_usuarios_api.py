@@ -1,17 +1,16 @@
 from types import SimpleNamespace
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.shared.api.v1.usuarios import router as usuarios_router
-from app.shared.core.database import get_db
+from app.shared.core.database import Base, get_db
 from app.shared.core.deps import requer_admin
 from app.shared.core.security import hash_senha
-from app.shared.core.database import Base
 from app.shared.models.usuario import PerfilUsuario, Usuario
 
 
@@ -148,7 +147,10 @@ def test_delete_definitivo_bloqueia_ultimo_admin_ativo(usuarios_db):
     response = client.delete(f"/api/v1/usuarios/{admin_alvo.id}/definitivo")
 
     assert response.status_code == 409
-    assert response.json()["detail"] == "Não é possível excluir o último administrador ativo"
+    assert (
+        response.json()["detail"]
+        == "Não é possível excluir o último administrador ativo"
+    )
 
 
 def test_delete_padrao_inativa_usuario_sem_excluir(usuarios_db):

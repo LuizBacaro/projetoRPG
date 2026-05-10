@@ -54,7 +54,9 @@ class MagiaRepositoryProtocol(Protocol):
 
     def has_dependencias(self, magia_id: int) -> bool: ...
 
-    def listar_historico(self, magia_id: int, *, limit: int = 50) -> List[MagiaHistorico]: ...
+    def listar_historico(
+        self, magia_id: int, *, limit: int = 50
+    ) -> List[MagiaHistorico]: ...
 
 
 class MagiaCriacaoParaImportProtocol(Protocol):

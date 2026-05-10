@@ -4,7 +4,10 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from app.games.dnd35.ports.consumiveis import ConsumivelCatalogProtocol, ConsumivelJogadorLinksProtocol
+from app.games.dnd35.ports.consumiveis import (
+    ConsumivelCatalogProtocol,
+    ConsumivelJogadorLinksProtocol,
+)
 from app.games.dnd35.ports.repositories import CombatenteGetByIdProtocol
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 from app.games.dnd35.repositories.consumivel_repository import (

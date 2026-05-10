@@ -9,12 +9,7 @@ Já declara o guard `requer_game_dnd35` (paridade com o original).
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.core.dependencies import (
-    get_campanha_service,
-    get_sessao_campanha_service,
-)
-from app.shared.core.deps import requer_game_dnd35, requer_mestre_ou_admin
-from app.shared.exceptions.custom_exceptions import ArenaBaseException
+from app.core.dependencies import get_campanha_service, get_sessao_campanha_service
 from app.games.dnd35.schemas.campanha import (
     CampanhaCreate,
     CampanhaResponse,
@@ -26,9 +21,9 @@ from app.games.dnd35.schemas.sessao_campanha import (
     SessaoCampanhaUpdate,
 )
 from app.games.dnd35.services.campanha_service import CampanhaService
-from app.games.dnd35.services.sessao_campanha_service import (
-    SessaoCampanhaService,
-)
+from app.games.dnd35.services.sessao_campanha_service import SessaoCampanhaService
+from app.shared.core.deps import requer_game_dnd35, requer_mestre_ou_admin
+from app.shared.exceptions.custom_exceptions import ArenaBaseException
 
 router = APIRouter(
     prefix="/campanhas",
@@ -45,9 +40,7 @@ def listar_campanhas(
     return service.listar_por_mestre(usuario.id)
 
 
-@router.post(
-    "", response_model=CampanhaResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("", response_model=CampanhaResponse, status_code=status.HTTP_201_CREATED)
 def criar_campanha(
     payload: CampanhaCreate,
     service: CampanhaService = Depends(get_campanha_service),
@@ -91,9 +84,7 @@ def associar_personagens(
     usuario=Depends(requer_mestre_ou_admin),
 ):
     try:
-        return service.associar_personagens(
-            campanha_id, usuario.id, personagem_ids
-        )
+        return service.associar_personagens(campanha_id, usuario.id, personagem_ids)
     except ArenaBaseException as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message)
 
@@ -158,9 +149,7 @@ def atualizar_sessao_campanha(
         raise HTTPException(status_code=exc.status_code, detail=exc.message)
 
 
-@router.delete(
-    "/sessoes/{sessao_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/sessoes/{sessao_id}", status_code=status.HTTP_204_NO_CONTENT)
 def deletar_sessao_campanha(
     sessao_id: int,
     service: SessaoCampanhaService = Depends(get_sessao_campanha_service),

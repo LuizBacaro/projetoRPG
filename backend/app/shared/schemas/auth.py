@@ -2,9 +2,12 @@
 Schemas de Autenticação
 SRP: validação dos dados de login, registro e resposta do token
 """
-from pydantic import BaseModel, field_validator
-from .usuario import UsuarioResponse
+
 import re
+
+from pydantic import BaseModel, field_validator
+
+from .usuario import UsuarioResponse
 
 
 class LoginRequest(BaseModel):
@@ -14,7 +17,8 @@ class LoginRequest(BaseModel):
 
 class RegistroRequest(BaseModel):
     """Schema para auto-cadastro público — perfil Jogador por padrão."""
-    nome:  str
+
+    nome: str
     email: str
     senha: str
 
@@ -28,7 +32,7 @@ class RegistroRequest(BaseModel):
     @field_validator("email")
     @classmethod
     def email_valido(cls, v: str) -> str:
-        padrao = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        padrao = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(padrao, v):
             raise ValueError("E-mail inválido")
         return v.lower().strip()
@@ -43,5 +47,5 @@ class RegistroRequest(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
-    token_type:   str = "bearer"
-    usuario:      UsuarioResponse
+    token_type: str = "bearer"
+    usuario: UsuarioResponse

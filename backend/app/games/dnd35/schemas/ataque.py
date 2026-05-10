@@ -2,11 +2,11 @@
 Schemas Pydantic para Ataque, MagiaSlot e MagiaPreparada
 SRP: apenas serialização/validação
 """
+
 from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
-
 
 # ── Ataque ──
 

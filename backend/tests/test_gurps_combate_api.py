@@ -93,10 +93,13 @@ def test_iniciar_duas_vezes_retorna_400(gurps_personagens_db):
     a = _criar(SessionLocal, client, "A", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "B", 0, velocidade_valor=5.0)
 
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r2 = client.post(
         "/api/v1/gurps/combate/iniciar",
@@ -111,10 +114,13 @@ def test_finalizar_e_status_inativo(gurps_personagens_db):
     client = _build_client(SessionLocal, _usuario(u1))
 
     a = _criar(SessionLocal, client, "Só", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a]},
+        ).status_code
+        == 200
+    )
 
     r = client.post("/api/v1/gurps/combate/finalizar")
     assert r.status_code == 200
@@ -131,10 +137,13 @@ def test_avancar_volta_ao_inicio_incrementa_rodada(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "P1", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "P2", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     assert client.post("/api/v1/gurps/combate/avancar-turno").json()["turno_atual"] == 1
     r2 = client.post("/api/v1/gurps/combate/avancar-turno")
@@ -150,10 +159,13 @@ def test_avancar_turno_incrementa(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "P1", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "P2", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post("/api/v1/gurps/combate/avancar-turno")
     assert r.status_code == 200
@@ -167,10 +179,13 @@ def test_definir_manobra_ativa(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "P1", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "P2", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post("/api/v1/gurps/combate/manobra-atual", json={"manobra": "ataque"})
     assert r.status_code == 200, r.text
@@ -187,12 +202,17 @@ def test_defesa_total_aplica_bonus_esquiva_efetiva_no_status(gurps_personagens_d
 
     a = _criar(SessionLocal, client, "P1", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "P2", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
-    r = client.post("/api/v1/gurps/combate/manobra-atual", json={"manobra": "defesa_total"})
+    r = client.post(
+        "/api/v1/gurps/combate/manobra-atual", json={"manobra": "defesa_total"}
+    )
     assert r.status_code == 200, r.text
     body = r.json()
     ativo = next(p for p in body["personagens"] if p["id"] == a)
@@ -206,10 +226,13 @@ def test_ataque_aplica_dano_quando_defesa_falha(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -236,10 +259,13 @@ def test_ataque_sem_dano_quando_defesa_sucesso(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -264,10 +290,13 @@ def test_ajustar_pv_cura_no_alvo(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     # Primeiro aplica dano.
     r1 = client.post(
@@ -284,7 +313,9 @@ def test_ajustar_pv_cura_no_alvo(gurps_personagens_db):
     assert r1.status_code == 200, r1.text
     pv_apos_dano = r1.json()["pvs_alvo_depois"]
 
-    r2 = client.post("/api/v1/gurps/combate/ajustar-pv", json={"alvo_id": b, "delta_pv": 3})
+    r2 = client.post(
+        "/api/v1/gurps/combate/ajustar-pv", json={"alvo_id": b, "delta_pv": 3}
+    )
     assert r2.status_code == 200, r2.text
     body = r2.json()
     assert body["pvs_alvo_antes"] == pv_apos_dano
@@ -297,23 +328,29 @@ def test_ataque_falha_quando_alvo_inconsciente(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     # Derruba alvo para 0 PV e tenta atacar de novo.
-    assert client.post(
-        "/api/v1/gurps/combate/ataque",
-        json={
-            "alvo_id": b,
-            "nh_ataque": 16,
-            "expressao_dano": "10d+0",
-            "dados_ataque": [3, 3, 3],
-            "dados_defesa": [6, 6, 6],
-            "dados_dano": [6] * 10,
-        },
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/ataque",
+            json={
+                "alvo_id": b,
+                "nh_ataque": 16,
+                "expressao_dano": "10d+0",
+                "dados_ataque": [3, 3, 3],
+                "dados_defesa": [6, 6, 6],
+                "dados_dano": [6] * 10,
+            },
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -329,15 +366,26 @@ def test_ataque_define_manobra_do_atacante_como_ataque(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
-    assert client.post(
-        "/api/v1/gurps/combate/ataque",
-        json={"alvo_id": b, "nh_ataque": 16, "dados_ataque": [3, 3, 3], "dados_defesa": [6, 6, 6]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/ataque",
+            json={
+                "alvo_id": b,
+                "nh_ataque": 16,
+                "dados_ataque": [3, 3, 3],
+                "dados_defesa": [6, 6, 6],
+            },
+        ).status_code
+        == 200
+    )
 
     st = client.get("/api/v1/gurps/combate/status")
     assert st.status_code == 200
@@ -345,21 +393,31 @@ def test_ataque_define_manobra_do_atacante_como_ataque(gurps_personagens_db):
     assert body["manobras_por_personagem"][str(a)] == "ataque"
 
 
-def test_defesa_cumulativa_aplica_penalidade_e_reseta_na_nova_rodada(gurps_personagens_db):
+def test_defesa_cumulativa_aplica_penalidade_e_reseta_na_nova_rodada(
+    gurps_personagens_db,
+):
     SessionLocal, u1, _ = gurps_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
 
     a = _criar(SessionLocal, client, "A1", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "B1", 0, velocidade_valor=6.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     # Turno A: ataca B (1a defesa de B na rodada).
     r1 = client.post(
         "/api/v1/gurps/combate/ataque",
-        json={"alvo_id": b, "nh_ataque": 16, "dados_ataque": [3, 3, 3], "dados_defesa": [6, 6, 6]},
+        json={
+            "alvo_id": b,
+            "nh_ataque": 16,
+            "dados_ataque": [3, 3, 3],
+            "dados_defesa": [6, 6, 6],
+        },
     )
     assert r1.status_code == 200, r1.text
     assert r1.json()["defesa"]["esquiva_efetiva"] >= 0
@@ -368,7 +426,12 @@ def test_defesa_cumulativa_aplica_penalidade_e_reseta_na_nova_rodada(gurps_perso
     assert client.post("/api/v1/gurps/combate/avancar-turno").status_code == 200
     r2 = client.post(
         "/api/v1/gurps/combate/ataque",
-        json={"alvo_id": a, "nh_ataque": 16, "dados_ataque": [3, 3, 3], "dados_defesa": [6, 6, 6]},
+        json={
+            "alvo_id": a,
+            "nh_ataque": 16,
+            "dados_ataque": [3, 3, 3],
+            "dados_defesa": [6, 6, 6],
+        },
     )
     assert r2.status_code == 200, r2.text
     esquiva_primeira_defesa = r2.json()["defesa"]["esquiva_efetiva"]
@@ -382,7 +445,12 @@ def test_defesa_cumulativa_aplica_penalidade_e_reseta_na_nova_rodada(gurps_perso
 
     r3 = client.post(
         "/api/v1/gurps/combate/ataque",
-        json={"alvo_id": b, "nh_ataque": 16, "dados_ataque": [3, 3, 3], "dados_defesa": [6, 6, 6]},
+        json={
+            "alvo_id": b,
+            "nh_ataque": 16,
+            "dados_ataque": [3, 3, 3],
+            "dados_defesa": [6, 6, 6],
+        },
     )
     assert r3.status_code == 200, r3.text
     # primeira defesa da nova rodada volta ao valor base efetivo (sem penalidade acumulada prévia)
@@ -392,7 +460,12 @@ def test_defesa_cumulativa_aplica_penalidade_e_reseta_na_nova_rodada(gurps_perso
     assert client.post("/api/v1/gurps/combate/avancar-turno").status_code == 200
     r4 = client.post(
         "/api/v1/gurps/combate/ataque",
-        json={"alvo_id": a, "nh_ataque": 16, "dados_ataque": [3, 3, 3], "dados_defesa": [6, 6, 6]},
+        json={
+            "alvo_id": a,
+            "nh_ataque": 16,
+            "dados_ataque": [3, 3, 3],
+            "dados_defesa": [6, 6, 6],
+        },
     )
     assert r4.status_code == 200, r4.text
     esquiva_segunda_defesa = r4.json()["defesa"]["esquiva_efetiva"]
@@ -405,10 +478,13 @@ def test_definir_postura_ativa_e_refletir_status(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "P1", 0, velocidade_valor=6.0)
     b = _criar(SessionLocal, client, "P2", 0, velocidade_valor=5.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post("/api/v1/gurps/combate/postura-atual", json={"postura": "agachado"})
     assert r.status_code == 200, r.text
@@ -426,39 +502,61 @@ def test_postura_modifica_nh_ataque_e_esquiva_efetiva(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=6.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     # Atacante deitado: penalidade no NH efetivo.
-    assert client.post(
-        "/api/v1/gurps/combate/postura-atual",
-        json={"postura": "deitado"},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/postura-atual",
+            json={"postura": "deitado"},
+        ).status_code
+        == 200
+    )
 
     r1 = client.post(
         "/api/v1/gurps/combate/ataque",
-        json={"alvo_id": b, "nh_ataque": 12, "dados_ataque": [3, 3, 3], "dados_defesa": [6, 6, 6]},
+        json={
+            "alvo_id": b,
+            "nh_ataque": 12,
+            "dados_ataque": [3, 3, 3],
+            "dados_defesa": [6, 6, 6],
+        },
     )
     assert r1.status_code == 200, r1.text
     assert r1.json()["nh_ataque_efetivo"] < 12
 
     # Alvo deitado: defesa efetiva mais baixa.
     assert client.post("/api/v1/gurps/combate/avancar-turno").status_code == 200
-    assert client.post(
-        "/api/v1/gurps/combate/postura-atual",
-        json={"postura": "deitado"},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/postura-atual",
+            json={"postura": "deitado"},
+        ).status_code
+        == 200
+    )
     assert client.post("/api/v1/gurps/combate/avancar-turno").status_code == 200
-    assert client.post(
-        "/api/v1/gurps/combate/postura-atual",
-        json={"postura": "em_pe"},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/postura-atual",
+            json={"postura": "em_pe"},
+        ).status_code
+        == 200
+    )
 
     r2 = client.post(
         "/api/v1/gurps/combate/ataque",
-        json={"alvo_id": b, "nh_ataque": 16, "dados_ataque": [3, 3, 3], "dados_defesa": [6, 6, 6]},
+        json={
+            "alvo_id": b,
+            "nh_ataque": 16,
+            "dados_ataque": [3, 3, 3],
+            "dados_defesa": [6, 6, 6],
+        },
     )
     assert r2.status_code == 200, r2.text
     assert r2.json()["defesa"]["esquiva_efetiva"] >= 0
@@ -470,10 +568,13 @@ def test_ataque_soco_usa_dx_quando_nh_omitido(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Brigador", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=6.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -499,10 +600,13 @@ def test_ataque_chute_aplica_penalidade_no_nh_base(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Lutador", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=6.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -526,10 +630,13 @@ def test_ataque_usa_aparar_quando_solicitado(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "Defensor", 0, velocidade_valor=6.0, aparar=13)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -553,10 +660,13 @@ def test_ataque_usa_bloqueio_quando_solicitado(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "Defensor", 0, velocidade_valor=6.0, bloqueio="10")
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -587,10 +697,13 @@ def test_rd_reduz_dano_no_fluxo_de_ataque(gurps_personagens_db):
         velocidade_valor=6.0,
         extras={"rd": 3},
     )
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -617,10 +730,13 @@ def test_esforco_consume_fadiga_do_personagem_ativo(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Ativo", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "Outro", 0, velocidade_valor=6.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/esforco",
@@ -640,33 +756,49 @@ def test_esforco_falha_sem_fadiga_disponivel(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "Ativo", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "Outro", 0, velocidade_valor=6.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     # Zera fadiga e tenta esforço.
-    assert client.patch(
-        f"/api/v1/gurps/personagens/{a}",
-        json={"fadiga_atual": 0},
-    ).status_code == 200
+    assert (
+        client.patch(
+            f"/api/v1/gurps/personagens/{a}",
+            json={"fadiga_atual": 0},
+        ).status_code
+        == 200
+    )
 
     r = client.post("/api/v1/gurps/combate/esforco", json={"custo_fadiga": 1})
     assert r.status_code == 422
     assert "fadiga" in r.json().get("detail", "").lower()
 
 
-def test_ataque_aplica_condicao_atordoado_quando_alvo_permanece_consciente(gurps_personagens_db):
+def test_ataque_aplica_condicao_atordoado_quando_alvo_permanece_consciente(
+    gurps_personagens_db,
+):
     SessionLocal, u1, _ = gurps_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
 
     a = _criar(SessionLocal, client, "Atacante", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "Alvo", 0, velocidade_valor=6.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
-    assert client.patch(f"/api/v1/gurps/personagens/{b}", json={"pvs_valor": 20, "pvs_atual": 20}).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
+    assert (
+        client.patch(
+            f"/api/v1/gurps/personagens/{b}", json={"pvs_valor": 20, "pvs_atual": 20}
+        ).status_code
+        == 200
+    )
 
     r = client.post(
         "/api/v1/gurps/combate/ataque",
@@ -689,23 +821,29 @@ def test_atordoado_so_permita_fazer_nada_e_recupera(gurps_personagens_db):
 
     a = _criar(SessionLocal, client, "A", 0, velocidade_valor=7.0)
     b = _criar(SessionLocal, client, "B", 0, velocidade_valor=6.0)
-    assert client.post(
-        "/api/v1/gurps/combate/iniciar",
-        json={"personagem_ids": [a, b]},
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/iniciar",
+            json={"personagem_ids": [a, b]},
+        ).status_code
+        == 200
+    )
 
     # A atordoa B
-    assert client.post(
-        "/api/v1/gurps/combate/ataque",
-        json={
-            "alvo_id": b,
-            "nh_ataque": 16,
-            "expressao_dano": "1d+0",
-            "dados_ataque": [3, 3, 3],
-            "dados_defesa": [6, 6, 6],
-            "dados_dano": [4],
-        },
-    ).status_code == 200
+    assert (
+        client.post(
+            "/api/v1/gurps/combate/ataque",
+            json={
+                "alvo_id": b,
+                "nh_ataque": 16,
+                "expressao_dano": "1d+0",
+                "dados_ataque": [3, 3, 3],
+                "dados_defesa": [6, 6, 6],
+                "dados_dano": [4],
+            },
+        ).status_code
+        == 200
+    )
 
     # Turno de B: não pode atacar enquanto atordoado.
     assert client.post("/api/v1/gurps/combate/avancar-turno").status_code == 200
@@ -714,7 +852,9 @@ def test_atordoado_so_permita_fazer_nada_e_recupera(gurps_personagens_db):
     assert "atordoado" in r1.json().get("detail", "").lower()
 
     # Fazer nada remove atordoado.
-    r2 = client.post("/api/v1/gurps/combate/manobra-atual", json={"manobra": "fazer_nada"})
+    r2 = client.post(
+        "/api/v1/gurps/combate/manobra-atual", json={"manobra": "fazer_nada"}
+    )
     assert r2.status_code == 200, r2.text
     body = r2.json()
     assert body["condicoes_por_personagem"][str(b)] == "normal"

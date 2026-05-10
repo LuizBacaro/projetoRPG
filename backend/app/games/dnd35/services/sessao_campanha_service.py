@@ -8,9 +8,12 @@ a classe durante a reorganização multi-jogo.
 
 from typing import List
 
-from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.games.dnd35.models.sessao_campanha import SessaoCampanha
-from app.games.dnd35.ports import CampanhaRepositoryProtocol, SessaoCampanhaRepositoryProtocol
+from app.games.dnd35.ports import (
+    CampanhaRepositoryProtocol,
+    SessaoCampanhaRepositoryProtocol,
+)
+from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 
 
 class SessaoCampanhaService:
@@ -54,9 +57,7 @@ class SessaoCampanhaService:
                 visivel_jogadores=bool(visivel_jogadores),
             )
         )
-        sessao.campanha_nome = getattr(
-            getattr(sessao, "campanha", None), "nome", ""
-        )
+        sessao.campanha_nome = getattr(getattr(sessao, "campanha", None), "nome", "")
         return sessao
 
     def atualizar(
@@ -66,17 +67,13 @@ class SessaoCampanhaService:
         resumo: str | None = None,
         visivel_jogadores: bool | None = None,
     ) -> SessaoCampanha:
-        sessao = self.sessao_repository.obter_por_id_e_mestre(
-            sessao_id, mestre_id
-        )
+        sessao = self.sessao_repository.obter_por_id_e_mestre(sessao_id, mestre_id)
         if not sessao:
             raise ArenaBaseException("Sessão não encontrada", status_code=404)
         if resumo is not None:
             resumo_limpo = str(resumo).strip()
             if not resumo_limpo:
-                raise DadosInvalidos(
-                    "Resumo da sessão não pode ser vazio"
-                )
+                raise DadosInvalidos("Resumo da sessão não pode ser vazio")
             sessao.resumo = resumo_limpo
         if visivel_jogadores is not None:
             sessao.visivel_jogadores = bool(visivel_jogadores)
@@ -87,9 +84,7 @@ class SessaoCampanhaService:
         return atualizada
 
     def deletar(self, mestre_id: int, sessao_id: int) -> None:
-        sessao = self.sessao_repository.obter_por_id_e_mestre(
-            sessao_id, mestre_id
-        )
+        sessao = self.sessao_repository.obter_por_id_e_mestre(sessao_id, mestre_id)
         if not sessao:
             raise ArenaBaseException("Sessão não encontrada", status_code=404)
         self.sessao_repository.delete(sessao)

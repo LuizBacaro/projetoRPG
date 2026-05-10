@@ -23,10 +23,7 @@ from app.games.dnd35.schemas.habilidade_especial import (
     HabilidadeEspecialResumo,
 )
 
-
-router = APIRouter(
-    prefix="/habilidades-especiais", tags=["Habilidades Especiais"]
-)
+router = APIRouter(prefix="/habilidades-especiais", tags=["Habilidades Especiais"])
 
 
 @router.get("", response_model=list[HabilidadeEspecialResumo])

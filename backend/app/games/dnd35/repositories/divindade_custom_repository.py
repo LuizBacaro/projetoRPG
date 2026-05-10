@@ -2,16 +2,16 @@
 DivindadeCustomRepository (D&D 3.5)
 SRP: persistencia das divindades customizadas (por campanha/mestre).
 """
+
 from typing import List, Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from ..models.divindade_custom import DivindadeCustom
-
 # `commit_with_rollback` continua no Auth Hub (utilitário compartilhado de
 # persistência) durante a reorganização.
 from ....repositories.base import commit_with_rollback
+from ..models.divindade_custom import DivindadeCustom
 
 
 class DivindadeCustomRepository:

@@ -12,10 +12,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
 
-from app.games.dnd35.catalogs.racas_catalog import (
-    get_raca_by_slug_or_name,
-    list_racas,
-)
+from app.games.dnd35.catalogs.racas_catalog import get_raca_by_slug_or_name, list_racas
 from app.games.dnd35.schemas.raca import RacaDetalheResponse, RacaResumoResponse
 
 router = APIRouter(prefix="/racas", tags=["Raças"])

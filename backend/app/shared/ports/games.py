@@ -27,7 +27,9 @@ class UserGameMembershipRepositoryProtocol(Protocol):
 
     db: Session
 
-    def listar_por_usuario(self, usuario_id: int) -> List[Tuple[UserGameMembership, Game]]: ...
+    def listar_por_usuario(
+        self, usuario_id: int
+    ) -> List[Tuple[UserGameMembership, Game]]: ...
 
     def buscar_por_usuario_e_slug(
         self, usuario_id: int, slug: str

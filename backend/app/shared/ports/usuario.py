@@ -6,7 +6,7 @@ from typing import List, Optional, Protocol
 
 from sqlalchemy.orm import Session
 
-from app.shared.models.usuario import Usuario, PerfilUsuario
+from app.shared.models.usuario import PerfilUsuario, Usuario
 
 
 class UsuarioRepositoryProtocol(Protocol):
@@ -14,7 +14,9 @@ class UsuarioRepositoryProtocol(Protocol):
 
     db: Session
 
-    def listar(self, apenas_ativos: bool = False, skip: int = 0, limit: int = 50) -> List[Usuario]: ...
+    def listar(
+        self, apenas_ativos: bool = False, skip: int = 0, limit: int = 50
+    ) -> List[Usuario]: ...
 
     def buscar_por_id(self, usuario_id: int) -> Optional[Usuario]: ...
 

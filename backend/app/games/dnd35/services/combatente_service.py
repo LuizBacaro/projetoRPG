@@ -3,42 +3,50 @@ Service de Combatente (Business Logic)
 SRP: Lógica de negócio de Combatente
 SOLID: DIP via repository injetado no constructor
 """
-import unicodedata
+
 import json
 import re
+import unicodedata
+from typing import Dict, List, Optional
 
-from typing import List, Optional, Dict
-
-from app.games.dnd35.catalogs import divindades_catalogo as _divindades_catalogo
 from app.games.dnd35.bonus_base_ataque import (
     calcular_bonus_base_ataque,
     calcular_habilidades_especiais,
     calcular_habilidades_especiais_por_nivel,
     calcular_resistencias_base,
 )
+from app.games.dnd35.catalogs import divindades_catalogo as _divindades_catalogo
+from app.games.dnd35.catalogs.habilidades_especiais_catalog import (
+    resolver_por_texto as _resolver_habilidade_por_texto,
+)
 from app.games.dnd35.catalogs.racas_catalog import get_raca_by_slug_or_name
+from app.games.dnd35.models.armadura_protecao import (
+    ArmaduraProtecao,
+    ArmaduraProtecaoJogador,
+)
+from app.games.dnd35.models.ataque import MagiaSlot
+from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.models.talento import Talento, TalentoJogador
+from app.games.dnd35.ports import (
+    CombatenteRepositoryProtocol,
+    CondicaoRepositoryProtocol,
+)
+from app.games.dnd35.ports.divindade_custom import DivindadeCustomRepositoryProtocol
+from app.games.dnd35.repositories.divindade_custom_repository import (
+    DivindadeCustomRepository,
+)
+from app.repositories.base import commit_with_rollback
+from app.services.file_service import FileService
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
     DadosInvalidos,
 )
-from app.games.dnd35.catalogs.habilidades_especiais_catalog import (
-    resolver_por_texto as _resolver_habilidade_por_texto,
-)
-from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
-from app.games.dnd35.models.ataque import MagiaSlot
-from app.games.dnd35.models.combatente import Combatente
-from app.games.dnd35.models.talento import Talento, TalentoJogador
-from app.games.dnd35.ports import CombatenteRepositoryProtocol, CondicaoRepositoryProtocol
-from app.games.dnd35.ports.divindade_custom import DivindadeCustomRepositoryProtocol
-from app.games.dnd35.repositories.divindade_custom_repository import DivindadeCustomRepository
 from app.shared.models.usuario import PerfilUsuario
-from app.repositories.base import commit_with_rollback
-from app.services.file_service import FileService
 
 # Nomes canônicos das condições automáticas de HP (D&D 3.5)
 _CONDICAO_INCONSCIENTE = "Inconsciente"
-_CONDICAO_MORRENDO     = "Morrendo"
+_CONDICAO_MORRENDO = "Morrendo"
 
 
 def _normalizar_nome_talento(nome: str | None) -> str:
@@ -52,6 +60,7 @@ def _normalizar_nome_talento(nome: str | None) -> str:
     chave = "".join(ch for ch in chave if unicodedata.category(ch) != "Mn")
     chave = re.sub(r"[^A-Za-z\s]", "", chave)
     return " ".join(chave.split()).upper()
+
 
 # Clérigo: magias por dia (Normal) + domínio — Magias por dia clerigo.xlsx (C = nv. 0 só truques; D–E = nv. 1 Normal/Domínio; truques sem slot de domínio)
 _CLERIC_SPELLS_PER_DAY_NORMAL = [
@@ -161,7 +170,9 @@ def _bonus_magias_por_modificador(mod: int) -> List[int]:
     return list(_SPELL_BONUS_BY_MODIFIER[m])
 
 
-def _linha_slots_clerigo(nivel_personagem: int, modificador_sab: int) -> List[Optional[int]]:
+def _linha_slots_clerigo(
+    nivel_personagem: int, modificador_sab: int
+) -> List[Optional[int]]:
     """Uma linha por nível de magia (0–9): totais = normal + domínio + bônus por atributo (Tabela 1-1)."""
     idx = max(1, min(20, nivel_personagem)) - 1
     n_row = _CLERIC_SPELLS_PER_DAY_NORMAL[idx]
@@ -189,11 +200,11 @@ class CombatenteService:
         condicao_repository: Optional[CondicaoRepositoryProtocol] = None,
         divindade_custom_repository: Optional[DivindadeCustomRepositoryProtocol] = None,
     ):
-        self.repository        = repository
-        self.file_service      = file_service
-        self.condicao_repo     = condicao_repository
-        self._divindade_custom = divindade_custom_repository or DivindadeCustomRepository(
-            repository.db
+        self.repository = repository
+        self.file_service = file_service
+        self.condicao_repo = condicao_repository
+        self._divindade_custom = (
+            divindade_custom_repository or DivindadeCustomRepository(repository.db)
         )
         self._condicao_id_cache: Dict[str, int] = {}
 
@@ -208,20 +219,31 @@ class CombatenteService:
         apenas_meus: bool = False,
     ) -> List[Combatente]:
         """Lista todos os combatentes, opcionalmente filtrando por tipo."""
+
         def _enriquecer(combatentes: List[Combatente]) -> List[Combatente]:
             self._sincronizar_progressao_em_memoria(combatentes)
             self._enriquecer_dados_raciais_em_memoria(combatentes)
             self._enriquecer_habilidades_especiais_em_memoria(combatentes)
             for combatente in combatentes:
                 campanha = getattr(combatente, "campanha", None)
-                setattr(combatente, "campanha_nome", getattr(campanha, "nome", "") if campanha else "")
+                setattr(
+                    combatente,
+                    "campanha_nome",
+                    getattr(campanha, "nome", "") if campanha else "",
+                )
             return combatentes
 
         # Jogador enxerga apenas seus próprios combatentes (qualquer tipo)
         if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
             if tipo:
-                return _enriquecer(self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit))
-            return _enriquecer(self.repository.get_by_owner(usuario.id, skip=skip, limit=limit))
+                return _enriquecer(
+                    self.repository.get_by_owner_and_tipo(
+                        usuario.id, tipo, skip=skip, limit=limit
+                    )
+                )
+            return _enriquecer(
+                self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
+            )
 
         if usuario and apenas_meus:
             if usuario.perfil == PerfilUsuario.MESTRE:
@@ -234,16 +256,30 @@ class CombatenteService:
                             limit=limit,
                         )
                     )
-                return _enriquecer(self.repository.get_by_owner_or_campanha_mestre(usuario.id, skip=skip, limit=limit))
+                return _enriquecer(
+                    self.repository.get_by_owner_or_campanha_mestre(
+                        usuario.id, skip=skip, limit=limit
+                    )
+                )
             if tipo:
-                return _enriquecer(self.repository.get_by_owner_and_tipo(usuario.id, tipo, skip=skip, limit=limit))
-            return _enriquecer(self.repository.get_by_owner(usuario.id, skip=skip, limit=limit))
+                return _enriquecer(
+                    self.repository.get_by_owner_and_tipo(
+                        usuario.id, tipo, skip=skip, limit=limit
+                    )
+                )
+            return _enriquecer(
+                self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
+            )
 
         if tipo:
-            return _enriquecer(self.repository.get_by_tipo(tipo, skip=skip, limit=limit))
+            return _enriquecer(
+                self.repository.get_by_tipo(tipo, skip=skip, limit=limit)
+            )
         return _enriquecer(self.repository.get_all(skip=skip, limit=limit))
 
-    def contar_todos(self, tipo: Optional[str] = None, usuario=None, apenas_meus: bool = False) -> int:
+    def contar_todos(
+        self, tipo: Optional[str] = None, usuario=None, apenas_meus: bool = False
+    ) -> int:
         """Conta combatentes respeitando escopo do usuário e filtro por tipo."""
         # Jogador conta apenas seus próprios combatentes (qualquer tipo)
         if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
@@ -254,7 +290,9 @@ class CombatenteService:
         if usuario and apenas_meus:
             if usuario.perfil == PerfilUsuario.MESTRE:
                 if tipo:
-                    return self.repository.count_by_owner_or_campanha_mestre_and_tipo(usuario.id, tipo)
+                    return self.repository.count_by_owner_or_campanha_mestre_and_tipo(
+                        usuario.id, tipo
+                    )
                 return self.repository.count_by_owner_or_campanha_mestre(usuario.id)
             if tipo:
                 return self.repository.count_by_owner_and_tipo(usuario.id, tipo)
@@ -277,12 +315,18 @@ class CombatenteService:
         self._enriquecer_dados_raciais_em_memoria([combatente])
         self._enriquecer_habilidades_especiais_em_memoria([combatente])
         campanha = getattr(combatente, "campanha", None)
-        setattr(combatente, "campanha_nome", getattr(campanha, "nome", "") if campanha else "")
+        setattr(
+            combatente,
+            "campanha_nome",
+            getattr(campanha, "nome", "") if campanha else "",
+        )
         return combatente
 
-    def criar(self, combatente_data: dict, foto_file=None, dono_id: Optional[int] = None) -> Combatente:
+    def criar(
+        self, combatente_data: dict, foto_file=None, dono_id: Optional[int] = None
+    ) -> Combatente:
         """Cria um novo combatente com foto opcional."""
-        if foto_file and hasattr(foto_file, 'filename') and foto_file.filename:
+        if foto_file and hasattr(foto_file, "filename") and foto_file.filename:
             combatente_data["foto_url"] = self.file_service.salvar_arquivo(foto_file)
 
         if dono_id is not None:
@@ -314,13 +358,16 @@ class CombatenteService:
         combatente = self.obter_por_id(combatente_id)
 
         # Troca foto somente se uma nova foi enviada
-        if foto_file and hasattr(foto_file, 'filename') and foto_file.filename:
+        if foto_file and hasattr(foto_file, "filename") and foto_file.filename:
             if combatente.foto_url:
                 self.file_service.deletar_arquivo(combatente.foto_url)
             combatente_data["foto_url"] = self.file_service.salvar_arquivo(foto_file)
 
         # Ajusta HP proporcional se hp_maximo mudou
-        if "hp_maximo" in combatente_data and combatente.hp_maximo != combatente_data["hp_maximo"]:
+        if (
+            "hp_maximo" in combatente_data
+            and combatente.hp_maximo != combatente_data["hp_maximo"]
+        ):
             novo_max = combatente_data["hp_maximo"]
             if "hp_atual" not in combatente_data and combatente.hp_maximo > 0:
                 proporcao = combatente.hp_atual / combatente.hp_maximo
@@ -334,10 +381,16 @@ class CombatenteService:
             alinhamento_atual=combatente.alinhamento,
             exigir_dois_dominios_clerigo=False,
         )
-        self._normalizar_idiomas_customizados(combatente_data, combatente_atual=combatente)
-        self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=combatente)
+        self._normalizar_idiomas_customizados(
+            combatente_data, combatente_atual=combatente
+        )
+        self._aplicar_predefinicoes_raciais(
+            combatente_data, combatente_atual=combatente
+        )
         self._recalcular_defesas(combatente_data, combatente_atual=combatente)
-        self._aplicar_regra_iniciativa_por_tipo(combatente_data, combatente_atual=combatente)
+        self._aplicar_regra_iniciativa_por_tipo(
+            combatente_data, combatente_atual=combatente
+        )
         self._preencher_bonus_base_ataque(combatente_data, combatente_atual=combatente)
 
         for key, value in combatente_data.items():
@@ -364,11 +417,15 @@ class CombatenteService:
         combatente_data["bonus_base_ataque"] = bba or ""
         habilidades_grouped = calcular_habilidades_especiais_por_nivel(classe, nivel)
         if habilidades_grouped:
-            combatente_data["habilidades_especiais"] = json.dumps(habilidades_grouped, ensure_ascii=False)
+            combatente_data["habilidades_especiais"] = json.dumps(
+                habilidades_grouped, ensure_ascii=False
+            )
         else:
             # Compatibilidade com registros legados sem agrupamento.
             habilidades = calcular_habilidades_especiais(classe, nivel)
-            combatente_data["habilidades_especiais"] = " | ".join(habilidades) if habilidades else ""
+            combatente_data["habilidades_especiais"] = (
+                " | ".join(habilidades) if habilidades else ""
+            )
         saves = calcular_resistencias_base(classe, nivel)
         if saves is not None:
             fortitude, reflexos, vontade = saves
@@ -376,20 +433,34 @@ class CombatenteService:
             combatente_data["reflexos_base"] = reflexos
             combatente_data["vontade_base"] = vontade
 
-        self._recalcular_resistencias_totais(combatente_data, combatente_atual=combatente_atual)
+        self._recalcular_resistencias_totais(
+            combatente_data, combatente_atual=combatente_atual
+        )
 
     def _recalcular_resistencias_totais(
         self,
         combatente_data: dict,
         combatente_atual: Optional[Combatente] = None,
     ) -> None:
-        fort_base = self._obter_valor_int(combatente_data, "fortitude_base", combatente_atual, default=0)
-        reflex_base = self._obter_valor_int(combatente_data, "reflexos_base", combatente_atual, default=0)
-        vontade_base = self._obter_valor_int(combatente_data, "vontade_base", combatente_atual, default=0)
+        fort_base = self._obter_valor_int(
+            combatente_data, "fortitude_base", combatente_atual, default=0
+        )
+        reflex_base = self._obter_valor_int(
+            combatente_data, "reflexos_base", combatente_atual, default=0
+        )
+        vontade_base = self._obter_valor_int(
+            combatente_data, "vontade_base", combatente_atual, default=0
+        )
 
-        con = self._obter_valor_int(combatente_data, "constituicao", combatente_atual, default=10)
-        des = self._obter_valor_int(combatente_data, "destreza", combatente_atual, default=10)
-        sab = self._obter_valor_int(combatente_data, "sabedoria", combatente_atual, default=10)
+        con = self._obter_valor_int(
+            combatente_data, "constituicao", combatente_atual, default=10
+        )
+        des = self._obter_valor_int(
+            combatente_data, "destreza", combatente_atual, default=10
+        )
+        sab = self._obter_valor_int(
+            combatente_data, "sabedoria", combatente_atual, default=10
+        )
 
         combatente_data["fortitude"] = fort_base + self._modificador_atributo(con)
         combatente_data["reflexos"] = reflex_base + self._modificador_atributo(des)
@@ -406,12 +477,16 @@ class CombatenteService:
         - Surpresa = 10 + bônus de armadura
         - CA = 10 + modificador de Destreza + bônus de armadura
         """
-        des = self._obter_valor_int(combatente_data, "destreza", combatente_atual, default=10)
+        des = self._obter_valor_int(
+            combatente_data, "destreza", combatente_atual, default=10
+        )
         mod_des = self._modificador_atributo(des)
         bonus_armadura = self._bonus_ca_armadura_total(combatente_atual)
         if bonus_armadura <= 0:
             # Fallback para preservar dados legados sem itens vinculados.
-            ca_atual = self._obter_valor_int(combatente_data, "ca", combatente_atual, default=10 + mod_des)
+            ca_atual = self._obter_valor_int(
+                combatente_data, "ca", combatente_atual, default=10 + mod_des
+            )
             bonus_armadura = max(0, ca_atual - (10 + mod_des))
 
         combatente_data["toque"] = 10 + mod_des
@@ -423,7 +498,10 @@ class CombatenteService:
             return 0
         total = (
             self.repository.db.query(ArmaduraProtecao.bonus_ca)
-            .join(ArmaduraProtecaoJogador, ArmaduraProtecaoJogador.item_id == ArmaduraProtecao.id)
+            .join(
+                ArmaduraProtecaoJogador,
+                ArmaduraProtecaoJogador.item_id == ArmaduraProtecao.id,
+            )
             .filter(
                 ArmaduraProtecaoJogador.combatente_id == combatente_atual.id,
                 ArmaduraProtecao.ativo.is_(True),
@@ -481,7 +559,9 @@ class CombatenteService:
             }
             self._aplicar_predefinicoes_raciais(payload, combatente_atual=combatente)
             self._recalcular_defesas(payload, combatente_atual=combatente)
-            self._aplicar_regra_iniciativa_por_tipo(payload, combatente_atual=combatente)
+            self._aplicar_regra_iniciativa_por_tipo(
+                payload, combatente_atual=combatente
+            )
             self._preencher_bonus_base_ataque(payload, combatente_atual=combatente)
             campos = (
                 "raca",
@@ -519,12 +599,15 @@ class CombatenteService:
         raca_atual = None
         if combatente_atual is not None:
             raca_atual = get_raca_by_slug_or_name(
-                getattr(combatente_atual, "raca_slug", None) or getattr(combatente_atual, "raca", None)
+                getattr(combatente_atual, "raca_slug", None)
+                or getattr(combatente_atual, "raca", None)
             )
 
         if raca_nova is None and combatente_atual is not None:
             # Mantém valores persistidos quando não há alteração de raça.
-            combatente_data["raca_slug"] = getattr(combatente_atual, "raca_slug", "") or ""
+            combatente_data["raca_slug"] = (
+                getattr(combatente_atual, "raca_slug", "") or ""
+            )
             return
 
         if raca_nova is None:
@@ -534,15 +617,27 @@ class CombatenteService:
         slug_atual = str((raca_atual or {}).get("slug") or "")
         if slug_novo == slug_atual:
             combatente_data["raca_slug"] = slug_novo
-            combatente_data["raca"] = str(raca_nova.get("nome") or combatente_data.get("raca") or "")
+            combatente_data["raca"] = str(
+                raca_nova.get("nome") or combatente_data.get("raca") or ""
+            )
             return
 
-        delta = {k: 0 for k in ("forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma")}
-        for mod in (raca_nova.get("modificadores_habilidade") or []):
+        delta = {
+            k: 0
+            for k in (
+                "forca",
+                "destreza",
+                "constituicao",
+                "inteligencia",
+                "sabedoria",
+                "carisma",
+            )
+        }
+        for mod in raca_nova.get("modificadores_habilidade") or []:
             atr = str(mod.get("atributo") or "")
             if atr in delta:
                 delta[atr] += int(mod.get("valor") or 0)
-        for mod in ((raca_atual or {}).get("modificadores_habilidade") or []):
+        for mod in (raca_atual or {}).get("modificadores_habilidade") or []:
             atr = str(mod.get("atributo") or "")
             if atr in delta:
                 delta[atr] -= int(mod.get("valor") or 0)
@@ -550,11 +645,15 @@ class CombatenteService:
         for atr, ajuste in delta.items():
             if ajuste == 0:
                 continue
-            valor_base = self._obter_valor_int(combatente_data, atr, combatente_atual, default=10)
+            valor_base = self._obter_valor_int(
+                combatente_data, atr, combatente_atual, default=10
+            )
             combatente_data[atr] = max(1, min(30, valor_base + ajuste))
 
         combatente_data["raca_slug"] = slug_novo
-        combatente_data["raca"] = str(raca_nova.get("nome") or combatente_data.get("raca") or "")
+        combatente_data["raca"] = str(
+            raca_nova.get("nome") or combatente_data.get("raca") or ""
+        )
 
     def _enriquecer_habilidades_especiais_em_memoria(
         self, combatentes: List[Combatente]
@@ -596,9 +695,7 @@ class CombatenteService:
                 else:
                     # formato legado "a | b"
                     legado = [
-                        part.strip()
-                        for part in raw_value.split("|")
-                        if part.strip()
+                        part.strip() for part in raw_value.split("|") if part.strip()
                     ]
                     if legado:
                         agrupadas.append(
@@ -642,13 +739,16 @@ class CombatenteService:
         """Persiste idiomas customizados na coluna String (JSON); nunca lista Python."""
         return json.dumps(idiomas, ensure_ascii=False) if idiomas else ""
 
-    def _enriquecer_dados_raciais_em_memoria(self, combatentes: List[Combatente]) -> None:
+    def _enriquecer_dados_raciais_em_memoria(
+        self, combatentes: List[Combatente]
+    ) -> None:
         for combatente in combatentes:
             idiomas_custom_list = self._parse_idiomas_customizados(
                 getattr(combatente, "idiomas_customizados", "")
             )
             raca = get_raca_by_slug_or_name(
-                getattr(combatente, "raca_slug", None) or getattr(combatente, "raca", None)
+                getattr(combatente, "raca_slug", None)
+                or getattr(combatente, "raca", None)
             )
             if not raca:
                 setattr(combatente, "tamanho_racial", "")
@@ -663,24 +763,69 @@ class CombatenteService:
                 setattr(combatente, "modificadores_pericia", [])
                 continue
 
-            talentos = [str(x).strip() for x in (raca.get("talentos_especiais") or []) if str(x).strip()]
-            habilidades = [str(x).strip() for x in (raca.get("habilidades_especiais") or []) if str(x).strip()]
-            resistencias = [str(x).strip() for x in (raca.get("resistencias") or []) if str(x).strip()]
-            mods_ataque = [str(x).strip() for x in (raca.get("modificadores_ataque") or []) if str(x).strip()]
-            mods_defesa = [str(x).strip() for x in (raca.get("modificadores_defesa") or []) if str(x).strip()]
-            mods_pericia = [str(x).strip() for x in (raca.get("modificadores_pericia") or []) if str(x).strip()]
+            talentos = [
+                str(x).strip()
+                for x in (raca.get("talentos_especiais") or [])
+                if str(x).strip()
+            ]
+            habilidades = [
+                str(x).strip()
+                for x in (raca.get("habilidades_especiais") or [])
+                if str(x).strip()
+            ]
+            resistencias = [
+                str(x).strip()
+                for x in (raca.get("resistencias") or [])
+                if str(x).strip()
+            ]
+            mods_ataque = [
+                str(x).strip()
+                for x in (raca.get("modificadores_ataque") or [])
+                if str(x).strip()
+            ]
+            mods_defesa = [
+                str(x).strip()
+                for x in (raca.get("modificadores_defesa") or [])
+                if str(x).strip()
+            ]
+            mods_pericia = [
+                str(x).strip()
+                for x in (raca.get("modificadores_pericia") or [])
+                if str(x).strip()
+            ]
             # Catálogo legado: em algumas raças o bônus de Procurar veio em "resistências".
             for item in resistencias:
                 if re.match(r"^\+\d+\s+procurar\b", item, flags=re.IGNORECASE):
                     if item not in mods_pericia:
                         mods_pericia.append(item)
-            passivos = talentos + habilidades + resistencias + mods_ataque + mods_defesa + mods_pericia
+            passivos = (
+                talentos
+                + habilidades
+                + resistencias
+                + mods_ataque
+                + mods_defesa
+                + mods_pericia
+            )
 
-            setattr(combatente, "raca_slug", str(raca.get("slug") or getattr(combatente, "raca_slug", "")))
-            setattr(combatente, "raca", str(raca.get("nome") or getattr(combatente, "raca", "")))
+            setattr(
+                combatente,
+                "raca_slug",
+                str(raca.get("slug") or getattr(combatente, "raca_slug", "")),
+            )
+            setattr(
+                combatente,
+                "raca",
+                str(raca.get("nome") or getattr(combatente, "raca", "")),
+            )
             setattr(combatente, "tamanho_racial", str(raca.get("tamanho") or ""))
-            setattr(combatente, "deslocamento_racial_metros", raca.get("deslocamento_metros"))
-            idiomas_raciais = [str(x) for x in (raca.get("idiomas_iniciais") or []) if str(x).strip()]
+            setattr(
+                combatente,
+                "deslocamento_racial_metros",
+                raca.get("deslocamento_metros"),
+            )
+            idiomas_raciais = [
+                str(x) for x in (raca.get("idiomas_iniciais") or []) if str(x).strip()
+            ]
             idiomas_totais = idiomas_raciais.copy()
             for idioma in idiomas_custom_list:
                 if idioma not in idiomas_totais:
@@ -701,19 +846,25 @@ class CombatenteService:
     ) -> None:
         if "idiomas_customizados" not in combatente_data:
             if combatente_atual is not None:
-                combatente_data["idiomas_customizados"] = getattr(combatente_atual, "idiomas_customizados", "") or ""
+                combatente_data["idiomas_customizados"] = (
+                    getattr(combatente_atual, "idiomas_customizados", "") or ""
+                )
             return
 
         valor = combatente_data.get("idiomas_customizados")
         if valor is None:
             if combatente_atual is not None:
-                combatente_data["idiomas_customizados"] = getattr(combatente_atual, "idiomas_customizados", "") or ""
+                combatente_data["idiomas_customizados"] = (
+                    getattr(combatente_atual, "idiomas_customizados", "") or ""
+                )
             else:
                 combatente_data["idiomas_customizados"] = ""
             return
 
         idiomas = self._parse_idiomas_customizados(valor)
-        combatente_data["idiomas_customizados"] = json.dumps(idiomas, ensure_ascii=False) if idiomas else ""
+        combatente_data["idiomas_customizados"] = (
+            json.dumps(idiomas, ensure_ascii=False) if idiomas else ""
+        )
 
     def _parse_idiomas_customizados(self, valor) -> list[str]:
         if valor is None:
@@ -749,11 +900,21 @@ class CombatenteService:
         combatente_data: dict,
         combatente_atual: Optional[Combatente] = None,
     ) -> None:
-        tipo = (combatente_data.get("tipo") or (combatente_atual.tipo if combatente_atual else "") or "").lower()
+        tipo = (
+            combatente_data.get("tipo")
+            or (combatente_atual.tipo if combatente_atual else "")
+            or ""
+        ).lower()
         if tipo != "jogador":
             return
-        des = self._obter_valor_int(combatente_data, "destreza", combatente_atual, default=10)
-        bonus_talento = self._bonus_iniciativa_aprimorada(combatente_atual.id) if combatente_atual else 0
+        des = self._obter_valor_int(
+            combatente_data, "destreza", combatente_atual, default=10
+        )
+        bonus_talento = (
+            self._bonus_iniciativa_aprimorada(combatente_atual.id)
+            if combatente_atual
+            else 0
+        )
         # Regra base D&D 3.5: Iniciativa = modificador de Destreza.
         # Talento Iniciativa Aprimorada concede +4 adicional.
         combatente_data["iniciativa"] = self._modificador_atributo(des) + bonus_talento
@@ -792,7 +953,9 @@ class CombatenteService:
         combatente.hp_atual = max(piso, min(novo_hp, teto))
         return self.repository.update(combatente)
 
-    def atualizar_iniciativa(self, combatente_id: int, nova_iniciativa: int) -> Combatente:
+    def atualizar_iniciativa(
+        self, combatente_id: int, nova_iniciativa: int
+    ) -> Combatente:
         """Atualiza iniciativa, mínimo 0."""
         combatente = self.obter_por_id(combatente_id)
         combatente.iniciativa = max(0, nova_iniciativa)
@@ -810,10 +973,10 @@ class CombatenteService:
         if valor <= 0:
             raise DadosInvalidos("Valor de dano deve ser maior que zero")
 
-        combatente  = self.obter_por_id(combatente_id)
+        combatente = self.obter_por_id(combatente_id)
         hp_anterior = combatente.hp_atual
         # aplicar_dano() no model já respeita as regras por tipo
-        novo_hp     = combatente.aplicar_dano(valor)
+        novo_hp = combatente.aplicar_dano(valor)
         self.repository.update(combatente)
 
         # Atualiza condições automáticas de HP
@@ -830,9 +993,9 @@ class CombatenteService:
         if valor <= 0:
             raise DadosInvalidos("Valor de cura deve ser maior que zero")
 
-        combatente   = self.obter_por_id(combatente_id)
-        hp_anterior  = combatente.hp_atual
-        novo_hp      = min(combatente.hp_maximo, combatente.hp_atual + valor)
+        combatente = self.obter_por_id(combatente_id)
+        hp_anterior = combatente.hp_atual
+        novo_hp = min(combatente.hp_maximo, combatente.hp_atual + valor)
         cura_efetiva = novo_hp - hp_anterior
 
         combatente.hp_atual = novo_hp
@@ -848,7 +1011,9 @@ class CombatenteService:
         )
         return self._response_dano_cura(combatente, mensagem)
 
-    def aplicar_dano_massa(self, combatente_ids: List[int], valor: int, usuario) -> Dict:
+    def aplicar_dano_massa(
+        self, combatente_ids: List[int], valor: int, usuario
+    ) -> Dict:
         """Aplica dano em lote validando ownership por combatente."""
         if valor <= 0:
             raise DadosInvalidos("Valor de dano deve ser maior que zero")
@@ -860,13 +1025,17 @@ class CombatenteService:
             combatente = self.obter_por_id(combatente_id)
             self._validar_acesso_combatente(combatente, usuario)
 
-        resultados = [self.aplicar_dano(combatente_id, valor) for combatente_id in ids_unicos]
+        resultados = [
+            self.aplicar_dano(combatente_id, valor) for combatente_id in ids_unicos
+        ]
         return {
             "resultados": resultados,
             "total": len(resultados),
         }
 
-    def aplicar_cura_massa(self, combatente_ids: List[int], valor: int, usuario) -> Dict:
+    def aplicar_cura_massa(
+        self, combatente_ids: List[int], valor: int, usuario
+    ) -> Dict:
         """Aplica cura em lote validando ownership por combatente."""
         if valor <= 0:
             raise DadosInvalidos("Valor de cura deve ser maior que zero")
@@ -878,7 +1047,9 @@ class CombatenteService:
             combatente = self.obter_por_id(combatente_id)
             self._validar_acesso_combatente(combatente, usuario)
 
-        resultados = [self.aplicar_cura(combatente_id, valor) for combatente_id in ids_unicos]
+        resultados = [
+            self.aplicar_cura(combatente_id, valor) for combatente_id in ids_unicos
+        ]
         return {
             "resultados": resultados,
             "total": len(resultados),
@@ -892,15 +1063,15 @@ class CombatenteService:
         if self.condicao_repo is None:
             return
 
-        hp      = combatente.hp_atual
-        tipo    = combatente.tipo
-        cid     = combatente.id
+        hp = combatente.hp_atual
+        tipo = combatente.tipo
+        cid = combatente.id
 
         id_inconsciente = self._id_condicao(_CONDICAO_INCONSCIENTE)
-        id_morrendo     = self._id_condicao(_CONDICAO_MORRENDO)
+        id_morrendo = self._id_condicao(_CONDICAO_MORRENDO)
         houve_mudanca = False
 
-        if tipo == 'monstro':
+        if tipo == "monstro":
             # Monstros não recebem Inconsciente/Morrendo — morrem diretamente.
             if id_inconsciente is not None:
                 self.condicao_repo.remover(cid, id_inconsciente, commit=False)
@@ -927,7 +1098,9 @@ class CombatenteService:
                 self.condicao_repo.remover(cid, id_morrendo, commit=False)
                 houve_mudanca = True
             if id_inconsciente is not None:
-                self.condicao_repo.aplicar(cid, id_inconsciente, duracao_turnos=-1, commit=False)
+                self.condicao_repo.aplicar(
+                    cid, id_inconsciente, duracao_turnos=-1, commit=False
+                )
                 houve_mudanca = True
         elif -10 < hp < 0:
             # Morrendo (-1 a -9)
@@ -935,7 +1108,9 @@ class CombatenteService:
                 self.condicao_repo.remover(cid, id_inconsciente, commit=False)
                 houve_mudanca = True
             if id_morrendo is not None:
-                self.condicao_repo.aplicar(cid, id_morrendo, duracao_turnos=-1, commit=False)
+                self.condicao_repo.aplicar(
+                    cid, id_morrendo, duracao_turnos=-1, commit=False
+                )
                 houve_mudanca = True
         else:
             # Morto (hp <= -10) — remove condições de processo
@@ -966,7 +1141,9 @@ class CombatenteService:
     def _validar_acesso_combatente(self, combatente: Combatente, usuario) -> None:
         """Garante acesso apenas ao dono, exceto perfil administrador."""
         if usuario is None:
-            raise ArenaBaseException("Usuário autenticado é obrigatório", status_code=401)
+            raise ArenaBaseException(
+                "Usuário autenticado é obrigatório", status_code=401
+            )
 
         perfil = getattr(usuario, "perfil", None)
         if perfil in (
@@ -983,10 +1160,12 @@ class CombatenteService:
                 status_code=403,
             )
 
-    def _mensagem_dano(self, combatente: Combatente, hp_anterior: int, dano_efetivo: int) -> str:
+    def _mensagem_dano(
+        self, combatente: Combatente, hp_anterior: int, dano_efetivo: int
+    ) -> str:
         hp = combatente.hp_atual
         tipo = combatente.tipo
-        if tipo == 'monstro':
+        if tipo == "monstro":
             if hp <= 0:
                 return f"{combatente.nome} foi derrotado! 💀"
             return f"{combatente.nome} sofreu {dano_efetivo} de dano"
@@ -1004,24 +1183,31 @@ class CombatenteService:
     def _response_dano_cura(self, combatente: Combatente, mensagem: str) -> Dict:
         """SRP: serialização isolada do response de dano/cura."""
         return {
-            "id":        combatente.id,
-            "nome":      combatente.nome,
-            "hp_atual":  combatente.hp_atual,
+            "id": combatente.id,
+            "nome": combatente.nome,
+            "hp_atual": combatente.hp_atual,
             "hp_maximo": combatente.hp_maximo,
-            "mensagem":  mensagem,
+            "mensagem": mensagem,
         }
 
     @staticmethod
     def _normalizar_texto(valor: str) -> str:
         texto = str(valor or "").strip()
-        return unicodedata.normalize("NFD", texto).encode("ascii", "ignore").decode("ascii").upper()
+        return (
+            unicodedata.normalize("NFD", texto)
+            .encode("ascii", "ignore")
+            .decode("ascii")
+            .upper()
+        )
 
     def _eh_clerigo(self, classe: str) -> bool:
         return self._normalizar_texto(classe) == "CLERIGO"
 
     @staticmethod
     def _parse_dominios(dominios_raw: str) -> List[str]:
-        itens = [item.strip() for item in str(dominios_raw or "").split(",") if item.strip()]
+        itens = [
+            item.strip() for item in str(dominios_raw or "").split(",") if item.strip()
+        ]
         vistos = set()
         dominios = []
         for item in itens:
@@ -1034,7 +1220,8 @@ class CombatenteService:
 
     def _carregar_divindades_custom(self) -> list:
         """Lista de divindades customizadas (passada ao catalogo).
-        Retorna lista vazia se a tabela ainda nao existir (tolera migrations atrasadas)."""
+        Retorna lista vazia se a tabela ainda nao existir (tolera migrations atrasadas).
+        """
         try:
             return self._divindade_custom.listar()
         except Exception:  # noqa: BLE001 — defensivo para ambiente de testes
@@ -1084,7 +1271,11 @@ class CombatenteService:
             combatente_data["dominios"] = ""
             return
 
-        dominios_raw = combatente_data["dominios"] if "dominios" in combatente_data else (dominios_atuais or "")
+        dominios_raw = (
+            combatente_data["dominios"]
+            if "dominios" in combatente_data
+            else (dominios_atuais or "")
+        )
         dominios = self._parse_dominios(dominios_raw)
         if not dominios and not exigir_dois_dominios_clerigo:
             combatente_data["dominios"] = ""
@@ -1131,154 +1322,154 @@ class CombatenteService:
     def inicializar_slots_magia(self, combatente_id: int) -> Dict:
         """Inicializa slots de magia para um combatente baseado em sua classe e nível."""
         combatente = self.obter_por_id(combatente_id)
-        
+
         # Magias adicionais (Tabela 1-1): INT Mago; CAR Feiticeiro/Bardo; SAB Clérigo/Druida/Paladino/Ranger
         ATRIBUTO_CHAVE = {
-            'Mago': 'inteligencia',
-            'Feiticeiro': 'carisma',
-            'Clérigo': 'sabedoria',
-            'Druida': 'sabedoria',
-            'Bardo': 'carisma',
-            'Paladino': 'sabedoria',
-            'Ranger': 'sabedoria',
+            "Mago": "inteligencia",
+            "Feiticeiro": "carisma",
+            "Clérigo": "sabedoria",
+            "Druida": "sabedoria",
+            "Bardo": "carisma",
+            "Paladino": "sabedoria",
+            "Ranger": "sabedoria",
         }
-        
+
         # Tabela de slots por classe e nível
         TABELA_SLOTS = {
-            'Mago': [
-                [3,1,None,None,None,None,None,None,None,None],
-                [4,2,None,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [4,3,2,None,None,None,None,None,None,None],
-                [4,3,2,1,None,None,None,None,None,None],
-                [4,3,3,2,None,None,None,None,None,None],
-                [4,4,3,2,1,None,None,None,None,None],
-                [4,4,3,3,2,None,None,None,None,None],
-                [4,4,4,3,2,1,None,None,None,None],
-                [4,4,4,3,3,2,None,None,None,None],
-                [4,4,4,4,3,2,1,None,None,None],
-                [4,4,4,4,3,3,2,None,None,None],
-                [4,4,4,4,4,3,2,1,None,None],
-                [4,4,4,4,4,3,3,2,None,None],
-                [4,4,4,4,4,4,3,2,1,None],
-                [4,4,4,4,4,4,3,3,2,None],
-                [4,4,4,4,4,4,4,3,2,1],
-                [4,4,4,4,4,4,4,3,3,2],
-                [4,4,4,4,4,4,4,4,3,3],
-                [4,4,4,4,4,4,4,4,4,4],
+            "Mago": [
+                [3, 1, None, None, None, None, None, None, None, None],
+                [4, 2, None, None, None, None, None, None, None, None],
+                [4, 2, 1, None, None, None, None, None, None, None],
+                [4, 3, 2, None, None, None, None, None, None, None],
+                [4, 3, 2, 1, None, None, None, None, None, None],
+                [4, 3, 3, 2, None, None, None, None, None, None],
+                [4, 4, 3, 2, 1, None, None, None, None, None],
+                [4, 4, 3, 3, 2, None, None, None, None, None],
+                [4, 4, 4, 3, 2, 1, None, None, None, None],
+                [4, 4, 4, 3, 3, 2, None, None, None, None],
+                [4, 4, 4, 4, 3, 2, 1, None, None, None],
+                [4, 4, 4, 4, 3, 3, 2, None, None, None],
+                [4, 4, 4, 4, 4, 3, 2, 1, None, None],
+                [4, 4, 4, 4, 4, 3, 3, 2, None, None],
+                [4, 4, 4, 4, 4, 4, 3, 2, 1, None],
+                [4, 4, 4, 4, 4, 4, 3, 3, 2, None],
+                [4, 4, 4, 4, 4, 4, 4, 3, 2, 1],
+                [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],
+                [4, 4, 4, 4, 4, 4, 4, 4, 3, 3],
+                [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             ],
-            'Feiticeiro': [
-                [3,1,None,None,None,None,None,None,None,None],
-                [4,2,None,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [4,3,2,None,None,None,None,None,None,None],
-                [4,3,2,1,None,None,None,None,None,None],
-                [4,3,3,2,None,None,None,None,None,None],
-                [4,4,3,2,1,None,None,None,None,None],
-                [4,4,3,3,2,None,None,None,None,None],
-                [4,4,4,3,2,1,None,None,None,None],
-                [4,4,4,3,3,2,None,None,None,None],
-                [4,4,4,4,3,2,1,None,None,None],
-                [4,4,4,4,3,3,2,None,None,None],
-                [4,4,4,4,4,3,2,1,None,None],
-                [4,4,4,4,4,3,3,2,None,None],
-                [4,4,4,4,4,4,3,2,1,None],
-                [4,4,4,4,4,4,3,3,2,None],
-                [4,4,4,4,4,4,4,3,2,1],
-                [4,4,4,4,4,4,4,3,3,2],
-                [4,4,4,4,4,4,4,4,3,3],
-                [4,4,4,4,4,4,4,4,4,4],
+            "Feiticeiro": [
+                [3, 1, None, None, None, None, None, None, None, None],
+                [4, 2, None, None, None, None, None, None, None, None],
+                [4, 2, 1, None, None, None, None, None, None, None],
+                [4, 3, 2, None, None, None, None, None, None, None],
+                [4, 3, 2, 1, None, None, None, None, None, None],
+                [4, 3, 3, 2, None, None, None, None, None, None],
+                [4, 4, 3, 2, 1, None, None, None, None, None],
+                [4, 4, 3, 3, 2, None, None, None, None, None],
+                [4, 4, 4, 3, 2, 1, None, None, None, None],
+                [4, 4, 4, 3, 3, 2, None, None, None, None],
+                [4, 4, 4, 4, 3, 2, 1, None, None, None],
+                [4, 4, 4, 4, 3, 3, 2, None, None, None],
+                [4, 4, 4, 4, 4, 3, 2, 1, None, None],
+                [4, 4, 4, 4, 4, 3, 3, 2, None, None],
+                [4, 4, 4, 4, 4, 4, 3, 2, 1, None],
+                [4, 4, 4, 4, 4, 4, 3, 3, 2, None],
+                [4, 4, 4, 4, 4, 4, 4, 3, 2, 1],
+                [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],
+                [4, 4, 4, 4, 4, 4, 4, 4, 3, 3],
+                [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             ],
-            'Druida': [
-                [3,1,None,None,None,None,None,None,None,None],
-                [4,2,None,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [5,3,2,None,None,None,None,None,None,None],
-                [5,3,2,1,None,None,None,None,None,None],
-                [5,3,3,2,None,None,None,None,None,None],
-                [6,4,3,2,1,None,None,None,None,None],
-                [6,4,3,3,2,None,None,None,None,None],
-                [6,4,4,3,2,1,None,None,None,None],
-                [6,4,4,3,3,2,None,None,None,None],
-                [6,5,4,4,3,2,1,None,None,None],
-                [6,5,4,4,3,3,2,None,None,None],
-                [6,5,5,4,4,3,2,1,None,None],
-                [6,5,5,4,4,3,3,2,None,None],
-                [6,5,5,5,4,4,3,2,1,None],
-                [6,5,5,5,4,4,3,3,2,None],
-                [6,5,5,5,5,4,4,3,2,1],
-                [6,5,5,5,5,4,4,3,3,2],
-                [6,5,5,5,5,5,4,4,3,3],
-                [6,5,5,5,5,5,4,4,4,4],
+            "Druida": [
+                [3, 1, None, None, None, None, None, None, None, None],
+                [4, 2, None, None, None, None, None, None, None, None],
+                [4, 2, 1, None, None, None, None, None, None, None],
+                [5, 3, 2, None, None, None, None, None, None, None],
+                [5, 3, 2, 1, None, None, None, None, None, None],
+                [5, 3, 3, 2, None, None, None, None, None, None],
+                [6, 4, 3, 2, 1, None, None, None, None, None],
+                [6, 4, 3, 3, 2, None, None, None, None, None],
+                [6, 4, 4, 3, 2, 1, None, None, None, None],
+                [6, 4, 4, 3, 3, 2, None, None, None, None],
+                [6, 5, 4, 4, 3, 2, 1, None, None, None],
+                [6, 5, 4, 4, 3, 3, 2, None, None, None],
+                [6, 5, 5, 4, 4, 3, 2, 1, None, None],
+                [6, 5, 5, 4, 4, 3, 3, 2, None, None],
+                [6, 5, 5, 5, 4, 4, 3, 2, 1, None],
+                [6, 5, 5, 5, 4, 4, 3, 3, 2, None],
+                [6, 5, 5, 5, 5, 4, 4, 3, 2, 1],
+                [6, 5, 5, 5, 5, 4, 4, 3, 3, 2],
+                [6, 5, 5, 5, 5, 5, 4, 4, 3, 3],
+                [6, 5, 5, 5, 5, 5, 4, 4, 4, 4],
             ],
-            'Bardo': [
-                [3,1,None,None,None,None,None,None,None,None],
-                [4,2,None,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [4,3,2,None,None,None,None,None,None,None],
-                [4,3,2,1,None,None,None,None,None,None],
-                [4,3,3,2,None,None,None,None,None,None],
-                [4,4,3,2,1,None,None,None,None,None],
-                [4,4,3,3,2,None,None,None,None,None],
-                [4,4,4,3,2,1,None,None,None,None],
-                [4,4,4,3,3,2,None,None,None,None],
-                [4,4,4,4,3,2,1,None,None,None],
-                [4,4,4,4,3,3,2,None,None,None],
-                [4,4,4,4,4,3,2,1,None,None],
-                [4,4,4,4,4,3,3,2,None,None],
-                [4,4,4,4,4,4,3,2,1,None],
-                [4,4,4,4,4,4,3,3,2,None],
-                [4,4,4,4,4,4,4,3,2,1],
-                [4,4,4,4,4,4,4,3,3,2],
-                [4,4,4,4,4,4,4,4,3,3],
-                [4,4,4,4,4,4,4,4,4,4],
+            "Bardo": [
+                [3, 1, None, None, None, None, None, None, None, None],
+                [4, 2, None, None, None, None, None, None, None, None],
+                [4, 2, 1, None, None, None, None, None, None, None],
+                [4, 3, 2, None, None, None, None, None, None, None],
+                [4, 3, 2, 1, None, None, None, None, None, None],
+                [4, 3, 3, 2, None, None, None, None, None, None],
+                [4, 4, 3, 2, 1, None, None, None, None, None],
+                [4, 4, 3, 3, 2, None, None, None, None, None],
+                [4, 4, 4, 3, 2, 1, None, None, None, None],
+                [4, 4, 4, 3, 3, 2, None, None, None, None],
+                [4, 4, 4, 4, 3, 2, 1, None, None, None],
+                [4, 4, 4, 4, 3, 3, 2, None, None, None],
+                [4, 4, 4, 4, 4, 3, 2, 1, None, None],
+                [4, 4, 4, 4, 4, 3, 3, 2, None, None],
+                [4, 4, 4, 4, 4, 4, 3, 2, 1, None],
+                [4, 4, 4, 4, 4, 4, 3, 3, 2, None],
+                [4, 4, 4, 4, 4, 4, 4, 3, 2, 1],
+                [4, 4, 4, 4, 4, 4, 4, 3, 3, 2],
+                [4, 4, 4, 4, 4, 4, 4, 4, 3, 3],
+                [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
             ],
-            'Paladino': [
-                [None,None,None,None,None,None,None,None,None,None],
-                [None,None,None,None,None,None,None,None,None,None],
-                [3,1,None,None,None,None,None,None,None,None],
-                [3,1,None,None,None,None,None,None,None,None],
-                [4,2,None,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [4,3,2,None,None,None,None,None,None,None],
-                [4,3,2,None,None,None,None,None,None,None],
-                [4,3,2,1,None,None,None,None,None,None],
-                [4,3,3,2,None,None,None,None,None,None],
-                [4,3,3,2,None,None,None,None,None,None],
-                [4,4,3,3,None,None,None,None,None,None],
-                [4,4,3,3,1,None,None,None,None,None],
-                [4,4,3,3,1,None,None,None,None,None],
-                [4,4,4,3,2,None,None,None,None,None],
-                [4,4,4,3,2,None,None,None,None,None],
-                [4,4,4,4,2,1,None,None,None,None],
-                [4,4,4,4,3,1,None,None,None,None],
-                [4,4,4,4,3,2,None,None,None,None],
+            "Paladino": [
+                [None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None],
+                [3, 1, None, None, None, None, None, None, None, None],
+                [3, 1, None, None, None, None, None, None, None, None],
+                [4, 2, None, None, None, None, None, None, None, None],
+                [4, 2, 1, None, None, None, None, None, None, None],
+                [4, 2, 1, None, None, None, None, None, None, None],
+                [4, 3, 2, None, None, None, None, None, None, None],
+                [4, 3, 2, None, None, None, None, None, None, None],
+                [4, 3, 2, 1, None, None, None, None, None, None],
+                [4, 3, 3, 2, None, None, None, None, None, None],
+                [4, 3, 3, 2, None, None, None, None, None, None],
+                [4, 4, 3, 3, None, None, None, None, None, None],
+                [4, 4, 3, 3, 1, None, None, None, None, None],
+                [4, 4, 3, 3, 1, None, None, None, None, None],
+                [4, 4, 4, 3, 2, None, None, None, None, None],
+                [4, 4, 4, 3, 2, None, None, None, None, None],
+                [4, 4, 4, 4, 2, 1, None, None, None, None],
+                [4, 4, 4, 4, 3, 1, None, None, None, None],
+                [4, 4, 4, 4, 3, 2, None, None, None, None],
             ],
-            'Ranger': [
-                [None,None,None,None,None,None,None,None,None,None],
-                [None,None,None,None,None,None,None,None,None,None],
-                [3,1,None,None,None,None,None,None,None,None],
-                [3,1,None,None,None,None,None,None,None,None],
-                [4,2,None,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [4,2,1,None,None,None,None,None,None,None],
-                [4,3,2,None,None,None,None,None,None,None],
-                [4,3,2,None,None,None,None,None,None,None],
-                [4,3,2,1,None,None,None,None,None,None],
-                [4,3,3,2,None,None,None,None,None,None],
-                [4,3,3,2,None,None,None,None,None,None],
-                [4,4,3,3,None,None,None,None,None,None],
-                [4,4,3,3,1,None,None,None,None,None],
-                [4,4,3,3,1,None,None,None,None,None],
-                [4,4,4,3,2,None,None,None,None,None],
-                [4,4,4,3,2,None,None,None,None,None],
-                [4,4,4,4,2,1,None,None,None,None],
-                [4,4,4,4,3,1,None,None,None,None],
-                [4,4,4,4,3,2,None,None,None,None],
+            "Ranger": [
+                [None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None],
+                [3, 1, None, None, None, None, None, None, None, None],
+                [3, 1, None, None, None, None, None, None, None, None],
+                [4, 2, None, None, None, None, None, None, None, None],
+                [4, 2, 1, None, None, None, None, None, None, None],
+                [4, 2, 1, None, None, None, None, None, None, None],
+                [4, 3, 2, None, None, None, None, None, None, None],
+                [4, 3, 2, None, None, None, None, None, None, None],
+                [4, 3, 2, 1, None, None, None, None, None, None],
+                [4, 3, 3, 2, None, None, None, None, None, None],
+                [4, 3, 3, 2, None, None, None, None, None, None],
+                [4, 4, 3, 3, None, None, None, None, None, None],
+                [4, 4, 3, 3, 1, None, None, None, None, None],
+                [4, 4, 3, 3, 1, None, None, None, None, None],
+                [4, 4, 4, 3, 2, None, None, None, None, None],
+                [4, 4, 4, 3, 2, None, None, None, None, None],
+                [4, 4, 4, 4, 2, 1, None, None, None, None],
+                [4, 4, 4, 4, 3, 1, None, None, None, None],
+                [4, 4, 4, 4, 3, 2, None, None, None, None],
             ],
         }
-        
+
         classe = combatente.classe
         tabla = TABELA_SLOTS.get(classe)
 
@@ -1297,16 +1488,18 @@ class CombatenteService:
 
         # Verificar se a classe tem slots disponíveis neste nível
         tem_slots = any(slot is not None for slot in linha_slots)
-        
+
         if not tem_slots:
-            raise DadosInvalidos(f"Classe {classe} não ganha slots de magia até o nível 3. Nível atual: {nivel}")
+            raise DadosInvalidos(
+                f"Classe {classe} não ganha slots de magia até o nível 3. Nível atual: {nivel}"
+            )
 
         bonus_row = _bonus_magias_por_modificador(modificador)
 
         # Deletar slots existentes
         for slot in combatente.magias_slots:
             self.repository.db.delete(slot)
-        
+
         # Criar novos slots
         slots_criados = []
         for nivel_magia, base in enumerate(linha_slots):
@@ -1323,18 +1516,18 @@ class CombatenteService:
                 combatente_id=combatente_id,
                 nivel=nivel_magia,
                 total=total_slots,
-                usados=0
+                usados=0,
             )
             self.repository.db.add(novo_slot)
             slots_criados.append(novo_slot)
-        
+
         commit_with_rollback(self.repository.db)
         self.repository.db.refresh(combatente)
-        
+
         return {
             "id": combatente_id,
             "classe": classe,
             "nivel": nivel,
             "slots_criados": len(slots_criados),
-            "message": f"Slots inicializados para {combatente.nome}"
+            "message": f"Slots inicializados para {combatente.nome}",
         }

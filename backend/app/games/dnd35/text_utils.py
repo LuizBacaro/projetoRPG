@@ -3,9 +3,9 @@ Normalização de texto para classes e listas de magia (D&D 3.5).
 
 Usado por routers, repositórios e services do pacote `app.games.dnd35`.
 """
+
 import re
 import unicodedata
-
 
 # Aliases canônicos de classe — mapeiam variantes para o nome normalizado no contexto de acesso
 # (ex.: Feiticeiro usa lista de magias do Mago em D&D 3.5)

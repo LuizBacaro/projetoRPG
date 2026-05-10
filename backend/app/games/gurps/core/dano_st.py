@@ -48,4 +48,3 @@ def dano_thr_sw_por_st(st_valor: int) -> Tuple[str, str]:
     if st >= 30:
         return _ST_DAMAGE_TABLE[30]
     return _ST_DAMAGE_TABLE[st]
-

@@ -2,8 +2,9 @@
 Schemas Pydantic para a camada multi-jogo (Auth Hub).
 SRP: contratos de catálogo de jogos, memberships e troca de jogo ativo.
 """
-from typing import List, Optional
+
 from datetime import datetime
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 

@@ -8,26 +8,27 @@ Política multi-jogo:
 - Membership é criado on-demand para slugs em `AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS`
   (ex.: `dnd35`, `gurps`) quando o usuário entra no jogo ou carrega o catálogo.
 """
+
 from datetime import timedelta
 from typing import List, Optional, Tuple
 
 from fastapi import HTTPException, status
 
 from ...shared.core.config import settings
-from ..core.security import criar_token
 from ..constants import AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS, GAME_SLUG_DND35
+from ..core.security import criar_token
 from ..models.game import Game, UserGameMembership
 from ..models.usuario import Usuario
 from ..ports import GameRepositoryProtocol, UserGameMembershipRepositoryProtocol
 from ..schemas.game import (
+    PERFIS_VALIDOS_NO_JOGO,
     GameResponse,
-    UserGameMembershipResponse,
-    TokenComJogoResponse,
+    MembershipAdminCreate,
     MembershipAdminItem,
     MembershipAdminListResponse,
-    MembershipAdminCreate,
     MembershipAdminUpdate,
-    PERFIS_VALIDOS_NO_JOGO,
+    TokenComJogoResponse,
+    UserGameMembershipResponse,
 )
 
 
@@ -45,9 +46,7 @@ class GameService:
     def listar_catalogo(self) -> List[GameResponse]:
         return [GameResponse.model_validate(g) for g in self.games.listar_disponiveis()]
 
-    def listar_memberships(
-        self, usuario: Usuario
-    ) -> List[UserGameMembershipResponse]:
+    def listar_memberships(self, usuario: Usuario) -> List[UserGameMembershipResponse]:
         memberships = self.memberships.listar_por_usuario(usuario.id)
         return [
             UserGameMembershipResponse(
@@ -105,9 +104,7 @@ class GameService:
 
     # ── Seleção de jogo ─────────────────────────────────────────────────
 
-    def selecionar_jogo(
-        self, usuario: Usuario, game_slug: str
-    ) -> TokenComJogoResponse:
+    def selecionar_jogo(self, usuario: Usuario, game_slug: str) -> TokenComJogoResponse:
         slug = (game_slug or "").strip().lower()
         if not slug:
             raise HTTPException(
@@ -268,9 +265,7 @@ class GameService:
                 detail=f"Usuário id={payload.usuario_id} não encontrado",
             )
 
-        existente = self.memberships.buscar_por_usuario_e_game_id(
-            usuario.id, game.id
-        )
+        existente = self.memberships.buscar_por_usuario_e_game_id(usuario.id, game.id)
         if existente is not None:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -332,9 +327,7 @@ class GameService:
         )
         return self._serializar_membership_admin(atualizado, usuario)
 
-    def revogar_membership_admin(
-        self, game_slug: str, membership_id: int
-    ) -> None:
+    def revogar_membership_admin(self, game_slug: str, membership_id: int) -> None:
         game = self._exigir_game_por_slug(game_slug)
         membership = self.memberships.get_by_id(membership_id)
         if membership is None or membership.game_id != game.id:

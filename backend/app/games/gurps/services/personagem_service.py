@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from decimal import Decimal, ROUND_FLOOR
+from decimal import ROUND_FLOOR, Decimal
 from typing import List, Optional
 
 from app.games.gurps.core.dano_st import dano_thr_sw_por_st
@@ -53,7 +53,9 @@ class GurpsPersonagemService:
     def catalogo_pericias_lite(self) -> List[dict]:
         return listar_pericias_lite()
 
-    def _validar_pre_requisitos_pericias(self, *, pericias: List[dict], st: int, dx: int, iq: int, ht: int, per: int) -> None:
+    def _validar_pre_requisitos_pericias(
+        self, *, pericias: List[dict], st: int, dx: int, iq: int, ht: int, per: int
+    ) -> None:
         erros = validar_pre_requisitos_lite(
             pericias=pericias,
             st_valor=st,
@@ -139,9 +141,14 @@ class GurpsPersonagemService:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         return p
 
-    def criar(self, usuario: Usuario, payload: GurpsPersonagemCreate) -> GurpsPersonagemResponse:
+    def criar(
+        self, usuario: Usuario, payload: GurpsPersonagemCreate
+    ) -> GurpsPersonagemResponse:
         self._validar_tipo(payload.tipo)
-        if usuario.perfil == PerfilUsuario.JOGADOR and payload.tipo.lower() != "jogador":
+        if (
+            usuario.perfil == PerfilUsuario.JOGADOR
+            and payload.tipo.lower() != "jogador"
+        ):
             raise DadosInvalidos("Jogadores so podem criar fichas do tipo jogador")
         nome = (payload.nome or "").strip()
         if not nome:
@@ -161,11 +168,15 @@ class GurpsPersonagemService:
             percepcao_valor = payload.iq_valor
 
         pvs_atual = payload.pvs_atual if payload.pvs_atual is not None else pvs_valor
-        fadiga_atual = payload.fadiga_atual if payload.fadiga_atual is not None else fadiga_valor
+        fadiga_atual = (
+            payload.fadiga_atual if payload.fadiga_atual is not None else fadiga_valor
+        )
 
         velocidade_valor = payload.velocidade_valor
         if "velocidade_valor" not in payload.model_fields_set:
-            velocidade_valor = self._calcular_velocidade_basica(payload.ht_valor, payload.dx_valor)
+            velocidade_valor = self._calcular_velocidade_basica(
+                payload.ht_valor, payload.dx_valor
+            )
         deslocamento_valor = payload.deslocamento_valor
         if "deslocamento_valor" not in payload.model_fields_set:
             deslocamento_valor = self._calcular_deslocamento_basico(velocidade_valor)
@@ -174,7 +185,10 @@ class GurpsPersonagemService:
             esquiva_valor = self._calcular_esquiva_basica(velocidade_valor)
         dano_impacto = payload.dano_impacto
         dano_balanco = payload.dano_balanco
-        if "dano_impacto" not in payload.model_fields_set or "dano_balanco" not in payload.model_fields_set:
+        if (
+            "dano_impacto" not in payload.model_fields_set
+            or "dano_balanco" not in payload.model_fields_set
+        ):
             thr, sw = dano_thr_sw_por_st(payload.st_valor)
             if "dano_impacto" not in payload.model_fields_set:
                 dano_impacto = thr
@@ -274,7 +288,9 @@ class GurpsPersonagemService:
         if "velocidade_valor" not in campos_enviados and (
             "ht_valor" in campos_enviados or "dx_valor" in campos_enviados
         ):
-            nova_vb = self._calcular_velocidade_basica(ent.ht_valor or 0, ent.dx_valor or 0)
+            nova_vb = self._calcular_velocidade_basica(
+                ent.ht_valor or 0, ent.dx_valor or 0
+            )
             ent.velocidade_valor = nova_vb
             if "deslocamento_valor" not in campos_enviados:
                 ent.deslocamento_valor = self._calcular_deslocamento_basico(nova_vb)
@@ -282,7 +298,9 @@ class GurpsPersonagemService:
                 ent.esquiva = self._calcular_esquiva_basica(nova_vb)
 
         if "velocidade_valor" in campos_enviados and "esquiva" not in campos_enviados:
-            ent.esquiva = self._calcular_esquiva_basica(ent.velocidade_valor or Decimal("0"))
+            ent.esquiva = self._calcular_esquiva_basica(
+                ent.velocidade_valor or Decimal("0")
+            )
 
         if "st_valor" in campos_enviados and "pvs_valor" not in campos_enviados:
             novo_pv_max = ent.st_valor or 0
@@ -291,7 +309,8 @@ class GurpsPersonagemService:
             if "pvs_atual" not in campos_enviados:
                 ent.pvs_atual = min(pv_atual_antigo, novo_pv_max)
         if "st_valor" in campos_enviados and (
-            "dano_impacto" not in campos_enviados or "dano_balanco" not in campos_enviados
+            "dano_impacto" not in campos_enviados
+            or "dano_balanco" not in campos_enviados
         ):
             thr, sw = dano_thr_sw_por_st(ent.st_valor or 0)
             if "dano_impacto" not in campos_enviados:

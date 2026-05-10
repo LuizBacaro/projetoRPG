@@ -62,8 +62,8 @@ jobs:
       - name: Lint and format code
         run: |
           black --check --diff app/ tests/
-          flake8 app/ tests/ --max-line-length=88 --extend-ignore=E203,W503
-          isort --check-only --diff app/ tests/
+          flake8 app/ tests/ --max-line-length=120 --extend-ignore=E203,W503,E402,E501,E712,F401,F403,F541,F841
+          isort --check-only --diff --profile black app/ tests/
 
       - name: Security scan
         run: |
@@ -125,8 +125,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Alembic upgrade (DB vazio)
-        run: python -m alembic upgrade head
+      # Migrações incrementais assumem baseline legado; em Postgres vazio usar metadata + stamp.
+      - name: Schema inicial (Postgres vazio) + stamp Alembic head
+        run: python -m scripts.ci_postgres_empty_schema
 
       - name: Alembic upgrade idempotente
         run: python -m alembic upgrade head

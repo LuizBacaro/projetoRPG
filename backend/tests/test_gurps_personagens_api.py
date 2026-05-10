@@ -13,7 +13,9 @@ from fastapi.testclient import TestClient
 from app.core.dependencies import get_file_service
 from app.games.gurps.api.v1.personagens import router as gurps_personagens_router
 from app.games.gurps.catalogs.lite_catalog import montar_catalogo_de_arquivos
-from app.games.gurps.repositories.catalogo_ficha_repository import repopular_catalogo_ficha_de_arquivos
+from app.games.gurps.repositories.catalogo_ficha_repository import (
+    repopular_catalogo_ficha_de_arquivos,
+)
 from app.games.gurps.schemas.personagem import GURPS_EXTRAS_MAX_JSON_BYTES
 from app.services.file_service import FileService
 from app.shared.core.database import get_db
@@ -147,7 +149,9 @@ def test_post_foto_atualiza_foto_url(gurps_personagens_db, monkeypatch, tmp_path
     monkeypatch.setattr("app.services.file_service.settings.CLOUDINARY_API_SECRET", "")
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024 * 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     app = FastAPI()
     app.include_router(gurps_personagens_router, prefix="/api/v1")
@@ -181,14 +185,18 @@ def test_post_foto_atualiza_foto_url(gurps_personagens_db, monkeypatch, tmp_path
     assert r2.json()["foto_url"] == url
 
 
-def test_post_segunda_foto_remove_arquivo_anterior(gurps_personagens_db, monkeypatch, tmp_path):
+def test_post_segunda_foto_remove_arquivo_anterior(
+    gurps_personagens_db, monkeypatch, tmp_path
+):
     SessionLocal, u1, _ = gurps_personagens_db
     monkeypatch.setattr("app.services.file_service.settings.CLOUDINARY_CLOUD_NAME", "")
     monkeypatch.setattr("app.services.file_service.settings.CLOUDINARY_API_KEY", "")
     monkeypatch.setattr("app.services.file_service.settings.CLOUDINARY_API_SECRET", "")
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024 * 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     app = FastAPI()
     app.include_router(gurps_personagens_router, prefix="/api/v1")
@@ -244,8 +252,14 @@ def test_jogador_lista_apenas_próprios(gurps_personagens_db):
     c1 = _build_client(SessionLocal, _usuario(u1))
     c2 = _build_client(SessionLocal, _usuario(u2))
 
-    assert c1.post("/api/v1/gurps/personagens", json=_payload_criar(nome="P1")).status_code == 201
-    assert c2.post("/api/v1/gurps/personagens", json=_payload_criar(nome="P2")).status_code == 201
+    assert (
+        c1.post("/api/v1/gurps/personagens", json=_payload_criar(nome="P1")).status_code
+        == 201
+    )
+    assert (
+        c2.post("/api/v1/gurps/personagens", json=_payload_criar(nome="P2")).status_code
+        == 201
+    )
 
     r1 = c1.get("/api/v1/gurps/personagens")
     assert r1.status_code == 200
@@ -274,7 +288,9 @@ def test_criar_calcula_vb_e_deslocamento_quando_omitidos(gurps_personagens_db):
     assert body["deslocamento_valor"] == 5
 
 
-def test_patch_ht_dx_recalcula_vb_e_deslocamento_quando_nao_override(gurps_personagens_db):
+def test_patch_ht_dx_recalcula_vb_e_deslocamento_quando_nao_override(
+    gurps_personagens_db,
+):
     SessionLocal, u1, _ = gurps_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
     pid = client.post(
@@ -320,7 +336,9 @@ def test_patch_st_ht_recalcula_maximos_sem_override(gurps_personagens_db):
         f"/api/v1/gurps/personagens/{pid}",
         json={"pvs_atual": 6, "fadiga_atual": 5},
     )
-    r = client.patch(f"/api/v1/gurps/personagens/{pid}", json={"st_valor": 8, "ht_valor": 9})
+    r = client.patch(
+        f"/api/v1/gurps/personagens/{pid}", json={"st_valor": 8, "ht_valor": 9}
+    )
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["pvs_valor"] == 8
@@ -379,7 +397,9 @@ def test_patch_vb_recalcula_esquiva_sem_override(gurps_personagens_db):
         json=_payload_criar(nome="EsquivaRecalc", velocidade_valor=5.0),
     ).json()["id"]
 
-    r = client.patch(f"/api/v1/gurps/personagens/{pid}", json={"velocidade_valor": 7.25})
+    r = client.patch(
+        f"/api/v1/gurps/personagens/{pid}", json={"velocidade_valor": 7.25}
+    )
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["esquiva"] == 10  # floor(7.25) + 3
@@ -427,7 +447,9 @@ def test_catalogo_pericias_lite_disponivel(gurps_personagens_db):
     assert "Medicina" in nomes
 
 
-def test_catalogo_lite_ficha_retorna_pericias_vantagens_desvantagens(gurps_personagens_db):
+def test_catalogo_lite_ficha_retorna_pericias_vantagens_desvantagens(
+    gurps_personagens_db,
+):
     SessionLocal, u1, _ = gurps_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
 
@@ -436,7 +458,9 @@ def test_catalogo_lite_ficha_retorna_pericias_vantagens_desvantagens(gurps_perso
     body = r.json()
     assert isinstance(body.get("pericias"), list) and len(body["pericias"]) >= 50
     assert isinstance(body.get("vantagens"), list) and len(body["vantagens"]) >= 50
-    assert isinstance(body.get("desvantagens"), list) and len(body["desvantagens"]) >= 50
+    assert (
+        isinstance(body.get("desvantagens"), list) and len(body["desvantagens"]) >= 50
+    )
     assert body["pericias"][0].get("nome")
     assert "meta" in body and "custos_atributos" in body["meta"]
     assert "custos_pontos_fonte" in body["meta"]
@@ -460,7 +484,9 @@ def test_catalogo_lite_ficha_via_banco_apos_seed(gurps_personagens_db):
     assert r.status_code == 200, r.text
     body = r.json()
     assert len(body["pericias"]) == len(esperado["pericias"])
-    assert {p["nome"] for p in body["pericias"]} == {p["nome"] for p in esperado["pericias"]}
+    assert {p["nome"] for p in body["pericias"]} == {
+        p["nome"] for p in esperado["pericias"]
+    }
     assert len(body["vantagens"]) == len(esperado["vantagens"])
     assert len(body["desvantagens"]) == len(esperado["desvantagens"])
     assert "custos_atributos" in body["meta"]

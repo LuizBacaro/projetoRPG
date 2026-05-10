@@ -1,7 +1,7 @@
 """Modelos canônicos do Auth Hub em `app.shared.models`."""
 
-from .usuario import PerfilUsuario, Usuario
 from .game import Game, UserGameMembership
+from .usuario import PerfilUsuario, Usuario
 
 __all__ = [
     "PerfilUsuario",

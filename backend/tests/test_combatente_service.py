@@ -1,8 +1,10 @@
 """
 Testes unitários para CombatenteService
 """
+
+from unittest.mock import MagicMock, Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
 
 
 def _mock_repo_db_chain(mock_repository: Mock) -> None:
@@ -13,22 +15,27 @@ def _mock_repo_db_chain(mock_repository: Mock) -> None:
     chain.join.return_value = chain
     chain.filter.return_value = chain
     chain.all.return_value = []
-from app.games.dnd35.services.combatente_service import CombatenteService
+
+
 from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.services.combatente_service import CombatenteService
+from app.shared.exceptions.custom_exceptions import (
+    CombatenteNaoEncontrado,
+    DadosInvalidos,
+)
 from app.shared.models.usuario import PerfilUsuario
-from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado, DadosInvalidos
 
 
 class TestCombatenteService:
     """Testes para o serviço de combatente"""
-    
+
     @pytest.fixture
     def mock_repository(self):
         """Mock do repository"""
         mock = Mock()
         _mock_repo_db_chain(mock)
         return mock
-    
+
     @pytest.fixture
     def mock_file_service(self):
         """Mock do file service"""
@@ -38,44 +45,83 @@ class TestCombatenteService:
     def mock_condicao_repository(self):
         """Mock do repository de condições"""
         return Mock()
-    
+
     @pytest.fixture
     def service(self, mock_repository, mock_file_service):
         """Instância do service com mocks"""
         return CombatenteService(mock_repository, mock_file_service)
 
     @pytest.fixture
-    def service_com_condicoes(self, mock_repository, mock_file_service, mock_condicao_repository):
+    def service_com_condicoes(
+        self, mock_repository, mock_file_service, mock_condicao_repository
+    ):
         """Instância do service com integração de condições"""
-        return CombatenteService(mock_repository, mock_file_service, mock_condicao_repository)
-    
+        return CombatenteService(
+            mock_repository, mock_file_service, mock_condicao_repository
+        )
+
     def test_listar_todos(self, service, mock_repository):
         """Testa listagem de todos os combatentes"""
         # Arrange
         combatentes_mock = [
-            Combatente(id=1, nome="Theron", tipo="jogador", classe="Guerreiro", hp_maximo=85, hp_atual=85, iniciativa=15),
-            Combatente(id=2, nome="Lyra", tipo="jogador", classe="Mago", hp_maximo=45, hp_atual=45, iniciativa=18)
+            Combatente(
+                id=1,
+                nome="Theron",
+                tipo="jogador",
+                classe="Guerreiro",
+                hp_maximo=85,
+                hp_atual=85,
+                iniciativa=15,
+            ),
+            Combatente(
+                id=2,
+                nome="Lyra",
+                tipo="jogador",
+                classe="Mago",
+                hp_maximo=45,
+                hp_atual=45,
+                iniciativa=18,
+            ),
         ]
         mock_repository.get_all.return_value = combatentes_mock
-        
+
         # Act
         resultado = service.listar_todos()
-        
+
         # Assert
         assert len(resultado) == 2
         assert resultado[0].nome == "Theron"
         mock_repository.get_all.assert_called_once()
 
-    def test_listar_todos_para_jogador_retorna_apenas_propriedade(self, service, mock_repository):
+    def test_listar_todos_para_jogador_retorna_apenas_propriedade(
+        self, service, mock_repository
+    ):
         """Jogador vê apenas seus próprios combatentes, independente do tipo."""
+
         class _UsuarioDummy:
             perfil = PerfilUsuario.JOGADOR
             id = 42
 
         # Jogador pode possuir combatentes de vários tipos
         combatentes_mock = [
-            Combatente(id=1, nome="Theron", tipo="jogador", classe="Guerreiro", hp_maximo=85, hp_atual=85, iniciativa=15),
-            Combatente(id=2, nome="Famélico", tipo="npc", classe="Lobo", hp_maximo=20, hp_atual=20, iniciativa=10),
+            Combatente(
+                id=1,
+                nome="Theron",
+                tipo="jogador",
+                classe="Guerreiro",
+                hp_maximo=85,
+                hp_atual=85,
+                iniciativa=15,
+            ),
+            Combatente(
+                id=2,
+                nome="Famélico",
+                tipo="npc",
+                classe="Lobo",
+                hp_maximo=20,
+                hp_atual=20,
+                iniciativa=10,
+            ),
         ]
         mock_repository.get_by_owner.return_value = combatentes_mock
 
@@ -94,33 +140,40 @@ class TestCombatenteService:
 
         assert len(resultado_npc) == 1
         assert resultado_npc[0].tipo == "npc"
-        mock_repository.get_by_owner_and_tipo.assert_called_once_with(42, "npc", skip=0, limit=100)
-    
+        mock_repository.get_by_owner_and_tipo.assert_called_once_with(
+            42, "npc", skip=0, limit=100
+        )
+
     def test_obter_por_id_sucesso(self, service, mock_repository):
         """Testa obter combatente por ID - sucesso"""
         # Arrange
         combatente_mock = Combatente(
-            id=1, nome="Theron", tipo="jogador", classe="Guerreiro",
-            hp_maximo=85, hp_atual=85, iniciativa=15
+            id=1,
+            nome="Theron",
+            tipo="jogador",
+            classe="Guerreiro",
+            hp_maximo=85,
+            hp_atual=85,
+            iniciativa=15,
         )
         mock_repository.get_by_id.return_value = combatente_mock
-        
+
         # Act
         resultado = service.obter_por_id(1)
-        
+
         # Assert
         assert resultado.nome == "Theron"
         mock_repository.get_by_id.assert_called_once_with(1)
-    
+
     def test_obter_por_id_nao_encontrado(self, service, mock_repository):
         """Testa obter combatente por ID - não encontrado"""
         # Arrange
         mock_repository.get_by_id.return_value = None
-        
+
         # Act & Assert
         with pytest.raises(CombatenteNaoEncontrado):
             service.obter_por_id(999)
-    
+
     def test_criar_combatente(self, service, mock_repository, mock_file_service):
         """Testa criação de combatente"""
         # Arrange
@@ -129,43 +182,55 @@ class TestCombatenteService:
             "tipo": "jogador",
             "classe": "Guerreiro",
             "hp_maximo": 100,
-            "iniciativa": 15
+            "iniciativa": 15,
         }
-        
+
         combatente_criado = Combatente(id=1, hp_atual=100, **combatente_data)
         mock_repository.create.return_value = combatente_criado
         mock_repository.get_by_id.return_value = combatente_criado
-        
+
         # Act
         resultado = service.criar(combatente_data)
-        
+
         # Assert
         assert resultado.id == 1
         assert resultado.nome == "Novo Guerreiro"
         assert resultado.hp_atual == resultado.hp_maximo
         mock_repository.create.assert_called_once()
-    
+
     def test_aplicar_dano(self, service, mock_repository):
         """Testa aplicação de dano"""
         # Arrange
         combatente_mock = Combatente(
-            id=1, nome="Theron", tipo="jogador", classe="Guerreiro",
-            hp_maximo=85, hp_atual=85, iniciativa=15
+            id=1,
+            nome="Theron",
+            tipo="jogador",
+            classe="Guerreiro",
+            hp_maximo=85,
+            hp_atual=85,
+            iniciativa=15,
         )
         mock_repository.get_by_id.return_value = combatente_mock
-        
+
         # Act
         resultado = service.aplicar_dano(1, 20)
-        
+
         # Assert
-        assert resultado['hp_atual'] == 65
+        assert resultado["hp_atual"] == 65
         mock_repository.update.assert_called_once()
 
-    def test_atualizar_hp_jogador_aceita_negativo_ate_menos_dez(self, service, mock_repository):
+    def test_atualizar_hp_jogador_aceita_negativo_ate_menos_dez(
+        self, service, mock_repository
+    ):
         """Jogador pode descer até -10 (D&D 3.5: morrendo/morto)."""
         combatente_mock = Combatente(
-            id=1, nome="Theron", tipo="jogador", classe="Guerreiro",
-            hp_maximo=20, hp_atual=5, iniciativa=10,
+            id=1,
+            nome="Theron",
+            tipo="jogador",
+            classe="Guerreiro",
+            hp_maximo=20,
+            hp_atual=5,
+            iniciativa=10,
         )
         mock_repository.get_by_id.return_value = combatente_mock
         mock_repository.update.return_value = combatente_mock
@@ -184,8 +249,13 @@ class TestCombatenteService:
     def test_atualizar_hp_monstro_clampa_no_zero(self, service, mock_repository):
         """Monstro continua morrendo a 0 — não fica negativo via atualização direta."""
         combatente_mock = Combatente(
-            id=2, nome="Goblin", tipo="monstro", classe="Goblin",
-            hp_maximo=8, hp_atual=4, iniciativa=12,
+            id=2,
+            nome="Goblin",
+            tipo="monstro",
+            classe="Goblin",
+            hp_maximo=8,
+            hp_atual=4,
+            iniciativa=12,
         )
         mock_repository.get_by_id.return_value = combatente_mock
         mock_repository.update.return_value = combatente_mock
@@ -193,7 +263,9 @@ class TestCombatenteService:
         service.atualizar_hp(2, -5)
         assert combatente_mock.hp_atual == 0
 
-    def test_sincronizar_estado_hp_faz_commit_unico(self, service_com_condicoes, mock_condicao_repository):
+    def test_sincronizar_estado_hp_faz_commit_unico(
+        self, service_com_condicoes, mock_condicao_repository
+    ):
         combatente = Combatente(
             id=1,
             nome="Theron",
@@ -212,10 +284,14 @@ class TestCombatenteService:
         service_com_condicoes._sincronizar_estado_hp(combatente)
 
         mock_condicao_repository.remover.assert_called_once_with(1, 20, commit=False)
-        mock_condicao_repository.aplicar.assert_called_once_with(1, 10, duracao_turnos=-1, commit=False)
+        mock_condicao_repository.aplicar.assert_called_once_with(
+            1, 10, duracao_turnos=-1, commit=False
+        )
         mock_condicao_repository.commit.assert_called_once()
 
-    def test_cache_id_condicao_evitar_lookup_repetido(self, service_com_condicoes, mock_condicao_repository):
+    def test_cache_id_condicao_evitar_lookup_repetido(
+        self, service_com_condicoes, mock_condicao_repository
+    ):
         mock_condicao_repository.get_by_nome.return_value = Mock(id=99)
 
         primeiro = service_com_condicoes._id_condicao("Inconsciente")
@@ -225,7 +301,9 @@ class TestCombatenteService:
         assert segundo == 99
         mock_condicao_repository.get_by_nome.assert_called_once_with("Inconsciente")
 
-    def test_criar_clerigo_exige_exatamente_dois_dominios(self, service, mock_repository):
+    def test_criar_clerigo_exige_exatamente_dois_dominios(
+        self, service, mock_repository
+    ):
         combatente_data = {
             "nome": "Aela",
             "tipo": "jogador",
@@ -240,7 +318,9 @@ class TestCombatenteService:
 
         mock_repository.create.assert_not_called()
 
-    def test_criar_clerigo_sem_dominios_permitido_no_cadastro_inicial(self, service, mock_repository):
+    def test_criar_clerigo_sem_dominios_permitido_no_cadastro_inicial(
+        self, service, mock_repository
+    ):
         combatente_data = {
             "nome": "Luzia",
             "tipo": "jogador",
@@ -249,7 +329,9 @@ class TestCombatenteService:
             "iniciativa": 1,
         }
 
-        combatente_criado = Combatente(id=2, hp_atual=16, dominios="", **combatente_data)
+        combatente_criado = Combatente(
+            id=2, hp_atual=16, dominios="", **combatente_data
+        )
         mock_repository.create.return_value = combatente_criado
         mock_repository.get_by_id.return_value = combatente_criado
 
@@ -288,7 +370,9 @@ class TestCombatenteService:
 
         assert resultado.dominios == ""
 
-    def test_atualizar_para_clerigo_sem_dominios_permitido_no_fluxo_generico(self, service, mock_repository):
+    def test_atualizar_para_clerigo_sem_dominios_permitido_no_fluxo_generico(
+        self, service, mock_repository
+    ):
         existente = Combatente(
             id=7,
             nome="Nira",

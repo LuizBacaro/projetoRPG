@@ -36,7 +36,9 @@ def test_openapi_login_tem_exemplo_de_resposta():
     assert response.status_code == 200
     openapi = response.json()
     operacao_login = openapi["paths"]["/api/v1/auth/login"]["post"]
-    example = operacao_login["responses"]["200"]["content"]["application/json"]["example"]
+    example = operacao_login["responses"]["200"]["content"]["application/json"][
+        "example"
+    ]
     assert "access_token" in example
     assert "refresh_token" in example
     assert example["token_type"] == "bearer"

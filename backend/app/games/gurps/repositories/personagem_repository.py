@@ -16,11 +16,7 @@ class GurpsPersonagemRepository(BaseRepository[GurpsPersonagem]):
     def get_by_ids(self, ids: List[int]) -> List[GurpsPersonagem]:
         if not ids:
             return []
-        return (
-            self.db.query(GurpsPersonagem)
-            .filter(GurpsPersonagem.id.in_(ids))
-            .all()
-        )
+        return self.db.query(GurpsPersonagem).filter(GurpsPersonagem.id.in_(ids)).all()
 
     def get_by_owner(
         self, dono_id: int, skip: int = 0, limit: int = 100
@@ -68,9 +64,7 @@ class GurpsPersonagemRepository(BaseRepository[GurpsPersonagem]):
 
     def count_by_tipo(self, tipo: str) -> int:
         return (
-            self.db.query(GurpsPersonagem)
-            .filter(GurpsPersonagem.tipo == tipo)
-            .count()
+            self.db.query(GurpsPersonagem).filter(GurpsPersonagem.tipo == tipo).count()
         )
 
     def count_all(self) -> int:
@@ -97,5 +91,7 @@ class GurpsPersonagemRepository(BaseRepository[GurpsPersonagem]):
             .all()
         )
 
-    def ordenar_para_turno_gurps(self, personagens: List[GurpsPersonagem]) -> List[GurpsPersonagem]:
+    def ordenar_para_turno_gurps(
+        self, personagens: List[GurpsPersonagem]
+    ) -> List[GurpsPersonagem]:
         return ordenar_personagens_para_turno_gurps(personagens)

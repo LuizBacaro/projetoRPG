@@ -3,13 +3,15 @@ config.py
 SRP: Gerenciar todas as configurações da aplicação via variáveis de ambiente
 SOLID: Single Responsibility — configuração centralizada
 """
-from pydantic_settings import BaseSettings
-from pydantic import model_validator
-from pathlib import Path
-from typing import List
-import secrets
+
 import logging
 import os
+import secrets
+from pathlib import Path
+from typing import List
+
+from pydantic import model_validator
+from pydantic_settings import BaseSettings
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +52,9 @@ class Settings(BaseSettings):
 
     # ── Caminhos ─────────────────────────────────────────────────────────────
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent
-    FRONTEND_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent.parent / "frontend"
+    FRONTEND_DIR: Path = (
+        Path(__file__).resolve().parent.parent.parent.parent.parent / "frontend"
+    )
     UPLOADS_DIR: Path = Path(__file__).resolve().parent.parent.parent.parent / "uploads"
     UPLOADS_BASE_URL: str = "/uploads"
 
@@ -76,7 +80,10 @@ class Settings(BaseSettings):
                 if n not in seen:
                     seen.add(n)
                     merged.append(n)
-                    logger.info("CORS: origem Arena adicionada automaticamente em produção: %s", n)
+                    logger.info(
+                        "CORS: origem Arena adicionada automaticamente em produção: %s",
+                        n,
+                    )
         self.ALLOWED_ORIGINS = merged
         return self
 
@@ -128,6 +135,7 @@ class Settings(BaseSettings):
 
     class Config:
         """Configuração de leitura do Pydantic"""
+
         # Suporta execução tanto na raiz do repo quanto dentro de backend/
         env_file = (".env", "backend/.env")
         case_sensitive = True
@@ -176,10 +184,12 @@ class Settings(BaseSettings):
             if self.ENVIRONMENT == "production":
                 raise ValueError(
                     "SECRET_KEY é obrigatória em produção! "
-                    "Gere com: python -c \"import secrets; print(secrets.token_hex(32))\""
+                    'Gere com: python -c "import secrets; print(secrets.token_hex(32))"'
                 )
             self.SECRET_KEY = secrets.token_hex(32)
-            logger.warning("⚠️  SECRET_KEY não configurada — gerada automaticamente (apenas dev)")
+            logger.warning(
+                "⚠️  SECRET_KEY não configurada — gerada automaticamente (apenas dev)"
+            )
 
         # Admin: avisar se credenciais não configuradas
         if not self.ADMIN_EMAIL or not self.ADMIN_PASSWORD:
@@ -200,11 +210,13 @@ class Settings(BaseSettings):
     def _normalizar_database_url(self) -> None:
         """Railway gera 'postgres://' mas SQLAlchemy >= 2.0 requer 'postgresql://'"""
         if self.DATABASE_URL.startswith("postgres://"):
-            self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql://", 1)
+            self.DATABASE_URL = self.DATABASE_URL.replace(
+                "postgres://", "postgresql://", 1
+            )
         # Resolve caminho relativo SQLite para absoluto baseado em BASE_DIR,
         # evitando apontamento ao diretório de trabalho quando iniciado fora do backend/.
         if self.DATABASE_URL.startswith("sqlite:///./"):
-            db_file = self.DATABASE_URL[len("sqlite:///./"):]
+            db_file = self.DATABASE_URL[len("sqlite:///./") :]
             absolute = self.BASE_DIR / db_file
             self.DATABASE_URL = f"sqlite:///{absolute}"
 

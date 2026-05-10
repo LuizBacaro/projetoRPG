@@ -90,8 +90,6 @@ class TalentoService:
             for tal in talentos_jogador
         ]
 
-    def remover_talento_jogador(
-        self, combatente_id: int, talento_id: int
-    ) -> bool:
+    def remover_talento_jogador(self, combatente_id: int, talento_id: int) -> bool:
         """Remove um talento do combatente"""
         return self._jogador.remover_talento(combatente_id, talento_id)

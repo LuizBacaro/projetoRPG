@@ -2,11 +2,15 @@
 AtaqueService
 SRP: regras de negócio para ataques e slots de magia
 """
+
 from typing import List, Optional
 
-from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 from app.games.dnd35.models.ataque import Ataque, MagiaSlot
-from app.games.dnd35.ports import AtaqueRepositoryProtocol, CombatenteRepositoryForAtaqueProtocol
+from app.games.dnd35.ports import (
+    AtaqueRepositoryProtocol,
+    CombatenteRepositoryForAtaqueProtocol,
+)
+from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 
 
 class AtaqueService:
@@ -35,7 +39,12 @@ class AtaqueService:
         """Substitui todos os ataques do combatente (bulk replace)."""
         self._verificar_combatente(combatente_id)
         dados = [
-            {"nome": a.nome, "bonus_ataque": a.bonus_ataque, "dano": a.dano, "tipo_dano": a.tipo_dano}
+            {
+                "nome": a.nome,
+                "bonus_ataque": a.bonus_ataque,
+                "dano": a.dano,
+                "tipo_dano": a.tipo_dano,
+            }
             for a in ataques_data
         ]
         return self.ataque_repo.substituir_todos(combatente_id, dados)
@@ -50,7 +59,11 @@ class AtaqueService:
         """Substitui todos os slots de magia do combatente (bulk replace)."""
         self._verificar_combatente(combatente_id)
         # Filtra apenas níveis com total > 0
-        dados = [{"nivel": s.nivel, "total": s.total, "usados": s.usados} for s in slots_data if s.total >= 0]
+        dados = [
+            {"nivel": s.nivel, "total": s.total, "usados": s.usados}
+            for s in slots_data
+            if s.total >= 0
+        ]
         return self.ataque_repo.substituir_magias(combatente_id, dados)
 
     def atualizar_usados(self, slot_id: int, usados: int) -> Optional[MagiaSlot]:

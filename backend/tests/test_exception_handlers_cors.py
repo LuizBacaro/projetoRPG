@@ -7,6 +7,7 @@ sem `Access-Control-Allow-Origin`, e o frontend só vê `TypeError: Failed to
 fetch`. Os handlers globais cobrem isso retornando JSON 4xx/5xx que passa
 pelo CORSMiddleware.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -23,7 +24,9 @@ def client():
     @app.get("/__test__/integrity-error")
     def _trigger_integrity():  # pragma: no cover - exec via TestClient
         raise IntegrityError(
-            "UPDATE...", {}, Exception("CHECK constraint failed: ck_combatentes_hp_atual_non_negative")
+            "UPDATE...",
+            {},
+            Exception("CHECK constraint failed: ck_combatentes_hp_atual_non_negative"),
         )
 
     @app.get("/__test__/operational-error")

@@ -72,4 +72,3 @@ def validar_pre_requisitos_lite(
                 f"{cat.nome} requer {cat.atributo_base.upper()} >= {cat.atributo_minimo}"
             )
     return erros
-

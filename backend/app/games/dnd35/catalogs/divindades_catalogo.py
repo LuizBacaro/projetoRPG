@@ -19,9 +19,8 @@ Este catalogo alimenta:
 
 from __future__ import annotations
 
-from typing import Any, Iterable, List, Optional, Sequence, Tuple, TypedDict
 import unicodedata
-
+from typing import Any, Iterable, List, Optional, Sequence, Tuple, TypedDict
 
 # ---------------------------------------------------------------------------
 # Constantes de alinhamento (regra do "um passo" D&D 3.5)
@@ -31,8 +30,8 @@ import unicodedata
 # do personagem/clérigo. (PHB 3.5 — um clérigo não pode escolher domínio
 # cujo descritor conflite com o próprio alinhamento.)
 DOMINIO_EIXO_ALINHAMENTO = {
-    "bem": ("moral", 1),    # exige não-Mau
-    "mal": ("moral", -1),   # exige não-Bom
+    "bem": ("moral", 1),  # exige não-Mau
+    "mal": ("moral", -1),  # exige não-Bom
     "ordem": ("ordem", 1),  # exige não-Caótico
     "caos": ("ordem", -1),  # exige não-Leal
 }
@@ -308,7 +307,10 @@ def buscar_por_nome(
             normalizado = _normalizar_custom(bruto)
             if not normalizado:
                 continue
-            if _key(normalizado["nome"]) == chave or _key(normalizado["label"]) == chave:
+            if (
+                _key(normalizado["nome"]) == chave
+                or _key(normalizado["label"]) == chave
+            ):
                 return normalizado
     return None
 
@@ -394,7 +396,9 @@ def parse_alinhamento(valor: str) -> Optional[Tuple[int, int]]:
     return (ordem, moral)
 
 
-def alinhamento_compativel(tendencia_divindade: str, alinhamento_personagem: str) -> bool:
+def alinhamento_compativel(
+    tendencia_divindade: str, alinhamento_personagem: str
+) -> bool:
     """
     Regra "um passo" (PHB 3.5): um adorador/clerigo pode diferir da divindade
     em, no maximo, um passo em cada um dos eixos (ordem/moral).

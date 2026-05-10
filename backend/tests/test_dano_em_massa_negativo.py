@@ -3,6 +3,7 @@
 Cenário relatado: PJ em 0/35 sofre dano em massa e API retorna 500.
 Esperado: backend deve aceitar e clampar HP entre -10 e 0 conforme D&D 3.5.
 """
+
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient

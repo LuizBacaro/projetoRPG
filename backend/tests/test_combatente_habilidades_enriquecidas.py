@@ -6,13 +6,14 @@ Cobre:
 - Formato legado `a | b` → retorno agrupado em único nível com fallback.
 - Tokens não reconhecidos pelo catálogo → slug/descricao vazios, raw preservado.
 """
+
 from __future__ import annotations
 
 import json
 from unittest.mock import Mock
 
-from app.games.dnd35.services.combatente_service import CombatenteService
 from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.services.combatente_service import CombatenteService
 
 
 def _service_com_mocks() -> CombatenteService:

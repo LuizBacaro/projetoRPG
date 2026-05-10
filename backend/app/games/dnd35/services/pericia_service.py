@@ -63,9 +63,7 @@ class PericiaService:
         """Obtém uma perícia por ID"""
         return self._pericia.obter_pericia(pericia_id)
 
-    def listar_todas_pericias(
-        self, skip: int = 0, limit: int = 100
-    ) -> List[Pericia]:
+    def listar_todas_pericias(self, skip: int = 0, limit: int = 100) -> List[Pericia]:
         """Lista todas as perícias disponíveis (ordem alfabética — espelha a Tabela 4-3 do livro)."""
         return self._pericia.listar_pericias(skip=skip, limit=limit)
 
@@ -135,9 +133,7 @@ class PericiaService:
         pericia = self._pericia.obter_pericia(pericia_jogador.pericia_id)
 
         if not pericia:
-            raise ValueError(
-                f"Perícia com ID {pericia_jogador.pericia_id} não existe"
-            )
+            raise ValueError(f"Perícia com ID {pericia_jogador.pericia_id} não existe")
 
         pericia_existente = self._pj.obter_pericia_jogador_por_ids(
             combatente_id, pericia_jogador.pericia_id
@@ -183,9 +179,7 @@ class PericiaService:
         """Obtém uma perícia específica do jogador"""
         return self._pj.obter_pericia_jogador(pericia_jogador_id)
 
-    def listar_pericias_combatente(
-        self, combatente_id: int
-    ) -> List[PericiaJogador]:
+    def listar_pericias_combatente(self, combatente_id: int) -> List[PericiaJogador]:
         """Lista todas as perícias de um combatente"""
         return self._pj.listar_pericias_combatente_com_pericia(combatente_id)
 

@@ -60,18 +60,24 @@ def inicializar_talentos(db: Session) -> None:
 
     json_path = default_json_path()
     if json_path.is_file():
-        sincronizar_catalogo_talentos_desde_json(db, json_path=json_path, remover_legado=True)
+        sincronizar_catalogo_talentos_desde_json(
+            db, json_path=json_path, remover_legado=True
+        )
         return
 
     # Fallback: seed mínimo só se o JSON não estiver no deploy e tabela vazia
     count = db.query(Talento).filter(Talento.deleted_at.is_(None)).count()
     if count > 0:
         logger.warning(
-            "Sem talentos_importacao_limpo.json e já existem %s talentos — não alterando.", count
+            "Sem talentos_importacao_limpo.json e já existem %s talentos — não alterando.",
+            count,
         )
         return
 
-    logger.warning("Catálogo JSON ausente em %s — usando seed mínimo de desenvolvimento.", json_path)
+    logger.warning(
+        "Catálogo JSON ausente em %s — usando seed mínimo de desenvolvimento.",
+        json_path,
+    )
 
     TALENTOS_PADRAO = [
         ("Golpe Poderoso", "Realiza um ataque com + 2 de dano", "PHB p.95"),
@@ -102,7 +108,9 @@ def inicializar_talentos(db: Session) -> None:
             )
         )
     db.commit()
-    print(f"✅ {len(TALENTOS_PADRAO)} talentos (seed mínimo) inseridos — prefira o JSON no repositório.")
+    print(
+        f"✅ {len(TALENTOS_PADRAO)} talentos (seed mínimo) inseridos — prefira o JSON no repositório."
+    )
 
 
 def inicializar_catalogo_tabelas_classes() -> None:

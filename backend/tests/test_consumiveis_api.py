@@ -94,9 +94,7 @@ def test_obter_consumivel_inexistente_404(api_db_session):
 
 def test_listar_filtro_tipo_oleo_casa_titulo_unicode_sqlite(api_db_session):
     """SQLite não faz ILIKE case-fold em Unicode; tipo 'Óleo' deve aparecer com ?tipo=óleo."""
-    api_db_session.add(
-        Consumivel(nome="Óleo da Escuridão", tipo="Óleo", ativo=True)
-    )
+    api_db_session.add(Consumivel(nome="Óleo da Escuridão", tipo="Óleo", ativo=True))
     api_db_session.commit()
     client = _build_client(api_db_session)
     r = client.get("/api/v1/consumiveis/", params={"tipo": "óleo"})

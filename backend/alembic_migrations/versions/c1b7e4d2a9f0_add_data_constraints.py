@@ -18,6 +18,16 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _tabela_existe(nome: str) -> bool:
+    try:
+        bind = op.get_bind()
+        if hasattr(bind, "__class__") and "Mock" in bind.__class__.__name__:
+            return False
+        return nome in sa.inspect(bind).get_table_names()
+    except Exception:
+        return False
+
+
 def upgrade() -> None:
     bind = op.get_bind()
 
@@ -36,25 +46,26 @@ def upgrade() -> None:
     )
 
     # Remove duplicatas de magias preparadas (mantém menor id)
-    bind.execute(
-        sa.text(
-            """
-            DELETE FROM magias_preparadas
-            WHERE id IN (
-                SELECT id FROM (
-                    SELECT
-                        id,
-                        ROW_NUMBER() OVER (
-                            PARTITION BY combatente_id, magia_id
-                            ORDER BY id
-                        ) AS rn
-                    FROM magias_preparadas
-                ) t
-                WHERE t.rn > 1
+    if _tabela_existe("magias_preparadas"):
+        bind.execute(
+            sa.text(
+                """
+                DELETE FROM magias_preparadas
+                WHERE id IN (
+                    SELECT id FROM (
+                        SELECT
+                            id,
+                            ROW_NUMBER() OVER (
+                                PARTITION BY combatente_id, magia_id
+                                ORDER BY id
+                            ) AS rn
+                        FROM magias_preparadas
+                    ) t
+                    WHERE t.rn > 1
+                )
+                """
             )
-            """
         )
-    )
 
     with op.batch_alter_table("combatentes") as batch_op:
         batch_op.create_check_constraint(
@@ -74,16 +85,18 @@ def upgrade() -> None:
             "tipo IN ('jogador', 'monstro', 'npc')",
         )
 
-    with op.batch_alter_table("magias_preparadas") as batch_op:
-        batch_op.create_unique_constraint(
-            "uq_magias_preparadas_combatente_magia",
-            ["combatente_id", "magia_id"],
-        )
+    if _tabela_existe("magias_preparadas"):
+        with op.batch_alter_table("magias_preparadas") as batch_op:
+            batch_op.create_unique_constraint(
+                "uq_magias_preparadas_combatente_magia",
+                ["combatente_id", "magia_id"],
+            )
 
 
 def downgrade() -> None:
-    with op.batch_alter_table("magias_preparadas") as batch_op:
-        batch_op.drop_constraint("uq_magias_preparadas_combatente_magia", type_="unique")
+    if _tabela_existe("magias_preparadas"):
+        with op.batch_alter_table("magias_preparadas") as batch_op:
+            batch_op.drop_constraint("uq_magias_preparadas_combatente_magia", type_="unique")
 
     with op.batch_alter_table("combatentes") as batch_op:
         batch_op.drop_constraint("ck_combatentes_tipo_valido", type_="check")

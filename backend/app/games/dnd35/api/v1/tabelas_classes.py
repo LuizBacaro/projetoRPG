@@ -10,14 +10,14 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.shared.core.catalog_cache import catalog_cache, make_cache_key
-from app.shared.core.config import settings
-from app.shared.core.deps import get_usuario_atual
 from app.games.dnd35.schemas.tabelas_classes import (
     TabelaClassesResponse,
     TabelasClassesListResponse,
 )
 from app.games.dnd35.services.tabelas_classes_service import TabelasClassesService
+from app.shared.core.catalog_cache import catalog_cache, make_cache_key
+from app.shared.core.config import settings
+from app.shared.core.deps import get_usuario_atual
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,9 @@ def listar_tabelas_classes(
                 return cached
 
         service = TabelasClassesService()
-        response = service.listar_tabelas(skip=skip, limit=limit, table_number=table_number)
+        response = service.listar_tabelas(
+            skip=skip, limit=limit, table_number=table_number
+        )
         if settings.CACHE_ENABLED:
             catalog_cache.set(cache_key, response, settings.CACHE_CATALOG_TTL_SECONDS)
         return response
@@ -61,7 +63,9 @@ def listar_tabelas_classes(
 
 
 @router.get("/{table_number}", response_model=TabelaClassesResponse)
-def obter_tabela_classes(table_number: int, _: object = Depends(get_usuario_atual)) -> TabelaClassesResponse:
+def obter_tabela_classes(
+    table_number: int, _: object = Depends(get_usuario_atual)
+) -> TabelaClassesResponse:
     _require_feature_enabled()
     try:
         cache_key = make_cache_key("tabelas_classes:detail", table_number=table_number)

@@ -4,26 +4,31 @@ Princípio SOLID: SRP - Responsável apenas por HTTP routing
 
 Canônico em `app.games.dnd35.api.v1.combate` (registrado em `app.main`).
 """
+
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.shared.core.database import get_db
-from app.core.dependencies import get_combate_service, get_combatente_service, get_condicao_service
-from app.shared.core.deps import (
-    get_usuario_atual,
-    requer_game_dnd35,
-    validar_combatentes_do_usuario,
+from app.core.dependencies import (
+    get_combate_service,
+    get_combatente_service,
+    get_condicao_service,
 )
-from app.shared.exceptions.custom_exceptions import ArenaBaseException
 from app.games.dnd35.schemas.combate import (
     AplicarDanoRequest,
     CombateHistoricoListResponse,
     IniciarCombateRequest,
 )
 from app.games.dnd35.services.combate_service import CombateService
-from app.shared.models.usuario import Usuario
 from app.games.dnd35.services.combatente_service import CombatenteService
 from app.games.dnd35.services.condicao_service import CondicaoService
+from app.shared.core.database import get_db
+from app.shared.core.deps import (
+    get_usuario_atual,
+    requer_game_dnd35,
+    validar_combatentes_do_usuario,
+)
+from app.shared.exceptions.custom_exceptions import ArenaBaseException
+from app.shared.models.usuario import Usuario
 
 router = APIRouter(
     prefix="/combate",

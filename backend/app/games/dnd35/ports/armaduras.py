@@ -4,8 +4,14 @@ from __future__ import annotations
 
 from typing import Any, List, Optional, Protocol
 
-from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
-from app.games.dnd35.schemas.armadura_protecao import ArmaduraProtecaoCreate, ArmaduraProtecaoJogadorCreate
+from app.games.dnd35.models.armadura_protecao import (
+    ArmaduraProtecao,
+    ArmaduraProtecaoJogador,
+)
+from app.games.dnd35.schemas.armadura_protecao import (
+    ArmaduraProtecaoCreate,
+    ArmaduraProtecaoJogadorCreate,
+)
 
 
 class ArmaduraProtecaoCatalogProtocol(Protocol):

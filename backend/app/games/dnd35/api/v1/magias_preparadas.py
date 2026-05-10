@@ -4,26 +4,26 @@ Endpoints de magias preparadas (D&D 3.5).
 Canônico em `app.games.dnd35.api.v1.magias_preparadas` (registrado em `app.main`).
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from app.shared.core.database import get_db
-from app.shared.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from app.games.dnd35.models.ataque import MagiaPreparada
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.magia import Magia
-from app.games.dnd35.repositories.magia_preparada_repository import MagiaPreparadaRepository
+from app.games.dnd35.repositories.magia_preparada_repository import (
+    MagiaPreparadaRepository,
+)
 from app.games.dnd35.schemas.ataque import (
-    MagiaPreparadaResponse,
-    MagiaPreparadaCreate,
     DescansoRequest,
+    MagiaPreparadaCreate,
+    MagiaPreparadaResponse,
 )
-
-from app.games.dnd35.text_utils import (
-    classes_magia as _classes_magia,
-    normalizar_classe_acesso as _normalizar_classe,
-)
+from app.games.dnd35.text_utils import classes_magia as _classes_magia
+from app.games.dnd35.text_utils import normalizar_classe_acesso as _normalizar_classe
+from app.shared.core.database import get_db
+from app.shared.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
 
 router = APIRouter(
     prefix="/magias-preparadas",
@@ -53,22 +53,26 @@ def _enriquecer(mp: MagiaPreparada) -> dict:
     quantidade = _normalizar_quantidade(getattr(mp, "quantidade", 1), 1)
     usos_realizados = _normalizar_usos(mp)
     return {
-        "id":              mp.id,
-        "combatente_id":   mp.combatente_id,
-        "magia_id":        mp.magia_id,
-        "nivel_slot":      mp.nivel_slot,
-        "quantidade":      quantidade,
+        "id": mp.id,
+        "combatente_id": mp.combatente_id,
+        "magia_id": mp.magia_id,
+        "nivel_slot": mp.nivel_slot,
+        "quantidade": quantidade,
         "usos_realizados": usos_realizados,
-        "preparada_em":    mp.preparada_em,
-        "usada":           bool(usos_realizados > 0 or mp.usada),
-        "magia_nome":      mp.magia.nome   if mp.magia else None,
-        "magia_escola":    mp.magia.escola if mp.magia else None,
-        "magia_nivel":     mp.magia.nivel  if mp.magia else None,
+        "preparada_em": mp.preparada_em,
+        "usada": bool(usos_realizados > 0 or mp.usada),
+        "magia_nome": mp.magia.nome if mp.magia else None,
+        "magia_escola": mp.magia.escola if mp.magia else None,
+        "magia_nivel": mp.magia.nivel if mp.magia else None,
     }
 
 
 @router.get("/{combatente_id}", response_model=List[MagiaPreparadaResponse])
-def listar_preparadas(combatente_id: int, db: Session = Depends(get_db), _: object = Depends(requer_dono_ou_admin_combatente)):
+def listar_preparadas(
+    combatente_id: int,
+    db: Session = Depends(get_db),
+    _: object = Depends(requer_dono_ou_admin_combatente),
+):
     repo = MagiaPreparadaRepository(db)
     registros = repo.listar_por_combatente(combatente_id)
     return [_enriquecer(r) for r in registros]
@@ -141,7 +145,9 @@ def preparar_magia(
     if ja_preparada:
         ja_preparada.nivel_slot = payload.nivel_slot
         ja_preparada.quantidade = quantidade_desejada
-        ja_preparada.usos_realizados = min(_normalizar_usos(ja_preparada), quantidade_desejada)
+        ja_preparada.usos_realizados = min(
+            _normalizar_usos(ja_preparada), quantidade_desejada
+        )
         ja_preparada.usada = ja_preparada.usos_realizados > 0
         atualizado = repo.commit_refresh(ja_preparada)
         return _enriquecer(atualizado)
@@ -181,14 +187,23 @@ def marcar_usada(
 
     if acao == "usar":
         if usos_realizados >= quantidade:
-            raise HTTPException(status_code=400, detail="Todas as cópias preparadas desta magia já foram utilizadas hoje")
+            raise HTTPException(
+                status_code=400,
+                detail="Todas as cópias preparadas desta magia já foram utilizadas hoje",
+            )
         usos_realizados += 1
     elif acao == "restaurar":
         if usos_realizados <= 0:
-            raise HTTPException(status_code=400, detail="Nenhum uso desta magia foi marcado hoje")
+            raise HTTPException(
+                status_code=400, detail="Nenhum uso desta magia foi marcado hoje"
+            )
         usos_realizados -= 1
     else:
-        usos_realizados = usos_realizados - 1 if usos_realizados > 0 else min(quantidade, usos_realizados + 1)
+        usos_realizados = (
+            usos_realizados - 1
+            if usos_realizados > 0
+            else min(quantidade, usos_realizados + 1)
+        )
 
     registro.usos_realizados = usos_realizados
     registro.usada = usos_realizados > 0
@@ -228,7 +243,7 @@ def descanso_longo(
     repo.commit()
 
     return {
-        "message":              "Descanso longo realizado com sucesso",
+        "message": "Descanso longo realizado com sucesso",
         "preparadas_removidas": deletadas,
-        "slots_resetados":      True,
+        "slots_resetados": True,
     }

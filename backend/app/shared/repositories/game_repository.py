@@ -2,7 +2,13 @@
 Repository para o catálogo de jogos e memberships por usuário.
 SRP: apenas acesso a dados da camada multi-jogo.
 """
-from typing import List, Optional, Tuple
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, Optional, Tuple
+
+if TYPE_CHECKING:
+    from ..models.usuario import Usuario
 
 from sqlalchemy.orm import Session
 
@@ -16,11 +22,7 @@ class GameRepository:
         self.db = db
 
     def listar_disponiveis(self) -> List[Game]:
-        return (
-            self.db.query(Game)
-            .order_by(Game.ordem.asc(), Game.nome.asc())
-            .all()
-        )
+        return self.db.query(Game).order_by(Game.ordem.asc(), Game.nome.asc()).all()
 
     def get_by_slug(self, slug: str) -> Optional[Game]:
         if not slug:
@@ -79,12 +81,12 @@ class UserGameMembershipRepository:
 
     def listar_memberships_de_jogo(
         self, game_id: int
-    ) -> List[Tuple[UserGameMembership, "Usuario"]]:
+    ) -> List[Tuple[UserGameMembership, Usuario]]:
         """
         Lista todos os memberships de um jogo com o Usuário em uma única query.
         Usado no painel admin para gerenciar acesso a um jogo específico.
         """
-        from ..models.usuario import Usuario  # local import evita ciclo
+        from ..models.usuario import Usuario
 
         rows = (
             self.db.query(UserGameMembership, Usuario)

@@ -34,11 +34,15 @@ def criar_admin_padrao(db: Session) -> None:
 
     admin_email = (settings.ADMIN_EMAIL or "").strip().lower()
     admin_password = (settings.ADMIN_PASSWORD or "").strip()
-    admin_username = (settings.ADMIN_USERNAME or "Administrador").strip() or "Administrador"
+    admin_username = (
+        settings.ADMIN_USERNAME or "Administrador"
+    ).strip() or "Administrador"
 
     # Se credenciais não configuradas, pular criação
     if not admin_email or not admin_password:
-        logger.info("ℹ️  Credenciais de admin não configuradas no .env — pulando criação")
+        logger.info(
+            "ℹ️  Credenciais de admin não configuradas no .env — pulando criação"
+        )
         return
 
     # ✅ Verifica se admin já existe

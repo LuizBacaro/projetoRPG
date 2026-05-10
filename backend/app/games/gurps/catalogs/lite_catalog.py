@@ -46,7 +46,9 @@ def carregar_sumario_personagens_json() -> dict[str, Any] | None:
         return json.load(f)
 
 
-def _aplicar_sumario_sobre_catalogo(out: dict[str, Any], sumario: dict[str, Any]) -> None:
+def _aplicar_sumario_sobre_catalogo(
+    out: dict[str, Any], sumario: dict[str, Any]
+) -> None:
     per: list[dict[str, Any]] = []
     for p in sumario.get("pericias", []):
         nome = (p.get("nome") or "").strip()

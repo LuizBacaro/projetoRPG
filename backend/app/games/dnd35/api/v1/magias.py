@@ -5,32 +5,43 @@ Canônico em `app.games.dnd35.api.v1.magias` (registrado em `app.main`).
 """
 
 from io import BytesIO
-
-from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
-from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from app.shared.core.catalog_cache import catalog_cache, make_cache_key
-from app.shared.core.config import settings
-from app.games.dnd35.text_utils import normalizar_classe_acesso
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    Response,
+    UploadFile,
+    status,
+)
+from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
+
 from app.core.dependencies import get_magia_import_service, get_magia_service
-from app.shared.core.database import get_db
-from app.shared.core.deps import requer_mestre_ou_admin
 from app.games.dnd35.models.magia import Magia
 from app.games.dnd35.repositories.magia_repository import MagiaRepository
 from app.games.dnd35.schemas.magia import (
     MagiaCreate,
+    MagiaHistoricoResponse,
     MagiaImportConfirmRequest,
     MagiaImportConfirmResponse,
-    MagiaHistoricoResponse,
     MagiaImportPreviewResponse,
     MagiaResponse,
     MagiaUpdate,
 )
+from app.games.dnd35.services.divindade_custom_service import (
+    build_divindade_custom_service,
+)
 from app.games.dnd35.services.magia_import_service import MagiaImportService
 from app.games.dnd35.services.magia_service import MagiaService
-from app.games.dnd35.services.divindade_custom_service import build_divindade_custom_service
+from app.games.dnd35.text_utils import normalizar_classe_acesso
+from app.shared.core.catalog_cache import catalog_cache, make_cache_key
+from app.shared.core.config import settings
+from app.shared.core.database import get_db
+from app.shared.core.deps import requer_mestre_ou_admin
 
 router = APIRouter(prefix="/magias", tags=["Magias"])
 
@@ -83,19 +94,32 @@ def _sanitize_query_value(value):
 
 @router.get("/", response_model=List[MagiaResponse])
 def listar_magias(
-    classe: Optional[str] = Query(None, description="Filtrar por classe: Mago, Clérigo, Druida, Bardo, Paladino, Ranger"),
-    nivel:  Optional[int] = Query(None, ge=0, le=9, description="Filtrar por nível (0-9)"),
+    classe: Optional[str] = Query(
+        None,
+        description="Filtrar por classe: Mago, Clérigo, Druida, Bardo, Paladino, Ranger",
+    ),
+    nivel: Optional[int] = Query(
+        None, ge=0, le=9, description="Filtrar por nível (0-9)"
+    ),
     escola: Optional[str] = Query(None, description="Filtrar por escola de magia"),
-    nome:   Optional[str] = Query(None, description="Buscar por nome (parcial)"),
-    componentes: Optional[str] = Query(None, description="Filtrar por componentes (ex: V,S)"),
+    nome: Optional[str] = Query(None, description="Buscar por nome (parcial)"),
+    componentes: Optional[str] = Query(
+        None, description="Filtrar por componentes (ex: V,S)"
+    ),
     dominio: Optional[str] = Query(None, description="Filtrar por domínio"),
     ativo: Optional[bool] = Query(None, description="Filtrar por status ativa/inativa"),
-    sort_by: Optional[str] = Query(None, description="Ordenacao por campo: nome, escola, nivel"),
-    sort_dir: Optional[str] = Query("asc", description="Direcao da ordenacao: asc ou desc"),
-    skip:   int = Query(0, ge=0, description="Quantidade de registros para pular"),
-    limit:  int = Query(100, ge=1, le=500, description="Quantidade máxima de registros retornados"),
+    sort_by: Optional[str] = Query(
+        None, description="Ordenacao por campo: nome, escola, nivel"
+    ),
+    sort_dir: Optional[str] = Query(
+        "asc", description="Direcao da ordenacao: asc ou desc"
+    ),
+    skip: int = Query(0, ge=0, description="Quantidade de registros para pular"),
+    limit: int = Query(
+        100, ge=1, le=500, description="Quantidade máxima de registros retornados"
+    ),
     response: Response = None,
-    db:     Session        = Depends(get_db),
+    db: Session = Depends(get_db),
     service: Optional[MagiaService] = Depends(get_magia_service),
 ):
     """
@@ -323,7 +347,9 @@ def criar_magia(
     service: Optional[MagiaService] = Depends(get_magia_service),
     usuario=Depends(requer_mestre_ou_admin),
 ):
-    magia = _resolve_service(service, db).criar(payload, usuario_id=getattr(usuario, "id", None))
+    magia = _resolve_service(service, db).criar(
+        payload, usuario_id=getattr(usuario, "id", None)
+    )
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return _serialize_magia(magia)
@@ -354,7 +380,9 @@ def desativar_magia(
     service: Optional[MagiaService] = Depends(get_magia_service),
     usuario=Depends(requer_mestre_ou_admin),
 ):
-    magia = _resolve_service(service, db).desativar(magia_id, usuario_id=getattr(usuario, "id", None))
+    magia = _resolve_service(service, db).desativar(
+        magia_id, usuario_id=getattr(usuario, "id", None)
+    )
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return _serialize_magia(magia)
@@ -367,7 +395,9 @@ def reativar_magia(
     service: Optional[MagiaService] = Depends(get_magia_service),
     usuario=Depends(requer_mestre_ou_admin),
 ):
-    magia = _resolve_service(service, db).reativar(magia_id, usuario_id=getattr(usuario, "id", None))
+    magia = _resolve_service(service, db).reativar(
+        magia_id, usuario_id=getattr(usuario, "id", None)
+    )
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return _serialize_magia(magia)
@@ -380,7 +410,9 @@ def excluir_magia(
     service: Optional[MagiaService] = Depends(get_magia_service),
     usuario=Depends(requer_mestre_ou_admin),
 ):
-    _resolve_service(service, db).deletar_fisico(magia_id, usuario_id=getattr(usuario, "id", None))
+    _resolve_service(service, db).deletar_fisico(
+        magia_id, usuario_id=getattr(usuario, "id", None)
+    )
     if settings.CACHE_ENABLED:
         catalog_cache.invalidate_prefix("magias:")
     return None
@@ -395,4 +427,3 @@ def listar_historico_magia(
     _: object = Depends(requer_mestre_ou_admin),
 ):
     return _resolve_service(service, db).listar_historico(magia_id, limit=limit)
-
