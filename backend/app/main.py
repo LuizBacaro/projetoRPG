@@ -827,17 +827,24 @@ def _garantir_coluna_dono_id() -> None:
             )
         )
 
-        owner_id = conn.execute(
-            text(
+        if engine.dialect.name == "postgresql":
+            owner_sql = """
+                SELECT id
+                FROM usuarios
+                WHERE CAST(perfil AS TEXT) ILIKE 'administrador'
+                  AND ativo IS TRUE
+                ORDER BY id
+                LIMIT 1
                 """
+        else:
+            owner_sql = """
                 SELECT id
                 FROM usuarios
                 WHERE perfil = 'administrador' AND ativo = 1
                 ORDER BY id
                 LIMIT 1
                 """
-            )
-        ).scalar()
+        owner_id = conn.execute(text(owner_sql)).scalar()
 
         if owner_id is None:
             owner_id = conn.execute(

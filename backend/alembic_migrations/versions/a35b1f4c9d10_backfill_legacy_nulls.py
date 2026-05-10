@@ -36,6 +36,25 @@ def _exec_if_column(bind, table_name: str, column_name: str, sql: str) -> None:
         bind.execute(sa.text(sql))
 
 
+def _sql_pick_admin_owner(dialect_name: str) -> str:
+    if dialect_name == "postgresql":
+        return """
+                    SELECT id
+                    FROM usuarios
+                    WHERE CAST(perfil AS TEXT) ILIKE 'administrador'
+                      AND ativo IS TRUE
+                    ORDER BY id
+                    LIMIT 1
+                    """
+    return """
+                    SELECT id
+                    FROM usuarios
+                    WHERE perfil = 'administrador' AND ativo = 1
+                    ORDER BY id
+                    LIMIT 1
+                    """
+
+
 def apply_backfill(bind) -> None:
     if _table_exists(bind, "combatentes"):
         _exec_if_column(bind, "combatentes", "iniciativa", "UPDATE combatentes SET iniciativa = 0 WHERE iniciativa IS NULL")
@@ -79,15 +98,7 @@ def apply_backfill(bind) -> None:
 
         if _column_exists(bind, "combatentes", "dono_id") and _table_exists(bind, "usuarios"):
             owner_id = bind.execute(
-                sa.text(
-                    """
-                    SELECT id
-                    FROM usuarios
-                    WHERE perfil = 'administrador' AND ativo = 1
-                    ORDER BY id
-                    LIMIT 1
-                    """
-                )
+                sa.text(_sql_pick_admin_owner(bind.dialect.name))
             ).scalar()
 
             if owner_id is None:
