@@ -5,7 +5,7 @@
  * (versão simplificada sem dependências de módulo)
  * 
  * Execução:
- *   node frontend/test-ficha-perfil-simples.js
+ *   node frontend/games/dnd35/test-ficha-perfil-simples.js
  */
 
 // ─────────────────────────────────────────────────────────
