@@ -27,6 +27,29 @@ def _is_sqlite() -> bool:
         return False
 
 
+def _nome_ck(registrado: str | None, esperado: str) -> bool:
+    return (registrado or "").lower() == esperado.lower()
+
+
+def _check_constraint_existe(tabela: str, nome: str) -> bool:
+    try:
+        bind = op.get_bind()
+        insp = sa.inspect(bind)
+        if tabela not in insp.get_table_names():
+            return False
+        return any(
+            _nome_ck(c.get("name"), nome)
+            for c in insp.get_check_constraints(tabela)
+        )
+    except Exception:
+        return False
+
+
+def _drop_check_se_existir(tabela: str, nome: str) -> None:
+    if _check_constraint_existe(tabela, nome):
+        op.drop_constraint(nome, tabela, type_="check")
+
+
 def upgrade() -> None:
     if _is_sqlite():
         # SQLite não suporta DROP/ADD CONSTRAINT — no-op seguro.
@@ -38,36 +61,25 @@ def upgrade() -> None:
     # sempre terão hp_atual ≥ 0, então esta linha é apenas de segurança).
     bind.execute(sa.text("UPDATE combatentes SET hp_atual = -10 WHERE hp_atual < -10"))
 
-    # Remove constraint antiga que forçava hp_atual >= 0
-    op.drop_constraint(
-        "ck_combatentes_hp_atual_non_negative",
-        "combatentes",
-        type_="check",
-    )
+    # Remove constraint antiga que forçava hp_atual >= 0 (pode não existir se veio de metadata).
+    _drop_check_se_existir("combatentes", "ck_combatentes_hp_atual_non_negative")
 
-    # Remove constraint que limita hp_atual <= hp_maximo pois hp negativo
-    # é sempre <= hp_maximo, mas a constraint antiga foi gerada sem contemplar
-    # valores negativos. Recria com mesmo nome para manter compatibilidade.
-    try:
-        op.drop_constraint(
+    # Remove LTE para recriar (metadata/create_all pode já ter minimum+LTE com os mesmos nomes).
+    _drop_check_se_existir("combatentes", "ck_combatentes_hp_atual_lte_hp_maximo")
+
+    # Nova constraint: permite -10 a hp_maximo (ORM já pode ter criado esta check).
+    if not _check_constraint_existe("combatentes", "ck_combatentes_hp_atual_minimum"):
+        op.create_check_constraint(
+            "ck_combatentes_hp_atual_minimum",
+            "combatentes",
+            "hp_atual >= -10",
+        )
+    if not _check_constraint_existe("combatentes", "ck_combatentes_hp_atual_lte_hp_maximo"):
+        op.create_check_constraint(
             "ck_combatentes_hp_atual_lte_hp_maximo",
             "combatentes",
-            type_="check",
+            "hp_atual <= hp_maximo",
         )
-    except Exception:
-        pass  # Pode não existir em bancos que não rodaram c1b7e4d2a9f0
-
-    # Nova constraint: permite -10 a hp_maximo
-    op.create_check_constraint(
-        "ck_combatentes_hp_atual_minimum",
-        "combatentes",
-        "hp_atual >= -10",
-    )
-    op.create_check_constraint(
-        "ck_combatentes_hp_atual_lte_hp_maximo",
-        "combatentes",
-        "hp_atual <= hp_maximo",
-    )
 
 
 def downgrade() -> None:
@@ -79,21 +91,18 @@ def downgrade() -> None:
     # Seta hp negativo para 0 antes de restaurar constraint >= 0
     bind.execute(sa.text("UPDATE combatentes SET hp_atual = 0 WHERE hp_atual < 0"))
 
-    op.drop_constraint("ck_combatentes_hp_atual_minimum", "combatentes", type_="check")
-    try:
-        op.drop_constraint(
-            "ck_combatentes_hp_atual_lte_hp_maximo", "combatentes", type_="check"
-        )
-    except Exception:
-        pass
+    _drop_check_se_existir("combatentes", "ck_combatentes_hp_atual_minimum")
+    _drop_check_se_existir("combatentes", "ck_combatentes_hp_atual_lte_hp_maximo")
 
-    op.create_check_constraint(
-        "ck_combatentes_hp_atual_non_negative",
-        "combatentes",
-        "hp_atual >= 0",
-    )
-    op.create_check_constraint(
-        "ck_combatentes_hp_atual_lte_hp_maximo",
-        "combatentes",
-        "hp_atual <= hp_maximo",
-    )
+    if not _check_constraint_existe("combatentes", "ck_combatentes_hp_atual_non_negative"):
+        op.create_check_constraint(
+            "ck_combatentes_hp_atual_non_negative",
+            "combatentes",
+            "hp_atual >= 0",
+        )
+    if not _check_constraint_existe("combatentes", "ck_combatentes_hp_atual_lte_hp_maximo"):
+        op.create_check_constraint(
+            "ck_combatentes_hp_atual_lte_hp_maximo",
+            "combatentes",
+            "hp_atual <= hp_maximo",
+        )
