@@ -224,6 +224,7 @@ jobs:
           # SQLite vazio: a cadeia Alembic incremental não cria magias/equipamentos do zero;
           # create_all no startup (STARTUP_RUN_ALEMBIC=0) alinha com o job migrations em Postgres.
           STARTUP_RUN_ALEMBIC: "0"
+          # Segredos opcionais (se ausentes, o script usa admin@arena.local / admin123). Aviso do editor sobre contexto = falso positivo.
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
