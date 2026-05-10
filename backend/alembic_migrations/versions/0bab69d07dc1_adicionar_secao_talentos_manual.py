@@ -20,29 +20,23 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Adiciona coluna secao à tabela talentos."""
-    
-    # Adicionar coluna secao
-    try:
-        op.add_column('talentos', sa.Column('secao', sa.String(200), nullable=True))
-    except Exception as e:
-        # Silenciar erros "coluna já existe" - compatível com SQLite e PostgreSQL
-        erro_str = str(e).lower()
-        if "duplicate column" in erro_str or "already exists" in erro_str:
-            pass  # Coluna já existe, tudo bem
-        else:
-            raise  # Re-raise se for outro tipo de erro
+
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
+    if "talentos" not in insp.get_table_names():
+        return
+    colunas = {c["name"] for c in insp.get_columns("talentos")}
+    if "secao" not in colunas:
+        op.add_column("talentos", sa.Column("secao", sa.String(200), nullable=True))
 
 
 def downgrade() -> None:
     """Remove coluna secao da tabela talentos."""
-    
-    # Remover coluna secao
-    try:
-        op.drop_column('talentos', 'secao')
-    except Exception as e:
-        # Silenciar erros se a coluna não existir
-        erro_str = str(e).lower()
-        if "no such column" in erro_str or "does not exist" in erro_str:
-            pass  # Coluna não existe, tudo bem
-        else:
-            raise  # Re-raise se for outro tipo de erro
+
+    bind = op.get_bind()
+    insp = sa.inspect(bind)
+    if "talentos" not in insp.get_table_names():
+        return
+    colunas = {c["name"] for c in insp.get_columns("talentos")}
+    if "secao" in colunas:
+        op.drop_column("talentos", "secao")
