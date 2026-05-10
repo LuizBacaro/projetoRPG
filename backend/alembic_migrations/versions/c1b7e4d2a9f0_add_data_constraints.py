@@ -28,6 +28,38 @@ def _tabela_existe(nome: str) -> bool:
         return False
 
 
+def _nome_constraint_igual(registrado: str | None, esperado: str) -> bool:
+    return (registrado or "").lower() == esperado.lower()
+
+
+def _check_constraint_existe(tabela: str, nome: str) -> bool:
+    try:
+        bind = op.get_bind()
+        insp = sa.inspect(bind)
+        if tabela not in insp.get_table_names():
+            return False
+        return any(
+            _nome_constraint_igual(c.get("name"), nome)
+            for c in insp.get_check_constraints(tabela)
+        )
+    except Exception:
+        return False
+
+
+def _unique_constraint_existe(tabela: str, nome: str) -> bool:
+    try:
+        bind = op.get_bind()
+        insp = sa.inspect(bind)
+        if tabela not in insp.get_table_names():
+            return False
+        return any(
+            _nome_constraint_igual(u.get("name"), nome)
+            for u in insp.get_unique_constraints(tabela)
+        )
+    except Exception:
+        return False
+
+
 def upgrade() -> None:
     bind = op.get_bind()
 
@@ -67,39 +99,49 @@ def upgrade() -> None:
             )
         )
 
-    with op.batch_alter_table("combatentes") as batch_op:
-        batch_op.create_check_constraint(
-            "ck_combatentes_hp_atual_non_negative",
-            "hp_atual >= 0",
-        )
-        batch_op.create_check_constraint(
-            "ck_combatentes_hp_maximo_positive",
-            "hp_maximo > 0",
-        )
-        batch_op.create_check_constraint(
-            "ck_combatentes_hp_atual_lte_hp_maximo",
-            "hp_atual <= hp_maximo",
-        )
-        batch_op.create_check_constraint(
-            "ck_combatentes_tipo_valido",
-            "tipo IN ('jogador', 'monstro', 'npc')",
-        )
+    # Schema criado por metadata/create_all já traz várias checks com estes nomes.
+    combatentes_checks = [
+        ("ck_combatentes_hp_atual_non_negative", "hp_atual >= 0"),
+        ("ck_combatentes_hp_maximo_positive", "hp_maximo > 0"),
+        ("ck_combatentes_hp_atual_lte_hp_maximo", "hp_atual <= hp_maximo"),
+        ("ck_combatentes_tipo_valido", "tipo IN ('jogador', 'monstro', 'npc')"),
+    ]
+    pending_ck = [
+        (n, sql)
+        for n, sql in combatentes_checks
+        if not _check_constraint_existe("combatentes", n)
+    ]
+    if pending_ck:
+        with op.batch_alter_table("combatentes") as batch_op:
+            for nome, sql_chk in pending_ck:
+                batch_op.create_check_constraint(nome, sql_chk)
 
     if _tabela_existe("magias_preparadas"):
-        with op.batch_alter_table("magias_preparadas") as batch_op:
-            batch_op.create_unique_constraint(
-                "uq_magias_preparadas_combatente_magia",
-                ["combatente_id", "magia_id"],
-            )
+        if not _unique_constraint_existe(
+            "magias_preparadas", "uq_magias_preparadas_combatente_magia"
+        ):
+            with op.batch_alter_table("magias_preparadas") as batch_op:
+                batch_op.create_unique_constraint(
+                    "uq_magias_preparadas_combatente_magia",
+                    ["combatente_id", "magia_id"],
+                )
 
 
 def downgrade() -> None:
-    if _tabela_existe("magias_preparadas"):
+    if _tabela_existe("magias_preparadas") and _unique_constraint_existe(
+        "magias_preparadas", "uq_magias_preparadas_combatente_magia"
+    ):
         with op.batch_alter_table("magias_preparadas") as batch_op:
             batch_op.drop_constraint("uq_magias_preparadas_combatente_magia", type_="unique")
 
-    with op.batch_alter_table("combatentes") as batch_op:
-        batch_op.drop_constraint("ck_combatentes_tipo_valido", type_="check")
-        batch_op.drop_constraint("ck_combatentes_hp_atual_lte_hp_maximo", type_="check")
-        batch_op.drop_constraint("ck_combatentes_hp_maximo_positive", type_="check")
-        batch_op.drop_constraint("ck_combatentes_hp_atual_non_negative", type_="check")
+    drop_order = [
+        "ck_combatentes_tipo_valido",
+        "ck_combatentes_hp_atual_lte_hp_maximo",
+        "ck_combatentes_hp_maximo_positive",
+        "ck_combatentes_hp_atual_non_negative",
+    ]
+    pending_drop = [n for n in drop_order if _check_constraint_existe("combatentes", n)]
+    if pending_drop:
+        with op.batch_alter_table("combatentes") as batch_op:
+            for nome in pending_drop:
+                batch_op.drop_constraint(nome, type_="check")
