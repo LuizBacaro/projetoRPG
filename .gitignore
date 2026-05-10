@@ -10,6 +10,7 @@ __pycache__/
 *.pyo
 .venv/
 .venv_pdf/
+backend/.venv-ci/
 venv/
 *.egg-info/
 
