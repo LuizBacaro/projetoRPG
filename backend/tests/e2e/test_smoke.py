@@ -41,8 +41,8 @@ def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
     """Navega para login e autentica."""
     page.goto(f"{FRONTEND}/pages/login.html")
     page.wait_for_load_state("networkidle")
-    page.fill("#loginEmail", email)
-    page.fill("#loginSenha", senha)
+    page.fill("#inputEmail", email)
+    page.fill("#inputSenha", senha)
     page.click("#btnLogin")
     # Aguarda redirecionamento ou elemento de dashboard
     page.wait_for_url(f"**/dashboard.html", timeout=8000)
@@ -63,8 +63,8 @@ def test_login_invalido_exibe_erro(page: Page):
     """Login com senha errada exibe mensagem de erro, não redireciona."""
     page.goto(f"{FRONTEND}/pages/login.html")
     page.wait_for_load_state("networkidle")
-    page.fill("#loginEmail", ADMIN_EMAIL)
-    page.fill("#loginSenha", "senha_errada_xpto")
+    page.fill("#inputEmail", ADMIN_EMAIL)
+    page.fill("#inputSenha", "senha_errada_xpto")
     page.click("#btnLogin")
 
     # Deve permanecer na tela de login
