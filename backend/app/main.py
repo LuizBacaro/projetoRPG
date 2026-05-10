@@ -11,13 +11,15 @@ import unicodedata
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import inspect, text
-from starlette.requests import Request
+from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
+
+from .shared.exceptions.custom_exceptions import ArenaBaseException
 
 from .shared.core.config import settings
 from .shared.core.database import engine, Base, SessionLocal, get_db
@@ -165,6 +167,11 @@ async def _readiness_middleware(request: Request, call_next):
     """
     Em production, /api/* fica 503 até a fase crítica de startup concluir.
     OPTIONS passa (CORS preflight). /health/live e /health/ping não passam por /api.
+
+    Também captura qualquer exceção não tratada e devolve um JSON 500
+    (em vez de deixar o `ServerErrorMiddleware` do Starlette responder por
+    fora do CORS). Sem isto, o navegador receberia a resposta sem o header
+    `Access-Control-Allow-Origin` e mostraria apenas "Failed to fetch".
     """
     if settings.ENVIRONMENT == "production" and not _db_startup_done.is_set():
         path = request.url.path or ""
@@ -173,7 +180,123 @@ async def _readiness_middleware(request: Request, call_next):
                 status_code=503,
                 content={"detail": "Inicialização do banco em curso; tente em instantes."},
             )
-    return await call_next(request)
+
+    try:
+        return await call_next(request)
+    except HTTPException:
+        # Re-levanta — FastAPI/Starlette já tem handler para HTTPException
+        # com CORS dentro do escopo de ExceptionMiddleware.
+        raise
+    except Exception:
+        logger.exception(
+            "Exceção não tratada em %s %s — convertendo em 500 JSON com CORS",
+            request.method,
+            request.url.path,
+        )
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Erro interno do servidor. Veja os logs para diagnóstico."},
+        )
+
+
+# ── Exception Handlers globais ────────────────────────────────────────────────
+# Garante que erros previsíveis (constraint do banco, falha de conexão, regra
+# de negócio) sempre voltem como JSON 4xx/5xx — passando pelo CORSMiddleware.
+# Sem isso, um IntegrityError não tratado pode chegar ao Render como 500 sem
+# `Access-Control-Allow-Origin`, e o navegador mostra apenas "Failed to fetch".
+
+@app.exception_handler(ArenaBaseException)
+async def _handle_arena_exception(request: Request, exc: ArenaBaseException) -> JSONResponse:
+    """Erro de regra de negócio → respeita o status_code definido pela exceção."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message},
+    )
+
+
+@app.exception_handler(IntegrityError)
+async def _handle_integrity_error(request: Request, exc: IntegrityError) -> JSONResponse:
+    """Violação de constraint (CHECK / UNIQUE / FK) → 409 com detalhe seguro.
+
+    Evita 500 sem CORS quando algum dado bate em uma constraint legada (ex.: a
+    constraint `ck_combatentes_hp_atual_non_negative` que sobreviveu em bancos
+    onde a migration `d5f9a2c1b8e7` rodou em SQLite no-op).
+    """
+    detalhe_bruto = str(getattr(exc, "orig", exc))
+    logger.warning(
+        "[%s] IntegrityError em %s %s: %s",
+        request.client.host if request.client else "?",
+        request.method,
+        request.url.path,
+        detalhe_bruto[:300],
+    )
+    detalhe_publico = "Violação de regra de integridade do banco. Tente novamente; se persistir, contate o suporte."
+    if "ck_combatentes_hp_atual_non_negative" in detalhe_bruto:
+        detalhe_publico = (
+            "O servidor ainda tem uma regra antiga que impede HP negativo. "
+            "Atualize/redeploy do backend para aplicar a migration mais recente."
+        )
+    return JSONResponse(
+        status_code=409,
+        content={"detail": detalhe_publico},
+    )
+
+
+@app.exception_handler(OperationalError)
+async def _handle_operational_error(request: Request, exc: OperationalError) -> JSONResponse:
+    """Falha de conexão/operação no banco → 503 (não derruba CORS)."""
+    detalhe = str(getattr(exc, "orig", exc))
+    logger.error(
+        "OperationalError em %s %s: %s",
+        request.method,
+        request.url.path,
+        detalhe[:300],
+        exc_info=True,
+    )
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Banco indisponível no momento. Tente em instantes."},
+    )
+
+
+@app.exception_handler(SQLAlchemyError)
+async def _handle_sqlalchemy_error(request: Request, exc: SQLAlchemyError) -> JSONResponse:
+    """Outras falhas SQLAlchemy → 500 controlado, mas com CORS."""
+    logger.exception(
+        "SQLAlchemyError em %s %s",
+        request.method,
+        request.url.path,
+    )
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Erro interno ao acessar o banco. Veja os logs do servidor."},
+    )
+
+
+@app.exception_handler(Exception)
+async def _handle_uncaught_exception(request: Request, exc: Exception) -> JSONResponse:
+    """Última linha de defesa: garante JSON com CORS em qualquer falha não prevista.
+
+    Sem este handler, exceções desconhecidas viram 500 do Starlette
+    em texto plano, e em alguns proxies (Render) podem chegar ao
+    navegador sem o header `Access-Control-Allow-Origin`, gerando
+    apenas "TypeError: Failed to fetch" no console.
+    """
+    if isinstance(exc, HTTPException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
+            headers=dict(exc.headers or {}),
+        )
+    logger.exception(
+        "Exceção não tratada em %s %s",
+        request.method,
+        request.url.path,
+    )
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Erro interno do servidor. Veja os logs para diagnóstico."},
+    )
 
 
 # ── Middleware CORS ──────────────────────────────────────────────────────────
@@ -681,12 +804,18 @@ def _garantir_colunas_soft_delete() -> None:
 
 
 def _garantir_constraints_item_13() -> None:
-    """Normaliza dados e garante unicidade para item #13 em bases existentes."""
+    """Normaliza dados e garante unicidade para item #13 em bases existentes.
+
+    Importante: a partir do release que permite jogadores caírem até -10 HP
+    (regra D&D 3.5 — `ck_combatentes_hp_atual_minimum CHECK hp_atual >= -10`),
+    NÃO zeramos mais hp_atual negativo. Apenas elevamos valores abaixo do
+    piso (< -10) para -10, mantendo o estado de "morto" coerente.
+    """
     logger.info("🔧 Aplicando guard de integridade do item #13")
     with engine.begin() as conn:
-        # Normaliza limites de HP
         conn.execute(text("UPDATE combatentes SET hp_maximo = 1 WHERE hp_maximo IS NULL OR hp_maximo <= 0"))
-        conn.execute(text("UPDATE combatentes SET hp_atual = 0 WHERE hp_atual IS NULL OR hp_atual < 0"))
+        conn.execute(text("UPDATE combatentes SET hp_atual = 0 WHERE hp_atual IS NULL"))
+        conn.execute(text("UPDATE combatentes SET hp_atual = -10 WHERE hp_atual < -10"))
         conn.execute(text("UPDATE combatentes SET hp_atual = hp_maximo WHERE hp_atual > hp_maximo"))
 
         # Normaliza tipo para conjunto fechado permitido
