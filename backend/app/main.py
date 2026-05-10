@@ -480,27 +480,27 @@ def _executar_alembic_migrations() -> None:
     """
     Executa as migrations do Alembic automaticamente no startup.
     SRP: Garante que o schema esteja sempre atualizado.
-    
-    IMPORTANTE: Deve rodar APÓS create_all(), pois migrations fazem ALTER TABLE
-    e precisam que as tabelas já existam.
-    
-    TODO: Falhas de migration devem abortar o startup. Não podemos seguir com um
-    banco parcialmente migrado, pois isso causa erros de coluna faltante em
-    etapas subsequentes.
+
+    Quando este passo roda, o schema deve vir **só** do Alembic (não use
+    `create_all` antes): senão tabelas novas existem sem `alembic_version` alinhado
+    e o próximo `upgrade` tenta `CREATE TABLE` de novo (ex.: gurps_campanhas).
+
+    Em produção/staging, `Settings` já exige DATABASE_URL PostgreSQL; aqui usamos
+    `settings.DATABASE_URL` para ficar alinhado ao engine da app.
     """
     try:
         from alembic.config import Config
         from alembic import command
-        
+
         backend_root = Path(__file__).parent.parent
         ini_path = backend_root / "alembic.ini"
-        
+
         if not ini_path.exists():
             raise FileNotFoundError(f"alembic.ini não encontrado em {ini_path}")
-        
+
         # Configurar Alembic
         cfg = Config(str(ini_path))
-        database_url = os.environ.get("DATABASE_URL", "sqlite:///./rpg_arena.db")
+        database_url = settings.DATABASE_URL
         cfg.set_main_option("sqlalchemy.url", database_url)
         
         logger.info(f"🔄 Executando migrations Alembic...")
@@ -536,23 +536,25 @@ def _inicializar_banco_critico(db) -> None:
     SRP: Orquestra a inicialização crítica do banco (gate para liberar /api em produção).
 
     Ordem importa:
-    1. Criar tabelas (create_all) - base para tudo
-    2. Migrations do Alembic (opcional por setting)
-    3. Admin + guards de schema + catálogo de jogos + memberships legados
+    1. Com `STARTUP_RUN_ALEMBIC`: só Alembic até `head` (fonte de verdade do schema).
+       Sem Alembic no startup: `create_all` para bases locais legadas / dev rápido.
+    2. Admin + guards de schema + catálogo de jogos + memberships legados
 
     Args:
         db: Sessão do banco
     """
-    passos = [
-        ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
-    ]
     if settings.STARTUP_RUN_ALEMBIC:
-        passos.append(("executar_alembic_migrations", _executar_alembic_migrations))
+        passos = [
+            ("executar_alembic_migrations", _executar_alembic_migrations),
+        ]
     else:
         logger.info(
             "⏭️ Pulando Alembic no startup da app (STARTUP_RUN_ALEMBIC=0); "
-            "espera-se migração prévia no processo de deploy."
+            "espera-se migração prévia no processo de deploy (ex.: Procfile)."
         )
+        passos = [
+            ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
+        ]
 
     passos.extend([
         ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
