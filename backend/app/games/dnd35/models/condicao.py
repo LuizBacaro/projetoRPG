@@ -2,6 +2,7 @@
 Model de Condição (Entity)
 Princípio SOLID: SRP - Entidade responsável apenas por representar uma Condição D&D
 """
+
 from sqlalchemy import Column, Integer, String, Text
 
 from app.shared.core.database import Base
@@ -12,6 +13,7 @@ class Condicao(Base):
     Entidade que representa uma condição de D&D 3.5
     Seed com as 25 condições da planilha Condies-D&D.xlsx
     """
+
     __tablename__ = "condicoes"
     __table_args__ = {"extend_existing": True}
 

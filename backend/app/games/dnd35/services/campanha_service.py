@@ -8,10 +8,13 @@ classe durante a reorganização multi-jogo.
 
 from typing import List
 
-from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.games.dnd35.models.campanha import Campanha
-from app.games.dnd35.ports import CampanhaRepositoryProtocol, CombatenteRepositoryProtocol
+from app.games.dnd35.ports import (
+    CampanhaRepositoryProtocol,
+    CombatenteRepositoryProtocol,
+)
 from app.repositories.base import commit_with_rollback
+from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 
 
 class CampanhaService:
@@ -27,9 +30,7 @@ class CampanhaService:
         campanhas = self.campanha_repository.listar_por_mestre(mestre_id)
         for campanha in campanhas:
             campanha.total_personagens = len(campanha.personagens or [])
-            campanha.personagem_ids = [
-                p.id for p in (campanha.personagens or [])
-            ]
+            campanha.personagem_ids = [p.id for p in (campanha.personagens or [])]
         return campanhas
 
     def criar(
@@ -56,9 +57,7 @@ class CampanhaService:
         criada.personagem_ids = [p.id for p in (criada.personagens or [])]
         return criada
 
-    def obter_por_id_mestre(
-        self, campanha_id: int, mestre_id: int
-    ) -> Campanha:
+    def obter_por_id_mestre(self, campanha_id: int, mestre_id: int) -> Campanha:
         campanha = self.campanha_repository.obter_por_id_e_mestre(
             campanha_id, mestre_id
         )
@@ -88,9 +87,7 @@ class CampanhaService:
 
         atualizada = self.campanha_repository.update(campanha)
         atualizada.total_personagens = len(atualizada.personagens or [])
-        atualizada.personagem_ids = [
-            p.id for p in (atualizada.personagens or [])
-        ]
+        atualizada.personagem_ids = [p.id for p in (atualizada.personagens or [])]
         return atualizada
 
     def deletar(self, campanha_id: int, mestre_id: int) -> None:
@@ -134,9 +131,7 @@ class CampanhaService:
         commit: bool = True,
     ) -> None:
         ids = list(
-            dict.fromkeys(
-                [int(pid) for pid in (personagem_ids or []) if int(pid) > 0]
-            )
+            dict.fromkeys([int(pid) for pid in (personagem_ids or []) if int(pid) > 0])
         )
         if not ids:
             if commit:

@@ -62,7 +62,9 @@ class CatalogCache:
 
     def _evict_if_needed_locked(self) -> None:
         now = time.time()
-        expired_keys = [key for key, (expires_at, _) in self._values.items() if expires_at <= now]
+        expired_keys = [
+            key for key, (expires_at, _) in self._values.items() if expires_at <= now
+        ]
         for key in expired_keys:
             self._values.pop(key, None)
 

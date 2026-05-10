@@ -3,8 +3,8 @@ from pathlib import Path
 
 from fastapi import UploadFile
 
-from app.shared.exceptions.custom_exceptions import InvalidFileError
 from app.services.file_service import FileService
+from app.shared.exceptions.custom_exceptions import InvalidFileError
 
 
 def _png_upload(filename: str = "avatar.png", payload_size: int = 16) -> UploadFile:
@@ -15,7 +15,9 @@ def _png_upload(filename: str = "avatar.png", payload_size: int = 16) -> UploadF
 def test_validar_arquivo_rejeita_extensao_invalida(monkeypatch, tmp_path):
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     service = FileService()
     arquivo = UploadFile(filename="avatar.exe", file=BytesIO(b"MZ123456"))
@@ -30,7 +32,9 @@ def test_validar_arquivo_rejeita_extensao_invalida(monkeypatch, tmp_path):
 def test_validar_arquivo_rejeita_magic_bytes_invalido(monkeypatch, tmp_path):
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     service = FileService()
     arquivo = UploadFile(filename="avatar.png", file=BytesIO(b"NAO_E_IMAGEM"))
@@ -45,7 +49,9 @@ def test_validar_arquivo_rejeita_magic_bytes_invalido(monkeypatch, tmp_path):
 def test_salvar_arquivo_grava_em_uploads(monkeypatch, tmp_path):
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     service = FileService()
     foto_url = service.salvar_arquivo(_png_upload())
@@ -57,9 +63,14 @@ def test_salvar_arquivo_grava_em_uploads(monkeypatch, tmp_path):
 
 def test_salvar_arquivo_usa_uploads_base_url_configuravel(monkeypatch, tmp_path):
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
-    monkeypatch.setattr("app.services.file_service.settings.UPLOADS_BASE_URL", "https://cdn.example.com/uploads")
+    monkeypatch.setattr(
+        "app.services.file_service.settings.UPLOADS_BASE_URL",
+        "https://cdn.example.com/uploads",
+    )
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     service = FileService()
     foto_url = service.salvar_arquivo(_png_upload())
@@ -71,7 +82,9 @@ def test_salvar_arquivo_usa_uploads_base_url_configuravel(monkeypatch, tmp_path)
 def test_deletar_arquivo_remove_arquivo_existente(monkeypatch, tmp_path):
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     service = FileService()
     foto_url = service.salvar_arquivo(_png_upload())
@@ -83,7 +96,9 @@ def test_deletar_arquivo_remove_arquivo_existente(monkeypatch, tmp_path):
 def test_deletar_arquivo_path_traversal_nao_remove(monkeypatch, tmp_path):
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     service = FileService()
 
@@ -92,9 +107,14 @@ def test_deletar_arquivo_path_traversal_nao_remove(monkeypatch, tmp_path):
 
 def test_deletar_arquivo_com_url_absoluta(monkeypatch, tmp_path):
     monkeypatch.setattr("app.services.file_service.settings.UPLOADS_DIR", tmp_path)
-    monkeypatch.setattr("app.services.file_service.settings.UPLOADS_BASE_URL", "https://cdn.example.com/uploads")
+    monkeypatch.setattr(
+        "app.services.file_service.settings.UPLOADS_BASE_URL",
+        "https://cdn.example.com/uploads",
+    )
     monkeypatch.setattr("app.services.file_service.settings.MAX_FILE_SIZE", 1024)
-    monkeypatch.setattr("app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"})
+    monkeypatch.setattr(
+        "app.services.file_service.settings.ALLOWED_EXTENSIONS", {".png"}
+    )
 
     service = FileService()
     foto_url = service.salvar_arquivo(_png_upload())

@@ -23,7 +23,11 @@ class RequestSizeLimitMiddleware:
 
         headers = Headers(scope=scope)
         content_type = headers.get("content-type", "").lower()
-        limit = self.max_json_body_size if "application/json" in content_type else self.max_request_size
+        limit = (
+            self.max_json_body_size
+            if "application/json" in content_type
+            else self.max_request_size
+        )
 
         content_length = headers.get("content-length")
         if content_length is not None:

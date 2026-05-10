@@ -50,9 +50,13 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
         if habilidades_grouped:
             habilidades_txt = json.dumps(habilidades_grouped, ensure_ascii=False)
         else:
-            habilidades = calcular_habilidades_especiais(combatente.classe, combatente.nivel)
+            habilidades = calcular_habilidades_especiais(
+                combatente.classe, combatente.nivel
+            )
             habilidades_txt = " | ".join(habilidades) if habilidades else ""
-        novas_resistencias = calcular_resistencias_base(combatente.classe, combatente.nivel)
+        novas_resistencias = calcular_resistencias_base(
+            combatente.classe, combatente.nivel
+        )
         mudou = False
 
         if (combatente.bonus_base_ataque or "") != novo_bba:
@@ -91,9 +95,15 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
         else:
             # Classes sem mapeamento no catálogo/fallback: preservar totais legados
             # e preencher base de forma derivada para evitar nulls em responses.
-            base_fort = (combatente.fortitude or 0) - _modificador_atributo(combatente.constituicao)
-            base_ref = (combatente.reflexos or 0) - _modificador_atributo(combatente.destreza)
-            base_vont = (combatente.vontade or 0) - _modificador_atributo(combatente.sabedoria)
+            base_fort = (combatente.fortitude or 0) - _modificador_atributo(
+                combatente.constituicao
+            )
+            base_ref = (combatente.reflexos or 0) - _modificador_atributo(
+                combatente.destreza
+            )
+            base_vont = (combatente.vontade or 0) - _modificador_atributo(
+                combatente.sabedoria
+            )
 
             if combatente.fortitude_base is None:
                 combatente.fortitude_base = base_fort
@@ -126,4 +136,7 @@ def sincronizar_bonus_base_ataque_combatentes(db: Session) -> None:
 
     if atualizados:
         db.commit()
-        logger.info("✅ Progressão base (BBA/TRs) sincronizada para %s combatente(s).", atualizados)
+        logger.info(
+            "✅ Progressão base (BBA/TRs) sincronizada para %s combatente(s).",
+            atualizados,
+        )

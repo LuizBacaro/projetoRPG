@@ -12,7 +12,6 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.dependencies import get_talento_service
-from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.games.dnd35.schemas.talento import (
     TalentoCreate,
     TalentoJogadorCreate,
@@ -20,15 +19,14 @@ from app.games.dnd35.schemas.talento import (
     TalentoResponse,
 )
 from app.games.dnd35.services.talento_service import TalentoService
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/talentos", tags=["talentos"])
 
 
-@router.post(
-    "/", response_model=TalentoResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/", response_model=TalentoResponse, status_code=status.HTTP_201_CREATED)
 def criar_talento(
     talento: TalentoCreate,
     service: TalentoService = Depends(get_talento_service),
@@ -57,9 +55,7 @@ def listar_talentos(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post(
-    "/{combatente_id}/adicionar", response_model=TalentoJogadorListResponse
-)
+@router.post("/{combatente_id}/adicionar", response_model=TalentoJogadorListResponse)
 def adicionar_talento_jogador(
     combatente_id: int,
     talento_jogador: TalentoJogadorCreate,
@@ -68,9 +64,7 @@ def adicionar_talento_jogador(
 ):
     """Adiciona um talento ao combatente"""
     try:
-        return service.adicionar_talento_jogador(
-            combatente_id, talento_jogador
-        )
+        return service.adicionar_talento_jogador(combatente_id, talento_jogador)
     except ValueError as e:
         logger.error(f"Validação falhou: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
@@ -79,9 +73,7 @@ def adicionar_talento_jogador(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get(
-    "/{combatente_id}/listar", response_model=List[TalentoJogadorListResponse]
-)
+@router.get("/{combatente_id}/listar", response_model=List[TalentoJogadorListResponse])
 def listar_talentos_jogador(
     combatente_id: int,
     service: TalentoService = Depends(get_talento_service),

@@ -3,6 +3,7 @@ CondicaoRepository
 Princípio SOLID: DIP - Abstração para acesso a dados de Condições
 SRP - Apenas lógica de persistência
 """
+
 from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session, aliased
@@ -39,7 +40,9 @@ class CondicaoRepository:
             for c in condicoes
         ]
 
-    def get_by_id(self, condicao_id: int) -> Optional[Condicao]:  # ✅ Usar Optional em vez de |
+    def get_by_id(
+        self, condicao_id: int
+    ) -> Optional[Condicao]:  # ✅ Usar Optional em vez de |
         """Retorna uma condição por ID"""
         return self.db.query(Condicao).filter(Condicao.id == condicao_id).first()
 
@@ -50,7 +53,9 @@ class CondicaoRepository:
     def seed(self, condicoes_data: List[Dict]) -> None:
         """Popula a tabela com as 25 condições padrão D&D"""
         for data in condicoes_data:
-            existente = self.db.query(Condicao).filter(Condicao.nome == data["nome"]).first()
+            existente = (
+                self.db.query(Condicao).filter(Condicao.nome == data["nome"]).first()
+            )
             if not existente:
                 novo = Condicao(nome=data["nome"], efeito=data["efeito"])
                 self.db.add(novo)
@@ -122,7 +127,9 @@ class CondicaoRepository:
         if commit:
             commit_with_rollback(self.db)
 
-    def remover(self, combatente_id: int, condicao_id: int, commit: bool = True) -> None:
+    def remover(
+        self, combatente_id: int, condicao_id: int, commit: bool = True
+    ) -> None:
         """Remove uma condição específica de um combatente"""
         self.db.query(CombatenteCondicao).filter(
             CombatenteCondicao.combatente_id == combatente_id,
@@ -133,7 +140,9 @@ class CondicaoRepository:
 
     def remover_todas(self, combatente_id: int, commit: bool = True) -> None:
         """Remove todas as condições de um combatente"""
-        self.db.query(CombatenteCondicao).filter(CombatenteCondicao.combatente_id == combatente_id).delete()
+        self.db.query(CombatenteCondicao).filter(
+            CombatenteCondicao.combatente_id == combatente_id
+        ).delete()
         if commit:
             commit_with_rollback(self.db)
 

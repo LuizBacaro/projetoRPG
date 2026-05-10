@@ -12,8 +12,12 @@ from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
+from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.equipamento import Equipamento, EquipamentoJogador
-from app.games.dnd35.ports import EquipamentoCatalogProtocol, EquipamentoJogadorLinksProtocol
+from app.games.dnd35.ports import (
+    EquipamentoCatalogProtocol,
+    EquipamentoJogadorLinksProtocol,
+)
 from app.games.dnd35.repositories.equipamento_repository import (
     EquipamentoJogadorRepository,
     EquipamentoRepository,
@@ -23,7 +27,6 @@ from app.games.dnd35.schemas.equipamento import (
     EquipamentoJogadorCreate,
     EquipamentoJogadorListResponse,
 )
-from app.games.dnd35.models.combatente import Combatente
 
 
 class EquipamentoService:
@@ -93,9 +96,7 @@ class EquipamentoService:
     ) -> EquipamentoJogadorListResponse:
         """Adiciona um equipamento ao combatente"""
         combatente = (
-            self.db.query(Combatente)
-            .filter(Combatente.id == combatente_id)
-            .first()
+            self.db.query(Combatente).filter(Combatente.id == combatente_id).first()
         )
         if not combatente:
             raise ValueError(f"Combatente {combatente_id} não encontrado")
@@ -108,7 +109,9 @@ class EquipamentoService:
                 f"Equipamento {equipamento_jogador.equipamento_id} não encontrado"
             )
 
-        eq_jogador = self._jogador.adicionar_equipamento(combatente_id, equipamento_jogador)
+        eq_jogador = self._jogador.adicionar_equipamento(
+            combatente_id, equipamento_jogador
+        )
 
         return EquipamentoJogadorListResponse(
             id=equipamento.id,

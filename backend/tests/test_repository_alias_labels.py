@@ -1,6 +1,6 @@
 from app.games.dnd35.models.combatente import Combatente
-from app.games.dnd35.models.condicao import Condicao
 from app.games.dnd35.models.combatente_condicao import CombatenteCondicao
+from app.games.dnd35.models.condicao import Condicao
 from app.games.dnd35.models.equipamento import Equipamento
 from app.games.dnd35.models.talento import Talento
 from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
@@ -31,7 +31,9 @@ def _criar_combatente(test_db):
 
 def test_equipamento_service_lista_com_alias_labels(test_db):
     combatente = _criar_combatente(test_db)
-    equipamento = Equipamento(nome="Mochila", descricao="Couro", pagina_referencia="PHB p.101", ativo=True)
+    equipamento = Equipamento(
+        nome="Mochila", descricao="Couro", pagina_referencia="PHB p.101", ativo=True
+    )
     test_db.add(equipamento)
     test_db.commit()
     test_db.refresh(equipamento)
@@ -52,7 +54,12 @@ def test_equipamento_service_lista_com_alias_labels(test_db):
 
 def test_talento_service_lista_com_alias_labels(test_db):
     combatente = _criar_combatente(test_db)
-    talento = Talento(nome="Iniciativa Aprimorada", descricao="+4 iniciativa", pagina_referencia="PHB p.95", ativo=True)
+    talento = Talento(
+        nome="Iniciativa Aprimorada",
+        descricao="+4 iniciativa",
+        pagina_referencia="PHB p.95",
+        ativo=True,
+    )
     test_db.add(talento)
     test_db.commit()
     test_db.refresh(talento)

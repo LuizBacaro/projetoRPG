@@ -11,9 +11,13 @@ from typing import Optional
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from app.games.dnd35.models.grimorio import GrimorioHistoricoTroca, GrimorioMagia, GrimorioNotificacao
-from app.games.dnd35.models.magia import Magia
 from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.models.grimorio import (
+    GrimorioHistoricoTroca,
+    GrimorioMagia,
+    GrimorioNotificacao,
+)
+from app.games.dnd35.models.magia import Magia
 from app.repositories.base import commit_with_rollback
 
 
@@ -21,8 +25,15 @@ class GrimorioRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def _query_listar(self, combatente_id: int, classe: Optional[str] = None, favorita: Optional[bool] = None):
-        query = self.db.query(GrimorioMagia).filter(GrimorioMagia.combatente_id == combatente_id)
+    def _query_listar(
+        self,
+        combatente_id: int,
+        classe: Optional[str] = None,
+        favorita: Optional[bool] = None,
+    ):
+        query = self.db.query(GrimorioMagia).filter(
+            GrimorioMagia.combatente_id == combatente_id
+        )
         if classe:
             query = query.filter(GrimorioMagia.classe == classe.strip().upper())
         if favorita is not None:
@@ -72,7 +83,12 @@ class GrimorioRepository:
 
         return query
 
-    def listar(self, combatente_id: int, classe: Optional[str] = None, favorita: Optional[bool] = None):
+    def listar(
+        self,
+        combatente_id: int,
+        classe: Optional[str] = None,
+        favorita: Optional[bool] = None,
+    ):
         query = self._query_listar(combatente_id, classe=classe, favorita=favorita)
         return query.order_by(GrimorioMagia.classe, GrimorioMagia.id).all()
 
@@ -105,15 +121,25 @@ class GrimorioRepository:
             query = query.limit(limit)
         return total, query.all()
 
-    def listar_historico_troca(self, combatente_id: int, classe: Optional[str] = None, limit: int = 20):
+    def listar_historico_troca(
+        self, combatente_id: int, classe: Optional[str] = None, limit: int = 20
+    ):
         query = self.db.query(GrimorioHistoricoTroca).filter(
             GrimorioHistoricoTroca.combatente_id == combatente_id
         )
         if classe:
-            query = query.filter(GrimorioHistoricoTroca.classe == classe.strip().upper())
-        return query.order_by(GrimorioHistoricoTroca.realizada_em.desc()).limit(limit).all()
+            query = query.filter(
+                GrimorioHistoricoTroca.classe == classe.strip().upper()
+            )
+        return (
+            query.order_by(GrimorioHistoricoTroca.realizada_em.desc())
+            .limit(limit)
+            .all()
+        )
 
-    def get_item(self, combatente_id: int, magia_id: int, classe: str) -> Optional[GrimorioMagia]:
+    def get_item(
+        self, combatente_id: int, magia_id: int, classe: str
+    ) -> Optional[GrimorioMagia]:
         return (
             self.db.query(GrimorioMagia)
             .filter(
@@ -145,7 +171,11 @@ class GrimorioRepository:
         return query.order_by(GrimorioNotificacao.criada_em.desc()).limit(limit).all()
 
     def get_notificacao(self, notificacao_id: int) -> Optional[GrimorioNotificacao]:
-        return self.db.query(GrimorioNotificacao).filter(GrimorioNotificacao.id == notificacao_id).first()
+        return (
+            self.db.query(GrimorioNotificacao)
+            .filter(GrimorioNotificacao.id == notificacao_id)
+            .first()
+        )
 
     def get_notificacao_aberta_por_tipo(
         self,
@@ -195,7 +225,9 @@ class GrimorioRepository:
         self.db.delete(item)
         commit_with_rollback(self.db)
 
-    def registrar_troca(self, historico: GrimorioHistoricoTroca) -> GrimorioHistoricoTroca:
+    def registrar_troca(
+        self, historico: GrimorioHistoricoTroca
+    ) -> GrimorioHistoricoTroca:
         self.db.add(historico)
         commit_with_rollback(self.db)
         self.db.refresh(historico)

@@ -4,8 +4,8 @@ Seed para popular perícias do Excel: Perícias.xlsx (D&D 3.5)
 Módulo canónico: `app.games.dnd35.seeds.pericias_seed`.
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
@@ -16,7 +16,9 @@ if str(_SCRIPTS) not in sys.path:
 
 from pericias_loader import carregar_pericias  # noqa: E402
 
-from app.games.dnd35.models.combatente import Combatente  # noqa: F401 — resolve relacionamentos
+from app.games.dnd35.models.combatente import (  # noqa: F401 — resolve relacionamentos
+    Combatente,
+)
 from app.games.dnd35.models.pericia import Pericia, PericiaClasse
 
 

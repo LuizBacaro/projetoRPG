@@ -184,13 +184,17 @@ class ModalDanoCura {
                     await this.danoCuraService.aplicarCuraEmMassa(ids, valor);
                 }
 
-                // Sincroniza HP nos combatentes locais do ArenaController
+                // Sincroniza HP nos combatentes locais do ArenaController.
+                // Regra D&D 3.5: monstros morrem a 0; jogadores/NPCs descem até -10.
                 ids.forEach(id => {
                     const c = this.arenaController.combatentes.find(x => x.id === id);
                     if (!c) return;
 
+                    const isMonstro = String(c.tipo || '').toLowerCase().trim() === 'monstro';
+                    const piso = isMonstro ? 0 : -10;
+
                     if (tipo === 'dano') {
-                        c.hp_atual = Math.max(0, c.hp_atual - valor);
+                        c.hp_atual = Math.max(piso, c.hp_atual - valor);
                     } else {
                         c.hp_atual = Math.min(c.hp_maximo, c.hp_atual + valor);
                     }

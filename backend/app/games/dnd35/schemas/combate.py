@@ -1,6 +1,7 @@
 """
 Schemas Pydantic para Combate (DTOs)
 """
+
 from datetime import datetime
 from typing import List, Optional
 
@@ -11,11 +12,13 @@ from app.games.dnd35.schemas.combatente import CombatenteResponse
 
 class IniciarCombateRequest(BaseModel):
     """Schema para iniciar combate"""
+
     combatente_ids: List[int] = Field(..., min_length=1)
 
 
 class CombateResponse(BaseModel):
     """Schema de resposta para Combate"""
+
     id: int
     combatentes_ids: List[int]
     turno_atual: int
@@ -31,6 +34,7 @@ class CombateResponse(BaseModel):
 
 class AplicarDanoRequest(BaseModel):
     """Schema para aplicar dano durante combate"""
+
     combatente_id: int = Field(..., gt=0)
     dano: int = Field(..., gt=0)
 

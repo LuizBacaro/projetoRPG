@@ -4,6 +4,7 @@ SRP: define contrato de entrada/saida das divindades de campanha.
 
 Canônico: `app.games.dnd35.schemas.divindade_custom`.
 """
+
 from datetime import datetime
 from typing import List, Optional
 

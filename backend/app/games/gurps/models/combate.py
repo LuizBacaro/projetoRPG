@@ -1,6 +1,6 @@
 """Combate ativo GURPS (ordem de iniciativa por lista de IDs)."""
 
-from sqlalchemy import Boolean, Column, Integer, JSON
+from sqlalchemy import JSON, Boolean, Column, Integer
 
 from app.shared.core.database import Base
 

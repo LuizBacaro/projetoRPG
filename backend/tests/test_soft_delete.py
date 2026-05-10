@@ -29,17 +29,10 @@ def test_combatente_repository_soft_delete_remove_da_listagem(test_db):
 def test_pericia_service_soft_delete_oculta_pericia(test_db):
     service = PericiaService(test_db)
     pericia = service.criar_pericia(
-        type("PericiaPayload", (), {
-            "nome": "Diplomacia",
-            "descricao": "Teste social",
-            "atributo": "CAR",
-            "tipo": "comum",
-            "especialidade": None,
-            "requer_treinamento": 0,
-            "pode_usar_sem_treinamento": 1,
-            "sofre_penalidade_armadura": 0,
-            "pagina_livro": None,
-            "dict": lambda self: {
+        type(
+            "PericiaPayload",
+            (),
+            {
                 "nome": "Diplomacia",
                 "descricao": "Teste social",
                 "atributo": "CAR",
@@ -49,8 +42,19 @@ def test_pericia_service_soft_delete_oculta_pericia(test_db):
                 "pode_usar_sem_treinamento": 1,
                 "sofre_penalidade_armadura": 0,
                 "pagina_livro": None,
+                "dict": lambda self: {
+                    "nome": "Diplomacia",
+                    "descricao": "Teste social",
+                    "atributo": "CAR",
+                    "tipo": "comum",
+                    "especialidade": None,
+                    "requer_treinamento": 0,
+                    "pode_usar_sem_treinamento": 1,
+                    "sofre_penalidade_armadura": 0,
+                    "pagina_livro": None,
+                },
             },
-        })()
+        )()
     )
 
     assert service.deletar_pericia(pericia.id) is True
@@ -71,16 +75,20 @@ def test_equipamento_service_reativa_registro_soft_deleted(test_db):
     test_db.commit()
 
     service = EquipamentoService(test_db)
-    payload = type("EquipamentoPayload", (), {
-        "nome": "Corda",
-        "descricao": "Nova",
-        "pagina_referencia": "PHB p.128",
-        "dict": lambda self: {
+    payload = type(
+        "EquipamentoPayload",
+        (),
+        {
             "nome": "Corda",
             "descricao": "Nova",
             "pagina_referencia": "PHB p.128",
+            "dict": lambda self: {
+                "nome": "Corda",
+                "descricao": "Nova",
+                "pagina_referencia": "PHB p.128",
+            },
         },
-    })()
+    )()
 
     restaurado = service.criar_equipamento(payload)
 
@@ -91,7 +99,9 @@ def test_equipamento_service_reativa_registro_soft_deleted(test_db):
 
 
 def test_equipamento_relationship_bidirecional_funciona_sem_warning(test_db):
-    equipamento = Equipamento(nome="Adaga", descricao="Arma", pagina_referencia="PHB p.120")
+    equipamento = Equipamento(
+        nome="Adaga", descricao="Arma", pagina_referencia="PHB p.120"
+    )
     combatente = Combatente(
         nome="Kara",
         tipo="jogador",
@@ -103,7 +113,9 @@ def test_equipamento_relationship_bidirecional_funciona_sem_warning(test_db):
     test_db.add_all([equipamento, combatente])
     test_db.flush()
 
-    vinculo = EquipamentoJogador(combatente_id=combatente.id, equipamento=equipamento, quantidade=1)
+    vinculo = EquipamentoJogador(
+        combatente_id=combatente.id, equipamento=equipamento, quantidade=1
+    )
     test_db.add(vinculo)
     test_db.commit()
 

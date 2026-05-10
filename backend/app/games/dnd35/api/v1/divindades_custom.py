@@ -11,19 +11,11 @@ escolher na ficha; apenas a criacao/remocao e restrita.
 
 Canônico em `app.games.dnd35.api.v1.divindades_custom` (registrado em `app.main`).
 """
+
 from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
-from ...services.divindade_custom_service import (
-    DivindadeCustomService,
-    build_divindade_custom_service,
-)
-from ...schemas.divindade_custom import (
-    DivindadeCustomCreate,
-    DivindadeCustomResponse,
-)
 
 # Auth Hub, BD e cache global: `app.shared.core.*` (canónico).
 from .....shared.core.catalog_cache import catalog_cache
@@ -31,11 +23,15 @@ from .....shared.core.config import settings
 from .....shared.core.database import get_db
 from .....shared.core.deps import (
     get_usuario_atual,
-    requer_mestre_ou_admin,
     requer_game_dnd35,
+    requer_mestre_ou_admin,
 )
 from .....shared.exceptions.custom_exceptions import ArenaBaseException
-
+from ...schemas.divindade_custom import DivindadeCustomCreate, DivindadeCustomResponse
+from ...services.divindade_custom_service import (
+    DivindadeCustomService,
+    build_divindade_custom_service,
+)
 
 router = APIRouter(
     prefix="/divindades",
@@ -75,7 +71,9 @@ def criar_divindade_custom(
 ):
     """Cria uma divindade customizada (restrito a Mestre/Administrador)."""
     try:
-        entidade = service.criar(payload.model_dump(), usuario_id=getattr(usuario, "id", None))
+        entidade = service.criar(
+            payload.model_dump(), usuario_id=getattr(usuario, "id", None)
+        )
     except ArenaBaseException as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message)
     _invalidar_caches()

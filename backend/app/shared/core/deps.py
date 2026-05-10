@@ -3,23 +3,25 @@ deps.py
 SRP: Dependências de autenticação/autorização para injeção no FastAPI
 SOLID: Dependency Injection — desacoplamento de segurança da lógica
 """
+
+import logging
+from typing import Optional
+
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from starlette.requests import Request
 from sqlalchemy.orm import Session
-from typing import Optional
-import logging
+from starlette.requests import Request
 
-from ...shared.core.config import settings
-from ...shared.core.database import get_db
-from .security import decodificar_token
-from .security_audit import log_security_event
-from ...shared.repositories.usuario_repository import UsuarioRepository
-from ..constants import GAME_SLUG_DND35, GAME_SLUG_GURPS
+from ...games.dnd35.models.ataque import MagiaSlot
 from ...games.dnd35.models.combatente import Combatente
 from ...games.gurps.models.personagem import GurpsPersonagem
-from ...games.dnd35.models.ataque import MagiaSlot
-from ..models.usuario import PerfilUsuario
+from ...shared.core.config import settings
+from ...shared.core.database import get_db
+from ...shared.repositories.usuario_repository import UsuarioRepository
+from ..constants import GAME_SLUG_DND35, GAME_SLUG_GURPS
+from ..models.usuario import PerfilUsuario, Usuario
+from .security import decodificar_token
+from .security_audit import log_security_event
 
 logger = logging.getLogger(__name__)
 
@@ -82,8 +84,8 @@ def extrair_token_do_header(request: Request) -> Optional[str]:
 def get_usuario_atual(
     request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Security(bearer_scheme),
-    db: Session = Depends(get_db)
-) -> "Usuario":
+    db: Session = Depends(get_db),
+) -> Usuario:
     """
     Dependency: Extrai e valida o usuário autenticado do token JWT.
 
@@ -177,8 +179,7 @@ def get_usuario_atual(
         )
         logger.warning(f"❌ Usuário não encontrado: {email}")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado"
         )
 
     if not usuario.ativo:
@@ -192,8 +193,7 @@ def get_usuario_atual(
         )
         logger.warning(f"⚠️  Usuário inativo tentou acessar: {email}")
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Usuário inativo"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Usuário inativo"
         )
 
     logger.info(f"✅ Acesso autorizado: {email}")
@@ -203,7 +203,7 @@ def get_usuario_atual(
 def requer_game_dnd35(
     request: Request,
     usuario=Depends(get_usuario_atual),
-) -> "Usuario":
+) -> Usuario:
     """
     Garante que o token Bearer carrega o claim `game_slug=dnd35` quando o
     modo estrito multi-jogo está ativo (`settings.MULTI_GAME_STRICT_MODE`).
@@ -269,7 +269,7 @@ def requer_game_dnd35(
 def requer_game_gurps(
     request: Request,
     usuario=Depends(get_usuario_atual),
-) -> "Usuario":
+) -> Usuario:
     """Garante `game_slug=gurps` quando `MULTI_GAME_STRICT_MODE` está ativo."""
     slug = extrair_game_slug_do_token(request)
 
@@ -322,10 +322,7 @@ def requer_game_gurps(
     return usuario
 
 
-def requer_admin(
-    request: Request,
-    usuario = Depends(get_usuario_atual)
-) -> "Usuario":
+def requer_admin(request: Request, usuario=Depends(get_usuario_atual)) -> Usuario:
     """
     Dependency: Valida se o usuário é ADMINISTRADOR.
 
@@ -352,16 +349,15 @@ def requer_admin(
         )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Apenas administradores podem acessar este recurso"
+            detail="Apenas administradores podem acessar este recurso",
         )
     logger.info(f"✅ Admin autorizado: {usuario.email}")
     return usuario
 
 
 def requer_mestre_ou_admin(
-    request: Request,
-    usuario = Depends(get_usuario_atual)
-) -> "Usuario":
+    request: Request, usuario=Depends(get_usuario_atual)
+) -> Usuario:
     """
     Dependency: Valida se é MESTRE ou ADMINISTRADOR.
 
@@ -374,10 +370,7 @@ def requer_mestre_ou_admin(
     Raises:
         HTTPException 403: Sem permissão adequada
     """
-    if usuario.perfil not in [
-        PerfilUsuario.ADMINISTRADOR,
-        PerfilUsuario.MESTRE
-    ]:
+    if usuario.perfil not in [PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE]:
         log_security_event(
             "rbac_mestre_admin",
             "denied",
@@ -391,16 +384,13 @@ def requer_mestre_ou_admin(
         )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Apenas mestres e administradores podem acessar"
+            detail="Apenas mestres e administradores podem acessar",
         )
     logger.info(f"✅ Mestre/Admin autorizado: {usuario.email}")
     return usuario
 
 
-def requer_jogador(
-    request: Request,
-    usuario = Depends(get_usuario_atual)
-) -> "Usuario":
+def requer_jogador(request: Request, usuario=Depends(get_usuario_atual)) -> Usuario:
     """
     Dependency: Valida se é JOGADOR (ou superior).
 
@@ -416,7 +406,7 @@ def requer_jogador(
     if usuario.perfil not in [
         PerfilUsuario.JOGADOR,
         PerfilUsuario.MESTRE,
-        PerfilUsuario.ADMINISTRADOR
+        PerfilUsuario.ADMINISTRADOR,
     ]:
         log_security_event(
             "rbac_jogador",
@@ -429,7 +419,7 @@ def requer_jogador(
         logger.warning(f"⚠️  Acesso negado — não é jogador: {usuario.email}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Acesso restrito a jogadores e superiores"
+            detail="Acesso restrito a jogadores e superiores",
         )
     logger.info(f"✅ Jogador autorizado: {usuario.email}")
     return usuario
@@ -440,7 +430,7 @@ def requer_dono_ou_admin_combatente(
     request: Request,
     usuario=Depends(get_usuario_atual),
     db: Session = Depends(get_db),
-) -> "Usuario":
+) -> Usuario:
     """Dependency: garante que o usuário é dono do combatente ou admin/mestre."""
     combatente = db.query(Combatente).filter(Combatente.id == combatente_id).first()
     if not combatente:
@@ -475,7 +465,7 @@ def requer_dono_ou_admin_slot_magia(
     request: Request,
     usuario=Depends(get_usuario_atual),
     db: Session = Depends(get_db),
-) -> "Usuario":
+) -> Usuario:
     """Dependency: garante acesso por propriedade para endpoints de slot por ID."""
     slot = db.query(MagiaSlot).filter(MagiaSlot.id == slot_id).first()
     if not slot:
@@ -484,7 +474,9 @@ def requer_dono_ou_admin_slot_magia(
             detail="Slot não encontrado",
         )
 
-    combatente = db.query(Combatente).filter(Combatente.id == slot.combatente_id).first()
+    combatente = (
+        db.query(Combatente).filter(Combatente.id == slot.combatente_id).first()
+    )
     if not combatente:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -525,11 +517,7 @@ def validar_combatentes_do_usuario(
     if not ids_unicos:
         return
 
-    combatentes = (
-        db.query(Combatente)
-        .filter(Combatente.id.in_(ids_unicos))
-        .all()
-    )
+    combatentes = db.query(Combatente).filter(Combatente.id.in_(ids_unicos)).all()
 
     encontrados = {c.id for c in combatentes}
     faltantes = [cid for cid in ids_unicos if cid not in encontrados]
@@ -603,7 +591,7 @@ def requer_dono_ou_admin_gurps_personagem(
     request: Request,
     usuario=Depends(get_usuario_atual),
     db: Session = Depends(get_db),
-) -> "Usuario":
+) -> Usuario:
     """Garante que o usuário é dono do personagem GURPS ou mestre/admin."""
     personagem = (
         db.query(GurpsPersonagem).filter(GurpsPersonagem.id == personagem_id).first()

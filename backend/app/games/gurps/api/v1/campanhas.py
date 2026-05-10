@@ -19,7 +19,11 @@ from app.games.gurps.schemas.sessao_campanha import (
 )
 from app.games.gurps.services.campanha_service import GurpsCampanhaService
 from app.games.gurps.services.sessao_campanha_service import GurpsSessaoCampanhaService
-from app.shared.core.deps import get_usuario_atual, requer_game_gurps, requer_mestre_ou_admin
+from app.shared.core.deps import (
+    get_usuario_atual,
+    requer_game_gurps,
+    requer_mestre_ou_admin,
+)
 from app.shared.exceptions.custom_exceptions import ArenaBaseException
 
 router = APIRouter(
@@ -114,7 +118,9 @@ def listar(
     return [GurpsCampanhaResponse.model_validate(c) for c in rows]
 
 
-@router.post("", response_model=GurpsCampanhaResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=GurpsCampanhaResponse, status_code=status.HTTP_201_CREATED
+)
 def criar(
     payload: GurpsCampanhaCreate,
     service: GurpsCampanhaService = Depends(get_gurps_campanha_service),

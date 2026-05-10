@@ -3,7 +3,11 @@
 import re
 from typing import Any, Dict, List, Optional
 
-from app.games.gurps.core.rolagem import avaliar_teste_3d6, parse_expressao_dano, rolar_dano
+from app.games.gurps.core.rolagem import (
+    avaliar_teste_3d6,
+    parse_expressao_dano,
+    rolar_dano,
+)
 from app.games.gurps.models.combate import GurpsCombate
 from app.games.gurps.ports import (
     GurpsCombateRepositoryProtocol,
@@ -37,7 +41,9 @@ class GurpsCombateService:
         }
         self._condicao_default = "normal"
 
-    def _penalidade_cumulativa_defesa(self, personagem_id: int, combate: GurpsCombate) -> int:
+    def _penalidade_cumulativa_defesa(
+        self, personagem_id: int, combate: GurpsCombate
+    ) -> int:
         qtd_defesas = int((combate.defesas_na_rodada or {}).get(str(personagem_id), 0))
         return max(0, qtd_defesas) * self._penalidade_por_defesa_adicional
 
@@ -47,14 +53,18 @@ class GurpsCombateService:
         )
         return int(self._mods_postura.get(postura, {}).get(eixo, 0))
 
-    def _movimento_efetivo(self, personagem_id: int, deslocamento_base: int, combate: GurpsCombate) -> int:
+    def _movimento_efetivo(
+        self, personagem_id: int, deslocamento_base: int, combate: GurpsCombate
+    ) -> int:
         postura = (combate.posturas_por_personagem or {}).get(
             str(personagem_id), self._postura_default
         )
         mov_mult = float(self._mods_postura.get(postura, {}).get("mov_mult", 1.0))
         return max(0, int(int(deslocamento_base or 0) * mov_mult))
 
-    def _esquiva_efetiva(self, personagem_id: int, esquiva_base: int, combate: GurpsCombate) -> int:
+    def _esquiva_efetiva(
+        self, personagem_id: int, esquiva_base: int, combate: GurpsCombate
+    ) -> int:
         manobra = (combate.manobras_por_personagem or {}).get(
             str(personagem_id), self._manobra_default
         )
@@ -86,7 +96,9 @@ class GurpsCombateService:
         self, tipo_defesa: str, personagem: Any, combate: GurpsCombate
     ) -> tuple[str, int]:
         opcoes = {
-            "esquiva": self._esquiva_efetiva(personagem.id, personagem.esquiva or 0, combate),
+            "esquiva": self._esquiva_efetiva(
+                personagem.id, personagem.esquiva or 0, combate
+            ),
             "aparar": self._aparar_efetivo(personagem, combate),
             "bloqueio": self._bloqueio_efetivo(personagem, combate),
         }
@@ -98,16 +110,22 @@ class GurpsCombateService:
         return tipo, int(opcoes[tipo])
 
     def _rd_alvo(self, personagem: Any) -> int:
-        extras = personagem.extras_json if isinstance(personagem.extras_json, dict) else {}
+        extras = (
+            personagem.extras_json if isinstance(personagem.extras_json, dict) else {}
+        )
         candidatos = [
             extras.get("rd"),
             extras.get("armadura_rd"),
-            (extras.get("armadura") or {}).get("rd")
-            if isinstance(extras.get("armadura"), dict)
-            else None,
-            ((extras.get("equipamento") or {}).get("armadura") or {}).get("rd")
-            if isinstance(extras.get("equipamento"), dict)
-            else None,
+            (
+                (extras.get("armadura") or {}).get("rd")
+                if isinstance(extras.get("armadura"), dict)
+                else None
+            ),
+            (
+                ((extras.get("equipamento") or {}).get("armadura") or {}).get("rd")
+                if isinstance(extras.get("equipamento"), dict)
+                else None
+            ),
         ]
         for c in candidatos:
             try:
@@ -204,14 +222,20 @@ class GurpsCombateService:
                 deslocamento_base = int(base.get("deslocamento_valor") or 0)
                 base["manobra_atual"] = manobra
                 base["postura_atual"] = postura
-                base["condicao_atual"] = condicoes.get(str(p.id), self._condicao_por_pv(p))
-                base["esquiva_efetiva"] = self._esquiva_efetiva(p.id, esquiva_base, combate)
+                base["condicao_atual"] = condicoes.get(
+                    str(p.id), self._condicao_por_pv(p)
+                )
+                base["esquiva_efetiva"] = self._esquiva_efetiva(
+                    p.id, esquiva_base, combate
+                )
                 base["deslocamento_efetivo"] = self._movimento_efetivo(
                     p.id, deslocamento_base, combate
                 )
                 base["mod_ataque_postura"] = self._mod_postura(p.id, combate, "ataque")
                 base["mod_alvo_postura"] = self._mod_postura(p.id, combate, "alvo")
-                base["defesas_rodada"] = int((combate.defesas_na_rodada or {}).get(str(p.id), 0))
+                base["defesas_rodada"] = int(
+                    (combate.defesas_na_rodada or {}).get(str(p.id), 0)
+                )
                 personagens_payload.append(base)
             payload["personagens"] = personagens_payload
 
@@ -294,7 +318,9 @@ class GurpsCombateService:
         if alvo_id not in ids:
             raise ArenaBaseException("Alvo fora do combate", status_code=404)
         if alvo_id == atacante_id:
-            raise ArenaBaseException("Alvo não pode ser o próprio atacante", status_code=422)
+            raise ArenaBaseException(
+                "Alvo não pode ser o próprio atacante", status_code=422
+            )
 
         pers = self.personagem_repo.get_by_ids([atacante_id, alvo_id])
         by_id = {p.id: p for p in pers}
@@ -303,7 +329,9 @@ class GurpsCombateService:
         if atacante is None or alvo is None:
             raise ArenaBaseException("Atacante ou alvo não encontrado", status_code=404)
         if not atacante.esta_consciente():
-            raise ArenaBaseException("Atacante inconsciente não pode agir", status_code=422)
+            raise ArenaBaseException(
+                "Atacante inconsciente não pode agir", status_code=422
+            )
         if not alvo.esta_consciente():
             raise ArenaBaseException("Alvo já está inconsciente", status_code=422)
 
@@ -317,12 +345,16 @@ class GurpsCombateService:
         if tipo not in {"arma", "soco", "chute"}:
             raise ArenaBaseException("tipo_ataque inválido", status_code=422)
 
-        nh_base = int(nh_ataque) if nh_ataque is not None else int(atacante.dx_valor or 10)
+        nh_base = (
+            int(nh_ataque) if nh_ataque is not None else int(atacante.dx_valor or 10)
+        )
         if tipo == "chute":
             nh_base -= 2
-        nh_ataque_efetivo = int(nh_base) + self._mod_postura(
-            atacante_id, combate, "ataque"
-        ) + self._mod_postura(alvo_id, combate, "alvo")
+        nh_ataque_efetivo = (
+            int(nh_base)
+            + self._mod_postura(atacante_id, combate, "ataque")
+            + self._mod_postura(alvo_id, combate, "alvo")
+        )
         teste_ataque = avaliar_teste_3d6(nh_ataque_efetivo, dados=dados_ataque)
         if not teste_ataque.sucesso:
             return {
@@ -345,7 +377,9 @@ class GurpsCombateService:
                 "pvs_alvo_depois": alvo.pvs_atual,
             }
 
-        defesa_tipo, defesa_valor = self._resolver_defesa_ativa(tipo_defesa, alvo, combate)
+        defesa_tipo, defesa_valor = self._resolver_defesa_ativa(
+            tipo_defesa, alvo, combate
+        )
         teste_defesa = avaliar_teste_3d6(defesa_valor, dados=dados_defesa)
         mapa_defesas = dict(combate.defesas_na_rodada or {})
         mapa_defesas[str(alvo.id)] = int(mapa_defesas.get(str(alvo.id), 0)) + 1
@@ -369,7 +403,9 @@ class GurpsCombateService:
                 "defesa": {
                     "tipo": defesa_tipo,
                     "valor_efetivo": defesa_valor,
-                    "esquiva_efetiva": defesa_valor if defesa_tipo == "esquiva" else None,
+                    "esquiva_efetiva": (
+                        defesa_valor if defesa_tipo == "esquiva" else None
+                    ),
                     "total": teste_defesa.total,
                     "dados": teste_defesa.dados,
                     "sucesso": True,
@@ -386,7 +422,11 @@ class GurpsCombateService:
                 parsed = parse_expressao_dano(expr)
                 mod = parsed.modificador - 1 if tipo == "soco" else parsed.modificador
                 sinal = f"+{mod}" if mod >= 0 else str(mod)
-                expr = f"{parsed.quantidade_dados}d{sinal}" if mod != 0 else f"{parsed.quantidade_dados}d"
+                expr = (
+                    f"{parsed.quantidade_dados}d{sinal}"
+                    if mod != 0
+                    else f"{parsed.quantidade_dados}d"
+                )
             except ValueError:
                 # fallback seguro para casos legados de dano_impacto fora do formato Nd+M
                 expr = "1d-1" if tipo == "soco" else "1d"
@@ -499,7 +539,9 @@ class GurpsCombateService:
 
         fadiga_antes = int(personagem.fadiga_atual or 0)
         if fadiga_antes <= 0:
-            raise ArenaBaseException("Sem fadiga disponível para esforço", status_code=422)
+            raise ArenaBaseException(
+                "Sem fadiga disponível para esforço", status_code=422
+            )
 
         custo = max(1, int(custo_fadiga))
         fadiga_depois = max(0, fadiga_antes - custo)

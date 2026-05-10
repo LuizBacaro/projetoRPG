@@ -73,7 +73,9 @@ class TalentoRepository:
             .all()
         )
 
-    def atualizar_talento(self, talento_id: int, talento_data: dict) -> Optional[Talento]:
+    def atualizar_talento(
+        self, talento_id: int, talento_data: dict
+    ) -> Optional[Talento]:
         """Atualiza um talento"""
         db_talento = (
             apply_not_deleted(self.db.query(Talento), Talento)

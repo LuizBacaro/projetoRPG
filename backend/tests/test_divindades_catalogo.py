@@ -2,7 +2,6 @@
 
 from app.games.dnd35.catalogs import divindades_catalogo as cat
 
-
 # ---------------------------------------------------------------------------
 # parse_alinhamento / alinhamento_compativel
 # ---------------------------------------------------------------------------

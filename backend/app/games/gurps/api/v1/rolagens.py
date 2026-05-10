@@ -67,4 +67,3 @@ def rolar_dano_por_expressao(payload: GurpsDanoRequest):
         )
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
-

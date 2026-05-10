@@ -3,42 +3,128 @@ Service de Condição (Business Logic)
 Princípio SOLID: SRP - lógica de negócio de Condição + duração
 DIP - Depende da abstração CondicaoRepository
 """
+
 from typing import Dict, List
 
-from app.shared.exceptions.custom_exceptions import ArenaBaseException, CombatenteNaoEncontrado, DadosInvalidos
-from app.games.dnd35.ports import CombatenteRepositoryProtocol, CondicaoRepositoryProtocol
+from app.games.dnd35.ports import (
+    CombatenteRepositoryProtocol,
+    CondicaoRepositoryProtocol,
+)
+from app.shared.exceptions.custom_exceptions import (
+    ArenaBaseException,
+    CombatenteNaoEncontrado,
+    DadosInvalidos,
+)
 from app.shared.models.usuario import PerfilUsuario
 
 # ── Seed das 25 condições da planilha Condies-D&D.xlsx ────────────────────────
 CONDICOES_SEED = [
-    {"nome": "Abalado", "efeito": "-2 em testes de ataque, saves e verificações de habilidade."},
-    {"nome": "Agarrado", "efeito": "Não pode se mover. -4 CA, -4 em testes de ataque corpo a corpo. Não pode usar ações de ataque à distância exceto armas leves."},
-    {"nome": "Apavorado", "efeito": "Foge do que o apavora. -2 em testes de ataque, saves e verificações de habilidade enquanto a fonte estiver visível."},
-    {"nome": "Atordoado", "efeito": "Não pode agir, perde bônus de Destreza à CA e sofre -2 na CA."},
-    {"nome": "Caído", "efeito": "-4 em ataques corpo a corpo. Ataques à distância impossíveis. +4 CA contra ataques à distância, -4 CA contra corpo a corpo."},
-    {"nome": "Cego", "efeito": "-2 CA, perde bônus de Destreza. Atacantes têm +2 para acertar. -4 em testes de Busca, Observar e outros dependentes de visão."},
-    {"nome": "Confuso", "efeito": "Age aleatoriamente: age normal, fica inativo, ataca aliado mais próximo ou ataca inimigo mais próximo (rolar 1d100 a cada turno)."},
-    {"nome": "Cowering", "efeito": "Paralisado de medo. Perde bônus de Destreza à CA e sofre -2 na CA. Opositores ganham +2 para acertar."},
+    {
+        "nome": "Abalado",
+        "efeito": "-2 em testes de ataque, saves e verificações de habilidade.",
+    },
+    {
+        "nome": "Agarrado",
+        "efeito": "Não pode se mover. -4 CA, -4 em testes de ataque corpo a corpo. Não pode usar ações de ataque à distância exceto armas leves.",
+    },
+    {
+        "nome": "Apavorado",
+        "efeito": "Foge do que o apavora. -2 em testes de ataque, saves e verificações de habilidade enquanto a fonte estiver visível.",
+    },
+    {
+        "nome": "Atordoado",
+        "efeito": "Não pode agir, perde bônus de Destreza à CA e sofre -2 na CA.",
+    },
+    {
+        "nome": "Caído",
+        "efeito": "-4 em ataques corpo a corpo. Ataques à distância impossíveis. +4 CA contra ataques à distância, -4 CA contra corpo a corpo.",
+    },
+    {
+        "nome": "Cego",
+        "efeito": "-2 CA, perde bônus de Destreza. Atacantes têm +2 para acertar. -4 em testes de Busca, Observar e outros dependentes de visão.",
+    },
+    {
+        "nome": "Confuso",
+        "efeito": "Age aleatoriamente: age normal, fica inativo, ataca aliado mais próximo ou ataca inimigo mais próximo (rolar 1d100 a cada turno).",
+    },
+    {
+        "nome": "Cowering",
+        "efeito": "Paralisado de medo. Perde bônus de Destreza à CA e sofre -2 na CA. Opositores ganham +2 para acertar.",
+    },
     {"nome": "Deslumbrado", "efeito": "-1 em testes de ataque e Observar."},
-    {"nome": "Desprevenido", "efeito": "Perde bônus de Destreza à CA. Não pode fazer ataques de oportunidade."},
-    {"nome": "Energizado", "efeito": "Morre em 1d4 rodadas se não tratado. Perde 1d4 pontos de uma habilidade por rodada."},
-    {"nome": "Enjoado", "efeito": "Pode apenas fazer ação de movimento ou padrão. -2 em testes de ataque, dano, saves e verificações de habilidade."},
-    {"nome": "Entorpecido", "efeito": "-2 em testes de Força e Destreza. Perde 1 ponto de bônus de Destreza à CA (min 0)."},
-    {"nome": "Envenenado", "efeito": "Sofre dano de veneno. Efeito varia conforme o veneno aplicado. Pode exigir saves de Fortitude."},
-    {"nome": "Esmorecido", "efeito": "-2 em testes de ataque, saves e verificações de habilidade."},
-    {"nome": "Exausto", "efeito": "Velocidade reduzida à metade. -6 em Força e Destreza. Não pode correr ou realizar carga."},
-    {"nome": "Fascinado", "efeito": "Para e foca em estímulo. -4 em testes de Observar e Ouvir. Reação a ameaças quebra o efeito."},
-    {"nome": "Fatigado", "efeito": "-2 em Força e Destreza. Não pode correr ou realizar carga."},
-    {"nome": "Flanqueado", "efeito": "Atacantes que flanqueiam ganham +2 nos testes de ataque corpo a corpo."},
-    {"nome": "Incorporeo", "efeito": "Imune a ataques não mágicos. 50% de chance de ignorar dano de ataques mágicos."},
-    {"nome": "Invisível", "efeito": "+2 em testes de ataque. Oponentes perdem bônus de Destreza à CA. -4 nos testes dos opositores para observar."},
-    {"nome": "Nauseado", "efeito": "Apenas ação de movimento por rodada. Não pode atacar, conjurar, usar itens ou habilidades especiais."},
-    {"nome": "Paralisado", "efeito": "Fica rígido e incapaz de agir. CA cerde bônus de Destreza. Opositores têm +4 e podem aplicar golpe de misericórdia."},
-    {"nome": "Sangrando", "efeito": "Perde 1 PV por rodada até receber cura ou ser estabilizado (Primeiros Socorros CD 15)."},
-    {"nome": "Surdo", "efeito": "-4 em testes de iniciativa. 20% de falha em conjuração com componentes verbais."},
+    {
+        "nome": "Desprevenido",
+        "efeito": "Perde bônus de Destreza à CA. Não pode fazer ataques de oportunidade.",
+    },
+    {
+        "nome": "Energizado",
+        "efeito": "Morre em 1d4 rodadas se não tratado. Perde 1d4 pontos de uma habilidade por rodada.",
+    },
+    {
+        "nome": "Enjoado",
+        "efeito": "Pode apenas fazer ação de movimento ou padrão. -2 em testes de ataque, dano, saves e verificações de habilidade.",
+    },
+    {
+        "nome": "Entorpecido",
+        "efeito": "-2 em testes de Força e Destreza. Perde 1 ponto de bônus de Destreza à CA (min 0).",
+    },
+    {
+        "nome": "Envenenado",
+        "efeito": "Sofre dano de veneno. Efeito varia conforme o veneno aplicado. Pode exigir saves de Fortitude.",
+    },
+    {
+        "nome": "Esmorecido",
+        "efeito": "-2 em testes de ataque, saves e verificações de habilidade.",
+    },
+    {
+        "nome": "Exausto",
+        "efeito": "Velocidade reduzida à metade. -6 em Força e Destreza. Não pode correr ou realizar carga.",
+    },
+    {
+        "nome": "Fascinado",
+        "efeito": "Para e foca em estímulo. -4 em testes de Observar e Ouvir. Reação a ameaças quebra o efeito.",
+    },
+    {
+        "nome": "Fatigado",
+        "efeito": "-2 em Força e Destreza. Não pode correr ou realizar carga.",
+    },
+    {
+        "nome": "Flanqueado",
+        "efeito": "Atacantes que flanqueiam ganham +2 nos testes de ataque corpo a corpo.",
+    },
+    {
+        "nome": "Incorporeo",
+        "efeito": "Imune a ataques não mágicos. 50% de chance de ignorar dano de ataques mágicos.",
+    },
+    {
+        "nome": "Invisível",
+        "efeito": "+2 em testes de ataque. Oponentes perdem bônus de Destreza à CA. -4 nos testes dos opositores para observar.",
+    },
+    {
+        "nome": "Nauseado",
+        "efeito": "Apenas ação de movimento por rodada. Não pode atacar, conjurar, usar itens ou habilidades especiais.",
+    },
+    {
+        "nome": "Paralisado",
+        "efeito": "Fica rígido e incapaz de agir. CA cerde bônus de Destreza. Opositores têm +4 e podem aplicar golpe de misericórdia.",
+    },
+    {
+        "nome": "Sangrando",
+        "efeito": "Perde 1 PV por rodada até receber cura ou ser estabilizado (Primeiros Socorros CD 15).",
+    },
+    {
+        "nome": "Surdo",
+        "efeito": "-4 em testes de iniciativa. 20% de falha em conjuração com componentes verbais.",
+    },
     # ── Condições automáticas de HP (D&D 3.5) ─────────────────────────────
-    {"nome": "Inconsciente", "efeito": "HP igual a 0. Incapaz de agir. Estável, mas inconsciente — sem perder HP por rodada. Pode ser acordado com cura."},
-    {"nome": "Morrendo", "efeito": "HP entre -1 e -9. Incapacitado e sangrando — perde 1 PV por rodada sem socorro. Pode ser estabilizado com Primeiros Socorros (CD 15) ou cura mágica. Morre ao atingir -10 HP."},
+    {
+        "nome": "Inconsciente",
+        "efeito": "HP igual a 0. Incapaz de agir. Estável, mas inconsciente — sem perder HP por rodada. Pode ser acordado com cura.",
+    },
+    {
+        "nome": "Morrendo",
+        "efeito": "HP entre -1 e -9. Incapacitado e sangrando — perde 1 PV por rodada sem socorro. Pode ser estabilizado com Primeiros Socorros (CD 15) ou cura mágica. Morre ao atingir -10 HP.",
+    },
 ]
 
 
@@ -76,7 +162,9 @@ class CondicaoService:
             "condicoes": condicoes,  # Inclui duracao_turnos de cada condição
         }
 
-    def aplicar_condicao(self, combatente_id: int, condicao_id: int, duracao_turnos: int = -1) -> Dict:
+    def aplicar_condicao(
+        self, combatente_id: int, condicao_id: int, duracao_turnos: int = -1
+    ) -> Dict:
         """
         Aplica uma condição a um combatente com duração opcional.
 
@@ -210,12 +298,19 @@ class CondicaoService:
             raise DadosInvalidos(f"Condição {condicao_id} não encontrada")
 
     def _validar_acesso_combatente(self, combatente, usuario) -> None:
-        """Garante acesso apenas ao dono, exceto perfil administrador."""
+        """Libera dono, administrador e mestre — alinhado com CombatenteService."""
         if usuario is None:
-            raise ArenaBaseException("Usuário autenticado é obrigatório", status_code=401)
+            raise ArenaBaseException(
+                "Usuário autenticado é obrigatório", status_code=401
+            )
 
         perfil = getattr(usuario, "perfil", None)
-        if perfil == PerfilUsuario.ADMINISTRADOR or perfil == PerfilUsuario.ADMINISTRADOR.value:
+        if perfil in (
+            PerfilUsuario.ADMINISTRADOR,
+            PerfilUsuario.ADMINISTRADOR.value,
+            PerfilUsuario.MESTRE,
+            PerfilUsuario.MESTRE.value,
+        ):
             return
 
         if combatente.dono_id != getattr(usuario, "id", None):

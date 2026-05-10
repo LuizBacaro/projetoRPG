@@ -2,17 +2,22 @@
 Router de Usuários
 SRP: apenas rotas HTTP para usuários
 """
+
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
+
 from ...core.database import get_db
-from ...core.deps import requer_admin, get_usuario_atual
-from ...models.usuario import Usuario
+from ...core.deps import get_usuario_atual, requer_admin
 from ...core.security_audit import log_security_event
+from ...models.usuario import Usuario
 from ...repositories.usuario_repository import UsuarioRepository
-from ...services.usuario_service import UsuarioService
 from ...schemas.usuario import (
-    UsuarioCreate, UsuarioUpdate, UsuarioResponse, UsuarioListResponse
+    UsuarioCreate,
+    UsuarioListResponse,
+    UsuarioResponse,
+    UsuarioUpdate,
 )
+from ...services.usuario_service import UsuarioService
 
 router = APIRouter(prefix="/usuarios", tags=["Usuários"])
 
@@ -27,7 +32,7 @@ def listar_usuarios(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     service: UsuarioService = Depends(get_service),
-    _: Usuario = Depends(get_usuario_atual)   # qualquer usuário logado
+    _: Usuario = Depends(get_usuario_atual),  # qualquer usuário logado
 ):
     usuarios = service.listar(apenas_ativos=apenas_ativos, skip=skip, limit=limit)
     return {
@@ -48,7 +53,7 @@ def meu_perfil(usuario_atual: Usuario = Depends(get_usuario_atual)):
 def buscar_usuario(
     usuario_id: int,
     service: UsuarioService = Depends(get_service),
-    _: Usuario = Depends(requer_admin)
+    _: Usuario = Depends(requer_admin),
 ):
     return service.buscar_por_id(usuario_id)
 
@@ -58,7 +63,7 @@ def criar_usuario(
     request: Request,
     dados: UsuarioCreate,
     service: UsuarioService = Depends(get_service),
-    usuario_atual: Usuario = Depends(requer_admin)
+    usuario_atual: Usuario = Depends(requer_admin),
 ):
     usuario = service.criar(dados, usuario_responsavel=usuario_atual.email)
     log_security_event(
@@ -78,16 +83,22 @@ def atualizar_usuario(
     usuario_id: int,
     dados: UsuarioUpdate,
     service: UsuarioService = Depends(get_service),
-    usuario_atual: Usuario = Depends(requer_admin)
+    usuario_atual: Usuario = Depends(requer_admin),
 ):
-    usuario = service.atualizar(usuario_id, dados, usuario_responsavel=usuario_atual.email)
+    usuario = service.atualizar(
+        usuario_id, dados, usuario_responsavel=usuario_atual.email
+    )
     log_security_event(
         "user_update",
         "success",
         request=request,
         actor_email=usuario_atual.email,
         target=f"usuario:{usuario.id}",
-        details={"email": usuario.email, "perfil": usuario.perfil, "ativo": usuario.ativo},
+        details={
+            "email": usuario.email,
+            "perfil": usuario.perfil,
+            "ativo": usuario.ativo,
+        },
     )
     return usuario
 
@@ -97,7 +108,7 @@ def excluir_usuario_definitivo(
     request: Request,
     usuario_id: int,
     service: UsuarioService = Depends(get_service),
-    usuario_atual: Usuario = Depends(requer_admin)
+    usuario_atual: Usuario = Depends(requer_admin),
 ):
     usuario = service.buscar_por_id(usuario_id)
     service.excluir_definitivo(usuario_id, usuario_solicitante_id=usuario_atual.id)
@@ -117,7 +128,7 @@ def inativar_usuario(
     request: Request,
     usuario_id: int,
     service: UsuarioService = Depends(get_service),
-    usuario_atual: Usuario = Depends(requer_admin)
+    usuario_atual: Usuario = Depends(requer_admin),
 ):
     usuario = service.inativar(usuario_id, usuario_responsavel=usuario_atual.email)
     log_security_event(

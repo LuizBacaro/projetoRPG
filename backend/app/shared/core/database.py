@@ -3,12 +3,14 @@ database.py
 SRP: Configuração SQLAlchemy — gerenciar conexão com banco de dados
 SOLID: Configuração centralizada por ambiente (SQLite/PostgreSQL)
 """
+
+import logging
+from typing import Generator
+
 from fastapi import HTTPException
 from sqlalchemy import create_engine, event
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from typing import Generator
-import logging
+from sqlalchemy.orm import Session, sessionmaker
 
 from .config import settings
 
@@ -43,12 +45,14 @@ def _build_engine():
         #
         # Não usar `connect_args["options"]=-csearch_path=...`: o pooler da Neon rejeita
         # search_path no pacote de startup. Ajustar com SET após conectar (Neon docs).
-        engine_config.update({
-            "pool_pre_ping": True,      # testa conexão antes de usar
-            "pool_recycle": 300,        # recicla a cada 5 min
-            "pool_size": 5,             # máximo de conexões ativas
-            "max_overflow": 10,         # conexões extras sob carga
-        })
+        engine_config.update(
+            {
+                "pool_pre_ping": True,  # testa conexão antes de usar
+                "pool_recycle": 300,  # recicla a cada 5 min
+                "pool_size": 5,  # máximo de conexões ativas
+                "max_overflow": 10,  # conexões extras sob carga
+            }
+        )
         logger.info(
             "🟢 Database: PostgreSQL — SET search_path após connect (auth,dnd35,public)"
         )
@@ -65,6 +69,7 @@ def _build_engine():
 
     # ✅ ADICIONADO — listener para melhor logging (opcional)
     if settings.ENVIRONMENT == "development":
+
         @event.listens_for(engine, "connect")
         def receive_connect(dbapi_conn, connection_record):
             logger.debug(f"✓ Conexão aberta com BD")

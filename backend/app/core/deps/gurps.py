@@ -47,7 +47,9 @@ def get_gurps_personagem_service(
 
 
 def get_gurps_campanha_service(
-    campanha_repository: GurpsCampanhaRepository = Depends(get_gurps_campanha_repository),
+    campanha_repository: GurpsCampanhaRepository = Depends(
+        get_gurps_campanha_repository
+    ),
     personagem_repository: GurpsPersonagemRepository = Depends(
         get_gurps_personagem_repository
     ),
@@ -59,13 +61,17 @@ def get_gurps_sessao_campanha_service(
     sessao_repository: GurpsSessaoCampanhaRepository = Depends(
         get_gurps_sessao_campanha_repository
     ),
-    campanha_repository: GurpsCampanhaRepository = Depends(get_gurps_campanha_repository),
+    campanha_repository: GurpsCampanhaRepository = Depends(
+        get_gurps_campanha_repository
+    ),
 ) -> GurpsSessaoCampanhaService:
     return GurpsSessaoCampanhaService(sessao_repository, campanha_repository)
 
 
 def get_gurps_combate_service(
     combate_repo: GurpsCombateRepository = Depends(get_gurps_combate_repository),
-    personagem_repo: GurpsPersonagemRepository = Depends(get_gurps_personagem_repository),
+    personagem_repo: GurpsPersonagemRepository = Depends(
+        get_gurps_personagem_repository
+    ),
 ) -> GurpsCombateService:
     return GurpsCombateService(combate_repo, personagem_repo)

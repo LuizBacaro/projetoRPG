@@ -1,6 +1,7 @@
 """
 Testes da camada multi-jogo: catálogo, seleção de jogo e guard `requer_game_dnd35`.
 """
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -14,13 +15,13 @@ from sqlalchemy.pool import StaticPool
 
 from app.shared.api.v1.auth import router as auth_router
 from app.shared.api.v1.games import router as games_router
+from app.shared.constants import GAME_SLUG_DND35
 from app.shared.core.config import settings
 from app.shared.core.database import Base, get_db
 from app.shared.core.deps import get_usuario_atual, requer_game_dnd35
 from app.shared.core.security import decodificar_token, hash_senha
 from app.shared.models.game import Game, UserGameMembership
 from app.shared.models.usuario import PerfilUsuario, Usuario
-from app.shared.constants import GAME_SLUG_DND35
 
 
 @pytest.fixture(scope="function")

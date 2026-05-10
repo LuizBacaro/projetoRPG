@@ -65,7 +65,12 @@ def _criar_personagem(
     *,
     velocidade_valor: float | None = None,
 ) -> int:
-    body: dict = {"nome": nome, "tipo": "jogador", "iniciativa": iniciativa, "extras": {}}
+    body: dict = {
+        "nome": nome,
+        "tipo": "jogador",
+        "iniciativa": iniciativa,
+        "extras": {},
+    }
     if velocidade_valor is not None:
         body["velocidade_valor"] = velocidade_valor
     r = client.post("/api/v1/gurps/personagens", json=body)
@@ -95,7 +100,9 @@ def test_mestre_cria_campanha_e_inicia_combate_com_personagens_do_jogador(
     cid = r_camp.json()["id"]
     assert set(r_camp.json()["personagem_ids"]) == {p_lento, p_rapido}
 
-    assert c_jog.get(f"/api/v1/gurps/personagens/{p_rapido}").json()["campanha_id"] == cid
+    assert (
+        c_jog.get(f"/api/v1/gurps/personagens/{p_rapido}").json()["campanha_id"] == cid
+    )
 
     r_comb = c_mestre.post(
         "/api/v1/gurps/combate/iniciar",
@@ -110,7 +117,9 @@ def test_mestre_cria_campanha_e_inicia_combate_com_personagens_do_jogador(
     assert c_mestre.post("/api/v1/gurps/combate/finalizar").status_code == 200
 
 
-def test_fluxo_mesa_multijogo_estrito_token_gurps(gurps_mestre_e_jogadores_db, monkeypatch):
+def test_fluxo_mesa_multijogo_estrito_token_gurps(
+    gurps_mestre_e_jogadores_db, monkeypatch
+):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
 
     SessionLocal, mestre, j1, _ = gurps_mestre_e_jogadores_db
@@ -152,10 +161,14 @@ def test_fluxo_mesa_multijogo_estrito_token_gurps(gurps_mestre_e_jogadores_db, m
     assert r_i.status_code == 200, r_i.text
     assert r_i.json()["personagens_ids"] == [p1]
 
-    assert client.post("/api/v1/gurps/combate/finalizar", headers=h_m).status_code == 200
+    assert (
+        client.post("/api/v1/gurps/combate/finalizar", headers=h_m).status_code == 200
+    )
 
 
-def test_fluxo_mesa_estrito_sem_slug_bloqueia_criacao_personagem(gurps_mestre_e_jogadores_db, monkeypatch):
+def test_fluxo_mesa_estrito_sem_slug_bloqueia_criacao_personagem(
+    gurps_mestre_e_jogadores_db, monkeypatch
+):
     monkeypatch.setattr(settings, "MULTI_GAME_STRICT_MODE", True)
 
     SessionLocal, _, j1, _ = gurps_mestre_e_jogadores_db

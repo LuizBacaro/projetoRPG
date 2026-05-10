@@ -2,7 +2,16 @@
 
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.shared.core.database import Base
@@ -43,7 +52,9 @@ class Magia(Base):
 
     # ── Combate ──
     dano = Column(String(50), nullable=True)
-    teste_resistencia = Column(String(50), nullable=True)  # Fortitude/Reflexos/Vontade/Nenhum
+    teste_resistencia = Column(
+        String(50), nullable=True
+    )  # Fortitude/Reflexos/Vontade/Nenhum
     resistencia_magica = Column(Boolean, default=False)
     resistencia_magia_texto = Column(String(50), nullable=True)
 
@@ -104,7 +115,9 @@ class Magia(Base):
             "pagina_referencia": self.pagina_referencia,
             "eh_truque": self.eh_truque,
             "tem_dano": self.tem_dano,
-            "data_criacao": self.data_criacao.isoformat() if self.data_criacao else None,
+            "data_criacao": (
+                self.data_criacao.isoformat() if self.data_criacao else None
+            ),
         }
 
     def __repr__(self):
@@ -121,7 +134,9 @@ class MagiaClasse(Base):
     )
 
     id = Column(Integer, primary_key=True, index=True)
-    magia_id = Column(Integer, ForeignKey("magias.id", ondelete="CASCADE"), nullable=False, index=True)
+    magia_id = Column(
+        Integer, ForeignKey("magias.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     classe = Column(String(50), nullable=False, index=True)
     nivel = Column(Integer, nullable=False)
 
@@ -140,4 +155,6 @@ class MagiaHistorico(Base):
     acao = Column(String(20), nullable=False)
     dados_anteriores = Column(JSON, nullable=True)
     dados_novos = Column(JSON, nullable=True)
-    criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True)
+    criado_em = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True
+    )

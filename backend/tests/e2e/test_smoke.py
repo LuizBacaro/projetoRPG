@@ -24,15 +24,18 @@ import os
 import pytest
 from playwright.sync_api import Page, expect
 
-BASE_URL    = os.getenv("BASE_URL", "http://localhost:8000")
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@arena.local")
-ADMIN_PASS  = os.getenv("ADMIN_PASSWORD", "admin123")  # padrão só para ambiente de dev/CI isolado
-FRONTEND    = BASE_URL  # arquivos estáticos servidos pelo mesmo servidor
+ADMIN_PASS = os.getenv(
+    "ADMIN_PASSWORD", "admin123"
+)  # padrão só para ambiente de dev/CI isolado
+FRONTEND = BASE_URL  # arquivos estáticos servidos pelo mesmo servidor
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
     """Navega para login e autentica."""
@@ -48,6 +51,7 @@ def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
 # ─────────────────────────────────────────────────────────────────────────────
 # Cenário 1 — Login
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def test_login_valido(page: Page):
     """Login com credenciais válidas redireciona para dashboard."""
@@ -84,12 +88,14 @@ def test_login_persiste_token(page: Page):
 # Cenário 2 — Dashboard / Listagem / Ficha
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def test_dashboard_lista_combatentes(page: Page):
     """Dashboard carrega e exibe ao menos um combatente no grid."""
     fazer_login(page)
     # Aguarda carregamento do grid (cards de combatente)
-    page.wait_for_selector(".combatente-card, .dashboard-card, [data-combatente-id]",
-                           timeout=10000)
+    page.wait_for_selector(
+        ".combatente-card, .dashboard-card, [data-combatente-id]", timeout=10000
+    )
     cards = page.locator(".combatente-card, .dashboard-card, [data-combatente-id]")
     assert cards.count() >= 1, "Deve haver ao menos um combatente listado"
 
@@ -97,13 +103,18 @@ def test_dashboard_lista_combatentes(page: Page):
 def test_dashboard_abre_ficha_mesma_aba(page: Page):
     """Clicar em 'Ver Ficha' navega na mesma aba, não abre nova."""
     fazer_login(page)
-    page.wait_for_selector(".combatente-card, .dashboard-card, [data-combatente-id]",
-                           timeout=10000)
+    page.wait_for_selector(
+        ".combatente-card, .dashboard-card, [data-combatente-id]", timeout=10000
+    )
 
-    paginas_antes = page.context.pages.__len__() if hasattr(page.context, "pages") else 1
+    paginas_antes = (
+        page.context.pages.__len__() if hasattr(page.context, "pages") else 1
+    )
 
     # Clica no primeiro link/botão de ficha disponível
-    btn_ficha = page.locator("a[href*='ficha-personagem'], button[data-acao='ficha']").first
+    btn_ficha = page.locator(
+        "a[href*='ficha-personagem'], button[data-acao='ficha']"
+    ).first
     if btn_ficha.count() == 0:
         pytest.skip("Botão de ficha não encontrado neste ambiente de teste")
 
@@ -119,17 +130,20 @@ def test_dashboard_abre_ficha_mesma_aba(page: Page):
 # Cenário 3 — Modal Perfil Divino (Ficha)
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def test_modal_perfil_divino_preenche_divindade(page: Page):
     """Ao abrir o modal de perfil mágico, campo Divindade é pré-preenchido com valor salvo."""
     fazer_login(page)
 
     # Navega direto para uma ficha (usa o primeiro combatente retornado pela API)
     token = page.evaluate("localStorage.getItem('token')")
-    combatentes = page.evaluate(f"""async () => {{
+    combatentes = page.evaluate(
+        f"""async () => {{
         const r = await fetch('{BASE_URL}/api/v1/combatentes?tipo=jogador&limit=1',
             {{ headers: {{ Authorization: 'Bearer {{}}'.replace('{{}}', localStorage.getItem('token')) }} }});
         return r.ok ? r.json() : [];
-    }}""")
+    }}"""
+    )
     if not combatentes:
         pytest.skip("Nenhum combatente jogador disponível no ambiente de teste")
 
@@ -155,11 +169,13 @@ def test_modal_perfil_salva_e_persiste(page: Page):
     """Editar alinhamento no modal e salvar deve refletir na ficha sem reload completo."""
     fazer_login(page)
 
-    combatentes = page.evaluate(f"""async () => {{
+    combatentes = page.evaluate(
+        f"""async () => {{
         const r = await fetch('{BASE_URL}/api/v1/combatentes?tipo=jogador&limit=1',
             {{ headers: {{ Authorization: 'Bearer ' + localStorage.getItem('token') }} }});
         return r.ok ? r.json() : [];
-    }}""")
+    }}"""
+    )
     if not combatentes:
         pytest.skip("Nenhum combatente jogador disponível no ambiente de teste")
 
@@ -195,15 +211,18 @@ def test_modal_perfil_salva_e_persiste(page: Page):
 # Cenário 4 — Grimório
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def test_grimorio_abre_e_lista_magias(page: Page):
     """Painel do grimório abre e exibe ao menos uma magia disponível."""
     fazer_login(page)
 
-    combatentes = page.evaluate(f"""async () => {{
+    combatentes = page.evaluate(
+        f"""async () => {{
         const r = await fetch('{BASE_URL}/api/v1/combatentes?tipo=jogador&limit=1',
             {{ headers: {{ Authorization: 'Bearer ' + localStorage.getItem('token') }} }});
         return r.ok ? r.json() : [];
-    }}""")
+    }}"""
+    )
     if not combatentes:
         pytest.skip("Nenhum combatente jogador disponível no ambiente de teste")
 

@@ -25,9 +25,7 @@ class SessaoCampanhaRepository(BaseRepository[SessaoCampanha]):
             self.db.query(SessaoCampanha)
             .join(Campanha, SessaoCampanha.campanha_id == Campanha.id)
             .filter(Campanha.mestre_id == mestre_id)
-            .order_by(
-                SessaoCampanha.created_at.desc(), SessaoCampanha.id.desc()
-            )
+            .order_by(SessaoCampanha.created_at.desc(), SessaoCampanha.id.desc())
             .all()
         )
 

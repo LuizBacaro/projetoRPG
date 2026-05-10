@@ -6,27 +6,28 @@ Estas rotas formam a fronteira que, em fases futuras, poderá ser extraída
 para um serviço Auth Hub independente (ver docs/arquitetura-multi-jogo.md).
 Hoje convivem com o backend D&D 3.5 mas não acoplam regras de jogo.
 """
+
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, status
+from starlette.requests import Request
 
-from ...core.deps import get_usuario_atual, extrair_token_do_header, requer_admin
-from ...core.security import decodificar_token
-from ...core.config import settings
 from app.core.dependencies import get_game_service
+
+from ...core.config import settings
+from ...core.deps import extrair_token_do_header, get_usuario_atual, requer_admin
+from ...core.security import decodificar_token
 from ...models.usuario import Usuario
 from ...schemas.game import (
     CatalogoJogosResponse,
+    MembershipAdminCreate,
+    MembershipAdminItem,
+    MembershipAdminListResponse,
+    MembershipAdminUpdate,
     SelecaoJogoRequest,
     TokenComJogoResponse,
-    MembershipAdminListResponse,
-    MembershipAdminItem,
-    MembershipAdminCreate,
-    MembershipAdminUpdate,
 )
 from ...services.game_service import GameService
-from starlette.requests import Request
-
 
 router = APIRouter(
     prefix="/games",

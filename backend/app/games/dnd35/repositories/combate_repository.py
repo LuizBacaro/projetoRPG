@@ -45,7 +45,9 @@ class CombateRepository(BaseRepository[Combate]):
         self.db.refresh(historico)
         return historico
 
-    def listar_historico(self, skip: int = 0, limit: int = 20) -> List[CombateHistorico]:
+    def listar_historico(
+        self, skip: int = 0, limit: int = 20
+    ) -> List[CombateHistorico]:
         return (
             self.db.query(CombateHistorico)
             .order_by(CombateHistorico.finalizado_em.desc())

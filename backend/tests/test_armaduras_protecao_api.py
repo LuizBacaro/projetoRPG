@@ -8,11 +8,13 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.games.dnd35.api.v1.armaduras_protecao import router as armaduras_router
-from app.shared.core.database import Base
-from app.shared.core.database import get_db
-from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
-from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador  # noqa: F401
+from app.games.dnd35.models.armadura_protecao import (  # noqa: F401
+    ArmaduraProtecao,
+    ArmaduraProtecaoJogador,
+)
 from app.games.dnd35.models.combatente import Combatente
+from app.shared.core.database import Base, get_db
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 
 
 @pytest.fixture(scope="function")
@@ -41,7 +43,9 @@ def _build_client(db_session):
         yield db_session
 
     app.dependency_overrides[get_db] = _override_get_db
-    app.dependency_overrides[get_usuario_atual] = lambda: SimpleNamespace(id=1, perfil="ADMINISTRADOR")
+    app.dependency_overrides[get_usuario_atual] = lambda: SimpleNamespace(
+        id=1, perfil="ADMINISTRADOR"
+    )
     app.dependency_overrides[requer_dono_ou_admin_combatente] = lambda: object()
 
     return TestClient(app)
@@ -75,7 +79,9 @@ def test_armaduras_protecao_criar_e_listar_catalogo(api_db_session):
     assert itens[0]["nome"] == "Cota de Malha"
 
 
-def test_armaduras_protecao_fluxo_jogador_adicionar_listar_bonus_e_remover(api_db_session):
+def test_armaduras_protecao_fluxo_jogador_adicionar_listar_bonus_e_remover(
+    api_db_session,
+):
     combatente = Combatente(
         nome="Thoran",
         tipo="jogador",
@@ -126,7 +132,9 @@ def test_armaduras_protecao_fluxo_jogador_adicionar_listar_bonus_e_remover(api_d
     assert combatente.surpresa == 12
     assert combatente.ca == 12
 
-    remover = client.delete(f"/api/v1/armaduras_protecao/{combatente.id}/remover/{item_id}")
+    remover = client.delete(
+        f"/api/v1/armaduras_protecao/{combatente.id}/remover/{item_id}"
+    )
     assert remover.status_code == 204
 
     bonus_final = client.get(f"/api/v1/armaduras_protecao/{combatente.id}/bonus-ca")

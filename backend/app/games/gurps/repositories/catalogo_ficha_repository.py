@@ -36,15 +36,19 @@ class GurpsCatalogoFichaRepository:
             .all()
         )
         base["vantagens"] = [
-            {"nome": r.nome, "custo": r.custo, "custo_texto": r.custo_texto} for r in vant_rows
+            {"nome": r.nome, "custo": r.custo, "custo_texto": r.custo_texto}
+            for r in vant_rows
         ]
         desv_rows = (
             self.db.query(GurpsCatalogoFichaDesvantagem)
-            .order_by(GurpsCatalogoFichaDesvantagem.ordem, GurpsCatalogoFichaDesvantagem.nome)
+            .order_by(
+                GurpsCatalogoFichaDesvantagem.ordem, GurpsCatalogoFichaDesvantagem.nome
+            )
             .all()
         )
         base["desvantagens"] = [
-            {"nome": r.nome, "custo": r.custo, "custo_texto": r.custo_texto} for r in desv_rows
+            {"nome": r.nome, "custo": r.custo, "custo_texto": r.custo_texto}
+            for r in desv_rows
         ]
         per_rows = (
             self.db.query(GurpsCatalogoFichaPericia)

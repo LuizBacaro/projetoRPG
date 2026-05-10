@@ -17,13 +17,6 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.dependencies import get_equipamento_service
-from app.shared.core.catalog_cache import catalog_cache, make_cache_key
-from app.shared.core.config import settings
-from app.shared.core.deps import (
-    get_usuario_atual,
-    requer_admin,
-    requer_dono_ou_admin_combatente,
-)
 from app.games.dnd35.schemas.equipamento import (
     EquipamentoCreate,
     EquipamentoJogadorCreate,
@@ -31,6 +24,13 @@ from app.games.dnd35.schemas.equipamento import (
     EquipamentoResponse,
 )
 from app.games.dnd35.services.equipamento_service import EquipamentoService
+from app.shared.core.catalog_cache import catalog_cache, make_cache_key
+from app.shared.core.config import settings
+from app.shared.core.deps import (
+    get_usuario_atual,
+    requer_admin,
+    requer_dono_ou_admin_combatente,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -122,9 +122,7 @@ def obter_equipamento(
 ):
     """Obtém um equipamento específico"""
     try:
-        cache_key = make_cache_key(
-            "equipamentos:detail", equipamento_id=equipamento_id
-        )
+        cache_key = make_cache_key("equipamentos:detail", equipamento_id=equipamento_id)
         if settings.CACHE_ENABLED:
             cached = catalog_cache.get(cache_key)
             if cached is not None:
@@ -148,9 +146,7 @@ def obter_equipamento(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete(
-    "/catalogo/{equipamento_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/catalogo/{equipamento_id}", status_code=status.HTTP_204_NO_CONTENT)
 def deletar_equipamento_catalogo(
     equipamento_id: int,
     service: EquipamentoService = Depends(get_equipamento_service),
@@ -188,9 +184,7 @@ def adicionar_equipamento_jogador(
 ):
     """Adiciona um equipamento ao combatente"""
     try:
-        return service.adicionar_equipamento_jogador(
-            combatente_id, equipamento_jogador
-        )
+        return service.adicionar_equipamento_jogador(combatente_id, equipamento_jogador)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

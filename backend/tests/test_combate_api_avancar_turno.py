@@ -45,7 +45,9 @@ class _FakeCombateService:
         self.combate.turno_atual = 1
         return self.combate
 
-    def montar_status_combate(self, combate: _FakeCombate, incluir_combatentes: bool = True):
+    def montar_status_combate(
+        self, combate: _FakeCombate, incluir_combatentes: bool = True
+    ):
         self.received_incluir_combatentes = incluir_combatentes
         payload = {
             "id": combate.id,

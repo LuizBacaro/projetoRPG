@@ -142,18 +142,32 @@ export class ConfiguracaoController {
 
     async atualizarHPMaximo(id, hpAtual, novoHPMax) {
         try {
+            // Sem clamp negativo aqui: jogadores podem ter HP atual em -10..hp_max (regra D&D 3.5).
+            // Apenas evita exceder o novo teto quando este é menor que o HP atual.
             const novoHPAtual = hpAtual > novoHPMax ? novoHPMax : hpAtual;
-            await fetch(`${getApiUrl('/combatentes')}/${id}`, {
+
+            const response = await fetch(`${getApiUrl('/combatentes')}/${id}`, {
                 method:  'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this._authHeaders(true),
                 body:    JSON.stringify({ hp_maximo: novoHPMax, hp_atual: novoHPAtual })
             });
+
+            if (!response.ok) {
+                let mensagem = 'Erro ao atualizar HP máximo';
+                try {
+                    const data = await response.json();
+                    mensagem = data.detail || mensagem;
+                } catch (_) { /* corpo vazio ou não JSON */ }
+                throw new Error(mensagem);
+            }
+
             Toast.success('HP máximo atualizado!');
             await this.atualizarSelecionados();
             await this.carregarCombatentes();
         } catch (error) {
-            Toast.error('Erro ao atualizar HP máximo');
+            Toast.error(error.message || 'Erro ao atualizar HP máximo');
             console.error(error);
+            await this.atualizarSelecionados();
         }
     }
 

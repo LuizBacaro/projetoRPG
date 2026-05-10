@@ -2,17 +2,21 @@
 Controller/Router de Combatentes
 SRP: Responsável apenas por HTTP routing
 """
+
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    Response,
+    UploadFile,
+)
 
 from app.core.dependencies import get_combatente_service
-from app.shared.core.deps import (
-    get_usuario_atual,
-    requer_dono_ou_admin_combatente,
-    requer_game_dnd35,
-)
-from app.shared.exceptions.custom_exceptions import ArenaBaseException
 from app.games.dnd35.schemas.combatente import (
     CombatenteResponse,
     DanoCuraMassaRequest,
@@ -23,6 +27,12 @@ from app.games.dnd35.schemas.combatente import (
     IniciativaUpdateRequest,
 )
 from app.games.dnd35.services.combatente_service import CombatenteService
+from app.shared.core.deps import (
+    get_usuario_atual,
+    requer_dono_ou_admin_combatente,
+    requer_game_dnd35,
+)
+from app.shared.exceptions.custom_exceptions import ArenaBaseException
 from app.shared.models.usuario import Usuario
 
 router = APIRouter(
@@ -72,13 +82,13 @@ def obter_combatente(
 
 @router.post("", response_model=CombatenteResponse, status_code=201)
 async def criar_combatente(
-    nome:       str = Form(..., max_length=100),
-    hp_maximo:  int = Form(...),
+    nome: str = Form(..., max_length=100),
+    hp_maximo: int = Form(...),
     iniciativa: int = Form(...),
-    tipo:       str = Form("jogador", max_length=20),
-    classe:     str = Form("Aventureiro", max_length=50),
-    raca:       Optional[str] = Form(None, max_length=50),
-    raca_slug:  Optional[str] = Form(None, max_length=80),
+    tipo: str = Form("jogador", max_length=20),
+    classe: str = Form("Aventureiro", max_length=50),
+    raca: Optional[str] = Form(None, max_length=50),
+    raca_slug: Optional[str] = Form(None, max_length=80),
     idiomas_customizados: Optional[str] = Form(None, max_length=1200),
     divindade: Optional[str] = Form(None, max_length=80),
     alinhamento: Optional[str] = Form(None, max_length=30),
@@ -87,14 +97,14 @@ async def criar_combatente(
     # ✅ NOVO
     pagina_referencia: Optional[str] = Form(None, max_length=100),
     # Atributos D&D
-    forca:        int = Form(10),
-    destreza:     int = Form(10),
+    forca: int = Form(10),
+    destreza: int = Form(10),
     constituicao: int = Form(10),
     inteligencia: int = Form(10),
-    sabedoria:    int = Form(10),
-    carisma:      int = Form(10),
+    sabedoria: int = Form(10),
+    carisma: int = Form(10),
     # Progressão
-    nivel:  int = Form(1),
+    nivel: int = Form(1),
     pontos: int = Form(0),
     # Economia
     pc: int = Form(0),
@@ -107,31 +117,31 @@ async def criar_combatente(
 ):
     """Cria um novo combatente"""
     combatente_data = {
-        "nome":               nome,
-        "tipo":               tipo,
-        "classe":             classe,
-        "raca":               raca or "",
-        "raca_slug":          raca_slug or "",
+        "nome": nome,
+        "tipo": tipo,
+        "classe": classe,
+        "raca": raca or "",
+        "raca_slug": raca_slug or "",
         "idiomas_customizados": idiomas_customizados,
-        "divindade":          divindade or "",
-        "alinhamento":        alinhamento or "",
-        "dominios":           dominios or "",
-        "campanha_id":        campanha_id,
-        "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
-        "hp_maximo":          hp_maximo,
-        "iniciativa":         iniciativa,
-        "forca":              forca,
-        "destreza":           destreza,
-        "constituicao":       constituicao,
-        "inteligencia":       inteligencia,
-        "sabedoria":          sabedoria,
-        "carisma":            carisma,
-        "nivel":              nivel,
-        "pontos":             pontos,
-        "pc":                 pc,
-        "pp":                 pp,
-        "po":                 po,
-        "pl":                 pl,
+        "divindade": divindade or "",
+        "alinhamento": alinhamento or "",
+        "dominios": dominios or "",
+        "campanha_id": campanha_id,
+        "pagina_referencia": pagina_referencia or "",  # ✅ NOVO
+        "hp_maximo": hp_maximo,
+        "iniciativa": iniciativa,
+        "forca": forca,
+        "destreza": destreza,
+        "constituicao": constituicao,
+        "inteligencia": inteligencia,
+        "sabedoria": sabedoria,
+        "carisma": carisma,
+        "nivel": nivel,
+        "pontos": pontos,
+        "pc": pc,
+        "pp": pp,
+        "po": po,
+        "pl": pl,
     }
     try:
         return service.criar(combatente_data, foto, dono_id=usuario_atual.id)
@@ -142,13 +152,13 @@ async def criar_combatente(
 @router.put("/{combatente_id}", response_model=CombatenteResponse)
 async def atualizar_combatente(
     combatente_id: int,
-    nome:          str = Form(..., max_length=100),
-    hp_maximo:     int = Form(...),
-    iniciativa:    int = Form(...),
-    tipo:          str = Form(..., max_length=20),
-    classe:        str = Form("Aventureiro", max_length=50),
-    raca:          Optional[str] = Form(None, max_length=50),
-    raca_slug:     Optional[str] = Form(None, max_length=80),
+    nome: str = Form(..., max_length=100),
+    hp_maximo: int = Form(...),
+    iniciativa: int = Form(...),
+    tipo: str = Form(..., max_length=20),
+    classe: str = Form("Aventureiro", max_length=50),
+    raca: Optional[str] = Form(None, max_length=50),
+    raca_slug: Optional[str] = Form(None, max_length=80),
     idiomas_customizados: Optional[str] = Form(None, max_length=1200),
     divindade: Optional[str] = Form(None, max_length=80),
     alinhamento: Optional[str] = Form(None, max_length=30),
@@ -157,14 +167,14 @@ async def atualizar_combatente(
     # ✅ NOVO
     pagina_referencia: Optional[str] = Form(None, max_length=100),
     # Atributos D&D
-    forca:        int = Form(10),
-    destreza:     int = Form(10),
+    forca: int = Form(10),
+    destreza: int = Form(10),
     constituicao: int = Form(10),
     inteligencia: int = Form(10),
-    sabedoria:    int = Form(10),
-    carisma:      int = Form(10),
+    sabedoria: int = Form(10),
+    carisma: int = Form(10),
     # Progressão
-    nivel:  int = Form(1),
+    nivel: int = Form(1),
     pontos: int = Form(0),
     # Economia
     pc: int = Form(0),
@@ -177,31 +187,31 @@ async def atualizar_combatente(
 ):
     """Atualiza um combatente existente"""
     combatente_data = {
-        "nome":               nome,
-        "tipo":               tipo,
-        "classe":             classe,
-        "raca":               raca or "",
-        "raca_slug":          raca_slug or "",
+        "nome": nome,
+        "tipo": tipo,
+        "classe": classe,
+        "raca": raca or "",
+        "raca_slug": raca_slug or "",
         "idiomas_customizados": idiomas_customizados,
-        "divindade":          divindade or "",
-        "alinhamento":        alinhamento or "",
-        "dominios":           dominios or "",
-        "campanha_id":        campanha_id,
-        "pagina_referencia":  pagina_referencia or "",   # ✅ NOVO
-        "hp_maximo":          hp_maximo,
-        "iniciativa":         iniciativa,
-        "forca":              forca,
-        "destreza":           destreza,
-        "constituicao":       constituicao,
-        "inteligencia":       inteligencia,
-        "sabedoria":          sabedoria,
-        "carisma":            carisma,
-        "nivel":              nivel,
-        "pontos":             pontos,
-        "pc":                 pc,
-        "pp":                 pp,
-        "po":                 po,
-        "pl":                 pl,
+        "divindade": divindade or "",
+        "alinhamento": alinhamento or "",
+        "dominios": dominios or "",
+        "campanha_id": campanha_id,
+        "pagina_referencia": pagina_referencia or "",  # ✅ NOVO
+        "hp_maximo": hp_maximo,
+        "iniciativa": iniciativa,
+        "forca": forca,
+        "destreza": destreza,
+        "constituicao": constituicao,
+        "inteligencia": inteligencia,
+        "sabedoria": sabedoria,
+        "carisma": carisma,
+        "nivel": nivel,
+        "pontos": pontos,
+        "pc": pc,
+        "pp": pp,
+        "po": po,
+        "pl": pl,
     }
     try:
         return service.atualizar(combatente_id, combatente_data, foto)

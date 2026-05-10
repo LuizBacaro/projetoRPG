@@ -11,6 +11,7 @@ Observacoes:
 
 Divindades de campanha D&D 3.5; canônico em `app.games.dnd35.models.divindade_custom`.
 """
+
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text

@@ -78,7 +78,9 @@ class GurpsCampanhaService:
         return criada
 
     def obter_por_id_mestre(self, campanha_id: int, mestre_id: int) -> GurpsCampanha:
-        campanha = self.campanha_repository.obter_por_id_e_mestre(campanha_id, mestre_id)
+        campanha = self.campanha_repository.obter_por_id_e_mestre(
+            campanha_id, mestre_id
+        )
         if not campanha:
             raise ArenaBaseException("Campanha nao encontrada", status_code=404)
         return campanha
@@ -111,9 +113,7 @@ class GurpsCampanhaService:
         atualizada.personagem_ids = [p.id for p in (atualizada.personagens or [])]
         return atualizada
 
-    def deletar(
-        self, campanha_id: int, usuario_id: int, perfil: PerfilUsuario
-    ) -> None:
+    def deletar(self, campanha_id: int, usuario_id: int, perfil: PerfilUsuario) -> None:
         campanha = self._campanha_gestao(campanha_id, usuario_id, perfil)
         for personagem in campanha.personagens or []:
             personagem.campanha_id = None
@@ -147,9 +147,7 @@ class GurpsCampanhaService:
         for personagem in atuais:
             if personagem.id not in ids_novos:
                 personagem.campanha_id = None
-        self._associar_personagens(
-            campanha_id, personagem_ids or [], commit=False
-        )
+        self._associar_personagens(campanha_id, personagem_ids or [], commit=False)
         commit_with_rollback(self.campanha_repository.db)
 
     def _associar_personagens(
@@ -159,9 +157,7 @@ class GurpsCampanhaService:
         commit: bool = True,
     ) -> None:
         ids = list(
-            dict.fromkeys(
-                [int(pid) for pid in (personagem_ids or []) if int(pid) > 0]
-            )
+            dict.fromkeys([int(pid) for pid in (personagem_ids or []) if int(pid) > 0])
         )
         if not ids:
             if commit:

@@ -1437,9 +1437,12 @@ export class FichaPersonagemController {
     _bonusIniciativaTalento() {
         const talentos = Array.isArray(this.talentosJogador) ? this.talentosJogador : [];
         for (const talento of talentos) {
+            // Normaliza igual ao backend: remove acentos, símbolos (ex.: ¹) e caixa.
             const nome = String(talento?.nome || '')
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^A-Za-z\s]/g, '')
+                .replace(/\s+/g, ' ')
                 .trim()
                 .toUpperCase();
             if (nome === 'INICIATIVA APRIMORADA') return 4;
