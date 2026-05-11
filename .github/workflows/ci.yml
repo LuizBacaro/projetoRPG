@@ -203,37 +203,32 @@ jobs:
       - name: Install Playwright browsers
         run: python -m playwright install chromium --with-deps
 
-      - name: Start API server
+      # O uvicorn tem de subir e ficar vivo no *mesmo* passo que o pytest: ao terminar um step,
+      # o shell encerra e processos em background costumam morrer (SIGHUP) — o E2E corria sem API.
+      - name: Start API server and run E2E smoke
         run: |
-          # Não copiar .env.example: define admin@arena-rpg.com.br e conflita com o smoke (admin@arena.local / admin123).
           export ADMIN_EMAIL="${ADMIN_EMAIL:-admin@arena.local}"
           export ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin123}"
           uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          UV_PID=$!
+          cleanup() { kill "$UV_PID" 2>/dev/null || true; }
+          trap cleanup EXIT
           for i in $(seq 1 40); do
             if curl -fsS "http://localhost:8000/health/live" >/dev/null 2>&1; then
-              echo "API pronta."
-              exit 0
+              echo "API pronta (pid=$UV_PID)."
+              break
             fi
             sleep 1
           done
-          echo "::error::Timeout aguardando /health/live"
-          exit 1
+          curl -fsS "http://localhost:8000/health/live" >/dev/null || {
+            echo "::error::Timeout aguardando /health/live"
+            exit 1
+          }
+          python -m pytest tests/e2e/ -v --tb=short
         env:
           SECRET_KEY: ci-test-secret-key-32chars-minimum!
           DATABASE_URL: sqlite:///./test_e2e.db
-          # SQLite vazio: a cadeia Alembic incremental não cria magias/equipamentos do zero;
-          # create_all no startup (STARTUP_RUN_ALEMBIC=0) alinha com o job migrations em Postgres.
           STARTUP_RUN_ALEMBIC: "0"
-          # Segredos opcionais (se ausentes, o script usa admin@arena.local / admin123). Aviso do editor sobre contexto = falso positivo.
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-
-      - name: Run E2E smoke tests
-        run: |
-          export ADMIN_EMAIL="${ADMIN_EMAIL:-admin@arena.local}"
-          export ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin123}"
-          python -m pytest tests/e2e/ -v --tb=short
-        env:
           BASE_URL: http://localhost:8000
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
