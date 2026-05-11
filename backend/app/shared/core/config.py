@@ -150,7 +150,20 @@ class Settings(BaseSettings):
         self._validar_seguranca()
         self._criar_diretorios()
         self._normalizar_database_url()
+        self._validar_render_sem_sqlite()
         self._validar_database_url_ambiente()
+
+    def _validar_render_sem_sqlite(self) -> None:
+        """Render usa filesystem efêmero; SQLite local perde dados e costuma ser erro de config."""
+        if os.environ.get("RENDER", "").lower() != "true":
+            return
+        url = (self.DATABASE_URL or "").strip().lower()
+        if "sqlite" in url:
+            raise ValueError(
+                "Com RENDER=true, DATABASE_URL não pode ser SQLite (disco efêmero). "
+                "Use PostgreSQL (ex.: Neon). Para produção, defina ENVIRONMENT=production, "
+                "SECRET_KEY e ADMIN_EMAIL/ADMIN_PASSWORD no painel do serviço."
+            )
 
     def _validar_database_url_ambiente(self) -> None:
         """
