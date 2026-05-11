@@ -144,7 +144,8 @@ def test_dashboard_lista_combatentes(page: Page):
     """Dashboard lista combatentes na tabela (layout atual)."""
     fazer_login(page)
     page.wait_for_selector("#tabelaCombatentes .btn-ver-ficha", timeout=20000)
-    linhas = page.locator("#tabelaCombatentes tbody tr:has(.btn-ver-ficha)")
+    # `id="tabelaCombatentes"` está no <tbody>, não num wrapper — evitar `tbody tbody`.
+    linhas = page.locator("#tabelaCombatentes tr:has(.btn-ver-ficha)")
     assert linhas.count() >= 1, "Deve haver ao menos um combatente na tabela"
 
 
@@ -230,10 +231,8 @@ def test_modal_perfil_salva_e_persiste(page: Page):
     modal = page.locator("#modalPerfilMagico")
     expect(modal).to_be_visible()
 
-    # Edita alinhamento
-    alinhamento_input = page.locator("#inputPerfilAlinhamento")
-    alinhamento_input.clear()
-    alinhamento_input.fill("Neutro")
+    # Alinhamento é <select> (opções canónicas, ex. "Neutro")
+    page.locator("#inputPerfilAlinhamento").select_option("Neutro")
 
     # Salva
     page.locator("#btnSalvarPerfilMagico").click()
