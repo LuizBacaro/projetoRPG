@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "echo 'static'",
+  "buildCommand": "node scripts/inject-render-api-origin.cjs",
   "installCommand": "echo 'static'",
   "outputDirectory": "frontend",
   "rewrites": [
