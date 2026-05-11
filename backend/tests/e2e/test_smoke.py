@@ -36,7 +36,8 @@ def _env_ou_padrao(key: str, default: str) -> str:
 
 
 BASE_URL = _env_ou_padrao("BASE_URL", "http://localhost:8000")
-ADMIN_EMAIL = _env_ou_padrao("ADMIN_EMAIL", "admin@arena.local")
+# `admin@arena.local` falha no Pydantic EmailStr (.local é domínio reservado) → 422 no login.
+ADMIN_EMAIL = _env_ou_padrao("ADMIN_EMAIL", "ci-admin@example.com")
 ADMIN_PASS = _env_ou_padrao("ADMIN_PASSWORD", "admin123")
 FRONTEND = BASE_URL  # arquivos estáticos servidos pelo mesmo servidor
 
