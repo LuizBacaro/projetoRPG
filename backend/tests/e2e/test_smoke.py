@@ -160,7 +160,9 @@ def test_dashboard_abre_ficha_mesma_aba(page: Page):
 
     paginas_depois = len(page.context.pages)
     assert paginas_depois == paginas_antes, "Ficha deve abrir na mesma aba"
-    expect(page).to_have_url(re.compile(r".*/games/dnd35/pages/ficha-personagem\.html.*"))
+    expect(page).to_have_url(
+        re.compile(r".*/games/dnd35/pages/ficha-personagem\.html.*")
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
