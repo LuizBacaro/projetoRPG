@@ -207,7 +207,8 @@ jobs:
       # o shell encerra e processos em background costumam morrer (SIGHUP) — o E2E corria sem API.
       - name: Start API server and run E2E smoke
         run: |
-          export ADMIN_EMAIL="${ADMIN_EMAIL:-admin@arena.local}"
+          # Domínio .local é rejeitado por Pydantic EmailStr no POST /auth/login (422).
+          export ADMIN_EMAIL="${ADMIN_EMAIL:-ci-admin@example.com}"
           export ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin123}"
           uvicorn app.main:app --host 0.0.0.0 --port 8000 &
           UV_PID=$!
