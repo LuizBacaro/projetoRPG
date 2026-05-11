@@ -45,8 +45,10 @@ FICHA_DND35_RELPATH = "/games/dnd35/pages/ficha-personagem.html"
 # Após login o hub multi-jogo (`selecionar-jogo.html`) exige escolher D&D 3.5;
 # `destinoPorSlug('dnd35')` redireciona para `/dashboard` (canónico), não `/pages/dashboard.html`.
 _DASHBOARD_URL_RE = re.compile(r".*(/dashboard/?$|/pages/dashboard\.html$)")
-# `expect_navigation(..., url=...)` espera até `load` por defeito — páginas com recursos pendentes podem nunca disparar load.
+# `expect_navigation(..., url=...)` espera até `load` por defeito — páginas com recursos
+# pendentes podem nunca disparar load.
 _SELETOR_JOGO_RE = re.compile(r".*selecionar-jogo\.html(\?.*)?$")
+_FICHA_DND35_URL_RE = re.compile(r".*/games/dnd35/pages/ficha-personagem\.html.*")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -160,9 +162,7 @@ def test_dashboard_abre_ficha_mesma_aba(page: Page):
 
     paginas_depois = len(page.context.pages)
     assert paginas_depois == paginas_antes, "Ficha deve abrir na mesma aba"
-    expect(page).to_have_url(
-        re.compile(r".*/games/dnd35/pages/ficha-personagem\.html.*")
-    )
+    expect(page).to_have_url(_FICHA_DND35_URL_RE)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
