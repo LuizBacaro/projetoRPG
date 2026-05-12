@@ -17,7 +17,28 @@ const fs = require("fs");
 const path = require("path");
 
 const DEFAULT_ORIGIN = "https://projetorpg-7ih3.onrender.com";
-const origin = (process.env.ARENA_RENDER_API_ORIGIN || "").trim() || DEFAULT_ORIGIN;
+
+let origin = (process.env.ARENA_RENDER_API_ORIGIN || "").trim() || DEFAULT_ORIGIN;
+try {
+    const u = new URL(origin);
+    if (
+        u.hostname === "arena-de-combate-rpg.com.br" ||
+        u.hostname === "www.arena-de-combate-rpg.com.br"
+    ) {
+        console.warn(
+            "[inject-render-api-origin] ARENA_RENDER_API_ORIGIN aponta para o site estático (apex/www). " +
+                "A API está no Render — a usar DEFAULT:",
+            DEFAULT_ORIGIN
+        );
+        origin = DEFAULT_ORIGIN;
+    }
+} catch (_e) {
+    console.warn(
+        "[inject-render-api-origin] ARENA_RENDER_API_ORIGIN inválida — a usar DEFAULT:",
+        DEFAULT_ORIGIN
+    );
+    origin = DEFAULT_ORIGIN;
+}
 
 const target = path.join(
     __dirname,
