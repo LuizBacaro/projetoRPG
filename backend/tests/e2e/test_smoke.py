@@ -73,11 +73,15 @@ def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
 
 
 def aguardar_ficha_carregar(page: Page, timeout_ms: int = 30000) -> None:
-    """A ficha só liga listeners ao `#btnEditarPerfilMagico` depois do skeleton (Promise.all)."""
+    """Aguarda `inicializar()` terminar e `_configurarEventos()` (ex.: clique no perfil mágico).
+
+    O skeleton de perícias usa `.sk-item` / `.sk-line`, não `.sk-circle` — esperar só
+    pelo skeleton quebrava o smoke (modal nunca abria porque o listener ainda não existia).
+    """
     page.wait_for_function(
         """() => {
-            const lista = document.getElementById('fichaPericiasLista');
-            return lista && !lista.querySelector('.sk-circle');
+            const c = window._fichaController;
+            return Boolean(c && c._fichaEventosDOMProntos === true);
         }""",
         timeout=timeout_ms,
     )
