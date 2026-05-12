@@ -8,6 +8,10 @@
  *   - Development (opcional): mesmo que Preview para `vercel dev`
  *
  * Se a variável não existir no build, mantém o default abaixo (API de produção atual no repo).
+ *
+ * Nota: no repositório, `render-api-origin-boot.js` usa `location.origin` em hosts que não são
+ * Vercel nem o domínio Arena (ex.: outro serviço Render com front+API no mesmo URL). O build
+ * da Vercel substitui este ficheiro por uma única origem explícita.
  */
 const fs = require("fs");
 const path = require("path");
