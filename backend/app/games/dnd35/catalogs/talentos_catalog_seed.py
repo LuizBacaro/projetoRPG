@@ -17,8 +17,8 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import and_
 
-from app.shared.core.config import settings
 from app.games.dnd35.models.talento import Talento, TalentoJogador
+from app.shared.core.config import settings
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -89,18 +89,14 @@ def upsert_talentos_from_rows(db: "Session", rows: list[dict]) -> tuple[int, int
         secao = _trunc(row.get("secao"), 200)
         pagina = _trunc(row.get("pagina_referencia"), 50)
 
-        q = db.query(Talento).filter(
-            Talento.nome == nome, Talento.deleted_at.is_(None)
-        )
+        q = db.query(Talento).filter(Talento.nome == nome, Talento.deleted_at.is_(None))
         existing = q.first()
 
         if existing:
             existing.descricao = descricao
             existing.prerequisitos = prerequisitos or existing.prerequisitos
             existing.secao = secao or existing.secao
-            existing.pagina_referencia = (
-                pagina or existing.pagina_referencia
-            )
+            existing.pagina_referencia = pagina or existing.pagina_referencia
             existing.ativo = True
             atualizados += 1
         else:
@@ -151,14 +147,11 @@ def aplicar_mapeamento_seed_antigo(
             continue
 
         src = idx[json_nome]
-        talento.descricao = _trunc(
-            src.get("beneficios") or src.get("descricao"), 1000
-        )
+        talento.descricao = _trunc(src.get("beneficios") or src.get("descricao"), 1000)
         talento.prerequisitos = _trunc(src.get("prerequisitos"), 500)
         talento.secao = _trunc(src.get("secao"), 200)
         talento.pagina_referencia = (
-            _trunc(src.get("pagina_referencia"), 50)
-            or talento.pagina_referencia
+            _trunc(src.get("pagina_referencia"), 50) or talento.pagina_referencia
         )
         talento.ativo = True
         atualizados += 1
@@ -199,9 +192,7 @@ def desativar_talentos_fora_do_catalogo(
         if t.nome in nomes_validos:
             continue
         em_uso = (
-            db.query(TalentoJogador)
-            .filter(TalentoJogador.talento_id == t.id)
-            .first()
+            db.query(TalentoJogador).filter(TalentoJogador.talento_id == t.id).first()
         )
         if em_uso:
             avisos.append(
@@ -264,9 +255,7 @@ def sincronizar_catalogo_talentos_desde_json(
     return True
 
 
-def seed_catalogo_inicial_vazio(
-    db: "Session", json_path: Path | None = None
-) -> bool:
+def seed_catalogo_inicial_vazio(db: "Session", json_path: Path | None = None) -> bool:
     """Compat: delega para sincronização completa (nome legado)."""
     return sincronizar_catalogo_talentos_desde_json(
         db, json_path=json_path, remover_legado=True

@@ -3,6 +3,7 @@ main.py
 SRP: Entry point da aplicação — orquestra inicialização e rotas
 SOLID: Dependency Injection via contexto FastAPI
 """
+
 import asyncio
 import logging
 import os
@@ -17,13 +18,47 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import inspect, text
-from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError, StatementError
+from sqlalchemy.exc import (
+    IntegrityError,
+    OperationalError,
+    SQLAlchemyError,
+    StatementError,
+)
 
-from .shared.exceptions.custom_exceptions import ArenaBaseException
-
-from .shared.core.config import settings
-from .shared.core.database import engine, Base, SessionLocal, get_db
-from .games.dnd35.legacy_membership import garantir_membership_dnd35_para_usuarios_legados
+from .games.dnd35.api.v1 import armaduras_protecao as dnd35_armaduras_protecao
+from .games.dnd35.api.v1 import ataques as dnd35_ataques
+from .games.dnd35.api.v1 import campanhas as dnd35_campanhas
+from .games.dnd35.api.v1 import combate as dnd35_combate
+from .games.dnd35.api.v1 import combatentes as dnd35_combatentes
+from .games.dnd35.api.v1 import condicoes as dnd35_condicoes
+from .games.dnd35.api.v1 import consumiveis as dnd35_consumiveis
+from .games.dnd35.api.v1 import divindades_custom as dnd35_divindades_custom
+from .games.dnd35.api.v1 import equipamentos as dnd35_equipamentos
+from .games.dnd35.api.v1 import grimorio as dnd35_grimorio
+from .games.dnd35.api.v1 import habilidades_especiais as dnd35_habilidades_especiais
+from .games.dnd35.api.v1 import magias as dnd35_magias
+from .games.dnd35.api.v1 import magias_preparadas as dnd35_magias_preparadas
+from .games.dnd35.api.v1 import pericias as dnd35_pericias
+from .games.dnd35.api.v1 import racas as dnd35_racas
+from .games.dnd35.api.v1 import tabelas_classes as dnd35_tabelas_classes
+from .games.dnd35.api.v1 import talentos as dnd35_talentos
+from .games.dnd35.legacy_membership import (
+    garantir_membership_dnd35_para_usuarios_legados,
+)
+from .games.dnd35.models import armadura_protecao as armadura_protecao_model
+from .games.dnd35.models import ataque as ataque_model
+from .games.dnd35.models import campanha as campanha_model
+from .games.dnd35.models import combate as combate_model
+from .games.dnd35.models import combatente as combatente_model
+from .games.dnd35.models import combatente_condicao as pivot_model
+from .games.dnd35.models import condicao as condicao_model
+from .games.dnd35.models import consumivel as consumivel_model
+from .games.dnd35.models import equipamento as equipamento_model
+from .games.dnd35.models import grimorio as grimorio_model
+from .games.dnd35.models import magia as magia_model
+from .games.dnd35.models import pericia as pericia_model
+from .games.dnd35.models import sessao_campanha as sessao_campanha_model
+from .games.dnd35.models import talento as talento_model
 from .games.dnd35.startup_seeds import (
     inicializar_catalogo_magias_se_vazio,
     inicializar_catalogo_tabelas_classes,
@@ -31,60 +66,28 @@ from .games.dnd35.startup_seeds import (
     inicializar_equipamentos,
     inicializar_talentos,
 )
-from .games.dnd35.sync_progressao_combatentes import sincronizar_bonus_base_ataque_combatentes
-from .shared.startup.admin_default import criar_admin_padrao
-from .shared.startup.game_catalog import inicializar_catalogo_jogos
-from .shared.core.rate_limit import RateLimitMiddleware
-from .shared.core.request_size import RequestSizeLimitMiddleware
-from .shared.api.v1 import (
-    auth,
-    games,
-    usuarios,
+from .games.dnd35.sync_progressao_combatentes import (
+    sincronizar_bonus_base_ataque_combatentes,
 )
 from .games.gurps.api.v1 import campanhas as gurps_campanhas
 from .games.gurps.api.v1 import combate as gurps_combate
 from .games.gurps.api.v1 import personagens as gurps_personagens
 from .games.gurps.api.v1 import rolagens as gurps_rolagens
-from .games.dnd35.api.v1 import (
-    armaduras_protecao as dnd35_armaduras_protecao,
-    divindades_custom as dnd35_divindades_custom,
-    ataques as dnd35_ataques,
-    campanhas as dnd35_campanhas,
-    combate as dnd35_combate,
-    combatentes as dnd35_combatentes,
-    condicoes as dnd35_condicoes,
-    equipamentos as dnd35_equipamentos,
-    consumiveis as dnd35_consumiveis,
-    grimorio as dnd35_grimorio,
-    habilidades_especiais as dnd35_habilidades_especiais,
-    racas as dnd35_racas,
-    tabelas_classes as dnd35_tabelas_classes,
-    talentos as dnd35_talentos,
-    magias as dnd35_magias,
-    magias_preparadas as dnd35_magias_preparadas,
-    pericias as dnd35_pericias,
-)
-
-# Importar models para criação de tabelas (ordem importa para ForeignKey)
-from .shared.models import usuario as usuario_model
-from .shared.models import game as game_model
-from .games.dnd35.models import equipamento as equipamento_model
-from .games.dnd35.models import consumivel as consumivel_model
-from .games.dnd35.models import armadura_protecao as armadura_protecao_model
-from .games.dnd35.models import talento as talento_model
-from .games.dnd35.models import combatente as combatente_model
-from .games.dnd35.models import combate as combate_model
-from .games.dnd35.models import condicao as condicao_model
-from .games.dnd35.models import combatente_condicao as pivot_model
-from .games.dnd35.models import ataque as ataque_model
-from .games.dnd35.models import pericia as pericia_model
-from .games.dnd35.models import magia as magia_model
-from .games.dnd35.models import grimorio as grimorio_model
-from .games.dnd35.models import campanha as campanha_model
-from .games.dnd35.models import sessao_campanha as sessao_campanha_model
 from .games.gurps.models import campanha as gurps_campanha_model
 from .games.gurps.models import combate as gurps_combate_model
 from .games.gurps.models import personagem as gurps_personagem_model
+from .shared.api.v1 import auth, games, usuarios
+from .shared.core.config import settings
+from .shared.core.database import Base, SessionLocal, engine, get_db
+from .shared.core.rate_limit import RateLimitMiddleware
+from .shared.core.request_size import RequestSizeLimitMiddleware
+from .shared.exceptions.custom_exceptions import ArenaBaseException
+
+# Importar models para criação de tabelas (ordem importa para ForeignKey)
+from .shared.models import game as game_model
+from .shared.models import usuario as usuario_model
+from .shared.startup.admin_default import criar_admin_padrao
+from .shared.startup.game_catalog import inicializar_catalogo_jogos
 
 logger = logging.getLogger(__name__)
 CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
@@ -103,6 +106,7 @@ async def lifespan(app: FastAPI):
     processo aceitar conexões de imediato — configure no Render o health check
     em `/health/live`. Em development mantém-se síncrono (comportamento anterior).
     """
+
     def _run_init_sync() -> None:
         db = SessionLocal()
         try:
@@ -124,7 +128,9 @@ async def lifespan(app: FastAPI):
                 except asyncio.CancelledError:
                     return
                 if exc is not None:
-                    logger.exception("❌ Falha na inicialização do banco (background): %s", exc)
+                    logger.exception(
+                        "❌ Falha na inicialização do banco (background): %s", exc
+                    )
 
             task = asyncio.create_task(_run_init_async())
             task.add_done_callback(_log_task_fail)
@@ -178,7 +184,9 @@ async def _readiness_middleware(request: Request, call_next):
         if path.startswith("/api") and request.method != "OPTIONS":
             return JSONResponse(
                 status_code=503,
-                content={"detail": "Inicialização do banco em curso; tente em instantes."},
+                content={
+                    "detail": "Inicialização do banco em curso; tente em instantes."
+                },
             )
 
     try:
@@ -195,7 +203,9 @@ async def _readiness_middleware(request: Request, call_next):
         )
         return JSONResponse(
             status_code=500,
-            content={"detail": "Erro interno do servidor. Veja os logs para diagnóstico."},
+            content={
+                "detail": "Erro interno do servidor. Veja os logs para diagnóstico."
+            },
         )
 
 
@@ -205,8 +215,11 @@ async def _readiness_middleware(request: Request, call_next):
 # Sem isso, um IntegrityError não tratado pode chegar ao Render como 500 sem
 # `Access-Control-Allow-Origin`, e o navegador mostra apenas "Failed to fetch".
 
+
 @app.exception_handler(ArenaBaseException)
-async def _handle_arena_exception(request: Request, exc: ArenaBaseException) -> JSONResponse:
+async def _handle_arena_exception(
+    request: Request, exc: ArenaBaseException
+) -> JSONResponse:
     """Erro de regra de negócio → respeita o status_code definido pela exceção."""
     return JSONResponse(
         status_code=exc.status_code,
@@ -215,7 +228,9 @@ async def _handle_arena_exception(request: Request, exc: ArenaBaseException) -> 
 
 
 @app.exception_handler(StatementError)
-async def _handle_statement_error(request: Request, exc: StatementError) -> JSONResponse:
+async def _handle_statement_error(
+    request: Request, exc: StatementError
+) -> JSONResponse:
     """Erros SQLAlchemy envolvendo o statement (ex.: IntegrityError em `.orig`)."""
     orig = getattr(exc, "orig", None)
     if isinstance(orig, IntegrityError):
@@ -223,12 +238,16 @@ async def _handle_statement_error(request: Request, exc: StatementError) -> JSON
     logger.exception("StatementError em %s %s", request.method, request.url.path)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Erro ao executar operação no banco. Veja os logs do servidor."},
+        content={
+            "detail": "Erro ao executar operação no banco. Veja os logs do servidor."
+        },
     )
 
 
 @app.exception_handler(IntegrityError)
-async def _handle_integrity_error(request: Request, exc: IntegrityError) -> JSONResponse:
+async def _handle_integrity_error(
+    request: Request, exc: IntegrityError
+) -> JSONResponse:
     """Violação de constraint (CHECK / UNIQUE / FK) → 409 com detalhe seguro.
 
     Evita 500 sem CORS quando algum dado bate em uma constraint legada (ex.: a
@@ -256,7 +275,9 @@ async def _handle_integrity_error(request: Request, exc: IntegrityError) -> JSON
 
 
 @app.exception_handler(OperationalError)
-async def _handle_operational_error(request: Request, exc: OperationalError) -> JSONResponse:
+async def _handle_operational_error(
+    request: Request, exc: OperationalError
+) -> JSONResponse:
     """Falha de conexão/operação no banco → 503 (não derruba CORS)."""
     detalhe = str(getattr(exc, "orig", exc))
     logger.error(
@@ -273,7 +294,9 @@ async def _handle_operational_error(request: Request, exc: OperationalError) -> 
 
 
 @app.exception_handler(SQLAlchemyError)
-async def _handle_sqlalchemy_error(request: Request, exc: SQLAlchemyError) -> JSONResponse:
+async def _handle_sqlalchemy_error(
+    request: Request, exc: SQLAlchemyError
+) -> JSONResponse:
     """Outras falhas SQLAlchemy → 500 controlado, mas com CORS."""
     logger.exception(
         "SQLAlchemyError em %s %s",
@@ -282,7 +305,9 @@ async def _handle_sqlalchemy_error(request: Request, exc: SQLAlchemyError) -> JS
     )
     return JSONResponse(
         status_code=500,
-        content={"detail": "Erro interno ao acessar o banco. Veja os logs do servidor."},
+        content={
+            "detail": "Erro interno ao acessar o banco. Veja os logs do servidor."
+        },
     )
 
 
@@ -408,14 +433,18 @@ if FRONTEND_DIR.exists():
             )
             logger.info("✅ Frontend %s montado em: %s", _slug, _game_dir)
     # Shell global (login, seletor de jogo, redirects legados /pages/*.html)
-    app.mount("/pages", StaticFiles(directory=str(FRONTEND_DIR / "pages")), name="pages")
+    app.mount(
+        "/pages", StaticFiles(directory=str(FRONTEND_DIR / "pages")), name="pages"
+    )
     _js_dir = FRONTEND_DIR / "js"
     if _js_dir.is_dir():
         app.mount("/js", StaticFiles(directory=str(_js_dir)), name="frontend_js")
         logger.info("✅ JS estático montado em /js → %s", _js_dir)
     _assets_dir = FRONTEND_DIR / "assets"
     if _assets_dir.is_dir():
-        app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="frontend_assets")
+        app.mount(
+            "/assets", StaticFiles(directory=str(_assets_dir)), name="frontend_assets"
+        )
         logger.info("✅ Assets estáticos montados em /assets → %s", _assets_dir)
     logger.info(f"✅ Frontend raiz: {FRONTEND_DIR}")
 else:
@@ -453,6 +482,7 @@ app.include_router(gurps_rolagens.router, prefix=settings.API_V1_PREFIX)
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 
 # ── Rotas Frontend ───────────────────────────────────────────────────────────
+
 
 @app.get("/")
 async def root():
@@ -495,6 +525,7 @@ async def pericias_page():
 
 # ── Health Check ─────────────────────────────────────────────────────────────
 
+
 @app.get("/health/live", include_in_schema=False)
 async def health_live():
     """
@@ -521,7 +552,7 @@ async def health():
         "db": db_status,
         "environment": settings.ENVIRONMENT,
         "version": settings.VERSION,
-        "cors_enabled": True
+        "cors_enabled": True,
     }
 
 
@@ -539,6 +570,7 @@ async def health_ping(token: str | None = Query(default=None)):
 
 
 # ── Funções de Inicialização ─────────────────────────────────────────────────
+
 
 def _obter_revisoes_alembic_atuais() -> list[str]:
     """
@@ -623,29 +655,29 @@ def _executar_alembic_migrations() -> None:
     """
     Executa as migrations do Alembic automaticamente no startup.
     SRP: Garante que o schema esteja sempre atualizado.
-    
-    IMPORTANTE: Deve rodar APÓS create_all(), pois migrations fazem ALTER TABLE
-    e precisam que as tabelas já existam.
-    
-    TODO: Falhas de migration devem abortar o startup. Não podemos seguir com um
-    banco parcialmente migrado, pois isso causa erros de coluna faltante em
-    etapas subsequentes.
+
+    Quando este passo roda, o schema deve vir **só** do Alembic (não use
+    `create_all` antes): senão tabelas novas existem sem `alembic_version` alinhado
+    e o próximo `upgrade` tenta `CREATE TABLE` de novo (ex.: gurps_campanhas).
+
+    Em produção/staging, `Settings` já exige DATABASE_URL PostgreSQL; aqui usamos
+    `settings.DATABASE_URL` para ficar alinhado ao engine da app.
     """
     try:
-        from alembic.config import Config
         from alembic import command
-        
+        from alembic.config import Config
+
         backend_root = Path(__file__).parent.parent
         ini_path = backend_root / "alembic.ini"
-        
+
         if not ini_path.exists():
             raise FileNotFoundError(f"alembic.ini não encontrado em {ini_path}")
-        
+
         # Configurar Alembic
         cfg = Config(str(ini_path))
-        database_url = os.environ.get("DATABASE_URL", "sqlite:///./rpg_arena.db")
+        database_url = settings.DATABASE_URL
         cfg.set_main_option("sqlalchemy.url", database_url)
-        
+
         logger.info(f"🔄 Executando migrations Alembic...")
 
         # Normalizar possíveis múltiplas linhas na tabela alembic_version
@@ -658,18 +690,18 @@ def _executar_alembic_migrations() -> None:
         except Exception as migration_error:
             logger.error(
                 "❌ Falha ao aplicar migrations do Alembic: %s",
-                str(migration_error)[:200]
+                str(migration_error)[:200],
             )
             raise RuntimeError(
                 "Falha ao aplicar migrations do Alembic. "
-                "Verifique o estado do banco e o histórico de migrations." 
+                "Verifique o estado do banco e o histórico de migrations."
                 f"Detalhes: {migration_error}"
             ) from migration_error
     except Exception as e:
         logger.error(
             "❌ Erro ao executar setup de migrations: %s: %s",
             type(e).__name__,
-            str(e)[:200]
+            str(e)[:200],
         )
         raise
 
@@ -679,45 +711,61 @@ def _inicializar_banco_critico(db) -> None:
     SRP: Orquestra a inicialização crítica do banco (gate para liberar /api em produção).
 
     Ordem importa:
-    1. Criar tabelas (create_all) - base para tudo
-    2. Migrations do Alembic (opcional por setting)
-    3. Admin + guards de schema + catálogo de jogos + memberships legados
+    1. Com `STARTUP_RUN_ALEMBIC`: só Alembic até `head` (fonte de verdade do schema).
+       Sem Alembic no startup: `create_all` para bases locais legadas / dev rápido.
+    2. Admin + guards de schema + catálogo de jogos + memberships legados
 
     Args:
         db: Sessão do banco
     """
-    passos = [
-        ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
-    ]
     if settings.STARTUP_RUN_ALEMBIC:
-        passos.append(("executar_alembic_migrations", _executar_alembic_migrations))
+        passos = [
+            ("executar_alembic_migrations", _executar_alembic_migrations),
+        ]
     else:
         logger.info(
             "⏭️ Pulando Alembic no startup da app (STARTUP_RUN_ALEMBIC=0); "
-            "espera-se migração prévia no processo de deploy."
+            "espera-se migração prévia no processo de deploy (ex.: Procfile)."
         )
+        passos = [
+            ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
+        ]
 
-    passos.extend([
-        ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
-        ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
-        ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
-        ("garantir_colunas_catalogo_equipamentos", _garantir_colunas_catalogo_equipamentos),
-        ("garantir_coluna_bonus_base_ataque", _garantir_coluna_bonus_base_ataque),
-        ("garantir_coluna_habilidades_especiais", _garantir_coluna_habilidades_especiais),
-        ("garantir_coluna_campanha_id", _garantir_coluna_campanha_id),
-        ("garantir_coluna_raca_slug", _garantir_coluna_raca_slug),
-        ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
-        ("garantir_colunas_dinheiro", _garantir_colunas_dinheiro),
-        ("garantir_colunas_talentos", _garantir_colunas_talentos),
-        ("garantir_colunas_armaduras_protecao", _garantir_colunas_armaduras_protecao),
-        ("garantir_coluna_pericia_destaque_arena", _garantir_coluna_pericia_destaque_arena),
-        ("garantir_constraints_item_13", _garantir_constraints_item_13),
-        ("inicializar_catalogo_jogos", lambda: inicializar_catalogo_jogos(db)),
-        (
-            "garantir_membership_dnd35_para_usuarios_legados",
-            lambda: garantir_membership_dnd35_para_usuarios_legados(db),
-        ),
-    ])
+    passos.extend(
+        [
+            ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
+            ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
+            ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
+            (
+                "garantir_colunas_catalogo_equipamentos",
+                _garantir_colunas_catalogo_equipamentos,
+            ),
+            ("garantir_coluna_bonus_base_ataque", _garantir_coluna_bonus_base_ataque),
+            (
+                "garantir_coluna_habilidades_especiais",
+                _garantir_coluna_habilidades_especiais,
+            ),
+            ("garantir_coluna_campanha_id", _garantir_coluna_campanha_id),
+            ("garantir_coluna_raca_slug", _garantir_coluna_raca_slug),
+            ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
+            ("garantir_colunas_dinheiro", _garantir_colunas_dinheiro),
+            ("garantir_colunas_talentos", _garantir_colunas_talentos),
+            (
+                "garantir_colunas_armaduras_protecao",
+                _garantir_colunas_armaduras_protecao,
+            ),
+            (
+                "garantir_coluna_pericia_destaque_arena",
+                _garantir_coluna_pericia_destaque_arena,
+            ),
+            ("garantir_constraints_item_13", _garantir_constraints_item_13),
+            ("inicializar_catalogo_jogos", lambda: inicializar_catalogo_jogos(db)),
+            (
+                "garantir_membership_dnd35_para_usuarios_legados",
+                lambda: garantir_membership_dnd35_para_usuarios_legados(db),
+            ),
+        ]
+    )
 
     for nome, callback in passos:
         _executar_passo_startup(nome, callback)
@@ -736,8 +784,14 @@ def _inicializar_banco_pos_ready(db) -> None:
         ("inicializar_consumiveis", lambda: inicializar_consumiveis(db)),
         ("seed_armaduras_protecao", lambda: _seed_armaduras_protecao(db)),
         ("inicializar_talentos", lambda: inicializar_talentos(db)),
-        ("inicializar_catalogo_magias_se_vazio", lambda: inicializar_catalogo_magias_se_vazio(db)),
-        ("sincronizar_bonus_base_ataque_combatentes", lambda: sincronizar_bonus_base_ataque_combatentes(db)),
+        (
+            "inicializar_catalogo_magias_se_vazio",
+            lambda: inicializar_catalogo_magias_se_vazio(db),
+        ),
+        (
+            "sincronizar_bonus_base_ataque_combatentes",
+            lambda: sincronizar_bonus_base_ataque_combatentes(db),
+        ),
         ("inicializar_catalogo_tabelas_classes", inicializar_catalogo_tabelas_classes),
         ("seed_combatentes", lambda: _seed_combatentes(db)),
     ]
@@ -767,19 +821,30 @@ def _garantir_coluna_dono_id() -> None:
     logger.warning("⚠️  coluna combatentes.dono_id ausente; aplicando schema guard")
     with engine.begin() as conn:
         conn.execute(text("ALTER TABLE combatentes ADD COLUMN dono_id INTEGER"))
-        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_combatentes_dono_id ON combatentes (dono_id)"))
-
-        owner_id = conn.execute(
+        conn.execute(
             text(
+                "CREATE INDEX IF NOT EXISTS ix_combatentes_dono_id ON combatentes (dono_id)"
+            )
+        )
+
+        if engine.dialect.name == "postgresql":
+            owner_sql = """
+                SELECT id
+                FROM usuarios
+                WHERE CAST(perfil AS TEXT) ILIKE 'administrador'
+                  AND ativo IS TRUE
+                ORDER BY id
+                LIMIT 1
                 """
+        else:
+            owner_sql = """
                 SELECT id
                 FROM usuarios
                 WHERE perfil = 'administrador' AND ativo = 1
                 ORDER BY id
                 LIMIT 1
                 """
-            )
-        ).scalar()
+        owner_id = conn.execute(text(owner_sql)).scalar()
 
         if owner_id is None:
             owner_id = conn.execute(
@@ -788,7 +853,9 @@ def _garantir_coluna_dono_id() -> None:
 
         if owner_id is not None:
             conn.execute(
-                text("UPDATE combatentes SET dono_id = :owner_id WHERE dono_id IS NULL"),
+                text(
+                    "UPDATE combatentes SET dono_id = :owner_id WHERE dono_id IS NULL"
+                ),
                 {"owner_id": owner_id},
             )
 
@@ -819,7 +886,9 @@ def _garantir_colunas_soft_delete() -> None:
             if "deleted_at" in colunas:
                 continue
 
-            logger.warning("⚠️  coluna %s.deleted_at ausente; aplicando schema guard", tabela)
+            logger.warning(
+                "⚠️  coluna %s.deleted_at ausente; aplicando schema guard", tabela
+            )
             conn.execute(text(f"ALTER TABLE {tabela} ADD COLUMN deleted_at TIMESTAMP"))
 
 
@@ -839,15 +908,23 @@ def _garantir_constraints_item_13() -> None:
         if engine.dialect.name == "postgresql":
             conn.execute(
                 text(
-                    'ALTER TABLE combatentes DROP CONSTRAINT IF EXISTS '
+                    "ALTER TABLE combatentes DROP CONSTRAINT IF EXISTS "
                     '"ck_combatentes_hp_atual_non_negative"'
                 )
             )
 
-        conn.execute(text("UPDATE combatentes SET hp_maximo = 1 WHERE hp_maximo IS NULL OR hp_maximo <= 0"))
+        conn.execute(
+            text(
+                "UPDATE combatentes SET hp_maximo = 1 WHERE hp_maximo IS NULL OR hp_maximo <= 0"
+            )
+        )
         conn.execute(text("UPDATE combatentes SET hp_atual = 0 WHERE hp_atual IS NULL"))
         conn.execute(text("UPDATE combatentes SET hp_atual = -10 WHERE hp_atual < -10"))
-        conn.execute(text("UPDATE combatentes SET hp_atual = hp_maximo WHERE hp_atual > hp_maximo"))
+        conn.execute(
+            text(
+                "UPDATE combatentes SET hp_atual = hp_maximo WHERE hp_atual > hp_maximo"
+            )
+        )
 
         # Normaliza tipo para conjunto fechado permitido
         conn.execute(
@@ -926,7 +1003,9 @@ def _garantir_colunas_catalogo_equipamentos() -> None:
                 "⚠️  coluna equipamentos.%s ausente; aplicando schema guard",
                 coluna,
             )
-            conn.execute(text(f"ALTER TABLE equipamentos ADD COLUMN {coluna} {tipo_sql}"))
+            conn.execute(
+                text(f"ALTER TABLE equipamentos ADD COLUMN {coluna} {tipo_sql}")
+            )
 
 
 def _garantir_colunas_talentos() -> None:
@@ -965,9 +1044,13 @@ def _garantir_coluna_bonus_base_ataque() -> None:
     if "bonus_base_ataque" in colunas_existentes:
         return
 
-    logger.warning("⚠️  coluna combatentes.bonus_base_ataque ausente; aplicando schema guard")
+    logger.warning(
+        "⚠️  coluna combatentes.bonus_base_ataque ausente; aplicando schema guard"
+    )
     with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE combatentes ADD COLUMN bonus_base_ataque VARCHAR(30)"))
+        conn.execute(
+            text("ALTER TABLE combatentes ADD COLUMN bonus_base_ataque VARCHAR(30)")
+        )
 
 
 def _garantir_coluna_habilidades_especiais() -> None:
@@ -981,9 +1064,15 @@ def _garantir_coluna_habilidades_especiais() -> None:
     if "habilidades_especiais" in colunas_existentes:
         return
 
-    logger.warning("⚠️  coluna combatentes.habilidades_especiais ausente; aplicando schema guard")
+    logger.warning(
+        "⚠️  coluna combatentes.habilidades_especiais ausente; aplicando schema guard"
+    )
     with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE combatentes ADD COLUMN habilidades_especiais VARCHAR(2000)"))
+        conn.execute(
+            text(
+                "ALTER TABLE combatentes ADD COLUMN habilidades_especiais VARCHAR(2000)"
+            )
+        )
 
 
 def _garantir_coluna_campanha_id() -> None:
@@ -1000,7 +1089,11 @@ def _garantir_coluna_campanha_id() -> None:
     logger.warning("⚠️  coluna combatentes.campanha_id ausente; aplicando schema guard")
     with engine.begin() as conn:
         conn.execute(text("ALTER TABLE combatentes ADD COLUMN campanha_id INTEGER"))
-        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_combatentes_campanha_id ON combatentes (campanha_id)"))
+        conn.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS ix_combatentes_campanha_id ON combatentes (campanha_id)"
+            )
+        )
 
 
 def _garantir_coluna_raca_slug() -> None:
@@ -1037,8 +1130,12 @@ def _garantir_colunas_resistencia_base() -> None:
         for coluna, tipo_sql in colunas_esperadas.items():
             if coluna in colunas_existentes:
                 continue
-            logger.warning("⚠️  coluna combatentes.%s ausente; aplicando schema guard", coluna)
-            conn.execute(text(f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql}"))
+            logger.warning(
+                "⚠️  coluna combatentes.%s ausente; aplicando schema guard", coluna
+            )
+            conn.execute(
+                text(f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql}")
+            )
 
 
 def _garantir_colunas_dinheiro() -> None:
@@ -1059,8 +1156,14 @@ def _garantir_colunas_dinheiro() -> None:
         for coluna, tipo_sql in colunas_esperadas.items():
             if coluna in colunas_existentes:
                 continue
-            logger.warning("⚠️  coluna combatentes.%s ausente; aplicando schema guard", coluna)
-            conn.execute(text(f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql} DEFAULT 0"))
+            logger.warning(
+                "⚠️  coluna combatentes.%s ausente; aplicando schema guard", coluna
+            )
+            conn.execute(
+                text(
+                    f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql} DEFAULT 0"
+                )
+            )
 
 
 def _garantir_colunas_armaduras_protecao() -> None:
@@ -1070,7 +1173,9 @@ def _garantir_colunas_armaduras_protecao() -> None:
     if "armaduras_protecao" not in tabelas_existentes:
         return
 
-    colunas_existentes = {col["name"] for col in inspector.get_columns("armaduras_protecao")}
+    colunas_existentes = {
+        col["name"] for col in inspector.get_columns("armaduras_protecao")
+    }
     colunas_esperadas = {
         "nome": "VARCHAR(120)",
         "tipo": "VARCHAR(60)",
@@ -1094,7 +1199,9 @@ def _garantir_colunas_armaduras_protecao() -> None:
                 "⚠️  coluna armaduras_protecao.%s ausente; aplicando schema guard",
                 coluna,
             )
-            conn.execute(text(f"ALTER TABLE armaduras_protecao ADD COLUMN {coluna} {tipo_sql}"))
+            conn.execute(
+                text(f"ALTER TABLE armaduras_protecao ADD COLUMN {coluna} {tipo_sql}")
+            )
 
 
 def _garantir_coluna_pericia_destaque_arena() -> None:
@@ -1104,13 +1211,21 @@ def _garantir_coluna_pericia_destaque_arena() -> None:
     if "pericia_jogadores" not in tabelas_existentes:
         return
 
-    colunas_existentes = {col["name"] for col in inspector.get_columns("pericia_jogadores")}
+    colunas_existentes = {
+        col["name"] for col in inspector.get_columns("pericia_jogadores")
+    }
     if "destaque_arena" in colunas_existentes:
         return
 
-    logger.warning("⚠️  coluna pericia_jogadores.destaque_arena ausente; aplicando schema guard")
+    logger.warning(
+        "⚠️  coluna pericia_jogadores.destaque_arena ausente; aplicando schema guard"
+    )
     with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE pericia_jogadores ADD COLUMN destaque_arena INTEGER DEFAULT 0"))
+        conn.execute(
+            text(
+                "ALTER TABLE pericia_jogadores ADD COLUMN destaque_arena INTEGER DEFAULT 0"
+            )
+        )
 
 
 def _seed_pericias(db) -> None:
@@ -1122,8 +1237,9 @@ def _seed_pericias(db) -> None:
     As reconciliações de nomes legados (ex.: "Acrobacia" → "Acrobacias") ficam a
     cargo das migrações Alembic — este seed não renomeia nada.
     """
-    from .games.dnd35.models.pericia import Pericia
     from scripts.seed_pericias import PERICIAS_DATA
+
+    from .games.dnd35.models.pericia import Pericia
 
     try:
         existentes = {nome for (nome,) in db.query(Pericia.nome).all()}
@@ -1156,8 +1272,13 @@ def _seed_pericias(db) -> None:
             logger.info("✅ %s perícias canônicas inseridas (Tabela 4-3)", len(criadas))
             print(f"✅ {len(criadas)} perícias canônicas inseridas (Tabela 4-3)")
         else:
-            logger.info("✅ Perícias da Tabela 4-3 já presentes (%s existentes)", len(existentes))
-            print(f"✅ Perícias da Tabela 4-3 já presentes ({len(existentes)} existentes)")
+            logger.info(
+                "✅ Perícias da Tabela 4-3 já presentes (%s existentes)",
+                len(existentes),
+            )
+            print(
+                f"✅ Perícias da Tabela 4-3 já presentes ({len(existentes)} existentes)"
+            )
 
     except Exception as e:
         db.rollback()
@@ -1170,8 +1291,9 @@ def _seed_armaduras_protecao(db) -> None:
     """
     Popula catálogo de armaduras/escudos da Tabela 7-6 se estiver vazio.
     """
-    from .games.dnd35.models.armadura_protecao import ArmaduraProtecao
     from scripts.seed_armaduras_protecao import seed_armaduras_protecao
+
+    from .games.dnd35.models.armadura_protecao import ArmaduraProtecao
 
     try:
         count = db.query(ArmaduraProtecao).count()
@@ -1206,8 +1328,9 @@ def _seed_pericias_classes(db) -> None:
     """
     Popula `pericias_classes` de forma idempotente para habilitar custo por classe.
     """
-    from .games.dnd35.models.pericia import Pericia, PericiaClasse
     from scripts.seed_pericias import PERICIAS_DATA
+
+    from .games.dnd35.models.pericia import Pericia, PericiaClasse
 
     try:
         associacoes_antes = db.query(PericiaClasse).count()
@@ -1227,17 +1350,23 @@ def _seed_pericias_classes(db) -> None:
         nao_mapeadas = 0
 
         for pericia in PERICIAS_DATA:
-            pericia_id = mapa_por_nome.get(_normalizar_nome_pericia(pericia.get("nome", "")))
+            pericia_id = mapa_por_nome.get(
+                _normalizar_nome_pericia(pericia.get("nome", ""))
+            )
             if pericia_id is None:
                 nao_mapeadas += 1
                 continue
 
             for classe_nome in pericia.get("classes", []):
-                existente = db.query(PericiaClasse.id).filter(
-                    PericiaClasse.pericia_id == pericia_id,
-                    PericiaClasse.classe_nome == classe_nome,
-                    PericiaClasse.is_default == 1,
-                ).first()
+                existente = (
+                    db.query(PericiaClasse.id)
+                    .filter(
+                        PericiaClasse.pericia_id == pericia_id,
+                        PericiaClasse.classe_nome == classe_nome,
+                        PericiaClasse.is_default == 1,
+                    )
+                    .first()
+                )
                 if existente:
                     continue
 
@@ -1277,8 +1406,8 @@ def _seed_combatentes(db) -> None:
     Args:
         db: Sessão do banco
     """
-    from .games.dnd35.repositories.combatente_repository import CombatenteRepository
     from .games.dnd35.models.combatente import Combatente
+    from .games.dnd35.repositories.combatente_repository import CombatenteRepository
 
     repo = CombatenteRepository(db)
     if repo.count() > 0:
@@ -1418,9 +1547,4 @@ def _seed_condicoes(db) -> None:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        log_level="info"
-    )
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")

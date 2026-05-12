@@ -1,16 +1,16 @@
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.games.dnd35.api.v1.magias_preparadas import router as magias_preparadas_router
-from app.shared.core.database import Base, get_db
-from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.games.dnd35.models.ataque import MagiaSlot
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.magia import Magia
+from app.shared.core.database import Base, get_db
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 
 
 @pytest.fixture(scope="function")
@@ -186,14 +186,18 @@ def test_toggle_uso_consume_e_restaura_uma_copia_por_vez(prepared_db):
     )
     assert preparar.status_code == 200
 
-    usar = client.patch(f"/api/v1/magias-preparadas/{combatente.id}/{magia.id}/usar?action=usar")
+    usar = client.patch(
+        f"/api/v1/magias-preparadas/{combatente.id}/{magia.id}/usar?action=usar"
+    )
     assert usar.status_code == 200
     payload_usar = usar.json()
     assert payload_usar["quantidade"] == 2
     assert payload_usar["usos_realizados"] == 1
     assert payload_usar["usada"] is True
 
-    restaurar = client.patch(f"/api/v1/magias-preparadas/{combatente.id}/{magia.id}/usar?action=restaurar")
+    restaurar = client.patch(
+        f"/api/v1/magias-preparadas/{combatente.id}/{magia.id}/usar?action=restaurar"
+    )
     assert restaurar.status_code == 200
     payload_restaurar = restaurar.json()
     assert payload_restaurar["usos_realizados"] == 0

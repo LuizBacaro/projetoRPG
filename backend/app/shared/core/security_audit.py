@@ -1,10 +1,9 @@
 """Helpers para logging estruturado de eventos de segurança."""
 
-from typing import Any, Optional
 import logging
+from typing import Any, Optional
 
 from starlette.requests import Request
-
 
 security_logger = logging.getLogger("app.security")
 

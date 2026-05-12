@@ -2,9 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0;url=/games/dnd35/pages/ficha-personagem.html" />
-  <script>window.location.replace("/games/dnd35/pages/ficha-personagem.html");</script>
   <title>Redirecionando…</title>
+  <!-- Preserva ?id= e outros query params ao delegar para a ficha D&D 3.5 -->
+  <script>
+    (function () {
+      var q = window.location.search || '';
+      window.location.replace('/games/dnd35/pages/ficha-personagem.html' + q);
+    })();
+  </script>
 </head>
 <body>
   <p><a href="/games/dnd35/pages/ficha-personagem.html">Abrir ficha (D&amp;D 3.5)</a></p>

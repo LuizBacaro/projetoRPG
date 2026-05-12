@@ -8,13 +8,14 @@ de RPG (D&D 3.5, D&D 5e, GURPS, etc.) deseja acessar após o login. Cada jogo
 tem seu próprio domínio de dados (campanhas, fichas, regras), mas autenticação,
 identidade e perfil global são únicos.
 """
+
 from sqlalchemy import (
-    Column,
-    Integer,
-    String,
     Boolean,
+    Column,
     DateTime,
     ForeignKey,
+    Integer,
+    String,
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
@@ -80,9 +81,7 @@ class UserGameMembership(Base):
     )
 
     id = Column(Integer, primary_key=True, index=True)
-    usuario_id = Column(
-        Integer, ForeignKey("usuarios.id"), nullable=False, index=True
-    )
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
     game_id = Column(
         Integer, ForeignKey("games_catalog.id"), nullable=False, index=True
     )

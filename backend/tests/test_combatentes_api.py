@@ -1,17 +1,20 @@
 import json
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.games.dnd35.api.v1.combatentes import router as combatentes_router
+from app.games.dnd35.models.armadura_protecao import (
+    ArmaduraProtecao,
+    ArmaduraProtecaoJogador,
+)
+from app.games.dnd35.models.talento import Talento, TalentoJogador
 from app.shared.core.database import Base, get_db
 from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
-from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
-from app.games.dnd35.models.talento import Talento, TalentoJogador
 
 
 class _UsuarioDummy:
@@ -105,7 +108,9 @@ def test_criar_combatente_retorna_alinhamento_e_dominios(combatentes_db):
     assert body["pl"] == 0
 
 
-def test_criar_combatente_rejeita_divindade_incompativel_com_alinhamento(combatentes_db):
+def test_criar_combatente_rejeita_divindade_incompativel_com_alinhamento(
+    combatentes_db,
+):
     """Regra do 1-passo: Leal e Bom não pode escolher Gruumsh (Caótico e Mau)."""
     _, db_factory = combatentes_db
     client = _build_client(db_factory)
@@ -267,7 +272,9 @@ def test_criar_combatente_preenche_bonus_base_ataque_por_classe_e_nivel(combaten
     assert body["vontade"] == 5
 
 
-def test_defesas_sao_recalculadas_automaticamente_por_destreza_e_armadura(combatentes_db):
+def test_defesas_sao_recalculadas_automaticamente_por_destreza_e_armadura(
+    combatentes_db,
+):
     _, db_factory = combatentes_db
     client = _build_client(db_factory)
 
@@ -283,9 +290,9 @@ def test_defesas_sao_recalculadas_automaticamente_por_destreza_e_armadura(combat
 
     assert response.status_code == 201
     body = response.json()
-    assert body["toque"] == 12      # 10 + mod DES
-    assert body["surpresa"] == 10   # 10 + bônus de armadura (inicialmente 0)
-    assert body["ca"] == 12         # 10 + mod DES + bônus de armadura (0)
+    assert body["toque"] == 12  # 10 + mod DES
+    assert body["surpresa"] == 10  # 10 + bônus de armadura (inicialmente 0)
+    assert body["ca"] == 12  # 10 + mod DES + bônus de armadura (0)
 
 
 def test_defesas_usam_bonus_ca_de_armadura_item_protecao(combatentes_db):
@@ -317,9 +324,9 @@ def test_defesas_usam_bonus_ca_de_armadura_item_protecao(combatentes_db):
     obter = client.get(f"/api/v1/combatentes/{combatente_id}")
     assert obter.status_code == 200
     body = obter.json()
-    assert body["toque"] == 12      # 10 + mod DES
-    assert body["surpresa"] == 16   # 10 + bônus de armadura (item)
-    assert body["ca"] == 18         # 10 + mod DES + bônus de armadura
+    assert body["toque"] == 12  # 10 + mod DES
+    assert body["surpresa"] == 16  # 10 + bônus de armadura (item)
+    assert body["ca"] == 18  # 10 + mod DES + bônus de armadura
 
 
 def test_habilidades_especiais_incluem_todos_os_niveis_ate_o_atual(combatentes_db):
@@ -340,7 +347,9 @@ def test_habilidades_especiais_incluem_todos_os_niveis_ate_o_atual(combatentes_d
     assert niveis == {1, 2, 4, 6}
 
 
-def test_atualizar_combatente_recalcula_bonus_base_ataque_quando_classe_ou_nivel_mudam(combatentes_db):
+def test_atualizar_combatente_recalcula_bonus_base_ataque_quando_classe_ou_nivel_mudam(
+    combatentes_db,
+):
     _, db_factory = combatentes_db
     client = _build_client(db_factory)
 
@@ -379,7 +388,9 @@ def test_jogador_com_iniciativa_aprimorada_recebe_bonus_na_iniciativa(combatente
     assert criado.status_code == 201
     combatente_id = criado.json()["id"]
 
-    talento = Talento(nome="Iniciativa Aprimorada", descricao="+4 em iniciativa", ativo=True)
+    talento = Talento(
+        nome="Iniciativa Aprimorada", descricao="+4 em iniciativa", ativo=True
+    )
     db.add(talento)
     db.flush()
     db.add(TalentoJogador(combatente_id=combatente_id, talento_id=talento.id))
@@ -404,7 +415,9 @@ def test_iniciativa_aprimorada_com_sufixo_unicode_aplica_bonus(combatentes_db):
     assert criado.status_code == 201
     combatente_id = criado.json()["id"]
 
-    talento = Talento(nome="Iniciativa Aprimorada¹", descricao="+4 iniciativa", ativo=True)
+    talento = Talento(
+        nome="Iniciativa Aprimorada¹", descricao="+4 iniciativa", ativo=True
+    )
     db.add(talento)
     db.flush()
     db.add(TalentoJogador(combatente_id=combatente_id, talento_id=talento.id))

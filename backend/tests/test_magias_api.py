@@ -1,6 +1,6 @@
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -79,7 +79,9 @@ def test_magias_criar_persiste_classes_e_campos_legados(magias_db):
     assert body["nome"] == "Raio Arcano"
     assert body["classe"] == "MAGO,FEITICEIRO"
     assert body["nivel"] == 1
-    assert sorted((item["classe"], item["nivel"]) for item in body["classes_niveis"]) == [
+    assert sorted(
+        (item["classe"], item["nivel"]) for item in body["classes_niveis"]
+    ) == [
         ("FEITICEIRO", 2),
         ("MAGO", 1),
     ]
@@ -128,7 +130,9 @@ def test_magias_atualizar_classes_niveis_recalcula_legado(magias_db):
     body = atualizar.json()
     assert body["classe"] == "BARDO,MAGO"
     assert body["nivel"] == 2
-    assert sorted((item["classe"], item["nivel"]) for item in body["classes_niveis"]) == [
+    assert sorted(
+        (item["classe"], item["nivel"]) for item in body["classes_niveis"]
+    ) == [
         ("BARDO", 2),
         ("MAGO", 3),
     ]
@@ -145,7 +149,9 @@ def test_magias_listar_ordenacao_por_nome_desc(magias_db):
         )
         assert resp.status_code == 201
 
-    lista = client.get("/api/v1/magias", params={"sort_by": "nome", "sort_dir": "desc", "limit": 20})
+    lista = client.get(
+        "/api/v1/magias", params={"sort_by": "nome", "sort_dir": "desc", "limit": 20}
+    )
     assert lista.status_code == 200
 
     nomes = [item["nome"] for item in lista.json()]

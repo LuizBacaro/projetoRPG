@@ -9,6 +9,8 @@ from fastapi.testclient import TestClient
 
 from app.games.gurps.api.v1.rolagens import router as gurps_rolagens_router
 from app.shared.core.deps import get_usuario_atual
+
+
 def _usuario_stub() -> SimpleNamespace:
     return SimpleNamespace(id=1, perfil="jogador", email="u@x", nome="U")
 
@@ -22,7 +24,9 @@ def _build_client() -> TestClient:
 
 def test_rolagem_3d6_com_dados_informados_sucesso_decisivo():
     client = _build_client()
-    r = client.post("/api/v1/gurps/rolagens/3d6", json={"nivel_efetivo": 12, "dados": [1, 1, 1]})
+    r = client.post(
+        "/api/v1/gurps/rolagens/3d6", json={"nivel_efetivo": 12, "dados": [1, 1, 1]}
+    )
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["total"] == 3
@@ -34,7 +38,9 @@ def test_rolagem_3d6_com_dados_informados_sucesso_decisivo():
 
 def test_rolagem_3d6_com_dados_informados_falha_critica():
     client = _build_client()
-    r = client.post("/api/v1/gurps/rolagens/3d6", json={"nivel_efetivo": 12, "dados": [6, 6, 6]})
+    r = client.post(
+        "/api/v1/gurps/rolagens/3d6", json={"nivel_efetivo": 12, "dados": [6, 6, 6]}
+    )
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["total"] == 18
@@ -45,7 +51,9 @@ def test_rolagem_3d6_com_dados_informados_falha_critica():
 
 def test_rolagem_3d6_rejeita_dados_invalidos():
     client = _build_client()
-    r = client.post("/api/v1/gurps/rolagens/3d6", json={"nivel_efetivo": 12, "dados": [0, 7, 1]})
+    r = client.post(
+        "/api/v1/gurps/rolagens/3d6", json={"nivel_efetivo": 12, "dados": [0, 7, 1]}
+    )
     assert r.status_code == 422
     assert "3 valores entre 1 e 6" in str(r.json().get("detail", ""))
 
@@ -88,4 +96,3 @@ def test_rolagem_dano_rejeita_expressao_invalida():
     r = client.post("/api/v1/gurps/rolagens/dano", json={"expressao": "abc"})
     assert r.status_code == 422
     assert "Nd" in str(r.json().get("detail", ""))
-

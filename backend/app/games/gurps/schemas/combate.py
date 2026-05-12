@@ -50,7 +50,8 @@ class GurpsAtaqueRequest(BaseModel):
         None, description="Opcional para debug/teste determinístico (3 dados 1..6)."
     )
     dados_dano: List[int] | None = Field(
-        None, description="Opcional para debug/teste determinístico (quantidade conforme expressão)."
+        None,
+        description="Opcional para debug/teste determinístico (quantidade conforme expressão).",
     )
 
 

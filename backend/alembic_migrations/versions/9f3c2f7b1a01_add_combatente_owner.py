@@ -32,6 +32,29 @@ def _indice_existe(tabela: str, indice: str) -> bool:
     return indice in indices
 
 
+def _sql_pick_admin_owner(dialect_name: str) -> str:
+    """
+    Postgres ENUM `perfilusuario` pode ter labels em minúsculas (migração 001) ou os nomes
+    Python do Enum (ADMINISTRADOR) conforme create_all/SQLAlchemy — comparar como texto.
+    """
+    if dialect_name == "postgresql":
+        return """
+            SELECT id
+            FROM usuarios
+            WHERE CAST(perfil AS TEXT) ILIKE 'administrador'
+              AND ativo IS TRUE
+            ORDER BY id
+            LIMIT 1
+            """
+    return """
+            SELECT id
+            FROM usuarios
+            WHERE perfil = 'administrador' AND ativo = 1
+            ORDER BY id
+            LIMIT 1
+            """
+
+
 def upgrade() -> None:
     if not _coluna_existe("combatentes", "dono_id"):
         op.add_column("combatentes", sa.Column("dono_id", sa.Integer(), nullable=True))
@@ -42,17 +65,7 @@ def upgrade() -> None:
     bind = op.get_bind()
 
     # Backfill: atribui combatentes sem dono a um admin ativo, ou ao primeiro usuário disponível.
-    owner_id = bind.execute(
-        sa.text(
-            """
-            SELECT id
-            FROM usuarios
-            WHERE perfil = 'administrador' AND ativo = 1
-            ORDER BY id
-            LIMIT 1
-            """
-        )
-    ).scalar()
+    owner_id = bind.execute(sa.text(_sql_pick_admin_owner(bind.dialect.name))).scalar()
 
     if owner_id is None:
         owner_id = bind.execute(

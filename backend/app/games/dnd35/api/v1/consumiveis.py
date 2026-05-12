@@ -11,19 +11,21 @@ from app.games.dnd35.schemas.consumivel import (
     ConsumivelResponse,
 )
 from app.games.dnd35.services.consumivel_service import ConsumivelService
-from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_admin,
     requer_dono_ou_admin_combatente,
 )
+from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/consumiveis", tags=["Consumiveis"])
 
 
-@router.post("/", response_model=ConsumivelResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=ConsumivelResponse, status_code=status.HTTP_201_CREATED
+)
 def criar_consumivel(
     payload: ConsumivelCreate,
     service: ConsumivelService = Depends(get_consumivel_service),
@@ -126,5 +128,7 @@ def remover_consumivel_jogador(
     except CombatenteNaoEncontrado as e:
         raise HTTPException(status_code=404, detail=str(e))
     if not ok:
-        raise HTTPException(status_code=404, detail="Consumível do jogador não encontrado")
+        raise HTTPException(
+            status_code=404, detail="Consumível do jogador não encontrado"
+        )
     return None

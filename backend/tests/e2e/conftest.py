@@ -10,10 +10,21 @@ import os
 from typing import Generator
 
 import pytest
-from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page
+from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
-HEADLESS  = os.getenv("E2E_HEADLESS", "1") != "0"  # headless por padrão; E2E_HEADLESS=0 para visual
+
+def _env_ou_padrao(key: str, default: str) -> str:
+    raw = os.environ.get(key)
+    if raw is None:
+        return default
+    stripped = raw.strip()
+    return default if stripped == "" else stripped
+
+
+BASE_URL = _env_ou_padrao("BASE_URL", "http://localhost:8000")
+HEADLESS = (
+    os.getenv("E2E_HEADLESS", "1") != "0"
+)  # headless por padrão; E2E_HEADLESS=0 para visual
 
 
 @pytest.fixture(scope="session")

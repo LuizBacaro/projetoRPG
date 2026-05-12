@@ -5,7 +5,10 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Protocol
 
 from app.games.dnd35.models.equipamento import Equipamento, EquipamentoJogador
-from app.games.dnd35.schemas.equipamento import EquipamentoCreate, EquipamentoJogadorCreate
+from app.games.dnd35.schemas.equipamento import (
+    EquipamentoCreate,
+    EquipamentoJogadorCreate,
+)
 
 
 class EquipamentoCatalogProtocol(Protocol):
@@ -19,7 +22,9 @@ class EquipamentoCatalogProtocol(Protocol):
 
     def obter_equipamento(self, equipamento_id: int) -> Optional[Equipamento]: ...
 
-    def listar_equipamentos(self, skip: int = 0, limit: int = 100) -> List[Equipamento]: ...
+    def listar_equipamentos(
+        self, skip: int = 0, limit: int = 100
+    ) -> List[Equipamento]: ...
 
     def atualizar_equipamento(
         self, equipamento_id: int, equipamento_data: Dict[str, Any]
@@ -35,7 +40,9 @@ class EquipamentoJogadorLinksProtocol(Protocol):
         self, combatente_id: int, equipamento_jogador: EquipamentoJogadorCreate
     ) -> EquipamentoJogador: ...
 
-    def obter_equipamentos_jogador_detalhado(self, combatente_id: int) -> List[dict]: ...
+    def obter_equipamentos_jogador_detalhado(
+        self, combatente_id: int
+    ) -> List[dict]: ...
 
     def remover_equipamento(self, combatente_id: int, equipamento_id: int) -> bool: ...
 

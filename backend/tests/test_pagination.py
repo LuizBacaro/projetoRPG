@@ -76,9 +76,27 @@ def test_listar_magias_filtra_classe_com_acento_sqlite(test_db):
 def test_usuario_repository_lista_e_conta_com_paginacao(test_db):
     test_db.add_all(
         [
-            Usuario(perfil=PerfilUsuario.ADMINISTRADOR, nome="Ana", email="ana@example.com", senha_hash="hash", ativo=True),
-            Usuario(perfil=PerfilUsuario.JOGADOR, nome="Bruno", email="bruno@example.com", senha_hash="hash", ativo=True),
-            Usuario(perfil=PerfilUsuario.JOGADOR, nome="Caio", email="caio@example.com", senha_hash="hash", ativo=False),
+            Usuario(
+                perfil=PerfilUsuario.ADMINISTRADOR,
+                nome="Ana",
+                email="ana@example.com",
+                senha_hash="hash",
+                ativo=True,
+            ),
+            Usuario(
+                perfil=PerfilUsuario.JOGADOR,
+                nome="Bruno",
+                email="bruno@example.com",
+                senha_hash="hash",
+                ativo=True,
+            ),
+            Usuario(
+                perfil=PerfilUsuario.JOGADOR,
+                nome="Caio",
+                email="caio@example.com",
+                senha_hash="hash",
+                ativo=False,
+            ),
         ]
     )
     test_db.commit()

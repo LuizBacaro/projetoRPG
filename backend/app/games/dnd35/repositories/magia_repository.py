@@ -11,14 +11,16 @@ from typing import Optional, Set, Tuple
 from sqlalchemy import asc, desc, false, func
 from sqlalchemy.orm import Session, joinedload
 
-from app.games.dnd35.text_utils import (
-    classes_magia,
-    normalizar_classe as _normalizar_classe,
-    normalizar_classe_acesso,
-)
-from app.games.dnd35.models.magia import Magia, MagiaClasse, MagiaHistorico
 from app.games.dnd35.models.ataque import MagiaPreparada
-from app.repositories.base import BaseRepository, apply_not_deleted, commit_with_rollback
+from app.games.dnd35.models.magia import Magia, MagiaClasse, MagiaHistorico
+from app.games.dnd35.text_utils import classes_magia
+from app.games.dnd35.text_utils import normalizar_classe as _normalizar_classe
+from app.games.dnd35.text_utils import normalizar_classe_acesso
+from app.repositories.base import (
+    BaseRepository,
+    apply_not_deleted,
+    commit_with_rollback,
+)
 
 
 class MagiaRepository(BaseRepository[Magia]):
@@ -37,7 +39,9 @@ class MagiaRepository(BaseRepository[Magia]):
         for mid, c in self.db.query(MagiaClasse.magia_id, MagiaClasse.classe).all():
             if c and normalizar_classe_acesso(c) == alvo:
                 ids.add(int(mid))
-        for mid, legacy in self.db.query(Magia.id, Magia.classe).filter(Magia.classe.isnot(None)).all():
+        for mid, legacy in (
+            self.db.query(Magia.id, Magia.classe).filter(Magia.classe.isnot(None)).all()
+        ):
             if legacy and alvo in classes_magia(legacy):
                 ids.add(int(mid))
         return ids
@@ -51,7 +55,11 @@ class MagiaRepository(BaseRepository[Magia]):
         for mid, c, nv in q.all():
             if int(nv) == int(nivel) and c and normalizar_classe_acesso(c) == alvo:
                 ids.add(int(mid))
-        for mid, legacy, nv in self.db.query(Magia.id, Magia.classe, Magia.nivel).filter(Magia.classe.isnot(None)).all():
+        for mid, legacy, nv in (
+            self.db.query(Magia.id, Magia.classe, Magia.nivel)
+            .filter(Magia.classe.isnot(None))
+            .all()
+        ):
             if int(nv) == int(nivel) and legacy and alvo in classes_magia(legacy):
                 ids.add(int(mid))
         return ids
@@ -63,7 +71,11 @@ class MagiaRepository(BaseRepository[Magia]):
         return apply_not_deleted(query, Magia)
 
     def get_by_nome(self, nome: str) -> Optional[Magia]:
-        return self.query_base().filter(func.lower(Magia.nome) == func.lower(nome.strip())).first()
+        return (
+            self.query_base()
+            .filter(func.lower(Magia.nome) == func.lower(nome.strip()))
+            .first()
+        )
 
     def listar_paginado(
         self,
@@ -98,7 +110,10 @@ class MagiaRepository(BaseRepository[Magia]):
                 query = query.filter(Magia.id.in_(ids_classe))
 
         elif nivel is not None:
-            query = query.filter((Magia.nivel == nivel) | Magia.classes_niveis.any(MagiaClasse.nivel == nivel))
+            query = query.filter(
+                (Magia.nivel == nivel)
+                | Magia.classes_niveis.any(MagiaClasse.nivel == nivel)
+            )
 
         if escola:
             query = query.filter(Magia.escola.ilike(escola.strip()))
@@ -122,16 +137,28 @@ class MagiaRepository(BaseRepository[Magia]):
         direction = (sort_dir or "asc").strip().lower()
         if sort_column is not None:
             order_expr = desc(sort_column) if direction == "desc" else asc(sort_column)
-            items = query.order_by(order_expr, Magia.id.asc()).offset(skip).limit(limit).all()
+            items = (
+                query.order_by(order_expr, Magia.id.asc())
+                .offset(skip)
+                .limit(limit)
+                .all()
+            )
         else:
-            items = query.order_by(Magia.nivel, Magia.nome, Magia.id.asc()).offset(skip).limit(limit).all()
+            items = (
+                query.order_by(Magia.nivel, Magia.nome, Magia.id.asc())
+                .offset(skip)
+                .limit(limit)
+                .all()
+            )
 
         return total, items
 
     def listar_classes(self) -> list[str]:
         classes_legacy = {
             _normalizar_classe(row[0])
-            for row in self.db.query(Magia.classe).filter(Magia.classe.isnot(None)).all()
+            for row in self.db.query(Magia.classe)
+            .filter(Magia.classe.isnot(None))
+            .all()
             if row[0] and row[0].strip()
         }
         classes_rel = {
@@ -148,7 +175,9 @@ class MagiaRepository(BaseRepository[Magia]):
         self.db.flush()
         for item in classes_niveis:
             magia.classes_niveis.append(
-                MagiaClasse(classe=_normalizar_classe(str(item["classe"])), nivel=item["nivel"])
+                MagiaClasse(
+                    classe=_normalizar_classe(str(item["classe"])), nivel=item["nivel"]
+                )
             )
 
     def has_dependencias(self, magia_id: int) -> bool:
@@ -185,7 +214,9 @@ class MagiaRepository(BaseRepository[Magia]):
         self.db.refresh(item)
         return item
 
-    def listar_historico(self, magia_id: int, *, limit: int = 50) -> list[MagiaHistorico]:
+    def listar_historico(
+        self, magia_id: int, *, limit: int = 50
+    ) -> list[MagiaHistorico]:
         return (
             self.db.query(MagiaHistorico)
             .filter(MagiaHistorico.magia_id == magia_id)

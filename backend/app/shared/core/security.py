@@ -3,20 +3,19 @@ security.py
 SRP: Funções de criptografia, JWT e verificação de autenticação
 SOLID: Single Responsibility — segurança centralizada
 """
-from passlib.context import CryptContext
-from datetime import datetime, timedelta, timezone
-from typing import Optional, Dict, Any
-from jose import JWTError, jwt
-from uuid import uuid4
+
 import logging
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Optional
+from uuid import uuid4
+
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 logger = logging.getLogger(__name__)
 
 # ── Configuração de hash de senhas ────────────────────────────────────────
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # ── Algoritmo JWT ────────────────────────────────────────────────────────────
 ALGORITHM = "HS256"
@@ -41,7 +40,7 @@ def criar_token(
     data: Dict[str, Any],
     secret_key: str,
     expires_delta: Optional[timedelta] = None,
-    token_type: str = "access"
+    token_type: str = "access",
 ) -> str:
     """Cria um JWT token com payload customizado."""
     to_encode = data.copy()
@@ -67,10 +66,7 @@ def criar_token(
         raise
 
 
-def decodificar_token(
-    token: str,
-    secret_key: str
-) -> Optional[Dict[str, Any]]:
+def decodificar_token(token: str, secret_key: str) -> Optional[Dict[str, Any]]:
     """Decodifica e valida um JWT token."""
     try:
         payload = jwt.decode(token, secret_key, algorithms=[ALGORITHM])
@@ -83,10 +79,7 @@ def decodificar_token(
         return None
 
 
-def extrair_email_do_token(
-    token: str,
-    secret_key: str
-) -> Optional[str]:
+def extrair_email_do_token(token: str, secret_key: str) -> Optional[str]:
     """Extrai o email (subject) do payload de um token JWT."""
     payload = decodificar_token(token, secret_key)
     if payload is None:

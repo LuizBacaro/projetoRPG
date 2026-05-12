@@ -2,19 +2,20 @@
 Service de Combate (Business Logic)
 Princípio SOLID: SRP - Lógica de negócio de Combate
 """
+
 from typing import Any, Dict, List, Optional
 
+from app.games.dnd35.models.combate import Combate, CombateHistorico
+from app.games.dnd35.ports import (
+    CombatenteRepositoryForCombateProtocol,
+    CombateRepositoryProtocol,
+)
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombateFinalizadoError,
     CombateJaAtivoError,
     CombateNotFoundError,
     ConcurrencyConflictError,
-)
-from app.games.dnd35.models.combate import Combate, CombateHistorico
-from app.games.dnd35.ports import (
-    CombatenteRepositoryForCombateProtocol,
-    CombateRepositoryProtocol,
 )
 
 
@@ -37,7 +38,9 @@ class CombateService:
         """
         # Validar se já existe combate ativo
         if self.combate_repo.existe_combate_ativo():
-            raise CombateJaAtivoError("Já existe um combate ativo. Finalize-o antes de iniciar outro.")
+            raise CombateJaAtivoError(
+                "Já existe um combate ativo. Finalize-o antes de iniciar outro."
+            )
 
         # Buscar combatentes
         combatentes = self.combatente_repo.get_by_ids(combatente_ids)
@@ -87,9 +90,13 @@ class CombateService:
             return 0
         rodada_atual = combate.rodada_atual or 1
         turno_atual = combate.turno_atual or 0
-        return max(1, ((rodada_atual - 1) * len(combate.combatentes_ids)) + turno_atual + 1)
+        return max(
+            1, ((rodada_atual - 1) * len(combate.combatentes_ids)) + turno_atual + 1
+        )
 
-    def _registrar_historico(self, combate: Combate, motivo_encerramento: str) -> CombateHistorico:
+    def _registrar_historico(
+        self, combate: Combate, motivo_encerramento: str
+    ) -> CombateHistorico:
         combatentes = self.combatente_repo.get_by_ids(combate.combatentes_ids)
         vivos = [c for c in combatentes if c.esta_vivo()]
         mortos = [c for c in combatentes if not c.esta_vivo()]
@@ -126,7 +133,9 @@ class CombateService:
 
         return self.combate_repo.criar_historico(historico)
 
-    def montar_status_combate(self, combate: Optional[Combate], incluir_combatentes: bool = True) -> Dict[str, Any]:
+    def montar_status_combate(
+        self, combate: Optional[Combate], incluir_combatentes: bool = True
+    ) -> Dict[str, Any]:
         """Monta payload de status com base em um combate já carregado."""
         if not combate:
             return {
@@ -146,7 +155,9 @@ class CombateService:
         }
 
         if incluir_combatentes:
-            payload["combatentes"] = self.combatente_repo.get_by_ids(combate.combatentes_ids)
+            payload["combatentes"] = self.combatente_repo.get_by_ids(
+                combate.combatentes_ids
+            )
 
         payload["resumido"] = not incluir_combatentes
         return payload
@@ -156,9 +167,13 @@ class CombateService:
         Obtém o status completo do combate ativo
         """
         combate = self.obter_combate_ativo()
-        return self.montar_status_combate(combate, incluir_combatentes=incluir_combatentes)
+        return self.montar_status_combate(
+            combate, incluir_combatentes=incluir_combatentes
+        )
 
-    def avancar_turno(self, expected_version: Optional[str], condicao_service: Optional[Any] = None) -> Combate:
+    def avancar_turno(
+        self, expected_version: Optional[str], condicao_service: Optional[Any] = None
+    ) -> Combate:
         """
         Avança para o próximo turno
         """
@@ -174,19 +189,27 @@ class CombateService:
             condicao_service.decrementar_duracao_todas(combatente_ativo_id)
 
         # Verificar se todos estão mortos
-        combatentes_vivos = self.combatente_repo.get_vivos_by_ids(combate.combatentes_ids)
+        combatentes_vivos = self.combatente_repo.get_vivos_by_ids(
+            combate.combatentes_ids
+        )
 
         if len(combatentes_vivos) == 0:
             combate.finalizar()
             combate = self.combate_repo.update(combate)
             self._registrar_historico(combate, motivo_encerramento="todos_mortos")
-            raise CombateFinalizadoError("Todos os combatentes estão mortos. Combate finalizado.")
+            raise CombateFinalizadoError(
+                "Todos os combatentes estão mortos. Combate finalizado."
+            )
 
         # Avançar turno
         combate.avancar_turno()
         return self.combate_repo.update(combate)
 
-    def finalizar_combate(self, expected_version: Optional[str] = None, motivo_encerramento: str = "manual") -> bool:
+    def finalizar_combate(
+        self,
+        expected_version: Optional[str] = None,
+        motivo_encerramento: str = "manual",
+    ) -> bool:
         """
         Finaliza o combate ativo
         """

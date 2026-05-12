@@ -15,7 +15,9 @@ from app.games.dnd35.schemas.pericia import (
 class PericiaCatalogRestoreProtocol(Protocol):
     """Superfície mínima para restauração de perícia soft-deletada."""
 
-    def restaurar_pericia(self, db_pericia: Pericia, pericia: PericiaCreate) -> Pericia: ...
+    def restaurar_pericia(
+        self, db_pericia: Pericia, pericia: PericiaCreate
+    ) -> Pericia: ...
 
 
 class PericiaRepositoryProtocol(PericiaCatalogRestoreProtocol, Protocol):
@@ -49,7 +51,9 @@ class PericiaRepositoryProtocol(PericiaCatalogRestoreProtocol, Protocol):
 class PericiaJogadorRepositoryProtocol(Protocol):
     """Persistência de vínculos combatente ↔ perícia — usado por `PericiaService`."""
 
-    def obter_pericia_jogador(self, pericia_jogador_id: int) -> Optional[PericiaJogador]: ...
+    def obter_pericia_jogador(
+        self, pericia_jogador_id: int
+    ) -> Optional[PericiaJogador]: ...
 
     def obter_pericia_jogador_por_ids(
         self, combatente_id: int, pericia_id: int

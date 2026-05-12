@@ -222,9 +222,7 @@ def get_armadura_protecao_service(
 def get_talento_service(
     db: Session = Depends(get_db),
     talento_catalog: TalentoRepository = Depends(get_talento_repository),
-    talento_jogador: TalentoJogadorRepository = Depends(
-        get_talento_jogador_repository
-    ),
+    talento_jogador: TalentoJogadorRepository = Depends(get_talento_jogador_repository),
 ) -> TalentoService:
     return TalentoService(
         db,

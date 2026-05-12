@@ -23,7 +23,12 @@ class _FakeCombateService:
                     "vencedor_nome": "Theron",
                     "vencedor_tipo": "jogador",
                     "motivo_encerramento": "manual",
-                    "estatisticas": {"vivos": 1, "mortos": 1, "hp_total_restante": 12, "combatentes": []},
+                    "estatisticas": {
+                        "vivos": 1,
+                        "mortos": 1,
+                        "hp_total_restante": 12,
+                        "combatentes": [],
+                    },
                     "finalizado_em": "2026-03-29T12:00:00",
                 }
             ],

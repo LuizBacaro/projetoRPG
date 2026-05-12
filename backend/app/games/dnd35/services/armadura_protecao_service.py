@@ -8,7 +8,11 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao
-from app.games.dnd35.ports import ArmaduraProtecaoCatalogProtocol, ArmaduraProtecaoJogadorLinksProtocol
+from app.games.dnd35.models.combatente import Combatente
+from app.games.dnd35.ports import (
+    ArmaduraProtecaoCatalogProtocol,
+    ArmaduraProtecaoJogadorLinksProtocol,
+)
 from app.games.dnd35.repositories.armadura_protecao_repository import (
     ArmaduraProtecaoJogadorRepository,
     ArmaduraProtecaoRepository,
@@ -18,7 +22,6 @@ from app.games.dnd35.schemas.armadura_protecao import (
     ArmaduraProtecaoJogadorCreate,
     ArmaduraProtecaoJogadorListResponse,
 )
-from app.games.dnd35.models.combatente import Combatente
 
 
 class ArmaduraProtecaoService:
@@ -34,7 +37,11 @@ class ArmaduraProtecaoService:
         self._jogador = jogador_links or ArmaduraProtecaoJogadorRepository(db)
 
     def criar_item(self, item: ArmaduraProtecaoCreate) -> ArmaduraProtecao:
-        existente = self.db.query(ArmaduraProtecao).filter(ArmaduraProtecao.nome == item.nome).first()
+        existente = (
+            self.db.query(ArmaduraProtecao)
+            .filter(ArmaduraProtecao.nome == item.nome)
+            .first()
+        )
         if existente:
             return existente
         return self._catalog.criar_item(item)
@@ -50,7 +57,9 @@ class ArmaduraProtecaoService:
         combatente_id: int,
         payload: ArmaduraProtecaoJogadorCreate,
     ) -> ArmaduraProtecaoJogadorListResponse:
-        combatente = self.db.query(Combatente).filter(Combatente.id == combatente_id).first()
+        combatente = (
+            self.db.query(Combatente).filter(Combatente.id == combatente_id).first()
+        )
         if not combatente:
             raise ValueError(f"Combatente {combatente_id} não encontrado")
 
@@ -74,7 +83,9 @@ class ArmaduraProtecaoService:
             propriedades_especiais=item.propriedades_especiais,
         )
 
-    def listar_itens_jogador(self, combatente_id: int) -> list[ArmaduraProtecaoJogadorListResponse]:
+    def listar_itens_jogador(
+        self, combatente_id: int
+    ) -> list[ArmaduraProtecaoJogadorListResponse]:
         itens = self._jogador.listar_detalhado(combatente_id)
         return [
             ArmaduraProtecaoJogadorListResponse(
@@ -96,7 +107,9 @@ class ArmaduraProtecaoService:
         removido = self._jogador.remover_item(combatente_id, item_id)
         if not removido:
             return False
-        combatente = self.db.query(Combatente).filter(Combatente.id == combatente_id).first()
+        combatente = (
+            self.db.query(Combatente).filter(Combatente.id == combatente_id).first()
+        )
         if combatente:
             self._recalcular_defesas_com_item_protecao(combatente)
         return True

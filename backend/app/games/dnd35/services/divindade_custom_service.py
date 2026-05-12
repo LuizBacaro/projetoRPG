@@ -8,20 +8,19 @@ Responsabilidades:
     acrescentando campos id/origem/criado_por_id/criado_em para a UI.
   * Unificar catalogo (oficial + customizadas) para expor em /magias/divindades.
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
+from ....shared.exceptions.custom_exceptions import DadosInvalidos
+from ..catalogs import divindades_catalogo as _divindades_catalogo
 from ..models.divindade_custom import DivindadeCustom
 from ..ports.divindade_custom import DivindadeCustomRepositoryProtocol
 from ..repositories.divindade_custom_repository import DivindadeCustomRepository
-
-from ..catalogs import divindades_catalogo as _divindades_catalogo
-from ....shared.exceptions.custom_exceptions import DadosInvalidos
 from .magia_service import DOMINIOS_FIXOS
-
 
 TENDENCIAS_VALIDAS = {
     "Leal e Bom",
@@ -83,7 +82,8 @@ class DivindadeCustomService:
         customizadas = [self.serializar(item) for item in self.repository.listar()]
         chaves_oficiais = {item["nome"].strip().lower() for item in oficial}
         filtradas_custom = [
-            item for item in customizadas
+            item
+            for item in customizadas
             if str(item["nome"]).strip().lower() not in chaves_oficiais
         ]
         return oficial + filtradas_custom

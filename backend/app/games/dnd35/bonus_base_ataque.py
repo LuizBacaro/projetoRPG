@@ -10,14 +10,13 @@ não esteja disponível no ambiente.
 
 from __future__ import annotations
 
-from functools import lru_cache
 import json
-from pathlib import Path
 import re
-
-from app.shared.core.config import settings
+from functools import lru_cache
+from pathlib import Path
 
 from app.games.dnd35.text_utils import normalizar_classe
+from app.shared.core.config import settings
 
 _TABLE_BY_CLASS: dict[str, int] = {
     "BARBARO": 3,
@@ -86,7 +85,9 @@ def calcular_bonus_base_ataque(classe: str | None, nivel: int | None) -> str | N
     return _calcular_bba_por_progressao(progression, nivel_val)
 
 
-def calcular_resistencias_base(classe: str | None, nivel: int | None) -> tuple[int, int, int] | None:
+def calcular_resistencias_base(
+    classe: str | None, nivel: int | None
+) -> tuple[int, int, int] | None:
     classe_norm = _resolver_chave_classe(classe or "")
     if not classe_norm or nivel is None:
         return None
@@ -182,7 +183,9 @@ def _buscar_bba_no_catalogo(table_number: int, nivel: int) -> str | None:
     return None
 
 
-def _buscar_resistencias_no_catalogo(table_number: int, nivel: int) -> tuple[int, int, int] | None:
+def _buscar_resistencias_no_catalogo(
+    table_number: int, nivel: int
+) -> tuple[int, int, int] | None:
     payload = _load_catalog()
     tables = payload.get("tables", [])
     if not isinstance(tables, list):
@@ -225,7 +228,9 @@ def _extrair_coluna_bba(values: list[str], level_idx: int) -> str | None:
     return None
 
 
-def _extrair_resistencias(values: list[str], level_idx: int) -> tuple[int, int, int] | None:
+def _extrair_resistencias(
+    values: list[str], level_idx: int
+) -> tuple[int, int, int] | None:
     """
     Após o marcador de nível: BBA, Fortitude, Reflexos, Vontade (e depois texto da coluna Especial).
 
@@ -282,16 +287,15 @@ def _resolver_chave_classe(classe: str) -> str:
 
     # Fallback por contenção: escolhe a maior chave encontrada no texto.
     # Ex.: "GUERREIRO (HUMANO)" -> "GUERREIRO"
-    candidates = [
-        key for key in _TABLE_BY_CLASS.keys()
-        if key and key in base
-    ]
+    candidates = [key for key in _TABLE_BY_CLASS.keys() if key and key in base]
     if not candidates:
         return base
     return max(candidates, key=len)
 
 
-def calcular_habilidades_especiais_por_nivel(classe: str | None, nivel: int | None) -> list[dict]:
+def calcular_habilidades_especiais_por_nivel(
+    classe: str | None, nivel: int | None
+) -> list[dict]:
     classe_norm = _resolver_chave_classe(classe or "")
     if not classe_norm or nivel is None:
         return []

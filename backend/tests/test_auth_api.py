@@ -1,16 +1,17 @@
 from datetime import timedelta
+
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.shared.api.v1.auth import router as auth_router
-from app.shared.core.deps import get_db
-from app.shared.core.security import criar_token, hash_senha
 from app.shared.core.config import settings
 from app.shared.core.database import Base
+from app.shared.core.deps import get_db
+from app.shared.core.security import criar_token, hash_senha
 from app.shared.models.usuario import PerfilUsuario, Usuario
 
 
@@ -133,7 +134,9 @@ def test_login_falha_com_senha_incorreta(auth_db):
 
 def test_login_falha_com_usuario_inativo(auth_db):
     test_db, test_db_factory = auth_db
-    _create_user(test_db, email="inactive@example.com", senha="SenhaSegura123", ativo=False)
+    _create_user(
+        test_db, email="inactive@example.com", senha="SenhaSegura123", ativo=False
+    )
     client = _build_client(test_db_factory)
 
     response = client.post(

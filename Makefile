@@ -14,7 +14,7 @@ test-backend:
 
 ## Roda apenas os testes de frontend (Node.js)
 test-frontend:
-	cd frontend && $(NODE) test-ficha-perfil-simples.js
+	cd frontend && $(NODE) games/dnd35/test-ficha-perfil-simples.js
 
 ## Roda E2E smoke (requer servidor em BASE_URL)
 ## Uso: make test-e2e BASE_URL=http://localhost:8000

@@ -152,7 +152,9 @@ class EquipamentoJogadorRepository:
         self.db.refresh(db_equipamento_jogador)
         return db_equipamento_jogador
 
-    def obter_equipamentos_jogador(self, combatente_id: int) -> list[EquipamentoJogador]:
+    def obter_equipamentos_jogador(
+        self, combatente_id: int
+    ) -> list[EquipamentoJogador]:
         """Obtém todos os equipamentos de um combatente"""
         return (
             self.db.query(EquipamentoJogador)

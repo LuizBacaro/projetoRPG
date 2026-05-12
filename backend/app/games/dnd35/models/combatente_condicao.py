@@ -2,6 +2,7 @@
 Model pivot: CombatenteCondicao
 Relacionamento N:N entre Combatente e Condição COM duração em turnos.
 """
+
 from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint
 
 from app.shared.core.database import Base
@@ -16,6 +17,7 @@ class CombatenteCondicao(Base):
     - duracao_turnos = -1 → condição permanente (até ser removida manualmente)
     - duracao_turnos = 0  → deve ser removida no próximo avancar_turno()
     """
+
     __tablename__ = "combatente_condicoes"
     __table_args__ = (
         UniqueConstraint("combatente_id", "condicao_id", name="uq_combatente_condicao"),
@@ -23,13 +25,21 @@ class CombatenteCondicao(Base):
     )
 
     id = Column(Integer, primary_key=True, index=True)
-    combatente_id = Column(Integer, ForeignKey("combatentes.id", ondelete="CASCADE"), nullable=False)
-    condicao_id = Column(Integer, ForeignKey("condicoes.id", ondelete="CASCADE"), nullable=False)
+    combatente_id = Column(
+        Integer, ForeignKey("combatentes.id", ondelete="CASCADE"), nullable=False
+    )
+    condicao_id = Column(
+        Integer, ForeignKey("condicoes.id", ondelete="CASCADE"), nullable=False
+    )
     # ✅ NOVO: duração em turnos (-1 = permanente, 0+ = turnos restantes)
     duracao_turnos = Column(Integer, default=-1, nullable=False)
 
     def __repr__(self):
-        dur_txt = "permanente" if self.duracao_turnos == -1 else f"{self.duracao_turnos} turnos"
+        dur_txt = (
+            "permanente"
+            if self.duracao_turnos == -1
+            else f"{self.duracao_turnos} turnos"
+        )
         return f"<CombatenteCondicao(combatente_id={self.combatente_id}, condicao_id={self.condicao_id}, duracao={dur_txt})>"
 
     def esta_ativa(self) -> bool:

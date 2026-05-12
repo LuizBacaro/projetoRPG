@@ -28,7 +28,9 @@ class ArmaduraProtecao(Base):
     peso = Column(Float, nullable=True)
     propriedades_especiais = Column(String(600), nullable=True)
     ativo = Column(Boolean, nullable=False, default=True, index=True)
-    criado_em = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+    criado_em = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
+    )
 
     combatentes = relationship(
         "ArmaduraProtecaoJogador",
@@ -45,8 +47,20 @@ class ArmaduraProtecaoJogador(Base):
     __table_args__ = {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, index=True)
-    combatente_id = Column(Integer, ForeignKey("combatentes.id", ondelete="CASCADE"), nullable=False, index=True)
-    item_id = Column(Integer, ForeignKey("armaduras_protecao.id", ondelete="CASCADE"), nullable=False, index=True)
-    adicionado_em = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+    combatente_id = Column(
+        Integer,
+        ForeignKey("combatentes.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    item_id = Column(
+        Integer,
+        ForeignKey("armaduras_protecao.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    adicionado_em = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
+    )
 
     item = relationship("ArmaduraProtecao", back_populates="combatentes", lazy="joined")

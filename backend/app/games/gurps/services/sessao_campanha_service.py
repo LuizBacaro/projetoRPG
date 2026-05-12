@@ -30,12 +30,14 @@ class GurpsSessaoCampanhaService:
         else:
             sessoes = self.sessao_repository.listar_por_mestre(usuario_id)
         for sessao in sessoes:
-            sessao.campanha_nome = getattr(
-                getattr(sessao, "campanha", None), "nome", ""
-            ) or ""
+            sessao.campanha_nome = (
+                getattr(getattr(sessao, "campanha", None), "nome", "") or ""
+            )
         return sessoes
 
-    def listar_visiveis_para_usuario(self, usuario_id: int) -> List[GurpsSessaoCampanha]:
+    def listar_visiveis_para_usuario(
+        self, usuario_id: int
+    ) -> List[GurpsSessaoCampanha]:
         db = self.sessao_repository.db
         campanha_ids = [
             row[0]
@@ -62,9 +64,9 @@ class GurpsSessaoCampanhaService:
             .all()
         )
         for sessao in sessoes:
-            sessao.campanha_nome = getattr(
-                getattr(sessao, "campanha", None), "nome", ""
-            ) or ""
+            sessao.campanha_nome = (
+                getattr(getattr(sessao, "campanha", None), "nome", "") or ""
+            )
         return sessoes
 
     def _campanha_para_nova_sessao(
@@ -112,9 +114,9 @@ class GurpsSessaoCampanhaService:
                 visivel_jogadores=bool(visivel_jogadores),
             )
         )
-        sessao.campanha_nome = getattr(
-            getattr(sessao, "campanha", None), "nome", ""
-        ) or ""
+        sessao.campanha_nome = (
+            getattr(getattr(sessao, "campanha", None), "nome", "") or ""
+        )
         return sessao
 
     def atualizar(
@@ -134,9 +136,9 @@ class GurpsSessaoCampanhaService:
         if visivel_jogadores is not None:
             sessao.visivel_jogadores = bool(visivel_jogadores)
         atualizada = self.sessao_repository.update(sessao)
-        atualizada.campanha_nome = getattr(
-            getattr(atualizada, "campanha", None), "nome", ""
-        ) or ""
+        atualizada.campanha_nome = (
+            getattr(getattr(atualizada, "campanha", None), "nome", "") or ""
+        )
         return atualizada
 
     def deletar(self, usuario_id: int, perfil: PerfilUsuario, sessao_id: int) -> None:

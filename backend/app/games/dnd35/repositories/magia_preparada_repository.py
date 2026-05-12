@@ -34,7 +34,9 @@ class MagiaPreparadaRepository:
 
     def obter_por_id(self, preparada_id: int) -> Optional[MagiaPreparada]:
         return (
-            self.db.query(MagiaPreparada).filter(MagiaPreparada.id == preparada_id).first()
+            self.db.query(MagiaPreparada)
+            .filter(MagiaPreparada.id == preparada_id)
+            .first()
         )
 
     def commit_refresh(self, registro: MagiaPreparada) -> MagiaPreparada:
@@ -62,9 +64,9 @@ class MagiaPreparadaRepository:
         )
 
     def reset_slots_usados(self, combatente_id: int) -> None:
-        self.db.query(MagiaSlot).filter(MagiaSlot.combatente_id == combatente_id).update(
-            {"usados": 0}
-        )
+        self.db.query(MagiaSlot).filter(
+            MagiaSlot.combatente_id == combatente_id
+        ).update({"usados": 0})
 
     def commit(self) -> None:
         self.db.commit()

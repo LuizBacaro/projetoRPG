@@ -9,6 +9,7 @@ __pycache__/
 *.pyc
 *.pyo
 .venv/
+.venv-ci/
 .venv_pdf/
 backend/.venv-ci/
 venv/

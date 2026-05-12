@@ -182,7 +182,9 @@ class PericiaJogadorRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def adicionar_pericia(self, pericia_jogador: PericiaJogadorCreate) -> PericiaJogador:
+    def adicionar_pericia(
+        self, pericia_jogador: PericiaJogadorCreate
+    ) -> PericiaJogador:
         """Adiciona uma perícia ao jogador"""
         db_pericia_jogador = PericiaJogador(
             **PericiaRepository._payload_data(pericia_jogador)

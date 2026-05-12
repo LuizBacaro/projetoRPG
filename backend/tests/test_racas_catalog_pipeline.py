@@ -13,6 +13,7 @@ Notas de import:
 - Por isso carregamos os módulos diretamente pelo caminho de arquivo com
   `importlib`, sob nomes privados, sem alterar configuração global do projeto.
 """
+
 from __future__ import annotations
 
 import importlib.util
@@ -21,7 +22,6 @@ from pathlib import Path
 from types import ModuleType
 
 import pytest
-
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 PLANILHA_V1 = _REPO_ROOT / "Características especiais.xlsx"

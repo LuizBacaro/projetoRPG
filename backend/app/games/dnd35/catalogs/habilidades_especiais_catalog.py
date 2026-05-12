@@ -28,7 +28,6 @@ from typing import Any
 
 from app.shared.core.config import settings
 
-
 _DEFAULT_PATH = "docs/dados/habilidades_especiais_catalogo.json"
 
 

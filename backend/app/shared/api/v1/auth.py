@@ -3,54 +3,52 @@ auth.py
 SRP: Rotas de autenticação — login, logout, refresh token
 SOLID: Dependency Injection via deps.py
 """
+
+import logging
+from datetime import timedelta
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
-from datetime import timedelta
-from typing import Optional
-import logging
 
-from ...core.config import settings
-from ...core.security import (
-    hash_senha,
-    verificar_senha,
-    criar_token,
-    decodificar_token,
-)
-from ...core.security_audit import log_security_event
-from ...core.deps import get_db, get_usuario_atual
-from ...repositories.usuario_repository import UsuarioRepository
-from ...models.usuario import Usuario, PerfilUsuario
 from ....games.dnd35.models.campanha import Campanha
+from ...core.config import settings
+from ...core.deps import get_db, get_usuario_atual
+from ...core.security import criar_token, decodificar_token, hash_senha, verificar_senha
+from ...core.security_audit import log_security_event
+from ...models.usuario import PerfilUsuario, Usuario
+from ...repositories.usuario_repository import UsuarioRepository
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["autenticacao"]
-)
+router = APIRouter(prefix="/auth", tags=["autenticacao"])
 
 
 # ── Schemas Pydantic ─────────────────────────────────────────────────────────
 
+
 class LoginRequest(BaseModel):
     """Schema para requisição de login"""
+
     email: EmailStr = Field(..., max_length=150, description="Email do usuário")
-    senha: str = Field(..., min_length=6, max_length=128, description="Senha do usuário")
+    senha: str = Field(
+        ..., min_length=6, max_length=128, description="Senha do usuário"
+    )
 
     class Config:
         json_schema_extra = {
-            "example": {
-                "email": "admin@arena-rpg.com.br",
-                "senha": "Admin@123456"
-            }
+            "example": {"email": "admin@arena-rpg.com.br", "senha": "Admin@123456"}
         }
 
 
 class TokenResponse(BaseModel):
     """Schema para resposta de autenticação"""
+
     access_token: str = Field(..., description="JWT token para autenticação")
-    refresh_token: Optional[str] = Field(default=None, description="Refresh token para renovação da sessão")
+    refresh_token: Optional[str] = Field(
+        default=None, description="Refresh token para renovação da sessão"
+    )
     token_type: str = Field(default="bearer", description="Tipo do token")
     usuario: dict = Field(..., description="Dados do usuário autenticado")
 
@@ -62,19 +60,23 @@ class TokenResponse(BaseModel):
                 "usuario": {
                     "id": 1,
                     "email": "admin@arena-rpg.com.br",
-                    "nome": "Administrador"
-                }
+                    "nome": "Administrador",
+                },
             }
         }
 
 
 class RefreshRequest(BaseModel):
     """Schema para renovação de sessão via refresh token."""
-    refresh_token: str = Field(..., min_length=1, max_length=4096, description="Refresh token JWT válido")
+
+    refresh_token: str = Field(
+        ..., min_length=1, max_length=4096, description="Refresh token JWT válido"
+    )
 
 
 class UsuarioResponse(BaseModel):
     """Schema para dados do usuário na resposta"""
+
     id: int
     email: str
     nome: str
@@ -87,15 +89,19 @@ class UsuarioResponse(BaseModel):
 
 class RegistroRequest(BaseModel):
     """Schema para cadastro público de nova conta."""
+
     nome: str = Field(..., min_length=1, max_length=100)
     email: EmailStr = Field(..., max_length=150)
     senha: str = Field(..., min_length=6, max_length=128)
-    perfil: str = Field(default=PerfilUsuario.JOGADOR.value, pattern="^(jogador|mestre)$")
+    perfil: str = Field(
+        default=PerfilUsuario.JOGADOR.value, pattern="^(jogador|mestre)$"
+    )
     campanha_nome: Optional[str] = Field(default=None, max_length=120)
 
 
 class RegistroResponse(BaseModel):
     """Schema de resposta do cadastro público."""
+
     id: int
     nome: str
     email: str
@@ -104,6 +110,7 @@ class RegistroResponse(BaseModel):
 
 
 # ── Rotas ────────────────────────────────────────────────────────────────────
+
 
 @router.post(
     "/login",
@@ -136,9 +143,7 @@ class RegistroResponse(BaseModel):
     },
 )
 def login(
-    request: Request,
-    credentials: LoginRequest,
-    db: Session = Depends(get_db)
+    request: Request, credentials: LoginRequest, db: Session = Depends(get_db)
 ) -> TokenResponse:
     """
     Endpoint de login.
@@ -230,8 +235,7 @@ def login(
         )
         logger.warning(f"⚠️  Login bloqueado — usuário inativo: {credentials.email}")
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Usuário inativo"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Usuário inativo"
         )
 
     # ✅ Cria JWT token com 24h de validade
@@ -262,8 +266,8 @@ def login(
             "email": usuario.email,
             "nome": usuario.nome,
             "perfil": usuario.perfil,
-            "ativo": usuario.ativo
-        }
+            "ativo": usuario.ativo,
+        },
     )
 
 
@@ -271,7 +275,7 @@ def login(
     "/logout",
     status_code=status.HTTP_200_OK,
     summary="Logout do usuário",
-    description="Invalida a sessão do usuário"
+    description="Invalida a sessão do usuário",
 )
 def logout(request: Request):
     """
@@ -287,7 +291,7 @@ def logout(request: Request):
     log_security_event("logout", "success", request=request)
     return {
         "message": "Logout realizado com sucesso. Remova o token do cliente.",
-        "status": "success"
+        "status": "success",
     }
 
 
@@ -324,7 +328,11 @@ def registrar(
         )
 
     perfil_solicitado = payload.perfil.strip().lower()
-    perfil = PerfilUsuario.MESTRE if perfil_solicitado == PerfilUsuario.MESTRE.value else PerfilUsuario.JOGADOR
+    perfil = (
+        PerfilUsuario.MESTRE
+        if perfil_solicitado == PerfilUsuario.MESTRE.value
+        else PerfilUsuario.JOGADOR
+    )
     campanha_nome = (payload.campanha_nome or "").strip()
     if perfil == PerfilUsuario.MESTRE and not campanha_nome:
         raise HTTPException(
@@ -376,7 +384,11 @@ def registrar(
         id=usuario.id,
         nome=usuario.nome,
         email=usuario.email,
-        perfil=usuario.perfil.value if hasattr(usuario.perfil, "value") else str(usuario.perfil),
+        perfil=(
+            usuario.perfil.value
+            if hasattr(usuario.perfil, "value")
+            else str(usuario.perfil)
+        ),
         ativo=usuario.ativo,
     )
 
@@ -534,9 +546,7 @@ def refresh(
         404: {"description": "Usuário não encontrado"},
     },
 )
-def obter_usuario_atual(
-    usuario: Usuario = Depends(get_usuario_atual)
-):
+def obter_usuario_atual(usuario: Usuario = Depends(get_usuario_atual)):
     """
     Endpoint que retorna dados do usuário logado.
 

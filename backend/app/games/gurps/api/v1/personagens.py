@@ -13,14 +13,18 @@ from app.games.gurps.schemas.personagem import (
     GurpsPersonagemUpdate,
 )
 from app.games.gurps.services.personagem_service import GurpsPersonagemService
+from app.services.file_service import FileService
 from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_gurps_personagem,
     requer_game_gurps,
 )
-from app.services.file_service import FileService
-from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos, InvalidFileError
+from app.shared.exceptions.custom_exceptions import (
+    ArenaBaseException,
+    DadosInvalidos,
+    InvalidFileError,
+)
 from app.shared.models.usuario import Usuario
 
 router = APIRouter(

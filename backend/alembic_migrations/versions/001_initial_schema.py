@@ -68,6 +68,25 @@ def _coluna_existe(tabela: str, coluna: str) -> bool:
 # Upgrade
 # 
 
+def _ensure_combatentes_raiz() -> None:
+    """
+    Banco totalmente novo (ex.: CI Postgres vazio, SQLite limpo): antes só havia
+    schema legado criado fora do Alembic; esta migration altera `combatentes`.
+    """
+    if _tabela_existe("combatentes"):
+        return
+    op.create_table(
+        "combatentes",
+        sa.Column("id", sa.Integer(), primary_key=True, index=True),
+        sa.Column("nome", sa.String(), nullable=False),
+        sa.Column("tipo", sa.String(), nullable=False),
+        sa.Column("classe", sa.String(), nullable=False),
+        sa.Column("hp_atual", sa.Integer(), nullable=False),
+        sa.Column("hp_maximo", sa.Integer(), nullable=False),
+        sa.Column("iniciativa", sa.Integer(), nullable=False, server_default="0"),
+    )
+
+
 def upgrade() -> None:
     # 
     # 1. Tabela `usuarios` — nova, não existia na feature/salva
@@ -93,6 +112,8 @@ def upgrade() -> None:
                 nullable=True,
             ),
         )
+
+    _ensure_combatentes_raiz()
 
     # 
     # 2. Colunas novas em `combatentes`

@@ -1,5 +1,5 @@
-// API em produção: sempre origem do Render, exceto em dev local (evita /api no Vercel → 404). CORS: ALLOWED_ORIGINS no Render.
-import { RENDER_API_ORIGIN as RENDER_API_ORIGIN_SHARED } from '/js/shared/render-api-origin.js';
+// API em produção: origem do Render (boot) ou mesmo host; dev local = mesma origem. CORS: ALLOWED_ORIGINS no Render.
+import { getRenderApiOrigin } from '/js/shared/render-api-origin.js?v=2';
 var _h = typeof window !== 'undefined' ? window.location.hostname : '';
 var IS_LOCAL =
     _h === 'localhost' ||
@@ -7,11 +7,18 @@ var IS_LOCAL =
     _h === '[::1]' ||
     _h.endsWith('.localhost');
 var IS_PRODUCTION = _h === 'arena-de-combate-rpg.com.br' || _h === 'www.arena-de-combate-rpg.com.br';
-var RENDER_API_ORIGIN = RENDER_API_ORIGIN_SHARED;
-var BASE_URL = IS_LOCAL ? window.location.origin : RENDER_API_ORIGIN;
+
+function resolveApiBaseUrl() {
+    if (IS_LOCAL && typeof window !== 'undefined') {
+        return window.location.origin;
+    }
+    return getRenderApiOrigin();
+}
 
 var API_CONFIG = {
-    BASE_URL: BASE_URL,
+    get BASE_URL() {
+        return resolveApiBaseUrl();
+    },
     API_PREFIX: '/api/v1',
     ENDPOINTS: {
         COMBATENTES: '/combatentes',
@@ -27,7 +34,7 @@ var API_CONFIG = {
 };
 
 function getApiUrl(endpoint) {
-    return BASE_URL + API_CONFIG.API_PREFIX + endpoint;
+    return resolveApiBaseUrl() + API_CONFIG.API_PREFIX + endpoint;
 }
 
 function sleep(ms) {
@@ -172,4 +179,4 @@ installFetchResilience();
 window.getApiUrl = getApiUrl;
 window.API_CONFIG = API_CONFIG;
 
-export { IS_PRODUCTION, BASE_URL, API_CONFIG, getApiUrl };
+export { IS_PRODUCTION, API_CONFIG, getApiUrl, resolveApiBaseUrl as BASE_URL };

@@ -1,6 +1,7 @@
 """
 Testes do pipeline e API do catálogo de Habilidades Especiais.
 """
+
 from __future__ import annotations
 
 import importlib.util
@@ -18,7 +19,6 @@ from app.games.dnd35.catalogs.habilidades_especiais_catalog import (
     list_habilidades,
     resolver_por_texto,
 )
-
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 PLANILHA_V2 = _REPO_ROOT / "Características especiais_v2.xlsx"
@@ -73,7 +73,12 @@ def test_pipeline_gera_catalogo_da_planilha_v2():
     result = pipeline.run()
 
     slugs = {h["slug"] for h in result.habilidades}
-    esperados = {"furia", "esquiva-sobrenatural", "visao-no-escuro", "visao-na-penumbra"}
+    esperados = {
+        "furia",
+        "esquiva-sobrenatural",
+        "visao-no-escuro",
+        "visao-na-penumbra",
+    }
     assert esperados <= slugs, f"faltando: {esperados - slugs}"
 
     for h in result.habilidades:
@@ -89,7 +94,9 @@ def test_loader_resolve_habilidade_por_slug():
     if not list_habilidades():
         pytest.skip("catálogo ausente no ambiente")
     assert item is not None
-    assert item["titulo"].lower().startswith("fúria") or item["titulo"].lower().startswith("furia")
+    assert item["titulo"].lower().startswith("fúria") or item[
+        "titulo"
+    ].lower().startswith("furia")
 
 
 def test_loader_resolve_por_texto_remove_parenteses():

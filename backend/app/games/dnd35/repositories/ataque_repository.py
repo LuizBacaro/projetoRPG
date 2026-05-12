@@ -3,6 +3,7 @@ AtaqueRepository
 SRP: acesso a dados de Ataque e MagiaSlot
 DIP: depende da abstração Session, não de implementação concreta
 """
+
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
@@ -27,7 +28,9 @@ class AtaqueRepository:
         self.db.refresh(ataque)
         return ataque
 
-    def deletar_por_combatente(self, combatente_id: int, auto_commit: bool = True) -> None:
+    def deletar_por_combatente(
+        self, combatente_id: int, auto_commit: bool = True
+    ) -> None:
         """Remove todos os ataques do combatente (usado no bulk replace)."""
         self.db.query(Ataque).filter(Ataque.combatente_id == combatente_id).delete()
         if auto_commit:
@@ -56,12 +59,18 @@ class AtaqueRepository:
             .all()
         )
 
-    def deletar_magias_por_combatente(self, combatente_id: int, auto_commit: bool = True) -> None:
-        self.db.query(MagiaSlot).filter(MagiaSlot.combatente_id == combatente_id).delete()
+    def deletar_magias_por_combatente(
+        self, combatente_id: int, auto_commit: bool = True
+    ) -> None:
+        self.db.query(MagiaSlot).filter(
+            MagiaSlot.combatente_id == combatente_id
+        ).delete()
         if auto_commit:
             commit_with_rollback(self.db)
 
-    def substituir_magias(self, combatente_id: int, slots_data: list) -> List[MagiaSlot]:
+    def substituir_magias(
+        self, combatente_id: int, slots_data: list
+    ) -> List[MagiaSlot]:
         """Delete + insert atômico para slots de magia."""
         self.deletar_magias_por_combatente(combatente_id, auto_commit=False)
         novos = []

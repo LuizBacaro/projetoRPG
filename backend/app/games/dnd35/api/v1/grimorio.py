@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from typing import Optional
 import json
+from typing import Optional
 
-from app.shared.core.database import get_db
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+
 from app.core.dependencies import get_grimorio_service
-from app.shared.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
 from app.games.dnd35.schemas.grimorio import (
     GrimorioDiagnosticoResponse,
     GrimorioHistoricoTrocaResponse,
@@ -21,6 +20,8 @@ from app.games.dnd35.schemas.grimorio import (
     GrimorioTrocaResponse,
 )
 from app.games.dnd35.services.grimorio_service import GrimorioService
+from app.shared.core.database import get_db
+from app.shared.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
 
 router = APIRouter(
     prefix="/grimorio",
@@ -46,7 +47,9 @@ def _parse_magia_ids(values: Optional[list[str]]) -> Optional[list[int]]:
     try:
         return list(dict.fromkeys(int(token) for token in tokens))
     except ValueError as exc:
-        raise HTTPException(status_code=422, detail="magia_ids deve conter apenas inteiros") from exc
+        raise HTTPException(
+            status_code=422, detail="magia_ids deve conter apenas inteiros"
+        ) from exc
 
 
 def _serialize(item) -> dict:
@@ -139,7 +142,11 @@ def diagnosticar_regras_grimorio(
     return service.diagnosticar_regras_divinas(combatente_id, classe=classe)
 
 
-@router.post("/{combatente_id}", response_model=GrimorioMagiaResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/{combatente_id}",
+    response_model=GrimorioMagiaResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def adicionar_magia_grimorio(
     combatente_id: int,
     payload: GrimorioMagiaCreate,
@@ -186,7 +193,9 @@ def remover_magia_grimorio(
     return None
 
 
-@router.get("/{combatente_id}/historico", response_model=list[GrimorioHistoricoTrocaResponse])
+@router.get(
+    "/{combatente_id}/historico", response_model=list[GrimorioHistoricoTrocaResponse]
+)
 def listar_historico_troca(
     combatente_id: int,
     classe: Optional[str] = Query(default=None),
@@ -194,7 +203,9 @@ def listar_historico_troca(
     service: GrimorioService = Depends(get_grimorio_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
-    historico = service.listar_historico_troca(combatente_id, classe=classe, limit=limit)
+    historico = service.listar_historico_troca(
+        combatente_id, classe=classe, limit=limit
+    )
     return [
         {
             "id": item.id,
@@ -204,8 +215,12 @@ def listar_historico_troca(
             "magia_adicionada_id": item.magia_adicionada_id,
             "nivel_personagem": item.nivel_personagem,
             "realizada_em": item.realizada_em,
-            "magia_removida_nome": item.magia_removida.nome if item.magia_removida else None,
-            "magia_adicionada_nome": item.magia_adicionada.nome if item.magia_adicionada else None,
+            "magia_removida_nome": (
+                item.magia_removida.nome if item.magia_removida else None
+            ),
+            "magia_adicionada_nome": (
+                item.magia_adicionada.nome if item.magia_adicionada else None
+            ),
         }
         for item in historico
     ]
@@ -234,13 +249,18 @@ def trocar_magia_grimorio(
     }
 
 
-@router.get("/{combatente_id}/notificacoes", response_model=list[GrimorioNotificacaoResponse])
+@router.get(
+    "/{combatente_id}/notificacoes", response_model=list[GrimorioNotificacaoResponse]
+)
 def listar_notificacoes_grimorio(
     combatente_id: int,
     classe: Optional[str] = Query(default=None),
     apenas_nao_lidas: bool = Query(default=False),
     limit: int = Query(default=30, ge=1, le=100),
-    force_sync: bool = Query(default=True, description="Passa false para polling leve sem sincronização automática"),
+    force_sync: bool = Query(
+        default=True,
+        description="Passa false para polling leve sem sincronização automática",
+    ),
     service: GrimorioService = Depends(get_grimorio_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
@@ -254,7 +274,10 @@ def listar_notificacoes_grimorio(
     return [_serialize_notificacao(item) for item in itens]
 
 
-@router.patch("/{combatente_id}/notificacoes/{notificacao_id}", response_model=GrimorioNotificacaoResponse)
+@router.patch(
+    "/{combatente_id}/notificacoes/{notificacao_id}",
+    response_model=GrimorioNotificacaoResponse,
+)
 def atualizar_notificacao_grimorio(
     combatente_id: int,
     notificacao_id: int,
@@ -262,11 +285,16 @@ def atualizar_notificacao_grimorio(
     service: GrimorioService = Depends(get_grimorio_service),
     _: object = Depends(requer_dono_ou_admin_combatente),
 ):
-    item = service.marcar_notificacao_lida(combatente_id, notificacao_id, lida=payload.lida)
+    item = service.marcar_notificacao_lida(
+        combatente_id, notificacao_id, lida=payload.lida
+    )
     return _serialize_notificacao(item)
 
 
-@router.delete("/{combatente_id}/notificacoes/{notificacao_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{combatente_id}/notificacoes/{notificacao_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 def descartar_notificacao_grimorio(
     combatente_id: int,
     notificacao_id: int,

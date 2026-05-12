@@ -44,12 +44,55 @@ def _unique_constraint_exists(bind, table_name: str, constraint_name: str) -> bo
     return any(constraint.get("name") == constraint_name for constraint in inspector.get_unique_constraints(table_name))
 
 
+def _ensure_magias_base_table(bind) -> None:
+    """Cria `magias` se ausente.
+
+    A cadeia legada 001→… não inclui CREATE desta tabela (vinha de bases pré-Alembic
+    ou de `metadata.create_all`). Sem isto, `batch_alter_table('magias')` falha em BD
+    novo (ex.: SQLite default no Render, Postgres vazio após primeira `upgrade`).
+    """
+    if _table_exists(bind, "magias"):
+        return
+    op.create_table(
+        "magias",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("nome", sa.String(length=100), nullable=False),
+        sa.Column("nivel", sa.Integer(), nullable=False),
+        sa.Column("classe", sa.String(length=50), nullable=False),
+        sa.Column("escola", sa.String(length=50), nullable=True),
+        sa.Column("sub_escola", sa.String(length=50), nullable=True),
+        sa.Column("componentes", sa.String(length=20), nullable=True),
+        sa.Column("alcance", sa.String(length=50), nullable=True),
+        sa.Column("area_efeito", sa.String(length=100), nullable=True),
+        sa.Column("duracao", sa.String(length=100), nullable=True),
+        sa.Column("tempo_conjuracao", sa.String(length=50), nullable=True),
+        sa.Column("dano", sa.String(length=50), nullable=True),
+        sa.Column("teste_resistencia", sa.String(length=50), nullable=True),
+        sa.Column(
+            "resistencia_magica",
+            sa.Boolean(),
+            nullable=True,
+            server_default=sa.text("0"),
+        ),
+        sa.Column("descricao", sa.String(length=1000), nullable=True),
+        sa.Column(
+            "ativo",
+            sa.Boolean(),
+            nullable=False,
+            server_default=sa.text("1"),
+        ),
+        sa.Column("data_criacao", sa.DateTime(timezone=True), nullable=True),
+    )
+
+
 def upgrade() -> None:
     bind = op.get_bind()
 
     # Limpa resquicio de tentativa anterior interrompida no modo batch do SQLite.
     if _table_exists(bind, "_alembic_tmp_magias"):
         op.execute(sa.text("DROP TABLE _alembic_tmp_magias"))
+
+    _ensure_magias_base_table(bind)
 
     columns_to_add = [
         sa.Column("nome_en", sa.String(length=100), nullable=True),

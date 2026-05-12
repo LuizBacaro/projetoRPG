@@ -78,7 +78,9 @@ def rolar_dano(
     )
 
 
-def calcular_nivel_efetivo(nh_base: int, modificadores: Optional[List[int]] = None) -> int:
+def calcular_nivel_efetivo(
+    nh_base: int, modificadores: Optional[List[int]] = None
+) -> int:
     return int(nh_base) + int(sum(modificadores or []))
 
 
@@ -130,4 +132,3 @@ def avaliar_teste_3d6(
         sucesso_decisivo=sucesso_decisivo,
         falha_critica=falha_critica,
     )
-

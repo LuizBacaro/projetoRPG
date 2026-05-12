@@ -5,7 +5,11 @@ from __future__ import annotations
 from typing import List, Optional, Protocol, Tuple
 
 from app.games.dnd35.models.combatente import Combatente
-from app.games.dnd35.models.grimorio import GrimorioHistoricoTroca, GrimorioMagia, GrimorioNotificacao
+from app.games.dnd35.models.grimorio import (
+    GrimorioHistoricoTroca,
+    GrimorioMagia,
+    GrimorioNotificacao,
+)
 
 
 class GrimorioRepositoryProtocol(Protocol):
@@ -14,7 +18,10 @@ class GrimorioRepositoryProtocol(Protocol):
     def get_combatente(self, combatente_id: int) -> Optional[Combatente]: ...
 
     def listar(
-        self, combatente_id: int, classe: Optional[str] = None, favorita: Optional[bool] = None
+        self,
+        combatente_id: int,
+        classe: Optional[str] = None,
+        favorita: Optional[bool] = None,
     ) -> List[GrimorioMagia]: ...
 
     def listar_paginado(
@@ -51,7 +58,9 @@ class GrimorioRepositoryProtocol(Protocol):
         self, combatente_id: int, classe: str, tipo: str
     ) -> Optional[GrimorioNotificacao]: ...
 
-    def get_item(self, combatente_id: int, magia_id: int, classe: str) -> Optional[GrimorioMagia]: ...
+    def get_item(
+        self, combatente_id: int, magia_id: int, classe: str
+    ) -> Optional[GrimorioMagia]: ...
 
     def create(self, item: GrimorioMagia) -> GrimorioMagia: ...
 

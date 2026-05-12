@@ -12,11 +12,10 @@ from typing import Any
 from fastapi import HTTPException
 
 from app.games.dnd35.catalogs import divindades_catalogo as _divindades_catalogo
-from app.games.dnd35.text_utils import normalizar_classe as _normalizar_classe
 from app.games.dnd35.models.magia import Magia
 from app.games.dnd35.ports import MagiaRepositoryProtocol
+from app.games.dnd35.text_utils import normalizar_classe as _normalizar_classe
 from app.repositories.base import commit_with_rollback
-
 
 DOMINIOS_FIXOS = {
     "AR": "Ar",
@@ -51,13 +50,17 @@ class MagiaService:
         if sort_by is not None:
             sort_by = str(sort_by).strip().lower()
             if sort_by not in {"nome", "escola", "nivel"}:
-                raise HTTPException(status_code=422, detail="Campo de ordenacao invalido")
+                raise HTTPException(
+                    status_code=422, detail="Campo de ordenacao invalido"
+                )
             kwargs["sort_by"] = sort_by
 
         if sort_dir is not None:
             sort_dir = str(sort_dir).strip().lower()
             if sort_dir not in {"asc", "desc"}:
-                raise HTTPException(status_code=422, detail="Direcao de ordenacao invalida")
+                raise HTTPException(
+                    status_code=422, detail="Direcao de ordenacao invalida"
+                )
             kwargs["sort_dir"] = sort_dir
 
         return self.repository.listar_paginado(**kwargs)
@@ -107,12 +110,18 @@ class MagiaService:
         )
         return magia
 
-    def atualizar(self, magia_id: int, payload: Any, *, usuario_id: int | None = None) -> Magia:
+    def atualizar(
+        self, magia_id: int, payload: Any, *, usuario_id: int | None = None
+    ) -> Magia:
         magia = self.obter_por_id(magia_id)
         dados_anteriores = self._snapshot_magia(magia)
         data = self._as_dict(payload, exclude_unset=True)
 
-        if "nome" in data and data["nome"] and data["nome"].strip().lower() != magia.nome.strip().lower():
+        if (
+            "nome" in data
+            and data["nome"]
+            and data["nome"].strip().lower() != magia.nome.strip().lower()
+        ):
             self._validar_nome_unico(data["nome"])
 
         self._aplicar_regras_dominios(data, magia_atual=magia)
@@ -195,23 +204,34 @@ class MagiaService:
     def _validar_nome_unico(self, nome: str) -> None:
         existente = self.repository.get_by_nome(nome)
         if existente:
-            raise HTTPException(status_code=409, detail="Já existe uma magia com este nome")
+            raise HTTPException(
+                status_code=409, detail="Já existe uma magia com este nome"
+            )
 
     @staticmethod
     def _validar_classes_niveis(classes_niveis: list[dict]) -> None:
         if not classes_niveis:
-            raise HTTPException(status_code=422, detail="Informe ao menos uma classe com nível")
+            raise HTTPException(
+                status_code=422, detail="Informe ao menos uma classe com nível"
+            )
 
         classes = set()
         for item in classes_niveis:
             classe = _normalizar_classe(str(item.get("classe", "")))
             nivel = item.get("nivel")
             if not classe:
-                raise HTTPException(status_code=422, detail="Classe inválida em classes_niveis")
+                raise HTTPException(
+                    status_code=422, detail="Classe inválida em classes_niveis"
+                )
             if classe in classes:
-                raise HTTPException(status_code=422, detail=f"Classe duplicada em classes_niveis: {classe}")
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Classe duplicada em classes_niveis: {classe}",
+                )
             if not isinstance(nivel, int) or nivel < 0 or nivel > 9:
-                raise HTTPException(status_code=422, detail=f"Nível inválido para classe {classe}")
+                raise HTTPException(
+                    status_code=422, detail=f"Nível inválido para classe {classe}"
+                )
             classes.add(classe)
 
     @staticmethod
@@ -220,9 +240,14 @@ class MagiaService:
 
     @classmethod
     def normalizar_dominios(cls, dominios_raw: str) -> str:
-        itens = [item.strip() for item in str(dominios_raw or "").split(",") if item.strip()]
+        itens = [
+            item.strip() for item in str(dominios_raw or "").split(",") if item.strip()
+        ]
         if not itens:
-            raise HTTPException(status_code=422, detail="Para magia de dominio, informe ao menos um dominio")
+            raise HTTPException(
+                status_code=422,
+                detail="Para magia de dominio, informe ao menos um dominio",
+            )
 
         vistos = set()
         canonical = []
@@ -246,21 +271,34 @@ class MagiaService:
 
         return ", ".join(canonical)
 
-    def _aplicar_regras_dominios(self, data: dict, *, magia_atual: Magia | None = None) -> None:
-        flag_final = bool(data.get("e_magia_dominio", magia_atual.e_magia_dominio if magia_atual else False))
+    def _aplicar_regras_dominios(
+        self, data: dict, *, magia_atual: Magia | None = None
+    ) -> None:
+        flag_final = bool(
+            data.get(
+                "e_magia_dominio", magia_atual.e_magia_dominio if magia_atual else False
+            )
+        )
 
         if not flag_final:
             data["dominios"] = None
             return
 
-        dominios_raw = data.get("dominios", magia_atual.dominios if magia_atual else None)
+        dominios_raw = data.get(
+            "dominios", magia_atual.dominios if magia_atual else None
+        )
         data["e_magia_dominio"] = True
         data["dominios"] = self.normalizar_dominios(dominios_raw or "")
 
     @staticmethod
     def _gerar_legacy_classes(classes_niveis: list[dict]) -> dict:
-        ordenadas = sorted(classes_niveis, key=lambda x: (x["nivel"], _normalizar_classe(str(x["classe"]))))
-        classe_legacy = ",".join(_normalizar_classe(str(item["classe"])) for item in ordenadas)
+        ordenadas = sorted(
+            classes_niveis,
+            key=lambda x: (x["nivel"], _normalizar_classe(str(x["classe"]))),
+        )
+        classe_legacy = ",".join(
+            _normalizar_classe(str(item["classe"])) for item in ordenadas
+        )
         nivel_legacy = ordenadas[0]["nivel"]
         return {"classe": classe_legacy, "nivel": nivel_legacy}
 

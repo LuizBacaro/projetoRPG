@@ -33,6 +33,4 @@ class SessaoCampanha(Base):
         nullable=False,
     )
 
-    campanha = relationship(
-        "Campanha", back_populates="sessoes", lazy="joined"
-    )
+    campanha = relationship("Campanha", back_populates="sessoes", lazy="joined")

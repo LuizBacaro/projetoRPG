@@ -233,7 +233,9 @@ class GurpsPersonagemUpdate(BaseModel):
 
     @field_validator("extras")
     @classmethod
-    def _extras_validar_update(cls, v: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def _extras_validar_update(
+        cls, v: Optional[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
         if v is None:
             return None
         return validar_extras_json_serializavel_e_tamanho(v)

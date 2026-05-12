@@ -8,8 +8,14 @@ from typing import Optional
 from sqlalchemy import and_
 from sqlalchemy.orm import Session, aliased
 
-from app.games.dnd35.models.armadura_protecao import ArmaduraProtecao, ArmaduraProtecaoJogador
-from app.games.dnd35.schemas.armadura_protecao import ArmaduraProtecaoCreate, ArmaduraProtecaoJogadorCreate
+from app.games.dnd35.models.armadura_protecao import (
+    ArmaduraProtecao,
+    ArmaduraProtecaoJogador,
+)
+from app.games.dnd35.schemas.armadura_protecao import (
+    ArmaduraProtecaoCreate,
+    ArmaduraProtecaoJogadorCreate,
+)
 from app.repositories.base import commit_with_rollback
 
 
@@ -25,10 +31,18 @@ class ArmaduraProtecaoRepository:
         return db_item
 
     def obter_por_id(self, item_id: int) -> Optional[ArmaduraProtecao]:
-        return self.db.query(ArmaduraProtecao).filter(ArmaduraProtecao.id == item_id).first()
+        return (
+            self.db.query(ArmaduraProtecao)
+            .filter(ArmaduraProtecao.id == item_id)
+            .first()
+        )
 
     def obter_por_nome(self, nome: str) -> Optional[ArmaduraProtecao]:
-        return self.db.query(ArmaduraProtecao).filter(ArmaduraProtecao.nome == nome).first()
+        return (
+            self.db.query(ArmaduraProtecao)
+            .filter(ArmaduraProtecao.nome == nome)
+            .first()
+        )
 
     def listar(self, skip: int = 0, limit: int = 100) -> list[ArmaduraProtecao]:
         return (

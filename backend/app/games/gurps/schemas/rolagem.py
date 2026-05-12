@@ -54,4 +54,3 @@ class GurpsDanoResponse(BaseModel):
     modificador: int
     total_sem_modificador: int
     total: int
-

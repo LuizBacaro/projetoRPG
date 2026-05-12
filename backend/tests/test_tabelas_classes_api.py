@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.games.dnd35.api.v1.tabelas_classes import router as tabelas_classes_router
+from app.games.dnd35.services.tabelas_classes_service import TabelasClassesService
 from app.shared.core.catalog_cache import catalog_cache
 from app.shared.core.config import settings
 from app.shared.core.deps import get_usuario_atual
-from app.games.dnd35.services.tabelas_classes_service import TabelasClassesService
 
 
 def _build_client() -> TestClient:
@@ -64,7 +64,10 @@ def test_tabelas_classes_lista_suporta_paginacao_e_filtro(monkeypatch):
     client = _build_client()
     original = _set_feature_flag(True)
     try:
-        response = client.get("/api/v1/tabelas-classes/", params={"skip": 0, "limit": 10, "table_number": 18})
+        response = client.get(
+            "/api/v1/tabelas-classes/",
+            params={"skip": 0, "limit": 10, "table_number": 18},
+        )
     finally:
         _restore_feature_flag(original)
         catalog_cache.clear()

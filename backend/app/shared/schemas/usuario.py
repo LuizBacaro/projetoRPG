@@ -2,17 +2,20 @@
 Schemas Pydantic de Usuário
 SRP: validação e serialização de dados de usuário
 """
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional
-from datetime import datetime
-from ..models.usuario import PerfilUsuario
+
 import re
+from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field, field_validator
+
+from ..models.usuario import PerfilUsuario
 
 
 class UsuarioBase(BaseModel):
     perfil: PerfilUsuario
-    nome:   str = Field(..., min_length=1, max_length=100)
-    email:  str = Field(..., min_length=3, max_length=150)
+    nome: str = Field(..., min_length=1, max_length=100)
+    email: str = Field(..., min_length=3, max_length=150)
 
     @field_validator("nome")
     @classmethod
@@ -24,7 +27,7 @@ class UsuarioBase(BaseModel):
     @field_validator("email")
     @classmethod
     def email_valido(cls, v: str) -> str:
-        padrao = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        padrao = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(padrao, v):
             raise ValueError("E-mail inválido")
         return v.lower().strip()
@@ -44,17 +47,17 @@ class UsuarioCreate(UsuarioBase):
 
 class UsuarioUpdate(BaseModel):
     perfil: Optional[PerfilUsuario] = None
-    nome:   Optional[str]           = Field(default=None, min_length=1, max_length=100)
-    email:  Optional[str]           = Field(default=None, min_length=3, max_length=150)
-    senha:  Optional[str]           = Field(default=None, min_length=6, max_length=128)
-    ativo:  Optional[bool]          = None
+    nome: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    email: Optional[str] = Field(default=None, min_length=3, max_length=150)
+    senha: Optional[str] = Field(default=None, min_length=6, max_length=128)
+    ativo: Optional[bool] = None
 
     @field_validator("email")
     @classmethod
     def email_valido(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return v
-        padrao = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        padrao = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(padrao, v):
             raise ValueError("E-mail inválido")
         return v.lower().strip()
@@ -68,16 +71,16 @@ class UsuarioUpdate(BaseModel):
 
 
 class UsuarioResponse(UsuarioBase):
-    id:                  int
-    ativo:               bool
-    usuario_responsavel: Optional[str]      = None
-    data_acao:           Optional[datetime] = None
+    id: int
+    ativo: bool
+    usuario_responsavel: Optional[str] = None
+    data_acao: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 
 
 class UsuarioListResponse(BaseModel):
-    total:    int
-    skip:     int
-    limit:    int
+    total: int
+    skip: int
+    limit: int
     usuarios: list[UsuarioResponse]

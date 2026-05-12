@@ -4,11 +4,22 @@ SRP: apenas roteamento HTTP para ataques e slots de magia
 
 Canônico em `app.games.dnd35.api.v1.ataques` (registrado em `app.main`).
 """
+
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.games.dnd35.repositories.ataque_repository import AtaqueRepository
+from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.schemas.ataque import (
+    AtaqueResponse,
+    AtaquesBulkRequest,
+    MagiasBulkRequest,
+    MagiaSlotResponse,
+    MagiaSlotUpdate,
+)
+from app.games.dnd35.services.ataque_service import AtaqueService
 from app.shared.core.database import get_db
 from app.shared.core.deps import (
     requer_dono_ou_admin_combatente,
@@ -16,16 +27,6 @@ from app.shared.core.deps import (
     requer_game_dnd35,
 )
 from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
-from app.games.dnd35.repositories.ataque_repository import AtaqueRepository
-from app.games.dnd35.schemas.ataque import (
-    AtaqueResponse,
-    AtaquesBulkRequest,
-    MagiaSlotResponse,
-    MagiaSlotUpdate,
-    MagiasBulkRequest,
-)
-from app.games.dnd35.services.ataque_service import AtaqueService
-from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 
 router = APIRouter(
     tags=["Ataques e Magias"],
@@ -72,7 +73,9 @@ def salvar_ataques(
 # ── Magias
 
 
-@router.get("/combatentes/{combatente_id}/magias", response_model=List[MagiaSlotResponse])
+@router.get(
+    "/combatentes/{combatente_id}/magias", response_model=List[MagiaSlotResponse]
+)
 def listar_magias(
     combatente_id: int,
     service: AtaqueService = Depends(get_ataque_service),
@@ -84,7 +87,9 @@ def listar_magias(
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.put("/combatentes/{combatente_id}/magias", response_model=List[MagiaSlotResponse])
+@router.put(
+    "/combatentes/{combatente_id}/magias", response_model=List[MagiaSlotResponse]
+)
 def salvar_magias(
     combatente_id: int,
     payload: MagiasBulkRequest,

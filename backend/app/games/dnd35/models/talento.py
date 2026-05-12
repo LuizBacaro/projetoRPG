@@ -62,6 +62,4 @@ class TalentoJogador(Base):
 
     adicionado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-    talento = relationship(
-        "Talento", back_populates="combatentes", lazy="joined"
-    )
+    talento = relationship("Talento", back_populates="combatentes", lazy="joined")

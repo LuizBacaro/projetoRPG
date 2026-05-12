@@ -34,45 +34,30 @@ _ACENTO_PARA_NORM = {
 }
 
 
+def _normalize_classe_explicit(bind, table: str) -> None:
+    """
+    Substituições conhecidas em todas as bases.
+
+    Não usamos unaccent nem CREATE EXTENSION no Postgres: se algum comando falha,
+    a transação inteira entra em estado abortado; um try/except não corrige isso
+    sem SAVEPOINT — o próximo revision falha com InFailedSqlTransaction.
+    """
+    for acentuado, normalizado in _ACENTO_PARA_NORM.items():
+        if acentuado == normalizado:
+            continue
+        variants = {acentuado, acentuado.upper(), acentuado.lower()}
+        for acc in variants:
+            bind.execute(
+                sa.text(f"UPDATE {table} SET classe = :norm WHERE classe = :acc"),
+                {"norm": normalizado, "acc": acc},
+            )
+
+
 def upgrade() -> None:
     bind = op.get_bind()
 
-    # Normaliza classe em magias: substitui versões acentuadas pela forma sem acento.
-    # Idempotente: uso de WHERE exclui linhas já corretas.
-    if bind.dialect.name == "postgresql":
-        # PostgreSQL: usa unaccent + upper para normalizar de forma genérica.
-        # unaccent extension deve estar instalado (CREATE EXTENSION IF NOT EXISTS unaccent).
-        bind.execute(sa.text(
-            "UPDATE magias "
-            "SET classe = upper(unaccent(classe)) "
-            "WHERE classe IS NOT NULL "
-            "  AND classe != upper(unaccent(classe))"
-        ))
-    else:
-        # SQLite e outros: aplica substituições explícitas linha a linha.
-        # O seed local já normaliza, mas cobre regressões.
-        for acentuado, normalizado in _ACENTO_PARA_NORM.items():
-            if acentuado != normalizado:
-                bind.execute(
-                    sa.text("UPDATE magias SET classe = :norm WHERE classe = :acc"),
-                    {"norm": normalizado, "acc": acentuado},
-                )
-
-    # Aplica o mesmo padrão à tabela magias_classes (caso existam registros futuros).
-    if bind.dialect.name == "postgresql":
-        bind.execute(sa.text(
-            "UPDATE magias_classes "
-            "SET classe = upper(unaccent(classe)) "
-            "WHERE classe IS NOT NULL "
-            "  AND classe != upper(unaccent(classe))"
-        ))
-    else:
-        for acentuado, normalizado in _ACENTO_PARA_NORM.items():
-            if acentuado != normalizado:
-                bind.execute(
-                    sa.text("UPDATE magias_classes SET classe = :norm WHERE classe = :acc"),
-                    {"norm": normalizado, "acc": acentuado},
-                )
+    _normalize_classe_explicit(bind, "magias")
+    _normalize_classe_explicit(bind, "magias_classes")
 
 
 def downgrade() -> None:

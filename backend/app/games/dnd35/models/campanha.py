@@ -17,9 +17,7 @@ class Campanha(Base):
     __tablename__ = "campanhas"
 
     id = Column(Integer, primary_key=True, index=True)
-    mestre_id = Column(
-        Integer, ForeignKey("usuarios.id"), nullable=False, index=True
-    )
+    mestre_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
     nome = Column(String(120), nullable=False)
     descricao = Column(String(500), nullable=True, default="")
     created_at = Column(
@@ -32,9 +30,7 @@ class Campanha(Base):
         nullable=False,
     )
 
-    personagens = relationship(
-        "Combatente", back_populates="campanha", lazy="selectin"
-    )
+    personagens = relationship("Combatente", back_populates="campanha", lazy="selectin")
     sessoes = relationship(
         "SessaoCampanha",
         back_populates="campanha",

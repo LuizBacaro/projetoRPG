@@ -3,11 +3,11 @@
 from decimal import Decimal
 
 from sqlalchemy import (
+    JSON,
     CheckConstraint,
     Column,
     ForeignKey,
     Integer,
-    JSON,
     Numeric,
     String,
 )
@@ -28,7 +28,9 @@ class GurpsPersonagem(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     dono_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True, index=True)
-    campanha_id = Column(Integer, ForeignKey("gurps_campanhas.id"), nullable=True, index=True)
+    campanha_id = Column(
+        Integer, ForeignKey("gurps_campanhas.id"), nullable=True, index=True
+    )
     tipo = Column(String(20), nullable=False)
     nome = Column(String(120), nullable=False)
     conceito = Column(String(200), nullable=True, default="")
@@ -102,7 +104,10 @@ class GurpsPersonagemVantagem(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     personagem_id = Column(
-        Integer, ForeignKey("gurps_personagens.id", ondelete="CASCADE"), nullable=False, index=True
+        Integer,
+        ForeignKey("gurps_personagens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     nome = Column(String(500), nullable=False)
     custo = Column(Integer, nullable=False, default=0)
@@ -115,7 +120,10 @@ class GurpsPersonagemDesvantagem(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     personagem_id = Column(
-        Integer, ForeignKey("gurps_personagens.id", ondelete="CASCADE"), nullable=False, index=True
+        Integer,
+        ForeignKey("gurps_personagens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     nome = Column(String(500), nullable=False)
     custo = Column(Integer, nullable=False, default=0)
@@ -128,7 +136,10 @@ class GurpsPersonagemPericia(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     personagem_id = Column(
-        Integer, ForeignKey("gurps_personagens.id", ondelete="CASCADE"), nullable=False, index=True
+        Integer,
+        ForeignKey("gurps_personagens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     nome = Column(String(500), nullable=False)
     tipo = Column(String(20), nullable=False)
