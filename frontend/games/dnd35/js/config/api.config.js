@@ -1,5 +1,5 @@
 // API em produção: origem do Render (boot) ou mesmo host; dev local = mesma origem. CORS: ALLOWED_ORIGINS no Render.
-import { getRenderApiOrigin } from '/js/shared/render-api-origin.js?v=2';
+import { getRenderApiOrigin } from '/js/shared/render-api-origin.js?v=3';
 var _h = typeof window !== 'undefined' ? window.location.hostname : '';
 var IS_LOCAL =
     _h === 'localhost' ||
