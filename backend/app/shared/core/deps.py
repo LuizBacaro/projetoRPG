@@ -643,6 +643,48 @@ def validar_gurps_personagens_do_usuario(
         )
 
 
+def validar_tormenta_personagens_do_usuario(
+    personagem_ids: list[int],
+    usuario,
+    db: Session,
+) -> None:
+    """Valida lista de personagens Tormenta para operações em lote (ex.: combate na Arena)."""
+    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+        return
+
+    ids_unicos = list(set(personagem_ids))
+    if not ids_unicos:
+        return
+
+    personagens = (
+        db.query(TormentaPersonagem).filter(TormentaPersonagem.id.in_(ids_unicos)).all()
+    )
+
+    encontrados = {p.id for p in personagens}
+    faltantes = [pid for pid in ids_unicos if pid not in encontrados]
+    if faltantes:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Personagens não encontrados: {faltantes}",
+        )
+
+    sem_acesso = [p.id for p in personagens if p.dono_id != usuario.id]
+    if sem_acesso:
+        log_security_event(
+            "tormenta_personagem_batch_access",
+            "denied",
+            user_email=usuario.email,
+            target="tormenta_personagens",
+            reason="not_owner",
+            details={"personagem_ids": sem_acesso},
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Sem permissão para os personagens: {sem_acesso}",
+        )
+
+
 def requer_dono_ou_admin_gurps_personagem(
     personagem_id: int,
     request: Request,

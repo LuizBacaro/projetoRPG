@@ -76,4 +76,101 @@ class TormentaPersonagemService {
         });
         return this._handleResponse(res, 'Erro ao excluir personagem');
     }
+
+    /**
+     * Envia retrato (multipart). Atualiza `foto_url` no servidor.
+     * @param {number|string} id
+     * @param {File} file
+     */
+    async enviarFoto(id, file) {
+        const fd = new FormData();
+        fd.append('foto', file);
+        const headers = {};
+        const token = AuthService.getToken();
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const res = await fetch(this._url(`/${id}/foto`), {
+            method: 'POST',
+            headers,
+            body: fd,
+        });
+        return this._handleResponse(res, 'Erro ao enviar retrato');
+    }
+
+    async importarInventarioLegado(id) {
+        const res = await fetch(this._url(`/${id}/inventario/importar-legado`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: '{}',
+        });
+        return this._handleResponse(res, 'Erro ao importar inventário legado');
+    }
+
+    async adicionarTalento(id, body) {
+        const res = await fetch(this._url(`/${id}/talentos`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao adicionar talento');
+    }
+
+    async removerTalento(id, vinculoId) {
+        const res = await fetch(this._url(`/${id}/talentos/${vinculoId}`), {
+            method: 'DELETE',
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao remover talento');
+    }
+
+    async adicionarEquipamento(id, body) {
+        const res = await fetch(this._url(`/${id}/equipamentos`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao adicionar equipamento');
+    }
+
+    async atualizarEquipamentoQuantidade(id, vinculoId, quantidade) {
+        const res = await fetch(this._url(`/${id}/equipamentos/${vinculoId}`), {
+            method: 'PATCH',
+            headers: this._headers(true),
+            body: JSON.stringify({ quantidade }),
+        });
+        return this._handleResponse(res, 'Erro ao atualizar quantidade do equipamento');
+    }
+
+    async removerEquipamento(id, vinculoId) {
+        const res = await fetch(this._url(`/${id}/equipamentos/${vinculoId}`), {
+            method: 'DELETE',
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao remover equipamento');
+    }
+
+    async adicionarConsumivel(id, body) {
+        const res = await fetch(this._url(`/${id}/consumiveis`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao adicionar consumível');
+    }
+
+    async atualizarConsumivelQuantidade(id, vinculoId, quantidade) {
+        const res = await fetch(this._url(`/${id}/consumiveis/${vinculoId}`), {
+            method: 'PATCH',
+            headers: this._headers(true),
+            body: JSON.stringify({ quantidade }),
+        });
+        return this._handleResponse(res, 'Erro ao atualizar quantidade do consumível');
+    }
+
+    async removerConsumivel(id, vinculoId) {
+        const res = await fetch(this._url(`/${id}/consumiveis/${vinculoId}`), {
+            method: 'DELETE',
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao remover consumível');
+    }
 }

@@ -2,21 +2,53 @@
 
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
 
-from app.core.dependencies import get_tormenta_personagem_service
+from app.core.dependencies import (
+    get_file_service,
+    get_tormenta_personagem_consumiveis_service,
+    get_tormenta_personagem_equipamentos_service,
+    get_tormenta_personagem_inventario_legado_service,
+    get_tormenta_personagem_service,
+    get_tormenta_personagem_talentos_service,
+)
+from app.services.file_service import FileService
 from app.games.tormenta.schemas.personagem import (
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
     TormentaPersonagemUpdate,
 )
+from app.games.tormenta.schemas.consumivel_personagem import (
+    TormentaConsumivelPersonagemItem,
+    TormentaConsumivelVinculoCreate,
+    TormentaConsumivelVinculoPatch,
+    TormentaMigrarConsumiveisJsonResponse,
+)
+from app.games.tormenta.schemas.equipamento_personagem import (
+    TormentaEquipamentoPersonagemItem,
+    TormentaEquipamentoVinculoCreate,
+    TormentaEquipamentoVinculoPatch,
+    TormentaMigrarEquipJsonResponse,
+)
+from app.games.tormenta.schemas.inventario_legado import TormentaInventarioLegadoImportResponse
+from app.games.tormenta.schemas.talento_personagem import (
+    TormentaMigrarTalentosJsonResponse,
+    TormentaTalentoPersonagemItem,
+    TormentaTalentoVinculoCreate,
+)
+from app.games.tormenta.services.personagem_consumiveis_service import TormentaPersonagemConsumiveisService
+from app.games.tormenta.services.personagem_equipamentos_service import TormentaPersonagemEquipamentosService
+from app.games.tormenta.services.personagem_inventario_legado_service import (
+    TormentaPersonagemInventarioLegadoService,
+)
 from app.games.tormenta.services.personagem_service import TormentaPersonagemService
+from app.games.tormenta.services.personagem_talentos_service import TormentaPersonagemTalentosService
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_tormenta_personagem,
     requer_game_tormenta,
 )
-from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
+from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos, InvalidFileError
 from app.shared.models.usuario import Usuario
 
 router = APIRouter(
@@ -54,11 +86,286 @@ def listar(
 def obter(
     personagem_id: int,
     service: TormentaPersonagemService = Depends(get_tormenta_personagem_service),
+    talentos_svc: TormentaPersonagemTalentosService = Depends(
+        get_tormenta_personagem_talentos_service
+    ),
+    equip_svc: TormentaPersonagemEquipamentosService = Depends(
+        get_tormenta_personagem_equipamentos_service
+    ),
+    consum_svc: TormentaPersonagemConsumiveisService = Depends(
+        get_tormenta_personagem_consumiveis_service
+    ),
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     try:
         ent = service.obter_por_id(personagem_id)
-        return TormentaPersonagemResponse.model_validate(ent)
+        base = TormentaPersonagemResponse.model_validate(ent)
+        itens_t = talentos_svc.listar_por_personagem(personagem_id)
+        itens_e = equip_svc.listar_por_personagem(personagem_id)
+        itens_c = consum_svc.listar_por_personagem(personagem_id)
+        return base.model_copy(
+            update={
+                "talentos": itens_t,
+                "equipamentos": itens_e,
+                "consumiveis": itens_c,
+            }
+        )
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/talentos",
+    response_model=List[TormentaTalentoPersonagemItem],
+)
+def listar_talentos_do_personagem(
+    personagem_id: int,
+    talentos_svc: TormentaPersonagemTalentosService = Depends(
+        get_tormenta_personagem_talentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    return talentos_svc.listar_por_personagem(personagem_id)
+
+
+@router.post(
+    "/{personagem_id}/talentos",
+    response_model=TormentaTalentoPersonagemItem,
+    status_code=201,
+)
+def adicionar_talento_ao_personagem(
+    personagem_id: int,
+    payload: TormentaTalentoVinculoCreate,
+    talentos_svc: TormentaPersonagemTalentosService = Depends(
+        get_tormenta_personagem_talentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return talentos_svc.adicionar_vinculo(personagem_id, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/talentos/migrar-do-json",
+    response_model=TormentaMigrarTalentosJsonResponse,
+)
+def migrar_talentos_mb_lista_do_json(
+    personagem_id: int,
+    talentos_svc: TormentaPersonagemTalentosService = Depends(
+        get_tormenta_personagem_talentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return talentos_svc.migrar_talentos_mb_lista_do_json(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.delete("/{personagem_id}/talentos/{vinculo_id}", status_code=204)
+def remover_talento_do_personagem(
+    personagem_id: int,
+    vinculo_id: int,
+    talentos_svc: TormentaPersonagemTalentosService = Depends(
+        get_tormenta_personagem_talentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        talentos_svc.remover_vinculo(personagem_id, vinculo_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/inventario/importar-legado",
+    response_model=TormentaInventarioLegadoImportResponse,
+)
+def importar_inventario_legado_do_json(
+    personagem_id: int,
+    legado_svc: TormentaPersonagemInventarioLegadoService = Depends(
+        get_tormenta_personagem_inventario_legado_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return legado_svc.importar_legado(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/equipamentos",
+    response_model=List[TormentaEquipamentoPersonagemItem],
+)
+def listar_equipamentos_do_personagem(
+    personagem_id: int,
+    equip_svc: TormentaPersonagemEquipamentosService = Depends(
+        get_tormenta_personagem_equipamentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    return equip_svc.listar_por_personagem(personagem_id)
+
+
+@router.post(
+    "/{personagem_id}/equipamentos",
+    response_model=TormentaEquipamentoPersonagemItem,
+    status_code=201,
+)
+def adicionar_equipamento_ao_personagem(
+    personagem_id: int,
+    payload: TormentaEquipamentoVinculoCreate,
+    equip_svc: TormentaPersonagemEquipamentosService = Depends(
+        get_tormenta_personagem_equipamentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return equip_svc.adicionar_vinculo(personagem_id, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.patch(
+    "/{personagem_id}/equipamentos/{vinculo_id}",
+    response_model=TormentaEquipamentoPersonagemItem,
+)
+def atualizar_quantidade_equipamento(
+    personagem_id: int,
+    vinculo_id: int,
+    payload: TormentaEquipamentoVinculoPatch,
+    equip_svc: TormentaPersonagemEquipamentosService = Depends(
+        get_tormenta_personagem_equipamentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return equip_svc.atualizar_quantidade(personagem_id, vinculo_id, payload)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/equipamentos/migrar-do-json",
+    response_model=TormentaMigrarEquipJsonResponse,
+)
+def migrar_equipamentos_do_json(
+    personagem_id: int,
+    equip_svc: TormentaPersonagemEquipamentosService = Depends(
+        get_tormenta_personagem_equipamentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return equip_svc.migrar_equipamentos_do_json(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.delete("/{personagem_id}/equipamentos/{vinculo_id}", status_code=204)
+def remover_equipamento_do_personagem(
+    personagem_id: int,
+    vinculo_id: int,
+    equip_svc: TormentaPersonagemEquipamentosService = Depends(
+        get_tormenta_personagem_equipamentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        equip_svc.remover_vinculo(personagem_id, vinculo_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/consumiveis",
+    response_model=List[TormentaConsumivelPersonagemItem],
+)
+def listar_consumiveis_do_personagem(
+    personagem_id: int,
+    consum_svc: TormentaPersonagemConsumiveisService = Depends(
+        get_tormenta_personagem_consumiveis_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    return consum_svc.listar_por_personagem(personagem_id)
+
+
+@router.post(
+    "/{personagem_id}/consumiveis",
+    response_model=TormentaConsumivelPersonagemItem,
+    status_code=201,
+)
+def adicionar_consumivel_ao_personagem(
+    personagem_id: int,
+    payload: TormentaConsumivelVinculoCreate,
+    consum_svc: TormentaPersonagemConsumiveisService = Depends(
+        get_tormenta_personagem_consumiveis_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return consum_svc.adicionar_vinculo(personagem_id, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.patch(
+    "/{personagem_id}/consumiveis/{vinculo_id}",
+    response_model=TormentaConsumivelPersonagemItem,
+)
+def atualizar_quantidade_consumivel(
+    personagem_id: int,
+    vinculo_id: int,
+    payload: TormentaConsumivelVinculoPatch,
+    consum_svc: TormentaPersonagemConsumiveisService = Depends(
+        get_tormenta_personagem_consumiveis_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return consum_svc.atualizar_quantidade(personagem_id, vinculo_id, payload)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/consumiveis/migrar-do-json",
+    response_model=TormentaMigrarConsumiveisJsonResponse,
+)
+def migrar_consumiveis_do_json(
+    personagem_id: int,
+    consum_svc: TormentaPersonagemConsumiveisService = Depends(
+        get_tormenta_personagem_consumiveis_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return consum_svc.migrar_consumiveis_do_json(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.delete("/{personagem_id}/consumiveis/{vinculo_id}", status_code=204)
+def remover_consumivel_do_personagem(
+    personagem_id: int,
+    vinculo_id: int,
+    consum_svc: TormentaPersonagemConsumiveisService = Depends(
+        get_tormenta_personagem_consumiveis_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        consum_svc.remover_vinculo(personagem_id, vinculo_id)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -91,6 +398,27 @@ def atualizar(
         raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/{personagem_id}/foto", response_model=TormentaPersonagemResponse)
+def upload_foto(
+    personagem_id: int,
+    foto: UploadFile = File(...),
+    service: TormentaPersonagemService = Depends(get_tormenta_personagem_service),
+    file_service: FileService = Depends(get_file_service),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    """Envia retrato (mesmo fluxo de arquivo que GURPS / combatentes D&D 3.5)."""
+    if not foto.filename:
+        raise HTTPException(status_code=400, detail="Nenhum arquivo enviado")
+    try:
+        ent = service.obter_por_id(personagem_id)
+        if ent.foto_url:
+            file_service.deletar_arquivo(ent.foto_url)
+        url = file_service.salvar_arquivo(foto)
+        return service.atualizar(personagem_id, TormentaPersonagemUpdate(foto_url=url))
+    except InvalidFileError as e:
+        raise HTTPException(status_code=400, detail=e.message)
 
 
 @router.delete("/{personagem_id}", status_code=204)

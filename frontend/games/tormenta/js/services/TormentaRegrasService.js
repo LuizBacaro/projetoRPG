@@ -49,4 +49,54 @@ class TormentaRegrasService {
         const res = await fetch(this._urlClasses(), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar classes Tormenta');
     }
+
+    _urlEquipamentos() {
+        return window.getApiUrl('/tormenta/regras/equipamentos');
+    }
+
+    _urlTalentos() {
+        return window.getApiUrl('/tormenta/regras/talentos');
+    }
+
+    /**
+     * Catálogo MB de equipamento (paginação + busca).
+     * @param {{ q?: string, skip?: number, limit?: number }} params
+     */
+    async listarEquipamentosCatalogo(params = {}) {
+        const q = new URLSearchParams();
+        if (params.q) q.set('q', params.q);
+        if (params.skip != null) q.set('skip', String(params.skip));
+        if (params.limit != null) q.set('limit', String(params.limit));
+        const qs = q.toString();
+        const res = await fetch(this._urlEquipamentos() + (qs ? `?${qs}` : ''), { headers: this._headers() });
+        return this._handleJson(res, 'Erro ao carregar equipamentos MB');
+    }
+
+    async listarTalentosCatalogo(params = {}) {
+        const q = new URLSearchParams();
+        if (params.q) q.set('q', params.q);
+        if (params.skip != null) q.set('skip', String(params.skip));
+        if (params.limit != null) q.set('limit', String(params.limit));
+        const qs = q.toString();
+        const res = await fetch(this._urlTalentos() + (qs ? `?${qs}` : ''), { headers: this._headers() });
+        return this._handleJson(res, 'Erro ao carregar talentos MB');
+    }
+
+    _urlArmadurasProtecao() {
+        return window.getApiUrl('/tormenta/regras/armaduras-protecao');
+    }
+
+    /**
+     * Catálogo de armaduras / proteção (paginação + busca).
+     * @param {{ q?: string, skip?: number, limit?: number }} params
+     */
+    async listarArmadurasProtecaoCatalogo(params = {}) {
+        const sp = new URLSearchParams();
+        if (params.q) sp.set('q', params.q);
+        if (params.skip != null) sp.set('skip', String(params.skip));
+        if (params.limit != null) sp.set('limit', String(params.limit));
+        const qs = sp.toString();
+        const res = await fetch(this._urlArmadurasProtecao() + (qs ? `?${qs}` : ''), { headers: this._headers() });
+        return this._handleJson(res, 'Erro ao carregar catálogo de armaduras');
+    }
 }

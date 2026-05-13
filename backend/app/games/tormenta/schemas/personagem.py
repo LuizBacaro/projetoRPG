@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from app.games.tormenta.schemas.consumivel_personagem import TormentaConsumivelPersonagemItem
+from app.games.tormenta.schemas.equipamento_personagem import TormentaEquipamentoPersonagemItem
+from app.games.tormenta.schemas.talento_personagem import TormentaTalentoPersonagemItem
 
 # Limite do JSON da ficha (perícias, equipamento, magias, notas).
 TORMENTA_FICHA_JSON_MAX_BYTES = 96_000
@@ -126,3 +130,6 @@ class TormentaPersonagemResponse(TormentaPersonagemBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    talentos: List[TormentaTalentoPersonagemItem] = Field(default_factory=list)
+    equipamentos: List[TormentaEquipamentoPersonagemItem] = Field(default_factory=list)
+    consumiveis: List[TormentaConsumivelPersonagemItem] = Field(default_factory=list)

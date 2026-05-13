@@ -20,16 +20,16 @@
 }
 
 .tormenta-ficha-wrap {
-    max-width: 1180px;
+    max-width: 1420px;
     margin: 0 auto;
-    padding: 0.75rem 0.5rem 2rem;
+    padding: 0.75rem 0.85rem 2rem;
 }
 
 .tormenta-ficha-sheet {
     background: var(--t20-white);
-    border: 2px solid var(--t20-ink);
+    border: 3px solid var(--t20-ink);
     box-shadow: 0 4px 0 rgba(163, 22, 22, 0.25), 0 12px 32px rgba(0, 0, 0, 0.12);
-    padding: 0.65rem 0.75rem 1rem;
+    padding: 1.05rem 1.15rem 1.25rem;
 }
 
 /* Barra superior Arena — pergaminho + acento vermelho (coerente com planilha 3) */
@@ -599,4 +599,1147 @@
     font-size: 0.58rem;
     color: var(--t20-muted);
     margin-top: 0.15rem;
+}
+
+/* ── Layout espelhado na ficha D&D 3.5 (3 colunas iguais + seções), cores Tormenta ── */
+.t20-ficha-header-dndlike {
+    margin-bottom: 0.55rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 2px solid var(--t20-red);
+}
+
+.t20-ficha-header__bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.65rem 1rem;
+    align-items: start;
+}
+
+@media (max-width: 720px) {
+    .t20-ficha-header__bar {
+        grid-template-columns: 1fr;
+        justify-items: stretch;
+    }
+
+    .t20-ficha-header__centro {
+        order: 0;
+    }
+
+    .t20-ficha-header__esq {
+        order: 1;
+    }
+
+    .t20-ficha-header__dir {
+        order: 2;
+        align-items: stretch !important;
+    }
+
+    .t20-logo-wrap--header {
+        text-align: center;
+    }
+}
+
+.t20-ficha-header__centro {
+    text-align: center;
+    min-width: 0;
+}
+
+.t20-ficha-header__dir {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+}
+
+.t20-toolbar-arena--header {
+    margin-bottom: 0;
+    justify-content: flex-end;
+    padding: 0.35rem 0.45rem;
+    border-bottom-width: 2px;
+}
+
+/* Rodapé da planilha (espelho leve do header) — descrição & narrativa */
+.t20-ficha-footer-dndlike {
+    margin-top: 0.65rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid var(--t20-red);
+}
+
+.t20-ficha-footer__bar {
+    padding: 0.35rem 0.1rem 0.5rem;
+}
+
+.t20-ficha-footer__titulo {
+    margin: 0 0 0.45rem;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--t20-red-deep);
+    text-align: center;
+    letter-spacing: 0.04em;
+}
+
+.t20-ficha-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 0.65rem;
+    align-items: start;
+}
+
+.t20-ficha-footer__grid .t20-ficha-field--wide {
+    grid-column: 1 / -1;
+}
+
+.t20-ficha-footer__grid .t20-ficha-field textarea {
+    width: 100%;
+}
+
+@media (max-width: 640px) {
+    .t20-ficha-footer__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-ficha-h1 {
+    margin: 0 0 0.35rem;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--t20-ink);
+    letter-spacing: 0.04em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.15rem 0.35rem;
+}
+
+.t20-ficha-meta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.t20-ficha-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: linear-gradient(180deg, #f4ebe0, #e8dcc8);
+    border: 1px solid rgba(100, 30, 20, 0.35);
+    color: var(--t20-ink);
+}
+
+.t20-ficha-tag--raca {
+    border-left: 3px solid var(--t20-red-deep);
+}
+
+.t20-ficha-tag--classe {
+    border-left: 3px solid #1a4a7a;
+}
+
+.t20-ficha-nivel-lbl {
+    font-weight: 600;
+    opacity: 0.85;
+    margin-right: 0.15rem;
+}
+
+.t20-logo-wrap--header {
+    text-align: right;
+    flex: 0 0 auto;
+}
+
+/* Cartões de seção (equivalente a .ficha-secao do D&D 3.5) */
+.t20-ficha-secao {
+    background: linear-gradient(145deg, #fffef8 0%, #f4ebe0 55%, #ebe2d6 100%);
+    border: 2px solid rgba(60, 35, 20, 0.38);
+    border-radius: 10px;
+    padding: 0.6rem 0.7rem 0.7rem;
+    box-shadow:
+        0 2px 6px rgba(30, 18, 12, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.t20-ficha-secao-titulo {
+    margin: 0 0 0.5rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid rgba(163, 22, 22, 0.35);
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--t20-red-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.t20-ficha-secao .t20-ficha-field:last-child {
+    margin-bottom: 0;
+}
+
+.t20-ficha-secao .t20-resistencias-row-dndlike,
+.t20-ficha-secao .t20-defesa-grid {
+    margin-top: 0;
+}
+
+.t20-ficha-secao--foto .t20-ficha-secao-titulo {
+    margin-bottom: 0.45rem;
+}
+
+.t20-ficha-foto-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.t20-ficha-foto-card {
+    width: 100%;
+    max-width: min(300px, 92%);
+    min-height: 300px;
+    border-radius: 10px;
+    border: 3px solid var(--t20-red-deep);
+    overflow: hidden;
+    background: linear-gradient(180deg, #2a1810 0%, #1a0f08 100%);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    aspect-ratio: 3 / 4;
+}
+
+.t20-portrait-frame--card {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+    clip-path: none;
+    box-shadow: none;
+}
+
+.t20-portrait-frame--card .t20-portrait-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.t20-portrait-frame--card .t20-portrait-placeholder {
+    font-size: 3.25rem;
+}
+
+.t20-ficha-secao--mb .t20-mb-auto-panel,
+.t20-modal-mb-xp .t20-mb-auto-panel {
+    margin: 0;
+}
+
+.t20-pericias-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    max-height: min(92vh, 2000px);
+    border: 1px solid var(--t20-grid-line);
+    border-radius: 4px;
+    background: rgba(255, 254, 248, 0.6);
+}
+
+.t20-defesa-row-dndlike--hero {
+    margin-top: 0;
+}
+
+.t20-dndlike-col--esq,
+.t20-dndlike-col--central {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.t20-sidebar.t20-dndlike-col--dir {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.t20-dndlike-corpo {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.88fr) minmax(280px, 1.18fr) minmax(220px, 0.88fr);
+    gap: 0.85rem 1rem;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .t20-dndlike-corpo {
+        grid-template-columns: 1fr 1fr;
+    }
+    .t20-dndlike-col--dir {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .t20-dndlike-corpo {
+        grid-template-columns: 1fr;
+    }
+
+    .t20-attrs-row--header .t20-shield {
+        min-width: 64px;
+        max-width: 88px;
+        height: 108px;
+    }
+}
+
+.t20-dndlike-col--esq .t20-identity-grid--stack {
+    grid-template-columns: 1fr;
+}
+
+.t20-identity-grid--compact {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem 0.45rem;
+}
+
+@media (max-width: 900px) {
+    .t20-identity-grid--compact {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.t20-identity-grid--compact .t20-ficha-field--wide {
+    grid-column: 1 / -1;
+}
+
+.t20-portrait-block--central {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.65rem;
+    margin-bottom: 0.45rem;
+}
+
+.t20-mb-ben-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.35rem;
+}
+
+.t20-mb-ben-grid--2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+    .t20-mb-ben-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.t20-mb-classe-ref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+}
+
+@media (max-width: 720px) {
+    .t20-mb-classe-ref-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-input--readonly {
+    background: rgba(245, 240, 232, 0.95);
+    color: var(--t20-ink);
+}
+
+.t20-defesa-row-dndlike {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: stretch;
+    margin-top: 0.35rem;
+}
+
+.t20-defesa-box-dnd {
+    flex: 1 1 4.5rem;
+    min-width: 4rem;
+    padding: 0.35rem 0.45rem;
+    border-radius: 6px;
+    border: 2px solid rgba(60, 35, 20, 0.45);
+    background: linear-gradient(165deg, #faf6ef, #ebe2d6);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.t20-defesa-box-dnd--wide {
+    flex: 2 1 10rem;
+}
+
+.t20-defesa-box-dnd__lbl {
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--t20-red-deep);
+}
+
+.t20-defesa-box-dnd__inp {
+    width: 100%;
+    max-width: 5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.t20-defesa-box-dnd__inp--sm {
+    max-width: 3.25rem;
+    font-size: 0.95rem;
+}
+
+.t20-defesa-box-dnd__pair {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.t20-defesa-box-dnd__sep {
+    font-weight: 700;
+    opacity: 0.55;
+}
+
+.t20-resistencias-row-dndlike {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.25rem;
+}
+
+.t20-res-box-dnd {
+    flex: 1 1 5.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 6px;
+    border: 2px solid rgba(26, 74, 122, 0.35);
+    background: linear-gradient(180deg, #f0f6fc, #dce8f4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.t20-res-box-dnd__lbl {
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #1a4a7a;
+}
+
+.t20-res-box-dnd__inp {
+    width: 100%;
+    max-width: 5rem;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* Faixa hero sob o cabeçalho: atributos + CA/PV/PM (alinhado à ficha D&D 3.5 da Arena) */
+.t20-ficha-hero-band {
+    margin-top: 0.35rem;
+    padding: 0.55rem 0.6rem 0.6rem;
+    border-radius: 10px;
+    border: 2px solid rgba(60, 35, 20, 0.28);
+    background: linear-gradient(180deg, rgba(255, 254, 248, 0.98), #e8dcc8);
+}
+
+.t20-ficha-hero-band__titulo {
+    margin: 0 0 0.35rem;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--t20-red-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-align: center;
+}
+
+.t20-ficha-hero-band__attrs {
+    margin-bottom: 0.4rem;
+}
+
+.t20-attrs-row--header {
+    justify-content: center;
+    margin-top: 0;
+}
+
+.t20-ficha-hero-band__vitals .t20-defesa-row-dndlike {
+    margin-top: 0;
+    justify-content: center;
+}
+
+.t20-hint--hero {
+    max-width: 52rem;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.t20-ficha-h1__sub {
+    font-weight: 650;
+    font-size: 0.62em;
+    letter-spacing: 0.06em;
+    opacity: 0.88;
+}
+
+.t20-ficha-meta-tags--sec {
+    margin-top: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.t20-ficha-meta-tags--sec .t20-ficha-tag {
+    font-size: 0.64rem;
+    padding: 0.14rem 0.42rem;
+}
+
+/* ── Layout D&D 3.5 (três colunas + círculos + diálogo) ── */
+.ficha-layout-dnd .tormenta-ficha-wrap {
+    max-width: 1480px;
+}
+
+.ficha-layout-dnd .ficha-corpo,
+.ficha-layout-dnd .t20-ficha-corpo {
+    display: grid;
+    grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 1.15fr) minmax(16rem, 1fr);
+    gap: 0.55rem;
+    align-items: start;
+    margin-top: 0.45rem;
+    padding-inline: 0.15rem;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+    .ficha-layout-dnd .ficha-corpo,
+    .ficha-layout-dnd .t20-ficha-corpo {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ficha-layout-dnd .ficha-coluna-esquerda,
+.ficha-layout-dnd .t20-ficha-col-esq,
+.ficha-layout-dnd .ficha-coluna-central,
+.ficha-layout-dnd .t20-ficha-col-centro,
+.ficha-layout-dnd .ficha-coluna-direita,
+.ficha-layout-dnd .t20-ficha-col-dir {
+    min-width: 0;
+}
+
+.ficha-layout-dnd .ficha-secao-titulo,
+.ficha-layout-dnd .t20-ficha-secao-titulo.ficha-secao-titulo {
+    font-family: var(--t20-font-medieval, Georgia, serif);
+}
+
+.t20-btn-editar-ficha {
+    margin-left: 0.35rem;
+    vertical-align: middle;
+}
+
+.t20-attrs-foto-split {
+    display: grid;
+    grid-template-columns: 1fr minmax(11rem, 42%);
+    gap: 0.45rem 0.35rem;
+    align-items: start;
+}
+
+@media (max-width: 720px) {
+    .t20-attrs-foto-split {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-vitals-centro {
+    margin-top: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Atributos em círculos (adaptado da ficha D&D 3.5 Arena) */
+.ficha-layout-dnd .ficha-atributos-circulo-grid-resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    justify-items: center;
+}
+
+.ficha-layout-dnd .ficha-atributo-circulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.ficha-layout-dnd .circulo-externo {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f5ead4, #d8c8a8);
+    border: 2px solid #a67c00;
+    box-shadow:
+        0 3px 10px rgba(44, 26, 14, 0.28),
+        inset 0 2px 6px rgba(201, 168, 76, 0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.08rem;
+    position: relative;
+}
+
+.ficha-layout-dnd .circulo-externo::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 1px solid rgba(166, 124, 0, 0.35);
+    pointer-events: none;
+}
+
+.ficha-layout-dnd .t20-circulo-valor-inp {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    min-width: 2.35rem;
+    width: 2.55rem;
+    max-width: 90%;
+    height: 1.45rem;
+    min-height: 0;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 1.28rem;
+    font-weight: 700;
+    color: #3d2814;
+    padding: 0;
+    margin: 0;
+    line-height: 1.45rem;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.ficha-layout-dnd .t20-circulo-valor-inp::-webkit-outer-spin-button,
+.ficha-layout-dnd .t20-circulo-valor-inp::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ficha-layout-dnd .t20-circulo-valor-inp:focus {
+    outline: none;
+}
+
+.ficha-layout-dnd .t20-circulo-valor-inp.t20-circulo-valor--readonly {
+    cursor: default;
+    user-select: none;
+    color: #4a3528;
+}
+
+.ficha-layout-dnd .circulo-mod {
+    position: relative;
+    z-index: 1;
+    font-size: 0.78rem;
+    color: #5a4030;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    line-height: 1.05;
+    font-weight: 700;
+}
+
+.ficha-layout-dnd .circulo-label {
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: #3d2814;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Atributos na coluna esquerda (mais estreita) */
+.ficha-layout-dnd .t20-ficha-col-esq .ficha-atributos-circulo-grid-resumo {
+    gap: 0.32rem;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .circulo-externo {
+    width: 74px;
+    height: 74px;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .circulo-externo::after {
+    inset: 4px;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .t20-circulo-valor-inp {
+    width: 2.35rem;
+    min-width: 2.15rem;
+    font-size: 1.14rem;
+    height: 1.32rem;
+    line-height: 1.32rem;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .circulo-mod {
+    font-size: 0.72rem;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .circulo-label {
+    font-size: 0.56rem;
+}
+
+.t20-foto-dnd.ficha-foto-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-height: 14rem;
+    border-radius: 4px;
+    border: 2px solid rgba(60, 35, 20, 0.45);
+    background: linear-gradient(180deg, #f8f4ea, #e4d8c4);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.t20-foto-dnd .t20-portrait-img,
+.t20-foto-dnd .ficha-foto {
+    width: 100%;
+    height: 100%;
+    min-height: 14rem;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.t20-foto-acoes {
+    position: absolute;
+    bottom: 0.35rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.35rem;
+}
+
+.t20-ficha-secao-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+}
+
+.t20-ficha-btn-adicionar {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.45rem;
+}
+
+.t20-ficha-dnd-lista,
+.t20-ficha-equip-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.t20-ficha-dnd-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.t20-tal-linha.t20-ficha-dnd-item {
+    grid-template-columns: 1fr auto auto;
+}
+
+.t20-ficha-vazio {
+    font-size: 0.82rem;
+    color: var(--t20-muted);
+    font-style: italic;
+}
+
+.t20-ficha-idiomas-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+}
+
+.t20-ficha-idiomas-lista .t20-idioma-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.35rem;
+    border-radius: 4px;
+    border: 1px solid rgba(60, 35, 20, 0.2);
+    background: rgba(255, 252, 245, 0.9);
+    margin-bottom: 0.25rem;
+}
+
+.t20-lista-traços-raciais {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.t20-mb-ben-grid--compact {
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+    .t20-mb-ben-grid--compact {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-pericia-de-classe-row {
+    background: rgba(255, 235, 160, 0.35);
+}
+
+.t20-pericia-de-classe {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+.t20-sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.t20-ficha-dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 0;
+    max-width: min(96vw, 40rem);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.t20-ficha-dialog::backdrop {
+    background: rgba(20, 12, 8, 0.45);
+}
+
+.t20-ficha-dialog__panel {
+    background: var(--t20-white);
+    border: 2px solid var(--t20-ink);
+    border-radius: 8px;
+    max-height: min(92vh, 44rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.t20-ficha-dialog__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    border-bottom: 2px solid rgba(60, 35, 20, 0.2);
+    position: sticky;
+    top: 0;
+    background: var(--t20-white);
+    z-index: 1;
+}
+
+.t20-ficha-dialog__titulo {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.t20-ficha-dialog__body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0.65rem 0.75rem;
+}
+
+.t20-ficha-dialog__body .t20-ficha-field input,
+.t20-ficha-dialog__body .t20-ficha-field select,
+.t20-ficha-dialog__body .t20-ficha-field textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.t20-ficha-dialog__body .t20-identity-grid--stack {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.t20-ficha-dialog__body .t20-identity-grid--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 560px) {
+    .t20-ficha-dialog__body .t20-identity-grid--compact {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.t20-ficha-dialog__body .t20-defesa-grid {
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}
+
+.t20-dialog-tracos-raca {
+    margin: 0;
+    white-space: pre-line;
+    max-height: 10rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.t20-modal-catalogo {
+    min-width: min(92vw, 26rem);
+}
+
+.t20-modal-catalogo__busca {
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.45rem 0.65rem;
+    border-bottom: 1px solid rgba(60, 35, 20, 0.15);
+}
+
+.t20-modal-catalogo-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0.35rem 0.65rem 0.5rem;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.t20-modal-catalogo-lista li {
+    margin-bottom: 0.25rem;
+}
+
+.t20-modal-pick-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.35rem 0.45rem;
+    border-radius: 4px;
+    border: 1px solid rgba(60, 35, 20, 0.2);
+    background: #faf7f0;
+    cursor: pointer;
+    font: inherit;
+}
+
+.t20-modal-pick-item:hover {
+    background: #fff3d6;
+}
+
+.t20-cat-sub {
+    font-size: 0.75rem;
+    color: var(--t20-muted);
+}
+
+/* Modal de equipamentos MB: o CSS de paridade D&D deixa .equipamentos-overlay sempre em flex; aqui só o #modalEquipamentos fica oculto até receber .is-open (JS Tormenta). */
+#modalEquipamentos.equipamentos-overlay:not(.is-open) {
+    display: none !important;
+    pointer-events: none;
+}
+
+/* Inputs em boxes coloridos (CA / PV / PM / Inic.) — sem fundo branco “padrão browser” */
+.ficha-defesa-box .ficha-defesa-valor-inp,
+.ficha-defesa-box .ficha-pv-inline-inp {
+    background: rgba(0, 0, 0, 0.28) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.ficha-defesa-box .ficha-defesa-valor-inp:focus,
+.ficha-defesa-box .ficha-pv-inline-inp:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.45);
+    outline-offset: 1px;
+}
+
+.ficha-defesa-box .ficha-defesa-valor-inp[readonly],
+.ficha-defesa-box .ficha-pv-inline-inp[readonly] {
+    cursor: default;
+    opacity: 0.97;
+}
+
+.ficha-defesa-box .ficha-pv-inline-sep {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Grelha “Ataques” (planilha MB) — alto contraste como referência */
+.t20-ficha-secao--ataques-planilha .t20-ataques-planilha-legend {
+    margin: 0 0 0.45rem;
+    font-size: 0.68rem;
+}
+
+.t20-ataques-planilha {
+    display: grid;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    grid-template-columns:
+        minmax(3.75rem, 0.95fr)
+        minmax(1.85rem, 0.42fr)
+        minmax(0.55rem, auto)
+        minmax(1.85rem, 0.42fr)
+        minmax(0.55rem, auto)
+        minmax(1.85rem, 0.42fr)
+        minmax(0.55rem, auto)
+        minmax(1.85rem, 0.4fr)
+        minmax(0.55rem, auto)
+        minmax(1.85rem, 0.4fr);
+    gap: 0.28rem 0.15rem;
+    align-items: center;
+    font-size: 0.68rem;
+    padding: 0.35rem 0.2rem 0.45rem;
+    border-radius: 8px;
+    border: 2px solid rgba(15, 15, 15, 0.85);
+    background: linear-gradient(180deg, #faf7f0, #e8e0d4);
+    overflow-x: visible;
+}
+
+.t20-ap-corner {
+    min-height: 1.5rem;
+}
+
+.t20-ap-h {
+    font-weight: 700;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+    color: var(--t20-ink);
+    line-height: 1.15;
+    padding: 0.1rem 0.05rem;
+}
+
+.t20-ap-sym,
+.t20-ap-eq,
+.t20-ap-plus {
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--t20-ink);
+}
+
+.t20-ap-rowlabel {
+    font-weight: 800;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 0.35rem 0.2rem;
+    background: linear-gradient(180deg, var(--t20-red-deep, #6e0000) 0%, #3a0808 100%);
+    color: #fff;
+    border-radius: 4px;
+    line-height: 1.2;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.t20-ap-inp {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 0.28rem 0.15rem;
+    border: 2px solid #0f0f0f;
+    border-radius: 4px;
+    background: #fff;
+    color: var(--t20-ink);
+}
+
+.t20-ap-inp::placeholder {
+    color: rgba(60, 60, 60, 0.45);
+    font-weight: 600;
+    font-size: 0.72rem;
+}
+
+.t20-ap-inp:focus {
+    outline: 2px solid rgba(139, 0, 0, 0.45);
+    outline-offset: 1px;
+}
+
+.t20-ap-inp--total,
+.t20-ap-inp[readonly] {
+    background: #e4dfd4 !important;
+    color: rgba(25, 18, 12, 0.92);
+    cursor: default;
+}
+
+.t20-ficha-secao--ataques-planilha .t20-ataques-planilha {
+    max-width: 100%;
+}
+
+/* PM — mesmo “card” dos demais vitais (Tormenta) */
+.ficha-defesa-box.ficha-pm-box {
+    background: linear-gradient(135deg, #2a1f4a 0%, #151028 100%);
+    border: 2px solid #7b68b8;
+    justify-content: center;
+}
+
+.t20-modal-mb-xp .ficha-modal-body {
+    max-height: none;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: block;
+    padding: 0.75rem 1rem 0.5rem;
+}
+
+.ficha-modal-box--t20-mb-xp {
+    width: min(100%, 28rem);
+    max-width: min(96vw, 28rem);
+    max-height: min(90vh, 42rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ficha-modal-box--t20-mb-xp .ficha-modal-header {
+    flex-shrink: 0;
+}
+
+.ficha-modal-box--t20-mb-xp .ficha-modal-actions {
+    flex-shrink: 0;
+}
+
+.ficha-modal-box--t20-mb-xp .t20-mb-ben-grid,
+.ficha-modal-box--t20-mb-xp .t20-mb-ben-grid--2 {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 480px) {
+    .ficha-modal-box--t20-mb-xp .t20-mb-ben-grid--compact {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .ficha-modal-box--t20-mb-xp .t20-mb-ben-grid--2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.ficha-modal-box--t20-mb-xp .t20-ficha-field input,
+.ficha-modal-box--t20-mb-xp .t20-ficha-field textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
 }

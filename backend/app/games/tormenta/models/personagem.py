@@ -4,6 +4,7 @@ Referência de paginação no model legado: págs. 304–305 — confirmar na ed
 """
 
 from sqlalchemy import JSON, CheckConstraint, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from app.shared.core.database import Base
 
@@ -55,3 +56,22 @@ class TormentaPersonagem(Base):
     # Perícias variáveis, equipamento, magias, notas de mesa (contrato JSON estável na API).
     ficha_json = Column(JSON, nullable=False, default=dict)
     foto_url = Column(String(2048), nullable=True)
+
+    talentos_vinculos = relationship(
+        "TormentaTalentoPersonagem",
+        back_populates="personagem",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    equipamentos_vinculos = relationship(
+        "TormentaEquipamentoPersonagem",
+        back_populates="personagem",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    consumiveis_vinculos = relationship(
+        "TormentaConsumivelPersonagem",
+        back_populates="personagem",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )

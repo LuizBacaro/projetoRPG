@@ -11,7 +11,12 @@ Stack vertical da ficha do **Módulo Básico** (cadastro digital, CRUD).
 ## API
 
 - `GET/POST /api/v1/tormenta/personagens`
-- `GET/PATCH/DELETE /api/v1/tormenta/personagens/{id}`
+- `GET/PATCH/DELETE /api/v1/tormenta/personagens/{id}` — o `GET` por id inclui `talentos` (tabelas SQL, paridade com D&D 3.5).
+- Talentos do personagem (catálogo `tormenta_talentos` + vínculo `tormenta_talentos_personagem`):
+  - `GET /api/v1/tormenta/personagens/{id}/talentos`
+  - `POST /api/v1/tormenta/personagens/{id}/talentos` — corpo `{ "talento_id": n }` **ou** `{ "nome": "..." }` (cria entrada de catálogo se não existir, `origem_catalogo_mb=false`).
+  - `DELETE /api/v1/tormenta/personagens/{id}/talentos/{vinculo_id}`
+  - `POST /api/v1/tormenta/personagens/{id}/talentos/migrar-do-json` — importa `ficha_json.talentos_mb_lista` para as tabelas (idempotente para duplicados).
 - `GET /api/v1/tormenta/regras/racas` — raças MB com `ajustes`, `escolhe_duas_mais2`, `mod_car_fixo` (Lefou), `tracos_resumo`, `idioma_racial_mb`; inclui `idiomas_geral_mb` e `idiomas_tabela_mb` (Cap. 2 MB)
 
 Guard: `requer_game_tormenta` (JWT `game_slug=tormenta` em modo estrito).
@@ -26,6 +31,7 @@ Guard: `requer_game_tormenta` (JWT `game_slug=tormenta` em modo estrito).
 Campos usados pelo frontend atual (podem crescer sem migration):
 
 - `pericias`: `[{ nome, graduacao, outros, somente_treinado, penalidade_armadura }]`
+- `talentos_mb_lista`: `[{ nome }]` (ficha web); espelho canónico em SQL via rotas de talentos acima + migração.
 - `talentos_texto`, `magias_texto`, `equipamento_texto`, `notas`
 - `dinheiro`: `{ ts, tp, to }`, `pm_max`, `pm_atual`, `idiomas`
 - `campanha`, `mestre`, `outros_jogadores`, `xp_atual`, `xp_proximo`

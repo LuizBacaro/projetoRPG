@@ -74,3 +74,38 @@ def test_get_regras_classes(client_regras_tormenta):
     bar = next(x for x in body["classes"] if x["slug"] == "barbaro")
     assert bar["bba_tipo"] == "plein"
     assert bar["habilidades_por_nivel"]["1"]
+
+
+def test_get_regras_equipamentos_pagina(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/equipamentos",
+        params={"q": "espada", "skip": 0, "limit": 5},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "itens" in body and "total" in body
+    assert body["total"] >= 3
+    assert len(body["itens"]) <= 5
+    assert all("espada" in x["nome"].lower() for x in body["itens"])
+    assert r.headers.get("X-Total-Count")
+
+
+def test_get_regras_talentos_pagina(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/talentos",
+        params={"q": "usar", "skip": 0, "limit": 10},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["total"] >= 1
+    assert len(body["itens"]) >= 1
+    assert any("usar" in x["nome"].lower() for x in body["itens"])
+
+
+def test_get_regras_armaduras_protecao_pagina(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/armaduras-protecao", params={"skip": 0, "limit": 20})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "itens" in body and "total" in body
+    assert body["total"] == 0
+    assert body["itens"] == []

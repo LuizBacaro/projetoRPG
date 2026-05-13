@@ -113,3 +113,52 @@ class TormentaClasseMbItem(BaseModel):
 class TormentaRegrasClassesResponse(BaseModel):
     beneficios_por_nivel: List[TormentaBeneficioNivelMbItem]
     classes: List[TormentaClasseMbItem]
+
+
+class TormentaCatalogoItem(BaseModel):
+    """Item do catálogo MB de equipamentos (campos extras são opcionais — UI estilo D&D 3.5)."""
+
+    id: int = Field(..., ge=1, description="Identificador estável após carregar o JSON (1..N).")
+    nome: str = Field(..., max_length=200)
+    categoria: Optional[str] = Field(
+        default=None,
+        max_length=80,
+        description="Categoria opcional (ex.: arma, armadura).",
+    )
+    secao: Optional[str] = Field(
+        default=None,
+        max_length=200,
+        description="Subtítulo / seção (ex.: Armas simples · Corpo a corpo).",
+    )
+    custo: Optional[str] = Field(default=None, max_length=80)
+    dano_p: Optional[str] = Field(default=None, max_length=40)
+    dano_m: Optional[str] = Field(default=None, max_length=40)
+    tipo_dano: Optional[str] = Field(default=None, max_length=120)
+    critico: Optional[str] = Field(default=None, max_length=80)
+    alcance: Optional[str] = Field(default=None, max_length=80)
+    peso: Optional[str] = Field(default=None, max_length=80)
+
+
+class TormentaCatalogoPaginaResponse(BaseModel):
+    itens: List[TormentaCatalogoItem]
+    total: int = Field(..., ge=0, description="Total após filtro de busca (antes da paginação).")
+
+
+class TormentaArmaduraCatalogoItem(BaseModel):
+    """Item do catálogo de armadura / proteção (Tormenta 20 — livro base)."""
+
+    id: int = Field(..., ge=1, description="Identificador estável após filtro (1..N).")
+    nome: str = Field(..., max_length=200)
+    tipo: str = Field(default="", max_length=120)
+    bonus_ca: int = Field(default=0, ge=-20, le=30)
+    penalidade: int = Field(default=0, ge=-20, le=20)
+    des_max: Optional[str] = Field(default=None, max_length=40)
+    falha_arcana: Optional[str] = Field(default=None, max_length=80)
+    deslocamento: Optional[str] = Field(default=None, max_length=80)
+    peso: Optional[str] = Field(default=None, max_length=40, description="Texto livre (ex.: 15 kg).")
+    propriedades_especiais: Optional[str] = Field(default=None, max_length=2000)
+
+
+class TormentaArmaduraCatalogoPaginaResponse(BaseModel):
+    itens: List[TormentaArmaduraCatalogoItem]
+    total: int = Field(..., ge=0, description="Total após filtro de busca (antes da paginação).")
