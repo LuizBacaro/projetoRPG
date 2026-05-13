@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha Tormenta 20 — Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260511j" />
+</head>
+<body class="tormenta-ficha-body">
+<div class="tormenta-ficha-wrap">
+    <div class="t20-toolbar-arena">
+        <a class="tormenta-btn tormenta-btn--primary" href="dashboard.html" style="color:#fff;text-decoration:none;">← Lista</a>
+        <button type="button" class="tormenta-btn" id="btnTrocarJogo">Trocar jogo</button>
+        <button type="button" class="tormenta-btn" id="btnLogout">Sair</button>
+    </div>
+
+    <div class="tormenta-ficha-sheet">
+        <input type="hidden" id="fichaId" />
+
+        <header class="t20-sheet-head">
+            <div>
+                <p class="t20-band" style="margin-top:0;">Ficha de personagem · Tormenta 20</p>
+                <div class="t20-portrait-block">
+                    <div class="t20-portrait-frame">
+                        <img id="f_foto_preview" class="t20-portrait-img" alt="" width="112" height="112" decoding="async" hidden />
+                        <span id="f_foto_placeholder" class="t20-portrait-placeholder" aria-hidden="true">?</span>
+                    </div>
+                    <div class="t20-ficha-field t20-ficha-field--wide">
+                        <label for="f_foto_url">URL do retrato (opcional)</label>
+                        <input id="f_foto_url" type="url" inputmode="url" maxlength="2048" placeholder="https://… ou caminho /uploads/…" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="t20-identity-grid">
+                    <div class="t20-ficha-field t20-ficha-field--wide">
+                        <label for="f_nome">Personagem</label>
+                        <input id="f_nome" type="text" required maxlength="120" />
+                    </div>
+                    <div class="t20-ficha-field t20-ficha-field--double">
+                        <label for="f_jogador">Jogador(a)</label>
+                        <input id="f_jogador" type="text" readonly tabindex="-1" />
+                    </div>
+                    <div class="t20-ficha-field t20-hidden-admin" id="wrapTipo">
+                        <label for="f_tipo">Tipo (mesa)</label>
+                        <select id="f_tipo">
+                            <option value="jogador">Jogador</option>
+                            <option value="npc">NPC</option>
+                            <option value="monstro">Monstro</option>
+                        </select>
+                    </div>
+                    <div class="t20-ficha-field t20-ficha-field--book">
+                        <label for="f_raca_select">Raça (Módulo Básico)</label>
+                        <select id="f_raca_select" class="t20-input"></select>
+                    </div>
+                    <div class="t20-ficha-field t20-ficha-field--book" id="wrapRacaLivre" style="display: none">
+                        <label for="f_raca_livre">Nome da raça (livre)</label>
+                        <input id="f_raca_livre" maxlength="120" placeholder="Ex.: Meio-orc, lefeu de outra região…" />
+                    </div>
+                    <input type="hidden" id="f_raca" value="" />
+                    <div class="t20-ficha-field t20-ficha-field--wide" id="wrapRacaMais2" style="display: none">
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-end">
+                            <div class="t20-ficha-field" style="margin: 0">
+                                <label for="f_raca_mais2a">+2 em habilidade (1ª)</label>
+                                <select id="f_raca_mais2a" class="t20-input"></select>
+                            </div>
+                            <div class="t20-ficha-field" style="margin: 0">
+                                <label for="f_raca_mais2b">+2 em habilidade (2ª)</label>
+                                <select id="f_raca_mais2b" class="t20-input"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="t20-ficha-field t20-ficha-field--wide" id="wrapRacaMais1" style="display: none">
+                        <div class="t20-ficha-field" style="margin: 0">
+                            <label for="f_raca_mais1">Meio-orc: +2 em outra habilidade (exceto INT e CAR)</label>
+                            <select id="f_raca_mais1" class="t20-input"></select>
+                        </div>
+                    </div>
+                    <div class="t20-ficha-field t20-ficha-field--wide">
+                        <p class="t20-hint" id="f_tracos_raca_txt" style="margin: 0; white-space: pre-line; max-height: 16rem; overflow-y: auto">Escolha uma raça para ver os traços raciais (MB, texto do livro).</p>
+                    </div>
+                    <div class="t20-ficha-field t20-ficha-field--book"><label for="f_origem">Origem</label><input id="f_origem" maxlength="120" /></div>
+                    <div class="t20-ficha-field t20-ficha-field--book"><label for="f_classe_só">Classe(s)</label><input id="f_classe_só" maxlength="120" /></div>
+                    <div class="t20-ficha-field"><label for="f_nivel">Nível</label><input id="f_nivel" type="number" min="0" max="40" /></div>
+                    <div class="t20-ficha-field"><label for="f_bba_mb">BBA base (MB)</label><input id="f_bba_mb" type="text" readonly tabindex="-1" class="t20-input" value="—" title="Base de Ataque conforme classe MB e nível (uma classe; multiclasse some no livro)" /></div>
+                    <div class="t20-ficha-field t20-ficha-field--wide">
+                        <label for="f_classe_mb">Classe MB (BBA / tabela)</label>
+                        <select id="f_classe_mb" class="t20-input"></select>
+                    </div>
+                    <details class="t20-hint" id="detailsClasseMb" style="margin-top: 0.15rem">
+                        <summary>Resumo da classe e benefícios por nível (MB)</summary>
+                        <div id="f_resumo_classe_mb" style="white-space: pre-wrap; margin: 0.35rem 0; font-size: 0.88rem"></div>
+                    </details>
+                    <div class="t20-ficha-field t20-ficha-field--double t20-ficha-field--book"><label for="f_divindade">Divindade</label><input id="f_divindade" maxlength="120" /></div>
+                    <div class="t20-ficha-field"><label for="f_sexo">Sexo</label><input id="f_sexo" maxlength="40" /></div>
+                    <div class="t20-ficha-field"><label for="f_idade">Idade</label><input id="f_idade" maxlength="80" /></div>
+                    <div class="t20-ficha-field"><label for="f_tendencia">Tendência</label><input id="f_tendencia" maxlength="80" /></div>
+                </div>
+            </div>
+            <div class="t20-logo-wrap">
+                <img src="/assets/brand/logo_tormenta-v5.png" width="200" height="80" alt="Tormenta" decoding="async" />
+                <span class="t20-logo-sub">Arena TTRPG · referência visual planilha Jambo</span>
+            </div>
+        </header>
+
+        <div class="t20-main-grid">
+            <div class="t20-main-col">
+                <p class="t20-band">Atributos</p>
+                <div class="t20-attrs-row" id="t20AttrsRow">
+                    <div class="t20-shield" data-attr="for">
+                        <span class="t20-shield-label">FOR</span>
+                        <input id="f_for" class="t20-shield-score" type="number" min="0" max="99" value="10" title="Valor final; compra por pontos usa valor − ajuste racial" />
+                        <span class="t20-shield-mod" id="f_for_mod">+0</span>
+                    </div>
+                    <div class="t20-shield" data-attr="des">
+                        <span class="t20-shield-label">DES</span>
+                        <input id="f_des" class="t20-shield-score" type="number" min="0" max="99" value="10" />
+                        <span class="t20-shield-mod" id="f_des_mod">+0</span>
+                    </div>
+                    <div class="t20-shield" data-attr="con">
+                        <span class="t20-shield-label">CON</span>
+                        <input id="f_con" class="t20-shield-score" type="number" min="0" max="99" value="10" />
+                        <span class="t20-shield-mod" id="f_con_mod">+0</span>
+                    </div>
+                    <div class="t20-shield" data-attr="int">
+                        <span class="t20-shield-label">INT</span>
+                        <input id="f_int" class="t20-shield-score" type="number" min="0" max="99" value="10" />
+                        <span class="t20-shield-mod" id="f_int_mod">+0</span>
+                    </div>
+                    <div class="t20-shield" data-attr="sab">
+                        <span class="t20-shield-label">SAB</span>
+                        <input id="f_sab" class="t20-shield-score" type="number" min="0" max="99" value="10" />
+                        <span class="t20-shield-mod" id="f_sab_mod">+0</span>
+                    </div>
+                    <div class="t20-shield" data-attr="car">
+                        <span class="t20-shield-label">CAR</span>
+                        <input id="f_car" class="t20-shield-score" type="number" min="0" max="99" value="10" />
+                        <span class="t20-shield-mod" id="f_car_mod">+0</span>
+                    </div>
+                </div>
+                <p class="t20-hint" id="hintAtributos">
+                    Modificadores conforme <strong>tabela do Tormenta 20</strong> (faixas de valor), não a fórmula d20 clássica (atributo − 10) ÷ 2.
+                    Fichas <strong>jogador</strong>: valores finais na ficha; a <strong>soma dos custos da compra por pontos</strong> (valores 8–18 <em>sem</em> bônus racial) não pode passar de <strong>20</strong>. Raça MB aplica ajustes sobre base 10 ao escolher a lista (Humanos/Lefou: escolha duas habilidades +2).
+                </p>
+                <p class="t20-hint" id="f_pts_compra" style="margin-top:0.2rem;">Compra por pontos: …</p>
+
+                <p class="t20-band" style="margin-top:0.65rem;">Pontos de vida · Mana · Defesa</p>
+                <div class="t20-vitals-frame">
+                    <div class="t20-vitals-row">
+                        <div class="t20-vital-block">
+                            <strong>Pontos de vida</strong>
+                            <div class="t20-vital-pair">
+                                <div class="t20-ficha-field"><label for="f_pv_max">Máx</label><input id="f_pv_max" type="number" /></div>
+                                <div class="t20-ficha-field"><label for="f_pv_atual">Atuais</label><input id="f_pv_atual" type="number" /></div>
+                            </div>
+                        </div>
+                        <div class="t20-vital-block">
+                            <strong>Pontos de mana</strong>
+                            <div class="t20-vital-pair">
+                                <div class="t20-ficha-field"><label for="f_pm_max">Máx</label><input id="f_pm_max" type="number" /></div>
+                                <div class="t20-ficha-field"><label for="f_pm_atual">Atuais</label><input id="f_pm_atual" type="number" /></div>
+                            </div>
+                        </div>
+                        <div class="t20-vital-block">
+                            <strong>Deslocamento / tamanho</strong>
+                            <div class="t20-vital-pair">
+                                <div class="t20-ficha-field"><label for="f_desl">Desloc.</label><input id="f_desl" maxlength="80" /></div>
+                                <div class="t20-ficha-field"><label for="f_tam">Tamanho</label><input id="f_tam" maxlength="80" /></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="t20-defesa-total">
+                    <div class="t20-shield-ico" title="Defesa total" aria-hidden="true">🛡</div>
+                    <div class="t20-ficha-field" style="flex:0 0 5rem;margin:0;">
+                        <label for="f_ca">Total</label>
+                        <input id="f_ca" type="number" />
+                    </div>
+                    <div class="t20-ficha-field" style="flex:1;margin:0;">
+                        <label for="f_rd">Redução de dano / anotações CA</label>
+                        <input id="f_rd" maxlength="80" />
+                    </div>
+                </div>
+                <p class="t20-band">Composição da defesa (opcional)</p>
+                <div class="t20-defesa-grid">
+                    <div class="t20-ficha-field"><label for="f_def_moddes">Mod. DES</label><input id="f_def_moddes" type="number" /></div>
+                    <div class="t20-ficha-field"><label for="f_def_arm">Armadura</label><input id="f_def_arm" type="number" /></div>
+                    <div class="t20-ficha-field"><label for="f_def_esc">Escudo</label><input id="f_def_esc" type="number" /></div>
+                    <div class="t20-ficha-field"><label for="f_def_out">Outros</label><input id="f_def_out" type="number" /></div>
+                    <div class="t20-ficha-field"><label for="f_def_pen">Pen. armadura</label><input id="f_def_pen" type="number" /></div>
+                </div>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Resistências (totais)</p>
+                <div class="t20-defesa-grid">
+                    <div class="t20-ficha-field"><label for="f_fort">Fortitude</label><input id="f_fort" type="number" /></div>
+                    <div class="t20-ficha-field"><label for="f_ref">Reflexos</label><input id="f_ref" type="number" /></div>
+                    <div class="t20-ficha-field"><label for="f_von">Vontade</label><input id="f_von" type="number" /></div>
+                    <div class="t20-ficha-field"><label for="f_ini">Iniciativa</label><input id="f_ini" type="number" /></div>
+                </div>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Ataques</p>
+                <table class="t20-data-table" id="tblAtaques">
+                    <thead>
+                        <tr>
+                            <th>Ataque</th>
+                            <th>Teste</th>
+                            <th>Dano</th>
+                            <th>Crítico</th>
+                            <th>Tipo</th>
+                            <th>Alcance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblAtaquesBody"></tbody>
+                </table>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Armadura &amp; escudo</p>
+                <table class="t20-data-table">
+                    <thead><tr><th></th><th>Defesa</th><th>Penalidade</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td>Armadura</td>
+                            <td><input id="arm_def" type="text" /></td>
+                            <td><input id="arm_pen" type="text" /></td>
+                        </tr>
+                        <tr>
+                            <td>Escudo</td>
+                            <td><input id="esc_def" type="text" /></td>
+                            <td><input id="esc_pen" type="text" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Pontos de experiência</p>
+                <div class="t20-ficha-field"><label for="f_xp">Total / anotação de XP</label><input id="f_xp" type="text" /></div>
+                <div class="t20-ficha-field"><label for="f_xpprox">Próximo nível (meta)</label><input id="f_xpprox" type="text" /></div>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Proficiências &amp; outras características</p>
+                <div class="t20-ficha-field"><textarea id="f_talentos" rows="4" placeholder="Proficiências, talentos, poderes…"></textarea></div>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Habilidades, magias &amp; rituais</p>
+                <div class="t20-ficha-field"><textarea id="f_magias" rows="6" placeholder="Espaço amplo como na planilha oficial…"></textarea></div>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Descrição</p>
+                <div class="t20-ficha-field"><label for="f_historia">História &amp; pano de fundo</label><textarea id="f_historia" rows="3"></textarea></div>
+                <div class="t20-ficha-field"><label for="f_pers">Personalidade</label><textarea id="f_pers" rows="2"></textarea></div>
+                <div class="t20-ficha-field"><label for="f_apar">Aparência</label><textarea id="f_apar" rows="2"></textarea></div>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Habilidades de raça &amp; origem</p>
+                <div class="t20-ficha-field"><textarea id="f_raca_origem_txt" rows="3" placeholder="Poderes de raça e origem…"></textarea></div>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Equipamento (item · qtd / slots)</p>
+                <div class="t20-equip-grid" id="wrapEquip"></div>
+                <div class="t20-foot-money">
+                    <div class="t20-ficha-field"><label for="f_ts">T$</label><input id="f_ts" type="text" /></div>
+                    <div class="t20-ficha-field"><label for="f_tp">TP</label><input id="f_tp" type="text" /></div>
+                    <div class="t20-ficha-field"><label for="f_to">TO</label><input id="f_to" type="text" /></div>
+                    <div class="t20-ficha-field"><label for="f_carga_lim">Lim. carga</label><input id="f_carga_lim" type="text" /></div>
+                    <div class="t20-ficha-field"><label for="f_carga_usada">Carga usada</label><input id="f_carga_usada" type="text" /></div>
+                </div>
+
+                <p class="t20-band" style="margin-top:0.5rem;">Mesa &amp; notas</p>
+                <div class="t20-defesa-grid">
+                    <div class="t20-ficha-field"><label for="f_campanha">Campanha</label><input id="f_campanha" /></div>
+                    <div class="t20-ficha-field"><label for="f_mestre">Mestre</label><input id="f_mestre" /></div>
+                </div>
+                <div class="t20-ficha-field"><label for="f_outros_j">Outros jogadores</label><input id="f_outros_j" /></div>
+                <div class="t20-ficha-field"><label for="f_idiomas">Idiomas</label><input id="f_idiomas" /></div>
+                <details class="t20-hint" id="detailsIdiomasMb" style="margin-top: 0.35rem">
+                    <summary>Referência MB — idiomas na Arton</summary>
+                    <div id="idiomasMbGeral" style="white-space: pre-line; margin: 0.45rem 0 0.6rem; font-size: 0.92rem"></div>
+                    <div style="overflow-x: auto">
+                        <table class="t20-pericias-table" id="tblIdiomasMb" style="font-size: 0.88rem">
+                            <thead>
+                                <tr>
+                                    <th>Idioma</th>
+                                    <th>Quem costuma falar (MB)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </details>
+                <p class="t20-hint" id="f_idiomas_sugestao_mb" style="margin-top: 0.25rem"></p>
+                <div class="t20-ficha-field"><label for="f_notas">Notas</label><textarea id="f_notas" rows="2"></textarea></div>
+            </div>
+
+            <aside class="t20-sidebar">
+                <p class="t20-band">Perícias</p>
+                <p class="t20-hint">½ nível usa o campo Nível do cabeçalho. Marque treinado quando aplicável (+2 no T20). <strong>Mod</strong> sincroniza com o atributo-chave ao mudar FOR/DES/… Colunas <strong>✱</strong> (só treinada) e <strong>Arm.</strong> (penalidade de armadura) vêm da regra base; pode ajustar se a mesa permitir.</p>
+                <div style="overflow-x:auto;">
+                    <table class="t20-pericias-table" id="tblPericias">
+                        <thead>
+                            <tr>
+                                <th title="Treinado">Tr</th>
+                                <th>Perícia</th>
+                                <th>Total</th>
+                                <th>½ nv</th>
+                                <th>Mod</th>
+                                <th>Out</th>
+                                <th title="Somente treinado (regra)">✱</th>
+                                <th title="Penalidade de armadura (regra)">Arm.</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </aside>
+        </div>
+
+        <div class="t20-ficha-actions">
+            <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnSalvar">Salvar ficha</button>
+            <span id="f_status" class="tormenta-cell-muted" style="color:var(--t20-muted);"></span>
+        </div>
+    </div>
+</div>
+<script src="/js/shared/render-api-origin-boot.js?v=2"></script>
+<script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
+<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/ui/Toast.js"></script>
+<script>
+    if (!AuthService.exigirJogo('tormenta')) {}
+</script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260512classes"></script>
+<script>
+(function () {
+    const svc = new TormentaPersonagemService();
+    const perfil = AuthService.getPerfil();
+    const isMestre = perfil === 'mestre' || perfil === 'administrador';
+
+    /** Preenchido por `aplicarRegrasPayload` (GET `/tormenta/regras/atributos` ou JSON estático). */
+    let PERICIAS_META = [];
+    let CUSTO_COMPRA_ATRIBUTO = {};
+    let PONTOS_INICIAIS_COMPRA = 20;
+
+    async function carregarRegrasTormenta() {
+        try {
+            return await new TormentaRegrasService().obterAtributos();
+        } catch (e1) {
+            const r = await fetch('/games/tormenta/data/regras-atributos.json?v=20260511c', {
+                cache: 'no-cache',
+            });
+            if (!r.ok) throw e1;
+            return r.json();
+        }
+    }
+
+    function aplicarRegrasPayload(data) {
+        PONTOS_INICIAIS_COMPRA =
+            typeof data.pontos_compra_iniciais === 'number' ? data.pontos_compra_iniciais : 20;
+        const next = {};
+        (data.custos || []).forEach((row) => {
+            next[row.valor] = row.custo;
+        });
+        CUSTO_COMPRA_ATRIBUTO = next;
+        PERICIAS_META = Array.isArray(data.pericias) ? data.pericias : [];
+    }
+
+    function q(id) { return document.getElementById(id); }
+
+    let RACAS_MB = [];
+    let IDIOMAS_MB_GERAL = '';
+    let IDIOMAS_MB_TABELA = [];
+    let CLASSES_MB = [];
+    let BENEFICIOS_NIVEL_MB = [];
+    const ATTR_KEYS = ['for', 'des', 'con', 'int', 'sab', 'car'];
+
+    async function carregarClassesTormenta() {
+        try {
+            const d = await new TormentaRegrasService().obterClasses();
+            return {
+                classes: Array.isArray(d.classes) ? d.classes : [],
+                beneficios_por_nivel: Array.isArray(d.beneficios_por_nivel) ? d.beneficios_por_nivel : [],
+            };
+        } catch (e1) {
+            const [r1, r2] = await Promise.all([
+                fetch('/games/tormenta/data/classes_mb.json?v=20260511d', { cache: 'no-cache' }),
+                fetch('/games/tormenta/data/beneficios_nivel_mb.json?v=20260511d', { cache: 'no-cache' }),
+            ]);
+            if (!r1.ok || !r2.ok) throw e1;
+            const c = await r1.json();
+            const b = await r2.json();
+            return {
+                classes: Array.isArray(c.classes) ? c.classes : [],
+                beneficios_por_nivel: Array.isArray(b.niveis) ? b.niveis : [],
+            };
+        }
+    }
+
+    function getClasseMbRowPorSlug(slug) {
+        return CLASSES_MB.find((x) => x.slug === slug) || null;
+    }
+
+    function bbaTbNivel(nivel, bbaTipo) {
+        const n = Math.max(0, Math.min(40, Math.floor(Number(nivel) || 0)));
+        if (n <= 0) return 0;
+        const t = bbaTipo || 'plein';
+        if (t === 'meio') return Math.floor(n / 2);
+        if (t === 'tres_quartos') return Math.floor((n * 3) / 4);
+        return n;
+    }
+
+    function popularSelectClassesMb() {
+        const sel = q('f_classe_mb');
+        if (!sel) return;
+        const cur = sel.value;
+        sel.innerHTML = '';
+        const o0 = document.createElement('option');
+        o0.value = '';
+        o0.textContent = '— Livre / multiclasse (texto ao lado)';
+        sel.appendChild(o0);
+        CLASSES_MB.forEach((row) => {
+            const o = document.createElement('option');
+            o.value = row.slug;
+            o.textContent = `${row.nome}${row.abreviatura ? ` (${row.abreviatura})` : ''}`;
+            sel.appendChild(o);
+        });
+        if (cur && CLASSES_MB.some((x) => x.slug === cur)) sel.value = cur;
+    }
+
+    function sincronizarClasseMbApartirDoTexto() {
+        const sel = q('f_classe_mb');
+        if (!sel) return;
+        const t = (q('f_classe_só') && q('f_classe_só').value.trim()) || '';
+        const first = t.split(/[/+,]/)[0].trim().split(/\s+/)[0];
+        if (!first) {
+            sel.value = '';
+            return;
+        }
+        const row = CLASSES_MB.find((c) => c.nome === first || c.slug === first.toLowerCase());
+        sel.value = row ? row.slug : '';
+    }
+
+    function atualizarResumoClasseMb() {
+        const el = q('f_resumo_classe_mb');
+        const bbaInp = q('f_bba_mb');
+        const slug = (q('f_classe_mb') && q('f_classe_mb').value) || '';
+        const nv = Math.min(20, Math.max(1, Math.floor(Number((q('f_nivel') && q('f_nivel').value) || '1'))));
+        const setBbaCampo = (v) => {
+            if (bbaInp) bbaInp.value = v;
+        };
+        if (!el && !bbaInp) return;
+        if (!slug) {
+            setBbaCampo('—');
+            if (el) {
+                el.textContent =
+                    'Escolha uma classe na lista MB para ver BBA neste nível, PV da classe e benefícios globais por nível. Multiclasse: some BBA por classe (veja o MB).';
+            }
+            return;
+        }
+        const c = getClasseMbRowPorSlug(slug);
+        if (!c) {
+            setBbaCampo('—');
+            if (el) el.textContent = 'Classe não encontrada na lista carregada.';
+            return;
+        }
+        const ben = (BENEFICIOS_NIVEL_MB || []).find((b) => Number(b.nivel) === nv) || null;
+        const bba = bbaTbNivel(nv, c && c.bba_tipo);
+        setBbaCampo(`+${bba}`);
+        const lines = [];
+        lines.push(`Classe: ${c.nome} (${c.abreviatura || c.slug})`);
+        lines.push(`PV (regra MB): ${c.pv_inicial} iniciais + ${c.pv_por_nivel} × (nível − 1) + Constituição por nível — não preenchemos PV automaticamente.`);
+        lines.push(`Perícias treinadas: ${c.pericias_treinadas || '—'}`);
+        lines.push(`BBA (base de ataque, um único nível nesta classe): +${bba} (tipo ${c.bba_tipo || 'plein'} no MB).`);
+        lines.push('');
+        lines.push(`— Benefícios de personagem no ${nv}º nível (tabela geral MB) —`);
+        if (ben) {
+            lines.push(`XP total necessário para este nível: ${ben.xp_total}.`);
+            lines.push(`Graduações em perícias (treinado / não treinado): ${ben.graduacao_pericias}.`);
+            lines.push(`Talentos (total acumulado): ${ben.talentos_totais}.`);
+            lines.push(`Pontos de habilidade extras acumulados: ${ben.pontos_habilidade_acumulados}.`);
+            lines.push(`Bônus meio de nível (CA, resistências e dano): +${ben.bonus_meio_nivel}.`);
+        } else {
+            lines.push('Nível fora da tabela 1–20 do MB.');
+        }
+        lines.push('');
+        lines.push(`— Habilidades de classe neste nível —`);
+        const hk = String(nv);
+        const tx = (c.habilidades_por_nivel && c.habilidades_por_nivel[hk]) || '';
+        lines.push(tx || 'Sem entrada neste PDF automatizado — consulte a tabela da classe no Capítulo 3 do MB.');
+        lines.push('');
+        lines.push('Perícias de classe e talentos adicionais (texto MB):');
+        lines.push(c.pericias_classe || '—');
+        lines.push(c.talentos_adicionais || '—');
+        el.textContent = lines.join('\n');
+    }
+
+    function onClasseMbChange(syncNome) {
+        const slug = (q('f_classe_mb') && q('f_classe_mb').value) || '';
+        const c = getClasseMbRowPorSlug(slug);
+        if (syncNome && c && q('f_classe_só')) q('f_classe_só').value = c.nome;
+        atualizarResumoClasseMb();
+    }
+
+    function popularOpcoesMais1Select() {
+        const el = q('f_raca_mais1');
+        if (!el) return;
+        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+        const row = getRacaRowPorSlug(slug);
+        const ex = row && Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
+        const cur = el.value;
+        el.innerHTML = '<option value="">—</option>';
+        const keys = ATTR_KEYS.filter((k) => !ex.includes(k));
+        keys.forEach((k) => {
+            const lab = { for: 'FOR', des: 'DES', con: 'CON', int: 'INT', sab: 'SAB', car: 'CAR' }[k];
+            const o = document.createElement('option');
+            o.value = k;
+            o.textContent = lab;
+            el.appendChild(o);
+        });
+        if (keys.includes(cur)) el.value = cur;
+    }
+
+    function bindClasseMbOnce() {
+        const sc = q('f_classe_mb');
+        if (sc && !sc.dataset.bound) {
+            sc.dataset.bound = '1';
+            sc.addEventListener('change', () => onClasseMbChange(true));
+        }
+        const cs = q('f_classe_só');
+        if (cs && !cs.dataset.boundClasseTxt) {
+            cs.dataset.boundClasseTxt = '1';
+            cs.addEventListener('blur', () => {
+                sincronizarClasseMbApartirDoTexto();
+                atualizarResumoClasseMb();
+            });
+        }
+        const nv = q('f_nivel');
+        if (nv && !nv.dataset.boundClasseNv) {
+            nv.dataset.boundClasseNv = '1';
+            nv.addEventListener('input', () => {
+                atualizarMeioNivelColuna();
+                atualizarResumoClasseMb();
+            });
+        }
+    }
+
+    async function carregarRacasTormenta() {
+        const empty = { racas: [], idiomas_geral_mb: '', idiomas_tabela_mb: [] };
+        try {
+            const d = await new TormentaRegrasService().obterRacas();
+            return {
+                racas: Array.isArray(d.racas) ? d.racas : [],
+                idiomas_geral_mb: typeof d.idiomas_geral_mb === 'string' ? d.idiomas_geral_mb : '',
+                idiomas_tabela_mb: Array.isArray(d.idiomas_tabela_mb) ? d.idiomas_tabela_mb : [],
+            };
+        } catch (e1) {
+            const r = await fetch('/games/tormenta/data/racas-mb.json?v=20260512idiomas', {
+                cache: 'no-cache',
+            });
+            if (!r.ok) throw e1;
+            const d = await r.json();
+            return {
+                racas: Array.isArray(d.racas) ? d.racas : [],
+                idiomas_geral_mb: typeof d.idiomas_geral_mb === 'string' ? d.idiomas_geral_mb : '',
+                idiomas_tabela_mb: Array.isArray(d.idiomas_tabela_mb) ? d.idiomas_tabela_mb : [],
+            };
+        }
+    }
+
+    function renderPainelIdiomasMbReferencia() {
+        const g = q('idiomasMbGeral');
+        const tb = q('tblIdiomasMb');
+        if (g) {
+            g.textContent = IDIOMAS_MB_GERAL || 'Texto de idiomas (MB) não carregado.';
+        }
+        if (tb) {
+            const body = tb.querySelector('tbody');
+            if (body) {
+                body.innerHTML = '';
+                (IDIOMAS_MB_TABELA || []).forEach((row) => {
+                    const tr = document.createElement('tr');
+                    const td1 = document.createElement('td');
+                    const td2 = document.createElement('td');
+                    td1.textContent = row.idioma || '';
+                    td2.textContent = row.falantes || '';
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    body.appendChild(tr);
+                });
+            }
+        }
+    }
+
+    function atualizarSugestaoIdiomasMb() {
+        const p = q('f_idiomas_sugestao_mb');
+        if (!p) return;
+        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+        const modInt = modificadorAtributoT20((q('f_int') && q('f_int').value) || '10');
+        const nExtra = Math.max(0, modInt);
+        if (!slug || slug === '__livre__') {
+            p.textContent =
+                slug === '__livre__'
+                    ? 'Raça livre: defina idiomas com o mestre. Regra MB: valkar + bônus de INT idiomas adicionais (e idioma racial se não humano).'
+                    : 'Escolha uma raça MB para ver o idioma racial típico e a sugestão de preenchimento.';
+            return;
+        }
+        const row = getRacaRowPorSlug(slug);
+        if (!row) {
+            p.textContent = '';
+            return;
+        }
+        const racial = row.idioma_racial_mb;
+        const base =
+            racial && String(racial).trim().length > 0
+                ? `Base típica (MB): valkar, ${String(racial).trim()}`
+                : 'Base típica (MB): valkar (humano: sem outro idioma racial fixo)';
+        p.textContent = `${base}. Idiomas adicionais pelo bônus de Inteligência (mod. atual ${modInt >= 0 ? '+' : ''}${modInt}): ${nExtra} idioma(s) extra(s) à escolha (conforme mesa e origem).`;
+    }
+
+    function getRacaRowPorSlug(slug) {
+        return RACAS_MB.find((x) => x.slug === slug) || null;
+    }
+
+    function racialDeltasMap() {
+        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+        const d = { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
+        if (!slug || slug === '__livre__') return d;
+        const row = getRacaRowPorSlug(slug);
+        if (!row) return d;
+        const adj = row.ajustes || {};
+        ATTR_KEYS.forEach((k) => {
+            if (adj[k] != null) d[k] += Number(adj[k]);
+        });
+        if (row.mod_car_fixo) d.car += Number(row.mod_car_fixo);
+        if (row.escolhe_duas_mais2) {
+            const excluiCar = (row.mod_car_fixo || 0) < 0;
+            const a = q('f_raca_mais2a') && q('f_raca_mais2a').value;
+            const b = q('f_raca_mais2b') && q('f_raca_mais2b').value;
+            const keysOk = ATTR_KEYS.filter((k) => !(excluiCar && k === 'car'));
+            if (a && keysOk.includes(a)) d[a] += 2;
+            if (b && keysOk.includes(b)) d[b] += 2;
+        }
+        if (row.escolhe_um_mais2) {
+            const excl = Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
+            const c1 = q('f_raca_mais1') && q('f_raca_mais1').value;
+            const keysOk1 = ATTR_KEYS.filter((k) => !excl.includes(k));
+            if (c1 && keysOk1.includes(c1)) d[c1] += 2;
+        }
+        return d;
+    }
+
+    function valorFinalAtributoCampo(a) {
+        const el = q(`f_${a}`);
+        const raw = el ? String(el.value).trim() : '';
+        if (!raw) return 10;
+        const n = Number(raw);
+        if (!Number.isFinite(n)) return 10;
+        return Math.floor(n);
+    }
+
+    function atributosCompraAtuais() {
+        const rDel = racialDeltasMap();
+        const out = {};
+        ATTR_KEYS.forEach((a) => {
+            const fin = valorFinalAtributoCampo(a);
+            out[a] = Math.max(1, fin - (rDel[a] || 0));
+        });
+        return out;
+    }
+
+    function somaCustosCompraAtributos() {
+        const bases = atributosCompraAtuais();
+        let soma = 0;
+        for (const a of ATTR_KEYS) {
+            const c = custoCompraAtributo(bases[a]);
+            if (c === null) return null;
+            soma += c;
+        }
+        return soma;
+    }
+
+    function validarCompraPontosJogador() {
+        const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
+        if (tipo !== 'jogador') return { ok: true };
+        const s = somaCustosCompraAtributos();
+        if (s === null) {
+            return {
+                ok: false,
+                msg: 'Personagem jogador: valores-base da compra (final − racial) devem estar entre 8 e 18 para somar custos.',
+            };
+        }
+        if (s > PONTOS_INICIAIS_COMPRA) {
+            return {
+                ok: false,
+                msg: `Personagem jogador: custo na compra por pontos não pode ultrapassar ${PONTOS_INICIAIS_COMPRA} (gasto atual: ${s}).`,
+            };
+        }
+        return { ok: true };
+    }
+
+    function validarEscolhasRacaMb() {
+        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+        const row = getRacaRowPorSlug(slug);
+        if (!row) return { ok: true };
+        if (row.escolhe_duas_mais2) {
+            const a = q('f_raca_mais2a') && q('f_raca_mais2a').value;
+            const b = q('f_raca_mais2b') && q('f_raca_mais2b').value;
+            if (!a || !b) {
+                return {
+                    ok: false,
+                    msg: 'Escolha duas habilidades diferentes para receber +2 (Humano ou Lefou).',
+                };
+            }
+            if (a === b) return { ok: false, msg: 'As duas habilidades com +2 devem ser diferentes.' };
+        }
+        if (row.escolhe_um_mais2) {
+            const x = q('f_raca_mais1') && q('f_raca_mais1').value;
+            if (!x) {
+                return {
+                    ok: false,
+                    msg: 'Meio-orc: escolha a outra habilidade com +2 (não pode ser INT nem CAR).',
+                };
+            }
+            const ex = row.excluir_atributos_mais2 || [];
+            if (ex.includes(x)) return { ok: false, msg: 'Meio-orc: escolha inválida para o +2 opcional.' };
+        }
+        return { ok: true };
+    }
+
+    function popularSelectRacas() {
+        const sel = q('f_raca_select');
+        if (!sel) return;
+        sel.innerHTML = '';
+        const o0 = document.createElement('option');
+        o0.value = '';
+        o0.textContent = '— Nenhuma (sem ajuste MB)';
+        sel.appendChild(o0);
+        RACAS_MB.forEach((row) => {
+            const o = document.createElement('option');
+            o.value = row.slug;
+            o.textContent = row.nome;
+            sel.appendChild(o);
+        });
+        const ox = document.createElement('option');
+        ox.value = '__livre__';
+        ox.textContent = 'Outra / livre';
+        sel.appendChild(ox);
+    }
+
+    function popularOpcoesMais2Selects() {
+        ['f_raca_mais2a', 'f_raca_mais2b'].forEach((id) => {
+            const el = q(id);
+            if (!el) return;
+            const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+            const row = getRacaRowPorSlug(slug);
+            const excluiCar = row && (row.mod_car_fixo || 0) < 0;
+            const keys = ATTR_KEYS.filter((k) => !(excluiCar && k === 'car'));
+            const cur = el.value;
+            el.innerHTML = '<option value="">—</option>';
+            keys.forEach((k) => {
+                const lab = { for: 'FOR', des: 'DES', con: 'CON', int: 'INT', sab: 'SAB', car: 'CAR' }[k];
+                const o = document.createElement('option');
+                o.value = k;
+                o.textContent = lab;
+                el.appendChild(o);
+            });
+            if (keys.includes(cur)) el.value = cur;
+        });
+    }
+
+    function atualizarTracosRacaPainel() {
+        const p = q('f_tracos_raca_txt');
+        if (!p) return;
+        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+        if (!slug || slug === '__livre__') {
+            p.textContent =
+                slug === '__livre__'
+                    ? 'Raça livre: descreva traços em Poderes de raça & origem ou nas notas.'
+                    : 'Escolha uma raça para ver o resumo de traços (Módulo Básico).';
+            return;
+        }
+        const row = getRacaRowPorSlug(slug);
+        p.textContent = row && row.tracos_resumo ? row.tracos_resumo : '—';
+    }
+
+    function syncCampoRacaNomeParaApi() {
+        const hid = q('f_raca');
+        if (!hid) return;
+        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+        if (slug === '__livre__') {
+            hid.value = (q('f_raca_livre') && q('f_raca_livre').value.trim()) || '';
+            return;
+        }
+        const row = getRacaRowPorSlug(slug);
+        hid.value = row ? row.nome : '';
+    }
+
+    function aplicarRacaSomenteAjustes() {
+        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+        if (!slug || slug === '__livre__') return;
+        const d = racialDeltasMap();
+        ATTR_KEYS.forEach((a) => {
+            const inp = q(`f_${a}`);
+            if (inp) inp.value = String(Math.max(1, 10 + (d[a] || 0)));
+        });
+        atualizarModsAtributos();
+    }
+
+    function onRacaChange(resetBaseDez) {
+        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+        const wrapL = q('wrapRacaLivre');
+        const wrapM = q('wrapRacaMais2');
+        const wrapM1 = q('wrapRacaMais1');
+        const row = getRacaRowPorSlug(slug);
+        if (wrapL) wrapL.style.display = slug === '__livre__' ? '' : 'none';
+        if (wrapM) wrapM.style.display = row && row.escolhe_duas_mais2 ? '' : 'none';
+        if (wrapM1) wrapM1.style.display = row && row.escolhe_um_mais2 ? '' : 'none';
+        popularOpcoesMais2Selects();
+        popularOpcoesMais1Select();
+        atualizarTracosRacaPainel();
+        atualizarSugestaoIdiomasMb();
+        syncCampoRacaNomeParaApi();
+        if (resetBaseDez && slug && slug !== '__livre__') aplicarRacaSomenteAjustes();
+        else atualizarLinhaCompraPontos();
+    }
+
+    function bindRacaUiOnce() {
+        const sel = q('f_raca_select');
+        if (sel && !sel.dataset.bound) {
+            sel.dataset.bound = '1';
+            sel.addEventListener('change', () => onRacaChange(true));
+        }
+        ['f_raca_mais2a', 'f_raca_mais2b'].forEach((id) => {
+            const el = q(id);
+            if (el && !el.dataset.bound) {
+                el.dataset.bound = '1';
+                el.addEventListener('change', () => {
+                    aplicarRacaSomenteAjustes();
+                    atualizarTracosRacaPainel();
+                    atualizarSugestaoIdiomasMb();
+                    syncCampoRacaNomeParaApi();
+                });
+            }
+        });
+        const m1 = q('f_raca_mais1');
+        if (m1 && !m1.dataset.bound) {
+            m1.dataset.bound = '1';
+            m1.addEventListener('change', () => {
+                aplicarRacaSomenteAjustes();
+                atualizarTracosRacaPainel();
+                atualizarSugestaoIdiomasMb();
+                syncCampoRacaNomeParaApi();
+            });
+        }
+        const liv = q('f_raca_livre');
+        if (liv && !liv.dataset.bound) {
+            liv.dataset.bound = '1';
+            liv.addEventListener('input', syncCampoRacaNomeParaApi);
+        }
+    }
+
+    function aplicarRacaCamposDoJson(j) {
+        const slug = j && j.raca_tormenta_slug != null ? String(j.raca_tormenta_slug) : '';
+        const sel = q('f_raca_select');
+        if (sel) {
+            sel.value = slug;
+            if (slug && !getRacaRowPorSlug(slug) && slug !== '__livre__') sel.value = '';
+        }
+        if (q('f_raca_mais2a')) q('f_raca_mais2a').value = (j && j.raca_tormenta_mais2a) || '';
+        if (q('f_raca_mais2b')) q('f_raca_mais2b').value = (j && j.raca_tormenta_mais2b) || '';
+        if (q('f_raca_mais1')) q('f_raca_mais1').value = (j && j.raca_tormenta_mais1) || '';
+        if (q('f_raca_livre')) q('f_raca_livre').value = (j && j.raca_tormenta_livre) || '';
+        onRacaChange(false);
+        if (q('f_raca_select') && q('f_raca_select').value === '__livre__' && q('wrapRacaLivre')) {
+            q('wrapRacaLivre').style.display = '';
+        }
+    }
+
+    function modificadorAtributoT20(val) {
+        const n = Number(val);
+        if (!Number.isFinite(n)) return 0;
+        const v = Math.max(1, Math.floor(n));
+        if (v <= 1) return -5;
+        if (v <= 3) return -4;
+        if (v <= 5) return -3;
+        if (v <= 7) return -2;
+        if (v <= 9) return -1;
+        if (v <= 11) return 0;
+        if (v <= 13) return 1;
+        if (v <= 15) return 2;
+        if (v <= 17) return 3;
+        if (v <= 19) return 4;
+        if (v <= 21) return 5;
+        if (v <= 23) return 6;
+        if (v <= 25) return 7;
+        return 7 + Math.floor((v - 25 + 1) / 2);
+    }
+
+    function custoCompraAtributo(val) {
+        const n = Number(val);
+        if (!Number.isFinite(n)) return null;
+        const v = Math.floor(n);
+        if (!Object.prototype.hasOwnProperty.call(CUSTO_COMPRA_ATRIBUTO, v)) return null;
+        return CUSTO_COMPRA_ATRIBUTO[v];
+    }
+
+    function atualizarLinhaCompraPontos() {
+        const el = q('f_pts_compra');
+        if (!el) return;
+        const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
+        const s = somaCustosCompraAtributos();
+        el.classList.remove('t20-compra-pontos-ok', 't20-compra-pontos-erro');
+        if (s === null) {
+            el.textContent =
+                'Compra por pontos (sem racial): — (valores-base fora de 8–18 na tabela do MB).';
+            if (tipo === 'jogador') el.classList.add('t20-compra-pontos-erro');
+            return;
+        }
+        el.textContent = `Compra por pontos (sem racial): ${s} / ${PONTOS_INICIAIS_COMPRA} pontos no máximo (MB).`;
+        if (tipo === 'jogador') {
+            if (s <= PONTOS_INICIAIS_COMPRA) el.classList.add('t20-compra-pontos-ok');
+            if (s > PONTOS_INICIAIS_COMPRA) el.classList.add('t20-compra-pontos-erro');
+        }
+        if (s > PONTOS_INICIAIS_COMPRA) {
+            el.textContent +=
+                ' Ultrapassou o orçamento: reduza os valores-base (final − ajuste racial) ou a raça.';
+        }
+    }
+
+    function formatModificadorAtributo(mod) {
+        if (!Number.isFinite(mod)) return '+0';
+        return (mod >= 0 ? '+' : '') + mod;
+    }
+
+    function aplicarFotoUrl(url) {
+        const raw = (url || '').trim();
+        const inp = q('f_foto_url');
+        const img = q('f_foto_preview');
+        const ph = q('f_foto_placeholder');
+        if (inp) inp.value = raw;
+        if (!img || !ph) return;
+        if (!raw) {
+            img.removeAttribute('src');
+            img.hidden = true;
+            ph.hidden = false;
+            return;
+        }
+        img.referrerPolicy = 'no-referrer';
+        img.src = raw;
+        img.hidden = false;
+        ph.hidden = true;
+        img.onerror = () => {
+            img.hidden = true;
+            ph.hidden = false;
+        };
+        img.onload = () => {
+            img.hidden = false;
+            ph.hidden = true;
+        };
+    }
+
+    function atualizarModsAtributos() {
+        ['for', 'des', 'con', 'int', 'sab', 'car'].forEach((a) => {
+            const el = q(`f_${a}`);
+            const m = q(`f_${a}_mod`);
+            if (el && m) m.textContent = formatModificadorAtributo(modificadorAtributoT20(el.value));
+        });
+        atualizarLinhaCompraPontos();
+        atualizarModsPericiasDasHabilidades();
+        atualizarSugestaoIdiomasMb();
+    }
+
+    function meioNivel() {
+        const n = Number(q('f_nivel')?.value || 0);
+        if (!Number.isFinite(n) || n < 0) return 0;
+        return Math.floor(n / 2);
+    }
+
+    function atualizarMeioNivelColuna() {
+        const v = meioNivel();
+        document.querySelectorAll('.t20-p-half').forEach((el) => {
+            el.textContent = String(v);
+        });
+    }
+
+    function splitClasseNivel(texto, nivelApi) {
+        const t = String(texto || '').trim();
+        const parts = t.split(/\s+/);
+        const last = parts[parts.length - 1];
+        if (/^\d+$/.test(last) && parts.length > 1) {
+            return { classe: parts.slice(0, -1).join(' '), nivel: last };
+        }
+        if (nivelApi != null && String(nivelApi) !== '') {
+            return { classe: t, nivel: String(nivelApi) };
+        }
+        return { classe: t, nivel: '' };
+    }
+
+    function montarAtaques() {
+        const tb = q('tblAtaquesBody');
+        const cols = ['nome', 'teste', 'dano', 'critico', 'tipo', 'alcance'];
+        tb.innerHTML = '';
+        for (let i = 0; i < 5; i++) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = cols
+                .map((c) => `<td><input class="atk-inp" data-atk="${i}" data-k="${c}" type="text" /></td>`)
+                .join('');
+            tb.appendChild(tr);
+        }
+    }
+
+    function montarEquip() {
+        const w = q('wrapEquip');
+        w.innerHTML = '';
+        for (let i = 0; i < 8; i++) {
+            const d = document.createElement('div');
+            d.className = 't20-ficha-field';
+            d.style.gridColumn = '1';
+            d.innerHTML = `<label>Item ${i + 1}</label><input class="eq-item" data-eq="${i}" type="text" />`;
+            const d2 = document.createElement('div');
+            d2.className = 't20-ficha-field';
+            d2.style.gridColumn = '2';
+            d2.innerHTML = `<label>Qtd</label><input class="eq-qtd" data-eq="${i}" type="text" />`;
+            w.appendChild(d);
+            w.appendChild(d2);
+        }
+    }
+
+    function escHtml(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function montarTabelaPericias() {
+        const tb = document.querySelector('#tblPericias tbody');
+        if (!PERICIAS_META.length) {
+            tb.innerHTML =
+                '<tr><td colspan="8" class="t20-hint">Não foi possível carregar a lista de perícias.</td></tr>';
+            return;
+        }
+        tb.innerHTML = PERICIAS_META.map((row, i) => {
+            const nome = row.nome || '—';
+            const dataAttr =
+                row.atributo && ['for', 'des', 'con', 'int', 'sab', 'car'].includes(row.atributo)
+                    ? ` data-per-attr="${row.atributo}"`
+                    : '';
+            const soTreinaRegra = row.somente_treinado === true;
+            const soTreinaChecked = soTreinaRegra ? ' checked' : '';
+            const penArmRegra = row.penalidade_armadura === true;
+            const penArmChecked = penArmRegra ? ' checked' : '';
+            const cellNome =
+                nome === '—'
+                    ? '<input class="nome-livre t20-input" placeholder="Outra" />'
+                    : `<span class="t20-p-nome">${escHtml(nome)}</span>`;
+            return `<tr data-per-idx="${i}"${dataAttr}>
+                <td><input type="checkbox" class="p-treinado" /></td>
+                <td>${cellNome}</td>
+                <td><input type="number" class="p-total t20-input" value="0" /></td>
+                <td><span class="t20-p-half">0</span></td>
+                <td><input type="number" class="p-mod t20-input" value="0" /></td>
+                <td><input type="number" class="p-out t20-input" value="0" /></td>
+                <td><input type="checkbox" class="p-so-treina" title="Somente treinado (regra base; pode desmarcar se a mesa permitir)"${soTreinaChecked} /></td>
+                <td><input type="checkbox" class="p-pen-arm" title="Penalidade de armadura (regra base; ajuste manual no Total se usar armadura)"${penArmChecked} /></td>
+            </tr>`;
+        }).join('');
+    }
+
+    function atualizarModsPericiasDasHabilidades() {
+        document.querySelectorAll('#tblPericias tbody tr').forEach((tr) => {
+            const attr = tr.getAttribute('data-per-attr');
+            if (!attr) return;
+            const inpAb = q(`f_${attr}`);
+            const modInp = tr.querySelector('.p-mod');
+            if (inpAb && modInp) {
+                modInp.value = String(modificadorAtributoT20(inpAb.value));
+            }
+        });
+    }
+
+    function coletarPericias() {
+        const rows = document.querySelectorAll('#tblPericias tbody tr');
+        const out = [];
+        rows.forEach((tr, i) => {
+            const livre = tr.querySelector('.nome-livre');
+            const metaNome = (PERICIAS_META[i] && PERICIAS_META[i].nome) || '';
+            const spanNome = tr.querySelector('.t20-p-nome');
+            let nome = livre ? (livre.value || '').trim() : '';
+            if (!nome && spanNome) nome = spanNome.textContent.trim();
+            if (!nome) nome = metaNome;
+            if (!nome && metaNome === '—') return;
+            if (!nome) nome = metaNome;
+            const treinado = Boolean(tr.querySelector('.p-treinado')?.checked);
+            const total = Number(tr.querySelector('.p-total')?.value || 0) || 0;
+            const modAt = Number(tr.querySelector('.p-mod')?.value || 0) || 0;
+            const outros = Number(tr.querySelector('.p-out')?.value || 0) || 0;
+            const soTreina = Boolean(tr.querySelector('.p-so-treina')?.checked);
+            const penArm = Boolean(tr.querySelector('.p-pen-arm')?.checked);
+            out.push({
+                nome,
+                treinado,
+                total,
+                mod_atributo: modAt,
+                outros,
+                somente_treinado: soTreina,
+                penalidade_armadura: penArm,
+                graduacao: total,
+            });
+        });
+        return out;
+    }
+
+    function preencherPericias(lista) {
+        const arr = Array.isArray(lista) ? lista : [];
+        const rows = document.querySelectorAll('#tblPericias tbody tr');
+        rows.forEach((tr, i) => {
+            const p = arr[i];
+            if (!p) return;
+            const livre = tr.querySelector('.nome-livre');
+            if (livre && p.nome) livre.value = p.nome;
+            const tre = tr.querySelector('.p-treinado');
+            if (tre) tre.checked = Boolean(p.treinado);
+            const tot = tr.querySelector('.p-total');
+            if (tot) tot.value = String(p.total != null ? p.total : p.graduacao ?? 0);
+            const mod = tr.querySelector('.p-mod');
+            if (mod) mod.value = String(p.mod_atributo ?? 0);
+            const ou = tr.querySelector('.p-out');
+            if (ou) ou.value = String(p.outros ?? 0);
+            const st = tr.querySelector('.p-so-treina');
+            if (st) {
+                const meta = PERICIAS_META[i];
+                const padraoRegra = meta && meta.somente_treinado === true;
+                const saved = p.somente_treinado;
+                st.checked =
+                    saved !== undefined && saved !== null
+                        ? Boolean(saved)
+                        : padraoRegra;
+            }
+            const pa = tr.querySelector('.p-pen-arm');
+            if (pa) {
+                const meta = PERICIAS_META[i];
+                const padraoArm = meta && meta.penalidade_armadura === true;
+                const savedArm = p.penalidade_armadura;
+                pa.checked =
+                    savedArm !== undefined && savedArm !== null
+                        ? Boolean(savedArm)
+                        : padraoArm;
+            }
+        });
+    }
+
+    function coletarAtaques() {
+        const out = [];
+        for (let i = 0; i < 5; i++) {
+            const row = {};
+            ['nome', 'teste', 'dano', 'critico', 'tipo', 'alcance'].forEach((k) => {
+                const inp = document.querySelector(`.atk-inp[data-atk="${i}"][data-k="${k}"]`);
+                row[k] = inp ? inp.value : '';
+            });
+            out.push(row);
+        }
+        return out;
+    }
+
+    function preencherAtaques(arr) {
+        const a = Array.isArray(arr) ? arr : [];
+        for (let i = 0; i < 5; i++) {
+            const o = a[i] || {};
+            ['nome', 'teste', 'dano', 'critico', 'tipo', 'alcance'].forEach((k) => {
+                const inp = document.querySelector(`.atk-inp[data-atk="${i}"][data-k="${k}"]`);
+                if (inp) inp.value = o[k] != null ? String(o[k]) : '';
+            });
+        }
+    }
+
+    function coletarEquip() {
+        const out = [];
+        for (let i = 0; i < 8; i++) {
+            const it = document.querySelector(`.eq-item[data-eq="${i}"]`);
+            const qt = document.querySelector(`.eq-qtd[data-eq="${i}"]`);
+            out.push({ item: it ? it.value : '', qtd: qt ? qt.value : '' });
+        }
+        return out;
+    }
+
+    function preencherEquip(arr) {
+        const a = Array.isArray(arr) ? arr : [];
+        for (let i = 0; i < 8; i++) {
+            const o = a[i] || {};
+            const it = document.querySelector(`.eq-item[data-eq="${i}"]`);
+            const qt = document.querySelector(`.eq-qtd[data-eq="${i}"]`);
+            if (it) it.value = o.item || '';
+            if (qt) qt.value = o.qtd != null ? String(o.qtd) : '';
+        }
+    }
+
+    function extrairFichaJson() {
+        return {
+            origem: q('f_origem').value || '',
+            raca_tormenta_slug: (q('f_raca_select') && q('f_raca_select').value) || null,
+            raca_tormenta_mais2a: (q('f_raca_mais2a') && q('f_raca_mais2a').value) || null,
+            raca_tormenta_mais2b: (q('f_raca_mais2b') && q('f_raca_mais2b').value) || null,
+            raca_tormenta_mais1: (q('f_raca_mais1') && q('f_raca_mais1').value) || null,
+            raca_tormenta_livre: (q('f_raca_livre') && q('f_raca_livre').value.trim()) || '',
+            tormenta_classe_mb_slug: (q('f_classe_mb') && q('f_classe_mb').value) || null,
+            atributos_compra: atributosCompraAtuais(),
+            pericias: coletarPericias(),
+            ataques: coletarAtaques(),
+            equipamentos: coletarEquip(),
+            defesa_detalhe: {
+                mod_des: Number(q('f_def_moddes').value || 0) || 0,
+                armadura: Number(q('f_def_arm').value || 0) || 0,
+                escudo: Number(q('f_def_esc').value || 0) || 0,
+                outros: Number(q('f_def_out').value || 0) || 0,
+                pen_armadura: Number(q('f_def_pen').value || 0) || 0,
+            },
+            armadura_escudo_tabela: {
+                armadura: { defesa: q('arm_def').value, penalidade: q('arm_pen').value },
+                escudo: { defesa: q('esc_def').value, penalidade: q('esc_pen').value },
+            },
+            talentos_texto: q('f_talentos').value,
+            magias_texto: q('f_magias').value,
+            raca_origem_texto: q('f_raca_origem_txt').value,
+            equipamento_texto_legacy: '',
+            dinheiro: { ts: q('f_ts').value, tp: q('f_tp').value, to: q('f_to').value },
+            carga: { limite: q('f_carga_lim').value, usada: q('f_carga_usada').value },
+            idiomas: q('f_idiomas').value,
+            campanha: q('f_campanha').value,
+            mestre: q('f_mestre').value,
+            outros_jogadores: q('f_outros_j').value,
+            xp_atual: q('f_xp').value,
+            xp_proximo: q('f_xpprox').value,
+            historia: q('f_historia').value,
+            personalidade: q('f_pers').value,
+            aparencia: q('f_apar').value,
+            notas: q('f_notas').value,
+        };
+    }
+
+    function aplicarFichaJson(j) {
+        if (!j || typeof j !== 'object') return;
+        aplicarRacaCamposDoJson(j);
+        const mbSel = q('f_classe_mb');
+        if (mbSel && j.tormenta_classe_mb_slug != null && String(j.tormenta_classe_mb_slug).trim()) {
+            const cs = String(j.tormenta_classe_mb_slug).trim();
+            mbSel.value = CLASSES_MB.some((x) => x.slug === cs) ? cs : mbSel.value;
+        }
+        q('f_origem').value = j.origem || '';
+        q('f_talentos').value = j.talentos_texto || '';
+        q('f_magias').value = j.magias_texto || '';
+        q('f_raca_origem_txt').value = j.raca_origem_texto || '';
+        const d = j.dinheiro || {};
+        q('f_ts').value = d.ts ?? '';
+        q('f_tp').value = d.tp ?? '';
+        q('f_to').value = d.to ?? '';
+        const cg = j.carga || {};
+        q('f_carga_lim').value = cg.limite ?? '';
+        q('f_carga_usada').value = cg.usada ?? '';
+        q('f_idiomas').value = j.idiomas || '';
+        q('f_campanha').value = j.campanha || '';
+        q('f_mestre').value = j.mestre || '';
+        q('f_outros_j').value = j.outros_jogadores || '';
+        q('f_xp').value = j.xp_atual != null ? String(j.xp_atual) : '';
+        q('f_xpprox').value = j.xp_proximo != null ? String(j.xp_proximo) : '';
+        q('f_historia').value = j.historia || '';
+        q('f_pers').value = j.personalidade || '';
+        q('f_apar').value = j.aparencia || '';
+        q('f_notas').value = j.notas || '';
+        preencherPericias(j.pericias);
+        preencherAtaques(j.ataques);
+        preencherEquip(j.equipamentos);
+        const def = j.defesa_detalhe || {};
+        q('f_def_moddes').value = def.mod_des != null ? String(def.mod_des) : '';
+        q('f_def_arm').value = def.armadura != null ? String(def.armadura) : '';
+        q('f_def_esc').value = def.escudo != null ? String(def.escudo) : '';
+        q('f_def_out').value = def.outros != null ? String(def.outros) : '';
+        q('f_def_pen').value = def.pen_armadura != null ? String(def.pen_armadura) : '';
+        const ae = j.armadura_escudo_tabela || {};
+        if (ae.armadura) {
+            q('arm_def').value = ae.armadura.defesa || '';
+            q('arm_pen').value = ae.armadura.penalidade || '';
+        }
+        if (ae.escudo) {
+            q('esc_def').value = ae.escudo.defesa || '';
+            q('esc_pen').value = ae.escudo.penalidade || '';
+        }
+        if (j.equipamento_texto_legacy && !j.equipamentos) {
+            /* legado: textarea única */
+        }
+    }
+
+    function classeNivelMerged() {
+        const c = (q('f_classe_só').value || '').trim();
+        const n = (q('f_nivel').value || '').trim();
+        if (c && n) return `${c} ${n}`.trim();
+        return c || n || '';
+    }
+
+    function payloadBase() {
+        syncCampoRacaNomeParaApi();
+        return {
+            nome: q('f_nome').value.trim(),
+            tipo: q('f_tipo').value,
+            jogador_nome: q('f_jogador').value.trim() || null,
+            raca: q('f_raca').value || null,
+            classe_nivel: classeNivelMerged() || null,
+            sexo: q('f_sexo').value || null,
+            idade: q('f_idade').value || null,
+            tendencia: q('f_tendencia').value || null,
+            divindade: q('f_divindade').value || null,
+            for_valor: valorFinalAtributoCampo('for'),
+            des_valor: valorFinalAtributoCampo('des'),
+            con_valor: valorFinalAtributoCampo('con'),
+            int_valor: valorFinalAtributoCampo('int'),
+            sab_valor: valorFinalAtributoCampo('sab'),
+            car_valor: valorFinalAtributoCampo('car'),
+            pv_max: Number(q('f_pv_max').value || 1),
+            pv_atual: Number(q('f_pv_atual').value || 1),
+            pa_max: Number(q('f_pm_max').value || 0),
+            pa_atual: Number(q('f_pm_atual').value || 0),
+            ca: Number(q('f_ca').value || 10),
+            rd: q('f_rd').value || '',
+            nivel: Number(q('f_nivel').value || 1),
+            iniciativa: Number(q('f_ini').value || 0),
+            deslocamento: q('f_desl').value || '',
+            tamanho: q('f_tam').value || '',
+            fort_total: Number(q('f_fort').value || 0),
+            ref_total: Number(q('f_ref').value || 0),
+            von_total: Number(q('f_von').value || 0),
+            ficha_json: extrairFichaJson(),
+            foto_url: (q('f_foto_url').value || '').trim() || null,
+        };
+    }
+
+    function preencherForm(p) {
+        q('fichaId').value = String(p.id);
+        q('f_nome').value = p.nome || '';
+        q('f_tipo').value = p.tipo || 'jogador';
+        q('f_tipo').disabled = !isMestre;
+        document.getElementById('wrapTipo').classList.toggle('is-mestre', isMestre);
+        q('f_jogador').value = AuthService.getNome();
+        q('f_raca').value = p.raca || '';
+        const sp = splitClasseNivel(p.classe_nivel, p.nivel);
+        q('f_classe_só').value = sp.classe;
+        q('f_nivel').value = sp.nivel !== '' ? sp.nivel : String(p.nivel ?? '');
+        q('f_sexo').value = p.sexo || '';
+        q('f_idade').value = p.idade || '';
+        q('f_tendencia').value = p.tendencia || '';
+        q('f_divindade').value = p.divindade || '';
+        q('f_for').value = p.for_valor;
+        q('f_des').value = p.des_valor;
+        q('f_con').value = p.con_valor;
+        q('f_int').value = p.int_valor;
+        q('f_sab').value = p.sab_valor;
+        q('f_car').value = p.car_valor;
+        atualizarModsAtributos();
+        q('f_pv_max').value = p.pv_max;
+        q('f_pv_atual').value = p.pv_atual;
+        q('f_pm_max').value = p.pa_max;
+        q('f_pm_atual').value = p.pa_atual;
+        q('f_ca').value = p.ca;
+        q('f_rd').value = p.rd || '';
+        q('f_ini').value = p.iniciativa;
+        q('f_desl').value = p.deslocamento || '';
+        q('f_tam').value = p.tamanho || '';
+        q('f_fort').value = p.fort_total;
+        q('f_ref').value = p.ref_total;
+        q('f_von').value = p.von_total;
+        aplicarFotoUrl(p.foto_url || '');
+        const fj = p.ficha_json || {};
+        q('f_origem').value = fj.origem || '';
+        aplicarFichaJson(fj);
+        sincronizarRacaSelectApartirDoNomeApi(p);
+        const slugSalvo =
+            fj.tormenta_classe_mb_slug != null ? String(fj.tormenta_classe_mb_slug).trim() : '';
+        if (!slugSalvo || !CLASSES_MB.some((x) => x.slug === slugSalvo)) {
+            sincronizarClasseMbApartirDoTexto();
+        }
+        atualizarResumoClasseMb();
+        atualizarMeioNivelColuna();
+        atualizarModsPericiasDasHabilidades();
+    }
+
+    function sincronizarRacaSelectApartirDoNomeApi(p) {
+        const fj = p.ficha_json || {};
+        if (fj.raca_tormenta_slug != null && String(fj.raca_tormenta_slug)) return;
+        const nome = (p.raca || '').trim();
+        if (!nome) return;
+        const m = RACAS_MB.find((r) => r.nome === nome);
+        if (m && q('f_raca_select')) {
+            q('f_raca_select').value = m.slug;
+            onRacaChange(false);
+        } else if (q('f_raca_select')) {
+            q('f_raca_select').value = '__livre__';
+            const w = q('wrapRacaLivre');
+            if (w) w.style.display = '';
+            if (q('f_raca_livre')) q('f_raca_livre').value = nome;
+            onRacaChange(false);
+        }
+    }
+
+    async function init() {
+        try {
+            aplicarRegrasPayload(await carregarRegrasTormenta());
+        } catch (e) {
+            console.warn(e);
+            Toast.error((e && e.message) || 'Erro ao carregar regras Tormenta.');
+            PERICIAS_META = [];
+        }
+
+        try {
+            const pack = await carregarRacasTormenta();
+            RACAS_MB = pack.racas;
+            IDIOMAS_MB_GERAL = pack.idiomas_geral_mb;
+            IDIOMAS_MB_TABELA = pack.idiomas_tabela_mb;
+        } catch (e2) {
+            console.warn(e2);
+            RACAS_MB = [];
+            IDIOMAS_MB_GERAL = '';
+            IDIOMAS_MB_TABELA = [];
+        }
+        try {
+            const cpack = await carregarClassesTormenta();
+            CLASSES_MB = cpack.classes;
+            BENEFICIOS_NIVEL_MB = cpack.beneficios_por_nivel;
+        } catch (e3) {
+            console.warn(e3);
+            CLASSES_MB = [];
+            BENEFICIOS_NIVEL_MB = [];
+        }
+        popularSelectClassesMb();
+        bindClasseMbOnce();
+        popularSelectRacas();
+        bindRacaUiOnce();
+        atualizarTracosRacaPainel();
+        renderPainelIdiomasMbReferencia();
+        atualizarSugestaoIdiomasMb();
+        atualizarResumoClasseMb();
+        montarAtaques();
+        montarEquip();
+        montarTabelaPericias();
+        q('f_jogador').value = AuthService.getNome();
+
+        ['for', 'des', 'con', 'int', 'sab', 'car'].forEach((a) => {
+            q(`f_${a}`).addEventListener('input', atualizarModsAtributos);
+        });
+        const ft = q('f_tipo');
+        if (ft) ft.addEventListener('change', atualizarLinhaCompraPontos);
+
+        const fotoInp = q('f_foto_url');
+        if (fotoInp) {
+            fotoInp.addEventListener('change', () => aplicarFotoUrl(fotoInp.value));
+            fotoInp.addEventListener('blur', () => aplicarFotoUrl(fotoInp.value));
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (id) {
+            try {
+                const p = await svc.obter(id);
+                preencherForm(p);
+                q('f_status').textContent = `Editando #${id}`;
+            } catch (e) {
+                Toast.error(e.message || 'Erro ao carregar');
+            }
+        } else {
+            q('f_status').textContent = 'Nova ficha';
+            aplicarFotoUrl('');
+            if (!isMestre) {
+                q('f_tipo').value = 'jogador';
+                q('f_tipo').disabled = true;
+            }
+            atualizarModsAtributos();
+            atualizarMeioNivelColuna();
+        }
+        const wrap = q('wrapTipo');
+        if (wrap) wrap.classList.toggle('is-mestre', isMestre);
+
+        q('btnSalvar').addEventListener('click', async () => {
+            const nome = q('f_nome').value.trim();
+            if (!nome) {
+                Toast.error('Informe o nome do personagem.');
+                return;
+            }
+            const comp = validarCompraPontosJogador();
+            if (!comp.ok) {
+                Toast.error(comp.msg);
+                return;
+            }
+            const vr = validarEscolhasRacaMb();
+            if (!vr.ok) {
+                Toast.error(vr.msg);
+                return;
+            }
+            const body = payloadBase();
+            const fid = q('fichaId').value;
+            try {
+                if (fid) {
+                    await svc.atualizar(fid, body);
+                    Toast.success('Ficha salva.');
+                } else {
+                    const criado = await svc.criar(body);
+                    q('fichaId').value = String(criado.id);
+                    history.replaceState(null, '', `ficha-personagem.html?id=${criado.id}`);
+                    q('f_status').textContent = `Editando #${criado.id}`;
+                    Toast.success('Ficha criada.');
+                }
+            } catch (e) {
+                Toast.error(e.message || 'Erro ao salvar');
+            }
+        });
+    }
+
+    q('btnLogout').addEventListener('click', () => AuthService.logout && AuthService.logout());
+    q('btnTrocarJogo').addEventListener('click', () => AuthService.trocarJogo && AuthService.trocarJogo());
+    init();
+})();
+</script>
+</body>
+</html>

@@ -30,6 +30,13 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 	- minimizar breaking changes e manter compatibilidade quando possivel.
 - Ao concluir mudancas em fluxos sensiveis, validar impacto e registrar risco residual quando nao houver cobertura automatizada suficiente.
 
+## Especificacao minima (SDD leve)
+
+Contrato enxuto entre requisito, codigo e revisao — **sem** processo pesado de documentacao.
+
+- Guia completo: [docs/fluxo-spec-driven-leve.md](docs/fluxo-spec-driven-leve.md).
+- Resumo: **nova rota** = schemas Pydantic + pelo menos **um teste** + criterios de aceite no PR/issue; **frontend** = `getApiUrl()`, payload alinhado ao backend, `?v=` quando mudar JS/CSS; **regras de jogo** = prompt/agente de levantamento RPG ou atualizacao da skill/doc canonica; **decisao estrutural** = ADR curto em `docs/adr/` quando for dificil reverter.
+
 ## Infra de producao
 
 - **Frontend:** Vercel (estatico, CDN global) — dominio `arena-de-combate-rpg.com.br` via Cloudflare
@@ -62,6 +69,7 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 - Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pos-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
 - Contratos de repositorio para servicos (`typing.Protocol`, pacotes `ports` no backend): [docs/ports-repositorios-servicos.md](docs/ports-repositorios-servicos.md).
 - GURPS 4E (ficha + arena, Lite primeiro): skill [.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md](.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md) e checklist em [melhoria-arquitetura](melhoria-arquitetura) (secao 7).
+- Tormenta 20 — levantamento de requisitos, inventário de tabelas e roadmap de catálogos: [docs/tormenta/README.md](docs/tormenta/README.md).
 - Admin em dev: `ADMIN_EMAIL` + `ADMIN_PASSWORD` em `backend/.env` (exemplo em `backend/.env.example`); `criar_admin_padrao` no startup so cria se ambos estiverem definidos — ver secao de credenciais no [README.md](README.md).
 
 ## Orquestracao de agentes (definicoes)

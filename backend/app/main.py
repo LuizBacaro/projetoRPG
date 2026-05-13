@@ -76,6 +76,8 @@ from .games.gurps.api.v1 import rolagens as gurps_rolagens
 from .games.gurps.models import campanha as gurps_campanha_model
 from .games.gurps.models import combate as gurps_combate_model
 from .games.gurps.models import personagem as gurps_personagem_model
+from .games.tormenta.api.v1 import personagens as tormenta_personagens
+from .games.tormenta.api.v1 import regras as tormenta_regras
 from .shared.api.v1 import auth, games, usuarios
 from .shared.core.config import settings
 from .shared.core.database import Base, SessionLocal, engine, get_db
@@ -409,6 +411,7 @@ else:
 BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = BASE_DIR.parent / "frontend"
 DND35_FRONTEND_DIR = FRONTEND_DIR / "games" / "dnd35"
+TORMENTA_FRONTEND_DIR = FRONTEND_DIR / "games" / "tormenta"
 UPLOADS_DIR = settings.UPLOADS_DIR
 
 # ── Static Files ─────────────────────────────────────────────────────────────
@@ -423,7 +426,7 @@ if FRONTEND_DIR.exists():
     else:
         logger.warning("⚠️  Pasta D&D 3.5 ausente: %s", DND35_FRONTEND_DIR)
     # Cascas "em breve" dos outros jogos (seletor → /games/<slug>/em-breve.html)
-    for _slug in ("gurps", "dnd5e"):
+    for _slug in ("gurps", "dnd5e", "tormenta"):
         _game_dir = FRONTEND_DIR / "games" / _slug
         if _game_dir.is_dir():
             app.mount(
@@ -478,6 +481,8 @@ app.include_router(gurps_personagens.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_combate.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_rolagens.router, prefix=settings.API_V1_PREFIX)
+app.include_router(tormenta_personagens.router, prefix=settings.API_V1_PREFIX)
+app.include_router(tormenta_regras.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 
@@ -521,6 +526,15 @@ async def favicon():
 async def pericias_page():
     """Tela de perícias do personagem."""
     return FileResponse(str(DND35_FRONTEND_DIR / "pages" / "pericias.html"))
+
+
+@app.get("/tormenta/dashboard", include_in_schema=False)
+async def tormenta_dashboard():
+    """Dashboard Tormenta (fichas) — atalho alinhado ao D&D /games/... ."""
+    path = TORMENTA_FRONTEND_DIR / "pages" / "dashboard.html"
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Frontend Tormenta não encontrado")
+    return FileResponse(str(path))
 
 
 # ── Health Check ─────────────────────────────────────────────────────────────

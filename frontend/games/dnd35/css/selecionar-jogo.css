@@ -338,9 +338,12 @@ body {
 
 /* ── Hub visual (logos + órbita) ─────────────────────────────────────────── */
 /*
- * Cor do fundo na viewport (bordas da janela): login.css → body { background: #0f0f23 }
- *   Hex: #0f0f23  |  RGB: rgb(15, 15, 35)  |  HSL: hsl(240, 40%, 10%)
- * Exportar arte com este tom (ou transparência real) evita “caixa” no logo central.
+ * Fundo da plataforma no seletor (deve casar com login.css → body):
+ *   HEX:  #0f0f23
+ *   RGB:  rgb(15, 15, 35)
+ *   HSL:  hsl(240, 40%, 10%)
+ * Na arte exportada (PNG/WebP), use este tom como fundo circular exterior
+ * OU transparência real — evita “caixa” / anel cinzento à volta do logo.
  */
 
 @keyframes hub-central-float {
@@ -383,6 +386,8 @@ body {
 }
 
 .hub-principal {
+    --arena-hub-fundo: #0f0f23;
+    --arena-hub-fundo-rgb: 15, 15, 35;
     margin: 0.5rem 0 2rem;
     text-align: center;
 }
@@ -580,6 +585,38 @@ body {
     height: min(34vw, 148px);
 }
 
+/*
+ * Tormenta (logo /assets/brand/logo_tormenta-v5.png): fundir borda do PNG com o fundo #0f0f23
+ * (--arena-hub-fundo no .hub-principal). Botão = círculo opaco da mesma cor + img ligeiramente
+ * reduzida — o “anel” visível é o próprio fundo.
+ */
+.hub-satellite--tormenta {
+    background: var(--arena-hub-fundo, #0f0f23);
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow:
+        0 0 0 2px var(--arena-hub-fundo, #0f0f23),
+        0 0 32px 20px rgba(var(--arena-hub-fundo-rgb, 15, 15, 35), 0.38);
+}
+
+.hub-satellite--tormenta img.hub-img-tormenta {
+    border-radius: 50%;
+    object-fit: cover;
+    aspect-ratio: 1;
+    width: min(34vw, 148px);
+    height: min(34vw, 148px);
+    display: block;
+    transform: scale(0.955);
+    transform-origin: center center;
+    box-shadow: none;
+}
+
+.hub-satellite--tormenta:hover:not(:disabled) img.hub-img-tormenta,
+.hub-satellite--tormenta:focus-visible:not(:disabled) img.hub-img-tormenta {
+    /* ~0.955 × 1.42 (hover dos outros satélites) */
+    transform: scale(1.356);
+}
+
 .hub-satellite:not(:disabled) img {
     animation: hub-satellite-pulse 4s ease-in-out infinite;
 }
@@ -590,6 +627,10 @@ body {
 
 .hub-orbit-slot:nth-child(3) .hub-satellite:not(:disabled) img {
     animation-delay: 1.1s;
+}
+
+.hub-orbit-slot:nth-child(4) .hub-satellite:not(:disabled) img {
+    animation-delay: 1.6s;
 }
 
 .hub-satellite:hover:not(:disabled) img,
@@ -652,7 +693,8 @@ body {
     }
 
     .hub-satellite img,
-    .hub-satellite--dnd5e img.hub-img-dd5 {
+    .hub-satellite--dnd5e img.hub-img-dd5,
+    .hub-satellite--tormenta img.hub-img-tormenta {
         width: min(24vw, 172px);
         height: min(24vw, 172px);
     }

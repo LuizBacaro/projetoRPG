@@ -6,7 +6,7 @@
     <title>Escolha o jogo — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/dnd35/css/login.css" />
-    <link rel="stylesheet" href="/games/dnd35/css/selecionar-jogo.css?v=20260428c" />
+    <link rel="stylesheet" href="/games/dnd35/css/selecionar-jogo.css?v=20260613c" />
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
 </head>
 <body>
@@ -76,7 +76,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="hub-orbit-slot" style="--slot-angle: 30deg;">
+                        <div class="hub-orbit-slot" style="--slot-angle: 0deg;">
                             <div class="hub-orbit-counter">
                                 <div class="hub-satellite-cluster">
                                     <button type="button" id="btnHubDnd5e" class="hub-satellite hub-satellite--dnd5e" disabled
@@ -98,7 +98,26 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="hub-orbit-slot" style="--slot-angle: 150deg;">
+                        <div class="hub-orbit-slot" style="--slot-angle: 90deg;">
+                            <div class="hub-orbit-counter">
+                                <div class="hub-satellite-cluster">
+                                    <button type="button" id="btnHubTormenta" class="hub-satellite hub-satellite--tormenta" disabled
+                                            title="Tormenta RPG" aria-label="Abrir Tormenta RPG">
+                                        <img
+                                            src="/assets/brand/logo_tormenta-v5.png"
+                                            alt=""
+                                            width="160"
+                                            height="160"
+                                            decoding="async"
+                                            fetchpriority="low"
+                                            class="hub-img-tormenta"
+                                        />
+                                    </button>
+                                    <span class="hub-satellite-label">Tormenta</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hub-orbit-slot" style="--slot-angle: 180deg;">
                             <div class="hub-orbit-counter">
                                 <div class="hub-satellite-cluster">
                                     <button type="button" id="btnHubGurps" class="hub-satellite hub-satellite--gurps" disabled
@@ -158,6 +177,7 @@
     const btnSair = document.getElementById('btnSair');
     const btnHubDnd35 = document.getElementById('btnHubDnd35');
     const btnHubDnd5e = document.getElementById('btnHubDnd5e');
+    const btnHubTormenta = document.getElementById('btnHubTormenta');
     const btnHubGurps = document.getElementById('btnHubGurps');
 
     let catalogoJogos = [];
@@ -318,8 +338,7 @@
     function destinoPorSlug(slug) {
         const s = normalizarSlugJogo(slug);
         if (s === 'dnd35') return '/dashboard';
-        if (s === 'gurps') return '/games/gurps/pages/dashboard.html';
-        return null;
+        if (s === 'tormenta') return '/games/tormenta/pages/dashboard.html';
     }
 
     /**
@@ -331,6 +350,7 @@
     function destinoEmBrevePorSlug(slug) {
         if (slug === 'gurps') return '/games/gurps/em-breve.html?from=seletor';
         if (slug === 'dnd5e') return '/games/dnd5e/em-breve.html?from=seletor';
+        if (slug === 'tormenta') return '/games/tormenta/em-breve.html?from=seletor';
         return null;
     }
 
@@ -347,6 +367,7 @@
             document.querySelector(`button[data-slug="${slug}"]`) ||
             (slug === 'dnd35' ? btnHubDnd35 : null) ||
             (slug === 'dnd5e' ? btnHubDnd5e : null) ||
+            (slug === 'tormenta' ? btnHubTormenta : null) ||
             (slug === 'gurps' ? btnHubGurps : null)
         );
     }
@@ -354,12 +375,17 @@
     function atualizarBotoesHub() {
         const j35 = jogoPorSlug('dnd35');
         const j5 = jogoPorSlug('dnd5e');
+        const jt = jogoPorSlug('tormenta');
         const g = jogoPorSlug('gurps');
         btnHubDnd35.disabled = !(j35 && j35.status === 'disponivel');
         btnHubDnd5e.disabled = !(
             j5 && (j5.status === 'disponivel' || j5.status === 'em_breve')
         );
         if (j5 && j5.status === 'manutencao') btnHubDnd5e.disabled = true;
+        btnHubTormenta.disabled = !(
+            jt && (jt.status === 'disponivel' || jt.status === 'em_breve')
+        );
+        if (jt && jt.status === 'manutencao') btnHubTormenta.disabled = true;
         btnHubGurps.disabled = !(
             g && (g.status === 'disponivel' || g.status === 'em_breve')
         );
@@ -622,6 +648,25 @@
             return;
         }
         exibirAviso('D&D 5e não está disponível no momento.');
+    });
+
+    btnHubTormenta.addEventListener('click', () => {
+        const j = jogoPorSlug('tormenta');
+        if (!j) {
+            exibirAviso('Tormenta não consta no catálogo.');
+            return;
+        }
+        if (j.status === 'disponivel') {
+            selecionarJogo('tormenta', btnHubTormenta);
+            return;
+        }
+        if (j.status === 'em_breve') {
+            const dest = destinoEmBrevePorSlug('tormenta');
+            if (dest) window.location.href = dest;
+            else exibirAviso('Página Tormenta em construção.');
+            return;
+        }
+        exibirAviso('Tormenta não está disponível no momento.');
     });
 
     btnHubGurps.addEventListener('click', () => {

@@ -19,6 +19,7 @@ Criticos deste projeto:
 - Nao hardcode URL de API no frontend.
 - Em alteracoes com schema, tratar migration incremental e compatibilidade SQLite/PostgreSQL.
 - Em alteracoes de frontend com controllers/services servidos por HTML, verificar cache-busting `?v=` quando aplicavel.
+- Seguir especificacao minima (SDD leve): [docs/fluxo-spec-driven-leve.md](../../docs/fluxo-spec-driven-leve.md) — criterios de aceite no PR/issue; nova rota com schemas + teste; regras de jogo com levantamento RPG ou doc/skill canonica; ADR curto apenas para decisoes dificeis de reverter.
 
 Solicitacao do usuario:
 

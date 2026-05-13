@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tormenta 20 — Fichas · Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
+</head>
+<body class="tormenta-app">
+<header class="tormenta-header">
+    <div>
+        <h1>Tormenta RPG</h1>
+        <p>Fichas do Módulo Básico (cadastro, edição e exclusão). Arena TTRPG.</p>
+    </div>
+    <div class="tormenta-header-actions">
+        <span id="nomeUsuario">…</span>
+        <span class="tormenta-badge-jogo">Tormenta</span>
+        <a class="tormenta-btn tormenta-btn--primary" href="ficha-personagem.html">+ Nova ficha</a>
+        <button type="button" class="tormenta-btn" id="btnTrocarJogo">Trocar jogo</button>
+        <button type="button" class="tormenta-btn" id="btnLogout">Sair</button>
+    </div>
+</header>
+<main class="tormenta-main">
+    <div class="tormenta-card">
+        <h2>Personagens</h2>
+        <div class="tormenta-toolbar">
+            <label><input type="checkbox" id="chkMeus" /> Só meus</label>
+        </div>
+        <div class="tormenta-table-wrap">
+            <table class="tormenta-table">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Nome</th>
+                        <th>Classe / nível</th>
+                        <th>PV</th>
+                        <th>CA</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tblPersonagens">
+                    <tr><td colspan="6" class="tormenta-cell-muted">Carregando…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<script src="/js/shared/render-api-origin-boot.js?v=2"></script>
+<script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
+<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/ui/Toast.js"></script>
+<script>
+    if (!AuthService.exigirJogo('tormenta')) {}
+</script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
+<script>
+(function () {
+    const svc = new TormentaPersonagemService();
+
+    function escapeHtml(s) {
+        return String(s ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function chipTipo(t) {
+        const x = String(t || '').toLowerCase();
+        const c =
+            x === 'monstro'
+                ? 'tormenta-chip-tipo--monstro'
+                : x === 'npc'
+                  ? 'tormenta-chip-tipo--npc'
+                  : 'tormenta-chip-tipo--jogador';
+        return `<span class="tormenta-chip-tipo ${c}">${escapeHtml(x || '—')}</span>`;
+    }
+
+    async function carregar() {
+        const tb = document.getElementById('tblPersonagens');
+        const meus = document.getElementById('chkMeus')?.checked;
+        tb.innerHTML = '<tr><td colspan="6" class="tormenta-cell-muted">Carregando…</td></tr>';
+        try {
+            const rows = await svc.listar({ meus, limit: 200 });
+            const arr = Array.isArray(rows) ? rows : [];
+            if (!arr.length) {
+                tb.innerHTML =
+                    '<tr><td colspan="6" class="tormenta-cell-muted">Nenhum personagem cadastrado.</td></tr>';
+                return;
+            }
+            tb.innerHTML = arr
+                .map(
+                    (p) => `
+                <tr>
+                    <td>${chipTipo(p.tipo)}</td>
+                    <td>${escapeHtml(p.nome)}</td>
+                    <td>${escapeHtml(p.classe_nivel || '—')}</td>
+                    <td>${escapeHtml(p.pv_atual)} / ${escapeHtml(p.pv_max)}</td>
+                    <td>${escapeHtml(p.ca)}</td>
+                    <td>
+                        <a class="tormenta-link" href="ficha-personagem.html?id=${p.id}">Editar</a>
+                        ·
+                        <button type="button" class="tormenta-link js-del" data-id="${p.id}" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;">Excluir</button>
+                    </td>
+                </tr>`
+                )
+                .join('');
+            tb.querySelectorAll('.js-del').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    const id = Number(btn.getAttribute('data-id'));
+                    if (!confirm('Excluir esta ficha permanentemente?')) return;
+                    try {
+                        await svc.excluir(id);
+                        Toast.success('Ficha excluída.');
+                        carregar();
+                    } catch (e) {
+                        Toast.error(e.message || 'Erro ao excluir');
+                    }
+                });
+            });
+        } catch (e) {
+            tb.innerHTML = `<tr><td colspan="6" class="tormenta-cell-muted">${escapeHtml(e.message || 'Erro')}</td></tr>`;
+        }
+    }
+
+    document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout && AuthService.logout());
+    document.getElementById('btnTrocarJogo').addEventListener('click', () => AuthService.trocarJogo && AuthService.trocarJogo());
+    document.getElementById('chkMeus')?.addEventListener('change', () => carregar());
+    const nu = document.getElementById('nomeUsuario');
+    if (nu) nu.textContent = AuthService.getNome();
+    carregar();
+})();
+</script>
+</body>
+</html>

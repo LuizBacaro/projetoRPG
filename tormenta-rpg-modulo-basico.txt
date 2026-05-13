@@ -1,0 +1,138 @@
+                           Bárbaro                                                                       Raças. Em Arton existem muitos povos humanos selvagens,
+                                                                                                    especialmente no reino da União Púrpura, e assim existem muitos
+                                Um selvagem que vaga pelas selvas. Um lutador brutal dos            bárbaros desta raça. Alguns anões e minotauros dedicam-se tanto ao
+                           desertos inclementes. Um caçador das montanhas geladas. Um               combate que descartam toda a cultura e civilização de seus povos,
+                           truculento brigão das ruas. O bárbaro pode ser qualquer um               também tornando-se bárbaros.
+                           deles, e muitos mais.
+                                                                                                         Os lefou abraçam a mentalidade caótica e destrutiva dos bár-
+                                 A vastidão territorial do Reinado nunca será totalmente            baros com naturalidade, e goblins de regiões não-civilizadas muitas
+                           civilizada. Metrópoles orgulhosas crescem aqui e ali, fazendas e         vezes adotam esta classe. Até mesmo os elfos, outrora altivos e ele-
+                           pastos cercam povoados, mas a maior parte do mundo permanece             gantes, estão revertendo à barbárie depois da queda de Lenórienn.
+                           inexplorada. Nessas terras selvagens e infestadas de feras, apenas       É raro encontrar um halﬂing ou qareen bárbaro.
+                           povos bárbaros sobrevivem — em aldeias, vilas ou grupos errantes.
+Capítulo 3: Classes
+
+
+
+
+                                O bárbaro é um mestre do combate, mas sem o treino, estudo
+                           ou reﬁnamento dos guerreiros da civilização. Membro de um povo
+                           primitivo ou ligado aos velhos costumes, o bárbaro conﬁa na própria
+                           força e resistência para vencer, sendo capaz de canalizar grande fúria
+                           para dizimar seus inimigos.
+                               Armado com machado ou lança, vestido em peles de animais
+                           ou coberto de tatuagens, o bárbaro é uma ﬁgura ameaçadora. Mas
+                           também é um companheiro ﬁel. Sua fúria invoca uma força sel-
+                           vagem, primitiva, que o assim chamado “homem civilizado” não
+                           consegue imitar.
+                                 Eles não sabem ler ou escrever, nem contar acima de cinco
+                           (os dedos de uma mão), e gargalham de quem julga essas coisas
+                           importantes. Mas nem todo bárbaro é rude ou ignorante: muitos
+                           podem ser nobres, orgulhosos e sábios, donos de certa beleza rústica
+                           e carisma animal. O bárbaro não conhece as sutilezas da civilização,
+                           mas tem a sabedoria primordial. Pode não fazer discursos ou entoar
+                           palavras doces, mas fala a língua do combate e do sangue.
+                                Aventuras. Para os bárbaros, aventurar-se é um modo de vida.
+                           Em seus povos, eles costumam ser os maiores lutadores ou caçadores.
+                           Muitos partem para conhecer o mundo em uma missão para suas
+                           tribos, ou num rito de passagem. Uma vez envolvidos em um grupo
+                           de aventureiros, os bárbaros aventuram-se para ajudar seus
+                           amigos. Caso decidam viver na civilização, existe muito
+                           pouco que possam fazer além de enfrentar perigos que
+                           amedrontam o povo comum.
+                                Tendência. Bárbaros podem ser Bondosos, Ma-
+                           lignos ou Neutros, mas nunca Leais. Seu espírito livre
+                           não se prende a regulamentos e artifícios da civilização.
+                                Religião. Bárbaros Bondosos ou Neutros costumam
+                           cultuar Allihanna ou Oceano (ambos na forma de um
+                           poderoso totem animal, como o Grande Urso ou o Rei-
+                           Tubarão). Bárbaros Malignos muitas vezes são devotos
+                           de Megalokk ou Ragnar.
+                                Histórico. Muitos dos povos bárbaros de Arton fo-
+                           ram dizimados pela “civilização”. Um membro desta classe
+                           pode ser um dos últimos sobreviventes de sua tribo, buscando
+                           vingança ou apenas manter seus ideais e cultura vivos.
+                                A fúria bárbara também pode surgir em um membro da
+                           sociedade civilizada, fazendo com que ele fuja para os ermos e se
+                           torne um bárbaro. Alguns são destrutivos e insanos demais até para
+                           seus povos brutais e, expulsos, ganham a vida como mercenários. A
+                           fúria animalesca de alguns bárbaros pode ser fruto de bênção (ou
+                           maldição) divina, gerando um forte vínculo com a divindade ou
+                           com um guia espiritual.
+
+
+
+
+                      46
+     Outras Classes. Bárbaros coexistem paciﬁcamente com rangers
+e druidas (sendo estes muitas vezes seus líderes espirituais). Têm
+mais diﬁculdade de convivência com magos e clérigos Leais. Quan-           Bárbaro
+do aprendem a respeitar e conﬁar na magia, encontram espíritos             Nível       BBA       Habilidades de Classe
+igualmente livres e caóticos nos feiticeiros.
+                                                                           1º           +1       Analfabetismo, fúria 1/dia,
+                                                                                                 movimento rápido
+Características de Classe                                                  2º           +2       Esquiva sobrenatural
+     Pontos de Vida: um bárbaro começa com 24 pontos de vida
+(+ modiﬁcador de Constituição) e ganha 6 PV (+ mod. Con) por               3º           +3       Instinto selvagem +1
+nível seguinte.                                                            4º           +4       Fúria 2/dia
+
+
+
+
+                                                                                                                                                     Capítulo 3: Classes
+     Perícias Treinadas: 4 + modiﬁcador de Inteligência.                   5º           +5       Esquiva sobrenatural aprimorada
+     Perícias de Classe: Adestrar Animais (Car), Atletismo (For),          6º           +6
+Cavalgar (Des), Iniciativa (Des), Intimidação (Car), Ofício (Int),
+                                                                           7º           +7       Redução de dano 1
+Percepção (Sab), Sobrevivência (Sab).
+                                                                           8º           +8       Fúria 3/dia
+   Talentos Adicionais: Usar Armaduras (leves e médias), Usar
+Armas (simples e marciais), Usar Escudos, Fortitude Maior.                 9º           +9       Instinto selvagem +2
+                                                                           10º         +10       Redução de dano 2
+Habilidades de Classe                                                      11º         +11       Fúria maior
+      Analfabetismo: graças aos esforços da Igreja de Tanna-Toh,           12º         +12       Fúria 4/dia
+cujos clérigos atuam como professores e educadores, a maior parte
+dos habitantes de Arton é alfabetizada — mas bárbaros são originá-
+                                                                           13º         +13       Redução de dano 3
+rios de povos que não têm acesso a esse tipo de educação, ou então a       14º         +14       Vontade inabalável
+rejeitam. Membros desta classe não sabem ler e escrever. No entanto,       15º         +15       Instinto selvagem +3
+podem aprender caso adquiram um nível em qualquer outra classe.
+                                                                           16º         +16       Fúria 5/dia, redução de dano 4
+    Fúria: você pode invocar uma fúria selvagem, tornando-se
+temível em combate por um curto período de tempo.                          17º         +17       Fúria incansável
+     Quando você usa esta habilidade, recebe +2 nas jogadas de             18º         +18
+ataque e dano corpo-a-corpo, e redução de dano 1, mas sofre uma            19º         +19       Redução de dano 5
+penalidade de –2 na classe de armadura. Além disso, não pode               20º         +20       Fúria 6/dia, fúria poderosa
+executar nenhuma ação que exige paciência ou concentração (como
+usar a perícia Furtividade ou lançar magias).
+      Usar esta habilidade é uma ação livre. A fúria dura um número          Redução de Dano: a partir do 7º nível, graças a seu extremo
+de rodadas igual a 5 + seu modiﬁcador de Constituição (mas você         vigor e força de vontade, o bárbaro ignora parte de seus ferimentos.
+pode terminá-la antes, se quiser). Quando a fúria termina, você ﬁca     Você recebe redução de dano 1 (todo o dano de ataques físicos
+fatigado (Força –2, Destreza –2 e não pode correr ou fazer investida)   que sofre é reduzido em 1). A cada três níveis seguintes, sua RD
+durante um minuto.                                                      aumenta em 1.
+     Um bárbaro só pode entrar em fúria uma vez por encontro.                Esta redução de dano é cumulativa com quaisquer outras,
+No 1º nível ele pode usar sua fúria uma vez por dia. No 4o nível,       incuindo aquela que você recebe durante a fúria (por exemplo, um
+e a cada 4 níveis seguintes, recebe uma utilização diária adicional     bárbaro de 10º nível em fúria tem redução de dano 3).
+(máximo 6 vezes por dia no 20º nível).
+                                                                             Fúria Maior: no 11º nível, o bônus fornecido pela fúria nas
+     Movimento Rápido: seu deslocamento aumenta em +3m.                 jogadas de ataque e dano corpo-a-corpo aumenta para +3, e a re-
+    Esquiva Sobrenatural: no 2º nível, seus instintos ﬁcam tão          dução de dano aumenta para 3.
+apurados que você consegue reagir ao perigo antes que seus senti-            Vontade Inabalável: a partir do 14º nível, você recebe +4 em
+dos percebam. Você nunca ﬁca desprevenido (veja “Surpresa” no           testes de Vontade quando em fúria.
+Capítulo 8: Combate).
+                                                                             Fúria Incansável: a partir do 17º nível, você não ﬁca mais
+     Caso já tenha recebido esquiva sobrenatural de outra classe,       fatigado quando sua fúria termina.
+você recebe esquiva sobrenatural aprimorada.
+                                                                             Fúria Poderosa: no 20º nível, o bônus fornecido pela fúria
+     Instinto Selvagem: no 3º nível, você recebe +1 em testes           nas jogadas de ataque e dano corpo-a-corpo aumenta para +4, e a
+de Iniciativa e Reﬂexos. A cada seis níveis seguintes, esse bônus       redução de dano aumenta para 5.
+aumenta em +1.
+                                                                              Ex-Bárbaros: um bárbaro que adota tendência Leal perde sua
+    Esquiva Sobrenatural Aprimorada: a partir do 5º nível, você         habilidade de entrar em fúria e não pode mais ganhar níveis nesta
+consegue lutar contra diversos inimigos como se fossem apenas um.       classe. Ele mantém outras habilidades de bárbaro já obtidas (redução
+Você não pode ser ﬂanqueado.                                            de dano, movimento rápido, instinto selvagem e esquiva sobrenatural).
+
+
+
+                                                                                                                                                47
+

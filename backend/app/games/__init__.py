@@ -8,7 +8,8 @@ api/v1 e core específico.
 Convenção de slugs (deve casar com `games_catalog.slug`):
   - dnd35  → Dungeons & Dragons 3.5 (já em produção)
   - dnd5e  → Dungeons & Dragons 5e (em breve)
-  - gurps  → GURPS (em breve)
+  - tormenta → Tormenta RPG (ficha Módulo Básico; disponível)
+  - gurps  → GURPS (disponível)
 
 Cada pacote de jogo expõe seus routers via `app/main.py`. O Auth Hub
 (em backend/app/shared/) decide quem entra em cada jogo via JWT claim

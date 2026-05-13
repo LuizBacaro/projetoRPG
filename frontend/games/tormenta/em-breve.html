@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tormenta RPG — em breve | Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/layout.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/botoes.css" />
+    <link rel="stylesheet" href="/games/tormenta/css/em-breve.css?v=20260613b" />
+</head>
+<body class="em-breve em-breve-tormenta" data-game="tormenta">
+
+    <main class="em-breve-shell">
+        <div class="em-breve-card">
+            <img
+                class="em-breve-logo"
+                src="/assets/brand/logo_tormenta-v5.png"
+                width="180"
+                height="180"
+                alt="Tormenta RPG"
+                decoding="async"
+                fetchpriority="high"
+            />
+
+            <span class="em-breve-kicker">Próximo sistema</span>
+            <h1 class="em-breve-titulo">Tormenta RPG</h1>
+
+            <p class="em-breve-descricao">
+                <strong>Ficha digital disponível.</strong>
+                <br />
+                Entre pelo <a href="/pages/selecionar-jogo.html">seletor de jogo</a> (Tormenta como jogo ativo) e abra o
+                <a href="/games/tormenta/pages/dashboard.html">dashboard de fichas</a>.
+            </p>
+
+            <ul class="em-breve-lista">
+                <li>API em <code>/api/v1/tormenta/personagens</code></li>
+                <li>Frontend em <code>frontend/games/tormenta/</code></li>
+                <li>Logotipo oficial no hub (Jambo / marca Tormenta)</li>
+            </ul>
+
+            <div class="em-breve-acoes">
+                <a href="/pages/selecionar-jogo.html" class="btn btn-primary">
+                    ← Voltar ao seletor de jogo
+                </a>
+                <a href="/dashboard" class="btn btn-secondary">
+                    Continuar no D&amp;D 3.5
+                </a>
+            </div>
+
+            <p class="em-breve-rodape">
+                Acompanhe o progresso na seção
+                <a href="/" class="em-breve-link">Arena TTRPG</a>.
+            </p>
+        </div>
+    </main>
+
+    <script type="module">
+        import { Toast } from '/games/dnd35/js/ui/toast.module.js';
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') === 'seletor') {
+            Toast.info('Tormenta RPG ainda não está disponível — voltamos quando estiver pronto.');
+        }
+    </script>
+
+</body>
+</html>

@@ -25,4 +25,9 @@ applyTo: "frontend/**/*.{html,css,js}"
 ## Convencoes Locais
 
 - A Arena e sensivel a cache de script; se bug persistir apos patch correto, considerar cache-busting controlado.
+
+## Especificacao minima (integracao)
+
+- Integracao nova ou alteracao de contrato: alinhar campos ao **OpenAPI / schemas** do backend; criterios de aceite no PR/issue quando houver mudanca de comportamento visivel.
+- Detalhe do fluxo: [docs/fluxo-spec-driven-leve.md](../../docs/fluxo-spec-driven-leve.md).
 - Na tela de usuarios, manter filtros, badges de estado e acoes de governanca claramente visiveis.
