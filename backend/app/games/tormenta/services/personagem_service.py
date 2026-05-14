@@ -253,6 +253,19 @@ class TormentaPersonagemService:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         return p
 
+    def obter_por_id_sincronizando_pm_mb(self, personagem_id: int) -> TormentaPersonagem:
+        """Carrega o personagem e persiste PM MB se divergirem do slug/nível/atributos (fichas antigas ou migração)."""
+        ent = self.obter_por_id(personagem_id)
+        antes_max = int(ent.pa_max or 0)
+        antes_atual = int(ent.pa_atual or 0)
+        self._sincronizar_pontos_magia_mb(ent)
+        depois_max = int(ent.pa_max or 0)
+        depois_atual = int(ent.pa_atual or 0)
+        if depois_max != antes_max or depois_atual != antes_atual:
+            commit_with_rollback(self.repo.db)
+            self.repo.db.refresh(ent)
+        return ent
+
     def criar(
         self, usuario: Usuario, payload: TormentaPersonagemCreate
     ) -> TormentaPersonagemResponse:

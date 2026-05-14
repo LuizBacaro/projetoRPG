@@ -176,6 +176,46 @@ def test_patch_paladino_abaixo_do_5_sem_pm(tormenta_personagens_db):
     assert r5.status_code == 200
     # 1 PM + SAB mod (+1) no 5º, sem níveis extras além do inicial
     assert r5.json()["pa_max"] == 2
+
+
+def test_get_sincroniza_pm_mb_quando_banco_estava_zerado(tormenta_personagens_db):
+    """GET detalhe reaplica regra MB de PM e persiste se o banco estiver defasado (ex.: ficha antiga)."""
+    from app.games.tormenta.models.personagem import TormentaPersonagem
+
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "nome": "Cura",
+            "tipo": "jogador",
+            "nivel": 1,
+            "classe_nivel": "Clérigo 1",
+            "for_valor": 10,
+            "des_valor": 10,
+            "con_valor": 10,
+            "int_valor": 10,
+            "sab_valor": 14,
+            "car_valor": 10,
+            "pv_max": 8,
+            "ficha_json": {"tormenta_classe_mb_slug": "clerigo"},
+        },
+    ).json()["id"]
+    db = SessionLocal()
+    try:
+        ent = db.get(TormentaPersonagem, rid)
+        ent.pa_max = 0
+        ent.pa_atual = 0
+        db.commit()
+    finally:
+        db.close()
+    b = client.get(f"/api/v1/tormenta/personagens/{rid}").json()
+    # 1 PM + mod SAB(14) +2 + 0 níveis extras × 3
+    assert b["pa_max"] == 3
+    assert b["pa_atual"] == 3
+
+
+def test_guerreiro_post_e_lista(tormenta_personagens_db):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
     r = client.post(

@@ -106,7 +106,7 @@ def obter(
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     try:
-        ent = service.obter_por_id(personagem_id)
+        ent = service.obter_por_id_sincronizando_pm_mb(personagem_id)
         base = TormentaPersonagemResponse.model_validate(ent)
         itens_t = talentos_svc.listar_por_personagem(personagem_id)
         itens_e = equip_svc.listar_por_personagem(personagem_id)
