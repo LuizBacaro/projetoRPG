@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260511arenaStatsToggle" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260511t20camp" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
     <div>
         <h1>Tormenta 20</h1>
-        <p>Combatentes, campanhas e arena — mesmo fluxo do dashboard D&amp;D 3.5, regras e fichas Tormenta.</p>
+        <p>Combatentes e fichas Tormenta 20. <strong>Campanhas</strong> e <strong>Arena de combate</strong> ficam disponíveis apenas para perfil <strong>mestre</strong> ou <strong>administrador</strong>.</p>
     </div>
     <div class="tormenta-header-actions">
         <span id="nomeUsuario">…</span>
@@ -26,7 +26,7 @@
     <nav class="t20-dash-nav" aria-label="Seções do dashboard">
         <button type="button" class="t20-dash-nav--active" data-tab="combatentes">⚔️ Combatentes</button>
         <button type="button" class="t20-dash-nav--campanhas" data-tab="campanhas" id="tabBtnCampanhas">📜 Campanhas</button>
-        <button type="button" data-tab="arena">🏟️ Arena</button>
+        <button type="button" data-tab="arena" id="tabBtnArena">🏟️ Arena</button>
     </nav>
 
     <section class="t20-dash-section t20-dash-section--active" id="tab-combatentes">
@@ -73,13 +73,83 @@
     </section>
 
     <section class="t20-dash-section" id="tab-campanhas">
-        <div class="t20-dash-placeholder">
-            <p><strong>Campanhas</strong> no modelo do dashboard D&amp;D 3.5 (cadastro de campanha, participantes e registro de sessões) ainda não estão ligadas ao módulo Tormenta neste ambiente.</p>
-            <p style="margin-top:0.75rem">Se precisar deste fluxo agora, use o jogo <strong>D&amp;D 3.5</strong> no seletor e abra o dashboard correspondente.</p>
+        <div id="t20campPanelTop" class="t20-camp-painel">
+            <p class="t20-dash-hint" style="margin-top:0;max-width:44rem">
+                Cadastre <strong>campanhas</strong>, associe <strong>combatentes</strong> (jogadores, monstros, NPCs) e registre <strong>sessões</strong> com resumo — alinhado ao fluxo do dashboard D&amp;D 3.5.
+            </p>
+            <div id="t20campSubAbas" class="t20-camp-subabas" role="tablist">
+                <button type="button" class="t20-camp-subaba-btn t20-camp-subaba-btn--active" data-t20camp-sub="cadastro">Cadastro de campanhas</button>
+                <button type="button" class="t20-camp-subaba-btn" data-t20camp-sub="sessoes">Registro de sessões</button>
+            </div>
+            <div id="t20campSubabaCadastro" class="t20-camp-subaba-pane t20-camp-subaba-pane--active">
+                <form id="t20campFormCampanha" class="t20-camp-form" autocomplete="off">
+                    <input type="hidden" id="t20campIdEdicao" value="" />
+                    <div id="t20campEdicaoBadge" class="t20-camp-edicao-badge" style="display:none"></div>
+                    <div class="t20-dash-field">
+                        <label for="t20campNome">Nome da campanha *</label>
+                        <input id="t20campNome" type="text" maxlength="120" required placeholder="Ex.: A sombra de Vhalor" />
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campDescricao">Descrição</label>
+                        <textarea id="t20campDescricao" rows="2" maxlength="500" placeholder="Resumo da campanha (opcional)"></textarea>
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campBusca">Participantes (combatentes cadastrados)</label>
+                        <input id="t20campBusca" type="search" placeholder="Buscar por nome…" />
+                        <div id="t20campTipoFiltros" class="t20-dash-filtros" style="margin-top:0.4rem">
+                            <button type="button" class="t20-dash-filter--active" data-t20camp-tipo="todos">Todos</button>
+                            <button type="button" data-t20camp-tipo="jogador">Jogadores</button>
+                            <button type="button" data-t20camp-tipo="monstro">Monstros</button>
+                            <button type="button" data-t20camp-tipo="npc">NPCs</button>
+                        </div>
+                        <div id="t20campPersonagens" class="t20-camp-checklist" aria-label="Seleção de personagens"></div>
+                    </div>
+                    <div class="t20-camp-form-acoes">
+                        <button type="button" class="tormenta-btn" id="t20campBtnCancelarCampanha" style="display:none">Cancelar edição</button>
+                        <button type="submit" class="tormenta-btn tormenta-btn--primary" id="t20campBtnSalvarCampanha">Criar campanha</button>
+                    </div>
+                </form>
+                <h3 class="t20-camp-lista-titulo">Campanhas cadastradas</h3>
+                <div id="t20campListaCampanhas" class="t20-camp-lista">
+                    <p class="tormenta-cell-muted">Abra esta aba para carregar.</p>
+                </div>
+            </div>
+            <div id="t20campSubabaSessoes" class="t20-camp-subaba-pane">
+                <form id="t20campFormSessao" class="t20-camp-form" autocomplete="off">
+                    <input type="hidden" id="t20campSessaoId" value="" />
+                    <div id="t20campSessaoEdicaoBadge" class="t20-camp-edicao-badge" style="display:none"></div>
+                    <div class="t20-dash-field">
+                        <label for="t20campSessaoCampanhaId">Campanha *</label>
+                        <select id="t20campSessaoCampanhaId" required>
+                            <option value="">Selecione a campanha</option>
+                        </select>
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campSessaoResumo">Resumo da sessão *</label>
+                        <textarea id="t20campSessaoResumo" rows="4" maxlength="4000" required placeholder="Acontecimentos da sessão…"></textarea>
+                    </div>
+                    <label class="t20-camp-visivel-lbl">
+                        <input id="t20campSessaoVisivel" type="checkbox" />
+                        <span>Disponibilizar este resumo para jogadores (lista «sessões visíveis» na API)</span>
+                    </label>
+                    <div class="t20-camp-form-acoes">
+                        <button type="button" class="tormenta-btn" id="t20campBtnCancelarSessao" style="display:none">Cancelar edição</button>
+                        <button type="submit" class="tormenta-btn tormenta-btn--primary" id="t20campBtnSalvarSessao">Registrar sessão</button>
+                    </div>
+                </form>
+                <h3 class="t20-camp-lista-titulo">Sessões registradas</h3>
+                <div id="t20campListaSessoes" class="t20-camp-lista">
+                    <p class="tormenta-cell-muted">Abra esta aba para carregar.</p>
+                </div>
+            </div>
         </div>
     </section>
 
     <section class="t20-dash-section" id="tab-arena">
+        <div id="t20ArenaBloqueioJogador" class="t20-dash-placeholder" hidden>
+            <p><strong>Arena de combate</strong> é exclusiva de <strong>mestre</strong> ou <strong>administrador</strong>. A API também bloqueia outros perfis.</p>
+            <p style="margin-top:0.75rem">Peça elevação de perfil a um administrador da plataforma ou use uma conta de mestre.</p>
+        </div>
         <div id="t20ArenaSetup" class="t20-arena-setup">
             <p class="t20-dash-hint" style="margin-top:0;max-width:42rem">
                 Selecione os personagens Tormenta 20, inicie o combate e use a ordem por <strong>iniciativa</strong> (empate: nome).
@@ -393,6 +463,8 @@
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
+<script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260511t20camp"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260511t20camp"></script>
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260511conjMb"></script>
@@ -1208,6 +1280,7 @@
         document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((b) => {
             b.addEventListener('click', () => {
                 const tab = b.getAttribute('data-tab');
+                if ((tab === 'arena' || tab === 'campanhas') && !isMestre) return;
                 document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((x) => x.classList.remove('t20-dash-nav--active'));
                 b.classList.add('t20-dash-nav--active');
                 document.querySelectorAll('.t20-dash-section').forEach((s) => {
@@ -1224,14 +1297,22 @@
             badge.textContent = perfil || '—';
             badge.className = 't20-dash-badge-perfil ' + (perfil || 'jogador');
         }
+        const bloqArena = document.getElementById('t20ArenaBloqueioJogador');
+        const arenaSetup = document.getElementById('t20ArenaSetup');
+        const arenaActive = document.getElementById('t20ArenaActive');
         if (!isMestre) {
             document.getElementById('filtroMonstro')?.style.setProperty('display', 'none');
             document.getElementById('filtroNpc')?.style.setProperty('display', 'none');
             document.getElementById('cardResumoMonstro')?.style.setProperty('display', 'none');
             document.getElementById('cardResumoNpc')?.style.setProperty('display', 'none');
             document.getElementById('tabBtnCampanhas')?.style.setProperty('display', 'none');
+            document.getElementById('tabBtnArena')?.style.setProperty('display', 'none');
+            if (bloqArena) bloqArena.hidden = false;
+            if (arenaSetup) arenaSetup.hidden = true;
+            if (arenaActive) arenaActive.hidden = true;
         } else {
             document.getElementById('wrapChkMeus')?.style.setProperty('display', '');
+            if (bloqArena) bloqArena.hidden = true;
         }
     }
 
@@ -1621,7 +1702,15 @@
 
     aplicarRestricoesPerfilUi();
     setTabs();
-    t20ArenaBindOnce();
+    if (isMestre) t20ArenaBindOnce();
+    if (isMestre && typeof window.__t20DashCampanhasInit === 'function') {
+        window.__t20DashCampanhasInit({
+            getLista: () => cacheLista,
+            isMestre,
+            recarregarTabela: carregar,
+            Toast,
+        });
+    }
     (async () => {
         try {
             RACAS_MB = await carregarRacasTormentaDash();

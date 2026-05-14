@@ -60,6 +60,8 @@ from .hub import (
     get_user_game_membership_repository,
 )
 from .tormenta import (
+    get_tormenta_campanha_repository,
+    get_tormenta_campanha_service,
     get_tormenta_combate_service,
     get_tormenta_personagem_consumiveis_service,
     get_tormenta_personagem_equipamentos_service,
@@ -68,6 +70,8 @@ from .tormenta import (
     get_tormenta_personagem_repository,
     get_tormenta_personagem_service,
     get_tormenta_personagem_talentos_service,
+    get_tormenta_sessao_campanha_repository,
+    get_tormenta_sessao_campanha_service,
 )
 
 __all__ = [
@@ -102,6 +106,8 @@ __all__ = [
     "get_gurps_personagem_service",
     "get_gurps_sessao_campanha_repository",
     "get_gurps_sessao_campanha_service",
+    "get_tormenta_campanha_repository",
+    "get_tormenta_campanha_service",
     "get_tormenta_combate_service",
     "get_tormenta_personagem_consumiveis_service",
     "get_tormenta_personagem_equipamentos_service",
@@ -110,6 +116,8 @@ __all__ = [
     "get_tormenta_personagem_repository",
     "get_tormenta_personagem_service",
     "get_tormenta_personagem_talentos_service",
+    "get_tormenta_sessao_campanha_repository",
+    "get_tormenta_sessao_campanha_service",
     "get_magia_import_service",
     "get_magia_repository",
     "get_magia_service",

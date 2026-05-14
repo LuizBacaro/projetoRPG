@@ -1651,3 +1651,136 @@
     background: var(--t20-input);
     resize: vertical;
 }
+
+/* ── Campanhas (mestre/admin) ── */
+.t20-camp-painel {
+    max-width: 52rem;
+}
+
+.t20-camp-subabas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.75rem 0 0.65rem;
+}
+
+.t20-camp-subaba-btn {
+    font: inherit;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    border: 2px solid rgba(60, 35, 20, 0.35);
+    background: #fffef8;
+    cursor: pointer;
+    color: var(--t20-ink);
+}
+
+.t20-camp-subaba-btn--active {
+    border-color: var(--t20-red-deep, #8b2500);
+    background: linear-gradient(180deg, #fff4e8, #ebe2d6);
+    font-weight: 700;
+}
+
+.t20-camp-subaba-pane {
+    display: none;
+    margin-top: 0.5rem;
+}
+
+.t20-camp-subaba-pane--active {
+    display: block;
+}
+
+.t20-camp-form-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.t20-camp-checklist {
+    margin-top: 0.45rem;
+    max-height: 14rem;
+    overflow: auto;
+    border: 1px solid rgba(60, 35, 20, 0.28);
+    border-radius: 8px;
+    padding: 0.4rem 0.5rem;
+    background: rgba(255, 254, 248, 0.85);
+}
+
+.t20-camp-cb-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0;
+    cursor: pointer;
+    font-size: 0.88rem;
+}
+
+.t20-camp-cb-tipo {
+    font-size: 0.72rem;
+    opacity: 0.75;
+    text-transform: lowercase;
+}
+
+.t20-camp-lista-titulo {
+    margin: 1.1rem 0 0.45rem;
+    font-size: 1rem;
+}
+
+.t20-camp-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.t20-camp-card {
+    border: 2px solid rgba(60, 35, 20, 0.3);
+    border-radius: 10px;
+    padding: 0.55rem 0.65rem;
+    background: linear-gradient(180deg, #fffef8, #ebe2d6);
+}
+
+.t20-camp-card__hd {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.35rem;
+    align-items: baseline;
+}
+
+.t20-camp-card__meta {
+    font-size: 0.78rem;
+    opacity: 0.85;
+}
+
+.t20-camp-card__desc {
+    margin: 0.35rem 0 0;
+    font-size: 0.84rem;
+    white-space: pre-wrap;
+}
+
+.t20-camp-card__ac {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.45rem;
+}
+
+.t20-camp-edicao-badge {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--t20-red-deep, #8b2500);
+    margin-bottom: 0.35rem;
+}
+
+.t20-camp-visivel-lbl {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+    font-size: 0.86rem;
+    cursor: pointer;
+}
+
+.t20-camp-visivel-lbl input {
+    margin-top: 0.2rem;
+}

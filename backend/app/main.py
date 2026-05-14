@@ -76,6 +76,7 @@ from .games.gurps.api.v1 import rolagens as gurps_rolagens
 from .games.gurps.models import campanha as gurps_campanha_model
 from .games.gurps.models import combate as gurps_combate_model
 from .games.gurps.models import personagem as gurps_personagem_model
+from .games.tormenta.api.v1 import campanhas as tormenta_campanhas
 from .games.tormenta.api.v1 import combate as tormenta_combate
 from .games.tormenta.api.v1 import personagens as tormenta_personagens
 from .games.tormenta.api.v1 import regras as tormenta_regras
@@ -483,6 +484,7 @@ app.include_router(gurps_campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_combate.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_rolagens.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_personagens.router, prefix=settings.API_V1_PREFIX)
+app.include_router(tormenta_campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_combate.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_regras.router, prefix=settings.API_V1_PREFIX)
 

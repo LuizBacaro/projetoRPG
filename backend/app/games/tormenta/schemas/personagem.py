@@ -132,6 +132,7 @@ class TormentaPersonagemResponse(TormentaPersonagemBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    campanha_id: Optional[int] = None
     talentos: List[TormentaTalentoPersonagemItem] = Field(default_factory=list)
     equipamentos: List[TormentaEquipamentoPersonagemItem] = Field(default_factory=list)
     consumiveis: List[TormentaConsumivelPersonagemItem] = Field(default_factory=list)

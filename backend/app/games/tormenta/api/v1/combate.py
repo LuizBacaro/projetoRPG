@@ -13,6 +13,7 @@ from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_game_tormenta,
+    requer_mestre_ou_admin,
     validar_tormenta_personagens_do_usuario,
 )
 from app.shared.exceptions.custom_exceptions import ArenaBaseException
@@ -21,7 +22,7 @@ from app.shared.models.usuario import Usuario
 router = APIRouter(
     prefix="/tormenta/combate",
     tags=["Tormenta — Arena"],
-    dependencies=[Depends(requer_game_tormenta)],
+    dependencies=[Depends(requer_game_tormenta), Depends(requer_mestre_ou_admin)],
 )
 
 

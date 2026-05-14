@@ -37,6 +37,7 @@ from app.games.gurps.models.personagem import (
     GurpsPersonagemVantagem,
 )
 from app.games.gurps.models.sessao_campanha import GurpsSessaoCampanha
+from app.games.tormenta.models.campanha import TormentaCampanha, TormentaSessaoCampanha
 from app.games.tormenta.models.combate import TormentaCombate
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.models.talento import TormentaTalento, TormentaTalentoPersonagem
@@ -88,6 +89,8 @@ __all__ = [
     "GurpsCatalogoFichaVantagem",
     "GurpsCatalogoFichaDesvantagem",
     "GurpsCatalogoFichaPericia",
+    "TormentaCampanha",
+    "TormentaSessaoCampanha",
     "TormentaCombate",
     "TormentaPersonagem",
     "TormentaTalento",

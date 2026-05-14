@@ -21,6 +21,9 @@ class TormentaPersonagem(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     dono_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True, index=True)
+    campanha_id = Column(
+        Integer, ForeignKey("tormenta_campanhas.id"), nullable=True, index=True
+    )
     tipo = Column(String(20), nullable=False)
     nome = Column(String(120), nullable=False)
     jogador_nome = Column(String(120), nullable=True)
@@ -56,6 +59,12 @@ class TormentaPersonagem(Base):
     # Perícias variáveis, equipamento, magias, notas de mesa (contrato JSON estável na API).
     ficha_json = Column(JSON, nullable=False, default=dict)
     foto_url = Column(String(2048), nullable=True)
+
+    campanha = relationship(
+        "TormentaCampanha",
+        back_populates="personagens",
+        lazy="selectin",
+    )
 
     talentos_vinculos = relationship(
         "TormentaTalentoPersonagem",
