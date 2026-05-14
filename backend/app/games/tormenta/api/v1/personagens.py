@@ -9,10 +9,16 @@ from app.core.dependencies import (
     get_tormenta_personagem_consumiveis_service,
     get_tormenta_personagem_equipamentos_service,
     get_tormenta_personagem_inventario_legado_service,
+    get_tormenta_personagem_magias_service,
     get_tormenta_personagem_service,
     get_tormenta_personagem_talentos_service,
 )
 from app.services.file_service import FileService
+from app.games.tormenta.schemas.magia_personagem import (
+    TormentaMagiaPersonagemItem,
+    TormentaMagiaVinculoCreate,
+    TormentaMigrarMagiasJsonResponse,
+)
 from app.games.tormenta.schemas.personagem import (
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
@@ -36,6 +42,7 @@ from app.games.tormenta.schemas.talento_personagem import (
     TormentaTalentoPersonagemItem,
     TormentaTalentoVinculoCreate,
 )
+from app.games.tormenta.services.personagem_magias_service import TormentaPersonagemMagiasService
 from app.games.tormenta.services.personagem_consumiveis_service import TormentaPersonagemConsumiveisService
 from app.games.tormenta.services.personagem_equipamentos_service import TormentaPersonagemEquipamentosService
 from app.games.tormenta.services.personagem_inventario_legado_service import (
@@ -95,6 +102,7 @@ def obter(
     consum_svc: TormentaPersonagemConsumiveisService = Depends(
         get_tormenta_personagem_consumiveis_service
     ),
+    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     try:
@@ -103,11 +111,13 @@ def obter(
         itens_t = talentos_svc.listar_por_personagem(personagem_id)
         itens_e = equip_svc.listar_por_personagem(personagem_id)
         itens_c = consum_svc.listar_por_personagem(personagem_id)
+        itens_m = magias_svc.listar_por_personagem(personagem_id)
         return base.model_copy(
             update={
                 "talentos": itens_t,
                 "equipamentos": itens_e,
                 "consumiveis": itens_c,
+                "magias": itens_m,
             }
         )
     except ArenaBaseException as e:
@@ -177,6 +187,67 @@ def remover_talento_do_personagem(
 ):
     try:
         talentos_svc.remover_vinculo(personagem_id, vinculo_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/magias",
+    response_model=List[TormentaMagiaPersonagemItem],
+)
+def listar_magias_do_personagem(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    return magias_svc.listar_por_personagem(personagem_id)
+
+
+@router.post(
+    "/{personagem_id}/magias",
+    response_model=TormentaMagiaPersonagemItem,
+    status_code=201,
+)
+def adicionar_magia_ao_personagem(
+    personagem_id: int,
+    payload: TormentaMagiaVinculoCreate,
+    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return magias_svc.adicionar_vinculo(personagem_id, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.delete("/{personagem_id}/magias/{vinculo_id}", status_code=204)
+def remover_magia_do_personagem(
+    personagem_id: int,
+    vinculo_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        magias_svc.remover_vinculo(personagem_id, vinculo_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/magias/migrar-do-json",
+    response_model=TormentaMigrarMagiasJsonResponse,
+)
+def migrar_magias_texto_do_json(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return magias_svc.migrar_magias_texto_do_json(personagem_id)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

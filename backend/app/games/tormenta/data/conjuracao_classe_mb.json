@@ -1,0 +1,58 @@
+{
+    "_meta": {
+    "fonte": "MB — Pontos de Magia (PM): bardo 1 PM + CAR +2/nível; clérigo/druida 1 PM + SAB +3/nível; feiticeiro 3 PM + CAR +3/nível; mago 1 PM + INT +3/nível; paladino/ranger (com magias) a partir do 5º nível: 1 PM + SAB +1/nível.",
+    "custo_magia": "Truques (círculo 0): 0 PM. Magia de círculo C≥1: custo em PM = C (1 PM por nível da magia).",
+    "grimorio_mb": "Só classes listadas em `classes` podem vincular magias do catálogo MB sem exceção; `tormenta_conjuracao_manual_mb: true` em ficha_json libera para multiclasse, talentos, inventor etc. (mesa)."
+  },
+  "classes": [
+    {
+      "slug": "bardo",
+      "habilidade_chave": "car",
+      "pm_constante": 1,
+      "pm_por_nivel": 2,
+      "conjuracao_inicia_nivel": 1
+    },
+    {
+      "slug": "clerigo",
+      "habilidade_chave": "sab",
+      "pm_constante": 1,
+      "pm_por_nivel": 3,
+      "conjuracao_inicia_nivel": 1
+    },
+    {
+      "slug": "druida",
+      "habilidade_chave": "sab",
+      "pm_constante": 1,
+      "pm_por_nivel": 3,
+      "conjuracao_inicia_nivel": 1
+    },
+    {
+      "slug": "feiticeiro",
+      "habilidade_chave": "car",
+      "pm_constante": 3,
+      "pm_por_nivel": 3,
+      "conjuracao_inicia_nivel": 1
+    },
+    {
+      "slug": "mago",
+      "habilidade_chave": "int",
+      "pm_constante": 1,
+      "pm_por_nivel": 3,
+      "conjuracao_inicia_nivel": 1
+    },
+    {
+      "slug": "paladino",
+      "habilidade_chave": "sab",
+      "pm_constante": 1,
+      "pm_por_nivel": 1,
+      "conjuracao_inicia_nivel": 5
+    },
+    {
+      "slug": "ranger",
+      "habilidade_chave": "sab",
+      "pm_constante": 1,
+      "pm_por_nivel": 1,
+      "conjuracao_inicia_nivel": 5
+    }
+  ]
+}

@@ -10,6 +10,10 @@ from app.games.tormenta.rules.atributos_t20 import (
     custo_total_compra_seis_atributos,
     pontos_iniciais_compra,
 )
+from app.games.tormenta.rules.conjuracao_t20 import (
+    classe_conjuracao_mb_registrada,
+    pontos_magia_maximos_conjuracao,
+)
 from app.games.tormenta.schemas.personagem import (
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
@@ -39,6 +43,94 @@ class TormentaPersonagemService:
             if t in ("monstro", "npc"):
                 return None
         return usuario.id
+
+    @staticmethod
+    def _nivel_conjuracao_mb_para_pm(ficha_json: Optional[dict], nivel_personagem: int) -> int:
+        fj = dict(ficha_json or {})
+        raw = fj.get("tormenta_nivel_conjurador_mb")
+        try:
+            if raw is not None and str(raw).strip() != "":
+                n = int(raw)
+                return max(1, min(40, n))
+        except (TypeError, ValueError):
+            pass
+        try:
+            n = int(nivel_personagem)
+            return max(1, min(40, n if n >= 1 else 1))
+        except (TypeError, ValueError):
+            return 1
+
+    @classmethod
+    def _pm_mb_calculado(
+        cls,
+        ficha_json: Optional[dict],
+        nivel_personagem: int,
+        fv: int,
+        dv: int,
+        cv: int,
+        iv: int,
+        sv: int,
+        carv: int,
+    ) -> Optional[int]:
+        fj = dict(ficha_json or {})
+        slug = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
+        if not slug:
+            return None
+        nv = cls._nivel_conjuracao_mb_para_pm(fj, nivel_personagem)
+        return pontos_magia_maximos_conjuracao(slug, nv, fv, dv, cv, iv, sv, carv)
+
+    @classmethod
+    def _resolver_pa_magia_criacao(cls, payload: TormentaPersonagemCreate) -> tuple[int, int]:
+        pm = cls._pm_mb_calculado(
+            payload.ficha_json,
+            int(payload.nivel),
+            int(payload.for_valor),
+            int(payload.des_valor),
+            int(payload.con_valor),
+            int(payload.int_valor),
+            int(payload.sab_valor),
+            int(payload.car_valor),
+        )
+        if pm is not None:
+            pa_max = max(0, min(999, int(pm)))
+        else:
+            pa_max = max(0, min(999, int(payload.pa_max)))
+        pa_atual = payload.pa_atual if payload.pa_atual is not None else pa_max
+        pa_atual = int(pa_atual)
+        if pa_max:
+            pa_atual = min(max(-999, pa_atual), pa_max)
+        pa_atual = max(-999, min(999, pa_atual))
+        return pa_max, pa_atual
+
+    def _sincronizar_pontos_magia_mb(self, ent: TormentaPersonagem) -> None:
+        """Recalcula PM (Pontos de Magia) MB quando a classe MB está na tabela; zera se ainda não conjura (ex.: paladino < 5)."""
+        fj = dict(ent.ficha_json or {})
+        slug = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
+        if not classe_conjuracao_mb_registrada(slug):
+            return
+        pm = self._pm_mb_calculado(
+            fj,
+            int(ent.nivel),
+            int(ent.for_valor),
+            int(ent.des_valor),
+            int(ent.con_valor),
+            int(ent.int_valor),
+            int(ent.sab_valor),
+            int(ent.car_valor),
+        )
+        if pm is None:
+            ent.pa_max = 0
+            ent.pa_atual = 0
+            return
+        old_max = int(ent.pa_max or 0)
+        new_max = max(0, min(999, int(pm)))
+        ent.pa_max = new_max
+        cur = int(ent.pa_atual) if ent.pa_atual is not None else new_max
+        if new_max > old_max:
+            cur = min(cur + (new_max - old_max), new_max)
+        else:
+            cur = min(cur, new_max)
+        ent.pa_atual = min(max(0, cur), new_max)
 
     def _validar_tipo(self, tipo: str) -> None:
         if (tipo or "").lower() not in self._tipos_validos():
@@ -187,8 +279,7 @@ class TormentaPersonagemService:
 
         pv_max = payload.pv_max
         pv_atual = payload.pv_atual if payload.pv_atual is not None else pv_max
-        pa_max = payload.pa_max
-        pa_atual = payload.pa_atual if payload.pa_atual is not None else pa_max
+        pa_max, pa_atual = self._resolver_pa_magia_criacao(payload)
 
         ficha = dict(payload.ficha_json or {})
 
@@ -273,6 +364,8 @@ class TormentaPersonagemService:
 
         for key, val in data.items():
             setattr(ent, key, val)
+
+        self._sincronizar_pontos_magia_mb(ent)
 
         if ent.pv_max is not None and ent.pv_atual is not None:
             ent.pv_atual = min(ent.pv_atual, ent.pv_max)

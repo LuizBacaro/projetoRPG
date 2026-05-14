@@ -41,3 +41,9 @@ No T20, “poderes” cobrem muito do que em outros sistemas são talentos ou ha
 
 - Item com peso e tipo → soma na `ficha_json.carga` pode ser calculada no cliente ou servidor.
 - Regra exata de carga: `lookup_json` + motor conforme livro.
+
+## Magias e grimório (MB p.144–209)
+
+- **Âmbito editorial:** lista de magias MB (≈ p.150–209) alimenta o catálogo; **instância por personagem** (conhecidas, preparadas, gasto de PM) fica em Postgres + API Tormenta.
+- **Documento de RFs e fases:** [07-requisitos-grimorio-mb-144-209.md](07-requisitos-grimorio-mb-144-209.md).
+- **Paridade UX:** fluxo D&D 3.5 em `frontend/games/dnd35/js/controllers/GrimorioController.js` + `GrimorioService.js` (adaptar a `personagem_id` e prefixo `/tormenta/`).

@@ -28,6 +28,15 @@ Prioridade: **P0** crítico para ficha utilizável; **P1** conforto; **P2** pari
 | RF-T23 | API + tabela `tormenta_equipamentos` | Slots, carga, preço em cobre |
 | RF-T24 | Ligação personagem ↔ poder escolhido (N:N) | Similar `TalentoJogador` D&D |
 
+### P2 — Grimório e conjuração MB (épico)
+
+Rastreio detalhado (tipos/níveis, habilidade-chave, conhecidas, PM, preparar vs lançar, catálogo p.150–209): **[07-requisitos-grimorio-mb-144-209.md](07-requisitos-grimorio-mb-144-209.md)**.
+
+| ID | Requisito | Critérios de aceite (resumo) |
+|----|-----------|------------------------------|
+| RF-T22 | Catálogo `tormenta_magias` / `tormenta_catalogo_magia` + API listagem | Círculo, tipo arcana/divina, metadados, `pagina_referencia`; sem texto integral protegido no repo |
+| RF-T40–T47 | Motor grimório MB (círculos, chave, PM, preparação/espontâneo, UI) | Ver doc 07; fases G0–G5 |
+
 ## P3 — Combate e mestre
 
 | ID | Requisito | Notas |

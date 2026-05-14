@@ -3470,3 +3470,43 @@ body::after {
     margin-left: 0;
     margin-right: 0;
 }
+
+/* Tormenta 20 ficha: CTA “Adicionar” com vermelho do tema (por cima do verde .ficha-btn-adicionar do parity D&D). */
+.tormenta-ficha-body .ficha-btn-adicionar.tormenta-btn--primary {
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    border: 1px solid var(--t20-red-deep);
+    color: #fff;
+    font-weight: 600;
+    transition:
+        filter 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.tormenta-ficha-body .ficha-btn-adicionar.tormenta-btn--primary:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 2px 8px rgba(139, 0, 0, 0.35);
+}
+
+/* Catálogos e modais na ficha T20: mesmo vermelho (classe herdada do card D&D / item-card-unified). */
+.tormenta-ficha-body button.item-btn-primary,
+.tormenta-ficha-body .talento-linha-acao.item-btn-primary {
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    border: 1px solid var(--t20-red-deep);
+    color: #fff;
+    font-weight: 700;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.7rem;
+    transition:
+        filter 0.15s ease,
+        box-shadow 0.15s ease;
+    white-space: nowrap;
+}
+
+.tormenta-ficha-body button.item-btn-primary:hover,
+.tormenta-ficha-body .talento-linha-acao.item-btn-primary:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 2px 8px rgba(139, 0, 0, 0.35);
+}

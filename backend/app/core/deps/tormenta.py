@@ -12,6 +12,7 @@ from app.games.tormenta.services.personagem_inventario_legado_service import (
 )
 from app.games.tormenta.services.combate_service import TormentaCombateService
 from app.games.tormenta.services.personagem_service import TormentaPersonagemService
+from app.games.tormenta.services.personagem_magias_service import TormentaPersonagemMagiasService
 from app.games.tormenta.services.personagem_talentos_service import TormentaPersonagemTalentosService
 from app.shared.core.database import get_db
 from app.shared.core.deps import get_usuario_atual
@@ -36,6 +37,12 @@ def get_tormenta_personagem_talentos_service(
     db: Session = Depends(get_db),
 ) -> TormentaPersonagemTalentosService:
     return TormentaPersonagemTalentosService(db)
+
+
+def get_tormenta_personagem_magias_service(
+    db: Session = Depends(get_db),
+) -> TormentaPersonagemMagiasService:
+    return TormentaPersonagemMagiasService(db)
 
 
 def get_tormenta_personagem_equipamentos_service(

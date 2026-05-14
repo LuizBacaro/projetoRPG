@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260512tormentaCombateApi" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260513arenaPolish" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -81,10 +81,9 @@
 
     <section class="t20-dash-section" id="tab-arena">
         <div id="t20ArenaSetup" class="t20-arena-setup">
-            <p class="t20-dash-hint" style="margin-top:0;max-width:40rem">
+            <p class="t20-dash-hint" style="margin-top:0;max-width:42rem">
                 Selecione os personagens Tormenta 20, inicie o combate e use a ordem por <strong>iniciativa</strong> (empate: nome).
-                Dano e cura ajustam <strong>PV atuais</strong> na API (mesma ficha). A sessão de combate fica <strong>guardada na sua conta</strong> (pode retomar noutro dispositivo após recarregar).
-                Para condições D&amp;D 3.5 e magias use a <a href="/arena">Arena D&amp;D 3.5</a>.
+                Dano e cura ajustam <strong>PV atuais</strong> na API (mesma ficha). O botão <strong>Condições (MB)</strong> (abaixo de dano/cura) abre a tabela de ataque (~p.220 MB). Consumíveis MB e companheiro animal ficam na <a href="ficha-personagem.html">ficha do personagem</a>. Para magias e condições D&amp;D 3.5: <a href="/arena">Arena D&amp;D 3.5</a>.
             </p>
             <div class="t20-arena-actions-row">
                 <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnIniciar">Iniciar combate</button>
@@ -104,18 +103,40 @@
                 </aside>
                 <div class="t20-arena-main">
                     <div class="t20-arena-char-top">
-                        <div>
+                        <div class="t20-arena-char-ident">
                             <h3 id="t20ArenaCharNome" class="t20-arena-char-nome">—</h3>
                             <p id="t20ArenaCharMeta" class="t20-arena-char-meta">—</p>
                         </div>
-                        <div class="t20-arena-char-badges">
-                            <span class="t20-arena-badge" id="t20ArenaCharIni" title="Iniciativa">—</span>
-                            <span class="t20-arena-badge t20-arena-badge--ca" id="t20ArenaCharCa" title="CA">—</span>
+                        <div class="t20-arena-stat-pills" role="group" aria-label="Iniciativa e CA">
+                            <div class="t20-arena-stat-pill t20-arena-stat-pill--ini" title="Iniciativa">
+                                <span class="t20-arena-stat-pill__lab">Iniciativa</span>
+                                <span id="t20ArenaCharIni" class="t20-arena-stat-pill__val">—</span>
+                            </div>
+                            <div class="t20-arena-stat-pill t20-arena-stat-pill--ca" title="Classe de armadura">
+                                <span class="t20-arena-stat-pill__lab">CA</span>
+                                <span id="t20ArenaCharCa" class="t20-arena-stat-pill__val">—</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="t20-arena-resources">
-                        <div class="t20-arena-res"><span class="t20-arena-res-lbl">PV</span><span id="t20ArenaCharPv" class="t20-arena-res-val">—</span></div>
-                        <div class="t20-arena-res"><span class="t20-arena-res-lbl">PM</span><span id="t20ArenaCharPm" class="t20-arena-res-val">—</span></div>
+                    <div class="t20-arena-stat-resources" role="group" aria-label="Pontos de vida e Pontos de Magia (PM)">
+                        <div class="t20-arena-res-card t20-arena-res-card--pv">
+                            <span class="t20-arena-res-card__lab">Pontos de vida</span>
+                            <div class="t20-arena-res-card__nums">
+                                <span id="t20ArenaCharPvCur" class="t20-arena-res-card__cur">—</span>
+                                <span class="t20-arena-res-card__slash">/</span>
+                                <span id="t20ArenaCharPvMax" class="t20-arena-res-card__max">—</span>
+                            </div>
+                            <div class="t20-arena-res-card__track" aria-hidden="true"><span id="t20ArenaCharPvBar" class="t20-arena-res-card__fill t20-arena-res-card__fill--pv"></span></div>
+                        </div>
+                        <div class="t20-arena-res-card t20-arena-res-card--pm">
+                            <span class="t20-arena-res-card__lab">Pontos de Magia (PM)</span>
+                            <div class="t20-arena-res-card__nums">
+                                <span id="t20ArenaCharPmCur" class="t20-arena-res-card__cur">—</span>
+                                <span class="t20-arena-res-card__slash">/</span>
+                                <span id="t20ArenaCharPmMax" class="t20-arena-res-card__max">—</span>
+                            </div>
+                            <div class="t20-arena-res-card__track" aria-hidden="true"><span id="t20ArenaCharPmBar" class="t20-arena-res-card__fill t20-arena-res-card__fill--pm"></span></div>
+                        </div>
                     </div>
                     <div class="t20-arena-portrait-row">
                         <div class="t20-arena-portrait-wrap" id="t20ArenaPortraitWrap">
@@ -123,8 +144,11 @@
                             <span id="t20ArenaCharImgPh" class="t20-arena-portrait-ph">Sem retrato</span>
                         </div>
                         <div class="t20-arena-quick">
-                            <span class="t20-arena-quick-title">Aplicar</span>
-                            <button type="button" class="tormenta-btn" id="t20ArenaBtnPvModal">Dano / Cura (PV)</button>
+                            <span class="t20-arena-quick-title">Ações rápidas</span>
+                            <div class="t20-arena-quick-btns">
+                                <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnPvModal">Dano / Cura (PV)</button>
+                                <button type="button" class="tormenta-btn t20-arena-btn-cond" id="t20ArenaBtnCondicoes">Condições (MB)</button>
+                            </div>
                         </div>
                     </div>
                     <div class="t20-arena-turn-row">
@@ -154,6 +178,71 @@
     <div class="t20-arena-modal__ft">
         <button type="button" class="tormenta-btn" id="t20ArenaModalPvCancelar">Cancelar</button>
         <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalPvAplicar">Aplicar</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalCondicoes" class="t20-arena-modal t20-arena-modal--cond">
+    <div class="t20-arena-modal__hd t20-arena-cond-modal-hd">
+        <h3 class="t20-arena-modal__titulo">Condições (MB) — Tormenta 20</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalCondFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd t20-arena-modal__bd--cond">
+        <div id="t20ArenaCondicoesRoot">
+            <p class="t20-dash-hint" style="margin-top:0">Marque o cenário; o resumo ajuda na mesa. Confirme penalidades e exceções no <strong>Módulo Básico</strong> (≈p. 220).</p>
+            <div class="t20-arena-cond-cols">
+                <fieldset class="t20-arena-fs">
+                    <legend>O atacante está…</legend>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Assustado (atacante): −2 na jogada de ataque." /> Assustado</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Caído (atacante): −4 na jogada de ataque (corpo a corpo); outras regras no livro." /> Caído</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Cego (atacante): entre outras penalidades, 50% de chance de falha em ataques (ver p. 220)." /> Cego</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Em posição mais alta (atacante): +1 na jogada de ataque à distância (conforme MB)." /> Em posição mais alta</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Flanqueando o alvo: +2 na jogada de ataque." /> Flanqueando o alvo</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Invisível (atacante): +2 na jogada de ataque contra adversários que não veem invisível (efeitos de camuflagem/cobertura podem somar)." /> Invisível</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Ofuscado (atacante): −1 na jogada de ataque." /> Ofuscado</label>
+                </fieldset>
+                <fieldset class="t20-arena-fs">
+                    <legend>O alvo está…</legend>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Caído (alvo): modificadores para acertá-lo conforme tabela (ex.: corpo a corpo vs distância)." /> Caído</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Cego (alvo): não aplica alguns bônus de precisão; veja interação com +4 na jogada de ataque." /> Cego</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Desprevenido (alvo): perde bônus na CA vindos de DES (e outros efeitos no livro)." /> Desprevenido</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob camuflagem (alvo): −2 na jogada de ataque (conforme MB)." /> Sob camuflagem</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob camuflagem total (alvo): chance de falha na jogada de ataque (ver MB)." /> Sob camuflagem total</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob cobertura (alvo): −4 na jogada de ataque à distância (conforme MB)." /> Sob cobertura</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob cobertura total (alvo): −8 na jogada de ataque à distância / outras interações no livro." /> Sob cobertura total</label>
+                </fieldset>
+            </div>
+            <fieldset class="t20-arena-fs t20-arena-fs--inline">
+                <legend>Tipo de ataque (contexto)</legend>
+                <label class="t20-arena-cb"><input type="radio" name="t20condTipoAtq" value="cc" checked data-tip="Ataque corpo a corpo selecionado (para linhas que citam corpo a corpo)." /> Corpo a corpo</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condTipoAtq" value="dist" data-tip="Ataque à distância selecionado (cobertura, CA +4 vs distância etc.)." /> À distância</label>
+            </fieldset>
+            <fieldset class="t20-arena-fs">
+                <legend>Modificador extra na jogada de ataque (escolha um, se aplicável)</legend>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="" checked data-tip="Sem modificador adicional desta linha." /> Nenhum desta lista</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="m2" data-tip="Modificador na jogada de ataque: −2." /> −2</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="m4" data-tip="Modificador na jogada de ataque: −4." /> −4</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="f50" data-tip="Modificador na jogada de ataque: 50% de chance de falha (antes do dado)." /> 50% de chance de falha</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="p1" data-tip="Modificador na jogada de ataque: +1." /> +1</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="p2cc" data-tip="Modificador na jogada de ataque: +2 (apenas corpo a corpo)." /> +2 (apenas corpo a corpo)</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="p4" data-tip="Modificador na jogada de ataque: +4 (não se aplica a alvos cegos)." /> +4 (não se aplica a alvos cegos)</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="m1" data-tip="Modificador na jogada de ataque: −1." /> −1</label>
+            </fieldset>
+            <fieldset class="t20-arena-fs">
+                <legend>Modificador na CA do alvo / efeito (escolha um, se aplicável)</legend>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="" checked data-tip="Sem entrada extra desta linha na CA." /> Nenhum desta lista</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="meleeR" data-tip="CA: −4 contra ataques corpo a corpo, +4 contra ataques à distância (conforme situação no MB)." /> −4 contra corpo a corpo, +4 contra à distância</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="m8" data-tip="Modificador na CA: −8." /> −8</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="m4" data-tip="Modificador na CA: −4." /> −4</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="f20" data-tip="CA: 20% de chance de falha no ataque (conforme MB)." /> 20% de chance de falha</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="f50" data-tip="CA: 50% de chance de falha no ataque (conforme MB)." /> 50% de chance de falha</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="p4" data-tip="Modificador na CA: +4." /> +4</label>
+            </fieldset>
+            <label class="t20-arena-cb t20-arena-cb--destaque"><input type="checkbox" id="t20CondNaoAtac" data-tip="O alvo não pode ser atacado (situações descritas na p. 220 do Módulo Básico)." /> O alvo não pode ser atacado (p. 220)</label>
+            <div id="t20ArenaCondResumo" class="t20-arena-cond-resumo" aria-live="polite"></div>
+        </div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalCondFecharFt">Fechar</button>
     </div>
 </dialog>
 
@@ -284,7 +373,8 @@
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
     <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260512"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260512classes"></script>
+<script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260514"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260511conjMb"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -713,12 +803,34 @@
         );
         setTxt('t20ArenaCharIni', p && p.iniciativa != null ? String(p.iniciativa) : '—');
         setTxt('t20ArenaCharCa', p && p.ca != null ? String(p.ca) : '—');
-        const pvA = p && p.pv_atual != null ? p.pv_atual : '—';
-        const pvM = p && p.pv_max != null ? p.pv_max : '—';
-        setTxt('t20ArenaCharPv', `${pvA} / ${pvM}`);
-        const pmA = p && p.pa_atual != null ? p.pa_atual : '—';
-        const pmM = p && p.pa_max != null ? p.pa_max : '—';
-        setTxt('t20ArenaCharPm', `${pmA} / ${pmM}`);
+        const pvMax = Math.max(0, Number(p && p.pv_max) || 0);
+        let pvCur = Number(p && p.pv_atual);
+        if (!Number.isFinite(pvCur)) pvCur = pvMax;
+        const pmMax = Math.max(0, Number(p && p.pa_max) || 0);
+        let pmCur = Number(p && p.pa_atual);
+        if (!Number.isFinite(pmCur)) pmCur = pmMax;
+        setTxt('t20ArenaCharPvCur', pvMax ? String(pvCur) : '—');
+        setTxt('t20ArenaCharPvMax', pvMax ? String(pvMax) : '—');
+        setTxt('t20ArenaCharPmCur', pmMax || pmCur ? String(pmCur) : '—');
+        setTxt('t20ArenaCharPmMax', pmMax ? String(pmMax) : '—');
+        const pvBar = document.getElementById('t20ArenaCharPvBar');
+        if (pvBar) {
+            if (pvMax > 0) {
+                const pct = Math.min(100, Math.max(0, (pvCur / pvMax) * 100));
+                pvBar.style.width = `${pct}%`;
+            } else {
+                pvBar.style.width = '0%';
+            }
+        }
+        const pmBar = document.getElementById('t20ArenaCharPmBar');
+        if (pmBar) {
+            if (pmMax > 0) {
+                const pct = Math.min(100, Math.max(0, (pmCur / pmMax) * 100));
+                pmBar.style.width = `${pct}%`;
+            } else {
+                pmBar.style.width = '0%';
+            }
+        }
         const img = document.getElementById('t20ArenaCharImg');
         const ph = document.getElementById('t20ArenaCharImgPh');
         if (p && p.foto_url && img && ph) {
@@ -879,6 +991,9 @@
         });
 
         void t20ArenaRefreshFromApi();
+        if (typeof window.__t20ArenaCondicoesInit === 'function') {
+            window.__t20ArenaCondicoesInit();
+        }
     }
 
     function setTabs() {

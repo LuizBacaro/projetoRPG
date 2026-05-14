@@ -32,9 +32,9 @@ Legenda de **Tipo**:
 | T18 | Pontos de vida e mana | *livro* | `regra_motor` | `pv_*`, `pa_*` | Parcial |
 | T19 | Condições | *livro* | `catalogo_db` | Futuro combate | Não iniciado |
 | T20 | Níveis de desafio / encontros | *livro* | `catalogo_db` | Mestre / futuro | Não iniciado |
-| T21 | Divindades e obrigações | *livro* | `texto_livre` / `catalogo_db` | Campo `divindade` | Texto |
+| T21 | Divindades e obrigações | *livro* p.120–126 | `lookup_json` + coluna SQL | `GET /tormenta/regras/identidade-mb` → `divindades[].slug` + `rotulo`; combo grava `rotulo` em `divindade` | Combo MB (Os Vinte + slug) |
 | T22 | Idiomas | *livro* | `catalogo_db` | `ficha_json.idiomas` | Texto |
-| T23 | Alinhamento / tendência | *livro* | `texto_livre` | Coluna `tendencia` | Existe |
+| T23 | Alinhamento / tendência | *livro* p.116–119 | `lookup_json` + coluna SQL | `GET /tormenta/regras/identidade-mb` → combo `tendencia`; valor em `tendencia` | Combo MB (9 alinhamentos) |
 | T24 | Moedas (T$, etc.) | *livro* | `texto_livre` | `ficha_json.dinheiro` | Existe |
 | T25 | XP e níveis | *livro* | `lookup_json` | Tabela XP por nível | Campos texto XP |
 | T26 | Planilha oficial (papel) | 304–305 (comentário no model) | `referência` | UI `ficha-personagem.html` | Contínuo |

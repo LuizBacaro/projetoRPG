@@ -22,6 +22,13 @@ applyTo: "frontend/**/*.{html,css,js}"
 - Manter direcao visual forte, intencional e responsiva; evitar UI generica.
 - Reaproveitar tokens de `frontend/css/variables.css` quando possivel.
 
+## Overlays estilo `equipamentos-overlay` (Tormenta e reaproveitamento D&D 3.5)
+
+- Em `tormenta-ficha-dnd-parity.css`, a classe **`.equipamentos-overlay`** fica com `display: flex`, `position: fixed` e cobre o ecrã inteiro (modal sempre “montado”).
+- Em **fichas Tormenta** (`tormenta-ficha.css`), cada overlay com esse padrão **tem de** ter uma regra do tipo `#meuModal.equipamentos-overlay:not(.is-open) { display: none !important; pointer-events: none; }` e o JavaScript deve **só** mostrar o modal com `classList.add('is-open')` e esconder com `remove('is-open')` (igual a `#modalEquipamentos` e `#modalTalentosMb`).
+- **Não** confiar só em `aria-hidden` ou `style="display:none"` no HTML se o ficheiro de paridade continuar a forçar `display: flex` no overlay — o utilizador fica com a página bloqueada.
+- Novo modal no mesmo padrão: acrescentar o **mesmo selector** em `tormenta-ficha.css` ao lado dos existentes, ou documentar exceção explícita no CSS de paridade.
+
 ## Convencoes Locais
 
 - A Arena e sensivel a cache de script; se bug persistir apos patch correto, considerar cache-busting controlado.

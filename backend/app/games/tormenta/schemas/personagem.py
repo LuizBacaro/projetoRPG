@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.games.tormenta.schemas.consumivel_personagem import TormentaConsumivelPersonagemItem
 from app.games.tormenta.schemas.equipamento_personagem import TormentaEquipamentoPersonagemItem
+from app.games.tormenta.schemas.magia_personagem import TormentaMagiaPersonagemItem
 from app.games.tormenta.schemas.talento_personagem import TormentaTalentoPersonagemItem
+from app.games.tormenta.rules.grimorio_elegibilidade_t20 import resumo_elegibilidade_grimorio_mb
 
 # Limite do JSON da ficha (perícias, equipamento, magias, notas).
 TORMENTA_FICHA_JSON_MAX_BYTES = 96_000
@@ -54,8 +56,8 @@ class TormentaPersonagemBase(BaseModel):
 
     pv_max: int = Field(default=1, ge=0, le=9999)
     pv_atual: Optional[int] = Field(None, ge=-9999, le=9999)
-    pa_max: int = Field(default=0, ge=0, le=999)
-    pa_atual: Optional[int] = Field(None, ge=-999, le=999)
+    pa_max: int = Field(default=0, ge=0, le=999, description="Pontos de Magia (PM) máximos — MB; calculado na criação se classe conjuradora MB.")
+    pa_atual: Optional[int] = Field(None, ge=-999, le=999, description="PM atuais (gastos na mesa).")
     ca: int = Field(default=10, ge=0, le=99)
     rd: str = Field(default="", max_length=80)
     nivel: int = Field(default=1, ge=0, le=40)
@@ -103,8 +105,8 @@ class TormentaPersonagemUpdate(BaseModel):
 
     pv_max: Optional[int] = Field(None, ge=0, le=9999)
     pv_atual: Optional[int] = Field(None, ge=-9999, le=9999)
-    pa_max: Optional[int] = Field(None, ge=0, le=999)
-    pa_atual: Optional[int] = Field(None, ge=-999, le=999)
+    pa_max: Optional[int] = Field(None, ge=0, le=999, description="Pontos de Magia (PM) máximos.")
+    pa_atual: Optional[int] = Field(None, ge=-999, le=999, description="PM atuais.")
     ca: Optional[int] = Field(None, ge=0, le=99)
     rd: Optional[str] = Field(None, max_length=80)
     nivel: Optional[int] = Field(None, ge=0, le=40)
@@ -133,3 +135,26 @@ class TormentaPersonagemResponse(TormentaPersonagemBase):
     talentos: List[TormentaTalentoPersonagemItem] = Field(default_factory=list)
     equipamentos: List[TormentaEquipamentoPersonagemItem] = Field(default_factory=list)
     consumiveis: List[TormentaConsumivelPersonagemItem] = Field(default_factory=list)
+    magias: List[TormentaMagiaPersonagemItem] = Field(
+        default_factory=list,
+        description="Vínculos grimório / conhecidas / preparadas (catálogo MB por slug).",
+    )
+    grimorio_mb_permitido: bool = Field(
+        default=False,
+        description="True se a ficha pode vincular magias MB (classe conjuradora + nível MB ou tormenta_conjuracao_manual_mb).",
+    )
+    grimorio_mb_motivo: Optional[str] = Field(
+        default=None,
+        description="Se grimorio_mb_permitido for false, texto para exibir na UI; caso contrário null.",
+    )
+
+    @model_validator(mode="after")
+    def _preencher_elegibilidade_grimorio_mb(self) -> Self:
+        ok, msg = resumo_elegibilidade_grimorio_mb(
+            tipo=str(self.tipo or ""),
+            nivel=int(self.nivel or 1),
+            ficha_json=self.ficha_json,
+        )
+        self.grimorio_mb_permitido = ok
+        self.grimorio_mb_motivo = None if ok else (msg or None)
+        return self

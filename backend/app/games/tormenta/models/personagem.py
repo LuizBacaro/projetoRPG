@@ -75,3 +75,9 @@ class TormentaPersonagem(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+    magias_vinculos = relationship(
+        "TormentaMagiaPersonagem",
+        back_populates="personagem",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )

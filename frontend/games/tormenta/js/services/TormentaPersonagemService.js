@@ -148,6 +148,11 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao remover equipamento');
     }
 
+    async listarConsumiveis(id) {
+        const res = await fetch(this._url(`/${id}/consumiveis`), { headers: this._headers(false) });
+        return this._handleResponse(res, 'Erro ao listar consumíveis');
+    }
+
     async adicionarConsumivel(id, body) {
         const res = await fetch(this._url(`/${id}/consumiveis`), {
             method: 'POST',
@@ -172,5 +177,36 @@ class TormentaPersonagemService {
             headers: this._headers(false),
         });
         return this._handleResponse(res, 'Erro ao remover consumível');
+    }
+
+    async listarMagias(id) {
+        const res = await fetch(this._url(`/${id}/magias`), { headers: this._headers(false) });
+        return this._handleResponse(res, 'Erro ao listar magias do personagem');
+    }
+
+    async adicionarMagia(id, body) {
+        const res = await fetch(this._url(`/${id}/magias`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao adicionar magia');
+    }
+
+    async removerMagia(id, vinculoId) {
+        const res = await fetch(this._url(`/${id}/magias/${vinculoId}`), {
+            method: 'DELETE',
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao remover magia');
+    }
+
+    async migrarMagiasDoJson(id) {
+        const res = await fetch(this._url(`/${id}/magias/migrar-do-json`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: '{}',
+        });
+        return this._handleResponse(res, 'Erro ao migrar magias do JSON');
     }
 }

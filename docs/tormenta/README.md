@@ -13,6 +13,7 @@ Documentação para **implementação confiável** da ficha e regras do jogo Tor
 | [04-catalogos-dinamicos-roadmap.md](04-catalogos-dinamicos-roadmap.md) | Talentos, magias, equipamento, habilidades — catálogos dinâmicos |
 | [05-contrato-dados-ficha-json-e-api.md](05-contrato-dados-ficha-json-e-api.md) | `ficha_json`, colunas SQL, `foto_url`, evolução da API |
 | [06-trilha-levantamento-por-capitulo.md](06-trilha-levantamento-por-capitulo.md) | Checklist ao folhear o livro capítulo a capítulo |
+| [07-requisitos-grimorio-mb-144-209.md](07-requisitos-grimorio-mb-144-209.md) | Grimório MB: regras p.144–145, lista p.150–209, RFs e fases (paridade D&D 3.5) |
 | [tabelas/README.md](tabelas/README.md) | JSONs de dados (estrutura; valores a partir do livro) |
 
 ## Ferramentas de requisitos (genérico RPG)
@@ -23,6 +24,7 @@ Documentação para **implementação confiável** da ficha e regras do jogo Tor
 ## Estado atual no código
 
 - CRUD de personagens: ver [backend/app/games/tormenta/README.md](../../backend/app/games/tormenta/README.md).
+- **Arquitetura Tormenta no Arena** (Postgres vs JSON de regras, catálogos MB via API, sem duplicar dados de catálogo no frontend): skill do repositório [`.cursor/skills/tormenta-20-arena-arquitetura-e-regras/SKILL.md`](../../.cursor/skills/tormenta-20-arena-arquitetura-e-regras/SKILL.md).
 - Planilhas de referência visual na raiz do repo: `planilha-tormenta.png`, `planilha-tormenta2.png`, `planilha-tormenta3.png`.
 
 ## Fluxo de trabalho recomendado

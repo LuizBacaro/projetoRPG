@@ -93,7 +93,89 @@ def _usuario(u: Usuario) -> SimpleNamespace:
     return SimpleNamespace(id=u.id, perfil=u.perfil, email=u.email, nome=u.nome)
 
 
-def test_criar_e_listar(tormenta_personagens_db):
+def test_criar_mago_mb_preenche_pontos_de_magia(tormenta_personagens_db):
+    """Classe conjuradora MB + atributos na criação → pa_max/pa_atual pela regra do livro."""
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "nome": "Arcanus",
+            "tipo": "jogador",
+            "nivel": 1,
+            "classe_nivel": "Mago 1",
+            "for_valor": 8,
+            "des_valor": 8,
+            "con_valor": 8,
+            "int_valor": 18,
+            "sab_valor": 8,
+            "car_valor": 8,
+            "pv_max": 6,
+            "ficha_json": {"tormenta_classe_mb_slug": "mago"},
+        },
+    )
+    assert r.status_code == 201
+    body = r.json()
+    assert body["pa_max"] == 5
+    assert body["pa_atual"] == 5
+
+
+def test_patch_mago_mb_sobe_nivel_atualiza_pm(tormenta_personagens_db):
+    """PATCH nível + atributos mantém PM MB alinhado ao livro."""
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "nome": "Arcanus2",
+            "tipo": "jogador",
+            "nivel": 1,
+            "classe_nivel": "Mago 1",
+            "for_valor": 8,
+            "des_valor": 8,
+            "con_valor": 8,
+            "int_valor": 18,
+            "sab_valor": 8,
+            "car_valor": 8,
+            "pv_max": 6,
+            "ficha_json": {"tormenta_classe_mb_slug": "mago"},
+        },
+    ).json()["id"]
+    r2 = client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={"nivel": 2},
+    )
+    assert r2.status_code == 200
+    assert r2.json()["pa_max"] == 8
+    assert r2.json()["pa_atual"] == 8
+
+
+def test_patch_paladino_abaixo_do_5_sem_pm(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "nome": "Luz",
+            "tipo": "jogador",
+            "nivel": 4,
+            "classe_nivel": "Paladino 4",
+            "for_valor": 10,
+            "des_valor": 10,
+            "con_valor": 10,
+            "int_valor": 10,
+            "sab_valor": 12,
+            "car_valor": 10,
+            "pv_max": 10,
+            "ficha_json": {"tormenta_classe_mb_slug": "paladino"},
+        },
+    ).json()["id"]
+    b = client.get(f"/api/v1/tormenta/personagens/{rid}").json()
+    assert b["pa_max"] == 0
+    r5 = client.patch(f"/api/v1/tormenta/personagens/{rid}", json={"nivel": 5})
+    assert r5.status_code == 200
+    # 1 PM + SAB mod (+1) no 5º, sem níveis extras além do inicial
+    assert r5.json()["pa_max"] == 2
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
     r = client.post(
@@ -306,6 +388,151 @@ def test_talentos_crud_e_get_personagem_inclui_lista(tormenta_personagens_db):
     assert (r_empty.json().get("talentos") or []) == []
 
 
+def test_magias_crud_e_get_personagem_inclui_lista(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={"nome": "ComMagias", "tipo": "jogador"},
+    ).json()["id"]
+    pr = client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={"nivel": 3, "ficha_json": {"tormenta_classe_mb_slug": "mago"}},
+    )
+    assert pr.status_code == 200, pr.text
+    assert pr.json().get("grimorio_mb_permitido") is True
+    r_add = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
+    )
+    assert r_add.status_code == 201, r_add.text
+    body = r_add.json()
+    assert body["magia_slug"] == "stub_truque_arc"
+    assert body["papel"] == "conhecida"
+    assert body.get("nome")
+    vid = body["id"]
+
+    r_dup = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
+    )
+    assert r_dup.status_code == 409
+
+    r_bad = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "slug_inexistente_xyz", "papel": "conhecida"},
+    )
+    assert r_bad.status_code == 422
+
+    r_add2 = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "stub_truque_arc", "papel": "preparada"},
+    )
+    assert r_add2.status_code == 201
+
+    r_get = client.get(f"/api/v1/tormenta/personagens/{rid}")
+    assert r_get.status_code == 200
+    mlist = r_get.json().get("magias") or []
+    assert len(mlist) == 2
+
+    r_list = client.get(f"/api/v1/tormenta/personagens/{rid}/magias")
+    assert r_list.status_code == 200
+    assert len(r_list.json()) == 2
+
+    d = client.delete(f"/api/v1/tormenta/personagens/{rid}/magias/{vid}")
+    assert d.status_code == 204
+    r_empty = client.get(f"/api/v1/tormenta/personagens/{rid}")
+    assert len(r_empty.json().get("magias") or []) == 1
+
+
+def test_magias_bloqueia_guerreiro_sem_conjuracao_manual(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={"nome": "GerrMag", "tipo": "jogador", "nivel": 5},
+    ).json()["id"]
+    client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={"ficha_json": {"tormenta_classe_mb_slug": "guerreiro"}},
+    )
+    r_get = client.get(f"/api/v1/tormenta/personagens/{rid}")
+    assert r_get.json().get("grimorio_mb_permitido") is False
+    r_add = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
+    )
+    assert r_add.status_code == 422
+
+
+def test_magias_paladino_so_apos_nivel_5_mb(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={"nome": "PalMag", "tipo": "jogador", "nivel": 4},
+    ).json()["id"]
+    client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={"ficha_json": {"tormenta_classe_mb_slug": "paladino"}},
+    )
+    assert client.get(f"/api/v1/tormenta/personagens/{rid}").json().get("grimorio_mb_permitido") is False
+    r_low = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
+    )
+    assert r_low.status_code == 422
+    client.patch(f"/api/v1/tormenta/personagens/{rid}", json={"nivel": 5})
+    assert client.get(f"/api/v1/tormenta/personagens/{rid}").json().get("grimorio_mb_permitido") is True
+    r_ok = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
+    )
+    assert r_ok.status_code == 201, r_ok.text
+
+
+def test_magias_paladino_nivel_conjurador_mb_libera_antes_do_nivel_total(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={"nome": "PalOverride", "tipo": "jogador", "nivel": 4},
+    ).json()["id"]
+    client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={
+            "ficha_json": {
+                "tormenta_classe_mb_slug": "paladino",
+                "tormenta_nivel_conjurador_mb": 5,
+            }
+        },
+    )
+    assert client.get(f"/api/v1/tormenta/personagens/{rid}").json().get("grimorio_mb_permitido") is True
+    r_add = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
+    )
+    assert r_add.status_code == 201, r_add.text
+
+
+def test_magias_conjuracao_manual_permite_guerreiro(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={"nome": "GuerMag", "tipo": "jogador", "nivel": 3},
+    ).json()["id"]
+    client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={"ficha_json": {"tormenta_classe_mb_slug": "guerreiro", "tormenta_conjuracao_manual_mb": True}},
+    )
+    r_add = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/magias",
+        json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
+    )
+    assert r_add.status_code == 201, r_add.text
+
+
 def test_migrar_talentos_mb_lista_do_json(tormenta_personagens_db):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
@@ -332,6 +559,34 @@ def test_migrar_talentos_mb_lista_do_json(tormenta_personagens_db):
     assert data["ignorados_duplicados"] == 1
     names = {x["nome"] for x in client.get(f"/api/v1/tormenta/personagens/{rid}/talentos").json()}
     assert names == {"Talento Migra A", "Talento Migra B"}
+
+
+def test_migrar_magias_texto_do_json(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json={"nome": "MigrarMag", "tipo": "jogador"},
+    ).json()["id"]
+    client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={
+            "nivel": 2,
+            "ficha_json": {
+                "tormenta_classe_mb_slug": "mago",
+                "magias_texto": "stub_truque_arc slug_inexistente_xyz stub_truque_arc",
+            },
+        },
+    )
+    r = client.post(f"/api/v1/tormenta/personagens/{rid}/magias/migrar-do-json")
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert data["vinculos_criados"] == 1
+    assert data["ignorados"] == 2
+    mlist = client.get(f"/api/v1/tormenta/personagens/{rid}").json().get("magias") or []
+    assert len(mlist) == 1
+    assert mlist[0]["magia_slug"] == "stub_truque_arc"
+    assert mlist[0]["papel"] == "conhecida"
 
 
 def test_importar_inventario_legado_remove_json(tormenta_personagens_db):

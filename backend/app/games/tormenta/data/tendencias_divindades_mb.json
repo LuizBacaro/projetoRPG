@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 — Módulo Básico (tendências e panteão).",
+    "tendencias_paginas_mb": "116–119 (grade de alinhamento; rótulos em português do MB).",
+    "divindades_paginas_mb": "120–126 (Os Vinte; ordem alfabética por nome próprio).",
+    "nota": "`slug` em divindades: chave estável para motor futuro (devotos, regras); a ficha e a API de personagem continuam a persistir o texto canónico em `rotulo` no campo `divindade`."
+  },
+  "tendencias": [
+    "Leal e Bondoso",
+    "Neutro e Bondoso",
+    "Caótico e Bondoso",
+    "Leal e Neutro",
+    "Neutro",
+    "Caótico e Neutro",
+    "Leal e Malvado",
+    "Neutro e Malvado",
+    "Caótico e Malvado"
+  ],
+  "divindades": [
+    { "slug": "aharadak", "rotulo": "Aharadak, Deus da Tormenta" },
+    { "slug": "allihanna", "rotulo": "Allihanna, Deusa da Natureza" },
+    { "slug": "arsenal", "rotulo": "Arsenal, Deus da Guerra" },
+    { "slug": "azgher", "rotulo": "Azgher, Deus do Sol" },
+    { "slug": "hyninn", "rotulo": "Hyninn, Deus da Trapaça" },
+    { "slug": "kallyadranoch", "rotulo": "Kallyadranoch, Deus dos Dragões" },
+    { "slug": "khalmyr", "rotulo": "Khalmyr, Deus da Justiça" },
+    { "slug": "lena", "rotulo": "Lena, Deusa da Vida" },
+    { "slug": "lin_wu", "rotulo": "Lin-Wu, Deus da Honra" },
+    { "slug": "marah", "rotulo": "Marah, Deusa da Paz" },
+    { "slug": "megalokk", "rotulo": "Megalokk, Deus dos Monstros" },
+    { "slug": "nimb", "rotulo": "Nimb, Deus do Caos" },
+    { "slug": "oceano", "rotulo": "Oceano, Deus do Oceano" },
+    { "slug": "sszzaas", "rotulo": "Sszzaas, Deus da Traição" },
+    { "slug": "tanna_toh", "rotulo": "Tanna-Toh, Deusa do Conhecimento" },
+    { "slug": "tenebra", "rotulo": "Tenebra, Deusa da Noite" },
+    { "slug": "thwor", "rotulo": "Thwor, Deus dos Goblinóides" },
+    { "slug": "thyatis", "rotulo": "Thyatis, Deus da Ressurreição" },
+    { "slug": "valkaria", "rotulo": "Valkaria, Deusa da Ambição" },
+    { "slug": "wynna", "rotulo": "Wynna, Deusa da Magia" }
+  ]
+}

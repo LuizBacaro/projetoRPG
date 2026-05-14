@@ -1113,7 +1113,7 @@
 .ficha-layout-dnd .ficha-corpo,
 .ficha-layout-dnd .t20-ficha-corpo {
     display: grid;
-    grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 1.15fr) minmax(16rem, 1fr);
+    grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 1.15fr) minmax(18rem, 1.08fr);
     gap: 0.55rem;
     align-items: start;
     margin-top: 0.45rem;
@@ -1551,8 +1551,14 @@
     color: var(--t20-muted);
 }
 
-/* Modal de equipamentos MB: o CSS de paridade D&D deixa .equipamentos-overlay sempre em flex; aqui só o #modalEquipamentos fica oculto até receber .is-open (JS Tormenta). */
-#modalEquipamentos.equipamentos-overlay:not(.is-open) {
+/* Modais MB no estilo `equipamentos-overlay` (paridade D&D): o parity deixa
+   .equipamentos-overlay sempre em flex na viewport; em Tormenta cada overlay
+   precisa de regra :not(.is-open) { display: none } + JS que alterna .is-open
+   (como modalEquipamentos). Sem isto o modal cobre a ficha ao carregar. */
+#modalEquipamentos.equipamentos-overlay:not(.is-open),
+#modalTalentosMb.equipamentos-overlay:not(.is-open),
+#modalGrimorioTormenta.equipamentos-overlay:not(.is-open),
+#modalConsumiveisTormenta.equipamentos-overlay:not(.is-open) {
     display: none !important;
     pointer-events: none;
 }
@@ -1584,6 +1590,10 @@
 }
 
 /* Grelha “Ataques” (planilha MB) — alto contraste como referência */
+.t20-ficha-secao--ataques-planilha {
+    min-width: 0;
+}
+
 .t20-ficha-secao--ataques-planilha .t20-ataques-planilha-legend {
     margin: 0 0 0.45rem;
     font-size: 0.68rem;
@@ -1594,25 +1604,27 @@
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    /* Colunas numéricas com minmax(0,…) para encolher dentro da borda; rótulos em 2 linhas se precisar */
     grid-template-columns:
-        minmax(3.75rem, 0.95fr)
-        minmax(1.85rem, 0.42fr)
-        minmax(0.55rem, auto)
-        minmax(1.85rem, 0.42fr)
-        minmax(0.55rem, auto)
-        minmax(1.85rem, 0.42fr)
-        minmax(0.55rem, auto)
-        minmax(1.85rem, 0.4fr)
-        minmax(0.55rem, auto)
-        minmax(1.85rem, 0.4fr);
-    gap: 0.28rem 0.15rem;
+        minmax(2.35rem, 3.15rem)
+        minmax(0, 1fr)
+        minmax(0.42rem, 1.85ch)
+        minmax(0, 1fr)
+        minmax(0.38rem, 1.35ch)
+        minmax(0, 1fr)
+        minmax(0.38rem, 1.35ch)
+        minmax(0, 1fr)
+        minmax(0.38rem, 1.35ch)
+        minmax(0, 1fr);
+    gap: 0.2rem 0.06rem;
     align-items: center;
-    font-size: 0.68rem;
-    padding: 0.35rem 0.2rem 0.45rem;
+    font-size: 0.64rem;
+    padding: 0.28rem 0.12rem 0.38rem;
     border-radius: 8px;
     border: 2px solid rgba(15, 15, 15, 0.85);
     background: linear-gradient(180deg, #faf7f0, #e8e0d4);
-    overflow-x: visible;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .t20-ap-corner {
@@ -1621,13 +1633,16 @@
 
 .t20-ap-h {
     font-weight: 700;
-    font-size: 0.58rem;
+    font-size: 0.5rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     text-align: center;
     color: var(--t20-ink);
-    line-height: 1.15;
-    padding: 0.1rem 0.05rem;
+    line-height: 1.12;
+    padding: 0.06rem 0.02rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    hyphens: auto;
 }
 
 .t20-ap-sym,
@@ -1635,17 +1650,18 @@
 .t20-ap-plus {
     text-align: center;
     font-weight: 800;
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     color: var(--t20-ink);
+    min-width: 0;
 }
 
 .t20-ap-rowlabel {
     font-weight: 800;
-    font-size: 0.58rem;
+    font-size: 0.52rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     text-align: center;
-    padding: 0.35rem 0.2rem;
+    padding: 0.28rem 0.12rem;
     background: linear-gradient(180deg, var(--t20-red-deep, #6e0000) 0%, #3a0808 100%);
     color: #fff;
     border-radius: 4px;
@@ -1656,15 +1672,28 @@
 
 .t20-ap-inp {
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+    box-sizing: border-box;
     text-align: center;
     font-weight: 700;
-    font-size: 0.82rem;
-    padding: 0.28rem 0.15rem;
-    border: 2px solid #0f0f0f;
+    font-size: 0.72rem;
+    padding: 0.2rem 0.06rem;
+    border: 1px solid #0f0f0f;
     border-radius: 4px;
     background: #fff;
     color: var(--t20-ink);
+}
+
+.t20-ap-inp::-webkit-outer-spin-button,
+.t20-ap-inp::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.t20-ap-inp[type='number'] {
+    appearance: textfield;
+    -moz-appearance: textfield;
 }
 
 .t20-ap-inp::placeholder {
@@ -1685,15 +1714,39 @@
     cursor: default;
 }
 
-.t20-ficha-secao--ataques-planilha .t20-ataques-planilha {
-    max-width: 100%;
-}
-
 /* PM — mesmo “card” dos demais vitais (Tormenta) */
 .ficha-defesa-box.ficha-pm-box {
     background: linear-gradient(135deg, #2a1f4a 0%, #151028 100%);
     border: 2px solid #7b68b8;
     justify-content: center;
+}
+
+/* Coluna esquerda: grelha 3×2 (CA, PV, PM | Ini, XP, Dinheiro) — mesma altura de cartão */
+.ficha-layout-dnd .ficha-defesa-row--col-esq {
+    align-items: stretch;
+    gap: 0.55rem;
+}
+
+.ficha-layout-dnd .ficha-defesa-row--col-esq > .ficha-defesa-box {
+    min-width: 0;
+    min-height: 5.9rem;
+}
+
+.ficha-layout-dnd .ficha-defesa-row--col-esq .ficha-defesa-box--popup-t20 {
+    padding: 0.55rem 0.35rem;
+    justify-content: center;
+}
+
+.ficha-layout-dnd .ficha-defesa-row--col-esq .ficha-defesa-box--popup-t20 .ficha-defesa-popup-btn {
+    flex: 1 1 auto;
+    align-self: stretch;
+    min-height: 4.5rem;
+    justify-content: center;
+}
+
+.ficha-layout-dnd .ficha-defesa-row--col-esq .ficha-defesa-valor--compact-t20 {
+    font-size: 1.35rem;
+    line-height: 1.12;
 }
 
 .t20-modal-mb-xp .ficha-modal-body {
@@ -1742,4 +1795,294 @@
     max-width: 100%;
     box-sizing: border-box;
     min-width: 0;
+}
+
+/* Grimório MB — papel: segmented control (três botões) */
+.grimorio-papel-wrap {
+    margin: 0;
+    padding: 0;
+}
+.grimorio-papel-legend {
+    margin: 0 0 0.28rem;
+    padding: 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--t20-muted, #5c5346);
+}
+.grimorio-papel-segmented {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.35);
+    box-sizing: border-box;
+}
+.grimorio-papel-segment {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    padding: 0.32rem 0.2rem 0.38rem;
+    border: none;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    text-align: center;
+    line-height: 1.22;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+.grimorio-papel-segment:last-child {
+    border-right: none;
+}
+.grimorio-papel-segment:hover {
+    background: rgba(255, 255, 255, 0.55);
+}
+.grimorio-papel-segment.is-selected {
+    background: rgba(139, 90, 43, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(139, 90, 43, 0.28);
+}
+.grimorio-papel-segment:focus-visible {
+    outline: 2px solid var(--t20-accent, #8b5a2b);
+    outline-offset: -2px;
+    z-index: 1;
+}
+.grimorio-papel-tit {
+    font-weight: 600;
+    font-size: 0.68rem;
+    display: block;
+}
+.grimorio-papel-sub {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--t20-muted, #6b6154);
+    font-weight: 400;
+    margin-top: 0.12rem;
+    line-height: 1.2;
+}
+.grimorio-papel-segment.is-selected .grimorio-papel-sub {
+    color: rgba(60, 52, 40, 0.88);
+}
+/* Legado: catálogos antigos com fieldset + rádios */
+.grimorio-papel-fieldset {
+    margin: 0;
+    padding: 0.35rem 0.4rem 0.45rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.45);
+}
+.grimorio-papel-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    margin-top: 0.2rem;
+}
+.grimorio-papel-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+    cursor: pointer;
+    font-size: 0.74rem;
+    line-height: 1.25;
+    margin: 0;
+}
+.grimorio-papel-opt input {
+    margin-top: 0.12rem;
+    flex-shrink: 0;
+}
+
+/* Multiclasse conjuradora MB */
+.t20-niv-conj-linha {
+    display: grid;
+    grid-template-columns: 1fr 5.5rem auto;
+    gap: 0.4rem;
+    align-items: center;
+    margin-bottom: 0.4rem;
+}
+.t20-niv-conj-linha .t20-niv-conj-del {
+    min-width: 2rem;
+    padding: 0.25rem 0.4rem;
+}
+
+/* ── Companheiro + modal consumíveis (lista na ficha; modal = equipamentos-overlay) ── */
+.t20-ficha-comp-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-height: 2rem;
+}
+
+.t20-ficha-comp-vazio {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--t20-muted, #6b6154);
+    font-style: italic;
+}
+
+.t20-ficha-comp-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.55rem;
+    border-radius: 8px;
+    border: 1px solid rgba(60, 35, 20, 0.2);
+    background: linear-gradient(165deg, rgba(255, 254, 248, 0.95), rgba(240, 232, 220, 0.85));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.t20-ficha-comp-sub {
+    font-size: 0.68rem;
+    color: var(--t20-muted, #6b6154);
+}
+
+.t20-ficha-comp-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.t20-ficha-dialog--companheiro {
+    max-width: min(96vw, 52rem);
+    width: 100%;
+}
+
+.t20-ficha-dialog--companheiro .t20-ficha-dialog__panel {
+    max-height: min(92vh, 46rem);
+}
+
+.t20-ficha-dialog__head--comp {
+    background: linear-gradient(180deg, #6e0a18, #4a060f);
+    color: #fff;
+    border-bottom: none;
+}
+
+.t20-ficha-dialog__head--comp .t20-ficha-dialog__titulo {
+    color: #fff;
+}
+
+.t20-ficha-dialog__foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    padding: 0.5rem 0.65rem;
+    border-top: 2px solid rgba(60, 35, 20, 0.15);
+    background: rgba(255, 252, 245, 0.98);
+}
+
+.t20-ficha-comp-bd {
+    max-height: min(78vh, 36rem);
+}
+
+.t20-ficha-comp-attrs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+    gap: 0.35rem;
+}
+
+.t20-ficha-comp-attr {
+    display: grid;
+    grid-template-columns: 2rem 1fr 1fr;
+    gap: 0.2rem;
+    align-items: center;
+    font-size: 0.62rem;
+    font-weight: 700;
+}
+
+.t20-ficha-comp-attr span {
+    text-align: center;
+    color: var(--t20-red-deep, #6e0a18);
+}
+
+.t20-ficha-comp-bloco {
+    padding: 0.45rem 0.4rem 0.55rem;
+    border-radius: 8px;
+    background: linear-gradient(165deg, #fff9d6, #f5edc4);
+    border: 1px solid rgba(110, 90, 20, 0.22);
+}
+
+.t20-ficha-comp-bloco-tit {
+    color: #a01818;
+}
+
+.t20-ficha-comp-ca-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    font-size: 0.62rem;
+}
+
+.t20-ficha-comp-ca-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    font-weight: 700;
+}
+
+.t20-ficha-comp-ca-grid input {
+    width: 3.2rem;
+}
+
+.t20-ficha-comp-save-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.65rem;
+}
+
+.t20-ficha-comp-save-lab {
+    display: inline-block;
+    min-width: 2.2rem;
+    font-weight: 800;
+    color: var(--t20-red-deep, #6e0a18);
+}
+
+.t20-ficha-comp-in-sm {
+    width: 3rem;
+    margin: 0 0.12rem;
+}
+
+.t20-ficha-comp-pv {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.t20-ficha-comp-pv input {
+    width: 4rem;
+    margin-left: 0.25rem;
+}
+
+.t20-ficha-comp-atk {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.68rem;
+    margin: 0.35rem 0 0.25rem;
+}
+
+.t20-ficha-comp-atk th,
+.t20-ficha-comp-atk td {
+    border: 1px solid rgba(60, 35, 20, 0.2);
+    padding: 0.2rem;
+}
+
+.t20-ficha-comp-atk th {
+    background: rgba(110, 0, 0, 0.1);
+    font-weight: 800;
+}
+
+.t20-ficha-comp-atk input {
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+    border: none;
+    background: transparent;
+    padding: 0.15rem;
 }
