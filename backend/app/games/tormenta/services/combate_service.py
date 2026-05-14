@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from app.games.tormenta.models.combate import TormentaCombate
+from app.games.tormenta.schemas.combate import TormentaCombateCondicaoMbItem
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.repositories.combate_repository import TormentaCombateRepository
 from app.games.tormenta.repositories.personagem_repository import TormentaPersonagemRepository
@@ -13,6 +14,7 @@ from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombateJaAtivoError,
     CombateNotFoundError,
+    DadosInvalidos,
 )
 
 
@@ -49,6 +51,9 @@ class TormentaCombateService:
                 "resumido": not incluir_personagens,
             }
 
+        raw_cond = combate.condicoes_mb_json
+        cond_map: Dict[str, Any] = raw_cond if isinstance(raw_cond, dict) else {}
+
         payload: Dict[str, Any] = {
             "id": combate.id,
             "usuario_id": combate.usuario_id,
@@ -58,6 +63,7 @@ class TormentaCombateService:
             "ativo": combate.ativo,
             "personagem_ativo_id": combate.obter_personagem_ativo_id(),
             "resumido": not incluir_personagens,
+            "condicoes_mb": cond_map,
         }
 
         if incluir_personagens:
@@ -96,6 +102,7 @@ class TormentaCombateService:
             turno_atual=0,
             rodada_atual=1,
             ativo=True,
+            condicoes_mb_json={},
         )
         return self.combate_repo.create(combate)
 
@@ -113,3 +120,32 @@ class TormentaCombateService:
         combate.finalizar()
         self.combate_repo.update(combate)
         return True
+
+    def aplicar_condicoes_mb(
+        self, por_personagem: Dict[str, TormentaCombateCondicaoMbItem]
+    ) -> TormentaCombate:
+        combate = self.obter_combate_ativo()
+        if not combate:
+            raise CombateNotFoundError("Nenhum combate Tormenta ativo")
+        permitidos = {int(x) for x in (combate.personagens_ids or [])}
+        atual: Dict[str, Any] = {}
+        raw = combate.condicoes_mb_json
+        if isinstance(raw, dict):
+            atual = {str(k): v for k, v in raw.items()}
+
+        for k, item in por_personagem.items():
+            try:
+                pid = int(str(k).strip())
+            except (TypeError, ValueError) as exc:
+                raise DadosInvalidos(f"Id de personagem invalido: {k}") from exc
+            if pid not in permitidos:
+                raise DadosInvalidos("Personagem nao participa deste combate")
+            rotulos = list(item.rotulos)
+            tips = list(item.tips)
+            if not rotulos and not tips:
+                atual.pop(str(pid), None)
+            else:
+                atual[str(pid)] = {"rotulos": rotulos, "tips": tips}
+
+        combate.condicoes_mb_json = atual
+        return self.combate_repo.update(combate)

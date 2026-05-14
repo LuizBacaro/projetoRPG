@@ -174,7 +174,7 @@ class TormentaPersonagemService:
         sab_valor: int,
         car_valor: int,
     ) -> None:
-        """Jogador: custo da compra 8–18 não pode ultrapassar o orçamento (20); rascunho com menos pontos gastos é permitido."""
+        """Jogador: custo da compra 8–18 deve somar exatamente 20 pontos (MB); nao pode ultrapassar."""
         if (tipo or "").lower() != "jogador":
             return
         fv, dv, cv, iv, sv, cav = TormentaPersonagemService._seis_valores_compra_pontos(
@@ -190,6 +190,11 @@ class TormentaPersonagemService:
         if int(total) > int(meta):
             raise DadosInvalidos(
                 f"Ficha tipo jogador: custo na compra por pontos nao pode ultrapassar {meta} "
+                f"(gasto atual: {total}). Ajuste ficha_json.atributos_compra ou os seis atributos."
+            )
+        if int(total) < int(meta):
+            raise DadosInvalidos(
+                f"Ficha tipo jogador: e obrigatorio gastar os {meta} pontos na compra por pontos do MB "
                 f"(gasto atual: {total}). Ajuste ficha_json.atributos_compra ou os seis atributos."
             )
 

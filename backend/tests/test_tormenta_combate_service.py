@@ -11,6 +11,7 @@ import app.models  # noqa: F401
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.repositories.combate_repository import TormentaCombateRepository
 from app.games.tormenta.repositories.personagem_repository import TormentaPersonagemRepository
+from app.games.tormenta.schemas.combate import TormentaCombateCondicaoMbItem
 from app.games.tormenta.services.combate_service import TormentaCombateService
 from app.shared.core.database import Base
 from app.shared.core.security import hash_senha
@@ -128,3 +129,37 @@ def test_avancar_turno_e_finalizar(db_tormenta_combate):
     assert st["rodada_atual"] == 2
     svc.finalizar_combate()
     assert svc.obter_status_combate()["ativo"] is False
+
+
+def test_condicoes_mb_persistem_no_combate(db_tormenta_combate):
+    db, u = db_tormenta_combate
+    a = TormentaPersonagem(dono_id=u.id, tipo="monstro", nome="A", iniciativa=2, ficha_json={})
+    b = TormentaPersonagem(dono_id=u.id, tipo="monstro", nome="B", iniciativa=1, ficha_json={})
+    db.add_all([a, b])
+    db.commit()
+    db.refresh(a)
+    db.refresh(b)
+
+    svc = TormentaCombateService(
+        TormentaCombateRepository(db),
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    svc.iniciar_combate([a.id, b.id])
+
+    svc.aplicar_condicoes_mb(
+        {
+            str(a.id): TormentaCombateCondicaoMbItem(rotulos=["Assustado"], tips=["tip-a"]),
+            str(b.id): TormentaCombateCondicaoMbItem(rotulos=["Caído"], tips=["tip-b"]),
+        }
+    )
+    st = svc.obter_status_combate()
+    cm = st.get("condicoes_mb") or {}
+    assert cm[str(a.id)]["rotulos"] == ["Assustado"]
+    assert cm[str(b.id)]["tips"] == ["tip-b"]
+
+    svc.aplicar_condicoes_mb({str(a.id): TormentaCombateCondicaoMbItem(rotulos=[], tips=[])})
+    st2 = svc.obter_status_combate()
+    cm2 = st2.get("condicoes_mb") or {}
+    assert str(a.id) not in cm2
+    assert cm2[str(b.id)]["rotulos"] == ["Caído"]

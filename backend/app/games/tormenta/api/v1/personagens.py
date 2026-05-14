@@ -17,7 +17,6 @@ from app.services.file_service import FileService
 from app.games.tormenta.schemas.magia_personagem import (
     TormentaMagiaPersonagemItem,
     TormentaMagiaVinculoCreate,
-    TormentaMigrarMagiasJsonResponse,
 )
 from app.games.tormenta.schemas.personagem import (
     TormentaPersonagemCreate,
@@ -231,23 +230,6 @@ def remover_magia_do_personagem(
 ):
     try:
         magias_svc.remover_vinculo(personagem_id, vinculo_id)
-    except ArenaBaseException as e:
-        raise HTTPException(status_code=e.status_code, detail=e.message)
-
-
-@router.post(
-    "/{personagem_id}/magias/migrar-do-json",
-    response_model=TormentaMigrarMagiasJsonResponse,
-)
-def migrar_magias_texto_do_json(
-    personagem_id: int,
-    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
-    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
-):
-    try:
-        return magias_svc.migrar_magias_texto_do_json(personagem_id)
-    except DadosInvalidos as e:
-        raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

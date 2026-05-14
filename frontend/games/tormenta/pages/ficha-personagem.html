@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260511t20apGrid" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260511t20itemPrimary" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260511t20p1export" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260511t20grimorioSemMigrar" />
 </head>
 <body class="tormenta-ficha-body">
 <div class="tormenta-ficha-wrap ficha-layout-dnd">
@@ -99,7 +99,7 @@
                     </div>
                     <p class="t20-hint" id="hintAtributos" style="margin-top:0.35rem;font-size:0.72rem">
                         Modificadores conforme <strong>tabela do Tormenta 20</strong> (faixas de valor). Os <strong>valores dos atributos</strong> são editados em <strong>Editar ficha</strong> (diálogo); aqui ficam só leitura.
-                        Fichas <strong>jogador</strong>: a <strong>soma dos custos da compra por pontos</strong> (valores 8–18 <em>sem</em> bônus racial) não pode passar de <strong>20</strong>.
+                        Fichas <strong>jogador</strong>: a <strong>soma dos custos da compra por pontos</strong> (valores-base 8–18 <em>sem</em> bônus racial) deve ser <strong>exatamente 20</strong> pontos (MB).
                     </p>
                     <p class="t20-hint t20-compra-pontos-ok" id="f_pts_compra" style="margin-top:0.2rem;font-size:0.72rem;">Compra por pontos: …</p>
                 </div>
@@ -579,7 +579,7 @@
                     <div class="t20-ficha-secao">
                         <h3 class="t20-ficha-secao-titulo">Atributos (valores finais)</h3>
                         <p class="t20-hint" style="margin:0 0 0.45rem;font-size:0.72rem">
-                            Edite os valores aqui; os círculos na coluna esquerda permanecem só leitura. Jogadores: custos da compra por pontos (8–18 sem bônus racial) são validados ao salvar a ficha.
+                            Edite os valores aqui; os círculos na coluna esquerda permanecem só leitura. Jogadores: custos da compra por pontos (8–18 sem bônus racial) devem somar <strong>20</strong> pontos MB ao salvar.
                         </p>
                         <div class="t20-identity-grid t20-identity-grid--compact">
                             <div class="t20-ficha-field"><label for="f_dlg_attr_for">FOR</label><input id="f_dlg_attr_for" type="number" min="0" max="99" class="t20-input" value="10" /></div>
@@ -1039,13 +1039,12 @@
                     <button type="button" class="equipamentos-fechar" id="btnFecharModalGrimorioTormenta" aria-label="Fechar">✕</button>
                 </div>
                 <p id="grimorioTormentaPmHint" class="t20-hint" style="margin:0 0 .75rem;padding:0 .25rem"></p>
-                <div class="equipamentos-controles">
-                    <div class="equipamentos-busca-wrapper" style="flex:1">
-                        <span class="equipamentos-busca-label">🔍 Buscar no catálogo</span>
-                        <input type="text" id="grimorioTormentaBusca" class="equipamentos-busca" placeholder="Nome ou slug…" autocomplete="off" />
+                <div class="equipamentos-controles t20-grimorio-barra-busca">
+                    <div class="equipamentos-busca-wrapper t20-grimorio-busca-grow">
+                        <span class="equipamentos-busca-label">Buscar no catálogo MB</span>
+                        <input type="text" id="grimorioTormentaBusca" class="equipamentos-busca" placeholder="Nome da magia ou identificador (ex.: bola-de-fogo)" autocomplete="off" />
                     </div>
-                    <button type="button" class="tormenta-btn" id="btnGrimorioTormentaBuscar">Buscar</button>
-                    <button type="button" class="tormenta-btn" id="btnGrimorioTormentaMigrar" title="Importa ficha_json.magias_texto: tokens que forem slugs válidos viram magias conhecidas">Importar texto legado</button>
+                    <button type="button" class="tormenta-btn tormenta-btn--primary t20-grimorio-btn-buscar" id="btnGrimorioTormentaBuscar">Buscar</button>
                 </div>
                 <div class="equipamentos-abas">
                     <button type="button" class="equipamentos-aba ativa" id="abaGrimorioVinculos">📌 Minhas magias</button>
@@ -1096,8 +1095,21 @@
             </div>
         </div>
 
-        <div class="t20-ficha-actions">
+        <div class="t20-ficha-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem">
             <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnSalvar">Salvar ficha</button>
+            <details class="t20-ficha-backup-details">
+                <summary>Cópia de segurança (arquivo)</summary>
+                <p class="t20-hint" style="margin:0.35rem 0 0">Guarde ou restaure uma cópia da ficha no seu computador. Formato técnico JSON — útil para backup ou mudar de navegador. Depois de carregar, use «Salvar ficha» para gravar no servidor.</p>
+                <div class="t20-ficha-backup-btns">
+                    <button type="button" class="tormenta-btn tormenta-btn--outline-red" id="btnT20ExportarJson" title="Exporta JSON: campos do formulário e inventário em SQL quando a ficha já tem ID">
+                        Descarregar cópia
+                    </button>
+                    <button type="button" class="tormenta-btn tormenta-btn--outline-red" id="btnT20ImportarJson" title="Carrega um arquivo JSON no navegador; use Salvar para gravar no servidor">
+                        Carregar cópia
+                    </button>
+                </div>
+            </details>
+            <input type="file" id="t20ImportFichaFile" accept="application/json,.json" class="t20-sr-only" tabindex="-1" aria-hidden="true" />
             <span id="f_status" class="tormenta-cell-muted" style="color:var(--t20-muted);"></span>
         </div>
     </div>
@@ -1109,9 +1121,9 @@
 <script>
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260511grimorioG4"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260511grimorioSemMigrar"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260511grimorioG6"></script>
-<script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260511grimorioG4"></script>
+<script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260511grimorioSemMigrar"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script>
 (function () {
@@ -2062,6 +2074,12 @@
                 msg: 'Personagem jogador: valores-base da compra (final − racial) devem estar entre 8 e 18 para somar custos.',
             };
         }
+        if (s < PONTOS_INICIAIS_COMPRA) {
+            return {
+                ok: false,
+                msg: `Personagem jogador: é obrigatório gastar os ${PONTOS_INICIAIS_COMPRA} pontos na compra por pontos do MB (gasto atual: ${s}).`,
+            };
+        }
         if (s > PONTOS_INICIAIS_COMPRA) {
             return {
                 ok: false,
@@ -2069,6 +2087,27 @@
             };
         }
         return { ok: true };
+    }
+
+    function t20AtualizarEstadoBotaoSalvar() {
+        const btn = q('btnSalvar');
+        if (!btn) return;
+        const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
+        let bloqueado = false;
+        let title = '';
+        if (tipo === 'jogador') {
+            const c = validarCompraPontosJogador();
+            const r = validarEscolhasRacaMb();
+            if (!c.ok) {
+                bloqueado = true;
+                title = c.msg;
+            } else if (!r.ok) {
+                bloqueado = true;
+                title = r.msg;
+            }
+        }
+        btn.disabled = bloqueado;
+        btn.title = title || 'Gravar personagem no servidor';
     }
 
     function validarEscolhasRacaMb() {
@@ -2199,6 +2238,7 @@
         atualizarTagsHeader();
         if (resetBaseDez && slug && slug !== '__livre__') aplicarRacaSomenteAjustes();
         else atualizarLinhaCompraPontos();
+        t20AtualizarEstadoBotaoSalvar();
     }
 
     function bindRacaUiOnce() {
@@ -2216,6 +2256,7 @@
                     atualizarTracosRacaPainel();
                     atualizarSugestaoIdiomasMb();
                     syncCampoRacaNomeParaApi();
+                    t20AtualizarEstadoBotaoSalvar();
                 });
             }
         });
@@ -2227,6 +2268,7 @@
                 atualizarTracosRacaPainel();
                 atualizarSugestaoIdiomasMb();
                 syncCampoRacaNomeParaApi();
+                t20AtualizarEstadoBotaoSalvar();
             });
         }
         const liv = q('f_raca_livre');
@@ -2294,17 +2336,22 @@
             el.textContent =
                 'Compra por pontos (sem racial): — (valores-base fora de 8–18 na tabela do MB).';
             if (tipo === 'jogador') el.classList.add('t20-compra-pontos-erro');
+            t20AtualizarEstadoBotaoSalvar();
             return;
         }
-        el.textContent = `Compra por pontos (sem racial): ${s} / ${PONTOS_INICIAIS_COMPRA} pontos no máximo (MB).`;
+        el.textContent = `Compra por pontos (sem racial): ${s} / ${PONTOS_INICIAIS_COMPRA} pontos (MB — deve gastar exatamente ${PONTOS_INICIAIS_COMPRA}).`;
         if (tipo === 'jogador') {
-            if (s <= PONTOS_INICIAIS_COMPRA) el.classList.add('t20-compra-pontos-ok');
-            if (s > PONTOS_INICIAIS_COMPRA) el.classList.add('t20-compra-pontos-erro');
+            if (s === PONTOS_INICIAIS_COMPRA) el.classList.add('t20-compra-pontos-ok');
+            if (s > PONTOS_INICIAIS_COMPRA || s < PONTOS_INICIAIS_COMPRA) el.classList.add('t20-compra-pontos-erro');
         }
         if (s > PONTOS_INICIAIS_COMPRA) {
             el.textContent +=
                 ' Ultrapassou o orçamento: reduza os valores-base (final − ajuste racial) ou a raça.';
         }
+        if (tipo === 'jogador' && s < PONTOS_INICIAIS_COMPRA) {
+            el.textContent += ` Faltam ${PONTOS_INICIAIS_COMPRA - s} ponto(s) de compra para distribuir (MB).`;
+        }
+        t20AtualizarEstadoBotaoSalvar();
     }
 
     function formatModificadorAtributo(mod) {
@@ -4957,9 +5004,113 @@
         };
     }
 
+    function t20SlugNomeArquivo(nome) {
+        const s = String(nome || 'personagem')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9._-]+/g, '')
+            .slice(0, 48);
+        return s || 'personagem';
+    }
+
+    function t20BaixarJson(obj, nomeArquivo) {
+        const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = nomeArquivo;
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(a.href);
+        a.remove();
+    }
+
+    async function t20MontarExportacaoTormenta() {
+        t20SyncAttrsDialogToSheet();
+        t20SyncResDialogToSheet();
+        t20SyncDeslTamDialogToSheet();
+        const body = payloadBase();
+        const fid = (q('fichaId') && q('fichaId').value.trim()) || '';
+        let base;
+        if (fid) {
+            base = await svc.obter(fid);
+        } else {
+            base = {
+                nome: body.nome,
+                tipo: body.tipo,
+                jogador_nome: body.jogador_nome,
+                raca: body.raca,
+                classe_nivel: body.classe_nivel,
+                sexo: body.sexo,
+                idade: body.idade,
+                tendencia: body.tendencia,
+                divindade: body.divindade,
+                for_valor: body.for_valor,
+                des_valor: body.des_valor,
+                con_valor: body.con_valor,
+                int_valor: body.int_valor,
+                sab_valor: body.sab_valor,
+                car_valor: body.car_valor,
+                pv_max: body.pv_max,
+                pv_atual: body.pv_atual,
+                pa_max: body.pa_max,
+                pa_atual: body.pa_atual,
+                ca: body.ca,
+                rd: body.rd,
+                nivel: body.nivel,
+                iniciativa: body.iniciativa,
+                deslocamento: body.deslocamento,
+                tamanho: body.tamanho,
+                fort_total: body.fort_total,
+                ref_total: body.ref_total,
+                von_total: body.von_total,
+                ficha_json: body.ficha_json,
+                foto_url: body.foto_url,
+                talentos: [],
+                equipamentos: [],
+                consumiveis: [],
+                magias: [],
+            };
+        }
+        const merged = {
+            ...base,
+            ...body,
+            ficha_json: body.ficha_json,
+            foto_url: body.foto_url != null ? body.foto_url : base.foto_url,
+        };
+        return {
+            schema: 'tormenta_ficha_export',
+            version: 1,
+            exported_at: new Date().toISOString(),
+            personagem: merged,
+        };
+    }
+
+    function t20ExtrairPersonagemDeImport(data) {
+        if (!data || typeof data !== 'object') return null;
+        if (data.schema === 'tormenta_ficha_export' && data.version === 1 && data.personagem && typeof data.personagem === 'object') {
+            return data.personagem;
+        }
+        if (typeof data.nome === 'string' && data.nome.trim() && (data.ficha_json != null || data.for_valor != null)) {
+            return data;
+        }
+        return null;
+    }
+
+    function t20AjustarIdImportado(personagem) {
+        const p = { ...personagem };
+        const cur = (q('fichaId') && q('fichaId').value.trim()) || '';
+        const fileId = p.id != null && p.id !== '' ? String(p.id) : '';
+        if (fileId && cur && fileId !== cur) {
+            delete p.id;
+        }
+        return p;
+    }
+
     function preencherForm(p) {
         _t20RdLegado = p.rd != null && p.rd !== undefined ? String(p.rd) : '';
-        q('fichaId').value = String(p.id);
+        q('fichaId').value = p.id != null && p.id !== '' ? String(p.id) : '';
         q('f_nome').value = p.nome || '';
         q('f_tipo').value = p.tipo || 'jogador';
         q('f_tipo').disabled = !isMestre;
@@ -5181,6 +5332,7 @@
             ft.addEventListener('change', () => {
                 atualizarLinhaCompraPontos();
                 atualizarTagsHeader();
+                t20AtualizarEstadoBotaoSalvar();
             });
         }
 
@@ -5406,27 +5558,6 @@
                 carregarGrimorioCatalogo(true);
             });
         }
-        const btnGrMig = q('btnGrimorioTormentaMigrar');
-        if (btnGrMig) {
-            btnGrMig.addEventListener('click', async () => {
-                const pidM = q('fichaId') && q('fichaId').value;
-                if (!pidM) {
-                    Toast.error('Salve a ficha antes de importar.');
-                    return;
-                }
-                try {
-                    const res = await grimorioSvc.migrarMagiasTextoDoJson(pidM);
-                    const cri = res && res.vinculos_criados != null ? res.vinculos_criados : 0;
-                    const ign = res && res.ignorados != null ? res.ignorados : 0;
-                    Toast.success(`Importação: ${cri} nova(s); ${ign} ignorado(s).`);
-                    await carregarGrimorioVinculosNaLista();
-                    await carregarGrimorioCatalogo(true);
-                } catch (eM) {
-                    Toast.error(eM.message || 'Erro ao importar texto legado');
-                }
-            });
-        }
-
         document.addEventListener('keydown', (ev) => {
             if (ev.key !== 'Escape') return;
             const ovGrEsc = q('modalGrimorioTormenta');
@@ -5673,6 +5804,97 @@
                 Toast.error(e.message || 'Erro ao salvar');
             }
         });
+
+        const btnEx = q('btnT20ExportarJson');
+        if (btnEx) {
+            btnEx.addEventListener('click', async () => {
+                try {
+                    const pack = await t20MontarExportacaoTormenta();
+                    const idp = pack.personagem && pack.personagem.id != null ? String(pack.personagem.id) : 'nova';
+                    const fn = `tormenta-ficha-${t20SlugNomeArquivo(pack.personagem.nome)}-${idp}.json`;
+                    t20BaixarJson(pack, fn);
+                    if (typeof Toast !== 'undefined' && Toast.success) Toast.success('Exportação JSON gerada.');
+                } catch (eEx) {
+                    if (typeof Toast !== 'undefined' && Toast.error) Toast.error(eEx.message || 'Erro ao exportar');
+                }
+            });
+        }
+        const btnIm = q('btnT20ImportarJson');
+        const inpIm = q('t20ImportFichaFile');
+        if (btnIm && inpIm) {
+            btnIm.addEventListener('click', () => {
+                if (
+                    !window.confirm(
+                        'Importar substitui os dados desta ficha no navegador (não grava no servidor até você clicar em Salvar). Continuar?',
+                    )
+                ) {
+                    return;
+                }
+                inpIm.value = '';
+                inpIm.click();
+            });
+            inpIm.addEventListener('change', () => {
+                const f = inpIm.files && inpIm.files[0];
+                inpIm.value = '';
+                if (!f) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const data = JSON.parse(String(reader.result || '{}'));
+                        const personagem = t20ExtrairPersonagemDeImport(data);
+                        if (!personagem) {
+                            Toast.error(
+                                'Arquivo JSON inválido ou formato não reconhecido (use Exportar JSON ou o formato da API de personagem).',
+                            );
+                            return;
+                        }
+                        const curAntes = (q('fichaId') && q('fichaId').value.trim()) || '';
+                        const fileId = personagem.id != null && personagem.id !== '' ? String(personagem.id) : '';
+                        const otherIdDropped = !!(fileId && curAntes && fileId !== curAntes);
+                        const p2 = t20AjustarIdImportado(personagem);
+                        preencherForm(p2);
+                        const st = q('f_status');
+                        if (st) {
+                            st.textContent =
+                                p2.id != null && String(p2.id)
+                                    ? `Editando #${p2.id} (importado)`
+                                    : 'Nova ficha (importada)';
+                        }
+                        t20AtualizarEstadoBotaoSalvar();
+                        if (typeof Toast !== 'undefined' && Toast.success) {
+                            Toast.success(
+                                otherIdDropped
+                                    ? 'Ficha importada (arquivo era de outro personagem — ID removido; salve para criar cópia).'
+                                    : 'Ficha importada na memória do navegador — salve para persistir.',
+                            );
+                        }
+                        try {
+                            if (p2.id != null && String(p2.id)) {
+                                history.replaceState(
+                                    null,
+                                    '',
+                                    `ficha-personagem.html?id=${encodeURIComponent(String(p2.id))}`,
+                                );
+                            } else {
+                                history.replaceState(null, '', 'ficha-personagem.html');
+                            }
+                        } catch (eH2) {
+                            /* ignore */
+                        }
+                    } catch (eIm) {
+                        if (typeof Toast !== 'undefined' && Toast.error) {
+                            Toast.error(eIm.message || 'Erro ao ler JSON');
+                        }
+                    }
+                };
+                reader.onerror = () => {
+                    if (typeof Toast !== 'undefined' && Toast.error) Toast.error('Não foi possível ler o arquivo.');
+                };
+                reader.readAsText(f, 'UTF-8');
+            });
+        }
+
+        t20AtualizarEstadoBotaoSalvar();
     }
 
     q('btnLogout').addEventListener('click', () => AuthService.logout && AuthService.logout());

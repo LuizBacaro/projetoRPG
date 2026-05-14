@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -14,7 +13,6 @@ from app.games.tormenta.rules.grimorio_elegibilidade_t20 import resumo_elegibili
 from app.games.tormenta.schemas.magia_personagem import (
     TormentaMagiaPersonagemItem,
     TormentaMagiaVinculoCreate,
-    TormentaMigrarMagiasJsonResponse,
 )
 from app.repositories.base import commit_with_rollback
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
@@ -111,60 +109,3 @@ class TormentaPersonagemMagiasService:
             raise ArenaBaseException("Vinculo nao encontrado", status_code=404)
         self.db.delete(row)
         commit_with_rollback(self.db)
-
-    def migrar_magias_texto_do_json(self, personagem_id: int) -> TormentaMigrarMagiasJsonResponse:
-        """Importa `ficha_json.magias_texto`: tokens (espaço, vírgula, `;`, quebra de linha) que forem slugs válidos no catálogo → papel `conhecida`."""
-        p = self.db.get(TormentaPersonagem, personagem_id)
-        if not p:
-            raise ArenaBaseException("Personagem nao encontrado", status_code=404)
-        fj = p.ficha_json or {}
-        raw = fj.get("magias_texto")
-        texto = str(raw or "").strip()
-        if not texto:
-            return TormentaMigrarMagiasJsonResponse(vinculos_criados=0, ignorados=0)
-
-        ok_g, motivo_g = resumo_elegibilidade_grimorio_mb(
-            tipo=str(p.tipo or ""),
-            nivel=int(p.nivel or 1),
-            ficha_json=p.ficha_json if isinstance(p.ficha_json, dict) else {},
-        )
-        if not ok_g:
-            raise DadosInvalidos(motivo_g)
-
-        tokens = [t.strip().lower() for t in re.split(r"[\s,;\n]+", texto) if t and str(t).strip()]
-        criados = 0
-        ignorados = 0
-        papel_default = "conhecida"
-        for slug in tokens:
-            if len(slug) < 2:
-                ignorados += 1
-                continue
-            slug = slug[:80]
-            if not magia_mb_slug_no_catalogo(slug):
-                ignorados += 1
-                continue
-            dup = (
-                self.db.query(TormentaMagiaPersonagem)
-                .filter(
-                    TormentaMagiaPersonagem.personagem_id == personagem_id,
-                    TormentaMagiaPersonagem.magia_slug == slug,
-                    TormentaMagiaPersonagem.papel == papel_default,
-                )
-                .first()
-            )
-            if dup:
-                ignorados += 1
-                continue
-            self.db.add(
-                TormentaMagiaPersonagem(
-                    personagem_id=personagem_id,
-                    magia_slug=slug,
-                    papel=papel_default,
-                    notas=None,
-                )
-            )
-            criados += 1
-            self.db.flush()
-        if criados:
-            commit_with_rollback(self.db)
-        return TormentaMigrarMagiasJsonResponse(vinculos_criados=criados, ignorados=ignorados)

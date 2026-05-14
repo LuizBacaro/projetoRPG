@@ -62,4 +62,17 @@ class TormentaCombateService {
         });
         return this._handleResponse(res, 'Erro ao finalizar combate');
     }
+
+    /**
+     * Persiste condições MB (~p.220) por personagem no combate ativo.
+     * @param {Record<string, { rotulos: string[], tips: string[] }>} porPersonagem chaves = id (string)
+     */
+    async aplicarCondicoesMb(porPersonagem) {
+        const res = await fetch(this._url('/condicoes-mb'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify({ por_personagem: porPersonagem }),
+        });
+        return this._handleResponse(res, 'Erro ao gravar condições do combate');
+    }
 }

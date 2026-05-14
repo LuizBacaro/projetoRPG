@@ -28,10 +28,6 @@ class TormentaGrimorioService {
         return this._personagem.removerMagia(personagemId, vinculoId);
     }
 
-    migrarMagiasTextoDoJson(personagemId) {
-        return this._personagem.migrarMagiasDoJson(personagemId);
-    }
-
     obterPersonagem(personagemId) {
         return this._personagem.obter(personagemId);
     }

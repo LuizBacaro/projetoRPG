@@ -20,14 +20,14 @@ Documentado também em `backend/app/games/tormenta/README.md`. Resumo:
 - `defesa_detalhe`, `armadura_escudo_tabela`
 - `talentos_texto`, `magias_texto`, `raca_origem_texto`
 - `raca_tormenta_slug`, `raca_tormenta_mais2a`, `raca_tormenta_mais2b`, `raca_tormenta_livre` (raça MB + escolhas Humano/Lefou ou texto livre)
-- `atributos_compra` — mapa `{ for, des, con, int, sab, car }` com valores-base 8–18 (compra por pontos; soma dos custos ≤ 20)
+- `atributos_compra` — mapa `{ for, des, con, int, sab, car }` com valores-base 8–18 (compra por pontos; soma dos custos na tabela MB = **20**)
 - `dinheiro`, `carga`, `idiomas`, `campanha`, `mestre`, `outros_jogadores`, `xp_atual`, `xp_proximo`
 - `historia`, `personalidade`, `aparencia`, `notas`
 - **Grimório / conjuração MB:** `tormenta_classe_mb_slug`, `tormenta_conjuracao_manual_mb`, `tormenta_nivel_conjurador_mb` (opcional), `tormenta_niveis_classe_mb` (opcional, lista `{slug, nivel}` — editável na ficha em «Multiclasse — classes conjuradoras» ou no JSON), `tormenta_grimorio_sessao_mb` (`pm_gastos_sessao`, `preparadas_anotacao` — lembretes de sessão)
 
 Novas chaves devem ser **aditivas** (nunca remover silenciosamente) para compatibilidade com fichas já salvas.
 
-**Compra por pontos (jogador):** ao criar ou atualizar via API, a soma dos custos dos seis atributos (8–18) **não pode ultrapassar 20**; gastar menos é permitido. Monstro/NPC: sem essa regra.
+**Compra por pontos (jogador):** ao criar ou atualizar via API, a soma dos custos dos seis atributos (8–18) deve ser **exatamente 20** pontos (MB). Monstro/NPC: sem essa regra.
 
 ### Evolução recomendada
 

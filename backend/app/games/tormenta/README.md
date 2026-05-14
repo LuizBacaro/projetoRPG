@@ -31,7 +31,7 @@ Guard: `requer_game_tormenta` (JWT `game_slug=tormenta` em modo estrito).
 
 ## Colunas principais
 
-- Atributos na compra por pontos: fichas **tipo jogador** usam `ficha_json.atributos_compra` quando presente (valores-base 8–18); senão os seis atributos do modelo. O custo total **não pode ultrapassar 20**; gastar menos é permitido (rascunho). Monstro/NPC sem essa regra.
+- Atributos na compra por pontos: fichas **tipo jogador** usam `ficha_json.atributos_compra` quando presente (valores-base 8–18); senão os seis atributos do modelo. O custo total na tabela MB deve ser **exatamente 20** pontos (nem menos nem mais). Monstro/NPC sem essa regra.
 - `foto_url`: URL do retrato (opcional). Contrato e evolução: [docs/tormenta/05-contrato-dados-ficha-json-e-api.md](../../../../docs/tormenta/05-contrato-dados-ficha-json-e-api.md).
 
 ## `ficha_json` (extensível)
@@ -49,7 +49,7 @@ Levantamento de requisitos do jogo: [docs/tormenta/README.md](../../../../docs/t
 
 ## Frontend
 
-`frontend/games/tormenta/pages/` — `dashboard.html`, `ficha-personagem.html`.
+`frontend/games/tormenta/pages/` — `dashboard.html`, `ficha-personagem.html` (compra MB **20 pontos exatos** para tipo **jogador** na API e na UI; **Exportar / Importar JSON** da ficha para backup local).
 
 ## Catálogos e regras MB (fonte única)
 

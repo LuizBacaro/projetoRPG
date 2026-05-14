@@ -133,6 +133,20 @@ body.tormenta-app {
     box-shadow: 0 2px 8px rgba(139, 0, 0, 0.35);
 }
 
+.tormenta-btn--outline-red {
+    background: transparent;
+    color: var(--t20-red-deep);
+    border-color: var(--t20-red-deep);
+    font-weight: 600;
+}
+
+.tormenta-btn--outline-red:hover {
+    background: rgba(139, 0, 0, 0.08);
+    border-color: var(--t20-red);
+    color: var(--t20-red-deep);
+    box-shadow: 0 0 0 1px rgba(139, 0, 0, 0.15);
+}
+
 .tormenta-main {
     max-width: 1100px;
     margin: 0 auto;

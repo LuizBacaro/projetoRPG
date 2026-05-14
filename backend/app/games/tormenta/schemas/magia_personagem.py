@@ -30,14 +30,3 @@ class TormentaMagiaPersonagemItem(BaseModel):
     escola: Optional[str] = Field(None, max_length=80)
     notas: Optional[str] = None
     adicionado_em: datetime
-
-
-class TormentaMigrarMagiasJsonResponse(BaseModel):
-    """Importação de `ficha_json.magias_texto` → vínculos (apenas tokens que são slugs do catálogo MB)."""
-
-    vinculos_criados: int = Field(..., ge=0)
-    ignorados: int = Field(
-        ...,
-        ge=0,
-        description="Tokens vazios, duplicados ou fora do catálogo.",
-    )

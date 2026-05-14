@@ -15,6 +15,8 @@ class TormentaCombate(Base):
     turno_atual = Column(Integer, default=0)
     rodada_atual = Column(Integer, default=1)
     ativo = Column(Boolean, default=True)
+    # {"<personagem_id>": {"rotulos": [...], "tips": [...]}} — cenário MB (~p.220) na mesa
+    condicoes_mb_json = Column(JSON, nullable=True)
 
     def obter_personagem_ativo_id(self):
         if not self.personagens_ids or self.turno_atual >= len(self.personagens_ids):

@@ -200,13 +200,4 @@ class TormentaPersonagemService {
         });
         return this._handleResponse(res, 'Erro ao remover magia');
     }
-
-    async migrarMagiasDoJson(id) {
-        const res = await fetch(this._url(`/${id}/magias/migrar-do-json`), {
-            method: 'POST',
-            headers: this._headers(true),
-            body: '{}',
-        });
-        return this._handleResponse(res, 'Erro ao migrar magias do JSON');
-    }
 }
