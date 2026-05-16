@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "titulo": "Tormenta 20 — compra de atributos por pontos",
+    "nota": "Valores de custo alinhados à referência comunitária TSdR (wiki); conferir com o Módulo Básico (p. 7 no teu exemplar).",
+    "pontos_iniciais": 20,
+    "versao_schema": 1
+  },
+  "custos": [
+    { "valor": 8, "custo": -2 },
+    { "valor": 9, "custo": -1 },
+    { "valor": 10, "custo": 0 },
+    { "valor": 11, "custo": 1 },
+    { "valor": 12, "custo": 2 },
+    { "valor": 13, "custo": 3 },
+    { "valor": 14, "custo": 4 },
+    { "valor": 15, "custo": 6 },
+    { "valor": 16, "custo": 8 },
+    { "valor": 17, "custo": 11 },
+    { "valor": 18, "custo": 14 }
+  ]
+}

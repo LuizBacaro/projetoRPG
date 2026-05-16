@@ -1,0 +1,163 @@
+/**
+ * frontend/games/tormenta/css/em-breve.css
+ * Casca visual "em breve" — paleta alinhada ao vermelho/verde Tormenta (marca).
+ */
+:root {
+    --tormenta-bg: #0f1a12;
+    --tormenta-card: #15261a;
+    --tormenta-border: #2d5a3a;
+    --tormenta-accent: #c41e3a;
+    --tormenta-accent-soft: #e85d4f;
+    --tormenta-green: #3d8c5a;
+    --tormenta-text: #e8f4ec;
+    --tormenta-muted: #9cb8a8;
+    /* Borda do logo: tons do próprio fundo/cartão (homogeneidade com o PNG) */
+    --tormenta-logo-fade: rgba(10, 18, 13, 0.72);
+}
+
+body.em-breve-tormenta {
+    min-height: 100vh;
+    margin: 0;
+    background:
+        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(61, 140, 90, 0.35), transparent),
+        linear-gradient(165deg, var(--tormenta-bg) 0%, #0a120d 100%);
+    color: var(--tormenta-text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+}
+
+.em-breve-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+    box-sizing: border-box;
+}
+
+.em-breve-card {
+    max-width: 34rem;
+    width: 100%;
+    padding: 2rem 1.75rem;
+    border-radius: 1rem;
+    background: linear-gradient(180deg, var(--tormenta-card) 0%, #101c14 100%);
+    border: 1px solid var(--tormenta-border);
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.em-breve-icone {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.em-breve-kicker {
+    display: block;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tormenta-green);
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.em-breve-titulo {
+    margin: 0 0 0.75rem;
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--tormenta-text);
+    line-height: 1.15;
+}
+
+.em-breve-descricao {
+    margin: 0 0 1.25rem;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--tormenta-muted);
+}
+
+.em-breve-descricao strong {
+    color: var(--tormenta-accent-soft);
+}
+
+.em-breve-lista {
+    margin: 0 0 1.5rem;
+    padding-left: 1.15rem;
+    color: var(--tormenta-muted);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.em-breve-lista code {
+    font-size: 0.82em;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 0.12rem 0.35rem;
+    border-radius: 0.25rem;
+    color: var(--tormenta-text);
+}
+
+.em-breve-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.em-breve-acoes .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.em-breve-acoes .btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+}
+
+.em-breve-acoes .btn-primary {
+    background: linear-gradient(135deg, var(--tormenta-green), #2d6b45);
+    color: #fff;
+}
+
+.em-breve-acoes .btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--tormenta-text);
+    border: 1px solid var(--tormenta-border);
+}
+
+.em-breve-rodape {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--tormenta-muted);
+}
+
+.em-breve-link {
+    color: var(--tormenta-accent-soft);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.em-breve-logo {
+    display: block;
+    width: min(180px, 48vw);
+    height: auto;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    object-fit: cover;
+    aspect-ratio: 1;
+    /* Halo só com cores do tema — sem cinza “estranho” ao fundo verde-escuro */
+    clip-path: circle(49.2% at 50% 50%);
+    box-shadow:
+        0 0 0 2px var(--tormenta-bg),
+        0 0 0 6px var(--tormenta-card),
+        0 0 0 12px var(--tormenta-logo-fade),
+        0 10px 32px rgba(0, 0, 0, 0.38);
+}

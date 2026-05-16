@@ -65,6 +65,8 @@ export class FichaPersonagemController {
         this.talentoService = new TalentoService();
         this.periciaService = new PericiaService();
         this.combatente        = null;
+        /** True após `_configurarEventos()` no fim de `inicializar()` — usado pelo smoke E2E. */
+        this._fichaEventosDOMProntos = false;
         this.bonusCaProtecao   = 0;
         this.dominiosPermitidos = [...DOMINIOS_PERMITIDOS_FALLBACK];
         this.divindadesCatalogo = DIVINDADES_CATALOGO_FALLBACK.map((item) => ({ ...item }));
@@ -162,9 +164,10 @@ export class FichaPersonagemController {
 
             // ── Configurar eventos ──
             this._configurarEventos();
-
+            this._fichaEventosDOMProntos = true;
 
         } catch (error) {
+            this._fichaEventosDOMProntos = false;
             console.error('❌ Erro ao inicializar ficha:', error);
             const msg = String(error?.message || '');
             if (msg.includes('401')) {

@@ -19,9 +19,12 @@ venv/
 uploads/
 backend/uploads/
 backend/uploads/**
+
+# Materiais de referência locais (PDFs, planilhas, scripts de extração)
+livros/
+helpers/
+
 *.pdf
-# ✅ EXCEÇÃO: Livro de referência D&D 3.5 (sem DRM, uso educacional)
-!D&D3_5_livro_jogador.pdf
 
 # IDE
 .vscode/

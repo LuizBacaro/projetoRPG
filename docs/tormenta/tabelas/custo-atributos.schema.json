@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://arena.local/schemas/tormenta-custo-atributos.json",
+  "title": "Tormenta20 custo por valor de habilidade",
+  "type": "object",
+  "required": ["custos"],
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "properties": {
+        "titulo_livro": { "type": "string" },
+        "tabela": { "type": "string" },
+        "pagina_livro": { "type": ["integer", "null"] },
+        "versao_schema": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "custos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["valor", "custo"],
+        "properties": {
+          "valor": { "type": "integer", "minimum": 1, "maximum": 20 },
+          "custo": { "type": "integer" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

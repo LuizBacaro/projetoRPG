@@ -70,6 +70,9 @@ jobs:
           safety check --full-report || true
           bandit -r app/ -ll -f json -o bandit-report.json || true
 
+      - name: Check Tormenta MB magias catalog JSON
+        run: python scripts/check_magias_mb_catalogo.py
+
       # Cobertura total da suite ~73% (maio/2026); restaurar 80% com mais testes.
       - name: Run pytest with coverage
         run: python -m pytest tests/ -q --tb=short --ignore=tests/e2e --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=72

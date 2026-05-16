@@ -7,7 +7,8 @@ Convenção de slugs (deve casar com `games_catalog.slug` no backend):
 
 - `dnd35/` — Dungeons & Dragons 3.5 (em produção)
 - `dnd5e/` — Dungeons & Dragons 5e (em breve)
-- `gurps/` — GURPS (em breve)
+- `tormenta/` — Tormenta RPG (em breve)
+- `gurps/` — GURPS (disponível)
 
 ## Estrutura-alvo de cada jogo
 
@@ -27,12 +28,13 @@ frontend/games/<slug>/
   reescreve `/dashboard`, `/arena` e `/pericias` para estes arquivos.
   O shell (`login`, seletor) em `frontend/pages/` também importa assets
   deste pacote (`/games/dnd35/css/...`, `.../js/config/...`). As páginas
-  **em breve** (`dnd5e/`, `gurps/`) reutilizam o mesmo
+  **em breve** (`dnd5e/`, `tormenta/`, `gurps/`) reutilizam o mesmo
   `/games/dnd35/js/ui/toast.module.js`.
 - `dnd5e/em-breve.html` — página de placeholder com identidade visual
   D&D 5e ("Em breve").
-- `gurps/em-breve.html` — página de placeholder com identidade visual
-  GURPS ("Em breve").
+- `tormenta/em-breve.html` — placeholder Tormenta (logotipo em
+  `/assets/brand/logo_tormenta-v5.png`).
+- `gurps/` — bundle GURPS (`pages/dashboard.html`, ficha, combate, …).
 
 ## Como o seletor entra aqui
 
@@ -42,7 +44,8 @@ frontend/games/<slug>/
 |---------|-------------|----------------------------------------|
 | dnd35   | disponivel  | `/dashboard` (frontend D&D 3.5)        |
 | dnd5e   | em_breve    | `/games/dnd5e/em-breve.html`           |
-| gurps   | em_breve    | `/games/gurps/em-breve.html`           |
+| tormenta | em_breve   | `/games/tormenta/em-breve.html`        |
+| gurps   | disponivel  | `/games/gurps/pages/dashboard.html`    |
 
 Quando um jogo "em breve" entrar em produção, o destino passa a ser a
 `pages/dashboard.html` daquele pacote e o status no catálogo do

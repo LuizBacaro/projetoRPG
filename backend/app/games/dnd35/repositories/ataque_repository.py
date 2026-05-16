@@ -13,7 +13,6 @@ from app.repositories.base import commit_with_rollback
 
 
 class AtaqueRepository:
-
     def __init__(self, db: Session):
         self.db = db
 
