@@ -38,7 +38,9 @@ class TormentaPersonagemTalentosService:
             adicionado_em=row.adicionado_em,
         )
 
-    def listar_por_personagem(self, personagem_id: int) -> List[TormentaTalentoPersonagemItem]:
+    def listar_por_personagem(
+        self, personagem_id: int
+    ) -> List[TormentaTalentoPersonagemItem]:
         rows = (
             self.db.query(TormentaTalentoPersonagem)
             .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
@@ -116,14 +118,18 @@ class TormentaPersonagemTalentosService:
         self.db.delete(row)
         commit_with_rollback(self.db)
 
-    def migrar_talentos_mb_lista_do_json(self, personagem_id: int) -> TormentaMigrarTalentosJsonResponse:
+    def migrar_talentos_mb_lista_do_json(
+        self, personagem_id: int
+    ) -> TormentaMigrarTalentosJsonResponse:
         p = self.db.get(TormentaPersonagem, personagem_id)
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         fj = p.ficha_json or {}
         raw = fj.get("talentos_mb_lista")
         if not isinstance(raw, list):
-            return TormentaMigrarTalentosJsonResponse(vinculos_criados=0, ignorados_duplicados=0)
+            return TormentaMigrarTalentosJsonResponse(
+                vinculos_criados=0, ignorados_duplicados=0
+            )
 
         criados = 0
         dup = 0

@@ -7,10 +7,18 @@ from typing import Set
 from sqlalchemy.orm import Session
 
 from app.games.tormenta.models.personagem import TormentaPersonagem
-from app.games.tormenta.schemas.inventario_legado import TormentaInventarioLegadoImportResponse
-from app.games.tormenta.services.personagem_consumiveis_service import TormentaPersonagemConsumiveisService
-from app.games.tormenta.services.personagem_equipamentos_service import TormentaPersonagemEquipamentosService
-from app.games.tormenta.services.personagem_talentos_service import TormentaPersonagemTalentosService
+from app.games.tormenta.schemas.inventario_legado import (
+    TormentaInventarioLegadoImportResponse,
+)
+from app.games.tormenta.services.personagem_consumiveis_service import (
+    TormentaPersonagemConsumiveisService,
+)
+from app.games.tormenta.services.personagem_equipamentos_service import (
+    TormentaPersonagemEquipamentosService,
+)
+from app.games.tormenta.services.personagem_talentos_service import (
+    TormentaPersonagemTalentosService,
+)
 from app.repositories.base import commit_with_rollback
 from app.shared.exceptions.custom_exceptions import ArenaBaseException
 
@@ -33,7 +41,9 @@ class TormentaPersonagemInventarioLegadoService:
     def __init__(self, db: Session):
         self.db = db
 
-    def importar_legado(self, personagem_id: int) -> TormentaInventarioLegadoImportResponse:
+    def importar_legado(
+        self, personagem_id: int
+    ) -> TormentaInventarioLegadoImportResponse:
         p = self.db.get(TormentaPersonagem, personagem_id)
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)

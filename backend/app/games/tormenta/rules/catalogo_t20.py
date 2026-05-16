@@ -198,14 +198,23 @@ def lista_talentos_mb_catalogo() -> List[Dict[str, Any]]:
 
 def _haystack_talento_mb(r: Dict[str, Any]) -> str:
     parts: List[str] = []
-    for k in ("nome", "secao", "categoria", "prerequisitos", "descricao_resumo", "pagina_referencia"):
+    for k in (
+        "nome",
+        "secao",
+        "categoria",
+        "prerequisitos",
+        "descricao_resumo",
+        "pagina_referencia",
+    ):
         v = r.get(k)
         if v is not None and str(v).strip():
             parts.append(str(v).lower())
     return " ".join(parts)
 
 
-def filtrar_talentos_mb(q: str | None, skip: int, limit: int) -> Tuple[List[Dict[str, Any]], int]:
+def filtrar_talentos_mb(
+    q: str | None, skip: int, limit: int
+) -> Tuple[List[Dict[str, Any]], int]:
     rows = [dict(r) for r in lista_talentos_mb_catalogo()]
     qn = (q or "").strip().lower()
     if qn:
@@ -284,7 +293,9 @@ def magia_mb_slug_no_catalogo(slug: str) -> bool:
     s = str(slug or "").strip().lower()
     if not s:
         return False
-    return any(str(r.get("slug", "")).strip().lower() == s for r in lista_magias_mb_catalogo())
+    return any(
+        str(r.get("slug", "")).strip().lower() == s for r in lista_magias_mb_catalogo()
+    )
 
 
 def metadados_magia_mb_por_slug(slug: str) -> Dict[str, Any] | None:

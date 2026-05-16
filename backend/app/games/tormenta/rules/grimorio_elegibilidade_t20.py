@@ -12,7 +12,9 @@ from typing import Any, Dict, Optional, Tuple
 from app.games.tormenta.rules.conjuracao_t20 import _mapa_conjuracao_por_slug
 
 
-def nivel_efetivo_conjuracao_mb(ficha_json: Optional[Dict[str, Any]], nivel_personagem: int) -> int:
+def nivel_efetivo_conjuracao_mb(
+    ficha_json: Optional[Dict[str, Any]], nivel_personagem: int
+) -> int:
     """Nível usado para liberar conjuração MB e checar `conjuracao_inicia_nivel` (multiclasse / override)."""
     fj = ficha_json if isinstance(ficha_json, dict) else {}
     raw = fj.get("tormenta_nivel_conjurador_mb")

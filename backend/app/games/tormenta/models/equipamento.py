@@ -4,7 +4,16 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.shared.core.database import Base
@@ -30,8 +39,12 @@ class TormentaEquipamento(Base):
     peso = Column(String(80), nullable=True)
     descricao = Column(Text, nullable=True)
     pagina_referencia = Column(String(50), nullable=True)
-    origem_catalogo_mb = Column(Boolean, nullable=False, default=True, server_default="true")
-    criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    origem_catalogo_mb = Column(
+        Boolean, nullable=False, default=True, server_default="true"
+    )
+    criado_em = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
     personagens = relationship(
         "TormentaEquipamentoPersonagem",
@@ -66,8 +79,13 @@ class TormentaEquipamentoPersonagem(Base):
     )
     quantidade = Column(Integer, nullable=False, default=1, server_default="1")
     notas = Column(String(500), nullable=True)
-    adicionado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    adicionado_em = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
-    personagem = relationship("TormentaPersonagem", back_populates="equipamentos_vinculos")
-    equipamento = relationship("TormentaEquipamento", back_populates="personagens", lazy="joined")
-
+    personagem = relationship(
+        "TormentaPersonagem", back_populates="equipamentos_vinculos"
+    )
+    equipamento = relationship(
+        "TormentaEquipamento", back_populates="personagens", lazy="joined"
+    )

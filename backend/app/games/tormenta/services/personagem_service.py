@@ -45,7 +45,9 @@ class TormentaPersonagemService:
         return usuario.id
 
     @staticmethod
-    def _nivel_conjuracao_mb_para_pm(ficha_json: Optional[dict], nivel_personagem: int) -> int:
+    def _nivel_conjuracao_mb_para_pm(
+        ficha_json: Optional[dict], nivel_personagem: int
+    ) -> int:
         fj = dict(ficha_json or {})
         raw = fj.get("tormenta_nivel_conjurador_mb")
         try:
@@ -80,7 +82,9 @@ class TormentaPersonagemService:
         return pontos_magia_maximos_conjuracao(slug, nv, fv, dv, cv, iv, sv, carv)
 
     @classmethod
-    def _resolver_pa_magia_criacao(cls, payload: TormentaPersonagemCreate) -> tuple[int, int]:
+    def _resolver_pa_magia_criacao(
+        cls, payload: TormentaPersonagemCreate
+    ) -> tuple[int, int]:
         pm = cls._pm_mb_calculado(
             payload.ficha_json,
             int(payload.nivel),
@@ -258,7 +262,9 @@ class TormentaPersonagemService:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         return p
 
-    def obter_por_id_sincronizando_pm_mb(self, personagem_id: int) -> TormentaPersonagem:
+    def obter_por_id_sincronizando_pm_mb(
+        self, personagem_id: int
+    ) -> TormentaPersonagem:
         """Carrega o personagem e persiste PM MB se divergirem do slug/nível/atributos (fichas antigas ou migração)."""
         ent = self.obter_por_id(personagem_id)
         antes_max = int(ent.pa_max or 0)

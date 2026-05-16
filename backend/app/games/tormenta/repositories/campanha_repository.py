@@ -21,7 +21,9 @@ class TormentaCampanhaRepository(BaseRepository[TormentaCampanha]):
         )
 
     def listar_todas(self) -> List[TormentaCampanha]:
-        return self.db.query(TormentaCampanha).order_by(TormentaCampanha.nome.asc()).all()
+        return (
+            self.db.query(TormentaCampanha).order_by(TormentaCampanha.nome.asc()).all()
+        )
 
     def obter_por_id(self, campanha_id: int) -> Optional[TormentaCampanha]:
         return (

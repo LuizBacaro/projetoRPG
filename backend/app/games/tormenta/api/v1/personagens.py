@@ -35,26 +35,40 @@ from app.games.tormenta.schemas.equipamento_personagem import (
     TormentaEquipamentoVinculoPatch,
     TormentaMigrarEquipJsonResponse,
 )
-from app.games.tormenta.schemas.inventario_legado import TormentaInventarioLegadoImportResponse
+from app.games.tormenta.schemas.inventario_legado import (
+    TormentaInventarioLegadoImportResponse,
+)
 from app.games.tormenta.schemas.talento_personagem import (
     TormentaMigrarTalentosJsonResponse,
     TormentaTalentoPersonagemItem,
     TormentaTalentoVinculoCreate,
 )
-from app.games.tormenta.services.personagem_magias_service import TormentaPersonagemMagiasService
-from app.games.tormenta.services.personagem_consumiveis_service import TormentaPersonagemConsumiveisService
-from app.games.tormenta.services.personagem_equipamentos_service import TormentaPersonagemEquipamentosService
+from app.games.tormenta.services.personagem_magias_service import (
+    TormentaPersonagemMagiasService,
+)
+from app.games.tormenta.services.personagem_consumiveis_service import (
+    TormentaPersonagemConsumiveisService,
+)
+from app.games.tormenta.services.personagem_equipamentos_service import (
+    TormentaPersonagemEquipamentosService,
+)
 from app.games.tormenta.services.personagem_inventario_legado_service import (
     TormentaPersonagemInventarioLegadoService,
 )
 from app.games.tormenta.services.personagem_service import TormentaPersonagemService
-from app.games.tormenta.services.personagem_talentos_service import TormentaPersonagemTalentosService
+from app.games.tormenta.services.personagem_talentos_service import (
+    TormentaPersonagemTalentosService,
+)
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_tormenta_personagem,
     requer_game_tormenta,
 )
-from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos, InvalidFileError
+from app.shared.exceptions.custom_exceptions import (
+    ArenaBaseException,
+    DadosInvalidos,
+    InvalidFileError,
+)
 from app.shared.models.usuario import Usuario
 
 router = APIRouter(
@@ -101,7 +115,9 @@ def obter(
     consum_svc: TormentaPersonagemConsumiveisService = Depends(
         get_tormenta_personagem_consumiveis_service
     ),
-    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     try:
@@ -196,7 +212,9 @@ def remover_talento_do_personagem(
 )
 def listar_magias_do_personagem(
     personagem_id: int,
-    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     return magias_svc.listar_por_personagem(personagem_id)
@@ -210,7 +228,9 @@ def listar_magias_do_personagem(
 def adicionar_magia_ao_personagem(
     personagem_id: int,
     payload: TormentaMagiaVinculoCreate,
-    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     try:
@@ -225,7 +245,9 @@ def adicionar_magia_ao_personagem(
 def remover_magia_do_personagem(
     personagem_id: int,
     vinculo_id: int,
-    magias_svc: TormentaPersonagemMagiasService = Depends(get_tormenta_personagem_magias_service),
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     try:

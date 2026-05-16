@@ -32,15 +32,27 @@ from app.games.tormenta.rules.atributos_t20 import (
     lista_pericias_com_atributo,
     pontos_iniciais_compra,
 )
-from app.games.tormenta.rules.classes_t20 import lista_beneficios_por_nivel_mb, lista_classes_mb
-from app.games.tormenta.rules.catalogo_armaduras_t20 import filtrar_armaduras_protecao_mb
-from app.games.tormenta.rules.catalogo_t20 import filtrar_equipamentos_mb, filtrar_magias_mb, filtrar_talentos_mb
+from app.games.tormenta.rules.classes_t20 import (
+    lista_beneficios_por_nivel_mb,
+    lista_classes_mb,
+)
+from app.games.tormenta.rules.catalogo_armaduras_t20 import (
+    filtrar_armaduras_protecao_mb,
+)
+from app.games.tormenta.rules.catalogo_t20 import (
+    filtrar_equipamentos_mb,
+    filtrar_magias_mb,
+    filtrar_talentos_mb,
+)
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
     tipo_lista_magias_por_classe_mb,
 )
 from app.games.tormenta.rules.racas_t20 import idiomas_mb_extras, lista_racas_mb
-from app.games.tormenta.rules.tendencias_divindades_t20 import lista_divindades_mb, lista_tendencias_mb
+from app.games.tormenta.rules.tendencias_divindades_t20 import (
+    lista_divindades_mb,
+    lista_tendencias_mb,
+)
 from app.games.tormenta.rules.conjuracao_t20 import (
     custo_pm_preparar_ou_lancar_magia,
     habilidade_chave_conjuracao,
@@ -68,7 +80,9 @@ def obter_regras_atributos(
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasAtributosResponse:
     custos = [TormentaCustoAtributoItem(**row) for row in lista_custos_compra()]
-    pericias = [TormentaPericiaAtributoItem(**row) for row in lista_pericias_com_atributo()]
+    pericias = [
+        TormentaPericiaAtributoItem(**row) for row in lista_pericias_com_atributo()
+    ]
     return TormentaRegrasAtributosResponse(
         pontos_compra_iniciais=pontos_iniciais_compra(),
         custos=custos,
@@ -102,7 +116,9 @@ def obter_regras_racas(
 def obter_regras_classes(
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasClassesResponse:
-    ben = [TormentaBeneficioNivelMbItem(**row) for row in lista_beneficios_por_nivel_mb()]
+    ben = [
+        TormentaBeneficioNivelMbItem(**row) for row in lista_beneficios_por_nivel_mb()
+    ]
     cls_rows = [TormentaClasseMbItem(**row) for row in lista_classes_mb()]
     return TormentaRegrasClassesResponse(beneficios_por_nivel=ben, classes=cls_rows)
 
@@ -192,9 +208,13 @@ def listar_catalogo_armaduras_protecao(
 )
 def listar_catalogo_magias(
     q: Optional[str] = None,
-    circulo: Optional[int] = Query(None, ge=0, le=20, description="0 = truque; omitir para todos."),
+    circulo: Optional[int] = Query(
+        None, ge=0, le=20, description="0 = truque; omitir para todos."
+    ),
     tipo: Optional[str] = Query(None, description="arcana ou divina."),
-    escola: Optional[str] = Query(None, description="Substring na escola (ex.: Abjuração)."),
+    escola: Optional[str] = Query(
+        None, description="Substring na escola (ex.: Abjuração)."
+    ),
     classe_mb_slug: Optional[str] = Query(
         None,
         max_length=40,
@@ -232,7 +252,9 @@ def listar_catalogo_magias(
             if tipo_filtro is None and t_auto is not None:
                 tipo_filtro = t_auto
             circulo_max = circulo_maximo_magias_lancaveis_mb(slug, int(nivel_mb))
-    slice_rows, total = filtrar_magias_mb(q, circulo, tipo_filtro, escola, circulo_max, skip, limit)
+    slice_rows, total = filtrar_magias_mb(
+        q, circulo, tipo_filtro, escola, circulo_max, skip, limit
+    )
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)
@@ -252,7 +274,9 @@ def obter_regras_conjuracao_mb(
     rows = lista_regras_conjuracao_classe_mb()
     classes = [TormentaConjuracaoClasseMbItem.model_validate(r) for r in rows]
     custo_pm_circulos = [
-        TormentaConjuracaoCustoCirculoItem(circulo=c, custo_pm=custo_pm_preparar_ou_lancar_magia(c))
+        TormentaConjuracaoCustoCirculoItem(
+            circulo=c, custo_pm=custo_pm_preparar_ou_lancar_magia(c)
+        )
         for c in range(0, 10)
     ]
     return TormentaRegrasConjuracaoMbResponse(
@@ -268,8 +292,15 @@ def obter_regras_conjuracao_mb(
     summary="Pré-visualização MB: CD base (10+mod), modificador da chave e PM máx. de conjuração",
 )
 def obter_conjuracao_preview_mb(
-    classe_slug: str = Query(..., min_length=1, max_length=40, description="Slug MB da classe (ex.: mago)."),
-    nivel: int = Query(1, ge=1, le=40, description="Nível do personagem na ficha (fallback se nivel_conjurador omitido)."),
+    classe_slug: str = Query(
+        ..., min_length=1, max_length=40, description="Slug MB da classe (ex.: mago)."
+    ),
+    nivel: int = Query(
+        1,
+        ge=1,
+        le=40,
+        description="Nível do personagem na ficha (fallback se nivel_conjurador omitido).",
+    ),
     nivel_conjurador: Optional[int] = Query(
         None,
         ge=1,

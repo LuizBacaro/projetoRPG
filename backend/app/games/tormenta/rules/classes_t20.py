@@ -42,9 +42,13 @@ def lista_beneficios_por_nivel_mb() -> List[Dict[str, Any]]:
             {
                 "nivel": n,
                 "xp_total": int(row.get("xp_total", 0) or 0),
-                "graduacao_pericias": str(row.get("graduacao_pericias", "") or "").strip(),
+                "graduacao_pericias": str(
+                    row.get("graduacao_pericias", "") or ""
+                ).strip(),
                 "talentos_totais": int(row.get("talentos_totais", 0) or 0),
-                "pontos_habilidade_acumulados": int(row.get("pontos_habilidade_acumulados", 0) or 0),
+                "pontos_habilidade_acumulados": int(
+                    row.get("pontos_habilidade_acumulados", 0) or 0
+                ),
                 "bonus_meio_nivel": int(row.get("bonus_meio_nivel", 0) or 0),
             }
         )
@@ -83,9 +87,13 @@ def lista_classes_mb() -> List[Dict[str, Any]]:
                 "bba_tipo": bba_tipo,
                 "pv_inicial": int(row.get("pv_inicial", 8) or 8),
                 "pv_por_nivel": int(row.get("pv_por_nivel", 2) or 0),
-                "pericias_treinadas": str(row.get("pericias_treinadas", "") or "").strip(),
+                "pericias_treinadas": str(
+                    row.get("pericias_treinadas", "") or ""
+                ).strip(),
                 "pericias_classe": str(row.get("pericias_classe", "") or "").strip(),
-                "talentos_adicionais": str(row.get("talentos_adicionais", "") or "").strip(),
+                "talentos_adicionais": str(
+                    row.get("talentos_adicionais", "") or ""
+                ).strip(),
                 "habilidades_por_nivel": hab_limpo,
             }
         )

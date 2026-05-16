@@ -8,7 +8,9 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List
 
-_DATA = Path(__file__).resolve().parent.parent / "data" / "tendencias_divindades_mb.json"
+_DATA = (
+    Path(__file__).resolve().parent.parent / "data" / "tendencias_divindades_mb.json"
+)
 
 
 @lru_cache(maxsize=1)

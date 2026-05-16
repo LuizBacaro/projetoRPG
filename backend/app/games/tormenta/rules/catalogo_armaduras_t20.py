@@ -37,7 +37,10 @@ def _carregar_armaduras() -> List[Dict[str, Any]]:
                 "falha_arcana": str(row.get("falha_arcana", "") or "").strip() or None,
                 "deslocamento": str(row.get("deslocamento", "") or "").strip() or None,
                 "peso": str(row.get("peso", "") or "").strip() or None,
-                "propriedades_especiais": str(row.get("propriedades_especiais", "") or "").strip() or None,
+                "propriedades_especiais": str(
+                    row.get("propriedades_especiais", "") or ""
+                ).strip()
+                or None,
             }
         )
     return out
@@ -56,7 +59,8 @@ def filtrar_armaduras_protecao_mb(
         rows = [
             r
             for r in rows
-            if qn in str(r.get("nome", "")).lower() or qn in str(r.get("tipo", "")).lower()
+            if qn in str(r.get("nome", "")).lower()
+            or qn in str(r.get("tipo", "")).lower()
         ]
     for i, item in enumerate(rows, start=1):
         item["id"] = i

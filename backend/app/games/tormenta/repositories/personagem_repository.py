@@ -90,4 +90,8 @@ class TormentaPersonagemRepository(BaseRepository[TormentaPersonagem]):
     def get_by_ids(self, ids: List[int]) -> List[TormentaPersonagem]:
         if not ids:
             return []
-        return self.db.query(TormentaPersonagem).filter(TormentaPersonagem.id.in_(ids)).all()
+        return (
+            self.db.query(TormentaPersonagem)
+            .filter(TormentaPersonagem.id.in_(ids))
+            .all()
+        )

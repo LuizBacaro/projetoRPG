@@ -14,7 +14,6 @@ from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 
 
 class AtaqueService:
-
     def __init__(
         self,
         ataque_repo: AtaqueRepositoryProtocol,

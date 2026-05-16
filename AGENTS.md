@@ -17,6 +17,12 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 - Antes de implementar, ler contexto em [README.md](README.md) e instrucoes aplicaveis em [.github/instructions](.github/instructions).
 - Em tarefas que toquem arquitetura, deploy, dados, schema ou decisoes historicas, consultar [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md).
 
+## Requisitos de feature (`.cursor/requisitos`)
+
+- Especificacoes por jogo (D&D, Tormenta, GURPS): pasta [.cursor/requisitos](.cursor/requisitos) e indice em [.cursor/requisitos/README.md](.cursor/requisitos/README.md).
+- **Antes de implementar qualquer item dessa pasta**, e obrigatorio seguir a arquitetura e o protocolo **deste** `AGENTS.md` (deploy Vercel/Render/Neon, multi-jogo, instrucoes em `.github/instructions`, skills em `.cursor/skills/`). Os `.md` de requisito definem o escopo funcional; nao substituem a governanca da plataforma.
+- Regra Cursor associada: [.cursor/rules/requisitos-implementacao.mdc](.cursor/rules/requisitos-implementacao.mdc).
+
 ## Protocolo obrigatorio de implementacao
 
 - Antes de qualquer refatoracao estetica/estrutural, priorizar validacao e preservacao dos requisitos funcionais do fluxo afetado.

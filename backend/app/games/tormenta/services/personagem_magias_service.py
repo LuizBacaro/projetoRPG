@@ -8,8 +8,13 @@ from sqlalchemy.orm import Session
 
 from app.games.tormenta.models.magia_personagem import TormentaMagiaPersonagem
 from app.games.tormenta.models.personagem import TormentaPersonagem
-from app.games.tormenta.rules.catalogo_t20 import magia_mb_slug_no_catalogo, metadados_magia_mb_por_slug
-from app.games.tormenta.rules.grimorio_elegibilidade_t20 import resumo_elegibilidade_grimorio_mb
+from app.games.tormenta.rules.catalogo_t20 import (
+    magia_mb_slug_no_catalogo,
+    metadados_magia_mb_por_slug,
+)
+from app.games.tormenta.rules.grimorio_elegibilidade_t20 import (
+    resumo_elegibilidade_grimorio_mb,
+)
 from app.games.tormenta.schemas.magia_personagem import (
     TormentaMagiaPersonagemItem,
     TormentaMagiaVinculoCreate,
@@ -30,7 +35,9 @@ class TormentaPersonagemMagiasService:
     def _to_item(row: TormentaMagiaPersonagem) -> TormentaMagiaPersonagemItem:
         meta = metadados_magia_mb_por_slug(row.magia_slug)
         nome = str(meta["nome"]) if meta and meta.get("nome") else None
-        circulo = int(meta["circulo"]) if meta and meta.get("circulo") is not None else None
+        circulo = (
+            int(meta["circulo"]) if meta and meta.get("circulo") is not None else None
+        )
         tipo = str(meta["tipo"]) if meta and meta.get("tipo") else None
         escola = str(meta["escola"]) if meta and meta.get("escola") else None
         return TormentaMagiaPersonagemItem(
@@ -45,16 +52,23 @@ class TormentaPersonagemMagiasService:
             adicionado_em=row.adicionado_em,
         )
 
-    def listar_por_personagem(self, personagem_id: int) -> List[TormentaMagiaPersonagemItem]:
+    def listar_por_personagem(
+        self, personagem_id: int
+    ) -> List[TormentaMagiaPersonagemItem]:
         rows = (
             self.db.query(TormentaMagiaPersonagem)
             .filter(TormentaMagiaPersonagem.personagem_id == personagem_id)
-            .order_by(TormentaMagiaPersonagem.papel.asc(), TormentaMagiaPersonagem.adicionado_em.asc())
+            .order_by(
+                TormentaMagiaPersonagem.papel.asc(),
+                TormentaMagiaPersonagem.adicionado_em.asc(),
+            )
             .all()
         )
         return [self._to_item(r) for r in rows]
 
-    def adicionar_vinculo(self, personagem_id: int, payload: TormentaMagiaVinculoCreate) -> TormentaMagiaPersonagemItem:
+    def adicionar_vinculo(
+        self, personagem_id: int, payload: TormentaMagiaVinculoCreate
+    ) -> TormentaMagiaPersonagemItem:
         p = self.db.get(TormentaPersonagem, personagem_id)
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
@@ -71,7 +85,9 @@ class TormentaPersonagemMagiasService:
         if len(slug) < 2:
             raise DadosInvalidos("magia_slug invalido")
         if not magia_mb_slug_no_catalogo(slug):
-            raise DadosInvalidos("Magia nao encontrada no catalogo MB (slug desconhecido)")
+            raise DadosInvalidos(
+                "Magia nao encontrada no catalogo MB (slug desconhecido)"
+            )
 
         papel = str(payload.papel or "").strip().lower()
         if papel not in _PAPEIS:

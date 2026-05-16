@@ -68,7 +68,9 @@ def classe_conjuracao_mb_registrada(slug: str) -> bool:
     return bool(s and s in _mapa_conjuracao_por_slug())
 
 
-def habilidade_chave_conjuracao(slug_classe: str) -> Optional[HabilidadeChaveConjuracao]:
+def habilidade_chave_conjuracao(
+    slug_classe: str,
+) -> Optional[HabilidadeChaveConjuracao]:
     """Atributo-chave de conjuração MB para o `slug` da classe, ou None se não for conjurador listado."""
     slug = str(slug_classe or "").strip().lower()
     if not slug:
@@ -111,7 +113,9 @@ def modificador_conjuracao_mb(
     hk = habilidade_chave_conjuracao(slug_classe)
     if not hk:
         return None
-    return _modificador_chave(hk, forca, destreza, constituicao, inteligencia, sabedoria, carisma)
+    return _modificador_chave(
+        hk, forca, destreza, constituicao, inteligencia, sabedoria, carisma
+    )
 
 
 def pontos_magia_maximos_conjuracao(
@@ -139,7 +143,9 @@ def pontos_magia_maximos_conjuracao(
     if n < ini:
         return None
     ch: HabilidadeChaveConjuracao = row["habilidade_chave"]  # type: ignore[assignment]
-    mod = _modificador_chave(ch, forca, destreza, constituicao, inteligencia, sabedoria, carisma)
+    mod = _modificador_chave(
+        ch, forca, destreza, constituicao, inteligencia, sabedoria, carisma
+    )
     pm_c = int(row["pm_constante"])
     pm_n = int(row["pm_por_nivel"])
     if ini == 1:

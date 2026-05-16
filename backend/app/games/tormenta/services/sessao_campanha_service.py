@@ -4,7 +4,9 @@ from typing import List
 
 from app.games.tormenta.models.campanha import TormentaCampanha, TormentaSessaoCampanha
 from app.games.tormenta.models.personagem import TormentaPersonagem
-from app.games.tormenta.repositories.campanha_repository import TormentaCampanhaRepository
+from app.games.tormenta.repositories.campanha_repository import (
+    TormentaCampanhaRepository,
+)
 from app.games.tormenta.repositories.sessao_campanha_repository import (
     TormentaSessaoCampanhaRepository,
 )
@@ -92,9 +94,7 @@ class TormentaSessaoCampanhaService:
         if perfil == PerfilUsuario.ADMINISTRADOR:
             sessao = self.sessao_repository.obter_por_id(sessao_id)
         else:
-            sessao = self.sessao_repository.obter_por_id_e_mestre(
-                sessao_id, usuario_id
-            )
+            sessao = self.sessao_repository.obter_por_id_e_mestre(sessao_id, usuario_id)
         if not sessao:
             raise ArenaBaseException("Sessao nao encontrada", status_code=404)
         return sessao

@@ -3,8 +3,12 @@
 from typing import List
 
 from app.games.tormenta.models.campanha import TormentaCampanha
-from app.games.tormenta.repositories.campanha_repository import TormentaCampanhaRepository
-from app.games.tormenta.repositories.personagem_repository import TormentaPersonagemRepository
+from app.games.tormenta.repositories.campanha_repository import (
+    TormentaCampanhaRepository,
+)
+from app.games.tormenta.repositories.personagem_repository import (
+    TormentaPersonagemRepository,
+)
 from app.repositories.base import commit_with_rollback
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.shared.models.usuario import PerfilUsuario

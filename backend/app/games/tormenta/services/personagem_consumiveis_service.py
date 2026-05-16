@@ -8,7 +8,10 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.games.tormenta.models.personagem import TormentaPersonagem
-from app.games.tormenta.models.consumivel import TormentaConsumivel, TormentaConsumivelPersonagem
+from app.games.tormenta.models.consumivel import (
+    TormentaConsumivel,
+    TormentaConsumivelPersonagem,
+)
 from app.games.tormenta.schemas.consumivel_personagem import (
     TormentaConsumivelPersonagemItem,
     TormentaConsumivelVinculoCreate,
@@ -36,7 +39,9 @@ class TormentaPersonagemConsumiveisService:
             adicionado_em=row.adicionado_em,
         )
 
-    def listar_por_personagem(self, personagem_id: int) -> List[TormentaConsumivelPersonagemItem]:
+    def listar_por_personagem(
+        self, personagem_id: int
+    ) -> List[TormentaConsumivelPersonagemItem]:
         rows = (
             self.db.query(TormentaConsumivelPersonagem)
             .filter(TormentaConsumivelPersonagem.personagem_id == personagem_id)
@@ -103,7 +108,10 @@ class TormentaPersonagemConsumiveisService:
         return self._to_item(v)
 
     def atualizar_quantidade(
-        self, personagem_id: int, vinculo_id: int, payload: TormentaConsumivelVinculoPatch
+        self,
+        personagem_id: int,
+        vinculo_id: int,
+        payload: TormentaConsumivelVinculoPatch,
     ) -> TormentaConsumivelPersonagemItem:
         row = self.db.get(TormentaConsumivelPersonagem, vinculo_id)
         if not row or row.personagem_id != personagem_id:
@@ -120,7 +128,9 @@ class TormentaPersonagemConsumiveisService:
         self.db.delete(row)
         commit_with_rollback(self.db)
 
-    def migrar_consumiveis_do_json(self, personagem_id: int) -> TormentaMigrarConsumiveisJsonResponse:
+    def migrar_consumiveis_do_json(
+        self, personagem_id: int
+    ) -> TormentaMigrarConsumiveisJsonResponse:
         p = self.db.get(TormentaPersonagem, personagem_id)
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
@@ -129,7 +139,9 @@ class TormentaPersonagemConsumiveisService:
         if raw is None:
             raw = fj.get("consumiveis_lista")
         if not isinstance(raw, list):
-            return TormentaMigrarConsumiveisJsonResponse(vinculos_criados=0, ignorados_duplicados=0)
+            return TormentaMigrarConsumiveisJsonResponse(
+                vinculos_criados=0, ignorados_duplicados=0
+            )
 
         criados = 0
         dup = 0
@@ -141,7 +153,11 @@ class TormentaPersonagemConsumiveisService:
             elif isinstance(item, dict):
                 nome = str(item.get("nome", item.get("item", ""))).strip()
                 try:
-                    qtd = int(str(item.get("qtd", item.get("quantidade", "1"))).replace(",", ".").split(".")[0])
+                    qtd = int(
+                        str(item.get("qtd", item.get("quantidade", "1")))
+                        .replace(",", ".")
+                        .split(".")[0]
+                    )
                 except (TypeError, ValueError):
                     qtd = 1
             else:

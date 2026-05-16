@@ -3,23 +3,37 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from app.games.tormenta.repositories.campanha_repository import TormentaCampanhaRepository
+from app.games.tormenta.repositories.campanha_repository import (
+    TormentaCampanhaRepository,
+)
 from app.games.tormenta.repositories.combate_repository import TormentaCombateRepository
-from app.games.tormenta.repositories.personagem_repository import TormentaPersonagemRepository
+from app.games.tormenta.repositories.personagem_repository import (
+    TormentaPersonagemRepository,
+)
 from app.games.tormenta.repositories.sessao_campanha_repository import (
     TormentaSessaoCampanhaRepository,
 )
 from app.games.tormenta.services.campanha_service import TormentaCampanhaService
 from app.games.tormenta.services.combate_service import TormentaCombateService
-from app.games.tormenta.services.personagem_consumiveis_service import TormentaPersonagemConsumiveisService
-from app.games.tormenta.services.personagem_equipamentos_service import TormentaPersonagemEquipamentosService
+from app.games.tormenta.services.personagem_consumiveis_service import (
+    TormentaPersonagemConsumiveisService,
+)
+from app.games.tormenta.services.personagem_equipamentos_service import (
+    TormentaPersonagemEquipamentosService,
+)
 from app.games.tormenta.services.personagem_inventario_legado_service import (
     TormentaPersonagemInventarioLegadoService,
 )
-from app.games.tormenta.services.personagem_magias_service import TormentaPersonagemMagiasService
+from app.games.tormenta.services.personagem_magias_service import (
+    TormentaPersonagemMagiasService,
+)
 from app.games.tormenta.services.personagem_service import TormentaPersonagemService
-from app.games.tormenta.services.personagem_talentos_service import TormentaPersonagemTalentosService
-from app.games.tormenta.services.sessao_campanha_service import TormentaSessaoCampanhaService
+from app.games.tormenta.services.personagem_talentos_service import (
+    TormentaPersonagemTalentosService,
+)
+from app.games.tormenta.services.sessao_campanha_service import (
+    TormentaSessaoCampanhaService,
+)
 from app.shared.core.database import get_db
 from app.shared.core.deps import get_usuario_atual
 from app.shared.models.usuario import Usuario

@@ -74,9 +74,16 @@ class TormentaRegrasRacasResponse(BaseModel):
 
 class TormentaBeneficioNivelMbItem(BaseModel):
     nivel: int = Field(..., ge=1, le=40)
-    xp_total: int = Field(..., ge=0, description="XP acumulado necessário para atingir este nível (MB).")
+    xp_total: int = Field(
+        ..., ge=0, description="XP acumulado necessário para atingir este nível (MB)."
+    )
     graduacao_pericias: str = Field(default="", max_length=40)
-    talentos_totais: int = Field(default=1, ge=0, le=30, description="Total de talentos do personagem neste nível (MB).")
+    talentos_totais: int = Field(
+        default=1,
+        ge=0,
+        le=30,
+        description="Total de talentos do personagem neste nível (MB).",
+    )
     pontos_habilidade_acumulados: int = Field(
         default=0,
         ge=0,
@@ -118,8 +125,14 @@ class TormentaRegrasClassesResponse(BaseModel):
 class TormentaDivindadeMbOpcao(BaseModel):
     """Uma divindade do MB: `slug` para motor/regras futuras; `rotulo` é o valor persistido em `divindade`."""
 
-    slug: str = Field(..., max_length=40, description="Chave estável (ex.: valkaria, khalmyr).")
-    rotulo: str = Field(..., max_length=120, description="Texto canónico no combo e no banco (`divindade`).")
+    slug: str = Field(
+        ..., max_length=40, description="Chave estável (ex.: valkaria, khalmyr)."
+    )
+    rotulo: str = Field(
+        ...,
+        max_length=120,
+        description="Texto canónico no combo e no banco (`divindade`).",
+    )
 
 
 class TormentaRegrasIdentidadeMbResponse(BaseModel):
@@ -138,7 +151,9 @@ class TormentaRegrasIdentidadeMbResponse(BaseModel):
 class TormentaCatalogoItem(BaseModel):
     """Item do catálogo MB (equipamentos ou talentos — campos de combate opcionais)."""
 
-    id: int = Field(..., ge=1, description="Identificador estável após carregar o JSON (1..N).")
+    id: int = Field(
+        ..., ge=1, description="Identificador estável após carregar o JSON (1..N)."
+    )
     nome: str = Field(..., max_length=200)
     categoria: Optional[str] = Field(
         default=None,
@@ -176,7 +191,9 @@ class TormentaCatalogoItem(BaseModel):
 
 class TormentaCatalogoPaginaResponse(BaseModel):
     itens: List[TormentaCatalogoItem]
-    total: int = Field(..., ge=0, description="Total após filtro de busca (antes da paginação).")
+    total: int = Field(
+        ..., ge=0, description="Total após filtro de busca (antes da paginação)."
+    )
 
 
 class TormentaArmaduraCatalogoItem(BaseModel):
@@ -190,22 +207,32 @@ class TormentaArmaduraCatalogoItem(BaseModel):
     des_max: Optional[str] = Field(default=None, max_length=40)
     falha_arcana: Optional[str] = Field(default=None, max_length=80)
     deslocamento: Optional[str] = Field(default=None, max_length=80)
-    peso: Optional[str] = Field(default=None, max_length=40, description="Texto livre (ex.: 15 kg).")
+    peso: Optional[str] = Field(
+        default=None, max_length=40, description="Texto livre (ex.: 15 kg)."
+    )
     propriedades_especiais: Optional[str] = Field(default=None, max_length=2000)
 
 
 class TormentaArmaduraCatalogoPaginaResponse(BaseModel):
     itens: List[TormentaArmaduraCatalogoItem]
-    total: int = Field(..., ge=0, description="Total após filtro de busca (antes da paginação).")
+    total: int = Field(
+        ..., ge=0, description="Total após filtro de busca (antes da paginação)."
+    )
 
 
 class TormentaMagiaMbCatalogoItem(BaseModel):
     """Metadado de magia MB para grimório / listagens (sem texto integral do livro)."""
 
-    id: int = Field(..., ge=1, description="Índice estável na lista filtrada ordenada (1..N).")
-    slug: str = Field(..., max_length=80, description="Chave estável para vínculos e API.")
+    id: int = Field(
+        ..., ge=1, description="Índice estável na lista filtrada ordenada (1..N)."
+    )
+    slug: str = Field(
+        ..., max_length=80, description="Chave estável para vínculos e API."
+    )
     nome: str = Field(..., max_length=200)
-    circulo: int = Field(..., ge=0, le=20, description="0 = truque; 1+ = círculo da magia (MB).")
+    circulo: int = Field(
+        ..., ge=0, le=20, description="0 = truque; 1+ = círculo da magia (MB)."
+    )
     tipo: Literal["arcana", "divina"] = Field(
         ...,
         description="Arcana ou divina (MB — tipos de magia).",
@@ -231,7 +258,9 @@ class TormentaMagiaMbCatalogoItem(BaseModel):
 
 class TormentaMagiaMbCatalogoPaginaResponse(BaseModel):
     itens: List[TormentaMagiaMbCatalogoItem]
-    total: int = Field(..., ge=0, description="Total após filtros (antes da paginação).")
+    total: int = Field(
+        ..., ge=0, description="Total após filtros (antes da paginação)."
+    )
 
 
 class TormentaConjuracaoClasseMbItem(BaseModel):
@@ -243,7 +272,12 @@ class TormentaConjuracaoClasseMbItem(BaseModel):
         description="Atributo que define CD e modificador na conjuração (MB).",
     )
     pm_constante: int = Field(..., ge=0, le=30)
-    pm_por_nivel: int = Field(..., ge=0, le=10, description="PM adicionados por nível de classe (após o 1º ou após o nível de início).")
+    pm_por_nivel: int = Field(
+        ...,
+        ge=0,
+        le=10,
+        description="PM adicionados por nível de classe (após o 1º ou após o nível de início).",
+    )
     conjuracao_inicia_nivel: int = Field(
         ...,
         ge=1,
@@ -269,7 +303,9 @@ class TormentaConjuracaoPreviewResponse(BaseModel):
     """Pré-visualização de CD base, modificador da chave e PM máx. de conjuração MB (ficha atual)."""
 
     classe_slug: str = Field(..., max_length=40)
-    nivel_conjuracao: int = Field(..., ge=1, le=40, description="Nível usado no cálculo (query ou padrão).")
+    nivel_conjuracao: int = Field(
+        ..., ge=1, le=40, description="Nível usado no cálculo (query ou padrão)."
+    )
     habilidade_chave: Optional[Literal["int", "sab", "car"]] = Field(
         default=None,
         description="Chave MB da classe; null se a classe não conjura no catálogo.",

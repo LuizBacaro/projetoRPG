@@ -4,7 +4,16 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.shared.core.database import Base
@@ -23,9 +32,13 @@ class TormentaTalento(Base):
     nome = Column(String(200), nullable=False, index=True)
     descricao = Column(Text, nullable=True)
     pagina_referencia = Column(String(50), nullable=True)
-    origem_catalogo_mb = Column(Boolean, nullable=False, default=True, server_default="true")
+    origem_catalogo_mb = Column(
+        Boolean, nullable=False, default=True, server_default="true"
+    )
 
-    criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    criado_em = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
     personagens = relationship(
         "TormentaTalentoPersonagem",
@@ -61,7 +74,11 @@ class TormentaTalentoPersonagem(Base):
         index=True,
     )
     notas = Column(String(500), nullable=True)
-    adicionado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    adicionado_em = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
     personagem = relationship("TormentaPersonagem", back_populates="talentos_vinculos")
-    talento = relationship("TormentaTalento", back_populates="personagens", lazy="joined")
+    talento = relationship(
+        "TormentaTalento", back_populates="personagens", lazy="joined"
+    )

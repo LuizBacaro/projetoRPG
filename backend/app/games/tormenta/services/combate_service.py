@@ -8,7 +8,9 @@ from app.games.tormenta.models.combate import TormentaCombate
 from app.games.tormenta.schemas.combate import TormentaCombateCondicaoMbItem
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.repositories.combate_repository import TormentaCombateRepository
-from app.games.tormenta.repositories.personagem_repository import TormentaPersonagemRepository
+from app.games.tormenta.repositories.personagem_repository import (
+    TormentaPersonagemRepository,
+)
 from app.games.tormenta.schemas.personagem import TormentaPersonagemResponse
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
@@ -30,7 +32,9 @@ class TormentaCombateService:
         self.usuario_id = usuario_id
 
     @staticmethod
-    def _ordenar_para_arena(personagens: List[TormentaPersonagem]) -> List[TormentaPersonagem]:
+    def _ordenar_para_arena(
+        personagens: List[TormentaPersonagem],
+    ) -> List[TormentaPersonagem]:
         def chave(p: TormentaPersonagem) -> tuple:
             ini = int(p.iniciativa) if p.iniciativa is not None else 0
             nome = (p.nome or "").lower()
@@ -71,7 +75,8 @@ class TormentaCombateService:
             by_id = {p.id: p for p in pers}
             ordenados = [by_id[i] for i in combate.personagens_ids if i in by_id]
             payload["personagens"] = [
-                TormentaPersonagemResponse.model_validate(p).model_dump() for p in ordenados
+                TormentaPersonagemResponse.model_validate(p).model_dump()
+                for p in ordenados
             ]
 
         return payload

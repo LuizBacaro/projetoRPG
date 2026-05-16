@@ -8,7 +8,10 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.games.tormenta.models.personagem import TormentaPersonagem
-from app.games.tormenta.models.equipamento import TormentaEquipamento, TormentaEquipamentoPersonagem
+from app.games.tormenta.models.equipamento import (
+    TormentaEquipamento,
+    TormentaEquipamentoPersonagem,
+)
 from app.games.tormenta.schemas.equipamento_personagem import (
     TormentaEquipamentoPersonagemItem,
     TormentaEquipamentoVinculoCreate,
@@ -24,7 +27,9 @@ class TormentaPersonagemEquipamentosService:
         self.db = db
 
     @staticmethod
-    def _to_item(row: TormentaEquipamentoPersonagem) -> TormentaEquipamentoPersonagemItem:
+    def _to_item(
+        row: TormentaEquipamentoPersonagem,
+    ) -> TormentaEquipamentoPersonagemItem:
         e = row.equipamento
         return TormentaEquipamentoPersonagemItem(
             id=row.id,
@@ -36,7 +41,9 @@ class TormentaPersonagemEquipamentosService:
             adicionado_em=row.adicionado_em,
         )
 
-    def listar_por_personagem(self, personagem_id: int) -> List[TormentaEquipamentoPersonagemItem]:
+    def listar_por_personagem(
+        self, personagem_id: int
+    ) -> List[TormentaEquipamentoPersonagemItem]:
         rows = (
             self.db.query(TormentaEquipamentoPersonagem)
             .filter(TormentaEquipamentoPersonagem.personagem_id == personagem_id)
@@ -109,7 +116,10 @@ class TormentaPersonagemEquipamentosService:
         return self._to_item(v)
 
     def atualizar_quantidade(
-        self, personagem_id: int, vinculo_id: int, payload: TormentaEquipamentoVinculoPatch
+        self,
+        personagem_id: int,
+        vinculo_id: int,
+        payload: TormentaEquipamentoVinculoPatch,
     ) -> TormentaEquipamentoPersonagemItem:
         row = self.db.get(TormentaEquipamentoPersonagem, vinculo_id)
         if not row or row.personagem_id != personagem_id:
@@ -126,13 +136,17 @@ class TormentaPersonagemEquipamentosService:
         self.db.delete(row)
         commit_with_rollback(self.db)
 
-    def migrar_equipamentos_do_json(self, personagem_id: int) -> TormentaMigrarEquipJsonResponse:
+    def migrar_equipamentos_do_json(
+        self, personagem_id: int
+    ) -> TormentaMigrarEquipJsonResponse:
         p = self.db.get(TormentaPersonagem, personagem_id)
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         raw = (p.ficha_json or {}).get("equipamentos")
         if not isinstance(raw, list):
-            return TormentaMigrarEquipJsonResponse(vinculos_criados=0, ignorados_duplicados=0)
+            return TormentaMigrarEquipJsonResponse(
+                vinculos_criados=0, ignorados_duplicados=0
+            )
 
         criados = 0
         dup = 0

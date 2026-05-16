@@ -10,7 +10,9 @@ from sqlalchemy.pool import StaticPool
 import app.models  # noqa: F401
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.repositories.combate_repository import TormentaCombateRepository
-from app.games.tormenta.repositories.personagem_repository import TormentaPersonagemRepository
+from app.games.tormenta.repositories.personagem_repository import (
+    TormentaPersonagemRepository,
+)
 from app.games.tormenta.schemas.combate import TormentaCombateCondicaoMbItem
 from app.games.tormenta.services.combate_service import TormentaCombateService
 from app.shared.core.database import Base
@@ -88,8 +90,12 @@ def test_iniciar_ordena_por_iniciativa_e_empate_nome(db_tormenta_combate):
 
 def test_nao_permite_dois_combates_ativos(db_tormenta_combate):
     db, u = db_tormenta_combate
-    a = TormentaPersonagem(dono_id=u.id, tipo="monstro", nome="A", iniciativa=1, ficha_json={})
-    b = TormentaPersonagem(dono_id=u.id, tipo="monstro", nome="B", iniciativa=2, ficha_json={})
+    a = TormentaPersonagem(
+        dono_id=u.id, tipo="monstro", nome="A", iniciativa=1, ficha_json={}
+    )
+    b = TormentaPersonagem(
+        dono_id=u.id, tipo="monstro", nome="B", iniciativa=2, ficha_json={}
+    )
     db.add_all([a, b])
     db.commit()
     db.refresh(a)
@@ -107,8 +113,12 @@ def test_nao_permite_dois_combates_ativos(db_tormenta_combate):
 
 def test_avancar_turno_e_finalizar(db_tormenta_combate):
     db, u = db_tormenta_combate
-    a = TormentaPersonagem(dono_id=u.id, tipo="monstro", nome="A", iniciativa=2, ficha_json={})
-    b = TormentaPersonagem(dono_id=u.id, tipo="monstro", nome="B", iniciativa=1, ficha_json={})
+    a = TormentaPersonagem(
+        dono_id=u.id, tipo="monstro", nome="A", iniciativa=2, ficha_json={}
+    )
+    b = TormentaPersonagem(
+        dono_id=u.id, tipo="monstro", nome="B", iniciativa=1, ficha_json={}
+    )
     db.add_all([a, b])
     db.commit()
     db.refresh(a)
@@ -133,8 +143,12 @@ def test_avancar_turno_e_finalizar(db_tormenta_combate):
 
 def test_condicoes_mb_persistem_no_combate(db_tormenta_combate):
     db, u = db_tormenta_combate
-    a = TormentaPersonagem(dono_id=u.id, tipo="monstro", nome="A", iniciativa=2, ficha_json={})
-    b = TormentaPersonagem(dono_id=u.id, tipo="monstro", nome="B", iniciativa=1, ficha_json={})
+    a = TormentaPersonagem(
+        dono_id=u.id, tipo="monstro", nome="A", iniciativa=2, ficha_json={}
+    )
+    b = TormentaPersonagem(
+        dono_id=u.id, tipo="monstro", nome="B", iniciativa=1, ficha_json={}
+    )
     db.add_all([a, b])
     db.commit()
     db.refresh(a)
@@ -149,7 +163,9 @@ def test_condicoes_mb_persistem_no_combate(db_tormenta_combate):
 
     svc.aplicar_condicoes_mb(
         {
-            str(a.id): TormentaCombateCondicaoMbItem(rotulos=["Assustado"], tips=["tip-a"]),
+            str(a.id): TormentaCombateCondicaoMbItem(
+                rotulos=["Assustado"], tips=["tip-a"]
+            ),
             str(b.id): TormentaCombateCondicaoMbItem(rotulos=["Caído"], tips=["tip-b"]),
         }
     )
@@ -158,7 +174,9 @@ def test_condicoes_mb_persistem_no_combate(db_tormenta_combate):
     assert cm[str(a.id)]["rotulos"] == ["Assustado"]
     assert cm[str(b.id)]["tips"] == ["tip-b"]
 
-    svc.aplicar_condicoes_mb({str(a.id): TormentaCombateCondicaoMbItem(rotulos=[], tips=[])})
+    svc.aplicar_condicoes_mb(
+        {str(a.id): TormentaCombateCondicaoMbItem(rotulos=[], tips=[])}
+    )
     st2 = svc.obter_status_combate()
     cm2 = st2.get("condicoes_mb") or {}
     assert str(a.id) not in cm2

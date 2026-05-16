@@ -71,7 +71,9 @@ def tormenta_personagens_db():
         Base.metadata.drop_all(bind=engine)
 
 
-def _build_client(SessionLocal, usuario: SimpleNamespace, file_service=None) -> TestClient:
+def _build_client(
+    SessionLocal, usuario: SimpleNamespace, file_service=None
+) -> TestClient:
     app = FastAPI()
     app.include_router(tormenta_personagens_router, prefix="/api/v1")
 
@@ -242,7 +244,16 @@ def test_guerreiro_post_e_lista(tormenta_personagens_db):
             nome="Arthas",
             nivel=3,
             classe_nivel="Guerreiro 3",
-            ficha_json={"pericias": [{"nome": "Luta", "graduacao": 2, "outros": 0, "somente_treinado": False}]},
+            ficha_json={
+                "pericias": [
+                    {
+                        "nome": "Luta",
+                        "graduacao": 2,
+                        "outros": 0,
+                        "somente_treinado": False,
+                    }
+                ]
+            },
         ),
     )
     assert r.status_code == 201
@@ -376,7 +387,14 @@ def test_criar_jogador_compra_menos_de_20_rejeita(tormenta_personagens_db):
             "sab_valor": 10,
             "car_valor": 10,
             "ficha_json": {
-                "atributos_compra": {"for": 10, "des": 10, "con": 10, "int": 10, "sab": 10, "car": 10},
+                "atributos_compra": {
+                    "for": 10,
+                    "des": 10,
+                    "con": 10,
+                    "int": 10,
+                    "sab": 10,
+                    "car": 10,
+                },
             },
         },
     )
@@ -558,14 +576,24 @@ def test_magias_paladino_so_apos_nivel_5_mb(tormenta_personagens_db):
         f"/api/v1/tormenta/personagens/{rid}",
         json={"ficha_json": {"tormenta_classe_mb_slug": "paladino"}},
     )
-    assert client.get(f"/api/v1/tormenta/personagens/{rid}").json().get("grimorio_mb_permitido") is False
+    assert (
+        client.get(f"/api/v1/tormenta/personagens/{rid}")
+        .json()
+        .get("grimorio_mb_permitido")
+        is False
+    )
     r_low = client.post(
         f"/api/v1/tormenta/personagens/{rid}/magias",
         json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
     )
     assert r_low.status_code == 422
     client.patch(f"/api/v1/tormenta/personagens/{rid}", json={"nivel": 5})
-    assert client.get(f"/api/v1/tormenta/personagens/{rid}").json().get("grimorio_mb_permitido") is True
+    assert (
+        client.get(f"/api/v1/tormenta/personagens/{rid}")
+        .json()
+        .get("grimorio_mb_permitido")
+        is True
+    )
     r_ok = client.post(
         f"/api/v1/tormenta/personagens/{rid}/magias",
         json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
@@ -573,7 +601,9 @@ def test_magias_paladino_so_apos_nivel_5_mb(tormenta_personagens_db):
     assert r_ok.status_code == 201, r_ok.text
 
 
-def test_magias_paladino_nivel_conjurador_mb_libera_antes_do_nivel_total(tormenta_personagens_db):
+def test_magias_paladino_nivel_conjurador_mb_libera_antes_do_nivel_total(
+    tormenta_personagens_db,
+):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
     rid = client.post(
@@ -589,7 +619,12 @@ def test_magias_paladino_nivel_conjurador_mb_libera_antes_do_nivel_total(torment
             }
         },
     )
-    assert client.get(f"/api/v1/tormenta/personagens/{rid}").json().get("grimorio_mb_permitido") is True
+    assert (
+        client.get(f"/api/v1/tormenta/personagens/{rid}")
+        .json()
+        .get("grimorio_mb_permitido")
+        is True
+    )
     r_add = client.post(
         f"/api/v1/tormenta/personagens/{rid}/magias",
         json={"magia_slug": "stub_truque_arc", "papel": "conhecida"},
@@ -606,7 +641,12 @@ def test_magias_conjuracao_manual_permite_guerreiro(tormenta_personagens_db):
     ).json()["id"]
     client.patch(
         f"/api/v1/tormenta/personagens/{rid}",
-        json={"ficha_json": {"tormenta_classe_mb_slug": "guerreiro", "tormenta_conjuracao_manual_mb": True}},
+        json={
+            "ficha_json": {
+                "tormenta_classe_mb_slug": "guerreiro",
+                "tormenta_conjuracao_manual_mb": True,
+            }
+        },
     )
     r_add = client.post(
         f"/api/v1/tormenta/personagens/{rid}/magias",
@@ -639,7 +679,10 @@ def test_migrar_talentos_mb_lista_do_json(tormenta_personagens_db):
     data = r.json()
     assert data["vinculos_criados"] == 2
     assert data["ignorados_duplicados"] == 1
-    names = {x["nome"] for x in client.get(f"/api/v1/tormenta/personagens/{rid}/talentos").json()}
+    names = {
+        x["nome"]
+        for x in client.get(f"/api/v1/tormenta/personagens/{rid}/talentos").json()
+    }
     assert names == {"Talento Migra A", "Talento Migra B"}
 
 

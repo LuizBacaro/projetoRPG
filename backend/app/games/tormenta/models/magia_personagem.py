@@ -4,7 +4,15 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.shared.core.database import Base
@@ -38,6 +46,8 @@ class TormentaMagiaPersonagem(Base):
     magia_slug = Column(String(80), nullable=False, index=True)
     papel = Column(String(20), nullable=False)
     notas = Column(String(500), nullable=True)
-    adicionado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    adicionado_em = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
     personagem = relationship("TormentaPersonagem", back_populates="magias_vinculos")
