@@ -139,6 +139,13 @@ class Dnd5ePreCadastroModal {
         });
     }
 
+    aplicarAtributosNeutros() {
+        this.ABILITIES.forEach((a) => {
+            this.el(`prec_base_${a.key}`).value = '10';
+        });
+        this.agendarPreview();
+    }
+
     aplicarMatrizPadrao() {
         this.ABILITIES.forEach((a, i) => {
             this.el(`prec_base_${a.key}`).value = String(this.MATRIZ_PADRAO[i]);
@@ -498,7 +505,7 @@ class Dnd5ePreCadastroModal {
         this.el('prec_jogador').value = this.nomeJogadorLogado();
         this.el('prec_nivel').value = '1';
         this.el('prec_xp').value = '0';
-        this.aplicarMatrizPadrao();
+        this.aplicarAtributosNeutros();
         this.atualizarUiRaca();
         this.renderPericiasEscolha();
         this.el('prec_status').textContent = '';
