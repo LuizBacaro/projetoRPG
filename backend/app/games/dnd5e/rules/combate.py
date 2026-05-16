@@ -18,15 +18,107 @@ class StatusVida(str, Enum):
 
 CONDICOES_PADRAO = frozenset(
     {
-        "incapacitado",
+        "agarrado",
+        "assustado",
         "atordoado",
         "cego",
-        "agarrado",
+        "enfeiticado",
         "envenenado",
-        "assustado",
+        "exausto",
+        "incapacitado",
+        "inconsciente",
+        "invisivel",
+        "paralisado",
+        "petrificado",
         "prostrado",
+        "surdo",
     }
 )
+
+CONDICOES_NOMES: dict[str, str] = {
+    "agarrado": "Agarrado",
+    "assustado": "Assustado",
+    "atordoado": "Atordoado",
+    "cego": "Cego",
+    "enfeiticado": "Enfeitiçado",
+    "envenenado": "Envenenado",
+    "exausto": "Exausto",
+    "incapacitado": "Incapacitado",
+    "inconsciente": "Inconsciente",
+    "invisivel": "Invisível",
+    "paralisado": "Paralisado",
+    "petrificado": "Petrificado",
+    "prostrado": "Prostrado",
+    "surdo": "Surdo",
+}
+
+
+def normalizar_condicao_slug(condicao: str) -> str:
+    """Slug estável para comparação (minúsculas, sem acentos extras)."""
+    return (
+        (condicao or "")
+        .strip()
+        .lower()
+        .replace(" ", "_")
+        .replace("ç", "c")
+        .replace("ã", "a")
+        .replace("á", "a")
+        .replace("é", "e")
+        .replace("í", "i")
+        .replace("ó", "o")
+        .replace("ú", "u")
+    )
+
+
+def _conjunto_condicoes(condicoes: Optional[Sequence[str]]) -> set[str]:
+    return {normalizar_condicao_slug(c) for c in (condicoes or ()) if c}
+
+
+@dataclass
+class ModificadoresAtaque:
+    """Vantagem/desvantagem e efeitos especiais derivados de condições PHB (resumo)."""
+
+    vantagem: bool = False
+    desvantagem: bool = False
+    acerto_automatico: bool = False
+    critico_automatico: bool = False
+
+    def rolagem_efetiva(self) -> tuple[bool, bool]:
+        """Cancela vantagem e desvantagem simultâneos (PHB)."""
+        if self.vantagem and self.desvantagem:
+            return False, False
+        return self.vantagem, self.desvantagem
+
+
+def resumo_modificadores_ataque(
+    condicoes_atacante: Optional[Sequence[str]] = None,
+    condicoes_alvo: Optional[Sequence[str]] = None,
+    *,
+    corpo_a_corpo: bool = True,
+) -> ModificadoresAtaque:
+    """Deriva modificadores de ataque a partir das condições (Cap. 9 — resumo de mesa)."""
+    at = _conjunto_condicoes(condicoes_atacante)
+    al = _conjunto_condicoes(condicoes_alvo)
+    mod = ModificadoresAtaque()
+
+    if at & {"cego", "envenenado", "atordoado", "assustado"}:
+        mod.desvantagem = True
+    if "exausto" in at:
+        mod.desvantagem = True
+
+    if al & {"atordoado", "inconsciente", "paralisado", "cego"}:
+        mod.vantagem = True
+    if "prostrado" in al:
+        if corpo_a_corpo:
+            mod.vantagem = True
+        else:
+            mod.desvantagem = True
+
+    if "incapacitado" in al and corpo_a_corpo:
+        mod.acerto_automatico = True
+        mod.critico_automatico = True
+
+    return mod
 
 
 @dataclass
@@ -69,6 +161,27 @@ def calcular_iniciativa(
     return roll + dex_mod
 
 
+def rolar_d20_ataque(
+    *,
+    vantagem: bool = False,
+    desvantagem: bool = False,
+    rolagem_forcada: Optional[int] = None,
+    rng: Optional[Callable[[int, int], int]] = None,
+) -> tuple[int, Optional[int]]:
+    """Retorna (d20 usado, d20 descartado ou None)."""
+    if rolagem_forcada is not None:
+        return rolagem_forcada, None
+    if vantagem and desvantagem:
+        return rolar_d20(rng), None
+    if vantagem:
+        r1, r2 = rolar_d20(rng), rolar_d20(rng)
+        return max(r1, r2), min(r1, r2)
+    if desvantagem:
+        r1, r2 = rolar_d20(rng), rolar_d20(rng)
+        return min(r1, r2), max(r1, r2)
+    return rolar_d20(rng), None
+
+
 def ataque_atinge_ca(
     mod_atributo: int,
     bonus_proficiencia: int,
@@ -77,12 +190,77 @@ def ataque_atinge_ca(
     rolagem_d20: Optional[int] = None,
     proficiente: bool = True,
     bonus_extra: int = 0,
+    vantagem: bool = False,
+    desvantagem: bool = False,
+    acerto_automatico: bool = False,
 ) -> bool:
-    """True se o ataque acerta (total >= CA)."""
-    roll = rolagem_d20 if rolagem_d20 is not None else rolar_d20()
+    """True se o ataque acerta (total >= CA ou acerto automático por condição)."""
+    if acerto_automatico:
+        return True
+    roll, _ = rolar_d20_ataque(
+        vantagem=vantagem,
+        desvantagem=desvantagem,
+        rolagem_forcada=rolagem_d20,
+    )
     prof = bonus_proficiencia if proficiente else 0
     total = roll + mod_atributo + prof + bonus_extra
     return total >= ac_alvo
+
+
+@dataclass
+class ResultadoAtaque:
+    rolagem: int
+    rolagem_secundaria: Optional[int]
+    total: int
+    acerto: bool
+    vantagem: bool
+    desvantagem: bool
+    critico_automatico: bool
+    acerto_automatico: bool
+
+
+def resolver_ataque(
+    mod_atributo: int,
+    bonus_proficiencia: int,
+    ac_alvo: int,
+    *,
+    rolagem_d20: Optional[int] = None,
+    proficiente: bool = True,
+    bonus_extra: int = 0,
+    condicoes_atacante: Optional[Sequence[str]] = None,
+    condicoes_alvo: Optional[Sequence[str]] = None,
+    corpo_a_corpo: bool = True,
+    rng: Optional[Callable[[int, int], int]] = None,
+) -> ResultadoAtaque:
+    """Resolve ataque com modificadores de condição e vantagem/desvantagem."""
+    mods = resumo_modificadores_ataque(
+        condicoes_atacante,
+        condicoes_alvo,
+        corpo_a_corpo=corpo_a_corpo,
+    )
+    vant, desv = mods.rolagem_efetiva()
+    roll, roll2 = rolar_d20_ataque(
+        vantagem=vant,
+        desvantagem=desv,
+        rolagem_forcada=rolagem_d20,
+        rng=rng,
+    )
+    prof = bonus_proficiencia if proficiente else 0
+    total = roll + mod_atributo + prof + bonus_extra
+    if mods.acerto_automatico:
+        acerto = True
+    else:
+        acerto = total >= ac_alvo
+    return ResultadoAtaque(
+        rolagem=roll,
+        rolagem_secundaria=roll2,
+        total=total,
+        acerto=acerto,
+        vantagem=vant,
+        desvantagem=desv,
+        critico_automatico=mods.critico_automatico,
+        acerto_automatico=mods.acerto_automatico,
+    )
 
 
 def calcular_dano(

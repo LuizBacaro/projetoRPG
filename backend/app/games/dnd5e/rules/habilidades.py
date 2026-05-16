@@ -3,12 +3,51 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Any, Dict, List, Tuple
 
 HABILIDADE_MIN = 1
 HABILIDADE_MAX = 25
 NIVEL_MIN = 1
 NIVEL_MAX = 20
+
+# (chave API, nome PT, abrev. EN, abrev. PT)
+_HABILIDADES_META: Tuple[Tuple[str, str, str, str], ...] = (
+    ("strength", "Força", "STR", "FOR"),
+    ("dexterity", "Destreza", "DEX", "DES"),
+    ("constitution", "Constituição", "CON", "CON"),
+    ("intelligence", "Inteligência", "INT", "INT"),
+    ("wisdom", "Sabedoria", "WIS", "SAB"),
+    ("charisma", "Carisma", "CHA", "CAR"),
+)
+
+_TABELA_BONUS_PROFICIENCIA: Tuple[Tuple[int, int, int], ...] = (
+    (1, 4, 2),
+    (5, 8, 3),
+    (9, 12, 4),
+    (13, 16, 5),
+    (17, 20, 6),
+)
+
+
+def lista_metadados_habilidades() -> List[Dict[str, Any]]:
+    """Metadados estáticos das seis habilidades (payload GET /regras/atributos)."""
+    return [
+        {
+            "chave": chave,
+            "nome": nome,
+            "abreviacao_en": abr_en,
+            "abreviacao_pt": abr_pt,
+        }
+        for chave, nome, abr_en, abr_pt in _HABILIDADES_META
+    ]
+
+
+def lista_tabela_bonus_proficiencia() -> List[Dict[str, int]]:
+    """Faixas de nível → bônus de proficiência (PHB)."""
+    return [
+        {"nivel_min": n_min, "nivel_max": n_max, "bonus": bonus}
+        for n_min, n_max, bonus in _TABELA_BONUS_PROFICIENCIA
+    ]
 
 
 def validar_valor_habilidade(valor: int) -> None:

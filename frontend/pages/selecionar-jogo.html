@@ -338,6 +338,7 @@
     function destinoPorSlug(slug) {
         const s = normalizarSlugJogo(slug);
         if (s === 'dnd35') return '/dashboard';
+        if (s === 'dnd5e') return '/games/dnd5e/pages/dashboard.html';
         if (s === 'tormenta') return '/games/tormenta/pages/dashboard.html';
         if (s === 'gurps') return '/games/gurps/pages/dashboard.html';
     }
@@ -379,9 +380,7 @@
         const jt = jogoPorSlug('tormenta');
         const g = jogoPorSlug('gurps');
         btnHubDnd35.disabled = !(j35 && j35.status === 'disponivel');
-        btnHubDnd5e.disabled = !(
-            j5 && (j5.status === 'disponivel' || j5.status === 'em_breve')
-        );
+        btnHubDnd5e.disabled = !(j5 && j5.status === 'disponivel');
         if (j5 && j5.status === 'manutencao') btnHubDnd5e.disabled = true;
         btnHubTormenta.disabled = !(
             jt && (jt.status === 'disponivel' || jt.status === 'em_breve')

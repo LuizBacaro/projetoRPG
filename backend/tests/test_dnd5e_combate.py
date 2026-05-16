@@ -9,6 +9,8 @@ from app.games.dnd5e.rules.combate import (
     calcular_dano,
     calcular_iniciativa,
     registrar_teste_morte,
+    resolver_ataque,
+    resumo_modificadores_ataque,
     verificar_morte,
 )
 
@@ -46,3 +48,39 @@ def test_morte_tres_falhas() -> None:
 
 def test_calcular_iniciativa() -> None:
     assert calcular_iniciativa(2, rolagem_d20=10) == 12
+
+
+def test_condicao_cego_desvantagem() -> None:
+    mods = resumo_modificadores_ataque(["cego"], [])
+    assert mods.desvantagem is True
+    assert mods.vantagem is False
+
+
+def test_condicao_alvo_atordoado_vantagem() -> None:
+    mods = resumo_modificadores_ataque([], ["atordoado"])
+    assert mods.vantagem is True
+
+
+def test_condicao_incapacitado_acerto_automatico_corpo_a_corpo() -> None:
+    mods = resumo_modificadores_ataque([], ["incapacitado"], corpo_a_corpo=True)
+    assert mods.acerto_automatico is True
+    assert mods.critico_automatico is True
+
+
+def test_resolver_ataque_incapacitado_acerta_sem_rolar() -> None:
+    r = resolver_ataque(
+        0,
+        2,
+        30,
+        rolagem_d20=3,
+        condicoes_alvo=["incapacitado"],
+        corpo_a_corpo=True,
+    )
+    assert r.acerto_automatico is True
+    assert r.acerto is True
+
+
+def test_vantagem_e_desvantagem_cancelam() -> None:
+    mods = resumo_modificadores_ataque(["cego"], ["atordoado"])
+    v, d = mods.rolagem_efetiva()
+    assert v is False and d is False

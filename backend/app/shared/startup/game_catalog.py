@@ -28,12 +28,12 @@ GAME_CATALOG_SEED = [
     },
     {
         "slug": "dnd5e",
-        "nome": "D&D 5e",
+        "nome": "D&D 5e — Arena TTRPG",
         "descricao": (
-            "Sistema D&D 5e com ficha simplificada e proficiências. "
-            "Em breve: stack independente."
+            "Sistema D&D 5e com ficha, catálogos PHB (raças, classes, magias) "
+            "e personagens na Arena."
         ),
-        "status": "em_breve",
+        "status": "disponivel",
         "icone": "🛡️",
         "ordem": 20,
     },

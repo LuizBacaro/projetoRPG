@@ -69,6 +69,10 @@ from .games.dnd35.startup_seeds import (
 from .games.dnd35.sync_progressao_combatentes import (
     sincronizar_bonus_base_ataque_combatentes,
 )
+from .games.dnd5e.api.v1 import combate as dnd5e_combate
+from .games.dnd5e.api.v1 import personagens as dnd5e_personagens
+from .games.dnd5e.api.v1 import regras as dnd5e_regras
+from .games.dnd5e.models import personagem as dnd5e_personagem_model
 from .games.gurps.api.v1 import campanhas as gurps_campanhas
 from .games.gurps.api.v1 import combate as gurps_combate
 from .games.gurps.api.v1 import personagens as gurps_personagens
@@ -487,6 +491,9 @@ app.include_router(tormenta_personagens.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_combate.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_regras.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_regras.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_combate.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_personagens.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 

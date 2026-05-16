@@ -1,0 +1,93 @@
+/* D&D 5e — ajustes sobre arena.css / combatentes.css (dnd35) */
+
+.dnd5e-arena-config-hint {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem;
+}
+
+.dnd5e-arena-config-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.dnd5e-btn-inline {
+    font-size: 0.82rem;
+    padding: 0.4rem 0.75rem;
+}
+
+.dnd5e-btn-sync {
+    font-size: 0.75rem;
+}
+
+.dnd5e-arena-tools-details {
+    margin-top: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    color: #dbe7ff;
+}
+
+.dnd5e-arena-tools-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.dnd5e-arena-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.dnd5e-arena-tools input[type='number'],
+.dnd5e-arena-tools input[type='text'] {
+    width: 4rem;
+    margin-left: 0.25rem;
+}
+
+.dnd5e-arena-tools select {
+    min-width: 8rem;
+    margin-left: 0.25rem;
+}
+
+.arena-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.dnd5e-arena-stat-line {
+    font-size: 0.85rem;
+    margin: 0.35rem 0 0;
+    opacity: 0.9;
+}
+
+.dnd5e-cond-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.badge-condicao-arena,
+.badge-condicao-mini {
+    font-size: 0.72rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    background: rgba(124, 58, 237, 0.25);
+    border: 1px solid rgba(167, 139, 250, 0.4);
+}
+
+.dnd5e-cond-badges-wrap {
+    min-height: 1.5rem;
+}
+
+.filter-btn-mestre[hidden] {
+    display: none !important;
+}

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Literal, Optional, Sequence
+from typing import Any, Dict, List, Literal, Optional, Sequence
+
+from app.games.dnd5e.data.equipamento_catalogo import ARMADURAS, ESCUDOS
 
 TipoDano = Literal["corte", "perfuracao", "impacto"]
 TipoArmadura = Literal["roupa", "leve", "media", "pesada"]
@@ -54,6 +56,58 @@ class Item:
     custo: float = 0.0
     quantidade: int = 1
     descricao: str = ""
+
+
+def _row_para_armadura(row: Dict[str, Any]) -> Armadura:
+    return Armadura(
+        armadura_id=str(row["slug"]),
+        nome=str(row.get("nome", "")),
+        tipo_armadura=row.get("tipo_armadura", "leve"),
+        ca=int(row.get("ca", 11)),
+        peso=float(row.get("peso", 0)),
+        custo=float(row.get("custo", 0)),
+        requisitos_forca=int(row.get("requisitos_forca", 0)),
+        penalidade_dex=str(row.get("penalidade_dex", "nenhuma")),
+    )
+
+
+def armadura_por_slug(slug: Optional[str]) -> Optional[Armadura]:
+    if not slug:
+        return None
+    key = slug.strip().lower()
+    for row in ARMADURAS:
+        if row.get("slug") == key:
+            return _row_para_armadura(row)
+    return None
+
+
+def escudo_por_slug(slug: Optional[str]) -> Optional[Escudo]:
+    if not slug:
+        return None
+    key = slug.strip().lower()
+    for row in ESCUDOS:
+        if row.get("slug") == key:
+            return Escudo(
+                escudo_id=str(row["slug"]),
+                nome=str(row.get("nome", "Escudo")),
+                bonus_ac=int(row.get("bonus_ac", 2)),
+                peso=float(row.get("peso", 6)),
+                custo=float(row.get("custo", 10)),
+            )
+    return None
+
+
+def calcular_ac_de_slugs(
+    *,
+    armadura_slug: Optional[str],
+    escudo_slug: Optional[str],
+    dex_mod: int,
+) -> int:
+    return calcular_ac_total(
+        armadura_por_slug(armadura_slug),
+        escudo_por_slug(escudo_slug),
+        dex_mod,
+    )
 
 
 def calcular_ac_total(
