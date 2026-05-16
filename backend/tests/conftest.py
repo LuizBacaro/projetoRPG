@@ -50,6 +50,42 @@ def gurps_personagens_db():
 
 
 @pytest.fixture(scope="function")
+def dnd5e_personagens_db():
+    """SQLite em memória + dois jogadores — testes de API D&D 5e."""
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(bind=engine)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db = SessionLocal()
+    try:
+        u1 = Usuario(
+            perfil=PerfilUsuario.JOGADOR,
+            nome="D&D 5e Um",
+            email="dnd5e1@example.com",
+            senha_hash=hash_senha("SenhaSegura123"),
+            ativo=True,
+        )
+        u2 = Usuario(
+            perfil=PerfilUsuario.JOGADOR,
+            nome="D&D 5e Dois",
+            email="dnd5e2@example.com",
+            senha_hash=hash_senha("SenhaSegura123"),
+            ativo=True,
+        )
+        db.add_all([u1, u2])
+        db.commit()
+        db.refresh(u1)
+        db.refresh(u2)
+        yield SessionLocal, u1, u2
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture(scope="function")
 def gurps_mestre_e_jogadores_db():
     """Dois jogadores + mestre — campanhas e cenários que exigem `PerfilUsuario.MESTRE`."""
     engine = create_engine(
