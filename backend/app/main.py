@@ -25,6 +25,10 @@ from sqlalchemy.exc import (
     StatementError,
 )
 
+from .games.dnd5e.api.v1 import combate as dnd5e_combate
+from .games.dnd5e.api.v1 import personagens as dnd5e_personagens
+from .games.dnd5e.api.v1 import regras as dnd5e_regras
+from .games.dnd5e.models import personagem as dnd5e_personagem_model
 from .games.dnd35.api.v1 import armaduras_protecao as dnd35_armaduras_protecao
 from .games.dnd35.api.v1 import ataques as dnd35_ataques
 from .games.dnd35.api.v1 import campanhas as dnd35_campanhas
@@ -487,6 +491,9 @@ app.include_router(tormenta_personagens.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_combate.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_regras.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_regras.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_combate.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_personagens.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 

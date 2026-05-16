@@ -1,6 +1,7 @@
 # Modelos SQLAlchemy — ordem importa para ForeignKeys.
 # Hub global: `usuario`, `game`. D&D 3.5: `app.games.dnd35.models`.
 
+from app.games.dnd5e.models.personagem import Dnd5ePersonagem
 from app.games.dnd35.models.armadura_protecao import (
     ArmaduraProtecao,
     ArmaduraProtecaoJogador,
@@ -106,4 +107,5 @@ __all__ = [
     "TormentaConsumivel",
     "TormentaConsumivelPersonagem",
     "TormentaMagiaPersonagem",
+    "Dnd5ePersonagem",
 ]

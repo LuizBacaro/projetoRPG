@@ -12,6 +12,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 
+from ...games.dnd5e.models.personagem import Dnd5ePersonagem
 from ...games.dnd35.models.ataque import MagiaSlot
 from ...games.dnd35.models.combatente import Combatente
 from ...games.gurps.models.personagem import GurpsPersonagem
@@ -19,7 +20,12 @@ from ...games.tormenta.models.personagem import TormentaPersonagem
 from ...shared.core.config import settings
 from ...shared.core.database import get_db
 from ...shared.repositories.usuario_repository import UsuarioRepository
-from ..constants import GAME_SLUG_DND35, GAME_SLUG_GURPS, GAME_SLUG_TORMENTA
+from ..constants import (
+    GAME_SLUG_DND5E,
+    GAME_SLUG_DND35,
+    GAME_SLUG_GURPS,
+    GAME_SLUG_TORMENTA,
+)
 from ..models.usuario import PerfilUsuario, Usuario
 from .security import decodificar_token
 from .security_audit import log_security_event
@@ -262,6 +268,62 @@ def requer_game_dnd35(
                 f"ao D&D 3.5 ('{GAME_SLUG_DND35}')."
             ),
             headers={"X-Game-Slug-Required": GAME_SLUG_DND35},
+        )
+
+    return usuario
+
+
+def requer_game_dnd5e(
+    request: Request,
+    usuario=Depends(get_usuario_atual),
+) -> Usuario:
+    """Garante `game_slug=dnd5e` quando `MULTI_GAME_STRICT_MODE` está ativo."""
+    slug = extrair_game_slug_do_token(request)
+
+    if not settings.MULTI_GAME_STRICT_MODE:
+        if slug and slug != GAME_SLUG_DND5E:
+            logger.warning(
+                "⚠️  Acesso a endpoint D&D 5e com game_slug='%s' (esperado '%s')",
+                slug,
+                GAME_SLUG_DND5E,
+            )
+        return usuario
+
+    if slug is None:
+        log_security_event(
+            "game_slug_required",
+            "denied",
+            request=request,
+            user_email=getattr(usuario, "email", None),
+            reason="missing_game_slug_claim",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Sessão sem jogo selecionado. Volte ao seletor de jogo "
+                "para entrar no D&D 5e."
+            ),
+            headers={"X-Game-Slug-Required": GAME_SLUG_DND5E},
+        )
+
+    if slug != GAME_SLUG_DND5E:
+        log_security_event(
+            "game_slug_mismatch",
+            "denied",
+            request=request,
+            user_email=getattr(usuario, "email", None),
+            target=f"game_slug:{slug}",
+            reason="wrong_game_slug",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"Token vinculado ao jogo '{slug}'. Este endpoint pertence "
+                f"ao D&D 5e ('{GAME_SLUG_DND5E}')."
+            ),
+            headers={"X-Game-Slug-Required": GAME_SLUG_DND5E},
         )
 
     return usuario
@@ -711,6 +773,43 @@ def requer_dono_ou_admin_gurps_personagem(
             request=request,
             user_email=usuario.email,
             target=f"gurps_personagem:{personagem_id}",
+            reason="not_owner",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não tem permissão para acessar este personagem",
+        )
+
+    return usuario
+
+
+def requer_dono_ou_admin_dnd5e_personagem(
+    personagem_id: int,
+    request: Request,
+    usuario=Depends(get_usuario_atual),
+    db: Session = Depends(get_db),
+) -> Usuario:
+    """Garante que o usuário é dono do personagem D&D 5e ou mestre/admin."""
+    personagem = (
+        db.query(Dnd5ePersonagem).filter(Dnd5ePersonagem.id == personagem_id).first()
+    )
+    if not personagem:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Personagem {personagem_id} não encontrado",
+        )
+
+    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+        return usuario
+
+    if personagem.dono_id != usuario.id:
+        log_security_event(
+            "dnd5e_personagem_access",
+            "denied",
+            request=request,
+            user_email=usuario.email,
+            target=f"dnd5e_personagem:{personagem_id}",
             reason="not_owner",
             level=logging.WARNING,
         )

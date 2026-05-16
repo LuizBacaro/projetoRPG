@@ -19,11 +19,8 @@
             <h1 class="em-breve-titulo">D&amp;D 5e</h1>
 
             <p class="em-breve-descricao">
-                <strong>Implantaremos em breve!</strong>
-                <br />
-                O D&amp;D 5e terá seu próprio backend, banco de dados e
-                bundle visual dentro da Arena, com ficha simplificada,
-                proficiências e regras 5e.
+                O D&amp;D 5e já está disponível na Arena com personagens e catálogos PHB.
+                Se você chegou por um link antigo, use o botão abaixo para entrar no jogo.
             </p>
 
             <ul class="em-breve-lista">
@@ -34,10 +31,10 @@
 
             <div class="em-breve-acoes">
                 <a href="/pages/selecionar-jogo.html" class="btn btn-primary">
-                    ← Voltar ao seletor de jogo
+                    Entrar no D&amp;D 5e
                 </a>
-                <a href="/dashboard" class="btn btn-secondary">
-                    Continuar no D&amp;D 3.5
+                <a href="/games/dnd5e/pages/dashboard.html" class="btn btn-secondary">
+                    Ir ao dashboard 5e
                 </a>
             </div>
 
@@ -52,7 +49,7 @@
         import { Toast } from '/games/dnd35/js/ui/toast.module.js';
         const params = new URLSearchParams(window.location.search);
         if (params.get('from') === 'seletor') {
-            Toast.info('D&D 5e ainda não está disponível — voltamos quando estiver pronto.');
+            Toast.info('Selecione D&D 5e no hub para entrar com sua conta.');
         }
     </script>
 
