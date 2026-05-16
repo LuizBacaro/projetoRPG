@@ -1,6 +1,7 @@
 # Modelos SQLAlchemy — ordem importa para ForeignKeys.
 # Hub global: `usuario`, `game`. D&D 3.5: `app.games.dnd35.models`.
 
+from app.games.dnd5e.models.personagem import Dnd5ePersonagem
 from app.games.dnd35.models.armadura_protecao import (
     ArmaduraProtecao,
     ArmaduraProtecaoJogador,
@@ -37,6 +38,19 @@ from app.games.gurps.models.personagem import (
     GurpsPersonagemVantagem,
 )
 from app.games.gurps.models.sessao_campanha import GurpsSessaoCampanha
+from app.games.tormenta.models.campanha import TormentaCampanha, TormentaSessaoCampanha
+from app.games.tormenta.models.combate import TormentaCombate
+from app.games.tormenta.models.consumivel import (
+    TormentaConsumivel,
+    TormentaConsumivelPersonagem,
+)
+from app.games.tormenta.models.equipamento import (
+    TormentaEquipamento,
+    TormentaEquipamentoPersonagem,
+)
+from app.games.tormenta.models.magia_personagem import TormentaMagiaPersonagem
+from app.games.tormenta.models.personagem import TormentaPersonagem
+from app.games.tormenta.models.talento import TormentaTalento, TormentaTalentoPersonagem
 from app.shared.models.game import Game, UserGameMembership
 from app.shared.models.usuario import PerfilUsuario, Usuario
 
@@ -82,4 +96,16 @@ __all__ = [
     "GurpsCatalogoFichaVantagem",
     "GurpsCatalogoFichaDesvantagem",
     "GurpsCatalogoFichaPericia",
+    "TormentaCampanha",
+    "TormentaSessaoCampanha",
+    "TormentaCombate",
+    "TormentaPersonagem",
+    "TormentaTalento",
+    "TormentaTalentoPersonagem",
+    "TormentaEquipamento",
+    "TormentaEquipamentoPersonagem",
+    "TormentaConsumivel",
+    "TormentaConsumivelPersonagem",
+    "TormentaMagiaPersonagem",
+    "Dnd5ePersonagem",
 ]

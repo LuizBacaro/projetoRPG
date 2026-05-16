@@ -1,0 +1,31 @@
+---
+description: Gate de implementação — requisitos em .cursor/requisitos devem seguir AGENTS.md e arquitetura deployada
+globs: .cursor/requisitos/**/*
+alwaysApply: false
+---
+
+# Implementação a partir de `.cursor/requisitos`
+
+Quando o pedido citar, abrir ou implementar qualquer ficheiro em `.cursor/requisitos/`:
+
+## Antes de escrever código
+
+1. Ler **[AGENTS.md](../../AGENTS.md)** (secao **Arquitetura de codigo** + deploy + multi-jogo + SDD leve).
+2. Ler [docs/arquitetura-camadas-solid.md](../../docs/arquitetura-camadas-solid.md) (camadas, SOLID, `games/<slug>/`).
+3. Ler [.cursor/requisitos/README.md](../requisitos/README.md) e o ficheiro de requisito da feature.
+4. Aplicar [.github/instructions](../../.github/instructions) da camada afetada (backend, frontend, migrations).
+5. Carregar a skill do jogo em `.cursor/skills/` quando a feature for D&D, Tormenta ou GURPS.
+
+## Durante a implementação
+
+- Respeitar `app/games/<slug>/`, Auth Hub, `game_slug` e contratos API existentes — não inventar estrutura paralela.
+- Reutilizar catálogos, serviços e padrões já usados no mesmo jogo.
+- Não copiar texto longo de livros/PDFs para o repositório; `livros/` e `helpers/` são locais e ignorados pelo Git.
+
+## Proibido sem releitura de AGENTS.md
+
+- Nova rota sem schema Pydantic + teste.
+- Migration com `BOOLEAN DEFAULT 0/1` no Postgres (usar `true`/`false`).
+- Alterar `DATABASE_URL` ou schema em produção sem `PRE_DEPLOY_CHECKLIST.md` e skill Neon/Render.
+
+Se houver conflito entre um `.md` desta pasta e `AGENTS.md`, **prevalece AGENTS.md**; atualize o requisito depois.

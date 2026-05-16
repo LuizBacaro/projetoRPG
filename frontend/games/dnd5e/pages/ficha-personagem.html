@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha D&amp;D 5e — Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/modais.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=18" />
+    <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
+    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=5" />
+</head>
+<body data-game="dnd5e" class="ficha-dnd5e-edit">
+
+<div class="ficha-wrapper">
+    <header class="ficha-header ficha-dnd5e-header">
+        <div class="ficha-dnd5e-header-bar">
+            <a href="dashboard.html" class="btn-voltar" id="btnVoltarFicha">← Voltar</a>
+            <a href="arena.html" class="btn-grimorio ficha-dnd5e-btn-arena">⚔️ Arena</a>
+        </div>
+        <div class="ficha-dnd5e-header-identidade">
+            <h1 class="ficha-titulo-texto ficha-hdr-nome-titulo">
+                <span class="ficha-hdr-emoji" aria-hidden="true">📜</span>
+                <span id="fichaHeaderNome">Ficha D&amp;D 5e</span>
+            </h1>
+            <div class="ficha-hdr-chips" id="fichaHdrChips">
+                <span class="ficha-hdr-chip ficha-hdr-chip-tipo">
+                    <span class="ficha-hdr-chip-label">Tipo</span>
+                    <span id="fichaHdrTipo" class="ficha-hdr-chip-valor">jogador</span>
+                </span>
+                <span class="ficha-hdr-chip">
+                    <span class="ficha-hdr-chip-label">Jogador</span>
+                    <span id="fichaHdrJogador" class="ficha-hdr-chip-valor">—</span>
+                </span>
+                <span class="ficha-hdr-chip">
+                    <span class="ficha-hdr-chip-label">Nível</span>
+                    <span id="fichaHdrNivel" class="ficha-hdr-chip-valor">1</span>
+                </span>
+                <span class="ficha-hdr-chip">
+                    <span class="ficha-hdr-chip-label">Raça</span>
+                    <span id="fichaHdrRaca" class="ficha-hdr-chip-valor">—</span>
+                </span>
+                <span class="ficha-hdr-chip">
+                    <span class="ficha-hdr-chip-label">Classe</span>
+                    <span id="fichaHdrClasse" class="ficha-hdr-chip-valor">—</span>
+                </span>
+                <span class="ficha-hdr-chip" id="fichaHdrSubclasseWrap" hidden>
+                    <span class="ficha-hdr-chip-label">Subclasse</span>
+                    <span id="fichaHdrSubclasse" class="ficha-hdr-chip-valor">—</span>
+                </span>
+                <span class="ficha-hdr-chip">
+                    <span class="ficha-hdr-chip-label">Antecedente</span>
+                    <span id="fichaHdrAntecedente" class="ficha-hdr-chip-valor">—</span>
+                </span>
+                <span class="ficha-hdr-chip">
+                    <span class="ficha-hdr-chip-label">XP</span>
+                    <span id="fichaHdrXp" class="ficha-hdr-chip-valor">0</span>
+                </span>
+            </div>
+            <p id="f5e_tracos" class="ficha-dnd5e-tracos ficha-hdr-tracos" hidden></p>
+        </div>
+    </header>
+
+    <div id="f5e_identidade_campos" class="ficha-dnd5e-sr-only" aria-hidden="true">
+        <input id="f5e_nome" type="text" required autocomplete="off" tabindex="-1" />
+        <input id="f5e_jogador" type="text" readonly tabindex="-1" />
+        <input id="f5e_nivel" type="number" min="1" max="20" value="1" tabindex="-1" />
+        <select id="f5e_raca" required tabindex="-1"></select>
+        <select id="f5e_classe" required tabindex="-1"></select>
+        <select id="f5e_antecedente" tabindex="-1"></select>
+        <div id="f5e_subclasse_wrap" hidden>
+            <select id="f5e_subclasse" tabindex="-1"><option value="">—</option></select>
+        </div>
+        <input id="f5e_xp" type="number" min="0" value="0" tabindex="-1" />
+    </div>
+
+    <main class="ficha-corpo">
+        <aside class="ficha-coluna-esquerda">
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">⚔️ Atributos</h3>
+                <div class="ficha-atributos-circulo-grid-resumo ficha-dnd5e-ability-edit" id="f5e_abilities_circles">
+                    <!-- preenchido por JS -->
+                </div>
+                <p class="ficha-dnd5e-foto-hint" style="margin-top:0.5rem">
+                    <button type="button" class="ficha-btn-adicionar" id="btnMatrizPadrao" style="width:auto">Matriz PHB</button>
+                </p>
+            </div>
+
+            <div class="ficha-defesa-row">
+                <div class="ficha-defesa-box ficha-ca-box">
+                    <span class="ficha-defesa-label">CA</span>
+                    <span id="f5e_ca" class="ficha-defesa-valor">—</span>
+                </div>
+                <div class="ficha-defesa-box ficha-pv-box">
+                    <span class="ficha-defesa-label">PV</span>
+                    <span class="ficha-defesa-valor ficha-pv-valor"><span id="f5e_hp_atual_label">—</span>/<span id="f5e_hp_max">—</span></span>
+                    <div class="ficha-pv-barra-wrap">
+                        <div class="ficha-pv-barra">
+                            <div id="fichaPvFill" class="ficha-pv-fill" style="width:100%"></div>
+                        </div>
+                    </div>
+                    <label class="ficha-label" for="f5e_hp_atual" style="margin-top:0.35rem">PV atual</label>
+                    <input id="f5e_hp_atual" type="number" min="0" />
+                </div>
+                
+                <div class="ficha-defesa-box ficha-ini-box">
+                    <span class="ficha-defesa-label">Iniciativa</span>
+                    <span id="f5e_iniciativa" class="ficha-defesa-valor">+0</span>
+                </div>
+                <div class="ficha-defesa-box ficha-ini-box">
+                    <span class="ficha-defesa-label">Prof.</span>
+                    <span id="f5e_prof" class="ficha-defesa-valor">+2</span>
+                </div>
+            </div>
+
+            <div class="ficha-secao" id="f5e_condicoes_sec">
+                <h3 class="ficha-secao-titulo">🔮 Condições (arena)</h3>
+                <div id="f5e_condicoes_lista" class="ficha-dnd5e-condicoes-lista">
+                    <span class="ficha-vazio">Nenhuma condição ativa</span>
+                </div>
+            </div>
+        </aside>
+
+        <section class="ficha-coluna-central">
+            <div class="ficha-secao" style="text-align:center">
+                <div class="ficha-foto-container" id="fichaFotoArea" title="Clique para enviar ou trocar a foto">
+                    <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto" />
+                    <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
+                </div>
+                <input type="file" id="f5e_foto_file" accept="image/*" class="ficha-dnd5e-sr-only" tabindex="-1" aria-hidden="true" />
+                <div class="ficha-dnd5e-foto-actions">
+                    <button type="button" class="ficha-btn-adicionar" id="btnF5eFotoUpload">📷 Enviar retrato</button>
+                    <p class="ficha-dnd5e-foto-hint">JPG ou PNG · até o limite do servidor</p>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">🛡️ Salvamentos</h3>
+                <div id="f5e_salvamentos" class="ficha-resistencias-row"></div>
+            </div>
+
+        </section>
+
+        <aside class="ficha-coluna-direita">
+            <div id="f5e_raca_extra" class="ficha-dnd5e-raca-extra ficha-dnd5e-edit-grid">
+                <div>
+                    <label class="ficha-label" for="f5e_extra1">+1 (meio-elfo)</label>
+                    <select id="f5e_extra1"></select>
+                </div>
+                <div>
+                    <label class="ficha-label" for="f5e_extra2">+1 (meio-elfo)</label>
+                    <select id="f5e_extra2"></select>
+                </div>
+                <div id="f5e_pericia_racial_wrap" hidden>
+                    <label class="ficha-label" for="f5e_pericia_racial">Perícia extra (raça)</label>
+                    <select id="f5e_pericia_racial"></select>
+                </div>
+                
+            </div>
+
+            <div id="f5e_antecedente_painel" class="ficha-secao" hidden>
+                <h3 class="ficha-secao-titulo">Antecedente</h3>
+                <p id="f5e_antecedente_resumo" class="ficha-vazio"></p>
+            </div>
+
+            <div class="ficha-secao">
+                <h3 class="ficha-secao-titulo">🎒 Equipamento &amp; CA</h3>
+                <div class="ficha-dnd5e-edit-grid">
+                    <div>
+                        <label class="ficha-label" for="f5e_armadura">Armadura</label>
+                        <select id="f5e_armadura"><option value="">Sem armadura</option></select>
+                    </div>
+                    <div>
+                        <label class="ficha-label" for="f5e_escudo">Escudo</label>
+                        <select id="f5e_escudo"><option value="">Nenhum</option></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ficha-secao ficha-dnd5e-secao-pericias">
+                <h3 class="ficha-secao-titulo">Perícias de classe</h3>
+                <p class="ficha-dnd5e-status ficha-dnd5e-pericias-hint" id="f5e_pericias_classe_hint"></p>
+                <div id="f5e_pericias_escolha" class="ficha-dnd5e-pericias-escolha"></div>
+            </div>
+
+            <div class="ficha-secao ficha-dnd5e-secao-pericias-todas">
+                <h3 class="ficha-secao-titulo">📋 Perícias</h3>
+                <p class="ficha-dnd5e-pericias-grade-legenda">Bônus totais · destaque = proficiente</p>
+                <div id="f5e_pericias_grade" class="ficha-dnd5e-pericias-grade"></div>
+            </div>
+
+            <div class="ficha-secao span-2">
+                <label class="ficha-label" for="f5e_notas">Notas</label>
+                <textarea id="f5e_notas" rows="3" placeholder="Ideais, vínculos, fraquezas…"></textarea>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="ficha-dnd5e-actions-bar">
+        <button type="button" class="ficha-dnd5e-btn-primary" id="btnSalvar">Salvar ficha</button>
+        <a href="dashboard.html" class="ficha-dnd5e-btn-ghost">Cancelar</a>
+        <span class="ficha-dnd5e-status" id="f5e_status"></span>
+    </footer>
+</div>
+
+<script src="/js/shared/render-api-origin-boot.js?v=2"></script>
+<script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
+<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/ui/Toast.js"></script>
+<script>
+    if (!AuthService.exigirJogo('dnd5e')) {}
+</script>
+<script src="../js/services/Dnd5ePersonagemService.js?v=3"></script>
+<script src="../js/services/Dnd5eRegrasService.js?v=3"></script>
+<script src="../js/services/Dnd5eCombateService.js?v=3"></script>
+<script src="../js/shared/dnd5e-condicoes-util.js?v=1"></script>
+<script src="../js/pages/ficha-dnd5e.js?v=9"></script>
+</body>
+</html>

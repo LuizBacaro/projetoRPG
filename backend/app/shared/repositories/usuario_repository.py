@@ -13,7 +13,6 @@ from ..models.usuario import PerfilUsuario, Usuario
 
 
 class UsuarioRepository:
-
     def __init__(self, db: Session):
         self.db = db
 

@@ -17,8 +17,49 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 - Antes de implementar, ler contexto em [README.md](README.md) e instrucoes aplicaveis em [.github/instructions](.github/instructions).
 - Em tarefas que toquem arquitetura, deploy, dados, schema ou decisoes historicas, consultar [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md).
 
+## Arquitetura de codigo (obrigatoria)
+
+Normas de **camadas**, **SOLID** e **multi-jogo** aplicam-se a todo backend/frontend novo ou refatorado. Detalhe e roteiro de evolucao: [docs/arquitetura-camadas-solid.md](docs/arquitetura-camadas-solid.md). Checklists GURPS e roadmap operacional: [docs/roadmap-gurps-melhorias.md](docs/roadmap-gurps-melhorias.md). Deploy e Auth Hub: [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
+
+### Camadas e responsabilidades (quem chama quem)
+
+| Camada | Papel | Regra de ouro |
+|--------|--------|----------------|
+| **API (routers)** | HTTP, status, deps, validacao de entrada | Sem regras de jogo nem SQL; chama **services** ou casos de uso. |
+| **Services** | Orquestra repositorios, transacoes, politicas | Unico sitio para **fluxo** (ex.: criar combatente + efeitos colaterais). |
+| **Repositories** | Persistencia, queries, `commit`/`rollback` | Nao conhecem FastAPI; usam helpers partilhados (`commit_with_rollback`, soft delete). |
+| **Models (ORM)** | Tabelas e invariantes de BD | Sem regras de negocio pesadas (evitar modelo gordo). |
+| **Dominio puro (`rules/`)** | Regras sem SQLAlchemy | Testavel sem BD; preferir `app.games.<slug>.rules` antes de enfiar logica no service. |
+
+### Fronteiras multi-jogo
+
+- **Plataforma** (usuario, JWT, `games_catalog`, membership): `app.shared.*` apenas.
+- **Regras por sistema**: `app.games.<slug>.*` (`dnd35`, `dnd5e`, `tormenta`, `gurps`, …).
+- **`shared` nunca importa** de `app.games.*` (sem acoplamento inverso).
+- Novo jogo = novo pacote em `games/<slug>/` (api, services, repositories, models, schemas, `rules/`, seeds) + guard `requer_game_<slug>` — **nao** estender o jogo errado nem copiar regras entre sistemas.
+
+### SOLID (resumo aplicavel)
+
+- **S:** um ficheiro = um motivo para mudar (service nao mistura parsing de Excel nem HTTP).
+- **O:** extensao por novo `games/<slug>` ou estrategia (Protocol), nao `if slug == "dnd35"` espalhado.
+- **L:** contratos estaveis em schemas Pydantic e `typing.Protocol` nos `ports/`.
+- **I:** interfaces pequenas (ex.: leitor vs escritor de grimorio), nao “god interface”.
+- **D:** rotas e services dependem de abstracoes injetadas via `app.core.deps` / factories — ver [docs/ports-repositorios-servicos.md](docs/ports-repositorios-servicos.md).
+
+### Decisoes estruturais
+
+- Mudanca que altera imports entre pacotes, DI ou fronteira `shared` ↔ `games/*` → ler [docs/arquitetura-camadas-solid.md](docs/arquitetura-camadas-solid.md) e, se for dificil reverter, ADR curto em `docs/adr/`.
+- Regra Cursor: [.cursor/rules/arquitetura-camadas.mdc](.cursor/rules/arquitetura-camadas.mdc).
+
+## Requisitos de feature (`.cursor/requisitos`)
+
+- Especificacoes por jogo (D&D, Tormenta, GURPS): pasta [.cursor/requisitos](.cursor/requisitos) e indice em [.cursor/requisitos/README.md](.cursor/requisitos/README.md).
+- **Antes de implementar qualquer item dessa pasta**, e obrigatorio seguir a arquitetura e o protocolo **deste** `AGENTS.md` (deploy Vercel/Render/Neon, multi-jogo, instrucoes em `.github/instructions`, skills em `.cursor/skills/`). Os `.md` de requisito definem o escopo funcional; nao substituem a governanca da plataforma.
+- Regra Cursor associada: [.cursor/rules/requisitos-implementacao.mdc](.cursor/rules/requisitos-implementacao.mdc).
+
 ## Protocolo obrigatorio de implementacao
 
+- Em backend ou refatoracao estrutural, cumprir a secao **Arquitetura de codigo** acima e [docs/arquitetura-camadas-solid.md](docs/arquitetura-camadas-solid.md).
 - Antes de qualquer refatoracao estetica/estrutural, priorizar validacao e preservacao dos requisitos funcionais do fluxo afetado.
 - Em tarefas com uso de skills, agentes ou instrucoes especializadas, manter o mesmo protocolo de leitura de contexto documental antes de codar.
 - Sempre priorizar reuso e modularidade: evitar duplicacao de regras, centralizar fonte de verdade e preservar contratos existentes.
@@ -29,6 +70,13 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 	- evitar logica duplicada e efeitos colaterais ocultos;
 	- minimizar breaking changes e manter compatibilidade quando possivel.
 - Ao concluir mudancas em fluxos sensiveis, validar impacto e registrar risco residual quando nao houver cobertura automatizada suficiente.
+
+## Especificacao minima (SDD leve)
+
+Contrato enxuto entre requisito, codigo e revisao — **sem** processo pesado de documentacao.
+
+- Guia completo: [docs/fluxo-spec-driven-leve.md](docs/fluxo-spec-driven-leve.md).
+- Resumo: **nova rota** = schemas Pydantic + pelo menos **um teste** + criterios de aceite no PR/issue; **frontend** = `getApiUrl()`, payload alinhado ao backend, `?v=` quando mudar JS/CSS; **regras de jogo** = prompt/agente de levantamento RPG ou atualizacao da skill/doc canonica; **decisao estrutural** = ADR curto em `docs/adr/` quando for dificil reverter.
 
 ## Infra de producao
 
@@ -60,8 +108,10 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 - Protecao de dados em producao (Neon branch, `DATABASE_URL`, PITR/snapshots, staging antes de prod, health `/health/live`): [PRE_DEPLOY_CHECKLIST.md](PRE_DEPLOY_CHECKLIST.md) (secao **Protecao de dados**) e skill [.cursor/skills/arena-producao-dados-neon-render/SKILL.md](.cursor/skills/arena-producao-dados-neon-render/SKILL.md).
 - Conjuracao D&D 3.5 (atributo por classe, Tabela 1-1, clerigo, troca Bardo/Feiticeiro): [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
 - Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pos-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
+- Camadas, SOLID e modularidade: [docs/arquitetura-camadas-solid.md](docs/arquitetura-camadas-solid.md). GURPS e roadmap operacional: [docs/roadmap-gurps-melhorias.md](docs/roadmap-gurps-melhorias.md).
 - Contratos de repositorio para servicos (`typing.Protocol`, pacotes `ports` no backend): [docs/ports-repositorios-servicos.md](docs/ports-repositorios-servicos.md).
-- GURPS 4E (ficha + arena, Lite primeiro): skill [.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md](.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md) e checklist em [melhoria-arquitetura](melhoria-arquitetura) (secao 7).
+- GURPS 4E (ficha + arena, Lite primeiro): skill [.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md](.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md) e checklist em [docs/roadmap-gurps-melhorias.md](docs/roadmap-gurps-melhorias.md) (secao 7).
+- Tormenta 20 — levantamento de requisitos, inventário de tabelas e roadmap de catálogos: [docs/tormenta/README.md](docs/tormenta/README.md).
 - Admin em dev: `ADMIN_EMAIL` + `ADMIN_PASSWORD` em `backend/.env` (exemplo em `backend/.env.example`); `criar_admin_padrao` no startup so cria se ambos estiverem definidos — ver secao de credenciais no [README.md](README.md).
 
 ## Orquestracao de agentes (definicoes)

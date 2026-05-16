@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260511t20camp" />
+</head>
+<body class="tormenta-app">
+<header class="tormenta-header">
+    <div>
+        <h1>Tormenta 20</h1>
+        <p>Combatentes e fichas Tormenta 20. <strong>Campanhas</strong> e <strong>Arena de combate</strong> ficam disponíveis apenas para perfil <strong>mestre</strong> ou <strong>administrador</strong>.</p>
+    </div>
+    <div class="tormenta-header-actions">
+        <span id="nomeUsuario">…</span>
+        <span id="badgePerfil" class="t20-dash-badge-perfil jogador">…</span>
+        <span class="tormenta-badge-jogo">Tormenta</span>
+        <button type="button" class="tormenta-btn" id="btnTrocarJogo">Trocar jogo</button>
+        <button type="button" class="tormenta-btn" id="btnLogout">Sair</button>
+    </div>
+</header>
+
+<main class="t20-dash-max">
+    <nav class="t20-dash-nav" aria-label="Seções do dashboard">
+        <button type="button" class="t20-dash-nav--active" data-tab="combatentes">⚔️ Combatentes</button>
+        <button type="button" class="t20-dash-nav--campanhas" data-tab="campanhas" id="tabBtnCampanhas">📜 Campanhas</button>
+        <button type="button" data-tab="arena" id="tabBtnArena">🏟️ Arena</button>
+    </nav>
+
+    <section class="t20-dash-section t20-dash-section--active" id="tab-combatentes">
+        <div class="t20-dash-resumo">
+            <div class="t20-dash-resumo-card"><div class="t20-dash-num" id="totalJogadores">—</div><div class="t20-dash-lbl">Jogadores</div></div>
+            <div class="t20-dash-resumo-card" id="cardResumoMonstro"><div class="t20-dash-num" id="totalMonstros">—</div><div class="t20-dash-lbl">Monstros</div></div>
+            <div class="t20-dash-resumo-card" id="cardResumoNpc"><div class="t20-dash-num" id="totalNPCs">—</div><div class="t20-dash-lbl">NPCs</div></div>
+            <div class="t20-dash-resumo-card"><div class="t20-dash-num" id="totalGeral">—</div><div class="t20-dash-lbl">Total</div></div>
+        </div>
+
+        <div class="t20-dash-toolbar">
+            <div class="t20-dash-filtros">
+                <button type="button" class="t20-dash-filter--active" data-tipo="todos">Todos</button>
+                <button type="button" data-tipo="jogador">Jogadores</button>
+                <button type="button" data-tipo="monstro" id="filtroMonstro">Monstros</button>
+                <button type="button" data-tipo="npc" id="filtroNpc">NPCs</button>
+            </div>
+            <label id="wrapChkMeus" style="display:none;font-size:0.85rem;cursor:pointer">
+                <input type="checkbox" id="chkMeus" /> Só meus (mestre)
+            </label>
+            <div class="t20-dash-acoes">
+                <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnNovoCombatente">+ Novo combatente</button>
+            </div>
+        </div>
+
+        <div class="tormenta-table-wrap">
+            <table class="tormenta-table">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Nome</th>
+                        <th>Classe</th>
+                        <th>Nível</th>
+                        <th>PV máx.</th>
+                        <th>CA</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tblPersonagens">
+                    <tr><td colspan="7" class="tormenta-cell-muted">Carregando…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="t20-dash-section" id="tab-campanhas">
+        <div id="t20campPanelTop" class="t20-camp-painel">
+            <p class="t20-dash-hint" style="margin-top:0;max-width:44rem">
+                Cadastre <strong>campanhas</strong>, associe <strong>combatentes</strong> (jogadores, monstros, NPCs) e registre <strong>sessões</strong> com resumo — alinhado ao fluxo do dashboard D&amp;D 3.5.
+            </p>
+            <div id="t20campSubAbas" class="t20-camp-subabas" role="tablist">
+                <button type="button" class="t20-camp-subaba-btn t20-camp-subaba-btn--active" data-t20camp-sub="cadastro">Cadastro de campanhas</button>
+                <button type="button" class="t20-camp-subaba-btn" data-t20camp-sub="sessoes">Registro de sessões</button>
+            </div>
+            <div id="t20campSubabaCadastro" class="t20-camp-subaba-pane t20-camp-subaba-pane--active">
+                <form id="t20campFormCampanha" class="t20-camp-form" autocomplete="off">
+                    <input type="hidden" id="t20campIdEdicao" value="" />
+                    <div id="t20campEdicaoBadge" class="t20-camp-edicao-badge" style="display:none"></div>
+                    <div class="t20-dash-field">
+                        <label for="t20campNome">Nome da campanha *</label>
+                        <input id="t20campNome" type="text" maxlength="120" required placeholder="Ex.: A sombra de Vhalor" />
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campDescricao">Descrição</label>
+                        <textarea id="t20campDescricao" rows="2" maxlength="500" placeholder="Resumo da campanha (opcional)"></textarea>
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campBusca">Participantes (combatentes cadastrados)</label>
+                        <input id="t20campBusca" type="search" placeholder="Buscar por nome…" />
+                        <div id="t20campTipoFiltros" class="t20-dash-filtros" style="margin-top:0.4rem">
+                            <button type="button" class="t20-dash-filter--active" data-t20camp-tipo="todos">Todos</button>
+                            <button type="button" data-t20camp-tipo="jogador">Jogadores</button>
+                            <button type="button" data-t20camp-tipo="monstro">Monstros</button>
+                            <button type="button" data-t20camp-tipo="npc">NPCs</button>
+                        </div>
+                        <div id="t20campPersonagens" class="t20-camp-checklist" aria-label="Seleção de personagens"></div>
+                    </div>
+                    <div class="t20-camp-form-acoes">
+                        <button type="button" class="tormenta-btn" id="t20campBtnCancelarCampanha" style="display:none">Cancelar edição</button>
+                        <button type="submit" class="tormenta-btn tormenta-btn--primary" id="t20campBtnSalvarCampanha">Criar campanha</button>
+                    </div>
+                </form>
+                <h3 class="t20-camp-lista-titulo">Campanhas cadastradas</h3>
+                <div id="t20campListaCampanhas" class="t20-camp-lista">
+                    <p class="tormenta-cell-muted">Abra esta aba para carregar.</p>
+                </div>
+            </div>
+            <div id="t20campSubabaSessoes" class="t20-camp-subaba-pane">
+                <form id="t20campFormSessao" class="t20-camp-form" autocomplete="off">
+                    <input type="hidden" id="t20campSessaoId" value="" />
+                    <div id="t20campSessaoEdicaoBadge" class="t20-camp-edicao-badge" style="display:none"></div>
+                    <div class="t20-dash-field">
+                        <label for="t20campSessaoCampanhaId">Campanha *</label>
+                        <select id="t20campSessaoCampanhaId" required>
+                            <option value="">Selecione a campanha</option>
+                        </select>
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campSessaoResumo">Resumo da sessão *</label>
+                        <textarea id="t20campSessaoResumo" rows="4" maxlength="4000" required placeholder="Acontecimentos da sessão…"></textarea>
+                    </div>
+                    <label class="t20-camp-visivel-lbl">
+                        <input id="t20campSessaoVisivel" type="checkbox" />
+                        <span>Disponibilizar este resumo para jogadores (lista «sessões visíveis» na API)</span>
+                    </label>
+                    <div class="t20-camp-form-acoes">
+                        <button type="button" class="tormenta-btn" id="t20campBtnCancelarSessao" style="display:none">Cancelar edição</button>
+                        <button type="submit" class="tormenta-btn tormenta-btn--primary" id="t20campBtnSalvarSessao">Registrar sessão</button>
+                    </div>
+                </form>
+                <h3 class="t20-camp-lista-titulo">Sessões registradas</h3>
+                <div id="t20campListaSessoes" class="t20-camp-lista">
+                    <p class="tormenta-cell-muted">Abra esta aba para carregar.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="t20-dash-section" id="tab-arena">
+        <div id="t20ArenaBloqueioJogador" class="t20-dash-placeholder" hidden>
+            <p><strong>Arena de combate</strong> é exclusiva de <strong>mestre</strong> ou <strong>administrador</strong>. A API também bloqueia outros perfis.</p>
+            <p style="margin-top:0.75rem">Peça elevação de perfil a um administrador da plataforma ou use uma conta de mestre.</p>
+        </div>
+        <div id="t20ArenaSetup" class="t20-arena-setup">
+            <p class="t20-dash-hint" style="margin-top:0;max-width:42rem">
+                Selecione os personagens Tormenta 20, inicie o combate e use a ordem por <strong>iniciativa</strong> (empate: nome).
+                Dano e cura ajustam <strong>PV atuais</strong> na API (mesma ficha). O botão <strong>Condições (MB)</strong> (abaixo de dano/cura) abre a tabela de ataque (~p.220 MB). Consumíveis MB e companheiro animal ficam na <a href="ficha-personagem.html">ficha do personagem</a>. Para magias e condições D&amp;D 3.5: <a href="/arena">Arena D&amp;D 3.5</a>.
+            </p>
+            <div class="t20-arena-actions-row">
+                <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnIniciar">Iniciar combate</button>
+            </div>
+            <p class="t20-arena-participantes-label">Participantes</p>
+            <div id="t20ArenaPick" class="t20-arena-pick-grid" role="group" aria-label="Seleção de combatentes Tormenta"></div>
+        </div>
+        <div id="t20ArenaActive" class="t20-arena-active" hidden>
+            <div class="t20-arena-active-bar">
+                <span class="t20-arena-round">Rodada <strong id="t20ArenaRodada">1</strong> · Turno <strong id="t20ArenaTurnoIdx">1</strong></span>
+                <div class="t20-arena-active-bar-acoes">
+                    <button type="button" class="tormenta-btn" id="t20ArenaBtnToggleStats" title="Mostrar ou ocultar números (PV, PM, CA, iniciativa) na mesa">Revelar stats</button>
+                    <button type="button" class="tormenta-btn" id="t20ArenaBtnEncerrar">Encerrar combate</button>
+                </div>
+            </div>
+            <div class="t20-arena-active-layout">
+                <aside class="t20-arena-ini-sidebar" aria-label="Ordem de iniciativa">
+                    <div class="t20-arena-ini-titulo">Iniciativa</div>
+                    <ul id="t20ArenaIniList" class="t20-arena-ini-list"></ul>
+                </aside>
+                <div class="t20-arena-photo-col" aria-label="Retrato e ações rápidas">
+                    <div class="t20-arena-portrait-vertical" id="t20ArenaPortraitWrap">
+                        <img id="t20ArenaCharImg" class="t20-arena-portrait-vertical__img" alt="" hidden decoding="async" />
+                        <span id="t20ArenaCharImgPh" class="t20-arena-portrait-ph t20-arena-portrait-ph--vertical">Sem retrato</span>
+                    </div>
+                    <div class="t20-arena-quick">
+                        <span class="t20-arena-quick-title">Ações rápidas</span>
+                        <div class="t20-arena-quick-btns">
+                            <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnPvModal">Dano / Cura (PV)</button>
+                            <button type="button" class="tormenta-btn t20-arena-btn-cond" id="t20ArenaBtnCondicoes">Condições (MB)</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="t20-arena-main">
+                    <div class="t20-arena-char-top">
+                        <div class="t20-arena-char-ident">
+                            <h3 id="t20ArenaCharNome" class="t20-arena-char-nome">—</h3>
+                            <p id="t20ArenaCharMeta" class="t20-arena-char-meta">—</p>
+                            <div id="t20ArenaCondStatusWrap" class="t20-arena-cond-status-wrap" hidden>
+                                <span class="t20-arena-cond-status-hd">Condições (mesa)</span>
+                                <div id="t20ArenaCondStatusBody" class="t20-arena-cond-status-body" aria-live="polite"></div>
+                            </div>
+                        </div>
+                        <div class="t20-arena-stat-pills" role="group" aria-label="Iniciativa e CA">
+                            <div class="t20-arena-stat-pill t20-arena-stat-pill--ini" title="Iniciativa">
+                                <span class="t20-arena-stat-pill__lab">Iniciativa</span>
+                                <span id="t20ArenaCharIni" class="t20-arena-stat-pill__val">—</span>
+                            </div>
+                            <div class="t20-arena-stat-pill t20-arena-stat-pill--ca" title="Classe de armadura">
+                                <span class="t20-arena-stat-pill__lab">CA</span>
+                                <span id="t20ArenaCharCa" class="t20-arena-stat-pill__val">—</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="t20-arena-stat-resources" role="group" aria-label="Pontos de vida e Pontos de Magia (PM)">
+                        <div class="t20-arena-res-card t20-arena-res-card--pv">
+                            <span class="t20-arena-res-card__lab">Pontos de vida</span>
+                            <div class="t20-arena-res-card__nums">
+                                <span id="t20ArenaCharPvCur" class="t20-arena-res-card__cur">—</span>
+                                <span class="t20-arena-res-card__slash">/</span>
+                                <span id="t20ArenaCharPvMax" class="t20-arena-res-card__max">—</span>
+                            </div>
+                            <div class="t20-arena-res-card__track" aria-hidden="true"><span id="t20ArenaCharPvBar" class="t20-arena-res-card__fill t20-arena-res-card__fill--pv"></span></div>
+                        </div>
+                        <div class="t20-arena-res-card t20-arena-res-card--pm">
+                            <span class="t20-arena-res-card__lab">Pontos de Magia (PM)</span>
+                            <div class="t20-arena-res-card__nums">
+                                <span id="t20ArenaCharPmCur" class="t20-arena-res-card__cur">—</span>
+                                <span class="t20-arena-res-card__slash">/</span>
+                                <span id="t20ArenaCharPmMax" class="t20-arena-res-card__max">—</span>
+                            </div>
+                            <div class="t20-arena-res-card__track" aria-hidden="true"><span id="t20ArenaCharPmBar" class="t20-arena-res-card__fill t20-arena-res-card__fill--pm"></span></div>
+                        </div>
+                    </div>
+                    <div class="t20-arena-turn-row">
+                        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnProximo">Encerrar turno (próximo)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<dialog id="t20ArenaModalPv" class="t20-arena-modal t20-arena-modal--wide-pv">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo">Dano / Cura (PV)</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalPvFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd t20-arena-modal__bd--pv-grid">
+        <div class="t20-arena-pv-col-alvos">
+            <p class="t20-arena-pv-alvos-titulo">Quem recebe</p>
+            <p class="t20-dash-hint" style="margin: 0 0 0.4rem; font-size: 0.72rem">Marque um ou mais combatentes (como na arena D&amp;D 3.5).</p>
+            <div id="t20ArenaPvListaAlvos" class="t20-arena-checkbox-alvos" role="group" aria-label="Alvos de dano ou cura"></div>
+        </div>
+        <div class="t20-arena-pv-col-valores">
+            <div class="t20-dash-field">
+                <label for="t20ArenaInputDano">Dano (subtrai dos PV atuais)</label>
+                <input id="t20ArenaInputDano" type="number" min="0" value="0" />
+            </div>
+            <div class="t20-dash-field">
+                <label for="t20ArenaInputCura">Cura (soma aos PV atuais, até o máximo)</label>
+                <input id="t20ArenaInputCura" type="number" min="0" value="0" />
+            </div>
+        </div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalPvCancelar">Cancelar</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalPvAplicar">Aplicar</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalCondicoes" class="t20-arena-modal t20-arena-modal--cond t20-arena-modal--wide-cond">
+    <div class="t20-arena-modal__hd t20-arena-cond-modal-hd">
+        <h3 class="t20-arena-modal__titulo">Condições (MB) — Tormenta 20</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalCondFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd t20-arena-modal__bd--cond">
+        <div class="t20-arena-cond-alvos-bloco">
+            <p class="t20-arena-pv-alvos-titulo">Quem recebe este cenário</p>
+            <p class="t20-dash-hint" style="margin: 0 0 0.4rem; font-size: 0.72rem">Marque os combatentes e monte o cenário; depois use <strong>Aplicar</strong> para gravar no painel de cada um.</p>
+            <div id="t20ArenaCondListaAlvos" class="t20-arena-checkbox-alvos" role="group" aria-label="Alvos das condições"></div>
+        </div>
+        <div id="t20ArenaCondicoesRoot">
+            <p class="t20-dash-hint" style="margin-top:0">Marque o cenário; o resumo ajuda na mesa. Confirme penalidades e exceções no <strong>Módulo Básico</strong> (≈p. 220).</p>
+            <div class="t20-arena-cond-cols">
+                <fieldset class="t20-arena-fs">
+                    <legend>O atacante está…</legend>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Assustado (atacante): −2 na jogada de ataque." /> Assustado</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Caído (atacante): −4 na jogada de ataque (corpo a corpo); outras regras no livro." /> Caído</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Cego (atacante): entre outras penalidades, 50% de chance de falha em ataques (ver p. 220)." /> Cego</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Em posição mais alta (atacante): +1 na jogada de ataque à distância (conforme MB)." /> Em posição mais alta</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Flanqueando o alvo: +2 na jogada de ataque." /> Flanqueando o alvo</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Invisível (atacante): +2 na jogada de ataque contra adversários que não veem invisível (efeitos de camuflagem/cobertura podem somar)." /> Invisível</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Ofuscado (atacante): −1 na jogada de ataque." /> Ofuscado</label>
+                </fieldset>
+                <fieldset class="t20-arena-fs">
+                    <legend>O alvo está…</legend>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Caído (alvo): modificadores para acertá-lo conforme tabela (ex.: corpo a corpo vs distância)." /> Caído</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Cego (alvo): não aplica alguns bônus de precisão; veja interação com +4 na jogada de ataque." /> Cego</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Desprevenido (alvo): perde bônus na CA vindos de DES (e outros efeitos no livro)." /> Desprevenido</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob camuflagem (alvo): −2 na jogada de ataque (conforme MB)." /> Sob camuflagem</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob camuflagem total (alvo): chance de falha na jogada de ataque (ver MB)." /> Sob camuflagem total</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob cobertura (alvo): −4 na jogada de ataque à distância (conforme MB)." /> Sob cobertura</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob cobertura total (alvo): −8 na jogada de ataque à distância / outras interações no livro." /> Sob cobertura total</label>
+                </fieldset>
+            </div>
+            <fieldset class="t20-arena-fs t20-arena-fs--inline">
+                <legend>Tipo de ataque (contexto)</legend>
+                <label class="t20-arena-cb"><input type="radio" name="t20condTipoAtq" value="cc" checked data-tip="Ataque corpo a corpo selecionado (para linhas que citam corpo a corpo)." /> Corpo a corpo</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condTipoAtq" value="dist" data-tip="Ataque à distância selecionado (cobertura, CA +4 vs distância etc.)." /> À distância</label>
+            </fieldset>
+            <fieldset class="t20-arena-fs">
+                <legend>Modificador extra na jogada de ataque (escolha um, se aplicável)</legend>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="" checked data-tip="Sem modificador adicional desta linha." /> Nenhum desta lista</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="m2" data-tip="Modificador na jogada de ataque: −2." /> −2</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="m4" data-tip="Modificador na jogada de ataque: −4." /> −4</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="f50" data-tip="Modificador na jogada de ataque: 50% de chance de falha (antes do dado)." /> 50% de chance de falha</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="p1" data-tip="Modificador na jogada de ataque: +1." /> +1</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="p2cc" data-tip="Modificador na jogada de ataque: +2 (apenas corpo a corpo)." /> +2 (apenas corpo a corpo)</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="p4" data-tip="Modificador na jogada de ataque: +4 (não se aplica a alvos cegos)." /> +4 (não se aplica a alvos cegos)</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="m1" data-tip="Modificador na jogada de ataque: −1." /> −1</label>
+            </fieldset>
+            <fieldset class="t20-arena-fs">
+                <legend>Modificador na CA do alvo / efeito (escolha um, se aplicável)</legend>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="" checked data-tip="Sem entrada extra desta linha na CA." /> Nenhum desta lista</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="meleeR" data-tip="CA: −4 contra ataques corpo a corpo, +4 contra ataques à distância (conforme situação no MB)." /> −4 contra corpo a corpo, +4 contra à distância</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="m8" data-tip="Modificador na CA: −8." /> −8</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="m4" data-tip="Modificador na CA: −4." /> −4</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="f20" data-tip="CA: 20% de chance de falha no ataque (conforme MB)." /> 20% de chance de falha</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="f50" data-tip="CA: 50% de chance de falha no ataque (conforme MB)." /> 50% de chance de falha</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="p4" data-tip="Modificador na CA: +4." /> +4</label>
+            </fieldset>
+            <label class="t20-arena-cb t20-arena-cb--destaque"><input type="checkbox" id="t20CondNaoAtac" data-tip="O alvo não pode ser atacado (situações descritas na p. 220 do Módulo Básico)." /> O alvo não pode ser atacado (p. 220)</label>
+            <div id="t20ArenaCondResumo" class="t20-arena-cond-resumo" aria-live="polite"></div>
+        </div>
+    </div>
+    <div class="t20-arena-modal__ft t20-arena-modal__ft--cond">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalCondCancelar">Cancelar</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalCondAplicar">Aplicar aos selecionados</button>
+        <button type="button" class="tormenta-btn" id="t20ArenaModalCondFecharFt">Fechar</button>
+    </div>
+</dialog>
+
+<!-- Seletor: Jogador / Monstro / NPC -->
+<div class="t20-dash-overlay" id="overlaySeletorTipo" aria-hidden="true">
+    <div class="t20-dash-modal" role="dialog" aria-labelledby="tituloSeletorTipo">
+        <div class="t20-dash-modal__hd">
+            <h2 id="tituloSeletorTipo">Novo combatente</h2>
+            <button type="button" class="t20-dash-modal__close" data-close="overlaySeletorTipo" aria-label="Fechar">×</button>
+        </div>
+        <div class="t20-dash-modal__bd">
+            <p class="t20-dash-hint" style="margin-top:0">Escolha o tipo de ficha. Monstros e NPCs ficam disponíveis para a mesa (sem dono fixo).</p>
+            <div class="t20-dash-tipo-grid">
+                <button type="button" class="t20-dash-tipo-btn" data-escolher-tipo="jogador">
+                    Jogador
+                    <small>Ficha de personagem do jogador (compra por pontos 8–18).</small>
+                </button>
+                <button type="button" class="t20-dash-tipo-btn" data-escolher-tipo="monstro">
+                    Monstro
+                    <small>Criatura ou antagonista (atributos livres).</small>
+                </button>
+                <button type="button" class="t20-dash-tipo-btn" data-escolher-tipo="npc">
+                    NPC
+                    <small>Personagem da mesma (atributos livres).</small>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cadastro rápido -->
+<div class="t20-dash-overlay" id="overlayCadastro" aria-hidden="true">
+    <div class="t20-dash-modal t20-dash-modal--wide" role="dialog" aria-labelledby="tituloCadastro">
+        <div class="t20-dash-modal__hd">
+            <h2 id="tituloCadastro">Cadastro inicial</h2>
+            <button type="button" class="t20-dash-modal__close" data-close="overlayCadastro" aria-label="Fechar">×</button>
+        </div>
+        <form id="formCadastroRapido" class="t20-dash-modal__bd">
+            <input type="hidden" name="tipo" id="cadTipo" value="jogador" />
+            <p id="cadastroSubtitulo" class="t20-dash-hint" style="margin-top:0"></p>
+            <div class="t20-dash-form-grid">
+                <div class="t20-dash-field t20-dash-field--full">
+                    <label for="cadNome">Nome do personagem *</label>
+                    <input id="cadNome" name="nome" type="text" required maxlength="120" autocomplete="off" />
+                </div>
+                <div class="t20-dash-field">
+                    <label for="cadNivel">Nível *</label>
+                    <input id="cadNivel" name="nivel" type="number" required min="0" max="40" value="1" />
+                </div>
+                <div class="t20-dash-field">
+                    <label for="cadPvMax">PV máximos *</label>
+                    <input id="cadPvMax" name="pv_max" type="number" required min="0" max="9999" value="10" />
+                </div>
+                <div class="t20-dash-field t20-dash-field--full">
+                    <label for="cadClasseMb">Classe MB (BBA / tabela)</label>
+                    <select id="cadClasseMb" class="t20-input"></select>
+                </div>
+                <div class="t20-dash-field t20-dash-field--full">
+                    <label for="cadRacaSelect">Raça (Módulo Básico)</label>
+                    <select id="cadRacaSelect" class="t20-input"></select>
+                </div>
+                <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacaLivre" style="display: none">
+                    <label for="cadRacaLivre">Nome da raça (livre)</label>
+                    <input id="cadRacaLivre" type="text" maxlength="120" placeholder="Ex.: Meio-orc, lefeu de outra região…" />
+                </div>
+                <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacialMais2" style="display: none">
+                    <span class="t20-dash-hint" style="display: block; margin-bottom: 0.35rem">
+                        Raça MB: +2 em duas habilidades diferentes (ex.: Humano, Lefou).
+                    </span>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
+                        <div class="t20-dash-field" style="min-width: 8rem">
+                            <label for="cadRacaMais2a">1º +2</label>
+                            <select id="cadRacaMais2a" class="t20-input"><option value="">—</option></select>
+                        </div>
+                        <div class="t20-dash-field" style="min-width: 8rem">
+                            <label for="cadRacaMais2b">2º +2</label>
+                            <select id="cadRacaMais2b" class="t20-input"><option value="">—</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacialMais1" style="display: none">
+                    <label for="cadRacaMais1">Raça MB: +2 em uma habilidade (Meio-orc)</label>
+                    <select id="cadRacaMais1" class="t20-input"><option value="">—</option></select>
+                </div>
+            </div>
+            <p class="t20-dash-hint" id="hintAttrsJogador" style="display:none">
+                Tipo jogador: os seis números são os <strong>valores finais</strong> (como na ficha). A compra por pontos usa a base = final − bônus racial MB; cada base entre <strong>8</strong> e <strong>18</strong> e a soma dos custos na tabela MB deve ser <strong>exatamente 20</strong> pontos.
+            </p>
+            <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0.75rem 0 0;padding:0.65rem">
+                <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Atributos</legend>
+                <div class="t20-dash-attrs6">
+                    <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="0" max="99" value="10" required /></div>
+                    <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="0" max="99" value="10" required /></div>
+                    <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="0" max="99" value="10" required /></div>
+                    <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="0" max="99" value="10" required /></div>
+                    <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="0" max="99" value="10" required /></div>
+                    <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="0" max="99" value="10" required /></div>
+                </div>
+            </fieldset>
+            <div class="t20-dash-field t20-dash-field--full" style="margin-top: 0.75rem">
+                <label for="cadInputFoto">Retrato (opcional)</label>
+                <p class="t20-dash-hint" style="margin: 0 0 0.35rem">
+                    Aparece na ficha como leitura; você pode trocar depois pelo botão “Enviar retrato” na ficha.
+                </p>
+                <div class="t20-dash-upload-area" id="cadUploadPlaceholder" role="button" tabindex="0" aria-label="Escolher imagem">
+                    📷 Clique para adicionar foto
+                </div>
+                <input type="file" id="cadInputFoto" accept="image/*" style="display: none" />
+                <div id="cadUploadPreview" class="t20-dash-upload-preview" style="display: none" aria-live="polite">
+                    <img id="cadPreviewImage" src="" alt="Pré-visualização do retrato" />
+                    <button type="button" class="t20-dash-upload-remove" id="cadBtnRemoverFoto" aria-label="Remover foto">✕</button>
+                </div>
+            </div>
+        </form>
+        <div class="t20-dash-modal__ft">
+            <button type="button" class="tormenta-btn" data-close="overlayCadastro">Cancelar</button>
+            <button type="submit" form="formCadastroRapido" class="tormenta-btn tormenta-btn--primary" id="btnConfirmarCadastro">Criar e abrir ficha</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/shared/render-api-origin-boot.js?v=2"></script>
+<script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
+<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/ui/Toast.js"></script>
+<script>
+    if (!AuthService.exigirJogo('tormenta')) {}
+</script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
+<script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260511t20camp"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260511t20camp"></script>
+<script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
+<script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260511conjMb"></script>
+<script>
+(function () {
+    const svc = new TormentaPersonagemService();
+    const combateSvc = new TormentaCombateService();
+    window.__t20ArenaCombateSvc = combateSvc;
+    const perfil = (AuthService.getPerfil && AuthService.getPerfil()) || 'jogador';
+    const isMestre = perfil === 'mestre' || perfil === 'administrador';
+
+    let custoPorValor = {};
+    let pontosIniciaisCompra = 20;
+    let filtroTipo = 'todos';
+    let cacheLista = [];
+    let RACAS_MB = [];
+    let CLASSES_MB = [];
+    const ATTR_KEYS_DASH = ['for', 'des', 'con', 'int', 'sab', 'car'];
+    const CAD_CAMPO_ID = { for: 'cadFor', des: 'cadDes', con: 'cadCon', int: 'cadInt', sab: 'cadSab', car: 'cadCar' };
+    let cadFotoPreviewObjectUrl = null;
+
+    function cadLimparFotoDash() {
+        const inp = document.getElementById('cadInputFoto');
+        const ph = document.getElementById('cadUploadPlaceholder');
+        const pr = document.getElementById('cadUploadPreview');
+        const img = document.getElementById('cadPreviewImage');
+        if (inp) inp.value = '';
+        if (ph) ph.style.display = '';
+        if (pr) pr.style.display = 'none';
+        if (img) img.removeAttribute('src');
+        if (cadFotoPreviewObjectUrl) {
+            URL.revokeObjectURL(cadFotoPreviewObjectUrl);
+            cadFotoPreviewObjectUrl = null;
+        }
+    }
+
+    function bindCadFotoUploadOnce() {
+        const ph = document.getElementById('cadUploadPlaceholder');
+        const inp = document.getElementById('cadInputFoto');
+        const pr = document.getElementById('cadUploadPreview');
+        const img = document.getElementById('cadPreviewImage');
+        const rm = document.getElementById('cadBtnRemoverFoto');
+        if (!ph || !inp || ph.dataset.boundFoto) return;
+        ph.dataset.boundFoto = '1';
+        ph.addEventListener('click', () => inp.click());
+        ph.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                inp.click();
+            }
+        });
+        inp.addEventListener('change', () => {
+            const f = inp.files && inp.files[0];
+            if (!f) {
+                cadLimparFotoDash();
+                return;
+            }
+            if (cadFotoPreviewObjectUrl) URL.revokeObjectURL(cadFotoPreviewObjectUrl);
+            cadFotoPreviewObjectUrl = URL.createObjectURL(f);
+            if (img) img.src = cadFotoPreviewObjectUrl;
+            if (ph) ph.style.display = 'none';
+            if (pr) pr.style.display = '';
+        });
+        if (rm) rm.addEventListener('click', () => cadLimparFotoDash());
+    }
+
+    async function carregarRacasTormentaDash() {
+        try {
+            const d = await new TormentaRegrasService().obterRacas();
+            return Array.isArray(d.racas) ? d.racas : [];
+        } catch (e1) {
+            const r = await fetch('/games/tormenta/data/racas-mb.json?v=20260512idiomas', { cache: 'no-cache' });
+            if (!r.ok) throw e1;
+            const d = await r.json();
+            return Array.isArray(d.racas) ? d.racas : [];
+        }
+    }
+
+    async function carregarClassesTormentaDash() {
+        try {
+            const d = await new TormentaRegrasService().obterClasses();
+            return Array.isArray(d.classes) ? d.classes : [];
+        } catch (e1) {
+            const r = await fetch('/games/tormenta/data/classes_mb.json?v=20260511d', { cache: 'no-cache' });
+            if (!r.ok) throw e1;
+            const c = await r.json();
+            return Array.isArray(c.classes) ? c.classes : [];
+        }
+    }
+
+    function getRacaRowPorSlugDash(slug) {
+        return RACAS_MB.find((x) => x.slug === slug) || null;
+    }
+
+    function valorFinalCadAttr(k) {
+        const id = CAD_CAMPO_ID[k];
+        const el = id ? document.getElementById(id) : null;
+        const raw = el ? String(el.value).trim() : '';
+        const n = Number(raw);
+        if (!Number.isFinite(n)) return 10;
+        return Math.floor(n);
+    }
+
+    function racialDeltasMapDash() {
+        const sel = document.getElementById('cadRacaSelect');
+        const slug = (sel && sel.value) || '';
+        const d = { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
+        if (!slug || slug === '__livre__') return d;
+        const row = getRacaRowPorSlugDash(slug);
+        if (!row) return d;
+        const adj = row.ajustes || {};
+        ATTR_KEYS_DASH.forEach((key) => {
+            if (adj[key] != null) d[key] += Number(adj[key]);
+        });
+        if (row.mod_car_fixo) d.car += Number(row.mod_car_fixo);
+        if (row.escolhe_duas_mais2) {
+            const excluiCar = (row.mod_car_fixo || 0) < 0;
+            const a = document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value;
+            const b = document.getElementById('cadRacaMais2b') && document.getElementById('cadRacaMais2b').value;
+            const keysOk = ATTR_KEYS_DASH.filter((key) => !(excluiCar && key === 'car'));
+            if (a && keysOk.includes(a)) d[a] += 2;
+            if (b && keysOk.includes(b)) d[b] += 2;
+        }
+        if (row.escolhe_um_mais2) {
+            const excl = Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
+            const c1 = document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value;
+            const keysOk1 = ATTR_KEYS_DASH.filter((key) => !excl.includes(key));
+            if (c1 && keysOk1.includes(c1)) d[c1] += 2;
+        }
+        return d;
+    }
+
+    function atributosCompraDash() {
+        const rDel = racialDeltasMapDash();
+        const out = {};
+        ATTR_KEYS_DASH.forEach((a) => {
+            const fin = valorFinalCadAttr(a);
+            out[a] = Math.max(1, fin - (rDel[a] || 0));
+        });
+        return out;
+    }
+
+    function popularCadOpcoesMais2Selects() {
+        ['cadRacaMais2a', 'cadRacaMais2b'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const sel = document.getElementById('cadRacaSelect');
+            const slug = (sel && sel.value) || '';
+            const row = getRacaRowPorSlugDash(slug);
+            const excluiCar = row && (row.mod_car_fixo || 0) < 0;
+            const keys = ATTR_KEYS_DASH.filter((k) => !(excluiCar && k === 'car'));
+            const cur = el.value;
+            el.innerHTML = '<option value="">—</option>';
+            keys.forEach((k) => {
+                const lab = { for: 'FOR', des: 'DES', con: 'CON', int: 'INT', sab: 'SAB', car: 'CAR' }[k];
+                const o = document.createElement('option');
+                o.value = k;
+                o.textContent = lab;
+                el.appendChild(o);
+            });
+            if (keys.includes(cur)) el.value = cur;
+        });
+    }
+
+    function popularCadOpcoesMais1Select() {
+        const el = document.getElementById('cadRacaMais1');
+        if (!el) return;
+        const sel = document.getElementById('cadRacaSelect');
+        const slug = (sel && sel.value) || '';
+        const row = getRacaRowPorSlugDash(slug);
+        const ex = row && Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
+        const cur = el.value;
+        el.innerHTML = '<option value="">—</option>';
+        const keys = ATTR_KEYS_DASH.filter((k) => !ex.includes(k));
+        keys.forEach((k) => {
+            const lab = { for: 'FOR', des: 'DES', con: 'CON', int: 'INT', sab: 'SAB', car: 'CAR' }[k];
+            const o = document.createElement('option');
+            o.value = k;
+            o.textContent = lab;
+            el.appendChild(o);
+        });
+        if (keys.includes(cur)) el.value = cur;
+    }
+
+    function aplicarCadRacaSomenteAjustes() {
+        const sel = document.getElementById('cadRacaSelect');
+        const slug = (sel && sel.value) || '';
+        if (!slug || slug === '__livre__') return;
+        const d = racialDeltasMapDash();
+        ATTR_KEYS_DASH.forEach((a) => {
+            const id = CAD_CAMPO_ID[a];
+            const inp = id ? document.getElementById(id) : null;
+            if (inp) inp.value = String(Math.max(1, 10 + (d[a] || 0)));
+        });
+    }
+
+    function validarEscolhasRacaMbDash() {
+        const sel = document.getElementById('cadRacaSelect');
+        const slug = (sel && sel.value) || '';
+        const row = getRacaRowPorSlugDash(slug);
+        if (!row) return { ok: true };
+        if (row.escolhe_duas_mais2) {
+            const a = document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value;
+            const b = document.getElementById('cadRacaMais2b') && document.getElementById('cadRacaMais2b').value;
+            if (!a || !b) {
+                return {
+                    ok: false,
+                    msg: 'Escolha duas habilidades diferentes para receber +2 (Humano ou Lefou).',
+                };
+            }
+            if (a === b) return { ok: false, msg: 'As duas habilidades com +2 devem ser diferentes.' };
+        }
+        if (row.escolhe_um_mais2) {
+            const x = document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value;
+            if (!x) {
+                return {
+                    ok: false,
+                    msg: 'Meio-orc: escolha a outra habilidade com +2 (não pode ser INT nem CAR).',
+                };
+            }
+            const ex = row.excluir_atributos_mais2 || [];
+            if (ex.includes(x)) return { ok: false, msg: 'Meio-orc: escolha inválida para o +2 opcional.' };
+        }
+        return { ok: true };
+    }
+
+    function bindCadRacialDashOnce() {
+        ['cadRacaMais2a', 'cadRacaMais2b'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el && !el.dataset.boundDash) {
+                el.dataset.boundDash = '1';
+                el.addEventListener('change', () => {
+                    aplicarCadRacaSomenteAjustes();
+                });
+            }
+        });
+        const m1 = document.getElementById('cadRacaMais1');
+        if (m1 && !m1.dataset.boundDash) {
+            m1.dataset.boundDash = '1';
+            m1.addEventListener('change', () => {
+                aplicarCadRacaSomenteAjustes();
+            });
+        }
+    }
+
+    function getClasseMbRowPorSlugDash(slug) {
+        return CLASSES_MB.find((x) => x.slug === slug) || null;
+    }
+
+    function popularCadRacaSelect() {
+        const sel = document.getElementById('cadRacaSelect');
+        if (!sel) return;
+        const cur = sel.value;
+        sel.innerHTML = '';
+        const o0 = document.createElement('option');
+        o0.value = '';
+        o0.textContent = '— Nenhuma (sem ajuste MB)';
+        sel.appendChild(o0);
+        RACAS_MB.forEach((row) => {
+            const o = document.createElement('option');
+            o.value = row.slug;
+            o.textContent = row.nome;
+            sel.appendChild(o);
+        });
+        const ox = document.createElement('option');
+        ox.value = '__livre__';
+        ox.textContent = 'Outra / livre';
+        sel.appendChild(ox);
+        if (cur && (cur === '__livre__' || RACAS_MB.some((x) => x.slug === cur))) sel.value = cur;
+    }
+
+    function popularCadClasseMbSelect() {
+        const sel = document.getElementById('cadClasseMb');
+        if (!sel) return;
+        const cur = sel.value;
+        sel.innerHTML = '';
+        const o0 = document.createElement('option');
+        o0.value = '';
+        o0.textContent = '— Livre / multiclasse (texto na ficha)';
+        sel.appendChild(o0);
+        CLASSES_MB.forEach((row) => {
+            const o = document.createElement('option');
+            o.value = row.slug;
+            o.textContent = `${row.nome}${row.abreviatura ? ` (${row.abreviatura})` : ''}`;
+            sel.appendChild(o);
+        });
+        if (cur && CLASSES_MB.some((x) => x.slug === cur)) sel.value = cur;
+    }
+
+    function onCadRacaSelectChange(resetAttrs) {
+        const sel = document.getElementById('cadRacaSelect');
+        const wrap = document.getElementById('cadWrapRacaLivre');
+        const wrapM2 = document.getElementById('cadWrapRacialMais2');
+        const wrapM1 = document.getElementById('cadWrapRacialMais1');
+        if (!sel) return;
+        const slug = sel.value || '';
+        const row = getRacaRowPorSlugDash(slug);
+        if (wrap) wrap.style.display = slug === '__livre__' ? '' : 'none';
+        if (slug !== '__livre__') {
+            const inp = document.getElementById('cadRacaLivre');
+            if (inp) inp.value = '';
+        }
+        if (!(row && row.escolhe_duas_mais2)) {
+            const a = document.getElementById('cadRacaMais2a');
+            const b = document.getElementById('cadRacaMais2b');
+            if (a) a.value = '';
+            if (b) b.value = '';
+        }
+        if (!(row && row.escolhe_um_mais2)) {
+            const m1 = document.getElementById('cadRacaMais1');
+            if (m1) m1.value = '';
+        }
+        if (wrapM2) wrapM2.style.display = row && row.escolhe_duas_mais2 ? '' : 'none';
+        if (wrapM1) wrapM1.style.display = row && row.escolhe_um_mais2 ? '' : 'none';
+        popularCadOpcoesMais2Selects();
+        popularCadOpcoesMais1Select();
+        if (resetAttrs && slug && slug !== '__livre__') {
+            const tipoCad = (document.getElementById('cadTipo') && document.getElementById('cadTipo').value) || '';
+            if (tipoCad !== 'jogador') aplicarCadRacaSomenteAjustes();
+        }
+    }
+
+    function escapeHtml(s) {
+        return String(s ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function chipTipo(t) {
+        const x = String(t || '').toLowerCase();
+        const c =
+            x === 'monstro'
+                ? 'tormenta-chip-tipo--monstro'
+                : x === 'npc'
+                  ? 'tormenta-chip-tipo--npc'
+                  : 'tormenta-chip-tipo--jogador';
+        return `<span class="tormenta-chip-tipo ${c}">${escapeHtml(x || '—')}</span>`;
+    }
+
+    function openOverlay(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.add('t20-dash-overlay--open');
+        el.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeOverlay(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('t20-dash-overlay--open');
+        el.setAttribute('aria-hidden', 'true');
+    }
+
+    const T20_ARENA_STATS_LS = 't20ArenaStatsVisiveis';
+    const t20Arena = {
+        ativo: false,
+        ordemIds: [],
+        byId: {},
+        turnoIdx: 0,
+        rodada: 1,
+        condPorId: Object.create(null),
+        statsVisiveis: (function () {
+            try {
+                return localStorage.getItem(T20_ARENA_STATS_LS) === '1';
+            } catch (_e) {
+                return false;
+            }
+        })(),
+    };
+    window.__t20ArenaRef = t20Arena;
+
+    function t20ArenaStatsMascarados() {
+        return !!(t20Arena.ativo && !t20Arena.statsVisiveis);
+    }
+
+    function t20ArenaSyncToggleStatsBtn() {
+        const b = document.getElementById('t20ArenaBtnToggleStats');
+        if (!b) return;
+        if (!t20Arena.ativo) {
+            b.hidden = true;
+            return;
+        }
+        b.hidden = false;
+        b.textContent = t20Arena.statsVisiveis ? 'Ocultar stats' : 'Revelar stats';
+    }
+
+    function t20ArenaRenderCondicaoStatus() {
+        const wrap = document.getElementById('t20ArenaCondStatusWrap');
+        const body = document.getElementById('t20ArenaCondStatusBody');
+        if (!wrap || !body) return;
+        const ids = t20Arena.ordemIds;
+        const ativoId = ids.length ? ids[t20Arena.turnoIdx] : null;
+        const rec = ativoId != null ? t20Arena.condPorId[ativoId] : null;
+        const rotulos = rec && Array.isArray(rec.rotulos) ? rec.rotulos.filter(Boolean) : [];
+        if (!rotulos.length) {
+            wrap.hidden = true;
+            body.innerHTML = '';
+            wrap.removeAttribute('title');
+            return;
+        }
+        wrap.hidden = false;
+        const tipAll = rec && Array.isArray(rec.tips) ? rec.tips.join(' · ') : '';
+        if (tipAll) wrap.setAttribute('title', tipAll.length > 400 ? `${tipAll.slice(0, 397)}…` : tipAll);
+        else wrap.removeAttribute('title');
+        body.innerHTML = rotulos
+            .map((label) => `<span class="t20-arena-cond-pill">${escapeHtml(label)}</span>`)
+            .join('');
+    }
+
+    function t20ArenaPvPopularListaAlvos() {
+        const host = document.getElementById('t20ArenaPvListaAlvos');
+        if (!host) return;
+        const ids = t20Arena.ordemIds;
+        const ativo = ids.length ? ids[t20Arena.turnoIdx] : null;
+        if (!ids.length) {
+            host.innerHTML = '<p class="t20-arena-cb-vazio">Nenhum combatente no combate.</p>';
+            return;
+        }
+        host.innerHTML = ids
+            .map((id) => {
+                const p = t20Arena.byId[id];
+                const nome = p ? escapeHtml(p.nome) : `#${id}`;
+                const tipo = p ? String(p.tipo || '').toLowerCase() : '';
+                const mostrarPv = tipo === 'jogador' && p && Number(p.pv_max) >= 0;
+                const mask = t20ArenaStatsMascarados();
+                let pvSpan = '';
+                if (mostrarPv) {
+                    const pvTxt = mask
+                        ? '<span class="t20-arena-cb-hp t20-hp-oculto">???/??? PV</span>'
+                        : `<span class="t20-arena-cb-hp">${escapeHtml(String(p.pv_atual))}/${escapeHtml(String(p.pv_max))} PV</span>`;
+                    pvSpan = pvTxt;
+                }
+                const badge = tipo ? `<span class="t20-arena-cb-tipo t20-arena-cb-tipo--${escapeHtml(tipo)}">${escapeHtml(tipo)}</span>` : '';
+                const ck = id === ativo ? ' checked' : '';
+                return `<div class="t20-arena-cb-item"><input type="checkbox" class="t20-arena-cb-inp" id="t20pv-alvo-${id}" value="${id}"${ck} /><label class="t20-arena-cb-lbl" for="t20pv-alvo-${id}"><span class="t20-arena-cb-nome">${nome}</span>${pvSpan}${badge}</label></div>`;
+            })
+            .join('');
+    }
+
+    window.__t20ArenaRenderCondStatus = t20ArenaRenderCondicaoStatus;
+
+    function t20ArenaResolveMediaUrl(u) {
+        if (!u) return '';
+        const s = String(u);
+        if (s.startsWith('http://') || s.startsWith('https://')) return s;
+        if (s.startsWith('/')) return window.location.origin + s;
+        return s;
+    }
+
+    function t20ArenaRenderPick() {
+        const host = document.getElementById('t20ArenaPick');
+        if (!host) return;
+        if (!cacheLista.length) {
+            host.innerHTML = '<p class="t20-arena-empty">Nenhum combatente cadastrado.</p>';
+            return;
+        }
+        host.innerHTML = cacheLista
+            .map((p) => {
+                const foto = p.foto_url
+                    ? `<img src="${escapeHtml(t20ArenaResolveMediaUrl(p.foto_url))}" alt="${escapeHtml(p.nome)}">`
+                    : '<span class="t20-arena-ph" aria-hidden="true">?</span>';
+                const ini = p.iniciativa != null ? escapeHtml(String(p.iniciativa)) : '—';
+                const ca = p.ca != null ? escapeHtml(String(p.ca)) : '—';
+                const maskPick = t20Arena.ativo && !t20Arena.statsVisiveis;
+                const caDisp = maskPick ? '?' : ca;
+                const iniDisp = maskPick ? '?' : ini;
+                return `<label class="t20-arena-pick-card"><input type="checkbox" class="t20-arena-pick-cb" value="${p.id}" /><span class="t20-arena-pick-body">${foto}<span class="t20-arena-pick-name">${escapeHtml(p.nome)}</span><span class="t20-arena-pick-meta">Nv ${escapeHtml(String(p.nivel ?? '—'))} · CA ${caDisp} · Ini ${iniDisp} · ${escapeHtml(p.tipo || '')}</span></span></label>`;
+            })
+            .join('');
+        document.querySelectorAll('.t20-arena-pick-card').forEach((lab) => {
+            const cb = lab.querySelector('.t20-arena-pick-cb');
+            if (!cb || cb.dataset.bound) return;
+            cb.dataset.bound = '1';
+            const sync = () => lab.classList.toggle('is-picked', cb.checked);
+            cb.addEventListener('change', sync);
+            sync();
+        });
+    }
+
+    function t20ArenaUiSetup() {
+        const s = document.getElementById('t20ArenaSetup');
+        const a = document.getElementById('t20ArenaActive');
+        if (s) s.hidden = false;
+        if (a) a.hidden = true;
+        t20ArenaSyncToggleStatsBtn();
+    }
+
+    function t20ArenaUiActive() {
+        const s = document.getElementById('t20ArenaSetup');
+        const a = document.getElementById('t20ArenaActive');
+        if (s) s.hidden = true;
+        if (a) a.hidden = false;
+        t20ArenaSyncToggleStatsBtn();
+    }
+
+    function t20ArenaRenderActive() {
+        const ids = t20Arena.ordemIds;
+        const ul = document.getElementById('t20ArenaIniList');
+        const ativoId = ids.length ? ids[t20Arena.turnoIdx] : null;
+        if (ul) {
+            ul.innerHTML = ids.length
+                ? ids
+                      .map((id, idx) => {
+                          const p = t20Arena.byId[id];
+                          const nome = p ? escapeHtml(p.nome) : `#${id}`;
+                          const maskL = t20ArenaStatsMascarados();
+                          const iniRaw = p && p.iniciativa != null ? escapeHtml(String(p.iniciativa)) : '—';
+                          const ini = maskL ? '?' : iniRaw;
+                          const cls = id === ativoId ? 'is-active' : '';
+                          const hasCond =
+                              t20Arena.condPorId[id] &&
+                              Array.isArray(t20Arena.condPorId[id].rotulos) &&
+                              t20Arena.condPorId[id].rotulos.length;
+                          const condDot = hasCond
+                              ? '<span class="t20-arena-ini-cond-dot" title="Cenário MB (condições) aplicado na arena"></span>'
+                              : '';
+                          return `<li class="${cls}">${condDot}<span class="t20-arena-ini-num">${idx + 1}.</span><span class="t20-arena-ini-meta">${ini} — ${nome}</span></li>`;
+                      })
+                      .join('')
+                : '<li>—</li>';
+        }
+        const p = ativoId ? t20Arena.byId[ativoId] : null;
+        const setTxt = (id, t) => {
+            const n = document.getElementById(id);
+            if (n) n.textContent = t;
+        };
+        setTxt('t20ArenaCharNome', p ? p.nome : '—');
+        setTxt(
+            't20ArenaCharMeta',
+            p ? `Nv ${p.nivel ?? '—'} · ${String(p.tipo || '').toLowerCase()}` : '—'
+        );
+        const mask = t20ArenaStatsMascarados();
+        setTxt('t20ArenaCharIni', mask ? '?' : p && p.iniciativa != null ? String(p.iniciativa) : '—');
+        setTxt('t20ArenaCharCa', mask ? '?' : p && p.ca != null ? String(p.ca) : '—');
+        const pvMax = Math.max(0, Number(p && p.pv_max) || 0);
+        let pvCur = Number(p && p.pv_atual);
+        if (!Number.isFinite(pvCur)) pvCur = pvMax;
+        const pmMax = Math.max(0, Number(p && p.pa_max) || 0);
+        let pmCur = Number(p && p.pa_atual);
+        if (!Number.isFinite(pmCur)) pmCur = pmMax;
+        setTxt('t20ArenaCharPvCur', mask && pvMax ? '?' : pvMax ? String(pvCur) : '—');
+        setTxt('t20ArenaCharPvMax', mask && pvMax ? '?' : pvMax ? String(pvMax) : '—');
+        setTxt('t20ArenaCharPmCur', mask && (pmMax || pmCur) ? '?' : pmMax || pmCur ? String(pmCur) : '—');
+        setTxt('t20ArenaCharPmMax', mask && pmMax ? '?' : pmMax ? String(pmMax) : '—');
+        ['t20ArenaCharIni', 't20ArenaCharCa', 't20ArenaCharPvCur', 't20ArenaCharPvMax', 't20ArenaCharPmCur', 't20ArenaCharPmMax'].forEach(
+            (eid) => {
+                const el = document.getElementById(eid);
+                if (el) el.classList.toggle('t20-hp-oculto', mask);
+            }
+        );
+        const pvBar = document.getElementById('t20ArenaCharPvBar');
+        if (pvBar) {
+            if (pvMax > 0) {
+                const pct = Math.min(100, Math.max(0, (pvCur / pvMax) * 100));
+                pvBar.style.width = `${pct}%`;
+            } else {
+                pvBar.style.width = '0%';
+            }
+        }
+        const pmBar = document.getElementById('t20ArenaCharPmBar');
+        if (pmBar) {
+            if (pmMax > 0) {
+                const pct = Math.min(100, Math.max(0, (pmCur / pmMax) * 100));
+                pmBar.style.width = `${pct}%`;
+            } else {
+                pmBar.style.width = '0%';
+            }
+        }
+        const img = document.getElementById('t20ArenaCharImg');
+        const ph = document.getElementById('t20ArenaCharImgPh');
+        if (p && p.foto_url && img && ph) {
+            const url = t20ArenaResolveMediaUrl(p.foto_url);
+            img.onerror = () => {
+                img.removeAttribute('src');
+                img.hidden = true;
+                ph.hidden = false;
+            };
+            img.onload = () => {
+                img.hidden = false;
+                ph.hidden = true;
+            };
+            img.alt = p.nome ? String(p.nome) : 'Retrato do combatente';
+            img.hidden = true;
+            ph.hidden = false;
+            img.src = url;
+        } else if (img && ph) {
+            img.onerror = null;
+            img.onload = null;
+            img.removeAttribute('src');
+            img.alt = '';
+            img.hidden = true;
+            ph.hidden = false;
+        }
+        setTxt('t20ArenaRodada', String(t20Arena.rodada || 1));
+        const turnoHum = ids.length ? String(t20Arena.turnoIdx + 1) : '0';
+        setTxt('t20ArenaTurnoIdx', `${turnoHum} / ${ids.length || 0}`);
+        t20ArenaRenderCondicaoStatus();
+        t20ArenaSyncToggleStatsBtn();
+    }
+
+    function t20ArenaApplyFromApi(st) {
+        if (!st || !st.ativo || !Array.isArray(st.personagens_ids) || !st.personagens_ids.length) {
+            t20Arena.ativo = false;
+            t20Arena.ordemIds = [];
+            t20Arena.byId = {};
+            t20Arena.turnoIdx = 0;
+            t20Arena.rodada = 1;
+            t20Arena.condPorId = Object.create(null);
+            t20ArenaUiSetup();
+            t20ArenaRenderPick();
+            t20ArenaRenderActive();
+            return;
+        }
+        t20Arena.ativo = true;
+        t20Arena.ordemIds = st.personagens_ids.map((x) => Number(x));
+        const nOrd = t20Arena.ordemIds.length;
+        let ti = Number(st.turno_atual);
+        if (!Number.isFinite(ti)) ti = 0;
+        if (nOrd > 0) ti = Math.min(Math.max(0, ti), nOrd - 1);
+        else ti = 0;
+        t20Arena.turnoIdx = ti;
+        t20Arena.rodada = Number(st.rodada_atual) || 1;
+        t20Arena.byId = {};
+        const list = Array.isArray(st.personagens) ? st.personagens : [];
+        list.forEach((p) => {
+            if (p && p.id != null) t20Arena.byId[Number(p.id)] = p;
+        });
+        t20Arena.ordemIds.forEach((id) => {
+            if (!t20Arena.byId[id]) {
+                const fromCache = cacheLista.find((x) => Number(x.id) === id);
+                if (fromCache) t20Arena.byId[id] = { ...fromCache };
+            }
+        });
+        t20Arena.condPorId = Object.create(null);
+        const cm = st.condicoes_mb;
+        if (cm && typeof cm === 'object') {
+            Object.keys(cm).forEach((k) => {
+                const id = Number(k);
+                if (!Number.isFinite(id) || id <= 0) return;
+                const v = cm[k];
+                if (!v || typeof v !== 'object') return;
+                const rotulos = Array.isArray(v.rotulos) ? v.rotulos : [];
+                const tips = Array.isArray(v.tips) ? v.tips : [];
+                if (rotulos.length || tips.length) t20Arena.condPorId[id] = { rotulos, tips };
+            });
+        }
+        t20ArenaUiActive();
+        t20ArenaRenderActive();
+        t20ArenaRenderPick();
+    }
+
+    async function t20ArenaRefreshFromApi() {
+        try {
+            const st = await combateSvc.status();
+            t20ArenaApplyFromApi(st);
+        } catch (_e) {
+            /* sem sessão ou offline */
+        }
+    }
+
+    window.__t20ArenaApplyFromApi = t20ArenaApplyFromApi;
+    window.__t20ArenaRefreshFromApi = t20ArenaRefreshFromApi;
+
+    function t20ArenaBindOnce() {
+        const root = document.getElementById('tab-arena');
+        if (!root || root.dataset.t20ArenaBound) return;
+        root.dataset.t20ArenaBound = '1';
+
+        document.getElementById('t20ArenaBtnIniciar')?.addEventListener('click', async () => {
+            const chosen = Array.from(document.querySelectorAll('.t20-arena-pick-cb:checked')).map((x) =>
+                Number(x.value)
+            );
+            if (!chosen.length) {
+                Toast.error('Marque ao menos um combatente.');
+                return;
+            }
+            try {
+                const st = await combateSvc.iniciar(chosen);
+                t20ArenaApplyFromApi(st);
+                Toast.success('Combate Tormenta iniciado (guardado na sua conta).');
+            } catch (e) {
+                Toast.error(e.message || 'Erro ao iniciar combate.');
+            }
+        });
+
+        document.getElementById('t20ArenaBtnEncerrar')?.addEventListener('click', async () => {
+            try {
+                const st = await combateSvc.finalizar();
+                t20ArenaApplyFromApi(st);
+                Toast.info('Combate encerrado.');
+            } catch (e) {
+                Toast.error(e.message || 'Erro ao encerrar combate.');
+            }
+        });
+
+        document.getElementById('t20ArenaBtnProximo')?.addEventListener('click', async () => {
+            if (!t20Arena.ativo || !t20Arena.ordemIds.length) return;
+            try {
+                const st = await combateSvc.avancarTurno();
+                t20ArenaApplyFromApi(st);
+            } catch (e) {
+                Toast.error(e.message || 'Erro ao avançar turno.');
+            }
+        });
+
+        document.getElementById('t20ArenaBtnToggleStats')?.addEventListener('click', () => {
+            if (!t20Arena.ativo) return;
+            t20Arena.statsVisiveis = !t20Arena.statsVisiveis;
+            try {
+                localStorage.setItem(T20_ARENA_STATS_LS, t20Arena.statsVisiveis ? '1' : '0');
+            } catch (_e) {}
+            t20ArenaSyncToggleStatsBtn();
+            t20ArenaRenderPick();
+            t20ArenaRenderActive();
+            const dlgPv = document.getElementById('t20ArenaModalPv');
+            if (dlgPv && dlgPv.open) t20ArenaPvPopularListaAlvos();
+            Toast.success(t20Arena.statsVisiveis ? 'Estatísticas visíveis' : 'Estatísticas ocultas');
+        });
+
+        const modal = document.getElementById('t20ArenaModalPv');
+        const fecharModal = () => {
+            if (modal && typeof modal.close === 'function') modal.close();
+        };
+
+        const dInpPv = document.getElementById('t20ArenaInputDano');
+        const cInpPv = document.getElementById('t20ArenaInputCura');
+        if (dInpPv && cInpPv && !dInpPv.dataset.t20PvMutual) {
+            dInpPv.dataset.t20PvMutual = '1';
+            cInpPv.dataset.t20PvMutual = '1';
+            dInpPv.addEventListener('input', () => {
+                if (Math.floor(Number(dInpPv.value) || 0) > 0) cInpPv.value = '0';
+            });
+            cInpPv.addEventListener('input', () => {
+                if (Math.floor(Number(cInpPv.value) || 0) > 0) dInpPv.value = '0';
+            });
+        }
+
+        document.getElementById('t20ArenaBtnPvModal')?.addEventListener('click', () => {
+            if (!t20Arena.ativo || !t20Arena.ordemIds.length) return;
+            if (!modal) return;
+            t20ArenaPvPopularListaAlvos();
+            if (dInpPv) dInpPv.value = '0';
+            if (cInpPv) cInpPv.value = '0';
+            t20ArenaRenderActive();
+            if (typeof modal.showModal === 'function') modal.showModal();
+        });
+
+        document.getElementById('t20ArenaModalPvFechar')?.addEventListener('click', fecharModal);
+        document.getElementById('t20ArenaModalPvCancelar')?.addEventListener('click', fecharModal);
+
+        document.getElementById('t20ArenaModalPvAplicar')?.addEventListener('click', async () => {
+            const dano = Math.max(0, Math.floor(Number(document.getElementById('t20ArenaInputDano')?.value || 0)));
+            const cura = Math.max(0, Math.floor(Number(document.getElementById('t20ArenaInputCura')?.value || 0)));
+            const alvos = Array.from(document.querySelectorAll('#t20ArenaPvListaAlvos .t20-arena-cb-inp:checked'))
+                .map((el) => Number(el.value))
+                .filter((id) => Number.isFinite(id) && id > 0);
+            if (!alvos.length) {
+                Toast.error('Marque ao menos um combatente.');
+                return;
+            }
+            if (dano > 0 && cura > 0) {
+                Toast.error('Use dano ou cura, não os dois ao mesmo tempo.');
+                return;
+            }
+            if (dano <= 0 && cura <= 0) {
+                Toast.error('Informe dano ou cura.');
+                return;
+            }
+            try {
+                for (let i = 0; i < alvos.length; i++) {
+                    const id = alvos[i];
+                    const p = t20Arena.byId[id];
+                    if (!p) continue;
+                    const max = Math.max(0, Number(p.pv_max) || 0);
+                    let cur = Number(p.pv_atual);
+                    if (!Number.isFinite(cur)) cur = max;
+                    let nv = cur - dano + cura;
+                    if (nv < 0) nv = 0;
+                    if (max > 0 && nv > max) nv = max;
+                    const upd = await svc.atualizar(id, { pv_atual: nv });
+                    const merged = { ...p, ...upd };
+                    t20Arena.byId[id] = merged;
+                    const ix = cacheLista.findIndex((x) => Number(x.id) === id);
+                    if (ix >= 0) {
+                        cacheLista[ix] = {
+                            ...cacheLista[ix],
+                            pv_atual: upd.pv_atual,
+                            pv_max: upd.pv_max ?? cacheLista[ix].pv_max,
+                        };
+                    }
+                }
+                atualizarResumo(cacheLista);
+                renderTabela(cacheLista);
+                t20ArenaRenderPick();
+                t20ArenaRenderActive();
+                await t20ArenaRefreshFromApi();
+                fecharModal();
+                Toast.success(dano > 0 ? `Dano ${dano} aplicado aos selecionados.` : `Cura ${cura} aplicada aos selecionados.`);
+            } catch (e) {
+                Toast.error(e.message || 'Erro ao salvar PV');
+            }
+        });
+
+        void t20ArenaRefreshFromApi();
+        if (typeof window.__t20ArenaCondicoesInit === 'function') {
+            window.__t20ArenaCondicoesInit();
+        }
+    }
+
+    function setTabs() {
+        document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((b) => {
+            b.addEventListener('click', () => {
+                const tab = b.getAttribute('data-tab');
+                if ((tab === 'arena' || tab === 'campanhas') && !isMestre) return;
+                document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((x) => x.classList.remove('t20-dash-nav--active'));
+                b.classList.add('t20-dash-nav--active');
+                document.querySelectorAll('.t20-dash-section').forEach((s) => {
+                    s.classList.toggle('t20-dash-section--active', s.id === 'tab-' + tab);
+                });
+                if (tab === 'arena') void t20ArenaRefreshFromApi();
+            });
+        });
+    }
+
+    function aplicarRestricoesPerfilUi() {
+        const badge = document.getElementById('badgePerfil');
+        if (badge) {
+            badge.textContent = perfil || '—';
+            badge.className = 't20-dash-badge-perfil ' + (perfil || 'jogador');
+        }
+        const bloqArena = document.getElementById('t20ArenaBloqueioJogador');
+        const arenaSetup = document.getElementById('t20ArenaSetup');
+        const arenaActive = document.getElementById('t20ArenaActive');
+        if (!isMestre) {
+            document.getElementById('filtroMonstro')?.style.setProperty('display', 'none');
+            document.getElementById('filtroNpc')?.style.setProperty('display', 'none');
+            document.getElementById('cardResumoMonstro')?.style.setProperty('display', 'none');
+            document.getElementById('cardResumoNpc')?.style.setProperty('display', 'none');
+            document.getElementById('tabBtnCampanhas')?.style.setProperty('display', 'none');
+            document.getElementById('tabBtnArena')?.style.setProperty('display', 'none');
+            if (bloqArena) bloqArena.hidden = false;
+            if (arenaSetup) arenaSetup.hidden = true;
+            if (arenaActive) arenaActive.hidden = true;
+        } else {
+            document.getElementById('wrapChkMeus')?.style.setProperty('display', '');
+            if (bloqArena) bloqArena.hidden = true;
+        }
+    }
+
+    async function carregarRegrasCompra() {
+        try {
+            const r = await fetch('/games/tormenta/data/regras-atributos.json?v=20260511c', { cache: 'no-cache' });
+            const d = await r.json();
+            pontosIniciaisCompra =
+                typeof d.pontos_compra_iniciais === 'number' ? d.pontos_compra_iniciais : 20;
+            const m = {};
+            (d.custos || []).forEach((row) => {
+                m[Number(row.valor)] = Number(row.custo);
+            });
+            custoPorValor = m;
+        } catch (_e) {
+            custoPorValor = {
+                8: -2, 9: -1, 10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 6, 16: 8, 17: 11, 18: 14,
+            };
+        }
+    }
+
+    function custoTotalSeis(forV, desV, conV, intV, sabV, carV) {
+        const vals = [forV, desV, conV, intV, sabV, carV];
+        let t = 0;
+        for (let i = 0; i < vals.length; i++) {
+            const c = custoPorValor[vals[i]];
+            if (c === undefined) return null;
+            t += c;
+        }
+        return t;
+    }
+
+    function attrsDoForm() {
+        return {
+            for_valor: Math.floor(Number(document.getElementById('cadFor').value) || 0),
+            des_valor: Math.floor(Number(document.getElementById('cadDes').value) || 0),
+            con_valor: Math.floor(Number(document.getElementById('cadCon').value) || 0),
+            int_valor: Math.floor(Number(document.getElementById('cadInt').value) || 0),
+            sab_valor: Math.floor(Number(document.getElementById('cadSab').value) || 0),
+            car_valor: Math.floor(Number(document.getElementById('cadCar').value) || 0),
+        };
+    }
+
+    function validarCadastro(tipo) {
+        const nome = document.getElementById('cadNome').value.trim();
+        if (!nome) {
+            Toast.error('Informe o nome do personagem.');
+            return false;
+        }
+        const nivel = Math.floor(Number(document.getElementById('cadNivel').value));
+        if (!Number.isFinite(nivel) || nivel < 0 || nivel > 40) {
+            Toast.error('Nível deve estar entre 0 e 40.');
+            return false;
+        }
+        const pvMax = Math.floor(Number(document.getElementById('cadPvMax').value));
+        if (!Number.isFinite(pvMax) || pvMax < 0) {
+            Toast.error('PV máximos inválidos.');
+            return false;
+        }
+        const a = attrsDoForm();
+        const t = (tipo || '').toLowerCase();
+        const vr0 = validarEscolhasRacaMbDash();
+        if (!vr0.ok) {
+            Toast.error(vr0.msg);
+            return false;
+        }
+        if (t === 'jogador') {
+            const bases = atributosCompraDash();
+            for (const k of ATTR_KEYS_DASH) {
+                const v = bases[k];
+                if (v < 8 || v > 18) {
+                    Toast.error(
+                        'Tipo jogador: cada valor-base da compra (atributo final − bônus racial MB) deve estar entre 8 e 18.'
+                    );
+                    return false;
+                }
+            }
+            const total = custoTotalSeis(bases.for, bases.des, bases.con, bases.int, bases.sab, bases.car);
+            if (total === null) {
+                Toast.error('Valores-base fora da tabela de custos (use bases entre 8 e 18).');
+                return false;
+            }
+            if (total > pontosIniciaisCompra) {
+                Toast.error(
+                    `Soma dos custos na compra por pontos (${total}) ultrapassa ${pontosIniciaisCompra}. Ajuste os atributos finais ou a raça.`
+                );
+                return false;
+            }
+            if (total < pontosIniciaisCompra) {
+                Toast.error(
+                    `Soma dos custos na compra por pontos (${total}) é menor que ${pontosIniciaisCompra}. Distribua todos os pontos do MB antes de criar.`
+                );
+                return false;
+            }
+        } else {
+            const vals = Object.values(a);
+            for (let i = 0; i < vals.length; i++) {
+                if (vals[i] < 0 || vals[i] > 99) {
+                    Toast.error('Cada atributo deve estar entre 0 e 99.');
+                    return false;
+                }
+            }
+        }
+        const slugR = (document.getElementById('cadRacaSelect') && document.getElementById('cadRacaSelect').value) || '';
+        if (slugR === '__livre__') {
+            const liv = (document.getElementById('cadRacaLivre') && document.getElementById('cadRacaLivre').value.trim()) || '';
+            if (!liv) {
+                Toast.error('Informe o nome da raça (livre).');
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function montarPayloadCriar(tipo) {
+        const nome = document.getElementById('cadNome').value.trim();
+        const nivel = Math.floor(Number(document.getElementById('cadNivel').value));
+        const pvMax = Math.floor(Number(document.getElementById('cadPvMax').value));
+        const slugR = (document.getElementById('cadRacaSelect') && document.getElementById('cadRacaSelect').value) || '';
+        const slugClasse = (document.getElementById('cadClasseMb') && document.getElementById('cadClasseMb').value) || '';
+        const a = attrsDoForm();
+        const t = (tipo || 'jogador').toLowerCase();
+        const jogadorNome =
+            t === 'jogador' && typeof AuthService.getNome === 'function' ? AuthService.getNome() || null : null;
+
+        let racaNomeApi = '';
+        let racaSlugFj = null;
+        const racaLivre = (document.getElementById('cadRacaLivre') && document.getElementById('cadRacaLivre').value.trim()) || '';
+        if (slugR === '__livre__') {
+            racaNomeApi = racaLivre;
+            racaSlugFj = '__livre__';
+        } else if (slugR) {
+            const rowR = getRacaRowPorSlugDash(slugR);
+            racaNomeApi = rowR ? rowR.nome : '';
+            racaSlugFj = slugR;
+        }
+
+        let classeNivelTxt = '';
+        const rowC = slugClasse ? getClasseMbRowPorSlugDash(slugClasse) : null;
+        if (rowC) {
+            classeNivelTxt = nivel ? `${rowC.nome} ${nivel}`.trim() : rowC.nome;
+        }
+
+        const fichaBase = {
+            raca_tormenta_slug: racaSlugFj,
+            raca_tormenta_livre: slugR === '__livre__' ? racaLivre : '',
+            raca_tormenta_mais2a: (document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value) || null,
+            raca_tormenta_mais2b: (document.getElementById('cadRacaMais2b') && document.getElementById('cadRacaMais2b').value) || null,
+            raca_tormenta_mais1: (document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value) || null,
+            tormenta_classe_mb_slug: slugClasse || null,
+            travar_raca_classe_mb: false,
+            cadastro_dashboard: true,
+        };
+        if (t === 'jogador') {
+            const bases = atributosCompraDash();
+            fichaBase.atributos_compra = {
+                for: bases.for,
+                des: bases.des,
+                con: bases.con,
+                int: bases.int,
+                sab: bases.sab,
+                car: bases.car,
+            };
+        }
+
+        return {
+            tipo: t,
+            nome,
+            nivel,
+            classe_nivel: classeNivelTxt || null,
+            raca: racaNomeApi || null,
+            jogador_nome: jogadorNome,
+            pv_max: pvMax,
+            pv_atual: pvMax,
+            for_valor: a.for_valor,
+            des_valor: a.des_valor,
+            con_valor: a.con_valor,
+            int_valor: a.int_valor,
+            sab_valor: a.sab_valor,
+            car_valor: a.car_valor,
+            ficha_json: fichaBase,
+        };
+    }
+
+    function atualizarResumo(arr) {
+        const cj = (x) => arr.filter((p) => (p.tipo || '').toLowerCase() === x).length;
+        const jog = cj('jogador');
+        const mon = cj('monstro');
+        const npc = cj('npc');
+        const set = (id, v) => {
+            const n = document.getElementById(id);
+            if (n) n.textContent = String(v);
+        };
+        set('totalJogadores', jog);
+        set('totalMonstros', mon);
+        set('totalNPCs', npc);
+        set('totalGeral', arr.length);
+    }
+
+    function renderTabela(arr) {
+        const tb = document.getElementById('tblPersonagens');
+        let rows = arr.slice();
+        if (filtroTipo !== 'todos') {
+            rows = rows.filter((p) => (p.tipo || '').toLowerCase() === filtroTipo);
+        }
+        if (!rows.length) {
+            tb.innerHTML =
+                '<tr><td colspan="7" class="tormenta-cell-muted">Nenhum combatente neste filtro.</td></tr>';
+            return;
+        }
+        tb.innerHTML = rows
+            .map((p) => {
+                const cl = escapeHtml((p.classe_nivel || '').trim() || '—');
+                const nv = p.nivel != null ? escapeHtml(p.nivel) : '—';
+                return `
+                <tr>
+                    <td>${chipTipo(p.tipo)}</td>
+                    <td>${escapeHtml(p.nome)}</td>
+                    <td>${cl}</td>
+                    <td>${nv}</td>
+                    <td>${escapeHtml(p.pv_max)}</td>
+                    <td>${escapeHtml(p.ca)}</td>
+                    <td>
+                        <a class="tormenta-link" href="ficha-personagem.html?id=${p.id}">Ficha</a>
+                        ·
+                        <a class="tormenta-link" href="ficha-personagem.html?id=${p.id}&editar=1">Editar</a>
+                        ·
+                        <button type="button" class="tormenta-link js-del" data-id="${p.id}" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;">Excluir</button>
+                    </td>
+                </tr>`;
+            })
+            .join('');
+        tb.querySelectorAll('.js-del').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const id = Number(btn.getAttribute('data-id'));
+                if (!confirm('Excluir esta ficha permanentemente?')) return;
+                try {
+                    await svc.excluir(id);
+                    Toast.success('Ficha excluída.');
+                    carregar();
+                } catch (e) {
+                    Toast.error(e.message || 'Erro ao excluir');
+                }
+            });
+        });
+    }
+
+    async function carregar() {
+        const tb = document.getElementById('tblPersonagens');
+        tb.innerHTML = '<tr><td colspan="7" class="tormenta-cell-muted">Carregando…</td></tr>';
+        const meus = isMestre && document.getElementById('chkMeus')?.checked;
+        try {
+            const rows = await svc.listar({ meus: !!meus, limit: 500 });
+            cacheLista = Array.isArray(rows) ? rows : [];
+            atualizarResumo(cacheLista);
+            renderTabela(cacheLista);
+            t20ArenaRenderPick();
+            await t20ArenaRefreshFromApi();
+        } catch (e) {
+            tb.innerHTML = `<tr><td colspan="7" class="tormenta-cell-muted">${escapeHtml(e.message || 'Erro')}</td></tr>`;
+        }
+    }
+
+    function resetFormCadastro(tipo) {
+        cadLimparFotoDash();
+        document.getElementById('cadTipo').value = tipo;
+        document.getElementById('cadNome').value = '';
+        document.getElementById('cadNivel').value = '1';
+        document.getElementById('cadPvMax').value = '10';
+        const sc = document.getElementById('cadClasseMb');
+        const sr = document.getElementById('cadRacaSelect');
+        if (sc) sc.value = '';
+        if (sr) sr.value = '';
+        const liv = document.getElementById('cadRacaLivre');
+        if (liv) liv.value = '';
+        const wrapL = document.getElementById('cadWrapRacaLivre');
+        if (wrapL) wrapL.style.display = 'none';
+        const t = (tipo || 'jogador').toLowerCase();
+        const defAttrs =
+            t === 'jogador'
+                ? { cadFor: 8, cadDes: 8, cadCon: 8, cadInt: 18, cadSab: 8, cadCar: 18 }
+                : { cadFor: 10, cadDes: 10, cadCon: 10, cadInt: 10, cadSab: 10, cadCar: 10 };
+        Object.entries(defAttrs).forEach(([id, v]) => {
+            const el = document.getElementById(id);
+            if (el) el.value = String(v);
+        });
+        const hj = document.getElementById('hintAttrsJogador');
+        const sub = document.getElementById('cadastroSubtitulo');
+        if (hj) hj.style.display = t === 'jogador' ? '' : 'none';
+        if (sub) {
+            sub.textContent =
+                t === 'jogador'
+                    ? 'Primeiro passo: nome, nível, classe, raça, PV e atributos (compra por pontos). Depois complete a ficha.'
+                    : 'Primeiro passo: dados rápidos para a mesa; atributos livres (0–99). Depois refine na ficha.';
+        }
+        ['cadFor', 'cadDes', 'cadCon', 'cadInt', 'cadSab', 'cadCar'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.min = '0';
+            el.max = '99';
+        });
+        onCadRacaSelectChange(false);
+    }
+
+    function abrirCadastro(tipo) {
+        resetFormCadastro(tipo);
+        closeOverlay('overlaySeletorTipo');
+        openOverlay('overlayCadastro');
+    }
+
+    document.getElementById('btnNovoCombatente')?.addEventListener('click', () => {
+        if (isMestre) openOverlay('overlaySeletorTipo');
+        else abrirCadastro('jogador');
+    });
+
+    document.querySelectorAll('[data-escolher-tipo]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const tipo = btn.getAttribute('data-escolher-tipo');
+            abrirCadastro(tipo);
+        });
+    });
+
+    document.querySelectorAll('[data-close]').forEach((btn) => {
+        btn.addEventListener('click', () => closeOverlay(btn.getAttribute('data-close')));
+    });
+
+    document.querySelectorAll('.t20-dash-overlay').forEach((ov) => {
+        ov.addEventListener('click', (e) => {
+            if (e.target === ov) closeOverlay(ov.id);
+        });
+    });
+
+    document.querySelectorAll('.t20-dash-filtros button[data-tipo]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const t = btn.getAttribute('data-tipo');
+            if (!isMestre && (t === 'monstro' || t === 'npc')) return;
+            filtroTipo = t;
+            document.querySelectorAll('.t20-dash-filtros button[data-tipo]').forEach((b) => {
+                b.classList.toggle('t20-dash-filter--active', b.getAttribute('data-tipo') === t);
+            });
+            renderTabela(cacheLista);
+        });
+    });
+
+    document.getElementById('formCadastroRapido')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const tipo = document.getElementById('cadTipo').value;
+        if (!validarCadastro(tipo)) return;
+        const btn = document.getElementById('btnConfirmarCadastro');
+        const payload = montarPayloadCriar(tipo);
+        try {
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Criando…';
+            }
+            const created = await svc.criar(payload);
+            const fi = document.getElementById('cadInputFoto');
+            const file = fi && fi.files && fi.files[0];
+            if (file) {
+                try {
+                    await svc.enviarFoto(created.id, file);
+                } catch (e2) {
+                    Toast.warning(e2.message || 'Personagem criado, mas não foi possível enviar o retrato.');
+                }
+            }
+            Toast.success(`${created.nome} criado. Abrindo ficha…`);
+            closeOverlay('overlayCadastro');
+            window.location.href = 'ficha-personagem.html?id=' + encodeURIComponent(created.id);
+        } catch (err) {
+            Toast.error(err.message || 'Erro ao criar');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Criar e abrir ficha';
+            }
+        }
+    });
+
+    document.getElementById('btnLogout')?.addEventListener('click', () => AuthService.logout && AuthService.logout());
+    document.getElementById('btnTrocarJogo')?.addEventListener('click', () => AuthService.trocarJogo && AuthService.trocarJogo());
+    document.getElementById('chkMeus')?.addEventListener('change', () => carregar());
+
+    document.getElementById('cadRacaSelect')?.addEventListener('change', () => onCadRacaSelectChange(true));
+
+    const nu = document.getElementById('nomeUsuario');
+    if (nu) nu.textContent = AuthService.getNome && AuthService.getNome();
+
+    aplicarRestricoesPerfilUi();
+    setTabs();
+    if (isMestre) t20ArenaBindOnce();
+    if (isMestre && typeof window.__t20DashCampanhasInit === 'function') {
+        window.__t20DashCampanhasInit({
+            getLista: () => cacheLista,
+            isMestre,
+            recarregarTabela: carregar,
+            Toast,
+        });
+    }
+    (async () => {
+        try {
+            RACAS_MB = await carregarRacasTormentaDash();
+        } catch (e) {
+            console.warn(e);
+            RACAS_MB = [];
+        }
+        try {
+            CLASSES_MB = await carregarClassesTormentaDash();
+        } catch (e) {
+            console.warn(e);
+            CLASSES_MB = [];
+        }
+        popularCadRacaSelect();
+        popularCadClasseMbSelect();
+        bindCadFotoUploadOnce();
+        bindCadRacialDashOnce();
+        onCadRacaSelectChange(false);
+        carregarRegrasCompra().then(() => carregar());
+    })();
+})();
+</script>
+</body>
+</html>

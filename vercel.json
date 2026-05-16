@@ -4,9 +4,13 @@
   "buildCommand": "node scripts/inject-render-api-origin.cjs",
   "installCommand": "echo 'static'",
   "outputDirectory": "frontend",
-  "rewrites": [
+    "rewrites": [
     { "source": "/dashboard", "destination": "/games/dnd35/pages/dashboard.html" },
     { "source": "/pericias", "destination": "/games/dnd35/pages/pericias.html" },
-    { "source": "/arena", "destination": "/games/dnd35/arena.html" }
+    { "source": "/arena", "destination": "/games/dnd35/arena.html" },
+    { "source": "/tormenta/dashboard", "destination": "/games/tormenta/pages/dashboard.html" },
+    { "source": "/dnd5e/dashboard", "destination": "/games/dnd5e/pages/dashboard.html" },
+    { "source": "/dnd5e/ficha", "destination": "/games/dnd5e/pages/ficha-personagem.html" },
+    { "source": "/dnd5e/arena", "destination": "/games/dnd5e/pages/arena.html" }
   ]
 }

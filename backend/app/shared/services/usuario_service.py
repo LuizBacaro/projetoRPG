@@ -13,7 +13,6 @@ from ..schemas.usuario import UsuarioCreate, UsuarioUpdate
 
 
 class UsuarioService:
-
     def __init__(self, repository: UsuarioRepositoryProtocol):
         self.repo = repository
 

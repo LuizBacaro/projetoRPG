@@ -1,0 +1,136 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 — Módulo Básico, Capítulo 2 (Raças), págs. 30–42; traços transcritos da seção «Traços Raciais» de cada raça e do quadro «Raças Pequenas» onde aplicável.",
+    "nota": "Humanos/Lefou: +2 em duas habilidades à escolha (Lefou: exceto Carisma; Car –4). Idiomas: regra + tabela transcritos do MB (Cap. 2, pág. 31)."
+  },
+  "idiomas_geral_mb": "O idioma comum de Arton é o valkar, língua difundida através de mercadores que viajavam pelo mundo, conhecida por quase todas as raças civilizadas. Ainda assim, muitos povos têm sua própria língua, e nos ermos mais longínquos você pode encontrar tribos humanóides que não falam valkar.\n\nTodo personagem sabe falar valkar, e mais um número de idiomas igual ao seu bônus de Inteligência. Membros de raças não humanas também sabem o idioma próprio da raça.\n\nAlfabetização: graças aos esforços dos clérigos de Tanna-Toh, a alfabetização é bastante difundida em Arton. Todo personagem, com exceção dos bárbaros, sabe ler e escrever em todos os idiomas que sabe falar. Bárbaros também aprendem a ler e escrever quando adquirem um nível em qualquer outra classe.",
+  "idiomas_tabela_mb": [
+    { "idioma": "Abissal", "falantes": "Demônios, qareen, outros habitantes dos reinos dos deuses malignos." },
+    { "idioma": "Anão", "falantes": "Anões, halflings, minotauros." },
+    { "idioma": "Aquan", "falantes": "Elfos-do-mar, qareen e criaturas aquáticas." },
+    { "idioma": "Auran", "falantes": "Elfos-do-céu, qareen e criaturas aéreas." },
+    { "idioma": "Celestial", "falantes": "Anjos, celestiais, qareen e habitantes dos reinos dos deuses bondosos." },
+    { "idioma": "Dracônico", "falantes": "Dragões, elfos, goblins, kobolds, homens-lagartos, nagahs, qareen." },
+    { "idioma": "Élfico", "falantes": "Elfos, goblins, halflings, minotauros, qareen." },
+    { "idioma": "Goblin", "falantes": "Goblins, anões, elfos, halflings, hobgoblins, bugbears, minotauros." },
+    { "idioma": "Gigante", "falantes": "Gigantes, anões, ogros, minotauros." },
+    { "idioma": "Gnoll", "falantes": "Gnolls, elfos, goblins." },
+    { "idioma": "Halfling", "falantes": "Halflings, goblins." },
+    { "idioma": "Ignan", "falantes": "Qareen, criaturas do fogo." },
+    { "idioma": "Infernal", "falantes": "Diabos, qareen, outros habitantes dos reinos dos deuses malignos." },
+    { "idioma": "Orc", "falantes": "Orcs, anões, elfos, goblins, halflings, minotauros." },
+    { "idioma": "Silvestre", "falantes": "Centauros, dríades, elfos, entes, goblins, minotauros, qareen, sprites, ninfas." },
+    { "idioma": "Táurico", "falantes": "Minotauros, anões." },
+    { "idioma": "Terran", "falantes": "Anões, qareen e criaturas do subterrâneo." },
+    { "idioma": "Valkar", "falantes": "Humanos, meio-elfos, meio-orcs, qareen e quase todas as raças civilizadas." }
+  ],
+  "racas": [
+    {
+      "slug": "anao",
+      "nome": "Anão",
+      "ajustes": { "con": 4, "sab": 2, "des": -2 },
+      "escolhe_duas_mais2": false,
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Anão",
+      "tracos_resumo": "Traços Raciais (MB)\n• +4 Constituição, +2 Sabedoria, –2 Destreza. Anões são resistentes e sábios, mas um tanto lentos.\n• Deslocamento 6 m. Embora sejam de tamanho Médio, anões têm pernas curtas e deslocam como Pequenos; o deslocamento de um anão jamais é reduzido por armadura ou excesso de carga.\n• Visão no Escuro: até 18 m em preto e branco; ignora camuflagem (incluindo camuflagem total) por escuridão.\n• +4 em testes de resistência contra venenos e magia.\n• Para anões, todos os tipos de machados e martelos são armas simples.\n• Classe de armadura +4 contra adversários de tamanho Grande ou maior.\n• +2 em testes de perícias (assuntos de pedra e metal) quando a perícia tiver Inteligência ou Sabedoria como habilidade-chave — masmorras, armadilhas, passagens secretas, armas, armaduras, joias, gemas, objetos de arte etc."
+    },
+    {
+      "slug": "elfo",
+      "nome": "Elfo",
+      "ajustes": { "des": 4, "int": 2, "con": -2 },
+      "escolhe_duas_mais2": false,
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Élfico",
+      "tracos_resumo": "Traços Raciais (MB)\n• +4 Destreza, +2 Inteligência, –2 Constituição. Ágil e inteligente, mais frágil que humanos.\n• Visão na Penumbra: ignora camuflagem (não camuflagem total) por escuridão; enxerga o dobro dos humanos com pouca luz (estrelas, tochas).\n• +4 em testes de Vontade contra encantamentos; imunes à magia sono.\n• +4 em testes de Identificar Magia e Percepção.\n• A CD do teste de resistência contra magias arcanas lançadas por um elfo aumenta em +2.\n• Proficiência com espadas curtas, espadas longas, floretes e arcos (curto, longo e composto). Recebem Foco em Arma para uma dessas armas (à escolha) como talento adicional.\n• Tamanho Médio; deslocamento padrão 9 m (como demais Médios sem traço específico)."
+    },
+    {
+      "slug": "goblin",
+      "nome": "Goblin",
+      "ajustes": { "des": 4, "con": 2, "car": -2 },
+      "escolhe_duas_mais2": false,
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Goblin",
+      "tracos_resumo": "Traços Raciais (MB)\n• +4 Destreza, +2 Constituição, –2 Carisma.\n• Tamanho Pequeno: CA +1; +1 nas jogadas de ataque; +4 em Furtividade; armas menores; vestimentas menores (ver Equipamento, Cap. 7).\n• Deslocamento 9 m (rápidos apesar de Pequenos).\n• Visão no Escuro: até 18 m em preto e branco; ignora camuflagem (incluindo total) por escuridão.\n• +4 em Fortitude contra doenças e venenos; não precisa testar Fortitude por ingerir comida estragada.\n• +4 em testes de Ladinagem e Ofício (uma à escolha do jogador)."
+    },
+    {
+      "slug": "halfling",
+      "nome": "Halfling",
+      "ajustes": { "des": 4, "car": 2, "for": -2 },
+      "escolhe_duas_mais2": false,
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Halfling",
+      "tracos_resumo": "Traços Raciais (MB)\n• +4 Destreza, +2 Carisma, –2 Força.\n• Tamanho Pequeno: CA +1; +1 nas jogadas de ataque; +4 em Furtividade; armas menores; vestimentas menores; deslocamento 6 m (quadro Raças Pequenas, MB).\n• +2 em todos os testes de resistência (sorte).\n• +1 em jogadas de ataque com armas de arremesso e fundas.\n• Para halflings, a perícia Atletismo é baseada em Destreza, não em Força.\n• +4 em testes de Enganação."
+    },
+    {
+      "slug": "humano",
+      "nome": "Humano",
+      "ajustes": {},
+      "escolhe_duas_mais2": true,
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": null,
+      "tracos_resumo": "Traços Raciais (MB)\n• +2 em duas habilidades à escolha do jogador (habilidades diferentes).\n• 2 talentos adicionais à escolha do jogador.\n• 2 perícias treinadas extras, que não precisam ser escolhidas entre as perícias de classe.\n• Tamanho Médio; deslocamento 9 m."
+    },
+    {
+      "slug": "lefou",
+      "nome": "Lefou",
+      "ajustes": {},
+      "escolhe_duas_mais2": true,
+      "mod_car_fixo": -4,
+      "idioma_racial_mb": "Conforme os pais (MB narra humanos, elfos ou meio-elfos); em geral valkar e os idiomas da cultura em que cresceu.",
+      "tracos_resumo": "Traços Raciais (MB)\n• +2 em duas habilidades à escolha (exceto Carisma); –4 em Carisma.\n• Monstro: não é humano nem humanóide; imune a magias e efeitos que afetem apenas essas criaturas.\n• Visão no escuro: ignora camuflagem (incluindo total) por escuridão; vê no escuro em preto e branco.\n• 2 talentos da Tormenta adicionais (o lefou não perde Carisma por estes talentos, mas perde se adquirir outros).\n• Deformidade (escolher uma): Articulações flexíveis (+4 Acrobacia); Dedos rígidos (deslocamento de escalada 4,5 m); Dentes afiados (+4 Intimidação); Mãos membranosas (natação 4,5 m); Olhos vermelhos (+4 Percepção, apenas observar); Pele rígida (CA +1).\n• Afinidade com a Tormenta: nunca recebe níveis negativos por efeitos da Tormenta ou seus habitantes (ainda pode receber por outras causas).\n• Tamanho Médio; deslocamento 9 m."
+    },
+    {
+      "slug": "minotauro",
+      "nome": "Minotauro",
+      "ajustes": { "for": 4, "con": 2, "car": -2 },
+      "escolhe_duas_mais2": false,
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Táurico",
+      "tracos_resumo": "Traços Raciais (MB)\n• +4 Força, +2 Constituição, –2 Carisma.\n• Classe de armadura +1 (couro rígido).\n• Chifres: ataque natural 1d6, crítico ×2, perfuração; pode fazer um ataque extra por rodada com os chifres, mas sofre –4 em todas as jogadas de ataque (incluindo esse).\n• Faro: +4 em Sobrevivência para rastrear pelo faro; detecta automaticamente criaturas a até 9 m.\n• Lógica labiríntica: +8 em Sobrevivência para não se perder.\n• Medo de altura: ao subir mais de 3 m (ou a até 3 m de uma queda dessa altura), –4 em jogadas e testes; não pode realizar ações que dependam de concentração (ex.: conjurar).\n• Tamanho Médio; deslocamento 9 m."
+    },
+    {
+      "slug": "qareen",
+      "nome": "Qareen",
+      "ajustes": { "car": 4, "int": 2, "sab": -2 },
+      "escolhe_duas_mais2": false,
+      "escolhe_um_mais2": false,
+      "excluir_atributos_mais2": [],
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Um idioma ligado à ascendência (Auran, Aquan, Ignan, Terran, Celestial ou Infernal; veja traços e tabela MB).",
+      "tracos_resumo": "Traços Raciais (MB)\n• +4 Carisma, +2 Inteligência, –2 Sabedoria.\n• +4 em testes de Identificar Magia.\n• Desejos: ao conjurar magia arcana a pedido de outra pessoa, gasta –1 PM (mínimo 1); só usa se tiver ≥1 PM. «Pedir um desejo» é ação livre; em combate o qareen age na iniciativa de quem pediu. Não é obrigado a conjurar contra a vontade.\n• Pequenos desejos: sem classe conjuradora, conjura todos os truques (nível 0) do livro como feiticeiro do mesmo nível — apenas quando outra pessoa pede.\n• 1× por dia: conjurar voo como feiticeiro do mesmo nível, sem gastar PM.\n• Resistência por descendência elementar: Água — frio e ácido 5; Ar — eletricidade e sônico 5; Fogo — fogo 5; Terra — RD 3/cortante ou perfurante; Luz — eletricidade 8; Trevas — ácido e energia negativa 5 (efeitos/magias necromânticas, ex.: infligir ferimentos).\n• Tamanho Médio; deslocamento 9 m."
+    },
+    {
+      "slug": "gnomo",
+      "nome": "Gnomo",
+      "ajustes": { "int": 4, "con": 2, "for": -2 },
+      "escolhe_duas_mais2": false,
+      "escolhe_um_mais2": false,
+      "excluir_atributos_mais2": [],
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Valkar + idiomas por INT (MB: gnomos não são nativos de Arton; veja narrador).",
+      "tracos_resumo": "Traços Raciais (MB — «Outras Raças»; ajuste +2 nível vs D20 padrão)\n• +4 Inteligência, +2 Constituição, –2 Força.\n• Tamanho Pequeno: CA +1; +1 nas jogadas de ataque; +4 em Furtividade; armas menores; vestimentas menores; deslocamento 6 m.\n• Visão na Penumbra (como no MB).\n• +4 em testes de Intuição e Ofícios (alquimia).\n• CA +4 contra adversários de tamanho Grande ou maior.\n• Falar com animais (como a magia).\n• Com Carisma 10+: globos de luz, som fantasma e prestidigitação à vontade, sem PM (MB)."
+    },
+    {
+      "slug": "meio_elfo",
+      "nome": "Meio-elfo",
+      "ajustes": {},
+      "escolhe_duas_mais2": false,
+      "escolhe_um_mais2": false,
+      "excluir_atributos_mais2": [],
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Valkar e Élfico (MB).",
+      "tracos_resumo": "Traços Raciais opcionais (MB — «Meio-Elfos»; elfos e meio-elfos podem ser iguais em jogo; use esta lista se quiser diferenciar)\n• Visão na Penumbra.\n• 1 talento bônus à escolha do jogador.\n• 1 perícia treinada extra (não precisa ser de classe).\n• +2 em testes de Vontade contra encantamentos.\n• +2 em testes de Identificar Magia e Percepção.\n• Tamanho Médio; deslocamento 9 m."
+    },
+    {
+      "slug": "meio_orc",
+      "nome": "Meio-orc",
+      "ajustes": { "for": 2 },
+      "escolhe_duas_mais2": false,
+      "escolhe_um_mais2": true,
+      "excluir_atributos_mais2": ["int", "car"],
+      "mod_car_fixo": 0,
+      "idioma_racial_mb": "Valkar e Orc (MB).",
+      "tracos_resumo": "Traços Raciais (MB — «Meio-Orcs»)\n• +2 Força, +2 em outra habilidade à escolha (exceto Inteligência e Carisma) — escolha no seletor da ficha.\n• Visão no Escuro: até 18 m em preto e branco; ignora camuflagem (incluindo total) por escuridão.\n• Duro de Matar como talento adicional.\n• +4 em testes de Intimidação.\n• Tamanho Médio; deslocamento 9 m.\n\n(O MB traz bloco opcional «Que Apelação!» com outro par de ajustes; use o que a mesa adotar.)"
+    }
+  ]
+}

@@ -59,6 +59,10 @@ Para **testes locais**, copie o exemplo: com `ADMIN_EMAIL` e `ADMIN_PASSWORD` pr
 - Slots de magia por nível com barras de progresso (visível apenas para classes conjuradoras)
 - Sincronização em tempo real via `BroadcastChannel` com a Arena
 
+### Tormenta 20 (Módulo Básico)
+
+- Ficha e grimório MB: **[docs/tormenta/grimorio-mb-mesa.md](docs/tormenta/grimorio-mb-mesa.md)** (catálogo, filtros por classe/nível, `ficha_json`, API de regras).
+
 ### Arena de Combate
 - Seleção de combatentes e ordem de iniciativa automática
 - Controle de turnos e rodadas

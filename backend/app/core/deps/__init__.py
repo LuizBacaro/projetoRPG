@@ -4,11 +4,14 @@ Injeção de dependências FastAPI, organizada por domínio.
 - ``hub`` — plataforma (jogos, memberships)
 - ``dnd35`` — D&D 3.5
 - ``gurps`` — GURPS
+- ``tormenta`` — Tormenta RPG
+- ``dnd5e`` — D&D 5e
 - ``file_storage`` — uploads (partilhado entre jogos)
 
 Rotas e código legado podem continuar a importar de ``app.core.dependencies``.
 """
 
+from .dnd5e import get_dnd5e_personagem_repository, get_dnd5e_personagem_service
 from .dnd35 import (
     get_armadura_protecao_jogador_repository,
     get_armadura_protecao_repository,
@@ -58,6 +61,20 @@ from .hub import (
     get_game_service,
     get_user_game_membership_repository,
 )
+from .tormenta import (
+    get_tormenta_campanha_repository,
+    get_tormenta_campanha_service,
+    get_tormenta_combate_service,
+    get_tormenta_personagem_consumiveis_service,
+    get_tormenta_personagem_equipamentos_service,
+    get_tormenta_personagem_inventario_legado_service,
+    get_tormenta_personagem_magias_service,
+    get_tormenta_personagem_repository,
+    get_tormenta_personagem_service,
+    get_tormenta_personagem_talentos_service,
+    get_tormenta_sessao_campanha_repository,
+    get_tormenta_sessao_campanha_service,
+)
 
 __all__ = [
     "get_armadura_protecao_jogador_repository",
@@ -69,6 +86,8 @@ __all__ = [
     "get_combate_service",
     "get_combatente_repository",
     "get_combatente_service",
+    "get_dnd5e_personagem_repository",
+    "get_dnd5e_personagem_service",
     "get_condicao_repository",
     "get_condicao_service",
     "get_consumivel_jogador_repository",
@@ -91,6 +110,18 @@ __all__ = [
     "get_gurps_personagem_service",
     "get_gurps_sessao_campanha_repository",
     "get_gurps_sessao_campanha_service",
+    "get_tormenta_campanha_repository",
+    "get_tormenta_campanha_service",
+    "get_tormenta_combate_service",
+    "get_tormenta_personagem_consumiveis_service",
+    "get_tormenta_personagem_equipamentos_service",
+    "get_tormenta_personagem_inventario_legado_service",
+    "get_tormenta_personagem_magias_service",
+    "get_tormenta_personagem_repository",
+    "get_tormenta_personagem_service",
+    "get_tormenta_personagem_talentos_service",
+    "get_tormenta_sessao_campanha_repository",
+    "get_tormenta_sessao_campanha_service",
     "get_magia_import_service",
     "get_magia_repository",
     "get_magia_service",

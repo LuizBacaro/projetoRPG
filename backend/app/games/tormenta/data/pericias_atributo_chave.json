@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "nota": "Atributos-chave, somente_treinado e penalidade_armadura alinhados à tabela TSdR (wiki); conferir Módulo Básico.",
+    "versao_schema": 3
+  },
+  "pericias": [
+    { "nome": "Acrobacia", "atributo": "des", "somente_treinado": false, "penalidade_armadura": true },
+    { "nome": "Adestramento", "atributo": "car", "somente_treinado": true, "penalidade_armadura": false },
+    { "nome": "Atletismo", "atributo": "for", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Atuação", "atributo": "car", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Cavalgar", "atributo": "des", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Conhecimento", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "nome": "Cura", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Diplomacia", "atributo": "car", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Enganação", "atributo": "car", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Fortitude", "atributo": "con", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Furtividade", "atributo": "des", "somente_treinado": false, "penalidade_armadura": true },
+    { "nome": "Guerra", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "nome": "Iniciativa", "atributo": "des", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Intimidação", "atributo": "car", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Investigação", "atributo": "int", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Intuição", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Jogatina", "atributo": "car", "somente_treinado": true, "penalidade_armadura": false },
+    { "nome": "Ladinagem", "atributo": "des", "somente_treinado": true, "penalidade_armadura": true },
+    { "nome": "Luta", "atributo": "for", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Misticismo", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "nome": "Nobreza", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "nome": "Ofício", "atributo": "int", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Ofício (2)", "atributo": "int", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Percepção", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Pilotagem", "atributo": "des", "somente_treinado": true, "penalidade_armadura": false },
+    { "nome": "Pontaria", "atributo": "des", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Reflexos", "atributo": "des", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Religião", "atributo": "sab", "somente_treinado": true, "penalidade_armadura": false },
+    { "nome": "Sobrevivência", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "Vontade", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "—", "atributo": null, "somente_treinado": false, "penalidade_armadura": false },
+    { "nome": "—", "atributo": null, "somente_treinado": false, "penalidade_armadura": false }
+  ]
+}

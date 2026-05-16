@@ -1,0 +1,5659 @@
+{
+  "meta": {
+    "nota": "Listagem MB pp.307–317 (nomes + resumo do efeito). Entradas [Stub] preservam testes de API. Re gere com build_magias_mb_catalogo_from_listagem_txt.py.",
+    "fonte_listagem": "listagem_magias_mb_pp307-317.txt"
+  },
+  "itens": [
+    {
+      "slug": "stub_truque_arc",
+      "nome": "[Stub] Truque arcano de teste",
+      "circulo": 0,
+      "tipo": "arcana",
+      "escola": "Evocação",
+      "execucao": "Padrão",
+      "alcance": "Curto",
+      "descricao_curta": "Entrada sintética para validação de API.",
+      "pagina_referencia": null
+    },
+    {
+      "slug": "abrir_fechar",
+      "nome": "Abrir/fechar",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "abre ou fecha um objeto pequeno.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "apavorante_gas_de_luigi",
+      "nome": "Apavorante gás de Luigi",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "alvo expele gases fétidos e barulhentos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "brilho",
+      "nome": "Brilho",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica ofuscado (–1 nos ataques).",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "compreender_idiomas",
+      "nome": "Compreender idiomas",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "você entende qualquer coisa escrita ou falada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "consertar",
+      "nome": "Consertar",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "repara pequenas falhas em objetos mundanos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_magia",
+      "nome": "Detectar magia",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "detecta a presença, quantidade e intensidade de auras mágicas na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_mortos_vivos",
+      "nome": "Detectar mortos-vivos",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "detecta a presença, quantidade e poder de mortos-vivos na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_portas_secretas",
+      "nome": "Detectar portas secretas",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "detecta portas e salas escondidas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_venenos",
+      "nome": "Detectar venenos",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "determina se uma criatura ou objeto é venenoso ou está envenenado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "disco_flutuante",
+      "nome": "Disco flutuante",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "disco de energia flutua e carrega até 100kg de carga.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "disfarce_ilusorio",
+      "nome": "Disfarce ilusório",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe +10 em testes de Enganação para disfarce.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "enfeiticar_pessoa",
+      "nome": "Enfeitiçar pessoa",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "alvo se torna prestativo em relação a você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escudo_arcano",
+      "nome": "Escudo arcano",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe +4 na CA e se torna imune a mísseis mágicos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "flor_perene",
+      "nome": "Flor perene",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "flor nasce na cabeça do alvo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "gagueira_de_raviollius",
+      "nome": "Gagueira de Raviollius",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "alvo não consegue falar corretamente, sofrendo –4 de testes baseados em Carisma.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "globos_de_luz",
+      "nome": "Globos de luz",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "cria quatro esferas de luz; cada uma ilumina tanto quanto uma tocha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "hipnotismo",
+      "nome": "Hipnotismo",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "deixa alvos imóveis e melhora a atitude deles em relação a você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "identificacao",
+      "nome": "Identificação",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "determina habilidades de um item mágico.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imagem_silenciosa",
+      "nome": "Imagem silenciosa",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma ilusão visual, como uma miragem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "intuir_direcao",
+      "nome": "Intuir direção",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe +4 em testes de Sobrevivência para não se perder.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_i",
+      "nome": "Invocar monstro I",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Pequeno sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "leque_cromatico",
+      "nome": "Leque cromático",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas na área ficam inconscientes, atordoadas ou cegas, de acordo com seu nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ler_magias",
+      "nome": "Ler magias",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "decifre inscrições mágicas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "luz",
+      "nome": "Luz",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "objeto brilha como tocha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "marca_arcana",
+      "nome": "Marca arcana",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "inscreve sua runa pessoal sobre um objeto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mensagem",
+      "nome": "Mensagem",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "troque mensagens telepáticas com um alvo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "montaria_arcana",
+      "nome": "Montaria arcana",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "invoca um cavalo ou pônei para servir como montaria (mas não para lutar).",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "maos_flamejantes",
+      "nome": "Mãos flamejantes",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "cone causa 2d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "maos_magicas",
+      "nome": "Mãos mágicas",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "move um objeto à distância.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "misseis_magicos",
+      "nome": "Mísseis mágicos",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "dispara duas esferas de energia que causa, cada uma, 1d4+1 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevoa_obscurecente",
+      "nome": "Névoa obscurecente",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "névoa obscurece toda a visão.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pasmar",
+      "nome": "Pasmar",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica pasmo por uma rodada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "prestidigitacao",
+      "nome": "Prestidigitação",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "gera diversos efeitos menores.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "protecao_contra_o_mal_bem_caos_ordem",
+      "nome": "Proteção contra o mal/bem/caos/ordem",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "fornece +2 na CA e nos testes de resistência contra criaturas da tendência escolhida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "queda_suave",
+      "nome": "Queda suave",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "alvo cai lentamente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "raio_de_fogo",
+      "nome": "Raio de fogo",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "causa 1d4 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "raio_de_frio",
+      "nome": "Raio de frio",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "causa 1d3 pontos de dano, e impõe –1 nos ataques na rodada seguinte.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "raio_de_acido",
+      "nome": "Raio de ácido",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "causa 1d3 pontos de dano, mais 1 na rodada seguinte.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "raio_do_enfraquecimento",
+      "nome": "Raio do enfraquecimento",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "impõe –2 nas jogadas de ataque e dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "recuo_acelerado",
+      "nome": "Recuo acelerado",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "seu deslocamento aumenta em 9m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "reduzir_pessoa",
+      "nome": "Reduzir pessoa",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "diminui a altura do alvo pela metade.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "resistencia",
+      "nome": "Resistência",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "fornece +1 nos testes de resistência.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "romper_morto_vivo",
+      "nome": "Romper morto-vivo",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "causa 1d6 pontos de dano em um morto-vivo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "salto",
+      "nome": "Salto",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +30 nos testes de Atletismo para saltar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "servo_invisivel",
+      "nome": "Servo invisível",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "criatura invisível realiza tarefas para você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "som_fantasma",
+      "nome": "Som fantasma",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "cria som ilusório.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "toque_da_fadiga",
+      "nome": "Toque da fadiga",
+      "circulo": 0,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica fatigado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "stub_1_circulo_arc",
+      "nome": "[Stub] Magia arcana 1º círculo",
+      "circulo": 1,
+      "tipo": "arcana",
+      "escola": "Abjuração",
+      "resistencia": "Nenhuma",
+      "pagina_referencia": "—"
+    },
+    {
+      "slug": "alarme",
+      "nome": "Alarme",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "avisa quando alguém invadir uma área protegida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "animar_corda",
+      "nome": "Animar corda",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "anima uma corda, que pode se enrolar, fazer um laço ou dar um nó.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "apagar",
+      "nome": "Apagar",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "apaga texto mundano ou mágico.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sono",
+      "nome": "Sono",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas na área totalizando 2d4 níveis adormecem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "suportar_elementos",
+      "nome": "Suportar elementos",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "protege o alvo de temperaturas extremas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "toque_chocante",
+      "nome": "Toque chocante",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "causa 2d8 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "toque_macabro",
+      "nome": "Toque macabro",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "alvo sofre 1d6 pontos de dano e –1 nas jogadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ventriloquismo",
+      "nome": "Ventriloquismo",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "projeta sua voz de outro lugar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "area_escorregadia",
+      "nome": "Área escorregadia",
+      "circulo": 1,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas na área podem cair no chão.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "stub_2_circulo_arc",
+      "nome": "[Stub] Magia arcana 2º círculo",
+      "circulo": 2,
+      "tipo": "arcana",
+      "escola": "Transmutação"
+    },
+    {
+      "slug": "agilidade_do_gato",
+      "nome": "Agilidade do gato",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +4 de Destreza.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "alterar_se",
+      "nome": "Alterar-se",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "você muda sua forma e recebe uma habilidade.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "amor_incontestavel_de_raviollius",
+      "nome": "Amor incontestável de Raviollius",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo se apaixona pela primeira criatura que ver.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ao_alcance_da_mao",
+      "nome": "Ao alcance da mão",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "projeta mãos a até 3m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "arma_magica",
+      "nome": "Arma mágica",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "arma recebe +1 nos ataques e danos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "armadilha_ilusoria",
+      "nome": "Armadilha ilusória",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "faz uma tranca parecer uma armadilha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "armadura_arcana",
+      "nome": "Armadura arcana",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe +4 na CA.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "arrombar",
+      "nome": "Arrombar",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "abre um objeto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "astucia_da_raposa",
+      "nome": "Astúcia da raposa",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +4 de Inteligência.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ataque_certeiro",
+      "nome": "Ataque certeiro",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe +20 na próxima jogada de ataque.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aterrorizar",
+      "nome": "Aterrorizar",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica apavorado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aumentar_pessoa",
+      "nome": "Aumentar pessoa",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "um humanóide aumenta uma categoria de tamanho.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aura_magica",
+      "nome": "Aura mágica",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "faz um objeto mundano parecer mágico ou vice-versa.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "boca_encantada",
+      "nome": "Boca encantada",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo pronuncia uma mensagem quando um evento acontece.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cativar",
+      "nome": "Cativar",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas prestam atenção em você, ignorando tudo ao redor.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cegueira_surdez",
+      "nome": "Cegueira/surdez",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica cego ou surdo, à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "chama_continua",
+      "nome": "Chama contínua",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "objeto ilumina tanto quanto uma tocha, permanentemente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "comandar_mortos_vivos",
+      "nome": "Comandar mortos-vivos",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "força um morto-vivo, inteligente ou não, a aceitar suas ordens.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "confundir_deteccao",
+      "nome": "Confundir detecção",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "adivinhações lançadas em um alvo dão resultado pertinente a outro alvo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cranio_voador_de_vladislav",
+      "nome": "Crânio voador de Vladislav",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "crânio envolto em magia negra causa 4d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "despedacar",
+      "nome": "Despedaçar",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "som alto e agudo causa 4d6 pontos de dano em construto ou destrói um objeto mundano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_pensamentos",
+      "nome": "Detectar pensamentos",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "detecta pensamentos superficiais na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escuridao",
+      "nome": "Escuridão",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "objeto irradia escuridão em uma área com 6m de raio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esfera_flamejante",
+      "nome": "Esfera flamejante",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "esfera causa 2d6 pontos de dano a qualquer criatura no mesmo espaço, e pode ser movimentada 9m com uma ação de movimento.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "protecao_contra_flechas",
+      "nome": "Proteção contra flechas",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "fornece redução de dano 10 contra armas de ataque à distância.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "raio_ardente",
+      "nome": "Raio ardente",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "causa 4d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "reflexos",
+      "nome": "Reflexos",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "cópias ilusórias suas fornecem +6 na CA.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "riso_histerico",
+      "nome": "Riso histérico",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo não consegue fazer outra ação além de rir.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sabedoria_da_coruja",
+      "nome": "Sabedoria da coruja",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +4 de Sabedoria.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "teia",
+      "nome": "Teia",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "prende criaturas na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "toque_da_idiotice",
+      "nome": "Toque da idiotice",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo sofre penalidade de 1d6 na Inteligência, Sabedoria e Carisma.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "toque_do_carnical",
+      "nome": "Toque do carniçal",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica paralisado e fedorento.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tranca_arcana",
+      "nome": "Tranca arcana",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "tranca um item que possa ser aberto ou fechado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "truque_da_corda",
+      "nome": "Truque da corda",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "corda leva a um pequeno plano de existência.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "vento_sussurrante",
+      "nome": "Vento sussurrante",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "envia uma mensagem curta.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ver_o_invisivel",
+      "nome": "Ver o invisível",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "você enxerga criaturas e objetos invisíveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "vigor_do_urso",
+      "nome": "Vigor do urso",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +4 de Constituição.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "visao_no_escuro",
+      "nome": "Visão no escuro",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "alvo pode enxergar no escuro.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "vitalidade_ilusoria",
+      "nome": "Vitalidade ilusória",
+      "circulo": 2,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe 1d10+5 PV temporários.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "arma_magica_maior",
+      "nome": "Arma mágica maior",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "arma recebe +2 nos ataques e danos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "bola_de_fogo",
+      "nome": "Bola de fogo",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "explosão com 6m de raio causa 6d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "clarividencia_clariaudiencia",
+      "nome": "Clarividência/clariaudiência",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "cria sensor mágico, pelo qual você pode ver ou ouvir, em um lugar específico",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "circulo_magico_contra_o_mal_bem_caos_ordem",
+      "nome": "Círculo mágico contra o mal/bem/caos/ordem",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como proteção contra o mal/bem/caos/ordem, mas afeta emanação com 3m de raio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "descanso_tranquilo",
+      "nome": "Descanso tranqüilo",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "impede um cadáver de se decompor.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "deslocamento",
+      "nome": "Deslocamento",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe camuflagem total (50% de chance de falha).",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dificultar_deteccao",
+      "nome": "Dificultar detecção",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica protegido de magias de adivinhação para detectá-lo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dissipar_magia",
+      "nome": "Dissipar magia",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "dissipa outras magias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "encolher_item",
+      "nome": "Encolher item",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "diminui um objeto mundano em até quatro categorias de tamanho.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escrita_ilusoria",
+      "nome": "Escrita ilusória",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "escreva um texto que apenas você e quem você permitir consegue entender.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esculpir_o_som",
+      "nome": "Esculpir o som",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "altera os sons emitidos pelos alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esfera_de_invisibilidade",
+      "nome": "Esfera de invisibilidade",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como invisibilidade, mas afeta todas as criaturas a até 3m do alvo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esplendor_da_aguia",
+      "nome": "Esplendor da águia",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +4 de Carisma.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "flecha_de_chamas",
+      "nome": "Flecha de chamas",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "transforma até cinco flechas normais em flamejantes, que causam 1d6 pontos de dano adicional.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "flecha_acida",
+      "nome": "Flecha ácida",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "flecha mágica causa 2d4 pontos de dano, mais 2d4 nos próximos dois turnos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forma_de_arvore",
+      "nome": "Forma de árvore",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "você se transforma em uma árvore.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forma_gasosa",
+      "nome": "Forma gasosa",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo se torna incorpóreo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forca_do_touro",
+      "nome": "Força do touro",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +4 de Força.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "furia",
+      "nome": "Fúria",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe benefícios da habilidade de classe fúria.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "heroismo",
+      "nome": "Heroísmo",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +2 nos ataques e testes de resistência.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "idiomas",
+      "nome": "Idiomas",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo entende e fala qualquer idioma existente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imagem_maior",
+      "nome": "Imagem maior",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como imagem silenciosa, mas inclui ilusões sonoras, olfativas e térmicas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imagem_menor",
+      "nome": "Imagem menor",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como imagem silenciosa, mas inclui sons simples.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imobilizar_animal",
+      "nome": "Imobilizar animal",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como imobilizar pessoa, mas afeta um animal em vez de um humanóide.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imobilizar_mortos_vivos",
+      "nome": "Imobilizar mortos-vivos",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como imobilizar pessoa, mas afeta um morto-vivo em vez de um humanóide.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imobilizar_pessoa",
+      "nome": "Imobilizar pessoa",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "paralisa um humanóide por um minuto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invisibilidade",
+      "nome": "Invisibilidade",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica invisível por um minuto ou até atacar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_ii",
+      "nome": "Invocar monstro II",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Pequeno sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_iii",
+      "nome": "Invocar monstro III",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Médio sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lentidao",
+      "nome": "Lentidão",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas afetadas só podem executar uma ação padrão ou de movimento por rodada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "levitacao",
+      "nome": "Levitação",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo flutua para cima ou para baixo conforme sua vontade.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "localizar_objeto",
+      "nome": "Localizar objeto",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "determina em que direção está um objeto à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "loquacidade",
+      "nome": "Loquacidade",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe +20 em testes de Enganação para blefar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lufada_de_vento",
+      "nome": "Lufada de vento",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "lufada de vento que derruba e empurra criaturas na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "luz_do_dia",
+      "nome": "Luz do dia",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "objeto emite luz brilhante como do dia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lamina_afiada",
+      "nome": "Lâmina afiada",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "dobra a margem de ameaça de uma arma.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "montaria_fantasmagorica",
+      "nome": "Montaria fantasmagórica",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "invoca uma criatura Grande, com diversas habilidades, para servir de montaria.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_vento",
+      "nome": "Muralha de vento",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma cortina de vento.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mao_espectral",
+      "nome": "Mão espectral",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "cria mão flutuante através da qual você pode lançar magias de toque.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevasca",
+      "nome": "Nevasca",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "chuva de gelo bloqueia visão e deixa o piso escorregadio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nublar",
+      "nome": "Nublar",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe camuflagem (20% de chance de falha).",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevoa",
+      "nome": "Névoa",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como névoa obscurecente, mas com maior alcance e duração.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevoa_fetida",
+      "nome": "Névoa fétida",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como névoa obscurecente, mas deixa as criaturas em seu interior enjoadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "obscurecer_objeto",
+      "nome": "Obscurecer objeto",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "esconde um item de efeitos de adivinhação.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "padrao_hipnotico",
+      "nome": "Padrão hipnótico",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "dispersão com 3m de raio deixa criaturas fascinadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pasmar_monstro",
+      "nome": "Pasmar monstro",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como pasmar, mas afeta qualquer criatura até 6º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "patas_de_aranha",
+      "nome": "Patas de aranha",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo pode escalar paredes e tetos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pequeno_refugio",
+      "nome": "Pequeno refúgio",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "cria domo imóvel que comporta até oito criaturas Médias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pirotecnia",
+      "nome": "Pirotecnia",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "transforma chama comum em fogos de artifício ou fumaça.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "piscar",
+      "nome": "Piscar",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "você “pisca” entre o Plano Material e o Etéreo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "poeira_ofuscante",
+      "nome": "Poeira ofuscante",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "nuvem de poeira cega e revela criaturas invisíveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "protecao_contra_energia",
+      "nome": "Proteção contra energia",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "absorve 75 pontos de dano de um tipo de energia à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pagina_secreta",
+      "nome": "Página secreta",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "muda o conteúdo de uma página.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "raio_da_exaustao",
+      "nome": "Raio da exaustão",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica fatigado ou exausto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "relampago",
+      "nome": "Relâmpago",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "linha de 30m causa 6d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "resistencia_a_energia",
+      "nome": "Resistência a energia",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "fornece resistência 10 contra um tipo de energia à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "respirar_na_agua",
+      "nome": "Respirar na água",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "até cinco criaturas podem falar e respirar na água.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "runas_explosivas",
+      "nome": "Runas explosivas",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "runas protegem objeto contendo informações escritas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "selo_da_serpente_sepia",
+      "nome": "Selo da serpente sépia",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "selo prende criatura que ler objeto onde ele está inscrito.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "soco_de_arsenal",
+      "nome": "Soco de Arsenal",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "causa dano igual a 4d6 + seu modificador de Força e empurra o alvo 3m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sono_profundo",
+      "nome": "Sono profundo",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "como sono, mas afeta criaturas totalizando 4d4 níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sugestao",
+      "nome": "Sugestão",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo obedece uma ordem sua.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "toque_vampirico",
+      "nome": "Toque vampírico",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo sofre 6d6 pontos de dano; você ganha PV temporários iguais ao dano causado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "velocidade",
+      "nome": "Velocidade",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +2 nos ataques, CA e testes de Reflexos, +9m no deslocamento e pode fazer um ataque adicional.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "visao_arcana",
+      "nome": "Visão arcana",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "você enxerga auras mágicas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "voo",
+      "nome": "Vôo",
+      "circulo": 3,
+      "tipo": "arcana",
+      "descricao_curta": "alvo pode voar com deslocamento de 18m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "armadilha_de_fogo",
+      "nome": "Armadilha de fogo",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "item protegido explode quando for aberto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "assassino_fantasmagorico",
+      "nome": "Assassino fantasmagórico",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "reduz alvo à –10 PV ou causa 3d6 de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aumentar_pessoa_em_massa",
+      "nome": "Aumentar pessoa em massa",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "como aumentar pessoa, mas afeta até 5 alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "confusao",
+      "nome": "Confusão",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas na área se comportam de modo aleatório.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "conjuracao_de_sombras",
+      "nome": "Conjuração de sombras",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "simula qualquer magia arcana de até 2º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_itens_efemeros",
+      "nome": "Criar itens efêmeros",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "cria um objeto mundano a partir de matéria vegetal morta.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_mortos_vivos_menor",
+      "nome": "Criar mortos-vivos menor",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "transforma um cadáver em um esqueleto ou zumbi sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "desespero_esmagador",
+      "nome": "Desespero esmagador",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas na área sofrem –2 em jogadas e testes.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_videncia",
+      "nome": "Detectar vidência",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "perceba qualquer tentativa de detectá-lo através de adivinhações.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "drenar_temporario",
+      "nome": "Drenar temporário",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "alvo sofre 1d4 níveis negativos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "enfeiticar_monstro",
+      "nome": "Enfeitiçar monstro",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "como enfeitiçar pessoa, mas afeta qualquer criatura viva.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "erupcao_de_aleph",
+      "nome": "Erupção de Aleph",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "causa 8d6 pontos de dano, mais 4d6 na rodada seguinte.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escudo_de_fogo",
+      "nome": "Escudo de fogo",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe resistência a fogo 10 e causa 2d6+3 pontos de dano a qualquer criatura que lhe atacar em corpo-a-corpo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esfera_resiliente",
+      "nome": "Esfera resiliente",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica preso em esfera tremeluzente e imóvel.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "fascinacao",
+      "nome": "Fascinação",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "obra de arte prende a atenção de quem lhe enxergar indefinidamente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "globo_de_invulnerabilidade_menor",
+      "nome": "Globo de invulnerabilidade menor",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "esfera com 3m de raio detém qualquer magia de até 3º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "grito",
+      "nome": "Grito",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "explosão sonora causa 4d6 pontos de dano e deixa criaturas surdas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invisibilidade_maior",
+      "nome": "Invisibilidade maior",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "como invisibilidade, mas não é anulada caso o alvo ataque.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_iv",
+      "nome": "Invocar monstro IV",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Médio sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "localizar_criatura",
+      "nome": "Localizar criatura",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "determina em que direção está uma criatura à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "medo",
+      "nome": "Medo",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas na área ficam apavoradas por um minuto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "melhoria_mnemonica",
+      "nome": "Melhoria mnemônica",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe 3 pontos de magia, que pode usar para memorizar magias na hora.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "metamorfose",
+      "nome": "Metamorfose",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "transforma um alvo voluntário em uma criatura diferente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "missao_menor",
+      "nome": "Missão menor",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "obriga o alvo a cumprir uma tarefa à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "moldar_rocha",
+      "nome": "Moldar rocha",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "muda a forma de um pedaço de pedra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "momento_de_tormenta",
+      "nome": "Momento de Tormenta",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma pequena área de Tormenta, que causa vários efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_fogo",
+      "nome": "Muralha de fogo",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma cortina de chamas que causa 4d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_gelo",
+      "nome": "Muralha de gelo",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma muralha de gelo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevoa_solida",
+      "nome": "Névoa sólida",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "como névoa, mas é tão grossa que impede o movimento.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "olho_arcano",
+      "nome": "Olho arcano",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "cria um sensor através do qual você pode enxergar como se estivesse onde ele está.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "onda_da_fadiga",
+      "nome": "Onda da fadiga",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas vivas na área ficam fatigadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "padrao_prismatico",
+      "nome": "Padrão prismático",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "como padrão hipnótico, mas afeta 4d8 níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "parede_ilusoria",
+      "nome": "Parede ilusória",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma parede ilusória e intangível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pedra_em_lama",
+      "nome": "Pedra em lama",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "transforma pedra e rocha em lama.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pele_rochosa",
+      "nome": "Pele rochosa",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "fornece redução de dano 10/adamante.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "permanencia",
+      "nome": "Permanência",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "torna outra magia permanente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pesadelo",
+      "nome": "Pesadelo",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "causa pesadelos que impedem sono tranqüilo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "porta_dimensional",
+      "nome": "Porta dimensional",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "transporta você e até uma criatura para outro lugar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "praga",
+      "nome": "Praga",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "alvo contrai uma doença à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "recipiente_arcano",
+      "nome": "Recipiente arcano",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "transfere sua alma para um cristal ou gema, e dali para outro corpo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "reduzir_pessoa_em_massa",
+      "nome": "Reduzir pessoa em massa",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "como reduzir pessoa, mas afeta até cinco humanóides.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "refugio_seguro",
+      "nome": "Refúgio seguro",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma pequena cabana de madeira.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_maldicao",
+      "nome": "Remover maldição",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "cura o alvo de qualquer maldição.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "rogar_maldicao",
+      "nome": "Rogar maldição",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "amaldiçoa um alvo, com efeitos variados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tempestade_glacial",
+      "nome": "Tempestade glacial",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "pedras de granizo causam 3d6 de esmagamento e 2d6 de frio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tentaculos_negros",
+      "nome": "Tentáculos negros",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "tentáculos surgem do chão e agarram criaturas na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "terreno_ilusorio",
+      "nome": "Terreno ilusório",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "terreno natural parece, tem sons e cheira como outro tipo de terreno natural.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "videncia",
+      "nome": "Vidência",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "você pode ver e ouvir uma criatura à distância.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "zona_de_silencio",
+      "nome": "Zona de silêncio",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "manipula sons dentro da área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ancora_dimensional",
+      "nome": "Âncora dimensional",
+      "circulo": 4,
+      "tipo": "arcana",
+      "descricao_curta": "impede movimento planar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ampliar_animal",
+      "nome": "Ampliar animal",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "um animal aumenta uma categoria de tamanho.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "arca_secreta",
+      "nome": "Arca secreta",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "esconde baú com equipamento no Plano Etéreo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "compor",
+      "nome": "Compor",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "muda a forma, mas não o tipo, de até 250kg de matéria.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cone_glacial",
+      "nome": "Cone glacial",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cone com 9m causa 10d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "contato_extraplanar",
+      "nome": "Contato extraplanar",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "faça perguntas para seres de outros planos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_itens_temporarios",
+      "nome": "Criar itens temporários",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "como criar itens efêmeros, mas também pode criar a partir de matéria mineral.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_passagens",
+      "nome": "Criar passagens",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "abre uma passagem através de madeira ou pedra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cao_fiel",
+      "nome": "Cão fiel",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cão de guarda protege local onde foi invocado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dominar_pessoa",
+      "nome": "Dominar pessoa",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "controle as ações de um humanóide.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "enfraquecer_o_intelecto",
+      "nome": "Enfraquecer o intelecto",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "reduz Inteligência e Carisma do alvo para 1.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "enviar_mensagem",
+      "nome": "Enviar mensagem",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "envia uma mensagem curta a uma criatura que esteja no mesmo plano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "expulsao",
+      "nome": "Expulsão",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "alvo é expulso para seu plano nativo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imagem_persistente",
+      "nome": "Imagem persistente",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "como imagem silenciosa, mas inclui ilusões sonoras, olfativas e térmicas e segue um roteiro pré-determinado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imobilizar_monstro",
+      "nome": "Imobilizar monstro",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "como imobilizar pessoa, mas afeta qualquer criatura viva.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_v",
+      "nome": "Invocar monstro V",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Grande sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lama_em_pedra",
+      "nome": "Lama em pedra",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "transforma lama, barro ou areia movediça em pedra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ligacao_telepatica",
+      "nome": "Ligação telepática",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cria um elo mental entre duas criaturas inteligentes.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "magia_perdida",
+      "nome": "Magia perdida",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "apaga uma magia da mente do alvo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "malogro",
+      "nome": "Malogro",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "murcha e mata uma planta (se for uma criatura, sofre 8d6 pontos de dano).",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "marionete",
+      "nome": "Marionete",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "controla o corpo de uma criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "metamorfose_torrida",
+      "nome": "Metamorfose tórrida",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "transforma o alvo em um animal de 1º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "miragem_arcana",
+      "nome": "Miragem arcana",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "como terreno ilusório, mas muda qualquer tipo de terreno.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "modificar_memoria",
+      "nome": "Modificar memória",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cria, modifica ou elimina a memória do alvo sobre um evento específico.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_energia",
+      "nome": "Muralha de energia",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma muralha de energia invisível e indestrutível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_ferro",
+      "nome": "Muralha de ferro",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma parede de ferro.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_pedra",
+      "nome": "Muralha de pedra",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma muralha unida às superfícies próximas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mao_interposta_de_talude",
+      "nome": "Mão interposta de Talude",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma mão flutuante que lhe fornece cobertura contra um oponente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevoa_mental",
+      "nome": "Névoa mental",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "névoa impõe –4 em testes baseados em Sabedoria.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevoa_mortal",
+      "nome": "Névoa mortal",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "névoa mata criaturas dentro dela.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "olhos_observadores",
+      "nome": "Olhos observadores",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "cria dez olhos flutuantes que seguem suas ordens e então voltam a você para transmitir o que viram.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_encantamento",
+      "nome": "Remover encantamento",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "remove todos os encantamentos afetando o alvo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "resistencia_a_magia",
+      "nome": "Resistência a magia",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "fornece +4 nos testes de resistência contra magia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "rocha_cadente_de_vectorius",
+      "nome": "Rocha cadente de Vectorius",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "meteoro causa 10d6 pontos de dano e soterra criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "santuario_particular",
+      "nome": "Santuário particular",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "protege área de visão, audição e magias de adivinhação.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "similaridade",
+      "nome": "Similaridade",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "como disfarce ilusório, mas pode afetar outras criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sonho",
+      "nome": "Sonho",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "você entra nos sonhos de uma criatura, e pode conversar com ela lá.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_dor",
+      "nome": "Símbolo da dor",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "runa mágica causa dores terríveis quando ativada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_do_sono",
+      "nome": "Símbolo do sono",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "como símbolo da dor, mas as criaturas adormecem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "telecinesia",
+      "nome": "Telecinesia",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "move objetos ou criaturas à distância.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "teletransporte",
+      "nome": "Teletransporte",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "transporta os alvos à longas distâncias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "viagem_planar",
+      "nome": "Viagem planar",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "transporta até cinco criaturas para outro plano de existência.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "visao_falsa",
+      "nome": "Visão falsa",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "engana magias de adivinhação.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "voo_prolongado",
+      "nome": "Vôo prolongado",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "como vôo, mas tem duração maior e deslocamento de 12m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ancora_planar_menor",
+      "nome": "Âncora planar menor",
+      "circulo": 5,
+      "tipo": "arcana",
+      "descricao_curta": "invoca um espírito de até 6º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "agilidade_do_gato_em_massa",
+      "nome": "Agilidade do gato em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como agilidade do gato, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "analisar_encantamento",
+      "nome": "Analisar encantamento",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "analisa uma criatura ou objeto e descobre as magias lhe afetando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "andar_nas_sombras",
+      "nome": "Andar nas sombras",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "alvos entram no Plano das Sombras, onde viajam mais rápido.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "animar_objetos",
+      "nome": "Animar objetos",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "concede vida a objetos inanimados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "astucia_da_raposa_em_massa",
+      "nome": "Astúcia da raposa em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como astúcia da raposa, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ataque_visual",
+      "nome": "Ataque visual",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "seu olhar apavora criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "bola_de_fogo_controlavel",
+      "nome": "Bola de fogo controlável",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como bola de fogo, mas causa 14d6 e pode ser detonada depois de lançada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "campo_antimagia",
+      "nome": "Campo antimagia",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "barreira com 3m de raio anula todos efeitos mágicos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "carne_para_pedra",
+      "nome": "Carne para pedra",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "criatura vira uma estátua.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "conjuracao_de_sombras_maior",
+      "nome": "Conjuração de sombras maior",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como conjuração de sombras, mas simula qualquer magia arcana de até 6º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "contingencia",
+      "nome": "Contingência",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "mantenha uma magia pronta para ser ativada em condição pré-determinada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "controlar_mortos_vivos",
+      "nome": "Controlar mortos-vivos",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "controle as ações de mortos-vivos totalizando 20º níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "controlar_o_clima",
+      "nome": "Controlar o clima",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "muda o clima da área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "controlar_agua",
+      "nome": "Controlar água",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "reduz ou aumenta o nível de água.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "convocacao_instantanea",
+      "nome": "Convocação instantânea",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "invoca um objeto de qualquer lugar para sua mão.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "corrente_de_relampagos",
+      "nome": "Corrente de relâmpagos",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "relâmpago causa 12d6 pontos de dano em um alvo, e 6d6 pontos de dano em até 10 outros alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_mortos_vivos",
+      "nome": "Criar mortos-vivos",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como criar mortos-vivos menor, mas pode criar um carniçal, lívido ou múmia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cubo_de_energia",
+      "nome": "Cubo de energia",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma prisão imóvel, invisível e indestrutível, que prende uma criatura Grande ou menor.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "circulo_da_morte",
+      "nome": "Círculo da morte",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "mata criaturas totalizando 10d4 níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dedo_da_morte",
+      "nome": "Dedo da morte",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "alvo cai com –10 PV.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "desejo_restrito",
+      "nome": "Desejo restrito",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "cria efeitos variados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "desintegrar",
+      "nome": "Desintegrar",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "causa 20d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "despistar",
+      "nome": "Despistar",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "você fica invisível e uma cópia ilusória surge em seu lugar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "destruir_mortos_vivos",
+      "nome": "Destruir mortos-vivos",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "destrói mortos-vivos criaturas totalizando 10d4 níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dissipar_magia_maior",
+      "nome": "Dissipar magia maior",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como dissipar magia, mas com maior limite no teste de dissipar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dominacao_total",
+      "nome": "Dominação total",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica completamente sob seu controle, realizando até mesmo ordens suicidas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "elucubracao_do_mago",
+      "nome": "Elucubração do mago",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "recupera uma magia de até 5º nível que você tenha lançado recentemente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esfera_gelida",
+      "nome": "Esfera gélida",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "explosão com 3m de raio causa 12d6 pontos de dano e congela líquidos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "espada_de_energia",
+      "nome": "Espada de energia",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "espada flutuante ataca seus inimigos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esplendor_da_aguia_em_massa",
+      "nome": "Esplendor da águia em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como esplendor da águia, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "estatua",
+      "nome": "Estátua",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "alvo se transforma em estátua viva, recebendo redução de dano 8 e outras características.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forca_do_touro_em_massa",
+      "nome": "Força do touro em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como força do touro, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "globo_de_invulnerabilidade",
+      "nome": "Globo de invulnerabilidade",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como globo de invulnerabilidade menor, mas detém qualquer magia de até 4º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "heroismo_maior",
+      "nome": "Heroísmo maior",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "alvo recebe +4 nos ataques e testes de resistência, 10 PV temporários e fica imune a medo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imagem_permanente",
+      "nome": "Imagem permanente",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como imagem silenciosa, mas inclui ilusões sonoras, olfativas e térmicas e é permanente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imobilizar_pessoa_em_massa",
+      "nome": "Imobilizar pessoa em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como imobilizar pessoa, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "insanidade",
+      "nome": "Insanidade",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica permanentemente sob efeito da magia confusão.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "inverter_a_gravidade",
+      "nome": "Inverter a gravidade",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "inverte gravidade da área, fazendo criaturas e objetos “caírem” para cima.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invisibilidade_em_massa",
+      "nome": "Invisibilidade em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como invisibilidade, mas afeta qualquer quantidade de criaturas dentro de 30m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_vi",
+      "nome": "Invocar monstro VI",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Grande sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_vii",
+      "nome": "Invocar monstro VII",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Enorme sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lendas_e_historias",
+      "nome": "Lendas e histórias",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "descobre informações sobre o alvo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mansao_magnifica_de_vectorius",
+      "nome": "Mansão magnífica de Vectorius",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma luxuosa mansão extradimensional.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "missao",
+      "nome": "Missão",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como missão menor, mas pode afetar uma criatura de qualquer nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mundo_dos_sonhos",
+      "nome": "Mundo dos sonhos",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "alvos adormecem e vivem uma realidade controlada por você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mao_poderosa_de_talude",
+      "nome": "Mão poderosa de Talude",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como mão interposta, mas também agarra o oponente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mao_vigorosa_de_talude",
+      "nome": "Mão vigorosa de Talude",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como mão interposta, mas também afasta o oponente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevoa_acida",
+      "nome": "Névoa ácida",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como névoa sólida, mas causa dano às criaturas em seu interior.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "onda_da_exaustao",
+      "nome": "Onda da exaustão",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "criaturas vivas na área ficam exaustas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "palavra_de_poder_cegar",
+      "nome": "Palavra de poder, cegar",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "cega uma criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "passagem_invisivel",
+      "nome": "Passagem invisível",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma passagem etérea através de uma parede.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "passeio_etereo",
+      "nome": "Passeio etéreo",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "você é transportado para o Plano Etéreo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pedra_em_carne",
+      "nome": "Pedra em carne",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "restaura uma criatura petrificada ao estado normal.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "projetar_imagem",
+      "nome": "Projetar imagem",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma cópia ilusória de você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "proteger_fortalezas",
+      "nome": "Proteger fortalezas",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "protege uma estrutura com diversos efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "rajada_prismatica",
+      "nome": "Rajada prismática",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "raios causam efeitos variados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "repulsao",
+      "nome": "Repulsão",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "campo de força impede criaturas de se aproximarem de você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "reverter_magia",
+      "nome": "Reverter magia",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "magias ou habilidades mágicas lançadas em você são refletidas de volta a quem as lançou.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sabedoria_da_coruja_em_massa",
+      "nome": "Sabedoria da coruja em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como sabedoria da coruja, mas afeta até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simulacro",
+      "nome": "Simulacro",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma cópia de uma criatura sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sugestao_em_massa",
+      "nome": "Sugestão em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como sugestão, mas afeta até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_fraqueza",
+      "nome": "Símbolo da fraqueza",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como símbolo da dor, mas as criaturas na área sofrem 3d6 de dano de Força.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_persuasao",
+      "nome": "Símbolo da persuasão",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como símbolo da dor, mas as criaturas ficam enfeitiçadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_do_atordoamento",
+      "nome": "Símbolo do atordoamento",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como símbolo da dor, mas as criaturas na área ficam atordoadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_do_medo",
+      "nome": "Símbolo do medo",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como símbolo da dor, mas as criaturas ficam apavoradas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "teletransportar_objeto",
+      "nome": "Teletransportar objeto",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como teletransporte, mas transporta um objeto e não você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "teletransporte_maior",
+      "nome": "Teletransporte maior",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como teletransporte, mas sem limite de alcance.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "transformacao_de_guerra",
+      "nome": "Transformação de guerra",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe habilidades de combate, mas não pode lançar magias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "vigor_do_urso_em_massa",
+      "nome": "Vigor do urso em massa",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "como vigor do urso, mas afeta até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "visao_da_verdade",
+      "nome": "Visão da verdade",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "revela a forma real das coisas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "veu",
+      "nome": "Véu",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "muda a aparência de até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ancora_planar",
+      "nome": "Âncora planar",
+      "circulo": 6,
+      "tipo": "arcana",
+      "descricao_curta": "invoca um espírito de até 12º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "banimento",
+      "nome": "Banimento",
+      "circulo": 7,
+      "tipo": "arcana",
+      "descricao_curta": "expulsa até cinco espíritos ou criaturas invocadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "resistencia_a_magia_maior",
+      "nome": "Resistência a magia maior",
+      "circulo": 7,
+      "tipo": "arcana",
+      "descricao_curta": "fornece +8 nos testes de resistência contra magia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "videncia_maior",
+      "nome": "Vidência maior",
+      "circulo": 7,
+      "tipo": "arcana",
+      "descricao_curta": "como vidência, mas dura mais e permite lançar magias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "visao",
+      "nome": "Visão",
+      "circulo": 7,
+      "tipo": "arcana",
+      "descricao_curta": "como lendas e histórias, mas funciona mais rapidamente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "visao_arcana_maior",
+      "nome": "Visão arcana maior",
+      "circulo": 7,
+      "tipo": "arcana",
+      "descricao_curta": "como visão arcana, mas determina capacidade de lançar magias instantaneamente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "animacao_ilusoria",
+      "nome": "Animação ilusória",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "esconde o que realmente está acontecendo na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "antipatia",
+      "nome": "Antipatia",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "alvo ou área repele um tipo de criatura à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aprisionar_a_alma",
+      "nome": "Aprisionar a alma",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "prende corpo do alvo em gema.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "clone",
+      "nome": "Clone",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "cria um clone sem vida de uma criatura; se ela morrer, sua alma é transportada para o clone.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "corpo_de_ferro",
+      "nome": "Corpo de ferro",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "você se transforma em uma estátua de ferro vivo, recebendo diversos bônus e imunidades.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_mortos_vivos_maior",
+      "nome": "Criar mortos-vivos maior",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "como criar mortos-vivos menor, mas pode criar uma sombra, aparição ou espectro.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simpatia",
+      "nome": "Simpatia",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "alvo atrai um tipo de criatura à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_insanidade",
+      "nome": "Símbolo da insanidade",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "como símbolo da dor, mas as criaturas ficam insanas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_morte",
+      "nome": "Símbolo da morte",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "como símbolo da dor, mas as criaturas morrem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "vazio",
+      "nome": "Vazio",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "alvo perde memória e habilidades.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ancora_planar_maior",
+      "nome": "Âncora planar maior",
+      "circulo": 8,
+      "tipo": "arcana",
+      "descricao_curta": "invoca um espírito de até 8º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "alterar_forma",
+      "nome": "Alterar forma",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "você assume a forma de qualquer criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aprisionamento",
+      "nome": "Aprisionamento",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "enterra alvo sob a terra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "chuva_de_meteoros",
+      "nome": "Chuva de meteoros",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "produz quatro rochas flamejantes, que causam até 32d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "contra_ataque_mental",
+      "nome": "Contra-ataque mental",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como limpar a mente, mas causa dano em quem tentar usar um efeito mental.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "circulo_de_teletransporte",
+      "nome": "Círculo de teletransporte",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "círculo transporta qualquer criatura que pisar nele.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "danca_irresistivel",
+      "nome": "Dança irresistível",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "obriga uma criatura a dançar por 1d4 rodadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "desejo",
+      "nome": "Desejo",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "cria efeitos variados e poderosos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_mortos_vivos_arc",
+      "nome": "Detectar mortos-vivos",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "detecta a presença, quantidade e poder de mortos-vivos na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "discernir_localizacao",
+      "nome": "Discernir localização",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "descubra a localização de uma criatura ou objeto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "disjuncao",
+      "nome": "Disjunção",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "dissipa efeitos mágicos e transforma itens mágicos em mundanos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dominar_monstro",
+      "nome": "Dominar monstro",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como dominar pessoa, mas afeta qualquer tipo de criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "drenar_energia",
+      "nome": "Drenar energia",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "alvo sofre 2d4 níveis negativos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "encarnacao_fantasmagorica",
+      "nome": "Encarnação fantasmagórica",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como assassino fantasmagórico, mas afeta até 10 criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "enfeiticar_animal",
+      "nome": "Enfeitiçar animal",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como enfeitiçar pessoa, mas afeta um animal.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "enfeiticar_monstro_em_massa",
+      "nome": "Enfeitiçar monstro em massa",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como enfeitiçar monstro, mas afeta qualquer número de criaturas vivas somando até 30 níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escudo_entropico",
+      "nome": "Escudo entrópico",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe camuflagem contra ataques à distância (20% de chance de falha).",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esfera_prismatica",
+      "nome": "Esfera prismática",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como muralha prismática, mas cria um globo imóvel que protege quem está dentro.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esfera_telecinetica",
+      "nome": "Esfera telecinética",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como esfera resiliente, mas a esfera pode ser movida telepaticamente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "estase_temporal",
+      "nome": "Estase temporal",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "alvo fica preso em estado de animação suspensa.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "evaporacao",
+      "nome": "Evaporação",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "evapora líquidos de criaturas na área, causando 16d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forma_eterea",
+      "nome": "Forma etérea",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como passeio etéreo, mas afeta até cinco criaturas voluntárias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "grito_da_banshee",
+      "nome": "Grito da banshee",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "grito terrível mata todas as criaturas que lhe ouvirem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "grito_maior",
+      "nome": "Grito maior",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como grito, mas causa 8d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imobilizar_monstro_em_massa",
+      "nome": "Imobilizar monstro em massa",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como imobilizar monstro, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "instante_de_presciencia",
+      "nome": "Instante de presciência",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "você recebe +15 em uma jogada ou teste, ou +15 na CA contra um ataque.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_ix",
+      "nome": "Invocar monstro IX",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Descomunal sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_viii",
+      "nome": "Invocar monstro VIII",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "Invoca um monstro Enorme sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "labirinto",
+      "nome": "Labirinto",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "expulsa alvo para labirinto em outra dimensão.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "libertacao",
+      "nome": "Libertação",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "liberta o alvo de todos os efeitos que restringem o movimento.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "limpar_a_mente",
+      "nome": "Limpar a mente",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "protege o alvo de efeitos que detectam, lêem ou influenciam emoções ou pensamentos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lagrimas_de_wynna",
+      "nome": "Lágrimas de Wynna",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "alvo perde capacidade de lançar magias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mata_dragao",
+      "nome": "Mata-dragão",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "carga de energia destruidora causa 20d12+20 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "metamorfosear_objetos",
+      "nome": "Metamorfosear objetos",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "transforma um alvo em uma criatura ou objeto diferente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_prismatica",
+      "nome": "Muralha prismática",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma muralha multicolorida que causa vários efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mao_esmagadora_de_talude",
+      "nome": "Mão esmagadora de Talude",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como mão interposta, mas também esmaga o oponente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nuvem_incendiaria",
+      "nome": "Nuvem incendiária",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "cria uma nuvem incandescente que causa 4d6 pontos de dano por rodada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "olhos_observadores_maior",
+      "nome": "Olhos observadores maior",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como olhos observadores, mas os olhos possuem visão da verdade.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ordem",
+      "nome": "Ordem",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como enviar mensagem, mas a mensagem pode conter uma sugestão.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "padrao_cintilante",
+      "nome": "Padrão cintilante",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "dispersão com 6m de raio deixa criaturas confusas, atordoadas ou inconscientes, de acordo com seus níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "palavra_de_poder_atordoar",
+      "nome": "Palavra de poder, atordoar",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "atordoa uma criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "palavra_de_poder_matar",
+      "nome": "Palavra de poder, matar",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "mata uma criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "parar_o_tempo",
+      "nome": "Parar o tempo",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "você fica livre para agir 1d4+1 rodadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "portal",
+      "nome": "Portal",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "abre um portal para convocar uma criatura ou viajar entre planos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "prender_a_alma",
+      "nome": "Prender a alma",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "captura a alma de uma criatura morta recentemente, impedindo ressurreição e similares.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "prisao",
+      "nome": "Prisão",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "prende uma criatura de diversas maneiras.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "projecao_astral",
+      "nome": "Projeção astral",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "libera sua alma de seu corpo físico e a projeta no Plano Astral.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "punho_cerrado_de_talude",
+      "nome": "Punho cerrado de Talude",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como mão interposta, mas também persegue e ataca o oponente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "raio_polar",
+      "nome": "Raio polar",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "causa 15d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "refugio",
+      "nome": "Refúgio",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "objeto preparado transporta criatura lhe segurando para um lugar determinado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sexto_sentido",
+      "nome": "Sexto sentido",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "você não fica surpreendido e desprevenido, e recebe +8 na CA e testes de Reflexos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sombras",
+      "nome": "Sombras",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "como conjuração de sombras, mas você pode copiar qualquer magia arcana de 8º nível ou menor.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tranca_dimensional",
+      "nome": "Tranca dimensional",
+      "circulo": 9,
+      "tipo": "arcana",
+      "descricao_curta": "impede viagens planares na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "brilho_div",
+      "nome": "Brilho",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "alvo fica ofuscado (–1 nos ataques).",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "consertar_div",
+      "nome": "Consertar",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "repara pequenas falhas em objetos mundanos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_magia_div",
+      "nome": "Detectar magia",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "detecta a presença, quantidade e intensidade de auras mágicas na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_venenos_div",
+      "nome": "Detectar venenos",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "determina se uma criatura ou objeto é venenoso ou está envenenado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "fogo_das_fadas",
+      "nome": "Fogo das fadas",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "luz envolve todos os alvos na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "infligir_ferimentos_leves",
+      "nome": "Infligir ferimentos leves",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "causa 1d8+1 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "intuir_direcao_div",
+      "nome": "Intuir direção",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "você recebe +4 em testes de Sobrevivência para não se perder.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invisibilidade_contra_animais",
+      "nome": "Invisibilidade contra animais",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "alvo não é percebido por animais.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invisibilidade_contra_mortos_vivos",
+      "nome": "Invisibilidade contra mortos-vivos",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "alvo não é percebido por mortos-vivos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_i_div",
+      "nome": "Invocar monstro I",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Pequeno sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ler_magias_div",
+      "nome": "Ler magias",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "decifre inscrições mágicas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "luz_div",
+      "nome": "Luz",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "objeto brilha como tocha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevoa_obscurecente_div",
+      "nome": "Névoa obscurecente",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "névoa obscurece toda a visão.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "orientacao",
+      "nome": "Orientação",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +1 numa jogada ou teste.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "passos_longos",
+      "nome": "Passos longos",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "seu deslocamento aumenta em 3m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "passos_sem_pegadas",
+      "nome": "Passos sem pegadas",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "alvo não deixa pegadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "perdicao",
+      "nome": "Perdição",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "inimigos sofrem –1 nos ataques e resistência contra medo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "presa_magica",
+      "nome": "Presa mágica",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +1 nos ataques e danos com armas naturais.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "purificar_alimentos",
+      "nome": "Purificar alimentos",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "purifica comida e bebida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "resistencia_div",
+      "nome": "Resistência",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "fornece +1 nos testes de resistência.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "romper_morto_vivo_div",
+      "nome": "Romper morto-vivo",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "causa 1d6 pontos de dano em um morto-vivo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "virtude",
+      "nome": "Virtude",
+      "circulo": 0,
+      "tipo": "divina",
+      "descricao_curta": "alvo ganha 1 PV temporário.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "stub_1_circulo_div",
+      "nome": "[Stub] Magia divina 1º círculo",
+      "circulo": 1,
+      "tipo": "divina",
+      "escola": "Encantamento",
+      "resistencia": "Vontade nega"
+    },
+    {
+      "slug": "abencoar_agua",
+      "nome": "Abençoar água",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "cria água benta.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "acalmar_animal",
+      "nome": "Acalmar animal",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "acalma um animal.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "amaldicoar_agua",
+      "nome": "Amaldiçoar água",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "cria água profana.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "arma_magica_div",
+      "nome": "Arma mágica",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "arma recebe +1 nos ataques e danos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "auxilio_divino",
+      "nome": "Auxílio divino",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "você recebe +1 nos ataques e danos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pedra_encantada",
+      "nome": "Pedra encantada",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "três pedras viram armas de arremesso.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "protecao_contra_o_mal_bem_caos_ordem_div",
+      "nome": "Proteção contra o mal/bem/caos/ordem",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "fornece +2 na CA e nos testes de resistência contra criaturas da tendência escolhida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_medo",
+      "nome": "Remover medo",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "cura o alvo de qualquer efeito de medo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "santuario",
+      "nome": "Santuário",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "Inimigos devem fazer teste de Vontade para lhe atacar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "suportar_elementos_div",
+      "nome": "Suportar elementos",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "protege o alvo de temperaturas extremas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "visao_da_morte",
+      "nome": "Visão da morte",
+      "circulo": 1,
+      "tipo": "divina",
+      "descricao_curta": "você percebe condição relativa das criaturas que enxergar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "acalmar_emocoes",
+      "nome": "Acalmar emoções",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "acalma criaturas na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "agilidade_do_gato_div",
+      "nome": "Agilidade do gato",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +4 de Destreza.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ajuda",
+      "nome": "Ajuda",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +1 nos ataques e resistências contra medo, e 1d8+1 PV temporários.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "amolecer_terra_e_pedra",
+      "nome": "Amolecer terra e pedra",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "transforma terra em lama ou pó, e pedra em argila.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ao_alcance_da_mao_div",
+      "nome": "Ao alcance da mão",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "projeta mãos a até 3m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "arma_espiritual",
+      "nome": "Arma espiritual",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "cria arma de energia que ataca seus inimigos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "armadilha_de_fogo_div",
+      "nome": "Armadilha de fogo",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "item protegido explode quando for aberto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "augurio",
+      "nome": "Augúrio",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "diz se uma ação trará resultados bons ou ruins.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "bom_fruto",
+      "nome": "Bom fruto",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "cria quatro frutos que alimentam e curam 1d4 pontos de vida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "bencao",
+      "nome": "Bênção",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "aliados recebem +1 nos ataques e resistência contra medo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cajado_abencoado",
+      "nome": "Cajado abençoado",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "arma recebe +1 nos ataques e danos e causa dano como se fosse maior.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "causar_medo",
+      "nome": "Causar medo",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "criatura de até 4º nível fica apavorada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "comandar",
+      "nome": "Comandar",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "força o alvo a obedecer uma ordem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "compreender_idiomas_div",
+      "nome": "Compreender idiomas",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "você entende qualquer coisa escrita ou falada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "condicao",
+      "nome": "Condição",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "determina condição (PV, magias afetando) de criaturas tocadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "consagrar",
+      "nome": "Consagrar",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "abençoa a área, aumentando o efeito de canalizar energia positiva e penalizando mortos-vivos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "constricao",
+      "nome": "Constrição",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "a vegetação da área prende criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_chama",
+      "nome": "Criar chama",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "cria chama com intensidade de uma tocha na mão do conjurador.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_agua",
+      "nome": "Criar água",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "enche um recipiente com água pura e potável.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "curar_ferimentos_leves",
+      "nome": "Curar ferimentos leves",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "recupera 1d8+1 pontos de vida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "curar_ferimentos_moderados",
+      "nome": "Curar ferimentos moderados",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "recupera 2d8+3 pontos de vida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "descanso_tranquilo_div",
+      "nome": "Descanso tranqüilo",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "impede um cadáver de se decompor.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "desespero",
+      "nome": "Desespero",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo fica abalado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "despedacar_div",
+      "nome": "Despedaçar",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "som alto e agudo causa 4d6 pontos de dano em construto ou destrói um objeto mundano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_animais",
+      "nome": "Detectar animais",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "detecta a presença, quantidade e condição de animais na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_armadilhas",
+      "nome": "Detectar armadilhas",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "detecta a presença de armadilhas na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "detectar_o_mal_bem_caos_ordem",
+      "nome": "Detectar o mal/bem/caos/ordem",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "detecta a presença, quantidade e intensidade de auras de uma tendência na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dissimular_tendencia",
+      "nome": "Dissimular tendência",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "esconde a tendência do alvo de efeitos de adivinhação.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "drenar_forca_vital",
+      "nome": "Drenar força vital",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "remove o restante da força vital de uma criatura moribunda, e usa-a para aumentar o poder do conjurador.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "encontrar_armadilhas",
+      "nome": "Encontrar armadilhas",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "você recebe a habilidade encontrar armadilhas de um ladino, e +10 em Percepção para procurá-las.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escuridao_div",
+      "nome": "Escuridão",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "objeto irradia escuridão em uma área com 6m de raio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esfriar_metal",
+      "nome": "Esfriar metal",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "Item de metal esfria e causa dano em qualquer criatura lhe tocando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esplendor_da_aguia_div",
+      "nome": "Esplendor da águia",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +4 de Carisma.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esquentar_metal",
+      "nome": "Esquentar metal",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "Item de metal esquenta e causa dano em qualquer criatura lhe tocando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "explosao_sonora",
+      "nome": "Explosão sonora",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "dispersão com 3m de raio causa 1d8 pontos de dano e surdez.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "falar_com_animais",
+      "nome": "Falar com animais",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "você pode se comunicar com animais.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forca_do_touro_div",
+      "nome": "Força do touro",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +4 de Força.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imobilizar_animal_div",
+      "nome": "Imobilizar animal",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "como imobilizar pessoa, mas afeta um animal em vez de um humanóide.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imobilizar_pessoa_div",
+      "nome": "Imobilizar pessoa",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "paralisa um humanóide por um minuto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "infligir_ferimentos_moderados",
+      "nome": "Infligir ferimentos moderados",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "causa 2d8+3 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_ii_div",
+      "nome": "Invocar monstro II",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Pequeno sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lamina_flamejante",
+      "nome": "Lâmina flamejante",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "cria uma lâmina de chamas que causa 1d8+2 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mensageiro_animal",
+      "nome": "Mensageiro animal",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "obriga um animal a ir até um local determinado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "moldar_madeira",
+      "nome": "Moldar madeira",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "muda a forma de um pedaço de madeira.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "patas_de_aranha_div",
+      "nome": "Patas de aranha",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo pode escalar paredes e tetos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pele_de_arvore",
+      "nome": "Pele de árvore",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "fornece +3 na classe de armadura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "profanar",
+      "nome": "Profanar",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "amaldiçoa a área, aumentando o efeito de canalizar energia negativa e fornecendo bônus para mortos-vivos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "proteger_outro",
+      "nome": "Proteger outro",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "você recebe metade do dano destinado a outra criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "reduzir_animal",
+      "nome": "Reduzir animal",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "como reduzir pessoa, mas afeta um animal voluntário.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_paralisia",
+      "nome": "Remover paralisia",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "cura o alvo de qualquer efeito de paralisia ou lentidão.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "resistencia_a_energia_div",
+      "nome": "Resistência a energia",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "fornece resistência 10 contra um tipo de energia à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "restauracao_menor",
+      "nome": "Restauração menor",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "cura 1d4 pontos de dano de habilidade.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "retardar_envenenamento",
+      "nome": "Retardar envenenamento",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo não sofre efeito de veneno pela duração da magia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sabedoria_da_coruja_div",
+      "nome": "Sabedoria da coruja",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +4 de Sabedoria.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "silencio",
+      "nome": "Silêncio",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "nenhum som é produzido na área afetada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tendencia_em_arma",
+      "nome": "Tendência em arma",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "arma recebe tendência.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "toque_da_loucura",
+      "nome": "Toque da loucura",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo fica atordoado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "torcer_madeira",
+      "nome": "Torcer madeira",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "entorta madeira comum.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tornar_inteiro",
+      "nome": "Tornar inteiro",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "repara um objeto estragado ou quebrado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "transe_animal",
+      "nome": "Transe animal",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "fascina animais totalizando 2d6 níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "vigor_do_urso_div",
+      "nome": "Vigor do urso",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +4 de Constituição.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "zona_da_verdade",
+      "nome": "Zona da verdade",
+      "circulo": 2,
+      "tipo": "divina",
+      "descricao_curta": "impede criaturas na área de mentirem deliberadamente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ampliar_plantas",
+      "nome": "Ampliar plantas",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "vegetação da área aumenta e se fecha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "armadilha_de_corda",
+      "nome": "Armadilha de corda",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "transforma corda comum em armadilha mágica.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cajado_em_cobra",
+      "nome": "Cajado em cobra",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "transforma um objeto alongado de madeira em uma cobra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "caminhar_na_agua",
+      "nome": "Caminhar na água",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "alvo pode caminhar na água como se fosse terra sólida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cegueira_surdez_div",
+      "nome": "Cegueira/surdez",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "alvo fica cego ou surdo, à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "chama_continua_div",
+      "nome": "Chama contínua",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "objeto ilumina tanto quanto uma tocha, permanentemente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "convocar_relampagos",
+      "nome": "Convocar relâmpagos",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "invoca um relâmpago por rodada, cada um causando 3d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "crescer_espinhos",
+      "nome": "Crescer espinhos",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "vegetação da área fica causa dano em criaturas na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_alimentos",
+      "nome": "Criar alimentos",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "cria comida e bebida para alimentar uma criatura Média por um dia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_mortos_vivos_menor_div",
+      "nome": "Criar mortos-vivos menor",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "transforma um cadáver em um esqueleto ou zumbi sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "curar_ferimentos_graves",
+      "nome": "Curar ferimentos graves",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "recupera 3d8+5 pontos de vida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "circulo_magico_contra_o_mal_bem_caos_ordem_div",
+      "nome": "Círculo mágico contra o mal/bem/caos/ordem",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "como proteção contra o mal/bem/caos/ordem, mas afeta emanação com 3m de raio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dissipar_magia_div",
+      "nome": "Dissipar magia",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "dissipa outras magias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dominar_animal",
+      "nome": "Dominar animal",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "sinta o que um animal está sentido e dê ordens a ele.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "enfraquecer_plantas",
+      "nome": "Enfraquecer plantas",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "vegetação da área diminui.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "envenenamento",
+      "nome": "Envenenamento",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "inocula veneno que causa 1d10 pontos de dano de Constituição.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escuridao_profunda",
+      "nome": "Escuridão profunda",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "como escuridão, mas área é de 18m de raio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "extinguir_fogo",
+      "nome": "Extinguir fogo",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "apaga fogo comum na área e dissipa magias de fogo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "falar_com_os_mortos",
+      "nome": "Falar com os mortos",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "faça perguntas para uma criatura morta.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "falar_com_plantas",
+      "nome": "Falar com plantas",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "você pode se comunicar com plantas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "infligir_ferimentos_graves",
+      "nome": "Infligir ferimentos graves",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "causa 3d8+5 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_iii_div",
+      "nome": "Invocar monstro III",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Médio sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "localizar_objeto_div",
+      "nome": "Localizar objeto",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "determina em que direção está um objeto à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "luz_cegante",
+      "nome": "Luz cegante",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "raio de sol causa 3d8 pontos de dano, ou 6d6 contra mortos-vivos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "luz_do_dia_div",
+      "nome": "Luz do dia",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "objeto emite luz brilhante como do dia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lagrimas_de_hyninn",
+      "nome": "Lágrimas de Hyninn",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "criaturas na área sofrem –5 em testes de Acrobacia, Enganação, Furtividade e Ladinagem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mesclar_se_as_rochas",
+      "nome": "Mesclar-se às rochas",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "você se funde a um bloco de pedra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "moldar_rocha_div",
+      "nome": "Moldar rocha",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "muda a forma de um pedaço de pedra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_vento_div",
+      "nome": "Muralha de vento",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "cria uma cortina de vento.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mao_opifera",
+      "nome": "Mão opífera",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "mão fantasmagórica encontra uma criatura e a guia até você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nevasca_div",
+      "nome": "Nevasca",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "chuva de gelo bloqueia visão e deixa o piso escorregadio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "obscurecer_objeto_div",
+      "nome": "Obscurecer objeto",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "esconde um item de efeitos de adivinhação.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "oracao",
+      "nome": "Oração",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "fornece +1 nas jogadas e testes de seus aliados, e impõe –1 nas jogadas e testes de seus inimigos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "praga_div",
+      "nome": "Praga",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "alvo contrai uma doença à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "presa_magica_maior",
+      "nome": "Presa mágica maior",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "como presa mágica, mas o bônus é de +2.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "protecao_contra_energia_div",
+      "nome": "Proteção contra energia",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "absorve 75 pontos de dano de um tipo de energia à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "purgar_invisibilidade",
+      "nome": "Purgar invisibilidade",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "qualquer coisa invisível a até 9m se torna visível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_cegueira_surdez",
+      "nome": "Remover cegueira/surdez",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "cura o alvo de cegueira ou surdez.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_doenca",
+      "nome": "Remover doença",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "cura o alvo de todas as doenças.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_maldicao_div",
+      "nome": "Remover maldição",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "cura o alvo de qualquer maldição.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "repelir_insetos",
+      "nome": "Repelir insetos",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "insetos não podem se aproximar a até 3m de você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "respirar_na_agua_div",
+      "nome": "Respirar na água",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "até cinco criaturas podem falar e respirar na água.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "restauracao",
+      "nome": "Restauração",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "como restauração menor, mas cura todos os pontos de dano temporário de habilidade.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "rogar_maldicao_div",
+      "nome": "Rogar maldição",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "amaldiçoa um alvo, com efeitos variados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "roupa_encantada",
+      "nome": "Roupa encantada",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "armadura ou escudo recebe +2 na CA.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "soco_de_arsenal_div",
+      "nome": "Soco de Arsenal",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "causa dano igual a 4d6 + seu modificador de Força e empurra o alvo 3m.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_de_protecao",
+      "nome": "Símbolo de proteção",
+      "circulo": 3,
+      "tipo": "divina",
+      "descricao_curta": "protege um objeto que possa ser aberto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "adivinhacao",
+      "nome": "Adivinhação",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "responde uma pergunta.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aliado_extraplanar_menor",
+      "nome": "Aliado extraplanar menor",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "invoca um espírito de até 6º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "andar_no_ar",
+      "nome": "Andar no ar",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "alvo pode caminhar no ar como se fosse terra sólida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "arma_magica_maior_div",
+      "nome": "Arma mágica maior",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "arma recebe +2 nos ataques e danos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "controlar_agua_div",
+      "nome": "Controlar água",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "reduz ou aumenta o nível de água.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "curar_ferimentos_criticos",
+      "nome": "Curar ferimentos críticos",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "recupera 4d8+7 pontos de vida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "colera_da_ordem",
+      "nome": "Cólera da ordem",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "causa 8d6 pontos de dano em criaturas Caóticas e deixa-as pasmas por uma rodada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cupula_de_protecao_contra_vegetais",
+      "nome": "Cúpula de proteção contra vegetais",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "cria uma barreira invisível que impede plantas monstruosas de se aproximar de você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "destruicao_sagrada",
+      "nome": "Destruição sagrada",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "causa 8d6 pontos de dano em criaturas Malignas e deixa-as cegas por uma rodada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "discernir_mentiras",
+      "nome": "Discernir mentiras",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "determina se os alvos estão mentindo deliberadamente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "enviar_mensagem_div",
+      "nome": "Enviar mensagem",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "envia uma mensagem curta a uma criatura que esteja no mesmo plano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "expulsao_div",
+      "nome": "Expulsão",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "alvo é expulso para seu plano nativo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "idiomas_div",
+      "nome": "Idiomas",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "alvo entende e fala qualquer idioma existente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imunidade_a_magia",
+      "nome": "Imunidade a magia",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "alvo fica imune a duas magias de até 4º nível à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "infligir_ferimentos_criticos",
+      "nome": "Infligir ferimentos críticos",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "causa 4d8+7 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "inseto_gigante",
+      "nome": "Inseto gigante",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "transforma um inseto comum em uma versão gigante, sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_iv_div",
+      "nome": "Invocar monstro IV",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Médio sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "malogro_div",
+      "nome": "Malogro",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "murcha e mata uma planta (se for uma criatura, sofre 8d6 pontos de dano).",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "martelo_do_caos",
+      "nome": "Martelo do caos",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "causa 8d6 pontos de dano em criaturas Leais e deixa-as confusas por uma rodada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "movimentacao_livre",
+      "nome": "Movimentação livre",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "alvo fica imune a efeitos que restrinjam movimento.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "nuvem_profana",
+      "nome": "Nuvem profana",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "causa 8d6 pontos de dano em criaturas Bondosas e deixa-as enjoadas por 1d4 rodadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pedras_afiadas",
+      "nome": "Pedras afiadas",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "solo rochoso virá terreno difícil que causa dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "poder_divino",
+      "nome": "Poder divino",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "você recebe +4 nos ataques e dano e 10 PV temporários.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "protecao_contra_a_morte",
+      "nome": "Proteção contra a morte",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "alvo fica imune a efeitos de necromancia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "reencarnacao",
+      "nome": "Reencarnação",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "traz uma criatura de volta à vida, mas em outro corpo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_veneno",
+      "nome": "Remover veneno",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "cura o alvo de todos os venenos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tempestade_glacial_div",
+      "nome": "Tempestade glacial",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "pedras de granizo causam 3d6 de esmagamento e 2d6 de frio.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "toque_enferrujante",
+      "nome": "Toque enferrujante",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "enferruja um objeto metálico mundano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "transferencia_de_poder_divino",
+      "nome": "Transferência de poder divino",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "alvo pode lançar uma magia sua de até 2º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ancora_dimensional_div",
+      "nome": "Âncora dimensional",
+      "circulo": 4,
+      "tipo": "divina",
+      "descricao_curta": "impede movimento planar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ampliar_animal_div",
+      "nome": "Ampliar animal",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "um animal aumenta uma categoria de tamanho.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "arma_do_rompimento",
+      "nome": "Arma do rompimento",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "arma se torna destruidora contra mortosvivos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "caminhar_em_arvores",
+      "nome": "Caminhar em árvores",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "entre em uma árvore e saia em outra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "coluna_de_chamas",
+      "nome": "Coluna de chamas",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "cilindro com 3m de raio e 12m de altura causa 10d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "comandar_maior",
+      "nome": "Comandar maior",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "como comandar, mas afeta até 5 alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "comunhao",
+      "nome": "Comunhão",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "responde até 10 perguntas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "comunhao_com_a_natureza",
+      "nome": "Comunhão com a natureza",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "fornece informações sobre a região.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "conspurcar",
+      "nome": "Conspurcar",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "transforma área em local profano, gerando vários efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "controlar_os_ventos",
+      "nome": "Controlar os ventos",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "muda a direção e intensidade dos ventos na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "convocar_tempestade_de_relampagos",
+      "nome": "Convocar tempestade de relâmpagos",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "como convocar relâmpagos, mas cada relâmpago causa 5d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "curar_ferimentos_leves_em_massa",
+      "nome": "Curar ferimentos leves em massa",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "recupera 1d8+9 pontos de vida de até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "despertar",
+      "nome": "Despertar",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "desperta inteligência humana em um animal ou árvore.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dissipar_o_mal_bem_caos_ordem",
+      "nome": "Dissipar o mal/bem/caos/ordem",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +4 na CA contra criaturas de uma tendência, entre outros efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forca_dos_justos",
+      "nome": "Força dos justos",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "você aumenta uma categoria de tamanho, recebe +4 na Força e redução de dano 5/mágica.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "infligir_ferimentos_leves_em_massa",
+      "nome": "Infligir ferimentos leves em massa",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "causa 1d8+9 pontos de dano em até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_v_div",
+      "nome": "Invocar monstro V",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Grande sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lama_em_pedra_div",
+      "nome": "Lama em pedra",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "transforma lama, barro ou areia movediça em pedra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "marca_da_justica",
+      "nome": "Marca da justiça",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "inscreve uma marca na pele do alvo, que lhe penaliza se ele realizar determinada ação.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "matar",
+      "nome": "Matar",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "alvo tocado é reduzido a –10 pontos de vida.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_espinhos",
+      "nome": "Muralha de espinhos",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "cria uma barreira de arbustos afiados que causa 2d8 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_fogo_div",
+      "nome": "Muralha de fogo",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "cria uma cortina de chamas que causa 4d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "muralha_de_pedra_div",
+      "nome": "Muralha de pedra",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "cria uma muralha de pedra unida às superfícies próximas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "palavra_de_recordacao",
+      "nome": "Palavra de recordação",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "teletransporta você e até cinco criaturas para um santuário.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pedra_em_lama_div",
+      "nome": "Pedra em lama",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "transforma pedra e rocha em lama.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "pele_rochosa_div",
+      "nome": "Pele rochosa",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "fornece redução de dano 10/adamante.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "penitencia",
+      "nome": "Penitência",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "redime o alvo de seus erros.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "praga_de_insetos",
+      "nome": "Praga de insetos",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "enxame de insetos causa 4d6 pontos de dano por turno.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "proibicao",
+      "nome": "Proibição",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "impede viagens planares na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "remover_encantamento_div",
+      "nome": "Remover encantamento",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "remove todos os encantamentos afetando o alvo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "repelir_madeira",
+      "nome": "Repelir madeira",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "linha de 18m move todos objetos de madeira até o limite do alcance.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "resistencia_a_magia_div",
+      "nome": "Resistência a magia",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "fornece +4 nos testes de resistência contra magia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "reviver_os_mortos",
+      "nome": "Reviver os mortos",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "revive uma criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "santificar",
+      "nome": "Santificar",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "transforma área em local sagrado, gerando vários efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_dor_div",
+      "nome": "Símbolo da dor",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "runa mágica causa dores terríveis quando ativada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_do_sono_div",
+      "nome": "Símbolo do sono",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "como símbolo da dor, mas as criaturas adormecem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "viagem_planar_div",
+      "nome": "Viagem planar",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "transporta até cinco criaturas para outro plano de existência.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "videncia_div",
+      "nome": "Vidência",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "você pode ver e ouvir uma criatura à distância.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "visao_da_verdade_div",
+      "nome": "Visão da verdade",
+      "circulo": 5,
+      "tipo": "divina",
+      "descricao_curta": "revela a forma real das coisas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "agilidade_do_gato_em_massa_div",
+      "nome": "Agilidade do gato em massa",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "como agilidade do gato, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aliado_extraplanar",
+      "nome": "Aliado extraplanar",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "invoca um espírito de até 12º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "animar_objetos_div",
+      "nome": "Animar objetos",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "concede vida a objetos inanimados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "banimento_div",
+      "nome": "Banimento",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "expulsa até cinco espíritos ou criaturas invocadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "banquete_de_herois",
+      "nome": "Banquete de heróis",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "cria banquete para 10 criaturas que cura e fornece diversos benefícios.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "barreira_de_laminas",
+      "nome": "Barreira de lâminas",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "barreira com 30m de lado e 6m de altura causa 10d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sementes_de_fogo",
+      "nome": "Sementes de fogo",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "seis bolotas causam total de 12d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_persuasao_div",
+      "nome": "Símbolo da persuasão",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "como símbolo da dor, mas as criaturas ficam enfeitiçadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_de_protecao_maior",
+      "nome": "Símbolo de proteção maior",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "como símbolo de proteção, mas com efeitos mais poderosos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_do_medo_div",
+      "nome": "Símbolo do medo",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "como símbolo da dor, mas as criaturas ficam apavoradas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "teletransporte_por_arvores",
+      "nome": "Teletransporte por árvores",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "você e até cinco criaturas entram em uma planta e saem em outra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "vigor_do_urso_em_massa_div",
+      "nome": "Vigor do urso em massa",
+      "circulo": 6,
+      "tipo": "divina",
+      "descricao_curta": "como vigor do urso, mas afeta até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "animar_plantas",
+      "nome": "Animar plantas",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "concede movimento a plantas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "blasfemia",
+      "nome": "Blasfêmia",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "criaturas não Malignas na área sofrem efeitos variados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "bordao_da_magia",
+      "nome": "Bordão da magia",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "armazena uma magia em um bordão de madeira para ser lançada mais tarde.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cajado_vivo",
+      "nome": "Cajado vivo",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "transforma um cajado em um ente.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "caminhar_no_vento",
+      "nome": "Caminhar no vento",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "até 5 criaturas são carregadas por um vento mágico.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "carvalho_vivo",
+      "nome": "Carvalho vivo",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "árvore vira ente e protege local.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "conto_das_rochas",
+      "nome": "Conto das rochas",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "converse com rochas naturais ou trabalhadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "controlar_o_clima_div",
+      "nome": "Controlar o clima",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "muda o clima da área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_mortos_vivos_div",
+      "nome": "Criar mortos-vivos",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como criar mortos-vivos menor, mas pode criar um carniçal, lívido ou múmia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cura_completa",
+      "nome": "Cura completa",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "recupera 100 pontos de vida do alvo, além de dano de habilidade e diversas condições.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "curar_ferimentos_graves_em_massa",
+      "nome": "Curar ferimentos graves em massa",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "recupera 3d8+13 pontos de vida de até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "curar_ferimentos_moderados_em_massa",
+      "nome": "Curar ferimentos moderados em massa",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "recupera 2d8+11 pontos de vida de até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cupula_de_protecao_contra_a_vida",
+      "nome": "Cúpula de proteção contra a vida",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como cúpula de proteção contra vegetais, mas impede animais, humanóides e monstros.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "destruir_mortos_vivos_div",
+      "nome": "Destruir mortos-vivos",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "destrói mortos-vivos criaturas totalizando 10d4 níveis.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "destruicao",
+      "nome": "Destruição",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "alvo tocado é consumido em chamas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "destruicao_rastejante",
+      "nome": "Destruição rastejante",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "invoca uma massa negra de insetos que causa 6d6 pontos de dano por rodada.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "dissipar_magia_maior_div",
+      "nome": "Dissipar magia maior",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como dissipar magia, mas com maior limite no teste de dissipar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ditado",
+      "nome": "Ditado",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "criaturas não Leais na área sofrem efeitos variados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "doenca_plena",
+      "nome": "Doença plena",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "alvo sofre 100 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "encontrar_o_caminho",
+      "nome": "Encontrar o caminho",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "alvo descobre o caminho mais direto para entrar ou sair de um lugar.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "esplendor_da_aguia_em_massa_div",
+      "nome": "Esplendor da águia em massa",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como esplendor da águia, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forca_do_touro_em_massa_div",
+      "nome": "Força do touro em massa",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como força do touro, mas afeta até cinco alvos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "infligir_ferimentos_graves_em_massa",
+      "nome": "Infligir ferimentos graves em massa",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "causa 3d8+13 pontos de dano em até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "infligir_ferimentos_moderados_em_massa",
+      "nome": "Infligir ferimentos moderados em massa",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "causa 2d8+11 pontos de dano em até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_vi_div",
+      "nome": "Invocar monstro VI",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Grande sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_vii_div",
+      "nome": "Invocar monstro VII",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Enorme sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "madeira_ferro",
+      "nome": "Madeira-ferro",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "item de madeira adquire resistência e peso do metal",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "metal_em_madeira",
+      "nome": "Metal em madeira",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "todos os objetos de metal na área se transformam em madeira.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "missao_div",
+      "nome": "Missão",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como missão menor, mas pode afetar uma criatura de qualquer nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "mover_terra",
+      "nome": "Mover terra",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "desloca terra para ajustar fossos, trincheiras, etc.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "palavra_do_caos",
+      "nome": "Palavra do caos",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "criaturas não Caóticas na área sofrem efeitos variados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "palavra_sagrada",
+      "nome": "Palavra sagrada",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "criaturas não Bondosas na área sofrem efeitos variados.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "passeio_etereo_div",
+      "nome": "Passeio etéreo",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "você é transportado para o Plano Etéreo.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "raio_de_sol",
+      "nome": "Raio de sol",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "raios causam 4d6 pontos de dano e cegueira.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "refugiar_itens",
+      "nome": "Refugiar itens",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "alvo fica invisível e indetectável por magias de adivinhação.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "refugio_div",
+      "nome": "Refúgio",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "objeto preparado transporta criatura lhe segurando para um lugar determinado.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "regeneracao",
+      "nome": "Regeneração",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "cura 4d8+13 pontos de dano e recupera partes arrancadas, ossos quebrados, etc.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "repulsao_div",
+      "nome": "Repulsão",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "campo de força impede criaturas de se aproximarem de você.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ressurreicao",
+      "nome": "Ressurreição",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como reviver os mortos, mas só precisa de uma parte do corpo da criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "restauracao_maior",
+      "nome": "Restauração maior",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como restauração, mas pode recuperar um nível perdido há até um ano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "sabedoria_da_coruja_em_massa_div",
+      "nome": "Sabedoria da coruja em massa",
+      "circulo": 7,
+      "tipo": "divina",
+      "descricao_curta": "como sabedoria da coruja, mas afeta até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aliado_extraplanar_maior",
+      "nome": "Aliado extraplanar maior",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "invoca um espírito de até 18º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aura_profana",
+      "nome": "Aura profana",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "alvos recebem +4 na CA e testes de resistência, entre outros efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "aura_sagrada",
+      "nome": "Aura sagrada",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "alvos recebem +4 na CA e testes de resistência, entre outros efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "campo_antimagia_div",
+      "nome": "Campo antimagia",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "barreira com 3m de raio anula todos efeitos mágicos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ciclone",
+      "nome": "Ciclone",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "ciclone com 3m de raio e 9m de altura avança erguendo tudo em seu caminho.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "criar_mortos_vivos_maior_div",
+      "nome": "Criar mortos-vivos maior",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como criar mortos-vivos menor, mas pode criar uma sombra, aparição ou espectro.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "cura_completa_em_massa",
+      "nome": "Cura completa em massa",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como cura completa, mas recupera 200 pontos de vida e afeta até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "curar_ferimentos_criticos_em_massa",
+      "nome": "Curar ferimentos críticos em massa",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "recupera 4d8+15 pontos de vida de até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "discernir_localizacao_div",
+      "nome": "Discernir localização",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "descubra a localização de uma criatura ou objeto.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "drenar_energia_div",
+      "nome": "Drenar energia",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "alvo sofre 2d4 níveis negativos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escudo_da_ordem",
+      "nome": "Escudo da ordem",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "alvos recebem +4 na CA e testes de resistência, entre outros efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "explosao_solar",
+      "nome": "Explosão solar",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "explosão com 24m de raio causa 6d6 pontos de dano e cegueira; mortos-vivos e criaturas vulneráveis a luz solar sofrem 16d6.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forma_animal",
+      "nome": "Forma animal",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como metamorfose, mas transforma até cinco criaturas voluntárias em animais.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "forma_eterea_div",
+      "nome": "Forma etérea",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como passeio etéreo, mas afeta até cinco criaturas voluntárias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "grupo_de_elementais",
+      "nome": "Grupo de elementais",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "invoca diversos elementais.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "homens_vegetais",
+      "nome": "Homens vegetais",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "cria 1d4+2 homens vegetais sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "implosao",
+      "nome": "Implosão",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "explosões destroem corpo de criaturas por dentro.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "imunidade_a_magia_maior",
+      "nome": "Imunidade a magia maior",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como imunidade a magia, mas as magias podem ser de até 8º nível.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "infligir_ferimentos_criticos_em_massa",
+      "nome": "Infligir ferimentos críticos em massa",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "causa 4d8+15 pontos de dano em até cinco criaturas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_ix_div",
+      "nome": "Invocar monstro IX",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Descomunal sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "invocar_monstro_viii_div",
+      "nome": "Invocar monstro VIII",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "Invoca um monstro Enorme sob seu comando.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "lagrimas_de_wynna_div",
+      "nome": "Lágrimas de Wynna",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "alvo perde capacidade de lançar magias.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "manto_do_caos",
+      "nome": "Manto do caos",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "alvos recebem +4 na CA e testes de resistência, entre outros efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "milagre",
+      "nome": "Milagre",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "sua divindade intercede em seu favor.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "prender_a_alma_div",
+      "nome": "Prender a alma",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "captura a alma de uma criatura morta recentemente, impedindo ressurreição e similares.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "projecao_astral_div",
+      "nome": "Projeção astral",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "libera sua alma de seu corpo físico e a projeta no Plano Astral.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "repelir_metal_ou_pedra",
+      "nome": "Repelir metal ou pedra",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como repelir madeira, mas afeta objetos de metal ou pedra.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "resistencia_a_magia_maior_div",
+      "nome": "Resistência a magia maior",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "fornece +8 nos testes de resistência contra magia.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "ressurreicao_verdadeira",
+      "nome": "Ressurreição verdadeira",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como reviver os mortos, mas não precisa de nenhuma parte do corpo da criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simpatia_div",
+      "nome": "Simpatia",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "alvo atrai um tipo de criatura à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_insanidade_div",
+      "nome": "Símbolo da insanidade",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como símbolo da dor, mas as criaturas ficam insanas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_morte_div",
+      "nome": "Símbolo da morte",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "como símbolo da dor, mas as criaturas morrem.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tempestade_da_vinganca",
+      "nome": "Tempestade da vingança",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "nuvem de tempestade causa vários efeitos.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tempestade_de_fogo",
+      "nome": "Tempestade de fogo",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "jatos de chama causam 16d6 pontos de dano.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "terremoto",
+      "nome": "Terremoto",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "tremor rasga o solo, com efeitos que variam de acordo com o terreno.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "tranca_dimensional_div",
+      "nome": "Tranca dimensional",
+      "circulo": 8,
+      "tipo": "divina",
+      "descricao_curta": "impede viagens planares na área.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "alterar_forma_div",
+      "nome": "Alterar forma",
+      "circulo": 9,
+      "tipo": "divina",
+      "descricao_curta": "você assume a forma de qualquer criatura.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "antipatia_div",
+      "nome": "Antipatia",
+      "circulo": 9,
+      "tipo": "divina",
+      "descricao_curta": "alvo ou área repele um tipo de criatura à sua escolha.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "buraco_negro",
+      "nome": "Buraco negro",
+      "circulo": 9,
+      "tipo": "divina",
+      "descricao_curta": "buraco negro dura três rodadas e suga tudo em seu redor.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "contra_ataque_mental_div",
+      "nome": "Contra-ataque mental",
+      "circulo": 9,
+      "tipo": "divina",
+      "descricao_curta": "como limpar a mente, mas causa dano em quem tentar usar um efeito mental.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "escudo_da_fe",
+      "nome": "Escudo da fé",
+      "circulo": 9,
+      "tipo": "divina",
+      "descricao_curta": "alvo recebe +2 na CA.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_da_fraqueza_div",
+      "nome": "Símbolo da fraqueza",
+      "circulo": 9,
+      "tipo": "divina",
+      "descricao_curta": "como símbolo da dor, mas as criaturas na área sofrem 3d6 de dano de Força.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "simbolo_do_atordoamento_div",
+      "nome": "Símbolo do atordoamento",
+      "circulo": 9,
+      "tipo": "divina",
+      "descricao_curta": "como símbolo da dor, mas as criaturas na área ficam atordoadas.",
+      "pagina_referencia": "MB 307–317"
+    },
+    {
+      "slug": "videncia_maior_div",
+      "nome": "Vidência maior",
+      "circulo": 9,
+      "tipo": "divina",
+      "descricao_curta": "como vidência, mas dura mais e permite lançar magias.",
+      "pagina_referencia": "MB 307–317"
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard D&amp;D 5e — Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/layout.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=22" />
+    <link rel="stylesheet" href="/games/dnd35/css/combatentes.css?v=20260401a" />
+    <link rel="stylesheet" href="../css/dnd5e-dashboard.css?v=3" />
+    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=5" />
+</head>
+<body data-game="dnd5e">
+
+<header class="dashboard-header dnd5e-dash-header">
+    <div class="header-nav">
+        <div class="header-titulo">
+            <h1>🛡️ D&amp;D 5e — Arena</h1>
+            <p>Personagens, catálogos PHB e ficha simplificada.</p>
+        </div>
+        <div class="header-usuario-container">
+            <div class="header-usuario">
+                <span id="nomeUsuario" class="usuario-nome">…</span>
+                <span class="badge-jogo-dnd5e">D&amp;D 5e</span>
+                <button type="button" class="btn-logout" id="btnTrocarJogo" title="Voltar ao seletor de jogo">🎲 Trocar jogo</button>
+                <button type="button" class="btn-logout" id="btnLogout">Sair</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="dnd5e-dash-body">
+
+    <section class="dnd5e-dash-card" id="secCatalogos">
+        <h2 class="dnd5e-dash-card-title">Catálogos (API)</h2>
+        <ul class="dnd5e-catalogo-resumo" id="catalogoResumo">
+            <li><span>Carregando…</span></li>
+        </ul>
+    </section>
+
+    <section class="dnd5e-dash-card">
+        <h2 class="dnd5e-dash-card-title">Personagens</h2>
+        <div class="dnd5e-dash-toolbar">
+            <button type="button" class="dnd5e-btn-novo" id="btnNovoJogador">+ Jogador</button>
+            <button type="button" class="dnd5e-btn-novo dnd5e-btn-mestre" id="btnNovoMonstro" hidden>+ Monstro</button>
+            <button type="button" class="dnd5e-btn-novo dnd5e-btn-mestre" id="btnNovoNpc" hidden>+ NPC</button>
+            <a class="dnd5e-btn-novo dnd5e-btn-ghost-link" href="arena.html">⚔️ Arena</a>
+            <label class="filter-chip">
+                <input type="checkbox" id="chkMeus" checked />
+                Só meus
+            </label>
+            <div class="dnd5e-dash-filters" id="dashFiltrosTipo">
+                <button type="button" class="dnd5e-filter-btn active" data-tipo="">Todos</button>
+                <button type="button" class="dnd5e-filter-btn" data-tipo="jogador">Jogadores</button>
+                <button type="button" class="dnd5e-filter-btn dnd5e-filter-mestre" data-tipo="monstro" hidden>Monstros</button>
+                <button type="button" class="dnd5e-filter-btn dnd5e-filter-mestre" data-tipo="npc" hidden>NPCs</button>
+            </div>
+        </div>
+        <div class="tabela-wrapper">
+            <table class="tabela-combatentes dnd5e-tabela-personagens">
+                <thead>
+                    <tr>
+                        <th class="col-foto">Foto</th>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Nível</th>
+                        <th>FOR</th>
+                        <th>DES</th>
+                        <th>CON</th>
+                        <th>PV</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tblPersonagens">
+                    <tr><td colspan="9" class="cell-muted">Carregando…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<div id="modalPrecadastro" class="dash-modal-overlay">
+    <div class="dash-modal-box dnd5e-prec-modal-box">
+        <div class="dash-modal-header">
+            <h2 id="precadastroTitulo">🧙 Novo jogador</h2>
+            <button type="button" class="dash-modal-close" id="btnFecharPrecadastro" aria-label="Fechar">×</button>
+        </div>
+        <div class="dash-modal-body">
+            <form id="formPrecadastro" class="ficha-dnd5e-edit">
+                <section class="dnd5e-prec-sec">
+                    <h3 class="dnd5e-prec-sec-titulo">Identidade</h3>
+                    <div class="dnd5e-prec-grid">
+                        <div class="span-2">
+                            <label class="ficha-label" for="prec_nome">Nome do personagem</label>
+                            <input id="prec_nome" type="text" required autocomplete="off" placeholder="Ex.: Aragorn" />
+                        </div>
+                        <div>
+                            <label class="ficha-label" for="prec_jogador">Jogador</label>
+                            <input id="prec_jogador" type="text" readonly tabindex="-1" />
+                        </div>
+                        <div>
+                            <label class="ficha-label" for="prec_nivel">Nível</label>
+                            <input id="prec_nivel" type="number" min="1" max="20" value="1" />
+                        </div>
+                        <div>
+                            <label class="ficha-label" for="prec_raca">Raça</label>
+                            <select id="prec_raca" required></select>
+                        </div>
+                        <div>
+                            <label class="ficha-label" for="prec_classe">Classe</label>
+                            <select id="prec_classe" required></select>
+                        </div>
+                        <div>
+                            <label class="ficha-label" for="prec_antecedente">Antecedente</label>
+                            <select id="prec_antecedente"></select>
+                        </div>
+                        <div id="prec_subclasse_wrap" hidden>
+                            <label class="ficha-label" for="prec_subclasse">Subclasse</label>
+                            <select id="prec_subclasse"><option value="">—</option></select>
+                        </div>
+                        <div>
+                            <label class="ficha-label" for="prec_xp">Experiência</label>
+                            <input id="prec_xp" type="number" min="0" value="0" />
+                        </div>
+                    </div>
+                    <p id="prec_tracos" class="ficha-dnd5e-tracos" hidden></p>
+                    <div id="prec_raca_extra" class="ficha-dnd5e-raca-extra dnd5e-prec-grid">
+                        <div>
+                            <label class="ficha-label" for="prec_extra1">+1 (meio-elfo)</label>
+                            <select id="prec_extra1"></select>
+                        </div>
+                        <div>
+                            <label class="ficha-label" for="prec_extra2">+1 (meio-elfo)</label>
+                            <select id="prec_extra2"></select>
+                        </div>
+                        <div id="prec_pericia_racial_wrap" hidden>
+                            <label class="ficha-label" for="prec_pericia_racial">Perícia extra (raça)</label>
+                            <select id="prec_pericia_racial"></select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dnd5e-prec-sec">
+                    <h3 class="dnd5e-prec-sec-titulo">⚔️ Atributos</h3>
+                    <div class="dnd5e-prec-atributos-toolbar">
+                        <button type="button" class="ficha-btn-adicionar" id="btnPrecMatriz">Matriz PHB</button>
+                        <span id="prec_preview_resumo" class="dnd5e-prec-preview-resumo"></span>
+                    </div>
+                    <div id="prec_abilities_circles" class="dnd5e-prec-atributos-host"></div>
+                </section>
+
+                <section class="dnd5e-prec-sec">
+                    <h3 class="dnd5e-prec-sec-titulo">🎒 Equipamento &amp; CA</h3>
+                    <div class="dnd5e-prec-grid">
+                        <div>
+                            <label class="ficha-label" for="prec_armadura">Armadura</label>
+                            <select id="prec_armadura"><option value="">Sem armadura</option></select>
+                        </div>
+                        <div>
+                            <label class="ficha-label" for="prec_escudo">Escudo</label>
+                            <select id="prec_escudo"><option value="">Nenhum</option></select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dnd5e-prec-sec">
+                    <h3 class="dnd5e-prec-sec-titulo">Perícias de classe</h3>
+                    <p class="ficha-dnd5e-status" id="prec_pericias_classe_hint"></p>
+                    <div id="prec_pericias_escolha" class="dnd5e-prec-pericias-host"></div>
+                </section>
+
+                <div class="dash-modal-actions">
+                    <button type="button" class="btn-dash-cancel" id="btnCancelarPrecadastro">Cancelar</button>
+                    <button type="submit" class="btn-dash-save" id="btnPrecadastroSalvar">✅ Cadastrar e abrir ficha</button>
+                    <span class="ficha-dnd5e-status" id="prec_status"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/shared/render-api-origin-boot.js?v=2"></script>
+<script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
+<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/ui/Toast.js"></script>
+<script>
+    if (!AuthService.exigirJogo('dnd5e')) {}
+</script>
+<script src="../js/services/Dnd5ePersonagemService.js?v=3"></script>
+<script src="../js/services/Dnd5eRegrasService.js?v=3"></script>
+<script src="../js/ui/Dnd5ePreCadastroModal.js?v=3"></script>
+<script>
+(function () {
+    const ps = new Dnd5ePersonagemService();
+    const rs = new Dnd5eRegrasService();
+    let filtroTipo = '';
+    const ehMestre = () =>
+        typeof AuthService.isMestre === 'function' && AuthService.isMestre();
+
+    document.getElementById('btnTrocarJogo').addEventListener('click', () => {
+        window.location.href = '/pages/selecionar-jogo.html';
+    });
+    document.getElementById('btnLogout').addEventListener('click', () => {
+        if (AuthService.logout) AuthService.logout();
+    });
+    AuthService.configurarHeaderUsuario();
+
+    function configurarUiMestre() {
+        const mestre = ehMestre();
+        document.querySelectorAll('.dnd5e-btn-mestre, .dnd5e-filter-mestre').forEach((el) => {
+            el.hidden = !mestre;
+        });
+        const chk = document.getElementById('chkMeus');
+        if (mestre && chk) {
+            chk.checked = false;
+            chk.closest('.filter-chip')?.setAttribute('title', 'Desmarque para ver fichas de todos os jogadores');
+        }
+    }
+
+    document.querySelectorAll('#dashFiltrosTipo .dnd5e-filter-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#dashFiltrosTipo .dnd5e-filter-btn').forEach((b) => {
+                b.classList.remove('active');
+            });
+            btn.classList.add('active');
+            filtroTipo = btn.dataset.tipo || '';
+            carregarPersonagens();
+        });
+    });
+
+    async function carregarCatalogos() {
+        const el = document.getElementById('catalogoResumo');
+        try {
+            const [racas, classes, magias, talentos, ant] = await Promise.all([
+                rs.racas(),
+                rs.classes(),
+                rs.magias(),
+                rs.talentos(),
+                rs.antecedentes(),
+            ]);
+            el.innerHTML = `
+                <li><strong>${racas.racas.length}</strong> raças</li>
+                <li><strong>${classes.classes.length}</strong> classes</li>
+                <li><strong>${magias.total}</strong> magias</li>
+                <li><strong>${talentos.total}</strong> talentos</li>
+                <li><strong>${ant.total}</strong> antecedentes</li>
+            `;
+        } catch (e) {
+            el.innerHTML = `<li class="cell-muted">${e.message || 'Erro nos catálogos'}</li>`;
+        }
+    }
+
+    function emojiTipo(tipo) {
+        const map = { jogador: '🧙', monstro: '👹', npc: '🤝' };
+        return map[tipo] || '⚔️';
+    }
+
+    function celulaFoto(p) {
+        if (p.foto_url) {
+            return `<div class="dnd5e-dash-thumb"><img src="${escapeHtml(p.foto_url)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='${emojiTipo(p.tipo)}'"/></div>`;
+        }
+        return `<div class="dnd5e-dash-thumb">${emojiTipo(p.tipo)}</div>`;
+    }
+
+    function badgeTipo(tipo) {
+        const t = (tipo || 'jogador').toLowerCase();
+        return `<span class="dnd5e-badge-tipo dnd5e-badge-tipo--${t}">${escapeHtml(t)}</span>`;
+    }
+
+    async function carregarPersonagens() {
+        const tbody = document.getElementById('tblPersonagens');
+        const meus = document.getElementById('chkMeus').checked;
+        const params = { meus: meus || undefined };
+        if (filtroTipo) params.tipo = filtroTipo;
+        try {
+            const lista = await ps.listar(params);
+            if (!lista.length) {
+                tbody.innerHTML =
+                    '<tr><td colspan="9" class="cell-muted">Nenhum personagem neste filtro.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = lista
+                .map((p) => {
+                    const classe =
+                        p.ficha && p.ficha.classe_slug ? p.ficha.classe_slug : '—';
+                    return `
+                <tr>
+                    <td>${celulaFoto(p)}</td>
+                    <td>${escapeHtml(p.nome)}</td>
+                    <td>${badgeTipo(p.tipo)}</td>
+                    <td>${p.nivel} <span class="cell-muted">(${escapeHtml(classe)})</span></td>
+                    <td>${p.strength} (${fmtMod(p.strength_mod)})</td>
+                    <td>${p.dexterity} (${fmtMod(p.dexterity_mod)})</td>
+                    <td>${p.constitution} (${fmtMod(p.constitution_mod)})</td>
+                    <td>${p.hp_atual ?? p.hp_max} / ${p.hp_max}</td>
+                    <td><a href="ficha-personagem.html?id=${p.id}">Editar</a></td>
+                </tr>`;
+                })
+                .join('');
+        } catch (e) {
+            tbody.innerHTML = `<tr><td colspan="9" class="cell-muted">${escapeHtml(e.message)}</td></tr>`;
+            if (typeof Toast !== 'undefined') Toast.error(e.message);
+        }
+    }
+
+    function fmtMod(v) {
+        const n = Number(v);
+        if (!Number.isFinite(n)) return '—';
+        return n >= 0 ? `+${n}` : String(n);
+    }
+
+    function escapeHtml(s) {
+        return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('chkMeus').addEventListener('change', carregarPersonagens);
+
+    configurarUiMestre();
+    carregarCatalogos();
+    carregarPersonagens();
+
+    const preCadastro = new Dnd5ePreCadastroModal();
+    preCadastro.init();
+})();
+</script>
+</body>
+</html>

@@ -192,7 +192,6 @@ def _linha_slots_clerigo(
 
 
 class CombatenteService:
-
     def __init__(
         self,
         repository: CombatenteRepositoryProtocol,
