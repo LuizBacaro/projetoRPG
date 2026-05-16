@@ -182,12 +182,16 @@
                 ? `Escolha até ${qtd} perícia(s) de classe.`
                 : 'Esta classe não exige escolha de perícias no nível 1.';
         const escolhidas = new Set(getPericiasClasseEscolhidas());
+        const selAtual = getPericiasClasseEscolhidas();
+        const noLimite = qtd > 0 && selAtual.length >= qtd;
         host.innerHTML = pool
             .map((slug) => {
                 const checked = escolhidas.has(slug) ? 'checked' : '';
+                const disabled =
+                    qtd > 0 && noLimite && !escolhidas.has(slug) ? 'disabled' : '';
                 return `<label class="ficha-dnd5e-pericia-opt">
-                    <input type="checkbox" value="${slug}" ${checked} />
-                    ${periciaNome(slug)}
+                    <input type="checkbox" value="${slug}" ${checked} ${disabled} />
+                    <span>${periciaNome(slug)}</span>
                 </label>`;
             })
             .join('');
@@ -199,6 +203,7 @@
                     Toast.error(`Máximo ${qtd} perícia(s) de classe.`);
                     return;
                 }
+                renderPericiasEscolha();
                 agendarPreview();
             });
         });

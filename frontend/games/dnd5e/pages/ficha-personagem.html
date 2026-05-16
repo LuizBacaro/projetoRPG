@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/modais.css" />
     <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=18" />
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
-    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=3" />
+    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=5" />
 </head>
 <body data-game="dnd5e" class="ficha-dnd5e-edit">
 
@@ -139,10 +139,6 @@
                 <div id="f5e_salvamentos" class="ficha-resistencias-row"></div>
             </div>
 
-            <div class="ficha-secao">
-                <h3 class="ficha-secao-titulo">📋 Perícias</h3>
-                <div id="f5e_pericias_grade" class="ficha-dnd5e-pericias-grade"></div>
-            </div>
         </section>
 
         <aside class="ficha-coluna-direita">
@@ -181,10 +177,16 @@
                 </div>
             </div>
 
-            <div class="ficha-secao">
+            <div class="ficha-secao ficha-dnd5e-secao-pericias">
                 <h3 class="ficha-secao-titulo">Perícias de classe</h3>
-                <p class="ficha-dnd5e-status" id="f5e_pericias_classe_hint"></p>
+                <p class="ficha-dnd5e-status ficha-dnd5e-pericias-hint" id="f5e_pericias_classe_hint"></p>
                 <div id="f5e_pericias_escolha" class="ficha-dnd5e-pericias-escolha"></div>
+            </div>
+
+            <div class="ficha-secao ficha-dnd5e-secao-pericias-todas">
+                <h3 class="ficha-secao-titulo">📋 Perícias</h3>
+                <p class="ficha-dnd5e-pericias-grade-legenda">Bônus totais · destaque = proficiente</p>
+                <div id="f5e_pericias_grade" class="ficha-dnd5e-pericias-grade"></div>
             </div>
 
             <div class="ficha-secao span-2">

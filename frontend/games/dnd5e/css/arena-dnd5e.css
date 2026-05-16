@@ -1,5 +1,18 @@
 /* D&D 5e — ajustes sobre arena.css / combatentes.css (dnd35) */
 
+#combatenteAtivoContainer {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#combatenteAtivoContainer .arena-card {
+    flex: 1;
+    min-height: 0;
+}
+
 .dnd5e-arena-config-hint {
     color: #94a3b8;
     font-size: 0.85rem;
@@ -22,10 +35,48 @@
     font-size: 0.75rem;
 }
 
+.dnd5e-arena-col-central {
+    justify-content: flex-start;
+}
+
+.dnd5e-arena-pv-rapido {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.5rem;
+    background: rgba(15, 23, 41, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 0.65rem;
+}
+
+.dnd5e-arena-pv-input {
+    width: 4.5rem;
+    padding: 0.35rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid var(--borda-sutil);
+    background: var(--bg-principal);
+    color: var(--texto-principal);
+    font-size: 0.82rem;
+}
+
+.dnd5e-arena-pv-btn {
+    flex: 1;
+    min-width: 5.5rem;
+}
+
+.dnd5e-btn-condicao-card {
+    width: 100%;
+    margin-top: 0.35rem;
+    font-size: 0.62rem;
+}
+
 .dnd5e-arena-tools-details {
-    margin-top: 0.75rem;
+    flex-shrink: 0;
+    margin-top: 0.5rem;
     padding: 0.65rem 0.85rem;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(15, 23, 41, 0.75);
+    border: 1px solid var(--borda-sutil);
     border-radius: 8px;
     color: #dbe7ff;
 }
@@ -33,6 +84,7 @@
 .dnd5e-arena-tools-details summary {
     cursor: pointer;
     font-weight: 600;
+    font-size: 0.78rem;
     margin-bottom: 0.5rem;
 }
 
@@ -62,32 +114,26 @@
     gap: 0.25rem;
 }
 
-.dnd5e-arena-stat-line {
-    font-size: 0.85rem;
-    margin: 0.35rem 0 0;
-    opacity: 0.9;
-}
-
-.dnd5e-cond-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    margin-bottom: 0.5rem;
-}
-
-.badge-condicao-arena,
 .badge-condicao-mini {
-    font-size: 0.72rem;
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
+    font-size: 0.52rem;
+    padding: 0.08rem 0.18rem;
+    border-radius: 3px;
     background: rgba(124, 58, 237, 0.25);
     border: 1px solid rgba(167, 139, 250, 0.4);
-}
-
-.dnd5e-cond-badges-wrap {
-    min-height: 1.5rem;
+    color: #e2e8f0;
 }
 
 .filter-btn-mestre[hidden] {
     display: none !important;
+}
+
+@media (max-width: 900px) {
+    .dnd5e-arena-pv-rapido {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dnd5e-arena-pv-input {
+        width: 100%;
+    }
 }

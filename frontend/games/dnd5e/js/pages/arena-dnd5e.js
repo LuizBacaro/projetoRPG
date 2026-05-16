@@ -66,7 +66,6 @@ class Dnd5eArenaController {
             this.modalCondicao?.abrir(this.combatenteAtual()?.id)
         );
         this.el('btnSyncPv')?.addEventListener('click', () => this.syncFichasArena());
-        this.el('btnProximoTurno')?.addEventListener('click', () => this.proximoTurno());
         this.el('btnFecharModalDanoCuraTopo')?.addEventListener('click', () => this.fecharModalDanoCura());
         this.el('btnCancelarModalDanoCura')?.addEventListener('click', () => this.fecharModalDanoCura());
         this.el('btnAplicarModalDanoCura')?.addEventListener('click', () => this.aplicarModalDanoCura());
@@ -462,7 +461,8 @@ class Dnd5eArenaController {
             this.catalogoCondicoes,
             (id, v) => this.aplicarDano(id, v),
             (id, v) => this.aplicarCura(id, v),
-            (id) => this.modalCondicao?.abrir(id)
+            (id) => this.modalCondicao?.abrir(id),
+            () => this.proximoTurno()
         );
         this.atualizarSelectAlvos();
     }

@@ -307,39 +307,7 @@ body.ficha-dnd5e-body {
     line-height: 1.5;
 }
 
-.ficha-dnd5e-pericias-escolha {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-}
-
-.ficha-dnd5e-pericia-opt {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.88rem;
-}
-
-.ficha-dnd5e-pericias-grade {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.35rem 0.75rem;
-    margin-top: 0.75rem;
-}
-
-.ficha-dnd5e-pericia-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.25rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.82rem;
-    background: rgba(0, 0, 0, 0.15);
-}
-
-.ficha-dnd5e-pericia-row.is-prof {
-    border-left: 2px solid var(--dnd5e-accent-strong);
-}
+/* Perícias — ver ficha-dnd5e-parity.css (fonte na ficha web) */
 
 .ficha-dnd5e-saves {
     display: flex;
