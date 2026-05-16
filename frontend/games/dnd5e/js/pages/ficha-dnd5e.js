@@ -460,6 +460,13 @@
         debounceTimer = setTimeout(rodarPreview, 280);
     }
 
+    function aplicarAtributosNeutros() {
+        ABILITIES.forEach((a) => {
+            el(`base_${a.key}`).value = '10';
+        });
+        agendarPreview();
+    }
+
     function aplicarMatrizPadrao() {
         ABILITIES.forEach((a, i) => {
             el(`base_${a.key}`).value = String(MATRIZ_PADRAO[i]);
@@ -791,7 +798,7 @@
                 carregarPersonagem(p);
                 aplicarModoPreCadastroFixo();
             } else {
-                aplicarMatrizPadrao();
+                aplicarAtributosNeutros();
                 renderCondicoesFicha();
                 Toast.error('Use o dashboard (+ Jogador) para o pré-cadastro.');
                 setTimeout(() => {
