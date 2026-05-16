@@ -48,9 +48,7 @@ class Dnd5ePersonagemService:
             raise DadosInvalidos("tipo deve ser jogador, monstro ou npc")
 
     @staticmethod
-    def _normalizar_ficha_entrada(
-        ficha: dict, *, nivel: int
-    ) -> dict:
+    def _normalizar_ficha_entrada(ficha: dict, *, nivel: int) -> dict:
         if not ficha:
             return {}
         try:

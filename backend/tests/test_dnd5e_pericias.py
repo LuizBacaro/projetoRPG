@@ -45,10 +45,17 @@ def test_antecedente_soldado_mais_classe():
 
 
 def test_ca_com_armadura_e_escudo():
-    base = {k: 10 for k in (
-        "strength", "dexterity", "constitution",
-        "intelligence", "wisdom", "charisma",
-    )}
+    base = {
+        k: 10
+        for k in (
+            "strength",
+            "dexterity",
+            "constitution",
+            "intelligence",
+            "wisdom",
+            "charisma",
+        )
+    }
     base["dexterity"] = 14
     resumo = montar_resumo_ficha(
         raca_slug="humano",
@@ -63,10 +70,17 @@ def test_ca_com_armadura_e_escudo():
 
 
 def test_escolha_classe_invalida():
-    base = {k: 10 for k in (
-        "strength", "dexterity", "constitution",
-        "intelligence", "wisdom", "charisma",
-    )}
+    base = {
+        k: 10
+        for k in (
+            "strength",
+            "dexterity",
+            "constitution",
+            "intelligence",
+            "wisdom",
+            "charisma",
+        )
+    }
     with pytest.raises(ValueError, match="não é opção válida"):
         montar_resumo_ficha(
             raca_slug="elfo",

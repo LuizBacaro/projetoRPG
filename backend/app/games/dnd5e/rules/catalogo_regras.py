@@ -17,7 +17,10 @@ from app.games.dnd5e.data.spell_slots_full_caster import (
 )
 from app.games.dnd5e.rules.antecedentes import listar_antecedentes
 from app.games.dnd5e.rules.combate import CONDICOES_NOMES, CONDICOES_PADRAO
-from app.games.dnd5e.rules.talentos import listar_feats_por_categoria, niveis_com_ganho_feat
+from app.games.dnd5e.rules.talentos import (
+    listar_feats_por_categoria,
+    niveis_com_ganho_feat,
+)
 
 
 def metadados_combate() -> Dict[str, Any]:
@@ -32,7 +35,20 @@ def metadados_combate() -> Dict[str, Any]:
         "critico_em": 20,
         "rodada_segundos": 6,
         "condicoes": condicoes,
-        "tipos_dano": ["corte", "perfuracao", "impacto", "fogo", "frio", "raio", "acido", "trovao", "necrotico", "radiante", "psiquico", "forca"],
+        "tipos_dano": [
+            "corte",
+            "perfuracao",
+            "impacto",
+            "fogo",
+            "frio",
+            "raio",
+            "acido",
+            "trovao",
+            "necrotico",
+            "radiante",
+            "psiquico",
+            "forca",
+        ],
         "acoes_turno": ["acao", "movimento", "reacao", "acao_bonus"],
         "salvamentos_morte": {
             "sucessos_para_estabilizar": 3,

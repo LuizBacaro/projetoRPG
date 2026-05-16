@@ -79,7 +79,9 @@ def normalizar_condicoes_ficha(raw: Any) -> List[Dict[str, Any]]:
     return [por_slug[s].para_dict() for s in sorted(por_slug)]
 
 
-def condicoes_ficha_de_resposta(ficha: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def condicoes_ficha_de_resposta(
+    ficha: Optional[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
     if not ficha:
         return []
     return normalizar_condicoes_ficha(ficha.get(CHAVE_FICHA_ARENA_CONDICOES))
@@ -128,7 +130,10 @@ def sincronizar_condicoes_por_hp(
     hp = max(0, int(hp_atual))
     manual_e_outras: List[Dict[str, Any]] = []
     for row in normalizar_condicoes_ficha(list(condicoes)):
-        if row.get("slug") == SLUG_INCONSCIENTE and row.get("origem") == ORIGEM_CONDICAO_HP:
+        if (
+            row.get("slug") == SLUG_INCONSCIENTE
+            and row.get("origem") == ORIGEM_CONDICAO_HP
+        ):
             continue
         manual_e_outras.append(row)
     if hp <= 0:

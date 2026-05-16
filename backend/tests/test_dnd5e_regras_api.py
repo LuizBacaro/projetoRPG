@@ -78,7 +78,9 @@ def test_get_regras_magias(client_regras_dnd5e):
     assert r.status_code == 200
     body = r.json()
     assert body["total"] >= 1
-    assert "conjuracao" in body and "habilidade_primaria_por_classe" in body["conjuracao"]
+    assert (
+        "conjuracao" in body and "habilidade_primaria_por_classe" in body["conjuracao"]
+    )
     assert r.headers.get("X-Total-Count") == str(body["total"])
 
 

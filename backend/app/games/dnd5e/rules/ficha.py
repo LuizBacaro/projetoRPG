@@ -93,7 +93,9 @@ def hp_max_nivel_1(classe_slug: str, constitution_mod: int) -> int:
     return max(1, faces + constitution_mod)
 
 
-def _montar_antecedente_resumo(antecedente_slug: Optional[str]) -> Optional[Dict[str, Any]]:
+def _montar_antecedente_resumo(
+    antecedente_slug: Optional[str],
+) -> Optional[Dict[str, Any]]:
     if not antecedente_slug:
         return None
     ant = antecedente_do_catalogo(antecedente_slug)
@@ -164,9 +166,7 @@ def montar_resumo_ficha(
             "pericias_escolha_qtd": int(classe.get("pericias_escolha_qtd", 0)),
             "pericias_escolha_de": list(classe.get("pericias_escolha_de") or []),
         },
-        "subclasse": (
-            {"slug": sub["slug"], "nome": sub["nome"]} if sub else None
-        ),
+        "subclasse": ({"slug": sub["slug"], "nome": sub["nome"]} if sub else None),
         "antecedente": _montar_antecedente_resumo(antecedente_slug),
         "antecedente_slug": antecedente_slug,
         "scores_base": {k: int(scores_base.get(k, 10)) for k in CHAVES_HABILIDADE},

@@ -792,9 +792,7 @@ def requer_dono_ou_admin_dnd5e_personagem(
 ) -> Usuario:
     """Garante que o usuário é dono do personagem D&D 5e ou mestre/admin."""
     personagem = (
-        db.query(Dnd5ePersonagem)
-        .filter(Dnd5ePersonagem.id == personagem_id)
-        .first()
+        db.query(Dnd5ePersonagem).filter(Dnd5ePersonagem.id == personagem_id).first()
     )
     if not personagem:
         raise HTTPException(

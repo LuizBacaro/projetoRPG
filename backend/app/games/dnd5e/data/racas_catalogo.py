@@ -23,7 +23,11 @@ RACAS_CATALOGO: List[RacaDict] = [
         "velocidade_metros": 9,
         "bonus_habilidades": {"dexterity": 2},
         "tracos_resumo": "Visão no escuro 18 m; imunidade a sono mágico; vantagem contra encantamento.",
-        "caracteristicas": ["visao_escuro_18m", "imunidade_sono_magico", "vantagem_encantamento"],
+        "caracteristicas": [
+            "visao_escuro_18m",
+            "imunidade_sono_magico",
+            "vantagem_encantamento",
+        ],
     },
     {
         "slug": "halfling",
@@ -57,7 +61,11 @@ RACAS_CATALOGO: List[RacaDict] = [
         "velocidade_metros": 9,
         "bonus_habilidades": {"strength": 2, "charisma": 1},
         "tracos_resumo": "Ancestralidade dracônica; resistência 5 ao dano ancestral; sopro inalado (2d6).",
-        "caracteristicas": ["ancestralidade_draconica", "resistencia_dano_ancestral", "sopro_inalado"],
+        "caracteristicas": [
+            "ancestralidade_draconica",
+            "resistencia_dano_ancestral",
+            "sopro_inalado",
+        ],
     },
     {
         "slug": "gnomo",
@@ -76,7 +84,10 @@ RACAS_CATALOGO: List[RacaDict] = [
         "bonus_habilidades": {"charisma": 2},
         "escolhe_duas_mais1": True,
         "tracos_resumo": "Dois aumentos de habilidade extras (+1 cada); proficiência em perícia à escolha.",
-        "caracteristicas": ["dois_bonus_habilidade_extra", "proficiencia_pericia_extra"],
+        "caracteristicas": [
+            "dois_bonus_habilidade_extra",
+            "proficiencia_pericia_extra",
+        ],
     },
     {
         "slug": "meio_orc",

@@ -32,7 +32,10 @@ def test_normalizar_aceita_string_legado() -> None:
 
 def test_normalizar_dict_com_duracao() -> None:
     out = normalizar_condicoes_ficha(
-        [{"slug": "cego", "duracao_turnos": 2}, {"slug": "invalida", "duracao_turnos": 1}]
+        [
+            {"slug": "cego", "duracao_turnos": 2},
+            {"slug": "invalida", "duracao_turnos": 1},
+        ]
     )
     assert len(out) == 1
     assert out[0] == {"slug": "cego", "duracao_turnos": 2}

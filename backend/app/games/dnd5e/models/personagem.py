@@ -12,7 +12,9 @@ class Dnd5ePersonagem(Base):
             "tipo IN ('jogador', 'monstro', 'npc')",
             name="ck_dnd5e_personagens_tipo_valido",
         ),
-        CheckConstraint("nivel >= 1 AND nivel <= 20", name="ck_dnd5e_personagens_nivel"),
+        CheckConstraint(
+            "nivel >= 1 AND nivel <= 20", name="ck_dnd5e_personagens_nivel"
+        ),
         {"extend_existing": True},
     )
 

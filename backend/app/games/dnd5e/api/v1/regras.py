@@ -77,8 +77,7 @@ def obter_regras_atributos(
         Dnd5eHabilidadeMetaItem(**row) for row in lista_metadados_habilidades()
     ]
     tabela = [
-        Dnd5eBonusProficienciaItem(**row)
-        for row in lista_tabela_bonus_proficiencia()
+        Dnd5eBonusProficienciaItem(**row) for row in lista_tabela_bonus_proficiencia()
     ]
     return Dnd5eRegrasAtributosResponse(
         habilidade_min=HABILIDADE_MIN,
@@ -226,9 +225,7 @@ def obter_regras_antecedentes(
 def obter_regras_pericias(
     _: Usuario = Depends(get_usuario_atual),
 ) -> Dnd5eRegrasPericiasResponse:
-    pericias = [
-        Dnd5ePericiaCatalogoItem(**row) for row in listar_pericias_catalogo()
-    ]
+    pericias = [Dnd5ePericiaCatalogoItem(**row) for row in listar_pericias_catalogo()]
     return Dnd5eRegrasPericiasResponse(pericias=pericias)
 
 

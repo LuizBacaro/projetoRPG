@@ -110,8 +110,6 @@ def upload_foto(
         if ent.foto_url:
             file_service.deletar_arquivo(ent.foto_url)
         url = file_service.salvar_arquivo(foto)
-        return service.atualizar(
-            personagem_id, Dnd5ePersonagemUpdate(foto_url=url)
-        )
+        return service.atualizar(personagem_id, Dnd5ePersonagemUpdate(foto_url=url))
     except InvalidFileError as e:
         raise HTTPException(status_code=400, detail=e.message)

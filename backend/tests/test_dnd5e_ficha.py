@@ -19,10 +19,17 @@ from app.shared.core.deps import get_usuario_atual
 
 
 def test_elfo_dex_mais_2():
-    base = {k: 10 for k in (
-        "strength", "dexterity", "constitution",
-        "intelligence", "wisdom", "charisma",
-    )}
+    base = {
+        k: 10
+        for k in (
+            "strength",
+            "dexterity",
+            "constitution",
+            "intelligence",
+            "wisdom",
+            "charisma",
+        )
+    }
     base["dexterity"] = 14
     eff = calcular_atributos_efetivos(base, "elfo")
     assert eff["dexterity"] == 16
@@ -33,10 +40,17 @@ def test_guerreiro_hp_nivel_1_con_mais_2():
 
 
 def test_meio_elfo_bonus_extra():
-    base = {k: 10 for k in (
-        "strength", "dexterity", "constitution",
-        "intelligence", "wisdom", "charisma",
-    )}
+    base = {
+        k: 10
+        for k in (
+            "strength",
+            "dexterity",
+            "constitution",
+            "intelligence",
+            "wisdom",
+            "charisma",
+        )
+    }
     eff = calcular_atributos_efetivos(
         base,
         "meio_elfo",
@@ -83,10 +97,17 @@ def test_post_calcular_atributos(client_calc):
 
 
 def test_validar_ficha_exige_pericias_classe():
-    base = {k: 10 for k in (
-        "strength", "dexterity", "constitution",
-        "intelligence", "wisdom", "charisma",
-    )}
+    base = {
+        k: 10
+        for k in (
+            "strength",
+            "dexterity",
+            "constitution",
+            "intelligence",
+            "wisdom",
+            "charisma",
+        )
+    }
     ficha = {
         "raca_slug": "elfo",
         "classe_slug": "ladino",
@@ -98,10 +119,17 @@ def test_validar_ficha_exige_pericias_classe():
 
 
 def test_validar_ficha_enriquece_ca():
-    base = {k: 10 for k in (
-        "strength", "dexterity", "constitution",
-        "intelligence", "wisdom", "charisma",
-    )}
+    base = {
+        k: 10
+        for k in (
+            "strength",
+            "dexterity",
+            "constitution",
+            "intelligence",
+            "wisdom",
+            "charisma",
+        )
+    }
     base["dexterity"] = 14
     ficha = {
         "raca_slug": "elfo",

@@ -117,10 +117,17 @@ def test_jogador_lista_apenas_proprios(dnd5e_personagens_db):
 def test_criar_ficha_phb_sem_pericias_rejeita(dnd5e_personagens_db):
     SessionLocal, u1, _ = dnd5e_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
-    base = {k: 10 for k in (
-        "strength", "dexterity", "constitution",
-        "intelligence", "wisdom", "charisma",
-    )}
+    base = {
+        k: 10
+        for k in (
+            "strength",
+            "dexterity",
+            "constitution",
+            "intelligence",
+            "wisdom",
+            "charisma",
+        )
+    }
     r = client.post(
         "/api/v1/dnd5e/personagens",
         json=_payload_criar(
