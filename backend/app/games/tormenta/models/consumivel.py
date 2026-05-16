@@ -24,7 +24,7 @@ class TormentaConsumivel(Base):
     tipo = Column(String(80), nullable=True)
     custo = Column(String(80), nullable=True)
     peso = Column(String(80), nullable=True)
-    origem_catalogo_mb = Column(Boolean, nullable=False, default=False, server_default="0")
+    origem_catalogo_mb = Column(Boolean, nullable=False, default=False, server_default="false")
     criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     personagens = relationship(

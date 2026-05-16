@@ -28,7 +28,7 @@ def upgrade() -> None:
             "origem_catalogo_mb",
             sa.Boolean(),
             nullable=False,
-            server_default=sa.text("1"),
+            server_default=sa.text("true"),
         ),
         sa.Column("criado_em", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),

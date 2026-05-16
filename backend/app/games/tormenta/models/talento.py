@@ -23,7 +23,7 @@ class TormentaTalento(Base):
     nome = Column(String(200), nullable=False, index=True)
     descricao = Column(Text, nullable=True)
     pagina_referencia = Column(String(50), nullable=True)
-    origem_catalogo_mb = Column(Boolean, nullable=False, default=True, server_default="1")
+    origem_catalogo_mb = Column(Boolean, nullable=False, default=True, server_default="true")
 
     criado_em = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
