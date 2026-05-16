@@ -1,28 +1,38 @@
-# `backend/app/games/dnd5e/` — EM BREVE
+# `backend/app/games/dnd5e/` — D&D 5ª edição
 
-Backend do sistema **Dungeons & Dragons 5e**. Reservado.
+Motor de regras **5E** (PHB) isolado do pacote `dnd35` (3.5). Sem API persistida ainda — fase 1 = domínio puro em `rules/` + testes (ver camadas em [AGENTS.md](../../../AGENTS.md) e [docs/arquitetura-camadas-solid.md](../../../../docs/arquitetura-camadas-solid.md) §1–3).
 
-Status atual: **andaime visual**. Não há código de regras D&D 5e ainda;
-a pasta existe para deixar evidente, no repositório, que D&D 5e é um
-próximo sistema planejado e onde ele vai morar.
+## Estrutura
 
-## Quando começar a implementar
+```
+dnd5e/
+  rules/           Lógica de jogo (habilidades, combate, magia, feats, equipamento, antecedentes)
+  data/            Tabelas e catálogos (spell slots, feats, equipamento, antecedentes)
+  README.md
+```
 
-1. Marcar `dnd5e` como `disponivel` em `GAME_CATALOG_SEED`
-   (`backend/app/shared/startup/game_catalog.py`).
-2. Adicionar destino em `destinoPorSlug()` no
-   `frontend/pages/selecionar-jogo.html`.
-3. Criar guard `requer_game_dnd5e` em `backend/app/core/deps.py`
-   (espelho de `requer_game_dnd35`).
-4. Replicar a estrutura de `backend/app/games/dnd35/`:
-   - `api/v1/` — routers
-   - `core/` — deps específicos, parsers
-   - `models/`, `repositories/`, `schemas/`, `services/`, `seeds/`
-5. Aplicar `dependencies=[Depends(requer_game_dnd5e)]` em todos os
-   routers do pacote.
-6. Registrar os routers em `app/main.py`.
-7. Substituir a casca do frontend (`frontend/games/dnd5e/em-breve.html`)
-   pelas páginas reais do jogo.
+## Módulos implementados
 
-> Enquanto este pacote estiver vazio, o frontend mostra apenas a página
-> "D&D 5e — em breve" para qualquer usuário que selecione esse jogo.
+| RF | Módulo | Testes |
+|----|--------|--------|
+| 01-habilidades | `rules/habilidades.py` | `tests/test_dnd5e_habilidades.py` |
+| 04-combate | `rules/combate.py` | `tests/test_dnd5e_combate.py` |
+| 05-magia | `rules/magia.py` | `tests/test_dnd5e_magia.py` |
+| 06-talentos-feitos | `rules/talentos.py` | `tests/test_dnd5e_talentos.py` |
+| 07-equipamento | `rules/equipamento.py` | `tests/test_dnd5e_equipamento.py` |
+| 08-antecedentes | `rules/antecedentes.py` | `tests/test_dnd5e_antecedentes.py` |
+
+## Próximos passos (plataforma)
+
+1. `requer_game_dnd5e` + routers `api/v1/`
+2. Models SQLAlchemy + Alembic (`dnd5e_*`)
+3. `game_slug=dnd5e` disponível no catálogo
+4. Frontend `frontend/games/dnd5e/`
+
+Ver também [.cursor/requisitos/dnd5e/README.md](../../../.cursor/requisitos/dnd5e/README.md) e [AGENTS.md](../../../AGENTS.md).
+
+## Testes
+
+```bash
+cd backend && pytest tests/test_dnd5e_*.py -q
+```

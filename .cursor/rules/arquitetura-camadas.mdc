@@ -1,0 +1,32 @@
+---
+description: Camadas backend, SOLID e fronteiras multi-jogo (shared vs games/*) — norma AGENTS.md + docs/arquitetura-camadas-solid
+globs: backend/**/*
+alwaysApply: false
+---
+
+# Arquitetura de codigo (Arena TTRPG)
+
+Antes de alterar backend, cumprir [AGENTS.md](../../AGENTS.md) (secao **Arquitetura de codigo**) e [docs/arquitetura-camadas-solid.md](../../docs/arquitetura-camadas-solid.md).
+
+## Camadas
+
+| Camada | Pode | Nao pode |
+|--------|------|----------|
+| `api/v1/` routers | HTTP, deps, chamar services | SQL, regras de jogo longas |
+| `services/` | Orquestrar fluxo, transacoes | FastAPI `Request` em logica de dominio |
+| `repositories/` | Queries, persistencia | Importar de `fastapi` |
+| `models/` | ORM, colunas, FKs | Regras de combate/magia pesadas |
+| `rules/` | Dominio puro, testes sem BD | SQLAlchemy session |
+
+## Multi-jogo
+
+- `app.shared.*` = Auth Hub, usuario, `games_catalog`.
+- `app.games.<slug>.*` = um sistema por slug.
+- **Proibido:** `shared` importar `games.*`.
+- Novo jogo = pacote novo + `requer_game_<slug>`, nao ramificar `dnd35`.
+
+## SOLID rapido
+
+- Extensao por pacote ou `Protocol`, nao `if slug` espalhado.
+- Services dependem de `ports/` onde ja existir contrato.
+- Decisao estrutural grande → ADR em `docs/adr/`.

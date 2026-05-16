@@ -10,10 +10,11 @@ Quando o pedido citar, abrir ou implementar qualquer ficheiro em `.cursor/requis
 
 ## Antes de escrever código
 
-1. Ler **[AGENTS.md](../../AGENTS.md)** por completo (infra Vercel/Render/Neon, multi-jogo, protocolo SOLID, SDD leve).
-2. Ler [.cursor/requisitos/README.md](../requisitos/README.md) e o ficheiro de requisito da feature.
-3. Aplicar [.github/instructions](../../.github/instructions) da camada afetada (backend, frontend, migrations).
-4. Carregar a skill do jogo em `.cursor/skills/` quando a feature for D&D, Tormenta ou GURPS.
+1. Ler **[AGENTS.md](../../AGENTS.md)** (secao **Arquitetura de codigo** + deploy + multi-jogo + SDD leve).
+2. Ler [docs/arquitetura-camadas-solid.md](../../docs/arquitetura-camadas-solid.md) (camadas, SOLID, `games/<slug>/`).
+3. Ler [.cursor/requisitos/README.md](../requisitos/README.md) e o ficheiro de requisito da feature.
+4. Aplicar [.github/instructions](../../.github/instructions) da camada afetada (backend, frontend, migrations).
+5. Carregar a skill do jogo em `.cursor/skills/` quando a feature for D&D, Tormenta ou GURPS.
 
 ## Durante a implementação
 
