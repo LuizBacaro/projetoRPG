@@ -17,6 +17,12 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 - Antes de implementar, ler contexto em [README.md](README.md) e instrucoes aplicaveis em [.github/instructions](.github/instructions).
 - Em tarefas que toquem arquitetura, deploy, dados, schema ou decisoes historicas, consultar [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md).
 
+## Requisitos de feature (`.cursor/requisitos`)
+
+- Especificacoes por jogo (D&D, Tormenta, GURPS): pasta [.cursor/requisitos](.cursor/requisitos) e indice em [.cursor/requisitos/README.md](.cursor/requisitos/README.md).
+- **Antes de implementar qualquer item dessa pasta**, e obrigatorio seguir a arquitetura e o protocolo **deste** `AGENTS.md` (deploy Vercel/Render/Neon, multi-jogo, instrucoes em `.github/instructions`, skills em `.cursor/skills/`). Os `.md` de requisito definem o escopo funcional; nao substituem a governanca da plataforma.
+- Regra Cursor associada: [.cursor/rules/requisitos-implementacao.mdc](.cursor/rules/requisitos-implementacao.mdc).
+
 ## Protocolo obrigatorio de implementacao
 
 - Antes de qualquer refatoracao estetica/estrutural, priorizar validacao e preservacao dos requisitos funcionais do fluxo afetado.
@@ -29,6 +35,13 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 	- evitar logica duplicada e efeitos colaterais ocultos;
 	- minimizar breaking changes e manter compatibilidade quando possivel.
 - Ao concluir mudancas em fluxos sensiveis, validar impacto e registrar risco residual quando nao houver cobertura automatizada suficiente.
+
+## Especificacao minima (SDD leve)
+
+Contrato enxuto entre requisito, codigo e revisao — **sem** processo pesado de documentacao.
+
+- Guia completo: [docs/fluxo-spec-driven-leve.md](docs/fluxo-spec-driven-leve.md).
+- Resumo: **nova rota** = schemas Pydantic + pelo menos **um teste** + criterios de aceite no PR/issue; **frontend** = `getApiUrl()`, payload alinhado ao backend, `?v=` quando mudar JS/CSS; **regras de jogo** = prompt/agente de levantamento RPG ou atualizacao da skill/doc canonica; **decisao estrutural** = ADR curto em `docs/adr/` quando for dificil reverter.
 
 ## Infra de producao
 
@@ -62,6 +75,7 @@ Este arquivo e a **fonte normativa principal** de instrucoes do projeto para hum
 - Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pos-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
 - Contratos de repositorio para servicos (`typing.Protocol`, pacotes `ports` no backend): [docs/ports-repositorios-servicos.md](docs/ports-repositorios-servicos.md).
 - GURPS 4E (ficha + arena, Lite primeiro): skill [.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md](.cursor/skills/gurps-4e-requisitos-ficha-arena/SKILL.md) e checklist em [melhoria-arquitetura](melhoria-arquitetura) (secao 7).
+- Tormenta 20 — levantamento de requisitos, inventário de tabelas e roadmap de catálogos: [docs/tormenta/README.md](docs/tormenta/README.md).
 - Admin em dev: `ADMIN_EMAIL` + `ADMIN_PASSWORD` em `backend/.env` (exemplo em `backend/.env.example`); `criar_admin_padrao` no startup so cria se ambos estiverem definidos — ver secao de credenciais no [README.md](README.md).
 
 ## Orquestracao de agentes (definicoes)

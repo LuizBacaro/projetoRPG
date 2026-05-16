@@ -1,0 +1,13 @@
+{
+  "_meta": {
+    "titulo_livro": "Tormenta 20 — Módulo Básico",
+    "tabela": "Custo de Valores de Habilidade",
+    "pagina_livro": null,
+    "versao_schema": 1,
+    "nota": "Substituir custos[] pelos valores do teu exemplar. Este ficheiro e apenas formato de exemplo."
+  },
+  "custos": [
+    { "valor": 8, "custo": 0 },
+    { "valor": 10, "custo": 0 }
+  ]
+}

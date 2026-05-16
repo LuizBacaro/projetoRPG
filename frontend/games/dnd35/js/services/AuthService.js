@@ -18,12 +18,14 @@ class AuthService {
     static GAME_LABELS = {
         dnd35: 'D&D 3.5',
         dnd5e: 'D&D 5e',
+        tormenta: 'Tormenta RPG',
         gurps: 'GURPS',
     };
 
     static GAME_ICONS = {
         dnd35: '🐉',
         dnd5e: '🐲',
+        tormenta: '🎲',
         gurps: '⚔️',
     };
 

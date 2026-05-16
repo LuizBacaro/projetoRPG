@@ -6,7 +6,7 @@ Política multi-jogo:
 - Jogos `disponiveis` no catálogo podem ser selecionados; `em_breve` continua
   bloqueado em `selecionar_jogo`.
 - Membership é criado on-demand para slugs em `AUTO_ENROLL_MEMBERSHIP_GAME_SLUGS`
-  (ex.: `dnd35`, `gurps`) quando o usuário entra no jogo ou carrega o catálogo.
+  (ex.: `dnd35`, `gurps`, `tormenta`) quando o usuário entra no jogo ou carrega o catálogo.
 """
 
 from datetime import timedelta

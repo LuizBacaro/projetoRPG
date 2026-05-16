@@ -1,0 +1,248 @@
+/**
+ * Tema Arena Tormenta + variáveis alinhadas às planilhas oficiais (referência:
+ * planilha-tormenta.png / planilha-tormenta2.png / planilha-tormenta3.png).
+ */
+:root {
+    /* Hub legado (ainda disponível para componentes que referenciem) */
+    --tormenta-fundo: #12080c;
+    --tormenta-fundo-elevado: #1c1016;
+    --tormenta-pergaminho: #efe2cf;
+    --tormenta-pergaminho-sombra: #d4c4a8;
+    --tormenta-ouro: #c9a24a;
+    --tormenta-ouro-suave: rgba(201, 162, 74, 0.35);
+    --tormenta-carmesim: #8b1c3a;
+    --tormenta-carmesim-escuro: #5c1026;
+    --tormenta-texto: #2a1810;
+    --tormenta-texto-suave: #5c4a3d;
+    --tormenta-borda: rgba(201, 162, 74, 0.45);
+    --tormenta-radius: 6px;
+    --tormenta-font-display: "Cormorant Garamond", "EB Garamond", "Palatino Linotype", Garamond, Georgia, serif;
+    --tormenta-font-ui: "Segoe UI", system-ui, Roboto, sans-serif;
+    --t20-font-medieval: "Cormorant Garamond", "EB Garamond", Garamond, "Palatino Linotype", Georgia, serif;
+
+    /* Ficha estilo planilha T20 */
+    /* Papel: fundo mais escuro (pergaminho envelhecido); folha/cartão um pouco mais claros */
+    --t20-cream: #d4c4b0;
+    --t20-parchment: #cbb9a4;
+    --t20-white: #ede4d6;
+    --t20-red: #8b0000;
+    --t20-red-deep: #6e0000;
+    --t20-red-bright: #a31616;
+    --t20-input: #e0eafc;
+    --t20-input-border: #9aa8bc;
+    --t20-ink: #0f0f0f;
+    --t20-muted: #3d3d3d;
+    --t20-grid-line: rgba(15, 15, 15, 0.12);
+}
+
+/* Dashboard Tormenta — pergaminho e faixa vermelha (planilha-tormenta3, livro) */
+body.tormenta-app {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--tormenta-font-ui);
+    color: var(--t20-ink);
+    background-color: var(--t20-cream);
+    background-image:
+        radial-gradient(ellipse 140% 90% at 50% 120%, rgba(42, 28, 18, 0.14), transparent 52%),
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(139, 0, 0, 0.07), transparent 48%),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 22px,
+            rgba(60, 35, 20, 0.04) 22px,
+            rgba(60, 35, 20, 0.04) 23px
+        ),
+        linear-gradient(180deg, #dfd2c2 0%, var(--t20-cream) 42%, #c9b8a4 100%);
+}
+
+.tormenta-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem 1rem;
+    background: linear-gradient(180deg, #e8dfd2, #d9cdc0);
+    border-bottom: 3px solid var(--t20-red);
+    box-shadow: 0 6px 18px rgba(30, 18, 12, 0.12);
+}
+
+.tormenta-header h1 {
+    margin: 0;
+    font-family: var(--t20-font-medieval);
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--t20-red-deep);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.tormenta-header p {
+    margin: 0.25rem 0 0;
+    font-size: 0.88rem;
+    color: var(--t20-muted);
+    max-width: 36rem;
+}
+
+.tormenta-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tormenta-badge-jogo {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    border: 1px solid var(--t20-red-deep);
+}
+
+.tormenta-btn {
+    font: inherit;
+    cursor: pointer;
+    border-radius: var(--tormenta-radius);
+    padding: 0.45rem 0.85rem;
+    border: 1px solid rgba(139, 0, 0, 0.35);
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--t20-ink);
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tormenta-btn:hover {
+    background: var(--t20-input);
+    border-color: var(--t20-red);
+    box-shadow: 0 0 0 1px rgba(139, 0, 0, 0.12);
+}
+
+.tormenta-btn--primary {
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    border-color: var(--t20-red-deep);
+    color: #fff;
+    font-weight: 600;
+}
+
+.tormenta-btn--primary:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 2px 8px rgba(139, 0, 0, 0.35);
+}
+
+.tormenta-btn--outline-red {
+    background: transparent;
+    color: var(--t20-red-deep);
+    border-color: var(--t20-red-deep);
+    font-weight: 600;
+}
+
+.tormenta-btn--outline-red:hover {
+    background: rgba(139, 0, 0, 0.08);
+    border-color: var(--t20-red);
+    color: var(--t20-red-deep);
+    box-shadow: 0 0 0 1px rgba(139, 0, 0, 0.15);
+}
+
+.tormenta-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.25rem 1rem 2.5rem;
+}
+
+.tormenta-card {
+    background: var(--t20-white);
+    color: var(--t20-ink);
+    border-radius: 4px;
+    border: 2px solid rgba(20, 12, 8, 0.65);
+    box-shadow:
+        0 0 0 1px rgba(139, 0, 0, 0.2),
+        0 10px 28px rgba(40, 20, 10, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    padding: 1rem 1.25rem;
+}
+
+.tormenta-card h2 {
+    margin: 0 0 0.75rem;
+    font-family: var(--t20-font-medieval);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--t20-red-deep);
+    border-bottom: 2px solid rgba(139, 0, 0, 0.35);
+    padding-bottom: 0.4rem;
+}
+
+.tormenta-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.tormenta-table-wrap {
+    overflow-x: auto;
+}
+
+.tormenta-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.tormenta-table th,
+.tormenta-table td {
+    padding: 0.45rem 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(44, 24, 16, 0.12);
+}
+
+.tormenta-table th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--t20-muted);
+    background: rgba(139, 0, 0, 0.1);
+    border-bottom: 2px solid rgba(139, 0, 0, 0.25);
+}
+
+.tormenta-link {
+    color: var(--t20-red-deep);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.tormenta-link:hover {
+    text-decoration: underline;
+}
+
+.tormenta-cell-muted {
+    color: var(--t20-muted);
+    font-style: italic;
+    opacity: 0.92;
+}
+
+.tormenta-chip-tipo {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.tormenta-chip-tipo--jogador {
+    background: #d9ecf7;
+    color: #1a4d6b;
+}
+.tormenta-chip-tipo--npc {
+    background: #ede8d0;
+    color: #5c4b10;
+}
+.tormenta-chip-tipo--monstro {
+    background: #f0d9d9;
+    color: #6b1a1a;
+}

@@ -38,6 +38,17 @@ GAME_CATALOG_SEED = [
         "ordem": 20,
     },
     {
+        "slug": "tormenta",
+        "nome": "Tormenta RPG",
+        "descricao": (
+            "Sistema d20 brasileiro (Jambo Editora): ficha digital do Módulo "
+            "Básico, cadastro e evolução na Arena."
+        ),
+        "status": "disponivel",
+        "icone": "🐉",
+        "ordem": 25,
+    },
+    {
         "slug": "gurps",
         "nome": "GURPS",
         "descricao": (

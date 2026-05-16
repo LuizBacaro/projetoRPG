@@ -1,0 +1,1386 @@
+Lista de magias
+
+Causar medo: criatura de até 4º nível fica apavorada.
+Cerrar portas: tranca magicamente uma porta, portão ou janela.
+
+A seguir estão listas de magias separadas por tipo (arcana e
+divina), nível e ordem alfabética.
+
+Chuva quente: produz água quente para se banhar, não para beber.
+
+Magias arcanas
+
+Detectar mortos-vivos: detecta a presença, quantidade e poder de
+mortos-vivos na área.
+
+Nível 0
+
+Detectar portas secretas: detecta portas e salas escondidas.
+
+Abrir/fechar: abre ou fecha um objeto pequeno.
+
+Compreender idiomas: você entende qualquer coisa escrita ou
+falada.
+
+Disco flutuante: disco de energia flutua e carrega até 100kg de carga.
+
+Apavorante gás de Luigi: alvo expele gases fétidos e barulhentos.
+
+Disfarce ilusório: você recebe +10 em testes de Enganação para
+disfarce.
+
+Brilho: alvo fica ofuscado (–1 nos ataques).
+
+Enfeitiçar pessoa: alvo se torna prestativo em relação a você.
+
+Consertar: repara pequenas falhas em objetos mundanos.
+
+Escudo arcano: você recebe +4 na CA e se torna imune a mísseis
+mágicos.
+
+Detectar magia: detecta a presença, quantidade e intensidade de
+auras mágicas na área.
+Detectar venenos: determina se uma criatura ou objeto é venenoso
+ou está envenenado.
+
+Gagueira de Raviollius: alvo não consegue falar corretamente,
+sofrendo –4 de testes baseados em Carisma.
+
+Flor perene: flor nasce na cabeça do alvo.
+
+Hipnotismo: deixa alvos imóveis e melhora a atitude deles em
+relação a você.
+
+Globos de luz: cria quatro esferas de luz; cada uma ilumina tanto
+quanto uma tocha.
+
+Identificação: determina habilidades de um item mágico.
+
+Intuir direção: você recebe +4 em testes de Sobrevivência para
+não se perder.
+
+Invocar monstro I: Invoca um monstro Pequeno sob seu comando.
+
+Imagem silenciosa: cria uma ilusão visual, como uma miragem.
+
+Ler magias: decifre inscrições mágicas.
+
+Leque cromático: criaturas na área ficam inconscientes, atordoadas
+ou cegas, de acordo com seu nível.
+
+Luz: objeto brilha como tocha.
+
+Mãos flamejantes: cone causa 2d6 pontos de dano.
+
+Mãos mágicas: move um objeto à distância.
+
+Mísseis mágicos: dispara duas esferas de energia que causa, cada
+uma, 1d4+1 pontos de dano.
+
+Marca arcana: inscreve sua runa pessoal sobre um objeto.
+Mensagem: troque mensagens telepáticas com um alvo.
+Pasmar: alvo fica pasmo por uma rodada.
+
+Montaria arcana: invoca um cavalo ou pônei para servir como
+montaria (mas não para lutar).
+
+Prestidigitação: gera diversos efeitos menores.
+
+Névoa obscurecente: névoa obscurece toda a visão.
+
+Raio de ácido: causa 1d3 pontos de dano, mais 1 na rodada seguinte.
+
+Proteção contra o mal/bem/caos/ordem: fornece +2 na CA e nos
+testes de resistência contra criaturas da tendência escolhida.
+
+Raio de fogo: causa 1d4 pontos de dano.
+Raio de frio: causa 1d3 pontos de dano, e impõe –1 nos ataques
+na rodada seguinte.
+
+Queda suave: alvo cai lentamente.
+Raio do enfraquecimento: impõe –2 nas jogadas de ataque e dano.
+
+Resistência: fornece +1 nos testes de resistência.
+
+Recuo acelerado: seu deslocamento aumenta em 9m.
+
+Romper morto-vivo: causa 1d6 pontos de dano em um morto-vivo.
+
+Reduzir pessoa: diminui a altura do alvo pela metade.
+
+Som fantasma: cria som ilusório.
+
+Salto: alvo recebe +30 nos testes de Atletismo para saltar.
+
+Toque da fadiga: alvo fica fatigado.
+
+Servo invisível: criatura invisível realiza tarefas para você.
+
+Magias de 1º nível
+
+Sono: criaturas na área totalizando 2d4 níveis adormecem.
+Suportar elementos: protege o alvo de temperaturas extremas.
+
+Alarme: avisa quando alguém invadir uma área protegida.
+
+Toque chocante: causa 2d8 pontos de dano.
+
+Animar corda: anima uma corda, que pode se enrolar, fazer um
+laço ou dar um nó.
+
+Toque macabro: alvo sofre 1d6 pontos de dano e –1 nas jogadas.
+
+Apagar: apaga texto mundano ou mágico.
+
+Ventriloquismo: projeta sua voz de outro lugar.
+
+Área escorregadia: criaturas na área podem cair no chão.
+
+Magias de 2º nível
+
+Arma mágica: arma recebe +1 nos ataques e danos.
+
+Agilidade do gato: alvo recebe +4 de Destreza.
+
+Armadura arcana: você recebe +4 na CA.
+
+Alterar-se: você muda sua forma e recebe uma habilidade.
+
+Ataque certeiro: você recebe +20 na próxima jogada de ataque.
+
+Amor incontestável de Raviollius: alvo se apaixona pela primeira
+criatura que ver.
+
+Aumentar pessoa: um humanóide aumenta uma categoria de
+tamanho.
+Aura mágica: faz um objeto mundano parecer mágico ou vice-versa.
+
+Ao alcance da mão: projeta mãos a até 3m.
+Armadilha ilusória: faz uma tranca parecer uma armadilha.
+
+1
+
+Astúcia da raposa: alvo recebe +4 de Inteligência.
+
+Proteção contra flechas: fornece redução de dano 10 contra armas
+de ataque à distância.
+
+Aterrorizar: alvo fica apavorado.
+
+Raio ardente: causa 4d6 pontos de dano.
+
+Boca encantada: alvo pronuncia uma mensagem quando um
+evento acontece.
+
+Reflexos: cópias ilusórias suas fornecem +6 na CA.
+
+Arrombar: abre um objeto.
+
+Cativar: criaturas prestam atenção em você, ignorando tudo ao
+redor.
+
+Riso histérico: alvo não consegue fazer outra ação além de rir.
+
+Cegueira/surdez: alvo fica cego ou surdo, à sua escolha.
+
+Sabedoria da coruja: alvo recebe +4 de Sabedoria.
+
+Chama contínua: objeto ilumina tanto quanto uma tocha,
+permanentemente.
+
+Teia: prende criaturas na área.
+
+Comandar mortos-vivos: força um morto-vivo, inteligente ou não,
+a aceitar suas ordens.
+
+Toque da idiotice: alvo sofre penalidade de 1d6 na Inteligência,
+Sabedoria e Carisma.
+
+Confundir detecção: adivinhações lançadas em um alvo dão
+resultado pertinente a outro alvo.
+
+Tranca arcana: tranca um item que possa ser aberto ou fechado.
+
+Crânio voador de Vladislav: crânio envolto em magia negra causa
+4d6 pontos de dano.
+
+Vento sussurrante: envia uma mensagem curta.
+
+Toque do carniçal: alvo fica paralisado e fedorento.
+
+Truque da corda: corda leva a um pequeno plano de existência.
+
+Despedaçar: som alto e agudo causa 4d6 pontos de dano em
+construto ou destrói um objeto mundano.
+
+Ver o invisível: você enxerga criaturas e objetos invisíveis.
+Vigor do urso: alvo recebe +4 de Constituição.
+
+Detectar pensamentos: detecta pensamentos superficiais na área.
+
+Visão no escuro: alvo pode enxergar no escuro.
+
+Escuridão: objeto irradia escuridão em uma área com 6m de raio.
+
+Vitalidade ilusória: você recebe 1d10+5 PV temporários.
+
+Esfera flamejante: esfera causa 2d6 pontos de dano a qualquer
+criatura no mesmo espaço, e pode ser movimentada 9m com uma
+ação de movimento.
+
+Magias de 3º nível
+
+Esplendor da águia: alvo recebe +4 de Carisma.
+
+Bola de fogo: explosão com 6m de raio causa 6d6 pontos de dano.
+
+Flecha ácida: flecha mágica causa 2d4 pontos de dano, mais 2d4
+nos próximos dois turnos.
+
+Círculo mágico contra o mal/bem/caos/ordem: como proteção
+contra o mal/bem/caos/ordem, mas afeta emanação com 3m de raio.
+
+Força do touro: alvo recebe +4 de Força.
+Forma de árvore: você se transforma em uma árvore.
+
+Clarividência/clariaudiência: cria sensor mágico, pelo qual você
+pode ver ou ouvir, em um lugar específico
+
+Arma mágica maior: arma recebe +2 nos ataques e danos.
+
+Imagem menor: como imagem silenciosa, mas inclui sons simples.
+
+Descanso tranqüilo: impede um cadáver de se decompor.
+
+Imobilizar animal: como imobilizar pessoa, mas afeta um animal
+em vez de um humanóide.
+
+Deslocamento: alvo recebe camuflagem total (50% de chance de
+falha).
+
+Invisibilidade: alvo fica invisível por um minuto ou até atacar.
+
+Dificultar detecção: alvo fica protegido de magias de adivinhação
+para detectá-lo.
+
+Invocar monstro II: Invoca um monstro Pequeno sob seu comando.
+Levitação: alvo flutua para cima ou para baixo conforme sua
+vontade.
+Localizar objeto: determina em que direção está um objeto à sua
+escolha.
+Lufada de vento: lufada de vento que derruba e empurra criaturas
+na área.
+
+Dissipar magia: dissipa outras magias.
+Encolher item: diminui um objeto mundano em até quatro
+categorias de tamanho.
+Escrita ilusória: escreva um texto que apenas você e quem você
+permitir consegue entender.
+Esculpir o som: altera os sons emitidos pelos alvos.
+
+Mão espectral: cria mão flutuante através da qual você pode lançar
+magias de toque.
+
+Esfera de invisibilidade: como invisibilidade, mas afeta todas as
+criaturas a até 3m do alvo.
+
+Névoa: como névoa obscurecente, mas com maior alcance e duração.
+Nublar: alvo recebe camuflagem (20% de chance de falha).
+
+Flecha de chamas: transforma até cinco flechas normais em
+flamejantes, que causam 1d6 pontos de dano adicional.
+
+Obscurecer objeto: esconde um item de efeitos de adivinhação.
+
+Forma gasosa: alvo se torna incorpóreo.
+
+Padrão hipnótico: dispersão com 3m de raio deixa criaturas
+fascinadas.
+
+Fúria: alvo recebe benefícios da habilidade de classe fúria.
+
+Pasmar monstro: como pasmar, mas afeta qualquer criatura até
+6º nível.
+
+Idiomas: alvo entende e fala qualquer idioma existente.
+
+Patas de aranha: alvo pode escalar paredes e tetos.
+Pirotecnia: transforma chama comum em fogos de artifício ou fumaça.
+Poeira ofuscante: nuvem de poeira cega e revela criaturas invisíveis.
+
+2
+
+Resistência a energia: fornece resistência 10 contra um tipo de
+energia à sua escolha.
+
+Heroísmo: alvo recebe +2 nos ataques e testes de resistência.
+Imagem maior: como imagem silenciosa, mas inclui ilusões sonoras,
+olfativas e térmicas.
+Imobilizar mortos-vivos: como imobilizar pessoa, mas afeta um
+morto-vivo em vez de um humanóide.
+
+Imobilizar pessoa: paralisa um humanóide por um minuto.
+Invocar monstro III: Invoca um monstro Médio sob seu comando.
+Lâmina afiada: dobra a margem de ameaça de uma arma.
+Lentidão: criaturas afetadas só podem executar uma ação padrão
+ou de movimento por rodada.
+Loquacidade: você recebe +20 em testes de Enganação para blefar.
+Luz do dia: objeto emite luz brilhante como do dia.
+Montaria fantasmagórica: invoca uma criatura Grande, com
+diversas habilidades, para servir de montaria.
+Muralha de vento: cria uma cortina de vento.
+Nevasca: chuva de gelo bloqueia visão e deixa o piso escorregadio.
+Névoa fétida: como névoa obscurecente, mas deixa as criaturas em
+seu interior enjoadas.
+Página secreta: muda o conteúdo de uma página.
+Pequeno refúgio: cria domo imóvel que comporta até oito criaturas
+Médias.
+Piscar: você “pisca” entre o Plano Material e o Etéreo.
+Proteção contra energia: absorve 75 pontos de dano de um tipo
+de energia à sua escolha.
+Raio da exaustão: alvo fica fatigado ou exausto.
+Relâmpago: linha de 30m causa 6d6 pontos de dano.
+Respirar na água: até cinco criaturas podem falar e respirar na água.
+Runas explosivas: runas protegem objeto contendo informações
+escritas.
+Selo da serpente sépia: selo prende criatura que ler objeto onde
+ele está inscrito.
+Soco de Arsenal: causa dano igual a 4d6 + seu modificador de Força
+e empurra o alvo 3m.
+Sono profundo: como sono, mas afeta criaturas totalizando 4d4
+níveis.
+Sugestão: alvo obedece uma ordem sua.
+Toque vampírico: alvo sofre 6d6 pontos de dano; você ganha PV
+temporários iguais ao dano causado.
+Velocidade: alvo recebe +2 nos ataques, CA e testes de Reflexos,
++9m no deslocamento e pode fazer um ataque adicional.
+Visão arcana: você enxerga auras mágicas.
+Vôo: alvo pode voar com deslocamento de 18m.
+
+Magias de 4º nível
+Âncora dimensional: impede movimento planar.
+Armadilha de fogo: item protegido explode quando for aberto.
+Assassino fantasmagórico: reduz alvo à –10 PV ou causa 3d6 de dano.
+Aumentar pessoa em massa: como aumentar pessoa, mas afeta até
+5 alvos.
+Confusão: criaturas na área se comportam de modo aleatório.
+Conjuração de sombras: simula qualquer magia arcana de até 2º
+nível.
+Criar itens efêmeros: cria um objeto mundano a partir de matéria
+vegetal morta.
+Criar mortos-vivos menor: transforma um cadáver em um
+esqueleto ou zumbi sob seu comando.
+
+Desespero esmagador: criaturas na área sofrem –2 em jogadas e
+testes.
+Detectar vidência: perceba qualquer tentativa de detectá-lo através
+de adivinhações.
+Drenar temporário: alvo sofre 1d4 níveis negativos.
+Enfeitiçar monstro: como enfeitiçar pessoa, mas afeta qualquer
+criatura viva.
+Erupção de Aleph: causa 8d6 pontos de dano, mais 4d6 na rodada
+seguinte.
+Escudo de fogo: você recebe resistência a fogo 10 e causa 2d6+3
+pontos de dano a qualquer criatura que lhe atacar em corpo-a-corpo.
+Esfera resiliente: alvo fica preso em esfera tremeluzente e imóvel.
+Fascinação: obra de arte prende a atenção de quem lhe enxergar
+indefinidamente.
+Globo de invulnerabilidade menor: esfera com 3m de raio detém
+qualquer magia de até 3º nível.
+Grito: explosão sonora causa 4d6 pontos de dano e deixa criaturas
+surdas.
+Invisibilidade maior: como invisibilidade, mas não é anulada caso
+o alvo ataque.
+Invocar monstro IV: Invoca um monstro Médio sob seu comando.
+Localizar criatura: determina em que direção está uma criatura
+à sua escolha.
+Medo: criaturas na área ficam apavoradas por um minuto.
+Melhoria mnemônica: você recebe 3 pontos de magia, que pode
+usar para memorizar magias na hora.
+Metamorfose: transforma um alvo voluntário em uma criatura
+diferente.
+Missão menor: obriga o alvo a cumprir uma tarefa à sua escolha.
+Moldar rocha: muda a forma de um pedaço de pedra.
+Momento de Tormenta: cria uma pequena área de Tormenta, que
+causa vários efeitos.
+Muralha de fogo: cria uma cortina de chamas que causa 4d6
+pontos de dano.
+Muralha de gelo: cria uma muralha de gelo.
+Névoa sólida: como névoa, mas é tão grossa que impede o
+movimento.
+Olho arcano: cria um sensor através do qual você pode enxergar
+como se estivesse onde ele está.
+Padrão prismático: como padrão hipnótico, mas afeta 4d8 níveis.
+Parede ilusória: cria uma parede ilusória e intangível.
+Pele rochosa: fornece redução de dano 10/adamante.
+Porta dimensional: transporta você e até uma criatura para outro lugar.
+Praga: alvo contrai uma doença à sua escolha.
+Reduzir pessoa em massa: como reduzir pessoa, mas afeta até cinco
+humanóides.
+Refúgio seguro: cria uma pequena cabana de madeira.
+Remover maldição: cura o alvo de qualquer maldição.
+Rogar maldição: amaldiçoa um alvo, com efeitos variados.
+Tempestade glacial: pedras de granizo causam 3d6 de esmagamento
+e 2d6 de frio.
+
+3
+
+Tentáculos negros: tentáculos surgem do chão e agarram criaturas
+na área.
+Terreno ilusório: terreno natural parece, tem sons e cheira como
+outro tipo de terreno natural.
+Vidência: você pode ver e ouvir uma criatura à distância.
+Zona de silêncio: manipula sons dentro da área.
+
+4
+
+Onda da fadiga: criaturas vivas na área ficam fatigadas.
+Pedra em lama: transforma pedra e rocha em lama.
+Permanência: torna outra magia permanente.
+Pesadelo: causa pesadelos que impedem sono tranqüilo.
+Recipiente arcano: transfere sua alma para um cristal ou gema, e
+dali para outro corpo.
+
+Magias de 5º nível
+
+Remover encantamento: remove todos os encantamentos afetando
+o alvo.
+
+Ampliar animal: um animal aumenta uma categoria de tamanho.
+Âncora planar menor: invoca um espírito de até 6º nível.
+Arca secreta: esconde baú com equipamento no Plano Etéreo.
+Cão fiel: cão de guarda protege local onde foi invocado.
+Compor: muda a forma, mas não o tipo, de até 250kg de matéria.
+Cone glacial: cone com 9m causa 10d6 pontos de dano.
+Contato extraplanar: faça perguntas para seres de outros planos.
+Criar itens temporários: como criar itens efêmeros, mas também
+pode criar a partir de matéria mineral.
+Criar passagens: abre uma passagem através de madeira ou pedra.
+Dominar pessoa: controle as ações de um humanóide.
+Enfraquecer o intelecto: reduz Inteligência e Carisma do alvo para 1.
+Enviar mensagem: envia uma mensagem curta a uma criatura que
+esteja no mesmo plano.
+Expulsão: alvo é expulso para seu plano nativo.
+Imagem persistente: como imagem silenciosa, mas inclui ilusões
+sonoras, olfativas e térmicas e segue um roteiro pré-determinado.
+Imobilizar monstro: como imobilizar pessoa, mas afeta qualquer
+criatura viva.
+Invocar monstro V: Invoca um monstro Grande sob seu comando.
+Lama em pedra: transforma lama, barro ou areia movediça em pedra.
+Ligação telepática: cria um elo mental entre duas criaturas
+inteligentes.
+Magia perdida: apaga uma magia da mente do alvo.
+Malogro: murcha e mata uma planta (se for uma criatura, sofre
+8d6 pontos de dano).
+Mão interposta de Talude: cria uma mão flutuante que lhe fornece
+cobertura contra um oponente.
+Marionete: controla o corpo de uma criatura.
+Metamorfose tórrida: transforma o alvo em um animal de 1º nível.
+Miragem arcana: como terreno ilusório, mas muda qualquer tipo
+de terreno.
+Modificar memória: cria, modifica ou elimina a memória do alvo
+sobre um evento específico.
+Muralha de energia: cria uma muralha de energia invisível e
+indestrutível.
+Muralha de ferro: cria uma parede de ferro.
+Muralha de pedra: cria uma muralha unida às superfícies próximas.
+Névoa mental: névoa impõe –4 em testes baseados em Sabedoria.
+Névoa mortal: névoa mata criaturas dentro dela.
+Olhos observadores: cria dez olhos flutuantes que seguem suas
+ordens e então voltam a você para transmitir o que viram.
+
+Resistência a magia: fornece +4 nos testes de resistência contra magia.
+Rocha cadente de Vectorius: meteoro causa 10d6 pontos de dano
+e soterra criaturas.
+Santuário particular: protege área de visão, audição e magias de
+adivinhação.
+Símbolo da dor: runa mágica causa dores terríveis quando ativada.
+Símbolo do sono: como símbolo da dor, mas as criaturas adormecem.
+Similaridade: como disfarce ilusório, mas pode afetar outras criaturas.
+Sonho: você entra nos sonhos de uma criatura, e pode conversar
+com ela lá.
+Telecinesia: move objetos ou criaturas à distância.
+Teletransporte: transporta os alvos à longas distâncias.
+Viagem planar: transporta até cinco criaturas para outro plano
+de existência.
+Visão falsa: engana magias de adivinhação.
+Vôo prolongado: como vôo, mas tem duração maior e deslocamento
+de 12m.
+
+Magias de 6º nível
+Agilidade do gato em massa: como agilidade do gato, mas afeta
+até cinco alvos.
+Analisar encantamento: analisa uma criatura ou objeto e descobre
+as magias lhe afetando.
+Âncora planar: invoca um espírito de até 12º nível.
+Andar nas sombras: alvos entram no Plano das Sombras, onde
+viajam mais rápido.
+Animar objetos: concede vida a objetos inanimados.
+Astúcia da raposa em massa: como astúcia da raposa, mas afeta
+até cinco alvos.
+Ataque visual: seu olhar apavora criaturas.
+Campo antimagia: barreira com 3m de raio anula todos efeitos
+mágicos.
+Carne para pedra: criatura vira uma estátua.
+Círculo da morte: mata criaturas totalizando 10d4 níveis.
+Contingência: mantenha uma magia pronta para ser ativada em
+condição pré-determinada.
+Controlar água: reduz ou aumenta o nível de água.
+Controlar o clima: muda o clima da área.
+Corrente de relâmpagos: relâmpago causa 12d6 pontos de dano
+em um alvo, e 6d6 pontos de dano em até 10 outros alvos.
+Criar mortos-vivos: como criar mortos-vivos menor, mas pode criar
+um carniçal, lívido ou múmia.
+
+Despistar: você fica invisível e uma cópia ilusória surge em seu lugar.
+
+Bola de fogo controlável: como bola de fogo, mas causa 14d6 e
+pode ser detonada depois de lançada.
+
+Destruir mortos-vivos: destrói mortos-vivos criaturas totalizando
+10d4 níveis.
+
+Conjuração de sombras maior: como conjuração de sombras, mas
+simula qualquer magia arcana de até 6º nível.
+
+Dissipar magia maior: como dissipar magia, mas com maior limite
+no teste de dissipar.
+
+Controlar mortos-vivos: controle as ações de mortos-vivos
+totalizando 20º níveis.
+
+Elucubração do mago: recupera uma magia de até 5º nível que
+você tenha lançado recentemente.
+
+Convocação instantânea: invoca um objeto de qualquer lugar
+para sua mão.
+
+Esfera gélida: explosão com 3m de raio causa 12d6 pontos de dano
+e congela líquidos.
+
+Cubo de energia: cria uma prisão imóvel, invisível e indestrutível,
+que prende uma criatura Grande ou menor.
+
+Esplendor da águia em massa: como esplendor da águia, mas afeta
+até cinco alvos.
+
+Dedo da morte: alvo cai com –10 PV.
+
+Força do touro em massa: como força do touro, mas afeta até
+cinco alvos.
+
+Dominação total: alvo fica completamente sob seu controle,
+realizando até mesmo ordens suicidas.
+
+Globo de invulnerabilidade: como globo de invulnerabilidade
+menor, mas detém qualquer magia de até 4º nível.
+
+Espada de energia: espada flutuante ataca seus inimigos.
+
+Desintegrar: causa 20d6 pontos de dano.
+
+Heroísmo maior: alvo recebe +4 nos ataques e testes de resistência,
+10 PV temporários e fica imune a medo.
+Imagem permanente: como imagem silenciosa, mas inclui ilusões
+sonoras, olfativas e térmicas e é permanente.
+Invocar monstro VI: Invoca um monstro Grande sob seu comando.
+Lendas e histórias: descobre informações sobre o alvo.
+Mão vigorosa de Talude: como mão interposta, mas também afasta
+o oponente.
+Missão: como missão menor, mas pode afetar uma criatura de
+qualquer nível.
+Mundo dos sonhos: alvos adormecem e vivem uma realidade
+controlada por você.
+Névoa ácida: como névoa sólida, mas causa dano às criaturas em
+seu interior.
+
+Desejo restrito: cria efeitos variados.
+
+Estátua: alvo se transforma em estátua viva, recebendo redução de
+dano 8 e outras características.
+Imobilizar pessoa em massa: como imobilizar pessoa, mas afeta
+até cinco alvos.
+Insanidade: alvo fica permanentemente sob efeito da magia
+confusão.
+Inverter a gravidade: inverte gravidade da área, fazendo criaturas
+e objetos “caírem” para cima.
+Invisibilidade em massa: como invisibilidade, mas afeta qualquer
+quantidade de criaturas dentro de 30m.
+Invocar monstro VII: Invoca um monstro Enorme sob seu
+comando.
+Mansão magnífica de Vectorius: cria uma luxuosa mansão extradimensional.
+
+Pedra em carne: restaura uma criatura petrificada ao estado normal.
+
+Mão poderosa de Talude: como mão interposta, mas também
+agarra o oponente.
+
+Proteger fortalezas: protege uma estrutura com diversos efeitos.
+
+Onda da exaustão: criaturas vivas na área ficam exaustas.
+
+Repulsão: campo de força impede criaturas de se aproximarem
+de você.
+
+Palavra de poder, cegar: cega uma criatura.
+
+Sabedoria da coruja em massa: como sabedoria da coruja, mas
+afeta até cinco criaturas.
+
+Passeio etéreo: você é transportado para o Plano Etéreo.
+
+Símbolo do medo: como símbolo da dor, mas as criaturas ficam
+apavoradas.
+
+Rajada prismática: raios causam efeitos variados.
+
+Símbolo da persuasão: como símbolo da dor, mas as criaturas ficam
+enfeitiçadas.
+
+Passagem invisível: cria uma passagem etérea através de uma parede.
+Projetar imagem: cria uma cópia ilusória de você.
+Reverter magia: magias ou habilidades mágicas lançadas em você
+são refletidas de volta a quem as lançou.
+
+Sugestão em massa: como sugestão, mas afeta até cinco criaturas.
+
+Símbolo do atordoamento: como símbolo da dor, mas as criaturas
+na área ficam atordoadas.
+
+Transformação de guerra: você recebe habilidades de combate,
+mas não pode lançar magias.
+
+Símbolo da fraqueza: como símbolo da dor, mas as criaturas na área
+sofrem 3d6 de dano de Força.
+
+Véu: muda a aparência de até cinco criaturas.
+
+Simulacro: cria uma cópia de uma criatura sob seu comando.
+
+Vigor do urso em massa: como vigor do urso, mas afeta até cinco
+criaturas.
+
+Teletransportar objeto: como teletransporte, mas transporta um
+objeto e não você.
+
+Visão da verdade: revela a forma real das coisas.
+
+Teletransporte maior: como teletransporte, mas sem limite de
+alcance.
+
+Magias de 7º nível
+Banimento: expulsa até cinco espíritos ou criaturas invocadas.
+
+Vidência maior: como vidência, mas dura mais e permite lançar magias.
+Visão: como lendas e histórias, mas funciona mais rapidamente.
+
+5
+
+Visão arcana maior: como visão arcana, mas determina capacidade
+de lançar magias instantaneamente.
+
+Resistência a magia maior: fornece +8 nos testes de resistência
+contra magia.
+
+Magias de 8º nível
+
+Símbolo da insanidade: como símbolo da dor, mas as criaturas
+ficam insanas.
+
+Âncora planar maior: invoca um espírito de até 8º nível.
+
+Símbolo da morte: como símbolo da dor, mas as criaturas morrem.
+
+Animação ilusória: esconde o que realmente está acontecendo
+na área.
+
+Simpatia: alvo atrai um tipo de criatura à sua escolha.
+
+Antipatia: alvo ou área repele um tipo de criatura à sua escolha.
+
+Vazio: alvo perde memória e habilidades.
+
+Aprisionar a alma: prende corpo do alvo em gema.
+Clone: cria um clone sem vida de uma criatura; se ela morrer, sua
+alma é transportada para o clone.
+Corpo de ferro: você se transforma em uma estátua de ferro vivo,
+recebendo diversos bônus e imunidades.
+Criar mortos-vivos maior: como criar mortos-vivos menor, mas
+pode criar uma sombra, aparição ou espectro.
+
+Magias de 9º nível
+Alterar forma: você assume a forma de qualquer criatura.
+Aprisionamento: enterra alvo sob a terra.
+Chuva de meteoros: produz quatro rochas flamejantes, que causam
+até 32d6 pontos de dano.
+
+Dança irresistível: obriga uma criatura a dançar por 1d4 rodadas.
+
+Círculo de teletransporte: círculo transporta qualquer criatura
+que pisar nele.
+
+Discernir localização: descubra a localização de uma criatura ou
+objeto.
+
+Contra-ataque mental: como limpar a mente, mas causa dano em
+quem tentar usar um efeito mental.
+
+Enfeitiçar monstro em massa: como enfeitiçar monstro, mas afeta
+qualquer número de criaturas vivas somando até 30 níveis.
+
+Desejo: cria efeitos variados e poderosos.
+
+Esfera telecinética: como esfera resiliente, mas a esfera pode ser
+movida telepaticamente.
+
+Disjunção: dissipa efeitos mágicos e transforma itens mágicos em
+mundanos.
+
+Estase temporal: alvo fica preso em estado de animação suspensa.
+
+Dominar monstro: como dominar pessoa, mas afeta qualquer tipo
+de criatura.
+
+Evaporação: evapora líquidos de criaturas na área, causando 16d6
+pontos de dano.
+
+Drenar energia: alvo sofre 2d4 níveis negativos.
+
+Grito maior: como grito, mas causa 8d6 pontos de dano.
+
+Encarnação fantasmagórica: como assassino fantasmagórico, mas
+afeta até 10 criaturas.
+
+Instante de presciência: você recebe +15 em uma jogada ou teste,
+ou +15 na CA contra um ataque.
+
+Esfera prismática: como muralha prismática, mas cria um globo
+imóvel que protege quem está dentro.
+
+Invocar monstro VIII: Invoca um monstro Enorme sob seu comando.
+Labirinto: expulsa alvo para labirinto em outra dimensão.
+
+Forma etérea: como passeio etéreo, mas afeta até cinco criaturas
+voluntárias.
+
+Limpar a mente: protege o alvo de efeitos que detectam, lêem ou
+influenciam emoções ou pensamentos.
+
+Grito da banshee: grito terrível mata todas as criaturas que lhe
+ouvirem.
+
+Mata-dragão: carga de energia destruidora causa 20d12+20 pontos
+de dano.
+
+Imobilizar monstro em massa: como imobilizar monstro, mas
+afeta até cinco alvos.
+
+Metamorfosear objetos: transforma um alvo em uma criatura ou
+objeto diferente.
+
+Invocar monstro IX: Invoca um monstro Descomunal sob seu
+comando.
+
+Muralha prismática: cria uma muralha multicolorida que causa
+vários efeitos.
+
+Lágrimas de Wynna: alvo perde capacidade de lançar magias.
+
+Nuvem incendiária: cria uma nuvem incandescente que causa 4d6
+pontos de dano por rodada.
+Olhos observadores maior: como olhos observadores, mas os olhos
+possuem visão da verdade.
+Ordem: como enviar mensagem, mas a mensagem pode conter
+uma sugestão.
+Padrão cintilante: dispersão com 6m de raio deixa criaturas
+confusas, atordoadas ou inconscientes, de acordo com seus níveis.
+Palavra de poder, atordoar: atordoa uma criatura.
+Prisão: prende uma criatura de diversas maneiras.
+Punho cerrado de Talude: como mão interposta, mas também
+persegue e ataca o oponente.
+Raio polar: causa 15d6 pontos de dano.
+
+6
+
+Tranca dimensional: impede viagens planares na área.
+
+Libertação: liberta o alvo de todos os efeitos que restringem o
+movimento.
+Mão esmagadora de Talude: como mão interposta, mas também
+esmaga o oponente.
+Palavra de poder, matar: mata uma criatura.
+Parar o tempo: você fica livre para agir 1d4+1 rodadas.
+Portal: abre um portal para convocar uma criatura ou viajar entre
+planos.
+Prender a alma: captura a alma de uma criatura morta recentemente,
+impedindo ressurreição e similares.
+Projeção astral: libera sua alma de seu corpo físico e a projeta no
+Plano Astral.
+Refúgio: objeto preparado transporta criatura lhe segurando para
+um lugar determinado.
+
+Sexto sentido: você não fica surpreendido e desprevenido, e recebe
++8 na CA e testes de Reflexos.
+Sombras: como conjuração de sombras, mas você pode copiar
+qualquer magia arcana de 8º nível ou menor.
+
+Detectar mortos-vivos: detecta a presença, quantidade e poder de
+mortos-vivos na área.
+Enfeitiçar animal: como enfeitiçar pessoa, mas afeta um animal.
+Escudo entrópico: você recebe camuflagem contra ataques à
+distância (20% de chance de falha).
+
+Magias divinas
+
+Escudo da fé: alvo recebe +2 na CA.
+
+Magias de nível 0
+
+Infligir ferimentos leves: causa 1d8+1 pontos de dano.
+
+Brilho: alvo fica ofuscado (–1 nos ataques).
+
+Fogo das fadas: luz envolve todos os alvos na área.
+Invisibilidade contra animais: alvo não é percebido por animais.
+
+Consertar: repara pequenas falhas em objetos mundanos.
+
+Invisibilidade contra mortos-vivos: alvo não é percebido por
+mortos-vivos.
+
+Detectar magia: detecta a presença, quantidade e intensidade de
+auras mágicas na área.
+
+Invocar monstro I: Invoca um monstro Pequeno sob seu comando.
+
+Detectar venenos: determina se uma criatura ou objeto é venenoso
+ou está envenenado.
+
+Passos longos: seu deslocamento aumenta em 3m.
+
+Névoa obscurecente: névoa obscurece toda a visão.
+
+Intuir direção: você recebe +4 em testes de Sobrevivência para
+não se perder.
+
+Passos sem pegadas: alvo não deixa pegadas.
+
+Ler magias: decifre inscrições mágicas.
+
+Perdição: inimigos sofrem –1 nos ataques e resistência contra medo.
+
+Luz: objeto brilha como tocha.
+
+Presa mágica: alvo recebe +1 nos ataques e danos com armas
+naturais.
+
+Orientação: alvo recebe +1 numa jogada ou teste.
+Purificar alimentos: purifica comida e bebida.
+Resistência: fornece +1 nos testes de resistência.
+Romper morto-vivo: causa 1d6 pontos de dano em um morto-vivo.
+Virtude: alvo ganha 1 PV temporário.
+
+Magias de 1º nível
+Abençoar água: cria água benta.
+Acalmar animal: acalma um animal.
+Amaldiçoar água: cria água profana.
+Arma mágica: arma recebe +1 nos ataques e danos.
+Auxílio divino: você recebe +1 nos ataques e danos.
+
+Pedra encantada: três pedras viram armas de arremesso.
+
+Proteção contra o mal/bem/caos/ordem: fornece +2 na CA e nos
+testes de resistência contra criaturas da tendência escolhida.
+Remover medo: cura o alvo de qualquer efeito de medo.
+Santuário: Inimigos devem fazer teste de Vontade para lhe atacar.
+Suportar elementos: protege o alvo de temperaturas extremas.
+Visão da morte: você percebe condição relativa das criaturas que
+enxergar.
+
+Magias de 2º nível
+Acalmar emoções: acalma criaturas na área.
+Agilidade do gato: alvo recebe +4 de Destreza.
+
+Bênção: aliados recebem +1 nos ataques e resistência contra medo.
+
+Ajuda: alvo recebe +1 nos ataques e resistências contra medo, e
+1d8+1 PV temporários.
+
+Bom fruto: cria quatro frutos que alimentam e curam 1d4 pontos
+de vida.
+
+Amolecer terra e pedra: transforma terra em lama ou pó, e pedra
+em argila.
+
+Cajado abençoado: arma recebe +1 nos ataques e danos e causa
+dano como se fosse maior.
+
+Ao alcance da mão: projeta mãos a até 3m.
+
+Causar medo: criatura de até 4º nível fica apavorada.
+Comandar: força o alvo a obedecer uma ordem.
+Compreender idiomas: você entende qualquer coisa escrita ou falada.
+Constrição: a vegetação da área prende criaturas.
+Criar água: enche um recipiente com água pura e potável.
+Criar chama: cria chama com intensidade de uma tocha na mão
+do conjurador.
+
+Arma espiritual: cria arma de energia que ataca seus inimigos.
+Armadilha de fogo: item protegido explode quando for aberto.
+Augúrio: diz se uma ação trará resultados bons ou ruins.
+Condição: determina condição (PV, magias afetando) de criaturas
+tocadas.
+Consagrar: abençoa a área, aumentando o efeito de canalizar energia
+positiva e penalizando mortos-vivos.
+Curar ferimentos moderados: recupera 2d8+3 pontos de vida.
+
+Curar ferimentos leves: recupera 1d8+1 pontos de vida.
+
+Descanso tranqüilo: impede um cadáver de se decompor.
+
+Desespero: alvo fica abalado.
+
+Despedaçar: som alto e agudo causa 4d6 pontos de dano em
+construto ou destrói um objeto mundano.
+
+Detectar animais: detecta a presença, quantidade e condição de
+animais na área.
+Detectar armadilhas: detecta a presença de armadilhas na área.
+
+Dissimular tendência: esconde a tendência do alvo de efeitos de
+adivinhação.
+
+Detectar o mal/bem/caos/ordem: detecta a presença, quantidade
+e intensidade de auras de uma tendência na área.
+
+Drenar força vital: remove o restante da força vital de uma criatura
+moribunda, e usa-a para aumentar o poder do conjurador.
+
+7
+
+Encontrar armadilhas: você recebe a habilidade encontrar
+armadilhas de um ladino, e +10 em Percepção para procurá-las.
+Escuridão: objeto irradia escuridão em uma área com 6m de raio.
+Esfriar metal: Item de metal esfria e causa dano em qualquer
+criatura lhe tocando.
+Esplendor da águia: alvo recebe +4 de Carisma.
+Esquentar metal: Item de metal esquenta e causa dano em qualquer
+criatura lhe tocando.
+Explosão sonora: dispersão com 3m de raio causa 1d8 pontos de
+dano e surdez.
+Falar com animais: você pode se comunicar com animais.
+Força do touro: alvo recebe +4 de Força.
+Imobilizar animal: como imobilizar pessoa, mas afeta um animal
+em vez de um humanóide.
+Imobilizar pessoa: paralisa um humanóide por um minuto.
+Infligir ferimentos moderados: causa 2d8+3 pontos de dano.
+Invocar monstro II: Invoca um monstro Pequeno sob seu comando.
+Lâmina flamejante: cria uma lâmina de chamas que causa 1d8+2
+pontos de dano.
+Mensageiro animal: obriga um animal a ir até um local determinado.
+Moldar madeira: muda a forma de um pedaço de madeira.
+Patas de aranha: alvo pode escalar paredes e tetos.
+Pele de árvore: fornece +3 na classe de armadura.
+Profanar: amaldiçoa a área, aumentando o efeito de canalizar energia
+negativa e fornecendo bônus para mortos-vivos.
+Proteger outro: você recebe metade do dano destinado a outra
+criatura.
+Reduzir animal: como reduzir pessoa, mas afeta um animal
+voluntário.
+Remover paralisia: cura o alvo de qualquer efeito de paralisia ou
+lentidão.
+Resistência a energia: fornece resistência 10 contra um tipo de
+energia à sua escolha.
+Restauração menor: cura 1d4 pontos de dano de habilidade.
+Retardar envenenamento: alvo não sofre efeito de veneno pela
+duração da magia.
+Sabedoria da coruja: alvo recebe +4 de Sabedoria.
+Silêncio: nenhum som é produzido na área afetada.
+Tendência em arma: arma recebe tendência.
+Toque da loucura: alvo fica atordoado.
+Torcer madeira: entorta madeira comum.
+Tornar inteiro: repara um objeto estragado ou quebrado.
+Transe animal: fascina animais totalizando 2d6 níveis.
+Vigor do urso: alvo recebe +4 de Constituição.
+Zona da verdade: impede criaturas na área de mentirem
+deliberadamente.
+
+Magias de 3º nível
+Ampliar plantas: vegetação da área aumenta e se fecha.
+Armadilha de corda: transforma corda comum em armadilha mágica.
+
+8
+
+Cajado em cobra: transforma um objeto alongado de madeira em
+uma cobra.
+Caminhar na água: alvo pode caminhar na água como se fosse
+terra sólida.
+Cegueira/surdez: alvo fica cego ou surdo, à sua escolha.
+Chama contínua: objeto ilumina tanto quanto uma tocha,
+permanentemente.
+Círculo mágico contra o mal/bem/caos/ordem: como proteção
+contra o mal/bem/caos/ordem, mas afeta emanação com 3m de raio.
+Convocar relâmpagos: invoca um relâmpago por rodada, cada um
+causando 3d6 pontos de dano.
+Crescer espinhos: vegetação da área fica causa dano em criaturas
+na área.
+Criar alimentos: cria comida e bebida para alimentar uma criatura
+Média por um dia.
+Criar mortos-vivos menor: transforma um cadáver em um
+esqueleto ou zumbi sob seu comando.
+Curar ferimentos graves: recupera 3d8+5 pontos de vida.
+Dissipar magia: dissipa outras magias.
+Dominar animal: sinta o que um animal está sentido e dê ordens a ele.
+Enfraquecer plantas: vegetação da área diminui.
+Envenenamento: inocula veneno que causa 1d10 pontos de dano
+de Constituição.
+Escuridão profunda: como escuridão, mas área é de 18m de raio.
+Extinguir fogo: apaga fogo comum na área e dissipa magias de fogo.
+Falar com os mortos: faça perguntas para uma criatura morta.
+Falar com plantas: você pode se comunicar com plantas.
+Infligir ferimentos graves: causa 3d8+5 pontos de dano.
+Invocar monstro III: Invoca um monstro Médio sob seu comando.
+Lágrimas de Hyninn: criaturas na área sofrem –5 em testes de
+Acrobacia, Enganação, Furtividade e Ladinagem.
+Localizar objeto: determina em que direção está um objeto à sua
+escolha.
+Luz cegante: raio de sol causa 3d8 pontos de dano, ou 6d6 contra
+mortos-vivos.
+Luz do dia: objeto emite luz brilhante como do dia.
+Mão opífera: mão fantasmagórica encontra uma criatura e a guia
+até você.
+Mesclar-se às rochas: você se funde a um bloco de pedra.
+Moldar rocha: muda a forma de um pedaço de pedra.
+Muralha de vento: cria uma cortina de vento.
+Nevasca: chuva de gelo bloqueia visão e deixa o piso escorregadio.
+Obscurecer objeto: esconde um item de efeitos de adivinhação.
+Oração: fornece +1 nas jogadas e testes de seus aliados, e impõe –1
+nas jogadas e testes de seus inimigos.
+Praga: alvo contrai uma doença à sua escolha.
+Presa mágica maior: como presa mágica, mas o bônus é de +2.
+Proteção contra energia: absorve 75 pontos de dano de um tipo
+de energia à sua escolha.
+Purgar invisibilidade: qualquer coisa invisível a até 9m se torna
+visível.
+
+Remover cegueira/surdez: cura o alvo de cegueira ou surdez.
+
+Repelir insetos: insetos não podem se aproximar a até 3m de você.
+
+Remover doença: cura o alvo de todas as doenças.
+
+Restauração: como restauração menor, mas cura todos os pontos de
+dano temporário de habilidade.
+
+Remover maldição: cura o alvo de qualquer maldição.
+Respirar na água: até cinco criaturas podem falar e respirar na água.
+Rogar maldição: amaldiçoa um alvo, com efeitos variados.
+Roupa encantada: armadura ou escudo recebe +2 na CA.
+Símbolo de proteção: protege um objeto que possa ser aberto.
+Soco de Arsenal: causa dano igual a 4d6 + seu modificador de Força
+e empurra o alvo 3m.
+
+Magias de 4º nível
+Adivinhação: responde uma pergunta.
+Aliado extraplanar menor: invoca um espírito de até 6º nível.
+Âncora dimensional: impede movimento planar.
+Andar no ar: alvo pode caminhar no ar como se fosse terra sólida.
+Arma mágica maior: arma recebe +2 nos ataques e danos.
+Cólera da ordem: causa 8d6 pontos de dano em criaturas Caóticas
+e deixa-as pasmas por uma rodada.
+Controlar água: reduz ou aumenta o nível de água.
+Cúpula de proteção contra vegetais: cria uma barreira invisível que
+impede plantas monstruosas de se aproximar de você.
+Curar ferimentos críticos: recupera 4d8+7 pontos de vida.
+Destruição sagrada: causa 8d6 pontos de dano em criaturas
+Malignas e deixa-as cegas por uma rodada.
+Discernir mentiras: determina se os alvos estão mentindo
+deliberadamente.
+Enviar mensagem: envia uma mensagem curta a uma criatura que
+esteja no mesmo plano.
+Expulsão: alvo é expulso para seu plano nativo.
+Idiomas: alvo entende e fala qualquer idioma existente.
+Imunidade a magia: alvo fica imune a duas magias de até 4º nível
+à sua escolha.
+Infligir ferimentos críticos: causa 4d8+7 pontos de dano.
+Inseto gigante: transforma um inseto comum em uma versão
+gigante, sob seu comando.
+Invocar monstro IV: Invoca um monstro Médio sob seu comando.
+Malogro: murcha e mata uma planta (se for uma criatura, sofre
+8d6 pontos de dano).
+Martelo do caos: causa 8d6 pontos de dano em criaturas Leais e
+deixa-as confusas por uma rodada.
+Movimentação livre: alvo fica imune a efeitos que restrinjam
+movimento.
+Nuvem profana: causa 8d6 pontos de dano em criaturas Bondosas
+e deixa-as enjoadas por 1d4 rodadas.
+Pedras afiadas: solo rochoso virá terreno difícil que causa dano.
+Poder divino: você recebe +4 nos ataques e dano e 10 PV
+temporários.
+Proteção contra a morte: alvo fica imune a efeitos de necromancia.
+Reencarnação: traz uma criatura de volta à vida, mas em outro corpo.
+Remover veneno: cura o alvo de todos os venenos.
+
+Tempestade glacial: pedras de granizo causam 3d6 de esmagamento
+e 2d6 de frio.
+Toque enferrujante: enferruja um objeto metálico mundano.
+Transferência de poder divino: alvo pode lançar uma magia sua
+de até 2º nível.
+
+Magias de 5º nível
+Ampliar animal: um animal aumenta uma categoria de tamanho.
+Arma do rompimento: arma se torna destruidora contra mortosvivos.
+Caminhar em árvores: entre em uma árvore e saia em outra.
+Coluna de chamas: cilindro com 3m de raio e 12m de altura causa
+10d6 pontos de dano.
+Comandar maior: como comandar, mas afeta até 5 alvos.
+Comunhão: responde até 10 perguntas.
+Comunhão com a natureza: fornece informações sobre a região.
+Conspurcar: transforma área em local profano, gerando vários efeitos.
+Controlar os ventos: muda a direção e intensidade dos ventos na área.
+Convocar tempestade de relâmpagos: como convocar relâmpagos,
+mas cada relâmpago causa 5d6 pontos de dano.
+Curar ferimentos leves em massa: recupera 1d8+9 pontos de vida
+de até cinco criaturas.
+Despertar: desperta inteligência humana em um animal ou árvore.
+Dissipar o mal/bem/caos/ordem: alvo recebe +4 na CA contra
+criaturas de uma tendência, entre outros efeitos.
+Força dos justos: você aumenta uma categoria de tamanho, recebe
++4 na Força e redução de dano 5/mágica.
+Infligir ferimentos leves em massa: causa 1d8+9 pontos de dano
+em até cinco criaturas.
+Invocar monstro V: Invoca um monstro Grande sob seu comando.
+Lama em pedra: transforma lama, barro ou areia movediça em pedra.
+Marca da justiça: inscreve uma marca na pele do alvo, que lhe
+penaliza se ele realizar determinada ação.
+Matar: alvo tocado é reduzido a –10 pontos de vida.
+Muralha de espinhos: cria uma barreira de arbustos afiados que
+causa 2d8 pontos de dano.
+Muralha de fogo: cria uma cortina de chamas que causa 4d6
+pontos de dano.
+Muralha de pedra: cria uma muralha de pedra unida às superfícies
+próximas.
+Pedra em lama: transforma pedra e rocha em lama.
+Pele rochosa: fornece redução de dano 10/adamante.
+Penitência: redime o alvo de seus erros.
+Praga de insetos: enxame de insetos causa 4d6 pontos de dano
+por turno.
+Remover encantamento: remove todos os encantamentos afetando
+o alvo.
+Resistência a magia: fornece +4 nos testes de resistência contra magia.
+
+9
+
+Reviver os mortos: revive uma criatura.
+Santificar: transforma área em local sagrado, gerando vários efeitos.
+
+Palavra de recordação: teletransporta você e até cinco criaturas
+para um santuário.
+
+Símbolo da dor: runa mágica causa dores terríveis quando ativada.
+
+Proibição: impede viagens planares na área.
+
+Símbolo do sono: como símbolo da dor, mas as criaturas adormecem.
+
+Repelir madeira: linha de 18m move todos objetos de madeira até
+o limite do alcance.
+
+Viagem planar: transporta até cinco criaturas para outro plano
+de existência.
+Vidência: você pode ver e ouvir uma criatura à distância.
+Visão da verdade: revela a forma real das coisas.
+
+Magias de 6º nível
+Agilidade do gato em massa: como agilidade do gato, mas afeta
+até cinco alvos.
+Aliado extraplanar: invoca um espírito de até 12º nível.
+Animar objetos: concede vida a objetos inanimados.
+
+Sementes de fogo: seis bolotas causam total de 12d6 pontos de dano.
+Símbolo do medo: como símbolo da dor, mas as criaturas ficam
+apavoradas.
+Símbolo da persuasão: como símbolo da dor, mas as criaturas ficam
+enfeitiçadas.
+Símbolo de proteção maior: como símbolo de proteção, mas com
+efeitos mais poderosos.
+
+Banimento: expulsa até cinco espíritos ou criaturas invocadas.
+
+Teletransporte por árvores: você e até cinco criaturas entram em
+uma planta e saem em outra.
+
+Banquete de heróis: cria banquete para 10 criaturas que cura e
+fornece diversos benefícios.
+
+Vigor do urso em massa: como vigor do urso, mas afeta até cinco
+criaturas.
+
+Barreira de lâminas: barreira com 30m de lado e 6m de altura
+causa 10d6 pontos de dano.
+
+Magias de 7º nível
+
+Bordão da magia: armazena uma magia em um bordão de madeira
+para ser lançada mais tarde.
+Caminhar no vento: até 5 criaturas são carregadas por um vento
+mágico.
+Carvalho vivo: árvore vira ente e protege local.
+Conto das rochas: converse com rochas naturais ou trabalhadas.
+Criar mortos-vivos: como criar mortos-vivos menor, mas pode criar
+um carniçal, lívido ou múmia.
+Cúpula de proteção contra a vida: como cúpula de proteção contra
+vegetais, mas impede animais, humanóides e monstros.
+Cura completa: recupera 100 pontos de vida do alvo, além de dano
+de habilidade e diversas condições.
+Curar ferimentos moderados em massa: recupera 2d8+11 pontos
+de vida de até cinco criaturas.
+Destruir mortos-vivos: destrói mortos-vivos criaturas totalizando
+10d4 níveis.
+Dissipar magia maior: como dissipar magia, mas com maior limite
+no teste de dissipar.
+Doença plena: alvo sofre 100 pontos de dano.
+Encontrar o caminho: alvo descobre o caminho mais direto para
+entrar ou sair de um lugar.
+Esplendor da águia em massa: como esplendor da águia, mas afeta
+até cinco alvos.
+Força do touro em massa: como força do touro, mas afeta até
+cinco alvos.
+Infligir ferimentos moderados em massa: causa 2d8+11 pontos
+de dano em até cinco criaturas.
+Invocar monstro VI: Invoca um monstro Grande sob seu comando.
+Madeira-ferro: item de madeira adquire resistência e peso do metal
+Missão: como missão menor, mas pode afetar uma criatura de
+qualquer nível.
+Mover terra: desloca terra para ajustar fossos, trincheiras, etc.
+
+10
+
+Sabedoria da coruja em massa: como sabedoria da coruja, mas
+afeta até cinco criaturas.
+
+Animar plantas: concede movimento a plantas.
+Blasfêmia: criaturas não Malignas na área sofrem efeitos variados.
+Cajado vivo: transforma um cajado em um ente.
+Controlar o clima: muda o clima da área.
+Curar ferimentos graves em massa: recupera 3d8+13 pontos de
+vida de até cinco criaturas.
+Destruição: alvo tocado é consumido em chamas.
+Destruição rastejante: invoca uma massa negra de insetos que causa
+6d6 pontos de dano por rodada.
+Ditado: criaturas não Leais na área sofrem efeitos variados.
+Infligir ferimentos graves em massa: causa 3d8+13 pontos de dano
+em até cinco criaturas.
+Invocar monstro VII: Invoca um monstro Enorme sob seu
+comando.
+Metal em madeira: todos os objetos de metal na área se transformam
+em madeira.
+Palavra do caos: criaturas não Caóticas na área sofrem efeitos
+variados.
+Palavra sagrada: criaturas não Bondosas na área sofrem efeitos
+variados.
+Passeio etéreo: você é transportado para o Plano Etéreo.
+Raio de sol: raios causam 4d6 pontos de dano e cegueira.
+Refugiar itens: alvo fica invisível e indetectável por magias de
+adivinhação.
+Refúgio: objeto preparado transporta criatura lhe segurando para
+um lugar determinado.
+Regeneração: cura 4d8+13 pontos de dano e recupera partes
+arrancadas, ossos quebrados, etc.
+Repulsão: campo de força impede criaturas de se aproximarem
+de você.
+Ressurreição: como reviver os mortos, mas só precisa de uma parte
+do corpo da criatura.
+
+Restauração maior: como restauração, mas pode recuperar um nível
+perdido há até um ano.
+
+Magias de 9º nível
+
+Símbolo do atordoamento: como símbolo da dor, mas as criaturas
+na área ficam atordoadas.
+
+Antipatia: alvo ou área repele um tipo de criatura à sua escolha.
+
+Alterar forma: você assume a forma de qualquer criatura.
+
+Símbolo da fraqueza: como símbolo da dor, mas as criaturas na área
+sofrem 3d6 de dano de Força.
+
+Buraco negro: buraco negro dura três rodadas e suga tudo em
+seu redor.
+
+Vidência maior: como vidência, mas dura mais e permite lançar
+magias.
+
+Contra-ataque mental: como limpar a mente, mas causa dano em
+quem tentar usar um efeito mental.
+
+Magias de 8º nível
+Aliado extraplanar maior: invoca um espírito de até 18º nível.
+Aura profana: alvos recebem +4 na CA e testes de resistência, entre
+outros efeitos.
+Aura sagrada: alvos recebem +4 na CA e testes de resistência, entre
+outros efeitos.
+Campo antimagia: barreira com 3m de raio anula todos efeitos
+mágicos.
+Ciclone: ciclone com 3m de raio e 9m de altura avança erguendo
+tudo em seu caminho.
+Criar mortos-vivos maior: como criar mortos-vivos menor, mas
+pode criar uma sombra, aparição ou espectro.
+Curar ferimentos críticos em massa: recupera 4d8+15 pontos de
+vida de até cinco criaturas.
+Discernir localização: descubra a localização de uma criatura ou
+objeto.
+Escudo da ordem: alvos recebem +4 na CA e testes de resistência,
+entre outros efeitos.
+Explosão solar: explosão com 24m de raio causa 6d6 pontos de
+dano e cegueira; mortos-vivos e criaturas vulneráveis a luz solar
+sofrem 16d6.
+
+Cura completa em massa: como cura completa, mas recupera 200
+pontos de vida e afeta até cinco criaturas.
+Drenar energia: alvo sofre 2d4 níveis negativos.
+Forma etérea: como passeio etéreo, mas afeta até cinco criaturas
+voluntárias.
+Grupo de elementais: invoca diversos elementais.
+Homens vegetais: cria 1d4+2 homens vegetais sob seu comando.
+Implosão: explosões destroem corpo de criaturas por dentro.
+Invocar monstro IX: Invoca um monstro Descomunal sob seu
+comando.
+Lágrimas de Wynna: alvo perde capacidade de lançar magias.
+Milagre: sua divindade intercede em seu favor.
+Prender a alma: captura a alma de uma criatura morta recentemente,
+impedindo ressurreição e similares.
+Projeção astral: libera sua alma de seu corpo físico e a projeta no
+Plano Astral.
+Ressurreição verdadeira: como reviver os mortos, mas não precisa
+de nenhuma parte do corpo da criatura.
+Simpatia: alvo atrai um tipo de criatura à sua escolha.
+Tempestade da vingança: nuvem de tempestade causa vários efeitos.
+
+Forma animal: como metamorfose, mas transforma até cinco
+criaturas voluntárias em animais.
+Imunidade a magia maior: como imunidade a magia, mas as magias
+podem ser de até 8º nível.
+Infligir ferimentos críticos em massa: causa 4d8+15 pontos de
+dano em até cinco criaturas.
+Invocar monstro VIII: Invoca um monstro Enorme sob seu
+comando.
+Manto do caos: alvos recebem +4 na CA e testes de resistência,
+entre outros efeitos.
+Repelir metal ou pedra: como repelir madeira, mas afeta objetos
+de metal ou pedra.
+Resistência a magia maior: fornece +8 nos testes de resistência
+contra magia.
+Símbolo da insanidade: como símbolo da dor, mas as criaturas
+ficam insanas.
+Símbolo da morte: como símbolo da dor, mas as criaturas morrem.
+Tempestade de fogo: jatos de chama causam 16d6 pontos de dano.
+Terremoto: tremor rasga o solo, com efeitos que variam de acordo
+com o terreno.
+Tranca dimensional: impede viagens planares na área.
+
+11
+
+

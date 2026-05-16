@@ -1,0 +1,3558 @@
+/* Tormenta 20 — paridade visual com ficha D&D 3.5 Arena (subset gerado a partir de dnd35/css/ficha-personagem.css; resets globais removidos). */
+
+@import url("https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap");
+
+/* 
+   FICHA DO PERSONAGEM — Estilo Medieval / Pergaminho
+    */
+
+
+:root {
+    --cor-pergaminho:      #f4e9d0;
+    --cor-pergaminho-esc:  #e8d5b0;
+    --cor-madeira:         #5c3a1e;
+    --cor-madeira-clara:   #8b5e3c;
+    --cor-dourada:         #c9a84c;
+    --cor-dourada-brilho:  #f0c040;
+    --cor-tinta:           #2c1a0e;
+    --cor-tinta-suave:     #4a3020;
+    --cor-vermelho:        #8b1a1a;
+    --cor-verde:           #1a5c2a;
+    --cor-azul:            #1a3a6b;
+    --fonte-titulo:        'Cinzel', serif;
+    --fonte-texto:         'IM Fell English', serif;
+    --sombra-suave:        0 4px 20px rgba(44, 26, 14, 0.25);
+    --sombra-forte:        0 8px 40px rgba(44, 26, 14, 0.5);
+    --borda-ornamental:    3px solid var(--cor-dourada);
+}
+
+
+/* Omitted global `body` from D&D ficha-personagem.css — Tormenta uses body.tormenta-ficha-body */
+
+/* ── Wrapper principal ── */
+.ficha-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    gap: 1rem;
+}
+
+/* ── Header ── */
+.ficha-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #3d2410 100%);
+    border: var(--borda-ornamental);
+    border-radius: 12px;
+    padding: 0.6rem 1.5rem;
+    box-shadow: var(--sombra-forte);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ornamento sutil no header */
+.ficha-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 10% 50%, rgba(201,168,76,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 90% 50%, rgba(201,168,76,0.12) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.ficha-titulo-texto {
+    font-family: var(--fonte-titulo);
+    font-size: 1.35rem;
+    color: var(--cor-dourada);
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+    letter-spacing: 0.1em;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-voltar {
+    background: linear-gradient(135deg, var(--cor-dourada) 0%, #a87d30 100%);
+    border: 2px solid var(--cor-madeira);
+    border-radius: 8px;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-voltar:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+/* ── Corpo: 3 colunas ── */
+.ficha-corpo {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    flex: 1;
+    align-items: start;
+}
+
+/* 
+   COLUNA ESQUERDA
+    */
+.ficha-coluna-esquerda {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Foto — ocupa toda a largura da coluna central */
+.ficha-foto-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 3px solid var(--cor-dourada);
+    box-shadow: var(--sombra-forte),
+                inset 0 0 30px rgba(201,168,76,0.12);
+    background: linear-gradient(180deg, var(--cor-pergaminho-esc), var(--cor-madeira));
+}
+
+/* Frame decorativo na foto */
+.ficha-foto-container::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.ficha-foto {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: none;
+}
+
+.ficha-foto.carregada { display: block; }
+
+.ficha-foto-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    opacity: 0.4;
+}
+
+/* ── Título no header: nameplate completo ── */
+.ficha-titulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.ficha-header-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+/* Tags e botão editar sobre fundo escuro do header */
+.ficha-header .ficha-meta {
+    justify-content: center;
+}
+
+.ficha-header .ficha-tag {
+    filter: brightness(1.3);
+}
+
+.ficha-header .ficha-btn-editar-identidade {
+    color: var(--cor-dourada);
+    border-color: rgba(201, 168, 76, 0.45);
+    background: rgba(201, 168, 76, 0.08);
+    margin-top: 0;
+}
+
+.ficha-header .ficha-btn-editar-identidade:hover {
+    background: rgba(201, 168, 76, 0.18);
+    color: var(--cor-dourada-brilho);
+}
+
+/* Identidade — mantida como fallback (não mais usada na view principal) */
+.ficha-identidade {
+    background: linear-gradient(135deg, var(--cor-pergaminho) 0%, var(--cor-pergaminho-esc) 100%);
+    border: 2px solid var(--cor-madeira-clara);
+    border-radius: 10px;
+    padding: 0.75rem 0.85rem;
+    box-shadow: var(--sombra-suave);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    position: relative;
+    text-align: center;
+}
+
+/* Linha dourada superior decorativa */
+.ficha-identidade::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cor-dourada), transparent);
+    border-radius: 1px;
+}
+
+.ficha-nome {
+    font-family: var(--fonte-titulo);
+    font-size: 1.2rem;
+    color: var(--cor-madeira);
+    text-align: center;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.ficha-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    justify-content: center;
+}
+
+.ficha-meta-secundaria {
+    margin-top: 0.3rem;
+}
+
+.ficha-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-family: var(--fonte-titulo);
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.ficha-tag-raca {
+    background: rgba(180, 120, 60, 0.15);
+    color: #c9a84c;
+    border: 1px solid rgba(180, 120, 60, 0.4);
+}
+
+.ficha-tag-classe {
+    background: rgba(65, 105, 225, 0.15);
+    color: #7b9ef7;
+    border: 1px solid rgba(65, 105, 225, 0.4);
+}
+
+.ficha-tag-jogador {
+    background: rgba(26, 58, 107, 0.18);
+    color: #4a7abf;
+    border: 1px solid rgba(26, 58, 107, 0.45);
+}
+
+.ficha-tag-monstro {
+    background: rgba(139, 26, 26, 0.15);
+    color: #c45c5c;
+    border: 1px solid rgba(139, 26, 26, 0.45);
+}
+
+.ficha-tag-npc {
+    background: rgba(26, 92, 42, 0.15);
+    color: #4a9e5c;
+    border: 1px solid rgba(26, 92, 42, 0.45);
+}
+
+.ficha-tag-tipo {
+    background: rgba(92, 58, 30, 0.12);
+    color: var(--cor-madeira-clara);
+    border: 1px solid rgba(92, 58, 30, 0.35);
+}
+
+.ficha-tag-nivel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(201,168,76,0.15);
+    color: var(--cor-dourada);
+    border: 1px solid rgba(201,168,76,0.4);
+}
+
+.ficha-tag-nivel .ficha-nivel-label {
+    font-size: 0.62rem;
+    color: inherit;
+    opacity: 0.75;
+}
+
+.ficha-tag-nivel .ficha-nivel-valor {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: inherit;
+}
+
+.ficha-tag-alinhamento {
+    background: rgba(35, 91, 120, 0.14);
+    color: #5e9fcc;
+    border: 1px solid rgba(35, 91, 120, 0.36);
+}
+
+.ficha-tag-dominio {
+    background: rgba(33, 99, 51, 0.14);
+    color: #68b07a;
+    border: 1px solid rgba(33, 99, 51, 0.36);
+}
+
+.ficha-btn-editar-identidade {
+    margin-top: 0.45rem;
+    align-self: center;
+    border: 1px solid rgba(201, 168, 76, 0.38);
+    background: linear-gradient(135deg, rgba(92, 58, 30, 0.14), rgba(201, 168, 76, 0.12));
+    color: var(--cor-madeira);
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.ficha-btn-editar-identidade:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.ficha-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 8, 4, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 1400;
+}
+
+.ficha-modal-box {
+    width: min(560px, 96vw);
+    background:
+        linear-gradient(145deg, var(--cor-pergaminho), var(--cor-pergaminho-esc)),
+        radial-gradient(circle at top right, rgba(168, 125, 66, 0.1), transparent 60%);
+    border: 2px solid var(--cor-madeira-clara);
+    border-radius: 14px;
+    box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.55),
+        inset 0 0 0 1px rgba(255, 244, 214, 0.35);
+    overflow: hidden;
+    position: relative;
+}
+
+.ficha-modal-box::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(92, 58, 30, 0.25);
+    border-radius: 10px;
+    pointer-events: none;
+}
+
+.ficha-modal-box-curto {
+    width: min(520px, 96vw);
+}
+
+.ficha-modal-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.85rem 1.1rem 0.8rem;
+    border-bottom: 1px solid rgba(92, 58, 30, 0.22);
+    background: linear-gradient(180deg, rgba(168, 125, 66, 0.14), transparent 85%);
+}
+
+.ficha-modal-header > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.ficha-modal-header h3 {
+    font-family: var(--fonte-titulo);
+    color: var(--cor-madeira);
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.ficha-modal-header p {
+    margin: 0;
+    color: var(--cor-tinta-suave);
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.ficha-modal-close {
+    flex-shrink: 0;
+    border: 1px solid rgba(92, 58, 30, 0.35);
+    background: rgba(255, 252, 244, 0.55);
+    color: var(--cor-madeira);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ficha-modal-close:hover {
+    background: rgba(124, 45, 18, 0.9);
+    color: #fff7ed;
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(124, 45, 18, 0.35);
+}
+
+.ficha-modal-body {
+    padding: 1rem 1.1rem 0.3rem;
+    display: grid;
+    gap: 0.95rem;
+}
+
+.ficha-modal-field {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.ficha-modal-field span {
+    font-family: var(--fonte-titulo);
+    font-size: 0.72rem;
+    color: var(--cor-madeira);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.ficha-modal-field input,
+.ficha-modal-field select,
+.ficha-modal-field textarea {
+    border: 1px solid rgba(92, 58, 30, 0.38);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 252, 244, 0.95), rgba(244, 230, 197, 0.85));
+    color: var(--cor-tinta);
+    padding: 0.65rem 0.85rem;
+    font-family: var(--fonte-texto);
+    font-size: 0.95rem;
+    box-shadow: inset 0 1px 3px rgba(92, 58, 30, 0.15);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.ficha-modal-field input:hover,
+.ficha-modal-field select:hover,
+.ficha-modal-field textarea:hover {
+    border-color: rgba(92, 58, 30, 0.6);
+}
+
+.ficha-modal-field input:focus,
+.ficha-modal-field select:focus,
+.ficha-modal-field textarea:focus {
+    outline: none;
+    border-color: var(--cor-madeira);
+    box-shadow:
+        inset 0 1px 3px rgba(92, 58, 30, 0.15),
+        0 0 0 3px rgba(168, 125, 66, 0.28);
+    background: linear-gradient(180deg, #fff7e6, #f5e3b7);
+}
+
+/* Select estilo pergaminho D&D com seta customizada dourada */
+.ficha-modal-field select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image:
+        linear-gradient(180deg, rgba(255, 252, 244, 0.95), rgba(244, 230, 197, 0.85)),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%235c3a1e' d='M6 8L0 0h12z'/></svg>");
+    background-repeat: no-repeat, no-repeat;
+    background-position: 0 0, right 0.85rem center;
+    background-size: auto, 11px 7px;
+    padding-right: 2.15rem;
+    cursor: pointer;
+}
+
+.ficha-modal-field select:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ficha-modal-field select option {
+    background: var(--cor-pergaminho);
+    color: var(--cor-tinta);
+    font-family: var(--fonte-texto);
+}
+
+.ficha-modal-field small {
+    color: var(--cor-madeira-clara);
+    font-size: 0.76rem;
+    line-height: 1.4;
+}
+
+.ficha-modal-field small.is-fallback {
+    color: #b9770e;
+}
+
+.ficha-modal-money-total {
+    display: block;
+    margin-top: 0.1rem;
+    color: var(--cor-madeira);
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.ficha-btn-cancelar {
+    background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%);
+    border: 1px solid rgba(92, 58, 30, 0.55);
+    color: #fff7ed;
+    font-family: var(--fonte-titulo);
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.55rem 1.05rem;
+    min-height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.2s ease, box-shadow 0.15s ease;
+    box-shadow: 0 2px 6px rgba(92, 58, 30, 0.3);
+}
+
+.ficha-btn-cancelar:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+    box-shadow: 0 3px 10px rgba(124, 45, 18, 0.4);
+}
+
+.ficha-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1.1rem 1.05rem;
+    border-top: 1px solid rgba(92, 58, 30, 0.18);
+    background: linear-gradient(0deg, rgba(168, 125, 66, 0.08), transparent);
+}
+
+/* Padroniza altura/estilo do botao Salvar dentro dos modais da ficha */
+.ficha-modal-actions .ficha-btn-salvar {
+    font-family: var(--fonte-titulo);
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.55rem 1.15rem;
+    min-height: 38px;
+    border-radius: 8px;
+}
+
+.ficha-nivel-linha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(92,58,30,0.08);
+    border-radius: 6px;
+}
+.ficha-nivel-label {
+    font-size: 0.68rem;
+    color: var(--cor-tinta-suave);
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+.ficha-nivel-valor {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+}
+
+/* ── Seção genérica ── */
+.ficha-secao {
+    background: linear-gradient(135deg, var(--cor-pergaminho) 0%, var(--cor-pergaminho-esc) 100%);
+    border: 2px solid var(--cor-madeira-clara);
+    border-radius: 10px;
+    padding: 0.75rem 0.85rem;
+    box-shadow: var(--sombra-suave);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Borda superior sutil nas seções */
+.ficha-secao::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cor-dourada), rgba(201,168,76,0.3), var(--cor-dourada));
+    opacity: 0.5;
+}
+
+.ficha-secao-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--cor-dourada);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.ficha-vazio {
+    font-size: 0.75rem;
+    color: var(--cor-madeira-clara);
+    font-style: italic;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+/* ── Equipamentos ── */
+.ficha-equipamentos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ficha-equip-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(92,58,30,0.06);
+    border-radius: 4px;
+    font-size: 0.72rem;
+    color: var(--cor-tinta);
+    border-left: 3px solid var(--cor-madeira-clara);
+}
+
+/* 
+   COLUNA CENTRAL
+    */
+.ficha-coluna-central {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ── Atributos em círculos ── */
+.ficha-atributos-circulo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+    justify-items: center;
+}
+
+/* Layout alternativo: 3 colunas × 2 linhas para resumo */
+.ficha-atributos-circulo-grid-resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    justify-items: center;
+}
+
+.ficha-atributo-circulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.circulo-externo {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--cor-pergaminho), var(--cor-pergaminho-esc));
+    border: 2px solid var(--cor-dourada);
+    box-shadow: 0 3px 10px rgba(44,26,14,0.3),
+                inset 0 2px 6px rgba(201,168,76,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+.circulo-externo::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.35);
+    pointer-events: none;
+}
+.circulo-externo:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(201,168,76,0.4),
+                inset 0 2px 8px rgba(201,168,76,0.3);
+}
+
+.circulo-valor {
+    font-family: var(--fonte-titulo);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    line-height: 1;
+}
+
+.circulo-mod {
+    font-size: 0.68rem;
+    color: var(--cor-tinta-suave);
+    font-family: var(--fonte-titulo);
+    line-height: 1;
+}
+
+.circulo-label {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* ── Defesa: CA / PV / Iniciativa ── */
+.ficha-defesa-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.ficha-defesa-box {
+    border-radius: 10px;
+    padding: 0.7rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: var(--sombra-suave);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Reflexo de luz nos boxes de defesa */
+.ficha-defesa-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent);
+    pointer-events: none;
+    border-radius: 10px 10px 0 0;
+}
+
+.ficha-ca-box {
+    background: linear-gradient(135deg, #1a3a6b 0%, #0f2040 100%);
+    border: 2px solid #4a7abf;
+}
+
+.ficha-pv-box {
+    background: linear-gradient(135deg, #8b1a1a 0%, #5c0f0f 100%);
+    border: 2px solid #c94040;
+    justify-content: center;
+}
+
+.ficha-ini-box {
+    background: linear-gradient(135deg, var(--cor-madeira) 0%, #3d2410 100%);
+    border: 2px solid var(--cor-dourada);
+    justify-content: center;
+}
+
+.ficha-defesa-label {
+    font-family: var(--fonte-titulo);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.6);
+}
+
+.ficha-defesa-valor {
+    font-family: var(--fonte-titulo);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    position: relative;
+    z-index: 1;
+}
+
+.ficha-pv-valor { font-size: 1.25rem; position: relative; z-index: 1; }
+
+.ficha-ca-detalhes {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+}
+.ficha-ca-sub { display: flex; flex-direction: column; align-items: center; gap: 0.05rem; }
+.ficha-ca-sub-label { font-size: 0.5rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
+.ficha-ca-sub-valor { font-size: 0.85rem; color: rgba(255,255,255,0.85); font-weight: 700; font-family: var(--fonte-titulo); }
+
+.ficha-pv-barra-wrap { width: 100%; }
+.ficha-pv-barra {
+    height: 5px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.ficha-pv-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b6b, #ff4040);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+/* ── Resistências ── */
+.ficha-resistencias-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+}
+
+.ficha-resistencia-box {
+    background: radial-gradient(circle at 35% 35%, var(--cor-pergaminho), var(--cor-pergaminho-esc));
+    border: 2px solid var(--cor-madeira-clara);
+    border-radius: 8px;
+    padding: 0.5rem 0.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    box-shadow: var(--sombra-suave);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.ficha-resistencia-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44,26,14,0.25);
+}
+
+.ficha-res-label {
+    font-family: var(--fonte-titulo);
+    font-size: 0.62rem;
+    color: var(--cor-madeira-clara);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.ficha-res-valor {
+    font-family: var(--fonte-titulo);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--cor-madeira);
+}
+
+.ficha-res-breakdown {
+    font-size: 0.62rem;
+    color: var(--cor-madeira-clara);
+    text-align: center;
+    line-height: 1.2;
+}
+
+.ficha-defesa-label-com-ajuda {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+}
+
+.ficha-help-icon {
+    font-size: 0.64rem;
+    color: rgba(120, 84, 45, 0.65);
+    opacity: 0.85;
+    cursor: help;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    user-select: none;
+}
+
+.ficha-help-icon:hover {
+    color: rgba(120, 84, 45, 0.9);
+    opacity: 1;
+}
+
+.ficha-help-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.ficha-raciais-count {
+    min-width: 1rem;
+    height: 1rem;
+    padding: 0 0.2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(120, 84, 45, 0.35);
+    background: rgba(120, 84, 45, 0.14);
+    color: rgba(120, 84, 45, 0.9);
+    font-size: 0.55rem;
+    font-weight: 700;
+    line-height: 1rem;
+    text-align: center;
+}
+
+.ficha-raciais-count.is-empty {
+    display: none;
+}
+
+.ficha-defesa-popup-btn {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.22rem;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+
+.ficha-habilidades-especiais-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ficha-habilidade-especial-item {
+    font-size: 0.78rem;
+    color: var(--cor-madeira);
+    background: rgba(92, 58, 30, 0.08);
+    border: 1px solid rgba(92, 58, 30, 0.2);
+    border-radius: 6px;
+    padding: 0.4rem 0.5rem;
+    line-height: 1.3;
+}
+
+.ficha-habilidade-especial-chip[title] {
+    border-bottom: 1px dotted rgba(92, 58, 30, 0.55);
+    cursor: help;
+}
+
+.ficha-habilidade-especial-chip[title]:hover {
+    background: rgba(92, 58, 30, 0.12);
+    border-radius: 3px;
+}
+
+.ficha-habilidade-especial-nivel {
+    font-weight: 700;
+    margin-right: 0.3rem;
+}
+
+.ficha-idiomas-form {
+    display: flex;
+    gap: 0.45rem;
+    margin-bottom: 0.5rem;
+}
+
+.ficha-idiomas-form input {
+    flex: 1;
+    min-width: 0;
+}
+
+.ficha-idiomas-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.ficha-idioma-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.26rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(92, 58, 30, 0.22);
+    background: rgba(92, 58, 30, 0.08);
+    color: var(--cor-madeira);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.ficha-idioma-remover {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-size: 0.82rem;
+}
+
+/* 
+   COLUNA DIREITA
+    */
+.ficha-coluna-direita {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+    width: 100%;        /* ✅ ocupa o 1fr inteiro */
+}
+
+/* ── Ataques ── */
+.ficha-ataques-tabela { display: flex; flex-direction: column; gap: 0.18rem; }
+
+.ficha-ataque-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: rgba(92,58,30,0.15);
+    border-radius: 4px;
+    align-items: center;
+}
+.ficha-ataque-header span {
+    font-size: 0.65rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.ficha-ataques-lista { display: flex; flex-direction: column; gap: 0.15rem; }
+
+/* ✅ Suporta tanto ficha-ataque-row quanto ficha-ataque-linha */
+.ficha-ataque-row,
+.ficha-ataque-linha {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: rgba(92,58,30,0.06);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 4px;
+    transition: background 0.15s;
+    align-items: center;
+}
+.ficha-ataque-row:hover,
+.ficha-ataque-linha:hover { background: rgba(92,58,30,0.12); }
+.ficha-ataque-row span,
+.ficha-ataque-linha span { font-size: 0.78rem; color: var(--cor-tinta); }
+.ficha-ataque-row .ataque-nome,
+.ficha-ataque-linha .ficha-ataque-nome { font-weight: 700; color: var(--cor-madeira); }
+
+.ficha-ataque-vazio {
+    font-size: 0.75rem;
+    color: var(--cor-madeira-clara);
+    font-style: italic;
+    padding: 0.3rem 0.5rem;
+}
+
+/* ── EQUIPAMENTOS ── */
+.ficha-equipamentos-tabela {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+}
+
+.ficha-equipamento-header {
+    display: grid;
+    grid-template-columns: 2.3fr 1.2fr 1fr 0.8fr 50px;
+    gap: 0.5rem;
+    padding: 0.7rem;
+    background: rgba(92,58,30,0.15);
+    border-radius: 4px;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.ficha-equipamento-header span {
+    font-size: 0.65rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.ficha-equipamentos-lista-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.ficha-equipamento-linha {
+    display: grid;
+    grid-template-columns: 2.3fr 1.2fr 1fr 0.8fr 50px;
+    gap: 0.5rem;
+    padding: 0.7rem;
+    background: rgba(92,58,30,0.06);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 4px;
+    transition: background 0.15s;
+    align-items: center;
+}
+
+.ficha-equipamento-linha:hover {
+    background: rgba(92,58,30,0.12);
+}
+
+.ficha-equipamento-linha span {
+    font-size: 0.78rem;
+    color: var(--cor-tinta);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ficha-equipamento-nome {
+    font-weight: 700;
+    color: var(--cor-madeira);
+    min-width: 0;
+}
+
+.ficha-equipamento-desc {
+    font-size: 0.73rem;
+    color: var(--cor-tinta-suave);
+    min-width: 0;
+}
+
+.ficha-equipamento-pag {
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+    text-align: center;
+    min-width: 0;
+}
+
+.ficha-equipamento-qtd {
+    text-align: center;
+    font-weight: 600;
+    color: var(--cor-verde);
+}
+
+.consumiveis-filtros {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0.55rem 1rem 0.65rem;
+    background: rgba(92, 58, 30, 0.04);
+    border-bottom: 1px solid rgba(92, 58, 30, 0.2);
+}
+
+.consumiveis-filtro-btn {
+    border: 1px solid rgba(92, 58, 30, 0.45);
+    background: rgba(92, 58, 30, 0.08);
+    color: var(--cor-tinta);
+    border-radius: 999px;
+    padding: 0.28rem 0.7rem;
+    font-size: 0.74rem;
+    cursor: pointer;
+}
+
+.consumiveis-filtro-btn.ativo {
+    background: rgba(124, 58, 237, 0.16);
+    border-color: rgba(124, 58, 237, 0.55);
+    color: #4c1d95;
+}
+
+/* ── Magias: grid responsivo ── */
+.ficha-magias-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+}
+
+.ficha-magia-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    background: rgba(26,58,107,0.08);
+    border: 1px solid rgba(26,58,107,0.2);
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+.ficha-magia-row:hover { background: rgba(26,58,107,0.14); }
+
+.ficha-magia-nivel {
+    font-size: 0.65rem;
+    color: var(--cor-tinta-suave);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+}
+
+.ficha-magia-slots {
+    font-size: 0.85rem;
+    color: var(--cor-azul);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+}
+
+.ficha-magia-vazio {
+    font-size: 0.75rem;
+    color: var(--cor-madeira-clara);
+    font-style: italic;
+    grid-column: 1 / -1;
+}
+
+/* ── Scrollbar temático ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(92,58,30,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--cor-madeira-clara); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cor-madeira); }
+
+/* ── Ornamento de fundo ── */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(201,168,76,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+.ficha-wrapper { position: relative; z-index: 1; }
+
+/* ========== PERÍCIAS DINÂMICAS ========== */
+/* Layout único (todas as larguras): nome → atributo → grade de modificadores */
+
+.ficha-secao.ficha-secao-pericias {
+    overflow: visible;
+}
+
+.ficha-pericias-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    /* Altura dinâmica, scrollable */
+    max-height: 500px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.35rem 0.45rem 0.5rem 0.1rem;
+    scroll-padding-block: 0.25rem;
+}
+
+.ficha-pericias-lista::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ficha-pericia-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0.65rem 0.85rem;
+    min-height: min-content;
+    background: linear-gradient(135deg, rgba(92,58,30,0.08) 0%, rgba(92,58,30,0.04) 100%);
+    border-radius: 8px;
+    border-left: 4px solid var(--cor-dourada);
+    transition: all 0.2s;
+    position: relative;
+    min-width: 0;
+    overflow: visible;
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 1px 0 rgba(92, 58, 30, 0.06);
+}
+
+.ficha-pericia-item:hover {
+    background: linear-gradient(135deg, rgba(92,58,30,0.15) 0%, rgba(92,58,30,0.08) 100%);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(44,26,14,0.2);
+}
+
+.ficha-pericia-nome {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    flex: none;
+    font-size: 0.84rem;
+    line-height: 1.35;
+    color: var(--cor-tinta);
+    font-weight: 600;
+    font-family: var(--fonte-texto);
+    white-space: normal;
+    min-width: 0;
+    padding-right: 0;
+}
+
+.ficha-pericia-nome-texto {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.ficha-pericia-arena-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+    margin-left: auto;
+    max-width: 100%;
+}
+
+.ficha-pericia-arena-toggle .ficha-pericia-mod-label {
+    font-size: 0.54rem;
+    color: var(--cor-madeira-clara);
+}
+
+.ficha-pericia-destaque-arena {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 46px;
+    height: 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(92, 58, 30, 0.4);
+    background: rgba(74, 48, 28, 0.42);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ficha-pericia-destaque-arena::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff7e6;
+    box-shadow: 0 1px 3px rgba(44, 26, 14, 0.3);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.ficha-pericia-destaque-arena::after {
+    content: 'OFF';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.48rem;
+    font-family: var(--fonte-titulo);
+    color: rgba(232, 213, 176, 0.95);
+    letter-spacing: 0.02em;
+    font-weight: 700;
+}
+
+.ficha-pericia-destaque-arena:checked {
+    background: linear-gradient(135deg, #c9a84c 0%, #a87d30 100%);
+    border-color: rgba(92, 58, 30, 0.65);
+}
+
+.ficha-pericia-destaque-arena:checked::before {
+    transform: translateX(28px);
+    background: #d7fbe2;
+}
+
+.ficha-pericia-destaque-arena:checked::after {
+    content: 'ON';
+    right: auto;
+    left: 7px;
+    color: rgba(61, 36, 16, 0.95);
+}
+
+.ficha-pericia-destaque-arena:hover {
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.18);
+}
+
+.ficha-pericia-destaque-arena:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ficha-pericia-atributo {
+    font-size: 0.68rem;
+    color: var(--cor-madeira-clara);
+    font-family: var(--fonte-titulo);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 0.06em;
+    min-width: 2rem;
+    text-align: left;
+    align-self: flex-start;
+}
+
+.ficha-pericia-mods {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: 100%;
+    gap: 0.45rem;
+    align-items: end;
+    flex-shrink: 0;
+    padding-left: 0;
+}
+
+.ficha-pericia-mod {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.ficha-pericia-mod-label {
+    font-size: 0.56rem;
+    line-height: 1.15;
+    color: var(--cor-tinta-suave);
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.92;
+}
+
+.ficha-pericia-mod-valor {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+    min-width: 32px;
+    text-align: center;
+}
+
+/* ── Inputs editáveis de perícia ── */
+.ficha-pericia-input {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-family: var(--fonte-titulo);
+    width: 45px;
+    padding: 0.2rem 0.3rem;
+    border: 1px solid var(--cor-madeira-clara);
+    border-radius: 3px;
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.8), rgba(232, 213, 176, 0.8));
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ficha-pericia-input:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 6px rgba(201, 168, 76, 0.3);
+}
+
+.ficha-pericia-input::-webkit-outer-spin-button,
+.ficha-pericia-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ficha-pericia-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.ficha-pericia-total-valor {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    font-weight: 700;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    min-width: 40px;
+    text-align: right;
+    background: rgba(201,168,76,0.15);
+    padding: 0.28rem 0.55rem;
+    border-radius: 6px;
+    flex-shrink: 0;             /* ✅ não encolhe */
+    margin-left: 0.15rem;
+}
+
+.ficha-pericia-total-valor.positivo {
+    color: var(--cor-verde);
+    background: rgba(26, 92, 42, 0.15);
+}
+
+.ficha-pericia-total-valor.negativo {
+    color: var(--cor-vermelho);
+    background: rgba(139, 26, 26, 0.15);
+}
+
+.ficha-pericia-total {
+    font-size: 0.88rem;         /* ✅ levemente maior */
+    font-weight: 700;
+    color: var(--cor-dourada);
+    font-family: var(--fonte-titulo);
+    min-width: 38px;            /* ✅ aumentado */
+    text-align: right;
+    background: rgba(201,168,76,0.15);
+    padding: 0.2rem 0.5rem;     /* ✅ padding aumentado */
+    border-radius: 4px;
+    flex-shrink: 0;             /* ✅ não encolhe */
+}
+
+/* ── Seção de magias — botão grimório ── */
+.btn-abrir-grimorio {
+    margin-top: 0.25rem;
+    width: 100%;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+
+@media (max-width: 1200px) {
+    .ficha-corpo {
+        /* ✅ Mantém proporção */
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .ficha-pericia-mod-valor {
+        font-size: 0.72rem;
+        min-width: 26px;
+    }
+
+    .ficha-pericia-total {
+        min-width: 34px;
+    }
+}
+
+@media (max-width: 992px) {
+    .ficha-corpo {
+        grid-template-columns: 1fr;
+    }
+
+    .ficha-coluna-esquerda,
+    .ficha-coluna-central,
+    .ficha-coluna-direita {
+        width: 100%;
+    }
+
+    .ficha-pericias-lista {
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .ficha-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .ficha-titulo-texto {
+        font-size: 1.2rem;
+    }
+
+    .ficha-pericia-item {
+        padding: 0.55rem 0.65rem;
+        gap: 0.45rem;
+    }
+
+    .ficha-pericia-atributo {
+        font-size: 0.62rem;
+    }
+
+    .ficha-pericia-mods {
+        gap: 0.4rem;
+    }
+
+    .ficha-pericia-mod-valor {
+        font-size: 0.68rem;
+        min-width: 24px;
+    }
+
+    .ficha-pericia-total {
+        font-size: 0.8rem;
+        min-width: 32px;
+    }
+
+    .ficha-secao-header {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 0.4rem;
+    }
+
+    .ficha-secao-header .ficha-secao-titulo {
+        flex: 1 1 100%;
+        padding-bottom: 0.25rem;
+    }
+
+    .ficha-secao-header .ficha-btn-adicionar {
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .ficha-pericias-lista {
+        max-height: 250px;
+        gap: 0.65rem;
+    }
+
+    .ficha-pericia-item {
+        padding: 0.42rem 0.48rem;
+        gap: 0.38rem;
+    }
+
+    .ficha-pericia-nome {
+        font-size: 0.75rem;
+    }
+
+    .ficha-pericia-nome {
+        gap: 0.3rem;
+    }
+
+    .ficha-pericia-destaque-arena {
+        width: 52px;
+        height: 22px;
+    }
+
+    .ficha-pericia-destaque-arena::before {
+        width: 18px;
+        height: 18px;
+    }
+
+    .ficha-pericia-destaque-arena::after {
+        font-size: 0.52rem;
+    }
+
+    .ficha-pericia-destaque-arena:checked::before {
+        transform: translateX(30px);
+    }
+
+    .ficha-pericia-atributo {
+        font-size: 0.58rem;
+    }
+
+    .ficha-pericia-mods {
+        gap: 0.28rem;
+    }
+
+    .ficha-pericia-mod-label {
+        font-size: 0.52rem;
+    }
+
+    .ficha-pericia-total {
+        font-size: 0.75rem;
+    }
+}
+
+/* ── Sincronização arena → ficha: animação de pulse ── */
+@keyframes slotPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(201,168,76,0.7); }
+    50%  { box-shadow: 0 0 0 8px rgba(201,168,76,0); }
+    100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+}
+
+.ficha-slot-pulse {
+    animation: slotPulse 0.6s ease-out;
+}
+
+.ficha-slot-esgotado {
+    opacity: 0.55;
+    border-color: rgba(248,113,113,0.4) !important;
+}
+
+.ficha-slot-esgotado .ficha-magia-usados,
+.ficha-slot-esgotado .ficha-slot-disponiveis {
+    color: #f87171 !important;
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODAL DE EQUIPAMENTOS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.equipamentos-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(2px);
+}
+
+.equipamentos-container {
+    background: var(--cor-pergaminho);
+    border: 3px solid var(--cor-dourada);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    max-width: 1020px;
+    width: 92%;
+    max-height: 85vh;
+    box-shadow: 0 12px 60px rgba(44, 26, 14, 0.8);
+    overflow: hidden;
+}
+
+.equipamentos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(139,94,60,0.15));
+    border-bottom: 2px solid var(--cor-dourada);
+}
+
+.equipamentos-header-esquerda {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.equipamentos-icone {
+    font-size: 2rem;
+}
+
+.equipamentos-titulo {
+    font-family: var(--fonte-titulo);
+    font-size: 1.2rem;
+    color: var(--cor-madeira);
+    margin: 0;
+}
+
+.equipamentos-subtitulo {
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+    margin: 0;
+    font-style: italic;
+}
+
+.equipamentos-fechar {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--cor-madeira);
+    transition: color 0.15s;
+}
+
+.equipamentos-fechar:hover {
+    color: var(--cor-vermelho);
+}
+
+.equipamentos-controles {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(92,58,30,0.06);
+    border-bottom: 1px solid rgba(92,58,30,0.2);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.equipamentos-busca-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.equipamentos-busca-label {
+    font-size: 0.65rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+}
+
+.equipamentos-busca {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgba(92,58,30,0.3);
+    border-radius: 4px;
+    font-family: var(--fonte-texto);
+    font-size: 0.8rem;
+    background: white;
+    color: var(--cor-tinta);
+    transition: border-color 0.15s;
+}
+
+.equipamentos-busca:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 8px rgba(201,168,76,0.3);
+}
+
+/* Grimório Tormenta: alinhar campo de busca à base com os botões */
+.equipamentos-controles.t20-grimorio-barra-busca {
+    align-items: flex-end;
+    gap: 0.65rem;
+}
+
+.t20-grimorio-busca-grow {
+    flex: 1;
+    min-width: min(100%, 12rem);
+}
+
+.t20-grimorio-btn-buscar {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.t20-ficha-backup-details {
+    margin: 0;
+    border: 1px solid rgba(92, 58, 30, 0.25);
+    border-radius: 4px;
+    padding: 0.35rem 0.5rem;
+    background: rgba(92, 58, 30, 0.04);
+}
+
+.t20-ficha-backup-details > summary {
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    color: var(--cor-madeira-clara);
+    text-transform: uppercase;
+    list-style: none;
+}
+
+.t20-ficha-backup-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.t20-ficha-backup-details .t20-ficha-backup-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.4rem;
+    align-items: center;
+}
+
+.equipamentos-quantidade-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.equipamentos-label {
+    font-size: 0.65rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+}
+
+.equipamentos-input-qtd {
+    width: 80px;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgba(92,58,30,0.3);
+    border-radius: 4px;
+    font-family: var(--fonte-texto);
+    font-size: 0.8rem;
+    background: white;
+    color: var(--cor-tinta);
+}
+
+.equipamentos-corpo {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--cor-pergaminho);
+}
+
+.equipamentos-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamentos-loading-icone {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Lista em coluna só quando NÃO for grid (evita empate de especificidade com .equipamentos-lista-grid) */
+.equipamentos-lista:not(.equipamentos-lista-grid) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.equipamento-item {
+    padding: 0.8rem;
+    background: rgba(92,58,30,0.08);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.equipamento-item:hover {
+    background: rgba(92,58,30,0.14);
+    border-color: var(--cor-dourada);
+    box-shadow: 0 2px 8px rgba(201,168,76,0.2);
+}
+
+.equipamento-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.equipamento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.equipamento-nome {
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-size: 0.85rem;
+    font-family: var(--fonte-titulo);
+    margin: 0;
+    flex: 1;
+}
+
+.equipamento-desc {
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+    line-height: 1.3;
+}
+
+.equipamento-pag {
+    font-size: 0.65rem;
+    color: var(--cor-tinta-suave);
+    font-style: italic;
+}
+
+.equipamento-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+}
+
+.equipamento-btn-adicionar {
+    background: var(--cor-verde);
+    border: none;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: all 0.15s;
+    white-space: nowrap;
+    align-self: flex-end;
+}
+
+.equipamento-btn-adicionar:hover {
+    background: #2a7a3a;
+    box-shadow: 0 2px 6px rgba(42, 122, 58, 0.3);
+}
+
+.equipamento-btn-deletar {
+    background: var(--cor-vermelho, #c44536);
+    border: none;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-weight: 700;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.equipamento-btn-deletar:hover {
+    background: #a63a28;
+    box-shadow: 0 2px 6px rgba(196, 69, 54, 0.3);
+}
+
+.equipamento-detalhes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamento-categoria {
+    background: rgba(201,168,76,0.1);
+    color: var(--cor-dourada);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 0.65rem;
+}
+
+.equipamento-custo,
+.equipamento-dano,
+.equipamento-critico,
+.equipamento-peso,
+.equipamento-tipo {
+    font-size: 0.65rem;
+    color: var(--cor-tinta-suave);
+}
+
+.equipamento-custo::before,
+.equipamento-dano::before,
+.equipamento-critico::before,
+.equipamento-peso::before,
+.equipamento-tipo::before {
+    content: "• ";
+    color: var(--cor-dourada);
+}
+
+.ficha-btn-adicionar {
+    background: var(--cor-verde);
+    border: none;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: background 0.15s;
+}
+
+.ficha-btn-adicionar:hover {
+    background: #2a7a3a;
+}
+
+.ficha-secao-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.ficha-btn-salvar {
+    background: linear-gradient(135deg, var(--cor-azul) 0%, #0f2040 100%);
+    border: 1px solid #4a7abf;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.ficha-btn-salvar:hover {
+    background: linear-gradient(135deg, #2a5a9b 0%, #1a3a6b 100%);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.ficha-btn-salvar:active {
+    transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ABAS DO MODAL DE EQUIPAMENTOS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.equipamentos-abas {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(92,58,30,0.08);
+    border-bottom: 1px solid rgba(92,58,30,0.2);
+}
+
+.equipamentos-aba {
+    padding: 0.6rem 1rem;
+    background: rgba(92,58,30,0.1);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.75rem;
+    color: var(--cor-madeira);
+    transition: all 0.15s;
+}
+
+.equipamentos-aba:hover {
+    background: rgba(92,58,30,0.2);
+    border-color: var(--cor-dourada);
+}
+
+.equipamentos-aba.ativa {
+    background: var(--cor-dourada);
+    color: var(--cor-pergaminho);
+    border-color: var(--cor-dourada);
+}
+
+.equipamentos-conteudo {
+    display: none;
+    overflow-y: auto;
+    flex: 1;
+    padding: 1rem;
+}
+
+.equipamentos-conteudo.ativo {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FORMULÁRIO DE CRIAR EQUIPAMENTO
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.equipamentos-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.equipamentos-form-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.equipamentos-form-label {
+    font-size: 0.7rem;
+    color: var(--cor-madeira-clara);
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.equipamentos-form-input {
+    padding: 0.65rem 0.85rem;
+    border: 1px solid rgba(92,58,30,0.3);
+    border-radius: 4px;
+    font-family: var(--fonte-texto);
+    font-size: 1rem;
+    line-height: 1.45;
+    background: rgba(244,233,208,0.8);
+    color: var(--cor-tinta);
+    transition: all 0.15s;
+}
+
+.equipamentos-form-input:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    background: white;
+    box-shadow: 0 0 8px rgba(201,168,76,0.3);
+}
+
+.equipamentos-form-input::placeholder {
+    color: rgba(44,26,14,0.5);
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+.equipamentos-btn-salvar {
+    align-self: flex-start;
+    padding: 0.6rem 1.2rem;
+    background: var(--cor-verde);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--fonte-titulo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: background 0.15s;
+    margin-top: 0.5rem;
+}
+
+.equipamentos-btn-salvar:hover {
+    background: #2a7a3a;
+}
+
+.equipamentos-btn-salvar:active {
+    transform: scale(0.98);
+}
+
+.equipamentos-vazio {
+    text-align: center;
+    padding: 2rem;
+    color: var(--cor-tinta-suave);
+    font-style: italic;
+}
+
+.btn-deletar-eq {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.4rem;
+    transition: transform 0.15s, opacity 0.15s;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.btn-deletar-eq:hover {
+    transform: scale(1.15);
+    background: rgba(220, 53, 69, 0.15);
+}
+
+.btn-deletar-eq:active {
+    transform: scale(0.95);
+}
+
+/* ── TALENTOS ── */
+
+.ficha-talentos-lista {
+    width: 100%;
+}
+
+/* Grid layout para cards de talentos */
+.ficha-talentos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .ficha-talentos-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ficha-talento-card {
+    background: rgba(244, 233, 208, 0.3);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(44, 26, 14, 0.1);
+}
+
+.ficha-talento-card:hover {
+    background: rgba(244, 233, 208, 0.5);
+    border-color: var(--cor-dourada);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(44, 26, 14, 0.2);
+}
+
+.ficha-talento-card-header {
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+}
+
+.ficha-talento-card-title {
+    font-family: var(--fonte-titulo);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cor-madeira);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.ficha-talento-card-body {
+    margin-bottom: 0.8rem;
+}
+
+.ficha-talento-card-field {
+    margin-bottom: 0.6rem;
+}
+
+.ficha-talento-card-field:last-child {
+    margin-bottom: 0;
+}
+
+.ficha-talento-card-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--cor-madeira-clara);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+}
+
+.ficha-talento-card-value {
+    font-size: 0.85rem;
+    color: var(--cor-tinta);
+    line-height: 1.4;
+    margin: 0;
+}
+
+.ficha-talento-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(201, 168, 76, 0.2);
+}
+
+.btn-deletar-tal {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border: 1px solid #bd2130;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-deletar-tal:hover {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    transform: scale(1.05);
+}
+
+.btn-deletar-tal:active {
+    transform: scale(0.95);
+}
+
+/* Layout antigo em tabela (mantido para compatibilidade) */
+.ficha-talentos-tabela {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ficha-talento-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 0.5fr;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: rgba(201, 168, 76, 0.15);
+    border-radius: 4px;
+    font-weight: 700;
+    color: var(--cor-tinta);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--cor-dourada);
+}
+
+.ficha-talento-linha {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 0.5fr;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: rgba(244, 233, 208, 0.3);
+    border-radius: 4px;
+    align-items: center;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+}
+
+.ficha-talento-linha:hover {
+    background: rgba(244, 233, 208, 0.6);
+    border-left-color: var(--cor-dourada);
+}
+
+.ficha-talento-nome {
+    font-weight: 600;
+    color: var(--cor-tinta);
+}
+
+.ficha-talento-desc {
+    color: var(--cor-tinta-suave);
+    font-size: 0.9rem;
+}
+
+.ficha-talento-pag {
+    color: rgba(44, 26, 14, 0.6);
+    font-size: 0.85rem;
+}
+
+.btn-deletar-tal {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+    transition: transform 0.15s, opacity 0.15s;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-deletar-tal:hover {
+    transform: scale(1.2);
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.btn-deletar-tal:active {
+    transform: scale(0.95);
+}
+
+/* ── Grid de cards no modal (talentos / armaduras): especificidade dupla ──
+   O mesmo elemento costuma ter equipamentos-lista + equipamentos-lista-grid.
+   Sem o seletor composto, .equipamentos-lista { flex } empatava com .equipamentos-lista-grid
+   e o último no arquivo nem sempre vencia (cache / ordem de folhas). */
+
+.equipamentos-lista.equipamentos-lista-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    align-content: start;
+    box-sizing: border-box;
+}
+
+.equipamentos-lista.equipamentos-lista-grid > .item-card {
+    min-width: 0;
+}
+
+.equipamentos-lista.equipamentos-lista-grid > .talentos-paginacao {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+    .equipamentos-lista.equipamentos-lista-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Modal talentos: lista em linhas (um bloco por talento, mais legível que grid de cards) ── */
+.equipamentos-lista.talentos-lista-linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.talento-linha {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.75rem 1rem;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid rgba(180, 140, 70, 0.55);
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.65), rgba(232, 213, 176, 0.28));
+    box-shadow: 0 1px 4px rgba(92, 58, 30, 0.08);
+    box-sizing: border-box;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.talento-linha:hover {
+    border-color: rgba(201, 168, 76, 0.75);
+    box-shadow: 0 2px 10px rgba(201, 168, 76, 0.18);
+}
+
+.talento-linha-conteudo {
+    flex: 1;
+    min-width: 0;
+}
+
+.talento-linha-cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.75rem;
+    margin-bottom: 0.2rem;
+}
+
+.talento-linha-nome {
+    font-family: var(--fonte-titulo, Georgia, serif);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cor-tinta, #2c1a0e);
+    line-height: 1.25;
+}
+
+.talento-linha-secao {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: rgba(120, 80, 30, 0.95);
+    padding: 0.12rem 0.45rem;
+    border-radius: 4px;
+    background: rgba(201, 168, 76, 0.28);
+    border: 1px solid rgba(180, 140, 70, 0.45);
+}
+
+.talento-linha-beneficio,
+.talento-linha-pre {
+    margin: 0.2rem 0 0;
+    font-size: 0.84rem;
+    line-height: 1.4;
+    color: rgba(44, 26, 14, 0.88);
+}
+
+.talento-linha-pre {
+    font-size: 0.8rem;
+    color: rgba(44, 26, 14, 0.72);
+}
+
+.talento-linha-rotulo {
+    font-weight: 600;
+    color: rgba(44, 26, 14, 0.55);
+    margin-right: 0.25rem;
+}
+
+.talento-linha-acao {
+    flex-shrink: 0;
+    align-self: center;
+    white-space: nowrap;
+}
+
+.equipamento-catalogo-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+    .equipamento-catalogo-acoes {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+}
+
+.talentos-paginacao--lista {
+    width: 100%;
+    margin-top: 0.35rem;
+}
+
+@media (max-width: 560px) {
+    .talento-linha {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .talento-linha-acao {
+        align-self: stretch;
+        width: 100%;
+    }
+}
+
+/* ── Modal equipamentos (catálogo Tabela 7-5): duas colunas (custo/danos | crítico/alcance/peso) ── */
+.equipamento-catalogo-linha .equipamento-spec-grid {
+    margin: 0.45rem 0 0;
+    width: 100%;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-grid--unica {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-grid--duas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 1rem;
+    align-items: start;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-par {
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 9.25rem) 1fr;
+    gap: 0.35rem 0.5rem;
+    align-items: baseline;
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-lbl {
+    font-weight: 600;
+    color: rgba(44, 26, 14, 0.52);
+}
+
+.equipamento-catalogo-linha .equipamento-spec-val {
+    color: rgba(44, 26, 14, 0.9);
+    word-break: break-word;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-vazio {
+    margin: 0.35rem 0 0;
+}
+
+.equipamento-catalogo-linha .equipamento-pag-ref {
+    margin: 0.5rem 0 0;
+}
+
+@media (max-width: 560px) {
+    .equipamento-catalogo-linha .equipamento-spec-grid--duas {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .equipamento-catalogo-linha .equipamento-spec-par {
+        grid-template-columns: 1fr;
+    }
+
+    .equipamento-catalogo-linha .equipamento-spec-lbl {
+        margin-bottom: -0.15rem;
+    }
+}
+
+.equipamentos-card {
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.7), rgba(232, 213, 176, 0.35));
+    border: 2px solid var(--cor-dourada);
+    border-radius: 10px;
+    padding: 1.4rem;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 4px 16px rgba(92, 58, 30, 0.12);
+    width: 100%;
+    max-width: 100%;
+}
+
+.equipamentos-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(92, 58, 30, 0.15);
+    background: linear-gradient(135deg, rgba(244, 233, 208, 0.7), rgba(201, 168, 76, 0.2));
+    border-color: #d4a574;
+}
+
+.equipamentos-card h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-tinta);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.equipamentos-desc {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--cor-tinta-suave);
+    line-height: 1.4;
+}
+
+.equipamentos-pag {
+    margin: 0;
+    font-size: 0.8rem;
+    color: rgba(44, 26, 14, 0.6);
+    font-style: italic;
+}
+
+.equipamentos-btn-adicionar {
+    align-self: flex-start;
+    background: var(--cor-verde);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+}
+
+.equipamentos-btn-adicionar:hover {
+    background: #2a7a3a;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(42, 122, 58, 0.3);
+}
+
+.equipamentos-btn-adicionar:active {
+    transform: scale(0.98);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   CARD DE TALENTO — Estendido com pré-requisitos e benefícios
+   ────────────────────────────────────────────────────────────── */
+
+.talento-card {
+    padding: 0.8rem;
+    background: rgba(92,58,30,0.08);
+    border: 1px solid rgba(92,58,30,0.2);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.talento-card:hover {
+    background: rgba(92,58,30,0.14);
+    border-color: var(--cor-dourada);
+    box-shadow: 0 2px 8px rgba(201,168,76,0.2);
+}
+
+.talento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.talento-nome {
+    margin: 0;
+    font-weight: 700;
+    color: var(--cor-madeira);
+    font-size: 0.85rem;
+    font-family: var(--fonte-titulo);
+    flex: 1;
+    line-height: 1.25;
+}
+
+.talento-secao {
+    display: inline-block;
+    background: var(--cor-dourada);
+    color: var(--cor-tinta);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    border: 1px solid #a87d30;
+    box-shadow: 0 1px 2px rgba(92, 58, 30, 0.15);
+}
+
+.talento-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin: 0;
+    flex: 1;
+}
+
+.talento-card .equipamentos-btn-adicionar {
+    align-self: flex-end;
+    margin-top: 0.3rem;
+}
+
+.talento-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.talento-label {
+    font-size: 0.65rem;
+    color: var(--cor-tinta-suave);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.talento-valor {
+    font-size: 0.7rem;
+    color: var(--cor-tinta-suave);
+    line-height: 1.3;
+    margin: 0;
+}
+
+.talento-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--cor-dourada);
+    letter-spacing: 0.5px;
+}
+
+.talento-valor {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--cor-tinta);
+    line-height: 1.5;
+    padding: 0.6rem 0.8rem;
+    background: rgba(244, 233, 208, 0.5);
+    border-left: 3px solid var(--cor-dourada);
+    border-radius: 4px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLOTS DE MAGIA — Barras de progresso na ficha
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ficha-slot-linha {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.45rem 0.6rem;
+    background: linear-gradient(135deg, rgba(26,58,107,0.10) 0%, rgba(26,58,107,0.04) 100%);
+    border-radius: 6px;
+    border-left: 3px solid var(--cor-azul);
+    transition: all 0.2s;
+}
+
+.ficha-slot-linha:hover {
+    background: linear-gradient(135deg, rgba(26,58,107,0.16) 0%, rgba(26,58,107,0.08) 100%);
+    transform: translateX(2px);
+}
+
+.ficha-slot-linha.ficha-slot-esgotado {
+    border-left-color: #f87171;
+}
+
+.ficha-slot-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ficha-slot-nivel {
+    font-family: var(--fonte-titulo);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--cor-tinta);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ficha-slot-contagem {
+    font-family: var(--fonte-titulo);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--cor-azul);
+}
+
+.ficha-magias-legenda-clerigo {
+    margin: 0 0 0.55rem;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: rgba(44, 26, 14, 0.72);
+    background: rgba(26, 58, 107, 0.08);
+    border-radius: 6px;
+    border-left: 3px solid var(--cor-azul);
+}
+
+.ficha-slot-cleric-origem {
+    margin: 0;
+    font-size: 0.68rem;
+    line-height: 1.3;
+    color: rgba(44, 26, 14, 0.62);
+    font-weight: 600;
+}
+
+.ficha-slot-barra-wrap {
+    height: 5px;
+    background: rgba(26,58,107,0.12);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ficha-slot-barra-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease, background 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BOTÕES GRIMÓRIO
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn-grimorio {
+    background: linear-gradient(135deg, #1a3a6b 0%, #0f2040 100%);
+    border: 2px solid #4a7abf;
+    border-radius: 8px;
+    color: #e2eaf5;
+    font-family: var(--fonte-titulo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+}
+
+.btn-grimorio:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26,58,107,0.4);
+}
+
+.btn-abrir-grimorio {
+    background: linear-gradient(135deg, #1a3a6b 0%, #0f2040 100%);
+    border: 2px solid #4a7abf;
+    border-radius: 8px;
+    color: #e2eaf5;
+    font-family: var(--fonte-titulo);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    letter-spacing: 0.05em;
+    margin-top: 0.4rem;
+    width: 100%;
+}
+
+.btn-abrir-grimorio:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26,58,107,0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VISUAL POLISH — Animações, Atmosfera, Micro-interações
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Keyframes ── */
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes headerGoldShimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+@keyframes parchmentGrain {
+    0%, 100% { transform: translate(0, 0); }
+    10%  { transform: translate(-1px, -1px); }
+    30%  { transform: translate(1px, 0); }
+    50%  { transform: translate(-1px, 1px); }
+    70%  { transform: translate(0, -1px); }
+    90%  { transform: translate(1px, 1px); }
+}
+
+@keyframes sheen {
+    0%   { left: -100%; }
+    100% { left: 200%; }
+}
+
+@keyframes pvPulseGlow {
+    0%, 100% { box-shadow: 0 0 4px rgba(255,64,64,0.3); }
+    50%      { box-shadow: 0 0 12px rgba(255,64,64,0.6); }
+}
+
+@keyframes circleFloatIn {
+    from { opacity: 0; transform: scale(0.6) rotate(-8deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes goldBorderFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes subtleFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
+}
+
+@keyframes candleFlicker {
+    0%, 100% { opacity: 0.04; }
+    25%      { opacity: 0.06; }
+    50%      { opacity: 0.03; }
+    75%      { opacity: 0.07; }
+}
+
+/* ── 2. Atmospheric Background ── */
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        /* Vinheta dramática */
+        radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%),
+        /* Brilho dourado de tocha no canto */
+        radial-gradient(ellipse at 15% 15%, rgba(201,168,76,0.06) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 85%, rgba(139,26,26,0.04) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+    animation: candleFlicker 4s ease-in-out infinite;
+}
+
+/* Grão de textura sutil sobre o fundo */
+/* Omitted global `body` from D&D ficha-personagem.css — Tormenta uses body.tormenta-ficha-body */
+
+/* ── 3. Page Entrance: Staggered Reveals ── */
+
+.ficha-header {
+    animation: fadeIn 0.5s ease-out both;
+}
+
+.ficha-coluna-esquerda {
+    animation: slideInLeft 0.6s ease-out 0.15s both;
+}
+
+.ficha-coluna-central {
+    animation: fadeInUp 0.6s ease-out 0.25s both;
+}
+
+.ficha-coluna-direita {
+    animation: slideInRight 0.6s ease-out 0.35s both;
+}
+
+/* Cada seção dentro das colunas anima escalonadamente */
+.ficha-coluna-esquerda .ficha-secao:nth-child(1) { animation: fadeInUp 0.5s ease-out 0.2s both; }
+.ficha-coluna-esquerda .ficha-secao:nth-child(2) { animation: fadeInUp 0.5s ease-out 0.3s both; }
+.ficha-coluna-esquerda .ficha-secao:nth-child(3) { animation: fadeInUp 0.5s ease-out 0.4s both; }
+.ficha-coluna-esquerda .ficha-defesa-row          { animation: fadeInUp 0.5s ease-out 0.25s both; }
+
+.ficha-coluna-direita .ficha-secao:nth-child(1) { animation: fadeInUp 0.5s ease-out 0.4s both; }
+.ficha-coluna-direita .ficha-secao:nth-child(2) { animation: fadeInUp 0.5s ease-out 0.5s both; }
+.ficha-coluna-direita .ficha-secao:nth-child(3) { animation: fadeInUp 0.5s ease-out 0.6s both; }
+.ficha-coluna-direita .ficha-secao:nth-child(4) { animation: fadeInUp 0.5s ease-out 0.7s both; }
+
+/* Círculos dos atributos entram com escala + rotação */
+.ficha-atributo-circulo:nth-child(1) { animation: circleFloatIn 0.5s ease-out 0.3s both; }
+.ficha-atributo-circulo:nth-child(2) { animation: circleFloatIn 0.5s ease-out 0.38s both; }
+.ficha-atributo-circulo:nth-child(3) { animation: circleFloatIn 0.5s ease-out 0.46s both; }
+.ficha-atributo-circulo:nth-child(4) { animation: circleFloatIn 0.5s ease-out 0.54s both; }
+.ficha-atributo-circulo:nth-child(5) { animation: circleFloatIn 0.5s ease-out 0.62s both; }
+.ficha-atributo-circulo:nth-child(6) { animation: circleFloatIn 0.5s ease-out 0.70s both; }
+
+/* ── 4. Header: Gold Shimmer Border ── */
+
+.ficha-header {
+    border-image: linear-gradient(
+        90deg,
+        var(--cor-dourada) 0%,
+        var(--cor-dourada-brilho) 25%,
+        var(--cor-dourada) 50%,
+        rgba(201,168,76,0.4) 75%,
+        var(--cor-dourada) 100%
+    ) 1;
+    border-width: 2px;
+    border-style: solid;
+    background-size: 200% 100%;
+}
+
+.ficha-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--cor-dourada-brilho) 30%,
+        var(--cor-dourada) 50%,
+        var(--cor-dourada-brilho) 70%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: headerGoldShimmer 4s ease-in-out infinite;
+}
+
+/* ── 5. Photo Frame: Corner Ornaments + Glow ── */
+
+.ficha-foto-container {
+    position: relative;
+    transition: box-shadow 0.4s ease;
+}
+
+.ficha-foto-container:hover {
+    box-shadow:
+        var(--sombra-forte),
+        inset 0 0 30px rgba(201,168,76,0.12),
+        0 0 25px rgba(201,168,76,0.15);
+}
+
+/* Cantos ornamentais do frame */
+.ficha-foto-container::before {
+    content: '✦';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 0.7rem;
+    color: var(--cor-dourada);
+    opacity: 0.5;
+    z-index: 2;
+    text-shadow: 0 0 6px rgba(201,168,76,0.4);
+    pointer-events: none;
+}
+
+/* ── 6. Defense Boxes: Animated Sheen ── */
+
+.ficha-defesa-box {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+
+.ficha-defesa-box:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow:
+        var(--sombra-suave),
+        0 8px 24px rgba(0,0,0,0.3);
+}
+
+/* Sheen brilhante ao hover */
+.ficha-defesa-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.08),
+        transparent
+    );
+    transition: none;
+    pointer-events: none;
+}
+
+.ficha-defesa-box:hover::after {
+    animation: sheen 0.6s ease-out forwards;
+}
+
+/* CA box: brilho azul ao hover */
+.ficha-ca-box:hover {
+    box-shadow:
+        var(--sombra-suave),
+        0 0 20px rgba(74,122,191,0.3);
+}
+
+/* PV box: pulso vermelho */
+.ficha-pv-box:hover {
+    box-shadow:
+        var(--sombra-suave),
+        0 0 20px rgba(201,64,64,0.3);
+}
+
+/* PV barra: gradiente animado */
+.ficha-pv-fill {
+    background: linear-gradient(90deg, #ff6b6b, #ff4040, #ff6b6b);
+    background-size: 200% 100%;
+    animation: goldBorderFlow 3s ease-in-out infinite;
+}
+
+/* ── 7. Attribute Circles: Glow & Interaction ── */
+
+.circulo-externo {
+    cursor: default;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.circulo-externo:hover {
+    transform: scale(1.12);
+    box-shadow:
+        0 6px 20px rgba(201,168,76,0.35),
+        inset 0 2px 8px rgba(201,168,76,0.25),
+        0 0 16px rgba(201,168,76,0.2);
+}
+
+/* Valor do atributo pulsa levemente no hover */
+.circulo-externo:hover .circulo-valor {
+    color: var(--cor-dourada);
+    text-shadow: 0 0 6px rgba(201,168,76,0.4);
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+/* ── 8. Sections: Gold Border Shimmer + Hover ── */
+
+.ficha-secao {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ficha-secao:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        var(--sombra-suave),
+        0 6px 20px rgba(44,26,14,0.15);
+}
+
+/* Borda dourada animada no topo das seções */
+.ficha-secao::after {
+    background: linear-gradient(
+        90deg,
+        var(--cor-dourada),
+        var(--cor-dourada-brilho),
+        var(--cor-dourada),
+        rgba(201,168,76,0.3),
+        var(--cor-dourada)
+    );
+    background-size: 200% 100%;
+    animation: goldBorderFlow 6s ease-in-out infinite;
+    height: 2px;
+    opacity: 0.7;
+}
+
+/* ── 9. Identity Card: Subtle Hover Glow ── */
+
+.ficha-identidade {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ficha-identidade:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        var(--sombra-suave),
+        0 0 16px rgba(201,168,76,0.1);
+}
+
+.ficha-nome {
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.ficha-identidade:hover .ficha-nome {
+    color: var(--cor-dourada);
+    text-shadow: 0 1px 8px rgba(201,168,76,0.3);
+}
+
+/* ── 10. Tags: Hover Interactions ── */
+
+.ficha-tag {
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.ficha-tag:hover {
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.ficha-tag-raca:hover {
+    background: rgba(180, 120, 60, 0.25);
+    border-color: rgba(180, 120, 60, 0.6);
+}
+
+.ficha-tag-classe:hover {
+    background: rgba(65, 105, 225, 0.25);
+    border-color: rgba(65, 105, 225, 0.6);
+}
+
+/* ── 11. Resistência Boxes: Enhanced Hover ── */
+
+.ficha-resistencia-box {
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+}
+
+.ficha-resistencia-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(44,26,14,0.2);
+    border-color: var(--cor-dourada);
+}
+
+.ficha-resistencia-box:hover .ficha-res-valor {
+    color: var(--cor-dourada);
+    text-shadow: 0 0 4px rgba(201,168,76,0.3);
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+/* ── 12. Slot de Magia: Enhanced Bars ── */
+
+.ficha-slot-barra-fill {
+    background: linear-gradient(90deg, #4a7abf, #60a5e8, #4a7abf);
+    background-size: 200% 100%;
+    animation: goldBorderFlow 3s ease-in-out infinite;
+}
+
+.ficha-slot-linha.ficha-slot-esgotado .ficha-slot-barra-fill {
+    background: linear-gradient(90deg, #f87171, #ef4444, #f87171);
+    background-size: 200% 100%;
+}
+
+/* ── 13. Botão Voltar: Sofisticado ── */
+
+.btn-voltar {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.btn-voltar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+    pointer-events: none;
+}
+
+.btn-voltar:hover::after {
+    transform: translateX(100%);
+}
+
+/* ── 14. Botões Grimório: Glow Mágico ── */
+
+.btn-grimorio,
+.btn-abrir-grimorio {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-grimorio:hover,
+.btn-abrir-grimorio:hover {
+    box-shadow:
+        0 4px 12px rgba(26,58,107,0.4),
+        0 0 20px rgba(74,122,191,0.2);
+}
+
+.btn-grimorio::before,
+.btn-abrir-grimorio::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, transparent 30%, rgba(74,122,191,0.15) 50%, transparent 70%);
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+.btn-grimorio:hover::before,
+.btn-abrir-grimorio:hover::before {
+    animation: sheen 0.8s ease-out forwards;
+}
+
+/* ── 15. Perícia Items: Stagger Entrance (só desktop — transform em mobile + scroll costuma “empilhar” itens) ── */
+
+@media (min-width: 769px) {
+    .ficha-pericia-item {
+        animation: fadeInUp 0.3s ease-out both;
+    }
+
+    .ficha-pericia-item:nth-child(1)  { animation-delay: 0.4s; }
+    .ficha-pericia-item:nth-child(2)  { animation-delay: 0.44s; }
+    .ficha-pericia-item:nth-child(3)  { animation-delay: 0.48s; }
+    .ficha-pericia-item:nth-child(4)  { animation-delay: 0.52s; }
+    .ficha-pericia-item:nth-child(5)  { animation-delay: 0.56s; }
+    .ficha-pericia-item:nth-child(6)  { animation-delay: 0.60s; }
+    .ficha-pericia-item:nth-child(7)  { animation-delay: 0.64s; }
+    .ficha-pericia-item:nth-child(8)  { animation-delay: 0.68s; }
+    .ficha-pericia-item:nth-child(9)  { animation-delay: 0.72s; }
+    .ficha-pericia-item:nth-child(10) { animation-delay: 0.76s; }
+}
+
+/* Hover mais expressivo nas perícias */
+.ficha-pericia-item:hover {
+    border-left-color: var(--cor-dourada-brilho);
+}
+
+.ficha-pericia-item:hover .ficha-pericia-nome {
+    color: var(--cor-madeira);
+    text-shadow: 0 0 1px rgba(92,58,30,0.2);
+}
+
+/* ── 16. Equipamento Items: Hover Refinado ── */
+
+.ficha-equip-item {
+    transition: all 0.2s ease;
+}
+
+.ficha-equip-item:hover {
+    background: rgba(92,58,30,0.12);
+    border-left-color: var(--cor-dourada);
+    transform: translateX(3px);
+}
+
+/* ── 17. Ataque Rows: Hover Aprimorado ── */
+
+.ficha-ataque-row:hover,
+.ficha-ataque-linha:hover {
+    background: rgba(92,58,30,0.12);
+    border-color: var(--cor-dourada);
+    box-shadow: 0 2px 8px rgba(44,26,14,0.1);
+}
+
+/* ── 18. Talento Rows: Gold Accent ── */
+
+.ficha-talento-linha:hover {
+    box-shadow: 0 2px 10px rgba(201,168,76,0.15);
+}
+
+/* ── 19. Scrollbar: More Atmospheric ── */
+
+::-webkit-scrollbar-track {
+    background: rgba(44,26,14,0.08);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--cor-madeira-clara), var(--cor-madeira));
+    border-radius: 4px;
+    border: 1px solid rgba(201,168,76,0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--cor-dourada), var(--cor-madeira));
+}
+
+/* ── 20. Focus States: Acessibilidade Medieval ── */
+
+*:focus-visible {
+    outline: 2px solid var(--cor-dourada);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ── 21. Print: Sem animações ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ── 22. Defesa valor: Número sutil flutuante ── */
+
+.ficha-defesa-valor {
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
+}
+
+.ficha-defesa-box:hover .ficha-defesa-valor {
+    transform: scale(1.08);
+    text-shadow: 0 2px 12px rgba(255,255,255,0.3), 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ── 23. Nível Linha: Hover ── */
+
+.ficha-nivel-linha {
+    transition: background 0.2s ease;
+}
+
+.ficha-nivel-linha:hover {
+    background: rgba(201,168,76,0.15);
+}
+
+.ficha-nivel-linha:hover .ficha-nivel-valor {
+    color: var(--cor-dourada);
+    transition: color 0.2s;
+}
+
+/* ── 24. Seção Titulo: Icon bounce ao hover da seção ── */
+
+.ficha-secao:hover .ficha-secao-titulo {
+    color: var(--cor-dourada);
+    transition: color 0.2s;
+}
+
+/* Tormenta 20 — retrato: usar toda a largura da coluna central (sem max-width da ficha D&D). */
+.t20-ficha-col-centro .t20-ficha-secao--retrato {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+.t20-ficha-col-centro .ficha-foto-container--t20-full {
+    max-width: none;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Tormenta 20 ficha: CTA “Adicionar” com vermelho do tema (por cima do verde .ficha-btn-adicionar do parity D&D). */
+.tormenta-ficha-body .ficha-btn-adicionar.tormenta-btn--primary {
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    border: 1px solid var(--t20-red-deep);
+    color: #fff;
+    font-weight: 600;
+    transition:
+        filter 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.tormenta-ficha-body .ficha-btn-adicionar.tormenta-btn--primary:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 2px 8px rgba(139, 0, 0, 0.35);
+}
+
+/* Catálogos e modais na ficha T20: mesmo vermelho (classe herdada do card D&D / item-card-unified). */
+.tormenta-ficha-body button.item-btn-primary,
+.tormenta-ficha-body .talento-linha-acao.item-btn-primary {
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    border: 1px solid var(--t20-red-deep);
+    color: #fff;
+    font-weight: 700;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.7rem;
+    transition:
+        filter 0.15s ease,
+        box-shadow 0.15s ease;
+    white-space: nowrap;
+}
+
+.tormenta-ficha-body button.item-btn-primary:hover,
+.tormenta-ficha-body .talento-linha-acao.item-btn-primary:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 2px 8px rgba(139, 0, 0, 0.35);
+}

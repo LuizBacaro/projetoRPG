@@ -28,6 +28,11 @@ applyTo: "backend/**/*.py"
 - Preserve compatibilidade com testes FastAPI que usam SQLite em memoria com `StaticPool`.
 - Ao tocar auth, cache, listagens ou startup, valide fluxos impactados e destaque risco residual quando nao houver teste.
 
+## Especificacao minima (rotas e contratos)
+
+- Nova rota ou mudanca de payload: manter **schemas** alinhados ao contrato real; preferir **pelo menos um teste** no caminho feliz (e erro esperado se for fluxo critico).
+- Criterios de aceite e risco de breaking change: ver [docs/fluxo-spec-driven-leve.md](../../docs/fluxo-spec-driven-leve.md).
+
 ## Seguranca
 
 - Nao introduza fallback permissivo para usuario atual.

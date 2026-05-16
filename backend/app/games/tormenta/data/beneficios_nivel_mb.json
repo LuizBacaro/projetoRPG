@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 — Módulo Básico, Cap. 3, tabela «Benefícios por Nível de Personagem» (pág. 45).",
+    "nota": "Talentos totais: 1 no 1º e +1 nos níveis ímpares seguintes. Pontos de habilidade acumulados: +1 nos níveis pares. Bônus meio nível: metade do nível (arred. para baixo) em CA, resistências e dano."
+  },
+  "niveis": [
+    { "nivel": 1, "xp_total": 0, "graduacao_pericias": "+4/+0", "talentos_totais": 1, "pontos_habilidade_acumulados": 0, "bonus_meio_nivel": 0 },
+    { "nivel": 2, "xp_total": 1000, "graduacao_pericias": "+5/+1", "talentos_totais": 1, "pontos_habilidade_acumulados": 1, "bonus_meio_nivel": 1 },
+    { "nivel": 3, "xp_total": 3000, "graduacao_pericias": "+6/+1", "talentos_totais": 2, "pontos_habilidade_acumulados": 1, "bonus_meio_nivel": 1 },
+    { "nivel": 4, "xp_total": 6000, "graduacao_pericias": "+7/+2", "talentos_totais": 2, "pontos_habilidade_acumulados": 2, "bonus_meio_nivel": 2 },
+    { "nivel": 5, "xp_total": 10000, "graduacao_pericias": "+8/+2", "talentos_totais": 3, "pontos_habilidade_acumulados": 2, "bonus_meio_nivel": 2 },
+    { "nivel": 6, "xp_total": 15000, "graduacao_pericias": "+9/+3", "talentos_totais": 3, "pontos_habilidade_acumulados": 3, "bonus_meio_nivel": 3 },
+    { "nivel": 7, "xp_total": 21000, "graduacao_pericias": "+10/+3", "talentos_totais": 4, "pontos_habilidade_acumulados": 3, "bonus_meio_nivel": 3 },
+    { "nivel": 8, "xp_total": 28000, "graduacao_pericias": "+11/+4", "talentos_totais": 4, "pontos_habilidade_acumulados": 4, "bonus_meio_nivel": 4 },
+    { "nivel": 9, "xp_total": 36000, "graduacao_pericias": "+12/+4", "talentos_totais": 5, "pontos_habilidade_acumulados": 4, "bonus_meio_nivel": 4 },
+    { "nivel": 10, "xp_total": 45000, "graduacao_pericias": "+13/+5", "talentos_totais": 5, "pontos_habilidade_acumulados": 5, "bonus_meio_nivel": 5 },
+    { "nivel": 11, "xp_total": 55000, "graduacao_pericias": "+14/+5", "talentos_totais": 6, "pontos_habilidade_acumulados": 5, "bonus_meio_nivel": 5 },
+    { "nivel": 12, "xp_total": 66000, "graduacao_pericias": "+15/+6", "talentos_totais": 6, "pontos_habilidade_acumulados": 6, "bonus_meio_nivel": 6 },
+    { "nivel": 13, "xp_total": 78000, "graduacao_pericias": "+16/+6", "talentos_totais": 7, "pontos_habilidade_acumulados": 6, "bonus_meio_nivel": 6 },
+    { "nivel": 14, "xp_total": 91000, "graduacao_pericias": "+17/+7", "talentos_totais": 7, "pontos_habilidade_acumulados": 7, "bonus_meio_nivel": 7 },
+    { "nivel": 15, "xp_total": 105000, "graduacao_pericias": "+18/+7", "talentos_totais": 8, "pontos_habilidade_acumulados": 7, "bonus_meio_nivel": 7 },
+    { "nivel": 16, "xp_total": 120000, "graduacao_pericias": "+19/+8", "talentos_totais": 8, "pontos_habilidade_acumulados": 8, "bonus_meio_nivel": 8 },
+    { "nivel": 17, "xp_total": 136000, "graduacao_pericias": "+20/+8", "talentos_totais": 9, "pontos_habilidade_acumulados": 8, "bonus_meio_nivel": 8 },
+    { "nivel": 18, "xp_total": 153000, "graduacao_pericias": "+21/+9", "talentos_totais": 9, "pontos_habilidade_acumulados": 9, "bonus_meio_nivel": 9 },
+    { "nivel": 19, "xp_total": 171000, "graduacao_pericias": "+22/+9", "talentos_totais": 10, "pontos_habilidade_acumulados": 9, "bonus_meio_nivel": 9 },
+    { "nivel": 20, "xp_total": 190000, "graduacao_pericias": "+23/+10", "talentos_totais": 10, "pontos_habilidade_acumulados": 10, "bonus_meio_nivel": 10 }
+  ]
+}

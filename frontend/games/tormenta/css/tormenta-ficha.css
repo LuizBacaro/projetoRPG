@@ -1,0 +1,2088 @@
+/* Ficha Tormenta 20 — layout estilo planilha (planilha-tormenta.png / 2 / 3) */
+
+.tormenta-ficha-body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--tormenta-font-ui);
+    color: var(--t20-ink);
+    background-color: var(--t20-cream);
+    background-image:
+        radial-gradient(ellipse 140% 90% at 50% 115%, rgba(42, 28, 18, 0.12), transparent 50%),
+        radial-gradient(ellipse 85% 45% at 50% 0%, rgba(139, 0, 0, 0.06), transparent 48%),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 24px,
+            rgba(60, 35, 20, 0.035) 24px,
+            rgba(60, 35, 20, 0.035) 25px
+        ),
+        linear-gradient(180deg, #ddd0c0 0%, var(--t20-cream) 50%, #c4b3a0 100%);
+}
+
+.tormenta-ficha-wrap {
+    max-width: 1420px;
+    margin: 0 auto;
+    padding: 0.75rem 0.85rem 2rem;
+}
+
+.tormenta-ficha-sheet {
+    background: var(--t20-white);
+    border: 3px solid var(--t20-ink);
+    box-shadow: 0 4px 0 rgba(163, 22, 22, 0.25), 0 12px 32px rgba(0, 0, 0, 0.12);
+    padding: 1.05rem 1.15rem 1.25rem;
+}
+
+/* Barra superior Arena — pergaminho + acento vermelho (coerente com planilha 3) */
+.t20-toolbar-arena {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    margin-bottom: 0.5rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #ebe2d6, #dcd2c6);
+    border: 2px solid rgba(20, 12, 8, 0.55);
+    border-bottom: 3px solid var(--t20-red);
+    box-shadow: 0 2px 8px rgba(30, 18, 12, 0.1);
+}
+
+.t20-hidden-admin {
+    display: none;
+}
+
+.t20-hidden-admin.is-mestre {
+    display: block;
+}
+
+.t20-toolbar-arena .tormenta-btn {
+    border-color: rgba(139, 0, 0, 0.35);
+    color: var(--t20-ink);
+    background: rgba(255, 255, 255, 0.88);
+}
+
+.t20-toolbar-arena .tormenta-btn--primary {
+    border-color: var(--t20-red-deep);
+    color: #fff;
+}
+
+/* Cabeçalho ficha + logo */
+.t20-portrait-block {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.65rem;
+    margin-bottom: 0.45rem;
+}
+
+.t20-portrait-frame {
+    position: relative;
+    width: 112px;
+    height: 112px;
+    flex: 0 0 auto;
+    border: 3px solid var(--t20-red-deep);
+    border-radius: 4px;
+    background: linear-gradient(145deg, rgba(224, 234, 252, 0.5), var(--t20-white));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(40, 20, 10, 0.12);
+    overflow: hidden;
+}
+
+.t20-portrait-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.t20-portrait-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: rgba(110, 0, 0, 0.35);
+    background: rgba(255, 254, 248, 0.85);
+}
+
+.t20-portrait-block .t20-ficha-field {
+    flex: 1 1 200px;
+    margin: 0;
+}
+
+.t20-sheet-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 1rem;
+    align-items: start;
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--t20-red);
+}
+
+@media (max-width: 720px) {
+    .t20-sheet-head {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-logo-wrap {
+    text-align: right;
+}
+
+.t20-logo-wrap img {
+    max-width: min(200px, 42vw);
+    height: auto;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.t20-logo-wrap .t20-logo-sub {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--t20-muted);
+    margin-top: 0.2rem;
+}
+
+/* Faixa vermelha “recortada” (título de seção) */
+.t20-band {
+    margin: 0 0 0.5rem;
+    padding: 0.4rem 0.65rem 0.55rem;
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    color: #fff;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - 6px),
+        98% 100%,
+        96% calc(100% - 6px),
+        94% 100%,
+        92% calc(100% - 6px),
+        90% 100%,
+        88% calc(100% - 6px),
+        86% 100%,
+        84% calc(100% - 6px),
+        82% 100%,
+        80% calc(100% - 6px),
+        78% 100%,
+        76% calc(100% - 6px),
+        74% 100%,
+        72% calc(100% - 6px),
+        70% 100%,
+        68% calc(100% - 6px),
+        66% 100%,
+        64% calc(100% - 6px),
+        62% 100%,
+        60% calc(100% - 6px),
+        58% 100%,
+        56% calc(100% - 6px),
+        54% 100%,
+        52% calc(100% - 6px),
+        50% 100%,
+        48% calc(100% - 6px),
+        46% 100%,
+        44% calc(100% - 6px),
+        42% 100%,
+        40% calc(100% - 6px),
+        38% 100%,
+        36% calc(100% - 6px),
+        34% 100%,
+        32% calc(100% - 6px),
+        30% 100%,
+        28% calc(100% - 6px),
+        26% 100%,
+        24% calc(100% - 6px),
+        22% 100%,
+        20% calc(100% - 6px),
+        18% 100%,
+        16% calc(100% - 6px),
+        14% 100%,
+        12% calc(100% - 6px),
+        10% 100%,
+        8% calc(100% - 6px),
+        6% 100%,
+        4% calc(100% - 6px),
+        2% 100%,
+        0% calc(100% - 6px)
+    );
+}
+
+.t20-input,
+.t20-ficha-field input,
+.t20-ficha-field select,
+.t20-ficha-field textarea {
+    font: inherit;
+    color: var(--t20-ink);
+    background: var(--t20-input);
+    border: 1px solid var(--t20-input-border);
+    border-radius: 3px;
+    padding: 0.28rem 0.4rem;
+    box-sizing: border-box;
+}
+
+.t20-ficha-field textarea {
+    resize: vertical;
+    min-height: 3rem;
+}
+
+.t20-ficha-field label {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--t20-muted);
+    margin-bottom: 0.12rem;
+}
+
+/* Grid principal: conteúdo | perícias */
+.t20-main-grid {
+    display: grid;
+    grid-template-columns: 1fr minmax(260px, 32%);
+    gap: 0.65rem 0.75rem;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .t20-main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-identity-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.35rem 0.45rem;
+}
+
+@media (max-width: 800px) {
+    .t20-identity-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.t20-identity-grid .t20-ficha-field--wide {
+    grid-column: 1 / -1;
+}
+
+.t20-identity-grid .t20-ficha-field--double {
+    grid-column: span 2;
+}
+
+/* Campos “caixa vermelha” como na planilha do livro (Raça, Origem, Classe, Divindade) */
+.t20-ficha-field--book input {
+    border: 2px solid var(--t20-red-deep) !important;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.65);
+}
+
+/* Escudo atributo: sigla no topo, valor grande no centro, modificador no círculo (planilha 3) */
+.t20-attrs-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    justify-content: space-between;
+    margin: 0.5rem 0 0.35rem;
+}
+
+.t20-shield {
+    flex: 1 1 calc(16.66% - 0.4rem);
+    min-width: 72px;
+    max-width: 96px;
+    margin: 0 auto;
+    height: 118px;
+    position: relative;
+    clip-path: polygon(50% 0%, 100% 22%, 100% 62%, 50% 100%, 0% 62%, 0% 22%);
+    background: linear-gradient(165deg, #c41e1e 0%, var(--t20-red) 42%, var(--t20-red-deep) 100%);
+    box-shadow: inset 0 -8px 14px rgba(0, 0, 0, 0.22);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0.32rem 0.2rem 0.42rem;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+.t20-shield-label {
+    flex: 0 0 auto;
+    font-size: 0.6rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.t20-shield-score {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+    margin: 0.1rem 0 0.12rem;
+    padding: 0 !important;
+    text-align: center;
+    font-family: var(--t20-font-medieval, Georgia, serif) !important;
+    font-weight: 800 !important;
+    font-size: 1.45rem !important;
+    line-height: 1 !important;
+    color: #fffef8 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.t20-shield-score::-webkit-outer-spin-button,
+.t20-shield-score::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.t20-shield-mod {
+    flex: 0 0 auto;
+    width: 2.15rem;
+    height: 2.15rem;
+    border-radius: 50%;
+    background: #fffef8;
+    color: var(--t20-red-deep);
+    font-weight: 800;
+    font-size: 0.88rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(0, 0, 0, 0.22);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 600px) {
+    .t20-shield {
+        flex: 1 1 calc(33.33% - 0.35rem);
+    }
+}
+
+/* Moldura PV / PM (acento livro) */
+.t20-vitals-frame {
+    margin: 0.35rem 0 0.65rem;
+    padding: 0.5rem 0.45rem;
+    border: 3px solid var(--t20-red-deep);
+    background: linear-gradient(165deg, rgba(224, 234, 252, 0.42), rgba(255, 254, 248, 0.95));
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+        0 3px 0 rgba(139, 0, 0, 0.12);
+}
+
+/* PV / PM / defesa compactos */
+.t20-vitals-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.4rem;
+    margin-top: 0;
+}
+
+.t20-vital-block {
+    border: 1px solid var(--t20-grid-line);
+    padding: 0.35rem;
+    background: rgba(224, 234, 252, 0.35);
+}
+
+.t20-vital-block strong {
+    display: block;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--t20-muted);
+    margin-bottom: 0.2rem;
+}
+
+.t20-vital-pair {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.t20-vital-pair .t20-ficha-field {
+    flex: 1;
+}
+
+.t20-defesa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.3rem;
+    margin-top: 0.35rem;
+}
+
+.t20-defesa-total {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0.35rem 0;
+    padding: 0.35rem;
+    border: 2px solid var(--t20-red);
+    border-radius: 8px;
+    background: rgba(224, 234, 252, 0.45);
+}
+
+.t20-defesa-total .t20-shield-ico {
+    width: 3rem;
+    height: 3.4rem;
+    clip-path: polygon(50% 0%, 100% 22%, 100% 70%, 50% 100%, 0% 70%, 0% 22%);
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.15rem;
+}
+
+/* Tabelas ataques / armadura */
+.t20-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+    margin-top: 0.25rem;
+}
+
+.t20-data-table th,
+.t20-data-table td {
+    border: 1px solid var(--t20-grid-line);
+    padding: 0.2rem 0.25rem;
+    vertical-align: middle;
+}
+
+.t20-data-table th {
+    background: rgba(163, 22, 22, 0.12);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.58rem;
+}
+
+.t20-data-table input {
+    width: 100%;
+    font-size: 0.72rem !important;
+    padding: 0.18rem 0.25rem !important;
+}
+
+/* Sidebar perícias — faixa vermelha à esquerda (eco da planilha) */
+.t20-sidebar {
+    border: 2px solid var(--t20-ink);
+    border-left: 6px solid var(--t20-red);
+    background: var(--t20-white);
+    padding: 0.35rem 0.35rem 0.35rem 0.4rem;
+}
+
+.t20-pericias-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.62rem;
+}
+
+.t20-pericias-table th,
+.t20-pericias-table td {
+    border-bottom: 1px solid var(--t20-grid-line);
+    padding: 0.15rem 0.12rem;
+    vertical-align: middle;
+}
+
+.t20-pericias-table th {
+    text-align: center;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--t20-muted);
+    font-size: 0.55rem;
+    background: rgba(224, 234, 252, 0.6);
+}
+
+.t20-pericias-table .t20-p-nome {
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.62rem;
+    max-width: 7.5rem;
+}
+
+.t20-pericias-table input[type="number"] {
+    width: 100%;
+    max-width: 2.4rem;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+}
+
+.t20-pericias-table .t20-p-half {
+    text-align: center;
+    font-weight: 700;
+    color: var(--t20-red);
+}
+
+.t20-pericias-table input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    margin: 0 auto;
+    display: block;
+    accent-color: var(--t20-red);
+}
+
+/* Perícias sujeitas a penalidade de armadura (marcação na ficha) */
+.t20-pericias-table tbody tr:has(.p-pen-arm:checked) {
+    background: rgba(224, 234, 252, 0.55);
+    box-shadow: inset 3px 0 0 0 var(--t20-ink);
+}
+
+#f_pts_compra.t20-compra-pontos-ok {
+    color: var(--t20-muted);
+}
+
+#f_pts_compra.t20-compra-pontos-erro {
+    color: #b00020;
+    font-weight: 700;
+}
+
+/* Blocos texto grandes (planilha 1) */
+.t20-block-text {
+    margin-top: 0.45rem;
+}
+
+.t20-block-text .t20-ficha-field {
+    margin-bottom: 0.35rem;
+}
+
+.t20-equip-grid {
+    display: grid;
+    grid-template-columns: 1fr 4rem;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.t20-equip-grid .t20-ficha-field {
+    margin: 0;
+}
+
+.t20-foot-money {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+    padding-top: 0.35rem;
+    border-top: 1px dashed var(--t20-grid-line);
+}
+
+.t20-foot-money .t20-ficha-field {
+    flex: 1 1 80px;
+    margin: 0;
+}
+
+.t20-ficha-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid var(--t20-red);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.t20-ficha-actions .tormenta-btn--primary {
+    padding: 0.5rem 1rem;
+}
+
+.t20-hint {
+    font-size: 0.58rem;
+    color: var(--t20-muted);
+    margin-top: 0.15rem;
+}
+
+/* ── Layout espelhado na ficha D&D 3.5 (3 colunas iguais + seções), cores Tormenta ── */
+.t20-ficha-header-dndlike {
+    margin-bottom: 0.55rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 2px solid var(--t20-red);
+}
+
+.t20-ficha-header__bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.65rem 1rem;
+    align-items: start;
+}
+
+@media (max-width: 720px) {
+    .t20-ficha-header__bar {
+        grid-template-columns: 1fr;
+        justify-items: stretch;
+    }
+
+    .t20-ficha-header__centro {
+        order: 0;
+    }
+
+    .t20-ficha-header__esq {
+        order: 1;
+    }
+
+    .t20-ficha-header__dir {
+        order: 2;
+        align-items: stretch !important;
+    }
+
+    .t20-logo-wrap--header {
+        text-align: center;
+    }
+}
+
+.t20-ficha-header__centro {
+    text-align: center;
+    min-width: 0;
+}
+
+.t20-ficha-header__dir {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+}
+
+.t20-toolbar-arena--header {
+    margin-bottom: 0;
+    justify-content: flex-end;
+    padding: 0.35rem 0.45rem;
+    border-bottom-width: 2px;
+}
+
+/* Rodapé da planilha (espelho leve do header) — descrição & narrativa */
+.t20-ficha-footer-dndlike {
+    margin-top: 0.65rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid var(--t20-red);
+}
+
+.t20-ficha-footer__bar {
+    padding: 0.35rem 0.1rem 0.5rem;
+}
+
+.t20-ficha-footer__titulo {
+    margin: 0 0 0.45rem;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: var(--t20-red-deep);
+    text-align: center;
+    letter-spacing: 0.04em;
+}
+
+.t20-ficha-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 0.65rem;
+    align-items: start;
+}
+
+.t20-ficha-footer__grid .t20-ficha-field--wide {
+    grid-column: 1 / -1;
+}
+
+.t20-ficha-footer__grid .t20-ficha-field textarea {
+    width: 100%;
+}
+
+@media (max-width: 640px) {
+    .t20-ficha-footer__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-ficha-h1 {
+    margin: 0 0 0.35rem;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--t20-ink);
+    letter-spacing: 0.04em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.15rem 0.35rem;
+}
+
+.t20-ficha-meta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.t20-ficha-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: linear-gradient(180deg, #f4ebe0, #e8dcc8);
+    border: 1px solid rgba(100, 30, 20, 0.35);
+    color: var(--t20-ink);
+}
+
+.t20-ficha-tag--raca {
+    border-left: 3px solid var(--t20-red-deep);
+}
+
+.t20-ficha-tag--classe {
+    border-left: 3px solid #1a4a7a;
+}
+
+.t20-ficha-nivel-lbl {
+    font-weight: 600;
+    opacity: 0.85;
+    margin-right: 0.15rem;
+}
+
+.t20-logo-wrap--header {
+    text-align: right;
+    flex: 0 0 auto;
+}
+
+/* Cartões de seção (equivalente a .ficha-secao do D&D 3.5) */
+.t20-ficha-secao {
+    background: linear-gradient(145deg, #fffef8 0%, #f4ebe0 55%, #ebe2d6 100%);
+    border: 2px solid rgba(60, 35, 20, 0.38);
+    border-radius: 10px;
+    padding: 0.6rem 0.7rem 0.7rem;
+    box-shadow:
+        0 2px 6px rgba(30, 18, 12, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.t20-ficha-secao-titulo {
+    margin: 0 0 0.5rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid rgba(163, 22, 22, 0.35);
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--t20-red-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.t20-ficha-secao .t20-ficha-field:last-child {
+    margin-bottom: 0;
+}
+
+.t20-ficha-secao .t20-resistencias-row-dndlike,
+.t20-ficha-secao .t20-defesa-grid {
+    margin-top: 0;
+}
+
+.t20-ficha-secao--foto .t20-ficha-secao-titulo {
+    margin-bottom: 0.45rem;
+}
+
+.t20-ficha-foto-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.t20-ficha-foto-card {
+    width: 100%;
+    max-width: min(300px, 92%);
+    min-height: 300px;
+    border-radius: 10px;
+    border: 3px solid var(--t20-red-deep);
+    overflow: hidden;
+    background: linear-gradient(180deg, #2a1810 0%, #1a0f08 100%);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    aspect-ratio: 3 / 4;
+}
+
+.t20-portrait-frame--card {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+    clip-path: none;
+    box-shadow: none;
+}
+
+.t20-portrait-frame--card .t20-portrait-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.t20-portrait-frame--card .t20-portrait-placeholder {
+    font-size: 3.25rem;
+}
+
+.t20-ficha-secao--mb .t20-mb-auto-panel,
+.t20-modal-mb-xp .t20-mb-auto-panel {
+    margin: 0;
+}
+
+.t20-pericias-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    max-height: min(92vh, 2000px);
+    border: 1px solid var(--t20-grid-line);
+    border-radius: 4px;
+    background: rgba(255, 254, 248, 0.6);
+}
+
+.t20-defesa-row-dndlike--hero {
+    margin-top: 0;
+}
+
+.t20-dndlike-col--esq,
+.t20-dndlike-col--central {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.t20-sidebar.t20-dndlike-col--dir {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.t20-dndlike-corpo {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.88fr) minmax(280px, 1.18fr) minmax(220px, 0.88fr);
+    gap: 0.85rem 1rem;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .t20-dndlike-corpo {
+        grid-template-columns: 1fr 1fr;
+    }
+    .t20-dndlike-col--dir {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .t20-dndlike-corpo {
+        grid-template-columns: 1fr;
+    }
+
+    .t20-attrs-row--header .t20-shield {
+        min-width: 64px;
+        max-width: 88px;
+        height: 108px;
+    }
+}
+
+.t20-dndlike-col--esq .t20-identity-grid--stack {
+    grid-template-columns: 1fr;
+}
+
+.t20-identity-grid--compact {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem 0.45rem;
+}
+
+@media (max-width: 900px) {
+    .t20-identity-grid--compact {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.t20-identity-grid--compact .t20-ficha-field--wide {
+    grid-column: 1 / -1;
+}
+
+.t20-portrait-block--central {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.65rem;
+    margin-bottom: 0.45rem;
+}
+
+.t20-mb-ben-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.35rem;
+}
+
+.t20-mb-ben-grid--2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+    .t20-mb-ben-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.t20-mb-classe-ref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+}
+
+@media (max-width: 720px) {
+    .t20-mb-classe-ref-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-input--readonly {
+    background: rgba(245, 240, 232, 0.95);
+    color: var(--t20-ink);
+}
+
+.t20-defesa-row-dndlike {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: stretch;
+    margin-top: 0.35rem;
+}
+
+.t20-defesa-box-dnd {
+    flex: 1 1 4.5rem;
+    min-width: 4rem;
+    padding: 0.35rem 0.45rem;
+    border-radius: 6px;
+    border: 2px solid rgba(60, 35, 20, 0.45);
+    background: linear-gradient(165deg, #faf6ef, #ebe2d6);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.t20-defesa-box-dnd--wide {
+    flex: 2 1 10rem;
+}
+
+.t20-defesa-box-dnd__lbl {
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--t20-red-deep);
+}
+
+.t20-defesa-box-dnd__inp {
+    width: 100%;
+    max-width: 5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.t20-defesa-box-dnd__inp--sm {
+    max-width: 3.25rem;
+    font-size: 0.95rem;
+}
+
+.t20-defesa-box-dnd__pair {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.t20-defesa-box-dnd__sep {
+    font-weight: 700;
+    opacity: 0.55;
+}
+
+.t20-resistencias-row-dndlike {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.25rem;
+}
+
+.t20-res-box-dnd {
+    flex: 1 1 5.5rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 6px;
+    border: 2px solid rgba(26, 74, 122, 0.35);
+    background: linear-gradient(180deg, #f0f6fc, #dce8f4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.t20-res-box-dnd__lbl {
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #1a4a7a;
+}
+
+.t20-res-box-dnd__inp {
+    width: 100%;
+    max-width: 5rem;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* Faixa hero sob o cabeçalho: atributos + CA/PV/PM (alinhado à ficha D&D 3.5 da Arena) */
+.t20-ficha-hero-band {
+    margin-top: 0.35rem;
+    padding: 0.55rem 0.6rem 0.6rem;
+    border-radius: 10px;
+    border: 2px solid rgba(60, 35, 20, 0.28);
+    background: linear-gradient(180deg, rgba(255, 254, 248, 0.98), #e8dcc8);
+}
+
+.t20-ficha-hero-band__titulo {
+    margin: 0 0 0.35rem;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--t20-red-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-align: center;
+}
+
+.t20-ficha-hero-band__attrs {
+    margin-bottom: 0.4rem;
+}
+
+.t20-attrs-row--header {
+    justify-content: center;
+    margin-top: 0;
+}
+
+.t20-ficha-hero-band__vitals .t20-defesa-row-dndlike {
+    margin-top: 0;
+    justify-content: center;
+}
+
+.t20-hint--hero {
+    max-width: 52rem;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.t20-ficha-h1__sub {
+    font-weight: 650;
+    font-size: 0.62em;
+    letter-spacing: 0.06em;
+    opacity: 0.88;
+}
+
+.t20-ficha-meta-tags--sec {
+    margin-top: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.t20-ficha-meta-tags--sec .t20-ficha-tag {
+    font-size: 0.64rem;
+    padding: 0.14rem 0.42rem;
+}
+
+/* ── Layout D&D 3.5 (três colunas + círculos + diálogo) ── */
+.ficha-layout-dnd .tormenta-ficha-wrap {
+    max-width: 1480px;
+}
+
+.ficha-layout-dnd .ficha-corpo,
+.ficha-layout-dnd .t20-ficha-corpo {
+    display: grid;
+    grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 1.15fr) minmax(18rem, 1.08fr);
+    gap: 0.55rem;
+    align-items: start;
+    margin-top: 0.45rem;
+    padding-inline: 0.15rem;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+    .ficha-layout-dnd .ficha-corpo,
+    .ficha-layout-dnd .t20-ficha-corpo {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ficha-layout-dnd .ficha-coluna-esquerda,
+.ficha-layout-dnd .t20-ficha-col-esq,
+.ficha-layout-dnd .ficha-coluna-central,
+.ficha-layout-dnd .t20-ficha-col-centro,
+.ficha-layout-dnd .ficha-coluna-direita,
+.ficha-layout-dnd .t20-ficha-col-dir {
+    min-width: 0;
+}
+
+.ficha-layout-dnd .ficha-secao-titulo,
+.ficha-layout-dnd .t20-ficha-secao-titulo.ficha-secao-titulo {
+    font-family: var(--t20-font-medieval, Georgia, serif);
+}
+
+.t20-btn-editar-ficha {
+    margin-left: 0.35rem;
+    vertical-align: middle;
+}
+
+.t20-attrs-foto-split {
+    display: grid;
+    grid-template-columns: 1fr minmax(11rem, 42%);
+    gap: 0.45rem 0.35rem;
+    align-items: start;
+}
+
+@media (max-width: 720px) {
+    .t20-attrs-foto-split {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-vitals-centro {
+    margin-top: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Atributos em círculos (adaptado da ficha D&D 3.5 Arena) */
+.ficha-layout-dnd .ficha-atributos-circulo-grid-resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    justify-items: center;
+}
+
+.ficha-layout-dnd .ficha-atributo-circulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.ficha-layout-dnd .circulo-externo {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f5ead4, #d8c8a8);
+    border: 2px solid #a67c00;
+    box-shadow:
+        0 3px 10px rgba(44, 26, 14, 0.28),
+        inset 0 2px 6px rgba(201, 168, 76, 0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.08rem;
+    position: relative;
+}
+
+.ficha-layout-dnd .circulo-externo::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 1px solid rgba(166, 124, 0, 0.35);
+    pointer-events: none;
+}
+
+.ficha-layout-dnd .t20-circulo-valor-inp {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    min-width: 2.35rem;
+    width: 2.55rem;
+    max-width: 90%;
+    height: 1.45rem;
+    min-height: 0;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 1.28rem;
+    font-weight: 700;
+    color: #3d2814;
+    padding: 0;
+    margin: 0;
+    line-height: 1.45rem;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.ficha-layout-dnd .t20-circulo-valor-inp::-webkit-outer-spin-button,
+.ficha-layout-dnd .t20-circulo-valor-inp::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ficha-layout-dnd .t20-circulo-valor-inp:focus {
+    outline: none;
+}
+
+.ficha-layout-dnd .t20-circulo-valor-inp.t20-circulo-valor--readonly {
+    cursor: default;
+    user-select: none;
+    color: #4a3528;
+}
+
+.ficha-layout-dnd .circulo-mod {
+    position: relative;
+    z-index: 1;
+    font-size: 0.78rem;
+    color: #5a4030;
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    line-height: 1.05;
+    font-weight: 700;
+}
+
+.ficha-layout-dnd .circulo-label {
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    font-size: 0.58rem;
+    font-weight: 700;
+    color: #3d2814;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Atributos na coluna esquerda (mais estreita) */
+.ficha-layout-dnd .t20-ficha-col-esq .ficha-atributos-circulo-grid-resumo {
+    gap: 0.32rem;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .circulo-externo {
+    width: 74px;
+    height: 74px;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .circulo-externo::after {
+    inset: 4px;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .t20-circulo-valor-inp {
+    width: 2.35rem;
+    min-width: 2.15rem;
+    font-size: 1.14rem;
+    height: 1.32rem;
+    line-height: 1.32rem;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .circulo-mod {
+    font-size: 0.72rem;
+}
+
+.ficha-layout-dnd .t20-ficha-col-esq .circulo-label {
+    font-size: 0.56rem;
+}
+
+.t20-foto-dnd.ficha-foto-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-height: 14rem;
+    border-radius: 4px;
+    border: 2px solid rgba(60, 35, 20, 0.45);
+    background: linear-gradient(180deg, #f8f4ea, #e4d8c4);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.t20-foto-dnd .t20-portrait-img,
+.t20-foto-dnd .ficha-foto {
+    width: 100%;
+    height: 100%;
+    min-height: 14rem;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.t20-foto-acoes {
+    position: absolute;
+    bottom: 0.35rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.35rem;
+}
+
+.t20-ficha-secao-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+}
+
+.t20-ficha-btn-adicionar {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.45rem;
+}
+
+.t20-ficha-dnd-lista,
+.t20-ficha-equip-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.t20-ficha-dnd-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.t20-tal-linha.t20-ficha-dnd-item {
+    grid-template-columns: 1fr auto auto;
+}
+
+.t20-ficha-vazio {
+    font-size: 0.82rem;
+    color: var(--t20-muted);
+    font-style: italic;
+}
+
+.t20-ficha-idiomas-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+}
+
+.t20-ficha-idiomas-lista .t20-idioma-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.35rem;
+    border-radius: 4px;
+    border: 1px solid rgba(60, 35, 20, 0.2);
+    background: rgba(255, 252, 245, 0.9);
+    margin-bottom: 0.25rem;
+}
+
+.t20-lista-traços-raciais {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.t20-mb-ben-grid--compact {
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+    .t20-mb-ben-grid--compact {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-pericia-de-classe-row {
+    background: rgba(255, 235, 160, 0.35);
+}
+
+.t20-pericia-de-classe {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+.t20-sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.t20-ficha-dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 0;
+    max-width: min(96vw, 40rem);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.t20-ficha-dialog::backdrop {
+    background: rgba(20, 12, 8, 0.45);
+}
+
+.t20-ficha-dialog__panel {
+    background: var(--t20-white);
+    border: 2px solid var(--t20-ink);
+    border-radius: 8px;
+    max-height: min(92vh, 44rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.t20-ficha-dialog__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    border-bottom: 2px solid rgba(60, 35, 20, 0.2);
+    position: sticky;
+    top: 0;
+    background: var(--t20-white);
+    z-index: 1;
+}
+
+.t20-ficha-dialog__titulo {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.t20-ficha-dialog__body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0.65rem 0.75rem;
+}
+
+.t20-ficha-dialog__body .t20-ficha-field input,
+.t20-ficha-dialog__body .t20-ficha-field select,
+.t20-ficha-dialog__body .t20-ficha-field textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.t20-ficha-dialog__body .t20-identity-grid--stack {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.t20-ficha-dialog__body .t20-identity-grid--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 560px) {
+    .t20-ficha-dialog__body .t20-identity-grid--compact {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.t20-ficha-dialog__body .t20-defesa-grid {
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}
+
+.t20-dialog-tracos-raca {
+    margin: 0;
+    white-space: pre-line;
+    max-height: 10rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.t20-modal-catalogo {
+    min-width: min(92vw, 26rem);
+}
+
+.t20-modal-catalogo__busca {
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.45rem 0.65rem;
+    border-bottom: 1px solid rgba(60, 35, 20, 0.15);
+}
+
+.t20-modal-catalogo-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0.35rem 0.65rem 0.5rem;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.t20-modal-catalogo-lista li {
+    margin-bottom: 0.25rem;
+}
+
+.t20-modal-pick-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.35rem 0.45rem;
+    border-radius: 4px;
+    border: 1px solid rgba(60, 35, 20, 0.2);
+    background: #faf7f0;
+    cursor: pointer;
+    font: inherit;
+}
+
+.t20-modal-pick-item:hover {
+    background: #fff3d6;
+}
+
+.t20-cat-sub {
+    font-size: 0.75rem;
+    color: var(--t20-muted);
+}
+
+/* Modais MB no estilo `equipamentos-overlay` (paridade D&D): o parity deixa
+   .equipamentos-overlay sempre em flex na viewport; em Tormenta cada overlay
+   precisa de regra :not(.is-open) { display: none } + JS que alterna .is-open
+   (como modalEquipamentos). Sem isto o modal cobre a ficha ao carregar. */
+#modalEquipamentos.equipamentos-overlay:not(.is-open),
+#modalTalentosMb.equipamentos-overlay:not(.is-open),
+#modalGrimorioTormenta.equipamentos-overlay:not(.is-open),
+#modalConsumiveisTormenta.equipamentos-overlay:not(.is-open) {
+    display: none !important;
+    pointer-events: none;
+}
+
+/* Inputs em boxes coloridos (CA / PV / PM / Inic.) — sem fundo branco “padrão browser” */
+.ficha-defesa-box .ficha-defesa-valor-inp,
+.ficha-defesa-box .ficha-pv-inline-inp {
+    background: rgba(0, 0, 0, 0.28) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.ficha-defesa-box .ficha-defesa-valor-inp:focus,
+.ficha-defesa-box .ficha-pv-inline-inp:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.45);
+    outline-offset: 1px;
+}
+
+.ficha-defesa-box .ficha-defesa-valor-inp[readonly],
+.ficha-defesa-box .ficha-pv-inline-inp[readonly] {
+    cursor: default;
+    opacity: 0.97;
+}
+
+.ficha-defesa-box .ficha-pv-inline-sep {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Grelha “Ataques” (planilha MB) — alto contraste como referência */
+.t20-ficha-secao--ataques-planilha {
+    min-width: 0;
+}
+
+.t20-ficha-secao--ataques-planilha .t20-ataques-planilha-legend {
+    margin: 0 0 0.45rem;
+    font-size: 0.68rem;
+}
+
+.t20-ataques-planilha {
+    display: grid;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    /* Colunas numéricas com minmax(0,…) para encolher dentro da borda; rótulos em 2 linhas se precisar */
+    grid-template-columns:
+        minmax(2.35rem, 3.15rem)
+        minmax(0, 1fr)
+        minmax(0.42rem, 1.85ch)
+        minmax(0, 1fr)
+        minmax(0.38rem, 1.35ch)
+        minmax(0, 1fr)
+        minmax(0.38rem, 1.35ch)
+        minmax(0, 1fr)
+        minmax(0.38rem, 1.35ch)
+        minmax(0, 1fr);
+    gap: 0.2rem 0.06rem;
+    align-items: center;
+    font-size: 0.64rem;
+    padding: 0.28rem 0.12rem 0.38rem;
+    border-radius: 8px;
+    border: 2px solid rgba(15, 15, 15, 0.85);
+    background: linear-gradient(180deg, #faf7f0, #e8e0d4);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.t20-ap-corner {
+    min-height: 1.5rem;
+}
+
+.t20-ap-h {
+    font-weight: 700;
+    font-size: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-align: center;
+    color: var(--t20-ink);
+    line-height: 1.12;
+    padding: 0.06rem 0.02rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+}
+
+.t20-ap-sym,
+.t20-ap-eq,
+.t20-ap-plus {
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.72rem;
+    color: var(--t20-ink);
+    min-width: 0;
+}
+
+.t20-ap-rowlabel {
+    font-weight: 800;
+    font-size: 0.52rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: 0.28rem 0.12rem;
+    background: linear-gradient(180deg, var(--t20-red-deep, #6e0000) 0%, #3a0808 100%);
+    color: #fff;
+    border-radius: 4px;
+    line-height: 1.2;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.t20-ap-inp {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 0.2rem 0.06rem;
+    border: 1px solid #0f0f0f;
+    border-radius: 4px;
+    background: #fff;
+    color: var(--t20-ink);
+}
+
+.t20-ap-inp::-webkit-outer-spin-button,
+.t20-ap-inp::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.t20-ap-inp[type='number'] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.t20-ap-inp::placeholder {
+    color: rgba(60, 60, 60, 0.45);
+    font-weight: 600;
+    font-size: 0.72rem;
+}
+
+.t20-ap-inp:focus {
+    outline: 2px solid rgba(139, 0, 0, 0.45);
+    outline-offset: 1px;
+}
+
+.t20-ap-inp--total,
+.t20-ap-inp[readonly] {
+    background: #e4dfd4 !important;
+    color: rgba(25, 18, 12, 0.92);
+    cursor: default;
+}
+
+/* PM — mesmo “card” dos demais vitais (Tormenta) */
+.ficha-defesa-box.ficha-pm-box {
+    background: linear-gradient(135deg, #2a1f4a 0%, #151028 100%);
+    border: 2px solid #7b68b8;
+    justify-content: center;
+}
+
+/* Coluna esquerda: grelha 3×2 (CA, PV, PM | Ini, XP, Dinheiro) — mesma altura de cartão */
+.ficha-layout-dnd .ficha-defesa-row--col-esq {
+    align-items: stretch;
+    gap: 0.55rem;
+}
+
+.ficha-layout-dnd .ficha-defesa-row--col-esq > .ficha-defesa-box {
+    min-width: 0;
+    min-height: 5.9rem;
+}
+
+.ficha-layout-dnd .ficha-defesa-row--col-esq .ficha-defesa-box--popup-t20 {
+    padding: 0.55rem 0.35rem;
+    justify-content: center;
+}
+
+.ficha-layout-dnd .ficha-defesa-row--col-esq .ficha-defesa-box--popup-t20 .ficha-defesa-popup-btn {
+    flex: 1 1 auto;
+    align-self: stretch;
+    min-height: 4.5rem;
+    justify-content: center;
+}
+
+.ficha-layout-dnd .ficha-defesa-row--col-esq .ficha-defesa-valor--compact-t20 {
+    font-size: 1.35rem;
+    line-height: 1.12;
+}
+
+.t20-modal-mb-xp .ficha-modal-body {
+    max-height: none;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: block;
+    padding: 0.75rem 1rem 0.5rem;
+}
+
+.ficha-modal-box--t20-mb-xp {
+    width: min(100%, 28rem);
+    max-width: min(96vw, 28rem);
+    max-height: min(90vh, 42rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ficha-modal-box--t20-mb-xp .ficha-modal-header {
+    flex-shrink: 0;
+}
+
+.ficha-modal-box--t20-mb-xp .ficha-modal-actions {
+    flex-shrink: 0;
+}
+
+.ficha-modal-box--t20-mb-xp .t20-mb-ben-grid,
+.ficha-modal-box--t20-mb-xp .t20-mb-ben-grid--2 {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 480px) {
+    .ficha-modal-box--t20-mb-xp .t20-mb-ben-grid--compact {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .ficha-modal-box--t20-mb-xp .t20-mb-ben-grid--2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.ficha-modal-box--t20-mb-xp .t20-ficha-field input,
+.ficha-modal-box--t20-mb-xp .t20-ficha-field textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+/* Grimório MB — papel: segmented control (três botões) */
+.grimorio-papel-wrap {
+    margin: 0;
+    padding: 0;
+}
+.grimorio-papel-legend {
+    margin: 0 0 0.28rem;
+    padding: 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--t20-muted, #5c5346);
+}
+.grimorio-papel-segmented {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.35);
+    box-sizing: border-box;
+}
+.grimorio-papel-segment {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    padding: 0.32rem 0.2rem 0.38rem;
+    border: none;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    text-align: center;
+    line-height: 1.22;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+.grimorio-papel-segment:last-child {
+    border-right: none;
+}
+.grimorio-papel-segment:hover {
+    background: rgba(255, 255, 255, 0.55);
+}
+.grimorio-papel-segment.is-selected {
+    background: rgba(139, 90, 43, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(139, 90, 43, 0.28);
+}
+.grimorio-papel-segment:focus-visible {
+    outline: 2px solid var(--t20-accent, #8b5a2b);
+    outline-offset: -2px;
+    z-index: 1;
+}
+.grimorio-papel-tit {
+    font-weight: 600;
+    font-size: 0.68rem;
+    display: block;
+}
+.grimorio-papel-sub {
+    display: block;
+    font-size: 0.6rem;
+    color: var(--t20-muted, #6b6154);
+    font-weight: 400;
+    margin-top: 0.12rem;
+    line-height: 1.2;
+}
+.grimorio-papel-segment.is-selected .grimorio-papel-sub {
+    color: rgba(60, 52, 40, 0.88);
+}
+/* Legado: catálogos antigos com fieldset + rádios */
+.grimorio-papel-fieldset {
+    margin: 0;
+    padding: 0.35rem 0.4rem 0.45rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.45);
+}
+.grimorio-papel-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    margin-top: 0.2rem;
+}
+.grimorio-papel-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+    cursor: pointer;
+    font-size: 0.74rem;
+    line-height: 1.25;
+    margin: 0;
+}
+.grimorio-papel-opt input {
+    margin-top: 0.12rem;
+    flex-shrink: 0;
+}
+
+/* Multiclasse conjuradora MB */
+.t20-niv-conj-linha {
+    display: grid;
+    grid-template-columns: 1fr 5.5rem auto;
+    gap: 0.4rem;
+    align-items: center;
+    margin-bottom: 0.4rem;
+}
+.t20-niv-conj-linha .t20-niv-conj-del {
+    min-width: 2rem;
+    padding: 0.25rem 0.4rem;
+}
+
+/* ── Companheiro + modal consumíveis (lista na ficha; modal = equipamentos-overlay) ── */
+.t20-ficha-comp-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-height: 2rem;
+}
+
+.t20-ficha-comp-vazio {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--t20-muted, #6b6154);
+    font-style: italic;
+}
+
+.t20-ficha-comp-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.55rem;
+    border-radius: 8px;
+    border: 1px solid rgba(60, 35, 20, 0.2);
+    background: linear-gradient(165deg, rgba(255, 254, 248, 0.95), rgba(240, 232, 220, 0.85));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.t20-ficha-comp-sub {
+    font-size: 0.68rem;
+    color: var(--t20-muted, #6b6154);
+}
+
+.t20-ficha-comp-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.t20-ficha-dialog--companheiro {
+    max-width: min(96vw, 52rem);
+    width: 100%;
+}
+
+.t20-ficha-dialog--companheiro .t20-ficha-dialog__panel {
+    max-height: min(92vh, 46rem);
+}
+
+.t20-ficha-dialog__head--comp {
+    background: linear-gradient(180deg, #6e0a18, #4a060f);
+    color: #fff;
+    border-bottom: none;
+}
+
+.t20-ficha-dialog__head--comp .t20-ficha-dialog__titulo {
+    color: #fff;
+}
+
+.t20-ficha-dialog__foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    padding: 0.5rem 0.65rem;
+    border-top: 2px solid rgba(60, 35, 20, 0.15);
+    background: rgba(255, 252, 245, 0.98);
+}
+
+.t20-ficha-comp-bd {
+    max-height: min(78vh, 36rem);
+}
+
+.t20-ficha-comp-attrs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+    gap: 0.35rem;
+}
+
+.t20-ficha-comp-attr {
+    display: grid;
+    grid-template-columns: 2rem 1fr 1fr;
+    gap: 0.2rem;
+    align-items: center;
+    font-size: 0.62rem;
+    font-weight: 700;
+}
+
+.t20-ficha-comp-attr span {
+    text-align: center;
+    color: var(--t20-red-deep, #6e0a18);
+}
+
+.t20-ficha-comp-bloco {
+    padding: 0.45rem 0.4rem 0.55rem;
+    border-radius: 8px;
+    background: linear-gradient(165deg, #fff9d6, #f5edc4);
+    border: 1px solid rgba(110, 90, 20, 0.22);
+}
+
+.t20-ficha-comp-bloco-tit {
+    color: #a01818;
+}
+
+.t20-ficha-comp-ca-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    font-size: 0.62rem;
+}
+
+.t20-ficha-comp-ca-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    font-weight: 700;
+}
+
+.t20-ficha-comp-ca-grid input {
+    width: 3.2rem;
+}
+
+.t20-ficha-comp-save-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.65rem;
+}
+
+.t20-ficha-comp-save-lab {
+    display: inline-block;
+    min-width: 2.2rem;
+    font-weight: 800;
+    color: var(--t20-red-deep, #6e0a18);
+}
+
+.t20-ficha-comp-in-sm {
+    width: 3rem;
+    margin: 0 0.12rem;
+}
+
+.t20-ficha-comp-pv {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.t20-ficha-comp-pv input {
+    width: 4rem;
+    margin-left: 0.25rem;
+}
+
+.t20-ficha-comp-atk {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.68rem;
+    margin: 0.35rem 0 0.25rem;
+}
+
+.t20-ficha-comp-atk th,
+.t20-ficha-comp-atk td {
+    border: 1px solid rgba(60, 35, 20, 0.2);
+    padding: 0.2rem;
+}
+
+.t20-ficha-comp-atk th {
+    background: rgba(110, 0, 0, 0.1);
+    font-weight: 800;
+}
+
+.t20-ficha-comp-atk input {
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+    border: none;
+    background: transparent;
+    padding: 0.15rem;
+}
