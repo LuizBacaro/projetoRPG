@@ -18,7 +18,8 @@ from app.games.tormenta.services.combate_service import TormentaCombateService
 from app.shared.core.database import Base
 from app.shared.core.security import hash_senha
 from app.shared.exceptions.custom_exceptions import CombateJaAtivoError
-from app.shared.models.usuario import PerfilUsuario, Usuario as UModel
+from app.shared.models.usuario import PerfilUsuario
+from app.shared.models.usuario import Usuario as UModel
 
 
 @pytest.fixture

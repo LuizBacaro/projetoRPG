@@ -10,7 +10,8 @@ from app.games.tormenta.api.v1.combate import router as tormenta_combate_router
 from app.shared.core.database import get_db
 from app.shared.core.deps import get_usuario_atual
 from app.shared.core.security import hash_senha
-from app.shared.models.usuario import PerfilUsuario, Usuario as UModel
+from app.shared.models.usuario import PerfilUsuario
+from app.shared.models.usuario import Usuario as UModel
 
 
 @pytest.fixture(scope="function")

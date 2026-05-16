@@ -7,11 +7,11 @@ from typing import List, Optional
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.models.equipamento import (
     TormentaEquipamento,
     TormentaEquipamentoPersonagem,
 )
+from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.schemas.equipamento_personagem import (
     TormentaEquipamentoPersonagemItem,
     TormentaEquipamentoVinculoCreate,

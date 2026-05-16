@@ -4,37 +4,10 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Response
 
-from app.games.tormenta.schemas.regras_ficha import (
-    TormentaArmaduraCatalogoItem,
-    TormentaArmaduraCatalogoPaginaResponse,
-    TormentaBeneficioNivelMbItem,
-    TormentaClasseMbItem,
-    TormentaConjuracaoCustoCirculoItem,
-    TormentaConjuracaoClasseMbItem,
-    TormentaCustoAtributoItem,
-    TormentaDivindadeMbOpcao,
-    TormentaIdiomaTabelaItem,
-    TormentaPericiaAtributoItem,
-    TormentaRacaMbItem,
-    TormentaCatalogoItem,
-    TormentaCatalogoPaginaResponse,
-    TormentaMagiaMbCatalogoItem,
-    TormentaMagiaMbCatalogoPaginaResponse,
-    TormentaRegrasConjuracaoMbResponse,
-    TormentaConjuracaoPreviewResponse,
-    TormentaRegrasAtributosResponse,
-    TormentaRegrasClassesResponse,
-    TormentaRegrasIdentidadeMbResponse,
-    TormentaRegrasRacasResponse,
-)
 from app.games.tormenta.rules.atributos_t20 import (
     lista_custos_compra,
     lista_pericias_com_atributo,
     pontos_iniciais_compra,
-)
-from app.games.tormenta.rules.classes_t20 import (
-    lista_beneficios_por_nivel_mb,
-    lista_classes_mb,
 )
 from app.games.tormenta.rules.catalogo_armaduras_t20 import (
     filtrar_armaduras_protecao_mb,
@@ -43,6 +16,18 @@ from app.games.tormenta.rules.catalogo_t20 import (
     filtrar_equipamentos_mb,
     filtrar_magias_mb,
     filtrar_talentos_mb,
+)
+from app.games.tormenta.rules.classes_t20 import (
+    lista_beneficios_por_nivel_mb,
+    lista_classes_mb,
+)
+from app.games.tormenta.rules.conjuracao_t20 import (
+    custo_pm_preparar_ou_lancar_magia,
+    habilidade_chave_conjuracao,
+    lista_regras_conjuracao_classe_mb,
+    modificador_conjuracao_mb,
+    pontos_magia_maximos_conjuracao,
+    texto_custo_pm_por_circulo_mb,
 )
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
@@ -53,13 +38,28 @@ from app.games.tormenta.rules.tendencias_divindades_t20 import (
     lista_divindades_mb,
     lista_tendencias_mb,
 )
-from app.games.tormenta.rules.conjuracao_t20 import (
-    custo_pm_preparar_ou_lancar_magia,
-    habilidade_chave_conjuracao,
-    lista_regras_conjuracao_classe_mb,
-    modificador_conjuracao_mb,
-    pontos_magia_maximos_conjuracao,
-    texto_custo_pm_por_circulo_mb,
+from app.games.tormenta.schemas.regras_ficha import (
+    TormentaArmaduraCatalogoItem,
+    TormentaArmaduraCatalogoPaginaResponse,
+    TormentaBeneficioNivelMbItem,
+    TormentaCatalogoItem,
+    TormentaCatalogoPaginaResponse,
+    TormentaClasseMbItem,
+    TormentaConjuracaoClasseMbItem,
+    TormentaConjuracaoCustoCirculoItem,
+    TormentaConjuracaoPreviewResponse,
+    TormentaCustoAtributoItem,
+    TormentaDivindadeMbOpcao,
+    TormentaIdiomaTabelaItem,
+    TormentaMagiaMbCatalogoItem,
+    TormentaMagiaMbCatalogoPaginaResponse,
+    TormentaPericiaAtributoItem,
+    TormentaRacaMbItem,
+    TormentaRegrasAtributosResponse,
+    TormentaRegrasClassesResponse,
+    TormentaRegrasConjuracaoMbResponse,
+    TormentaRegrasIdentidadeMbResponse,
+    TormentaRegrasRacasResponse,
 )
 from app.shared.core.deps import get_usuario_atual, requer_game_tormenta
 from app.shared.models.usuario import Usuario

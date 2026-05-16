@@ -7,7 +7,6 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
-
 TormentaMagiaPapelMb = Literal["grimorio", "conhecida", "preparada"]
 
 

@@ -39,17 +39,17 @@ from app.games.gurps.models.personagem import (
 from app.games.gurps.models.sessao_campanha import GurpsSessaoCampanha
 from app.games.tormenta.models.campanha import TormentaCampanha, TormentaSessaoCampanha
 from app.games.tormenta.models.combate import TormentaCombate
-from app.games.tormenta.models.personagem import TormentaPersonagem
-from app.games.tormenta.models.talento import TormentaTalento, TormentaTalentoPersonagem
-from app.games.tormenta.models.equipamento import (
-    TormentaEquipamento,
-    TormentaEquipamentoPersonagem,
-)
 from app.games.tormenta.models.consumivel import (
     TormentaConsumivel,
     TormentaConsumivelPersonagem,
 )
+from app.games.tormenta.models.equipamento import (
+    TormentaEquipamento,
+    TormentaEquipamentoPersonagem,
+)
 from app.games.tormenta.models.magia_personagem import TormentaMagiaPersonagem
+from app.games.tormenta.models.personagem import TormentaPersonagem
+from app.games.tormenta.models.talento import TormentaTalento, TormentaTalentoPersonagem
 from app.shared.models.game import Game, UserGameMembership
 from app.shared.models.usuario import PerfilUsuario, Usuario
 

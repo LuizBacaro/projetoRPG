@@ -5,12 +5,12 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from app.games.tormenta.models.combate import TormentaCombate
-from app.games.tormenta.schemas.combate import TormentaCombateCondicaoMbItem
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.repositories.combate_repository import TormentaCombateRepository
 from app.games.tormenta.repositories.personagem_repository import (
     TormentaPersonagemRepository,
 )
+from app.games.tormenta.schemas.combate import TormentaCombateCondicaoMbItem
 from app.games.tormenta.schemas.personagem import TormentaPersonagemResponse
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,

@@ -7,6 +7,9 @@ from typing import Any, Dict, List, Optional, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.games.tormenta.rules.grimorio_elegibilidade_t20 import (
+    resumo_elegibilidade_grimorio_mb,
+)
 from app.games.tormenta.schemas.consumivel_personagem import (
     TormentaConsumivelPersonagemItem,
 )
@@ -15,9 +18,6 @@ from app.games.tormenta.schemas.equipamento_personagem import (
 )
 from app.games.tormenta.schemas.magia_personagem import TormentaMagiaPersonagemItem
 from app.games.tormenta.schemas.talento_personagem import TormentaTalentoPersonagemItem
-from app.games.tormenta.rules.grimorio_elegibilidade_t20 import (
-    resumo_elegibilidade_grimorio_mb,
-)
 
 # Limite do JSON da ficha (perícias, equipamento, magias, notas).
 TORMENTA_FICHA_JSON_MAX_BYTES = 96_000

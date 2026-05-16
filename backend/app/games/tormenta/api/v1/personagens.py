@@ -13,16 +13,6 @@ from app.core.dependencies import (
     get_tormenta_personagem_service,
     get_tormenta_personagem_talentos_service,
 )
-from app.services.file_service import FileService
-from app.games.tormenta.schemas.magia_personagem import (
-    TormentaMagiaPersonagemItem,
-    TormentaMagiaVinculoCreate,
-)
-from app.games.tormenta.schemas.personagem import (
-    TormentaPersonagemCreate,
-    TormentaPersonagemResponse,
-    TormentaPersonagemUpdate,
-)
 from app.games.tormenta.schemas.consumivel_personagem import (
     TormentaConsumivelPersonagemItem,
     TormentaConsumivelVinculoCreate,
@@ -38,13 +28,19 @@ from app.games.tormenta.schemas.equipamento_personagem import (
 from app.games.tormenta.schemas.inventario_legado import (
     TormentaInventarioLegadoImportResponse,
 )
+from app.games.tormenta.schemas.magia_personagem import (
+    TormentaMagiaPersonagemItem,
+    TormentaMagiaVinculoCreate,
+)
+from app.games.tormenta.schemas.personagem import (
+    TormentaPersonagemCreate,
+    TormentaPersonagemResponse,
+    TormentaPersonagemUpdate,
+)
 from app.games.tormenta.schemas.talento_personagem import (
     TormentaMigrarTalentosJsonResponse,
     TormentaTalentoPersonagemItem,
     TormentaTalentoVinculoCreate,
-)
-from app.games.tormenta.services.personagem_magias_service import (
-    TormentaPersonagemMagiasService,
 )
 from app.games.tormenta.services.personagem_consumiveis_service import (
     TormentaPersonagemConsumiveisService,
@@ -55,10 +51,14 @@ from app.games.tormenta.services.personagem_equipamentos_service import (
 from app.games.tormenta.services.personagem_inventario_legado_service import (
     TormentaPersonagemInventarioLegadoService,
 )
+from app.games.tormenta.services.personagem_magias_service import (
+    TormentaPersonagemMagiasService,
+)
 from app.games.tormenta.services.personagem_service import TormentaPersonagemService
 from app.games.tormenta.services.personagem_talentos_service import (
     TormentaPersonagemTalentosService,
 )
+from app.services.file_service import FileService
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_dono_ou_admin_tormenta_personagem,
