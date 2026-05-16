@@ -18,6 +18,7 @@ from app.games.dnd5e.rules.classes import (
     niveis_com_ganho_feat,
     tabela_xp_por_nivel,
 )
+from app.games.dnd5e.rules.ficha import montar_resumo_ficha
 from app.games.dnd5e.rules.habilidades import (
     HABILIDADE_MAX,
     HABILIDADE_MIN,
@@ -26,24 +27,20 @@ from app.games.dnd5e.rules.habilidades import (
     lista_metadados_habilidades,
     lista_tabela_bonus_proficiencia,
 )
-from app.games.dnd5e.rules.ficha import montar_resumo_ficha
 from app.games.dnd5e.rules.pericias import listar_pericias_catalogo
 from app.games.dnd5e.rules.racas import lista_racas_catalogo
 from app.games.dnd5e.rules.subclasses import listar_subclasses
 from app.games.dnd5e.schemas.regras import (
-    Dnd5eCalcularAtributosRequest,
-    Dnd5eCalcularAtributosResponse,
-    Dnd5ePericiaCatalogoItem,
-    Dnd5eRegrasPericiasResponse,
-    Dnd5eRegrasSubclassesResponse,
-    Dnd5eSubclasseItem,
     Dnd5eAntecedenteCatalogoItem,
     Dnd5eBonusProficienciaItem,
+    Dnd5eCalcularAtributosRequest,
+    Dnd5eCalcularAtributosResponse,
     Dnd5eClasseItem,
     Dnd5eCondicaoItem,
     Dnd5eFeatCatalogoItem,
     Dnd5eHabilidadeMetaItem,
     Dnd5eMagiaCatalogoItem,
+    Dnd5ePericiaCatalogoItem,
     Dnd5eRacaItem,
     Dnd5eRegrasAntecedentesResponse,
     Dnd5eRegrasAtributosResponse,
@@ -51,8 +48,11 @@ from app.games.dnd5e.schemas.regras import (
     Dnd5eRegrasCombateResponse,
     Dnd5eRegrasEquipamentoResponse,
     Dnd5eRegrasMagiasResponse,
+    Dnd5eRegrasPericiasResponse,
     Dnd5eRegrasRacasResponse,
+    Dnd5eRegrasSubclassesResponse,
     Dnd5eRegrasTalentosResponse,
+    Dnd5eSubclasseItem,
     Dnd5eXpNivelItem,
 )
 from app.shared.core.deps import get_usuario_atual, requer_game_dnd5e

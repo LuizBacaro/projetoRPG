@@ -12,17 +12,17 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 
+from ...games.dnd5e.models.personagem import Dnd5ePersonagem
 from ...games.dnd35.models.ataque import MagiaSlot
 from ...games.dnd35.models.combatente import Combatente
-from ...games.dnd5e.models.personagem import Dnd5ePersonagem
 from ...games.gurps.models.personagem import GurpsPersonagem
 from ...games.tormenta.models.personagem import TormentaPersonagem
 from ...shared.core.config import settings
 from ...shared.core.database import get_db
 from ...shared.repositories.usuario_repository import UsuarioRepository
 from ..constants import (
-    GAME_SLUG_DND35,
     GAME_SLUG_DND5E,
+    GAME_SLUG_DND35,
     GAME_SLUG_GURPS,
     GAME_SLUG_TORMENTA,
 )

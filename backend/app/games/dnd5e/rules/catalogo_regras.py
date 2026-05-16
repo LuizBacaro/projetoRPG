@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from app.games.dnd5e.data.equipamento_catalogo import (
+    ARMADURAS,
     ARMAS_MARCIAIS,
     ARMAS_SIMPLES,
-    ARMADURAS,
     ESCUDOS,
 )
 from app.games.dnd5e.data.magias_catalogo import MAGIAS_CATALOGO

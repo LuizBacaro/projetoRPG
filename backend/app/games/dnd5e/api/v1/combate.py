@@ -10,24 +10,24 @@ from app.games.dnd5e.rules.combate import (
     calcular_iniciativa,
     resolver_ataque,
 )
-from app.games.dnd5e.rules.dados import rolar_d20
 from app.games.dnd5e.rules.condicoes_ficha import (
     decrementar_condicoes_turno,
     normalizar_condicoes_ficha,
     sincronizar_condicoes_por_hp,
 )
+from app.games.dnd5e.rules.dados import rolar_d20
 from app.games.dnd5e.schemas.combate import (
     Dnd5eAtaqueRequest,
     Dnd5eAtaqueResponse,
     Dnd5eCondicaoAtivaItem,
     Dnd5eCondicoesTurnoRequest,
     Dnd5eCondicoesTurnoResponse,
-    Dnd5eSincronizarHpCondicoesRequest,
     Dnd5eDanoRequest,
     Dnd5eDanoResponse,
     Dnd5eIniciativaRequest,
     Dnd5eIniciativaResponse,
     Dnd5eIniciativaResultado,
+    Dnd5eSincronizarHpCondicoesRequest,
 )
 from app.shared.core.deps import get_usuario_atual, requer_game_dnd5e
 from app.shared.models.usuario import Usuario

@@ -7,6 +7,10 @@ from typing import Any, Dict, List, Optional, Sequence
 from app.games.dnd5e.data.classes_catalogo import CLASSES_CATALOGO
 from app.games.dnd5e.rules.antecedentes import antecedente_do_catalogo
 from app.games.dnd5e.rules.classes import classe_por_slug
+from app.games.dnd5e.rules.condicoes_ficha import (
+    CHAVE_FICHA_ARENA_CONDICOES,
+    normalizar_condicoes_ficha,
+)
 from app.games.dnd5e.rules.equipamento import calcular_ac_de_slugs
 from app.games.dnd5e.rules.habilidades import (
     HABILIDADE_MAX,
@@ -21,10 +25,6 @@ from app.games.dnd5e.rules.pericias import (
     montar_salvamentos,
 )
 from app.games.dnd5e.rules.racas import raca_por_slug
-from app.games.dnd5e.rules.condicoes_ficha import (
-    CHAVE_FICHA_ARENA_CONDICOES,
-    normalizar_condicoes_ficha,
-)
 from app.games.dnd5e.rules.subclasses import validar_subclasse_para_classe
 
 CHAVES_HABILIDADE = (

@@ -3,9 +3,7 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from app.games.dnd5e.repositories.personagem_repository import (
-    Dnd5ePersonagemRepository,
-)
+from app.games.dnd5e.repositories.personagem_repository import Dnd5ePersonagemRepository
 from app.games.dnd5e.services.personagem_service import Dnd5ePersonagemService
 from app.shared.core.database import get_db
 
