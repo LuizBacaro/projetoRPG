@@ -69,7 +69,9 @@ class CompanheiroAnimalService:
         combatente = self._combatente_or_raise(combatente_id)
         eleg = self._elegibilidade(combatente)
         if not eleg.elegivel:
-            raise ValueError(eleg.motivo or "Personagem não elegível para companheiro animal.")
+            raise ValueError(
+                eleg.motivo or "Personagem não elegível para companheiro animal."
+            )
 
         especie_raw = especie_por_slug(payload.especie_slug)
         if not especie_raw:

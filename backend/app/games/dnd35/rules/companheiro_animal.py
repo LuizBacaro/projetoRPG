@@ -2,6 +2,7 @@
 Regras de companheiro animal D&D 3.5 (PHB).
 Fonte: .cursor/requisitos/dnd35/09-companheiro-animal-dnd35.md
 """
+
 from __future__ import annotations
 
 import re
@@ -209,9 +210,17 @@ def calcular_estatisticas(
 ) -> Dict[str, Any]:
     """Calcula bloco derivado para API/UI."""
     bonus = bonus_atributos or {}
-    attrs = {k: int(atributos_base.get(k, 10)) + int(bonus.get(k, 0)) for k in (
-        "forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma"
-    )}
+    attrs = {
+        k: int(atributos_base.get(k, 10)) + int(bonus.get(k, 0))
+        for k in (
+            "forca",
+            "destreza",
+            "constituicao",
+            "inteligencia",
+            "sabedoria",
+            "carisma",
+        )
+    }
     hd_b = hd_bonus(nivel_efetivo)
     hd_total = max(1, int(hd_base) + hd_b)
     an_vinculo = armadura_natural_bonus(nivel_efetivo)

@@ -2,6 +2,7 @@
 Catálogo de espécies de companheiro animal (nível inicial) — D&D 3.5 PHB.
 Estatísticas base simplificadas (SRD); ajustes finos podem evoluir em seed dedicado.
 """
+
 from __future__ import annotations
 
 from typing import Any, Dict, List
