@@ -11,6 +11,7 @@ __pycache__/
 .venv/
 .venv-ci/
 .venv_pdf/
+backend/.venv-ci/
 venv/
 *.egg-info/
 

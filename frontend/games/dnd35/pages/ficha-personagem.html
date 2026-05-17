@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/variables.css">
     <link rel="stylesheet" href="/games/dnd35/css/modais.css">
     <link rel="stylesheet" href="/games/dnd35/css/skeleton.css?v=1">
-    <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=18">
+    <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=21">
     <link rel="stylesheet" href="/games/dnd35/css/item-card-unified.css">
     <link rel="stylesheet" href="/games/dnd35/css/grimorio.css?v=20260418a">
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css">
@@ -210,6 +210,18 @@
                 </div>
                 <div id="fichaConsumiveis" class="ficha-equipamentos-lista">
                     <span class="ficha-vazio">Nenhum consumível cadastrado</span>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
+                <div class="ficha-secao-header">
+                    <h3 class="ficha-secao-titulo">🐾 Companheiro Animal</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarCompanheiroAnimal" title="Adicionar companheiro animal">
+                        ➕ Adicionar
+                    </button>
+                </div>
+                <div id="fichaCompanheiroAnimal" class="ficha-equipamentos-lista">
+                    <span class="ficha-vazio">Nenhum companheiro animal cadastrado</span>
                 </div>
             </div>
 
@@ -966,6 +978,52 @@
     </div>
 </div>
 
+<div id="modalCompanheiroAnimal" class="equipamentos-overlay" style="display: none;">
+    <div class="equipamentos-container equipamentos-container--companheiro">
+        <div class="equipamentos-header">
+            <div class="equipamentos-header-esquerda">
+                <span class="equipamentos-icone">🐾</span>
+                <div>
+                    <h2 class="equipamentos-titulo">Companheiro Animal</h2>
+                    <p class="equipamentos-subtitulo" id="caElegibilidadeHint">Druida ou Ranger (4º+)</p>
+                </div>
+            </div>
+            <button type="button" class="equipamentos-fechar" id="btnFecharModalCompanheiroAnimal">✕</button>
+        </div>
+        <div class="equipamentos-corpo ca-form-corpo">
+            <div class="equipamentos-form-grupo">
+                <label class="equipamentos-form-label" for="caNomeCompanheiro">Nome</label>
+                <input type="text" id="caNomeCompanheiro" class="equipamentos-form-input" placeholder="Ex: Greywind" maxlength="120" />
+            </div>
+            <div class="equipamentos-form-grupo">
+                <label class="equipamentos-form-label" for="caEspecieCompanheiro">Espécie (PHB)</label>
+                <select id="caEspecieCompanheiro" class="equipamentos-form-input"></select>
+            </div>
+            <fieldset class="ca-bonus-atributos">
+                <legend class="equipamentos-form-label">Bônus de atributos (escolha do jogador)</legend>
+                <div class="ca-bonus-grid">
+                    <label>FOR <input type="number" min="0" max="6" value="0" data-bonus-attr="forca" class="ca-bonus-input" inputmode="numeric" /></label>
+                    <label>DES <input type="number" min="0" max="6" value="0" data-bonus-attr="destreza" class="ca-bonus-input" inputmode="numeric" /></label>
+                    <label>CON <input type="number" min="0" max="6" value="0" data-bonus-attr="constituicao" class="ca-bonus-input" inputmode="numeric" /></label>
+                    <label>INT <input type="number" min="0" max="6" value="0" data-bonus-attr="inteligencia" class="ca-bonus-input" inputmode="numeric" /></label>
+                    <label>SAB <input type="number" min="0" max="6" value="0" data-bonus-attr="sabedoria" class="ca-bonus-input" inputmode="numeric" /></label>
+                    <label>CAR <input type="number" min="0" max="6" value="0" data-bonus-attr="carisma" class="ca-bonus-input" inputmode="numeric" /></label>
+                </div>
+            </fieldset>
+            <div class="equipamentos-form-grupo">
+                <label class="equipamentos-form-label" for="caAnotacoesCompanheiro">Anotações</label>
+                <textarea id="caAnotacoesCompanheiro" class="equipamentos-form-input" rows="2" placeholder="Truques, talentos, notas…"></textarea>
+            </div>
+            <div id="caPreviewDerivadas" class="ca-preview-derivadas"></div>
+            <div class="ficha-modal-actions ca-modal-actions">
+                <button type="button" class="ficha-btn-cancelar" id="btnRemoverCompanheiroAnimal" hidden>Remover</button>
+                <button type="button" class="equipamentos-btn-salvar" id="btnPreviewCompanheiroAnimal">Recalcular</button>
+                <button type="button" class="equipamentos-btn-salvar" id="btnSalvarCompanheiroAnimal">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/js/shared/render-api-origin-boot.js?v=2"></script>
 <script src="../js/ui/ModalConfirm.js?v=27"></script>
 <script src="../js/services/AuthService.js?v=20260426b"></script>
@@ -977,6 +1035,7 @@
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
 <script type="module" src="../js/controllers/FichaPersonagemController.js?v=64"></script>
 <script type="module" src="../js/controllers/ConsumiveisFichaController.js?v=1"></script>
+<script type="module" src="../js/controllers/CompanheiroAnimalFichaController.js?v=2"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=20260420c"></script>
 </body>
 </html>

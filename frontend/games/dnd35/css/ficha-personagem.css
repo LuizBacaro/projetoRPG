@@ -3463,3 +3463,112 @@ body {
     color: var(--cor-dourada);
     transition: color 0.2s;
 }
+
+/* ── Companheiro animal (ficha) ── */
+
+.ficha-companheiro-resumo {
+    grid-template-columns: 1.5fr 1fr 0.9fr 0.6fr;
+}
+
+.ficha-companheiro-stats {
+    margin: 0.35rem 0 0;
+    padding: 0 0.7rem 0.5rem;
+    font-size: 0.75rem;
+    color: var(--cor-texto-suave, #5c4a3a);
+}
+
+.equipamentos-container--companheiro {
+    max-width: 520px;
+}
+
+.ca-form-corpo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ca-bonus-atributos {
+    border: 1px solid rgba(92, 58, 30, 0.25);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    margin: 0;
+}
+
+.ca-bonus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem 0.75rem;
+    margin-top: 0.5rem;
+    justify-items: start;
+}
+
+.ca-bonus-grid label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    width: auto;
+    max-width: 100%;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: var(--fonte-titulo);
+    color: var(--cor-tinta);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.ca-bonus-input {
+    width: 3.25rem;
+    min-width: 3.25rem;
+    padding: 0.45rem 0.35rem;
+    border: 2px solid rgba(92, 58, 30, 0.45);
+    border-radius: 6px;
+    font-family: var(--fonte-titulo);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    background: #fff;
+    color: var(--cor-tinta);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+}
+
+.ca-bonus-input:focus {
+    outline: none;
+    border-color: var(--cor-dourada, #b8860b);
+    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.25);
+}
+
+/* Remove setas pequenas do number em WebKit — valor centralizado e legível */
+.ca-bonus-input::-webkit-outer-spin-button,
+.ca-bonus-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ca-bonus-input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.ca-preview-derivadas {
+    background: rgba(92, 58, 30, 0.06);
+    border: 1px dashed rgba(92, 58, 30, 0.3);
+    border-radius: 6px;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.78rem;
+}
+
+.ca-preview-lista {
+    margin: 0.35rem 0 0;
+    padding-left: 1.1rem;
+}
+
+.ca-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
