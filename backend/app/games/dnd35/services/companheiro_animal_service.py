@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.games.dnd35.catalogs.companheiros_especies import (
@@ -170,11 +171,15 @@ class CompanheiroAnimalService:
         )
 
     def obter(self, combatente_id: int) -> Optional[CompanheiroAnimalResponse]:
-        combatente = self._combatente_or_raise(combatente_id)
-        ent = self._repo.obter_por_combatente(combatente_id)
-        if not ent:
+        try:
+            combatente = self._combatente_or_raise(combatente_id)
+            ent = self._repo.obter_por_combatente(combatente_id)
+            if not ent:
+                return None
+            return self._to_response(ent, combatente)
+        except SQLAlchemyError:
+            self.db.rollback()
             return None
-        return self._to_response(ent, combatente)
 
     def elegibilidade(self, combatente_id: int) -> CompanheiroElegibilidadeResponse:
         combatente = self._combatente_or_raise(combatente_id)

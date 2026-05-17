@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.dependencies import get_companheiro_animal_service
 from app.games.dnd35.schemas.companheiro_animal import (
@@ -75,6 +76,11 @@ def obter(
         return service.obter(combatente_id)
     except CombatenteNaoEncontrado as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except SQLAlchemyError:
+        logger.exception(
+            "Falha ao obter companheiro animal (combatente_id=%s)", combatente_id
+        )
+        return None
 
 
 @router.put(
