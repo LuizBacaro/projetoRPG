@@ -56,5 +56,5 @@ class CompanheiroAnimal(Base):
         "Combatente",
         back_populates="companheiro_animal",
         foreign_keys=[combatente_id],
-        lazy="joined",
+        lazy="select",
     )

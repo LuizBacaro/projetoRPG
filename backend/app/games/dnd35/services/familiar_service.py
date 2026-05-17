@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.games.dnd35.catalogs.familiares_especies import (
@@ -147,11 +148,15 @@ class FamiliarService:
         )
 
     def obter(self, combatente_id: int) -> Optional[FamiliarResponse]:
-        combatente = self._combatente_or_raise(combatente_id)
-        ent = self._repo.obter_por_combatente(combatente_id)
-        if not ent:
+        try:
+            combatente = self._combatente_or_raise(combatente_id)
+            ent = self._repo.obter_por_combatente(combatente_id)
+            if not ent:
+                return None
+            return self._to_response(ent, combatente)
+        except SQLAlchemyError:
+            self.db.rollback()
             return None
-        return self._to_response(ent, combatente)
 
     def elegibilidade(self, combatente_id: int) -> FamiliarElegibilidadeResponse:
         combatente = self._combatente_or_raise(combatente_id)

@@ -51,7 +51,11 @@ export class CompanheiroAnimalService {
             method: 'GET',
             headers: this._headers(),
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (res.status === 404) return null;
+        if (!res.ok) {
+            if (res.status >= 500) return null;
+            throw new Error(`HTTP ${res.status}`);
+        }
         const data = await res.json();
         return data || null;
     }
