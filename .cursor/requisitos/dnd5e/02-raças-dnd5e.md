@@ -56,8 +56,22 @@ Cada raça aplica bônus/penalidades a habilidades, define velocidade base (9m p
 - Vantagem em testes de mágica
 
 ### Meio-Elfo
-- Dois aumentos de habilidade extras
-- Proficiência em perícia à escolha
+- **+2 Carisma** (fixo no catálogo `bonus_habilidades`)
+- **Dois +1** em habilidades distintas à escolha do jogador (não fixos na raça)
+- Proficiência em **uma** perícia à escolha (`proficiencia_pericia_extra`)
+
+**Contrato Arena (UI + API — não hardcodar slug `meio_elfo`):**
+
+| Campo catálogo (`Dnd5eRacaItem`) | Uso |
+|----------------------------------|-----|
+| `escolhe_duas_mais1: true` | Exibir bloco de dois selects de +1 |
+| `caracteristicas` contém `dois_bonus_habilidade_extra` | Alternativa/compatível para mesma regra |
+| `caracteristicas` contém `proficiencia_pericia_extra` | Exibir select de perícia racial |
+| `bonus_habilidade_extra` no payload de cálculo/ficha | Mapa `{ strength: 1, wisdom: 1 }` etc. |
+
+Frontend: `frontend/games/dnd5e/js/shared/dnd5e-raca-util.js` — labels dinâmicos `+1 (Nome da raça)`; pré-cadastro (`Dnd5ePreCadastroModal.js`) e ficha (`ficha-dnd5e.js`).
+
+**Divergência D&D 3.5:** em [02-raças-dnd35.md](../dnd35/02-raças-dnd35.md) o meio-elfo tem apenas **+2 CHA** e **+2 perícias** — não há “dois +1 em atributos”; não reutilizar a UI 5e no `dnd35`.
 
 ### Meio-Orc
 - Agressividade: ação bônus quando HP <= 1/2

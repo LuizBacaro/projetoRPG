@@ -97,9 +97,12 @@
         return out;
     }
 
+    function racaSelecionada() {
+        return catalogoRacas.find((r) => r.slug === el('f5e_raca').value);
+    }
+
     function getBonusExtra() {
-        const raca = el('f5e_raca').value;
-        if (raca !== 'meio_elfo') return {};
+        if (!Dnd5eRacaUtil.temBonusHabilidadeExtraEscolha(racaSelecionada())) return {};
         const k1 = el('f5e_extra1').value;
         const k2 = el('f5e_extra2').value;
         const out = {};
@@ -131,8 +134,7 @@
     }
 
     function atualizarUiRaca() {
-        const slug = el('f5e_raca').value;
-        const raca = catalogoRacas.find((r) => r.slug === slug);
+        const raca = racaSelecionada();
         const tracos = el('f5e_tracos');
         const extra = el('f5e_raca_extra');
         if (raca && raca.tracos_resumo) {
@@ -141,7 +143,15 @@
         } else {
             tracos.hidden = true;
         }
-        extra.classList.toggle('is-visible', slug === 'meio_elfo');
+        extra.classList.toggle(
+            'is-visible',
+            Dnd5eRacaUtil.temBonusHabilidadeExtraEscolha(raca)
+        );
+        Dnd5eRacaUtil.atualizarLabelsBonusExtra(
+            raca,
+            ['f5e_extra1_label', 'f5e_extra2_label'],
+            el
+        );
         const temPericiaExtra =
             raca &&
             Array.isArray(raca.caracteristicas) &&

@@ -19,7 +19,8 @@ Quando o pedido citar, abrir ou implementar qualquer ficheiro em `.cursor/requis
 ## Durante a implementação
 
 - Respeitar `app/games/<slug>/`, Auth Hub, `game_slug` e contratos API existentes — não inventar estrutura paralela.
-- Reutilizar catálogos, serviços e padrões já usados no mesmo jogo.
+- Reutilizar catálogos, serviços e padrões já usados **no mesmo jogo** (`slug` da tarefa).
+- **D&D 3.5 (`dnd35`) e D&D 5E (`dnd5e`) são jogos distintos:** RF de `dnd35/` só em `games/dnd35/`; RF de `dnd5e/` só em `games/dnd5e/`. Proibido misturar requisitos, catálogos, UI ou regras entre os dois.
 - Não copiar texto longo de livros/PDFs para o repositório; `livros/` e `helpers/` são locais e ignorados pelo Git.
 
 ## Proibido sem releitura de AGENTS.md

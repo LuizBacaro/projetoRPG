@@ -127,6 +127,13 @@ class Combatente(SoftDeleteMixin, Base):
         lazy="selectin",
         foreign_keys="ArmaduraProtecaoJogador.combatente_id",
     )
+    companheiro_animal = relationship(
+        "CompanheiroAnimal",
+        back_populates="combatente",
+        cascade="all, delete-orphan",
+        uselist=False,
+        lazy="select",
+    )
     campanha = relationship("Campanha", back_populates="personagens", lazy="joined")
 
     # ── Helpers de domínio ──
@@ -159,3 +166,7 @@ class Combatente(SoftDeleteMixin, Base):
 
     def calcular_modificador(self, atributo: str) -> int:
         return (getattr(self, atributo.lower(), 10) - 10) // 2
+
+
+# Registro do mapper para relationship("CompanheiroAnimal") — import após a classe.
+from app.games.dnd35.models.companheiro_animal import CompanheiroAnimal  # noqa: F401, E402

@@ -9,6 +9,7 @@ from app.games.dnd35.models.armadura_protecao import (
 from app.games.dnd35.models.ataque import Ataque, MagiaPreparada, MagiaSlot
 from app.games.dnd35.models.campanha import Campanha
 from app.games.dnd35.models.combate import Combate, CombateHistorico
+from app.games.dnd35.models.companheiro_animal import CompanheiroAnimal
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.combatente_condicao import CombatenteCondicao
 from app.games.dnd35.models.condicao import Condicao
@@ -73,6 +74,7 @@ __all__ = [
     "TalentoJogador",
     "Consumivel",
     "ConsumivelJogador",
+    "CompanheiroAnimal",
     "Combatente",
     "Usuario",
     "PerfilUsuario",

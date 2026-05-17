@@ -4,11 +4,15 @@ Especificações em `*.md` desta pasta descrevem mecânicas **D&D 5ª edição**
 
 **Antes de implementar:** seguir o gate em [.cursor/requisitos/README.md](../README.md) e [AGENTS.md](../../../AGENTS.md).
 
+## Jogo distinto de D&D 3.5
+
+**`dnd5e` ≠ `dnd35`.** Requisitos, código e catálogos são separados. Não implementar RF desta pasta em `dnd35/` nem copiar lógica 3.5 para 5e. Ver [dnd35/README.md](../dnd35/README.md).
+
 ## Código de produção vs. esta pasta
 
 | Área | Sistema | Nota |
 |------|---------|------|
-| `backend/app/games/dnd35/` | D&D **3.5** | Ficha, grimório e arena atuais no deploy |
+| `backend/app/games/dnd35/` | D&D **3.5** | Ficha, grimório e arena atuais no deploy — requisitos em [.cursor/requisitos/dnd35/](../dnd35/) |
 | `.cursor/requisitos/dnd5e/` | D&D **5E** | Roadmap / novas features 5e; não confundir regras 3.5 com 5e |
 
 Ao implementar um RF desta pasta, criar ou estender módulos **5e** de forma isolada (novo `game_slug` / pacote), salvo decisão explícita de convergir com `dnd35`.

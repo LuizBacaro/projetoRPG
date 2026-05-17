@@ -161,8 +161,12 @@ class Dnd5ePreCadastroModal {
         return out;
     }
 
+    racaSelecionada() {
+        return this.catalogoRacas.find((r) => r.slug === this.el('prec_raca').value);
+    }
+
     getBonusExtra() {
-        if (this.el('prec_raca').value !== 'meio_elfo') return {};
+        if (!Dnd5eRacaUtil.temBonusHabilidadeExtraEscolha(this.racaSelecionada())) return {};
         const k1 = this.el('prec_extra1').value;
         const k2 = this.el('prec_extra2').value;
         const out = {};
@@ -238,8 +242,7 @@ class Dnd5ePreCadastroModal {
     }
 
     atualizarUiRaca() {
-        const slug = this.el('prec_raca').value;
-        const raca = this.catalogoRacas.find((r) => r.slug === slug);
+        const raca = this.racaSelecionada();
         const tracos = this.el('prec_tracos');
         const extra = this.el('prec_raca_extra');
         if (raca && raca.tracos_resumo) {
@@ -248,7 +251,15 @@ class Dnd5ePreCadastroModal {
         } else {
             tracos.hidden = true;
         }
-        extra?.classList.toggle('is-visible', slug === 'meio_elfo');
+        extra?.classList.toggle(
+            'is-visible',
+            Dnd5eRacaUtil.temBonusHabilidadeExtraEscolha(raca)
+        );
+        Dnd5eRacaUtil.atualizarLabelsBonusExtra(
+            raca,
+            ['prec_extra1_label', 'prec_extra2_label'],
+            (id) => this.el(id)
+        );
         const temPericiaExtra =
             raca &&
             Array.isArray(raca.caracteristicas) &&
