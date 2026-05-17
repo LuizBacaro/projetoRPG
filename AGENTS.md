@@ -55,14 +55,14 @@ Normas de **camadas**, **SOLID** e **multi-jogo** aplicam-se a todo backend/fron
 
 - Especificacoes por jogo (D&D 3.5, D&D 5E, Tormenta, GURPS): pasta [.cursor/requisitos](.cursor/requisitos) e indice em [.cursor/requisitos/README.md](.cursor/requisitos/README.md).
 - **D&D 3.5 (`dnd35`) e D&D 5E (`dnd5e`) sao jogos distintos** — requisitos, backend `app/games/<slug>/` e frontend `frontend/games/<slug>/` nao se misturam; ver [.cursor/requisitos/dnd35/README.md](.cursor/requisitos/dnd35/README.md) e [.cursor/requisitos/dnd5e/README.md](.cursor/requisitos/dnd5e/README.md).
-- **Antes de implementar qualquer item dessa pasta**, e obrigatorio seguir a arquitetura e o protocolo **deste** `AGENTS.md` (deploy Vercel/Render/Neon, multi-jogo, instrucoes em `.github/instructions`, skills em `.cursor/skills/`). Os `.md` de requisito definem o escopo funcional; nao substituem a governanca da plataforma.
+- **Antes de implementar qualquer item dessa pasta**, e obrigatorio seguir a arquitetura e o protocolo **deste** `AGENTS.md` (deploy Vercel/Render/Neon, multi-jogo, instrucoes em `.github/instructions`, skills conforme [.cursor/skills/README.md](.cursor/skills/README.md)). Os `.md` de requisito definem o escopo funcional; nao substituem a governanca da plataforma.
 - Regra Cursor associada: [.cursor/rules/requisitos-implementacao.mdc](.cursor/rules/requisitos-implementacao.mdc).
 
 ## Protocolo obrigatorio de implementacao
 
 - Em backend ou refatoracao estrutural, cumprir a secao **Arquitetura de codigo** acima e [docs/arquitetura-camadas-solid.md](docs/arquitetura-camadas-solid.md).
 - Antes de qualquer refatoracao estetica/estrutural, priorizar validacao e preservacao dos requisitos funcionais do fluxo afetado.
-- Em tarefas com uso de skills, agentes ou instrucoes especializadas, manter o mesmo protocolo de leitura de contexto documental antes de codar.
+- Em tarefas com uso de skills, agentes ou instrucoes especializadas, manter o mesmo protocolo de leitura de contexto documental antes de codar; escolher **1–2 skills** pelo [.cursor/skills/README.md](.cursor/skills/README.md) (evitar empilhar varios playbooks na mesma conversa).
 - Sempre priorizar reuso e modularidade: evitar duplicacao de regras, centralizar fonte de verdade e preservar contratos existentes.
 - Aplicar SOLID e Clean Code em toda alteracao:
 	- funcoes/metodos curtos com responsabilidade unica (SRP);
@@ -105,6 +105,8 @@ Contrato enxuto entre requisito, codigo e revisao — **sem** processo pesado de
 
 ## Referencias por tema (leitura antes de codar)
 
+- **Mapa de governanca (fluxos, agentes, skills, Excel):** [docs/governanca-agentes-fluxos.md](docs/governanca-agentes-fluxos.md) e [docs/governanca-agentes-fluxos.xlsx](docs/governanca-agentes-fluxos.xlsx) — regenerar planilha com `python3 scripts/generate-governanca-xlsx.py`.
+- **Indice de skills (qual carregar por tarefa):** [.cursor/skills/README.md](.cursor/skills/README.md) — deploy, requisitos, ficha por jogo; complemento transversal em [.github/skills/README.md](.github/skills/README.md).
 - Para evolucoes da ficha por classe/nivel (BBA, resistencias, defesas CA/Toque/Surpresa, iniciativa e habilidades especiais), consultar [docs/progressao-classes-bba-resistencias-habilidades.md](docs/progressao-classes-bba-resistencias-habilidades.md).
 - Para pre-definicoes por raca e catalogo racial normalizado, consultar [docs/predefinicoes-raciais-contrato.md](docs/predefinicoes-raciais-contrato.md) e `docs/dados/racas_caracteristicas_catalogo.json`.
 - Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md).
@@ -180,7 +182,11 @@ Usar quando for preciso extrair texto, tabelas e informacoes de PDFs com suporte
 
 ## Skills Especializadas
 
-- `rpg-requirements-analysis`
+**Indice canonico (agentes e humanos):** [.cursor/skills/README.md](.cursor/skills/README.md) — atalho por tipo de tarefa, receitas e o que nao misturar na janela de contexto. Skills em `.github/skills/` (PDF, auditoria JS): [.github/skills/README.md](.github/skills/README.md).
+
+Exemplos frequentes (detalhe em cada `SKILL.md`):
+
+- `rpg-requirements-analysis` ([.github/skills/rpg-requirements-analysis/SKILL.md](.github/skills/rpg-requirements-analysis/SKILL.md))
 Workflow para transformar texto de regra, PDF ou documento em especificacao acionavel, separando regra da fonte, interpretacao operacional e decisao de produto.
 
 - `dnd-spellcasting-conventions` ([.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md))

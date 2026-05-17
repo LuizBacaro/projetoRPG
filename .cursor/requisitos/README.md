@@ -9,7 +9,7 @@ Especificações funcionais por sistema de jogo (D&D 3.5, D&D 5E, Tormenta 20, G
 1. **[AGENTS.md](../../AGENTS.md)** — arquitetura deployada, **camadas/SOLID/multi-jogo**, protocolo de implementação, SDD leve.
 2. **[docs/arquitetura-camadas-solid.md](../../docs/arquitetura-camadas-solid.md)** — profundidade sobre camadas, modularidade e evolução do código.
 3. Instruções da área alterada em **[.github/instructions](../../.github/instructions)** (`backend`, `frontend` ou `migrations`).
-4. Skill do jogo, quando existir:
+4. Skill do jogo, quando existir (índice completo: [.cursor/skills/README.md](../skills/README.md)):
    - Tormenta: [.cursor/skills/tormenta-20-arena-arquitetura-e-regras/SKILL.md](../skills/tormenta-20-arena-arquitetura-e-regras/SKILL.md)
    - D&D 3.5 em produção (`dnd35`): requisitos em [dnd35/](dnd35/) e conjuração em [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](../skills/dnd-spellcasting-conventions/SKILL.md)
    - D&D 5E (`dnd5e`): [.cursor/requisitos/dnd5e/README.md](dnd5e/README.md) e [5e-database](https://github.com/5e-bits/5e-database) — **não** misturar regras com `dnd35`

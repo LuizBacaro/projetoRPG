@@ -1,5 +1,7 @@
 # Guia de Orquestracao de Agentes
 
+> **Mapa unificado (Cursor + Copilot + planilha Excel):** [docs/governanca-agentes-fluxos.md](docs/governanca-agentes-fluxos.md) · [governanca-agentes-fluxos.xlsx](docs/governanca-agentes-fluxos.xlsx)
+
 Este documento explica como a orquestracao de agentes foi estruturada neste workspace e qual e o papel de cada tipo de customizacao.
 
 O objetivo e deixar claro:
