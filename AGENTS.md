@@ -53,7 +53,8 @@ Normas de **camadas**, **SOLID** e **multi-jogo** aplicam-se a todo backend/fron
 
 ## Requisitos de feature (`.cursor/requisitos`)
 
-- Especificacoes por jogo (D&D, Tormenta, GURPS): pasta [.cursor/requisitos](.cursor/requisitos) e indice em [.cursor/requisitos/README.md](.cursor/requisitos/README.md).
+- Especificacoes por jogo (D&D 3.5, D&D 5E, Tormenta, GURPS): pasta [.cursor/requisitos](.cursor/requisitos) e indice em [.cursor/requisitos/README.md](.cursor/requisitos/README.md).
+- **D&D 3.5 (`dnd35`) e D&D 5E (`dnd5e`) sao jogos distintos** — requisitos, backend `app/games/<slug>/` e frontend `frontend/games/<slug>/` nao se misturam; ver [.cursor/requisitos/dnd35/README.md](.cursor/requisitos/dnd35/README.md) e [.cursor/requisitos/dnd5e/README.md](.cursor/requisitos/dnd5e/README.md).
 - **Antes de implementar qualquer item dessa pasta**, e obrigatorio seguir a arquitetura e o protocolo **deste** `AGENTS.md` (deploy Vercel/Render/Neon, multi-jogo, instrucoes em `.github/instructions`, skills em `.cursor/skills/`). Os `.md` de requisito definem o escopo funcional; nao substituem a governanca da plataforma.
 - Regra Cursor associada: [.cursor/rules/requisitos-implementacao.mdc](.cursor/rules/requisitos-implementacao.mdc).
 
@@ -70,6 +71,7 @@ Normas de **camadas**, **SOLID** e **multi-jogo** aplicam-se a todo backend/fron
 	- evitar logica duplicada e efeitos colaterais ocultos;
 	- minimizar breaking changes e manter compatibilidade quando possivel.
 - Ao concluir mudancas em fluxos sensiveis, validar impacto e registrar risco residual quando nao houver cobertura automatizada suficiente.
+- Antes de push/PR com alteracoes em `backend/**/*.py`, cumprir [docs/normas-qualidade-backend-ci.md](docs/normas-qualidade-backend-ci.md) (`make format-backend` ou `make ci-backend-lint`).
 
 ## Especificacao minima (SDD leve)
 
@@ -96,6 +98,7 @@ Contrato enxuto entre requisito, codigo e revisao — **sem** processo pesado de
 ## Onde estao as regras especificas
 
 - Backend Python: [.github/instructions/backend.instructions.md](.github/instructions/backend.instructions.md)
+- **Backend — black / isort / flake8 (CI):** [docs/normas-qualidade-backend-ci.md](docs/normas-qualidade-backend-ci.md) — obrigatorio antes de push/PR; comando local: `make ci-backend-lint`
 - Frontend Web: [.github/instructions/frontend.instructions.md](.github/instructions/frontend.instructions.md)
 - Migrations Alembic: [.github/instructions/migrations.instructions.md](.github/instructions/migrations.instructions.md)
 - Historico de evolucao: [HISTORICO_EVOLUCAO.md](HISTORICO_EVOLUCAO.md)

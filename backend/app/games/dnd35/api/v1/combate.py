@@ -52,6 +52,8 @@ def iniciar_combate(
         return status
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/status")

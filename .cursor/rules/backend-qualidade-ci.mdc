@@ -1,0 +1,16 @@
+---
+description: Black, isort e flake8 antes de push/PR — espelhar CI backend (normas em docs/normas-qualidade-backend-ci.md)
+globs: backend/**/*.py
+alwaysApply: false
+---
+
+# Qualidade backend (CI)
+
+Antes de concluir alterações em `backend/**/*.py`:
+
+1. Ler [docs/normas-qualidade-backend-ci.md](../../docs/normas-qualidade-backend-ci.md).
+2. Executar na raiz do repo: `make ci-backend-lint` (ou `make format-backend` para corrigir).
+3. Garantir ordem alfabética de imports em `app/main.py`, `app/models/__init__.py`, `app/core/deps/dnd35.py`.
+4. Imports tardios de mapper: `# noqa: F401, E402` na linha do `import` (ver `combatente.py`).
+
+Não dar por concluído se `black --check` ou `isort --check-only --profile black` falhar.

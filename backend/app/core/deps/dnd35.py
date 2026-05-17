@@ -10,6 +10,9 @@ from app.games.dnd35.repositories.armadura_protecao_repository import (
 from app.games.dnd35.repositories.campanha_repository import CampanhaRepository
 from app.games.dnd35.repositories.combate_repository import CombateRepository
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
+from app.games.dnd35.repositories.companheiro_animal_repository import (
+    CompanheiroAnimalRepository,
+)
 from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
 from app.games.dnd35.repositories.consumivel_repository import (
     ConsumivelJogadorRepository,
@@ -39,6 +42,7 @@ from app.games.dnd35.services.armadura_protecao_service import ArmaduraProtecaoS
 from app.games.dnd35.services.campanha_service import CampanhaService
 from app.games.dnd35.services.combate_service import CombateService
 from app.games.dnd35.services.combatente_service import CombatenteService
+from app.games.dnd35.services.companheiro_animal_service import CompanheiroAnimalService
 from app.games.dnd35.services.condicao_service import CondicaoService
 from app.games.dnd35.services.consumivel_service import ConsumivelService
 from app.games.dnd35.services.equipamento_service import EquipamentoService
@@ -97,6 +101,12 @@ def get_pericia_jogador_repository(
     db: Session = Depends(get_db),
 ) -> PericiaJogadorRepository:
     return PericiaJogadorRepository(db)
+
+
+def get_companheiro_animal_repository(
+    db: Session = Depends(get_db),
+) -> CompanheiroAnimalRepository:
+    return CompanheiroAnimalRepository(db)
 
 
 def get_consumivel_repository(db: Session = Depends(get_db)) -> ConsumivelRepository:
@@ -170,6 +180,18 @@ def get_pericia_service(
         pericia_repository=pericia_repository,
         pericia_jogador_repository=pericia_jogador_repository,
         combatente_repository=combatente_repository,
+    )
+
+
+def get_companheiro_animal_service(
+    db: Session = Depends(get_db),
+    repo: CompanheiroAnimalRepository = Depends(get_companheiro_animal_repository),
+    combatente_repository: CombatenteRepository = Depends(get_combatente_repository),
+) -> CompanheiroAnimalService:
+    return CompanheiroAnimalService(
+        db,
+        repo=repo,
+        combatente_repo=combatente_repository,
     )
 
 

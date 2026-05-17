@@ -3,7 +3,7 @@ NODE   ?= node
 BASE_URL ?= http://localhost:8000
 SNAPSHOT ?= backend/scripts/generated/personagens_snapshot.json
 
-.PHONY: test test-backend test-frontend test-e2e lint backup-personagens restore-personagens
+.PHONY: test test-backend test-frontend test-e2e lint format-backend ci-backend-lint backup-personagens restore-personagens
 
 ## Roda toda a suite de testes (backend + frontend)
 test: test-backend test-frontend
@@ -26,6 +26,17 @@ lint:
 	@command -v flake8 > /dev/null && \
 	  cd backend && flake8 app --max-line-length=120 --extend-ignore=E501 || \
 	  echo "flake8 não instalado — pulando lint"
+
+## Formata backend (black + isort) — mesmas regras do CI
+format-backend:
+	cd backend && black app/ tests/ && isort --profile black app/ tests/
+
+## Verificação de lint/format igual ao job GitHub Actions (backend)
+ci-backend-lint:
+	cd backend && \
+	  black --check --diff app/ tests/ && \
+	  isort --check-only --diff --profile black app/ tests/ && \
+	  flake8 app/ tests/ --max-line-length=120 --extend-ignore=E203,W503,E402,E501,E712,F401,F403,F541,F841
 
 ## Gera snapshot JSON completo dos personagens do banco configurado em DATABASE_URL
 backup-personagens:

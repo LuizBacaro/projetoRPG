@@ -127,11 +127,11 @@
                     <p id="prec_tracos" class="ficha-dnd5e-tracos" hidden></p>
                     <div id="prec_raca_extra" class="ficha-dnd5e-raca-extra dnd5e-prec-grid">
                         <div>
-                            <label class="ficha-label" for="prec_extra1">+1 (meio-elfo)</label>
+                            <label class="ficha-label" id="prec_extra1_label" for="prec_extra1">+1 (bônus racial)</label>
                             <select id="prec_extra1"></select>
                         </div>
                         <div>
-                            <label class="ficha-label" for="prec_extra2">+1 (meio-elfo)</label>
+                            <label class="ficha-label" id="prec_extra2_label" for="prec_extra2">+1 (bônus racial)</label>
                             <select id="prec_extra2"></select>
                         </div>
                         <div id="prec_pericia_racial_wrap" hidden>
@@ -189,7 +189,8 @@
 </script>
 <script src="../js/services/Dnd5ePersonagemService.js?v=3"></script>
 <script src="../js/services/Dnd5eRegrasService.js?v=3"></script>
-<script src="../js/ui/Dnd5ePreCadastroModal.js?v=3"></script>
+<script src="../js/shared/dnd5e-raca-util.js?v=1"></script>
+<script src="../js/ui/Dnd5ePreCadastroModal.js?v=4"></script>
 <script>
 (function () {
     const ps = new Dnd5ePersonagemService();

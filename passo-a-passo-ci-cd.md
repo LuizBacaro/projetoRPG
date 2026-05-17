@@ -9,6 +9,8 @@ Este guia explica como o repositório [LuizBacaro/projetoRPG](https://github.com
 | Gatilho | O que roda |
 |--------|------------|
 | **Push** em `feature/**`, `develop`, `feature/salva`, `main`, `master` | `backend` (lint + pytest + coverage), `migrations` (Postgres + Alembic), `frontend` (ESLint + teste JS). |
+
+**Normas de lint/format do backend (evitar falha no deploy):** [docs/normas-qualidade-backend-ci.md](docs/normas-qualidade-backend-ci.md) — rodar `make ci-backend-lint` antes do push.
 | **Pull request** com base nessas branches | O mesmo acima. |
 | **Push** em `develop` | Após jobs verdes: job **`deploy-staging`** (hooks opcionais). |
 | **Push** em `feature/salva` | Roda também **E2E** (Playwright); depois **`deploy-prod`** (hook opcional + smoke em `/health/live` + smoke GURPS opcional). |
@@ -233,9 +235,10 @@ Detalhes no código: `backend/app/main.py` (`_inicializar_banco_critico`, `_exec
 ## 8. Como acompanhar e depurar
 
 1. [Actions](https://github.com/LuizBacaro/projetoRPG/actions) → clique no workflow **CI/CD Pipeline** → abra a execução falha.  
-2. Verifique qual job falhou: `backend`, `migrations`, `frontend`, `e2e`, `deploy-*`.  
-3. **Migrations**: erros de Alembic (head múltiplo, SQL, ordem de revisões) aparecem primeiro neste job.  
-4. **E2E**: confira se `/health/live` subiu (timeout indica crash no startup, muitas vezes migração ou `DATABASE_URL`).
+2. Verifique qual job falhou: `backend`, `migrations`, `frontend`, `e2e`, `deploy-*`.
+3. Se o job `backend` falhou em **Lint and format code**, aplicar [docs/normas-qualidade-backend-ci.md](docs/normas-qualidade-backend-ci.md) (`make format-backend` + `make ci-backend-lint`).  
+4. **Migrations**: erros de Alembic (head múltiplo, SQL, ordem de revisões) aparecem primeiro neste job.  
+5. **E2E**: confira se `/health/live` subiu (timeout indica crash no startup, muitas vezes migração ou `DATABASE_URL`).
 
 ---
 
