@@ -169,6 +169,6 @@ class Combatente(SoftDeleteMixin, Base):
 
 
 # Registro do mapper para relationship("CompanheiroAnimal") — import após a classe.
-from app.games.dnd35.models.companheiro_animal import (
+from app.games.dnd35.models.companheiro_animal import (  # noqa: F401, E402
     CompanheiroAnimal,
-)  # noqa: F401, E402
+)

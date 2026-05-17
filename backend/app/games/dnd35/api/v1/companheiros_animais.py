@@ -12,10 +12,7 @@ from app.games.dnd35.schemas.companheiro_animal import (
     CompanheiroEspecieItem,
 )
 from app.games.dnd35.services.companheiro_animal_service import CompanheiroAnimalService
-from app.shared.core.deps import (
-    get_usuario_atual,
-    requer_dono_ou_admin_combatente,
-)
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 
 logger = logging.getLogger(__name__)

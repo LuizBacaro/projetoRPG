@@ -13,10 +13,7 @@ from app.games.dnd35.api.v1.companheiros_animais import router as companheiros_r
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.companheiro_animal import CompanheiroAnimal
 from app.shared.core.database import Base, get_db
-from app.shared.core.deps import (
-    get_usuario_atual,
-    requer_dono_ou_admin_combatente,
-)
+from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
 from app.shared.models.usuario import PerfilUsuario
 
 

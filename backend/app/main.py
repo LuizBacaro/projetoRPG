@@ -34,8 +34,8 @@ from .games.dnd35.api.v1 import ataques as dnd35_ataques
 from .games.dnd35.api.v1 import campanhas as dnd35_campanhas
 from .games.dnd35.api.v1 import combate as dnd35_combate
 from .games.dnd35.api.v1 import combatentes as dnd35_combatentes
-from .games.dnd35.api.v1 import condicoes as dnd35_condicoes
 from .games.dnd35.api.v1 import companheiros_animais as dnd35_companheiros_animais
+from .games.dnd35.api.v1 import condicoes as dnd35_condicoes
 from .games.dnd35.api.v1 import consumiveis as dnd35_consumiveis
 from .games.dnd35.api.v1 import divindades_custom as dnd35_divindades_custom
 from .games.dnd35.api.v1 import equipamentos as dnd35_equipamentos
@@ -54,9 +54,9 @@ from .games.dnd35.models import armadura_protecao as armadura_protecao_model
 from .games.dnd35.models import ataque as ataque_model
 from .games.dnd35.models import campanha as campanha_model
 from .games.dnd35.models import combate as combate_model
-from .games.dnd35.models import companheiro_animal as companheiro_animal_model
 from .games.dnd35.models import combatente as combatente_model
 from .games.dnd35.models import combatente_condicao as pivot_model
+from .games.dnd35.models import companheiro_animal as companheiro_animal_model
 from .games.dnd35.models import condicao as condicao_model
 from .games.dnd35.models import consumivel as consumivel_model
 from .games.dnd35.models import equipamento as equipamento_model

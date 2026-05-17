@@ -10,10 +10,10 @@ from app.games.dnd35.repositories.armadura_protecao_repository import (
 from app.games.dnd35.repositories.campanha_repository import CampanhaRepository
 from app.games.dnd35.repositories.combate_repository import CombateRepository
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
-from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
 from app.games.dnd35.repositories.companheiro_animal_repository import (
     CompanheiroAnimalRepository,
 )
+from app.games.dnd35.repositories.condicao_repository import CondicaoRepository
 from app.games.dnd35.repositories.consumivel_repository import (
     ConsumivelJogadorRepository,
     ConsumivelRepository,
@@ -42,8 +42,8 @@ from app.games.dnd35.services.armadura_protecao_service import ArmaduraProtecaoS
 from app.games.dnd35.services.campanha_service import CampanhaService
 from app.games.dnd35.services.combate_service import CombateService
 from app.games.dnd35.services.combatente_service import CombatenteService
-from app.games.dnd35.services.condicao_service import CondicaoService
 from app.games.dnd35.services.companheiro_animal_service import CompanheiroAnimalService
+from app.games.dnd35.services.condicao_service import CondicaoService
 from app.games.dnd35.services.consumivel_service import ConsumivelService
 from app.games.dnd35.services.equipamento_service import EquipamentoService
 from app.games.dnd35.services.grimorio_service import GrimorioService
