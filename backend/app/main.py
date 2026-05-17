@@ -39,6 +39,7 @@ from .games.dnd35.api.v1 import condicoes as dnd35_condicoes
 from .games.dnd35.api.v1 import consumiveis as dnd35_consumiveis
 from .games.dnd35.api.v1 import divindades_custom as dnd35_divindades_custom
 from .games.dnd35.api.v1 import equipamentos as dnd35_equipamentos
+from .games.dnd35.api.v1 import familiares as dnd35_familiares
 from .games.dnd35.api.v1 import grimorio as dnd35_grimorio
 from .games.dnd35.api.v1 import habilidades_especiais as dnd35_habilidades_especiais
 from .games.dnd35.api.v1 import magias as dnd35_magias
@@ -60,6 +61,7 @@ from .games.dnd35.models import companheiro_animal as companheiro_animal_model
 from .games.dnd35.models import condicao as condicao_model
 from .games.dnd35.models import consumivel as consumivel_model
 from .games.dnd35.models import equipamento as equipamento_model
+from .games.dnd35.models import familiar as familiar_model
 from .games.dnd35.models import grimorio as grimorio_model
 from .games.dnd35.models import magia as magia_model
 from .games.dnd35.models import pericia as pericia_model
@@ -481,6 +483,7 @@ app.include_router(dnd35_grimorio.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_equipamentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_consumiveis.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_companheiros_animais.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_familiares.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_armaduras_protecao.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_talentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_tabelas_classes.router, prefix=settings.API_V1_PREFIX)

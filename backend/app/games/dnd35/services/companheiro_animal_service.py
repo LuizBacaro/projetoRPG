@@ -13,10 +13,12 @@ from app.games.dnd35.repositories.combatente_repository import CombatenteReposit
 from app.games.dnd35.repositories.companheiro_animal_repository import (
     CompanheiroAnimalRepository,
 )
+from app.games.dnd35.repositories.familiar_repository import FamiliarRepository
 from app.games.dnd35.rules.companheiro_animal import (
     calcular_estatisticas,
     elegibilidade_companheiro,
 )
+from app.games.dnd35.rules.vinculo_animal import MSG_TEM_FAMILIAR
 from app.games.dnd35.schemas.companheiro_animal import (
     CHAVES_ATRIBUTO,
     CompanheiroAnimalResponse,
@@ -27,6 +29,7 @@ from app.games.dnd35.schemas.companheiro_animal import (
     CompanheiroEspecieItem,
     CompanheiroEstatisticasDerivadas,
 )
+from app.games.dnd35.services.vinculo_arena_service import VinculoArenaService
 from app.shared.exceptions.custom_exceptions import CombatenteNaoEncontrado
 
 
@@ -37,16 +40,26 @@ class CompanheiroAnimalService:
         *,
         repo: CompanheiroAnimalRepository,
         combatente_repo: CombatenteRepository,
+        familiar_repo: FamiliarRepository | None = None,
+        vinculo_arena: VinculoArenaService | None = None,
     ):
         self.db = db
         self._repo = repo
         self._combatente_repo = combatente_repo
+        self._familiar_repo = familiar_repo
+        self._vinculo_arena = vinculo_arena
 
     def _combatente_or_raise(self, combatente_id: int):
         c = self._combatente_repo.get_by_id(combatente_id)
         if not c:
             raise CombatenteNaoEncontrado(combatente_id)
         return c
+
+    def _assert_sem_familiar(self, combatente_id: int) -> None:
+        if self._familiar_repo and self._familiar_repo.obter_por_combatente(
+            combatente_id
+        ):
+            raise ValueError(MSG_TEM_FAMILIAR)
 
     def _elegibilidade(self, combatente) -> CompanheiroElegibilidadeResponse:
         ok, motivo, nivel_ef = elegibilidade_companheiro(
@@ -178,6 +191,8 @@ class CompanheiroAnimalService:
         if not especie_por_slug(payload.especie_slug):
             raise ValueError(f"Espécie inválida: {payload.especie_slug}")
 
+        self._assert_sem_familiar(combatente_id)
+
         ent = self._repo.obter_por_combatente(combatente_id)
         if ent is None:
             ent = CompanheiroAnimal(combatente_id=combatente_id)
@@ -186,6 +201,8 @@ class CompanheiroAnimalService:
         else:
             self._aplicar_payload(ent, payload)
             ent = self._repo.atualizar(ent)
+        if self._vinculo_arena:
+            self._vinculo_arena.sync_companheiro(ent, combatente)
         return self._to_response(ent, combatente)
 
     def criar_a_partir_calculo(
@@ -221,5 +238,7 @@ class CompanheiroAnimalService:
         ent = self._repo.obter_por_combatente(combatente_id)
         if not ent:
             return False
+        if self._vinculo_arena:
+            self._vinculo_arena.remover_combatente_arena(ent.arena_combatente_id)
         self._repo.remover(ent)
         return True

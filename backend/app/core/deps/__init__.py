@@ -33,6 +33,8 @@ from .dnd35 import (
     get_equipamento_jogador_repository,
     get_equipamento_repository,
     get_equipamento_service,
+    get_familiar_repository,
+    get_familiar_service,
     get_grimorio_repository,
     get_grimorio_service,
     get_magia_import_service,
@@ -46,6 +48,7 @@ from .dnd35 import (
     get_talento_jogador_repository,
     get_talento_repository,
     get_talento_service,
+    get_vinculo_arena_service,
 )
 from .file_storage import get_file_service
 from .gurps import (
@@ -90,6 +93,9 @@ __all__ = [
     "get_combatente_service",
     "get_companheiro_animal_repository",
     "get_companheiro_animal_service",
+    "get_familiar_repository",
+    "get_familiar_service",
+    "get_vinculo_arena_service",
     "get_dnd5e_personagem_repository",
     "get_dnd5e_personagem_service",
     "get_condicao_repository",

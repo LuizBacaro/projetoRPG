@@ -162,6 +162,23 @@ header p {
     font-style: italic;
 }
 
+/* ── Vínculos na arena ── */
+.painel-direito .arena-incluir-vinculos {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--texto-secundario);
+    line-height: 1.35;
+    cursor: pointer;
+}
+
+.painel-direito .arena-incluir-vinculos input {
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+}
+
 /* ── Botão iniciar combate ── */
 .painel-direito .btn-iniciar {
     width: 100%;

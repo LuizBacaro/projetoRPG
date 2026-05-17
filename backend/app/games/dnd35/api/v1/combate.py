@@ -12,6 +12,7 @@ from app.core.dependencies import (
     get_combate_service,
     get_combatente_service,
     get_condicao_service,
+    get_vinculo_arena_service,
 )
 from app.games.dnd35.schemas.combate import (
     AplicarDanoRequest,
@@ -21,6 +22,7 @@ from app.games.dnd35.schemas.combate import (
 from app.games.dnd35.services.combate_service import CombateService
 from app.games.dnd35.services.combatente_service import CombatenteService
 from app.games.dnd35.services.condicao_service import CondicaoService
+from app.games.dnd35.services.vinculo_arena_service import VinculoArenaService
 from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
@@ -41,13 +43,18 @@ router = APIRouter(
 def iniciar_combate(
     request: IniciarCombateRequest,
     service: CombateService = Depends(get_combate_service),
+    vinculo_arena: VinculoArenaService = Depends(get_vinculo_arena_service),
     db: Session = Depends(get_db),
     usuario_atual: Usuario = Depends(get_usuario_atual),
 ):
     """Inicia um novo combate"""
     try:
-        validar_combatentes_do_usuario(request.combatente_ids, usuario_atual, db)
-        combate = service.iniciar_combate(request.combatente_ids)
+        ids = vinculo_arena.expandir_combatente_ids(
+            request.combatente_ids,
+            incluir_vinculos=request.incluir_vinculos,
+        )
+        validar_combatentes_do_usuario(ids, usuario_atual, db)
+        combate = service.iniciar_combate(ids)
         status = service.obter_status_combate()
         return status
     except ArenaBaseException as e:

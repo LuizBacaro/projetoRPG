@@ -2,6 +2,7 @@
 
 ## Sumário
 
+0. [Escopo: Companheiro Animal vs Familiar](#escopo)
 1. [Quem Pode Ter Companheiro Animal](#quem-pode)
 2. [Seleção do Companheiro](#seleção)
 3. [Ganho de Dados de Vida](#hd-bônus)
@@ -20,9 +21,55 @@
 
 ---
 
+## 0. Escopo: Companheiro Animal vs Familiar {#escopo}
+
+> **Leitura obrigatória antes de implementar ou estender a ficha.** O Livro do Jogador trata **duas habilidades diferentes** que usam animais pequenos, mas com regras, progressão e classes distintas.
+
+### O que este documento cobre (Companheiro Animal)
+
+| Item | Detalhe |
+|------|---------|
+| **Classes** | **Druida** (1º nível) e **Ranger** (4º nível) |
+| **Mecânica** | Lista PHB de espécies (lobo, águia, serpente…), HD bônus, bônus de atributos, armadura natural por vínculo, truques, Link / Vínculo compartilhado |
+| **Arena (implementação)** | API `companheiros-animais`, ficha D&D 3.5, regras em `rules.companheiro_animal`; NPC espelhado via `VinculoArenaService` (ver RF 10 §11) |
+
+### O que este documento **não** cobre (Familiar)
+
+O trecho do PHB sobre **Familiar** (*Familiar*) aplica-se a **Mago** e **Feiticeiro**, não a Ranger nem à progressão de companheiro animal:
+
+- Convocação com **24 h** e **100 PO** de componentes; criatura vira **besta mágica**.
+- Espécies diferentes (gato, coruja, morcego, cobra, sapo, texugo, falcão, corvo, lagarto, rato…).
+- Progressão por **nível combinado** das classes com a característica Familiar (Mago + Feiticeiro somam).
+- PV do familiar = **metade dos PV do mestre**; tabela de **Inteligência**, armadura natural e poderes (Prontidão, transmitir magias de toque, vínculo empático, falar com mestre, etc.).
+- Morte ou dispensa: teste de **Fortitude CD 15** e perda de **XP** (regras próprias, não as de 24 h em ambiente natural do companheiro).
+
+**Regra explícita do PHB (não misturar):** *«Assim, um druida/feiticeiro não poderia usar seu companheiro animal como familiar.»* — são vínculos **mutuamente exclusivos** no mesmo personagem.
+
+| | Companheiro animal | Familiar |
+|---|-------------------|----------|
+| Classes | Druida, Ranger (4º+) | Mago, Feiticeiro |
+| Nível efetivo | Druida = nível; Ranger = nível − 3 | Soma dos níveis de classe com Familiar |
+| Espécies | Lista terrestre/aérea/réptil/aquática (PHB companheiro) | Gato, coruja, morcego, etc. (tabela do familiar) |
+| Progressão de combate | HD bônus, BAB = HD total, salvamentos por HD | Metade dos PV do mestre; BAB/resistências do mestre |
+| Magias no animal | Truques bônus; Link / compartilhamento de magias (este RF) | Transmitir toque, magias em «Você», partilha de magias |
+| Morte / substituição | Ritual 24 h (ambiente natural); novo companheiro | Fort CD 15, perda de XP; 1 ano e 1 dia para substituir |
+
+### Fora de escopo na Arena (por agora)
+
+- Implementar **Familiar** de Mago/Feiticeiro → ver **[10-familiar-dnd35.md](10-familiar-dnd35.md)** (implementado; API `/api/v1/familiares`).
+- Tratar Mago ou Feiticeiro na API de **companheiro animal** atual (elegibilidade deve recusar e apontar ao RF 10).
+- Unificar catálogo de espécies ou fórmulas entre companheiro animal e familiar.
+
+### Multiclasse (Druida + outra classe)
+
+- **Companheiro animal:** usar nível de **Druida** (ou de Ranger, se for a classe que concede o companheiro) para nível efetivo — ver secção [Quem pode](#quem-pode) e parser de classe na API.
+- **Familiar:** níveis de Mago e Feiticeiro **acumulam** na tabela do familiar (PHB); isso **não** se aplica ao cálculo de HD bônus do companheiro animal.
+
+---
+
 ## 1. Quem Pode Ter Companheiro Animal {#quem-pode}
 
-**Classes beneficiárias:**
+**Classes beneficiárias (somente estas duas):**
 
 - **Druida**: Recebe um companheiro animal no 1º nível de classe
   - Nível efetivo = Nível de Druida (total)
@@ -39,6 +86,10 @@
 - Manter conduta alinhada com sua classe
 - Druidas devem manter neutralidade (certos alinhamentos podem perder o vínculo)
 - O companheiro deve ser escolhido de uma lista oficial
+
+**Não elegíveis para companheiro animal (usar Familiar ou outra regra, se existir):**
+- Mago, Feiticeiro, Clérigo, Paladino, Bardo, Ladino, Guerreiro, Bárbaro, Monge, etc.
+- Personagem com **Familiar** ativo (ver [Escopo](#escopo))
 
 ---
 
@@ -383,9 +434,12 @@ Onde:
 
 ### Restrições de Posse
 
-- ❌ **Não pode ter simultaneamente:** Familiar de Mago, Montaria de Paladino ou outro Companheiro Animal
-- ❌ **Exclusividade:** Uma entidade mágica de vínculo por personagem
-- ✅ **Exceção:** Talentos específicos podem permitir múltiplas entidades
+- ❌ **Não pode ter simultaneamente:** Familiar (Mago/Feiticeiro), montaria especial de Paladino (níveis altos) ou **dois** companheiros animais
+- ❌ **Companheiro animal ≠ Familiar:** o mesmo lobo não pode ser ao mesmo tempo companheiro animal do druida e familiar do feiticeiro (PHB)
+- ❌ **Exclusividade:** Uma entidade de vínculo “companheiro animal” por personagem neste RF
+- ✅ **Exceção:** Talentos ou prestige classes específicas (fora do escopo inicial da Arena)
+
+> **Nota:** Regras completas de **Familiar** (100 PO, XP por morte, tabela gato/coruja/morcego…) **não** estão neste ficheiro — ver [secção 0](#escopo).
 
 ### Morte e Ressurreição
 
