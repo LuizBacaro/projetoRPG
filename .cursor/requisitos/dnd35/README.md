@@ -42,8 +42,10 @@ Especificações em `*.md` desta pasta descrevem mecânicas **D&D 3.5** (modific
 | `01-habilidades-dnd35.md` | Seis atributos, modificadores, ganhos por nível |
 | `02-raças-dnd35.md` | Sete raças, ajustes e traços |
 | `03-classes-dnd35.md` | Classes e progressão 3.5 |
-| `04-combate-dnd35.md` | Combate e arena 3.5 |
+| `04-combate-dnd35.md` | Combate e arena 3.5 (incl. vínculos animais via `incluir_vinculos`) |
 | `05-magia-dnd35.md` | Magia e slots 3.5 |
 | `06-pericias-dnd35.md` | Perícias |
 | `07-talentos-feitos-dnd35.md` | Talentos (feats) |
 | `08-equipamento-dnd35.md` | Equipamento |
+| `09-companheiro-animal-dnd35.md` | Companheiro animal (**Druida / Ranger**) |
+| `10-familiar-dnd35.md` | Familiar (**Mago / Feiticeiro**; PHB p. ~40; ficha + arena) |

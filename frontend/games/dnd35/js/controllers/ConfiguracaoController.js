@@ -202,7 +202,10 @@ export class ConfiguracaoController {
             const response = await fetch(getApiUrl('/combate/iniciar'), {
                 method: 'POST',
                 headers: this._authHeaders(true),
-                body: JSON.stringify({ combatente_ids: this.combatentesSelecionados }),
+                body: JSON.stringify({
+                    combatente_ids: this.combatentesSelecionados,
+                    incluir_vinculos: document.getElementById('chkIncluirVinculos')?.checked !== false,
+                }),
             });
 
             if (!response.ok) {

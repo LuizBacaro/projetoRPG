@@ -16,6 +16,7 @@ from app.games.dnd35.models.condicao import Condicao
 from app.games.dnd35.models.consumivel import Consumivel, ConsumivelJogador
 from app.games.dnd35.models.divindade_custom import DivindadeCustom
 from app.games.dnd35.models.equipamento import Equipamento, EquipamentoJogador
+from app.games.dnd35.models.familiar import Familiar
 from app.games.dnd35.models.grimorio import (
     GrimorioHistoricoTroca,
     GrimorioMagia,
