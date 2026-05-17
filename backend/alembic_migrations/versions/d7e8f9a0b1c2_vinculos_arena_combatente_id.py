@@ -16,7 +16,14 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _table_exists(bind, table_name: str) -> bool:
+    inspector = sa.inspect(bind)
+    return table_name in inspector.get_table_names()
+
+
 def _column_exists(bind, table: str, column: str) -> bool:
+    if not _table_exists(bind, table):
+        return False
     inspector = sa.inspect(bind)
     cols = [c["name"] for c in inspector.get_columns(table)]
     return column in cols
@@ -25,6 +32,8 @@ def _column_exists(bind, table: str, column: str) -> bool:
 def upgrade() -> None:
     bind = op.get_bind()
     for table in ("companheiros_animais", "familiares"):
+        if not _table_exists(bind, table):
+            continue
         if not _column_exists(bind, table, "arena_combatente_id"):
             op.add_column(
                 table,

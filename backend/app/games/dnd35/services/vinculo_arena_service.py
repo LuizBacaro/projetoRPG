@@ -20,6 +20,7 @@ from app.games.dnd35.repositories.companheiro_animal_repository import (
     CompanheiroAnimalRepository,
 )
 from app.games.dnd35.repositories.familiar_repository import FamiliarRepository
+from app.games.dnd35.schema_compat import has_arena_combatente_id
 from app.repositories.base import soft_delete_entity
 
 
@@ -101,6 +102,8 @@ class VinculoArenaService:
         return self._combatente_repo.create(ent)
 
     def sync_companheiro(self, ca: CompanheiroAnimal, mestre: Combatente) -> int:
+        if not has_arena_combatente_id(self.db.get_bind()):
+            return 0
         especie = especie_companheiro(ca.especie_slug) or {}
         especie_nome = especie.get("nome", ca.especie_slug)
         npc = self._persistir_combatente_arena(
@@ -125,6 +128,8 @@ class VinculoArenaService:
         return npc.id
 
     def sync_familiar(self, fam: Familiar, mestre: Combatente) -> int:
+        if not has_arena_combatente_id(self.db.get_bind()):
+            return 0
         especie = especie_familiar(fam.especie_slug) or {}
         especie_nome = especie.get("nome", fam.especie_slug)
         attrs = especie.get("atributos_base", {})
