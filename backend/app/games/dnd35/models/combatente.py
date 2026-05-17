@@ -130,6 +130,15 @@ class Combatente(SoftDeleteMixin, Base):
     companheiro_animal = relationship(
         "CompanheiroAnimal",
         back_populates="combatente",
+        foreign_keys="CompanheiroAnimal.combatente_id",
+        cascade="all, delete-orphan",
+        uselist=False,
+        lazy="select",
+    )
+    familiar = relationship(
+        "Familiar",
+        back_populates="combatente",
+        foreign_keys="Familiar.combatente_id",
         cascade="all, delete-orphan",
         uselist=False,
         lazy="select",
@@ -168,7 +177,8 @@ class Combatente(SoftDeleteMixin, Base):
         return (getattr(self, atributo.lower(), 10) - 10) // 2
 
 
-# Registro do mapper para relationship("CompanheiroAnimal") — import após a classe.
+# Registro do mapper — imports após a classe.
 from app.games.dnd35.models.companheiro_animal import (  # noqa: F401, E402
     CompanheiroAnimal,
 )
+from app.games.dnd35.models.familiar import Familiar  # noqa: F401, E402

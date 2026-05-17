@@ -14,6 +14,10 @@ class IniciarCombateRequest(BaseModel):
     """Schema para iniciar combate"""
 
     combatente_ids: List[int] = Field(..., min_length=1)
+    incluir_vinculos: bool = Field(
+        True,
+        description="Incluir companheiro animal ou familiar dos jogadores selecionados na ordem de iniciativa",
+    )
 
 
 class CombateResponse(BaseModel):

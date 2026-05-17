@@ -25,6 +25,7 @@ from app.games.dnd35.repositories.equipamento_repository import (
     EquipamentoJogadorRepository,
     EquipamentoRepository,
 )
+from app.games.dnd35.repositories.familiar_repository import FamiliarRepository
 from app.games.dnd35.repositories.grimorio_repository import GrimorioRepository
 from app.games.dnd35.repositories.magia_repository import MagiaRepository
 from app.games.dnd35.repositories.pericia_repository import (
@@ -46,12 +47,14 @@ from app.games.dnd35.services.companheiro_animal_service import CompanheiroAnima
 from app.games.dnd35.services.condicao_service import CondicaoService
 from app.games.dnd35.services.consumivel_service import ConsumivelService
 from app.games.dnd35.services.equipamento_service import EquipamentoService
+from app.games.dnd35.services.familiar_service import FamiliarService
 from app.games.dnd35.services.grimorio_service import GrimorioService
 from app.games.dnd35.services.magia_import_service import MagiaImportService
 from app.games.dnd35.services.magia_service import MagiaService
 from app.games.dnd35.services.pericia_service import PericiaService
 from app.games.dnd35.services.sessao_campanha_service import SessaoCampanhaService
 from app.games.dnd35.services.talento_service import TalentoService
+from app.games.dnd35.services.vinculo_arena_service import VinculoArenaService
 from app.shared.core.database import get_db
 
 from .file_storage import get_file_service
@@ -107,6 +110,10 @@ def get_companheiro_animal_repository(
     db: Session = Depends(get_db),
 ) -> CompanheiroAnimalRepository:
     return CompanheiroAnimalRepository(db)
+
+
+def get_familiar_repository(db: Session = Depends(get_db)) -> FamiliarRepository:
+    return FamiliarRepository(db)
 
 
 def get_consumivel_repository(db: Session = Depends(get_db)) -> ConsumivelRepository:
@@ -183,15 +190,53 @@ def get_pericia_service(
     )
 
 
+def get_vinculo_arena_service(
+    db: Session = Depends(get_db),
+    combatente_repository: CombatenteRepository = Depends(get_combatente_repository),
+    companheiro_repository: CompanheiroAnimalRepository = Depends(
+        get_companheiro_animal_repository
+    ),
+    familiar_repository: FamiliarRepository = Depends(get_familiar_repository),
+) -> VinculoArenaService:
+    return VinculoArenaService(
+        db,
+        combatente_repo=combatente_repository,
+        companheiro_repo=companheiro_repository,
+        familiar_repo=familiar_repository,
+    )
+
+
 def get_companheiro_animal_service(
     db: Session = Depends(get_db),
     repo: CompanheiroAnimalRepository = Depends(get_companheiro_animal_repository),
     combatente_repository: CombatenteRepository = Depends(get_combatente_repository),
+    familiar_repository: FamiliarRepository = Depends(get_familiar_repository),
+    vinculo_arena: VinculoArenaService = Depends(get_vinculo_arena_service),
 ) -> CompanheiroAnimalService:
     return CompanheiroAnimalService(
         db,
         repo=repo,
         combatente_repo=combatente_repository,
+        familiar_repo=familiar_repository,
+        vinculo_arena=vinculo_arena,
+    )
+
+
+def get_familiar_service(
+    db: Session = Depends(get_db),
+    repo: FamiliarRepository = Depends(get_familiar_repository),
+    combatente_repository: CombatenteRepository = Depends(get_combatente_repository),
+    companheiro_repository: CompanheiroAnimalRepository = Depends(
+        get_companheiro_animal_repository
+    ),
+    vinculo_arena: VinculoArenaService = Depends(get_vinculo_arena_service),
+) -> FamiliarService:
+    return FamiliarService(
+        db,
+        repo=repo,
+        combatente_repo=combatente_repository,
+        companheiro_repo=companheiro_repository,
+        vinculo_arena=vinculo_arena,
     )
 
 

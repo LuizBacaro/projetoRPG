@@ -215,13 +215,13 @@
 
             <div class="ficha-secao">
                 <div class="ficha-secao-header">
-                    <h3 class="ficha-secao-titulo">🐾 Companheiro Animal</h3>
-                    <button class="ficha-btn-adicionar" id="btnAdicionarCompanheiroAnimal" title="Adicionar companheiro animal">
+                    <h3 class="ficha-secao-titulo">🐾 Companheiro Animal / Familiar</h3>
+                    <button class="ficha-btn-adicionar" id="btnAdicionarCompanheiroAnimal" title="Adicionar companheiro animal ou familiar">
                         ➕ Adicionar
                     </button>
                 </div>
                 <div id="fichaCompanheiroAnimal" class="ficha-equipamentos-lista">
-                    <span class="ficha-vazio">Nenhum companheiro animal cadastrado</span>
+                    <span class="ficha-vazio">Nenhum companheiro animal ou familiar cadastrado</span>
                 </div>
             </div>
 
@@ -984,13 +984,20 @@
             <div class="equipamentos-header-esquerda">
                 <span class="equipamentos-icone">🐾</span>
                 <div>
-                    <h2 class="equipamentos-titulo">Companheiro Animal</h2>
-                    <p class="equipamentos-subtitulo" id="caElegibilidadeHint">Druida ou Ranger (4º+)</p>
+                    <h2 class="equipamentos-titulo">Companheiro Animal / Familiar</h2>
+                    <p class="equipamentos-subtitulo" id="caElegibilidadeHint">Druida, Ranger (4º+) · Mago, Feiticeiro (familiar)</p>
                 </div>
             </div>
             <button type="button" class="equipamentos-fechar" id="btnFecharModalCompanheiroAnimal">✕</button>
         </div>
         <div class="equipamentos-corpo ca-form-corpo">
+            <div class="equipamentos-form-grupo" id="caTipoVinculoWrap" hidden>
+                <label class="equipamentos-form-label" for="caTipoVinculo">Tipo de vínculo</label>
+                <select id="caTipoVinculo" class="equipamentos-form-input">
+                    <option value="companheiro">Companheiro animal (Druida / Ranger)</option>
+                    <option value="familiar">Familiar (Mago / Feiticeiro)</option>
+                </select>
+            </div>
             <div class="equipamentos-form-grupo">
                 <label class="equipamentos-form-label" for="caNomeCompanheiro">Nome</label>
                 <input type="text" id="caNomeCompanheiro" class="equipamentos-form-input" placeholder="Ex: Greywind" maxlength="120" />
@@ -999,7 +1006,7 @@
                 <label class="equipamentos-form-label" for="caEspecieCompanheiro">Espécie (PHB)</label>
                 <select id="caEspecieCompanheiro" class="equipamentos-form-input"></select>
             </div>
-            <fieldset class="ca-bonus-atributos">
+            <fieldset class="ca-bonus-atributos" id="caBonusAtributosFieldset">
                 <legend class="equipamentos-form-label">Bônus de atributos (escolha do jogador)</legend>
                 <div class="ca-bonus-grid">
                     <label>FOR <input type="number" min="0" max="6" value="0" data-bonus-attr="forca" class="ca-bonus-input" inputmode="numeric" /></label>
@@ -1035,7 +1042,7 @@
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
 <script type="module" src="../js/controllers/FichaPersonagemController.js?v=64"></script>
 <script type="module" src="../js/controllers/ConsumiveisFichaController.js?v=1"></script>
-<script type="module" src="../js/controllers/CompanheiroAnimalFichaController.js?v=2"></script>
+<script type="module" src="../js/controllers/CompanheiroAnimalFichaController.js?v=4"></script>
 <script type="module" src="../js/controllers/GrimorioController.js?v=20260420c"></script>
 </body>
 </html>
