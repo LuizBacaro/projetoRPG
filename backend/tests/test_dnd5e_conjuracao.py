@@ -10,24 +10,20 @@ from app.games.dnd5e.schemas.combate import Dnd5eConjurarRequest
 from app.games.dnd5e.services.conjuracao_service import Dnd5eConjuracaoService
 from app.repositories.base import commit_with_rollback
 from app.shared.core.database import SessionLocal
+from tests.dnd5e_test_utils import get_or_create_magia
 
 
 def test_conjurar_truque_gasta_sem_slot():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "light").first()
-        if not magia:
-            magia = Dnd5eMagia(
-                slug="light",
-                nome="Light",
-                nivel=0,
-                escola="evocacao",
-                componentes_verbal=True,
-                ativo=True,
-            )
-            db.add(magia)
-            commit_with_rollback(db)
-            db.refresh(magia)
+        magia = get_or_create_magia(
+            db,
+            "light",
+            nome="Light",
+            nivel=0,
+            escola="evocacao",
+            componentes_verbal=True,
+        )
 
         svc = Dnd5eConjuracaoService(Dnd5eMagiaRepository(db))
         res = svc.conjurar(
@@ -49,8 +45,15 @@ def test_conjurar_truque_gasta_sem_slot():
 def test_conjurar_exige_grimorio_quando_personagem_id():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "fireball").first()
-        assert magia is not None
+        magia = get_or_create_magia(
+            db,
+            "fireball",
+            nome="Fireball",
+            nivel=3,
+            escola="evocacao",
+            dano="8d6",
+            teste_resistencia="dex",
+        )
 
         svc = Dnd5eConjuracaoService(
             Dnd5eMagiaRepository(db), Dnd5eGrimorioRepository(db)

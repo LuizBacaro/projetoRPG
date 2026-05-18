@@ -14,13 +14,21 @@ from app.games.dnd5e.schemas.combate import (
 from app.games.dnd5e.services.conjuracao_service import Dnd5eConjuracaoService
 from app.repositories.base import commit_with_rollback
 from app.shared.core.database import SessionLocal
+from tests.dnd5e_test_utils import get_or_create_magia
 
 
 def test_conjurar_upcast_gasta_slot_superior():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "fireball").first()
-        assert magia is not None
+        magia = get_or_create_magia(
+            db,
+            "fireball",
+            nome="Fireball",
+            nivel=3,
+            escola="evocacao",
+            dano="8d6",
+            teste_resistencia="dex",
+        )
 
         svc = Dnd5eConjuracaoService(Dnd5eMagiaRepository(db))
         slots = [0, 4, 3, 2, 0, 0, 0, 0, 0, 0]
@@ -48,8 +56,9 @@ def test_conjurar_upcast_gasta_slot_superior():
 def test_conjurar_rejeita_nao_preparada():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "light").first()
-        assert magia is not None
+        magia = get_or_create_magia(
+            db, "light", nome="Light", nivel=0, escola="evocacao"
+        )
 
         svc = Dnd5eConjuracaoService(Dnd5eMagiaRepository(db))
         with pytest.raises(HTTPException) as exc:
@@ -73,21 +82,16 @@ def test_conjurar_rejeita_nao_preparada():
 def test_conjurar_ataque_magico_acerto_e_dano():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "fire-bolt").first()
-        if not magia:
-            magia = Dnd5eMagia(
-                slug="fire-bolt",
-                nome="Raio de Fogo",
-                nivel=0,
-                escola="evocacao",
-                dano="1d10",
-                ataque_magico="ranged",
-                ativo=True,
-            )
-            db.add(magia)
-            commit_with_rollback(db)
-            db.refresh(magia)
-        else:
+        magia = get_or_create_magia(
+            db,
+            "fire-bolt",
+            nome="Raio de Fogo",
+            nivel=0,
+            escola="evocacao",
+            dano="1d10",
+            ataque_magico="ranged",
+        )
+        if not magia.ataque_magico or not magia.dano:
             magia.ataque_magico = "ranged"
             magia.dano = magia.dano or "1d10"
             commit_with_rollback(db)
@@ -115,10 +119,15 @@ def test_conjurar_ataque_magico_acerto_e_dano():
 def test_conjurar_ataque_magico_erro_sem_dano():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "fire-bolt").first()
-        assert magia is not None
-        magia.ataque_magico = "ranged"
-        commit_with_rollback(db)
+        magia = get_or_create_magia(
+            db,
+            "fire-bolt",
+            nome="Raio de Fogo",
+            nivel=0,
+            escola="evocacao",
+            dano="1d10",
+            ataque_magico="ranged",
+        )
 
         svc = Dnd5eConjuracaoService(Dnd5eMagiaRepository(db))
         res = svc.conjurar(
@@ -143,8 +152,15 @@ def test_conjurar_ataque_magico_erro_sem_dano():
 def test_conjurar_ritual_nao_gasta_slot():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "fireball").first()
-        assert magia is not None
+        magia = get_or_create_magia(
+            db,
+            "fireball",
+            nome="Fireball",
+            nivel=3,
+            escola="evocacao",
+            dano="8d6",
+            teste_resistencia="dex",
+        )
         ritual_antes = bool(magia.ritual)
         magia.ritual = True
         commit_with_rollback(db)
@@ -178,8 +194,14 @@ def test_conjurar_ritual_nao_gasta_slot():
 def test_conjurar_ritual_rejeita_sem_tag():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "fireball").first()
-        assert magia is not None
+        magia = get_or_create_magia(
+            db,
+            "fireball",
+            nome="Fireball",
+            nivel=3,
+            escola="evocacao",
+            ritual=False,
+        )
         magia.ritual = False
         commit_with_rollback(db)
 
@@ -204,8 +226,13 @@ def test_conjurar_ritual_rejeita_sem_tag():
 def test_conjurar_rejeita_material_nao_confirmado():
     db = SessionLocal()
     try:
-        magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == "fireball").first()
-        assert magia is not None
+        magia = get_or_create_magia(
+            db,
+            "fireball",
+            nome="Fireball",
+            nivel=3,
+            escola="evocacao",
+        )
         consumido_antes = bool(magia.material_consumido)
         material_antes = magia.componentes_material
         magia.material_consumido = True
