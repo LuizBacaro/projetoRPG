@@ -1,0 +1,337 @@
+/* Grimório D&D 5e — modal e cards (paridade visual com dnd35) */
+
+#modalGrimorioDnd5e.grimorio-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: rgba(0, 0, 0, 0.72);
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+#modalGrimorioDnd5e.grimorio-overlay.show {
+    display: flex;
+}
+
+.d5e-grimorio-container {
+    background: var(--cor-fundo-card, #1a1520);
+    border: 1px solid var(--cor-borda, #4a3f55);
+    border-radius: 12px;
+    width: min(960px, 100%);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--cor-texto, #f0e8ff);
+}
+
+.d5e-grimorio-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--cor-borda, #4a3f55);
+}
+
+.d5e-grimorio-titulo {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.d5e-grimorio-subtitulo {
+    margin: 0.2rem 0 0;
+    opacity: 0.85;
+    font-size: 0.9rem;
+}
+
+.d5e-grimorio-header-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.d5e-grimorio-fechar,
+.d5e-grimorio-btn-descanso {
+    border: 1px solid var(--cor-borda, #4a3f55);
+    background: var(--cor-fundo-secao, #2a2235);
+    color: inherit;
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+}
+
+.d5e-grimorio-corpo {
+    overflow-y: auto;
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.d5e-grimorio-slots-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.d5e-grimorio-slot {
+    background: var(--cor-fundo-secao, #2a2235);
+    border-radius: 8px;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+}
+
+.d5e-grimorio-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.d5e-grimorio-busca {
+    flex: 1;
+    min-width: 180px;
+    padding: 0.45rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda, #4a3f55);
+    background: var(--cor-fundo-secao, #2a2235);
+    color: inherit;
+}
+
+.d5e-grimorio-niveis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.d5e-grimorio-nivel-btn {
+    border: 1px solid var(--cor-borda, #4a3f55);
+    background: transparent;
+    color: inherit;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.d5e-grimorio-nivel-btn.ativo {
+    background: var(--cor-destaque, #7c4dff);
+    border-color: var(--cor-destaque, #7c4dff);
+}
+
+.d5e-grimorio-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+}
+
+.d5e-grimorio-card {
+    background: var(--cor-fundo-secao, #2a2235);
+    border: 1px solid var(--cor-borda, #4a3f55);
+    border-radius: 10px;
+    padding: 0.75rem;
+}
+
+.d5e-grimorio-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.d5e-grimorio-card-header h4 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.d5e-grimorio-meta,
+.d5e-grimorio-desc {
+    font-size: 0.82rem;
+    opacity: 0.9;
+    margin: 0.35rem 0;
+}
+
+.d5e-grimorio-card-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.5rem 0;
+}
+
+.d5e-grimorio-btn-small,
+.d5e-grimorio-btn-icon {
+    font-size: 0.78rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid var(--cor-borda, #4a3f55);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.d5e-grimorio-nota {
+    width: 100%;
+    margin-top: 0.25rem;
+    border-radius: 6px;
+    border: 1px solid var(--cor-borda, #4a3f55);
+    background: var(--cor-fundo-card, #1a1520);
+    color: inherit;
+    font-size: 0.8rem;
+}
+
+.d5e-grimorio-painel-adicionar {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--cor-borda, #4a3f55);
+}
+
+.d5e-grimorio-catalogo-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.d5e-grimorio-catalogo-item {
+    text-align: left;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--cor-borda, #4a3f55);
+    background: var(--cor-fundo-card, #1a1520);
+    color: inherit;
+    cursor: pointer;
+}
+
+.d5e-grimorio-catalogo-item:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.d5e-grimorio-catalogo-item strong {
+    display: block;
+}
+
+.btn-abrir-grimorio-dnd5e {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.55rem;
+    border-radius: 8px;
+    border: 1px solid var(--cor-destaque, #7c4dff);
+    background: linear-gradient(180deg, #5a3dcc 0%, #452e99 100%);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#secaoMagiasDnd5e .ficha-magias-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+#secaoMagiasDnd5e .ficha-magia-slot {
+    background: var(--cor-fundo-secao, #2a2235);
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+.ficha-slot-gastar {
+    margin-left: 0.35rem;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    border: 1px solid #475569;
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+.ficha-slot-gastar:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.ficha-magia-meta {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.grimorio-slot-chip {
+    display: inline-block;
+    margin: 0.15rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 0.25rem;
+    background: #1e293b;
+    font-size: 0.75rem;
+}
+
+/* Preview PT ao expandir magia (Dnd5eGrimorioController) */
+.grimorio-descricao-teaser {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    opacity: 0.88;
+    margin: 0.35rem 0 0;
+}
+
+.grimorio-descricao-pt-preview {
+    margin: 0.5rem 0 0;
+    padding: 0.65rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--cor-borda, #4a3f55);
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.grimorio-descricao-pt-texto {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.grimorio-descricao-pt-subtitulo {
+    display: block;
+    margin: 0.65rem 0 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.75;
+}
+
+.grimorio-descricao-pt-material {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.grimorio-5e-badges-regras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+}
+
+.grimorio-badge-ritual {
+    background: #1e3a5f;
+    border-color: #3b82f6;
+}
+
+.grimorio-badge-consumivel {
+    background: #4a1d1d;
+    border-color: #f87171;
+}
+
+.grimorio-badge-concentracao {
+    background: #3b2f4a;
+    border-color: #a78bfa;
+}

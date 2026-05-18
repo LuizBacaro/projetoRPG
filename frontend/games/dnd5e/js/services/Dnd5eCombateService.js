@@ -56,4 +56,12 @@ class Dnd5eCombateService {
             condicoes,
         });
     }
+
+    conjurarMagia(payload) {
+        return this._post('/conjurar', payload);
+    }
+
+    testeConcentracao(payload) {
+        return this._post('/concentracao-teste', payload);
+    }
 }

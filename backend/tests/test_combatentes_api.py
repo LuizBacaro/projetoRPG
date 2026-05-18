@@ -15,11 +15,13 @@ from app.games.dnd35.models.armadura_protecao import (
 from app.games.dnd35.models.talento import Talento, TalentoJogador
 from app.shared.core.database import Base, get_db
 from app.shared.core.deps import get_usuario_atual, requer_dono_ou_admin_combatente
+from app.shared.models.usuario import PerfilUsuario
 
 
 class _UsuarioDummy:
     def __init__(self, user_id: int):
         self.id = user_id
+        self.perfil = PerfilUsuario.ADMINISTRADOR
 
 
 @pytest.fixture(scope="function")
@@ -87,6 +89,29 @@ def _combatente_payload(**overrides):
     }
     payload.update(overrides)
     return payload
+
+
+def test_listar_combatentes_com_atributo_acima_de_30_nao_retorna_500(combatentes_db):
+    """Monstros do bestiário podem ter atributos >30; a listagem não deve falhar na serialização."""
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    criado = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(
+            tipo="monstro",
+            classe="Besta",
+            nome="Lobo alto INT",
+            inteligencia="47",
+        ),
+    )
+    assert criado.status_code == 201
+    assert criado.json()["inteligencia"] == 47
+
+    lista = client.get("/api/v1/combatentes")
+    assert lista.status_code == 200
+    ids = {item["id"] for item in lista.json()}
+    assert criado.json()["id"] in ids
 
 
 def test_criar_combatente_retorna_alinhamento_e_dominios(combatentes_db):

@@ -5,9 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, List, Literal, Optional
 
-from app.games.dnd5e.data.spell_slots_full_caster import (
-    CLASSE_HABILIDADE_PRIMARIA,
+from app.games.dnd5e.data.spell_slots_full_caster import CLASSE_HABILIDADE_PRIMARIA
+from app.games.dnd5e.data.spell_tables import (
     FULL_CASTER_SLOTS,
+    HALF_CASTER_SLOTS,
+    WARLOCK_SLOTS,
 )
 from app.games.dnd5e.rules.dados import rolar_d20
 from app.games.dnd5e.rules.habilidades import calcular_bonus_proficiencia
@@ -69,13 +71,26 @@ def habilidade_primaria_classe(classe: str) -> HabilidadePrimaria:
     return chave  # type: ignore[return-value]
 
 
+def max_nivel_magia_conjuravel(classe: str, nivel: int) -> int:
+    """Maior nível de magia para o qual o personagem tem espaço (PHB 5e)."""
+    slots = espacos_por_classe_nivel(classe, nivel)
+    for idx in range(len(slots) - 1, 0, -1):
+        if slots[idx] > 0:
+            return idx
+    return 0
+
+
 def espacos_por_classe_nivel(classe: str, nivel: int) -> List[int]:
     """Espaços por nível de magia (índice = nível da magia). Truques no índice 0."""
     slug = (classe or "").strip().lower()
     nivel = max(1, min(20, nivel))
-    if slug in ("mago", "clerigo", "druida", "wizard", "cleric", "druid"):
-        return list(FULL_CASTER_SLOTS[nivel])
-    # Bardo / Feiticeiro / demais: mesma tabela completa no MVP
+    if slug in ("bruxo", "warlock"):
+        qtd, slot_lvl = WARLOCK_SLOTS[nivel]
+        arr = [0] * 10
+        arr[slot_lvl] = qtd
+        return arr
+    if slug in ("paladino", "paladin", "patrulheiro", "ranger"):
+        return list(HALF_CASTER_SLOTS[nivel])
     return list(FULL_CASTER_SLOTS[nivel])
 
 
@@ -84,16 +99,43 @@ def calcular_dc_magia(bonus_proficiencia: int, mod_habilidade: int) -> int:
     return 8 + bonus_proficiencia + mod_habilidade
 
 
-def lancar_magia(conjurador: Conjurador, magia: Magia) -> bool:
-    """Gasta espaço (truques não gastam). Retorna False se sem espaço ou magia desconhecida."""
-    if magia.nivel > 0:
-        if conjurador.espacos_disponiveis(magia.nivel) <= 0:
+def lancar_magia(
+    conjurador: Conjurador,
+    magia: Magia,
+    *,
+    nivel_slot: Optional[int] = None,
+    ignorar_slot: bool = False,
+) -> bool:
+    """Gasta espaço (truques não gastam). nivel_slot permite upcast (≥ nível da magia)."""
+    if magia.nivel > 0 and not ignorar_slot:
+        slot = max(magia.nivel, int(nivel_slot or magia.nivel))
+        if slot >= len(conjurador.espacos_usados_por_nivel):
             return False
-        conjurador.espacos_usados_por_nivel[magia.nivel] += 1
+        if conjurador.espacos_disponiveis(slot) <= 0:
+            return False
+        conjurador.espacos_usados_por_nivel[slot] += 1
 
-    if magia.requer_concentracao or "concentracao" in magia.duracao.lower():
+    dur = (magia.duracao or "").lower()
+    if magia.requer_concentracao or "concentr" in dur:
         conjurador.magia_concentracao = magia.magia_id
     return True
+
+
+def componentes_resumo(
+    verbal: bool,
+    somatico: bool,
+    material: Optional[str] = None,
+) -> str:
+    parts = []
+    if verbal:
+        parts.append("V")
+    if somatico:
+        parts.append("S")
+    if material:
+        parts.append(f"M ({material[:60]})" if len(material) > 60 else f"M ({material})")
+    elif material is not None and material == "":
+        parts.append("M")
+    return ", ".join(parts) if parts else "—"
 
 
 def recuperar_espacos_repouso_longo(conjurador: Conjurador) -> None:

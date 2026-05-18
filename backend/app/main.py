@@ -26,8 +26,13 @@ from sqlalchemy.exc import (
 )
 
 from .games.dnd5e.api.v1 import combate as dnd5e_combate
+from .games.dnd5e.api.v1 import conjuracao as dnd5e_conjuracao
+from .games.dnd5e.api.v1 import grimorio as dnd5e_grimorio
+from .games.dnd5e.api.v1 import magias as dnd5e_magias
 from .games.dnd5e.api.v1 import personagens as dnd5e_personagens
 from .games.dnd5e.api.v1 import regras as dnd5e_regras
+from .games.dnd5e.models import grimorio as dnd5e_grimorio_model
+from .games.dnd5e.models import magia as dnd5e_magia_model
 from .games.dnd5e.models import personagem as dnd5e_personagem_model
 from .games.dnd35.api.v1 import armaduras_protecao as dnd35_armaduras_protecao
 from .games.dnd35.api.v1 import ataques as dnd35_ataques
@@ -499,7 +504,10 @@ app.include_router(tormenta_combate.router, prefix=settings.API_V1_PREFIX)
 app.include_router(tormenta_regras.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd5e_regras.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd5e_combate.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_magias.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_grimorio.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd5e_personagens.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd5e_conjuracao.router, prefix=settings.API_V1_PREFIX)
 
 logger.info("✅ Rotas da API v1 registradas com sucesso")
 

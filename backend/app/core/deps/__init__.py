@@ -11,7 +11,17 @@ Injeção de dependências FastAPI, organizada por domínio.
 Rotas e código legado podem continuar a importar de ``app.core.dependencies``.
 """
 
-from .dnd5e import get_dnd5e_personagem_repository, get_dnd5e_personagem_service
+from .dnd5e import (
+    get_dnd5e_conjuracao_ficha_service,
+    get_dnd5e_conjuracao_service,
+    get_dnd5e_grimorio_repository,
+    get_dnd5e_grimorio_service,
+    get_dnd5e_magia_import_service,
+    get_dnd5e_magia_repository,
+    get_dnd5e_magia_service,
+    get_dnd5e_personagem_repository,
+    get_dnd5e_personagem_service,
+)
 from .dnd35 import (
     get_armadura_protecao_jogador_repository,
     get_armadura_protecao_repository,
@@ -96,6 +106,13 @@ __all__ = [
     "get_familiar_repository",
     "get_familiar_service",
     "get_vinculo_arena_service",
+    "get_dnd5e_conjuracao_ficha_service",
+    "get_dnd5e_conjuracao_service",
+    "get_dnd5e_grimorio_repository",
+    "get_dnd5e_grimorio_service",
+    "get_dnd5e_magia_import_service",
+    "get_dnd5e_magia_repository",
+    "get_dnd5e_magia_service",
     "get_dnd5e_personagem_repository",
     "get_dnd5e_personagem_service",
     "get_condicao_repository",
