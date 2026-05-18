@@ -95,6 +95,18 @@ def atualizar(
         raise HTTPException(status_code=422, detail=str(e))
 
 
+@router.delete("/{personagem_id}", status_code=204)
+def excluir(
+    personagem_id: int,
+    service: Dnd5ePersonagemService = Depends(get_dnd5e_personagem_service),
+    _: Usuario = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    try:
+        service.excluir(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
 @router.post("/{personagem_id}/foto", response_model=Dnd5ePersonagemResponse)
 def upload_foto(
     personagem_id: int,

@@ -8,9 +8,21 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 import app.models  # noqa: F401 - registra mappers/tabelas no metadata global
-from app.shared.core.database import Base
+from app.shared.core.database import Base, engine
 from app.shared.core.security import hash_senha
 from app.shared.models.usuario import PerfilUsuario, Usuario
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _pytest_ensure_sqlite_schema():
+    """
+    Cria tabelas ORM no SQLite usado por SessionLocal() nos testes de serviço.
+
+    Testes que usam engine próprio em memória não dependem disto; evita
+    OperationalError (no such table: dnd5e_*) no CI sem migração Alembic.
+    """
+    Base.metadata.create_all(bind=engine)
+    yield
 
 
 @pytest.fixture(scope="function")

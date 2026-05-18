@@ -67,6 +67,14 @@ class Dnd5ePersonagemService {
         return this._handleResponse(res, 'Erro ao salvar personagem');
     }
 
+    async excluir(id) {
+        const res = await fetch(this._url(`/${id}`), {
+            method: 'DELETE',
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao excluir personagem');
+    }
+
     async enviarFoto(id, file) {
         const fd = new FormData();
         fd.append('foto', file);

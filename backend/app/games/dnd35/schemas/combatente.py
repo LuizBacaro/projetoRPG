@@ -17,6 +17,9 @@ from app.games.dnd35.schemas.ataque import (
 
 _HTML_TAG_RE = re.compile(r"<[^>]+>")
 
+# Jogadores costumam ficar ≤30; monstros/NPC de bestiário podem exceder (ex.: dragões).
+_ATTR_MAX = 50
+
 
 def _strip_html(v):
     """Remove tags HTML de strings para prevenir XSS"""
@@ -65,12 +68,12 @@ class CombatenteBase(BaseModel):
     po: int = Field(default=0, ge=0)
     pl: int = Field(default=0, ge=0)
 
-    forca: int = Field(default=10, ge=1, le=30)
-    destreza: int = Field(default=10, ge=1, le=30)
-    constituicao: int = Field(default=10, ge=1, le=30)
-    inteligencia: int = Field(default=10, ge=1, le=30)
-    sabedoria: int = Field(default=10, ge=1, le=30)
-    carisma: int = Field(default=10, ge=1, le=30)
+    forca: int = Field(default=10, ge=1, le=_ATTR_MAX)
+    destreza: int = Field(default=10, ge=1, le=_ATTR_MAX)
+    constituicao: int = Field(default=10, ge=1, le=_ATTR_MAX)
+    inteligencia: int = Field(default=10, ge=1, le=_ATTR_MAX)
+    sabedoria: int = Field(default=10, ge=1, le=_ATTR_MAX)
+    carisma: int = Field(default=10, ge=1, le=_ATTR_MAX)
 
     fortitude: int = Field(default=0, ge=-10, le=50)
     reflexos: int = Field(default=0, ge=-10, le=50)
@@ -126,12 +129,12 @@ class CombatenteUpdate(BaseModel):
     po: Optional[int] = Field(None, ge=0)
     pl: Optional[int] = Field(None, ge=0)
 
-    forca: Optional[int] = Field(None, ge=1, le=30)
-    destreza: Optional[int] = Field(None, ge=1, le=30)
-    constituicao: Optional[int] = Field(None, ge=1, le=30)
-    inteligencia: Optional[int] = Field(None, ge=1, le=30)
-    sabedoria: Optional[int] = Field(None, ge=1, le=30)
-    carisma: Optional[int] = Field(None, ge=1, le=30)
+    forca: Optional[int] = Field(None, ge=1, le=_ATTR_MAX)
+    destreza: Optional[int] = Field(None, ge=1, le=_ATTR_MAX)
+    constituicao: Optional[int] = Field(None, ge=1, le=_ATTR_MAX)
+    inteligencia: Optional[int] = Field(None, ge=1, le=_ATTR_MAX)
+    sabedoria: Optional[int] = Field(None, ge=1, le=_ATTR_MAX)
+    carisma: Optional[int] = Field(None, ge=1, le=_ATTR_MAX)
 
     fortitude: Optional[int] = Field(None, ge=-10, le=50)
     reflexos: Optional[int] = Field(None, ge=-10, le=50)

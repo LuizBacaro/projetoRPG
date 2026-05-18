@@ -61,7 +61,7 @@ export class MagiaService {
                 return await this._listarTodasEFiltrar(classeNormalizada);
             }
 
-            const magias = pagina.items;
+            const magias = this._normalizarNiveisPorClasse(pagina.items, classeNormalizada);
 
             // Catálogo vazio na API (sem dados importados) ou filtro sem match → tenta fallback
             if (!magias || magias.length === 0) {
@@ -136,9 +136,10 @@ export class MagiaService {
         }
 
         const body = await res.json();
-        const items = Array.isArray(body)
+        const rawItems = Array.isArray(body)
             ? body
             : (Array.isArray(body?.items) ? body.items : []);
+        const items = this._normalizarNiveisPorClasse(rawItems, classeNormalizada);
         const totalHeader = Number(res.headers.get('X-Total-Count'));
         const skipHeader = Number(res.headers.get('X-Skip'));
         const limitHeader = Number(res.headers.get('X-Limit'));
@@ -166,6 +167,21 @@ export class MagiaService {
     }
 
     /**
+     * Garante que `nivel` reflita a classe consultada (MagiaClasse), não o nível legado.
+     * @private
+     */
+    _normalizarNiveisPorClasse(magias, classeNormalizada) {
+        if (!Array.isArray(magias) || !classeNormalizada) return magias || [];
+        const alvo = this._normalizarClasse(classeNormalizada);
+        return magias.map((magia) => {
+            const classes = Array.isArray(magia?.classes_niveis) ? magia.classes_niveis : [];
+            const match = classes.find((cn) => this._normalizarClasse(cn?.classe || '') === alvo);
+            if (!match) return magia;
+            return { ...magia, nivel: Number(match.nivel ?? magia.nivel) };
+        });
+    }
+
+    /**
      * Fallback: busca todas as magias e filtra por classe no frontend
      * @private
      * @param {string} classeNormalizada - Já em MAIÚSCULA
@@ -182,7 +198,7 @@ export class MagiaService {
             const todasMagias = Array.isArray(raw) ? raw : (Array.isArray(raw?.items) ? raw.items : []);
 
             // ✅ FILTRA COMPARANDO EM MAIÚSCULA
-            const magiasFiltradas = todasMagias.filter(m => {
+            const magiasFiltradas = this._normalizarNiveisPorClasse(todasMagias.filter(m => {
                 const alvo = this._normalizarClasse(classeNormalizada);
 
                 if (Array.isArray(m.classes_niveis) && m.classes_niveis.length > 0) {
@@ -197,7 +213,7 @@ export class MagiaService {
                     .map(v => this._normalizarClasse(v))
                     .filter(Boolean);
                 return classesLegacy.includes(alvo);
-            });
+            }), classeNormalizada);
             
             this._cache.set(classeNormalizada, magiasFiltradas);
             return magiasFiltradas;

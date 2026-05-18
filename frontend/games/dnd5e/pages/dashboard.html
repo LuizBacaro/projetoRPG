@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/layout.css" />
     <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=22" />
     <link rel="stylesheet" href="/games/dnd35/css/combatentes.css?v=20260401a" />
-    <link rel="stylesheet" href="../css/dnd5e-dashboard.css?v=3" />
+    <link rel="stylesheet" href="../css/dnd5e-dashboard.css?v=4" />
     <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=5" />
 </head>
 <body data-game="dnd5e">
@@ -184,6 +184,7 @@
 <script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
 <script src="/games/dnd35/js/services/AuthService.js"></script>
 <script src="/games/dnd35/js/ui/Toast.js"></script>
+<script src="/games/dnd35/js/ui/ModalConfirm.js"></script>
 <script>
     if (!AuthService.exigirJogo('dnd5e')) {}
 </script>
@@ -295,13 +296,47 @@
                     <td>${p.dexterity} (${fmtMod(p.dexterity_mod)})</td>
                     <td>${p.constitution} (${fmtMod(p.constitution_mod)})</td>
                     <td>${p.hp_atual ?? p.hp_max} / ${p.hp_max}</td>
-                    <td><a href="ficha-personagem.html?id=${p.id}">Editar</a></td>
+                    <td class="dnd5e-acoes-personagem">
+                        <a href="ficha-personagem.html?id=${p.id}">Editar</a>
+                        <button type="button" class="dnd5e-btn-excluir-personagem" data-id="${p.id}" data-nome="${escapeHtml(p.nome)}">Excluir</button>
+                    </td>
                 </tr>`;
                 })
                 .join('');
+            tbody.querySelectorAll('.dnd5e-btn-excluir-personagem').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const id = Number(btn.dataset.id);
+                    const nome = btn.dataset.nome || 'este personagem';
+                    excluirPersonagem(id, nome);
+                });
+            });
         } catch (e) {
             tbody.innerHTML = `<tr><td colspan="9" class="cell-muted">${escapeHtml(e.message)}</td></tr>`;
             if (typeof Toast !== 'undefined') Toast.error(e.message);
+        }
+    }
+
+    function excluirPersonagem(id, nome) {
+        const executar = async () => {
+            try {
+                await ps.excluir(id);
+                if (typeof Toast !== 'undefined') Toast.success('Personagem excluído.');
+                await carregarPersonagens();
+            } catch (e) {
+                if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro ao excluir.');
+            }
+        };
+        if (window.ModalConfirm && typeof window.ModalConfirm.mostrar === 'function') {
+            window.ModalConfirm.mostrar({
+                titulo: 'Excluir personagem',
+                texto: `Deseja excluir "${nome}"? Esta ação não pode ser desfeita.`,
+                textoConfirmar: 'Excluir',
+                onConfirmar: executar,
+            });
+            return;
+        }
+        if (window.confirm(`Excluir "${nome}"? Esta ação não pode ser desfeita.`)) {
+            executar();
         }
     }
 

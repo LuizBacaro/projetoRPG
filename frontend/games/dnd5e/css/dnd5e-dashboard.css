@@ -75,6 +75,30 @@
     font-size: 0.85rem;
 }
 
+.dnd5e-acoes-personagem {
+    white-space: nowrap;
+}
+
+.dnd5e-acoes-personagem a {
+    margin-right: 0.65rem;
+}
+
+.dnd5e-btn-excluir-personagem {
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    color: #f87171;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.dnd5e-btn-excluir-personagem:hover {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.65);
+}
+
 .dnd5e-catalogo-resumo strong {
     display: block;
     font-size: 1.1rem;

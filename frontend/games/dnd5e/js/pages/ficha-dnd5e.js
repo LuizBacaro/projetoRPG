@@ -42,7 +42,6 @@
     let debounceTimer = null;
     let debounceHpCondTimer = null;
     let arenaCondicoesAtual = [];
-
     const el = (id) => document.getElementById(id);
 
     function fmtMod(n) {
@@ -345,6 +344,8 @@
         if (el('fichaHdrNivel')) el('fichaHdrNivel').textContent = el('f5e_nivel').value || '1';
         if (el('fichaHdrRaca')) el('fichaHdrRaca').textContent = raca ? raca.nome : '—';
         if (el('fichaHdrClasse')) el('fichaHdrClasse').textContent = classe ? classe.nome : '—';
+        const fichaClasse = el('fichaClasse');
+        if (fichaClasse) fichaClasse.textContent = classe ? classe.nome : '—';
         if (el('fichaHdrAntecedente')) {
             el('fichaHdrAntecedente').textContent = ant ? ant.nome : '—';
         }
@@ -450,6 +451,9 @@
         renderPericiasGrade(p.pericias);
         atualizarAntecedentePainel(p.antecedente);
         atualizarHeaderIdentidade();
+        if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
+            window.__dnd5eAtualizarSecaoMagias();
+        }
     }
 
     async function rodarPreview() {
@@ -657,7 +661,6 @@
         if (f.armadura_slug) el('f5e_armadura').value = f.armadura_slug;
         if (f.escudo_slug) el('f5e_escudo').value = f.escudo_slug;
         if (f.notas) el('f5e_notas').value = f.notas;
-
         const base = f.scores_base || {};
         ABILITIES.forEach((a) => {
             if (base[a.key] != null) el(`base_${a.key}`).value = base[a.key];
@@ -741,6 +744,26 @@
             });
     }
 
+    window.__dnd5eFichaGrimorioApi = {
+        getSnapshot() {
+            const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
+            return {
+                id: personagemId,
+                nome: el('f5e_nome').value.trim(),
+                nivel,
+                ficha: {
+                    classe_slug: el('f5e_classe').value,
+                    raca_slug: el('f5e_raca').value,
+                },
+            };
+        },
+        getClasseNome() {
+            const slug = el('f5e_classe').value;
+            const c = catalogoClasses.find((x) => x.slug === slug);
+            return c ? c.nome : slug;
+        },
+    };
+
     async function init() {
         configurarTipoCriacao();
         AuthService.configurarHeaderUsuario();
@@ -759,9 +782,17 @@
             renderPericiasEscolha();
             atualizarSubclasses();
             atualizarHeaderIdentidade();
+            if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
+                window.__dnd5eAtualizarSecaoMagias();
+            }
             agendarPreview();
         });
-        el('f5e_nivel').addEventListener('change', atualizarHeaderIdentidade);
+        el('f5e_nivel').addEventListener('change', () => {
+            atualizarHeaderIdentidade();
+            if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
+                window.__dnd5eAtualizarSecaoMagias();
+            }
+        });
         el('f5e_antecedente').addEventListener('change', agendarPreview);
         el('f5e_extra1').addEventListener('change', agendarPreview);
         el('f5e_extra2').addEventListener('change', agendarPreview);

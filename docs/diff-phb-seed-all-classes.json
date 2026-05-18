@@ -1,0 +1,663 @@
+{
+  "BARDO": {
+    "levels": {
+      "0": {
+        "phb_count": 15,
+        "seed_count": 15,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "1": {
+        "phb_count": 26,
+        "seed_count": 26,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "2": {
+        "phb_count": 33,
+        "seed_count": 33,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "3": {
+        "phb_count": 29,
+        "seed_count": 29,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "4": {
+        "phb_count": 19,
+        "seed_count": 19,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "5": {
+        "phb_count": 12,
+        "seed_count": 12,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "6": {
+        "phb_count": 12,
+        "seed_count": 12,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "7": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "8": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "9": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      }
+    },
+    "summary": {
+      "phb_total_unique": 146,
+      "seed_total_unique": 146,
+      "total_missing_in_seed": 0,
+      "total_extra_in_seed": 0
+    },
+    "duplicates_in_seed": []
+  },
+  "CLERIGO": {
+    "levels": {
+      "0": {
+        "phb_count": 11,
+        "seed_count": 12,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "luz"
+        ]
+      },
+      "1": {
+        "phb_count": 25,
+        "seed_count": 28,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "detectar bem",
+          "detectar caos",
+          "detectar mal"
+        ]
+      },
+      "2": {
+        "phb_count": 32,
+        "seed_count": 32,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "3": {
+        "phb_count": 30,
+        "seed_count": 31,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "circulo magico contra o caos mal bem ordem"
+        ]
+      },
+      "4": {
+        "phb_count": 23,
+        "seed_count": 23,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "5": {
+        "phb_count": 23,
+        "seed_count": 24,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "comando maior"
+        ]
+      },
+      "6": {
+        "phb_count": 18,
+        "seed_count": 26,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "aliado extra planar",
+          "dissipar magia maior",
+          "esplendor da aguia em massa",
+          "forca do touro em massa",
+          "sabedoria da coruja em massa",
+          "simbolo de protecao maior",
+          "tarefa missao",
+          "vigor do urso em massa"
+        ]
+      },
+      "7": {
+        "phb_count": 16,
+        "seed_count": 18,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "restauracao maior",
+          "videncia maior"
+        ]
+      },
+      "8": {
+        "phb_count": 15,
+        "seed_count": 17,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "aliado extra planar maior",
+          "imunidade a magias"
+        ]
+      },
+      "9": {
+        "phb_count": 9,
+        "seed_count": 11,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "cura completa em massa",
+          "ressurreicao verdadeira"
+        ]
+      }
+    },
+    "summary": {
+      "phb_total_unique": 202,
+      "seed_total_unique": 222,
+      "total_missing_in_seed": 0,
+      "total_extra_in_seed": 20
+    },
+    "duplicates_in_seed": []
+  },
+  "DRUIDA": {
+    "levels": {
+      "0": {
+        "phb_count": 12,
+        "seed_count": 13,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "luz"
+        ]
+      },
+      "1": {
+        "phb_count": 20,
+        "seed_count": 20,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "2": {
+        "phb_count": 26,
+        "seed_count": 26,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "3": {
+        "phb_count": 22,
+        "seed_count": 22,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "4": {
+        "phb_count": 17,
+        "seed_count": 17,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "5": {
+        "phb_count": 18,
+        "seed_count": 19,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "convocar tempestade de relampagos"
+        ]
+      },
+      "6": {
+        "phb_count": 13,
+        "seed_count": 18,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "agilidade do gato em massa",
+          "dissipar magia maior",
+          "forca do touro em massa",
+          "sabedoria da coruja em massa",
+          "vigor do urso em massa"
+        ]
+      },
+      "7": {
+        "phb_count": 12,
+        "seed_count": 13,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "videncia maior"
+        ]
+      },
+      "8": {
+        "phb_count": 12,
+        "seed_count": 11,
+        "missing_in_seed": [
+          "comandar plantas"
+        ],
+        "extra_in_seed": []
+      },
+      "9": {
+        "phb_count": 10,
+        "seed_count": 10,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      }
+    },
+    "summary": {
+      "phb_total_unique": 162,
+      "seed_total_unique": 169,
+      "total_missing_in_seed": 1,
+      "total_extra_in_seed": 8
+    },
+    "duplicates_in_seed": []
+  },
+  "PALADINO": {
+    "levels": {
+      "0": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "1": {
+        "phb_count": 15,
+        "seed_count": 15,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "2": {
+        "phb_count": 9,
+        "seed_count": 9,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "3": {
+        "phb_count": 8,
+        "seed_count": 11,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "circulo magico contra o caos",
+          "circulo magico contra o mal",
+          "curar montaria"
+        ]
+      },
+      "4": {
+        "phb_count": 14,
+        "seed_count": 14,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "5": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "6": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "7": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "8": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "9": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      }
+    },
+    "summary": {
+      "phb_total_unique": 46,
+      "seed_total_unique": 49,
+      "total_missing_in_seed": 0,
+      "total_extra_in_seed": 3
+    },
+    "duplicates_in_seed": []
+  },
+  "RANGER": {
+    "levels": {
+      "0": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "1": {
+        "phb_count": 14,
+        "seed_count": 14,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "2": {
+        "phb_count": 12,
+        "seed_count": 12,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "3": {
+        "phb_count": 13,
+        "seed_count": 13,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "4": {
+        "phb_count": 7,
+        "seed_count": 7,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "5": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "6": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "7": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "8": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "9": {
+        "phb_count": 0,
+        "seed_count": 0,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      }
+    },
+    "summary": {
+      "phb_total_unique": 46,
+      "seed_total_unique": 46,
+      "total_missing_in_seed": 0,
+      "total_extra_in_seed": 0
+    },
+    "duplicates_in_seed": []
+  },
+  "MAGO": {
+    "levels": {
+      "0": {
+        "phb_count": 18,
+        "seed_count": 19,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "luz"
+        ]
+      },
+      "1": {
+        "phb_count": 39,
+        "seed_count": 39,
+        "missing_in_seed": [],
+        "extra_in_seed": []
+      },
+      "2": {
+        "phb_count": 49,
+        "seed_count": 50,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "imagem menor"
+        ]
+      },
+      "3": {
+        "phb_count": 39,
+        "seed_count": 42,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "circulo magico contra o caos mal bem ordem",
+          "imagem maior",
+          "voo"
+        ]
+      },
+      "4": {
+        "phb_count": 79,
+        "seed_count": 41,
+        "missing_in_seed": [
+          "ampliar animais",
+          "ancora planar menor",
+          "arca secreta de leomund",
+          "cancelar encantamento",
+          "cao fiel de mordenkainen",
+          "compor",
+          "cone glacial",
+          "contato extra planar",
+          "criar passagens",
+          "dominar pessoa",
+          "enfraquecer o intelecto",
+          "enviar mensagem",
+          "evocacao de sombras",
+          "expulsao",
+          "invocar criaturas v",
+          "lama em pedra",
+          "ligacao telepatica de rary",
+          "malogro",
+          "mao interposta de bigby",
+          "metamorfose torrida",
+          "muralha de energia",
+          "muralha de pedra",
+          "nevoa mental",
+          "nevoa mortal",
+          "olhos observadores",
+          "onda da fadiga",
+          "pedra em lama",
+          "permanencia",
+          "pesadelo",
+          "recipiente arcano",
+          "santuario particular de mordenkainen",
+          "simbolo da dor",
+          "simbolo do sono",
+          "similaridade",
+          "sonho",
+          "telecinesia",
+          "teletransporte",
+          "visao falsa",
+          "voo prolongado"
+        ],
+        "extra_in_seed": [
+          "invisibilidade maior"
+        ]
+      },
+      "5": {
+        "phb_count": 0,
+        "seed_count": 43,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "ampliar animais",
+          "ancora planar menor",
+          "arca secreta de leomund",
+          "cancelar encantamento",
+          "cao fiel de mordenkainen",
+          "compor",
+          "cone glacial",
+          "contato extra planar",
+          "criar itens temporarios",
+          "criar passagens",
+          "dominar pessoa",
+          "enfraquecer o intelecto",
+          "enviar mensagem",
+          "evocacao de sombras",
+          "expulsao",
+          "imagem persistente",
+          "imobilizar monstro",
+          "invocar criaturas v",
+          "lama em pedra",
+          "ligacao telepatica de rary",
+          "malogro",
+          "mao interposta de bigby",
+          "metamorfose torrida",
+          "miragem arcana",
+          "muralha de energia",
+          "muralha de pedra",
+          "nevoa mental",
+          "nevoa mortal",
+          "olhos observadores",
+          "onda da fadiga",
+          "pedra em lama",
+          "permanencia",
+          "pesadelo",
+          "recipiente arcano",
+          "santuario particular de mordenkainen",
+          "simbolo da dor",
+          "simbolo do sono",
+          "similaridade",
+          "sonho",
+          "telecinesia",
+          "teletransporte",
+          "visao falsa",
+          "voo prolongado"
+        ]
+      },
+      "6": {
+        "phb_count": 30,
+        "seed_count": 43,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "agilidade do gato em massa",
+          "ancora planar",
+          "astucia da raposa em massa",
+          "dissipar magia maior",
+          "esplendor da aguia em massa",
+          "forca do touro em massa",
+          "globo de invulnerabilidade",
+          "imagem programada",
+          "sabedoria da coruja em massa",
+          "sugestao em massa",
+          "tarefa missao",
+          "veu",
+          "vigor do urso em massa"
+        ]
+      },
+      "7": {
+        "phb_count": 55,
+        "seed_count": 35,
+        "missing_in_seed": [
+          "animacao ilusoria",
+          "antipatia",
+          "aprisionar a alma",
+          "clone",
+          "corpo de ferro",
+          "criar mortos vivos maior",
+          "danca irresistivel de otto",
+          "discernir localizacao",
+          "estase temporal",
+          "evaporacao",
+          "explosao solar",
+          "grito maior",
+          "invocar criaturas viii",
+          "labirinto",
+          "limpar a mente",
+          "metamorfosear objetos",
+          "muralha prismatica",
+          "nuvem incendiaria",
+          "padrao cintilante",
+          "palavra de poder atordoar",
+          "prisao",
+          "protecao contra magias",
+          "punho cerrado de bigby",
+          "raio polar",
+          "simbolo da insanidade",
+          "simbolo da morte",
+          "simpatia",
+          "tranca dimensional"
+        ],
+        "extra_in_seed": [
+          "conjuracao de sombras maior",
+          "imobilizar pessoas em massa",
+          "invisibilidade em massa",
+          "teletransportar objeto",
+          "teletransporte maior",
+          "videncia maior",
+          "visao",
+          "visao arcana maior"
+        ]
+      },
+      "8": {
+        "phb_count": 0,
+        "seed_count": 35,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "ancora planar maior",
+          "animacao ilusoria",
+          "antipatia",
+          "aprisionar a alma",
+          "clone",
+          "corpo de ferro",
+          "criar mortos vivos maior",
+          "danca irresistivel de otto",
+          "discernir localizacao",
+          "enfeiticar monstro em massa",
+          "esfera telecinetica de otiluke",
+          "estase temporal",
+          "evaporacao",
+          "evocacao de sombras maior",
+          "explosao solar",
+          "grito maior",
+          "instante de presciencia",
+          "invocar criaturas viii",
+          "labirinto",
+          "limpar a mente",
+          "metamorfosear objetos",
+          "muralha prismatica",
+          "nuvem incendiaria",
+          "olhos observadores maior",
+          "ordem",
+          "padrao cintilante",
+          "palavra de poder atordoar",
+          "prisao",
+          "protecao contra magias",
+          "punho cerrado de bigby",
+          "raio polar",
+          "simbolo da insanidade",
+          "simbolo da morte",
+          "simpatia",
+          "tranca dimensional"
+        ]
+      },
+      "9": {
+        "phb_count": 18,
+        "seed_count": 24,
+        "missing_in_seed": [],
+        "extra_in_seed": [
+          "desejo",
+          "dominar monstro",
+          "encarnacao fantasmagorica",
+          "esfera prismatica",
+          "imobilizar monstro em massa",
+          "sombras"
+        ]
+      }
+    },
+    "summary": {
+      "phb_total_unique": 327,
+      "seed_total_unique": 371,
+      "total_missing_in_seed": 67,
+      "total_extra_in_seed": 111
+    },
+    "duplicates_in_seed": []
+  }
+}
