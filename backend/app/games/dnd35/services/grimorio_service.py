@@ -5,12 +5,14 @@ from __future__ import annotations
 import csv
 import json
 import re
+import threading
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 
 from app.games.dnd35.models.grimorio import (
     GrimorioHistoricoTroca,
@@ -25,6 +27,8 @@ _CLASSES_DIVINAS = {"CLERIGO", "DRUIDA", "PALADINO"}
 # Evita rodar 2-3 queries extras a cada GET /notificações em chamadas rápidas consecutivas.
 _SYNC_INTERVAL_SECONDS = 30
 _sync_last: dict[int, datetime] = {}  # combatente_id → última sincronização
+_sync_locks: dict[int, threading.RLock] = {}
+_sync_locks_mutex = threading.Lock()
 
 # Em D&D 3.5, Feiticeiro usa a mesma lista de magias do Mago.
 # O banco de dados armazena as magias com class="MAGO"; este alias
@@ -611,34 +615,51 @@ class GrimorioService:
         self.grimorio_repo = grimorio_repo
         self.magia_repo = magia_repo
 
+    @staticmethod
+    def _lock_preparar_listagem(combatente_id: int) -> threading.RLock:
+        with _sync_locks_mutex:
+            lock = _sync_locks.get(combatente_id)
+            if lock is None:
+                lock = threading.RLock()
+                _sync_locks[combatente_id] = lock
+            return lock
+
+    def _magias_ids_no_grimorio(self, combatente_id: int, classe_norm: str) -> set[int]:
+        """IDs já presentes na classe, comparando slug normalizado (evita duplicar CLERIGO vs Clérigo)."""
+        itens = self.grimorio_repo.listar(combatente_id, classe=None, favorita=None)
+        return {
+            item.magia_id for item in itens if _normalizar(item.classe) == classe_norm
+        }
+
     def _preparar_listagem(
         self, combatente_id: int, classe: Optional[str] = None
     ) -> Optional[str]:
-        classe_norm = _normalizar(classe) if classe else None
-        combatente = self.grimorio_repo.get_combatente(combatente_id)
-        if not combatente:
-            raise HTTPException(status_code=404, detail="Combatente não encontrado")
+        with self._lock_preparar_listagem(combatente_id):
+            classe_norm = _normalizar(classe) if classe else None
+            combatente = self.grimorio_repo.get_combatente(combatente_id)
+            if not combatente:
+                raise HTTPException(status_code=404, detail="Combatente não encontrado")
 
-        classe_referencia = classe_norm or _normalizar(combatente.classe)
-        nivel_personagem = int(combatente.nivel or 1)
+            classe_referencia = classe_norm or _normalizar(combatente.classe)
+            nivel_personagem = int(combatente.nivel or 1)
 
-        magias_adicionadas = self._sincronizar_magias_automaticas(
-            combatente_id,
-            classe_norm=classe_referencia,
-            nivel_personagem=nivel_personagem,
-        )
-        if magias_adicionadas:
-            self._registrar_notificacao_magias_adicionadas(
+            magias_adicionadas = self._sincronizar_magias_automaticas(
                 combatente_id,
                 classe_norm=classe_referencia,
-                magias=magias_adicionadas,
+                nivel_personagem=nivel_personagem,
             )
+            if magias_adicionadas:
+                self._registrar_notificacao_magias_adicionadas(
+                    combatente_id,
+                    classe_norm=classe_referencia,
+                    magias=magias_adicionadas,
+                )
 
-        self._reconciliar_magias_invalidas(
-            combatente_id,
-            classe_norm=classe_referencia,
-        )
-        return classe_norm
+            self._reconciliar_magias_invalidas(
+                combatente_id,
+                classe_norm=classe_referencia,
+            )
+            return classe_norm
 
     def listar(
         self,
@@ -819,22 +840,25 @@ class GrimorioService:
         )
 
         if deve_sincronizar:
-            _sync_last[combatente_id] = agora
-            magias_adicionadas = self._sincronizar_magias_automaticas(
-                combatente_id,
-                classe_norm=classe_norm,
-                nivel_personagem=int(combatente.nivel or 1),
-            )
-            if magias_adicionadas:
-                self._registrar_notificacao_magias_adicionadas(
+            with self._lock_preparar_listagem(combatente_id):
+                _sync_last[combatente_id] = agora
+                magias_adicionadas = self._sincronizar_magias_automaticas(
                     combatente_id,
                     classe_norm=classe_norm,
-                    magias=magias_adicionadas,
+                    nivel_personagem=int(combatente.nivel or 1),
                 )
-            self._reconciliar_magias_invalidas(combatente_id, classe_norm=classe_norm)
-            self._garantir_notificacoes_sistema(
-                combatente_id, classe_norm, int(combatente.nivel or 1)
-            )
+                if magias_adicionadas:
+                    self._registrar_notificacao_magias_adicionadas(
+                        combatente_id,
+                        classe_norm=classe_norm,
+                        magias=magias_adicionadas,
+                    )
+                self._reconciliar_magias_invalidas(
+                    combatente_id, classe_norm=classe_norm
+                )
+                self._garantir_notificacoes_sistema(
+                    combatente_id, classe_norm, int(combatente.nivel or 1)
+                )
 
         return self.grimorio_repo.listar_notificacoes(
             combatente_id,
@@ -1044,12 +1068,7 @@ class GrimorioService:
             limit=500,
         )
 
-        existentes = {
-            item.magia_id
-            for item in self.grimorio_repo.listar(
-                combatente_id, classe=classe_norm, favorita=None
-            )
-        }
+        existentes = self._magias_ids_no_grimorio(combatente_id, classe_norm)
 
         combatente = self.grimorio_repo.get_combatente(combatente_id)
         alinhamento_norm = _alinhamento_do_combatente(combatente)
@@ -1077,14 +1096,18 @@ class GrimorioService:
             if magia.id in existentes:
                 continue
 
-            self.grimorio_repo.create(
-                GrimorioMagia(
-                    combatente_id=combatente_id,
-                    magia_id=magia.id,
-                    classe=classe_norm,
-                    origem="AUTO_NIVEL",
+            try:
+                self.grimorio_repo.create(
+                    GrimorioMagia(
+                        combatente_id=combatente_id,
+                        magia_id=magia.id,
+                        classe=classe_norm,
+                        origem="AUTO_NIVEL",
+                    )
                 )
-            )
+            except IntegrityError:
+                # Corrida entre requisições paralelas ou linha legada com classe grafada diferente.
+                continue
             existentes.add(magia.id)
             adicionadas.append(
                 {
