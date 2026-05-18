@@ -258,3 +258,8 @@ class Dnd5ePersonagemService:
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
         return self._to_response(ent)
+
+    def excluir(self, personagem_id: int) -> None:
+        ent = self.obter_por_id(personagem_id)
+        self.repo.db.delete(ent)
+        commit_with_rollback(self.repo.db)

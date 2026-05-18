@@ -1301,6 +1301,34 @@
     box-shadow: 0 0 16px rgba(201,168,76,0.14), 0 12px 24px rgba(0,0,0,0.18);
 }
 .grimorio-magia-card.sem-slot { opacity: 0.5; }
+.grimorio-magia-card.nivel-bloqueado {
+    border-color: rgba(251, 191, 36, 0.35);
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.08), transparent 42%),
+        linear-gradient(135deg, rgba(48, 38, 18, 0.55) 0%, rgba(30, 24, 14, 0.4) 100%);
+}
+.grimorio-magia-card.nivel-bloqueado .grimorio-preparar-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.grimorio-card-aviso-nivel {
+    margin: 0.35rem 0 0.5rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 8px;
+    border: 1px solid rgba(251, 191, 36, 0.38);
+    background: rgba(92, 60, 9, 0.28);
+    color: #ffedc4;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+.grimorio-add-item.is-nivel-bloqueado {
+    border-color: rgba(251, 191, 36, 0.32);
+    opacity: 0.92;
+}
+.grimorio-preparada-badge--bloqueado {
+    border-color: rgba(251, 191, 36, 0.4);
+    color: #ffedc4;
+}
 .grimorio-magia-card.ja-usada {
     opacity: 0.66;
     background: linear-gradient(135deg, rgba(248,113,113,0.07) 0%, rgba(248,113,113,0.035) 100%);

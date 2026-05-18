@@ -4,6 +4,7 @@
 import { CombatenteCard } from '/games/dnd35/js/ui/CombatenteCard.js';
 import { Dnd5eCombatenteAtivoView } from '../ui/Dnd5eCombatenteAtivoView.js';
 import { Dnd5eCondicaoModal } from '../ui/Dnd5eCondicaoModal.js';
+import { Dnd5eSpellCastPanel } from '../ui/Dnd5eSpellCastPanel.js';
 
 const ps = new Dnd5ePersonagemService();
 const cs = new Dnd5eCombateService();
@@ -24,6 +25,7 @@ class Dnd5eArenaController {
         this.catalogoClasses = [];
         this.uidManual = 0;
         this.modalCondicao = null;
+        this.spellPanel = new Dnd5eSpellCastPanel(this);
         this.ehMestre = false;
         this._init();
     }
@@ -139,6 +141,10 @@ class Dnd5eArenaController {
             sabedoria: p.wisdom,
             carisma: p.charisma,
             salvamentos: this._salvamentosDePersonagem(p, f),
+            arena_conjuracao: f.arena_conjuracao || {
+                espacos_usados: [],
+                magia_concentracao_id: null,
+            },
         };
     }
 
@@ -464,7 +470,19 @@ class Dnd5eArenaController {
             (id) => this.modalCondicao?.abrir(id),
             () => this.proximoTurno()
         );
+        this._renderPainelConjuracao(atual);
         this.atualizarSelectAlvos();
+    }
+
+    async _renderPainelConjuracao(combatente) {
+        const host = document.getElementById('dnd5eSpellCastContainer');
+        if (!host || !this.spellPanel) return;
+        if (!combatente?.personagemId || !combatente.classe) {
+            host.innerHTML = '';
+            return;
+        }
+        await this.spellPanel.carregarMagias(combatente);
+        this.spellPanel.render(host, combatente);
     }
 
     async aplicarDano(id, valor) {

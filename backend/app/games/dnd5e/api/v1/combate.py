@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.core.dependencies import get_dnd5e_conjuracao_service
 from app.games.dnd5e.rules.combate import (
     ArmaCombate,
     calcular_dano,
@@ -19,9 +20,13 @@ from app.games.dnd5e.rules.dados import rolar_d20
 from app.games.dnd5e.schemas.combate import (
     Dnd5eAtaqueRequest,
     Dnd5eAtaqueResponse,
+    Dnd5eConcentracaoTesteRequest,
+    Dnd5eConcentracaoTesteResponse,
     Dnd5eCondicaoAtivaItem,
     Dnd5eCondicoesTurnoRequest,
     Dnd5eCondicoesTurnoResponse,
+    Dnd5eConjurarRequest,
+    Dnd5eConjurarResponse,
     Dnd5eDanoRequest,
     Dnd5eDanoResponse,
     Dnd5eIniciativaRequest,
@@ -29,6 +34,7 @@ from app.games.dnd5e.schemas.combate import (
     Dnd5eIniciativaResultado,
     Dnd5eSincronizarHpCondicoesRequest,
 )
+from app.games.dnd5e.services.conjuracao_service import Dnd5eConjuracaoService
 from app.shared.core.deps import get_usuario_atual, requer_game_dnd5e
 from app.shared.models.usuario import Usuario
 
@@ -170,3 +176,29 @@ def resolver_dano(
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
     return Dnd5eDanoResponse(dano_total=total)
+
+
+@router.post(
+    "/conjurar",
+    response_model=Dnd5eConjurarResponse,
+    summary="Gasta espaço de magia, calcula CD e dano (se houver)",
+)
+def conjurar_magia_combate(
+    payload: Dnd5eConjurarRequest,
+    _: Usuario = Depends(get_usuario_atual),
+    service: Dnd5eConjuracaoService = Depends(get_dnd5e_conjuracao_service),
+) -> Dnd5eConjurarResponse:
+    return service.conjurar(payload)
+
+
+@router.post(
+    "/concentracao-teste",
+    response_model=Dnd5eConcentracaoTesteResponse,
+    summary="Teste de concentração ao receber dano (PHB 5e)",
+)
+def teste_concentracao_combate(
+    payload: Dnd5eConcentracaoTesteRequest,
+    _: Usuario = Depends(get_usuario_atual),
+    service: Dnd5eConjuracaoService = Depends(get_dnd5e_conjuracao_service),
+) -> Dnd5eConcentracaoTesteResponse:
+    return service.teste_concentracao(payload)

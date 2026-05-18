@@ -149,3 +149,14 @@ def test_criar_rejeita_ficha_maior_que_limite(dnd5e_personagens_db):
     blob = {"x": "a" * DND5E_FICHA_MAX_JSON_BYTES}
     r = client.post("/api/v1/dnd5e/personagens", json=_payload_criar(ficha=blob))
     assert r.status_code == 422
+
+
+def test_excluir_personagem(dnd5e_personagens_db):
+    SessionLocal, u1, _ = dnd5e_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    created = client.post("/api/v1/dnd5e/personagens", json=_payload_criar()).json()
+    pid = created["id"]
+
+    r = client.delete(f"/api/v1/dnd5e/personagens/{pid}")
+    assert r.status_code == 204
+    assert client.get(f"/api/v1/dnd5e/personagens/{pid}").status_code == 404
