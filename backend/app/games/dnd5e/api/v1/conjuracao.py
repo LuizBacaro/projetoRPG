@@ -11,8 +11,13 @@ from app.games.dnd5e.schemas.conjuracao import (
     Dnd5eConjuracaoGastarSlotRequest,
     Dnd5eConjuracaoPrepararRequest,
 )
-from app.games.dnd5e.services.conjuracao_ficha_service import Dnd5eConjuracaoFichaService
-from app.shared.core.deps import requer_dono_ou_admin_dnd5e_personagem, requer_game_dnd5e
+from app.games.dnd5e.services.conjuracao_ficha_service import (
+    Dnd5eConjuracaoFichaService,
+)
+from app.shared.core.deps import (
+    requer_dono_ou_admin_dnd5e_personagem,
+    requer_game_dnd5e,
+)
 
 router = APIRouter(
     prefix="/dnd5e/personagens",
@@ -43,9 +48,7 @@ def gastar_slot_conjuracao(
     service: Dnd5eConjuracaoFichaService = Depends(get_dnd5e_conjuracao_ficha_service),
     _: object = Depends(requer_dono_ou_admin_dnd5e_personagem),
 ):
-    return service.gastar_slot(
-        personagem_id, payload.nivel_magia, payload.quantidade
-    )
+    return service.gastar_slot(personagem_id, payload.nivel_magia, payload.quantidade)
 
 
 @router.put(

@@ -123,7 +123,9 @@ class Dnd5eConjurarRequest(BaseModel):
     validar_preparacao: bool = False
     teste_resistencia_mod_alvo: Optional[int] = Field(None, ge=-5, le=20)
     rolagem_salvaguarda_alvo: Optional[int] = Field(None, ge=1, le=20)
-    ac_alvo: Optional[int] = Field(None, ge=0, le=40, description="CA para ataque mágico")
+    ac_alvo: Optional[int] = Field(
+        None, ge=0, le=40, description="CA para ataque mágico"
+    )
     rolagem_ataque_d20: Optional[int] = Field(None, ge=1, le=20)
     bonus_ataque_extra: int = Field(default=0, ge=-20, le=20)
     condicoes_atacante: List[str] = Field(default_factory=list)

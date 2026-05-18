@@ -184,20 +184,22 @@ class Dnd5eGrimorioService:
         classe_norm = _classe_lista_magias(classe)
         item = self.grimorio_repo.obter_item(personagem_id, magia_id, classe_norm)
         if not item:
-            raise HTTPException(status_code=404, detail="Item do grimório não encontrado")
+            raise HTTPException(
+                status_code=404, detail="Item do grimório não encontrado"
+            )
         if favorita is not None:
             item.favorita = favorita
         if anotacoes is not None:
             item.anotacoes = anotacoes.strip() or None
         return self.grimorio_repo.atualizar(item)
 
-    def remover_magia(
-        self, personagem_id: int, magia_id: int, *, classe: str
-    ) -> None:
+    def remover_magia(self, personagem_id: int, magia_id: int, *, classe: str) -> None:
         classe_norm = _classe_lista_magias(classe)
         item = self.grimorio_repo.obter_item(personagem_id, magia_id, classe_norm)
         if not item:
-            raise HTTPException(status_code=404, detail="Item do grimório não encontrado")
+            raise HTTPException(
+                status_code=404, detail="Item do grimório não encontrado"
+            )
         self.grimorio_repo.remover(item)
 
     def listar_historico_troca(
@@ -247,11 +249,15 @@ class Dnd5eGrimorioService:
         if self.grimorio_repo.obter_item(
             personagem_id, magia_adicionada_id, classe_norm
         ):
-            raise HTTPException(status_code=409, detail="Magia nova já está no grimório")
+            raise HTTPException(
+                status_code=409, detail="Magia nova já está no grimório"
+            )
 
         magia_nova = self.magia_repo.obter(magia_adicionada_id)
         if not magia_nova:
-            raise HTTPException(status_code=404, detail="Magia adicionada não encontrada")
+            raise HTTPException(
+                status_code=404, detail="Magia adicionada não encontrada"
+            )
 
         nivel_removida = item_antigo.magia.nivel if item_antigo.magia else None
         nivel_nova = magia_nova.nivel

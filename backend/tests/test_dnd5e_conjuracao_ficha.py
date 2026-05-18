@@ -3,7 +3,9 @@
 from app.games.dnd5e.models.personagem import Dnd5ePersonagem
 from app.games.dnd5e.repositories.grimorio_repository import Dnd5eGrimorioRepository
 from app.games.dnd5e.repositories.personagem_repository import Dnd5ePersonagemRepository
-from app.games.dnd5e.services.conjuracao_ficha_service import Dnd5eConjuracaoFichaService
+from app.games.dnd5e.services.conjuracao_ficha_service import (
+    Dnd5eConjuracaoFichaService,
+)
 from app.repositories.base import commit_with_rollback
 from app.shared.core.database import SessionLocal
 
@@ -83,9 +85,7 @@ def test_preparar_magias_mago():
             )
         )
 
-        svc = Dnd5eConjuracaoFichaService(
-            Dnd5ePersonagemRepository(db), grim
-        )
+        svc = Dnd5eConjuracaoFichaService(Dnd5ePersonagemRepository(db), grim)
         estado = svc.preparar_magias(p.id, [magia.id])
         assert magia.id in estado.magias_preparadas_ids
         assert estado.magias_preparadas_max == 6  # INT +3, nível 3

@@ -4,6 +4,9 @@
  */
 import { getApiUrl } from '/games/dnd35/js/config/api.config.js';
 
+/** Limite máximo aceito por GET /dnd5e/magias (FastAPI le=500). */
+const API_LIMIT_MAX = 500;
+
 const ALIASES = {
     feiticeiro: 'mago',
     sorcerer: 'mago',
@@ -40,26 +43,50 @@ export class Dnd5eMagiaService {
     async listarPorClasse(classe) {
         const slug = this._normalizarClasse(classe);
         if (this._cache.has(slug)) return this._cache.get(slug);
-        const pagina = await this.listarPorClassePaginado(slug, { skip: 0, limit: 500 });
-        const magias = pagina.items || [];
+
+        const magias = [];
+        let skip = 0;
+        let total = Number.POSITIVE_INFINITY;
+
+        while (skip < total) {
+            const pagina = await this.listarPorClassePaginado(slug, {
+                skip,
+                limit: API_LIMIT_MAX,
+            });
+            const lote = pagina.items || [];
+            magias.push(...lote);
+            total = Number.isFinite(pagina.total) ? pagina.total : magias.length;
+            if (!lote.length || lote.length < API_LIMIT_MAX) break;
+            skip += lote.length;
+        }
+
         this._cache.set(slug, magias);
         return magias;
     }
 
-    async listarPorClassePaginado(classe, { nome, nivel, escola, componentes, skip = 0, limit = 20 } = {}) {
+    async listarPorClassePaginado(
+        classe,
+        { nome, nivel, maxNivel, escola, componentes, skip = 0, limit = 20 } = {}
+    ) {
         const slug = this._normalizarClasse(classe);
         const query = new URLSearchParams();
         query.set('classe', slug);
         if (nome) query.set('nome', String(nome).trim());
         if (nivel !== undefined && nivel !== null && String(nivel) !== 'todos') {
             query.set('nivel', String(nivel));
+        } else if (maxNivel !== undefined && maxNivel !== null && String(maxNivel) !== '') {
+            query.set('max_nivel', String(maxNivel));
         }
         if (escola && escola !== 'todas') query.set('escola', String(escola).trim());
         if (componentes && componentes !== 'todos') {
             query.set('componentes', String(componentes).trim());
         }
+        const limitClamped = Math.min(
+            API_LIMIT_MAX,
+            Math.max(1, Number(limit) || 20)
+        );
         query.set('skip', String(Math.max(0, Number(skip) || 0)));
-        query.set('limit', String(Math.max(1, Number(limit) || 20)));
+        query.set('limit', String(limitClamped));
 
         const url = getApiUrl(`/dnd5e/magias?${query.toString()}`);
         const res = await fetch(url, { headers: this._headers() });
@@ -74,7 +101,7 @@ export class Dnd5eMagiaService {
             items,
             total: Number.isFinite(totalHeader) ? totalHeader : items.length,
             skip: Math.max(0, Number(skip) || 0),
-            limit: Math.max(1, Number(limit) || 20),
+            limit: limitClamped,
         };
     }
 

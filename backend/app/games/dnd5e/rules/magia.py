@@ -132,7 +132,9 @@ def componentes_resumo(
     if somatico:
         parts.append("S")
     if material:
-        parts.append(f"M ({material[:60]})" if len(material) > 60 else f"M ({material})")
+        parts.append(
+            f"M ({material[:60]})" if len(material) > 60 else f"M ({material})"
+        )
     elif material is not None and material == "":
         parts.append("M")
     return ", ".join(parts) if parts else "—"

@@ -14,7 +14,9 @@ _MARCADORES_NIVEL_SUPERIOR = (
 
 
 def slugify_en(name: str) -> str:
-    base = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
+    base = (
+        unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
+    )
     return re.sub(r"[^a-z0-9]+", "-", base).strip("-")
 
 

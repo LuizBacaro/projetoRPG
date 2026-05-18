@@ -90,7 +90,9 @@ class Dnd5eConjuracaoFichaService:
         ficha = deepcopy(dict(p.ficha_json or {}))
         classe = classe_slug_ficha(ficha)
         if not classe:
-            raise HTTPException(status_code=422, detail="Personagem sem classe conjuradora")
+            raise HTTPException(
+                status_code=422, detail="Personagem sem classe conjuradora"
+            )
         conj = _get_conjuracao(ficha, classe, p.nivel)
         totais = espacos_por_classe_nivel(classe, p.nivel)
         usados = conj["espacos_usados"]

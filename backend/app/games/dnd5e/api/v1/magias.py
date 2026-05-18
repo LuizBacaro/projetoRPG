@@ -8,7 +8,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
 from fastapi.responses import StreamingResponse
 
-from app.core.dependencies import get_dnd5e_magia_import_service, get_dnd5e_magia_service
+from app.core.dependencies import (
+    get_dnd5e_magia_import_service,
+    get_dnd5e_magia_service,
+)
 from app.games.dnd5e.schemas.grimorio import (
     Dnd5eMagiaImportConfirmRequest,
     Dnd5eMagiaImportConfirmResponse,
@@ -89,9 +92,7 @@ async def preview_importacao_magias(
     return await service.preview(arquivo)
 
 
-@router.post(
-    "/importacao/confirmar", response_model=Dnd5eMagiaImportConfirmResponse
-)
+@router.post("/importacao/confirmar", response_model=Dnd5eMagiaImportConfirmResponse)
 def confirmar_importacao_magias(
     payload: Dnd5eMagiaImportConfirmRequest,
     service: Dnd5eMagiaImportService = Depends(get_dnd5e_magia_import_service),

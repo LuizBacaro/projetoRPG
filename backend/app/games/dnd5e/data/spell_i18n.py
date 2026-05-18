@@ -107,7 +107,9 @@ def traduzir_duracao(texto: Optional[str]) -> Optional[str]:
     return s
 
 
-def traduzir_alcance(texto: Optional[str], metros: Optional[int] = None) -> Optional[str]:
+def traduzir_alcance(
+    texto: Optional[str], metros: Optional[int] = None
+) -> Optional[str]:
     if metros and metros > 0:
         return f"{metros} m"
     if not texto:

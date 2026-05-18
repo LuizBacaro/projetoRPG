@@ -113,9 +113,7 @@ class Dnd5eConjuracaoService:
         conc_id = (
             int(conj.magia_concentracao)
             if conj.magia_concentracao and conj.magia_concentracao.isdigit()
-            else payload.magia_concentracao_id
-            if manteve
-            else None
+            else payload.magia_concentracao_id if manteve else None
         )
         msg = (
             "Concentração mantida."
@@ -169,7 +167,9 @@ class Dnd5eConjuracaoService:
         if not slots_total:
             from app.games.dnd5e.rules.magia import espacos_por_classe_nivel
 
-            slots_total = espacos_por_classe_nivel(payload.classe, payload.nivel_personagem)
+            slots_total = espacos_por_classe_nivel(
+                payload.classe, payload.nivel_personagem
+            )
         if len(slots_usados) < len(slots_total):
             slots_usados = slots_usados + [0] * (len(slots_total) - len(slots_usados))
 
@@ -284,10 +284,7 @@ class Dnd5eConjuracaoService:
             if ataque_roll is None:
                 ataque_roll, _ = rolar_d20_ataque(vantagem=vant, desvantagem=desv)
             ataque_total = (
-                ataque_roll
-                + mod_hab
-                + prof
-                + (payload.bonus_ataque_extra or 0)
+                ataque_roll + mod_hab + prof + (payload.bonus_ataque_extra or 0)
             )
             ataque_acertou = ataque_atinge_ca(
                 mod_hab,
@@ -303,9 +300,7 @@ class Dnd5eConjuracaoService:
 
         dano_total = None
         if magia_row.dano and (not requer_ataque or ataque_acertou):
-            dano_total = calcular_dano(
-                magia_row.dano, mod_hab, is_critico=critico
-            )
+            dano_total = calcular_dano(magia_row.dano, mod_hab, is_critico=critico)
 
         salv_passou: Optional[bool] = None
         if (
@@ -322,9 +317,7 @@ class Dnd5eConjuracaoService:
         concentracao_id = (
             int(conj.magia_concentracao)
             if conj.magia_concentracao and conj.magia_concentracao.isdigit()
-            else payload.magia_id
-            if magia.requer_concentracao
-            else None
+            else payload.magia_id if magia.requer_concentracao else None
         )
 
         msg = f"{magia_row.nome} conjurada."
@@ -351,7 +344,9 @@ class Dnd5eConjuracaoService:
             mensagem=msg,
             dc=dc,
             espacos_usados_por_nivel=conj.espacos_usados_por_nivel,
-            magia_concentracao_id=concentracao_id if magia.requer_concentracao else None,
+            magia_concentracao_id=(
+                concentracao_id if magia.requer_concentracao else None
+            ),
             dano_total=dano_total,
             magia_nome=magia_row.nome,
             magia_nivel=nivel,

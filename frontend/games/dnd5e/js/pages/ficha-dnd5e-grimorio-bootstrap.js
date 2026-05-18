@@ -1,14 +1,14 @@
 /**
  * Inicializa Dnd5eGrimorioController na ficha D&D 5e (APIs 5e + UI de preview PT).
  */
-import { Dnd5eGrimorioController } from '../controllers/Dnd5eGrimorioController.js?v=20260518a';
+import { Dnd5eGrimorioController } from '../controllers/Dnd5eGrimorioController.js?v=20260519a';
 import { Dnd5eGrimorioService } from '../services/Dnd5eGrimorioService.js';
-import { Dnd5eMagiaService } from '../services/Dnd5eMagiaService.js';
+import { Dnd5eMagiaService } from '../services/Dnd5eMagiaService.js?v=2';
 import { Dnd5eMagiaPreparadaAdapter } from '../services/Dnd5eMagiaPreparadaAdapter.js';
 import {
     isClasseConjuradora,
     normalizeClasseConjuradora,
-} from '/games/dnd35/js/utils/combat-rules.js?v=20260419a';
+} from '/games/dnd35/js/utils/combat-rules.js?v=20260518b';
 import {
     installGlobalErrorGuards,
     reportDegradedMode,
@@ -67,10 +67,12 @@ function atualizarUiConjurador(combatente) {
     if (btnAbrir) btnAbrir.style.display = show ? '' : 'none';
 }
 
-function bindAbrirGrimorio() {
+function bindGrimorioUi() {
     const abrir = () => window._grimorioController?.abrirGrimorio();
+    const fechar = () => window._grimorioController?.fecharGrimorio();
     document.getElementById('btnGrimorio')?.addEventListener('click', abrir);
     document.getElementById('btnAbrirGrimorio')?.addEventListener('click', abrir);
+    document.getElementById('btnFecharGrimorio')?.addEventListener('click', fechar);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
             if (!window._grimorioController) return;
 
-            bindAbrirGrimorio();
+            bindGrimorioUi();
 
             document.getElementById('modalGrimorio')?.addEventListener('click', (event) => {
                 if (event.target.id === 'modalGrimorio') {

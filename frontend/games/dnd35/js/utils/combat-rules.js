@@ -418,6 +418,7 @@ function resolveCombatenteSpellSlots(combatente, classe = null) {
 }
 
 const CombatRules = {
+    normalizeText,
     normalizeCombatenteTipo,
     isTipoJogador,
     isTipoMonstro,
@@ -440,6 +441,7 @@ if (typeof window !== 'undefined') {
 }
 
 export {
+    normalizeText,
     normalizeCombatenteTipo,
     isTipoJogador,
     isTipoMonstro,

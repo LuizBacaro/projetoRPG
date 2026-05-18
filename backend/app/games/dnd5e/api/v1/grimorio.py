@@ -107,9 +107,7 @@ def adicionar_magia_grimorio(
     return grimorio_item_para_dict(item)
 
 
-@router.patch(
-    "/{personagem_id}/{magia_id}", response_model=Dnd5eGrimorioMagiaResponse
-)
+@router.patch("/{personagem_id}/{magia_id}", response_model=Dnd5eGrimorioMagiaResponse)
 def atualizar_item_grimorio(
     personagem_id: int,
     magia_id: int,
@@ -169,9 +167,9 @@ def listar_historico_troca_grimorio(
             "nivel_personagem": h.nivel_personagem,
             "realizada_em": h.realizada_em,
             "magia_removida_nome": h.magia_removida.nome if h.magia_removida else None,
-            "magia_adicionada_nome": h.magia_adicionada.nome
-            if h.magia_adicionada
-            else None,
+            "magia_adicionada_nome": (
+                h.magia_adicionada.nome if h.magia_adicionada else None
+            ),
         }
         for h in historico
     ]

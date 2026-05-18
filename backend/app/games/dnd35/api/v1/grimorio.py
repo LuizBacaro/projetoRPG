@@ -62,9 +62,7 @@ def _serialize(item) -> dict:
     magia_nivel = None
     if magia:
         magia_nivel = (
-            _nivel_por_classe(magia, classe_norm)
-            if classe_norm
-            else magia.nivel
+            _nivel_por_classe(magia, classe_norm) if classe_norm else magia.nivel
         )
     return {
         "id": item.id,

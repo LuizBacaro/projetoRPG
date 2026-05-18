@@ -42,9 +42,7 @@ class Dnd5eGrimorioRepository:
     ) -> tuple[int, list[Dnd5eGrimorioMagia]]:
         query = self._base_query(personagem_id)
         if classe:
-            query = query.filter(
-                Dnd5eGrimorioMagia.classe == classe.strip().lower()
-            )
+            query = query.filter(Dnd5eGrimorioMagia.classe == classe.strip().lower())
         if favorita is not None:
             query = query.filter(Dnd5eGrimorioMagia.favorita == favorita)
 
@@ -144,7 +142,9 @@ class Dnd5eGrimorioRepository:
             query.order_by(Dnd5eGrimorioNotificacao.criada_em.desc()).limit(limit).all()
         )
 
-    def get_notificacao(self, notificacao_id: int) -> Optional[Dnd5eGrimorioNotificacao]:
+    def get_notificacao(
+        self, notificacao_id: int
+    ) -> Optional[Dnd5eGrimorioNotificacao]:
         return (
             self.db.query(Dnd5eGrimorioNotificacao)
             .filter(Dnd5eGrimorioNotificacao.id == notificacao_id)

@@ -6,8 +6,14 @@ from fastapi import HTTPException
 from app.games.dnd5e.models.grimorio import Dnd5eGrimorioMagia
 from app.games.dnd5e.models.magia import Dnd5eMagia, Dnd5eMagiaClasse
 from app.games.dnd5e.models.personagem import Dnd5ePersonagem
-from app.games.dnd5e.services.grimorio_service import Dnd5eGrimorioService, grimorio_item_para_dict
-from app.games.dnd5e.services.magia_service import Dnd5eMagiaService, magia_para_response
+from app.games.dnd5e.services.grimorio_service import (
+    Dnd5eGrimorioService,
+    grimorio_item_para_dict,
+)
+from app.games.dnd5e.services.magia_service import (
+    Dnd5eMagiaService,
+    magia_para_response,
+)
 from app.shared.core.database import SessionLocal
 from app.games.dnd5e.repositories.grimorio_repository import Dnd5eGrimorioRepository
 from app.games.dnd5e.repositories.magia_repository import Dnd5eMagiaRepository

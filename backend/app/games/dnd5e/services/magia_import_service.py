@@ -244,7 +244,9 @@ class Dnd5eMagiaImportService:
         with self._lock:
             draft = self._drafts.get(import_id)
         if not draft:
-            raise HTTPException(status_code=404, detail="Importação expirada ou inválida")
+            raise HTTPException(
+                status_code=404, detail="Importação expirada ou inválida"
+            )
         if draft.expires_at < datetime.now(timezone.utc):
             with self._lock:
                 self._drafts.pop(import_id, None)
@@ -264,7 +266,9 @@ class Dnd5eMagiaImportService:
         content = await arquivo.read()
         wb = load_workbook(BytesIO(content), read_only=True, data_only=True)
         ws = wb.active
-        headers = [str(c.value or "").strip().lower() for c in next(ws.iter_rows(max_row=1))]
+        headers = [
+            str(c.value or "").strip().lower() for c in next(ws.iter_rows(max_row=1))
+        ]
         if headers[: len(HEADERS_ESPERADOS)] != HEADERS_ESPERADOS:
             raise HTTPException(
                 status_code=422,
@@ -275,10 +279,14 @@ class Dnd5eMagiaImportService:
         erros: list[dict[str, Any]] = []
         por_slug: dict[str, dict[str, Any]] = {}
 
-        for idx, row_cells in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+        for idx, row_cells in enumerate(
+            ws.iter_rows(min_row=2, values_only=True), start=2
+        ):
             if idx > MAX_IMPORT_ROWS + 1:
                 break
-            vals = list(row_cells) + [None] * (len(HEADERS_ESPERADOS) - len(row_cells or []))
+            vals = list(row_cells) + [None] * (
+                len(HEADERS_ESPERADOS) - len(row_cells or [])
+            )
             nome = str(vals[1] or "").strip()
             if not nome:
                 continue
@@ -290,7 +298,9 @@ class Dnd5eMagiaImportService:
             classe_slug = _classe_slug(classe_raw)
 
             try:
-                pagina = int(float(str(vals[13]))) if vals[13] not in (None, "") else None
+                pagina = (
+                    int(float(str(vals[13]))) if vals[13] not in (None, "") else None
+                )
             except ValueError:
                 pagina = None
 
@@ -322,9 +332,7 @@ class Dnd5eMagiaImportService:
                     por_slug[slug]["classes_links"]
                 )
             else:
-                parsed["classes_links"] = _dedupe_classes_links(
-                    parsed["classes_links"]
-                )
+                parsed["classes_links"] = _dedupe_classes_links(parsed["classes_links"])
                 por_slug[slug] = parsed
 
         rows = list(por_slug.values())

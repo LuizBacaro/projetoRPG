@@ -125,8 +125,6 @@ KNOWN_SPELLS_WARLOCK: dict[int, int] = {
 # Magias preparadas = mod habilidade + nível (mín. 1) — Clérigo/Druida/Mago
 PREPARED_CLASSES = frozenset({"mago", "clerigo", "druida"})
 
-KNOWN_CLASSES = frozenset(
-    {"bardo", "feiticeiro", "bruxo", "paladino", "patrulheiro"}
-)
+KNOWN_CLASSES = frozenset({"bardo", "feiticeiro", "bruxo", "paladino", "patrulheiro"})
 
 SHORT_REST_RECOVER_ALL = frozenset({"bruxo"})

@@ -46,7 +46,9 @@ class Dnd5eMagia(Base):
     material_custo_gp = Column(Integer, nullable=False, default=0)
 
     dano = Column(String(80), nullable=True)
-    teste_resistencia = Column(String(40), nullable=True)  # for/dex/con/int/wis/cha/nenhum
+    teste_resistencia = Column(
+        String(40), nullable=True
+    )  # for/dex/con/int/wis/cha/nenhum
     ataque_magico = Column(String(20), nullable=True)  # ranged | melee | None
     descricao = Column(Text, nullable=True)
     descricao_en = Column(Text, nullable=True)

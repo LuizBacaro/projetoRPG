@@ -1,6 +1,9 @@
 """Parser de descrições PT do Foundry."""
 
-from app.games.dnd5e.data.foundry_spells import html_para_texto, separar_descricao_foundry
+from app.games.dnd5e.data.foundry_spells import (
+    html_para_texto,
+    separar_descricao_foundry,
+)
 
 
 def test_separar_descricao_bola_de_fogo():
