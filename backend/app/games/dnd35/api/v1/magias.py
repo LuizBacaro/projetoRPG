@@ -46,12 +46,26 @@ from app.shared.core.deps import requer_mestre_ou_admin
 router = APIRouter(prefix="/magias", tags=["Magias"])
 
 
-def _serialize_magia(magia: Magia) -> dict:
+def _nivel_magia_para_classe(magia: Magia, classe_filtro: Optional[str]) -> Optional[int]:
+    """Nível da magia na classe filtrada (MagiaClasse), não o nível legado da coluna Magia.nivel."""
+    if not classe_filtro or not str(classe_filtro).strip():
+        return getattr(magia, "nivel", None)
+    alvo = normalizar_classe_acesso(str(classe_filtro).strip())
+    if not alvo:
+        return getattr(magia, "nivel", None)
+    for cn in getattr(magia, "classes_niveis", None) or []:
+        if cn.classe and normalizar_classe_acesso(cn.classe) == alvo:
+            return int(cn.nivel)
+    return getattr(magia, "nivel", None)
+
+
+def _serialize_magia(magia: Magia, *, classe_filtro: Optional[str] = None) -> dict:
+    nivel = _nivel_magia_para_classe(magia, classe_filtro)
     return {
         "id": getattr(magia, "id", None),
         "nome": getattr(magia, "nome", None),
         "nome_en": getattr(magia, "nome_en", None),
-        "nivel": getattr(magia, "nivel", None),
+        "nivel": nivel,
         "classe": getattr(magia, "classe", None),
         "escola": getattr(magia, "escola", None),
         "sub_escola": getattr(magia, "sub_escola", None),
@@ -184,7 +198,7 @@ def listar_magias(
         skip=skip,
         limit=limit,
     )
-    items = [_serialize_magia(magia) for magia in rows]
+    items = [_serialize_magia(magia, classe_filtro=classe_normalizado) for magia in rows]
 
     if settings.CACHE_ENABLED:
         catalog_cache.set(

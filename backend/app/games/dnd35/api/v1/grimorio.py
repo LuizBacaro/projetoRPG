@@ -19,7 +19,11 @@ from app.games.dnd35.schemas.grimorio import (
     GrimorioTrocaRequest,
     GrimorioTrocaResponse,
 )
-from app.games.dnd35.services.grimorio_service import GrimorioService
+from app.games.dnd35.services.grimorio_service import (
+    GrimorioService,
+    _nivel_por_classe,
+    _normalizar as _normalizar_classe_grimorio,
+)
 from app.shared.core.database import get_db
 from app.shared.core.deps import requer_dono_ou_admin_combatente, requer_game_dnd35
 
@@ -54,6 +58,14 @@ def _parse_magia_ids(values: Optional[list[str]]) -> Optional[list[int]]:
 
 def _serialize(item) -> dict:
     magia = item.magia
+    classe_norm = _normalizar_classe_grimorio(item.classe) if item.classe else None
+    magia_nivel = None
+    if magia:
+        magia_nivel = (
+            _nivel_por_classe(magia, classe_norm)
+            if classe_norm
+            else magia.nivel
+        )
     return {
         "id": item.id,
         "combatente_id": item.combatente_id,
@@ -65,7 +77,7 @@ def _serialize(item) -> dict:
         "adicionada_em": item.adicionada_em,
         "magia_nome": magia.nome if magia else None,
         "magia_escola": magia.escola if magia else None,
-        "magia_nivel": magia.nivel if magia else None,
+        "magia_nivel": magia_nivel,
         "magia_componentes": magia.componentes if magia else None,
         "magia_e_magia_dominio": bool(magia.e_magia_dominio) if magia else False,
         "magia_dominios": magia.dominios if magia else None,

@@ -53,6 +53,7 @@ class Dnd5eMagiaService:
         *,
         nome: Optional[str] = None,
         nivel: Optional[int] = None,
+        max_nivel: Optional[int] = None,
         escola: Optional[str] = None,
         classe_slug: Optional[str] = None,
         skip: int = 0,
@@ -61,6 +62,7 @@ class Dnd5eMagiaService:
         total, rows = self.repository.listar_paginado(
             nome=nome,
             nivel=nivel,
+            max_nivel=max_nivel,
             escola=escola,
             classe_slug=classe_slug,
             skip=skip,

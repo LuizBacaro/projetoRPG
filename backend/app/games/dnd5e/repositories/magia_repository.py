@@ -35,6 +35,7 @@ class Dnd5eMagiaRepository:
         *,
         nome: Optional[str] = None,
         nivel: Optional[int] = None,
+        max_nivel: Optional[int] = None,
         escola: Optional[str] = None,
         classe_slug: Optional[str] = None,
         skip: int = 0,
@@ -65,13 +66,19 @@ class Dnd5eMagiaRepository:
         if nivel is not None:
             query = query.filter(Dnd5eMagia.nivel == nivel)
 
+        if max_nivel is not None:
+            query = query.filter(Dnd5eMagia.nivel <= max_nivel)
+
         if escola:
             query = query.filter(Dnd5eMagia.escola.ilike(escola.strip()))
 
-        rows = query.order_by(Dnd5eMagia.nivel, Dnd5eMagia.nome).all()
-        total = len(rows)
-        if skip or limit < len(rows):
-            rows = rows[skip : skip + limit]
+        total = query.count()
+        rows = (
+            query.order_by(Dnd5eMagia.nivel, Dnd5eMagia.nome)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
         return total, rows
 
     def criar(self, magia: Dnd5eMagia) -> Dnd5eMagia:

@@ -30,6 +30,7 @@ router = APIRouter(
 def listar_magias(
     nome: Optional[str] = Query(default=None),
     nivel: Optional[int] = Query(default=None, ge=0, le=9),
+    max_nivel: Optional[int] = Query(default=None, ge=0, le=9),
     escola: Optional[str] = Query(default=None),
     classe_slug: Optional[str] = Query(default=None, alias="classe"),
     skip: int = Query(default=0, ge=0),
@@ -40,6 +41,7 @@ def listar_magias(
     total, magias = service.listar(
         nome=nome,
         nivel=nivel,
+        max_nivel=max_nivel,
         escola=escola,
         classe_slug=classe_slug,
         skip=skip,
