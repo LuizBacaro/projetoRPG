@@ -12,8 +12,8 @@ from app.games.dnd5e.models.grimorio import (
     Dnd5eGrimorioMagia,
     Dnd5eGrimorioNotificacao,
 )
-from app.games.dnd5e.models.personagem import Dnd5ePersonagem
 from app.games.dnd5e.models.magia import Dnd5eMagia
+from app.games.dnd5e.models.personagem import Dnd5ePersonagem
 from app.repositories.base import commit_with_rollback
 
 

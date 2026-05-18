@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Response, status
@@ -25,8 +26,6 @@ from app.shared.core.deps import (
     requer_dono_ou_admin_dnd5e_personagem,
     requer_game_dnd5e,
 )
-
-import json
 
 
 def _serialize_notificacao(item) -> dict:

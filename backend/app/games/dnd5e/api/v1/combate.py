@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.core.dependencies import get_dnd5e_conjuracao_service
 from app.games.dnd5e.rules.combate import (
     ArmaCombate,
     calcular_dano,
@@ -16,15 +17,14 @@ from app.games.dnd5e.rules.condicoes_ficha import (
     sincronizar_condicoes_por_hp,
 )
 from app.games.dnd5e.rules.dados import rolar_d20
-from app.core.dependencies import get_dnd5e_conjuracao_service
 from app.games.dnd5e.schemas.combate import (
     Dnd5eAtaqueRequest,
     Dnd5eAtaqueResponse,
+    Dnd5eConcentracaoTesteRequest,
+    Dnd5eConcentracaoTesteResponse,
     Dnd5eCondicaoAtivaItem,
     Dnd5eCondicoesTurnoRequest,
     Dnd5eCondicoesTurnoResponse,
-    Dnd5eConcentracaoTesteRequest,
-    Dnd5eConcentracaoTesteResponse,
     Dnd5eConjurarRequest,
     Dnd5eConjurarResponse,
     Dnd5eDanoRequest,

@@ -19,9 +19,8 @@ from app.games.dnd35.schemas.grimorio import (
     GrimorioTrocaRequest,
     GrimorioTrocaResponse,
 )
+from app.games.dnd35.services.grimorio_service import GrimorioService, _nivel_por_classe
 from app.games.dnd35.services.grimorio_service import (
-    GrimorioService,
-    _nivel_por_classe,
     _normalizar as _normalizar_classe_grimorio,
 )
 from app.shared.core.database import get_db
