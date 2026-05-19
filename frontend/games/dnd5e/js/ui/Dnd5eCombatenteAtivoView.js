@@ -102,9 +102,9 @@ export class Dnd5eCombatenteAtivoView {
                     </div>
 
                     <div class="arena-coluna-central dnd5e-arena-col-central">
+                        <div id="dnd5eArenaMagiasHost" class="dnd5e-arena-magias-host"></div>
                         <div class="arena-secao">
                             <h3 class="arena-secao-titulo">Ajuste rápido de PV</h3>
-                            <div id="dnd5eSpellCastContainer" class="dnd5e-spell-cast-host"></div>
                             <div class="dnd5e-arena-pv-rapido">
                                 <input type="number" id="inputDanoAtivo" class="dnd5e-arena-pv-input" placeholder="Valor" min="0" />
                                 <button type="button" class="arena-btn-dano-cura dnd5e-arena-pv-btn" data-action="dano">⚔️ Dano</button>

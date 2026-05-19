@@ -122,9 +122,46 @@ KNOWN_SPELLS_WARLOCK: dict[int, int] = {
     20: 15,
 }
 
-# Magias preparadas = mod habilidade + nível (mín. 1) — Clérigo/Druida/Mago
-PREPARED_CLASSES = frozenset({"mago", "clerigo", "druida"})
+# --- Modo de lista de magias (PHB 5e) ---
+# Full caster preparado: mod habilidade + nível de personagem (mín. 1).
+# Ver docs/dnd5e/issue-conjuracao-paladino-patrulheiro.md antes de alterar.
+PREPARED_FULL_CASTER_CLASSES = frozenset({"mago", "clerigo", "druida"})
+PREPARED_HALF_CASTER_CLASSES = frozenset({"paladino"})
+PREPARED_CLASSES = PREPARED_FULL_CASTER_CLASSES | PREPARED_HALF_CASTER_CLASSES
 
-KNOWN_CLASSES = frozenset({"bardo", "feiticeiro", "bruxo", "paladino", "patrulheiro"})
+KNOWN_CLASSES = frozenset({"bardo", "feiticeiro", "bruxo", "patrulheiro"})
+
+# Patrulheiro — Spells Known (PHB); índice = nível de personagem
+KNOWN_SPELLS_HALF_CASTER: dict[int, int] = {
+    2: 2,
+    3: 3,
+    4: 3,
+    5: 4,
+    6: 2,
+    7: 3,
+    8: 3,
+    9: 4,
+    10: 4,
+    11: 5,
+    12: 5,
+    13: 6,
+    14: 6,
+    15: 7,
+    16: 7,
+    17: 8,
+    18: 8,
+    19: 9,
+    20: 9,
+}
 
 SHORT_REST_RECOVER_ALL = frozenset({"bruxo"})
+
+
+def magias_preparadas_max_full_caster(mod_habilidade: int, nivel: int) -> int:
+    """Mago, clérigo, druida — mod + nível (mín. 1)."""
+    return max(1, mod_habilidade + nivel)
+
+
+def magias_preparadas_max_paladino(mod_habilidade: int, nivel: int) -> int:
+    """Paladino PHB — mod CAR + floor(nível/2) (mín. 1)."""
+    return max(1, mod_habilidade + nivel // 2)

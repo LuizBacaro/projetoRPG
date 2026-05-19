@@ -17,6 +17,7 @@ from app.games.dnd5e.repositories.magia_repository import Dnd5eMagiaRepository
 from app.games.dnd5e.rules.magia import max_nivel_magia_conjuravel
 from app.games.dnd5e.services.conjuracao_shared import (
     classe_slug_ficha,
+    contar_magias_conhecidas_grimorio,
     magias_conhecidas_max,
 )
 from app.games.dnd5e.services.magia_service import _componentes_str
@@ -153,12 +154,14 @@ class Dnd5eGrimorioService:
         if personagem:
             ficha = dict(personagem.ficha_json or {})
             slug = classe_slug_ficha(ficha) or classe_norm
-            maximo = magias_conhecidas_max(slug, int(personagem.nivel or 1))
-            if maximo is not None:
-                total, _ = self.grimorio_repo.listar_paginado(
+            nivel_pers = int(personagem.nivel or 1)
+            maximo = magias_conhecidas_max(slug, nivel_pers)
+            if maximo is not None and int(magia.nivel or 0) >= 1:
+                _, itens = self.grimorio_repo.listar_paginado(
                     personagem_id, classe=classe_norm, limit=500
                 )
-                if total >= maximo:
+                conhecidas = contar_magias_conhecidas_grimorio(itens)
+                if conhecidas >= maximo:
                     raise HTTPException(
                         status_code=422,
                         detail=f"Limite de magias conhecidas ({maximo}) atingido",

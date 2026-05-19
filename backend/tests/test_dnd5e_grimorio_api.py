@@ -20,13 +20,13 @@ from app.repositories.base import commit_with_rollback
 from app.shared.core.database import SessionLocal
 
 
-def _seed_magia(db, slug="raio-teste", classe="mago"):
+def _seed_magia(db, slug="raio-teste", classe="mago", nivel=0):
     magia = db.query(Dnd5eMagia).filter(Dnd5eMagia.slug == slug).first()
     if not magia:
         magia = Dnd5eMagia(
             slug=slug,
             nome="Raio Teste",
-            nivel=0,
+            nivel=nivel,
             escola="evocacao",
             tempo_conjuracao="1 ação",
             componentes_verbal=True,
@@ -35,6 +35,8 @@ def _seed_magia(db, slug="raio-teste", classe="mago"):
         )
         db.add(magia)
         db.flush()
+    else:
+        magia.nivel = nivel
     ja = (
         db.query(Dnd5eMagiaClasse)
         .filter(
@@ -44,7 +46,11 @@ def _seed_magia(db, slug="raio-teste", classe="mago"):
         .first()
     )
     if not ja:
-        db.add(Dnd5eMagiaClasse(magia_id=magia.id, classe_slug=classe, nivel=0))
+        db.add(
+            Dnd5eMagiaClasse(
+                magia_id=magia.id, classe_slug=classe, nivel=nivel
+            )
+        )
         commit_with_rollback(db)
     return magia
 
@@ -123,6 +129,72 @@ def test_grimorio_troca_magia():
         total, itens = svc.listar_paginado(p.id, classe="bardo")
         assert total == 1
         assert itens[0].magia_id == m2.id
+    finally:
+        db.close()
+
+
+def test_grimorio_limita_patrulheiro_magias_conhecidas_sem_truques():
+    db = SessionLocal()
+    try:
+        p = Dnd5ePersonagem(
+            tipo="jogador",
+            nome="Ranger Limite",
+            nivel=6,
+            ficha_json={"classe_slug": "patrulheiro"},
+        )
+        db.add(p)
+        commit_with_rollback(db)
+        db.refresh(p)
+
+        truque = _seed_magia(db, slug="ranger-cantrip", classe="patrulheiro", nivel=0)
+        m1 = _seed_magia(db, slug="ranger-l1-a", classe="patrulheiro", nivel=1)
+        m2 = _seed_magia(db, slug="ranger-l1-b", classe="patrulheiro", nivel=1)
+        m3 = _seed_magia(db, slug="ranger-l1-c", classe="patrulheiro", nivel=1)
+
+        svc = Dnd5eGrimorioService(
+            Dnd5eGrimorioRepository(db), Dnd5eMagiaRepository(db)
+        )
+        svc.adicionar_magia(p.id, magia_id=truque.id, classe="patrulheiro")
+        svc.adicionar_magia(p.id, magia_id=m1.id, classe="patrulheiro")
+        svc.adicionar_magia(p.id, magia_id=m2.id, classe="patrulheiro")
+
+        with pytest.raises(HTTPException) as exc:
+            svc.adicionar_magia(p.id, magia_id=m3.id, classe="patrulheiro")
+        assert "limite" in str(exc.value.detail).lower()
+
+        truque2 = _seed_magia(db, slug="ranger-cantrip-2", classe="patrulheiro", nivel=0)
+        svc.adicionar_magia(p.id, magia_id=truque2.id, classe="patrulheiro")
+        _, itens = svc.listar_paginado(p.id, classe="patrulheiro")
+        assert len(itens) == 4
+    finally:
+        db.close()
+
+
+def test_grimorio_paladino_sem_limite_conhecidas_no_grimorio():
+    db = SessionLocal()
+    try:
+        p = Dnd5ePersonagem(
+            tipo="jogador",
+            nome="Paladino Grimorio",
+            nivel=6,
+            charisma=14,
+            ficha_json={"classe_slug": "paladino"},
+        )
+        db.add(p)
+        commit_with_rollback(db)
+        db.refresh(p)
+
+        spells = [
+            _seed_magia(db, slug=f"pal-spell-{i}", classe="paladino", nivel=1)
+            for i in range(4)
+        ]
+        svc = Dnd5eGrimorioService(
+            Dnd5eGrimorioRepository(db), Dnd5eMagiaRepository(db)
+        )
+        for sp in spells:
+            svc.adicionar_magia(p.id, magia_id=sp.id, classe="paladino")
+        total, _ = svc.listar_paginado(p.id, classe="paladino")
+        assert total == 4
     finally:
         db.close()
 

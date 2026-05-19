@@ -24,16 +24,36 @@ export class Dnd5eConjuracaoFichaService {
         return res.json();
     }
 
-    async gastarSlot(personagemId, nivelMagia, quantidade = 1) {
+    async gastarSlot(personagemId, nivelMagia, quantidade = 1, magiaId = null) {
         const url = getApiUrl(`/dnd5e/personagens/${personagemId}/conjuracao/gastar-slot`);
+        const body = { nivel_magia: nivelMagia, quantidade };
+        if (magiaId != null) body.magia_id = Number(magiaId);
         const res = await fetch(url, {
             method: 'POST',
             headers: this._headers(),
-            body: JSON.stringify({ nivel_magia: nivelMagia, quantidade }),
+            body: JSON.stringify(body),
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
             throw new Error(err.detail || 'Não foi possível gastar o espaço');
+        }
+        return res.json();
+    }
+
+    async devolverSlot(personagemId, nivelMagia, quantidade = 1, magiaId = null) {
+        const url = getApiUrl(
+            `/dnd5e/personagens/${personagemId}/conjuracao/devolver-slot`
+        );
+        const body = { nivel_magia: nivelMagia, quantidade };
+        if (magiaId != null) body.magia_id = Number(magiaId);
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: this._headers(),
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || 'Não foi possível devolver o espaço');
         }
         return res.json();
     }
