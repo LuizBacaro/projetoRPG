@@ -9,13 +9,13 @@ from app.games.dnd5e.data.spell_tables import (
     magias_preparadas_max_paladino,
 )
 from app.games.dnd5e.models.personagem import Dnd5ePersonagem
-from app.games.dnd5e.services.conjuracao_shared import magias_conhecidas_max
 from app.games.dnd5e.repositories.grimorio_repository import Dnd5eGrimorioRepository
 from app.games.dnd5e.repositories.magia_repository import Dnd5eMagiaRepository
 from app.games.dnd5e.repositories.personagem_repository import Dnd5ePersonagemRepository
 from app.games.dnd5e.services.conjuracao_ficha_service import (
     Dnd5eConjuracaoFichaService,
 )
+from app.games.dnd5e.services.conjuracao_shared import magias_conhecidas_max
 from app.repositories.base import commit_with_rollback
 from app.shared.core.database import SessionLocal
 

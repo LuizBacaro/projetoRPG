@@ -5,10 +5,10 @@ from __future__ import annotations
 from typing import Optional
 
 from app.games.dnd5e.data.spell_tables import (
+    FULL_SPELL_LIST_PREPARED_CLASSES,
     KNOWN_SPELLS_FULL,
     KNOWN_SPELLS_HALF_CASTER,
     KNOWN_SPELLS_WARLOCK,
-    FULL_SPELL_LIST_PREPARED_CLASSES,
     PREPARED_CLASSES,
     PREPARED_FULL_CASTER_CLASSES,
     PREPARED_HALF_CASTER_CLASSES,
