@@ -202,26 +202,40 @@ export class Dnd5eArenaMagiasView {
 
         let linhas = '';
         for (const m of grupo.magias || []) {
-            const usada = !truque && m.lancada;
-            const acaoBtn = usada ? 'restaurar' : 'usar';
-            const icone = truque ? '✨' : usada ? '↩️' : '🔥';
+            const semEspacos = !truque && disponiveis <= 0;
+            const marcouSessao = Boolean(m.lancada);
+            const acaoBtn = semEspacos ? 'restaurar' : 'usar';
+            const icone = truque
+                ? marcouSessao
+                    ? '↩️'
+                    : '✨'
+                : semEspacos
+                  ? '↩️'
+                  : '🔥';
             const titulo = truque
-                ? 'Conjurar truque (sem gasto)'
-                : usada
-                  ? 'Restaurar (devolver espaço)'
-                  : 'Lançar magia (gastar espaço)';
+                ? marcouSessao
+                    ? 'Limpar marcação do truque (at-will — não gasta espaço)'
+                    : 'Conjurar truque (at-will — sem gasto de espaço)'
+                : semEspacos
+                  ? 'Devolver um espaço deste nível'
+                  : marcouSessao
+                    ? `Lançar novamente (${disponiveis} espaço(s) de NIV ${nivel})`
+                    : `Lançar magia (gasta 1 espaço de NIV ${nivel})`;
             linhas +=
-                `<div class="arena-prep-magia-row ${usada ? 'arena-prep-usada' : ''}">` +
-                `<span class="arena-prep-nome ${usada ? 'arena-prep-nome-usada' : ''}" data-magia-id="${m.magia_id}">` +
+                `<div class="arena-prep-magia-row ${marcouSessao ? 'arena-prep-marcada' : ''} ${semEspacos ? 'arena-prep-sem-espaco' : ''}">` +
+                `<span class="arena-prep-nome ${marcouSessao ? 'arena-prep-nome-marcada' : ''}" data-magia-id="${m.magia_id}">` +
                 esc(m.magia_nome) +
                 '</span>';
             if (m.magia_escola) {
                 linhas += `<span class="arena-prep-escola">${esc(m.magia_escola)}</span>`;
             }
+            if (!truque && marcouSessao && !semEspacos) {
+                linhas += '<span class="arena-prep-slot-hint">−1 slot</span>';
+            }
             linhas +=
-                `<button class="arena-prep-btn ${usada ? 'arena-prep-btn-usada' : ''}"` +
+                `<button class="arena-prep-btn ${semEspacos ? 'arena-prep-btn-esgotado' : ''} ${marcouSessao && truque ? 'arena-prep-btn-marcada' : ''}"` +
                 ` data-magia-id="${m.magia_id}" data-nivel="${nivel}" data-acao="${acaoBtn}"` +
-                ` title="${titulo}">${icone}</button>` +
+                ` title="${esc(titulo)}">${icone}</button>` +
                 '</div>';
         }
 

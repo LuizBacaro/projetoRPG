@@ -46,11 +46,7 @@ def _seed_magia(db, slug="raio-teste", classe="mago", nivel=0):
         .first()
     )
     if not ja:
-        db.add(
-            Dnd5eMagiaClasse(
-                magia_id=magia.id, classe_slug=classe, nivel=nivel
-            )
-        )
+        db.add(Dnd5eMagiaClasse(magia_id=magia.id, classe_slug=classe, nivel=nivel))
         commit_with_rollback(db)
     return magia
 
@@ -162,7 +158,9 @@ def test_grimorio_limita_patrulheiro_magias_conhecidas_sem_truques():
             svc.adicionar_magia(p.id, magia_id=m3.id, classe="patrulheiro")
         assert "limite" in str(exc.value.detail).lower()
 
-        truque2 = _seed_magia(db, slug="ranger-cantrip-2", classe="patrulheiro", nivel=0)
+        truque2 = _seed_magia(
+            db, slug="ranger-cantrip-2", classe="patrulheiro", nivel=0
+        )
         svc.adicionar_magia(p.id, magia_id=truque2.id, classe="patrulheiro")
         _, itens = svc.listar_paginado(p.id, classe="patrulheiro")
         assert len(itens) == 4

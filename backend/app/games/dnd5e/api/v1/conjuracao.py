@@ -85,7 +85,11 @@ def preparar_magias_conjuracao(
     service: Dnd5eConjuracaoFichaService = Depends(get_dnd5e_conjuracao_ficha_service),
     _: object = Depends(requer_dono_ou_admin_dnd5e_personagem),
 ):
-    return service.preparar_magias(personagem_id, payload.magia_ids)
+    return service.preparar_magias(
+        personagem_id,
+        payload.magia_ids,
+        payload.magias_quantidade or None,
+    )
 
 
 @router.post(

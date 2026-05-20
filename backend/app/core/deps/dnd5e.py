@@ -70,5 +70,6 @@ def get_dnd5e_conjuracao_ficha_service(
         get_dnd5e_personagem_repository
     ),
     grimorio_repo: Dnd5eGrimorioRepository = Depends(get_dnd5e_grimorio_repository),
+    magia_repo: Dnd5eMagiaRepository = Depends(get_dnd5e_magia_repository),
 ) -> Dnd5eConjuracaoFichaService:
-    return Dnd5eConjuracaoFichaService(personagem_repo, grimorio_repo)
+    return Dnd5eConjuracaoFichaService(personagem_repo, grimorio_repo, magia_repo)

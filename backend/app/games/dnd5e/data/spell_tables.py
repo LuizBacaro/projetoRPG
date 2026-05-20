@@ -129,6 +129,9 @@ PREPARED_FULL_CASTER_CLASSES = frozenset({"mago", "clerigo", "druida"})
 PREPARED_HALF_CASTER_CLASSES = frozenset({"paladino"})
 PREPARED_CLASSES = PREPARED_FULL_CASTER_CLASSES | PREPARED_HALF_CASTER_CLASSES
 
+# Clérigo/Druida: lista completa da classe (preparar sem entrada prévia no grimório).
+FULL_SPELL_LIST_PREPARED_CLASSES = frozenset({"clerigo", "druida"})
+
 KNOWN_CLASSES = frozenset({"bardo", "feiticeiro", "bruxo", "patrulheiro"})
 
 # Patrulheiro — Spells Known (PHB); índice = nível de personagem

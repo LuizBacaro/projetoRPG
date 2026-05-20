@@ -3,6 +3,22 @@
  */
 import { getApiUrl } from '/games/dnd35/js/config/api.config.js';
 
+function _detailFromApiError(err) {
+    const d = err?.detail;
+    if (typeof d === 'string' && d.trim()) return d.trim();
+    if (Array.isArray(d)) {
+        return d
+            .map((item) => {
+                if (typeof item === 'string') return item;
+                if (item && typeof item.msg === 'string') return item.msg;
+                return '';
+            })
+            .filter(Boolean)
+            .join('; ');
+    }
+    return '';
+}
+
 export class Dnd5eConjuracaoFichaService {
     constructor(token) {
         this.token = token || localStorage.getItem('token');
@@ -19,7 +35,9 @@ export class Dnd5eConjuracaoFichaService {
         const res = await fetch(url, { headers: this._headers() });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.detail || `Erro ao carregar conjuração (${res.status})`);
+            throw new Error(
+                _detailFromApiError(err) || `Erro ao carregar conjuração (${res.status})`
+            );
         }
         return res.json();
     }
@@ -73,18 +91,24 @@ export class Dnd5eConjuracaoFichaService {
         return res.json();
     }
 
-    async preparar(personagemId, magiaIds) {
+    async preparar(personagemId, magiaIds, magiasQuantidade = null) {
         const url = getApiUrl(
             `/dnd5e/personagens/${personagemId}/conjuracao/preparar`
         );
+        const body = { magia_ids: magiaIds };
+        if (magiasQuantidade && typeof magiasQuantidade === 'object') {
+            body.magias_quantidade = magiasQuantidade;
+        }
         const res = await fetch(url, {
             method: 'PUT',
             headers: this._headers(),
-            body: JSON.stringify({ magia_ids: magiaIds }),
+            body: JSON.stringify(body),
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.detail || 'Não foi possível preparar magias');
+            throw new Error(
+                _detailFromApiError(err) || 'Não foi possível preparar magias'
+            );
         }
         return res.json();
     }

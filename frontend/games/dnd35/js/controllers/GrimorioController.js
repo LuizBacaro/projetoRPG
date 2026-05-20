@@ -514,11 +514,14 @@ class GrimorioController {
         }
         if (this._ehModo5e()) {
             try {
-                this._conjuracao5eEstado =
-                    window.__dnd5eConjuracaoEstado ||
-                    (await this.magiaPreparadaService.conjuracao?.obter?.(
+                if (typeof this.magiaPreparadaService?.conjuracao?.obter === 'function') {
+                    this._conjuracao5eEstado = await this.magiaPreparadaService.conjuracao.obter(
                         this.combatente.id
-                    ));
+                    );
+                    window.__dnd5eConjuracaoEstado = this._conjuracao5eEstado;
+                } else {
+                    this._conjuracao5eEstado = window.__dnd5eConjuracaoEstado || null;
+                }
             } catch (_error) {
                 this._conjuracao5eEstado = window.__dnd5eConjuracaoEstado || null;
             }
@@ -531,15 +534,23 @@ class GrimorioController {
 
     _hidratarSlotsDisponiveis5e() {
         const estado = this._conjuracao5eEstado;
+        const qtyMap = estado?.magias_preparadas_qty || {};
         const mapa = {};
         (estado?.slots || []).forEach((slot) => {
             const nivel = Number(slot.nivel || 0);
+            let preparadas = 0;
+            for (const item of this.magiasPreparadas) {
+                const magiaId = Number(item.magia_id);
+                if (this._nivelMagiaGrimorio5e(magiaId) !== nivel) continue;
+                preparadas += Math.max(0, Number(qtyMap[String(magiaId)] ?? item.quantidade ?? 0));
+            }
+            const total = Number(slot.total || 0);
             mapa[nivel] = {
                 nivel,
-                total: Number(slot.total || 0),
-                preparadas: Number(slot.usados || 0),
+                total,
+                preparadas,
                 usadas: Number(slot.usados || 0),
-                disponivel: Number(slot.disponiveis ?? 0),
+                disponivel: Math.max(total - preparadas, 0),
             };
         });
         this.slotsDisponiveis = mapa;
@@ -689,32 +700,96 @@ class GrimorioController {
         }
     }
 
+    _nivelSlotPreparacao(item) {
+        return this._nivelMagiaNaClasseAtiva(item?.magia || {});
+    }
+
+    _nivelMagiaGrimorio5e(magiaId) {
+        const id = Number(magiaId);
+        const item = this.itensGrimorio.find((e) => Number(e.magia_id) === id);
+        if (item) return this._nivelSlotPreparacao(item);
+        const cat = this.catalogoIndex?.get?.(id);
+        return cat ? this._nivelMagiaNaClasseAtiva(cat) : 0;
+    }
+
+    _contagemPreparadasQueContamLimite5e() {
+        return [...this.magiasPreparadasMap.keys()].filter(
+            (id) => this._nivelMagiaGrimorio5e(id) >= 1
+        ).length;
+    }
+
+    _slotTotal5ePorNivel(nivelSlot) {
+        const nivel = Number(nivelSlot || 0);
+        const slot = (this._conjuracao5eEstado?.slots || []).find(
+            (s) => Number(s.nivel) === nivel
+        );
+        const fromEstado = Math.max(0, Number(slot?.total || 0));
+        if (fromEstado > 0) return fromEstado;
+        return Math.max(0, Number(this.slotsDisponiveis?.[nivel]?.total || 0));
+    }
+
+    _qtyPreparada5ePorNivel(nivelSlot, excluirMagiaId = null) {
+        const nivel = Number(nivelSlot || 0);
+        if (nivel <= 0) return 0;
+        const qtyMap = this._conjuracao5eEstado?.magias_preparadas_qty || {};
+        let soma = 0;
+        for (const item of this.magiasPreparadas) {
+            const magiaId = Number(item.magia_id);
+            if (excluirMagiaId != null && magiaId === Number(excluirMagiaId)) continue;
+            const nivelMagia = this._nivelMagiaGrimorio5e(magiaId);
+            if (nivelMagia !== nivel) continue;
+            soma += Math.max(0, Number(qtyMap[String(magiaId)] ?? item.quantidade ?? 0));
+        }
+        return soma;
+    }
+
     _obterInfoPreparacao5e(item) {
         const magiaId = Number(item?.magia_id ?? item?.id ?? 0);
-        const nivelSlot = Number(item?.magia?.nivel ?? item?.nivel ?? 0);
-        const preparada = this.magiasPreparadasMap.has(magiaId);
-        const max = Math.max(
+        const nivelSlot = this._nivelSlotPreparacao(item);
+        const registro = this.magiasPreparadasMap.get(magiaId) || null;
+        const preparada = Boolean(registro);
+        const quantidadeAtual = preparada ? this._quantidadePreparada(registro) : 0;
+        const maxLista = Math.max(
             1,
             Number(this._conjuracao5eEstado?.magias_preparadas_max || 1)
         );
-        const preparadas = this.magiasPreparadas.length;
-        const restantes = Math.max(0, max - preparadas + (preparada ? 1 : 0));
+        const contaNoLimite = nivelSlot >= 1;
+        const preparadasQueContam = this._contagemPreparadasQueContamLimite5e();
+        const restantesLista = contaNoLimite
+            ? Math.max(0, maxLista - preparadasQueContam + (preparada ? 1 : 0))
+            : maxLista;
+        const totalSlotsNivel = this._slotTotal5ePorNivel(nivelSlot);
+        const preparadasNoNivel = this._qtyPreparada5ePorNivel(nivelSlot, magiaId);
+        const disponivelSlotsNivel = Math.max(0, totalSlotsNivel - preparadasNoNivel);
+        const quantidadeMaxima =
+            nivelSlot >= 1
+                ? Math.max(quantidadeAtual, disponivelSlotsNivel)
+                : 1;
+        const temEspacoLista = preparada || !contaNoLimite || restantesLista > 0;
+        const temEspacoSlots = nivelSlot <= 0 || disponivelSlotsNivel > 0 || quantidadeAtual > 0;
 
         return {
             magiaId,
             nivelSlot,
-            registro: this.magiasPreparadasMap.get(magiaId) || null,
+            registro,
             preparada,
             usada: false,
             parcialmenteUsada: false,
             totalmenteUsada: false,
-            quantidadeAtual: preparada ? 1 : 0,
+            quantidadeAtual,
             usosRealizados: 0,
-            quantidadeMaxima: 1,
-            slot: { nivel: nivelSlot, total: max, disponivel: restantes, preparadas, usadas: 0 },
-            podePreparar: true,
-            temEspaco: preparada || restantes > 0,
+            quantidadeMaxima,
+            slot: {
+                nivel: nivelSlot,
+                total: nivelSlot >= 1 ? totalSlotsNivel : maxLista,
+                disponivel: nivelSlot >= 1 ? disponivelSlotsNivel : restantesLista,
+                preparadas: preparadasNoNivel + quantidadeAtual,
+                usadas: 0,
+            },
+            podePreparar: nivelSlot >= 1 ? totalSlotsNivel > 0 || preparada : true,
+            temEspaco: temEspacoLista && temEspacoSlots,
             modo5e: true,
+            exigeQuantidade: nivelSlot >= 1,
         };
     }
 
@@ -724,7 +799,7 @@ class GrimorioController {
         }
 
         const magiaId = Number(item?.magia_id ?? item?.id ?? 0);
-        const nivelSlot = Number(item?.magia?.nivel ?? item?.nivel ?? 0);
+        const nivelSlot = this._nivelSlotPreparacao(item);
         const registro = this.magiasPreparadasMap.get(magiaId) || null;
         const slot = this.slotsDisponiveis[nivelSlot] || {
             nivel: nivelSlot,
@@ -2032,9 +2107,15 @@ class GrimorioController {
             button.addEventListener('click', async (event) => {
                 event.stopPropagation();
                 const magiaId = Number(button.dataset.magiaId);
+                const itemCard = this.itensGrimorio.find(
+                    (entry) => Number(entry.magia_id) === magiaId
+                );
+                const preparoCard = itemCard ? this._obterInfoPreparacao(itemCard) : null;
                 const quantidade =
                     button.dataset.modo5e === '1'
-                        ? null
+                        ? preparoCard?.exigeQuantidade
+                            ? this._lerQuantidadePreparacaoCard(magiaId)
+                            : null
                         : this._lerQuantidadePreparacaoCard(magiaId);
                 await this._togglePreparada(magiaId, quantidade);
             });
@@ -2127,13 +2208,16 @@ class GrimorioController {
             ? `<p class="grimorio-card-aviso-nivel">${escapeHtml(this._mensagemMagiaNivelBloqueado(magia.nivel))}</p>`
             : '';
         const quantidadeRapida = this._obterQuantidadePreparacaoRapida(id, preparo);
+        const mostrarQtdInline = !classeEspontanea && (!modo5ePrep || preparo.exigeQuantidade);
         const descricaoPreparacao = classeEspontanea
             ? 'Conjuracao espontanea: use os slots de magia na arena para controlar os usos do dia.'
-            : modo5ePrep
+              : modo5ePrep
               ? preparo.preparada
-                  ? 'Magia preparada para hoje (PHB 5e).'
+                  ? preparo.exigeQuantidade
+                      ? `Preparada ${preparo.quantidadeAtual}x no nível ${preparo.nivelSlot} (máx ${preparo.quantidadeMaxima} pelo slot)`
+                      : 'Magia preparada para hoje (truque — PHB 5e).'
                   : preparo.temEspaco
-                    ? `Preparadas: ${this.magiasPreparadas.length}/${maxPrep5e}`
+                    ? `Preparadas: ${this._contagemPreparadasQueContamLimite5e()}/${maxPrep5e}`
                     : `Limite de preparação atingido (${maxPrep5e}).`
               : preparo.preparada
                 ? `Preparada ${preparo.quantidadeAtual}x no nível ${preparo.nivelSlot}${preparo.usosRealizados ? ` • ${preparo.usosRealizados} usada(s)` : ''}`
@@ -2142,7 +2226,9 @@ class GrimorioController {
                   : 'Sem slot disponível para este nível';
         const textoPreparar = modo5ePrep
             ? preparo.preparada
-                ? '✅ Preparada'
+                ? preparo.exigeQuantidade
+                    ? `✅ Preparada ×${preparo.quantidadeAtual}`
+                    : '✅ Preparada'
                 : 'Preparar'
             : preparo.preparada
               ? `✅ Preparada ×${preparo.quantidadeAtual}`
@@ -2153,9 +2239,13 @@ class GrimorioController {
                 : 'Todos os slots deste nível já foram preenchidos'
             : preparo.preparada
               ? modo5ePrep
-                  ? 'Clique para remover da preparação'
+                  ? preparo.exigeQuantidade
+                      ? 'Clique para remover da preparação'
+                      : 'Truque preparado — clique para remover'
                   : 'Clique para ajustar ou remover a quantidade preparada'
-              : `Marcar ${magia.nome || 'magia'} como preparada hoje`;
+              : modo5ePrep && !preparo.exigeQuantidade
+                ? `Truque (at-will): marcar ${magia.nome || 'magia'} como disponível hoje — sem quantidade`
+                : `Marcar ${magia.nome || 'magia'} como preparada hoje`;
         const tituloPrepararFinal = nivelBloqueado
             ? this._mensagemMagiaNivelBloqueado(magia.nivel)
             : tituloPreparar;
@@ -2183,7 +2273,7 @@ class GrimorioController {
                             <span class="grimorio-badge grimorio-badge-escola">${escapeHtml(escola || 'Sem escola')}</span>
                             <span class="grimorio-badge grimorio-badge-comp">N${Number(magia.nivel || 0)} - ${escapeHtml(magia.componentes || '-')}</span>
                             <span class="grimorio-badge grimorio-badge-origem">${escapeHtml(String(origemLabel).replace(/_/g, ' '))}</span>
-                            ${(!classeEspontanea && preparo.preparada) ? `<span class="grimorio-badge grimorio-badge-preparada">${preparo.usosRealizados ? `${preparo.usosRealizados}/${preparo.quantidadeAtual} usada(s)` : `Preparada ×${preparo.quantidadeAtual}`}</span>` : ''}
+                            ${(!classeEspontanea && preparo.preparada) ? `<span class="grimorio-badge grimorio-badge-preparada">${preparo.usosRealizados ? `${preparo.usosRealizados}/${preparo.quantidadeAtual} usada(s)` : (preparo.exigeQuantidade || !modo5ePrep) ? `Preparada ×${preparo.quantidadeAtual}` : 'Preparada'}</span>` : ''}
                             ${classeEspontanea ? '<span class="grimorio-badge grimorio-badge-conhecida">Magia conhecida</span>' : ''}
                             ${magiaDominio ? `<span class="grimorio-badge grimorio-badge-dominio">Dominio${dominios ? `: ${escapeHtml(dominios)}` : ''}</span>` : ''}
                             ${this._renderizarBadgesExtrasCard(magia)}
@@ -2211,14 +2301,17 @@ class GrimorioController {
                 <div class="grimorio-card-rodape">
                     <button class="grimorio-expandir-btn" data-id="${id}">${aberta ? '▲ Menos detalhes' : '▼ Ver detalhes'}</button>
                         ${!classeEspontanea ? `<div class="grimorio-rodape-direita">
-                            ${modo5ePrep ? '' : `<div class="grimorio-preparo-inline ${(!preparo.temEspaco && !preparo.preparada) ? 'is-disabled' : ''}" data-magia-id="${id}">
+                            <div class="grimorio-preparo-grupo">
+                            ${mostrarQtdInline ? `<div class="grimorio-preparo-inline ${(!preparo.temEspaco && !preparo.preparada) ? 'is-disabled' : ''}" data-magia-id="${id}">
                                 <span class="grimorio-preparo-inline-label">Qtd</span>
                                 <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="-1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>−</button>
                                 <input class="grimorio-preparo-input" data-magia-id="${id}" type="number" min="${preparo.preparada ? 0 : (preparo.temEspaco ? 1 : 0)}" max="${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}" step="1" value="${quantidadeRapida}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>
                                 <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>+</button>
                                 <span class="grimorio-preparo-inline-max">máx ${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}</span>
-                            </div>`}
+                            </div>` : ''}
                             <button class="grimorio-preparar-btn ${preparo.preparada ? 'ativa' : ''}" data-magia-id="${id}" data-modo5e="${modo5ePrep ? '1' : '0'}" title="${escapeHtml(tituloPrepararFinal)}" ${((!preparo.temEspaco && !preparo.preparada) || nivelBloqueado) ? 'disabled' : ''}>${textoPreparar}</button>
+                            ${modo5ePrep && !mostrarQtdInline ? '<span class="grimorio-truque-hint" title="Truques são at-will — não gastam espaço de magia">at-will</span>' : ''}
+                            </div>
                             ${item.anotacoes ? '<span class="grimorio-preparada-badge">Com anotacoes</span>' : (item._catalogo_expandido ? (nivelBloqueado ? '<span class="grimorio-preparada-badge grimorio-preparada-badge--bloqueado">Nível indisponível</span>' : '<span class="grimorio-preparada-badge">Disponível hoje</span>') : '')}
                         </div>` : ''}
                 </div>
@@ -2554,7 +2647,11 @@ class GrimorioController {
         const posicaoAtual = this.indiceDetalheAtual + 1;
         const totalItens = this.itensFiltrados.length;
         const quantidadeSugerida = preparo.preparada ? preparo.quantidadeAtual : (preparo.temEspaco ? 1 : 0);
-        const limiteQuantidade = Math.max(quantidadeSugerida, preparo.quantidadeMaxima || 0);
+        const mostrarQuantidadeDetalhe =
+            !this._classeEhEspontanea() && (!this._ehModo5e() || preparo.exigeQuantidade);
+        const limiteQuantidade = mostrarQuantidadeDetalhe
+            ? Math.max(quantidadeSugerida, preparo.quantidadeMaxima || 0)
+            : 0;
         const textoBotaoPreparar = preparo.preparada ? '💾 Salvar preparo' : '🪄 Preparar hoje';
 
         const anterior = document.getElementById('grimorioModalDetalhes');
@@ -2591,15 +2688,15 @@ class GrimorioController {
                 </div>
                 <div class="grimorio-detalhe-preparo-box ${(!preparo.temEspaco && !preparo.preparada) ? 'is-disabled' : ''}">
                     <div class="grimorio-detalhe-preparo-topo">
-                        <span class="grimorio-detalhe-preparo-titulo">Preparos de hoje</span>
-                        <span class="grimorio-detalhe-preparo-status">${preparo.preparada ? `${preparo.quantidadeAtual} preparada(s)` : `0/${preparo.slot.total || 0}`}</span>
+                        <span class="grimorio-detalhe-preparo-titulo">Preparos de hoje${preparo.exigeQuantidade ? ` (N${preparo.nivelSlot})` : ''}</span>
+                        <span class="grimorio-detalhe-preparo-status">${mostrarQuantidadeDetalhe ? (preparo.preparada ? `${preparo.quantidadeAtual}/${limiteQuantidade}` : `${preparo.slot.disponivel || 0} slot(s) livre(s)`) : (preparo.preparada ? 'Preparada' : 'Truque')}</span>
                     </div>
                     <div class="grimorio-detalhe-quantidade-row">
                         <button class="grimorio-detalhe-stepper" id="grimorioDetalheQtdMenos" type="button" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>−</button>
                         <input class="grimorio-detalhe-quantidade-input" id="grimorioDetalheQuantidade" type="number" min="0" max="${limiteQuantidade}" step="1" value="${quantidadeSugerida}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>
                         <button class="grimorio-detalhe-stepper" id="grimorioDetalheQtdMais" type="button" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>+</button>
                     </div>
-                    <div class="grimorio-detalhe-preparo-ajuda">Máximo neste nível: ${limiteQuantidade}. Se preparar 2x, a Arena exibirá duas cópias da magia.</div>
+                    <div class="grimorio-detalhe-preparo-ajuda">${mostrarQuantidadeDetalhe ? `Máximo neste nível: ${limiteQuantidade} (espaços de magia do personagem).` : 'Truques não usam quantidade — apenas marque como preparado.'}</div>
                 </div>
                 <div class="grimorio-confirm-botoes grimorio-detalhe-botoes">
                     <button class="grimorio-confirm-btn grimorio-confirm-cancelar" id="grimorioDetalheAnterior">← Anterior</button>
@@ -2648,9 +2745,15 @@ class GrimorioController {
         normalizarQuantidadeInput();
 
         overlay.querySelector('#grimorioDetalhePreparar')?.addEventListener('click', async () => {
-            const quantidadeDesejada = normalizarQuantidadeInput();
+            const quantidadeDesejada = mostrarQuantidadeDetalhe
+                ? normalizarQuantidadeInput()
+                : null;
             await this._togglePreparada(item.magia_id, quantidadeDesejada);
         });
+
+        if (!mostrarQuantidadeDetalhe) {
+            overlay.querySelector('.grimorio-detalhe-quantidade-row')?.remove();
+        }
 
         overlay.querySelector('#grimorioDetalheLimparPreparo')?.addEventListener('click', async () => {
             if (quantidadeInput) quantidadeInput.value = '0';

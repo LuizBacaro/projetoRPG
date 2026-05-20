@@ -550,6 +550,15 @@ class Dnd5eArenaController {
             (m) => Number(m.magia_id) === Number(magiaId)
         );
         const nivelMagia = Number(magia?.magia_nivel ?? nivel) || 0;
+        if (nivelMagia >= 1) {
+            const slotNivel = (combatente._conjEstado?.slots || []).find(
+                (s) => Number(s.nivel) === nivelMagia
+            );
+            if (slotNivel && Number(slotNivel.disponiveis) <= 0) {
+                Toast.error(`Sem espaços de magia disponíveis no nível ${nivelMagia}.`);
+                return;
+            }
+        }
         try {
             combatente._conjEstado = await this.conjuracaoFichaService.gastarSlot(
                 combatente.personagemId,
@@ -562,7 +571,9 @@ class Dnd5eArenaController {
             return;
         }
         Toast.success(
-            `🔥 ${magia?.magia_nome || 'Magia'}${nivelMagia ? ` (NIV ${nivelMagia})` : ''}`
+            nivelMagia
+                ? `🔥 ${magia?.magia_nome || 'Magia'} — 1 espaço de NIV ${nivelMagia} gasto`
+                : `✨ ${magia?.magia_nome || 'Truque'} conjurado (at-will)`
         );
         this._renderMagiasHost(
             document.getElementById('dnd5eArenaMagiasHost'),
@@ -587,7 +598,11 @@ class Dnd5eArenaController {
             Toast.error(e.message || 'Não foi possível devolver o espaço.');
             return;
         }
-        Toast.success(`↩️ ${magia?.magia_nome || 'Magia'} restaurada`);
+        Toast.success(
+            nivelMagia
+                ? `↩️ Espaço de NIV ${nivelMagia} devolvido`
+                : `↩️ Marcação de ${magia?.magia_nome || 'truque'} removida`
+        );
         this._renderMagiasHost(
             document.getElementById('dnd5eArenaMagiasHost'),
             combatente
