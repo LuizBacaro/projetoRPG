@@ -7,8 +7,10 @@ from typing import Any, Optional
 
 from fastapi import HTTPException
 
-from app.games.dnd5e.data.spell_tables import PREPARED_CLASSES, SHORT_REST_RECOVER_ALL
+from app.games.dnd5e.data.spell_tables import SHORT_REST_RECOVER_ALL
+from app.games.dnd5e.models.grimorio import Dnd5eGrimorioMagia
 from app.games.dnd5e.repositories.grimorio_repository import Dnd5eGrimorioRepository
+from app.games.dnd5e.repositories.magia_repository import Dnd5eMagiaRepository
 from app.games.dnd5e.repositories.personagem_repository import Dnd5ePersonagemRepository
 from app.games.dnd5e.rules.magia import espacos_por_classe_nivel
 from app.games.dnd5e.schemas.conjuracao import (
@@ -16,8 +18,15 @@ from app.games.dnd5e.schemas.conjuracao import (
     Dnd5eSlotNivelItem,
 )
 from app.games.dnd5e.services.conjuracao_shared import (
+    FULL_SPELL_LIST_PREPARED_CLASSES,
+    classe_prepara_magias,
     classe_slug_ficha,
+    contar_magias_conhecidas_grimorio,
+    contar_magias_preparadas_com_nivel,
     magias_conhecidas_max,
+    magias_preparadas_max,
+    normalizar_magias_preparadas_qty,
+    somar_qty_preparadas_por_nivel,
 )
 from app.games.dnd5e.services.grimorio_service import _classe_lista_magias
 from app.repositories.base import commit_with_rollback
@@ -46,6 +55,8 @@ def _estado_default(classe: str, nivel: int) -> dict[str, Any]:
         "classe": classe,
         "espacos_usados": [0] * len(totais),
         "magias_preparadas_ids": [],
+        "magias_preparadas_qty": {},
+        "magias_lancadas_ids": [],
         "magia_concentracao_id": None,
     }
 
@@ -60,14 +71,18 @@ def _get_conjuracao(ficha: dict, classe: str, nivel: int) -> dict[str, Any]:
         usados.extend([0] * (len(totais) - len(usados)))
     base["espacos_usados"] = usados[: len(totais)]
     base["classe"] = classe
+    lancadas = base.get("magias_lancadas_ids")
+    if not isinstance(lancadas, list):
+        base["magias_lancadas_ids"] = []
+    base["magias_preparadas_qty"] = normalizar_magias_preparadas_qty(
+        base.get("magias_preparadas_qty")
+    )
     return base
 
 
 def _magias_preparadas_max(personagem, classe: str, nivel: int) -> Optional[int]:
-    if classe not in PREPARED_CLASSES:
-        return None
     mod = _mod_habilidade(personagem, classe)
-    return max(1, mod + nivel)
+    return magias_preparadas_max(classe, nivel, mod)
 
 
 class Dnd5eConjuracaoFichaService:
@@ -75,9 +90,52 @@ class Dnd5eConjuracaoFichaService:
         self,
         personagem_repo: Dnd5ePersonagemRepository,
         grimorio_repo: Dnd5eGrimorioRepository,
+        magia_repo: Dnd5eMagiaRepository,
     ):
         self.personagem_repo = personagem_repo
         self.grimorio_repo = grimorio_repo
+        self.magia_repo = magia_repo
+
+    def _nivel_magia(self, magia_id: int) -> int:
+        row = self.magia_repo.obter(magia_id)
+        return int(row.nivel or 0) if row else 0
+
+    def _magia_na_lista_classe(self, magia_id: int, classe_grim: str) -> bool:
+        row = self.magia_repo.obter(magia_id)
+        if not row:
+            return False
+        return any(
+            (link.classe_slug or "").strip().lower() == classe_grim
+            for link in (row.classes_niveis or [])
+        )
+
+    def _garantir_magia_no_grimorio(
+        self,
+        personagem_id: int,
+        magia_id: int,
+        classe: str,
+        classe_grim: str,
+    ) -> None:
+        if self.grimorio_repo.obter_item(personagem_id, magia_id, classe_grim):
+            return
+        if classe not in FULL_SPELL_LIST_PREPARED_CLASSES:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Magia {magia_id} não está no grimório",
+            )
+        if not self._magia_na_lista_classe(magia_id, classe_grim):
+            raise HTTPException(
+                status_code=422,
+                detail="Magia não pertence à lista da classe",
+            )
+        self.grimorio_repo.adicionar(
+            Dnd5eGrimorioMagia(
+                personagem_id=personagem_id,
+                magia_id=magia_id,
+                classe=classe_grim,
+                origem="PREPARACAO_CATALOGO",
+            )
+        )
 
     def _personagem(self, personagem_id: int):
         p = self.personagem_repo.get_by_id(personagem_id)
@@ -114,14 +172,18 @@ class Dnd5eConjuracaoFichaService:
             personagem_id, classe=classe_grim, limit=500
         )
         prep_ids = [int(x) for x in (conj.get("magias_preparadas_ids") or [])]
+        prep_qty = normalizar_magias_preparadas_qty(conj.get("magias_preparadas_qty"))
+        lancadas_ids = [int(x) for x in (conj.get("magias_lancadas_ids") or [])]
         return Dnd5eConjuracaoEstadoResponse(
             classe=classe,
             nivel_personagem=p.nivel,
-            prepara_magias=classe in PREPARED_CLASSES,
+            prepara_magias=classe_prepara_magias(classe),
             magias_conhecidas_max=magias_conhecidas_max(classe, p.nivel),
-            magias_conhecidas_atual=len(itens),
+            magias_conhecidas_atual=contar_magias_conhecidas_grimorio(itens),
             magias_preparadas_max=_magias_preparadas_max(p, classe, p.nivel),
             magias_preparadas_ids=prep_ids,
+            magias_preparadas_qty=prep_qty,
+            magias_lancadas_ids=lancadas_ids,
             slots=slots,
             magia_concentracao_id=conj.get("magia_concentracao_id"),
             recupera_slots_repouso_curto=classe in SHORT_REST_RECOVER_ALL,
@@ -135,48 +197,122 @@ class Dnd5eConjuracaoFichaService:
         self.personagem_repo.db.refresh(personagem)
 
     def gastar_slot(
-        self, personagem_id: int, nivel_magia: int, quantidade: int = 1
+        self,
+        personagem_id: int,
+        nivel_magia: int,
+        quantidade: int = 1,
+        magia_id: Optional[int] = None,
     ) -> Dnd5eConjuracaoEstadoResponse:
         p = self._personagem(personagem_id)
         ficha = deepcopy(dict(p.ficha_json or {}))
         classe = classe_slug_ficha(ficha)
         conj = _get_conjuracao(ficha, classe, p.nivel)
         totais = espacos_por_classe_nivel(classe, p.nivel)
-        if nivel_magia <= 0 or nivel_magia >= len(totais):
+        if nivel_magia < 0 or nivel_magia >= len(totais):
             raise HTTPException(status_code=422, detail="Nível de magia inválido")
-        usados = conj["espacos_usados"]
-        disp = totais[nivel_magia] - usados[nivel_magia]
-        if disp < quantidade:
-            raise HTTPException(status_code=422, detail="Sem espaços disponíveis")
-        usados[nivel_magia] += quantidade
+        if nivel_magia >= 1:
+            usados = conj["espacos_usados"]
+            disp = totais[nivel_magia] - usados[nivel_magia]
+            if disp < quantidade:
+                raise HTTPException(status_code=422, detail="Sem espaços disponíveis")
+            usados[nivel_magia] += quantidade
+        if magia_id is not None:
+            lancadas = list(conj.get("magias_lancadas_ids") or [])
+            if int(magia_id) not in lancadas:
+                lancadas.append(int(magia_id))
+            conj["magias_lancadas_ids"] = lancadas
         self._salvar_conjuracao(p, ficha, conj)
         return self.obter_estado(personagem_id)
 
-    def preparar_magias(
-        self, personagem_id: int, magia_ids: list[int]
+    def devolver_slot(
+        self,
+        personagem_id: int,
+        nivel_magia: int,
+        quantidade: int = 1,
+        magia_id: Optional[int] = None,
     ) -> Dnd5eConjuracaoEstadoResponse:
         p = self._personagem(personagem_id)
         ficha = deepcopy(dict(p.ficha_json or {}))
         classe = classe_slug_ficha(ficha)
-        if classe not in PREPARED_CLASSES:
+        conj = _get_conjuracao(ficha, classe, p.nivel)
+        totais = espacos_por_classe_nivel(classe, p.nivel)
+        if nivel_magia < 0 or nivel_magia >= len(totais):
+            raise HTTPException(status_code=422, detail="Nível de magia inválido")
+        if nivel_magia >= 1:
+            usados = conj["espacos_usados"]
+            if usados[nivel_magia] < quantidade:
+                raise HTTPException(
+                    status_code=422, detail="Nenhum espaço usado neste nível"
+                )
+            usados[nivel_magia] -= quantidade
+        if magia_id is not None:
+            lancadas = [
+                int(x)
+                for x in (conj.get("magias_lancadas_ids") or [])
+                if int(x) != int(magia_id)
+            ]
+            conj["magias_lancadas_ids"] = lancadas
+        self._salvar_conjuracao(p, ficha, conj)
+        return self.obter_estado(personagem_id)
+
+    def preparar_magias(
+        self,
+        personagem_id: int,
+        magia_ids: list[int],
+        magias_quantidade: Optional[dict] = None,
+    ) -> Dnd5eConjuracaoEstadoResponse:
+        p = self._personagem(personagem_id)
+        ficha = deepcopy(dict(p.ficha_json or {}))
+        classe = classe_slug_ficha(ficha)
+        if not classe_prepara_magias(classe):
             raise HTTPException(
                 status_code=400, detail="Esta classe não prepara magias diariamente"
             )
         max_prep = _magias_preparadas_max(p, classe, p.nivel) or 1
-        if len(magia_ids) > max_prep:
+        classe_grim = _classe_lista_magias(classe)
+        totais = espacos_por_classe_nivel(classe, p.nivel)
+        conj = _get_conjuracao(ficha, classe, p.nivel)
+        qty_map = normalizar_magias_preparadas_qty(
+            magias_quantidade
+            if magias_quantidade is not None
+            else conj.get("magias_preparadas_qty")
+        )
+
+        for mid in magia_ids:
+            chave = str(int(mid))
+            if chave not in qty_map:
+                qty_map[chave] = 1
+
+        ids_ativos = sorted({int(chave) for chave, qtd in qty_map.items() if qtd > 0})
+        niveis = {int(mid): self._nivel_magia(int(mid)) for mid in ids_ativos}
+
+        if contar_magias_preparadas_com_nivel(ids_ativos, niveis) > max_prep:
             raise HTTPException(
                 status_code=422,
-                detail=f"Máximo de {max_prep} magias preparadas",
+                detail=f"Máximo de {max_prep} magias preparadas (truques não contam)",
             )
-        classe_grim = _classe_lista_magias(classe)
-        for mid in magia_ids:
-            if not self.grimorio_repo.obter_item(personagem_id, mid, classe_grim):
+
+        soma_por_nivel = somar_qty_preparadas_por_nivel(qty_map, niveis)
+        for nivel_slot, soma in soma_por_nivel.items():
+            limite = totais[nivel_slot] if nivel_slot < len(totais) else 0
+            if soma > limite:
                 raise HTTPException(
                     status_code=422,
-                    detail=f"Magia {mid} não está no grimório",
+                    detail=(
+                        f"Preparação excede os {limite} espaço(s) de magia "
+                        f"do nível {nivel_slot}"
+                    ),
                 )
-        conj = _get_conjuracao(ficha, classe, p.nivel)
-        conj["magias_preparadas_ids"] = magia_ids
+
+        for mid in ids_ativos:
+            self._garantir_magia_no_grimorio(
+                personagem_id, int(mid), classe, classe_grim
+            )
+
+        conj["magias_preparadas_ids"] = ids_ativos
+        conj["magias_preparadas_qty"] = {
+            chave: qtd for chave, qtd in qty_map.items() if qtd > 0
+        }
         self._salvar_conjuracao(p, ficha, conj)
         return self.obter_estado(personagem_id)
 
@@ -188,8 +324,10 @@ class Dnd5eConjuracaoFichaService:
         totais = espacos_por_classe_nivel(classe, p.nivel)
         conj["espacos_usados"] = [0] * len(totais)
         conj["magia_concentracao_id"] = None
-        if classe in PREPARED_CLASSES:
+        conj["magias_lancadas_ids"] = []
+        if classe_prepara_magias(classe):
             conj["magias_preparadas_ids"] = []
+            conj["magias_preparadas_qty"] = {}
         self._salvar_conjuracao(p, ficha, conj)
         return self.obter_estado(personagem_id)
 
@@ -205,5 +343,6 @@ class Dnd5eConjuracaoFichaService:
         conj = _get_conjuracao(ficha, classe, p.nivel)
         totais = espacos_por_classe_nivel(classe, p.nivel)
         conj["espacos_usados"] = [0] * len(totais)
+        conj["magias_lancadas_ids"] = []
         self._salvar_conjuracao(p, ficha, conj)
         return self.obter_estado(personagem_id)

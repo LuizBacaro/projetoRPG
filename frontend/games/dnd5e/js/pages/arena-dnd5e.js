@@ -4,7 +4,13 @@
 import { CombatenteCard } from '/games/dnd35/js/ui/CombatenteCard.js';
 import { Dnd5eCombatenteAtivoView } from '../ui/Dnd5eCombatenteAtivoView.js';
 import { Dnd5eCondicaoModal } from '../ui/Dnd5eCondicaoModal.js';
-import { Dnd5eSpellCastPanel } from '../ui/Dnd5eSpellCastPanel.js';
+import {
+    Dnd5eArenaMagiasHelper,
+    MODO_CONJURADOR,
+} from '../arena/Dnd5eArenaMagiasHelper.js';
+import { Dnd5eArenaMagiasView } from '../ui/Dnd5eArenaMagiasView.js';
+import { Dnd5eGrimorioService } from '../services/Dnd5eGrimorioService.js';
+import { Dnd5eConjuracaoFichaService } from '../services/Dnd5eConjuracaoFichaService.js';
 
 const ps = new Dnd5ePersonagemService();
 const cs = new Dnd5eCombateService();
@@ -25,7 +31,8 @@ class Dnd5eArenaController {
         this.catalogoClasses = [];
         this.uidManual = 0;
         this.modalCondicao = null;
-        this.spellPanel = new Dnd5eSpellCastPanel(this);
+        this.grimorioService = new Dnd5eGrimorioService();
+        this.conjuracaoFichaService = new Dnd5eConjuracaoFichaService();
         this.ehMestre = false;
         this._init();
     }
@@ -141,10 +148,6 @@ class Dnd5eArenaController {
             sabedoria: p.wisdom,
             carisma: p.charisma,
             salvamentos: this._salvamentosDePersonagem(p, f),
-            arena_conjuracao: f.arena_conjuracao || {
-                espacos_usados: [],
-                magia_concentracao_id: null,
-            },
         };
     }
 
@@ -475,14 +478,162 @@ class Dnd5eArenaController {
     }
 
     async _renderPainelConjuracao(combatente) {
-        const host = document.getElementById('dnd5eSpellCastContainer');
-        if (!host || !this.spellPanel) return;
+        const host = document.getElementById('dnd5eArenaMagiasHost');
+        if (!host) return;
         if (!combatente?.personagemId || !combatente.classe) {
             host.innerHTML = '';
             return;
         }
-        await this.spellPanel.carregarMagias(combatente);
-        this.spellPanel.render(host, combatente);
+        if (!Dnd5eArenaMagiasHelper.ehConjurador(combatente.classe)) {
+            host.innerHTML = '';
+            return;
+        }
+        try {
+            await this._carregarDadosConjuracao(combatente);
+        } catch (e) {
+            host.innerHTML = '';
+            console.warn('⚠️ Falha ao carregar conjuração:', e?.message || e);
+            return;
+        }
+        this._renderMagiasHost(host, combatente);
+    }
+
+    async _carregarDadosConjuracao(combatente) {
+        const [estado, grimorio] = await Promise.all([
+            this.conjuracaoFichaService.obter(combatente.personagemId).catch(() => null),
+            this.grimorioService
+                .listar(combatente.personagemId, {
+                    classe: combatente.classe,
+                    limit: 200,
+                })
+                .catch(() => ({ items: [] })),
+        ]);
+        combatente._conjEstado = estado;
+        combatente._magiasGrimorio = grimorio?.items || [];
+    }
+
+    _renderMagiasHost(host, combatente) {
+        const modo = Dnd5eArenaMagiasHelper.modo(
+            combatente.classe,
+            combatente._conjEstado
+        );
+        if (modo === MODO_CONJURADOR.NENHUM) {
+            host.innerHTML = '';
+            return;
+        }
+        const lancadas = combatente._conjEstado?.magias_lancadas_ids || [];
+        const grupos = Dnd5eArenaMagiasHelper.agruparPorNivel(
+            combatente._magiasGrimorio,
+            combatente._conjEstado,
+            modo,
+            lancadas
+        );
+        const slotBruxo =
+            modo === MODO_CONJURADOR.BRUXO
+                ? Dnd5eArenaMagiasHelper.slotBruxo(combatente._conjEstado)
+                : null;
+
+        host.innerHTML = Dnd5eArenaMagiasView.render(grupos, modo, slotBruxo);
+
+        Dnd5eArenaMagiasView.bindEvents(host, {
+            onLancar: (magiaId, nivel) =>
+                this._lancarMagia(combatente, magiaId, nivel),
+            onRestaurar: (magiaId, nivel) =>
+                this._restaurarMagia(combatente, magiaId, nivel),
+            onSlotDelta: (nivel, delta) =>
+                this._ajustarSlot(combatente, nivel, delta),
+        });
+    }
+
+    async _lancarMagia(combatente, magiaId, nivel) {
+        const magia = (combatente._magiasGrimorio || []).find(
+            (m) => Number(m.magia_id) === Number(magiaId)
+        );
+        const nivelMagia = Number(magia?.magia_nivel ?? nivel) || 0;
+        if (nivelMagia >= 1) {
+            const slotNivel = (combatente._conjEstado?.slots || []).find(
+                (s) => Number(s.nivel) === nivelMagia
+            );
+            if (slotNivel && Number(slotNivel.disponiveis) <= 0) {
+                Toast.error(`Sem espaços de magia disponíveis no nível ${nivelMagia}.`);
+                return;
+            }
+        }
+        try {
+            combatente._conjEstado = await this.conjuracaoFichaService.gastarSlot(
+                combatente.personagemId,
+                nivelMagia,
+                1,
+                magiaId
+            );
+        } catch (e) {
+            Toast.error(e.message || 'Sem espaços de magia disponíveis.');
+            return;
+        }
+        Toast.success(
+            nivelMagia
+                ? `🔥 ${magia?.magia_nome || 'Magia'} — 1 espaço de NIV ${nivelMagia} gasto`
+                : `✨ ${magia?.magia_nome || 'Truque'} conjurado (at-will)`
+        );
+        this._renderMagiasHost(
+            document.getElementById('dnd5eArenaMagiasHost'),
+            combatente
+        );
+    }
+
+    async _restaurarMagia(combatente, magiaId, nivel) {
+        const magia = (combatente._magiasGrimorio || []).find(
+            (m) => Number(m.magia_id) === Number(magiaId)
+        );
+        const nivelMagia = Number(magia?.magia_nivel ?? nivel) || 0;
+        try {
+            combatente._conjEstado =
+                await this.conjuracaoFichaService.devolverSlot(
+                    combatente.personagemId,
+                    nivelMagia,
+                    1,
+                    magiaId
+                );
+        } catch (e) {
+            Toast.error(e.message || 'Não foi possível devolver o espaço.');
+            return;
+        }
+        Toast.success(
+            nivelMagia
+                ? `↩️ Espaço de NIV ${nivelMagia} devolvido`
+                : `↩️ Marcação de ${magia?.magia_nome || 'truque'} removida`
+        );
+        this._renderMagiasHost(
+            document.getElementById('dnd5eArenaMagiasHost'),
+            combatente
+        );
+    }
+
+    async _ajustarSlot(combatente, nivel, delta) {
+        try {
+            if (delta > 0) {
+                combatente._conjEstado =
+                    await this.conjuracaoFichaService.gastarSlot(
+                        combatente.personagemId,
+                        nivel,
+                        1
+                    );
+            } else {
+                combatente._conjEstado =
+                    await this.conjuracaoFichaService.devolverSlot(
+                        combatente.personagemId,
+                        nivel,
+                        1
+                    );
+            }
+        } catch (e) {
+            Toast.error(e.message || 'Não foi possível ajustar o espaço.');
+            return;
+        }
+        this._renderMagiasHost(
+            document.getElementById('dnd5eArenaMagiasHost'),
+            combatente
+        );
     }
 
     async aplicarDano(id, valor) {

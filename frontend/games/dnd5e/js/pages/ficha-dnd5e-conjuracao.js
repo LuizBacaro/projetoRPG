@@ -25,6 +25,8 @@ function renderSlots(estado) {
         if (pct <= 50) cor = '#facc15';
         if (pct <= 25) cor = '#f87171';
         const disabled = s.disponiveis <= 0 ? ' disabled' : '';
+        const tituloGastar =
+            'Gastar 1 espaço de magia de ' + s.nivel + 'º nível (simulação na ficha)';
         return (
             '<motion class="ficha-slot-linha" data-nivel="' +
             s.nivel +
@@ -46,7 +48,9 @@ function renderSlots(estado) {
             s.nivel +
             '"' +
             disabled +
-            '>−1</button>' +
+            ' title="' +
+            tituloGastar +
+            '">Gastar 1</button>' +
             '</div>'
         );
     });

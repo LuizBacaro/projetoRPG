@@ -1,7 +1,7 @@
 /**
  * Grimório D&D 5e — estende o controller compartilhado com preview PT e metadados PHB.
  */
-import { GrimorioController } from '/games/dnd35/js/controllers/GrimorioController.js?v=20260519a';
+import { GrimorioController } from '/games/dnd35/js/controllers/GrimorioController.js?v=20260521a';
 import { escapeHtml } from '/games/dnd35/js/utils/formatters.js';
 
 export class Dnd5eGrimorioController extends GrimorioController {
