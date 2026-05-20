@@ -1552,6 +1552,30 @@
     justify-content: flex-end;
 }
 
+.grimorio-preparo-grupo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    padding: 0.2rem 0.35rem;
+    border-radius: 10px;
+    border: 1px solid rgba(201, 168, 76, 0.18);
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.grimorio-truque-hint {
+    font-family: var(--fonte-titulo);
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #a5f3fc;
+    border: 1px solid rgba(103, 232, 249, 0.35);
+    background: rgba(8, 47, 73, 0.35);
+    border-radius: 999px;
+    padding: 0.2rem 0.45rem;
+    white-space: nowrap;
+}
+
 .grimorio-preparo-inline {
     display: inline-flex;
     align-items: center;
@@ -1602,23 +1626,62 @@
 }
 
 .grimorio-preparo-input {
-    width: 46px;
-    height: 24px;
-    border-radius: 7px;
-    border: 1px solid rgba(201, 168, 76, 0.28);
-    background: rgba(7, 9, 16, 0.72);
-    color: var(--cor-pergaminho);
+    width: 58px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid #facc15;
+    background-color: #6b4f14;
+    background-image: linear-gradient(180deg, #9a7428 0%, #5c4510 100%);
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    caret-color: #fde047;
+    color-scheme: light only;
+    opacity: 1;
     text-align: center;
     font-family: var(--fonte-titulo);
-    font-size: 0.74rem;
-    font-weight: 700;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 30px;
+    letter-spacing: 0.06em;
+    text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.85),
+        0 0 16px rgba(250, 204, 21, 0.75);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        0 0 12px rgba(250, 204, 21, 0.35);
+    -moz-appearance: textfield;
+    appearance: textfield;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.grimorio-preparo-input::-webkit-outer-spin-button,
+.grimorio-preparo-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .grimorio-preparo-input:focus {
     outline: none;
-    border-color: rgba(201, 168, 76, 0.62);
-    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.12);
+    border-color: #fef08a;
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    box-shadow:
+        0 0 0 2px rgba(253, 224, 71, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        0 0 20px rgba(250, 204, 21, 0.55);
+}
+
+.grimorio-preparo-input:disabled {
+    opacity: 0.5;
+    border-color: rgba(201, 168, 76, 0.28);
+    background-image: linear-gradient(
+        180deg,
+        rgba(55, 44, 22, 0.85) 0%,
+        rgba(35, 28, 14, 0.9) 100%
+    );
+    color: rgba(255, 251, 235, 0.45);
+    text-shadow: none;
+    box-shadow: none;
 }
 
 .grimorio-expandir-btn {

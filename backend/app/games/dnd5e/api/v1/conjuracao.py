@@ -48,7 +48,31 @@ def gastar_slot_conjuracao(
     service: Dnd5eConjuracaoFichaService = Depends(get_dnd5e_conjuracao_ficha_service),
     _: object = Depends(requer_dono_ou_admin_dnd5e_personagem),
 ):
-    return service.gastar_slot(personagem_id, payload.nivel_magia, payload.quantidade)
+    return service.gastar_slot(
+        personagem_id,
+        payload.nivel_magia,
+        payload.quantidade,
+        magia_id=payload.magia_id,
+    )
+
+
+@router.post(
+    "/{personagem_id}/conjuracao/devolver-slot",
+    response_model=Dnd5eConjuracaoEstadoResponse,
+    summary="Devolve um espaço de magia previamente gasto (arena)",
+)
+def devolver_slot_conjuracao(
+    personagem_id: int,
+    payload: Dnd5eConjuracaoGastarSlotRequest,
+    service: Dnd5eConjuracaoFichaService = Depends(get_dnd5e_conjuracao_ficha_service),
+    _: object = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    return service.devolver_slot(
+        personagem_id,
+        payload.nivel_magia,
+        payload.quantidade,
+        magia_id=payload.magia_id,
+    )
 
 
 @router.put(
@@ -61,7 +85,11 @@ def preparar_magias_conjuracao(
     service: Dnd5eConjuracaoFichaService = Depends(get_dnd5e_conjuracao_ficha_service),
     _: object = Depends(requer_dono_ou_admin_dnd5e_personagem),
 ):
-    return service.preparar_magias(personagem_id, payload.magia_ids)
+    return service.preparar_magias(
+        personagem_id,
+        payload.magia_ids,
+        payload.magias_quantidade or None,
+    )
 
 
 @router.post(
