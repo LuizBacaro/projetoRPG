@@ -273,7 +273,9 @@ class Dnd5eConjuracaoFichaService:
         totais = espacos_por_classe_nivel(classe, p.nivel)
         conj = _get_conjuracao(ficha, classe, p.nivel)
         qty_map = normalizar_magias_preparadas_qty(
-            magias_quantidade if magias_quantidade is not None else conj.get("magias_preparadas_qty")
+            magias_quantidade
+            if magias_quantidade is not None
+            else conj.get("magias_preparadas_qty")
         )
 
         for mid in magia_ids:
