@@ -424,6 +424,47 @@ function resolveCombatenteSpellSlots(combatente, classe = null) {
     return [...mapa.values()].sort((a, b) => Number(a.nivel || 0) - Number(b.nivel || 0));
 }
 
+function quantidadePreparadaMagia(registro) {
+    return Math.max(1, Number(registro?.quantidade || 1));
+}
+
+function quantidadeUsadaMagia(registro) {
+    const quantidade = quantidadePreparadaMagia(registro);
+    const usos = Number(registro?.usos_realizados ?? (registro?.usada ? 1 : 0) ?? 0);
+    return Math.max(0, Math.min(quantidade, usos));
+}
+
+/**
+ * Mescla slots diarios do combatente com o estado de magias preparadas/decoradas
+ * (mesma logica do painel de slots do Grimorio em D&D 3.5).
+ */
+function resolveSlotsComPreparacao(combatente, classe = null) {
+    const slots = resolveCombatenteSpellSlots(combatente, classe);
+    const preparadasLista = Array.isArray(combatente?.magias_preparadas)
+        ? combatente.magias_preparadas
+        : [];
+
+    return slots.map((slot) => {
+        const nivel = Number(slot?.nivel || 0);
+        const total = Math.max(0, Number(slot?.total || 0));
+        const preparadas = preparadasLista
+            .filter((item) => Number(item.nivel_slot || 0) === nivel)
+            .reduce((soma, item) => soma + quantidadePreparadaMagia(item), 0);
+        const usadas = preparadasLista
+            .filter((item) => Number(item.nivel_slot || 0) === nivel)
+            .reduce((soma, item) => soma + quantidadeUsadaMagia(item), 0);
+        const restantes = Math.max(0, preparadas - usadas);
+
+        return {
+            ...slot,
+            preparadas,
+            usadas,
+            restantes,
+            disponivel: Math.max(0, total - preparadas),
+        };
+    });
+}
+
 const CombatRules = {
     normalizeText,
     normalizeCombatenteTipo,
@@ -439,6 +480,9 @@ const CombatRules = {
     classeTabelaMagias,
     getFallbackSpellSlots,
     resolveCombatenteSpellSlots,
+    resolveSlotsComPreparacao,
+    quantidadePreparadaMagia,
+    quantidadeUsadaMagia,
     textoSlotsClerigoBreakdown,
     bonusMagiasPorNivelDoModificador,
 };
@@ -462,6 +506,9 @@ export {
     classeTabelaMagias,
     getFallbackSpellSlots,
     resolveCombatenteSpellSlots,
+    resolveSlotsComPreparacao,
+    quantidadePreparadaMagia,
+    quantidadeUsadaMagia,
     textoSlotsClerigoBreakdown,
     bonusMagiasPorNivelDoModificador,
     CombatRules,

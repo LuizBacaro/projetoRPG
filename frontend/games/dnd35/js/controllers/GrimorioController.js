@@ -123,6 +123,8 @@ class GrimorioController {
         }
         this._sincronizarModoPainelAdicionar(false);
         document.body.style.overflow = '';
+
+        window._fichaController?.sincronizarSlotsMagiaDesdeGrimorio?.(this.magiasPreparadas);
     }
 
     _sincronizarModoPainelAdicionar(ativo) {
@@ -617,10 +619,6 @@ class GrimorioController {
         const slots = resolveCombatenteSpellSlots(this.combatente, this.classeAtiva);
         const mapa = {};
 
-        if (this.combatente) {
-            this.combatente.magias_slots = slots;
-        }
-
         slots.forEach((slot) => {
             const nivel = Number(slot?.nivel || 0);
             const total = Math.max(0, Number(slot?.total || 0));
@@ -637,9 +635,19 @@ class GrimorioController {
                 total_dominio: slot.total_dominio,
                 preparadas,
                 usadas,
+                restantes: Math.max(0, preparadas - usadas),
                 disponivel: Math.max(total - preparadas, 0),
             };
+
+            // Sincroniza o "usados" no slot do combatente para que o painel
+            // "Slots de Magia" da ficha (renderizarSlotsDeMapia) reflita as
+            // copias preparadas ja consumidas (queimadas hoje).
+            slot.usados = Math.min(total, usadas);
         });
+
+        if (this.combatente) {
+            this.combatente.magias_slots = slots;
+        }
 
         this.slotsDisponiveis = mapa;
     }
@@ -663,9 +671,11 @@ class GrimorioController {
             : '';
 
         grid.innerHTML = legendaClerigo + slots.map((slot) => {
-            const cor = slot.disponivel <= 0 ? '#f87171' : slot.disponivel < slot.total ? '#facc15' : '#4ade80';
+            const restantes = Math.max(0, Number(slot.restantes ?? (slot.preparadas - slot.usadas) ?? 0));
+            const total = Number(slot.total || 0);
+            const cor = restantes <= 0 ? '#f87171' : restantes < total ? '#facc15' : '#4ade80';
             const label = Number(slot.nivel) === 0 ? 'Truque' : `N${slot.nivel}`;
-            const largura = slot.total > 0 ? Math.max(8, (slot.disponivel / slot.total) * 100) : 0;
+            const largura = total > 0 ? Math.max(8, (restantes / total) * 100) : 0;
             const origem = ehClerigo && textoSlotsClerigoBreakdown(slot)
                 ? `<span class="grimorio-slot-origem">${textoSlotsClerigoBreakdown(slot)}</span>`
                 : '';
@@ -679,7 +689,7 @@ class GrimorioController {
                     <span class="grimorio-slot-contagem" style="color:${cor}">${
                         this._ehModo5e()
                             ? `${slot.disponivel}/${slot.total}`
-                            : `${slot.preparadas}/${slot.total}`
+                            : `${restantes}/${total}`
                     }</span>
                     <span class="grimorio-slot-usadas">${
                         this._ehModo5e()
@@ -2149,6 +2159,15 @@ class GrimorioController {
             });
         });
 
+        lista.querySelectorAll('.grimorio-queimar-btn').forEach((button) => {
+            button.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                if (button.disabled) return;
+                const magiaId = Number(button.dataset.magiaId);
+                await this._queimarMagiaPreparada(magiaId);
+            });
+        });
+
         lista.querySelectorAll('.grimorio-expandir-btn').forEach((button) => {
             button.addEventListener('click', (event) => {
                 event.stopPropagation();
@@ -2262,6 +2281,34 @@ class GrimorioController {
         return `<div class="grimorio-detalhe-linha"><span class="grimorio-detalhe-chave">Descricao</span><span class="grimorio-detalhe-valor">${escapeHtml(magia.descricao || '-')}</span></div>`;
     }
 
+    /**
+     * Renderiza o botao 🔥 "Lancar copia preparada" que aparece ao lado das
+     * acoes do card quando a magia esta preparada. Quando todas as copias ja
+     * foram consumidas hoje, o botao vira 💨 e desabilita ate o Descanso Longo.
+     */
+    _renderizarBotaoQueimarMagia(magiaId, preparo) {
+        const quantidade = Math.max(0, Number(preparo.quantidadeAtual || 0));
+        const usados = Math.max(0, Number(preparo.usosRealizados || 0));
+        const restantes = Math.max(0, quantidade - usados);
+        const nivelSlot = Number(preparo.nivelSlot || 0);
+        const totalmenteUsada = quantidade > 0 && restantes <= 0;
+        const sufixoContador = quantidade > 1 ? ` ${restantes}/${quantidade}` : '';
+        const icone = totalmenteUsada ? '💨' : '🔥';
+        const titulo = totalmenteUsada
+            ? 'Magia já consumida hoje. Realize um Descanso Longo para lançá-la novamente.'
+            : quantidade > 1
+              ? `Lançar (queimar) uma cópia preparada — ${restantes} de ${quantidade} restantes`
+              : 'Lançar (queimar) esta cópia preparada';
+        return `
+            <button class="grimorio-queimar-btn ${totalmenteUsada ? 'grimorio-queimar-btn--consumida' : ''}"
+                    data-magia-id="${magiaId}"
+                    data-nivel="${nivelSlot}"
+                    data-instancia="${Math.max(1, restantes)}"
+                    data-acao-preparo="usar"
+                    title="${escapeHtml(titulo)}"
+                    ${totalmenteUsada ? 'disabled' : ''}>${icone}${sufixoContador}</button>
+        `;
+    }
 
     _renderizarCard(item) {
         const magia = item.magia || {};
@@ -2282,6 +2329,9 @@ class GrimorioController {
             ? `<p class="grimorio-card-aviso-nivel">${escapeHtml(this._mensagemMagiaNivelBloqueado(magia.nivel))}</p>`
             : '';
         const quantidadeRapida = this._obterQuantidadePreparacaoRapida(id, preparo);
+        // Regra D&D 3.5: depois que uma cópia preparada eh queimada (lancada), a magia
+        // nao pode ser repreparada nem ter quantidade alterada ate o Descanso Longo.
+        const possuiUsosConsumidos = !classeEspontanea && (Number(preparo.usosRealizados || 0) > 0);
         const mostrarQtdInline = !classeEspontanea && (!modo5ePrep || preparo.exigeQuantidade);
         const descricaoPreparacao = classeEspontanea
             ? 'Conjuracao espontanea: use os slots de magia na arena para controlar os usos do dia.'
@@ -2322,7 +2372,14 @@ class GrimorioController {
                 : `Marcar ${magia.nome || 'magia'} como preparada hoje`;
         const tituloPrepararFinal = nivelBloqueado
             ? this._mensagemMagiaNivelBloqueado(magia.nivel)
-            : tituloPreparar;
+            : possuiUsosConsumidos
+              ? 'Esta magia já foi lançada hoje. Realize um Descanso Longo para prepará-la novamente.'
+              : tituloPreparar;
+        // D&D 5e nao usa "queimar magia preparada" (consome slot apenas), entao restringimos
+        // o botao ao modo classico (3.5) com classes preparadas.
+        const botaoQueimar = (!classeEspontanea && !modo5ePrep && preparo.preparada)
+            ? this._renderizarBotaoQueimarMagia(id, preparo)
+            : '';
 
         const detalhes = `
             <div class="grimorio-card-detalhes ${aberta ? 'show' : ''}">
@@ -2354,6 +2411,7 @@ class GrimorioController {
                         </div>
                     </div>
                     <div class="grimorio-acoes-card">
+                        ${botaoQueimar}
                         ${itemPersistido ? `<button class="grimorio-favorita-btn ${item.favorita ? 'ativa' : ''}" data-magia-id="${id}" title="Favoritar">★</button>` : ''}
                         ${itemPersistido ? `<button class="grimorio-anotacao-btn" data-magia-id="${id}" title="Anotacoes">✎</button>` : ''}
                         ${classeMago && itemPersistido ? `<button class="grimorio-remover-btn" data-magia-id="${id}" title="Remover">🗑</button>` : ''}
@@ -2376,16 +2434,17 @@ class GrimorioController {
                     <button class="grimorio-expandir-btn" data-id="${id}">${aberta ? '▲ Menos detalhes' : '▼ Ver detalhes'}</button>
                         ${!classeEspontanea ? `<div class="grimorio-rodape-direita">
                             <div class="grimorio-preparo-grupo">
-                            ${mostrarQtdInline ? `<div class="grimorio-preparo-inline ${(!preparo.temEspaco && !preparo.preparada) ? 'is-disabled' : ''}" data-magia-id="${id}">
+                            ${mostrarQtdInline ? `<div class="grimorio-preparo-inline ${(!preparo.temEspaco && !preparo.preparada) || possuiUsosConsumidos ? 'is-disabled' : ''}" data-magia-id="${id}">
                                 <span class="grimorio-preparo-inline-label">Qtd</span>
-                                <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="-1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>−</button>
-                                <input class="grimorio-preparo-input" data-magia-id="${id}" type="number" min="${preparo.preparada ? 0 : (preparo.temEspaco ? 1 : 0)}" max="${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}" step="1" value="${quantidadeRapida}" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>
-                                <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="1" ${(!preparo.temEspaco && !preparo.preparada) ? 'disabled' : ''}>+</button>
+                                <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="-1" ${(!preparo.temEspaco && !preparo.preparada) || possuiUsosConsumidos ? 'disabled' : ''}>−</button>
+                                <input class="grimorio-preparo-input" data-magia-id="${id}" type="number" min="${preparo.preparada ? 0 : (preparo.temEspaco ? 1 : 0)}" max="${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}" step="1" value="${quantidadeRapida}" ${(!preparo.temEspaco && !preparo.preparada) || possuiUsosConsumidos ? 'disabled' : ''}>
+                                <button class="grimorio-preparo-step" type="button" data-magia-id="${id}" data-delta="1" ${(!preparo.temEspaco && !preparo.preparada) || possuiUsosConsumidos ? 'disabled' : ''}>+</button>
                                 <span class="grimorio-preparo-inline-max">máx ${Math.max(quantidadeRapida, preparo.quantidadeMaxima || 0)}</span>
                             </div>` : ''}
-                            <button class="grimorio-preparar-btn ${preparo.preparada ? 'ativa' : ''}" data-magia-id="${id}" data-modo5e="${modo5ePrep ? '1' : '0'}" title="${escapeHtml(tituloPrepararFinal)}" ${((!preparo.temEspaco && !preparo.preparada) || nivelBloqueado) ? 'disabled' : ''}>${textoPreparar}</button>
+                            <button class="grimorio-preparar-btn ${preparo.preparada ? 'ativa' : ''}" data-magia-id="${id}" data-modo5e="${modo5ePrep ? '1' : '0'}" title="${escapeHtml(tituloPrepararFinal)}" ${((!preparo.temEspaco && !preparo.preparada) || nivelBloqueado || possuiUsosConsumidos) ? 'disabled' : ''}>${textoPreparar}</button>
                             ${modo5ePrep && !mostrarQtdInline ? '<span class="grimorio-truque-hint" title="Truques são at-will — não gastam espaço de magia">at-will</span>' : ''}
                             </div>
+                            ${possuiUsosConsumidos ? '<span class="grimorio-preparada-badge grimorio-preparada-badge--consumida" title="Realize um Descanso Longo para preparar novamente">🌙 Aguardando descanso longo</span>' : ''}
                             ${item.anotacoes ? '<span class="grimorio-preparada-badge">Com anotacoes</span>' : (item._catalogo_expandido ? (nivelBloqueado ? '<span class="grimorio-preparada-badge grimorio-preparada-badge--bloqueado">Nível indisponível</span>' : '<span class="grimorio-preparada-badge">Disponível hoje</span>') : '')}
                         </div>` : ''}
                 </div>
@@ -2497,6 +2556,97 @@ class GrimorioController {
         return res.json();
     }
 
+    /**
+     * Consome (queima) uma copia preparada da magia: incrementa usos_realizados
+     * no backend (PATCH .../usar?action=usar), recarrega estado local e
+     * notifica outras abas via BroadcastChannel. O slot continua marcado como
+     * gasto ate o Descanso Longo, honrando a regra de D&D 3.5.
+     */
+    async _queimarMagiaPreparada(magiaId) {
+        const item = this.itensGrimorio.find(
+            (entry) => Number(entry.magia_id) === Number(magiaId)
+        );
+        if (!item) return;
+
+        const preparo = this._obterInfoPreparacao(item);
+        if (!preparo.preparada) {
+            this._mostrarToast('Esta magia não está preparada hoje.', 'info');
+            return;
+        }
+
+        const restantes = Math.max(
+            0,
+            Number(preparo.quantidadeAtual || 0) - Number(preparo.usosRealizados || 0)
+        );
+        if (restantes <= 0) {
+            this._mostrarToast(
+                'Magia já consumida hoje. Realize um Descanso Longo para lançá-la novamente.',
+                'info'
+            );
+            return;
+        }
+
+        const combatenteId = this.combatente?.id;
+        if (!combatenteId) return;
+
+        const nivelSlot = Number(preparo.nivelSlot || 0);
+
+        try {
+            await this.magiaPreparadaService.toggleUsada(combatenteId, magiaId, 'usar');
+            await this._carregarMagiasPreparadas();
+            this._renderizarPainelSlots();
+            this.filtrar();
+
+            this._broadcastMagiaUsada(combatenteId, magiaId, nivelSlot);
+            this._broadcastPreparacaoAtualizada({
+                origem: 'queimar-grimorio',
+                magiaId,
+                nivel: nivelSlot,
+            });
+            window._fichaController?.sincronizarSlotsMagiaDesdeGrimorio?.(this.magiasPreparadas);
+
+            const nomeMagia = item.magia?.nome || `magia #${magiaId}`;
+            const novoRestante = Math.max(0, restantes - 1);
+            const sufixo = Number(preparo.quantidadeAtual || 1) > 1
+                ? ` (${novoRestante}/${preparo.quantidadeAtual} restantes)`
+                : '';
+            this._mostrarToast(`🔥 ${nomeMagia} lançada${sufixo}.`, 'sucesso');
+        } catch (error) {
+            this._mostrarToast(
+                error.message || 'Não foi possível lançar esta magia preparada.',
+                'erro'
+            );
+        }
+    }
+
+    /**
+     * Emite o evento "magia-usada" no canal `magias-rpg`, no mesmo formato que a
+     * arena envia. Permite ao FichaPersonagemController._processarEventoMagia
+     * atualizar o painel `fichaMagiasGrid` em outras abas/janelas, incluindo o
+     * efeito visual de pulsar o slot afetado.
+     */
+    _broadcastMagiaUsada(combatenteId, magiaId, nivel) {
+        if (!this._canal || !combatenteId) return;
+        const slotAtual = this.slotsDisponiveis?.[Number(nivel)] || null;
+        const total = Number(slotAtual?.total || 0);
+        const restantes = Number(slotAtual?.restantes ?? Math.max(0, (slotAtual?.preparadas || 0) - (slotAtual?.usadas || 0)));
+        try {
+            this._canal.postMessage({
+                tipo: 'magia-usada',
+                combatenteId: Number(combatenteId),
+                magiaId: Number(magiaId),
+                nivel: Number(nivel),
+                usada: true,
+                restantes,
+                total,
+                origem: 'queimar-grimorio',
+                timestamp: Date.now(),
+            });
+        } catch (_error) {
+            // Broadcast e opcional.
+        }
+    }
+
     async _togglePreparada(magiaId, quantidadeDesejada = null) {
         const item = this.itensGrimorio.find((entry) => Number(entry.magia_id) === Number(magiaId));
         if (!item) return;
@@ -2507,6 +2657,19 @@ class GrimorioController {
         }
 
         const preparo = this._obterInfoPreparacao(item);
+
+        // Regra D&D 3.5: depois que uma copia foi lancada (usos_realizados > 0),
+        // a magia precisa de um Descanso Longo antes de ser preparada novamente
+        // ou ter sua quantidade alterada. So vale para classes preparadas.
+        const classeEspontanea = this._classeEhEspontanea();
+        if (!classeEspontanea && Number(preparo.usosRealizados || 0) > 0) {
+            this._mostrarToast(
+                'Esta magia já foi lançada hoje. Realize um Descanso Longo para prepará-la novamente.',
+                'info'
+            );
+            return;
+        }
+
         if (!preparo.podePreparar && !preparo.preparada) {
             this._mostrarToast('Esta magia não possui slot disponível para ser preparada hoje.', 'info');
             return;
@@ -2554,6 +2717,7 @@ class GrimorioController {
                 this._renderizarModalDetalhes();
             }
             this._broadcastPreparacaoAtualizada();
+            window._fichaController?.sincronizarSlotsMagiaDesdeGrimorio?.(this.magiasPreparadas);
         } catch (error) {
             this._mostrarToast(error.message || 'Não foi possível atualizar a preparação da magia.', 'erro');
         }
@@ -2602,9 +2766,7 @@ class GrimorioController {
                     await this.magiaPreparadaService.descansoLongo(this.combatente.id, true);
                     this._aplicarDescansoLongoEstadoLocal();
                     await this._recarregarDados();
-                    if (window._fichaController?.renderizarSlotsDeMapia) {
-                        window._fichaController.renderizarSlotsDeMapia();
-                    }
+                    window._fichaController?.sincronizarSlotsMagiaDesdeGrimorio?.(this.magiasPreparadas);
                     this._broadcastPreparacaoAtualizada({ resetSlots: true, origem: 'descanso-longo' });
                     this._mostrarToast('Descanso longo realizado. As magias preparadas de hoje foram limpas.', 'sucesso');
                 } catch (error) {
