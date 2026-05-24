@@ -19,6 +19,7 @@ from fastapi import (
 from app.core.dependencies import get_combatente_service
 from app.games.dnd35.schemas.combatente import (
     CombatenteResponse,
+    CombatenteUpdate,
     DanoCuraMassaRequest,
     DanoCuraMassaResponse,
     DanoCuraRequest,
@@ -312,13 +313,16 @@ def aplicar_cura_massa(
 @router.patch("/{combatente_id}", response_model=CombatenteResponse)
 def atualizar_parcial(
     combatente_id: int,
-    data: dict,
+    data: CombatenteUpdate,
     service: CombatenteService = Depends(get_combatente_service),
     _: Usuario = Depends(requer_dono_ou_admin_combatente),
 ):
-    """Atualiza campos específicos de um combatente"""
+    """Atualiza campos específicos de um combatente (JSON parcial)."""
+    payload = data.model_dump(exclude_unset=True)
+    if not payload:
+        raise HTTPException(status_code=400, detail="Nenhum campo para atualizar")
     try:
-        return service.atualizar(combatente_id, data)
+        return service.atualizar(combatente_id, payload)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

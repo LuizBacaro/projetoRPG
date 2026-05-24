@@ -164,6 +164,45 @@ export class CombatenteService {
     }
 
     /**
+     * Atualiza campos específicos via PATCH JSON (evita sobrescrever a ficha inteira).
+     * @param {number} id
+     * @param {Object} campos
+     * @returns {Promise<Combatente>}
+     */
+    async atualizarCampos(id, campos) {
+        try {
+            const url = `${getApiUrl('/combatentes')}/${id}`;
+
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+                body: JSON.stringify(campos)
+            });
+
+            if (!response.ok) {
+                let detail = 'Erro ao atualizar combatente';
+                try {
+                    const errorData = await response.json();
+                    detail = errorData.detail || detail;
+                } catch {
+                    // mantém mensagem padrão
+                }
+                throw new Error(detail);
+            }
+
+            const data = await response.json();
+            return this._toModel(data);
+
+        } catch (error) {
+            console.error('❌ Erro ao atualizar campos do combatente:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Atualiza um combatente completo
      * @param {number} id
      * @param {FormData} formData
