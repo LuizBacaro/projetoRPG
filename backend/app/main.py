@@ -407,7 +407,12 @@ app.add_middleware(
         "If-Match",
         "If-None-Match",
     ],
-    expose_headers=["Content-Length"],
+    expose_headers=[
+        "Content-Length",
+        "X-Total-Count",
+        "X-Skip",
+        "X-Limit",
+    ],
     max_age=600,
 )
 

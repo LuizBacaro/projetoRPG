@@ -1,4 +1,4 @@
-import { MagiaService } from '../services/MagiaService.js?v=20260523a';
+import { MagiaService } from '../services/MagiaService.js?v=20260524a';
 import { GrimorioService } from '../services/GrimorioService.js?v=20260411b';
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { getApiUrl } from '../config/api.config.js';
@@ -10,11 +10,12 @@ import {
 } from '../utils/graceful-degradation.js';
 import {
     isClasseConjuradora,
+    classeTabelaMagias,
     normalizeClasseConjuradora,
     normalizeText,
     resolveCombatenteSpellSlots,
     textoSlotsClerigoBreakdown,
-} from '../utils/combat-rules.js?v=20260518b';
+} from '../utils/combat-rules.js?v=20260524a';
 
 const ESCOLAS_ORDEM = [
     'Abjuracao',
@@ -144,7 +145,9 @@ class GrimorioController {
             painel.classList.add('show');
             this._sincronizarModoPainelAdicionar(true);
             this.paginacaoAdicionar.page = 1;
-            this._renderizarPainelAdicionar();
+            // Recarrega catálogo ao abrir (evita cache stale de sessões/deploys anteriores).
+            this._carregarCatalogoClasse({ forceRefresh: true })
+                .finally(() => this._renderizarPainelAdicionar());
             setTimeout(() => {
                 document.getElementById('grimorioAdicionarBusca')?.focus();
             }, 30);
@@ -311,15 +314,27 @@ class GrimorioController {
         }
     }
 
-    async _carregarCatalogoClasse() {
-        if (!this.classeAtiva) {
+    async _carregarCatalogoClasse({ forceRefresh = false } = {}) {
+        const classeApi = this._classeCatalogoApi();
+        if (!classeApi) {
             this.catalogoClasse = [];
             this.catalogoIndex = new Map();
             return;
         }
 
-        this.catalogoClasse = await this.magiaService.listarPorClasse(this.classeAtiva);
+        if (forceRefresh) {
+            this.magiaService.limparCacheClasse(classeApi);
+        }
+
+        this.catalogoClasse = await this.magiaService.listarTodasPorClasse(classeApi, { forceRefresh });
         this.catalogoIndex = new Map(this.catalogoClasse.map((magia) => [Number(magia.id), magia]));
+    }
+
+    _classeCatalogoApi() {
+        const base = this.classeAtiva
+            || normalizeClasseConjuradora(this.combatente?.classe)
+            || String(this.combatente?.classe || '').trim();
+        return classeTabelaMagias(base) || base || '';
     }
 
     async _carregarItensGrimorio() {
@@ -1511,60 +1526,31 @@ class GrimorioController {
             paginacaoWrap.innerHTML = '<span class="grimorio-paginacao-info">Carregando página...</span>';
         }
 
-        // Garante que o catálogo da classe esteja em memória antes de paginar.
-        // Se a inicialização do grimório falhou (rede, deploy, cache stale), tenta novamente
-        // ao abrir o painel "Adicionar magia conhecida" para evitar lista permanentemente vazia.
+        // Catálogo completo em memória (mesmo fluxo do painel de troca) — evita depender
+        // de paginação server-side + headers CORS que podem falhar silenciosamente em produção.
         if (!Array.isArray(this.catalogoClasse) || this.catalogoClasse.length === 0) {
             try {
-                await this._carregarCatalogoClasse();
+                await this._carregarCatalogoClasse({ forceRefresh: true });
             } catch (error) {
                 console.warn('[GrimorioController] Falha ao recarregar catálogo da classe:', error);
             }
-        }
-
-        let pagina = null;
-        try {
-            pagina = await this.magiaService.listarPorClassePaginado(this.classeAtiva, {
-                nome: termo,
-                nivel: nivelFiltro,
-                escola: escolaFiltro,
-                componentes: componenteFiltro,
-                skip,
-                limit: pageSize,
-            });
-        } catch (error) {
-            console.error('[GrimorioController] Falha ao paginar catálogo de magias:', error);
-            pagina = null;
         }
 
         if (requestId !== this.paginacaoAdicionar.requestId) {
             return;
         }
 
-        // Fallback resiliente: se a API paginada falhou ou veio vazia, mas o catálogo
-        // de classe já foi carregado, paginamos client-side. Garante que o jogador veja
-        // as magias disponíveis mesmo com instabilidade de rede ou cache stale do backend.
-        const totalApi = Math.max(0, Number(pagina?.total || 0));
-        const itensApi = Array.isArray(pagina?.items) ? pagina.items : [];
-        const usarFallbackCatalogo =
-            (!pagina || itensApi.length === 0)
-            && Array.isArray(this.catalogoClasse)
-            && this.catalogoClasse.length > 0;
+        const catalogoBase = Array.isArray(this.catalogoClasse) ? this.catalogoClasse : [];
+        const idsExistentesSet = idsExistentes;
+        const candidatas = catalogoBase.filter((magia) => !idsExistentesSet.has(Number(magia?.id)));
+        const todasFiltradas = this._filtrarCatalogoClienteSide(candidatas, {
+            nome: termo,
+            nivel: nivelFiltro,
+            escola: escolaFiltro,
+            componentes: componenteFiltro,
+        });
 
-        let totalBackend = totalApi;
-        let itensPagina = itensApi;
-
-        if (usarFallbackCatalogo) {
-            const todasFiltradas = this._filtrarCatalogoClienteSide(this.catalogoClasse, {
-                nome: termo,
-                nivel: nivelFiltro,
-                escola: escolaFiltro,
-                componentes: componenteFiltro,
-            });
-            totalBackend = todasFiltradas.length;
-            itensPagina = todasFiltradas.slice(skip, skip + pageSize);
-        }
-
+        const totalBackend = todasFiltradas.length;
         const totalPaginas = Math.max(1, Math.ceil(totalBackend / pageSize));
         this.paginacaoAdicionar.total = totalBackend;
         this.paginacaoAdicionar.totalPages = totalPaginas;
@@ -1575,8 +1561,7 @@ class GrimorioController {
             return;
         }
 
-        let disponiveis = itensPagina;
-        disponiveis = disponiveis.filter((magia) => !idsExistentes.has(Number(magia.id)));
+        let disponiveis = todasFiltradas.slice(skip, skip + pageSize);
 
         if (disponiveis.length === 0) {
             this.magiasDisponiveisAdicionar = [];
@@ -1585,11 +1570,13 @@ class GrimorioController {
                 paginaAtual: this.paginacaoAdicionar.page,
                 totalPaginas: this.paginacaoAdicionar.totalPages,
             });
-            const semCatalogo = totalBackend === 0
-                && (!Array.isArray(this.catalogoClasse) || this.catalogoClasse.length === 0);
+            const semCatalogo = catalogoBase.length === 0;
+            const todasConhecidas = catalogoBase.length > 0 && candidatas.length === 0;
             const mensagem = semCatalogo
                 ? 'Não foi possível carregar o catálogo de magias da classe. Tente fechar e reabrir o grimório (a conexão com o servidor pode ter falhado).'
-                : 'Nenhuma magia encontrada com os filtros atuais.';
+                : (todasConhecidas
+                    ? 'Todas as magias desta classe já constam no grimório.'
+                    : 'Nenhuma magia encontrada com os filtros atuais.');
             lista.innerHTML = `<div class="grimorio-vazio">${escapeHtml(mensagem)}</div>`;
             preview.innerHTML = '<div class="grimorio-historico-vazio">Nenhuma magia corresponde aos filtros selecionados.</div>';
             if (paginacaoWrap) {
@@ -1767,7 +1754,7 @@ class GrimorioController {
             .trim();
         const escolaNorm = String(escola || 'todas').toLowerCase().trim();
         const componenteNorm = String(componentes || 'todos').toUpperCase().trim();
-        const nivelNorm = String(nivel ?? 'todos');
+        const nivelNorm = String(nivel ?? 'todos').toLowerCase().trim();
 
         return catalogo.filter((magia) => {
             if (!magia) return false;
@@ -3104,10 +3091,16 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(tentarInicializar);
 
             const token = localStorage.getItem('token');
-            // Singleton por token — preserva cache de catálogo entre re-aberturas do grimório
-            if (!window._magiaServiceSingleton || window._magiaServiceSingleton._token !== token) {
+            // Singleton por token + versão — invalida cache JS antigo após deploy
+            const MAGIA_SERVICE_VERSION = '20260524a';
+            if (
+                !window._magiaServiceSingleton
+                || window._magiaServiceSingleton._token !== token
+                || window._magiaServiceSingleton._version !== MAGIA_SERVICE_VERSION
+            ) {
                 window._magiaServiceSingleton = new MagiaService(token);
                 window._magiaServiceSingleton._token = token;
+                window._magiaServiceSingleton._version = MAGIA_SERVICE_VERSION;
             }
             const magiaService = window._magiaServiceSingleton;
             const grimorioService = new GrimorioService(token);
