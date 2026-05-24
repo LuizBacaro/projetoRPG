@@ -793,6 +793,7 @@ def _inicializar_banco_critico(db) -> None:
             ("garantir_coluna_raca_slug", _garantir_coluna_raca_slug),
             ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
             ("garantir_colunas_dinheiro", _garantir_colunas_dinheiro),
+            ("garantir_colunas_perfil_divino", _garantir_colunas_perfil_divino),
             ("garantir_colunas_talentos", _garantir_colunas_talentos),
             (
                 "garantir_colunas_armaduras_protecao",
@@ -1206,6 +1207,33 @@ def _garantir_colunas_dinheiro() -> None:
             conn.execute(
                 text(
                     f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql} DEFAULT 0"
+                )
+            )
+
+
+def _garantir_colunas_perfil_divino() -> None:
+    """Garante alinhamento, domínios e divindade em bancos legados."""
+    inspector = inspect(engine)
+    tabelas_existentes = set(inspector.get_table_names())
+    if "combatentes" not in tabelas_existentes:
+        return
+
+    colunas_existentes = {col["name"] for col in inspector.get_columns("combatentes")}
+    colunas_esperadas = {
+        "alinhamento": "VARCHAR",
+        "dominios": "VARCHAR",
+        "divindade": "VARCHAR",
+    }
+    with engine.begin() as conn:
+        for coluna, tipo_sql in colunas_esperadas.items():
+            if coluna in colunas_existentes:
+                continue
+            logger.warning(
+                "⚠️  coluna combatentes.%s ausente; aplicando schema guard", coluna
+            )
+            conn.execute(
+                text(
+                    f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql} DEFAULT ''"
                 )
             )
 
