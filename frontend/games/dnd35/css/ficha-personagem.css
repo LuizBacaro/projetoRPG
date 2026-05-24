@@ -728,7 +728,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0;
+    gap: 0.08rem;
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
 }
@@ -746,19 +746,22 @@ body {
                 inset 0 2px 8px rgba(201,168,76,0.3);
 }
 
-.circulo-valor {
+.circulo-mod {
     font-family: var(--fonte-titulo);
-    font-size: 1.2rem;
+    font-size: 1.28rem;
     font-weight: 700;
-    color: var(--cor-madeira);
+    color: var(--cor-madeira-claro);
     line-height: 1;
+    letter-spacing: -0.02em;
 }
 
-.circulo-mod {
-    font-size: 0.68rem;
-    color: var(--cor-tinta-suave);
+.circulo-valor {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1a1208;
     font-family: var(--fonte-titulo);
     line-height: 1;
+    letter-spacing: 0.02em;
 }
 
 .circulo-label {
@@ -3193,11 +3196,16 @@ body {
         0 0 16px rgba(201,168,76,0.2);
 }
 
-/* Valor do atributo pulsa levemente no hover */
-.circulo-externo:hover .circulo-valor {
+/* Modificador em evidencia pulsa levemente no hover */
+.circulo-externo:hover .circulo-mod {
     color: var(--cor-dourada);
     text-shadow: 0 0 6px rgba(201,168,76,0.4);
     transition: color 0.2s, text-shadow 0.2s;
+}
+
+.circulo-externo:hover .circulo-valor {
+    color: var(--cor-madeira-claro);
+    transition: color 0.2s;
 }
 
 /* ── 8. Sections: Gold Border Shimmer + Hover ── */
