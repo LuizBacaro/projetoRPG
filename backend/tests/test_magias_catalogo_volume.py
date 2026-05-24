@@ -65,7 +65,9 @@ def test_listar_mago_completo_com_catalogo_acima_de_500(test_db):
     )
 
     assert response.headers["x-total-count"] == str(len(magos))
-    nomes = {item["nome"] if isinstance(item, dict) else item.nome for item in resultado}
+    nomes = {
+        item["nome"] if isinstance(item, dict) else item.nome for item in resultado
+    }
     assert nomes == {m.nome for m in magos}
 
 
