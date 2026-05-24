@@ -108,10 +108,16 @@ class GrimorioController {
         if (!overlay) return;
 
         overlay.classList.add('show');
-        document.body.style.overflow = 'hidden';
+        if (!this._ehPaginaStandalone()) {
+            document.body.style.overflow = 'hidden';
+        }
 
         await this._recarregarDados();
         this._configurarFiltros();
+    }
+
+    _ehPaginaStandalone() {
+        return document.body.classList.contains('grimorio-standalone');
     }
 
     fecharGrimorio() {
@@ -122,7 +128,9 @@ class GrimorioController {
             this._debounceBuscaAdicionar = null;
         }
         this._sincronizarModoPainelAdicionar(false);
-        document.body.style.overflow = '';
+        if (!this._ehPaginaStandalone()) {
+            document.body.style.overflow = '';
+        }
 
         window._fichaController?.sincronizarSlotsMagiaDesdeGrimorio?.(this.magiasPreparadas);
     }
