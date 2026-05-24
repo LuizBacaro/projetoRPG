@@ -6,6 +6,19 @@
  */
 
 import { getApiUrl } from '../config/api.config.js';
+import { classeTabelaMagias } from '../utils/combat-rules.js?v=20260524a';
+
+/** Aliases de classe → token usado na API /magias (MAIÚSCULAS, sem acento). */
+const CLASSE_API_ALIASES = {
+    FEITICEIRO: 'MAGO',
+    SORCERER: 'MAGO',
+    WIZARD: 'MAGO',
+    PATRULHEIRO: 'RANGER',
+    CLERIC: 'CLERIGO',
+    DRUID: 'DRUIDA',
+    BARD: 'BARDO',
+    PALADIN: 'PALADINO',
+};
 
 export class MagiaService {
     constructor(token) {
@@ -27,17 +40,20 @@ export class MagiaService {
      * @returns {string}
      */
     _normalizarClasse(classe) {
-        const valorBase = String(classe || '')
+        const tabela = classeTabelaMagias(classe) || String(classe || '').trim();
+        const valorBase = String(tabela || classe || '')
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '');
         let classNorm = valorBase.toUpperCase().trim();
-        
-        // Mapear Feiticeiro para Mago (mesmas magias)
-        if (classNorm === 'FEITICEIRO') {
-            classNorm = 'MAGO';
-        }
-        
+
+        classNorm = CLASSE_API_ALIASES[classNorm] || classNorm;
+
         return classNorm;
+    }
+
+    _normalizarFiltroToken(valor, padrao) {
+        const token = String(valor ?? padrao).trim().toLowerCase();
+        return token || padrao;
     }
 
     /**
@@ -45,38 +61,31 @@ export class MagiaService {
      * @param {string} classe - Ex: 'Mago', 'Clérigo' (será convertido para MAIÚSCULA)
      * @returns {Promise<Array>}
      */
-    async listarPorClasse(classe) {
-        // ✅ NORMALIZA PARA MAIÚSCULA
+    async listarPorClasse(classe, { forceRefresh = false } = {}) {
         const classeNormalizada = this._normalizarClasse(classe);
 
-        if (this._cache.has(classeNormalizada)) {
-            return this._cache.get(classeNormalizada);
+        if (!classeNormalizada) {
+            return [];
+        }
+
+        if (!forceRefresh && this._cache.has(classeNormalizada)) {
+            const cached = this._cache.get(classeNormalizada);
+            if (Array.isArray(cached) && cached.length > 0) {
+                return cached;
+            }
         }
 
         try {
-            const pagina = await this.listarPorClassePaginado(classeNormalizada, { skip: 0, limit: 500 });
+            const magias = await this.listarTodasPorClasse(classeNormalizada, { forceRefresh });
 
-            if (!pagina || !Array.isArray(pagina.items)) {
-                console.warn('⚠️ Filtro na API paginada falhou, usando fallback...');
-                return await this._listarTodasEFiltrar(classeNormalizada);
-            }
-
-            const magias = this._normalizarNiveisPorClasse(pagina.items, classeNormalizada);
-
-            // Catálogo vazio na API (sem dados importados) ou filtro sem match → tenta fallback
             if (!magias || magias.length === 0) {
-                const fallback = await this._listarTodasEFiltrar(classeNormalizada);
-                if (!fallback.length) {
-                    console.info(
-                        '[MagiaService] Catálogo vazio ou sem magias para a classe; ' +
-                        'importe magias (admin) ou verifique a classe do personagem.'
-                    );
-                }
-                return fallback;
+                console.info(
+                    '[MagiaService] Catálogo vazio ou sem magias para a classe; ' +
+                    'importe magias (admin) ou verifique a classe do personagem.'
+                );
+                return [];
             }
 
-            // Apenas cacheia resultados não-vazios para permitir nova tentativa quando
-            // a primeira chamada falha por motivos transitórios (deploy, cache do backend, rede).
             this._cache.set(classeNormalizada, magias);
             return magias;
         } catch (err) {
@@ -84,10 +93,62 @@ export class MagiaService {
             try {
                 return await this._listarTodasEFiltrar(classeNormalizada);
             } catch (fallbackErr) {
-                console.error(`❌ Fallback também falhou:`, fallbackErr);
+                console.error('❌ Fallback também falhou:', fallbackErr);
                 throw fallbackErr;
             }
         }
+    }
+
+    /**
+     * Carrega todas as magias de uma classe (paginação server-side com ?classe=).
+     * @param {string} classe
+     * @param {{ forceRefresh?: boolean }} [opts]
+     */
+    async listarTodasPorClasse(classe, { forceRefresh = false } = {}) {
+        const classeNormalizada = this._normalizarClasse(classe);
+        if (!classeNormalizada) return [];
+
+        if (!forceRefresh && this._cache.has(classeNormalizada)) {
+            const cached = this._cache.get(classeNormalizada);
+            if (Array.isArray(cached) && cached.length > 0) {
+                return cached;
+            }
+        }
+
+        const pageSize = 500;
+        let skip = 0;
+        let totalEsperado = Infinity;
+        const acumulado = [];
+
+        while (skip < totalEsperado) {
+            const pagina = await this.listarPorClassePaginado(classeNormalizada, {
+                skip,
+                limit: pageSize,
+            });
+
+            const lote = Array.isArray(pagina?.items) ? pagina.items : [];
+            const total = Math.max(0, Number(pagina?.total || 0));
+            if (Number.isFinite(total) && total > 0) {
+                totalEsperado = total;
+            }
+
+            if (!lote.length) {
+                break;
+            }
+
+            acumulado.push(...lote);
+            skip += lote.length;
+
+            if (lote.length < pageSize) {
+                break;
+            }
+        }
+
+        if (acumulado.length > 0) {
+            this._cache.set(classeNormalizada, acumulado);
+        }
+
+        return acumulado;
     }
 
     async ListaMagiaPorClasse(classe) {
@@ -117,14 +178,17 @@ export class MagiaService {
         if (nome !== undefined && nome !== null && String(nome).trim() !== '') {
             query.set('nome', String(nome).trim());
         }
-        if (nivel !== undefined && nivel !== null && String(nivel).trim() !== '' && String(nivel) !== 'todos') {
-            query.set('nivel', String(nivel));
+        const nivelToken = this._normalizarFiltroToken(nivel, 'todos');
+        if (nivelToken !== 'todos') {
+            query.set('nivel', nivelToken);
         }
-        if (escola !== undefined && escola !== null && String(escola).trim() !== '' && String(escola) !== 'todas') {
+        const escolaToken = this._normalizarFiltroToken(escola, 'todas');
+        if (escolaToken !== 'todas') {
             query.set('escola', String(escola).trim());
         }
-        if (componentes !== undefined && componentes !== null && String(componentes).trim() !== '' && String(componentes) !== 'todos') {
-            query.set('componentes', String(componentes).trim());
+        const componenteToken = this._normalizarFiltroToken(componentes, 'todos').toUpperCase();
+        if (componenteToken !== 'TODOS') {
+            query.set('componentes', componenteToken);
         }
 
         query.set('skip', String(Math.max(0, Number(skip || 0))));
@@ -266,5 +330,12 @@ export class MagiaService {
      */
     limparCache() {
         this._cache.clear();
+    }
+
+    limparCacheClasse(classe) {
+        const classeNormalizada = this._normalizarClasse(classe);
+        if (classeNormalizada) {
+            this._cache.delete(classeNormalizada);
+        }
     }
 }

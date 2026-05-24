@@ -1,11 +1,18 @@
 const CANONICAL_CLASSES = {
     MAGO: 'Mago',
+    WIZARD: 'Mago',
     FEITICEIRO: 'Feiticeiro',
+    SORCERER: 'Feiticeiro',
     CLERIGO: 'Clérigo',
+    CLERIC: 'Clérigo',
     DRUIDA: 'Druida',
+    DRUID: 'Druida',
     BARDO: 'Bardo',
+    BARD: 'Bardo',
     PALADINO: 'Paladino',
+    PALADIN: 'Paladino',
     RANGER: 'Ranger',
+    PATRULHEIRO: 'Ranger',
 };
 
 const SPELL_SLOT_TABLES = {

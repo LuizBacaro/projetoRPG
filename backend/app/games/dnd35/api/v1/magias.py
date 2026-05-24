@@ -204,7 +204,7 @@ def listar_magias(
         _serialize_magia(magia, classe_filtro=classe_normalizado) for magia in rows
     ]
 
-    if settings.CACHE_ENABLED:
+    if settings.CACHE_ENABLED and not (classe_normalizado and total == 0 and not items):
         catalog_cache.set(
             cache_key,
             {"total": total, "items": items},
