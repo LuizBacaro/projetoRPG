@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="grimorio-standalone-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,15 +59,25 @@
             color: #fff5d4;
         }
 
-        /* Modo página: o overlay vira o corpo da página com mais espaço de trabalho */
+        /* Pagina dedicada: rolagem natural (nao modal com overflow preso) */
+        html.grimorio-standalone-root,
+        body.grimorio-standalone {
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            height: auto;
+            min-height: 100%;
+        }
+
         body.grimorio-standalone .grimorio-overlay {
             position: static;
-            display: flex;
+            display: block;
             inset: auto;
             background: transparent;
             padding: 16px;
             backdrop-filter: none;
-            min-height: calc(100vh - 60px);
+            min-height: 0;
+            overflow: visible;
         }
 
         body.grimorio-standalone .grimorio-container {
@@ -77,12 +87,43 @@
             height: auto;
             margin: 0 auto;
             animation: none;
+            overflow: visible;
+            display: block;
         }
 
-        /* No modo standalone, o painel "adicionar do catálogo" não precisa ocupar 97vh */
+        body.grimorio-standalone .grimorio-corpo {
+            flex: none;
+            overflow: visible;
+            min-height: auto;
+        }
+
         body.grimorio-standalone .grimorio-container--catalogo {
             max-height: none;
             height: auto;
+            display: block;
+        }
+
+        body.grimorio-standalone .grimorio-container--catalogo .grimorio-adicionar-wrap {
+            flex: none;
+            min-height: auto;
+        }
+
+        body.grimorio-standalone .grimorio-container--catalogo .grimorio-painel-adicionar-catalogo.show {
+            display: block;
+            min-height: auto;
+        }
+
+        body.grimorio-standalone .grimorio-container--catalogo .grimorio-add-layout {
+            height: auto;
+            min-height: auto;
+        }
+
+        body.grimorio-standalone .grimorio-container--catalogo .grimorio-adicionar-lista,
+        body.grimorio-standalone .grimorio-container--catalogo .grimorio-add-preview {
+            height: auto;
+            max-height: none;
+            min-height: 240px;
+            overflow: visible;
         }
 
         /* Skip-link/aux container invisível: o bootstrap precisa do #fichaClasse no DOM
@@ -313,6 +354,6 @@
 </script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
 <script type="module" src="../js/pages/grimorio-standalone-bootstrap.js?v=2"></script>
-<script type="module" src="../js/controllers/GrimorioController.js?v=20260524f"></script>
+<script type="module" src="../js/controllers/GrimorioController.js?v=20260524g"></script>
 </body>
 </html>
