@@ -75,6 +75,8 @@ export class MagiaService {
                 return fallback;
             }
 
+            // Apenas cacheia resultados não-vazios para permitir nova tentativa quando
+            // a primeira chamada falha por motivos transitórios (deploy, cache do backend, rede).
             this._cache.set(classeNormalizada, magias);
             return magias;
         } catch (err) {
@@ -189,15 +191,21 @@ export class MagiaService {
      */
     async _listarTodasEFiltrar(classeNormalizada) {
         try {
-            const url = getApiUrl('/magias/?limit=500');
+            // Antes buscávamos /magias/?limit=500 (sem filtro) e cortávamos client-side.
+            // Com >500 magias na base de produção, isso podia perder magias de Mago/Clérigo
+            // se elas caíssem fora da primeira janela de IDs. Aplicamos o filtro de classe
+            // diretamente no backend, garantindo todas as magias da classe.
+            const params = new URLSearchParams({ classe: classeNormalizada, limit: '500' });
+            const url = getApiUrl(`/magias/?${params.toString()}`);
             const res = await fetch(url, { headers: this._headers() });
-            
+
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            
+
             const raw = await res.json();
             const todasMagias = Array.isArray(raw) ? raw : (Array.isArray(raw?.items) ? raw.items : []);
 
-            // ✅ FILTRA COMPARANDO EM MAIÚSCULA
+            // Mesmo com ?classe=, mantemos o filtro client-side defensivo: cobre legado
+            // (classes em string única) e qualquer divergência entre normalizações.
             const magiasFiltradas = this._normalizarNiveisPorClasse(todasMagias.filter(m => {
                 const alvo = this._normalizarClasse(classeNormalizada);
 
@@ -214,8 +222,13 @@ export class MagiaService {
                     .filter(Boolean);
                 return classesLegacy.includes(alvo);
             }), classeNormalizada);
-            
-            this._cache.set(classeNormalizada, magiasFiltradas);
+
+            // Não persiste cache vazio: evita travar a UI em "0 magias" se o /magias?limit=500
+            // (sem filtro de classe) trouxer apenas magias de outras classes na primeira janela
+            // de IDs (com a base atual em produção há 1061 magias e o limite máximo é 500).
+            if (magiasFiltradas.length > 0) {
+                this._cache.set(classeNormalizada, magiasFiltradas);
+            }
             return magiasFiltradas;
         } catch (err) {
             console.error(`❌ Erro ao filtrar magias:`, err);

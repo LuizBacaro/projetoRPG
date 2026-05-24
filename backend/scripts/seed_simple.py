@@ -16,10 +16,12 @@ try:
     from app.shared.core.database import SessionLocal, Base, engine
     from app.games.dnd35.models.combatente import Combatente
     from app.games.dnd35.models.pericia import Pericia, PericiaClasse
+    from app.games.dnd35.models.magia import Magia
     import app.games.dnd35.models.combate  # Importar para criar tabela
     
     # Import seed data
     from seed_pericias import PERICIAS_DATA
+    from seed_magias import seed_magias
     
     print("✅ Imports bem-sucedidos!")
     
@@ -97,6 +99,13 @@ try:
                 print(f"✅ {len(associacoes)} associações pericias_classes criadas!")
             else:
                 print(f"✅ pericias_classes já populado ({pericia_class_count} associações)")
+
+            magia_count = db.query(Magia).count()
+            if magia_count == 0:
+                print("🔄 Populando catálogo de magias (seed PHB — pode levar ~20–40s)…")
+                seed_magias(db, force=False)
+            else:
+                print(f"✅ Magias já populadas ({magia_count} registros)")
         else:
             print("\n🌱 Populando banco de dados...")
             
@@ -199,6 +208,9 @@ try:
             
             db.commit()
             print(f"✅ {len(associacoes)} associações pericias_classes criadas!")
+
+            print("\n🔄 Populando catálogo de magias (seed PHB — pode levar ~20–40s)…")
+            seed_magias(db, force=False)
         
         print("\n" + "=" * 50)
         print("Para iniciar o servidor:")

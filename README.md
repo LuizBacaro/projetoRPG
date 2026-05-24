@@ -457,6 +457,10 @@ python -m scripts.seed_magias
 python -m scripts.seed_pericias
 python -m scripts.seed_equipamentos
 
+# Paridade local ↔ produção (grimório Mago com catálogo >500 magias):
+# make dev-magias-paridade
+# Ou passo a passo: make seed-magias && make pad-magias-dev && make check-magias-producao
+
 # 5. Iniciar o servidor
 uvicorn app.main:app --reload --port 8000
 
