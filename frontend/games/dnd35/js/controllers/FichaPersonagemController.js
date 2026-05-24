@@ -10,6 +10,7 @@ import { EquipamentoService } from '../services/EquipamentoService.js';
 import { ArmaduraProtecaoService } from '../services/ArmaduraProtecaoService.js';
 import { TalentoService } from '../services/TalentoService.js?v=3';
 import { PericiaService } from '../services/PericiaService.js';
+import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js';
 import { getApiUrl } from '../config/api.config.js';
 import { escapeHtml } from '../utils/formatters.js';
 import {
@@ -18,11 +19,11 @@ import {
     safeBootstrapAsync,
 } from '../utils/graceful-degradation.js';
 import {
-    resolveCombatenteSpellSlots,
+    resolveSlotsComPreparacao,
     isClasseConjuradora,
     normalizeClasseConjuradora,
     textoSlotsClerigoBreakdown,
-} from '../utils/combat-rules.js?v=20260419a';
+} from '../utils/combat-rules.js?v=20260524f';
 import { modificadorPericiaPreferindoDomFicha } from '../utils/dnd.js?v=20260420b';
 import { resolverBonusRaciaisPorPericia } from '../utils/pericia-racial.js?v=20260421a';
 
@@ -306,11 +307,14 @@ export class FichaPersonagemController {
             });
         }
 
+        // Botao do header abre pagina dedicada do grimorio (mesmo fluxo de pericias).
         const btnGrimorio = document.getElementById('btnGrimorio');
         if (btnGrimorio) {
-            btnGrimorio.addEventListener('click', () => window._grimorioController?.abrirGrimorio());
+            btnGrimorio.addEventListener('click', () => this.abrirPaginaGrimorio());
         }
 
+        // O botao dentro da secao de slots continua abrindo o grimorio como modal,
+        // preservando a experiencia atual quando o usuario nao quer trocar de aba.
         const btnAbrirGrimorio = document.getElementById('btnAbrirGrimorio');
         if (btnAbrirGrimorio) {
             btnAbrirGrimorio.addEventListener('click', () => window._grimorioController?.abrirGrimorio());
@@ -426,8 +430,8 @@ export class FichaPersonagemController {
                 if (event.data?.tipo === 'magia-usada') {
                     this._processarEventoMagia(event.data);
                 }
-                if (event.data?.tipo === 'magia-preparada-atualizada' && event.data?.resetSlots) {
-                    this._processarDescansoLongoMagias(event.data);
+                if (event.data?.tipo === 'magia-preparada-atualizada') {
+                    this._processarPreparacaoAtualizada(event.data);
                 }
             };
         } catch (err) {
@@ -436,28 +440,35 @@ export class FichaPersonagemController {
     }
 
     /**
-     * ✅ NOVO: Processa evento de magia lançada na arena
-     * Atualiza o painel de slots (fichaMagiasGrid) em tempo real
-     * SRP: apenas roteamento — atualização de UI delegada a métodos específicos
-     * @param {{ combatenteId, magiaId, nivel, usada, disponiveis, total }} payload
+     * Feedback visual quando uma magia e lancada (arena ou grimorio).
+     * O painel "Slots de Magia" exibe preparadas/total; o lancamento nao altera
+     * essa contagem, apenas pulsa o slot afetado.
      */
     _processarEventoMagia(payload) {
-        // Ignora eventos de outros combatentes
         if (!this.combatente || this.combatente.id !== payload.combatenteId) {
             return;
         }
 
-
-        // 1. Atualiza painel de slots na ficha
-        this._atualizarPainelSlotsFicha(payload.nivel, payload.disponiveis, payload.total);
-
-        // 2. Pulsa o slot para dar feedback visual
         this._pulsarSlot(payload.nivel);
+    }
 
-        // 3. Atualiza painel de slots no grimório (se estiver aberto)
-        if (window._grimorioController) {
-            this._atualizarPainelSlotsGrimorio(payload.nivel, payload.disponiveis, payload.total);
+    async _processarPreparacaoAtualizada(payload) {
+        if (!this.combatente || this.combatente.id !== payload.combatenteId) {
+            return;
         }
+
+        if (payload.resetSlots) {
+            this._processarDescansoLongoMagias(payload);
+            return;
+        }
+
+        if (window._grimorioController?.magiasPreparadas) {
+            this.sincronizarSlotsMagiaDesdeGrimorio(window._grimorioController.magiasPreparadas);
+            return;
+        }
+
+        await this._recarregarMagiasPreparadas();
+        this.renderizarSlotsDeMapia();
     }
 
     _processarDescansoLongoMagias(payload) {
@@ -465,14 +476,31 @@ export class FichaPersonagemController {
             return;
         }
 
-        if (Array.isArray(this.combatente.magias_slots)) {
-            this.combatente.magias_slots = this.combatente.magias_slots.map((slot) => ({
-                ...slot,
-                usados: 0,
-            }));
-        }
-
+        this.combatente.magias_preparadas = [];
         this.renderizarSlotsDeMapia();
+    }
+
+    /**
+     * Atualiza o painel "Slots de Magia" com a lista de preparadas do grimorio.
+     * @param {Array} magiasPreparadas
+     */
+    sincronizarSlotsMagiaDesdeGrimorio(magiasPreparadas) {
+        if (!this.combatente) return;
+        this.combatente.magias_preparadas = Array.isArray(magiasPreparadas)
+            ? [...magiasPreparadas]
+            : [];
+        this.renderizarSlotsDeMapia();
+    }
+
+    async _recarregarMagiasPreparadas() {
+        if (!this.combatente?.id) return;
+        try {
+            const service = new MagiaPreparadaService(this.token);
+            const lista = await service.listar(this.combatente.id);
+            this.combatente.magias_preparadas = Array.isArray(lista) ? lista : [];
+        } catch (_error) {
+            this.combatente.magias_preparadas = [];
+        }
     }
 
     /**
@@ -2019,7 +2047,7 @@ export class FichaPersonagemController {
             return;
         }
 
-        const slots = resolveCombatenteSpellSlots(this.combatente);
+        const slots = resolveSlotsComPreparacao(this.combatente);
         const slotsAtivos = slots.filter(s => (s.total || 0) > 0);
         const ehClerigo = normalizeClasseConjuradora(this.combatente?.classe) === 'Clérigo';
 
@@ -2049,13 +2077,12 @@ export class FichaPersonagemController {
         slotsAtivos.sort((a, b) => a.nivel - b.nivel);
 
         grid.innerHTML = slotsAtivos.map(slot => {
-            const usados      = slot.usados || 0;
+            const restantes   = Math.max(0, Number(slot.restantes ?? (slot.preparadas - slot.usadas) ?? 0));
             const total       = slot.total  || 0;
-            const disponiveis = total - usados;
-            const pct         = total > 0 ? (disponiveis / total) * 100 : 0;
+            const pct         = total > 0 ? (restantes / total) * 100 : 0;
             const labelNivel  = slot.nivel === 0 ? 'Truques' : `${slot.nivel}° Nível`;
 
-            const corBarra = pct > 50 ? '#4ade80' : pct > 25 ? '#facc15' : '#f87171';
+            const corBarra = pct <= 0 ? '#f87171' : pct <= 50 ? '#facc15' : '#4ade80';
 
             const linhaClerigo = ehClerigo && textoSlotsClerigoBreakdown(slot)
                 ? `<p class="ficha-slot-cleric-origem">${textoSlotsClerigoBreakdown(slot)}</p>`
@@ -2065,7 +2092,7 @@ export class FichaPersonagemController {
                 <div class="ficha-slot-linha">
                     <div class="ficha-slot-topo">
                         <span class="ficha-slot-nivel">${labelNivel}</span>
-                        <span class="ficha-slot-contagem">${disponiveis}/${total}</span>
+                        <span class="ficha-slot-contagem">${restantes}/${total}</span>
                     </div>
                     ${linhaClerigo}
                     <div class="ficha-slot-barra-wrap">
@@ -3548,6 +3575,32 @@ export class FichaPersonagemController {
             window.location.href = `/games/dnd35/pages/pericias-ficha.html?${params.toString()}`;
         } catch (err) {
             window.NotificationService?.erro('❌ Erro ao abrir perícias');
+            console.error(err);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // GRIMORIO (pagina dedicada)
+    // ─────────────────────────────────────────────────────────
+
+    /**
+     * Navega para a pagina dedicada do grimorio (mesmo fluxo de pericias-ficha).
+     */
+    abrirPaginaGrimorio() {
+        const combatenteId = this.combatente?.id;
+        if (!combatenteId) {
+            window._grimorioController?.abrirGrimorio();
+            return;
+        }
+
+        try {
+            const params = new URLSearchParams({
+                id: String(combatenteId),
+                return_to: encodeURIComponent(window.location.pathname + window.location.search),
+            });
+            window.location.href = `/games/dnd35/pages/grimorio.html?${params.toString()}`;
+        } catch (err) {
+            window.NotificationService?.erro('❌ Erro ao abrir grimório');
             console.error(err);
         }
     }
