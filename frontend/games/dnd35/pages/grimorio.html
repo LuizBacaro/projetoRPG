@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 Grimório de Magias</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css">
+    <link rel="stylesheet" href="/games/dnd35/css/modais.css">
+    <link rel="stylesheet" href="/games/dnd35/css/skeleton.css?v=1">
+    <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=21">
+    <link rel="stylesheet" href="/games/dnd35/css/item-card-unified.css">
+    <link rel="stylesheet" href="/games/dnd35/css/grimorio.css?v=20260524b">
+    <link rel="stylesheet" href="/games/dnd35/css/responsivo.css">
+    <style>
+        body {
+            margin: 0;
+            background: #0e0905;
+            min-height: 100vh;
+        }
+
+        .grimorio-page-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 18px;
+            background: linear-gradient(180deg, rgba(20, 14, 6, 0.92), rgba(12, 9, 5, 0.96));
+            border-bottom: 1px solid rgba(201, 168, 76, 0.35);
+            color: #f3e5c1;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .grimorio-page-topbar .voltar-link {
+            color: #d6b25c;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(214, 178, 92, 0.4);
+            background: rgba(0, 0, 0, 0.2);
+            transition: background 0.2s ease;
+        }
+
+        .grimorio-page-topbar .voltar-link:hover {
+            background: rgba(214, 178, 92, 0.15);
+        }
+
+        .grimorio-page-topbar .personagem-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .grimorio-page-topbar .personagem-info strong {
+            color: #fff5d4;
+        }
+
+        /* Modo página: o overlay vira o corpo da página com mais espaço de trabalho */
+        body.grimorio-standalone .grimorio-overlay {
+            position: static;
+            display: flex;
+            inset: auto;
+            background: transparent;
+            padding: 16px;
+            backdrop-filter: none;
+            min-height: calc(100vh - 60px);
+        }
+
+        body.grimorio-standalone .grimorio-container {
+            width: 100%;
+            max-width: 1600px;
+            max-height: none;
+            height: auto;
+            margin: 0 auto;
+            animation: none;
+        }
+
+        /* No modo standalone, o painel "adicionar do catálogo" não precisa ocupar 97vh */
+        body.grimorio-standalone .grimorio-container--catalogo {
+            max-height: none;
+            height: auto;
+        }
+
+        /* Skip-link/aux container invisível: o bootstrap precisa do #fichaClasse no DOM
+           para o GrimorioController identificar a classe do personagem. */
+        .grimorio-standalone-aux {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="grimorio-standalone">
+
+<!-- Auxiliar invisível: o bootstrap do GrimorioController.js lê #fichaClasse e
+     window._fichaController.combatente. Mantemos esses pontos de extensão para
+     poder reutilizar o controller sem modificações. -->
+<div class="grimorio-standalone-aux" aria-hidden="true">
+    <span id="fichaClasse">—</span>
+</div>
+
+<!-- Barra superior da página standalone -->
+<header class="grimorio-page-topbar">
+    <a href="#" id="linkVoltarFicha" class="voltar-link">← Voltar para a Ficha</a>
+    <div class="personagem-info">
+        <span>📜</span>
+        <strong id="grimorioPageNomePersonagem">Carregando personagem…</strong>
+        <span id="grimorioPageClassePersonagem" style="opacity:.8;"></span>
+    </div>
+</header>
+
+<!-- ── Grimório (mesma marcação do modal da ficha, agora em página inteira) ── -->
+<div id="modalGrimorio" class="grimorio-overlay show">
+    <div class="grimorio-container">
+
+        <!-- HEADER -->
+        <div class="grimorio-header">
+            <div class="grimorio-header-esquerda">
+                <span class="grimorio-icone">📖</span>
+                <div>
+                    <h2 class="grimorio-titulo">Grimório de Magias</h2>
+                    <p class="grimorio-subtitulo" id="grimorioSubtitulo">—</p>
+                </div>
+            </div>
+            <div class="grimorio-header-acoes">
+                <span class="grimorio-indicador">Total: <strong id="grimorioTotalMagias">0</strong></span>
+                <span class="grimorio-indicador">Páginas (Mago): <strong id="grimorioTotalPaginas">-</strong></span>
+                <span class="grimorio-indicador" id="grimorioPaginasPorNivelWrap" style="display:none">Por nível: <strong id="grimorioPaginasPorNivel">-</strong></span>
+                <button class="grimorio-btn-descanso" id="btnDescansoLongoGrimorio" type="button">🌙 Descanso Longo</button>
+                <button class="grimorio-fechar" id="btnFecharGrimorio" title="Fechar e voltar para a ficha">✕</button>
+            </div>
+        </div>
+
+        <div class="grimorio-classe-wrap" id="grimorioClasseWrap" style="display:none">
+            <label for="grimorioClasseSelect">Classe ativa</label>
+            <select id="grimorioClasseSelect" class="grimorio-select-classe"></select>
+        </div>
+
+        <div class="grimorio-topo-controles">
+            <div class="grimorio-slots-painel grimorio-resumo-painel">
+                <div class="grimorio-slots-titulo">Resumo</div>
+                <div class="grimorio-slots-grid">
+                    <span class="grimorio-slots-vazio">Gerencie magias conhecidas, favoritas e anotacoes pessoais.</span>
+                </div>
+            </div>
+            <div class="grimorio-busca-wrapper">
+                <span class="grimorio-busca-label">🔍 Buscar</span>
+                <input type="text" id="grimorioBusca" class="grimorio-busca"
+                    placeholder="Nome, escola, descricao...">
+            </div>
+        </div>
+
+        <div id="grimorioAvisoClasse" class="grimorio-aviso-classe" style="display:none"></div>
+
+        <div class="grimorio-filtros">
+            <div class="grimorio-filtro-grupo">
+                <label class="grimorio-filtro-label">Nível</label>
+                <div class="grimorio-niveis" id="grimorioNiveis">
+                    <button class="grimorio-nivel-btn ativo" data-nivel="todos">Todos</button>
+                    <button class="grimorio-nivel-btn" data-nivel="0">0°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="1">1°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="2">2°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="3">3°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="4">4°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="5">5°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="6">6°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="7">7°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="8">8°</button>
+                    <button class="grimorio-nivel-btn" data-nivel="9">9°</button>
+                    <button class="grimorio-nivel-btn grimorio-btn-preparadas" id="btnFiltroFavoritas">★ Favoritas</button>
+                    <button class="grimorio-nivel-btn grimorio-btn-preparadas" id="btnFiltroPreparagas" style="display:none">🕯️ Preparadas</button>
+                </div>
+            </div>
+            <div class="grimorio-filtros-secundarios">
+                <div class="grimorio-filtro-grupo grimorio-filtro-grupo--escolas">
+                    <label class="grimorio-filtro-label">Escola</label>
+                    <div class="grimorio-niveis" id="grimorioFiltroEscolas">
+                        <!-- Populado dinamicamente -->
+                    </div>
+                </div>
+                <div class="grimorio-filtro-grupo grimorio-filtro-grupo--componente">
+                    <label class="grimorio-filtro-label" for="grimorioFiltroComponente">Comp.</label>
+                    <select id="grimorioFiltroComponente" class="grimorio-select-componente">
+                        <option value="todos">Todos</option>
+                        <option value="V">V</option>
+                        <option value="G">G</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                        <option value="FD">FD</option>
+                        <option value="XP">XP</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="grimorio-adicionar-wrap">
+            <div class="grimorio-adicionar-acoes">
+                <button class="grimorio-btn-descanso" id="btnAdicionarMagiaGrimorio">➕ Adicionar magia conhecida</button>
+                <button class="grimorio-btn-descanso" id="btnTrocarMagiaGrimorio">🔁 Trocar magia</button>
+                <button class="grimorio-btn-descanso" id="btnNotificacoesGrimorio">🔔 Notificações</button>
+                <span class="grimorio-troca-badge" id="grimorioTrocaBadge" style="display:none">Troca disponível</span>
+                <span class="grimorio-troca-badge" id="grimorioNotificacoesBadge" style="display:none">0</span>
+            </div>
+            <div id="grimorioPainelAdicionar" class="grimorio-painel-adicionar grimorio-painel-adicionar-catalogo">
+                <div class="grimorio-painel-header">
+                    <div class="grimorio-painel-header-meta">
+                        <strong>Adicionar do catálogo da classe</strong>
+                        <span id="grimorioAdicionarResumo" class="grimorio-add-resumo">0 resultados</span>
+                    </div>
+                    <button id="btnFecharPainelAdicionar" class="grimorio-fechar-painel">✕</button>
+                </div>
+                <div class="grimorio-add-filtros-grid">
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarBusca">Titulo</label>
+                        <input type="text" id="grimorioAdicionarBusca" class="grimorio-busca" placeholder="Buscar por nome...">
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarEscola">Escola</label>
+                        <select id="grimorioAdicionarEscola" class="grimorio-select-componente">
+                            <option value="todas">Todas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarNivel">Nivel</label>
+                        <select id="grimorioAdicionarNivel" class="grimorio-select-componente">
+                            <option value="todos">Todos</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioAdicionarComponente">Comp.</label>
+                        <select id="grimorioAdicionarComponente" class="grimorio-select-componente">
+                            <option value="todos">Todos</option>
+                            <option value="V">V</option>
+                            <option value="G">G</option>
+                            <option value="M">M</option>
+                            <option value="F">F</option>
+                            <option value="FD">FD</option>
+                            <option value="XP">XP</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="grimorio-add-dica">Use setas para navegar, Enter para adicionar, PgUp/PgDn para alternar e Home/End para ir aos extremos.</p>
+                <div class="grimorio-add-layout">
+                    <div id="grimorioAdicionarLista" class="grimorio-adicionar-lista"></div>
+                    <div id="grimorioAdicionarPreview" class="grimorio-add-preview">
+                        <div class="grimorio-historico-vazio">Selecione uma magia para visualizar o preview antes de adicionar.</div>
+                    </div>
+                </div>
+                <div class="grimorio-paginacao grimorio-paginacao-adicionar" id="grimorioPaginacaoAdicionar"></div>
+            </div>
+            <div id="grimorioPainelTroca" class="grimorio-painel-adicionar">
+                <div class="grimorio-painel-header">
+                    <strong>Trocar magia conhecida</strong>
+                    <button id="btnFecharPainelTroca" class="grimorio-fechar-painel">✕</button>
+                </div>
+                <div class="grimorio-troca-grid">
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioTrocaRemovida">Remover</label>
+                        <select id="grimorioTrocaRemovida" class="grimorio-select-componente"></select>
+                    </div>
+                    <div>
+                        <label class="grimorio-filtro-label" for="grimorioTrocaAdicionada">Adicionar</label>
+                        <select id="grimorioTrocaAdicionada" class="grimorio-select-componente"></select>
+                    </div>
+                </div>
+                <button class="grimorio-btn-descanso" id="btnConfirmarTrocaMagia">✅ Confirmar troca</button>
+                <div id="grimorioHistoricoTroca" class="grimorio-historico-troca"></div>
+            </div>
+            <div id="grimorioPainelNotificacoes" class="grimorio-painel-adicionar">
+                <div class="grimorio-painel-header">
+                    <strong>Painel de notificações do grimório</strong>
+                    <button id="btnFecharPainelNotificacoes" class="grimorio-fechar-painel">✕</button>
+                </div>
+                <div id="grimorioListaNotificacoes" class="grimorio-notificacoes-lista"></div>
+            </div>
+        </div>
+
+        <div class="grimorio-corpo" id="grimorioCopo">
+            <div class="grimorio-loading" id="grimorioLoading" style="display:none">
+                <span class="grimorio-loading-icone">🔮</span>
+                <p>Consultando os tomos arcanos...</p>
+            </div>
+            <div class="grimorio-lista" id="grimorioLista"></div>
+        </div>
+
+    </div>
+</div>
+
+<script src="/js/shared/render-api-origin-boot.js?v=2"></script>
+<script src="../js/ui/ModalConfirm.js?v=27"></script>
+<script src="../js/services/AuthService.js?v=20260426b"></script>
+<script>
+    if (window.AuthService) {
+        window.AuthService.exigirJogo('dnd35');
+    }
+</script>
+<script type="module" src="../js/services/NotificationService.js?v=28"></script>
+<script type="module" src="../js/pages/grimorio-standalone-bootstrap.js?v=2"></script>
+<script type="module" src="../js/controllers/GrimorioController.js?v=20260524f"></script>
+</body>
+</html>

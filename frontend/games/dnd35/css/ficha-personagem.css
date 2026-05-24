@@ -169,16 +169,32 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.2rem;
+    gap: 0.35rem;
 }
 
 /* Tags e botão editar sobre fundo escuro do header */
 .ficha-header .ficha-meta {
     justify-content: center;
+    gap: 0.45rem;
+}
+
+.ficha-header .ficha-meta-secundaria {
+    margin-top: 0.15rem;
 }
 
 .ficha-header .ficha-tag {
     filter: brightness(1.3);
+    font-size: 0.85rem;
+    padding: 0.28rem 0.82rem;
+    letter-spacing: 0.04em;
+}
+
+.ficha-header .ficha-tag-nivel .ficha-nivel-label {
+    font-size: 0.78rem;
+}
+
+.ficha-header .ficha-tag-nivel .ficha-nivel-valor {
+    font-size: 0.92rem;
 }
 
 .ficha-header .ficha-btn-editar-identidade {
@@ -186,6 +202,8 @@ body {
     border-color: rgba(201, 168, 76, 0.45);
     background: rgba(201, 168, 76, 0.08);
     margin-top: 0;
+    font-size: 0.82rem;
+    padding: 0.42rem 0.95rem;
 }
 
 .ficha-header .ficha-btn-editar-identidade:hover {
