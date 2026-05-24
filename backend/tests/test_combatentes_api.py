@@ -229,6 +229,51 @@ def test_atualizar_combatente_persiste_alinhamento_e_dominios_editados(combatent
     assert obter.json()["dominios"] == "Morte, Magia"
 
 
+def test_atualizar_parcial_persiste_alinhamento_e_dinheiro(combatentes_db):
+    _, db_factory = combatentes_db
+    client = _build_client(db_factory)
+
+    criado = client.post(
+        "/api/v1/combatentes",
+        data=_combatente_payload(
+            nome="Thaelorian",
+            classe="Mago",
+            divindade="",
+            alinhamento="",
+            dominios="",
+            inteligencia="18",
+            sabedoria="10",
+        ),
+    )
+    combatente_id = criado.json()["id"]
+
+    alinhamento = client.patch(
+        f"/api/v1/combatentes/{combatente_id}",
+        json={"alinhamento": "Leal e Bom", "divindade": "Heironeous"},
+    )
+    assert alinhamento.status_code == 200, alinhamento.text
+    assert alinhamento.json()["alinhamento"] == "Leal e Bom"
+    assert alinhamento.json()["divindade"] == "Heironeous"
+
+    dinheiro = client.patch(
+        f"/api/v1/combatentes/{combatente_id}",
+        json={"pc": 5, "pp": 10, "po": 250, "pl": 1},
+    )
+    assert dinheiro.status_code == 200
+    body = dinheiro.json()
+    assert body["pc"] == 5
+    assert body["pp"] == 10
+    assert body["po"] == 250
+    assert body["pl"] == 1
+    assert body["alinhamento"] == "Leal e Bom"
+    assert body["divindade"] == "Heironeous"
+
+    obter = client.get(f"/api/v1/combatentes/{combatente_id}")
+    assert obter.status_code == 200
+    assert obter.json()["po"] == 250
+    assert obter.json()["alinhamento"] == "Leal e Bom"
+
+
 def test_aplicar_dano_massa_sucesso(combatentes_db):
     _, db_factory = combatentes_db
     client = _build_client(db_factory)

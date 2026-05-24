@@ -142,6 +142,7 @@ class CombatenteUpdate(BaseModel):
 
     nivel: Optional[int] = Field(None, ge=1, le=20)
     pontos: Optional[int] = Field(None, ge=0)
+    idiomas_customizados: Optional[Any] = None
 
 
 class HabilidadeEspecialEnriquecida(BaseModel):

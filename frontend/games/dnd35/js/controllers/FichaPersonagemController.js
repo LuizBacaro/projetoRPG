@@ -1302,8 +1302,12 @@ export class FichaPersonagemController {
                 selectDominio2?.value || '',
             );
             this._validarPerfilMagico(alinhamento, divindade, dominios);
-            const formData = this._buildFormDataAtualizacaoCombatente({ alinhamento, divindade, dominios });
-            this.combatente = await this.combatenteService.atualizar(this.combatente.id, formData);
+            await this.combatenteService.atualizarCampos(this.combatente.id, {
+                alinhamento,
+                divindade,
+                dominios,
+            });
+            this.combatente = await this.combatenteService.obterCombatente(this.combatente.id);
 
             this.renderizarIdentidade();
             this.fecharModalPerfilMagico();
@@ -1741,10 +1745,10 @@ export class FichaPersonagemController {
             const idiomasExtras = this.idiomasFichaDraft.filter(
                 (idioma) => !idiomasBase.some((base) => base.localeCompare(idioma, 'pt-BR', { sensitivity: 'accent' }) === 0),
             );
-            const formData = this._buildFormDataAtualizacaoCombatente({
-                idiomas_customizados: JSON.stringify(idiomasExtras),
+            await this.combatenteService.atualizarCampos(this.combatente.id, {
+                idiomas_customizados: idiomasExtras,
             });
-            this.combatente = await this.combatenteService.atualizar(this.combatente.id, formData);
+            this.combatente = await this.combatenteService.obterCombatente(this.combatente.id);
             this.idiomasFichaDraft = this._obterIdiomasConhecidos();
             this.renderizarIdiomas();
         } catch (error) {
@@ -1808,9 +1812,7 @@ export class FichaPersonagemController {
         const po = getVal('inputDinheiroPO');
         const pl = getVal('inputDinheiroPL');
         try {
-            const formData = this._buildFormDataAtualizacaoCombatente({ pc, pp, po, pl });
-            await this.combatenteService.atualizar(this.combatente.id, formData);
-            // Recarrega do backend para garantir estado persistido (evita falso positivo visual).
+            await this.combatenteService.atualizarCampos(this.combatente.id, { pc, pp, po, pl });
             this.combatente = await this.combatenteService.obterCombatente(this.combatente.id);
             this.renderizarDinheiro();
             this.fecharModalDinheiro();
