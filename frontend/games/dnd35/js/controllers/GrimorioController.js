@@ -1,4 +1,4 @@
-import { MagiaService } from '../services/MagiaService.js?v=20260428e';
+import { MagiaService } from '../services/MagiaService.js?v=20260523a';
 import { GrimorioService } from '../services/GrimorioService.js?v=20260411b';
 import { MagiaPreparadaService } from '../services/MagiaPreparadaService.js?v=20260401b';
 import { getApiUrl } from '../config/api.config.js';
@@ -1511,20 +1511,60 @@ class GrimorioController {
             paginacaoWrap.innerHTML = '<span class="grimorio-paginacao-info">Carregando página...</span>';
         }
 
-        const pagina = await this.magiaService.listarPorClassePaginado(this.classeAtiva, {
-            nome: termo,
-            nivel: nivelFiltro,
-            escola: escolaFiltro,
-            componentes: componenteFiltro,
-            skip,
-            limit: pageSize,
-        });
+        // Garante que o catálogo da classe esteja em memória antes de paginar.
+        // Se a inicialização do grimório falhou (rede, deploy, cache stale), tenta novamente
+        // ao abrir o painel "Adicionar magia conhecida" para evitar lista permanentemente vazia.
+        if (!Array.isArray(this.catalogoClasse) || this.catalogoClasse.length === 0) {
+            try {
+                await this._carregarCatalogoClasse();
+            } catch (error) {
+                console.warn('[GrimorioController] Falha ao recarregar catálogo da classe:', error);
+            }
+        }
+
+        let pagina = null;
+        try {
+            pagina = await this.magiaService.listarPorClassePaginado(this.classeAtiva, {
+                nome: termo,
+                nivel: nivelFiltro,
+                escola: escolaFiltro,
+                componentes: componenteFiltro,
+                skip,
+                limit: pageSize,
+            });
+        } catch (error) {
+            console.error('[GrimorioController] Falha ao paginar catálogo de magias:', error);
+            pagina = null;
+        }
 
         if (requestId !== this.paginacaoAdicionar.requestId) {
             return;
         }
 
-        const totalBackend = Math.max(0, Number(pagina?.total || 0));
+        // Fallback resiliente: se a API paginada falhou ou veio vazia, mas o catálogo
+        // de classe já foi carregado, paginamos client-side. Garante que o jogador veja
+        // as magias disponíveis mesmo com instabilidade de rede ou cache stale do backend.
+        const totalApi = Math.max(0, Number(pagina?.total || 0));
+        const itensApi = Array.isArray(pagina?.items) ? pagina.items : [];
+        const usarFallbackCatalogo =
+            (!pagina || itensApi.length === 0)
+            && Array.isArray(this.catalogoClasse)
+            && this.catalogoClasse.length > 0;
+
+        let totalBackend = totalApi;
+        let itensPagina = itensApi;
+
+        if (usarFallbackCatalogo) {
+            const todasFiltradas = this._filtrarCatalogoClienteSide(this.catalogoClasse, {
+                nome: termo,
+                nivel: nivelFiltro,
+                escola: escolaFiltro,
+                componentes: componenteFiltro,
+            });
+            totalBackend = todasFiltradas.length;
+            itensPagina = todasFiltradas.slice(skip, skip + pageSize);
+        }
+
         const totalPaginas = Math.max(1, Math.ceil(totalBackend / pageSize));
         this.paginacaoAdicionar.total = totalBackend;
         this.paginacaoAdicionar.totalPages = totalPaginas;
@@ -1535,7 +1575,7 @@ class GrimorioController {
             return;
         }
 
-        let disponiveis = Array.isArray(pagina?.items) ? pagina.items : [];
+        let disponiveis = itensPagina;
         disponiveis = disponiveis.filter((magia) => !idsExistentes.has(Number(magia.id)));
 
         if (disponiveis.length === 0) {
@@ -1545,7 +1585,12 @@ class GrimorioController {
                 paginaAtual: this.paginacaoAdicionar.page,
                 totalPaginas: this.paginacaoAdicionar.totalPages,
             });
-            lista.innerHTML = '<div class="grimorio-vazio">Nenhuma magia encontrada com os filtros atuais.</div>';
+            const semCatalogo = totalBackend === 0
+                && (!Array.isArray(this.catalogoClasse) || this.catalogoClasse.length === 0);
+            const mensagem = semCatalogo
+                ? 'Não foi possível carregar o catálogo de magias da classe. Tente fechar e reabrir o grimório (a conexão com o servidor pode ter falhado).'
+                : 'Nenhuma magia encontrada com os filtros atuais.';
+            lista.innerHTML = `<div class="grimorio-vazio">${escapeHtml(mensagem)}</div>`;
             preview.innerHTML = '<div class="grimorio-historico-vazio">Nenhuma magia corresponde aos filtros selecionados.</div>';
             if (paginacaoWrap) {
                 paginacaoWrap.innerHTML = this._renderizarControlesPaginacaoAdicionar();
@@ -1710,6 +1755,48 @@ class GrimorioController {
             .map((item) => item.trim())
             .filter(Boolean);
         return new Set(partes);
+    }
+
+    _filtrarCatalogoClienteSide(catalogo, { nome, nivel, escola, componentes } = {}) {
+        if (!Array.isArray(catalogo)) return [];
+
+        const termo = String(nome || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+        const escolaNorm = String(escola || 'todas').toLowerCase().trim();
+        const componenteNorm = String(componentes || 'todos').toUpperCase().trim();
+        const nivelNorm = String(nivel ?? 'todos');
+
+        return catalogo.filter((magia) => {
+            if (!magia) return false;
+
+            if (termo) {
+                const nomeNormalizado = String(magia.nome || '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase();
+                if (!nomeNormalizado.includes(termo)) return false;
+            }
+
+            if (escolaNorm && escolaNorm !== 'todas') {
+                const escolaItem = this._normalizarEscola(magia.escola || '').toLowerCase();
+                if (escolaItem !== escolaNorm) return false;
+            }
+
+            if (nivelNorm && nivelNorm !== 'todos') {
+                const nivelItem = Number(this._nivelMagiaNaClasseAtiva(magia));
+                if (Number(nivelNorm) !== nivelItem) return false;
+            }
+
+            if (componenteNorm && componenteNorm !== 'TODOS') {
+                const componentesItem = this._extrairComponentes(magia.componentes || '');
+                if (!componentesItem.has(componenteNorm)) return false;
+            }
+
+            return true;
+        });
     }
 
     _renderizarPainelTroca() {
