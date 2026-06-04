@@ -1,52 +1,54 @@
 # `frontend/games/`
 
-Cada subpasta aqui é um sistema de RPG suportado pela plataforma, com
-seu próprio bundle visual: páginas, CSS e JS.
+Cada subpasta é um sistema de RPG (`game_slug` = pasta), com páginas, CSS e JS próprios.
 
-Convenção de slugs (deve casar com `games_catalog.slug` no backend):
+**Fonte de verdade do status no produto:** `games_catalog.status` no backend (`backend/app/shared/startup/game_catalog.py`), sincronizado no startup. O seletor (`frontend/pages/selecionar-jogo.html`) lê a API `/api/v1/games`.
 
-- `dnd35/` — Dungeons & Dragons 3.5 (em produção)
-- `dnd5e/` — Dungeons & Dragons 5e (em breve)
-- `tormenta/` — Tormenta RPG (em breve)
-- `gurps/` — GURPS (disponível)
+## Slugs
 
-## Estrutura-alvo de cada jogo
+| Slug | Pasta | Status no catálogo (2026-06) | Maturidade |
+|------|--------|------------------------------|------------|
+| `dnd35` | `dnd35/` | **disponivel** | Produção — dashboard, ficha, arena, grimório |
+| `dnd5e` | `dnd5e/` | **disponivel** | Ficha, dashboard e arena; backend com catálogos 5e |
+| `tormenta` | `tormenta/` | **disponivel** | Ficha MB, dashboard, grimório/API de regras |
+| `gurps` | `gurps/` | **disponivel** | Dashboard, ficha, combate Lite |
+
+Páginas `em-breve.html` permanecem como fallback quando o catálogo marcar `em_breve` ou `manutencao`.
+
+## Estrutura-alvo
 
 ```
 frontend/games/<slug>/
-    pages/        # HTMLs específicos do jogo (dashboard, ficha, arena, etc.)
-    css/          # estilos próprios do jogo
+    pages/           # dashboard, ficha, arena, …
+    css/
     js/
-        services/    # clientes HTTP do backend daquele jogo
-        controllers/ # orquestração de UI
+        services/
+        controllers/
 ```
 
-## Estado atual
+## Rewrites Vercel (raiz `vercel.json`)
 
-- `dnd35/` — bundle em uso: `arena.html`, `pages/` (dashboard, perícias,
-  ficha, magias, …), `js/` e `css/`. O `vercel.json` na raiz do repo
-  reescreve `/dashboard`, `/arena` e `/pericias` para estes arquivos.
-  O shell (`login`, seletor) em `frontend/pages/` também importa assets
-  deste pacote (`/games/dnd35/css/...`, `.../js/config/...`). As páginas
-  **em breve** (`dnd5e/`, `tormenta/`, `gurps/`) reutilizam o mesmo
-  `/games/dnd35/js/ui/toast.module.js`.
-- `dnd5e/em-breve.html` — página de placeholder com identidade visual
-  D&D 5e ("Em breve").
-- `tormenta/em-breve.html` — placeholder Tormenta (logotipo em
-  `/assets/brand/logo_tormenta-v5.png`).
-- `gurps/` — bundle GURPS (`pages/dashboard.html`, ficha, combate, …).
+| Rota pública | Destino |
+|--------------|---------|
+| `/dashboard`, `/arena`, `/pericias` | `dnd35/` |
+| `/dnd5e/dashboard`, `/dnd5e/ficha`, `/dnd5e/arena` | `dnd5e/pages/` |
+| `/tormenta/dashboard` | `tormenta/pages/dashboard.html` |
 
-## Como o seletor entra aqui
+## Seletor pós-login
 
-`pages/selecionar-jogo.html` mapeia cada `slug` ao destino:
+`frontend/pages/selecionar-jogo.html` — função `destinoPorSlug()`:
 
-| Slug    | Status      | Destino                                |
-|---------|-------------|----------------------------------------|
-| dnd35   | disponivel  | `/dashboard` (frontend D&D 3.5)        |
-| dnd5e   | em_breve    | `/games/dnd5e/em-breve.html`           |
-| tormenta | em_breve   | `/games/tormenta/em-breve.html`        |
-| gurps   | disponivel  | `/games/gurps/pages/dashboard.html`    |
+| Slug | Destino (status `disponivel`) |
+|------|-------------------------------|
+| `dnd35` | `/dashboard` |
+| `dnd5e` | `/games/dnd5e/pages/dashboard.html` |
+| `tormenta` | `/games/tormenta/pages/dashboard.html` |
+| `gurps` | `/games/gurps/pages/dashboard.html` |
 
-Quando um jogo "em breve" entrar em produção, o destino passa a ser a
-`pages/dashboard.html` daquele pacote e o status no catálogo do
-backend muda para `disponivel`.
+## Build D&D 5e — conjuração (TypeScript)
+
+O subpacote `dnd5e/spellcasting/` compila para `dnd5e/js/spellcasting/`. **`node_modules/` não é versionado** — ver [dnd5e/spellcasting/README.md](dnd5e/spellcasting/README.md).
+
+## Matriz requisitos × código
+
+Gerar com: `python3 scripts/generate_requisitos_cobertura_matrix.py` → [docs/requisitos-cobertura-matrix.md](../../docs/requisitos-cobertura-matrix.md).

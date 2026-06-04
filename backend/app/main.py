@@ -93,7 +93,7 @@ from .games.tormenta.api.v1 import campanhas as tormenta_campanhas
 from .games.tormenta.api.v1 import combate as tormenta_combate
 from .games.tormenta.api.v1 import personagens as tormenta_personagens
 from .games.tormenta.api.v1 import regras as tormenta_regras
-from .shared.api.v1 import auth, games, usuarios
+from .shared.api.v1 import auth, games, oauth_google, usuarios
 from .shared.core.config import settings
 from .shared.core.database import Base, SessionLocal, engine, get_db
 from .shared.core.rate_limit import RateLimitMiddleware
@@ -478,6 +478,7 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 # ── Rotas da API v1 ──────────────────────────────────────────────────────────
 # Ordem importa: dependências primeiro
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(oauth_google.router, prefix=settings.API_V1_PREFIX)
 app.include_router(games.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_campanhas.router, prefix=settings.API_V1_PREFIX)
 app.include_router(usuarios.router, prefix=settings.API_V1_PREFIX)

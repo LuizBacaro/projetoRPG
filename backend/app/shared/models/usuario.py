@@ -26,7 +26,9 @@ class Usuario(Base):
     perfil = Column(SAEnum(PerfilUsuario), nullable=False)
     nome = Column(String(100), nullable=False)
     email = Column(String(150), unique=True, nullable=False, index=True)
-    senha_hash = Column(String(255), nullable=False)
+    senha_hash = Column(String(255), nullable=True)
+    oauth_provider = Column(String(32), nullable=True)
+    oauth_subject = Column(String(128), nullable=True)
     ativo = Column(Boolean, default=True, nullable=False)
 
     usuario_responsavel = Column(String(150), nullable=True)

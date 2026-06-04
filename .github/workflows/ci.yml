@@ -73,6 +73,22 @@ jobs:
       - name: Check Tormenta MB magias catalog JSON
         run: python scripts/check_magias_mb_catalogo.py
 
+      - name: Detect changes in magias seed / PHB tooling
+        id: phb_seed_filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            magias_seed:
+              - 'backend/scripts/seed_magias.py'
+              - 'backend/scripts/diff_phb_seed_all_classes.py'
+              - 'backend/scripts/patch_*phb*.py'
+              - 'backend/scripts/patch_clerigo_phb_seed.py'
+              - 'docs/diff-phb-seed-all-classes.json'
+
+      - name: PHB seed snapshot (sem PDF)
+        if: steps.phb_seed_filter.outputs.magias_seed == 'true'
+        run: python3 scripts/check_phb_seed_snapshot.py
+
       # Cobertura total da suite ~73% (maio/2026); restaurar 80% com mais testes.
       - name: Run pytest with coverage
         run: python -m pytest tests/ -q --tb=short --ignore=tests/e2e --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=72
@@ -171,6 +187,9 @@ jobs:
 
       - name: Run frontend unit tests
         run: node games/dnd35/test-ficha-perfil-simples.js
+
+      - name: Auditoria estática dnd35 JS
+        run: bash ../scripts/audit-dnd35-js.sh
 
   # ──────────────────────────────────────────
   # E2E Smoke: Playwright (PR + push develop/feature/salva + manual)

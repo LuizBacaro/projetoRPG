@@ -113,6 +113,14 @@ class Settings(BaseSettings):
     API_RATE_LIMIT_PER_MINUTE: int = 180
     LOGIN_RATE_LIMIT_PER_MINUTE: int = 10
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    ACCESS_TOKEN_EXPIRE_HOURS: int = 24
+
+    # ── OAuth (Google) ───────────────────────────────────────────────────────
+    GOOGLE_OAUTH_CLIENT_ID: str = ""
+    GOOGLE_OAUTH_CLIENT_SECRET: str = ""
+    # URL pública do frontend (login/oauth-callback). Ex.: https://arena-de-combate-rpg.com.br
+    FRONTEND_BASE_URL: str = ""
+    OAUTH_EXCHANGE_TTL_SECONDS: int = 120
 
     # ── Multi-jogo ───────────────────────────────────────────────────────────
     # Quando True, endpoints específicos do D&D 3.5 exigem `game_slug=dnd35`
