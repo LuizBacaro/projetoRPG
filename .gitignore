@@ -26,6 +26,10 @@ helpers/
 
 *.pdf
 
+# Node (ex.: frontend/games/dnd5e/spellcasting)
+node_modules/
+**/node_modules/
+
 # IDE
 .vscode/
 .idea/

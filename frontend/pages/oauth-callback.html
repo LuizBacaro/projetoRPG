@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Google — Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/login.css" />
+</head>
+<body>
+<div class="login-wrapper">
+    <div class="login-logo">
+        <h1>⚔️ Arena TTRPG</h1>
+    </div>
+    <div class="login-card">
+        <h2 id="statusTitulo">Concluindo login…</h2>
+        <p id="statusMsg" class="hint">Aguarde um instante.</p>
+        <div id="erroOAuth" class="msg-box msg-erro" style="display:none"></div>
+    </div>
+</div>
+<script src="/js/shared/render-api-origin-boot.js"></script>
+<script type="module">
+    import { getApiUrl } from '/games/dnd35/js/config/api.config.js?v=20260604';
+    import { persistSession, redirectAfterLogin } from '/js/shared/auth-session.js?v=20260604';
+
+    const params = new URLSearchParams(window.location.search);
+    const erro = params.get('oauth_error');
+    const exchange = params.get('exchange');
+    const titulo = document.getElementById('statusTitulo');
+    const msg = document.getElementById('statusMsg');
+    const erroBox = document.getElementById('erroOAuth');
+
+    function falhar(texto) {
+        titulo.textContent = 'Não foi possível entrar';
+        msg.textContent = '';
+        erroBox.textContent = texto;
+        erroBox.style.display = 'block';
+        setTimeout(() => {
+            window.location.href = '/pages/login.html';
+        }, 4000);
+    }
+
+    if (erro) {
+        falhar('Login com Google cancelado ou indisponível. Tente de novo.');
+    } else if (!exchange) {
+        falhar('Resposta OAuth incompleta.');
+    } else {
+        try {
+            const res = await fetch(getApiUrl('/auth/oauth/exchange'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ exchange_code: exchange }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                falhar(data.detail || 'Código de troca inválido.');
+            } else {
+                persistSession(data);
+                redirectAfterLogin();
+            }
+        } catch (e) {
+            console.error(e);
+            falhar('Erro de conexão ao finalizar login.');
+        }
+    }
+</script>
+</body>
+</html>

@@ -80,6 +80,50 @@ class AuthService {
         return !!this.getToken();
     }
 
+    static _apiBaseUrl() {
+        if (typeof window !== 'undefined' && window.__ARENA_RENDER_API_ORIGIN__) {
+            return String(window.__ARENA_RENDER_API_ORIGIN__).replace(/\/$/, '');
+        }
+        if (typeof window !== 'undefined') {
+            return window.location.origin;
+        }
+        return '';
+    }
+
+    /**
+     * Renova access token via refresh (24h) sem redirecionar ao login.
+     * @returns {Promise<boolean>}
+     */
+    static async tentarRenovarToken() {
+        const refresh = localStorage.getItem(this.REFRESH_KEY);
+        if (!refresh) {
+            return false;
+        }
+        try {
+            const res = await fetch(`${this._apiBaseUrl()}/api/v1/auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: refresh }),
+            });
+            if (!res.ok) {
+                return false;
+            }
+            const data = await res.json();
+            if (data.access_token) {
+                localStorage.setItem(this.TOKEN_KEY, data.access_token);
+            }
+            if (data.refresh_token) {
+                localStorage.setItem(this.REFRESH_KEY, data.refresh_token);
+            }
+            if (data.usuario) {
+                localStorage.setItem(this.USUARIO_KEY, JSON.stringify(data.usuario));
+            }
+            return Boolean(data.access_token);
+        } catch (_err) {
+            return false;
+        }
+    }
+
     // ── Usuário 
     static getUsuario() {
         try {
@@ -243,8 +287,31 @@ window.AuthService = AuthService;
     const fetchOriginal = window.fetch.bind(window);
 
     window.fetch = async function (...args) {
-        const resposta = await fetchOriginal(...args);
+        let resposta = await fetchOriginal(...args);
         try {
+            const url =
+                typeof args[0] === 'string'
+                    ? args[0]
+                    : (args[0] && args[0].url) || '';
+            const isAuthEndpoint =
+                url.includes('/auth/login') ||
+                url.includes('/auth/refresh') ||
+                url.includes('/auth/oauth/');
+
+            if (resposta && resposta.status === 401 && !isAuthEndpoint) {
+                const renovou = await AuthService.tentarRenovarToken();
+                if (renovou) {
+                    const init = args[1] ? { ...args[1] } : {};
+                    const headers = new Headers(init.headers || {});
+                    const token = AuthService.getToken();
+                    if (token) {
+                        headers.set('Authorization', `Bearer ${token}`);
+                    }
+                    init.headers = headers;
+                    resposta = await fetchOriginal(args[0], init);
+                }
+            }
+
             if (
                 resposta &&
                 (resposta.status === 409 || resposta.status === 403) &&

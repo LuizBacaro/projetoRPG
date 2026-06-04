@@ -59,6 +59,10 @@ Repositório: **[5e-bits/5e-database](https://github.com/5e-bits/5e-database)** 
 
 Consultar a árvore atual em [github.com/5e-bits/5e-database/tree/main/src](https://github.com/5e-bits/5e-database/tree/main/src).
 
+**Versão de referência no código:** `DND5E_DATABASE_VERSION` em `backend/app/games/dnd5e/data/catalogo_metadata.py` (ADR [0003](../../docs/adr/0003-dnd5e-fonte-dados-5e-database.md)).
+
+**Plano de UI:** [docs/dnd5e/plano-ui-dashboard.md](../../docs/dnd5e/plano-ui-dashboard.md).
+
 ## Fluxo sugerido para implementação
 
 1. Ler o RF (`NN-*.md`) e o gate em `AGENTS.md`.

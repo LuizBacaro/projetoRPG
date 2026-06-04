@@ -3,14 +3,25 @@
     "levels": {
       "0": {
         "phb_count": 15,
-        "seed_count": 15,
-        "missing_in_seed": [],
+        "seed_count": 11,
+        "missing_in_seed": [
+          "consertar",
+          "detectar magia",
+          "ler magias",
+          "resistencia"
+        ],
         "extra_in_seed": []
       },
       "1": {
         "phb_count": 26,
-        "seed_count": 26,
-        "missing_in_seed": [],
+        "seed_count": 21,
+        "missing_in_seed": [
+          "causar medo",
+          "compreender idiomas",
+          "curar ferimentos leves",
+          "invocar criaturas ix",
+          "remover medo"
+        ],
         "extra_in_seed": []
       },
       "2": {
@@ -64,8 +75,8 @@
     },
     "summary": {
       "phb_total_unique": 146,
-      "seed_total_unique": 146,
-      "total_missing_in_seed": 0,
+      "seed_total_unique": 137,
+      "total_missing_in_seed": 9,
       "total_extra_in_seed": 0
     },
     "duplicates_in_seed": []

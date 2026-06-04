@@ -36,6 +36,11 @@ Referências internas usam prefixo **`/games/dnd35/`** (CSS, JS e links entre
 páginas do 3.5). O `AuthService` continua a enviar o utilizador para
 `/pages/login.html` e `/pages/selecionar-jogo.html` (hub).
 
+## Qualidade JS
+
+- Auditoria e plano de refatoração: [docs/dnd35-js-auditoria-2026-06.md](../../../docs/dnd35-js-auditoria-2026-06.md)
+- Script local/CI: `scripts/audit-dnd35-js.sh`
+
 ## Próximo jogo (ex.: GURPS)
 
 1. Criar `frontend/games/gurps/` com `pages/`, `css/`, `js/` (ou só `em-breve.html`

@@ -111,6 +111,8 @@ Contrato enxuto entre requisito, codigo e revisao — **sem** processo pesado de
 - Para pre-definicoes por raca e catalogo racial normalizado, consultar [docs/predefinicoes-raciais-contrato.md](docs/predefinicoes-raciais-contrato.md) e `docs/dados/racas_caracteristicas_catalogo.json`.
 - Arquitetura de deploy (Vercel + Render, CORS, `getApiUrl`, rewrites): skill [.cursor/skills/arena-ttrpg-architecture/SKILL.md](.cursor/skills/arena-ttrpg-architecture/SKILL.md).
 - Protecao de dados em producao (Neon branch, `DATABASE_URL`, PITR/snapshots, staging antes de prod, health `/health/live`): [PRE_DEPLOY_CHECKLIST.md](PRE_DEPLOY_CHECKLIST.md) (secao **Protecao de dados**) e skill [.cursor/skills/arena-producao-dados-neon-render/SKILL.md](.cursor/skills/arena-producao-dados-neon-render/SKILL.md).
+- Sessao JWT (24h access, refresh 7d), retry no login e OAuth Google: [docs/auth-sessao-oauth.md](docs/auth-sessao-oauth.md).
+- Livros locais → scripts → seeds: [docs/livros-para-dados.md](docs/livros-para-dados.md). ADRs: [docs/adr/README.md](docs/adr/README.md).
 - Conjuracao D&D 3.5 (atributo por classe, Tabela 1-1, clerigo, troca Bardo/Feiticeiro): [docs/regras-conjuracao-dnd-arena.md](docs/regras-conjuracao-dnd-arena.md) e skill [.cursor/skills/dnd-spellcasting-conventions/SKILL.md](.cursor/skills/dnd-spellcasting-conventions/SKILL.md).
 - Arquitetura multi-jogo (Auth Hub global + jogos isolados, `games_catalog`, `game_slug` no token, seletor de jogo pos-login, guard `AuthService.exigirJogo`): [docs/arquitetura-multi-jogo.md](docs/arquitetura-multi-jogo.md).
 - Camadas, SOLID e modularidade: [docs/arquitetura-camadas-solid.md](docs/arquitetura-camadas-solid.md). GURPS e roadmap operacional: [docs/roadmap-gurps-melhorias.md](docs/roadmap-gurps-melhorias.md).

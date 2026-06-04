@@ -49,3 +49,4 @@ Especificações em `*.md` desta pasta descrevem mecânicas **D&D 3.5** (modific
 | `08-equipamento-dnd35.md` | Equipamento |
 | `09-companheiro-animal-dnd35.md` | Companheiro animal (**Druida / Ranger**) |
 | `10-familiar-dnd35.md` | Familiar (**Mago / Feiticeiro**; PHB p. ~40; ficha + arena) |
+| `11-monstros-dnd35.md` | Monstros/NPC (DMG) — bestiário mínimo e trilha futura |
