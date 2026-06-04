@@ -8,9 +8,10 @@
 ![Neon](https://img.shields.io/badge/DB-Neon-00E5B4)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-Plataforma web fullstack para gerenciamento de combates de **D&D 3.5** (Tabletop RPG),
-com autenticação JWT, sistema de magias completo (grimório + preparação diária),
-fichas de personagem interativas e arena de combate em tempo real.
+Plataforma web fullstack para **TTRPG multi-jogo** (hub de conta + escolha de sistema),
+com **D&D 3.5** como módulo principal: autenticação JWT (access 24h + refresh 7 dias),
+login opcional com **Google OAuth**, grimório e preparação de magias, fichas interativas
+e arena de combate em tempo real.
 
 ---
 
@@ -38,10 +39,16 @@ Para **testes locais**, copie o exemplo: com `ADMIN_EMAIL` e `ADMIN_PASSWORD` pr
 ## ✨ Funcionalidades
 
 ### Acesso e Usuários
-- Login com e-mail e senha (JWT — 24h de validade)
+- Login com e-mail e senha → **access token** (JWT, 24h) + **refresh token** (7 dias, rotação no `/auth/refresh`)
+- **Google OAuth** (opcional): botão na tela de login quando `GOOGLE_OAUTH_CLIENT_ID` / `SECRET` estão configurados; contas só Google sem senha local
+- Sessão no frontend: `localStorage` + renovação silenciosa (`auth-session.js`, `AuthService.tentarRenovarToken` em 401)
+- Warm-up e retry de login em cold start do Render (`/health/live`, 503)
+- Hub pós-login: `/pages/selecionar-jogo.html` (`game_slug` no token)
 - 3 perfis: **Administrador**, **Mestre**, **Jogador**
 - CRUD completo de usuários com exclusão lógica
 - Auditoria: usuário responsável + data da ação
+
+> Detalhes de tokens, OAuth e produção: **[docs/auth-sessao-oauth.md](docs/auth-sessao-oauth.md)**
 
 ### Dashboard
 - Cadastro de **Jogadores**, **Monstros** e **NPCs**
@@ -87,7 +94,12 @@ Para **testes locais**, copie o exemplo: com `ADMIN_EMAIL` e `ADMIN_PASSWORD` pr
 /  (raiz)
 └── redireciona para ──► /pages/login.html
                               │
-                         [Login JWT → seletor de jogo]
+              [E-mail/senha ou Google OAuth → JWT + refresh]
+                              │
+         (OAuth) ──► /pages/oauth-callback.html?exchange=…
+                              │
+                              ▼
+                      /pages/selecionar-jogo.html
                               │
                               ▼
                       /dashboard              ← vercel.json → games/dnd35/pages/dashboard.html
@@ -171,8 +183,16 @@ backend/
 │   │   ├── dnd5e/                 # Reservado (em breve)
 │   │   └── gurps/                 # Reservado (em breve)
 │   │
-│   ├── api/v1/                    # Onde o main registra os routers
-│   │   ├── auth.py                # Hub — login, refresh JWT (implementação neste pacote)
+│   ├── shared/                    # Auth Hub, config, startup multi-jogo
+│   │   ├── api/v1/
+│   │   │   ├── auth.py            # login, refresh, registro, logout
+│   │   │   └── oauth_google.py    # Google OAuth (authorize, callback, exchange)
+│   │   └── services/
+│   │       ├── auth_token_service.py
+│   │       └── google_oauth_service.py
+│   │
+│   ├── api/v1/                    # Registro no main (shims → shared ou games)
+│   │   ├── auth.py                # Hub — reexporta rotas de autenticação
 │   │   ├── usuarios.py            # Hub — CRUD utilizadores
 │   │   ├── games.py               # Hub — catálogo de jogos + POST selecionar (`game_slug` no token)
 │   │   └── …                      # D&D 3.5: em regra [SHIM] — reexportam `router` de `games.dnd35.api.v1.*`
@@ -195,7 +215,6 @@ backend/
 │   ├── repositories/              # usuario_repository, game_repository (hub); demais → shims
 │   ├── services/                  # usuario_service, game_service, file_service (hub); demais → shims
 │   ├── seeds/                     # Legado + suporte a seeds (ver também games/dnd35/seeds)
-│   ├── shared/                    # README / placeholder (futura separação Auth Hub vs jogo)
 │   └── exceptions/                # Exceções customizadas
 │
 ├── scripts/                       # Scripts de seed/import (magias, perícias, equipamentos, …)
@@ -208,8 +227,10 @@ backend/
 
 ```
 frontend/
+├── js/shared/
+│   └── auth-session.js            # refresh silencioso, warm-up /health/live, retry login
 ├── pages/                         # Shell global — URLs /pages/*.html
-│   ├── login.html, selecionar-jogo.html
+│   ├── login.html, selecionar-jogo.html, oauth-callback.html
 │   ├── ficha-personagem.html, magias.html, usuarios.html, …
 │   └── …                          # Outras telas ainda servidas desta pasta
 │
@@ -263,7 +284,9 @@ Antes de implementar ou aprovar qualquer melhoria/correção/feature, validar:
 
 ```
 Usuario (perfil: admin/mestre/jogador)
-├── id, nome, email (único), senha_hash
+├── id, nome, email (único)
+├── senha_hash (nullable — contas só Google OAuth)
+├── oauth_provider, oauth_subject (ex.: google + sub do Google)
 ├── ativo (exclusão lógica)
 └── usuario_responsavel, data_acao
 
@@ -307,9 +330,14 @@ Pericia (54 perícias D&D 3.5)
 ### Autenticação (`/api/v1/auth`)
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
-| `POST` | `/auth/login` | ❌ | Login — retorna JWT |
-| `POST` | `/auth/logout` | ✅ | Invalidar sessão |
-| `POST` | `/auth/refresh` | ✅ | Renovar token |
+| `POST` | `/auth/login` | ❌ | Login — retorna `access_token` + `refresh_token` + `usuario` |
+| `POST` | `/auth/refresh` | ❌ | Body: `{ "refresh_token": "…" }` — renova par de tokens (rotação) |
+| `POST` | `/auth/registro` | ❌ | Cadastro público (jogador/mestre) |
+| `POST` | `/auth/logout` | ✅ | Invalidar sessão (cliente remove tokens) |
+| `GET` | `/auth/oauth/google/status` | ❌ | `{ "google_enabled": true/false }` |
+| `GET` | `/auth/oauth/google/authorize` | ❌ | Redireciona para consentimento Google |
+| `GET` | `/auth/oauth/google/callback` | ❌ | Callback OAuth → redirect ao frontend com `exchange` |
+| `POST` | `/auth/oauth/exchange` | ❌ | Body: `{ "exchange_code": "…" }` → mesmo payload do login |
 
 ### Usuários (`/api/v1/usuarios`)
 | Método | Rota | Auth | Descrição |
@@ -387,13 +415,32 @@ Pericia (54 perícias D&D 3.5)
 
 ## 🔐 Autenticação
 
+### E-mail e senha
+
 ```
-1. POST /auth/login (email + senha)
-2. Backend: bcrypt verify → JWT (user_id, perfil, 24h expiry)
-3. Frontend: sessionStorage (AuthService.TOKEN_KEY)
-4. Todas as requisições: Authorization: Bearer {token}
-5. Backend: deps.py → extrair_token → decodificar → get_usuario_atual
+1. POST /api/v1/auth/login { email, senha }
+2. Backend: bcrypt → access JWT (24h) + refresh JWT (7d)
+3. Frontend: localStorage (token, refresh_token, usuario) — ver AuthService / auth-session.js
+4. Requisições API: Authorization: Bearer <access_token>
+5. Em 401: POST /auth/refresh uma vez; se falhar → logout e /pages/login.html
+6. Ao abrir login: tentativa de refresh silencioso se já houver refresh_token
 ```
+
+Variáveis: `ACCESS_TOKEN_EXPIRE_HOURS=24`, `REFRESH_TOKEN_EXPIRE_DAYS=7` (`backend/.env.example`).
+
+### Google OAuth (opcional)
+
+```
+1. GET /auth/oauth/google/status → frontend mostra botão se google_enabled
+2. Utilizador clica → GET /auth/oauth/google/authorize → Google
+3. Google → GET /auth/oauth/google/callback (na API)
+4. API redireciona → /pages/oauth-callback.html?exchange=<código único>
+5. Frontend POST /auth/oauth/exchange → grava tokens e vai ao seletor de jogo
+```
+
+**Produção (Render):** `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `FRONTEND_BASE_URL` (ex.: `https://arena-de-combate-rpg.com.br`).  
+**Redirect URI no Google Cloud:** `https://<sua-api>/api/v1/auth/oauth/google/callback`  
+Guia completo: **[docs/auth-sessao-oauth.md](docs/auth-sessao-oauth.md)**
 
 **Perfis de acesso:**
 - **Administrador** — acesso total + gestão de usuários
@@ -448,8 +495,14 @@ cp .env.example .env
 # Edite .env no mínimo:
 #   DATABASE_URL=sqlite:///./rpg_arena.db
 #   SECRET_KEY=sua-chave-secreta-aqui   # em dev pode ficar vazio (gerada ao arrancar)
+#   ACCESS_TOKEN_EXPIRE_HOURS=24
+#   REFRESH_TOKEN_EXPIRE_DAYS=7
 #   ADMIN_EMAIL=admin@arena-rpg.com.br
 #   ADMIN_PASSWORD=TroquePorSenhaForte123!
+# OAuth local (opcional):
+#   GOOGLE_OAUTH_CLIENT_ID=
+#   GOOGLE_OAUTH_CLIENT_SECRET=
+#   FRONTEND_BASE_URL=http://127.0.0.1:8000
 # (sem ADMIN_EMAIL + ADMIN_PASSWORD o usuário admin não é criado no startup)
 
 # 4. Rodar seeds (opcional — popula magias, perícias, equipamentos)
@@ -473,8 +526,15 @@ uvicorn app.main:app --reload --port 8000
 
 ```bash
 cd backend
-pytest tests/ -v --cov=app
+pytest tests/ -v --cov=app --ignore=tests/e2e
+
+# E2E Playwright (API + frontend no mesmo origin)
+# pip install playwright pytest-playwright && playwright install chromium
+uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+BASE_URL=http://localhost:8000 pytest tests/e2e/ -v
 ```
+
+Ver **[docs/e2e-playwright-arena.md](docs/e2e-playwright-arena.md)**.
 
 ### Backup e Restore de Personagens
 
@@ -535,6 +595,11 @@ Registro.br (domínio) → Cloudflare (DNS + CDN) → Vercel (frontend)
 | `ENVIRONMENT` | `production` |
 | `ADMIN_EMAIL` | seu e-mail de admin |
 | `ADMIN_PASSWORD` | senha forte |
+| `ACCESS_TOKEN_EXPIRE_HOURS` | `24` (opcional; padrão) |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | `7` (opcional; padrão) |
+| `FRONTEND_BASE_URL` | `https://arena-de-combate-rpg.com.br` (redirect pós-OAuth) |
+| `GOOGLE_OAUTH_CLIENT_ID` | Client ID OAuth 2.0 (Web) — opcional |
+| `GOOGLE_OAUTH_CLIENT_SECRET` | Secret OAuth — opcional |
 | `ALLOWED_ORIGINS` | `["https://arena-de-combate-rpg.com.br","https://seu-app.vercel.app"]` |
 
 5. Após o deploy, copie a URL do Render (ex.: `https://projetorpg-7ih3.onrender.com`) — o `vercel.json` já referencia o proxy `/api` para essa API; não é obrigatório hardcodar URL no frontend.
@@ -553,9 +618,9 @@ Registro.br (domínio) → Cloudflare (DNS + CDN) → Vercel (frontend)
 #### 5. Anti-sleep no Render (gratuito)
 O Render free tier dorme após 15 min de inatividade. Para evitar cold start:
 1. Crie conta gratuita em [cron-job.org](https://cron-job.org)
-2. Novo cron job → URL: `https://projetorpg-7ih3.onrender.com/health`
+2. Novo cron job → URL: `https://projetorpg-7ih3.onrender.com/health/live`
 3. Schedule: `*/10 * * * *` (a cada 10 min) — mantém a API sempre acordada
-4. O endpoint `/health` retorna 200 instantaneamente sem tocar no banco
+4. O endpoint `/health/live` retorna 200 sem esperar migrations/seeds (usado também pelo login no frontend)
 
 > ℹ️ Job já configurado em produção: [console.cron-job.org/jobs](https://console.cron-job.org/jobs)
 

@@ -86,9 +86,7 @@ def _trocar_codigo_por_tokens(code: str, redirect_uri: str) -> Dict[str, Any]:
         return user_res.json()
 
 
-def obter_ou_criar_usuario_google(
-    db: Session, userinfo: Dict[str, Any]
-) -> Usuario:
+def obter_ou_criar_usuario_google(db: Session, userinfo: Dict[str, Any]) -> Usuario:
     sub = (userinfo.get("sub") or "").strip()
     email = (userinfo.get("email") or "").strip().lower()
     nome = (userinfo.get("name") or userinfo.get("given_name") or email).strip()
