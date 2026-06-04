@@ -15,10 +15,10 @@ from ....games.dnd35.models.campanha import Campanha
 from ...core.config import settings
 from ...core.deps import get_db, get_usuario_atual
 from ...core.security import decodificar_token, hash_senha, verificar_senha
-from ...services.auth_token_service import emitir_par_tokens
 from ...core.security_audit import log_security_event
 from ...models.usuario import PerfilUsuario, Usuario
 from ...repositories.usuario_repository import UsuarioRepository
+from ...services.auth_token_service import emitir_par_tokens
 
 logger = logging.getLogger(__name__)
 

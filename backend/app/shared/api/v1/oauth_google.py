@@ -12,6 +12,7 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from ...core.config import settings
 from ...core.deps import get_db
 from ...core.security_audit import log_security_event
 from ...services.auth_token_service import emitir_par_tokens
@@ -29,7 +30,6 @@ from ...services.oauth_exchange_store import (
     criar_oauth_state,
 )
 from .auth import TokenResponse
-from ...core.config import settings
 
 logger = logging.getLogger(__name__)
 
