@@ -120,12 +120,13 @@
     import { getApiUrl } from '/games/dnd35/js/config/api.config.js?v=20260604';
     import {
         warmupApi,
+        waitForApiReady,
         trySilentRefresh,
         postJsonWithRetry,
         persistSession,
         redirectAfterLogin,
         fetchOAuthGoogleStatus,
-    } from '/js/shared/auth-session.js?v=20260604';
+    } from '/js/shared/auth-session.js?v=20260605';
 
     // ── Elementos de Login ────────────────────────────────────────────────
     const btnLogin   = document.getElementById('btnLogin');
@@ -157,6 +158,7 @@
         btnLogin.disabled = true;
         btnLogin.textContent = 'Verificando sessão…';
         await warmupApi();
+        await waitForApiReady({ timeoutMs: 90000 });
         const renovou = await trySilentRefresh();
         if (renovou) {
             redirectAfterLogin();
@@ -241,10 +243,20 @@
 
         try {
             await warmupApi();
+            btnLogin.textContent = 'Preparando servidor…';
+            const pronto = await waitForApiReady({ timeoutMs: 120000 });
+            if (!pronto) {
+                mostrarErroLogin(
+                    'O servidor ainda está inicializando. Aguarde um minuto e tente de novo.'
+                );
+                return;
+            }
             const res = await postJsonWithRetry(
                 '/auth/login',
                 { email, senha },
                 {
+                    maxAttempts: 12,
+                    baseDelayMs: 1500,
                     onRetry(attempt) {
                         btnLogin.textContent =
                             attempt === 1
