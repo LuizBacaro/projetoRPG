@@ -113,6 +113,19 @@ CRON_PING_TOKEN = os.getenv("CRON_PING_TOKEN", "").strip()
 # para o Render não dar timeout no deploy (health check antes do fim do startup).
 _db_startup_done = threading.Event()
 
+# Login/refresh/oauth não dependem de seeds nem de todos os schema guards.
+_READINESS_AUTH_PREFIXES = (
+    "/api/v1/auth/login",
+    "/api/v1/auth/refresh",
+    "/api/v1/auth/registro",
+    "/api/v1/auth/logout",
+    "/api/v1/auth/oauth/",
+)
+
+
+def _auth_bypass_readiness(path: str) -> bool:
+    return any(path.startswith(prefix) for prefix in _READINESS_AUTH_PREFIXES)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -127,9 +140,22 @@ async def lifespan(app: FastAPI):
     def _run_init_sync() -> None:
         db = SessionLocal()
         try:
-            _inicializar_banco_critico(db)
+            _inicializar_banco_essencial(db)
             _db_startup_done.set()
-            _inicializar_banco_pos_ready(db)
+            logger.info("✅ Readiness: API liberada (login e rotas /api)")
+            try:
+                _inicializar_banco_schema_guards()
+            except Exception as exc:
+                logger.exception(
+                    "⚠️  Schema guards falharam após liberar API (login segue): %s",
+                    exc,
+                )
+            try:
+                _inicializar_banco_pos_ready(db)
+            except Exception as exc:
+                logger.exception(
+                    "⚠️  Seeds pós-ready falharam (API já liberada): %s", exc
+                )
         finally:
             db.close()
 
@@ -198,7 +224,11 @@ async def _readiness_middleware(request: Request, call_next):
     """
     if settings.ENVIRONMENT == "production" and not _db_startup_done.is_set():
         path = request.url.path or ""
-        if path.startswith("/api") and request.method != "OPTIONS":
+        if (
+            path.startswith("/api")
+            and request.method != "OPTIONS"
+            and not _auth_bypass_readiness(path)
+        ):
             return JSONResponse(
                 status_code=503,
                 content={
@@ -580,6 +610,17 @@ async def health_live():
     return {"status": "live"}
 
 
+@app.get("/health/ready", include_in_schema=False)
+async def health_ready():
+    """Readiness: fase essencial do BD concluída (login e /api liberados em production)."""
+    if _db_startup_done.is_set():
+        return {"status": "ready"}
+    return JSONResponse(
+        status_code=503,
+        content={"status": "starting", "detail": "Inicialização do banco em curso"},
+    )
+
+
 @app.get("/health")
 async def health():
     """Verificar saúde da API e conectividade com o banco."""
@@ -751,60 +792,25 @@ def _executar_alembic_migrations() -> None:
         raise
 
 
-def _inicializar_banco_critico(db) -> None:
-    """
-    SRP: Orquestra a inicialização crítica do banco (gate para liberar /api em produção).
-
-    Ordem importa:
-    1. Com `STARTUP_RUN_ALEMBIC`: só Alembic até `head` (fonte de verdade do schema).
-       Sem Alembic no startup: `create_all` para bases locais legadas / dev rápido.
-    2. Admin + guards de schema + catálogo de jogos + memberships legados
-
-    Args:
-        db: Sessão do banco
-    """
+def _passos_alembic_ou_create_all() -> list:
     if settings.STARTUP_RUN_ALEMBIC:
-        passos = [
-            ("executar_alembic_migrations", _executar_alembic_migrations),
-        ]
-    else:
-        logger.info(
-            "⏭️ Pulando Alembic no startup da app (STARTUP_RUN_ALEMBIC=0); "
-            "espera-se migração prévia no processo de deploy (ex.: Procfile)."
-        )
-        passos = [
-            ("criar_tabelas", lambda: Base.metadata.create_all(bind=engine)),
-        ]
+        return [("executar_alembic_migrations", _executar_alembic_migrations)]
+    logger.info(
+        "⏭️ Pulando Alembic no startup da app (STARTUP_RUN_ALEMBIC=0); "
+        "espera-se migração prévia no processo de deploy (ex.: Procfile)."
+    )
+    return [("criar_tabelas", lambda: Base.metadata.create_all(bind=engine))]
 
+
+def _inicializar_banco_essencial(db) -> None:
+    """
+    Fase mínima antes de liberar /api em produção: schema de auth + catálogo de jogos.
+    """
+    passos = _passos_alembic_ou_create_all()
     passos.extend(
         [
+            ("garantir_colunas_oauth_usuario", _garantir_colunas_oauth_usuario),
             ("criar_admin_padrao", lambda: criar_admin_padrao(db)),
-            ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
-            ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
-            (
-                "garantir_colunas_catalogo_equipamentos",
-                _garantir_colunas_catalogo_equipamentos,
-            ),
-            ("garantir_coluna_bonus_base_ataque", _garantir_coluna_bonus_base_ataque),
-            (
-                "garantir_coluna_habilidades_especiais",
-                _garantir_coluna_habilidades_especiais,
-            ),
-            ("garantir_coluna_campanha_id", _garantir_coluna_campanha_id),
-            ("garantir_coluna_raca_slug", _garantir_coluna_raca_slug),
-            ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
-            ("garantir_colunas_dinheiro", _garantir_colunas_dinheiro),
-            ("garantir_colunas_perfil_divino", _garantir_colunas_perfil_divino),
-            ("garantir_colunas_talentos", _garantir_colunas_talentos),
-            (
-                "garantir_colunas_armaduras_protecao",
-                _garantir_colunas_armaduras_protecao,
-            ),
-            (
-                "garantir_coluna_pericia_destaque_arena",
-                _garantir_coluna_pericia_destaque_arena,
-            ),
-            ("garantir_constraints_item_13", _garantir_constraints_item_13),
             ("inicializar_catalogo_jogos", lambda: inicializar_catalogo_jogos(db)),
             (
                 "garantir_membership_dnd35_para_usuarios_legados",
@@ -812,9 +818,48 @@ def _inicializar_banco_critico(db) -> None:
             ),
         ]
     )
-
     for nome, callback in passos:
         _executar_passo_startup(nome, callback)
+
+
+def _inicializar_banco_schema_guards() -> None:
+    """Guards legados (podem demorar); rodam após liberar login em production."""
+    passos = [
+        ("garantir_coluna_dono_id", _garantir_coluna_dono_id),
+        ("garantir_colunas_soft_delete", _garantir_colunas_soft_delete),
+        (
+            "garantir_colunas_catalogo_equipamentos",
+            _garantir_colunas_catalogo_equipamentos,
+        ),
+        ("garantir_coluna_bonus_base_ataque", _garantir_coluna_bonus_base_ataque),
+        (
+            "garantir_coluna_habilidades_especiais",
+            _garantir_coluna_habilidades_especiais,
+        ),
+        ("garantir_coluna_campanha_id", _garantir_coluna_campanha_id),
+        ("garantir_coluna_raca_slug", _garantir_coluna_raca_slug),
+        ("garantir_colunas_resistencia_base", _garantir_colunas_resistencia_base),
+        ("garantir_colunas_dinheiro", _garantir_colunas_dinheiro),
+        ("garantir_colunas_perfil_divino", _garantir_colunas_perfil_divino),
+        ("garantir_colunas_talentos", _garantir_colunas_talentos),
+        (
+            "garantir_colunas_armaduras_protecao",
+            _garantir_colunas_armaduras_protecao,
+        ),
+        (
+            "garantir_coluna_pericia_destaque_arena",
+            _garantir_coluna_pericia_destaque_arena,
+        ),
+        ("garantir_constraints_item_13", _garantir_constraints_item_13),
+    ]
+    for nome, callback in passos:
+        _executar_passo_startup(nome, callback)
+
+
+def _inicializar_banco_critico(db) -> None:
+    """Dev/staging síncrono: essencial + guards + (chamador faz pos_ready)."""
+    _inicializar_banco_essencial(db)
+    _inicializar_banco_schema_guards()
 
 
 def _inicializar_banco_pos_ready(db) -> None:
@@ -855,6 +900,68 @@ def _executar_passo_startup(nome: str, callback) -> None:
     except Exception as exc:
         logger.exception("❌ Falha no passo de startup '%s'", nome)
         raise RuntimeError(f"Falha no startup em '{nome}': {exc}") from exc
+
+
+def _garantir_colunas_oauth_usuario() -> None:
+    """Colunas OAuth em `usuarios` (auth schema no Postgres) antes do admin no startup."""
+    inspector = inspect(engine)
+    dialect = engine.dialect.name
+
+    schema = None
+    if dialect == "postgresql":
+        for sch in ("auth", "public"):
+            if "usuarios" in inspector.get_table_names(schema=sch):
+                schema = sch
+                break
+        if schema is None:
+            return
+
+    table_names = (
+        inspector.get_table_names(schema=schema)
+        if schema is not None
+        else inspector.get_table_names()
+    )
+    if "usuarios" not in table_names:
+        return
+
+    colunas = {col["name"] for col in inspector.get_columns("usuarios", schema=schema)}
+    senha_col = next(
+        (
+            col
+            for col in inspector.get_columns("usuarios", schema=schema)
+            if col["name"] == "senha_hash"
+        ),
+        None,
+    )
+    needs_nullable = bool(senha_col and not senha_col.get("nullable", True))
+    needs_oauth = "oauth_provider" not in colunas or "oauth_subject" not in colunas
+
+    if not needs_oauth and not needs_nullable:
+        return
+
+    logger.warning("⚠️  schema OAuth em usuarios incompleto; aplicando schema guard")
+    qualified = f'"{schema}"."usuarios"' if schema else "usuarios"
+    with engine.begin() as conn:
+        if dialect == "postgresql":
+            conn.execute(text("SET search_path TO auth, dnd35, public"))
+        if "oauth_provider" not in colunas:
+            conn.execute(
+                text(f"ALTER TABLE {qualified} ADD COLUMN oauth_provider VARCHAR(32)")
+            )
+        if "oauth_subject" not in colunas:
+            conn.execute(
+                text(f"ALTER TABLE {qualified} ADD COLUMN oauth_subject VARCHAR(128)")
+            )
+        if needs_nullable and dialect == "postgresql":
+            conn.execute(
+                text(f"ALTER TABLE {qualified} ALTER COLUMN senha_hash DROP NOT NULL")
+            )
+        conn.execute(
+            text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS ix_usuarios_oauth_provider_subject "
+                f"ON {qualified} (oauth_provider, oauth_subject)"
+            )
+        )
 
 
 def _garantir_coluna_dono_id() -> None:

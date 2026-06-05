@@ -57,16 +57,39 @@ export async function warmupApi({ timeoutMs = 25000 } = {}) {
     }
 }
 
+/**
+ * Aguarda readiness do BD (produção libera /api após fase essencial).
+ */
+export async function waitForApiReady({
+    timeoutMs = 120000,
+    intervalMs = 2000,
+} = {}) {
+    const url = `${getApiOrigin()}/health/ready`;
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+        try {
+            const res = await fetch(url, { method: 'GET' });
+            if (res.ok) {
+                return true;
+            }
+        } catch (_err) {
+            /* rede / cold start */
+        }
+        await sleep(intervalMs);
+    }
+    return false;
+}
+
 export async function refreshSession() {
     const refreshToken = localStorage.getItem(STORAGE_REFRESH);
     if (!refreshToken) {
         return null;
     }
-    const res = await fetch(getApiUrl('/auth/refresh'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+    const res = await postJsonWithRetry(
+        '/auth/refresh',
+        { refresh_token: refreshToken },
+        { maxAttempts: 8, baseDelayMs: 1200 }
+    );
     if (!res.ok) {
         return null;
     }
@@ -87,8 +110,8 @@ export async function postJsonWithRetry(
     endpoint,
     body,
     {
-        maxAttempts = 4,
-        baseDelayMs = 800,
+        maxAttempts = 10,
+        baseDelayMs = 1200,
         onRetry = null,
     } = {}
 ) {

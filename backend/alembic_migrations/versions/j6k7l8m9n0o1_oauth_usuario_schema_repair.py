@@ -1,10 +1,10 @@
-"""usuario_oauth_google
+"""oauth_usuario_schema_repair
 
-Revision ID: i5j6k7l8m9n0
-Revises: h4i5j6k7l8m9
-Create Date: 2026-06-04
+Revision ID: j6k7l8m9n0o1
+Revises: i5j6k7l8m9n0
+Create Date: 2026-06-05
 
-OAuth Google: senha_hash opcional + oauth_provider/oauth_subject.
+Reaplica colunas OAuth em auth.usuarios quando i5j6k7l8m9n0 foi stamped sem DDL.
 """
 
 from typing import Sequence, Union
@@ -14,8 +14,8 @@ from alembic import op
 from sqlalchemy import text
 from sqlalchemy.exc import NoSuchTableError
 
-revision: str = "i5j6k7l8m9n0"
-down_revision: Union[str, None] = "h4i5j6k7l8m9"
+revision: str = "j6k7l8m9n0o1"
+down_revision: Union[str, None] = "i5j6k7l8m9n0"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -23,7 +23,6 @@ IDX_OAUTH = "ix_usuarios_oauth_provider_subject"
 
 
 def _schema_usuarios(bind) -> str | None:
-    """Postgres: tabela após fase_c fica em auth; SQLite usa schema implícito."""
     if bind.dialect.name != "postgresql":
         return None
     insp = sa.inspect(bind)
@@ -42,7 +41,14 @@ def _coluna_existe(tabela: str, coluna: str, schema: str | None = None) -> bool:
         return False
 
 
-def _aplicar_colunas_oauth(schema: str | None) -> None:
+def upgrade() -> None:
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        bind.execute(text("SET search_path TO auth, dnd35, public"))
+    schema = _schema_usuarios(bind)
+    if schema is None and bind.dialect.name == "postgresql":
+        return
+
     if not _coluna_existe("usuarios", "oauth_provider", schema=schema):
         op.add_column(
             "usuarios",
@@ -55,7 +61,6 @@ def _aplicar_colunas_oauth(schema: str | None) -> None:
             sa.Column("oauth_subject", sa.String(128), nullable=True),
             schema=schema,
         )
-    bind = op.get_bind()
     cols = sa.inspect(bind).get_columns("usuarios", schema=schema)
     senha = next((c for c in cols if c["name"] == "senha_hash"), None)
     if senha and not senha.get("nullable", True):
@@ -82,49 +87,7 @@ def _aplicar_colunas_oauth(schema: str | None) -> None:
                 f"ON {qual} (oauth_provider, oauth_subject)"
             )
         )
-    else:
-        insp = sa.inspect(bind)
-        existing = {idx["name"] for idx in insp.get_indexes("usuarios", schema=schema)}
-        if IDX_OAUTH not in existing:
-            op.create_index(
-                IDX_OAUTH,
-                "usuarios",
-                ["oauth_provider", "oauth_subject"],
-                unique=True,
-                schema=schema,
-            )
-
-
-def upgrade() -> None:
-    bind = op.get_bind()
-    if bind.dialect.name == "postgresql":
-        bind.execute(text("SET search_path TO auth, dnd35, public"))
-    schema = _schema_usuarios(bind)
-    if schema is None and bind.dialect.name == "postgresql":
-        return
-    _aplicar_colunas_oauth(schema)
 
 
 def downgrade() -> None:
-    bind = op.get_bind()
-    if bind.dialect.name == "postgresql":
-        bind.execute(text("SET search_path TO auth, dnd35, public"))
-    schema = _schema_usuarios(bind)
-    if not _coluna_existe("usuarios", "oauth_provider", schema=schema):
-        return
-    if bind.dialect.name == "postgresql":
-        if schema:
-            op.execute(text(f'DROP INDEX IF EXISTS "{schema}".{IDX_OAUTH}'))
-        else:
-            op.execute(text(f"DROP INDEX IF EXISTS {IDX_OAUTH}"))
-    else:
-        op.drop_index(IDX_OAUTH, table_name="usuarios", schema=schema)
-    op.drop_column("usuarios", "oauth_subject", schema=schema)
-    op.drop_column("usuarios", "oauth_provider", schema=schema)
-    op.alter_column(
-        "usuarios",
-        "senha_hash",
-        existing_type=sa.String(255),
-        nullable=False,
-        schema=schema,
-    )
+    pass
