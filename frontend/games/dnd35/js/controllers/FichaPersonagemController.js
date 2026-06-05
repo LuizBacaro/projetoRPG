@@ -2304,7 +2304,7 @@ export class FichaPersonagemController {
     mostrarErro(mensagem) {
         console.error('❌', mensagem);
         const container = document.getElementById('fichaPericiasLista');
-        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${escapeHtml(mensagem)}</span>`;
     }
 
     async carregarRenderizarEquipamentos(combatenteId) {
@@ -2432,7 +2432,7 @@ export class FichaPersonagemController {
     mostrarErroEquipamentos(mensagem) {
         console.error('❌', mensagem);
         const container = document.getElementById('fichaEquipamentos');
-        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${escapeHtml(mensagem)}</span>`;
     }
 
     async carregarRenderizarArmadurasProtecao(combatenteId) {
@@ -2492,7 +2492,7 @@ export class FichaPersonagemController {
 
     mostrarErroArmadurasProtecao(mensagem) {
         const container = document.getElementById('fichaArmadurasProtecao');
-        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${escapeHtml(mensagem)}</span>`;
     }
 
     async abrirModalArmadurasProtecao() {
@@ -3246,7 +3246,7 @@ export class FichaPersonagemController {
     mostrarErroTalentos(mensagem) {
         console.error('❌', mensagem);
         const container = document.getElementById('fichaTalentos');
-        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${mensagem}</span>`;
+        if (container) container.innerHTML = `<span class="ficha-vazio">❌ ${escapeHtml(mensagem)}</span>`;
     }
 
     async abrirModalTalentos() {

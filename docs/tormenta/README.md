@@ -14,6 +14,7 @@ Documentação para **implementação confiável** da ficha e regras do jogo Tor
 | [05-contrato-dados-ficha-json-e-api.md](05-contrato-dados-ficha-json-e-api.md) | `ficha_json`, colunas SQL, `foto_url`, evolução da API |
 | [06-trilha-levantamento-por-capitulo.md](06-trilha-levantamento-por-capitulo.md) | Checklist ao folhear o livro capítulo a capítulo |
 | [07-requisitos-grimorio-mb-144-209.md](07-requisitos-grimorio-mb-144-209.md) | Grimório MB: regras p.144–145, lista p.150–209, RFs e fases (paridade D&D 3.5) |
+| [08-grimorio-g0-g2-fechamento.md](08-grimorio-g0-g2-fechamento.md) | Checklist G0–G2 fechado; G4/G5 próximos passos |
 | [tabelas/README.md](tabelas/README.md) | JSONs de dados (estrutura; valores a partir do livro) |
 
 ## Ferramentas de requisitos (genérico RPG)

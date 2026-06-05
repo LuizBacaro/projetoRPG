@@ -36,6 +36,11 @@
             <button id="btnLogin" type="submit" class="btn-login">Entrar</button>
         </form>
 
+        <div id="grupoGoogle" class="oauth-google-group" style="display:none">
+            <div class="divider">ou</div>
+            <button type="button" id="btnGoogle" class="btn-google">Entrar com Google</button>
+        </div>
+
         <div class="divider">ou</div>
 
         <button id="btnAbrirCadastro" class="btn-cadastro">✨ Criar nova conta</button>
@@ -112,7 +117,15 @@
 <!-- ── Scripts ───────────────────────────────────────────────────────────── -->
 <script src="/js/shared/render-api-origin-boot.js"></script>
 <script type="module">
-    import { getApiUrl } from '/games/dnd35/js/config/api.config.js?v=20260513';
+    import { getApiUrl } from '/games/dnd35/js/config/api.config.js?v=20260604';
+    import {
+        warmupApi,
+        trySilentRefresh,
+        postJsonWithRetry,
+        persistSession,
+        redirectAfterLogin,
+        fetchOAuthGoogleStatus,
+    } from '/js/shared/auth-session.js?v=20260604';
 
     // ── Elementos de Login ────────────────────────────────────────────────
     const btnLogin   = document.getElementById('btnLogin');
@@ -136,10 +149,29 @@
     const perfilInfoTexto   = document.getElementById('perfilInfoTexto');
     const erroCadastro      = document.getElementById('erroCadastro');
     const sucessoCadastro   = document.getElementById('sucessoCadastro');
+    const grupoGoogle       = document.getElementById('grupoGoogle');
+    const btnGoogle         = document.getElementById('btnGoogle');
 
-    // Limpa sessão anterior — login sempre explícito
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
+    // ── Entrada: warm-up + refresh silencioso (mantém 24h sem pedir senha de novo)
+    (async function iniciarSessao() {
+        btnLogin.disabled = true;
+        btnLogin.textContent = 'Verificando sessão…';
+        await warmupApi();
+        const renovou = await trySilentRefresh();
+        if (renovou) {
+            redirectAfterLogin();
+            return;
+        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        btnLogin.disabled = false;
+        btnLogin.textContent = 'Entrar';
+
+        const oauthStatus = await fetchOAuthGoogleStatus();
+        if (oauthStatus.google_enabled && grupoGoogle) {
+            grupoGoogle.style.display = '';
+        }
+    })();
 
     // ── Helpers ───────────────────────────────────────────────────────────
 
@@ -205,14 +237,22 @@
         }
 
         btnLogin.disabled    = true;
-        btnLogin.textContent = 'Entrando...';
+        btnLogin.textContent = 'Conectando…';
 
         try {
-            const res  = await fetch(getApiUrl('/auth/login'), {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ email, senha })
-            });
+            await warmupApi();
+            const res = await postJsonWithRetry(
+                '/auth/login',
+                { email, senha },
+                {
+                    onRetry(attempt) {
+                        btnLogin.textContent =
+                            attempt === 1
+                                ? 'Servidor acordando…'
+                                : `Tentando de novo (${attempt})…`;
+                    },
+                }
+            );
 
             const ct = res.headers.get('Content-Type') || '';
             let data;
@@ -229,7 +269,9 @@
                 mostrarErroLogin(
                     res.status === 404
                         ? 'Não encontramos a API neste endereço. Faça um recarregamento forçado (Ctrl+Shift+R) e confira o deploy.'
-                        : 'Servidor retornou resposta inválida. Tente de novo em instantes.'
+                        : res.status === 503
+                          ? 'Servidor ainda inicializando. Aguarde alguns segundos e tente novamente.'
+                          : 'Servidor retornou resposta inválida. Tente de novo em instantes.'
                 );
                 return;
             }
@@ -239,17 +281,8 @@
                 return;
             }
 
-            localStorage.setItem('token',    data.access_token);
-            if (data.refresh_token) {
-                localStorage.setItem('refresh_token', data.refresh_token);
-            }
-            localStorage.setItem('usuario', JSON.stringify(data.usuario));
-            // Multi-jogo: após um login novo, não carregar jogo anterior — o usuário
-            // deve passar pelo hub de escolha (`selecionar-jogo`). O auto-entrada no
-            // seletor só usa `game_slug_ativo` quando já existia na mesma sessão.
-            localStorage.removeItem('game_slug_ativo');
-            localStorage.removeItem('game_nome_ativo');
-            window.location.href = '/pages/selecionar-jogo.html';
+            persistSession(data);
+            redirectAfterLogin();
 
         } catch (err) {
             mostrarErroLogin('Erro de conexão com o servidor.');
@@ -258,6 +291,12 @@
             btnLogin.disabled    = false;
             btnLogin.textContent = 'Entrar';
         }
+    }
+
+    if (btnGoogle) {
+        btnGoogle.addEventListener('click', () => {
+            window.location.href = getApiUrl('/auth/oauth/google/authorize');
+        });
     }
 
     // ── Cadastro ──────────────────────────────────────────────────────────

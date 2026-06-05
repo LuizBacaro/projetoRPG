@@ -41,6 +41,14 @@ No Arena, **`dnd35` e `dnd5e` são dois sistemas com `game_slug`, código e requ
 
 PDFs, planilhas e scripts de extração ficam em `livros/` e `helpers/` na raiz do repositório (`.gitignore`). Use-os só na máquina local; não commitar.
 
+## Matriz de cobertura (requisito × código)
+
+```bash
+python3 scripts/generate_requisitos_cobertura_matrix.py
+```
+
+Saída: [docs/requisitos-cobertura-matrix.md](../../docs/requisitos-cobertura-matrix.md) (heurística API/testes/FE — revisar manualmente).
+
 ## Ao concluir uma feature
 
 - Alinhar contrato API + teste mínimo (ver SDD leve em `AGENTS.md`).

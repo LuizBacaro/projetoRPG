@@ -5,7 +5,6 @@ SOLID: Dependency Injection via deps.py
 """
 
 import logging
-from datetime import timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -15,10 +14,11 @@ from sqlalchemy.orm import Session
 from ....games.dnd35.models.campanha import Campanha
 from ...core.config import settings
 from ...core.deps import get_db, get_usuario_atual
-from ...core.security import criar_token, decodificar_token, hash_senha, verificar_senha
+from ...core.security import decodificar_token, hash_senha, verificar_senha
 from ...core.security_audit import log_security_event
 from ...models.usuario import PerfilUsuario, Usuario
 from ...repositories.usuario_repository import UsuarioRepository
+from ...services.auth_token_service import emitir_par_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -206,6 +206,21 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    if not usuario.senha_hash:
+        log_security_event(
+            "login",
+            "failure",
+            request=request,
+            user_email=credentials.email,
+            reason="oauth_only_account",
+            level=logging.WARNING,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Esta conta usa login com Google. Clique em «Entrar com Google».",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     # ✅ Verifica senha
     if not verificar_senha(credentials.senha, usuario.senha_hash):
         log_security_event(
@@ -238,37 +253,10 @@ def login(
             status_code=status.HTTP_403_FORBIDDEN, detail="Usuário inativo"
         )
 
-    # ✅ Cria JWT token com 24h de validade
-    # ⚠️ IMPORTANTE: Passar settings.SECRET_KEY como argumento
-    token = criar_token(
-        data={"sub": usuario.email},
-        secret_key=settings.SECRET_KEY,
-        expires_delta=timedelta(hours=24),
-        token_type="access",
-    )
-    refresh_token = criar_token(
-        data={"sub": usuario.email},
-        secret_key=settings.SECRET_KEY,
-        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
-        token_type="refresh",
-    )
-
     logger.info(f"✅ Login bem-sucedido: {usuario.email}")
     log_security_event("login", "success", request=request, user_email=usuario.email)
 
-    # ✅ Retorna token + dados do usuário
-    return TokenResponse(
-        access_token=token,
-        refresh_token=refresh_token,
-        token_type="bearer",
-        usuario={
-            "id": usuario.id,
-            "email": usuario.email,
-            "nome": usuario.nome,
-            "perfil": usuario.perfil,
-            "ativo": usuario.ativo,
-        },
-    )
+    return TokenResponse(**emitir_par_tokens(usuario))
 
 
 @router.post(
@@ -491,34 +479,10 @@ def refresh(
             detail="Usuário inativo",
         )
 
-    novo_access_token = criar_token(
-        data={"sub": usuario.email},
-        secret_key=settings.SECRET_KEY,
-        expires_delta=timedelta(hours=24),
-        token_type="access",
-    )
-    novo_refresh_token = criar_token(
-        data={"sub": usuario.email},
-        secret_key=settings.SECRET_KEY,
-        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
-        token_type="refresh",
-    )
-
     logger.info(f"✅ Token renovado com sucesso: {usuario.email}")
     log_security_event("refresh", "success", request=request, user_email=usuario.email)
 
-    return TokenResponse(
-        access_token=novo_access_token,
-        refresh_token=novo_refresh_token,
-        token_type="bearer",
-        usuario={
-            "id": usuario.id,
-            "email": usuario.email,
-            "nome": usuario.nome,
-            "perfil": usuario.perfil,
-            "ativo": usuario.ativo,
-        },
-    )
+    return TokenResponse(**emitir_par_tokens(usuario))
 
 
 @router.get(

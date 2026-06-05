@@ -158,7 +158,7 @@ class GameService:
                 "profile": perfil,
             },
             secret_key=settings.SECRET_KEY,
-            expires_delta=timedelta(hours=24),
+            expires_delta=timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS),
             token_type="access",
         )
         novo_refresh_token = criar_token(

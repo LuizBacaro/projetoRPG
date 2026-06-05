@@ -52,7 +52,8 @@ def main() -> None:
             [4, "Skills", ".cursor/skills/, .github/skills/", "Playbooks sob demanda", "Cursor: skills do projeto; 1-2 por tarefa"],
             [5, "Agentes e prompts", ".github/agents/, .github/prompts/", "Personas e atalhos", "Principalmente GitHub Copilot"],
             [6, "Hook", ".github/hooks/operational-safety.json", "Guarda terminal/SQL", "Se hooks ativos no runtime"],
-            [7, "CI", ".github/workflows/ci.yml", "Lint e testes", "Push/PR"],
+            [7, "CI", ".github/workflows/ci.yml", "Lint, audit-dnd35-js, E2E Playwright", "Push/PR"],
+            [7, "ADRs", "docs/adr/", "Decisões irreversíveis (monólito, Tormenta, dnd5e, apps adiado)", "Manual / @ no chat"],
             ["—", "Tracking manual", "MELHORIAS.md, HISTORICO_EVOLUCAO.md", "Débito e histórico", "Solto — não ligado a agentes"],
         ],
     )
@@ -133,6 +134,11 @@ def main() -> None:
             ["Atalho feature?", "Prompt", ".github/prompts/nova-feature-fullstack.prompt.md"],
             ["Conjuração D&D 3.5?", "Skill", ".cursor/skills/dnd-spellcasting-conventions/"],
             ["Deploy/CORS?", "Skill", ".cursor/skills/arena-ttrpg-architecture/"],
+            ["Auth refresh/OAuth?", "Doc", "docs/auth-sessao-oauth.md"],
+            ["Livros → dados/RF?", "Doc", "docs/livros-para-dados.md"],
+            ["Matriz RF × código?", "Doc", "docs/requisitos-cobertura-matrix.md"],
+            ["Auditoria JS dnd35?", "Doc + script", "docs/dnd35-js-auditoria-2026-06.md, scripts/audit-dnd35-js.sh"],
+            ["E2E Playwright?", "Doc", "docs/e2e-playwright-arena.md"],
             ["Dados Neon?", "Skill", ".cursor/skills/arena-producao-dados-neon-render/"],
             ["Guarda terminal?", "Hook", ".github/hooks/"],
             ["Guia markdown?", "Este doc", "docs/governanca-agentes-fluxos.md"],
@@ -165,6 +171,8 @@ def main() -> None:
             ["Erro só produção", "arena-ttrpg-architecture", "arena-producao-dados se BD", "—", "PRE_DEPLOY_CHECKLIST"],
             ["Migration", "Prompt Migration Segura", "API Contract Orchestrator", "PRE_DEPLOY + skill Neon", "CI"],
             ["Levantamento livro", "Levantamento Requisitos RPG / RPG Analyst", "pdf skill", "RF em requisitos/", "Handoff — não codar"],
+            ["Auditoria JS dnd35", "docs/dnd35-js-auditoria-2026-06.md", "scripts/audit-dnd35-js.sh", "Fase 1 quick wins", "E2E + ESLint"],
+            ["Auth/OAuth produção", "docs/auth-sessao-oauth.md", "Render env GOOGLE_OAUTH_*", "PRE_DEPLOY_CHECKLIST", "—"],
         ],
     )
 
