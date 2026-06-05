@@ -27,11 +27,13 @@ def test_health_live(page: Page):
 
 
 def test_oauth_google_status(page: Page):
-    """Status OAuth expõe campo enabled (CI sem credenciais → false)."""
+    """Status OAuth expõe google_enabled (CI sem credenciais → false)."""
     res = page.request.get(f"{BASE_URL}/api/v1/auth/oauth/google/status")
     assert res.ok, res.text()
     data = res.json()
-    assert "enabled" in data
+    assert "google_enabled" in data
+    assert isinstance(data["google_enabled"], bool)
+    assert data.get("frontend_callback_path") == "/pages/oauth-callback.html"
 
 
 def test_pagina_login_carrega(page: Page):
