@@ -75,6 +75,31 @@ class Dnd5ePersonagemService {
         return this._handleResponse(res, 'Erro ao excluir personagem');
     }
 
+    async progressaoPendencias(id) {
+        const res = await fetch(this._url(`/${id}/progressao/pendencias`), {
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao carregar pendências');
+    }
+
+    async progressaoHpRoll(id, body) {
+        const res = await fetch(this._url(`/${id}/progressao/hp-roll`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao registrar PV');
+    }
+
+    async progressaoMarco(id, body) {
+        const res = await fetch(this._url(`/${id}/progressao/marco`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao registrar marco');
+    }
+
     async enviarFoto(id, file) {
         const fd = new FormData();
         fd.append('foto', file);

@@ -12,7 +12,13 @@ from app.games.dnd5e.models.grimorio import Dnd5eGrimorioMagia
 from app.games.dnd5e.repositories.grimorio_repository import Dnd5eGrimorioRepository
 from app.games.dnd5e.repositories.magia_repository import Dnd5eMagiaRepository
 from app.games.dnd5e.repositories.personagem_repository import Dnd5ePersonagemRepository
-from app.games.dnd5e.rules.magia import espacos_por_classe_nivel
+from app.games.dnd5e.rules.magia import (
+    custo_ponto_feiticaria_criar_slot,
+    espacos_por_classe_nivel,
+    pontos_feiticaria_max,
+    recuperacao_arcana_max_niveis_slot,
+    truque_multiplicador_dados,
+)
 from app.games.dnd5e.schemas.conjuracao import (
     Dnd5eConjuracaoEstadoResponse,
     Dnd5eSlotNivelItem,
@@ -25,9 +31,11 @@ from app.games.dnd5e.services.conjuracao_shared import (
     contar_magias_preparadas_com_nivel,
     magias_conhecidas_max,
     magias_preparadas_max,
+    modo_lista_conjuracao,
     normalizar_magias_preparadas_qty,
     somar_qty_preparadas_por_nivel,
 )
+from app.games.dnd5e.rules.magia import habilidade_primaria_classe, max_nivel_magia_conjuravel
 from app.games.dnd5e.services.grimorio_service import _classe_lista_magias
 from app.repositories.base import commit_with_rollback
 
@@ -51,14 +59,35 @@ def _mod_habilidade(personagem, classe: str) -> int:
 
 def _estado_default(classe: str, nivel: int) -> dict[str, Any]:
     totais = espacos_por_classe_nivel(classe, nivel)
+    pf_max = pontos_feiticaria_max(classe, nivel)
     return {
         "classe": classe,
         "espacos_usados": [0] * len(totais),
+        "slots_bonus_pf": [0] * len(totais),
         "magias_preparadas_ids": [],
         "magias_preparadas_qty": {},
         "magias_lancadas_ids": [],
         "magia_concentracao_id": None,
+        "pontos_feiticaria_atual": pf_max if pf_max else None,
+        "recuperacao_arcana_usada": False,
     }
+
+
+def _normalizar_slots_bonus(conj: dict, tamanho: int) -> list[int]:
+    bonus = list(conj.get("slots_bonus_pf") or [])
+    if len(bonus) < tamanho:
+        bonus.extend([0] * (tamanho - len(bonus)))
+    return bonus[:tamanho]
+
+
+def _pontos_feiticaria_atual(conj: dict, classe: str, nivel: int) -> Optional[int]:
+    maximo = pontos_feiticaria_max(classe, nivel)
+    if maximo <= 0:
+        return None
+    atual = conj.get("pontos_feiticaria_atual")
+    if atual is None:
+        return maximo
+    return max(0, min(maximo, int(atual)))
 
 
 def _get_conjuracao(ficha: dict, classe: str, nivel: int) -> dict[str, Any]:
@@ -77,6 +106,10 @@ def _get_conjuracao(ficha: dict, classe: str, nivel: int) -> dict[str, Any]:
     base["magias_preparadas_qty"] = normalizar_magias_preparadas_qty(
         base.get("magias_preparadas_qty")
     )
+    base["slots_bonus_pf"] = _normalizar_slots_bonus(base, len(totais))
+    pf_max = pontos_feiticaria_max(classe, nivel)
+    if pf_max > 0 and base.get("pontos_feiticaria_atual") is None:
+        base["pontos_feiticaria_atual"] = pf_max
     return base
 
 
@@ -154,19 +187,28 @@ class Dnd5eConjuracaoFichaService:
         conj = _get_conjuracao(ficha, classe, p.nivel)
         totais = espacos_por_classe_nivel(classe, p.nivel)
         usados = conj["espacos_usados"]
+        bonus = _normalizar_slots_bonus(conj, len(totais))
         slots = []
         for nivel, total in enumerate(totais):
             if nivel == 0 or total <= 0:
                 continue
             u = usados[nivel] if nivel < len(usados) else 0
+            b = bonus[nivel] if nivel < len(bonus) else 0
             slots.append(
                 Dnd5eSlotNivelItem(
                     nivel=nivel,
-                    total=total,
+                    total=total + b,
                     usados=u,
-                    disponiveis=max(0, total - u),
+                    disponiveis=max(0, total + b - u),
                 )
             )
+        pf_max = pontos_feiticaria_max(classe, p.nivel)
+        pf_atual = _pontos_feiticaria_atual(conj, classe, p.nivel)
+        arcana_max = (
+            recuperacao_arcana_max_niveis_slot(p.nivel)
+            if classe == "mago"
+            else None
+        )
         classe_grim = _classe_lista_magias(classe)
         _, itens = self.grimorio_repo.listar_paginado(
             personagem_id, classe=classe_grim, limit=500
@@ -177,6 +219,9 @@ class Dnd5eConjuracaoFichaService:
         return Dnd5eConjuracaoEstadoResponse(
             classe=classe,
             nivel_personagem=p.nivel,
+            habilidade_primaria=habilidade_primaria_classe(classe),
+            modo_lista=modo_lista_conjuracao(classe),
+            max_nivel_magia=max_nivel_magia_conjuravel(classe, p.nivel),
             prepara_magias=classe_prepara_magias(classe),
             magias_conhecidas_max=magias_conhecidas_max(classe, p.nivel),
             magias_conhecidas_atual=contar_magias_conhecidas_grimorio(itens),
@@ -187,6 +232,12 @@ class Dnd5eConjuracaoFichaService:
             slots=slots,
             magia_concentracao_id=conj.get("magia_concentracao_id"),
             recupera_slots_repouso_curto=classe in SHORT_REST_RECOVER_ALL,
+            truque_multiplicador_dados=truque_multiplicador_dados(p.nivel),
+            pontos_feiticaria_atual=pf_atual,
+            pontos_feiticaria_max=pf_max if pf_max > 0 else None,
+            recuperacao_arcana_disponivel=classe == "mago"
+            and not bool(conj.get("recuperacao_arcana_usada")),
+            recuperacao_arcana_max_niveis=arcana_max,
         )
 
     def _salvar_conjuracao(self, personagem, ficha: dict, conj: dict) -> None:
@@ -212,10 +263,12 @@ class Dnd5eConjuracaoFichaService:
             raise HTTPException(status_code=422, detail="Nível de magia inválido")
         if nivel_magia >= 1:
             usados = conj["espacos_usados"]
-            disp = totais[nivel_magia] - usados[nivel_magia]
+            bonus = _normalizar_slots_bonus(conj, len(totais))
+            disp = totais[nivel_magia] + bonus[nivel_magia] - usados[nivel_magia]
             if disp < quantidade:
                 raise HTTPException(status_code=422, detail="Sem espaços disponíveis")
             usados[nivel_magia] += quantidade
+            conj["slots_bonus_pf"] = bonus
         if magia_id is not None:
             lancadas = list(conj.get("magias_lancadas_ids") or [])
             if int(magia_id) not in lancadas:
@@ -323,8 +376,13 @@ class Dnd5eConjuracaoFichaService:
         conj = _get_conjuracao(ficha, classe, p.nivel)
         totais = espacos_por_classe_nivel(classe, p.nivel)
         conj["espacos_usados"] = [0] * len(totais)
+        conj["slots_bonus_pf"] = [0] * len(totais)
         conj["magia_concentracao_id"] = None
         conj["magias_lancadas_ids"] = []
+        conj["recuperacao_arcana_usada"] = False
+        pf_max = pontos_feiticaria_max(classe, p.nivel)
+        if pf_max > 0:
+            conj["pontos_feiticaria_atual"] = pf_max
         if classe_prepara_magias(classe):
             conj["magias_preparadas_ids"] = []
             conj["magias_preparadas_qty"] = {}
@@ -335,14 +393,120 @@ class Dnd5eConjuracaoFichaService:
         p = self._personagem(personagem_id)
         ficha = deepcopy(dict(p.ficha_json or {}))
         classe = classe_slug_ficha(ficha)
-        if classe not in SHORT_REST_RECOVER_ALL:
+        conj = _get_conjuracao(ficha, classe, p.nivel)
+        if classe in SHORT_REST_RECOVER_ALL:
+            totais = espacos_por_classe_nivel(classe, p.nivel)
+            conj["espacos_usados"] = [0] * len(totais)
+            conj["magias_lancadas_ids"] = []
+            self._salvar_conjuracao(p, ficha, conj)
+        return self.obter_estado(personagem_id)
+
+    def criar_slot_pontos_feiticaria(
+        self, personagem_id: int, nivel_slot: int
+    ) -> Dnd5eConjuracaoEstadoResponse:
+        p = self._personagem(personagem_id)
+        ficha = deepcopy(dict(p.ficha_json or {}))
+        classe = classe_slug_ficha(ficha)
+        if classe not in ("feiticeiro", "sorcerer"):
             raise HTTPException(
-                status_code=400,
-                detail="Repouso curto não recupera slots desta classe",
+                status_code=400, detail="Pontos de feitiçaria só para Feiticeiro"
             )
         conj = _get_conjuracao(ficha, classe, p.nivel)
         totais = espacos_por_classe_nivel(classe, p.nivel)
-        conj["espacos_usados"] = [0] * len(totais)
-        conj["magias_lancadas_ids"] = []
+        try:
+            custo = custo_ponto_feiticaria_criar_slot(nivel_slot)
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=str(e)) from e
+        atual = _pontos_feiticaria_atual(conj, classe, p.nivel) or 0
+        if atual < custo:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Pontos insuficientes (precisa {custo}, tem {atual})",
+            )
+        bonus = _normalizar_slots_bonus(conj, len(totais))
+        bonus[nivel_slot] += 1
+        conj["pontos_feiticaria_atual"] = atual - custo
+        conj["slots_bonus_pf"] = bonus
+        self._salvar_conjuracao(p, ficha, conj)
+        return self.obter_estado(personagem_id)
+
+    def converter_slot_pontos_feiticaria(
+        self, personagem_id: int, nivel_slot: int
+    ) -> Dnd5eConjuracaoEstadoResponse:
+        p = self._personagem(personagem_id)
+        ficha = deepcopy(dict(p.ficha_json or {}))
+        classe = classe_slug_ficha(ficha)
+        if classe not in ("feiticeiro", "sorcerer"):
+            raise HTTPException(
+                status_code=400, detail="Pontos de feitiçaria só para Feiticeiro"
+            )
+        conj = _get_conjuracao(ficha, classe, p.nivel)
+        totais = espacos_por_classe_nivel(classe, p.nivel)
+        usados = conj["espacos_usados"]
+        bonus = _normalizar_slots_bonus(conj, len(totais))
+        disp = totais[nivel_slot] + bonus[nivel_slot] - usados[nivel_slot]
+        if disp < 1:
+            raise HTTPException(
+                status_code=422, detail="Sem espaço disponível para converter"
+            )
+        pf_max = pontos_feiticaria_max(classe, p.nivel)
+        atual = _pontos_feiticaria_atual(conj, classe, p.nivel) or 0
+        if atual + nivel_slot > pf_max:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Excede o máximo de {pf_max} pontos de feitiçaria",
+            )
+        usados[nivel_slot] += 1
+        conj["pontos_feiticaria_atual"] = atual + nivel_slot
+        conj["slots_bonus_pf"] = bonus
+        self._salvar_conjuracao(p, ficha, conj)
+        return self.obter_estado(personagem_id)
+
+    def recuperacao_arcana(
+        self, personagem_id: int, slots: dict[int, int]
+    ) -> Dnd5eConjuracaoEstadoResponse:
+        p = self._personagem(personagem_id)
+        ficha = deepcopy(dict(p.ficha_json or {}))
+        classe = classe_slug_ficha(ficha)
+        if classe != "mago":
+            raise HTTPException(
+                status_code=400, detail="Recuperação arcana só para Mago"
+            )
+        conj = _get_conjuracao(ficha, classe, p.nivel)
+        if conj.get("recuperacao_arcana_usada"):
+            raise HTTPException(
+                status_code=400,
+                detail="Recuperação arcana já usada desde o último descanso longo",
+            )
+        max_niveis = recuperacao_arcana_max_niveis_slot(p.nivel)
+        gasto = sum(int(n) * int(q) for n, q in slots.items())
+        if gasto <= 0:
+            raise HTTPException(status_code=422, detail="Informe slots a recuperar")
+        if gasto > max_niveis:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Máximo de {max_niveis} níveis de slot recuperáveis",
+            )
+        usados = conj["espacos_usados"]
+        for nivel, qtd in slots.items():
+            if usados[nivel] < qtd:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Sem {qtd} espaço(s) usado(s) no nível {nivel}",
+                )
+        for nivel, qtd in slots.items():
+            usados[nivel] -= qtd
+        conj["recuperacao_arcana_usada"] = True
+        self._salvar_conjuracao(p, ficha, conj)
+        return self.obter_estado(personagem_id)
+
+    def definir_concentracao(
+        self, personagem_id: int, magia_id: Optional[int]
+    ) -> Dnd5eConjuracaoEstadoResponse:
+        p = self._personagem(personagem_id)
+        ficha = deepcopy(dict(p.ficha_json or {}))
+        classe = classe_slug_ficha(ficha)
+        conj = _get_conjuracao(ficha, classe, p.nivel)
+        conj["magia_concentracao_id"] = int(magia_id) if magia_id else None
         self._salvar_conjuracao(p, ficha, conj)
         return self.obter_estado(personagem_id)

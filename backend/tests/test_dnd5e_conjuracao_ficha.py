@@ -363,3 +363,62 @@ def test_preparar_truque_nao_conta_no_limite():
         assert truque.id in estado.magias_preparadas_ids
     finally:
         db.close()
+
+
+def test_feiticeiro_pontos_feiticaria_criar_slot():
+    db = SessionLocal()
+    try:
+        p = Dnd5ePersonagem(
+            tipo="jogador",
+            nome="Feiticeiro PF",
+            nivel=5,
+            charisma=16,
+            ficha_json={"classe_slug": "feiticeiro"},
+        )
+        db.add(p)
+        commit_with_rollback(db)
+        db.refresh(p)
+
+        svc = _conj_svc(db)
+        estado = svc.obter_estado(p.id)
+        assert estado.pontos_feiticaria_max == 5
+        assert estado.pontos_feiticaria_atual == 5
+
+        svc.gastar_slot(p.id, 1, 2)
+        estado2 = svc.criar_slot_pontos_feiticaria(p.id, 1)
+        assert estado2.pontos_feiticaria_atual == 3
+        slot1 = next(s for s in estado2.slots if s.nivel == 1)
+        assert slot1.disponiveis >= 1
+    finally:
+        db.close()
+
+
+def test_mago_recuperacao_arcana():
+    db = SessionLocal()
+    try:
+        p = Dnd5ePersonagem(
+            tipo="jogador",
+            nome="Mago Arcana",
+            nivel=5,
+            intelligence=16,
+            ficha_json={"classe_slug": "mago"},
+        )
+        db.add(p)
+        commit_with_rollback(db)
+        db.refresh(p)
+
+        svc = _conj_svc(db)
+        svc.gastar_slot(p.id, 1, 2)
+        estado = svc.obter_estado(p.id)
+        assert estado.recuperacao_arcana_disponivel is True
+        assert estado.recuperacao_arcana_max_niveis == 3
+
+        estado2 = svc.recuperacao_arcana(p.id, {1: 2})
+        slot1 = next(s for s in estado2.slots if s.nivel == 1)
+        assert slot1.usados == 0
+        assert estado2.recuperacao_arcana_disponivel is False
+
+        with pytest.raises(HTTPException):
+            svc.recuperacao_arcana(p.id, {1: 1})
+    finally:
+        db.close()

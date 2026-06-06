@@ -18,6 +18,7 @@ from app.games.dnd5e.rules.classes import (
     niveis_com_ganho_feat,
     tabela_xp_por_nivel,
 )
+from app.games.dnd5e.rules.equipamento import montar_resumo_equipamento
 from app.games.dnd5e.rules.ficha import montar_resumo_ficha
 from app.games.dnd5e.rules.habilidades import (
     HABILIDADE_MAX,
@@ -30,11 +31,19 @@ from app.games.dnd5e.rules.habilidades import (
 from app.games.dnd5e.rules.pericias import listar_pericias_catalogo
 from app.games.dnd5e.rules.racas import lista_racas_catalogo
 from app.games.dnd5e.rules.subclasses import listar_subclasses
+from app.games.dnd5e.schemas.conjuracao import Dnd5eConjuracaoPerfilResponse
+from app.games.dnd5e.schemas.progressao import (
+    Dnd5eGerarAtributosRequest,
+    Dnd5eGerarAtributosResponse,
+)
+from app.games.dnd5e.services.conjuracao_shared import perfil_conjuracao_classe
 from app.games.dnd5e.schemas.regras import (
     Dnd5eAntecedenteCatalogoItem,
     Dnd5eBonusProficienciaItem,
     Dnd5eCalcularAtributosRequest,
     Dnd5eCalcularAtributosResponse,
+    Dnd5eCalcularEquipamentoRequest,
+    Dnd5eCalcularEquipamentoResponse,
     Dnd5eClasseItem,
     Dnd5eCondicaoItem,
     Dnd5eFeatCatalogoItem,
@@ -55,6 +64,8 @@ from app.games.dnd5e.schemas.regras import (
     Dnd5eSubclasseItem,
     Dnd5eXpNivelItem,
 )
+from app.core.dependencies import get_dnd5e_progressao_service
+from app.games.dnd5e.services.progressao_service import Dnd5eProgressaoService
 from app.shared.core.deps import get_usuario_atual, requer_game_dnd5e
 from app.shared.models.usuario import Usuario
 
@@ -139,6 +150,21 @@ def obter_regras_combate(
         acoes_turno=meta["acoes_turno"],
         salvamentos_morte=meta["salvamentos_morte"],
     )
+
+
+@router.get(
+    "/conjuracao-perfil",
+    response_model=Dnd5eConjuracaoPerfilResponse,
+    summary="Perfil de conjuração por classe e nível (slots, modo de lista, teto)",
+)
+def obter_conjuracao_perfil(
+    classe: str = Query(..., min_length=2, max_length=40),
+    nivel: int = Query(..., ge=1, le=20),
+    mod_habilidade: int = Query(0, ge=-5, le=20),
+    _: Usuario = Depends(get_usuario_atual),
+) -> Dnd5eConjuracaoPerfilResponse:
+    perfil = perfil_conjuracao_classe(classe, nivel, mod_habilidade=mod_habilidade)
+    return Dnd5eConjuracaoPerfilResponse(**perfil)
 
 
 @router.get(
@@ -245,6 +271,19 @@ def obter_regras_subclasses(
 
 
 @router.post(
+    "/gerar-atributos",
+    response_model=Dnd5eGerarAtributosResponse,
+    summary="Gera scores base (4d6, matriz PHB ou compra de pontos)",
+)
+def gerar_atributos(
+    payload: Dnd5eGerarAtributosRequest,
+    service: Dnd5eProgressaoService = Depends(get_dnd5e_progressao_service),
+    _: Usuario = Depends(get_usuario_atual),
+) -> Dnd5eGerarAtributosResponse:
+    return service.gerar_atributos(payload.metodo, seed=payload.seed)
+
+
+@router.post(
     "/calcular-atributos",
     response_model=Dnd5eCalcularAtributosResponse,
     summary="Preview de ficha: atributos, perícias, antecedente, CA com armadura",
@@ -254,11 +293,18 @@ def calcular_atributos_ficha(
     _: Usuario = Depends(get_usuario_atual),
 ) -> Dnd5eCalcularAtributosResponse:
     try:
+        ficha_progressao = None
+        if payload.progressao or payload.feats:
+            ficha_progressao = {
+                "progressao": payload.progressao or {"hp_rolls": [], "marcos": []},
+                "feats": payload.feats,
+            }
         resumo = montar_resumo_ficha(
             raca_slug=payload.raca_slug,
             classe_slug=payload.classe_slug,
             scores_base=payload.scores_base,
             bonus_habilidade_extra=payload.bonus_habilidade_extra,
+            bonus_atributo_feat=payload.bonus_atributo_feat,
             antecedente_slug=payload.antecedente_slug,
             nivel=payload.nivel,
             pericias_classe_escolhidas=payload.pericias_classe_escolhidas,
@@ -266,7 +312,32 @@ def calcular_atributos_ficha(
             subclasse_slug=payload.subclasse_slug,
             armadura_slug=payload.armadura_slug,
             escudo_slug=payload.escudo_slug,
+            ficha_progressao=ficha_progressao,
+            feats=payload.feats,
+            hp_roll_nivel_1=payload.hp_roll_nivel_1,
         )
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
     return Dnd5eCalcularAtributosResponse(**resumo)
+
+
+@router.post(
+    "/calcular-equipamento",
+    response_model=Dnd5eCalcularEquipamentoResponse,
+    summary="Resumo de CA, peso, encargo e inventário",
+)
+def calcular_equipamento_ficha(
+    payload: Dnd5eCalcularEquipamentoRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> Dnd5eCalcularEquipamentoResponse:
+    resumo = montar_resumo_equipamento(
+        armadura_slug=payload.armadura_slug,
+        escudo_slug=payload.escudo_slug,
+        arma_principal_slug=payload.arma_principal_slug,
+        armas_slugs=payload.armas_slugs,
+        itens=[i.model_dump() for i in payload.itens],
+        forca=payload.forca,
+        dex_mod=payload.dex_mod,
+        ouro_po=payload.ouro_po,
+    )
+    return Dnd5eCalcularEquipamentoResponse(**resumo)

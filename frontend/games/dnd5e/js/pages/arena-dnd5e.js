@@ -9,6 +9,13 @@ import {
     MODO_CONJURADOR,
 } from '../arena/Dnd5eArenaMagiasHelper.js';
 import { Dnd5eArenaMagiasView } from '../ui/Dnd5eArenaMagiasView.js';
+import { Dnd5eArenaConjuracaoModal } from '../ui/Dnd5eArenaConjuracaoModal.js';
+import {
+    magiaPrecisaAlvo,
+    montarPayloadConjurar,
+    modAtributo,
+} from '../arena/Dnd5eArenaConjuracaoHelper.js';
+import { parseBonusAtaque, parseDanoFicha } from '../arena/Dnd5eArenaAtaquesHelper.js';
 import { Dnd5eGrimorioService } from '../services/Dnd5eGrimorioService.js';
 import { Dnd5eConjuracaoFichaService } from '../services/Dnd5eConjuracaoFichaService.js';
 
@@ -105,6 +112,7 @@ class Dnd5eArenaController {
         }
 
         this.modalCondicao = new Dnd5eCondicaoModal(this);
+        this.modalConjuracao = new Dnd5eArenaConjuracaoModal(this);
         this.ehMestre = Dnd5eArenaController.ehMestreUsuario();
         this._configurarUiMestre();
         await this.carregarPersonagens();
@@ -141,14 +149,49 @@ class Dnd5eArenaController {
             ca: f.ca_total != null ? f.ca_total : 10 + (p.dexterity_mod || 0),
             dex_mod: p.dexterity_mod ?? 0,
             condicoes: CU.normalizarLista(f.arena_condicoes || []),
+            death_failures: 0,
+            death_successes: 0,
+            status_vida: 'vivo',
+            mod_medicina: this._modMedicinaDePersonagem(p, f),
+            economia: {
+                acao_usada: false,
+                bonus_acao_usada: false,
+                movimento_usado_metros: 0,
+                reacao_usada: false,
+                velocidade_metros: 9,
+            },
             forca: p.strength,
             destreza: p.dexterity,
             constituicao: p.constitution,
             inteligencia: p.intelligence,
             sabedoria: p.wisdom,
             carisma: p.charisma,
+            strength_mod: p.strength_mod ?? 0,
+            dexterity_mod: p.dexterity_mod ?? 0,
+            constitution_mod: p.constitution_mod ?? 0,
+            intelligence_mod: p.intelligence_mod ?? 0,
+            wisdom_mod: p.wisdom_mod ?? 0,
+            charisma_mod: p.charisma_mod ?? 0,
+            bonus_proficiencia: p.bonus_proficiencia ?? 2,
+            magia_concentracao_id: null,
             salvamentos: this._salvamentosDePersonagem(p, f),
+            ataques: Array.isArray(f.inventario?.ataques)
+                ? f.inventario.ataques.map((a) => ({ ...a }))
+                : [],
         };
+    }
+
+    _modMedicinaDePersonagem(p, f) {
+        const pericias = f.pericias;
+        if (Array.isArray(pericias)) {
+            const med = pericias.find((x) => x.slug === 'medicina');
+            if (med != null) return Number(med.bonus) || 0;
+        }
+        const profs = f.pericias_proficientes || [];
+        const sabMod =
+            p.wisdom_mod ?? Math.floor(((Number(p.wisdom) || 10) - 10) / 2);
+        const profBonus = profs.includes('medicina') ? p.bonus_proficiencia ?? 2 : 0;
+        return sabMod + profBonus;
     }
 
     _salvamentosDePersonagem(p, f) {
@@ -162,14 +205,15 @@ class Dnd5eArenaController {
             wisdom: 'SAB',
             charisma: 'CAR',
         };
-        return ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma']
-            .slice(0, 3)
-            .map((key, i) => {
-                const labels = ['Fortitude', 'Reflexos', 'Vontade'];
-                const mod = p[`${key}_mod`] ?? 0;
-                const prof = p.bonus_proficiencia ?? 2;
-                return { label: labels[i] || map[key], bonus: mod };
-            });
+        const defs = [
+            { slug: 'fortitude', key: 'constitution', label: 'Fortitude' },
+            { slug: 'reflexos', key: 'dexterity', label: 'Reflexos' },
+            { slug: 'vontade', key: 'wisdom', label: 'Vontade' },
+        ];
+        return defs.map((d) => {
+            const mod = p[`${d.key}_mod`] ?? 0;
+            return { slug: d.slug, tipo: d.slug, label: d.label, bonus: mod };
+        });
     }
 
     async carregarPersonagens() {
@@ -295,6 +339,18 @@ class Dnd5eArenaController {
             sabedoria: 10,
             carisma: 10,
             salvamentos: [],
+            death_failures: 0,
+            death_successes: 0,
+            status_vida: 'vivo',
+            mod_medicina: 0,
+            economia: {
+                acao_usada: false,
+                bonus_acao_usada: false,
+                movimento_usado_metros: 0,
+                reacao_usada: false,
+                velocidade_metros: 9,
+            },
+            ataques: [],
         };
         this.combatentes.push(c);
         this.selecionados.add(id);
@@ -328,9 +384,24 @@ class Dnd5eArenaController {
                 hp_atual: c.hp_atual,
                 ficha: { arena_condicoes: c.condicoes || [] },
             });
+            await this._persistirConcentracaoNaFicha(c, true);
             if (!silencioso) Toast.success(`Ficha de ${c.nome} atualizada.`);
         } catch (e) {
             Toast.error(`${c.nome}: ${e.message}`);
+        }
+    }
+
+    async _persistirConcentracaoNaFicha(c, silencioso) {
+        if (!c.personagemId || !this.conjuracaoFichaService) return;
+        try {
+            const estado = await this.conjuracaoFichaService.definirConcentracao(
+                c.personagemId,
+                c.magia_concentracao_id ?? null
+            );
+            c._conjEstado = estado;
+            if (!silencioso) Toast.success(`Concentração de ${c.nome} salva na ficha.`);
+        } catch (e) {
+            if (!silencioso) Toast.error(`${c.nome}: ${e.message}`);
         }
     }
 
@@ -365,9 +436,15 @@ class Dnd5eArenaController {
             const res = await cs.iniciativa(payload);
             const ordemMap = new Map(res.ordem.map((r) => [r.id, r]));
             this.combatentes.sort((a, b) => {
-                const ia = ordemMap.get(a.id)?.iniciativa ?? 0;
-                const ib = ordemMap.get(b.id)?.iniciativa ?? 0;
-                return ib - ia;
+                const ra = ordemMap.get(a.id);
+                const rb = ordemMap.get(b.id);
+                const ia = ra?.iniciativa ?? 0;
+                const ib = rb?.iniciativa ?? 0;
+                if (ib !== ia) return ib - ia;
+                const da = ra?.dex_mod ?? a.dex_mod ?? 0;
+                const db = rb?.dex_mod ?? b.dex_mod ?? 0;
+                if (db !== da) return db - da;
+                return (a.nome || '').localeCompare(b.nome || '');
             });
             this.combatentes.forEach((c) => {
                 const r = ordemMap.get(c.id);
@@ -432,12 +509,22 @@ class Dnd5eArenaController {
                         return `<span class="badge-condicao-mini">${nome}</span>`;
                     })
                     .join('');
+                const sv = c.status_vida || (c.hp_atual > 0 ? 'vivo' : 'inconsciente');
+                const statusMini =
+                    sv === 'morto'
+                        ? '<span class="dnd5e-ordem-status dnd5e-status-morto">☠</span>'
+                        : sv === 'estabilizado'
+                          ? '<span class="dnd5e-ordem-status dnd5e-status-estabilizado">💤</span>'
+                          : sv === 'inconsciente' && c.hp_atual === 0
+                            ? '<span class="dnd5e-ordem-status dnd5e-status-morrendo">0</span>'
+                            : '';
                 return `
-                <div class="combatente-ordem-item ${ativo ? 'ativo' : ''}" data-idx="${idx}">
+                <div class="combatente-ordem-item ${ativo ? 'ativo' : ''} ${sv === 'morto' ? 'dnd5e-ordem-morto' : ''}" data-idx="${idx}">
                     <span class="ordem-iniciativa-valor">${c.iniciativa ?? '—'}</span>
                     <div class="ordem-info">
                         <div class="ordem-nome-linha">
                             <span class="ordem-nome">${window.escapeHtml(c.nome)}</span>
+                            ${statusMini}
                         </div>
                         <div class="ordem-hp-bar"><div class="ordem-hp-fill" style="width:${hpPct}%;background:${hpCor}"></div></div>
                         <div class="badges-condicao-ordem-wrapper">${cond}</div>
@@ -471,7 +558,17 @@ class Dnd5eArenaController {
             (id, v) => this.aplicarDano(id, v),
             (id, v) => this.aplicarCura(id, v),
             (id) => this.modalCondicao?.abrir(id),
-            () => this.proximoTurno()
+            () => this.proximoTurno(),
+            {
+                onDeathSave: (id) => this.rolarDeathSave(id),
+                onEstabilizar: (id, metodo, modMedicina) =>
+                    this.estabilizarCombatente(id, metodo, modMedicina),
+                onMedicinaModChange: (id, mod) => this.atualizarModMedicina(id, mod),
+                onEconomia: (tipo, metros) => this.gastarEconomia(tipo, metros),
+                getAlvosAtaque: () => this.combatentes,
+                onAtaqueFicha: (atacanteId, alvoId, idx) =>
+                    this.executarAtaqueFicha(atacanteId, alvoId, idx),
+            }
         );
         this._renderPainelConjuracao(atual);
         this.atualizarSelectAlvos();
@@ -510,6 +607,8 @@ class Dnd5eArenaController {
         ]);
         combatente._conjEstado = estado;
         combatente._magiasGrimorio = grimorio?.items || [];
+        combatente.magia_concentracao_id =
+            estado?.magia_concentracao_id ?? combatente.magia_concentracao_id ?? null;
     }
 
     _renderMagiasHost(host, combatente) {
@@ -533,7 +632,12 @@ class Dnd5eArenaController {
                 ? Dnd5eArenaMagiasHelper.slotBruxo(combatente._conjEstado)
                 : null;
 
-        host.innerHTML = Dnd5eArenaMagiasView.render(grupos, modo, slotBruxo);
+        host.innerHTML = Dnd5eArenaMagiasView.render(
+            grupos,
+            modo,
+            slotBruxo,
+            combatente._conjEstado
+        );
 
         Dnd5eArenaMagiasView.bindEvents(host, {
             onLancar: (magiaId, nivel) =>
@@ -549,6 +653,10 @@ class Dnd5eArenaController {
         const magia = (combatente._magiasGrimorio || []).find(
             (m) => Number(m.magia_id) === Number(magiaId)
         );
+        if (!magia) {
+            Toast.error('Magia não encontrada no grimório.');
+            return;
+        }
         const nivelMagia = Number(magia?.magia_nivel ?? nivel) || 0;
         if (nivelMagia >= 1) {
             const slotNivel = (combatente._conjEstado?.slots || []).find(
@@ -559,26 +667,93 @@ class Dnd5eArenaController {
                 return;
             }
         }
-        try {
-            combatente._conjEstado = await this.conjuracaoFichaService.gastarSlot(
-                combatente.personagemId,
-                nivelMagia,
-                1,
-                magiaId
-            );
-        } catch (e) {
-            Toast.error(e.message || 'Sem espaços de magia disponíveis.');
+        const executar = (opts) =>
+            this._executarConjuracao(combatente, magia, nivelMagia, opts);
+        if (magiaPrecisaAlvo(magia) || magia.ritual || magia.material_consumido) {
+            this.modalConjuracao.abrir({
+                combatente,
+                magia,
+                nivel: nivelMagia,
+                estado: combatente._conjEstado,
+                onConfirm: executar,
+            });
             return;
         }
-        Toast.success(
-            nivelMagia
-                ? `🔥 ${magia?.magia_nome || 'Magia'} — 1 espaço de NIV ${nivelMagia} gasto`
-                : `✨ ${magia?.magia_nome || 'Truque'} conjurado (at-will)`
+        await executar({});
+    }
+
+    async _executarConjuracao(combatente, magia, nivelMagia, opts) {
+        const payload = montarPayloadConjurar(
+            combatente,
+            magia,
+            combatente._conjEstado,
+            opts
         );
-        this._renderMagiasHost(
-            document.getElementById('dnd5eArenaMagiasHost'),
-            combatente
-        );
+        try {
+            const res = await cs.conjurarMagia(payload);
+            if (!res.sucesso) {
+                Toast.error(res.mensagem || 'Falha ao conjurar.');
+                return;
+            }
+
+            if (!res.conjurada_como_ritual) {
+                const slotGasto = res.nivel_slot_gasto ?? nivelMagia;
+                combatente._conjEstado = await this.conjuracaoFichaService.gastarSlot(
+                    combatente.personagemId,
+                    slotGasto,
+                    1,
+                    magia.magia_id
+                );
+            } else {
+                combatente._conjEstado = await this.conjuracaoFichaService.gastarSlot(
+                    combatente.personagemId,
+                    0,
+                    0,
+                    magia.magia_id
+                );
+            }
+
+            if (res.requer_concentracao) {
+                combatente.magia_concentracao_id = res.magia_concentracao_id ?? null;
+                await this._persistirConcentracaoNaFicha(combatente, true);
+            }
+
+            const dano =
+                res.dano_aplicar != null ? res.dano_aplicar : res.dano_total;
+            if (dano != null && dano > 0 && opts.alvo) {
+                await this.aplicarDano(opts.alvo.id, dano, {
+                    is_critico: !!res.ataque_critico,
+                });
+            }
+
+            Toast.success(res.mensagem || `${magia.magia_nome} conjurada.`);
+            this._renderPainelConjuracao(combatente);
+            this.renderPainelAtivo();
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao conjurar magia.');
+        }
+    }
+
+    async _testarConcentracaoAposDano(combatente, dano) {
+        if (!combatente?.magia_concentracao_id || dano <= 0) return;
+        try {
+            const res = await cs.testeConcentracao({
+                conjurador_id: combatente.id,
+                dano_recebido: dano,
+                mod_constituicao: modAtributo(combatente, 'con'),
+                bonus_proficiencia: combatente.bonus_proficiencia ?? 2,
+                magia_concentracao_id: combatente.magia_concentracao_id,
+            });
+            if (!res.manteve_concentracao) {
+                combatente.magia_concentracao_id = null;
+                await this._persistirConcentracaoNaFicha(combatente, true);
+                Toast.warning(
+                    res.mensagem || `${combatente.nome} perdeu a concentração.`
+                );
+            }
+        } catch (e) {
+            console.warn('Concentração:', e?.message || e);
+        }
     }
 
     async _restaurarMagia(combatente, magiaId, nivel) {
@@ -636,24 +811,136 @@ class Dnd5eArenaController {
         );
     }
 
-    async aplicarDano(id, valor) {
+    _aplicarResultadoMorte(c, res) {
+        c.hp_atual = res.hp_atual ?? c.hp_atual;
+        c.death_failures = res.death_failures ?? c.death_failures ?? 0;
+        c.death_successes = res.death_successes ?? c.death_successes ?? 0;
+        c.status_vida = res.status_vida || c.status_vida || 'vivo';
+    }
+
+    async aplicarDano(id, valor, { is_critico = false } = {}) {
         const c = this.combatentePorId(id);
-        if (!c) return;
-        c.hp_atual = Math.max(0, c.hp_atual - valor);
-        await this.syncHpCondicoes(c);
-        this.atualizarUiCombate();
+        if (!c || c.status_vida === 'morto') return;
+        try {
+            const res = await cs.danoHp({
+                hp_atual: c.hp_atual,
+                hp_max: c.hp_maximo,
+                dano: valor,
+                death_failures: c.death_failures || 0,
+                death_successes: c.death_successes || 0,
+                is_critico,
+                status_vida: c.status_vida || 'vivo',
+            });
+            this._aplicarResultadoMorte(c, res);
+            await this._testarConcentracaoAposDano(c, valor);
+            if (res.morte_instantanea) {
+                Toast.error(`${c.nome}: morte instantânea!`);
+            } else if (res.status_vida === 'morto') {
+                Toast.error(`${c.nome} está morto.`);
+            } else if (res.mensagem) {
+                Toast.success(res.mensagem);
+            }
+            await this.syncHpCondicoes(c);
+            this.atualizarUiCombate();
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao aplicar dano');
+        }
     }
 
     async aplicarCura(id, valor) {
         const c = this.combatentePorId(id);
         if (!c) return;
         c.hp_atual = Math.min(c.hp_maximo, c.hp_atual + valor);
+        if (c.hp_atual > 0) {
+            c.death_failures = 0;
+            c.death_successes = 0;
+            c.status_vida = 'vivo';
+        }
         await this.syncHpCondicoes(c);
         this.atualizarUiCombate();
     }
 
+    async rolarDeathSave(id) {
+        const c = this.combatentePorId(id);
+        if (!c || c.hp_atual > 0 || c.status_vida === 'morto') return;
+        if (c.status_vida === 'estabilizado') return;
+        try {
+            const res = await cs.deathSave({
+                hp_atual: c.hp_atual,
+                death_failures: c.death_failures || 0,
+                death_successes: c.death_successes || 0,
+            });
+            this._aplicarResultadoMorte(c, res);
+            Toast.success(`Salvamento: ${res.rolagem} — ${res.mensagem}`);
+            if (res.status_vida === 'morto') {
+                Toast.error(`${c.nome} está morto.`);
+            } else if (res.status_vida === 'estabilizado') {
+                Toast.success(`${c.nome} estabilizou (3 sucessos).`);
+            }
+            if (res.hp_atual > 0) {
+                await this.syncHpCondicoes(c);
+            }
+            this.atualizarUiCombate();
+        } catch (e) {
+            Toast.error(e.message || 'Erro no salvamento');
+        }
+    }
+
+    atualizarModMedicina(id, mod) {
+        const c = this.combatentePorId(id);
+        if (!c) return;
+        c.mod_medicina = Number(mod) || 0;
+    }
+
+    async estabilizarCombatente(id, metodo = 'medicina', modMedicina = null) {
+        const c = this.combatentePorId(id);
+        if (!c || c.hp_atual > 0 || c.status_vida === 'morto') return;
+        const mod =
+            modMedicina != null ? Number(modMedicina) : Number(c.mod_medicina) || 0;
+        try {
+            const res = await cs.estabilizar({
+                hp_atual: c.hp_atual,
+                death_failures: c.death_failures || 0,
+                death_successes: c.death_successes || 0,
+                metodo,
+                mod_medicina: mod,
+            });
+            c.death_failures = res.death_failures;
+            c.death_successes = res.death_successes;
+            c.status_vida = res.status_vida;
+            if (res.sucesso) {
+                Toast.success(res.mensagem || `${c.nome} estabilizado.`);
+            } else {
+                Toast.error(res.mensagem || 'Falha ao estabilizar.');
+            }
+            this.atualizarUiCombate();
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao estabilizar');
+        }
+    }
+
+    async gastarEconomia(tipo, metros = 0) {
+        const c = this.combatenteAtual();
+        if (!c) return;
+        try {
+            const res = await cs.economiaTurno({
+                tipo,
+                metros,
+                economia: c.economia || {},
+            });
+            c.economia = res.economia;
+            if (res.mensagem) Toast.success(res.mensagem);
+            this.atualizarUiCombate();
+        } catch (e) {
+            Toast.error(e.message || 'Ação indisponível');
+        }
+    }
+
     async proximoTurno() {
         const atual = this.combatenteAtual();
+        if (atual?.hp_atual === 0 && atual.status_vida === 'inconsciente') {
+            await this.rolarDeathSave(atual.id);
+        }
         if (atual?.condicoes?.length) {
             try {
                 const res = await cs.decrementarCondicoesTurno(atual.condicoes);
@@ -667,6 +954,24 @@ class Dnd5eArenaController {
         if (this.turnoAtual >= this.combatentes.length) {
             this.turnoAtual = 0;
             this.rodadaAtual += 1;
+        }
+        const prox = this.combatenteAtual();
+        if (prox) {
+            try {
+                const res = await cs.economiaTurno({
+                    tipo: 'reset',
+                    economia: prox.economia || {},
+                });
+                prox.economia = res.economia;
+            } catch {
+                prox.economia = {
+                    acao_usada: false,
+                    bonus_acao_usada: false,
+                    movimento_usado_metros: 0,
+                    reacao_usada: false,
+                    velocidade_metros: 9,
+                };
+            }
         }
         this.atualizarUiCombate();
     }
@@ -761,6 +1066,75 @@ class Dnd5eArenaController {
         return CU.slugs(c?.condicoes || []);
     }
 
+    async executarAtaqueFicha(atacanteId, alvoId, ataqueIdx) {
+        const atacante = this.combatentePorId(atacanteId);
+        const alvo = this.combatentePorId(alvoId);
+        if (!atacante || !alvo) {
+            Toast.error('Combatente inválido.');
+            return;
+        }
+        if (alvo.status_vida === 'morto') {
+            Toast.error('Alvo está morto.');
+            return;
+        }
+        const ataque = (atacante.ataques || [])[ataqueIdx];
+        if (!ataque) return;
+
+        if (atacante.economia?.acao_usada) {
+            Toast.warning('Ação já usada neste turno (use o painel de economia se necessário).');
+        }
+
+        const bonusExtra = parseBonusAtaque(ataque.bonus_ataque);
+        try {
+            const res = await cs.ataque({
+                mod_atributo: 0,
+                bonus_proficiencia: 0,
+                proficiente: false,
+                bonus_extra: bonusExtra,
+                ac_alvo: alvo.ca ?? 10,
+                condicoes_atacante: this.slugsCondicoes(atacante),
+                condicoes_alvo: this.slugsCondicoes(alvo),
+                corpo_a_corpo: true,
+            });
+
+            const critTxt = res.is_critico ? ' — CRÍTICO!' : '';
+            if (res.acerto) {
+                Toast.success(
+                    `${ataque.nome}: acertou (${res.total} ≥ CA ${alvo.ca})${critTxt}`
+                );
+                if (ataque.dano) {
+                    const { dano, mod } = parseDanoFicha(ataque.dano);
+                    const danoRes = await cs.dano({
+                        dano,
+                        mod_atributo: mod,
+                        is_critico: !!res.is_critico,
+                    });
+                    await this.aplicarDano(alvo.id, danoRes.dano_total, {
+                        is_critico: !!res.is_critico,
+                    });
+                }
+            } else {
+                Toast.warning(`${ataque.nome}: errou (${res.total} vs CA ${alvo.ca})`);
+            }
+
+            if (!atacante.economia?.acao_usada) {
+                try {
+                    const eco = await cs.economiaTurno({
+                        tipo: 'acao',
+                        metros: 0,
+                        economia: atacante.economia || {},
+                    });
+                    atacante.economia = eco.economia;
+                } catch {
+                    /* economia opcional */
+                }
+            }
+            this.atualizarUiCombate();
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao resolver ataque');
+        }
+    }
+
     async testarAtaque() {
         const alvo = this.combatentePorId(this.el('toolAlvoDano')?.value);
         const ac = alvo ? alvo.ca : parseInt(this.el('toolAc')?.value, 10) || 10;
@@ -776,10 +1150,12 @@ class Dnd5eArenaController {
             });
             const elRes = this.el('toolAtaqueRes');
             if (elRes) {
+                const crit = res.is_critico ? ' CRÍTICO!' : '';
                 elRes.textContent = res.acerto
-                    ? `Acertou (${res.total} ≥ CA ${ac})`
+                    ? `Acertou (${res.total} ≥ CA ${ac})${crit}`
                     : `Errou (${res.total} vs CA ${ac})`;
-                elRes.dataset.criticoAuto = res.critico_automatico ? '1' : '';
+                elRes.dataset.criticoAuto =
+                    res.is_critico || res.critico_automatico ? '1' : '';
             }
         } catch (e) {
             Toast.error(e.message);
@@ -792,16 +1168,14 @@ class Dnd5eArenaController {
             Toast.error('Selecione um alvo.');
             return;
         }
-        const critico =
-            this.el('toolAtaqueRes')?.dataset.criticoAuto === '1' ||
-            this.slugsCondicoes(alvo).includes('incapacitado');
+        const critico = this.el('toolAtaqueRes')?.dataset.criticoAuto === '1';
         try {
             const res = await cs.dano({
                 dano: this.el('toolDano')?.value?.trim() || '1d8',
                 mod_atributo: parseInt(this.el('toolDanoMod')?.value, 10) || 0,
-                is_critico: critico && this.el('toolCorpoACorpo')?.checked,
+                is_critico: critico,
             });
-            await this.aplicarDano(alvo.id, res.dano_total);
+            await this.aplicarDano(alvo.id, res.dano_total, { is_critico: critico });
             const elRes = this.el('toolDanoRes');
             if (elRes) {
                 elRes.textContent = `${res.dano_total} em ${alvo.nome} (PV ${alvo.hp_atual})`;

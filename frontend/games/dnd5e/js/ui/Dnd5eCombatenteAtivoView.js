@@ -1,8 +1,18 @@
+import { renderAtaquesFichaHtml } from '../arena/Dnd5eArenaAtaquesHelper.js';
+
 /**
  * Painel do combatente ativo na arena D&D 5e (layout arena-card do dnd35).
  */
 export class Dnd5eCombatenteAtivoView {
-    static render(combatente, catalogoCondicoes, onDano, onCura, onCondicao, onProximoTurno) {
+    static render(
+        combatente,
+        catalogoCondicoes,
+        onDano,
+        onCura,
+        onCondicao,
+        onProximoTurno,
+        handlers = {}
+    ) {
         const container = document.getElementById('combatenteAtivoContainer');
         if (!container) return;
 
@@ -64,6 +74,88 @@ export class Dnd5eCombatenteAtivoView {
             .join('');
 
         const ini = combatente.iniciativa ?? '—';
+        const statusVida = combatente.status_vida || (hpAtual > 0 ? 'vivo' : 'inconsciente');
+        const morto = statusVida === 'morto';
+        const estabilizado = statusVida === 'estabilizado';
+        const morrendo = hpAtual === 0 && statusVida === 'inconsciente';
+        const falhas = combatente.death_failures || 0;
+        const sucessos = combatente.death_successes || 0;
+        const eco = combatente.economia || {};
+        const movRest =
+            Math.max(0, (eco.velocidade_metros || 9) - (eco.movimento_usado_metros || 0));
+
+        const statusBadge = morto
+            ? '<span class="dnd5e-status-vida dnd5e-status-morto">☠ Morto</span>'
+            : estabilizado
+              ? '<span class="dnd5e-status-vida dnd5e-status-estabilizado">💤 Estabilizado</span>'
+              : morrendo
+                ? '<span class="dnd5e-status-vida dnd5e-status-morrendo">🩸 Morrendo (0 PV)</span>'
+                : '';
+
+        let deathHtml = '';
+        if (morto) {
+            deathHtml = `<div class="dnd5e-arena-death-saves dnd5e-arena-death-morto">
+                <p>Combatente morto — remova da ordem ou encerre o combate.</p>
+            </div>`;
+        } else if (estabilizado) {
+            deathHtml = `<div class="dnd5e-arena-death-saves dnd5e-arena-death-estavel">
+                <h3 class="arena-secao-titulo">Estabilizado</h3>
+                <p class="dnd5e-death-hint">0 PV, sem salvamentos. Qualquer dano volta ao estado morrendo.</p>
+            </div>`;
+        } else if (morrendo) {
+            deathHtml = `<div class="dnd5e-arena-death-saves">
+                <h3 class="arena-secao-titulo">Salvamentos contra morte</h3>
+                <p class="dnd5e-death-tracker">
+                    <span class="dnd5e-death-successes" title="Sucessos">✓ ${sucessos}/3</span>
+                    <span class="dnd5e-death-failures" title="Falhas">✗ ${falhas}/3</span>
+                </p>
+                <div class="dnd5e-death-actions">
+                    <label class="dnd5e-medicina-mod-label">
+                        Mod. Medicina
+                        <input
+                            type="number"
+                            id="dnd5eModMedicina"
+                            class="dnd5e-medicina-mod-input"
+                            value="${combatente.mod_medicina ?? 0}"
+                            step="1"
+                        />
+                    </label>
+                    <button type="button" class="arena-btn-condicao dnd5e-btn-death-save" data-action="death-save">
+                        🎲 Rolar salvamento
+                    </button>
+                    <button type="button" class="arena-btn-condicao dnd5e-btn-estabilizar" data-action="estabilizar-medicina">
+                        🩹 Medicina (CD 10)
+                    </button>
+                    <button type="button" class="arena-btn-condicao dnd5e-btn-estabilizar" data-action="estabilizar-magia">
+                        ✨ Magia
+                    </button>
+                </div>
+            </div>`;
+        }
+
+        const alvosAtaque = (handlers.getAlvosAtaque?.() || []).filter((a) => a.id !== combatente.id);
+        const ataquesHtml = renderAtaquesFichaHtml(
+            combatente,
+            alvosAtaque,
+            Dnd5eCombatenteAtivoView._esc
+        );
+
+        const economiaHtml = `
+            <div class="dnd5e-arena-economia">
+                <h3 class="arena-secao-titulo">Economia do turno</h3>
+                <div class="dnd5e-economia-chips">
+                    <span class="dnd5e-eco-chip ${eco.acao_usada ? 'usado' : ''}">Ação</span>
+                    <span class="dnd5e-eco-chip ${eco.bonus_acao_usada ? 'usado' : ''}">Bônus</span>
+                    <span class="dnd5e-eco-chip ${eco.reacao_usada ? 'usado' : ''}">Reação</span>
+                    <span class="dnd5e-eco-chip mov">Mov. ${movRest.toFixed(1)}m</span>
+                </div>
+                <div class="dnd5e-economia-btns">
+                    <button type="button" class="dnd5e-eco-btn" data-eco="acao">Ação</button>
+                    <button type="button" class="dnd5e-eco-btn" data-eco="bonus_acao">Bônus</button>
+                    <button type="button" class="dnd5e-eco-btn" data-eco="reacao">Reação</button>
+                    <button type="button" class="dnd5e-eco-btn" data-eco="movimento">+1,5m</button>
+                </div>
+            </div>`;
 
         container.innerHTML = `
             <div class="arena-card">
@@ -76,6 +168,7 @@ export class Dnd5eCombatenteAtivoView {
                         <span class="arena-raca-classe">
                             <span class="badge badge-${Dnd5eCombatenteAtivoView._esc(tipo)}">${Dnd5eCombatenteAtivoView._esc(tipo)}</span>
                             ${Dnd5eCombatenteAtivoView._esc(metaClasse)}
+                            ${statusBadge}
                         </span>
                     </div>
                 </div>
@@ -103,6 +196,7 @@ export class Dnd5eCombatenteAtivoView {
 
                     <div class="arena-coluna-central dnd5e-arena-col-central">
                         <div id="dnd5eArenaMagiasHost" class="dnd5e-arena-magias-host"></div>
+                        ${ataquesHtml}
                         <div class="arena-secao">
                             <h3 class="arena-secao-titulo">Ajuste rápido de PV</h3>
                             <div class="dnd5e-arena-pv-rapido">
@@ -111,6 +205,8 @@ export class Dnd5eCombatenteAtivoView {
                                 <button type="button" class="arena-btn-condicao dnd5e-arena-pv-btn" data-action="cura">✨ Cura</button>
                             </div>
                         </div>
+                        ${deathHtml}
+                        ${economiaHtml}
                     </div>
 
                     <div class="arena-coluna-direita">
@@ -165,6 +261,42 @@ export class Dnd5eCombatenteAtivoView {
         });
         container.querySelector('#btnAvancarTurnoArena')?.addEventListener('click', () => {
             onProximoTurno?.();
+        });
+        container.querySelector('[data-action="death-save"]')?.addEventListener('click', () => {
+            handlers.onDeathSave?.(combatente.id);
+        });
+        const medInput = container.querySelector('#dnd5eModMedicina');
+        medInput?.addEventListener('change', () => {
+            handlers.onMedicinaModChange?.(combatente.id, medInput.value);
+        });
+        container
+            .querySelector('[data-action="estabilizar-medicina"]')
+            ?.addEventListener('click', () => {
+                const mod = medInput ? medInput.value : combatente.mod_medicina ?? 0;
+                handlers.onEstabilizar?.(combatente.id, 'medicina', mod);
+            });
+        container
+            .querySelector('[data-action="estabilizar-magia"]')
+            ?.addEventListener('click', () => {
+                handlers.onEstabilizar?.(combatente.id, 'magia');
+            });
+        container.querySelectorAll('[data-eco]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const tipo = btn.getAttribute('data-eco');
+                const metros = tipo === 'movimento' ? 1.5 : 0;
+                handlers.onEconomia?.(tipo, metros);
+            });
+        });
+        container.querySelectorAll('[data-ataque-idx]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.getAttribute('data-ataque-idx'), 10);
+                const alvoId = container.querySelector('#dnd5eAtaqueAlvo')?.value;
+                if (!alvoId) {
+                    Toast.error('Selecione um alvo.');
+                    return;
+                }
+                handlers.onAtaqueFicha?.(combatente.id, alvoId, idx);
+            });
         });
     }
 

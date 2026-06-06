@@ -13,7 +13,8 @@ RACAS_CATALOGO: List[RacaDict] = [
         "tamanho": "Médio",
         "velocidade_metros": 7.5,
         "bonus_habilidades": {"constitution": 2},
-        "tracos_resumo": "Visão no escuro 18 m; +2 em salvamentos contra veneno; bônus +2 com machados.",
+        "bonus_hp_por_nivel": 1,
+        "tracos_resumo": "Visão no escuro 18 m; +2 em salvamentos contra veneno; bônus +2 com machados; +1 PV/nível.",
         "caracteristicas": ["visao_escuro_18m", "resistencia_veneno", "bonus_machados"],
     },
     {

@@ -12,6 +12,11 @@ from app.games.dnd5e.rules.condicoes_ficha import (
     sincronizar_condicoes_por_hp,
 )
 from app.games.dnd5e.rules.ficha import validar_ficha_para_gravacao
+from app.games.dnd5e.rules.progressao import (
+    calcular_hp_max_total,
+    migrar_ficha_para_v2,
+    validar_nivel_vs_experiencia,
+)
 from app.games.dnd5e.rules.habilidades import AbilityScores, PersonagemHabilidades
 from app.games.dnd5e.schemas.personagem import (
     Dnd5ePersonagemCreate,
@@ -48,13 +53,39 @@ class Dnd5ePersonagemService:
             raise DadosInvalidos("tipo deve ser jogador, monstro ou npc")
 
     @staticmethod
-    def _normalizar_ficha_entrada(ficha: dict, *, nivel: int) -> dict:
+    def _normalizar_ficha_entrada(
+        ficha: dict,
+        *,
+        nivel: int,
+        experiencia: int = 0,
+    ) -> dict:
         if not ficha:
             return {}
         try:
-            return validar_ficha_para_gravacao(ficha, nivel=nivel)
+            return validar_ficha_para_gravacao(
+                ficha,
+                nivel=nivel,
+                experiencia=experiencia,
+            )
         except ValueError as e:
             raise DadosInvalidos(str(e)) from e
+
+    @staticmethod
+    def _sincronizar_hp_max(ent: Dnd5ePersonagem, ficha: dict) -> None:
+        ficha_v2 = migrar_ficha_para_v2(ficha)
+        classe_slug = (ficha_v2.get("classe_slug") or "").strip().lower()
+        if not classe_slug:
+            return
+        hp_rolls = (ficha_v2.get("progressao") or {}).get("hp_rolls") or []
+        con_mod = (int(ent.constitution) - 10) // 2
+        ent.hp_max = calcular_hp_max_total(
+            classe_slug,
+            con_mod,
+            ent.nivel,
+            hp_rolls,
+            raca_slug=(ficha_v2.get("raca_slug") or "").strip(),
+            feats=ficha_v2.get("feats") or [],
+        )
 
     @staticmethod
     def _personagem_habilidades(ent: Dnd5ePersonagem) -> PersonagemHabilidades:
@@ -191,8 +222,15 @@ class Dnd5ePersonagemService:
                     nivel=payload.nivel,
                 )
             )
+            validar_nivel_vs_experiencia(payload.nivel, payload.experiencia)
         except ValueError as e:
             raise DadosInvalidos(str(e)) from e
+
+        ficha_norm = self._normalizar_ficha_entrada(
+            payload.ficha or {},
+            nivel=payload.nivel,
+            experiencia=payload.experiencia,
+        )
 
         ent = Dnd5ePersonagem(
             dono_id=self._resolver_dono(usuario, payload.tipo),
@@ -209,10 +247,11 @@ class Dnd5ePersonagemService:
             charisma=payload.charisma,
             hp_max=payload.hp_max,
             hp_atual=hp_atual,
-            ficha_json=normalizar_ficha_para_gravacao(
-                self._normalizar_ficha_entrada(payload.ficha or {}, nivel=payload.nivel)
-            ),
+            ficha_json=normalizar_ficha_para_gravacao(ficha_norm),
         )
+        self._sincronizar_hp_max(ent, ficha_norm)
+        if hp_atual is None or hp_atual == payload.hp_max:
+            ent.hp_atual = ent.hp_max
         self.repo.db.add(ent)
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
@@ -228,18 +267,28 @@ class Dnd5ePersonagemService:
         for key, val in data.items():
             setattr(ent, key, val)
 
+        nivel = int(data.get("nivel", ent.nivel))
+        experiencia = int(data.get("experiencia", ent.experiencia))
+
         if ficha is not None:
-            nivel = int(data.get("nivel", ent.nivel))
             ficha_atual = ficha_json_para_resposta(ent.ficha_json)
             ficha_mesclada = {**ficha_atual, **ficha}
             ent.ficha_json = normalizar_ficha_para_gravacao(
-                self._normalizar_ficha_entrada(ficha_mesclada, nivel=nivel)
+                self._normalizar_ficha_entrada(
+                    ficha_mesclada,
+                    nivel=nivel,
+                    experiencia=experiencia,
+                )
             )
 
         try:
             self._personagem_habilidades(ent)
+            validar_nivel_vs_experiencia(nivel, experiencia)
         except ValueError as e:
             raise DadosInvalidos(str(e)) from e
+
+        ficha_sync = ficha_json_para_resposta(ent.ficha_json)
+        self._sincronizar_hp_max(ent, ficha_sync)
 
         if "hp_max" in data and "hp_atual" not in data:
             ent.hp_atual = min(ent.hp_atual or 0, ent.hp_max or 0)
@@ -252,7 +301,11 @@ class Dnd5ePersonagemService:
             )
             ficha_atual[CHAVE_FICHA_ARENA_CONDICOES] = condicoes
             ent.ficha_json = normalizar_ficha_para_gravacao(
-                self._normalizar_ficha_entrada(ficha_atual, nivel=ent.nivel)
+                self._normalizar_ficha_entrada(
+                    ficha_atual,
+                    nivel=ent.nivel,
+                    experiencia=ent.experiencia,
+                )
             )
 
         commit_with_rollback(self.repo.db)

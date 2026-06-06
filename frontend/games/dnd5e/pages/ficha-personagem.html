@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/modais.css" />
     <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=18" />
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
-    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=5" />
+    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=14" />
     <link rel="stylesheet" href="/games/dnd35/css/grimorio.css?v=4" />
     <link rel="stylesheet" href="../css/grimorio-dnd5e.css?v=3" />
 </head>
@@ -85,8 +85,10 @@
                 <div class="ficha-atributos-circulo-grid-resumo ficha-dnd5e-ability-edit" id="f5e_abilities_circles">
                     <!-- preenchido por JS -->
                 </div>
-                <p class="ficha-dnd5e-foto-hint" style="margin-top:0.5rem">
+                <p class="ficha-dnd5e-foto-hint ficha-dnd5e-metodos-atributos" style="margin-top:0.5rem">
                     <button type="button" class="ficha-btn-adicionar" id="btnMatrizPadrao" style="width:auto">Matriz PHB</button>
+                    <button type="button" class="ficha-btn-adicionar" id="btnGerar4d6" style="width:auto">4d6</button>
+                    <button type="button" class="ficha-btn-adicionar" id="btnCompraPontos" style="width:auto">27 pts</button>
                 </p>
             </div>
 
@@ -105,6 +107,7 @@
                     </div>
                     <label class="ficha-label" for="f5e_hp_atual" style="margin-top:0.35rem">PV atual</label>
                     <input id="f5e_hp_atual" type="number" min="0" />
+                    <p id="f5e_hp_detalhe" class="ficha-dnd5e-hp-detalhe" aria-live="polite"></p>
                 </div>
                 
                 <div class="ficha-defesa-box ficha-ini-box">
@@ -123,6 +126,37 @@
                     <span class="ficha-vazio">Nenhuma condição ativa</span>
                 </div>
             </div>
+
+            <div class="ficha-secao">
+                <div class="ficha-secao-header">
+                    <h3 class="ficha-secao-titulo">🌟 Talentos</h3>
+                    <button type="button" class="ficha-btn-adicionar" id="f5e_btn_ir_progressao" title="Registrar talentos na seção Progressão">📈 Progressão</button>
+                </div>
+                <div id="f5e_talentos_lista" class="ficha-talentos-lista">
+                    <span class="ficha-vazio">Nenhum talento registrado</span>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
+                <div class="ficha-secao-header">
+                    <h3 class="ficha-secao-titulo">🎒 Equipamentos</h3>
+                    <button type="button" class="ficha-btn-adicionar" id="f5e_btn_add_equip" title="Adicionar equipamento">➕ Adicionar</button>
+                </div>
+                <div id="f5e_equipamentos_lista" class="ficha-equipamentos-lista">
+                    <span class="ficha-vazio">Nenhum equipamento cadastrado</span>
+                </div>
+            </div>
+
+            <div class="ficha-secao">
+                <div class="ficha-secao-header">
+                    <h3 class="ficha-secao-titulo">🧪 Consumíveis</h3>
+                    <button type="button" class="ficha-btn-adicionar" id="f5e_btn_add_consumivel" title="Adicionar consumível">➕ Adicionar</button>
+                </div>
+                <div id="f5e_consumiveis_lista" class="ficha-equipamentos-lista">
+                    <span class="ficha-vazio">Nenhum consumível cadastrado</span>
+                </div>
+            </div>
+
             <div class="ficha-secao" id="secaoMagias" style="display:none" hidden>
                 <h3 class="ficha-secao-titulo">✨ Magias</h3>
                 <div class="ficha-magias-grid" id="fichaMagiasGrid">
@@ -152,6 +186,84 @@
                 <div id="f5e_salvamentos" class="ficha-resistencias-row"></div>
             </div>
 
+            <div class="ficha-secao ficha-dnd5e-progressao-sec" id="f5e_progressao_sec">
+                <h3 class="ficha-secao-titulo">📈 Progressão</h3>
+                <p class="ficha-dnd5e-status" id="f5e_progressao_status"></p>
+                <div class="ficha-dnd5e-edit-grid">
+                    <div>
+                        <label class="ficha-label" for="f5e_hp_roll_nivel">Rolar PV (nível)</label>
+                        <input id="f5e_hp_roll_nivel" type="number" min="1" max="20" value="2" />
+                    </div>
+                    <div>
+                        <label class="ficha-label" for="f5e_hp_roll_valor">Valor do dado (opcional)</label>
+                        <input id="f5e_hp_roll_valor" type="number" min="1" max="12" placeholder="auto" />
+                    </div>
+                </div>
+                <label class="ficha-label ficha-dnd5e-check">
+                    <input type="checkbox" id="f5e_hp_roll_media" /> Usar média do dado de vida
+                </label>
+                <button type="button" class="ficha-btn-adicionar" id="f5e_btn_hp_roll">Registrar PV do nível</button>
+                <div id="f5e_hp_rolls_lista" class="ficha-dnd5e-progressao-lista"></div>
+                <hr class="ficha-dnd5e-sep" />
+                <p class="ficha-dnd5e-status ficha-dnd5e-marco-hint">
+                    Nos níveis 4, 8, 12, 16 e 19 a classe concede
+                    <strong>Incremento no Valor de Habilidade</strong> (PHB).
+                    <strong>Talento</strong> só se a mesa usar a regra opcional (Cap. 6).
+                </p>
+                <div class="ficha-dnd5e-edit-grid">
+                    <div>
+                        <label class="ficha-label" for="f5e_marco_nivel">Nível do marco</label>
+                        <select id="f5e_marco_nivel"></select>
+                    </div>
+                    <div>
+                        <label class="ficha-label" for="f5e_marco_tipo">Escolha</label>
+                        <select id="f5e_marco_tipo">
+                            <option value="asi">Incremento no Valor de Habilidade</option>
+                            <option value="feat">Talento (regra opcional)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="f5e_marco_feat_wrap" hidden>
+                    <label class="ficha-label" for="f5e_marco_feat">Talento</label>
+                    <select id="f5e_marco_feat"></select>
+                </div>
+                <div id="f5e_marco_asi_wrap">
+                    <label class="ficha-label" for="f5e_marco_asi_modo">Distribuição</label>
+                    <select id="f5e_marco_asi_modo">
+                        <option value="2">+2 em um atributo</option>
+                        <option value="1+1">+1 em dois atributos</option>
+                    </select>
+                    <div class="ficha-dnd5e-edit-grid ficha-dnd5e-asi-grid">
+                        <div>
+                            <label class="ficha-label" for="f5e_marco_asi_attr">Atributo</label>
+                            <select id="f5e_marco_asi_attr">
+                                <option value="strength">Força</option>
+                                <option value="dexterity">Destreza</option>
+                                <option value="constitution">Constituição</option>
+                                <option value="intelligence">Inteligência</option>
+                                <option value="wisdom">Sabedoria</option>
+                                <option value="charisma">Carisma</option>
+                            </select>
+                        </div>
+                        <div id="f5e_marco_asi_attr2_wrap" hidden>
+                            <label class="ficha-label" for="f5e_marco_asi_attr2">Segundo atributo</label>
+                            <select id="f5e_marco_asi_attr2">
+                                <option value="strength">Força</option>
+                                <option value="dexterity">Destreza</option>
+                                <option value="constitution">Constituição</option>
+                                <option value="intelligence">Inteligência</option>
+                                <option value="wisdom">Sabedoria</option>
+                                <option value="charisma">Carisma</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="ficha-btn-adicionar" id="f5e_btn_marco">Registrar escolha</button>
+                <div id="f5e_marcos_lista" class="ficha-dnd5e-progressao-lista"></div>
+                <p class="ficha-label ficha-dnd5e-pendencias-titulo">Pendências</p>
+                <ul id="f5e_pendencias_lista" class="ficha-dnd5e-pendencias"></ul>
+            </div>
+
         </section>
 
         <aside class="ficha-coluna-direita">
@@ -177,7 +289,9 @@
             </div>
 
             <div class="ficha-secao">
-                <h3 class="ficha-secao-titulo">🎒 Equipamento &amp; CA</h3>
+                <div class="ficha-secao-header">
+                    <h3 class="ficha-secao-titulo">🛡️ Armadura/Item de Proteção</h3>
+                </div>
                 <div class="ficha-dnd5e-edit-grid">
                     <div>
                         <label class="ficha-label" for="f5e_armadura">Armadura</label>
@@ -186,6 +300,47 @@
                     <div>
                         <label class="ficha-label" for="f5e_escudo">Escudo</label>
                         <select id="f5e_escudo"><option value="">Nenhum</option></select>
+                    </div>
+                    <div>
+                        <label class="ficha-label" for="f5e_ouro">Ouro (gp)</label>
+                        <input type="number" id="f5e_ouro" min="0" step="1" value="0" class="ficha-input-num" />
+                    </div>
+                </div>
+                <p id="f5e_protecao_resumo" class="ficha-dnd5e-status"></p>
+                <p id="f5e_equip_resumo" class="ficha-dnd5e-status"></p>
+            </div>
+
+            <div class="ficha-secao">
+                <div class="ficha-secao-header">
+                    <h3 class="ficha-secao-titulo">⚔️ Ataques</h3>
+                    <button type="button" class="ficha-btn-adicionar" id="f5e_btn_editar_ataques" title="Editar ataques">✏️ Editar</button>
+                </div>
+                <div class="ficha-dnd5e-edit-grid" style="margin-bottom:0.5rem">
+                    <div class="span-2">
+                        <label class="ficha-label" for="f5e_arma_principal">Arma principal</label>
+                        <select id="f5e_arma_principal"><option value="">Nenhuma</option></select>
+                    </div>
+                </div>
+                <button type="button" class="ficha-btn-adicionar ficha-dnd5e-btn-sync-arma" id="f5e_btn_sync_arma_ataque">↻ Gerar ataque da arma</button>
+                <div class="ficha-ataques-tabela">
+                    <div class="ficha-ataque-header">
+                        <span>Nome</span>
+                        <span>Ataque</span>
+                        <span>Dano</span>
+                    </div>
+                    <div id="f5e_ataques_lista" class="ficha-ataques-lista">
+                        <div class="ficha-ataque-vazio">Nenhum ataque cadastrado</div>
+                    </div>
+                </div>
+                <div id="f5e_ataques_editor" class="ficha-dnd5e-ataques-editor" hidden>
+                    <div class="ficha-dnd5e-ataques-editor-head">
+                        <span>Nome</span><span>Bônus</span><span>Dano</span><span>Tipo</span><span></span>
+                    </div>
+                    <div id="f5e_ataques_editor_lista"></div>
+                    <div class="ficha-dnd5e-ataques-editor-acoes">
+                        <button type="button" class="ficha-btn-adicionar" id="f5e_btn_add_linha_ataque">+ Adicionar</button>
+                        <button type="button" class="ficha-btn-adicionar ficha-dnd5e-btn-salvar-ataques" id="f5e_btn_salvar_ataques">💾 Salvar</button>
+                        <button type="button" class="ficha-btn-adicionar ficha-dnd5e-btn-cancelar-ataques" id="f5e_btn_cancelar_ataques">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -410,13 +565,16 @@
 <script>
     if (!AuthService.exigirJogo('dnd5e')) {}
 </script>
-<script src="../js/services/Dnd5ePersonagemService.js?v=3"></script>
-<script src="../js/services/Dnd5eRegrasService.js?v=3"></script>
+<script src="../js/services/Dnd5ePersonagemService.js?v=4"></script>
+<script src="../js/services/Dnd5eRegrasService.js?v=4"></script>
+<script src="../js/ui/Dnd5eProgressaoPanel.js?v=2"></script>
+<script src="../js/ui/Dnd5eFichaCatalogoModal.js?v=1"></script>
+<script src="../js/ui/Dnd5eFichaInventarioPanel.js?v=3"></script>
 <script src="../js/services/Dnd5eCombateService.js?v=3"></script>
 <script src="../js/shared/dnd5e-condicoes-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-raca-util.js?v=1"></script>
-<script src="../js/pages/ficha-dnd5e.js?v=12"></script>
+<script src="../js/pages/ficha-dnd5e.js?v=18"></script>
 <script type="module" src="../js/pages/ficha-dnd5e-grimorio-bootstrap.js?v=4"></script>
-<script type="module" src="../js/pages/ficha-dnd5e-conjuracao.js?v=1"></script>
+<script type="module" src="../js/pages/ficha-dnd5e-conjuracao.js?v=2"></script>
 </body>
 </html>

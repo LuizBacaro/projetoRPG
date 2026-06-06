@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 DND5E_FICHA_MAX_JSON_BYTES = 65_536
-DND5E_FICHA_FORMAT_VERSION = 1
+DND5E_FICHA_FORMAT_VERSION = 2
 
 
 def validar_ficha_json_serializavel_e_tamanho(data: Any) -> Dict[str, Any]:
@@ -26,9 +26,9 @@ def validar_ficha_json_serializavel_e_tamanho(data: Any) -> Dict[str, Any]:
 
 
 def normalizar_ficha_para_gravacao(data: Dict[str, Any]) -> Dict[str, Any]:
-    out = dict(data)
-    out.setdefault("v", DND5E_FICHA_FORMAT_VERSION)
-    return out
+    from app.games.dnd5e.rules.progressao import migrar_ficha_para_v2
+
+    return migrar_ficha_para_v2(data)
 
 
 def ficha_json_para_resposta(raw: Any) -> Dict[str, Any]:

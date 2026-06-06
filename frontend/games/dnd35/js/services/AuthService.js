@@ -106,6 +106,9 @@ class AuthService {
                 body: JSON.stringify({ refresh_token: refresh }),
             });
             if (!res.ok) {
+                if (res.status === 401 || res.status === 403 || res.status === 404) {
+                    localStorage.removeItem(this.REFRESH_KEY);
+                }
                 return false;
             }
             const data = await res.json();

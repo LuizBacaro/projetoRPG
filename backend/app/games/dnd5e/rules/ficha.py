@@ -25,6 +25,16 @@ from app.games.dnd5e.rules.pericias import (
     montar_salvamentos,
 )
 from app.games.dnd5e.rules.racas import raca_por_slug
+from app.games.dnd5e.rules.progressao import (
+    calcular_hp_max_total,
+    hp_max_nivel_1,
+    listar_pendencias,
+    montar_hp_resumo,
+    registrar_hp_roll_na_ficha,
+    migrar_ficha_para_v2,
+    validar_progressao_ficha,
+    validar_scores_base_por_metodo,
+)
 from app.games.dnd5e.rules.subclasses import validar_subclasse_para_classe
 
 CHAVES_HABILIDADE = (
@@ -84,15 +94,6 @@ def calcular_modificadores(scores: Dict[str, int]) -> Dict[str, int]:
     return {k: calcular_modificador(scores[k]) for k in CHAVES_HABILIDADE}
 
 
-def hp_max_nivel_1(classe_slug: str, constitution_mod: int) -> int:
-    """PV máximo no nível 1 = máximo do dado de vida + mod. CON (mín. 1)."""
-    classe = classe_por_slug(classe_slug)
-    if classe is None:
-        raise ValueError(f"Classe inválida: {classe_slug}")
-    faces = DADO_VIDA_FACES.get(str(classe.get("dado_vida", "d8")), 8)
-    return max(1, faces + constitution_mod)
-
-
 def _montar_antecedente_resumo(
     antecedente_slug: Optional[str],
 ) -> Optional[Dict[str, Any]]:
@@ -117,6 +118,7 @@ def montar_resumo_ficha(
     classe_slug: str,
     scores_base: Dict[str, int],
     bonus_habilidade_extra: Optional[Dict[str, int]] = None,
+    bonus_atributo_feat: Optional[Dict[str, int]] = None,
     antecedente_slug: Optional[str] = None,
     nivel: int = 1,
     pericias_classe_escolhidas: Optional[Sequence[str]] = None,
@@ -124,6 +126,9 @@ def montar_resumo_ficha(
     subclasse_slug: Optional[str] = None,
     armadura_slug: Optional[str] = None,
     escudo_slug: Optional[str] = None,
+    ficha_progressao: Optional[Dict[str, Any]] = None,
+    feats: Optional[Sequence[str]] = None,
+    hp_roll_nivel_1: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Payload para preview API e validação da ficha."""
     raca = raca_por_slug(raca_slug)
@@ -139,8 +144,57 @@ def montar_resumo_ficha(
     efetivos = calcular_atributos_efetivos(
         scores_base, raca_slug, bonus_habilidade_extra=bonus_habilidade_extra
     )
+    if bonus_atributo_feat:
+        for chave, delta in bonus_atributo_feat.items():
+            if chave in efetivos:
+                efetivos[chave] = int(efetivos[chave]) + int(delta)
+                validar_valor_habilidade(efetivos[chave])
     mods = calcular_modificadores(efetivos)
-    hp = hp_max_nivel_1(classe_slug, mods["constitution"])
+    feats_list = list(feats or [])
+    prog = (ficha_progressao or {}).get("progressao") if ficha_progressao else None
+    hp_rolls = (prog or {}).get("hp_rolls") if isinstance(prog, dict) else None
+    if hp_rolls is None and ficha_progressao:
+        hp_rolls = ficha_progressao.get("hp_rolls")
+    hp_rolls_list = list(hp_rolls or [])
+    tem_roll_nivel_1 = any(
+        int(r.get("nivel", 0)) == 1 for r in hp_rolls_list if isinstance(r, dict)
+    )
+    if hp_roll_nivel_1 is not None and not tem_roll_nivel_1:
+        ficha_tmp, _ = registrar_hp_roll_na_ficha(
+            migrar_ficha_para_v2(
+                {"progressao": {"hp_rolls": hp_rolls_list, "marcos": []}}
+            ),
+            nivel=1,
+            classe_slug=classe_slug,
+            con_mod=mods["constitution"],
+            roll=int(hp_roll_nivel_1),
+        )
+        hp_rolls_list = list((ficha_tmp.get("progressao") or {}).get("hp_rolls") or [])
+    hp_total = calcular_hp_max_total(
+        classe_slug,
+        mods["constitution"],
+        nivel_ef,
+        hp_rolls_list,
+        raca_slug=raca_slug,
+        feats=feats_list,
+    )
+    hp1 = calcular_hp_max_total(
+        classe_slug,
+        mods["constitution"],
+        1,
+        hp_rolls_list,
+        raca_slug=raca_slug,
+        feats=feats_list,
+    )
+    hp_resumo = montar_hp_resumo(
+        classe_slug,
+        mods["constitution"],
+        nivel_ef,
+        hp_rolls_list,
+        raca_slug=raca_slug,
+        feats=feats_list,
+    )
+    hp = hp1
     ca_sem_armadura = 10 + mods["dexterity"]
     ca_total = calcular_ac_de_slugs(
         armadura_slug=armadura_slug,
@@ -157,7 +211,7 @@ def montar_resumo_ficha(
         exigir_quantidade_classe=False,
     )
 
-    return {
+    resumo = {
         "raca": {"slug": raca["slug"], "nome": raca["nome"]},
         "classe": {
             "slug": classe["slug"],
@@ -173,6 +227,9 @@ def montar_resumo_ficha(
         "scores_efetivos": efetivos,
         "modificadores": mods,
         "hp_max_nivel_1": hp,
+        "hp_max_total": hp_total,
+        "hp_resumo": hp_resumo,
+        "feats": list(feats or []),
         "ca_base": ca_sem_armadura,
         "ca_total": ca_total,
         "armadura_slug": armadura_slug,
@@ -194,33 +251,52 @@ def montar_resumo_ficha(
             nivel=nivel_ef,
         ),
     }
+    ficha_stub = {
+        "raca_slug": raca_slug,
+        "classe_slug": classe_slug,
+        "feats": list(feats or []),
+        "progressao": prog
+        if isinstance(prog, dict)
+        else {"hp_rolls": hp_rolls or [], "marcos": []},
+    }
+    resumo["pendencias"] = listar_pendencias(
+        nivel=nivel_ef,
+        classe_slug=classe_slug,
+        con_mod=mods["constitution"],
+        ficha=ficha_stub,
+    )
+    return resumo
 
 
 def validar_ficha_para_gravacao(
     ficha: Dict[str, Any],
     *,
     nivel: int = 1,
+    experiencia: int = 0,
+    exigir_progressao_completa: bool = False,
 ) -> Dict[str, Any]:
     """
     Valida ficha completa (PHB criação) e devolve ficha enriquecida com resumo calculado.
     Levanta ValueError se regras não forem atendidas.
     """
-    raca_slug = (ficha.get("raca_slug") or "").strip()
-    classe_slug = (ficha.get("classe_slug") or "").strip()
+    out = migrar_ficha_para_v2(ficha)
+    raca_slug = (out.get("raca_slug") or "").strip()
+    classe_slug = (out.get("classe_slug") or "").strip()
     if not raca_slug or not classe_slug:
-        out_parcial = dict(ficha)
-        if CHAVE_FICHA_ARENA_CONDICOES in ficha:
+        out_parcial = dict(out)
+        if CHAVE_FICHA_ARENA_CONDICOES in out:
             out_parcial[CHAVE_FICHA_ARENA_CONDICOES] = normalizar_condicoes_ficha(
-                ficha.get(CHAVE_FICHA_ARENA_CONDICOES)
+                out.get(CHAVE_FICHA_ARENA_CONDICOES)
             )
         return out_parcial
 
-    scores_base = dict(ficha.get("scores_base") or {})
-    validar_scores_base_criacao(scores_base)
+    scores_base = dict(out.get("scores_base") or {})
+    metodo = (out.get("metodo_atributos") or "padrao").strip().lower()
+    validar_scores_base_por_metodo(scores_base, metodo)
 
     raca = raca_por_slug(raca_slug)
     if raca and "proficiencia_pericia_extra" in (raca.get("caracteristicas") or []):
-        if not (ficha.get("pericia_racial_extra") or "").strip():
+        if not (out.get("pericia_racial_extra") or "").strip():
             raise ValueError(
                 "Raça exige escolha de uma perícia extra (proficiência racial)"
             )
@@ -229,48 +305,56 @@ def validar_ficha_para_gravacao(
         raca_slug=raca_slug,
         classe_slug=classe_slug,
         scores_base=scores_base,
-        bonus_habilidade_extra=ficha.get("bonus_habilidade_extra"),
-        antecedente_slug=ficha.get("antecedente_slug"),
+        bonus_habilidade_extra=out.get("bonus_habilidade_extra"),
+        bonus_atributo_feat=out.get("bonus_atributo_feat"),
+        antecedente_slug=out.get("antecedente_slug"),
         nivel=nivel,
-        pericias_classe_escolhidas=ficha.get("pericias_classe_escolhidas") or [],
-        pericia_racial_extra=ficha.get("pericia_racial_extra"),
-        subclasse_slug=ficha.get("subclasse_slug"),
-        armadura_slug=ficha.get("armadura_slug"),
-        escudo_slug=ficha.get("escudo_slug"),
+        pericias_classe_escolhidas=out.get("pericias_classe_escolhidas") or [],
+        pericia_racial_extra=out.get("pericia_racial_extra"),
+        subclasse_slug=out.get("subclasse_slug"),
+        armadura_slug=out.get("armadura_slug"),
+        escudo_slug=out.get("escudo_slug"),
+        ficha_progressao=out,
+        feats=out.get("feats"),
     )
 
     # Validação estrita de perícias de classe na gravação.
     montar_proficiencias_pericias(
         classe_slug=classe_slug,
         raca_slug=raca_slug,
-        antecedente_slug=ficha.get("antecedente_slug"),
-        pericias_classe_escolhidas=ficha.get("pericias_classe_escolhidas") or [],
-        pericia_racial_extra=ficha.get("pericia_racial_extra"),
+        antecedente_slug=out.get("antecedente_slug"),
+        pericias_classe_escolhidas=out.get("pericias_classe_escolhidas") or [],
+        pericia_racial_extra=out.get("pericia_racial_extra"),
         exigir_quantidade_classe=True,
     )
 
-    out = dict(ficha)
+    if exigir_progressao_completa:
+        validar_progressao_ficha(
+            out,
+            nivel=nivel,
+            classe_slug=classe_slug,
+            con_mod=resumo["modificadores"]["constitution"],
+            experiencia=experiencia,
+        )
+
     out["ca_base"] = resumo["ca_base"]
     out["ca_total"] = resumo["ca_total"]
     out["pericias_proficientes"] = resumo["pericias_proficientes"]
     out["hp_max_nivel_1_ref"] = resumo["hp_max_nivel_1"]
+    out["hp_max_total_ref"] = resumo["hp_max_total"]
+    out["pendencias"] = resumo.get("pendencias", [])
     if resumo.get("subclasse"):
         out["subclasse_nome"] = resumo["subclasse"]["nome"]
-    if CHAVE_FICHA_ARENA_CONDICOES in ficha:
+    if CHAVE_FICHA_ARENA_CONDICOES in out:
         out[CHAVE_FICHA_ARENA_CONDICOES] = normalizar_condicoes_ficha(
-            ficha.get(CHAVE_FICHA_ARENA_CONDICOES)
+            out.get(CHAVE_FICHA_ARENA_CONDICOES)
         )
     return out
 
 
 def validar_scores_base_criacao(scores_base: Dict[str, int]) -> None:
     """Criação: cada valor base entre 8 e 15 (matriz padrão / compra simplificada)."""
-    for chave in CHAVES_HABILIDADE:
-        v = int(scores_base.get(chave, 10))
-        if v < 8 or v > 15:
-            raise ValueError(
-                f"Valor base de {chave} deve estar entre 8 e 15 na criação de personagem"
-            )
+    validar_scores_base_por_metodo(scores_base, "padrao")
 
 
 def listar_classes_para_ficha() -> List[Dict[str, Any]]:

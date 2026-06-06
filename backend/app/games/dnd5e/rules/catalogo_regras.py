@@ -94,11 +94,14 @@ def payload_conjuracao_mb() -> Dict[str, Any]:
 
 
 def listar_equipamento_catalogo() -> Dict[str, Any]:
+    from app.games.dnd5e.data.equipamento_catalogo import ITENS_VARIADOS
+
     return {
         "armas_simples": list(ARMAS_SIMPLES),
         "armas_marciais": list(ARMAS_MARCIAIS),
         "armaduras": list(ARMADURAS),
         "escudos": list(ESCUDOS),
+        "itens_variados": list(ITENS_VARIADOS),
     }
 
 

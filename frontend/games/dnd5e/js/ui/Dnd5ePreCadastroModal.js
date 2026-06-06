@@ -35,6 +35,20 @@ class Dnd5ePreCadastroModal {
         return v >= 0 ? `+${v}` : String(v);
     }
 
+    formatHpDetalhe(resumo) {
+        if (!resumo?.niveis?.length) return '';
+        const n1 = resumo.niveis[0];
+        const modStr = this.fmtMod(n1.con_mod);
+        const partes = [`${resumo.dado_vida}(${n1.roll})`, `CON(${modStr})`];
+        if (resumo.bonus_racial_por_nivel) {
+            partes.push(`raça(+${resumo.bonus_racial_por_nivel}/nív.)`);
+        }
+        if (resumo.bonus_feat_por_nivel) {
+            partes.push(`Tough(+${resumo.bonus_feat_por_nivel}/nív.)`);
+        }
+        return `${partes.join(' + ')} = ${n1.subtotal} PV`;
+    }
+
     nomeJogadorLogado() {
         if (typeof AuthService.getNome === 'function') return AuthService.getNome();
         return '';
@@ -46,6 +60,7 @@ class Dnd5ePreCadastroModal {
         this.renderAbilities();
         this.el('prec_jogador').value = this.nomeJogadorLogado();
         this.el('btnPrecMatriz').addEventListener('click', () => this.aplicarMatrizPadrao());
+        this.el('prec_hp_roll')?.addEventListener('input', () => this.agendarPreview());
         this.el('formPrecadastro').addEventListener('submit', (e) => {
             e.preventDefault();
             this.cadastrar();
@@ -61,6 +76,7 @@ class Dnd5ePreCadastroModal {
             'prec_extra1',
             'prec_extra2',
             'prec_pericia_racial',
+            'prec_hp_roll',
         ].forEach((id) => {
             this.el(id)?.addEventListener('change', () => {
                 if (id === 'prec_raca') this.atualizarUiRaca();
@@ -181,8 +197,14 @@ class Dnd5ePreCadastroModal {
         ).map((cb) => cb.value);
     }
 
+    getHpRollNivel1() {
+        const raw = this.el('prec_hp_roll')?.value;
+        const roll = raw ? parseInt(raw, 10) : null;
+        return Number.isFinite(roll) && roll > 0 ? roll : null;
+    }
+
     payloadCalcular() {
-        return {
+        const body = {
             raca_slug: this.el('prec_raca').value,
             classe_slug: this.el('prec_classe').value,
             antecedente_slug: this.el('prec_antecedente').value || null,
@@ -195,6 +217,9 @@ class Dnd5ePreCadastroModal {
             armadura_slug: this.el('prec_armadura').value || null,
             escudo_slug: this.el('prec_escudo').value || null,
         };
+        const roll = this.getHpRollNivel1();
+        if (roll != null) body.hp_roll_nivel_1 = roll;
+        return body;
     }
 
     periciaNome(slug) {
@@ -393,6 +418,14 @@ class Dnd5ePreCadastroModal {
             this.el(`prec_mod_${a.key}`).textContent = this.fmtMod(p.modificadores[a.key]);
             this.el(`prec_eff_${a.key}`).textContent = String(p.scores_efetivos[a.key]);
         });
+        const dadoEl = this.el('prec_hp_dado');
+        if (dadoEl && p.classe?.dado_vida) {
+            dadoEl.textContent = p.classe.dado_vida;
+        }
+        const hpDet = this.el('prec_hp_detalhe');
+        if (hpDet) {
+            hpDet.textContent = p.hp_resumo ? this.formatHpDetalhe(p.hp_resumo) : '';
+        }
         const resumo = this.el('prec_preview_resumo');
         if (resumo) {
             resumo.textContent = `CA ${p.ca_total ?? p.ca_base} · PV ${p.hp_max_nivel_1} · Inic. ${this.fmtMod(p.iniciativa)}`;
@@ -443,6 +476,11 @@ class Dnd5ePreCadastroModal {
             Toast.error('Escolha a perícia extra concedida pela raça.');
             return false;
         }
+        const hpRoll = this.getHpRollNivel1();
+        if (!hpRoll) {
+            Toast.error('Informe a rolagem do dado de vida no nível 1.');
+            return false;
+        }
         return true;
     }
 
@@ -468,6 +506,22 @@ class Dnd5ePreCadastroModal {
             f.pericias_proficientes = preview.pericias_proficientes;
             f.hp_max_nivel_1_ref = preview.hp_max_nivel_1;
             if (preview.subclasse) f.subclasse_nome = preview.subclasse.nome;
+            const roll = this.getHpRollNivel1();
+            const conMod = preview.modificadores?.constitution ?? 0;
+            if (roll != null) {
+                f.progressao = {
+                    hp_rolls: [
+                        {
+                            nivel: 1,
+                            roll,
+                            con_mod: conMod,
+                            ganho: Math.max(1, roll + conMod),
+                            usar_media: false,
+                        },
+                    ],
+                    marcos: [],
+                };
+            }
         }
         f.arena_condicoes = [];
         return f;
@@ -482,7 +536,10 @@ class Dnd5ePreCadastroModal {
             const preview = await this.rs.calcularAtributos(this.payloadCalcular());
             const eff = preview.scores_efetivos;
             const nivel = parseInt(this.el('prec_nivel').value, 10) || 1;
-            const hpMax = preview.hp_max_nivel_1;
+            const hpMax =
+                preview.hp_max_total && preview.hp_max_total > preview.hp_max_nivel_1
+                    ? preview.hp_max_total
+                    : preview.hp_max_nivel_1;
             const payload = {
                 nome: this.el('prec_nome').value.trim(),
                 jogador_nome: this.el('prec_jogador').value.trim() || null,
@@ -516,6 +573,8 @@ class Dnd5ePreCadastroModal {
         this.el('prec_jogador').value = this.nomeJogadorLogado();
         this.el('prec_nivel').value = '1';
         this.el('prec_xp').value = '0';
+        if (this.el('prec_hp_roll')) this.el('prec_hp_roll').value = '';
+        if (this.el('prec_hp_detalhe')) this.el('prec_hp_detalhe').textContent = '';
         this.aplicarAtributosNeutros();
         this.atualizarUiRaca();
         this.renderPericiasEscolha();
