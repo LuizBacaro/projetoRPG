@@ -27,6 +27,8 @@ def _coluna_existe(bind, table_name: str, column_name: str) -> bool:
 
 def upgrade() -> None:
     bind = op.get_bind()
+    if "magias_preparadas" not in sa.inspect(bind).get_table_names():
+        return
 
     with op.batch_alter_table("magias_preparadas") as batch_op:
         if not _coluna_existe(bind, "magias_preparadas", "quantidade"):
@@ -40,6 +42,8 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     bind = op.get_bind()
+    if "magias_preparadas" not in sa.inspect(bind).get_table_names():
+        return
 
     with op.batch_alter_table("magias_preparadas") as batch_op:
         if _coluna_existe(bind, "magias_preparadas", "usos_realizados"):
