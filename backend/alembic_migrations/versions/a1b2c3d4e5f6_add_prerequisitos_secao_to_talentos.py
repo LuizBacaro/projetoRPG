@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.exc import NoSuchTableError
 
 
 # revision identifiers, used by Alembic.
@@ -18,14 +19,28 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _tabela_existe(tabela: str) -> bool:
+    try:
+        bind = op.get_bind()
+        return tabela in sa.inspect(bind).get_table_names()
+    except Exception:
+        return False
+
+
 def _coluna_existe(tabela: str, coluna: str) -> bool:
-    bind = op.get_bind()
-    inspector = sa.inspect(bind)
-    colunas = [c["name"] for c in inspector.get_columns(tabela)]
-    return coluna in colunas
+    try:
+        bind = op.get_bind()
+        inspector = sa.inspect(bind)
+        colunas = [c["name"] for c in inspector.get_columns(tabela)]
+        return coluna in colunas
+    except NoSuchTableError:
+        return False
 
 
 def upgrade() -> None:
+    if not _tabela_existe("talentos"):
+        return
+
     # Adicionar coluna prerequisitos
     if not _coluna_existe("talentos", "prerequisitos"):
         op.add_column(
@@ -42,6 +57,9 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    if not _tabela_existe("talentos"):
+        return
+
     # Remover colunas em caso de rollback
     if _coluna_existe("talentos", "secao"):
         op.drop_column("talentos", "secao")
