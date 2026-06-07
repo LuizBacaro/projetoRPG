@@ -48,6 +48,7 @@
     let debounceTimer = null;
     let debounceHpCondTimer = null;
     let arenaCondicoesAtual = [];
+    let syncXpEmAndamento = false;
     const el = (id) => document.getElementById(id);
 
     function fmtMod(n) {
@@ -122,6 +123,53 @@
         ).map((cb) => cb.value);
     }
 
+    function subclasseValidaParaPreview() {
+        const sub = el('f5e_subclasse')?.value;
+        if (!sub) return null;
+        const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
+        const opt = el('f5e_subclasse')?.selectedOptions?.[0];
+        const match = opt?.textContent?.match(/nív\.\s*(\d+)/i);
+        const minNivel = match ? parseInt(match[1], 10) : 3;
+        return nivel >= minNivel ? sub : null;
+    }
+
+    function sincronizarXpComNivel() {
+        if (typeof Dnd5eXpUtil === 'undefined' || syncXpEmAndamento) return;
+        syncXpEmAndamento = true;
+        Dnd5eXpUtil.aplicarNivelParaXp(el('f5e_nivel'), el('f5e_xp'));
+        syncXpEmAndamento = false;
+        atualizarHeaderIdentidade();
+    }
+
+    function sincronizarNivelComXp() {
+        if (typeof Dnd5eXpUtil === 'undefined' || syncXpEmAndamento) return;
+        syncXpEmAndamento = true;
+        const novoNivel = Dnd5eXpUtil.aplicarXpParaNivel(el('f5e_xp'), el('f5e_nivel'));
+        syncXpEmAndamento = false;
+        if (novoNivel == null) {
+            atualizarHeaderIdentidade();
+            return;
+        }
+        atualizarHeaderIdentidade();
+        atualizarSubclasses();
+        if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
+            window.__dnd5eAtualizarSecaoMagias();
+        }
+        agendarPreview();
+        progressaoPanel?.refreshPendencias();
+    }
+
+    function aoAlterarNivel() {
+        sincronizarXpComNivel();
+        atualizarHeaderIdentidade();
+        if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
+            window.__dnd5eAtualizarSecaoMagias();
+        }
+        atualizarSubclasses();
+        agendarPreview();
+        progressaoPanel?.refreshPendencias();
+    }
+
     function payloadCalcular() {
         const armEsc = inventarioPanel
             ? inventarioPanel.getArmaduraEscudoParaCalcular()
@@ -139,7 +187,7 @@
             nivel: parseInt(el('f5e_nivel').value, 10) || 1,
             pericias_classe_escolhidas: getPericiasClasseEscolhidas(),
             pericia_racial_extra: el('f5e_pericia_racial').value || null,
-            subclasse_slug: el('f5e_subclasse').value || null,
+            subclasse_slug: subclasseValidaParaPreview(),
             armadura_slug: armEsc.armadura_slug,
             escudo_slug: armEsc.escudo_slug,
             feats: fichaProgressaoLocal.feats || [],
@@ -323,6 +371,8 @@
                     .join('');
             if (atual && disponiveis.some((s) => s.slug === atual)) {
                 select.value = atual;
+            } else {
+                select.value = '';
             }
             atualizarHeaderIdentidade();
         } catch {
@@ -387,7 +437,6 @@
             el('fichaHdrJogador').textContent =
                 el('f5e_jogador').value.trim() || nomeJogadorLogado() || '—';
         }
-        if (el('fichaHdrNivel')) el('fichaHdrNivel').textContent = el('f5e_nivel').value || '1';
         if (el('fichaHdrRaca')) el('fichaHdrRaca').textContent = raca ? raca.nome : '—';
         if (el('fichaHdrClasse')) el('fichaHdrClasse').textContent = classe ? classe.nome : '—';
         const fichaClasse = el('fichaClasse');
@@ -395,7 +444,6 @@
         if (el('fichaHdrAntecedente')) {
             el('fichaHdrAntecedente').textContent = ant ? ant.nome : '—';
         }
-        if (el('fichaHdrXp')) el('fichaHdrXp').textContent = el('f5e_xp').value || '0';
         const tipoEl = el('fichaHdrTipo');
         if (tipoEl) {
             tipoEl.textContent = tipoCriacao;
@@ -672,6 +720,7 @@
 
         el('f5e_status').textContent = 'Salvando…';
         try {
+            sincronizarXpComNivel();
             const preview = await rs.calcularAtributos(payloadCalcular());
             const eff = preview.scores_efetivos;
             const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
@@ -816,7 +865,6 @@
             'f5e_classe',
             'f5e_antecedente',
             'f5e_subclasse',
-            'f5e_xp',
             'f5e_extra1',
             'f5e_extra2',
             'f5e_pericia_racial',
@@ -827,6 +875,12 @@
             if (node.tagName === 'INPUT') node.readOnly = true;
             node.setAttribute('data-pre-cadastro-lock', '');
         });
+        const xpNode = el('f5e_xp');
+        if (xpNode) {
+            xpNode.disabled = false;
+            xpNode.readOnly = false;
+            xpNode.removeAttribute('data-pre-cadastro-lock');
+        }
         ABILITIES.forEach((a) => {
             const inp = el(`base_${a.key}`);
             if (inp) inp.disabled = true;
@@ -915,22 +969,15 @@
             }
             agendarPreview();
         });
-        el('f5e_nivel').addEventListener('change', () => {
-            atualizarHeaderIdentidade();
-            if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
-                window.__dnd5eAtualizarSecaoMagias();
-            }
-        });
+        el('f5e_nivel').addEventListener('change', aoAlterarNivel);
+        el('f5e_nivel').addEventListener('input', aoAlterarNivel);
+        el('f5e_xp').addEventListener('input', sincronizarNivelComXp);
+        el('f5e_xp').addEventListener('change', sincronizarNivelComXp);
         el('f5e_antecedente').addEventListener('change', agendarPreview);
         el('f5e_extra1').addEventListener('change', agendarPreview);
         el('f5e_extra2').addEventListener('change', agendarPreview);
         el('f5e_pericia_racial').addEventListener('change', agendarPreview);
         el('f5e_subclasse').addEventListener('change', agendarPreview);
-        el('f5e_nivel').addEventListener('change', () => {
-            atualizarSubclasses();
-            agendarPreview();
-            progressaoPanel?.refreshPendencias();
-        });
         el('f5e_hp_atual').addEventListener('input', () => {
             el('f5e_hp_atual').dataset.userTouched = '1';
             const hpMax = parseInt(el('f5e_hp_max').textContent, 10) || 1;
@@ -953,6 +1000,9 @@
             catalogoClasses = classes.classes || [];
             catalogoAntecedentes = ant.antecedentes || [];
             catalogoPericias = per.pericias || [];
+            if (typeof Dnd5eXpUtil !== 'undefined' && classes.xp_por_nivel) {
+                Dnd5eXpUtil.setTabela(classes.xp_por_nivel);
+            }
             preencherSelects();
             preencherSelectExtra();
             atualizarUiRaca();

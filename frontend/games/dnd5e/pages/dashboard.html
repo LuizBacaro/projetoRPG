@@ -151,18 +151,15 @@
                 </section>
 
                 <section class="dnd5e-prec-sec">
-                    <h3 class="dnd5e-prec-sec-titulo">❤️ Pontos de Vida (nível 1)</h3>
-                    <div class="dnd5e-prec-grid">
-                        <div>
-                            <label class="ficha-label" for="prec_hp_roll">Rolagem do dado de vida</label>
-                            <input id="prec_hp_roll" type="number" min="1" max="12" required
-                                placeholder="ex.: 8" title="Valor que você tirou no dado de vida da classe" />
-                        </div>
+                    <h3 class="dnd5e-prec-sec-titulo" id="prec_hp_sec_titulo">❤️ Pontos de Vida</h3>
+                    <p id="prec_hp_hint" class="dnd5e-prec-hp-hint"></p>
+                    <div class="dnd5e-prec-grid dnd5e-prec-hp-meta">
                         <div>
                             <span class="ficha-label">Dado da classe</span>
                             <span id="prec_hp_dado" class="dnd5e-prec-hp-dado">—</span>
                         </div>
                     </div>
+                    <div id="prec_hp_rolls_host" class="dnd5e-prec-hp-rolls"></div>
                     <p id="prec_hp_detalhe" class="ficha-dnd5e-hp-detalhe"></p>
                 </section>
 
@@ -207,7 +204,8 @@
 <script src="../js/services/Dnd5ePersonagemService.js?v=3"></script>
 <script src="../js/services/Dnd5eRegrasService.js?v=3"></script>
 <script src="../js/shared/dnd5e-raca-util.js?v=1"></script>
-<script src="../js/ui/Dnd5ePreCadastroModal.js?v=5"></script>
+<script src="../js/shared/dnd5e-xp-util.js?v=1"></script>
+<script src="../js/ui/Dnd5ePreCadastroModal.js?v=7"></script>
 <script>
 (function () {
     const ps = new Dnd5ePersonagemService();

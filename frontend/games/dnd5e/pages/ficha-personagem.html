@@ -37,7 +37,8 @@
                 </span>
                 <span class="ficha-hdr-chip">
                     <span class="ficha-hdr-chip-label">Nível</span>
-                    <span id="fichaHdrNivel" class="ficha-hdr-chip-valor">1</span>
+                    <input id="f5e_nivel" type="number" min="1" max="20" value="1"
+                        class="ficha-hdr-chip-input" aria-label="Nível" />
                 </span>
                 <span class="ficha-hdr-chip">
                     <span class="ficha-hdr-chip-label">Raça</span>
@@ -58,7 +59,8 @@
                 </span>
                 <span class="ficha-hdr-chip">
                     <span class="ficha-hdr-chip-label">XP</span>
-                    <span id="fichaHdrXp" class="ficha-hdr-chip-valor">0</span>
+                    <input id="f5e_xp" type="number" min="0" value="0"
+                        class="ficha-hdr-chip-input" aria-label="Experiência" />
                 </span>
             </div>
             <p id="f5e_tracos" class="ficha-dnd5e-tracos ficha-hdr-tracos" hidden></p>
@@ -68,14 +70,12 @@
     <div id="f5e_identidade_campos" class="ficha-dnd5e-sr-only" aria-hidden="true">
         <input id="f5e_nome" type="text" required autocomplete="off" tabindex="-1" />
         <input id="f5e_jogador" type="text" readonly tabindex="-1" />
-        <input id="f5e_nivel" type="number" min="1" max="20" value="1" tabindex="-1" />
         <select id="f5e_raca" required tabindex="-1"></select>
         <select id="f5e_classe" required tabindex="-1"></select>
         <select id="f5e_antecedente" tabindex="-1"></select>
         <div id="f5e_subclasse_wrap" hidden>
             <select id="f5e_subclasse" tabindex="-1"><option value="">—</option></select>
         </div>
-        <input id="f5e_xp" type="number" min="0" value="0" tabindex="-1" />
     </div>
 
     <main class="ficha-corpo">
@@ -573,7 +573,8 @@
 <script src="../js/services/Dnd5eCombateService.js?v=3"></script>
 <script src="../js/shared/dnd5e-condicoes-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-raca-util.js?v=1"></script>
-<script src="../js/pages/ficha-dnd5e.js?v=18"></script>
+<script src="../js/shared/dnd5e-xp-util.js?v=1"></script>
+<script src="../js/pages/ficha-dnd5e.js?v=19"></script>
 <script type="module" src="../js/pages/ficha-dnd5e-grimorio-bootstrap.js?v=4"></script>
 <script type="module" src="../js/pages/ficha-dnd5e-conjuracao.js?v=2"></script>
 </body>

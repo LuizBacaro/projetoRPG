@@ -303,6 +303,37 @@
     line-height: 1.2;
 }
 
+.ficha-hdr-chip-input {
+    width: 100%;
+    min-width: 3.5rem;
+    max-width: 7rem;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--cor-dourada, #e8d5a3);
+    line-height: 1.2;
+    font-family: inherit;
+}
+
+.ficha-hdr-chip-input:focus {
+    outline: 1px solid rgba(201, 168, 76, 0.65);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+.ficha-hdr-chip-input:disabled,
+.ficha-hdr-chip-input[readonly] {
+    opacity: 0.95;
+    cursor: default;
+}
+
+.ficha-dnd5e-header-identidade .ficha-hdr-chip-input {
+    color: #f5e6a8;
+}
+
 .ficha-hdr-chip-tipo--jogador {
     border-color: rgba(129, 199, 132, 0.45);
 }
@@ -740,6 +771,39 @@
     display: inline-block;
     font-weight: 600;
     color: #cbd5e1;
+}
+
+.dnd5e-prec-hp-hint {
+    margin: 0 0 0.5rem;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.45;
+}
+
+.dnd5e-prec-hp-meta {
+    margin-bottom: 0.5rem;
+}
+
+.dnd5e-prec-hp-rolls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.dnd5e-prec-hp-roll-row {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.dnd5e-prec-hp-roll-row .ficha-label {
+    margin: 0;
+}
+
+.dnd5e-prec-hp-roll-row input {
+    width: 100%;
+    min-width: 0;
 }
 
 .ficha-dnd5e-marco-hint {
