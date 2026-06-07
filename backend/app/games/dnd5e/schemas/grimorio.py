@@ -30,6 +30,7 @@ class Dnd5eGrimorioMagiaResponse(BaseModel):
     adicionada_em: datetime
 
     magia_nome: Optional[str] = None
+    magia_dano: Optional[str] = None
     magia_ataque_magico: Optional[str] = None
     magia_escola: Optional[str] = None
     magia_nivel: Optional[int] = None

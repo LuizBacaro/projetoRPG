@@ -117,9 +117,9 @@ def validar_feat(feat: Feat, personagem: PersonagemFeats) -> bool:
 
 def adicionar_feat(personagem: PersonagemFeats, feat: Feat) -> None:
     if not validar_feat(feat, personagem):
-        raise ValueError(f"Pre-requisitos nao atendidos para feat {feat.slug}")
+        raise ValueError(f"Pré-requisitos não atendidos para o talento {feat.slug}")
     if feat.slug in personagem.feats:
-        raise ValueError(f"Feat {feat.slug} ja possui")
+        raise ValueError(f"Talento {feat.slug} já registrado")
     personagem.feats.append(feat.slug)
     if feat.tipo_bonus == "Atributo" and feat.bonus_especial is None:
         # ASI genérico: exemplo +2 STR (testes usam override explícito)

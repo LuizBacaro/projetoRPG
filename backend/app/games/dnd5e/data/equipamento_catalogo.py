@@ -182,3 +182,41 @@ ARMADURAS: List[ArmaduraDict] = [
 ESCUDOS: List[Dict[str, Any]] = [
     {"slug": "escudo", "nome": "Escudo", "bonus_ac": 2, "peso": 6, "custo": 10},
 ]
+
+ITENS_VARIADOS: List[Dict[str, Any]] = [
+    {
+        "slug": "mochila",
+        "nome": "Mochila",
+        "categoria": "acampamento",
+        "peso": 5,
+        "custo": 2,
+    },
+    {
+        "slug": "corda",
+        "nome": "Corda (15 m)",
+        "categoria": "acampamento",
+        "peso": 10,
+        "custo": 1,
+    },
+    {
+        "slug": "lanterna",
+        "nome": "Lanterna",
+        "categoria": "acampamento",
+        "peso": 1,
+        "custo": 5,
+    },
+    {
+        "slug": "kit-ladrao",
+        "nome": "Kit de ladrão",
+        "categoria": "ferramentas",
+        "peso": 1,
+        "custo": 25,
+    },
+    {
+        "slug": "pocao-cura-menor",
+        "nome": "Poção de cura menor",
+        "categoria": "medicinal",
+        "peso": 0.5,
+        "custo": 50,
+    },
+]

@@ -14,6 +14,7 @@ from app.games.dnd5e.services.grimorio_service import Dnd5eGrimorioService
 from app.games.dnd5e.services.magia_import_service import Dnd5eMagiaImportService
 from app.games.dnd5e.services.magia_service import Dnd5eMagiaService
 from app.games.dnd5e.services.personagem_service import Dnd5ePersonagemService
+from app.games.dnd5e.services.progressao_service import Dnd5eProgressaoService
 from app.shared.core.database import get_db
 
 
@@ -56,6 +57,12 @@ def get_dnd5e_personagem_service(
     repository: Dnd5ePersonagemRepository = Depends(get_dnd5e_personagem_repository),
 ) -> Dnd5ePersonagemService:
     return Dnd5ePersonagemService(repository)
+
+
+def get_dnd5e_progressao_service(
+    repository: Dnd5ePersonagemRepository = Depends(get_dnd5e_personagem_repository),
+) -> Dnd5eProgressaoService:
+    return Dnd5eProgressaoService(repository)
 
 
 def get_dnd5e_conjuracao_service(

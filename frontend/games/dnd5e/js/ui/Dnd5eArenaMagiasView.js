@@ -22,18 +22,49 @@ const esc = (str) => {
         .replace(/"/g, '&quot;');
 };
 
+const HAB_LABEL = { int: 'INT', wis: 'SAB', cha: 'CAR', dex: 'DES' };
+const MODO_LABEL = {
+    preparado: 'Preparado',
+    conhecido: 'Conhecido',
+    bruxo: 'Pacto (Bruxo)',
+};
+
 export class Dnd5eArenaMagiasView {
-    static render(grupos, modo, slotBruxo) {
+    static render(grupos, modo, slotBruxo, estado = null) {
         if (modo === MODO_CONJURADOR.NENHUM) {
             return '';
         }
+        const perfil = Dnd5eArenaMagiasView._renderPerfil(estado);
         if (modo === MODO_CONJURADOR.BRUXO) {
-            return Dnd5eArenaMagiasView._renderBruxo(grupos, slotBruxo);
+            return perfil + Dnd5eArenaMagiasView._renderBruxo(grupos, slotBruxo);
         }
         if (modo === MODO_CONJURADOR.PREPARADO) {
-            return Dnd5eArenaMagiasView._renderPreparado(grupos);
+            return perfil + Dnd5eArenaMagiasView._renderPreparado(grupos);
         }
-        return Dnd5eArenaMagiasView._renderConhecido(grupos);
+        return perfil + Dnd5eArenaMagiasView._renderConhecido(grupos);
+    }
+
+    static _renderPerfil(estado) {
+        if (!estado) return '';
+        const hab = HAB_LABEL[estado.habilidade_primaria] || String(estado.habilidade_primaria || '').toUpperCase();
+        const modo = MODO_LABEL[estado.modo_lista] || estado.modo_lista || '—';
+        const maxNiv = estado.max_nivel_magia ?? '—';
+        const truques = estado.truque_multiplicador_dados || 1;
+        const partes = [`${modo}`, `CD: ${hab}`, `máx. ${maxNiv}º`, `truques ×${truques}`];
+        if (estado.magias_conhecidas_max != null) {
+            partes.push(`conhecidas ${estado.magias_conhecidas_atual ?? 0}/${estado.magias_conhecidas_max}`);
+        }
+        if (estado.magias_preparadas_max != null) {
+            const prep = (estado.magias_preparadas_ids || []).length;
+            partes.push(`preparadas ${prep}/${estado.magias_preparadas_max}`);
+        }
+        if (estado.recupera_slots_repouso_curto) {
+            partes.push('repouso curto ↻');
+        }
+        if (estado.magia_concentracao_id) {
+            partes.push(`concentrando #${estado.magia_concentracao_id}`);
+        }
+        return `<p class="dnd5e-conj-perfil">${esc(partes.join(' · '))}</p>`;
     }
 
     static bindEvents(container, callbacks) {

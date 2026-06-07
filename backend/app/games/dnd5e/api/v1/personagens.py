@@ -4,13 +4,25 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
 
-from app.core.dependencies import get_dnd5e_personagem_service, get_file_service
+from app.core.dependencies import (
+    get_dnd5e_personagem_service,
+    get_dnd5e_progressao_service,
+    get_file_service,
+)
 from app.games.dnd5e.schemas.personagem import (
     Dnd5ePersonagemCreate,
     Dnd5ePersonagemResponse,
     Dnd5ePersonagemUpdate,
 )
+from app.games.dnd5e.schemas.progressao import (
+    Dnd5eHpRollRequest,
+    Dnd5eHpRollResponse,
+    Dnd5eMarcoRequest,
+    Dnd5eMarcoResponse,
+    Dnd5ePendenciasProgressaoResponse,
+)
 from app.games.dnd5e.services.personagem_service import Dnd5ePersonagemService
+from app.games.dnd5e.services.progressao_service import Dnd5eProgressaoService
 from app.services.file_service import FileService
 from app.shared.core.deps import (
     get_usuario_atual,
@@ -105,6 +117,71 @@ def excluir(
         service.excluir(personagem_id)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/progressao/pendencias",
+    response_model=Dnd5ePendenciasProgressaoResponse,
+    summary="Pendências de progressão (HP por nível, marcos feat/ASI)",
+)
+def progressao_pendencias(
+    personagem_id: int,
+    service: Dnd5eProgressaoService = Depends(get_dnd5e_progressao_service),
+    _: Usuario = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    try:
+        return service.pendencias(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/progressao/hp-roll",
+    response_model=Dnd5eHpRollResponse,
+    summary="Registra rolagem de PV para um nível (2–20)",
+)
+def progressao_hp_roll(
+    personagem_id: int,
+    payload: Dnd5eHpRollRequest,
+    service: Dnd5eProgressaoService = Depends(get_dnd5e_progressao_service),
+    _: Usuario = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    try:
+        return service.registrar_hp_roll(
+            personagem_id,
+            nivel=payload.nivel,
+            roll=payload.roll,
+            usar_media=payload.usar_media,
+        )
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@router.post(
+    "/{personagem_id}/progressao/marco",
+    response_model=Dnd5eMarcoResponse,
+    summary="Registra marco de feat ou ASI (níveis 4/8/12/16/19)",
+)
+def progressao_marco(
+    personagem_id: int,
+    payload: Dnd5eMarcoRequest,
+    service: Dnd5eProgressaoService = Depends(get_dnd5e_progressao_service),
+    _: Usuario = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    try:
+        return service.registrar_marco(
+            personagem_id,
+            nivel=payload.nivel,
+            tipo=payload.tipo,
+            slug=payload.slug,
+            distribuicao=payload.distribuicao,
+        )
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 
 @router.post("/{personagem_id}/foto", response_model=Dnd5ePersonagemResponse)

@@ -9,6 +9,7 @@ from app.games.dnd5e.rules.equipamento import (
     calcular_dano_arma,
     calcular_penalidade_encargo,
     calcular_peso_total,
+    montar_resumo_equipamento,
     validar_peso_maximo,
 )
 
@@ -30,3 +31,20 @@ def test_encargo_reduz_velocidade() -> None:
     peso = calcular_peso_total(itens)
     assert calcular_penalidade_encargo(peso, forca=10) == 3
     assert validar_peso_maximo(peso, forca=10) is True
+
+
+def test_montar_resumo_equipamento_guerreiro() -> None:
+    res = montar_resumo_equipamento(
+        armadura_slug="placas",
+        escudo_slug="escudo",
+        arma_principal_slug="espada-longa",
+        itens=[{"slug": "mochila", "quantidade": 1}],
+        forca=16,
+        dex_mod=0,
+        ouro_po=50,
+    )
+    assert res["ca_total"] == 20
+    assert res["arma_principal"]["slug"] == "espada-longa"
+    assert res["peso_total_lb"] > 60
+    assert res["capacidade_lb"] == 240
+    assert res["ouro_po"] == 50

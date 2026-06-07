@@ -5,9 +5,12 @@ from app.games.dnd5e.rules.combate import (
     Combatente,
     RodadaCombate,
     StatusVida,
+    aplicar_dano_hp,
+    aplicar_teste_morte,
     ataque_atinge_ca,
     calcular_dano,
     calcular_iniciativa,
+    estabilizar_combatente,
     registrar_teste_morte,
     resolver_ataque,
     resumo_modificadores_ataque,
@@ -84,3 +87,60 @@ def test_vantagem_e_desvantagem_cancelam() -> None:
     mods = resumo_modificadores_ataque(["cego"], ["atordoado"])
     v, d = mods.rolagem_efetiva()
     assert v is False and d is False
+
+
+def test_resolver_ataque_nat_20_critico_e_acerto() -> None:
+    r = resolver_ataque(3, 2, 30, rolagem_d20=20)
+    assert r.is_critico is True
+    assert r.acerto is True
+
+
+def test_aplicar_teste_morte_nat_20_recupera_1_pv() -> None:
+    r = aplicar_teste_morte(0, 0, 0, 20)
+    assert r.hp_atual == 1
+    assert r.death_successes == 0
+    assert r.death_failures == 0
+    assert r.status == StatusVida.VIVO
+
+
+def test_dano_em_zero_adiciona_falha() -> None:
+    r = aplicar_dano_hp(0, 30, 0, 0, 5)
+    assert r.death_failures == 1
+    assert r.status == StatusVida.INCONSCIENTE
+
+
+def test_dano_critico_em_zero_duas_falhas() -> None:
+    r = aplicar_dano_hp(0, 30, 0, 0, 5, is_critico=True)
+    assert r.death_failures == 2
+
+
+def test_morte_instantanea_dano_excedente() -> None:
+    r = aplicar_dano_hp(5, 10, 0, 0, 20)
+    assert r.morte_instantanea is True
+    assert r.status == StatusVida.MORTO
+
+
+def test_estabilizado_volta_a_morrer_com_dano() -> None:
+    r = aplicar_dano_hp(0, 20, 0, 3, 3, status_vida=StatusVida.ESTABILIZADO)
+    assert r.death_successes == 0
+    assert r.death_failures == 1
+    assert r.status == StatusVida.INCONSCIENTE
+
+
+def test_estabilizar_medicina_cd10() -> None:
+    ok = estabilizar_combatente(0, metodo="medicina", rolagem_d20=12, mod_medicina=0)
+    assert ok.sucesso is True
+    assert ok.status == StatusVida.ESTABILIZADO
+    fail = estabilizar_combatente(0, metodo="medicina", rolagem_d20=4, mod_medicina=0)
+    assert fail.sucesso is False
+
+
+def test_gastar_economia_acao_duplicada_falha() -> None:
+    from app.games.dnd5e.rules.combate import gastar_acao_turno, reset_economia_turno
+
+    eco = gastar_acao_turno(reset_economia_turno(), "acao")
+    try:
+        gastar_acao_turno(eco, "acao")
+        assert False, "deveria falhar"
+    except ValueError:
+        pass

@@ -7,6 +7,7 @@ from typing import Callable, List, Literal, Optional
 
 from app.games.dnd5e.data.spell_slots_full_caster import CLASSE_HABILIDADE_PRIMARIA
 from app.games.dnd5e.data.spell_tables import (
+    BARD_SLOTS,
     FULL_CASTER_SLOTS,
     HALF_CASTER_SLOTS,
     WARLOCK_SLOTS,
@@ -89,9 +90,127 @@ def espacos_por_classe_nivel(classe: str, nivel: int) -> List[int]:
         arr = [0] * 10
         arr[slot_lvl] = qtd
         return arr
+    if slug in ("bardo", "bard"):
+        return list(BARD_SLOTS[nivel])
     if slug in ("paladino", "paladin", "patrulheiro", "ranger"):
         return list(HALF_CASTER_SLOTS[nivel])
     return list(FULL_CASTER_SLOTS[nivel])
+
+
+CUSTO_PONTO_FEITICARIA_SLOT: dict[int, int] = {1: 2, 2: 3, 3: 5, 4: 6, 5: 7}
+
+
+def truque_multiplicador_dados(nivel_personagem: int) -> int:
+    """PHB: truques escalam dados aos níveis 5, 11 e 17 do personagem."""
+    n = max(1, int(nivel_personagem))
+    if n >= 17:
+        return 4
+    if n >= 11:
+        return 3
+    if n >= 5:
+        return 2
+    return 1
+
+
+def save_causa_metade_dano(
+    *,
+    dano: Optional[str],
+    save_tipo: str,
+    slug: str = "",
+) -> bool:
+    """True se passar no save reduz o dano à metade (PHB padrão; exceções por slug)."""
+    if not dano or (save_tipo or "nenhum").strip().lower() in ("", "nenhum"):
+        return False
+    slug_l = (slug or "").strip().lower()
+    if slug_l in {
+        "disintegrate",
+        "desintegrar",
+        "power-word-kill",
+        "palavra-poder-matar",
+    }:
+        return False
+    return True
+
+
+def _parse_bonus_dados_upcast(
+    descricao: Optional[str], delta_niveis: int
+) -> Optional[str]:
+    if not descricao or delta_niveis <= 0:
+        return None
+    import re
+
+    m = re.search(r"\+?\s*(\d+)\s*d\s*(\d+)", str(descricao), re.I)
+    if not m:
+        return None
+    per_level = int(m.group(1))
+    faces = int(m.group(2))
+    return f"{per_level * delta_niveis}d{faces}"
+
+
+def _somar_expressoes_dado(base: str, extra: str) -> str:
+    import re
+
+    def parse_dice(expr: str):
+        m = re.match(r"^(\d+)\s*d\s*(\d+)(.*)$", str(expr).strip().lower())
+        if not m:
+            return None
+        return int(m.group(1)), int(m.group(2)), m.group(3)
+
+    b = parse_dice(base)
+    e = parse_dice(extra)
+    if b and e and b[1] == e[1]:
+        return f"{b[0] + e[0]}d{b[1]}{b[2]}"
+    return f"{base}+{extra}"
+
+
+def escalar_dano_upcast(
+    expressao: str,
+    nivel_magia: int,
+    nivel_slot: Optional[int],
+    *,
+    descricao_nivel_superior: Optional[str] = None,
+) -> str:
+    """Soma dados extras por slot acima do nível da magia (ex.: Bola de Fogo +1d6/nível)."""
+    if nivel_slot is None or nivel_magia <= 0 or int(nivel_slot) <= int(nivel_magia):
+        return str(expressao)
+    delta = int(nivel_slot) - int(nivel_magia)
+    bonus = _parse_bonus_dados_upcast(descricao_nivel_superior, delta)
+    if not bonus:
+        return str(expressao)
+    return _somar_expressoes_dado(str(expressao), bonus)
+
+
+def escalar_expressao_dano_truque(expressao: str, nivel_personagem: int) -> str:
+    """Multiplica quantidade de dados em expressões NdX (+mod opcional)."""
+    mult = truque_multiplicador_dados(nivel_personagem)
+    if mult <= 1:
+        return str(expressao)
+    expr = str(expressao).strip().lower()
+    if "d" not in expr:
+        return expr
+    left, right = expr.split("d", 1)
+    dados = left.strip()
+    if not dados.isdigit():
+        return expr
+    return f"{int(dados) * mult}d{right}"
+
+
+def pontos_feiticaria_max(classe: str, nivel: int) -> int:
+    """Feiticeiro PHB: pontos = nível (a partir do 2º)."""
+    if (classe or "").strip().lower() not in ("feiticeiro", "sorcerer"):
+        return 0
+    return max(0, int(nivel)) if int(nivel) >= 2 else 0
+
+
+def custo_ponto_feiticaria_criar_slot(nivel_slot: int) -> int:
+    if nivel_slot not in CUSTO_PONTO_FEITICARIA_SLOT:
+        raise ValueError("Só é possível criar slots de 1º a 5º nível")
+    return CUSTO_PONTO_FEITICARIA_SLOT[nivel_slot]
+
+
+def recuperacao_arcana_max_niveis_slot(nivel_mago: int) -> int:
+    """Total de níveis de slot recuperáveis (metade do nível de mago, arred. p/ cima)."""
+    return max(0, (int(nivel_mago) + 1) // 2)
 
 
 def calcular_dc_magia(bonus_proficiencia: int, mod_habilidade: int) -> int:

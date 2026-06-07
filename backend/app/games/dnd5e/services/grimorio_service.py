@@ -377,6 +377,7 @@ def grimorio_item_para_dict(item: Dnd5eGrimorioMagia) -> dict:
         "origem": item.origem,
         "adicionada_em": item.adicionada_em,
         "magia_nome": magia.nome if magia else None,
+        "magia_dano": magia.dano if magia else None,
         "magia_ataque_magico": getattr(magia, "ataque_magico", None) if magia else None,
         "magia_escola": magia.escola if magia else None,
         "magia_nivel": magia.nivel if magia else None,

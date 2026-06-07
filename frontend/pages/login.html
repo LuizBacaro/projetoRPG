@@ -126,7 +126,7 @@
         persistSession,
         redirectAfterLogin,
         fetchOAuthGoogleStatus,
-    } from '/js/shared/auth-session.js?v=20260605';
+    } from '/js/shared/auth-session.js?v=20260606';
 
     // ── Elementos de Login ────────────────────────────────────────────────
     const btnLogin   = document.getElementById('btnLogin');
@@ -153,8 +153,27 @@
     const grupoGoogle       = document.getElementById('grupoGoogle');
     const btnGoogle         = document.getElementById('btnGoogle');
 
+    function limparSessaoLocal() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('refresh_token');
+    }
+
     // ── Entrada: warm-up + refresh silencioso (mantém 24h sem pedir senha de novo)
     (async function iniciarSessao() {
+        const temRefresh = !!localStorage.getItem('refresh_token');
+        const temToken = !!localStorage.getItem('token');
+
+        if (!temRefresh && !temToken) {
+            btnLogin.disabled = false;
+            btnLogin.textContent = 'Entrar';
+            const oauthStatus = await fetchOAuthGoogleStatus();
+            if (oauthStatus.google_enabled && grupoGoogle) {
+                grupoGoogle.style.display = '';
+            }
+            return;
+        }
+
         btnLogin.disabled = true;
         btnLogin.textContent = 'Verificando sessão…';
         await warmupApi();
@@ -164,8 +183,7 @@
             redirectAfterLogin();
             return;
         }
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario');
+        limparSessaoLocal();
         btnLogin.disabled = false;
         btnLogin.textContent = 'Entrar';
 

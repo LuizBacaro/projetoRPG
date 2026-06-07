@@ -49,3 +49,12 @@ def nivel_por_xp(xp_total: int) -> int:
         if xp >= row["xp_total"]:
             nivel = row["nivel"]
     return nivel
+
+
+def xp_minima_por_nivel(nivel: int) -> int:
+    """XP mínima acumulada para estar no nível informado (PHB)."""
+    nivel_ef = max(1, min(20, int(nivel)))
+    for row in TABELA_XP_POR_NIVEL:
+        if row["nivel"] == nivel_ef:
+            return int(row["xp_total"])
+    return 0
