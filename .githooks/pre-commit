@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Pre-commit: black + isort no backend (mesmas regras do CI).
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+STAGED="$(git diff --cached --name-only --diff-filter=ACM \
+  | grep -E '^backend/(app|tests)/.*\.py$' || true)"
+
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+if [ -x "$ROOT/.venv/bin/black" ]; then
+  BLACK="$ROOT/.venv/bin/black"
+  ISORT="$ROOT/.venv/bin/isort"
+elif command -v black >/dev/null 2>&1; then
+  BLACK="black"
+  ISORT="isort"
+else
+  echo "❌ black não encontrado."
+  echo "   Instale: pip install -r backend/requirements-dev.txt"
+  echo "   Ou rode: make install-hooks"
+  exit 1
+fi
+
+BACKEND_FILES=()
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  BACKEND_FILES+=("${path#backend/}")
+done <<< "$STAGED"
+
+echo "→ pre-commit: black + isort (${#BACKEND_FILES[@]} ficheiro(s) Python no backend)"
+
+(
+  cd backend
+  "$BLACK" "${BACKEND_FILES[@]}"
+  "$ISORT" --profile black "${BACKEND_FILES[@]}"
+)
+
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  git add "$path"
+done <<< "$STAGED"
+
+(
+  cd backend
+  "$BLACK" --check "${BACKEND_FILES[@]}"
+  "$ISORT" --check-only --profile black "${BACKEND_FILES[@]}"
+)
+
+echo "✅ black e isort OK."
