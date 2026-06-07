@@ -35,7 +35,10 @@ from app.games.dnd5e.services.conjuracao_shared import (
     normalizar_magias_preparadas_qty,
     somar_qty_preparadas_por_nivel,
 )
-from app.games.dnd5e.rules.magia import habilidade_primaria_classe, max_nivel_magia_conjuravel
+from app.games.dnd5e.rules.magia import (
+    habilidade_primaria_classe,
+    max_nivel_magia_conjuravel,
+)
 from app.games.dnd5e.services.grimorio_service import _classe_lista_magias
 from app.repositories.base import commit_with_rollback
 
@@ -205,9 +208,7 @@ class Dnd5eConjuracaoFichaService:
         pf_max = pontos_feiticaria_max(classe, p.nivel)
         pf_atual = _pontos_feiticaria_atual(conj, classe, p.nivel)
         arcana_max = (
-            recuperacao_arcana_max_niveis_slot(p.nivel)
-            if classe == "mago"
-            else None
+            recuperacao_arcana_max_niveis_slot(p.nivel) if classe == "mago" else None
         )
         classe_grim = _classe_lista_magias(classe)
         _, itens = self.grimorio_repo.listar_paginado(

@@ -255,9 +255,11 @@ def montar_resumo_ficha(
         "raca_slug": raca_slug,
         "classe_slug": classe_slug,
         "feats": list(feats or []),
-        "progressao": prog
-        if isinstance(prog, dict)
-        else {"hp_rolls": hp_rolls or [], "marcos": []},
+        "progressao": (
+            prog
+            if isinstance(prog, dict)
+            else {"hp_rolls": hp_rolls or [], "marcos": []}
+        ),
     }
     resumo["pendencias"] = listar_pendencias(
         nivel=nivel_ef,

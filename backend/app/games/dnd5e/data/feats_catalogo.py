@@ -9,7 +9,12 @@ FeatDict = Dict[str, Any]
 FEATS_CATALOGO: List[FeatDict] = [
     # Atributo / gerais
     {"slug": "alert", "nome": "Alerta", "tipo_bonus": "Atributo", "requisito_nivel": 1},
-    {"slug": "athlete", "nome": "Atleta", "tipo_bonus": "Atributo", "requisito_nivel": 1},
+    {
+        "slug": "athlete",
+        "nome": "Atleta",
+        "tipo_bonus": "Atributo",
+        "requisito_nivel": 1,
+    },
     {
         "slug": "resilient",
         "nome": "Resiliente",
@@ -57,8 +62,16 @@ FEATS_CATALOGO: List[FeatDict] = [
         "tipo_bonus": "Combate",
         "requisitos": {"dex_min": 13},
     },
-    {"slug": "mounted-combatant", "nome": "Combatente Montado", "tipo_bonus": "Combate"},
-    {"slug": "polearm-master", "nome": "Mestre em Armas de Haste", "tipo_bonus": "Combate"},
+    {
+        "slug": "mounted-combatant",
+        "nome": "Combatente Montado",
+        "tipo_bonus": "Combate",
+    },
+    {
+        "slug": "polearm-master",
+        "nome": "Mestre em Armas de Haste",
+        "tipo_bonus": "Combate",
+    },
     {"slug": "sentinel", "nome": "Sentinela", "tipo_bonus": "Combate"},
     {"slug": "sharpshooter", "nome": "Atirador de Elite", "tipo_bonus": "Combate"},
     {
@@ -113,7 +126,11 @@ FEATS_CATALOGO: List[FeatDict] = [
         "requisitos": {"cha_min": 13},
     },
     {"slug": "linguist", "nome": "Linguista", "tipo_bonus": "Perícia"},
-    {"slug": "expert-duplicator", "nome": "Especialista em Cópias", "tipo_bonus": "Perícia"},
+    {
+        "slug": "expert-duplicator",
+        "nome": "Especialista em Cópias",
+        "tipo_bonus": "Perícia",
+    },
     # Utilidade
     {"slug": "lucky", "nome": "Sortudo", "tipo_bonus": "Utilidade"},
     {"slug": "healer", "nome": "Curandeiro", "tipo_bonus": "Utilidade"},
@@ -125,7 +142,11 @@ FEATS_CATALOGO: List[FeatDict] = [
         "tipo_bonus": "Utilidade",
     },
     {"slug": "mobile", "nome": "Ágil", "tipo_bonus": "Utilidade"},
-    {"slug": "dungeon-delver", "nome": "Explorador de Masmorras", "tipo_bonus": "Utilidade"},
+    {
+        "slug": "dungeon-delver",
+        "nome": "Explorador de Masmorras",
+        "tipo_bonus": "Utilidade",
+    },
     {
         "slug": "keen-mind",
         "nome": "Mente Aguçada",
@@ -139,7 +160,11 @@ FEATS_CATALOGO: List[FeatDict] = [
     {"slug": "tavern-brawler", "nome": "Brigão de Taverna", "tipo_bonus": "Utilidade"},
     {"slug": "tough", "nome": "Robusto", "tipo_bonus": "Utilidade"},
     {"slug": "weapon-master", "nome": "Mestre em Armas", "tipo_bonus": "Utilidade"},
-    {"slug": "crossbow-expert", "nome": "Especialista em Bestas", "tipo_bonus": "Combate"},
+    {
+        "slug": "crossbow-expert",
+        "nome": "Especialista em Bestas",
+        "tipo_bonus": "Combate",
+    },
     {
         "slug": "grappler",
         "nome": "Agarrador",
@@ -158,8 +183,16 @@ FEATS_CATALOGO: List[FeatDict] = [
         "nome": "Treinamento em Armadura Média",
         "tipo_bonus": "Utilidade",
     },
-    {"slug": "polearm-savant", "nome": "Especialista em Haste", "tipo_bonus": "Combate"},
-    {"slug": "shield-training", "nome": "Treinamento com Escudo", "tipo_bonus": "Utilidade"},
+    {
+        "slug": "polearm-savant",
+        "nome": "Especialista em Haste",
+        "tipo_bonus": "Combate",
+    },
+    {
+        "slug": "shield-training",
+        "nome": "Treinamento com Escudo",
+        "tipo_bonus": "Utilidade",
+    },
     {
         "slug": "skulker",
         "nome": "Furtivo",

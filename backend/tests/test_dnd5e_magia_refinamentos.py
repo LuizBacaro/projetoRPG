@@ -35,6 +35,5 @@ def test_escalar_dano_upcast_fireball() -> None:
 
 def test_escalar_dano_upcast_sem_delta() -> None:
     assert (
-        escalar_dano_upcast("8d6", 3, 3, descricao_nivel_superior="+1d6/nível")
-        == "8d6"
+        escalar_dano_upcast("8d6", 3, 3, descricao_nivel_superior="+1d6/nível") == "8d6"
     )

@@ -252,7 +252,11 @@ def atualizar_economia_turno(
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
     estado = Dnd5eEconomiaTurnoState(**nova.as_dict())
-    msg = "Economia reiniciada." if payload.tipo == "reset" else f"Ação '{payload.tipo}' registrada."
+    msg = (
+        "Economia reiniciada."
+        if payload.tipo == "reset"
+        else f"Ação '{payload.tipo}' registrada."
+    )
     return Dnd5eEconomiaTurnoResponse(economia=estado, mensagem=msg)
 
 

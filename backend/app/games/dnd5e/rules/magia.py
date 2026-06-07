@@ -122,12 +122,19 @@ def save_causa_metade_dano(
     if not dano or (save_tipo or "nenhum").strip().lower() in ("", "nenhum"):
         return False
     slug_l = (slug or "").strip().lower()
-    if slug_l in {"disintegrate", "desintegrar", "power-word-kill", "palavra-poder-matar"}:
+    if slug_l in {
+        "disintegrate",
+        "desintegrar",
+        "power-word-kill",
+        "palavra-poder-matar",
+    }:
         return False
     return True
 
 
-def _parse_bonus_dados_upcast(descricao: Optional[str], delta_niveis: int) -> Optional[str]:
+def _parse_bonus_dados_upcast(
+    descricao: Optional[str], delta_niveis: int
+) -> Optional[str]:
     if not descricao or delta_niveis <= 0:
         return None
     import re

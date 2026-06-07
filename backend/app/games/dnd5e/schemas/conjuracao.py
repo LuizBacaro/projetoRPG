@@ -64,6 +64,7 @@ class Dnd5ePontosFeiticariaConverterSlotRequest(BaseModel):
 
 class Dnd5eRecuperacaoArcanaRequest(BaseModel):
     """Mapa nível do slot (1–5) → quantidade a recuperar."""
+
     slots: Dict[int, int] = Field(default_factory=dict)
 
     @field_validator("slots")

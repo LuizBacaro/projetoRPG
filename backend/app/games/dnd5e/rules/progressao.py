@@ -72,8 +72,7 @@ def _feats_de_marcos(marcos: Sequence[Dict[str, Any]]) -> List[str]:
 
 def matriz_padrao_scores() -> Dict[str, int]:
     return {
-        chave: MATRIZ_PADRAO_VALORES[i]
-        for i, chave in enumerate(CHAVES_HABILIDADE)
+        chave: MATRIZ_PADRAO_VALORES[i] for i, chave in enumerate(CHAVES_HABILIDADE)
     }
 
 
@@ -88,14 +87,15 @@ def gerar_scores_4d6(*, seed: Optional[int] = None) -> Dict[str, int]:
 
 def custo_compra_pontos(valor: int) -> int:
     if valor not in _CUSTO_COMPRA_PONTOS:
-        raise ValueError(
-            f"Valor {valor} inválido na compra de pontos (permitido 8–15)"
-        )
+        raise ValueError(f"Valor {valor} inválido na compra de pontos (permitido 8–15)")
     return _CUSTO_COMPRA_PONTOS[valor]
 
 
 def total_pontos_gastos(scores_base: Dict[str, int]) -> int:
-    return sum(custo_compra_pontos(int(scores_base.get(chave, 8))) for chave in CHAVES_HABILIDADE)
+    return sum(
+        custo_compra_pontos(int(scores_base.get(chave, 8)))
+        for chave in CHAVES_HABILIDADE
+    )
 
 
 def validar_scores_base_por_metodo(
@@ -110,9 +110,7 @@ def validar_scores_base_por_metodo(
         v = int(scores_base.get(chave, 10))
         if met == "4d6":
             if v < 3 or v > 18:
-                raise ValueError(
-                    f"Valor base de {chave} deve estar entre 3 e 18 (4d6)"
-                )
+                raise ValueError(f"Valor base de {chave} deve estar entre 3 e 18 (4d6)")
         elif met == "pontos":
             if v < 8 or v > 15:
                 raise ValueError(
@@ -419,9 +417,7 @@ def validar_distribuicao_asi(distribuicao: Dict[str, int]) -> None:
         )
     total = sum(int(v) for v in distribuicao.values())
     if total != 2:
-        raise ValueError(
-            "O incremento deve somar exatamente +2 pontos de atributo"
-        )
+        raise ValueError("O incremento deve somar exatamente +2 pontos de atributo")
     for chave, delta in distribuicao.items():
         if chave not in CHAVES_HABILIDADE:
             raise ValueError(f"Atributo inválido no incremento: {chave}")
@@ -460,9 +456,7 @@ def validar_marco(
 ) -> None:
     nivel_marco = int(marco.get("nivel", 0))
     if nivel_marco not in NIVEIS_GANHO_FEAT:
-        raise ValueError(
-            f"O nível {nivel_marco} não concede incremento nem talento"
-        )
+        raise ValueError(f"O nível {nivel_marco} não concede incremento nem talento")
     if nivel < nivel_marco:
         raise ValueError(
             f"Personagem nível {nivel} ainda não atingiu marco do nível {nivel_marco}"
@@ -635,9 +629,7 @@ def validar_progressao_ficha(
         raise ValueError(f"Falta registrar PV do nível {n}")
 
     for n in marcos_pendentes(nivel, marcos):
-        raise ValueError(
-            f"Falta escolher incremento ou talento do nível {n}"
-        )
+        raise ValueError(f"Falta escolher incremento ou talento do nível {n}")
 
     if classe_slug:
         raca_slug = (ficha_v2.get("raca_slug") or "").strip()

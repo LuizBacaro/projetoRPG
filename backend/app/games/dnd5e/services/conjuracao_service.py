@@ -334,11 +334,7 @@ class Dnd5eConjuracaoService:
         dano_aplicar: Optional[int] = None
         if dano_total is not None:
             if salv_passou is True:
-                dano_aplicar = (
-                    max(0, int(dano_total) // 2)
-                    if metade_no_save
-                    else 0
-                )
+                dano_aplicar = max(0, int(dano_total) // 2) if metade_no_save else 0
             else:
                 dano_aplicar = int(dano_total)
 

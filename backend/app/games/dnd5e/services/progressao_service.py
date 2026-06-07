@@ -52,7 +52,9 @@ class Dnd5eProgressaoService:
         return ent
 
     @staticmethod
-    def gerar_atributos(metodo: str, *, seed: int | None = None) -> Dnd5eGerarAtributosResponse:
+    def gerar_atributos(
+        metodo: str, *, seed: int | None = None
+    ) -> Dnd5eGerarAtributosResponse:
         met = (metodo or "padrao").strip().lower()
         if met == "4d6":
             scores = gerar_scores_4d6(seed=seed)
@@ -79,7 +81,9 @@ class Dnd5eProgressaoService:
     def _ficha_atual(self, ent: Dnd5ePersonagem) -> Dict[str, Any]:
         return migrar_ficha_para_v2(ficha_json_para_resposta(ent.ficha_json))
 
-    def _scores_efetivos(self, ent: Dnd5ePersonagem, ficha: Dict[str, Any]) -> Dict[str, int]:
+    def _scores_efetivos(
+        self, ent: Dnd5ePersonagem, ficha: Dict[str, Any]
+    ) -> Dict[str, int]:
         scores_base = dict(ficha.get("scores_base") or {})
         if not scores_base:
             scores_base = {
