@@ -24,17 +24,17 @@ from app.games.dnd5e.rules.pericias import (
     montar_proficiencias_pericias,
     montar_salvamentos,
 )
-from app.games.dnd5e.rules.racas import raca_por_slug
 from app.games.dnd5e.rules.progressao import (
     calcular_hp_max_total,
     hp_max_nivel_1,
     listar_pendencias,
+    migrar_ficha_para_v2,
     montar_hp_resumo,
     registrar_hp_roll_na_ficha,
-    migrar_ficha_para_v2,
     validar_progressao_ficha,
     validar_scores_base_por_metodo,
 )
+from app.games.dnd5e.rules.racas import raca_por_slug
 from app.games.dnd5e.rules.subclasses import validar_subclasse_para_classe
 
 CHAVES_HABILIDADE = (

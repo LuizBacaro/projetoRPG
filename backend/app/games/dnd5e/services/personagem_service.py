@@ -12,12 +12,12 @@ from app.games.dnd5e.rules.condicoes_ficha import (
     sincronizar_condicoes_por_hp,
 )
 from app.games.dnd5e.rules.ficha import validar_ficha_para_gravacao
+from app.games.dnd5e.rules.habilidades import AbilityScores, PersonagemHabilidades
 from app.games.dnd5e.rules.progressao import (
     calcular_hp_max_total,
     migrar_ficha_para_v2,
     validar_nivel_vs_experiencia,
 )
-from app.games.dnd5e.rules.habilidades import AbilityScores, PersonagemHabilidades
 from app.games.dnd5e.schemas.personagem import (
     Dnd5ePersonagemCreate,
     Dnd5ePersonagemResponse,

@@ -4,6 +4,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
+from app.core.dependencies import get_dnd5e_progressao_service
 from app.games.dnd5e.rules.catalogo_regras import (
     listar_antecedentes_catalogo,
     listar_equipamento_catalogo,
@@ -36,7 +37,6 @@ from app.games.dnd5e.schemas.progressao import (
     Dnd5eGerarAtributosRequest,
     Dnd5eGerarAtributosResponse,
 )
-from app.games.dnd5e.services.conjuracao_shared import perfil_conjuracao_classe
 from app.games.dnd5e.schemas.regras import (
     Dnd5eAntecedenteCatalogoItem,
     Dnd5eBonusProficienciaItem,
@@ -64,7 +64,7 @@ from app.games.dnd5e.schemas.regras import (
     Dnd5eSubclasseItem,
     Dnd5eXpNivelItem,
 )
-from app.core.dependencies import get_dnd5e_progressao_service
+from app.games.dnd5e.services.conjuracao_shared import perfil_conjuracao_classe
 from app.games.dnd5e.services.progressao_service import Dnd5eProgressaoService
 from app.shared.core.deps import get_usuario_atual, requer_game_dnd5e
 from app.shared.models.usuario import Usuario

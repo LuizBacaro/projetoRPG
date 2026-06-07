@@ -23,10 +23,10 @@ from app.games.dnd5e.rules.magia import (
     componentes_resumo,
     escalar_dano_upcast,
     escalar_expressao_dano_truque,
-    save_causa_metade_dano,
     habilidade_primaria_classe,
     lancar_magia,
     salvaguarda_atinge_dc,
+    save_causa_metade_dano,
     teste_concentracao,
 )
 from app.games.dnd5e.schemas.combate import (

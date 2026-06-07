@@ -6,9 +6,9 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Literal, Optional, Sequence
 
 from app.games.dnd5e.data.equipamento_catalogo import (
+    ARMADURAS,
     ARMAS_MARCIAIS,
     ARMAS_SIMPLES,
-    ARMADURAS,
     ESCUDOS,
     ITENS_VARIADOS,
 )

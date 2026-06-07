@@ -7,10 +7,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from app.games.dnd5e.data.classes_catalogo import NIVEIS_GANHO_FEAT
 from app.games.dnd5e.rules.classes import nivel_por_xp
-from app.games.dnd5e.rules.habilidades import (
-    HABILIDADE_MAX,
-    validar_valor_habilidade,
-)
+from app.games.dnd5e.rules.habilidades import HABILIDADE_MAX, validar_valor_habilidade
 from app.games.dnd5e.rules.talentos import (
     PersonagemFeats,
     calcular_ganhos_feats,

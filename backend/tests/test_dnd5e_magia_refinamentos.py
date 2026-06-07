@@ -1,9 +1,6 @@
 """Refinamentos E4 — save metade, upcast de dano."""
 
-from app.games.dnd5e.rules.magia import (
-    escalar_dano_upcast,
-    save_causa_metade_dano,
-)
+from app.games.dnd5e.rules.magia import escalar_dano_upcast, save_causa_metade_dano
 
 
 def test_save_causa_metade_dano_padrao() -> None:

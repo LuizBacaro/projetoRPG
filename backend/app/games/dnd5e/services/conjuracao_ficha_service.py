@@ -15,6 +15,8 @@ from app.games.dnd5e.repositories.personagem_repository import Dnd5ePersonagemRe
 from app.games.dnd5e.rules.magia import (
     custo_ponto_feiticaria_criar_slot,
     espacos_por_classe_nivel,
+    habilidade_primaria_classe,
+    max_nivel_magia_conjuravel,
     pontos_feiticaria_max,
     recuperacao_arcana_max_niveis_slot,
     truque_multiplicador_dados,
@@ -34,10 +36,6 @@ from app.games.dnd5e.services.conjuracao_shared import (
     modo_lista_conjuracao,
     normalizar_magias_preparadas_qty,
     somar_qty_preparadas_por_nivel,
-)
-from app.games.dnd5e.rules.magia import (
-    habilidade_primaria_classe,
-    max_nivel_magia_conjuravel,
 )
 from app.games.dnd5e.services.grimorio_service import _classe_lista_magias
 from app.repositories.base import commit_with_rollback
