@@ -6,12 +6,14 @@ from typing import Optional
 
 from app.games.dnd5e.data.spell_tables import (
     FULL_SPELL_LIST_PREPARED_CLASSES,
+    KNOWN_CLASSES,
     KNOWN_SPELLS_FULL,
     KNOWN_SPELLS_HALF_CASTER,
     KNOWN_SPELLS_WARLOCK,
     PREPARED_CLASSES,
     PREPARED_FULL_CASTER_CLASSES,
     PREPARED_HALF_CASTER_CLASSES,
+    SHORT_REST_RECOVER_ALL,
     magias_preparadas_max_full_caster,
     magias_preparadas_max_paladino,
 )
@@ -23,6 +25,45 @@ def classe_slug_ficha(ficha: dict) -> str:
 
 def classe_prepara_magias(classe: str) -> bool:
     return classe in PREPARED_CLASSES
+
+
+def modo_lista_conjuracao(classe: str) -> str:
+    slug = (classe or "").strip().lower()
+    if slug == "bruxo":
+        return "bruxo"
+    if slug in PREPARED_CLASSES:
+        return "preparado"
+    if slug in KNOWN_CLASSES:
+        return "conhecido"
+    return "nenhum"
+
+
+def perfil_conjuracao_classe(
+    classe: str,
+    nivel: int,
+    *,
+    mod_habilidade: int = 0,
+) -> dict:
+    """Metadados PHB por classe (slots, modo de lista, teto de nível de magia)."""
+    from app.games.dnd5e.rules.magia import (
+        espacos_por_classe_nivel,
+        habilidade_primaria_classe,
+        max_nivel_magia_conjuravel,
+    )
+
+    slug = (classe or "").strip().lower()
+    nivel = max(1, min(20, int(nivel)))
+    return {
+        "classe": slug,
+        "nivel": nivel,
+        "habilidade_primaria": habilidade_primaria_classe(slug),
+        "modo_lista": modo_lista_conjuracao(slug),
+        "max_nivel_magia": max_nivel_magia_conjuravel(slug, nivel),
+        "recupera_slots_repouso_curto": slug in SHORT_REST_RECOVER_ALL,
+        "espacos_por_nivel": espacos_por_classe_nivel(slug, nivel),
+        "magias_conhecidas_max": magias_conhecidas_max(slug, nivel),
+        "magias_preparadas_max": magias_preparadas_max(slug, nivel, mod_habilidade),
+    }
 
 
 def magias_conhecidas_max(classe: str, nivel: int) -> Optional[int]:

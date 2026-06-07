@@ -40,6 +40,7 @@ def _payload_criar(**overrides):
         "nome": "Aragorn 5e",
         "tipo": "jogador",
         "nivel": 5,
+        "experiencia": 6500,
         "strength": 16,
         "dexterity": 14,
         "constitution": 14,
@@ -61,7 +62,7 @@ def test_criar_personagem_com_modificadores_calculados(dnd5e_personagens_db):
     assert body["dexterity_mod"] == 2
     assert body["bonus_proficiencia"] == 3
     assert body["ficha"]["raca"] == "humano"
-    assert body["ficha"].get("v") == 1
+    assert body["ficha"].get("v") == 2
     assert body["dono_id"] == u1.id
 
 

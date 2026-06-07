@@ -21,6 +21,7 @@ from .dnd5e import (
     get_dnd5e_magia_service,
     get_dnd5e_personagem_repository,
     get_dnd5e_personagem_service,
+    get_dnd5e_progressao_service,
 )
 from .dnd35 import (
     get_armadura_protecao_jogador_repository,
@@ -115,6 +116,7 @@ __all__ = [
     "get_dnd5e_magia_service",
     "get_dnd5e_personagem_repository",
     "get_dnd5e_personagem_service",
+    "get_dnd5e_progressao_service",
     "get_condicao_repository",
     "get_condicao_service",
     "get_consumivel_jogador_repository",

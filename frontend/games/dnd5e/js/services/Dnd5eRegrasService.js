@@ -53,6 +53,14 @@ class Dnd5eRegrasService {
         return this._get('/magias', params);
     }
 
+    conjuracaoPerfil(classe, nivel, modHabilidade = 0) {
+        return this._get('/conjuracao-perfil', {
+            classe,
+            nivel,
+            mod_habilidade: modHabilidade,
+        });
+    }
+
     talentos(params) {
         return this._get('/talentos', params);
     }
@@ -71,6 +79,40 @@ class Dnd5eRegrasService {
 
     subclasses(classeSlug) {
         return this._get('/subclasses', classeSlug ? { classe_slug: classeSlug } : {});
+    }
+
+    async gerarAtributos(body) {
+        const res = await fetch(this._url('/gerar-atributos'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (res.status === 401) {
+            if (typeof AuthService.logout === 'function') AuthService.logout();
+            throw new Error('Sessão expirada.');
+        }
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(e.detail || 'Erro ao gerar atributos');
+        }
+        return res.json();
+    }
+
+    async calcularEquipamento(body) {
+        const res = await fetch(this._url('/calcular-equipamento'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (res.status === 401) {
+            if (typeof AuthService.logout === 'function') AuthService.logout();
+            throw new Error('Sessão expirada.');
+        }
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(e.detail || 'Erro ao calcular equipamento');
+        }
+        return res.json();
     }
 
     async calcularAtributos(body) {

@@ -91,6 +91,9 @@ export async function refreshSession() {
         { maxAttempts: 8, baseDelayMs: 1200 }
     );
     if (!res.ok) {
+        if (res.status === 401 || res.status === 403 || res.status === 404) {
+            localStorage.removeItem(STORAGE_REFRESH);
+        }
         return null;
     }
     const data = await res.json();

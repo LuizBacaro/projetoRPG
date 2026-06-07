@@ -123,7 +123,72 @@ export class Dnd5eConjuracaoFichaService {
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.detail || 'Descanso curto falhou');
+            throw new Error(_detailFromApiError(err) || 'Descanso curto falhou');
+        }
+        return res.json();
+    }
+
+    async criarSlotPontosFeiticaria(personagemId, nivelSlot) {
+        const url = getApiUrl(
+            `/dnd5e/personagens/${personagemId}/conjuracao/pontos-feiticaria/criar-slot`
+        );
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: this._headers(),
+            body: JSON.stringify({ nivel_slot: nivelSlot }),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(_detailFromApiError(err) || 'Falha ao criar slot');
+        }
+        return res.json();
+    }
+
+    async converterSlotPontosFeiticaria(personagemId, nivelSlot) {
+        const url = getApiUrl(
+            `/dnd5e/personagens/${personagemId}/conjuracao/pontos-feiticaria/converter`
+        );
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: this._headers(),
+            body: JSON.stringify({ nivel_slot: nivelSlot }),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(_detailFromApiError(err) || 'Falha ao converter slot');
+        }
+        return res.json();
+    }
+
+    async definirConcentracao(personagemId, magiaId = null) {
+        const url = getApiUrl(
+            `/dnd5e/personagens/${personagemId}/conjuracao/concentracao`
+        );
+        const body = { magia_id: magiaId != null ? Number(magiaId) : null };
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: this._headers(),
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(_detailFromApiError(err) || 'Falha ao salvar concentração');
+        }
+        return res.json();
+    }
+
+    async recuperacaoArcana(personagemId, slots) {
+        const url = getApiUrl(
+            `/dnd5e/personagens/${personagemId}/conjuracao/recuperacao-arcana`
+        );
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: this._headers(),
+            body: JSON.stringify({ slots }),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(_detailFromApiError(err) || 'Recuperação arcana falhou');
         }
         return res.json();
     }

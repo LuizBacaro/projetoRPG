@@ -146,6 +146,12 @@ export class Dnd5eArenaMagiasHelper {
                 magia_nome: magia.magia_nome || `Magia #${magiaId}`,
                 magia_escola: magia.magia_escola || '',
                 magia_nivel: nivel,
+                magia_dano: magia.magia_dano || null,
+                magia_ataque_magico: magia.magia_ataque_magico || null,
+                teste_resistencia: magia.teste_resistencia || null,
+                requer_concentracao: !!magia.requer_concentracao,
+                ritual: !!magia.ritual,
+                material_consumido: !!magia.material_consumido,
                 truque,
                 lancada: lancadas.has(magiaId),
             });

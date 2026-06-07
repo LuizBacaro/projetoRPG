@@ -50,6 +50,7 @@ class Dnd5eAtaqueResponse(BaseModel):
     desvantagem: bool = False
     critico_automatico: bool = False
     acerto_automatico: bool = False
+    is_critico: bool = False
 
 
 class Dnd5eDanoRequest(BaseModel):
@@ -146,6 +147,12 @@ class Dnd5eConjurarResponse(BaseModel):
     nivel_slot_gasto: Optional[int] = None
     teste_resistencia: Optional[str] = None
     salvaguarda_passou: Optional[bool] = None
+    salvaguarda_rolagem: Optional[int] = Field(None, ge=1, le=20)
+    dano_aplicar: Optional[int] = Field(
+        None,
+        ge=0,
+        description="Dano efetivo após resistência (metade se passou no save)",
+    )
     componentes: Optional[str] = None
     requer_concentracao: bool = False
     ritual: bool = False
@@ -174,3 +181,88 @@ class Dnd5eConcentracaoTesteResponse(BaseModel):
     total: int
     magia_concentracao_id: Optional[int] = None
     mensagem: str
+
+
+class Dnd5eDeathSaveRequest(BaseModel):
+    hp_atual: int = Field(..., ge=0)
+    death_failures: int = Field(default=0, ge=0, le=10)
+    death_successes: int = Field(default=0, ge=0, le=10)
+    rolagem_d20: Optional[int] = Field(None, ge=1, le=20)
+
+
+class Dnd5eDeathSaveResponse(BaseModel):
+    rolagem: int = Field(ge=1, le=20)
+    death_failures: int = Field(ge=0)
+    death_successes: int = Field(ge=0)
+    hp_atual: int = Field(ge=0)
+    status_vida: str
+    mensagem: str
+
+
+class Dnd5eDanoHpRequest(BaseModel):
+    hp_atual: int = Field(..., ge=0)
+    hp_max: int = Field(..., ge=1)
+    dano: int = Field(..., ge=0)
+    death_failures: int = Field(default=0, ge=0, le=10)
+    death_successes: int = Field(default=0, ge=0, le=10)
+    is_critico: bool = False
+    status_vida: str = Field(
+        default="vivo",
+        max_length=20,
+        description="vivo | inconsciente | estabilizado | morto",
+    )
+
+
+class Dnd5eDanoHpResponse(BaseModel):
+    hp_atual: int = Field(ge=0)
+    death_failures: int = Field(ge=0)
+    death_successes: int = Field(ge=0)
+    status_vida: str
+    morte_instantanea: bool = False
+    mensagem: str
+
+
+class Dnd5eEstabilizarRequest(BaseModel):
+    hp_atual: int = Field(..., ge=0)
+    death_failures: int = Field(default=0, ge=0, le=10)
+    death_successes: int = Field(default=0, ge=0, le=10)
+    metodo: str = Field(
+        default="medicina",
+        max_length=20,
+        description="medicina (CD 10) | magia",
+    )
+    mod_medicina: int = Field(default=0, ge=-5, le=20)
+    rolagem_d20: Optional[int] = Field(None, ge=1, le=20)
+
+
+class Dnd5eEstabilizarResponse(BaseModel):
+    death_failures: int = Field(ge=0)
+    death_successes: int = Field(ge=0)
+    status_vida: str
+    sucesso: bool
+    rolagem: Optional[int] = Field(None, ge=1, le=20)
+    total_medicina: Optional[int] = None
+    mensagem: str
+
+
+class Dnd5eEconomiaTurnoState(BaseModel):
+    acao_usada: bool = False
+    bonus_acao_usada: bool = False
+    movimento_usado_metros: float = Field(default=0.0, ge=0)
+    reacao_usada: bool = False
+    velocidade_metros: float = Field(default=9.0, ge=0)
+
+
+class Dnd5eEconomiaTurnoRequest(BaseModel):
+    economia: Dnd5eEconomiaTurnoState = Field(default_factory=Dnd5eEconomiaTurnoState)
+    tipo: str = Field(
+        ...,
+        max_length=20,
+        description="acao | bonus_acao | movimento | reacao | reset",
+    )
+    metros: float = Field(default=0.0, ge=0, description="Metros ao gastar movimento")
+
+
+class Dnd5eEconomiaTurnoResponse(BaseModel):
+    economia: Dnd5eEconomiaTurnoState
+    mensagem: str = ""

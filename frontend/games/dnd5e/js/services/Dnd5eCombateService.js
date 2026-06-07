@@ -42,6 +42,22 @@ class Dnd5eCombateService {
         return this._post('/dano', payload);
     }
 
+    deathSave(payload) {
+        return this._post('/death-save', payload);
+    }
+
+    danoHp(payload) {
+        return this._post('/dano-hp', payload);
+    }
+
+    estabilizar(payload) {
+        return this._post('/estabilizar', payload);
+    }
+
+    economiaTurno(payload) {
+        return this._post('/turno/economia', payload);
+    }
+
     decrementarCondicoesTurno(condicoes) {
         return this._post('/condicoes/decrementar-turno', { condicoes });
     }

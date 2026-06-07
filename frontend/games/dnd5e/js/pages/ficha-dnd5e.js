@@ -36,12 +36,19 @@
     let catalogoAntecedentes = [];
     let catalogoPericias = [];
     let catalogoCondicoes = [];
-    let armaduras = [];
-    let escudos = [];
+    let inventarioPanel = null;
     let previewAtual = null;
+    let fichaProgressaoLocal = {
+        metodo_atributos: 'padrao',
+        progressao: { hp_rolls: [], marcos: [] },
+        feats: [],
+        bonus_atributo_feat: {},
+    };
+    let progressaoPanel = null;
     let debounceTimer = null;
     let debounceHpCondTimer = null;
     let arenaCondicoesAtual = [];
+    let syncXpEmAndamento = false;
     const el = (id) => document.getElementById(id);
 
     function fmtMod(n) {
@@ -116,19 +123,75 @@
         ).map((cb) => cb.value);
     }
 
+    function subclasseValidaParaPreview() {
+        const sub = el('f5e_subclasse')?.value;
+        if (!sub) return null;
+        const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
+        const opt = el('f5e_subclasse')?.selectedOptions?.[0];
+        const match = opt?.textContent?.match(/nív\.\s*(\d+)/i);
+        const minNivel = match ? parseInt(match[1], 10) : 3;
+        return nivel >= minNivel ? sub : null;
+    }
+
+    function sincronizarXpComNivel() {
+        if (typeof Dnd5eXpUtil === 'undefined' || syncXpEmAndamento) return;
+        syncXpEmAndamento = true;
+        Dnd5eXpUtil.aplicarNivelParaXp(el('f5e_nivel'), el('f5e_xp'));
+        syncXpEmAndamento = false;
+        atualizarHeaderIdentidade();
+    }
+
+    function sincronizarNivelComXp() {
+        if (typeof Dnd5eXpUtil === 'undefined' || syncXpEmAndamento) return;
+        syncXpEmAndamento = true;
+        const novoNivel = Dnd5eXpUtil.aplicarXpParaNivel(el('f5e_xp'), el('f5e_nivel'));
+        syncXpEmAndamento = false;
+        if (novoNivel == null) {
+            atualizarHeaderIdentidade();
+            return;
+        }
+        atualizarHeaderIdentidade();
+        atualizarSubclasses();
+        if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
+            window.__dnd5eAtualizarSecaoMagias();
+        }
+        agendarPreview();
+        progressaoPanel?.refreshPendencias();
+    }
+
+    function aoAlterarNivel() {
+        sincronizarXpComNivel();
+        atualizarHeaderIdentidade();
+        if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
+            window.__dnd5eAtualizarSecaoMagias();
+        }
+        atualizarSubclasses();
+        agendarPreview();
+        progressaoPanel?.refreshPendencias();
+    }
+
     function payloadCalcular() {
+        const armEsc = inventarioPanel
+            ? inventarioPanel.getArmaduraEscudoParaCalcular()
+            : {
+                  armadura_slug: el('f5e_armadura')?.value || null,
+                  escudo_slug: el('f5e_escudo')?.value || null,
+              };
         return {
             raca_slug: el('f5e_raca').value,
             classe_slug: el('f5e_classe').value,
             antecedente_slug: el('f5e_antecedente').value || null,
             scores_base: getScoresBase(),
             bonus_habilidade_extra: getBonusExtra(),
+            bonus_atributo_feat: fichaProgressaoLocal.bonus_atributo_feat || {},
             nivel: parseInt(el('f5e_nivel').value, 10) || 1,
             pericias_classe_escolhidas: getPericiasClasseEscolhidas(),
             pericia_racial_extra: el('f5e_pericia_racial').value || null,
-            subclasse_slug: el('f5e_subclasse').value || null,
-            armadura_slug: el('f5e_armadura').value || null,
-            escudo_slug: el('f5e_escudo').value || null,
+            subclasse_slug: subclasseValidaParaPreview(),
+            armadura_slug: armEsc.armadura_slug,
+            escudo_slug: armEsc.escudo_slug,
+            feats: fichaProgressaoLocal.feats || [],
+            progressao: fichaProgressaoLocal.progressao || { hp_rolls: [], marcos: [] },
         };
     }
 
@@ -308,12 +371,45 @@
                     .join('');
             if (atual && disponiveis.some((s) => s.slug === atual)) {
                 select.value = atual;
+            } else {
+                select.value = '';
             }
             atualizarHeaderIdentidade();
         } catch {
             wrap.hidden = true;
             if (el('fichaHdrSubclasseWrap')) el('fichaHdrSubclasseWrap').hidden = true;
         }
+    }
+
+    function formatHpDetalhe(resumo) {
+        if (!resumo?.niveis?.length) return '';
+        const n1 = resumo.niveis[0];
+        const modStr = fmtMod(n1.con_mod);
+        const partes = [`${resumo.dado_vida}(${n1.roll})`, `CON(${modStr})`];
+        if (resumo.bonus_racial_por_nivel) {
+            partes.push(`raça(+${resumo.bonus_racial_por_nivel}/nív.)`);
+        }
+        if (resumo.bonus_feat_por_nivel) {
+            partes.push(`Tough(+${resumo.bonus_feat_por_nivel}/nív.)`);
+        }
+        let linha = `${partes.join(' + ')} = ${n1.subtotal} PV (nív. 1)`;
+        if (resumo.niveis.length > 1) {
+            const extras = resumo.niveis
+                .slice(1)
+                .map(
+                    (n) =>
+                        `nív. ${n.nivel}: ${resumo.dado_vida}(${n.roll})+CON(${fmtMod(n.con_mod)})+${n.bonus_extra} = +${n.subtotal}`
+                )
+                .join(' · ');
+            linha += ` · ${extras} · total ${resumo.total}`;
+        }
+        return linha;
+    }
+
+    function renderHpDetalhe(resumo) {
+        const host = el('f5e_hp_detalhe');
+        if (!host) return;
+        host.textContent = resumo ? formatHpDetalhe(resumo) : '';
     }
 
     function atualizarBarraPv(hpAtual, hpMax) {
@@ -341,7 +437,6 @@
             el('fichaHdrJogador').textContent =
                 el('f5e_jogador').value.trim() || nomeJogadorLogado() || '—';
         }
-        if (el('fichaHdrNivel')) el('fichaHdrNivel').textContent = el('f5e_nivel').value || '1';
         if (el('fichaHdrRaca')) el('fichaHdrRaca').textContent = raca ? raca.nome : '—';
         if (el('fichaHdrClasse')) el('fichaHdrClasse').textContent = classe ? classe.nome : '—';
         const fichaClasse = el('fichaClasse');
@@ -349,7 +444,6 @@
         if (el('fichaHdrAntecedente')) {
             el('fichaHdrAntecedente').textContent = ant ? ant.nome : '—';
         }
-        if (el('fichaHdrXp')) el('fichaHdrXp').textContent = el('f5e_xp').value || '0';
         const tipoEl = el('fichaHdrTipo');
         if (tipoEl) {
             tipoEl.textContent = tipoCriacao;
@@ -436,13 +530,18 @@
             el(`mod_${a.key}`).textContent = fmtMod(mod);
             el(`eff_${a.key}`).textContent = String(eff);
         });
-        const hpMax = p.hp_max_nivel_1;
+        const nivelPreview = parseInt(el('f5e_nivel').value, 10) || 1;
+        const hpMax =
+            nivelPreview > 1 && p.hp_max_total
+                ? p.hp_max_total
+                : p.hp_max_nivel_1;
         el('f5e_hp_max').textContent = String(hpMax);
         const hpInput = el('f5e_hp_atual');
         if (!hpInput.dataset.userTouched) {
             hpInput.value = String(hpMax);
         }
         atualizarBarraPv(parseInt(hpInput.value, 10), hpMax);
+        renderHpDetalhe(p.hp_resumo);
         if (el('f5e_ca')) el('f5e_ca').textContent = String(p.ca_total ?? p.ca_base);
         el('f5e_iniciativa').textContent = fmtMod(p.iniciativa);
         const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
@@ -463,6 +562,10 @@
         try {
             const p = await rs.calcularAtributos(payloadCalcular());
             aplicarPreview(p);
+            if (inventarioPanel) {
+                inventarioPanel.renderTudo(fichaProgressaoLocal.feats);
+                await inventarioPanel.atualizarResumoEquipamento(p);
+            }
             el('f5e_status').textContent = '';
         } catch (e) {
             el('f5e_status').textContent = e.message || 'Erro no cálculo';
@@ -482,10 +585,34 @@
     }
 
     function aplicarMatrizPadrao() {
+        fichaProgressaoLocal.metodo_atributos = 'padrao';
         ABILITIES.forEach((a, i) => {
             el(`base_${a.key}`).value = String(MATRIZ_PADRAO[i]);
         });
         agendarPreview();
+    }
+
+    async function aplicarGeracaoAtributos(metodo) {
+        try {
+            const data = await rs.gerarAtributos({ metodo });
+            fichaProgressaoLocal.metodo_atributos = data.metodo || metodo;
+            const scores = data.scores_base || {};
+            const maxBase = metodo === '4d6' ? 18 : 15;
+            const minBase = metodo === '4d6' ? 3 : 8;
+            ABILITIES.forEach((a) => {
+                const inp = el(`base_${a.key}`);
+                if (!inp) return;
+                inp.min = String(minBase);
+                inp.max = String(maxBase);
+                inp.value = String(scores[a.key] ?? 10);
+            });
+            agendarPreview();
+            if (metodo === 'pontos') {
+                Toast.success('Compra de pontos: ajuste os valores (máx. 27 pts).');
+            }
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao gerar atributos');
+        }
     }
 
     function renderCondicoesFicha() {
@@ -524,17 +651,28 @@
     function montarFichaJson(preview) {
         const base = getScoresBase();
         const f = {
-            v: 1,
+            v: 2,
             raca_slug: el('f5e_raca').value,
             classe_slug: el('f5e_classe').value,
             antecedente_slug: el('f5e_antecedente').value || null,
             subclasse_slug: el('f5e_subclasse').value || null,
+            metodo_atributos: fichaProgressaoLocal.metodo_atributos || 'padrao',
             scores_base: base,
             bonus_habilidade_extra: getBonusExtra(),
+            bonus_atributo_feat: fichaProgressaoLocal.bonus_atributo_feat || {},
+            progressao: fichaProgressaoLocal.progressao || { hp_rolls: [], marcos: [] },
+            feats: fichaProgressaoLocal.feats || [],
             pericias_classe_escolhidas: getPericiasClasseEscolhidas(),
             pericia_racial_extra: el('f5e_pericia_racial').value || null,
-            armadura_slug: el('f5e_armadura').value || null,
-            escudo_slug: el('f5e_escudo').value || null,
+            ...(inventarioPanel
+                ? inventarioPanel.getArmaduraEscudoParaCalcular()
+                : {
+                      armadura_slug: el('f5e_armadura')?.value || null,
+                      escudo_slug: el('f5e_escudo')?.value || null,
+                  }),
+            inventario: inventarioPanel
+                ? inventarioPanel.getInventarioParaFicha()
+                : {},
             notas: el('f5e_notas').value.trim(),
         };
         if (preview) {
@@ -582,11 +720,14 @@
 
         el('f5e_status').textContent = 'Salvando…';
         try {
+            sincronizarXpComNivel();
             const preview = await rs.calcularAtributos(payloadCalcular());
             const eff = preview.scores_efetivos;
             const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
             const hpMax =
-                nivel === 1 ? preview.hp_max_nivel_1 : parseInt(el('f5e_hp_max').textContent, 10);
+                preview.hp_max_total && preview.hp_max_total > preview.hp_max_nivel_1
+                    ? preview.hp_max_total
+                    : preview.hp_max_nivel_1;
             const hpAtual = parseInt(el('f5e_hp_atual').value, 10);
             const payload = {
                 nome,
@@ -633,14 +774,6 @@
             catalogoAntecedentes
                 .map((a) => `<option value="${a.slug}">${a.nome}</option>`)
                 .join('');
-        el('f5e_armadura').innerHTML =
-            '<option value="">Sem armadura</option>' +
-            armaduras
-                .map((a) => `<option value="${a.slug}">${a.nome} (CA ${a.ca})</option>`)
-                .join('');
-        el('f5e_escudo').innerHTML =
-            '<option value="">Nenhum</option>' +
-            escudos.map((s) => `<option value="${s.slug}">${s.nome} (+${s.bonus_ac})</option>`).join('');
     }
 
     function carregarPersonagem(p) {
@@ -653,13 +786,24 @@
         el('f5e_hp_atual').dataset.userTouched = '1';
 
         const f = p.ficha || {};
+        fichaProgressaoLocal = {
+            metodo_atributos: f.metodo_atributos || 'padrao',
+            progressao: f.progressao || { hp_rolls: [], marcos: [] },
+            feats: f.feats || [],
+            bonus_atributo_feat: f.bonus_atributo_feat || {},
+        };
+        if (progressaoPanel) {
+            progressaoPanel.loadFromFicha(f);
+            progressaoPanel.refreshPendencias();
+        }
         arenaCondicoesAtual = CU.normalizarLista(f.arena_condicoes || []);
         sincronizarCondicoesPorHp();
         if (f.raca_slug) el('f5e_raca').value = f.raca_slug;
         if (f.classe_slug) el('f5e_classe').value = f.classe_slug;
         if (f.antecedente_slug) el('f5e_antecedente').value = f.antecedente_slug;
-        if (f.armadura_slug) el('f5e_armadura').value = f.armadura_slug;
-        if (f.escudo_slug) el('f5e_escudo').value = f.escudo_slug;
+        if (inventarioPanel) {
+            inventarioPanel.loadFromFicha(f, fichaProgressaoLocal.feats);
+        }
         if (f.notas) el('f5e_notas').value = f.notas;
         const base = f.scores_base || {};
         ABILITIES.forEach((a) => {
@@ -721,7 +865,6 @@
             'f5e_classe',
             'f5e_antecedente',
             'f5e_subclasse',
-            'f5e_xp',
             'f5e_extra1',
             'f5e_extra2',
             'f5e_pericia_racial',
@@ -732,6 +875,12 @@
             if (node.tagName === 'INPUT') node.readOnly = true;
             node.setAttribute('data-pre-cadastro-lock', '');
         });
+        const xpNode = el('f5e_xp');
+        if (xpNode) {
+            xpNode.disabled = false;
+            xpNode.readOnly = false;
+            xpNode.removeAttribute('data-pre-cadastro-lock');
+        }
         ABILITIES.forEach((a) => {
             const inp = el(`base_${a.key}`);
             if (inp) inp.disabled = true;
@@ -772,7 +921,40 @@
         renderAbilities();
 
         el('btnMatrizPadrao').addEventListener('click', aplicarMatrizPadrao);
+        el('btnGerar4d6')?.addEventListener('click', () => aplicarGeracaoAtributos('4d6'));
+        el('btnCompraPontos')?.addEventListener('click', () => aplicarGeracaoAtributos('pontos'));
         el('btnSalvar').addEventListener('click', salvar);
+
+        progressaoPanel = new Dnd5eProgressaoPanel({
+            personagemService: ps,
+            regrasService: rs,
+            el,
+            getPersonagemId: () => personagemId,
+            getNivel: () => parseInt(el('f5e_nivel').value, 10) || 1,
+            onFichaAtualizada: (res) => {
+                const ficha = res.ficha || res;
+                if (ficha.progressao) {
+                    fichaProgressaoLocal.progressao = ficha.progressao;
+                }
+                if (ficha.feats) {
+                    fichaProgressaoLocal.feats = ficha.feats;
+                    inventarioPanel?.renderTalentos(ficha.feats);
+                }
+                if (ficha.bonus_atributo_feat) {
+                    fichaProgressaoLocal.bonus_atributo_feat = ficha.bonus_atributo_feat;
+                }
+                agendarPreview();
+            },
+        });
+        await progressaoPanel.init();
+
+        inventarioPanel = new Dnd5eFichaInventarioPanel({
+            el,
+            regrasService: rs,
+            onChange: agendarPreview,
+            getPreview: () => previewAtual,
+        });
+        await inventarioPanel.init();
         el('f5e_raca').addEventListener('change', () => {
             atualizarUiRaca();
             atualizarHeaderIdentidade();
@@ -787,23 +969,15 @@
             }
             agendarPreview();
         });
-        el('f5e_nivel').addEventListener('change', () => {
-            atualizarHeaderIdentidade();
-            if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
-                window.__dnd5eAtualizarSecaoMagias();
-            }
-        });
+        el('f5e_nivel').addEventListener('change', aoAlterarNivel);
+        el('f5e_nivel').addEventListener('input', aoAlterarNivel);
+        el('f5e_xp').addEventListener('input', sincronizarNivelComXp);
+        el('f5e_xp').addEventListener('change', sincronizarNivelComXp);
         el('f5e_antecedente').addEventListener('change', agendarPreview);
         el('f5e_extra1').addEventListener('change', agendarPreview);
         el('f5e_extra2').addEventListener('change', agendarPreview);
         el('f5e_pericia_racial').addEventListener('change', agendarPreview);
-        el('f5e_armadura').addEventListener('change', agendarPreview);
-        el('f5e_escudo').addEventListener('change', agendarPreview);
         el('f5e_subclasse').addEventListener('change', agendarPreview);
-        el('f5e_nivel').addEventListener('change', () => {
-            atualizarSubclasses();
-            agendarPreview();
-        });
         el('f5e_hp_atual').addEventListener('input', () => {
             el('f5e_hp_atual').dataset.userTouched = '1';
             const hpMax = parseInt(el('f5e_hp_max').textContent, 10) || 1;
@@ -814,12 +988,11 @@
         configurarUploadFoto();
 
         try {
-            const [racas, classes, ant, per, equip, combateMeta] = await Promise.all([
+            const [racas, classes, ant, per, combateMeta] = await Promise.all([
                 rs.racas(),
                 rs.classes(),
                 rs.antecedentes(),
                 rs.pericias(),
-                rs.equipamento(),
                 rs.combate().catch(() => ({ condicoes: [] })),
             ]);
             catalogoCondicoes = combateMeta.condicoes || [];
@@ -827,8 +1000,9 @@
             catalogoClasses = classes.classes || [];
             catalogoAntecedentes = ant.antecedentes || [];
             catalogoPericias = per.pericias || [];
-            armaduras = equip.armaduras || [];
-            escudos = equip.escudos || [];
+            if (typeof Dnd5eXpUtil !== 'undefined' && classes.xp_por_nivel) {
+                Dnd5eXpUtil.setTabela(classes.xp_por_nivel);
+            }
             preencherSelects();
             preencherSelectExtra();
             atualizarUiRaca();

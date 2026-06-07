@@ -260,6 +260,46 @@ def test_conjurar_rejeita_material_nao_confirmado():
         db.close()
 
 
+def test_conjurar_salvaguarda_metade_dano_no_sucesso():
+    db = SessionLocal()
+    try:
+        magia = get_or_create_magia(
+            db,
+            "fireball",
+            nome="Fireball",
+            nivel=3,
+            escola="evocacao",
+            dano="8d6",
+            teste_resistencia="dex",
+        )
+        magia.teste_resistencia = "dex"
+        magia.dano = magia.dano or "8d6"
+        commit_with_rollback(db)
+
+        svc = Dnd5eConjuracaoService(Dnd5eMagiaRepository(db))
+        slots = [0, 4, 3, 2, 0, 0, 0, 0, 0, 0]
+        res = svc.conjurar(
+            Dnd5eConjurarRequest(
+                conjurador_id="c1",
+                nome="Mago",
+                classe="mago",
+                nivel_personagem=5,
+                magia_id=magia.id,
+                mod_inteligencia=3,
+                espacos_por_nivel=slots,
+                espacos_usados_por_nivel=[0] * len(slots),
+                teste_resistencia_mod_alvo=5,
+                rolagem_salvaguarda_alvo=20,
+            )
+        )
+        assert res.sucesso is True
+        assert res.salvaguarda_passou is True
+        assert res.dano_total is not None and res.dano_total > 0
+        assert res.dano_aplicar == res.dano_total // 2
+    finally:
+        db.close()
+
+
 def test_concentracao_perdida_em_dano_alto():
     db = SessionLocal()
     try:

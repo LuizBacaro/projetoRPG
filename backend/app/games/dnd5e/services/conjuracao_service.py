@@ -21,9 +21,12 @@ from app.games.dnd5e.rules.magia import (
     Magia,
     calcular_dc_magia,
     componentes_resumo,
+    escalar_dano_upcast,
+    escalar_expressao_dano_truque,
     habilidade_primaria_classe,
     lancar_magia,
     salvaguarda_atinge_dc,
+    save_causa_metade_dano,
     teste_concentracao,
 )
 from app.games.dnd5e.schemas.combate import (
@@ -300,19 +303,40 @@ class Dnd5eConjuracaoService:
 
         dano_total = None
         if magia_row.dano and (not requer_ataque or ataque_acertou):
-            dano_total = calcular_dano(magia_row.dano, mod_hab, is_critico=critico)
+            expressao_dano = magia_row.dano
+            if nivel <= 0:
+                expressao_dano = escalar_expressao_dano_truque(
+                    magia_row.dano, payload.nivel_personagem
+                )
+            dano_total = calcular_dano(expressao_dano, mod_hab, is_critico=critico)
 
         salv_passou: Optional[bool] = None
-        if (
-            save_tipo != "nenhum"
-            and payload.teste_resistencia_mod_alvo is not None
-            and payload.rolagem_salvaguarda_alvo is not None
-        ):
+        salv_roll: Optional[int] = None
+        if save_tipo != "nenhum" and payload.teste_resistencia_mod_alvo is not None:
+            from app.games.dnd5e.rules.dados import rolar_d20
+
+            salv_roll = (
+                payload.rolagem_salvaguarda_alvo
+                if payload.rolagem_salvaguarda_alvo is not None
+                else rolar_d20()
+            )
             salv_passou = salvaguarda_atinge_dc(
                 payload.teste_resistencia_mod_alvo,
                 dc,
-                rolagem_d20=payload.rolagem_salvaguarda_alvo,
+                rolagem_d20=salv_roll,
             )
+
+        metade_no_save = save_causa_metade_dano(
+            dano=magia_row.dano,
+            save_tipo=save_tipo,
+            slug=str(magia_row.slug or ""),
+        )
+        dano_aplicar: Optional[int] = None
+        if dano_total is not None:
+            if salv_passou is True:
+                dano_aplicar = max(0, int(dano_total) // 2) if metade_no_save else 0
+            else:
+                dano_aplicar = int(dano_total)
 
         concentracao_id = (
             int(conj.magia_concentracao)
@@ -336,6 +360,11 @@ class Dnd5eConjuracaoService:
                 msg += f" · Ataque {ataque_total} vs CA {payload.ac_alvo} (erro)"
         if salv_passou is True:
             msg += " · Alvo passou na resistência."
+            if dano_aplicar is not None:
+                if dano_aplicar == 0 and not metade_no_save:
+                    msg += " · Sem dano (save bem-sucedido)."
+                elif metade_no_save and dano_total is not None:
+                    msg += f" · Dano reduzido para {dano_aplicar}."
         elif salv_passou is False:
             msg += " · Alvo falhou na resistência."
 
@@ -348,11 +377,13 @@ class Dnd5eConjuracaoService:
                 concentracao_id if magia.requer_concentracao else None
             ),
             dano_total=dano_total,
+            dano_aplicar=dano_aplicar,
             magia_nome=magia_row.nome,
             magia_nivel=nivel,
             nivel_slot_gasto=nivel_slot if nivel > 0 and not como_ritual else None,
             teste_resistencia=save_tipo if save_tipo != "nenhum" else None,
             salvaguarda_passou=salv_passou,
+            salvaguarda_rolagem=salv_roll,
             componentes=comps,
             requer_concentracao=magia.requer_concentracao,
             ritual=bool(magia_row.ritual),
