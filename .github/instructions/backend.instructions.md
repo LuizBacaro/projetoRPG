@@ -25,7 +25,7 @@ applyTo: "backend/**/*.py"
 
 ## Qualidade e Testes
 
-- **Antes de push/PR:** seguir [docs/normas-qualidade-backend-ci.md](../../docs/normas-qualidade-backend-ci.md) — `make ci-backend-lint` (black 24.10.0, isort 5.13.2 com `--profile black`, flake8).
+- **Antes de push/PR:** seguir [docs/normas-qualidade-backend-ci.md](../../docs/normas-qualidade-backend-ci.md) — `make install-hooks` (pre-commit com black/isort); validacao completa: `make ci-backend-lint` (black 24.10.0, isort 5.13.2 com `--profile black`, flake8).
 - Preserve compatibilidade com testes FastAPI que usam SQLite em memoria com `StaticPool`.
 - Ao tocar auth, cache, listagens ou startup, valide fluxos impactados e destaque risco residual quando nao houver teste.
 - Novos models/routers: imports em ordem alfabética em `app/main.py`, `app/models/__init__.py` e `app/core/deps/dnd35.py` (ver normas CI).

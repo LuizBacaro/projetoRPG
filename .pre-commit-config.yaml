@@ -1,0 +1,23 @@
+# Opcional: framework pre-commit (alternativa ao hook nativo em .githooks/).
+# Instalação recomendada do projeto: make install-hooks  (usa .githooks/pre-commit)
+# Com este ficheiro: pip install pre-commit && pre-commit install
+# Doc: docs/normas-qualidade-backend-ci.md
+
+default_language_version:
+  python: python3
+
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        name: black (backend app/ tests/)
+        files: ^backend/(app|tests)/.*\.py$
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort (backend, profile black)
+        files: ^backend/(app|tests)/.*\.py$
+        args: [--profile=black]
