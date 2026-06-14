@@ -65,6 +65,16 @@ def get_tormenta_personagem_magias_service(
     return TormentaPersonagemMagiasService(db)
 
 
+def get_tormenta_personagem_progressao_service(
+    db: Session = Depends(get_db),
+):
+    from app.games.tormenta.services.personagem_progressao_service import (
+        TormentaPersonagemProgressaoService,
+    )
+
+    return TormentaPersonagemProgressaoService(db)
+
+
 def get_tormenta_personagem_equipamentos_service(
     db: Session = Depends(get_db),
 ) -> TormentaPersonagemEquipamentosService:

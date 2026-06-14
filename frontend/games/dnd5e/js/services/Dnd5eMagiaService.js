@@ -40,9 +40,16 @@ export class Dnd5eMagiaService {
         return ALIASES[base] || base;
     }
 
-    async listarPorClasse(classe) {
+    async listarTodasPorClasse(classe, { forceRefresh = false } = {}) {
         const slug = this._normalizarClasse(classe);
-        if (this._cache.has(slug)) return this._cache.get(slug);
+        if (!slug) return [];
+
+        if (!forceRefresh && this._cache.has(slug)) {
+            const cached = this._cache.get(slug);
+            if (Array.isArray(cached) && cached.length > 0) {
+                return cached;
+            }
+        }
 
         const magias = [];
         let skip = 0;
@@ -60,8 +67,27 @@ export class Dnd5eMagiaService {
             skip += lote.length;
         }
 
-        this._cache.set(slug, magias);
+        if (magias.length > 0) {
+            this._cache.set(slug, magias);
+        }
+
         return magias;
+    }
+
+    async listarPorClasse(classe, { forceRefresh = false } = {}) {
+        if (forceRefresh) {
+            this.limparCacheClasse(classe);
+        }
+        return this.listarTodasPorClasse(classe, { forceRefresh });
+    }
+
+    limparCacheClasse(classe) {
+        const slug = this._normalizarClasse(classe);
+        if (slug) this._cache.delete(slug);
+    }
+
+    limparCache() {
+        this._cache.clear();
     }
 
     async listarPorClassePaginado(
@@ -126,5 +152,9 @@ export class Dnd5eMagiaService {
         const res = await fetch(url, { headers: this._headers() });
         if (!res.ok) throw new Error(`Magia não encontrada (${res.status})`);
         return this._mapMagia(await res.json());
+    }
+
+    async obterPorId(magiaId) {
+        return this.obter(magiaId);
     }
 }

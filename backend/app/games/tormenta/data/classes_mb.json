@@ -35,7 +35,8 @@
         "18": "Fúria 6/dia, fúria poderosa (MB).",
         "19": "Sem habilidade nova listada — ver MB p. 48.",
         "20": "Ápice — ver MB p. 48 (fúria poderosa no 18º)."
-      }
+      },
+      "pericias_treinadas_base": 4
     },
     {
       "slug": "bardo",
@@ -68,7 +69,8 @@
         "18": "Nova música de bardo (MB).",
         "19": "Nova música de bardo (MB).",
         "20": "Nova música de bardo; ápice de classe (MB)."
-      }
+      },
+      "pericias_treinadas_base": 6
     },
     {
       "slug": "clerigo",
@@ -101,7 +103,8 @@
         "18": "Canalizar 18d6; aprende 2 magias novas (MB).",
         "19": "Canalizar 19d6 (MB).",
         "20": "Canalizar 20d6; poder divino; ápice (MB)."
-      }
+      },
+      "pericias_treinadas_base": 2
     },
     {
       "slug": "druida",
@@ -134,7 +137,8 @@
         "18": "Magias até 8º nível; aprende 2 magias novas (MB).",
         "19": "— (MB).",
         "20": "Forma selvagem com 4 habilidades por uso; magias até 9º nível; ápice (MB)."
-      }
+      },
+      "pericias_treinadas_base": 4
     },
     {
       "slug": "feiticeiro",
@@ -167,7 +171,8 @@
         "18": "Aprende 1 magia nova (MB).",
         "19": "Aprende 1 magia nova (MB).",
         "20": "Quinto poder da linhagem (ápice da linhagem); aprende 1 magia nova (MB)."
-      }
+      },
+      "pericias_treinadas_base": 2
     },
     {
       "slug": "guerreiro",
@@ -200,7 +205,8 @@
         "18": "Técnica de luta (talento de combate — MB).",
         "19": "Sem nova técnica de luta (MB).",
         "20": "Técnica de luta (talento de combate — MB)."
-      }
+      },
+      "pericias_treinadas_base": 2
     },
     {
       "slug": "ladino",
@@ -233,7 +239,8 @@
         "18": "Sentir armadilhas +6 (MB).",
         "19": "Ataque furtivo +10d6 (MB).",
         "20": "Técnica ladina; ápice (MB)."
-      }
+      },
+      "pericias_treinadas_base": 8
     },
     {
       "slug": "mago",
@@ -266,7 +273,8 @@
         "18": "Aprende 2 magias novas (MB).",
         "19": "Aprende 2 magias novas (MB).",
         "20": "Mistérios arcanos (talento metamágico); ápice (MB)."
-      }
+      },
+      "pericias_treinadas_base": 2
     },
     {
       "slug": "monge",
@@ -299,7 +307,8 @@
         "18": "Corpo vazio (forma etérea); movimento ágil +20; técnica de luta (MB).",
         "19": "— (MB).",
         "20": "Autoperfeição (RD 5, sucesso automático em resistências com teste); bônus na CA +4; dano desarmado 2d10 (MB)."
-      }
+      },
+      "pericias_treinadas_base": 4
     },
     {
       "slug": "paladino",
@@ -332,7 +341,8 @@
         "18": "Cura pelas mãos 5d8+5; sexta condição removível (MB).",
         "19": "Destruir o mal 7/dia (MB).",
         "20": "Canalizar energia positiva 5d6; se elo com as forças divinas: 4º talento de combate ou poder concedido; ápice (MB)."
-      }
+      },
+      "pericias_treinadas_base": 2
     },
     {
       "slug": "ranger",
@@ -365,7 +375,8 @@
         "18": "— (MB).",
         "19": "5º inimigo predileto; se elo com o mundo: 4º talento de combate ou perícia (MB).",
         "20": "Ápice de classe (MB)."
-      }
+      },
+      "pericias_treinadas_base": 6
     },
     {
       "slug": "samurai",
@@ -398,7 +409,8 @@
         "18": "Grito de kiai maior (+6 — MB).",
         "19": "Espadas ancestrais +9 (MB).",
         "20": "Técnica de luta; espadas ancestrais +10; ápice (MB)."
-      }
+      },
+      "pericias_treinadas_base": 4
     },
     {
       "slug": "swashbuckler",
@@ -431,7 +443,8 @@
         "18": "Técnica de luta (MB).",
         "19": "Bônus na CA +4 (MB).",
         "20": "Ápice (MB)."
-      }
+      },
+      "pericias_treinadas_base": 4
     }
   ]
 }

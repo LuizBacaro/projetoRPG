@@ -168,4 +168,70 @@ class TormentaRegrasService {
         const res = await fetch(this._urlArmadurasProtecao() + (qs ? `?${qs}` : ''), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar catálogo de armaduras');
     }
+
+    _urlTracosRaciaisPreview() {
+        return window.getApiUrl('/tormenta/regras/tracos-raciais-preview');
+    }
+
+    async obterTracosRaciaisPreview(slug) {
+        const sp = new URLSearchParams();
+        sp.set('slug', String(slug || '').trim());
+        const res = await fetch(`${this._urlTracosRaciaisPreview()}?${sp}`, { headers: this._headers() });
+        return this._handleJson(res, 'Erro ao carregar traços raciais MB');
+    }
+
+    _urlPericiasRegras() {
+        return window.getApiUrl('/tormenta/regras/pericias');
+    }
+
+    async obterRegrasPericias() {
+        const res = await fetch(this._urlPericiasRegras(), { headers: this._headers() });
+        return this._handleJson(res, 'Erro ao carregar regras de perícias');
+    }
+
+    async calcularBonusPericia(body) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/pericias/calcular-bonus'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        return this._handleJson(res, 'Erro ao calcular bônus de perícia');
+    }
+
+    async rolarPericia(body) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/pericias/rolar'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        return this._handleJson(res, 'Erro ao rolar perícia');
+    }
+
+    /**
+     * PV máximos MB por classe, nível e CON.
+     * @param {{ classe_slug: string, nivel?: number, con_valor?: number }} p
+     */
+    async obterPvPreview(p) {
+        const sp = new URLSearchParams();
+        sp.set('classe_slug', String(p.classe_slug || '').trim());
+        sp.set('nivel', String(p.nivel != null ? p.nivel : 1));
+        sp.set('con_valor', String(p.con_valor != null ? p.con_valor : 10));
+        const res = await fetch(
+            `${window.getApiUrl('/tormenta/regras/pv-preview')}?${sp}`,
+            { headers: this._headers() }
+        );
+        return this._handleJson(res, 'Erro ao calcular PV MB');
+    }
+
+    /**
+     * Valida orçamento de perícias treinadas e graduações (MB).
+     */
+    async validarPericiasCriacao(body) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/pericias/validar-criacao'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        return this._handleJson(res, 'Erro ao validar orçamento de perícias');
+    }
 }

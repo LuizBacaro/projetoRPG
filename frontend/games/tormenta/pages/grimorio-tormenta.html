@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Grimório Tormenta 20 — Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css" />
+    <link rel="stylesheet" href="/games/dnd35/css/grimorio.css" />
+</head>
+<body class="t20-body t20-grimorio-pagina">
+    <header class="t20-ficha-topbar">
+        <a href="/tormenta/dashboard" class="tormenta-btn">← Dashboard</a>
+        <h1>Grimório Tormenta 20</h1>
+        <p class="t20-hint">Abra uma ficha para gerir magias ou use o parâmetro <code>?id=</code> na URL.</p>
+    </header>
+    <main class="t20-grimorio-pagina-main">
+        <div id="t20GrimorioPaginaStatus" class="t20-hint">A carregar…</div>
+        <div id="t20GrimorioPaginaConteudo" hidden>
+            <p id="t20GrimorioPaginaNome" class="t20-ficha-tag"></p>
+            <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnAbrirGrimorioModal">Abrir grimório MB</button>
+            <p class="t20-hint">O modal usa o mesmo fluxo da ficha (catálogo, vínculos SQL, gasto de PM).</p>
+        </div>
+    </main>
+    <script src="/js/shared/render-api-origin-boot.js?v=2"></script>
+    <script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
+    <script src="/games/dnd35/js/services/AuthService.js"></script>
+    <script src="/games/dnd35/js/ui/Toast.js"></script>
+    <script>
+        if (!AuthService.exigirJogo('tormenta')) {}
+    </script>
+    <script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
+    <script src="/games/tormenta/js/services/TormentaRegrasService.js"></script>
+    <script src="/games/tormenta/js/services/TormentaGrimorioService.js"></script>
+    <script>
+    (function () {
+        const params = new URLSearchParams(window.location.search);
+        const id = Number(params.get('id'));
+        const status = document.getElementById('t20GrimorioPaginaStatus');
+        const cont = document.getElementById('t20GrimorioPaginaConteudo');
+        const nome = document.getElementById('t20GrimorioPaginaNome');
+        const btn = document.getElementById('btnAbrirGrimorioModal');
+        if (!id) {
+            status.textContent = 'Informe ?id=ID_DO_PERSONAGEM na URL ou abra o grimório pela ficha.';
+            return;
+        }
+        const svc = new TormentaPersonagemService();
+        svc.obter(id).then((p) => {
+            status.hidden = true;
+            cont.hidden = false;
+            nome.textContent = p.nome || `Personagem #${id}`;
+            btn.addEventListener('click', () => {
+                window.location.href = `/games/tormenta/pages/ficha-personagem.html?id=${id}#grimorio`;
+            });
+        }).catch((e) => {
+            status.textContent = e.message || 'Erro ao carregar personagem.';
+        });
+    })();
+    </script>
+</body>
+</html>

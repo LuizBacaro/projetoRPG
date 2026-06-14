@@ -14,6 +14,7 @@ from app.games.tormenta.rules.conjuracao_t20 import (
     classe_conjuracao_mb_registrada,
     pontos_magia_maximos_conjuracao,
 )
+from app.games.tormenta.rules.pericias_criacao_t20 import validar_pericias_ficha_mb
 from app.games.tormenta.schemas.personagem import (
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
@@ -26,6 +27,36 @@ from app.shared.models.usuario import PerfilUsuario, Usuario
 
 class TormentaPersonagemService:
     _CHAVES_COMPRA = ("for", "des", "con", "int", "sab", "car")
+    _CAMPOS_ATRIBUTO = (
+        "for_valor",
+        "des_valor",
+        "con_valor",
+        "int_valor",
+        "sab_valor",
+        "car_valor",
+    )
+
+    @staticmethod
+    def _patch_mexe_compra_pontos(data: dict) -> bool:
+        """True se o PATCH altera atributos ou atributos_compra (validação de criação MB)."""
+        if any(
+            k in data for k in ("tipo",) + TormentaPersonagemService._CAMPOS_ATRIBUTO
+        ):
+            return True
+        fj = data.get("ficha_json")
+        return isinstance(fj, dict) and "atributos_compra" in fj
+
+    @staticmethod
+    def _patch_mexe_pericias_mb(data: dict) -> bool:
+        """True se o PATCH altera nível, INT ou bloco de perícias/classe MB."""
+        if any(k in data for k in ("tipo", "nivel", "int_valor")):
+            return True
+        fj = data.get("ficha_json")
+        if not isinstance(fj, dict):
+            return False
+        return bool(
+            fj.keys() & {"pericias", "tormenta_classe_mb_slug", "raca_tormenta_slug"}
+        )
 
     def __init__(self, repo: TormentaPersonagemRepositoryProtocol):
         self.repo = repo
@@ -202,6 +233,37 @@ class TormentaPersonagemService:
                 f"(gasto atual: {total}). Ajuste ficha_json.atributos_compra ou os seis atributos."
             )
 
+    @staticmethod
+    def _validar_pericias_t20_jogador(
+        tipo: str,
+        ficha_json: Optional[dict],
+        nivel: int,
+        int_valor: int,
+    ) -> None:
+        """Jogador com classe MB: valida vagas treinadas e graduações de perícias."""
+        if (tipo or "").lower() != "jogador":
+            return
+        if not ficha_json:
+            return
+        slug = str(ficha_json.get("tormenta_classe_mb_slug") or "").strip().lower()
+        if not slug:
+            return
+        pericias = ficha_json.get("pericias")
+        if not isinstance(pericias, list) or len(pericias) == 0:
+            return
+        raca_slug = str(ficha_json.get("raca_tormenta_slug") or "").strip().lower()
+        if raca_slug in ("__livre__", ""):
+            raca_slug = None
+        ok, motivo, _ = validar_pericias_ficha_mb(
+            nivel=int(nivel or 1),
+            slug_classe=slug,
+            int_valor=int(int_valor),
+            slug_raca=raca_slug,
+            pericias=pericias,
+        )
+        if not ok:
+            raise DadosInvalidos(motivo or "Orçamento de perícias MB inválido.")
+
     def listar_todos(
         self,
         tipo: Optional[str],
@@ -300,6 +362,12 @@ class TormentaPersonagemService:
             payload.sab_valor,
             payload.car_valor,
         )
+        self._validar_pericias_t20_jogador(
+            payload.tipo,
+            dict(payload.ficha_json or {}),
+            int(payload.nivel or 1),
+            int(payload.int_valor),
+        )
 
         pv_max = payload.pv_max
         pv_atual = payload.pv_atual if payload.pv_atual is not None else pv_max
@@ -362,16 +430,20 @@ class TormentaPersonagemService:
         fj = dict(ent.ficha_json or {})
         if "ficha_json" in data and data["ficha_json"] is not None:
             fj.update(dict(data["ficha_json"] or {}))
-        self._validar_compra_pontos_t20_jogador(
-            tipo_final,
-            fj,
-            fv,
-            dv,
-            cv,
-            iv,
-            sv,
-            cav,
-        )
+        if self._patch_mexe_compra_pontos(data):
+            self._validar_compra_pontos_t20_jogador(
+                tipo_final,
+                fj,
+                fv,
+                dv,
+                cv,
+                iv,
+                sv,
+                cav,
+            )
+        nv_final = int(data["nivel"]) if "nivel" in data else int(ent.nivel or 1)
+        if self._patch_mexe_pericias_mb(data):
+            self._validar_pericias_t20_jogador(tipo_final, fj, nv_final, iv)
 
         if "foto_url" in data:
             raw = data["foto_url"]

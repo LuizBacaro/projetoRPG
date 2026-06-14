@@ -75,4 +75,40 @@ class TormentaCombateService {
         });
         return this._handleResponse(res, 'Erro ao gravar condições do combate');
     }
+
+    async rolarIniciativa(personagemIds) {
+        const res = await fetch(this._url('/rolar-iniciativa'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify({ personagem_ids: personagemIds }),
+        });
+        return this._handleResponse(res, 'Erro ao rolar iniciativa');
+    }
+
+    async rolarAtaque(payload) {
+        const res = await fetch(this._url('/rolar-ataque'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload),
+        });
+        return this._handleResponse(res, 'Erro ao rolar ataque');
+    }
+
+    async rolarDano(payload) {
+        const res = await fetch(this._url('/rolar-dano'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload),
+        });
+        return this._handleResponse(res, 'Erro ao rolar dano');
+    }
+
+    async testarResistenciaMagia(payload) {
+        const res = await fetch(this._url('/testar-resistencia-magia'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload),
+        });
+        return this._handleResponse(res, 'Erro no teste de resistência à magia');
+    }
 }

@@ -1,3 +1,114 @@
 {
-  "itens": []
+  "_meta": {
+    "fonte": "Tormenta 20 MB — armaduras e escudos (metadados para modal de proteção na ficha).",
+    "nota": "Valores típicos MB; confirme no exemplar da mesa."
+  },
+  "itens": [
+    {
+      "nome": "Armadura de couro",
+      "tipo": "leve",
+      "bonus_ca": 2,
+      "penalidade": 0,
+      "des_max": null,
+      "falha_arcana": "5%",
+      "peso": "7,5 kg"
+    },
+    {
+      "nome": "Armadura de couro batido",
+      "tipo": "leve",
+      "bonus_ca": 3,
+      "penalidade": 0,
+      "des_max": null,
+      "falha_arcana": "10%",
+      "peso": "10 kg"
+    },
+    {
+      "nome": "Armadura de gibão de peles",
+      "tipo": "leve",
+      "bonus_ca": 4,
+      "penalidade": -1,
+      "des_max": null,
+      "falha_arcana": "15%",
+      "peso": "12,5 kg"
+    },
+    {
+      "nome": "Armadura de couro reforçado",
+      "tipo": "leve",
+      "bonus_ca": 5,
+      "penalidade": -1,
+      "des_max": null,
+      "falha_arcana": "15%",
+      "peso": "15 kg"
+    },
+    {
+      "nome": "Armadura de cota de malha",
+      "tipo": "media",
+      "bonus_ca": 6,
+      "penalidade": -2,
+      "des_max": "+2",
+      "falha_arcana": "20%",
+      "peso": "20 kg"
+    },
+    {
+      "nome": "Armadura de escamas",
+      "tipo": "media",
+      "bonus_ca": 7,
+      "penalidade": -3,
+      "des_max": "+2",
+      "falha_arcana": "25%",
+      "peso": "22,5 kg"
+    },
+    {
+      "nome": "Armadura de peitoral",
+      "tipo": "pesada",
+      "bonus_ca": 8,
+      "penalidade": -4,
+      "des_max": "+1",
+      "falha_arcana": "25%",
+      "peso": "25 kg"
+    },
+    {
+      "nome": "Armadura de placas",
+      "tipo": "pesada",
+      "bonus_ca": 10,
+      "penalidade": -5,
+      "des_max": "+1",
+      "falha_arcana": "35%",
+      "peso": "30 kg"
+    },
+    {
+      "nome": "Escudo leve de madeira",
+      "tipo": "escudo",
+      "bonus_ca": 1,
+      "penalidade": -1,
+      "des_max": null,
+      "falha_arcana": "5%",
+      "peso": "2,5 kg"
+    },
+    {
+      "nome": "Broquel",
+      "tipo": "escudo",
+      "bonus_ca": 1,
+      "penalidade": 0,
+      "des_max": null,
+      "falha_arcana": "5%",
+      "peso": "2,5 kg"
+    },
+    {
+      "nome": "Escudo pesado de aço",
+      "tipo": "escudo",
+      "bonus_ca": 2,
+      "penalidade": -2,
+      "des_max": null,
+      "falha_arcana": "15%",
+      "peso": "7,5 kg"
+    },
+    {
+      "nome": "Elmo",
+      "tipo": "protecao",
+      "bonus_ca": 0,
+      "penalidade": 0,
+      "propriedades_especiais": "Proteção parcial conforme MB."
+    }
+  ]
 }

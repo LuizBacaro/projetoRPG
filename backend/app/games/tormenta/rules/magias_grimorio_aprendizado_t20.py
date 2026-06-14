@@ -1,0 +1,280 @@
+"""Orçamento de magias no livro (grimório) — mago MB (Fase C)."""
+
+from __future__ import annotations
+
+import json
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+from app.games.tormenta.rules.conjuracao_t20 import habilidade_chave_conjuracao
+from app.games.tormenta.rules.grimorio_conjuracao_t20 import modo_conjuracao_classe_mb
+from app.games.tormenta.rules.magias_progressao_mb_t20 import (
+    circulo_maximo_magias_lancaveis_mb,
+    tipo_lista_magias_por_classe_mb,
+)
+
+_DATA = (
+    Path(__file__).resolve().parent.parent
+    / "data"
+    / "magias_grimorio_aprendizado_mb.json"
+)
+
+
+@lru_cache(maxsize=1)
+def _carregar() -> Dict[str, Any]:
+    if not _DATA.is_file():
+        return {"classes": {}}
+    return json.loads(_DATA.read_text(encoding="utf-8"))
+
+
+def _classe_row(slug_classe: str) -> Optional[Dict[str, Any]]:
+    s = str(slug_classe or "").strip().lower()
+    if not s:
+        return None
+    classes = _carregar().get("classes") or {}
+    row = classes.get(s)
+    return row if isinstance(row, dict) else None
+
+
+def classe_usa_limite_grimorio_mb(slug_classe: str) -> bool:
+    """Preparador com tabela de aprendizado no livro (Fase C: mago)."""
+    if modo_conjuracao_classe_mb(slug_classe) != "preparar":
+        return False
+    return _classe_row(slug_classe) is not None
+
+
+def _mod_habilidade_chave(
+    slug_classe: str,
+    *,
+    for_valor: int = 10,
+    des_valor: int = 10,
+    con_valor: int = 10,
+    int_valor: int = 10,
+    sab_valor: int = 10,
+    car_valor: int = 10,
+) -> int:
+    ch = habilidade_chave_conjuracao(slug_classe) or "int"
+    vals = {
+        "for": for_valor,
+        "des": des_valor,
+        "con": con_valor,
+        "int": int_valor,
+        "sab": sab_valor,
+        "car": car_valor,
+    }
+    return modificador_atributo_t20(int(vals.get(ch, 10)))
+
+
+def orcamento_magias_grimorio_mb(
+    slug_classe: str,
+    nivel: int,
+    *,
+    for_valor: int = 10,
+    des_valor: int = 10,
+    con_valor: int = 10,
+    int_valor: int = 10,
+    sab_valor: int = 10,
+    car_valor: int = 10,
+) -> Optional[int]:
+    """Máximo de magias de círculo ≥1 no livro (truques opcionalmente fora do orçamento)."""
+    row = _classe_row(slug_classe)
+    if not row:
+        return None
+    try:
+        nv = max(1, min(40, int(nivel)))
+    except (TypeError, ValueError):
+        nv = 1
+    inicial = row.get("inicial") or {}
+    try:
+        base_c1 = int(inicial.get("magias_circulo_1", 0) or 0)
+    except (TypeError, ValueError):
+        base_c1 = 0
+    mod = _mod_habilidade_chave(
+        slug_classe,
+        for_valor=for_valor,
+        des_valor=des_valor,
+        con_valor=con_valor,
+        int_valor=int_valor,
+        sab_valor=sab_valor,
+        car_valor=car_valor,
+    )
+    if inicial.get("bonus_mod_habilidade_circulo_1") is True:
+        base_c1 += mod
+    try:
+        por_nv = int(row.get("magias_por_nivel_apos_1", 2) or 2)
+    except (TypeError, ValueError):
+        por_nv = 2
+    extra = max(0, nv - 1) * max(0, por_nv)
+    return max(0, base_c1 + extra)
+
+
+def truques_contam_orcamento_grimorio_mb(slug_classe: str) -> bool:
+    row = _classe_row(slug_classe)
+    if not row:
+        return False
+    return row.get("truques_contam_no_orcamento") is True
+
+
+def contar_grimorio_no_orcamento(
+    vinculos: List[Dict[str, Any]],
+    *,
+    slug_classe: str,
+    metadados_por_slug: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> int:
+    """Conta vínculos grimorio que consomem orçamento (círculo ≥1 salvo flag)."""
+    meta_map = metadados_por_slug or {}
+    truques_contam = truques_contam_orcamento_grimorio_mb(slug_classe)
+    total = 0
+    for v in vinculos:
+        if not isinstance(v, dict):
+            continue
+        if str(v.get("papel", "")).strip().lower() != "grimorio":
+            continue
+        circ = None
+        if v.get("circulo") is not None:
+            try:
+                circ = int(v["circulo"])
+            except (TypeError, ValueError):
+                circ = None
+        slug = str(v.get("magia_slug") or "").strip().lower()
+        if circ is None and slug in meta_map:
+            try:
+                circ = int(meta_map[slug].get("circulo", 0) or 0)
+            except (TypeError, ValueError):
+                circ = 0
+        if circ is None:
+            circ = 0
+        if circ == 0 and not truques_contam:
+            continue
+        total += 1
+    return total
+
+
+def validar_adicionar_grimorio_mb(
+    *,
+    slug_classe: str,
+    nivel: int,
+    circulo_magia: int,
+    tipo_magia: Optional[str],
+    vinculos_existentes: List[Dict[str, Any]],
+    for_valor: int = 10,
+    des_valor: int = 10,
+    con_valor: int = 10,
+    int_valor: int = 10,
+    sab_valor: int = 10,
+    car_valor: int = 10,
+    metadados_por_slug: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> Tuple[bool, str]:
+    if not classe_usa_limite_grimorio_mb(slug_classe):
+        return True, ""
+    try:
+        circ = int(circulo_magia)
+    except (TypeError, ValueError):
+        circ = 0
+    cmax = circulo_maximo_magias_lancaveis_mb(slug_classe, nivel)
+    if circ > cmax:
+        return (
+            False,
+            f"Magia de {circ}º círculo: esta classe no nível {nivel} só aprende até o {cmax}º círculo (MB).",
+        )
+    tipo_esperado = tipo_lista_magias_por_classe_mb(slug_classe)
+    if tipo_esperado and tipo_magia:
+        if str(tipo_magia).strip().lower() != tipo_esperado:
+            return (
+                False,
+                f"Magia {tipo_magia} incompatível com a lista {tipo_esperado} da classe {slug_classe} (MB).",
+            )
+    if circ == 0 and not truques_contam_orcamento_grimorio_mb(slug_classe):
+        return True, ""
+    orc = orcamento_magias_grimorio_mb(
+        slug_classe,
+        nivel,
+        for_valor=for_valor,
+        des_valor=des_valor,
+        con_valor=con_valor,
+        int_valor=int_valor,
+        sab_valor=sab_valor,
+        car_valor=car_valor,
+    )
+    if orc is None:
+        return True, ""
+    usado = contar_grimorio_no_orcamento(
+        vinculos_existentes,
+        slug_classe=slug_classe,
+        metadados_por_slug=metadados_por_slug,
+    )
+    if usado >= orc:
+        return (
+            False,
+            f"Limite de magias no livro (grimório): {usado}/{orc} (MB, {slug_classe}).",
+        )
+    return True, ""
+
+
+def preview_grimorio_mb(
+    *,
+    slug_classe: str,
+    nivel: int,
+    vinculos: Optional[List[Dict[str, Any]]] = None,
+    for_valor: int = 10,
+    des_valor: int = 10,
+    con_valor: int = 10,
+    int_valor: int = 10,
+    sab_valor: int = 10,
+    car_valor: int = 10,
+) -> Dict[str, Any]:
+    from app.games.tormenta.rules.catalogo_t20 import metadados_magia_mb_por_slug
+
+    vinculos = vinculos or []
+    usa = classe_usa_limite_grimorio_mb(slug_classe)
+    meta: Dict[str, Dict[str, Any]] = {}
+    for v in vinculos:
+        if not isinstance(v, dict):
+            continue
+        sl = str(v.get("magia_slug") or "").strip().lower()
+        if sl and sl not in meta:
+            m = metadados_magia_mb_por_slug(sl)
+            if m:
+                meta[sl] = m
+    usado = contar_grimorio_no_orcamento(
+        vinculos, slug_classe=slug_classe, metadados_por_slug=meta
+    )
+    orc = (
+        orcamento_magias_grimorio_mb(
+            slug_classe,
+            nivel,
+            for_valor=for_valor,
+            des_valor=des_valor,
+            con_valor=con_valor,
+            int_valor=int_valor,
+            sab_valor=sab_valor,
+            car_valor=car_valor,
+        )
+        if usa
+        else None
+    )
+    truques_livro = sum(
+        1
+        for v in vinculos
+        if isinstance(v, dict)
+        and str(v.get("papel", "")).strip().lower() == "grimorio"
+        and int(
+            (meta.get(str(v.get("magia_slug") or "").strip().lower()) or {}).get(
+                "circulo", 0
+            )
+            or 0
+        )
+        == 0
+    )
+    return {
+        "classe_slug": str(slug_classe).strip().lower(),
+        "nivel": int(nivel),
+        "usa_limite_grimorio": usa,
+        "grimorio_usadas": usado,
+        "grimorio_max": orc,
+        "truques_no_livro": truques_livro,
+        "truques_contam_orcamento": truques_contam_orcamento_grimorio_mb(slug_classe),
+        "circulo_max_lancavel": circulo_maximo_magias_lancaveis_mb(slug_classe, nivel),
+    }

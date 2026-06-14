@@ -200,4 +200,95 @@ class TormentaPersonagemService {
         });
         return this._handleResponse(res, 'Erro ao remover magia');
     }
+
+    /** Lança magia MB debitando PM (`pa_atual`). */
+    async lancarMagia(id, magiaSlug) {
+        const res = await fetch(this._url(`/${id}/magias/lancar`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify({ magia_slug: magiaSlug }),
+        });
+        return this._handleResponse(res, 'Erro ao lançar magia');
+    }
+
+    async previewMagiasConhecidas(id) {
+        const res = await fetch(this._url(`/${id}/magias/conhecidas-preview`), {
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao carregar limite de magias conhecidas');
+    }
+
+    async previewGrimorio(id) {
+        const res = await fetch(this._url(`/${id}/magias/grimorio-preview`), {
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao carregar limite do livro (grimório)');
+    }
+
+    async previewRepertorio(id) {
+        const res = await fetch(this._url(`/${id}/magias/repertorio-preview`), {
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao carregar limite do repertório aprendido');
+    }
+
+    async previewPreparadas(id) {
+        const res = await fetch(this._url(`/${id}/magias/preparadas-preview`), {
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao carregar limite de magias preparadas');
+    }
+
+    async limparPreparadas(id) {
+        const res = await fetch(this._url(`/${id}/magias/limpar-preparadas`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: '{}',
+        });
+        return this._handleResponse(res, 'Erro ao limpar magias preparadas');
+    }
+
+    async previewSubirNivel(id, nivelAlvo) {
+        const res = await fetch(
+            this._url(`/${id}/subir-nivel-preview?nivel_alvo=${encodeURIComponent(nivelAlvo)}`),
+            { headers: this._headers(false) }
+        );
+        return this._handleResponse(res, 'Erro ao carregar preview de subir de nível');
+    }
+
+    async aplicarSubirNivel(id, body = {}) {
+        const res = await fetch(this._url(`/${id}/subir-nivel`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao subir de nível');
+    }
+
+    async trocarMagiaConhecida(id, body) {
+        const res = await fetch(this._url(`/${id}/magias/trocar`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao trocar magia conhecida');
+    }
+
+    async migrarMagiasDoJson(id, body) {
+        const opts = {
+            method: 'POST',
+            headers: this._headers(body != null),
+        };
+        if (body != null) opts.body = JSON.stringify(body);
+        const res = await fetch(this._url(`/${id}/magias/migrar-do-json`), opts);
+        return this._handleResponse(res, 'Erro ao sincronizar magias da ficha');
+    }
+
+    async encerrarConcentracao(id) {
+        const res = await fetch(this._url(`/${id}/magias/encerrar-concentracao`), {
+            method: 'POST',
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao encerrar concentração');
+    }
 }

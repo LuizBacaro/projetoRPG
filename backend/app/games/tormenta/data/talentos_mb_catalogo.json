@@ -139,6 +139,70 @@
       "prerequisitos": "Sab 13",
       "descricao_resumo": "Somar Sabedoria em vez de Força nas jogadas de ataque com armas leves corpo a corpo se for vantajoso (MB).",
       "pagina_referencia": "MB p. 126"
+    },
+    {
+      "nome": "Duro de Matar",
+      "categoria": "Geral",
+      "secao": "Resistência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Permanece lutando com 0 PV ou menos; estabiliza automaticamente em 0 PV (MB).",
+      "pagina_referencia": "MB p. 128"
+    },
+    {
+      "nome": "Foco em Arma",
+      "categoria": "Combate",
+      "secao": "Ataque",
+      "prerequisitos": "Proficiência com a arma",
+      "descricao_resumo": "+2 em jogadas de ataque com uma arma escolhida (MB).",
+      "pagina_referencia": "MB p. 127"
+    },
+    {
+      "nome": "Esquiva",
+      "categoria": "Combate",
+      "secao": "Defesa",
+      "prerequisitos": "Des 13",
+      "descricao_resumo": "+1 na Defesa (não acumula com armadura pesada; MB).",
+      "pagina_referencia": "MB p. 127"
+    },
+    {
+      "nome": "Iniciativa Aprimorada",
+      "categoria": "Combate",
+      "secao": "Iniciativa",
+      "prerequisitos": "—",
+      "descricao_resumo": "+4 em testes de Iniciativa (MB).",
+      "pagina_referencia": "MB p. 128"
+    },
+    {
+      "nome": "Percepção Aguçada",
+      "categoria": "Geral",
+      "secao": "Perícia",
+      "prerequisitos": "—",
+      "descricao_resumo": "+2 em testes de Percepção (MB).",
+      "pagina_referencia": "MB p. 130"
+    },
+    {
+      "nome": "Tolerância a Veneno",
+      "categoria": "Geral",
+      "secao": "Resistência",
+      "prerequisitos": "—",
+      "descricao_resumo": "+4 em testes de Fortitude contra venenos (MB).",
+      "pagina_referencia": "MB p. 131"
+    },
+    {
+      "nome": "Conjuração Acelerada",
+      "categoria": "Magia",
+      "secao": "Conjuração",
+      "prerequisitos": "Capacidade de conjurar magias",
+      "descricao_resumo": "Conjurar magia de ação padrão como ação de movimento (+2 PM; MB).",
+      "pagina_referencia": "MB p. 132"
+    },
+    {
+      "nome": "Especialização em Magia",
+      "categoria": "Magia",
+      "secao": "Conjuração",
+      "prerequisitos": "Capacidade de conjurar magias",
+      "descricao_resumo": "+2 na CD de resistência de magias de uma escola escolhida (MB).",
+      "pagina_referencia": "MB p. 132"
     }
   ]
 }

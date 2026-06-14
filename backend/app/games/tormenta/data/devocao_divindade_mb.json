@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 MB — prece de devoção (RF-T44d; análogo ao truque de domínio D&D 3.5).",
+    "nota": "Truque divino concedido pela divindade: lançável sem PM e sem ocupar o repertório aprendido. Slugs devem existir em magias_mb_catalogo.json (tipo divina, círculo 0). Mapeamento temático MB; validar no exemplar licenciado."
+  },
+  "divindades": {
+    "aharadak": { "truque_devocao_slug": "infligir_ferimentos_leves" },
+    "allihanna": { "truque_devocao_slug": "invisibilidade_contra_animais" },
+    "arsenal": { "truque_devocao_slug": "presa_magica" },
+    "azgher": { "truque_devocao_slug": "luz_div" },
+    "hyninn": { "truque_devocao_slug": "brilho_div" },
+    "kallyadranoch": { "truque_devocao_slug": "presa_magica" },
+    "khalmyr": { "truque_devocao_slug": "orientacao" },
+    "lena": { "truque_devocao_slug": "virtude" },
+    "lin_wu": { "truque_devocao_slug": "resistencia_div" },
+    "marah": { "truque_devocao_slug": "virtude" },
+    "megalokk": { "truque_devocao_slug": "presa_magica" },
+    "nimb": { "truque_devocao_slug": "brilho_div" },
+    "oceano": { "truque_devocao_slug": "intuir_direcao_div" },
+    "sszzaas": { "truque_devocao_slug": "detectar_magia_div" },
+    "tanna_toh": { "truque_devocao_slug": "detectar_magia_div" },
+    "tenebra": { "truque_devocao_slug": "perdicao" },
+    "thwor": { "truque_devocao_slug": "invocar_monstro_i_div" },
+    "thyatis": { "truque_devocao_slug": "romper_morto_vivo_div" },
+    "valkaria": { "truque_devocao_slug": "passos_longos" },
+    "wynna": { "truque_devocao_slug": "detectar_magia_div" }
+  }
+}

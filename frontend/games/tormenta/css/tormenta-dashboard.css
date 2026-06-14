@@ -817,6 +817,38 @@
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
 }
 
+.t20-arena-magias-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: min(52vh, 28rem);
+    overflow-y: auto;
+}
+
+.t20-arena-magia-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--t20-border, rgba(255, 255, 255, 0.12));
+    border-radius: 6px;
+}
+
+.t20-arena-magia-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.t20-arena-magia-meta .t20-hint {
+    font-size: 0.72rem;
+}
+
 .t20-arena-btn-cond {
     border: 2px solid rgba(60, 35, 20, 0.35) !important;
     background: linear-gradient(180deg, rgba(255, 254, 248, 0.95), rgba(235, 226, 214, 0.95)) !important;
@@ -1110,6 +1142,7 @@
 .t20-arena-cb-inp {
     margin-top: 0.18rem;
     flex-shrink: 0;
+    accent-color: var(--t20-red-deep);
 }
 
 .t20-arena-cb-lbl {
@@ -1154,6 +1187,65 @@
 .t20-arena-cb-tipo--npc {
     background: rgba(22, 101, 52, 0.12);
     color: #14532d;
+}
+
+.t20-arena-roll-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 0.65rem;
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 480px) {
+    .t20-arena-roll-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-arena-roll-result {
+    margin-top: 0.65rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid rgba(163, 22, 22, 0.28);
+    background: rgba(163, 22, 22, 0.06);
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.t20-arena-roll-result[hidden] {
+    display: none !important;
+}
+
+.t20-arena-roll-result__tit {
+    margin: 0 0 0.25rem;
+    font-weight: 700;
+    color: var(--t20-red-deep);
+}
+
+.t20-arena-roll-result__linha {
+    margin: 0;
+}
+
+.t20-arena-roll-result__hint {
+    margin: 0.35rem 0 0;
+    font-size: 0.72rem;
+    color: var(--t20-muted);
+}
+
+.t20-arena-roll-ok {
+    color: #166534;
+    font-weight: 800;
+}
+
+.t20-arena-roll-fail {
+    color: #991b1b;
+    font-weight: 800;
+}
+
+.t20-arena-sr-bonus-hint {
+    margin: 0.45rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.4;
 }
 
 .t20-arena-modal--wide-cond {

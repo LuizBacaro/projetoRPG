@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 MB — aprendizado de magias no livro (grimório); mago piloto Fase C.",
+    "nota": "Truques arcana no livro não consomem orçamento quando truques_contam_no_orcamento é false."
+  },
+  "classes": {
+    "mago": {
+      "magias_por_nivel_apos_1": 2,
+      "truques_contam_no_orcamento": false,
+      "inicial": {
+        "magias_circulo_1": 3,
+        "bonus_mod_habilidade_circulo_1": true
+      }
+    }
+  }
+}
