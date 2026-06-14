@@ -6,7 +6,7 @@ import json
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _EQUIP_JSON = _DATA_DIR / "equipamentos_mb_catalogo.json"
