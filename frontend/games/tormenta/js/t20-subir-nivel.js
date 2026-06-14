@@ -110,7 +110,14 @@
     async function confirmarSubirNivel() {
         const pid = q('fichaId') && q('fichaId').value;
         const prev = window.__t20SubirNivelPreview;
-        if (!pid || !prev || !prev.permitido) return;
+        if (!pid || !prev) {
+            if (typeof Toast !== 'undefined') Toast.error('Abra o assistente com «Subir nível (MB)» antes de confirmar.');
+            return;
+        }
+        if (!prev.permitido) {
+            if (typeof Toast !== 'undefined') Toast.error(prev.motivo || 'Subida de nível não permitida.');
+            return;
+        }
         const aplicarPv = !!(q('subirNivelAplicarPv') && q('subirNivelAplicarPv').checked);
         try {
             const res = await svc().aplicarSubirNivel(pid, { aplicar_ganhos_vida: aplicarPv });

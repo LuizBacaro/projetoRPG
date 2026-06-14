@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260511t20p1export" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260614subirnivel" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260614grimorioPolish" />
 </head>
 <body class="tormenta-ficha-body">
@@ -1047,7 +1047,6 @@
                 <p id="grimorioTormentaPmHint" class="t20-hint" style="margin:0 0 .75rem;padding:0 .25rem"></p>
                 <div class="t20-grimorio-preparadas-bar" style="display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 .65rem;align-items:center">
                     <button type="button" class="tormenta-btn tormenta-btn--outline-red" id="btnGrimorioLimparPreparadas" title="Remove todas as magias preparadas hoje (descanso longo / novo dia)">🌙 Limpar preparadas</button>
-                    <button type="button" class="tormenta-btn tormenta-btn--secondary" id="btnGrimorioMigrarLegado" title="Importa nomes de magias_texto (ficha JSON) para vínculos SQL">📥 Importar do texto legado</button>
                 </div>
                 <p id="grimorioTormentaTrocaHint" class="t20-hint" style="display:none;margin:0 0 .5rem;padding:.35rem .5rem;background:rgba(120,80,200,.12);border-radius:6px"></p>
                 <div class="equipamentos-controles t20-grimorio-barra-busca">
@@ -1172,14 +1171,14 @@
 <script>
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioPolish"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioAuto"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260614"></script>
 <script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260614"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260614"></script>
-<script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614subirnivel"></script>
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260614"></script>
 <script>
 (function () {
@@ -4247,7 +4246,7 @@
             const arr = Array.isArray(p.magias) ? p.magias : [];
             await t20CarregarPreviewsGrimorioMago(pid);
             if (!arr.length) {
-                lista.innerHTML = '<p class="t20-hint">Nenhuma magia vinculada. Use o catálogo ou «Importar do texto legado».</p>';
+                lista.innerHTML = '<p class="t20-hint">Nenhuma magia vinculada. Busque no catálogo MB e adicione à ficha.</p>';
                 __t20LastPersonagemPayload = p;
                 t20AtualizarGrimorioElegibilidadeVisual(p);
                 return;
@@ -4447,16 +4446,52 @@
         }
     }
 
+    async function sincronizarMagiasTextoGrimorio(pid, personagem) {
+        const campo = q('f_magias');
+        const local = campo ? String(campo.value || '').trim() : '';
+        const fj = personagem && personagem.ficha_json;
+        const servidor =
+            fj && fj.magias_texto != null ? String(fj.magias_texto).trim() : '';
+        if (!local && !servidor) return { sincronizado: false };
+        try {
+            const body = local ? { magias_texto: campo.value } : null;
+            const res = await new TormentaPersonagemService().migrarMagiasDoJson(pid, body);
+            const restante =
+                res && res.magias_texto_restante != null ? String(res.magias_texto_restante) : '';
+            if (campo) campo.value = restante;
+            const n = (res && res.vinculos_criados) || 0;
+            const nf = (res && res.nao_encontrados) || [];
+            if (n > 0) {
+                Toast.success(
+                    n === 1
+                        ? '1 magia da sua lista foi adicionada ao grimório.'
+                        : `${n} magias da sua lista foram adicionadas ao grimório.`
+                );
+            } else if (nf.length) {
+                const amostra = nf.slice(0, 4).join(', ');
+                const sufixo = nf.length > 4 ? '…' : '';
+                Toast.warning(
+                    `Não reconhecemos na lista: ${amostra}${sufixo}. Revise em «Minhas magias» ou busque no catálogo.`
+                );
+            }
+            return { sincronizado: true, res };
+        } catch (e) {
+            Toast.error(e.message || 'Não foi possível sincronizar a lista de magias.');
+            return { sincronizado: false, erro: e };
+        }
+    }
+
     async function abrirModalGrimorioTormenta() {
         const pid = q('fichaId') && q('fichaId').value;
         if (!pid) {
             Toast.error('Salve a ficha uma vez antes de abrir o grimório.');
             return;
         }
+        let personagemGrim;
         try {
-            const chk = await svc.obter(pid);
-            if (!chk.grimorio_mb_permitido) {
-                Toast.error(chk.grimorio_mb_motivo || 'Grimório não disponível para esta ficha.');
+            personagemGrim = await svc.obter(pid);
+            if (!personagemGrim.grimorio_mb_permitido) {
+                Toast.error(personagemGrim.grimorio_mb_motivo || 'Grimório não disponível para esta ficha.');
                 return;
             }
         } catch (e0) {
@@ -4478,6 +4513,7 @@
             ov.classList.add('is-open');
             ov.setAttribute('aria-hidden', 'false');
         }
+        await sincronizarMagiasTextoGrimorio(pid, personagemGrim);
         await carregarGrimorioResumoPm();
         t20SincronizarAbasGrimorioVinculos();
         await carregarGrimorioVinculosNaLista();
@@ -5955,31 +5991,6 @@
                     await carregarGrimorioResumoPm();
                 } catch (e) {
                     Toast.error(e.message || 'Erro ao limpar preparadas');
-                }
-            });
-        }
-        const btnMigrarLeg = q('btnGrimorioMigrarLegado');
-        if (btnMigrarLeg && !btnMigrarLeg.dataset.boundGrim) {
-            btnMigrarLeg.dataset.boundGrim = '1';
-            btnMigrarLeg.addEventListener('click', async () => {
-                const pid = q('fichaId') && q('fichaId').value;
-                if (!pid) {
-                    Toast.error('Salve a ficha antes de importar.');
-                    return;
-                }
-                try {
-                    const res = await new TormentaPersonagemService().migrarMagiasDoJson(pid);
-                    const n = (res && res.vinculos_criados) || 0;
-                    const ign = (res && res.ignorados_duplicados) || 0;
-                    const nf = (res && res.nao_encontrados) || [];
-                    let msg = `${n} magia(s) importada(s).`;
-                    if (ign) msg += ` ${ign} ignorada(s) (duplicadas).`;
-                    if (nf.length) msg += ` Não encontradas: ${nf.slice(0, 5).join(', ')}${nf.length > 5 ? '…' : ''}.`;
-                    Toast.success(msg);
-                    await carregarGrimorioVinculosNaLista();
-                    await carregarGrimorioResumoPm();
-                } catch (e) {
-                    Toast.error(e.message || 'Erro ao importar magias legadas');
                 }
             });
         }

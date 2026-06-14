@@ -1046,3 +1046,31 @@ def test_clerigo_preparada_e_lancar_truque_divino(tormenta_personagens_db):
     )
     assert r_lanc_circ.status_code == 200, r_lanc_circ.text
     assert r_lanc_circ.json()["custo_pm"] == 1
+
+
+def test_magias_migrar_texto_limpa_ficha_apos_sincronizar(tormenta_personagens_db):
+    SessionLocal, _, _, u_mestre = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u_mestre))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_json(
+            nome="Mago Sync Magias",
+            ficha_json={
+                "tormenta_classe_mb_slug": "mago",
+                "magias_texto": "Mísseis mágicos",
+            },
+        ),
+    )
+    assert r.status_code == 201, r.text
+    rid = r.json()["id"]
+    mig = client.post(f"/api/v1/tormenta/personagens/{rid}/magias/migrar-do-json")
+    assert mig.status_code == 200, mig.text
+    data = mig.json()
+    assert data["vinculos_criados"] >= 1
+    assert data["magias_texto_restante"] == ""
+    got = client.get(f"/api/v1/tormenta/personagens/{rid}")
+    fj = got.json().get("ficha_json") or {}
+    assert not str(fj.get("magias_texto") or "").strip()
+    mig2 = client.post(f"/api/v1/tormenta/personagens/{rid}/magias/migrar-do-json")
+    assert mig2.status_code == 200
+    assert mig2.json()["vinculos_criados"] == 0

@@ -16,7 +16,9 @@ from app.games.tormenta.rules.catalogo_t20 import (
 )
 from app.games.tormenta.rules.conjuracao_combate_t20 import (
     aplicar_concentracao_ao_lancar,
+    aplicar_resistencia_magia_ao_lancar,
     ler_concentracao_mb,
+    ler_resistencia_magia_sessao_mb,
     limpar_concentracao_mb,
     magia_mb_exige_concentracao,
 )
@@ -343,12 +345,12 @@ class TormentaPersonagemMagiasService:
 
         p.pa_atual = int(sim["pa_atual_depois"])
         fj_atual = p.ficha_json if isinstance(p.ficha_json, dict) else {}
-        p.ficha_json = aplicar_concentracao_ao_lancar(
-            fj_atual, magia_slug=slug, meta=meta
-        )
+        fj_atual = aplicar_concentracao_ao_lancar(fj_atual, magia_slug=slug, meta=meta)
+        p.ficha_json = aplicar_resistencia_magia_ao_lancar(fj_atual, magia_slug=slug)
         commit_with_rollback(self.db)
         self.db.refresh(p)
         conc = ler_concentracao_mb(p.ficha_json)
+        rm = ler_resistencia_magia_sessao_mb(p.ficha_json)
         return {
             "magia_slug": slug,
             "custo_pm": int(sim["custo_pm"]),
@@ -360,19 +362,26 @@ class TormentaPersonagemMagiasService:
             "truque_devocao": truque_devocao,
             "exige_concentracao": magia_mb_exige_concentracao(meta),
             "concentracao_ativa": conc.get("nome") if conc else None,
+            "resistencia_magia_bonus": rm,
         }
 
     def migrar_magias_do_json(
-        self, personagem_id: int
+        self, personagem_id: int, *, magias_texto_override: Optional[str] = None
     ) -> TormentaMigrarMagiasJsonResponse:
         p = self.db.get(TormentaPersonagem, personagem_id)
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
-        fj = p.ficha_json if isinstance(p.ficha_json, dict) else {}
+        fj = dict(p.ficha_json if isinstance(p.ficha_json, dict) else {})
+        if magias_texto_override is not None:
+            fj["magias_texto"] = str(magias_texto_override)
+            p.ficha_json = fj
         texto = str(fj.get("magias_texto") or "").strip()
         if not texto:
             return TormentaMigrarMagiasJsonResponse(
-                vinculos_criados=0, ignorados_duplicados=0, nao_encontrados=[]
+                vinculos_criados=0,
+                ignorados_duplicados=0,
+                nao_encontrados=[],
+                magias_texto_restante="",
             )
 
         slug_classe = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
@@ -439,12 +448,29 @@ class TormentaPersonagemMagiasService:
             criados += 1
             self.db.flush()
 
-        if criados:
+        texto_restante = ""
+        alterou_ficha = False
+        fj_novo = dict(fj)
+        if not nao_encontrados:
+            if str(fj_novo.get("magias_texto") or "").strip():
+                fj_novo["magias_texto"] = ""
+                alterou_ficha = True
+        else:
+            texto_restante = "\n".join(nao_encontrados)
+            fj_novo["magias_texto"] = texto_restante
+            alterou_ficha = True
+
+        if alterou_ficha:
+            p.ficha_json = fj_novo
+
+        if criados or alterou_ficha:
             commit_with_rollback(self.db)
+
         return TormentaMigrarMagiasJsonResponse(
             vinculos_criados=criados,
             ignorados_duplicados=dup,
             nao_encontrados=nao_encontrados[:50],
+            magias_texto_restante=texto_restante,
         )
 
     def encerrar_concentracao_mb(

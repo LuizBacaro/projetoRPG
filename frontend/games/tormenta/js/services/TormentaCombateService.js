@@ -102,4 +102,13 @@ class TormentaCombateService {
         });
         return this._handleResponse(res, 'Erro ao rolar dano');
     }
+
+    async testarResistenciaMagia(payload) {
+        const res = await fetch(this._url('/testar-resistencia-magia'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload),
+        });
+        return this._handleResponse(res, 'Erro no teste de resistência à magia');
+    }
 }

@@ -31,8 +31,8 @@ Validação de papel (`grimorio` / `conhecida` / `preparada`): `grimorio_conjura
 | Catálogo completo p.150–209 (G5) | **Feito** (706 itens; metadados `escola`/execução via `enrich_magias_mb_catalogo.py`; sem `descricao_longa` no repo — RF-T46) |
 | Repertório aprendido + prece de devoção (RF-T44d) | **Feito** |
 | Progressão magias conhecidas por nível (RF-T42) | **Feito** (bardo/feiticeiro; troca bardo RF-T42c no backend + UI) |
-| Migração `magias_texto` → SQL | **Feito** (`POST …/magias/migrar-do-json`) |
-| Concentração / resistência à magia | **Parcial** (concentração ao lançar + encerrar; SR na mesa) |
+| Migração `magias_texto` → SQL | **Feito** (automática ao abrir o grimório) |
+| Concentração / resistência à magia | **Feito** (concentração ao lançar/encerrar; teste automático ao aplicar dano; `POST …/combate/testar-resistencia-magia`; RM +4/+8 MB) |
 
 ## Referência
 `docs/tormenta/07-requisitos-grimorio-mb-144-209.md`, `08-grimorio-g0-g2-fechamento.md`.

@@ -256,6 +256,9 @@ class TormentaCombateService:
         aplicar_ao_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         from app.games.tormenta.rules.combate_t20 import rolar_dano
+        from app.games.tormenta.rules.conjuracao_combate_t20 import (
+            processar_concentracao_apos_dano_mb,
+        )
 
         combate = self._exigir_combate_ativo()
         roll = rolar_dano(
@@ -267,10 +270,139 @@ class TormentaCombateService:
         if aplicar_ao_id is not None:
             alvo = self._personagem_no_combate(combate, int(aplicar_ao_id))
             pv = int(alvo.pv_atual or 0)
-            alvo.pv_atual = max(0, pv - int(roll["dano"]))
+            dano = int(roll["dano"])
+            alvo.pv_atual = max(0, pv - dano)
+            conc = processar_concentracao_apos_dano_mb(
+                alvo.ficha_json if isinstance(alvo.ficha_json, dict) else {},
+                dano=dano,
+                con_valor=int(alvo.con_valor or 10),
+                nivel=int(alvo.nivel or 1),
+                fort_total=int(alvo.fort_total or 0),
+            )
+            if conc.get("tinha_concentracao"):
+                alvo.ficha_json = conc.get("ficha_json") or {}
+                out["concentracao"] = {
+                    "tinha_concentracao": True,
+                    "perdida": bool(conc.get("concentracao_perdida")),
+                    "magia_anterior": conc.get("concentracao_anterior"),
+                    "teste": conc.get("teste"),
+                }
             self.personagem_repo.update(alvo)
             out["alvo_id"] = alvo.id
             out["alvo_nome"] = alvo.nome
             out["pv_antes"] = pv
             out["pv_depois"] = int(alvo.pv_atual or 0)
         return out
+
+    def testar_resistencia_magia_combate(
+        self,
+        *,
+        alvo_id: int,
+        tipo: str,
+        cd: Optional[int] = None,
+        circulo_magia: Optional[int] = None,
+        conjurador_id: Optional[int] = None,
+        magia_slug: Optional[str] = None,
+        falha_voluntaria: bool = False,
+    ) -> Dict[str, Any]:
+        from app.games.tormenta.rules.catalogo_t20 import metadados_magia_mb_por_slug
+        from app.games.tormenta.rules.conjuracao_combate_t20 import (
+            bonus_resistencia_magia_efetivo_mb,
+            cd_teste_resistencia_magia_mb,
+            inferir_tipo_resistencia_mb,
+            mod_habilidade_chave_conjurador_mb,
+            normalizar_tipo_resistencia_request,
+            rolar_teste_resistencia_magia_mb,
+        )
+
+        combate = self._exigir_combate_ativo()
+        alvo = self._personagem_no_combate(combate, int(alvo_id))
+
+        tipo_res: Optional[str] = None
+        if tipo:
+            tipo_res = normalizar_tipo_resistencia_request(tipo)
+        if not tipo_res and magia_slug:
+            meta = metadados_magia_mb_por_slug(magia_slug)
+            tipo_res = inferir_tipo_resistencia_mb((meta or {}).get("resistencia"))
+        if not tipo_res:
+            raise DadosInvalidos(
+                "Informe tipo (fortitude/reflexos/vontade) ou magia_slug com teste no catálogo"
+            )
+
+        cd_final: Optional[int] = int(cd) if cd is not None else None
+        circ = circulo_magia
+        conj_nome: Optional[str] = None
+
+        if cd_final is None:
+            if circ is None and magia_slug:
+                meta = metadados_magia_mb_por_slug(magia_slug)
+                if meta:
+                    circ = int(meta.get("circulo", 0) or 0)
+            if circ is None:
+                raise DadosInvalidos(
+                    "Informe cd ou circulo_magia (ou magia_slug com círculo no catálogo)"
+                )
+            if conjurador_id is None:
+                raise DadosInvalidos(
+                    "Informe conjurador_id para calcular CD (10 + círculo + mod. chave)"
+                )
+            conj = self._personagem_no_combate(combate, int(conjurador_id))
+            conj_nome = conj.nome
+            fj_conj = conj.ficha_json if isinstance(conj.ficha_json, dict) else {}
+            classe = str(fj_conj.get("tormenta_classe_mb_slug") or "").strip().lower()
+            mod_chave = mod_habilidade_chave_conjurador_mb(
+                classe_slug=classe,
+                int_valor=int(conj.int_valor or 10),
+                sab_valor=int(conj.sab_valor or 10),
+                car_valor=int(conj.car_valor or 10),
+            )
+            cd_final = cd_teste_resistencia_magia_mb(int(circ), mod_chave)
+
+        fj = alvo.ficha_json if isinstance(alvo.ficha_json, dict) else {}
+        bonus_rm = bonus_resistencia_magia_efetivo_mb(fj)
+
+        if falha_voluntaria:
+            return {
+                "alvo_id": alvo.id,
+                "alvo_nome": alvo.nome,
+                "conjurador_id": conjurador_id,
+                "conjurador_nome": conj_nome,
+                "tipo": tipo_res,
+                "cd": cd_final,
+                "falha_voluntaria": True,
+                "passou": False,
+                "bonus_base": (
+                    int(alvo.fort_total or 0)
+                    if tipo_res == "fortitude"
+                    else (
+                        int(alvo.ref_total or 0)
+                        if tipo_res == "reflexos"
+                        else int(alvo.von_total or 0)
+                    )
+                ),
+                "bonus_resistencia_magia": bonus_rm,
+                "bonus_total": 0,
+                "d20": None,
+                "total": None,
+                "margem": None,
+                "sucesso": False,
+            }
+
+        teste = rolar_teste_resistencia_magia_mb(
+            tipo=tipo_res,
+            fort_total=int(alvo.fort_total or 0),
+            ref_total=int(alvo.ref_total or 0),
+            von_total=int(alvo.von_total or 0),
+            bonus_rm=bonus_rm,
+            cd=int(cd_final),
+        )
+        return {
+            "alvo_id": alvo.id,
+            "alvo_nome": alvo.nome,
+            "conjurador_id": conjurador_id,
+            "conjurador_nome": conj_nome,
+            "magia_slug": magia_slug,
+            "circulo_magia": circ,
+            "falha_voluntaria": False,
+            **teste,
+        }

@@ -9,6 +9,7 @@ from app.games.tormenta.schemas.combate import (
     TormentaCombateRolarAtaqueRequest,
     TormentaCombateRolarDanoRequest,
     TormentaCombateRolarIniciativaRequest,
+    TormentaCombateTestarResistenciaMagiaRequest,
     TormentaIniciarCombateRequest,
 )
 from app.games.tormenta.services.combate_service import TormentaCombateService
@@ -137,6 +138,31 @@ def rolar_dano(
             mod_atributo=body.mod_atributo,
             confirmar_critico=body.confirmar_critico,
             aplicar_ao_id=body.aplicar_ao_alvo_id,
+        )
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/testar-resistencia-magia")
+def testar_resistencia_magia(
+    body: TormentaCombateTestarResistenciaMagiaRequest,
+    service: TormentaCombateService = Depends(get_tormenta_combate_service),
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        ids = [body.alvo_id]
+        if body.conjurador_id is not None:
+            ids.append(body.conjurador_id)
+        validar_tormenta_personagens_do_usuario(ids, usuario_atual, db)
+        return service.testar_resistencia_magia_combate(
+            alvo_id=body.alvo_id,
+            tipo=body.tipo or "",
+            cd=body.cd,
+            circulo_magia=body.circulo_magia,
+            conjurador_id=body.conjurador_id,
+            magia_slug=body.magia_slug,
+            falha_voluntaria=body.falha_voluntaria,
         )
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)

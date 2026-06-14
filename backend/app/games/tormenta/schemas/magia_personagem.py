@@ -54,6 +54,18 @@ class TormentaMigrarMagiasJsonResponse(BaseModel):
     vinculos_criados: int = Field(..., ge=0, le=999)
     ignorados_duplicados: int = Field(..., ge=0, le=999)
     nao_encontrados: List[str] = Field(default_factory=list)
+    magias_texto_restante: str = Field(
+        default="",
+        description="Texto remanescente em ficha_json.magias_texto após a sincronização.",
+    )
+
+
+class TormentaMigrarMagiasJsonRequest(BaseModel):
+    magias_texto: Optional[str] = Field(
+        None,
+        max_length=12000,
+        description="Opcional: sincroniza a lista de magias em texto antes de importar.",
+    )
 
 
 class TormentaEncerrarConcentracaoResponse(BaseModel):

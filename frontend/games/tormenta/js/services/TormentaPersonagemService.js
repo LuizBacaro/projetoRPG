@@ -274,12 +274,14 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao trocar magia conhecida');
     }
 
-    async migrarMagiasDoJson(id) {
-        const res = await fetch(this._url(`/${id}/magias/migrar-do-json`), {
+    async migrarMagiasDoJson(id, body) {
+        const opts = {
             method: 'POST',
-            headers: this._headers(false),
-        });
-        return this._handleResponse(res, 'Erro ao importar magias do texto legado');
+            headers: this._headers(body != null),
+        };
+        if (body != null) opts.body = JSON.stringify(body);
+        const res = await fetch(this._url(`/${id}/magias/migrar-do-json`), opts);
+        return this._handleResponse(res, 'Erro ao sincronizar magias da ficha');
     }
 
     async encerrarConcentracao(id) {

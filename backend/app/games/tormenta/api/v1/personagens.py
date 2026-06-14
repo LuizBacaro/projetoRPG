@@ -42,6 +42,7 @@ from app.games.tormenta.schemas.magia_personagem import (
     TormentaMagiaTrocaRequest,
     TormentaMagiaTrocaResponse,
     TormentaMagiaVinculoCreate,
+    TormentaMigrarMagiasJsonRequest,
     TormentaMigrarMagiasJsonResponse,
 )
 from app.games.tormenta.schemas.personagem import (
@@ -303,13 +304,16 @@ def lancar_magia_gastando_pm(
 )
 def migrar_magias_do_json(
     personagem_id: int,
+    body: TormentaMigrarMagiasJsonRequest = TormentaMigrarMagiasJsonRequest(),
     magias_svc: TormentaPersonagemMagiasService = Depends(
         get_tormenta_personagem_magias_service
     ),
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     try:
-        return magias_svc.migrar_magias_do_json(personagem_id)
+        return magias_svc.migrar_magias_do_json(
+            personagem_id, magias_texto_override=body.magias_texto
+        )
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

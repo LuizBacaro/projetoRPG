@@ -1558,7 +1558,8 @@
 #modalEquipamentos.equipamentos-overlay:not(.is-open),
 #modalTalentosMb.equipamentos-overlay:not(.is-open),
 #modalGrimorioTormenta.equipamentos-overlay:not(.is-open),
-#modalConsumiveisTormenta.equipamentos-overlay:not(.is-open) {
+#modalConsumiveisTormenta.equipamentos-overlay:not(.is-open),
+#modalSubirNivelTormenta.equipamentos-overlay:not(.is-open) {
     display: none !important;
     pointer-events: none;
 }

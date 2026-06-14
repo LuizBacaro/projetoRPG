@@ -29,9 +29,10 @@ Stack vertical da ficha do **Módulo Básico** (cadastro digital, CRUD).
 - `GET /api/v1/tormenta/regras/tracos-raciais-preview?slug=` — bônus mecânicos raciais (`tracos_mecanicos_mb.json`).
 - `GET /api/v1/tormenta/regras/pericias` — DCs padrão; `POST .../pericias/calcular-bonus` e `POST .../pericias/rolar`.
 - `POST /api/v1/tormenta/personagens/{id}/magias/lancar` — debita PM (`pa_atual`) ao lançar magia MB; regista concentração em `ficha_json.tormenta_grimorio_sessao_mb` quando a duração MB exige.
-- `POST /api/v1/tormenta/personagens/{id}/magias/migrar-do-json` — importa `magias_texto` (nomes separados por vírgula/linha) para vínculos SQL.
+- `POST /api/v1/tormenta/personagens/{id}/magias/migrar-do-json` — sincroniza lista de magias em texto (`magias_texto`) para vínculos SQL (chamado automaticamente ao abrir o grimório).
 - `POST /api/v1/tormenta/personagens/{id}/magias/encerrar-concentracao` — remove concentração ativa da sessão.
-- `POST /api/v1/tormenta/combate/rolar-iniciativa|rolar-ataque|rolar-dano` — rolagens na arena (mestre/admin).
+- `POST /api/v1/tormenta/combate/rolar-iniciativa|rolar-ataque|rolar-dano` — rolagens na arena (mestre/admin); dano aplicado dispara teste de concentração (CD 10 + dano).
+- `POST /api/v1/tormenta/combate/testar-resistencia-magia` — teste automático Fort/Ref/Von vs CD (10 + círculo + mod. chave) com bônus RM +4/+8.
 
 **Catálogos SQL (RF-T20–T23):** mantidos em JSON versionado + API `/regras/*`; migração para tabelas SQL só se houver CRUD administrativo ou consultas pesadas (decisão documentada no skill Tormenta).
 

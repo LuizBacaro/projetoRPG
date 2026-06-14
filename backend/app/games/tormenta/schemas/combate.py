@@ -49,3 +49,21 @@ class TormentaCombateRolarDanoRequest(BaseModel):
     mod_atributo: int = Field(0, ge=-99, le=99)
     confirmar_critico: bool = False
     aplicar_ao_alvo_id: Optional[int] = None
+
+
+class TormentaCombateTestarResistenciaMagiaRequest(BaseModel):
+    """Teste de resistência contra magia (MB): CD explícita ou círculo + conjurador."""
+
+    alvo_id: int
+    tipo: Optional[str] = Field(
+        None, description="fortitude | reflexos | vontade (ou infere de magia_slug)"
+    )
+    cd: Optional[int] = Field(None, ge=1, le=99)
+    circulo_magia: Optional[int] = Field(None, ge=0, le=9)
+    conjurador_id: Optional[int] = None
+    magia_slug: Optional[str] = Field(
+        None,
+        max_length=120,
+        description="Opcional: infere tipo de teste do catálogo MB.",
+    )
+    falha_voluntaria: bool = False

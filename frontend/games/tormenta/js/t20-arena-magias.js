@@ -72,7 +72,7 @@
         }
         if (srBonus) {
             partes.push(
-                `<p class="t20-dash-hint"><strong>Resistência à magia (lembrete MB):</strong> +${srBonus} em testes (magia ativa na ficha).</p>`
+                `<p class="t20-dash-hint"><strong>Resistência à magia (MB):</strong> +${srBonus} em testes contra magia${conc ? '' : ' (ativa na sessão ou lembrete do grimório)'}.</p>`
             );
         }
         return partes.join('');
@@ -107,12 +107,22 @@
             .join('')}</ul>`;
     }
 
-    function srBonusDeVinculos(magias) {
+    function lerResistenciaMagia(fichaJson) {
+        const fj = fichaJson && typeof fichaJson === 'object' ? fichaJson : {};
+        const sess = fj.tormenta_grimorio_sessao_mb;
+        if (!sess || typeof sess !== 'object') return null;
+        const b = Number(sess.resistencia_magia_bonus);
+        return Number.isFinite(b) && b > 0 ? b : null;
+    }
+
+    function srBonusDeVinculos(magias, fichaJson) {
+        const ativo = lerResistenciaMagia(fichaJson);
+        if (ativo) return ativo;
         const map = {
-            resistencia_a_magia: 5,
-            resistencia_a_magia_div: 5,
-            resistencia_a_magia_maior: 12,
-            resistencia_a_magia_maior_div: 12,
+            resistencia_a_magia: 4,
+            resistencia_a_magia_div: 4,
+            resistencia_a_magia_maior: 8,
+            resistencia_a_magia_maior_div: 8,
         };
         let best = 0;
         (magias || []).forEach((m) => {
@@ -141,7 +151,7 @@
             const full = await personagemSvc().obter(p.id);
             const pm = full.pa_atual != null ? full.pa_atual : p.pa_atual;
             const conc = lerConcentracao(full.ficha_json);
-            const sr = srBonusDeVinculos(full.magias);
+            const sr = srBonusDeVinculos(full.magias, full.ficha_json);
             const head = montarCabecalhoCombate(conc, sr);
             corpo.innerHTML = montarListaHtml(full.magias, pm, head);
             const btnConc = corpo.querySelector('.t20-arena-encerrar-conc');
@@ -180,6 +190,7 @@
             if (typeof Toast !== 'undefined') {
                 let msg = `Magia lançada (−${res.custo_pm || 0} PM). PM: ${res.pa_atual_depois}/${res.pa_max != null ? res.pa_max : '—'}`;
                 if (res.concentracao_ativa) msg += ` · Concentração: ${res.concentracao_ativa}`;
+                if (res.resistencia_magia_bonus) msg += ` · RM +${res.resistencia_magia_bonus}`;
                 Toast.success(msg);
             }
             const ar = arenaRef();

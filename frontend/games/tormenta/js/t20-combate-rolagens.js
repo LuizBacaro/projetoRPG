@@ -72,8 +72,47 @@
             });
             let msg = `Dano: ${r.dano} (${formula}${mod ? `+${mod}` : ''})`;
             if (r.pv_antes != null) msg += ` · PV ${r.pv_antes}→${r.pv_depois}`;
+            if (r.concentracao && r.concentracao.tinha_concentracao) {
+                const t = r.concentracao.teste || {};
+                const concMsg = r.concentracao.perdida
+                    ? `Concentração perdida (${r.concentracao.magia_anterior || '—'}): ${t.d20}+${t.bonus}=${t.total} vs CD ${t.dc}`
+                    : `Manteve concentração (${r.concentracao.magia_anterior || '—'}): ${t.d20}+${t.bonus}=${t.total} vs CD ${t.dc}`;
+                msg += ` · ${concMsg}`;
+            }
             if (typeof Toast !== 'undefined') Toast.info(msg);
             if (typeof ar.refresh === 'function') await ar.refresh();
+        } catch (e) {
+            if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro');
+        }
+    }
+
+    async function testarResistenciaMagiaPrompt() {
+        const ar = arenaRef();
+        if (!ar || !ar.ativo) return;
+        const alvoId = window.prompt('ID do alvo:', String(ar.ordemIds[ar.turnoIdx] || ''));
+        if (!alvoId) return;
+        const tipo = window.prompt('Tipo (fortitude/reflexos/vontade):', 'vontade');
+        if (!tipo) return;
+        const usarCd = window.confirm('Informar CD manualmente? (Cancelar = calcular por círculo + conjurador)');
+        let payload = { alvo_id: Number(alvoId), tipo };
+        if (usarCd) {
+            const cd = Number(window.prompt('CD do teste:', '15'));
+            if (!Number.isFinite(cd)) return;
+            payload.cd = cd;
+        } else {
+            const circ = Number(window.prompt('Círculo da magia:', '3'));
+            const conjId = window.prompt('ID do conjurador:', String(ar.ordemIds[0] || ''));
+            if (!conjId || !Number.isFinite(circ)) return;
+            payload.circulo_magia = circ;
+            payload.conjurador_id = Number(conjId);
+        }
+        try {
+            const r = await combate().testarResistenciaMagia(payload);
+            const rm = r.bonus_resistencia_magia ? ` (+${r.bonus_resistencia_magia} RM)` : '';
+            const msg = r.falha_voluntaria
+                ? `${r.alvo_nome}: falha voluntária vs CD ${r.cd}`
+                : `${r.alvo_nome}: ${r.d20}+${r.bonus_total}${rm}=${r.total} vs CD ${r.cd} → ${r.passou ? 'PASSOU' : 'FALHOU'}`;
+            if (typeof Toast !== 'undefined') Toast.info(msg);
         } catch (e) {
             if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro');
         }
@@ -94,6 +133,7 @@
         bar.appendChild(mk('Rolar iniciativa', rolarIniciativaTodos));
         bar.appendChild(mk('Rolar ataque', rolarAtaquePrompt));
         bar.appendChild(mk('Rolar dano', rolarDanoPrompt));
+        bar.appendChild(mk('Teste resist. magia', testarResistenciaMagiaPrompt));
     }
 
     document.addEventListener('DOMContentLoaded', () => {
