@@ -3,7 +3,7 @@ NODE   ?= node
 BASE_URL ?= http://localhost:8000
 SNAPSHOT ?= backend/scripts/generated/personagens_snapshot.json
 
-.PHONY: test test-backend test-frontend test-e2e lint format-backend ci-backend-lint backup-personagens restore-personagens seed-magias pad-magias-dev check-magias-catalogo check-magias-producao dev-magias-paridade
+.PHONY: test test-backend test-frontend test-e2e lint format-backend ci-backend-lint install-hooks pre-commit-run backup-personagens restore-personagens seed-magias pad-magias-dev check-magias-catalogo check-magias-producao dev-magias-paridade
 
 ## Roda toda a suite de testes (backend + frontend)
 test: test-backend test-frontend
@@ -37,6 +37,14 @@ ci-backend-lint:
 	  black --check --diff app/ tests/ && \
 	  isort --check-only --diff --profile black app/ tests/ && \
 	  flake8 app/ tests/ --max-line-length=120 --extend-ignore=E203,W503,E402,E501,E712,F401,F403,F541,F841
+
+## Instala git hook pre-commit (.githooks/ — black + isort antes de cada commit)
+install-hooks:
+	./scripts/install-git-hooks.sh
+
+## Formata e valida todo o backend (simula o que o hook faria em massa)
+pre-commit-run: format-backend
+	cd backend && black --check app/ tests/ && isort --check-only --profile black app/ tests/
 
 ## Gera snapshot JSON completo dos personagens do banco configurado em DATABASE_URL
 backup-personagens:

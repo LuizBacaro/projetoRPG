@@ -54,18 +54,30 @@ Referência épica: [07-requisitos-grimorio-mb-144-209.md](07-requisitos-grimori
 |------|--------|-------|
 | `TormentaGrimorioService.js` | ✅ | |
 | Modal / botão `btnT20Grimorio` na ficha | ✅ | `ficha-personagem.html` |
-| Migrar só `magias_texto` → SQL | ⏳ | Opcional; endpoint migração idempotente quando necessário |
-| Página dedicada `/grimorio-tormenta` | ⏳ | Modal cobre MVP; rewrite Vercel se quiser URL própria |
+| Migrar só `magias_texto` → SQL | ✅ | `POST …/magias/migrar-do-json` + botão no modal grimório |
+| Filtro escola no catálogo | ✅ | `grimorioTormentaFiltroEscola` |
+| Troca magia bardo (RF-T42c) | ✅ | Catálogo em modo troca (sem prompt de slug) |
+| Página dedicada `/grimorio-tormenta` | ✅ | Rewrite Vercel; modal na ficha cobre MVP |
 
 **Conclusão G0–G2:** **fechadas** para desenvolvimento backend/regras. Produto pode marcar Tormenta `disponivel` no catálogo (já em `game_catalog.py`).
 
 ---
 
-## G5 — Próximo (fora deste fechamento)
+## G5 — Catálogo MB (metadados pp.150–209)
 
-- Seed privado com lista completa MB p.150–209 (licença).
-- Reduzir stubs no JSON público.
-- Automação de PM gasto na sessão (opcional; hoje lembrete em `ficha_json`).
+| Item | Estado | Notas |
+|------|--------|-------|
+| Listagem pp.307–317 (~706 magias) | ✅ | `build_magias_mb_catalogo_from_listagem_txt.py` |
+| Enriquecimento escola/execução (PDF privado) | ✅ | `enrich_magias_mb_catalogo.py` + `magias_mb_nome_aliases.json`; `g5_estado: enriquecimento_completo` |
+| Texto integral no repo público | ❌ | RF-T46 / licença — usar livro na mesa |
+| 4 stubs de teste | ✅ | `escola: Geral` |
+
+---
+
+## G6 — Combate conjuração (próximo)
+
+- Concentração: registo ao lançar; encerrar na ficha/arena (**MVP feito**).
+- Resistência à magia ativa: lembrete na arena; motor completo → backlog.
 
 ---
 

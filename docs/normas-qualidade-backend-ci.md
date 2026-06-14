@@ -23,6 +23,36 @@ cd backend
 pip install black==24.10.0 isort==5.13.2 flake8==7.1.1
 ```
 
+### Hook git (recomendado — evita falha no deploy)
+
+Instale **uma vez** por clone do repositório:
+
+```bash
+make install-hooks
+# ou: ./scripts/install-git-hooks.sh
+```
+
+Isso configura `core.hooksPath=.githooks` e instala **black** + **isort** (versões em `backend/requirements-dev.txt`).
+
+Antes de cada `git commit`, o script `.githooks/pre-commit` executa automaticamente em ficheiros `.py` staged em `backend/app/` e `backend/tests/`:
+
+1. **black** (formata)
+2. **isort** com `--profile black` (ordena imports)
+3. Re-adiciona os ficheiros formatados ao stage
+4. Valida com `--check` / `--check-only`
+
+Se algo falhar, o commit é bloqueado.
+
+Comandos úteis:
+
+```bash
+make pre-commit-run      # formata tudo + valida black/isort
+make format-backend      # corrige black + isort manualmente
+make ci-backend-lint     # verificação completa (inclui flake8), igual ao CI
+```
+
+Alternativa opcional: [pre-commit framework](https://pre-commit.com/) via `.pre-commit-config.yaml` (`pip install pre-commit && pre-commit install`).
+
 ### Comando único recomendado (antes de cada push)
 
 Na raiz do repositório:

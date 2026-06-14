@@ -96,7 +96,7 @@ Este documento alinha a **implementação futura do grimório** na Arena TTRPG c
 | **G2** | Motor PM + habilidade-chave + custo PM/círculo em `rules/conjuracao_t20.py` + `GET /tormenta/regras/conjuracao-mb` | RF-T41–T43 — **feito**; multiclasse e ajustes finos → backlog |
 | **G3** | SQL `tormenta_magias_personagem` + `GET/POST/DELETE .../personagens/{id}/magias` + `magias` no `GET` personagem | **Feito**; migrar `ficha_json.magias_texto` → opcional (G4) |
 | **G4** | `TormentaGrimorioService.js` + UI (modal ou página) + botão na ficha (substituir placeholder `btnT20Grimorio`) | Paridade G0–G3 |
-| **G5** | Lista completa p.150–209 no catálogo (importação privada / seed) | Licença + pipeline |
+| **G5** | Lista completa pp.307–317 + metadados MB (escola, execução, etc.) via pipeline privado PDF pp.150–209 | **Feito** no repo (sem texto longo RF-T46) |
 
 ---
 

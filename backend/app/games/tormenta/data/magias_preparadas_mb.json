@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 MB — teto diário de magias preparadas.",
+    "nota": "Fórmula típica MB: nível de conjuração + modificador da habilidade-chave (mín. 1). Mago exige magia no livro; divinos preparam da lista completa."
+  },
+  "classes": {
+    "mago": {
+      "formula": "nivel_mais_mod_habilidade",
+      "habilidade_chave": "int",
+      "minimo": 1,
+      "truques_contam_no_teto": false,
+      "exige_grimorio": true
+    },
+    "clerigo": {
+      "formula": "nivel_mais_mod_habilidade",
+      "habilidade_chave": "sab",
+      "minimo": 1,
+      "truques_contam_no_teto": false,
+      "exige_grimorio": false
+    },
+    "druida": {
+      "formula": "nivel_mais_mod_habilidade",
+      "habilidade_chave": "sab",
+      "minimo": 1,
+      "truques_contam_no_teto": false,
+      "exige_grimorio": false
+    },
+    "paladino": {
+      "formula": "nivel_mais_mod_habilidade",
+      "habilidade_chave": "sab",
+      "minimo": 1,
+      "truques_contam_no_teto": false,
+      "exige_grimorio": false
+    },
+    "ranger": {
+      "formula": "nivel_mais_mod_habilidade",
+      "habilidade_chave": "sab",
+      "minimo": 1,
+      "truques_contam_no_teto": false,
+      "exige_grimorio": false
+    }
+  }
+}

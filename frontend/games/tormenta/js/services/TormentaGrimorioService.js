@@ -31,4 +31,8 @@ class TormentaGrimorioService {
     obterPersonagem(personagemId) {
         return this._personagem.obter(personagemId);
     }
+
+    lancarMagiaGastandoPm(personagemId, magiaSlug) {
+        return this._personagem.lancarMagia(personagemId, magiaSlug);
+    }
 }

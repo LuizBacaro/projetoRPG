@@ -10,49 +10,56 @@
       "habilidade_chave": "car",
       "pm_constante": 1,
       "pm_por_nivel": 2,
-      "conjuracao_inicia_nivel": 1
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "espontaneo"
     },
     {
       "slug": "clerigo",
       "habilidade_chave": "sab",
       "pm_constante": 1,
       "pm_por_nivel": 3,
-      "conjuracao_inicia_nivel": 1
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "preparar"
     },
     {
       "slug": "druida",
       "habilidade_chave": "sab",
       "pm_constante": 1,
       "pm_por_nivel": 3,
-      "conjuracao_inicia_nivel": 1
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "preparar"
     },
     {
       "slug": "feiticeiro",
       "habilidade_chave": "car",
       "pm_constante": 3,
       "pm_por_nivel": 3,
-      "conjuracao_inicia_nivel": 1
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "espontaneo"
     },
     {
       "slug": "mago",
       "habilidade_chave": "int",
       "pm_constante": 1,
       "pm_por_nivel": 3,
-      "conjuracao_inicia_nivel": 1
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "preparar"
     },
     {
       "slug": "paladino",
       "habilidade_chave": "sab",
       "pm_constante": 1,
       "pm_por_nivel": 1,
-      "conjuracao_inicia_nivel": 5
+      "conjuracao_inicia_nivel": 5,
+      "modo_conjuracao": "preparar"
     },
     {
       "slug": "ranger",
       "habilidade_chave": "sab",
       "pm_constante": 1,
       "pm_por_nivel": 1,
-      "conjuracao_inicia_nivel": 5
+      "conjuracao_inicia_nivel": 5,
+      "modo_conjuracao": "preparar"
     }
   ]
 }

@@ -3243,9 +3243,16 @@ class GrimorioController {
     }
 }
 
-// Inicializacao
+// Inicializacao — apenas ficha D&D 3.5 (5e usa ficha-dnd5e-grimorio-bootstrap.js)
+
+function _ehPaginaGrimorioDnd35() {
+    if (document.body?.dataset?.game === 'dnd5e') return false;
+    return /\/games\/dnd35\//.test(window.location.pathname);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+    if (!_ehPaginaGrimorioDnd35()) return;
+
     installGlobalErrorGuards('grimorio-page');
     const tentarInicializar = setInterval(() => {
         try {

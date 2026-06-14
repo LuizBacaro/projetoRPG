@@ -1,9 +1,9 @@
 /**
  * Inicializa Dnd5eGrimorioController na ficha D&D 5e (APIs 5e + UI de preview PT).
  */
-import { Dnd5eGrimorioController } from '../controllers/Dnd5eGrimorioController.js?v=20260520b';
+import { Dnd5eGrimorioController } from '../controllers/Dnd5eGrimorioController.js?v=20260614a';
 import { Dnd5eGrimorioService } from '../services/Dnd5eGrimorioService.js';
-import { Dnd5eMagiaService } from '../services/Dnd5eMagiaService.js?v=2';
+import { Dnd5eMagiaService } from '../services/Dnd5eMagiaService.js?v=20260614a';
 import { Dnd5eMagiaPreparadaAdapter } from '../services/Dnd5eMagiaPreparadaAdapter.js';
 import {
     isClasseConjuradora,

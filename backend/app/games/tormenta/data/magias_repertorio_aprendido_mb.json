@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 MB — magias aprendidas no repertório (clérigo, druida, paladino, ranger).",
+    "nota": "Mesma progressão do grimório do mago: 3 magias de 1º círculo + mod. SAB no 1º nível de conjuração, +2 por nível seguinte. Preces (truques) não consomem orçamento."
+  },
+  "classes": {
+    "clerigo": {
+      "magias_por_nivel_apos_1": 2,
+      "truques_contam_no_orcamento": false,
+      "inicial": {
+        "magias_circulo_1": 3,
+        "bonus_mod_habilidade_circulo_1": true
+      }
+    },
+    "druida": {
+      "magias_por_nivel_apos_1": 2,
+      "truques_contam_no_orcamento": false,
+      "inicial": {
+        "magias_circulo_1": 3,
+        "bonus_mod_habilidade_circulo_1": true
+      }
+    },
+    "paladino": {
+      "magias_por_nivel_apos_1": 2,
+      "truques_contam_no_orcamento": false,
+      "inicial": {
+        "magias_circulo_1": 3,
+        "bonus_mod_habilidade_circulo_1": true
+      }
+    },
+    "ranger": {
+      "magias_por_nivel_apos_1": 2,
+      "truques_contam_no_orcamento": false,
+      "inicial": {
+        "magias_circulo_1": 3,
+        "bonus_mod_habilidade_circulo_1": true
+      }
+    }
+  }
+}

@@ -1,94 +1,25 @@
-# FEATURE: Sistema de Raças Tormenta RPG
+# FEATURE: Raças Tormenta 20 (MB)
 
-## Descrição Breve
-Criar 8 raças jogáveis (Anões, Elfos, Goblins, Halflings, Humanos, Lefou, Minotauros, Qareen) com modificadores de habilidades, tamanho, velocidade e habilidades raciais.
+> **Alinhamento:** 11 raças em `racas_mb.json` (+ gnomo, meio-elfo, meio-orc). Ajustes MB (+4/+2/-2), não +2/-2 do d20 antigo.
 
-## Regra Principal
-Cada raça aplica bônus/penalidades a habilidades, define tamanho e velocidade base, e fornece habilidades especiais únicas.
+## Descrição
+Raças jogáveis com ajustes de atributo, traços textuais e **efeitos mecânicos** resumidos.
 
-## Dados/Campos Necessários
-- race: enum — "Anao" | "Elfo" | "Goblin" | "Halfling" | "Humano" | "Lefou" | "Minotauro" | "Qareen"
-- raceName: string
-- raceDescription: string
+## Dados
+- Catálogo: `backend/app/games/tormenta/data/racas_mb.json`
+- Efeitos mecânicos: `data/tracos_mecanicos_mb.json`
+- API: `GET /tormenta/regras/racas`, `GET /tormenta/regras/tracos-raciais-preview?slug=`
 
-## Modificadores Raciais de Habilidades
+## Estado de implementação
 
-| Raça | STR | DEX | CON | INT | WIS | CHA | TAM | VEL |
-|------|-----|-----|-----|-----|-----|-----|-----|-----|
-| Anão | — | -2 | +2 | — | — | -2 | P | 6m |
-| Elfo | — | +2 | — | +2 | — | — | P | 9m |
-| Goblin | — | +2 | — | — | -2 | — | P | 6m |
-| Halfling | — | +2 | — | — | — | — | P | 6m |
-| Humano | — | — | — | — | — | — | M | 9m |
-| Lefou | -2 | — | — | — | +2 | — | P | 6m |
-| Minotauro | +2 | — | — | -2 | — | — | M | 9m |
-| Qareen | — | — | — | — | — | +2 | M | 9m |
+| Item | Estado |
+|------|--------|
+| 11 raças MB + API | **Feito** |
+| Ajustes + humano/lefou +2 escolha | **Feito** (UI ficha) |
+| Texto `tracos_resumo` na ficha | **Feito** |
+| Motor mecânico (CA Pequeno, resistências, perícias) | **Feito** (`tracos_raciais_t20.py` + `t20-tracos-raciais.js`) |
+| Deformidade lefou / domínio qareen (escolhas UI) | **Parcial** (texto; flags futuras) |
+| Deslocamento/tamanho automático por raça | **Feito** (preview + tags ficha) |
 
-*TAM: P=Pequeno, M=Médio | VEL: Velocidade de movimento*
-
-## Características Especiais por Raça
-
-### Anão
-- Visão no escuro 18m
-- Resistência contra magia: +2
-- Bônus +1 com armas anãs (machadinha, machado grande)
-- Ausência de ferro: falha automática em testes contra magia de ferro mágico
-
-### Elfo
-- Visão noturna 60m (preto e branco)
-- Imunidade a sono mágico e encantamento
-- Bônus +2 em Percepção (ouvida e visão)
-- Arco longo adicional na tabela de favoritas
-
-### Goblin
-- Visão no escuro 18m
-- Bônus +2 em Enganação e Furtividade
-- Tamanho pequeno: passe em espaços de 30cm
-- Fraqueza a fogo: -2 em testes de resistência contra
-
-### Halfling
-- Sorte (+1 em testes de ataque e resistência)
-- Tamanho pequeno: passe em espaços de 30cm
-- Bônus +2 em Furtividade
-- Ligeireza: +3m em movimento
-
-### Humano
-- Sem penalidades ou bônus especiais
-- Um talento extra no nível 1
-- Progressão versátil: melhor para multiclasse
-
-### Lefou
-- Visão normal (apesar do tamanho pequeno)
-- Tamanho pequeno: passe em espaços de 30cm
-- Regeneração: recupera 1 PV por 10 minutos em repouso
-- Bônus +2 em Sobrevivência
-
-### Minotauro
-- Chifres: ataque natural 1d6 (STR mod)
-- Tamanho médio: mas fraqueza a espaços fechados
-- Bônus +2 em Intimidação
-- Bônus +3 ao derrubar inimigos (special feat)
-
-### Qareen
-- Resistência ao fogo: reduz dano em 5 pontos
-- Ênfase em magia: +1 espaço de feitiço arcano
-- Bônus +2 em Identificar Magia
-- Herança divina: acesso a magias de domínio
-
-## Aplicação dos Modificadores
-Somar bônus raciais ao valor base ANTES de calcular modificador.
-
-**Exemplo**: Elfo com Inteligência 15
-- Base: 15
-- Bônus racial: +2
-- Final: 17
-- Modificador: +3
-
-## Validações
-- Raça deve estar em enum de 8 raças
-- Modificadores aplicados automaticamente
-- Valores finais não podem exceder 25
-- Tamanho reflete em resistência a combate (Pequeno = bônus defesa vs. grandes)
-
-## Referência do Livro
-Capítulo 2: Raças | Características raciais específicas
+## Referência
+MB Cap. 2 — Raças (p.30–42).

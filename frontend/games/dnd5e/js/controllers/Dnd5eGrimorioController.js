@@ -1,10 +1,54 @@
 /**
  * Grimório D&D 5e — estende o controller compartilhado com preview PT e metadados PHB.
  */
-import { GrimorioController } from '/games/dnd35/js/controllers/GrimorioController.js?v=20260521a';
+import { GrimorioController } from '/games/dnd35/js/controllers/GrimorioController.js?v=20260614a';
 import { escapeHtml } from '/games/dnd35/js/utils/formatters.js';
+import { Dnd5eMagiaService } from '../services/Dnd5eMagiaService.js?v=20260614a';
 
 export class Dnd5eGrimorioController extends GrimorioController {
+    constructor(
+        combatente,
+        token,
+        magiaService = null,
+        grimorioService = null,
+        magiaPreparadaService = null
+    ) {
+        const magiaSvc =
+            magiaService instanceof Dnd5eMagiaService ? magiaService : new Dnd5eMagiaService(token);
+        super(combatente, token, magiaSvc, grimorioService, magiaPreparadaService);
+    }
+
+    async _carregarCatalogoClasse({ forceRefresh = false } = {}) {
+        const classeApi = this._classeCatalogoApi();
+        if (!classeApi) {
+            this.catalogoClasse = [];
+            this.catalogoIndex = new Map();
+            return;
+        }
+
+        if (forceRefresh) {
+            if (typeof this.magiaService.limparCacheClasse === 'function') {
+                this.magiaService.limparCacheClasse(classeApi);
+            } else if (typeof this.magiaService.limparCache === 'function') {
+                this.magiaService.limparCache();
+            } else if (this.magiaService._cache instanceof Map) {
+                const slug =
+                    typeof this.magiaService._normalizarClasse === 'function'
+                        ? this.magiaService._normalizarClasse(classeApi)
+                        : String(classeApi || '').toLowerCase();
+                if (slug) this.magiaService._cache.delete(slug);
+            }
+        }
+
+        const listar =
+            typeof this.magiaService.listarTodasPorClasse === 'function'
+                ? (classe, opts) => this.magiaService.listarTodasPorClasse(classe, opts)
+                : (classe, opts) => this.magiaService.listarPorClasse(classe, opts);
+
+        this.catalogoClasse = await listar(classeApi, { forceRefresh });
+        this.catalogoIndex = new Map(this.catalogoClasse.map((magia) => [Number(magia.id), magia]));
+    }
+
     _ehModo5e() {
         return true;
     }

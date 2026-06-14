@@ -5,6 +5,9 @@ geralmente via:
 
   pdftotext -f 307 -l 317 tormenta-rpg-modulo-basico.pdf listagem_magias_mb_pp307-317.txt
 
+Metadados estruturados (escola, execução, etc.) podem ser fundidos depois com
+`enrich_magias_mb_catalogo.py` a partir de pp.150–209 (PDF licenciado).
+
 Uso:
   python3 backend/scripts/build_magias_mb_catalogo_from_listagem_txt.py \\
       backend/app/games/tormenta/data/sources/listagem_magias_mb_pp307-317.txt \\

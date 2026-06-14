@@ -9,6 +9,7 @@
     { "source": "/pericias", "destination": "/games/dnd35/pages/pericias.html" },
     { "source": "/arena", "destination": "/games/dnd35/arena.html" },
     { "source": "/tormenta/dashboard", "destination": "/games/tormenta/pages/dashboard.html" },
+    { "source": "/tormenta/grimorio", "destination": "/games/tormenta/pages/grimorio-tormenta.html" },
     { "source": "/dnd5e/dashboard", "destination": "/games/dnd5e/pages/dashboard.html" },
     { "source": "/dnd5e/ficha", "destination": "/games/dnd5e/pages/ficha-personagem.html" },
     { "source": "/dnd5e/arena", "destination": "/games/dnd5e/pages/arena.html" }

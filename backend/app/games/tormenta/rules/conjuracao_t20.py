@@ -53,6 +53,9 @@ def lista_regras_conjuracao_classe_mb() -> List[Dict[str, Any]]:
                 "pm_constante": pm_c,
                 "pm_por_nivel": pm_n,
                 "conjuracao_inicia_nivel": ini,
+                "modo_conjuracao": str(
+                    row.get("modo_conjuracao", "preparar") or "preparar"
+                ),
             }
         )
     return sorted(out, key=lambda x: x["slug"])

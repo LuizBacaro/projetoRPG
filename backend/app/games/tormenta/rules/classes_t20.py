@@ -79,24 +79,27 @@ def lista_classes_mb() -> List[Dict[str, Any]]:
                 kk = str(k).strip()
                 if kk.isdigit() and 1 <= int(kk) <= 40:
                     hab_limpo[kk] = str(v or "").strip()
-        out.append(
-            {
-                "slug": slug,
-                "nome": nome,
-                "abreviatura": str(row.get("abreviatura", "") or "").strip(),
-                "bba_tipo": bba_tipo,
-                "pv_inicial": int(row.get("pv_inicial", 8) or 8),
-                "pv_por_nivel": int(row.get("pv_por_nivel", 2) or 0),
-                "pericias_treinadas": str(
-                    row.get("pericias_treinadas", "") or ""
-                ).strip(),
-                "pericias_classe": str(row.get("pericias_classe", "") or "").strip(),
-                "talentos_adicionais": str(
-                    row.get("talentos_adicionais", "") or ""
-                ).strip(),
-                "habilidades_por_nivel": hab_limpo,
-            }
-        )
+        base_pt = row.get("pericias_treinadas_base")
+        item: Dict[str, Any] = {
+            "slug": slug,
+            "nome": nome,
+            "abreviatura": str(row.get("abreviatura", "") or "").strip(),
+            "bba_tipo": bba_tipo,
+            "pv_inicial": int(row.get("pv_inicial", 8) or 8),
+            "pv_por_nivel": int(row.get("pv_por_nivel", 2) or 0),
+            "pericias_treinadas": str(row.get("pericias_treinadas", "") or "").strip(),
+            "pericias_classe": str(row.get("pericias_classe", "") or "").strip(),
+            "talentos_adicionais": str(
+                row.get("talentos_adicionais", "") or ""
+            ).strip(),
+            "habilidades_por_nivel": hab_limpo,
+        }
+        if base_pt is not None:
+            try:
+                item["pericias_treinadas_base"] = int(base_pt)
+            except (TypeError, ValueError):
+                pass
+        out.append(item)
     return out
 
 
