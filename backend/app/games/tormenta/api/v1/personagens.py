@@ -10,6 +10,7 @@ from app.core.dependencies import (
     get_tormenta_personagem_equipamentos_service,
     get_tormenta_personagem_inventario_legado_service,
     get_tormenta_personagem_magias_service,
+    get_tormenta_personagem_progressao_service,
     get_tormenta_personagem_service,
     get_tormenta_personagem_talentos_service,
 )
@@ -29,13 +30,29 @@ from app.games.tormenta.schemas.inventario_legado import (
     TormentaInventarioLegadoImportResponse,
 )
 from app.games.tormenta.schemas.magia_personagem import (
+    TormentaEncerrarConcentracaoResponse,
+    TormentaMagiaLancarRequest,
+    TormentaMagiaLancarResponse,
     TormentaMagiaPersonagemItem,
+    TormentaMagiasConhecidasPreviewResponse,
+    TormentaMagiasGrimorioPreviewResponse,
+    TormentaMagiasLimparPreparadasResponse,
+    TormentaMagiasPreparadasPreviewResponse,
+    TormentaMagiasRepertorioPreviewResponse,
+    TormentaMagiaTrocaRequest,
+    TormentaMagiaTrocaResponse,
     TormentaMagiaVinculoCreate,
+    TormentaMigrarMagiasJsonResponse,
 )
 from app.games.tormenta.schemas.personagem import (
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
     TormentaPersonagemUpdate,
+)
+from app.games.tormenta.schemas.progressao import (
+    TormentaSubirNivelAplicarRequest,
+    TormentaSubirNivelAplicarResponse,
+    TormentaSubirNivelPreviewResponse,
 )
 from app.games.tormenta.schemas.talento_personagem import (
     TormentaMigrarTalentosJsonResponse,
@@ -53,6 +70,9 @@ from app.games.tormenta.services.personagem_inventario_legado_service import (
 )
 from app.games.tormenta.services.personagem_magias_service import (
     TormentaPersonagemMagiasService,
+)
+from app.games.tormenta.services.personagem_progressao_service import (
+    TormentaPersonagemProgressaoService,
 )
 from app.games.tormenta.services.personagem_service import TormentaPersonagemService
 from app.games.tormenta.services.personagem_talentos_service import (
@@ -252,6 +272,213 @@ def remover_magia_do_personagem(
 ):
     try:
         magias_svc.remover_vinculo(personagem_id, vinculo_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/magias/lancar",
+    response_model=TormentaMagiaLancarResponse,
+)
+def lancar_magia_gastando_pm(
+    personagem_id: int,
+    payload: TormentaMagiaLancarRequest,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        data = magias_svc.lancar_magia_gastando_pm(personagem_id, payload.magia_slug)
+        return TormentaMagiaLancarResponse(**data)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/magias/migrar-do-json",
+    response_model=TormentaMigrarMagiasJsonResponse,
+)
+def migrar_magias_do_json(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return magias_svc.migrar_magias_do_json(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/magias/encerrar-concentracao",
+    response_model=TormentaEncerrarConcentracaoResponse,
+)
+def encerrar_concentracao_magia_mb(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return magias_svc.encerrar_concentracao_mb(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/magias/conhecidas-preview",
+    response_model=TormentaMagiasConhecidasPreviewResponse,
+)
+def preview_magias_conhecidas_personagem(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        data = magias_svc.preview_conhecidas_mb(personagem_id)
+        return TormentaMagiasConhecidasPreviewResponse(**data)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/magias/trocar",
+    response_model=TormentaMagiaTrocaResponse,
+)
+def trocar_magia_conhecida_bardo(
+    personagem_id: int,
+    payload: TormentaMagiaTrocaRequest,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return magias_svc.trocar_magia_conhecida_bardo(personagem_id, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/magias/grimorio-preview",
+    response_model=TormentaMagiasGrimorioPreviewResponse,
+)
+def preview_grimorio_personagem(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        data = magias_svc.preview_grimorio_mb(personagem_id)
+        return TormentaMagiasGrimorioPreviewResponse(**data)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/magias/repertorio-preview",
+    response_model=TormentaMagiasRepertorioPreviewResponse,
+)
+def preview_repertorio_personagem(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        data = magias_svc.preview_repertorio_mb(personagem_id)
+        return TormentaMagiasRepertorioPreviewResponse(**data)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/magias/preparadas-preview",
+    response_model=TormentaMagiasPreparadasPreviewResponse,
+)
+def preview_preparadas_personagem(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        data = magias_svc.preview_preparadas_mb(personagem_id)
+        return TormentaMagiasPreparadasPreviewResponse(**data)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/magias/limpar-preparadas",
+    response_model=TormentaMagiasLimparPreparadasResponse,
+)
+def limpar_magias_preparadas_personagem(
+    personagem_id: int,
+    magias_svc: TormentaPersonagemMagiasService = Depends(
+        get_tormenta_personagem_magias_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        n = magias_svc.limpar_preparadas(personagem_id)
+        return TormentaMagiasLimparPreparadasResponse(removidas=n)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.get(
+    "/{personagem_id}/subir-nivel-preview",
+    response_model=TormentaSubirNivelPreviewResponse,
+)
+def preview_subir_nivel_personagem(
+    personagem_id: int,
+    nivel_alvo: int = Query(
+        ..., ge=1, le=40, description="Próximo nível (deve ser atual + 1)."
+    ),
+    prog_svc: TormentaPersonagemProgressaoService = Depends(
+        get_tormenta_personagem_progressao_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return prog_svc.preview_subir_nivel(personagem_id, nivel_alvo)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/subir-nivel",
+    response_model=TormentaSubirNivelAplicarResponse,
+)
+def aplicar_subir_nivel_personagem(
+    personagem_id: int,
+    payload: TormentaSubirNivelAplicarRequest,
+    prog_svc: TormentaPersonagemProgressaoService = Depends(
+        get_tormenta_personagem_progressao_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return prog_svc.aplicar_subir_nivel(personagem_id, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

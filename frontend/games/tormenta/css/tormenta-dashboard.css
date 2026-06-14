@@ -817,6 +817,38 @@
     box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
 }
 
+.t20-arena-magias-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: min(52vh, 28rem);
+    overflow-y: auto;
+}
+
+.t20-arena-magia-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--t20-border, rgba(255, 255, 255, 0.12));
+    border-radius: 6px;
+}
+
+.t20-arena-magia-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.t20-arena-magia-meta .t20-hint {
+    font-size: 0.72rem;
+}
+
 .t20-arena-btn-cond {
     border: 2px solid rgba(60, 35, 20, 0.35) !important;
     background: linear-gradient(180deg, rgba(255, 254, 248, 0.95), rgba(235, 226, 214, 0.95)) !important;

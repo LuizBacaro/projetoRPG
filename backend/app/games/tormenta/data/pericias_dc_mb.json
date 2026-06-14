@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 MB — tabela de dificuldades padrão (referência para calculadora de perícias)."
+  },
+  "dificuldades": [
+    { "rotulo": "Muito fácil", "dc": 5 },
+    { "rotulo": "Fácil", "dc": 10 },
+    { "rotulo": "Médio", "dc": 15 },
+    { "rotulo": "Difícil", "dc": 20 },
+    { "rotulo": "Muito difícil", "dc": 25 },
+    { "rotulo": "Quase impossível", "dc": 30 }
+  ],
+  "pericias_exemplos": {
+    "Acrobacia": { "facil": 10, "medio": 15, "dificil": 20 },
+    "Ladinagem": { "facil": 10, "medio": 15, "dificil": 20 },
+    "Percepção": { "facil": 10, "medio": 15, "dificil": 20 },
+    "Sobrevivência": { "facil": 10, "medio": 15, "dificil": 20 }
+  }
+}

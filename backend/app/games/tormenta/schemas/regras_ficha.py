@@ -109,6 +109,12 @@ class TormentaClasseMbItem(BaseModel):
     pv_inicial: int = Field(..., ge=1, le=99)
     pv_por_nivel: int = Field(..., ge=0, le=30)
     pericias_treinadas: str = Field(default="", max_length=200)
+    pericias_treinadas_base: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=20,
+        description="Vagas de perícia treinada da classe (antes do mod. INT e bônus racial).",
+    )
     pericias_classe: str = Field(default="", max_length=2000)
     talentos_adicionais: str = Field(default="", max_length=2000)
     habilidades_por_nivel: Dict[str, str] = Field(
@@ -132,6 +138,11 @@ class TormentaDivindadeMbOpcao(BaseModel):
         ...,
         max_length=120,
         description="Texto canónico no combo e no banco (`divindade`).",
+    )
+    truque_devocao_slug: Optional[str] = Field(
+        default=None,
+        max_length=80,
+        description="Prece de devoção (círculo 0) concedida a devotos — RF-T44d.",
     )
 
 
@@ -284,6 +295,10 @@ class TormentaConjuracaoClasseMbItem(BaseModel):
         le=20,
         description="Nível mínimo da classe em que há conjuração (ex.: 5 para paladino/ranger com magias).",
     )
+    modo_conjuracao: Literal["preparar", "espontaneo"] = Field(
+        default="preparar",
+        description="preparar (mago/clérigo/druida/paladino/ranger) ou espontaneo (bardo/feiticeiro).",
+    )
 
 
 class TormentaConjuracaoCustoCirculoItem(BaseModel):
@@ -344,3 +359,107 @@ class TormentaConjuracaoPreviewResponse(BaseModel):
         le=9,
         description="Maior círculo lançável neste nível (0 = só truques); null se a classe não usa lista MB.",
     )
+
+
+class TormentaTracosRaciaisPreviewResponse(BaseModel):
+    slug: str
+    encontrado: bool
+    tamanho: Optional[str] = None
+    deslocamento_m: Optional[int] = None
+    ca_bonus: int = 0
+    ca_vs_grande_ou_maior: int = 0
+    ataque_bonus: int = 0
+    furtividade_bonus: int = 0
+    fortitude_bonus: int = 0
+    reflexos_bonus: int = 0
+    vontade_bonus: int = 0
+    pericias_bonus: Dict[str, int] = Field(default_factory=dict)
+
+
+class TormentaDificuldadePadraoItem(BaseModel):
+    rotulo: str
+    dc: int
+
+
+class TormentaRegrasPericiasResponse(BaseModel):
+    dificuldades: List[TormentaDificuldadePadraoItem]
+    bonus_treinado: int = 2
+
+
+class TormentaPericiaBonusRequest(BaseModel):
+    nivel: int = Field(1, ge=1, le=40)
+    mod_atributo: int = Field(0, ge=-99, le=99)
+    treinado: bool = False
+    graduacao: int = Field(0, ge=0, le=99)
+    outros: int = Field(0, ge=-99, le=99)
+    racial_bonus: int = Field(0, ge=-99, le=99)
+    penalidade_armadura: int = Field(0, ge=0, le=99)
+    pericia_de_classe: bool = False
+    nome_pericia: Optional[str] = Field(None, max_length=120)
+    slug_raca: Optional[str] = Field(None, max_length=40)
+
+
+class TormentaPericiaBonusResponse(BaseModel):
+    bonus_total: int
+    meio_nivel: int
+    percepcao_passiva: Optional[int] = None
+
+
+class TormentaPericiaRolarRequest(BaseModel):
+    bonus: int = Field(0, ge=-99, le=99)
+    dc: int = Field(15, ge=0, le=99)
+
+
+class TormentaPericiaRolarResponse(BaseModel):
+    d20: int
+    bonus: int
+    total: int
+    dc: int
+    sucesso: bool
+    falha_critica: bool
+    sucesso_critico: bool
+    margem: int
+
+
+class TormentaPvPreviewResponse(BaseModel):
+    classe_slug: str = Field(..., max_length=40)
+    classe_nome: str = Field(default="", max_length=80)
+    encontrado: bool = True
+    nivel: int = Field(..., ge=1, le=40)
+    pv_inicial: Optional[int] = Field(default=None, ge=1, le=99)
+    pv_por_nivel: Optional[int] = Field(default=None, ge=0, le=30)
+    mod_con: int = Field(default=0, ge=-99, le=99)
+    contrib_niveis_extras: Optional[int] = Field(default=None, ge=0, le=999)
+    contrib_constituicao: Optional[int] = Field(default=None, ge=-999, le=999)
+    pv_max: Optional[int] = Field(default=None, ge=1, le=999)
+
+
+class TormentaPericiaFichaItem(BaseModel):
+    nome: str = Field(default="", max_length=120)
+    treinado: bool = False
+    graduacao: int = Field(default=0, ge=0, le=99)
+    total: Optional[int] = Field(default=None, ge=0, le=99)
+
+
+class TormentaPericiasValidarCriacaoRequest(BaseModel):
+    nivel: int = Field(1, ge=1, le=40)
+    classe_slug: str = Field(..., min_length=1, max_length=40)
+    int_valor: int = Field(10, ge=0, le=99)
+    slug_raca: Optional[str] = Field(None, max_length=40)
+    pericias: List[TormentaPericiaFichaItem] = Field(default_factory=list)
+
+
+class TormentaPericiasValidarCriacaoResponse(BaseModel):
+    valido: bool
+    motivo: str = Field(default="", max_length=500)
+    vagas_treinadas: Optional[int] = Field(default=None, ge=0, le=99)
+    usadas_treinadas: int = Field(default=0, ge=0, le=99)
+    pontos_grad_treinadas: int = Field(default=0, ge=0, le=99)
+    gasto_grad_treinadas: int = Field(default=0, ge=0, le=99)
+    pontos_grad_nao_treinadas: int = Field(default=0, ge=0, le=99)
+    gasto_grad_nao_treinadas: int = Field(default=0, ge=0, le=99)
+    graduacao_pericias_texto: str = Field(default="", max_length=40)
+    mod_int: int = Field(default=0, ge=-99, le=99)
+    pericias_treinadas_extra_racial: int = Field(default=0, ge=0, le=20)
+    nivel: int = Field(default=1, ge=1, le=40)
+    classe_slug: str = Field(default="", max_length=40)

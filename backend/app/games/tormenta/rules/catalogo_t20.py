@@ -309,6 +309,64 @@ def metadados_magia_mb_por_slug(slug: str) -> Dict[str, Any] | None:
     return None
 
 
+def _norm_nome_magia_mb(texto: str) -> str:
+    import unicodedata
+
+    s = unicodedata.normalize("NFKD", str(texto or "").strip().lower())
+    return "".join(ch for ch in s if not unicodedata.combining(ch))
+
+
+def resolver_magia_mb_slug_por_texto(
+    texto: str,
+    *,
+    tipo_preferido: Optional[str] = None,
+) -> Optional[str]:
+    """Resolve nome livre ou slug para slug do catálogo MB."""
+    raw = str(texto or "").strip()
+    if not raw:
+        return None
+    slug_try = raw.lower().replace(" ", "-")[:80]
+    if magia_mb_slug_no_catalogo(slug_try):
+        return slug_try
+    if magia_mb_slug_no_catalogo(raw.lower()[:80]):
+        return raw.lower()[:80]
+    alvo = _norm_nome_magia_mb(raw)
+    if not alvo:
+        return None
+    tipo = str(tipo_preferido or "").strip().lower() or None
+    candidatos: list[Dict[str, Any]] = []
+    for r in lista_magias_mb_catalogo():
+        nome = _norm_nome_magia_mb(str(r.get("nome") or ""))
+        if nome == alvo or alvo in nome or nome in alvo:
+            candidatos.append(r)
+    if not candidatos:
+        return None
+    if tipo:
+        por_tipo = [r for r in candidatos if str(r.get("tipo") or "").lower() == tipo]
+        if len(por_tipo) == 1:
+            return str(por_tipo[0].get("slug") or "").strip().lower()
+        if len(por_tipo) > 1:
+            candidatos = por_tipo
+    if len(candidatos) == 1:
+        return str(candidatos[0].get("slug") or "").strip().lower()
+    return None
+
+
+def papel_padrao_migracao_magias_mb(slug_classe: str) -> str:
+    from app.games.tormenta.rules.grimorio_conjuracao_t20 import (
+        modo_conjuracao_classe_mb,
+    )
+    from app.games.tormenta.rules.magias_grimorio_aprendizado_t20 import (
+        classe_usa_limite_grimorio_mb,
+    )
+
+    if modo_conjuracao_classe_mb(slug_classe) == "espontaneo":
+        return "conhecida"
+    if classe_usa_limite_grimorio_mb(slug_classe):
+        return "grimorio"
+    return "conhecida"
+
+
 def _haystack_magia_mb(r: Dict[str, Any]) -> str:
     parts: List[str] = []
     for k in (

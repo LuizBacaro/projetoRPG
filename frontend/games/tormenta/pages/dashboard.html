@@ -153,7 +153,7 @@
         <div id="t20ArenaSetup" class="t20-arena-setup">
             <p class="t20-dash-hint" style="margin-top:0;max-width:42rem">
                 Selecione os personagens Tormenta 20, inicie o combate e use a ordem por <strong>iniciativa</strong> (empate: nome).
-                Dano e cura ajustam <strong>PV atuais</strong> na API (mesma ficha). O botão <strong>Condições (MB)</strong> (abaixo de dano/cura) abre a tabela de ataque (~p.220 MB). Consumíveis MB e companheiro animal ficam na <a href="ficha-personagem.html">ficha do personagem</a>. Para magias e condições D&amp;D 3.5: <a href="/arena">Arena D&amp;D 3.5</a>.
+                Dano e cura ajustam <strong>PV atuais</strong> na API. <strong>Magias (PM)</strong> debita Pontos de Magia do conjurador ativo (preparadas, conhecidas ou truques no livro). O botão <strong>Condições (MB)</strong> abre a tabela de ataque (~p.220 MB). Consumíveis MB e companheiro animal ficam na <a href="ficha-personagem.html">ficha do personagem</a>.
             </p>
             <div class="t20-arena-actions-row">
                 <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnIniciar">Iniciar combate</button>
@@ -183,6 +183,7 @@
                         <span class="t20-arena-quick-title">Ações rápidas</span>
                         <div class="t20-arena-quick-btns">
                             <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnPvModal">Dano / Cura (PV)</button>
+                            <button type="button" class="tormenta-btn" id="t20ArenaBtnMagias" title="Lançar magia MB (debita PM na ficha)">✨ Magias (PM)</button>
                             <button type="button" class="tormenta-btn t20-arena-btn-cond" id="t20ArenaBtnCondicoes">Condições (MB)</button>
                         </div>
                     </div>
@@ -262,6 +263,19 @@
     <div class="t20-arena-modal__ft">
         <button type="button" class="tormenta-btn" id="t20ArenaModalPvCancelar">Cancelar</button>
         <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalPvAplicar">Aplicar</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalMagias" class="t20-arena-modal t20-arena-modal--wide-pv">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo" id="t20ArenaMagiasTitulo">Magias (PM)</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalMagiasFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd" id="t20ArenaMagiasCorpo">
+        <p class="t20-dash-hint">Carregando…</p>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalMagiasCancelar">Fechar</button>
     </div>
 </dialog>
 
@@ -467,6 +481,8 @@
 <script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260511t20camp"></script>
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
+<script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260511conjMb"></script>
 <script>
 (function () {
@@ -1129,6 +1145,7 @@
 
     window.__t20ArenaApplyFromApi = t20ArenaApplyFromApi;
     window.__t20ArenaRefreshFromApi = t20ArenaRefreshFromApi;
+    window.__t20ArenaRenderActive = t20ArenaRenderActive;
 
     function t20ArenaBindOnce() {
         const root = document.getElementById('tab-arena');

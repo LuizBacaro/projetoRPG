@@ -154,3 +154,123 @@ class TormentaCombateService:
 
         combate.condicoes_mb_json = atual
         return self.combate_repo.update(combate)
+
+    def _exigir_combate_ativo(self) -> TormentaCombate:
+        combate = self.obter_combate_ativo()
+        if not combate:
+            raise CombateNotFoundError("Nenhum combate Tormenta ativo")
+        return combate
+
+    def _personagem_no_combate(
+        self, combate: TormentaCombate, pid: int
+    ) -> TormentaPersonagem:
+        permitidos = {int(x) for x in (combate.personagens_ids or [])}
+        if pid not in permitidos:
+            raise DadosInvalidos("Personagem nao participa deste combate")
+        p = self.personagem_repo.get_by_id(pid)
+        if not p:
+            raise ArenaBaseException("Personagem nao encontrado", status_code=404)
+        return p
+
+    def _mods_condicoes_personagem(
+        self, combate: TormentaCombate, pid: int
+    ) -> Dict[str, int]:
+        from app.games.tormenta.rules.combate_t20 import modificadores_de_condicoes_mb
+
+        raw = (
+            combate.condicoes_mb_json
+            if isinstance(combate.condicoes_mb_json, dict)
+            else {}
+        )
+        entry = raw.get(str(pid)) or {}
+        rotulos = entry.get("rotulos") if isinstance(entry, dict) else []
+        if not isinstance(rotulos, list):
+            rotulos = []
+        return modificadores_de_condicoes_mb([str(x) for x in rotulos])
+
+    def rolar_iniciativa_combate(self, personagem_ids: List[int]) -> Dict[str, Any]:
+        from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+        from app.games.tormenta.rules.combate_t20 import rolar_iniciativa
+
+        combate = self._exigir_combate_ativo()
+        resultados: List[Dict[str, Any]] = []
+        for pid in personagem_ids:
+            p = self._personagem_no_combate(combate, int(pid))
+            des_mod = modificador_atributo_t20(int(p.des_valor or 10))
+            roll = rolar_iniciativa(des_mod)
+            p.iniciativa = int(roll["total"])
+            self.personagem_repo.update(p)
+            resultados.append(
+                {
+                    "personagem_id": p.id,
+                    "nome": p.nome,
+                    **roll,
+                }
+            )
+        resultados.sort(key=lambda x: (-x["total"], (x.get("nome") or "").lower()))
+        ordenados = [r["personagem_id"] for r in resultados]
+        combate.personagens_ids = ordenados
+        combate.turno_atual = 0
+        self.combate_repo.update(combate)
+        return {"resultados": resultados, "ordem": ordenados}
+
+    def rolar_ataque_combate(
+        self,
+        atacante_id: int,
+        alvo_id: int,
+        bab: int,
+        mod_atributo: int,
+        bonus_arma: int = 0,
+        penalidades: int = 0,
+        ca_alvo: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        from app.games.tormenta.rules.combate_t20 import rolar_ataque
+
+        combate = self._exigir_combate_ativo()
+        atacante = self._personagem_no_combate(combate, atacante_id)
+        alvo = self._personagem_no_combate(combate, alvo_id)
+        ca = int(ca_alvo if ca_alvo is not None else (alvo.ca or 10))
+        mods = self._mods_condicoes_personagem(combate, atacante_id)
+        roll = rolar_ataque(
+            bab,
+            mod_atributo,
+            bonus_arma=bonus_arma,
+            penalidades=penalidades,
+            modificador_condicoes=mods.get("ataque", 0),
+            ca_alvo=ca,
+        )
+        return {
+            "atacante_id": atacante_id,
+            "alvo_id": alvo_id,
+            "atacante_nome": atacante.nome,
+            "alvo_nome": alvo.nome,
+            "modificador_condicoes_ataque": mods.get("ataque", 0),
+            **roll,
+        }
+
+    def rolar_dano_combate(
+        self,
+        formula_dano: str,
+        mod_atributo: int = 0,
+        confirmar_critico: bool = False,
+        aplicar_ao_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        from app.games.tormenta.rules.combate_t20 import rolar_dano
+
+        combate = self._exigir_combate_ativo()
+        roll = rolar_dano(
+            formula_dano,
+            mod_atributo,
+            confirmar_critico=confirmar_critico,
+        )
+        out: Dict[str, Any] = dict(roll)
+        if aplicar_ao_id is not None:
+            alvo = self._personagem_no_combate(combate, int(aplicar_ao_id))
+            pv = int(alvo.pv_atual or 0)
+            alvo.pv_atual = max(0, pv - int(roll["dano"]))
+            self.personagem_repo.update(alvo)
+            out["alvo_id"] = alvo.id
+            out["alvo_nome"] = alvo.nome
+            out["pv_antes"] = pv
+            out["pv_depois"] = int(alvo.pv_atual or 0)
+        return out

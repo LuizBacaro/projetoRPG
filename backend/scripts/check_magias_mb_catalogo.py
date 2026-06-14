@@ -1,4 +1,4 @@
-#!/usr/bin/env python33
+#!/usr/bin/env python3
 """Checagens leves de qualidade sobre `magias_mb_catalogo.json` (duplicatas, slugs, campos mínimos)."""
 
 from __future__ import annotations
@@ -65,8 +65,17 @@ def main() -> int:
     if not isinstance(meta, dict):
         avisos.append("`meta` ausente ou não-objeto")
 
+    com_escola = sum(1 for row in itens if isinstance(row, dict) and row.get("escola"))
+    if len(itens) < 600:
+        avisos.append(f"total {len(itens)} < 600 (esperado catálogo MB completo)")
+    if com_escola < len(itens) * 0.05:
+        avisos.append(
+            f"cobertura escola baixa: {com_escola}/{len(itens)} "
+            "(G5: use enrich_magias_mb_catalogo.py com pp.150–209)"
+        )
+
     print(f"Catálogo: {_CATALOGO}")
-    print(f"Total de itens: {len(itens)}")
+    print(f"Total de itens: {len(itens)} (com escola: {com_escola})")
     print(f"Avisos (nome+tipo): {len(avisos)}")
     for a in avisos[:30]:
         print(f"  AVISO: {a}")

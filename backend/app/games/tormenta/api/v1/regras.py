@@ -29,15 +29,28 @@ from app.games.tormenta.rules.conjuracao_t20 import (
     pontos_magia_maximos_conjuracao,
     texto_custo_pm_por_circulo_mb,
 )
+from app.games.tormenta.rules.devocao_divindade_t20 import (
+    truque_devocao_por_divindade_mb,
+)
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
     tipo_lista_magias_por_classe_mb,
 )
+from app.games.tormenta.rules.pericias_criacao_t20 import preview_pericias_criacao_mb
+from app.games.tormenta.rules.pericias_t20 import (
+    calcular_bonus_pericia,
+    lista_dificuldades_padrao_mb,
+    percepcao_passiva_t20,
+    racial_bonus_pericia,
+    rolar_teste_pericia,
+)
+from app.games.tormenta.rules.progressao_pv_t20 import preview_pv_mb
 from app.games.tormenta.rules.racas_t20 import idiomas_mb_extras, lista_racas_mb
 from app.games.tormenta.rules.tendencias_divindades_t20 import (
     lista_divindades_mb,
     lista_tendencias_mb,
 )
+from app.games.tormenta.rules.tracos_raciais_t20 import preview_tracos_raciais
 from app.games.tormenta.schemas.regras_ficha import (
     TormentaArmaduraCatalogoItem,
     TormentaArmaduraCatalogoPaginaResponse,
@@ -54,12 +67,21 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaMagiaMbCatalogoItem,
     TormentaMagiaMbCatalogoPaginaResponse,
     TormentaPericiaAtributoItem,
+    TormentaPericiaBonusRequest,
+    TormentaPericiaBonusResponse,
+    TormentaPericiaRolarRequest,
+    TormentaPericiaRolarResponse,
+    TormentaPericiasValidarCriacaoRequest,
+    TormentaPericiasValidarCriacaoResponse,
+    TormentaPvPreviewResponse,
     TormentaRacaMbItem,
     TormentaRegrasAtributosResponse,
     TormentaRegrasClassesResponse,
     TormentaRegrasConjuracaoMbResponse,
     TormentaRegrasIdentidadeMbResponse,
+    TormentaRegrasPericiasResponse,
     TormentaRegrasRacasResponse,
+    TormentaTracosRaciaisPreviewResponse,
 )
 from app.shared.core.deps import get_usuario_atual, requer_game_tormenta
 from app.shared.models.usuario import Usuario
@@ -131,7 +153,16 @@ def obter_regras_classes(
 def obter_regras_identidade_mb(
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasIdentidadeMbResponse:
-    div_rows = [TormentaDivindadeMbOpcao(**row) for row in lista_divindades_mb()]
+    div_rows = []
+    for row in lista_divindades_mb():
+        slug = str(row.get("slug") or "").strip().lower()
+        div_rows.append(
+            TormentaDivindadeMbOpcao(
+                slug=slug,
+                rotulo=str(row.get("rotulo") or ""),
+                truque_devocao_slug=truque_devocao_por_divindade_mb(slug),
+            )
+        )
     return TormentaRegrasIdentidadeMbResponse(
         tendencias=lista_tendencias_mb(),
         divindades=div_rows,
@@ -355,3 +386,113 @@ def obter_conjuracao_preview_mb(
         magias_lista_tipo=lista_t,
         magias_circulo_max=cmax,
     )
+
+
+@router.get(
+    "/tracos-raciais-preview",
+    response_model=TormentaTracosRaciaisPreviewResponse,
+    summary="Bônus mecânicos raciais MB (CA, resistências, perícias)",
+)
+def obter_tracos_raciais_preview(
+    slug: str = Query(..., min_length=1, max_length=40),
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaTracosRaciaisPreviewResponse:
+    data = preview_tracos_raciais(slug.strip().lower())
+    return TormentaTracosRaciaisPreviewResponse(**data)
+
+
+@router.get(
+    "/pericias",
+    response_model=TormentaRegrasPericiasResponse,
+    summary="Tabela de DCs padrão MB e bônus de treinamento",
+)
+def obter_regras_pericias(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaRegrasPericiasResponse:
+    from app.games.tormenta.schemas.regras_ficha import TormentaDificuldadePadraoItem
+
+    dcs = [
+        TormentaDificuldadePadraoItem(**row) for row in lista_dificuldades_padrao_mb()
+    ]
+    return TormentaRegrasPericiasResponse(dificuldades=dcs, bonus_treinado=2)
+
+
+@router.post(
+    "/pericias/calcular-bonus",
+    response_model=TormentaPericiaBonusResponse,
+    summary="Calcula bônus total de perícia MB",
+)
+def calcular_bonus_pericia_mb(
+    body: TormentaPericiaBonusRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPericiaBonusResponse:
+    racial = int(body.racial_bonus)
+    if body.slug_raca and body.nome_pericia:
+        racial = racial_bonus_pericia(body.slug_raca, body.nome_pericia)
+    bonus = calcular_bonus_pericia(
+        nivel=body.nivel,
+        mod_atributo=body.mod_atributo,
+        treinado=body.treinado,
+        graduacao=body.graduacao,
+        outros=body.outros,
+        racial_bonus=racial,
+        penalidade_armadura=body.penalidade_armadura,
+        pericia_de_classe=body.pericia_de_classe,
+    )
+    meio = body.nivel // 2
+    pp = None
+    if body.nome_pericia and str(body.nome_pericia).strip().lower() == "percepção":
+        pp = percepcao_passiva_t20(bonus)
+    elif body.nome_pericia and str(body.nome_pericia).strip().lower() == "percepcao":
+        pp = percepcao_passiva_t20(bonus)
+    return TormentaPericiaBonusResponse(
+        bonus_total=bonus, meio_nivel=meio, percepcao_passiva=pp
+    )
+
+
+@router.post(
+    "/pericias/rolar",
+    response_model=TormentaPericiaRolarResponse,
+    summary="Rola teste de perícia 1d20 + bônus vs DC",
+)
+def rolar_pericia_mb(
+    body: TormentaPericiaRolarRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPericiaRolarResponse:
+    data = rolar_teste_pericia(body.bonus, body.dc)
+    return TormentaPericiaRolarResponse(**data)
+
+
+@router.get(
+    "/pv-preview",
+    response_model=TormentaPvPreviewResponse,
+    summary="PV máximos MB por classe, nível e CON",
+)
+def obter_pv_preview_mb(
+    classe_slug: str = Query(..., min_length=1, max_length=40),
+    nivel: int = Query(1, ge=1, le=40),
+    con_valor: int = Query(10, ge=0, le=99),
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPvPreviewResponse:
+    data = preview_pv_mb(classe_slug.strip().lower(), nivel, con_valor)
+    return TormentaPvPreviewResponse(**data)
+
+
+@router.post(
+    "/pericias/validar-criacao",
+    response_model=TormentaPericiasValidarCriacaoResponse,
+    summary="Valida orçamento de perícias treinadas e graduações (MB)",
+)
+def validar_pericias_criacao_mb(
+    body: TormentaPericiasValidarCriacaoRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPericiasValidarCriacaoResponse:
+    pericias = [p.model_dump() for p in body.pericias]
+    data = preview_pericias_criacao_mb(
+        nivel=body.nivel,
+        slug_classe=body.classe_slug.strip().lower(),
+        int_valor=body.int_valor,
+        slug_raca=(body.slug_raca or "").strip().lower() or None,
+        pericias=pericias,
+    )
+    return TormentaPericiasValidarCriacaoResponse(**data)

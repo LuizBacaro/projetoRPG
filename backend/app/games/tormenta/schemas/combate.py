@@ -1,6 +1,6 @@
 """Schemas — combate Tormenta (Arena)."""
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -28,3 +28,24 @@ class TormentaCombateCondicoesMbRequest(BaseModel):
     """Chaves = id do personagem (string); apenas combatentes do combate ativo."""
 
     por_personagem: Dict[str, TormentaCombateCondicaoMbItem] = Field(..., min_length=1)
+
+
+class TormentaCombateRolarIniciativaRequest(BaseModel):
+    personagem_ids: List[int] = Field(..., min_length=1)
+
+
+class TormentaCombateRolarAtaqueRequest(BaseModel):
+    atacante_id: int
+    alvo_id: int
+    bab: int = Field(0, ge=-99, le=99)
+    mod_atributo: int = Field(0, ge=-99, le=99)
+    bonus_arma: int = Field(0, ge=-99, le=99)
+    penalidades: int = Field(0, ge=0, le=99)
+    ca_alvo: Optional[int] = Field(None, ge=0, le=99)
+
+
+class TormentaCombateRolarDanoRequest(BaseModel):
+    formula_dano: str = Field("1d8", max_length=40)
+    mod_atributo: int = Field(0, ge=-99, le=99)
+    confirmar_critico: bool = False
+    aplicar_ao_alvo_id: Optional[int] = None

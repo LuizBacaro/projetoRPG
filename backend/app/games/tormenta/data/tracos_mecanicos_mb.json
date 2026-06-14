@@ -1,0 +1,153 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 MB — efeitos mecânicos resumidos para motor de regras (sem texto integral do livro).",
+    "nota": "Bônus raciais somam-se a talentos e condições; não substituem ajustes de atributo em racas_mb.json."
+  },
+  "racas": {
+    "anao": {
+      "tamanho": "medio",
+      "deslocamento_m": 6,
+      "ca_bonus": 0,
+      "ca_vs_grande_ou_maior": 4,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 4,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 4,
+      "pericias_bonus": {}
+    },
+    "elfo": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 4,
+      "pericias_bonus": {
+        "Identificar Magia": 4,
+        "Percepção": 4
+      }
+    },
+    "goblin": {
+      "tamanho": "pequeno",
+      "deslocamento_m": 9,
+      "ca_bonus": 1,
+      "ataque_bonus": 1,
+      "furtividade_bonus": 4,
+      "fortitude_bonus": 4,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Ladinagem": 4,
+        "Ofício": 4
+      }
+    },
+    "halfling": {
+      "tamanho": "pequeno",
+      "deslocamento_m": 6,
+      "ca_bonus": 1,
+      "ataque_bonus": 1,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 2,
+      "reflexos_bonus": 2,
+      "vontade_bonus": 2,
+      "pericias_bonus": {
+        "Enganação": 4
+      }
+    },
+    "humano": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {},
+      "pericias_treinadas_extra": 2
+    },
+    "lefou": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    },
+    "minotauro": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 1,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Sobrevivência": 4
+      }
+    },
+    "qareen": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Identificar Magia": 4
+      }
+    },
+    "gnomo": {
+      "tamanho": "pequeno",
+      "deslocamento_m": 6,
+      "ca_bonus": 1,
+      "ca_vs_grande_ou_maior": 4,
+      "ataque_bonus": 1,
+      "furtividade_bonus": 4,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Intuição": 4,
+        "Ofício": 4
+      }
+    },
+    "meio_elfo": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 2,
+      "pericias_bonus": {
+        "Identificar Magia": 2,
+        "Percepção": 2
+      },
+      "pericias_treinadas_extra": 1
+    },
+    "meio_orc": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Intimidação": 4
+      }
+    }
+  }
+}

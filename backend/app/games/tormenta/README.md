@@ -26,6 +26,14 @@ Stack vertical da ficha do **Módulo Básico** (cadastro digital, CRUD).
 - `GET /api/v1/tormenta/regras/identidade-mb` — tendências (alinhamento, MB p.116–119) e divindades com **`slug` + `rotulo`** (Os Vinte, MB p.120–126); o personagem guarda só o `rotulo` em `divindade` (`tendencias_divindades_mb.json`).
 - `GET /api/v1/tormenta/regras/magias` — catálogo de magias MB (**metadados**: `slug`, `circulo`, `tipo` arcana/divina, `escola`, etc.); dados em `data/magias_mb_catalogo.json` (stubs de CI substituíveis por seed privado).
 - `GET /api/v1/tormenta/regras/conjuracao-mb` — **habilidade-chave** e progressão de **PM** por classe (`data/conjuracao_classe_mb.json`); tabela **custo PM por círculo** (truque 0; C≥1 = C PM); motor em `rules/conjuracao_t20.py`.
+- `GET /api/v1/tormenta/regras/tracos-raciais-preview?slug=` — bônus mecânicos raciais (`tracos_mecanicos_mb.json`).
+- `GET /api/v1/tormenta/regras/pericias` — DCs padrão; `POST .../pericias/calcular-bonus` e `POST .../pericias/rolar`.
+- `POST /api/v1/tormenta/personagens/{id}/magias/lancar` — debita PM (`pa_atual`) ao lançar magia MB; regista concentração em `ficha_json.tormenta_grimorio_sessao_mb` quando a duração MB exige.
+- `POST /api/v1/tormenta/personagens/{id}/magias/migrar-do-json` — importa `magias_texto` (nomes separados por vírgula/linha) para vínculos SQL.
+- `POST /api/v1/tormenta/personagens/{id}/magias/encerrar-concentracao` — remove concentração ativa da sessão.
+- `POST /api/v1/tormenta/combate/rolar-iniciativa|rolar-ataque|rolar-dano` — rolagens na arena (mestre/admin).
+
+**Catálogos SQL (RF-T20–T23):** mantidos em JSON versionado + API `/regras/*`; migração para tabelas SQL só se houver CRUD administrativo ou consultas pesadas (decisão documentada no skill Tormenta).
 
 Guard: `requer_game_tormenta` (JWT `game_slug=tormenta` em modo estrito).
 

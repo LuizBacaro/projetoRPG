@@ -6,7 +6,7 @@
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260511t20p1export" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260511t20grimorioSemMigrar" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260614grimorioPolish" />
 </head>
 <body class="tormenta-ficha-body">
 <div class="tormenta-ficha-wrap ficha-layout-dnd">
@@ -113,6 +113,7 @@
                         <span class="ficha-defesa-label">PV</span>
                         <span id="fichaPv" class="ficha-defesa-valor ficha-pv-valor" title="PV atuais / PV máximos">1 / 1</span>
                         <span id="fichaPvBreakdown" class="ficha-res-breakdown">Atuais / máximos</span>
+                        <button type="button" id="btnT20CalcularPvMb" class="tormenta-btn t20-btn-pv-mb" style="font-size:0.65rem;margin-top:0.15rem;padding:0.15rem 0.35rem" title="Calcular PV máximos pelo Módulo Básico (classe + nível + CON)">Calcular PV (MB)</button>
                     </div>
                     <div class="ficha-defesa-box ficha-pm-box">
                         <span class="ficha-defesa-label" title="Pontos de Magia (PM) — Módulo Básico">PM</span>
@@ -320,6 +321,7 @@
                 <div class="t20-ficha-secao t20-ficha-secao--pericias">
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Perícias</h3>
                     <p class="t20-hint" style="margin-top:0">½ nível usa o nível em <strong>Editar ficha</strong>. Marque treinado quando aplicável (+2 no T20). Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe MB.</p>
+                    <p class="t20-hint" id="fichaPericiasOrcamento" style="margin-top:0.2rem;font-size:0.72rem"></p>
                     <div class="t20-pericias-scroll">
                         <table class="t20-pericias-table" id="tblPericias">
                             <thead>
@@ -633,6 +635,7 @@
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--wide">
                                 <p class="t20-hint t20-dialog-tracos-raca" id="f_tracos_raca_txt">Escolha uma raça para ver os traços raciais (MB, texto do livro).</p>
+                                <p class="t20-hint" id="t20TracosMecanicosHint" style="margin-top:0.35rem"></p>
                             </div>
                         </div>
                     </div>
@@ -642,6 +645,9 @@
                             <div class="t20-ficha-field t20-ficha-field--book"><label for="f_origem">Origem</label><input id="f_origem" maxlength="120" /></div>
                             <div class="t20-ficha-field t20-ficha-field--book"><label for="f_classe_só">Classe(s)</label><input id="f_classe_só" maxlength="120" /></div>
                             <div class="t20-ficha-field"><label for="f_nivel">Nível</label><input id="f_nivel" type="number" min="0" max="40" /></div>
+                            <div class="t20-ficha-field" style="display:flex;align-items:flex-end">
+                                <button type="button" id="btnT20SubirNivelMb" class="tormenta-btn tormenta-btn--outline-red" style="width:100%;font-size:.78rem" title="Sobe um nível aplicando PV, PM e benefícios MB">⬆ Subir nível (MB)</button>
+                            </div>
                             <div class="t20-ficha-field"><label for="f_bba_mb">BBA base (MB)</label><input id="f_bba_mb" type="text" readonly tabindex="-1" class="t20-input" value="—" title="Base de Ataque conforme classe MB e nível (uma classe; multiclasse some no livro)" /></div>
                             <div class="t20-ficha-field t20-ficha-field--wide">
                                 <label for="f_classe_mb">Classe MB (BBA / tabela)</label>
@@ -1039,6 +1045,11 @@
                     <button type="button" class="equipamentos-fechar" id="btnFecharModalGrimorioTormenta" aria-label="Fechar">✕</button>
                 </div>
                 <p id="grimorioTormentaPmHint" class="t20-hint" style="margin:0 0 .75rem;padding:0 .25rem"></p>
+                <div class="t20-grimorio-preparadas-bar" style="display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 .65rem;align-items:center">
+                    <button type="button" class="tormenta-btn tormenta-btn--outline-red" id="btnGrimorioLimparPreparadas" title="Remove todas as magias preparadas hoje (descanso longo / novo dia)">🌙 Limpar preparadas</button>
+                    <button type="button" class="tormenta-btn tormenta-btn--secondary" id="btnGrimorioMigrarLegado" title="Importa nomes de magias_texto (ficha JSON) para vínculos SQL">📥 Importar do texto legado</button>
+                </div>
+                <p id="grimorioTormentaTrocaHint" class="t20-hint" style="display:none;margin:0 0 .5rem;padding:.35rem .5rem;background:rgba(120,80,200,.12);border-radius:6px"></p>
                 <div class="equipamentos-controles t20-grimorio-barra-busca">
                     <div class="equipamentos-busca-wrapper t20-grimorio-busca-grow">
                         <span class="equipamentos-busca-label">Buscar no catálogo MB</span>
@@ -1052,6 +1063,12 @@
                 </div>
                 <div class="equipamentos-corpo" id="grimorioTormentaCorpo">
                     <div id="conteudoGrimorioVinculos" class="equipamentos-conteudo ativo">
+                        <div class="equipamentos-abas t20-grimorio-vinc-filtros" id="grimorioVinculosFiltros" style="margin-bottom:.5rem">
+                            <button type="button" class="equipamentos-aba ativa" data-grim-vinc-filt="">Todas</button>
+                            <button type="button" class="equipamentos-aba" data-grim-vinc-filt="conhecida" id="grimVincFiltRepertorio">📜 Repertório</button>
+                            <button type="button" class="equipamentos-aba" data-grim-vinc-filt="grimorio">📖 No livro</button>
+                            <button type="button" class="equipamentos-aba" data-grim-vinc-filt="preparada">🕯️ Preparadas hoje</button>
+                        </div>
                         <div class="equipamentos-lista talentos-lista-linhas" id="grimorioTormentaListaVinculos"></div>
                     </div>
                     <div id="conteudoGrimorioCatalogo" class="equipamentos-conteudo">
@@ -1080,6 +1097,21 @@
                                     <option value="divina">Divina</option>
                                 </select>
                             </label>
+                            <label class="equipamentos-busca-label" style="display: flex; align-items: center; gap: 0.35rem">
+                                Escola
+                                <select id="grimorioTormentaFiltroEscola" class="t20-input" style="min-width: 8rem" title="Filtra por escola MB">
+                                    <option value="">Todas</option>
+                                    <option value="Abjuração">Abjuração</option>
+                                    <option value="Adivinhação">Adivinhação</option>
+                                    <option value="Encantamento">Encantamento</option>
+                                    <option value="Evocação">Evocação</option>
+                                    <option value="Ilusão">Ilusão</option>
+                                    <option value="Necromancia">Necromancia</option>
+                                    <option value="Transmutação">Transmutação</option>
+                                    <option value="Cura">Cura</option>
+                                    <option value="Invocação">Invocação</option>
+                                </select>
+                            </label>
                             <label class="t20-hint" style="display: flex; align-items: center; gap: 0.4rem; margin: 0; flex: 1; min-width: 12rem">
                                 <input type="checkbox" id="grimorioTormentaRestricaoMb" checked />
                                 <span>Só magias MB da classe (tipo + círculos por nível)</span>
@@ -1091,6 +1123,25 @@
                         </div>
                         <div class="equipamentos-lista talentos-lista-linhas" id="grimorioTormentaListaCatalogo"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="equipamentos-overlay" id="modalSubirNivelTormenta" aria-hidden="true" role="dialog" aria-labelledby="tituloModalSubirNivel">
+            <div class="equipamentos-modal" style="max-width:32rem">
+                <div class="equipamentos-cabecalho">
+                    <h2 id="tituloModalSubirNivel" class="equipamentos-titulo">Subir nível (MB)</h2>
+                    <button type="button" class="equipamentos-fechar" id="btnFecharModalSubirNivel" aria-label="Fechar">✕</button>
+                </div>
+                <p class="t20-hint" style="margin:0 0 .75rem">Aplica o próximo nível (atual + 1) com PV, PM e referências do Módulo Básico.</p>
+                <div id="subirNivelTormentaCorpo" class="t20-subir-nivel-corpo" style="font-size:.85rem;line-height:1.45"></div>
+                <label class="t20-hint" style="display:flex;align-items:center;gap:.4rem;margin:.75rem 0">
+                    <input type="checkbox" id="subirNivelAplicarPv" checked />
+                    <span>Curar PV ganhos neste nível (soma ao atual até o novo máximo)</span>
+                </label>
+                <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.5rem">
+                    <button type="button" class="tormenta-btn tormenta-btn--outline-red" id="btnFecharModalSubirNivel2">Cancelar</button>
+                    <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnSubirNivelConfirmar">Confirmar</button>
                 </div>
             </div>
         </div>
@@ -1121,10 +1172,15 @@
 <script>
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260511grimorioSemMigrar"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260511grimorioG6"></script>
-<script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260511grimorioSemMigrar"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioPolish"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260614grimorioPolish"></script>
+<script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
+<script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-progressao-pv.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260614"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -2104,6 +2160,9 @@
             } else if (!r.ok) {
                 bloqueado = true;
                 title = r.msg;
+            } else if (window.__t20PericiasOrcamentoOk === false) {
+                bloqueado = true;
+                title = window.__t20PericiasOrcamentoMsg || 'Orçamento de perícias MB inválido.';
             }
         }
         btn.disabled = bloqueado;
@@ -2238,6 +2297,9 @@
         atualizarTagsHeader();
         if (resetBaseDez && slug && slug !== '__livre__') aplicarRacaSomenteAjustes();
         else atualizarLinhaCompraPontos();
+        if (typeof window.__t20AplicarTracosRaciaisMecanicos === 'function') {
+            window.__t20AplicarTracosRaciaisMecanicos(slug);
+        }
         t20AtualizarEstadoBotaoSalvar();
     }
 
@@ -3625,6 +3687,8 @@
     let _grimCatalogTotal = 0;
     let _grimConjPreviewData = null;
     let _grimModalRefreshT = null;
+    let _grimVinculoFiltroPapel = '';
+    let _grimTrocaSlugRem = null;
 
     function t20SlugIdSafe(s) {
         const x = String(s || '').replace(/[^a-zA-Z0-9_]/g, '_');
@@ -3739,14 +3803,144 @@
         }
     }
 
+    function t20ModoConjuracaoMbEfetivo() {
+        const manual = q('f_conjuracao_manual_mb') && q('f_conjuracao_manual_mb').checked;
+        if (manual) return null;
+        const slug = ((q('f_classe_mb') && q('f_classe_mb').value) || '').trim().toLowerCase();
+        if (!slug || !T20_CONJ_MB_BY_SLUG || !T20_CONJ_MB_BY_SLUG[slug]) return null;
+        const m = String(T20_CONJ_MB_BY_SLUG[slug].modo_conjuracao || 'preparar').trim().toLowerCase();
+        return m === 'espontaneo' ? 'espontaneo' : 'preparar';
+    }
+
+    function t20UsaLivroGrimorioMb() {
+        const slug = ((q('f_classe_mb') && q('f_classe_mb').value) || '').trim().toLowerCase();
+        return slug === 'mago';
+    }
+
+    function t20UsaRepertorioAprendidoMb() {
+        const slug = ((q('f_classe_mb') && q('f_classe_mb').value) || '').trim().toLowerCase();
+        return ['clerigo', 'druida', 'paladino', 'ranger'].includes(slug);
+    }
+
+    function t20PapelGrimorioPadraoMb() {
+        if (t20ModoConjuracaoMbEfetivo() === 'espontaneo') return 'conhecida';
+        if (t20UsaRepertorioAprendidoMb()) return 'conhecida';
+        return 'grimorio';
+    }
+
+    function t20PapeisGrimorioPermitidosMb() {
+        const modo = t20ModoConjuracaoMbEfetivo();
+        if (!modo) return ['conhecida', 'grimorio', 'preparada'];
+        if (modo === 'espontaneo') return ['conhecida'];
+        if (t20UsaRepertorioAprendidoMb()) return ['conhecida', 'preparada'];
+        return ['grimorio', 'preparada'];
+    }
+
+    function t20SincronizarAbasGrimorioVinculos() {
+        const filtros = q('grimorioVinculosFiltros');
+        if (!filtros) return;
+        const btnLivro = filtros.querySelector('[data-grim-vinc-filt="grimorio"]');
+        const btnRep = filtros.querySelector('[data-grim-vinc-filt="conhecida"]');
+        const usaLivro = t20UsaLivroGrimorioMb();
+        const usaRep = t20UsaRepertorioAprendidoMb();
+        if (btnLivro) {
+            btnLivro.hidden = !usaLivro;
+            btnLivro.style.display = usaLivro ? '' : 'none';
+        }
+        if (btnRep) {
+            btnRep.hidden = !usaRep;
+            btnRep.style.display = usaRep ? '' : 'none';
+            if (usaRep) {
+                btnRep.textContent = '📜 Repertório aprendido';
+            }
+        }
+        if (!usaLivro && _grimVinculoFiltroPapel === 'grimorio') {
+            _grimVinculoFiltroPapel = '';
+            filtros.querySelectorAll('[data-grim-vinc-filt]').forEach((b) => {
+                b.classList.toggle('ativa', (b.getAttribute('data-grim-vinc-filt') || '') === '');
+            });
+        }
+        if (!usaRep && _grimVinculoFiltroPapel === 'conhecida') {
+            _grimVinculoFiltroPapel = '';
+            filtros.querySelectorAll('[data-grim-vinc-filt]').forEach((b) => {
+                b.classList.toggle('ativa', (b.getAttribute('data-grim-vinc-filt') || '') === '');
+            });
+        }
+    }
+
+    function montarHtmlGrimorioPapelSegmented(gid) {
+        const permitidos = t20PapeisGrimorioPermitidosMb();
+        const padrao = t20PapelGrimorioPadraoMb();
+        const defs = [
+            {
+                p: 'conhecida',
+                tit: 'Repertório / conhecida',
+                sub: 'Aprendidas (clérigo, druida…) ou espontâneas (bardo)',
+            },
+            {
+                p: 'grimorio',
+                tit: 'No grimório (livro)',
+                sub: 'Mago: entra no livro',
+            },
+            {
+                p: 'preparada',
+                tit: 'Preparei para hoje',
+                sub: 'Clérigo, druida, mago (preparação diária)',
+            },
+        ];
+        const segs = defs
+            .map(({ p, tit, sub }) => {
+                const ok = permitidos.includes(p);
+                const on = ok && p === padrao;
+                const dis = ok ? '' : ' disabled';
+                const cls = `grimorio-papel-segment${on ? ' is-selected' : ''}${ok ? '' : ' is-disabled'}`;
+                return `<button type="button" class="${cls}" data-papel="${p}" aria-pressed="${on ? 'true' : 'false'}"${dis}>
+            <span class="grimorio-papel-tit">${escHtml(tit)}</span>
+            <span class="grimorio-papel-sub">${escHtml(sub)}</span>
+        </button>`;
+            })
+            .join('');
+        return `<input type="hidden" class="grimorio-papel-value" value="${escHtml(padrao)}" autocomplete="off" />
+                <div class="grimorio-papel-wrap">
+                    <p class="grimorio-papel-legend" id="grimPapelLeg_${gid}">Guardar na ficha como</p>
+                    <div class="grimorio-papel-segmented" role="group" aria-labelledby="grimPapelLeg_${gid}">
+                        ${segs}
+                    </div>
+                </div>`;
+    }
+
+    function t20SincronizarPapeisGrimorioCatalogo() {
+        const lista = q('grimorioTormentaListaCatalogo');
+        if (!lista) return;
+        const permitidos = t20PapeisGrimorioPermitidosMb();
+        const padrao = t20PapelGrimorioPadraoMb();
+        lista.querySelectorAll('article[data-grim-slug]').forEach((art) => {
+            const seg = art.querySelector('.grimorio-papel-segmented');
+            if (!seg) return;
+            const hid = art.querySelector('input.grimorio-papel-value');
+            let ativo = padrao;
+            if (hid && permitidos.includes(hid.value)) ativo = hid.value;
+            seg.querySelectorAll('.grimorio-papel-segment').forEach((btn) => {
+                const p = (btn.getAttribute('data-papel') || '').trim();
+                const ok = permitidos.includes(p);
+                btn.disabled = !ok;
+                btn.classList.toggle('is-disabled', !ok);
+                const on = ok && p === ativo;
+                btn.classList.toggle('is-selected', on);
+                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            if (hid) hid.value = ativo;
+        });
+    }
+
     function t20LerPapelGrimorioDoArtigo(art) {
-        if (!art) return 'conhecida';
+        if (!art) return t20PapelGrimorioPadraoMb();
         const hid = art.querySelector('input.grimorio-papel-value');
         if (hid && hid.value) return hid.value;
         const inp = art.querySelector('fieldset.grimorio-papel-fieldset input[type="radio"]:checked');
         if (inp && inp.value) return inp.value;
         const sel = art.querySelector('.grimorio-papel-select');
-        return (sel && sel.value) || 'conhecida';
+        return (sel && sel.value) || t20PapelGrimorioPadraoMb();
     }
 
     function fecharModalGrimorioTormenta() {
@@ -3775,6 +3969,11 @@
         const descHtml = descShort
             ? `<p class="t20-hint" style="margin:.35rem 0 0;font-size:.74rem;line-height:1.38">${escHtml(descShort)}</p>`
             : '';
+        const emTroca = !!_grimTrocaSlugRem;
+        const btnAcao = emTroca
+            ? `<button type="button" class="talento-linha-acao item-btn-primary" data-grim-troca-nova="${slugEnc}">↔ Trocar por esta</button>`
+            : `<button type="button" class="talento-linha-acao item-btn-primary" data-grim-add="${slugEnc}">➕ Adicionar</button>`;
+        const papelHtml = emTroca ? '' : montarHtmlGrimorioPapelSegmented(gid);
         return `<article class="talento-linha equipamento-catalogo-linha" data-grim-slug="${escHtml(slug)}">
             <div class="talento-linha-conteudo">
                 <div class="talento-linha-cabecalho">
@@ -3784,30 +3983,34 @@
                 ${descHtml}
             </div>
             <div class="equipamento-catalogo-acoes" style="flex-direction:column;align-items:stretch;gap:.4rem">
-                <input type="hidden" class="grimorio-papel-value" value="conhecida" autocomplete="off" />
-                <div class="grimorio-papel-wrap">
-                    <p class="grimorio-papel-legend" id="grimPapelLeg_${gid}">Guardar na ficha como</p>
-                    <div class="grimorio-papel-segmented" role="group" aria-labelledby="grimPapelLeg_${gid}">
-                        <button type="button" class="grimorio-papel-segment is-selected" data-papel="conhecida" aria-pressed="true">
-                            <span class="grimorio-papel-tit">Lista / conhecida</span>
-                            <span class="grimorio-papel-sub">Magias fixas ou espontâneas (bardo, feiticeiro…)</span>
-                        </button>
-                        <button type="button" class="grimorio-papel-segment" data-papel="grimorio" aria-pressed="false">
-                            <span class="grimorio-papel-tit">No grimório (livro)</span>
-                            <span class="grimorio-papel-sub">Mago: entra no livro; outras mesas</span>
-                        </button>
-                        <button type="button" class="grimorio-papel-segment" data-papel="preparada" aria-pressed="false">
-                            <span class="grimorio-papel-tit">Preparei para hoje</span>
-                            <span class="grimorio-papel-sub">Clérigo, druida, preparação diária</span>
-                        </button>
-                    </div>
-                </div>
-                <button type="button" class="talento-linha-acao item-btn-primary" data-grim-add="${slugEnc}">➕ Adicionar</button>
+                ${papelHtml}
+                ${btnAcao}
             </div>
         </article>`;
     }
 
-    function montarHtmlGrimorioVinculoItem(it) {
+    function _grimorioAtualizarHintTrocaBardo() {
+        const hint = q('grimorioTormentaTrocaHint');
+        if (!hint) return;
+        if (!_grimTrocaSlugRem) {
+            hint.style.display = 'none';
+            hint.textContent = '';
+            return;
+        }
+        hint.style.display = 'block';
+        hint.innerHTML = `Modo <strong>troca de magia (bardo)</strong>: removendo <code>${escHtml(_grimTrocaSlugRem)}</code>. Escolha a magia nova no catálogo ou <button type="button" class="tormenta-btn tormenta-btn--secondary" id="btnGrimorioCancelarTroca" style="margin-left:.35rem;padding:.15rem .45rem;font-size:.72rem">Cancelar</button>`;
+        const btnC = q('btnGrimorioCancelarTroca');
+        if (btnC && !btnC.dataset.bound) {
+            btnC.dataset.bound = '1';
+            btnC.addEventListener('click', () => {
+                _grimTrocaSlugRem = null;
+                _grimorioAtualizarHintTrocaBardo();
+                abaGrimorioTormentaModal('vinculos');
+            });
+        }
+    }
+
+    function montarHtmlGrimorioVinculoItem(it, magiasAll) {
         const nome = it.nome || it.magia_slug;
         const papRaw = it.papel || '';
         const papLab =
@@ -3819,7 +4022,24 @@
                     ? 'Lista / conhecida'
                     : papRaw;
         const circ = it.circulo != null ? ` · ${it.circulo}º` : '';
-        return `<article class="talento-linha equipamento-catalogo-linha">
+        const podeTroca =
+            papRaw === 'conhecida' &&
+            window.__t20ConhecidasPreview &&
+            window.__t20ConhecidasPreview.bardo_pode_trocar;
+        const btnTroca = podeTroca
+            ? `<button type="button" class="talento-linha-acao" data-grim-troca="${escHtml(it.magia_slug || '')}" title="Trocar por outra magia conhecida (bardo MB)">↔</button>`
+            : '';
+        const slugMag = String(it.magia_slug || '').trim().toLowerCase();
+        const jaPrep = (magiasAll || []).some(
+            (m) =>
+                String(m.magia_slug || '').trim().toLowerCase() === slugMag &&
+                String(m.papel || '').trim().toLowerCase() === 'preparada'
+        );
+        const btnPrep =
+            papRaw === 'grimorio' && t20ModoConjuracaoMbEfetivo() === 'preparar' && !jaPrep
+                ? `<button type="button" class="talento-linha-acao item-btn-primary" data-grim-preparar="${escHtml(slugMag)}" title="Preparar para hoje (MB)">🕯️</button>`
+                : '';
+        return `<article class="talento-linha equipamento-catalogo-linha" data-grim-vinc-papel="${escHtml(papRaw)}">
             <div class="talento-linha-conteudo">
                 <div class="talento-linha-cabecalho">
                     <span class="talento-linha-nome">${escHtml(nome)}</span>
@@ -3828,6 +4048,8 @@
                 <p class="t20-hint" style="margin:.2rem 0 0;font-size:.72rem">${escHtml(it.magia_slug || '')}</p>
             </div>
             <div class="equipamento-catalogo-acoes">
+                ${btnPrep}
+                ${btnTroca}
                 <button type="button" class="talento-linha-acao" data-grim-del="${String(it.id)}">🗑️</button>
             </div>
         </article>`;
@@ -3852,6 +4074,7 @@
                     opt.disabled = false;
                 });
             }
+            t20SincronizarPapeisGrimorioCatalogo();
             return;
         }
         if (selT) {
@@ -3871,6 +4094,7 @@
             if (selC.value && parseInt(selC.value, 10) > cmax) selC.value = '';
             selC.disabled = false;
         }
+        t20SincronizarPapeisGrimorioCatalogo();
     }
 
     function t20NivelConjuracaoMbEfetivo() {
@@ -3898,6 +4122,32 @@
         if (!Number.isFinite(nv) || nv < 1) nv = 1;
         if (nv > 40) nv = 40;
         return nv;
+    }
+
+    async function t20CarregarPreviewsGrimorioMago(pid) {
+        const psvc = new TormentaPersonagemService();
+        window.__t20GrimorioPreview = null;
+        window.__t20RepertorioPreview = null;
+        window.__t20PreparadasPreview = null;
+        if (!pid) return;
+        try {
+            window.__t20GrimorioPreview = await psvc.previewGrimorio(pid);
+        } catch (_eG) {
+            window.__t20GrimorioPreview = null;
+        }
+        try {
+            window.__t20RepertorioPreview = await psvc.previewRepertorio(pid);
+        } catch (_eR) {
+            window.__t20RepertorioPreview = null;
+        }
+        try {
+            window.__t20PreparadasPreview = await psvc.previewPreparadas(pid);
+        } catch (_eP) {
+            window.__t20PreparadasPreview = null;
+        }
+        if (__t20LastPersonagemPayload) {
+            t20AtualizarBadgeGrimorio(__t20LastPersonagemPayload, window.__t20ConhecidasPreview);
+        }
     }
 
     async function carregarGrimorioResumoPm() {
@@ -3955,10 +4205,35 @@
                 }
             }
             el.textContent = `${nota} Truque: ${t0}; 1º círculo: ${t1}. PM na ficha (máx. / atual).${extra}`;
+            const pid = q('fichaId') && q('fichaId').value;
+            if (pid) {
+                try {
+                    const prevC = await new TormentaPersonagemService().previewMagiasConhecidas(pid);
+                    window.__t20ConhecidasPreview = prevC;
+                    if (prevC && prevC.usa_limite_conhecidas && prevC.por_circulo && prevC.por_circulo.length) {
+                        const partes = prevC.por_circulo.map(
+                            (r) => `C${r.circulo} ${r.usadas}/${r.limite}`
+                        );
+                        el.textContent += ` Conhecidas MB: ${partes.join('; ')}.`;
+                    }
+                } catch (_ePrevC) {
+                    window.__t20ConhecidasPreview = null;
+                }
+                await t20CarregarPreviewsGrimorioMago(pid);
+                const gPrev = window.__t20GrimorioPreview;
+                const pPrev = window.__t20PreparadasPreview;
+                if (gPrev && gPrev.usa_limite_grimorio && gPrev.grimorio_max != null) {
+                    el.textContent += ` Livro: ${gPrev.grimorio_usadas}/${gPrev.grimorio_max}.`;
+                }
+                if (pPrev && pPrev.usa_limite_preparadas && pPrev.preparadas_max != null) {
+                    el.textContent += ` Preparadas hoje: ${pPrev.preparadas_usadas}/${pPrev.preparadas_max}.`;
+                }
+            }
         } catch (e) {
             el.textContent = e.message || 'Não foi possível carregar regras de conjuração.';
         } finally {
             aplicarGrimorioRestricaoUi();
+            t20SincronizarAbasGrimorioVinculos();
         }
     }
 
@@ -3970,13 +4245,27 @@
         try {
             const p = await grimorioSvc.obterPersonagem(pid);
             const arr = Array.isArray(p.magias) ? p.magias : [];
+            await t20CarregarPreviewsGrimorioMago(pid);
             if (!arr.length) {
                 lista.innerHTML = '<p class="t20-hint">Nenhuma magia vinculada. Use o catálogo ou «Importar do texto legado».</p>';
                 __t20LastPersonagemPayload = p;
                 t20AtualizarGrimorioElegibilidadeVisual(p);
                 return;
             }
-            lista.innerHTML = arr.map((it) => montarHtmlGrimorioVinculoItem(it)).join('');
+            let arrFiltrado = arr;
+            if (_grimVinculoFiltroPapel) {
+                arrFiltrado = arr.filter(
+                    (it) => String(it.papel || '').trim().toLowerCase() === _grimVinculoFiltroPapel
+                );
+            }
+            if (!arrFiltrado.length) {
+                lista.innerHTML =
+                    '<p class="t20-hint">Nenhuma magia neste filtro. Troque a aba ou adicione no catálogo.</p>';
+            } else {
+                lista.innerHTML = arrFiltrado
+                    .map((it) => montarHtmlGrimorioVinculoItem(it, arr))
+                    .join('');
+            }
             __t20LastPersonagemPayload = p;
             t20AtualizarGrimorioElegibilidadeVisual(p);
             lista.querySelectorAll('[data-grim-del]').forEach((btn) => {
@@ -3989,6 +4278,33 @@
                         await carregarGrimorioVinculosNaLista();
                     } catch (e) {
                         Toast.error(e.message || 'Erro ao remover');
+                    }
+                });
+            });
+            lista.querySelectorAll('[data-grim-troca]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const slugRem = btn.getAttribute('data-grim-troca');
+                    if (!slugRem) return;
+                    _grimTrocaSlugRem = String(slugRem).trim().toLowerCase();
+                    _grimorioAtualizarHintTrocaBardo();
+                    abaGrimorioTormentaModal('catalogo');
+                    carregarGrimorioCatalogo(true);
+                });
+            });
+            lista.querySelectorAll('[data-grim-preparar]').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    const slug = btn.getAttribute('data-grim-preparar');
+                    if (!slug || !pid) return;
+                    try {
+                        await grimorioSvc.adicionarVinculo(pid, {
+                            magia_slug: slug,
+                            papel: 'preparada',
+                        });
+                        Toast.success('Magia preparada para hoje.');
+                        await carregarGrimorioVinculosNaLista();
+                        await carregarGrimorioResumoPm();
+                    } catch (e) {
+                        Toast.error(e.message || 'Erro ao preparar');
                     }
                 });
             });
@@ -4008,6 +4324,7 @@
             lista.addEventListener('click', async (ev) => {
                 const bseg = ev.target.closest('.grimorio-papel-segment');
                 if (bseg && lista.contains(bseg)) {
+                    if (bseg.disabled || bseg.classList.contains('is-disabled')) return;
                     const seg = bseg.closest('.grimorio-papel-segmented');
                     if (!seg || !lista.contains(seg)) return;
                     const art0 = bseg.closest('article');
@@ -4021,9 +4338,9 @@
                     if (hid) hid.value = v;
                     return;
                 }
-                const btn = ev.target.closest('[data-grim-add]');
+                const btn = ev.target.closest('[data-grim-add],[data-grim-troca-nova]');
                 if (!btn || !lista.contains(btn)) return;
-                const enc = btn.getAttribute('data-grim-add');
+                const enc = btn.getAttribute('data-grim-add') || btn.getAttribute('data-grim-troca-nova');
                 const art = btn.closest('article');
                 const papel = t20LerPapelGrimorioDoArtigo(art);
                 let slug = '';
@@ -4035,6 +4352,32 @@
                 const pid0 = q('fichaId') && q('fichaId').value;
                 if (!pid0) {
                     Toast.error('Salve a ficha antes de adicionar magias.');
+                    return;
+                }
+                if (btn.hasAttribute('data-grim-troca-nova') && _grimTrocaSlugRem) {
+                    try {
+                        await new TormentaPersonagemService().trocarMagiaConhecida(pid0, {
+                            magia_slug_removida: _grimTrocaSlugRem,
+                            magia_slug_nova: slug,
+                        });
+                        Toast.success('Magia trocada.');
+                        _grimTrocaSlugRem = null;
+                        _grimorioAtualizarHintTrocaBardo();
+                        await carregarGrimorioVinculosNaLista();
+                        await carregarGrimorioResumoPm();
+                    } catch (e) {
+                        Toast.error(e.message || 'Erro na troca');
+                    }
+                    return;
+                }
+                const permitidos = t20PapeisGrimorioPermitidosMb();
+                if (!permitidos.includes(papel)) {
+                    const modo = t20ModoConjuracaoMbEfetivo();
+                    Toast.error(
+                        modo === 'preparar'
+                            ? 'Esta classe usa grimório ou preparadas — não «conhecida».'
+                            : 'Esta classe usa magias conhecidas — não grimório nem preparadas.'
+                    );
                     return;
                 }
                 try {
@@ -4054,8 +4397,10 @@
         try {
             const selC = q('grimorioTormentaFiltroCirculo');
             const selT = q('grimorioTormentaFiltroTipo');
+            const selE = q('grimorioTormentaFiltroEscola');
             const circRaw = selC && selC.value !== '' ? parseInt(selC.value, 10) : null;
             const tipoRaw = selT && selT.value ? String(selT.value).trim() : '';
+            const escolaRaw = selE && selE.value ? String(selE.value).trim() : '';
             const params = {
                 q: query,
                 skip: _grimCatalogSkip,
@@ -4063,6 +4408,7 @@
             };
             if (circRaw !== null && Number.isFinite(circRaw)) params.circulo = circRaw;
             if (tipoRaw) params.tipo = tipoRaw;
+            if (escolaRaw) params.escola = escolaRaw;
             const useRestr =
                 q('grimorioTormentaRestricaoMb') &&
                 q('grimorioTormentaRestricaoMb').checked &&
@@ -4097,6 +4443,7 @@
             lista.innerHTML = `<p class="t20-hint">${escHtml(e.message || 'Erro ao carregar catálogo')}</p>`;
         } finally {
             if (ld) ld.style.display = 'none';
+            t20SincronizarPapeisGrimorioCatalogo();
         }
     }
 
@@ -4132,6 +4479,7 @@
             ov.setAttribute('aria-hidden', 'false');
         }
         await carregarGrimorioResumoPm();
+        t20SincronizarAbasGrimorioVinculos();
         await carregarGrimorioVinculosNaLista();
         await carregarGrimorioCatalogo(true);
     }
@@ -4605,6 +4953,13 @@
             raca_tormenta_mais1: (q('f_raca_mais1') && q('f_raca_mais1').value) || null,
             raca_tormenta_livre: (q('f_raca_livre') && q('f_raca_livre').value.trim()) || '',
             tormenta_classe_mb_slug: (q('f_classe_mb') && q('f_classe_mb').value) || null,
+            tormenta_divindade_mb_slug: (() => {
+                const sel = q('f_divindade');
+                if (!sel || !sel.selectedOptions || !sel.selectedOptions.length) return null;
+                const op = sel.selectedOptions[0];
+                const ds = op && op.getAttribute('data-slug');
+                return ds ? String(ds).trim() : null;
+            })(),
             tormenta_conjuracao_manual_mb: !!(q('f_conjuracao_manual_mb') && q('f_conjuracao_manual_mb').checked),
             travar_raca_classe_mb: travaRacaClasseMb || forcarTravarNoProximoExtrair,
             ...(cadastroDashboardOrigem ? { cadastro_dashboard: true } : {}),
@@ -4813,9 +5168,26 @@
         }
     }
 
-    function t20AtualizarBadgeGrimorio(p) {
+    function t20AtualizarBadgeGrimorio(p, preview) {
         const el = q('t20GrimorioBadge');
         if (!el) return;
+        const gPrev = window.__t20GrimorioPreview;
+        if (gPrev && gPrev.usa_limite_grimorio && gPrev.grimorio_max != null) {
+            let txt = `Livro ${gPrev.grimorio_usadas}/${gPrev.grimorio_max}`;
+            const pPrev = window.__t20PreparadasPreview;
+            if (pPrev && pPrev.usa_limite_preparadas && pPrev.preparadas_max != null) {
+                txt += ` · Preparadas ${pPrev.preparadas_usadas}/${pPrev.preparadas_max}`;
+            }
+            el.textContent = `${txt} (MB)`;
+            return;
+        }
+        const prev = preview || window.__t20ConhecidasPreview;
+        if (prev && prev.usa_limite_conhecidas && prev.total_conhecidas_max != null) {
+            let txt = `Conhecidas ${prev.total_conhecidas_usadas}/${prev.total_conhecidas_max} (MB)`;
+            if (prev.bardo_pode_trocar) txt += ' · troca de magia disponível neste nível';
+            el.textContent = txt;
+            return;
+        }
         const arr = p && Array.isArray(p.magias) ? p.magias : [];
         const n = arr.length;
         el.textContent =
@@ -4879,7 +5251,7 @@
             return;
         }
         const ref = pApi && typeof pApi.magias !== 'undefined' ? pApi : __t20LastPersonagemPayload;
-        if (ref && Array.isArray(ref.magias)) t20AtualizarBadgeGrimorio(ref);
+        if (ref && Array.isArray(ref.magias)) t20AtualizarBadgeGrimorio(ref, window.__t20ConhecidasPreview);
         else badge.textContent = 'Grimório disponível (salve e reabra para atualizar a lista de magias).';
     }
 
@@ -5169,6 +5541,7 @@
         t20SyncResSheetToDialog();
         t20SyncDeslTamSheetToDialog();
     }
+    window.t20PreencherFormPersonagem = preencherForm;
 
     function aplicarTravaRacaClasseMb() {
         const sr = q('f_raca_select');
@@ -5543,7 +5916,7 @@
                 tGr = setTimeout(() => carregarGrimorioCatalogo(true), 360);
             });
         }
-        ['grimorioTormentaFiltroCirculo', 'grimorioTormentaFiltroTipo'].forEach((fid) => {
+        ['grimorioTormentaFiltroCirculo', 'grimorioTormentaFiltroTipo', 'grimorioTormentaFiltroEscola'].forEach((fid) => {
             const el = q(fid);
             if (el && !el.dataset.boundGrimFil) {
                 el.dataset.boundGrimFil = '1';
@@ -5556,6 +5929,71 @@
             restrGr.addEventListener('change', () => {
                 aplicarGrimorioRestricaoUi();
                 carregarGrimorioCatalogo(true);
+            });
+        }
+        const btnLimparPrep = q('btnGrimorioLimparPreparadas');
+        if (btnLimparPrep && !btnLimparPrep.dataset.boundGrim) {
+            btnLimparPrep.dataset.boundGrim = '1';
+            btnLimparPrep.addEventListener('click', async () => {
+                const pid = q('fichaId') && q('fichaId').value;
+                if (!pid) return;
+                if (
+                    !window.confirm(
+                        'Remover todas as magias preparadas hoje? (Novo dia / descanso longo MB)'
+                    )
+                ) {
+                    return;
+                }
+                try {
+                    const res = await new TormentaPersonagemService().limparPreparadas(pid);
+                    Toast.success(
+                        res && res.removidas
+                            ? `${res.removidas} magia(s) preparada(s) removida(s).`
+                            : 'Nenhuma preparada para limpar.'
+                    );
+                    await carregarGrimorioVinculosNaLista();
+                    await carregarGrimorioResumoPm();
+                } catch (e) {
+                    Toast.error(e.message || 'Erro ao limpar preparadas');
+                }
+            });
+        }
+        const btnMigrarLeg = q('btnGrimorioMigrarLegado');
+        if (btnMigrarLeg && !btnMigrarLeg.dataset.boundGrim) {
+            btnMigrarLeg.dataset.boundGrim = '1';
+            btnMigrarLeg.addEventListener('click', async () => {
+                const pid = q('fichaId') && q('fichaId').value;
+                if (!pid) {
+                    Toast.error('Salve a ficha antes de importar.');
+                    return;
+                }
+                try {
+                    const res = await new TormentaPersonagemService().migrarMagiasDoJson(pid);
+                    const n = (res && res.vinculos_criados) || 0;
+                    const ign = (res && res.ignorados_duplicados) || 0;
+                    const nf = (res && res.nao_encontrados) || [];
+                    let msg = `${n} magia(s) importada(s).`;
+                    if (ign) msg += ` ${ign} ignorada(s) (duplicadas).`;
+                    if (nf.length) msg += ` Não encontradas: ${nf.slice(0, 5).join(', ')}${nf.length > 5 ? '…' : ''}.`;
+                    Toast.success(msg);
+                    await carregarGrimorioVinculosNaLista();
+                    await carregarGrimorioResumoPm();
+                } catch (e) {
+                    Toast.error(e.message || 'Erro ao importar magias legadas');
+                }
+            });
+        }
+        const filtrosVinc = q('grimorioVinculosFiltros');
+        if (filtrosVinc && !filtrosVinc.dataset.boundGrim) {
+            filtrosVinc.dataset.boundGrim = '1';
+            filtrosVinc.addEventListener('click', (ev) => {
+                const btn = ev.target.closest('[data-grim-vinc-filt]');
+                if (!btn || !filtrosVinc.contains(btn)) return;
+                _grimVinculoFiltroPapel = (btn.getAttribute('data-grim-vinc-filt') || '').trim();
+                filtrosVinc.querySelectorAll('[data-grim-vinc-filt]').forEach((b) => {
+                    b.classList.toggle('ativa', b === btn);
+                });
+                carregarGrimorioVinculosNaLista();
             });
         }
         document.addEventListener('keydown', (ev) => {
