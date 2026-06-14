@@ -261,7 +261,7 @@ def test_get_regras_magias_pagina_e_filtros(client_regras_tormenta):
         "/api/v1/tormenta/regras/magias",
         params={"q": "[stub]", "skip": 2, "limit": 2},
     )
-    assert r_page.json()["total"] == 4
+    assert r_page.json()["total"] == 5
     assert len(r_page.json()["itens"]) == 2
 
 
@@ -339,7 +339,7 @@ def test_magias_mb_catalogo_g5_escola_completa():
     ]
     meta = data.get("meta") or {}
     assert len(itens) >= 700
-    assert stubs == 4
+    assert stubs == 5
     assert (
         not sem_escola
     ), f"magias sem escola: {[r.get('nome') for r in sem_escola[:10]]}"
