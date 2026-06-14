@@ -3,6 +3,7 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
+from pydantic import ValidationError
 
 from app.core.dependencies import (
     get_file_service,
@@ -156,6 +157,11 @@ def obter(
                 "magias": itens_m,
             }
         )
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Dados da ficha inválidos para resposta da API: {e.errors()[:3]}",
+        ) from e
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -292,6 +298,11 @@ def lancar_magia_gastando_pm(
     try:
         data = magias_svc.lancar_magia_gastando_pm(personagem_id, payload.magia_slug)
         return TormentaMagiaLancarResponse(**data)
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Resposta de lançamento inválida: {e.errors()[:3]}",
+        ) from e
     except DadosInvalidos as e:
         raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:

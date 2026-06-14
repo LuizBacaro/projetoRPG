@@ -27,6 +27,36 @@ from app.shared.models.usuario import PerfilUsuario, Usuario
 
 class TormentaPersonagemService:
     _CHAVES_COMPRA = ("for", "des", "con", "int", "sab", "car")
+    _CAMPOS_ATRIBUTO = (
+        "for_valor",
+        "des_valor",
+        "con_valor",
+        "int_valor",
+        "sab_valor",
+        "car_valor",
+    )
+
+    @staticmethod
+    def _patch_mexe_compra_pontos(data: dict) -> bool:
+        """True se o PATCH altera atributos ou atributos_compra (validação de criação MB)."""
+        if any(
+            k in data for k in ("tipo",) + TormentaPersonagemService._CAMPOS_ATRIBUTO
+        ):
+            return True
+        fj = data.get("ficha_json")
+        return isinstance(fj, dict) and "atributos_compra" in fj
+
+    @staticmethod
+    def _patch_mexe_pericias_mb(data: dict) -> bool:
+        """True se o PATCH altera nível, INT ou bloco de perícias/classe MB."""
+        if any(k in data for k in ("tipo", "nivel", "int_valor")):
+            return True
+        fj = data.get("ficha_json")
+        if not isinstance(fj, dict):
+            return False
+        return bool(
+            fj.keys() & {"pericias", "tormenta_classe_mb_slug", "raca_tormenta_slug"}
+        )
 
     def __init__(self, repo: TormentaPersonagemRepositoryProtocol):
         self.repo = repo
@@ -400,18 +430,20 @@ class TormentaPersonagemService:
         fj = dict(ent.ficha_json or {})
         if "ficha_json" in data and data["ficha_json"] is not None:
             fj.update(dict(data["ficha_json"] or {}))
-        self._validar_compra_pontos_t20_jogador(
-            tipo_final,
-            fj,
-            fv,
-            dv,
-            cv,
-            iv,
-            sv,
-            cav,
-        )
+        if self._patch_mexe_compra_pontos(data):
+            self._validar_compra_pontos_t20_jogador(
+                tipo_final,
+                fj,
+                fv,
+                dv,
+                cv,
+                iv,
+                sv,
+                cav,
+            )
         nv_final = int(data["nivel"]) if "nivel" in data else int(ent.nivel or 1)
-        self._validar_pericias_t20_jogador(tipo_final, fj, nv_final, iv)
+        if self._patch_mexe_pericias_mb(data):
+            self._validar_pericias_t20_jogador(tipo_final, fj, nv_final, iv)
 
         if "foto_url" in data:
             raw = data["foto_url"]

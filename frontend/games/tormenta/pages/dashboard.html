@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260511t20camp" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260614arenaRoll" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -185,6 +185,10 @@
                             <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnPvModal">Dano / Cura (PV)</button>
                             <button type="button" class="tormenta-btn" id="t20ArenaBtnMagias" title="Lançar magia MB (debita PM na ficha)">✨ Magias (PM)</button>
                             <button type="button" class="tormenta-btn t20-arena-btn-cond" id="t20ArenaBtnCondicoes">Condições (MB)</button>
+                            <button type="button" class="tormenta-btn" id="t20ArenaBtnRolarIniciativa">Rolar iniciativa</button>
+                            <button type="button" class="tormenta-btn" id="t20ArenaBtnRolarAtaque">Rolar ataque</button>
+                            <button type="button" class="tormenta-btn" id="t20ArenaBtnRolarDano">Rolar dano</button>
+                            <button type="button" class="tormenta-btn" id="t20ArenaBtnResistenciaMagia" title="Teste de resistência contra magia (MB)">Resist. magia</button>
                         </div>
                     </div>
                 </div>
@@ -263,6 +267,161 @@
     <div class="t20-arena-modal__ft">
         <button type="button" class="tormenta-btn" id="t20ArenaModalPvCancelar">Cancelar</button>
         <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalPvAplicar">Aplicar</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalAtaque" class="t20-arena-modal t20-arena-modal--wide-pv">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo">Rolar ataque</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalAtaqueFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd t20-arena-modal__bd--pv-grid">
+        <div class="t20-arena-pv-col-alvos">
+            <p class="t20-arena-pv-alvos-titulo">Alvo</p>
+            <p class="t20-dash-hint" style="margin: 0 0 0.4rem; font-size: 0.72rem">Escolha quem recebe o ataque (combatente ativo é o atacante).</p>
+            <div id="t20ArenaAtaqueListaAlvos" class="t20-arena-checkbox-alvos" role="radiogroup" aria-label="Alvo do ataque"></div>
+        </div>
+        <div class="t20-arena-pv-col-valores">
+            <div class="t20-dash-field">
+                <label for="t20ArenaAtaquePreset">Ataque da ficha (opcional)</label>
+                <select id="t20ArenaAtaquePreset" class="t20-input">
+                    <option value="">— Manual —</option>
+                </select>
+            </div>
+            <div class="t20-arena-roll-grid">
+                <div class="t20-dash-field">
+                    <label for="t20ArenaAtaqueBab">BAB</label>
+                    <input id="t20ArenaAtaqueBab" type="number" class="t20-input" value="0" />
+                </div>
+                <div class="t20-dash-field">
+                    <label for="t20ArenaAtaqueMod">Mod. FOR/DES</label>
+                    <input id="t20ArenaAtaqueMod" type="number" class="t20-input" value="0" />
+                </div>
+                <div class="t20-dash-field">
+                    <label for="t20ArenaAtaqueBonusArma">Bônus arma</label>
+                    <input id="t20ArenaAtaqueBonusArma" type="number" class="t20-input" value="0" />
+                </div>
+                <div class="t20-dash-field">
+                    <label for="t20ArenaAtaquePenal">Penalidades</label>
+                    <input id="t20ArenaAtaquePenal" type="number" min="0" class="t20-input" value="0" />
+                </div>
+            </div>
+            <div class="t20-dash-field">
+                <label for="t20ArenaAtaqueCa">CA do alvo (vazio = usa a CA da ficha)</label>
+                <input id="t20ArenaAtaqueCa" type="number" min="0" max="99" class="t20-input" placeholder="automático" />
+            </div>
+            <div id="t20ArenaAtaqueResultado" class="t20-arena-roll-result" hidden aria-live="polite"></div>
+        </div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalAtaqueCancelar">Cancelar</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalAtaqueRolar">Rolar ataque</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalDano" class="t20-arena-modal t20-arena-modal--wide-pv">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo">Rolar dano</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalDanoFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd t20-arena-modal__bd--pv-grid">
+        <div class="t20-arena-pv-col-alvos">
+            <p class="t20-arena-pv-alvos-titulo">Aplicar em</p>
+            <p class="t20-dash-hint" style="margin: 0 0 0.4rem; font-size: 0.72rem">Escolha o alvo para aplicar PV (opcional se só quiser rolar).</p>
+            <div id="t20ArenaDanoListaAlvos" class="t20-arena-checkbox-alvos" role="radiogroup" aria-label="Alvo do dano"></div>
+            <label class="t20-arena-cb t20-arena-cb--destaque" style="margin-top: 0.5rem">
+                <input type="checkbox" id="t20ArenaDanoAplicarPv" checked />
+                Aplicar dano aos PV do alvo selecionado
+            </label>
+        </div>
+        <div class="t20-arena-pv-col-valores">
+            <div class="t20-dash-field">
+                <label for="t20ArenaDanoPreset">Ataque da ficha (opcional)</label>
+                <select id="t20ArenaDanoPreset" class="t20-input">
+                    <option value="">— Manual —</option>
+                </select>
+            </div>
+            <div class="t20-dash-field">
+                <label for="t20ArenaDanoFormula">Fórmula (ex. 1d8+1)</label>
+                <input id="t20ArenaDanoFormula" type="text" class="t20-input" value="1d8" maxlength="40" autocomplete="off" />
+            </div>
+            <div class="t20-arena-roll-grid">
+                <div class="t20-dash-field">
+                    <label for="t20ArenaDanoMod">Mod. FOR (CAC)</label>
+                    <input id="t20ArenaDanoMod" type="number" class="t20-input" value="0" />
+                </div>
+                <div class="t20-dash-field t20-dash-field--cb">
+                    <label class="t20-arena-cb" style="margin-top: 1.35rem">
+                        <input type="checkbox" id="t20ArenaDanoCritico" />
+                        Confirmar crítico
+                    </label>
+                </div>
+            </div>
+            <div id="t20ArenaDanoResultado" class="t20-arena-roll-result" hidden aria-live="polite"></div>
+        </div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalDanoCancelar">Cancelar</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalDanoRolar">Rolar dano</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalResistenciaMagia" class="t20-arena-modal t20-arena-modal--wide-pv">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo">Teste de resistência à magia</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalResistenciaMagiaFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd t20-arena-modal__bd--pv-grid">
+        <div class="t20-arena-pv-col-alvos">
+            <p class="t20-arena-pv-alvos-titulo">Quem resiste</p>
+            <p class="t20-dash-hint" style="margin: 0 0 0.4rem; font-size: 0.72rem">Escolha o alvo que faz o teste de resistência.</p>
+            <div id="t20ArenaSrListaAlvos" class="t20-arena-checkbox-alvos" role="radiogroup" aria-label="Alvo do teste de resistência"></div>
+            <p id="t20ArenaSrBonusAlvo" class="t20-arena-sr-bonus-hint t20-dash-hint" hidden aria-live="polite"></p>
+        </div>
+        <div class="t20-arena-pv-col-valores">
+            <div class="t20-dash-field">
+                <label for="t20ArenaSrConjurador">Conjurador</label>
+                <select id="t20ArenaSrConjurador" class="t20-input"></select>
+            </div>
+            <div class="t20-dash-field">
+                <label for="t20ArenaSrMagia">Magia (opcional)</label>
+                <select id="t20ArenaSrMagia" class="t20-input">
+                    <option value="">— Manual —</option>
+                </select>
+            </div>
+            <div class="t20-arena-roll-grid">
+                <div class="t20-dash-field">
+                    <label for="t20ArenaSrTipo">Tipo de teste</label>
+                    <select id="t20ArenaSrTipo" class="t20-input">
+                        <option value="">— Inferir da magia —</option>
+                        <option value="fortitude">Fortitude</option>
+                        <option value="reflexos">Reflexos</option>
+                        <option value="vontade">Vontade</option>
+                    </select>
+                </div>
+                <div class="t20-dash-field">
+                    <label for="t20ArenaSrCirculo">Círculo</label>
+                    <input id="t20ArenaSrCirculo" type="number" min="0" max="9" class="t20-input" value="1" />
+                </div>
+            </div>
+            <label class="t20-arena-cb t20-arena-cb--destaque">
+                <input type="checkbox" id="t20ArenaSrCdManual" />
+                Informar CD manualmente (em vez de 10 + círculo + mod. chave)
+            </label>
+            <div class="t20-dash-field" id="t20ArenaSrCdWrap" hidden>
+                <label for="t20ArenaSrCd">CD do teste</label>
+                <input id="t20ArenaSrCd" type="number" min="1" max="99" class="t20-input" placeholder="ex. 15" />
+            </div>
+            <label class="t20-arena-cb">
+                <input type="checkbox" id="t20ArenaSrFalhaVol" />
+                Falha voluntária (alvo não resiste)
+            </label>
+            <div id="t20ArenaSrResultado" class="t20-arena-roll-result" hidden aria-live="polite"></div>
+        </div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalResistenciaMagiaCancelar">Cancelar</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalResistenciaMagiaRolar">Rolar teste</button>
     </div>
 </dialog>
 
@@ -481,7 +640,7 @@
 <script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260511t20camp"></script>
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
-<script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
 <script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260511conjMb"></script>
 <script>

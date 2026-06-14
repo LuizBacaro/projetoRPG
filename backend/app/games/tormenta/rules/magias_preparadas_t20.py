@@ -299,7 +299,8 @@ def validar_lancar_magia_preparador_mb(
             )
         return True, ""
     if not exige_grimorio_para_preparar_mb(slug_classe):
-        if "conhecida" in papeis_por_slug.get(slug, set()):
+        papeis = papeis_por_slug.get(slug, set())
+        if "conhecida" in papeis or "preparada" in papeis:
             return True, ""
         from app.games.tormenta.rules.devocao_divindade_t20 import (
             classe_usa_truque_devocao_mb,

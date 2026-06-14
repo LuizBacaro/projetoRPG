@@ -48,6 +48,12 @@ class TormentaMagiaLancarResponse(BaseModel):
     concentracao_ativa: Optional[str] = Field(
         None, description="Nome da magia em concentração após o lançamento."
     )
+    resistencia_magia_bonus: Optional[int] = Field(
+        None,
+        ge=0,
+        le=20,
+        description="Bônus de resistência à magia ativo na sessão após o lançamento (MB).",
+    )
 
 
 class TormentaMigrarMagiasJsonResponse(BaseModel):

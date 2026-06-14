@@ -473,6 +473,37 @@ def test_patch_jogador_atributos_compra_ultrapassa_rejeita(tormenta_personagens_
     assert "ultrapassar" in r.json().get("detail", "").lower()
 
 
+def test_patch_so_pv_atual_ignora_atributos_compra_invalidos(tormenta_personagens_db):
+    """Arena Dano/Cura: PATCH só em pv_atual não revalida compra MB da criação."""
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_json(nome="ArenaPv", pv_max=20, pv_atual=20),
+    ).json()["id"]
+    client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={
+            "ficha_json": {
+                "atributos_compra": {
+                    "for": 10,
+                    "des": 10,
+                    "con": 10,
+                    "int": 10,
+                    "sab": 10,
+                    "car": 10,
+                }
+            }
+        },
+    )
+    r = client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={"pv_atual": 12},
+    )
+    assert r.status_code == 200, r.text
+    assert r.json()["pv_atual"] == 12
+
+
 def test_talentos_crud_e_get_personagem_inclui_lista(tormenta_personagens_db):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))

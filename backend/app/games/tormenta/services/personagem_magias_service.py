@@ -85,11 +85,18 @@ class TormentaPersonagemMagiasService:
     def _to_item(row: TormentaMagiaPersonagem) -> TormentaMagiaPersonagemItem:
         meta = metadados_magia_mb_por_slug(row.magia_slug)
         nome = str(meta["nome"]) if meta and meta.get("nome") else None
-        circulo = (
-            int(meta["circulo"]) if meta and meta.get("circulo") is not None else None
-        )
-        tipo = str(meta["tipo"]) if meta and meta.get("tipo") else None
-        escola = str(meta["escola"]) if meta and meta.get("escola") else None
+        circulo = None
+        if meta and meta.get("circulo") is not None:
+            try:
+                circulo = max(0, min(20, int(meta["circulo"])))
+            except (TypeError, ValueError):
+                circulo = None
+        tipo = None
+        if meta and meta.get("tipo"):
+            tipo = str(meta["tipo"])[:20]
+        escola = None
+        if meta and meta.get("escola"):
+            escola = str(meta["escola"])[:80]
         return TormentaMagiaPersonagemItem(
             id=row.id,
             magia_slug=row.magia_slug,
@@ -321,7 +328,7 @@ class TormentaPersonagemMagiasService:
                 raise DadosInvalidos(motivo_l)
 
         div_slug_lanc = divindade_mb_slug_de_ficha(fj, p.divindade)
-        truque_devocao = (
+        truque_devocao = bool(
             circulo_mag == 0
             and div_slug_lanc
             and magia_e_truque_devocao_mb(div_slug_lanc, slug)
