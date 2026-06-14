@@ -19,6 +19,17 @@
       "pagina_referencia": null
     },
     {
+      "slug": "stub_truque_div",
+      "nome": "[Stub] Truque divino de teste",
+      "circulo": 0,
+      "tipo": "divina",
+      "escola": "Evocação",
+      "execucao": "Padrão",
+      "alcance": "Curto",
+      "descricao_curta": "Entrada sintética para validação de API (lista divina).",
+      "pagina_referencia": null
+    },
+    {
       "slug": "abrir_fechar",
       "nome": "Abrir/fechar",
       "circulo": 0,

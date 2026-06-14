@@ -651,7 +651,7 @@ def test_magias_paladino_so_apos_nivel_5_mb(tormenta_personagens_db):
     )
     r_ok = client.post(
         f"/api/v1/tormenta/personagens/{rid}/magias",
-        json={"magia_slug": "stub_truque_arc", "papel": "preparada"},
+        json={"magia_slug": "stub_truque_div", "papel": "preparada"},
     )
     assert r_ok.status_code == 201, r_ok.text
 
@@ -682,7 +682,7 @@ def test_magias_paladino_nivel_conjurador_mb_libera_antes_do_nivel_total(
     )
     r_add = client.post(
         f"/api/v1/tormenta/personagens/{rid}/magias",
-        json={"magia_slug": "stub_truque_arc", "papel": "preparada"},
+        json={"magia_slug": "stub_truque_div", "papel": "preparada"},
     )
     assert r_add.status_code == 201, r_add.text
 
