@@ -44,7 +44,17 @@ def _payload_criar(**overrides):
         "strength": 16,
         "dexterity": 14,
         "constitution": 14,
-        "ficha": {"raca": "humano", "classe": "guerreiro"},
+        "ficha": {
+            "raca": "humano",
+            "classe": "guerreiro",
+            "pericia_racial_extra": "percepcao",
+            "pericias_classe_escolhidas": ["atletismo", "intuicao"],
+            "progressao": {
+                "hp_rolls": [],
+                "marcos": [{"nivel": 1, "tipo": "feat", "slug": "alert"}],
+            },
+            "feats": ["alert"],
+        },
     }
     body.update(overrides)
     return body
