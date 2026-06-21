@@ -33,6 +33,7 @@ ARMAS_SIMPLES: List[ArmaDict] = [
         "peso": 3,
         "custo": 1,
         "propriedades": ["versatil"],
+        "dano_versatil": "1d8",
     },
     {
         "slug": "maca",
@@ -53,6 +54,7 @@ ARMAS_MARCIAIS: List[ArmaDict] = [
         "peso": 3,
         "custo": 15,
         "propriedades": ["versatil"],
+        "dano_versatil": "1d10",
     },
     {
         "slug": "espada-grande",

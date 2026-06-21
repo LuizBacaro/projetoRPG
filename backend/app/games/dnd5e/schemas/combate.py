@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -11,6 +11,7 @@ class Dnd5eIniciativaCombatente(BaseModel):
     id: str = Field(..., max_length=40)
     nome: str = Field(..., max_length=120)
     dex_mod: int = Field(default=0, ge=-5, le=20)
+    feats: List[str] = Field(default_factory=list)
 
 
 class Dnd5eIniciativaRequest(BaseModel):
@@ -39,6 +40,24 @@ class Dnd5eAtaqueRequest(BaseModel):
     condicoes_atacante: List[str] = Field(default_factory=list)
     condicoes_alvo: List[str] = Field(default_factory=list)
     corpo_a_corpo: bool = True
+    arma_slug: Optional[str] = Field(
+        None,
+        max_length=80,
+        description="Se informado, aplica finesse/versátil/leve/duas mãos",
+    )
+    str_mod: Optional[int] = Field(None, ge=-5, le=20)
+    dex_mod: Optional[int] = Field(None, ge=-5, le=20)
+    duas_maos: bool = False
+    feats: List[str] = Field(default_factory=list)
+    raca_slug: Optional[str] = Field(
+        None,
+        max_length=40,
+        description="Raça do atacante (traits: sorte halfling)",
+    )
+    aplicar_sorte_halfling: bool = Field(
+        default=True,
+        description="Rerrolar natural 1 (halfling)",
+    )
 
 
 class Dnd5eAtaqueResponse(BaseModel):
@@ -51,12 +70,66 @@ class Dnd5eAtaqueResponse(BaseModel):
     critico_automatico: bool = False
     acerto_automatico: bool = False
     is_critico: bool = False
+    sorte_reroll: Optional[int] = Field(
+        None,
+        ge=1,
+        le=20,
+        description="Segunda rolagem da Sorte (halfling)",
+    )
+    mod_atributo_usado: Optional[int] = None
+    atributo_usado: Optional[str] = None
+    arma_slug: Optional[str] = None
+    propriedades: List[str] = Field(default_factory=list)
+    bonus_feats: int = 0
+
+
+class Dnd5eSalvamentoRequest(BaseModel):
+    mod_atributo: int = Field(default=0, ge=-5, le=20)
+    bonus_proficiencia: int = Field(default=2, ge=2, le=6)
+    cd: int = Field(..., ge=0, le=40)
+    proficiente: bool = False
+    raca_slug: Optional[str] = Field(None, max_length=40)
+    categoria: str = Field(
+        default="",
+        max_length=32,
+        description="Ex.: veneno, encantamento",
+    )
+    condicoes: List[str] = Field(default_factory=list)
+    rolagem_d20: Optional[int] = Field(None, ge=1, le=20)
+    aplicar_sorte_halfling: bool = True
+    feats: List[str] = Field(default_factory=list)
+    feat_escolhas: Dict[str, Any] = Field(default_factory=dict)
+    save_tipo: str = Field(
+        default="",
+        max_length=20,
+        description="fortitude | reflexos | vontade (Resilient)",
+    )
+    usar_lucky: bool = False
+    lucky_restantes: int = Field(default=0, ge=0, le=10)
+
+
+class Dnd5eSalvamentoResponse(BaseModel):
+    rolagem: int
+    rolagem_secundaria: Optional[int] = None
+    sorte_reroll: Optional[int] = None
+    lucky_reroll: Optional[int] = Field(None, ge=1, le=20)
+    lucky_restantes: int = Field(default=0, ge=0)
+    proficiente_resilient: bool = False
+    total: int
+    sucesso: bool
+    vantagem: bool = False
+    bonus_racial: int = 0
+    cd: int
 
 
 class Dnd5eDanoRequest(BaseModel):
     dano: str = Field(default="1d8", max_length=20)
     mod_atributo: int = Field(default=0, ge=-5, le=20)
     is_critico: bool = False
+    arma_slug: Optional[str] = Field(None, max_length=80)
+    str_mod: Optional[int] = Field(None, ge=-5, le=20)
+    dex_mod: Optional[int] = Field(None, ge=-5, le=20)
+    duas_maos: bool = False
     rolagem_forcada: Optional[int] = Field(
         None,
         ge=1,
@@ -66,6 +139,9 @@ class Dnd5eDanoRequest(BaseModel):
 
 class Dnd5eDanoResponse(BaseModel):
     dano_total: int = Field(ge=1)
+    expressao_dano: Optional[str] = None
+    mod_atributo_usado: Optional[int] = None
+    atributo_usado: Optional[str] = None
 
 
 class Dnd5eCondicaoAtivaItem(BaseModel):
@@ -133,6 +209,8 @@ class Dnd5eConjurarRequest(BaseModel):
     condicoes_alvo: List[str] = Field(default_factory=list)
     como_ritual: bool = False
     confirmar_material_consumido: bool = False
+    armadura_slug: Optional[str] = Field(None, max_length=80)
+    escudo_slug: Optional[str] = Field(None, max_length=80)
 
 
 class Dnd5eConjurarResponse(BaseModel):
@@ -172,12 +250,16 @@ class Dnd5eConcentracaoTesteRequest(BaseModel):
     bonus_proficiencia: int = Field(default=2, ge=2, le=6)
     magia_concentracao_id: Optional[int] = None
     rolagem_d20: Optional[int] = Field(None, ge=1, le=20)
+    rolagem_d20_secundaria: Optional[int] = Field(None, ge=1, le=20)
+    feats: List[str] = Field(default_factory=list)
 
 
 class Dnd5eConcentracaoTesteResponse(BaseModel):
     manteve_concentracao: bool
     dc: int
     rolagem: int
+    rolagem_secundaria: Optional[int] = Field(None, ge=1, le=20)
+    war_caster_vantagem: bool = False
     total: int
     magia_concentracao_id: Optional[int] = None
     mensagem: str
@@ -211,6 +293,17 @@ class Dnd5eDanoHpRequest(BaseModel):
         max_length=20,
         description="vivo | inconsciente | estabilizado | morto",
     )
+    raca_slug: Optional[str] = Field(
+        None,
+        max_length=40,
+        description="Raça do alvo (traits: resistência veneno anão)",
+    )
+    raca_variante_slug: Optional[str] = Field(None, max_length=40)
+    tipo_dano: str = Field(
+        default="",
+        max_length=32,
+        description="Ex.: veneno, cortante, fogo",
+    )
 
 
 class Dnd5eDanoHpResponse(BaseModel):
@@ -220,6 +313,9 @@ class Dnd5eDanoHpResponse(BaseModel):
     status_vida: str
     morte_instantanea: bool = False
     mensagem: str
+    dano_aplicado: int = Field(default=0, ge=0)
+    dano_original: Optional[int] = Field(None, ge=0)
+    mensagem_racial: str = Field(default="", max_length=120)
 
 
 class Dnd5eEstabilizarRequest(BaseModel):
@@ -251,6 +347,9 @@ class Dnd5eEconomiaTurnoState(BaseModel):
     movimento_usado_metros: float = Field(default=0.0, ge=0)
     reacao_usada: bool = False
     velocidade_metros: float = Field(default=9.0, ge=0)
+    esquivando: bool = False
+    desengajado: bool = False
+    ajuda_alvo_id: str = Field(default="", max_length=40)
 
 
 class Dnd5eEconomiaTurnoRequest(BaseModel):
@@ -258,11 +357,32 @@ class Dnd5eEconomiaTurnoRequest(BaseModel):
     tipo: str = Field(
         ...,
         max_length=20,
-        description="acao | bonus_acao | movimento | reacao | reset",
+        description="acao | bonus_acao | movimento | reacao | dash | dodge | disengage | help | reset",
     )
     metros: float = Field(default=0.0, ge=0, description="Metros ao gastar movimento")
+    ajuda_alvo_id: str = Field(default="", max_length=40)
 
 
 class Dnd5eEconomiaTurnoResponse(BaseModel):
     economia: Dnd5eEconomiaTurnoState
     mensagem: str = ""
+
+
+class Dnd5eOportunidadeRequest(BaseModel):
+    str_mod: int = Field(default=0, ge=-5, le=20)
+    dex_mod: int = Field(default=0, ge=-5, le=20)
+    bonus_proficiencia: int = Field(default=2, ge=2, le=6)
+    ac_alvo: int = Field(..., ge=0, le=40)
+    arma_slug: Optional[str] = Field(None, max_length=80)
+    feats: List[str] = Field(default_factory=list)
+    raca_slug: Optional[str] = Field(None, max_length=40)
+    rolagem_d20: Optional[int] = Field(None, ge=1, le=20)
+    economia_atacante: Dnd5eEconomiaTurnoState = Field(
+        default_factory=Dnd5eEconomiaTurnoState
+    )
+    alvo_desengajado: bool = False
+
+
+class Dnd5eOportunidadeResponse(Dnd5eAtaqueResponse):
+    economia_atacante: Dnd5eEconomiaTurnoState
+    tipo: str = "ataque_oportunidade"

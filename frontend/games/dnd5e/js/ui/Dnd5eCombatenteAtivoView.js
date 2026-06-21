@@ -83,6 +83,12 @@ export class Dnd5eCombatenteAtivoView {
         const eco = combatente.economia || {};
         const movRest =
             Math.max(0, (eco.velocidade_metros || 9) - (eco.movimento_usado_metros || 0));
+        const luckyMax = (combatente.feats || []).some(
+            (f) => String(f).toLowerCase() === 'lucky'
+        )
+            ? 3
+            : 0;
+        const luckyRest = combatente.lucky_restantes ?? luckyMax;
 
         const statusBadge = morto
             ? '<span class="dnd5e-status-vida dnd5e-status-morto">☠ Morto</span>'
@@ -148,12 +154,31 @@ export class Dnd5eCombatenteAtivoView {
                     <span class="dnd5e-eco-chip ${eco.bonus_acao_usada ? 'usado' : ''}">Bônus</span>
                     <span class="dnd5e-eco-chip ${eco.reacao_usada ? 'usado' : ''}">Reação</span>
                     <span class="dnd5e-eco-chip mov">Mov. ${movRest.toFixed(1)}m</span>
+                    ${eco.esquivando ? '<span class="dnd5e-eco-chip usado">Esquivando</span>' : ''}
+                    ${eco.desengajado ? '<span class="dnd5e-eco-chip usado">Desengajado</span>' : ''}
+                    ${
+                        luckyMax
+                            ? `<span class="dnd5e-eco-chip mov">Lucky ${luckyRest}/${luckyMax}</span>`
+                            : ''
+                    }
                 </div>
                 <div class="dnd5e-economia-btns">
                     <button type="button" class="dnd5e-eco-btn" data-eco="acao">Ação</button>
                     <button type="button" class="dnd5e-eco-btn" data-eco="bonus_acao">Bônus</button>
                     <button type="button" class="dnd5e-eco-btn" data-eco="reacao">Reação</button>
                     <button type="button" class="dnd5e-eco-btn" data-eco="movimento">+1,5m</button>
+                </div>
+                <div class="dnd5e-economia-btns dnd5e-economia-phb">
+                    <button type="button" class="dnd5e-eco-btn" data-eco="dash">Correr</button>
+                    <button type="button" class="dnd5e-eco-btn" data-eco="dodge">Esquivar</button>
+                    <button type="button" class="dnd5e-eco-btn" data-eco="disengage">Desengajar</button>
+                    <button type="button" class="dnd5e-eco-btn" data-eco="help">Ajudar</button>
+                    <button type="button" class="dnd5e-eco-btn" data-action="sair-alcance">Sair alcance</button>
+                    ${
+                        luckyMax
+                            ? `<button type="button" class="dnd5e-eco-btn" data-action="lucky">Usar Lucky</button>`
+                            : ''
+                    }
                 </div>
             </div>`;
 
@@ -286,6 +311,12 @@ export class Dnd5eCombatenteAtivoView {
                 const metros = tipo === 'movimento' ? 1.5 : 0;
                 handlers.onEconomia?.(tipo, metros);
             });
+        });
+        container.querySelector('[data-action="sair-alcance"]')?.addEventListener('click', () => {
+            handlers.onSairAlcance?.(combatente.id);
+        });
+        container.querySelector('[data-action="lucky"]')?.addEventListener('click', () => {
+            handlers.onUsarLucky?.(combatente.id);
         });
         container.querySelectorAll('[data-ataque-idx]').forEach((btn) => {
             btn.addEventListener('click', () => {

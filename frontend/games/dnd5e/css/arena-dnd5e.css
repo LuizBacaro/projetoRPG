@@ -280,6 +280,10 @@
     text-decoration: line-through;
 }
 
+.dnd5e-economia-phb {
+    margin-top: 0.35rem;
+}
+
 .dnd5e-economia-btns {
     display: flex;
     flex-wrap: wrap;

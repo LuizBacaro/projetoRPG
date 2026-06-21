@@ -118,6 +118,12 @@ FEATS_CATALOGO: List[FeatDict] = [
         "tipo_bonus": "Perícia",
         "bonus_especial": {"pericias_extra": 3},
     },
+    {
+        "slug": "skill-expert",
+        "nome": "Especialista",
+        "tipo_bonus": "Perícia",
+        "bonus_especial": {"pericias_extra": 1, "expertise": 1},
+    },
     {"slug": "observant", "nome": "Observador", "tipo_bonus": "Perícia"},
     {
         "slug": "actor",

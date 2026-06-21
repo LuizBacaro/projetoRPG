@@ -161,3 +161,56 @@ def test_excluir_personagem(dnd5e_personagens_db):
     r = client.delete(f"/api/v1/dnd5e/personagens/{pid}")
     assert r.status_code == 204
     assert client.get(f"/api/v1/dnd5e/personagens/{pid}").status_code == 404
+
+
+def test_progressao_pericias_override(dnd5e_personagens_db):
+    SessionLocal, u1, _ = dnd5e_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    ficha = {
+        "raca_slug": "elfo",
+        "classe_slug": "guerreiro",
+        "scores_base": {
+            "strength": 15,
+            "dexterity": 14,
+            "constitution": 13,
+            "intelligence": 12,
+            "wisdom": 10,
+            "charisma": 8,
+        },
+        "pericias_classe_escolhidas": ["atletismo", "intuicao"],
+    }
+    created = client.post(
+        "/api/v1/dnd5e/personagens", json=_payload_criar(ficha=ficha)
+    ).json()
+    pid = created["id"]
+
+    r = client.post(
+        f"/api/v1/dnd5e/personagens/{pid}/progressao/pericias-override",
+        json={"pericias_override": {"furtividade": True, "atletismo": False}},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "furtividade" in body["pericias_proficientes"]
+    assert "atletismo" not in body["pericias_proficientes"]
+    assert body["ficha"]["pericias_override"]["furtividade"] is True
+
+
+def test_progressao_pericias_override_ficha_legada(dnd5e_personagens_db):
+    SessionLocal, u1, _ = dnd5e_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    ficha = {
+        "raca": "elfo",
+        "classe": "guerreiro",
+        "pericias_classe_escolhidas": ["atletismo", "intuicao"],
+    }
+    created = client.post(
+        "/api/v1/dnd5e/personagens", json=_payload_criar(ficha=ficha)
+    ).json()
+    pid = created["id"]
+
+    r = client.post(
+        f"/api/v1/dnd5e/personagens/{pid}/progressao/pericias-override",
+        json={"pericias_override": {"furtividade": True}},
+    )
+    assert r.status_code == 200, r.text
+    assert "furtividade" in r.json()["pericias_proficientes"]

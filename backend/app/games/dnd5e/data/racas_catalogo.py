@@ -62,6 +62,7 @@ RACAS_CATALOGO: List[RacaDict] = [
         "velocidade_metros": 9,
         "bonus_habilidades": {"strength": 2, "charisma": 1},
         "tracos_resumo": "Ancestralidade dracônica; resistência 5 ao dano ancestral; sopro inalado (2d6).",
+        "escolhe_variante": True,
         "caracteristicas": [
             "ancestralidade_draconica",
             "resistencia_dano_ancestral",
@@ -105,7 +106,12 @@ RACAS_CATALOGO: List[RacaDict] = [
         "tamanho": "Médio",
         "velocidade_metros": 9,
         "bonus_habilidades": {"charisma": 2},
-        "tracos_resumo": "Herança infernal; resistência 5 a fogo; visão no escuro 18 m.",
-        "caracteristicas": ["heranca_infernal", "resistencia_fogo", "visao_escuro_18m"],
+        "escolhe_variante": True,
+        "tracos_resumo": "Herança infernal; resistência a dano infernal; visão no escuro 18 m.",
+        "caracteristicas": [
+            "heranca_infernal",
+            "resistencia_dano_infernal",
+            "visao_escuro_18m",
+        ],
     },
 ]

@@ -114,6 +114,12 @@ def resumo_modificadores_ataque(
         else:
             mod.desvantagem = True
 
+    if "esquivando" in al:
+        mod.desvantagem = True
+
+    if "help_advantage" in al:
+        mod.vantagem = True
+
     if "incapacitado" in al and corpo_a_corpo:
         mod.acerto_automatico = True
         mod.critico_automatico = True
@@ -481,6 +487,9 @@ class EconomiaTurno:
     movimento_usado_metros: float = 0.0
     reacao_usada: bool = False
     velocidade_metros: float = 9.0
+    esquivando: bool = False
+    desengajado: bool = False
+    ajuda_alvo_id: str = ""
 
     def as_dict(self) -> dict:
         return {
@@ -489,6 +498,9 @@ class EconomiaTurno:
             "movimento_usado_metros": self.movimento_usado_metros,
             "reacao_usada": self.reacao_usada,
             "velocidade_metros": self.velocidade_metros,
+            "esquivando": self.esquivando,
+            "desengajado": self.desengajado,
+            "ajuda_alvo_id": self.ajuda_alvo_id,
         }
 
 
@@ -501,6 +513,9 @@ def economia_turno_de_dict(data: Optional[dict]) -> EconomiaTurno:
         movimento_usado_metros=float(data.get("movimento_usado_metros") or 0),
         reacao_usada=bool(data.get("reacao_usada")),
         velocidade_metros=float(data.get("velocidade_metros") or 9),
+        esquivando=bool(data.get("esquivando")),
+        desengajado=bool(data.get("desengajado")),
+        ajuda_alvo_id=str(data.get("ajuda_alvo_id") or ""),
     )
 
 
@@ -508,11 +523,27 @@ def reset_economia_turno(*, velocidade_metros: float = 9.0) -> EconomiaTurno:
     return EconomiaTurno(velocidade_metros=velocidade_metros)
 
 
+ACOES_COMBAT_PHB = frozenset(
+    {
+        "dash",
+        "dodge",
+        "disengage",
+        "help",
+        "acao",
+        "bonus_acao",
+        "reacao",
+        "movimento",
+        "reset",
+    }
+)
+
+
 def gastar_acao_turno(
     economia: EconomiaTurno,
     tipo: str,
     *,
     metros: float = 0.0,
+    ajuda_alvo_id: str = "",
 ) -> EconomiaTurno:
     """Registra gasto de ação/movimento/reação; levanta ValueError se inválido."""
     t = (tipo or "").strip().lower()
@@ -522,9 +553,39 @@ def gastar_acao_turno(
         movimento_usado_metros=economia.movimento_usado_metros,
         reacao_usada=economia.reacao_usada,
         velocidade_metros=economia.velocidade_metros,
+        esquivando=economia.esquivando,
+        desengajado=economia.desengajado,
+        ajuda_alvo_id=economia.ajuda_alvo_id,
     )
     if t == "reset":
         return reset_economia_turno(velocidade_metros=out.velocidade_metros)
+    if t == "dash":
+        if out.acao_usada:
+            raise ValueError("Ação padrão já usada neste turno")
+        out.acao_usada = True
+        out.velocidade_metros += max(0.0, float(out.velocidade_metros))
+        return out
+    if t == "dodge":
+        if out.acao_usada:
+            raise ValueError("Ação padrão já usada neste turno")
+        out.acao_usada = True
+        out.esquivando = True
+        return out
+    if t == "disengage":
+        if out.acao_usada:
+            raise ValueError("Ação padrão já usada neste turno")
+        out.acao_usada = True
+        out.desengajado = True
+        return out
+    if t == "help":
+        if out.acao_usada:
+            raise ValueError("Ação padrão já usada neste turno")
+        alvo = (ajuda_alvo_id or "").strip()
+        if not alvo:
+            raise ValueError("Ajuda exige alvo")
+        out.acao_usada = True
+        out.ajuda_alvo_id = alvo
+        return out
     if t == "acao":
         if out.acao_usada:
             raise ValueError("Ação padrão já usada neste turno")

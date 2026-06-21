@@ -78,7 +78,7 @@ def _row_para_armadura(row: Dict[str, Any]) -> Armadura:
 
 
 def _row_para_arma(row: Dict[str, Any]) -> Arma:
-    return Arma(
+    arma = Arma(
         arma_id=str(row["slug"]),
         nome=str(row.get("nome", "")),
         tipo=str(row.get("tipo", "corpo_a_corpo")),
@@ -90,6 +90,9 @@ def _row_para_arma(row: Dict[str, Any]) -> Arma:
         propriedades=list(row.get("propriedades") or []),
         requisitos=list(row.get("requisitos") or []),
     )
+    if row.get("dano_versatil"):
+        setattr(arma, "dano_versatil", str(row["dano_versatil"]))
+    return arma
 
 
 def _row_para_item(row: Dict[str, Any], quantidade: int = 1) -> Item:
