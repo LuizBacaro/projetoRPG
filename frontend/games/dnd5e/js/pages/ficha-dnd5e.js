@@ -58,6 +58,7 @@
     let arenaCondicoesAtual = [];
     let syncXpEmAndamento = false;
     let xpSalvoNoServidor = 0;
+    let nivelSalvoNoServidor = 1;
     const el = (id) => document.getElementById(id);
 
     function fmtMod(n) {
@@ -1201,20 +1202,33 @@
         const qtd = (classe && classe.pericias_escolha_qtd) || 0;
         const sel = getPericiasClasseEscolhidas();
         if (qtd > 0 && sel.length !== qtd) {
+            const secPericias = document.querySelector('.ficha-dnd5e-secao-pericias');
+            secPericias?.classList.add('is-editavel');
+            document.querySelectorAll('#f5e_pericias_escolha input[type=checkbox]').forEach((cb) => {
+                cb.disabled = false;
+            });
+            secPericias?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             Toast.error(`Escolha exatamente ${qtd} perícia(s) de classe.`);
             return false;
         }
         const raca = catalogoRacas.find((r) => r.slug === el('f5e_raca').value);
-        const precisaPericiaRacial =
-            raca &&
-            Array.isArray(raca.caracteristicas) &&
-            raca.caracteristicas.includes('proficiencia_pericia_extra');
-        if (precisaPericiaRacial && !el('f5e_pericia_racial').value) {
+        if (precisaPericiaRacialPendente()) {
+            desbloquearCamposPendentesPreCadastro();
+            el('f5e_pericia_racial_wrap')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            el('f5e_pericia_racial')?.focus();
             Toast.error('Escolha a perícia extra concedida pela raça.');
             return false;
         }
         if (Dnd5eRacaUtil.temVarianteEscolha(raca) && !el('f5e_raca_variante')?.value) {
             Toast.error(`Escolha ${Dnd5eRacaUtil.labelVariante(raca).toLowerCase()}.`);
+            return false;
+        }
+        const slotsExp = Number(previewAtual?.expertise_slots_classe || 0);
+        const expLista = expertiseLocal || fichaProgressaoLocal.expertise_pericias || [];
+        if (slotsExp > 0 && expLista.length < slotsExp) {
+            progressaoPanel?.renderPendenciasLocais(previewAtual?.pendencias || []);
+            el('f5e_expertise_wrap')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            Toast.error(`Escolha ${slotsExp} perícia(s) com Expertise de classe.`);
             return false;
         }
         const ant = antecedenteSelecionado();
@@ -1300,7 +1314,10 @@
             if (personagemId) {
                 await ps.atualizar(personagemId, payload);
                 xpSalvoNoServidor = parseInt(el('f5e_xp').value, 10) || 0;
+                nivelSalvoNoServidor = nivel;
                 Toast.success('Ficha salva.');
+                progressaoPanel?.renderPendenciasLocais(previewAtual?.pendencias || []);
+                await progressaoPanel?.refreshPendencias();
             } else {
                 payload.tipo = tipoCriacao;
                 const criado = await ps.criar(payload);
@@ -1336,6 +1353,7 @@
         el('f5e_nivel').value = p.nivel;
         el('f5e_xp').value = p.experiencia;
         xpSalvoNoServidor = parseInt(p.experiencia, 10) || 0;
+        nivelSalvoNoServidor = parseInt(p.nivel, 10) || 1;
         sincronizarXpComNivel();
         sincronizarXpAoCarregar();
         el('f5e_hp_atual').value = p.hp_atual;
@@ -1443,6 +1461,26 @@
         atualizarHeaderIdentidade();
     }
 
+    function precisaPericiaRacialPendente() {
+        const raca = catalogoRacas.find((r) => r.slug === el('f5e_raca').value);
+        const precisa =
+            raca &&
+            Array.isArray(raca.caracteristicas) &&
+            raca.caracteristicas.includes('proficiencia_pericia_extra');
+        return precisa && !(el('f5e_pericia_racial')?.value || '').trim();
+    }
+
+    function desbloquearCamposPendentesPreCadastro() {
+        if (precisaPericiaRacialPendente()) {
+            const node = el('f5e_pericia_racial');
+            const wrap = el('f5e_pericia_racial_wrap');
+            if (node) {
+                node.disabled = false;
+                node.removeAttribute('data-pre-cadastro-lock');
+            }
+            if (wrap) wrap.hidden = false;
+        }
+    }
     function periciasClasseCompletas() {
         const classe = catalogoClasses.find((c) => c.slug === el('f5e_classe').value);
         const qtd = (classe && classe.pericias_escolha_qtd) || 0;
@@ -1464,7 +1502,10 @@
             'f5e_extra1',
             'f5e_extra2',
             'f5e_pericia_racial',
-        ];
+        ].filter((id) => {
+            if (id === 'f5e_pericia_racial' && precisaPericiaRacialPendente()) return false;
+            return true;
+        });
         if (periciasOk && el('f5e_raca_variante')?.value) {
             lockIds.push('f5e_raca_variante');
         }
@@ -1495,6 +1536,7 @@
             .forEach((cb) => {
                 cb.disabled = periciasOk;
             });
+        desbloquearCamposPendentesPreCadastro();
     }
 
     window.__dnd5eFichaGrimorioApi = {
@@ -1545,6 +1587,8 @@
             getExpertisePericias: () =>
                 Array.isArray(expertiseLocal) ? expertiseLocal : fichaProgressaoLocal.expertise_pericias || [],
             getExpertiseSlotsClasse: () => Number(previewAtual?.expertise_slots_classe || 0),
+            getProgressao: () => fichaProgressaoLocal.progressao,
+            getNivelSalvo: () => nivelSalvoNoServidor,
             getXp: () => parseInt(el('f5e_xp').value, 10) || 0,
             xpPrecisaSalvar: () => {
                 const xp = parseInt(el('f5e_xp').value, 10) || 0;

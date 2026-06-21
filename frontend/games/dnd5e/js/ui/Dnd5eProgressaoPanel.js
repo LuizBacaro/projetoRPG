@@ -42,6 +42,8 @@ class Dnd5eProgressaoPanel {
         this.getClasseSlug = options.getClasseSlug || (() => '');
         this.getExpertisePericias = options.getExpertisePericias || (() => []);
         this.getExpertiseSlotsClasse = options.getExpertiseSlotsClasse || null;
+        this.getProgressao = options.getProgressao || (() => this._progCache || {});
+        this.getNivelSalvo = options.getNivelSalvo || (() => this.getNivel());
         this.xpPrecisaSalvar = options.xpPrecisaSalvar || (() => false);
         this.onFichaAtualizada = options.onFichaAtualizada || (() => {});
         this.catalogoFeats = [];
@@ -184,6 +186,28 @@ class Dnd5eProgressaoPanel {
         this._renderFeatEscolhasSection(f.feats || [], this._featEscolhasLocal);
     }
 
+    _nivelEfetivo() {
+        let n = Math.max(1, Math.min(20, parseInt(this.getNivel(), 10) || 1));
+        if (typeof Dnd5eXpUtil !== 'undefined') {
+            n = Math.max(n, Dnd5eXpUtil.nivelPorXp(this.getXp()));
+        }
+        return n;
+    }
+
+    _nivelSubiuPendente() {
+        const atual = this._nivelEfetivo();
+        const salvo = Math.max(1, parseInt(this.getNivelSalvo(), 10) || 1);
+        return atual > salvo;
+    }
+
+    _dadosProgressaoLocal() {
+        const prog = this.getProgressao?.() || this._progCache || {};
+        return {
+            hp_rolls: prog.hp_rolls || [],
+            marcos: prog.marcos || [],
+        };
+    }
+
     _slotsExpertiseClasse(classeSlug, nivel) {
         if (typeof this.getExpertiseSlotsClasse === 'function') {
             const slots = this.getExpertiseSlotsClasse();
@@ -198,11 +222,10 @@ class Dnd5eProgressaoPanel {
     }
 
     _pendenciasProgressaoLocal() {
-        const nivel = Math.max(1, Math.min(20, this.getNivel()));
+        const nivel = this._nivelEfetivo();
         const raca = (this.getRacaSlug() || '').toLowerCase();
         const classe = (this.getClasseSlug() || '').toLowerCase();
-        const hpRolls = this._progCache?.hp_rolls || [];
-        const marcos = this._progCache?.marcos || [];
+        const { hp_rolls: hpRolls, marcos } = this._dadosProgressaoLocal();
         const hpNiveis = new Set(
             hpRolls.map((r) => parseInt(r.nivel, 10)).filter((n) => Number.isFinite(n))
         );
@@ -266,6 +289,11 @@ class Dnd5eProgressaoPanel {
             const cat = PENDENCIAS_UTIL ? PENDENCIAS_UTIL.categoria(p) : '';
             return cat === 'hp' || cat === 'marco' || cat === 'pericia';
         });
+    }
+
+    _deveExibirProgressao(pendenciasServidor) {
+        if (this._pendenciasAcao(pendenciasServidor).length > 0) return true;
+        return this._nivelSubiuPendente();
     }
 
     _htmlHpRolls(rolls) {
@@ -381,18 +409,26 @@ class Dnd5eProgressaoPanel {
 
     _atualizarModoProgressao(pendenciasServidor) {
         const acao = this._pendenciasAcao(pendenciasServidor);
-        const temAcao = acao.length > 0;
+        const nivelSubiu = this._nivelSubiuPendente();
+        const exibir = acao.length > 0 || nivelSubiu;
         const edit = this.el('f5e_progressao_edit');
         const info = this.el('f5e_progressao_info');
         const secao = this.el('f5e_progressao_sec');
         const tituloPendencias = edit?.querySelector('.ficha-dnd5e-pendencias-titulo');
 
-        if (edit) edit.hidden = !temAcao;
+        if (edit) edit.hidden = !exibir;
         if (info) info.hidden = true;
-        if (tituloPendencias) tituloPendencias.hidden = !temAcao;
+        if (tituloPendencias) tituloPendencias.hidden = !acao.length;
         if (secao) {
-            secao.hidden = !temAcao;
-            secao.classList.toggle('has-pendencias', temAcao);
+            secao.hidden = !exibir;
+            secao.classList.toggle('has-pendencias', exibir);
+        }
+        if (nivelSubiu && this.xpPrecisaSalvar()) {
+            this._setStatus(
+                `Nível ${this._nivelEfetivo()} — salve a ficha e registre PV/marcos do novo nível.`
+            );
+        } else if (!exibir) {
+            this._setStatus('');
         }
     }
 
@@ -664,6 +700,7 @@ class Dnd5eProgressaoPanel {
         const alerta = this.el('f5e_pendencias_alerta');
         const badge = this.el('f5e_pendencias_badge');
         const acao = this._pendenciasAcao(pendenciasServidor);
+        const nivelSubiu = this._nivelSubiuPendente();
 
         this._atualizarModoProgressao(pendenciasServidor);
 
@@ -674,20 +711,30 @@ class Dnd5eProgressaoPanel {
             .sort((a, b) => a - b);
         this._preencherNivelHpPendente(hpPendentes);
 
+        const badgeQtd = acao.length + (nivelSubiu && !acao.length ? 1 : 0);
         if (badge) {
-            badge.textContent = acao.length ? String(acao.length) : '';
-            badge.hidden = !acao.length;
+            badge.textContent = badgeQtd ? String(badgeQtd) : '';
+            badge.hidden = !badgeQtd;
         }
         if (alerta) {
-            if (!acao.length) {
+            if (!acao.length && !nivelSubiu) {
                 alerta.hidden = true;
                 alerta.innerHTML = '';
             } else {
                 alerta.hidden = false;
-                const resumo = PENDENCIAS_UTIL
-                    ? PENDENCIAS_UTIL.resumoAlerta(acao)
-                    : `${acao.length} item(ns)`;
-                alerta.innerHTML = `<strong>Progressão incompleta</strong> — ${resumo}. Clique em um item para ir ao campo.`;
+                const partes = [];
+                if (nivelSubiu) {
+                    partes.push(
+                        `nível ${this._nivelEfetivo()} (salve a ficha${acao.length ? ' e complete' : ''})`
+                    );
+                }
+                if (acao.length) {
+                    const resumo = PENDENCIAS_UTIL
+                        ? PENDENCIAS_UTIL.resumoAlerta(acao)
+                        : `${acao.length} item(ns)`;
+                    partes.push(resumo);
+                }
+                alerta.innerHTML = `<strong>Progressão incompleta</strong> — ${partes.join(' · ')}. Clique em um item para ir ao campo.`;
             }
         }
         if (!host) return;
