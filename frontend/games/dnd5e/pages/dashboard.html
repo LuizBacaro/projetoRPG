@@ -100,10 +100,8 @@
                             <input id="prec_jogador" type="text" readonly tabindex="-1" />
                         </div>
                         <div>
-                            <label class="ficha-label">Nível</label>
-                            <input id="prec_nivel" type="hidden" value="1" />
-                            <span class="dnd5e-prec-nivel-fixo">1</span>
-                            <p class="ficha-dnd5e-status dnd5e-prec-nivel-hint">Evolução na ficha após o cadastro.</p>
+                            <label class="ficha-label" for="prec_nivel">Nível</label>
+                            <input id="prec_nivel" type="number" min="1" max="20" value="1" />
                         </div>
                         <div>
                             <label class="ficha-label" for="prec_raca">Raça</label>
@@ -132,7 +130,10 @@
                             <label class="ficha-label" for="prec_subclasse">Subclasse</label>
                             <select id="prec_subclasse"><option value="">—</option></select>
                         </div>
-                        <input id="prec_xp" type="hidden" value="0" />
+                        <div>
+                            <label class="ficha-label" for="prec_xp">Experiência</label>
+                            <input id="prec_xp" type="number" min="0" value="0" />
+                        </div>
                     </div>
                     <p id="prec_tracos" class="ficha-dnd5e-tracos" hidden></p>
                     <div id="prec_raca_extra" class="ficha-dnd5e-raca-extra dnd5e-prec-grid">
@@ -175,6 +176,11 @@
                     </div>
                     <div id="prec_hp_rolls_host" class="dnd5e-prec-hp-rolls"></div>
                     <p id="prec_hp_detalhe" class="ficha-dnd5e-hp-detalhe"></p>
+                </section>
+
+                <section class="dnd5e-prec-sec" id="prec_progressao_wrap" hidden>
+                    <h3 class="dnd5e-prec-sec-titulo">📈 Progressão</h3>
+                    <div id="prec_progressao_host"></div>
                 </section>
 
                 <section class="dnd5e-prec-sec">
@@ -225,12 +231,13 @@
 </script>
 <script src="../js/services/Dnd5ePersonagemService.js?v=3"></script>
 <script src="../js/services/Dnd5eRegrasService.js?v=5"></script>
-<script src="../js/shared/dnd5e-raca-util.js?v=1"></script>
+<script src="../js/shared/dnd5e-raca-util.js?v=3"></script>
 <script src="../js/shared/dnd5e-xp-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-ouro-classe-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-idiomas-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-tracos-util.js?v=1"></script>
-<script src="../js/ui/Dnd5ePreCadastroModal.js?v=13"></script>
+<script src="../js/ui/Dnd5ePreCadastroProgressao.js?v=2"></script>
+<script src="../js/ui/Dnd5ePreCadastroModal.js?v=15"></script>
 <script>
 (function () {
     const ps = new Dnd5ePersonagemService();
