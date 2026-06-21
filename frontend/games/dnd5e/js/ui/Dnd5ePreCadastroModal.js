@@ -19,6 +19,7 @@ class Dnd5ePreCadastroModal {
         this.catalogoClasses = [];
         this.catalogoAntecedentes = [];
         this.catalogoPericias = [];
+        this.catalogoIdiomas = [];
         this.armaduras = [];
         this.escudos = [];
         this.debounceTimer = null;
@@ -26,6 +27,14 @@ class Dnd5ePreCadastroModal {
         this._syncXpEmAndamento = false;
         this.hpRollsCache = {};
         this.lastConMod = 0;
+        this.classeOuroMeta = {
+            slug: null,
+            ouro_aplicado: 0,
+            rolagem: [],
+            formula: '',
+        };
+        this.idiomasAntecedente = [];
+        this.tracosAntecedente = null;
     }
 
     el(id) {
@@ -151,6 +160,7 @@ class Dnd5ePreCadastroModal {
         this.renderAbilities();
         this.el('prec_jogador').value = this.nomeJogadorLogado();
         this.el('btnPrecMatriz').addEventListener('click', () => this.aplicarMatrizPadrao());
+        this.el('prec_btn_rolar_ouro')?.addEventListener('click', () => this.rolarOuroClasse(true));
         this.el('formPrecadastro').addEventListener('submit', (e) => {
             e.preventDefault();
             this.cadastrar();
@@ -172,6 +182,13 @@ class Dnd5ePreCadastroModal {
                 if (id === 'prec_classe') {
                     this.renderPericiasEscolha();
                     this.atualizarSubclasses();
+                    this.atualizarOuroFormula();
+                    this.rolarOuroClasse(true);
+                }
+                if (id === 'prec_antecedente') {
+                    this.renderOuroResumo();
+                    this.renderIdiomasAntecedente(true);
+                    this.renderTracosAntecedente(true);
                 }
                 if (id === 'prec_nivel') {
                     this.sincronizarXpComNivel();
@@ -199,17 +216,24 @@ class Dnd5ePreCadastroModal {
         document.getElementById('btnNovoNpc')?.addEventListener('click', () => this.abrir('npc'));
 
         try {
-            const [racas, classes, ant, per, equip] = await Promise.all([
+            const carregarIdiomas =
+                typeof this.rs.idiomas === 'function'
+                    ? this.rs.idiomas()
+                    : Promise.resolve({ idiomas: window.__dnd5eCatalogoIdiomas || [] });
+            const [racas, classes, ant, per, equip, idiomas] = await Promise.all([
                 this.rs.racas(),
                 this.rs.classes(),
                 this.rs.antecedentes(),
                 this.rs.pericias(),
                 this.rs.equipamento(),
+                carregarIdiomas,
             ]);
             this.catalogoRacas = racas.racas || [];
             this.catalogoClasses = classes.classes || [];
             this.catalogoAntecedentes = ant.antecedentes || [];
             this.catalogoPericias = per.pericias || [];
+            this.catalogoIdiomas = idiomas.idiomas || [];
+            window.__dnd5eCatalogoIdiomas = this.catalogoIdiomas;
             this.armaduras = equip.armaduras || [];
             this.escudos = equip.escudos || [];
             if (typeof Dnd5eXpUtil !== 'undefined' && classes.xp_por_nivel) {
@@ -279,6 +303,164 @@ class Dnd5ePreCadastroModal {
             out[a.key] = parseInt(this.el(`prec_base_${a.key}`).value, 10) || 10;
         });
         return out;
+    }
+
+    antecedenteSelecionado() {
+        const slug = this.el('prec_antecedente').value || null;
+        if (!slug) return null;
+        return this.catalogoAntecedentes.find((a) => a.slug === slug) || null;
+    }
+
+    getIdiomasAntecedenteEscolhidos() {
+        if (typeof Dnd5eIdiomasUtil === 'undefined') return this.idiomasAntecedente;
+        const fromDom = Dnd5eIdiomasUtil.getEscolhidosDoHost(
+            this.el('prec_antecedente_idiomas_host'),
+            'prec-idioma'
+        );
+        return fromDom.length ? fromDom : this.idiomasAntecedente;
+    }
+
+    renderIdiomasAntecedente(reset = false) {
+        const wrap = this.el('prec_antecedente_idiomas_wrap');
+        const host = this.el('prec_antecedente_idiomas_host');
+        const hint = this.el('prec_antecedente_idiomas_hint');
+        const ant = this.antecedenteSelecionado();
+        if (!wrap || !host || typeof Dnd5eIdiomasUtil === 'undefined') return;
+        if (!ant || !(ant.idiomas_qtd > 0)) {
+            wrap.hidden = true;
+            host.innerHTML = '';
+            this.idiomasAntecedente = [];
+            return;
+        }
+        wrap.hidden = false;
+        if (reset) this.idiomasAntecedente = [];
+        Dnd5eIdiomasUtil.renderEscolha({
+            host,
+            hint,
+            catalogo: this.catalogoIdiomas,
+            qtd: ant.idiomas_qtd,
+            selecionados: this.idiomasAntecedente,
+            idPrefix: 'prec-idioma',
+            onChange: (idiomas) => {
+                this.idiomasAntecedente = idiomas;
+            },
+        });
+    }
+
+    getTracosAntecedenteEscolhidos() {
+        if (typeof Dnd5eTracosUtil === 'undefined') return this.tracosAntecedente;
+        const ant = this.antecedenteSelecionado();
+        const fromDom = Dnd5eTracosUtil.getEscolhidosDoHost(
+            this.el('prec_antecedente_tracos_host')
+        );
+        if (fromDom && Dnd5eTracosUtil.tracosEstaoCompletos(fromDom)) return fromDom;
+        if (this.tracosAntecedente && ant?.tracos_opcoes) {
+            return Dnd5eTracosUtil.normalizarEscolhidos(
+                this.tracosAntecedente,
+                ant.tracos_opcoes
+            );
+        }
+        return fromDom;
+    }
+
+    renderTracosAntecedente(reset = false) {
+        const wrap = this.el('prec_antecedente_tracos_wrap');
+        const host = this.el('prec_antecedente_tracos_host');
+        const hint = this.el('prec_antecedente_tracos_hint');
+        const btn = this.el('prec_antecedente_tracos_sortear');
+        const ant = this.antecedenteSelecionado();
+        if (!wrap || !host || typeof Dnd5eTracosUtil === 'undefined') return;
+        if (!ant) {
+            wrap.hidden = true;
+            host.innerHTML = '';
+            this.tracosAntecedente = null;
+            return;
+        }
+        wrap.hidden = false;
+        if (reset) this.tracosAntecedente = null;
+        Dnd5eTracosUtil.renderEscolha({
+            host,
+            hint,
+            btnSortear: btn,
+            opcoes: ant.tracos_opcoes || {},
+            selecionados: reset ? null : this.tracosAntecedente,
+            idPrefix: 'prec-traco',
+            onChange: (tracos) => {
+                this.tracosAntecedente = tracos;
+            },
+        });
+    }
+
+    classeSelecionada() {
+        return this.catalogoClasses.find((c) => c.slug === this.el('prec_classe').value);
+    }
+
+    atualizarOuroFormula() {
+        const elFormula = this.el('prec_ouro_formula');
+        if (!elFormula) return;
+        const classe = this.classeSelecionada();
+        if (!classe) {
+            elFormula.textContent = 'Selecione uma classe.';
+            return;
+        }
+        const formula = classe.ouro_inicial_formula || '—';
+        elFormula.textContent = `Fórmula PHB: ${formula}`;
+    }
+
+    renderOuroResumo(roll) {
+        const host = this.el('prec_ouro_resultado');
+        if (!host) return;
+        const antSlug = this.el('prec_antecedente').value || null;
+        const ant = antSlug
+            ? this.catalogoAntecedentes.find((a) => a.slug === antSlug)
+            : null;
+        const antOuro = Number(ant?.ouro_po ?? ant?.ouro_extra) || 0;
+        const classeOuro = this.classeOuroMeta.ouro_aplicado || 0;
+        const partes = [];
+        if (roll && typeof Dnd5eOuroClasseUtil !== 'undefined') {
+            partes.push(`Classe: ${Dnd5eOuroClasseUtil.formatRollHint(roll)}`);
+        } else if (classeOuro > 0) {
+            partes.push(`Classe: ${classeOuro} gp`);
+        }
+        if (antOuro > 0) partes.push(`Antecedente: +${antOuro} gp`);
+        if (classeOuro > 0 || antOuro > 0) {
+            partes.push(`Total inicial: ${classeOuro + antOuro} gp`);
+        }
+        host.textContent = partes.join(' · ');
+    }
+
+    async rolarOuroClasse(forcar = false) {
+        const slug = this.el('prec_classe').value;
+        if (!slug) return;
+        if (
+            !forcar &&
+            this.classeOuroMeta.slug === slug &&
+            this.classeOuroMeta.ouro_aplicado > 0
+        ) {
+            this.renderOuroResumo({
+                total: this.classeOuroMeta.ouro_aplicado,
+                dados: this.classeOuroMeta.rolagem,
+                formula: this.classeOuroMeta.formula,
+                multiplicador: 1,
+            });
+            return;
+        }
+        const btn = this.el('prec_btn_rolar_ouro');
+        if (btn) btn.disabled = true;
+        try {
+            const roll = await this.rs.rolarOuroClasse({ classe_slug: slug });
+            this.classeOuroMeta = {
+                slug,
+                ouro_aplicado: Number(roll.total) || 0,
+                rolagem: roll.dados || [],
+                formula: roll.formula || '',
+            };
+            this.renderOuroResumo(roll);
+        } catch (e) {
+            if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro ao rolar ouro');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
     }
 
     racaSelecionada() {
@@ -623,6 +805,31 @@ class Dnd5ePreCadastroModal {
             );
             return false;
         }
+        const ant = this.antecedenteSelecionado();
+        if (
+            ant &&
+            ant.idiomas_qtd > 0 &&
+            typeof Dnd5eIdiomasUtil !== 'undefined' &&
+            !Dnd5eIdiomasUtil.validarEscolha(
+                this.getIdiomasAntecedenteEscolhidos(),
+                ant.idiomas_qtd,
+                this.catalogoIdiomas
+            )
+        ) {
+            Toast.error(`Escolha exatamente ${ant.idiomas_qtd} idioma(s) do antecedente.`);
+            return false;
+        }
+        if (
+            ant &&
+            typeof Dnd5eTracosUtil !== 'undefined' &&
+            !Dnd5eTracosUtil.validarEscolha(
+                this.getTracosAntecedenteEscolhidos(),
+                ant.tracos_opcoes || {}
+            )
+        ) {
+            Toast.error('Escolha traço de personalidade, ideal, laço e fraqueza do antecedente.');
+            return false;
+        }
         return true;
     }
 
@@ -651,6 +858,25 @@ class Dnd5ePreCadastroModal {
             const conMod = preview.modificadores?.constitution ?? 0;
             const progressao = this.buildProgressaoHp(conMod);
             if (progressao) f.progressao = progressao;
+        }
+        if (this.classeOuroMeta.ouro_aplicado > 0) {
+            f.classe_ouro_slug = this.classeOuroMeta.slug;
+            f.ouro_classe_aplicado = this.classeOuroMeta.ouro_aplicado;
+            f.ouro_classe_rolagem = this.classeOuroMeta.rolagem;
+            f.ouro_classe_formula = this.classeOuroMeta.formula;
+            f.inventario = {
+                ouro_po: this.classeOuroMeta.ouro_aplicado,
+                equipamentos: [],
+                consumiveis: [],
+            };
+        }
+        const idiomas = this.getIdiomasAntecedenteEscolhidos();
+        if (idiomas.length) {
+            f.antecedente_idiomas = idiomas;
+        }
+        const tracos = this.getTracosAntecedenteEscolhidos();
+        if (tracos && typeof Dnd5eTracosUtil !== 'undefined' && Dnd5eTracosUtil.tracosEstaoCompletos(tracos)) {
+            f.antecedente_tracos = tracos;
         }
         f.arena_condicoes = [];
         return f;
@@ -705,7 +931,19 @@ class Dnd5ePreCadastroModal {
         this.sincronizarXpComNivel();
         this.hpRollsCache = {};
         this.lastConMod = 0;
+        this.classeOuroMeta = {
+            slug: null,
+            ouro_aplicado: 0,
+            rolagem: [],
+            formula: '',
+        };
+        this.idiomasAntecedente = [];
+        this.tracosAntecedente = null;
+        this.renderIdiomasAntecedente(true);
+        this.renderTracosAntecedente(true);
         this.renderHpRolls();
+        if (this.el('prec_ouro_resultado')) this.el('prec_ouro_resultado').textContent = '';
+        this.atualizarOuroFormula();
         if (this.el('prec_hp_detalhe')) this.el('prec_hp_detalhe').textContent = '';
         this.aplicarAtributosNeutros();
         this.atualizarUiRaca();
@@ -737,6 +975,10 @@ class Dnd5ePreCadastroModal {
         this.el('modalPrecadastro').classList.add('show');
         this.renderHpRolls();
         this.atualizarSubclasses();
+        this.atualizarOuroFormula();
+        this.rolarOuroClasse(true);
+        this.renderIdiomasAntecedente(true);
+        this.renderTracosAntecedente(true);
         this.rodarPreview();
     }
 

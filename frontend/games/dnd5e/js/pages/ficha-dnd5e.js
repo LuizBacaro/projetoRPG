@@ -35,6 +35,7 @@
     let catalogoClasses = [];
     let catalogoAntecedentes = [];
     let catalogoPericias = [];
+    let catalogoIdiomas = [];
     let catalogoCondicoes = [];
     let inventarioPanel = null;
     let previewAtual = null;
@@ -42,13 +43,21 @@
         metodo_atributos: 'padrao',
         progressao: { hp_rolls: [], marcos: [] },
         feats: [],
+        feat_escolhas: {},
         bonus_atributo_feat: {},
+        pericias_override: {},
+        expertise_pericias: [],
     };
+    let periciasEditModo = false;
+    let periciasDesejadasLocal = {};
+    let periciasOverrideSalvo = {};
+    let expertiseLocal = [];
     let progressaoPanel = null;
     let debounceTimer = null;
     let debounceHpCondTimer = null;
     let arenaCondicoesAtual = [];
     let syncXpEmAndamento = false;
+    let xpSalvoNoServidor = 0;
     const el = (id) => document.getElementById(id);
 
     function fmtMod(n) {
@@ -148,6 +157,7 @@
         syncXpEmAndamento = false;
         if (novoNivel == null) {
             atualizarHeaderIdentidade();
+            atualizarPendenciasLocais();
             return;
         }
         atualizarHeaderIdentidade();
@@ -156,7 +166,11 @@
             window.__dnd5eAtualizarSecaoMagias();
         }
         agendarPreview();
-        progressaoPanel?.refreshPendencias();
+        progressaoPanel?.renderPendenciasLocais(previewAtual?.pendencias || []);
+    }
+
+    function atualizarPendenciasLocais() {
+        progressaoPanel?.renderPendenciasLocais(previewAtual?.pendencias || []);
     }
 
     function aoAlterarNivel() {
@@ -167,7 +181,11 @@
         }
         atualizarSubclasses();
         agendarPreview();
-        progressaoPanel?.refreshPendencias();
+        if (personagemId) {
+            progressaoPanel?.refreshPendencias();
+        } else {
+            atualizarPendenciasLocais();
+        }
     }
 
     function payloadCalcular() {
@@ -179,6 +197,7 @@
               };
         return {
             raca_slug: el('f5e_raca').value,
+            raca_variante_slug: el('f5e_raca_variante')?.value || null,
             classe_slug: el('f5e_classe').value,
             antecedente_slug: el('f5e_antecedente').value || null,
             scores_base: getScoresBase(),
@@ -191,8 +210,96 @@
             armadura_slug: armEsc.armadura_slug,
             escudo_slug: armEsc.escudo_slug,
             feats: fichaProgressaoLocal.feats || [],
+            feat_escolhas: fichaProgressaoLocal.feat_escolhas || {},
+            pericias_override: fichaProgressaoLocal.pericias_override || {},
+            expertise_pericias: fichaProgressaoLocal.expertise_pericias || [],
             progressao: fichaProgressaoLocal.progressao || { hp_rolls: [], marcos: [] },
         };
+    }
+
+    function calcularPericiasOverride(desejadas, automaticas) {
+        const auto = new Set(automaticas || []);
+        const override = {};
+        Object.keys(desejadas || {}).forEach((slug) => {
+            const desejada = !!desejadas[slug];
+            const autoProf = auto.has(slug);
+            if (desejada !== autoProf) {
+                override[slug] = desejada;
+            }
+        });
+        return override;
+    }
+
+    function sincronizarPericiasOverrideLocal() {
+        if (!periciasEditModo || !previewAtual) return;
+        fichaProgressaoLocal.pericias_override = calcularPericiasOverride(
+            periciasDesejadasLocal,
+            previewAtual.pericias_automaticas || []
+        );
+    }
+
+    function setModoEdicaoPericias(ativo) {
+        periciasEditModo = !!ativo;
+        const sec = document.querySelector('.ficha-dnd5e-secao-pericias-todas');
+        sec?.classList.toggle('is-editing', periciasEditModo);
+        el('f5e_btn_editar_pericias').hidden = periciasEditModo;
+        el('f5e_btn_salvar_pericias').hidden = !periciasEditModo;
+        el('f5e_btn_cancelar_pericias').hidden = !periciasEditModo;
+        const leg = el('f5e_pericias_grade_legenda');
+        if (leg) {
+            leg.textContent = periciasEditModo
+                ? 'Marque as perícias em que o personagem é proficiente (multiclasse, talentos, mesa).'
+                : 'Bônus totais · destaque = proficiente';
+        }
+    }
+
+    function abrirEditorPericias() {
+        if (!previewAtual?.pericias?.length) {
+            Toast.error('Aguarde o cálculo da ficha antes de editar perícias.');
+            return;
+        }
+        periciasOverrideSalvo = { ...(fichaProgressaoLocal.pericias_override || {}) };
+        periciasDesejadasLocal = {};
+        previewAtual.pericias.forEach((p) => {
+            periciasDesejadasLocal[p.slug] = !!p.proficiente;
+        });
+        setModoEdicaoPericias(true);
+        renderPericiasGrade(previewAtual.pericias);
+    }
+
+    function cancelarEditorPericias() {
+        fichaProgressaoLocal.pericias_override = { ...periciasOverrideSalvo };
+        periciasDesejadasLocal = {};
+        setModoEdicaoPericias(false);
+        agendarPreview();
+    }
+
+    async function salvarPericiasOverride() {
+        sincronizarPericiasOverrideLocal();
+        const override = { ...(fichaProgressaoLocal.pericias_override || {}) };
+        try {
+            if (personagemId) {
+                const res = await ps.progressaoPericiasOverride(personagemId, {
+                    pericias_override: override,
+                });
+                if (res.pericias_override) {
+                    fichaProgressaoLocal.pericias_override = res.pericias_override;
+                }
+                if (res.ficha?.pericias_override) {
+                    fichaProgressaoLocal.pericias_override = res.ficha.pericias_override;
+                }
+                progressaoPanel?.renderPendenciasLocais(res.pendencias || []);
+            } else {
+                fichaProgressaoLocal.pericias_override = override;
+            }
+            periciasOverrideSalvo = { ...fichaProgressaoLocal.pericias_override };
+            setModoEdicaoPericias(false);
+            periciasDesejadasLocal = {};
+            await rodarPreview();
+            Toast.success('Proficiências de perícias salvas.');
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao salvar proficiências');
+        }
     }
 
     function atualizarUiRaca() {
@@ -219,6 +326,17 @@
             Array.isArray(raca.caracteristicas) &&
             raca.caracteristicas.includes('proficiencia_pericia_extra');
         el('f5e_pericia_racial_wrap').hidden = !temPericiaExtra;
+        const temVariante = Dnd5eRacaUtil.temVarianteEscolha(raca);
+        el('f5e_raca_variante_wrap').hidden = !temVariante;
+        if (temVariante) {
+            const lbl = el('f5e_raca_variante_label');
+            if (lbl) lbl.textContent = Dnd5eRacaUtil.labelVariante(raca);
+            Dnd5eRacaUtil.preencherSelectVariante(
+                raca,
+                el('f5e_raca_variante'),
+                el('f5e_raca_variante')?.value
+            );
+        }
     }
 
     function preencherSelectExtra() {
@@ -306,18 +424,229 @@
             host.innerHTML = '';
             return;
         }
+        const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
+        const profBonus = previewAtual?.bonus_proficiencia ?? bonusProficiencia(nivel);
+        if (periciasEditModo) {
+            host.innerHTML = pericias
+                .map((p) => {
+                    const prof = !!periciasDesejadasLocal[p.slug];
+                    const modBase = Number(p.bonus) - (p.proficiente ? profBonus : 0);
+                    const bonus = modBase + (prof ? profBonus : 0);
+                    const checked = prof ? 'checked' : '';
+                    return `<div class="ficha-dnd5e-pericia-row is-edit${prof ? ' is-prof' : ''}">
+                <label>
+                    <input type="checkbox" data-pericia-slug="${p.slug}" ${checked} />
+                    <span>${p.nome}</span>
+                </label>
+                <strong>${fmtMod(bonus)}</strong>
+            </div>`;
+                })
+                .join('');
+            host.querySelectorAll('input[data-pericia-slug]').forEach((inp) => {
+                inp.addEventListener('change', () => {
+                    const slug = inp.getAttribute('data-pericia-slug');
+                    periciasDesejadasLocal[slug] = inp.checked;
+                    sincronizarPericiasOverrideLocal();
+                    renderPericiasGrade(pericias);
+                    agendarPreview();
+                });
+            });
+            return;
+        }
         host.innerHTML = pericias
             .map(
                 (p) => `
-            <div class="ficha-dnd5e-pericia-row${p.proficiente ? ' is-prof' : ''}">
-                <span>${p.nome}</span>
+            <div class="ficha-dnd5e-pericia-row${p.proficiente ? ' is-prof' : ''}${p.expertise ? ' is-expert' : ''}">
+                <span>${p.nome}${p.expertise ? ' <em class="ficha-dnd5e-expertise-tag">2× prof</em>' : ''}</span>
                 <strong>${fmtMod(p.bonus)}</strong>
             </div>`
             )
             .join('');
     }
 
-    function atualizarAntecedentePainel(ant) {
+    function renderExpertiseSection(preview) {
+        const wrap = el('f5e_expertise_wrap');
+        const hint = el('f5e_expertise_hint');
+        const host = el('f5e_expertise_escolha');
+        const slots = Number(preview?.expertise_slots_classe || 0);
+        if (!wrap || !host) return;
+        if (!slots) {
+            wrap.hidden = true;
+            host.innerHTML = '';
+            return;
+        }
+        wrap.hidden = false;
+        const classe = preview?.classe?.nome || 'classe';
+        if (hint) {
+            hint.textContent = `${classe}: escolha ${slots} perícia(s) proficiente(s) para dobrar o bônus de proficiência (Expertise).`;
+        }
+        const profs = (preview?.pericias || []).filter((x) => x.proficiente);
+        const escolhidas = new Set(expertiseLocal || []);
+        host.innerHTML = profs
+            .map((p) => {
+                const checked = escolhidas.has(p.slug) ? 'checked' : '';
+                return `<label class="ficha-dnd5e-expertise-item">
+                    <input type="checkbox" data-expertise-slug="${p.slug}" ${checked} />
+                    <span>${p.nome}</span>
+                </label>`;
+            })
+            .join('');
+        host.querySelectorAll('input[data-expertise-slug]').forEach((inp) => {
+            inp.addEventListener('change', () => {
+                const slug = inp.getAttribute('data-expertise-slug');
+                let next = (expertiseLocal || []).filter((s) => s !== slug);
+                if (inp.checked) {
+                    if (next.length >= slots) {
+                        inp.checked = false;
+                        Toast.error(`Escolha no máximo ${slots} perícia(s) com Expertise.`);
+                        return;
+                    }
+                    next.push(slug);
+                }
+                expertiseLocal = next;
+                fichaProgressaoLocal.expertise_pericias = [...next];
+                agendarPreview();
+            });
+        });
+    }
+
+    async function salvarExpertisePericias() {
+        if (!personagemId) {
+            Toast.error('Salve a ficha antes de registrar Expertise.');
+            return;
+        }
+        const slots = Number(previewAtual?.expertise_slots_classe || 0);
+        const lista = [...(expertiseLocal || [])];
+        if (slots && lista.length < slots) {
+            Toast.error(`Escolha ${slots} perícia(s) com Expertise.`);
+            return;
+        }
+        try {
+            const res = await ps.progressaoExpertisePericias(personagemId, {
+                expertise_pericias: lista,
+            });
+            if (res.expertise_pericias) {
+                fichaProgressaoLocal.expertise_pericias = res.expertise_pericias;
+                expertiseLocal = [...res.expertise_pericias];
+            }
+            if (res.ficha?.expertise_pericias) {
+                fichaProgressaoLocal.expertise_pericias = res.ficha.expertise_pericias;
+                expertiseLocal = [...res.ficha.expertise_pericias];
+            }
+            progressaoPanel?.renderPendenciasLocais(res.pendencias || []);
+            await rodarPreview();
+            Toast.success('Expertise salva.');
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao salvar expertise');
+        }
+    }
+
+    function antecedenteSelecionado() {
+        const slug = el('f5e_antecedente').value || null;
+        if (!slug) return null;
+        return (
+            catalogoAntecedentes.find((a) => a.slug === slug) || previewAtual?.antecedente || null
+        );
+    }
+
+    function getIdiomasAntecedenteEscolhidos() {
+        if (typeof Dnd5eIdiomasUtil === 'undefined') {
+            return inventarioPanel ? inventarioPanel.getIdiomasAntecedente() : [];
+        }
+        const fromDom = Dnd5eIdiomasUtil.getEscolhidosDoHost(
+            el('f5e_antecedente_idiomas_host'),
+            'f5e-idioma'
+        );
+        if (fromDom.length) return fromDom;
+        return inventarioPanel ? inventarioPanel.getIdiomasAntecedente() : [];
+    }
+
+    function getTracosAntecedenteEscolhidos() {
+        if (typeof Dnd5eTracosUtil === 'undefined') {
+            return inventarioPanel ? inventarioPanel.getTracosAntecedente() : null;
+        }
+        const host = el('f5e_antecedente_tracos_host');
+        const ant = antecedenteSelecionado();
+        const fromDom = Dnd5eTracosUtil.getEscolhidosDoHost(host);
+        if (fromDom && Dnd5eTracosUtil.tracosEstaoCompletos(fromDom)) return fromDom;
+        const salvos =
+            inventarioPanel?.getTracosAntecedente() ||
+            previewAtual?.antecedente_tracos ||
+            null;
+        if (salvos && ant?.tracos_opcoes) {
+            return Dnd5eTracosUtil.normalizarEscolhidos(salvos, ant.tracos_opcoes);
+        }
+        return fromDom;
+    }
+
+    function renderTracosAntecedente(reset = false) {
+        const ant = antecedenteSelecionado();
+        const host = el('f5e_antecedente_tracos_host');
+        const hint = el('f5e_antecedente_tracos_hint');
+        const btn = el('f5e_antecedente_tracos_sortear');
+        const wrap = el('f5e_antecedente_tracos_wrap');
+        if (!host || typeof Dnd5eTracosUtil === 'undefined') return;
+        if (!ant) {
+            host.innerHTML = '';
+            host.hidden = true;
+            if (hint) hint.textContent = '';
+            if (btn) btn.hidden = true;
+            if (wrap) wrap.hidden = true;
+            return;
+        }
+        if (wrap) wrap.hidden = false;
+        if (reset) inventarioPanel?.setTracosAntecedente(null);
+        const selecionados = reset
+            ? null
+            : inventarioPanel?.getTracosAntecedente() ||
+              previewAtual?.antecedente_tracos ||
+              null;
+        Dnd5eTracosUtil.renderEscolha({
+            host,
+            hint,
+            btnSortear: btn,
+            opcoes: ant.tracos_opcoes || {},
+            selecionados,
+            idPrefix: 'f5e-traco',
+            onChange: (tracos) => {
+                inventarioPanel?.setTracosAntecedente(tracos);
+                atualizarAntecedentePainel(ant, tracos);
+            },
+        });
+    }
+
+    function renderIdiomasAntecedente() {
+        const ant = antecedenteSelecionado();
+        const host = el('f5e_antecedente_idiomas_host');
+        const hint = el('f5e_antecedente_idiomas_hint');
+        if (!host || typeof Dnd5eIdiomasUtil === 'undefined') return;
+        if (!ant) {
+            host.innerHTML = '';
+            host.hidden = true;
+            if (hint) hint.textContent = '';
+            return;
+        }
+        const selecionados =
+            inventarioPanel?.getIdiomasAntecedente() ||
+            Dnd5eIdiomasUtil.normalizarEscolhidos(
+                previewAtual?.antecedente_idiomas,
+                catalogoIdiomas
+            );
+        Dnd5eIdiomasUtil.renderEscolha({
+            host,
+            hint,
+            catalogo: catalogoIdiomas,
+            qtd: ant.idiomas_qtd || 0,
+            selecionados,
+            idPrefix: 'f5e-idioma',
+            onChange: (idiomas) => {
+                inventarioPanel?.setIdiomasAntecedente(idiomas);
+                atualizarAntecedentePainel(ant, getTracosAntecedenteEscolhidos());
+            },
+        });
+    }
+
+    function atualizarAntecedentePainel(ant, tracosExtras) {
         const painel = el('f5e_antecedente_painel');
         const resumo = el('f5e_antecedente_resumo');
         if (!ant) {
@@ -326,17 +655,112 @@
         }
         painel.hidden = false;
         const per = (ant.pericias || []).join(', ');
+        const tracos = tracosExtras || getTracosAntecedenteEscolhidos();
+        const idiomasTxt =
+            ant.idiomas_qtd > 0
+                ? `Idiomas: ${Dnd5eIdiomasUtil.formatLista(getIdiomasAntecedenteEscolhidos(), catalogoIdiomas) || `escolha ${ant.idiomas_qtd}`}`
+                : '';
+        const tracoTxt =
+            tracos && typeof Dnd5eTracosUtil !== 'undefined'
+                ? Dnd5eTracosUtil.formatResumo(tracos)
+                : tracos && tracos.personalidade && tracos.personalidade.length
+                  ? `Personalidade: ${tracos.personalidade.join(' · ')}`
+                  : '';
         resumo.innerHTML = [
             `<strong>${ant.nome}</strong>`,
             per ? `Perícias: ${per}` : '',
-            ant.idiomas_qtd ? `Idiomas extras: ${ant.idiomas_qtd}` : '',
+            ant.ferramentas && ant.ferramentas.length
+                ? `Ferramentas: ${ant.ferramentas.join(', ')}`
+                : '',
+            idiomasTxt,
             ant.equipamento && ant.equipamento.length
                 ? `Equipamento: ${ant.equipamento.join(', ')}`
                 : '',
-            ant.ouro_po ? `Ouro inicial: ${ant.ouro_po} PO` : '',
+            ant.ouro_po ? `Ouro do antecedente: ${ant.ouro_po} PO` : '',
+            tracoTxt,
         ]
             .filter(Boolean)
             .join(' · ');
+    }
+
+    function sincronizarAntecedenteInventario() {
+        if (!inventarioPanel) return;
+        const slug = el('f5e_antecedente').value || null;
+        const ant = slug
+            ? catalogoAntecedentes.find((a) => a.slug === slug) ||
+              previewAtual?.antecedente
+            : null;
+        const changed = inventarioPanel.sincronizarAntecedente(slug, ant);
+        if (changed) {
+            renderIdiomasAntecedente();
+            renderTracosAntecedente(true);
+        }
+        if (ant) {
+            renderTracosAntecedente(false);
+            atualizarAntecedentePainel(ant, getTracosAntecedenteEscolhidos());
+        } else {
+            renderIdiomasAntecedente();
+            renderTracosAntecedente(false);
+        }
+    }
+
+    function sincronizarXpAoCarregar() {
+        if (typeof Dnd5eXpUtil === 'undefined') return;
+        const xpAntes = parseInt(el('f5e_xp').value, 10) || 0;
+        const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
+        const ajustou = Dnd5eXpUtil.aplicarNivelParaXp(el('f5e_nivel'), el('f5e_xp'));
+        const xpDepois = parseInt(el('f5e_xp').value, 10) || 0;
+        if (ajustou && xpDepois !== xpAntes) {
+            Toast.warning(
+                `XP ajustado para ${xpDepois.toLocaleString('pt-BR')} (mínimo do nível ${nivel}). Salve a ficha para sincronizar.`
+            );
+            atualizarPendenciasLocais();
+        }
+    }
+
+    async function aplicarEquipamentoClasse(forcar = false) {
+        if (!inventarioPanel) return;
+        const slug = el('f5e_classe').value;
+        if (!slug) return;
+        const jaAplicado =
+            !forcar &&
+            inventarioPanel.classeEquipMeta.slug === slug &&
+            inventarioPanel.classeEquipMeta.aplicado;
+        if (jaAplicado) return;
+        try {
+            const inv = inventarioPanel.getInventarioParaFicha();
+            const res = await rs.aplicarEquipamentoClasse({
+                classe_slug: slug,
+                inventario: inv,
+                armadura_slug: inv.armadura_slug,
+                escudo_slug: inv.escudo_slug,
+                arma_principal_slug: inv.arma_principal_slug,
+                classe_equip_slug: inventarioPanel.classeEquipMeta.slug,
+                forcar,
+            });
+            inventarioPanel.aplicarEquipamentoClasse(res);
+            agendarPreview();
+            Toast.success(res.nome_pacote || 'Equipamento inicial aplicado.');
+        } catch (e) {
+            Toast.error(e.message || 'Erro ao aplicar equipamento da classe');
+        }
+    }
+
+    async function rolarESincronizarOuroClasse(forcar = false) {
+        if (!inventarioPanel) return;
+        const slug = el('f5e_classe').value;
+        if (!slug) return;
+        const jaAplicado =
+            !forcar &&
+            inventarioPanel.classeOuroMeta.slug === slug &&
+            inventarioPanel.classeOuroMeta.ouro_aplicado > 0;
+        if (jaAplicado) return;
+        try {
+            const roll = await rs.rolarOuroClasse({ classe_slug: slug });
+            inventarioPanel.aplicarOuroClasse(slug, roll, forcar);
+        } catch (e) {
+            Toast?.error?.(e.message || 'Erro ao rolar ouro da classe');
+        }
     }
 
     async function atualizarSubclasses() {
@@ -522,8 +946,67 @@
         });
     }
 
+    async function aplicarRepousoLongo() {
+        if (!personagemId) {
+            Toast.error('Salve a ficha antes do repouso longo.');
+            return;
+        }
+        const confirmar =
+            typeof Dnd5eConfirmModal !== 'undefined'
+                ? () =>
+                      Dnd5eConfirmModal.confirmar({
+                          variante: 'repouso',
+                          icone: '🌙',
+                          titulo: 'Repouso longo',
+                          texto: 'Seu personagem descansa 8 horas e recupera recursos.',
+                          detalhe:
+                              '<li><strong>PV:</strong> 1d8 + CON por nível acima de 1 (mín. 1 por nível)</li>' +
+                              '<li><strong>Magia:</strong> restaura todos os espaços de magia</li>',
+                          textoConfirmar: 'Aplicar repouso',
+                          textoCancelar: 'Cancelar',
+                      })
+                : () =>
+                      Promise.resolve(
+                          window.confirm(
+                              'Repouso longo recupera PV e espaços de magia. Continuar?'
+                          )
+                      );
+        const ok = await confirmar();
+        if (!ok) return;
+        const btn = el('f5e_btn_repouso_longo');
+        if (btn) btn.disabled = true;
+        try {
+            const res = await ps.repousoLongo(personagemId);
+            if (res.hp_atual != null) {
+                el('f5e_hp_atual').value = String(res.hp_atual);
+                el('f5e_hp_atual').dataset.userTouched = '1';
+                const hpMax =
+                    parseInt(el('f5e_hp_max').textContent, 10) || res.hp_max || 1;
+                atualizarBarraPv(res.hp_atual, hpMax);
+            }
+            if (typeof window.__dnd5eRecarregarConjuracao === 'function') {
+                await window.__dnd5eRecarregarConjuracao(personagemId);
+            }
+            if (window._grimorioController?._recarregarDados) {
+                await window._grimorioController._recarregarDados();
+            }
+            Toast.success(res.mensagem || 'Repouso longo aplicado.');
+        } catch (e) {
+            Toast.error(e.message || 'Erro no repouso longo');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    window.__dnd5eAplicarRepousoLongo = aplicarRepousoLongo;
+
     function aplicarPreview(p) {
         previewAtual = p;
+        const tracosEl = el('f5e_tracos');
+        if (tracosEl && p.tracos_resumo) {
+            tracosEl.textContent = p.tracos_resumo;
+            tracosEl.hidden = false;
+        }
         ABILITIES.forEach((a) => {
             const mod = p.modificadores[a.key];
             const eff = p.scores_efetivos[a.key];
@@ -544,15 +1027,27 @@
         renderHpDetalhe(p.hp_resumo);
         if (el('f5e_ca')) el('f5e_ca').textContent = String(p.ca_total ?? p.ca_base);
         el('f5e_iniciativa').textContent = fmtMod(p.iniciativa);
+        if (el('f5e_percepcao_passiva')) {
+            el('f5e_percepcao_passiva').textContent = String(p.percepcao_passiva ?? 10);
+        }
+        const mi = p.magic_initiate || p.efeitos_feats?.magic_initiate;
+        const miHost = el('f5e_magic_initiate_resumo');
+        if (miHost) {
+            miHost.textContent = mi?.resumo || '';
+            miHost.hidden = !mi?.resumo;
+        }
         const nivel = parseInt(el('f5e_nivel').value, 10) || 1;
         el('f5e_prof').textContent = fmtMod(p.bonus_proficiencia ?? bonusProficiencia(nivel));
         renderSalvamentos(p.salvamentos);
         renderPericiasGrade(p.pericias);
-        atualizarAntecedentePainel(p.antecedente);
+        expertiseLocal = [...(fichaProgressaoLocal.expertise_pericias || p.expertise_pericias || [])];
+        renderExpertiseSection(p);
+        atualizarAntecedentePainel(p.antecedente, inventarioPanel?.antecedenteMeta?.tracos);
         atualizarHeaderIdentidade();
         if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
             window.__dnd5eAtualizarSecaoMagias();
         }
+        progressaoPanel?.renderPendenciasLocais(p.pendencias || []);
     }
 
     async function rodarPreview() {
@@ -653,6 +1148,7 @@
         const f = {
             v: 2,
             raca_slug: el('f5e_raca').value,
+            raca_variante_slug: el('f5e_raca_variante')?.value || null,
             classe_slug: el('f5e_classe').value,
             antecedente_slug: el('f5e_antecedente').value || null,
             subclasse_slug: el('f5e_subclasse').value || null,
@@ -662,8 +1158,11 @@
             bonus_atributo_feat: fichaProgressaoLocal.bonus_atributo_feat || {},
             progressao: fichaProgressaoLocal.progressao || { hp_rolls: [], marcos: [] },
             feats: fichaProgressaoLocal.feats || [],
+            feat_escolhas: fichaProgressaoLocal.feat_escolhas || {},
+            pericias_override: fichaProgressaoLocal.pericias_override || {},
             pericias_classe_escolhidas: getPericiasClasseEscolhidas(),
             pericia_racial_extra: el('f5e_pericia_racial').value || null,
+            raca_variante_slug: el('f5e_raca_variante')?.value || null,
             ...(inventarioPanel
                 ? inventarioPanel.getArmaduraEscudoParaCalcular()
                 : {
@@ -673,6 +1172,9 @@
             inventario: inventarioPanel
                 ? inventarioPanel.getInventarioParaFicha()
                 : {},
+            ...(inventarioPanel ? inventarioPanel.getAntecedenteMeta() : {}),
+            ...(inventarioPanel ? inventarioPanel.getClasseOuroMeta() : {}),
+            ...(inventarioPanel ? inventarioPanel.getClasseEquipMeta() : {}),
             notas: el('f5e_notas').value.trim(),
         };
         if (preview) {
@@ -702,6 +1204,48 @@
         if (precisaPericiaRacial && !el('f5e_pericia_racial').value) {
             Toast.error('Escolha a perícia extra concedida pela raça.');
             return false;
+        }
+        if (Dnd5eRacaUtil.temVarianteEscolha(raca) && !el('f5e_raca_variante')?.value) {
+            Toast.error(`Escolha ${Dnd5eRacaUtil.labelVariante(raca).toLowerCase()}.`);
+            return false;
+        }
+        const ant = antecedenteSelecionado();
+        if (
+            ant &&
+            ant.idiomas_qtd > 0 &&
+            typeof Dnd5eIdiomasUtil !== 'undefined' &&
+            !Dnd5eIdiomasUtil.validarEscolha(
+                getIdiomasAntecedenteEscolhidos(),
+                ant.idiomas_qtd,
+                catalogoIdiomas
+            )
+        ) {
+            Toast.error(`Escolha exatamente ${ant.idiomas_qtd} idioma(s) do antecedente.`);
+            return false;
+        }
+        if (inventarioPanel && ant) {
+            inventarioPanel.setIdiomasAntecedente(getIdiomasAntecedenteEscolhidos());
+            inventarioPanel.setTracosAntecedente(getTracosAntecedenteEscolhidos());
+        }
+        if (
+            ant &&
+            typeof Dnd5eTracosUtil !== 'undefined' &&
+            !Dnd5eTracosUtil.validarEscolha(getTracosAntecedenteEscolhidos(), ant.tracos_opcoes || {})
+        ) {
+            Toast.error('Escolha traço de personalidade, ideal, laço e fraqueza do antecedente.');
+            return false;
+        }
+        if (el('f5e_raca').value === 'humano') {
+            const marcos = fichaProgressaoLocal?.progressao?.marcos || [];
+            const temFeatHumano = marcos.some(
+                (m) => m.nivel === 1 && (m.tipo || '').toLowerCase() === 'feat' && m.slug
+            );
+            if (!temFeatHumano) {
+                Toast.error(
+                    'Humano exige talento no nível 1 — registre na seção Progressão.'
+                );
+                return false;
+            }
         }
         return true;
     }
@@ -747,6 +1291,7 @@
 
             if (personagemId) {
                 await ps.atualizar(personagemId, payload);
+                xpSalvoNoServidor = parseInt(el('f5e_xp').value, 10) || 0;
                 Toast.success('Ficha salva.');
             } else {
                 payload.tipo = tipoCriacao;
@@ -776,12 +1321,15 @@
                 .join('');
     }
 
-    function carregarPersonagem(p) {
+    async function carregarPersonagem(p) {
         if (p.tipo) tipoCriacao = p.tipo;
         el('f5e_nome').value = p.nome || '';
         el('f5e_jogador').value = p.jogador_nome || nomeJogadorLogado();
         el('f5e_nivel').value = p.nivel;
         el('f5e_xp').value = p.experiencia;
+        xpSalvoNoServidor = parseInt(p.experiencia, 10) || 0;
+        sincronizarXpComNivel();
+        sincronizarXpAoCarregar();
         el('f5e_hp_atual').value = p.hp_atual;
         el('f5e_hp_atual').dataset.userTouched = '1';
 
@@ -790,7 +1338,10 @@
             metodo_atributos: f.metodo_atributos || 'padrao',
             progressao: f.progressao || { hp_rolls: [], marcos: [] },
             feats: f.feats || [],
+            feat_escolhas: f.feat_escolhas || {},
             bonus_atributo_feat: f.bonus_atributo_feat || {},
+            pericias_override: f.pericias_override || {},
+            expertise_pericias: f.expertise_pericias || [],
         };
         if (progressaoPanel) {
             progressaoPanel.loadFromFicha(f);
@@ -799,10 +1350,39 @@
         arenaCondicoesAtual = CU.normalizarLista(f.arena_condicoes || []);
         sincronizarCondicoesPorHp();
         if (f.raca_slug) el('f5e_raca').value = f.raca_slug;
+        atualizarUiRaca();
+        if (f.raca_variante_slug) el('f5e_raca_variante').value = f.raca_variante_slug;
         if (f.classe_slug) el('f5e_classe').value = f.classe_slug;
         if (f.antecedente_slug) el('f5e_antecedente').value = f.antecedente_slug;
         if (inventarioPanel) {
             inventarioPanel.loadFromFicha(f, fichaProgressaoLocal.feats);
+            const antSlug = f.antecedente_slug || el('f5e_antecedente').value || null;
+            if (
+                antSlug &&
+                String(f.antecedente_inventario_slug || '') !== String(antSlug)
+            ) {
+                const ant =
+                    catalogoAntecedentes.find((a) => a.slug === antSlug) || null;
+                inventarioPanel.sincronizarAntecedente(antSlug, ant);
+            }
+            renderIdiomasAntecedente();
+            renderTracosAntecedente(false);
+            const antAtual = antecedenteSelecionado();
+            if (antAtual) atualizarAntecedentePainel(antAtual, getTracosAntecedenteEscolhidos());
+            if (
+                f.classe_slug &&
+                (!f.ouro_classe_aplicado ||
+                    String(f.classe_ouro_slug || '') !== String(f.classe_slug))
+            ) {
+                await rolarESincronizarOuroClasse(true);
+            }
+            if (
+                f.classe_slug &&
+                (!f.classe_equip_aplicado ||
+                    String(f.classe_equip_slug || '') !== String(f.classe_slug))
+            ) {
+                await aplicarEquipamentoClasse(true);
+            }
         }
         if (f.notas) el('f5e_notas').value = f.notas;
         const base = f.scores_base || {};
@@ -925,14 +1505,34 @@
         el('btnCompraPontos')?.addEventListener('click', () => aplicarGeracaoAtributos('pontos'));
         el('btnSalvar').addEventListener('click', salvar);
 
+        el('f5e_btn_editar_pericias')?.addEventListener('click', abrirEditorPericias);
+        el('f5e_btn_salvar_pericias')?.addEventListener('click', salvarPericiasOverride);
+        el('f5e_btn_cancelar_pericias')?.addEventListener('click', cancelarEditorPericias);
+        el('f5e_btn_salvar_expertise')?.addEventListener('click', salvarExpertisePericias);
+
         progressaoPanel = new Dnd5eProgressaoPanel({
             personagemService: ps,
             regrasService: rs,
             el,
             getPersonagemId: () => personagemId,
             getNivel: () => parseInt(el('f5e_nivel').value, 10) || 1,
+            getRacaSlug: () => el('f5e_raca').value || '',
+            getXp: () => parseInt(el('f5e_xp').value, 10) || 0,
+            xpPrecisaSalvar: () => {
+                const xp = parseInt(el('f5e_xp').value, 10) || 0;
+                return xp !== xpSalvoNoServidor;
+            },
             onFichaAtualizada: (res) => {
                 const ficha = res.ficha || res;
+                if (res.hp_max != null) {
+                    el('f5e_hp_max').textContent = String(res.hp_max);
+                }
+                if (res.hp_atual != null) {
+                    el('f5e_hp_atual').value = String(res.hp_atual);
+                    const hpMax =
+                        parseInt(el('f5e_hp_max').textContent, 10) || res.hp_max || 1;
+                    atualizarBarraPv(res.hp_atual, hpMax);
+                }
                 if (ficha.progressao) {
                     fichaProgressaoLocal.progressao = ficha.progressao;
                 }
@@ -942,6 +1542,16 @@
                 }
                 if (ficha.bonus_atributo_feat) {
                     fichaProgressaoLocal.bonus_atributo_feat = ficha.bonus_atributo_feat;
+                }
+                if (ficha.feat_escolhas) {
+                    fichaProgressaoLocal.feat_escolhas = ficha.feat_escolhas;
+                }
+                if (ficha.pericias_override) {
+                    fichaProgressaoLocal.pericias_override = ficha.pericias_override;
+                }
+                if (ficha.expertise_pericias) {
+                    fichaProgressaoLocal.expertise_pericias = ficha.expertise_pericias;
+                    expertiseLocal = [...ficha.expertise_pericias];
                 }
                 agendarPreview();
             },
@@ -953,6 +1563,8 @@
             regrasService: rs,
             onChange: agendarPreview,
             getPreview: () => previewAtual,
+            onRolarOuroClasse: (forcar) => rolarESincronizarOuroClasse(forcar),
+            onAplicarEquipClasse: (forcar) => aplicarEquipamentoClasse(forcar),
         });
         await inventarioPanel.init();
         el('f5e_raca').addEventListener('change', () => {
@@ -964,6 +1576,8 @@
             renderPericiasEscolha();
             atualizarSubclasses();
             atualizarHeaderIdentidade();
+            rolarESincronizarOuroClasse(true);
+            aplicarEquipamentoClasse(true);
             if (typeof window.__dnd5eAtualizarSecaoMagias === 'function') {
                 window.__dnd5eAtualizarSecaoMagias();
             }
@@ -971,12 +1585,22 @@
         });
         el('f5e_nivel').addEventListener('change', aoAlterarNivel);
         el('f5e_nivel').addEventListener('input', aoAlterarNivel);
-        el('f5e_xp').addEventListener('input', sincronizarNivelComXp);
-        el('f5e_xp').addEventListener('change', sincronizarNivelComXp);
-        el('f5e_antecedente').addEventListener('change', agendarPreview);
+        el('f5e_xp').addEventListener('input', () => {
+            sincronizarNivelComXp();
+            atualizarPendenciasLocais();
+        });
+        el('f5e_xp').addEventListener('change', () => {
+            sincronizarNivelComXp();
+            atualizarPendenciasLocais();
+        });
+        el('f5e_antecedente').addEventListener('change', () => {
+            sincronizarAntecedenteInventario();
+            agendarPreview();
+        });
         el('f5e_extra1').addEventListener('change', agendarPreview);
         el('f5e_extra2').addEventListener('change', agendarPreview);
         el('f5e_pericia_racial').addEventListener('change', agendarPreview);
+        el('f5e_raca_variante')?.addEventListener('change', agendarPreview);
         el('f5e_subclasse').addEventListener('change', agendarPreview);
         el('f5e_hp_atual').addEventListener('input', () => {
             el('f5e_hp_atual').dataset.userTouched = '1';
@@ -986,13 +1610,19 @@
         });
         el('f5e_nome').addEventListener('input', atualizarHeaderIdentidade);
         configurarUploadFoto();
+        el('f5e_btn_repouso_longo')?.addEventListener('click', aplicarRepousoLongo);
 
         try {
-            const [racas, classes, ant, per, combateMeta] = await Promise.all([
+            const carregarIdiomas =
+                typeof rs.idiomas === 'function'
+                    ? rs.idiomas()
+                    : Promise.resolve({ idiomas: window.__dnd5eCatalogoIdiomas || [] });
+            const [racas, classes, ant, per, idiomas, combateMeta] = await Promise.all([
                 rs.racas(),
                 rs.classes(),
                 rs.antecedentes(),
                 rs.pericias(),
+                carregarIdiomas,
                 rs.combate().catch(() => ({ condicoes: [] })),
             ]);
             catalogoCondicoes = combateMeta.condicoes || [];
@@ -1000,6 +1630,8 @@
             catalogoClasses = classes.classes || [];
             catalogoAntecedentes = ant.antecedentes || [];
             catalogoPericias = per.pericias || [];
+            catalogoIdiomas = idiomas.idiomas || [];
+            window.__dnd5eCatalogoIdiomas = catalogoIdiomas;
             if (typeof Dnd5eXpUtil !== 'undefined' && classes.xp_por_nivel) {
                 Dnd5eXpUtil.setTabela(classes.xp_por_nivel);
             }
@@ -1010,7 +1642,7 @@
 
             if (personagemId) {
                 const p = await ps.obter(personagemId);
-                carregarPersonagem(p);
+                await carregarPersonagem(p);
                 aplicarModoPreCadastroFixo();
             } else {
                 aplicarAtributosNeutros();

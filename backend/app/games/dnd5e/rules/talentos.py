@@ -38,9 +38,12 @@ class PersonagemFeats:
         return self.habilidades.nivel
 
 
-def calcular_ganhos_feats(nivel: int) -> int:
-    """Quantos feats o personagem já deveria ter escolhido até este nível (níveis 4/8/12/16/19)."""
-    return sum(1 for n in NIVEIS_GANHO_FEAT if nivel >= n)
+def calcular_ganhos_feats(nivel: int, *, raca_slug: str = "") -> int:
+    """Quantos feats o personagem já deveria ter escolhido até este nível."""
+    total = sum(1 for n in NIVEIS_GANHO_FEAT if nivel >= n)
+    if (raca_slug or "").strip().lower() == "humano" and nivel >= 1:
+        total += 1
+    return total
 
 
 def niveis_com_ganho_feat() -> tuple[int, ...]:

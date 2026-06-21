@@ -91,6 +91,39 @@
     font-style: italic;
 }
 
+.ficha-secao-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.35rem;
+}
+
+.ficha-secao-header .ficha-secao-titulo {
+    margin: 0;
+}
+
+.ficha-dnd5e-pericias-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.ficha-dnd5e-btn-salvar-pericias {
+    background: linear-gradient(135deg, #1e6b3a 0%, #145a2e 100%);
+    border-color: rgba(120, 220, 150, 0.45);
+}
+
+.ficha-dnd5e-btn-salvar-pericias:hover {
+    filter: brightness(1.08);
+}
+
+.ficha-dnd5e-btn-cancelar-pericias {
+    opacity: 0.9;
+}
+
 .ficha-dnd5e-pericias-grade {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -98,16 +131,79 @@
     font-size: 0.85rem;
 }
 
+.ficha-dnd5e-secao-pericias-todas.is-editing .ficha-dnd5e-pericias-grade {
+    padding: 0.55rem;
+    border-radius: 8px;
+    border: 1px solid rgba(201, 168, 76, 0.28);
+    background: rgba(15, 23, 42, 0.55);
+}
+
 .ficha-dnd5e-pericia-row {
     display: flex;
     justify-content: space-between;
-    padding: 0.2rem 0;
+    align-items: center;
+    padding: 0.28rem 0.35rem;
     border-bottom: 1px solid rgba(201, 168, 76, 0.12);
+    border-radius: 4px;
+    transition: background 0.15s ease;
+}
+
+.ficha-dnd5e-secao-pericias-todas.is-editing .ficha-dnd5e-pericia-row {
+    border-bottom-color: rgba(201, 168, 76, 0.08);
+}
+
+.ficha-dnd5e-secao-pericias-todas.is-editing .ficha-dnd5e-pericia-row:hover {
+    background: rgba(201, 168, 76, 0.06);
 }
 
 .ficha-dnd5e-pericia-row.is-prof {
     font-weight: 600;
     color: var(--cor-dourada, #c9a84c);
+}
+
+.ficha-dnd5e-pericia-row.is-edit {
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.ficha-dnd5e-pericia-row.is-edit label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex: 1;
+    cursor: pointer;
+    min-width: 0;
+}
+
+.ficha-dnd5e-pericia-row.is-edit label span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ficha-dnd5e-pericia-row.is-edit input[type='checkbox'] {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--cor-dourada, #c9a84c);
+    cursor: pointer;
+}
+
+.ficha-dnd5e-pericia-row.is-edit strong {
+    min-width: 2.25rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.ficha-dnd5e-secao-pericias-todas.is-editing .ficha-dnd5e-pericias-grade-legenda {
+    color: #fde68a;
+    opacity: 1;
+    font-style: normal;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.45rem;
+    border-radius: 6px;
+    background: rgba(120, 53, 15, 0.35);
+    border-left: 3px solid var(--cor-dourada, #c9a84c);
 }
 
 .ficha-dnd5e-save-chip {
@@ -681,10 +777,150 @@
     padding: 0.2rem 0;
 }
 
+.ficha-dnd5e-feat-escolha {
+    margin-top: 0.45rem;
+}
+
+.ficha-dnd5e-feat-escolhas-sec {
+    margin-top: 0.35rem;
+}
+
+.ficha-dnd5e-feat-escolhas-titulo {
+    margin-bottom: 0.35rem;
+}
+
+.ficha-dnd5e-pericia-row.is-expert {
+    border-left: 3px solid var(--ficha-accent, #c9a227);
+}
+
+.ficha-dnd5e-expertise-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    opacity: 0.85;
+}
+
+.ficha-dnd5e-expertise-wrap {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--ficha-borda, rgba(255, 255, 255, 0.12));
+}
+
+.ficha-dnd5e-expertise-escolha {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 0.35rem 0.75rem;
+    margin: 0.5rem 0 0.75rem;
+}
+
+.ficha-dnd5e-expertise-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+}
+
+.ficha-dnd5e-skilled-titulo {
+    margin: 0 0 0.35rem;
+}
+
+.ficha-dnd5e-skilled-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem;
+}
+
+.ficha-dnd5e-skilled-grid select {
+    width: 100%;
+    min-width: 0;
+    font-size: 0.82rem;
+}
+
+@media (max-width: 520px) {
+    .ficha-dnd5e-skilled-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .ficha-dnd5e-pendencias {
     margin: 0.25rem 0 0;
-    padding-left: 1.1rem;
+    padding-left: 0;
+    list-style: none;
     font-size: 0.88rem;
+}
+
+.ficha-dnd5e-pendencias-alerta {
+    margin: 0.5rem 0 0.65rem;
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgba(180, 83, 9, 0.45);
+    background: rgba(251, 191, 36, 0.18);
+    color: #78350f;
+    font-size: 0.84rem;
+    line-height: 1.4;
+}
+
+.ficha-dnd5e-pendencias-alerta strong {
+    color: #451a03;
+    font-weight: 700;
+}
+
+.ficha-dnd5e-progressao-sec.has-pendencias {
+    box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.35);
+    border-radius: 0.5rem;
+}
+
+.ficha-dnd5e-pendencias-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    margin-left: 0.35rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: #f59e0b;
+    color: #1c1917;
+    font-size: 0.72rem;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.ficha-dnd5e-pendencia-item {
+    display: block;
+    width: 100%;
+    margin: 0.2rem 0;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.ficha-dnd5e-pendencia-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.ficha-dnd5e-pendencia-item.is-xp {
+    border-left: 3px solid #38bdf8;
+    padding-left: 0.65rem;
+}
+
+.ficha-dnd5e-pendencia-item.is-hp {
+    border-left: 3px solid #f87171;
+    padding-left: 0.65rem;
+}
+
+.ficha-dnd5e-pendencia-item.is-marco {
+    border-left: 3px solid #a78bfa;
+    padding-left: 0.65rem;
+}
+
+.ficha-dnd5e-pendencia-vazio {
+    color: rgba(255, 255, 255, 0.55);
+    list-style: none;
 }
 
 .ficha-dnd5e-sep {
@@ -698,6 +934,63 @@
     align-items: center;
     gap: 0.35rem;
     margin: 0.35rem 0;
+}
+
+.ficha-dnd5e-edit .ficha-label.ficha-dnd5e-check {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0;
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.ficha-dnd5e-edit .ficha-dnd5e-check input[type='checkbox'] {
+    width: auto;
+    min-width: 1rem;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+}
+
+.ficha-dnd5e-ouro-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ficha-dnd5e-ouro-row .ficha-input-num {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.dnd5e-prec-ouro-toolbar {
+    margin: 0.35rem 0 0.5rem;
+}
+
+.dnd5e-idiomas-host {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.dnd5e-idioma-row select {
+    width: 100%;
+}
+
+.dnd5e-tracos-host {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.dnd5e-traco-row select {
+    width: 100%;
+}
+
+#f5e_antecedente_tracos_sortear,
+#prec_antecedente_tracos_sortear {
+    margin-top: 0.35rem;
 }
 
 .ficha-conj-perfil-text {
@@ -818,6 +1111,39 @@
 
 .ficha-dnd5e-edit .ficha-ca-box {
     justify-content: center;
+}
+
+.ficha-pv-box #f5e_hp_atual {
+    text-align: center;
+    font-size: 1.45rem;
+    font-weight: 700;
+    font-family: var(--fonte-titulo, inherit);
+    line-height: 1.2;
+    color: #fff4c9;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 214, 140, 0.55);
+    padding: 0.5rem 0.35rem;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+    -moz-appearance: textfield;
+}
+
+.ficha-pv-box #f5e_hp_atual:focus {
+    outline: none;
+    color: #fffbe6;
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 230, 170, 0.85);
+    box-shadow: 0 0 0 2px rgba(255, 200, 120, 0.25);
+}
+
+.ficha-pv-box #f5e_hp_atual::-webkit-outer-spin-button,
+.ficha-pv-box #f5e_hp_atual::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ficha-pv-box .ficha-label[for='f5e_hp_atual'] {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.72);
 }
 
 .ficha-dnd5e-progressao-sec {
@@ -1098,4 +1424,157 @@
     .ficha-dnd5e-ataque-linha-edit > :nth-child(n + 3) {
         grid-column: 1 / -1;
     }
+}
+
+/* ── Modal de confirmação (repouso longo e ações similares) ── */
+.f5e-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(8, 10, 18, 0.72);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.f5e-confirm-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.f5e-confirm-box {
+    width: min(100%, 420px);
+    border-radius: 12px;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    background: linear-gradient(165deg, #1a1f2e 0%, #12151f 100%);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    padding: 1.25rem 1.35rem 1.1rem;
+    transform: translateY(8px) scale(0.98);
+    transition: transform 0.22s ease;
+}
+
+.f5e-confirm-overlay.is-open .f5e-confirm-box {
+    transform: translateY(0) scale(1);
+}
+
+.f5e-confirm--repouso .f5e-confirm-box {
+    border-color: rgba(120, 160, 255, 0.45);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(120, 160, 255, 0.08);
+}
+
+.f5e-confirm-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.75rem;
+}
+
+.f5e-confirm-icone {
+    font-size: 1.65rem;
+    line-height: 1;
+}
+
+.f5e-confirm-titulo {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #f3ead8;
+    letter-spacing: 0.02em;
+}
+
+.f5e-confirm-texto {
+    margin: 0 0 0.65rem;
+    color: #c9cdd8;
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.f5e-confirm-detalhe {
+    margin: 0 0 1rem;
+    padding: 0.65rem 0.85rem;
+    list-style: none;
+    border-radius: 8px;
+    background: rgba(201, 168, 76, 0.08);
+    border-left: 3px solid rgba(201, 168, 76, 0.45);
+}
+
+.f5e-confirm--repouso .f5e-confirm-detalhe {
+    background: rgba(120, 160, 255, 0.1);
+    border-left-color: rgba(120, 160, 255, 0.5);
+}
+
+.f5e-confirm-detalhe li {
+    margin: 0.25rem 0;
+    color: #e8dcc4;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.f5e-confirm-detalhe li strong {
+    color: #f3ead8;
+}
+
+.f5e-confirm-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+}
+
+.f5e-confirm-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 0.55rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.f5e-confirm-btn:active {
+    transform: scale(0.98);
+}
+
+.f5e-confirm-btn-cancelar {
+    background: rgba(255, 255, 255, 0.06);
+    color: #c9cdd8;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.f5e-confirm-btn-cancelar:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.f5e-confirm-btn-ok {
+    background: linear-gradient(180deg, #c9a84c 0%, #a8862e 100%);
+    color: #1a1208;
+}
+
+.f5e-confirm--repouso .f5e-confirm-btn-ok {
+    background: linear-gradient(180deg, #7aa2ff 0%, #5578d8 100%);
+    color: #0d1220;
+}
+
+.f5e-confirm-btn-ok:hover {
+    filter: brightness(1.06);
+}
+
+.ficha-btn-repouso-longo {
+    background: rgba(120, 160, 255, 0.12);
+    border: 1px solid rgba(120, 160, 255, 0.35);
+    color: #dce8ff;
+}
+
+.ficha-btn-repouso-longo:hover {
+    background: rgba(120, 160, 255, 0.2);
+}
+
+.ficha-btn-equip-classe {
+    margin-top: 0.35rem;
+    width: auto;
 }

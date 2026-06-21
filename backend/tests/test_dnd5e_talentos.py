@@ -18,6 +18,8 @@ def test_niveis_ganho_feat() -> None:
     assert calcular_ganhos_feats(4) == 1
     assert calcular_ganhos_feats(8) == 2
     assert calcular_ganhos_feats(19) == 5
+    assert calcular_ganhos_feats(1, raca_slug="humano") == 1
+    assert calcular_ganhos_feats(1, raca_slug="elfo") == 0
 
 
 def test_catalogo_tem_cerca_de_50_feats() -> None:

@@ -131,6 +131,8 @@ export function montarPayloadConjurar(combatente, magia, estado, opts = {}) {
         condicoes_alvo: opts.condicoes_alvo || [],
         como_ritual: !!opts.como_ritual,
         confirmar_material_consumido: !!opts.confirmar_material,
+        armadura_slug: combatente.armadura_slug || null,
+        escudo_slug: combatente.escudo_slug || null,
     };
 
     if (opts.nivel_slot != null && nivelMagia >= 1) {

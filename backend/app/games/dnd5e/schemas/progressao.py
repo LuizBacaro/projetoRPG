@@ -55,7 +55,7 @@ class Dnd5eHpRollResponse(BaseModel):
 
 
 class Dnd5eMarcoRequest(BaseModel):
-    nivel: int = Field(..., ge=4, le=20)
+    nivel: int = Field(..., ge=1, le=20)
     tipo: str = Field(..., description="feat | asi", max_length=8)
     slug: Optional[str] = Field(
         default=None,
@@ -66,11 +66,51 @@ class Dnd5eMarcoRequest(BaseModel):
         default=None,
         description="Distribuição ASI (+2 ou +1/+1) quando tipo=asi",
     )
+    feat_escolhas: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Escolhas obrigatórias (resilient, magic_initiate) ao registrar feat",
+    )
+
+
+class Dnd5eFeatEscolhasRequest(BaseModel):
+    feat_escolhas: Dict[str, Any] = Field(default_factory=dict)
+
+
+class Dnd5eFeatEscolhasResponse(BaseModel):
+    feat_escolhas: Dict[str, Any] = Field(default_factory=dict)
+    ficha: Dict[str, Any] = Field(default_factory=dict)
+    pendencias: List[str] = Field(default_factory=list)
+
+
+class Dnd5ePericiasOverrideRequest(BaseModel):
+    pericias_override: Dict[str, bool] = Field(default_factory=dict)
+
+
+class Dnd5ePericiasOverrideResponse(BaseModel):
+    pericias_override: Dict[str, bool] = Field(default_factory=dict)
+    pericias_proficientes: List[str] = Field(default_factory=list)
+    pericias_automaticas: List[str] = Field(default_factory=list)
+    ficha: Dict[str, Any] = Field(default_factory=dict)
+    pendencias: List[str] = Field(default_factory=list)
+
+
+class Dnd5eExpertisePericiasRequest(BaseModel):
+    expertise_pericias: List[str] = Field(default_factory=list)
+
+
+class Dnd5eExpertisePericiasResponse(BaseModel):
+    expertise_pericias: List[str] = Field(default_factory=list)
+    expertise_efetiva: List[str] = Field(default_factory=list)
+    expertise_slots_classe: int = Field(default=0, ge=0, le=8)
+    ficha: Dict[str, Any] = Field(default_factory=dict)
+    pendencias: List[str] = Field(default_factory=list)
 
 
 class Dnd5eMarcoResponse(BaseModel):
     marco: Dict[str, Any]
     hp_max: int = Field(ge=1)
+    hp_atual: int = Field(ge=0)
+    hp_retroativo_con: int = Field(default=0, ge=0)
     ficha: Dict[str, Any] = Field(default_factory=dict)
     pendencias: List[str] = Field(default_factory=list)
 
@@ -82,3 +122,19 @@ class Dnd5ePendenciasProgressaoResponse(BaseModel):
     hp_resumo: Optional[Dict[str, Any]] = None
     marcos_pendentes: List[int] = Field(default_factory=list)
     niveis_hp_pendentes: List[int] = Field(default_factory=list)
+
+
+class Dnd5eRepousoLongoCuraItem(BaseModel):
+    nivel: int = Field(ge=2, le=20)
+    roll: int = Field(ge=1, le=8)
+    con_mod: int
+    ganho: int = Field(ge=1)
+
+
+class Dnd5eRepousoLongoResponse(BaseModel):
+    hp_atual: int = Field(ge=0)
+    hp_max: int = Field(ge=1)
+    cura_total: int = Field(ge=0)
+    cura_niveis: List[Dnd5eRepousoLongoCuraItem] = Field(default_factory=list)
+    mensagem: str = Field(default="", max_length=500)
+    conjuracao: Optional[Dict[str, Any]] = None

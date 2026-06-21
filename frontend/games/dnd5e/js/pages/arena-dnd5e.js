@@ -141,6 +141,12 @@ class Dnd5eArenaController {
             classe: f.classe_slug || '',
             classe_label: this.nomeClasse(f.classe_slug),
             raca: f.raca_slug || '',
+            raca_variante: f.raca_variante_slug || '',
+            armadura_slug: f.armadura_slug || f.inventario?.armadura_slug || null,
+            escudo_slug: f.escudo_slug || f.inventario?.escudo_slug || null,
+            arma_principal_slug: f.inventario?.arma_principal_slug || null,
+            feats: f.feats || [],
+            feat_escolhas: f.feat_escolhas || {},
             nivel: p.nivel || 1,
             hp_maximo: hpMax,
             hp_atual: hpAtual,
@@ -159,7 +165,12 @@ class Dnd5eArenaController {
                 movimento_usado_metros: 0,
                 reacao_usada: false,
                 velocidade_metros: 9,
+                esquivando: false,
+                desengajado: false,
+                ajuda_alvo_id: '',
             },
+            lucky_restantes: this._luckyMax(f.feats || []),
+            _usarLuckyProximo: false,
             forca: p.strength,
             destreza: p.dexterity,
             constituicao: p.constitution,
@@ -349,8 +360,11 @@ class Dnd5eArenaController {
                 movimento_usado_metros: 0,
                 reacao_usada: false,
                 velocidade_metros: 9,
+                esquivando: false,
+                desengajado: false,
+                ajuda_alvo_id: '',
             },
-            ataques: [],
+            lucky_restantes: 0,
         };
         this.combatentes.push(c);
         this.selecionados.add(id);
@@ -405,6 +419,29 @@ class Dnd5eArenaController {
         }
     }
 
+    _luckyMax(feats) {
+        return (feats || []).some((f) => String(f).toLowerCase() === 'lucky') ? 3 : 0;
+    }
+
+    _initLuckyCombatentes() {
+        for (const c of this.combatentes) {
+            const max = this._luckyMax(c.feats);
+            if (max) c.lucky_restantes = max;
+        }
+    }
+
+    _condicoesAlvoParaAtaque(alvoId) {
+        const alvo = this.combatentePorId(alvoId);
+        if (!alvo) return [];
+        const slugs = [...this.slugsCondicoes(alvo)];
+        if (alvo.economia?.esquivando) slugs.push('esquivando');
+        const helpFrom = this.combatentes.find(
+            (x) => x.economia?.ajuda_alvo_id === alvoId
+        );
+        if (helpFrom) slugs.push('help_advantage');
+        return slugs;
+    }
+
     async adicionarCondicao(id, slug, duracaoTurnos) {
         const c = this.combatentePorId(id);
         if (!c) return;
@@ -432,6 +469,7 @@ class Dnd5eArenaController {
                 id: c.id,
                 nome: c.nome,
                 dex_mod: c.dex_mod,
+                feats: c.feats || [],
             }));
             const res = await cs.iniciativa(payload);
             const ordemMap = new Map(res.ordem.map((r) => [r.id, r]));
@@ -456,6 +494,7 @@ class Dnd5eArenaController {
             this.turnoAtual = 0;
             this.rodadaAtual = 1;
             this.combateAtivo = true;
+            this._initLuckyCombatentes();
             this.el('telaConfiguracao')?.classList.remove('ativa');
             this.el('telaArena')?.classList.add('ativa');
             this.atualizarUiCombate();
@@ -565,6 +604,8 @@ class Dnd5eArenaController {
                     this.estabilizarCombatente(id, metodo, modMedicina),
                 onMedicinaModChange: (id, mod) => this.atualizarModMedicina(id, mod),
                 onEconomia: (tipo, metros) => this.gastarEconomia(tipo, metros),
+                onSairAlcance: (id) => this.executarSairAlcance(id),
+                onUsarLucky: (id) => this.marcarUsarLucky(id),
                 getAlvosAtaque: () => this.combatentes,
                 onAtaqueFicha: (atacanteId, alvoId, idx) =>
                     this.executarAtaqueFicha(atacanteId, alvoId, idx),
@@ -743,6 +784,7 @@ class Dnd5eArenaController {
                 mod_constituicao: modAtributo(combatente, 'con'),
                 bonus_proficiencia: combatente.bonus_proficiencia ?? 2,
                 magia_concentracao_id: combatente.magia_concentracao_id,
+                feats: combatente.feats || [],
             });
             if (!res.manteve_concentracao) {
                 combatente.magia_concentracao_id = null;
@@ -818,7 +860,7 @@ class Dnd5eArenaController {
         c.status_vida = res.status_vida || c.status_vida || 'vivo';
     }
 
-    async aplicarDano(id, valor, { is_critico = false } = {}) {
+    async aplicarDano(id, valor, { is_critico = false, tipo_dano = '' } = {}) {
         const c = this.combatentePorId(id);
         if (!c || c.status_vida === 'morto') return;
         try {
@@ -830,6 +872,9 @@ class Dnd5eArenaController {
                 death_successes: c.death_successes || 0,
                 is_critico,
                 status_vida: c.status_vida || 'vivo',
+                raca_slug: c.raca || '',
+                raca_variante_slug: c.raca_variante || '',
+                tipo_dano: tipo_dano || '',
             });
             this._aplicarResultadoMorte(c, res);
             await this._testarConcentracaoAposDano(c, valor);
@@ -865,10 +910,20 @@ class Dnd5eArenaController {
         if (!c || c.hp_atual > 0 || c.status_vida === 'morto') return;
         if (c.status_vida === 'estabilizado') return;
         try {
+            let rolagemD20;
+            if (c._usarLuckyProximo && (c.lucky_restantes || 0) > 0) {
+                const r1 = Math.floor(Math.random() * 20) + 1;
+                const r2 = Math.floor(Math.random() * 20) + 1;
+                rolagemD20 = Math.max(r1, r2);
+                c.lucky_restantes = Math.max(0, (c.lucky_restantes || 0) - 1);
+                c._usarLuckyProximo = false;
+                Toast.info(`Lucky: ${r1} → ${rolagemD20} (reroll ${r2})`);
+            }
             const res = await cs.deathSave({
                 hp_atual: c.hp_atual,
                 death_failures: c.death_failures || 0,
                 death_successes: c.death_successes || 0,
+                rolagem_d20: rolagemD20,
             });
             this._aplicarResultadoMorte(c, res);
             Toast.success(`Salvamento: ${res.rolagem} — ${res.mensagem}`);
@@ -922,11 +977,32 @@ class Dnd5eArenaController {
     async gastarEconomia(tipo, metros = 0) {
         const c = this.combatenteAtual();
         if (!c) return;
+        let ajudaAlvoId = '';
+        if (tipo === 'help') {
+            const alvos = this.combatentes.filter(
+                (x) => x.id !== c.id && x.status_vida !== 'morto'
+            );
+            if (!alvos.length) {
+                Toast.error('Sem alvo para Ajudar.');
+                return;
+            }
+            const linhas = alvos.map((a, i) => `${i + 1}. ${a.nome}`).join('\n');
+            const pick = prompt(`Ajudar — alvo do próximo ataque:\n${linhas}`, '1');
+            if (pick == null) return;
+            const idx = parseInt(pick, 10) - 1;
+            const alvo = Number.isFinite(idx) ? alvos[idx] : alvos[0];
+            if (!alvo) {
+                Toast.error('Alvo inválido.');
+                return;
+            }
+            ajudaAlvoId = alvo.id;
+        }
         try {
             const res = await cs.economiaTurno({
                 tipo,
                 metros,
                 economia: c.economia || {},
+                ajuda_alvo_id: ajudaAlvoId,
             });
             c.economia = res.economia;
             if (res.mensagem) Toast.success(res.mensagem);
@@ -970,10 +1046,105 @@ class Dnd5eArenaController {
                     movimento_usado_metros: 0,
                     reacao_usada: false,
                     velocidade_metros: 9,
+                    esquivando: false,
+                    desengajado: false,
+                    ajuda_alvo_id: '',
                 };
             }
         }
         this.atualizarUiCombate();
+    }
+
+    marcarUsarLucky(id) {
+        const c = this.combatentePorId(id);
+        if (!c || !(c.lucky_restantes > 0)) {
+            Toast.error('Sem pontos de Lucky.');
+            return;
+        }
+        c._usarLuckyProximo = !c._usarLuckyProximo;
+        Toast.success(
+            c._usarLuckyProximo
+                ? 'Lucky ativo no próximo d20.'
+                : 'Lucky cancelado.'
+        );
+        this.atualizarUiCombate();
+    }
+
+    async executarSairAlcance(movendoId) {
+        const movendo = this.combatentePorId(movendoId);
+        if (!movendo) return;
+        const inimigos = this.combatentes.filter(
+            (x) => x.id !== movendo.id && x.status_vida !== 'morto'
+        );
+        if (!inimigos.length) {
+            Toast.error('Nenhum inimigo para ataque de oportunidade.');
+            return;
+        }
+        const linhas = inimigos.map((a, i) => `${i + 1}. ${a.nome}`).join('\n');
+        const pick = prompt(
+            `Quem pode reagir (ataque de oportunidade)?\n${linhas}`,
+            '1'
+        );
+        if (pick == null) return;
+        const idx = parseInt(pick, 10) - 1;
+        const atacante = Number.isFinite(idx) ? inimigos[idx] : inimigos[0];
+        if (!atacante) {
+            Toast.error('Atacante inválido.');
+            return;
+        }
+        await this.executarOportunidade(movendo.id, atacante.id);
+    }
+
+    async executarOportunidade(alvoId, atacanteId) {
+        const alvo = this.combatentePorId(alvoId);
+        const atacante = this.combatentePorId(atacanteId);
+        if (!alvo || !atacante) return;
+        const armaSlug = atacante.arma_principal_slug || null;
+        try {
+            const res = await cs.oportunidade({
+                str_mod: atacante.strength_mod ?? 0,
+                dex_mod: atacante.dexterity_mod ?? 0,
+                bonus_proficiencia: atacante.bonus_proficiencia ?? 2,
+                ac_alvo: alvo.ca ?? 10,
+                arma_slug: armaSlug,
+                feats: atacante.feats || [],
+                raca_slug: atacante.raca || '',
+                economia_atacante: atacante.economia || {},
+                alvo_desengajado: !!alvo.economia?.desengajado,
+            });
+            atacante.economia = res.economia_atacante;
+            if (res.acerto) {
+                Toast.warning(
+                    `${atacante.nome}: oportunidade acertou (${res.total} ≥ CA ${alvo.ca})`
+                );
+                const ataque = (atacante.ataques || [])[0];
+                if (ataque?.dano || armaSlug) {
+                    const { dano, mod } = parseDanoFicha(ataque?.dano || '1d8');
+                    const danoRes = await cs.dano(
+                        armaSlug
+                            ? {
+                                  dano,
+                                  mod_atributo: mod,
+                                  is_critico: !!res.is_critico,
+                                  arma_slug: armaSlug,
+                                  str_mod: atacante.strength_mod ?? 0,
+                                  dex_mod: atacante.dexterity_mod ?? 0,
+                              }
+                            : { dano, mod_atributo: mod, is_critico: !!res.is_critico }
+                    );
+                    await this.aplicarDano(alvo.id, danoRes.dano_total, {
+                        is_critico: !!res.is_critico,
+                    });
+                }
+            } else {
+                Toast.info(
+                    `${atacante.nome}: oportunidade errou (${res.total} vs CA ${alvo.ca})`
+                );
+            }
+            this.atualizarUiCombate();
+        } catch (e) {
+            Toast.error(e.message || 'Oportunidade indisponível');
+        }
     }
 
     abrirModalDanoCura() {
@@ -1085,16 +1256,25 @@ class Dnd5eArenaController {
         }
 
         const bonusExtra = parseBonusAtaque(ataque.bonus_ataque);
+        const armaSlug = ataque.slug || atacante.arma_principal_slug || null;
+        const usarArma = Boolean(armaSlug);
         try {
             const res = await cs.ataque({
-                mod_atributo: 0,
-                bonus_proficiencia: 0,
-                proficiente: false,
+                mod_atributo: usarArma ? 0 : (atacante.strength_mod ?? 0),
+                str_mod: atacante.strength_mod ?? 0,
+                dex_mod: atacante.dexterity_mod ?? 0,
+                bonus_proficiencia: atacante.bonus_proficiencia ?? 2,
+                proficiente: true,
                 bonus_extra: bonusExtra,
                 ac_alvo: alvo.ca ?? 10,
                 condicoes_atacante: this.slugsCondicoes(atacante),
-                condicoes_alvo: this.slugsCondicoes(alvo),
+                condicoes_alvo: this._condicoesAlvoParaAtaque(alvoId),
                 corpo_a_corpo: true,
+                arma_slug: usarArma ? armaSlug : null,
+                duas_maos: !!ataque.duas_maos,
+                feats: atacante.feats || [],
+                raca_slug: atacante.raca || '',
+                aplicar_sorte_halfling: true,
             });
 
             const critTxt = res.is_critico ? ' — CRÍTICO!' : '';
@@ -1104,11 +1284,22 @@ class Dnd5eArenaController {
                 );
                 if (ataque.dano) {
                     const { dano, mod } = parseDanoFicha(ataque.dano);
-                    const danoRes = await cs.dano({
-                        dano,
-                        mod_atributo: mod,
-                        is_critico: !!res.is_critico,
-                    });
+                    const danoPayload = usarArma
+                        ? {
+                              dano,
+                              mod_atributo: mod,
+                              is_critico: !!res.is_critico,
+                              arma_slug: armaSlug,
+                              str_mod: atacante.strength_mod ?? 0,
+                              dex_mod: atacante.dexterity_mod ?? 0,
+                              duas_maos: !!ataque.duas_maos,
+                          }
+                        : {
+                              dano,
+                              mod_atributo: mod,
+                              is_critico: !!res.is_critico,
+                          };
+                    const danoRes = await cs.dano(danoPayload);
                     await this.aplicarDano(alvo.id, danoRes.dano_total, {
                         is_critico: !!res.is_critico,
                     });
@@ -1147,6 +1338,8 @@ class Dnd5eArenaController {
                 condicoes_atacante: atacante ? this.slugsCondicoes(atacante) : [],
                 condicoes_alvo: alvo ? this.slugsCondicoes(alvo) : [],
                 corpo_a_corpo: this.el('toolCorpoACorpo')?.checked,
+                raca_slug: atacante?.raca || '',
+                aplicar_sorte_halfling: true,
             });
             const elRes = this.el('toolAtaqueRes');
             if (elRes) {

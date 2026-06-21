@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/modais.css" />
     <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=18" />
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
-    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=14" />
+    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=22" />
     <link rel="stylesheet" href="/games/dnd35/css/grimorio.css?v=4" />
     <link rel="stylesheet" href="../css/grimorio-dnd5e.css?v=3" />
 </head>
@@ -107,6 +107,7 @@
                     </div>
                     <label class="ficha-label" for="f5e_hp_atual" style="margin-top:0.35rem">PV atual</label>
                     <input id="f5e_hp_atual" type="number" min="0" />
+                    <button type="button" class="ficha-btn-adicionar ficha-btn-repouso-longo" id="f5e_btn_repouso_longo" style="margin-top:0.35rem;width:auto">🌙 Repouso longo</button>
                     <p id="f5e_hp_detalhe" class="ficha-dnd5e-hp-detalhe" aria-live="polite"></p>
                 </div>
                 
@@ -115,9 +116,14 @@
                     <span id="f5e_iniciativa" class="ficha-defesa-valor">+0</span>
                 </div>
                 <div class="ficha-defesa-box ficha-ini-box">
+                    <span class="ficha-defesa-label">Percep. passiva</span>
+                    <span id="f5e_percepcao_passiva" class="ficha-defesa-valor">10</span>
+                </div>
+                <div class="ficha-defesa-box ficha-ini-box">
                     <span class="ficha-defesa-label">Prof.</span>
                     <span id="f5e_prof" class="ficha-defesa-valor">+2</span>
                 </div>
+                <p id="f5e_magic_initiate_resumo" class="ficha-dnd5e-hp-detalhe" hidden></p>
             </div>
 
             <div class="ficha-secao" id="f5e_condicoes_sec">
@@ -187,7 +193,11 @@
             </div>
 
             <div class="ficha-secao ficha-dnd5e-progressao-sec" id="f5e_progressao_sec">
-                <h3 class="ficha-secao-titulo">📈 Progressão</h3>
+                <h3 class="ficha-secao-titulo">
+                    📈 Progressão
+                    <span id="f5e_pendencias_badge" class="ficha-dnd5e-pendencias-badge" hidden></span>
+                </h3>
+                <div id="f5e_pendencias_alerta" class="ficha-dnd5e-pendencias-alerta" hidden role="status"></div>
                 <p class="ficha-dnd5e-status" id="f5e_progressao_status"></p>
                 <div class="ficha-dnd5e-edit-grid">
                     <div>
@@ -206,6 +216,7 @@
                 <div id="f5e_hp_rolls_lista" class="ficha-dnd5e-progressao-lista"></div>
                 <hr class="ficha-dnd5e-sep" />
                 <p class="ficha-dnd5e-status ficha-dnd5e-marco-hint">
+                    <strong>Humano:</strong> escolha um talento no 1º nível (marco abaixo).
                     Nos níveis 4, 8, 12, 16 e 19 a classe concede
                     <strong>Incremento no Valor de Habilidade</strong> (PHB).
                     <strong>Talento</strong> só se a mesa usar a regra opcional (Cap. 6).
@@ -226,6 +237,43 @@
                 <div id="f5e_marco_feat_wrap" hidden>
                     <label class="ficha-label" for="f5e_marco_feat">Talento</label>
                     <select id="f5e_marco_feat"></select>
+                    <div id="f5e_marco_feat_resilient_wrap" class="ficha-dnd5e-feat-escolha" hidden>
+                        <label class="ficha-label" for="f5e_marco_feat_resilient">Resiliente — salvaguarda</label>
+                        <select id="f5e_marco_feat_resilient">
+                            <option value="">— escolha —</option>
+                            <option value="strength">Força (Fortitude)</option>
+                            <option value="dexterity">Destreza (Reflexos)</option>
+                            <option value="constitution">Constituição (Fortitude)</option>
+                            <option value="intelligence">Inteligência (Vontade)</option>
+                            <option value="wisdom">Sabedoria (Vontade)</option>
+                            <option value="charisma">Carisma (Vontade)</option>
+                        </select>
+                    </div>
+                    <div id="f5e_marco_feat_magic_wrap" class="ficha-dnd5e-feat-escolha" hidden>
+                        <label class="ficha-label" for="f5e_marco_feat_magic">Iniciado em Magia — classe</label>
+                        <select id="f5e_marco_feat_magic">
+                            <option value="">— escolha —</option>
+                            <option value="clerigo">Clérigo</option>
+                            <option value="mago">Mago</option>
+                            <option value="druida">Druida</option>
+                            <option value="bruxo">Bruxo</option>
+                        </select>
+                    </div>
+                    <div id="f5e_marco_feat_skilled_wrap" class="ficha-dnd5e-feat-escolha" hidden>
+                        <p class="ficha-label ficha-dnd5e-skilled-titulo">Habilidoso (Skilled) — 3 perícias</p>
+                        <div class="ficha-dnd5e-skilled-grid">
+                            <select id="f5e_marco_feat_skilled_1" aria-label="Perícia 1"></select>
+                            <select id="f5e_marco_feat_skilled_2" aria-label="Perícia 2"></select>
+                            <select id="f5e_marco_feat_skilled_3" aria-label="Perícia 3"></select>
+                        </div>
+                    </div>
+                    <div id="f5e_marco_feat_skill_expert_wrap" class="ficha-dnd5e-feat-escolha" hidden>
+                        <p class="ficha-label ficha-dnd5e-skilled-titulo">Especialista (Skill Expert)</p>
+                        <label class="ficha-label" for="f5e_marco_feat_skill_expert_nova">Nova proficiência</label>
+                        <select id="f5e_marco_feat_skill_expert_nova" aria-label="Nova proficiência"></select>
+                        <label class="ficha-label" for="f5e_marco_feat_skill_expert_exp">Expertise em</label>
+                        <select id="f5e_marco_feat_skill_expert_exp" aria-label="Expertise"></select>
+                    </div>
                 </div>
                 <div id="f5e_marco_asi_wrap">
                     <label class="ficha-label" for="f5e_marco_asi_modo">Distribuição</label>
@@ -260,6 +308,48 @@
                 </div>
                 <button type="button" class="ficha-btn-adicionar" id="f5e_btn_marco">Registrar escolha</button>
                 <div id="f5e_marcos_lista" class="ficha-dnd5e-progressao-lista"></div>
+                <div id="f5e_feat_escolhas_sec" class="ficha-dnd5e-feat-escolhas-sec" hidden>
+                    <hr class="ficha-dnd5e-sep" />
+                    <p class="ficha-label ficha-dnd5e-feat-escolhas-titulo">Escolhas de talentos</p>
+                    <div id="f5e_feat_escolhas_resilient_wrap" class="ficha-dnd5e-feat-escolha" hidden>
+                        <label class="ficha-label" for="f5e_feat_escolha_resilient">Resiliente — salvaguarda</label>
+                        <select id="f5e_feat_escolha_resilient">
+                            <option value="">— escolha —</option>
+                            <option value="strength">Força (Fortitude)</option>
+                            <option value="dexterity">Destreza (Reflexos)</option>
+                            <option value="constitution">Constituição (Fortitude)</option>
+                            <option value="intelligence">Inteligência (Vontade)</option>
+                            <option value="wisdom">Sabedoria (Vontade)</option>
+                            <option value="charisma">Carisma (Vontade)</option>
+                        </select>
+                    </div>
+                    <div id="f5e_feat_escolhas_magic_wrap" class="ficha-dnd5e-feat-escolha" hidden>
+                        <label class="ficha-label" for="f5e_feat_escolha_magic">Iniciado em Magia — classe</label>
+                        <select id="f5e_feat_escolha_magic">
+                            <option value="">— escolha —</option>
+                            <option value="clerigo">Clérigo</option>
+                            <option value="mago">Mago</option>
+                            <option value="druida">Druida</option>
+                            <option value="bruxo">Bruxo</option>
+                        </select>
+                    </div>
+                    <div id="f5e_feat_escolhas_skilled_wrap" class="ficha-dnd5e-feat-escolha" hidden>
+                        <p class="ficha-label ficha-dnd5e-skilled-titulo">Habilidoso (Skilled) — 3 perícias</p>
+                        <div class="ficha-dnd5e-skilled-grid">
+                            <select id="f5e_feat_escolha_skilled_1" aria-label="Perícia 1"></select>
+                            <select id="f5e_feat_escolha_skilled_2" aria-label="Perícia 2"></select>
+                            <select id="f5e_feat_escolha_skilled_3" aria-label="Perícia 3"></select>
+                        </div>
+                    </div>
+                    <div id="f5e_feat_escolhas_skill_expert_wrap" class="ficha-dnd5e-feat-escolha" hidden>
+                        <p class="ficha-label ficha-dnd5e-skilled-titulo">Especialista (Skill Expert)</p>
+                        <label class="ficha-label" for="f5e_feat_escolha_skill_expert_nova">Nova proficiência</label>
+                        <select id="f5e_feat_escolha_skill_expert_nova" aria-label="Nova proficiência"></select>
+                        <label class="ficha-label" for="f5e_feat_escolha_skill_expert_exp">Expertise em</label>
+                        <select id="f5e_feat_escolha_skill_expert_exp" aria-label="Expertise"></select>
+                    </div>
+                    <button type="button" class="ficha-btn-adicionar" id="f5e_btn_feat_escolhas">Salvar escolhas de talentos</button>
+                </div>
                 <p class="ficha-label ficha-dnd5e-pendencias-titulo">Pendências</p>
                 <ul id="f5e_pendencias_lista" class="ficha-dnd5e-pendencias"></ul>
             </div>
@@ -280,12 +370,25 @@
                     <label class="ficha-label" for="f5e_pericia_racial">Perícia extra (raça)</label>
                     <select id="f5e_pericia_racial"></select>
                 </div>
+                <div id="f5e_raca_variante_wrap" hidden>
+                    <label class="ficha-label" id="f5e_raca_variante_label" for="f5e_raca_variante">Linhagem</label>
+                    <select id="f5e_raca_variante"></select>
+                </div>
                 
             </div>
 
             <div id="f5e_antecedente_painel" class="ficha-secao" hidden>
                 <h3 class="ficha-secao-titulo">Antecedente</h3>
                 <p id="f5e_antecedente_resumo" class="ficha-vazio"></p>
+                <div id="f5e_antecedente_idiomas_wrap">
+                    <div id="f5e_antecedente_idiomas_host" class="dnd5e-idiomas-host" hidden></div>
+                    <p id="f5e_antecedente_idiomas_hint" class="ficha-dnd5e-status"></p>
+                </div>
+                <div id="f5e_antecedente_tracos_wrap">
+                    <div id="f5e_antecedente_tracos_host" class="dnd5e-tracos-host" hidden></div>
+                    <p id="f5e_antecedente_tracos_hint" class="ficha-dnd5e-status"></p>
+                    <button type="button" id="f5e_antecedente_tracos_sortear" class="btn btn-sm" hidden>Sortear traços</button>
+                </div>
             </div>
 
             <div class="ficha-secao">
@@ -303,7 +406,13 @@
                     </div>
                     <div>
                         <label class="ficha-label" for="f5e_ouro">Ouro (gp)</label>
-                        <input type="number" id="f5e_ouro" min="0" step="1" value="0" class="ficha-input-num" />
+                        <div class="ficha-dnd5e-ouro-row">
+                            <input type="number" id="f5e_ouro" min="0" step="1" value="0" class="ficha-input-num" />
+                            <button type="button" class="ficha-btn-adicionar" id="f5e_btn_rolar_ouro" title="Rolar ouro inicial da classe">🎲 Rolar</button>
+                        </div>
+                        <p id="f5e_ouro_classe_hint" class="ficha-dnd5e-status"></p>
+                        <button type="button" class="ficha-btn-adicionar ficha-btn-equip-classe" id="f5e_btn_equip_classe" title="Aplicar pacote PHB da classe">⚔️ Equip. inicial</button>
+                        <p id="f5e_equip_classe_hint" class="ficha-dnd5e-status"></p>
                     </div>
                 </div>
                 <p id="f5e_protecao_resumo" class="ficha-dnd5e-status"></p>
@@ -352,9 +461,22 @@
             </div>
 
             <div class="ficha-secao ficha-dnd5e-secao-pericias-todas">
-                <h3 class="ficha-secao-titulo">📋 Perícias</h3>
-                <p class="ficha-dnd5e-pericias-grade-legenda">Bônus totais · destaque = proficiente</p>
+                <div class="ficha-secao-header">
+                    <h3 class="ficha-secao-titulo">📋 Perícias</h3>
+                    <div class="ficha-dnd5e-pericias-acoes">
+                        <button type="button" class="ficha-btn-adicionar" id="f5e_btn_editar_pericias" title="Editar proficiências">✏️ Editar</button>
+                        <button type="button" class="ficha-btn-adicionar ficha-dnd5e-btn-salvar-pericias" id="f5e_btn_salvar_pericias" hidden>💾 Salvar</button>
+                        <button type="button" class="ficha-btn-adicionar ficha-dnd5e-btn-cancelar-pericias" id="f5e_btn_cancelar_pericias" hidden>Cancelar</button>
+                    </div>
+                </div>
+                <p class="ficha-dnd5e-pericias-grade-legenda" id="f5e_pericias_grade_legenda">Bônus totais · destaque = proficiente</p>
                 <div id="f5e_pericias_grade" class="ficha-dnd5e-pericias-grade"></div>
+                <div id="f5e_expertise_wrap" class="ficha-dnd5e-expertise-wrap" hidden>
+                    <p class="ficha-label">Especialização (Expertise)</p>
+                    <p class="ficha-dnd5e-status" id="f5e_expertise_hint"></p>
+                    <div id="f5e_expertise_escolha" class="ficha-dnd5e-expertise-escolha"></div>
+                    <button type="button" class="ficha-btn-adicionar" id="f5e_btn_salvar_expertise">💾 Salvar expertise</button>
+                </div>
             </div>
 
             <div class="ficha-secao span-2">
@@ -565,17 +687,24 @@
 <script>
     if (!AuthService.exigirJogo('dnd5e')) {}
 </script>
-<script src="../js/services/Dnd5ePersonagemService.js?v=4"></script>
-<script src="../js/services/Dnd5eRegrasService.js?v=4"></script>
-<script src="../js/ui/Dnd5eProgressaoPanel.js?v=2"></script>
+<script src="../js/services/Dnd5ePersonagemService.js?v=5"></script>
+<script src="../js/services/Dnd5eRegrasService.js?v=6"></script>
+<script src="../js/ui/Dnd5eConfirmModal.js?v=1"></script>
+<script src="../js/ui/Dnd5eProgressaoPanel.js?v=7"></script>
 <script src="../js/ui/Dnd5eFichaCatalogoModal.js?v=1"></script>
-<script src="../js/ui/Dnd5eFichaInventarioPanel.js?v=3"></script>
+<script src="../js/ui/Dnd5eFichaInventarioPanel.js?v=6"></script>
 <script src="../js/services/Dnd5eCombateService.js?v=3"></script>
+<script src="../js/shared/dnd5e-antecedente-util.js?v=1"></script>
+<script src="../js/shared/dnd5e-ouro-classe-util.js?v=1"></script>
+<script src="../js/shared/dnd5e-idiomas-util.js?v=1"></script>
+<script src="../js/shared/dnd5e-tracos-util.js?v=1"></script>
+<script src="../js/shared/dnd5e-equipamento-classe-util.js?v=1"></script>
+<script src="../js/shared/dnd5e-pendencias-util.js?v=3"></script>
 <script src="../js/shared/dnd5e-condicoes-util.js?v=1"></script>
-<script src="../js/shared/dnd5e-raca-util.js?v=1"></script>
-<script src="../js/shared/dnd5e-xp-util.js?v=1"></script>
-<script src="../js/pages/ficha-dnd5e.js?v=19"></script>
+<script src="../js/shared/dnd5e-raca-util.js?v=2"></script>
+<script src="../js/shared/dnd5e-xp-util.js?v=2"></script>
+<script src="../js/pages/ficha-dnd5e.js?v=33"></script>
 <script type="module" src="../js/pages/ficha-dnd5e-grimorio-bootstrap.js?v=20260614a"></script>
-<script type="module" src="../js/pages/ficha-dnd5e-conjuracao.js?v=2"></script>
+<script type="module" src="../js/pages/ficha-dnd5e-conjuracao.js?v=3"></script>
 </body>
 </html>

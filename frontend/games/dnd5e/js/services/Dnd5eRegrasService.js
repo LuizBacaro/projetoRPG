@@ -81,6 +81,10 @@ class Dnd5eRegrasService {
         return this._get('/subclasses', classeSlug ? { classe_slug: classeSlug } : {});
     }
 
+    idiomas() {
+        return this._get('/idiomas');
+    }
+
     async gerarAtributos(body) {
         const res = await fetch(this._url('/gerar-atributos'), {
             method: 'POST',
@@ -128,6 +132,43 @@ class Dnd5eRegrasService {
         if (!res.ok) {
             const e = await res.json().catch(() => ({}));
             throw new Error(e.detail || 'Erro ao calcular atributos');
+        }
+        return res.json();
+    }
+
+    async aplicarEquipamentoClasse(body) {
+        const res = await fetch(this._url('/aplicar-equipamento-classe'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (res.status === 401) {
+            if (typeof AuthService.logout === 'function') AuthService.logout();
+            throw new Error('Sessão expirada.');
+        }
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(e.detail || 'Erro ao aplicar equipamento da classe');
+        }
+        return res.json();
+    }
+
+    async rolarOuroClasse(body) {
+        const res = await fetch(this._url('/rolar-ouro-classe'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (res.status === 401) {
+            if (typeof AuthService.logout === 'function') AuthService.logout();
+            throw new Error('Sessão expirada.');
+        }
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            const detail = e.detail;
+            throw new Error(
+                typeof detail === 'string' ? detail : detail?.msg || 'Erro ao rolar ouro da classe'
+            );
         }
         return res.json();
     }

@@ -11,6 +11,22 @@ const Dnd5eRacaUtil = {
         );
     },
 
+    temVarianteEscolha(raca) {
+        if (!raca) return false;
+        if (raca.escolhe_variante === true) return true;
+        return Array.isArray(raca.variantes) && raca.variantes.length > 0;
+    },
+
+    listarVariantes(raca) {
+        if (!raca || !Array.isArray(raca.variantes)) return [];
+        return raca.variantes;
+    },
+
+    labelVariante(raca) {
+        if (!raca) return 'Linhagem';
+        return raca.slug === 'tiefling' ? 'Herança infernal' : 'Ancestralidade dracônica';
+    },
+
     labelBonusHabilidadeExtra(raca) {
         return raca ? `+1 (${raca.nome})` : '+1 (bônus racial)';
     },
@@ -21,5 +37,23 @@ const Dnd5eRacaUtil = {
             const lbl = getEl(id);
             if (lbl) lbl.textContent = texto;
         });
+    },
+
+    preencherSelectVariante(raca, selectEl, valorAtual) {
+        if (!selectEl) return;
+        const variantes = this.listarVariantes(raca);
+        if (!variantes.length) {
+            selectEl.innerHTML = '';
+            return;
+        }
+        selectEl.innerHTML =
+            '<option value="">— escolha —</option>' +
+            variantes
+                .map(
+                    (v) =>
+                        `<option value="${v.slug}">${v.nome} (resist. ${v.tipo_dano_pt || v.tipo_dano || ''})</option>`
+                )
+                .join('');
+        if (valorAtual) selectEl.value = valorAtual;
     },
 };
