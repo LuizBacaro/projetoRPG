@@ -283,6 +283,7 @@ def teste_concentracao(
     mod_constituicao: int,
     *,
     rolagem_d20: Optional[int] = None,
+    rolagem_secundaria: Optional[int] = None,
     bonus_proficiencia: Optional[int] = None,
 ) -> bool:
     """Teste de concentração: DC 10 ou metade do dano (o maior). True = mantém."""
@@ -294,7 +295,16 @@ def teste_concentracao(
         if bonus_proficiencia is not None
         else conjurador.bonus_proficiencia
     )
-    roll = rolagem_d20 if rolagem_d20 is not None else rolar_d20()
+    if rolagem_d20 is not None:
+        roll = rolagem_d20
+        if rolagem_secundaria is not None:
+            roll = max(int(rolagem_d20), int(rolagem_secundaria))
+    else:
+        from app.games.dnd5e.rules.dados import rolar_d20
+
+        roll = rolar_d20()
+        if rolagem_secundaria is not None:
+            roll = max(roll, int(rolagem_secundaria))
     total = roll + mod_constituicao + prof
     if total < dc:
         conjurador.magia_concentracao = None

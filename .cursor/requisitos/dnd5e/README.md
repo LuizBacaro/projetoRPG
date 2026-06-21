@@ -56,8 +56,11 @@ Repositório: **[5e-bits/5e-database](https://github.com/5e-bits/5e-database)** 
 | `06-talentos-feitos-dnd5e.md` | `feats` |
 | `07-equipamento-dnd5e.md` | `equipment`, `magic-items` |
 | `08-antecedentes-dnd5e.md` | `backgrounds` |
+| `10-pericias-dnd5e.md` | Lógica no código (`pericias_catalogo.py`); **sem** ranks/pontos 3.5 |
 
 Consultar a árvore atual em [github.com/5e-bits/5e-database/tree/main/src](https://github.com/5e-bits/5e-database/tree/main/src).
+
+**Perícias 5e vs 3.5:** leia [10-pericias-dnd5e.md](10-pericias-dnd5e.md) antes de alterar ficha ou progressão — **não** portar pontos de perícia do [06-pericias-dnd35.md](../dnd35/06-pericias-dnd35.md).
 
 **Versão de referência no código:** `DND5E_DATABASE_VERSION` em `backend/app/games/dnd5e/data/catalogo_metadata.py` (ADR [0003](../../docs/adr/0003-dnd5e-fonte-dados-5e-database.md)).
 

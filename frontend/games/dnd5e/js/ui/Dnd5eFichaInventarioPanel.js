@@ -51,6 +51,8 @@ class Dnd5eFichaInventarioPanel {
         this.el = options.el || ((id) => document.getElementById(id));
         this.rs = options.regrasService;
         this.onChange = options.onChange || (() => {});
+        this.onRolarOuroClasse = options.onRolarOuroClasse || (() => {});
+        this.onAplicarEquipClasse = options.onAplicarEquipClasse || (() => {});
         this.getPreview = options.getPreview || (() => null);
         this.catalogoModal = options.catalogoModal || new Dnd5eFichaCatalogoModal();
 
@@ -63,6 +65,23 @@ class Dnd5eFichaInventarioPanel {
             talentos: [],
         };
         this.state = normalizarInventarioFicha({});
+        this.antecedenteMeta = {
+            inventario_slug: null,
+            ouro_aplicado: 0,
+            tracos: null,
+            idiomas: [],
+        };
+        this.classeOuroMeta = {
+            slug: null,
+            ouro_aplicado: 0,
+            rolagem: [],
+            formula: '',
+        };
+        this.classeEquipMeta = {
+            slug: null,
+            aplicado: false,
+            nome: '',
+        };
     }
 
     async init() {
@@ -90,13 +109,187 @@ class Dnd5eFichaInventarioPanel {
 
     loadFromFicha(ficha, featsExtras) {
         this.state = normalizarInventarioFicha(ficha || {});
+        this.antecedenteMeta = {
+            inventario_slug: ficha?.antecedente_inventario_slug || null,
+            ouro_aplicado: Number(ficha?.antecedente_ouro_aplicado) || 0,
+            tracos: ficha?.antecedente_tracos || null,
+            idiomas: ficha?.antecedente_idiomas || [],
+        };
+        this.classeOuroMeta = {
+            slug: ficha?.classe_ouro_slug || null,
+            ouro_aplicado: Number(ficha?.ouro_classe_aplicado) || 0,
+            rolagem: ficha?.ouro_classe_rolagem || [],
+            formula: ficha?.ouro_classe_formula || '',
+        };
+        this.classeEquipMeta = {
+            slug: ficha?.classe_equip_slug || null,
+            aplicado: !!ficha?.classe_equip_aplicado,
+            nome: ficha?.classe_equip_nome || '',
+        };
         this._featsFicha = Array.isArray(featsExtras)
             ? featsExtras
             : Array.isArray(ficha?.feats)
               ? ficha.feats
               : [];
         this._syncCamposDom();
+        if (this.classeOuroMeta.ouro_aplicado > 0) {
+            this._atualizarHintOuroClasse({
+                total: this.classeOuroMeta.ouro_aplicado,
+                dados: this.classeOuroMeta.rolagem,
+                formula: this.classeOuroMeta.formula,
+                multiplicador: 1,
+            });
+        }
+        if (this.classeEquipMeta.aplicado) {
+            this._atualizarHintEquipClasse(this.classeEquipMeta);
+        }
         this.renderTudo();
+    }
+
+    getClasseEquipMeta() {
+        return {
+            classe_equip_slug: this.classeEquipMeta.slug,
+            classe_equip_aplicado: !!this.classeEquipMeta.aplicado,
+            classe_equip_nome: this.classeEquipMeta.nome || '',
+        };
+    }
+
+    _atualizarHintEquipClasse(meta) {
+        const hint = this.el('f5e_equip_classe_hint');
+        if (!hint) return;
+        if (!meta?.aplicado) {
+            hint.textContent = '';
+            return;
+        }
+        hint.textContent = meta.nome
+            ? `${meta.nome} aplicado.`
+            : 'Equipamento inicial da classe aplicado.';
+    }
+
+    aplicarEquipamentoClasse(res) {
+        if (typeof Dnd5eEquipamentoClasseUtil === 'undefined') return false;
+        const out = Dnd5eEquipamentoClasseUtil.aplicarResposta(this.state, res);
+        if (!out.changed) return false;
+        this.state = out.state;
+        this.classeEquipMeta = {
+            slug: out.meta.classe_equip_slug,
+            aplicado: out.meta.classe_equip_aplicado,
+            nome: out.meta.classe_equip_nome,
+        };
+        this._syncCamposDom();
+        this._atualizarHintEquipClasse(this.classeEquipMeta);
+        this.renderTudo();
+        this._emitChange();
+        return true;
+    }
+
+    getAntecedenteMeta() {
+        return {
+            antecedente_inventario_slug: this.antecedenteMeta.inventario_slug,
+            antecedente_ouro_aplicado: this.antecedenteMeta.ouro_aplicado || 0,
+            antecedente_tracos: this.antecedenteMeta.tracos || null,
+            antecedente_idiomas: this.antecedenteMeta.idiomas || [],
+        };
+    }
+
+    getClasseOuroMeta() {
+        return {
+            classe_ouro_slug: this.classeOuroMeta.slug,
+            ouro_classe_aplicado: this.classeOuroMeta.ouro_aplicado || 0,
+            ouro_classe_rolagem: this.classeOuroMeta.rolagem || [],
+            ouro_classe_formula: this.classeOuroMeta.formula || '',
+        };
+    }
+
+    _atualizarHintOuroClasse(roll) {
+        const hint = this.el('f5e_ouro_classe_hint');
+        if (!hint || typeof Dnd5eOuroClasseUtil === 'undefined') return;
+        hint.textContent = roll ? Dnd5eOuroClasseUtil.formatRollHint(roll) : '';
+    }
+
+    aplicarOuroClasse(classeSlug, roll, forcar = false) {
+        if (typeof Dnd5eOuroClasseUtil === 'undefined') return false;
+        const slugAtual = classeSlug ? String(classeSlug).trim() : null;
+        const res = Dnd5eOuroClasseUtil.sincronizarOuro({
+            inventarioState: this.state,
+            slugAtual,
+            slugAplicado: this.classeOuroMeta.slug,
+            ouroAplicado: this.classeOuroMeta.ouro_aplicado,
+            roll,
+            forcar,
+        });
+        if (!res.changed) {
+            this._atualizarHintOuroClasse(
+                roll || {
+                    total: this.classeOuroMeta.ouro_aplicado,
+                    dados: this.classeOuroMeta.rolagem,
+                    formula: this.classeOuroMeta.formula,
+                    multiplicador: 1,
+                }
+            );
+            return false;
+        }
+        this.state.ouro_po = res.inventarioState.ouro_po;
+        this.classeOuroMeta = {
+            slug: res.meta.classe_ouro_slug,
+            ouro_aplicado: res.meta.ouro_classe_aplicado || 0,
+            rolagem: res.meta.ouro_classe_rolagem || [],
+            formula: res.meta.ouro_classe_formula || '',
+        };
+        this._syncCamposDom();
+        this._atualizarHintOuroClasse(roll);
+        this._emitChange();
+        return true;
+    }
+
+    sincronizarAntecedente(antecedenteSlug, antecedente, idiomasEscolhidos, tracosEscolhidos) {
+        if (typeof Dnd5eAntecedenteUtil === 'undefined') return false;
+        const slugAtual = antecedenteSlug ? String(antecedenteSlug).trim() : null;
+        const idiomas =
+            idiomasEscolhidos !== undefined
+                ? idiomasEscolhidos
+                : this.antecedenteMeta.idiomas;
+        const tracos =
+            tracosEscolhidos !== undefined ? tracosEscolhidos : this.antecedenteMeta.tracos;
+        const res = Dnd5eAntecedenteUtil.sincronizarInventario({
+            inventarioState: this.state,
+            slugAtual,
+            slugAplicado: this.antecedenteMeta.inventario_slug,
+            ouroAplicado: this.antecedenteMeta.ouro_aplicado,
+            antecedente,
+            idiomasEscolhidos: idiomas,
+            tracosEscolhidos: tracos,
+            uidFn: f5eUid,
+        });
+        if (!res.changed) return false;
+        this.state.equipamentos = res.inventarioState.equipamentos;
+        this.state.ouro_po = res.inventarioState.ouro_po;
+        this.antecedenteMeta = {
+            inventario_slug: res.meta.antecedente_inventario_slug,
+            ouro_aplicado: res.meta.antecedente_ouro_aplicado || 0,
+            tracos: res.meta.antecedente_tracos,
+            idiomas: res.meta.antecedente_idiomas || [],
+        };
+        this._syncCamposDom();
+        this.renderEquipamentos();
+        this._emitChange();
+        return true;
+    }
+
+    setIdiomasAntecedente(idiomas) {
+        this.antecedenteMeta.idiomas = Array.isArray(idiomas) ? [...idiomas] : [];
+    }
+
+    getIdiomasAntecedente() {
+        return [...(this.antecedenteMeta.idiomas || [])];
+    }
+
+    setTracosAntecedente(tracos) {
+        this.antecedenteMeta.tracos = tracos && typeof tracos === 'object' ? tracos : null;
+    }
+
+    getTracosAntecedente() {
+        return this.antecedenteMeta.tracos || null;
     }
 
     getInventarioParaFicha() {
@@ -218,6 +411,16 @@ class Dnd5eFichaInventarioPanel {
             if (ed) ed.hidden = true;
         });
         this.el('f5e_btn_sync_arma_ataque')?.addEventListener('click', () => this._sincronizarArmaPrincipalAtaque());
+        this.el('f5e_btn_rolar_ouro')?.addEventListener('click', () => {
+            if (typeof this.onRolarOuroClasse === 'function') {
+                this.onRolarOuroClasse(true);
+            }
+        });
+        this.el('f5e_btn_equip_classe')?.addEventListener('click', () => {
+            if (typeof this.onAplicarEquipClasse === 'function') {
+                this.onAplicarEquipClasse(true);
+            }
+        });
     }
 
     _emitChange() {

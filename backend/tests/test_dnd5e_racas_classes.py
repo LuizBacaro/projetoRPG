@@ -19,6 +19,7 @@ def test_doze_classes_e_xp():
     assert len(CLASSE_SLUGS_VALIDOS) == 12
     assert nivel_por_xp(0) == 1
     assert nivel_por_xp(300) == 2
-    assert nivel_por_xp(355000) == 20
+    assert nivel_por_xp(500000) == 20
     assert xp_minima_por_nivel(5) == 6500
-    assert xp_minima_por_nivel(12) == 100000
+    assert xp_minima_por_nivel(12) == 110000
+    assert xp_minima_por_nivel(20) == 500000

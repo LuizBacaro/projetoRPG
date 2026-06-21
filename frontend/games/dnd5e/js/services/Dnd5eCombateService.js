@@ -50,6 +50,10 @@ class Dnd5eCombateService {
         return this._post('/dano-hp', payload);
     }
 
+    salvamento(payload) {
+        return this._post('/salvamento', payload);
+    }
+
     estabilizar(payload) {
         return this._post('/estabilizar', payload);
     }
@@ -75,6 +79,10 @@ class Dnd5eCombateService {
 
     conjurarMagia(payload) {
         return this._post('/conjurar', payload);
+    }
+
+    oportunidade(payload) {
+        return this._post('/oportunidade', payload);
     }
 
     testeConcentracao(payload) {

@@ -5,6 +5,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
 
 from app.core.dependencies import (
+    get_dnd5e_conjuracao_ficha_service,
     get_dnd5e_personagem_service,
     get_dnd5e_progressao_service,
     get_file_service,
@@ -15,11 +16,21 @@ from app.games.dnd5e.schemas.personagem import (
     Dnd5ePersonagemUpdate,
 )
 from app.games.dnd5e.schemas.progressao import (
+    Dnd5eExpertisePericiasRequest,
+    Dnd5eExpertisePericiasResponse,
+    Dnd5eFeatEscolhasRequest,
+    Dnd5eFeatEscolhasResponse,
     Dnd5eHpRollRequest,
     Dnd5eHpRollResponse,
     Dnd5eMarcoRequest,
     Dnd5eMarcoResponse,
     Dnd5ePendenciasProgressaoResponse,
+    Dnd5ePericiasOverrideRequest,
+    Dnd5ePericiasOverrideResponse,
+    Dnd5eRepousoLongoResponse,
+)
+from app.games.dnd5e.services.conjuracao_ficha_service import (
+    Dnd5eConjuracaoFichaService,
 )
 from app.games.dnd5e.services.personagem_service import Dnd5ePersonagemService
 from app.games.dnd5e.services.progressao_service import Dnd5eProgressaoService
@@ -177,11 +188,113 @@ def progressao_marco(
             tipo=payload.tipo,
             slug=payload.slug,
             distribuicao=payload.distribuicao,
+            feat_escolhas=payload.feat_escolhas,
         )
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
     except DadosInvalidos as e:
         raise HTTPException(status_code=422, detail=str(e))
+
+
+@router.post(
+    "/{personagem_id}/progressao/feat-escolhas",
+    response_model=Dnd5eFeatEscolhasResponse,
+    summary="Atualiza escolhas de talentos (Resiliente, Iniciado em Magia)",
+)
+def progressao_feat_escolhas(
+    personagem_id: int,
+    payload: Dnd5eFeatEscolhasRequest,
+    service: Dnd5eProgressaoService = Depends(get_dnd5e_progressao_service),
+    _: Usuario = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    try:
+        return service.salvar_feat_escolhas(
+            personagem_id,
+            payload.feat_escolhas,
+        )
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@router.post(
+    "/{personagem_id}/progressao/pericias-override",
+    response_model=Dnd5ePericiasOverrideResponse,
+    summary="Atualiza proficiências manuais de perícias (multiclasse, feats, mesa)",
+)
+def progressao_pericias_override(
+    personagem_id: int,
+    payload: Dnd5ePericiasOverrideRequest,
+    service: Dnd5eProgressaoService = Depends(get_dnd5e_progressao_service),
+    _: Usuario = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    try:
+        return service.salvar_pericias_override(
+            personagem_id,
+            payload.pericias_override,
+        )
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@router.post(
+    "/{personagem_id}/progressao/expertise-pericias",
+    response_model=Dnd5eExpertisePericiasResponse,
+    summary="Escolhas de Expertise (Ladino/Bardo) — dobra bônus de proficiência",
+)
+def progressao_expertise_pericias(
+    personagem_id: int,
+    payload: Dnd5eExpertisePericiasRequest,
+    service: Dnd5eProgressaoService = Depends(get_dnd5e_progressao_service),
+    _: Usuario = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    try:
+        return service.salvar_expertise_pericias(
+            personagem_id,
+            payload.expertise_pericias,
+        )
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
+@router.post(
+    "/{personagem_id}/repouso-longo",
+    response_model=Dnd5eRepousoLongoResponse,
+    summary="Repouso longo — recupera PV (1d8+CON/nível) e slots de magia",
+)
+def repouso_longo(
+    personagem_id: int,
+    prog_service: Dnd5eProgressaoService = Depends(get_dnd5e_progressao_service),
+    conj_service: Dnd5eConjuracaoFichaService = Depends(
+        get_dnd5e_conjuracao_ficha_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_dnd5e_personagem),
+):
+    try:
+        res = prog_service.aplicar_repouso_longo(personagem_id)
+        try:
+            estado = conj_service.descanso_longo(personagem_id)
+            res.conjuracao = estado.model_dump()
+            if estado.slots:
+                res.mensagem = (
+                    f"{res.mensagem}; espaços de magia restaurados"
+                    if res.mensagem
+                    else "Espaços de magia restaurados"
+                )
+        except HTTPException:
+            pass
+        return res
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
 
 
 @router.post("/{personagem_id}/foto", response_model=Dnd5ePersonagemResponse)

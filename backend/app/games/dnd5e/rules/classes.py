@@ -10,6 +10,7 @@ from app.games.dnd5e.data.classes_catalogo import (
     TABELA_XP_POR_NIVEL,
 )
 from app.games.dnd5e.data.classes_proficiencias import proficiencias_classe
+from app.games.dnd5e.data.ouro_inicial_catalogo import formula_ouro_inicial
 
 CLASSE_SLUGS_VALIDOS = frozenset(c["slug"] for c in CLASSES_CATALOGO)
 
@@ -19,6 +20,7 @@ def lista_classes_catalogo() -> List[Dict[str, Any]]:
     for row in CLASSES_CATALOGO:
         merged = dict(row)
         merged.update(proficiencias_classe(row["slug"]))
+        merged["ouro_inicial_formula"] = formula_ouro_inicial(row["slug"])
         out.append(merged)
     return out
 
@@ -37,6 +39,7 @@ def classe_por_slug(slug: str) -> Optional[Dict[str, Any]]:
         if row.get("slug") == key:
             merged = dict(row)
             merged.update(proficiencias_classe(key))
+            merged["ouro_inicial_formula"] = formula_ouro_inicial(key)
             return merged
     return None
 

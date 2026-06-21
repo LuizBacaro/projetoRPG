@@ -39,6 +39,8 @@ Cada habilidade tem valor 3-20 (ou até 25 com itens mágicos). Modificador = (v
 | 13-16 | +5 |
 | 17-20 | +6 |
 
+Perícias e proficiências (sem pontos por nível, 18 perícias PHB, Skilled, override): ver [10-pericias-dnd5e.md](10-pericias-dnd5e.md).
+
 ## Validações
 - Valores habilidades: 1 <= x <= 25
 - Modificador = (valor - 10) / 2, arredondado para baixo

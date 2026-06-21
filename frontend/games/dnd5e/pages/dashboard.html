@@ -115,6 +115,15 @@
                             <label class="ficha-label" for="prec_antecedente">Antecedente</label>
                             <select id="prec_antecedente"></select>
                         </div>
+                        <div id="prec_antecedente_idiomas_wrap" class="span-2" hidden>
+                            <div id="prec_antecedente_idiomas_host" class="dnd5e-idiomas-host"></div>
+                            <p id="prec_antecedente_idiomas_hint" class="ficha-dnd5e-status"></p>
+                        </div>
+                        <div id="prec_antecedente_tracos_wrap" class="span-2" hidden>
+                            <div id="prec_antecedente_tracos_host" class="dnd5e-tracos-host"></div>
+                            <p id="prec_antecedente_tracos_hint" class="ficha-dnd5e-status"></p>
+                            <button type="button" id="prec_antecedente_tracos_sortear" class="btn btn-sm">Sortear traços</button>
+                        </div>
                         <div id="prec_subclasse_wrap" hidden>
                             <label class="ficha-label" for="prec_subclasse">Subclasse</label>
                             <select id="prec_subclasse"><option value="">—</option></select>
@@ -164,6 +173,15 @@
                 </section>
 
                 <section class="dnd5e-prec-sec">
+                    <h3 class="dnd5e-prec-sec-titulo">💰 Ouro inicial</h3>
+                    <p id="prec_ouro_formula" class="ficha-dnd5e-status">Selecione uma classe.</p>
+                    <div class="dnd5e-prec-ouro-toolbar">
+                        <button type="button" class="ficha-btn-adicionar" id="prec_btn_rolar_ouro">🎲 Rolar ouro da classe</button>
+                    </div>
+                    <p id="prec_ouro_resultado" class="ficha-dnd5e-status"></p>
+                </section>
+
+                <section class="dnd5e-prec-sec">
                     <h3 class="dnd5e-prec-sec-titulo">🎒 Equipamento &amp; CA</h3>
                     <div class="dnd5e-prec-grid">
                         <div>
@@ -202,10 +220,13 @@
     if (!AuthService.exigirJogo('dnd5e')) {}
 </script>
 <script src="../js/services/Dnd5ePersonagemService.js?v=3"></script>
-<script src="../js/services/Dnd5eRegrasService.js?v=3"></script>
+<script src="../js/services/Dnd5eRegrasService.js?v=5"></script>
 <script src="../js/shared/dnd5e-raca-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-xp-util.js?v=1"></script>
-<script src="../js/ui/Dnd5ePreCadastroModal.js?v=7"></script>
+<script src="../js/shared/dnd5e-ouro-classe-util.js?v=1"></script>
+<script src="../js/shared/dnd5e-idiomas-util.js?v=1"></script>
+<script src="../js/shared/dnd5e-tracos-util.js?v=1"></script>
+<script src="../js/ui/Dnd5ePreCadastroModal.js?v=10"></script>
 <script>
 (function () {
     const ps = new Dnd5ePersonagemService();

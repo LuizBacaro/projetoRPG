@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from app.games.dnd5e.data.classes_catalogo import NIVEIS_GANHO_FEAT
 from app.games.dnd5e.rules.classes import nivel_por_xp
+from app.games.dnd5e.rules.feat_efeitos import agregar_efeitos_feats
 from app.games.dnd5e.rules.habilidades import HABILIDADE_MAX, validar_valor_habilidade
 from app.games.dnd5e.rules.talentos import (
     PersonagemFeats,
@@ -32,6 +33,10 @@ DADO_VIDA_FACES: Dict[str, int] = {
 }
 METODOS_ATRIBUTOS = frozenset({"padrao", "4d6", "pontos"})
 MATRIZ_PADRAO_VALORES = (15, 14, 13, 12, 10, 8)
+MAGIC_INITIATE_CLASSES = frozenset({"clerigo", "mago", "druida", "bruxo"})
+FEATS_REQUEREM_ESCOLHA = frozenset(
+    {"resilient", "magic-initiate", "skilled", "skill-expert"}
+)
 _CUSTO_COMPRA_PONTOS = {8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9}
 ORCAMENTO_COMPRA_PONTOS = 27
 _ORCAMENTO_COMPRA_PONTOS = ORCAMENTO_COMPRA_PONTOS
@@ -54,6 +59,14 @@ def migrar_ficha_para_v2(ficha: Dict[str, Any]) -> Dict[str, Any]:
         out["progressao"] = prog
     if "feats" not in out or not isinstance(out.get("feats"), list):
         out["feats"] = _feats_de_marcos(out.get("progressao", {}).get("marcos") or [])
+    if not (out.get("raca_slug") or "").strip():
+        leg = (out.get("raca") or "").strip().lower()
+        if leg:
+            out["raca_slug"] = leg
+    if not (out.get("classe_slug") or "").strip():
+        leg = (out.get("classe") or "").strip().lower()
+        if leg:
+            out["classe_slug"] = leg
     return out
 
 
@@ -161,8 +174,8 @@ def bonus_hp_por_nivel_racial(raca_slug: str) -> int:
 
 
 def bonus_hp_por_nivel_feat(feats: Optional[Sequence[str]]) -> int:
-    slugs = {(f or "").strip().lower() for f in (feats or [])}
-    return 2 if "tough" in slugs else 0
+    fx = agregar_efeitos_feats(feats, "progressao")
+    return int(fx.get("bonus_hp_por_nivel", 0))
 
 
 def bonus_hp_extras_por_nivel(
@@ -239,6 +252,46 @@ def normalizar_hp_rolls(hp_rolls: Any) -> List[Dict[str, Any]]:
             }
         )
     return sorted(out, key=lambda x: x["nivel"])
+
+
+def recalcular_ganhos_hp_rolls(
+    hp_rolls: Sequence[Dict[str, Any]],
+    novo_con_mod: int,
+    *,
+    nivel_max: Optional[int] = None,
+) -> List[Dict[str, Any]]:
+    """Atualiza ganho/con_mod de rolagens já registradas (PHB: CON retroativa)."""
+    nivel_limite = max(1, min(20, int(nivel_max))) if nivel_max is not None else 20
+    out: List[Dict[str, Any]] = []
+    for item in normalizar_hp_rolls(hp_rolls):
+        copia = dict(item)
+        if int(copia["nivel"]) <= nivel_limite:
+            roll = int(copia["roll"])
+            con = int(novo_con_mod)
+            copia["con_mod"] = con
+            copia["ganho"] = max(1, roll + con)
+        out.append(copia)
+    return out
+
+
+def aplicar_retroativo_con_hp_na_ficha(
+    ficha: Dict[str, Any],
+    *,
+    con_mod_novo: int,
+    nivel: int,
+) -> Dict[str, Any]:
+    out = migrar_ficha_para_v2(ficha)
+    prog = dict(out.get("progressao") or {})
+    hp_rolls = normalizar_hp_rolls(prog.get("hp_rolls") or [])
+    if not hp_rolls:
+        return out
+    prog["hp_rolls"] = recalcular_ganhos_hp_rolls(
+        hp_rolls,
+        int(con_mod_novo),
+        nivel_max=nivel,
+    )
+    out["progressao"] = prog
+    return out
 
 
 def niveis_hp_pendentes(nivel: int, hp_rolls: Sequence[Dict[str, Any]]) -> List[int]:
@@ -376,6 +429,15 @@ def montar_hp_resumo(
     }
 
 
+def humano_precisa_feat_nivel_1(ficha: Dict[str, Any]) -> bool:
+    """True se raça humano ainda não registrou marco feat no nível 1."""
+    raca = (ficha.get("raca_slug") or "").strip().lower()
+    if raca != "humano":
+        return False
+    marcos = normalizar_marcos((ficha.get("progressao") or {}).get("marcos") or [])
+    return not any(m["nivel"] == 1 and m["tipo"] == "feat" for m in marcos)
+
+
 def normalizar_marcos(marcos: Any) -> List[Dict[str, Any]]:
     if not isinstance(marcos, list):
         return []
@@ -387,10 +449,13 @@ def normalizar_marcos(marcos: Any) -> List[Dict[str, Any]]:
             nivel = int(item.get("nivel", 0))
         except (TypeError, ValueError):
             continue
-        if nivel not in NIVEIS_GANHO_FEAT:
-            continue
         tipo = (item.get("tipo") or "").strip().lower()
         if tipo not in ("feat", "asi"):
+            continue
+        if nivel == 1:
+            if tipo != "feat":
+                continue
+        elif nivel not in NIVEIS_GANHO_FEAT:
             continue
         marco: Dict[str, Any] = {"nivel": nivel, "tipo": tipo}
         if tipo == "feat":
@@ -444,6 +509,203 @@ def _personagem_feats_de_ficha(
     )
 
 
+def _attr_resilient_escolhido(feat_escolhas: Optional[Dict[str, Any]]) -> str:
+    esc = feat_escolhas or {}
+    return (
+        str(esc.get("resilient") or esc.get("resilient_atributo") or "").strip().lower()
+    )
+
+
+def _classe_magic_initiate_escolhida(feat_escolhas: Optional[Dict[str, Any]]) -> str:
+    esc = feat_escolhas or {}
+    return (
+        str(esc.get("magic_initiate") or esc.get("magic_initiate_classe") or "")
+        .strip()
+        .lower()
+    )
+
+
+def _skilled_pericias_completas(feat_escolhas: Optional[Dict[str, Any]]) -> bool:
+    from app.games.dnd5e.rules.pericias import (
+        SKILLED_FEAT_QTD,
+        skilled_pericias_de_feat_escolhas,
+    )
+
+    return len(skilled_pericias_de_feat_escolhas(feat_escolhas)) == SKILLED_FEAT_QTD
+
+
+def _skill_expert_escolhas_completas(feat_escolhas: Optional[Dict[str, Any]]) -> bool:
+    from app.games.dnd5e.rules.pericias import (
+        skill_expert_expertise_de_feat_escolhas,
+        skill_expert_nova_de_feat_escolhas,
+    )
+
+    nova = skill_expert_nova_de_feat_escolhas(feat_escolhas)
+    exp = skill_expert_expertise_de_feat_escolhas(feat_escolhas)
+    return bool(nova and exp)
+
+
+def _expertise_classe_completa(
+    ficha: Dict[str, Any],
+    classe_slug: str,
+    nivel: int,
+) -> bool:
+    from app.games.dnd5e.rules.pericias import (
+        calcular_slots_expertise_classe,
+        normalizar_expertise_pericias,
+    )
+
+    slots = calcular_slots_expertise_classe(classe_slug, nivel)
+    if slots <= 0:
+        return True
+    escolhidas = normalizar_expertise_pericias(ficha.get("expertise_pericias"))
+    return len(escolhidas) >= slots
+
+
+def mesclar_feat_escolhas(
+    ficha: Dict[str, Any],
+    novas: Optional[Dict[str, Any]],
+) -> Dict[str, Any]:
+    from app.games.dnd5e.rules.pericias import (
+        normalizar_pericia_slug,
+        normalizar_skilled_pericias,
+    )
+
+    out = migrar_ficha_para_v2(ficha)
+    escolhas = dict(out.get("feat_escolhas") or {})
+    for chave, valor in (novas or {}).items():
+        if valor is None:
+            continue
+        key = str(chave).strip()
+        if key in ("skilled_pericias", "skilled"):
+            norm = normalizar_skilled_pericias(valor)
+            if norm:
+                escolhas["skilled_pericias"] = norm
+            elif "skilled_pericias" in escolhas:
+                del escolhas["skilled_pericias"]
+            continue
+        if key in (
+            "skill_expert_nova",
+            "skill_expert_pericia",
+            "skill_expert_expertise",
+            "skill_expert_especializacao",
+        ):
+            slug = normalizar_pericia_slug(str(valor))
+            if key in ("skill_expert_nova", "skill_expert_pericia"):
+                if slug:
+                    escolhas["skill_expert_nova"] = slug
+                elif "skill_expert_nova" in escolhas:
+                    del escolhas["skill_expert_nova"]
+            else:
+                if slug:
+                    escolhas["skill_expert_expertise"] = slug
+                elif "skill_expert_expertise" in escolhas:
+                    del escolhas["skill_expert_expertise"]
+            continue
+        txt = str(valor).strip().lower()
+        if txt:
+            escolhas[key] = txt
+    out["feat_escolhas"] = escolhas
+    return out
+
+
+def validar_feat_escolhas_ficha(ficha: Dict[str, Any]) -> None:
+    from app.games.dnd5e.rules.pericias import (
+        aplicar_pericias_override,
+        montar_proficiencias_automaticas,
+        skilled_pericias_de_feat_escolhas,
+        validar_skill_expert_escolhas,
+        validar_skilled_pericias,
+    )
+
+    ficha_v2 = migrar_ficha_para_v2(ficha)
+    feats = {(f or "").strip().lower() for f in (ficha_v2.get("feats") or [])}
+    escolhas = ficha_v2.get("feat_escolhas") or {}
+    classe_slug = (ficha_v2.get("classe_slug") or "").strip().lower()
+    raca_slug = (ficha_v2.get("raca_slug") or "humano").strip().lower()
+    if "resilient" in feats:
+        attr = _attr_resilient_escolhido(escolhas)
+        if attr not in CHAVES_HABILIDADE:
+            raise ValueError("Resiliente exige escolha de atributo de salvaguarda")
+    if "magic-initiate" in feats:
+        cls = _classe_magic_initiate_escolhida(escolhas)
+        if cls not in MAGIC_INITIATE_CLASSES:
+            raise ValueError("Iniciado em Magia exige escolha de classe conjuradora")
+    if "skilled" in feats:
+        validar_skilled_pericias(skilled_pericias_de_feat_escolhas(escolhas))
+    if "skill-expert" in feats and classe_slug:
+        prof_auto = montar_proficiencias_automaticas(
+            classe_slug=classe_slug,
+            raca_slug=raca_slug,
+            antecedente_slug=ficha_v2.get("antecedente_slug"),
+            pericias_classe_escolhidas=ficha_v2.get("pericias_classe_escolhidas") or [],
+            pericia_racial_extra=ficha_v2.get("pericia_racial_extra"),
+            feats=list(ficha_v2.get("feats") or []),
+            feat_escolhas=escolhas,
+        )
+        prof_final = aplicar_pericias_override(
+            prof_auto, ficha_v2.get("pericias_override")
+        )
+        validar_skill_expert_escolhas(escolhas, proficientes=prof_final)
+
+
+def pendencias_feat_escolhas(ficha: Dict[str, Any]) -> List[str]:
+    ficha_v2 = migrar_ficha_para_v2(ficha)
+    feats = {(f or "").strip().lower() for f in (ficha_v2.get("feats") or [])}
+    escolhas = ficha_v2.get("feat_escolhas") or {}
+    out: List[str] = []
+    if (
+        "resilient" in feats
+        and _attr_resilient_escolhido(escolhas) not in CHAVES_HABILIDADE
+    ):
+        out.append("feat_escolha_resilient")
+    if (
+        "magic-initiate" in feats
+        and _classe_magic_initiate_escolhida(escolhas) not in MAGIC_INITIATE_CLASSES
+    ):
+        out.append("feat_escolha_magic_initiate")
+    if "skilled" in feats and not _skilled_pericias_completas(escolhas):
+        out.append("feat_escolha_skilled")
+    if "skill-expert" in feats and not _skill_expert_escolhas_completas(escolhas):
+        out.append("feat_escolha_skill_expert")
+    return out
+
+
+def _validar_feat_escolhas_marco(
+    slug: str,
+    feat_escolhas: Optional[Dict[str, Any]],
+) -> None:
+    from app.games.dnd5e.rules.pericias import (
+        skilled_pericias_de_feat_escolhas,
+        validar_skilled_pericias,
+    )
+
+    s = (slug or "").strip().lower()
+    esc = feat_escolhas or {}
+    if s == "resilient":
+        attr = _attr_resilient_escolhido(esc)
+        if attr not in CHAVES_HABILIDADE:
+            raise ValueError("Resiliente exige escolha de atributo de salvaguarda")
+    if s == "magic-initiate":
+        cls = _classe_magic_initiate_escolhida(esc)
+        if cls not in MAGIC_INITIATE_CLASSES:
+            raise ValueError("Iniciado em Magia exige escolha de classe conjuradora")
+    if s == "skilled":
+        validar_skilled_pericias(skilled_pericias_de_feat_escolhas(esc))
+    if s == "skill-expert":
+        from app.games.dnd5e.rules.pericias import (
+            skill_expert_expertise_de_feat_escolhas,
+            skill_expert_nova_de_feat_escolhas,
+        )
+
+        if not skill_expert_nova_de_feat_escolhas(
+            esc
+        ) or not skill_expert_expertise_de_feat_escolhas(esc):
+            raise ValueError(
+                "Especialista (Skill Expert) exige nova proficiência e perícia para expertise"
+            )
+
+
 def validar_marco(
     marco: Dict[str, Any],
     *,
@@ -452,7 +714,13 @@ def validar_marco(
     scores_efetivos: Dict[str, int],
 ) -> None:
     nivel_marco = int(marco.get("nivel", 0))
-    if nivel_marco not in NIVEIS_GANHO_FEAT:
+    raca_slug = (ficha.get("raca_slug") or "").strip().lower()
+    if nivel_marco == 1:
+        if raca_slug != "humano":
+            raise ValueError("Marco nível 1 só concede talento para humanos")
+        if (marco.get("tipo") or "").strip().lower() != "feat":
+            raise ValueError("Marco nível 1 humano deve ser talento (feat)")
+    elif nivel_marco not in NIVEIS_GANHO_FEAT:
         raise ValueError(f"O nível {nivel_marco} não concede incremento nem talento")
     if nivel < nivel_marco:
         raise ValueError(
@@ -476,6 +744,7 @@ def validar_marco(
         )
         if not validar_feat(feat, personagem):
             raise ValueError(f"Pré-requisitos não atendidos para o talento {slug}")
+        _validar_feat_escolhas_marco(slug, marco.get("feat_escolhas"))
     elif tipo == "asi":
         validar_distribuicao_asi(dict(marco.get("distribuicao") or {}))
         for chave, delta in (marco.get("distribuicao") or {}).items():
@@ -506,6 +775,8 @@ def aplicar_marco_na_ficha(
         if slug and slug not in feats:
             feats.append(slug)
         out["feats"] = feats
+        if marco.get("feat_escolhas"):
+            out = mesclar_feat_escolhas(out, marco.get("feat_escolhas"))
     elif (marco.get("tipo") or "").strip().lower() == "asi":
         bonus = dict(out.get("bonus_atributo_feat") or {})
         for chave, delta in (marco.get("distribuicao") or {}).items():
@@ -562,10 +833,22 @@ def registrar_hp_roll_na_ficha(
     return out, entrada
 
 
-def marcos_pendentes(nivel: int, marcos: Sequence[Dict[str, Any]]) -> List[int]:
+def marcos_pendentes(
+    nivel: int,
+    marcos: Sequence[Dict[str, Any]],
+    *,
+    raca_slug: str = "",
+) -> List[int]:
     nivel_ef = max(1, min(20, int(nivel)))
     registrados = {int(m["nivel"]) for m in normalizar_marcos(marcos)}
-    return [n for n in NIVEIS_GANHO_FEAT if n <= nivel_ef and n not in registrados]
+    pendentes = [n for n in NIVEIS_GANHO_FEAT if n <= nivel_ef and n not in registrados]
+    if (
+        (raca_slug or "").strip().lower() == "humano"
+        and nivel_ef >= 1
+        and 1 not in registrados
+    ):
+        pendentes = [1] + pendentes
+    return sorted(set(pendentes))
 
 
 def listar_pendencias(
@@ -580,20 +863,28 @@ def listar_pendencias(
     hp_rolls = normalizar_hp_rolls(prog.get("hp_rolls") or [])
     marcos = normalizar_marcos(prog.get("marcos") or [])
 
+    raca_slug = (ficha_v2.get("raca_slug") or "").strip()
     pendencias: List[str] = []
     for n in niveis_hp_pendentes(nivel, hp_rolls):
         pendencias.append(f"hp_nivel_{n}")
-    for n in marcos_pendentes(nivel, marcos):
+    if humano_precisa_feat_nivel_1(ficha_v2):
+        pendencias.append("feat_nivel_1")
+    for n in marcos_pendentes(nivel, marcos, raca_slug=raca_slug):
+        if n == 1:
+            continue
         pendencias.append(f"marco_nivel_{n}")
+    pendencias.extend(pendencias_feat_escolhas(ficha_v2))
+    if classe_slug and not _expertise_classe_completa(ficha_v2, classe_slug, nivel):
+        pendencias.append("expertise_classe")
 
-    esperados = calcular_ganhos_feats(nivel)
+    esperados = calcular_ganhos_feats(nivel, raca_slug=raca_slug)
     feats = list(ficha_v2.get("feats") or [])
-    if len(feats) < esperados and not marcos_pendentes(nivel, marcos):
+    if len(feats) < esperados and not marcos_pendentes(
+        nivel, marcos, raca_slug=raca_slug
+    ):
         pendencias.append("revisar_feats")
 
     if classe_slug and nivel >= 1:
-        raca_slug = (ficha_v2.get("raca_slug") or "").strip()
-        feats = list(ficha_v2.get("feats") or [])
         hp_total = calcular_hp_max_total(
             classe_slug,
             con_mod,
@@ -625,7 +916,12 @@ def validar_progressao_ficha(
     for n in niveis_hp_pendentes(nivel, hp_rolls):
         raise ValueError(f"Falta registrar PV do nível {n}")
 
-    for n in marcos_pendentes(nivel, marcos):
+    raca_slug = (ficha_v2.get("raca_slug") or "").strip()
+    if humano_precisa_feat_nivel_1(ficha_v2):
+        raise ValueError("Humano exige escolha de talento no nível 1")
+    for n in marcos_pendentes(nivel, marcos, raca_slug=raca_slug):
+        if n == 1:
+            continue
         raise ValueError(f"Falta escolher incremento ou talento do nível {n}")
 
     if classe_slug:
@@ -639,3 +935,28 @@ def validar_progressao_ficha(
             raca_slug=raca_slug,
             feats=feats,
         )
+
+
+def calcular_cura_repouso_longo(
+    nivel: int,
+    con_mod: int,
+    *,
+    rng: Optional[random.Random] = None,
+) -> Tuple[int, List[Dict[str, Any]]]:
+    """Repouso longo (PHB simplificado): 1d8+CON por nível acima de 1, mín. 1 cada."""
+    rng = rng or random.Random()
+    cura_total = 0
+    detalhes: List[Dict[str, Any]] = []
+    for n in range(2, max(2, int(nivel) + 1)):
+        roll = rng.randint(1, 8)
+        ganho = max(1, int(roll) + int(con_mod))
+        cura_total += ganho
+        detalhes.append(
+            {
+                "nivel": n,
+                "roll": int(roll),
+                "con_mod": int(con_mod),
+                "ganho": int(ganho),
+            }
+        )
+    return cura_total, detalhes

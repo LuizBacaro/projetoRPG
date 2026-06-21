@@ -1,5 +1,6 @@
 """HTTP — regras de ficha D&D 5e (dados estáticos para o frontend)."""
 
+import random
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -8,6 +9,7 @@ from app.core.dependencies import get_dnd5e_progressao_service
 from app.games.dnd5e.rules.catalogo_regras import (
     listar_antecedentes_catalogo,
     listar_equipamento_catalogo,
+    listar_idiomas_catalogo_api,
     listar_magias_catalogo,
     listar_talentos_catalogo,
     metadados_combate,
@@ -20,6 +22,9 @@ from app.games.dnd5e.rules.classes import (
     tabela_xp_por_nivel,
 )
 from app.games.dnd5e.rules.equipamento import montar_resumo_equipamento
+from app.games.dnd5e.rules.equipamento_inicial import (
+    aplicar_equipamento_classe_na_ficha,
+)
 from app.games.dnd5e.rules.ficha import montar_resumo_ficha
 from app.games.dnd5e.rules.habilidades import (
     HABILIDADE_MAX,
@@ -29,6 +34,7 @@ from app.games.dnd5e.rules.habilidades import (
     lista_metadados_habilidades,
     lista_tabela_bonus_proficiencia,
 )
+from app.games.dnd5e.rules.ouro_inicial import rolar_ouro_inicial_classe
 from app.games.dnd5e.rules.pericias import listar_pericias_catalogo
 from app.games.dnd5e.rules.racas import lista_racas_catalogo
 from app.games.dnd5e.rules.subclasses import listar_subclasses
@@ -39,6 +45,8 @@ from app.games.dnd5e.schemas.progressao import (
 )
 from app.games.dnd5e.schemas.regras import (
     Dnd5eAntecedenteCatalogoItem,
+    Dnd5eAplicarEquipamentoClasseRequest,
+    Dnd5eAplicarEquipamentoClasseResponse,
     Dnd5eBonusProficienciaItem,
     Dnd5eCalcularAtributosRequest,
     Dnd5eCalcularAtributosResponse,
@@ -48,6 +56,7 @@ from app.games.dnd5e.schemas.regras import (
     Dnd5eCondicaoItem,
     Dnd5eFeatCatalogoItem,
     Dnd5eHabilidadeMetaItem,
+    Dnd5eIdiomaCatalogoItem,
     Dnd5eMagiaCatalogoItem,
     Dnd5ePericiaCatalogoItem,
     Dnd5eRacaItem,
@@ -56,11 +65,14 @@ from app.games.dnd5e.schemas.regras import (
     Dnd5eRegrasClassesResponse,
     Dnd5eRegrasCombateResponse,
     Dnd5eRegrasEquipamentoResponse,
+    Dnd5eRegrasIdiomasResponse,
     Dnd5eRegrasMagiasResponse,
     Dnd5eRegrasPericiasResponse,
     Dnd5eRegrasRacasResponse,
     Dnd5eRegrasSubclassesResponse,
     Dnd5eRegrasTalentosResponse,
+    Dnd5eRolarOuroClasseRequest,
+    Dnd5eRolarOuroClasseResponse,
     Dnd5eSubclasseItem,
     Dnd5eXpNivelItem,
 )
@@ -256,6 +268,19 @@ def obter_regras_pericias(
 
 
 @router.get(
+    "/idiomas",
+    response_model=Dnd5eRegrasIdiomasResponse,
+    summary="Idiomas PHB para escolha de antecedente",
+)
+def obter_regras_idiomas(
+    _: Usuario = Depends(get_usuario_atual),
+) -> Dnd5eRegrasIdiomasResponse:
+    rows = listar_idiomas_catalogo_api()
+    idiomas = [Dnd5eIdiomaCatalogoItem(**row) for row in rows]
+    return Dnd5eRegrasIdiomasResponse(idiomas=idiomas, total=len(idiomas))
+
+
+@router.get(
     "/subclasses",
     response_model=Dnd5eRegrasSubclassesResponse,
     summary="Subclasses PHB (filtro opcional por classe)",
@@ -284,6 +309,58 @@ def gerar_atributos(
 
 
 @router.post(
+    "/rolar-ouro-classe",
+    response_model=Dnd5eRolarOuroClasseResponse,
+    summary="Rola ouro inicial da classe (PHB Cap. 5)",
+)
+def rolar_ouro_classe(
+    payload: Dnd5eRolarOuroClasseRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> Dnd5eRolarOuroClasseResponse:
+    try:
+        rng = random.Random(payload.seed) if payload.seed is not None else None
+        result = rolar_ouro_inicial_classe(payload.classe_slug, rng=rng)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    return Dnd5eRolarOuroClasseResponse(**result)
+
+
+@router.post(
+    "/aplicar-equipamento-classe",
+    response_model=Dnd5eAplicarEquipamentoClasseResponse,
+    summary="Aplica pacote de equipamento inicial da classe (PHB Cap. 5)",
+)
+def aplicar_equipamento_classe(
+    payload: Dnd5eAplicarEquipamentoClasseRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> Dnd5eAplicarEquipamentoClasseResponse:
+    ficha_stub = {
+        "classe_slug": payload.classe_slug,
+        "inventario": dict(payload.inventario or {}),
+        "armadura_slug": payload.armadura_slug,
+        "escudo_slug": payload.escudo_slug,
+        "arma_principal_slug": payload.arma_principal_slug,
+        "classe_equip_slug": payload.classe_equip_slug,
+    }
+    try:
+        out = aplicar_equipamento_classe_na_ficha(ficha_stub, forcar=payload.forcar)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    inv = out.get("inventario") or {}
+    return Dnd5eAplicarEquipamentoClasseResponse(
+        inventario=inv,
+        armadura_slug=out.get("armadura_slug") or inv.get("armadura_slug"),
+        escudo_slug=out.get("escudo_slug") or inv.get("escudo_slug"),
+        arma_principal_slug=out.get("arma_principal_slug")
+        or inv.get("arma_principal_slug"),
+        classe_equip_slug=out.get("classe_equip_slug"),
+        classe_equip_aplicado=bool(out.get("classe_equip_aplicado")),
+        classe_equip_nome=str(out.get("classe_equip_nome") or ""),
+        nome_pacote=str(out.get("classe_equip_nome") or ""),
+    )
+
+
+@router.post(
     "/calcular-atributos",
     response_model=Dnd5eCalcularAtributosResponse,
     summary="Preview de ficha: atributos, perícias, antecedente, CA com armadura",
@@ -301,6 +378,7 @@ def calcular_atributos_ficha(
             }
         resumo = montar_resumo_ficha(
             raca_slug=payload.raca_slug,
+            raca_variante_slug=payload.raca_variante_slug,
             classe_slug=payload.classe_slug,
             scores_base=payload.scores_base,
             bonus_habilidade_extra=payload.bonus_habilidade_extra,
@@ -314,6 +392,9 @@ def calcular_atributos_ficha(
             escudo_slug=payload.escudo_slug,
             ficha_progressao=ficha_progressao,
             feats=payload.feats,
+            feat_escolhas=payload.feat_escolhas,
+            pericias_override=payload.pericias_override,
+            expertise_pericias=payload.expertise_pericias,
             hp_roll_nivel_1=payload.hp_roll_nivel_1,
         )
     except ValueError as e:

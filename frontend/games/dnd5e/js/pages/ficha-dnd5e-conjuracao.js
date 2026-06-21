@@ -275,6 +275,10 @@ function bindDescansoLongo(personagemId) {
             if (!personagemId) return;
             ev.preventDefault();
             ev.stopImmediatePropagation();
+            if (typeof window.__dnd5eAplicarRepousoLongo === 'function') {
+                await window.__dnd5eAplicarRepousoLongo();
+                return;
+            }
             if (
                 !confirm(
                     'Descanso longo restaura todos os espaços e limpa magias preparadas. Continuar?'

@@ -32,6 +32,8 @@ Cada classe define: d. de vida (d8, d10, d12), habilidade primária, proficiênc
 
 ## Tabela de Experiência (requisito para nível)
 
+**Fonte canônica no código:** `backend/app/games/dnd5e/data/classes_catalogo.py` → `TABELA_XP_POR_NIVEL` (exposta na API `/dnd5e/regras/classes`).
+
 | Nível | XP | Nível | XP |
 |-------|-----|-------|-----|
 | 1 | 0 | 11 | 86.000 |

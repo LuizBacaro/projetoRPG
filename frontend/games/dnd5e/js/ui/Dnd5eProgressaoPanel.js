@@ -10,34 +10,7 @@ const ATTR_LABELS_PT = {
     charisma: 'Carisma',
 };
 
-const PENDENCIAS_LABELS = {
-    hp_nivel_2: 'Rolar PV do nível 2',
-    hp_nivel_3: 'Rolar PV do nível 3',
-    hp_nivel_4: 'Rolar PV do nível 4',
-    hp_nivel_5: 'Rolar PV do nível 5',
-    hp_nivel_6: 'Rolar PV do nível 6',
-    hp_nivel_7: 'Rolar PV do nível 7',
-    hp_nivel_8: 'Rolar PV do nível 8',
-    hp_nivel_9: 'Rolar PV do nível 9',
-    hp_nivel_10: 'Rolar PV do nível 10',
-    hp_nivel_11: 'Rolar PV do nível 11',
-    hp_nivel_12: 'Rolar PV do nível 12',
-    hp_nivel_13: 'Rolar PV do nível 13',
-    hp_nivel_14: 'Rolar PV do nível 14',
-    hp_nivel_15: 'Rolar PV do nível 15',
-    hp_nivel_16: 'Rolar PV do nível 16',
-    hp_nivel_17: 'Rolar PV do nível 17',
-    hp_nivel_18: 'Rolar PV do nível 18',
-    hp_nivel_19: 'Rolar PV do nível 19',
-    hp_nivel_20: 'Rolar PV do nível 20',
-    marco_nivel_4: 'Escolher incremento ou talento (nível 4)',
-    marco_nivel_8: 'Escolher incremento ou talento (nível 8)',
-    marco_nivel_12: 'Escolher incremento ou talento (nível 12)',
-    marco_nivel_16: 'Escolher incremento ou talento (nível 16)',
-    marco_nivel_19: 'Escolher incremento ou talento (nível 19)',
-    revisar_feats: 'Revisar talentos registrados',
-    hp_max_invalido: 'PV máximo inválido — confira as rolagens',
-};
+const PENDENCIAS_UTIL = typeof Dnd5ePendenciasUtil !== 'undefined' ? Dnd5ePendenciasUtil : null;
 
 function formatDistribuicaoAsi(distribuicao) {
     const partes = Object.entries(distribuicao || {}).map(
@@ -53,37 +26,170 @@ class Dnd5eProgressaoPanel {
         this.el = options.el || ((id) => document.getElementById(id));
         this.getPersonagemId = options.getPersonagemId || (() => null);
         this.getNivel = options.getNivel || (() => 1);
+        this.getXp = options.getXp || (() => 0);
+        this.getRacaSlug = options.getRacaSlug || (() => '');
+        this.xpPrecisaSalvar = options.xpPrecisaSalvar || (() => false);
         this.onFichaAtualizada = options.onFichaAtualizada || (() => {});
         this.catalogoFeats = [];
+        this.catalogoPericias = [];
         this.niveisFeat = [4, 8, 12, 16, 19];
+        this._featEscolhasLocal = {};
     }
 
     async init() {
         try {
             const data = await this.rs.classes();
             this.niveisFeat = data.niveis_ganho_feat || this.niveisFeat;
-            const feats = await this.rs.talentos();
+            const [feats, per] = await Promise.all([
+                this.rs.talentos(),
+                this.rs.pericias(),
+            ]);
             this.catalogoFeats = (feats.talentos || []).filter(
                 (f) => f.slug !== 'ability-score-improvement'
             );
+            this.catalogoPericias = per.pericias || [];
+            this._preencherSkilledSelectOptions();
+            this._preencherSkillExpertSelectOptions();
         } catch (_e) {
             /* offline */
         }
         this._bind();
     }
 
+    _periciaNome(slug) {
+        const p = this.catalogoPericias.find((x) => x.slug === slug);
+        return p ? p.nome : slug;
+    }
+
+    _htmlOptsPericias() {
+        const opts = (this.catalogoPericias || [])
+            .map((p) => `<option value="${p.slug}">${p.nome}</option>`)
+            .join('');
+        return `<option value="">— escolha —</option>${opts}`;
+    }
+
+    _preencherSkilledSelectOptions() {
+        const html = this._htmlOptsPericias();
+        [1, 2, 3].forEach((i) => {
+            const marco = this.el(`f5e_marco_feat_skilled_${i}`);
+            const feat = this.el(`f5e_feat_escolha_skilled_${i}`);
+            if (marco) marco.innerHTML = html;
+            if (feat) feat.innerHTML = html;
+        });
+    }
+
+    _preencherSkillExpertSelectOptions() {
+        const html = this._htmlOptsPericias();
+        ['f5e_marco_feat_skill_expert_nova', 'f5e_marco_feat_skill_expert_exp'].forEach((id) => {
+            const sel = this.el(id);
+            if (sel) sel.innerHTML = html;
+        });
+        ['f5e_feat_escolha_skill_expert_nova', 'f5e_feat_escolha_skill_expert_exp'].forEach((id) => {
+            const sel = this.el(id);
+            if (sel) sel.innerHTML = html;
+        });
+    }
+
+    _preencherSkillExpertSelects(prefix, escolhas) {
+        const nova = escolhas?.skill_expert_nova || escolhas?.skill_expert_pericia || '';
+        const exp =
+            escolhas?.skill_expert_expertise || escolhas?.skill_expert_especializacao || '';
+        const selNova = this.el(`${prefix}_nova`);
+        const selExp = this.el(`${prefix}_exp`);
+        if (selNova) selNova.value = nova || '';
+        if (selExp) selExp.value = exp || '';
+    }
+
+    _coletarSkillExpert(prefix) {
+        const nova = this.el(`${prefix}_nova`)?.value || '';
+        const exp = this.el(`${prefix}_exp`)?.value || '';
+        const out = {};
+        if (nova) out.skill_expert_nova = nova;
+        if (exp) out.skill_expert_expertise = exp;
+        return out;
+    }
+
+    _validarSkillExpert(escolhas) {
+        if (!escolhas?.skill_expert_nova || !escolhas?.skill_expert_expertise) {
+            return 'Especialista (Skill Expert) exige nova proficiência e perícia para expertise.';
+        }
+        return null;
+    }
+
+    _labelSkillExpertExtra(escolhas) {
+        const nova = escolhas?.skill_expert_nova || escolhas?.skill_expert_pericia;
+        const exp =
+            escolhas?.skill_expert_expertise || escolhas?.skill_expert_especializacao;
+        if (!nova || !exp) return '';
+        return ` (${this._periciaNome(nova)} + exp. ${this._periciaNome(exp)})`;
+    }
+
+    _preencherSkilledSelects(prefix, slugs) {
+        const lista = Array.isArray(slugs) ? slugs : [];
+        [1, 2, 3].forEach((i) => {
+            const sel = this.el(`${prefix}_${i}`);
+            if (sel) sel.value = lista[i - 1] || '';
+        });
+    }
+
+    _coletarSkilledSlugs(prefix) {
+        return [1, 2, 3]
+            .map((i) => this.el(`${prefix}_${i}`)?.value || '')
+            .filter(Boolean);
+    }
+
+    _validarSkilledSlugs(slugs) {
+        const list = slugs || [];
+        if (list.length !== 3) {
+            return 'Habilidoso (Skilled) exige exatamente 3 perícias.';
+        }
+        if (new Set(list).size !== 3) {
+            return 'As 3 perícias do Habilidoso devem ser distintas.';
+        }
+        return null;
+    }
+
+    _labelSkilledExtra(escolhas) {
+        const slugs = escolhas?.skilled_pericias || escolhas?.skilled;
+        if (!Array.isArray(slugs) || !slugs.length) return '';
+        const nomes = slugs.map((s) => this._periciaNome(s)).join(', ');
+        return ` (${nomes})`;
+    }
+
     loadFromFicha(ficha) {
         const f = ficha || {};
         const prog = f.progressao || { hp_rolls: [], marcos: [] };
-        this._renderPendencias(f.pendencias || []);
+        this.renderPendenciasLocais(f.pendencias || []);
         this._renderHpRolls(prog.hp_rolls || []);
         this._renderMarcos(prog.marcos || [], f.feats || []);
+        this._featEscolhasLocal = { ...(f.feat_escolhas || {}) };
+        this._renderFeatEscolhasSection(f.feats || [], this._featEscolhasLocal);
+    }
+
+    renderPendenciasLocais(pendenciasServidor) {
+        this._renderPendencias(pendenciasServidor || []);
+    }
+
+    _ctxPendencias() {
+        return {
+            nivel: this.getNivel(),
+            xp: this.getXp(),
+            xpPrecisaSalvar: this.xpPrecisaSalvar(),
+            temPersonagem: !!this.getPersonagemId(),
+        };
+    }
+
+    _pendenciasMescladas(pendenciasServidor) {
+        if (!PENDENCIAS_UTIL) return pendenciasServidor || [];
+        return PENDENCIAS_UTIL.mergePendencias(pendenciasServidor, this._ctxPendencias());
     }
 
     _bind() {
         const btnHp = this.el('f5e_btn_hp_roll');
         const btnMarco = this.el('f5e_btn_marco');
+        const btnFeatEscolhas = this.el('f5e_btn_feat_escolhas');
         const tipoMarco = this.el('f5e_marco_tipo');
+        const selFeatMarco = this.el('f5e_marco_feat');
         const asiModo = this.el('f5e_marco_asi_modo');
         if (btnHp) {
             btnHp.addEventListener('click', () => this._registrarHpRoll());
@@ -91,9 +197,19 @@ class Dnd5eProgressaoPanel {
         if (btnMarco) {
             btnMarco.addEventListener('click', () => this._registrarMarco());
         }
+        if (btnFeatEscolhas) {
+            btnFeatEscolhas.addEventListener('click', () => this._salvarFeatEscolhas());
+        }
+        if (selFeatMarco) {
+            selFeatMarco.addEventListener('change', () => this._toggleFeatEscolhaMarco());
+        }
         if (tipoMarco) {
             tipoMarco.addEventListener('change', () => this._toggleMarcoCampos());
             this._toggleMarcoCampos();
+        }
+        const selNivel = this.el('f5e_marco_nivel');
+        if (selNivel) {
+            selNivel.addEventListener('change', () => this._toggleMarcoCampos());
         }
         if (asiModo) {
             asiModo.addEventListener('change', () => this._toggleAsiModo());
@@ -102,11 +218,162 @@ class Dnd5eProgressaoPanel {
     }
 
     _toggleMarcoCampos() {
+        const nivelMarco = parseInt(this.el('f5e_marco_nivel')?.value, 10);
         const tipo = (this.el('f5e_marco_tipo')?.value || 'asi').toLowerCase();
         const featWrap = this.el('f5e_marco_feat_wrap');
         const asiWrap = this.el('f5e_marco_asi_wrap');
-        if (featWrap) featWrap.hidden = tipo !== 'feat';
-        if (asiWrap) asiWrap.hidden = tipo !== 'asi';
+        const tipoSel = this.el('f5e_marco_tipo');
+        const soFeatHumano = nivelMarco === 1;
+        if (soFeatHumano && tipoSel) {
+            tipoSel.value = 'feat';
+        }
+        if (tipoSel) {
+            tipoSel.querySelectorAll('option').forEach((opt) => {
+                if (opt.value === 'asi') {
+                    opt.hidden = soFeatHumano;
+                    opt.disabled = soFeatHumano;
+                }
+            });
+        }
+        const tipoEf = soFeatHumano ? 'feat' : tipo;
+        if (featWrap) featWrap.hidden = tipoEf !== 'feat';
+        if (asiWrap) asiWrap.hidden = tipoEf !== 'asi';
+        this._toggleFeatEscolhaMarco();
+    }
+
+    _toggleFeatEscolhaMarco() {
+        const slug = (this.el('f5e_marco_feat')?.value || '').toLowerCase();
+        const resilient = this.el('f5e_marco_feat_resilient_wrap');
+        const magic = this.el('f5e_marco_feat_magic_wrap');
+        const skilled = this.el('f5e_marco_feat_skilled_wrap');
+        const skillExpert = this.el('f5e_marco_feat_skill_expert_wrap');
+        if (resilient) resilient.hidden = slug !== 'resilient';
+        if (magic) magic.hidden = slug !== 'magic-initiate';
+        if (skilled) skilled.hidden = slug !== 'skilled';
+        if (skillExpert) skillExpert.hidden = slug !== 'skill-expert';
+    }
+
+    _renderFeatEscolhasSection(feats, escolhas) {
+        const lista = (feats || []).map((f) => String(f).toLowerCase());
+        const temRes = lista.includes('resilient');
+        const temMag = lista.includes('magic-initiate');
+        const temSkilled = lista.includes('skilled');
+        const temSkillExpert = lista.includes('skill-expert');
+        const sec = this.el('f5e_feat_escolhas_sec');
+        const wrapRes = this.el('f5e_feat_escolhas_resilient_wrap');
+        const wrapMag = this.el('f5e_feat_escolhas_magic_wrap');
+        const wrapSkilled = this.el('f5e_feat_escolhas_skilled_wrap');
+        const wrapSkillExpert = this.el('f5e_feat_escolhas_skill_expert_wrap');
+        if (sec) sec.hidden = !temRes && !temMag && !temSkilled && !temSkillExpert;
+        if (wrapRes) wrapRes.hidden = !temRes;
+        if (wrapMag) wrapMag.hidden = !temMag;
+        if (wrapSkilled) wrapSkilled.hidden = !temSkilled;
+        if (wrapSkillExpert) wrapSkillExpert.hidden = !temSkillExpert;
+        const selRes = this.el('f5e_feat_escolha_resilient');
+        const selMag = this.el('f5e_feat_escolha_magic');
+        if (selRes) {
+            selRes.value =
+                escolhas?.resilient || escolhas?.resilient_atributo || '';
+        }
+        if (selMag) {
+            selMag.value =
+                escolhas?.magic_initiate || escolhas?.magic_initiate_classe || '';
+        }
+        if (temSkilled) {
+            this._preencherSkilledSelects(
+                'f5e_feat_escolha_skilled',
+                escolhas?.skilled_pericias || escolhas?.skilled
+            );
+        }
+        if (temSkillExpert) {
+            this._preencherSkillExpertSelects('f5e_feat_escolha_skill_expert', escolhas);
+        }
+    }
+
+    _coletarFeatEscolhasMarco(slug) {
+        const s = (slug || '').toLowerCase();
+        const out = {};
+        if (s === 'resilient') {
+            const v = this.el('f5e_marco_feat_resilient')?.value || '';
+            if (v) out.resilient = v;
+        }
+        if (s === 'magic-initiate') {
+            const v = this.el('f5e_marco_feat_magic')?.value || '';
+            if (v) out.magic_initiate = v;
+        }
+        if (s === 'skilled') {
+            const slugs = this._coletarSkilledSlugs('f5e_marco_feat_skilled');
+            if (slugs.length) out.skilled_pericias = slugs;
+        }
+        if (s === 'skill-expert') {
+            Object.assign(out, this._coletarSkillExpert('f5e_marco_feat_skill_expert'));
+        }
+        return Object.keys(out).length ? out : null;
+    }
+
+    _coletarFeatEscolhasAtuais() {
+        const out = { ...(this._featEscolhasLocal || {}) };
+        if (!this.el('f5e_feat_escolhas_resilient_wrap')?.hidden) {
+            const v = this.el('f5e_feat_escolha_resilient')?.value || '';
+            if (v) out.resilient = v;
+            else delete out.resilient;
+        }
+        if (!this.el('f5e_feat_escolhas_magic_wrap')?.hidden) {
+            const v = this.el('f5e_feat_escolha_magic')?.value || '';
+            if (v) out.magic_initiate = v;
+            else delete out.magic_initiate;
+        }
+        if (!this.el('f5e_feat_escolhas_skilled_wrap')?.hidden) {
+            const slugs = this._coletarSkilledSlugs('f5e_feat_escolha_skilled');
+            if (slugs.length) out.skilled_pericias = slugs;
+            else delete out.skilled_pericias;
+        }
+        if (!this.el('f5e_feat_escolhas_skill_expert_wrap')?.hidden) {
+            const se = this._coletarSkillExpert('f5e_feat_escolha_skill_expert');
+            if (se.skill_expert_nova) out.skill_expert_nova = se.skill_expert_nova;
+            else delete out.skill_expert_nova;
+            if (se.skill_expert_expertise) out.skill_expert_expertise = se.skill_expert_expertise;
+            else delete out.skill_expert_expertise;
+        }
+        return out;
+    }
+
+    async _salvarFeatEscolhas() {
+        const id = this.getPersonagemId();
+        if (!id) {
+            Toast.error('Salve a ficha antes de registrar escolhas de talentos.');
+            return;
+        }
+        const escolhas = this._coletarFeatEscolhasAtuais();
+        if (this.el('f5e_feat_escolhas_skilled_wrap')?.hidden === false) {
+            const err = this._validarSkilledSlugs(escolhas.skilled_pericias);
+            if (err) {
+                Toast.error(err);
+                return;
+            }
+        }
+        if (this.el('f5e_feat_escolhas_skill_expert_wrap')?.hidden === false) {
+            const err = this._validarSkillExpert(escolhas);
+            if (err) {
+                Toast.error(err);
+                return;
+            }
+        }
+        this._setStatus('Salvando escolhas…');
+        try {
+            const res = await this.ps.progressaoFeatEscolhas(id, {
+                feat_escolhas: escolhas,
+            });
+            this._featEscolhasLocal = { ...(res.feat_escolhas || escolhas) };
+            this.loadFromFicha(res.ficha);
+            this.onFichaAtualizada(res);
+            await this.refreshPendencias();
+            Toast.success('Escolhas de talentos salvas.');
+            this._setStatus('');
+        } catch (e) {
+            this._setStatus('');
+            Toast.error(e.message || 'Erro ao salvar escolhas');
+        }
     }
 
     _toggleAsiModo() {
@@ -120,7 +387,8 @@ class Dnd5eProgressaoPanel {
         if (!id) return;
         try {
             const data = await this.ps.progressaoPendencias(id);
-            this._renderPendencias(data.pendencias || []);
+            this.renderPendenciasLocais(data.pendencias || []);
+            this._preencherNivelHpPendente(data.niveis_hp_pendentes);
             if (this.el('f5e_hp_max') && data.hp_max) {
                 this.el('f5e_hp_max').textContent = String(data.hp_max);
             }
@@ -138,16 +406,119 @@ class Dnd5eProgressaoPanel {
         }
     }
 
-    _renderPendencias(pendencias) {
+    _renderPendencias(pendenciasServidor) {
         const host = this.el('f5e_pendencias_lista');
+        const alerta = this.el('f5e_pendencias_alerta');
+        const secao = this.el('f5e_progressao_sec');
+        const badge = this.el('f5e_pendencias_badge');
+        const merged = this._pendenciasMescladas(pendenciasServidor);
+
+        if (secao) {
+            secao.classList.toggle('has-pendencias', merged.length > 0);
+        }
+        if (badge) {
+            badge.textContent = merged.length ? String(merged.length) : '';
+            badge.hidden = !merged.length;
+        }
+        if (alerta) {
+            if (!merged.length) {
+                alerta.hidden = true;
+                alerta.innerHTML = '';
+            } else {
+                alerta.hidden = false;
+                const resumo = PENDENCIAS_UTIL
+                    ? PENDENCIAS_UTIL.resumoAlerta(merged)
+                    : `${merged.length} item(ns)`;
+                alerta.innerHTML = `<strong>Progressão incompleta</strong> — ${resumo}. Clique em um item para ir ao campo.`;
+            }
+        }
         if (!host) return;
-        if (!pendencias.length) {
-            host.innerHTML = '<span class="ficha-vazio">Nenhuma pendência</span>';
+        if (!merged.length) {
+            host.innerHTML = '<li class="ficha-dnd5e-pendencia-vazio">Nenhuma pendência</li>';
             return;
         }
-        host.innerHTML = pendencias
-            .map((p) => `<li>${PENDENCIAS_LABELS[p] || p}</li>`)
+        host.innerHTML = merged
+            .map((p) => {
+                const cat = PENDENCIAS_UTIL ? PENDENCIAS_UTIL.categoria(p) : 'outro';
+                const label = PENDENCIAS_UTIL ? PENDENCIAS_UTIL.traduzir(p) : p;
+                return `<li><button type="button" class="ficha-dnd5e-pendencia-item is-${cat}" data-pendencia="${p}">${label}</button></li>`;
+            })
             .join('');
+        host.querySelectorAll('[data-pendencia]').forEach((btn) => {
+            btn.addEventListener('click', () => this._navegarPendencia(btn.dataset.pendencia));
+        });
+    }
+
+    _navegarPendencia(slug) {
+        const util = PENDENCIAS_UTIL;
+        const cat = util ? util.categoria(slug) : '';
+        const secao = this.el('f5e_progressao_sec');
+        secao?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        if (slug === 'xp_nao_salvo') {
+            this.el('btnSalvar')?.focus();
+            return;
+        }
+        if (slug === 'xp_insuficiente' || slug === 'xp_nivel_excedido') {
+            const xp = this.el('f5e_xp');
+            xp?.focus();
+            xp?.select?.();
+            return;
+        }
+        if (cat === 'hp' || slug.startsWith('hp_nivel_')) {
+            const n = util ? util.nivelDePendencia(slug) : null;
+            const input = this.el('f5e_hp_roll_nivel');
+            if (input && n) input.value = String(n);
+            input?.focus();
+            return;
+        }
+        if (cat === 'marco' || slug.startsWith('marco_nivel_') || slug === 'feat_nivel_1') {
+            const n =
+                slug === 'feat_nivel_1'
+                    ? 1
+                    : util
+                      ? util.nivelDePendencia(slug)
+                      : null;
+            const sel = this.el('f5e_marco_nivel');
+            if (sel && n) sel.value = String(n);
+            this._toggleMarcoCampos();
+            sel?.focus();
+            return;
+        }
+        if (slug === 'feat_escolha_resilient' || slug === 'feat_escolha_magic_initiate' || slug === 'feat_escolha_skilled' || slug === 'feat_escolha_skill_expert') {
+            this.el('f5e_feat_escolhas_sec')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
+            if (slug === 'feat_escolha_resilient') {
+                this.el('f5e_feat_escolha_resilient')?.focus();
+            } else if (slug === 'feat_escolha_magic_initiate') {
+                this.el('f5e_feat_escolha_magic')?.focus();
+            } else if (slug === 'feat_escolha_skilled') {
+                this.el('f5e_feat_escolha_skilled_1')?.focus();
+            } else {
+                this.el('f5e_feat_escolha_skill_expert_nova')?.focus();
+            }
+            return;
+        }
+        if (slug === 'expertise_classe') {
+            this.el('f5e_expertise_wrap')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
+            this.el('f5e_expertise_escolha')?.querySelector('input')?.focus();
+            return;
+        }
+        this.el('f5e_btn_hp_roll')?.focus();
+    }
+
+    _preencherNivelHpPendente(pendentes) {
+        const input = this.el('f5e_hp_roll_nivel');
+        if (!input) return;
+        const lista = Array.isArray(pendentes) ? pendentes : [];
+        if (lista.length) {
+            input.value = String(lista[0]);
+        }
     }
 
     _renderHpRolls(rolls) {
@@ -194,7 +565,20 @@ class Dnd5eProgressaoPanel {
                 return `<div class="ficha-dnd5e-progressao-item">Nív. ${m.nivel}: Incremento (${dist})</div>`;
             }
             const feat = this.catalogoFeats.find((f) => f.slug === m.slug);
-            return `<div class="ficha-dnd5e-progressao-item">Nív. ${m.nivel}: Talento — ${feat ? feat.nome : m.slug}</div>`;
+            let extra = '';
+            if (m.slug === 'resilient' && this._featEscolhasLocal?.resilient) {
+                extra = ` (${ATTR_LABELS_PT[this._featEscolhasLocal.resilient] || this._featEscolhasLocal.resilient})`;
+            }
+            if (m.slug === 'magic-initiate' && this._featEscolhasLocal?.magic_initiate) {
+                extra = ` (${this._featEscolhasLocal.magic_initiate})`;
+            }
+            if (m.slug === 'skilled') {
+                extra = this._labelSkilledExtra(this._featEscolhasLocal);
+            }
+            if (m.slug === 'skill-expert') {
+                extra = this._labelSkillExpertExtra(this._featEscolhasLocal);
+            }
+            return `<div class="ficha-dnd5e-progressao-item">Nív. ${m.nivel}: Talento — ${feat ? feat.nome : m.slug}${extra}</div>`;
         });
         if (!linhas.length && feats && feats.length) {
             feats
@@ -213,16 +597,22 @@ class Dnd5eProgressaoPanel {
         const selectFeat = this.el('f5e_marco_feat');
         if (selectNivel) {
             const nivel = this.getNivel();
+            const raca = (this.getRacaSlug() || '').toLowerCase();
             const usados = new Set((marcos || []).map((m) => m.nivel));
-            const opcoes = this.niveisFeat.filter((n) => n <= nivel && !usados.has(n));
+            let opcoes = this.niveisFeat.filter((n) => n <= nivel && !usados.has(n));
+            if (raca === 'humano' && nivel >= 1 && !usados.has(1)) {
+                opcoes = [1, ...opcoes];
+            }
             selectNivel.innerHTML = opcoes.length
                 ? opcoes.map((n) => `<option value="${n}">${n}º nível</option>`).join('')
                 : '<option value="">—</option>';
+            this._toggleMarcoCampos();
         }
         if (selectFeat && this.catalogoFeats.length) {
             selectFeat.innerHTML = this.catalogoFeats
                 .map((f) => `<option value="${f.slug}">${f.nome}</option>`)
                 .join('');
+            this._toggleFeatEscolhaMarco();
         }
     }
 
@@ -231,10 +621,35 @@ class Dnd5eProgressaoPanel {
         if (st) st.textContent = msg || '';
     }
 
+    _validarAntesHpRoll() {
+        const nivel = parseInt(this.el('f5e_nivel')?.value, 10) || 1;
+        const xp = parseInt(this.el('f5e_xp')?.value, 10) || 0;
+        if (typeof Dnd5eXpUtil !== 'undefined') {
+            const xpMin = Dnd5eXpUtil.xpMinimaPorNivel(nivel);
+            if (xp < xpMin) {
+                Dnd5eXpUtil.aplicarNivelParaXp(this.el('f5e_nivel'), this.el('f5e_xp'));
+                return `Nível ${nivel} exige pelo menos ${xpMin} XP. Ajuste aplicado — salve a ficha e tente novamente.`;
+            }
+            const maxNivel = Dnd5eXpUtil.nivelPorXp(xp);
+            if (nivel > maxNivel) {
+                return `Nível ${nivel} exige mais XP (máximo permitido com ${xp} XP: ${maxNivel}).`;
+            }
+        }
+        if (this.xpPrecisaSalvar()) {
+            return 'Salve a ficha para sincronizar o XP antes de registrar PV por nível.';
+        }
+        return null;
+    }
+
     async _registrarHpRoll() {
         const id = this.getPersonagemId();
         if (!id) {
             Toast.error('Salve a ficha antes de registrar PV por nível.');
+            return;
+        }
+        const erroValidacao = this._validarAntesHpRoll();
+        if (erroValidacao) {
+            Toast.error(erroValidacao);
             return;
         }
         const nivel = parseInt(this.el('f5e_hp_roll_nivel')?.value, 10);
@@ -273,7 +688,10 @@ class Dnd5eProgressaoPanel {
             Toast.error('Não há marco pendente para registrar neste nível.');
             return;
         }
-        const tipo = (this.el('f5e_marco_tipo')?.value || 'asi').toLowerCase();
+        let tipo = (this.el('f5e_marco_tipo')?.value || 'asi').toLowerCase();
+        if (nivel === 1) {
+            tipo = 'feat';
+        }
         const body = { nivel, tipo };
         if (tipo === 'feat') {
             const slug = this.el('f5e_marco_feat')?.value;
@@ -282,6 +700,30 @@ class Dnd5eProgressaoPanel {
                 return;
             }
             body.slug = slug;
+            const escolhas = this._coletarFeatEscolhasMarco(slug);
+            if (slug === 'resilient' && !escolhas?.resilient) {
+                Toast.error('Resiliente exige escolha de salvaguarda.');
+                return;
+            }
+            if (slug === 'magic-initiate' && !escolhas?.magic_initiate) {
+                Toast.error('Iniciado em Magia exige escolha de classe.');
+                return;
+            }
+            if (slug === 'skilled') {
+                const err = this._validarSkilledSlugs(escolhas?.skilled_pericias);
+                if (err) {
+                    Toast.error(err);
+                    return;
+                }
+            }
+            if (slug === 'skill-expert') {
+                const err = this._validarSkillExpert(escolhas);
+                if (err) {
+                    Toast.error(err);
+                    return;
+                }
+            }
+            if (escolhas) body.feat_escolhas = escolhas;
         } else {
             const modo = this.el('f5e_marco_asi_modo')?.value || '2';
             const attr1 = this.el('f5e_marco_asi_attr')?.value;
@@ -304,9 +746,22 @@ class Dnd5eProgressaoPanel {
         try {
             const res = await this.ps.progressaoMarco(id, body);
             this.loadFromFicha(res.ficha);
+            if (this.el('f5e_hp_max') && res.hp_max) {
+                this.el('f5e_hp_max').textContent = String(res.hp_max);
+            }
+            const hpInput = this.el('f5e_hp_atual');
+            if (hpInput && res.hp_atual != null) {
+                hpInput.value = String(res.hp_atual);
+            }
             this.onFichaAtualizada(res);
             await this.refreshPendencias();
-            Toast.success('Escolha de progressão registrada.');
+            if (res.hp_retroativo_con > 0) {
+                Toast.success(
+                    `CON aumentou: +${res.hp_retroativo_con} PV máx. (retroativo por nível).`
+                );
+            } else {
+                Toast.success('Escolha de progressão registrada.');
+            }
             this._setStatus('');
         } catch (e) {
             this._setStatus('');

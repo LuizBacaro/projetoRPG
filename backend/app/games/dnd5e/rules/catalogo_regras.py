@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from app.games.dnd5e.data.antecedentes_tracos_catalogo import tracos_opcoes_antecedente
 from app.games.dnd5e.data.equipamento_catalogo import (
     ARMADURAS,
     ARMAS_MARCIAIS,
@@ -17,6 +18,7 @@ from app.games.dnd5e.data.spell_slots_full_caster import (
 )
 from app.games.dnd5e.rules.antecedentes import listar_antecedentes
 from app.games.dnd5e.rules.combate import CONDICOES_NOMES, CONDICOES_PADRAO
+from app.games.dnd5e.rules.idiomas import lista_idiomas_catalogo
 from app.games.dnd5e.rules.talentos import (
     listar_feats_por_categoria,
     niveis_com_ganho_feat,
@@ -136,12 +138,18 @@ def listar_antecedentes_catalogo() -> List[Dict[str, Any]]:
             "slug": a.antecedente_id,
             "nome": a.nome,
             "pericias": a.pericias,
+            "ferramentas": a.ferramentas,
             "idiomas_qtd": a.idiomas_qtd,
             "equipamento": a.equipamento,
             "ouro_extra": a.ouro_extra,
+            "tracos_opcoes": tracos_opcoes_antecedente(a.antecedente_id),
         }
         for a in listar_antecedentes()
     ]
+
+
+def listar_idiomas_catalogo_api() -> List[Dict[str, Any]]:
+    return lista_idiomas_catalogo()
 
 
 def niveis_feat_ganho() -> List[int]:

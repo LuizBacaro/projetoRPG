@@ -37,6 +37,13 @@ class Dnd5eRegrasAtributosResponse(BaseModel):
     bonus_proficiencia_por_nivel: List[Dnd5eBonusProficienciaItem]
 
 
+class Dnd5eRacaVarianteItem(BaseModel):
+    slug: str = Field(..., max_length=40)
+    nome: str = Field(..., max_length=80)
+    tipo_dano: str = Field(default="", max_length=40)
+    tipo_dano_pt: str = Field(default="", max_length=40)
+
+
 class Dnd5eRacaItem(BaseModel):
     slug: str = Field(..., max_length=40)
     nome: str = Field(..., max_length=80)
@@ -46,6 +53,8 @@ class Dnd5eRacaItem(BaseModel):
     tracos_resumo: str = Field(default="", max_length=4000)
     caracteristicas: List[str] = Field(default_factory=list)
     escolhe_duas_mais1: bool = False
+    escolhe_variante: bool = False
+    variantes: List[Dnd5eRacaVarianteItem] = Field(default_factory=list)
 
 
 class Dnd5eRegrasRacasResponse(BaseModel):
@@ -64,6 +73,23 @@ class Dnd5eClasseItem(BaseModel):
     armaduras: List[str] = Field(default_factory=list)
     armas: List[str] = Field(default_factory=list)
     escudos: bool = False
+    ouro_inicial_formula: str = Field(default="—", max_length=32)
+
+
+class Dnd5eRolarOuroClasseRequest(BaseModel):
+    classe_slug: str = Field(..., max_length=40)
+    seed: Optional[int] = Field(
+        default=None, description="Semente opcional para reproduzir rolagem"
+    )
+
+
+class Dnd5eRolarOuroClasseResponse(BaseModel):
+    classe_slug: str = Field(..., max_length=40)
+    total: int = Field(ge=0)
+    dados: List[int] = Field(default_factory=list)
+    soma_dados: int = Field(ge=0)
+    multiplicador: int = Field(ge=1)
+    formula: str = Field(default="—", max_length=32)
 
 
 class Dnd5eXpNivelItem(BaseModel):
@@ -134,13 +160,24 @@ class Dnd5eRegrasEquipamentoResponse(BaseModel):
     itens_variados: List[Dict[str, Any]] = Field(default_factory=list)
 
 
+class Dnd5eAntecedenteTracosOpcoes(BaseModel):
+    personalidade: List[str] = Field(default_factory=list)
+    ideais: List[str] = Field(default_factory=list)
+    lacos: List[str] = Field(default_factory=list)
+    fraquezas: List[str] = Field(default_factory=list)
+
+
 class Dnd5eAntecedenteCatalogoItem(BaseModel):
     slug: str = Field(..., max_length=80)
     nome: str = Field(..., max_length=120)
     pericias: List[str] = Field(default_factory=list)
+    ferramentas: List[str] = Field(default_factory=list)
     idiomas_qtd: int = Field(default=0, ge=0, le=10)
     equipamento: List[str] = Field(default_factory=list)
     ouro_extra: int = Field(default=0, ge=0)
+    tracos_opcoes: Dnd5eAntecedenteTracosOpcoes = Field(
+        default_factory=Dnd5eAntecedenteTracosOpcoes
+    )
 
 
 class Dnd5eRegrasAntecedentesResponse(BaseModel):
@@ -156,6 +193,17 @@ class Dnd5ePericiaCatalogoItem(BaseModel):
 
 class Dnd5eRegrasPericiasResponse(BaseModel):
     pericias: List[Dnd5ePericiaCatalogoItem]
+
+
+class Dnd5eIdiomaCatalogoItem(BaseModel):
+    slug: str = Field(..., max_length=40)
+    nome: str = Field(..., max_length=80)
+    tipo: str = Field(default="padrao", max_length=20)
+
+
+class Dnd5eRegrasIdiomasResponse(BaseModel):
+    idiomas: List[Dnd5eIdiomaCatalogoItem]
+    total: int = Field(ge=0)
 
 
 class Dnd5eSubclasseItem(BaseModel):
@@ -174,6 +222,7 @@ class Dnd5ePericiaGradeItem(BaseModel):
     nome: str
     habilidade: str
     proficiente: bool
+    expertise: bool = False
     bonus: int
 
 
@@ -187,6 +236,7 @@ class Dnd5eAntecedenteResumoItem(BaseModel):
     slug: str
     nome: str
     pericias: List[str] = Field(default_factory=list)
+    ferramentas: List[str] = Field(default_factory=list)
     idiomas_qtd: int = 0
     equipamento: List[str] = Field(default_factory=list)
     ouro_po: int = 0
@@ -194,6 +244,7 @@ class Dnd5eAntecedenteResumoItem(BaseModel):
 
 class Dnd5eCalcularAtributosRequest(BaseModel):
     raca_slug: str = Field(..., max_length=40)
+    raca_variante_slug: Optional[str] = Field(None, max_length=40)
     classe_slug: str = Field(..., max_length=40)
     antecedente_slug: Optional[str] = Field(None, max_length=80)
     scores_base: Dict[str, int] = Field(default_factory=dict)
@@ -206,6 +257,9 @@ class Dnd5eCalcularAtributosRequest(BaseModel):
     armadura_slug: Optional[str] = Field(None, max_length=80)
     escudo_slug: Optional[str] = Field(None, max_length=80)
     feats: List[str] = Field(default_factory=list)
+    feat_escolhas: Dict[str, Any] = Field(default_factory=dict)
+    pericias_override: Dict[str, bool] = Field(default_factory=dict)
+    expertise_pericias: List[str] = Field(default_factory=list)
     progressao: Optional[Dict[str, Any]] = None
     hp_roll_nivel_1: Optional[int] = Field(
         default=None,
@@ -217,6 +271,8 @@ class Dnd5eCalcularAtributosRequest(BaseModel):
 
 class Dnd5eCalcularAtributosResponse(BaseModel):
     raca: Dict[str, str]
+    raca_variante: Optional[Dict[str, Any]] = None
+    raca_variante_slug: Optional[str] = None
     classe: Dict[str, Any]
     subclasse: Optional[Dict[str, str]] = None
     antecedente: Optional[Dnd5eAntecedenteResumoItem] = None
@@ -236,9 +292,19 @@ class Dnd5eCalcularAtributosResponse(BaseModel):
     iniciativa: int
     velocidade_metros: float = Field(ge=0)
     tracos_resumo: str = Field(default="", max_length=4000)
+    efeitos_feats: Dict[str, Any] = Field(default_factory=dict)
+    feat_escolhas: Dict[str, Any] = Field(default_factory=dict)
+    percepcao_passiva: int = Field(default=10, ge=0)
+    investigacao_passiva: int = Field(default=10, ge=0)
+    magic_initiate: Optional[Dict[str, Any]] = None
     bonus_proficiencia: int = Field(ge=2, le=6)
     nivel: int = Field(ge=1, le=20)
     pericias_proficientes: List[str] = Field(default_factory=list)
+    pericias_automaticas: List[str] = Field(default_factory=list)
+    pericias_override: Dict[str, bool] = Field(default_factory=dict)
+    expertise_pericias: List[str] = Field(default_factory=list)
+    expertise_efetiva: List[str] = Field(default_factory=list)
+    expertise_slots_classe: int = Field(default=0, ge=0, le=8)
     pericias: List[Dnd5ePericiaGradeItem] = Field(default_factory=list)
     salvamentos: List[Dnd5eSalvamentoItem] = Field(default_factory=list)
 
@@ -272,3 +338,24 @@ class Dnd5eCalcularEquipamentoResponse(BaseModel):
     capacidade_lb: float = Field(ge=0)
     penalidade_velocidade_m: int = Field(ge=0)
     sobrecarregado: bool = False
+
+
+class Dnd5eAplicarEquipamentoClasseRequest(BaseModel):
+    classe_slug: str = Field(..., max_length=40)
+    inventario: Dict[str, Any] = Field(default_factory=dict)
+    armadura_slug: Optional[str] = Field(None, max_length=80)
+    escudo_slug: Optional[str] = Field(None, max_length=80)
+    arma_principal_slug: Optional[str] = Field(None, max_length=80)
+    classe_equip_slug: Optional[str] = Field(None, max_length=40)
+    forcar: bool = False
+
+
+class Dnd5eAplicarEquipamentoClasseResponse(BaseModel):
+    inventario: Dict[str, Any] = Field(default_factory=dict)
+    armadura_slug: Optional[str] = None
+    escudo_slug: Optional[str] = None
+    arma_principal_slug: Optional[str] = None
+    classe_equip_slug: Optional[str] = None
+    classe_equip_aplicado: bool = False
+    classe_equip_nome: str = Field(default="", max_length=120)
+    nome_pacote: str = Field(default="", max_length=120)

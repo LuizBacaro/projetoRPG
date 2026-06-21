@@ -100,6 +100,41 @@ class Dnd5ePersonagemService {
         return this._handleResponse(res, 'Erro ao registrar marco');
     }
 
+    async progressaoFeatEscolhas(id, body) {
+        const res = await fetch(this._url(`/${id}/progressao/feat-escolhas`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao salvar escolhas de talentos');
+    }
+
+    async progressaoPericiasOverride(id, body) {
+        const res = await fetch(this._url(`/${id}/progressao/pericias-override`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao salvar proficiências de perícias');
+    }
+
+    async progressaoExpertisePericias(id, body) {
+        const res = await fetch(this._url(`/${id}/progressao/expertise-pericias`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao salvar expertise de perícias');
+    }
+
+    async repousoLongo(id) {
+        const res = await fetch(this._url(`/${id}/repouso-longo`), {
+            method: 'POST',
+            headers: this._headers(true),
+        });
+        return this._handleResponse(res, 'Erro ao aplicar repouso longo');
+    }
+
     async enviarFoto(id, file) {
         const fd = new FormData();
         fd.append('foto', file);

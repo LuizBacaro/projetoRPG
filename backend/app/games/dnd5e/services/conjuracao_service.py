@@ -15,6 +15,7 @@ from app.games.dnd5e.rules.combate import (
     resumo_modificadores_ataque,
     rolar_d20_ataque,
 )
+from app.games.dnd5e.rules.conjuracao_armadura import validar_conjuracao_armadura
 from app.games.dnd5e.rules.habilidades import calcular_bonus_proficiencia
 from app.games.dnd5e.rules.magia import (
     Conjurador,
@@ -101,16 +102,23 @@ class Dnd5eConjuracaoService:
             magia_concentracao=str(payload.magia_concentracao_id),
         )
         from app.games.dnd5e.rules.dados import rolar_d20
+        from app.games.dnd5e.rules.feat_combate import war_caster_vantagem_concentracao
 
+        vantagem = war_caster_vantagem_concentracao(payload.feats)
         roll = payload.rolagem_d20 if payload.rolagem_d20 is not None else rolar_d20()
+        roll2 = payload.rolagem_d20_secundaria
+        if vantagem and roll2 is None and payload.rolagem_d20 is None:
+            roll2 = rolar_d20()
         dc = max(10, payload.dano_recebido // 2)
         prof = payload.bonus_proficiencia
-        total = roll + payload.mod_constituicao + prof
+        roll_usado = max(roll, roll2) if roll2 is not None else roll
+        total = roll_usado + payload.mod_constituicao + prof
         manteve = teste_concentracao(
             conj,
             payload.dano_recebido,
             payload.mod_constituicao,
             rolagem_d20=roll,
+            rolagem_secundaria=roll2 if vantagem else None,
             bonus_proficiencia=prof,
         )
         conc_id = (
@@ -126,13 +134,23 @@ class Dnd5eConjuracaoService:
         return Dnd5eConcentracaoTesteResponse(
             manteve_concentracao=manteve,
             dc=dc,
-            rolagem=roll,
+            rolagem=roll_usado,
+            rolagem_secundaria=roll2 if vantagem and roll2 is not None else None,
+            war_caster_vantagem=vantagem,
             total=total,
             magia_concentracao_id=conc_id,
             mensagem=msg,
         )
 
     def conjurar(self, payload: Dnd5eConjurarRequest) -> Dnd5eConjurarResponse:
+        ok_armadura, msg_armadura = validar_conjuracao_armadura(
+            payload.classe,
+            armadura_slug=payload.armadura_slug,
+            escudo_slug=payload.escudo_slug,
+        )
+        if not ok_armadura:
+            raise HTTPException(status_code=422, detail=msg_armadura)
+
         magia_row = self.magia_repo.obter(payload.magia_id)
         if not magia_row:
             raise HTTPException(status_code=404, detail="Magia não encontrada")
