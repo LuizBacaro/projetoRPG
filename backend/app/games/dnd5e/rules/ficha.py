@@ -32,6 +32,7 @@ from app.games.dnd5e.rules.pericias import (
     montar_expertise_efetiva,
     montar_grade_pericias,
     montar_proficiencias_automaticas,
+    montar_proficiencias_pericias,
     montar_salvamentos,
     normalizar_expertise_pericias,
     normalizar_pericias_override,
