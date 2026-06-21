@@ -1541,6 +1541,10 @@
             getPersonagemId: () => personagemId,
             getNivel: () => parseInt(el('f5e_nivel').value, 10) || 1,
             getRacaSlug: () => el('f5e_raca').value || '',
+            getClasseSlug: () => el('f5e_classe').value || '',
+            getExpertisePericias: () =>
+                Array.isArray(expertiseLocal) ? expertiseLocal : fichaProgressaoLocal.expertise_pericias || [],
+            getExpertiseSlotsClasse: () => Number(previewAtual?.expertise_slots_classe || 0),
             getXp: () => parseInt(el('f5e_xp').value, 10) || 0,
             xpPrecisaSalvar: () => {
                 const xp = parseInt(el('f5e_xp').value, 10) || 0;

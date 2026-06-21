@@ -12,6 +12,17 @@ const ATTR_LABELS_PT = {
 
 const PENDENCIAS_UTIL = typeof Dnd5ePendenciasUtil !== 'undefined' ? Dnd5ePendenciasUtil : null;
 
+const EXPERTISE_SLOTS_CLASSE = {
+    ladino: [
+        [1, 2],
+        [6, 2],
+    ],
+    bardo: [
+        [3, 2],
+        [10, 2],
+    ],
+};
+
 function formatDistribuicaoAsi(distribuicao) {
     const partes = Object.entries(distribuicao || {}).map(
         ([k, v]) => `${ATTR_LABELS_PT[k] || k} +${v}`
@@ -28,6 +39,9 @@ class Dnd5eProgressaoPanel {
         this.getNivel = options.getNivel || (() => 1);
         this.getXp = options.getXp || (() => 0);
         this.getRacaSlug = options.getRacaSlug || (() => '');
+        this.getClasseSlug = options.getClasseSlug || (() => '');
+        this.getExpertisePericias = options.getExpertisePericias || (() => []);
+        this.getExpertiseSlotsClasse = options.getExpertiseSlotsClasse || null;
         this.xpPrecisaSalvar = options.xpPrecisaSalvar || (() => false);
         this.onFichaAtualizada = options.onFichaAtualizada || (() => {});
         this.catalogoFeats = [];
@@ -168,6 +182,82 @@ class Dnd5eProgressaoPanel {
         this._renderMarcos(prog.marcos || [], f.feats || []);
         this._featEscolhasLocal = { ...(f.feat_escolhas || {}) };
         this._renderFeatEscolhasSection(f.feats || [], this._featEscolhasLocal);
+    }
+
+    _slotsExpertiseClasse(classeSlug, nivel) {
+        if (typeof this.getExpertiseSlotsClasse === 'function') {
+            const slots = this.getExpertiseSlotsClasse();
+            if (Number.isFinite(slots)) return Math.max(0, slots);
+        }
+        const key = (classeSlug || '').toLowerCase();
+        let total = 0;
+        (EXPERTISE_SLOTS_CLASSE[key] || []).forEach(([min, qtd]) => {
+            if (nivel >= min) total += qtd;
+        });
+        return total;
+    }
+
+    _pendenciasProgressaoLocal() {
+        const nivel = Math.max(1, Math.min(20, this.getNivel()));
+        const raca = (this.getRacaSlug() || '').toLowerCase();
+        const classe = (this.getClasseSlug() || '').toLowerCase();
+        const hpRolls = this._progCache?.hp_rolls || [];
+        const marcos = this._progCache?.marcos || [];
+        const hpNiveis = new Set(
+            hpRolls.map((r) => parseInt(r.nivel, 10)).filter((n) => Number.isFinite(n))
+        );
+        const marcoNiveis = new Set(
+            marcos.map((m) => parseInt(m.nivel, 10)).filter((n) => Number.isFinite(n))
+        );
+        const out = [];
+
+        for (let n = 1; n <= nivel; n += 1) {
+            if (!hpNiveis.has(n)) out.push(`hp_nivel_${n}`);
+        }
+
+        if (raca === 'humano' && nivel >= 1 && !marcoNiveis.has(1)) {
+            out.push('feat_nivel_1');
+        }
+
+        this.niveisFeat.forEach((n) => {
+            if (n <= nivel && !marcoNiveis.has(n)) {
+                out.push(`marco_nivel_${n}`);
+            }
+        });
+
+        out.push(...this._pendenciasFeatEscolhasLocal());
+
+        const slotsExp = this._slotsExpertiseClasse(classe, nivel);
+        const expertise = (this.getExpertisePericias() || []).filter(Boolean);
+        if (slotsExp > 0 && expertise.length < slotsExp) {
+            out.push('expertise_classe');
+        }
+
+        return out;
+    }
+
+    _pendenciasFeatEscolhasLocal() {
+        const feats = (this._featsCache || []).map((f) => String(f).toLowerCase());
+        const esc = this._featEscolhasLocal || {};
+        const out = [];
+        if (feats.includes('resilient') && !esc.resilient) {
+            out.push('feat_escolha_resilient');
+        }
+        if (feats.includes('magic-initiate') && !esc.magic_initiate) {
+            out.push('feat_escolha_magic_initiate');
+        }
+        if (feats.includes('skilled')) {
+            const sl = esc.skilled_pericias || [];
+            if (sl.length !== 3 || new Set(sl).size !== 3) {
+                out.push('feat_escolha_skilled');
+            }
+        }
+        if (feats.includes('skill-expert')) {
+            if (!esc.skill_expert_nova || !esc.skill_expert_expertise) {
+                out.push('feat_escolha_skill_expert');
+            }
+        }
+        return out;
     }
 
     _pendenciasAcao(pendencias) {
@@ -320,8 +410,31 @@ class Dnd5eProgressaoPanel {
     }
 
     _pendenciasMescladas(pendenciasServidor) {
-        if (!PENDENCIAS_UTIL) return pendenciasServidor || [];
-        return PENDENCIAS_UTIL.mergePendencias(pendenciasServidor, this._ctxPendencias());
+        const localProg = this._pendenciasProgressaoLocal();
+        let base = pendenciasServidor || [];
+        if (PENDENCIAS_UTIL) {
+            base = PENDENCIAS_UTIL.mergePendencias(pendenciasServidor, this._ctxPendencias());
+        }
+        const seen = new Set(base);
+        localProg.forEach((p) => {
+            if (!seen.has(p)) {
+                base.push(p);
+                seen.add(p);
+            }
+        });
+        if (PENDENCIAS_UTIL) {
+            const ordem = { xp: 0, hp: 1, marco: 2, pericia: 3, outro: 4 };
+            base = base.sort((a, b) => {
+                const ca = ordem[PENDENCIAS_UTIL.categoria(a)] ?? 9;
+                const cb = ordem[PENDENCIAS_UTIL.categoria(b)] ?? 9;
+                if (ca !== cb) return ca - cb;
+                return PENDENCIAS_UTIL.traduzir(a).localeCompare(
+                    PENDENCIAS_UTIL.traduzir(b),
+                    'pt-BR'
+                );
+            });
+        }
+        return base;
     }
 
     _bind() {
@@ -553,6 +666,13 @@ class Dnd5eProgressaoPanel {
         const acao = this._pendenciasAcao(pendenciasServidor);
 
         this._atualizarModoProgressao(pendenciasServidor);
+
+        const hpPendentes = acao
+            .filter((p) => String(p).startsWith('hp_nivel_'))
+            .map((p) => (PENDENCIAS_UTIL ? PENDENCIAS_UTIL.nivelDePendencia(p) : null))
+            .filter((n) => Number.isFinite(n))
+            .sort((a, b) => a - b);
+        this._preencherNivelHpPendente(hpPendentes);
 
         if (badge) {
             badge.textContent = acao.length ? String(acao.length) : '';

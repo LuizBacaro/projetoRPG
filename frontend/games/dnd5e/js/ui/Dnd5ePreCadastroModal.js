@@ -35,6 +35,10 @@ class Dnd5ePreCadastroModal {
         };
         this.idiomasAntecedente = [];
         this.tracosAntecedente = null;
+        this.progressaoPanel = new Dnd5ePreCadastroProgressao({
+            el: (id) => this.el(id),
+            regrasService: this.rs,
+        });
         this._ultimoPreview = null;
     }
 
@@ -197,6 +201,9 @@ class Dnd5ePreCadastroModal {
                     this.renderHpRolls();
                     this.atualizarSubclasses();
                 }
+                if (id === 'prec_raca' || id === 'prec_classe' || id === 'prec_nivel') {
+                    this._renderProgressaoPanel(this._ultimoPreview);
+                }
                 this.agendarPreview();
             });
         });
@@ -206,6 +213,7 @@ class Dnd5ePreCadastroModal {
             this.sincronizarXpComNivel();
             this.renderHpRolls();
             this.atualizarSubclasses();
+            this._renderProgressaoPanel(this._ultimoPreview);
             this.agendarPreview();
         });
         this.el('btnFecharPrecadastro')?.addEventListener('click', () => this.fechar());
@@ -243,6 +251,7 @@ class Dnd5ePreCadastroModal {
             }
             this.preencherSelects();
             this.preencherSelectExtra();
+            await this.progressaoPanel.init();
         } catch (e) {
             if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro ao carregar catálogos');
         }
@@ -513,6 +522,23 @@ class Dnd5ePreCadastroModal {
         return nivel >= minNivel ? sub : null;
     }
 
+    _progressaoExtras() {
+        const nivel = this.nivelAtual();
+        if (!this.progressaoPanel) return {};
+        return this.progressaoPanel.montarExtrasFicha(nivel, this.el('prec_raca').value);
+    }
+
+    _renderProgressaoPanel(preview) {
+        if (!this.progressaoPanel) return;
+        const p = preview || this._ultimoPreview || {};
+        this.progressaoPanel.render({
+            nivel: this.nivelAtual(),
+            racaSlug: this.el('prec_raca').value,
+            classeSlug: this.el('prec_classe').value,
+            periciasProficientes: p.pericias_proficientes || [],
+            expertiseSlotsClasse: p.expertise_slots_classe,
+        });
+    }
 
     payloadCalcular() {
         const body = {
@@ -529,11 +555,17 @@ class Dnd5ePreCadastroModal {
             armadura_slug: this.el('prec_armadura').value || null,
             escudo_slug: this.el('prec_escudo').value || null,
         };
+        const extras = this._progressaoExtras();
         const progressao = this.buildProgressaoHp(this.lastConMod) || {
             hp_rolls: [],
             marcos: [],
         };
+        if (extras.marcos) progressao.marcos = extras.marcos;
         body.progressao = progressao;
+        if (extras.feats) body.feats = extras.feats;
+        if (extras.feat_escolhas) body.feat_escolhas = extras.feat_escolhas;
+        if (extras.bonus_atributo_feat) body.bonus_atributo_feat = extras.bonus_atributo_feat;
+        if (extras.expertise_pericias) body.expertise_pericias = extras.expertise_pericias;
         return body;
     }
 
@@ -764,6 +796,7 @@ class Dnd5ePreCadastroModal {
             resumo.textContent = `CA ${p.ca_total ?? p.ca_base} · PV ${pv} · Inic. ${this.fmtMod(p.iniciativa)}`;
         }
         this._ultimoPreview = p;
+        this._renderProgressaoPanel(p);
     }
 
     agendarPreview() {
@@ -853,6 +886,15 @@ class Dnd5ePreCadastroModal {
             Toast.error('Escolha traço de personalidade, ideal, laço e fraqueza do antecedente.');
             return false;
         }
+        const errProg = this.progressaoPanel?.validar(
+            this.nivelAtual(),
+            this.el('prec_raca').value,
+            this.el('prec_classe').value
+        );
+        if (errProg) {
+            Toast.error(errProg);
+            return false;
+        }
         return true;
     }
 
@@ -881,8 +923,18 @@ class Dnd5ePreCadastroModal {
             if (preview.subclasse) f.subclasse_nome = preview.subclasse.nome;
             const conMod = preview.modificadores?.constitution ?? 0;
             const progressao = this.buildProgressaoHp(conMod) || { hp_rolls: [], marcos: [] };
+            const extras = this._progressaoExtras();
+            if (extras.marcos) progressao.marcos = extras.marcos;
             if (progressao.hp_rolls?.length || progressao.marcos?.length) {
                 f.progressao = progressao;
+            }
+            if (extras.feats) f.feats = extras.feats;
+            if (extras.feat_escolhas) f.feat_escolhas = extras.feat_escolhas;
+            if (extras.bonus_atributo_feat) {
+                f.bonus_atributo_feat = extras.bonus_atributo_feat;
+            }
+            if (extras.expertise_pericias) {
+                f.expertise_pericias = extras.expertise_pericias;
             }
         }
         if (this.classeOuroMeta.ouro_aplicado > 0) {
