@@ -374,11 +374,19 @@
         const escolhidas = new Set(getPericiasClasseEscolhidas());
         const selAtual = getPericiasClasseEscolhidas();
         const noLimite = qtd > 0 && selAtual.length >= qtd;
+        const fixoPosPreCadastro = document.body.classList.contains('ficha-dnd5e-pre-cadastro-fixo');
+        const bloquearPericias = fixoPosPreCadastro && periciasClasseCompletas();
+        const secPericias = document.querySelector('.ficha-dnd5e-secao-pericias');
+        if (secPericias) {
+            secPericias.classList.toggle('is-editavel', fixoPosPreCadastro && !bloquearPericias);
+        }
         host.innerHTML = pool
             .map((slug) => {
                 const checked = escolhidas.has(slug) ? 'checked' : '';
                 const disabled =
-                    qtd > 0 && noLimite && !escolhidas.has(slug) ? 'disabled' : '';
+                    bloquearPericias || (qtd > 0 && noLimite && !escolhidas.has(slug))
+                        ? 'disabled'
+                        : '';
                 return `<label class="ficha-dnd5e-pericia-opt">
                     <input type="checkbox" value="${slug}" ${checked} ${disabled} />
                     <span>${periciaNome(slug)}</span>
@@ -1435,10 +1443,18 @@
         atualizarHeaderIdentidade();
     }
 
+    function periciasClasseCompletas() {
+        const classe = catalogoClasses.find((c) => c.slug === el('f5e_classe').value);
+        const qtd = (classe && classe.pericias_escolha_qtd) || 0;
+        if (qtd <= 0) return true;
+        return getPericiasClasseEscolhidas().length === qtd;
+    }
+
     function aplicarModoPreCadastroFixo() {
         if (!personagemId) return;
         document.body.classList.add('ficha-dnd5e-pre-cadastro-fixo');
-        [
+        const periciasOk = periciasClasseCompletas();
+        const lockIds = [
             'f5e_nome',
             'f5e_nivel',
             'f5e_raca',
@@ -1448,7 +1464,11 @@
             'f5e_extra1',
             'f5e_extra2',
             'f5e_pericia_racial',
-        ].forEach((id) => {
+        ];
+        if (periciasOk && el('f5e_raca_variante')?.value) {
+            lockIds.push('f5e_raca_variante');
+        }
+        lockIds.forEach((id) => {
             const node = el(id);
             if (!node) return;
             node.disabled = true;
@@ -1466,10 +1486,14 @@
             if (inp) inp.disabled = true;
         });
         el('btnMatrizPadrao')?.setAttribute('hidden', '');
+        const secPericias = document.querySelector('.ficha-dnd5e-secao-pericias');
+        if (secPericias) {
+            secPericias.classList.toggle('is-editavel', !periciasOk);
+        }
         document
             .querySelectorAll('#f5e_pericias_escolha input[type=checkbox]')
             .forEach((cb) => {
-                cb.disabled = true;
+                cb.disabled = periciasOk;
             });
     }
 

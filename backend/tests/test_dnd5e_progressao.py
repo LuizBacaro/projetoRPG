@@ -27,6 +27,7 @@ from app.games.dnd5e.rules.progressao import (
     pendencias_feat_escolhas,
     recalcular_ganhos_hp_rolls,
     registrar_hp_roll_na_ficha,
+    sincronizar_dados_de_marcos,
     validar_feat_escolhas_ficha,
     validar_marco,
     validar_nivel_vs_experiencia,
@@ -412,3 +413,55 @@ def test_marco_skilled_exige_tres_pericias():
         validar_marco(
             marco, ficha=ficha, nivel=4, scores_efetivos=matriz_padrao_scores()
         )
+
+
+def test_sincronizar_dados_de_marcos_deriva_feats_e_asi():
+    ficha = migrar_ficha_para_v2(
+        {
+            "progressao": {
+                "marcos": [
+                    {"nivel": 1, "tipo": "feat", "slug": "alert"},
+                    {"nivel": 4, "tipo": "asi", "distribuicao": {"wisdom": 2}},
+                ],
+            },
+        }
+    )
+    out = sincronizar_dados_de_marcos(ficha)
+    assert "alert" in out["feats"]
+    assert out["bonus_atributo_feat"]["wisdom"] == 2
+
+
+def test_validar_progressao_nivel5_exige_hp_e_marco4():
+    ficha = migrar_ficha_para_v2(
+        {
+            "raca_slug": "humano",
+            "classe_slug": "guerreiro",
+            "scores_base": matriz_padrao_scores(),
+            "pericia_racial_extra": "percepcao",
+            "pericias_classe_escolhidas": ["atletismo", "intuicao"],
+            "progressao": {
+                "hp_rolls": [
+                    {"nivel": 1, "roll": 10, "con_mod": 2, "ganho": 12},
+                    {"nivel": 2, "roll": 6, "con_mod": 2, "ganho": 8},
+                    {"nivel": 3, "roll": 5, "con_mod": 2, "ganho": 7},
+                    {"nivel": 4, "roll": 7, "con_mod": 2, "ganho": 9},
+                    {"nivel": 5, "roll": 6, "con_mod": 2, "ganho": 8},
+                ],
+                "marcos": [
+                    {"nivel": 1, "tipo": "feat", "slug": "alert"},
+                    {"nivel": 4, "tipo": "asi", "distribuicao": {"constitution": 2}},
+                ],
+            },
+        }
+    )
+    validar_progressao_ficha(
+        ficha,
+        nivel=5,
+        classe_slug="guerreiro",
+        con_mod=2,
+        experiencia=6500,
+        exigir_hp_nivel_1=True,
+    )
+    pend = listar_pendencias(nivel=5, classe_slug="guerreiro", con_mod=2, ficha=ficha)
+    assert "marco_nivel_4" not in pend
+    assert "hp_nivel_2" not in pend

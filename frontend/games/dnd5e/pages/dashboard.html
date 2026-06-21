@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=22" />
     <link rel="stylesheet" href="/games/dnd35/css/combatentes.css?v=20260401a" />
     <link rel="stylesheet" href="../css/dnd5e-dashboard.css?v=4" />
-    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=5" />
+    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=9" />
 </head>
 <body data-game="dnd5e">
 
@@ -100,8 +100,10 @@
                             <input id="prec_jogador" type="text" readonly tabindex="-1" />
                         </div>
                         <div>
-                            <label class="ficha-label" for="prec_nivel">Nível</label>
-                            <input id="prec_nivel" type="number" min="1" max="20" value="1" />
+                            <label class="ficha-label">Nível</label>
+                            <input id="prec_nivel" type="hidden" value="1" />
+                            <span class="dnd5e-prec-nivel-fixo">1</span>
+                            <p class="ficha-dnd5e-status dnd5e-prec-nivel-hint">Evolução na ficha após o cadastro.</p>
                         </div>
                         <div>
                             <label class="ficha-label" for="prec_raca">Raça</label>
@@ -122,16 +124,15 @@
                         <div id="prec_antecedente_tracos_wrap" class="span-2" hidden>
                             <div id="prec_antecedente_tracos_host" class="dnd5e-tracos-host"></div>
                             <p id="prec_antecedente_tracos_hint" class="ficha-dnd5e-status"></p>
-                            <button type="button" id="prec_antecedente_tracos_sortear" class="btn btn-sm">Sortear traços</button>
+                            <div class="dnd5e-prec-tracos-toolbar">
+                                <button type="button" id="prec_antecedente_tracos_sortear" class="ficha-btn-adicionar">🎲 Sortear traços</button>
+                            </div>
                         </div>
                         <div id="prec_subclasse_wrap" hidden>
                             <label class="ficha-label" for="prec_subclasse">Subclasse</label>
                             <select id="prec_subclasse"><option value="">—</option></select>
                         </div>
-                        <div>
-                            <label class="ficha-label" for="prec_xp">Experiência</label>
-                            <input id="prec_xp" type="number" min="0" value="0" />
-                        </div>
+                        <input id="prec_xp" type="hidden" value="0" />
                     </div>
                     <p id="prec_tracos" class="ficha-dnd5e-tracos" hidden></p>
                     <div id="prec_raca_extra" class="ficha-dnd5e-raca-extra dnd5e-prec-grid">
@@ -146,6 +147,10 @@
                         <div id="prec_pericia_racial_wrap" hidden>
                             <label class="ficha-label" for="prec_pericia_racial">Perícia extra (raça)</label>
                             <select id="prec_pericia_racial"></select>
+                        </div>
+                        <div id="prec_raca_variante_wrap" hidden>
+                            <label class="ficha-label" id="prec_raca_variante_label" for="prec_raca_variante">Linhagem</label>
+                            <select id="prec_raca_variante"></select>
                         </div>
                     </div>
                 </section>
@@ -173,7 +178,6 @@
                 </section>
 
                 <section class="dnd5e-prec-sec">
-                    <h3 class="dnd5e-prec-sec-titulo">💰 Ouro inicial</h3>
                     <p id="prec_ouro_formula" class="ficha-dnd5e-status">Selecione uma classe.</p>
                     <div class="dnd5e-prec-ouro-toolbar">
                         <button type="button" class="ficha-btn-adicionar" id="prec_btn_rolar_ouro">🎲 Rolar ouro da classe</button>
@@ -226,7 +230,7 @@
 <script src="../js/shared/dnd5e-ouro-classe-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-idiomas-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-tracos-util.js?v=1"></script>
-<script src="../js/ui/Dnd5ePreCadastroModal.js?v=10"></script>
+<script src="../js/ui/Dnd5ePreCadastroModal.js?v=13"></script>
 <script>
 (function () {
     const ps = new Dnd5ePersonagemService();
