@@ -35,6 +35,7 @@ class Dnd5ePreCadastroModal {
         };
         this.idiomasAntecedente = [];
         this.tracosAntecedente = null;
+        this._ultimoPreview = null;
     }
 
     el(id) {
@@ -176,6 +177,7 @@ class Dnd5ePreCadastroModal {
             'prec_extra1',
             'prec_extra2',
             'prec_pericia_racial',
+            'prec_raca_variante',
         ].forEach((id) => {
             this.el(id)?.addEventListener('change', () => {
                 if (id === 'prec_raca') this.atualizarUiRaca();
@@ -511,9 +513,11 @@ class Dnd5ePreCadastroModal {
         return nivel >= minNivel ? sub : null;
     }
 
+
     payloadCalcular() {
         const body = {
             raca_slug: this.el('prec_raca').value,
+            raca_variante_slug: this.el('prec_raca_variante')?.value || null,
             classe_slug: this.el('prec_classe').value,
             antecedente_slug: this.el('prec_antecedente').value || null,
             scores_base: this.getScoresBase(),
@@ -525,8 +529,11 @@ class Dnd5ePreCadastroModal {
             armadura_slug: this.el('prec_armadura').value || null,
             escudo_slug: this.el('prec_escudo').value || null,
         };
-        const progressao = this.buildProgressaoHp(this.lastConMod);
-        if (progressao) body.progressao = progressao;
+        const progressao = this.buildProgressaoHp(this.lastConMod) || {
+            hp_rolls: [],
+            marcos: [],
+        };
+        body.progressao = progressao;
         return body;
     }
 
@@ -598,6 +605,17 @@ class Dnd5ePreCadastroModal {
             Array.isArray(raca.caracteristicas) &&
             raca.caracteristicas.includes('proficiencia_pericia_extra');
         this.el('prec_pericia_racial_wrap').hidden = !temPericiaExtra;
+        const temVariante = Dnd5eRacaUtil.temVarianteEscolha(raca);
+        this.el('prec_raca_variante_wrap').hidden = !temVariante;
+        if (temVariante) {
+            const lbl = this.el('prec_raca_variante_label');
+            if (lbl) lbl.textContent = Dnd5eRacaUtil.labelVariante(raca);
+            Dnd5eRacaUtil.preencherSelectVariante(
+                raca,
+                this.el('prec_raca_variante'),
+                this.el('prec_raca_variante')?.value
+            );
+        }
     }
 
     renderPericiasEscolha() {
@@ -745,6 +763,7 @@ class Dnd5ePreCadastroModal {
                 p.hp_max_total && p.hp_max_total > 0 ? p.hp_max_total : p.hp_max_nivel_1;
             resumo.textContent = `CA ${p.ca_total ?? p.ca_base} · PV ${pv} · Inic. ${this.fmtMod(p.iniciativa)}`;
         }
+        this._ultimoPreview = p;
     }
 
     agendarPreview() {
@@ -789,6 +808,10 @@ class Dnd5ePreCadastroModal {
             raca.caracteristicas.includes('proficiencia_pericia_extra');
         if (precisaPericiaRacial && !this.el('prec_pericia_racial').value) {
             Toast.error('Escolha a perícia extra concedida pela raça.');
+            return false;
+        }
+        if (Dnd5eRacaUtil.temVarianteEscolha(raca) && !this.el('prec_raca_variante')?.value) {
+            Toast.error(`Escolha ${Dnd5eRacaUtil.labelVariante(raca).toLowerCase()}.`);
             return false;
         }
         const nivel = this.nivelAtual();
@@ -838,6 +861,7 @@ class Dnd5ePreCadastroModal {
         const f = {
             v: 1,
             raca_slug: this.el('prec_raca').value,
+            raca_variante_slug: this.el('prec_raca_variante')?.value || null,
             classe_slug: this.el('prec_classe').value,
             antecedente_slug: this.el('prec_antecedente').value || null,
             subclasse_slug: this.el('prec_subclasse').value || null,
@@ -856,8 +880,10 @@ class Dnd5ePreCadastroModal {
             f.hp_max_nivel_1_ref = preview.hp_max_nivel_1;
             if (preview.subclasse) f.subclasse_nome = preview.subclasse.nome;
             const conMod = preview.modificadores?.constitution ?? 0;
-            const progressao = this.buildProgressaoHp(conMod);
-            if (progressao) f.progressao = progressao;
+            const progressao = this.buildProgressaoHp(conMod) || { hp_rolls: [], marcos: [] };
+            if (progressao.hp_rolls?.length || progressao.marcos?.length) {
+                f.progressao = progressao;
+            }
         }
         if (this.classeOuroMeta.ouro_aplicado > 0) {
             f.classe_ouro_slug = this.classeOuroMeta.slug;

@@ -58,6 +58,7 @@ class Dnd5ePersonagemService:
         *,
         nivel: int,
         experiencia: int = 0,
+        exigir_progressao_completa: bool = False,
     ) -> dict:
         if not ficha:
             return {}
@@ -66,6 +67,7 @@ class Dnd5ePersonagemService:
                 ficha,
                 nivel=nivel,
                 experiencia=experiencia,
+                exigir_progressao_completa=exigir_progressao_completa,
             )
         except ValueError as e:
             raise DadosInvalidos(str(e)) from e
@@ -226,10 +228,12 @@ class Dnd5ePersonagemService:
         except ValueError as e:
             raise DadosInvalidos(str(e)) from e
 
+        exigir_prog = int(payload.nivel) > 1
         ficha_norm = self._normalizar_ficha_entrada(
             payload.ficha or {},
             nivel=payload.nivel,
             experiencia=payload.experiencia,
+            exigir_progressao_completa=exigir_prog,
         )
 
         ent = Dnd5ePersonagem(

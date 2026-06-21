@@ -46,6 +46,7 @@ from app.games.dnd5e.rules.progressao import (
     migrar_ficha_para_v2,
     montar_hp_resumo,
     registrar_hp_roll_na_ficha,
+    sincronizar_dados_de_marcos,
     validar_progressao_ficha,
     validar_scores_base_por_metodo,
 )
@@ -378,7 +379,7 @@ def validar_ficha_para_gravacao(
     Valida ficha completa (PHB criação) e devolve ficha enriquecida com resumo calculado.
     Levanta ValueError se regras não forem atendidas.
     """
-    out = migrar_ficha_para_v2(ficha)
+    out = sincronizar_dados_de_marcos(ficha)
     raca_slug = (out.get("raca_slug") or "").strip()
     classe_slug = (out.get("classe_slug") or "").strip()
     if not raca_slug or not classe_slug:
@@ -442,6 +443,7 @@ def validar_ficha_para_gravacao(
             classe_slug=classe_slug,
             con_mod=resumo["modificadores"]["constitution"],
             experiencia=experiencia,
+            exigir_hp_nivel_1=nivel > 1,
         )
 
     out["ca_base"] = resumo["ca_base"]

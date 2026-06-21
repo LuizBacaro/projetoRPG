@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/modais.css" />
     <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=18" />
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
-    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=22" />
+    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=23" />
     <link rel="stylesheet" href="/games/dnd35/css/grimorio.css?v=4" />
     <link rel="stylesheet" href="../css/grimorio-dnd5e.css?v=3" />
 </head>
@@ -192,13 +192,15 @@
                 <div id="f5e_salvamentos" class="ficha-resistencias-row"></div>
             </div>
 
-            <div class="ficha-secao ficha-dnd5e-progressao-sec" id="f5e_progressao_sec">
+            <div class="ficha-secao ficha-dnd5e-progressao-sec" id="f5e_progressao_sec" hidden>
                 <h3 class="ficha-secao-titulo">
                     📈 Progressão
                     <span id="f5e_pendencias_badge" class="ficha-dnd5e-pendencias-badge" hidden></span>
                 </h3>
                 <div id="f5e_pendencias_alerta" class="ficha-dnd5e-pendencias-alerta" hidden role="status"></div>
                 <p class="ficha-dnd5e-status" id="f5e_progressao_status"></p>
+                <div id="f5e_progressao_info" class="ficha-dnd5e-progressao-info" hidden></div>
+                <div id="f5e_progressao_edit" class="ficha-dnd5e-progressao-edit">
                 <div class="ficha-dnd5e-edit-grid">
                     <div>
                         <label class="ficha-label" for="f5e_hp_roll_nivel">Rolar PV (nível)</label>
@@ -352,6 +354,7 @@
                 </div>
                 <p class="ficha-label ficha-dnd5e-pendencias-titulo">Pendências</p>
                 <ul id="f5e_pendencias_lista" class="ficha-dnd5e-pendencias"></ul>
+                </div>
             </div>
 
         </section>
@@ -387,7 +390,7 @@
                 <div id="f5e_antecedente_tracos_wrap">
                     <div id="f5e_antecedente_tracos_host" class="dnd5e-tracos-host" hidden></div>
                     <p id="f5e_antecedente_tracos_hint" class="ficha-dnd5e-status"></p>
-                    <button type="button" id="f5e_antecedente_tracos_sortear" class="btn btn-sm" hidden>Sortear traços</button>
+                    <button type="button" id="f5e_antecedente_tracos_sortear" class="ficha-btn-adicionar" hidden>🎲 Sortear traços</button>
                 </div>
             </div>
 
@@ -690,7 +693,7 @@
 <script src="../js/services/Dnd5ePersonagemService.js?v=5"></script>
 <script src="../js/services/Dnd5eRegrasService.js?v=6"></script>
 <script src="../js/ui/Dnd5eConfirmModal.js?v=1"></script>
-<script src="../js/ui/Dnd5eProgressaoPanel.js?v=7"></script>
+<script src="../js/ui/Dnd5eProgressaoPanel.js?v=9"></script>
 <script src="../js/ui/Dnd5eFichaCatalogoModal.js?v=1"></script>
 <script src="../js/ui/Dnd5eFichaInventarioPanel.js?v=6"></script>
 <script src="../js/services/Dnd5eCombateService.js?v=3"></script>
@@ -703,7 +706,7 @@
 <script src="../js/shared/dnd5e-condicoes-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-raca-util.js?v=2"></script>
 <script src="../js/shared/dnd5e-xp-util.js?v=2"></script>
-<script src="../js/pages/ficha-dnd5e.js?v=33"></script>
+<script src="../js/pages/ficha-dnd5e.js?v=34"></script>
 <script type="module" src="../js/pages/ficha-dnd5e-grimorio-bootstrap.js?v=20260614a"></script>
 <script type="module" src="../js/pages/ficha-dnd5e-conjuracao.js?v=3"></script>
 </body>
