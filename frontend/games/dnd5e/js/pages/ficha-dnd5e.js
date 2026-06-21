@@ -47,6 +47,8 @@
         bonus_atributo_feat: {},
         pericias_override: {},
         expertise_pericias: [],
+        pericia_racial_extra: null,
+        pericias_classe_escolhidas: [],
     };
     let periciasEditModo = false;
     let periciasDesejadasLocal = {};
@@ -113,6 +115,39 @@
         return out;
     }
 
+    function racaSlugDaFicha(f) {
+        if (!f || typeof f !== 'object') return '';
+        const direto = (f.raca_slug || '').trim();
+        if (direto) return direto;
+        const leg = f.raca;
+        if (typeof leg === 'string') return leg.trim().toLowerCase();
+        if (leg && typeof leg === 'object' && leg.slug) return String(leg.slug).trim().toLowerCase();
+        return '';
+    }
+
+    function racaExigePericiaExtra() {
+        const slug = (el('f5e_raca')?.value || '').trim();
+        const raca = racaSelecionada();
+        return Dnd5eRacaUtil.temPericiaExtra(raca || { slug });
+    }
+
+    function garantirUiPericiaRacial() {
+        const temPericiaExtra = racaExigePericiaExtra();
+        const sec = el('f5e_pericia_racial_sec');
+        const select = el('f5e_pericia_racial');
+        const extra = el('f5e_raca_extra');
+        if (sec) {
+            sec.hidden = !temPericiaExtra;
+        } else if (temPericiaExtra && extra) {
+            extra.classList.add('is-visible');
+        }
+        if (!temPericiaExtra || !select) return;
+        select.disabled = false;
+        select.removeAttribute('data-pre-cadastro-lock');
+        const atual = getPericiaRacialExtra();
+        if (atual) aplicarPericiaRacialValor(atual);
+    }
+
     function racaSelecionada() {
         return catalogoRacas.find((r) => r.slug === el('f5e_raca').value);
     }
@@ -127,10 +162,39 @@
         return out;
     }
 
+    function getPericiaRacialExtra() {
+        const dom = (el('f5e_pericia_racial')?.value || '').trim();
+        const cache = (fichaProgressaoLocal.pericia_racial_extra || '').trim();
+        return dom || cache || null;
+    }
+
+    function aplicarPericiaRacialValor(slug) {
+        const val = (slug || '').trim();
+        if (!val) return;
+        fichaProgressaoLocal.pericia_racial_extra = val;
+        const sel = el('f5e_pericia_racial');
+        if (!sel) return;
+        const tem = Array.from(sel.options).some((o) => o.value === val);
+        if (tem) sel.value = val;
+    }
+
+    function sincronizarPericiaRacialDoDom() {
+        const val = (el('f5e_pericia_racial')?.value || '').trim();
+        fichaProgressaoLocal.pericia_racial_extra = val || null;
+    }
+
+    function sincronizarPericiasClasseDoDom() {
+        const sel = getPericiasClasseEscolhidas();
+        fichaProgressaoLocal.pericias_classe_escolhidas = sel;
+    }
+
     function getPericiasClasseEscolhidas() {
-        return Array.from(
+        const dom = Array.from(
             document.querySelectorAll('#f5e_pericias_escolha input[type=checkbox]:checked')
         ).map((cb) => cb.value);
+        if (dom.length) return dom;
+        const cache = fichaProgressaoLocal.pericias_classe_escolhidas || [];
+        return Array.isArray(cache) ? cache.filter(Boolean) : [];
     }
 
     function subclasseValidaParaPreview() {
@@ -206,7 +270,7 @@
             bonus_atributo_feat: fichaProgressaoLocal.bonus_atributo_feat || {},
             nivel: parseInt(el('f5e_nivel').value, 10) || 1,
             pericias_classe_escolhidas: getPericiasClasseEscolhidas(),
-            pericia_racial_extra: el('f5e_pericia_racial').value || null,
+            pericia_racial_extra: getPericiaRacialExtra(),
             subclasse_slug: subclasseValidaParaPreview(),
             armadura_slug: armEsc.armadura_slug,
             escudo_slug: armEsc.escudo_slug,
@@ -313,21 +377,23 @@
         } else {
             tracos.hidden = true;
         }
+        const temBonusExtra = Dnd5eRacaUtil.temBonusHabilidadeExtraEscolha(raca);
+        const temPericiaExtra = Dnd5eRacaUtil.temPericiaExtra(raca);
+        const temVariante = Dnd5eRacaUtil.temVarianteEscolha(raca);
         extra.classList.toggle(
             'is-visible',
-            Dnd5eRacaUtil.temBonusHabilidadeExtraEscolha(raca)
+            Dnd5eRacaUtil.precisaSecaoRacaExtra(raca)
         );
+        el('f5e_extra1_wrap')?.toggleAttribute('hidden', !temBonusExtra);
+        el('f5e_extra2_wrap')?.toggleAttribute('hidden', !temBonusExtra);
         Dnd5eRacaUtil.atualizarLabelsBonusExtra(
             raca,
             ['f5e_extra1_label', 'f5e_extra2_label'],
             el
         );
-        const temPericiaExtra =
-            raca &&
-            Array.isArray(raca.caracteristicas) &&
-            raca.caracteristicas.includes('proficiencia_pericia_extra');
-        el('f5e_pericia_racial_wrap').hidden = !temPericiaExtra;
-        const temVariante = Dnd5eRacaUtil.temVarianteEscolha(raca);
+        const secPericiaRacial = el('f5e_pericia_racial_sec');
+        if (secPericiaRacial) secPericiaRacial.hidden = !temPericiaExtra;
+        else if (temPericiaExtra && extra) extra.classList.add('is-visible');
         el('f5e_raca_variante_wrap').hidden = !temVariante;
         if (temVariante) {
             const lbl = el('f5e_raca_variante_label');
@@ -338,9 +404,11 @@
                 el('f5e_raca_variante')?.value
             );
         }
+        garantirUiPericiaRacial();
     }
 
     function preencherSelectExtra() {
+        const periciaAtual = getPericiaRacialExtra();
         const opts = ABILITIES.map(
             (a) => `<option value="${a.key}">${a.name}</option>`
         ).join('');
@@ -348,9 +416,13 @@
         el('f5e_extra2').innerHTML = opts;
         el('f5e_extra2').value = 'wisdom';
         const perOpts =
-            '<option value="">—</option>' +
+            '<option value="">— escolha —</option>' +
             catalogoPericias.map((p) => `<option value="${p.slug}">${p.nome}</option>`).join('');
-        el('f5e_pericia_racial').innerHTML = perOpts;
+        const sel = el('f5e_pericia_racial');
+        if (sel) {
+            sel.innerHTML = perOpts;
+            if (periciaAtual) aplicarPericiaRacialValor(periciaAtual);
+        }
     }
 
     function renderPericiasEscolha() {
@@ -402,10 +474,12 @@
                     Toast.error(`Máximo ${qtd} perícia(s) de classe.`);
                     return;
                 }
+                sincronizarPericiasClasseDoDom();
                 renderPericiasEscolha();
                 agendarPreview();
             });
         });
+        sincronizarPericiasClasseDoDom();
     }
 
     function renderSalvamentos(salvamentos) {
@@ -1170,7 +1244,7 @@
             feat_escolhas: fichaProgressaoLocal.feat_escolhas || {},
             pericias_override: fichaProgressaoLocal.pericias_override || {},
             pericias_classe_escolhidas: getPericiasClasseEscolhidas(),
-            pericia_racial_extra: el('f5e_pericia_racial').value || null,
+            pericia_racial_extra: getPericiaRacialExtra(),
             raca_variante_slug: el('f5e_raca_variante')?.value || null,
             ...(inventarioPanel
                 ? inventarioPanel.getArmaduraEscudoParaCalcular()
@@ -1198,6 +1272,9 @@
     }
 
     function validarAntesSalvar() {
+        garantirUiPericiaRacial();
+        sincronizarPericiaRacialDoDom();
+        sincronizarPericiasClasseDoDom();
         const classe = catalogoClasses.find((c) => c.slug === el('f5e_classe').value);
         const qtd = (classe && classe.pericias_escolha_qtd) || 0;
         const sel = getPericiasClasseEscolhidas();
@@ -1208,15 +1285,19 @@
                 cb.disabled = false;
             });
             secPericias?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            Toast.error(`Escolha exatamente ${qtd} perícia(s) de classe.`);
+            Toast.error(
+                `Escolha exatamente ${qtd} perícia(s) na lista de classe do Guerreiro (não confundir com a perícia racial).`
+            );
             return false;
         }
         const raca = catalogoRacas.find((r) => r.slug === el('f5e_raca').value);
         if (precisaPericiaRacialPendente()) {
-            desbloquearCamposPendentesPreCadastro();
-            el('f5e_pericia_racial_wrap')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            garantirUiPericiaRacial();
+            el('f5e_pericia_racial_sec')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             el('f5e_pericia_racial')?.focus();
-            Toast.error('Escolha a perícia extra concedida pela raça.');
+            Toast.error(
+                'Humano: escolha 1 perícia extra do traço racial (qualquer uma das 18 — não precisa ser da lista do Guerreiro).'
+            );
             return false;
         }
         if (Dnd5eRacaUtil.temVarianteEscolha(raca) && !el('f5e_raca_variante')?.value) {
@@ -1284,6 +1365,8 @@
         }
         if (!validarAntesSalvar()) return;
 
+        sincronizarPericiaRacialDoDom();
+        sincronizarPericiasClasseDoDom();
         el('f5e_status').textContent = 'Salvando…';
         try {
             sincronizarXpComNivel();
@@ -1368,6 +1451,8 @@
             bonus_atributo_feat: f.bonus_atributo_feat || {},
             pericias_override: f.pericias_override || {},
             expertise_pericias: f.expertise_pericias || [],
+            pericia_racial_extra: f.pericia_racial_extra || null,
+            pericias_classe_escolhidas: f.pericias_classe_escolhidas || [],
         };
         if (progressaoPanel) {
             progressaoPanel.loadFromFicha(f);
@@ -1376,7 +1461,12 @@
         arenaCondicoesAtual = CU.normalizarLista(f.arena_condicoes || []);
         sincronizarCondicoesPorHp();
         if (f.raca_slug) el('f5e_raca').value = f.raca_slug;
+        else {
+            const racaSlug = racaSlugDaFicha(f);
+            if (racaSlug) el('f5e_raca').value = racaSlug;
+        }
         atualizarUiRaca();
+        garantirUiPericiaRacial();
         if (f.raca_variante_slug) el('f5e_raca_variante').value = f.raca_variante_slug;
         if (f.classe_slug) el('f5e_classe').value = f.classe_slug;
         if (f.antecedente_slug) el('f5e_antecedente').value = f.antecedente_slug;
@@ -1420,7 +1510,7 @@
             if (keys[0]) el('f5e_extra1').value = keys[0];
             if (keys[1]) el('f5e_extra2').value = keys[1];
         }
-        if (f.pericia_racial_extra) el('f5e_pericia_racial').value = f.pericia_racial_extra;
+        aplicarPericiaRacialValor(f.pericia_racial_extra);
 
         renderFoto(p.foto_url);
         atualizarHeaderIdentidade();
@@ -1429,6 +1519,7 @@
         atualizarUiRaca();
         renderPericiasEscolha();
         if (f.pericias_classe_escolhidas) {
+            fichaProgressaoLocal.pericias_classe_escolhidas = [...f.pericias_classe_escolhidas];
             f.pericias_classe_escolhidas.forEach((slug) => {
                 const cb = document.querySelector(
                     `#f5e_pericias_escolha input[value="${slug}"]`
@@ -1462,24 +1553,15 @@
     }
 
     function precisaPericiaRacialPendente() {
-        const raca = catalogoRacas.find((r) => r.slug === el('f5e_raca').value);
-        const precisa =
-            raca &&
-            Array.isArray(raca.caracteristicas) &&
-            raca.caracteristicas.includes('proficiencia_pericia_extra');
-        return precisa && !(el('f5e_pericia_racial')?.value || '').trim();
+        return racaExigePericiaExtra() && !getPericiaRacialExtra();
+    }
+
+    function dadosPericiasIniciaisPendentes() {
+        return !periciasClasseCompletas() || precisaPericiaRacialPendente();
     }
 
     function desbloquearCamposPendentesPreCadastro() {
-        if (precisaPericiaRacialPendente()) {
-            const node = el('f5e_pericia_racial');
-            const wrap = el('f5e_pericia_racial_wrap');
-            if (node) {
-                node.disabled = false;
-                node.removeAttribute('data-pre-cadastro-lock');
-            }
-            if (wrap) wrap.hidden = false;
-        }
+        garantirUiPericiaRacial();
     }
     function periciasClasseCompletas() {
         const classe = catalogoClasses.find((c) => c.slug === el('f5e_classe').value);
@@ -1491,7 +1573,7 @@
     function aplicarModoPreCadastroFixo() {
         if (!personagemId) return;
         document.body.classList.add('ficha-dnd5e-pre-cadastro-fixo');
-        const periciasOk = periciasClasseCompletas();
+        const periciasClasseOk = periciasClasseCompletas();
         const lockIds = [
             'f5e_nome',
             'f5e_nivel',
@@ -1501,12 +1583,8 @@
             'f5e_subclasse',
             'f5e_extra1',
             'f5e_extra2',
-            'f5e_pericia_racial',
-        ].filter((id) => {
-            if (id === 'f5e_pericia_racial' && precisaPericiaRacialPendente()) return false;
-            return true;
-        });
-        if (periciasOk && el('f5e_raca_variante')?.value) {
+        ];
+        if (periciasClasseOk && el('f5e_raca_variante')?.value) {
             lockIds.push('f5e_raca_variante');
         }
         lockIds.forEach((id) => {
@@ -1529,12 +1607,12 @@
         el('btnMatrizPadrao')?.setAttribute('hidden', '');
         const secPericias = document.querySelector('.ficha-dnd5e-secao-pericias');
         if (secPericias) {
-            secPericias.classList.toggle('is-editavel', !periciasOk);
+            secPericias.classList.toggle('is-editavel', dadosPericiasIniciaisPendentes());
         }
         document
             .querySelectorAll('#f5e_pericias_escolha input[type=checkbox]')
             .forEach((cb) => {
-                cb.disabled = periciasOk;
+                cb.disabled = periciasClasseOk;
             });
         desbloquearCamposPendentesPreCadastro();
     }
@@ -1625,6 +1703,15 @@
                     fichaProgressaoLocal.expertise_pericias = ficha.expertise_pericias;
                     expertiseLocal = [...ficha.expertise_pericias];
                 }
+                if (ficha.pericia_racial_extra) {
+                    fichaProgressaoLocal.pericia_racial_extra = ficha.pericia_racial_extra;
+                    aplicarPericiaRacialValor(ficha.pericia_racial_extra);
+                }
+                if (ficha.pericias_classe_escolhidas) {
+                    fichaProgressaoLocal.pericias_classe_escolhidas = [
+                        ...ficha.pericias_classe_escolhidas,
+                    ];
+                }
                 agendarPreview();
             },
         });
@@ -1660,10 +1747,12 @@
         el('f5e_xp').addEventListener('input', () => {
             sincronizarNivelComXp();
             atualizarPendenciasLocais();
+            garantirUiPericiaRacial();
         });
         el('f5e_xp').addEventListener('change', () => {
             sincronizarNivelComXp();
             atualizarPendenciasLocais();
+            garantirUiPericiaRacial();
         });
         el('f5e_antecedente').addEventListener('change', () => {
             sincronizarAntecedenteInventario();
@@ -1671,7 +1760,12 @@
         });
         el('f5e_extra1').addEventListener('change', agendarPreview);
         el('f5e_extra2').addEventListener('change', agendarPreview);
-        el('f5e_pericia_racial').addEventListener('change', agendarPreview);
+        el('f5e_pericia_racial')?.addEventListener('change', () => {
+            sincronizarPericiaRacialDoDom();
+        sincronizarPericiasClasseDoDom();
+            agendarPreview();
+        });
+        el('f5e_pericia_racial')?.addEventListener('input', sincronizarPericiaRacialDoDom);
         el('f5e_raca_variante')?.addEventListener('change', agendarPreview);
         el('f5e_subclasse').addEventListener('change', agendarPreview);
         el('f5e_hp_atual').addEventListener('input', () => {

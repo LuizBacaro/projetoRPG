@@ -623,21 +623,21 @@ class Dnd5ePreCadastroModal {
         } else {
             tracos.hidden = true;
         }
+        const temBonusExtra = Dnd5eRacaUtil.temBonusHabilidadeExtraEscolha(raca);
+        const temPericiaExtra = Dnd5eRacaUtil.temPericiaExtra(raca);
+        const temVariante = Dnd5eRacaUtil.temVarianteEscolha(raca);
         extra?.classList.toggle(
             'is-visible',
-            Dnd5eRacaUtil.temBonusHabilidadeExtraEscolha(raca)
+            Dnd5eRacaUtil.precisaSecaoRacaExtra(raca)
         );
+        this.el('prec_extra1')?.closest('div')?.toggleAttribute('hidden', !temBonusExtra);
+        this.el('prec_extra2')?.closest('div')?.toggleAttribute('hidden', !temBonusExtra);
         Dnd5eRacaUtil.atualizarLabelsBonusExtra(
             raca,
             ['prec_extra1_label', 'prec_extra2_label'],
             (id) => this.el(id)
         );
-        const temPericiaExtra =
-            raca &&
-            Array.isArray(raca.caracteristicas) &&
-            raca.caracteristicas.includes('proficiencia_pericia_extra');
         this.el('prec_pericia_racial_wrap').hidden = !temPericiaExtra;
-        const temVariante = Dnd5eRacaUtil.temVarianteEscolha(raca);
         this.el('prec_raca_variante_wrap').hidden = !temVariante;
         if (temVariante) {
             const lbl = this.el('prec_raca_variante_label');

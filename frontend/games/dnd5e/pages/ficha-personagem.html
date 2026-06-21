@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/modais.css" />
     <link rel="stylesheet" href="/games/dnd35/css/ficha-personagem.css?v=18" />
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
-    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=23" />
+    <link rel="stylesheet" href="../css/ficha-dnd5e-parity.css?v=25" />
     <link rel="stylesheet" href="/games/dnd35/css/grimorio.css?v=4" />
     <link rel="stylesheet" href="../css/grimorio-dnd5e.css?v=3" />
 </head>
@@ -361,17 +361,13 @@
 
         <aside class="ficha-coluna-direita">
             <div id="f5e_raca_extra" class="ficha-dnd5e-raca-extra ficha-dnd5e-edit-grid">
-                <div>
+                <div id="f5e_extra1_wrap">
                     <label class="ficha-label" id="f5e_extra1_label" for="f5e_extra1">+1 (bônus racial)</label>
                     <select id="f5e_extra1"></select>
                 </div>
-                <div>
+                <div id="f5e_extra2_wrap">
                     <label class="ficha-label" id="f5e_extra2_label" for="f5e_extra2">+1 (bônus racial)</label>
                     <select id="f5e_extra2"></select>
-                </div>
-                <div id="f5e_pericia_racial_wrap" hidden>
-                    <label class="ficha-label" for="f5e_pericia_racial">Perícia extra (raça)</label>
-                    <select id="f5e_pericia_racial"></select>
                 </div>
                 <div id="f5e_raca_variante_wrap" hidden>
                     <label class="ficha-label" id="f5e_raca_variante_label" for="f5e_raca_variante">Linhagem</label>
@@ -458,7 +454,15 @@
             </div>
 
             <div class="ficha-secao ficha-dnd5e-secao-pericias">
-                <h3 class="ficha-secao-titulo">Perícias de classe</h3>
+                <h3 class="ficha-secao-titulo">Proficiências iniciais</h3>
+                <div id="f5e_pericia_racial_sec" class="ficha-dnd5e-pericia-racial-sec" hidden>
+                    <label class="ficha-label" for="f5e_pericia_racial">Perícia extra (traço racial)</label>
+                    <p class="ficha-dnd5e-pericia-racial-hint" id="f5e_pericia_racial_hint">
+                        Escolha <strong>uma</strong> perícia entre as 18 do jogo — independente das perícias de classe.
+                    </p>
+                    <select id="f5e_pericia_racial" class="ficha-dnd5e-pericia-racial-select"></select>
+                </div>
+                <h4 class="ficha-dnd5e-pericias-classe-titulo">Perícias de classe</h4>
                 <p class="ficha-dnd5e-status ficha-dnd5e-pericias-hint" id="f5e_pericias_classe_hint"></p>
                 <div id="f5e_pericias_escolha" class="ficha-dnd5e-pericias-escolha"></div>
             </div>
@@ -704,9 +708,9 @@
 <script src="../js/shared/dnd5e-equipamento-classe-util.js?v=1"></script>
 <script src="../js/shared/dnd5e-pendencias-util.js?v=3"></script>
 <script src="../js/shared/dnd5e-condicoes-util.js?v=1"></script>
-<script src="../js/shared/dnd5e-raca-util.js?v=2"></script>
+<script src="../js/shared/dnd5e-raca-util.js?v=5"></script>
 <script src="../js/shared/dnd5e-xp-util.js?v=2"></script>
-<script src="../js/pages/ficha-dnd5e.js?v=36"></script>
+<script src="../js/pages/ficha-dnd5e.js?v=40"></script>
 <script type="module" src="../js/pages/ficha-dnd5e-grimorio-bootstrap.js?v=20260614a"></script>
 <script type="module" src="../js/pages/ficha-dnd5e-conjuracao.js?v=3"></script>
 </body>
