@@ -34,6 +34,8 @@ class Dnd5eProgressaoPanel {
         this.catalogoPericias = [];
         this.niveisFeat = [4, 8, 12, 16, 19];
         this._featEscolhasLocal = {};
+        this._progCache = { hp_rolls: [], marcos: [] };
+        this._featsCache = [];
     }
 
     async init() {
@@ -159,11 +161,149 @@ class Dnd5eProgressaoPanel {
     loadFromFicha(ficha) {
         const f = ficha || {};
         const prog = f.progressao || { hp_rolls: [], marcos: [] };
+        this._progCache = prog;
+        this._featsCache = f.feats || [];
         this.renderPendenciasLocais(f.pendencias || []);
         this._renderHpRolls(prog.hp_rolls || []);
         this._renderMarcos(prog.marcos || [], f.feats || []);
         this._featEscolhasLocal = { ...(f.feat_escolhas || {}) };
         this._renderFeatEscolhasSection(f.feats || [], this._featEscolhasLocal);
+    }
+
+    _pendenciasAcao(pendencias) {
+        const merged = this._pendenciasMescladas(pendencias);
+        return merged.filter((p) => {
+            const cat = PENDENCIAS_UTIL ? PENDENCIAS_UTIL.categoria(p) : '';
+            return cat === 'hp' || cat === 'marco' || cat === 'pericia';
+        });
+    }
+
+    _htmlHpRolls(rolls) {
+        if (!rolls.length) return '';
+        return rolls
+            .map((r) => {
+                const mod = Number(r.con_mod);
+                const modStr = mod >= 0 ? `+${mod}` : String(mod);
+                return `<div class="ficha-dnd5e-progressao-item is-readonly">Nív. ${r.nivel}: dado(${r.roll}) CON(${modStr}) = +${r.ganho} PV</div>`;
+            })
+            .join('');
+    }
+
+    _htmlMarcos(marcos, feats) {
+        const linhas = (marcos || []).map((m) => {
+            if (m.tipo === 'asi') {
+                const dist = formatDistribuicaoAsi(m.distribuicao);
+                return `<div class="ficha-dnd5e-progressao-item is-readonly">Nív. ${m.nivel}: Incremento (${dist})</div>`;
+            }
+            const feat = this.catalogoFeats.find((f) => f.slug === m.slug);
+            let extra = '';
+            if (m.slug === 'resilient' && this._featEscolhasLocal?.resilient) {
+                extra = ` (${ATTR_LABELS_PT[this._featEscolhasLocal.resilient] || this._featEscolhasLocal.resilient})`;
+            }
+            if (m.slug === 'magic-initiate' && this._featEscolhasLocal?.magic_initiate) {
+                extra = ` (${this._featEscolhasLocal.magic_initiate})`;
+            }
+            if (m.slug === 'skilled') {
+                extra = this._labelSkilledExtra(this._featEscolhasLocal);
+            }
+            if (m.slug === 'skill-expert') {
+                extra = this._labelSkillExpertExtra(this._featEscolhasLocal);
+            }
+            return `<div class="ficha-dnd5e-progressao-item is-readonly">Nív. ${m.nivel}: Talento — ${feat ? feat.nome : m.slug}${extra}</div>`;
+        });
+        if (!linhas.length && feats && feats.length) {
+            feats
+                .filter((slug) => slug !== 'ability-score-improvement')
+                .forEach((slug) => {
+                    const feat = this.catalogoFeats.find((f) => f.slug === slug);
+                    linhas.push(
+                        `<div class="ficha-dnd5e-progressao-item is-readonly">Talento — ${feat ? feat.nome : slug}</div>`
+                    );
+                });
+        }
+        return linhas.join('');
+    }
+
+    _textoProximaProgressao() {
+        const nivel = this.getNivel();
+        const raca = (this.getRacaSlug() || '').toLowerCase();
+        const hpRolls = this._progCache?.hp_rolls || [];
+        const marcos = this._progCache?.marcos || [];
+        const hpNiveis = new Set(hpRolls.map((r) => r.nivel));
+        const marcoNiveis = new Set(marcos.map((m) => m.nivel));
+        const partes = [];
+
+        if (nivel < 20) {
+            partes.push(`Ao atingir o nível ${nivel + 1}, registre os PV do dado de vida.`);
+        }
+        const marcosFuturos = this.niveisFeat.filter((n) => n > nivel);
+        const proxMarco = marcosFuturos[0];
+        if (proxMarco) {
+            partes.push(`Próximo marco de classe: nível ${proxMarco}.`);
+        } else if (nivel >= 20) {
+            partes.push('Nível máximo — sem marcos futuros.');
+        }
+
+        if (nivel >= 2 && !hpNiveis.has(2)) {
+            return `Registre os PV do nível 2 para concluir a progressão atual.`;
+        }
+        for (let n = 2; n <= nivel; n += 1) {
+            if (!hpNiveis.has(n)) {
+                return `Registre os PV do nível ${n} para concluir a progressão atual.`;
+            }
+        }
+        const marcosDevidos = this.niveisFeat.filter((n) => n <= nivel && !marcoNiveis.has(n));
+        if (raca === 'humano' && nivel >= 1 && !marcoNiveis.has(1)) {
+            marcosDevidos.unshift(1);
+        }
+        if (marcosDevidos.length) {
+            return `Escolha incremento ou talento do nível ${marcosDevidos[0]}.`;
+        }
+
+        return partes.join(' ');
+    }
+
+    _renderProgressaoInfo() {
+        const host = this.el('f5e_progressao_info');
+        if (!host) return;
+        const nivel = this.getNivel();
+        const hpRolls = this._progCache?.hp_rolls || [];
+        const marcos = this._progCache?.marcos || [];
+        const hpHtml = this._htmlHpRolls(hpRolls);
+        const marcoHtml = this._htmlMarcos(marcos, this._featsCache);
+        const proximo = this._textoProximaProgressao();
+        host.innerHTML = `
+            <p class="ficha-dnd5e-status ficha-dnd5e-progressao-info-status">
+                <strong>Progressão em dia</strong> — nível ${nivel}.
+            </p>
+            <p class="ficha-dnd5e-status ficha-dnd5e-progressao-info-proximo">${proximo}</p>
+            ${
+                hpHtml
+                    ? `<p class="ficha-label">PV registrados</p><div class="ficha-dnd5e-progressao-lista">${hpHtml}</div>`
+                    : ''
+            }
+            ${
+                marcoHtml
+                    ? `<p class="ficha-label">Marcos registrados</p><div class="ficha-dnd5e-progressao-lista">${marcoHtml}</div>`
+                    : ''
+            }`;
+    }
+
+    _atualizarModoProgressao(pendenciasServidor) {
+        const acao = this._pendenciasAcao(pendenciasServidor);
+        const temAcao = acao.length > 0;
+        const edit = this.el('f5e_progressao_edit');
+        const info = this.el('f5e_progressao_info');
+        const secao = this.el('f5e_progressao_sec');
+        const tituloPendencias = edit?.querySelector('.ficha-dnd5e-pendencias-titulo');
+
+        if (edit) edit.hidden = !temAcao;
+        if (info) info.hidden = true;
+        if (tituloPendencias) tituloPendencias.hidden = !temAcao;
+        if (secao) {
+            secao.hidden = !temAcao;
+            secao.classList.toggle('has-pendencias', temAcao);
+        }
     }
 
     renderPendenciasLocais(pendenciasServidor) {
@@ -409,35 +549,33 @@ class Dnd5eProgressaoPanel {
     _renderPendencias(pendenciasServidor) {
         const host = this.el('f5e_pendencias_lista');
         const alerta = this.el('f5e_pendencias_alerta');
-        const secao = this.el('f5e_progressao_sec');
         const badge = this.el('f5e_pendencias_badge');
-        const merged = this._pendenciasMescladas(pendenciasServidor);
+        const acao = this._pendenciasAcao(pendenciasServidor);
 
-        if (secao) {
-            secao.classList.toggle('has-pendencias', merged.length > 0);
-        }
+        this._atualizarModoProgressao(pendenciasServidor);
+
         if (badge) {
-            badge.textContent = merged.length ? String(merged.length) : '';
-            badge.hidden = !merged.length;
+            badge.textContent = acao.length ? String(acao.length) : '';
+            badge.hidden = !acao.length;
         }
         if (alerta) {
-            if (!merged.length) {
+            if (!acao.length) {
                 alerta.hidden = true;
                 alerta.innerHTML = '';
             } else {
                 alerta.hidden = false;
                 const resumo = PENDENCIAS_UTIL
-                    ? PENDENCIAS_UTIL.resumoAlerta(merged)
-                    : `${merged.length} item(ns)`;
+                    ? PENDENCIAS_UTIL.resumoAlerta(acao)
+                    : `${acao.length} item(ns)`;
                 alerta.innerHTML = `<strong>Progressão incompleta</strong> — ${resumo}. Clique em um item para ir ao campo.`;
             }
         }
         if (!host) return;
-        if (!merged.length) {
-            host.innerHTML = '<li class="ficha-dnd5e-pendencia-vazio">Nenhuma pendência</li>';
+        if (!acao.length) {
+            host.innerHTML = '';
             return;
         }
-        host.innerHTML = merged
+        host.innerHTML = acao
             .map((p) => {
                 const cat = PENDENCIAS_UTIL ? PENDENCIAS_UTIL.categoria(p) : 'outro';
                 const label = PENDENCIAS_UTIL ? PENDENCIAS_UTIL.traduzir(p) : p;

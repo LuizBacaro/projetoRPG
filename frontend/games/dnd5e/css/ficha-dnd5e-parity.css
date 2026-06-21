@@ -296,7 +296,10 @@
     cursor: default;
 }
 
-.ficha-dnd5e-pre-cadastro-fixo #f5e_pericias_escolha input {
+.ficha-dnd5e-pre-cadastro-fixo
+    .ficha-dnd5e-secao-pericias:not(.is-editavel)
+    #f5e_pericias_escolha
+    input {
     pointer-events: none;
 }
 
@@ -563,6 +566,63 @@
     align-items: center;
     gap: 0.5rem 0.85rem;
     margin-top: 0.65rem;
+}
+
+#formPrecadastro .ficha-btn-adicionar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    width: auto;
+    min-height: 2.15rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid rgba(201, 168, 76, 0.48);
+    background: linear-gradient(
+        180deg,
+        rgba(201, 168, 76, 0.28) 0%,
+        rgba(92, 28, 22, 0.72) 100%
+    );
+    color: #fff8e7;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+#formPrecadastro .ficha-btn-adicionar:hover {
+    background: linear-gradient(
+        180deg,
+        rgba(201, 168, 76, 0.42) 0%,
+        rgba(110, 32, 26, 0.82) 100%
+    );
+    border-color: rgba(201, 168, 76, 0.72);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+#formPrecadastro .ficha-btn-adicionar:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+#formPrecadastro .ficha-btn-adicionar:focus-visible {
+    outline: 2px solid rgba(201, 168, 76, 0.85);
+    outline-offset: 2px;
+}
+
+#formPrecadastro .ficha-btn-adicionar:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .dnd5e-prec-preview-resumo {
@@ -966,8 +1026,81 @@
     min-width: 0;
 }
 
+.dnd5e-prec-nivel-fixo {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ficha-dourado, #c9a227);
+}
+
+.dnd5e-prec-nivel-hint {
+    margin: 0.25rem 0 0;
+    font-size: 0.78rem;
+    opacity: 0.75;
+}
+
+.dnd5e-prec-progressao-hint {
+    margin: 0 0 0.65rem;
+    font-size: 0.82rem;
+    opacity: 0.88;
+}
+
+.dnd5e-prec-marcos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.dnd5e-prec-marco-card {
+    padding: 0.65rem 0.7rem;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(201, 168, 76, 0.22);
+}
+
+.dnd5e-prec-marco-titulo {
+    margin: 0 0 0.45rem;
+}
+
+.dnd5e-prec-skilled-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+}
+
+.dnd5e-prec-expertise-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+}
+
+.dnd5e-prec-progressao-expertise {
+    margin-top: 0.85rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(201, 168, 76, 0.15);
+}
+
+.dnd5e-prec-feat-extra {
+    margin-top: 0.45rem;
+}
+
 .dnd5e-prec-ouro-toolbar {
     margin: 0.35rem 0 0.5rem;
+}
+
+.dnd5e-prec-tracos-toolbar {
+    margin: 0.45rem 0 0.15rem;
+}
+
+.dnd5e-prec-tracos-toolbar .ficha-btn-adicionar,
+#f5e_antecedente_tracos_sortear.ficha-btn-adicionar {
+    width: auto;
+    min-width: 10.5rem;
+}
+
+.dnd5e-prec-ouro-toolbar .ficha-btn-adicionar {
+    min-width: 11.5rem;
 }
 
 .dnd5e-idiomas-host {
@@ -990,7 +1123,7 @@
 
 #f5e_antecedente_tracos_sortear,
 #prec_antecedente_tracos_sortear {
-    margin-top: 0.35rem;
+    margin-top: 0;
 }
 
 .ficha-conj-perfil-text {
@@ -1148,6 +1281,29 @@
 
 .ficha-dnd5e-progressao-sec {
     margin-top: 0.25rem;
+}
+
+.ficha-dnd5e-progressao-sec.is-modo-info {
+    border-color: rgba(201, 168, 76, 0.22);
+}
+
+.ficha-dnd5e-progressao-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.ficha-dnd5e-progressao-info-status {
+    margin: 0;
+}
+
+.ficha-dnd5e-progressao-info-proximo {
+    margin: 0;
+    opacity: 0.88;
+}
+
+.ficha-dnd5e-progressao-item.is-readonly {
+    opacity: 0.92;
 }
 
 .ficha-dnd5e-pendencias-titulo {

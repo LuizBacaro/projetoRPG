@@ -35,25 +35,54 @@ def _usuario(u: Usuario) -> SimpleNamespace:
     return SimpleNamespace(id=u.id, perfil=u.perfil, email=u.email, nome=u.nome)
 
 
+def _hp_rolls_ate_nivel(nivel: int, con_mod: int = 2) -> list:
+    rolls = []
+    for n in range(1, nivel + 1):
+        ganho = (10 if n == 1 else 6) + con_mod
+        rolls.append(
+            {
+                "nivel": n,
+                "roll": 8 if n == 1 else 6,
+                "con_mod": con_mod,
+                "ganho": ganho,
+            }
+        )
+    return rolls
+
+
 def _payload_criar(**overrides):
+    nivel = overrides.get("nivel", 5)
+    con_mod = 2
     body = {
         "nome": "Aragorn 5e",
         "tipo": "jogador",
-        "nivel": 5,
-        "experiencia": 6500,
+        "nivel": nivel,
+        "experiencia": 6500 if nivel == 5 else 0,
         "strength": 16,
         "dexterity": 14,
         "constitution": 14,
         "ficha": {
-            "raca": "humano",
-            "classe": "guerreiro",
+            "raca_slug": "humano",
+            "classe_slug": "guerreiro",
+            "scores_base": {
+                "strength": 15,
+                "dexterity": 14,
+                "constitution": 14,
+                "intelligence": 12,
+                "wisdom": 10,
+                "charisma": 8,
+            },
             "pericia_racial_extra": "percepcao",
             "pericias_classe_escolhidas": ["atletismo", "intuicao"],
             "progressao": {
-                "hp_rolls": [],
-                "marcos": [{"nivel": 1, "tipo": "feat", "slug": "alert"}],
+                "hp_rolls": _hp_rolls_ate_nivel(nivel, con_mod),
+                "marcos": [
+                    {"nivel": 1, "tipo": "feat", "slug": "alert"},
+                    {"nivel": 4, "tipo": "asi", "distribuicao": {"wisdom": 2}},
+                ],
             },
             "feats": ["alert"],
+            "bonus_atributo_feat": {"wisdom": 2},
         },
     }
     body.update(overrides)
@@ -71,9 +100,34 @@ def test_criar_personagem_com_modificadores_calculados(dnd5e_personagens_db):
     assert body["strength_mod"] == 3
     assert body["dexterity_mod"] == 2
     assert body["bonus_proficiencia"] == 3
-    assert body["ficha"]["raca"] == "humano"
+    assert body["ficha"]["raca_slug"] == "humano"
     assert body["ficha"].get("v") == 2
     assert body["dono_id"] == u1.id
+
+
+def test_criar_nivel5_sem_progressao_completa_rejeita(dnd5e_personagens_db):
+    SessionLocal, u1, _ = dnd5e_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    payload = _payload_criar(
+        ficha={
+            "raca_slug": "humano",
+            "classe_slug": "guerreiro",
+            "scores_base": {
+                "strength": 15,
+                "dexterity": 14,
+                "constitution": 14,
+                "intelligence": 12,
+                "wisdom": 10,
+                "charisma": 8,
+            },
+            "pericia_racial_extra": "percepcao",
+            "pericias_classe_escolhidas": ["atletismo", "intuicao"],
+            "progressao": {"hp_rolls": [], "marcos": []},
+        }
+    )
+    r = client.post("/api/v1/dnd5e/personagens", json=payload)
+    assert r.status_code == 400
+    assert "nível" in r.json()["detail"].lower() or "pv" in r.json()["detail"].lower()
 
 
 def test_patch_nome_nao_apaga_ficha(dnd5e_personagens_db):
@@ -85,7 +139,7 @@ def test_patch_nome_nao_apaga_ficha(dnd5e_personagens_db):
     r = client.patch(f"/api/v1/dnd5e/personagens/{pid}", json={"nome": "Renomeado"})
     assert r.status_code == 200
     assert r.json()["nome"] == "Renomeado"
-    assert r.json()["ficha"]["classe"] == "guerreiro"
+    assert r.json()["ficha"]["classe_slug"] == "guerreiro"
 
 
 def test_criar_sem_nome_rejeita(dnd5e_personagens_db):
@@ -190,7 +244,8 @@ def test_progressao_pericias_override(dnd5e_personagens_db):
         "pericias_classe_escolhidas": ["atletismo", "intuicao"],
     }
     created = client.post(
-        "/api/v1/dnd5e/personagens", json=_payload_criar(ficha=ficha)
+        "/api/v1/dnd5e/personagens",
+        json=_payload_criar(nivel=1, experiencia=0, ficha=ficha),
     ).json()
     pid = created["id"]
 
@@ -211,10 +266,23 @@ def test_progressao_pericias_override_ficha_legada(dnd5e_personagens_db):
     ficha = {
         "raca": "elfo",
         "classe": "guerreiro",
+        "scores_base": {
+            "strength": 15,
+            "dexterity": 14,
+            "constitution": 13,
+            "intelligence": 12,
+            "wisdom": 10,
+            "charisma": 8,
+        },
         "pericias_classe_escolhidas": ["atletismo", "intuicao"],
+        "progressao": {
+            "hp_rolls": [{"nivel": 1, "roll": 10, "con_mod": 1, "ganho": 11}],
+            "marcos": [],
+        },
     }
     created = client.post(
-        "/api/v1/dnd5e/personagens", json=_payload_criar(ficha=ficha)
+        "/api/v1/dnd5e/personagens",
+        json=_payload_criar(nivel=1, experiencia=0, ficha=ficha),
     ).json()
     pid = created["id"]
 

@@ -294,10 +294,40 @@ def aplicar_retroativo_con_hp_na_ficha(
     return out
 
 
-def niveis_hp_pendentes(nivel: int, hp_rolls: Sequence[Dict[str, Any]]) -> List[int]:
+def niveis_hp_pendentes(
+    nivel: int,
+    hp_rolls: Sequence[Dict[str, Any]],
+    *,
+    incluir_nivel_1: bool = False,
+) -> List[int]:
     nivel_ef = max(1, min(20, int(nivel)))
     registrados = {int(r["nivel"]) for r in hp_rolls}
-    return [n for n in range(2, nivel_ef + 1) if n not in registrados]
+    inicio = 1 if incluir_nivel_1 else 2
+    return [n for n in range(inicio, nivel_ef + 1) if n not in registrados]
+
+
+def sincronizar_dados_de_marcos(ficha: Dict[str, Any]) -> Dict[str, Any]:
+    """Deriva feats, feat_escolhas e bonus_atributo_feat a partir de progressao.marcos."""
+    out = migrar_ficha_para_v2(ficha)
+    marcos = normalizar_marcos((out.get("progressao") or {}).get("marcos") or [])
+    feats = list(out.get("feats") or [])
+    for marco in marcos:
+        if (marco.get("tipo") or "").strip().lower() == "feat":
+            slug = (marco.get("slug") or "").strip().lower()
+            if slug and slug not in feats:
+                feats.append(slug)
+            esc = marco.get("feat_escolhas")
+            if isinstance(esc, dict) and esc:
+                out = mesclar_feat_escolhas(out, esc)
+    out["feats"] = feats
+    bonus = dict(out.get("bonus_atributo_feat") or {})
+    for marco in marcos:
+        if (marco.get("tipo") or "").strip().lower() == "asi":
+            for chave, delta in (marco.get("distribuicao") or {}).items():
+                if chave in CHAVES_HABILIDADE:
+                    bonus[chave] = int(bonus.get(chave, 0)) + int(delta)
+    out["bonus_atributo_feat"] = bonus
+    return out
 
 
 def calcular_hp_max_total(
@@ -706,7 +736,7 @@ def _validar_feat_escolhas_marco(
             )
 
 
-def validar_marco(
+def _validar_conteudo_marco(
     marco: Dict[str, Any],
     *,
     ficha: Dict[str, Any],
@@ -726,12 +756,6 @@ def validar_marco(
         raise ValueError(
             f"Personagem nível {nivel} ainda não atingiu marco do nível {nivel_marco}"
         )
-
-    marcos_existentes = normalizar_marcos(
-        (ficha.get("progressao") or {}).get("marcos") or []
-    )
-    if any(m["nivel"] == nivel_marco for m in marcos_existentes):
-        raise ValueError(f"Marco do nível {nivel_marco} já registrado")
 
     tipo = (marco.get("tipo") or "").strip().lower()
     if tipo == "feat":
@@ -756,6 +780,27 @@ def validar_marco(
                 )
     else:
         raise ValueError("Marco deve ser incremento (asi) ou talento (feat)")
+
+
+def validar_marco(
+    marco: Dict[str, Any],
+    *,
+    ficha: Dict[str, Any],
+    nivel: int,
+    scores_efetivos: Dict[str, int],
+) -> None:
+    nivel_marco = int(marco.get("nivel", 0))
+    marcos_existentes = normalizar_marcos(
+        (ficha.get("progressao") or {}).get("marcos") or []
+    )
+    if any(m["nivel"] == nivel_marco for m in marcos_existentes):
+        raise ValueError(f"Marco do nível {nivel_marco} já registrado")
+    _validar_conteudo_marco(
+        marco,
+        ficha=ficha,
+        nivel=nivel,
+        scores_efetivos=scores_efetivos,
+    )
 
 
 def aplicar_marco_na_ficha(
@@ -905,15 +950,24 @@ def validar_progressao_ficha(
     classe_slug: str,
     con_mod: int,
     experiencia: int,
+    exigir_hp_nivel_1: bool = False,
 ) -> None:
-    ficha_v2 = migrar_ficha_para_v2(ficha)
+    from app.games.dnd5e.rules.ficha import calcular_atributos_efetivos
+    from app.games.dnd5e.rules.pericias import (
+        aplicar_pericias_override,
+        calcular_slots_expertise_classe,
+        montar_proficiencias_automaticas,
+        validar_expertise_pericias_classe,
+    )
+
+    ficha_v2 = sincronizar_dados_de_marcos(ficha)
     validar_nivel_vs_experiencia(nivel, experiencia)
 
     prog = ficha_v2.get("progressao") or {}
     hp_rolls = normalizar_hp_rolls(prog.get("hp_rolls") or [])
     marcos = normalizar_marcos(prog.get("marcos") or [])
 
-    for n in niveis_hp_pendentes(nivel, hp_rolls):
+    for n in niveis_hp_pendentes(nivel, hp_rolls, incluir_nivel_1=exigir_hp_nivel_1):
         raise ValueError(f"Falta registrar PV do nível {n}")
 
     raca_slug = (ficha_v2.get("raca_slug") or "").strip()
@@ -924,8 +978,52 @@ def validar_progressao_ficha(
             continue
         raise ValueError(f"Falta escolher incremento ou talento do nível {n}")
 
+    scores_base = dict(ficha_v2.get("scores_base") or {})
+    scores_efetivos = calcular_atributos_efetivos(
+        scores_base,
+        raca_slug,
+        bonus_habilidade_extra=ficha_v2.get("bonus_habilidade_extra"),
+    )
+    vistos_marco: set[int] = set()
+    for marco in marcos:
+        nivel_m = int(marco.get("nivel", 0))
+        if nivel_m in vistos_marco:
+            raise ValueError(f"Marco duplicado no nível {nivel_m}")
+        vistos_marco.add(nivel_m)
+        _validar_conteudo_marco(
+            marco,
+            ficha=ficha_v2,
+            nivel=nivel,
+            scores_efetivos=scores_efetivos,
+        )
+
+    validar_feat_escolhas_ficha(ficha_v2)
+
     if classe_slug:
-        raca_slug = (ficha_v2.get("raca_slug") or "").strip()
+        slots_exp = calcular_slots_expertise_classe(classe_slug, nivel)
+        if slots_exp > 0 and not _expertise_classe_completa(
+            ficha_v2, classe_slug, nivel
+        ):
+            raise ValueError(f"Escolha {slots_exp} perícia(s) com Expertise de classe")
+        prof_auto = montar_proficiencias_automaticas(
+            classe_slug=classe_slug,
+            raca_slug=raca_slug,
+            antecedente_slug=ficha_v2.get("antecedente_slug"),
+            pericias_classe_escolhidas=ficha_v2.get("pericias_classe_escolhidas") or [],
+            pericia_racial_extra=ficha_v2.get("pericia_racial_extra"),
+            feats=list(ficha_v2.get("feats") or []),
+            feat_escolhas=ficha_v2.get("feat_escolhas"),
+        )
+        prof_final = aplicar_pericias_override(
+            prof_auto, ficha_v2.get("pericias_override")
+        )
+        validar_expertise_pericias_classe(
+            ficha_v2.get("expertise_pericias") or [],
+            classe_slug=classe_slug,
+            nivel=nivel,
+            proficientes=prof_final,
+        )
+
         feats = list(ficha_v2.get("feats") or [])
         calcular_hp_max_total(
             classe_slug,
