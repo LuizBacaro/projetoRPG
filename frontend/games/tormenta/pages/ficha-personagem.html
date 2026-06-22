@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260614subirnivel" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260614grimorioPolish" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260621header" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260621header" />
 </head>
 <body class="tormenta-ficha-body">
 <div class="tormenta-ficha-wrap ficha-layout-dnd">
@@ -21,13 +21,18 @@
                     <a class="tormenta-btn tormenta-btn--primary" href="dashboard.html" style="color:#fff;text-decoration:none;">← Lista</a>
                 </div>
                 <div class="t20-ficha-header__centro ficha-titulo">
-                    <h1 class="t20-ficha-h1 ficha-titulo-texto">
-                        <span id="t20FichaNomeHero">Ficha de personagem</span><span class="t20-ficha-h1__sub"> · Tormenta 20</span>
-                    </h1>
-                    <div class="t20-ficha-meta-tags ficha-header-identity" aria-live="polite">
-                        <span class="t20-ficha-tag t20-ficha-tag--raca" id="t20TagRaca">Raça: —</span>
-                        <span class="t20-ficha-tag t20-ficha-tag--classe" id="t20TagClasse">Classe: —</span>
-                        <span class="t20-ficha-tag"><span class="t20-ficha-nivel-lbl">Nív.</span> <strong id="t20TagNivel">—</strong></span>
+                    <div class="t20-ficha-header__titulo-wrap">
+                        <h1 class="t20-ficha-h1 ficha-titulo-texto">
+                            <span id="t20FichaNomeHero" class="t20-ficha-h1__nome">Ficha de personagem</span>
+                            <span class="t20-ficha-h1__sub" aria-hidden="true">Tormenta 20</span>
+                        </h1>
+                    </div>
+                    <div class="t20-ficha-header__meta-principal">
+                        <div class="t20-ficha-meta-tags ficha-header-identity" aria-live="polite">
+                            <span class="t20-ficha-tag t20-ficha-tag--raca" id="t20TagRaca">Raça: —</span>
+                            <span class="t20-ficha-tag t20-ficha-tag--classe" id="t20TagClasse">Classe: —</span>
+                            <span class="t20-ficha-tag t20-ficha-tag--nivel"><span class="t20-ficha-nivel-lbl">Nív.</span> <strong id="t20TagNivel">—</strong></span>
+                        </div>
                         <button type="button" class="tormenta-btn tormenta-btn--primary t20-btn-editar-ficha" id="btnT20EditarFicha">Editar ficha</button>
                     </div>
                     <div class="t20-ficha-meta-tags t20-ficha-meta-tags--sec ficha-meta-secundaria" aria-live="polite">
@@ -388,6 +393,26 @@
                 </div>
             </div>
         </footer>
+
+        <dialog id="t20ModalPericiaDc" class="t20-ficha-dialog t20-dialog-pericia-dc">
+            <div class="t20-ficha-dialog__panel">
+                <div class="t20-ficha-dialog__head">
+                    <h2 class="t20-ficha-dialog__titulo" id="t20PericiaDcTitulo">Teste de perícia</h2>
+                    <button type="button" class="ficha-modal-close" id="t20PericiaDcFechar" aria-label="Fechar">✕</button>
+                </div>
+                <div class="t20-ficha-dialog__body">
+                    <p class="t20-pericia-dc-hint" id="t20PericiaDcHint">Informe a Classe de Dificuldade (CD) do teste.</p>
+                    <label class="ficha-modal-field t20-pericia-dc-field" for="t20PericiaDcInput">
+                        <span id="t20PericiaDcLabel">CD (padrão 15)</span>
+                        <input id="t20PericiaDcInput" type="number" min="1" max="99" step="1" value="15" inputmode="numeric" />
+                    </label>
+                </div>
+                <div class="t20-ficha-dialog__foot">
+                    <button type="button" class="ficha-btn-cancelar" id="t20PericiaDcCancelar">Cancelar</button>
+                    <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20PericiaDcRolar">🎲 Rolar teste</button>
+                </div>
+            </div>
+        </dialog>
 
         <div id="t20ModalDinheiro" class="ficha-modal-overlay" style="display: none;">
             <div class="ficha-modal-box ficha-modal-box-curto">
@@ -1176,7 +1201,7 @@
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260614"></script>
-<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260621"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260614"></script>
 <script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614subirnivel"></script>
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260614"></script>
@@ -1765,7 +1790,7 @@
         if (tagN) tagN.textContent = nv !== '' ? String(nv) : '—';
         const nome = (q('f_nome') && q('f_nome').value.trim()) || '';
         if (nomeHero) nomeHero.textContent = nome || 'Ficha de personagem';
-        if (h1Sub) h1Sub.style.display = 'inline';
+        if (h1Sub) h1Sub.style.display = '';
 
         const mapTipo = { jogador: 'Jogador', npc: 'NPC', monstro: 'Monstro' };
         const tipoEl = q('f_tipo');

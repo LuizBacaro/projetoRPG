@@ -642,6 +642,35 @@
 .t20-ficha-header__centro {
     text-align: center;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.15rem 0.35rem 0.25rem;
+}
+
+.t20-ficha-header__titulo-wrap {
+    width: 100%;
+    max-width: 36rem;
+    padding: 0.35rem 0.65rem 0.4rem;
+    border-radius: 8px;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 252, 245, 0.92) 0%,
+        rgba(237, 228, 214, 0.78) 100%
+    );
+    border: 1px solid rgba(80, 40, 25, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.t20-ficha-header__meta-principal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem 0.55rem;
+    width: 100%;
+    max-width: 42rem;
 }
 
 .t20-ficha-header__dir {
@@ -701,17 +730,51 @@
 }
 
 .t20-ficha-h1 {
-    margin: 0 0 0.35rem;
+    margin: 0;
     font-family: var(--t20-font-medieval, Georgia, serif);
     font-size: 1.15rem;
     font-weight: 800;
-    color: var(--t20-ink);
     letter-spacing: 0.04em;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    align-items: baseline;
-    gap: 0.15rem 0.35rem;
+    gap: 0.12rem;
+    line-height: 1.2;
+}
+
+.t20-ficha-h1__nome {
+    display: block;
+    font-size: clamp(1.15rem, 2.8vw, 1.45rem);
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    color: #2a1208;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.t20-ficha-h1__sub {
+    display: block;
+    font-weight: 700;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #5a2818;
+    opacity: 1;
+    background: linear-gradient(90deg, #3d1810 0%, #6e0000 42%, #8b4513 68%, #4a2418 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* fallback legível se gradient clip falhar */
+    paint-order: stroke fill;
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+    .t20-ficha-h1__sub {
+        color: #5a2818;
+        -webkit-text-fill-color: #5a2818;
+    }
 }
 
 .t20-ficha-meta-tags {
@@ -741,6 +804,11 @@
 
 .t20-ficha-tag--classe {
     border-left: 3px solid #1a4a7a;
+}
+
+.t20-ficha-tag--nivel {
+    border-left: 3px solid var(--t20-red-bright);
+    background: linear-gradient(180deg, #faf3e8, #efe0cc);
 }
 
 .t20-ficha-nivel-lbl {
@@ -1087,17 +1155,13 @@
     text-align: center;
 }
 
-.t20-ficha-h1__sub {
-    font-weight: 650;
-    font-size: 0.62em;
-    letter-spacing: 0.06em;
-    opacity: 0.88;
-}
-
 .t20-ficha-meta-tags--sec {
-    margin-top: 0.35rem;
+    margin-top: 0.15rem;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 42rem;
+    padding: 0.2rem 0.35rem 0;
+    border-top: 1px dashed rgba(80, 40, 25, 0.2);
 }
 
 .t20-ficha-meta-tags--sec .t20-ficha-tag {
@@ -1143,8 +1207,76 @@
 }
 
 .t20-btn-editar-ficha {
-    margin-left: 0.35rem;
-    vertical-align: middle;
+    flex: 0 0 auto;
+    margin-left: 0;
+    white-space: nowrap;
+    font-size: 0.78rem;
+    padding: 0.35rem 0.75rem;
+    box-shadow: 0 1px 3px rgba(30, 18, 12, 0.12);
+}
+
+@media (max-width: 520px) {
+    .t20-ficha-header__meta-principal {
+        flex-direction: column;
+    }
+
+    .t20-btn-editar-ficha {
+        width: 100%;
+        max-width: 14rem;
+    }
+}
+
+/* Modal CD — teste de perícia (rolador 🎲) */
+.t20-dialog-pericia-dc {
+    max-width: min(96vw, 22rem);
+}
+
+.t20-dialog-pericia-dc .t20-ficha-dialog__titulo {
+    font-family: var(--t20-font-medieval, Georgia, serif);
+    color: var(--t20-red-deep);
+    font-size: 1rem;
+}
+
+.t20-pericia-dc-hint {
+    margin: 0 0 0.65rem;
+    font-size: 0.82rem;
+    color: var(--t20-muted);
+    line-height: 1.4;
+}
+
+.t20-dialog-pericia-dc .ficha-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+}
+
+.t20-dialog-pericia-dc .ficha-modal-field span {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--t20-ink);
+}
+
+.t20-dialog-pericia-dc .ficha-modal-field input {
+    width: 100%;
+    max-width: 7rem;
+    padding: 0.45rem 0.55rem;
+    border: 2px solid var(--t20-input-border);
+    border-radius: 6px;
+    background: var(--t20-input);
+    color: var(--t20-ink);
+    font-family: inherit;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: center;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.t20-dialog-pericia-dc .ficha-modal-field input:focus {
+    outline: none;
+    border-color: var(--t20-red-bright);
+    box-shadow: 0 0 0 3px rgba(163, 22, 22, 0.18);
 }
 
 .t20-attrs-foto-split {

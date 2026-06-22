@@ -163,9 +163,12 @@
 
 .ficha-header-identity {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.2rem;
+    justify-content: center;
+    gap: 0.35rem;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 /* Tags e botão editar sobre fundo escuro do header */
