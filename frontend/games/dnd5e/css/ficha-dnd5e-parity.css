@@ -1039,6 +1039,33 @@
     opacity: 0.75;
 }
 
+.ficha-dnd5e-pericia-racial-sec {
+    margin: 0 0 0.75rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 8px;
+    background: rgba(201, 168, 76, 0.1);
+    border: 1px solid rgba(201, 168, 76, 0.28);
+}
+
+.ficha-dnd5e-pericia-racial-hint {
+    margin: 0.15rem 0 0.35rem;
+    font-size: 0.78rem;
+    opacity: 0.82;
+    line-height: 1.35;
+}
+
+.ficha-dnd5e-pericia-racial-select {
+    width: 100%;
+    margin-top: 0.25rem;
+}
+
+.ficha-dnd5e-pericias-classe-titulo {
+    margin: 0.85rem 0 0.25rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    opacity: 0.92;
+}
+
 .dnd5e-prec-progressao-hint {
     margin: 0 0 0.65rem;
     font-size: 0.82rem;

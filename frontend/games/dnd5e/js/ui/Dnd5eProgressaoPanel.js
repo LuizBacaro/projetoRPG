@@ -12,6 +12,17 @@ const ATTR_LABELS_PT = {
 
 const PENDENCIAS_UTIL = typeof Dnd5ePendenciasUtil !== 'undefined' ? Dnd5ePendenciasUtil : null;
 
+const EXPERTISE_SLOTS_CLASSE = {
+    ladino: [
+        [1, 2],
+        [6, 2],
+    ],
+    bardo: [
+        [3, 2],
+        [10, 2],
+    ],
+};
+
 function formatDistribuicaoAsi(distribuicao) {
     const partes = Object.entries(distribuicao || {}).map(
         ([k, v]) => `${ATTR_LABELS_PT[k] || k} +${v}`
@@ -28,6 +39,11 @@ class Dnd5eProgressaoPanel {
         this.getNivel = options.getNivel || (() => 1);
         this.getXp = options.getXp || (() => 0);
         this.getRacaSlug = options.getRacaSlug || (() => '');
+        this.getClasseSlug = options.getClasseSlug || (() => '');
+        this.getExpertisePericias = options.getExpertisePericias || (() => []);
+        this.getExpertiseSlotsClasse = options.getExpertiseSlotsClasse || null;
+        this.getProgressao = options.getProgressao || (() => this._progCache || {});
+        this.getNivelSalvo = options.getNivelSalvo || (() => this.getNivel());
         this.xpPrecisaSalvar = options.xpPrecisaSalvar || (() => false);
         this.onFichaAtualizada = options.onFichaAtualizada || (() => {});
         this.catalogoFeats = [];
@@ -170,12 +186,114 @@ class Dnd5eProgressaoPanel {
         this._renderFeatEscolhasSection(f.feats || [], this._featEscolhasLocal);
     }
 
+    _nivelEfetivo() {
+        let n = Math.max(1, Math.min(20, parseInt(this.getNivel(), 10) || 1));
+        if (typeof Dnd5eXpUtil !== 'undefined') {
+            n = Math.max(n, Dnd5eXpUtil.nivelPorXp(this.getXp()));
+        }
+        return n;
+    }
+
+    _nivelSubiuPendente() {
+        const atual = this._nivelEfetivo();
+        const salvo = Math.max(1, parseInt(this.getNivelSalvo(), 10) || 1);
+        return atual > salvo;
+    }
+
+    _dadosProgressaoLocal() {
+        const prog = this.getProgressao?.() || this._progCache || {};
+        return {
+            hp_rolls: prog.hp_rolls || [],
+            marcos: prog.marcos || [],
+        };
+    }
+
+    _slotsExpertiseClasse(classeSlug, nivel) {
+        if (typeof this.getExpertiseSlotsClasse === 'function') {
+            const slots = this.getExpertiseSlotsClasse();
+            if (Number.isFinite(slots)) return Math.max(0, slots);
+        }
+        const key = (classeSlug || '').toLowerCase();
+        let total = 0;
+        (EXPERTISE_SLOTS_CLASSE[key] || []).forEach(([min, qtd]) => {
+            if (nivel >= min) total += qtd;
+        });
+        return total;
+    }
+
+    _pendenciasProgressaoLocal() {
+        const nivel = this._nivelEfetivo();
+        const raca = (this.getRacaSlug() || '').toLowerCase();
+        const classe = (this.getClasseSlug() || '').toLowerCase();
+        const { hp_rolls: hpRolls, marcos } = this._dadosProgressaoLocal();
+        const hpNiveis = new Set(
+            hpRolls.map((r) => parseInt(r.nivel, 10)).filter((n) => Number.isFinite(n))
+        );
+        const marcoNiveis = new Set(
+            marcos.map((m) => parseInt(m.nivel, 10)).filter((n) => Number.isFinite(n))
+        );
+        const out = [];
+
+        for (let n = 1; n <= nivel; n += 1) {
+            if (!hpNiveis.has(n)) out.push(`hp_nivel_${n}`);
+        }
+
+        if (raca === 'humano' && nivel >= 1 && !marcoNiveis.has(1)) {
+            out.push('feat_nivel_1');
+        }
+
+        this.niveisFeat.forEach((n) => {
+            if (n <= nivel && !marcoNiveis.has(n)) {
+                out.push(`marco_nivel_${n}`);
+            }
+        });
+
+        out.push(...this._pendenciasFeatEscolhasLocal());
+
+        const slotsExp = this._slotsExpertiseClasse(classe, nivel);
+        const expertise = (this.getExpertisePericias() || []).filter(Boolean);
+        if (slotsExp > 0 && expertise.length < slotsExp) {
+            out.push('expertise_classe');
+        }
+
+        return out;
+    }
+
+    _pendenciasFeatEscolhasLocal() {
+        const feats = (this._featsCache || []).map((f) => String(f).toLowerCase());
+        const esc = this._featEscolhasLocal || {};
+        const out = [];
+        if (feats.includes('resilient') && !esc.resilient) {
+            out.push('feat_escolha_resilient');
+        }
+        if (feats.includes('magic-initiate') && !esc.magic_initiate) {
+            out.push('feat_escolha_magic_initiate');
+        }
+        if (feats.includes('skilled')) {
+            const sl = esc.skilled_pericias || [];
+            if (sl.length !== 3 || new Set(sl).size !== 3) {
+                out.push('feat_escolha_skilled');
+            }
+        }
+        if (feats.includes('skill-expert')) {
+            if (!esc.skill_expert_nova || !esc.skill_expert_expertise) {
+                out.push('feat_escolha_skill_expert');
+            }
+        }
+        return out;
+    }
+
     _pendenciasAcao(pendencias) {
         const merged = this._pendenciasMescladas(pendencias);
         return merged.filter((p) => {
             const cat = PENDENCIAS_UTIL ? PENDENCIAS_UTIL.categoria(p) : '';
             return cat === 'hp' || cat === 'marco' || cat === 'pericia';
         });
+    }
+
+    _deveExibirProgressao(pendenciasServidor) {
+        if (this._pendenciasAcao(pendenciasServidor).length > 0) return true;
+        return this._nivelSubiuPendente();
     }
 
     _htmlHpRolls(rolls) {
@@ -291,18 +409,26 @@ class Dnd5eProgressaoPanel {
 
     _atualizarModoProgressao(pendenciasServidor) {
         const acao = this._pendenciasAcao(pendenciasServidor);
-        const temAcao = acao.length > 0;
+        const nivelSubiu = this._nivelSubiuPendente();
+        const exibir = acao.length > 0 || nivelSubiu;
         const edit = this.el('f5e_progressao_edit');
         const info = this.el('f5e_progressao_info');
         const secao = this.el('f5e_progressao_sec');
         const tituloPendencias = edit?.querySelector('.ficha-dnd5e-pendencias-titulo');
 
-        if (edit) edit.hidden = !temAcao;
+        if (edit) edit.hidden = !exibir;
         if (info) info.hidden = true;
-        if (tituloPendencias) tituloPendencias.hidden = !temAcao;
+        if (tituloPendencias) tituloPendencias.hidden = !acao.length;
         if (secao) {
-            secao.hidden = !temAcao;
-            secao.classList.toggle('has-pendencias', temAcao);
+            secao.hidden = !exibir;
+            secao.classList.toggle('has-pendencias', exibir);
+        }
+        if (nivelSubiu && this.xpPrecisaSalvar()) {
+            this._setStatus(
+                `Nível ${this._nivelEfetivo()} — salve a ficha e registre PV/marcos do novo nível.`
+            );
+        } else if (!exibir) {
+            this._setStatus('');
         }
     }
 
@@ -320,8 +446,31 @@ class Dnd5eProgressaoPanel {
     }
 
     _pendenciasMescladas(pendenciasServidor) {
-        if (!PENDENCIAS_UTIL) return pendenciasServidor || [];
-        return PENDENCIAS_UTIL.mergePendencias(pendenciasServidor, this._ctxPendencias());
+        const localProg = this._pendenciasProgressaoLocal();
+        let base = pendenciasServidor || [];
+        if (PENDENCIAS_UTIL) {
+            base = PENDENCIAS_UTIL.mergePendencias(pendenciasServidor, this._ctxPendencias());
+        }
+        const seen = new Set(base);
+        localProg.forEach((p) => {
+            if (!seen.has(p)) {
+                base.push(p);
+                seen.add(p);
+            }
+        });
+        if (PENDENCIAS_UTIL) {
+            const ordem = { xp: 0, hp: 1, marco: 2, pericia: 3, outro: 4 };
+            base = base.sort((a, b) => {
+                const ca = ordem[PENDENCIAS_UTIL.categoria(a)] ?? 9;
+                const cb = ordem[PENDENCIAS_UTIL.categoria(b)] ?? 9;
+                if (ca !== cb) return ca - cb;
+                return PENDENCIAS_UTIL.traduzir(a).localeCompare(
+                    PENDENCIAS_UTIL.traduzir(b),
+                    'pt-BR'
+                );
+            });
+        }
+        return base;
     }
 
     _bind() {
@@ -551,23 +700,41 @@ class Dnd5eProgressaoPanel {
         const alerta = this.el('f5e_pendencias_alerta');
         const badge = this.el('f5e_pendencias_badge');
         const acao = this._pendenciasAcao(pendenciasServidor);
+        const nivelSubiu = this._nivelSubiuPendente();
 
         this._atualizarModoProgressao(pendenciasServidor);
 
+        const hpPendentes = acao
+            .filter((p) => String(p).startsWith('hp_nivel_'))
+            .map((p) => (PENDENCIAS_UTIL ? PENDENCIAS_UTIL.nivelDePendencia(p) : null))
+            .filter((n) => Number.isFinite(n))
+            .sort((a, b) => a - b);
+        this._preencherNivelHpPendente(hpPendentes);
+
+        const badgeQtd = acao.length + (nivelSubiu && !acao.length ? 1 : 0);
         if (badge) {
-            badge.textContent = acao.length ? String(acao.length) : '';
-            badge.hidden = !acao.length;
+            badge.textContent = badgeQtd ? String(badgeQtd) : '';
+            badge.hidden = !badgeQtd;
         }
         if (alerta) {
-            if (!acao.length) {
+            if (!acao.length && !nivelSubiu) {
                 alerta.hidden = true;
                 alerta.innerHTML = '';
             } else {
                 alerta.hidden = false;
-                const resumo = PENDENCIAS_UTIL
-                    ? PENDENCIAS_UTIL.resumoAlerta(acao)
-                    : `${acao.length} item(ns)`;
-                alerta.innerHTML = `<strong>Progressão incompleta</strong> — ${resumo}. Clique em um item para ir ao campo.`;
+                const partes = [];
+                if (nivelSubiu) {
+                    partes.push(
+                        `nível ${this._nivelEfetivo()} (salve a ficha${acao.length ? ' e complete' : ''})`
+                    );
+                }
+                if (acao.length) {
+                    const resumo = PENDENCIAS_UTIL
+                        ? PENDENCIAS_UTIL.resumoAlerta(acao)
+                        : `${acao.length} item(ns)`;
+                    partes.push(resumo);
+                }
+                alerta.innerHTML = `<strong>Progressão incompleta</strong> — ${partes.join(' · ')}. Clique em um item para ir ao campo.`;
             }
         }
         if (!host) return;

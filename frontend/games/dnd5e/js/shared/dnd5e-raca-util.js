@@ -27,6 +27,28 @@ const Dnd5eRacaUtil = {
         return raca.slug === 'tiefling' ? 'Herança infernal' : 'Ancestralidade dracônica';
     },
 
+    temPericiaExtra(raca) {
+        if (!raca) return false;
+        if (
+            Array.isArray(raca.caracteristicas) &&
+            raca.caracteristicas.includes('proficiencia_pericia_extra')
+        ) {
+            return true;
+        }
+        return this.racaExigePericiaExtraPorSlug(raca.slug);
+    },
+
+    racaExigePericiaExtraPorSlug(slug) {
+        const s = (slug || '').trim().toLowerCase();
+        return s === 'humano' || s === 'meio_elfo';
+    },
+
+    precisaSecaoRacaExtra(raca) {
+        return (
+            this.temBonusHabilidadeExtraEscolha(raca) || this.temVarianteEscolha(raca)
+        );
+    },
+
     labelBonusHabilidadeExtra(raca) {
         return raca ? `+1 (${raca.nome})` : '+1 (bônus racial)';
     },

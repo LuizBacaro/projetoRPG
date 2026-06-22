@@ -40,8 +40,12 @@ def ficha_json_para_resposta(raw: Any) -> Dict[str, Any]:
             parsed = json.loads(raw)
         except (TypeError, ValueError):
             return {}
-        return parsed if isinstance(parsed, dict) else {}
-    return raw if isinstance(raw, dict) else {}
+        data = parsed if isinstance(parsed, dict) else {}
+    else:
+        data = raw if isinstance(raw, dict) else {}
+    from app.games.dnd5e.rules.progressao import migrar_ficha_para_v2
+
+    return migrar_ficha_para_v2(data)
 
 
 class Dnd5ePersonagemBase(BaseModel):
