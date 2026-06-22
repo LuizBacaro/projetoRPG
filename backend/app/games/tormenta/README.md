@@ -4,9 +4,10 @@ Stack vertical da ficha do **Módulo Básico** (cadastro digital, CRUD).
 
 ## Regras de atributos (T20)
 
-- **Modificadores** (faixas) e **custos de compra por pontos** (8–18): `app.games.tormenta.rules.atributos_t20` + dados `app/games/tormenta/data/atributos_compra_pontos.json`.
+- **Modificadores** (faixas), **compra por pontos** (8–18, 20 pts) e **rolagem 4d6** (reroll MB): `app.games.tormenta.rules.atributos_t20` + dados `app/games/tormenta/data/atributos_compra_pontos.json`; `ficha_json.metodo_geracao_atributos` (`compra_pontos` | `4d6`).
+- API: `GET /tormenta/regras/atributos`, `POST /tormenta/regras/gerar-atributos`.
 - Testes: `tests/test_tormenta_atributos_t20.py`.
-- A ficha web espelha a mesma lógica em JS — alterações na tabela devem atualizar **JSON + Python + `ficha-personagem.html` (CUSTO_COMPRA_ATRIBUTO / modificadorAtributoT20)**.
+- A ficha web espelha a mesma lógica em JS (`t20-atributos-geracao.js` + dashboard/ficha) — alterações na tabela devem atualizar **JSON + Python + JS**.
 
 ## API
 

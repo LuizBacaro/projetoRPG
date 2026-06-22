@@ -7,8 +7,11 @@ from typing import List, Optional
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.ports import TormentaPersonagemRepositoryProtocol
 from app.games.tormenta.rules.atributos_t20 import (
+    METODO_GERACAO_PADRAO,
     custo_total_compra_seis_atributos,
+    normalizar_metodo_geracao_atributos,
     pontos_iniciais_compra,
+    validar_valores_base_4d6,
 )
 from app.games.tormenta.rules.conjuracao_t20 import (
     classe_conjuracao_mb_registrada,
@@ -38,13 +41,15 @@ class TormentaPersonagemService:
 
     @staticmethod
     def _patch_mexe_compra_pontos(data: dict) -> bool:
-        """True se o PATCH altera atributos ou atributos_compra (validação de criação MB)."""
+        """True se o PATCH altera atributos, método de geração ou atributos_compra."""
         if any(
             k in data for k in ("tipo",) + TormentaPersonagemService._CAMPOS_ATRIBUTO
         ):
             return True
         fj = data.get("ficha_json")
-        return isinstance(fj, dict) and "atributos_compra" in fj
+        if not isinstance(fj, dict):
+            return False
+        return "atributos_compra" in fj or "metodo_geracao_atributos" in fj
 
     @staticmethod
     def _patch_mexe_pericias_mb(data: dict) -> bool:
@@ -199,7 +204,19 @@ class TormentaPersonagemService:
             return cols
 
     @staticmethod
-    def _validar_compra_pontos_t20_jogador(
+    def _metodo_geracao_atributos(ficha_json: Optional[dict]) -> str:
+        if not ficha_json:
+            return METODO_GERACAO_PADRAO
+        raw = ficha_json.get("metodo_geracao_atributos")
+        try:
+            return normalizar_metodo_geracao_atributos(
+                str(raw) if raw is not None else METODO_GERACAO_PADRAO
+            )
+        except ValueError:
+            return METODO_GERACAO_PADRAO
+
+    @staticmethod
+    def _validar_atributos_criacao_jogador(
         tipo: str,
         ficha_json: Optional[dict],
         for_valor: int,
@@ -209,12 +226,20 @@ class TormentaPersonagemService:
         sab_valor: int,
         car_valor: int,
     ) -> None:
-        """Jogador: custo da compra 8–18 deve somar exatamente 20 pontos (MB); nao pode ultrapassar."""
+        """Jogador: valida compra por pontos (20 pts) ou rolagem 4d6 conforme metodo_geracao_atributos."""
         if (tipo or "").lower() != "jogador":
             return
+        metodo = TormentaPersonagemService._metodo_geracao_atributos(ficha_json)
         fv, dv, cv, iv, sv, cav = TormentaPersonagemService._seis_valores_compra_pontos(
             ficha_json, for_valor, des_valor, con_valor, int_valor, sab_valor, car_valor
         )
+        bases = (fv, dv, cv, iv, sv, cav)
+        if metodo == "4d6":
+            try:
+                validar_valores_base_4d6(bases)
+            except ValueError as exc:
+                raise DadosInvalidos(str(exc)) from exc
+            return
         meta = pontos_iniciais_compra()
         total = custo_total_compra_seis_atributos(fv, dv, cv, iv, sv, cav)
         if total is None:
@@ -352,7 +377,7 @@ class TormentaPersonagemService:
         if not nome:
             raise DadosInvalidos("Nome e obrigatorio")
 
-        self._validar_compra_pontos_t20_jogador(
+        self._validar_atributos_criacao_jogador(
             payload.tipo,
             dict(payload.ficha_json or {}),
             payload.for_valor,
@@ -431,7 +456,7 @@ class TormentaPersonagemService:
         if "ficha_json" in data and data["ficha_json"] is not None:
             fj.update(dict(data["ficha_json"] or {}))
         if self._patch_mexe_compra_pontos(data):
-            self._validar_compra_pontos_t20_jogador(
+            self._validar_atributos_criacao_jogador(
                 tipo_final,
                 fj,
                 fv,

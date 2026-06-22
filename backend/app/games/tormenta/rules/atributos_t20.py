@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 import json
+import random
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _COMPRA_JSON = _DATA_DIR / "atributos_compra_pontos.json"
 _PERICIAS_JSON = _DATA_DIR / "pericias_atributo_chave.json"
 
 _ATTR_VALIDOS = frozenset({"for", "des", "con", "int", "sab", "car"})
+CHAVES_ATRIBUTO: Tuple[str, ...] = ("for", "des", "con", "int", "sab", "car")
+METODOS_GERACAO_ATRIBUTOS = frozenset({"compra_pontos", "4d6"})
+METODO_GERACAO_PADRAO = "compra_pontos"
 
 
 def modificador_atributo_t20(valor: int) -> int:
@@ -96,6 +100,78 @@ def lista_custos_compra() -> List[Dict[str, int]]:
     """Cópia somente leitura das linhas {valor, custo} para API futura."""
     data = _carregar_compra_pontos()
     return [dict(x) for x in data.get("custos", [])]
+
+
+def _rolar_um_valor_4d6(rng: random.Random) -> int:
+    """4d6 descartando o menor dado (MB)."""
+    dados = sorted(rng.randint(1, 6) for _ in range(4))
+    return int(sum(dados[1:]))
+
+
+def soma_modificadores_valores(valores: Sequence[int]) -> int:
+    return sum(modificador_atributo_t20(int(v)) for v in valores)
+
+
+def qualidade_geracao_4d6(valores: Sequence[int]) -> bool:
+    """MB: soma dos modificadores >= +4 ou pelo menos um valor >= 14."""
+    vals = [int(v) for v in valores]
+    if len(vals) != 6:
+        return False
+    if any(v < 3 or v > 18 for v in vals):
+        return False
+    if any(v >= 14 for v in vals):
+        return True
+    return soma_modificadores_valores(vals) >= 4
+
+
+def gerar_seis_valores_4d6(
+    *,
+    seed: Optional[int] = None,
+    exigir_qualidade_mb: bool = True,
+    max_tentativas: int = 100,
+) -> List[int]:
+    """Rola seis atributos 4d6; repete até cumprir a regra de reroll do MB (se exigida)."""
+    rng = random.Random(seed)
+    ultima: List[int] = []
+    for _ in range(max(1, int(max_tentativas))):
+        ultima = [_rolar_um_valor_4d6(rng) for _ in range(6)]
+        if not exigir_qualidade_mb or qualidade_geracao_4d6(ultima):
+            return ultima
+    return ultima
+
+
+def valores_4d6_para_mapa(valores: Sequence[int]) -> Dict[str, int]:
+    """Associa os seis números rolados à ordem canônica FOR..CAR (distribuição inicial na UI)."""
+    vals = [int(v) for v in valores]
+    if len(vals) != 6:
+        raise ValueError("Devem ser exatamente seis valores (4d6).")
+    return {chave: vals[i] for i, chave in enumerate(CHAVES_ATRIBUTO)}
+
+
+def normalizar_metodo_geracao_atributos(metodo: Optional[str]) -> str:
+    m = (metodo or METODO_GERACAO_PADRAO).strip().lower()
+    if m not in METODOS_GERACAO_ATRIBUTOS:
+        raise ValueError(
+            f"Método de geração de atributos inválido: {metodo!r} "
+            f"(permitido: {', '.join(sorted(METODOS_GERACAO_ATRIBUTOS))})."
+        )
+    return m
+
+
+def validar_valores_base_4d6(valores: Sequence[int]) -> None:
+    vals = [int(v) for v in valores]
+    if len(vals) != 6:
+        raise ValueError("Devem ser exatamente seis valores-base (4d6).")
+    for v in vals:
+        if v < 3 or v > 18:
+            raise ValueError(
+                f"Valor-base {v} fora do intervalo 3–18 permitido pela rolagem 4d6 do MB."
+            )
+    if not qualidade_geracao_4d6(vals):
+        raise ValueError(
+            "Rolagem 4d6 inválida: a soma dos modificadores deve ser pelo menos +4 "
+            "ou pelo menos um valor-base deve ser 14 ou mais (MB)."
+        )
 
 
 @lru_cache(maxsize=1)

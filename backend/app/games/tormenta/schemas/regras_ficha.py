@@ -33,6 +33,36 @@ class TormentaRegrasAtributosResponse(BaseModel):
     pontos_compra_iniciais: int = Field(default=20, ge=0, le=999)
     custos: List[TormentaCustoAtributoItem]
     pericias: List[TormentaPericiaAtributoItem]
+    metodos_geracao: List[str] = Field(
+        default_factory=lambda: ["compra_pontos", "4d6"],
+        description="Métodos MB suportados na criação de personagem jogador.",
+    )
+
+
+class TormentaGerarAtributosRequest(BaseModel):
+    metodo: Literal["compra_pontos", "4d6"] = Field(
+        default="4d6",
+        description="compra_pontos devolve base 10 em cada; 4d6 rola seis valores 3–18.",
+    )
+    seed: Optional[int] = Field(
+        default=None,
+        description="Semente opcional para reproduzir a mesma rolagem (testes/depuração).",
+    )
+
+
+class TormentaGerarAtributosResponse(BaseModel):
+    metodo: Literal["compra_pontos", "4d6"]
+    valores: Dict[str, int] = Field(
+        description="Valores-base por atributo (for, des, con, int, sab, car), sem bônus racial.",
+    )
+    qualidade_4d6_ok: Optional[bool] = Field(
+        default=None,
+        description="Para 4d6: True se cumpre reroll MB (+4 mods ou algum 14+).",
+    )
+    soma_modificadores: Optional[int] = Field(
+        default=None,
+        description="Soma dos modificadores T20 dos seis valores-base.",
+    )
 
 
 class TormentaRacaMbItem(BaseModel):
