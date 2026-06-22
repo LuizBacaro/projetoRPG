@@ -427,6 +427,56 @@ def test_criar_jogador_compra_menos_de_20_rejeita(tormenta_personagens_db):
     assert "20" in d and ("obrigatorio" in d or "gastar" in d or "gasto" in d)
 
 
+def test_criar_jogador_4d6_valido(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    bases = {"for": 14, "des": 12, "con": 11, "int": 10, "sab": 9, "car": 8}
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "nome": "Rolador",
+            "tipo": "jogador",
+            "for_valor": bases["for"],
+            "des_valor": bases["des"],
+            "con_valor": bases["con"],
+            "int_valor": bases["int"],
+            "sab_valor": bases["sab"],
+            "car_valor": bases["car"],
+            "ficha_json": {
+                "metodo_geracao_atributos": "4d6",
+                "atributos_compra": bases,
+            },
+        },
+    )
+    assert r.status_code == 201
+
+
+def test_criar_jogador_4d6_qualidade_invalida_rejeita(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    bases = {"for": 10, "des": 10, "con": 10, "int": 10, "sab": 10, "car": 10}
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "nome": "Fraco",
+            "tipo": "jogador",
+            **{
+                f"{k}_valor": v
+                for k, v in zip(
+                    ["for", "des", "con", "int", "sab", "car"], bases.values()
+                )
+            },
+            "ficha_json": {
+                "metodo_geracao_atributos": "4d6",
+                "atributos_compra": bases,
+            },
+        },
+    )
+    assert r.status_code == 422
+    d = r.json().get("detail", "").lower()
+    assert "4d6" in d or "modificador" in d or "14" in d
+
+
 def test_criar_monstro_dez_em_todos_ok(tormenta_personagens_db):
     SessionLocal, _, _, u_mestre = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u_mestre))

@@ -2,12 +2,18 @@
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from app.games.tormenta.rules.atributos_t20 import (
+    CHAVES_ATRIBUTO,
+    METODOS_GERACAO_ATRIBUTOS,
+    gerar_seis_valores_4d6,
     lista_custos_compra,
     lista_pericias_com_atributo,
     pontos_iniciais_compra,
+    qualidade_geracao_4d6,
+    soma_modificadores_valores,
+    valores_4d6_para_mapa,
 )
 from app.games.tormenta.rules.catalogo_armaduras_t20 import (
     filtrar_armaduras_protecao_mb,
@@ -63,6 +69,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaConjuracaoPreviewResponse,
     TormentaCustoAtributoItem,
     TormentaDivindadeMbOpcao,
+    TormentaGerarAtributosRequest,
+    TormentaGerarAtributosResponse,
     TormentaIdiomaTabelaItem,
     TormentaMagiaMbCatalogoItem,
     TormentaMagiaMbCatalogoPaginaResponse,
@@ -109,6 +117,40 @@ def obter_regras_atributos(
         pontos_compra_iniciais=pontos_iniciais_compra(),
         custos=custos,
         pericias=pericias,
+        metodos_geracao=sorted(METODOS_GERACAO_ATRIBUTOS),
+    )
+
+
+@router.post(
+    "/gerar-atributos",
+    response_model=TormentaGerarAtributosResponse,
+    summary="Gera valores-base de atributos (compra por pontos ou 4d6 MB)",
+)
+def gerar_atributos(
+    payload: TormentaGerarAtributosRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaGerarAtributosResponse:
+    metodo = payload.metodo
+    if metodo == "compra_pontos":
+        valores = {chave: 10 for chave in CHAVES_ATRIBUTO}
+        soma = soma_modificadores_valores(valores.values())
+        return TormentaGerarAtributosResponse(
+            metodo=metodo,
+            valores=valores,
+            qualidade_4d6_ok=None,
+            soma_modificadores=soma,
+        )
+    try:
+        rolados = gerar_seis_valores_4d6(seed=payload.seed, exigir_qualidade_mb=True)
+        valores = valores_4d6_para_mapa(rolados)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    soma = soma_modificadores_valores(rolados)
+    return TormentaGerarAtributosResponse(
+        metodo=metodo,
+        valores=valores,
+        qualidade_4d6_ok=qualidade_geracao_4d6(rolados),
+        soma_modificadores=soma,
     )
 
 

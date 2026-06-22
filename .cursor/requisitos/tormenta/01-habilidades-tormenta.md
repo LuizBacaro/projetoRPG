@@ -16,8 +16,10 @@ Seis atributos (FOR, DES, CON, INT, SAB, CAR) com modificadores por **faixas T20
 |------|--------|
 | 6 atributos + modificadores T20 | **Feito** |
 | Compra 20 pts + validação API/UI | **Feito** |
-| Métodos aleatórios (4d6, 3d6, heroico…) | **Não feito** (fora do MB padrão da ficha) |
-| Campo `generationMethod` | **Não aplicável** ao T20 MB |
+| Rolagem 4d6 (descarta menor) + reroll MB | **Feito** (dashboard + ficha + API `POST /tormenta/regras/gerar-atributos`) |
+| Raça na criação: base 10 + ajustes raciais nos finais | **Feito** |
+| Métodos aleatórios extras (3d6, heroico…) | **Não feito** |
+| Campo `metodo_geracao_atributos` em `ficha_json` | **Feito** (`compra_pontos` \| `4d6`) |
 
 ## Referência
 MB Cap. 1 — Habilidades; contrato `docs/tormenta/05-contrato-dados-ficha-json-e-api.md`.

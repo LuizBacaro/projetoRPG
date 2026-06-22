@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260614arenaRoll" />
@@ -593,8 +596,22 @@
                 </div>
             </div>
             <p class="t20-dash-hint" id="hintAttrsJogador" style="display:none">
-                Tipo jogador: os seis números são os <strong>valores finais</strong> (como na ficha). A compra por pontos usa a base = final − bônus racial MB; cada base entre <strong>8</strong> e <strong>18</strong> e a soma dos custos na tabela MB deve ser <strong>exatamente 20</strong> pontos.
+                Tipo jogador: os seis números são os <strong>valores finais</strong> (base + bônus racial MB).
+                <strong>Compra por pontos:</strong> base 8–18, soma dos custos = <strong>20</strong>.
+                <strong>4d6:</strong> role seis valores 3–18 (descarta o menor); reroll MB se soma de mods &lt; +4 e nenhum 14+.
             </p>
+            <div class="t20-dash-field t20-dash-field--full" id="cadWrapMetodoGeracao" style="display:none">
+                <label for="cadMetodoGeracao">Geração de atributos (MB)</label>
+                <select id="cadMetodoGeracao" class="t20-input">
+                    <option value="compra_pontos">Compra por pontos (20 pts)</option>
+                    <option value="4d6">Rolagem 4d6 (descarta o menor)</option>
+                </select>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.45rem;align-items:center">
+                    <button type="button" class="tormenta-btn" id="cadBtnRolar4d6" style="display:none">Rolar 4d6</button>
+                    <button type="button" class="tormenta-btn" id="cadBtnResetCompra" style="display:none">Resetar base 10</button>
+                    <span class="t20-dash-hint" id="cadHintMetodoGeracao" style="margin:0"></span>
+                </div>
+            </div>
             <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0.75rem 0 0;padding:0.65rem">
                 <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Atributos</legend>
                 <div class="t20-dash-attrs6">
@@ -642,7 +659,8 @@
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
 <script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260511conjMb"></script>
+<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260621attr"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260621attr"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -659,6 +677,8 @@
     let CLASSES_MB = [];
     const ATTR_KEYS_DASH = ['for', 'des', 'con', 'int', 'sab', 'car'];
     const CAD_CAMPO_ID = { for: 'cadFor', des: 'cadDes', con: 'cadCon', int: 'cadInt', sab: 'cadSab', car: 'cadCar' };
+    let cadBasesAtributos = null;
+    let cadMetodoGeracao = 'compra_pontos';
     let cadFotoPreviewObjectUrl = null;
 
     function cadLimparFotoDash() {
@@ -824,16 +844,99 @@
         if (keys.includes(cur)) el.value = cur;
     }
 
+    function getMetodoGeracaoDash() {
+        const el = document.getElementById('cadMetodoGeracao');
+        const v = (el && el.value) || cadMetodoGeracao || 'compra_pontos';
+        return v === '4d6' ? '4d6' : 'compra_pontos';
+    }
+
+    function aplicarFinaisDeBasesDash(bases) {
+        const AG = window.T20AtributosGeracao;
+        if (!AG) return;
+        AG.aplicarBasesNosCampos(bases, CAD_CAMPO_ID, racialDeltasMapDash());
+    }
+
+    function atualizarHintMetodoGeracaoDash() {
+        const hint = document.getElementById('cadHintMetodoGeracao');
+        const tipoCad = (document.getElementById('cadTipo') && document.getElementById('cadTipo').value) || '';
+        if (!hint || tipoCad !== 'jogador') return;
+        const met = getMetodoGeracaoDash();
+        if (met === '4d6') {
+            const bases = atributosCompraDash();
+            const vals = ATTR_KEYS_DASH.map((k) => bases[k]);
+            const AG = window.T20AtributosGeracao;
+            const ok = AG && AG.qualidadeGeracao4d6(vals);
+            const soma = AG ? AG.somaModificadoresValores(vals) : 0;
+            hint.textContent = ok
+                ? `4d6 OK — soma dos modificadores (base): ${soma >= 0 ? '+' : ''}${soma}. Distribua nos atributos se quiser trocar a ordem.`
+                : `4d6: role novamente ou ajuste — precisa +4 de mods totais ou algum base 14+ (atual: ${soma >= 0 ? '+' : ''}${soma}).`;
+        } else {
+            const bases = atributosCompraDash();
+            const total = custoTotalSeis(bases.for, bases.des, bases.con, bases.int, bases.sab, bases.car);
+            if (total === null) {
+                hint.textContent = 'Compra: bases fora de 8–18 na tabela MB.';
+            } else if (total === pontosIniciaisCompra) {
+                hint.textContent = `Compra por pontos: ${total} / ${pontosIniciaisCompra} pts (OK).`;
+            } else {
+                hint.textContent = `Compra por pontos: ${total} / ${pontosIniciaisCompra} pts.`;
+            }
+        }
+    }
+
+    function atualizarUiMetodoGeracaoDash() {
+        const tipoCad = (document.getElementById('cadTipo') && document.getElementById('cadTipo').value) || '';
+        const wrap = document.getElementById('cadWrapMetodoGeracao');
+        const btn4 = document.getElementById('cadBtnRolar4d6');
+        const btnR = document.getElementById('cadBtnResetCompra');
+        const met = getMetodoGeracaoDash();
+        if (wrap) wrap.style.display = tipoCad === 'jogador' ? '' : 'none';
+        if (btn4) btn4.style.display = tipoCad === 'jogador' && met === '4d6' ? '' : 'none';
+        if (btnR) btnR.style.display = tipoCad === 'jogador' && met === 'compra_pontos' ? '' : 'none';
+        atualizarHintMetodoGeracaoDash();
+    }
+
+    async function rolar4d6Dash() {
+        const AG = window.T20AtributosGeracao;
+        if (!AG) return;
+        try {
+            const rs = new TormentaRegrasService();
+            const data = await rs.gerarAtributos({ metodo: '4d6' });
+            cadBasesAtributos = { ...(data.valores || {}) };
+        } catch (_e) {
+            const vals = AG.gerarSeisValores4d6Local();
+            cadBasesAtributos = AG.valoresParaMapa(vals);
+        }
+        aplicarFinaisDeBasesDash(cadBasesAtributos);
+        atualizarHintMetodoGeracaoDash();
+        Toast.success('4d6 rolado — valores-base aplicados (ajuste a ordem nos campos se quiser).');
+    }
+
+    function resetCompraPontosDash() {
+        const AG = window.T20AtributosGeracao;
+        cadBasesAtributos = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+        aplicarFinaisDeBasesDash(cadBasesAtributos);
+        atualizarHintMetodoGeracaoDash();
+    }
+
     function aplicarCadRacaSomenteAjustes() {
         const sel = document.getElementById('cadRacaSelect');
         const slug = (sel && sel.value) || '';
-        if (!slug || slug === '__livre__') return;
-        const d = racialDeltasMapDash();
-        ATTR_KEYS_DASH.forEach((a) => {
-            const id = CAD_CAMPO_ID[a];
-            const inp = id ? document.getElementById(id) : null;
-            if (inp) inp.value = String(Math.max(1, 10 + (d[a] || 0)));
-        });
+        const AG = window.T20AtributosGeracao;
+        if (!slug || slug === '__livre__') {
+            const bases = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            cadBasesAtributos = null;
+            aplicarFinaisDeBasesDash(bases);
+            atualizarHintMetodoGeracaoDash();
+            return;
+        }
+        const met = getMetodoGeracaoDash();
+        if (met === '4d6' && cadBasesAtributos) {
+            aplicarFinaisDeBasesDash(cadBasesAtributos);
+        } else {
+            cadBasesAtributos = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            aplicarFinaisDeBasesDash(cadBasesAtributos);
+        }
+        atualizarHintMetodoGeracaoDash();
     }
 
     function validarEscolhasRacaMbDash() {
@@ -873,6 +976,7 @@
                 el.dataset.boundDash = '1';
                 el.addEventListener('change', () => {
                     aplicarCadRacaSomenteAjustes();
+                    atualizarHintMetodoGeracaoDash();
                 });
             }
         });
@@ -881,6 +985,7 @@
             m1.dataset.boundDash = '1';
             m1.addEventListener('change', () => {
                 aplicarCadRacaSomenteAjustes();
+                atualizarHintMetodoGeracaoDash();
             });
         }
     }
@@ -956,10 +1061,8 @@
         if (wrapM1) wrapM1.style.display = row && row.escolhe_um_mais2 ? '' : 'none';
         popularCadOpcoesMais2Selects();
         popularCadOpcoesMais1Select();
-        if (resetAttrs && slug && slug !== '__livre__') {
-            const tipoCad = (document.getElementById('cadTipo') && document.getElementById('cadTipo').value) || '';
-            if (tipoCad !== 'jogador') aplicarCadRacaSomenteAjustes();
-        }
+        if (resetAttrs) aplicarCadRacaSomenteAjustes();
+        atualizarUiMetodoGeracaoDash();
     }
 
     function escapeHtml(s) {
@@ -1556,32 +1659,42 @@
             return false;
         }
         if (t === 'jogador') {
+            const met = getMetodoGeracaoDash();
             const bases = atributosCompraDash();
-            for (const k of ATTR_KEYS_DASH) {
-                const v = bases[k];
-                if (v < 8 || v > 18) {
+            if (met === '4d6') {
+                const AG = window.T20AtributosGeracao;
+                const v4 = AG ? AG.validarBases4d6(bases) : { ok: false, msg: 'Módulo 4d6 indisponível.' };
+                if (!v4.ok) {
+                    Toast.error(v4.msg);
+                    return false;
+                }
+            } else {
+                for (const k of ATTR_KEYS_DASH) {
+                    const v = bases[k];
+                    if (v < 8 || v > 18) {
+                        Toast.error(
+                            'Tipo jogador: cada valor-base da compra (atributo final − bônus racial MB) deve estar entre 8 e 18.'
+                        );
+                        return false;
+                    }
+                }
+                const total = custoTotalSeis(bases.for, bases.des, bases.con, bases.int, bases.sab, bases.car);
+                if (total === null) {
+                    Toast.error('Valores-base fora da tabela de custos (use bases entre 8 e 18).');
+                    return false;
+                }
+                if (total > pontosIniciaisCompra) {
                     Toast.error(
-                        'Tipo jogador: cada valor-base da compra (atributo final − bônus racial MB) deve estar entre 8 e 18.'
+                        `Soma dos custos na compra por pontos (${total}) ultrapassa ${pontosIniciaisCompra}. Ajuste os atributos finais ou a raça.`
                     );
                     return false;
                 }
-            }
-            const total = custoTotalSeis(bases.for, bases.des, bases.con, bases.int, bases.sab, bases.car);
-            if (total === null) {
-                Toast.error('Valores-base fora da tabela de custos (use bases entre 8 e 18).');
-                return false;
-            }
-            if (total > pontosIniciaisCompra) {
-                Toast.error(
-                    `Soma dos custos na compra por pontos (${total}) ultrapassa ${pontosIniciaisCompra}. Ajuste os atributos finais ou a raça.`
-                );
-                return false;
-            }
-            if (total < pontosIniciaisCompra) {
-                Toast.error(
-                    `Soma dos custos na compra por pontos (${total}) é menor que ${pontosIniciaisCompra}. Distribua todos os pontos do MB antes de criar.`
-                );
-                return false;
+                if (total < pontosIniciaisCompra) {
+                    Toast.error(
+                        `Soma dos custos na compra por pontos (${total}) é menor que ${pontosIniciaisCompra}. Distribua todos os pontos do MB antes de criar.`
+                    );
+                    return false;
+                }
             }
         } else {
             const vals = Object.values(a);
@@ -1644,6 +1757,7 @@
         };
         if (t === 'jogador') {
             const bases = atributosCompraDash();
+            fichaBase.metodo_geracao_atributos = getMetodoGeracaoDash();
             fichaBase.atributos_compra = {
                 for: bases.for,
                 des: bases.des,
@@ -1767,21 +1881,27 @@
         const wrapL = document.getElementById('cadWrapRacaLivre');
         if (wrapL) wrapL.style.display = 'none';
         const t = (tipo || 'jogador').toLowerCase();
-        const defAttrs =
-            t === 'jogador'
-                ? { cadFor: 8, cadDes: 8, cadCon: 8, cadInt: 18, cadSab: 8, cadCar: 18 }
-                : { cadFor: 10, cadDes: 10, cadCon: 10, cadInt: 10, cadSab: 10, cadCar: 10 };
-        Object.entries(defAttrs).forEach(([id, v]) => {
-            const el = document.getElementById(id);
-            if (el) el.value = String(v);
-        });
+        cadBasesAtributos = null;
+        cadMetodoGeracao = 'compra_pontos';
+        const selMet = document.getElementById('cadMetodoGeracao');
+        if (selMet) selMet.value = 'compra_pontos';
+        onCadRacaSelectChange(false);
+        if (t === 'jogador') {
+            resetCompraPontosDash();
+        } else {
+            const defAttrs = { cadFor: 10, cadDes: 10, cadCon: 10, cadInt: 10, cadSab: 10, cadCar: 10 };
+            Object.entries(defAttrs).forEach(([id, v]) => {
+                const el = document.getElementById(id);
+                if (el) el.value = String(v);
+            });
+        }
         const hj = document.getElementById('hintAttrsJogador');
         const sub = document.getElementById('cadastroSubtitulo');
         if (hj) hj.style.display = t === 'jogador' ? '' : 'none';
         if (sub) {
             sub.textContent =
                 t === 'jogador'
-                    ? 'Primeiro passo: nome, nível, classe, raça, PV e atributos (compra por pontos). Depois complete a ficha.'
+                    ? 'Primeiro passo: nome, nível, classe, raça, método de atributos (compra ou 4d6), PV e valores finais. Depois complete a ficha.'
                     : 'Primeiro passo: dados rápidos para a mesa; atributos livres (0–99). Depois refine na ficha.';
         }
         ['cadFor', 'cadDes', 'cadCon', 'cadInt', 'cadSab', 'cadCar'].forEach((id) => {
@@ -1790,13 +1910,18 @@
             el.min = '0';
             el.max = '99';
         });
-        onCadRacaSelectChange(false);
+        atualizarUiMetodoGeracaoDash();
     }
 
     function abrirCadastro(tipo) {
         resetFormCadastro(tipo);
         closeOverlay('overlaySeletorTipo');
         openOverlay('overlayCadastro');
+        const t = (tipo || 'jogador').toLowerCase();
+        if (t === 'jogador') {
+            resetCompraPontosDash();
+            atualizarUiMetodoGeracaoDash();
+        }
     }
 
     document.getElementById('btnNovoCombatente')?.addEventListener('click', () => {
@@ -1870,6 +1995,25 @@
     document.getElementById('btnLogout')?.addEventListener('click', () => AuthService.logout && AuthService.logout());
     document.getElementById('btnTrocarJogo')?.addEventListener('click', () => AuthService.trocarJogo && AuthService.trocarJogo());
     document.getElementById('chkMeus')?.addEventListener('change', () => carregar());
+
+    document.getElementById('cadMetodoGeracao')?.addEventListener('change', () => {
+        cadMetodoGeracao = getMetodoGeracaoDash();
+        if (cadMetodoGeracao === 'compra_pontos') {
+            cadBasesAtributos = null;
+            resetCompraPontosDash();
+        } else {
+            cadBasesAtributos = null;
+        }
+        atualizarUiMetodoGeracaoDash();
+    });
+    document.getElementById('cadBtnRolar4d6')?.addEventListener('click', () => rolar4d6Dash());
+    document.getElementById('cadBtnResetCompra')?.addEventListener('click', () => resetCompraPontosDash());
+    ['cadFor', 'cadDes', 'cadCon', 'cadInt', 'cadSab', 'cadCar'].forEach((id) => {
+        document.getElementById(id)?.addEventListener('input', () => {
+            if (getMetodoGeracaoDash() === '4d6') cadBasesAtributos = atributosCompraDash();
+            atualizarHintMetodoGeracaoDash();
+        });
+    });
 
     document.getElementById('cadRacaSelect')?.addEventListener('change', () => onCadRacaSelectChange(true));
 
