@@ -104,9 +104,9 @@
                     </div>
                     <p class="t20-hint" id="hintAtributos" style="margin-top:0.35rem;font-size:0.72rem">
                         Modificadores conforme <strong>tabela do Tormenta 20</strong> (faixas de valor). Os <strong>valores dos atributos</strong> são editados em <strong>Editar ficha</strong> (diálogo); aqui ficam só leitura.
-                        Fichas <strong>jogador</strong>: a <strong>soma dos custos da compra por pontos</strong> (valores-base 8–18 <em>sem</em> bônus racial) deve ser <strong>exatamente 20</strong> pontos (MB).
+                        Fichas <strong>jogador</strong>: <strong>compra por pontos</strong> (bases 8–18, soma = 20) ou <strong>4d6</strong> (bases 3–18, reroll MB).
                     </p>
-                    <p class="t20-hint t20-compra-pontos-ok" id="f_pts_compra" style="margin-top:0.2rem;font-size:0.72rem;">Compra por pontos: …</p>
+                    <p class="t20-hint t20-compra-pontos-ok" id="f_pts_compra" style="margin-top:0.2rem;font-size:0.72rem;">Atributos: …</p>
                 </div>
                 <div class="ficha-defesa-row ficha-defesa-row--col-esq" style="margin-top:0.45rem">
                     <div class="ficha-defesa-box ficha-ca-box">
@@ -606,8 +606,21 @@
                     <div class="t20-ficha-secao">
                         <h3 class="t20-ficha-secao-titulo">Atributos (valores finais)</h3>
                         <p class="t20-hint" style="margin:0 0 0.45rem;font-size:0.72rem">
-                            Edite os valores aqui; os círculos na coluna esquerda permanecem só leitura. Jogadores: custos da compra por pontos (8–18 sem bônus racial) devem somar <strong>20</strong> pontos MB ao salvar.
+                            Edite os valores finais (base + racial). Jogadores: escolha o método MB abaixo; ao trocar a raça, a base reinicia em 10 (+ ajustes raciais nos finais).
                         </p>
+                        <div class="t20-identity-grid t20-identity-grid--compact" id="wrapMetodoGeracaoFicha" style="margin-bottom:0.45rem">
+                            <div class="t20-ficha-field t20-ficha-field--wide">
+                                <label for="f_metodo_geracao">Geração de atributos (MB)</label>
+                                <select id="f_metodo_geracao" class="t20-input">
+                                    <option value="compra_pontos">Compra por pontos (20 pts)</option>
+                                    <option value="4d6">Rolagem 4d6</option>
+                                </select>
+                            </div>
+                            <div class="t20-ficha-field" style="display:flex;align-items:flex-end;gap:0.35rem;flex-wrap:wrap">
+                                <button type="button" id="btnFichaRolar4d6" class="tormenta-btn" style="display:none;font-size:0.78rem">Rolar 4d6</button>
+                                <button type="button" id="btnFichaResetCompra" class="tormenta-btn" style="display:none;font-size:0.78rem">Base 10</button>
+                            </div>
+                        </div>
                         <div class="t20-identity-grid t20-identity-grid--compact">
                             <div class="t20-ficha-field"><label for="f_dlg_attr_for">FOR</label><input id="f_dlg_attr_for" type="number" min="0" max="99" class="t20-input" value="10" /></div>
                             <div class="t20-ficha-field"><label for="f_dlg_attr_des">DES</label><input id="f_dlg_attr_des" type="number" min="0" max="99" class="t20-input" value="10" /></div>
@@ -1197,7 +1210,8 @@
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioAuto"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260614grimorioPolish"></script>
+<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260621attr"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260621attr"></script>
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260614"></script>
@@ -1393,6 +1407,61 @@
     }
 
     const ATTR_KEYS = ['for', 'des', 'con', 'int', 'sab', 'car'];
+    let fichaBasesAtributos = null;
+
+    function getMetodoGeracaoFicha() {
+        const el = q('f_metodo_geracao');
+        const v = (el && el.value) || 'compra_pontos';
+        return v === '4d6' ? '4d6' : 'compra_pontos';
+    }
+
+    function aplicarFinaisDeBasesFicha(bases) {
+        const AG = window.T20AtributosGeracao;
+        if (!AG) return;
+        const rDel = racialDeltasMap();
+        ATTR_KEYS.forEach((a) => {
+            const base = Math.floor(Number(bases[a]));
+            const fin = Math.max(1, (Number.isFinite(base) ? base : 10) + (rDel[a] || 0));
+            const idInp = T20_ATTR_INP[a];
+            const idDlg = T20_ATTR_DLG[a];
+            if (idInp && q(idInp)) q(idInp).value = String(fin);
+            if (idDlg && q(idDlg)) q(idDlg).value = String(fin);
+        });
+        atualizarModsAtributos();
+        atualizarLinhaCompraPontos();
+    }
+
+    function atualizarUiMetodoGeracaoFicha() {
+        const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
+        const wrap = q('wrapMetodoGeracaoFicha');
+        const btn4 = q('btnFichaRolar4d6');
+        const btnR = q('btnFichaResetCompra');
+        const met = getMetodoGeracaoFicha();
+        if (wrap) wrap.style.display = tipo === 'jogador' ? '' : 'none';
+        if (btn4) btn4.style.display = tipo === 'jogador' && met === '4d6' ? '' : 'none';
+        if (btnR) btnR.style.display = tipo === 'jogador' && met === 'compra_pontos' ? '' : 'none';
+        atualizarLinhaCompraPontos();
+    }
+
+    async function rolar4d6Ficha() {
+        const AG = window.T20AtributosGeracao;
+        if (!AG) return;
+        try {
+            const data = await new TormentaRegrasService().gerarAtributos({ metodo: '4d6' });
+            fichaBasesAtributos = { ...(data.valores || {}) };
+        } catch (_e) {
+            const vals = AG.gerarSeisValores4d6Local();
+            fichaBasesAtributos = AG.valoresParaMapa(vals);
+        }
+        aplicarFinaisDeBasesFicha(fichaBasesAtributos);
+        Toast.success('4d6 rolado — ajuste a distribuição nos campos se quiser.');
+    }
+
+    function resetCompraPontosFicha() {
+        const AG = window.T20AtributosGeracao;
+        fichaBasesAtributos = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+        aplicarFinaisDeBasesFicha(fichaBasesAtributos);
+    }
 
     const T20_ATTR_INP = {
         for: 'fichaForResumo',
@@ -1448,7 +1517,9 @@
             const el = q(T20_ATTR_DLG[a]);
             if (!el) return;
             el.addEventListener('input', () => {
+                if (getMetodoGeracaoFicha() === '4d6') fichaBasesAtributos = atributosCompraAtuais();
                 t20SyncAttrsDialogToSheet();
+                atualizarLinhaCompraPontos();
             });
         });
     }
@@ -2147,6 +2218,13 @@
     function validarCompraPontosJogador() {
         const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
         if (tipo !== 'jogador') return { ok: true };
+        const met = getMetodoGeracaoFicha();
+        const bases = atributosCompraAtuais();
+        if (met === '4d6') {
+            const AG = window.T20AtributosGeracao;
+            if (!AG) return { ok: true };
+            return AG.validarBases4d6(bases);
+        }
         const s = somaCustosCompraAtributos();
         if (s === null) {
             return {
@@ -2294,14 +2372,20 @@
 
     function aplicarRacaSomenteAjustes() {
         const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
-        if (!slug || slug === '__livre__') return;
-        const d = racialDeltasMap();
-        ATTR_KEYS.forEach((a) => {
-            const id = T20_ATTR_INP[a];
-            const inp = id ? q(id) : null;
-            if (inp) inp.value = String(Math.max(1, 10 + (d[a] || 0)));
-        });
-        atualizarModsAtributos();
+        const AG = window.T20AtributosGeracao;
+        if (!slug || slug === '__livre__') {
+            fichaBasesAtributos = null;
+            const bases = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            aplicarFinaisDeBasesFicha(bases);
+            return;
+        }
+        const met = getMetodoGeracaoFicha();
+        if (met === '4d6' && fichaBasesAtributos) {
+            aplicarFinaisDeBasesFicha(fichaBasesAtributos);
+        } else {
+            fichaBasesAtributos = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            aplicarFinaisDeBasesFicha(fichaBasesAtributos);
+        }
     }
 
     function onRacaChange(resetBaseDez) {
@@ -2365,6 +2449,30 @@
                 atualizarTagsHeader();
             });
         }
+        const metSel = q('f_metodo_geracao');
+        if (metSel && !metSel.dataset.bound) {
+            metSel.dataset.bound = '1';
+            metSel.addEventListener('change', () => {
+                if (getMetodoGeracaoFicha() === 'compra_pontos') {
+                    fichaBasesAtributos = null;
+                    resetCompraPontosFicha();
+                } else {
+                    fichaBasesAtributos = null;
+                }
+                atualizarUiMetodoGeracaoFicha();
+                t20AtualizarEstadoBotaoSalvar();
+            });
+        }
+        const b4 = q('btnFichaRolar4d6');
+        if (b4 && !b4.dataset.bound) {
+            b4.dataset.bound = '1';
+            b4.addEventListener('click', () => rolar4d6Ficha());
+        }
+        const br = q('btnFichaResetCompra');
+        if (br && !br.dataset.bound) {
+            br.dataset.bound = '1';
+            br.addEventListener('click', () => resetCompraPontosFicha());
+        }
     }
 
     function aplicarRacaCamposDoJson(j) {
@@ -2416,8 +2524,28 @@
         const el = q('f_pts_compra');
         if (!el) return;
         const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
-        const s = somaCustosCompraAtributos();
+        const met = getMetodoGeracaoFicha();
         el.classList.remove('t20-compra-pontos-ok', 't20-compra-pontos-erro');
+        if (tipo !== 'jogador') {
+            el.textContent = 'Atributos livres (monstro/NPC).';
+            t20AtualizarEstadoBotaoSalvar();
+            return;
+        }
+        if (met === '4d6') {
+            const bases = atributosCompraAtuais();
+            const vals = ATTR_KEYS.map((k) => bases[k]);
+            const AG = window.T20AtributosGeracao;
+            const ok = AG && AG.qualidadeGeracao4d6(vals);
+            const soma = AG ? AG.somaModificadoresValores(vals) : 0;
+            el.textContent = ok
+                ? `4d6 (base): mods ${soma >= 0 ? '+' : ''}${soma} — OK para salvar (MB).`
+                : `4d6 (base): mods ${soma >= 0 ? '+' : ''}${soma} — role de novo ou ajuste (+4 total ou algum 14+).`;
+            if (ok) el.classList.add('t20-compra-pontos-ok');
+            else el.classList.add('t20-compra-pontos-erro');
+            t20AtualizarEstadoBotaoSalvar();
+            return;
+        }
+        const s = somaCustosCompraAtributos();
         if (s === null) {
             el.textContent =
                 'Compra por pontos (sem racial): — (valores-base fora de 8–18 na tabela do MB).';
@@ -5053,6 +5181,7 @@
                 out.tormenta_niveis_classe_mb = niv;
                 return out;
             })(),
+            metodo_geracao_atributos: getMetodoGeracaoFicha(),
             atributos_compra: atributosCompraAtuais(),
             pericias: coletarPericias(),
             ataques: coletarAtaques(),
@@ -5132,6 +5261,14 @@
         if (q('f_hab_classe_mb') && j.habilidade_classe_mb != null) {
             q('f_hab_classe_mb').value = String(j.habilidade_classe_mb);
         }
+        if (q('f_metodo_geracao')) {
+            const rawMet = (j.metodo_geracao_atributos || 'compra_pontos').toString().trim().toLowerCase();
+            q('f_metodo_geracao').value = rawMet === '4d6' ? '4d6' : 'compra_pontos';
+        }
+        if (j.atributos_compra && typeof j.atributos_compra === 'object') {
+            fichaBasesAtributos = { ...j.atributos_compra };
+        }
+        atualizarUiMetodoGeracaoFicha();
         atualizarListaTraçosRaciaisUl();
         destacarPericiasClasseMb();
         atualizarResistenciasBreakdownTormenta();
@@ -5764,6 +5901,7 @@
         const ft = q('f_tipo');
         if (ft) {
             ft.addEventListener('change', () => {
+                atualizarUiMetodoGeracaoFicha();
                 atualizarLinhaCompraPontos();
                 atualizarTagsHeader();
                 t20AtualizarEstadoBotaoSalvar();

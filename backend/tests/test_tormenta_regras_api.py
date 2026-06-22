@@ -47,6 +47,39 @@ def test_get_regras_atributos(client_regras_tormenta):
     assert body["pericias"][-1]["penalidade_armadura"] is False
 
 
+def test_post_gerar_atributos_4d6(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/gerar-atributos",
+        json={"metodo": "4d6", "seed": 99},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["metodo"] == "4d6"
+    assert set(body["valores"].keys()) == {"for", "des", "con", "int", "sab", "car"}
+    assert body["qualidade_4d6_ok"] is True
+    for v in body["valores"].values():
+        assert 3 <= v <= 18
+
+
+def test_post_gerar_atributos_compra_pontos(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/gerar-atributos",
+        json={"metodo": "compra_pontos"},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["metodo"] == "compra_pontos"
+    assert all(v == 10 for v in body["valores"].values())
+    assert body["qualidade_4d6_ok"] is None
+
+
+def test_get_regras_atributos_inclui_metodos(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/atributos")
+    assert r.status_code == 200
+    assert "4d6" in r.json()["metodos_geracao"]
+    assert "compra_pontos" in r.json()["metodos_geracao"]
+
+
 def test_get_regras_racas(client_regras_tormenta):
     r = client_regras_tormenta.get("/api/v1/tormenta/regras/racas")
     assert r.status_code == 200

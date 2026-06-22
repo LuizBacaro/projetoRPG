@@ -36,6 +36,15 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao carregar regras Tormenta');
     }
 
+    async gerarAtributos(payload = {}) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/gerar-atributos'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        return this._handleJson(res, 'Erro ao gerar atributos T20');
+    }
+
     async obterRacas() {
         const res = await fetch(this._urlRacas(), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar raças Tormenta');
