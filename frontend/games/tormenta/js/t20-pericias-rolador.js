@@ -8,6 +8,93 @@
         return document.getElementById(id);
     }
 
+    let dcDialogBound = false;
+    let dcResolve = null;
+
+    function bindDcDialog() {
+        if (dcDialogBound) return;
+        const dlg = q('t20ModalPericiaDc');
+        if (!dlg) return;
+        dcDialogBound = true;
+
+        const fechar = () => {
+            if (typeof dlg.close === 'function') dlg.close();
+            if (dcResolve) {
+                dcResolve(null);
+                dcResolve = null;
+            }
+        };
+
+        q('t20PericiaDcFechar')?.addEventListener('click', fechar);
+        q('t20PericiaDcCancelar')?.addEventListener('click', fechar);
+        dlg.addEventListener('cancel', (ev) => {
+            ev.preventDefault();
+            fechar();
+        });
+
+        q('t20PericiaDcRolar')?.addEventListener('click', () => {
+            const inp = q('t20PericiaDcInput');
+            const raw = inp ? String(inp.value).trim() : '';
+            const dc = raw === '' ? 15 : Number(raw);
+            if (!Number.isFinite(dc) || dc < 1) {
+                if (typeof Toast !== 'undefined' && Toast.error) {
+                    Toast.error('Informe uma CD válida (1–99).');
+                }
+                inp?.focus();
+                return;
+            }
+            if (typeof dlg.close === 'function') dlg.close();
+            if (dcResolve) {
+                dcResolve(Math.min(99, Math.max(1, Math.round(dc))));
+                dcResolve = null;
+            }
+        });
+
+        q('t20PericiaDcInput')?.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                q('t20PericiaDcRolar')?.click();
+            }
+        });
+    }
+
+    function pedirDcPericia(nome) {
+        bindDcDialog();
+        const dlg = q('t20ModalPericiaDc');
+        if (!dlg) {
+            const dcInp = window.prompt(`DC para ${nome} (padrão 15):`, '15');
+            if (dcInp == null) return Promise.resolve(null);
+            return Promise.resolve(Number(dcInp) || 15);
+        }
+
+        const titulo = q('t20PericiaDcTitulo');
+        const label = q('t20PericiaDcLabel');
+        const hint = q('t20PericiaDcHint');
+        const inp = q('t20PericiaDcInput');
+        if (titulo) titulo.textContent = `Teste: ${nome}`;
+        if (label) label.textContent = `CD para ${nome} (padrão 15)`;
+        if (hint) {
+            hint.textContent =
+                'Informe a Classe de Dificuldade (CD) do teste. O resultado será 1d20 + bônus da perícia.';
+        }
+        if (inp) {
+            inp.value = '15';
+        }
+
+        return new Promise((resolve) => {
+            dcResolve = resolve;
+            if (typeof dlg.showModal === 'function') {
+                dlg.showModal();
+            } else {
+                dlg.setAttribute('open', '');
+            }
+            setTimeout(() => {
+                inp?.focus();
+                inp?.select?.();
+            }, 40);
+        });
+    }
+
     function nivelPersonagem() {
         const n = Number(q('f_nivel') && q('f_nivel').value);
         return Number.isFinite(n) && n >= 1 ? n : 1;
@@ -51,9 +138,8 @@
     async function rolarPericia(tr) {
         const nomeEl = tr.querySelector('.t20-p-nome');
         const nome = nomeEl ? nomeEl.textContent.trim() : 'Perícia';
-        const dcInp = window.prompt(`DC para ${nome} (padrão 15):`, '15');
-        if (dcInp == null) return;
-        const dc = Number(dcInp) || 15;
+        const dc = await pedirDcPericia(nome);
+        if (dc == null) return;
         try {
             const calc = await calcularBonusLinha(tr);
             const roll = await regras().rolarPericia({
@@ -97,6 +183,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        bindDcDialog();
         const obs = new MutationObserver(() => {
             if (document.querySelector('#tblPericias tbody tr')) injetarBotoesRolar();
         });
