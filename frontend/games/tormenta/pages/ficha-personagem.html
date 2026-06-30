@@ -5780,6 +5780,22 @@
 
         if (fid) {
             try {
+                if (window.T20PoderesV13 && typeof window.T20PoderesV13.validarAntesDeAdicionar === 'function') {
+                    const vr = await window.T20PoderesV13.validarAntesDeAdicionar(nomeTrim, () => ({
+                        nivel: Number(q('f_nivel').value || 1),
+                        for_valor: valorFinalAtributoCampo('for'),
+                        des_valor: valorFinalAtributoCampo('des'),
+                        con_valor: valorFinalAtributoCampo('con'),
+                        int_valor: valorFinalAtributoCampo('int'),
+                        sab_valor: valorFinalAtributoCampo('sab'),
+                        car_valor: valorFinalAtributoCampo('car'),
+                        ficha_json: extrairFichaJson(),
+                        poderes_escolhidos: window.T20PoderesV13.coletarNomesPoderesFicha
+                            ? window.T20PoderesV13.coletarNomesPoderesFicha()
+                            : [],
+                    }));
+                    if (!vr.valido) return;
+                }
                 const item = await svc.adicionarTalento(fid, { nome: nomeTrim });
                 aplicarNaLinha(item);
             } catch (e1) {

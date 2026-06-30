@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Cap. 2 p.124–128 (poderes de combate e magia)",
+    "nota": "Overlay por nome normalizado; complementa prerequisitos em texto do catálogo MB."
+  },
+  "overlay_por_nome": {
+    "ataque poderoso": [
+      { "tipo": "atributo_min", "atributo": "for", "valor": 1 }
+    ],
+    "ataque preciso": [
+      { "tipo": "atributo_min", "atributo": "des", "valor": 1 },
+      { "tipo": "poder", "slug": "ataque_poderoso" }
+    ],
+    "esquiva": [
+      { "tipo": "atributo_min", "atributo": "des", "valor": 1 }
+    ],
+    "ataque desarmado aprimorado": [
+      { "tipo": "atributo_min", "atributo": "sab", "valor": 1 }
+    ],
+    "acuidade com armas": [
+      { "tipo": "atributo_min", "atributo": "des", "valor": 1 }
+    ],
+    "foco em arma": [
+      { "tipo": "proficiencia_arma" }
+    ],
+    "conjuracao acelerada": [
+      { "tipo": "conjura_magias" }
+    ],
+    "especializacao em magia": [
+      { "tipo": "conjura_magias" }
+    ],
+    "combate defensivo": [
+      { "tipo": "atributo_min", "atributo": "des", "valor": 1 }
+    ],
+    "celebrar ritual": [
+      { "tipo": "conjura_magias" }
+    ],
+    "escrever pergaminho": [
+      { "tipo": "conjura_magias" }
+    ]
+  }
+}

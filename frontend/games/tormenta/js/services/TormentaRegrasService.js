@@ -422,4 +422,27 @@ class TormentaRegrasService {
         });
         return this._handleJson(res, 'Erro ao validar orçamento de perícias');
     }
+
+    /** RF-T08g — valida pré-requisitos de poder v1.3 antes de vincular na ficha. */
+    async validarPreRequisitosPoder(body) {
+        const payload = { ...body };
+        if (body.regraVersao && payload.regra_versao == null) {
+            payload.regra_versao = body.regraVersao;
+        }
+        if (body.nomePoder && payload.nome_poder == null) {
+            payload.nome_poder = body.nomePoder;
+        }
+        if (body.poderesEscolhidos && payload.poderes_escolhidos == null) {
+            payload.poderes_escolhidos = body.poderesEscolhidos;
+        }
+        const res = await fetch(
+            window.getApiUrl('/tormenta/regras/poderes/validar-pre-requisitos'),
+            {
+                method: 'POST',
+                headers: { ...this._headers(), 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            }
+        );
+        return this._handleJson(res, 'Erro ao validar pré-requisitos do poder');
+    }
 }

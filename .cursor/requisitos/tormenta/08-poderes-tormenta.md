@@ -70,7 +70,7 @@ Cada deus oferece **4** poderes concedidos; devoto escolhe **1** ao aderir. Cros
 | RF-T08d | UI: rótulo **Poderes**, filtros por categoria | P1 — **Feito** |
 | RF-T08e | Poderes concedidos filtrados por `divindade.slug` | P1 — **Feito** (RF-T09-v13) |
 | RF-T08f | Regra substituição: poder de classe → poder geral | P2 |
-| RF-T08g | Validação de pré-requisitos (nível, atributo, perícia, poderes) | P2 |
+| RF-T08g | Validação de pré-requisitos (nível, atributo, perícia, poderes) | **Feito** |
 | RF-T08h | Debitar PM ao ativar poder com custo | P1 — **Feito** |
 | RF-T08i | Poderes de origem e humano Versátil na criação | P1 — **Feito** |
 | RF-T08j | Poderes da Tormenta (flag `tormenta: true`) | P3 |
@@ -85,7 +85,7 @@ Cada deus oferece **4** poderes concedidos; devoto escolhe **1** ao aderir. Cros
 | PM ao ativar | **Feito** (`POST /poderes/ativar`, catálogo `custo_pm`) |
 | Poderes concedidos por deus | **Feito** (`tendencias_divindades_mb.json` + UI filtrada) |
 | Substituição classe → geral | **Não feito** |
-| Pré-requisitos automáticos | **Não feito** |
+| Pré-requisitos automáticos | **Feito** | `poderes_pre_requisitos_v13_t20.py`, overlay JSON, API `POST /poderes/validar-pre-requisitos`, bloqueio ao vincular v1.3 |
 
 ## Gap código
 

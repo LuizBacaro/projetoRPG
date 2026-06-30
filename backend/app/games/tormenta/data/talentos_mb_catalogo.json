@@ -205,6 +205,24 @@
       "prerequisitos": "Capacidade de conjurar magias",
       "descricao_resumo": "+2 na CD de resistência de magias de uma escola escolhida (MB).",
       "pagina_referencia": "MB p. 132"
+    },
+    {
+      "nome": "Ataque Poderoso",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "secao": "Ataque",
+      "prerequisitos": "For 13",
+      "descricao_resumo": "Sacrifica precisão por dano extra no ataque corpo a corpo (v1.3 p.125).",
+      "pagina_referencia": "v1.3 p. 125"
+    },
+    {
+      "nome": "Ataque Preciso",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "secao": "Ataque",
+      "prerequisitos": "Des 13, Ataque Poderoso",
+      "descricao_resumo": "Ignora parte da Defesa do alvo com ataques corpo a corpo (v1.3 p.125).",
+      "pagina_referencia": "v1.3 p. 125"
     }
   ]
 }

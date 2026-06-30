@@ -131,6 +131,43 @@
         });
     }
 
+    function coletarNomesPoderesFicha() {
+        const nomes = [];
+        document.querySelectorAll('#t20FichaTalentosMb .t20-tal-nome').forEach((inp) => {
+            const v = (inp.value || '').trim();
+            if (v.length >= 2) nomes.push(v);
+        });
+        return nomes;
+    }
+
+    async function validarAntesDeAdicionar(nome, getContext) {
+        if (!isV13()) return { valido: true };
+        const ctx = typeof getContext === 'function' ? getContext() : null;
+        if (!ctx) return { valido: true };
+        const regras = new TormentaRegrasService();
+        const res = await regras.validarPreRequisitosPoder({
+            nome_poder: nome,
+            regra_versao: 'v13',
+            nivel: ctx.nivel,
+            for_valor: ctx.for_valor,
+            des_valor: ctx.des_valor,
+            con_valor: ctx.con_valor,
+            int_valor: ctx.int_valor,
+            sab_valor: ctx.sab_valor,
+            car_valor: ctx.car_valor,
+            ficha_json: ctx.ficha_json,
+            poderes_escolhidos: ctx.poderes_escolhidos || [],
+        });
+        if (!res.valido && global.Toast && global.Toast.error) {
+            const msg =
+                res.motivo ||
+                (res.faltando || []).map((f) => f.descricao).filter(Boolean).join('; ') ||
+                'Pré-requisitos não atendidos';
+            global.Toast.error(`«${nome}»: ${msg}`);
+        }
+        return res;
+    }
+
     function init() {
         montarFiltroCategoriaModal();
         wireModalFiltro();
@@ -141,6 +178,8 @@
         decorarLinha,
         paramsCatalogoPoderes,
         labelCategoria,
+        validarAntesDeAdicionar,
+        coletarNomesPoderesFicha,
         CATEGORIAS,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

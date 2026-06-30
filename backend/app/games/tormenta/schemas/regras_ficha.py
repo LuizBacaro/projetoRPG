@@ -387,6 +387,10 @@ class TormentaCatalogoItem(BaseModel):
         le=99,
         description="PM gastos ao ativar o poder (0 = passivo ou desconhecido).",
     )
+    pre_requisitos_v13: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="Pré-requisitos estruturados v1.3 (RF-T08g).",
+    )
     custo: Optional[str] = Field(default=None, max_length=80)
     dano_p: Optional[str] = Field(default=None, max_length=40)
     dano_m: Optional[str] = Field(default=None, max_length=40)
@@ -920,3 +924,30 @@ class TormentaCondicoesV13Response(BaseModel):
     condicoes: list[TormentaCondicaoV13Item]
     situacoes_especiais: list[TormentaCondicaoV13Item]
     total: int = Field(..., ge=0)
+
+
+class TormentaPoderPreRequisitoFaltandoItem(BaseModel):
+    tipo: str = Field(default="", max_length=40)
+    descricao: str = Field(default="", max_length=200)
+
+
+class TormentaPoderValidarPreRequisitosRequest(BaseModel):
+    nome_poder: str = Field(..., min_length=2, max_length=200)
+    regra_versao: Optional[str] = Field(default="v13", max_length=8)
+    nivel: int = Field(default=1, ge=1, le=40)
+    for_valor: int = Field(default=0, ge=-99, le=99)
+    des_valor: int = Field(default=0, ge=-99, le=99)
+    con_valor: int = Field(default=0, ge=-99, le=99)
+    int_valor: int = Field(default=0, ge=-99, le=99)
+    sab_valor: int = Field(default=0, ge=-99, le=99)
+    car_valor: int = Field(default=0, ge=-99, le=99)
+    ficha_json: Optional[Dict[str, Any]] = Field(default=None)
+    poderes_escolhidos: List[str] = Field(default_factory=list)
+
+
+class TormentaPoderValidarPreRequisitosResponse(BaseModel):
+    valido: bool
+    nome_poder: str = Field(..., max_length=200)
+    faltando: List[TormentaPoderPreRequisitoFaltandoItem] = Field(default_factory=list)
+    pre_requisitos: List[Dict[str, Any]] = Field(default_factory=list)
+    motivo: str = Field(default="", max_length=500)

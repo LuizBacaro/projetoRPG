@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -14,6 +14,13 @@ from app.games.tormenta.rules.poderes_ficha_v13_t20 import (
     AUTO_PODER_NOTA_PREFIX,
     listar_poderes_sync_v13,
 )
+from app.games.tormenta.rules.poderes_pre_requisitos_v13_t20 import (
+    PersonagemPoderContext,
+    contexto_poder_de_personagem,
+    deve_validar_pre_requisitos_v13,
+    validar_pre_requisitos_poder,
+)
+from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
 from app.games.tormenta.schemas.talento_personagem import (
     TormentaMigrarTalentosJsonResponse,
     TormentaPoderAtivarResponse,
@@ -86,6 +93,71 @@ class TormentaPersonagemTalentosService:
         self.db.flush()
         return t
 
+    def _nomes_poderes_vinculados(self, personagem_id: int) -> List[str]:
+        rows = (
+            self.db.query(TormentaTalentoPersonagem)
+            .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
+            .all()
+        )
+        return [str(r.talento.nome) for r in rows if r.talento and r.talento.nome]
+
+    def _validar_pre_requisitos_ao_vincular(
+        self,
+        personagem: TormentaPersonagem,
+        nome_poder: str,
+        notas: Optional[str],
+    ) -> None:
+        fj = personagem.ficha_json if isinstance(personagem.ficha_json, dict) else {}
+        rv = regra_versao_de_ficha(fj)
+        if not deve_validar_pre_requisitos_v13(regra_versao=rv, notas=notas):
+            return
+        ctx = contexto_poder_de_personagem(
+            personagem,
+            poderes_nomes_extra=self._nomes_poderes_vinculados(int(personagem.id)),
+        )
+        res = validar_pre_requisitos_poder(nome_poder, ctx)
+        if not res.get("valido"):
+            faltando = res.get("faltando") or []
+            partes = [
+                str(x.get("descricao") or "") for x in faltando if x.get("descricao")
+            ]
+            detalhe = "; ".join(partes) if partes else "pré-requisitos não atendidos"
+            raise DadosInvalidos(
+                f"Pré-requisitos não atendidos para «{nome_poder.strip()}»: {detalhe}."
+            )
+
+    @staticmethod
+    def preview_validar_pre_requisitos(body: Dict[str, Any]) -> Dict[str, Any]:
+        fj = body.get("ficha_json") if isinstance(body.get("ficha_json"), dict) else {}
+        rv = str(body.get("regra_versao") or regra_versao_de_ficha(fj) or "v13")
+        ctx = PersonagemPoderContext(
+            nivel=int(body.get("nivel") or 1),
+            for_valor=int(body.get("for_valor") or 0),
+            des_valor=int(body.get("des_valor") or 0),
+            con_valor=int(body.get("con_valor") or 0),
+            int_valor=int(body.get("int_valor") or 0),
+            sab_valor=int(body.get("sab_valor") or 0),
+            car_valor=int(body.get("car_valor") or 0),
+            ficha_json=fj,
+            poderes_nomes=list(body.get("poderes_escolhidos") or []),
+            regra_versao=rv,
+        )
+        nome = str(body.get("nome_poder") or "").strip()
+        res = validar_pre_requisitos_poder(nome, ctx)
+        faltando = res.get("faltando") or []
+        motivo = ""
+        if faltando:
+            motivo = "; ".join(
+                str(x.get("descricao") or "") for x in faltando if x.get("descricao")
+            )
+        return {
+            "valido": bool(res.get("valido")),
+            "nome_poder": nome,
+            "faltando": faltando,
+            "pre_requisitos": res.get("pre_requisitos") or [],
+            "motivo": motivo,
+        }
+
     def adicionar_vinculo(
         self, personagem_id: int, payload: TormentaTalentoVinculoCreate
     ) -> TormentaTalentoPersonagemItem:
@@ -95,6 +167,14 @@ class TormentaPersonagemTalentosService:
                 raise DadosInvalidos("Talento nao encontrado no catalogo")
         else:
             t = self._buscar_ou_criar_talento_por_nome(payload.nome or "")
+
+        p = self.db.get(TormentaPersonagem, personagem_id)
+        if p:
+            self._validar_pre_requisitos_ao_vincular(
+                p,
+                t.nome,
+                (payload.notas or "").strip() or None,
+            )
 
         dup = (
             self.db.query(TormentaTalentoPersonagem)

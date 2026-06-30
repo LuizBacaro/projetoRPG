@@ -89,9 +89,16 @@ def custo_pm_de_item(row: Dict[str, Any]) -> int:
 
 
 def enriquecer_item_catalogo_poder(row: Dict[str, Any]) -> Dict[str, Any]:
+    from app.games.tormenta.rules.poderes_pre_requisitos_v13_t20 import (
+        pre_requisitos_de_poder,
+    )
+
     out = dict(row)
     out["categoria_v13"] = categoria_v13_de_item(out)
     out["custo_pm"] = custo_pm_de_item(out)
+    reqs = pre_requisitos_de_poder(out)
+    if reqs:
+        out["pre_requisitos_v13"] = reqs
     return out
 
 
@@ -115,14 +122,23 @@ def metadados_poder_por_nome(
     *,
     notas: str | None = None,
 ) -> Dict[str, Any]:
-    """Resolve categoria_v13 e custo_pm para um poder na ficha."""
+    """Resolve categoria_v13, custo_pm e pre_requisitos_v13 para um poder na ficha."""
+    from app.games.tormenta.rules.poderes_pre_requisitos_v13_t20 import (
+        pre_requisitos_de_poder,
+    )
+
     n = str(nome or "").strip()
     if not n:
-        return {"categoria_v13": "geral", "custo_pm": 0}
+        return {"categoria_v13": "geral", "custo_pm": 0, "pre_requisitos_v13": []}
     m = mapa_catalogo_poderes_por_nome()
     row = m.get(_norm_nome(n)) or m.get(n.lower())
     if not row:
         row = {"nome": n, "categoria": "Geral"}
     cat = categoria_v13_de_item(row, notas=notas)
     pm = custo_pm_de_item(row)
-    return {"categoria_v13": cat, "custo_pm": pm}
+    reqs = pre_requisitos_de_poder(row)
+    return {
+        "categoria_v13": cat,
+        "custo_pm": pm,
+        "pre_requisitos_v13": reqs,
+    }

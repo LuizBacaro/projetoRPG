@@ -132,6 +132,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaPericiasValidarCriacaoResponse,
     TormentaPmMulticlassePreviewRequest,
     TormentaPmMulticlassePreviewResponse,
+    TormentaPoderValidarPreRequisitosRequest,
+    TormentaPoderValidarPreRequisitosResponse,
     TormentaPvPreviewResponse,
     TormentaRacaMbItem,
     TormentaRegrasAtributosResponse,
@@ -143,6 +145,9 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaRegrasPericiasResponse,
     TormentaRegrasRacasResponse,
     TormentaTracosRaciaisPreviewResponse,
+)
+from app.games.tormenta.services.personagem_talentos_service import (
+    TormentaPersonagemTalentosService,
 )
 from app.shared.core.deps import get_usuario_atual, requer_game_tormenta
 from app.shared.models.usuario import Usuario
@@ -1042,3 +1047,27 @@ def validar_pericias_criacao_mb(
         origem_beneficios=body.origem_beneficios,
     )
     return TormentaPericiasValidarCriacaoResponse(**data)
+
+
+@router.post(
+    "/poderes/validar-pre-requisitos",
+    response_model=TormentaPoderValidarPreRequisitosResponse,
+    summary="Valida pré-requisitos de poder v1.3 (RF-T08g)",
+)
+def validar_pre_requisitos_poder_v13(
+    body: TormentaPoderValidarPreRequisitosRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPoderValidarPreRequisitosResponse:
+    rv = normalizar_regra_versao(body.regra_versao or REGRA_VERSAO_V13)
+    if rv != REGRA_VERSAO_V13:
+        return TormentaPoderValidarPreRequisitosResponse(
+            valido=True,
+            nome_poder=body.nome_poder.strip(),
+            faltando=[],
+            pre_requisitos=[],
+            motivo="",
+        )
+    data = TormentaPersonagemTalentosService.preview_validar_pre_requisitos(
+        body.model_dump()
+    )
+    return TormentaPoderValidarPreRequisitosResponse(**data)

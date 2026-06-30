@@ -36,7 +36,9 @@ _TALENT_FIELD_LIMITS: Dict[str, int] = {
     "pagina_referencia": 80,
     "custo_pm": 4,
 }
-_TALENT_EXTRA_FIELDS: Tuple[str, ...] = tuple(_TALENT_FIELD_LIMITS)
+_TALENT_EXTRA_FIELDS: Tuple[str, ...] = tuple(_TALENT_FIELD_LIMITS) + (
+    "pre_requisitos_v13",
+)
 
 
 def _norm_nome_catalogo(texto: str) -> str:

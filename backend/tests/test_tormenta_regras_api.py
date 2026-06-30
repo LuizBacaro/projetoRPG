@@ -876,3 +876,28 @@ def test_get_conjuracao_preview_v13_cd_atributo_valor(client_regras_tormenta):
     b = r.json()
     assert b["modificador_conjuracao"] == 5
     assert b["cd_magia"] == 19
+
+
+def test_post_poderes_validar_pre_requisitos_v13(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/poderes/validar-pre-requisitos",
+        json={
+            "nome_poder": "Ataque Poderoso",
+            "regra_versao": "v13",
+            "for_valor": 0,
+        },
+    )
+    assert r.status_code == 200, r.text
+    assert r.json()["valido"] is False
+    assert r.json()["faltando"]
+
+    r_ok = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/poderes/validar-pre-requisitos",
+        json={
+            "nome_poder": "Ataque Poderoso",
+            "regra_versao": "v13",
+            "for_valor": 2,
+        },
+    )
+    assert r_ok.status_code == 200
+    assert r_ok.json()["valido"] is True
