@@ -768,6 +768,23 @@ def test_get_regras_conjuracao_mb(client_regras_tormenta):
     assert body.get("nota_custo_magia")
 
 
+def test_get_regras_conjuracao_mb_v13(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/conjuracao-mb",
+        params={"regra_versao": "v13"},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["regra_versao"] == "v13"
+    assert "classes" in body and "custo_pm_circulos" in body
+    assert any(x["slug"] == "arcanista" for x in body["classes"])
+    arcanista = next(x for x in body["classes"] if x["slug"] == "arcanista")
+    assert arcanista["modo_conjuracao"] == "caminho"
+    custos = {x["circulo"]: x["custo_pm"] for x in body["custo_pm_circulos"]}
+    assert custos[0] == 0 and custos[1] == 1 and custos[5] == 15
+    assert body.get("nota_custo_magia")
+
+
 def test_get_regras_conjuracao_preview_mago(client_regras_tormenta):
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/conjuracao-preview",
