@@ -7,6 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
+    <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260629wiz" />
 </head>
@@ -889,6 +890,7 @@
 <script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
 <script src="/games/dnd35/js/services/AuthService.js"></script>
 <script src="/games/dnd35/js/ui/Toast.js"></script>
+<script src="/games/dnd35/js/ui/ModalConfirm.js"></script>
 <script>
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
@@ -2289,14 +2291,30 @@
         tb.querySelectorAll('.js-del').forEach((btn) => {
             btn.addEventListener('click', async () => {
                 const id = Number(btn.getAttribute('data-id'));
-                if (!confirm('Excluir esta ficha permanentemente?')) return;
-                try {
-                    await svc.excluir(id);
-                    Toast.success('Ficha excluída.');
-                    carregar();
-                } catch (e) {
-                    Toast.error(e.message || 'Erro ao excluir');
+                const executarExclusao = async () => {
+                    try {
+                        await svc.excluir(id);
+                        Toast.success('Ficha excluída.');
+                        carregar();
+                    } catch (e) {
+                        Toast.error(e.message || 'Erro ao excluir');
+                    }
+                };
+
+                if (window.ModalConfirm && typeof window.ModalConfirm.mostrar === 'function') {
+                    window.ModalConfirm.mostrar({
+                        titulo: 'Excluir ficha',
+                        texto: 'Excluir esta ficha permanentemente?',
+                        textoConfirmar: 'Excluir',
+                        textoCancelar: 'Cancelar',
+                        classeConfirmar: 'modal-confirm-btn-perigo',
+                        onConfirmar: executarExclusao,
+                    });
+                    return;
                 }
+
+                if (!confirm('Excluir esta ficha permanentemente?')) return;
+                await executarExclusao();
             });
         });
     }
