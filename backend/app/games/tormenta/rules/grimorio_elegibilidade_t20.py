@@ -9,7 +9,11 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional, Tuple
 
-from app.games.tormenta.rules.conjuracao_t20 import _mapa_conjuracao_por_slug
+from app.games.tormenta.rules.conjuracao_t20 import mapa_conjuracao_por_slug
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_V13,
+    regra_versao_de_ficha,
+)
 
 
 def nivel_efetivo_conjuracao_mb(
@@ -25,7 +29,7 @@ def nivel_efetivo_conjuracao_mb(
             pass
     arr = fj.get("tormenta_niveis_classe_mb")
     if isinstance(arr, list) and arr:
-        mapa = _mapa_conjuracao_por_slug()
+        mapa = mapa_conjuracao_por_slug(regra_versao_de_ficha(fj))
         total = 0
         for it in arr:
             if not isinstance(it, dict):
@@ -70,19 +74,27 @@ def resumo_elegibilidade_grimorio_mb(
     nv = nivel_efetivo_conjuracao_mb(fj, nv_base)
 
     slug = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
+    rv = regra_versao_de_ficha(fj)
     if not slug:
         return (
             False,
-            "Selecione a classe MB na ficha ou ative tormenta_conjuracao_manual_mb em ficha_json "
+            "Selecione a classe na ficha ou ative tormenta_conjuracao_manual_mb em ficha_json "
             "(multiclasse, talentos de conjuração, inventor etc., conforme a mesa).",
         )
 
-    row = _mapa_conjuracao_por_slug().get(slug)
+    if slug == "arcanista" and rv == REGRA_VERSAO_V13:
+        cam = str(fj.get("arcanista_caminho") or "").strip().lower()
+        if cam not in ("bruxo", "mago", "feiticeiro"):
+            return (
+                False,
+                "Arcanista v1.3 exige caminho (bruxo, mago ou feiticeiro) em ficha_json.arcanista_caminho.",
+            )
+
+    row = mapa_conjuracao_por_slug(rv).get(slug)
     if not row:
         return (
             False,
-            f"A classe «{slug}» não possui lista de magias de conjurador no MB deste projeto "
-            "(mago, feiticeiro, bardo, clérigo, druida; paladino e ranger com magias a partir do 5º nível). "
+            f"A classe «{slug}» não possui lista de magias de conjurador nesta edição. "
             "Para outras origens, use tormenta_conjuracao_manual_mb na ficha.",
         )
 

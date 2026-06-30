@@ -38,8 +38,8 @@ def lista_tendencias_mb() -> List[str]:
     return out
 
 
-def lista_divindades_mb() -> List[Dict[str, str]]:
-    """Cada item: `slug` (chave estável) e `rotulo` (texto gravado no personagem)."""
+def lista_divindades_mb() -> List[Dict[str, Any]]:
+    """Cada item: `slug`, `rotulo` e metadados v1.3 opcionais."""
     rows = _documento().get("divindades") or []
     out: List[Dict[str, str]] = []
     if not isinstance(rows, list):
@@ -58,5 +58,14 @@ def lista_divindades_mb() -> List[Dict[str, str]]:
         if not slug:
             slug = _slug_fallback_de_rotulo(rot)
         slug = re.sub(r"[^a-z0-9_]", "", slug)[:40]
-        out.append({"slug": slug or _slug_fallback_de_rotulo(rot), "rotulo": rot})
+        item: Dict[str, Any] = {
+            "slug": slug or _slug_fallback_de_rotulo(rot),
+            "rotulo": rot,
+        }
+        if x.get("energia"):
+            item["energia"] = str(x.get("energia"))
+        pc = x.get("poderes_concedidos")
+        if isinstance(pc, list):
+            item["poderes_concedidos"] = [str(p) for p in pc if str(p).strip()]
+        out.append(item)
     return out

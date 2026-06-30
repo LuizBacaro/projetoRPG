@@ -7,13 +7,14 @@ import pytest
 from app.games.tormenta.rules.atributos_t20 import (
     CHAVES_ATRIBUTO,
     METODOS_GERACAO_ATRIBUTOS,
+    contribuicao_atributo_t20,
     custo_total_compra_seis_atributos,
     custo_valor_atributo_compra,
     gerar_seis_valores_4d6,
     lista_pericias_com_atributo,
     modificador_atributo_t20,
     pontos_iniciais_compra,
-    qualidade_geracao_4d6,
+    qualidade_geracao_4d6_v13,
     validar_valores_base_4d6,
     valores_4d6_para_mapa,
 )
@@ -67,7 +68,7 @@ def test_custo_total_quatro_dezoito() -> None:
 
 def test_lista_pericias_tamanho_e_primeira() -> None:
     lst = lista_pericias_com_atributo()
-    assert len(lst) == 32
+    assert len(lst) == 30
     assert lst[0]["nome"] == "Acrobacia"
     assert lst[0]["atributo"] == "des"
     assert lst[0]["somente_treinado"] is False
@@ -82,7 +83,7 @@ def test_lista_pericias_tamanho_e_primeira() -> None:
     assert lst[21]["nome"] == "Ofício"
     assert lst[21]["somente_treinado"] is False
     assert lst[21]["penalidade_armadura"] is False
-    assert lst[-2]["nome"] == "—"
+    assert lst[-1]["nome"] == "Vontade"
 
 
 def test_gerar_4d6_reproduzivel_com_seed() -> None:
@@ -114,5 +115,50 @@ def test_valores_4d6_para_mapa() -> None:
     assert m["car"] == 10
 
 
+def test_pontos_iniciais_compra_v13() -> None:
+    assert pontos_iniciais_compra("v13") == 10
+
+
+def test_custo_compra_v13() -> None:
+    assert custo_valor_atributo_compra(0, "v13") == 0
+    assert custo_valor_atributo_compra(1, "v13") == 1
+    assert custo_valor_atributo_compra(4, "v13") == 7
+    assert custo_valor_atributo_compra(-1, "v13") == -1
+
+
+def test_contribuicao_atributo_v13() -> None:
+    assert contribuicao_atributo_t20(3, "v13") == 3
+    assert contribuicao_atributo_t20(12, "mb") == 1
+
+
+def test_custo_total_v13_dez_pontos() -> None:
+    assert custo_total_compra_seis_atributos(1, 1, 1, 1, 1, 1, "v13") == 6
+    assert custo_total_compra_seis_atributos(2, 2, 2, 2, 2, 0, "v13") == 10
+
+
 def test_metodos_geracao_contem_4d6() -> None:
     assert "4d6" in METODOS_GERACAO_ATRIBUTOS
+
+
+def test_gerar_seis_valores_4d6_v13() -> None:
+    vals = gerar_seis_valores_4d6(seed=42, regra_versao="v13")
+    assert len(vals) == 6
+    assert all(-2 <= v <= 4 for v in vals)
+    assert qualidade_geracao_4d6_v13(vals)
+
+
+def test_validar_4d6_v13_rejeita_soma_baixa() -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="soma"):
+        validar_valores_base_4d6([0, 0, 0, 0, 0, 0], "v13")
+
+
+def test_lista_racas_v13() -> None:
+    from app.games.tormenta.rules.racas_t20 import lista_racas
+
+    racas = lista_racas("v13")
+    assert len(racas) == 17
+    slugs = {r["slug"] for r in racas}
+    assert "hynne" in slugs
+    assert "halfling" not in slugs

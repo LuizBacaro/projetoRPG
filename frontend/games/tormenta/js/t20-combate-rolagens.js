@@ -223,6 +223,34 @@
         }
     }
 
+    function regraVersaoPersonagemArena(p) {
+        if (!p) return 'mb';
+        const fj = p.ficha_json && typeof p.ficha_json === 'object' ? p.ficha_json : {};
+        if (window.T20RegraVersao && typeof window.T20RegraVersao.getRegraVersaoFicha === 'function') {
+            return window.T20RegraVersao.getRegraVersaoFicha(fj);
+        }
+        return fj.regra_versao === 'v13' ? 'v13' : 'mb';
+    }
+
+    function modAtributoCombatePersonagem(p, hab) {
+        if (!p) return 0;
+        const rv = regraVersaoPersonagemArena(p);
+        const h = String(hab || 'for').toLowerCase();
+        const map = {
+            for: p.for_valor,
+            des: p.des_valor,
+            con: p.con_valor,
+            int: p.int_valor,
+            sab: p.sab_valor,
+            car: p.car_valor,
+        };
+        const val = map[h] != null ? map[h] : p.for_valor;
+        if (window.T20RegraVersao) {
+            return window.T20RegraVersao.contribuicaoAtributo(val, rv);
+        }
+        return Number(val) || 0;
+    }
+
     function abrirModalAtaque() {
         const ar = arenaRef();
         if (!ar || !ar.ativo || !ar.ordemIds.length) {
@@ -251,7 +279,8 @@
             if (el) el.value = String(val);
         };
         set('t20ArenaAtaqueBab', 0);
-        set('t20ArenaAtaqueMod', 0);
+        const atMod = modAtributoCombatePersonagem(atacante, 'for');
+        set('t20ArenaAtaqueMod', atMod);
         set('t20ArenaAtaqueBonusArma', 0);
         set('t20ArenaAtaquePenal', 0);
         const ca = document.getElementById('t20ArenaAtaqueCa');
@@ -330,7 +359,10 @@
         const form = document.getElementById('t20ArenaDanoFormula');
         if (form) form.value = '1d8';
         const mod = document.getElementById('t20ArenaDanoMod');
-        if (mod) mod.value = '0';
+        const ar2 = arenaRef();
+        const ativoId2 = ar2 && ar2.ativo ? ar2.ordemIds[ar2.turnoIdx] : null;
+        const at2 = ativoId2 != null ? ar2.byId[ativoId2] : null;
+        if (mod) mod.value = String(modAtributoCombatePersonagem(at2, 'for'));
         const crit = document.getElementById('t20ArenaDanoCritico');
         if (crit) crit.checked = false;
         const apl = document.getElementById('t20ArenaDanoAplicarPv');

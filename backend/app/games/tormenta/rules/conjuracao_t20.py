@@ -1,4 +1,4 @@
-"""Conjuração MB — habilidade-chave, Pontos de Magia (PM) máximos por classe/nível, custo em PM por círculo."""
+"""Conjuração T20 — PM, habilidade-chave, custo por círculo (MB e v1.3)."""
 
 from __future__ import annotations
 
@@ -7,23 +7,78 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
-from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_MB,
+    REGRA_VERSAO_V13,
+    normalizar_regra_versao,
+)
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _CONJ_JSON = _DATA_DIR / "conjuracao_classe_mb.json"
+_CONJ_V13_JSON = _DATA_DIR / "conjuracao_classe_v13.json"
 
 HabilidadeChaveConjuracao = Literal["int", "sab", "car"]
+
+_CUSTO_PM_V13 = {0: 0, 1: 1, 2: 3, 3: 6, 4: 10, 5: 15}
+
+
+@lru_cache(maxsize=2)
+def _carregar_conjuracao(regra_versao: str = REGRA_VERSAO_MB) -> Dict[str, Any]:
+    path = (
+        _CONJ_V13_JSON
+        if normalizar_regra_versao(regra_versao) == REGRA_VERSAO_V13
+        else _CONJ_JSON
+    )
+    if not path.is_file():
+        return {"classes": []}
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @lru_cache(maxsize=1)
 def _carregar_conjuracao_classe_mb() -> Dict[str, Any]:
-    if not _CONJ_JSON.is_file():
-        return {"classes": []}
-    return json.loads(_CONJ_JSON.read_text(encoding="utf-8"))
+    return _carregar_conjuracao(REGRA_VERSAO_MB)
+
+
+def _pm_por_nivel_v13(slug: str) -> Optional[int]:
+    data = _carregar_conjuracao(REGRA_VERSAO_V13)
+    slug_l = str(slug or "").strip().lower()
+    for row in data.get("classes") or []:
+        if isinstance(row, dict) and str(row.get("slug", "")).lower() == slug_l:
+            return int(row.get("pm_por_nivel", 0))
+    extra = data.get("pm_por_nivel_nao_conjurador") or {}
+    if isinstance(extra, dict) and slug_l in extra:
+        return int(extra[slug_l])
+    return None
+
+
+def habilidade_chave_conjuracao_v13(
+    slug_classe: str, arcanista_caminho: Optional[str] = None
+) -> Optional[HabilidadeChaveConjuracao]:
+    slug = str(slug_classe or "").strip().lower()
+    data = _carregar_conjuracao(REGRA_VERSAO_V13)
+    for row in data.get("classes") or []:
+        if not isinstance(row, dict) or str(row.get("slug", "")).lower() != slug:
+            continue
+        if slug == "arcanista":
+            caminhos = row.get("caminhos") or {}
+            cam = str(arcanista_caminho or "mago").strip().lower()
+            sub = caminhos.get(cam) if isinstance(caminhos, dict) else None
+            if isinstance(sub, dict):
+                ch = str(sub.get("habilidade_chave", "int")).lower()
+                return ch if ch in ("int", "sab", "car") else "int"  # type: ignore[return-value]
+        ch = str(row.get("habilidade_chave", "")).lower()
+        if ch in ("int", "sab", "car"):
+            return ch  # type: ignore[return-value]
+    return None
 
 
 def lista_regras_conjuracao_classe_mb() -> List[Dict[str, Any]]:
-    """Linhas do JSON de conjuração (slug, chave, constantes de Pontos de Magia — PM)."""
+    """Linhas do JSON de conjuração MB (slug, chave, constantes de Pontos de Magia — PM)."""
+    return _lista_regras_conjuracao_mb()
+
+
+def _lista_regras_conjuracao_mb() -> List[Dict[str, Any]]:
     data = _carregar_conjuracao_classe_mb()
     rows = data.get("classes") or []
     out: List[Dict[str, Any]] = []
@@ -61,8 +116,70 @@ def lista_regras_conjuracao_classe_mb() -> List[Dict[str, Any]]:
     return sorted(out, key=lambda x: x["slug"])
 
 
+def lista_regras_conjuracao_por_versao(
+    regra_versao: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Regras de conjuração/PM por classe conforme edição."""
+    rv = normalizar_regra_versao(regra_versao)
+    if rv != REGRA_VERSAO_V13:
+        return lista_regras_conjuracao_classe_mb()
+    data = _carregar_conjuracao(REGRA_VERSAO_V13)
+    out: List[Dict[str, Any]] = []
+    for row in data.get("classes") or []:
+        if not isinstance(row, dict):
+            continue
+        slug = str(row.get("slug", "")).strip().lower()
+        if not slug:
+            continue
+        out.append(
+            {
+                "slug": slug,
+                "habilidade_chave": str(row.get("habilidade_chave", "")).lower(),
+                "pm_constante": 0,
+                "pm_por_nivel": int(row.get("pm_por_nivel", 0) or 0),
+                "conjuracao_inicia_nivel": int(
+                    row.get("conjuracao_inicia_nivel", 1) or 1
+                ),
+                "modo_conjuracao": str(
+                    row.get("modo_conjuracao", "preparar") or "preparar"
+                ),
+            }
+        )
+    extra = data.get("pm_por_nivel_nao_conjurador") or {}
+    if isinstance(extra, dict):
+        for slug, pm in extra.items():
+            s = str(slug).strip().lower()
+            if not s:
+                continue
+            out.append(
+                {
+                    "slug": s,
+                    "habilidade_chave": "int",
+                    "pm_constante": 0,
+                    "pm_por_nivel": int(pm),
+                    "conjuracao_inicia_nivel": 1,
+                    "modo_conjuracao": "nao_conjura",
+                }
+            )
+    return sorted(out, key=lambda x: x["slug"])
+
+
 def _mapa_conjuracao_por_slug() -> Dict[str, Dict[str, Any]]:
     return {str(r["slug"]).lower(): r for r in lista_regras_conjuracao_classe_mb()}
+
+
+def mapa_conjuracao_por_slug(
+    regra_versao: Optional[str] = None,
+) -> Dict[str, Dict[str, Any]]:
+    """Mapa slug → linha de conjuração conforme edição (MB ou v1.3)."""
+    rv = normalizar_regra_versao(regra_versao)
+    if rv == REGRA_VERSAO_V13:
+        return {
+            str(r["slug"]).lower(): r
+            for r in lista_regras_conjuracao_por_versao(REGRA_VERSAO_V13)
+            if str(r.get("modo_conjuracao", "")).lower() != "nao_conjura"
+        }
+    return _mapa_conjuracao_por_slug()
 
 
 def classe_conjuracao_mb_registrada(slug: str) -> bool:
@@ -73,8 +190,11 @@ def classe_conjuracao_mb_registrada(slug: str) -> bool:
 
 def habilidade_chave_conjuracao(
     slug_classe: str,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
 ) -> Optional[HabilidadeChaveConjuracao]:
-    """Atributo-chave de conjuração MB para o `slug` da classe, ou None se não for conjurador listado."""
+    if normalizar_regra_versao(regra_versao) == REGRA_VERSAO_V13:
+        return habilidade_chave_conjuracao_v13(slug_classe, arcanista_caminho)
     slug = str(slug_classe or "").strip().lower()
     if not slug:
         return None
@@ -95,12 +215,13 @@ def _modificador_chave(
     inteligencia: int,
     sabedoria: int,
     carisma: int,
+    regra_versao: Optional[str] = None,
 ) -> int:
     if habilidade == "int":
-        return modificador_atributo_t20(inteligencia)
+        return contribuicao_atributo_t20(inteligencia, regra_versao)
     if habilidade == "sab":
-        return modificador_atributo_t20(sabedoria)
-    return modificador_atributo_t20(carisma)
+        return contribuicao_atributo_t20(sabedoria, regra_versao)
+    return contribuicao_atributo_t20(carisma, regra_versao)
 
 
 def modificador_conjuracao_mb(
@@ -111,13 +232,42 @@ def modificador_conjuracao_mb(
     inteligencia: int,
     sabedoria: int,
     carisma: int,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
 ) -> Optional[int]:
-    """Modificador da habilidade-chave de conjuração MB, ou None se a classe não conjura no catálogo."""
-    hk = habilidade_chave_conjuracao(slug_classe)
+    """Contribuição do atributo-chave (mod. MB ou valor v1.3)."""
+    hk = habilidade_chave_conjuracao(slug_classe, regra_versao, arcanista_caminho)
     if not hk:
         return None
     return _modificador_chave(
-        hk, forca, destreza, constituicao, inteligencia, sabedoria, carisma
+        hk,
+        forca,
+        destreza,
+        constituicao,
+        inteligencia,
+        sabedoria,
+        carisma,
+        regra_versao,
+    )
+
+
+def cd_resistencia_magia_t20(
+    nivel_personagem: int,
+    atributo_chave_valor: int,
+    regra_versao: Optional[str] = None,
+) -> int:
+    """CD de magia: MB usa mod+10+½n; v1.3 usa 10 + ⌊n/2⌋ + valor atributo."""
+    try:
+        n = int(nivel_personagem)
+    except (TypeError, ValueError):
+        n = 1
+    meio = max(0, n // 2)
+    if normalizar_regra_versao(regra_versao) == REGRA_VERSAO_V13:
+        return 10 + meio + int(atributo_chave_valor)
+    return (
+        10
+        + meio
+        + contribuicao_atributo_t20(int(atributo_chave_valor), REGRA_VERSAO_MB)
     )
 
 
@@ -130,8 +280,10 @@ def pontos_magia_maximos_conjuracao(
     inteligencia: int,
     sabedoria: int,
     carisma: int,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
 ) -> Optional[int]:
-    """Pontos de Magia (PM) máximos MB para a classe no nível indicado, ou None se não conjura / abaixo do nível inicial."""
+    """PM máximos. MB: fórmula por conjurador; v1.3: nível × pm_por_nivel (todas as classes)."""
     slug = str(slug_classe or "").strip().lower()
     try:
         n = int(nivel_classe)
@@ -139,6 +291,12 @@ def pontos_magia_maximos_conjuracao(
         return None
     if n < 1 or n > 40:
         return None
+    rv = normalizar_regra_versao(regra_versao)
+    if rv == REGRA_VERSAO_V13:
+        pm_n = _pm_por_nivel_v13(slug)
+        if pm_n is None:
+            return None
+        return n * pm_n
     row = _mapa_conjuracao_por_slug().get(slug)
     if not row:
         return None
@@ -147,7 +305,7 @@ def pontos_magia_maximos_conjuracao(
         return None
     ch: HabilidadeChaveConjuracao = row["habilidade_chave"]  # type: ignore[assignment]
     mod = _modificador_chave(
-        ch, forca, destreza, constituicao, inteligencia, sabedoria, carisma
+        ch, forca, destreza, constituicao, inteligencia, sabedoria, carisma, rv
     )
     pm_c = int(row["pm_constante"])
     pm_n = int(row["pm_por_nivel"])
@@ -160,21 +318,30 @@ def pontos_magia_maximos_conjuracao(
 pontos_mana_maximos_conjuracao = pontos_magia_maximos_conjuracao
 
 
-def custo_pm_preparar_ou_lancar_magia(circulo: int) -> int:
-    """PM (Pontos de Magia) para preparar ou lançar: círculo 0 = 0; círculo C≥1 = C PM (MB)."""
+def custo_pm_preparar_ou_lancar_magia(
+    circulo: int, regra_versao: Optional[str] = None
+) -> int:
+    """PM para preparar/lançar. MB: C PM; v1.3: 1/3/6/10/15 (Tabela 4-1)."""
     try:
         c = int(circulo)
     except (TypeError, ValueError):
         return 0
     if c <= 0:
         return 0
+    if normalizar_regra_versao(regra_versao) == REGRA_VERSAO_V13:
+        return _CUSTO_PM_V13.get(min(c, 5), 15)
     return min(c, 20)
 
 
-def texto_custo_pm_por_circulo_mb() -> str:
-    data = _carregar_conjuracao_classe_mb()
+def texto_custo_pm_por_circulo_mb(regra_versao: Optional[str] = None) -> str:
+    rv = normalizar_regra_versao(regra_versao)
+    data = _carregar_conjuracao(rv)
     meta = data.get("_meta") if isinstance(data.get("_meta"), dict) else {}
     t = meta.get("custo_magia")
     if isinstance(t, str) and t.strip():
         return t.strip()
+    if rv == REGRA_VERSAO_V13:
+        return (
+            "1º: 1 PM; 2º: 3; 3º: 6; 4º: 10; 5º: 15. Truques via aprimoramento (0 PM)."
+        )
     return "Truque (círculo 0): 0 PM. Círculo C≥1: C PM."

@@ -4,17 +4,26 @@ from __future__ import annotations
 
 import json
 import random
+import unicodedata
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+from app.games.tormenta.rules.atributos_t20 import (
+    contribuicao_atributo_t20,
+    lista_pericias_com_atributo,
+)
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_MB,
+    REGRA_VERSAO_V13,
+    normalizar_regra_versao,
+)
 from app.games.tormenta.rules.tracos_raciais_t20 import tracos_mecanicos_por_slug
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _DC_JSON = _DATA_DIR / "pericias_dc_mb.json"
 
-_BONUS_TREINADO_T20 = 2
+_BONUS_TREINADO_MB = 2
 
 
 @lru_cache(maxsize=1)
@@ -32,7 +41,7 @@ def lista_dificuldades_padrao_mb() -> List[Dict[str, Any]]:
 
 
 def bonus_meio_nivel_t20(nivel: int) -> int:
-    """½ nível arredondado para baixo (MB)."""
+    """⌊nível / 2⌋ (MB e v1.3)."""
     try:
         nv = int(nivel)
     except (TypeError, ValueError):
@@ -40,10 +49,66 @@ def bonus_meio_nivel_t20(nivel: int) -> int:
     return max(0, nv // 2)
 
 
+def bonus_treinamento_por_nivel(nivel: int, regra_versao: Optional[str] = None) -> int:
+    """
+    Bônus de treinamento conforme patamar (v1.3 p.114):
+    1–6 → +2; 7–14 → +4; 15+ → +6. MB legado: +2 fixo.
+    """
+    if normalizar_regra_versao(regra_versao) != REGRA_VERSAO_V13:
+        return _BONUS_TREINADO_MB
+    try:
+        nv = int(nivel)
+    except (TypeError, ValueError):
+        nv = 1
+    nv = max(1, min(40, nv))
+    if nv >= 15:
+        return 6
+    if nv >= 7:
+        return 4
+    return 2
+
+
 def bonus_pericia_classe_mb(treinado: bool, pericia_de_classe: bool) -> int:
-    """Bônus de treinamento T20: +2 se treinado (perícia de classe segue mesma regra na ficha)."""
+    """Legado MB — preferir bonus_treinamento_por_nivel com regra_versao."""
     _ = pericia_de_classe
-    return _BONUS_TREINADO_T20 if treinado else 0
+    return _BONUS_TREINADO_MB if treinado else 0
+
+
+def _normalizar_nome_pericia(nome: str) -> str:
+    s = unicodedata.normalize("NFKD", str(nome or "").strip().lower())
+    return "".join(c for c in s if not unicodedata.combining(c))
+
+
+def meta_pericia_por_nome(
+    nome: str, regra_versao: Optional[str] = None
+) -> Optional[Dict[str, Any]]:
+    alvo = _normalizar_nome_pericia(nome)
+    if not alvo:
+        return None
+    for row in lista_pericias_com_atributo(regra_versao):
+        if _normalizar_nome_pericia(row.get("nome", "")) == alvo:
+            return row
+        slug = str(row.get("slug", "")).strip().lower()
+        if slug and slug == alvo.replace(" ", "_"):
+            return row
+    return None
+
+
+def pode_usar_pericia_treinada(
+    nome_pericia: str,
+    treinado: bool,
+    regra_versao: Optional[str] = None,
+) -> tuple[bool, str]:
+    """Bloqueia uso de perícia «somente treinada» sem treino (v1.3 p.114)."""
+    meta = meta_pericia_por_nome(nome_pericia, regra_versao)
+    if not meta or not meta.get("somente_treinado"):
+        return True, ""
+    if treinado:
+        return True, ""
+    return (
+        False,
+        f"{meta.get('nome', nome_pericia)}: perícia somente treinada — marque «Treinado» na ficha.",
+    )
 
 
 def calcular_bonus_pericia(
@@ -56,13 +121,20 @@ def calcular_bonus_pericia(
     racial_bonus: int = 0,
     penalidade_armadura: int = 0,
     pericia_de_classe: bool = False,
+    regra_versao: Optional[str] = None,
 ) -> int:
-    """Bônus total = mod + ½ nv + graduação + treinado (+2) + outros + racial − penalidade armadura."""
+    """
+    MB: mod + ½ nv + graduação + treino (+2) + outros + racial − penalidade.
+    v1.3: valor atributo + ½ nv + treino (+2/+4/+6) + outros + racial − penalidade (sem graduação).
+    """
+    rv = normalizar_regra_versao(regra_versao)
     meio = bonus_meio_nivel_t20(nivel)
-    tre = bonus_pericia_classe_mb(treinado, pericia_de_classe)
+    tre = bonus_treinamento_por_nivel(nivel, rv) if treinado else 0
     try:
         grad = int(graduacao)
     except (TypeError, ValueError):
+        grad = 0
+    if rv == REGRA_VERSAO_V13:
         grad = 0
     try:
         out = int(outros)
@@ -80,6 +152,7 @@ def calcular_bonus_pericia(
         mod = int(mod_atributo)
     except (TypeError, ValueError):
         mod = 0
+    _ = pericia_de_classe
     return mod + meio + grad + tre + out + rac - pen
 
 
@@ -88,8 +161,12 @@ def percepcao_passiva_t20(bonus_percepcao: int) -> int:
     return 10 + int(bonus_percepcao)
 
 
-def racial_bonus_pericia(slug_raca: str, nome_pericia: str) -> int:
-    row = tracos_mecanicos_por_slug(slug_raca)
+def racial_bonus_pericia(
+    slug_raca: str,
+    nome_pericia: str,
+    regra_versao: Optional[str] = None,
+) -> int:
+    row = tracos_mecanicos_por_slug(slug_raca, regra_versao)
     if not row:
         return 0
     per_map = row.get("pericias_bonus") or {}
@@ -127,5 +204,5 @@ def rolar_teste_pericia(
     }
 
 
-def mod_atributo_de_valor(valor: int) -> int:
-    return modificador_atributo_t20(int(valor))
+def mod_atributo_de_valor(valor: int, regra_versao: Optional[str] = None) -> int:
+    return contribuicao_atributo_t20(int(valor), regra_versao)

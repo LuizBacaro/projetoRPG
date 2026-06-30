@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from app.games.tormenta.rules.classes_t20 import lista_classes_mb
+from app.games.tormenta.rules.beneficios_nivel_t20 import beneficio_nivel
+from app.games.tormenta.rules.classes_t20 import lista_classes
 from app.games.tormenta.rules.conjuracao_t20 import (
     classe_conjuracao_mb_registrada,
     pontos_magia_maximos_conjuracao,
@@ -25,13 +26,20 @@ from app.games.tormenta.rules.magias_preparadas_t20 import (
     classe_usa_limite_preparadas_mb,
     teto_preparadas_mb,
 )
-from app.games.tormenta.rules.pericias_criacao_t20 import beneficio_nivel_mb
 from app.games.tormenta.rules.progressao_pv_t20 import pv_maximos_mb
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_V13,
+    regra_versao_de_ficha,
+)
 
 
-def _habilidade_classe_mb(slug_classe: str, nivel: int) -> Optional[str]:
+def _habilidade_classe_por_nivel(
+    slug_classe: str,
+    nivel: int,
+    regra_versao: Optional[str] = None,
+) -> Optional[str]:
     s = str(slug_classe or "").strip().lower()
-    for row in lista_classes_mb():
+    for row in lista_classes(regra_versao):
         if str(row.get("slug", "")).strip().lower() != s:
             continue
         hab = row.get("habilidades_por_nivel") or {}
@@ -99,46 +107,55 @@ def preview_subir_nivel_mb(
             "avisos": avisos,
         }
 
-    pv_ant = pv_maximos_mb(slug, nv0, con_valor)
-    pv_nov = pv_maximos_mb(slug, nv1, con_valor)
+    pv_ant = pv_maximos_mb(slug, nv0, con_valor, regra_versao=regra_versao_de_ficha(fj))
+    pv_nov = pv_maximos_mb(slug, nv1, con_valor, regra_versao=regra_versao_de_ficha(fj))
     pv_ganho = None
     if pv_ant is not None and pv_nov is not None:
         pv_ganho = max(0, pv_nov - pv_ant)
 
+    rv = regra_versao_de_ficha(fj)
+    arcanista = str(fj.get("arcanista_caminho") or "").strip().lower() or None
     nv_conj0 = nivel_efetivo_conjuracao_mb(fj, nv0)
     nv_conj1 = nivel_efetivo_conjuracao_mb(fj, nv1)
     pa_ant = None
     pa_nov = None
     pa_ganho = None
-    if classe_conjuracao_mb_registrada(slug):
+    sinc_pm = rv == REGRA_VERSAO_V13 or classe_conjuracao_mb_registrada(slug)
+    if sinc_pm:
+        nv_pm0 = nv0 if rv == REGRA_VERSAO_V13 else nv_conj0
+        nv_pm1 = nv1 if rv == REGRA_VERSAO_V13 else nv_conj1
         pa_ant = pontos_magia_maximos_conjuracao(
             slug,
-            nv_conj0,
+            nv_pm0,
             for_valor,
             des_valor,
             con_valor,
             int_valor,
             sab_valor,
             car_valor,
+            regra_versao=rv,
+            arcanista_caminho=arcanista,
         )
         pa_nov = pontos_magia_maximos_conjuracao(
             slug,
-            nv_conj1,
+            nv_pm1,
             for_valor,
             des_valor,
             con_valor,
             int_valor,
             sab_valor,
             car_valor,
+            regra_versao=rv,
+            arcanista_caminho=arcanista,
         )
         if pa_ant is not None and pa_nov is not None:
             pa_ganho = max(0, pa_nov - pa_ant)
 
-    ben_ant = beneficio_nivel_mb(nv0) or {}
-    ben_nov = beneficio_nivel_mb(nv1) or {}
+    ben_ant = beneficio_nivel(nv0, rv) or {}
+    ben_nov = beneficio_nivel(nv1, rv) or {}
     if nv1 > 20:
         avisos.append(
-            "Tabela de benefícios MB cobre níveis 1–20; acima disso use campos manuais."
+            "Tabela de benefícios cobre níveis 1–20; acima disso use campos manuais."
         )
 
     talentos_ant = int(ben_ant.get("talentos_totais", 0) or 0)
@@ -147,7 +164,11 @@ def preview_subir_nivel_mb(
 
     magias_livro_ganho = None
     magias_livro_max_novo = None
-    if classe_usa_limite_grimorio_mb(slug):
+    if classe_usa_limite_grimorio_mb(
+        slug,
+        regra_versao=rv,
+        arcanista_caminho=arcanista,
+    ):
         o0 = orcamento_magias_grimorio_mb(
             slug,
             nv_conj0,
@@ -157,6 +178,8 @@ def preview_subir_nivel_mb(
             int_valor=int_valor,
             sab_valor=sab_valor,
             car_valor=car_valor,
+            regra_versao=rv,
+            arcanista_caminho=arcanista,
         )
         o1 = orcamento_magias_grimorio_mb(
             slug,
@@ -167,17 +190,32 @@ def preview_subir_nivel_mb(
             int_valor=int_valor,
             sab_valor=sab_valor,
             car_valor=car_valor,
+            regra_versao=rv,
+            arcanista_caminho=arcanista,
         )
         if o0 is not None and o1 is not None:
             magias_livro_ganho = max(0, o1 - o0)
             magias_livro_max_novo = o1
 
     conhecidas_max_novo = None
-    if classe_usa_limite_conhecidas_mb(slug):
-        conhecidas_max_novo = total_magias_conhecidas_max_mb(slug, nv_conj1)
+    if classe_usa_limite_conhecidas_mb(
+        slug,
+        regra_versao=rv,
+        arcanista_caminho=arcanista,
+    ):
+        conhecidas_max_novo = total_magias_conhecidas_max_mb(
+            slug,
+            nv_conj1,
+            regra_versao=rv,
+            arcanista_caminho=arcanista,
+        )
 
     preparadas_teto_novo = None
-    if classe_usa_limite_preparadas_mb(slug):
+    if classe_usa_limite_preparadas_mb(
+        slug,
+        regra_versao=rv,
+        arcanista_caminho=arcanista,
+    ):
         preparadas_teto_novo = teto_preparadas_mb(
             slug,
             nv_conj1,
@@ -187,9 +225,11 @@ def preview_subir_nivel_mb(
             int_valor=int_valor,
             sab_valor=sab_valor,
             car_valor=car_valor,
+            regra_versao=rv,
+            arcanista_caminho=arcanista,
         )
 
-    hab_txt = _habilidade_classe_mb(slug, nv1)
+    hab_txt = _habilidade_classe_por_nivel(slug, nv1, regra_versao=rv)
 
     return {
         "permitido": True,
@@ -209,6 +249,8 @@ def preview_subir_nivel_mb(
         "graduacao_pericias_nova": str(ben_nov.get("graduacao_pericias", "") or ""),
         "talentos_totais_novo": talentos_nov,
         "talentos_ganho": talentos_ganho,
+        "poderes_gerais_totais_novo": talentos_nov if rv == REGRA_VERSAO_V13 else None,
+        "poderes_gerais_ganho": talentos_ganho if rv == REGRA_VERSAO_V13 else None,
         "pontos_habilidade_acumulados": int(
             ben_nov.get("pontos_habilidade_acumulados", 0) or 0
         ),

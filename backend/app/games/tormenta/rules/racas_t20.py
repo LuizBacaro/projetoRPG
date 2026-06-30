@@ -5,21 +5,39 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_MB,
+    normalizar_regra_versao,
+)
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _RACAS_JSON = _DATA_DIR / "racas_mb.json"
+_RACAS_V13_JSON = _DATA_DIR / "racas_v13.json"
+
+
+@lru_cache(maxsize=2)
+def _carregar_racas(regra_versao: str = "mb") -> Dict[str, Any]:
+    from app.games.tormenta.rules.regra_versao_t20 import REGRA_VERSAO_V13
+
+    path = (
+        _RACAS_V13_JSON
+        if normalizar_regra_versao(regra_versao) == REGRA_VERSAO_V13
+        else _RACAS_JSON
+    )
+    raw = path.read_text(encoding="utf-8")
+    return json.loads(raw)
 
 
 @lru_cache(maxsize=1)
-def _carregar_racas() -> Dict[str, Any]:
-    raw = _RACAS_JSON.read_text(encoding="utf-8")
-    return json.loads(raw)
+def _carregar_racas_mb() -> Dict[str, Any]:
+    return _carregar_racas("mb")
 
 
 def idiomas_mb_extras() -> Tuple[str, List[Dict[str, str]]]:
     """Texto geral de idiomas (MB) + tabela Idioma / quem costuma falar."""
-    data = _carregar_racas()
+    data = _carregar_racas_mb()
     geral = str(data.get("idiomas_geral_mb", "") or "").strip()
     raw_tab = data.get("idiomas_tabela_mb") or []
     tabela: List[Dict[str, str]] = []
@@ -40,8 +58,12 @@ def idiomas_mb_extras() -> Tuple[str, List[Dict[str, str]]]:
 
 
 def lista_racas_mb() -> List[Dict[str, Any]]:
-    """Lista ordenada de raças MB para API/ficha (slug, nome, ajustes, flags, tracos_resumo, idioma_racial_mb)."""
-    data = _carregar_racas()
+    return lista_racas(REGRA_VERSAO_MB)
+
+
+def lista_racas(regra_versao: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Lista ordenada de raças para API/ficha conforme edição (mb ou v13)."""
+    data = _carregar_racas(normalizar_regra_versao(regra_versao))
     out: List[Dict[str, Any]] = []
     for row in data.get("racas", []):
         slug = str(row.get("slug", "")).strip()
@@ -76,11 +98,22 @@ def lista_racas_mb() -> List[Dict[str, Any]]:
                 "nome": nome,
                 "ajustes": ajustes_limpo,
                 "escolhe_duas_mais2": bool(row.get("escolhe_duas_mais2")),
+                "escolhe_tres_mais1": bool(row.get("escolhe_tres_mais1")),
                 "escolhe_um_mais2": bool(row.get("escolhe_um_mais2")),
+                "escolhe_suraggel_subtipo": bool(row.get("escolhe_suraggel_subtipo")),
                 "excluir_atributos_mais2": excluir,
+                "excluir_atributos_mais1": [
+                    str(x).lower().strip()
+                    for x in (row.get("excluir_atributos_mais1") or [])
+                    if str(x).lower().strip()
+                    in ("for", "des", "con", "int", "sab", "car")
+                ],
                 "mod_car_fixo": int(row.get("mod_car_fixo", 0) or 0),
                 "tracos_resumo": str(row.get("tracos_resumo", "")).strip(),
                 "idioma_racial_mb": idioma_racial,
+                "pericias_treinadas_extra": int(
+                    row.get("pericias_treinadas_extra", 0) or 0
+                ),
             }
         )
     return out

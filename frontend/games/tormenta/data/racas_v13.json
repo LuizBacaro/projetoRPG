@@ -1,0 +1,117 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Tabela 1-2 p.18; traços p.19–31",
+    "nota": "Ajustes v1.3 (+2/+1/−1). Humano: +1 em três atributos (Versátil separado). Sem texto longo de traços."
+  },
+  "racas": [
+    {
+      "slug": "humano",
+      "nome": "Humano",
+      "ajustes": {},
+      "escolhe_tres_mais1": true,
+      "tracos_resumo": "Versátil: 2 perícias treinadas OU 1 perícia + 1 poder geral (p.19)."
+    },
+    {
+      "slug": "anao",
+      "nome": "Anão",
+      "ajustes": { "con": 2, "sab": 1, "des": -1 },
+      "tracos_resumo": "Desloc. 6 m; visão no escuro; resistências (p.19)."
+    },
+    {
+      "slug": "dahllan",
+      "nome": "Dahllan",
+      "ajustes": { "sab": 2, "des": 1, "int": -1 },
+      "tracos_resumo": "Empatia selvagem; amigo dos animais (p.20)."
+    },
+    {
+      "slug": "elfo",
+      "nome": "Elfo",
+      "ajustes": { "int": 2, "des": 1, "con": -1 },
+      "tracos_resumo": "Visão na penumbra; graça de Wynna (p.20)."
+    },
+    {
+      "slug": "goblin",
+      "nome": "Goblin",
+      "ajustes": { "des": 2, "int": 1, "car": -1 },
+      "tracos_resumo": "Pequeno; desloc. 9 m; engenhoso (p.21)."
+    },
+    {
+      "slug": "lefou",
+      "nome": "Lefou",
+      "ajustes": { "car": -1 },
+      "escolhe_tres_mais1": true,
+      "excluir_atributos_mais1": ["car"],
+      "tracos_resumo": "Deformidade; afinidade Tormenta (p.22)."
+    },
+    {
+      "slug": "minotauro",
+      "nome": "Minotauro",
+      "ajustes": { "for": 2, "con": 1, "sab": -1 },
+      "tracos_resumo": "Medo de altura; chifres; faro (p.23)."
+    },
+    {
+      "slug": "qareen",
+      "nome": "Qareen",
+      "ajustes": { "car": 2, "int": 1, "sab": -1 },
+      "tracos_resumo": "Desejos; herança de Wynna (p.24)."
+    },
+    {
+      "slug": "golem",
+      "nome": "Golem",
+      "ajustes": { "for": 2, "con": 1, "car": -1 },
+      "tracos_resumo": "Construto; sem fome/sono (p.25)."
+    },
+    {
+      "slug": "hynne",
+      "nome": "Hynne",
+      "ajustes": { "des": 2, "car": 1, "for": -1 },
+      "tracos_resumo": "Pequeno; sorte hynne (p.26)."
+    },
+    {
+      "slug": "kliren",
+      "nome": "Kliren",
+      "ajustes": { "int": 2, "car": 1, "for": -1 },
+      "tracos_resumo": "Híbrido gnoll; vanguardista (p.27)."
+    },
+    {
+      "slug": "medusa",
+      "nome": "Medusa",
+      "ajustes": { "des": 2, "car": 1 },
+      "tracos_resumo": "Olhar atordoante; serpentes (p.28)."
+    },
+    {
+      "slug": "osteon",
+      "nome": "Osteon",
+      "ajustes": { "con": -1 },
+      "escolhe_tres_mais1": true,
+      "excluir_atributos_mais1": ["con"],
+      "tracos_resumo": "Morto-vivo; memória póstuma (p.28)."
+    },
+    {
+      "slug": "sereia_tritao",
+      "nome": "Sereia/Tritão",
+      "ajustes": {},
+      "escolhe_tres_mais1": true,
+      "tracos_resumo": "Anfíbio; transformação aquática (p.29)."
+    },
+    {
+      "slug": "silfide",
+      "nome": "Sílfide",
+      "ajustes": { "car": 2, "des": 1, "for": -2 },
+      "tracos_resumo": "Minúscula; voo (PM) (p.30)."
+    },
+    {
+      "slug": "suraggel",
+      "nome": "Suraggel",
+      "ajustes": {},
+      "escolhe_suraggel_subtipo": true,
+      "tracos_resumo": "Aggelus (+Sab,+Car) ou Sulfure (+Des,+Int) (p.30)."
+    },
+    {
+      "slug": "trog",
+      "nome": "Trog",
+      "ajustes": { "con": 2, "for": 1, "int": -1 },
+      "tracos_resumo": "Reptiliano; camuflagem (p.31)."
+    }
+  ]
+}

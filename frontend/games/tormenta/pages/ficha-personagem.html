@@ -151,7 +151,7 @@
                 </details>
                 <div class="ficha-secao t20-ficha-secao" style="margin-top:0.65rem">
                     <div class="ficha-secao-header">
-                        <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Talentos (MB / escolhidos)</h3>
+                        <h3 class="ficha-secao-titulo t20-ficha-secao-titulo" id="titSecaoTalentosPoderes">Talentos (MB / escolhidos)</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnT20AddTalentoMb" title="Adicionar talento">➕ Adicionar</button>
                     </div>
                     <div id="t20FichaTalentosMb" class="t20-ficha-dnd-lista"><span class="t20-ficha-vazio">Nenhum talento na lista.</span></div>
@@ -325,7 +325,7 @@
 
                 <div class="t20-ficha-secao t20-ficha-secao--pericias">
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Perícias</h3>
-                    <p class="t20-hint" style="margin-top:0">½ nível usa o nível em <strong>Editar ficha</strong>. Marque treinado quando aplicável (+2 no T20). Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe MB.</p>
+                    <p class="t20-hint" id="fichaPericiasHint" style="margin-top:0">½ nível usa o nível em <strong>Editar ficha</strong>. Marque treinado quando aplicável (+2 no T20). Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe MB.</p>
                     <p class="t20-hint" id="fichaPericiasOrcamento" style="margin-top:0.2rem;font-size:0.72rem"></p>
                     <div class="t20-pericias-scroll">
                         <table class="t20-pericias-table" id="tblPericias">
@@ -333,9 +333,9 @@
                                 <tr>
                                     <th title="Treinado">Tr</th>
                                     <th>Perícia</th>
-                                    <th>Total</th>
+                                    <th id="thPericiasTotal" title="Graduações (MB)">Total</th>
                                     <th>½ nv</th>
-                                    <th>Mod</th>
+                                    <th id="thPericiasMod">Mod</th>
                                     <th>Out</th>
                                     <th title="Somente treinado (regra)">✱</th>
                                     <th title="Penalidade de armadura (regra)">Arm.</th>
@@ -667,9 +667,40 @@
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--wide" id="wrapRacaMais1" style="display: none">
                                 <div class="t20-ficha-field" style="margin: 0">
-                                    <label for="f_raca_mais1">Meio-orc: +2 em outra habilidade (exceto INT e CAR)</label>
+                                    <label for="f_raca_mais1" id="lbl_raca_mais1">+1 em habilidade (3ª)</label>
                                     <select id="f_raca_mais1" class="t20-input"></select>
                                 </div>
+                            </div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="wrapHumanoVersatil" style="display: none">
+                                <label for="f_humano_versatil">Humano — Versátil (v1.3)</label>
+                                <select id="f_humano_versatil" class="t20-input">
+                                    <option value="duas_pericias">2 perícias treinadas à escolha</option>
+                                    <option value="pericia_poder">1 perícia treinada + 1 poder geral</option>
+                                </select>
+                                <div id="wrapHumanoVersatilPoder" style="display: none; margin-top: 0.35rem">
+                                    <label for="f_humano_versatil_poder_nome">Poder geral (Versátil)</label>
+                                    <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap">
+                                        <input
+                                            id="f_humano_versatil_poder_nome"
+                                            class="t20-input"
+                                            readonly
+                                            placeholder="Escolha um poder geral"
+                                            style="flex: 1; min-width: 10rem"
+                                        />
+                                        <button type="button" class="tormenta-btn" id="btnHumanoVersatilPoder">
+                                            Escolher
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="t20-hint" id="lblVersatilPoderHint" style="margin: 0.25rem 0 0">Poder geral: use a seção Poderes ou «Escolher» acima.</p>
+                            </div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="wrapSuraggelSubtipo" style="display: none">
+                                <label for="f_suraggel_subtipo">Suraggel — subtipo (v1.3)</label>
+                                <select id="f_suraggel_subtipo" class="t20-input">
+                                    <option value="">— Escolha —</option>
+                                    <option value="aggelus">Aggelus (+Sab +2, +Car +1)</option>
+                                    <option value="sulfure">Sulfure (+Des +2, +Int +1)</option>
+                                </select>
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--wide">
                                 <p class="t20-hint t20-dialog-tracos-raca" id="f_tracos_raca_txt">Escolha uma raça para ver os traços raciais (MB, texto do livro).</p>
@@ -680,16 +711,73 @@
                     <div class="t20-ficha-secao">
                         <h3 class="t20-ficha-secao-titulo">Classe, nível &amp; MB</h3>
                         <div class="t20-identity-grid t20-identity-grid--compact">
+                            <div class="t20-ficha-field t20-ficha-field--book" id="wrapOrigemSlug" style="display: none">
+                                <label for="f_origem_slug">Origem (v1.3)</label>
+                                <select id="f_origem_slug" class="t20-input"></select>
+                            </div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="wrapOrigemBeneficios" style="display: none">
+                                <div id="t20OrigemBeneficiosHost"></div>
+                                <div id="t20OrigemItensEscolhaHost" style="display: none; margin-top: 0.35rem"></div>
+                                <p id="t20OrigemItensLista" class="t20-hint" style="margin: 0.35rem 0 0"></p>
+                            </div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="wrapKitInicialV13" style="display: none">
+                                <p class="t20-hint" style="margin: 0 0 0.35rem">
+                                    <strong>Equipamento inicial</strong> (p.140) — grátis no 1º nível, além dos itens da origem.
+                                </p>
+                                <p id="t20KitSemArmaduraHint" class="t20-hint" style="display: none; margin: 0 0 0.35rem">
+                                    Arcanista v1.3: começa sem armadura.
+                                </p>
+                                <div class="t20-identity-grid t20-identity-grid--compact">
+                                    <div class="t20-ficha-field">
+                                        <label for="f_kit_arma_simples">Arma simples</label>
+                                        <select id="f_kit_arma_simples" class="t20-input"></select>
+                                    </div>
+                                    <div class="t20-ficha-field" id="wrapKitArmaMarcial" style="display: none">
+                                        <label for="f_kit_arma_marcial">Arma marcial</label>
+                                        <select id="f_kit_arma_marcial" class="t20-input"></select>
+                                    </div>
+                                    <div class="t20-ficha-field" id="wrapKitArmadura">
+                                        <label for="f_kit_armadura">Armadura</label>
+                                        <select id="f_kit_armadura" class="t20-input"></select>
+                                    </div>
+                                    <div class="t20-ficha-field" id="wrapKitEscudo" style="display: none">
+                                        <label style="display:flex;align-items:center;gap:.35rem;margin-top:1.4rem">
+                                            <input type="checkbox" id="f_kit_escudo" />
+                                            Escudo leve
+                                        </label>
+                                    </div>
+                                    <div class="t20-ficha-field">
+                                        <label>Dinheiro inicial</label>
+                                        <span id="t20KitDinheiroRolado" class="t20-hint">Clique em «Rolar T$ 4d6»</span>
+                                        <button type="button" class="tormenta-btn" id="btnKitRolarDinheiro" style="margin-top: 0.25rem">
+                                            Rolar T$ 4d6
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="t20-ficha-field t20-ficha-field--book"><label for="f_origem">Origem</label><input id="f_origem" maxlength="120" /></div>
                             <div class="t20-ficha-field t20-ficha-field--book"><label for="f_classe_só">Classe(s)</label><input id="f_classe_só" maxlength="120" /></div>
                             <div class="t20-ficha-field"><label for="f_nivel">Nível</label><input id="f_nivel" type="number" min="0" max="40" /></div>
                             <div class="t20-ficha-field" style="display:flex;align-items:flex-end">
-                                <button type="button" id="btnT20SubirNivelMb" class="tormenta-btn tormenta-btn--outline-red" style="width:100%;font-size:.78rem" title="Sobe um nível aplicando PV, PM e benefícios MB">⬆ Subir nível (MB)</button>
+                                <button type="button" id="btnT20SubirNivelMb" class="tormenta-btn tormenta-btn--outline-red" style="width:100%;font-size:.78rem" title="Sobe um nível aplicando PV, PM e benefícios da edição ativa">⬆ Subir nível</button>
                             </div>
                             <div class="t20-ficha-field"><label for="f_bba_mb">BBA base (MB)</label><input id="f_bba_mb" type="text" readonly tabindex="-1" class="t20-input" value="—" title="Base de Ataque conforme classe MB e nível (uma classe; multiclasse some no livro)" /></div>
                             <div class="t20-ficha-field t20-ficha-field--wide">
-                                <label for="f_classe_mb">Classe MB (BBA / tabela)</label>
+                                <label for="f_classe_mb" id="lbl_classe_mb">Classe (tabela)</label>
                                 <select id="f_classe_mb" class="t20-input"></select>
+                            </div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="wrapArcanistaCaminho" style="display: none">
+                                <label for="f_arcanista_caminho">Caminho do Arcanista (v1.3 — irreversível)</label>
+                                <select id="f_arcanista_caminho" class="t20-input">
+                                    <option value="">— Escolha o caminho —</option>
+                                    <option value="bruxo">Bruxo (INT — foco ou Misticismo)</option>
+                                    <option value="mago">Mago (INT — grimório, preparar)</option>
+                                    <option value="feiticeiro">Feiticeiro (CAR — espontâneo, linhagem)</option>
+                                </select>
+                            </div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="wrapPericiasClasseOu" style="display: none">
+                                <label>Perícias de classe — escolha «ou» (v1.3)</label>
+                                <div id="t20PericiasClasseOuHost"></div>
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--wide">
                                 <label style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; font-weight: 600">
@@ -748,6 +836,16 @@
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--book"><label for="f_tendencia">Tendência (MB)</label><select id="f_tendencia" class="t20-input" title="Alinhamento — Módulo Básico p.116–119 (lista via API)"></select></div>
                             <div class="t20-ficha-field t20-ficha-field--double t20-ficha-field--book"><label for="f_divindade">Divindade (MB)</label><select id="f_divindade" class="t20-input" title="Panteão — Módulo Básico p.120–126 (lista via API)"></select></div>
+                            <div class="t20-ficha-field t20-ficha-field--double" id="wrapPoderConcedido" style="display: none">
+                                <label for="f_poder_concedido">Poder concedido (devoto)</label>
+                                <select id="f_poder_concedido" class="t20-input"></select>
+                            </div>
+                            <div class="t20-ficha-field" id="wrapDevoto" style="display: none">
+                                <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer; font-weight: 600">
+                                    <input type="checkbox" id="f_devoto" />
+                                    <span>Devoto</span>
+                                </label>
+                            </div>
                             <div class="t20-ficha-field"><label for="f_sexo">Sexo</label><input id="f_sexo" maxlength="40" /></div>
                             <div class="t20-ficha-field"><label for="f_idade">Idade</label><input id="f_idade" maxlength="80" /></div>
                             <div class="t20-ficha-field"><label for="f_dlg_desl">Deslocamento</label><input id="f_dlg_desl" maxlength="80" placeholder="Ex.: 9 m" title="Espelhado no cabeçalho da ficha" /></div>
@@ -1029,8 +1127,8 @@
                     <div class="equipamentos-header-esquerda">
                         <span class="equipamentos-icone">📜</span>
                         <div>
-                            <h2 class="equipamentos-titulo">Gerenciar talentos</h2>
-                            <p class="equipamentos-subtitulo">Catálogo MB (talentos das classes) e talento livre. <span class="t20-hint">Esc fecha.</span></p>
+                            <h2 class="equipamentos-titulo" id="titModalGerenciarTalentos">Gerenciar talentos</h2>
+                            <p class="equipamentos-subtitulo" id="subModalGerenciarTalentos">Catálogo MB (talentos das classes) e talento livre. <span class="t20-hint">Esc fecha.</span></p>
                         </div>
                     </div>
                     <button type="button" class="equipamentos-fechar" id="btnFecharModalTalentosMb" aria-label="Fechar">✕</button>
@@ -1167,7 +1265,7 @@
         <div class="equipamentos-overlay" id="modalSubirNivelTormenta" aria-hidden="true" role="dialog" aria-labelledby="tituloModalSubirNivel">
             <div class="equipamentos-modal" style="max-width:32rem">
                 <div class="equipamentos-cabecalho">
-                    <h2 id="tituloModalSubirNivel" class="equipamentos-titulo">Subir nível (MB)</h2>
+                    <h2 id="tituloModalSubirNivel" class="equipamentos-titulo">Subir nível</h2>
                     <button type="button" class="equipamentos-fechar" id="btnFecharModalSubirNivel" aria-label="Fechar">✕</button>
                 </div>
                 <p class="t20-hint" style="margin:0 0 .75rem">Aplica o próximo nível (atual + 1) com PV, PM e referências do Módulo Básico.</p>
@@ -1210,15 +1308,19 @@
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioAuto"></script>
-<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260621attr"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260621attr"></script>
+<script src="/games/tormenta/js/t20-regra-versao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
-<script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260614"></script>
-<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260621"></script>
+<script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260614"></script>
 <script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614subirnivel"></script>
-<script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260614"></script>
+<script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-origens-v13.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-kit-inicial-v13.js?v=20260629"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -1234,13 +1336,32 @@
     let CUSTO_COMPRA_ATRIBUTO = {};
     let PONTOS_INICIAIS_COMPRA = 20;
 
+    /** Versão de regras da ficha: v13 (novas) ou mb (legado). */
+    let T20_REGRA_VERSAO_FICHA =
+        window.T20RegraVersao && window.T20RegraVersao.DEFAULT_NOVA_FICHA
+            ? window.T20RegraVersao.DEFAULT_NOVA_FICHA
+            : 'v13';
+
+    function getRegraVersaoAtiva() {
+        return T20_REGRA_VERSAO_FICHA;
+    }
+
+    function t20LabelVersao() {
+        return window.T20RegraVersao
+            ? window.T20RegraVersao.labelVersaoCurta(getRegraVersaoAtiva())
+            : 'MB';
+    }
+
     async function carregarRegrasTormenta() {
+        const rv = getRegraVersaoAtiva();
         try {
-            return await new TormentaRegrasService().obterAtributos();
+            return await new TormentaRegrasService().obterAtributos({ regraVersao: rv });
         } catch (e1) {
-            const r = await fetch('/games/tormenta/data/regras-atributos.json?v=20260511c', {
-                cache: 'no-cache',
-            });
+            const path =
+                rv === 'v13'
+                    ? '/games/tormenta/data/atributos_compra_pontos_v13.json?v=20260629'
+                    : '/games/tormenta/data/regras-atributos.json?v=20260511c';
+            const r = await fetch(path, { cache: 'no-cache' });
             if (!r.ok) throw e1;
             return r.json();
         }
@@ -1248,7 +1369,11 @@
 
     function aplicarRegrasPayload(data) {
         PONTOS_INICIAIS_COMPRA =
-            typeof data.pontos_compra_iniciais === 'number' ? data.pontos_compra_iniciais : 20;
+            typeof data.pontos_compra_iniciais === 'number'
+                ? data.pontos_compra_iniciais
+                : typeof data._meta?.pontos_iniciais === 'number'
+                  ? data._meta.pontos_iniciais
+                  : 20;
         const next = {};
         (data.custos || []).forEach((row) => {
             next[row.valor] = row.custo;
@@ -1372,6 +1497,13 @@
         t20SetSpanText('fichaCa', String(__t20CaBaseSemItens + t20SomaBonusArmaduras()));
     }
 
+    function t20RecalcularCaBaseV13() {
+        if (!window.T20RegraVersao || !window.T20RegraVersao.isV13(getRegraVersaoAtiva())) return;
+        const desEl = q('fichaDesResumo');
+        const des = desEl ? Number(desEl.value) : 0;
+        __t20CaBaseSemItens = window.T20RegraVersao.defesaBaseCa(des, getRegraVersaoAtiva(), 0);
+    }
+
     function t20ReadIniciativaTotal() {
         const el = q('fichaIniciativa');
         if (!el) return 0;
@@ -1386,7 +1518,15 @@
         if (caBd) {
             const arm = t20SomaBonusArmaduras();
             const base = __t20CaBaseSemItens;
-            if (arm === 0) {
+            const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+            if (isV13) {
+                const desM = modificadorAtributoT20((q('fichaDesResumo') && q('fichaDesResumo').value) || '0');
+                if (arm === 0) {
+                    caBd.textContent = `10 + DES ${formatModificadorAtributo(desM)} = ${base} (v1.3)`;
+                } else {
+                    caBd.textContent = `Base ${base} (10+DES) + itens ${arm >= 0 ? '+' : ''}${arm} = ${base + arm}`;
+                }
+            } else if (arm === 0) {
                 caBd.textContent = `CA salva: ${base} (lista de armaduras sem bônus de CA)`;
             } else {
                 caBd.textContent = `Base ${base} + itens ${arm >= 0 ? '+' : ''}${arm} = ${base + arm}`;
@@ -1401,9 +1541,13 @@
         const iniTot = t20IniciativaTotalMbFromSheet();
         t20SetSpanText('fichaIniciativa', t20FmtIniTotalApi(iniTot));
         const pvBd = q('fichaPvBreakdown');
-        if (pvBd) pvBd.textContent = 'Atuais / máximos';
+        if (pvBd && !(pvBd.dataset && pvBd.dataset.t20PvFormula)) {
+            pvBd.textContent = 'Atuais / máximos';
+        }
         const pmBd = q('fichaPmBreakdown');
-        if (pmBd) pmBd.textContent = 'Atuais / máximos';
+        if (pmBd && !(pmBd.dataset && pmBd.dataset.t20PmFormula)) {
+            pmBd.textContent = 'Atuais / máximos';
+        }
     }
 
     const ATTR_KEYS = ['for', 'des', 'con', 'int', 'sab', 'car'];
@@ -1419,9 +1563,12 @@
         const AG = window.T20AtributosGeracao;
         if (!AG) return;
         const rDel = racialDeltasMap();
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        const fallbackBase = isV13 ? 0 : 10;
+        const minFin = isV13 ? -99 : 1;
         ATTR_KEYS.forEach((a) => {
             const base = Math.floor(Number(bases[a]));
-            const fin = Math.max(1, (Number.isFinite(base) ? base : 10) + (rDel[a] || 0));
+            const fin = Math.max(minFin, (Number.isFinite(base) ? base : fallbackBase) + (rDel[a] || 0));
             const idInp = T20_ATTR_INP[a];
             const idDlg = T20_ATTR_DLG[a];
             if (idInp && q(idInp)) q(idInp).value = String(fin);
@@ -1446,11 +1593,15 @@
     async function rolar4d6Ficha() {
         const AG = window.T20AtributosGeracao;
         if (!AG) return;
+        const rv = getRegraVersaoAtiva();
         try {
-            const data = await new TormentaRegrasService().gerarAtributos({ metodo: '4d6' });
+            const data = await new TormentaRegrasService().gerarAtributos({
+                metodo: '4d6',
+                regraVersao: rv,
+            });
             fichaBasesAtributos = { ...(data.valores || {}) };
         } catch (_e) {
-            const vals = AG.gerarSeisValores4d6Local();
+            const vals = AG.gerarSeisValores4d6Local({ regraVersao: rv });
             fichaBasesAtributos = AG.valoresParaMapa(vals);
         }
         aplicarFinaisDeBasesFicha(fichaBasesAtributos);
@@ -1459,7 +1610,10 @@
 
     function resetCompraPontosFicha() {
         const AG = window.T20AtributosGeracao;
-        fichaBasesAtributos = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+        const rv = getRegraVersaoAtiva();
+        fichaBasesAtributos = AG
+            ? AG.basesPadraoCompra({ regraVersao: rv })
+            : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
         aplicarFinaisDeBasesFicha(fichaBasesAtributos);
     }
 
@@ -1716,6 +1870,8 @@
     function t20RenderPmMbResumoPainel(cj) {
         const host = q('t20PmMbResumoCorpo');
         if (!host) return;
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        const lv = t20LabelVersao();
         const fallbackCusto =
             'Truques (círculo 0): 0 PM. Magia de círculo C ≥ 1: custo em PM = C (1 PM por nível da magia).';
         const notaApi =
@@ -1723,9 +1879,12 @@
                 ? cj.nota_custo_magia.trim()
                 : '';
         const notaCusto = notaApi || fallbackCusto;
-        const intro =
-            'PM medem o poder mágico do conjurador. Bardos e feiticeiros gastam PM ao lançar magias; clérigos, druidas, magos, paladinos e rangers ao prepará-las. Consulte o MB para tabelas completas e efeitos.';
-        const titulo = 'PM máximos (resumo MB — por nível de classe após o 1º):';
+        const intro = isV13
+            ? 'Todas as classes têm Pontos de Magia (PM). PM máximos = nível × PM por nível da classe (soma em multiclasse).'
+            : 'PM medem o poder mágico do conjurador. Bardos e feiticeiros gastam PM ao lançar magias; clérigos, druidas, magos, paladinos e rangers ao prepará-las. Consulte o MB para tabelas completas e efeitos.';
+        const titulo = isV13
+            ? `PM máximos (${lv} — nível × PM por nível):`
+            : `PM máximos (resumo ${lv} — por nível de classe após o 1º):`;
         host.textContent = [notaCusto, '', intro, '', titulo, ...t20LinhasResumoPmClasses(cj)].join('\n');
     }
 
@@ -1739,16 +1898,25 @@
     let forcarTravarNoProximoExtrair = false;
 
     async function carregarClassesTormenta() {
+        const rv = getRegraVersaoAtiva();
         try {
-            const d = await new TormentaRegrasService().obterClasses();
+            const d = await new TormentaRegrasService().obterClasses({ regraVersao: rv });
             return {
                 classes: Array.isArray(d.classes) ? d.classes : [],
                 beneficios_por_nivel: Array.isArray(d.beneficios_por_nivel) ? d.beneficios_por_nivel : [],
             };
         } catch (e1) {
+            const clsPath =
+                rv === 'v13'
+                    ? '/games/tormenta/data/classes_v13.json?v=20260629'
+                    : '/games/tormenta/data/classes_mb.json?v=20260511d';
+            const benPath =
+                rv === 'v13'
+                    ? '/games/tormenta/data/beneficios_nivel_v13.json?v=20260629'
+                    : '/games/tormenta/data/beneficios_nivel_mb.json?v=20260511d';
             const [r1, r2] = await Promise.all([
-                fetch('/games/tormenta/data/classes_mb.json?v=20260511d', { cache: 'no-cache' }),
-                fetch('/games/tormenta/data/beneficios_nivel_mb.json?v=20260511d', { cache: 'no-cache' }),
+                fetch(clsPath, { cache: 'no-cache' }),
+                fetch(benPath, { cache: 'no-cache' }),
             ]);
             if (!r1.ok || !r2.ok) throw e1;
             const c = await r1.json();
@@ -1758,6 +1926,165 @@
                 beneficios_por_nivel: Array.isArray(b.niveis) ? b.niveis : [],
             };
         }
+    }
+
+    async function aplicarPacoteRegrasTormenta(regraVersao) {
+        T20_REGRA_VERSAO_FICHA = window.T20RegraVersao
+            ? window.T20RegraVersao.normalizar(regraVersao)
+            : String(regraVersao || 'mb');
+        try {
+            aplicarRegrasPayload(await carregarRegrasTormenta());
+        } catch (e) {
+            console.warn(e);
+        }
+        try {
+            const pack = await carregarRacasTormenta();
+            RACAS_MB = pack.racas;
+            IDIOMAS_MB_GERAL = pack.idiomas_geral_mb;
+            IDIOMAS_MB_TABELA = pack.idiomas_tabela_mb;
+        } catch (e2) {
+            console.warn(e2);
+            RACAS_MB = [];
+        }
+        try {
+            const cpack = await carregarClassesTormenta();
+            CLASSES_MB = cpack.classes;
+            BENEFICIOS_NIVEL_MB = cpack.beneficios_por_nivel;
+        } catch (e3) {
+            console.warn(e3);
+            CLASSES_MB = [];
+        }
+        try {
+            const cj = await new TormentaRegrasService().obterConjuracaoMb({ regraVersao: getRegraVersaoAtiva() });
+            const mp = {};
+            (Array.isArray(cj.classes) ? cj.classes : []).forEach((row) => {
+                const s = String(row.slug || '')
+                    .trim()
+                    .toLowerCase();
+                if (s) mp[s] = row;
+            });
+            T20_CONJ_MB_BY_SLUG = mp;
+            t20RenderPmMbResumoPainel(cj);
+        } catch (e3b) {
+            console.warn(e3b);
+            T20_CONJ_MB_BY_SLUG = {};
+        }
+        popularSelectRacas();
+        popularSelectClassesMb();
+        t20AtualizarLabelsVersaoRegras();
+        t20AtualizarUiArcanistaCaminho();
+        let snapshotPericias = null;
+        if (typeof coletarPericias === 'function') {
+            const rowsPer = document.querySelectorAll('#tblPericias tbody tr');
+            if (rowsPer.length) snapshotPericias = coletarPericias();
+        }
+        if (typeof montarTabelaPericias === 'function') {
+            montarTabelaPericias();
+            if (snapshotPericias && snapshotPericias.length) {
+                preencherPericias(snapshotPericias);
+            }
+            t20AtualizarUiPericiasVersao();
+            atualizarMeioNivelColuna();
+            atualizarModsPericiasDasHabilidades();
+            if (typeof window.t20ValidarPericiasOrcamentoMb === 'function') {
+                window.t20ValidarPericiasOrcamentoMb();
+            }
+        }
+        if (typeof onRacaChange === 'function') {
+            onRacaChange(false);
+        }
+        if (typeof window.t20AtualizarVitaisSugeridos === 'function') {
+            window.t20AtualizarVitaisSugeridos();
+        }
+        if (window.T20OrigensV13) {
+            await window.T20OrigensV13.carregarCatalogos();
+            window.T20OrigensV13.atualizarUiOrigemV13();
+        }
+    }
+
+    function t20AtualizarLabelsVersaoRegras() {
+        const lv = t20LabelVersao();
+        const lblCl = q('lbl_classe_mb');
+        if (lblCl) lblCl.textContent = `Classe (${lv} — BBA / tabela)`;
+        const lblRaca = document.querySelector('label[for="f_raca_select"]');
+        if (lblRaca) lblRaca.textContent = `Raça (${lv})`;
+        const lblPm = document.querySelector('.ficha-pm-box .ficha-defesa-label');
+        if (lblPm) {
+            lblPm.title = `Pontos de Magia (PM) — ${lv}`;
+        }
+        if (typeof window.t20AtualizarBotaoCalcularPv === 'function') {
+            window.t20AtualizarBotaoCalcularPv();
+        }
+        const btnSub = q('btnT20SubirNivelMb');
+        const titSub = q('tituloModalSubirNivel');
+        const lvSub = t20LabelVersao();
+        if (btnSub) {
+            btnSub.textContent = `⬆ Subir nível (${lvSub})`;
+            btnSub.title = `Sobe um nível aplicando PV, PM e benefícios ${lvSub}`;
+        }
+        if (titSub) titSub.textContent = `Subir nível (${lvSub})`;
+        const lblGrad = document.querySelector('label[for="f_mb_grad_pericias"]');
+        if (lblGrad) {
+            lblGrad.textContent =
+                window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())
+                    ? 'Bônus em perícias (tr / n-tr)'
+                    : 'Graduações perícias (tr / n-tr)';
+        }
+        const lblTal = document.querySelector('label[for="f_mb_talentos_acum"]');
+        if (lblTal) {
+            lblTal.textContent =
+                window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())
+                    ? 'Poderes gerais (acumulado)'
+                    : 'Talentos (acumulado MB)';
+        }
+        const lblMeio = document.querySelector('label[for="f_mb_bonus_meio"]');
+        if (lblMeio) {
+            lblMeio.textContent =
+                window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())
+                    ? 'Bônus meio de nível (CA / resist / dano)'
+                    : 'Bônus meio de nível (MB)';
+        }
+        const v13 =
+            window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        const secTal = q('titSecaoTalentosPoderes');
+        if (secTal) {
+            secTal.textContent = v13 ? 'Poderes (gerais / escolhidos)' : 'Talentos (MB / escolhidos)';
+        }
+        const btnAddTal = q('btnT20AddTalentoMb');
+        if (btnAddTal) {
+            btnAddTal.title = v13 ? 'Adicionar poder' : 'Adicionar talento';
+        }
+        const titModalTal = q('titModalGerenciarTalentos');
+        if (titModalTal) {
+            titModalTal.textContent = v13 ? 'Gerenciar poderes' : 'Gerenciar talentos';
+        }
+        const subModalTal = q('subModalGerenciarTalentos');
+        if (subModalTal) {
+            subModalTal.innerHTML = v13
+                ? 'Catálogo v1.3 (poderes gerais e de classe) e poder livre. <span class="t20-hint">Esc fecha.</span>'
+                : 'Catálogo MB (talentos das classes) e talento livre. <span class="t20-hint">Esc fecha.</span>';
+        }
+        const lblCompTal = document.querySelector('label[for="t20CompTal"]');
+        if (lblCompTal) {
+            lblCompTal.textContent = v13 ? 'Poderes' : 'Talentos';
+        }
+        const hintVers = q('lblVersatilPoderHint');
+        if (hintVers) {
+            hintVers.style.display = v13 ? '' : 'none';
+        }
+        if (window.T20OrigensV13) {
+            window.T20OrigensV13.atualizarUiOrigemV13();
+        }
+        if (window.T20KitInicialV13) {
+            window.T20KitInicialV13.atualizarUiKitV13();
+        }
+    }
+
+    function t20AtualizarUiArcanistaCaminho() {
+        const wrap = q('wrapArcanistaCaminho');
+        const slug = (q('f_classe_mb') && q('f_classe_mb').value) || '';
+        const show = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva()) && slug === 'arcanista';
+        if (wrap) wrap.style.display = show ? '' : 'none';
     }
 
     function getClasseMbRowPorSlug(slug) {
@@ -1980,19 +2307,24 @@
         setTa('f_mb_pericias_classe_disp', c.pericias_classe || '');
         setTa('f_mb_talentos_classe_disp', c.talentos_adicionais || '');
 
-        const conMod = modificadorAtributoT20((q('fichaConResumo') && q('fichaConResumo').value) || '10');
+        const conMod = modificadorAtributoT20((q('fichaConResumo') && q('fichaConResumo').value) || '0');
         const nPv = nvChar;
         const pvParte = c.pv_inicial + c.pv_por_nivel * Math.max(0, nPv - 1);
         const pvSug = pvParte + conMod * nPv;
+        const lv = t20LabelVersao();
+        const conLbl = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva()) ? 'CON' : 'mod. CON';
         setPvRef(
-            `Fórmula usual (MB): ${c.pv_inicial} PV iniciais + ${c.pv_por_nivel} por nível após o 1º × (nível−1) + modificador de Constituição × nível.\n` +
-                `Nível ${nPv} · mod. CON ${conMod >= 0 ? '+' : ''}${conMod} → sugestão de total: ${pvSug} PV (ajuste na mesa se usar regra diferente).`
+            `Fórmula (${lv}): ${c.pv_inicial} PV iniciais + ${c.pv_por_nivel} por nível após o 1º × (nível−1) + ${conLbl} × nível.\n` +
+                `Nível ${nPv} · ${conLbl} ${conMod >= 0 ? '+' : ''}${conMod} → sugestão de total: ${pvSug} PV (ajuste na mesa se usar regra diferente).`
         );
 
         atualizarTagsHeader();
         destacarPericiasClasseMb();
         renderFichaHabilidadesEspeciais();
         t20AtualizarResumoBotaoXpMb();
+        if (typeof window.t20AtualizarVitaisSugeridos === 'function') {
+            window.t20AtualizarVitaisSugeridos();
+        }
         } finally {
             t20SincronizarBbaPlanilhaAtaquesMb();
         }
@@ -2006,19 +2338,25 @@
         if (!c || !p) return;
         const nvRaw = Math.floor(Number((q('f_nivel') && q('f_nivel').value) || '0'));
         const nvChar = nvRaw < 1 ? 1 : Math.min(40, nvRaw);
-        const conMod = modificadorAtributoT20((q('fichaConResumo') && q('fichaConResumo').value) || '10');
+        const conMod = modificadorAtributoT20((q('fichaConResumo') && q('fichaConResumo').value) || '0');
         const pvParte = c.pv_inicial + c.pv_por_nivel * Math.max(0, nvChar - 1);
         const pvSug = pvParte + conMod * nvChar;
+        const lv = t20LabelVersao();
+        const conLbl = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva()) ? 'CON' : 'mod. CON';
         p.textContent =
-            `Fórmula usual (MB): ${c.pv_inicial} PV iniciais + ${c.pv_por_nivel} por nível após o 1º × (nível−1) + modificador de Constituição × nível.\n` +
-            `Nível ${nvChar} · mod. CON ${conMod >= 0 ? '+' : ''}${conMod} → sugestão de total: ${pvSug} PV (ajuste na mesa se usar regra diferente).`;
+            `Fórmula (${lv}): ${c.pv_inicial} PV iniciais + ${c.pv_por_nivel} por nível após o 1º × (nível−1) + ${conLbl} × nível.\n` +
+            `Nível ${nvChar} · ${conLbl} ${conMod >= 0 ? '+' : ''}${conMod} → sugestão de total: ${pvSug} PV (ajuste na mesa se usar regra diferente).`;
     }
 
     function onClasseMbChange(syncNome) {
         const slug = (q('f_classe_mb') && q('f_classe_mb').value) || '';
         const c = getClasseMbRowPorSlug(slug);
         if (syncNome && c && q('f_classe_só')) q('f_classe_só').value = c.nome;
+        t20AtualizarUiArcanistaCaminho();
         atualizarResumoClasseMb();
+        if (typeof window.t20AplicarPericiasClasseV13 === 'function') {
+            window.t20AplicarPericiasClasseV13();
+        }
         t20AtualizarGrimorioElegibilidadeVisual(null);
         agendarAtualizarGrimorioSeModalAberto();
     }
@@ -2028,7 +2366,14 @@
         if (!el) return;
         const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
         const row = getRacaRowPorSlug(slug);
-        const ex = row && Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
+        const tresMais1 = row && row.escolhe_tres_mais1;
+        const ex = tresMais1
+            ? Array.isArray(row.excluir_atributos_mais1)
+                ? row.excluir_atributos_mais1
+                : []
+            : row && Array.isArray(row.excluir_atributos_mais2)
+              ? row.excluir_atributos_mais2
+              : [];
         const cur = el.value;
         el.innerHTML = '<option value="">—</option>';
         const keys = ATTR_KEYS.filter((k) => !ex.includes(k));
@@ -2080,18 +2425,21 @@
     }
 
     async function carregarRacasTormenta() {
+        const rv = getRegraVersaoAtiva();
         const empty = { racas: [], idiomas_geral_mb: '', idiomas_tabela_mb: [] };
         try {
-            const d = await new TormentaRegrasService().obterRacas();
+            const d = await new TormentaRegrasService().obterRacas({ regraVersao: rv });
             return {
                 racas: Array.isArray(d.racas) ? d.racas : [],
                 idiomas_geral_mb: typeof d.idiomas_geral_mb === 'string' ? d.idiomas_geral_mb : '',
                 idiomas_tabela_mb: Array.isArray(d.idiomas_tabela_mb) ? d.idiomas_tabela_mb : [],
             };
         } catch (e1) {
-            const r = await fetch('/games/tormenta/data/racas-mb.json?v=20260512idiomas', {
-                cache: 'no-cache',
-            });
+            const path =
+                rv === 'v13'
+                    ? '/games/tormenta/data/racas_v13.json?v=20260629'
+                    : '/games/tormenta/data/racas-mb.json?v=20260512idiomas';
+            const r = await fetch(path, { cache: 'no-cache' });
             if (!r.ok) throw e1;
             const d = await r.json();
             return {
@@ -2175,6 +2523,27 @@
             if (a && keysOk.includes(a)) d[a] += 2;
             if (b && keysOk.includes(b)) d[b] += 2;
         }
+        if (row.escolhe_tres_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1)
+                ? row.excluir_atributos_mais1
+                : [];
+            const a = q('f_raca_mais2a') && q('f_raca_mais2a').value;
+            const b = q('f_raca_mais2b') && q('f_raca_mais2b').value;
+            const c = q('f_raca_mais1') && q('f_raca_mais1').value;
+            [a, b, c].forEach((k) => {
+                if (k && ATTR_KEYS.includes(k) && !excl.includes(k)) d[k] += 1;
+            });
+        }
+        if (row.escolhe_suraggel_subtipo) {
+            const sub = (q('f_suraggel_subtipo') && q('f_suraggel_subtipo').value) || '';
+            if (sub === 'aggelus') {
+                d.sab += 2;
+                d.car += 1;
+            } else if (sub === 'sulfure') {
+                d.des += 2;
+                d.int += 1;
+            }
+        }
         if (row.escolhe_um_mais2) {
             const excl = Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
             const c1 = q('f_raca_mais1') && q('f_raca_mais1').value;
@@ -2188,18 +2557,22 @@
         const id = T20_ATTR_INP[a];
         const el = id ? q(id) : null;
         const raw = el ? String(el.value).trim() : '';
-        if (!raw) return 10;
+        const fallback =
+            window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva()) ? 0 : 10;
+        if (!raw) return fallback;
         const n = Number(raw);
-        if (!Number.isFinite(n)) return 10;
+        if (!Number.isFinite(n)) return fallback;
         return Math.floor(n);
     }
 
     function atributosCompraAtuais() {
         const rDel = racialDeltasMap();
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        const minBase = isV13 ? -99 : 1;
         const out = {};
         ATTR_KEYS.forEach((a) => {
             const fin = valorFinalAtributoCampo(a);
-            out[a] = Math.max(1, fin - (rDel[a] || 0));
+            out[a] = Math.max(minBase, fin - (rDel[a] || 0));
         });
         return out;
     }
@@ -2223,25 +2596,29 @@
         if (met === '4d6') {
             const AG = window.T20AtributosGeracao;
             if (!AG) return { ok: true };
-            return AG.validarBases4d6(bases);
+            return AG.validarBases4d6(bases, { regraVersao: getRegraVersaoAtiva() });
         }
         const s = somaCustosCompraAtributos();
+        const lv = t20LabelVersao();
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
         if (s === null) {
             return {
                 ok: false,
-                msg: 'Personagem jogador: valores-base da compra (final − racial) devem estar entre 8 e 18 para somar custos.',
+                msg: isV13
+                    ? 'Personagem jogador: valores-base da compra (final − racial) devem estar na tabela v1.3 (−2 a +4).'
+                    : 'Personagem jogador: valores-base da compra (final − racial) devem estar entre 8 e 18 para somar custos.',
             };
         }
         if (s < PONTOS_INICIAIS_COMPRA) {
             return {
                 ok: false,
-                msg: `Personagem jogador: é obrigatório gastar os ${PONTOS_INICIAIS_COMPRA} pontos na compra por pontos do MB (gasto atual: ${s}).`,
+                msg: `Personagem jogador: é obrigatório gastar os ${PONTOS_INICIAIS_COMPRA} pontos na compra por pontos (${lv}; gasto atual: ${s}).`,
             };
         }
         if (s > PONTOS_INICIAIS_COMPRA) {
             return {
                 ok: false,
-                msg: `Personagem jogador: custo na compra por pontos não pode ultrapassar ${PONTOS_INICIAIS_COMPRA} (gasto atual: ${s}).`,
+                msg: `Personagem jogador: custo na compra por pontos não pode ultrapassar ${PONTOS_INICIAIS_COMPRA} (${lv}; gasto atual: ${s}).`,
             };
         }
         return { ok: true };
@@ -2281,10 +2658,42 @@
             if (!a || !b) {
                 return {
                     ok: false,
-                    msg: 'Escolha duas habilidades diferentes para receber +2 (Humano ou Lefou).',
+                    msg: 'Escolha duas habilidades diferentes para receber +2.',
                 };
             }
             if (a === b) return { ok: false, msg: 'As duas habilidades com +2 devem ser diferentes.' };
+        }
+        if (row.escolhe_tres_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1)
+                ? row.excluir_atributos_mais1
+                : [];
+            const a = q('f_raca_mais2a') && q('f_raca_mais2a').value;
+            const b = q('f_raca_mais2b') && q('f_raca_mais2b').value;
+            const c = q('f_raca_mais1') && q('f_raca_mais1').value;
+            const lv = t20LabelVersao();
+            if (!a || !b || !c) {
+                return {
+                    ok: false,
+                    msg: `Raça (${lv}): escolha três habilidades diferentes para receber +1 cada.`,
+                };
+            }
+            if (new Set([a, b, c]).size < 3) {
+                return { ok: false, msg: 'As três habilidades com +1 devem ser diferentes.' };
+            }
+            for (const k of [a, b, c]) {
+                if (excl.includes(k)) {
+                    return {
+                        ok: false,
+                        msg: `Atributo ${k.toUpperCase()} não pode receber +1 nesta raça.`,
+                    };
+                }
+            }
+        }
+        if (row.escolhe_suraggel_subtipo) {
+            const sub = (q('f_suraggel_subtipo') && q('f_suraggel_subtipo').value) || '';
+            if (!sub) {
+                return { ok: false, msg: 'Suraggel: escolha subtipo Aggelus ou Sulfure.' };
+            }
         }
         if (row.escolhe_um_mais2) {
             const x = q('f_raca_mais1') && q('f_raca_mais1').value;
@@ -2303,10 +2712,11 @@
     function popularSelectRacas() {
         const sel = q('f_raca_select');
         if (!sel) return;
+        const lv = t20LabelVersao();
         sel.innerHTML = '';
         const o0 = document.createElement('option');
         o0.value = '';
-        o0.textContent = '— Nenhuma (sem ajuste MB)';
+        o0.textContent = `— Nenhuma (sem ajuste ${lv})`;
         sel.appendChild(o0);
         RACAS_MB.forEach((row) => {
             const o = document.createElement('option');
@@ -2349,7 +2759,7 @@
             p.textContent =
                 slug === '__livre__'
                     ? 'Raça livre: descreva traços em Poderes de raça & origem ou nas notas.'
-                    : 'Escolha uma raça para ver o resumo de traços (Módulo Básico).';
+                    : `Escolha uma raça para ver o resumo de traços (${t20LabelVersao()}).`;
             atualizarListaTraçosRaciaisUl();
             return;
         }
@@ -2373,9 +2783,13 @@
     function aplicarRacaSomenteAjustes() {
         const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
         const AG = window.T20AtributosGeracao;
+        const rvOpts = { regraVersao: getRegraVersaoAtiva() };
+        const fallback =
+            window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva()) ? 0 : 10;
+        const padrao = { for: fallback, des: fallback, con: fallback, int: fallback, sab: fallback, car: fallback };
         if (!slug || slug === '__livre__') {
             fichaBasesAtributos = null;
-            const bases = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            const bases = AG ? AG.basesPadraoCompra(rvOpts) : padrao;
             aplicarFinaisDeBasesFicha(bases);
             return;
         }
@@ -2383,7 +2797,7 @@
         if (met === '4d6' && fichaBasesAtributos) {
             aplicarFinaisDeBasesFicha(fichaBasesAtributos);
         } else {
-            fichaBasesAtributos = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            fichaBasesAtributos = AG ? AG.basesPadraoCompra(rvOpts) : padrao;
             aplicarFinaisDeBasesFicha(fichaBasesAtributos);
         }
     }
@@ -2393,10 +2807,32 @@
         const wrapL = q('wrapRacaLivre');
         const wrapM = q('wrapRacaMais2');
         const wrapM1 = q('wrapRacaMais1');
+        const wrapVers = q('wrapHumanoVersatil');
+        const wrapSur = q('wrapSuraggelSubtipo');
         const row = getRacaRowPorSlug(slug);
         if (wrapL) wrapL.style.display = slug === '__livre__' ? '' : 'none';
-        if (wrapM) wrapM.style.display = row && row.escolhe_duas_mais2 ? '' : 'none';
-        if (wrapM1) wrapM1.style.display = row && row.escolhe_um_mais2 ? '' : 'none';
+        const tresMais1 = row && row.escolhe_tres_mais1;
+        const duasMais2 = row && row.escolhe_duas_mais2;
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        if (wrapM) wrapM.style.display = tresMais1 || duasMais2 ? '' : 'none';
+        if (wrapM1) wrapM1.style.display = tresMais1 || (row && row.escolhe_um_mais2) ? '' : 'none';
+        if (wrapVers) {
+            wrapVers.style.display = isV13 && slug === 'humano' ? '' : 'none';
+        }
+        t20AtualizarUiHumanoVersatilPoder();
+        if (wrapSur) {
+            wrapSur.style.display = isV13 && slug === 'suraggel' ? '' : 'none';
+        }
+        const lbl2a = document.querySelector('label[for="f_raca_mais2a"]');
+        const lbl2b = document.querySelector('label[for="f_raca_mais2b"]');
+        const lbl1 = q('lbl_raca_mais1');
+        if (lbl2a) lbl2a.textContent = tresMais1 ? '+1 em habilidade (1ª)' : '+2 em habilidade (1ª)';
+        if (lbl2b) lbl2b.textContent = tresMais1 ? '+1 em habilidade (2ª)' : '+2 em habilidade (2ª)';
+        if (lbl1) {
+            lbl1.textContent = tresMais1
+                ? '+1 em habilidade (3ª)'
+                : 'Meio-orc: +2 em outra habilidade (exceto INT e CAR)';
+        }
         popularOpcoesMais2Selects();
         popularOpcoesMais1Select();
         atualizarTracosRacaPainel();
@@ -2441,6 +2877,21 @@
                 t20AtualizarEstadoBotaoSalvar();
             });
         }
+        ['f_humano_versatil', 'f_suraggel_subtipo'].forEach((fid) => {
+            const el = q(fid);
+            if (el && !el.dataset.bound) {
+                el.dataset.bound = '1';
+                el.addEventListener('change', () => {
+                    if (fid === 'f_suraggel_subtipo') aplicarRacaSomenteAjustes();
+                    if (fid === 'f_humano_versatil') t20AtualizarUiHumanoVersatilPoder();
+                    if (typeof window.__t20AplicarTracosRaciaisMecanicos === 'function') {
+                        const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
+                        window.__t20AplicarTracosRaciaisMecanicos(slug);
+                    }
+                    t20AtualizarEstadoBotaoSalvar();
+                });
+            }
+        });
         const liv = q('f_raca_livre');
         if (liv && !liv.dataset.bound) {
             liv.dataset.bound = '1';
@@ -2486,6 +2937,26 @@
         if (q('f_raca_mais2b')) q('f_raca_mais2b').value = (j && j.raca_tormenta_mais2b) || '';
         if (q('f_raca_mais1')) q('f_raca_mais1').value = (j && j.raca_tormenta_mais1) || '';
         if (q('f_raca_livre')) q('f_raca_livre').value = (j && j.raca_tormenta_livre) || '';
+        if (q('f_humano_versatil')) {
+            q('f_humano_versatil').value =
+                (j && j.humano_versatil) || 'duas_pericias';
+        }
+        window.__t20HumanoVersatilPoderSlug = j && j.humano_versatil_poder_slug
+            ? String(j.humano_versatil_poder_slug).trim()
+            : null;
+        if (q('f_humano_versatil_poder_nome')) {
+            if (j && j.humano_versatil_poder_slug) {
+                q('f_humano_versatil_poder_nome').value = String(j.humano_versatil_poder_slug)
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, (c) => c.toUpperCase());
+            } else {
+                q('f_humano_versatil_poder_nome').value = '';
+            }
+        }
+        t20AtualizarUiHumanoVersatilPoder();
+        if (q('f_suraggel_subtipo')) {
+            q('f_suraggel_subtipo').value = (j && j.suraggel_subtipo) || '';
+        }
         onRacaChange(false);
         if (q('f_raca_select') && q('f_raca_select').value === '__livre__' && q('wrapRacaLivre')) {
             q('wrapRacaLivre').style.display = '';
@@ -2493,6 +2964,9 @@
     }
 
     function modificadorAtributoT20(val) {
+        if (window.T20RegraVersao) {
+            return window.T20RegraVersao.contribuicaoAtributo(val, getRegraVersaoAtiva());
+        }
         const n = Number(val);
         if (!Number.isFinite(n)) return 0;
         const v = Math.max(1, Math.floor(n));
@@ -2525,6 +2999,8 @@
         if (!el) return;
         const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
         const met = getMetodoGeracaoFicha();
+        const lv = t20LabelVersao();
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
         el.classList.remove('t20-compra-pontos-ok', 't20-compra-pontos-erro');
         if (tipo !== 'jogador') {
             el.textContent = 'Atributos livres (monstro/NPC).';
@@ -2535,6 +3011,18 @@
             const bases = atributosCompraAtuais();
             const vals = ATTR_KEYS.map((k) => bases[k]);
             const AG = window.T20AtributosGeracao;
+            const rv = getRegraVersaoAtiva();
+            if (isV13) {
+                const ok = AG && AG.qualidadeGeracao4d6V13(vals);
+                const soma = vals.reduce((a, b) => a + (Number(b) || 0), 0);
+                el.textContent = ok
+                    ? `4d6 v1.3: soma ${soma} (≥6) — OK para salvar.`
+                    : `4d6 v1.3: soma ${soma} — role de novo (mínimo 6 na soma dos atributos).`;
+                if (ok) el.classList.add('t20-compra-pontos-ok');
+                else el.classList.add('t20-compra-pontos-erro');
+                t20AtualizarEstadoBotaoSalvar();
+                return;
+            }
             const ok = AG && AG.qualidadeGeracao4d6(vals);
             const soma = AG ? AG.somaModificadoresValores(vals) : 0;
             el.textContent = ok
@@ -2547,13 +3035,14 @@
         }
         const s = somaCustosCompraAtributos();
         if (s === null) {
-            el.textContent =
-                'Compra por pontos (sem racial): — (valores-base fora de 8–18 na tabela do MB).';
+            el.textContent = isV13
+                ? `Compra por pontos (sem racial): — (valores-base fora da tabela v1.3).`
+                : 'Compra por pontos (sem racial): — (valores-base fora de 8–18 na tabela do MB).';
             if (tipo === 'jogador') el.classList.add('t20-compra-pontos-erro');
             t20AtualizarEstadoBotaoSalvar();
             return;
         }
-        el.textContent = `Compra por pontos (sem racial): ${s} / ${PONTOS_INICIAIS_COMPRA} pontos (MB — deve gastar exatamente ${PONTOS_INICIAIS_COMPRA}).`;
+        el.textContent = `Compra por pontos (sem racial): ${s} / ${PONTOS_INICIAIS_COMPRA} pontos (${lv} — deve gastar exatamente ${PONTOS_INICIAIS_COMPRA}).`;
         if (tipo === 'jogador') {
             if (s === PONTOS_INICIAIS_COMPRA) el.classList.add('t20-compra-pontos-ok');
             if (s > PONTOS_INICIAIS_COMPRA || s < PONTOS_INICIAIS_COMPRA) el.classList.add('t20-compra-pontos-erro');
@@ -2563,7 +3052,7 @@
                 ' Ultrapassou o orçamento: reduza os valores-base (final − ajuste racial) ou a raça.';
         }
         if (tipo === 'jogador' && s < PONTOS_INICIAIS_COMPRA) {
-            el.textContent += ` Faltam ${PONTOS_INICIAIS_COMPRA - s} ponto(s) de compra para distribuir (MB).`;
+            el.textContent += ` Faltam ${PONTOS_INICIAIS_COMPRA - s} ponto(s) de compra para distribuir (${lv}).`;
         }
         t20AtualizarEstadoBotaoSalvar();
     }
@@ -2624,6 +3113,7 @@
             const m = q(T20_ATTR_MOD[a]);
             if (el && m) m.textContent = formatModificadorAtributo(modificadorAtributoT20(el.value));
         });
+        t20RecalcularCaBaseV13();
         atualizarLinhaCompraPontos();
         atualizarModsPericiasDasHabilidades();
         atualizarSugestaoIdiomasMb();
@@ -3960,22 +4450,44 @@
         if (manual) return null;
         const slug = ((q('f_classe_mb') && q('f_classe_mb').value) || '').trim().toLowerCase();
         if (!slug || !T20_CONJ_MB_BY_SLUG || !T20_CONJ_MB_BY_SLUG[slug]) return null;
-        const m = String(T20_CONJ_MB_BY_SLUG[slug].modo_conjuracao || 'preparar').trim().toLowerCase();
+        const row = T20_CONJ_MB_BY_SLUG[slug];
+        if (slug === 'arcanista') {
+            const cam =
+                (q('f_arcanista_caminho') && String(q('f_arcanista_caminho').value).trim().toLowerCase()) ||
+                'mago';
+            const caminhos = row.caminhos || {};
+            const sub = caminhos[cam] || caminhos.mago || {};
+            const m = String(sub.modo_conjuracao || 'preparar').trim().toLowerCase();
+            if (m === 'foco') return 'foco';
+            return m === 'espontaneo' ? 'espontaneo' : 'preparar';
+        }
+        const m = String(row.modo_conjuracao || 'preparar').trim().toLowerCase();
+        if (m === 'foco') return 'foco';
         return m === 'espontaneo' ? 'espontaneo' : 'preparar';
     }
 
     function t20UsaLivroGrimorioMb() {
         const slug = ((q('f_classe_mb') && q('f_classe_mb').value) || '').trim().toLowerCase();
-        return slug === 'mago';
+        if (slug === 'mago') return true;
+        if (slug === 'arcanista') {
+            const cam =
+                (q('f_arcanista_caminho') && String(q('f_arcanista_caminho').value).trim().toLowerCase()) ||
+                'mago';
+            return cam === 'mago';
+        }
+        return false;
     }
 
     function t20UsaRepertorioAprendidoMb() {
         const slug = ((q('f_classe_mb') && q('f_classe_mb').value) || '').trim().toLowerCase();
-        return ['clerigo', 'druida', 'paladino', 'ranger'].includes(slug);
+        if (['clerigo', 'druida', 'paladino', 'ranger'].includes(slug)) return true;
+        if (slug === 'cacador') return true;
+        return false;
     }
 
     function t20PapelGrimorioPadraoMb() {
-        if (t20ModoConjuracaoMbEfetivo() === 'espontaneo') return 'conhecida';
+        const modo = t20ModoConjuracaoMbEfetivo();
+        if (modo === 'espontaneo' || modo === 'foco') return 'conhecida';
         if (t20UsaRepertorioAprendidoMb()) return 'conhecida';
         return 'grimorio';
     }
@@ -3983,7 +4495,7 @@
     function t20PapeisGrimorioPermitidosMb() {
         const modo = t20ModoConjuracaoMbEfetivo();
         if (!modo) return ['conhecida', 'grimorio', 'preparada'];
-        if (modo === 'espontaneo') return ['conhecida'];
+        if (modo === 'foco' || modo === 'espontaneo') return ['conhecida'];
         if (t20UsaRepertorioAprendidoMb()) return ['conhecida', 'preparada'];
         return ['grimorio', 'preparada'];
     }
@@ -4322,9 +4834,16 @@
                     const nvChar = Math.floor(Number((q('f_nivel') && q('f_nivel').value) || '1'));
                     const nvSafe = !Number.isFinite(nvChar) || nvChar < 1 ? 1 : Math.min(40, nvChar);
                     const nvEff = t20NivelConjuracaoMbEfetivo();
+                    const rv = getRegraVersaoAtiva();
+                    const camArc =
+                        q('f_arcanista_caminho') && q('f_arcanista_caminho').value
+                            ? String(q('f_arcanista_caminho').value).trim().toLowerCase()
+                            : null;
                     const prev = await regras.obterConjuracaoPreview({
                         classe_slug: slug,
                         nivel: nvSafe,
+                        regraVersao: rv,
+                        ...(camArc && slug === 'arcanista' ? { arcanista_caminho: camArc } : {}),
                         ...(nvEff !== nvSafe ? { nivel_conjurador: nvEff } : {}),
                         for_valor: valorFinalAtributoCampo('for'),
                         des_valor: valorFinalAtributoCampo('des'),
@@ -4334,7 +4853,7 @@
                         car_valor: valorFinalAtributoCampo('car'),
                     });
                     _grimConjPreviewData = prev;
-                    if (prev && prev.habilidade_chave) {
+                    if (prev && (prev.habilidade_chave || prev.pontos_magia_maximos != null)) {
                         const pmx =
                             prev.pontos_magia_maximos != null
                                 ? prev.pontos_magia_maximos
@@ -4346,7 +4865,13 @@
                                 ? `${prev.modificador_conjuracao >= 0 ? '+' : ''}${prev.modificador_conjuracao}`
                                 : '—';
                         const cdv = prev.cd_magia != null ? prev.cd_magia : '—';
-                        extra = ` · Nível conj. MB usado: ${prev.nivel_conjuracao}. CD (base): ${cdv}. Mod. conj.: ${modStr}. PM conj. máx. (regra MB): ${pmx}.`;
+                        const lv = t20LabelVersao();
+                        const regraPm = window.T20RegraVersao && window.T20RegraVersao.isV13(rv)
+                            ? `PM máx. (${lv}): ${pmx}`
+                            : `PM conj. máx. (regra ${lv}): ${pmx}`;
+                        extra = prev.habilidade_chave
+                            ? ` · Nível conj. usado: ${prev.nivel_conjuracao}. CD (base): ${cdv}. Mod. conj.: ${modStr}. ${regraPm}.`
+                            : ` · ${regraPm}.`;
                     }
                     if (prev && prev.magias_lista_tipo != null && prev.magias_circulo_max != null) {
                         extra += ` Catálogo MB (recomendado): ${prev.magias_lista_tipo}, círculos 0–${prev.magias_circulo_max}.`;
@@ -4724,6 +5249,10 @@
             }
         }
         fecharModalTalentosMb();
+        if (_talModalTargetInput && _talModalTargetInput.id === 'f_humano_versatil_poder_nome') {
+            window.__t20HumanoVersatilPoderSlug = t20SlugifyPoderSlug(nomeTrim);
+            t20AplicarPoderesAutomaticosNaLista();
+        }
     }
 
     function parseNomesPericiasClasseMb(texto) {
@@ -4742,13 +5271,26 @@
     function destacarPericiasClasseMb() {
         const slug = (q('f_classe_mb') && q('f_classe_mb').value) || '';
         const c = getClasseMbRowPorSlug(slug);
-        const alvo = new Set(parseNomesPericiasClasseMb(c && c.pericias_classe));
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        let alvo = new Set();
+        if (isV13 && c && Array.isArray(c.pericias_escolha_de) && c.pericias_escolha_de.length) {
+            alvo = new Set(c.pericias_escolha_de.map((s) => String(s).toLowerCase()));
+            (c.pericias_fixas || []).forEach((s) => alvo.add(String(s).toLowerCase()));
+            (c.pericias_escolha_um_de || []).forEach((gr) =>
+                (gr || []).forEach((s) => alvo.add(String(s).toLowerCase()))
+            );
+        } else {
+            alvo = new Set(parseNomesPericiasClasseMb(c && c.pericias_classe));
+        }
         document.querySelectorAll('#tblPericias tbody tr').forEach((tr) => {
+            const slugRow = (tr.getAttribute('data-per-slug') || '').trim().toLowerCase();
             const span = tr.querySelector('.t20-p-nome');
             const livre = tr.querySelector('.nome-livre');
             const nome = (span && span.textContent.trim()) || (livre && livre.value.trim()) || '';
-            const isClasse = nome && alvo.has(nome.toLowerCase());
+            const isClasse =
+                (slugRow && alvo.has(slugRow)) || (nome && alvo.has(nome.toLowerCase()));
             tr.classList.toggle('t20-pericia-de-classe-row', Boolean(isClasse));
+            tr.classList.toggle('t20-pericia-fixa-classe-row', Boolean(isV13 && c && (c.pericias_fixas || []).includes(slugRow)));
         });
     }
 
@@ -4879,7 +5421,8 @@
                 nome === '—'
                     ? '<input class="nome-livre t20-input" placeholder="Outra" />'
                     : `<span class="t20-p-nome">${escHtml(nome)}</span>`;
-            return `<tr data-per-idx="${i}"${dataAttr}>
+            const slugAttr = row.slug ? ` data-per-slug="${escHtml(String(row.slug))}"` : '';
+            return `<tr data-per-idx="${i}"${dataAttr}${slugAttr}>
                 <td><input type="checkbox" class="p-treinado" /></td>
                 <td>${cellNome}</td>
                 <td><input type="number" class="p-total t20-input" value="0" /></td>
@@ -4902,6 +5445,121 @@
                 modInp.value = String(modificadorAtributoT20(inpAb.value));
             }
         });
+    }
+
+    function t20AplicarPericiasOrigemBeneficios() {
+        if (!window.T20RegraVersao || !window.T20RegraVersao.isV13(getRegraVersaoAtiva())) return;
+        const picks = Array.isArray(window.__t20OrigemBeneficios) ? window.__t20OrigemBeneficios : [];
+        const slugs = new Set(
+            picks
+                .filter((b) => String(b).startsWith('pericia:'))
+                .map((b) => String(b).split(':')[1].trim().toLowerCase())
+                .filter(Boolean)
+        );
+        document.querySelectorAll('#tblPericias tbody tr[data-per-slug]').forEach((tr) => {
+            const slug = (tr.getAttribute('data-per-slug') || '').trim().toLowerCase();
+            if (!slugs.has(slug)) return;
+            const cb = tr.querySelector('.p-treinado');
+            if (cb) cb.checked = true;
+        });
+        if (typeof window.t20ValidarPericiasOrcamentoMb === 'function') {
+            window.t20ValidarPericiasOrcamentoMb();
+        }
+    }
+
+    function t20SlugifyPoderSlug(texto) {
+        return String(texto || '')
+            .normalize('NFD')
+            .replace(/\p{M}/gu, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_|_$/g, '');
+    }
+
+    function t20AtualizarUiHumanoVersatilPoder() {
+        const wrap = q('wrapHumanoVersatilPoder');
+        const sel = q('f_humano_versatil');
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        const show = isV13 && sel && sel.value === 'pericia_poder';
+        if (wrap) wrap.style.display = show ? '' : 'none';
+        if (!show) {
+            window.__t20HumanoVersatilPoderSlug = null;
+            const nom = q('f_humano_versatil_poder_nome');
+            if (nom) nom.value = '';
+        }
+    }
+
+    function t20ColetarPoderesAutomaticosPreview() {
+        const nomes = [];
+        const seen = new Set();
+        const add = (nome) => {
+            const n = String(nome || '').trim();
+            const k = n.toLowerCase();
+            if (n.length >= 2 && !seen.has(k)) {
+                seen.add(k);
+                nomes.push(n);
+            }
+        };
+        const slugLabel = (slug) =>
+            String(slug || '')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, (c) => c.toUpperCase());
+        const picks = Array.isArray(window.__t20OrigemBeneficios) ? window.__t20OrigemBeneficios : [];
+        picks
+            .filter((b) => String(b).startsWith('poder:'))
+            .forEach((b) => add(slugLabel(String(b).split(':')[1])));
+        const selPod = q('f_poder_concedido');
+        if (selPod && selPod.value) {
+            const op = selPod.selectedOptions && selPod.selectedOptions[0];
+            add(op ? op.textContent.trim() : slugLabel(selPod.value));
+        }
+        const nomVers = q('f_humano_versatil_poder_nome') && q('f_humano_versatil_poder_nome').value;
+        if (nomVers) add(nomVers);
+        return nomes;
+    }
+
+    function t20AplicarPoderesAutomaticosNaLista() {
+        if (!window.T20RegraVersao || !window.T20RegraVersao.isV13(getRegraVersaoAtiva())) return;
+        const w = q('t20FichaTalentosMb');
+        if (!w) return;
+        const exist = new Set();
+        w.querySelectorAll('.t20-tal-nome').forEach((inp) => {
+            const v = (inp.value || '').trim().toLowerCase();
+            if (v) exist.add(v);
+        });
+        t20ColetarPoderesAutomaticosPreview().forEach((nome) => {
+            if (exist.has(nome.toLowerCase())) return;
+            const empty = w.querySelector('.t20-ficha-vazio');
+            if (empty) empty.remove();
+            w.appendChild(montarLinhaTalentoMb(nome, {}));
+            exist.add(nome.toLowerCase());
+        });
+    }
+
+    function t20AplicarEquipamentosAutomaticosNaLista() {
+        if (!window.T20RegraVersao || !window.T20RegraVersao.isV13(getRegraVersaoAtiva())) return;
+        if (!window.T20KitInicialV13 || typeof window.T20KitInicialV13.coletarEquipamentosPreview !== 'function') return;
+        const w = q('fichaEquipamentos');
+        if (!w) return;
+        let holder = w.querySelector('.ficha-equipamentos-lista-items');
+        if (!holder) {
+            w.innerHTML =
+                '<div class="ficha-equipamentos-tabela"><div class="ficha-equipamento-header"><span>Item</span><span>Qtd</span><span>Catálogo</span><span></span></div><div class="ficha-equipamentos-lista-items"></div></div>';
+            holder = w.querySelector('.ficha-equipamentos-lista-items');
+        }
+        if (!holder) return;
+        const exist = new Set();
+        holder.querySelectorAll('.t20-eq-linha input[type="text"]').forEach((inp) => {
+            const v = (inp.value || '').trim().toLowerCase();
+            if (v) exist.add(v);
+        });
+        window.T20KitInicialV13.coletarEquipamentosPreview().forEach(({ nome, qtd }) => {
+            if (exist.has(nome.toLowerCase())) return;
+            holder.appendChild(criarLinhaEquip(nome, String(qtd || 1)));
+            exist.add(nome.toLowerCase());
+        });
+        const empty = w.querySelector('.ficha-vazio');
+        if (empty) empty.remove();
     }
 
     function coletarPericias() {
@@ -4936,42 +5594,112 @@
         return out;
     }
 
+    const T20_ALIASES_PERICIA = {
+        'Adestrar Animais': 'Adestramento',
+        'Identificar Magia': 'Misticismo',
+        'Obter Informação': 'Investigação',
+        'Ofício (2)': 'Ofício',
+    };
+
+    function normalizarNomePericiaSalva(nome) {
+        const n = String(nome || '').trim();
+        return T20_ALIASES_PERICIA[n] || n;
+    }
+
+    function mapaPericiasPorNomeNaTabela() {
+        const map = new Map();
+        document.querySelectorAll('#tblPericias tbody tr').forEach((tr) => {
+            const livre = tr.querySelector('.nome-livre');
+            const spanNome = tr.querySelector('.t20-p-nome');
+            let nome = livre ? (livre.value || '').trim() : '';
+            if (!nome && spanNome) nome = spanNome.textContent.trim();
+            if (nome && nome !== '—') map.set(nome, tr);
+        });
+        return map;
+    }
+
+    function t20AtualizarUiPericiasVersao() {
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        const thTotal = q('thPericiasTotal');
+        const thMod = q('thPericiasMod');
+        const hint = q('fichaPericiasHint');
+        if (thTotal) thTotal.style.display = isV13 ? 'none' : '';
+        if (thMod) thMod.textContent = isV13 ? 'Atrib.' : 'Mod';
+        document.querySelectorAll('#tblPericias tbody tr').forEach((tr) => {
+            const totInp = tr.querySelector('.p-total');
+            if (totInp) {
+                const td = totInp.closest('td');
+                if (td) td.style.display = isV13 ? 'none' : '';
+                if (isV13) totInp.value = '0';
+            }
+        });
+        if (hint) {
+            hint.innerHTML = isV13
+                ? '½ nível usa o nível em <strong>Editar ficha</strong>. Treino +2 (1º–6º), +4 (7º–14º), +6 (15º+) — v1.3. Coluna <strong>Atrib.</strong> = valor do atributo-chave. Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe.'
+                : '½ nível usa o nível em <strong>Editar ficha</strong>. Marque treinado quando aplicável (+2 no MB). Coluna <strong>Total</strong> = graduações. Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe MB.';
+        }
+    }
+
+    function aplicarLinhaPericia(tr, p, idxFallback) {
+        if (!tr || !p) return;
+        const livre = tr.querySelector('.nome-livre');
+        if (livre && p.nome) livre.value = p.nome;
+        const tre = tr.querySelector('.p-treinado');
+        if (tre) tre.checked = Boolean(p.treinado);
+        const tot = tr.querySelector('.p-total');
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        if (tot && !isV13) tot.value = String(p.total != null ? p.total : p.graduacao ?? 0);
+        const mod = tr.querySelector('.p-mod');
+        if (mod) mod.value = String(p.mod_atributo ?? 0);
+        const ou = tr.querySelector('.p-out');
+        if (ou) ou.value = String(p.outros ?? 0);
+        const st = tr.querySelector('.p-so-treina');
+        if (st) {
+            const meta = PERICIAS_META[idxFallback];
+            const padraoRegra = meta && meta.somente_treinado === true;
+            const saved = p.somente_treinado;
+            st.checked =
+                saved !== undefined && saved !== null ? Boolean(saved) : padraoRegra;
+        }
+        const pa = tr.querySelector('.p-pen-arm');
+        if (pa) {
+            const meta = PERICIAS_META[idxFallback];
+            const padraoArm = meta && meta.penalidade_armadura === true;
+            const savedArm = p.penalidade_armadura;
+            pa.checked =
+                savedArm !== undefined && savedArm !== null ? Boolean(savedArm) : padraoArm;
+        }
+    }
+
     function preencherPericias(lista) {
         const arr = Array.isArray(lista) ? lista : [];
+        const porNome = mapaPericiasPorNomeNaTabela();
         const rows = document.querySelectorAll('#tblPericias tbody tr');
-        rows.forEach((tr, i) => {
-            const p = arr[i];
-            if (!p) return;
-            const livre = tr.querySelector('.nome-livre');
-            if (livre && p.nome) livre.value = p.nome;
-            const tre = tr.querySelector('.p-treinado');
-            if (tre) tre.checked = Boolean(p.treinado);
-            const tot = tr.querySelector('.p-total');
-            if (tot) tot.value = String(p.total != null ? p.total : p.graduacao ?? 0);
-            const mod = tr.querySelector('.p-mod');
-            if (mod) mod.value = String(p.mod_atributo ?? 0);
-            const ou = tr.querySelector('.p-out');
-            if (ou) ou.value = String(p.outros ?? 0);
-            const st = tr.querySelector('.p-so-treina');
-            if (st) {
-                const meta = PERICIAS_META[i];
-                const padraoRegra = meta && meta.somente_treinado === true;
-                const saved = p.somente_treinado;
-                st.checked =
-                    saved !== undefined && saved !== null
-                        ? Boolean(saved)
-                        : padraoRegra;
+        arr.forEach((p, i) => {
+            const nomeCanon = normalizarNomePericiaSalva(p.nome);
+            let tr = nomeCanon ? porNome.get(nomeCanon) : null;
+            let idx = i;
+            if (!tr && nomeCanon) {
+                rows.forEach((row, j) => {
+                    if (tr) return;
+                    const span = row.querySelector('.t20-p-nome');
+                    const liv = row.querySelector('.nome-livre');
+                    const rn = liv
+                        ? (liv.value || '').trim()
+                        : span
+                          ? span.textContent.trim()
+                          : '';
+                    if (rn === nomeCanon) {
+                        tr = row;
+                        idx = j;
+                    }
+                });
             }
-            const pa = tr.querySelector('.p-pen-arm');
-            if (pa) {
-                const meta = PERICIAS_META[i];
-                const padraoArm = meta && meta.penalidade_armadura === true;
-                const savedArm = p.penalidade_armadura;
-                pa.checked =
-                    savedArm !== undefined && savedArm !== null
-                        ? Boolean(savedArm)
-                        : padraoArm;
+            if (!tr && rows[i]) {
+                tr = rows[i];
+                idx = i;
             }
+            if (tr) aplicarLinhaPericia(tr, p, idx);
         });
     }
 
@@ -5134,14 +5862,43 @@
     }
 
     function extrairFichaJson() {
+        const rv = getRegraVersaoAtiva();
+        const caminhoArc = q('f_arcanista_caminho') && q('f_arcanista_caminho').value;
         return {
-            origem: q('f_origem').value || '',
+            regra_versao: rv,
+            ...(window.T20OrigensV13
+                ? window.T20OrigensV13.lerOrigemPayload()
+                : { origem: q('f_origem').value || '' }),
+            ...(window.T20KitInicialV13 && window.T20KitInicialV13.lerKitPayload()
+                ? { kit_inicial_v13: window.T20KitInicialV13.lerKitPayload() }
+                : {}),
             raca_tormenta_slug: (q('f_raca_select') && q('f_raca_select').value) || null,
             raca_tormenta_mais2a: (q('f_raca_mais2a') && q('f_raca_mais2a').value) || null,
             raca_tormenta_mais2b: (q('f_raca_mais2b') && q('f_raca_mais2b').value) || null,
             raca_tormenta_mais1: (q('f_raca_mais1') && q('f_raca_mais1').value) || null,
             raca_tormenta_livre: (q('f_raca_livre') && q('f_raca_livre').value.trim()) || '',
+            humano_versatil:
+                q('f_humano_versatil') && q('f_humano_versatil').value
+                    ? String(q('f_humano_versatil').value).trim()
+                    : null,
+            humano_versatil_poder_slug:
+                q('f_humano_versatil') && q('f_humano_versatil').value === 'pericia_poder'
+                    ? window.__t20HumanoVersatilPoderSlug ||
+                      (q('f_humano_versatil_poder_nome') && q('f_humano_versatil_poder_nome').value.trim()
+                          ? t20SlugifyPoderSlug(q('f_humano_versatil_poder_nome').value)
+                          : null)
+                    : null,
+            suraggel_subtipo:
+                q('f_suraggel_subtipo') && q('f_suraggel_subtipo').value
+                    ? String(q('f_suraggel_subtipo').value).trim().toLowerCase()
+                    : null,
             tormenta_classe_mb_slug: (q('f_classe_mb') && q('f_classe_mb').value) || null,
+            arcanista_caminho:
+                caminhoArc && String(caminhoArc).trim() ? String(caminhoArc).trim().toLowerCase() : null,
+            pericias_classe_ou:
+                window.__t20PericiasClasseOu && typeof window.__t20PericiasClasseOu === 'object'
+                    ? { ...window.__t20PericiasClasseOu }
+                    : null,
             tormenta_divindade_mb_slug: (() => {
                 const sel = q('f_divindade');
                 if (!sel || !sel.selectedOptions || !sel.selectedOptions.length) return null;
@@ -5215,6 +5972,15 @@
             const cs = String(j.tormenta_classe_mb_slug).trim();
             mbSel.value = CLASSES_MB.some((x) => x.slug === cs) ? cs : mbSel.value;
         }
+        const camSel = q('f_arcanista_caminho');
+        if (camSel && j.arcanista_caminho != null && String(j.arcanista_caminho).trim()) {
+            camSel.value = String(j.arcanista_caminho).trim().toLowerCase();
+        }
+        window.__t20PericiasClasseOu =
+            j.pericias_classe_ou && typeof j.pericias_classe_ou === 'object'
+                ? { ...j.pericias_classe_ou }
+                : {};
+        t20AtualizarUiArcanistaCaminho();
         const cm = q('f_conjuracao_manual_mb');
         if (cm) cm.checked = j.tormenta_conjuracao_manual_mb === true;
         const ncj = q('f_nivel_conj_mb');
@@ -5236,7 +6002,15 @@
             if (prepT) prepT.value = '';
         }
         renderNiveisConjMbFromJson(j.tormenta_niveis_classe_mb || []);
-        q('f_origem').value = j.origem || '';
+        if (window.T20OrigensV13) {
+            window.T20OrigensV13.aplicarOrigemPayload(j);
+        } else {
+            q('f_origem').value = j.origem || '';
+        }
+        if (window.T20KitInicialV13) {
+            window.T20KitInicialV13.aplicarKitPayload(j);
+            window.T20KitInicialV13.atualizarUiKitV13();
+        }
         q('f_talentos').value = j.talentos_texto || '';
         q('f_magias').value = j.magias_texto || '';
         q('f_raca_origem_txt').value = j.raca_origem_texto || '';
@@ -5256,6 +6030,10 @@
         q('f_apar').value = j.aparencia || '';
         q('f_notas').value = j.notas || '';
         preencherPericias(j.pericias);
+        t20AplicarPericiasOrigemBeneficios();
+        if (typeof window.t20AplicarPericiasClasseV13 === 'function') {
+            window.t20AplicarPericiasClasseV13();
+        }
         preencherAtaques(j.ataques);
         t20AplicarAtaquesBonusPlanilha(j.ataques_bonus_planilha);
         if (q('f_hab_classe_mb') && j.habilidade_classe_mb != null) {
@@ -5560,7 +6338,7 @@
             pv_atual: pvP.a,
             pa_max: pmP.b,
             pa_atual: pmP.a,
-            ca: __t20CaBaseSemItens,
+            ca: (t20RecalcularCaBaseV13(), __t20CaBaseSemItens),
             rd: _t20RdLegado,
             nivel: Number(q('f_nivel').value || 1),
             iniciativa: t20ReadIniciativaTotal(),
@@ -5740,6 +6518,12 @@
         t20SyncDeslTamSheetToDialog();
     }
     window.t20PreencherFormPersonagem = preencherForm;
+    window.getRegraVersaoAtiva = getRegraVersaoAtiva;
+    window.coletarPericias = coletarPericias;
+    window.preencherPericias = preencherPericias;
+    window.t20AplicarPericiasOrigemBeneficios = t20AplicarPericiasOrigemBeneficios;
+    window.t20AplicarPoderesAutomaticosNaLista = t20AplicarPoderesAutomaticosNaLista;
+    window.t20AplicarEquipamentosAutomaticosNaLista = t20AplicarEquipamentosAutomaticosNaLista;
 
     function aplicarTravaRacaClasseMb() {
         const sr = q('f_raca_select');
@@ -5794,53 +6578,33 @@
     }
 
     async function init() {
+        const paramsEarly = new URLSearchParams(window.location.search);
+        const idEarly = paramsEarly.get('id');
+        if (idEarly) {
+            try {
+                const peek = await svc.obter(idEarly);
+                if (window.T20RegraVersao) {
+                    T20_REGRA_VERSAO_FICHA = window.T20RegraVersao.getRegraVersaoFicha(peek.ficha_json || {});
+                }
+            } catch (ePeek) {
+                console.warn(ePeek);
+            }
+        }
+
         try {
-            aplicarRegrasPayload(await carregarRegrasTormenta());
+            await aplicarPacoteRegrasTormenta(getRegraVersaoAtiva());
+            renderPainelIdiomasMbReferencia();
+            if (__t20LastPersonagemPayload && __t20LastPersonagemPayload.ficha_json) {
+                renderNiveisConjMbFromJson(
+                    __t20LastPersonagemPayload.ficha_json.tormenta_niveis_classe_mb || []
+                );
+            }
         } catch (e) {
             console.warn(e);
             Toast.error((e && e.message) || 'Erro ao carregar regras Tormenta.');
             PERICIAS_META = [];
         }
 
-        try {
-            const pack = await carregarRacasTormenta();
-            RACAS_MB = pack.racas;
-            IDIOMAS_MB_GERAL = pack.idiomas_geral_mb;
-            IDIOMAS_MB_TABELA = pack.idiomas_tabela_mb;
-        } catch (e2) {
-            console.warn(e2);
-            RACAS_MB = [];
-            IDIOMAS_MB_GERAL = '';
-            IDIOMAS_MB_TABELA = [];
-        }
-        try {
-            const cpack = await carregarClassesTormenta();
-            CLASSES_MB = cpack.classes;
-            BENEFICIOS_NIVEL_MB = cpack.beneficios_por_nivel;
-        } catch (e3) {
-            console.warn(e3);
-            CLASSES_MB = [];
-            BENEFICIOS_NIVEL_MB = [];
-        }
-        try {
-            const cj = await new TormentaRegrasService().obterConjuracaoMb();
-            const mp = {};
-            (Array.isArray(cj.classes) ? cj.classes : []).forEach((row) => {
-                const s = String(row.slug || '')
-                    .trim()
-                    .toLowerCase();
-                if (s) mp[s] = row;
-            });
-            T20_CONJ_MB_BY_SLUG = mp;
-            t20RenderPmMbResumoPainel(cj);
-            if (__t20LastPersonagemPayload && __t20LastPersonagemPayload.ficha_json) {
-                renderNiveisConjMbFromJson(__t20LastPersonagemPayload.ficha_json.tormenta_niveis_classe_mb || []);
-            }
-        } catch (e3b) {
-            console.warn(e3b);
-            T20_CONJ_MB_BY_SLUG = {};
-            t20RenderPmMbResumoPainel(null);
-        }
         try {
             await carregarIdentidadeMbTormenta();
             t20MontarSelectsIdentidadeMb();
@@ -5849,6 +6613,20 @@
             TENDENCIAS_MB_OPTS = [];
             DIVINDADES_MB_OPTS = [];
             t20MontarSelectsIdentidadeMb();
+        }
+        if (window.T20OrigensV13) {
+            try {
+                await window.T20OrigensV13.init();
+            } catch (eOrig) {
+                console.warn(eOrig);
+            }
+        }
+        if (window.T20KitInicialV13) {
+            try {
+                await window.T20KitInicialV13.init();
+            } catch (eKit) {
+                console.warn(eKit);
+            }
         }
         popularSelectClassesMb();
         bindClasseMbOnce();
@@ -5872,6 +6650,7 @@
         t20AtualizarResumoBotaoXpMb();
         montarEquip();
         montarTabelaPericias();
+        t20AtualizarUiPericiasVersao();
         renderIdiomasListaDoCampo();
         destacarPericiasClasseMb();
         q('f_jogador').value = AuthService.getNome();
@@ -6225,6 +7004,13 @@
         if (btnAddTal) {
             btnAddTal.addEventListener('click', () => abrirModalTalentosTormenta(null, null));
         }
+        const btnVersPod = q('btnHumanoVersatilPoder');
+        if (btnVersPod) {
+            btnVersPod.addEventListener('click', () => {
+                const inp = q('f_humano_versatil_poder_nome');
+                if (inp) abrirModalTalentosTormenta(inp, null);
+            });
+        }
         const btnAddCons = q('btnT20AddConsumivel');
         if (btnAddCons) {
             btnAddCons.addEventListener('click', () => {
@@ -6376,6 +7162,18 @@
                 Toast.error(vr.msg);
                 return;
             }
+            const slugCl = (q('f_classe_mb') && q('f_classe_mb').value) || '';
+            if (
+                window.T20RegraVersao &&
+                window.T20RegraVersao.isV13(getRegraVersaoAtiva()) &&
+                slugCl === 'arcanista'
+            ) {
+                const cam = q('f_arcanista_caminho') && q('f_arcanista_caminho').value;
+                if (!cam || !String(cam).trim()) {
+                    Toast.error('Arcanista (v1.3): escolha o caminho Bruxo, Mago ou Feiticeiro.');
+                    return;
+                }
+            }
             if (cadastroDashboardOrigem && !travaRacaClasseMb) {
                 forcarTravarNoProximoExtrair = true;
             }
@@ -6407,6 +7205,7 @@
                     try {
                         const pGr = await svc.obter(fidAfter);
                         __t20LastPersonagemPayload = pGr;
+                        t20AplicarInventarioDasColunasApi(pGr);
                         t20AtualizarGrimorioElegibilidadeVisual(pGr);
                     } catch (eBg) {
                         console.warn(eBg);

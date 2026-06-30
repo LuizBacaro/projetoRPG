@@ -171,7 +171,7 @@ Pede confirmação para: `git reset --hard`, `rm -rf`, `DROP DATABASE`, etc.
 | Item | Situação |
 |------|----------|
 | `GUIA_ORQUESTRACAO_AGENTES.md` | Espelha este guia; pode desatualizar se só um for editado |
-| `.github/agents/` + prompts | Desenhados para Copilot; no Cursor = referência textual |
+| `.github/agents/` + prompts | Copilot nativo; no Cursor usar `.cursor/agents/` (adaptado) ou `@` nos `.agent.md` |
 | Skill `postgresql` em `.github/skills/` | Migração **.NET**, não Neon do Arena |
 | `MELHORIAS.md` | Lista manual; agente não lê sozinho |
 | `livros/`, `helpers/` | Local, `.gitignore` |
@@ -201,6 +201,13 @@ Segue AGENTS.md (camadas; só games/dnd35).
 Erro CORS em produção: @.cursor/skills/arena-ttrpg-architecture/SKILL.md
 e AGENTS.md (infra).
 ```
+
+```text
+/rpg-requirements-analyst
+Analisa capítulo X e gera RF em .cursor/requisitos/dnd35/ — não codar ainda.
+```
+
+Ou, sem subagente explícito:
 
 ```text
 Analisa capítulo X e gera RF em .cursor/requisitos/dnd35/

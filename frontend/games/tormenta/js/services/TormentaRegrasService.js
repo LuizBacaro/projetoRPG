@@ -2,12 +2,26 @@
  * Regras estáticas da ficha Tormenta (`/api/v1/tormenta/regras/*`).
  */
 class TormentaRegrasService {
-    _urlAtributos() {
-        return window.getApiUrl('/tormenta/regras/atributos');
+    _appendRegraVersao(url, regraVersao) {
+        if (!regraVersao) return url;
+        const rv = String(regraVersao).trim();
+        if (!rv) return url;
+        const sep = url.includes('?') ? '&' : '?';
+        return `${url}${sep}regra_versao=${encodeURIComponent(rv)}`;
     }
 
-    _urlRacas() {
-        return window.getApiUrl('/tormenta/regras/racas');
+    _urlAtributos(regraVersao) {
+        return this._appendRegraVersao(
+            window.getApiUrl('/tormenta/regras/atributos'),
+            regraVersao
+        );
+    }
+
+    _urlRacas(regraVersao) {
+        return this._appendRegraVersao(
+            window.getApiUrl('/tormenta/regras/racas'),
+            regraVersao
+        );
     }
 
     _headers() {
@@ -31,31 +45,38 @@ class TormentaRegrasService {
         return res.json();
     }
 
-    async obterAtributos() {
-        const res = await fetch(this._urlAtributos(), { headers: this._headers() });
+    async obterAtributos(opts = {}) {
+        const res = await fetch(this._urlAtributos(opts.regraVersao), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar regras Tormenta');
     }
 
     async gerarAtributos(payload = {}) {
+        const body = { ...payload };
+        if (payload.regraVersao && body.regra_versao == null) {
+            body.regra_versao = payload.regraVersao;
+        }
         const res = await fetch(window.getApiUrl('/tormenta/regras/gerar-atributos'), {
             method: 'POST',
             headers: { ...this._headers(), 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(body),
         });
         return this._handleJson(res, 'Erro ao gerar atributos T20');
     }
 
-    async obterRacas() {
-        const res = await fetch(this._urlRacas(), { headers: this._headers() });
+    async obterRacas(opts = {}) {
+        const res = await fetch(this._urlRacas(opts.regraVersao), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar raças Tormenta');
     }
 
-    _urlClasses() {
-        return window.getApiUrl('/tormenta/regras/classes');
+    _urlClasses(regraVersao) {
+        return this._appendRegraVersao(
+            window.getApiUrl('/tormenta/regras/classes'),
+            regraVersao
+        );
     }
 
-    async obterClasses() {
-        const res = await fetch(this._urlClasses(), { headers: this._headers() });
+    async obterClasses(opts = {}) {
+        const res = await fetch(this._urlClasses(opts.regraVersao), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar classes Tormenta');
     }
 
@@ -63,9 +84,19 @@ class TormentaRegrasService {
         return window.getApiUrl('/tormenta/regras/identidade-mb');
     }
 
-    /** PM por classe, chave de conjuração e custo em PM por círculo (MB). */
-    _urlConjuracaoMb() {
-        return window.getApiUrl('/tormenta/regras/conjuracao-mb');
+    /** PM por classe, chave de conjuração e custo em PM por círculo. */
+    _urlConjuracaoMb(regraVersao) {
+        return this._appendRegraVersao(
+            window.getApiUrl('/tormenta/regras/conjuracao-mb'),
+            regraVersao
+        );
+    }
+
+    _urlOrigens(regraVersao) {
+        return this._appendRegraVersao(
+            window.getApiUrl('/tormenta/regras/origens'),
+            regraVersao || 'v13'
+        );
     }
 
     /** Tendências (alinhamento) e divindades (Os Vinte) do MB para combos na ficha. */
@@ -74,9 +105,26 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao carregar tendências/divindades MB');
     }
 
-    async obterConjuracaoMb() {
-        const res = await fetch(this._urlConjuracaoMb(), { headers: this._headers() });
-        return this._handleJson(res, 'Erro ao carregar regras de conjuração MB');
+    /** Origens v1.3 (Tabela 1-19) — benefícios de perícia e poder. */
+    async obterOrigens(opts = {}) {
+        const res = await fetch(this._urlOrigens(opts.regraVersao), { headers: this._headers() });
+        return this._handleJson(res, 'Erro ao carregar origens v1.3');
+    }
+
+    /** Kit inicial v1.3 (p.140) — opções por classe. */
+    async obterKitInicial(opts = {}) {
+        const q = new URLSearchParams();
+        q.set('regra_versao', opts.regraVersao || 'v13');
+        if (opts.tormentaClasseMbSlug) q.set('tormenta_classe_mb_slug', String(opts.tormentaClasseMbSlug));
+        const res = await fetch(`${window.getApiUrl('/tormenta/regras/kit-inicial')}?${q}`, {
+            headers: this._headers(),
+        });
+        return this._handleJson(res, 'Erro ao carregar kit inicial v1.3');
+    }
+
+    async obterConjuracaoMb(opts = {}) {
+        const res = await fetch(this._urlConjuracaoMb(opts.regraVersao), { headers: this._headers() });
+        return this._handleJson(res, 'Erro ao carregar regras de conjuração');
     }
 
     _urlEquipamentos() {
@@ -151,13 +199,15 @@ class TormentaRegrasService {
         if (p.nivel_conjurador != null && p.nivel_conjurador !== '') {
             sp.set('nivel_conjurador', String(p.nivel_conjurador));
         }
+        if (p.regraVersao) sp.set('regra_versao', String(p.regraVersao).trim());
+        if (p.arcanista_caminho) sp.set('arcanista_caminho', String(p.arcanista_caminho).trim());
         ['for', 'des', 'con', 'int', 'sab', 'car'].forEach((k) => {
             const key = `${k}_valor`;
             if (p[key] != null) sp.set(key, String(p[key]));
         });
         const qs = sp.toString();
         const res = await fetch(`${this._urlConjuracaoPreview()}?${qs}`, { headers: this._headers() });
-        return this._handleJson(res, 'Erro ao calcular pré-visualização de conjuração MB');
+        return this._handleJson(res, 'Erro ao calcular pré-visualização de conjuração');
     }
 
     _urlArmadurasProtecao() {
@@ -182,27 +232,36 @@ class TormentaRegrasService {
         return window.getApiUrl('/tormenta/regras/tracos-raciais-preview');
     }
 
-    async obterTracosRaciaisPreview(slug) {
+    async obterTracosRaciaisPreview(slug, opts = {}) {
         const sp = new URLSearchParams();
         sp.set('slug', String(slug || '').trim());
+        if (opts.regraVersao) sp.set('regra_versao', String(opts.regraVersao).trim());
+        if (opts.humanoVersatil) sp.set('humano_versatil', String(opts.humanoVersatil).trim());
         const res = await fetch(`${this._urlTracosRaciaisPreview()}?${sp}`, { headers: this._headers() });
-        return this._handleJson(res, 'Erro ao carregar traços raciais MB');
+        return this._handleJson(res, 'Erro ao carregar traços raciais');
     }
 
-    _urlPericiasRegras() {
-        return window.getApiUrl('/tormenta/regras/pericias');
+    _urlPericiasRegras(regraVersao) {
+        return this._appendRegraVersao(
+            window.getApiUrl('/tormenta/regras/pericias'),
+            regraVersao
+        );
     }
 
-    async obterRegrasPericias() {
-        const res = await fetch(this._urlPericiasRegras(), { headers: this._headers() });
+    async obterRegrasPericias(opts = {}) {
+        const res = await fetch(this._urlPericiasRegras(opts.regraVersao), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar regras de perícias');
     }
 
     async calcularBonusPericia(body) {
+        const payload = { ...body };
+        if (body.regraVersao && payload.regra_versao == null) {
+            payload.regra_versao = body.regraVersao;
+        }
         const res = await fetch(window.getApiUrl('/tormenta/regras/pericias/calcular-bonus'), {
             method: 'POST',
             headers: { ...this._headers(), 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
+            body: JSON.stringify(payload),
         });
         return this._handleJson(res, 'Erro ao calcular bônus de perícia');
     }
@@ -217,29 +276,42 @@ class TormentaRegrasService {
     }
 
     /**
-     * PV máximos MB por classe, nível e CON.
-     * @param {{ classe_slug: string, nivel?: number, con_valor?: number }} p
+     * PV máximos por classe, nível e CON.
+     * @param {{ classe_slug: string, nivel?: number, con_valor?: number, regraVersao?: string }} p
      */
     async obterPvPreview(p) {
         const sp = new URLSearchParams();
         sp.set('classe_slug', String(p.classe_slug || '').trim());
         sp.set('nivel', String(p.nivel != null ? p.nivel : 1));
         sp.set('con_valor', String(p.con_valor != null ? p.con_valor : 10));
+        if (p.regraVersao) sp.set('regra_versao', String(p.regraVersao).trim());
+        if (p.arcanista_caminho) sp.set('arcanista_caminho', String(p.arcanista_caminho).trim());
+        ['for', 'des', 'int', 'sab', 'car'].forEach((k) => {
+            const key = `${k}_valor`;
+            if (p[key] != null) sp.set(key, String(p[key]));
+        });
         const res = await fetch(
             `${window.getApiUrl('/tormenta/regras/pv-preview')}?${sp}`,
             { headers: this._headers() }
         );
-        return this._handleJson(res, 'Erro ao calcular PV MB');
+        return this._handleJson(res, 'Erro ao calcular PV');
     }
 
     /**
      * Valida orçamento de perícias treinadas e graduações (MB).
      */
     async validarPericiasCriacao(body) {
+        const payload = { ...body };
+        if (body.regraVersao && payload.regra_versao == null) {
+            payload.regra_versao = body.regraVersao;
+        }
+        if (body.humanoVersatil && payload.humano_versatil == null) {
+            payload.humano_versatil = body.humanoVersatil;
+        }
         const res = await fetch(window.getApiUrl('/tormenta/regras/pericias/validar-criacao'), {
             method: 'POST',
             headers: { ...this._headers(), 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
+            body: JSON.stringify(payload),
         });
         return this._handleJson(res, 'Erro ao validar orçamento de perícias');
     }

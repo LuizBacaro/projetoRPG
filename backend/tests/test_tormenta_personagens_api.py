@@ -1155,3 +1155,72 @@ def test_magias_migrar_texto_limpa_ficha_apos_sincronizar(tormenta_personagens_d
     mig2 = client.post(f"/api/v1/tormenta/personagens/{rid}/magias/migrar-do-json")
     assert mig2.status_code == 200
     assert mig2.json()["vinculos_criados"] == 0
+
+
+_T20_JOG_V13_BASE10 = {
+    "for_valor": 3,
+    "des_valor": 3,
+    "con_valor": 2,
+    "int_valor": 0,
+    "sab_valor": 0,
+    "car_valor": 0,
+}
+
+
+def _t20_post_jogador_v13_json(**kwargs) -> dict:
+    """POST mínimo jogador v1.3 com compra = 10 pts (3+3+2 custos)."""
+    ficha_extra = kwargs.pop("ficha_json", None) or {}
+    body = {"tipo": "jogador", **_T20_JOG_V13_BASE10.copy()}
+    body.update(kwargs)
+    if "pv_max" in body and "pv_atual" not in body:
+        body["pv_atual"] = body["pv_max"]
+    fj = {"regra_versao": "v13", **ficha_extra}
+    fj["atributos_compra"] = {
+        "for": body["for_valor"],
+        "des": body["des_valor"],
+        "con": body["con_valor"],
+        "int": body["int_valor"],
+        "sab": body["sab_valor"],
+        "car": body["car_valor"],
+    }
+    body["ficha_json"] = fj
+    return body
+
+
+def test_criar_jogador_v13_sem_origem_rejeita(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Sem Origem",
+            nivel=1,
+            pv_max=12,
+            ficha_json={"tormenta_classe_mb_slug": "guerreiro"},
+        ),
+    )
+    assert r.status_code == 422
+    assert "origem" in r.json()["detail"].lower()
+
+
+def test_criar_jogador_v13_com_origem_ok(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Com Origem",
+            nivel=1,
+            pv_max=12,
+            ficha_json={
+                "tormenta_classe_mb_slug": "guerreiro",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+            },
+        ),
+    )
+    assert r.status_code == 201
+    fj = r.json()["ficha_json"]
+    assert fj["origem_slug"] == "acolito"
+    assert len(fj["origem_beneficios"]) == 2

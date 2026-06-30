@@ -34,7 +34,7 @@ No Arena, **`dnd35` e `dnd5e` são dois sistemas com `game_slug`, código e requ
 |-------|----------|
 | `dnd35/` | Ficha e mecânicas **D&D 3.5** em produção (`backend/app/games/dnd35/`, `frontend/games/dnd35/`) |
 | `dnd5e/` | Ficha e mecânicas **D&D 5E** (ver [dnd5e/README.md](dnd5e/README.md); catálogo JSON: [5e-bits/5e-database](https://github.com/5e-bits/5e-database)) |
-| `tormenta/` | Ficha e mecânicas Tormenta 20 (MB) |
+| `tormenta/` | Ficha e mecânicas **Tormenta 20 — Edição Jogo do Ano v1.3** ([tormenta/README.md](tormenta/README.md)) |
 | `gurps/` | Ficha e mecânicas GURPS 4E |
 
 ## Materiais de referência locais (não versionados)

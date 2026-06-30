@@ -1,5 +1,5 @@
 /**
- * Wizard «Subir nível (MB)» — preview e aplicação via API.
+ * Wizard «Subir nível» — preview e aplicação via API (MB ou v1.3).
  */
 (function () {
     const svc = () => new TormentaPersonagemService();
@@ -15,6 +15,14 @@
         return d.innerHTML;
     }
 
+    function labelVersao() {
+        if (typeof window.t20LabelVersao === 'function') return window.t20LabelVersao();
+        if (window.T20RegraVersao && typeof window.getRegraVersaoAtiva === 'function') {
+            return window.T20RegraVersao.isV13(window.getRegraVersaoAtiva()) ? 'v1.3' : 'MB';
+        }
+        return 'MB';
+    }
+
     function fecharModal() {
         const ov = q('modalSubirNivelTormenta');
         if (!ov) return;
@@ -27,6 +35,7 @@
         if (!p.permitido) {
             return `<p class="t20-hint" style="color:var(--t20-danger,#a33)">${escHtml(p.motivo || 'Não permitido.')}</p>`;
         }
+        const lv = labelVersao();
         const linhas = [];
         linhas.push(`<p><strong>Nível ${p.nivel_atual} → ${p.nivel_alvo}</strong> (${escHtml(p.classe_slug || '')})</p>`);
         if (p.pv_ganho != null) {
@@ -36,10 +45,16 @@
             linhas.push(`<p>PM: ${p.pa_max_atual} → <strong>${p.pa_max_novo}</strong> (+${p.pa_ganho})</p>`);
         }
         if (p.talentos_ganho > 0) {
-            linhas.push(`<p>Talentos (total MB): <strong>${p.talentos_totais_novo}</strong> (+${p.talentos_ganho} neste nível)</p>`);
+            const rotulo =
+                lv === 'v1.3' ? 'Poderes gerais (acumulado)' : `Talentos (total ${lv})`;
+            linhas.push(
+                `<p>${rotulo}: <strong>${p.talentos_totais_novo}</strong> (+${p.talentos_ganho} neste nível)</p>`
+            );
         }
         if (p.graduacao_pericias_nova) {
-            linhas.push(`<p>Graduações de perícias: <strong>${escHtml(p.graduacao_pericias_nova)}</strong></p>`);
+            const rotGrad =
+                lv === 'v1.3' ? 'Bônus em perícias (tr / n-tr)' : 'Graduações de perícias';
+            linhas.push(`<p>${rotGrad}: <strong>${escHtml(p.graduacao_pericias_nova)}</strong></p>`);
         }
         if (p.magias_livro_ganho != null && p.magias_livro_ganho > 0) {
             linhas.push(
@@ -56,7 +71,9 @@
             linhas.push('<p>Bardo: <strong>troca de magia conhecida</strong> disponível neste nível.</p>');
         }
         if (p.habilidade_classe) {
-            linhas.push(`<p class="t20-hint" style="margin-top:.5rem"><strong>Classe (MB):</strong> ${escHtml(p.habilidade_classe)}</p>`);
+            linhas.push(
+                `<p class="t20-hint" style="margin-top:.5rem"><strong>Poder de classe (${lv}):</strong> ${escHtml(p.habilidade_classe)}</p>`
+            );
         }
         if (Array.isArray(p.avisos) && p.avisos.length) {
             linhas.push(`<p class="t20-hint">${escHtml(p.avisos.join(' '))}</p>`);
@@ -93,8 +110,9 @@
         }
         const slug = (q('f_classe_mb') && q('f_classe_mb').value) || '';
         if (!String(slug).trim()) {
-            if (typeof Toast !== 'undefined') Toast.error('Selecione a classe MB em Editar ficha.');
-            else alert('Selecione a classe MB.');
+            const lv = labelVersao();
+            if (typeof Toast !== 'undefined') Toast.error(`Selecione a classe (${lv}) em Editar ficha.`);
+            else alert(`Selecione a classe (${lv}).`);
             return;
         }
         const ov = q('modalSubirNivelTormenta');
@@ -110,8 +128,9 @@
     async function confirmarSubirNivel() {
         const pid = q('fichaId') && q('fichaId').value;
         const prev = window.__t20SubirNivelPreview;
+        const lv = labelVersao();
         if (!pid || !prev) {
-            if (typeof Toast !== 'undefined') Toast.error('Abra o assistente com «Subir nível (MB)» antes de confirmar.');
+            if (typeof Toast !== 'undefined') Toast.error(`Abra o assistente «Subir nível (${lv})» antes de confirmar.`);
             return;
         }
         if (!prev.permitido) {
@@ -134,7 +153,7 @@
             if (typeof window.atualizarResumoClasseMb === 'function') {
                 window.atualizarResumoClasseMb();
             }
-            if (typeof Toast !== 'undefined') Toast.success(`Nível ${p.nivel} aplicado (MB).`);
+            if (typeof Toast !== 'undefined') Toast.success(`Nível ${p.nivel} aplicado (${lv}).`);
             fecharModal();
         } catch (e) {
             if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro ao subir de nível');

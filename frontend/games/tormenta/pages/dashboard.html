@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0" />
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260614arenaRoll" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260629wiz" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -550,96 +550,151 @@
         <form id="formCadastroRapido" class="t20-dash-modal__bd">
             <input type="hidden" name="tipo" id="cadTipo" value="jogador" />
             <p id="cadastroSubtitulo" class="t20-dash-hint" style="margin-top:0"></p>
-            <div class="t20-dash-form-grid">
-                <div class="t20-dash-field t20-dash-field--full">
-                    <label for="cadNome">Nome do personagem *</label>
-                    <input id="cadNome" name="nome" type="text" required maxlength="120" autocomplete="off" />
-                </div>
-                <div class="t20-dash-field">
-                    <label for="cadNivel">Nível *</label>
-                    <input id="cadNivel" name="nivel" type="number" required min="0" max="40" value="1" />
-                </div>
-                <div class="t20-dash-field">
-                    <label for="cadPvMax">PV máximos *</label>
-                    <input id="cadPvMax" name="pv_max" type="number" required min="0" max="9999" value="10" />
-                </div>
-                <div class="t20-dash-field t20-dash-field--full">
-                    <label for="cadClasseMb">Classe MB (BBA / tabela)</label>
-                    <select id="cadClasseMb" class="t20-input"></select>
-                </div>
-                <div class="t20-dash-field t20-dash-field--full">
-                    <label for="cadRacaSelect">Raça (Módulo Básico)</label>
-                    <select id="cadRacaSelect" class="t20-input"></select>
-                </div>
-                <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacaLivre" style="display: none">
-                    <label for="cadRacaLivre">Nome da raça (livre)</label>
-                    <input id="cadRacaLivre" type="text" maxlength="120" placeholder="Ex.: Meio-orc, lefeu de outra região…" />
-                </div>
-                <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacialMais2" style="display: none">
-                    <span class="t20-dash-hint" style="display: block; margin-bottom: 0.35rem">
-                        Raça MB: +2 em duas habilidades diferentes (ex.: Humano, Lefou).
-                    </span>
-                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
-                        <div class="t20-dash-field" style="min-width: 8rem">
-                            <label for="cadRacaMais2a">1º +2</label>
-                            <select id="cadRacaMais2a" class="t20-input"><option value="">—</option></select>
-                        </div>
-                        <div class="t20-dash-field" style="min-width: 8rem">
-                            <label for="cadRacaMais2b">2º +2</label>
-                            <select id="cadRacaMais2b" class="t20-input"><option value="">—</option></select>
-                        </div>
+            <nav id="cadWizardNav" class="cad-wizard-nav" aria-label="Passos da criação v1.3" style="display:none"></nav>
+
+            <div class="cad-wizard-step" data-cad-step="1">
+                <div class="t20-dash-form-grid">
+                    <div class="t20-dash-field t20-dash-field--full">
+                        <label for="cadNome">Nome do personagem *</label>
+                        <input id="cadNome" name="nome" type="text" required maxlength="120" autocomplete="off" />
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="cadNivel">Nível *</label>
+                        <input id="cadNivel" name="nivel" type="number" required min="0" max="40" value="1" />
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="cadPvMax">PV máximos *</label>
+                        <input id="cadPvMax" name="pv_max" type="number" required min="0" max="9999" value="10" />
                     </div>
                 </div>
-                <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacialMais1" style="display: none">
-                    <label for="cadRacaMais1">Raça MB: +2 em uma habilidade (Meio-orc)</label>
-                    <select id="cadRacaMais1" class="t20-input"><option value="">—</option></select>
+                <div class="t20-dash-field t20-dash-field--full" style="margin-top: 0.75rem">
+                    <label for="cadInputFoto">Retrato (opcional)</label>
+                    <p class="t20-dash-hint" style="margin: 0 0 0.35rem">
+                        Aparece na ficha como leitura; você pode trocar depois pelo botão “Enviar retrato” na ficha.
+                    </p>
+                    <div class="t20-dash-upload-area" id="cadUploadPlaceholder" role="button" tabindex="0" aria-label="Escolher imagem">
+                        📷 Clique para adicionar foto
+                    </div>
+                    <input type="file" id="cadInputFoto" accept="image/*" style="display: none" />
+                    <div id="cadUploadPreview" class="t20-dash-upload-preview" style="display: none" aria-live="polite">
+                        <img id="cadPreviewImage" src="" alt="Pré-visualização do retrato" />
+                        <button type="button" class="t20-dash-upload-remove" id="cadBtnRemoverFoto" aria-label="Remover foto">✕</button>
+                    </div>
                 </div>
             </div>
-            <p class="t20-dash-hint" id="hintAttrsJogador" style="display:none">
-                Tipo jogador: os seis números são os <strong>valores finais</strong> (base + bônus racial MB).
-                <strong>Compra por pontos:</strong> base 8–18, soma dos custos = <strong>20</strong>.
-                <strong>4d6:</strong> role seis valores 3–18 (descarta o menor); reroll MB se soma de mods &lt; +4 e nenhum 14+.
-            </p>
-            <div class="t20-dash-field t20-dash-field--full" id="cadWrapMetodoGeracao" style="display:none">
-                <label for="cadMetodoGeracao">Geração de atributos (MB)</label>
-                <select id="cadMetodoGeracao" class="t20-input">
-                    <option value="compra_pontos">Compra por pontos (20 pts)</option>
-                    <option value="4d6">Rolagem 4d6 (descarta o menor)</option>
-                </select>
-                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.45rem;align-items:center">
-                    <button type="button" class="tormenta-btn" id="cadBtnRolar4d6" style="display:none">Rolar 4d6</button>
-                    <button type="button" class="tormenta-btn" id="cadBtnResetCompra" style="display:none">Resetar base 10</button>
-                    <span class="t20-dash-hint" id="cadHintMetodoGeracao" style="margin:0"></span>
+
+            <div class="cad-wizard-step" data-cad-step="2">
+                <div class="t20-dash-form-grid">
+                    <div class="t20-dash-field t20-dash-field--full">
+                        <label for="cadClasseMb">Classe MB (BBA / tabela)</label>
+                        <select id="cadClasseMb" class="t20-input"></select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full">
+                        <label for="cadRacaSelect">Raça (Módulo Básico)</label>
+                        <select id="cadRacaSelect" class="t20-input"></select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacaLivre" style="display: none">
+                        <label for="cadRacaLivre">Nome da raça (livre)</label>
+                        <input id="cadRacaLivre" type="text" maxlength="120" placeholder="Ex.: Meio-orc, lefeu de outra região…" />
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacialMais2" style="display: none">
+                        <span class="t20-dash-hint" style="display: block; margin-bottom: 0.35rem">
+                            Raça MB: +2 em duas habilidades diferentes (ex.: Humano, Lefou).
+                        </span>
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
+                            <div class="t20-dash-field" style="min-width: 8rem">
+                                <label for="cadRacaMais2a">1º +2</label>
+                                <select id="cadRacaMais2a" class="t20-input"><option value="">—</option></select>
+                            </div>
+                            <div class="t20-dash-field" style="min-width: 8rem">
+                                <label for="cadRacaMais2b">2º +2</label>
+                                <select id="cadRacaMais2b" class="t20-input"><option value="">—</option></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacialMais1" style="display: none">
+                        <label for="cadRacaMais1">Raça MB: +2 em uma habilidade (Meio-orc)</label>
+                        <select id="cadRacaMais1" class="t20-input"><option value="">—</option></select>
+                    </div>
                 </div>
             </div>
-            <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0.75rem 0 0;padding:0.65rem">
-                <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Atributos</legend>
-                <div class="t20-dash-attrs6">
-                    <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="0" max="99" value="10" required /></div>
-                    <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="0" max="99" value="10" required /></div>
-                    <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="0" max="99" value="10" required /></div>
-                    <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="0" max="99" value="10" required /></div>
-                    <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="0" max="99" value="10" required /></div>
-                    <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="0" max="99" value="10" required /></div>
-                </div>
-            </fieldset>
-            <div class="t20-dash-field t20-dash-field--full" style="margin-top: 0.75rem">
-                <label for="cadInputFoto">Retrato (opcional)</label>
-                <p class="t20-dash-hint" style="margin: 0 0 0.35rem">
-                    Aparece na ficha como leitura; você pode trocar depois pelo botão “Enviar retrato” na ficha.
+
+            <div class="cad-wizard-step" data-cad-step="3">
+                <p class="t20-dash-hint" id="hintAttrsJogador" style="display:none">
+                    Tipo jogador: os seis números são os <strong>valores finais</strong> (base + bônus racial MB).
+                    <strong>Compra por pontos:</strong> base 8–18, soma dos custos = <strong>20</strong>.
+                    <strong>4d6:</strong> role seis valores 3–18 (descarta o menor); reroll MB se soma de mods &lt; +4 e nenhum 14+.
                 </p>
-                <div class="t20-dash-upload-area" id="cadUploadPlaceholder" role="button" tabindex="0" aria-label="Escolher imagem">
-                    📷 Clique para adicionar foto
+                <div class="t20-dash-field t20-dash-field--full" id="cadWrapMetodoGeracao" style="display:none">
+                    <label for="cadMetodoGeracao">Geração de atributos</label>
+                    <select id="cadMetodoGeracao" class="t20-input">
+                        <option value="compra_pontos">Compra por pontos</option>
+                        <option value="4d6">Rolagem 4d6 (descarta o menor)</option>
+                    </select>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.45rem;align-items:center">
+                        <button type="button" class="tormenta-btn" id="cadBtnRolar4d6" style="display:none">Rolar 4d6</button>
+                        <button type="button" class="tormenta-btn" id="cadBtnResetCompra" style="display:none">Resetar base padrão</button>
+                        <span class="t20-dash-hint" id="cadHintMetodoGeracao" style="margin:0"></span>
+                    </div>
                 </div>
-                <input type="file" id="cadInputFoto" accept="image/*" style="display: none" />
-                <div id="cadUploadPreview" class="t20-dash-upload-preview" style="display: none" aria-live="polite">
-                    <img id="cadPreviewImage" src="" alt="Pré-visualização do retrato" />
-                    <button type="button" class="t20-dash-upload-remove" id="cadBtnRemoverFoto" aria-label="Remover foto">✕</button>
+                <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0.75rem 0 0;padding:0.65rem">
+                    <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Atributos</legend>
+                    <div class="t20-dash-attrs6">
+                        <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="0" max="99" value="10" required /></div>
+                        <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="0" max="99" value="10" required /></div>
+                        <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="0" max="99" value="10" required /></div>
+                        <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="0" max="99" value="10" required /></div>
+                        <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="0" max="99" value="10" required /></div>
+                        <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="0" max="99" value="10" required /></div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="4" style="display:none">
+                <div class="t20-dash-field t20-dash-field--full">
+                    <label for="cadOrigemSlug">Origem (v1.3) *</label>
+                    <select id="cadOrigemSlug" class="t20-input"></select>
                 </div>
+                <div id="cadOrigemBeneficiosHost" class="t20-dash-field t20-dash-field--full"></div>
+                <div id="cadOrigemItensEscolhaHost" class="t20-dash-field t20-dash-field--full" style="display:none"></div>
+                <p id="cadOrigemItensLista" class="t20-dash-hint" style="margin:0.35rem 0 0"></p>
+            </div>
+
+            <div class="cad-wizard-step cad-wizard-step--v13" id="cadWizardStepKit" data-cad-step="5" style="display:none">
+                <p class="t20-dash-hint" style="margin-top:0">Kit inicial (nível 1) — p.140 v1.3. Mochila, saco de dormir e traje são adicionados automaticamente.</p>
+                <div class="t20-dash-form-grid">
+                    <div class="t20-dash-field t20-dash-field--full">
+                        <label for="cadKitArmaSimples">Arma simples *</label>
+                        <select id="cadKitArmaSimples" class="t20-input"></select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapKitArmaMarcial" style="display:none">
+                        <label for="cadKitArmaMarcial">Arma marcial</label>
+                        <select id="cadKitArmaMarcial" class="t20-input"></select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapKitArmadura" style="display:none">
+                        <label for="cadKitArmadura">Armadura</label>
+                        <select id="cadKitArmadura" class="t20-input"></select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapKitEscudo" style="display:none">
+                        <label><input type="checkbox" id="cadKitEscudo" checked /> Incluir escudo leve</label>
+                    </div>
+                </div>
+                <p id="cadKitSemArmaduraHint" class="t20-dash-hint" style="display:none;margin:0.35rem 0 0">Esta classe não recebe armadura no kit inicial.</p>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.65rem">
+                    <button type="button" class="tormenta-btn" id="cadBtnKitRolarDinheiro">Rolar T$ 4d6</button>
+                    <span class="t20-dash-hint" id="cadKitDinheiroRolado" style="margin:0">Clique em «Rolar T$ 4d6»</span>
+                </div>
+            </div>
+
+            <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="6" style="display:none">
+                <p class="t20-dash-hint" style="margin-top:0">Revise os dados antes de criar. Você poderá ajustar detalhes na ficha.</p>
+                <div id="cadWizardResumo" class="cad-wizard-resumo"></div>
             </div>
         </form>
         <div class="t20-dash-modal__ft">
             <button type="button" class="tormenta-btn" data-close="overlayCadastro">Cancelar</button>
+            <button type="button" class="tormenta-btn" id="cadWizardPrev" style="display:none">Anterior</button>
+            <button type="button" class="tormenta-btn tormenta-btn--primary" id="cadWizardNext" style="display:none">Próximo</button>
             <button type="submit" form="formCadastroRapido" class="tormenta-btn tormenta-btn--primary" id="btnConfirmarCadastro">Criar e abrir ficha</button>
         </div>
     </div>
@@ -659,8 +714,10 @@
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
 <script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
-<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260621attr"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260621attr"></script>
+<script src="/games/tormenta/js/t20-regra-versao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260629wiz"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -669,8 +726,12 @@
     const perfil = (AuthService.getPerfil && AuthService.getPerfil()) || 'jogador';
     const isMestre = perfil === 'mestre' || perfil === 'administrador';
 
+    const DASH_REGRA_VERSAO =
+        window.T20RegraVersao && window.T20RegraVersao.DEFAULT_NOVA_FICHA
+            ? window.T20RegraVersao.DEFAULT_NOVA_FICHA
+            : 'v13';
     let custoPorValor = {};
-    let pontosIniciaisCompra = 20;
+    let pontosIniciaisCompra = 10;
     let filtroTipo = 'todos';
     let cacheLista = [];
     let RACAS_MB = [];
@@ -728,10 +789,14 @@
 
     async function carregarRacasTormentaDash() {
         try {
-            const d = await new TormentaRegrasService().obterRacas();
+            const d = await new TormentaRegrasService().obterRacas({ regraVersao: DASH_REGRA_VERSAO });
             return Array.isArray(d.racas) ? d.racas : [];
         } catch (e1) {
-            const r = await fetch('/games/tormenta/data/racas-mb.json?v=20260512idiomas', { cache: 'no-cache' });
+            const path =
+                DASH_REGRA_VERSAO === 'v13'
+                    ? '/games/tormenta/data/racas_v13.json?v=20260629'
+                    : '/games/tormenta/data/racas-mb.json?v=20260512idiomas';
+            const r = await fetch(path, { cache: 'no-cache' });
             if (!r.ok) throw e1;
             const d = await r.json();
             return Array.isArray(d.racas) ? d.racas : [];
@@ -740,10 +805,14 @@
 
     async function carregarClassesTormentaDash() {
         try {
-            const d = await new TormentaRegrasService().obterClasses();
+            const d = await new TormentaRegrasService().obterClasses({ regraVersao: DASH_REGRA_VERSAO });
             return Array.isArray(d.classes) ? d.classes : [];
         } catch (e1) {
-            const r = await fetch('/games/tormenta/data/classes_mb.json?v=20260511d', { cache: 'no-cache' });
+            const path =
+                DASH_REGRA_VERSAO === 'v13'
+                    ? '/games/tormenta/data/classes_v13.json?v=20260629'
+                    : '/games/tormenta/data/classes_mb.json?v=20260511d';
+            const r = await fetch(path, { cache: 'no-cache' });
             if (!r.ok) throw e1;
             const c = await r.json();
             return Array.isArray(c.classes) ? c.classes : [];
@@ -783,6 +852,14 @@
             if (a && keysOk.includes(a)) d[a] += 2;
             if (b && keysOk.includes(b)) d[b] += 2;
         }
+        if (row.escolhe_tres_mais1) {
+            const a = document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value;
+            const b = document.getElementById('cadRacaMais2b') && document.getElementById('cadRacaMais2b').value;
+            const c = document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value;
+            [a, b, c].forEach((k) => {
+                if (k && ATTR_KEYS_DASH.includes(k)) d[k] += 1;
+            });
+        }
         if (row.escolhe_um_mais2) {
             const excl = Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
             const c1 = document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value;
@@ -792,12 +869,38 @@
         return d;
     }
 
+    function isDashV13() {
+        return DASH_REGRA_VERSAO === 'v13';
+    }
+
+    function atualizarLabelCompraPontosDash() {
+        const opt = document.querySelector('#cadMetodoGeracao option[value="compra_pontos"]');
+        if (opt) opt.textContent = `Compra por pontos (${pontosIniciaisCompra} pts)`;
+    }
+
+    function atualizarHintAttrsJogadorDash() {
+        const hj = document.getElementById('hintAttrsJogador');
+        if (!hj) return;
+        if (isDashV13()) {
+            hj.innerHTML =
+                'Tipo jogador v1.3: os seis números são os <strong>valores finais</strong> (base + bônus racial). ' +
+                '<strong>Compra por pontos:</strong> base −2 a +4, soma dos custos = <strong>10</strong>. ' +
+                '<strong>4d6:</strong> role seis valores (Tabela 1-1); soma dos seis bases deve ser ≥ 6.';
+        } else {
+            hj.innerHTML =
+                'Tipo jogador: os seis números são os <strong>valores finais</strong> (base + bônus racial MB). ' +
+                '<strong>Compra por pontos:</strong> base 8–18, soma dos custos = <strong>20</strong>. ' +
+                '<strong>4d6:</strong> role seis valores 3–18 (descarta o menor); reroll MB se soma de mods &lt; +4 e nenhum 14+.';
+        }
+    }
+
     function atributosCompraDash() {
         const rDel = racialDeltasMapDash();
+        const minBase = isDashV13() ? -99 : 1;
         const out = {};
         ATTR_KEYS_DASH.forEach((a) => {
             const fin = valorFinalCadAttr(a);
-            out[a] = Math.max(1, fin - (rDel[a] || 0));
+            out[a] = Math.max(minBase, fin - (rDel[a] || 0));
         });
         return out;
     }
@@ -853,7 +956,9 @@
     function aplicarFinaisDeBasesDash(bases) {
         const AG = window.T20AtributosGeracao;
         if (!AG) return;
-        AG.aplicarBasesNosCampos(bases, CAD_CAMPO_ID, racialDeltasMapDash());
+        AG.aplicarBasesNosCampos(bases, CAD_CAMPO_ID, racialDeltasMapDash(), {
+            regraVersao: DASH_REGRA_VERSAO,
+        });
     }
 
     function atualizarHintMetodoGeracaoDash() {
@@ -861,20 +966,30 @@
         const tipoCad = (document.getElementById('cadTipo') && document.getElementById('cadTipo').value) || '';
         if (!hint || tipoCad !== 'jogador') return;
         const met = getMetodoGeracaoDash();
+        const rvOpt = { regraVersao: DASH_REGRA_VERSAO };
         if (met === '4d6') {
             const bases = atributosCompraDash();
             const vals = ATTR_KEYS_DASH.map((k) => bases[k]);
             const AG = window.T20AtributosGeracao;
-            const ok = AG && AG.qualidadeGeracao4d6(vals);
-            const soma = AG ? AG.somaModificadoresValores(vals) : 0;
-            hint.textContent = ok
-                ? `4d6 OK — soma dos modificadores (base): ${soma >= 0 ? '+' : ''}${soma}. Distribua nos atributos se quiser trocar a ordem.`
-                : `4d6: role novamente ou ajuste — precisa +4 de mods totais ou algum base 14+ (atual: ${soma >= 0 ? '+' : ''}${soma}).`;
+            if (isDashV13()) {
+                const ok = AG && AG.qualidadeGeracao4d6V13(vals);
+                const soma = vals.reduce((a, b) => a + b, 0);
+                hint.textContent = ok
+                    ? `4d6 v1.3 OK — soma dos valores-base: ${soma}.`
+                    : `4d6 v1.3: role novamente — soma dos seis bases deve ser ≥ 6 (atual: ${soma}).`;
+            } else {
+                const ok = AG && AG.qualidadeGeracao4d6(vals);
+                const soma = AG ? AG.somaModificadoresValores(vals) : 0;
+                hint.textContent = ok
+                    ? `4d6 OK — soma dos modificadores (base): ${soma >= 0 ? '+' : ''}${soma}. Distribua nos atributos se quiser trocar a ordem.`
+                    : `4d6: role novamente ou ajuste — precisa +4 de mods totais ou algum base 14+ (atual: ${soma >= 0 ? '+' : ''}${soma}).`;
+            }
         } else {
             const bases = atributosCompraDash();
             const total = custoTotalSeis(bases.for, bases.des, bases.con, bases.int, bases.sab, bases.car);
+            const rangeTxt = isDashV13() ? '−2 a +4' : '8–18';
             if (total === null) {
-                hint.textContent = 'Compra: bases fora de 8–18 na tabela MB.';
+                hint.textContent = `Compra: bases fora de ${rangeTxt} na tabela.`;
             } else if (total === pontosIniciaisCompra) {
                 hint.textContent = `Compra por pontos: ${total} / ${pontosIniciaisCompra} pts (OK).`;
             } else {
@@ -900,10 +1015,10 @@
         if (!AG) return;
         try {
             const rs = new TormentaRegrasService();
-            const data = await rs.gerarAtributos({ metodo: '4d6' });
+            const data = await rs.gerarAtributos({ metodo: '4d6', regraVersao: DASH_REGRA_VERSAO });
             cadBasesAtributos = { ...(data.valores || {}) };
         } catch (_e) {
-            const vals = AG.gerarSeisValores4d6Local();
+            const vals = AG.gerarSeisValores4d6Local({ regraVersao: DASH_REGRA_VERSAO });
             cadBasesAtributos = AG.valoresParaMapa(vals);
         }
         aplicarFinaisDeBasesDash(cadBasesAtributos);
@@ -913,7 +1028,9 @@
 
     function resetCompraPontosDash() {
         const AG = window.T20AtributosGeracao;
-        cadBasesAtributos = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+        cadBasesAtributos = AG
+            ? AG.basesPadraoCompra({ regraVersao: DASH_REGRA_VERSAO })
+            : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
         aplicarFinaisDeBasesDash(cadBasesAtributos);
         atualizarHintMetodoGeracaoDash();
     }
@@ -923,7 +1040,9 @@
         const slug = (sel && sel.value) || '';
         const AG = window.T20AtributosGeracao;
         if (!slug || slug === '__livre__') {
-            const bases = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            const bases = AG
+                ? AG.basesPadraoCompra({ regraVersao: DASH_REGRA_VERSAO })
+                : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
             cadBasesAtributos = null;
             aplicarFinaisDeBasesDash(bases);
             atualizarHintMetodoGeracaoDash();
@@ -933,7 +1052,9 @@
         if (met === '4d6' && cadBasesAtributos) {
             aplicarFinaisDeBasesDash(cadBasesAtributos);
         } else {
-            cadBasesAtributos = AG ? AG.basesPadraoCompra() : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            cadBasesAtributos = AG
+                ? AG.basesPadraoCompra({ regraVersao: DASH_REGRA_VERSAO })
+                : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
             aplicarFinaisDeBasesDash(cadBasesAtributos);
         }
         atualizarHintMetodoGeracaoDash();
@@ -1057,8 +1178,8 @@
             const m1 = document.getElementById('cadRacaMais1');
             if (m1) m1.value = '';
         }
-        if (wrapM2) wrapM2.style.display = row && row.escolhe_duas_mais2 ? '' : 'none';
-        if (wrapM1) wrapM1.style.display = row && row.escolhe_um_mais2 ? '' : 'none';
+        if (wrapM2) wrapM2.style.display = row && (row.escolhe_duas_mais2 || row.escolhe_tres_mais1) ? '' : 'none';
+        if (wrapM1) wrapM1.style.display = row && (row.escolhe_um_mais2 || row.escolhe_tres_mais1) ? '' : 'none';
         popularCadOpcoesMais2Selects();
         popularCadOpcoesMais1Select();
         if (resetAttrs) aplicarCadRacaSomenteAjustes();
@@ -1597,20 +1718,85 @@
 
     async function carregarRegrasCompra() {
         try {
-            const r = await fetch('/games/tormenta/data/regras-atributos.json?v=20260511c', { cache: 'no-cache' });
-            const d = await r.json();
+            const d = await new TormentaRegrasService().obterAtributos({ regraVersao: DASH_REGRA_VERSAO });
             pontosIniciaisCompra =
-                typeof d.pontos_compra_iniciais === 'number' ? d.pontos_compra_iniciais : 20;
+                typeof d.pontos_compra_iniciais === 'number' ? d.pontos_compra_iniciais : 10;
             const m = {};
             (d.custos || []).forEach((row) => {
                 m[Number(row.valor)] = Number(row.custo);
             });
             custoPorValor = m;
         } catch (_e) {
-            custoPorValor = {
-                8: -2, 9: -1, 10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 6, 16: 8, 17: 11, 18: 14,
+            try {
+                const path =
+                    DASH_REGRA_VERSAO === 'v13'
+                        ? '/games/tormenta/data/atributos_compra_pontos_v13.json?v=20260629'
+                        : '/games/tormenta/data/regras-atributos.json?v=20260511c';
+                const r = await fetch(path, { cache: 'no-cache' });
+                const d = await r.json();
+                pontosIniciaisCompra =
+                    typeof d.pontos_compra_iniciais === 'number'
+                        ? d.pontos_compra_iniciais
+                        : typeof d._meta?.pontos_iniciais === 'number'
+                          ? d._meta.pontos_iniciais
+                          : 10;
+                const m = {};
+                (d.custos || []).forEach((row) => {
+                    m[Number(row.valor)] = Number(row.custo);
+                });
+                custoPorValor = m;
+            } catch (_e2) {
+                custoPorValor = { '-2': 0, '-1': -1, 0: 0, 1: 1, 2: 2, 3: 4, 4: 7 };
+            }
+        }
+        atualizarLabelCompraPontosDash();
+    }
+
+    function validarAtributosJogadorDash() {
+        const met = getMetodoGeracaoDash();
+        const bases = atributosCompraDash();
+        const AG = window.T20AtributosGeracao;
+        const rvOpt = { regraVersao: DASH_REGRA_VERSAO };
+        if (met === '4d6') {
+            const v4 = AG ? AG.validarBases4d6(bases, rvOpt) : { ok: false, msg: 'Módulo 4d6 indisponível.' };
+            if (!v4.ok) return v4;
+            return { ok: true };
+        }
+        const minB = isDashV13() ? -2 : 8;
+        const maxB = isDashV13() ? 4 : 18;
+        for (const k of ATTR_KEYS_DASH) {
+            const v = bases[k];
+            if (v < minB || v > maxB) {
+                return {
+                    ok: false,
+                    msg: isDashV13()
+                        ? 'Tipo jogador v1.3: cada valor-base da compra deve estar entre −2 e +4.'
+                        : 'Tipo jogador: cada valor-base da compra (atributo final − bônus racial MB) deve estar entre 8 e 18.',
+                };
+            }
+        }
+        const total = custoTotalSeis(bases.for, bases.des, bases.con, bases.int, bases.sab, bases.car);
+        if (total === null) {
+            return {
+                ok: false,
+                msg: isDashV13()
+                    ? 'Valores-base fora da tabela de custos v1.3 (use bases entre −2 e +4).'
+                    : 'Valores-base fora da tabela de custos (use bases entre 8 e 18).',
             };
         }
+        if (total > pontosIniciaisCompra) {
+            return {
+                ok: false,
+                msg: `Soma dos custos na compra por pontos (${total}) ultrapassa ${pontosIniciaisCompra}. Ajuste os atributos finais ou a raça.`,
+            };
+        }
+        if (total < pontosIniciaisCompra) {
+            return {
+                ok: false,
+                msg: `Soma dos custos na compra por pontos (${total}) é menor que ${pontosIniciaisCompra}. Distribua todos os pontos antes de criar.`,
+            };
+        }
+        return { ok: true };
     }
 
     function custoTotalSeis(forV, desV, conV, intV, sabV, carV) {
@@ -1659,42 +1845,10 @@
             return false;
         }
         if (t === 'jogador') {
-            const met = getMetodoGeracaoDash();
-            const bases = atributosCompraDash();
-            if (met === '4d6') {
-                const AG = window.T20AtributosGeracao;
-                const v4 = AG ? AG.validarBases4d6(bases) : { ok: false, msg: 'Módulo 4d6 indisponível.' };
-                if (!v4.ok) {
-                    Toast.error(v4.msg);
-                    return false;
-                }
-            } else {
-                for (const k of ATTR_KEYS_DASH) {
-                    const v = bases[k];
-                    if (v < 8 || v > 18) {
-                        Toast.error(
-                            'Tipo jogador: cada valor-base da compra (atributo final − bônus racial MB) deve estar entre 8 e 18.'
-                        );
-                        return false;
-                    }
-                }
-                const total = custoTotalSeis(bases.for, bases.des, bases.con, bases.int, bases.sab, bases.car);
-                if (total === null) {
-                    Toast.error('Valores-base fora da tabela de custos (use bases entre 8 e 18).');
-                    return false;
-                }
-                if (total > pontosIniciaisCompra) {
-                    Toast.error(
-                        `Soma dos custos na compra por pontos (${total}) ultrapassa ${pontosIniciaisCompra}. Ajuste os atributos finais ou a raça.`
-                    );
-                    return false;
-                }
-                if (total < pontosIniciaisCompra) {
-                    Toast.error(
-                        `Soma dos custos na compra por pontos (${total}) é menor que ${pontosIniciaisCompra}. Distribua todos os pontos do MB antes de criar.`
-                    );
-                    return false;
-                }
+            const va = validarAtributosJogadorDash();
+            if (!va.ok) {
+                Toast.error(va.msg);
+                return false;
             }
         } else {
             const vals = Object.values(a);
@@ -1711,6 +1865,20 @@
             if (!liv) {
                 Toast.error('Informe o nome da raça (livre).');
                 return false;
+            }
+        }
+        if (
+            t === 'jogador' &&
+            isDashV13() &&
+            window.T20DashWizardV13 &&
+            T20DashWizardV13.isWizardAtivo()
+        ) {
+            for (let s = 4; s <= 5; s++) {
+                const vp = T20DashWizardV13.validarPasso(s);
+                if (!vp.ok) {
+                    Toast.error(vp.msg || 'Complete origem e equipamento.');
+                    return false;
+                }
             }
         }
         return true;
@@ -1746,6 +1914,7 @@
         }
 
         const fichaBase = {
+            regra_versao: DASH_REGRA_VERSAO,
             raca_tormenta_slug: racaSlugFj,
             raca_tormenta_livre: slugR === '__livre__' ? racaLivre : '',
             raca_tormenta_mais2a: (document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value) || null,
@@ -1766,6 +1935,9 @@
                 sab: bases.sab,
                 car: bases.car,
             };
+            if (window.T20DashWizardV13 && T20DashWizardV13.isWizardAtivo()) {
+                Object.assign(fichaBase, T20DashWizardV13.lerPayloadOrigemKit());
+            }
         }
 
         return {
@@ -1860,7 +2032,7 @@
             atualizarResumo(cacheLista);
             renderTabela(cacheLista);
             t20ArenaRenderPick();
-            await t20ArenaRefreshFromApi();
+            void t20ArenaRefreshFromApi();
         } catch (e) {
             tb.innerHTML = `<tr><td colspan="7" class="tormenta-cell-muted">${escapeHtml(e.message || 'Erro')}</td></tr>`;
         }
@@ -1898,11 +2070,18 @@
         const hj = document.getElementById('hintAttrsJogador');
         const sub = document.getElementById('cadastroSubtitulo');
         if (hj) hj.style.display = t === 'jogador' ? '' : 'none';
+        atualizarHintAttrsJogadorDash();
         if (sub) {
-            sub.textContent =
-                t === 'jogador'
-                    ? 'Primeiro passo: nome, nível, classe, raça, método de atributos (compra ou 4d6), PV e valores finais. Depois complete a ficha.'
-                    : 'Primeiro passo: dados rápidos para a mesa; atributos livres (0–99). Depois refine na ficha.';
+            if (t === 'jogador' && isDashV13()) {
+                sub.textContent =
+                    'Assistente v1.3: identidade → raça/classe → atributos → origem → equipamento → revisão.';
+            } else if (t === 'jogador') {
+                sub.textContent =
+                    'Primeiro passo: nome, nível, classe, raça, método de atributos (compra ou 4d6), PV e valores finais. Depois complete a ficha.';
+            } else {
+                sub.textContent =
+                    'Primeiro passo: dados rápidos para a mesa; atributos livres (0–99). Depois refine na ficha.';
+            }
         }
         ['cadFor', 'cadDes', 'cadCon', 'cadInt', 'cadSab', 'cadCar'].forEach((id) => {
             const el = document.getElementById(id);
@@ -1921,6 +2100,9 @@
         if (t === 'jogador') {
             resetCompraPontosDash();
             atualizarUiMetodoGeracaoDash();
+        }
+        if (window.T20DashWizardV13) {
+            T20DashWizardV13.onAbrirCadastro();
         }
     }
 
@@ -2031,17 +2213,26 @@
             Toast,
         });
     }
+    if (window.T20DashWizardV13) {
+        T20DashWizardV13.init({
+            regraVersao: DASH_REGRA_VERSAO,
+            Toast,
+            validarRaca: validarEscolhasRacaMbDash,
+            validarAtributos: validarAtributosJogadorDash,
+        });
+    }
     (async () => {
+        void carregar();
         try {
-            RACAS_MB = await carregarRacasTormentaDash();
+            const [racas, classes] = await Promise.all([
+                carregarRacasTormentaDash(),
+                carregarClassesTormentaDash(),
+            ]);
+            RACAS_MB = Array.isArray(racas) ? racas : [];
+            CLASSES_MB = Array.isArray(classes) ? classes : [];
         } catch (e) {
             console.warn(e);
             RACAS_MB = [];
-        }
-        try {
-            CLASSES_MB = await carregarClassesTormentaDash();
-        } catch (e) {
-            console.warn(e);
             CLASSES_MB = [];
         }
         popularCadRacaSelect();
@@ -2049,7 +2240,7 @@
         bindCadFotoUploadOnce();
         bindCadRacialDashOnce();
         onCadRacaSelectChange(false);
-        carregarRegrasCompra().then(() => carregar());
+        void carregarRegrasCompra();
     })();
 })();
 </script>

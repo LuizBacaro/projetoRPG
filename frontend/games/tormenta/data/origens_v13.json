@@ -1,0 +1,504 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Tabela 1-19 p.86–97",
+    "nota": "Benefícios como slugs; escolher 2 (perícias/poderes) na criação."
+  },
+  "origens": [
+    {
+      "slug": "acolito",
+      "nome": "Acólito",
+      "pagina": 86,
+      "beneficios_pericias": [
+        "cura",
+        "religiao",
+        "vontade"
+      ],
+      "beneficios_poderes": [
+        "medicina",
+        "membro_da_igreja",
+        "vontade_de_ferro"
+      ]
+    },
+    {
+      "slug": "amigo_animais",
+      "nome": "Amigo dos Animais",
+      "pagina": 86,
+      "beneficios_pericias": [
+        "adestramento",
+        "cavalgar"
+      ],
+      "beneficios_poderes": [
+        "amigo_especial"
+      ]
+    },
+    {
+      "slug": "amnesico",
+      "nome": "Amnésico",
+      "pagina": 86,
+      "beneficios_pericias": [],
+      "beneficios_poderes": [],
+      "poder_unico": "lembrancas_graduais"
+    },
+    {
+      "slug": "aristocrata",
+      "nome": "Aristocrata",
+      "pagina": 87,
+      "beneficios_pericias": [
+        "diplomacia",
+        "enganacao",
+        "nobreza"
+      ],
+      "beneficios_poderes": [
+        "comandar",
+        "sangue_azul"
+      ]
+    },
+    {
+      "slug": "artesao",
+      "nome": "Artesão",
+      "pagina": 87,
+      "beneficios_pericias": [
+        "oficio",
+        "vontade"
+      ],
+      "beneficios_poderes": [
+        "frutos_do_trabalho",
+        "sortudo"
+      ]
+    },
+    {
+      "slug": "artista",
+      "nome": "Artista",
+      "pagina": 87,
+      "beneficios_pericias": [
+        "atuacao",
+        "enganacao"
+      ],
+      "beneficios_poderes": [
+        "atraente",
+        "dom_artistico",
+        "sortudo",
+        "torcida"
+      ]
+    },
+    {
+      "slug": "assistente_laboratorio",
+      "nome": "Assistente de Laboratório",
+      "pagina": 88,
+      "beneficios_pericias": [
+        "oficio",
+        "misticismo"
+      ],
+      "beneficios_poderes": [
+        "esse_cheiro",
+        "veneficio",
+        "poder_da_tormenta"
+      ]
+    },
+    {
+      "slug": "batedor",
+      "nome": "Batedor",
+      "pagina": 88,
+      "beneficios_pericias": [
+        "furtividade",
+        "percepcao",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [
+        "a_prova_de_tudo",
+        "estilo_de_disparo",
+        "sentidos_agucados"
+      ]
+    },
+    {
+      "slug": "capanga",
+      "nome": "Capanga",
+      "pagina": 88,
+      "beneficios_pericias": [
+        "luta",
+        "intimidacao"
+      ],
+      "beneficios_poderes": [
+        "confissao",
+        "poder_de_combate"
+      ]
+    },
+    {
+      "slug": "charlatao",
+      "nome": "Charlatão",
+      "pagina": 89,
+      "beneficios_pericias": [
+        "enganacao",
+        "jogatina"
+      ],
+      "beneficios_poderes": [
+        "alpinista_social",
+        "aparencia_inofensiva",
+        "sortudo"
+      ]
+    },
+    {
+      "slug": "circense",
+      "nome": "Circense",
+      "pagina": 89,
+      "beneficios_pericias": [
+        "acrobacia",
+        "atuacao",
+        "reflexos"
+      ],
+      "beneficios_poderes": [
+        "acrobatico",
+        "torcida",
+        "truque_de_magica"
+      ]
+    },
+    {
+      "slug": "criminoso",
+      "nome": "Criminoso",
+      "pagina": 89,
+      "beneficios_pericias": [
+        "enganacao",
+        "furtividade",
+        "ladinagem"
+      ],
+      "beneficios_poderes": [
+        "punguista",
+        "veneficio"
+      ]
+    },
+    {
+      "slug": "curandeiro",
+      "nome": "Curandeiro",
+      "pagina": 90,
+      "beneficios_pericias": [
+        "cura",
+        "vontade"
+      ],
+      "beneficios_poderes": [
+        "medicina",
+        "medico_de_campo",
+        "veneficio"
+      ]
+    },
+    {
+      "slug": "eremita",
+      "nome": "Eremita",
+      "pagina": 90,
+      "beneficios_pericias": [
+        "misticismo",
+        "religiao",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [
+        "busca_interior",
+        "lobo_solitario"
+      ]
+    },
+    {
+      "slug": "escravo",
+      "nome": "Escravo",
+      "pagina": 90,
+      "beneficios_pericias": [
+        "atletismo",
+        "fortitude",
+        "furtividade"
+      ],
+      "beneficios_poderes": [
+        "desejo_de_liberdade",
+        "vitalidade"
+      ]
+    },
+    {
+      "slug": "estudioso",
+      "nome": "Estudioso",
+      "pagina": 91,
+      "beneficios_pericias": [
+        "conhecimento",
+        "guerra",
+        "misticismo"
+      ],
+      "beneficios_poderes": [
+        "aparencia_inofensiva",
+        "palpite_fundamentado"
+      ]
+    },
+    {
+      "slug": "fazendeiro",
+      "nome": "Fazendeiro",
+      "pagina": 91,
+      "beneficios_pericias": [
+        "adestramento",
+        "cavalgar",
+        "oficio",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [
+        "agua_no_feijao",
+        "ginete"
+      ]
+    },
+    {
+      "slug": "forasteiro",
+      "nome": "Forasteiro",
+      "pagina": 91,
+      "beneficios_pericias": [
+        "cavalgar",
+        "pilotagem",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [
+        "cultura_exotica",
+        "lobo_solitario"
+      ]
+    },
+    {
+      "slug": "gladiador",
+      "nome": "Gladiador",
+      "pagina": 92,
+      "beneficios_pericias": [
+        "atuacao",
+        "luta"
+      ],
+      "beneficios_poderes": [
+        "atraente",
+        "pao_e_circo",
+        "torcida",
+        "poder_de_combate"
+      ]
+    },
+    {
+      "slug": "guarda",
+      "nome": "Guarda",
+      "pagina": 92,
+      "beneficios_pericias": [
+        "investigacao",
+        "luta",
+        "percepcao"
+      ],
+      "beneficios_poderes": [
+        "detetive",
+        "investigador",
+        "poder_de_combate"
+      ]
+    },
+    {
+      "slug": "herdeiro",
+      "nome": "Herdeiro",
+      "pagina": 92,
+      "beneficios_pericias": [
+        "misticismo",
+        "nobreza",
+        "oficio"
+      ],
+      "beneficios_poderes": [
+        "comandar",
+        "heranca"
+      ]
+    },
+    {
+      "slug": "heroi_campones",
+      "nome": "Herói Camponês",
+      "pagina": 93,
+      "beneficios_pericias": [
+        "adestramento",
+        "oficio"
+      ],
+      "beneficios_poderes": [
+        "coracao_heroico",
+        "sortudo",
+        "surto_heroico",
+        "torcida"
+      ]
+    },
+    {
+      "slug": "marujo",
+      "nome": "Marujo",
+      "pagina": 93,
+      "beneficios_pericias": [
+        "atletismo",
+        "jogatina",
+        "pilotagem"
+      ],
+      "beneficios_poderes": [
+        "acrobatico",
+        "passagem_de_navio"
+      ]
+    },
+    {
+      "slug": "mateiro",
+      "nome": "Mateiro",
+      "pagina": 93,
+      "beneficios_pericias": [
+        "atletismo",
+        "furtividade",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [
+        "lobo_solitario",
+        "sentidos_agucados",
+        "vendedor_de_caracas"
+      ]
+    },
+    {
+      "slug": "membro_guilda",
+      "nome": "Membro de Guilda",
+      "pagina": 94,
+      "beneficios_pericias": [
+        "diplomacia",
+        "enganacao",
+        "misticismo",
+        "oficio"
+      ],
+      "beneficios_poderes": [
+        "foco_em_pericia",
+        "rede_de_contatos"
+      ]
+    },
+    {
+      "slug": "mercador",
+      "nome": "Mercador",
+      "pagina": 94,
+      "beneficios_pericias": [
+        "diplomacia",
+        "intuicao",
+        "oficio"
+      ],
+      "beneficios_poderes": [
+        "negociacao",
+        "proficiencia",
+        "sortudo"
+      ]
+    },
+    {
+      "slug": "minerador",
+      "nome": "Minerador",
+      "pagina": 94,
+      "beneficios_pericias": [
+        "atletismo",
+        "fortitude",
+        "oficio"
+      ],
+      "beneficios_poderes": [
+        "ataque_poderoso",
+        "escavador",
+        "sentidos_agucados"
+      ]
+    },
+    {
+      "slug": "nomade",
+      "nome": "Nômade",
+      "pagina": 95,
+      "beneficios_pericias": [
+        "cavalgar",
+        "pilotagem",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [
+        "lobo_solitario",
+        "mochileiro",
+        "sentidos_agucados"
+      ]
+    },
+    {
+      "slug": "pivete",
+      "nome": "Pivete",
+      "pagina": 95,
+      "beneficios_pericias": [
+        "furtividade",
+        "iniciativa",
+        "ladinagem"
+      ],
+      "beneficios_poderes": [
+        "acrobatico",
+        "aparencia_inofensiva",
+        "quebra_galho"
+      ]
+    },
+    {
+      "slug": "refugiado",
+      "nome": "Refugiado",
+      "pagina": 95,
+      "beneficios_pericias": [
+        "fortitude",
+        "reflexos",
+        "vontade"
+      ],
+      "beneficios_poderes": [
+        "estoico",
+        "vontade_de_ferro"
+      ]
+    },
+    {
+      "slug": "seguidor",
+      "nome": "Seguidor",
+      "pagina": 96,
+      "beneficios_pericias": [
+        "adestramento",
+        "oficio"
+      ],
+      "beneficios_poderes": [
+        "antigo_mestre",
+        "proficiencia",
+        "surto_heroico"
+      ]
+    },
+    {
+      "slug": "selvagem",
+      "nome": "Selvagem",
+      "pagina": 96,
+      "beneficios_pericias": [
+        "percepcao",
+        "reflexos",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [
+        "lobo_solitario",
+        "vida_rustica",
+        "vitalidade"
+      ]
+    },
+    {
+      "slug": "soldado",
+      "nome": "Soldado",
+      "pagina": 96,
+      "beneficios_pericias": [
+        "fortitude",
+        "guerra",
+        "luta",
+        "pontaria"
+      ],
+      "beneficios_poderes": [
+        "influencia_militar",
+        "poder_de_combate"
+      ]
+    },
+    {
+      "slug": "taverneiro",
+      "nome": "Taverneiro",
+      "pagina": 97,
+      "beneficios_pericias": [
+        "diplomacia",
+        "jogatina",
+        "oficio"
+      ],
+      "beneficios_poderes": [
+        "gororoba",
+        "proficiencia",
+        "vitalidade"
+      ]
+    },
+    {
+      "slug": "trabalhador",
+      "nome": "Trabalhador",
+      "pagina": 97,
+      "beneficios_pericias": [
+        "atletismo",
+        "fortitude"
+      ],
+      "beneficios_poderes": [
+        "atletico",
+        "esforcado"
+      ]
+    }
+  ]
+}

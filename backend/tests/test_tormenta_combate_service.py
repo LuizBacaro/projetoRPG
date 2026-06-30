@@ -182,3 +182,29 @@ def test_condicoes_mb_persistem_no_combate(db_tormenta_combate):
     cm2 = st2.get("condicoes_mb") or {}
     assert str(a.id) not in cm2
     assert cm2[str(b.id)]["rotulos"] == ["Caído"]
+
+
+def test_rolar_iniciativa_v13_usa_valor_des(db_tormenta_combate):
+    db, u = db_tormenta_combate
+    p = TormentaPersonagem(
+        dono_id=u.id,
+        tipo="jogador",
+        nome="Agil",
+        des_valor=2,
+        iniciativa=0,
+        ficha_json={"regra_versao": "v13"},
+    )
+    db.add(p)
+    db.commit()
+    db.refresh(p)
+
+    svc = TormentaCombateService(
+        TormentaCombateRepository(db),
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    svc.iniciar_combate([p.id])
+    out = svc.rolar_iniciativa_combate([p.id])
+    r0 = out["resultados"][0]
+    assert r0["modificador"] == 2
+    assert r0["total"] == r0["d20"] + 2

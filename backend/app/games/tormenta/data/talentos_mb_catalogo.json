@@ -1,7 +1,8 @@
 {
   "_meta": {
     "fonte": "Tormenta 20 — Módulo Básico (Cap. 5, talentos). Textos resumidos para autocomplete na ficha; expandir conforme mesa.",
-    "nota": "Chave de merge é o nome (case-insensitive) com a lista agregada das classes MB. Itens só neste ficheiro aparecem no catálogo se não estiverem nas tabelas de classe."
+    "nota": "Chave de merge é o nome (case-insensitive) com a lista agregada das classes MB. Itens só neste ficheiro aparecem no catálogo se não estiverem nas tabelas de classe.",
+    "nomenclatura_v13": "Na v1.3 do jogo, «talentos» passam a ser «poderes» (gerais, de classe e concedidos); este catálogo alimenta a UI de Poderes na ficha."
   },
   "itens": [
     {

@@ -1,0 +1,639 @@
+                                            Créditos
+                      Criação                                                              Artes Internas
+       Guilherme Dei Svaldi, J. M. Trevisan,                                Anderson Jackal, Arthur Portela, Braulio Gregorio,
+Leonel Caldela, Marcelo Cassaro e Rafael Dei Svaldi                             Czepeku (patreon.com/czepekuscenes),
+                                                                               Dan Ramos, Danilo Martins, Dora Lauer,
+           Desenvolvimento                                                    Erica Awano, Estevan Silveira, Felipe Froio,
+Camila Gamino, Christiano Linzmeier, Daniel Duran,                                Janio Garcia, João G. Santos, Juaum,
+Gabriel Pitre, Glauco Lessa, Gil “Gilgante” Cardoso,                                 Judah Carvalho, Lucas Gomes,
+Guilherme Dei Svaldi, J.M. Trevisan, José Cerqueira,                         Marcelo Cassaro, Natália Haian, Odmir Fortes,
+   Karen Soarele, Leonel Caldela, Lucas Redzard                                     Pablo Souza, Pietro Antognioni,
+     Felipetto, Marcelo Cassaro, Momo Soares,                                         Rafael Françoi, Renato Leite,
+   Rafael Dei Svaldi, Thiago Rosa e Thiago Trot                                    Ricardo Mango, Samuel Marcelino,
+                                                                                      Tiago Zacarovs e Walter Pax
+             Direção de Arte                                                         Assistente Editorial
+                        Dan Ramos
+                                                                                                    Miguel Souza
+                Diagramação
+                        Tiago Orib
+                                                                                 Assistente de produção
+                                                                                                    Laura Reginin
+                      Revisão
+          Elisa Guimarães, Emerson Xavier,                                                  Editora-Chefe
+         Kali de los Santos e Vitória Vozniak                                                       Karen Soarele
+
+                 Arte da Capa                                                               Diretor-geral
+                    Samuel Marcelino                                                           Guilherme Dei Svaldi
+
+   Equipe da Jambô: Guilherme Dei Svaldi, Rafael Dei Svaldi, Leonel Caldela, Akila Gabriel, Ana Carolina Gonçalves, Ana Júlia Gamla,
+   Anderson Dornelles, André Schwertz, Bruno Piñeiro, Daniel Boff, Dan Ramos, Dani Marques, Davide Di Benedetto, Elisa Guimarães,
+     Gabriel Adam, Gabriel dos Santos, Jaime de Andruart, José Cerqueira, J. M. Trevisan, Julia Rosiello, Karen Soarele, Laura Reginin,
+      Leticia Mendes, Marcel Reis, Marcelo Cassaro, Marina Alvarez, Marcus Vinicius, Marlon Vernes, Maurício Feijó, Miguel Souza,
+             Priscilla Souza, Simone Rocha, Tatiana Gomes, Thiago Rosa, Tiago Guimarães, Tiago Orib e Victória Cernicchiaro.
+      Tormenta é Copyright © 1999-2025 Leonel Caldela, Marcelo Cassaro, Guilherme Dei Svaldi, Rafael Dei Svaldi e J. M. Trevisan,
+     baseado em material original de Marcelo Cassaro, Rogerio Saladino e J. M. Trevisan. Todos os direitos reservados à Jambô Editora.
+      Reproduzir este livro sem autorização da editora não é um ato heroico. Prestigiar o trabalho da equipe que trabalhou nele, sim!
+
+
+
+
+                                               Rua Coronel Genuíno, 209 • Porto Alegre, rs
+                                                     contato@jamboeditora.com.br
+                                                       www.jamboeditora.com.br
+                                                                               @jamboeditora
+
+                                         1ª edição: maio de 2025 (v1.1) | ISBN: 978658337594-0
+                                            Dados Internacionais de Catalogação na Publicação
+
+                                    S969h Svaldi, Guilherme Dei
+                                    		 Heróis de Arton / Guilherme Dei Svaldi [et al.]; ilustrações
+                                          por Samuel Marcelino [et al.]. -- -- Porto Alegre: Jambô, 2025.
+                                            328p. il.
+                                            1. Jogos eletrônicos - RPG. I. Svaldi, Guilherme Dei. II.
+                                          Marcelino, Samuel. III. Título.
+                                                                                          CDU 794.021
+                                                           Sumário
+Prefácio....................................................4 Capítulo 2:                                             Bases........................................... 244
+                                                              Distinções........................................102   Novas Magias Arcanas............... 252
+Sobre Este Livro...........................5 Distinções em Jogo..................... 104
+                                                                                                                      Novos Itens Mágicos.................. 256
+Capitulo 1:                                                   Usando Distinções..................... 105                Armas.................................... 256
+Campeões de Arton..................6 Aeronauta Goblin....................... 106                                        Armaduras & Escudos........... 258
+Novas Raças................................... 8           Algoz da Tormenta..................... 109                   Esotéricos.............................. 260
+   Duende...................................... 8          Amazona.................................... 112              Acessórios.............................. 262
+   Eiradaan................................... 12          Armadilheiro Mestre.................. 115                    Itens Inteligentes................... 269
+   Galokk...................................... 13         Arqueiro de Lenórienn............... 118                     Itens Amaldiçoados............... 271
+   Meio-Elfo................................. 14           Bruxo da Tormenta..................... 121                 Artefatos..................................... 274
+   Sátiro........................................ 15       Caçador de Cabeças.................... 124
+Nova Classe: Treinador................. 16                 Caçador de Dragões.................... 127                 Capítulo 4:
+Classes Variantes.......................... 22             Campeão de Dojo....................... 130                 Regras Opcionais..................278
+   Alquimista............................... 22            Capitão do Conclave Pirata........ 133                     Atributos Variados...................... 280
+   Atleta....................................... 24        Carteador.................................... 136          Raças Abertas............................. 281
+   Burguês.................................... 25          Cavaleiro do Corvo..................... 139                Devoções Abertas....................... 281
+   Duelista.................................... 27         Cavaleiro Feérico........................ 142              Complicações............................. 282
+   Ermitão.................................... 29          Chapéu-Preto............................. 145              Idades Variadas........................... 288
+   Inovador................................... 30          Cobaia dos Médicos Monstros... 148                         Objetivos Heroicos..................... 292
+   Machado de Pedra.................... 32                 Dracomante Real........................ 151                Papéis no Grupo......................... 294
+   Magimarcialista........................ 33              Drogadora................................... 154           Combate Avançado..................... 296
+   Necromante............................. 34              Engenhoqueiro Goblin............... 157                       Ações Rápidas........................ 296
+   Santo........................................ 37        Escapista Magnífico.................... 160                   Armas Leves e Ágeis.............. 296
+   Seteiro...................................... 38        Gigante Furioso.......................... 163                 Ataques de Oportunidade...... 296
+   Usurpador................................ 40            Ginete de Namalkah................... 166                     Ataques Mirados.................... 297
+   Vassalo..................................... 41         Guerreiro Mágico....................... 169                   Cobertura Leve e Efeitos....... 297
+   Ventanista................................ 44           Infiltrador de Wynlla.................. 172                   Defesa Progressiva................. 297
+Novas Origens.............................. 46             Mago da Ordem do Vazio........... 175                         Desafiando a Morte................ 297
+Novos Poderes de Classe.............. 54                   Mago de Batalha de Wynlla........ 178                         Efeitos Críticos...................... 298
+   Arcanista.................................. 54          Médico de Salistick..................... 181                  Escalando Criaturas............... 300
+   Bárbaro.................................... 56          Mestre Bêbado............................ 184                 Falhas Críticas....................... 300
+   Bardo........................................ 57        Mestre Cozinheiro...................... 187                   Morte Alternativa.................. 300
+   Bucaneiro................................. 59           Mestre dos Desejos.................... 190
+   Caçador.................................... 61                                                                        Lancinante Revisado.............. 304
+                                                           Mestre Mahou-Jutsu................... 193                     Lesões.................................... 304
+   Cavaleiro.................................. 62          Mosqueteiro de Rishantor.......... 196
+   Clérigo..................................... 64                                                                       Mais Armas Ágeis.................. 304
+                                                           Mutagenista................................ 199               Movimento Intercalado.......... 304
+   Druida...................................... 66         Pistoleiro de Smokestone........... 202
+   Guerreiro................................. 68                                                                         Posicionamento...................... 304
+                                                           Professor de Magia..................... 205
+   Inventor................................... 70                                                                        RD Combinada...................... 304
+                                                           Senador....................................... 208
+   Lutador.................................... 73                                                                        Saque Rápido Limitado.......... 304
+                                                           Vigarista..................................... 211
+   Nobre....................................... 75                                                                    Culinária Avançada..................... 305
+   Paladino................................... 76          Capítulo 3:                                                Exploração de Masmorras.......... 310
+Novos Poderes Gerais................... 78                 Arsenal dos Heróis............214                          Domínios.................................... 314
+   Poderes de Combate................ 78                   Novos Equipamentos................. 216                       Tornando-se Regente............. 314
+   Poderes de Destino.................. 80                   Armas.................................... 216               Características
+   Poderes de Magia..................... 82                  Armaduras & Escudos........... 223                          dos Domínios......................... 314
+   Poderes da Tormenta............... 83                     Itens Gerais............................ 227                Turnos de Domínio................ 323
+   Poderes de Raça....................... 84                 Itens Superiores..................... 239                   Domínios Místicos................. 325
+   Poderes de Grupo.................... 92                   Capangas................................ 240                Eventos Aleatórios................. 325
+Tabelas para Personagens............. 96                     Veículos.................................. 241           Lista de Regras Opcionais.......... 328
+    Prefácio                                                    uma partida de RPG ou fora dela — por exemplo,
+                                                                nas páginas de um conto. As regras opcionais
+
+
+
+
+    A
+                                                                são capazes de chacoalhar qualquer campanha.
+             s pessoas podem dizer muita coisa
+                                                                E o que dizer das novas raças, classes, poderes,
+             sobre Tormenta e seus criadores
+                                                                magias, itens e artefatos? Sério, é muita coisa.
+             — e acreditamos, com base real,
+                                                                Mas, como eu disse, não é só isso.
+             que essas coisas são boas —, mas
+    não podem dizer que não somos honestos                          Heróis de Arton é talvez o nosso título de
+    nos títulos de nossos suplementos para                      suplemento mais literal. Não só por conta de tudo
+    Tormenta20.                                                 isso que descrevi no parágrafo anterior. Mas por
+                                                                causa de vocês.
+         O Atlas de Arton dá o maior panorama já
+    visto sobre as terras do Reinado e além, com                     Tormenta vem empilhando sucessos estron-
+    minúcias sobre a história do mundo, seu povo e              dosos em financiamentos coletivos desde 2019,
+    seus costumes. Ameaças de Arton trouxe criaturas            quando lançamos Tormenta20. Já se vão seis anos
+    terríveis para serem enfrentadas pelo seu grupo.            desde que fiz aquela notória live no meu escritó-
+    Deuses de Arton se dedica ao poderoso Panteão e             rio, na esperança de que pelo menos umas dez
+    suas divindades, às vezes tão falhas quanto os              pessoas aparecessem para contribuir, evitando
+    mortais que as veneram. E Heróis de Arton…                  que a gente passasse vergonha, e fui surpreen-
+        Heróis de Arton é um caso à parte.                      dido com uma avalanche de apoios e carinho
+                                                                vinda de um grupo enorme de pessoas que só
+        Não me entenda mal, o livro que você tem em             precisava de uma única chance para gritar alto:
+    mãos — ou preenchendo a tela de seu monitor,                “Eu sou fã de Tormenta!”.
+    tablet, celular — de fato se concentra no que
+    realmente interessa para um jogo de RPG: os                     Seis anos de livros produzidos porque nosso
+    personagens. Veja bem, eu não disse jogadores               público aceitou o desafio de caminhar lado a lado
+    ou mestres: disse personagens. Porque o material            com seus autores preferidos, sugerindo, dando
+    aqui serve de inspiração e guia para ambos.                 feedback com base em nossas prévias constantes,
+                                                                apontando o que mais gostava. Fazendo cada
+        As distinções, provavelmente as grandes
+                                                                suplemento junto da gente.
+    estrelas desse conteúdo, não mostram apenas
+    como jogar com um Cavaleiro do Corvo — um                       Heróis de Arton logicamente é sobre aqueles
+    exemplo que, juro, não foi escolhido para agradar           que resolvem desafiar o mal em Arton, desbra-
+    meu amigo Leonel Caldela — mecanicamente                    vando masmorras infinitas, navegando no Mar
+    falando. Ajudam a entender o que é um Cavaleiro             Negro com o Conclave Pirata ou tentando destruir
+    do Corvo. Como pensa e age um Cavaleiro do                  a Tormenta. Mas também é sobre você, que está
+    Corvo. E isso é valioso para qualquer ser humano            lendo este livro. Você, que se lembra de nós toda
+    que se interessa por Tormenta, inclusive aqueles            vez que rola um dado.
+    cujo tempo de rolar dados ainda está por vir. As
+                                                                    Você, herói de Arton.
+    tabelas de nomes e trejeitos servem para dar cor
+    tanto a protagonistas quanto a NPCs, dentro de                                              — J.M. Trevisan
+
+
+
+
+                                     Em memória de João Pedro Weber de Morais,
+                                que abriu as portas de Arton a um novo grupo de heróis.
+
+
+
+
+4
+Sobre Este Livro                                          campanha. Se você já leu romances e HQs de Tormenta,
+                                                          ou se assistiu a alguma streams, pode reconhecer várias
+
+
+
+
+D
+                                                          dessas especializações e poderá repetir as façanhas
+         esde seu início, Tormenta foi defini-            de seus NPCs favoritos. Cada distinção traz uma
+         do, acima de tudo, por sua varieda-              nova árvore de poderes exclusiva, mas cuidado! Cada
+         de. Suas opções. Ao longo de vários              uma também tem uma admissão que, na melhor das
+         sistemas de jogo, Arton sempre teve              hipóteses, pode exigir uma tarefa difícil. Na pior,
+uma constante: abrigava todo tipo de he-                  pode matar um aventureiro antes que ele complete
+róis, todos os gêneros de histórias, o maior              o treinamento…
+número de visões de mundo que os autores
+conseguiam reunir. Por isso, Arton sempre
+pertenceu aos leitores e jogadores.
+                                                          Capítulo 3:
+    Por isso você tem em mãos um livro que ofe-
+                                                          Arsenal dos Heróis
+                                                              Aventureiros artonianos precisam, antes de mais
+rece ainda mais opções, ainda mais caminhos para
+                                                          nada, sobreviver para colocar sua marca neste mundo
+aventureiros, ainda mais maneiras de personalizar
+                                                          de problemas. O Capítulo 3 apresenta muitas novas
+Tormenta20 e torná-lo seu.
+                                                          opções para triunfar sobre as ameaças que espreitam
+    Já se disse várias vezes que nada é esquisito         em cada canto, com diversos novos equipamentos
+demais para Arton, e isso é verdade. Mas também nada      — desde armas e armaduras até itens mundanos,
+é comum demais. Da mesma forma, nada é poderoso           ferramentas, instrumentos musicais, alquímicos,
+demais ou fraco demais, nenhum personagem é               alimentação, veículos... E a nova categoria aparatos,
+voltado demais ao combate ou à interpretação. Todos       itens que modificam e melhoram as engenhocas dos
+têm seu lugar, todos são bem-vindos, desde que            inventores. Aqui também está a nova regra de bases,
+funcionem bem com seu grupo e não estraguem a             para que o grupo tenha seu próprio quartel-general,
+diversão de ninguém. Este livro existe para expandir      com cômodos e mobília personalizados. O capítulo
+ainda mais a variedade dos aventureiros artonianos,       ainda traz novas magias, artefatos e itens mágicos,
+com novas raças, classes, origens, regras… e a            incluindo itens inteligentes e amaldiçoados.
+interpretação que surge com tudo isso.
+
+                                                          Capítulo 4:
+Capítulo 1:                                               Regras Opcionais
+Campeões de Arton                                             Este capítulo permite que você jogue Tormenta20
+    Este capítulo apresenta diversas novas opções         de forma diferente. Os conteúdos apresentados aqui
+para construir seu personagem: 5 raças, 14 classes        só podem ser usados com a aprovação do mestre,
+variantes (versões especializadas das classes básicas),   pois mudam o jogo de formas mais profundas do que
+30 origens e mais de 400 poderes de classe e gerais,      aqueles dos capítulos anteriores. Também podem
+incluindo os inéditos poderes de raça e de grupo.         deixar o jogo mais complexo, desafiador e até mesmo
+Também traz uma nova classe básica — o treinador,         letal, então considere com cuidado antes de usá-los.
+um herói que conta com monstros poderosos para            Para grupos procurando mais opções de personagens
+protegê-lo e auxiliá-lo. As novas regras vêm com          ou estilos de jogo, porém, é um prato cheio.
+muitas ideias de conceitos de personagens, mas
+nem só de regras vive o Capítulo 1, pois ele se
+encerra com tabelas trazendo nomes, aparências,
+trejeitos e objetivos para os heróis, além de nomes
+para mascotes e para bandos ou guildas. Como um
+                                                              Arton já foi chamada de “colcha de retalhos”.
+duende treinador ou um anão chamado Mondhom
+                                                          E, assim como o mundo real, é isso mesmo — com
+que finge ser um hynne, seus aventureiros jamais
+                                                          orgulho! Neste mundo todos são bem-vindos, há
+serão os mesmos.
+                                                          opções para todos os estilos de jogo. Heróis de Arton,
+                                                          mais do que oferecer novas formas de deixar aventu-
+Capítulo 2: Distinções                                    reiros poderosos, aumenta ainda mais a diversidade
+    Distinções ligam seu personagem a uma ordem,          deste mundo cheio de esquisitices, cheio de vilões,
+guilda, filosofia de vida, povo ou tradição artonianos,   cheio de problemas...
+criando laços ainda mais fortes com o cenário e a             E cheio de campeões.
+
+
+
+
+                                                                                                                    5
+CAPÍTULO
+
+
+
+
+           1
+                  Novas Raças
+    Duende                                                  conseguem encontrar lugar em grupos de aventureiros,
+                                                            quando esses têm mente aberta e paciência — muita
+                                                            paciência — com suas atitudes imprevisíveis.
+        Embora as fadas mais comuns no Reinado sejam
+    as diminutas sílfides, nas profundezas das florestas        Duendes aventureiros, de alguma forma, conse-
+    de Arton há seres féericos com tamanhos, formas e       guem se adaptar às táticas de suas classes escolhidas
+    aparências tão diversas quanto o humor de sua rainha.   — existe dentro deles algum tipo de lógica misterio-
+    Essas fadas são chamadas de duendes… E nenhuma          sa governando tais habilidades. Um duende guer-
+    é igual à outra!                                        reiro usará bem suas armas, talvez de formas esqui-
+                                                            sitas, mas com os mesmos resultados. Um duende
+         Um duende pode ser um enorme ovo, com braços
+                                                            bardo vai entoar canções estranhas
+    e pernas muito finos, enquanto outro é similar a um
+                                                            em estilos não existentes,
+    mordomo esguio e pomposo de pele azulada e roupas
+                                                            um clérigo vai falar com
+    aristocráticas. Sua aparência física não segue nenhum
+                                                            sua divindade de formas
+    padrão, sendo quase impossível identificá-los como
+                                                            chocantes, um druida
+    uma única raça. Como único traço em comum, todos
+                                                            mudará para formas sel-
+    lembram personagens de histórias infantis, até mesmo
+                                                            vagens que parecem de-
+    tolos aos olhos de adultos.
+                                                            senhadas por crianças
+        Duendes costumam se entregar a tarefas que          e assim por diante.
+    parecem bobas e sem sentido para outros povos, mas
+    que são muito importantes para eles próprios — coisas
+    como levar um raio de sol a um pardal ou vigiar um
+                                                                Quem não quer
+    riacho para evitar que alguém o roube. Como outras          ser um ovo com
+    fadas, duendes podem ser apenas brincalhões ou              pernas e braços?
+    então maléficos: alguns realizam trabalhos domésticos
+    em troca de leite e biscoitos, outros pregam peças
+    perigosas e comem carne crua. Duendes levam suas
+    “tarefas” muito a sério.
+        Todo duende tem um tabu, um ato que ele
+    nunca pode fazer — ou deixar de fazer. Pode ser
+    algo inofensivo como sempre entrar de costas
+    em uma casa, ou sério como matar o filho pri-
+    mogênito de qualquer pessoa que lhe faça uma
+    pergunta. Tabus de duendes podem ser comple-
+    xos ou cheios de regras arbitrárias: um duende
+    pode ser seu amigo desde que você nunca olhe
+    em seu rosto, exceto no equinócio de inverno,
+    quando deixar de olhar em seu rosto é uma
+    ofensa punida com pobreza eterna. Um duende
+    nunca diz qual é seu tabu. Quando é impedido
+    de cumpri-lo, um duende morre em poucos dias.
+        Duendes não vivem em sociedade, exceto na
+    Pondsmânia; nenhum tipo de grupo ou organização
+    formada por duendes consegue durar mais que
+    alguns momentos. Quando surgem em cidades, sua
+    incapacidade de seguir qualquer regra ou padrão
+    torna impossível sua permanência. Uns poucos
+
+
+
+    Capítulo 1
+8
+Habilidades de Raça                                            Sonhos Malucos
+    Nenhum conjunto pré-determinado de habilidades             Sabe quando você tem um sonho maluco,
+poderia representar os diferentes membros desta raça.          no qual nada faz sentido? Alguns duendes
+Assim, para criar um duende, você precisará fazer              são exatamente assim. O que não é de se
+algumas escolhas.                                              estranhar — afinal, Nimb tem um dedo
+                                                               na criação das fadas. Se quiser emular
+                                                               essa esquisitice toda, você pode criar
+Passo 1: Natureza                                              seu duende de forma aleatória. Para
+    Você é uma criatura do tipo espírito. Além disso,
+                                                               isso, role 1d3, 1d4, 2d6 e 3d12, todos ao
+escolha se você será animal, vegetal ou mineral.
+                                                               mesmo tempo. Esses dados irão definir,
+    1) Animal. Você é feito de carne e osso. Seu corpo         respectivamente, sua natureza, tamanho,
+é humanoide, mas sua aparência varia: pode ser algo            dois bônus de atributos e três poderes (se
+similar a um elfo ou sílfide, um animal que anda sobre         você rolar bônus de atributos ou poderes
+duas patas ou uma mistura dessas possibilidades. Você          repetidos, role novamente). Você ainda
+recebe +1 em um atributo a sua escolha.                        recebe as três limitações de todos os
+     2) Vegetal. Você é feito de folhas, vinhas, cortiça       duendes (veja o passo 5) e ainda precisa
+ou madeira. Você recebe as habilidades Natureza                definir seu tabu junto com o mestre.
+Vegetal (é imune a atordoamento e metamorfose, mas             Se criar seu duende de forma aleatória, você
+é afetado por efeitos que afetam plantas monstruosas           começa o jogo com +2 PM — um presente
+— se o efeito não tiver um teste de resistência, você          do Deus do Caos por sua ousadia.
+tem direito a um teste de Fortitude) e Florescer Feérico
+(uma vez por rodada, pode gastar uma quantidade de
+PM limitada pela sua Constituição para curar 2d8 PV
+por PM gasto no início do seu próximo turno).              Passo 3: Dons
+                                                               Escolha dois atributos diferentes. Você recebe +1
+    3) Mineral. Você é feito de material inorgânico,
+                                                           em cada atributo escolhido. Não, não pode ser +2 em
+como argila, rocha, cristal ou vidro. Você recebe
+                                                           um único atributo. Xô, larga disso! Porém, se você
+imunidade a efeitos de metabolismo e redução de
+                                                           for animal, pode adicionar um desses +1 no mesmo
+corte, fogo e perfuração 5, mas não se beneficia de
+                                                           atributo que aumentou pela natureza.
+itens da categoria alimentação.
+                                                               Se você estiver criando seu duende de forma
+                                                           aleatória, a rolagem de 2d6 determina os atributos nos
+Passo 2: Tamanho                                           quais você receberá +1, sendo uma rolagem 1 = Força,
+   Escolha seu tamanho, entre Minúsculo, Pequeno,
+                                                           2 = Destreza, 3 = Constituição e assim por diante.
+Médio ou Grande.
+    1) Minúsculo. Você é miudinho e fofinho. Pode ser      Passo 4:
+uma caneca falante, um gato de monóculo ou um corvo        Presentes de Magia e de Caos
+com cara de velho (é, talvez não seja tão fofo assim).         Duendes não só são esquisitos: eles também
+Você é Minúsculo (+5 em testes de Furtividade, –5 em       conseguem fazer coisas esquisitas. Escolha três
+testes de manobras de combate, usa armas reduzidas),       poderes da lista abaixo. Todos eles são mágicos. No
+possui deslocamento base 6m e sofre –1 em Força.           caso de habilidades que permitam teste de resistência,
+    2) Pequeno. Você tem o tamanho de um hynne,            a CD é Car, a menos que especificado em contrário.
+de uma criança, de um cachorro ou de um barril. Talvez     Uma vez por patamar, você pode escolher um presente
+você seja um barril! Você é Pequeno (+2 em testes          no lugar de um poder de classe. e
+de Furtividade, –2 em testes de manobra) e possui              1) Afinidade Elemental. Você possui ligação
+deslocamento base 6m.                                      com um tipo de elemento do mundo natural, entre
+   3) Médio. Você é Médio (sem modificadores por           água, fogo ou vegetação (escolha uma quando adquirir
+tamanho) e possui deslocamento base 9m. Blé!               este presente). Seu atributo-chave para as magias a
+    4) Grande. Agora sim! Meta medo em qualquer            seguir é Carisma. Caso aprenda novamente qualquer
+um que achar que fadas são fracotes. Você é Grande (–2     uma delas, seu custo diminui em –1 PM.
+em testes de Furtividade, +2 em testes de manobra,             • Água. Você é ligado a lagos e rios. Provavelmente
+usa armas aumentadas), possui deslocamento base            tem a pele e/ou os cabelos azulados. Você recebe
+9m e sofre –1 em Destreza.                                 deslocamento de natação igual ao seu deslocamento
+
+
+
+                                                                                       Campeões de Arton
+                                                                                                                     9
+     base e pode lançar as magias Criar Elementos (apenas       •   Apatia Profunda. A criatura fica alquebrada e frustrada.
+     água) e Névoa.                                             •   Coração de Geleia. A criatura fica abalada e, na
+         • Fogo. Você é ligado a calor e chamas. Prova-             primeira vez que tentar fazer uma ação hostil em
+     velmente tem a pele e/ou os cabelos avermelhados.              cada cena, deve repetir o teste de resistência. Se
+     Você recebe redução de fogo 5 e pode lançar as ma-             falhar, não consegue e perde sua ação.
+     gias Criar Elementos (apenas fogo) e Explosão de Chamas.   •   Envelhecimento Súbito. A criatura fica fraca e lenta.
+         • Vegetação. Você é ligado a bosques e florestas.      •   Loucura do Verão. No início de cada cena, a criatura
+     Provavelmente tem a pele e/ou os cabelos esverdeados.          deve repetir o teste de resistência. Se falhar, fica
+     Você pode atravessar terrenos difíceis naturais sem            confusa.
+     sofrer redução em seu deslocamento e pode lançar as
+     magias Armamento da Natureza e Controlar Plantas.          •   Mil Verrugas. A vítima sofre –2 em Carisma e, na
+                                                                    primeira vez em cada cena que outra criatura inicie
+         2) Encantar Objetos. Você pode gastar                      seu turno em alcance curto dela, essa segunda
+     uma ação de movimento e 3 PM para tocar um item                criatura deve fazer um teste de Vontade. Se falhar,
+     e colocar nele um encanto pertinente a sua escolha             a atitude dela em relação à criatura amaldiçoada
+     (por exemplo, se tocar uma arma, pode colocar um               piora em uma categoria. Ser feio pode matar!
+     encanto de arma nela). O encanto não pode ter
+     pré-requisitos e dura até o fim da cena ou até você        •   Ruína do Corpo. A criatura fica fatigada e vulnerável.
+     usar este poder novamente.                                     7) Mais Lá do que Aqui. Você pode gastar
+         3) Enfeitiçar. Suas feições feéricas podem             uma ação padrão e 2 PM para fazer seu corpo, exceto
+     deslumbrar outros seres. Você pode lançar Enfeitiçar       por uma parte (como a cabeça ou uma cauda), desa-
+     e usar seus aprimoramentos como se tivesse acesso          parecer pela cena. Nesse estado, recebe camuflagem
+     aos mesmos círculos de magia que um arcanista de           leve e +5 em Furtividade.
+     seu nível.                                                     8) Metamorfose Animal. Você pode se
+         4) Invisibilidade. Um poder comum entre                transformar em um tipo de animal. Escolha uma
+     duendes e responsável por boa parte do folclore            forma selvagem do druida, como ágil ou veloz (veja
+     confuso sobre eles (“Como assim você não viu aquela        Tormenta20, p. 63). Você pode gastar uma ação
+     tartaruga alada falante que estava aqui agora há           completa e 3 PM para assumir essa forma, recebendo
+     pouco?”). Você pode lançar Invisibilidade e usar seus      todos seus modificadores. Ao contrário de um druida,
+     aprimoramentos como se tivesse acesso aos mesmos           você pode falar e lançar magias mesmo em sua forma
+     círculos de magia que um arcanista de seu nível.           selvagem. Porém, você pode assumir apenas a forma
+                                                                escolhida, e apenas em sua versão básica.
+         5) Língua da Natureza. Você recebe +2
+     em Adestramento e Sobrevivência, e pode falar com              9) Sonhos Proféticos. Uma vez por cena,
+     animais e plantas (como o efeito da magia Voz Divina).     você pode gastar 3 PM para ter uma visão que,
+                                                                graças a sua natureza feérica, provavelmente se
+         6) Maldição. Nem todos os poderes feéricos             concretizará. Role 1d20. Até o fim da cena, você pode
+     são fofos ou engraçados… Você pode gastar uma              substituir o resultado do d20 de um teste realizado
+     ação padrão e 3 PM para amaldiçoar uma criatura em         por uma criatura em alcance curto pelo resultado do
+     alcance curto. A criatura tem direito a um teste de        dado que você rolou ao usar este presente.
+     resistência. Se falhar, sofre o efeito da maldição. Se
+     passar, fica imune a este presente por um dia. Para            10) Velocidade do Pensamento. Em seu
+     construir sua maldição, escolha qual resistência ela       primeiro turno em cada cena, você pode gastar 2 PM
+     permite (entre Fortitude ou Vontade) e seu efeito          para realizar uma ação padrão adicional. Se fizer isso,
+     (da lista abaixo). Uma vez feitas, essas escolhas não      você pula seu turno na segunda rodada.
+     podem ser mudadas.                                             11) Visão Feérica. Você recebe visão na
+         A maldição é permanente, mas você pode                 penumbra e está permanentemente sob efeito da
+     cancelá-la como uma ação livre, e ela pode ser curada      magia Visão Mística com o aprimoramento de enxergar
+     por Purificação com o aprimoramento de +7 PM.              criaturas e objetos invisíveis.
+     Além disso, você só pode manter uma maldição por               12) Voo. Você possui asas ou alguma fonte de
+     vez (se quiser amaldiçoar uma nova criatura, precisa       voo mágico. Consegue flutuar 1,5m acima do nível
+     cancelar a maldição anterior). Com a permissão do          do chão com deslocamento igual ao seu deslocamento
+     mestre, você pode criar uma maldição personalizada,        base +3m, o que permite que ignore terreno difícil e
+     usando os efeitos abaixo como referência.                  torna-o imune a dano por queda (a menos que esteja
+
+
+
+     Capítulo 1
+10
+inconsciente). Você também pode voar, mas isso é        Tabus de Duendes
+cansativo: você gasta 1 PM por rodada para voar com
+                                                        Em teoria, duendes podem ter qualquer tipo
+deslocamento igual ao seu deslocamento base +6m.
+                                                        de tabu. Na prática, apenas os comportamentos
+                                                        mais esquisitos, absurdos e desprovidos de
+Passo 5: Limitações                                     sentido surgem como tabus para esta raça
+    A natureza mágica e caótica dos duendes faz         peculiar. Aqui vão alguns exemplos.
+com que eles sejam poderosos — mas também lhes
+                                                        • Sempre remenda as roupas de qualquer mortal
+impõe várias limitações. Você recebe as habilidades
+                                                        que esteja dormindo sob o mesmo teto que ele.
+a seguir.
+                                                        • Come apenas carne crua.
+    Aversão a Ferro. Um material rígido e infle-
+xível, o ferro é nocivo a duendes. Você sofre 1 ponto   • Nunca pode ouvir um agradecimento.
+de dano adicional por dado de dano de ataques com       • Sempre entra em qualquer lugar de costas.
+armas de ferro e sofre 1d6 pontos de dano por rodada
+se estiver empunhando ou vestindo um item de ferro.     • Não revela o próprio nome.
+Isso também se aplica a aço, que inclui ferro em sua    • Compõe um pequeno poema para todos que
+composição. Na prática, duendes usam apenas armas       encontra, descrevendo a morte de cada um.
+de madeira ou de materiais especiais, como mitral.      • Não pode ver crianças em noites de lua cheia.
+    Aversão a Sinos. O badalar de um sino               • Nunca senta em cadeiras.
+representa ordem e devoção, algo que faz mal a
+duendes. Se você escutar esse som, fica alquebrado e    • Carrega sempre consigo um pote fechado.
+esmorecido até o fim da cena. No início de qualquer     Diz que ali dentro está seu coração.
+cena em um ambiente urbano no qual haja uma ou          • Usa sapatos muito pequenos e reclama de dor
+mais igrejas ou templos (o que inclui praticamente      nos pés o tempo todo. Fica enfurecido se alguém
+todas as aldeias e cidades do Reinado!), role 1d6. Em   sugerir ou oferecer sapatos diferentes.
+um resultado 1, você escutará um sino badalando
+                                                        • Age como se estivesse paralisado se qualquer
+em algum lugar.
+                                                        quantidade de sal tocar sua pele.
+     Tabu. Você possui um tabu — algo que nunca
+                                                        • Um dia por semana, atende por um nome
+pode fazer (ou deixar de fazer). Crie seu tabu junto
+                                                        diferente e demonstra personalidade um pouco
+com o mestre. Em termos de regras, a esquisitice de
+                                                        diferente. Diz não lembrar de seu outro nome.
+seu tabu impõe uma penalidade de –5 em Diplomacia,
+Iniciativa, Luta ou Percepção, a sua escolha (um tabu   • Varre qualquer cômodo onde esteja.
+que afete seu comportamento, por exemplo, impõe –5      • Tem pavor do próprio reflexo.
+em Diplomacia). Se você desrespeitar seu tabu, fica
+                                                        • Nunca pode aceitar um favor sem pagar
+fatigado por um dia (mesmo que seja imune a essa
+                                                        pelo menos uma moeda.
+condição). Nenhum efeito pode curar essa condição.
+Se no dia seguinte continuar desrespeitando o tabu,     • Ao passar na frente de qualquer templo,
+você fica exausto. Se no terceiro dia não mudar seu     cobre os olhos com uma venda.
+comportamento, você morre.                              • Rouba um garfo de qualquer casa na qual entre.
+    Longevidade. Duendes não seguem o ciclo             • Precisa atravessar todos os espinheiros
+natural. Sua longevidade varia de duende para duende.   que encontra em seu caminho.
+    Devoção. Allihanna, Hyninn, Nimb, Wynna.            • Sempre responde uma pergunta com
+                                                        outra pergunta.
+                                                        • Não pode falar a verdade durante um dia
+                                                        inteiro por mês. Esse dia varia a cada mês.
+                                                        Não pode avisar ninguém sobre a chegada
+                                                        desse dia, ou sobre este tabu.
+                                                        • Em intervalos de tempo aleatórios,
+                                                        lembra-se de que está atrasado para um
+                                                        compromisso importante e corre para longe,
+                                                        sumindo por algumas horas.
+                                                        • Não pode olhar pessoas feridas nos olhos.
+
+
+
+                                                                             Campeões de Arton
+                                                                                                           11
+     Eiradaan                                                  Fisicamente, o eiradaan lembra um elfo, com as
+                                                           mesmas orelhas pontiagudas, olhos amendoados e
+                                                           traços delicados. Mas seu corpo ostenta a exuberância
+         Seres féericos ancestrais, os eiradaan foram
+                                                           do mundo natural, com galhadas ramificando-se na
+     criados pelo Panteão para proteger Vitalia, o Reino
+                                                           cabeça. Nos olhos, exibe grande inteligência, mas
+     de Lena, de todo o mal da Criação, e chegaram a
+                                                           também certo resquício de tristeza profunda.
+     Arton após um evento que trouxe grande tristeza à
+     Deusa da Vida. Não há registros acurados sobre o          Eiradaan entregam-se a longos períodos de me-
+     que teria exatamente acontecido; sabe-se apenas que   lancolia, ou então buscam se manter ocupados para
+     os eiradaan falharam em sua tarefa sagrada, sendo     afastar a tristeza (mas nunca se dedicam a um mes-
+     expulsos de seu lar divino.                           mo projeto por muito tempo). Apesar de seu poder
+                                                           mágico fenomenal, eiradaan ainda são fadas: vulne-
+         Em Arton, os eiradaan se refugiaram nas flo-
+                                                           ráveis a emoções fortes, tornando-se perigosos quan-
+     restas mais densas e profundas. Lendas dizem que,
+                                                           do algo desperta sua antiga mágoa.
+     nesses locais secretos, ergueram reinos mágicos que
+     governam conforme seus caprichos. De fato, muitos         Entre os eiradaan, muitos são arcanistas, mas
+     nobres na corte de Thantalla-Dhaedelin, a Rainha da   também há nobres e cavaleiros — em sua maioria,
+     Pondsmânia, são eiradaan.                             atuam como guardiões e soldados de elite da Rainha
+                                                           das Fadas. Esses são especialmente imponentes e
+                                                           dignos, vivendo conforme códigos e tabus de honra
+                                                           e glória, duelando (entre si ou com mortais) e pro-
+                                                           tegendo locais sagrados. Suas montarias são grandes
+                                                           gamos celestiais presenteados por Allihanna; dizem
+                                                           que a deusa, às vezes, também oferta essas montarias
+                                                           sagradas a outros devotos valorosos.
+                                                               Alguns eiradaan aceitam acompanhar grupos de
+                                                           aventureiros, seja para aplacar a melancolia ancestral,
+                                                           seja para procurar pistas sobre o mistério de seu
+                                                           banimento divino.
+
+
+                                                                  Habilidades de Raça
+                                                                                  Sabedoria +2, Carisma
+                                                                             +1, Força –1.
+                                                                                 Essência Feérica. Você é
+                                                                             uma criatura do tipo espírito, recebe
+                                                                             visão na penumbra e pode falar com
+                                                                            animais livremente.
+                                                                             Magia Instintiva. Você pode
+                                                                    usar Sabedoria no lugar de seu atributo-cha-
+                                                                   ve de magias arcanas e Misticismo. Além
+                                                                   disso, quando lança uma magia, você recebe
+                                                                  +1 PM para gastar em seus aprimoramentos
+                                                                   (não cumulativo com outros efeitos que
+                                                                   fornecem PM para aprimoramentos, como
+                                                                  bolsa de pó; Tormenta20, p. 159).
+                                     Todo eiradaan
+                                      convive com                   Sentidos Místicos. Você está sempre sob
+                                     a tragédia em         o efeito básico da magia Visão Mística. e
+                                      seu passado
+                                                               Canção da Melancolia. Quando faz um
+                                                           teste de Vontade contra efeitos mentais, você rola
+                                                           dois dados e usa o pior resultado.
+                                                               Longevidade. x5.
+                                                               Devoção. Allihanna, Lena, Thyatis, Wynna.
+
+
+
+     Capítulo 1
+12
+Galokk                                                  Habilidades de Raça
+                                                           Força +1, Constituição +1, +1 em um
+    A Era de Megalokk foi um período de violência e     atributo, Carisma –1.
+carnificina, dominado por feras colossais. Khalmyr,
+então líder do Panteão, pôs fim a essa época terrível       Força dos Titãs. Quando acerta um ataque
+                                                        corpo a corpo ou de arremesso, você pode gastar 1 PM.
+confinando essas criaturas medonhas a lugares remo-
+                                                        Se fizer isso, sempre que rolar o resultado máximo
+tos, permitindo à vida natural florescer. Enfurecido
+                                                        em um dado de dano da arma, role um dado extra,
+pelo domínio dos povos civilizados, o Deus dos
+                                                        até um limite de dados extras igual à sua Força.
+Monstros criou os gigantes, raças humanoides, mas
+monstruosas, que assolam Arton.                            Meio-Gigante. Você é uma criatura do tipo
+                                                        humanoide (gigante). Seu tamanho é Grande e você
+    Gigantes são os humanos de Megalokk. São
+                                                        pode usar Força como atributo-chave de Intimidação.
+opostos aos filhos de Valkaria por serem estagnados:
+não buscam, não evoluem, não ambicionam. A                  Infância entre os Pequenos. Você se torna
+Deusa da Ambição os despreza, não teve nenhuma          treinado em uma perícia a sua escolha.
+participação em sua gênese. Ou teve? Xamãs do Deus          Longevidade. Normal.
+dos Monstros provocam, gargalham que ele derrotou
+                                                            Devoção.
+a deusa em um combate brutal e a forçou a partilhar
+                                                        Allihanna,
+a humanidade com Megalokk. Devotos de Valkaria
+                                                        Arsenal,
+renegam tal absurdo, mas a existência dos galokk
+                                                        Megalokk.
+pode ser evidência de que a Deusa da Ambição teve,
+sim, algum envolvimento na origem desses monstros.
+    Também chamados de
+meios-gigantes, galokk
+não são uma raça ou um
+povo. Não surgem de cru-
+zamentos entre huma-
+nos e gigantes, mas
+de formas não na-
+turais: nascem
+em famílias hu-
+manas, mas cres-
+cem muito mais
+do que o normal.
+Outros são devo-
+tos de Megalokk, re-
+compensados e trans-
+formados por aprazê-lo.
+Outros ainda são vítimas de
+acidentes alquímicos ou maldições.
+    Após a manifestação do poder de Megalokk, os
+galokk podem chegar a três metros de altura, grandes
+como ogros. Diferente desses, contudo, seus corpos
+têm proporções humanas, mas são duros feito rocha.
+     Meios-gigantes raramente encontram lugar em
+cidades feitas para seres menores. Também não exis-
+tem em número suficiente para formar suas próprias
+comunidades. Muitos acabam como capangas, guar-
+da-costas, gladiadores ou soldados. Mas existem                         Kelandra Elmheart.
+aqueles que desafiam suas naturezas e adotam                             Uma galokk com
+carreiras inesperadas como arcanistas, bardos                             papel decisivo
+                                                                        na história de Arton
+e inventores. Afinal, galokk são gigantes… mas
+também humanos.
+
+
+
+                                                                                    Campeões de Arton
+                                                                                                                13
+

@@ -27,6 +27,8 @@ class TormentaSubirNivelPreviewResponse(BaseModel):
     graduacao_pericias_nova: str = ""
     talentos_totais_novo: int = 0
     talentos_ganho: int = 0
+    poderes_gerais_totais_novo: Optional[int] = None
+    poderes_gerais_ganho: Optional[int] = None
     pontos_habilidade_acumulados: int = 0
     bonus_meio_nivel: int = 0
     habilidade_classe: Optional[str] = None

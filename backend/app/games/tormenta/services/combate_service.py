@@ -189,14 +189,16 @@ class TormentaCombateService:
         return modificadores_de_condicoes_mb([str(x) for x in rotulos])
 
     def rolar_iniciativa_combate(self, personagem_ids: List[int]) -> Dict[str, Any]:
-        from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+        from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
         from app.games.tormenta.rules.combate_t20 import rolar_iniciativa
+        from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
 
         combate = self._exigir_combate_ativo()
         resultados: List[Dict[str, Any]] = []
         for pid in personagem_ids:
             p = self._personagem_no_combate(combate, int(pid))
-            des_mod = modificador_atributo_t20(int(p.des_valor or 10))
+            rv = regra_versao_de_ficha(p.ficha_json)
+            des_mod = contribuicao_atributo_t20(int(p.des_valor or 10), rv)
             roll = rolar_iniciativa(des_mod)
             p.iniciativa = int(roll["total"])
             self.personagem_repo.update(p)

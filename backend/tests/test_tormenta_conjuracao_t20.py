@@ -42,8 +42,29 @@ def test_pm_paladino_ranger_inicio_nivel_5():
     assert pontos_magia_maximos_conjuracao("paladino", 5, f, d, c, i, s, ca) == 3
 
 
-def test_custo_pm_circulo():
+def test_custo_pm_circulo_mb():
     assert custo_pm_preparar_ou_lancar_magia(0) == 0
     assert custo_pm_preparar_ou_lancar_magia(1) == 1
     assert custo_pm_preparar_ou_lancar_magia(3) == 3
     assert custo_pm_preparar_ou_lancar_magia(-1) == 0
+
+
+def test_custo_pm_circulo_v13():
+    assert custo_pm_preparar_ou_lancar_magia(1, "v13") == 1
+    assert custo_pm_preparar_ou_lancar_magia(2, "v13") == 3
+    assert custo_pm_preparar_ou_lancar_magia(3, "v13") == 6
+    assert custo_pm_preparar_ou_lancar_magia(4, "v13") == 10
+    assert custo_pm_preparar_ou_lancar_magia(5, "v13") == 15
+
+
+def test_cd_magia_v13():
+    from app.games.tormenta.rules.conjuracao_t20 import cd_resistencia_magia_t20
+
+    assert cd_resistencia_magia_t20(8, 5, "v13") == 19
+
+
+def test_pm_arcanista_v13():
+    f, d, c, i, s, ca = _attrs(4, 2, 3)
+    assert (
+        pontos_magia_maximos_conjuracao("arcanista", 5, f, d, c, i, s, ca, "v13") == 30
+    )

@@ -9,6 +9,10 @@ from sqlalchemy.orm import Session
 
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.models.talento import TormentaTalento, TormentaTalentoPersonagem
+from app.games.tormenta.rules.poderes_ficha_v13_t20 import (
+    AUTO_PODER_NOTA_PREFIX,
+    listar_poderes_sync_v13,
+)
 from app.games.tormenta.schemas.talento_personagem import (
     TormentaMigrarTalentosJsonResponse,
     TormentaTalentoPersonagemItem,
@@ -174,3 +178,66 @@ class TormentaPersonagemTalentosService:
             vinculos_criados=criados,
             ignorados_duplicados=dup,
         )
+
+    def sincronizar_poderes_automaticos_v13(
+        self, personagem_id: int, ficha_json: dict
+    ) -> dict:
+        """Garante vínculos SQL para poderes de origem, concedido e Versátil v1.3."""
+        desejados = listar_poderes_sync_v13(ficha_json)
+        desejados_notas = {p["notas"] for p in desejados}
+
+        rows = (
+            self.db.query(TormentaTalentoPersonagem)
+            .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
+            .all()
+        )
+
+        removidos = 0
+        for row in rows:
+            nota = (row.notas or "").strip()
+            if nota.startswith(AUTO_PODER_NOTA_PREFIX) and nota not in desejados_notas:
+                self.db.delete(row)
+                removidos += 1
+
+        if removidos:
+            self.db.flush()
+
+        vinculados_talento_ids = {
+            r.talento_id
+            for r in self.db.query(TormentaTalentoPersonagem)
+            .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
+            .all()
+        }
+        notas_existentes = {
+            (r.notas or "").strip()
+            for r in self.db.query(TormentaTalentoPersonagem)
+            .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
+            .all()
+            if (r.notas or "").strip()
+        }
+
+        criados = 0
+        for pod in desejados:
+            nota = pod["notas"]
+            if nota in notas_existentes:
+                continue
+            nome = str(pod.get("nome") or "").strip()
+            if len(nome) < 2:
+                continue
+            t = self._buscar_ou_criar_talento_por_nome(nome)
+            if t.id in vinculados_talento_ids:
+                continue
+            self.db.add(
+                TormentaTalentoPersonagem(
+                    personagem_id=personagem_id,
+                    talento_id=t.id,
+                    notas=nota,
+                )
+            )
+            vinculados_talento_ids.add(t.id)
+            criados += 1
+
+        if criados or removidos:
+            commit_with_rollback(self.db)
+
+        return {"vinculos_criados": criados, "vinculos_removidos": removidos}

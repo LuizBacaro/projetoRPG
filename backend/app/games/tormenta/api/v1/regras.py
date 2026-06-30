@@ -12,9 +12,12 @@ from app.games.tormenta.rules.atributos_t20 import (
     lista_pericias_com_atributo,
     pontos_iniciais_compra,
     qualidade_geracao_4d6,
+    qualidade_geracao_4d6_v13,
     soma_modificadores_valores,
+    valor_base_inicial_compra,
     valores_4d6_para_mapa,
 )
+from app.games.tormenta.rules.beneficios_nivel_t20 import lista_beneficios_por_nivel
 from app.games.tormenta.rules.catalogo_armaduras_t20 import (
     filtrar_armaduras_protecao_mb,
 )
@@ -23,14 +26,13 @@ from app.games.tormenta.rules.catalogo_t20 import (
     filtrar_magias_mb,
     filtrar_talentos_mb,
 )
-from app.games.tormenta.rules.classes_t20 import (
-    lista_beneficios_por_nivel_mb,
-    lista_classes_mb,
-)
+from app.games.tormenta.rules.classes_t20 import lista_classes
 from app.games.tormenta.rules.conjuracao_t20 import (
+    cd_resistencia_magia_t20,
     custo_pm_preparar_ou_lancar_magia,
     habilidade_chave_conjuracao,
     lista_regras_conjuracao_classe_mb,
+    lista_regras_conjuracao_por_versao,
     modificador_conjuracao_mb,
     pontos_magia_maximos_conjuracao,
     texto_custo_pm_por_circulo_mb,
@@ -38,20 +40,29 @@ from app.games.tormenta.rules.conjuracao_t20 import (
 from app.games.tormenta.rules.devocao_divindade_t20 import (
     truque_devocao_por_divindade_mb,
 )
+from app.games.tormenta.rules.kit_inicial_v13_t20 import opcoes_kit_inicial_v13
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
     tipo_lista_magias_por_classe_mb,
 )
-from app.games.tormenta.rules.pericias_criacao_t20 import preview_pericias_criacao_mb
+from app.games.tormenta.rules.origens_t20 import lista_origens_v13
+from app.games.tormenta.rules.pericias_classe_t20 import preview_pericias_classe_v13
+from app.games.tormenta.rules.pericias_criacao_t20 import preview_pericias_criacao
 from app.games.tormenta.rules.pericias_t20 import (
+    bonus_treinamento_por_nivel,
     calcular_bonus_pericia,
     lista_dificuldades_padrao_mb,
     percepcao_passiva_t20,
+    pode_usar_pericia_treinada,
     racial_bonus_pericia,
     rolar_teste_pericia,
 )
 from app.games.tormenta.rules.progressao_pv_t20 import preview_pv_mb
-from app.games.tormenta.rules.racas_t20 import idiomas_mb_extras, lista_racas_mb
+from app.games.tormenta.rules.racas_t20 import idiomas_mb_extras, lista_racas
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_V13,
+    normalizar_regra_versao,
+)
 from app.games.tormenta.rules.tendencias_divindades_t20 import (
     lista_divindades_mb,
     lista_tendencias_mb,
@@ -72,8 +83,9 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaGerarAtributosRequest,
     TormentaGerarAtributosResponse,
     TormentaIdiomaTabelaItem,
-    TormentaMagiaMbCatalogoItem,
+    TormentaKitInicialV13Opcoes,
     TormentaMagiaMbCatalogoPaginaResponse,
+    TormentaOrigemV13Item,
     TormentaPericiaAtributoItem,
     TormentaPericiaBonusRequest,
     TormentaPericiaBonusResponse,
@@ -87,6 +99,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaRegrasClassesResponse,
     TormentaRegrasConjuracaoMbResponse,
     TormentaRegrasIdentidadeMbResponse,
+    TormentaRegrasKitInicialV13Response,
+    TormentaRegrasOrigensResponse,
     TormentaRegrasPericiasResponse,
     TormentaRegrasRacasResponse,
     TormentaTracosRaciaisPreviewResponse,
@@ -107,14 +121,20 @@ router = APIRouter(
     summary="Custos de compra por pontos e perícias com atributo-chave",
 )
 def obter_regras_atributos(
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Edição: mb (legado) ou v13 (Jogo do Ano). Padrão mb.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasAtributosResponse:
-    custos = [TormentaCustoAtributoItem(**row) for row in lista_custos_compra()]
+    rv = normalizar_regra_versao(regra_versao)
+    custos = [TormentaCustoAtributoItem(**row) for row in lista_custos_compra(rv)]
     pericias = [
-        TormentaPericiaAtributoItem(**row) for row in lista_pericias_com_atributo()
+        TormentaPericiaAtributoItem(**row) for row in lista_pericias_com_atributo(rv)
     ]
     return TormentaRegrasAtributosResponse(
-        pontos_compra_iniciais=pontos_iniciais_compra(),
+        regra_versao=rv,
+        pontos_compra_iniciais=pontos_iniciais_compra(rv),
         custos=custos,
         pericias=pericias,
         metodos_geracao=sorted(METODOS_GERACAO_ATRIBUTOS),
@@ -131,25 +151,36 @@ def gerar_atributos(
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaGerarAtributosResponse:
     metodo = payload.metodo
+    rv = normalizar_regra_versao(payload.regra_versao)
     if metodo == "compra_pontos":
-        valores = {chave: 10 for chave in CHAVES_ATRIBUTO}
-        soma = soma_modificadores_valores(valores.values())
+        base = valor_base_inicial_compra(rv)
+        valores = {chave: base for chave in CHAVES_ATRIBUTO}
+        soma = soma_modificadores_valores(valores.values(), rv)
         return TormentaGerarAtributosResponse(
             metodo=metodo,
+            regra_versao=rv,
             valores=valores,
             qualidade_4d6_ok=None,
             soma_modificadores=soma,
         )
     try:
-        rolados = gerar_seis_valores_4d6(seed=payload.seed, exigir_qualidade_mb=True)
+        rolados = gerar_seis_valores_4d6(
+            seed=payload.seed, exigir_qualidade_mb=True, regra_versao=rv
+        )
         valores = valores_4d6_para_mapa(rolados)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-    soma = soma_modificadores_valores(rolados)
+    soma = soma_modificadores_valores(rolados, rv)
+    q_ok = (
+        qualidade_geracao_4d6_v13(rolados)
+        if rv == "v13"
+        else qualidade_geracao_4d6(rolados)
+    )
     return TormentaGerarAtributosResponse(
         metodo=metodo,
+        regra_versao=rv,
         valores=valores,
-        qualidade_4d6_ok=qualidade_geracao_4d6(rolados),
+        qualidade_4d6_ok=q_ok,
         soma_modificadores=soma,
     )
 
@@ -160,12 +191,18 @@ def gerar_atributos(
     summary="Raças do Módulo Básico (ajustes, traços, idioma racial) + regra e tabela de idiomas MB",
 )
 def obter_regras_racas(
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Edição: mb (11 raças) ou v13 (17 raças). Padrão mb.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasRacasResponse:
+    rv = normalizar_regra_versao(regra_versao)
     geral, tabela = idiomas_mb_extras()
-    racas = [TormentaRacaMbItem(**row) for row in lista_racas_mb()]
+    racas = [TormentaRacaMbItem(**row) for row in lista_racas(rv)]
     idiomas_rows = [TormentaIdiomaTabelaItem(**row) for row in tabela]
     return TormentaRegrasRacasResponse(
+        regra_versao=rv,
         racas=racas,
         idiomas_geral_mb=geral,
         idiomas_tabela_mb=idiomas_rows,
@@ -175,16 +212,25 @@ def obter_regras_racas(
 @router.get(
     "/classes",
     response_model=TormentaRegrasClassesResponse,
-    summary="Benefícios por nível (MB) e classes com BBA, PV e perícias",
+    summary="Benefícios por nível e classes com BBA, PV, PM e perícias",
 )
 def obter_regras_classes(
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Versão de regras: mb (legado) ou v13 (Edição Jogo do Ano v1.3). Default: mb.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasClassesResponse:
+    rv = normalizar_regra_versao(regra_versao)
     ben = [
-        TormentaBeneficioNivelMbItem(**row) for row in lista_beneficios_por_nivel_mb()
+        TormentaBeneficioNivelMbItem(**row) for row in lista_beneficios_por_nivel(rv)
     ]
-    cls_rows = [TormentaClasseMbItem(**row) for row in lista_classes_mb()]
-    return TormentaRegrasClassesResponse(beneficios_por_nivel=ben, classes=cls_rows)
+    cls_rows = [TormentaClasseMbItem(**row) for row in lista_classes(rv)]
+    return TormentaRegrasClassesResponse(
+        regra_versao=rv,
+        beneficios_por_nivel=ben,
+        classes=cls_rows,
+    )
 
 
 @router.get(
@@ -203,11 +249,52 @@ def obter_regras_identidade_mb(
                 slug=slug,
                 rotulo=str(row.get("rotulo") or ""),
                 truque_devocao_slug=truque_devocao_por_divindade_mb(slug),
+                energia=row.get("energia"),
+                poderes_concedidos=list(row.get("poderes_concedidos") or []),
             )
         )
     return TormentaRegrasIdentidadeMbResponse(
         tendencias=lista_tendencias_mb(),
         divindades=div_rows,
+    )
+
+
+@router.get(
+    "/origens",
+    response_model=TormentaRegrasOrigensResponse,
+    summary="Origens v1.3 (Tabela 1-19) — benefícios de perícia e poder",
+)
+def obter_regras_origens(
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Versão de regras: v13 (padrão para origens).",
+    ),
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaRegrasOrigensResponse:
+    rv = normalizar_regra_versao(regra_versao or REGRA_VERSAO_V13)
+    rows = [TormentaOrigemV13Item(**row) for row in lista_origens_v13()]
+    return TormentaRegrasOrigensResponse(regra_versao=rv, origens=rows)
+
+
+@router.get(
+    "/kit-inicial",
+    response_model=TormentaRegrasKitInicialV13Response,
+    summary="Equipamento inicial v1.3 (p.140) — opções por classe",
+)
+def obter_regras_kit_inicial_v13(
+    tormenta_classe_mb_slug: Optional[str] = Query(
+        None,
+        description="Slug da classe v1.3 para proficiências do kit.",
+    ),
+    regra_versao: Optional[str] = Query(None),
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaRegrasKitInicialV13Response:
+    rv = normalizar_regra_versao(regra_versao or REGRA_VERSAO_V13)
+    slug = str(tormenta_classe_mb_slug or "").strip().lower()
+    op = opcoes_kit_inicial_v13(slug)
+    return TormentaRegrasKitInicialV13Response(
+        regra_versao=rv,
+        opcoes=TormentaKitInicialV13Opcoes(**op),
     )
 
 
@@ -342,20 +429,26 @@ def listar_catalogo_magias(
     summary="Conjuração MB: habilidade-chave e PM por classe; custo em PM por círculo",
 )
 def obter_regras_conjuracao_mb(
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Edição: mb ou v13 (custo PM 1/3/6/10/15). Padrão mb.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasConjuracaoMbResponse:
-    rows = lista_regras_conjuracao_classe_mb()
+    rv = normalizar_regra_versao(regra_versao)
+    rows = lista_regras_conjuracao_por_versao(rv)
     classes = [TormentaConjuracaoClasseMbItem.model_validate(r) for r in rows]
     custo_pm_circulos = [
         TormentaConjuracaoCustoCirculoItem(
-            circulo=c, custo_pm=custo_pm_preparar_ou_lancar_magia(c)
+            circulo=c, custo_pm=custo_pm_preparar_ou_lancar_magia(c, rv)
         )
         for c in range(0, 10)
     ]
     return TormentaRegrasConjuracaoMbResponse(
+        regra_versao=rv,
         classes=classes,
         custo_pm_circulos=custo_pm_circulos,
-        nota_custo_magia=texto_custo_pm_por_circulo_mb(),
+        nota_custo_magia=texto_custo_pm_por_circulo_mb(rv),
     )
 
 
@@ -386,15 +479,25 @@ def obter_conjuracao_preview_mb(
     int_valor: int = Query(10, ge=0, le=99),
     sab_valor: int = Query(10, ge=0, le=99),
     car_valor: int = Query(10, ge=0, le=99),
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Edição: mb ou v13. Padrão mb.",
+    ),
+    arcanista_caminho: Optional[str] = Query(
+        None,
+        max_length=16,
+        description="Caminho arcanista v1.3: bruxo | mago | feiticeiro.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaConjuracaoPreviewResponse:
+    rv = normalizar_regra_versao(regra_versao)
     slug = classe_slug.strip().lower()
     nv = int(nivel_conjurador) if nivel_conjurador is not None else int(nivel)
     if nv < 1:
         nv = 1
     if nv > 40:
         nv = 40
-    hk = habilidade_chave_conjuracao(slug)
+    hk = habilidade_chave_conjuracao(slug, rv, arcanista_caminho)
     mod = modificador_conjuracao_mb(
         slug,
         for_valor,
@@ -403,8 +506,13 @@ def obter_conjuracao_preview_mb(
         int_valor,
         sab_valor,
         car_valor,
+        regra_versao=rv,
+        arcanista_caminho=arcanista_caminho,
     )
-    cd_magia = (10 + mod) if mod is not None else None
+    if rv == REGRA_VERSAO_V13 and mod is not None:
+        cd_magia = cd_resistencia_magia_t20(nv, mod, rv)
+    else:
+        cd_magia = (10 + mod) if mod is not None else None
     pm = pontos_magia_maximos_conjuracao(
         slug,
         nv,
@@ -414,6 +522,8 @@ def obter_conjuracao_preview_mb(
         int_valor,
         sab_valor,
         car_valor,
+        regra_versao=rv,
+        arcanista_caminho=arcanista_caminho,
     )
     lista_t = tipo_lista_magias_por_classe_mb(slug)
     cmax = circulo_maximo_magias_lancaveis_mb(slug, nv)
@@ -433,44 +543,80 @@ def obter_conjuracao_preview_mb(
 @router.get(
     "/tracos-raciais-preview",
     response_model=TormentaTracosRaciaisPreviewResponse,
-    summary="Bônus mecânicos raciais MB (CA, resistências, perícias)",
+    summary="Bônus mecânicos raciais (CA, resistências, perícias)",
 )
 def obter_tracos_raciais_preview(
     slug: str = Query(..., min_length=1, max_length=40),
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Edição: mb ou v13. Padrão mb.",
+    ),
+    humano_versatil: Optional[str] = Query(
+        None,
+        max_length=32,
+        description="Humano v1.3: duas_pericias | pericia_poder",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaTracosRaciaisPreviewResponse:
-    data = preview_tracos_raciais(slug.strip().lower())
+    data = preview_tracos_raciais(
+        slug.strip().lower(),
+        regra_versao=regra_versao,
+        humano_versatil=humano_versatil,
+    )
     return TormentaTracosRaciaisPreviewResponse(**data)
 
 
 @router.get(
     "/pericias",
     response_model=TormentaRegrasPericiasResponse,
-    summary="Tabela de DCs padrão MB e bônus de treinamento",
+    summary="Tabela de DCs padrão e bônus de treinamento",
 )
 def obter_regras_pericias(
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Versão de regras: mb ou v13. Default: mb.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasPericiasResponse:
     from app.games.tormenta.schemas.regras_ficha import TormentaDificuldadePadraoItem
 
+    rv = normalizar_regra_versao(regra_versao)
     dcs = [
         TormentaDificuldadePadraoItem(**row) for row in lista_dificuldades_padrao_mb()
     ]
-    return TormentaRegrasPericiasResponse(dificuldades=dcs, bonus_treinado=2)
+    niveis_v13 = None
+    bonus = 2
+    if rv == "v13":
+        bonus = 2
+        niveis_v13 = [
+            {"nivel_min": 1, "nivel_max": 6, "bonus": 2},
+            {"nivel_min": 7, "nivel_max": 14, "bonus": 4},
+            {"nivel_min": 15, "nivel_max": 40, "bonus": 6},
+        ]
+    return TormentaRegrasPericiasResponse(
+        regra_versao=rv,
+        dificuldades=dcs,
+        bonus_treinado=bonus,
+        bonus_treinamento_niveis=niveis_v13,
+    )
 
 
 @router.post(
     "/pericias/calcular-bonus",
     response_model=TormentaPericiaBonusResponse,
-    summary="Calcula bônus total de perícia MB",
+    summary="Calcula bônus total de perícia",
 )
 def calcular_bonus_pericia_mb(
     body: TormentaPericiaBonusRequest,
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaPericiaBonusResponse:
+    rv = normalizar_regra_versao(body.regra_versao)
     racial = int(body.racial_bonus)
     if body.slug_raca and body.nome_pericia:
-        racial = racial_bonus_pericia(body.slug_raca, body.nome_pericia)
+        racial = racial_bonus_pericia(body.slug_raca, body.nome_pericia, rv)
+    pode, motivo = pode_usar_pericia_treinada(
+        body.nome_pericia or "", body.treinado, rv
+    )
     bonus = calcular_bonus_pericia(
         nivel=body.nivel,
         mod_atributo=body.mod_atributo,
@@ -480,15 +626,21 @@ def calcular_bonus_pericia_mb(
         racial_bonus=racial,
         penalidade_armadura=body.penalidade_armadura,
         pericia_de_classe=body.pericia_de_classe,
+        regra_versao=rv,
     )
     meio = body.nivel // 2
+    tre = bonus_treinamento_por_nivel(body.nivel, rv) if body.treinado else 0
     pp = None
-    if body.nome_pericia and str(body.nome_pericia).strip().lower() == "percepção":
-        pp = percepcao_passiva_t20(bonus)
-    elif body.nome_pericia and str(body.nome_pericia).strip().lower() == "percepcao":
+    nome_norm = (body.nome_pericia or "").strip().lower()
+    if nome_norm in ("percepção", "percepcao"):
         pp = percepcao_passiva_t20(bonus)
     return TormentaPericiaBonusResponse(
-        bonus_total=bonus, meio_nivel=meio, percepcao_passiva=pp
+        bonus_total=bonus,
+        meio_nivel=meio,
+        bonus_treinamento=tre,
+        percepcao_passiva=pp,
+        pode_usar=pode,
+        motivo_bloqueio=motivo,
     )
 
 
@@ -508,33 +660,77 @@ def rolar_pericia_mb(
 @router.get(
     "/pv-preview",
     response_model=TormentaPvPreviewResponse,
-    summary="PV máximos MB por classe, nível e CON",
+    summary="PV máximos por classe, nível e CON",
 )
 def obter_pv_preview_mb(
     classe_slug: str = Query(..., min_length=1, max_length=40),
     nivel: int = Query(1, ge=1, le=40),
-    con_valor: int = Query(10, ge=0, le=99),
+    con_valor: int = Query(10, ge=-99, le=99),
+    for_valor: int = Query(10, ge=-99, le=99),
+    des_valor: int = Query(10, ge=-99, le=99),
+    int_valor: int = Query(10, ge=-99, le=99),
+    sab_valor: int = Query(10, ge=-99, le=99),
+    car_valor: int = Query(10, ge=-99, le=99),
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Versão de regras: mb ou v13. Default: mb.",
+    ),
+    arcanista_caminho: Optional[str] = Query(
+        None,
+        max_length=16,
+        description="Caminho do arcanista v1.3: bruxo | mago | feiticeiro.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaPvPreviewResponse:
-    data = preview_pv_mb(classe_slug.strip().lower(), nivel, con_valor)
+    rv = normalizar_regra_versao(regra_versao)
+    data = preview_pv_mb(
+        classe_slug.strip().lower(),
+        nivel,
+        con_valor,
+        regra_versao=rv,
+        arcanista_caminho=arcanista_caminho,
+        for_valor=for_valor,
+        des_valor=des_valor,
+        int_valor=int_valor,
+        sab_valor=sab_valor,
+        car_valor=car_valor,
+    )
     return TormentaPvPreviewResponse(**data)
+
+
+@router.get(
+    "/pericias-classe-preview",
+    summary="Perícias de classe v1.3: fixas, grupos «ou» e pool de escolha",
+)
+def obter_pericias_classe_preview(
+    classe_slug: str = Query(..., min_length=1, max_length=40),
+    _: Usuario = Depends(get_usuario_atual),
+) -> dict:
+    data = preview_pericias_classe_v13(classe_slug.strip().lower())
+    if not data:
+        raise HTTPException(status_code=404, detail="Classe v1.3 não encontrada.")
+    return data
 
 
 @router.post(
     "/pericias/validar-criacao",
     response_model=TormentaPericiasValidarCriacaoResponse,
-    summary="Valida orçamento de perícias treinadas e graduações (MB)",
+    summary="Valida orçamento de perícias treinadas (e graduações MB)",
 )
 def validar_pericias_criacao_mb(
     body: TormentaPericiasValidarCriacaoRequest,
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaPericiasValidarCriacaoResponse:
+    rv = normalizar_regra_versao(body.regra_versao)
     pericias = [p.model_dump() for p in body.pericias]
-    data = preview_pericias_criacao_mb(
+    data = preview_pericias_criacao(
         nivel=body.nivel,
         slug_classe=body.classe_slug.strip().lower(),
         int_valor=body.int_valor,
         slug_raca=(body.slug_raca or "").strip().lower() or None,
         pericias=pericias,
+        regra_versao=rv,
+        humano_versatil=body.humano_versatil,
+        origem_beneficios=body.origem_beneficios,
     )
     return TormentaPericiasValidarCriacaoResponse(**data)
