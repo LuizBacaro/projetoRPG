@@ -100,13 +100,16 @@ Escolha de caminho **irreversível** na criação (`ficha_json.caminho_arcanista
 
 | Item | Estado |
 |------|--------|
-| `classes_mb.json` (13 classes MB) | **Desatualizado** |
-| PV automático por fórmula v1.3 | **Não feito** |
-| PM/nível por classe | **Parcial** |
-| Arcanista 3 caminhos | **Não feito** |
-| Bucaneiro, Caçador, Cavaleiro, Inventor, Lutador, Nobre | **Não feito** |
-| mago, feiticeiro, monge, samurai, swashbuckler, ranger | **Legado — ocultar no core v1.3** |
-| Modal 20 níveis | **Feito** (texto MB) |
+| `classes_v13.json` (14 classes) | **Feito** |
+| API `GET /regras/classes?regra_versao=v13` | **Feito** |
+| PV automático por fórmula v1.3 | **Feito** | `progressao_pv_t20.py`, botão Calcular PV, wizard |
+| PM/nível por classe (todas as classes) | **Feito** | `conjuracao_classe_v13.json` + preview |
+| Arcanista 3 caminhos | **Feito** | Wizard + ficha + validação salvar |
+| Bucaneiro, Caçador, Cavaleiro, Inventor, Lutador, Nobre | **Feito** | `classes_v13.json` |
+| mago, feiticeiro, monge, samurai, swashbuckler, ranger | **Legado — ocultar no core v1.3** | **Feito** (lista v13 não inclui) |
+| PM multiclasse na UI | **Feito** | `multiclasse_v13` + `t20-multiclasse-v13.js`; API `/pm-preview-multiclasse` |
+| Subir nível multiclasse | **Feito** | Modal escolhe classe; `multiclasse_v13` + PV/PM p.34 |
+| Modal 20 níveis | **Feito** (texto v1.3 quando `regra_versao=v13`) |
 
 ## Gap código (MB → v1.3)
 

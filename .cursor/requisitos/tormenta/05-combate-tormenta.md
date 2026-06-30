@@ -43,7 +43,7 @@ Rodadas, iniciativa, turnos, ataques, dano/cura PV, condições e testes de resi
 | Iniciativa + rolagens ataque/dano | **Feito** |
 | Modificadores condições (parcial) | **Feito** |
 | Concentração + resistência magia | **Feito** |
-| Condições vs lista p.394 v1.3 | **Parcial** — validar nomes/efeitos |
+| Condições vs lista p.394 v1.3 | **Feito** | Catálogo + motor ataque/CA; modal arena v1.3 |
 | Morte / 0 PV | **Não feito** |
 | Economia de ações completa | **Não feito** |
 

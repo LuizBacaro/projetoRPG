@@ -125,18 +125,25 @@
                 pvBd.textContent = formula;
             }
             const pmBd = q('fichaPmBreakdown');
-            if (pmBd && prev.pm_max != null) {
-                const pmTxt = isV13()
-                    ? `Sugestão: ${prev.nivel} × ${prev.pm_por_nivel} = ${prev.pm_max} PM`
-                    : `PM conj. máx. (regra ${labelVersao()}): ${prev.pm_max}`;
-                pmBd.dataset.t20PmFormula = pmTxt;
-                pmBd.textContent = pmTxt;
+            if (pmBd) {
+                if (isV13() && window.T20MulticlasseV13) {
+                    await window.T20MulticlasseV13.atualizarPmSugerido(!!aplicar);
+                } else if (prev.pm_max != null) {
+                    const pmTxt = `PM conj. máx. (regra ${labelVersao()}): ${prev.pm_max}`;
+                    pmBd.dataset.t20PmFormula = pmTxt;
+                    pmBd.textContent = pmTxt;
+                    if (aplicar) {
+                        const parPm = lerPar('fichaPm');
+                        const novoMaxPm = prev.pm_max;
+                        escreverPar('fichaPm', Math.min(parPm.atual, novoMaxPm), novoMaxPm);
+                    }
+                }
             }
             if (aplicar) {
                 const parPv = lerPar('fichaPv');
                 const novoMaxPv = prev.pv_max;
                 escreverPar('fichaPv', Math.min(parPv.atual, novoMaxPv), novoMaxPv);
-                if (prev.pm_max != null) {
+                if (!isV13() && prev.pm_max != null) {
                     const parPm = lerPar('fichaPm');
                     const novoMaxPm = prev.pm_max;
                     escreverPar('fichaPm', Math.min(parPm.atual, novoMaxPm), novoMaxPm);

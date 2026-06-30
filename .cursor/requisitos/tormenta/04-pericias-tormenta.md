@@ -71,7 +71,7 @@ Legenda: **T** = somente treinada; **A** = penalidade de armadura.
 | RF-T04d | Penalidade armadura só onde Tabela 2-1 / exceção Atletismo | P0 |
 | RF-T04e | UI tabela + rolagem `POST …/pericias/rolar` | P0 |
 | RF-T04f | Percepção passiva (derivada de Percepção) | P1 |
-| RF-T04g | Ofício: especialidades múltiplas (mesma perícia) | P2 |
+| RF-T04g | Ofício: especialidades múltiplas (mesma perícia) | **Feito** |
 | RF-T04h | DCs padrão (`pericias_dc_*.json`) | P1 |
 
 ## Estado de implementação
@@ -85,8 +85,8 @@ Legenda: **T** = somente treinada; **A** = penalidade de armadura.
 | UI ficha (tabela, orçamento, rolagem) | **Feito** | Coluna graduação oculta em v1.3; restore por nome |
 | Motor rolagem | **Feito** | Bloqueio «somente treinada» sem treino |
 | Misticismo | **Feito** | Substitui Identificar Magia |
-| Percepção passiva (UI) | **Pendente** | P1 — API retorna; UI não exibe |
-| Ofício especialidades múltiplas | **Pendente** | P2 |
+| Percepção passiva (UI) | **Feito** | Cartão «Pass.» na coluna esquerda; atualiza com perícias/equipamento |
+| Ofício especialidades múltiplas | **Feito** | `oficio_especialidades[]` na ficha v1.3 |
 | Atletismo penalidade só natação | **Feito** | Checkbox 🏊 na ficha + `uso_atletismo_natacao` na API |
 
 ## Gap código

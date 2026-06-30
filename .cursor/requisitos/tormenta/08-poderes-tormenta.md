@@ -67,12 +67,12 @@ Cada deus oferece **4** poderes concedidos; devoto escolhe **1** ao aderir. Cros
 | RF-T08a | Catálogo poderes v1.3 com **6 categorias** + `pagina` | P0 |
 | RF-T08b | API `GET /tormenta/regras/talentos` (alias `/poderes` futuro) | P0 |
 | RF-T08c | Vínculo SQL `tormenta_talentos_personagem` | P0 |
-| RF-T08d | UI: rótulo **Poderes**, filtros por categoria | P1 |
-| RF-T08e | Poderes concedidos filtrados por `divindade.slug` | P1 |
+| RF-T08d | UI: rótulo **Poderes**, filtros por categoria | P1 — **Feito** |
+| RF-T08e | Poderes concedidos filtrados por `divindade.slug` | P1 — **Feito** (RF-T09-v13) |
 | RF-T08f | Regra substituição: poder de classe → poder geral | P2 |
 | RF-T08g | Validação de pré-requisitos (nível, atributo, perícia, poderes) | P2 |
-| RF-T08h | Debitar PM ao ativar poder com custo | P1 |
-| RF-T08i | Poderes de origem e humano Versátil na criação | P1 |
+| RF-T08h | Debitar PM ao ativar poder com custo | P1 — **Feito** |
+| RF-T08i | Poderes de origem e humano Versátil na criação | P1 — **Feito** |
 | RF-T08j | Poderes da Tormenta (flag `tormenta: true`) | P3 |
 
 ## Estado de implementação
@@ -81,9 +81,9 @@ Cada deus oferece **4** poderes concedidos; devoto escolhe **1** ao aderir. Cros
 |------|--------|
 | Catálogo talentos MB + API | **Feito** (nomenclatura legada) |
 | Vínculo personagem-poder | **Feito** |
-| Categorias v1.3 completas | **Parcial** |
-| PM ao ativar | **Parcial** |
-| Poderes concedidos por deus | **Parcial** (`tendencias_divindades_mb.json`) |
+| Categorias v1.3 completas | **Feito** (`categoria_v13` + filtro UI) |
+| PM ao ativar | **Feito** (`POST /poderes/ativar`, catálogo `custo_pm`) |
+| Poderes concedidos por deus | **Feito** (`tendencias_divindades_mb.json` + UI filtrada) |
 | Substituição classe → geral | **Não feito** |
 | Pré-requisitos automáticos | **Não feito** |
 

@@ -6,6 +6,7 @@
 
     let ORIGENS_V13 = [];
     let DIVINIDADES_META = [];
+    const CLASSES_DEVOTO_OBRIGATORIO = new Set(['clerigo', 'druida', 'paladino']);
 
     function q(id) {
         return document.getElementById(id);
@@ -138,6 +139,57 @@
         atualizarUiOrigemItens();
     }
 
+    function classeExigeDevocao() {
+        const sel = q('f_classe_mb');
+        const slug = sel ? String(sel.value || '').trim().toLowerCase() : '';
+        return CLASSES_DEVOTO_OBRIGATORIO.has(slug);
+    }
+
+    function sincronizarDevotoObrigatorio() {
+        const exige = classeExigeDevocao();
+        const cb = q('f_devoto');
+        if (exige && cb) cb.checked = true;
+        const hint = q('t20DevocaoHint');
+        if (hint) {
+            let txt = exige
+                ? 'Clérigo, druida e paladino devem escolher divindade e poder concedido.'
+                : 'Devoção opcional: marque Devoto e escolha um poder da divindade (Os Vinte).';
+            if (String((q('f_classe_mb') && q('f_classe_mb').value) || '').toLowerCase() === 'paladino') {
+                txt += ' Paladinos são campeões do bem e da ordem (narrativo).';
+            }
+            hint.textContent = txt;
+        }
+        return exige;
+    }
+
+    function renderObrigacoesDivindade(row, hostId) {
+        const host = q(hostId);
+        if (!host) return;
+        if (!row || !isV13()) {
+            host.innerHTML = '';
+            host.style.display = 'none';
+            return;
+        }
+        const flags = Array.isArray(row.obrigacoes_flags) ? row.obrigacoes_flags : [];
+        if (!flags.length) {
+            host.innerHTML = '';
+            host.style.display = 'none';
+            return;
+        }
+        host.style.display = '';
+        const pag = row.pagina ? ` <span class="t20-obrig-pag">(livro p.${row.pagina})</span>` : '';
+        const lista = flags
+            .map((f) => `<li>${String(f.rotulo || f.slug || '').trim()}</li>`)
+            .join('');
+        const nimb = row.sem_penalidade_obrigacao
+            ? '<p class="t20-hint t20-obrig-nimb" style="margin:.35rem 0 0">Nimb: violar O&R não causa perda de PM.</p>'
+            : '';
+        host.innerHTML =
+            `<p class="t20-hint" style="margin:0 0 .35rem"><strong>Obrigações & Restrições</strong>${pag}</p>` +
+            `<ul class="t20-obrig-list">${lista}</ul>` +
+            nimb;
+    }
+
     function atualizarPoderesConcedidos() {
         const selDiv = q('f_divindade');
         const selPod = q('f_poder_concedido');
@@ -160,6 +212,8 @@
         if (prev) selPod.value = prev;
         const wrap = q('wrapPoderConcedido');
         if (wrap) wrap.style.display = isV13() ? '' : 'none';
+        renderObrigacoesDivindade(row, 't20DivindadeObrigacoesHost');
+        sincronizarDevotoObrigatorio();
     }
 
     function atualizarUiOrigemV13() {
@@ -167,9 +221,11 @@
         const wrapSlug = q('wrapOrigemSlug');
         const wrapBen = q('wrapOrigemBeneficios');
         const wrapDev = q('wrapDevoto');
+        const wrapHint = q('wrapDevocaoHint');
         if (wrapSlug) wrapSlug.style.display = v13 ? '' : 'none';
         if (wrapBen) wrapBen.style.display = v13 ? '' : 'none';
         if (wrapDev) wrapDev.style.display = v13 ? '' : 'none';
+        if (wrapHint) wrapHint.style.display = v13 ? '' : 'none';
         const leg = q('f_origem');
         if (leg) leg.style.display = v13 ? 'none' : '';
         if (v13) {
@@ -202,7 +258,7 @@
                 q('f_poder_concedido') && q('f_poder_concedido').value
                     ? String(q('f_poder_concedido').value).trim()
                     : null,
-            devoto: !!(q('f_devoto') && q('f_devoto').checked),
+            devoto: !!(q('f_devoto') && q('f_devoto').checked) || classeExigeDevocao(),
         };
     }
 
@@ -257,9 +313,16 @@
             }
         });
         q('f_poder_concedido')?.addEventListener('change', () => {
+            const pod = q('f_poder_concedido') && q('f_poder_concedido').value;
+            if (pod && q('f_devoto')) q('f_devoto').checked = true;
             if (typeof global.t20AplicarPoderesAutomaticosNaLista === 'function') {
                 global.t20AplicarPoderesAutomaticosNaLista();
             }
+        });
+        q('f_devoto')?.addEventListener('change', sincronizarDevotoObrigatorio);
+        q('f_classe_mb')?.addEventListener('change', () => {
+            sincronizarDevotoObrigatorio();
+            atualizarPoderesConcedidos();
         });
     }
 
@@ -276,6 +339,9 @@
         lerOrigemPayload,
         aplicarOrigemPayload,
         atualizarPoderesConcedidos,
+        renderObrigacoesDivindade,
         origemPorSlug,
+        classeExigeDevocao,
+        sincronizarDevotoObrigatorio,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -47,3 +47,7 @@ Principais mudanças v1.3 (sem copiar texto do livro):
 ## Direitos autorais
 
 Não copiar texto longo nem tabelas completas do livro no repositório. RFs trazem estrutura, fórmulas genéricas, remissão de página e critérios de aceite — ver `docs/tormenta/00-visao-e-fontes-legais.md`.
+
+## Backlog v1.3
+
+Itens pendentes e prioridades transversais: **[docs/tormenta/03-requisitos-funcionais-backlog.md](../../docs/tormenta/03-requisitos-funcionais-backlog.md)** (secção **Backlog v1.3**).

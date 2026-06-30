@@ -58,10 +58,10 @@ def test_rolar_teste_pericia_seed():
     assert r["total"] == r["d20"] + 5
 
 
-def test_modificadores_condicoes_mb():
-    m = modificadores_de_condicoes_mb(["Cego", "Surpreso"])
-    assert m["ataque"] == -4
-    assert m["ca"] == -4
+def test_modificadores_condicoes_v13() -> None:
+    m = modificadores_de_condicoes_mb(["Desprevenido"])
+    assert m["ataque"] == 0
+    assert m["ca"] == -5
 
 
 def test_rolar_iniciativa_seed():

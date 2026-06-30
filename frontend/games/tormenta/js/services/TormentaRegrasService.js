@@ -152,11 +152,17 @@ class TormentaRegrasService {
     async listarTalentosCatalogo(params = {}) {
         const q = new URLSearchParams();
         if (params.q) q.set('q', params.q);
+        if (params.categoria_v13) q.set('categoria_v13', params.categoria_v13);
         if (params.skip != null) q.set('skip', String(params.skip));
         if (params.limit != null) q.set('limit', String(params.limit));
         const qs = q.toString();
         const res = await fetch(this._urlTalentos() + (qs ? `?${qs}` : ''), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar talentos MB');
+    }
+
+    /** Alias v1.3 — mesmo endpoint `/tormenta/regras/poderes`. */
+    listarPoderesCatalogo(params = {}) {
+        return this.listarTalentosCatalogo(params);
     }
 
     _urlMagias() {
@@ -237,8 +243,50 @@ class TormentaRegrasService {
         sp.set('slug', String(slug || '').trim());
         if (opts.regraVersao) sp.set('regra_versao', String(opts.regraVersao).trim());
         if (opts.humanoVersatil) sp.set('humano_versatil', String(opts.humanoVersatil).trim());
+        if (opts.lefouDeformidadeModo) {
+            sp.set('lefou_deformidade_modo', String(opts.lefouDeformidadeModo).trim());
+        }
+        if (opts.lefouDeformidadePericias) {
+            sp.set('lefou_deformidade_pericias', String(opts.lefouDeformidadePericias).trim());
+        }
+        if (opts.qareenAscendencia) {
+            sp.set('qareen_ascendencia', String(opts.qareenAscendencia).trim());
+        }
+        if (opts.osteonMemoriaModo) {
+            sp.set('osteon_memoria_modo', String(opts.osteonMemoriaModo).trim());
+        }
+        if (opts.osteonMemoriaPericia) {
+            sp.set('osteon_memoria_pericia', String(opts.osteonMemoriaPericia).trim());
+        }
+        if (opts.sereiaMagias) {
+            sp.set('sereia_magias', String(opts.sereiaMagias).trim());
+        }
+        if (opts.golemFonteElemental) {
+            sp.set('golem_fonte_elemental', String(opts.golemFonteElemental).trim());
+        }
+        if (opts.klirenPericia) {
+            sp.set('kliren_pericia', String(opts.klirenPericia).trim());
+        }
+        if (opts.klirenOficio) {
+            sp.set('kliren_oficio', String(opts.klirenOficio).trim());
+        }
+        if (opts.silfideMagias) {
+            sp.set('silfide_magias', String(opts.silfideMagias).trim());
+        }
         const res = await fetch(`${this._urlTracosRaciaisPreview()}?${sp}`, { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar traços raciais');
+    }
+
+    _urlEscolhasRaciais() {
+        return window.getApiUrl('/tormenta/regras/escolhas-raciais');
+    }
+
+    async obterEscolhasRaciais(slug, opts = {}) {
+        const sp = new URLSearchParams();
+        sp.set('slug', String(slug || '').trim());
+        if (opts.regraVersao) sp.set('regra_versao', String(opts.regraVersao).trim());
+        const res = await fetch(`${this._urlEscolhasRaciais()}?${sp}`, { headers: this._headers() });
+        return this._handleJson(res, 'Erro ao carregar escolhas raciais');
     }
 
     _urlPericiasRegras(regraVersao) {
@@ -285,6 +333,15 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao rolar perícia');
     }
 
+    async ajustarBonusAtaque(body) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/ataque/ajustar-bonus'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        return this._handleJson(res, 'Erro ao ajustar bônus de ataque');
+    }
+
     async previewCarga(body) {
         const res = await fetch(window.getApiUrl('/tormenta/regras/carga-preview'), {
             method: 'POST',
@@ -314,6 +371,37 @@ class TormentaRegrasService {
             { headers: this._headers() }
         );
         return this._handleJson(res, 'Erro ao calcular PV');
+    }
+
+    /**
+     * PM máximos v1.3 — soma multiclasse (nível × pm/nível por classe).
+     * @param {{ classes: Array<{slug: string, nivel: number}>, regraVersao?: string }} p
+     */
+    async obterPmPreviewMulticlasse(p) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/pm-preview-multiclasse'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                classes: Array.isArray(p.classes) ? p.classes : [],
+                regra_versao: p.regraVersao || 'v13',
+            }),
+        });
+        return this._handleJson(res, 'Erro ao calcular PM multiclasse');
+    }
+
+    /**
+     * Dinheiro inicial v1.3 — Tabela 3-1 por nível.
+     * @param {{ nivel?: number, regraVersao?: string }} p
+     */
+    async obterDinheiroInicial(p) {
+        const sp = new URLSearchParams();
+        sp.set('nivel', String(p.nivel != null ? p.nivel : 1));
+        if (p.regraVersao) sp.set('regra_versao', String(p.regraVersao).trim());
+        const res = await fetch(
+            `${window.getApiUrl('/tormenta/regras/dinheiro-inicial')}?${sp}`,
+            { headers: this._headers() }
+        );
+        return this._handleJson(res, 'Erro ao carregar dinheiro inicial');
     }
 
     /**

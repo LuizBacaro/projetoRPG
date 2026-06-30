@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
 from app.games.tormenta.rules.classes_t20 import classe_por_slug, lista_classes
@@ -124,3 +124,158 @@ def preview_pv_mb(
         "pm_por_nivel": pm_pn_i,
         "pm_max": pm_max,
     }
+
+
+def _niveis_por_classe_de_lista(classes: List[Dict[str, Any]]) -> Dict[str, int]:
+    """Agrega linhas ``[{slug, nivel}]`` em mapa slug → nível total."""
+    out: Dict[str, int] = {}
+    for item in classes or []:
+        if not isinstance(item, dict):
+            continue
+        slug = str(item.get("slug") or "").strip().lower()
+        if not slug:
+            continue
+        try:
+            nv = int(item.get("nivel", 0))
+        except (TypeError, ValueError):
+            continue
+        if nv < 1:
+            continue
+        out[slug] = out.get(slug, 0) + nv
+    return out
+
+
+def preview_pm_multiclasse_v13(classes: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Breakdown de PM máximos v1.3 para multiclasse (soma nível × pm/nível)."""
+    niveis_map = _niveis_por_classe_de_lista(classes)
+    breakdown: List[Dict[str, Any]] = []
+    partes: List[str] = []
+    total = 0
+    for slug in sorted(niveis_map.keys()):
+        nv = niveis_map[slug]
+        row = classe_por_slug(slug, REGRA_VERSAO_V13)
+        if not row:
+            breakdown.append(
+                {
+                    "slug": slug,
+                    "nome": slug,
+                    "nivel": nv,
+                    "pm_por_nivel": None,
+                    "pm_classe": None,
+                }
+            )
+            continue
+        pm_pn_raw = row.get("pm_por_nivel")
+        try:
+            pm_pn = int(pm_pn_raw) if pm_pn_raw is not None else None
+        except (TypeError, ValueError):
+            pm_pn = None
+        if pm_pn is None or pm_pn < 0:
+            breakdown.append(
+                {
+                    "slug": slug,
+                    "nome": str(row.get("nome", slug)),
+                    "nivel": nv,
+                    "pm_por_nivel": pm_pn,
+                    "pm_classe": None,
+                }
+            )
+            continue
+        pm_classe = nv * pm_pn
+        total += pm_classe
+        nome = str(row.get("nome", slug))
+        breakdown.append(
+            {
+                "slug": slug,
+                "nome": nome,
+                "nivel": nv,
+                "pm_por_nivel": pm_pn,
+                "pm_classe": pm_classe,
+            }
+        )
+        partes.append(f"{nome} {nv}×{pm_pn}={pm_classe}")
+    formula = " + ".join(partes) + (f" = {total} PM" if partes else "")
+    return {
+        "regra_versao": REGRA_VERSAO_V13,
+        "pm_max": total if partes else None,
+        "breakdown": breakdown,
+        "formula": formula,
+        "nivel_total_classes": sum(niveis_map.values()) if niveis_map else 0,
+    }
+
+
+def pm_maximos_v13_multiclasse(niveis_por_classe: Dict[str, int]) -> Optional[int]:
+    """PM máximos v1.3 — soma nível × pm_por_nivel de cada classe (p.34)."""
+    prev = preview_pm_multiclasse_v13(
+        [{"slug": s, "nivel": n} for s, n in niveis_por_classe.items()]
+    )
+    return prev.get("pm_max")
+
+
+def niveis_multiclasse_v13_de_ficha(
+    ficha_json: Optional[Dict[str, Any]],
+    nivel_personagem: int,
+) -> List[Dict[str, Any]]:
+    """Linhas ``[{slug, nivel}]`` — ``multiclasse_v13`` ou classe principal única."""
+    fj = ficha_json if isinstance(ficha_json, dict) else {}
+    slug_pri = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
+    mc = fj.get("multiclasse_v13")
+    if isinstance(mc, list) and mc:
+        out: List[Dict[str, Any]] = []
+        for item in mc:
+            if not isinstance(item, dict):
+                continue
+            sl = str(item.get("slug") or "").strip().lower()
+            if not sl:
+                continue
+            try:
+                nv = int(item.get("nivel", 0))
+            except (TypeError, ValueError):
+                continue
+            if nv < 1:
+                continue
+            out.append({"slug": sl, "nivel": min(40, nv)})
+        if out:
+            return out
+    if slug_pri:
+        try:
+            nv = int(nivel_personagem)
+        except (TypeError, ValueError):
+            nv = 1
+        return [{"slug": slug_pri, "nivel": max(1, min(40, nv))}]
+    return []
+
+
+def _pv_contribuicao_classe_v13(
+    slug: str, nivel: int, *, primaria: bool
+) -> Optional[int]:
+    row = classe_por_slug(slug, REGRA_VERSAO_V13)
+    if not row or nivel < 1:
+        return None
+    pv_ini = int(row.get("pv_inicial", 8) or 8)
+    pv_pn = int(row.get("pv_por_nivel", 2) or 0)
+    if primaria:
+        return pv_ini + max(0, nivel - 1) * pv_pn
+    return nivel * pv_pn
+
+
+def pv_maximos_v13_multiclasse(
+    classes: List[Dict[str, Any]],
+    con_valor: int,
+    slug_primario: str,
+) -> Optional[int]:
+    """PV máximos v1.3 multiclasse — soma por classe + CON × nível total (p.34)."""
+    niveis_map = _niveis_por_classe_de_lista(classes)
+    if not niveis_map:
+        return None
+    pri = str(slug_primario or "").strip().lower()
+    base = 0
+    total_nv = 0
+    for slug, nv in niveis_map.items():
+        contrib = _pv_contribuicao_classe_v13(slug, nv, primaria=(slug == pri))
+        if contrib is None:
+            return None
+        base += contrib
+        total_nv += nv
+    mod_con = contribuicao_atributo_t20(int(con_valor), REGRA_VERSAO_V13)
+    return base + total_nv * mod_con

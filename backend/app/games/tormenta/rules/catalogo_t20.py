@@ -30,9 +30,11 @@ _MAGIA_STRING_FIELDS: Tuple[str, ...] = tuple(_MAGIA_FIELD_LIMITS)
 _TALENT_FIELD_LIMITS: Dict[str, int] = {
     "secao": 200,
     "categoria": 80,
+    "categoria_v13": 40,
     "prerequisitos": 500,
     "descricao_resumo": 2000,
     "pagina_referencia": 80,
+    "custo_pm": 4,
 }
 _TALENT_EXTRA_FIELDS: Tuple[str, ...] = tuple(_TALENT_FIELD_LIMITS)
 
@@ -296,7 +298,11 @@ def lista_talentos_mb_catalogo() -> List[Dict[str, Any]]:
         out.append(item)
 
     out.sort(key=lambda x: str(x["nome"]).lower())
-    return out
+    from app.games.tormenta.rules.poderes_catalogo_v13_t20 import (
+        enriquecer_item_catalogo_poder,
+    )
+
+    return [enriquecer_item_catalogo_poder(r) for r in out]
 
 
 def _haystack_talento_mb(r: Dict[str, Any]) -> str:
@@ -316,12 +322,19 @@ def _haystack_talento_mb(r: Dict[str, Any]) -> str:
 
 
 def filtrar_talentos_mb(
-    q: str | None, skip: int, limit: int
+    q: str | None,
+    skip: int,
+    limit: int,
+    *,
+    categoria_v13: str | None = None,
 ) -> Tuple[List[Dict[str, Any]], int]:
     rows = [dict(r) for r in lista_talentos_mb_catalogo()]
     qn = (q or "").strip().lower()
     if qn:
         rows = [r for r in rows if qn in _haystack_talento_mb(r)]
+    cat_f = str(categoria_v13 or "").strip().lower()
+    if cat_f:
+        rows = [r for r in rows if str(r.get("categoria_v13") or "") == cat_f]
     for i, item in enumerate(rows, start=1):
         item["id"] = i
     total = len(rows)

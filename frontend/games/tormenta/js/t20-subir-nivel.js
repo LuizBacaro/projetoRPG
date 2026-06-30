@@ -23,11 +23,75 @@
         return 'MB';
     }
 
+    function isV13() {
+        return labelVersao() === 'v1.3';
+    }
+
     function fecharModal() {
         const ov = q('modalSubirNivelTormenta');
         if (!ov) return;
         ov.classList.remove('is-open');
         ov.setAttribute('aria-hidden', 'true');
+    }
+
+    function classePrincipalSlug() {
+        const sel = q('f_classe_mb');
+        return sel && sel.value ? String(sel.value).trim().toLowerCase() : '';
+    }
+
+    function linhasMulticlasseEfetivas() {
+        if (window.T20MulticlasseV13 && typeof window.T20MulticlasseV13.niveisEfetivosParaPm === 'function') {
+            return window.T20MulticlasseV13.niveisEfetivosParaPm() || [];
+        }
+        const slug = classePrincipalSlug();
+        if (!slug) return [];
+        const nv = Math.floor(Number((q('f_nivel') && q('f_nivel').value) || '1'));
+        return [{ slug, nivel: Number.isFinite(nv) && nv >= 1 ? nv : 1 }];
+    }
+
+    function montarSelectClasseAlvo() {
+        if (!isV13()) return '';
+        const prefer =
+            (window.__t20SubirNivelClassePick && String(window.__t20SubirNivelClassePick).trim().toLowerCase()) ||
+            classeAlvoSelecionada() ||
+            classePrincipalSlug();
+        const linhas = linhasMulticlasseEfetivas();
+        const slugsExistentes = new Set(linhas.map((r) => String(r.slug || '').trim().toLowerCase()).filter(Boolean));
+        const opts = [];
+        linhas.forEach((r) => {
+            const s = String(r.slug || '').trim().toLowerCase();
+            if (!s) return;
+            const nv = r.nivel != null ? r.nivel : 1;
+            opts.push(
+                `<option value="${escHtml(s)}"${s === prefer ? ' selected' : ''}>${escHtml(s)} (nv ${nv} → ${Number(nv) + 1})</option>`
+            );
+        });
+        const slugsV13 =
+            window.T20MulticlasseV13 && Array.isArray(window.T20MulticlasseV13._slugsCache)
+                ? window.T20MulticlasseV13._slugsCache
+                : [];
+        slugsV13.forEach((s) => {
+            const slug = String(s || '').trim().toLowerCase();
+            if (!slug || slugsExistentes.has(slug)) return;
+            opts.push(
+                `<option value="${escHtml(slug)}"${slug === prefer ? ' selected' : ''}>${escHtml(slug)} (nova classe, 1º nível)</option>`
+            );
+        });
+        if (!opts.length) {
+            const pri = classePrincipalSlug();
+            if (pri) {
+                opts.push(`<option value="${escHtml(pri)}" selected>${escHtml(pri)}</option>`);
+            }
+        }
+        return `<label class="t20-hint" style="display:block;margin:0 0 .65rem">Classe que sobe +1 (multiclasse v1.3)
+            <select id="subirNivelClasseAlvo" class="t20-input" style="width:100%;margin-top:.25rem">${opts.join('')}</select>
+        </label>`;
+    }
+
+    function classeAlvoSelecionada() {
+        const sel = q('subirNivelClasseAlvo');
+        if (sel && sel.value) return String(sel.value).trim().toLowerCase();
+        return classePrincipalSlug();
     }
 
     function montarHtmlPreview(p) {
@@ -37,12 +101,27 @@
         }
         const lv = labelVersao();
         const linhas = [];
-        linhas.push(`<p><strong>Nível ${p.nivel_atual} → ${p.nivel_alvo}</strong> (${escHtml(p.classe_slug || '')})</p>`);
+        if (isV13()) {
+            linhas.push(montarSelectClasseAlvo());
+        }
+        const clsTxt = p.classe_slug || '';
+        const nvCls =
+            p.classe_nivel_atual != null && p.classe_nivel_novo != null
+                ? ` · ${escHtml(clsTxt)} ${p.classe_nivel_atual}→${p.classe_nivel_novo}`
+                : clsTxt
+                  ? ` (${escHtml(clsTxt)})`
+                  : '';
+        linhas.push(`<p><strong>Nível total ${p.nivel_atual} → ${p.nivel_alvo}</strong>${nvCls}</p>`);
+        if (p.classe_nova_multiclasse) {
+            linhas.push('<p class="t20-hint">Nova classe na multiclasse (PV = ganho subsequente, p.34).</p>');
+        }
         if (p.pv_ganho != null) {
             linhas.push(`<p>PV: ${p.pv_max_atual} → <strong>${p.pv_max_novo}</strong> (+${p.pv_ganho})</p>`);
         }
         if (p.pa_ganho != null && p.pa_ganho > 0) {
             linhas.push(`<p>PM: ${p.pa_max_atual} → <strong>${p.pa_max_novo}</strong> (+${p.pa_ganho})</p>`);
+        } else if (p.pa_max_novo != null && p.pa_max_atual != null && p.pa_max_novo !== p.pa_max_atual) {
+            linhas.push(`<p>PM: ${p.pa_max_atual} → <strong>${p.pa_max_novo}</strong></p>`);
         }
         if (p.talentos_ganho > 0) {
             const rotulo =
@@ -81,17 +160,33 @@
         return linhas.join('');
     }
 
+    function bindSelectClasseAlvo() {
+        const sel = q('subirNivelClasseAlvo');
+        if (!sel || sel.dataset.t20Bound) return;
+        sel.dataset.t20Bound = '1';
+        sel.addEventListener('change', () => {
+            void carregarPreview();
+        });
+    }
+
     async function carregarPreview() {
         const corpo = q('subirNivelTormentaCorpo');
         const pid = q('fichaId') && q('fichaId').value;
         if (!corpo || !pid) return;
+        const pick = classeAlvoSelecionada();
+        if (pick) window.__t20SubirNivelClassePick = pick;
         corpo.innerHTML = '<p class="t20-hint">Carregando…</p>';
         try {
             const nv = Math.floor(Number((q('f_nivel') && q('f_nivel').value) || '1'));
             const alvo = Number.isFinite(nv) ? nv + 1 : 2;
-            const p = await svc().previewSubirNivel(pid, alvo);
+            const opts = {};
+            if (isV13()) {
+                opts.classeSlug = classeAlvoSelecionada();
+            }
+            const p = await svc().previewSubirNivel(pid, alvo, opts);
             window.__t20SubirNivelPreview = p;
             corpo.innerHTML = montarHtmlPreview(p);
+            bindSelectClasseAlvo();
             const btn = q('btnSubirNivelConfirmar');
             if (btn) btn.disabled = !(p && p.permitido);
         } catch (e) {
@@ -108,12 +203,16 @@
             else alert('Salve a ficha antes de subir de nível.');
             return;
         }
-        const slug = (q('f_classe_mb') && q('f_classe_mb').value) || '';
+        const slug = classePrincipalSlug();
         if (!String(slug).trim()) {
             const lv = labelVersao();
             if (typeof Toast !== 'undefined') Toast.error(`Selecione a classe (${lv}) em Editar ficha.`);
             else alert(`Selecione a classe (${lv}).`);
             return;
+        }
+        if (isV13() && window.T20MulticlasseV13 && typeof window.T20MulticlasseV13.carregarSlugsClasses === 'function') {
+            const slugs = await window.T20MulticlasseV13.carregarSlugsClasses();
+            window.T20MulticlasseV13._slugsCache = slugs;
         }
         const ov = q('modalSubirNivelTormenta');
         if (ov) {
@@ -138,8 +237,12 @@
             return;
         }
         const aplicarPv = !!(q('subirNivelAplicarPv') && q('subirNivelAplicarPv').checked);
+        const body = { aplicar_ganhos_vida: aplicarPv };
+        if (isV13()) {
+            body.classe_slug = classeAlvoSelecionada() || prev.classe_slug || undefined;
+        }
         try {
-            const res = await svc().aplicarSubirNivel(pid, { aplicar_ganhos_vida: aplicarPv });
+            const res = await svc().aplicarSubirNivel(pid, body);
             const p = res.personagem;
             if (typeof window.t20PreencherFormPersonagem === 'function') {
                 window.t20PreencherFormPersonagem(p);
@@ -149,6 +252,9 @@
                     window.t20WritePairSlash('fichaPv', p.pv_atual, p.pv_max);
                     window.t20WritePairSlash('fichaPm', p.pa_atual, p.pa_max);
                 }
+            }
+            if (window.T20MulticlasseV13 && typeof window.T20MulticlasseV13.aplicarPayload === 'function') {
+                window.T20MulticlasseV13.aplicarPayload(p.ficha_json || {});
             }
             if (typeof window.atualizarResumoClasseMb === 'function') {
                 window.atualizarResumoClasseMb();

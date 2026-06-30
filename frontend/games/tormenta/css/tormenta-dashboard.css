@@ -1981,3 +1981,51 @@
 .cad-wizard-checklist__aviso {
     margin: 0.35rem 0 0;
 }
+
+.cad-equip-preview-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.cad-equip-preview-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+}
+
+.cad-equip-preview-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.cad-equip-preview-tag--origem {
+    background: rgba(120, 180, 255, 0.18);
+    color: #7eb8ff;
+}
+
+.t20-obrig-list,
+.cad-obrig-list {
+    margin: 0;
+    padding-left: 1.15rem;
+    font-size: 0.88rem;
+}
+
+.t20-obrig-list li,
+.cad-obrig-list li {
+    margin: 0.15rem 0;
+}
+
+.t20-obrig-pag {
+    font-weight: normal;
+    opacity: 0.85;
+}

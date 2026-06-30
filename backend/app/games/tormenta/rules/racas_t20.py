@@ -7,6 +7,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from app.games.tormenta.rules.escolhas_raciais_t20 import (
+    escolhas_por_raca,
+    flag_escolha_por_tipo,
+)
 from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_MB,
     normalizar_regra_versao,
@@ -92,6 +96,9 @@ def lista_racas(regra_versao: Optional[str] = None) -> List[Dict[str, Any]]:
                 xx = str(x).lower().strip()
                 if xx in ("for", "des", "con", "int", "sab", "car"):
                     excluir.append(xx)
+        esc_cfg = escolhas_por_raca(slug, regra_versao)
+        esc_tipo = str((esc_cfg or {}).get("tipo") or "")
+        esc_flag = flag_escolha_por_tipo(esc_tipo, slug)
         out.append(
             {
                 "slug": slug,
@@ -101,6 +108,14 @@ def lista_racas(regra_versao: Optional[str] = None) -> List[Dict[str, Any]]:
                 "escolhe_tres_mais1": bool(row.get("escolhe_tres_mais1")),
                 "escolhe_um_mais2": bool(row.get("escolhe_um_mais2")),
                 "escolhe_suraggel_subtipo": bool(row.get("escolhe_suraggel_subtipo")),
+                "escolhe_lefou_deformidade": esc_flag == "escolhe_lefou_deformidade",
+                "escolhe_qareen_ascendencia": esc_flag == "escolhe_qareen_ascendencia",
+                "escolhe_osteon_memoria": esc_flag == "escolhe_osteon_memoria",
+                "escolhe_sereia_magias": esc_flag == "escolhe_sereia_magias",
+                "escolhe_golem_fonte": esc_flag == "escolhe_golem_fonte",
+                "escolhe_kliren_hibrido": esc_flag == "escolhe_kliren_hibrido",
+                "escolhe_silfide_magias": esc_flag == "escolhe_silfide_magias",
+                "magias_inatas_v13": esc_flag == "magias_inatas_v13",
                 "excluir_atributos_mais2": excluir,
                 "excluir_atributos_mais1": [
                     str(x).lower().strip()

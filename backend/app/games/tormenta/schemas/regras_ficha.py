@@ -96,6 +96,38 @@ class TormentaRacaMbItem(BaseModel):
     )
     excluir_atributos_mais1: List[str] = Field(default_factory=list)
     escolhe_suraggel_subtipo: bool = False
+    escolhe_lefou_deformidade: bool = Field(
+        default=False,
+        description="v1.3: Lefou — Deformidade (+2 em 2 perícias ou 1 perícia + poder Tormenta).",
+    )
+    escolhe_qareen_ascendencia: bool = Field(
+        default=False,
+        description="v1.3: Qareen — ascendência elementar e magia 1º círculo.",
+    )
+    magias_inatas_v13: bool = Field(
+        default=False,
+        description="v1.3: raça concede magia(s) inata(s) fixas (ex.: Dahllan).",
+    )
+    escolhe_osteon_memoria: bool = Field(
+        default=False,
+        description="v1.3: Osteon — Memória Póstuma (perícia ou poder geral).",
+    )
+    escolhe_sereia_magias: bool = Field(
+        default=False,
+        description="v1.3: Sereia/Tritão — 2 magias da Canção dos Mares.",
+    )
+    escolhe_golem_fonte: bool = Field(
+        default=False,
+        description="v1.3: Golem — Fonte Elemental + poder geral.",
+    )
+    escolhe_kliren_hibrido: bool = Field(
+        default=False,
+        description="v1.3: Kliren — perícia Híbrido + Ofício Vanguardista.",
+    )
+    escolhe_silfide_magias: bool = Field(
+        default=False,
+        description="v1.3: Sílfide — 2 magias das Fadas.",
+    )
     mod_car_fixo: int = Field(default=0, ge=-10, le=10)
     tracos_resumo: str = Field(default="", max_length=8000)
     idioma_racial_mb: Optional[str] = Field(
@@ -219,6 +251,11 @@ class TormentaRegrasClassesResponse(BaseModel):
     classes: List[TormentaClasseMbItem]
 
 
+class TormentaObrigacaoFlagItem(BaseModel):
+    slug: str = Field(..., max_length=60)
+    rotulo: str = Field(..., max_length=120)
+
+
 class TormentaDivindadeMbOpcao(BaseModel):
     """Uma divindade do MB: `slug` para motor/regras futuras; `rotulo` é o valor persistido em `divindade`."""
 
@@ -243,6 +280,20 @@ class TormentaDivindadeMbOpcao(BaseModel):
     poderes_concedidos: List[str] = Field(
         default_factory=list,
         description="Slugs dos 4 poderes concedidos (Tabela 1-20 v1.3).",
+    )
+    pagina: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=999,
+        description="Página v1.3 com Obrigações & Restrições (Tabela 1-20).",
+    )
+    obrigacoes_flags: List[TormentaObrigacaoFlagItem] = Field(
+        default_factory=list,
+        description="Flags compactas de obrigações/restrições (RF-T09h).",
+    )
+    sem_penalidade_obrigacao: bool = Field(
+        default=False,
+        description="True se violar O&R não causa perda de PM (ex.: Nimb).",
     )
 
 
@@ -324,6 +375,17 @@ class TormentaCatalogoItem(BaseModel):
         default=None,
         max_length=80,
         description="Referência de página no MB (talentos).",
+    )
+    categoria_v13: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="Categoria v1.3: geral, combate, destino, magia, concedido, tormenta, classe.",
+    )
+    custo_pm: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=99,
+        description="PM gastos ao ativar o poder (0 = passivo ou desconhecido).",
     )
     custo: Optional[str] = Field(default=None, max_length=80)
     dano_p: Optional[str] = Field(default=None, max_length=40)
@@ -518,6 +580,19 @@ class TormentaTracosRaciaisPreviewResponse(BaseModel):
     regra_versao: str = Field(default="mb", max_length=8)
     tamanho: Optional[str] = None
     deslocamento_m: Optional[int] = None
+    tamanho_ui: Optional[str] = Field(
+        None,
+        max_length=8,
+        description="Código UI: M, P, Min, G…",
+    )
+    tamanho_label: Optional[str] = Field(None, max_length=40)
+    deslocamento_natacao_m: Optional[int] = Field(None, ge=0, le=999)
+    deslocamento_voo_m: Optional[int] = Field(None, ge=0, le=999)
+    deslocamento_pairar_m: Optional[int] = Field(None, ge=0, le=999)
+    desloc_nao_reduz_armadura_carga: bool = Field(
+        default=False,
+        description="Anão/Golem: deslocamento não reduzido por armadura ou carga.",
+    )
     ca_bonus: int = 0
     ca_vs_grande_ou_maior: int = 0
     ataque_bonus: int = 0
@@ -527,6 +602,77 @@ class TormentaTracosRaciaisPreviewResponse(BaseModel):
     vontade_bonus: int = 0
     pericias_bonus: Dict[str, int] = Field(default_factory=dict)
     pericias_treinadas_extra: int = Field(default=0, ge=0, le=20)
+    reducao_dano: Dict[str, int] = Field(
+        default_factory=dict,
+        description="RD por tipo de dano (escolhas raciais v1.3, ex.: qareen).",
+    )
+    imunidades_dano: Dict[str, bool] = Field(
+        default_factory=dict,
+        description="Imunidade a tipo de dano (escolhas raciais v1.3, ex.: golem).",
+    )
+    magias_inatas: List[str] = Field(
+        default_factory=list,
+        description="Slugs de magias inatas raciais (v1.3).",
+    )
+    escolhas_resumo: List[str] = Field(default_factory=list)
+    pericias_treinadas_escolha: List[str] = Field(
+        default_factory=list,
+        description="Perícias marcadas treinadas por escolha racial (ex.: Osteon).",
+    )
+
+
+class TormentaEscolhaRacialFonteItem(BaseModel):
+    slug: str = Field(..., max_length=40)
+    rotulo: str = Field(..., max_length=80)
+    imunidade_tipo: str = Field(..., max_length=40)
+
+
+class TormentaEscolhaRacialMagiaOpcaoItem(BaseModel):
+    slug: str = Field(..., max_length=80)
+    nome: str = Field(..., max_length=120)
+
+
+class TormentaEscolhaRacialModoItem(BaseModel):
+    slug: str = Field(..., max_length=40)
+    rotulo: str = Field(..., max_length=200)
+    slots_pericia: int = Field(0, ge=0, le=5)
+    slots_poder_tormenta: int = Field(0, ge=0, le=3)
+
+
+class TormentaEscolhaRacialAscendenciaItem(BaseModel):
+    slug: str = Field(..., max_length=40)
+    rotulo: str = Field(..., max_length=80)
+    rd_tipo: str = Field(..., max_length=40)
+    rd_valor: int = Field(..., ge=0, le=99)
+
+
+class TormentaEscolhaRacialMagiaInataItem(BaseModel):
+    slug: str = Field(..., max_length=80)
+    nome: str = Field(..., max_length=120)
+    atributo_chave: str = Field(..., max_length=8)
+
+
+class TormentaEscolhasRaciaisRacaResponse(BaseModel):
+    slug: str = Field(..., max_length=40)
+    tipo: str = Field(..., max_length=40)
+    bonus_pericia: Optional[int] = Field(None, ge=0, le=20)
+    categoria_poder: Optional[str] = Field(None, max_length=40)
+    modos: Optional[List[TormentaEscolhaRacialModoItem]] = None
+    ascendencias: Optional[List[TormentaEscolhaRacialAscendenciaItem]] = None
+    magias_inatas: Optional[List[TormentaEscolhaRacialMagiaInataItem]] = None
+    magia_circulo: Optional[int] = Field(None, ge=0, le=9)
+    magia_lista: Optional[str] = Field(None, max_length=20)
+    magia_atributo_chave: Optional[str] = Field(None, max_length=8)
+    escolhas_qtd: Optional[int] = Field(None, ge=1, le=6)
+    magias_opcoes: Optional[List[TormentaEscolhaRacialMagiaOpcaoItem]] = None
+    fontes: Optional[List[TormentaEscolhaRacialFonteItem]] = None
+    bonus_oficio: Optional[int] = Field(None, ge=0, le=20)
+    slots_pericia: Optional[int] = Field(None, ge=0, le=5)
+
+
+class TormentaEscolhasRaciaisResponse(BaseModel):
+    regra_versao: str = Field(default="v13", max_length=8)
+    raca: TormentaEscolhasRaciaisRacaResponse
 
 
 class TormentaDificuldadePadraoItem(BaseModel):
@@ -580,6 +726,11 @@ class TormentaPericiaBonusRequest(BaseModel):
         default=False,
         description="Sobrecarga de carga v1.3: +5 penalidade de armadura em perícias.",
     )
+    tormenta_classe_mb_slug: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="Slug da classe v1.3 — proficiência de armadura (RF-T07e-1).",
+    )
 
 
 class TormentaPericiaBonusResponse(BaseModel):
@@ -611,6 +762,21 @@ class TormentaPericiaRolarResponse(BaseModel):
     falha_critica: bool
     sucesso_critico: bool
     margem: int
+
+
+class TormentaAtaqueBonusRequest(BaseModel):
+    bonus_base: int = Field(0, ge=-99, le=99)
+    nome_arma: Optional[str] = Field(default=None, max_length=120)
+    proficiencia_arma: Optional[str] = Field(default=None, max_length=40)
+    tormenta_classe_mb_slug: Optional[str] = Field(default=None, max_length=40)
+
+
+class TormentaAtaqueBonusResponse(BaseModel):
+    bonus_base: int
+    bonus_efetivo: int
+    penalidade_nao_proficiente: int = Field(default=0, ge=0, le=5)
+    proficiente: bool = True
+    proficiencia_arma: str = Field(default="simples", max_length=40)
 
 
 class TormentaCargaItemRef(BaseModel):
@@ -645,6 +811,40 @@ class TormentaCargaPreviewResponse(BaseModel):
     penalidade_armadura_extra: int = 0
     deslocamento_extra_m: int = 0
     detalhes: List[TormentaCargaDetalheItem] = Field(default_factory=list)
+
+
+class TormentaMulticlasseClasseItem(BaseModel):
+    slug: str = Field(..., min_length=1, max_length=40)
+    nivel: int = Field(..., ge=1, le=40)
+
+
+class TormentaPmMulticlasseLinha(BaseModel):
+    slug: str = Field(..., max_length=40)
+    nome: str = Field(default="", max_length=80)
+    nivel: int = Field(..., ge=1, le=40)
+    pm_por_nivel: Optional[int] = Field(default=None, ge=0, le=99)
+    pm_classe: Optional[int] = Field(default=None, ge=0, le=9999)
+
+
+class TormentaPmMulticlassePreviewRequest(BaseModel):
+    classes: List[TormentaMulticlasseClasseItem] = Field(default_factory=list)
+    regra_versao: Optional[str] = Field(default=None, max_length=8)
+
+
+class TormentaPmMulticlassePreviewResponse(BaseModel):
+    regra_versao: str = Field(default="v13", max_length=8)
+    pm_max: Optional[int] = Field(default=None, ge=0, le=9999)
+    breakdown: List[TormentaPmMulticlasseLinha] = Field(default_factory=list)
+    formula: str = Field(default="", max_length=500)
+    nivel_total_classes: int = Field(default=0, ge=0, le=800)
+
+
+class TormentaDinheiroInicialResponse(BaseModel):
+    regra_versao: str = Field(default="v13", max_length=8)
+    nivel: int = Field(..., ge=1, le=40)
+    tipo: str = Field(..., description="4d6 ou fixo", max_length=8)
+    valor: Optional[int] = Field(default=None, ge=0, le=9999999)
+    tabela_ref: str = Field(default="Tabela 3-1", max_length=32)
 
 
 class TormentaPvPreviewResponse(BaseModel):
@@ -705,3 +905,18 @@ class TormentaPericiasValidarCriacaoResponse(BaseModel):
     vagas_treinadas_base: Optional[int] = Field(default=None, ge=0, le=99)
     nivel: int = Field(default=1, ge=1, le=40)
     classe_slug: str = Field(default="", max_length=40)
+
+
+class TormentaCondicaoV13Item(BaseModel):
+    slug: str = Field(..., max_length=60)
+    nome: str = Field(..., max_length=80)
+    categoria: Optional[str] = Field(default=None, max_length=40)
+    mod_ataque: Optional[int] = None
+    mod_ca: Optional[int] = None
+    efeito_resumo: Optional[str] = Field(default=None, max_length=400)
+
+
+class TormentaCondicoesV13Response(BaseModel):
+    condicoes: list[TormentaCondicaoV13Item]
+    situacoes_especiais: list[TormentaCondicaoV13Item]
+    total: int = Field(..., ge=0)

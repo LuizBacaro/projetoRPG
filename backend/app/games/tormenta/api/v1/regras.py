@@ -28,6 +28,10 @@ from app.games.tormenta.rules.catalogo_t20 import (
     filtrar_talentos_mb,
 )
 from app.games.tormenta.rules.classes_t20 import lista_classes
+from app.games.tormenta.rules.condicoes_t20 import (
+    lista_condicoes_v13,
+    lista_situacoes_especiais_v13,
+)
 from app.games.tormenta.rules.conjuracao_t20 import (
     cd_resistencia_magia_t20,
     custo_pm_preparar_ou_lancar_magia,
@@ -41,6 +45,10 @@ from app.games.tormenta.rules.conjuracao_t20 import (
 from app.games.tormenta.rules.devocao_divindade_t20 import (
     truque_devocao_por_divindade_mb,
 )
+from app.games.tormenta.rules.dinheiro_inicial_v13_t20 import (
+    preview_dinheiro_inicial_v13,
+)
+from app.games.tormenta.rules.escolhas_raciais_t20 import escolhas_por_raca
 from app.games.tormenta.rules.kit_inicial_v13_t20 import opcoes_kit_inicial_v13
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
@@ -63,7 +71,14 @@ from app.games.tormenta.rules.pericias_t20 import (
     racial_bonus_pericia,
     rolar_teste_pericia,
 )
-from app.games.tormenta.rules.progressao_pv_t20 import preview_pv_mb
+from app.games.tormenta.rules.proficiencia_arma_t20 import ajustar_bonus_ataque_v13
+from app.games.tormenta.rules.proficiencia_armadura_t20 import (
+    tem_protecao_sem_proficiencia,
+)
+from app.games.tormenta.rules.progressao_pv_t20 import (
+    preview_pm_multiclasse_v13,
+    preview_pv_mb,
+)
 from app.games.tormenta.rules.racas_t20 import idiomas_mb_extras, lista_racas
 from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_V13,
@@ -77,17 +92,30 @@ from app.games.tormenta.rules.tracos_raciais_t20 import preview_tracos_raciais
 from app.games.tormenta.schemas.regras_ficha import (
     TormentaArmaduraCatalogoItem,
     TormentaArmaduraCatalogoPaginaResponse,
+    TormentaAtaqueBonusRequest,
+    TormentaAtaqueBonusResponse,
+    TormentaBeneficioNivelMbItem,
     TormentaCargaDetalheItem,
     TormentaCargaPreviewRequest,
     TormentaCargaPreviewResponse,
     TormentaCatalogoItem,
     TormentaCatalogoPaginaResponse,
     TormentaClasseMbItem,
+    TormentaCondicaoV13Item,
+    TormentaCondicoesV13Response,
     TormentaConjuracaoClasseMbItem,
     TormentaConjuracaoCustoCirculoItem,
     TormentaConjuracaoPreviewResponse,
     TormentaCustoAtributoItem,
+    TormentaDinheiroInicialResponse,
     TormentaDivindadeMbOpcao,
+    TormentaEscolhaRacialAscendenciaItem,
+    TormentaEscolhaRacialFonteItem,
+    TormentaEscolhaRacialMagiaInataItem,
+    TormentaEscolhaRacialMagiaOpcaoItem,
+    TormentaEscolhaRacialModoItem,
+    TormentaEscolhasRaciaisRacaResponse,
+    TormentaEscolhasRaciaisResponse,
     TormentaGerarAtributosRequest,
     TormentaGerarAtributosResponse,
     TormentaIdiomaTabelaItem,
@@ -102,6 +130,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaPericiaRolarResponse,
     TormentaPericiasValidarCriacaoRequest,
     TormentaPericiasValidarCriacaoResponse,
+    TormentaPmMulticlassePreviewRequest,
+    TormentaPmMulticlassePreviewResponse,
     TormentaPvPreviewResponse,
     TormentaRacaMbItem,
     TormentaRegrasAtributosResponse,
@@ -260,6 +290,9 @@ def obter_regras_identidade_mb(
                 truque_devocao_slug=truque_devocao_por_divindade_mb(slug),
                 energia=row.get("energia"),
                 poderes_concedidos=list(row.get("poderes_concedidos") or []),
+                pagina=row.get("pagina"),
+                obrigacoes_flags=list(row.get("obrigacoes_flags") or []),
+                sem_penalidade_obrigacao=bool(row.get("sem_penalidade_obrigacao")),
             )
         )
     return TormentaRegrasIdentidadeMbResponse(
@@ -333,14 +366,25 @@ def listar_catalogo_equipamentos(
     response_model=TormentaCatalogoPaginaResponse,
     summary="Catálogo MB de talentos (agregado das classes + busca)",
 )
+@router.get(
+    "/poderes",
+    response_model=TormentaCatalogoPaginaResponse,
+    summary="Alias v1.3 — catálogo de poderes (mesmo que /talentos)",
+    include_in_schema=True,
+)
 def listar_catalogo_talentos(
     q: Optional[str] = None,
+    categoria_v13: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Filtrar por categoria v1.3 (geral, combate, destino, magia, concedido, tormenta, classe).",
+    ),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=200),
     response: Response = None,
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaCatalogoPaginaResponse:
-    slice_rows, total = filtrar_talentos_mb(q, skip, limit)
+    slice_rows, total = filtrar_talentos_mb(q, skip, limit, categoria_v13=categoria_v13)
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)
@@ -368,6 +412,26 @@ def listar_catalogo_armaduras_protecao(
         response.headers["X-Limit"] = str(limit)
     itens = [TormentaArmaduraCatalogoItem.model_validate(r) for r in slice_rows]
     return TormentaArmaduraCatalogoPaginaResponse(itens=itens, total=total)
+
+
+@router.get(
+    "/condicoes",
+    response_model=TormentaCondicoesV13Response,
+    summary="Catálogo de condições v1.3 (Apêndice B p.394) e situações especiais (Tabela 5-3)",
+)
+def listar_condicoes_v13(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaCondicoesV13Response:
+    cond = [TormentaCondicaoV13Item.model_validate(r) for r in lista_condicoes_v13()]
+    sit = [
+        TormentaCondicaoV13Item.model_validate(r)
+        for r in lista_situacoes_especiais_v13()
+    ]
+    return TormentaCondicoesV13Response(
+        condicoes=cond,
+        situacoes_especiais=sit,
+        total=len(cond) + len(sit),
+    )
 
 
 @router.get(
@@ -550,6 +614,63 @@ def obter_conjuracao_preview_mb(
 
 
 @router.get(
+    "/escolhas-raciais",
+    response_model=TormentaEscolhasRaciaisResponse,
+    summary="Escolhas raciais v1.3 (Lefou, Qareen, Dahllan)",
+)
+def obter_escolhas_raciais(
+    slug: str = Query(..., min_length=1, max_length=40),
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Edição: v13. Padrão v13.",
+    ),
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaEscolhasRaciaisResponse:
+    rv = normalizar_regra_versao(regra_versao or REGRA_VERSAO_V13)
+    if rv != REGRA_VERSAO_V13:
+        raise HTTPException(status_code=404, detail="Escolhas raciais só v1.3.")
+    s = slug.strip().lower()
+    cfg = escolhas_por_raca(s, rv)
+    if not cfg:
+        raise HTTPException(status_code=404, detail="Raça sem escolhas v1.3.")
+    modos = None
+    if cfg.get("modos"):
+        modos = [TormentaEscolhaRacialModoItem(**m) for m in cfg["modos"]]
+    asc = None
+    if cfg.get("ascendencias"):
+        asc = [TormentaEscolhaRacialAscendenciaItem(**a) for a in cfg["ascendencias"]]
+    mag = None
+    if cfg.get("magias_inatas"):
+        mag = [TormentaEscolhaRacialMagiaInataItem(**m) for m in cfg["magias_inatas"]]
+    mag_ops = None
+    if cfg.get("magias_opcoes"):
+        mag_ops = [
+            TormentaEscolhaRacialMagiaOpcaoItem(**m) for m in cfg["magias_opcoes"]
+        ]
+    fontes = None
+    if cfg.get("fontes"):
+        fontes = [TormentaEscolhaRacialFonteItem(**f) for f in cfg["fontes"]]
+    raca = TormentaEscolhasRaciaisRacaResponse(
+        slug=s,
+        tipo=str(cfg.get("tipo") or ""),
+        bonus_pericia=cfg.get("bonus_pericia"),
+        categoria_poder=cfg.get("categoria_poder"),
+        modos=modos,
+        ascendencias=asc,
+        magias_inatas=mag,
+        magia_circulo=cfg.get("magia_circulo"),
+        magia_lista=cfg.get("magia_lista"),
+        magia_atributo_chave=cfg.get("magia_atributo_chave"),
+        escolhas_qtd=cfg.get("escolhas_qtd"),
+        magias_opcoes=mag_ops,
+        fontes=fontes,
+        bonus_oficio=cfg.get("bonus_oficio"),
+        slots_pericia=cfg.get("slots_pericia"),
+    )
+    return TormentaEscolhasRaciaisResponse(regra_versao=rv, raca=raca)
+
+
+@router.get(
     "/tracos-raciais-preview",
     response_model=TormentaTracosRaciaisPreviewResponse,
     summary="Bônus mecânicos raciais (CA, resistências, perícias)",
@@ -565,12 +686,78 @@ def obter_tracos_raciais_preview(
         max_length=32,
         description="Humano v1.3: duas_pericias | pericia_poder",
     ),
+    lefou_deformidade_modo: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Lefou v1.3: duas_pericias | pericia_poder_tormenta",
+    ),
+    lefou_deformidade_pericias: Optional[str] = Query(
+        None,
+        max_length=500,
+        description="Lefou v1.3: perícias separadas por vírgula.",
+    ),
+    qareen_ascendencia: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Qareen v1.3: agua | ar | fogo | terra | luz | trevas",
+    ),
+    osteon_memoria_modo: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Osteon v1.3: pericia | poder_geral",
+    ),
+    osteon_memoria_pericia: Optional[str] = Query(
+        None,
+        max_length=120,
+    ),
+    sereia_magias: Optional[str] = Query(
+        None,
+        max_length=200,
+        description="Sereia v1.3: slugs de magias separados por vírgula.",
+    ),
+    golem_fonte_elemental: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Golem v1.3: agua | ar | fogo | terra.",
+    ),
+    kliren_pericia: Optional[str] = Query(None, max_length=120),
+    kliren_oficio: Optional[str] = Query(None, max_length=120),
+    silfide_magias: Optional[str] = Query(
+        None,
+        max_length=200,
+        description="Sílfide v1.3: slugs de magias separados por vírgula.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaTracosRaciaisPreviewResponse:
+    per_lefou = None
+    if lefou_deformidade_pericias:
+        per_lefou = [
+            p.strip() for p in str(lefou_deformidade_pericias).split(",") if p.strip()
+        ]
+    mag_sereia = None
+    if sereia_magias:
+        mag_sereia = [
+            p.strip().lower() for p in str(sereia_magias).split(",") if p.strip()
+        ]
+    mag_silfide = None
+    if silfide_magias:
+        mag_silfide = [
+            p.strip().lower() for p in str(silfide_magias).split(",") if p.strip()
+        ]
     data = preview_tracos_raciais(
         slug.strip().lower(),
         regra_versao=regra_versao,
         humano_versatil=humano_versatil,
+        lefou_deformidade_modo=lefou_deformidade_modo,
+        lefou_deformidade_pericias=per_lefou,
+        qareen_ascendencia=qareen_ascendencia,
+        osteon_memoria_modo=osteon_memoria_modo,
+        osteon_memoria_pericia=osteon_memoria_pericia,
+        sereia_magias=mag_sereia,
+        golem_fonte_elemental=golem_fonte_elemental,
+        kliren_pericia=kliren_pericia,
+        kliren_oficio=kliren_oficio,
+        silfide_magias=mag_silfide,
     )
     return TormentaTracosRaciaisPreviewResponse(**data)
 
@@ -632,12 +819,20 @@ def calcular_bonus_pericia_mb(
             meta,
             body.itens_protecao,
             uso_atletismo_natacao=body.uso_atletismo_natacao,
+            slug_classe=body.tormenta_classe_mb_slug,
         )
     else:
         pen_arm = int(body.penalidade_armadura)
     meta_pen = meta_pericia_por_nome(body.nome_pericia or "", rv)
+    nao_prof = False
+    if body.itens_protecao is not None:
+        nao_prof = tem_protecao_sem_proficiencia(
+            body.itens_protecao, body.tormenta_classe_mb_slug
+        )
     if body.penalidade_sobrecarga_carga and pericia_aplica_penalidade_armadura(
-        meta_pen, uso_atletismo_natacao=body.uso_atletismo_natacao
+        meta_pen,
+        uso_atletismo_natacao=body.uso_atletismo_natacao,
+        nao_proficiente_armadura=nao_prof,
     ):
         pen_arm += PENALIDADE_SOBRECARGA
     bonus = calcular_bonus_pericia(
@@ -679,6 +874,24 @@ def rolar_pericia_mb(
 ) -> TormentaPericiaRolarResponse:
     data = rolar_teste_pericia(body.bonus, body.dc)
     return TormentaPericiaRolarResponse(**data)
+
+
+@router.post(
+    "/ataque/ajustar-bonus",
+    response_model=TormentaAtaqueBonusResponse,
+    summary="Ajusta bônus de ataque v1.3 (−5 se não proficiente na arma)",
+)
+def ajustar_bonus_ataque_v13_api(
+    body: TormentaAtaqueBonusRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaAtaqueBonusResponse:
+    data = ajustar_bonus_ataque_v13(
+        body.bonus_base,
+        body.tormenta_classe_mb_slug,
+        nome_arma=body.nome_arma,
+        proficiencia_arma=body.proficiencia_arma,
+    )
+    return TormentaAtaqueBonusResponse(**data)
 
 
 @router.post(
@@ -748,6 +961,49 @@ def obter_pv_preview_mb(
         car_valor=car_valor,
     )
     return TormentaPvPreviewResponse(**data)
+
+
+@router.post(
+    "/pm-preview-multiclasse",
+    response_model=TormentaPmMulticlassePreviewResponse,
+    summary="PM máximos v1.3 — soma multiclasse (nível × pm/nível por classe)",
+)
+def obter_pm_preview_multiclasse_v13(
+    body: TormentaPmMulticlassePreviewRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPmMulticlassePreviewResponse:
+    rv = normalizar_regra_versao(body.regra_versao or REGRA_VERSAO_V13)
+    if rv != REGRA_VERSAO_V13:
+        raise HTTPException(
+            status_code=400,
+            detail="PM multiclasse por soma só está disponível na regra v1.3.",
+        )
+    classes = [{"slug": c.slug.strip().lower(), "nivel": c.nivel} for c in body.classes]
+    data = preview_pm_multiclasse_v13(classes)
+    return TormentaPmMulticlassePreviewResponse(**data)
+
+
+@router.get(
+    "/dinheiro-inicial",
+    response_model=TormentaDinheiroInicialResponse,
+    summary="Dinheiro inicial v1.3 — Tabela 3-1 por nível",
+)
+def obter_dinheiro_inicial_v13(
+    nivel: int = Query(1, ge=1, le=40),
+    regra_versao: Optional[str] = Query(
+        None,
+        description="Versão de regras: v13 (padrão).",
+    ),
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaDinheiroInicialResponse:
+    rv = normalizar_regra_versao(regra_versao or REGRA_VERSAO_V13)
+    if rv != REGRA_VERSAO_V13:
+        raise HTTPException(
+            status_code=400,
+            detail="Tabela 3-1 de dinheiro inicial só está disponível na regra v1.3.",
+        )
+    data = preview_dinheiro_inicial_v13(nivel)
+    return TormentaDinheiroInicialResponse(**data)
 
 
 @router.get(

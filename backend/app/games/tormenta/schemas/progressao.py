@@ -15,6 +15,10 @@ class TormentaSubirNivelPreviewResponse(BaseModel):
     nivel_atual: int = Field(..., ge=1, le=40)
     nivel_alvo: int = Field(..., ge=1, le=40)
     classe_slug: str = ""
+    classe_nivel_atual: Optional[int] = None
+    classe_nivel_novo: Optional[int] = None
+    classe_nova_multiclasse: bool = False
+    multiclasse_v13_novo: Optional[List[Dict[str, Any]]] = None
     nivel_conjuracao_atual: Optional[int] = None
     nivel_conjuracao_novo: Optional[int] = None
     pv_max_atual: Optional[int] = None
@@ -44,6 +48,10 @@ class TormentaSubirNivelAplicarRequest(BaseModel):
     aplicar_ganhos_vida: bool = Field(
         True,
         description="Soma pv_ganho aos PV atuais (até o novo máximo).",
+    )
+    classe_slug: Optional[str] = Field(
+        None,
+        description="Classe v1.3 que recebe +1 (multiclasse). Omitido = classe principal.",
     )
 
 

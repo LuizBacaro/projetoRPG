@@ -80,6 +80,9 @@
     }
 
     function somaBonusProtecao(itensProtecao) {
+        if (global.T20LimitesEquipamento && global.T20LimitesEquipamento.somaBonusCaAtivos) {
+            return global.T20LimitesEquipamento.somaBonusCaAtivos(itensProtecao);
+        }
         return (itensProtecao || []).reduce(
             (acc, it) => acc + (Number(it && it.bonus_ca) || 0),
             0

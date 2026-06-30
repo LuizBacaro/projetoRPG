@@ -56,3 +56,35 @@ def test_tem_armadura_pesada() -> None:
 def test_soma_bonus_protecao() -> None:
     itens = [{"bonus_ca": 6}, {"bonus_ca": 1}]
     assert soma_bonus_protecao(itens) == 7
+
+
+def test_defesa_total_v13_ficha_com_armadura_e_escudo() -> None:
+    from app.games.tormenta.rules.defesa_t20 import defesa_total_v13_ficha
+
+    armaduras = [
+        {"nome": "Couro", "tipo": "leve", "bonus_ca": 2},
+        {"nome": "Broquel", "tipo": "escudo", "bonus_ca": 1, "empunhado": True},
+    ]
+    assert defesa_total_v13_ficha(2, armaduras, []) == 15
+
+
+def test_ca_efetiva_personagem_v13_com_armadura() -> None:
+    from app.games.tormenta.rules.defesa_t20 import ca_efetiva_personagem
+
+    fj = {
+        "regra_versao": "v13",
+        "armaduras_protecao": [
+            {"nome": "Couro", "tipo": "leve", "bonus_ca": 2},
+            {"nome": "Broquel", "tipo": "escudo", "bonus_ca": 1, "empunhado": True},
+        ],
+    }
+    assert ca_efetiva_personagem(des_valor=3, ca=13, ficha_json=fj) == 16
+
+
+def test_ca_efetiva_personagem_mb_soma_itens() -> None:
+    from app.games.tormenta.rules.defesa_t20 import ca_efetiva_personagem
+
+    fj = {
+        "armaduras_protecao": [{"nome": "Couro", "tipo": "leve", "bonus_ca": 2}],
+    }
+    assert ca_efetiva_personagem(des_valor=12, ca=11, ficha_json=fj) == 13

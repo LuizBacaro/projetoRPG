@@ -232,16 +232,19 @@
 
     function resolverItensOrigemPreview(row) {
         if (!row) return [];
+        const fixos = Array.isArray(row.itens) ? row.itens.slice() : [];
         if (row.itens_escolha && Array.isArray(row.itens_escolha.opcoes)) {
             const slug = row.slug;
             const pick =
                 (global.__t20OrigemItensEscolha && global.__t20OrigemItensEscolha[slug]) ||
                 row.itens_escolha.default ||
                 '';
-            const op = row.itens_escolha.opcoes.find((x) => x.slug === pick) || row.itens_escolha.opcoes[0];
-            return op && Array.isArray(op.itens) ? op.itens.slice() : [];
+            const op =
+                row.itens_escolha.opcoes.find((x) => x.slug === pick) || row.itens_escolha.opcoes[0];
+            const escolhidos = op && Array.isArray(op.itens) ? op.itens.slice() : [];
+            return fixos.concat(escolhidos);
         }
-        return Array.isArray(row.itens) ? row.itens.slice() : [];
+        return fixos;
     }
 
     function coletarEquipamentosPreview() {

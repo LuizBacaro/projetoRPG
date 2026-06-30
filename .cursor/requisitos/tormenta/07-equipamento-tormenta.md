@@ -152,9 +152,9 @@ Inventor e classes com itens superiores: cross-ref `03-classes-tormenta.md`.
 | Arcanista sem armadura no kit | **Feito** | `sem_armadura` em `kit_inicial_v13_t20.py` |
 | T$ 4d6 no wizard | **Feito** | Botão «Rolar T$ 4d6»; persiste em `ficha_json.dinheiro` |
 | Defesa v1.3 (valor DES, armadura pesada sem DES) | **Feito** | `defesa_t20.py` (`defesa_total_v13`); ficha `t20CalcularCaTotal()` |
-| Penalidade armadura por perícia | **Feito** | `penalidade_armadura_t20.py`; ficha + rolador v1.3 |
+| Penalidade armadura por perícia | **Feito** | `penalidade_armadura_t20.py`; ficha + rolador v1.3; proficiência For/Des (RF-T07e-1) |
 | Carga / espaços | **Feito** | `carga_t20.py`, API `carga-preview`, ficha v1.3 |
-| Revisão preços/stats catálogo v1.3 | **Parcial** | Armaduras/escudos + espacos; overlay armas kit (`armas_v13_overlay.json`); tabela 3-3 completa fora do repo |
+| Revisão preços/stats catálogo v1.3 | **Feito** | Tabela 3-3 core (~56 itens); legacy MB documentado (Cajado, Estilingue, Wakizashi, mangual, martelo leve, arco composto) |
 
 ## Implementação — criação v1.3 (dashboard)
 
@@ -194,11 +194,16 @@ Itens fixos do kit (sempre adicionados quando há `kit_inicial_v13`): **Mochila*
 
 ## Gap código
 
-- Backend pode usar nomenclatura ou valores do **MB** no catálogo geral; revisar `equipamentos_mb_catalogo.json` contra Tabelas 3-3 e 3-5 v1.3.
+- Backend pode usar nomenclatura ou valores do **MB** no catálogo geral; revisão Tabelas 3-3 e 3-5 v1.3 — **Feito** para armas core + legacy MB documentado (**RF-T07a-1**).
 - ~~Defesa na ficha (valor DES; pesada sem DES)~~ — **Feito** (`defesa_t20.py`, `t20-regra-versao.js`, ficha).
-- Penalidade de armadura em perícias For/Des: integração completa com item equipado — **Feito** (RF-T07e / RF-T04d).
+- Penalidade de armadura em perícias For/Des: integração completa com item equipado — **Feito** (RF-T07e / RF-T04d); proficiência armadura em **todas** For/Des — **Feito** (RF-T07e-1).
 - Carga v1.3: motor em `rules/carga_t20.py` — **Feito** (RF-T07f).
-- Personagens **acima do 1º nível**: Tabela 3-1 (dinheiro por nível) — **não** implementada no wizard (só kit no nv 1).
+- Personagens **acima do 1º nível**: Tabela 3-1 (dinheiro por nível) — **Feito** (RF-T07g-1).
+- Modal equipamentos: exibir espaços/proficiência v1.3 — **Feito** (RF-T07a-2).
+- Limite 4 vestidos / 2 empunhados (p.141) — **Feito** (RF-T07h-1; escudos + armas ⚔️ marcadas em Ataques).
+- Arena: CA com armaduras equipadas — **Feito** (RF-T07d-1: `ca_efetiva_personagem`, combate Tormenta).
+
+Backlog central: `docs/tormenta/03-requisitos-funcionais-backlog.md` (secção **Backlog v1.3**).
 
 ## Critérios de aceite
 
@@ -216,7 +221,8 @@ Itens fixos do kit (sempre adicionados quando há `kit_inicial_v13`): **Mochila*
 - Kit p.140: `backend/app/games/tormenta/rules/kit_inicial_v13_t20.py`
 - Sync ficha → SQL: `backend/app/games/tormenta/rules/equipamentos_ficha_v13_t20.py`
 - Serviço: `backend/app/games/tormenta/services/personagem_equipamentos_service.py`
-- Penalidade armadura: `backend/app/games/tormenta/rules/penalidade_armadura_t20.py`, `frontend/games/tormenta/js/t20-penalidade-armadura.js`
+- Penalidade armadura: `backend/app/games/tormenta/rules/penalidade_armadura_t20.py`, `proficiencia_armadura_t20.py`, `frontend/games/tormenta/js/t20-penalidade-armadura.js`
+- Limites vestido/empunhado: `limites_equipamento_v13_t20.py`, `t20-limites-equipamento-v13.js`
 - API kit: `GET /api/v1/tormenta/regras/kit-inicial`
 - Skill: `tormenta-20-arena-arquitetura-e-regras`
 - Cross-ref origens: `09-origens-divindades-tormenta.md`

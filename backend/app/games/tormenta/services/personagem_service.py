@@ -23,6 +23,10 @@ from app.games.tormenta.rules.origens_t20 import (
     validar_beneficios_origem,
 )
 from app.games.tormenta.rules.pericias_criacao_t20 import validar_pericias_ficha
+from app.games.tormenta.rules.progressao_pv_t20 import (
+    niveis_multiclasse_v13_de_ficha,
+    preview_pm_multiclasse_v13,
+)
 from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_V13,
     regra_versao_de_ficha,
@@ -131,6 +135,12 @@ class TormentaPersonagemService:
         if not slug:
             return None
         rv = regra_versao_de_ficha(fj)
+        if rv == REGRA_VERSAO_V13:
+            linhas = niveis_multiclasse_v13_de_ficha(fj, int(nivel_personagem))
+            if linhas:
+                prev = preview_pm_multiclasse_v13(linhas)
+                pm = prev.get("pm_max")
+                return int(pm) if pm is not None else None
         arcanista = str(fj.get("arcanista_caminho") or "").strip().lower() or None
         nv = (
             int(nivel_personagem)

@@ -77,8 +77,8 @@ Persistir escolha em `ficha_json` (ex.: `humano_versatil: "duas_pericias" | "per
 | RF-T02d | Lefou / Osteon / Sereia: regras de +1×3 com exceção | P0 |
 | RF-T02e | Suraggel: escolha aggelus vs sulfure | P1 |
 | RF-T02f | Preview traços + motor `tracos_raciais_t20.py` | P0 |
-| RF-T02g | Tamanho/deslocamento automático (Tabela 1-21 + exceções) | P1 |
-| RF-T02h | Escolhas estruturadas (lefou, qareen, dahllan magias, etc.) | P2 |
+| RF-T02g | Tamanho/deslocamento automático (Tabela 1-21 + exceções) | **Feito** |
+| RF-T02h | Escolhas estruturadas (lefou, qareen, golem, kliren, osteon, sereia, sílfide…) | **Feito** |
 
 ## Estado de implementação
 
@@ -89,9 +89,21 @@ Persistir escolha em `ficha_json` (ex.: `humano_versatil: "duas_pericias" | "per
 | Humano +1×3 + Versátil | **Feito** | UI + `humano_versatil` no JSON |
 | Lefou / Osteon / Sereia +1×3 | **Feito** | Exclusões de atributo na UI |
 | Suraggel aggelus/sulfure | **Feito** | UI + persistência |
-| Tamanho/deslocamento automático | **Parcial** | Preview API aplica desloc/tamanho |
-| Escolhas P2 (lefou deformidade, qareen…) | **Pendente** | P2 |
+| Tamanho/deslocamento automático | **Feito** | Preview API + ficha + wizard; elfo 12 m, anão/golem exceções, sereia/sílfide |
+| Escolhas P2 (todas as raças com escolha v1.3) | **Feito** | lefou, qareen, golem, kliren, osteon, sereia, sílfide + dahllan fixo |
+| Traços fixos (hynne, medusa, trog…) | **Feito** | `tracos_mecanicos_v13.json` |
 | `racas_mb.json` legado | **Mantido** | Fichas MB antigas |
+
+## Fora de escopo (habilidades raciais avançadas — backlog P2)
+
+Regras do livro v1.3 ainda **não modeladas** no motor/UI; persistência futura em `ficha_json` ou flags de combate.
+
+| ID | Raça / tema | Detalhe |
+|----|-------------|---------|
+| RF-T02-oos1 | **Golem** | Sem origem na criação; penalidade armadura −2; armadura acoplada (1 dia vestir/remover; não conta limite de itens) |
+| RF-T02-oos2 | **Osteon** | Memória Póstuma alternativa: osteon de outra raça humanoide (+ habilidade/tamanho da raça ancestral) |
+| RF-T02-oos3 | **Hynne** | Atletismo usa DES (não FOR); Sorte Salvadora (reroll resistência, 1 PM) |
+| RF-T02-oos4 | **Trog** | Furtividade +5 sem armadura/roupas pesadas (além do +2 base em tracos) |
 
 ## Gap código (MB → v1.3)
 

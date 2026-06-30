@@ -140,11 +140,11 @@ Persistir em `ficha_json`: `origem.slug`, `origem_beneficios: ["pericia:furtivid
 | RF-T09a | Campo `origem` em `ficha_json` + UI passo construção | P1 |
 | RF-T09b | Catálogo **35 origens** v1.3 + endpoint `GET /tormenta/regras/origens` | P1 |
 | RF-T09c | Escolha de 2 benefícios + validação perícia/poder | P1 |
-| RF-T09d | Itens de origem na criação (grátis) | P2 |
+| RF-T09d | Itens de origem na criação (grátis) | **Feito** |
 | RF-T09e | `GET /tormenta/regras/identidade-mb` → tendências + divindades v1.3 | P0 |
 | RF-T09f | Select divindade (`slug` + `rotulo`); flag `devoto: boolean` | P0 |
 | RF-T09g | Poder concedido vinculado à divindade escolhida | P1 |
-| RF-T09h | Obrigações/restrições (flags + link página PDF) | P2 |
+| RF-T09h | Obrigações/restrições (flags + link página PDF) | **Feito** |
 | RF-T09i | `_meta` e listas alinhadas Tabela 1-20 (Os Vinte) | P1 |
 | RF-T09j | Amnésico + origem custom (modo Mesa / notas) | P3 |
 | RF-T09k | Suplemento: distinções, Frade, deuses menores | P3 |
@@ -154,18 +154,20 @@ Persistir em `ficha_json`: `origem.slug`, `origem_beneficios: ["pericia:furtivid
 | Item | Estado |
 |------|--------|
 | Tendências + divindades JSON (20 entradas) | **Feito** |
-| API identidade-mb | **Feito** |
-| UI combos tendência/divindade | **Feito** |
-| **Origens** (35) | **Não feito** |
-| Poderes concedidos por deus no catálogo | **Parcial** |
-| `_meta.fonte` v1.3 | **Desatualizado** (cita MB p.116–126) |
+| API identidade-mb (`poderes_concedidos[]`, `energia`, truque devoção) | **Feito** |
+| UI combos tendência/divindade + poder concedido filtrado | **Feito** |
+| Validação devoção v1.3 (backend + wizard + ficha) | **Feito** |
+| Clérigo/druida/paladino: devoção obrigatória | **Feito** |
+| Sync SQL poder concedido (`auto:v13:concedido:*`) | **Feito** |
+| **Origens** (35) catálogo + API | **Feito** |
+| Origem UI wizard/ficha + benefícios | **Feito** |
+| Itens grátis origem na criação | **Feito** (RF-T09d) |
+| Obrigações/restrições (flags + link PDF) | **Feito** (RF-T09h) |
+| `_meta.fonte` v1.3 | **Feito** |
 
 ## Gap código
 
-- Criar `origens_mb_catalogo.json` (ou `origens_t20.json`) com 35 slugs e benefícios estruturados.
-- Atualizar `_meta` de `tendencias_divindades_mb.json` para v1.3 p.96–109; incluir `energia` e `poderes_concedidos[]` por deus.
-- Wizard de criação: passo origem entre classe e equipamento; aplicar treinamento em perícias e poderes escolhidos.
-- Paladino: validar devoção + tendência narrativa «bem e ordem» na UI (aviso, não bloqueio rígido salvo Mesa).
+- Paladino: aviso narrativo «bem e ordem» na UI (não bloqueio rígido) — **Feito** (hint wizard + ficha).
 
 ## Critérios de aceite
 

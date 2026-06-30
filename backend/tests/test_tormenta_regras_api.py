@@ -76,6 +76,32 @@ def test_post_gerar_atributos_4d6(client_regras_tormenta):
         assert 3 <= v <= 18
 
 
+def test_post_gerar_atributos_compra_pontos_v13(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/gerar-atributos",
+        json={"metodo": "compra_pontos", "regra_versao": "v13"},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["regra_versao"] == "v13"
+    assert all(v == 0 for v in body["valores"].values())
+    assert body["soma_modificadores"] == 0
+
+
+def test_post_gerar_atributos_4d6_v13(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/gerar-atributos",
+        json={"metodo": "4d6", "seed": 42, "regra_versao": "v13"},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["regra_versao"] == "v13"
+    assert body["qualidade_4d6_ok"] is True
+    vals = list(body["valores"].values())
+    assert all(-2 <= v <= 4 for v in vals)
+    assert sum(vals) >= 6
+
+
 def test_post_gerar_atributos_compra_pontos(client_regras_tormenta):
     r = client_regras_tormenta.post(
         "/api/v1/tormenta/regras/gerar-atributos",
@@ -127,6 +153,48 @@ def test_get_regras_racas_v13(client_regras_tormenta):
     assert "gnomo" not in slugs
     hum = next(x for x in body["racas"] if x["slug"] == "humano")
     assert hum["escolhe_tres_mais1"] is True
+    lef = next(x for x in body["racas"] if x["slug"] == "lefou")
+    assert lef["escolhe_lefou_deformidade"] is True
+
+
+def test_get_regras_escolhas_raciais_lefou(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/escolhas-raciais",
+        params={"slug": "lefou", "regra_versao": "v13"},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["regra_versao"] == "v13"
+    assert body["raca"]["slug"] == "lefou"
+    assert body["raca"]["tipo"] == "deformidade"
+    assert len(body["raca"]["modos"]) == 2
+
+
+def test_get_regras_escolhas_raciais_golem(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/escolhas-raciais",
+        params={"slug": "golem", "regra_versao": "v13"},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["raca"]["tipo"] == "fonte_elemental_poder"
+    assert len(body["raca"]["fontes"]) == 4
+
+
+def test_get_tracos_raciais_lefou_deformidade(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/tracos-raciais-preview",
+        params={
+            "slug": "lefou",
+            "regra_versao": "v13",
+            "lefou_deformidade_modo": "duas_pericias",
+            "lefou_deformidade_pericias": "Acrobacia,Percepção",
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["pericias_bonus"]["Acrobacia"] == 2
+    assert body["pericias_bonus"]["Percepção"] == 2
 
 
 def test_get_regras_classes(client_regras_tormenta):
@@ -151,6 +219,18 @@ def test_get_regras_classes_v13_beneficios(client_regras_tormenta):
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["regra_versao"] == "v13"
+    assert len(body["classes"]) == 14
+    slugs = {x["slug"] for x in body["classes"]}
+    assert "arcanista" in slugs
+    assert "mago" not in slugs
+    assert "ranger" not in slugs
+    bar = next(x for x in body["classes"] if x["slug"] == "barbaro")
+    assert bar["pv_inicial"] == 24
+    assert bar["pv_por_nivel"] == 6
+    assert bar["pm_por_nivel"] == 3
+    arc = next(x for x in body["classes"] if x["slug"] == "arcanista")
+    assert arc["pm_por_nivel"] == 6
+    assert arc.get("atributo_principal")
     assert len(body["beneficios_por_nivel"]) == 20
     nv1 = next(x for x in body["beneficios_por_nivel"] if x["nivel"] == 1)
     assert nv1["graduacao_pericias"] == "+2/+0"
@@ -246,6 +326,12 @@ def test_get_regras_identidade_mb(client_regras_tormenta):
     valk = next(d for d in body["divindades"] if d["slug"] == "valkaria")
     assert valk.get("energia")
     assert len(valk.get("poderes_concedidos") or []) == 4
+    ali = next(d for d in body["divindades"] if d["slug"] == "allihanna")
+    assert ali.get("pagina") == 97
+    flags = ali.get("obrigacoes_flags") or []
+    assert any(f.get("slug") == "nao_usar_armadura_metal" for f in flags)
+    nimb = next(d for d in body["divindades"] if d["slug"] == "nimb")
+    assert nimb.get("sem_penalidade_obrigacao") is True
 
 
 def test_get_regras_origens_v13(client_regras_tormenta):
@@ -269,10 +355,21 @@ def test_get_regras_armaduras_protecao_pagina(client_regras_tormenta):
     assert r.status_code == 200, r.text
     body = r.json()
     assert "itens" in body and "total" in body
-    assert body["total"] == 12
-    assert len(body["itens"]) == 12
+    assert body["total"] == 13
+    assert len(body["itens"]) == 13
     assert body["itens"][0]["nome"] == "Armadura de couro"
     assert body["itens"][0]["bonus_ca"] == 2
+
+
+def test_get_regras_condicoes_v13(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/condicoes")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["total"] >= 30
+    slugs = {c["slug"] for c in body["condicoes"]}
+    assert "desprevenido" in slugs
+    assert "vulneravel" in slugs
+    assert len(body["situacoes_especiais"]) >= 3
 
 
 def test_get_tracos_raciais_preview(client_regras_tormenta):
@@ -355,6 +452,23 @@ def test_post_pericias_calcular_bonus_acrobacia_com_armadura(client_regras_torme
     assert body["bonus_total"] == 7
 
 
+def test_post_pericias_calcular_bonus_percepcao_passiva(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pericias/calcular-bonus",
+        json={
+            "nivel": 3,
+            "mod_atributo": 4,
+            "treinado": True,
+            "regra_versao": "v13",
+            "nome_pericia": "Percepção",
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["bonus_total"] == 7
+    assert body["percepcao_passiva"] == 17
+
+
 def test_post_pericias_calcular_bonus_diplomacia_ignora_armadura(
     client_regras_tormenta,
 ):
@@ -373,6 +487,43 @@ def test_post_pericias_calcular_bonus_diplomacia_ignora_armadura(
     body = r.json()
     assert body["penalidade_armadura_aplicada"] == 0
     assert body["bonus_total"] == 3
+
+
+def test_post_pericias_calcular_bonus_luta_arcanista_sem_proficiencia(
+    client_regras_tormenta,
+):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pericias/calcular-bonus",
+        json={
+            "nivel": 5,
+            "mod_atributo": 3,
+            "treinado": False,
+            "regra_versao": "v13",
+            "nome_pericia": "Luta",
+            "tormenta_classe_mb_slug": "arcanista",
+            "itens_protecao": [{"nome": "Placas", "tipo": "pesada", "penalidade": -5}],
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["penalidade_armadura_aplicada"] == 5
+    assert body["bonus_total"] == 0
+
+
+def test_post_ataque_ajustar_bonus_arcanista_marcial(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/ataque/ajustar-bonus",
+        json={
+            "bonus_base": 6,
+            "nome_arma": "Espada longa",
+            "tormenta_classe_mb_slug": "arcanista",
+        },
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["bonus_efetivo"] == 1
+    assert body["penalidade_nao_proficiente"] == 5
+    assert body["proficiente"] is False
 
 
 def test_post_carga_preview_v13(client_regras_tormenta):
@@ -671,3 +822,57 @@ def test_get_regras_conjuracao_preview_guerreiro_sem_conjuracao(client_regras_to
     assert b.get("pontos_magia_maximos") is None
     assert b.get("magias_lista_tipo") is None
     assert b.get("magias_circulo_max") == 0
+
+
+def test_post_pm_preview_multiclasse_v13(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pm-preview-multiclasse",
+        json={
+            "classes": [
+                {"slug": "arcanista", "nivel": 3},
+                {"slug": "paladino", "nivel": 1},
+            ],
+            "regra_versao": "v13",
+        },
+    )
+    assert r.status_code == 200, r.text
+    b = r.json()
+    assert b["pm_max"] == 21
+    assert len(b["breakdown"]) == 2
+
+
+def test_get_dinheiro_inicial_v13(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/dinheiro-inicial",
+        params={"nivel": 5, "regra_versao": "v13"},
+    )
+    assert r.status_code == 200, r.text
+    b = r.json()
+    assert b["tipo"] == "fixo"
+    assert b["valor"] == 2000
+
+
+def test_get_poderes_categoria_filtro_v13(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/poderes",
+        params={"categoria_v13": "combate", "limit": 5},
+    )
+    assert r.status_code == 200, r.text
+    for it in r.json()["itens"]:
+        assert it.get("categoria_v13") == "combate"
+
+
+def test_get_conjuracao_preview_v13_cd_atributo_valor(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/conjuracao-preview",
+        params={
+            "classe_slug": "clerigo",
+            "nivel": 8,
+            "sab_valor": 5,
+            "regra_versao": "v13",
+        },
+    )
+    assert r.status_code == 200, r.text
+    b = r.json()
+    assert b["modificador_conjuracao"] == 5
+    assert b["cd_magia"] == 19

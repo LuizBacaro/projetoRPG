@@ -74,6 +74,7 @@
     { "nome": "Saco de seda", "categoria": "Equipamento" },
     { "nome": "Tocha", "categoria": "Equipamento" },
     { "nome": "Tridente", "categoria": "Arma corpo a corpo" },
+    { "nome": "Tacape", "categoria": "Arma corpo a corpo" },
     { "nome": "Vara (3 m)", "categoria": "Equipamento" },
     { "nome": "Virotes (10)", "categoria": "Munição" },
     { "nome": "Corda de prumo", "categoria": "Equipamento" },

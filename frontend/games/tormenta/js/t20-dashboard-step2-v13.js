@@ -124,7 +124,7 @@
         const wrapPv = q('cadWrapPvSugerido');
         if (!isV13Wizard()) {
             if (wrapPv) wrapPv.style.display = 'none';
-            ['cadWrapHumanoVersatil', 'cadWrapSuraggel', 'cadWrapArcanistaCaminho'].forEach((id) => {
+            ['cadWrapHumanoVersatil', 'cadWrapSuraggel', 'cadWrapArcanistaCaminho', 'cadWrapLefouDeformidade', 'cadWrapQareenEscolhas', 'cadWrapDahllanMagias', 'cadWrapOsteonMemoria', 'cadWrapSereiaMagias', 'cadWrapGolemEscolhas', 'cadWrapKlirenEscolhas', 'cadWrapSilfideMagias'].forEach((id) => {
                 const el = q(id);
                 if (el) el.style.display = 'none';
             });
@@ -138,6 +138,9 @@
         atualizarUiHumanoVersatil();
         atualizarUiSuraggel();
         atualizarUiArcanistaCaminho();
+        if (global.T20EscolhasRaciaisV13) {
+            global.T20EscolhasRaciaisV13.atualizarUiCadastro();
+        }
         void atualizarPvSugerido(false);
     }
 
@@ -178,6 +181,11 @@
             }
         }
 
+        if (global.T20EscolhasRaciaisV13) {
+            const vEsc = global.T20EscolhasRaciaisV13.validarCadastro();
+            if (!vEsc.ok) return vEsc;
+        }
+
         return { ok: true };
     }
 
@@ -209,6 +217,10 @@
             out.arcanista_caminho = cam ? String(cam).trim().toLowerCase() : null;
         }
 
+        if (global.T20EscolhasRaciaisV13) {
+            Object.assign(out, global.T20EscolhasRaciaisV13.lerPayloadCadastro());
+        }
+
         return out;
     }
 
@@ -231,6 +243,10 @@
         if (classeSlug() === 'arcanista') {
             const cam = q('cadArcanistaCaminho') && q('cadArcanistaCaminho').selectedOptions[0];
             if (cam) parts.push(`Arcanista: ${cam.textContent}`);
+        }
+        if (global.T20EscolhasRaciaisV13) {
+            const extra = global.T20EscolhasRaciaisV13.resumoCadastro();
+            if (extra) parts.push(extra);
         }
         return parts.join(' · ');
     }
@@ -284,6 +300,7 @@
         if (q('cadHumanoVersatilPoderNome')) q('cadHumanoVersatilPoderNome').value = '';
         if (q('cadSuraggelSubtipo')) q('cadSuraggelSubtipo').value = '';
         if (q('cadArcanistaCaminho')) q('cadArcanistaCaminho').value = '';
+        if (global.T20EscolhasRaciaisV13) global.T20EscolhasRaciaisV13.resetCadastro();
         if (q('cadHintPvSugerido')) q('cadHintPvSugerido').textContent = '';
     }
 

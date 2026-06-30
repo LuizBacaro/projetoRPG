@@ -1090,6 +1090,50 @@
     display: flex;
     flex-direction: column;
     gap: 0.18rem;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+/* Inventário geral (4 colunas: item, qtd, catálogo, remover) */
+.ficha-equipamento-header.t20-eq-header,
+.ficha-equipamento-linha.t20-eq-linha {
+    grid-template-columns: minmax(0, 1fr) 2.5rem 1.5rem 1.5rem;
+    gap: 0.3rem;
+    padding: 0.35rem 0.4rem;
+    min-width: 0;
+}
+
+.ficha-equipamento-linha.t20-eq-linha {
+    overflow: hidden;
+}
+
+.t20-eq-linha .eq-item,
+.t20-eq-linha .eq-qtd {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.t20-eq-linha .eq-qtd {
+    max-width: 2.5rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+    text-align: center;
+}
+
+.t20-eq-linha .t20-eq-pick,
+.t20-eq-linha .t20-eq-del {
+    padding: 0.12rem 0;
+    font-size: 0.72rem;
+    line-height: 1.1;
+    min-width: 0;
+    width: 1.5rem;
+    justify-self: center;
+    flex-shrink: 0;
+}
+
+.t20-eq-linha .t20-eq-pick {
+    font-size: 0.85rem;
 }
 
 .ficha-equipamento-header {
@@ -1274,6 +1318,46 @@ body::before {
 
 .ficha-pericias-lista::-webkit-scrollbar {
     width: 8px;
+}
+
+.t20-oficio-esp-wrap {
+    margin-top: 0.35rem;
+}
+
+.t20-oficio-esp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.t20-oficio-esp-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    background: rgba(120, 90, 40, 0.15);
+    font-size: 0.85rem;
+}
+
+.t20-oficio-esp-del {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0 0.15rem;
+    line-height: 1;
+}
+
+.t20-oficio-esp-add {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.t20-oficio-esp-add .t20-input {
+    flex: 1;
+    min-width: 6rem;
 }
 
 .ficha-pericia-item {
@@ -2600,6 +2684,17 @@ body::before {
     align-items: start;
 }
 
+.equipamento-catalogo-linha .equipamento-spec-grid--tripla {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.4rem 1rem;
+    align-items: start;
+}
+
+.equipamento-catalogo-linha .equipamento-spec-col--v13 .equipamento-spec-lbl {
+    color: var(--t20-red-deep, #8b1a1a);
+}
+
 .equipamento-catalogo-linha .equipamento-spec-col {
     display: flex;
     flex-direction: column;
@@ -2635,7 +2730,8 @@ body::before {
 }
 
 @media (max-width: 560px) {
-    .equipamento-catalogo-linha .equipamento-spec-grid--duas {
+    .equipamento-catalogo-linha .equipamento-spec-grid--duas,
+    .equipamento-catalogo-linha .equipamento-spec-grid--tripla {
         grid-template-columns: 1fr;
     }
 }

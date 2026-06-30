@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from app.games.tormenta.rules.tendencias_divindades_t20 import (
+    classe_exige_devocao_v13,
     divindade_por_slug,
     validar_devocao_v13,
 )
@@ -71,6 +72,42 @@ def test_service_validar_devocao_v13() -> None:
             "poder_concedido_slug": row["poderes_concedidos"][0],
         },
     )
+
+
+def test_classe_exige_devocao_v13():
+    assert classe_exige_devocao_v13({"tormenta_classe_mb_slug": "clerigo"}) is True
+    assert classe_exige_devocao_v13({"tormenta_classe_mb_slug": "guerreiro"}) is False
+
+
+def test_validar_devocao_v13_clerigo_sem_divindade_rejeita():
+    ok, msg = validar_devocao_v13(
+        {"regra_versao": "v13", "tormenta_classe_mb_slug": "clerigo"}
+    )
+    assert ok is False
+    assert "divindade" in msg.lower()
+
+
+def test_validar_devocao_v13_clerigo_com_poder_ok():
+    row = divindade_por_slug("lena")
+    assert row
+    pod = row["poderes_concedidos"][0]
+    ok, msg = validar_devocao_v13(
+        {
+            "regra_versao": "v13",
+            "tormenta_classe_mb_slug": "clerigo",
+            "tormenta_divindade_mb_slug": "lena",
+            "poder_concedido_slug": pod,
+        }
+    )
+    assert ok is True
+    assert msg == ""
+
+
+def test_validar_devocao_v13_todas_divindades_quatro_poderes():
+    from app.games.tormenta.rules.tendencias_divindades_t20 import lista_divindades_mb
+
+    for row in lista_divindades_mb():
+        assert len(row.get("poderes_concedidos") or []) == 4, row.get("slug")
 
 
 def test_service_devoto_sem_poder_rejeita() -> None:

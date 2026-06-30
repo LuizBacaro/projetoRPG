@@ -443,7 +443,7 @@
 
 <dialog id="t20ArenaModalCondicoes" class="t20-arena-modal t20-arena-modal--cond t20-arena-modal--wide-cond">
     <div class="t20-arena-modal__hd t20-arena-cond-modal-hd">
-        <h3 class="t20-arena-modal__titulo">Condições (MB) — Tormenta 20</h3>
+        <h3 class="t20-arena-modal__titulo">Condições — Tormenta 20 v1.3</h3>
         <button type="button" class="t20-arena-modal__x" id="t20ArenaModalCondFechar" aria-label="Fechar">×</button>
     </div>
     <div class="t20-arena-modal__bd t20-arena-modal__bd--cond">
@@ -453,7 +453,19 @@
             <div id="t20ArenaCondListaAlvos" class="t20-arena-checkbox-alvos" role="group" aria-label="Alvos das condições"></div>
         </div>
         <div id="t20ArenaCondicoesRoot">
-            <p class="t20-dash-hint" style="margin-top:0">Marque o cenário; o resumo ajuda na mesa. Confirme penalidades e exceções no <strong>Módulo Básico</strong> (≈p. 220).</p>
+            <p class="t20-dash-hint" style="margin-top:0">Marque o cenário ou condições persistentes (p.394); o resumo ajuda na mesa. Modificadores numéricos entram automaticamente nas rolagens de ataque.</p>
+            <fieldset class="t20-arena-fs t20-arena-fs--inline">
+                <legend>Condições persistentes (p.394)</legend>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Desprevenido" data-tip="Desprevenido: −5 na Defesa e Reflexos." /> Desprevenido</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Vulnerável" data-tip="Vulnerável: −2 na Defesa." /> Vulnerável</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Enredado" data-tip="Enredado: lento, vulnerável, −2 em ataques." /> Enredado</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Agarrado" data-tip="Agarrado: desprevenido, imóvel, −2 em ataques." /> Agarrado</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Atordoado" data-tip="Atordoado: desprevenido; não pode fazer ações." /> Atordoado</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Caído" data-tip="Caído: −5 em ataques corpo a corpo; +5 CA vs corpo a corpo." /> Caído</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Cego" data-tip="Cego: desprevenido, lento; alvos com camuflagem total." /> Cego</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Ofuscado" data-tip="Ofuscado: −2 em ataques e Percepção." /> Ofuscado</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Surpreendido" data-tip="Surpreendido: desprevenido; só reações." /> Surpreendido</label>
+            </fieldset>
             <div class="t20-arena-cond-cols">
                 <fieldset class="t20-arena-fs">
                     <legend>O atacante está…</legend>
@@ -525,7 +537,7 @@
             <div class="t20-dash-tipo-grid">
                 <button type="button" class="t20-dash-tipo-btn" data-escolher-tipo="jogador">
                     Jogador
-                    <small>Ficha de personagem do jogador (compra por pontos 8–18).</small>
+                    <small>Ficha de personagem do jogador (compra por pontos ou rolagem 4d6).</small>
                 </button>
                 <button type="button" class="t20-dash-tipo-btn" data-escolher-tipo="monstro">
                     Monstro
@@ -596,6 +608,7 @@
                     <div class="t20-dash-field t20-dash-field--full">
                         <label for="cadRacaSelect">Raça (Módulo Básico)</label>
                         <select id="cadRacaSelect" class="t20-input"></select>
+                        <p id="cadRacaTamanhoDeslocHint" class="t20-dash-hint" style="margin: 0.35rem 0 0"></p>
                     </div>
                     <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacaLivre" style="display: none">
                         <label for="cadRacaLivre">Nome da raça (livre)</label>
@@ -646,6 +659,89 @@
                             <option value="aggelus">Aggelus (+Sab +2, +Car +1)</option>
                             <option value="sulfure">Sulfure (+Des +2, +Int +1)</option>
                         </select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapLefouDeformidade" style="display: none">
+                        <label for="cadLefouDeformidadeModo">Lefou — Deformidade (v1.3)</label>
+                        <select id="cadLefouDeformidadeModo" class="t20-input">
+                            <option value="duas_pericias">2 perícias (+2 cada)</option>
+                            <option value="pericia_poder_tormenta">1 perícia (+2) + 1 poder da Tormenta</option>
+                        </select>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem">
+                            <div class="t20-dash-field" style="margin: 0">
+                                <label for="cadLefouPericia1">Perícia 1</label>
+                                <select id="cadLefouPericia1" class="t20-input"></select>
+                            </div>
+                            <div class="t20-dash-field" style="margin: 0">
+                                <label for="cadLefouPericia2">Perícia 2</label>
+                                <select id="cadLefouPericia2" class="t20-input"></select>
+                            </div>
+                        </div>
+                        <div id="cadWrapLefouPoderTormenta" style="display: none; margin-top: 0.35rem">
+                            <label for="cadLefouPoderTormentaNome">Poder da Tormenta</label>
+                            <input
+                                id="cadLefouPoderTormentaNome"
+                                class="t20-input"
+                                maxlength="120"
+                                placeholder="Nome do poder da Tormenta"
+                            />
+                        </div>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapQareenEscolhas" style="display: none">
+                        <label for="cadQareenAscendencia">Qareen — ascendência (v1.3)</label>
+                        <select id="cadQareenAscendencia" class="t20-input"></select>
+                        <div style="margin-top: 0.35rem">
+                            <label for="cadQareenMagiaNome">Tatuagem Mística — magia 1º círculo</label>
+                            <input
+                                id="cadQareenMagiaNome"
+                                class="t20-input"
+                                maxlength="120"
+                                placeholder="Nome da magia arcana"
+                            />
+                        </div>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapDahllanMagias" style="display: none">
+                        <p class="t20-dash-hint" style="margin: 0">
+                            <strong>Dahllan:</strong> <span id="cadDahllanMagiasHint">Controlar Plantas (SAB)</span>
+                        </p>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapOsteonMemoria" style="display: none">
+                        <label for="cadOsteonMemoriaModo">Osteon — Memória Póstuma (v1.3)</label>
+                        <select id="cadOsteonMemoriaModo" class="t20-input">
+                            <option value="">— Escolha —</option>
+                            <option value="pericia">1 perícia treinada</option>
+                            <option value="poder_geral">1 poder geral</option>
+                        </select>
+                        <select id="cadOsteonMemoriaPericia" class="t20-input" style="display: none; margin-top: 0.35rem"></select>
+                        <div id="cadWrapOsteonPoderGeral" style="display: none; margin-top: 0.35rem">
+                            <label for="cadOsteonMemoriaPoderNome">Poder geral</label>
+                            <input id="cadOsteonMemoriaPoderNome" class="t20-input" maxlength="120" placeholder="Nome do poder geral" />
+                        </div>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapSereiaMagias" style="display: none">
+                        <label>Sereia/Tritão — Canção dos Mares (2 magias)</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem">
+                            <select id="cadSereiaMagia1" class="t20-input"></select>
+                            <select id="cadSereiaMagia2" class="t20-input"></select>
+                        </div>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapGolemEscolhas" style="display: none">
+                        <label for="cadGolemFonteElemental">Golem — Fonte Elemental (v1.3)</label>
+                        <select id="cadGolemFonteElemental" class="t20-input"></select>
+                        <label for="cadGolemPoderGeralNome" style="display: block; margin-top: 0.35rem">Propósito de Criação — poder geral</label>
+                        <input id="cadGolemPoderGeralNome" class="t20-input" maxlength="120" placeholder="Nome do poder geral" />
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapKlirenEscolhas" style="display: none">
+                        <label for="cadKlirenPericia">Kliren — Híbrido (1 perícia)</label>
+                        <select id="cadKlirenPericia" class="t20-input"></select>
+                        <label for="cadKlirenOficio" style="display: block; margin-top: 0.35rem">Vanguardista — Ofício (+2)</label>
+                        <input id="cadKlirenOficio" class="t20-input" maxlength="80" placeholder="Ex.: alquimia" />
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapSilfideMagias" style="display: none">
+                        <label>Sílfide — Magia das Fadas (2 magias)</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem">
+                            <select id="cadSilfideMagia1" class="t20-input"></select>
+                            <select id="cadSilfideMagia2" class="t20-input"></select>
+                        </div>
                     </div>
                     <div class="t20-dash-field t20-dash-field--full" id="cadWrapArcanistaCaminho" style="display: none">
                         <label for="cadArcanistaCaminho">Caminho do Arcanista (v1.3 — irreversível)</label>
@@ -709,7 +805,7 @@
             </div>
 
             <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="6" style="display:none">
-                <p class="t20-dash-hint" style="margin-top:0">
+                <p id="cadDevocaoHint" class="t20-dash-hint" style="margin-top:0">
                     Devoção é <strong>opcional</strong>. Devotos escolhem um deus (Os Vinte) e um poder concedido (Tabela 1-20 v1.3).
                 </p>
                 <div class="t20-dash-form-grid">
@@ -731,11 +827,13 @@
                         <label for="cadPoderConcedido">Poder concedido</label>
                         <select id="cadPoderConcedido" class="t20-input"></select>
                     </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadDivindadeObrigacoesHost" style="display:none"></div>
                 </div>
             </div>
 
             <div class="cad-wizard-step cad-wizard-step--v13" id="cadWizardStepKit" data-cad-step="7" style="display:none">
-                <p class="t20-dash-hint" style="margin-top:0">Kit inicial (nível 1) — p.140 v1.3. Mochila, saco de dormir e traje são adicionados automaticamente.</p>
+                <p class="t20-dash-hint" id="cadWizardStepKitHint" style="margin-top:0">Kit inicial (nível 1) — p.140 v1.3. Mochila, saco de dormir e traje são adicionados automaticamente.</p>
+                <div id="cadWrapKitNv1">
                 <div class="t20-dash-form-grid">
                     <div class="t20-dash-field t20-dash-field--full">
                         <label for="cadKitArmaSimples">Arma simples *</label>
@@ -757,6 +855,18 @@
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.65rem">
                     <button type="button" class="tormenta-btn" id="cadBtnKitRolarDinheiro">Rolar T$ 4d6</button>
                     <span class="t20-dash-hint" id="cadKitDinheiroRolado" style="margin:0">Clique em «Rolar T$ 4d6»</span>
+                </div>
+                <div id="cadEquipamentosPreviewWrap" class="t20-dash-field t20-dash-field--full" style="margin-top:0.75rem">
+                    <p class="t20-dash-hint" style="margin:0 0 0.35rem"><strong>Equipamento automático</strong> (itens grátis da origem + kit p.140):</p>
+                    <ul id="cadEquipamentosPreviewLista" class="cad-equip-preview-list"></ul>
+                </div>
+                </div>
+                <div id="cadWrapDinheiroTabela" style="display:none">
+                    <p class="t20-dash-hint" style="margin:0 0 0.5rem">Tabela 3-1 — valor fixo de T$ para personagens acima do 1º nível.</p>
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
+                        <span class="t20-dash-hint" id="cadDinheiroTabelaValor" style="margin:0">—</span>
+                        <button type="button" class="tormenta-btn" id="cadBtnAplicarDinheiroTabela">Usar T$ da Tabela 3-1</button>
+                    </div>
                 </div>
             </div>
 
@@ -791,10 +901,14 @@
 <script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/t20-atributos-ui.js?v=20260629t01"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/t20-dashboard-pericias-v13.js?v=20260629s42"></script>
+<script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260629s42"></script>
-<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260629s42"></script>
+<script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
+<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260629dev"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -972,6 +1086,10 @@
     function atualizarHintAttrsJogadorDash() {
         const hj = document.getElementById('hintAttrsJogador');
         if (!hj) return;
+        if (window.T20AtributosUi) {
+            hj.innerHTML = window.T20AtributosUi.hintAtributosResumoHtml(DASH_REGRA_VERSAO, pontosIniciaisCompra);
+            return;
+        }
         if (isDashV13()) {
             hj.innerHTML =
                 'Tipo jogador v1.3: os seis números são os <strong>valores finais</strong> (base + bônus racial). ' +
@@ -1313,6 +1431,11 @@
         atualizarUiMetodoGeracaoDash();
         if (window.T20DashStep2V13 && T20DashStep2V13.atualizarUiPasso2) {
             T20DashStep2V13.atualizarUiPasso2();
+        }
+        if (isDashV13() && window.T20TracosRaciaisV13 && slug && slug !== '__livre__') {
+            void window.T20TracosRaciaisV13.aplicarTracosRaciaisCadastro(slug);
+        } else if (window.T20TracosRaciaisV13) {
+            void window.T20TracosRaciaisV13.aplicarTracosRaciaisCadastro('');
         }
     }
 
@@ -2074,6 +2197,9 @@
             if (window.T20DashStep2V13 && T20DashStep2V13.lerPayloadPasso2) {
                 Object.assign(fichaBase, T20DashStep2V13.lerPayloadPasso2());
             }
+            if (window.T20TracosRaciaisV13 && T20TracosRaciaisV13.lerPayloadTamanhoDeslocCadastro) {
+                Object.assign(fichaBase, T20TracosRaciaisV13.lerPayloadTamanhoDeslocCadastro());
+            }
             if (window.T20DashPericiasV13 && T20DashPericiasV13.lerPayloadPericias) {
                 Object.assign(fichaBase, T20DashPericiasV13.lerPayloadPericias());
             }
@@ -2082,6 +2208,10 @@
         const topWizard =
             t === 'jogador' && window.T20DashWizardV13 && T20DashWizardV13.isWizardAtivo()
                 ? T20DashWizardV13.lerPayloadCamposPersonagem()
+                : {};
+        const tdCache =
+            window.__t20TracosRaciaisCadCache && window.T20TracosRaciaisV13
+                ? window.T20TracosRaciaisV13.payloadTamanhoDesloc(window.__t20TracosRaciaisCadCache)
                 : {};
 
         return {
@@ -2095,6 +2225,9 @@
             divindade: topWizard.divindade != null ? topWizard.divindade : null,
             pv_max: pvMax,
             pv_atual: pvMax,
+            deslocamento:
+                tdCache.deslocamento_racial_m != null ? String(tdCache.deslocamento_racial_m) : '',
+            tamanho: tdCache.tamanho_racial_ui || '',
             for_valor: a.for_valor,
             des_valor: a.des_valor,
             con_valor: a.con_valor,

@@ -74,3 +74,11 @@ def test_pm_arcanista_v13_nivel_1() -> None:
 def test_pv_arcanista_v13_con_0() -> None:
     pv = pv_maximos_mb("arcanista", 1, 0, regra_versao="v13")
     assert pv == 8
+
+
+def test_pm_multiclasse_v13_exemplo_livro() -> None:
+    from app.games.tormenta.rules.progressao_pv_t20 import pm_maximos_v13_multiclasse
+
+    # Arcanista 3 / Paladino 1 → 3×6 + 1×3 = 21 (p.34)
+    pm = pm_maximos_v13_multiclasse({"arcanista": 3, "paladino": 1})
+    assert pm == 21

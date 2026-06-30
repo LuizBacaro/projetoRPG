@@ -1,0 +1,265 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 v1.3 — Apêndice B (p.394) + Tabela 5-3 situações especiais (p.145)",
+    "nota": "Modificadores numéricos automáticos na arena; efeitos narrativos (50% falha, ações limitadas) ficam como tips na UI."
+  },
+  "condicoes": [
+    {
+      "slug": "abalado",
+      "nome": "Abalado",
+      "categoria": "medo",
+      "mod_pericia": -2,
+      "efeito_resumo": "−2 em testes de perícia; se abalado de novo, vira Apavorado."
+    },
+    {
+      "slug": "agarrado",
+      "nome": "Agarrado",
+      "categoria": "paralisia",
+      "mod_ataque": -2,
+      "implica": ["desprevenido", "imovel"],
+      "efeito_resumo": "Desprevenido, imóvel, −2 em ataques; só armas leves."
+    },
+    {
+      "slug": "apavorado",
+      "nome": "Apavorado",
+      "categoria": "medo",
+      "mod_pericia": -5,
+      "efeito_resumo": "−5 em perícias; deve fugir da fonte do medo."
+    },
+    {
+      "slug": "alquebrado",
+      "nome": "Alquebrado",
+      "categoria": "mental",
+      "efeito_resumo": "Custo de PM de habilidades e magias +1."
+    },
+    {
+      "slug": "atordoado",
+      "nome": "Atordoado",
+      "categoria": "mental",
+      "implica": ["desprevenido"],
+      "efeito_resumo": "Desprevenido; não pode fazer ações."
+    },
+    {
+      "slug": "caido",
+      "nome": "Caído",
+      "categoria": "movimento",
+      "mod_ataque": -5,
+      "mod_ca_melee_contra": 5,
+      "mod_ca_distancia_contra": -5,
+      "efeito_resumo": "−5 em ataques corpo a corpo; deslocamento 1,5 m; +5 CA vs corpo a corpo, −5 vs distância."
+    },
+    {
+      "slug": "cego",
+      "nome": "Cego",
+      "categoria": "sentidos",
+      "implica": ["desprevenido", "lento"],
+      "mod_pericia_fisica": -5,
+      "efeito_resumo": "Desprevenido, lento; −5 em perícias Físicas; alvos têm camuflagem total."
+    },
+    {
+      "slug": "confuso",
+      "nome": "Confuso",
+      "categoria": "mental",
+      "efeito_resumo": "Comportamento aleatório (1d6 no início do turno)."
+    },
+    {
+      "slug": "debilitado",
+      "nome": "Debilitado",
+      "categoria": "fisico",
+      "mod_atributo_fisico": -5,
+      "efeito_resumo": "−5 em For/Des/Con e perícias baseadas; se repetir, fica Inconsciente."
+    },
+    {
+      "slug": "desprevenido",
+      "nome": "Desprevenido",
+      "categoria": "mental",
+      "mod_ca": -5,
+      "mod_reflexos": -5,
+      "efeito_resumo": "−5 na Defesa e em Reflexos."
+    },
+    {
+      "slug": "em_chamas",
+      "nome": "Em Chamas",
+      "categoria": "dano",
+      "efeito_resumo": "1d6 de fogo no início de cada turno; ação padrão ou água para apagar."
+    },
+    {
+      "slug": "enjoado",
+      "nome": "Enjoado",
+      "categoria": "fadiga",
+      "efeito_resumo": "Só ação padrão ou movimento por rodada (não ambas)."
+    },
+    {
+      "slug": "enredado",
+      "nome": "Enredado",
+      "categoria": "paralisia",
+      "implica": ["lento", "vulneravel"],
+      "mod_ataque": -2,
+      "efeito_resumo": "Lento, vulnerável, −2 em ataques."
+    },
+    {
+      "slug": "envenenado",
+      "nome": "Envenenado",
+      "categoria": "veneno",
+      "efeito_resumo": "Efeito varia conforme o veneno."
+    },
+    {
+      "slug": "esmorecido",
+      "nome": "Esmorecido",
+      "categoria": "mental",
+      "mod_atributo_mental": -5,
+      "efeito_resumo": "−5 em Int/Sab/Car e perícias baseadas."
+    },
+    {
+      "slug": "exausto",
+      "nome": "Exausto",
+      "categoria": "fadiga",
+      "implica": ["debilitado", "lento", "vulneravel"],
+      "efeito_resumo": "Debilitado, lento e vulnerável; se repetir, Inconsciente."
+    },
+    {
+      "slug": "fascinado",
+      "nome": "Fascinado",
+      "categoria": "mental",
+      "mod_percepcao": -5,
+      "efeito_resumo": "−5 em Percepção; só observa o foco."
+    },
+    {
+      "slug": "fatigado",
+      "nome": "Fatigado",
+      "categoria": "fadiga",
+      "implica": ["fraco", "vulneravel"],
+      "efeito_resumo": "Fraco e vulnerável; se repetir, Exausto."
+    },
+    {
+      "slug": "fraco",
+      "nome": "Fraco",
+      "categoria": "fisico",
+      "mod_atributo_fisico": -2,
+      "efeito_resumo": "−2 em For/Des/Con e perícias baseadas; se repetir, Debilitado."
+    },
+    {
+      "slug": "frustrado",
+      "nome": "Frustrado",
+      "categoria": "mental",
+      "mod_atributo_mental": -2,
+      "efeito_resumo": "−2 em Int/Sab/Car e perícias baseadas; se repetir, Esmorecido."
+    },
+    {
+      "slug": "inconsciente",
+      "nome": "Inconsciente",
+      "categoria": "incapacitacao",
+      "implica": ["indefeso"],
+      "efeito_resumo": "Indefeso; não pode fazer ações."
+    },
+    {
+      "slug": "indefeso",
+      "nome": "Indefeso",
+      "categoria": "incapacitacao",
+      "mod_ca": -10,
+      "efeito_resumo": "−10 na Defesa; falha automática em Reflexos."
+    },
+    {
+      "slug": "imovel",
+      "nome": "Imóvel",
+      "categoria": "paralisia",
+      "efeito_resumo": "Deslocamento 0 m."
+    },
+    {
+      "slug": "lento",
+      "nome": "Lento",
+      "categoria": "paralisia",
+      "efeito_resumo": "Deslocamento reduzido à metade; não pode correr ou investir."
+    },
+    {
+      "slug": "ofuscado",
+      "nome": "Ofuscado",
+      "categoria": "sentidos",
+      "mod_ataque": -2,
+      "mod_percepcao": -2,
+      "efeito_resumo": "−2 em ataques e Percepção."
+    },
+    {
+      "slug": "paralisado",
+      "nome": "Paralisado",
+      "categoria": "paralisia",
+      "implica": ["imovel", "indefeso"],
+      "efeito_resumo": "Imóvel, indefeso; só ações puramente mentais."
+    },
+    {
+      "slug": "pasmo",
+      "nome": "Pasmo",
+      "categoria": "mental",
+      "efeito_resumo": "Só reações; não pode fazer ações."
+    },
+    {
+      "slug": "petrificado",
+      "nome": "Petrificado",
+      "categoria": "incapacitacao",
+      "implica": ["inconsciente"],
+      "efeito_resumo": "Inconsciente; RD 10."
+    },
+    {
+      "slug": "sangrando",
+      "nome": "Sangrando",
+      "categoria": "dano",
+      "efeito_resumo": "Teste de Fortitude CD 15 no turno ou 1d6 de dano."
+    },
+    {
+      "slug": "surdo",
+      "nome": "Surdo",
+      "categoria": "sentidos",
+      "mod_iniciativa": -5,
+      "efeito_resumo": "−5 em Iniciativa; não ouve; magias em condição ruim."
+    },
+    {
+      "slug": "surpreendido",
+      "nome": "Surpreendido",
+      "categoria": "mental",
+      "implica": ["desprevenido"],
+      "aliases": ["surpreso"],
+      "efeito_resumo": "Desprevenido; só reações."
+    },
+    {
+      "slug": "vulneravel",
+      "nome": "Vulnerável",
+      "categoria": "defesa",
+      "mod_ca": -2,
+      "efeito_resumo": "−2 na Defesa."
+    }
+  ],
+  "situacoes_especiais": [
+    {
+      "slug": "assustado_atacante",
+      "nome": "Assustado (atacante)",
+      "mod_ataque": -2,
+      "efeito_resumo": "Legado MB / medo leve: −2 na jogada de ataque."
+    },
+    {
+      "slug": "flanqueando",
+      "nome": "Flanqueando o alvo",
+      "mod_ataque": 2,
+      "somente_corpo_a_corpo": true,
+      "efeito_resumo": "Tabela 5-3: +2 em ataques corpo a corpo."
+    },
+    {
+      "slug": "invisivel_atacante",
+      "nome": "Invisível (atacante)",
+      "mod_ataque": 5,
+      "efeito_resumo": "Tabela 5-3: +5 (não vs cegos)."
+    },
+    {
+      "slug": "camuflagem_alvo",
+      "nome": "Sob camuflagem (alvo)",
+      "mod_ca": 2,
+      "efeito_resumo": "Tabela 5-3: 20% falha (tratado como +2 CA aproximado na mesa)."
+    },
+    {
+      "slug": "cobertura_alvo",
+      "nome": "Sob cobertura (alvo)",
+      "mod_ca": 5,
+      "somente_distancia": true,
+      "efeito_resumo": "Tabela 5-3: +5 CA vs ataques à distância."
+    }
+  ]
+}

@@ -156,6 +156,10 @@
             body.penalidade_sobrecarga_carga = Boolean(
                 window.__t20CargaState && window.__t20CargaState.sobrecarga
             );
+            const slugEl = document.getElementById('f_classe_mb');
+            if (slugEl && slugEl.value) {
+                body.tormenta_classe_mb_slug = String(slugEl.value).trim();
+            }
         } else {
             body.penalidade_armadura = 0;
         }
@@ -236,4 +240,29 @@
         if (tb) obs.observe(tb, { childList: true });
         setTimeout(injetarBotoesRolar, 800);
     });
+
+    function encontrarLinhaPorSlug(slug) {
+        const s = String(slug || '').trim().toLowerCase();
+        if (!s) return null;
+        return document.querySelector(`#tblPericias tbody tr[data-per-slug="${s}"]`);
+    }
+
+    function encontrarLinhaPorNome(nome) {
+        const alvo = String(nome || '').trim().toLowerCase();
+        if (!alvo) return null;
+        const rows = document.querySelectorAll('#tblPericias tbody tr');
+        for (let i = 0; i < rows.length; i++) {
+            const el = rows[i].querySelector('.t20-p-nome');
+            const txt = el ? String(el.textContent || '').trim().toLowerCase() : '';
+            if (txt === alvo) return rows[i];
+        }
+        return null;
+    }
+
+    window.T20PericiasRolador = {
+        calcularBonusLinha,
+        encontrarLinhaPorSlug,
+        encontrarLinhaPorNome,
+        rolarPericia,
+    };
 })();

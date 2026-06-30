@@ -28,6 +28,7 @@
 
     let ORIGENS = [];
     let TENDENCIAS = [];
+    const CLASSES_DEVOTO_OBRIGATORIO = new Set(['clerigo', 'druida', 'paladino']);
     let DIVINIDADES = [];
     let KIT_OPCOES = null;
     let stepAtual = 1;
@@ -63,15 +64,11 @@
     }
 
     function proximoPasso(de) {
-        let next = de + 1;
-        if (next === PASSO_KIT && !passoKitAplica()) next = PASSO_KIT + 1;
-        return Math.min(totalPassos(), next);
+        return Math.min(totalPassos(), de + 1);
     }
 
     function passoAnterior(de) {
-        let prev = de - 1;
-        if (prev === PASSO_KIT && !passoKitAplica()) prev = PASSO_KIT - 1;
-        return Math.max(1, prev);
+        return Math.max(1, de - 1);
     }
 
     function slugParaLabel(slug) {
@@ -107,6 +104,29 @@
         const sel = q('cadDivindade');
         if (!sel || !sel.selectedOptions || !sel.selectedOptions[0]) return '';
         return String(sel.selectedOptions[0].getAttribute('data-slug') || '').trim().toLowerCase();
+    }
+
+    function classeExigeDevocao() {
+        const slug = String((q('cadClasseMb') && q('cadClasseMb').value) || '')
+            .trim()
+            .toLowerCase();
+        return CLASSES_DEVOTO_OBRIGATORIO.has(slug);
+    }
+
+    function sincronizarDevotoObrigatorioWizard() {
+        const exige = classeExigeDevocao();
+        if (exige && q('cadDevoto')) q('cadDevoto').checked = true;
+        const hint = q('cadDevocaoHint');
+        if (hint) {
+            let txt = exige
+                ? 'Clérigo, druida e paladino devem escolher divindade e poder concedido.'
+                : 'Devoção opcional. Devotos escolhem um deus (Os Vinte) e um poder concedido (Tabela 1-20 v1.3).';
+            if (String((q('cadClasseMb') && q('cadClasseMb').value) || '').toLowerCase() === 'paladino') {
+                txt += ' Paladinos são campeões do bem e da ordem (narrativo).';
+            }
+            hint.textContent = txt;
+        }
+        return exige;
     }
 
     function preencherSelectTendencias() {
@@ -163,6 +183,33 @@
         } else {
             selPod.value = '';
         }
+        renderObrigacoesDivindadeCad(row);
+    }
+
+    function renderObrigacoesDivindadeCad(row) {
+        const host = q('cadDivindadeObrigacoesHost');
+        if (!host) return;
+        if (!row) {
+            host.innerHTML = '';
+            host.style.display = 'none';
+            return;
+        }
+        const flags = Array.isArray(row.obrigacoes_flags) ? row.obrigacoes_flags : [];
+        if (!flags.length) {
+            host.innerHTML = '';
+            host.style.display = 'none';
+            return;
+        }
+        host.style.display = '';
+        const pag = row.pagina ? ` <span class="t20-obrig-pag">(livro p.${row.pagina})</span>` : '';
+        host.innerHTML =
+            `<p class="t20-dash-hint" style="margin:0 0 .35rem"><strong>Obrigações & Restrições</strong>${pag}</p>` +
+            `<ul class="t20-obrig-list cad-obrig-list">${flags
+                .map((f) => `<li>${String(f.rotulo || f.slug || '').trim()}</li>`)
+                .join('')}</ul>` +
+            (row.sem_penalidade_obrigacao
+                ? '<p class="t20-dash-hint" style="margin:.35rem 0 0">Nimb: violar O&R não causa perda de PM.</p>'
+                : '');
     }
 
     function origemPorSlug(slug) {
@@ -279,6 +326,7 @@
                 if (!global.__cadOrigemItensEscolha) global.__cadOrigemItensEscolha = {};
                 global.__cadOrigemItensEscolha[row.slug] = rb.value;
                 renderResumo();
+                renderEquipamentosPreview();
             });
         });
     }
@@ -300,6 +348,90 @@
         } else {
             el.textContent = 'Sem itens fixos nesta origem.';
         }
+    }
+
+    function resolverItensOrigemPreview(row) {
+        if (!row) return [];
+        const fixos = Array.isArray(row.itens) ? row.itens.slice() : [];
+        if (row.itens_escolha && Array.isArray(row.itens_escolha.opcoes)) {
+            const slug = row.slug;
+            const pick =
+                (global.__cadOrigemItensEscolha && global.__cadOrigemItensEscolha[slug]) ||
+                row.itens_escolha.default ||
+                '';
+            const op =
+                row.itens_escolha.opcoes.find((x) => x.slug === pick) || row.itens_escolha.opcoes[0];
+            const escolhidos = op && Array.isArray(op.itens) ? op.itens.slice() : [];
+            return fixos.concat(escolhidos);
+        }
+        return fixos;
+    }
+
+    function coletarEquipamentosPreview() {
+        const nomes = [];
+        const seen = new Set();
+        const add = (nome, qtd, tag) => {
+            const n = String(nome || '').trim();
+            const k = n.toLowerCase();
+            if (n.length >= 1 && !seen.has(k)) {
+                seen.add(k);
+                nomes.push({
+                    nome: n,
+                    qtd: Math.max(1, parseInt(String(qtd || 1), 10) || 1),
+                    tag: tag || '',
+                });
+            }
+        };
+        const slugOrig = q('cadOrigemSlug') && q('cadOrigemSlug').value;
+        const rowOrig = origemPorSlug(slugOrig);
+        resolverItensOrigemPreview(rowOrig).forEach((n) => add(n, 1, 'origem'));
+        if (passoKitAplica() && KIT_OPCOES) {
+            (KIT_OPCOES.fixos || []).forEach((n) => add(n, 1, 'kit'));
+            const kit = global.__cadKitInicial || {};
+            const armaS =
+                (q('cadKitArmaSimples') && q('cadKitArmaSimples').value) || kit.arma_simples;
+            const armaM =
+                (q('cadKitArmaMarcial') && q('cadKitArmaMarcial').value) || kit.arma_marcial;
+            const arm =
+                (q('cadKitArmadura') && q('cadKitArmadura').value) || kit.armadura;
+            const esc =
+                q('cadKitEscudo') && q('cadKitEscudo').checked !== undefined
+                    ? q('cadKitEscudo').checked
+                    : kit.escudo !== false;
+            if (armaS) add(armaS, 1, 'kit');
+            if (KIT_OPCOES.arma_marcial && armaM) add(armaM, 1, 'kit');
+            if (KIT_OPCOES.armadura_leve && !KIT_OPCOES.sem_armadura && arm) add(arm, 1, 'kit');
+            if (KIT_OPCOES.escudo && esc) add('Escudo leve de madeira', 1, 'kit');
+        }
+        return nomes;
+    }
+
+    function renderEquipamentosPreview() {
+        const wrap = q('cadEquipamentosPreviewWrap');
+        const lista = q('cadEquipamentosPreviewLista');
+        if (!wrap || !lista) return;
+        if (!passoKitAplica()) {
+            wrap.style.display = 'none';
+            return;
+        }
+        wrap.style.display = '';
+        const itens = coletarEquipamentosPreview();
+        if (!itens.length) {
+            lista.innerHTML =
+                '<li class="t20-dash-hint" style="margin:0">Escolha a origem (passo 4) para ver os itens grátis.</li>';
+            return;
+        }
+        lista.innerHTML = itens
+            .map((it) => {
+                const tag =
+                    it.tag === 'origem'
+                        ? '<span class="cad-equip-preview-tag cad-equip-preview-tag--origem">origem</span>'
+                        : it.tag === 'kit'
+                          ? '<span class="cad-equip-preview-tag cad-equip-preview-tag--kit">kit</span>'
+                          : '';
+                return `<li>${tag}<span>${it.nome}</span>${it.qtd > 1 ? ` ×${it.qtd}` : ''}</li>`;
+            })
+            .join('');
     }
 
     function preencherSelect(el, opcoes, prev) {
@@ -342,6 +474,10 @@
             lbl.textContent =
                 kit.dinheiro_pp != null ? `T$ ${kit.dinheiro_pp} (4d6)` : 'Clique em «Rolar T$ 4d6»';
         }
+        if (global.T20DinheiroTabelaV13 && typeof global.T20DinheiroTabelaV13.atualizarUiWizard === 'function') {
+            void global.T20DinheiroTabelaV13.atualizarUiWizard();
+        }
+        renderEquipamentosPreview();
     }
 
     function rolarDinheiroKit() {
@@ -366,15 +502,12 @@
             'Origem',
             'Perícias',
             'Devoção',
-            'Equipamento',
+            nivelCadastro() <= 1 ? 'Equipamento' : 'Dinheiro (T$)',
             'Revisão',
         ];
         nav.innerHTML = labels
             .map((lab, i) => {
                 const n = i + 1;
-                if (n === PASSO_KIT && !passoKitAplica()) {
-                    return `<span class="cad-wizard-nav__item cad-wizard-nav__item--skip" title="Kit inicial só no 1º nível">${n}. ${lab} (—)</span>`;
-                }
                 const cls =
                     n === stepAtual
                         ? 'cad-wizard-nav__item cad-wizard-nav__item--active'
@@ -387,11 +520,7 @@
     }
 
     function mostrarPasso(n) {
-        let target = Math.max(1, Math.min(totalPassos(), n));
-        if (target === PASSO_KIT && !passoKitAplica()) {
-            target = n < stepAtual ? passoAnterior(PASSO_KIT + 1) : proximoPasso(PASSO_KIT - 1);
-        }
-        stepAtual = target;
+        stepAtual = Math.max(1, Math.min(totalPassos(), n));
         document.querySelectorAll('.cad-wizard-step').forEach((el) => {
             const s = parseInt(el.getAttribute('data-cad-step') || '0', 10);
             if (!isWizardAtivo()) {
@@ -413,8 +542,14 @@
         if (stepAtual === 5 && global.T20DashPericiasV13 && global.T20DashPericiasV13.prepararPassoPericias) {
             void global.T20DashPericiasV13.prepararPassoPericias();
         }
-        if (stepAtual === 6) renderPoderesConcedidos();
-        if (stepAtual === 7) renderUiKit();
+        if (stepAtual === 6) {
+            sincronizarDevotoObrigatorioWizard();
+            renderPoderesConcedidos();
+        }
+        if (stepAtual === 7) {
+            renderUiKit();
+            renderEquipamentosPreview();
+        }
         if (stepAtual === 8) {
             void renderChecklistRevisao();
             renderResumo();
@@ -468,14 +603,18 @@
             optional: !devoto && v6.ok,
         });
 
-        if (passoKitAplica()) {
+        if (passoKitAplica() || nivelCadastro() > 1) {
             const v7 = validarPasso(7);
             items.push({
                 passo: 7,
-                label: 'Kit inicial',
+                label: passoKitAplica() ? 'Kit inicial' : 'Dinheiro (Tabela 3-1)',
                 ok: v7.ok,
                 msg: v7.msg || '',
-                detalhe: v7.ok ? 'Equipamento de 1º nível' : '',
+                detalhe: v7.ok
+                    ? passoKitAplica()
+                        ? 'Equipamento de 1º nível'
+                        : 'T$ conforme nível'
+                    : '',
             });
         }
 
@@ -606,6 +745,12 @@
                 ? q('cadPoderConcedido').selectedOptions[0].textContent
                 : '';
         const kit = global.__cadKitInicial || {};
+        const eqPrev =
+            passoKitAplica() && coletarEquipamentosPreview().length
+                ? coletarEquipamentosPreview()
+                      .map((it) => it.nome)
+                      .join(', ')
+                : '';
         const step2Extra =
             global.T20DashStep2V13 && global.T20DashStep2V13.resumoPasso2
                 ? global.T20DashStep2V13.resumoPasso2()
@@ -624,8 +769,15 @@
             `<p>Tendência: ${tend || '—'} · Divindade: ${div || '—'}${devoto ? ' (devoto)' : ''}</p>` +
             (pod ? `<p>Poder concedido: ${pod}</p>` : '') +
             (parseInt(String(nv || '1'), 10) <= 1
-                ? `<p>Kit: ${kit.arma_simples || q('cadKitArmaSimples')?.value || '—'}${kit.arma_marcial ? ', ' + kit.arma_marcial : ''}${kit.armadura ? ', ' + kit.armadura : ''}${kit.dinheiro_pp != null ? ' · T$ ' + kit.dinheiro_pp : ''}</p>`
-                : '<p class="t20-dash-hint" style="margin:0.25rem 0">Kit inicial: não se aplica (nível &gt; 1).</p>');
+                ? `<p>Kit: ${kit.arma_simples || q('cadKitArmaSimples')?.value || '—'}${kit.arma_marcial ? ', ' + kit.arma_marcial : ''}${kit.armadura ? ', ' + kit.armadura : ''}${kit.dinheiro_pp != null ? ' · T$ ' + kit.dinheiro_pp : ''}</p>` +
+                  (eqPrev ? `<p>Equipamento: ${eqPrev}</p>` : '')
+                : `<p>T$ (Tabela 3-1): ${
+                      kit.dinheiro_tabela_pp != null
+                          ? kit.dinheiro_tabela_pp
+                          : global.__cadDinheiroTabela && global.__cadDinheiroTabela.valor != null
+                            ? global.__cadDinheiroTabela.valor
+                            : '—'
+                  }</p>`);
     }
 
     function validarPasso(n) {
@@ -673,14 +825,25 @@
             return { ok: true };
         }
         if (n === 6) {
-            const devoto = !!(q('cadDevoto') && q('cadDevoto').checked);
+            const exige = classeExigeDevocao();
+            const devoto = exige || !!(q('cadDevoto') && q('cadDevoto').checked);
             const divSlug = slugDivindadeSelecionado();
             const pod = q('cadPoderConcedido') && q('cadPoderConcedido').value;
             if (devoto && !divSlug) {
-                return { ok: false, msg: 'Devoto: escolha uma divindade (Os Vinte).' };
+                return {
+                    ok: false,
+                    msg: exige
+                        ? 'Clérigo, druida e paladino devem escolher uma divindade.'
+                        : 'Devoto: escolha uma divindade (Os Vinte).',
+                };
             }
             if (devoto && !pod) {
-                return { ok: false, msg: 'Devoto: escolha um poder concedido da divindade.' };
+                return {
+                    ok: false,
+                    msg: exige
+                        ? 'Clérigo, druida e paladino devem escolher um poder concedido.'
+                        : 'Devoto: escolha um poder concedido da divindade.',
+                };
             }
             if (pod && !divSlug) {
                 return { ok: false, msg: 'Poder concedido exige divindade escolhida.' };
@@ -696,7 +859,17 @@
         }
         if (n === 7) {
             const nv = parseInt(String(q('cadNivel') && q('cadNivel').value || '1'), 10);
-            if (nv > 1) return { ok: true };
+            if (nv > 1) {
+                if (
+                    global.__cadDinheiroTabela &&
+                    global.__cadDinheiroTabela.valor != null &&
+                    (!global.__cadKitInicial || global.__cadKitInicial.dinheiro_tabela_pp == null)
+                ) {
+                    if (!global.__cadKitInicial) global.__cadKitInicial = {};
+                    global.__cadKitInicial.dinheiro_tabela_pp = global.__cadDinheiroTabela.valor;
+                }
+                return { ok: true };
+            }
             const arma = q('cadKitArmaSimples') && q('cadKitArmaSimples').value;
             if (!arma) return { ok: false, msg: 'Escolha a arma simples do kit inicial.' };
             return { ok: true };
@@ -785,7 +958,7 @@
                 global.__cadOrigemItensEscolha && typeof global.__cadOrigemItensEscolha === 'object'
                     ? { ...global.__cadOrigemItensEscolha }
                     : {},
-            devoto: !!(q('cadDevoto') && q('cadDevoto').checked),
+            devoto: classeExigeDevocao() || !!(q('cadDevoto') && q('cadDevoto').checked),
             poder_concedido_slug:
                 q('cadPoderConcedido') && q('cadPoderConcedido').value
                     ? String(q('cadPoderConcedido').value).trim()
@@ -807,6 +980,17 @@
             const din = global.__cadKitInicial && global.__cadKitInicial.dinheiro_pp;
             if (din != null) kit.dinheiro_pp = din;
             out.kit_inicial_v13 = kit;
+            if (din != null) {
+                out.dinheiro = { pc: 0, pp: din, po: 0, pl: 0 };
+            }
+        } else if (nv > 1) {
+            let din =
+                global.__cadKitInicial && global.__cadKitInicial.dinheiro_tabela_pp != null
+                    ? global.__cadKitInicial.dinheiro_tabela_pp
+                    : null;
+            if (din == null && global.__cadDinheiroTabela && global.__cadDinheiroTabela.valor != null) {
+                din = global.__cadDinheiroTabela.valor;
+            }
             if (din != null) {
                 out.dinheiro = { pc: 0, pp: din, po: 0, pl: 0 };
             }
@@ -837,6 +1021,7 @@
                 global.T20DashPericiasV13.invalidarPericias();
             }
             renderBeneficiosOrigem();
+            renderEquipamentosPreview();
         });
         q('cadDivindade')?.addEventListener('change', () => {
             renderPoderesConcedidos();
@@ -853,6 +1038,7 @@
             if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
                 global.T20DashPericiasV13.invalidarPericias();
             }
+            sincronizarDevotoObrigatorioWizard();
             void carregarKitOpcoes().then(renderUiKit);
             if (global.T20DashStep2V13 && global.T20DashStep2V13.atualizarUiPasso2) {
                 global.T20DashStep2V13.atualizarUiPasso2();
@@ -863,11 +1049,14 @@
             if (global.T20DashStep2V13 && global.T20DashStep2V13.atualizarPvSugerido) {
                 void global.T20DashStep2V13.atualizarPvSugerido(false);
             }
-            if (isWizardAtivo() && stepAtual === PASSO_KIT && !passoKitAplica()) {
-                mostrarPasso(proximoPasso(PASSO_KIT - 1));
+            if (isWizardAtivo() && stepAtual === PASSO_KIT) {
+                renderNav();
             }
         });
         q('cadBtnKitRolarDinheiro')?.addEventListener('click', () => rolarDinheiroKit());
+        ['cadKitArmaSimples', 'cadKitArmaMarcial', 'cadKitArmadura', 'cadKitEscudo'].forEach((id) => {
+            q(id)?.addEventListener('change', () => renderEquipamentosPreview());
+        });
         q('formCadastroRapido')?.addEventListener(
             'submit',
             (ev) => {

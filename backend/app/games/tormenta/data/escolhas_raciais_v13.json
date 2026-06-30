@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Raças p.25–30",
+    "nota": "Escolhas estruturadas RF-T02-v13; sem texto longo do livro."
+  },
+  "racas": {
+    "lefou": {
+      "tipo": "deformidade",
+      "bonus_pericia": 2,
+      "categoria_poder": "tormenta",
+      "modos": [
+        {
+          "slug": "duas_pericias",
+          "rotulo": "2 perícias (+2 cada)",
+          "slots_pericia": 2,
+          "slots_poder_tormenta": 0
+        },
+        {
+          "slug": "pericia_poder_tormenta",
+          "rotulo": "1 perícia (+2) + 1 poder da Tormenta",
+          "slots_pericia": 1,
+          "slots_poder_tormenta": 1
+        }
+      ]
+    },
+    "qareen": {
+      "tipo": "ascendencia_magia",
+      "ascendencias": [
+        { "slug": "agua", "rotulo": "Água", "rd_tipo": "frio", "rd_valor": 10 },
+        { "slug": "ar", "rotulo": "Ar", "rd_tipo": "eletricidade", "rd_valor": 10 },
+        { "slug": "fogo", "rotulo": "Fogo", "rd_tipo": "fogo", "rd_valor": 10 },
+        { "slug": "terra", "rotulo": "Terra", "rd_tipo": "acido", "rd_valor": 10 },
+        { "slug": "luz", "rotulo": "Luz", "rd_tipo": "luz", "rd_valor": 10 },
+        { "slug": "trevas", "rotulo": "Trevas", "rd_tipo": "trevas", "rd_valor": 10 }
+      ],
+      "magia_circulo": 1,
+      "magia_lista": "arcana",
+      "magia_atributo_chave": "car"
+    },
+    "dahllan": {
+      "tipo": "magias_fixas",
+      "magias_inatas": [
+        {
+          "slug": "controlar_plantas",
+          "nome": "Controlar Plantas",
+          "atributo_chave": "sab"
+        }
+      ]
+    },
+    "golem": {
+      "tipo": "fonte_elemental_poder",
+      "categoria_poder": "geral",
+      "fontes": [
+        { "slug": "agua", "rotulo": "Água", "imunidade_tipo": "frio" },
+        { "slug": "ar", "rotulo": "Ar", "imunidade_tipo": "eletricidade" },
+        { "slug": "fogo", "rotulo": "Fogo", "imunidade_tipo": "fogo" },
+        { "slug": "terra", "rotulo": "Terra", "imunidade_tipo": "acido" }
+      ]
+    },
+    "kliren": {
+      "tipo": "hibrido_vanguardista",
+      "bonus_oficio": 2,
+      "slots_pericia": 1
+    },
+    "osteon": {
+      "tipo": "memoria_postuma",
+      "modos": [
+        {
+          "slug": "pericia",
+          "rotulo": "1 perícia treinada à escolha",
+          "slots_pericia": 1,
+          "categoria_poder": null
+        },
+        {
+          "slug": "poder_geral",
+          "rotulo": "1 poder geral à escolha",
+          "slots_pericia": 0,
+          "categoria_poder": "geral"
+        }
+      ]
+    },
+    "sereia_tritao": {
+      "tipo": "magias_escolha",
+      "escolhas_qtd": 2,
+      "magia_atributo_chave": "car",
+      "magias_opcoes": [
+        { "slug": "amedrontar", "nome": "Amedrontar" },
+        { "slug": "comando", "nome": "Comando" },
+        { "slug": "despedacar", "nome": "Despedaçar" },
+        { "slug": "enfeiticar", "nome": "Enfeitiçar" },
+        { "slug": "hipnotismo", "nome": "Hipnotismo" },
+        { "slug": "sono", "nome": "Sono" }
+      ]
+    },
+    "silfide": {
+      "tipo": "magias_escolha",
+      "escolhas_qtd": 2,
+      "magia_atributo_chave": "car",
+      "magias_opcoes": [
+        { "slug": "criar_ilusao", "nome": "Criar Ilusão" },
+        { "slug": "enfeiticar", "nome": "Enfeitiçar" },
+        { "slug": "luz", "nome": "Luz" },
+        { "slug": "sono", "nome": "Sono" }
+      ]
+    }
+  }
+}

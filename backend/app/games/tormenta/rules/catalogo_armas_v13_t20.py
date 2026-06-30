@@ -58,6 +58,13 @@ def _carregar_armas_overlay() -> List[Dict[str, Any]]:
     return out
 
 
+# Nomes legacy MB → nome canônico no overlay (stats v1.3)
+_ALIASES_ARMA_V13: Dict[str, str] = {
+    "mangual pesado": "mangual",
+    "katana": "espada samurai (katana)",
+}
+
+
 @lru_cache(maxsize=1)
 def mapa_armas_v13_por_nome() -> Dict[str, Dict[str, Any]]:
     out: Dict[str, Dict[str, Any]] = {}
@@ -65,6 +72,11 @@ def mapa_armas_v13_por_nome() -> Dict[str, Dict[str, Any]]:
         chave = _norm_nome(str(row.get("nome", "")))
         if chave:
             out[chave] = dict(row)
+    for alias_raw, canon_raw in _ALIASES_ARMA_V13.items():
+        ak = _norm_nome(alias_raw)
+        ck = _norm_nome(canon_raw)
+        if ck in out and ak not in out:
+            out[ak] = dict(out[ck])
     return out
 
 

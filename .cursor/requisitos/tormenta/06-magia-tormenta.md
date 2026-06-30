@@ -100,10 +100,9 @@ Bardo: arcano espontâneo (CAR). Clérigo/Druida: divino (SAB), devoção.
 |------|--------|
 | Grimório SQL + modal | **Feito** |
 | Catálogo ~706 metadados | **Feito** |
-| Custo PM = círculo (MB) | **Errado** — alvo 1/3/6/10/15 |
-| Arcanista 3 caminhos | **Não feito** |
-| mago + feiticeiro separados | **Legado MB** |
-| CD com atributo **valor** | **Verificar** (pode usar mod. MB) |
+| Custo PM = círculo (MB) | **Feito** — v13 usa 1/3/6/10/15 |
+| Arcanista 3 caminhos | **Feito** |
+| CD com atributo **valor** | **Feito** |
 | Concentração + RM | **Feito** (revisar fórmula CD) |
 
 ## Gap código

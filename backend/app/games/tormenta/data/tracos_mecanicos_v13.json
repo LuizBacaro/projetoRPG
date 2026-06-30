@@ -20,6 +20,7 @@
     "anao": {
       "tamanho": "medio",
       "deslocamento_m": 6,
+      "desloc_nao_reduz_armadura_carga": true,
       "ca_bonus": 0,
       "ca_vs_grande_ou_maior": 2,
       "ataque_bonus": 0,
@@ -44,7 +45,7 @@
     },
     "elfo": {
       "tamanho": "medio",
-      "deslocamento_m": 9,
+      "deslocamento_m": 12,
       "ca_bonus": 0,
       "ataque_bonus": 0,
       "furtividade_bonus": 0,
@@ -109,8 +110,9 @@
     },
     "golem": {
       "tamanho": "medio",
-      "deslocamento_m": 9,
-      "ca_bonus": 0,
+      "deslocamento_m": 6,
+      "desloc_nao_reduz_armadura_carga": true,
+      "ca_bonus": 2,
       "ataque_bonus": 0,
       "furtividade_bonus": 0,
       "fortitude_bonus": 0,
@@ -141,8 +143,7 @@
       "reflexos_bonus": 0,
       "vontade_bonus": 0,
       "pericias_bonus": {
-        "Intuição": 2,
-        "Ofício": 2
+        "Intuição": 2
       }
     },
     "medusa": {
@@ -170,6 +171,7 @@
     "sereia_tritao": {
       "tamanho": "medio",
       "deslocamento_m": 9,
+      "deslocamento_natacao_m": 12,
       "ca_bonus": 0,
       "ataque_bonus": 0,
       "furtividade_bonus": 0,
@@ -179,11 +181,13 @@
       "pericias_bonus": {}
     },
     "silfide": {
-      "tamanho": "pequeno",
-      "deslocamento_m": 6,
-      "ca_bonus": 1,
-      "ataque_bonus": 1,
-      "furtividade_bonus": 2,
+      "tamanho": "minusculo",
+      "deslocamento_m": 9,
+      "deslocamento_pairar_m": 9,
+      "deslocamento_voo_m": 12,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
       "fortitude_bonus": 0,
       "reflexos_bonus": 0,
       "vontade_bonus": 0,
@@ -203,7 +207,7 @@
     "trog": {
       "tamanho": "medio",
       "deslocamento_m": 9,
-      "ca_bonus": 0,
+      "ca_bonus": 1,
       "ataque_bonus": 0,
       "furtividade_bonus": 2,
       "fortitude_bonus": 0,

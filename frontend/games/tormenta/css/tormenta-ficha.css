@@ -2251,3 +2251,18 @@
     background: transparent;
     padding: 0.15rem;
 }
+
+.t20-obrig-list {
+    margin: 0;
+    padding-left: 1.15rem;
+    font-size: 0.88rem;
+}
+
+.t20-obrig-list li {
+    margin: 0.15rem 0;
+}
+
+.t20-obrig-pag {
+    font-weight: normal;
+    opacity: 0.85;
+}

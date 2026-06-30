@@ -7,6 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from app.games.tormenta.rules.escolhas_raciais_t20 import aplicar_escolhas_ao_preview
 from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_MB,
     REGRA_VERSAO_V13,
@@ -21,6 +22,53 @@ _TRACOS_V13_JSON = _DATA_DIR / "tracos_mecanicos_v13.json"
 _SLUG_ALIASES_V13: Dict[str, str] = {
     "halfling": "hynne",
 }
+
+_TAMANHO_UI: Dict[str, str] = {
+    "minusculo": "Min",
+    "pequeno": "P",
+    "medio": "M",
+    "grande": "G",
+    "enorme": "En",
+    "colossal": "Col",
+}
+
+_TAMANHO_LABEL: Dict[str, str] = {
+    "minusculo": "Minúsculo",
+    "pequeno": "Pequeno",
+    "medio": "Médio",
+    "grande": "Grande",
+    "enorme": "Enorme",
+    "colossal": "Colossal",
+}
+
+
+def _enriquecer_tamanho_desloc(
+    preview: Dict[str, Any],
+    row: Optional[Dict[str, Any]],
+) -> Dict[str, Any]:
+    out = dict(preview)
+    if not row:
+        out["tamanho_ui"] = None
+        out["tamanho_label"] = None
+        out["deslocamento_natacao_m"] = None
+        out["deslocamento_voo_m"] = None
+        out["deslocamento_pairar_m"] = None
+        out["desloc_nao_reduz_armadura_carga"] = False
+        return out
+    tam = str(row.get("tamanho") or "medio").strip().lower()
+    out["tamanho_ui"] = _TAMANHO_UI.get(tam, "M")
+    out["tamanho_label"] = _TAMANHO_LABEL.get(tam, "Médio")
+    for key in (
+        "deslocamento_natacao_m",
+        "deslocamento_voo_m",
+        "deslocamento_pairar_m",
+    ):
+        val = row.get(key)
+        out[key] = int(val) if val is not None else None
+    out["desloc_nao_reduz_armadura_carga"] = bool(
+        row.get("desloc_nao_reduz_armadura_carga")
+    )
+    return out
 
 
 def _resolver_slug(slug: str, regra_versao: str) -> str:
@@ -90,6 +138,16 @@ def preview_tracos_raciais(
     pericias_nomes: Optional[List[str]] = None,
     regra_versao: Optional[str] = None,
     humano_versatil: Optional[str] = None,
+    lefou_deformidade_modo: Optional[str] = None,
+    lefou_deformidade_pericias: Optional[List[str]] = None,
+    qareen_ascendencia: Optional[str] = None,
+    osteon_memoria_modo: Optional[str] = None,
+    osteon_memoria_pericia: Optional[str] = None,
+    sereia_magias: Optional[List[str]] = None,
+    golem_fonte_elemental: Optional[str] = None,
+    kliren_pericia: Optional[str] = None,
+    kliren_oficio: Optional[str] = None,
+    silfide_magias: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     """
     Resumo de bônus raciais aplicáveis para a ficha.
@@ -114,6 +172,17 @@ def preview_tracos_raciais(
             "vontade_bonus": 0,
             "pericias_bonus": {},
             "pericias_treinadas_extra": 0,
+            "reducao_dano": {},
+            "imunidades_dano": {},
+            "magias_inatas": [],
+            "escolhas_resumo": [],
+            "pericias_treinadas_escolha": [],
+            "tamanho_ui": None,
+            "tamanho_label": None,
+            "deslocamento_natacao_m": None,
+            "deslocamento_voo_m": None,
+            "deslocamento_pairar_m": None,
+            "desloc_nao_reduz_armadura_carga": False,
         }
 
     per_map = row.get("pericias_bonus") or {}
@@ -133,7 +202,7 @@ def preview_tracos_raciais(
         slug, rv, humano_versatil=humano_versatil
     )
 
-    return {
+    base = {
         "slug": s,
         "encontrado": True,
         "regra_versao": rv,
@@ -148,4 +217,25 @@ def preview_tracos_raciais(
         "vontade_bonus": int(row.get("vontade_bonus", 0) or 0),
         "pericias_bonus": out_per,
         "pericias_treinadas_extra": extra,
+        "reducao_dano": {},
+        "imunidades_dano": {},
+        "magias_inatas": [],
+        "escolhas_resumo": [],
+        "pericias_treinadas_escolha": [],
     }
+    base = _enriquecer_tamanho_desloc(base, row)
+    return aplicar_escolhas_ao_preview(
+        base,
+        slug,
+        regra_versao=rv,
+        lefou_deformidade_modo=lefou_deformidade_modo,
+        lefou_deformidade_pericias=lefou_deformidade_pericias,
+        qareen_ascendencia=qareen_ascendencia,
+        golem_fonte_elemental=golem_fonte_elemental,
+        kliren_pericia=kliren_pericia,
+        kliren_oficio=kliren_oficio,
+        osteon_memoria_modo=osteon_memoria_modo,
+        osteon_memoria_pericia=osteon_memoria_pericia,
+        sereia_magias=sereia_magias,
+        silfide_magias=silfide_magias,
+    )

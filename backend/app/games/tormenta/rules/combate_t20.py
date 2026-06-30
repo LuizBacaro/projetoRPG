@@ -1,4 +1,4 @@
-"""Combate Tormenta 20 — rolagens de iniciativa, ataque e dano; modificadores de condições MB."""
+"""Combate Tormenta 20 — rolagens de iniciativa, ataque e dano; condições v1.3."""
 
 from __future__ import annotations
 
@@ -6,50 +6,14 @@ import random
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-# Modificadores automáticos a partir de rótulos MB (~p.220) gravados na arena.
-_CONDICOES_MOD_ATQ: Dict[str, int] = {
-    "cego": -4,
-    "atordoado": -4,
-    "agarrado": -4,
-    "enjoado": -2,
-    "exausto": -2,
-    "frustrado": -2,
-    "lento": -2,
-}
-
-_CONDICOES_MOD_CA: Dict[str, int] = {
-    "surpreso": -4,
-    "desprevenido": -4,
-    "agarrado": -2,
-    "atordoado": -2,
-    "enjoado": -2,
-    "frustrado": -2,
-    "lento": -2,
-}
-
-
-def _normalizar_chave(s: str) -> str:
-    t = str(s or "").strip().lower()
-    t = re.sub(r"[^a-záàâãéêíóôõúç0-9]+", " ", t)
-    return t.strip()
+from app.games.tormenta.rules.condicoes_t20 import modificadores_de_condicoes
 
 
 def modificadores_de_condicoes_mb(
     rotulos: Optional[List[str]],
 ) -> Dict[str, int]:
-    """Soma modificadores de ataque e CA a partir de rótulos persistidos na arena."""
-    mods = {"ataque": 0, "ca": 0}
-    if not rotulos:
-        return mods
-    for raw in rotulos:
-        ch = _normalizar_chave(raw)
-        for key, val in _CONDICOES_MOD_ATQ.items():
-            if key in ch:
-                mods["ataque"] += val
-        for key, val in _CONDICOES_MOD_CA.items():
-            if key in ch:
-                mods["ca"] += val
-    return mods
+    """Alias — delega ao catálogo v1.3 (RF-T05-v13)."""
+    return modificadores_de_condicoes(rotulos)
 
 
 def rolar_dado_formula(

@@ -9,12 +9,14 @@ from sqlalchemy.orm import Session
 
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.models.talento import TormentaTalento, TormentaTalentoPersonagem
+from app.games.tormenta.rules.poderes_catalogo_v13_t20 import metadados_poder_por_nome
 from app.games.tormenta.rules.poderes_ficha_v13_t20 import (
     AUTO_PODER_NOTA_PREFIX,
     listar_poderes_sync_v13,
 )
 from app.games.tormenta.schemas.talento_personagem import (
     TormentaMigrarTalentosJsonResponse,
+    TormentaPoderAtivarResponse,
     TormentaTalentoPersonagemItem,
     TormentaTalentoVinculoCreate,
 )
@@ -31,6 +33,7 @@ class TormentaPersonagemTalentosService:
     @staticmethod
     def _to_item(row: TormentaTalentoPersonagem) -> TormentaTalentoPersonagemItem:
         t = row.talento
+        meta = metadados_poder_por_nome(t.nome, notas=row.notas)
         return TormentaTalentoPersonagemItem(
             id=row.id,
             talento_id=row.talento_id,
@@ -39,6 +42,8 @@ class TormentaPersonagemTalentosService:
             pagina_referencia=t.pagina_referencia,
             origem_catalogo_mb=bool(t.origem_catalogo_mb),
             notas=row.notas,
+            categoria_v13=meta.get("categoria_v13"),
+            custo_pm=int(meta.get("custo_pm") or 0),
             adicionado_em=row.adicionado_em,
         )
 
@@ -241,3 +246,43 @@ class TormentaPersonagemTalentosService:
             commit_with_rollback(self.db)
 
         return {"vinculos_criados": criados, "vinculos_removidos": removidos}
+
+    def ativar_poder_com_pm(
+        self,
+        personagem_id: int,
+        vinculo_id: int,
+        *,
+        custo_pm_override: int | None = None,
+    ) -> TormentaPoderAtivarResponse:
+        p = self.db.get(TormentaPersonagem, personagem_id)
+        if not p:
+            raise ArenaBaseException("Personagem nao encontrado", status_code=404)
+        row = self.db.get(TormentaTalentoPersonagem, vinculo_id)
+        if not row or row.personagem_id != personagem_id:
+            raise ArenaBaseException("Vinculo nao encontrado", status_code=404)
+        meta = metadados_poder_por_nome(row.talento.nome, notas=row.notas)
+        custo = (
+            int(custo_pm_override)
+            if custo_pm_override is not None
+            else int(meta.get("custo_pm") or 0)
+        )
+        custo = max(0, min(99, custo))
+        if custo <= 0:
+            raise DadosInvalidos(
+                "Este poder nao possui custo PM registrado no catálogo para ativação."
+            )
+        pa_max = int(p.pa_max or 0)
+        antes = int(p.pa_atual if p.pa_atual is not None else pa_max)
+        if antes < custo:
+            raise DadosInvalidos(f"PM insuficientes: possui {antes}, custo {custo}.")
+        depois = antes - custo
+        p.pa_atual = depois
+        commit_with_rollback(self.db)
+        self.db.refresh(p)
+        return TormentaPoderAtivarResponse(
+            nome=row.talento.nome,
+            custo_pm=custo,
+            pa_atual_antes=antes,
+            pa_atual_depois=depois,
+            pa_max=pa_max,
+        )

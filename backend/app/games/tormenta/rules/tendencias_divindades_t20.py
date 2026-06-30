@@ -6,10 +6,14 @@ import json
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, FrozenSet, List
 
 _DATA = (
     Path(__file__).resolve().parent.parent / "data" / "tendencias_divindades_mb.json"
+)
+
+_CLASSES_DEVOTO_OBRIGATORIO_V13: FrozenSet[str] = frozenset(
+    {"clerigo", "druida", "paladino"}
 )
 
 
@@ -67,6 +71,17 @@ def lista_divindades_mb() -> List[Dict[str, Any]]:
         pc = x.get("poderes_concedidos")
         if isinstance(pc, list):
             item["poderes_concedidos"] = [str(p) for p in pc if str(p).strip()]
+        from app.games.tormenta.rules.divindades_obrigacoes_v13_t20 import (
+            obrigacoes_divindade_v13,
+        )
+
+        obr = obrigacoes_divindade_v13(item["slug"])
+        if obr.get("pagina") is not None:
+            item["pagina"] = obr["pagina"]
+        if obr.get("obrigacoes_flags"):
+            item["obrigacoes_flags"] = obr["obrigacoes_flags"]
+        if obr.get("sem_penalidade_obrigacao"):
+            item["sem_penalidade_obrigacao"] = True
         out.append(item)
     return out
 
@@ -91,6 +106,13 @@ def divindade_por_rotulo(rotulo: str) -> Dict[str, Any] | None:
     return None
 
 
+def classe_exige_devocao_v13(ficha_json: dict | None) -> bool:
+    """Clérigo, druida e paladino são devotos automáticos (v1.3 p.96)."""
+    fj = dict(ficha_json or {})
+    slug = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
+    return slug in _CLASSES_DEVOTO_OBRIGATORIO_V13
+
+
 def validar_devocao_v13(
     ficha_json: dict | None,
     *,
@@ -98,7 +120,7 @@ def validar_devocao_v13(
 ) -> tuple[bool, str]:
     """Valida devoto / poder concedido v1.3 (opcional; regras se preenchido)."""
     fj = dict(ficha_json or {})
-    devoto = bool(fj.get("devoto"))
+    devoto = bool(fj.get("devoto")) or classe_exige_devocao_v13(fj)
     pcs = str(fj.get("poder_concedido_slug") or "").strip().lower()
     div_slug = str(fj.get("tormenta_divindade_mb_slug") or "").strip().lower()
     if not div_slug:
@@ -107,8 +129,15 @@ def validar_devocao_v13(
             div_slug = str(row_rot.get("slug") or "").strip().lower()
 
     if devoto and not div_slug:
+        if classe_exige_devocao_v13(fj):
+            return False, "Clérigo, druida e paladino devem escolher uma divindade."
         return False, "Devoto: escolha uma divindade (Os Vinte)."
     if devoto and not pcs:
+        if classe_exige_devocao_v13(fj):
+            return (
+                False,
+                "Clérigo, druida e paladino devem escolher um poder concedido.",
+            )
         return False, "Devoto: escolha um poder concedido da divindade."
     if pcs and not div_slug:
         return False, "Poder concedido exige divindade escolhida."
