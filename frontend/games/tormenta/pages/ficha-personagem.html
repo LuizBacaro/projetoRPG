@@ -57,53 +57,53 @@
             <aside class="ficha-coluna-esquerda t20-ficha-col-esq">
                 <textarea id="f_talentos" class="t20-sr-only" tabindex="-1" aria-hidden="true" rows="1" title="Campo legado (dados antigos); use a lista de talentos MB."></textarea>
                 <div class="ficha-secao t20-ficha-secao">
-                    <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">⚔️ Atributos</h3>
+                    <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">⚔️ Atributos (valor / mod.)</h3>
                     <div class="ficha-atributos-circulo-grid-resumo t20-circulos-attrs" id="t20AttrsRow">
                         <div class="ficha-atributo-circulo" data-attr="for">
                             <div class="circulo-externo">
-                                <input id="fichaForResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Força" />
-                                <span class="circulo-mod" id="fichaForModResumo">+0</span>
+                                <input id="fichaForResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Força" aria-describedby="fichaForModResumo" />
+                                <span class="circulo-mod" id="fichaForModResumo" aria-label="Modificador de Força">+0</span>
                             </div>
                             <span class="circulo-label">FOR</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="des">
                             <div class="circulo-externo">
-                                <input id="fichaDesResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Destreza" />
-                                <span class="circulo-mod" id="fichaDesModResumo">+0</span>
+                                <input id="fichaDesResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Destreza" aria-describedby="fichaDesModResumo" />
+                                <span class="circulo-mod" id="fichaDesModResumo" aria-label="Modificador de Destreza">+0</span>
                             </div>
                             <span class="circulo-label">DES</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="con">
                             <div class="circulo-externo">
-                                <input id="fichaConResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Constituição" />
-                                <span class="circulo-mod" id="fichaConModResumo">+0</span>
+                                <input id="fichaConResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Constituição" aria-describedby="fichaConModResumo" />
+                                <span class="circulo-mod" id="fichaConModResumo" aria-label="Modificador de Constituição">+0</span>
                             </div>
                             <span class="circulo-label">CON</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="int">
                             <div class="circulo-externo">
-                                <input id="fichaIntResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Inteligência" />
-                                <span class="circulo-mod" id="fichaIntModResumo">+0</span>
+                                <input id="fichaIntResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Inteligência" aria-describedby="fichaIntModResumo" />
+                                <span class="circulo-mod" id="fichaIntModResumo" aria-label="Modificador de Inteligência">+0</span>
                             </div>
                             <span class="circulo-label">INT</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="sab">
                             <div class="circulo-externo">
-                                <input id="fichaSabResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Sabedoria" />
-                                <span class="circulo-mod" id="fichaSabModResumo">+0</span>
+                                <input id="fichaSabResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Sabedoria" aria-describedby="fichaSabModResumo" />
+                                <span class="circulo-mod" id="fichaSabModResumo" aria-label="Modificador de Sabedoria">+0</span>
                             </div>
                             <span class="circulo-label">SAB</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="car">
                             <div class="circulo-externo">
-                                <input id="fichaCarResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Carisma" />
-                                <span class="circulo-mod" id="fichaCarModResumo">+0</span>
+                                <input id="fichaCarResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Carisma" aria-describedby="fichaCarModResumo" />
+                                <span class="circulo-mod" id="fichaCarModResumo" aria-label="Modificador de Carisma">+0</span>
                             </div>
                             <span class="circulo-label">CAR</span>
                         </div>
                     </div>
                     <p class="t20-hint" id="hintAtributos" style="margin-top:0.35rem;font-size:0.72rem">
-                        Modificadores conforme <strong>tabela do Tormenta 20</strong> (faixas de valor). Os <strong>valores dos atributos</strong> são editados em <strong>Editar ficha</strong> (diálogo); aqui ficam só leitura.
+                        Valor e modificador do atributo são mostrados juntos para facilitar a leitura. Os <strong>valores dos atributos</strong> são editados em <strong>Editar ficha</strong> (diálogo); aqui ficam só leitura.
                         Fichas <strong>jogador</strong>: <strong>compra por pontos</strong> (bases 8–18, soma = 20) ou <strong>4d6</strong> (bases 3–18, reroll MB).
                     </p>
                     <p class="t20-hint t20-compra-pontos-ok" id="f_pts_compra" style="margin-top:0.2rem;font-size:0.72rem;">Atributos: …</p>
@@ -3327,10 +3327,16 @@
     }
 
     function atualizarModsAtributos() {
+        const rv = getRegraVersaoAtiva();
         ATTR_KEYS.forEach((a) => {
             const el = q(T20_ATTR_INP[a]);
             const m = q(T20_ATTR_MOD[a]);
-            if (el && m) m.textContent = formatModificadorAtributo(modificadorAtributoT20(el.value));
+            if (!el || !m) return;
+            if (window.T20AtributosUi && typeof window.T20AtributosUi.formatContribuicaoAttr === 'function') {
+                m.textContent = window.T20AtributosUi.formatContribuicaoAttr(el.value, rv);
+            } else {
+                m.textContent = formatModificadorAtributo(modificadorAtributoT20(el.value));
+            }
         });
         t20RecalcularCaBaseV13();
         atualizarLinhaCompraPontos();
