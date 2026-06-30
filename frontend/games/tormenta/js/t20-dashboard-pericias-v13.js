@@ -8,6 +8,7 @@
     let catalogo = [];
     let cfgClasse = null;
     let slugToNome = {};
+    let atributosCatalogo = [];
 
     function q(id) {
         return document.getElementById(id);
@@ -74,25 +75,31 @@
         const slug = classeSlug();
         if (!slug) {
             catalogo = [];
+            atributosCatalogo = [];
             cfgClasse = null;
             return;
         }
         try {
             const svc = new TormentaRegrasService();
-            const [cat, cls] = await Promise.all([
-                svc.obterRegrasPericias({ regraVersao: 'v13' }),
+            const [atributos, cls] = await Promise.all([
+                svc.obterAtributos({ regraVersao: 'v13' }),
                 svc.obterPericiasClassePreview(slug),
             ]);
-            catalogo = Array.isArray(cat.pericias) ? cat.pericias : [];
+            atributosCatalogo = Array.isArray(atributos && atributos.pericias) ? atributos.pericias : [];
+            catalogo = atributosCatalogo.map((p) => ({
+                slug: String(p.slug || '').trim().toLowerCase(),
+                nome: String(p.nome || '').trim(),
+                somente_treinado: Boolean(p.somente_treinado),
+                penalidade_armadura: Boolean(p.penalidade_armadura),
+            })).filter((p) => p.slug && p.nome);
             slugToNome = {};
             catalogo.forEach((p) => {
-                const sl = String(p.slug || '').trim().toLowerCase();
-                const nom = String(p.nome || '').trim();
-                if (sl && nom) slugToNome[sl] = nom;
+                if (p.slug && p.nome) slugToNome[p.slug] = p.nome;
             });
             cfgClasse = cls || null;
         } catch (_e) {
             catalogo = [];
+            atributosCatalogo = [];
             cfgClasse = null;
         }
     }
@@ -130,10 +137,7 @@
         const origemSlugs = slugsBloqueadosOrigem();
         const prev = global.__cadPericiasTreinadas || {};
         const rows = catalogo.length
-            ? catalogo.map((p) => ({
-                  slug: String(p.slug || '').trim().toLowerCase(),
-                  nome: String(p.nome || '').trim(),
-              }))
+            ? catalogo
             : Object.keys(slugToNome).map((slug) => ({ slug, nome: slugToNome[slug] }));
 
         rows.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
@@ -150,7 +154,7 @@
                 else if (origemSlugs.has(p.slug)) tag = ' <span class="t20-dash-hint">(origem)</span>';
                 else if (pool.has(p.slug)) tag = ' <span class="t20-dash-hint">(lista classe)</span>';
                 return (
-                    `<label class="cad-pericia-check" style="display:flex;align-items:center;gap:0.35rem;margin:0.15rem 0">` +
+                    `<label class="cad-pericia-check" style="display:flex;align-items:flex-start;gap:0.5rem;margin:0;cursor:pointer;line-height:1.35">` +
                     `<input type="checkbox" data-pericia-slug="${p.slug}" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} />` +
                     `<span>${p.nome}${tag}</span></label>`
                 );

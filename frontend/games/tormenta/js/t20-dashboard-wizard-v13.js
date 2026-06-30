@@ -271,12 +271,14 @@
         }
         host.innerHTML =
             '<p class="t20-dash-hint" style="margin:0 0 .35rem">Escolha <strong>2</strong> benefícios:</p>' +
-            opts
+            `<div class="cad-origem-beneficios-list" style="display:grid;gap:0.25rem;max-width:34rem">${opts
                 .map(
                     (o) =>
-                        `<label style="display:block;margin:.15rem 0"><input type="checkbox" class="cad-origem-ben-cb" value="${o.id}" ${saved.includes(o.id) ? 'checked' : ''}/> ${o.label}</label>`
+                        `<label class="cad-origem-ben-item" style="display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:0.6rem;margin:0;padding:0.25rem 0.1rem;cursor:pointer;line-height:1.3;border-radius:0.25rem">` +
+                        `<input type="checkbox" class="cad-origem-ben-cb" value="${o.id}" ${saved.includes(o.id) ? 'checked' : ''} style="margin-top:0.18rem"/>` +
+                        `<span style="display:block;min-width:0">${o.label}</span></label>`
                 )
-                .join('');
+                .join('')}</div>`;
         host.querySelectorAll('.cad-origem-ben-cb').forEach((cb) => {
             cb.addEventListener('change', () => {
                 const picks = Array.from(host.querySelectorAll('.cad-origem-ben-cb:checked')).map(
