@@ -1450,6 +1450,7 @@
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260629s44"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260629t01"></script>
+<script src="/games/tormenta/js/t20-atributos-resumo.js?v=20260630a"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
@@ -1687,16 +1688,21 @@
             const total = t20CalcularCaTotal();
             const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
             if (isV13) {
-                const desV = Math.trunc(Number((q('fichaDesResumo') && q('fichaDesResumo').value) || 0));
+                // desV é o score d20; desAttr é o modificador nativo v1.3 para exibição no texto
+                const desScore = Math.trunc(Number((q('fichaDesResumo') && q('fichaDesResumo').value) || 0));
+                const desAttr = window.T20RegraVersao
+                    ? window.T20RegraVersao.contribuicaoAtributo(desScore, getRegraVersaoAtiva())
+                    : desScore;
+                const desFmt = (desAttr >= 0 ? '+' : '') + desAttr;
                 const pesada =
                     window.T20RegraVersao &&
                     window.T20RegraVersao.temArmaduraPesada(t20ArmadurasEquipadas);
                 if (arm === 0) {
-                    caBd.textContent = `10 + DES ${desV} = ${total} (v1.3)`;
+                    caBd.textContent = `10 + DES ${desFmt} = ${total} (v1.3)`;
                 } else if (pesada) {
-                    caBd.textContent = `10 + itens ${arm >= 0 ? '+' : ''}${arm} = ${total} (v1.3; armadura pesada — DES ${desV} não aplica)`;
+                    caBd.textContent = `10 + itens ${arm >= 0 ? '+' : ''}${arm} = ${total} (v1.3; armadura pesada — DES ${desFmt} não aplica)`;
                 } else {
-                    caBd.textContent = `10 + DES ${desV} + itens ${arm >= 0 ? '+' : ''}${arm} = ${total} (v1.3)`;
+                    caBd.textContent = `10 + DES ${desFmt} + itens ${arm >= 0 ? '+' : ''}${arm} = ${total} (v1.3)`;
                 }
             } else if (arm === 0) {
                 caBd.textContent = `CA salva: ${base} (lista de armaduras sem bônus de CA)`;
@@ -1742,14 +1748,28 @@
         const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
         const fallbackBase = isV13 ? 0 : 10;
         const minFin = isV13 ? -99 : 1;
+        const valoresNativos = {};
         ATTR_KEYS.forEach((a) => {
             const base = Math.floor(Number(bases[a]));
             const fin = Math.max(minFin, (Number.isFinite(base) ? base : fallbackBase) + (rDel[a] || 0));
-            const idInp = T20_ATTR_INP[a];
+            valoresNativos[a] = String(fin);
+            // Diálogo: exibe score d20 para v1.3 (ex.: 14) ou valor MB direto (ex.: 12)
             const idDlg = T20_ATTR_DLG[a];
-            if (idInp && q(idInp)) q(idInp).value = String(fin);
-            if (idDlg && q(idDlg)) q(idDlg).value = String(fin);
+            if (idDlg && q(idDlg)) q(idDlg).value = String(isV13 ? 10 + 2 * fin : fin);
         });
+        if (window.T20AtributosResumo && typeof window.T20AtributosResumo.aplicarValoresResumoAtributos === 'function') {
+            window.T20AtributosResumo.aplicarValoresResumoAtributos(valoresNativos, {
+                fallback: fallbackBase,
+                ids: T20_ATTR_INP,
+                v13Score: isV13,
+            });
+        } else {
+            ATTR_KEYS.forEach((a) => {
+                const idInp = T20_ATTR_INP[a];
+                const fin = Number(valoresNativos[a]);
+                if (idInp && q(idInp)) q(idInp).value = String(isV13 ? 10 + 2 * fin : fin);
+            });
+        }
         atualizarModsAtributos();
         atualizarLinhaCompraPontos();
     }
@@ -2757,11 +2777,13 @@
         const id = T20_ATTR_INP[a];
         const el = id ? q(id) : null;
         const raw = el ? String(el.value).trim() : '';
-        const fallback =
-            window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva()) ? 0 : 10;
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        const fallback = isV13 ? 0 : 10;
         if (!raw) return fallback;
         const n = Number(raw);
         if (!Number.isFinite(n)) return fallback;
+        // v1.3: input exibe score d20 (10+2×attr); converte de volta para nativo (−2 a +4)
+        if (isV13) return Math.trunc((n - 10) / 2);
         return Math.floor(n);
     }
 
@@ -3332,11 +3354,10 @@
             const el = q(T20_ATTR_INP[a]);
             const m = q(T20_ATTR_MOD[a]);
             if (!el || !m) return;
-            if (window.T20AtributosUi && typeof window.T20AtributosUi.formatContribuicaoAttr === 'function') {
-                m.textContent = window.T20AtributosUi.formatContribuicaoAttr(el.value, rv);
-            } else {
-                m.textContent = formatModificadorAtributo(modificadorAtributoT20(el.value));
-            }
+            const contrib = window.T20RegraVersao && typeof window.T20RegraVersao.contribuicaoAtributo === 'function'
+                ? window.T20RegraVersao.contribuicaoAtributo(el.value, rv)
+                : modificadorAtributoT20(el.value);
+            m.textContent = formatModificadorAtributo(contrib);
         });
         t20RecalcularCaBaseV13();
         atualizarLinhaCompraPontos();
@@ -3541,7 +3562,12 @@
 
     function t20ForValorCarga() {
         const el = q('fichaForResumo') || q('f_for');
-        return el ? Number(el.value) || 0 : 0;
+        const raw = el ? Number(el.value) || 0 : 0;
+        // v1.3: input exibe score d20; backend espera nativo (−2 a +4)
+        if (window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())) {
+            return Math.trunc((raw - 10) / 2);
+        }
+        return raw;
     }
 
     function t20ColetarItensInventarioCarga() {
@@ -7126,12 +7152,33 @@
         q('f_idade').value = p.idade || '';
         t20RestaurarSelectOuLegado(q('f_tendencia'), p.tendencia || '');
         t20RestaurarSelectOuLegado(q('f_divindade'), p.divindade || '');
-        q('fichaForResumo').value = p.for_valor;
-        q('fichaDesResumo').value = p.des_valor;
-        q('fichaConResumo').value = p.con_valor;
-        q('fichaIntResumo').value = p.int_valor;
-        q('fichaSabResumo').value = p.sab_valor;
-        q('fichaCarResumo').value = p.car_valor;
+        const _isV13Preenche = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        if (window.T20AtributosResumo && typeof window.T20AtributosResumo.aplicarValoresResumoAtributos === 'function') {
+            window.T20AtributosResumo.aplicarValoresResumoAtributos(
+                {
+                    for: p.for_valor,
+                    des: p.des_valor,
+                    con: p.con_valor,
+                    int: p.int_valor,
+                    sab: p.sab_valor,
+                    car: p.car_valor,
+                },
+                {
+                    fallback: _isV13Preenche ? 0 : 10,
+                    ids: T20_ATTR_INP,
+                    v13Score: _isV13Preenche,
+                }
+            );
+        } else {
+            // Fallback: converte para score d20 se v1.3
+            const _v13s = _isV13Preenche ? (v) => 10 + 2 * (Number(v) || 0) : (v) => v;
+            q('fichaForResumo').value = _v13s(p.for_valor);
+            q('fichaDesResumo').value = _v13s(p.des_valor);
+            q('fichaConResumo').value = _v13s(p.con_valor);
+            q('fichaIntResumo').value = _v13s(p.int_valor);
+            q('fichaSabResumo').value = _v13s(p.sab_valor);
+            q('fichaCarResumo').value = _v13s(p.car_valor);
+        }
         atualizarModsAtributos();
         t20WritePairSlash('fichaPv', p.pv_atual, p.pv_max);
         t20WritePairSlash('fichaPm', p.pa_atual, p.pa_max);

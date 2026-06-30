@@ -49,11 +49,24 @@
         return 7 + Math.floor((v - 25 + 1) / 2);
     }
 
-    /** Contribuição mecânica do atributo (mod MB ou valor direto v1.3). */
+    /**
+     * Converte atributo nativo v1.3 (−2 a +4) para score d20-equivalente
+     * (ex.: 2 → 14, 1 → 12, 0 → 10).  Exibição nos círculos da ficha.
+     */
+    function v13AttrToScore(attr) {
+        const n = Number(attr);
+        return Number.isFinite(n) ? 10 + 2 * Math.trunc(n) : 10;
+    }
+
+    /**
+     * Contribuição mecânica do atributo para fórmulas.
+     * v1.3: val é o score d20-equivalente (10+2×attr); retorna o atributo nativo (−2 a +4).
+     * MB:   val é o score MB (8–18+); retorna o modificador pelo livro.
+     */
     function contribuicaoAtributo(val, regraVersao) {
         if (isV13(regraVersao)) {
             const n = Number(val);
-            return Number.isFinite(n) ? Math.trunc(n) : 0;
+            return Number.isFinite(n) ? Math.trunc((n - 10) / 2) : 0;
         }
         return modificadorAtributoMb(val);
     }
@@ -107,6 +120,7 @@
         getRegraVersaoFicha,
         isV13,
         modificadorAtributoMb,
+        v13AttrToScore,
         contribuicaoAtributo,
         labelVersaoCurta,
         valorBaseCompraPadrao,
