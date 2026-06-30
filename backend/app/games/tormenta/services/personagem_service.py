@@ -674,5 +674,7 @@ class TormentaPersonagemService:
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
         return TormentaPersonagemResponse.model_validate(ent)
+
+    def excluir(self, personagem_id: int) -> None:
         ent = self.obter_por_id(personagem_id)
         self.repo.delete(ent)
