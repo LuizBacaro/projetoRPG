@@ -77,6 +77,15 @@
       "peso": "30 kg"
     },
     {
+      "nome": "Brunea",
+      "tipo": "pesada",
+      "bonus_ca": 5,
+      "penalidade": -2,
+      "des_max": "+1",
+      "falha_arcana": "25%",
+      "peso": "20 kg"
+    },
+    {
       "nome": "Escudo leve de madeira",
       "tipo": "escudo",
       "bonus_ca": 1,

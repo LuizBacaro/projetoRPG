@@ -449,6 +449,7 @@
                         <span>Carga usada</span>
                         <input id="t20InputCargaUsada" type="text" maxlength="80" placeholder="Ex.: 12" />
                     </label>
+                    <p id="t20CargaModalHint" class="t20-hint" style="margin-top:0.35rem;font-size:0.72rem"></p>
                     <small id="t20ModalDinheiroTotalPo" class="ficha-modal-money-total">Total equivalente: PO 0</small>
                 </div>
                 <div class="ficha-modal-actions">
@@ -1315,6 +1316,7 @@
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-carga-v13.js?v=20260629s46"></script>
 <script src="/games/tormenta/js/t20-penalidade-armadura.js?v=20260629s45"></script>
 <script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260629s45"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260614"></script>
@@ -3137,6 +3139,7 @@
         atualizarResistenciasBreakdownTormenta();
         t20AtualizarModHabAtaquePlanilhaDeAtributos();
         t20AtualizarVitaisBreakdownTormenta();
+        t20AtualizarCargaV13();
         agendarAtualizarGrimorioSeModalAberto();
     }
 
@@ -3226,6 +3229,7 @@
         if (li) li.value = d.limite != null ? String(d.limite) : '';
         if (us) us.value = d.usada != null ? String(d.usada) : '';
         t20AtualizarModalDinheiroTotal();
+        t20AtualizarCargaV13();
         m.style.display = 'flex';
     }
 
@@ -3310,7 +3314,109 @@
 
     function t20CargaParaJson() {
         const p = window.__t20DinheiroPersist || {};
-        return { limite: p.limite || '', usada: p.usada || '' };
+        const st = window.__t20CargaState;
+        const base = { limite: p.limite || '', usada: p.usada || '' };
+        if (window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva()) && st) {
+            base.estado = st.estado || '';
+            base.auto_v13 = true;
+            base.limite_maximo = st.limite_maximo != null ? st.limite_maximo : undefined;
+        }
+        return base;
+    }
+
+    function t20TotalMoedasCarga() {
+        const p = window.__t20DinheiroPersist || {};
+        return Math.max(
+            0,
+            Math.floor(Number(p.pc || 0) + Number(p.pp || 0) + Number(p.po || 0) + Number(p.pl || 0))
+        );
+    }
+
+    function t20ForValorCarga() {
+        const el = q('fichaForResumo') || q('f_for');
+        return el ? Number(el.value) || 0 : 0;
+    }
+
+    function t20ColetarItensInventarioCarga() {
+        const itens = [];
+        document.querySelectorAll('#fichaEquipamentos .ficha-equipamento-linha').forEach((row) => {
+            const nome = (row.querySelector('.eq-item') && row.querySelector('.eq-item').value.trim()) || '';
+            if (!nome) return;
+            let qtd = 1;
+            try {
+                qtd = Math.max(1, parseInt(String((row.querySelector('.eq-qtd') && row.querySelector('.eq-qtd').value) || '1'), 10) || 1);
+            } catch (e0) {
+                qtd = 1;
+            }
+            itens.push({ nome, quantidade: qtd });
+        });
+        if (typeof t20ArmadurasEquipadas !== 'undefined') {
+            t20ArmadurasEquipadas.forEach((a) => {
+                itens.push({
+                    nome: a.nome || '',
+                    tipo: a.tipo || '',
+                    quantidade: 1,
+                });
+            });
+        }
+        document.querySelectorAll('#t20FichaConsumiveis .t20-cons-linha').forEach((row) => {
+            const nome = (row.querySelector('.t20-tal-nome') && row.querySelector('.t20-tal-nome').value.trim()) || '';
+            if (!nome) return;
+            let qtd = 1;
+            try {
+                qtd = Math.max(1, parseInt(String((row.querySelector('.eq-qtd') && row.querySelector('.eq-qtd').value) || '1'), 10) || 1);
+            } catch (e1) {
+                qtd = 1;
+            }
+            itens.push({ nome, quantidade: qtd, categoria: 'Consumível' });
+        });
+        return itens;
+    }
+
+    async function t20AtualizarCargaV13() {
+        if (!window.T20RegraVersao || !window.T20RegraVersao.isV13(getRegraVersaoAtiva())) return;
+        if (!window.T20CargaV13) return;
+        const forV = t20ForValorCarga();
+        const itens = t20ColetarItensInventarioCarga();
+        const moedas = t20TotalMoedasCarga();
+        let prev;
+        try {
+            prev = await new TormentaRegrasService().previewCarga({
+                for_valor: forV,
+                itens,
+                moedas_total: moedas,
+            });
+        } catch (eCarga) {
+            prev = window.T20CargaV13.previewCargaLocal(forV, itens, moedas);
+        }
+        window.__t20CargaState = prev;
+        const used = window.T20CargaV13.formatarEspacos(prev.espacos_usados);
+        const lim = prev.limite;
+        const rs = q('t20FichaDinheiroResumo');
+        if (rs) {
+            const estadoTxt = prev.estado !== 'normal' ? ` · ${window.T20CargaV13.labelEstado(prev.estado)}` : '';
+            rs.textContent = `Carga ${used}/${lim}${estadoTxt}`;
+        }
+        const hintModal = q('t20CargaModalHint');
+        if (hintModal) {
+            hintModal.textContent = `v1.3: limite ${lim} (máx. ${prev.limite_maximo}) · usado ${used} · moedas +${prev.espacos_moedas || 0} esp.`;
+            if (prev.sobrecarga) hintModal.textContent += ' — sobrecarga (−5 armadura, −3 m desloc.)';
+        }
+        const li = q('t20InputCargaLim');
+        const us = q('t20InputCargaUsada');
+        if (li) {
+            li.value = String(lim);
+            li.readOnly = true;
+        }
+        if (us) {
+            us.value = used;
+            us.readOnly = true;
+        }
+        window.__t20DinheiroPersist = {
+            ...(window.__t20DinheiroPersist || {}),
+            limite: String(lim),
+            usada: used,
+        };
     }
 
     function renderT20AtaquesLista() {
@@ -3480,6 +3586,7 @@
         });
         t20AtualizarVitaisBreakdownTormenta();
         t20AtualizarPenalidadesPericias();
+        t20AtualizarCargaV13();
     }
 
     async function t20CarregarCatalogoArmaduras(reset) {
@@ -5913,6 +6020,7 @@
         a.forEach((o) => {
             holder.appendChild(criarLinhaEquip(o.item || '', o.qtd != null ? String(o.qtd) : ''));
         });
+        t20AtualizarCargaV13();
     }
 
     function extrairFichaJson() {
@@ -6088,6 +6196,7 @@
         if (typeof window.t20AplicarPericiasClasseV13 === 'function') {
             window.t20AplicarPericiasClasseV13();
         }
+        t20AtualizarCargaV13();
         preencherAtaques(j.ataques);
         t20AplicarAtaquesBonusPlanilha(j.ataques_bonus_planilha);
         if (q('f_hab_classe_mb') && j.habilidade_classe_mb != null) {

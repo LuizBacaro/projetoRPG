@@ -285,6 +285,15 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao rolar perícia');
     }
 
+    async previewCarga(body) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/carga-preview'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        return this._handleJson(res, 'Erro ao calcular carga');
+    }
+
     /**
      * PV máximos por classe, nível e CON.
      * @param {{ classe_slug: string, nivel?: number, con_valor?: number, regraVersao?: string }} p

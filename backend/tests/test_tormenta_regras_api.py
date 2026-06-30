@@ -175,6 +175,20 @@ def test_get_regras_equipamentos_pagina(client_regras_tormenta):
     assert r.headers.get("X-Total-Count")
 
 
+def test_get_regras_equipamentos_armadura_v13(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/equipamentos",
+        params={"q": "Armadura de couro", "limit": 1},
+    )
+    assert r.status_code == 200
+    itens = r.json()["itens"]
+    assert len(itens) == 1
+    row = itens[0]
+    assert row["tipo"] == "leve"
+    assert row["bonus_ca"] == 2
+    assert row["espacos"] == 2
+
+
 def test_get_regras_talentos_pagina(client_regras_tormenta):
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/talentos",
@@ -359,6 +373,25 @@ def test_post_pericias_calcular_bonus_diplomacia_ignora_armadura(
     body = r.json()
     assert body["penalidade_armadura_aplicada"] == 0
     assert body["bonus_total"] == 3
+
+
+def test_post_carga_preview_v13(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/carga-preview",
+        json={
+            "for_valor": 2,
+            "itens": [
+                {"nome": "Mochila", "quantidade": 1},
+                {"nome": "Armadura de couro", "tipo": "leve", "quantidade": 1},
+            ],
+            "moedas_total": 1500,
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["limite"] == 14
+    assert body["espacos_moedas"] == 1
+    assert body["estado"] == "normal"
 
 
 def test_post_pericias_rolar(client_regras_tormenta):

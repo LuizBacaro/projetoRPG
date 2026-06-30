@@ -153,6 +153,9 @@
         if (isV13) {
             body.itens_protecao = itensProtecaoEquipados();
             body.uso_atletismo_natacao = usoNat;
+            body.penalidade_sobrecarga_carga = Boolean(
+                window.__t20CargaState && window.__t20CargaState.sobrecarga
+            );
         } else {
             body.penalidade_armadura = 0;
         }

@@ -14,6 +14,7 @@ from app.games.tormenta.rules.atributos_t20 import (
     lista_pericias_com_atributo,
     modificador_atributo_t20,
     pontos_iniciais_compra,
+    qualidade_geracao_4d6,
     qualidade_geracao_4d6_v13,
     validar_valores_base_4d6,
     valores_4d6_para_mapa,

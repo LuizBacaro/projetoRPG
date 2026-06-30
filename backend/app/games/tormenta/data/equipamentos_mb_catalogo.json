@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "fonte": "Referência MB — lista curada para autocomplete na ficha (expandir conforme mesa).",
-    "nota": "Pesos/slots exatos podem variar; nomes alinhados ao vocabulário usual do MB."
+    "fonte": "Tormenta 20 v1.3 — Cap. 3 p.142–164 (Tabelas 3-3 e 3-5); stats parciais + autocomplete.",
+    "nota": "Armaduras/escudos enriquecidos via armaduras_protecao_catalogo.json; espacos via carga_t20."
   },
   "itens": [
     {
@@ -28,6 +28,7 @@
     { "nome": "Armadura de escamas", "categoria": "Armadura média" },
     { "nome": "Armadura de peitoral", "categoria": "Armadura pesada" },
     { "nome": "Armadura de placas", "categoria": "Armadura pesada" },
+    { "nome": "Brunea", "categoria": "Armadura pesada" },
     { "nome": "Azagaia", "categoria": "Arma arremessável" },
     { "nome": "Bordão", "categoria": "Arma corpo a corpo" },
     { "nome": "Broquel", "categoria": "Escudo" },

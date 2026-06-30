@@ -332,6 +332,22 @@ class TormentaCatalogoItem(BaseModel):
     critico: Optional[str] = Field(default=None, max_length=80)
     alcance: Optional[str] = Field(default=None, max_length=80)
     peso: Optional[str] = Field(default=None, max_length=80)
+    tipo: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="Tipo v1.3 (leve, media, pesada, escudo) para armaduras.",
+    )
+    espacos: Optional[float] = Field(
+        default=None,
+        ge=0,
+        le=100,
+        description="Espaços de carga v1.3 (p.141).",
+    )
+    bonus_ca: Optional[int] = Field(default=None, ge=-20, le=30)
+    penalidade: Optional[int] = Field(default=None, ge=-20, le=20)
+    proficiencia: Optional[str] = Field(default=None, max_length=40)
+    empunhadura: Optional[str] = Field(default=None, max_length=40)
+    regra_versao: Optional[str] = Field(default=None, max_length=8)
 
 
 class TormentaCatalogoPaginaResponse(BaseModel):
@@ -560,6 +576,10 @@ class TormentaPericiaBonusRequest(BaseModel):
         default=False,
         description="Atletismo: penalidade só em natação (v1.3 p.116).",
     )
+    penalidade_sobrecarga_carga: bool = Field(
+        default=False,
+        description="Sobrecarga de carga v1.3: +5 penalidade de armadura em perícias.",
+    )
 
 
 class TormentaPericiaBonusResponse(BaseModel):
@@ -591,6 +611,40 @@ class TormentaPericiaRolarResponse(BaseModel):
     falha_critica: bool
     sucesso_critico: bool
     margem: int
+
+
+class TormentaCargaItemRef(BaseModel):
+    nome: str = Field(default="", max_length=200)
+    quantidade: int = Field(default=1, ge=1, le=9999)
+    categoria: Optional[str] = Field(default=None, max_length=80)
+    tipo: Optional[str] = Field(default=None, max_length=40)
+    espacos: Optional[float] = Field(default=None, ge=0, le=100)
+
+
+class TormentaCargaPreviewRequest(BaseModel):
+    for_valor: int = Field(..., ge=-99, le=99)
+    itens: List[TormentaCargaItemRef] = Field(default_factory=list)
+    moedas_total: int = Field(default=0, ge=0, le=9_999_999)
+
+
+class TormentaCargaDetalheItem(BaseModel):
+    nome: str
+    quantidade: int = 1
+    espacos_unidade: float = 0
+    espacos_total: float = 0
+
+
+class TormentaCargaPreviewResponse(BaseModel):
+    limite: int
+    limite_maximo: int
+    espacos_usados: float
+    espacos_itens: float
+    espacos_moedas: int
+    estado: str = Field(description="normal | sobrecarregado | acima_maximo")
+    sobrecarga: bool
+    penalidade_armadura_extra: int = 0
+    deslocamento_extra_m: int = 0
+    detalhes: List[TormentaCargaDetalheItem] = Field(default_factory=list)
 
 
 class TormentaPvPreviewResponse(BaseModel):

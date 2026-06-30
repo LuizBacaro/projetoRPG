@@ -18,6 +18,7 @@ from app.games.tormenta.rules.atributos_t20 import (
     valores_4d6_para_mapa,
 )
 from app.games.tormenta.rules.beneficios_nivel_t20 import lista_beneficios_por_nivel
+from app.games.tormenta.rules.carga_t20 import PENALIDADE_SOBRECARGA, preview_carga_v13
 from app.games.tormenta.rules.catalogo_armaduras_t20 import (
     filtrar_armaduras_protecao_mb,
 )
@@ -46,7 +47,10 @@ from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     tipo_lista_magias_por_classe_mb,
 )
 from app.games.tormenta.rules.origens_t20 import lista_origens_v13
-from app.games.tormenta.rules.penalidade_armadura_t20 import penalidade_armadura_pericia
+from app.games.tormenta.rules.penalidade_armadura_t20 import (
+    penalidade_armadura_pericia,
+    pericia_aplica_penalidade_armadura,
+)
 from app.games.tormenta.rules.pericias_classe_t20 import preview_pericias_classe_v13
 from app.games.tormenta.rules.pericias_criacao_t20 import preview_pericias_criacao
 from app.games.tormenta.rules.pericias_t20 import (
@@ -73,7 +77,9 @@ from app.games.tormenta.rules.tracos_raciais_t20 import preview_tracos_raciais
 from app.games.tormenta.schemas.regras_ficha import (
     TormentaArmaduraCatalogoItem,
     TormentaArmaduraCatalogoPaginaResponse,
-    TormentaBeneficioNivelMbItem,
+    TormentaCargaDetalheItem,
+    TormentaCargaPreviewRequest,
+    TormentaCargaPreviewResponse,
     TormentaCatalogoItem,
     TormentaCatalogoPaginaResponse,
     TormentaClasseMbItem,
@@ -86,6 +92,7 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaGerarAtributosResponse,
     TormentaIdiomaTabelaItem,
     TormentaKitInicialV13Opcoes,
+    TormentaMagiaMbCatalogoItem,
     TormentaMagiaMbCatalogoPaginaResponse,
     TormentaOrigemV13Item,
     TormentaPericiaAtributoItem,
@@ -628,6 +635,11 @@ def calcular_bonus_pericia_mb(
         )
     else:
         pen_arm = int(body.penalidade_armadura)
+    meta_pen = meta_pericia_por_nome(body.nome_pericia or "", rv)
+    if body.penalidade_sobrecarga_carga and pericia_aplica_penalidade_armadura(
+        meta_pen, uso_atletismo_natacao=body.uso_atletismo_natacao
+    ):
+        pen_arm += PENALIDADE_SOBRECARGA
     bonus = calcular_bonus_pericia(
         nivel=body.nivel,
         mod_atributo=body.mod_atributo,
@@ -667,6 +679,34 @@ def rolar_pericia_mb(
 ) -> TormentaPericiaRolarResponse:
     data = rolar_teste_pericia(body.bonus, body.dc)
     return TormentaPericiaRolarResponse(**data)
+
+
+@router.post(
+    "/carga-preview",
+    response_model=TormentaCargaPreviewResponse,
+    summary="Calcula carga v1.3 (espaços, limite, sobrecarga)",
+)
+def preview_carga_tormenta_v13(
+    body: TormentaCargaPreviewRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaCargaPreviewResponse:
+    raw = preview_carga_v13(
+        for_valor=body.for_valor,
+        itens=[i.model_dump() for i in body.itens],
+        moedas_total=body.moedas_total,
+    )
+    return TormentaCargaPreviewResponse(
+        limite=raw["limite"],
+        limite_maximo=raw["limite_maximo"],
+        espacos_usados=raw["espacos_usados"],
+        espacos_itens=raw["espacos_itens"],
+        espacos_moedas=raw["espacos_moedas"],
+        estado=raw["estado"],
+        sobrecarga=raw["sobrecarga"],
+        penalidade_armadura_extra=raw["penalidade_armadura_extra"],
+        deslocamento_extra_m=raw["deslocamento_extra_m"],
+        detalhes=[TormentaCargaDetalheItem(**d) for d in raw.get("detalhes") or []],
+    )
 
 
 @router.get(

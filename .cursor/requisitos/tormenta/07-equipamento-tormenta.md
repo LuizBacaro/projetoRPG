@@ -129,7 +129,7 @@ Inventor e classes com itens superiores: cross-ref `03-classes-tormenta.md`.
 
 | ID | Requisito | Prioridade |
 |----|-----------|------------|
-| RF-T07a | Catálogo `equipamentos_mb_catalogo.json` alinhado v1.3 Tabelas 3-3 e 3-5 | P0 |
+| RF-T07a | Catálogo `equipamentos_mb_catalogo.json` alinhado v1.3 Tabelas 3-3 e 3-5 | **Parcial** | Armaduras Tabela 3-5 + espacos; overlay armas kit/origem (`armas_v13_overlay.json`) |
 | RF-T07b | API `GET /tormenta/regras/equipamentos` | P0 |
 | RF-T07c | Modal equipamentos na ficha + vínculo SQL | P0 |
 | RF-T07d | **Defesa** = 10 + DES + armadura + escudo; armadura pesada sem DES e −3 m | P0 |
@@ -153,8 +153,8 @@ Inventor e classes com itens superiores: cross-ref `03-classes-tormenta.md`.
 | T$ 4d6 no wizard | **Feito** | Botão «Rolar T$ 4d6»; persiste em `ficha_json.dinheiro` |
 | Defesa v1.3 (valor DES, armadura pesada sem DES) | **Feito** | `defesa_t20.py` (`defesa_total_v13`); ficha `t20CalcularCaTotal()` |
 | Penalidade armadura por perícia | **Feito** | `penalidade_armadura_t20.py`; ficha + rolador v1.3 |
-| Carga / espaços | **Não feito** | RF-T07f |
-| Revisão preços/stats catálogo v1.3 | **Não feito** | Tabelas 3-3 e 3-5 vs `equipamentos_mb_catalogo.json` |
+| Carga / espaços | **Feito** | `carga_t20.py`, API `carga-preview`, ficha v1.3 |
+| Revisão preços/stats catálogo v1.3 | **Parcial** | Armaduras/escudos + espacos; overlay armas kit (`armas_v13_overlay.json`); tabela 3-3 completa fora do repo |
 
 ## Implementação — criação v1.3 (dashboard)
 
@@ -188,14 +188,16 @@ Itens fixos do kit (sempre adicionados quando há `kit_inicial_v13`): **Mochila*
 ### Testes
 
 - Testes: `backend/tests/test_tormenta_equipamentos_v13.py` — origem, kit, sync SQL, opções por classe
-- Testes: `backend/tests/test_tormenta_penalidade_armadura.py` — motor e API calcular-bonus
+- Testes: `backend/tests/test_tormenta_carga_v13.py` — limite FOR, ocupação, sobrecarga
+- Carga: `backend/app/games/tormenta/rules/carga_t20.py`, `frontend/games/tormenta/js/t20-carga-v13.js`
+- API carga: `POST /api/v1/tormenta/regras/carga-preview`
 
 ## Gap código
 
 - Backend pode usar nomenclatura ou valores do **MB** no catálogo geral; revisar `equipamentos_mb_catalogo.json` contra Tabelas 3-3 e 3-5 v1.3.
 - ~~Defesa na ficha (valor DES; pesada sem DES)~~ — **Feito** (`defesa_t20.py`, `t20-regra-versao.js`, ficha).
 - Penalidade de armadura em perícias For/Des: integração completa com item equipado — **Feito** (RF-T07e / RF-T04d).
-- Carga opcional para MVP; se implementar, motor em `rules/` separado de inventário SQL (RF-T07f).
+- Carga v1.3: motor em `rules/carga_t20.py` — **Feito** (RF-T07f).
 - Personagens **acima do 1º nível**: Tabela 3-1 (dinheiro por nível) — **não** implementada no wizard (só kit no nv 1).
 
 ## Critérios de aceite

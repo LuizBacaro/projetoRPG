@@ -1,0 +1,192 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 v1.3 — Tabela 3-3 p.143–145 (overlay parcial: kit p.140 + origens)",
+    "nota": "Não replica a tabela inteira; preenche stats de armas usadas no wizard/kit. Estilingue≈Funda; Cajado≈Bordão (MB legado)."
+  },
+  "itens": [
+    {
+      "nome": "Clava",
+      "secao": "Armas simples · Corpo a corpo",
+      "proficiencia": "simples",
+      "empunhadura": "uma mão",
+      "custo": "—",
+      "dano_m": "1d6",
+      "tipo_dano": "Impacto",
+      "critico": "×2",
+      "peso": "1,5 kg"
+    },
+    {
+      "nome": "Maça",
+      "secao": "Armas simples · Corpo a corpo",
+      "proficiencia": "simples",
+      "empunhadura": "uma mão",
+      "custo": "T$ 12",
+      "dano_m": "1d8",
+      "tipo_dano": "Impacto",
+      "critico": "×2",
+      "peso": "6 kg"
+    },
+    {
+      "nome": "Lança",
+      "secao": "Armas simples · Corpo a corpo",
+      "proficiencia": "simples",
+      "empunhadura": "uma mão",
+      "custo": "T$ 2",
+      "dano_m": "1d6",
+      "tipo_dano": "Perfuração",
+      "critico": "×2",
+      "alcance": "Curto",
+      "peso": "1,5 kg"
+    },
+    {
+      "nome": "Bordão",
+      "secao": "Armas simples · Corpo a corpo",
+      "proficiencia": "simples",
+      "empunhadura": "duas mãos",
+      "custo": "—",
+      "dano_m": "1d6/1d6",
+      "tipo_dano": "Impacto",
+      "critico": "×2",
+      "peso": "2 kg"
+    },
+    {
+      "nome": "Cajado",
+      "secao": "Armas simples · Corpo a corpo",
+      "proficiencia": "simples",
+      "empunhadura": "duas mãos",
+      "custo": "—",
+      "dano_m": "1d6/1d6",
+      "tipo_dano": "Impacto",
+      "critico": "×2",
+      "peso": "2 kg"
+    },
+    {
+      "nome": "Azagaia",
+      "secao": "Armas simples · À distância",
+      "proficiencia": "simples",
+      "empunhadura": "uma mão",
+      "custo": "T$ 1",
+      "dano_m": "1d6",
+      "tipo_dano": "Perfuração",
+      "critico": "×2",
+      "alcance": "Médio",
+      "peso": "1 kg"
+    },
+    {
+      "nome": "Funda",
+      "secao": "Armas simples · À distância",
+      "proficiencia": "simples",
+      "empunhadura": "uma mão",
+      "custo": "—",
+      "dano_m": "1d4",
+      "tipo_dano": "Impacto",
+      "critico": "×2",
+      "alcance": "Médio",
+      "peso": "250 g"
+    },
+    {
+      "nome": "Estilingue",
+      "secao": "Armas simples · À distância",
+      "proficiencia": "simples",
+      "empunhadura": "uma mão",
+      "custo": "—",
+      "dano_m": "1d4",
+      "tipo_dano": "Impacto",
+      "critico": "×2",
+      "alcance": "Médio",
+      "peso": "250 g"
+    },
+    {
+      "nome": "Dardo",
+      "secao": "Armas simples · Arremessável",
+      "proficiencia": "simples",
+      "empunhadura": "leve",
+      "custo": "T$ 0,5",
+      "dano_m": "1d4",
+      "tipo_dano": "Perfuração",
+      "critico": "×2",
+      "alcance": "Curto",
+      "peso": "250 g"
+    },
+    {
+      "nome": "Espada longa",
+      "secao": "Armas marciais · Corpo a corpo",
+      "proficiencia": "marcial",
+      "empunhadura": "uma mão",
+      "custo": "T$ 15",
+      "dano_m": "1d8",
+      "tipo_dano": "Corte",
+      "critico": "19",
+      "peso": "2 kg"
+    },
+    {
+      "nome": "Espada curta",
+      "secao": "Armas simples · Corpo a corpo",
+      "proficiencia": "simples",
+      "empunhadura": "leve",
+      "custo": "T$ 10",
+      "dano_m": "1d6",
+      "tipo_dano": "Perfuração",
+      "critico": "19",
+      "peso": "1 kg"
+    },
+    {
+      "nome": "Machado de batalha",
+      "secao": "Armas marciais · Corpo a corpo",
+      "proficiencia": "marcial",
+      "empunhadura": "uma mão",
+      "custo": "T$ 10",
+      "dano_m": "1d8",
+      "tipo_dano": "Corte",
+      "critico": "×3",
+      "peso": "3 kg"
+    },
+    {
+      "nome": "Martelo de guerra",
+      "secao": "Armas marciais · Corpo a corpo",
+      "proficiencia": "marcial",
+      "empunhadura": "uma mão",
+      "custo": "T$ 12",
+      "dano_m": "1d8",
+      "tipo_dano": "Impacto",
+      "critico": "×3",
+      "peso": "2,5 kg"
+    },
+    {
+      "nome": "Tridente",
+      "secao": "Armas marciais · Corpo a corpo",
+      "proficiencia": "marcial",
+      "empunhadura": "uma mão",
+      "custo": "T$ 15",
+      "dano_m": "1d8",
+      "tipo_dano": "Perfuração",
+      "critico": "×2",
+      "alcance": "Curto",
+      "peso": "2 kg"
+    },
+    {
+      "nome": "Arco curto",
+      "secao": "Armas simples · À distância",
+      "proficiencia": "simples",
+      "empunhadura": "duas mãos",
+      "custo": "T$ 30",
+      "dano_m": "1d6",
+      "tipo_dano": "Perfuração",
+      "critico": "×3",
+      "alcance": "Médio",
+      "peso": "1 kg"
+    },
+    {
+      "nome": "Arco longo",
+      "secao": "Armas marciais · À distância",
+      "proficiencia": "marcial",
+      "empunhadura": "duas mãos",
+      "custo": "T$ 100",
+      "dano_m": "1d8",
+      "tipo_dano": "Perfuração",
+      "critico": "×3",
+      "alcance": "Médio",
+      "peso": "1,5 kg"
+    }
+  ]
+}
