@@ -777,12 +777,12 @@
                 <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0.75rem 0 0;padding:0.65rem">
                     <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Atributos</legend>
                     <div class="t20-dash-attrs6">
-                        <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="0" max="99" value="10" required /></div>
-                        <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="0" max="99" value="10" required /></div>
-                        <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="0" max="99" value="10" required /></div>
-                        <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="0" max="99" value="10" required /></div>
-                        <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="0" max="99" value="10" required /></div>
-                        <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="0" max="99" value="10" required /></div>
+                        <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="0" max="99" value="0" required /></div>
+                        <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="0" max="99" value="0" required /></div>
+                        <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="0" max="99" value="0" required /></div>
+                        <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="0" max="99" value="0" required /></div>
+                        <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="0" max="99" value="0" required /></div>
+                        <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="0" max="99" value="0" required /></div>
                     </div>
                 </fieldset>
             </div>
@@ -1021,7 +1021,7 @@
         const el = id ? document.getElementById(id) : null;
         const raw = el ? String(el.value).trim() : '';
         const n = Number(raw);
-        if (!Number.isFinite(n)) return 10;
+        if (!Number.isFinite(n)) return isDashV13() ? 0 : 10;
         return Math.floor(n);
     }
 
@@ -1094,9 +1094,9 @@
         }
         if (isDashV13()) {
             hj.innerHTML =
-                'Tipo jogador v1.3: os seis números são os <strong>valores finais</strong> (base + bônus racial). ' +
+                'Tipo jogador v1.3: os seis números são os valores finais no modo compra por pontos e os valores-base no modo 4d6. ' +
                 '<strong>Compra por pontos:</strong> base −2 a +4, soma dos custos = <strong>10</strong>. ' +
-                '<strong>4d6:</strong> role seis valores (Tabela 1-1); soma dos seis bases deve ser ≥ 6.';
+                '<strong>4d6:</strong> role seis valores 4d6, converta cada soma pela Tabela 1-1 e use os seis valores-base resultantes; a soma dos seis deve ser ≥ 6.';
         } else {
             hj.innerHTML =
                 'Tipo jogador: os seis números são os <strong>valores finais</strong> (base + bônus racial MB). ' +
@@ -1114,6 +1114,28 @@
             out[a] = Math.max(minBase, fin - (rDel[a] || 0));
         });
         return out;
+    }
+
+    function aplicarBasesPadraoDash() {
+        const AG = window.T20AtributosGeracao;
+        if (AG) {
+            cadBasesAtributos = AG.basesPadraoCompra({ regraVersao: DASH_REGRA_VERSAO });
+        } else {
+            cadBasesAtributos = isDashV13()
+                ? { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 }
+                : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+        }
+        aplicarFinaisDeBasesDash(cadBasesAtributos);
+    }
+
+    function resetAtributosDash() {
+        const metodo = getMetodoGeracaoDash();
+        cadBasesAtributos = null;
+        if (metodo === '4d6') {
+            aplicarBasesPadraoDash();
+        } else {
+            resetCompraPontosDash();
+        }
     }
 
     function popularCadOpcoesMais2Selects() {
@@ -1213,9 +1235,13 @@
             if (total === null) {
                 hint.textContent = `Compra: bases fora de ${rangeTxt} na tabela.`;
             } else if (total === pontosIniciaisCompra) {
-                hint.textContent = `Compra por pontos: ${total} / ${pontosIniciaisCompra} pts (OK).`;
+                hint.textContent = `Compra por pontos: ${total} / ${pontosIniciaisCompra} pts (OK).`; 
+            } else if (total < pontosIniciaisCompra) {
+                const falta = pontosIniciaisCompra - total;
+                hint.textContent = `Compra por pontos: ${total} / ${pontosIniciaisCompra} pts. Faltam ${falta} pt${falta === 1 ? '' : 's'}.`;
             } else {
-                hint.textContent = `Compra por pontos: ${total} / ${pontosIniciaisCompra} pts.`;
+                const excesso = total - pontosIniciaisCompra;
+                hint.textContent = `Compra por pontos: ${total} / ${pontosIniciaisCompra} pts. Excedeu em ${excesso} pt${excesso === 1 ? '' : 's'}.`;
             }
         }
     }
@@ -1252,7 +1278,9 @@
         const AG = window.T20AtributosGeracao;
         cadBasesAtributos = AG
             ? AG.basesPadraoCompra({ regraVersao: DASH_REGRA_VERSAO })
-            : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+            : isDashV13()
+                ? { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 }
+                : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
         aplicarFinaisDeBasesDash(cadBasesAtributos);
         atualizarHintMetodoGeracaoDash();
     }
@@ -1264,7 +1292,9 @@
         if (!slug || slug === '__livre__') {
             const bases = AG
                 ? AG.basesPadraoCompra({ regraVersao: DASH_REGRA_VERSAO })
-                : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+                : isDashV13()
+                    ? { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 }
+                    : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
             cadBasesAtributos = null;
             aplicarFinaisDeBasesDash(bases);
             atualizarHintMetodoGeracaoDash();
@@ -1276,7 +1306,9 @@
         } else {
             cadBasesAtributos = AG
                 ? AG.basesPadraoCompra({ regraVersao: DASH_REGRA_VERSAO })
-                : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
+                : isDashV13()
+                    ? { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 }
+                    : { for: 10, des: 10, con: 10, int: 10, sab: 10, car: 10 };
             aplicarFinaisDeBasesDash(cadBasesAtributos);
         }
         atualizarHintMetodoGeracaoDash();
@@ -1470,6 +1502,10 @@
     function closeOverlay(id) {
         const el = document.getElementById(id);
         if (!el) return;
+        const active = document.activeElement;
+        if (active && el.contains(active)) {
+            active.blur();
+        }
         el.classList.remove('t20-dash-overlay--open');
         el.setAttribute('aria-hidden', 'true');
     }
@@ -2362,7 +2398,7 @@
             T20DashPericiasV13.resetPericias();
         }
         if (t === 'jogador') {
-            resetCompraPontosDash();
+            resetAtributosDash();
         } else {
             const defAttrs = { cadFor: 10, cadDes: 10, cadCon: 10, cadInt: 10, cadSab: 10, cadCar: 10 };
             Object.entries(defAttrs).forEach(([id, v]) => {
@@ -2493,12 +2529,7 @@
 
     document.getElementById('cadMetodoGeracao')?.addEventListener('change', () => {
         cadMetodoGeracao = getMetodoGeracaoDash();
-        if (cadMetodoGeracao === 'compra_pontos') {
-            cadBasesAtributos = null;
-            resetCompraPontosDash();
-        } else {
-            cadBasesAtributos = null;
-        }
+        resetAtributosDash();
         atualizarUiMetodoGeracaoDash();
     });
     document.getElementById('cadBtnRolar4d6')?.addEventListener('click', () => rolar4d6Dash());
