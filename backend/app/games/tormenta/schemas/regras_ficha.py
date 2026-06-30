@@ -538,7 +538,12 @@ class TormentaPericiaBonusRequest(BaseModel):
     graduacao: int = Field(0, ge=0, le=99)
     outros: int = Field(0, ge=-99, le=99)
     racial_bonus: int = Field(0, ge=-99, le=99)
-    penalidade_armadura: int = Field(0, ge=0, le=99)
+    penalidade_armadura: int = Field(
+        0,
+        ge=0,
+        le=99,
+        description="Override manual; ignorado se itens_protecao for enviado.",
+    )
     pericia_de_classe: bool = False
     nome_pericia: Optional[str] = Field(None, max_length=120)
     slug_raca: Optional[str] = Field(None, max_length=40)
@@ -547,12 +552,26 @@ class TormentaPericiaBonusRequest(BaseModel):
         max_length=8,
         description="mb ou v13 — altera fórmula de bônus e treino.",
     )
+    itens_protecao: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="Armaduras/escudos equipados — auto-calcula penalidade por perícia.",
+    )
+    uso_atletismo_natacao: bool = Field(
+        default=False,
+        description="Atletismo: penalidade só em natação (v1.3 p.116).",
+    )
 
 
 class TormentaPericiaBonusResponse(BaseModel):
     bonus_total: int
     meio_nivel: int
     bonus_treinamento: int = Field(default=0, ge=0, le=10)
+    penalidade_armadura_aplicada: int = Field(
+        default=0,
+        ge=0,
+        le=99,
+        description="Penalidade subtraída do bônus (armadura + escudo).",
+    )
     percepcao_passiva: Optional[int] = None
     pode_usar: bool = Field(default=True)
     motivo_bloqueio: str = Field(default="", max_length=300)

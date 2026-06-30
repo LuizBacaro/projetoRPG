@@ -27,6 +27,7 @@ from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_V13,
     regra_versao_de_ficha,
 )
+from app.games.tormenta.rules.tendencias_divindades_t20 import validar_devocao_v13
 from app.games.tormenta.schemas.personagem import (
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
@@ -318,7 +319,8 @@ class TormentaPersonagemService:
         if not ficha_json:
             return
         if criacao and ficha_json.get("cadastro_dashboard"):
-            return
+            if not ficha_json.get("pericias_wizard_v13"):
+                return
         slug = str(ficha_json.get("tormenta_classe_mb_slug") or "").strip().lower()
         if not slug:
             return
@@ -380,6 +382,22 @@ class TormentaPersonagemService:
         ok, motivo = validar_beneficios_origem(slug, ben)
         if not ok:
             raise DadosInvalidos(motivo or "Benefícios de origem inválidos.")
+
+    @staticmethod
+    def _validar_devocao_v13(
+        tipo: str,
+        ficha_json: Optional[dict],
+        *,
+        divindade_rotulo: Optional[str] = None,
+    ) -> None:
+        if (tipo or "").lower() != "jogador":
+            return
+        fj = dict(ficha_json or {})
+        if regra_versao_de_ficha(fj) != REGRA_VERSAO_V13:
+            return
+        ok, motivo = validar_devocao_v13(fj, divindade_rotulo=divindade_rotulo)
+        if not ok:
+            raise DadosInvalidos(motivo or "Devoção inválida.")
 
     @staticmethod
     def _preparar_ficha_json_tormenta(ficha_json: Optional[dict]) -> dict:
@@ -516,6 +534,11 @@ class TormentaPersonagemService:
         )
         self._validar_arcanista_caminho_v13(payload.tipo, ficha_prep)
         self._validar_origem_v13(payload.tipo, ficha_prep, criacao=True)
+        self._validar_devocao_v13(
+            payload.tipo,
+            ficha_prep,
+            divindade_rotulo=(payload.divindade or "").strip() or None,
+        )
 
         pv_max = payload.pv_max
         pv_atual = payload.pv_atual if payload.pv_atual is not None else pv_max
@@ -605,6 +628,8 @@ class TormentaPersonagemService:
         if "ficha_json" in data:
             self._validar_arcanista_caminho_v13(tipo_final, fj)
             self._validar_origem_v13(tipo_final, fj)
+            div_rot = str(data.get("divindade", ent.divindade) or "").strip() or None
+            self._validar_devocao_v13(tipo_final, fj, divindade_rotulo=div_rot)
 
         if "foto_url" in data:
             raw = data["foto_url"]

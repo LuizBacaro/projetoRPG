@@ -46,12 +46,14 @@ from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     tipo_lista_magias_por_classe_mb,
 )
 from app.games.tormenta.rules.origens_t20 import lista_origens_v13
+from app.games.tormenta.rules.penalidade_armadura_t20 import penalidade_armadura_pericia
 from app.games.tormenta.rules.pericias_classe_t20 import preview_pericias_classe_v13
 from app.games.tormenta.rules.pericias_criacao_t20 import preview_pericias_criacao
 from app.games.tormenta.rules.pericias_t20 import (
     bonus_treinamento_por_nivel,
     calcular_bonus_pericia,
     lista_dificuldades_padrao_mb,
+    meta_pericia_por_nome,
     percepcao_passiva_t20,
     pode_usar_pericia_treinada,
     racial_bonus_pericia,
@@ -617,6 +619,15 @@ def calcular_bonus_pericia_mb(
     pode, motivo = pode_usar_pericia_treinada(
         body.nome_pericia or "", body.treinado, rv
     )
+    if body.itens_protecao is not None:
+        meta = meta_pericia_por_nome(body.nome_pericia or "", rv)
+        pen_arm = penalidade_armadura_pericia(
+            meta,
+            body.itens_protecao,
+            uso_atletismo_natacao=body.uso_atletismo_natacao,
+        )
+    else:
+        pen_arm = int(body.penalidade_armadura)
     bonus = calcular_bonus_pericia(
         nivel=body.nivel,
         mod_atributo=body.mod_atributo,
@@ -624,7 +635,7 @@ def calcular_bonus_pericia_mb(
         graduacao=body.graduacao,
         outros=body.outros,
         racial_bonus=racial,
-        penalidade_armadura=body.penalidade_armadura,
+        penalidade_armadura=pen_arm,
         pericia_de_classe=body.pericia_de_classe,
         regra_versao=rv,
     )
@@ -638,6 +649,7 @@ def calcular_bonus_pericia_mb(
         bonus_total=bonus,
         meio_nivel=meio,
         bonus_treinamento=tre,
+        penalidade_armadura_aplicada=pen_arm,
         percepcao_passiva=pp,
         pode_usar=pode,
         motivo_bloqueio=motivo,

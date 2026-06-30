@@ -73,6 +73,29 @@
         return 10 + des + outros;
     }
 
+    function temArmaduraPesada(itensProtecao) {
+        return (itensProtecao || []).some(
+            (it) => String((it && it.tipo) || '').trim().toLowerCase() === 'pesada'
+        );
+    }
+
+    function somaBonusProtecao(itensProtecao) {
+        return (itensProtecao || []).reduce(
+            (acc, it) => acc + (Number(it && it.bonus_ca) || 0),
+            0
+        );
+    }
+
+    /** CA total v1.3: 10 + DES (exceto com armadura pesada) + bônus armadura/escudo. */
+    function defesaTotalV13(desValor, itensProtecao, outrosBonus) {
+        const bonus = somaBonusProtecao(itensProtecao);
+        const des = temArmaduraPesada(itensProtecao)
+            ? 0
+            : contribuicaoAtributo(desValor, RV_V13);
+        const outros = Number(outrosBonus) || 0;
+        return 10 + des + bonus + outros;
+    }
+
     global.T20RegraVersao = {
         RV_MB,
         RV_V13,
@@ -85,5 +108,8 @@
         labelVersaoCurta,
         valorBaseCompraPadrao,
         defesaBaseCa,
+        temArmaduraPesada,
+        somaBonusProtecao,
+        defesaTotalV13,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

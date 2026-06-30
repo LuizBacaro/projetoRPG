@@ -317,6 +317,48 @@ def test_post_pericias_calcular_bonus_v13(client_regras_tormenta):
     body = r.json()
     assert body["bonus_total"] == 10
     assert body["bonus_treinamento"] == 4
+    assert body["penalidade_armadura_aplicada"] == 0
+
+
+def test_post_pericias_calcular_bonus_acrobacia_com_armadura(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pericias/calcular-bonus",
+        json={
+            "nivel": 7,
+            "mod_atributo": 3,
+            "treinado": True,
+            "regra_versao": "v13",
+            "nome_pericia": "Acrobacia",
+            "itens_protecao": [
+                {"nome": "Cota de malha", "tipo": "media", "penalidade": -2},
+                {"nome": "Escudo leve", "tipo": "escudo", "penalidade": -1},
+            ],
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["penalidade_armadura_aplicada"] == 3
+    assert body["bonus_total"] == 7
+
+
+def test_post_pericias_calcular_bonus_diplomacia_ignora_armadura(
+    client_regras_tormenta,
+):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pericias/calcular-bonus",
+        json={
+            "nivel": 3,
+            "mod_atributo": 2,
+            "treinado": False,
+            "regra_versao": "v13",
+            "nome_pericia": "Diplomacia",
+            "itens_protecao": [{"nome": "Placas", "tipo": "pesada", "penalidade": -5}],
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["penalidade_armadura_aplicada"] == 0
+    assert body["bonus_total"] == 3
 
 
 def test_post_pericias_rolar(client_regras_tormenta):

@@ -253,6 +253,16 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao carregar regras de perícias');
     }
 
+    async obterPericiasClassePreview(classeSlug) {
+        const sp = new URLSearchParams();
+        sp.set('classe_slug', String(classeSlug || '').trim());
+        const res = await fetch(
+            `${window.getApiUrl('/tormenta/regras/pericias-classe-preview')}?${sp}`,
+            { headers: this._headers() }
+        );
+        return this._handleJson(res, 'Erro ao carregar perícias de classe');
+    }
+
     async calcularBonusPericia(body) {
         const payload = { ...body };
         if (body.regraVersao && payload.regra_versao == null) {

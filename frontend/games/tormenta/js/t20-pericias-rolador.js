@@ -118,6 +118,15 @@
         return window.T20RegraVersao ? window.T20RegraVersao.DEFAULT_NOVA_FICHA : 'v13';
     }
 
+    function itensProtecaoEquipados() {
+        const raw =
+            typeof window.t20ArmadurasEquipadas !== 'undefined' ? window.t20ArmadurasEquipadas : [];
+        if (window.T20PenalidadeArmadura && window.T20PenalidadeArmadura.itensProtecaoPayload) {
+            return window.T20PenalidadeArmadura.itensProtecaoPayload(raw);
+        }
+        return raw;
+    }
+
     async function calcularBonusLinha(tr) {
         const nomeEl = tr.querySelector('.t20-p-nome');
         const nome = nomeEl ? nomeEl.textContent.trim() : '';
@@ -128,6 +137,7 @@
         const deClasse = tr.classList.contains('t20-pericia-de-classe-row');
         const rv = getRegraVersaoRolador();
         const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(rv);
+        const usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
         const body = {
             nivel: nivelPersonagem(),
             mod_atributo: modAt,
@@ -138,9 +148,14 @@
             slug_raca: slugRaca(),
             nome_pericia: nome,
             pericia_de_classe: deClasse,
-            penalidade_armadura: 0,
             regraVersao: rv,
         };
+        if (isV13) {
+            body.itens_protecao = itensProtecaoEquipados();
+            body.uso_atletismo_natacao = usoNat;
+        } else {
+            body.penalidade_armadura = 0;
+        }
         const res = await regras().calcularBonusPericia(body);
         return res;
     }
@@ -172,6 +187,9 @@
             });
             let msg = `${nome}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total} vs DC ${dc} → `;
             msg += roll.sucesso ? 'SUCESSO' : 'FALHA';
+            if (calc.penalidade_armadura_aplicada > 0) {
+                msg += ` (pen. armadura −${calc.penalidade_armadura_aplicada})`;
+            }
             if (roll.falha_critica) msg += ' (falha crítica)';
             if (roll.sucesso_critico) msg += ' (sucesso crítico)';
             if (calc.percepcao_passiva != null) {

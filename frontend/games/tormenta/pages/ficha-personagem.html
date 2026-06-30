@@ -327,6 +327,7 @@
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Perícias</h3>
                     <p class="t20-hint" id="fichaPericiasHint" style="margin-top:0">½ nível usa o nível em <strong>Editar ficha</strong>. Marque treinado quando aplicável (+2 no T20). Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe MB.</p>
                     <p class="t20-hint" id="fichaPericiasOrcamento" style="margin-top:0.2rem;font-size:0.72rem"></p>
+                    <p class="t20-hint" id="fichaPenArmEquipHint" style="margin-top:0.2rem;font-size:0.72rem"></p>
                     <div class="t20-pericias-scroll">
                         <table class="t20-pericias-table" id="tblPericias">
                             <thead>
@@ -1308,13 +1309,14 @@
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioAuto"></script>
-<script src="/games/tormenta/js/t20-regra-versao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/t20-regra-versao.js?v=20260629s44"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
-<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-penalidade-armadura.js?v=20260629s45"></script>
+<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260629s45"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260614"></script>
 <script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614subirnivel"></script>
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260629"></script>
@@ -1493,8 +1495,17 @@
         else el.textContent = s;
     }
 
+    function t20CalcularCaTotal() {
+        const rv = getRegraVersaoAtiva();
+        if (window.T20RegraVersao && window.T20RegraVersao.isV13(rv)) {
+            const des = Number(q('fichaDesResumo') && q('fichaDesResumo').value) || 0;
+            return window.T20RegraVersao.defesaTotalV13(des, t20ArmadurasEquipadas, 0);
+        }
+        return __t20CaBaseSemItens + t20SomaBonusArmaduras();
+    }
+
     function t20AtualizarCaExibida() {
-        t20SetSpanText('fichaCa', String(__t20CaBaseSemItens + t20SomaBonusArmaduras()));
+        t20SetSpanText('fichaCa', String(t20CalcularCaTotal()));
     }
 
     function t20RecalcularCaBaseV13() {
@@ -1518,18 +1529,24 @@
         if (caBd) {
             const arm = t20SomaBonusArmaduras();
             const base = __t20CaBaseSemItens;
+            const total = t20CalcularCaTotal();
             const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
             if (isV13) {
-                const desM = modificadorAtributoT20((q('fichaDesResumo') && q('fichaDesResumo').value) || '0');
+                const desV = Math.trunc(Number((q('fichaDesResumo') && q('fichaDesResumo').value) || 0));
+                const pesada =
+                    window.T20RegraVersao &&
+                    window.T20RegraVersao.temArmaduraPesada(t20ArmadurasEquipadas);
                 if (arm === 0) {
-                    caBd.textContent = `10 + DES ${formatModificadorAtributo(desM)} = ${base} (v1.3)`;
+                    caBd.textContent = `10 + DES ${desV} = ${total} (v1.3)`;
+                } else if (pesada) {
+                    caBd.textContent = `10 + itens ${arm >= 0 ? '+' : ''}${arm} = ${total} (v1.3; armadura pesada — DES ${desV} não aplica)`;
                 } else {
-                    caBd.textContent = `Base ${base} (10+DES) + itens ${arm >= 0 ? '+' : ''}${arm} = ${base + arm}`;
+                    caBd.textContent = `10 + DES ${desV} + itens ${arm >= 0 ? '+' : ''}${arm} = ${total} (v1.3)`;
                 }
             } else if (arm === 0) {
                 caBd.textContent = `CA salva: ${base} (lista de armaduras sem bônus de CA)`;
             } else {
-                caBd.textContent = `Base ${base} + itens ${arm >= 0 ? '+' : ''}${arm} = ${base + arm}`;
+                caBd.textContent = `Base ${base} + itens ${arm >= 0 ? '+' : ''}${arm} = ${total}`;
             }
         }
         t20AtualizarCaExibida();
@@ -3430,6 +3447,7 @@
         if (!t20ArmadurasEquipadas.length) {
             lista.innerHTML = '<span class="ficha-vazio">Nenhuma armadura/item de proteção cadastrado</span>';
             t20AtualizarVitaisBreakdownTormenta();
+            t20AtualizarPenalidadesPericias();
             return;
         }
         lista.innerHTML = `
@@ -3461,6 +3479,7 @@
             });
         });
         t20AtualizarVitaisBreakdownTormenta();
+        t20AtualizarPenalidadesPericias();
     }
 
     async function t20CarregarCatalogoArmaduras(reset) {
@@ -5417,6 +5436,10 @@
             const soTreinaChecked = soTreinaRegra ? ' checked' : '';
             const penArmRegra = row.penalidade_armadura === true;
             const penArmChecked = penArmRegra ? ' checked' : '';
+            const isAtletismo = row.slug === 'atletismo';
+            const natCtrl = isAtletismo
+                ? '<label class="t20-pen-nat" title="Natação — aplica penalidade de armadura"><input type="checkbox" class="p-pen-natacao" /> 🏊</label>'
+                : '';
             const cellNome =
                 nome === '—'
                     ? '<input class="nome-livre t20-input" placeholder="Outra" />'
@@ -5430,9 +5453,34 @@
                 <td><input type="number" class="p-mod t20-input" value="0" /></td>
                 <td><input type="number" class="p-out t20-input" value="0" /></td>
                 <td><input type="checkbox" class="p-so-treina" title="Somente treinado (regra base; pode desmarcar se a mesa permitir)"${soTreinaChecked} /></td>
-                <td><input type="checkbox" class="p-pen-arm" title="Penalidade de armadura (regra base; ajuste manual no Total se usar armadura)"${penArmChecked} /></td>
+                <td class="t20-pen-arm-cell"><input type="checkbox" class="p-pen-arm" title="Perícia sujeita a penalidade de armadura (Tabela 2-1)"${penArmChecked} /><span class="p-pen-val t20-pen-val" aria-live="polite"></span>${natCtrl}</td>
             </tr>`;
         }).join('');
+        tb.querySelectorAll('.p-pen-natacao').forEach((cb) => {
+            cb.addEventListener('change', () => t20AtualizarPenalidadesPericias());
+        });
+    }
+
+    function t20AtualizarPenalidadesPericias() {
+        const penApi = window.T20PenalidadeArmadura;
+        if (!penApi) return;
+        const itens = typeof t20ArmadurasEquipadas !== 'undefined' ? t20ArmadurasEquipadas : [];
+        const totalPen = penApi.penalidadeEquipadaTotal(itens);
+        const hint = q('fichaPenArmEquipHint');
+        if (hint) {
+            hint.textContent =
+                totalPen > 0
+                    ? `Penalidade equipada: −${totalPen} (armadura + escudo acumulam nas perícias marcadas).`
+                    : '';
+        }
+        document.querySelectorAll('#tblPericias tbody tr').forEach((tr, i) => {
+            const meta = PERICIAS_META[i] || {};
+            const usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
+            const pen = penApi.penalidadeArmaduraPericia(meta, itens, usoNat);
+            const span = tr.querySelector('.p-pen-val');
+            if (span) span.textContent = pen > 0 ? `−${pen}` : '';
+            tr.classList.toggle('t20-pericia-pen-arm-ativa', pen > 0);
+        });
     }
 
     function atualizarModsPericiasDasHabilidades() {
@@ -5632,12 +5680,17 @@
                 if (td) td.style.display = isV13 ? 'none' : '';
                 if (isV13) totInp.value = '0';
             }
+            const penArm = tr.querySelector('.p-pen-arm');
+            if (penArm) penArm.disabled = isV13;
+            const penNat = tr.querySelector('.p-pen-nat');
+            if (penNat) penNat.style.display = isV13 ? '' : 'none';
         });
         if (hint) {
             hint.innerHTML = isV13
-                ? '½ nível usa o nível em <strong>Editar ficha</strong>. Treino +2 (1º–6º), +4 (7º–14º), +6 (15º+) — v1.3. Coluna <strong>Atrib.</strong> = valor do atributo-chave. Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe.'
+                ? '½ nível usa o nível em <strong>Editar ficha</strong>. Treino +2 (1º–6º), +4 (7º–14º), +6 (15º+) — v1.3. Coluna <strong>Atrib.</strong> = valor do atributo-chave. Coluna <strong>Arm.</strong> mostra penalidade automática dos itens equipados (Acrobacia, Furtividade, Ladinagem; Atletismo só com 🏊 natação). Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe.'
                 : '½ nível usa o nível em <strong>Editar ficha</strong>. Marque treinado quando aplicável (+2 no MB). Coluna <strong>Total</strong> = graduações. Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe MB.';
         }
+        t20AtualizarPenalidadesPericias();
     }
 
     function aplicarLinhaPericia(tr, p, idxFallback) {
@@ -5701,6 +5754,7 @@
             }
             if (tr) aplicarLinhaPericia(tr, p, idx);
         });
+        t20AtualizarPenalidadesPericias();
     }
 
     function coletarAtaques() {

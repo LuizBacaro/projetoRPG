@@ -82,7 +82,7 @@ def test_vagas_humano_versatil_pericia_poder() -> None:
             "v13",
             humano_versatil="pericia_poder",
         )
-        == 9
+        == 11
     )
 
 

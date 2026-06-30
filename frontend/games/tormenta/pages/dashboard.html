@@ -566,6 +566,10 @@
                         <label for="cadPvMax">PV máximos *</label>
                         <input id="cadPvMax" name="pv_max" type="number" required min="0" max="9999" value="10" />
                     </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapPvSugerido" style="display: none">
+                        <button type="button" class="tormenta-btn" id="cadBtnAplicarPvSugerido">Usar PV sugerido</button>
+                        <p class="t20-dash-hint" id="cadHintPvSugerido" style="margin: 0.25rem 0 0"></p>
+                    </div>
                 </div>
                 <div class="t20-dash-field t20-dash-field--full" style="margin-top: 0.75rem">
                     <label for="cadInputFoto">Retrato (opcional)</label>
@@ -598,23 +602,59 @@
                         <input id="cadRacaLivre" type="text" maxlength="120" placeholder="Ex.: Meio-orc, lefeu de outra região…" />
                     </div>
                     <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacialMais2" style="display: none">
-                        <span class="t20-dash-hint" style="display: block; margin-bottom: 0.35rem">
+                        <span class="t20-dash-hint" id="cadRacialMais2Hint" style="display: block; margin-bottom: 0.35rem">
                             Raça MB: +2 em duas habilidades diferentes (ex.: Humano, Lefou).
                         </span>
                         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap">
                             <div class="t20-dash-field" style="min-width: 8rem">
-                                <label for="cadRacaMais2a">1º +2</label>
+                                <label for="cadRacaMais2a" id="cadLabelRacaMais2a">1º +2</label>
                                 <select id="cadRacaMais2a" class="t20-input"><option value="">—</option></select>
                             </div>
                             <div class="t20-dash-field" style="min-width: 8rem">
-                                <label for="cadRacaMais2b">2º +2</label>
+                                <label for="cadRacaMais2b" id="cadLabelRacaMais2b">2º +2</label>
                                 <select id="cadRacaMais2b" class="t20-input"><option value="">—</option></select>
                             </div>
                         </div>
                     </div>
                     <div class="t20-dash-field t20-dash-field--full" id="cadWrapRacialMais1" style="display: none">
-                        <label for="cadRacaMais1">Raça MB: +2 em uma habilidade (Meio-orc)</label>
+                        <label for="cadRacaMais1" id="cadLabelRacaMais1">Raça MB: +2 em uma habilidade (Meio-orc)</label>
                         <select id="cadRacaMais1" class="t20-input"><option value="">—</option></select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapHumanoVersatil" style="display: none">
+                        <label for="cadHumanoVersatil">Humano — Versátil (v1.3)</label>
+                        <select id="cadHumanoVersatil" class="t20-input">
+                            <option value="duas_pericias">2 perícias treinadas à escolha</option>
+                            <option value="pericia_poder">1 perícia treinada + 1 poder geral</option>
+                        </select>
+                        <div id="cadWrapHumanoVersatilPoder" style="display: none; margin-top: 0.35rem">
+                            <label for="cadHumanoVersatilPoderNome">Poder geral (Versátil)</label>
+                            <input
+                                id="cadHumanoVersatilPoderNome"
+                                class="t20-input"
+                                maxlength="120"
+                                placeholder="Nome do poder geral (ex.: Acrobático)"
+                            />
+                            <p class="t20-dash-hint" style="margin: 0.25rem 0 0">
+                                Perícias e poder detalhados podem ser ajustados na ficha após a criação.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapSuraggel" style="display: none">
+                        <label for="cadSuraggelSubtipo">Suraggel — subtipo (v1.3)</label>
+                        <select id="cadSuraggelSubtipo" class="t20-input">
+                            <option value="">— Escolha —</option>
+                            <option value="aggelus">Aggelus (+Sab +2, +Car +1)</option>
+                            <option value="sulfure">Sulfure (+Des +2, +Int +1)</option>
+                        </select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapArcanistaCaminho" style="display: none">
+                        <label for="cadArcanistaCaminho">Caminho do Arcanista (v1.3 — irreversível)</label>
+                        <select id="cadArcanistaCaminho" class="t20-input">
+                            <option value="">— Escolha —</option>
+                            <option value="bruxo">Bruxo</option>
+                            <option value="mago">Mago</option>
+                            <option value="feiticeiro">Feiticeiro</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -660,7 +700,41 @@
                 <p id="cadOrigemItensLista" class="t20-dash-hint" style="margin:0.35rem 0 0"></p>
             </div>
 
-            <div class="cad-wizard-step cad-wizard-step--v13" id="cadWizardStepKit" data-cad-step="5" style="display:none">
+            <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="5" style="display:none">
+                <p class="t20-dash-hint" style="margin-top:0">
+                    Marque as perícias <strong>treinadas</strong> (classe + INT + racial + origem). Perícias de classe e origem já vêm marcadas.
+                </p>
+                <div id="cadPericiasHost" class="cad-pericias-grid" style="max-height:16rem;overflow:auto;border:1px solid var(--t20-border,#333);padding:0.5rem;border-radius:0.35rem"></div>
+                <p id="cadPericiasHint" class="t20-dash-hint" style="margin:0.35rem 0 0"></p>
+            </div>
+
+            <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="6" style="display:none">
+                <p class="t20-dash-hint" style="margin-top:0">
+                    Devoção é <strong>opcional</strong>. Devotos escolhem um deus (Os Vinte) e um poder concedido (Tabela 1-20 v1.3).
+                </p>
+                <div class="t20-dash-form-grid">
+                    <div class="t20-dash-field t20-dash-field--full">
+                        <label for="cadTendencia">Tendência</label>
+                        <select id="cadTendencia" class="t20-input"></select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full">
+                        <label for="cadDivindade">Divindade</label>
+                        <select id="cadDivindade" class="t20-input"></select>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full">
+                        <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;font-weight:600">
+                            <input type="checkbox" id="cadDevoto" />
+                            <span>Devoto</span>
+                        </label>
+                    </div>
+                    <div class="t20-dash-field t20-dash-field--full">
+                        <label for="cadPoderConcedido">Poder concedido</label>
+                        <select id="cadPoderConcedido" class="t20-input"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cad-wizard-step cad-wizard-step--v13" id="cadWizardStepKit" data-cad-step="7" style="display:none">
                 <p class="t20-dash-hint" style="margin-top:0">Kit inicial (nível 1) — p.140 v1.3. Mochila, saco de dormir e traje são adicionados automaticamente.</p>
                 <div class="t20-dash-form-grid">
                     <div class="t20-dash-field t20-dash-field--full">
@@ -686,8 +760,9 @@
                 </div>
             </div>
 
-            <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="6" style="display:none">
-                <p class="t20-dash-hint" style="margin-top:0">Revise os dados antes de criar. Você poderá ajustar detalhes na ficha.</p>
+            <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="8" style="display:none">
+                <p class="t20-dash-hint" style="margin-top:0">Revise os dados antes de criar. Itens pendentes aparecem no checklist abaixo.</p>
+                <div id="cadWizardChecklist" class="cad-wizard-checklist-wrap" aria-live="polite"></div>
                 <div id="cadWizardResumo" class="cad-wizard-resumo"></div>
             </div>
         </form>
@@ -717,7 +792,9 @@
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
-<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260629wiz"></script>
+<script src="/games/tormenta/js/t20-dashboard-pericias-v13.js?v=20260629s42"></script>
+<script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260629s42"></script>
+<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260629s42"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -853,12 +930,26 @@
             if (b && keysOk.includes(b)) d[b] += 2;
         }
         if (row.escolhe_tres_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1) ? row.excluir_atributos_mais1 : [];
             const a = document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value;
             const b = document.getElementById('cadRacaMais2b') && document.getElementById('cadRacaMais2b').value;
             const c = document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value;
             [a, b, c].forEach((k) => {
-                if (k && ATTR_KEYS_DASH.includes(k)) d[k] += 1;
+                if (k && ATTR_KEYS_DASH.includes(k) && !excl.includes(k)) d[k] += 1;
             });
+        }
+        if (row.escolhe_suraggel_subtipo) {
+            const sub =
+                (document.getElementById('cadSuraggelSubtipo') &&
+                    document.getElementById('cadSuraggelSubtipo').value) ||
+                '';
+            if (sub === 'aggelus') {
+                d.sab += 2;
+                d.car += 1;
+            } else if (sub === 'sulfure') {
+                d.des += 2;
+                d.int += 1;
+            }
         }
         if (row.escolhe_um_mais2) {
             const excl = Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
@@ -913,7 +1004,13 @@
             const slug = (sel && sel.value) || '';
             const row = getRacaRowPorSlugDash(slug);
             const excluiCar = row && (row.mod_car_fixo || 0) < 0;
-            const keys = ATTR_KEYS_DASH.filter((k) => !(excluiCar && k === 'car'));
+            let excl = [];
+            if (row && row.escolhe_tres_mais1 && Array.isArray(row.excluir_atributos_mais1)) {
+                excl = row.excluir_atributos_mais1;
+            }
+            const keys = ATTR_KEYS_DASH.filter(
+                (k) => !excl.includes(k) && !(excluiCar && k === 'car')
+            );
             const cur = el.value;
             el.innerHTML = '<option value="">—</option>';
             keys.forEach((k) => {
@@ -933,7 +1030,12 @@
         const sel = document.getElementById('cadRacaSelect');
         const slug = (sel && sel.value) || '';
         const row = getRacaRowPorSlugDash(slug);
-        const ex = row && Array.isArray(row.excluir_atributos_mais2) ? row.excluir_atributos_mais2 : [];
+        let ex = [];
+        if (row && row.escolhe_tres_mais1 && Array.isArray(row.excluir_atributos_mais1)) {
+            ex = row.excluir_atributos_mais1;
+        } else if (row && Array.isArray(row.excluir_atributos_mais2)) {
+            ex = row.excluir_atributos_mais2;
+        }
         const cur = el.value;
         el.innerHTML = '<option value="">—</option>';
         const keys = ATTR_KEYS_DASH.filter((k) => !ex.includes(k));
@@ -1087,6 +1189,28 @@
             const ex = row.excluir_atributos_mais2 || [];
             if (ex.includes(x)) return { ok: false, msg: 'Meio-orc: escolha inválida para o +2 opcional.' };
         }
+        if (row.escolhe_tres_mais1 && isDashV13()) {
+            const excl = Array.isArray(row.excluir_atributos_mais1) ? row.excluir_atributos_mais1 : [];
+            const picks = [
+                document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value,
+                document.getElementById('cadRacaMais2b') && document.getElementById('cadRacaMais2b').value,
+                document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value,
+            ].filter(Boolean);
+            if (picks.length !== 3) {
+                return { ok: false, msg: 'Escolha três atributos diferentes para +1 (v1.3).' };
+            }
+            if (new Set(picks).size !== 3) {
+                return { ok: false, msg: 'Os três +1 raciais devem ser em atributos diferentes.' };
+            }
+            for (const p of picks) {
+                if (excl.includes(p)) {
+                    return { ok: false, msg: 'Atributo inválido para +1 nesta raça.' };
+                }
+            }
+        }
+        if (window.T20DashStep2V13 && typeof T20DashStep2V13.validarPasso2Extra === 'function') {
+            return T20DashStep2V13.validarPasso2Extra();
+        }
         return { ok: true };
     }
 
@@ -1168,13 +1292,13 @@
             const inp = document.getElementById('cadRacaLivre');
             if (inp) inp.value = '';
         }
-        if (!(row && row.escolhe_duas_mais2)) {
+        if (!(row && (row.escolhe_duas_mais2 || row.escolhe_tres_mais1))) {
             const a = document.getElementById('cadRacaMais2a');
             const b = document.getElementById('cadRacaMais2b');
             if (a) a.value = '';
             if (b) b.value = '';
         }
-        if (!(row && row.escolhe_um_mais2)) {
+        if (!(row && (row.escolhe_um_mais2 || row.escolhe_tres_mais1))) {
             const m1 = document.getElementById('cadRacaMais1');
             if (m1) m1.value = '';
         }
@@ -1182,8 +1306,14 @@
         if (wrapM1) wrapM1.style.display = row && (row.escolhe_um_mais2 || row.escolhe_tres_mais1) ? '' : 'none';
         popularCadOpcoesMais2Selects();
         popularCadOpcoesMais1Select();
+        if (window.T20DashPericiasV13 && T20DashPericiasV13.invalidarPericias) {
+            T20DashPericiasV13.invalidarPericias();
+        }
         if (resetAttrs) aplicarCadRacaSomenteAjustes();
         atualizarUiMetodoGeracaoDash();
+        if (window.T20DashStep2V13 && T20DashStep2V13.atualizarUiPasso2) {
+            T20DashStep2V13.atualizarUiPasso2();
+        }
     }
 
     function escapeHtml(s) {
@@ -1821,7 +1951,7 @@
         };
     }
 
-    function validarCadastro(tipo) {
+    async function validarCadastro(tipo) {
         const nome = document.getElementById('cadNome').value.trim();
         if (!nome) {
             Toast.error('Informe o nome do personagem.');
@@ -1873,12 +2003,15 @@
             window.T20DashWizardV13 &&
             T20DashWizardV13.isWizardAtivo()
         ) {
-            for (let s = 4; s <= 5; s++) {
-                const vp = T20DashWizardV13.validarPasso(s);
-                if (!vp.ok) {
-                    Toast.error(vp.msg || 'Complete origem e equipamento.');
-                    return false;
+            const vr = await T20DashWizardV13.validarAntesCriar();
+            if (!vr.ok) {
+                Toast.error(vr.msg || 'Complete origem, perícias, devoção e equipamento.');
+                if (vr.passo && T20DashWizardV13.mostrarPasso) {
+                    T20DashWizardV13.mostrarPasso(vr.passo);
+                } else if (T20DashWizardV13.mostrarPasso) {
+                    T20DashWizardV13.mostrarPasso(8);
                 }
+                return false;
             }
         }
         return true;
@@ -1938,7 +2071,18 @@
             if (window.T20DashWizardV13 && T20DashWizardV13.isWizardAtivo()) {
                 Object.assign(fichaBase, T20DashWizardV13.lerPayloadOrigemKit());
             }
+            if (window.T20DashStep2V13 && T20DashStep2V13.lerPayloadPasso2) {
+                Object.assign(fichaBase, T20DashStep2V13.lerPayloadPasso2());
+            }
+            if (window.T20DashPericiasV13 && T20DashPericiasV13.lerPayloadPericias) {
+                Object.assign(fichaBase, T20DashPericiasV13.lerPayloadPericias());
+            }
         }
+
+        const topWizard =
+            t === 'jogador' && window.T20DashWizardV13 && T20DashWizardV13.isWizardAtivo()
+                ? T20DashWizardV13.lerPayloadCamposPersonagem()
+                : {};
 
         return {
             tipo: t,
@@ -1947,6 +2091,8 @@
             classe_nivel: classeNivelTxt || null,
             raca: racaNomeApi || null,
             jogador_nome: jogadorNome,
+            tendencia: topWizard.tendencia != null ? topWizard.tendencia : null,
+            divindade: topWizard.divindade != null ? topWizard.divindade : null,
             pv_max: pvMax,
             pv_atual: pvMax,
             for_valor: a.for_valor,
@@ -2058,6 +2204,12 @@
         const selMet = document.getElementById('cadMetodoGeracao');
         if (selMet) selMet.value = 'compra_pontos';
         onCadRacaSelectChange(false);
+        if (window.T20DashStep2V13 && T20DashStep2V13.resetPasso2) {
+            T20DashStep2V13.resetPasso2();
+        }
+        if (window.T20DashPericiasV13 && T20DashPericiasV13.resetPericias) {
+            T20DashPericiasV13.resetPericias();
+        }
         if (t === 'jogador') {
             resetCompraPontosDash();
         } else {
@@ -2074,7 +2226,7 @@
         if (sub) {
             if (t === 'jogador' && isDashV13()) {
                 sub.textContent =
-                    'Assistente v1.3: identidade → raça/classe → atributos → origem → equipamento → revisão.';
+                    'Assistente v1.3: identidade → raça/classe → atributos → origem → perícias → devoção → equipamento → revisão.';
             } else if (t === 'jogador') {
                 sub.textContent =
                     'Primeiro passo: nome, nível, classe, raça, método de atributos (compra ou 4d6), PV e valores finais. Depois complete a ficha.';
@@ -2088,6 +2240,16 @@
             if (!el) return;
             el.min = '0';
             el.max = '99';
+            if (id === 'cadInt' && !el.dataset.periciasInvBound) {
+                el.dataset.periciasInvBound = '1';
+                const inv = () => {
+                    if (window.T20DashPericiasV13 && T20DashPericiasV13.invalidarPericias) {
+                        T20DashPericiasV13.invalidarPericias();
+                    }
+                };
+                el.addEventListener('input', inv);
+                el.addEventListener('change', inv);
+            }
         });
         atualizarUiMetodoGeracaoDash();
     }
@@ -2143,7 +2305,7 @@
     document.getElementById('formCadastroRapido')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const tipo = document.getElementById('cadTipo').value;
-        if (!validarCadastro(tipo)) return;
+        if (!await validarCadastro(tipo)) return;
         const btn = document.getElementById('btnConfirmarCadastro');
         const payload = montarPayloadCriar(tipo);
         try {
@@ -2211,6 +2373,19 @@
             isMestre,
             recarregarTabela: carregar,
             Toast,
+        });
+    }
+    if (window.T20DashPericiasV13) {
+        T20DashPericiasV13.init({ regraVersao: DASH_REGRA_VERSAO });
+    }
+    if (window.T20DashStep2V13) {
+        T20DashStep2V13.init({
+            regraVersao: DASH_REGRA_VERSAO,
+            getRacaRow: getRacaRowPorSlugDash,
+            onRacaAttrChange: () => {
+                aplicarCadRacaSomenteAjustes();
+                atualizarHintMetodoGeracaoDash();
+            },
         });
     }
     if (window.T20DashWizardV13) {

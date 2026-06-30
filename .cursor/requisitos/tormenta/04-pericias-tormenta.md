@@ -87,7 +87,7 @@ Legenda: **T** = somente treinada; **A** = penalidade de armadura.
 | Misticismo | **Feito** | Substitui Identificar Magia |
 | Percepção passiva (UI) | **Pendente** | P1 — API retorna; UI não exibe |
 | Ofício especialidades múltiplas | **Pendente** | P2 |
-| Atletismo penalidade só natação | **Parcial** | Flag JSON; sem UI dedicada |
+| Atletismo penalidade só natação | **Feito** | Checkbox 🏊 na ficha + `uso_atletismo_natacao` na API |
 
 ## Gap código
 

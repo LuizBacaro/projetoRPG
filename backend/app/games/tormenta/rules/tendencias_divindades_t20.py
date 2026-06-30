@@ -69,3 +69,58 @@ def lista_divindades_mb() -> List[Dict[str, Any]]:
             item["poderes_concedidos"] = [str(p) for p in pc if str(p).strip()]
         out.append(item)
     return out
+
+
+def divindade_por_slug(slug: str) -> Dict[str, Any] | None:
+    s = str(slug or "").strip().lower()
+    if not s:
+        return None
+    for row in lista_divindades_mb():
+        if str(row.get("slug") or "").strip().lower() == s:
+            return row
+    return None
+
+
+def divindade_por_rotulo(rotulo: str) -> Dict[str, Any] | None:
+    r = str(rotulo or "").strip()
+    if not r:
+        return None
+    for row in lista_divindades_mb():
+        if str(row.get("rotulo") or "").strip() == r:
+            return row
+    return None
+
+
+def validar_devocao_v13(
+    ficha_json: dict | None,
+    *,
+    divindade_rotulo: str | None = None,
+) -> tuple[bool, str]:
+    """Valida devoto / poder concedido v1.3 (opcional; regras se preenchido)."""
+    fj = dict(ficha_json or {})
+    devoto = bool(fj.get("devoto"))
+    pcs = str(fj.get("poder_concedido_slug") or "").strip().lower()
+    div_slug = str(fj.get("tormenta_divindade_mb_slug") or "").strip().lower()
+    if not div_slug:
+        row_rot = divindade_por_rotulo(divindade_rotulo or "")
+        if row_rot:
+            div_slug = str(row_rot.get("slug") or "").strip().lower()
+
+    if devoto and not div_slug:
+        return False, "Devoto: escolha uma divindade (Os Vinte)."
+    if devoto and not pcs:
+        return False, "Devoto: escolha um poder concedido da divindade."
+    if pcs and not div_slug:
+        return False, "Poder concedido exige divindade escolhida."
+    if pcs and div_slug:
+        row = divindade_por_slug(div_slug)
+        if not row:
+            return False, "Divindade desconhecida."
+        pool = {
+            str(p).strip().lower()
+            for p in (row.get("poderes_concedidos") or [])
+            if str(p).strip()
+        }
+        if pcs not in pool:
+            return False, "Poder concedido invalido para a divindade escolhida."
+    return True, ""

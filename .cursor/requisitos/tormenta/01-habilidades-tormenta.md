@@ -83,7 +83,7 @@ Valor **< −5**: FOR/DES → paralisado; CON → morte; INT/SAB → inconscient
 | `modificador_atributo_t20` (faixas d20) | **Feito (legado MB)** | **Incompatível v1.3** |
 | Compra 20 pts / 8–18 | **Feito (MB errado)** | Alvo: 10 pts / base 0 |
 | 4d6 + reroll | **Parcial** | Falta Tabela 1-1 e soma ≥ 6 |
-| Defesa 10 + DES (valor) | **Parcial** | Confirmar se usa mod. ou valor |
+| Defesa 10 + DES (valor) + armadura/escudo | **Feito** | `defesa_t20.py`, `t20-regra-versao.js`, ficha v1.3 |
 | PM universal | **Parcial** | |
 | Recuperação PV/PM por descanso | **Não feito** | |
 

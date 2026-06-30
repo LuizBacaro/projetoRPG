@@ -135,28 +135,68 @@ Inventor e classes com itens superiores: cross-ref `03-classes-tormenta.md`.
 | RF-T07d | **Defesa** = 10 + DES + armadura + escudo; armadura pesada sem DES e −3 m | P0 |
 | RF-T07e | Penalidade de armadura em perícias For/Des conforme item equipado | P1 |
 | RF-T07f | Carga: limite 10+2×FOR, sobrecarga, ocupação por espaços | P2 |
-| RF-T07g | Equipamento inicial na criação (passo 7 / p.140) + itens de origem | P2 |
+| RF-T07g | Equipamento inicial na criação (passo 7 wizard / p.140) + itens de origem | P1 |
 | RF-T07h | Metadados de arma: proficiência, dano, crítico, alcance, habilidades | P1 |
 | RF-T07i | Itens superiores / melhorias (metadados + remissão Tabela 3-8) | P3 |
 
 ## Estado de implementação
 
-| Item | Estado |
-|------|--------|
-| Catálogo + API equipamentos | **Feito** (base MB) |
-| UI modal equipamentos | **Feito** |
-| Defesa v1.3 (valor DES, não modificador d20) | **Parcial / verificar** |
-| Penalidade armadura por perícia | **Parcial** |
-| Carga / espaços | **Não feito** |
-| Equipamento inicial automático | **Não feito** |
-| Revisão preços/stats v1.3 | **Não feito** |
+| Item | Estado | Notas |
+|------|--------|-------|
+| Catálogo + API equipamentos | **Feito** | Base MB; revisão stats v1.3 pendente |
+| UI modal equipamentos na ficha | **Feito** | Vínculo SQL `tormenta_personagem_equipamentos` |
+| **Itens de origem na criação v1.3** | **Feito** | `origens_itens_v13.json` + sync SQL na criação |
+| **Kit inicial wizard (p.140)** | **Feito** | Passo 7 do wizard; pulado se nível > 1 |
+| Sync automático origem + kit → SQL | **Feito** | `equipamentos_ficha_v13_t20.py`; notas `auto:v13:origem:*` / `auto:v13:kit:*` |
+| API opções do kit | **Feito** | `GET /tormenta/regras/kit-inicial?tormenta_classe_mb_slug=` |
+| Arcanista sem armadura no kit | **Feito** | `sem_armadura` em `kit_inicial_v13_t20.py` |
+| T$ 4d6 no wizard | **Feito** | Botão «Rolar T$ 4d6»; persiste em `ficha_json.dinheiro` |
+| Defesa v1.3 (valor DES, armadura pesada sem DES) | **Feito** | `defesa_t20.py` (`defesa_total_v13`); ficha `t20CalcularCaTotal()` |
+| Penalidade armadura por perícia | **Feito** | `penalidade_armadura_t20.py`; ficha + rolador v1.3 |
+| Carga / espaços | **Não feito** | RF-T07f |
+| Revisão preços/stats catálogo v1.3 | **Não feito** | Tabelas 3-3 e 3-5 vs `equipamentos_mb_catalogo.json` |
+
+## Implementação — criação v1.3 (dashboard)
+
+Wizard de 8 passos (`t20-dashboard-wizard-v13.js`):
+
+| Passo | Conteúdo equipamento |
+|-------|----------------------|
+| 4 | Origem — itens fixos da origem (catálogo) + escolhas (`origem_itens_escolha`) |
+| 7 | Kit inicial — arma simples*, marcial/armadura/escudo conforme classe; T$ 4d6 |
+| 8 | Revisão — checklist inclui kit quando nível = 1 |
+
+\* Obrigatório no 1º nível. Se **nível > 1**, o passo 7 é **pulado** (sem kit automático).
+
+### Payload na criação (`ficha_json`)
+
+| Campo | Uso |
+|-------|-----|
+| `origem_slug` | Resolve itens via `resolver_itens_origem_v13()` |
+| `origem_itens_escolha` | Escolhas de itens variantes (ex.: tipo de traje) |
+| `kit_inicial_v13` | `{ arma_simples, arma_marcial?, armadura?, escudo, dinheiro_pp? }` |
+| `dinheiro` | `{ pc, pp, po, pl }` — preenchido com T$ rolado no wizard |
+
+### Backend (sync na criação)
+
+1. `PersonagemService.criar()` → `_sincronizar_equipamentos_v13()`
+2. `listar_equipamentos_sync_v13()` monta lista: itens origem + itens kit
+3. `TormentaPersonagemEquipamentosService.sincronizar_equipamentos_automaticos_v13()` upsert/remove por nota `auto:v13:*`
+
+Itens fixos do kit (sempre adicionados quando há `kit_inicial_v13`): **Mochila**, **Saco de dormir**, **Roupas de viajante**.
+
+### Testes
+
+- Testes: `backend/tests/test_tormenta_equipamentos_v13.py` — origem, kit, sync SQL, opções por classe
+- Testes: `backend/tests/test_tormenta_penalidade_armadura.py` — motor e API calcular-bonus
 
 ## Gap código
 
-- Backend pode usar nomenclatura ou valores do MB; revisar `equipamentos_mb_catalogo.json` contra Tabelas 3-3 e 3-5.
-- Defesa na ficha deve usar **valor** de Destreza (v1.3), não tabela de modificador MB.
-- Arcanista: flag «sem armadura inicial» na criação.
-- Carga opcional para MVP; se implementar, motor em `rules/` separado de inventário SQL.
+- Backend pode usar nomenclatura ou valores do **MB** no catálogo geral; revisar `equipamentos_mb_catalogo.json` contra Tabelas 3-3 e 3-5 v1.3.
+- ~~Defesa na ficha (valor DES; pesada sem DES)~~ — **Feito** (`defesa_t20.py`, `t20-regra-versao.js`, ficha).
+- Penalidade de armadura em perícias For/Des: integração completa com item equipado — **Feito** (RF-T07e / RF-T04d).
+- Carga opcional para MVP; se implementar, motor em `rules/` separado de inventário SQL (RF-T07f).
+- Personagens **acima do 1º nível**: Tabela 3-1 (dinheiro por nível) — **não** implementada no wizard (só kit no nv 1).
 
 ## Critérios de aceite
 
@@ -164,8 +204,17 @@ Inventor e classes com itens superiores: cross-ref `03-classes-tormenta.md`.
 - Arma não proficiente reflete −5 (quando combate implementar ataque).
 - Catálogo `_meta.fonte` aponta v1.3 p.142–164.
 - Sem tabelas completas de preço/dano no repositório.
+- **Criação v1.3:** personagem nv 1 criado pelo wizard sai com itens de origem + kit p.140 em SQL (notas `auto:v13:*`), salvo escolhas explícitas no passo 7.
+- **Arcanista nv 1:** kit sem armadura; demais opções conforme proficiências da classe.
 
 ## Referência
 
-- Dados: `backend/app/games/tormenta/data/equipamentos_mb_catalogo.json`
+- Catálogo geral: `backend/app/games/tormenta/data/equipamentos_mb_catalogo.json`
+- Itens por origem: `backend/app/games/tormenta/data/origens_itens_v13.json`
+- Kit p.140: `backend/app/games/tormenta/rules/kit_inicial_v13_t20.py`
+- Sync ficha → SQL: `backend/app/games/tormenta/rules/equipamentos_ficha_v13_t20.py`
+- Serviço: `backend/app/games/tormenta/services/personagem_equipamentos_service.py`
+- Penalidade armadura: `backend/app/games/tormenta/rules/penalidade_armadura_t20.py`, `frontend/games/tormenta/js/t20-penalidade-armadura.js`
+- API kit: `GET /api/v1/tormenta/regras/kit-inicial`
 - Skill: `tormenta-20-arena-arquitetura-e-regras`
+- Cross-ref origens: `09-origens-divindades-tormenta.md`

@@ -1,5 +1,5 @@
 /**
- * Wizard de criação v1.3 no dashboard — passos: identidade → raça/classe → atributos → origem → kit → revisão.
+ * Wizard de criação v1.3 no dashboard — identidade → raça/classe → atributos → origem → devoção → kit → revisão.
  */
 (function (global) {
     'use strict';
@@ -27,6 +27,8 @@
     ];
 
     let ORIGENS = [];
+    let TENDENCIAS = [];
+    let DIVINIDADES = [];
     let KIT_OPCOES = null;
     let stepAtual = 1;
     let cfg = null;
@@ -45,7 +47,31 @@
     }
 
     function totalPassos() {
-        return isWizardAtivo() ? 6 : 1;
+        return isWizardAtivo() ? 8 : 1;
+    }
+
+    const PASSO_KIT = 7;
+
+    function nivelCadastro() {
+        const n = parseInt(String(q('cadNivel') && q('cadNivel').value || '1'), 10);
+        return Number.isFinite(n) && n >= 0 ? n : 1;
+    }
+
+    /** Kit inicial v1.3 só se aplica a personagens de 1º nível. */
+    function passoKitAplica() {
+        return nivelCadastro() <= 1;
+    }
+
+    function proximoPasso(de) {
+        let next = de + 1;
+        if (next === PASSO_KIT && !passoKitAplica()) next = PASSO_KIT + 1;
+        return Math.min(totalPassos(), next);
+    }
+
+    function passoAnterior(de) {
+        let prev = de - 1;
+        if (prev === PASSO_KIT && !passoKitAplica()) prev = PASSO_KIT - 1;
+        return Math.max(1, prev);
     }
 
     function slugParaLabel(slug) {
@@ -58,10 +84,84 @@
         if (!isV13()) return;
         try {
             const svc = new TormentaRegrasService();
-            const data = await svc.obterOrigens({ regraVersao: 'v13' });
-            ORIGENS = Array.isArray(data.origens) ? data.origens : [];
+            const [orig, ident] = await Promise.all([
+                svc.obterOrigens({ regraVersao: 'v13' }),
+                svc.obterIdentidadeMb(),
+            ]);
+            ORIGENS = Array.isArray(orig.origens) ? orig.origens : [];
+            TENDENCIAS = Array.isArray(ident.tendencias) ? ident.tendencias : [];
+            DIVINIDADES = Array.isArray(ident.divindades) ? ident.divindades : [];
         } catch (_e) {
             ORIGENS = [];
+            TENDENCIAS = [];
+            DIVINIDADES = [];
+        }
+    }
+
+    function divindadePorSlug(slug) {
+        const s = String(slug || '').trim().toLowerCase();
+        return DIVINIDADES.find((d) => String(d.slug || '').toLowerCase() === s) || null;
+    }
+
+    function slugDivindadeSelecionado() {
+        const sel = q('cadDivindade');
+        if (!sel || !sel.selectedOptions || !sel.selectedOptions[0]) return '';
+        return String(sel.selectedOptions[0].getAttribute('data-slug') || '').trim().toLowerCase();
+    }
+
+    function preencherSelectTendencias() {
+        const sel = q('cadTendencia');
+        if (!sel) return;
+        const prev = sel.value;
+        sel.innerHTML = '<option value="">—</option>';
+        TENDENCIAS.forEach((t) => {
+            const rotulo = typeof t === 'string' ? t : String(t.rotulo || t.nome || '').trim();
+            if (!rotulo) return;
+            const op = document.createElement('option');
+            op.value = rotulo;
+            op.textContent = rotulo;
+            sel.appendChild(op);
+        });
+        if (prev) sel.value = prev;
+    }
+
+    function preencherSelectDivindades() {
+        const sel = q('cadDivindade');
+        if (!sel) return;
+        const prev = sel.value;
+        sel.innerHTML = '<option value="">— Nenhuma —</option>';
+        DIVINIDADES.forEach((d) => {
+            const rotulo = String(d.rotulo || d.nome || '').trim();
+            const slug = String(d.slug || '').trim();
+            if (!rotulo) return;
+            const op = document.createElement('option');
+            op.value = rotulo;
+            op.textContent = rotulo;
+            if (slug) op.setAttribute('data-slug', slug);
+            sel.appendChild(op);
+        });
+        if (prev) sel.value = prev;
+    }
+
+    function renderPoderesConcedidos() {
+        const selPod = q('cadPoderConcedido');
+        if (!selPod) return;
+        const divSlug = slugDivindadeSelecionado();
+        const row = divindadePorSlug(divSlug);
+        const prev = selPod.value;
+        selPod.innerHTML = '<option value="">— Nenhum / não devoto —</option>';
+        if (row && Array.isArray(row.poderes_concedidos)) {
+            row.poderes_concedidos.forEach((p) => {
+                const op = document.createElement('option');
+                op.value = p;
+                op.textContent = slugParaLabel(p);
+                selPod.appendChild(op);
+            });
+        }
+        if (prev && Array.from(selPod.options).some((o) => o.value === prev)) {
+            selPod.value = prev;
+        } else {
+            selPod.value = '';
         }
     }
 
@@ -141,6 +241,9 @@
                     return;
                 }
                 global.__cadOrigemBeneficios = picks;
+                if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
+                    global.T20DashPericiasV13.invalidarPericias();
+                }
                 renderResumo();
             });
         });
@@ -212,10 +315,7 @@
     }
 
     function renderUiKit() {
-        const wrap = q('cadWizardStepKit');
-        const nv = q('cadNivel') ? parseInt(String(q('cadNivel').value || '1'), 10) : 1;
-        if (wrap) wrap.style.display = nv <= 1 ? '' : 'none';
-        if (!KIT_OPCOES || nv > 1) return;
+        if (!passoKitAplica() || !KIT_OPCOES) return;
         const op = KIT_OPCOES;
         const kit = global.__cadKitInicial || {};
         preencherSelect(q('cadKitArmaSimples'), ARMAS_SIMPLES, kit.arma_simples || 'Adaga');
@@ -264,12 +364,17 @@
             'Raça e classe',
             'Atributos',
             'Origem',
+            'Perícias',
+            'Devoção',
             'Equipamento',
             'Revisão',
         ];
         nav.innerHTML = labels
             .map((lab, i) => {
                 const n = i + 1;
+                if (n === PASSO_KIT && !passoKitAplica()) {
+                    return `<span class="cad-wizard-nav__item cad-wizard-nav__item--skip" title="Kit inicial só no 1º nível">${n}. ${lab} (—)</span>`;
+                }
                 const cls =
                     n === stepAtual
                         ? 'cad-wizard-nav__item cad-wizard-nav__item--active'
@@ -282,7 +387,11 @@
     }
 
     function mostrarPasso(n) {
-        stepAtual = Math.max(1, Math.min(totalPassos(), n));
+        let target = Math.max(1, Math.min(totalPassos(), n));
+        if (target === PASSO_KIT && !passoKitAplica()) {
+            target = n < stepAtual ? passoAnterior(PASSO_KIT + 1) : proximoPasso(PASSO_KIT - 1);
+        }
+        stepAtual = target;
         document.querySelectorAll('.cad-wizard-step').forEach((el) => {
             const s = parseInt(el.getAttribute('data-cad-step') || '0', 10);
             if (!isWizardAtivo()) {
@@ -294,9 +403,169 @@
         });
         renderNav();
         atualizarBotoesRodape();
+        if (stepAtual === 1 && global.T20DashStep2V13 && global.T20DashStep2V13.atualizarUiPasso2) {
+            global.T20DashStep2V13.atualizarUiPasso2();
+        }
+        if (stepAtual === 2 && global.T20DashStep2V13 && global.T20DashStep2V13.atualizarUiPasso2) {
+            global.T20DashStep2V13.atualizarUiPasso2();
+        }
         if (stepAtual === 4) renderBeneficiosOrigem();
-        if (stepAtual === 5) renderUiKit();
-        if (stepAtual === 6) renderResumo();
+        if (stepAtual === 5 && global.T20DashPericiasV13 && global.T20DashPericiasV13.prepararPassoPericias) {
+            void global.T20DashPericiasV13.prepararPassoPericias();
+        }
+        if (stepAtual === 6) renderPoderesConcedidos();
+        if (stepAtual === 7) renderUiKit();
+        if (stepAtual === 8) {
+            void renderChecklistRevisao();
+            renderResumo();
+        }
+    }
+
+    function escapeHtmlCheck(s) {
+        return String(s ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    async function montarItensChecklist() {
+        const items = [];
+        const v4 = validarPasso(4);
+        items.push({
+            passo: 4,
+            label: 'Origem e benefícios',
+            ok: v4.ok,
+            msg: v4.msg || '',
+            detalhe: v4.ok ? '2 benefícios escolhidos' : '',
+        });
+
+        let perOk = false;
+        let perMsg = 'Complete o passo Perícias.';
+        let perDet = '';
+        if (global.T20DashPericiasV13 && global.T20DashPericiasV13.refreshOrcamento) {
+            const st = await global.T20DashPericiasV13.refreshOrcamento();
+            perOk = Boolean(st.ok);
+            perMsg = st.msg || perMsg;
+            perDet = st.detalhe || (st.treinadas ? `${st.treinadas} treinadas` : '');
+        }
+        items.push({
+            passo: 5,
+            label: 'Perícias treinadas',
+            ok: perOk,
+            msg: perMsg,
+            detalhe: perDet,
+        });
+
+        const v6 = validarPasso(6);
+        const devoto = !!(q('cadDevoto') && q('cadDevoto').checked);
+        items.push({
+            passo: 6,
+            label: 'Devoção',
+            ok: v6.ok,
+            msg: v6.msg || '',
+            detalhe: devoto ? 'Devoto configurado' : 'Opcional — sem devoção',
+            optional: !devoto && v6.ok,
+        });
+
+        if (passoKitAplica()) {
+            const v7 = validarPasso(7);
+            items.push({
+                passo: 7,
+                label: 'Kit inicial',
+                ok: v7.ok,
+                msg: v7.msg || '',
+                detalhe: v7.ok ? 'Equipamento de 1º nível' : '',
+            });
+        }
+
+        return items;
+    }
+
+    async function renderChecklistRevisao() {
+        const host = q('cadWizardChecklist');
+        if (!host || !isWizardAtivo()) return;
+        host.innerHTML = '<p class="t20-dash-hint" style="margin:0">Verificando…</p>';
+        const items = await montarItensChecklist();
+        const pendencias = items.filter((it) => !it.ok);
+        global.__cadWizardChecklistOk = pendencias.length === 0;
+
+        host.innerHTML =
+            '<p class="cad-wizard-checklist__title">Checklist antes de criar</p>' +
+            '<ul class="cad-wizard-checklist">' +
+            items
+                .map((it) => {
+                    const cls = it.ok
+                        ? 'cad-wizard-checklist__item cad-wizard-checklist__item--ok'
+                        : 'cad-wizard-checklist__item cad-wizard-checklist__item--pendente';
+                    const icon = it.ok ? '✓' : '⚠';
+                    const det = it.detalhe ? `<span class="cad-wizard-checklist__det">${escapeHtmlCheck(it.detalhe)}</span>` : '';
+                    const btn = it.ok
+                        ? ''
+                        : `<button type="button" class="tormenta-btn cad-wizard-checklist__btn" data-ir-passo="${it.passo}">Ajustar</button>`;
+                    return (
+                        `<li class="${cls}">` +
+                        `<span class="cad-wizard-checklist__lab"><strong>${icon}</strong> ${escapeHtmlCheck(it.label)}</span>` +
+                        det +
+                        btn +
+                        `</li>`
+                    );
+                })
+                .join('') +
+            '</ul>' +
+            (pendencias.length
+                ? `<p class="t20-dash-hint t20-compra-pontos-erro cad-wizard-checklist__aviso">` +
+                  `${pendencias.length} item(ns) pendente(s) — corrija antes de criar.</p>`
+                : `<p class="t20-dash-hint t20-compra-pontos-ok cad-wizard-checklist__aviso">Tudo pronto para criar a ficha.</p>`);
+
+        host.querySelectorAll('[data-ir-passo]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const n = parseInt(btn.getAttribute('data-ir-passo') || '0', 10);
+                if (n >= 1) mostrarPasso(n);
+            });
+        });
+
+        atualizarBotaoCriarChecklist(pendencias.length === 0);
+    }
+
+    function atualizarBotaoCriarChecklist(ok) {
+        const sub = q('btnConfirmarCadastro');
+        if (!sub || !isWizardAtivo() || stepAtual !== totalPassos()) return;
+        if (ok) {
+            sub.removeAttribute('aria-disabled');
+            sub.title = '';
+        } else {
+            sub.setAttribute('aria-disabled', 'true');
+            sub.title = 'Resolva os itens pendentes no checklist.';
+        }
+    }
+
+    async function validarAntesCriar() {
+        if (!isWizardAtivo()) return { ok: true };
+        for (let s = 4; s <= 7; s++) {
+            if (s === 7 && !passoKitAplica()) continue;
+            if (
+                s === 5 &&
+                global.T20DashPericiasV13 &&
+                typeof global.T20DashPericiasV13.validarPassoPericias === 'function'
+            ) {
+                const vp = await global.T20DashPericiasV13.validarPassoPericias();
+                if (!vp.ok) return { ok: false, msg: vp.msg, passo: 5 };
+                continue;
+            }
+            const vp = validarPasso(s);
+            if (!vp.ok) return { ok: false, msg: vp.msg, passo: s };
+        }
+        const items = await montarItensChecklist();
+        const pend = items.filter((it) => !it.ok);
+        if (pend.length) {
+            return {
+                ok: false,
+                msg: pend[0].msg || 'Itens pendentes na revisão.',
+                passo: pend[0].passo,
+            };
+        }
+        return { ok: true };
     }
 
     function atualizarBotoesRodape() {
@@ -329,15 +598,34 @@
         const rac = q('cadRacaSelect') && q('cadRacaSelect').selectedOptions[0];
         const orig = q('cadOrigemSlug') && q('cadOrigemSlug').selectedOptions[0];
         const bens = (global.__cadOrigemBeneficios || []).join(', ') || '—';
+        const tend = q('cadTendencia') && q('cadTendencia').value;
+        const div = q('cadDivindade') && q('cadDivindade').value;
+        const devoto = !!(q('cadDevoto') && q('cadDevoto').checked);
+        const pod =
+            q('cadPoderConcedido') && q('cadPoderConcedido').selectedOptions[0]
+                ? q('cadPoderConcedido').selectedOptions[0].textContent
+                : '';
         const kit = global.__cadKitInicial || {};
+        const step2Extra =
+            global.T20DashStep2V13 && global.T20DashStep2V13.resumoPasso2
+                ? global.T20DashStep2V13.resumoPasso2()
+                : '';
+        const perRes =
+            global.T20DashPericiasV13 && global.T20DashPericiasV13.resumoPericias
+                ? global.T20DashPericiasV13.resumoPericias()
+                : '';
         host.innerHTML =
             `<p><strong>${nome || '—'}</strong> · Nv ${nv || '1'}</p>` +
             `<p>Classe: ${cls ? cls.textContent : '—'} · Raça: ${rac ? rac.textContent : '—'}</p>` +
+            (step2Extra ? `<p>${step2Extra}</p>` : '') +
+            (perRes ? `<p>${perRes}</p>` : '') +
             `<p>Origem: ${orig ? orig.textContent : '—'}</p>` +
             `<p>Benefícios: ${bens}</p>` +
+            `<p>Tendência: ${tend || '—'} · Divindade: ${div || '—'}${devoto ? ' (devoto)' : ''}</p>` +
+            (pod ? `<p>Poder concedido: ${pod}</p>` : '') +
             (parseInt(String(nv || '1'), 10) <= 1
-                ? `<p>Kit: ${kit.arma_simples || '—'}${kit.arma_marcial ? ', ' + kit.arma_marcial : ''}${kit.armadura ? ', ' + kit.armadura : ''}${kit.dinheiro_pp != null ? ' · T$ ' + kit.dinheiro_pp : ''}</p>`
-                : '');
+                ? `<p>Kit: ${kit.arma_simples || q('cadKitArmaSimples')?.value || '—'}${kit.arma_marcial ? ', ' + kit.arma_marcial : ''}${kit.armadura ? ', ' + kit.armadura : ''}${kit.dinheiro_pp != null ? ' · T$ ' + kit.dinheiro_pp : ''}</p>`
+                : '<p class="t20-dash-hint" style="margin:0.25rem 0">Kit inicial: não se aplica (nível &gt; 1).</p>');
     }
 
     function validarPasso(n) {
@@ -376,29 +664,78 @@
             return { ok: true };
         }
         if (n === 5) {
+            if (
+                global.T20DashPericiasV13 &&
+                typeof global.T20DashPericiasV13.validarPassoPericias === 'function'
+            ) {
+                return global.T20DashPericiasV13.validarPassoPericias();
+            }
+            return { ok: true };
+        }
+        if (n === 6) {
+            const devoto = !!(q('cadDevoto') && q('cadDevoto').checked);
+            const divSlug = slugDivindadeSelecionado();
+            const pod = q('cadPoderConcedido') && q('cadPoderConcedido').value;
+            if (devoto && !divSlug) {
+                return { ok: false, msg: 'Devoto: escolha uma divindade (Os Vinte).' };
+            }
+            if (devoto && !pod) {
+                return { ok: false, msg: 'Devoto: escolha um poder concedido da divindade.' };
+            }
+            if (pod && !divSlug) {
+                return { ok: false, msg: 'Poder concedido exige divindade escolhida.' };
+            }
+            if (pod && divSlug) {
+                const row = divindadePorSlug(divSlug);
+                const pool = row && Array.isArray(row.poderes_concedidos) ? row.poderes_concedidos : [];
+                if (!pool.includes(pod)) {
+                    return { ok: false, msg: 'Poder concedido inválido para a divindade escolhida.' };
+                }
+            }
+            return { ok: true };
+        }
+        if (n === 7) {
             const nv = parseInt(String(q('cadNivel') && q('cadNivel').value || '1'), 10);
             if (nv > 1) return { ok: true };
             const arma = q('cadKitArmaSimples') && q('cadKitArmaSimples').value;
             if (!arma) return { ok: false, msg: 'Escolha a arma simples do kit inicial.' };
             return { ok: true };
         }
+        if (n === 8) {
+            if (global.__cadWizardChecklistOk === false) {
+                return {
+                    ok: false,
+                    msg: 'Revise o checklist — há itens pendentes (ex.: perícias).',
+                };
+            }
+            return { ok: true };
+        }
         return { ok: true };
     }
 
-    function avancar() {
-        const v = validarPasso(stepAtual);
+    async function avancar() {
+        let v;
+        if (
+            stepAtual === 5 &&
+            global.T20DashPericiasV13 &&
+            typeof global.T20DashPericiasV13.validarPassoPericias === 'function'
+        ) {
+            v = await global.T20DashPericiasV13.validarPassoPericias();
+        } else {
+            v = validarPasso(stepAtual);
+        }
         if (!v.ok) {
             if (cfg && cfg.Toast) cfg.Toast.error(v.msg || 'Passo incompleto.');
             return false;
         }
         if (stepAtual < totalPassos()) {
-            mostrarPasso(stepAtual + 1);
+            mostrarPasso(proximoPasso(stepAtual));
         }
         return true;
     }
 
     function voltar() {
-        if (stepAtual > 1) mostrarPasso(stepAtual - 1);
+        if (stepAtual > 1) mostrarPasso(passoAnterior(stepAtual));
     }
 
     function resetWizard() {
@@ -406,8 +743,31 @@
         global.__cadOrigemBeneficios = [];
         global.__cadOrigemItensEscolha = {};
         global.__cadKitInicial = {};
+        global.__cadWizardChecklistOk = null;
         if (q('cadOrigemSlug')) q('cadOrigemSlug').value = '';
         if (q('cadOrigemBeneficiosHost')) q('cadOrigemBeneficiosHost').innerHTML = '';
+        if (q('cadTendencia')) q('cadTendencia').value = '';
+        if (q('cadDivindade')) q('cadDivindade').value = '';
+        if (q('cadDevoto')) q('cadDevoto').checked = false;
+        if (q('cadPoderConcedido')) q('cadPoderConcedido').innerHTML = '';
+        if (q('cadWizardChecklist')) q('cadWizardChecklist').innerHTML = '';
+        global.__cadWizardChecklistOk = null;
+        if (global.T20DashStep2V13 && global.T20DashStep2V13.resetPasso2) {
+            global.T20DashStep2V13.resetPasso2();
+        }
+        if (global.T20DashPericiasV13 && global.T20DashPericiasV13.resetPericias) {
+            global.T20DashPericiasV13.resetPericias();
+        }
+    }
+
+    function lerPayloadCamposPersonagem() {
+        if (!isV13()) return {};
+        const tend = q('cadTendencia') && q('cadTendencia').value.trim();
+        const div = q('cadDivindade') && q('cadDivindade').value.trim();
+        return {
+            tendencia: tend || null,
+            divindade: div || null,
+        };
     }
 
     function lerPayloadOrigemKit() {
@@ -425,6 +785,12 @@
                 global.__cadOrigemItensEscolha && typeof global.__cadOrigemItensEscolha === 'object'
                     ? { ...global.__cadOrigemItensEscolha }
                     : {},
+            devoto: !!(q('cadDevoto') && q('cadDevoto').checked),
+            poder_concedido_slug:
+                q('cadPoderConcedido') && q('cadPoderConcedido').value
+                    ? String(q('cadPoderConcedido').value).trim()
+                    : null,
+            tormenta_divindade_mb_slug: slugDivindadeSelecionado() || null,
         };
         const nv = parseInt(String(q('cadNivel') && q('cadNivel').value || '1'), 10);
         if (nv <= 1) {
@@ -452,6 +818,9 @@
         resetWizard();
         void carregarCatalogos().then(() => {
             preencherSelectOrigens();
+            preencherSelectTendencias();
+            preencherSelectDivindades();
+            renderPoderesConcedidos();
             void carregarKitOpcoes().then(renderUiKit);
             mostrarPasso(1);
         });
@@ -464,12 +833,40 @@
         q('cadWizardNext')?.addEventListener('click', () => avancar());
         q('cadOrigemSlug')?.addEventListener('change', () => {
             global.__cadOrigemBeneficios = [];
+            if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
+                global.T20DashPericiasV13.invalidarPericias();
+            }
             renderBeneficiosOrigem();
         });
-        q('cadClasseMb')?.addEventListener('change', () => {
-            void carregarKitOpcoes().then(renderUiKit);
+        q('cadDivindade')?.addEventListener('change', () => {
+            renderPoderesConcedidos();
+            renderResumo();
         });
-        q('cadNivel')?.addEventListener('change', renderUiKit);
+        q('cadDevoto')?.addEventListener('change', () => renderResumo());
+        q('cadPoderConcedido')?.addEventListener('change', () => {
+            const pod = q('cadPoderConcedido') && q('cadPoderConcedido').value;
+            if (pod && q('cadDevoto')) q('cadDevoto').checked = true;
+            renderResumo();
+        });
+        q('cadTendencia')?.addEventListener('change', () => renderResumo());
+        q('cadClasseMb')?.addEventListener('change', () => {
+            if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
+                global.T20DashPericiasV13.invalidarPericias();
+            }
+            void carregarKitOpcoes().then(renderUiKit);
+            if (global.T20DashStep2V13 && global.T20DashStep2V13.atualizarUiPasso2) {
+                global.T20DashStep2V13.atualizarUiPasso2();
+            }
+        });
+        q('cadNivel')?.addEventListener('change', () => {
+            renderUiKit();
+            if (global.T20DashStep2V13 && global.T20DashStep2V13.atualizarPvSugerido) {
+                void global.T20DashStep2V13.atualizarPvSugerido(false);
+            }
+            if (isWizardAtivo() && stepAtual === PASSO_KIT && !passoKitAplica()) {
+                mostrarPasso(proximoPasso(PASSO_KIT - 1));
+            }
+        });
         q('cadBtnKitRolarDinheiro')?.addEventListener('click', () => rolarDinheiroKit());
         q('formCadastroRapido')?.addEventListener(
             'submit',
@@ -495,7 +892,12 @@
         isWizardAtivo,
         avancar,
         validarPasso,
+        validarAntesCriar,
         lerPayloadOrigemKit,
+        lerPayloadCamposPersonagem,
+        passoKitAplica,
         mostrarPasso,
+        renderResumo,
+        renderChecklistRevisao,
     };
 })(typeof window !== 'undefined' ? window : globalThis);
