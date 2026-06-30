@@ -491,12 +491,12 @@ class TormentaMagiaMbCatalogoPaginaResponse(BaseModel):
 
 
 class TormentaConjuracaoClasseMbItem(BaseModel):
-    """Progressão de PM e chave de conjuração por classe (MB)."""
+    """Progressão de PM e chave de conjuração por classe (MB/v1.3)."""
 
     slug: str = Field(..., max_length=40)
     habilidade_chave: Literal["int", "sab", "car"] = Field(
         ...,
-        description="Atributo que define CD e modificador na conjuração (MB).",
+        description="Atributo que define CD e modificador na conjuração.",
     )
     pm_constante: int = Field(..., ge=0, le=30)
     pm_por_nivel: int = Field(
@@ -511,9 +511,11 @@ class TormentaConjuracaoClasseMbItem(BaseModel):
         le=20,
         description="Nível mínimo da classe em que há conjuração (ex.: 5 para paladino/ranger com magias).",
     )
-    modo_conjuracao: Literal["preparar", "espontaneo"] = Field(
+    modo_conjuracao: Literal[
+        "preparar", "espontaneo", "foco", "caminho", "nao_conjura"
+    ] = Field(
         default="preparar",
-        description="preparar (mago/clérigo/druida/paladino/ranger) ou espontaneo (bardo/feiticeiro).",
+        description="Tipo de conjuração por classe: preparar, espontâneo, foco, caminho (arcanista) ou não conjura.",
     )
 
 
