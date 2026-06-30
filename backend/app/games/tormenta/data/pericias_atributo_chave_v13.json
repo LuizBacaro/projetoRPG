@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Tabela 2-1 p.115",
+    "versao": "v13",
+    "total": 29,
+    "nota": "Atletismo: penalidade de armadura só em natação (p.116) — flag parcial no JSON."
+  },
+  "pericias": [
+    { "slug": "acrobacia", "nome": "Acrobacia", "atributo": "des", "somente_treinado": false, "penalidade_armadura": true },
+    { "slug": "adestramento", "nome": "Adestramento", "atributo": "car", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "atletismo", "nome": "Atletismo", "atributo": "for", "somente_treinado": false, "penalidade_armadura": false, "penalidade_armadura_natacao": true },
+    { "slug": "atuacao", "nome": "Atuação", "atributo": "car", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "cavalgar", "nome": "Cavalgar", "atributo": "des", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "conhecimento", "nome": "Conhecimento", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "cura", "nome": "Cura", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "diplomacia", "nome": "Diplomacia", "atributo": "car", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "enganacao", "nome": "Enganação", "atributo": "car", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "fortitude", "nome": "Fortitude", "atributo": "con", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "furtividade", "nome": "Furtividade", "atributo": "des", "somente_treinado": false, "penalidade_armadura": true },
+    { "slug": "guerra", "nome": "Guerra", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "iniciativa", "nome": "Iniciativa", "atributo": "des", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "intimidacao", "nome": "Intimidação", "atributo": "car", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "intuicao", "nome": "Intuição", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "investigacao", "nome": "Investigação", "atributo": "int", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "jogatina", "nome": "Jogatina", "atributo": "car", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "ladinagem", "nome": "Ladinagem", "atributo": "des", "somente_treinado": true, "penalidade_armadura": true },
+    { "slug": "luta", "nome": "Luta", "atributo": "for", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "misticismo", "nome": "Misticismo", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "nobreza", "nome": "Nobreza", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "oficio", "nome": "Ofício", "atributo": "int", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "percepcao", "nome": "Percepção", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "pilotagem", "nome": "Pilotagem", "atributo": "des", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "pontaria", "nome": "Pontaria", "atributo": "des", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "reflexos", "nome": "Reflexos", "atributo": "des", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "religiao", "nome": "Religião", "atributo": "sab", "somente_treinado": true, "penalidade_armadura": false },
+    { "slug": "sobrevivencia", "nome": "Sobrevivência", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false },
+    { "slug": "vontade", "nome": "Vontade", "atributo": "sab", "somente_treinado": false, "penalidade_armadura": false }
+  ]
+}

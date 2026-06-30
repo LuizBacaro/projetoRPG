@@ -1,0 +1,219 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Tabela 1-21; traços p.19–31",
+    "nota": "Escala v1.3 (+2 típico em perícias/resistências). Pequeno: Furtividade +2 (Tabela 1-21)."
+  },
+  "racas": {
+    "humano": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ca_vs_grande_ou_maior": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {},
+      "pericias_treinadas_extra": 2
+    },
+    "anao": {
+      "tamanho": "medio",
+      "deslocamento_m": 6,
+      "desloc_nao_reduz_armadura_carga": true,
+      "ca_bonus": 0,
+      "ca_vs_grande_ou_maior": 2,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 2,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 2,
+      "pericias_bonus": {}
+    },
+    "dahllan": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Adestramento": 2
+      }
+    },
+    "elfo": {
+      "tamanho": "medio",
+      "deslocamento_m": 12,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 2,
+      "pericias_bonus": {
+        "Misticismo": 2,
+        "Percepção": 2
+      }
+    },
+    "goblin": {
+      "tamanho": "pequeno",
+      "deslocamento_m": 9,
+      "ca_bonus": 1,
+      "ataque_bonus": 1,
+      "furtividade_bonus": 2,
+      "fortitude_bonus": 2,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Ladinagem": 2,
+        "Ofício": 2
+      }
+    },
+    "lefou": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    },
+    "minotauro": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 1,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Sobrevivência": 2
+      }
+    },
+    "qareen": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Misticismo": 2
+      }
+    },
+    "golem": {
+      "tamanho": "medio",
+      "deslocamento_m": 6,
+      "desloc_nao_reduz_armadura_carga": true,
+      "ca_bonus": 2,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    },
+    "hynne": {
+      "tamanho": "pequeno",
+      "deslocamento_m": 6,
+      "ca_bonus": 1,
+      "ataque_bonus": 1,
+      "furtividade_bonus": 2,
+      "fortitude_bonus": 1,
+      "reflexos_bonus": 1,
+      "vontade_bonus": 1,
+      "pericias_bonus": {
+        "Enganação": 2
+      }
+    },
+    "kliren": {
+      "tamanho": "pequeno",
+      "deslocamento_m": 6,
+      "ca_bonus": 1,
+      "ataque_bonus": 1,
+      "furtividade_bonus": 2,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Intuição": 2
+      }
+    },
+    "medusa": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    },
+    "osteon": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    },
+    "sereia_tritao": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "deslocamento_natacao_m": 12,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    },
+    "silfide": {
+      "tamanho": "minusculo",
+      "deslocamento_m": 9,
+      "deslocamento_pairar_m": 9,
+      "deslocamento_voo_m": 12,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    },
+    "suraggel": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    },
+    "trog": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 1,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 2,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {}
+    }
+  }
+}

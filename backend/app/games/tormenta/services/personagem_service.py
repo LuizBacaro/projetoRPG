@@ -17,11 +17,31 @@ from app.games.tormenta.rules.conjuracao_t20 import (
     classe_conjuracao_mb_registrada,
     pontos_magia_maximos_conjuracao,
 )
-from app.games.tormenta.rules.pericias_criacao_t20 import validar_pericias_ficha_mb
+from app.games.tormenta.rules.defesa_t20 import defesa_base_ca
+from app.games.tormenta.rules.origens_t20 import (
+    sincronizar_pericias_origem_ficha_json,
+    validar_beneficios_origem,
+)
+from app.games.tormenta.rules.pericias_criacao_t20 import validar_pericias_ficha
+from app.games.tormenta.rules.progressao_pv_t20 import (
+    niveis_multiclasse_v13_de_ficha,
+    preview_pm_multiclasse_v13,
+)
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_V13,
+    regra_versao_de_ficha,
+)
+from app.games.tormenta.rules.tendencias_divindades_t20 import validar_devocao_v13
 from app.games.tormenta.schemas.personagem import (
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
     TormentaPersonagemUpdate,
+)
+from app.games.tormenta.services.personagem_equipamentos_service import (
+    TormentaPersonagemEquipamentosService,
+)
+from app.games.tormenta.services.personagem_talentos_service import (
+    TormentaPersonagemTalentosService,
 )
 from app.repositories.base import commit_with_rollback
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
@@ -114,8 +134,31 @@ class TormentaPersonagemService:
         slug = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
         if not slug:
             return None
-        nv = cls._nivel_conjuracao_mb_para_pm(fj, nivel_personagem)
-        return pontos_magia_maximos_conjuracao(slug, nv, fv, dv, cv, iv, sv, carv)
+        rv = regra_versao_de_ficha(fj)
+        if rv == REGRA_VERSAO_V13:
+            linhas = niveis_multiclasse_v13_de_ficha(fj, int(nivel_personagem))
+            if linhas:
+                prev = preview_pm_multiclasse_v13(linhas)
+                pm = prev.get("pm_max")
+                return int(pm) if pm is not None else None
+        arcanista = str(fj.get("arcanista_caminho") or "").strip().lower() or None
+        nv = (
+            int(nivel_personagem)
+            if rv == REGRA_VERSAO_V13
+            else cls._nivel_conjuracao_mb_para_pm(fj, nivel_personagem)
+        )
+        return pontos_magia_maximos_conjuracao(
+            slug,
+            nv,
+            fv,
+            dv,
+            cv,
+            iv,
+            sv,
+            carv,
+            regra_versao=rv,
+            arcanista_caminho=arcanista,
+        )
 
     @classmethod
     def _resolver_pa_magia_criacao(
@@ -143,10 +186,13 @@ class TormentaPersonagemService:
         return pa_max, pa_atual
 
     def _sincronizar_pontos_magia_mb(self, ent: TormentaPersonagem) -> None:
-        """Recalcula PM (Pontos de Magia) MB quando a classe MB está na tabela; zera se ainda não conjura (ex.: paladino < 5)."""
+        """Recalcula PM máximos: v1.3 (todas as classes) ou MB (só conjuradores na tabela)."""
         fj = dict(ent.ficha_json or {})
         slug = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
-        if not classe_conjuracao_mb_registrada(slug):
+        if not slug:
+            return
+        rv = regra_versao_de_ficha(fj)
+        if rv != REGRA_VERSAO_V13 and not classe_conjuracao_mb_registrada(slug):
             return
         pm = self._pm_mb_calculado(
             fj,
@@ -171,6 +217,13 @@ class TormentaPersonagemService:
         else:
             cur = min(cur, new_max)
         ent.pa_atual = min(max(0, cur), new_max)
+
+    def _sincronizar_ca_v13(self, ent: TormentaPersonagem) -> None:
+        """v1.3: CA base = 10 + DES (valor); armaduras da lista somam na UI."""
+        fj = dict(ent.ficha_json or {})
+        if regra_versao_de_ficha(fj) != REGRA_VERSAO_V13:
+            return
+        ent.ca = defesa_base_ca(int(ent.des_valor or 0), REGRA_VERSAO_V13)
 
     def _validar_tipo(self, tipo: str) -> None:
         if (tipo or "").lower() not in self._tipos_validos():
@@ -229,6 +282,7 @@ class TormentaPersonagemService:
         """Jogador: valida compra por pontos (20 pts) ou rolagem 4d6 conforme metodo_geracao_atributos."""
         if (tipo or "").lower() != "jogador":
             return
+        rv = regra_versao_de_ficha(ficha_json)
         metodo = TormentaPersonagemService._metodo_geracao_atributos(ficha_json)
         fv, dv, cv, iv, sv, cav = TormentaPersonagemService._seis_valores_compra_pontos(
             ficha_json, for_valor, des_valor, con_valor, int_valor, sab_valor, car_valor
@@ -236,16 +290,17 @@ class TormentaPersonagemService:
         bases = (fv, dv, cv, iv, sv, cav)
         if metodo == "4d6":
             try:
-                validar_valores_base_4d6(bases)
+                validar_valores_base_4d6(bases, rv)
             except ValueError as exc:
                 raise DadosInvalidos(str(exc)) from exc
             return
-        meta = pontos_iniciais_compra()
-        total = custo_total_compra_seis_atributos(fv, dv, cv, iv, sv, cav)
+        meta = pontos_iniciais_compra(rv)
+        total = custo_total_compra_seis_atributos(fv, dv, cv, iv, sv, cav, rv)
+        intervalo = "entre −2 e +4 (v1.3)" if rv == "v13" else "entre 8 e 18 (MB)"
         if total is None:
             raise DadosInvalidos(
-                "Ficha tipo jogador: cada valor em atributos_compra (ou atributo do personagem) "
-                "usado na soma deve estar entre 8 e 18 (compra por pontos do Modulo Basico)."
+                f"Ficha tipo jogador: cada valor em atributos_compra (ou atributo do personagem) "
+                f"usado na soma deve estar {intervalo}."
             )
         if int(total) > int(meta):
             raise DadosInvalidos(
@@ -253,8 +308,9 @@ class TormentaPersonagemService:
                 f"(gasto atual: {total}). Ajuste ficha_json.atributos_compra ou os seis atributos."
             )
         if int(total) < int(meta):
+            edicao = "v1.3" if rv == "v13" else "MB"
             raise DadosInvalidos(
-                f"Ficha tipo jogador: e obrigatorio gastar os {meta} pontos na compra por pontos do MB "
+                f"Ficha tipo jogador: e obrigatorio gastar os {meta} pontos na compra por pontos do {edicao} "
                 f"(gasto atual: {total}). Ajuste ficha_json.atributos_compra ou os seis atributos."
             )
 
@@ -264,12 +320,17 @@ class TormentaPersonagemService:
         ficha_json: Optional[dict],
         nivel: int,
         int_valor: int,
+        *,
+        criacao: bool = False,
     ) -> None:
         """Jogador com classe MB: valida vagas treinadas e graduações de perícias."""
         if (tipo or "").lower() != "jogador":
             return
         if not ficha_json:
             return
+        if criacao and ficha_json.get("cadastro_dashboard"):
+            if not ficha_json.get("pericias_wizard_v13"):
+                return
         slug = str(ficha_json.get("tormenta_classe_mb_slug") or "").strip().lower()
         if not slug:
             return
@@ -279,15 +340,100 @@ class TormentaPersonagemService:
         raca_slug = str(ficha_json.get("raca_tormenta_slug") or "").strip().lower()
         if raca_slug in ("__livre__", ""):
             raca_slug = None
-        ok, motivo, _ = validar_pericias_ficha_mb(
+        ok, motivo, _ = validar_pericias_ficha(
             nivel=int(nivel or 1),
             slug_classe=slug,
             int_valor=int(int_valor),
             slug_raca=raca_slug,
             pericias=pericias,
+            regra_versao=regra_versao_de_ficha(ficha_json),
+            humano_versatil=ficha_json.get("humano_versatil"),
+            origem_beneficios=ficha_json.get("origem_beneficios"),
         )
         if not ok:
             raise DadosInvalidos(motivo or "Orçamento de perícias MB inválido.")
+
+    @staticmethod
+    def _validar_arcanista_caminho_v13(tipo: str, ficha_json: Optional[dict]) -> None:
+        if (tipo or "").lower() != "jogador":
+            return
+        if not ficha_json:
+            return
+        if regra_versao_de_ficha(ficha_json) != REGRA_VERSAO_V13:
+            return
+        slug = str(ficha_json.get("tormenta_classe_mb_slug") or "").strip().lower()
+        if slug != "arcanista":
+            return
+        cam = str(ficha_json.get("arcanista_caminho") or "").strip().lower()
+        if cam not in ("bruxo", "mago", "feiticeiro"):
+            raise DadosInvalidos(
+                "Arcanista v1.3: escolha o caminho Bruxo, Mago ou Feiticeiro (irreversível)."
+            )
+
+    @staticmethod
+    def _validar_origem_v13(
+        tipo: str, ficha_json: Optional[dict], *, criacao: bool = False
+    ) -> None:
+        if (tipo or "").lower() != "jogador":
+            return
+        fj = dict(ficha_json or {})
+        if regra_versao_de_ficha(fj) != REGRA_VERSAO_V13:
+            return
+        slug = str(fj.get("origem_slug") or "").strip().lower()
+        if not slug:
+            if criacao:
+                raise DadosInvalidos(
+                    "Ficha v1.3 tipo jogador: origem obrigatoria (ficha_json.origem_slug)."
+                )
+            return
+        ben = fj.get("origem_beneficios")
+        if not isinstance(ben, list):
+            ben = []
+        ok, motivo = validar_beneficios_origem(slug, ben)
+        if not ok:
+            raise DadosInvalidos(motivo or "Benefícios de origem inválidos.")
+
+    @staticmethod
+    def _validar_devocao_v13(
+        tipo: str,
+        ficha_json: Optional[dict],
+        *,
+        divindade_rotulo: Optional[str] = None,
+    ) -> None:
+        if (tipo or "").lower() != "jogador":
+            return
+        fj = dict(ficha_json or {})
+        if regra_versao_de_ficha(fj) != REGRA_VERSAO_V13:
+            return
+        ok, motivo = validar_devocao_v13(fj, divindade_rotulo=divindade_rotulo)
+        if not ok:
+            raise DadosInvalidos(motivo or "Devoção inválida.")
+
+    @staticmethod
+    def _preparar_ficha_json_tormenta(ficha_json: Optional[dict]) -> dict:
+        """Normaliza ficha_json v1.3 (ex.: perícias treinadas pela origem)."""
+        fj = dict(ficha_json or {})
+        if regra_versao_de_ficha(fj) == REGRA_VERSAO_V13:
+            fj = sincronizar_pericias_origem_ficha_json(fj)
+        return fj
+
+    def _sincronizar_poderes_v13(self, personagem_id: int, ficha_json: dict) -> None:
+        if regra_versao_de_ficha(ficha_json) != REGRA_VERSAO_V13:
+            return
+        TormentaPersonagemTalentosService(
+            self.repo.db
+        ).sincronizar_poderes_automaticos_v13(personagem_id, ficha_json)
+
+    def _sincronizar_equipamentos_v13(
+        self, personagem_id: int, ficha_json: dict, nivel: int
+    ) -> None:
+        if regra_versao_de_ficha(ficha_json) != REGRA_VERSAO_V13:
+            return
+        fj = dict(ficha_json or {})
+        fj["nivel"] = int(nivel or 1)
+        TormentaPersonagemEquipamentosService(
+            self.repo.db
+        ).sincronizar_equipamentos_automaticos_v13(personagem_id, fj)
 
     def listar_todos(
         self,
@@ -377,9 +523,11 @@ class TormentaPersonagemService:
         if not nome:
             raise DadosInvalidos("Nome e obrigatorio")
 
+        ficha_prep = self._preparar_ficha_json_tormenta(payload.ficha_json)
+
         self._validar_atributos_criacao_jogador(
             payload.tipo,
-            dict(payload.ficha_json or {}),
+            ficha_prep,
             payload.for_valor,
             payload.des_valor,
             payload.con_valor,
@@ -389,16 +537,24 @@ class TormentaPersonagemService:
         )
         self._validar_pericias_t20_jogador(
             payload.tipo,
-            dict(payload.ficha_json or {}),
+            ficha_prep,
             int(payload.nivel or 1),
             int(payload.int_valor),
+            criacao=True,
+        )
+        self._validar_arcanista_caminho_v13(payload.tipo, ficha_prep)
+        self._validar_origem_v13(payload.tipo, ficha_prep, criacao=True)
+        self._validar_devocao_v13(
+            payload.tipo,
+            ficha_prep,
+            divindade_rotulo=(payload.divindade or "").strip() or None,
         )
 
         pv_max = payload.pv_max
         pv_atual = payload.pv_atual if payload.pv_atual is not None else pv_max
         pa_max, pa_atual = self._resolver_pa_magia_criacao(payload)
 
-        ficha = dict(payload.ficha_json or {})
+        ficha = ficha_prep
 
         ent = TormentaPersonagem(
             dono_id=self._resolver_dono(usuario, payload.tipo),
@@ -433,8 +589,15 @@ class TormentaPersonagemService:
             ficha_json=ficha,
             foto_url=(payload.foto_url or "").strip() or None,
         )
+        self._sincronizar_ca_v13(ent)
 
         self.repo.db.add(ent)
+        commit_with_rollback(self.repo.db)
+        self.repo.db.refresh(ent)
+        self._sincronizar_poderes_v13(ent.id, dict(ent.ficha_json or {}))
+        self._sincronizar_equipamentos_v13(
+            ent.id, dict(ent.ficha_json or {}), int(ent.nivel or 1)
+        )
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
         return TormentaPersonagemResponse.model_validate(ent)
@@ -455,6 +618,9 @@ class TormentaPersonagemService:
         fj = dict(ent.ficha_json or {})
         if "ficha_json" in data and data["ficha_json"] is not None:
             fj.update(dict(data["ficha_json"] or {}))
+        fj = self._preparar_ficha_json_tormenta(fj)
+        if "ficha_json" in data:
+            data["ficha_json"] = fj
         if self._patch_mexe_compra_pontos(data):
             self._validar_atributos_criacao_jogador(
                 tipo_final,
@@ -469,6 +635,11 @@ class TormentaPersonagemService:
         nv_final = int(data["nivel"]) if "nivel" in data else int(ent.nivel or 1)
         if self._patch_mexe_pericias_mb(data):
             self._validar_pericias_t20_jogador(tipo_final, fj, nv_final, iv)
+        if "ficha_json" in data:
+            self._validar_arcanista_caminho_v13(tipo_final, fj)
+            self._validar_origem_v13(tipo_final, fj)
+            div_rot = str(data.get("divindade", ent.divindade) or "").strip() or None
+            self._validar_devocao_v13(tipo_final, fj, divindade_rotulo=div_rot)
 
         if "foto_url" in data:
             raw = data["foto_url"]
@@ -487,12 +658,19 @@ class TormentaPersonagemService:
             setattr(ent, key, val)
 
         self._sincronizar_pontos_magia_mb(ent)
+        self._sincronizar_ca_v13(ent)
 
         if ent.pv_max is not None and ent.pv_atual is not None:
             ent.pv_atual = min(ent.pv_atual, ent.pv_max)
         if ent.pa_max is not None and ent.pa_atual is not None:
             ent.pa_atual = min(ent.pa_atual, ent.pa_max)
 
+        commit_with_rollback(self.repo.db)
+        self.repo.db.refresh(ent)
+        self._sincronizar_poderes_v13(ent.id, dict(ent.ficha_json or {}))
+        self._sincronizar_equipamentos_v13(
+            ent.id, dict(ent.ficha_json or {}), int(ent.nivel or 1)
+        )
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
         return TormentaPersonagemResponse.model_validate(ent)

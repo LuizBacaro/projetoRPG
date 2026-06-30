@@ -1073,6 +1073,54 @@ def test_subir_nivel_preview_e_aplicar_mago(tormenta_personagens_db):
     assert res["personagem"]["ficha_json"].get("habilidade_classe_mb")
 
 
+def test_subir_nivel_v13_multiclasse_nova_classe(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid_resp = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="McArc3",
+            nivel=3,
+            pv_max=12,
+            pv_atual=12,
+            pa_max=18,
+            pa_atual=18,
+            ficha_json={
+                "tormenta_classe_mb_slug": "arcanista",
+                "arcanista_caminho": "mago",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "multiclasse_v13": [{"slug": "arcanista", "nivel": 3}],
+                "cadastro_dashboard": True,
+            },
+        ),
+    )
+    assert rid_resp.status_code == 201, rid_resp.text
+    rid = rid_resp.json()["id"]
+    prev = client.get(
+        f"/api/v1/tormenta/personagens/{rid}/subir-nivel-preview",
+        params={"nivel_alvo": 4, "classe_slug": "paladino"},
+    )
+    assert prev.status_code == 200, prev.text
+    body = prev.json()
+    assert body["permitido"] is True
+    assert body["classe_nova_multiclasse"] is True
+    assert body["pa_ganho"] == 3
+    assert body["pa_max_novo"] == 21
+
+    aplic = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/subir-nivel",
+        json={"aplicar_ganhos_vida": True, "classe_slug": "paladino"},
+    )
+    assert aplic.status_code == 200, aplic.text
+    res = aplic.json()
+    assert res["personagem"]["nivel"] == 4
+    assert res["personagem"]["pa_max"] == 21
+    mc = res["personagem"]["ficha_json"].get("multiclasse_v13") or []
+    assert {"slug": "arcanista", "nivel": 3} in mc
+    assert {"slug": "paladino", "nivel": 1} in mc
+
+
 def test_clerigo_preparada_e_lancar_truque_divino(tormenta_personagens_db):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
@@ -1155,3 +1203,307 @@ def test_magias_migrar_texto_limpa_ficha_apos_sincronizar(tormenta_personagens_d
     mig2 = client.post(f"/api/v1/tormenta/personagens/{rid}/magias/migrar-do-json")
     assert mig2.status_code == 200
     assert mig2.json()["vinculos_criados"] == 0
+
+
+_T20_JOG_V13_BASE10 = {
+    "for_valor": 3,
+    "des_valor": 3,
+    "con_valor": 2,
+    "int_valor": 0,
+    "sab_valor": 0,
+    "car_valor": 0,
+}
+
+
+def _t20_post_jogador_v13_json(**kwargs) -> dict:
+    """POST mínimo jogador v1.3 com compra = 10 pts (3+3+2 custos)."""
+    ficha_extra = kwargs.pop("ficha_json", None) or {}
+    body = {"tipo": "jogador", **_T20_JOG_V13_BASE10.copy()}
+    body.update(kwargs)
+    if "pv_max" in body and "pv_atual" not in body:
+        body["pv_atual"] = body["pv_max"]
+    fj = {"regra_versao": "v13", **ficha_extra}
+    fj["atributos_compra"] = {
+        "for": body["for_valor"],
+        "des": body["des_valor"],
+        "con": body["con_valor"],
+        "int": body["int_valor"],
+        "sab": body["sab_valor"],
+        "car": body["car_valor"],
+    }
+    body["ficha_json"] = fj
+    return body
+
+
+def test_criar_jogador_v13_compra_pontos_invalida_rejeita(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Pts Invalidos",
+            nivel=1,
+            pv_max=12,
+            for_valor=4,
+            des_valor=4,
+            con_valor=4,
+            int_valor=4,
+            sab_valor=4,
+            car_valor=4,
+            ficha_json={
+                "tormenta_classe_mb_slug": "guerreiro",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+            },
+        ),
+    )
+    assert r.status_code == 422
+    assert "pontos" in r.json()["detail"].lower()
+
+
+def test_criar_jogador_v13_4d6_ok(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    bases = {"for": 1, "des": 1, "con": 1, "int": 1, "sab": 1, "car": 1}
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "tipo": "jogador",
+            "nome": "Rolagem 4d6",
+            "nivel": 1,
+            "pv_max": 12,
+            "pv_atual": 12,
+            **bases,
+            "ficha_json": {
+                "regra_versao": "v13",
+                "metodo_geracao_atributos": "4d6",
+                "atributos_compra": bases,
+                "tormenta_classe_mb_slug": "guerreiro",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+            },
+        },
+    )
+    assert r.status_code == 201
+    assert r.json()["ficha_json"]["metodo_geracao_atributos"] == "4d6"
+
+
+def test_criar_jogador_v13_sem_origem_rejeita(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Sem Origem",
+            nivel=1,
+            pv_max=12,
+            ficha_json={"tormenta_classe_mb_slug": "guerreiro"},
+        ),
+    )
+    assert r.status_code == 422
+    assert "origem" in r.json()["detail"].lower()
+
+
+def test_criar_jogador_v13_com_origem_ok(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Com Origem",
+            nivel=1,
+            pv_max=12,
+            ficha_json={
+                "tormenta_classe_mb_slug": "guerreiro",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+            },
+        ),
+    )
+    assert r.status_code == 201
+    fj = r.json()["ficha_json"]
+    assert fj["origem_slug"] == "acolito"
+    assert len(fj["origem_beneficios"]) == 2
+
+
+def test_criar_jogador_v13_devoto_com_poder_concedido(tormenta_personagens_db):
+    from app.games.tormenta.rules.tendencias_divindades_t20 import divindade_por_slug
+
+    row = divindade_por_slug("khalmyr")
+    assert row and row.get("poderes_concedidos")
+    pod = row["poderes_concedidos"][0]
+    rotulo = row["rotulo"]
+
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Devoto Khalmyr",
+            nivel=1,
+            pv_max=12,
+            tendencia="Leal e Bom",
+            divindade=rotulo,
+            ficha_json={
+                "tormenta_classe_mb_slug": "guerreiro",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+                "devoto": True,
+                "tormenta_divindade_mb_slug": "khalmyr",
+                "poder_concedido_slug": pod,
+            },
+        ),
+    )
+    assert r.status_code == 201
+    body = r.json()
+    assert body["divindade"] == rotulo
+    assert body["ficha_json"]["poder_concedido_slug"] == pod
+    assert body["ficha_json"]["devoto"] is True
+
+
+def test_criar_jogador_v13_devoto_poder_invalido_rejeita(tormenta_personagens_db):
+    from app.games.tormenta.rules.tendencias_divindades_t20 import divindade_por_slug
+
+    row = divindade_por_slug("khalmyr")
+    assert row
+    rotulo = row["rotulo"]
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Devoto Invalido",
+            nivel=1,
+            pv_max=12,
+            divindade=rotulo,
+            ficha_json={
+                "tormenta_classe_mb_slug": "guerreiro",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+                "devoto": True,
+                "tormenta_divindade_mb_slug": "khalmyr",
+                "poder_concedido_slug": "poder_inexistente_xyz",
+            },
+        ),
+    )
+    assert r.status_code == 422
+    assert "invalido" in r.json()["detail"].lower()
+
+
+def test_criar_jogador_v13_clerigo_sem_devocao_rejeita(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Clerigo Sem Deus",
+            nivel=1,
+            pv_max=12,
+            ficha_json={
+                "tormenta_classe_mb_slug": "clerigo",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+            },
+        ),
+    )
+    assert r.status_code == 422
+    assert "divindade" in r.json()["detail"].lower()
+
+
+def test_criar_jogador_v13_arcanista_sem_caminho_rejeita(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Arc Sem Caminho",
+            nivel=1,
+            pv_max=10,
+            ficha_json={
+                "tormenta_classe_mb_slug": "arcanista",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+            },
+        ),
+    )
+    assert r.status_code == 422
+    assert "caminho" in r.json()["detail"].lower()
+
+
+def test_criar_jogador_v13_humano_arcanista_bruxo_wizard(tormenta_personagens_db):
+    """Payload equivalente ao wizard v1.3 passo 2 (Sprint 3)."""
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Bruxo Humano",
+            nivel=1,
+            pv_max=10,
+            ficha_json={
+                "tormenta_classe_mb_slug": "arcanista",
+                "arcanista_caminho": "bruxo",
+                "raca_tormenta_slug": "humano",
+                "raca_tormenta_mais2a": "int",
+                "raca_tormenta_mais2b": "sab",
+                "raca_tormenta_mais1": "des",
+                "humano_versatil": "duas_pericias",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+                "cadastro_wizard_v13": True,
+            },
+        ),
+    )
+    assert r.status_code == 201, r.text
+    fj = r.json()["ficha_json"]
+    assert fj["arcanista_caminho"] == "bruxo"
+    assert fj["humano_versatil"] == "duas_pericias"
+    assert fj["raca_tormenta_slug"] == "humano"
+    assert fj["origem_slug"] == "acolito"
+
+
+def test_criar_jogador_v13_com_pericias_wizard(tormenta_personagens_db):
+    """Wizard v1.3 passo Perícias — orçamento válido na criação."""
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    pericias = [
+        {"nome": "Misticismo", "treinado": True, "graduacao": 0},
+        {"nome": "Vontade", "treinado": True, "graduacao": 0},
+        {"nome": "Conhecimento", "treinado": True, "graduacao": 0},
+        {"nome": "Investigação", "treinado": True, "graduacao": 0},
+        {"nome": "Atletismo", "treinado": True, "graduacao": 0},
+        {"nome": "Acrobacia", "treinado": True, "graduacao": 0},
+        {"nome": "Cura", "treinado": True, "graduacao": 0},
+    ]
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Arc Pericias OK",
+            nivel=1,
+            pv_max=10,
+            ficha_json={
+                "tormenta_classe_mb_slug": "arcanista",
+                "arcanista_caminho": "bruxo",
+                "raca_tormenta_slug": "humano",
+                "humano_versatil": "duas_pericias",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "cadastro_dashboard": True,
+                "cadastro_wizard_v13": True,
+                "pericias_wizard_v13": True,
+                "pericias": pericias,
+            },
+        ),
+    )
+    assert r.status_code == 201, r.text
+    fj = r.json()["ficha_json"]
+    treinadas = [p for p in (fj.get("pericias") or []) if p.get("treinado")]
+    assert len(treinadas) >= 7

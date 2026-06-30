@@ -182,3 +182,121 @@ def test_condicoes_mb_persistem_no_combate(db_tormenta_combate):
     cm2 = st2.get("condicoes_mb") or {}
     assert str(a.id) not in cm2
     assert cm2[str(b.id)]["rotulos"] == ["Caído"]
+
+
+def test_rolar_iniciativa_v13_usa_valor_des(db_tormenta_combate):
+    db, u = db_tormenta_combate
+    p = TormentaPersonagem(
+        dono_id=u.id,
+        tipo="jogador",
+        nome="Agil",
+        des_valor=2,
+        iniciativa=0,
+        ficha_json={"regra_versao": "v13"},
+    )
+    db.add(p)
+    db.commit()
+    db.refresh(p)
+
+    svc = TormentaCombateService(
+        TormentaCombateRepository(db),
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    svc.iniciar_combate([p.id])
+    out = svc.rolar_iniciativa_combate([p.id])
+    r0 = out["resultados"][0]
+    assert r0["modificador"] == 2
+    assert r0["total"] == r0["d20"] + 2
+
+
+def test_rolar_ataque_usa_ca_com_armaduras_ficha(db_tormenta_combate):
+    db, u = db_tormenta_combate
+    alvo = TormentaPersonagem(
+        dono_id=u.id,
+        tipo="jogador",
+        nome="Tank",
+        des_valor=2,
+        ca=12,
+        ficha_json={
+            "regra_versao": "v13",
+            "armaduras_protecao": [
+                {"nome": "Couro", "tipo": "leve", "bonus_ca": 2},
+                {"nome": "Broquel", "tipo": "escudo", "bonus_ca": 1, "empunhado": True},
+            ],
+        },
+    )
+    atk = TormentaPersonagem(
+        dono_id=u.id,
+        tipo="monstro",
+        nome="Goblin",
+        ficha_json={},
+    )
+    db.add_all([alvo, atk])
+    db.commit()
+    db.refresh(alvo)
+    db.refresh(atk)
+
+    svc = TormentaCombateService(
+        TormentaCombateRepository(db),
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    svc.iniciar_combate([atk.id, alvo.id])
+    roll = svc.rolar_ataque_combate(
+        atacante_id=atk.id,
+        alvo_id=alvo.id,
+        bab=0,
+        mod_atributo=0,
+    )
+    assert roll["ca_alvo"] == 15
+    st = svc.obter_status_combate()
+    pers = {p["id"]: p for p in st["personagens"]}
+    assert pers[alvo.id]["ca"] == 15
+    assert pers[alvo.id]["ca_efetiva"] == 15
+
+
+def test_rolar_ataque_aplica_condicao_desprevenido_no_alvo(db_tormenta_combate):
+    db, u = db_tormenta_combate
+    alvo = TormentaPersonagem(
+        dono_id=u.id,
+        tipo="jogador",
+        nome="Desp",
+        des_valor=0,
+        ca=10,
+        ficha_json={"regra_versao": "v13"},
+    )
+    atk = TormentaPersonagem(
+        dono_id=u.id,
+        tipo="monstro",
+        nome="Goblin",
+        ficha_json={},
+    )
+    db.add_all([alvo, atk])
+    db.commit()
+    db.refresh(alvo)
+    db.refresh(atk)
+
+    svc = TormentaCombateService(
+        TormentaCombateRepository(db),
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    svc.iniciar_combate([atk.id, alvo.id])
+    svc.aplicar_condicoes_mb(
+        {
+            str(alvo.id): TormentaCombateCondicaoMbItem(
+                rotulos=["Desprevenido"],
+                tips=["−5 Defesa"],
+            ),
+        }
+    )
+    roll = svc.rolar_ataque_combate(
+        atacante_id=atk.id,
+        alvo_id=alvo.id,
+        bab=0,
+        mod_atributo=0,
+    )
+    assert roll["ca_base_alvo"] == 10
+    assert roll["modificador_condicoes_ca_alvo"] == -5
+    assert roll["ca_alvo"] == 5

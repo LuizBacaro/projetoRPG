@@ -1,0 +1,51 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 v1.3 — Cap. 3 p.141 (ocupação por espaços)",
+    "nota": "Valores explícitos por nome; inferência por categoria/tipo quando ausente."
+  },
+  "zero_espacos_nomes": [
+    "mochila"
+  ],
+  "meio_espaco_padroes": [
+    "poção",
+    "pocao",
+    "pergaminho",
+    "alquímic",
+    "alquimic",
+    "frasco"
+  ],
+  "por_nome": {
+    "saco de dormir": 1,
+    "saco de estopa": 1,
+    "saco de seda": 1,
+    "roupas de viajante": 1,
+    "traje de viajante": 1,
+    "tocha": 0.5,
+    "rações (1 dia)": 0.5,
+    "rações": 0.5,
+    "flechas (20)": 0.5,
+    "virotes (10)": 0.5,
+    "cavalo de carga": 10,
+    "cavalo": 10
+  },
+  "por_categoria": {
+    "armadura leve": 2,
+    "armadura média": 2,
+    "armadura media": 2,
+    "armadura pesada": 5,
+    "escudo": 1,
+    "consumível": 0.5,
+    "consumivel": 0.5,
+    "munição": 0.5,
+    "municao": 0.5
+  },
+  "por_tipo_protecao": {
+    "leve": 2,
+    "media": 2,
+    "pesada": 5,
+    "escudo": 1
+  },
+  "escudo_pesado_nomes": [
+    "escudo pesado"
+  ]
+}

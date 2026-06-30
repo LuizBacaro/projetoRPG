@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Tabela 1-3, blocos de classe p.36–81",
+    "custo_magia": "Círculos 1º–5º: 1 / 3 / 6 / 10 / 15 PM (Tabela 4-1 p.170). Truques via aprimoramento (0 PM).",
+    "pm_classe": "PM máximos = nível × pm_por_nivel (soma em multiclasse). Todas as classes têm PM.",
+    "nota": "Arcanista: escolher caminho bruxo/mago/feiticeiro em ficha_json.arcanista_caminho."
+  },
+  "classes": [
+    {
+      "slug": "arcanista",
+      "habilidade_chave": "int",
+      "pm_por_nivel": 6,
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "caminho",
+      "caminhos": {
+        "bruxo": { "habilidade_chave": "int", "modo_conjuracao": "foco" },
+        "mago": { "habilidade_chave": "int", "modo_conjuracao": "preparar" },
+        "feiticeiro": { "habilidade_chave": "car", "modo_conjuracao": "espontaneo" }
+      }
+    },
+    {
+      "slug": "bardo",
+      "habilidade_chave": "car",
+      "pm_por_nivel": 4,
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "espontaneo"
+    },
+    {
+      "slug": "clerigo",
+      "habilidade_chave": "sab",
+      "pm_por_nivel": 5,
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "preparar"
+    },
+    {
+      "slug": "druida",
+      "habilidade_chave": "sab",
+      "pm_por_nivel": 4,
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "preparar"
+    },
+    {
+      "slug": "paladino",
+      "habilidade_chave": "sab",
+      "pm_por_nivel": 3,
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "preparar"
+    },
+    {
+      "slug": "cacador",
+      "habilidade_chave": "sab",
+      "pm_por_nivel": 4,
+      "conjuracao_inicia_nivel": 1,
+      "modo_conjuracao": "preparar"
+    }
+  ],
+  "pm_por_nivel_nao_conjurador": {
+    "barbaro": 3,
+    "bucaneiro": 3,
+    "cavaleiro": 3,
+    "guerreiro": 3,
+    "inventor": 4,
+    "ladino": 4,
+    "lutador": 3,
+    "nobre": 4
+  }
+}

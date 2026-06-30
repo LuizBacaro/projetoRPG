@@ -122,6 +122,15 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao remover talento');
     }
 
+    async ativarPoder(id, body) {
+        const res = await fetch(this._url(`/${id}/poderes/ativar`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(body),
+        });
+        return this._handleResponse(res, 'Erro ao ativar poder');
+    }
+
     async adicionarEquipamento(id, body) {
         const res = await fetch(this._url(`/${id}/equipamentos`), {
             method: 'POST',
@@ -248,11 +257,13 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao limpar magias preparadas');
     }
 
-    async previewSubirNivel(id, nivelAlvo) {
-        const res = await fetch(
-            this._url(`/${id}/subir-nivel-preview?nivel_alvo=${encodeURIComponent(nivelAlvo)}`),
-            { headers: this._headers(false) }
-        );
+    async previewSubirNivel(id, nivelAlvo, opts = {}) {
+        const qs = new URLSearchParams({ nivel_alvo: String(nivelAlvo) });
+        const slug = opts && opts.classeSlug;
+        if (slug) qs.set('classe_slug', String(slug));
+        const res = await fetch(this._url(`/${id}/subir-nivel-preview?${qs}`), {
+            headers: this._headers(false),
+        });
         return this._handleResponse(res, 'Erro ao carregar preview de subir de nível');
     }
 

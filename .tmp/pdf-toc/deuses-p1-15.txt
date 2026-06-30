@@ -1,0 +1,697 @@
+ O Guia definitivo de Deuses e devotos
+do maior universo de fantasia do Brasil
+                                             Créditos
+                       Criação                                                              Artes Internas
+       Guilherme Dei Svaldi, J. M. Trevisan,                                         Anderson Jackal, Arthur Portela,
+Leonel Caldela, Marcelo Cassaro e Rafael Dei Svaldi                              Dan Ramos, Danilo Martins, Dora Lauer,
+                                                                              Erica Awano, Gabriel Feitosa, Guilherme Tero,
+            Desenvolvimento                                                      Janio Garcia, João G. Santos, João Garin,
+ Camila Gamino, Christiano Linzmeier, Daniel Duran,                             Juaum, Judah Carvalho, Leonardo Wyrnist,
+  Gabriel Pitre, Guilherme Dei Svaldi, J.M. Trevisan,                         Lucas Gomes, Marcelo Cassaro, Odmir Fortes,
+Karen Soarele, Leonel Caldela, Lucas Redzard Felipetto,                       Pablo Souza, Pietro Antognioni, Rafael Françoi,
+  Marcelo Cassaro, Momo Soares, Rafael Dei Svaldi,                           Renato Leite, Ricardo Mango, Samuel Marcelino,
+      Ricardo Berger, Thiago Rosa e Thiago Trot                                     Tiago Zacarovs e Victor Maristane
+
+              Direção de Arte                                                        Assistente Editorial
+                         Dan Ramos                                                                  Miguel Souza
+
+                 Diagramação                                                     Assistente de produção
+                         Tiago Orib
+                                                                                                    Laura Reginin
+
+                       Revisão                                                              Editora-Chefe
+           Elisa Guimarães, Emerson Xavier,
+          Kali de los Santos e Vitória Vozniak                                                      Karen Soarele
+
+
+                  Arte da Capa                                                              Diretor-geral
+                     Samuel Marcelino                                                          Guilherme Dei Svaldi
+
+    Equipe da Jambô: Guilherme Dei Svaldi, Rafael Dei Svaldi, Leonel Caldela, Akila Gabriel, Ana Carolina Gonçalves, Ana Júlia Gamla,
+    Anderson Dornelles, André Schwertz, Bruno Piñeiro, Daniel Boff, Dan Ramos, Dani Marques, Davide Di Benedetto, Elisa Guimarães,
+      Gabriel Adam, Gabriel dos Santos, Jaime de Andruart, José Cerqueira, J. M. Trevisan, Julia Rosiello, Karen Soarele, Laura Reginin,
+       Leticia Mendes, Marcel Reis, Marcelo Cassaro, Marina Alvarez, Marcus Vinicius, Marlon Vernes, Maurício Feijó, Miguel Souza,
+              Priscilla Souza, Simone Rocha, Tatiana Gomes, Thiago Rosa, Tiago Guimarães, Tiago Orib e Victória Cernicchiaro.
+       Tormenta é Copyright © 1999-2025 Leonel Caldela, Marcelo Cassaro, Guilherme Dei Svaldi, Rafael Dei Svaldi e J. M. Trevisan,
+      baseado em material original de Marcelo Cassaro, Rogerio Saladino e J. M. Trevisan. Todos os direitos reservados à Jambô Editora.
+         Reproduzir este livro sem autorização da editora é uma violação das Obrigações & Restrições de qualquer devoto artoniano.
+
+
+
+
+                                                Rua Coronel Genuíno, 209 • Porto Alegre, rs
+                                                      contato@jamboeditora.com.br
+                                                        www.jamboeditora.com.br
+                                                                               @jamboeditora
+                                          1ª edição: maio de 2025 (v1.1) | ISBN: 978658337593-3
+                                             Dados Internacionais de Catalogação na Publicação
+
+                                     C343d Cassaro, Marcelo
+                                     		 Deuses de Arton / Marcelo Cassaro [et al.]; ilustrações por
+                                           Erica Awano [et al.]. -- -- Porto Alegre: Jambô, 2025.
+                                              320p. il.
+                                              1. Jogos eletrônicos - RPG. I. Cassaro, Marcelo. II. Awano,
+                                           Erica. III. Título.
+                                                                                         CDU 794.021
+                                                        Sumário
+Introdução: ........................................4      Paladino de Marah................... 30               Sumo-Sacerdote......................... 127
+Sobre Este Livro............................. 4            Paladino de Tanna-Toh............. 30                 Taumaturgista............................. 130
+O Panteão....................................... 5         Paladino de Thyatis.................. 31              Teurgista Hermético................... 133
+A Segunda Lição............................. 6             Paladino de Valkaria................. 31              Tibarita....................................... 136
+                                                           Paladino do Bem...................... 32              Tirano do Terceiro...................... 139
+Capítulo 1:                                             Nova Linhagem: Abençoada......... 33
+Campeões dos Deuses..........8                                                                                   Capítulo 3:
+                                                        Outros Devotos............................ 34
+Ser Devoto.................................... 10
+                                                        Suraggel Variantes........................ 36            Deuses e Avatares.................142
+Classes Divinas............................ 11
+                                                        Nova Classe: Frade....................... 38             História do Panteão.................... 144
+Clérigos & Frades......................... 12
+                                                        Novos Poderes Concedidos.......... 42                    Aharadak.................................... 148
+   Sacerdote de Aharadak............ 12
+                                                        Equipamentos Religiosos............. 48                  Allihanna.................................... 152
+   Sacerdote de Allihanna............ 12
+                                                           Equipamento de Aventura....... 48                     Arsenal....................................... 156
+   Sacerdote de Arsenal............... 13
+                                                           Ferramentas............................. 49           Azgher........................................ 160
+   Sacerdote de Azgher................ 13
+                                                           Vestuário.................................. 49        Hyninn........................................ 164
+   Sacerdote de Hyninn................ 14
+                                                           Esotéricos................................ 51         Kallyadranoch............................. 168
+   Sacerdote de Kallyadranoch..... 14
+                                                           Alquímicos............................... 52          Khalmyr...................................... 172
+   Sacerdote de Khalmyr.............. 14
+                                                           Alimentação............................. 52           Lena............................................ 176
+   Sacerdote de Lena.................... 15
+                                                           Serviços.................................... 54       Lin-Wu........................................ 180
+   Sacerdote de Lin-Wu................ 15
+                                                           Itens Superiores....................... 54            Marah......................................... 184
+   Sacerdote de Marah................. 16
+                                                        Itens Litúrgicos............................ 55          Megalokk.................................... 188
+   Sacerdote de Megalokk............ 16
+                                                        Magias Divinas............................. 60           Nimb.......................................... 192
+   Sacerdote de Nimb................... 17
+   Sacerdote de Oceano................ 17               Capítulo 2:                                              Oceano....................................... 196
+   Sacerdote de Sszzaas................ 18              Distinções..........................................66   Sszzaas........................................ 200
+   Sacerdote de Tanna-Toh........... 18                 Distinções em Jogo....................... 68             Tanna-Toh................................... 204
+   Sacerdote de Tenebra............... 19               Usando Distinções....................... 68              Tenebra....................................... 208
+   Sacerdote de Thyatis................ 19              Bufão de Hyninn........................... 70            Thwor......................................... 212
+   Sacerdote de Thwor................. 20               Cavaleiro da Luz........................... 73           Thyatis........................................ 216
+   Sacerdote de Valkaria............... 20              Cavaleiro de Khalmyr................... 76               Valkaria....................................... 220
+   Sacerdote de Wynna................ 21                Colecionador Monstruoso............ 79                   Wynna........................................ 224
+   Sacerdote do Panteão............... 21               Dançarina de Marah..................... 82               Deuses Menores......................... 228
+   Autoridades Divinas................ 22               Detetive de Tanna-Toh.................. 85               Os Antigos Deuses..................... 238
+Druidas......................................... 24     Exegeta do Akzath........................ 88             Artefatos Divinos....................... 246
+   Druida de Aharadak................. 24               Forjador Litúrgico......................... 92
+   Druida de Allihanna................ 24               Guardião da Realidade................. 95                Capítulo 4:
+   Druida de Megalokk................ 25                Herói Henshin.............................. 98           Ameaças Divinas.....................250
+   Druida do Oceano.................... 25              Improvisador de Lena................. 102                Abissais...................................... 252
+   Druida de Tenebra................... 26              Inquisidor de Wynna.................. 105                Aspectos dos Deuses.................. 264
+   Druida de Arton....................... 26            Mestre de Armearia.................... 108               Celestiais.................................... 274
+Paladinos...................................... 28      Numeromante............................ 112              Fadas.......................................... 286
+   Paladino de Azgher.................. 28              Pacificador.................................. 115        Gênios........................................ 298
+   Paladino de Khalmyr................ 28               Pregador..................................... 118        Gigantes..................................... 306
+   Paladino de Lena...................... 29            Sombra de Tenebra..................... 121               Perigos Complexos..................... 316
+   Paladino de Lin-Wu.................. 29              Sortudo de Nimb........................ 124              Tabela de Ameaças por ND........ 319
+    Sobre Este Livro                                        Capítulo 3:
+
+
+    D
+            euses. Eles estão por toda parte.
+                                                            Deuses e Avatares
+                                                                Se você já conhece os devotos e a maneira
+            Divindades e seus devotos são
+                                                            como eles enxergam as divindades, chegou a
+            protagonistas, vilões, patronos e               hora de conhecer os deuses em si — a maneira
+            manipuladores em quase todas as                 como veem a si mesmos e uns aos outros, seus
+    principais histórias de Arton.                          objetivos, seus históricos... e as fichas de seus
+        Em Holy Avenger, a trama girava em torno do         avatares. O Capítulo 3 começa com uma linha
+    maior campeão dos deuses — e acabava com uma            de tempo dos principais acontecimentos divinos
+    reviravolta no Panteão. Em O Inimigo do Mundo, os       da história artoniana, então detalha cada uma das
+    deuses tinham seus próprios capítulos, com sua          vinte divindades maiores. O capítulo continua
+    própria trama paralela. Mesmo quando os deu-            com os deuses menores: divindades ainda longe
+    ses não estão explicitamente no centro da nar-          do nível de poder do Panteão, mas acima dos
+    rativa, sua presença pode ser sentida: em Ledd, o       mortais e cultuados por eles. Aqui há regras para
+    Colecionador é vítima das tramoias divinas; em          ser devoto de um deus menor, incluindo tornar
+    A Joia da Alma, os heróis lidam com um poder            sua ascensão e o crescimento de sua igreja um
+    anterior aos próprios deuses. Sagas fundamenta-         dos objetivos de seu personagem. E para ser um
+    das no mundo físico, como a Guerra Artoniana,           deus menor, com seus próprios seguidores. Temos
+    incluem passagem pelos reinos dos deuses, ou            descrições dos deuses caídos — seu histórico e a
+    devotos em papéis de liderança. Durante certas          situação atual de seus devotos e, por fim, artefatos
+    fases de Tormenta, os deuses foram considerados         dos deuses, alguns dos itens mais poderosos e
+    os grandes personagens icônicos do cenário, os          importantes de Arton.
+    mais lembrados pelos jogadores.
+       Deuses estão por toda parte. Neste livro,            Capítulo 4:
+    você vai conhecer mais sobre eles. Muito mais.          Ameaças Divinas
+                                                                O livro termina com ameaças divinas —
+    Capítulo 1:                                             abissais, celestiais, fadas, gênios, gigantes... E
+    Campeões dos Deuses                                     os infames aspectos dos deuses, versões menos
+                                                            poderosas de avatares, em geral focadas em uma
+        O primeiro passo para entender a relação
+                                                            só faceta da divindade. Fechando o capítulo há
+    entre os artonianos e seus deuses é saber o que
+                                                            novos perigos complexos de natureza divina.
+    significa a devoção. Isso é explicado neste capítulo,
+    com discussões sobre a mentalidade dos devotos e
+    descrições específicas sobre servos de cada um dos
+    deuses maiores. Nesse capítulo também há uma
+    nova classe, o frade — um sacerdote mais afeito à            Deuses de Arton é mais do que um compêndio
+    erudição e à magia do que às armas e armaduras.         de estatísticas e elementos de jogo. É um compi-
+    Além disso, temos a linhagem abençoada, novos           lado de recursos para tornar os deuses artonia-
+    poderes, magias e itens.                                nos presenças palpáveis em sua campanha. As
+                                                            divindades do Panteão são poderosas e (quase)
+    Capítulo 2:                                             eternas, sim... Mas cheias de defeitos, emoções,
+    Distinções                                              objetivos, até mesmo sonhos. Seus devotos são
+                                                            religiosos que guiam suas vidas pela relação com
+        Continuando com material para personagens,          seu patrono, mas são indivíduos, cada um ser-
+    este capítulo traz distinções para devotos —            vindo ao deus a sua própria maneira. A devoção
+    especializações para heróis ligados aos deuses.         é uma parte esotérica e mística da vida dos arto-
+    Cada distinção faz um personagem ser membro de          nianos. Aqui você descobrirá como lidar com ela.
+    uma ordem, adepto de uma filosofia, praticante de
+    uma disciplina exclusiva ou detentor de segredos            Os maiores tesouros deste livro não são
+    únicos. Mais do que poderes e opções de regras,         itens ou poderes. Seu grande valor está no que
+    as distinções são objetivos para aventureiros,          é cósmico, imaterial, transcendental. No que é
+    elementos do cenário com impacto concreto nos           sagrado, profano, solene, apoteótico.
+    personagens e na campanha.                                  Divino.
+
+
+
+
+4
+O Panteão                                           pela própria divindade ou arquitetada por
+                                                    mortais. Deuses maiores só morrem sob
+
+
+
+
+O
+                                                    eventos cataclísmicos.
+         Panteão é o conjunto de vinte
+         deuses maiores que regem                       Deuses são onipotentes em seus reinos —
+         Arton e toda a Criação. Seres              dimensões ainda na Criação, mas fora do mundo
+         de poder incompreensível, mas              material de Arton. Isso, contudo, não significa
+não ilimitado, sua influência é sentida             que não sejam vulneráveis a suas próprias fragi-
+                                                    lidades emocionais. Glórienn foi afugentada de
+por todos os artonianos, mesmo que não
+                                                    seu reino por não ter vontade de lutar.
+saibam. Contudo, os deuses do Panteão não
+existem sem seus seguidores — precisam                  Quando um deus maior cai ou morre, outro
+de pessoas que acreditem neles, que sejam           deve ascender, para que continuem sendo
+devotadas a eles. Assim, a relação entre            vinte. Arton sofre com o Panteão incompleto:
+                                                    deuses menores surgem espontaneamente,
+deuses e mortais é complexa e fluida.
+                                                    mortais são tomados por pesadelos, pessoas
+Ambos completam um ao outro.
+                                                    racionais se entregam a cultos absurdos ou
+    Sempre deve haver vinte deuses no Panteão       sanguinários. A ascensão de um novo deus é
+— por ser um número sagrado de estabilidade         uma lei cósmica: não há como barrar a entrada
+primordial, porque o número original era vinte      de um novo membro no Panteão, exceto pela
+ou por algum outro motivo desconhecido. O fato      entrada de outro deus em seu lugar. Ainda que
+é: essas vinte divindades moldaram a Criação.       o recém-chegado seja odiado por todos (como
+Tudo que existe é, de alguma forma, reflexo de      é o caso de Aharadak, o Deus da Tormenta),
+suas personalidades.                                só se pode aceitar sua presença. Não há uma
+    Os vinte deuses determinam os aspectos          “eleição” — um deus menor, mortal ou entidade
+mais importantes da existência em Arton. Não        ascende a partir dos acontecimentos que levaram
+por imposição ou por decisão dos mortais, mas       à queda. Cada caso é único.
+por simples influência passiva. Durante a maior         Deuses podem vir ao mundo como avatares,
+parte da história, por exemplo, não houve um        personificações materiais de imenso poder.
+Deus da Morte. Tudo que era vivo morria, mas        Contudo, criar um avatar toma uma parcela
+a morte não era cultuada, não era um elemento       considerável do poder divino. Assim, eles só são
+fundamental e sagrado de Arton. Da mesma            usados em ocasiões gravíssimas. Além disso, um
+forma, Kallyadranoch foi um deus maior durante      avatar não é invulnerável; pode ser derrotado
+a maior parte da história. Assim, dragões e
+                                                    ou até morrer, enfraquecendo e ferindo o deus.
+a busca por poder bruto foram elementos
+fundamentais e sagrados para os artonianos,             Apesar de tudo isso, deuses maiores não
+mesmo que fossem mais específicos e “menores”       podem interferir diretamente em Arton. Por isso
+do que o conceito de morte.                         precisam de devotos e heróis: atuam por meio
+                                                    de agentes mortais que cumprem seus desígnios
+     Os vinte deuses têm suas próprias relações,
+                                                    ditados em profecias, revelados em visões ou
+tão complexas e vibrantes quanto as dos mortais.
+                                                    proferidos por seus sumo-sacerdotes.
+Consideram-se grandes amigos e aliados, ou
+inimigos ferrenhos, ou até amantes. Mas,                Por fim, o Panteão depende da crença dos
+acima de tudo, consideram-se uma família,           mortais. Quanto maior seu número de devotos
+uma confraria. Sempre há um líder, o deus mais      e quanto mais fervorosa for sua crença, mas
+poderoso de todos, que decide disputas internas e   forte um deus se torna. A ascensão de um deus
+arbitra sobre grandes questões cósmicas. Durante    maior só ocorre quando ele tem muitos fiéis ou
+a maior parte da história foi Khalmyr. Tauron       seguidores em Arton. Sua queda em geral vem
+ocupou o posto por um breve tempo e Valkaria        precedida de um declínio em sua religião.
+é a líder hoje em dia.                                  Arton e o Panteão têm uma relação indisso-
+    Deuses maiores podem cair ou morrer. Isso       lúvel, na qual mortais criados e abençoados por
+aconteceu um punhado de vezes ao longo da           deuses garantem poder a esses mesmos deuses.
+história, mas esses eventos mudaram a Criação       O que é material é moldado pelo que é místico
+para sempre. A queda de um deus maior pode          e vice-versa. E, por definição, tudo que é mais
+ser decretada pelos demais deuses, provocada        importante em Arton é um reflexo do Panteão.
+
+
+
+
+                                                                                                       5
+                                      S e g u nda Lição
+                                    A
+                                                                                       a  s s ã o  a c o n chegantes e
+                                                                                ofad                                 dito
+                                       e.  N  ã o   se  a canhe. As alm ara serem usados. Acre
+                   Aproxime-s                                  o prontos p
+   Olá, jovem. ue deixei na mesa estã
+                hos q                                                                                            to, e
+os pergamin chá-los úteis.                                                   e u s a  d o  C onhecimen reto?
+que você va
+              ia                                                 oh, a D                                    er, cor
+                          r ie l, s e r v  o de Tanna-T gino que queira aprend ste é o
+                      Lu                                           a                                       ee
+     Sou Mestre vocação. Se está aqui, im Panteão e acredito qu
+                in h  a                                      br e  o
+ ensinar é m mpo pretendia falar so                                                                                    te
+ Já há algu   m   te
+                                                                                   a  n te s  d e  t u do que exis
+                  rfeito.                                               e r q ue ,                               a z io.
+  momento pe                    u  s e s , é  p r e ciso entend ntidades: o Nada e o V a
+                        o s de                                      ua s e                                    e su
+      Para falar d xistir, hav ia apenas d não há testemunhas d iram se
+                   ia a    e                                  z qu    e                                 , decid
+  e um dia v ir a seu respeito, uma ve r ias em sua infinit ude e sentimentos
+                  be                                          tá                                        sd
+   Pouco se sa as é consenso que, soli te poderosas c r iat ura logo em
+   existência,
+                   m                                      s. Vin                                     veis,
+                  o r ig e m   a  v inte deuse s domínios e responsá o. Arton.
+   unir e dar          d  o n a s  d e  s  eus própr io -c r iado. O nosso mund                                    or
+                    s,                                           m                               o Panteão, p de
+    conf lit uoso ovoar um mundo recé                                           e  v in d a s  d
+                    rp                                                   idas                                    ínio
+    seguida, po                  o c  u m   e n ta  ção sobre as Reinado e além. O dom pares. A
+                             a d                                        d o                                      us
+         Há uma vast eclesiástica na história uente inter venção de se ue parecem
+                       ncia                                      ubseq                                          oq
+     sua importâ Era dos Monstros e a s                                   m  e n o s c o n traditórios d petrificação
+                       a                                          ntos                                     u na
+      Megalokk n aixão oculta — sentime dos Três, que culmino ação de
+                       p                                          lt a                                      rm
+      rivalidade e yr e Tenebra. A Revo adranoch, na transfo                                                                 e
+                        lm                                         lly                                       e fatos quas
+      — entre K ha o esquecimento de Ka ia e, numa sequência d s Rubis da
+                         ,n                                         nc                                       do
+       de Valkaria m mero fiapo de existê , claro, do astuto roubo ao poderoso
+                          u                                         m                                        m
+       Tilliann em a criação dos lefeu. Alé osamente dando orige
+                    e is, n                             as, en   g en  h
+       impossív                 do por Ssz za                                                                                    hos
+        Virtu  d e e x e c u ta
+                                                                                               g u  a rd  ad o s em pergamin
+                          Arton.                                                      latos                                 m
+        Paladino de                          e s  fa  to s, e m  bora sejam re eiramente espalhados e ite nas
+                                dos ess                                     costum                                  m de no
+             Tudo isso, to poeiradas, também são teatro e conversas de fi
+                            s em                                        as de                                    os.
+         de biblioteca os, rimas infantis, peç mas estão muito próxim                                                     rço um
+                            ard                                         s,                               so que disto res que
+         canções de b euses parecem distante                                             ã o , c on  fe s
+                             d                                                  Pante                                  ós, se
+         tavernas. Os                       d ig o   q u e  vou falar do é falar de cada um de n
+                                   nd   o                                     de ,
+               Por isso, qua O que quero, na realida
+                                d e .                                                                                       ada e
+                              a
+          pouco a verd cuidados dos vinte.                                               e fa  a p  re se n tada pelo N a deus
+          existem sob
+                              os                                               da tar                                    e cad
+                                           os  c r ia  do s  como fr uto ço conjunto. Mesmo qu me forma de
+                                      m                                        fo r                                    bli
+                Perceba: se fo os por conta de um es aquela fosse a mais su uássemos a
+                               x ist  im                                   o q u e                                o n
+                                                                                                                    n ti
+           pelo Vazio, e feito sua raça desejand utros permitiria que c s invejoso não
+                                a                                          so                                     eu
+            criador tenh m acordo entre todos o z de garantir que um d mos, reforço,
+                               s  u                                        p a                                     ive
+            vida, apena tade dos vinte seria ca mero acenar de mão. V
+                               on                                          m
+             viver. Só a v criação de outro com u
+                               d a
+             se livrasse                               o.
+                                 e do Panteã                                      estudante.
+              pela vontad                                     r io s o, n  ob re
+                                       o é o mais cu
+                   Mas isso nã
+          O que me arranca um sorriso toda vez
+     caprichosos, ou quando me banho nas          que Nimb joga seus dados
+                                              águas de Oceano, é saber que, por ma
+     poderosos que sejam, é por força de nos                                          is
+     divinos. É nossa crença que os manté sa vontade que os deuses permanecem
+                                             m vigorosos.
+         Khalmyr, o Deus da Justiça, teria sid
+     pelo Reinado se não fossem as cavalg o capaz de espalhar seu julgamento
+                                            ada
+    da Luz? Valkaria, a Deusa dos Aventu s irrefreáveis dos cavaleiros da Ordem
+                                             reiros, teria assumido a liderança ent
+    os seus se não fosse pela persistência                                          re
+                                            de cada herói rastejando em masmorr
+    Mesmo quando falamos de um deus                                                 as?
+                                           mo
+    Força. Já se perguntou se não é pela ins rto, como Tauron, outrora o Deus da
+    deixarem de acreditar, ainda que fac istência dos minotauros em jamais
+                                           ea
+    colossal ainda brilha flamejante em face com a Tormenta, que seu crânio
+                                           Tiberus? Teria Glórienn feito…
+        Bem, não falemos de Glórienn.
+        Vivemos em um mundo onde a devoçã
+   feitos miraculosos. E onde, em contra        o plena é recompensada com poderes,
+                                           partida, somos devidamente punido
+   deixamos nossas obrigações de lado.                                          s se
+                                          Com justiça, acredito eu, mesmo qua
+   a punição é aplicada por alguém com                                           ndo
+                                           o
+   mundo um mero mortal também tem Hyninn. Por outro lado, neste mesmo
+                                            pos
+   se já ouviu falar de Rhond, o Deus das sibilidade de se tornar deus. Não sei
+                                            Arm
+   mas estou certo de que conhece Arsena as, ou de Mauziell, a Deusa das Avós,
+                                             l.
+       Um homem que veio de um lugar alé
+  passou a vida colecionando armas de m de Arton, um clérigo da Guerra que
+                                           gra
+  grupos e mais grupos de aventureiros, nde poder arcano, manipulando
+  Kishinauros destruidor. Quando tod e então atacou o Reinado, pilotando seu
+                                          os
+  viajou pelos reinos dos deuses, empun achavam que estava derrotado, Arsenal
+                                           hando a mais magnífica das armas,
+  tomar o lugar de seu patrono, Keenn                                           para
+                                         . E venceu.
+       E que tal Thwor Khoshkothruk? Um
+ que uniu os goblinoides sob sua bandei bugbear cruel, nascido de uma profecia,
+                                           ra
+ um continente inteiro. Enquanto o Rei de tal modo que foi capaz de conquistar
+                                         nado se apavorava com a possibilidade
+ de um ataque a partir da cidade-fortale
+ transformou a Flecha de Fogo, que dev za de Khalifor, o general foi além:
+                                           eria causar sua morte, em instrument
+para decretar a derrocada de Ragnar.                                              o
+                                         E, sim, assumiu seu posto, como Deus
+Goblinoides.                                                                    dos
+      Poderíamos falar de Gwen, a Deusa
+só de uma raça, mas de duas. Ou de Laada Liberdade, que mudou o destino não
+a primeira jornada. Mas não quero me n, o Deus das Viagens, tão antigo quanto
+                                           estender.
+     Saiba apenas, est udante, que em alg
+acreditar estar andando sem compan uns momentos você pode até
+mortais caminham sempre de mã hei ros. Ma s, em Arton, deuses e
+                                       os dadas.
+CAPÍTULO
+
+
+
+
+           1
+     A
+             ventureiros podem adquirir suas habi-              por pescado ao Oceano, viajantes suplicam pela
+             lidades de várias maneiras, mas muitos             proteção de Khalmyr, sentinelas noturnas apagam velas
+             o fazem por devoção aos deuses. Por                para Tenebra. Aventureiros são gratos a Valkaria por
+             afinidade ou destino, cumprem mis-                 tesouros obtidos, bardos pedem inspiração a Marah e
+     sões em nome de suas divindades, recebendo                 Tanna-Toh, bárbaros urram para Megalokk, arcanistas
+                                                                clamam por mágica a Wynna. Isso, no entanto, é
+     grandes poderes em troca.
+                                                                diferente de ser devoto.
+         Essa relação entre mundano e divino pode ser
+                                                                    É raro um deus interferir diretamente no mundo
+     harmoniosa ou tumultuada, plena de dilemas, dúvidas
+                                                                dos mortais — eles não podem ou não querem.
+     e objeções. Devo confiar totalmente em meu patrono e
+                                                                Fazem-no através de seus campeões. Deus e devoto
+     seguir todas as suas ordens? Deuses são perfeitos? Ou
+                                                                têm um pacto: o deus oferece milagres divinos,
+     cometem erros e, portanto, devem ser questionados?
+                                                                enquanto o devoto segue seus comandos e propaga
+     Quando é sensato violar minhas Obrigações &
+                                                                sua causa. Enquanto cada um cumpre sua parte, o
+     Restições? Ser devoto não é apenas seguir dogmas
+                                                                acordo se mantém. Quando os milagres deixam de
+     para ganhar poderes — é ter uma relação profunda e
+                                                                acontecer, o devoto pode suportar por algum tempo,
+     dramática com algo maior que você, questionar suas
+                                                                talvez acreditando estar sendo testado — mas, caso
+     próprias atitudes ou confiar que trilha o caminho certo.
+                                                                a ausência seja longa, pode abandonar o patrono. Da
+          Embora qualquer personagem possa ser devoto,          mesma forma, se um devoto deixa de seguir suas
+     o livro básico Tormenta20 contém três classes mais         obrigações ou não se dedica a cumprir os desígnios
+     profundamente ligadas aos deuses: clérigos, druidas        do patrono, um deus deixará de abençoá-lo.
+     e paladinos. Aqui essas classes são descritas em
+                                                                    Ser devoto significa almejar harmonia completa
+     detalhes, diferenciando devotos de cada fé, inclusive
+                                                                com sua divindade, buscar cada oportunidade para
+     sua aparência e vestimentas. Temos ainda suas versões
+                                                                aprazê-la, viver e respirar seus propósitos. Não é
+     fundamentalistas — devotos ainda mais fervorosos,
+                                                                algo deixado de lado quando conveniente, nem um
+     que podem ser campeões imaculados ou fanáticos
+                                                                incômodo para fazer “quando houver tempo”. Todas
+     perigosos, conforme a divindade a que servem.
+                                                                as suas ações e pensamentos devem ser voltados
+         Este capítulo também oferece uma nova classe: o        ao padroeiro. Por isso é impossível ser devotado a
+     frade, um erudito religioso focado em conhecimento,        mais de uma divindade: para conceder bênçãos, um
+     proteção e suporte. Também apresenta novos poderes         deus exige todo o seu empenho, dedicação, atenção
+     concedidos e opções para personagens.                      e zelo. Inclusive atraindo a inimizade potencial dos
+                                                                adversários da divindade.
+
+     Ser Devoto                                                     Claro, os deuses de Arton podem errar, mas não
+                                                                cabe a um devoto julgar seu patrono — isso é para os
+         O que significa, afinal, ser devotado a um deus?       descrentes, os fracos de convicção. Devotos acreditam
+     O que exatamente um personagem jogador precisa             em seus deuses sem necessidade de prova ou evidência.
+     fazer para receber benefícios mecânicos por servir a       Esse é o significado de ter fé.
+     uma divindade?                                                 Devotos não buscam “brechas” nas regras; sequer
+          Praticamente todos os povos de Arton acreditam        pensar em tal coisa significa que você não confia em
+     na existência dos deuses. Rogam nomes de divinda-          sua divindade, não compartilha de seus ideais. Mesmo
+     des quando acontece algo assombroso, jubiloso ou           quando a ordem de um deus contraria o bom senso,
+     terrível. Também o fazem para buscar sua atenção e         quando uma obrigação parece tola ou inapropriada, o
+     proteção — diz-se que os deuses sempre podem ou-           devoto verdadeiro confia que existe ali algum objetivo
+     vir quando são chamados. Da mesma forma, evita-            além de sua compreensão.
+     -se pronunciar nomes de deuses malignos para não               Quando um devoto questiona suas obrigações e
+     atrair seu interesse: uma simples menção a Aharadak        restrições, isso é uma crise de fé. E quando ele falha
+     em uma taverna pode causar pânico, revolta e violên-       com seu deus, quando descumpre seus deveres — por
+     cia. Reverenciar os deuses na vida diária, como um         acidente ou forçado por uma situação crítica —,
+     todo, é hábito comum. “Pelo Panteão” e “Pelos vin-         seu arrependimento precisa ser sincero. Sua alma
+     te deuses!” são expressões frequentes.                     não encontra descanso enquanto ele não conseguir
+        Claro, também há pessoas com afinidade e simpatia       perdão, através de ações ou orações. Esse período de
+     maior por esse ou aquele deus. Camponeses pedem            tormento interno é representado pela perda de PM
+     bom tempo a Azgher e Allihanna, pescadores rogam           quando uma obrigação ou restrição é violada.
+
+
+
+     Capítulo 1
+10
+    Por tudo isso, devotos verdadeiros são poucos.            “Posso servir a mais
+Uma aldeia pode amar e respeitar Allihanna, participar        de uma divindade?”
+de seus ritos, fazer oferendas — mas o xamã ser o
+                                                              Sim. Mas sem poderes, espertinho!
+único devoto. Toda a nação de Wynlla reconhece a
+Deusa da Magia como sua padroeira, mas apenas uma             Ser devoto significa lealdade e devoção
+parte mínima da população pode operar seus milagres.          totais para com uma divindade. Os poderes
+                                                              concedidos são uma forma de recompensa
+                                                              divina para aqueles que concordam em
+Classes Divinas                                               atuar como servos de um deus. Apenas um.
+                                                              Qualquer personagem pode seguir as
+    O livro básico Tormenta20 descreve as classes
+                                                              Obrigações & Restrições de duas ou
+básicas dedicadas aos deuses (clérigo, druida e
+                                                              mais divindades, simplesmente como
+paladino) em termos gerais. Aqui você vai encontrar
+                                                              demonstração de respeito. No entanto,
+descrições específicas para personagens dessas
+                                                              embora essa atitude tenha alguma chance
+classes — e também do novo frade — dedicadas para
+                                                              de atrair simpatia pontual — por parte das
+cada divindade.
+                                                              próprias divindades ou de seus devotos —,
+    Indumentária. Vestimenta típica para o de-                não concede quaisquer poderes concedidos.
+voto. Usar outras vestes não viola as Obrigações &
+Restrições, mas pode influenciar testes sociais com
+                                                              Nova Regra: Devoção Ampla
+outros devotos da mesma divindade.
+                                                              Clérigos e frades do Panteão, druidas de
+    Fundamentalistas. Enquanto um devoto
+                                                              Arton e paladinos do bem não recebem
+normal às vezes questiona sua divindade, até mesmo
+                                                              poderes concedidos. Em compensação,
+desafiando-a, o fundamentalista é um seguidor extremo
+                                                              por sua devoção ampla, recebem +2 PM
+de seus ideais, beirando o fanatismo. Ele acredita
+                                                              por patamar.
+que outros devotos são infiéis, que sua igreja tem
+sido liberal e tolerante demais! Não apenas segue as
+Obrigações & Restrições padrão à risca, mas também
+adota dogmas muito mais rígidos. A recompensa divina      evangelho ao vigário”, considera os clérigos frouxos e
+por tamanha lealdade é maior, assim como o castigo        tolerantes, acredita saber mais sobre sua religião que
+por falhar em cumprir essa doutrina severa.               o próprio sumo-sacerdote! Quase todos são simples
+                                                          fanfarrões — mas, algumas vezes, os deuses decidem
+    Um fundamentalista recebe um poder concedido
+                                                          retribuir seu fervor com milagres reais.
+adicional, mas, além das Obrigações & Restrições de
+sua divindade, deve seguir também seus dogmas. Se             Um devoto fundamentalista que não seja clérigo,
+violar qualquer deles, perde seus pontos de mana e        druida, frade ou paladino pode escolher seu dogma
+habilidades de classe divina, só podendo recuperá-los     entre essas classes, conforme a afinidade. Por exem-
+a partir do próximo dia (habilidades são recuperadas      plo, um guerreiro devoto fundamentalista de Azgher
+após um descanso). Se violar obrigações ou dogmas de      pode adotar o dogma do clérigo (atacar e destruir de-
+novo na mesma aventura, só pode recuperar os PM e         votos de Tenebra) ou do paladino (idem, e também
+habilidades após cumprir uma penitência — que deve        atacar e destruir necromantes e mortos-vivos). O be-
+ser imposta por outro fundamentalista do mesmo            nefício mecânico é o mesmo (um poder concedido a
+deus. Além disso, fundamentalistas usam apenas a          mais), bem como a punição por violações. Dogmas de
+arma favorita de sua divindade. Utilizar qualquer outra   paladinos tendem a ser mais rigorosos, mas o joga-
+arma configura violação de seus dogmas.                   dor pode escolhê-los como desafio de interpretação.
+
+   Note que alguns dogmas fundamentalistas os tor-
+nam inviáveis como personagens jogadores, servindo
+melhor a NPCs.
+    Outros Fundamentalistas. Quase todos
+os fundamentalistas em Arton são clérigos, druidas,
+frades e paladinos: essas são as classes mais próximas
+dos deuses. São os “mais devotos dos devotos”, por
+assim dizer. Por isso, embora existam devotos de outras
+classes, fundamentalistas são muitíssimo raros — mas
+não impossíveis. É o proverbial leigo que “ensina o
+
+
+
+                                                                                   Campeões dos Deuses
+                                                                                                                   11
+      Clérigos & Frades
+     C
+              lérigos e frades — coletivamente chama-               Indumentária. Muitos desprezam o uso de
+              dos de sacerdotes — existem em uma                roupas diferenciadas, que consideram apego fútil à
+              espantosa variedade em Arton. Temos               individualidade, vestindo apenas mantos rústicos.
+              desde o humilde xamã de Allihanna,                Outros glorificam o Devorador com trajes elaborados,
+     devotado à proteção de um povoado selvagem,                invariavelmente em vermelho vivo.
+     até o exótico clérigo de Nimb, que age e se veste              Fundamentalista. Diferente de outros
+     como um louco. Alguns são pacíficos, solenes,              deuses, Aharadak tem mais fundamentalistas que
+     enquanto outros são combativos e brutais,                  liberais — são os verdadeiros vilões, cultistas
+     dependendo da divindade a que servem.                      maníacos que aterrorizam aldeias, sacrificam vítimas,
+                                                                invocam aberrações. É impossível para tais depravados
+                                                                perder seus poderes; suas almas já pertencem ao
+     Sacerdote de Aharadak                                      Devorador por completo. São obcecados com espalhar
+         Vistos por muitos como cultistas profanos e de-        a corrupção da Tormenta, não importando quantos
+     pravados — quase todos de fato o são —, consideram-        precisem sofrer ou morrer. Ainda assim, em suas
+     -se arautos da chegada inevitável da Tormenta. Sua         mentes alucinadas, estão “fazendo o bem”.
+     missão é atuar como mediadores entre a Tormenta
+     e Arton, entre os lefeu e os artonianos. A tempes-
+     tade não vem para destruir, mas para acolher: livrar
+                                                                Sacerdote de allihanna
+     este mundo de guerras, diferenças, individualidades            Diferente do solitário druida, que prefere a
+     que levam apenas à mágoa e ao ódio. Na Anticriação,        reclusão ou a companhia de poucos aventureiros
+     tudo é perfeição e harmonia. Tudo é lefeu.                 chegados, clérigos e frades de Allihanna (também
+                                                                conhecidos como xamãs) desempenham um papel
+         Sacerdotes de Aharadak consideram os povos de
+                                                                mais semelhante ao de guias espirituais convencionais.
+     Arton como crianças ingênuas, guiadas por deuses
+                                                                São frequentemente encontrados em pequenas
+     falhos. Reagem com medo e violência ao Devorador,
+                                                                comunidades ou tribos, atuando como conselheiros
+     quando este se tornou deus apenas para mostrar o
+                                                                dos chefes e do próprio povo.
+     caminho. Conduzir Arton a uma era de plenitude, livre
+     de dor ou sofrimento — pois tais coisas são causadas           No cotidiano da aldeia, o xamã assume posição de
+     por intolerância, preconceito, conflito. Aharadak aceita   grande importância. Muitas vezes é o único indivíduo
+     tudo e todos. De fato, é a única divindade no Panteão      dotado de habilidades mágicas, servindo como elo
+     sem qualquer restrição de devotos.                         entre os mortais e os deuses. Ele trata doenças,
+                                                                concede bênçãos e realiza adivinhações sobre o
+         Por ser tão tolerante, Aharadak abençoa até seus
+                                                                futuro, entre outras responsabilidades “espirituais”.
+     opositores. Concede poder divino aos que tentam
+                                                                Geralmente é um membro respeitado e poderoso
+     confrontá-lo, usam recursos da Tormenta para resistir
+                                                                da tribo, embora em certas circunstâncias possa ser
+     à sua chegada. Vários clérigos e frades de Aharadak
+                                                                também temido, obedecido apenas por intimidação.
+     unem-se a grupos de aventureiros que combatem
+     a Tormenta, ainda assim mantendo seus dons. Por                Vários xamãs cultuam Allihanna através de
+     outro lado, muitos suspeitam ser justamente essa           algum animal totêmico que a representa (incluindo
+     a intenção secreta do Devorador, corromper seus            os mesmos venerados pelos bárbaros). Assim, tanto
+     inimigos, seduzi-los com seu poder. Infestar o mundo       a Divina Serpente das voracis quanto o Urso Dourado
+     com sua vermelhidão.                                       das Montanhas Sanguinárias são faces da deusa, assim
+         Alguns sacerdotes de Aharadak acolhem refugiados       como centenas de outros animais sagrados de Arton.
+     lefou em cultos ou orfanatos, provendo conforto                 Ao contrário do druida selvagem, o xamã demons-
+     material e espiritual a esses excluídos. Outros são        tra grande habilidade no trato com pessoas. Em uma
+     especialmente dedicados à sua proteção, aceitando mis-     comunidade de bárbaros, pode ser considerado o mais
+     sões para ajudá-los mesmo sem qualquer recompensa.         adequado para lidar com forasteiros de sociedades
+
+
+
+     Capítulo 1
+12
+urbanizadas. No entanto, ele ainda mantém respeito            Fundamentalista. Qualquer mínima derrota
+e apreço pelos animais, muitas vezes recebendo em         deve ser imediatamente corrigida com uma vitória. Isso
+troca o mesmo tipo de gentileza.                          vale para qualquer teste de perícia, qualquer disputa,
+    Indumentária. O xamã tende a usar trajes              até mesmo algo inofensivo como uma discussão ou um
+                                                          jogo amigável. Deixar de fazê-lo é uma violação das
+cerimoniosos, em tons naturais e sóbrios de verde e
+                                                          Obrigações & Restrições, mesmo quando não houver
+marrom, para inspirar respeito entre os seus. Ostenta
+                                                          meio (nesse caso, crie um meio).
+amuletos, pinturas ritualísticas e símbolos sagrados,
+cultivando uma aura de mistério.
+    Fundamentalista. Totalmente dedicado à                Sacerdote de azgher
+proteção e ao bem-estar de sua comunidade, jamais             Embora o culto a Azgher seja mais prevalente
+se ausenta em missões ou aventuras, exceto quando         em Halak-Tûr, também é praticado em numerosos
+essa comunidade está em risco. Mesmo nesses casos,        outros pontos de Arton, incluindo o Reinado. Nesses
+não deve se ausentar por mais de um mês.                  lugares, clérigos e frades do Deus-Sol atuam como
+                                                          guias e líderes espirituais, ajudando suas comunidades
+                                                          a entender e respeitar a natureza exigente de seu
+Sacerdote de arsenal                                      deus. Conduzem cerimônias ao nascer e pôr do sol,
+    A ainda recente ascensão de Arsenal causou grande     agradecendo a Azgher por sua luz e seu calor.
+tumulto entre os clérigos da Guerra. Para muitos
+antigos devotos de Keenn, a derrota de sua divindade          No passado, o culto de Azgher era restrito ao
+foi devastadora — uns enlouqueceram, outros se            deserto e seus povos originários. Com o tempo, seu
+                                                          aspecto vigilante — aquele que revela verdades e
+mataram, outros ainda buscaram uma morte digna
+                                                          encontra culpados — atraiu novos seguidores entre
+em combate, na esperança de reencontrar seu deus.
+                                                          os que buscam fazer justiça. Sua igreja acabaria se
+Os demais aceitaram o recém-chegado com honras,
+                                                          tornando bastante popular no Reinado, agregando
+celebraram sua conquista épica, julgando ser natural
+                                                          os mais variados caçadores de bandidos e monstros.
+seguir o guerreiro mais forte.
+                                                          Mesmo membros de raças altamente improváveis,
+     Clérigos e frades de Arsenal buscam ocupar os        como osteon e trogs, podem acabar como seus devotos.
+mesmos papéis tradicionais antes desempenhados por
+                                                              Clérigos e frades de Azgher também glorificam o
+sacerdotes de Keenn. Atuam como chefes de guerra
+                                                          bom tempo, a beleza, a própria vida que floresce sob
+para aldeias ou conselheiros para regentes. Podem
+                                                          o sol. Seu brilho sagrado é uma bênção de conforto e
+ser vistos em ambos os lados de qualquer grande
+                                                          segurança, em contraste à escuridão sinistra de Tenebra.
+batalha. Incitam conflitos, mas não fazem guerra pela
+                                                          Dias de clima firme são presentes deste deus para Arton.
+guerra, como Keenn pregava. Acreditam que guerrear
+torna os povos mais fortes, é parte fundamental do            Indumentária. Sacerdotes de Azgher nor-
+amadurecimento das civilizações. Preparam Arton para      malmente vestem branco com detalhes em dourado.
+sair vitoriosa contra qualquer adversário.                Sempre escondem o rosto, conforme as exigências
+                                                          de sua crença, usando desde simples lenços a belas
+    De fato, mais que apenas buscar guerra, clérigos
+                                                          máscaras douradas, que podem trazer gravada a figura
+de Arsenal buscam vitória. Arsenal odeia perdedores,
+                                                          do sol. Outros exibem o símbolo sagrado como joia,
+eles dizem. Como seu patrono fazia em vida, clamam
+                                                          bandeira ou escudo.
+sempre haver um meio para alcançar qualquer objetivo.
+Obstáculos só existem para serem superados — ou               Fundamentalista. Não apenas é proibido de
+esmagados. Desistir não é opção. Derrota não é opção.     se associar a devotos de Tenebra, mas também deve
+                                                          atacar e destruir todos aqueles que encontrar.
+    Apesar dessa postura impetuosa, o clérigo de
+Arsenal não é nenhum bárbaro furioso e estúpido —
+mas um guerreiro perspicaz, pragmático, estratégico.
+Luta de forma inteligente. Estuda seu inimigo antes
+de atacar, busca fraquezas. Usa curas e proteções, até
+recua quando julga necessário. É forte e corajoso,
+mas não tolo.
+    Indumentária. Buscando emular a forma
+blindada de seu deus, o sacerdote procura vestir tantas
+camadas de metal quanto puder, preferencialmente
+nas cores verde e púrpura.
+
+
+
+                                                                                    Campeões dos Deuses
+                                                                                                                     13
+

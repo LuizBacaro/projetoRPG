@@ -1,35 +1,40 @@
-"""Progressão de PV Tormenta 20 (MB) — tabelas fixas por classe + modificador de Constituição."""
+"""Progressão de PV Tormenta 20 — tabelas fixas por classe + Constituição."""
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
-from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
-from app.games.tormenta.rules.classes_t20 import lista_classes_mb
+from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
+from app.games.tormenta.rules.classes_t20 import classe_por_slug, lista_classes
+from app.games.tormenta.rules.conjuracao_t20 import pontos_magia_maximos_conjuracao
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_V13,
+    normalizar_regra_versao,
+)
 
 
-def _mapa_classes_pv() -> Dict[str, Dict[str, Any]]:
-    return {str(c["slug"]).lower(): c for c in lista_classes_mb()}
+def _mapa_classes_pv(regra_versao: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+    return {str(c["slug"]).lower(): c for c in lista_classes(regra_versao)}
 
 
-def classe_mb_por_slug(slug: str) -> Optional[Dict[str, Any]]:
-    s = str(slug or "").strip().lower()
-    if not s:
-        return None
-    return _mapa_classes_pv().get(s)
+def classe_mb_por_slug(
+    slug: str, regra_versao: Optional[str] = None
+) -> Optional[Dict[str, Any]]:
+    return classe_por_slug(slug, regra_versao)
 
 
 def pv_maximos_mb(
     slug_classe: str,
     nivel: int,
     con_valor: int,
+    regra_versao: Optional[str] = None,
 ) -> Optional[int]:
     """
-    PV máximos MB: pv_inicial + (nível−1)×pv_por_nível + nível×mod_CON.
+    PV máximos: pv_inicial + (nível−1)×pv_por_nível + nível×CON.
 
-    Tabelas fixas do Módulo Básico (sem rolagem de dado por nível).
+    Tabelas fixas (sem rolagem de dado por nível).
     """
-    row = classe_mb_por_slug(slug_classe)
+    row = classe_por_slug(slug_classe, regra_versao)
     if not row:
         return None
     try:
@@ -39,7 +44,7 @@ def pv_maximos_mb(
     nv = max(1, min(40, nv))
     pv_ini = int(row.get("pv_inicial", 8) or 8)
     pv_pn = int(row.get("pv_por_nivel", 2) or 0)
-    mod_con = modificador_atributo_t20(int(con_valor))
+    mod_con = contribuicao_atributo_t20(int(con_valor), regra_versao)
     return pv_ini + max(0, nv - 1) * pv_pn + nv * mod_con
 
 
@@ -47,32 +52,68 @@ def preview_pv_mb(
     slug_classe: str,
     nivel: int,
     con_valor: int,
+    regra_versao: Optional[str] = None,
+    *,
+    arcanista_caminho: Optional[str] = None,
+    for_valor: int = 10,
+    des_valor: int = 10,
+    int_valor: int = 10,
+    sab_valor: int = 10,
+    car_valor: int = 10,
 ) -> Dict[str, Any]:
-    """Breakdown para API/UI."""
-    row = classe_mb_por_slug(slug_classe)
+    """Breakdown PV/PM para API/UI."""
+    rv = normalizar_regra_versao(regra_versao)
+    row = classe_por_slug(slug_classe, rv)
     if not row:
         return {
             "classe_slug": slug_classe,
             "encontrado": False,
+            "regra_versao": rv,
             "pv_max": None,
+            "pm_max": None,
+            "pm_por_nivel": None,
             "nivel": nivel,
-            "mod_con": modificador_atributo_t20(int(con_valor)),
+            "mod_con": contribuicao_atributo_t20(int(con_valor), rv),
         }
     try:
         nv = int(nivel)
     except (TypeError, ValueError):
         nv = 1
     nv = max(1, min(40, nv))
-    mod_con = modificador_atributo_t20(int(con_valor))
+    mod_con = contribuicao_atributo_t20(int(con_valor), rv)
     pv_ini = int(row.get("pv_inicial", 8) or 8)
     pv_pn = int(row.get("pv_por_nivel", 2) or 0)
     de_niveis = max(0, nv - 1) * pv_pn
     de_con = nv * mod_con
     total = pv_ini + de_niveis + de_con
+    pm_pn_raw = row.get("pm_por_nivel")
+    pm_pn_i: Optional[int] = None
+    if pm_pn_raw is not None:
+        try:
+            pm_pn_i = int(pm_pn_raw)
+        except (TypeError, ValueError):
+            pm_pn_i = None
+    pm_max: Optional[int] = None
+    if rv == REGRA_VERSAO_V13 and pm_pn_i is not None and pm_pn_i > 0:
+        pm_max = nv * pm_pn_i
+    elif rv != REGRA_VERSAO_V13:
+        pm_max = pontos_magia_maximos_conjuracao(
+            slug_classe,
+            nv,
+            for_valor,
+            des_valor,
+            con_valor,
+            int_valor,
+            sab_valor,
+            car_valor,
+            regra_versao=rv,
+            arcanista_caminho=arcanista_caminho,
+        )
     return {
         "classe_slug": str(slug_classe).strip().lower(),
         "classe_nome": str(row.get("nome", "")),
         "encontrado": True,
+        "regra_versao": rv,
         "nivel": nv,
         "pv_inicial": pv_ini,
         "pv_por_nivel": pv_pn,
@@ -80,4 +121,161 @@ def preview_pv_mb(
         "contrib_niveis_extras": de_niveis,
         "contrib_constituicao": de_con,
         "pv_max": total,
+        "pm_por_nivel": pm_pn_i,
+        "pm_max": pm_max,
     }
+
+
+def _niveis_por_classe_de_lista(classes: List[Dict[str, Any]]) -> Dict[str, int]:
+    """Agrega linhas ``[{slug, nivel}]`` em mapa slug → nível total."""
+    out: Dict[str, int] = {}
+    for item in classes or []:
+        if not isinstance(item, dict):
+            continue
+        slug = str(item.get("slug") or "").strip().lower()
+        if not slug:
+            continue
+        try:
+            nv = int(item.get("nivel", 0))
+        except (TypeError, ValueError):
+            continue
+        if nv < 1:
+            continue
+        out[slug] = out.get(slug, 0) + nv
+    return out
+
+
+def preview_pm_multiclasse_v13(classes: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Breakdown de PM máximos v1.3 para multiclasse (soma nível × pm/nível)."""
+    niveis_map = _niveis_por_classe_de_lista(classes)
+    breakdown: List[Dict[str, Any]] = []
+    partes: List[str] = []
+    total = 0
+    for slug in sorted(niveis_map.keys()):
+        nv = niveis_map[slug]
+        row = classe_por_slug(slug, REGRA_VERSAO_V13)
+        if not row:
+            breakdown.append(
+                {
+                    "slug": slug,
+                    "nome": slug,
+                    "nivel": nv,
+                    "pm_por_nivel": None,
+                    "pm_classe": None,
+                }
+            )
+            continue
+        pm_pn_raw = row.get("pm_por_nivel")
+        try:
+            pm_pn = int(pm_pn_raw) if pm_pn_raw is not None else None
+        except (TypeError, ValueError):
+            pm_pn = None
+        if pm_pn is None or pm_pn < 0:
+            breakdown.append(
+                {
+                    "slug": slug,
+                    "nome": str(row.get("nome", slug)),
+                    "nivel": nv,
+                    "pm_por_nivel": pm_pn,
+                    "pm_classe": None,
+                }
+            )
+            continue
+        pm_classe = nv * pm_pn
+        total += pm_classe
+        nome = str(row.get("nome", slug))
+        breakdown.append(
+            {
+                "slug": slug,
+                "nome": nome,
+                "nivel": nv,
+                "pm_por_nivel": pm_pn,
+                "pm_classe": pm_classe,
+            }
+        )
+        partes.append(f"{nome} {nv}×{pm_pn}={pm_classe}")
+    formula = " + ".join(partes) + (f" = {total} PM" if partes else "")
+    return {
+        "regra_versao": REGRA_VERSAO_V13,
+        "pm_max": total if partes else None,
+        "breakdown": breakdown,
+        "formula": formula,
+        "nivel_total_classes": sum(niveis_map.values()) if niveis_map else 0,
+    }
+
+
+def pm_maximos_v13_multiclasse(niveis_por_classe: Dict[str, int]) -> Optional[int]:
+    """PM máximos v1.3 — soma nível × pm_por_nivel de cada classe (p.34)."""
+    prev = preview_pm_multiclasse_v13(
+        [{"slug": s, "nivel": n} for s, n in niveis_por_classe.items()]
+    )
+    return prev.get("pm_max")
+
+
+def niveis_multiclasse_v13_de_ficha(
+    ficha_json: Optional[Dict[str, Any]],
+    nivel_personagem: int,
+) -> List[Dict[str, Any]]:
+    """Linhas ``[{slug, nivel}]`` — ``multiclasse_v13`` ou classe principal única."""
+    fj = ficha_json if isinstance(ficha_json, dict) else {}
+    slug_pri = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
+    mc = fj.get("multiclasse_v13")
+    if isinstance(mc, list) and mc:
+        out: List[Dict[str, Any]] = []
+        for item in mc:
+            if not isinstance(item, dict):
+                continue
+            sl = str(item.get("slug") or "").strip().lower()
+            if not sl:
+                continue
+            try:
+                nv = int(item.get("nivel", 0))
+            except (TypeError, ValueError):
+                continue
+            if nv < 1:
+                continue
+            out.append({"slug": sl, "nivel": min(40, nv)})
+        if out:
+            return out
+    if slug_pri:
+        try:
+            nv = int(nivel_personagem)
+        except (TypeError, ValueError):
+            nv = 1
+        return [{"slug": slug_pri, "nivel": max(1, min(40, nv))}]
+    return []
+
+
+def _pv_contribuicao_classe_v13(
+    slug: str, nivel: int, *, primaria: bool
+) -> Optional[int]:
+    row = classe_por_slug(slug, REGRA_VERSAO_V13)
+    if not row or nivel < 1:
+        return None
+    pv_ini = int(row.get("pv_inicial", 8) or 8)
+    pv_pn = int(row.get("pv_por_nivel", 2) or 0)
+    if primaria:
+        return pv_ini + max(0, nivel - 1) * pv_pn
+    return nivel * pv_pn
+
+
+def pv_maximos_v13_multiclasse(
+    classes: List[Dict[str, Any]],
+    con_valor: int,
+    slug_primario: str,
+) -> Optional[int]:
+    """PV máximos v1.3 multiclasse — soma por classe + CON × nível total (p.34)."""
+    niveis_map = _niveis_por_classe_de_lista(classes)
+    if not niveis_map:
+        return None
+    pri = str(slug_primario or "").strip().lower()
+    base = 0
+    total_nv = 0
+    for slug, nv in niveis_map.items():
+        contrib = _pv_contribuicao_classe_v13(slug, nv, primaria=(slug == pri))
+        if contrib is None:
+            return None
+        base += contrib
+        total_nv += nv
+    mod_con = contribuicao_atributo_t20(int(con_valor), REGRA_VERSAO_V13)
+    return base + total_nv * mod_con
