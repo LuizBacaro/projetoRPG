@@ -30,6 +30,7 @@
         if (isV13(rv)) {
             return (
                 'v1.3: o <strong>valor do atributo</strong> entra direto nas fórmulas (CA = 10 + DES + armadura). ' +
+                'O valor e o modificador são exibidos juntos no resumo da ficha para maior clareza. ' +
                 'Jogador: <strong>compra ' +
                 pts +
                 ' pts</strong> (bases −2 a +4, Tabela 1-1) ou <strong>4d6</strong> (soma dos seis ≥ 6). ' +
@@ -38,6 +39,7 @@
         }
         return (
             'Modificadores conforme <strong>tabela do MB</strong> (faixas de valor). ' +
+            'O valor e o modificador são exibidos juntos no resumo da ficha para maior clareza. ' +
             'Jogador: <strong>compra ' +
             pts +
             ' pts</strong> (bases 8–18) ou <strong>4d6</strong> (reroll MB). ' +
@@ -136,7 +138,11 @@
         ];
         modIds.forEach((id) => {
             const el = q(id);
-            if (el) el.style.display = v13 ? 'none' : '';
+            if (el) {
+                // Sempre mostrar contribuição na ficha de atributos;
+                // em v1.3 ela coincide com o valor bruto e dá clareza ao jogador.
+                el.style.display = '';
+            }
         });
     }
 
