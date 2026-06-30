@@ -111,6 +111,22 @@
         return Number(c.pericias_bonus[nome] || 0);
     }
 
+    function getRegraVersaoRolador() {
+        if (typeof window.getRegraVersaoAtiva === 'function') {
+            return window.getRegraVersaoAtiva();
+        }
+        return window.T20RegraVersao ? window.T20RegraVersao.DEFAULT_NOVA_FICHA : 'v13';
+    }
+
+    function itensProtecaoEquipados() {
+        const raw =
+            typeof window.t20ArmadurasEquipadas !== 'undefined' ? window.t20ArmadurasEquipadas : [];
+        if (window.T20PenalidadeArmadura && window.T20PenalidadeArmadura.itensProtecaoPayload) {
+            return window.T20PenalidadeArmadura.itensProtecaoPayload(raw);
+        }
+        return raw;
+    }
+
     async function calcularBonusLinha(tr) {
         const nomeEl = tr.querySelector('.t20-p-nome');
         const nome = nomeEl ? nomeEl.textContent.trim() : '';
@@ -119,18 +135,34 @@
         const outros = Number(tr.querySelector('.p-out')?.value || 0);
         const grad = Number(tr.querySelector('.p-total')?.value || 0);
         const deClasse = tr.classList.contains('t20-pericia-de-classe-row');
+        const rv = getRegraVersaoRolador();
+        const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(rv);
+        const usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
         const body = {
             nivel: nivelPersonagem(),
             mod_atributo: modAt,
             treinado,
-            graduacao: grad,
-            outros,
+            graduacao: isV13 ? 0 : grad,
+            outros: isV13 ? outros + grad : outros,
             racial_bonus: bonusRacialPericia(nome),
             slug_raca: slugRaca(),
             nome_pericia: nome,
             pericia_de_classe: deClasse,
-            penalidade_armadura: 0,
+            regraVersao: rv,
         };
+        if (isV13) {
+            body.itens_protecao = itensProtecaoEquipados();
+            body.uso_atletismo_natacao = usoNat;
+            body.penalidade_sobrecarga_carga = Boolean(
+                window.__t20CargaState && window.__t20CargaState.sobrecarga
+            );
+            const slugEl = document.getElementById('f_classe_mb');
+            if (slugEl && slugEl.value) {
+                body.tormenta_classe_mb_slug = String(slugEl.value).trim();
+            }
+        } else {
+            body.penalidade_armadura = 0;
+        }
         const res = await regras().calcularBonusPericia(body);
         return res;
     }
@@ -138,16 +170,33 @@
     async function rolarPericia(tr) {
         const nomeEl = tr.querySelector('.t20-p-nome');
         const nome = nomeEl ? nomeEl.textContent.trim() : 'Perícia';
+        const treinado = Boolean(tr.querySelector('.p-treinado')?.checked);
+        const soTreina = Boolean(tr.querySelector('.p-so-treina')?.checked);
+        if (soTreina && !treinado) {
+            const msg = `${nome}: perícia somente treinada — marque «Treinado» antes de rolar.`;
+            if (typeof Toast !== 'undefined' && Toast.error) Toast.error(msg);
+            else alert(msg);
+            return;
+        }
         const dc = await pedirDcPericia(nome);
         if (dc == null) return;
         try {
             const calc = await calcularBonusLinha(tr);
+            if (calc.pode_usar === false) {
+                const msg = calc.motivo_bloqueio || `${nome}: não pode usar sem treino.`;
+                if (typeof Toast !== 'undefined' && Toast.error) Toast.error(msg);
+                else alert(msg);
+                return;
+            }
             const roll = await regras().rolarPericia({
                 bonus: calc.bonus_total,
                 dc,
             });
             let msg = `${nome}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total} vs DC ${dc} → `;
             msg += roll.sucesso ? 'SUCESSO' : 'FALHA';
+            if (calc.penalidade_armadura_aplicada > 0) {
+                msg += ` (pen. armadura −${calc.penalidade_armadura_aplicada})`;
+            }
             if (roll.falha_critica) msg += ' (falha crítica)';
             if (roll.sucesso_critico) msg += ' (sucesso crítico)';
             if (calc.percepcao_passiva != null) {
@@ -191,4 +240,29 @@
         if (tb) obs.observe(tb, { childList: true });
         setTimeout(injetarBotoesRolar, 800);
     });
+
+    function encontrarLinhaPorSlug(slug) {
+        const s = String(slug || '').trim().toLowerCase();
+        if (!s) return null;
+        return document.querySelector(`#tblPericias tbody tr[data-per-slug="${s}"]`);
+    }
+
+    function encontrarLinhaPorNome(nome) {
+        const alvo = String(nome || '').trim().toLowerCase();
+        if (!alvo) return null;
+        const rows = document.querySelectorAll('#tblPericias tbody tr');
+        for (let i = 0; i < rows.length; i++) {
+            const el = rows[i].querySelector('.t20-p-nome');
+            const txt = el ? String(el.textContent || '').trim().toLowerCase() : '';
+            if (txt === alvo) return rows[i];
+        }
+        return null;
+    }
+
+    window.T20PericiasRolador = {
+        calcularBonusLinha,
+        encontrarLinhaPorSlug,
+        encontrarLinhaPorNome,
+        rolarPericia,
+    };
 })();

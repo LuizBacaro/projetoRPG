@@ -2,15 +2,28 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.models.talento import TormentaTalento, TormentaTalentoPersonagem
+from app.games.tormenta.rules.poderes_catalogo_v13_t20 import metadados_poder_por_nome
+from app.games.tormenta.rules.poderes_ficha_v13_t20 import (
+    AUTO_PODER_NOTA_PREFIX,
+    listar_poderes_sync_v13,
+)
+from app.games.tormenta.rules.poderes_pre_requisitos_v13_t20 import (
+    PersonagemPoderContext,
+    contexto_poder_de_personagem,
+    deve_validar_pre_requisitos_v13,
+    validar_pre_requisitos_poder,
+)
+from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
 from app.games.tormenta.schemas.talento_personagem import (
     TormentaMigrarTalentosJsonResponse,
+    TormentaPoderAtivarResponse,
     TormentaTalentoPersonagemItem,
     TormentaTalentoVinculoCreate,
 )
@@ -27,6 +40,7 @@ class TormentaPersonagemTalentosService:
     @staticmethod
     def _to_item(row: TormentaTalentoPersonagem) -> TormentaTalentoPersonagemItem:
         t = row.talento
+        meta = metadados_poder_por_nome(t.nome, notas=row.notas)
         return TormentaTalentoPersonagemItem(
             id=row.id,
             talento_id=row.talento_id,
@@ -35,6 +49,8 @@ class TormentaPersonagemTalentosService:
             pagina_referencia=t.pagina_referencia,
             origem_catalogo_mb=bool(t.origem_catalogo_mb),
             notas=row.notas,
+            categoria_v13=meta.get("categoria_v13"),
+            custo_pm=int(meta.get("custo_pm") or 0),
             adicionado_em=row.adicionado_em,
         )
 
@@ -77,6 +93,71 @@ class TormentaPersonagemTalentosService:
         self.db.flush()
         return t
 
+    def _nomes_poderes_vinculados(self, personagem_id: int) -> List[str]:
+        rows = (
+            self.db.query(TormentaTalentoPersonagem)
+            .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
+            .all()
+        )
+        return [str(r.talento.nome) for r in rows if r.talento and r.talento.nome]
+
+    def _validar_pre_requisitos_ao_vincular(
+        self,
+        personagem: TormentaPersonagem,
+        nome_poder: str,
+        notas: Optional[str],
+    ) -> None:
+        fj = personagem.ficha_json if isinstance(personagem.ficha_json, dict) else {}
+        rv = regra_versao_de_ficha(fj)
+        if not deve_validar_pre_requisitos_v13(regra_versao=rv, notas=notas):
+            return
+        ctx = contexto_poder_de_personagem(
+            personagem,
+            poderes_nomes_extra=self._nomes_poderes_vinculados(int(personagem.id)),
+        )
+        res = validar_pre_requisitos_poder(nome_poder, ctx)
+        if not res.get("valido"):
+            faltando = res.get("faltando") or []
+            partes = [
+                str(x.get("descricao") or "") for x in faltando if x.get("descricao")
+            ]
+            detalhe = "; ".join(partes) if partes else "pré-requisitos não atendidos"
+            raise DadosInvalidos(
+                f"Pré-requisitos não atendidos para «{nome_poder.strip()}»: {detalhe}."
+            )
+
+    @staticmethod
+    def preview_validar_pre_requisitos(body: Dict[str, Any]) -> Dict[str, Any]:
+        fj = body.get("ficha_json") if isinstance(body.get("ficha_json"), dict) else {}
+        rv = str(body.get("regra_versao") or regra_versao_de_ficha(fj) or "v13")
+        ctx = PersonagemPoderContext(
+            nivel=int(body.get("nivel") or 1),
+            for_valor=int(body.get("for_valor") or 0),
+            des_valor=int(body.get("des_valor") or 0),
+            con_valor=int(body.get("con_valor") or 0),
+            int_valor=int(body.get("int_valor") or 0),
+            sab_valor=int(body.get("sab_valor") or 0),
+            car_valor=int(body.get("car_valor") or 0),
+            ficha_json=fj,
+            poderes_nomes=list(body.get("poderes_escolhidos") or []),
+            regra_versao=rv,
+        )
+        nome = str(body.get("nome_poder") or "").strip()
+        res = validar_pre_requisitos_poder(nome, ctx)
+        faltando = res.get("faltando") or []
+        motivo = ""
+        if faltando:
+            motivo = "; ".join(
+                str(x.get("descricao") or "") for x in faltando if x.get("descricao")
+            )
+        return {
+            "valido": bool(res.get("valido")),
+            "nome_poder": nome,
+            "faltando": faltando,
+            "pre_requisitos": res.get("pre_requisitos") or [],
+            "motivo": motivo,
+        }
+
     def adicionar_vinculo(
         self, personagem_id: int, payload: TormentaTalentoVinculoCreate
     ) -> TormentaTalentoPersonagemItem:
@@ -86,6 +167,14 @@ class TormentaPersonagemTalentosService:
                 raise DadosInvalidos("Talento nao encontrado no catalogo")
         else:
             t = self._buscar_ou_criar_talento_por_nome(payload.nome or "")
+
+        p = self.db.get(TormentaPersonagem, personagem_id)
+        if p:
+            self._validar_pre_requisitos_ao_vincular(
+                p,
+                t.nome,
+                (payload.notas or "").strip() or None,
+            )
 
         dup = (
             self.db.query(TormentaTalentoPersonagem)
@@ -173,4 +262,107 @@ class TormentaPersonagemTalentosService:
         return TormentaMigrarTalentosJsonResponse(
             vinculos_criados=criados,
             ignorados_duplicados=dup,
+        )
+
+    def sincronizar_poderes_automaticos_v13(
+        self, personagem_id: int, ficha_json: dict
+    ) -> dict:
+        """Garante vínculos SQL para poderes de origem, concedido e Versátil v1.3."""
+        desejados = listar_poderes_sync_v13(ficha_json)
+        desejados_notas = {p["notas"] for p in desejados}
+
+        rows = (
+            self.db.query(TormentaTalentoPersonagem)
+            .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
+            .all()
+        )
+
+        removidos = 0
+        for row in rows:
+            nota = (row.notas or "").strip()
+            if nota.startswith(AUTO_PODER_NOTA_PREFIX) and nota not in desejados_notas:
+                self.db.delete(row)
+                removidos += 1
+
+        if removidos:
+            self.db.flush()
+
+        vinculados_talento_ids = {
+            r.talento_id
+            for r in self.db.query(TormentaTalentoPersonagem)
+            .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
+            .all()
+        }
+        notas_existentes = {
+            (r.notas or "").strip()
+            for r in self.db.query(TormentaTalentoPersonagem)
+            .filter(TormentaTalentoPersonagem.personagem_id == personagem_id)
+            .all()
+            if (r.notas or "").strip()
+        }
+
+        criados = 0
+        for pod in desejados:
+            nota = pod["notas"]
+            if nota in notas_existentes:
+                continue
+            nome = str(pod.get("nome") or "").strip()
+            if len(nome) < 2:
+                continue
+            t = self._buscar_ou_criar_talento_por_nome(nome)
+            if t.id in vinculados_talento_ids:
+                continue
+            self.db.add(
+                TormentaTalentoPersonagem(
+                    personagem_id=personagem_id,
+                    talento_id=t.id,
+                    notas=nota,
+                )
+            )
+            vinculados_talento_ids.add(t.id)
+            criados += 1
+
+        if criados or removidos:
+            commit_with_rollback(self.db)
+
+        return {"vinculos_criados": criados, "vinculos_removidos": removidos}
+
+    def ativar_poder_com_pm(
+        self,
+        personagem_id: int,
+        vinculo_id: int,
+        *,
+        custo_pm_override: int | None = None,
+    ) -> TormentaPoderAtivarResponse:
+        p = self.db.get(TormentaPersonagem, personagem_id)
+        if not p:
+            raise ArenaBaseException("Personagem nao encontrado", status_code=404)
+        row = self.db.get(TormentaTalentoPersonagem, vinculo_id)
+        if not row or row.personagem_id != personagem_id:
+            raise ArenaBaseException("Vinculo nao encontrado", status_code=404)
+        meta = metadados_poder_por_nome(row.talento.nome, notas=row.notas)
+        custo = (
+            int(custo_pm_override)
+            if custo_pm_override is not None
+            else int(meta.get("custo_pm") or 0)
+        )
+        custo = max(0, min(99, custo))
+        if custo <= 0:
+            raise DadosInvalidos(
+                "Este poder nao possui custo PM registrado no catálogo para ativação."
+            )
+        pa_max = int(p.pa_max or 0)
+        antes = int(p.pa_atual if p.pa_atual is not None else pa_max)
+        if antes < custo:
+            raise DadosInvalidos(f"PM insuficientes: possui {antes}, custo {custo}.")
+        depois = antes - custo
+        p.pa_atual = depois
+        commit_with_rollback(self.db)
+        self.db.refresh(p)
+        return TormentaPoderAtivarResponse(
+            nome=row.talento.nome,
+            custo_pm=custo,
+            pa_atual_antes=antes,
+            pa_atual_depois=depois,
+            pa_max=pa_max,
         )

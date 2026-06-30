@@ -45,6 +45,10 @@ class TormentaCombateService:
     def obter_combate_ativo(self) -> Optional[TormentaCombate]:
         return self.combate_repo.get_ativo_por_usuario(self.usuario_id)
 
+    @staticmethod
+    def _des_valor_personagem(p: TormentaPersonagem) -> int:
+        return int(p.des_valor) if p.des_valor is not None else 10
+
     def montar_status(
         self, combate: Optional[TormentaCombate], incluir_personagens: bool = True
     ) -> Dict[str, Any]:
@@ -71,13 +75,23 @@ class TormentaCombateService:
         }
 
         if incluir_personagens:
+            from app.games.tormenta.rules.defesa_t20 import ca_efetiva_personagem
+
             pers = self.personagem_repo.get_by_ids(list(combate.personagens_ids or []))
             by_id = {p.id: p for p in pers}
             ordenados = [by_id[i] for i in combate.personagens_ids if i in by_id]
-            payload["personagens"] = [
-                TormentaPersonagemResponse.model_validate(p).model_dump()
-                for p in ordenados
-            ]
+            personagens_out: List[Dict[str, Any]] = []
+            for p in ordenados:
+                dump = TormentaPersonagemResponse.model_validate(p).model_dump()
+                ca_eff = ca_efetiva_personagem(
+                    des_valor=self._des_valor_personagem(p),
+                    ca=int(p.ca or 10),
+                    ficha_json=p.ficha_json if isinstance(p.ficha_json, dict) else {},
+                )
+                dump["ca_efetiva"] = ca_eff
+                dump["ca"] = ca_eff
+                personagens_out.append(dump)
+            payload["personagens"] = personagens_out
 
         return payload
 
@@ -189,14 +203,16 @@ class TormentaCombateService:
         return modificadores_de_condicoes_mb([str(x) for x in rotulos])
 
     def rolar_iniciativa_combate(self, personagem_ids: List[int]) -> Dict[str, Any]:
-        from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+        from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
         from app.games.tormenta.rules.combate_t20 import rolar_iniciativa
+        from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
 
         combate = self._exigir_combate_ativo()
         resultados: List[Dict[str, Any]] = []
         for pid in personagem_ids:
             p = self._personagem_no_combate(combate, int(pid))
-            des_mod = modificador_atributo_t20(int(p.des_valor or 10))
+            rv = regra_versao_de_ficha(p.ficha_json)
+            des_mod = contribuicao_atributo_t20(int(p.des_valor or 10), rv)
             roll = rolar_iniciativa(des_mod)
             p.iniciativa = int(roll["total"])
             self.personagem_repo.update(p)
@@ -225,18 +241,28 @@ class TormentaCombateService:
         ca_alvo: Optional[int] = None,
     ) -> Dict[str, Any]:
         from app.games.tormenta.rules.combate_t20 import rolar_ataque
+        from app.games.tormenta.rules.defesa_t20 import ca_efetiva_personagem
 
         combate = self._exigir_combate_ativo()
         atacante = self._personagem_no_combate(combate, atacante_id)
         alvo = self._personagem_no_combate(combate, alvo_id)
-        ca = int(ca_alvo if ca_alvo is not None else (alvo.ca or 10))
-        mods = self._mods_condicoes_personagem(combate, atacante_id)
+        if ca_alvo is not None:
+            ca_base = int(ca_alvo)
+        else:
+            ca_base = ca_efetiva_personagem(
+                des_valor=self._des_valor_personagem(alvo),
+                ca=int(alvo.ca or 10),
+                ficha_json=alvo.ficha_json if isinstance(alvo.ficha_json, dict) else {},
+            )
+        mods_atk = self._mods_condicoes_personagem(combate, atacante_id)
+        mods_alvo = self._mods_condicoes_personagem(combate, alvo_id)
+        ca = max(0, ca_base + int(mods_alvo.get("ca", 0)))
         roll = rolar_ataque(
             bab,
             mod_atributo,
             bonus_arma=bonus_arma,
             penalidades=penalidades,
-            modificador_condicoes=mods.get("ataque", 0),
+            modificador_condicoes=mods_atk.get("ataque", 0),
             ca_alvo=ca,
         )
         return {
@@ -244,7 +270,9 @@ class TormentaCombateService:
             "alvo_id": alvo_id,
             "atacante_nome": atacante.nome,
             "alvo_nome": alvo.nome,
-            "modificador_condicoes_ataque": mods.get("ataque", 0),
+            "modificador_condicoes_ataque": mods_atk.get("ataque", 0),
+            "modificador_condicoes_ca_alvo": mods_alvo.get("ca", 0),
+            "ca_base_alvo": ca_base,
             **roll,
         }
 

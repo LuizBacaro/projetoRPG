@@ -1,38 +1,128 @@
-# FEATURE: Magia Tormenta 20 (MB)
+# FEATURE: Magia Tormenta 20 (Edição Jogo do Ano v1.3)
 
-> **Não usar slots 0–9 do d20.** T20 usa **PM**, **círculos** e modos **preparar** vs **espontâneo**.
+> **Fonte:** `Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf` — Cap. 4 p.168–178; Arcanista p.36–39; PM/habilidades p.224+.  
+> **Não usar** slots 0–9 do d20. Recurso = **PM (Pontos de Mana)**.
 
 ## Descrição
-Conjuração MB: PM por classe, habilidade-chave, grimório SQL, catálogo de magias, gasto de PM ao lançar.
 
-## Dados
-- `conjuracao_classe_mb.json` — `modo_conjuracao`: `preparar` | `espontaneo`
-- Catálogo: `magias_mb_catalogo.json`, `GET /tormenta/regras/magias`
-- Vínculos: `tormenta_magias_personagem`, `/personagens/{id}/magias`
-- Lançar: `POST /personagens/{id}/magias/lancar` (debita `pa_atual`)
+Magias arcanas ou divinas, círculos 1º–5º, lançamento gasta **PM** conforme Tabela 4-1. Conjuradores: **Arcanista**, **Bardo**, **Clérigo**, **Druida** (+ **Paladino** / **Caçador** conforme classe). Grimório SQL + catálogo JSON.
 
-## Modos por classe (MB)
-| Modo | Classes |
-|------|---------|
-| preparar | mago, clérigo, druida, paladino, ranger |
-| espontaneo | bardo, feiticeiro |
+## PM e custo de magias
 
-Validação de papel (`grimorio` / `conhecida` / `preparada`): `grimorio_conjuracao_t20.py`.
+| Recurso | Regra |
+|---------|--------|
+| Nome no livro | **Pontos de Mana (PM)** — mesmo pool de poderes/habilidades |
+| Campos legado Arena | `pa_atual` / `pa_max` (= PM) |
+
+**Tabela 4-1 — Custo de magias (p.170):**
+
+| Círculo | PM |
+|---------|-----|
+| 1º | **1** |
+| 2º | **3** |
+| 3º | **6** |
+| 4º | **10** |
+| 5º | **15** |
+
+> **Não** usar regra MB «círculo C = C PM». Backend `custo_pm_preparar_ou_lancar_magia(circulo)` retorna `circulo` — **incorreto para v1.3**.
+
+**Truque (p.170):** aprimoramento que reduz custo da magia a **0 PM** (não é círculo 0 separado).
+
+## Atributo-chave e CD (p.170)
+
+| Tipo / classe | Atributo-chave |
+|---------------|----------------|
+| Bruxo, Mago (arcanista) | **Inteligência** |
+| Feiticeiro, Bardo | **Carisma** |
+| Clérigo, Druida | **Sabedoria** |
+
+**CD resistência** = **10 + ⌊nível/2⌋ + atributo-chave**  
+(ex.: feiticeira 8º, CAR 5 → CD **19**).
+
+## Arcanista — três caminhos (p.36–39)
+
+Classe única que substitui Mago + Feiticeiro do MB.
+
+| Caminho | Conjuração | Notas |
+|---------|------------|--------|
+| **Bruxo** | Via **foco**; Misticismo se sem foco | PM 6/nível (Tabela 1-3) |
+| **Mago** | **Grimório**; memoriza metade das conhecidas | Preparação |
+| **Feiticeiro** | **Espontâneo**; linhagens (p.39) | Conhecidas por nível |
+
+Bardo: arcano espontâneo (CAR). Clérigo/Druida: divino (SAB), devoção.
+
+## Regras de lançamento (p.170+)
+
+| Regra | Resumo |
+|-------|--------|
+| Gestos e palavras | Mãos livres; amordaçado → não lança |
+| Concentração | Teste **Vontade** se condição ruim/terrível (CD 15/20 + custo PM da magia) |
+| Armadura + magia arcana | Teste **Misticismo** CD 20 + custo PM (+ penalidade armadura) |
+| Aprimoramentos | Gasto extra de PM; limite p.224 |
+| Listas | Arcanas p.174+; divinas p.176+; descrições p.178+ (sem texto longo no repo) |
+
+## Modos por classe (v1.3)
+
+| Padrão | Classes |
+|--------|---------|
+| Grimório / preparação | Arcanista (**Mago**), Clérigo, Druida |
+| Espontâneo / conhecidas | Arcanista (**Feiticeiro**), Bardo |
+| Foco | Arcanista (**Bruxo**) |
+| Divino por devoção | Clérigo, Paladino (parcial) |
+
+> Migrar `conjuracao_classe_mb.json`: sair mago/feiticeiro/ranger → **arcanista** (+ caminho), **caçador**.
+
+## Dados e API
+
+- `conjuracao_classe_mb.json` → classes v1.3 + caminho arcanista
+- `magias_mb_catalogo.json`, `GET /tormenta/regras/magias`
+- `tormenta_magias_personagem`, `/personagens/{id}/magias`, `/lancar`
+- `grimorio_conjuracao_t20.py` — papéis grimório / conhecida / preparada / foco
+
+## Requisitos funcionais
+
+| ID | Requisito | Prioridade |
+|----|-----------|------------|
+| RF-T06a | Custo PM **1/3/6/10/15** por círculo (Tabela 4-1) | P0 |
+| RF-T06b | CD = 10 + ⌊nível/2⌋ + atributo-chave | P0 |
+| RF-T06c | Arcanista: caminho Bruxo / Mago / Feiticeiro | P0 |
+| RF-T06d | Grimório SQL + modal; preparar vs espontâneo vs foco | P0 |
+| RF-T06e | Débito PM ao lançar (+ aprimoramentos) | P0 |
+| RF-T06f | Catálogo metadados p.174–178 | P0 |
+| RF-T06g | Armadura + magia arcana → teste Misticismo | P1 |
+| RF-T06h | Concentração (Vontade) + resistência à magia | P1 |
+| RF-T06i | Truque via aprimoramento (0 PM) | P1 |
+| RF-T06j | Linhagens feiticeiro + progressão conhecidas | P2 |
 
 ## Estado de implementação
 
 | Item | Estado |
 |------|--------|
-| Motor PM + CD preview | **Feito** (G2) |
-| Grimório SQL + modal ficha | **Feito** (G3–G4) |
-| Enforcement preparar vs espontâneo | **Feito** |
-| Gasto PM automático ao lançar | **Feito** |
-| Página `/tormenta/grimorio` | **Feito** |
-| Catálogo completo p.150–209 (G5) | **Feito** (706 itens; metadados `escola`/execução via `enrich_magias_mb_catalogo.py`; sem `descricao_longa` no repo — RF-T46) |
-| Repertório aprendido + prece de devoção (RF-T44d) | **Feito** |
-| Progressão magias conhecidas por nível (RF-T42) | **Feito** (bardo/feiticeiro; troca bardo RF-T42c no backend + UI) |
-| Migração `magias_texto` → SQL | **Feito** (automática ao abrir o grimório) |
-| Concentração / resistência à magia | **Feito** (concentração ao lançar/encerrar; teste automático ao aplicar dano; `POST …/combate/testar-resistencia-magia`; RM +4/+8 MB) |
+| Grimório SQL + modal | **Feito** |
+| Catálogo ~706 metadados | **Feito** |
+| Custo PM = círculo (MB) | **Feito** — v13 usa 1/3/6/10/15 |
+| Arcanista 3 caminhos | **Feito** |
+| CD com atributo **valor** | **Feito** |
+| Concentração + RM | **Feito** (revisar fórmula CD) |
+
+## Gap código
+
+| Módulo | Correção |
+|--------|----------|
+| `conjuracao_t20.custo_pm_preparar_ou_lancar_magia` | Mapa `{1:1, 2:3, 3:6, 4:10, 5:15}` |
+| `conjuracao_classe_mb.json` | Arcanista + caminho; caçador; remover mago/feiticeiro |
+| Preview CD magia | 10 + ⌊nível/2⌋ + valor atributo-chave |
+| UI ficha | Escolha caminho arcanista na criação |
+
+## Critérios de aceite
+
+- Lançar magia 3º círculo debita **6 PM**, não 3.
+- Arcanista Mago: só lança magias **memorizadas** (metade das conhecidas).
+- Arcanista Feiticeiro: lança conhecidas sem preparação diária.
+- CD de magia nível 8, SAB 4 → **16** (10 + 4 + 2).
+- Repo sem `descricao_longa` de magias (RF-T46).
 
 ## Referência
-`docs/tormenta/07-requisitos-grimorio-mb-144-209.md`, `08-grimorio-g0-g2-fechamento.md`.
+
+- Livro: Cap. 4 p.168–178; Arcanista p.36–39; gasto PM p.224.
+- Docs legado (atualizar páginas): `docs/tormenta/07-requisitos-grimorio-mb-144-209.md`.

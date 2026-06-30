@@ -5,6 +5,7 @@ Skills são **playbooks curtos** que o agente carrega **só quando a tarefa pede
 - [AGENTS.md](../../AGENTS.md) — governança, camadas, multi-jogo, protocolo
 - [.cursor/requisitos/](../requisitos/) — **o quê** implementar (RF por jogo)
 - [.cursor/rules/](../rules/) — regras automáticas por área (backend, CI, requisitos)
+- [.cursor/agents/](../agents/) — subagentes Cursor (orquestradores, requisitos, PDF, especialistas)
 
 ## Janela de contexto em 30 segundos
 
@@ -20,6 +21,7 @@ Skills são **playbooks curtos** que o agente carrega **só quando a tarefa pede
 | Local | Conteúdo |
 |-------|----------|
 | **`.cursor/skills/`** (esta pasta) | Domínio Arena: deploy, D&D 3.5, Tormenta, GURPS, produção |
+| **`.cursor/agents/`** | Subagentes Cursor (espelho adaptado de `.github/agents/`) |
 | **`.github/skills/`** | Análise de requisitos, PDF, auditoria JS, design — ver [índice GitHub](../.github/skills/README.md) |
 
 Skills globais do Cursor (`~/.cursor/skills-cursor/`: create-skill, babysit, PR split) são do editor, não deste repositório.
@@ -30,7 +32,7 @@ Skills globais do Cursor (`~/.cursor/skills-cursor/`: create-skill, babysit, PR 
 
 | Tu queres… | Skill / documento |
 |------------|-------------------|
-| Livro/PDF → especificação RF | [rpg-requirements-analysis](../.github/skills/rpg-requirements-analysis/SKILL.md) |
+| Livro/PDF → especificação RF | subagente [rpg-requirements-analyst](../agents/rpg-requirements-analyst.md) + skill [rpg-requirements-analysis](../.github/skills/rpg-requirements-analysis/SKILL.md) |
 | Implementar RF já escrito | RF em [requisitos/](../requisitos/) + [requisitos-implementacao](../rules/requisitos-implementacao.mdc) |
 | Ficha D&D 3.5 — progressão de classe | [class-progression-conventions](class-progression-conventions/SKILL.md) |
 | Ficha D&D 3.5 — conjuração / grimório | [dnd-spellcasting-conventions](dnd-spellcasting-conventions/SKILL.md) |

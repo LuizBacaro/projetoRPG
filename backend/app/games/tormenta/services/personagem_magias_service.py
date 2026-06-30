@@ -27,6 +27,7 @@ from app.games.tormenta.rules.devocao_divindade_t20 import (
     magia_e_truque_devocao_mb,
 )
 from app.games.tormenta.rules.grimorio_conjuracao_t20 import (
+    contexto_conjuracao_de_ficha,
     validar_papel_magia_para_classe,
 )
 from app.games.tormenta.rules.grimorio_elegibilidade_t20 import (
@@ -176,14 +177,20 @@ class TormentaPersonagemMagiasService:
         fj = p.ficha_json if isinstance(p.ficha_json, dict) else {}
         slug_classe = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
         manual = fj.get("tormenta_conjuracao_manual_mb") is True
+        ctx = contexto_conjuracao_de_ficha(fj)
+        rv = ctx.get("regra_versao")
+        cam = ctx.get("arcanista_caminho")
         if slug_classe and not manual:
             from app.games.tormenta.rules.grimorio_conjuracao_t20 import (
-                modo_conjuracao_classe_mb,
-                validar_papel_magia_para_classe,
+                modo_conjuracao_classe,
             )
 
             ok_p, motivo_p = validar_papel_magia_para_classe(
-                slug_classe, papel, conjuracao_manual=manual
+                slug_classe,
+                papel,
+                conjuracao_manual=manual,
+                regra_versao=rv,
+                arcanista_caminho=cam,
             )
             if not ok_p:
                 raise DadosInvalidos(motivo_p)
@@ -197,13 +204,15 @@ class TormentaPersonagemMagiasService:
             slug_classe
             and not manual
             and papel == "conhecida"
-            and modo_conjuracao_classe_mb(slug_classe) == "espontaneo"
+            and modo_conjuracao_classe(slug_classe, rv, cam) in ("espontaneo", "foco")
         ):
             ok_c, motivo_c = validar_adicionar_conhecida_mb(
                 slug_classe=slug_classe,
                 nivel=nv_conj,
                 circulo_magia=circulo_mag,
                 vinculos_existentes=existentes,
+                regra_versao=rv,
+                arcanista_caminho=cam,
             )
             if not ok_c:
                 raise DadosInvalidos(motivo_c)
@@ -212,7 +221,11 @@ class TormentaPersonagemMagiasService:
                 classe_usa_limite_repertorio_mb,
             )
 
-            if classe_usa_limite_repertorio_mb(slug_classe):
+            if classe_usa_limite_repertorio_mb(
+                slug_classe,
+                regra_versao=rv,
+                arcanista_caminho=cam,
+            ):
                 ok_rep, motivo_rep = validar_adicionar_repertorio_mb(
                     slug_classe=slug_classe,
                     nivel=nv_conj,
@@ -225,6 +238,8 @@ class TormentaPersonagemMagiasService:
                     int_valor=int(p.int_valor or 10),
                     sab_valor=int(p.sab_valor or 10),
                     car_valor=int(p.car_valor or 10),
+                    regra_versao=rv,
+                    arcanista_caminho=cam,
                 )
                 if not ok_rep:
                     raise DadosInvalidos(motivo_rep)
@@ -241,6 +256,8 @@ class TormentaPersonagemMagiasService:
                 int_valor=int(p.int_valor or 10),
                 sab_valor=int(p.sab_valor or 10),
                 car_valor=int(p.car_valor or 10),
+                regra_versao=rv,
+                arcanista_caminho=cam,
             )
             if not ok_gm:
                 raise DadosInvalidos(motivo_gm)
@@ -257,6 +274,8 @@ class TormentaPersonagemMagiasService:
                 int_valor=int(p.int_valor or 10),
                 sab_valor=int(p.sab_valor or 10),
                 car_valor=int(p.car_valor or 10),
+                regra_versao=rv,
+                arcanista_caminho=cam,
             )
             if not ok_pr:
                 raise DadosInvalidos(motivo_pr)
@@ -504,6 +523,7 @@ class TormentaPersonagemMagiasService:
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         fj = p.ficha_json if isinstance(p.ficha_json, dict) else {}
+        ctx = contexto_conjuracao_de_ficha(fj)
         slug_classe = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
         nv = nivel_efetivo_conjuracao_mb(fj, int(p.nivel or 1))
         vinculos = [
@@ -519,6 +539,8 @@ class TormentaPersonagemMagiasService:
             slug_classe=slug_classe,
             nivel=nv,
             vinculos=vinculos,
+            regra_versao=ctx.get("regra_versao"),
+            arcanista_caminho=ctx.get("arcanista_caminho"),
         )
 
     def preview_grimorio_mb(self, personagem_id: int) -> Dict[str, Any]:
@@ -526,6 +548,7 @@ class TormentaPersonagemMagiasService:
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         fj = p.ficha_json if isinstance(p.ficha_json, dict) else {}
+        ctx = contexto_conjuracao_de_ficha(fj)
         slug_classe = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
         nv = nivel_efetivo_conjuracao_mb(fj, int(p.nivel or 1))
         vinculos = self._vinculos_dict_por_personagem(personagem_id)
@@ -539,6 +562,8 @@ class TormentaPersonagemMagiasService:
             int_valor=int(p.int_valor or 10),
             sab_valor=int(p.sab_valor or 10),
             car_valor=int(p.car_valor or 10),
+            regra_versao=ctx.get("regra_versao"),
+            arcanista_caminho=ctx.get("arcanista_caminho"),
         )
 
     def preview_repertorio_mb(self, personagem_id: int) -> Dict[str, Any]:
@@ -546,6 +571,7 @@ class TormentaPersonagemMagiasService:
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         fj = p.ficha_json if isinstance(p.ficha_json, dict) else {}
+        ctx = contexto_conjuracao_de_ficha(fj)
         slug_classe = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
         nv = nivel_efetivo_conjuracao_mb(fj, int(p.nivel or 1))
         vinculos = self._vinculos_dict_por_personagem(personagem_id)
@@ -559,6 +585,8 @@ class TormentaPersonagemMagiasService:
             int_valor=int(p.int_valor or 10),
             sab_valor=int(p.sab_valor or 10),
             car_valor=int(p.car_valor or 10),
+            regra_versao=ctx.get("regra_versao"),
+            arcanista_caminho=ctx.get("arcanista_caminho"),
         )
 
     def preview_preparadas_mb(self, personagem_id: int) -> Dict[str, Any]:
@@ -566,6 +594,7 @@ class TormentaPersonagemMagiasService:
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         fj = p.ficha_json if isinstance(p.ficha_json, dict) else {}
+        ctx = contexto_conjuracao_de_ficha(fj)
         slug_classe = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
         nv = nivel_efetivo_conjuracao_mb(fj, int(p.nivel or 1))
         vinculos = self._vinculos_dict_por_personagem(personagem_id)
@@ -579,6 +608,8 @@ class TormentaPersonagemMagiasService:
             int_valor=int(p.int_valor or 10),
             sab_valor=int(p.sab_valor or 10),
             car_valor=int(p.car_valor or 10),
+            regra_versao=ctx.get("regra_versao"),
+            arcanista_caminho=ctx.get("arcanista_caminho"),
         )
 
     def limpar_preparadas(self, personagem_id: int) -> int:

@@ -1,0 +1,95 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20 v1.3 — Tabela 1-19 p.86–97 (itens grátis da origem)",
+    "nota": "Nomes operacionais para inventário; escolhas do livro usam default ou origem_itens_escolha na ficha."
+  },
+  "itens_por_origem": {
+    "acolito": ["Símbolo sagrado de madeira", "Traje de sacerdote"],
+    "amigo_animais": ["Cavalo de carga"],
+    "amnesico": [],
+    "aristocrata": ["Joia de família (T$ 300)", "Traje da corte"],
+    "artesao": ["Instrumento musical (comum)", "Item fabricado (até T$ 50)"],
+    "artista": ["Kit de disfarce"],
+    "assistente_laboratorio": ["Bolsa de componentes"],
+    "batedor": ["Tenda para 2 pessoas", "Equipamento de viagem", "Arco curto"],
+    "capanga": ["Clava"],
+    "charlatao": ["Kit de disfarce", "Joia falsificada"],
+    "circense": ["Bolas de malabarismo"],
+    "criminoso": ["Kit de disfarce"],
+    "curandeiro": ["Poção de cura (frasco)", "Poção de cura (frasco)", "Kit de primeiros socorros"],
+    "eremita": ["Tenda para 2 pessoas", "Equipamento de viagem"],
+    "escravo": ["Algemas", "Maça"],
+    "estudioso": ["Coleção de livros"],
+    "fazendeiro": ["Carroça", "Lança", "Rações (1 dia)", "Rações (1 dia)", "Rações (1 dia)", "Rações (1 dia)", "Rações (1 dia)", "Rações (1 dia)", "Rações (1 dia)", "Rações (1 dia)", "Rações (1 dia)", "Rações (1 dia)"],
+    "forasteiro": ["Equipamento de viagem", "Instrumento musical (comum)", "Traje estrangeiro"],
+    "gladiador": ["Espada longa", "Item de admirador"],
+    "guarda": ["Apito", "Insígnia da milícia", "Espada longa"],
+    "herdeiro": ["Símbolo de herança"],
+    "heroi_campones": ["Instrumento musical (comum)", "Traje de plebeu"],
+    "marujo": ["Corda (15 m)"],
+    "mateiro": ["Arco curto", "Tenda para 2 pessoas", "Equipamento de viagem", "Flechas (20)"],
+    "membro_guilda": ["Chaves de ladrão"],
+    "mercador": ["Carroça", "Mercadorias (T$ 100)"],
+    "minerador": ["Gemas preciosas (T$ 100)", "Picareta"],
+    "nomade": ["Bordão", "Equipamento de viagem"],
+    "pivete": ["Chaves de ladrão", "Traje de plebeu"],
+    "refugiado": ["Item estrangeiro (T$ 100)"],
+    "seguidor": ["Item do mestre (T$ 100)"],
+    "selvagem": ["Clava"],
+    "soldado": ["Espada longa", "Uniforme militar", "Insígnia militar"],
+    "taverneiro": ["Clava", "Panela", "Avental"],
+    "trabalhador": ["Maça"]
+  },
+  "escolhas_por_origem": {
+    "amigo_animais": {
+      "campo": "montaria",
+      "opcoes": [
+        { "slug": "cao", "nome": "Cão de caça", "itens": ["Cão de caça"] },
+        { "slug": "cavalo", "nome": "Cavalo", "itens": ["Cavalo de carga"] },
+        { "slug": "poni", "nome": "Pônei", "itens": ["Cavalo de carga"] },
+        { "slug": "trobo", "nome": "Trobo", "itens": ["Burro"] }
+      ],
+      "default": "cavalo"
+    },
+    "artista": {
+      "campo": "item",
+      "opcoes": [
+        { "slug": "disfarce", "nome": "Estojo de disfarces", "itens": ["Kit de disfarce"] },
+        { "slug": "instrumento", "nome": "Instrumento musical", "itens": ["Instrumento musical (comum)"] }
+      ],
+      "default": "instrumento"
+    },
+    "criminoso": {
+      "campo": "item",
+      "opcoes": [
+        { "slug": "disfarce", "nome": "Estojo de disfarces", "itens": ["Kit de disfarce"] },
+        { "slug": "gazua", "nome": "Gazua", "itens": ["Chaves de ladrão"] }
+      ],
+      "default": "gazua"
+    },
+    "heroi_campones": {
+      "campo": "item",
+      "opcoes": [
+        { "slug": "oficio", "nome": "Instrumentos de ofício", "itens": ["Instrumento musical (comum)"] },
+        { "slug": "arma", "nome": "Arma simples", "itens": ["Clava"] }
+      ],
+      "default": "oficio"
+    },
+    "membro_guilda": {
+      "campo": "item",
+      "opcoes": [
+        { "slug": "gazua", "nome": "Gazua", "itens": ["Chaves de ladrão"] },
+        { "slug": "oficio", "nome": "Instrumentos de ofício", "itens": ["Instrumento musical (comum)"] }
+      ],
+      "default": "oficio"
+    },
+    "trabalhador": {
+      "campo": "ferramenta",
+      "opcoes": [
+        { "slug": "maca", "nome": "Maça", "itens": ["Maça"] },
+        { "slug": "lanca", "nome": "Lança", "itens": ["Lança"] }
+      ],
+      "default": "maca"
+    }
+  }
+}

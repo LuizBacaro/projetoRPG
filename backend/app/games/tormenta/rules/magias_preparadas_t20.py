@@ -9,7 +9,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
 from app.games.tormenta.rules.catalogo_t20 import metadados_magia_mb_por_slug
-from app.games.tormenta.rules.grimorio_conjuracao_t20 import modo_conjuracao_classe_mb
+from app.games.tormenta.rules.grimorio_conjuracao_t20 import (
+    modo_conjuracao_classe,
+    slug_efetivo_tabelas_magia_mb,
+)
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
     tipo_lista_magias_por_classe_mb,
@@ -34,10 +37,19 @@ def _classe_row(slug_classe: str) -> Optional[Dict[str, Any]]:
     return row if isinstance(row, dict) else None
 
 
-def classe_usa_limite_preparadas_mb(slug_classe: str) -> bool:
-    if modo_conjuracao_classe_mb(slug_classe) != "preparar":
+def classe_usa_limite_preparadas_mb(
+    slug_classe: str,
+    *,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
+) -> bool:
+    if (
+        modo_conjuracao_classe(slug_classe, regra_versao, arcanista_caminho)
+        != "preparar"
+    ):
         return False
-    return _classe_row(slug_classe) is not None
+    eff = slug_efetivo_tabelas_magia_mb(slug_classe, regra_versao, arcanista_caminho)
+    return _classe_row(eff) is not None
 
 
 def _mod_habilidade_preparadas(
@@ -73,8 +85,11 @@ def teto_preparadas_mb(
     int_valor: int = 10,
     sab_valor: int = 10,
     car_valor: int = 10,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
 ) -> Optional[int]:
-    row = _classe_row(slug_classe)
+    eff = slug_efetivo_tabelas_magia_mb(slug_classe, regra_versao, arcanista_caminho)
+    row = _classe_row(eff)
     if not row:
         return None
     try:
@@ -101,29 +116,54 @@ def teto_preparadas_mb(
     return None
 
 
-def truques_contam_teto_preparadas_mb(slug_classe: str) -> bool:
-    row = _classe_row(slug_classe)
+def truques_contam_teto_preparadas_mb(
+    slug_classe: str,
+    *,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
+) -> bool:
+    eff = slug_efetivo_tabelas_magia_mb(slug_classe, regra_versao, arcanista_caminho)
+    row = _classe_row(eff)
     if not row:
         return False
     return row.get("truques_contam_no_teto") is True
 
 
-def exige_grimorio_para_preparar_mb(slug_classe: str) -> bool:
-    row = _classe_row(slug_classe)
+def exige_grimorio_para_preparar_mb(
+    slug_classe: str,
+    *,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
+) -> bool:
+    eff = slug_efetivo_tabelas_magia_mb(slug_classe, regra_versao, arcanista_caminho)
+    row = _classe_row(eff)
     if not row:
         return False
     return row.get("exige_grimorio") is not False
 
 
-def exige_repertorio_para_preparar_mb(slug_classe: str) -> bool:
+def exige_repertorio_para_preparar_mb(
+    slug_classe: str,
+    *,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
+) -> bool:
     """Preparadores divinos precisam ter a magia no repertório (papel conhecida)."""
-    if exige_grimorio_para_preparar_mb(slug_classe):
+    if exige_grimorio_para_preparar_mb(
+        slug_classe,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
+    ):
         return False
     from app.games.tormenta.rules.magias_repertorio_aprendido_t20 import (
         classe_usa_limite_repertorio_mb,
     )
 
-    return classe_usa_limite_repertorio_mb(slug_classe)
+    return classe_usa_limite_repertorio_mb(
+        slug_classe,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
+    )
 
 
 def _slugs_grimorio(vinculos: List[Dict[str, Any]]) -> set[str]:
@@ -157,9 +197,15 @@ def contar_preparadas_no_teto(
     *,
     slug_classe: str,
     metadados_por_slug: Optional[Dict[str, Dict[str, Any]]] = None,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
 ) -> int:
     meta_map = metadados_por_slug or {}
-    truques_contam = truques_contam_teto_preparadas_mb(slug_classe)
+    truques_contam = truques_contam_teto_preparadas_mb(
+        slug_classe,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
+    )
     total = 0
     for v in vinculos:
         if not isinstance(v, dict):
@@ -200,15 +246,26 @@ def validar_adicionar_preparada_mb(
     sab_valor: int = 10,
     car_valor: int = 10,
     metadados_por_slug: Optional[Dict[str, Dict[str, Any]]] = None,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
 ) -> Tuple[bool, str]:
-    if not classe_usa_limite_preparadas_mb(slug_classe):
+    if not classe_usa_limite_preparadas_mb(
+        slug_classe,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
+    ):
         return True, ""
     slug = str(magia_slug or "").strip().lower()
     try:
         circ = int(circulo_magia)
     except (TypeError, ValueError):
         circ = 0
-    cmax = circulo_maximo_magias_lancaveis_mb(slug_classe, nivel)
+    cmax = circulo_maximo_magias_lancaveis_mb(
+        slug_classe,
+        nivel,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
+    )
     if circ > cmax:
         return (
             False,
@@ -228,19 +285,34 @@ def validar_adicionar_preparada_mb(
                 False,
                 f"Magia {tipo_mag} incompatível com a lista {tipo_esperado} da classe {slug_classe} (MB).",
             )
-    if exige_grimorio_para_preparar_mb(slug_classe):
+    if exige_grimorio_para_preparar_mb(
+        slug_classe,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
+    ):
         if slug not in _slugs_grimorio(vinculos_existentes):
             return (
                 False,
                 "Só é possível preparar magias que já estão no livro (grimório) do personagem (MB).",
             )
-    elif exige_repertorio_para_preparar_mb(slug_classe) and circ >= 1:
+    elif (
+        exige_repertorio_para_preparar_mb(
+            slug_classe,
+            regra_versao=regra_versao,
+            arcanista_caminho=arcanista_caminho,
+        )
+        and circ >= 1
+    ):
         if slug not in _slugs_conhecidas(vinculos_existentes):
             return (
                 False,
                 "Só é possível preparar magias que já estão no repertório aprendido do personagem (MB).",
             )
-    if circ == 0 and not truques_contam_teto_preparadas_mb(slug_classe):
+    if circ == 0 and not truques_contam_teto_preparadas_mb(
+        slug_classe,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
+    ):
         return True, ""
     teto = teto_preparadas_mb(
         slug_classe,
@@ -251,6 +323,8 @@ def validar_adicionar_preparada_mb(
         int_valor=int_valor,
         sab_valor=sab_valor,
         car_valor=car_valor,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
     )
     if teto is None:
         return True, ""
@@ -258,6 +332,8 @@ def validar_adicionar_preparada_mb(
         vinculos_existentes,
         slug_classe=slug_classe,
         metadados_por_slug=metadados_por_slug,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
     )
     if usado >= teto:
         return (
@@ -336,11 +412,17 @@ def preview_preparadas_mb(
     int_valor: int = 10,
     sab_valor: int = 10,
     car_valor: int = 10,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
 ) -> Dict[str, Any]:
     from app.games.tormenta.rules.catalogo_t20 import metadados_magia_mb_por_slug
 
     vinculos = vinculos or []
-    usa = classe_usa_limite_preparadas_mb(slug_classe)
+    usa = classe_usa_limite_preparadas_mb(
+        slug_classe,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
+    )
     meta: Dict[str, Dict[str, Any]] = {}
     for v in vinculos:
         if not isinstance(v, dict):
@@ -351,7 +433,11 @@ def preview_preparadas_mb(
             if m:
                 meta[sl] = m
     usado = contar_preparadas_no_teto(
-        vinculos, slug_classe=slug_classe, metadados_por_slug=meta
+        vinculos,
+        slug_classe=slug_classe,
+        metadados_por_slug=meta,
+        regra_versao=regra_versao,
+        arcanista_caminho=arcanista_caminho,
     )
     teto = (
         teto_preparadas_mb(
@@ -363,12 +449,15 @@ def preview_preparadas_mb(
             int_valor=int_valor,
             sab_valor=sab_valor,
             car_valor=car_valor,
+            regra_versao=regra_versao,
+            arcanista_caminho=arcanista_caminho,
         )
         if usa
         else None
     )
     mod = 0
-    row = _classe_row(slug_classe)
+    eff = slug_efetivo_tabelas_magia_mb(slug_classe, regra_versao, arcanista_caminho)
+    row = _classe_row(eff)
     if row:
         mod = _mod_habilidade_preparadas(
             slug_classe,
@@ -387,7 +476,19 @@ def preview_preparadas_mb(
         "preparadas_usadas": usado,
         "preparadas_max": teto,
         "mod_habilidade_chave": mod,
-        "truques_contam_teto": truques_contam_teto_preparadas_mb(slug_classe),
-        "exige_grimorio": exige_grimorio_para_preparar_mb(slug_classe),
-        "exige_repertorio": exige_repertorio_para_preparar_mb(slug_classe),
+        "truques_contam_teto": truques_contam_teto_preparadas_mb(
+            slug_classe,
+            regra_versao=regra_versao,
+            arcanista_caminho=arcanista_caminho,
+        ),
+        "exige_grimorio": exige_grimorio_para_preparar_mb(
+            slug_classe,
+            regra_versao=regra_versao,
+            arcanista_caminho=arcanista_caminho,
+        ),
+        "exige_repertorio": exige_repertorio_para_preparar_mb(
+            slug_classe,
+            regra_versao=regra_versao,
+            arcanista_caminho=arcanista_caminho,
+        ),
     }

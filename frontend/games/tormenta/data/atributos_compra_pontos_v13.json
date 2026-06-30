@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "titulo": "Tormenta 20 — compra de atributos v1.3 (Edição Jogo do Ano)",
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Tabela 1-1 p.17",
+    "pontos_iniciais": 10,
+    "base_inicial": 0,
+    "versao_schema": 1
+  },
+  "custos": [
+    { "valor": -2, "custo": 0 },
+    { "valor": -1, "custo": -1 },
+    { "valor": 0, "custo": 0 },
+    { "valor": 1, "custo": 1 },
+    { "valor": 2, "custo": 2 },
+    { "valor": 3, "custo": 4 },
+    { "valor": 4, "custo": 7 }
+  ],
+  "rolagem_4d6_para_atributo": [
+    { "soma_min": 0, "soma_max": 7, "atributo": -2 },
+    { "soma_min": 8, "soma_max": 9, "atributo": -1 },
+    { "soma_min": 10, "soma_max": 11, "atributo": 0 },
+    { "soma_min": 12, "soma_max": 13, "atributo": 1 },
+    { "soma_min": 14, "soma_max": 15, "atributo": 2 },
+    { "soma_min": 16, "soma_max": 17, "atributo": 3 },
+    { "soma_min": 18, "soma_max": 99, "atributo": 4 }
+  ],
+  "soma_minima_seis_atributos_4d6": 6
+}

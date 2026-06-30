@@ -1,0 +1,154 @@
+{
+  "_meta": {
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Obrigações & Restrições p.96–105 (Tabela 1-20).",
+    "nota": "Apenas slugs e rótulos curtos; texto completo no livro. Violação: perde todos PM (p.96); 2ª na aventura → penitência (Religião)."
+  },
+  "por_slug": {
+    "aharadak": {
+      "pagina": 96,
+      "obrigacoes_flags": [
+        { "slug": "abster_crimes_profanacoes", "rotulo": "Abster-se de crimes e profanações" },
+        { "slug": "fascinado_cena_acao_impar", "rotulo": "Início de cena de ação: ímpar no 1d6 = fascinado na 1ª rodada" }
+      ]
+    },
+    "allihanna": {
+      "pagina": 97,
+      "obrigacoes_flags": [
+        { "slug": "nao_usar_armadura_metal", "rotulo": "Proibido armaduras e escudos de metal" },
+        { "slug": "nao_descansar_comunidade_grande", "rotulo": "Em cidade ou maior: não recupera PV/PM ao descansar" }
+      ]
+    },
+    "arsenal": {
+      "pagina": 97,
+      "obrigacoes_flags": [
+        { "slug": "proibir_derrota_combate", "rotulo": "Proibido ser derrotado em combate ou disputa" },
+        { "slug": "proibir_derrota_grupo", "rotulo": "Derrota do grupo também viola as obrigações" }
+      ]
+    },
+    "azgher": {
+      "pagina": 98,
+      "obrigacoes_flags": [
+        { "slug": "cobrir_rosto_sempre", "rotulo": "Rosto sempre coberto (exceto sumo-sacerdote ou funeral)" },
+        { "slug": "doar_20_porcento_tesouro_ouro", "rotulo": "Doar 20% de qualquer tesouro à igreja, em ouro" }
+      ]
+    },
+    "hyninn": {
+      "pagina": 98,
+      "obrigacoes_flags": [
+        { "slug": "nao_recusar_golpe_trapaca", "rotulo": "Não recusar golpe, trapaça ou artimanha (exceto se prejudicar aliados)" },
+        { "slug": "ato_furtivo_diario_sessao", "rotulo": "1 ato furtivo/ousado por dia ou sessão (CD Eng/Lad 15 + ½ nível)" }
+      ]
+    },
+    "kallyadranoch": {
+      "pagina": 98,
+      "obrigacoes_flags": [
+        { "slug": "oferenda_tesouro_subir_nivel", "rotulo": "Ao subir de nível: oferenda = 20% da dif. do dinheiro inicial entre níveis" }
+      ]
+    },
+    "khalmyr": {
+      "pagina": 99,
+      "obrigacoes_flags": [
+        { "slug": "nao_recusar_ajuda_inocente", "rotulo": "Não recusar pedido de ajuda de pessoa inocente" },
+        { "slug": "obedecer_superior_igreja", "rotulo": "Cumprir ordens de devotos de Khalmyr de nível maior" },
+        { "slug": "so_itens_magicos_mesmo_deus", "rotulo": "Só usar itens mágicos permanentes criados por devotos de Khalmyr" }
+      ]
+    },
+    "lena": {
+      "pagina": 99,
+      "obrigacoes_flags": [
+        { "slug": "proibir_dano_letal_pv", "rotulo": "Proibido causar dano letal ou perda de PV" },
+        { "slug": "devota_apenas_mulheres", "rotulo": "Só mulheres podem ser devotas (exceto paladinos de Lena)" },
+        { "slug": "cleriga_parto_antes_poderes", "rotulo": "Clériga deve dar à luz ao menos uma vez antes dos poderes divinos" }
+      ]
+    },
+    "lin_wu": {
+      "pagina": 100,
+      "obrigacoes_flags": [
+        { "slug": "proibir_enganacao_furtividade_ladinagem", "rotulo": "Proibido ações que exijam Enganação, Furtividade ou Ladinagem" }
+      ]
+    },
+    "marah": {
+      "pagina": 101,
+      "obrigacoes_flags": [
+        { "slug": "proibir_dano_pv_condicoes", "rotulo": "Proibido causar dano, perda de PV e condições (exc. enfeitiçado/fascinado/pasmo)" },
+        { "slug": "proibir_violencia_combate", "rotulo": "Em combate: só proteger, curar, fugir, render-se ou aceitar a morte" }
+      ]
+    },
+    "megalokk": {
+      "pagina": 102,
+      "obrigacoes_flags": [
+        { "slug": "proibir_pericias_int_car", "rotulo": "Proibido perícias de INT/CAR (exc. Adestramento e Intimidação)" },
+        { "slug": "proibir_acao_preparada_foco", "rotulo": "Proibido preparar ação, escolher 10/20 em testes e magias sustentadas" }
+      ]
+    },
+    "nimb": {
+      "pagina": 102,
+      "sem_penalidade_obrigacao": true,
+      "obrigacoes_flags": [
+        { "slug": "sem_obrigacoes_perda_pm", "rotulo": "Sem obrigações verdadeiras — nunca perde PM por descumprir O&R" },
+        { "slug": "penalidade_carisma_menos_5", "rotulo": "−5 em testes de perícias baseadas em Carisma" },
+        { "slug": "confuso_cena_acao_1", "rotulo": "Início de cena de ação: 1 no 1d6 = confuso até o fim da cena" }
+      ]
+    },
+    "oceano": {
+      "pagina": 103,
+      "obrigacoes_flags": [
+        { "slug": "armas_permitidas_maritimas", "rotulo": "Só azagaia, lança, tridente e rede como armas" },
+        { "slug": "apenas_armadura_leve", "rotulo": "Apenas armaduras leves" },
+        { "slug": "nao_afastar_oceano_1_mes", "rotulo": "Não ficar afastado do oceano por mais de um mês" }
+      ]
+    },
+    "sszzaas": {
+      "pagina": 103,
+      "obrigacoes_flags": [
+        { "slug": "ato_traicao_intriga_diario_sessao", "rotulo": "1 ato de traição ou intriga/dia ou sessão (CD Eng 15 + ½ nível)" }
+      ]
+    },
+    "tanna_toh": {
+      "pagina": 103,
+      "obrigacoes_flags": [
+        { "slug": "nao_recusar_missao_conhecimento", "rotulo": "Não recusar missão de busca por conhecimento ou informação" },
+        { "slug": "sempre_dizer_verdade", "rotulo": "Sempre dizer a verdade" },
+        { "slug": "nao_recusar_pergunta_direta", "rotulo": "Não recusar responder pergunta direta" },
+        { "slug": "proibir_esconder_conhecimento", "rotulo": "Proibido esconder qualquer conhecimento" }
+      ]
+    },
+    "tenebra": {
+      "pagina": 104,
+      "obrigacoes_flags": [
+        { "slug": "cobrir_corpo_dia_sol", "rotulo": "De dia, cobrir-se inteiramente; nenhuma pele exposta ao sol" }
+      ]
+    },
+    "thwor": {
+      "pagina": 104,
+      "obrigacoes_flags": [
+        { "slug": "identidade_duyshidakk", "rotulo": "Deve ser aceito como duyshidakk (povo goblinoide)" },
+        { "slug": "promover_mundo_como_deve_ser", "rotulo": "Esforçar-se para que o «Mundo Como Deve Ser» domine o continente" },
+        { "slug": "priorizar_alianca_goblinoides", "rotulo": "Priorizar alianças com goblinoides; combate só em último caso" }
+      ]
+    },
+    "thyatis": {
+      "pagina": 105,
+      "obrigacoes_flags": [
+        { "slug": "proibir_matar_inteligentes", "rotulo": "Proibido matar criaturas inteligentes (Int −3 ou maior)" },
+        { "slug": "preferir_dano_nao_letal", "rotulo": "Preferir ataques/armas que incapacitam ou causam dano não letal" }
+      ]
+    },
+    "valkaria": {
+      "pagina": 105,
+      "obrigacoes_flags": [
+        { "slug": "limite_dias_mesma_cidade", "rotulo": "Máx. 2d10+10 dias na mesma cidade, vila ou aldeia" },
+        { "slug": "limite_meses_mesmo_reino", "rotulo": "Máx. 1d4+2 meses no mesmo reino" },
+        { "slug": "proibir_uniao_estavel", "rotulo": "Proibido casar-se ou formar união estável" }
+      ]
+    },
+    "wynna": {
+      "pagina": 105,
+      "obrigacoes_flags": [
+        { "slug": "nao_recusar_ajuda_inocente", "rotulo": "Não recusar pedido de ajuda de alguém inocente" },
+        { "slug": "proibir_matar_seres_magicos", "rotulo": "Proibido matar seres mágicos (elfos, qareen, sílfides…)" },
+        { "slug": "proibir_matar_conjuradores_arcanos", "rotulo": "Proibido matar conjuradores arcanos" }
+      ]
+    }
+  }
+}

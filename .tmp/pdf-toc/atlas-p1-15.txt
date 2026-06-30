@@ -1,0 +1,373 @@
+ O Guia de exploração definitivo do
+maior universo de fantasia do brasil
+    Uma criação de
+
+Guilherme Dei Svaldi
+
+   J. M. Trevisan
+
+  Leonel Caldela
+
+ Marcelo Cassaro
+
+ Rafael Dei Svaldi
+
+
+
+
+ Tornada possível pelo
+
+  apoio de milhares
+
+ de heróis artonianos
+             A Cidade-Muralha de Villent, sempre vigilante,
+frente à Garganta do Troll e às terras da Supremacia Purista
+                     Créditos
+ Desenvolvimento: Dan Ramos, Davide Di Benedetto, Glauco Lessa,
+  Guilherme Dei Svaldi, J.M. Trevisan, Karen Soarele, Leonel Caldela,
+    Lucas Borne, Marcelo Cassaro, Rafael Dei Svaldi, Thiago Rosa.
+   Texto Adicional: Alice Priestly, Camila Gamino, Elisa Guimarães,
+        Felipe Della Corte, Jadir Dei Svaldi, Marielle Zum Bach,
+      Marlon Teske, Momo Soares, Victor Lucky, Vinicius Mendes.
+                             Arte da Capa: Dan Ramos.
+    Arte: André Vazzios, Claudio Pozas, Dan Ramos, Danilo Martins,
+    Danilo “Meowchado” Moraes, Diego Sá, Dora Lauer, Eduardo Pires,
+Erica Awano, Giih Costa, Guilherme Santana, Henrique DLD, Janio Garcia,
+ Joaquin Silva, Juaum, Julio Rocha, Lorenzo Hernandes, Mariana Livraes,
+    Matheus “Birbo” Rocha, Pablo Souza, Pedro “Staztho-Art” Mattos,
+Poliane Almeida, Rafael Pen, Rainer Petter, Rebirth Studio, Ricardo Mango,
+ Rod Reis, Rodrigo Lopes, Samuel Marcelino, Vitor Louzada, Walter Pax.
+                            Cartografia: Bruno Müller.
+                            Heráldica: Danilo Martins.
+           Projeto Gráfico e Direção de Arte: Dan Ramos.
+            Diagramação: Guilherme Dei Svaldi, Karen Soarele.
+     Revisão: Christiano Linzmeier, Emerson Xavier, Leonel Caldela.
+              Revisão Sensível: Alice Priestly, Naomi Maratea.
+                          Editora-chefe: Karen Soarele.
+          Equipe da Jambô: Guilherme Dei Svaldi, Rafael Dei Svaldi, Leonel Caldela,
+    Ana Carolina Gonçalves, André Schwertz, Andrew Frank, Cássia Bellmann, Dan Ramos,
+ Daniel Boff, Davide Di Benedetto, Elisa Guimarães, Freddy Mees, Gislaine Alves, Glauco Lessa,
+   J. M. Trevisan, Julia Rosiello, Karen Soarele, Marcel Reis, Marcelo Cassaro, Marlon Vernes,
+Matheus Tietbohl, Maurício Feijó, Priscilla Souza, Tatiana Gomes, Thiago Rosa e Tiago Guimarães.
+           Tormenta é Copyright © 1999-2023 Leonel Caldela, Marcelo Cassaro,
+     Guilherme Dei Svaldi, Rafael Dei Svaldi e J. M. Trevisan. Todos os direitos reservados.
+
+
+
+
+                         Rua Coronel Genuíno, 209 • Porto Alegre, rs
+                               contato@jamboeditora.com.br
+                                 www.jamboeditora.com.br
+                                                   @jamboeditora
+
+             Todos os direitos desta edição reservados à Jambô Editora. É proibida
+             a reprodução total ou parcial, por quaisquer meios existentes ou que
+             venham a ser criados, sem autorização prévia, por escrito, da editora.
+                    1ª edição: novembro de 2023 | ISBN: 978658863453-0
+                      Dados Internacionais de Catalogação na Publicação
+
+              S969a Svaldi, Guilherme Dei
+              		 Atlas de Arton / Guilherme Dei Svaldi [et al.]; ilustrações
+                    por Dan Ramos [et al.]. -- -- Porto Alegre: Jambô, 2023.
+                      480p. il.
+                      1. Jogos eletrônicos - RPG. I. Svaldi, Guilherme Dei. II.
+                    Ramos, Dan. III. Título.
+                                                                 CDU 794.021
+                                                         Sumário
+A primeira lição............................8            Aslothia..................................... 192     Os Três Mares............................ 355
+                                                         Repúblicas Livres...................... 206           Ubani......................................... 362
+Introdução:
+Boas-vindas a arton............10                        Salistick..................................... 218    Deserto da Perdição................... 372
+Uma Breve História de Arton...... 12                     Svalas......................................... 230   Tamu-ra..................................... 384
+Tempo & Calendário................... 30                 Feudos de Trebuck..................... 234            Moreania................................... 394
+Linha do Tempo........................... 34             Triunphus.................................. 246       Doherimm................................. 406
+                                                         Sckharshantallas........................ 250          Éter Divino................................ 418
+Capítulo 1:                                              Montanhas Sanguinárias........... 262
+O Reinado...........................................44                                                         Capítulo 4:
+Deheon........................................ 52        Montanhas Uivantes................. 267               Organizações.........................422
+Valkaria........................................ 68      Ermos Púrpuras......................... 272           Exércitos & Mercenários........... 424
+Bielefeld....................................... 78      Floresta de Tollon...................... 277          Ordens & Igrejas....................... 431
+Namalkah.................................... 94          Império de Tauron..................... 282            Guildas & Irmandades.............. 439
+Wynlla....................................... 106        Nova Malpetrim........................ 300
+                                                                                                               Capítulo 5:
+Ahlen......................................... 118       Smokestone............................... 306         Vida em Arton...........................446
+Zakharov................................... 134          Ruínas de Tyrondir.................... 312            A Sociedade Artoniana.............. 448
+Pondsmânia............................... 146            Catacumbas de Leverick............ 317                Viagens & Estradas................... 450
+Academia Arcana....................... 160               Capítulo 3:                                           Dinheiro & Comércio................ 453
+Vectora....................................... 165       Além de Arton.........................322             Arte & Cultura.......................... 456
+                                                         Lamnor...................................... 326      Lei & Ordem............................. 465
+Capítulo 2:
+Além dO Reinado....................170                   Khalifor...................................... 338    Vida de Aventureiro.................. 468
+Supremacia Purista.................... 174               Khubar....................................... 342     Apêndice:
+Conflagração do Aço.................. 186                Galrasia...................................... 350    Origens Regionais.............470
+                               A Primeira Lição
+        Sente-se, jovem. Sei que você tem muitas perguntas. Não se preocupe, eu tenho
+    as respostas. Não é preciso ter pressa. Se há alguma coisa que aprendi ao longo dos
+    séculos é isso: tudo que vale a pena ser sabido merece ser aprendido com calma.
+         Como deve me chamar? Meus alunos me chamam de Mestre Luriel.
+    Se acredita que tenho algo a lhe ensinar, pode me chamar assim também.
+    Terei prazer em chamar você de estudante.
+         Então, estudante, vamos começar pelo começo.
+         Arton faz parte de uma Criação maior. O início de tudo é uma história longa,
+    que mais tarde você conhecerá. Por enquanto, o que precisa saber é que Arton
+    possui vinte deuses, que formam o Panteão. Cada uma dessas divindades
+    possui um reino divino, também chamado de “mundo” ou às vezes “Plano”. São
+    dimensões místicas, à parte do mundo material, mas com manifestações físicas.
+    E é isso que torna Arton especial: os mundos dos deuses, incluindo o sol e a lua,
+    orbitam ao redor do nosso.
+         Estamos, eu e você, no centro da Criação.
+         Divindades são fascinantes e poderíamos ter toda uma conversa sobre elas,
+     mas são assunto para outra aula. O tópico de hoje é Arton.
+         O que move este mundo, mais ainda que seus deuses, são seus aventureiros.
+         Nem todos em Arton são aventureiros, claro. A maioria dos habitantes
+     leva vidas simples: são fazendeiros, artesãos, servos. Andando pela vastidão
+     dos reinos, você verá muita gente que não deixa os limites de sua aldeia, que
+     nunca ultrapassou os portões de sua cidade murada. Mas, em meio a esses, há
+     os que anseiam por mais, ou que são obrigados a sair da vida cotidiana. Tudo de
+     importante que acontece em Arton tem a participação de aventureiros.
+          O Reinado, a maior coalizão de nações do continente, só existe por causa
+     desses heróis. Essa aliança foi formada por um propósito nobre: garantir que
+     seus habitantes sempre tenham um lar. Já foi muito maior, sendo composta de
+     quase todos os povos civilizados de Arton Norte. Mas precisou lutar contra os
+     escravistas e conquistadores minotauros nas Guerras Táuricas. Eu mesmo fui um
+      escravo dos minotauros, estudante. A partir desse conflito, formou-se o Império
+      de Tauron. Mais tarde, a odiosa Supremacia Purista se ergueu para exterminar
+      todos os não humanos e o Reinado mais uma vez pegou em armas. A Guerra
+      Artoniana provocou a saída de outros membros da coalizão, incluindo Aslothia,
+      que se tornou uma terra sombria de mortos-vivos governada por um Arquilich.
+          Em todos esses casos, houve a interferência de heróis. Sem aventureiros, as
+      práticas de escravidão dos minotauros nunca teriam sido enfrentadas. Sem
+      aventureiros, a Supremacia Purista teria triunfado.
+          Aventureiros fazem muito mais do que lutar em guerras e resistir a tiranos.
+      Mesmo em suas áreas civilizadas, Arton é perigosa. Vastas extensões de terras
+      selvagens escondem monstros vorazes, cultos profanos, masmorras cheias de
+      armadilhas. Um aventureiro pode passar décadas vagando por Arton sem
+      enfrentar o mesmo tipo de ameaça duas vezes.
+
+
+
+
+8
+        É claro, existem muitas terras além do Reinado,
+                                                             além até mesmo deste continente.
+    A Grande Savana, com sua orgulhosa civilização
+                                                          arcana. O Deserto da Perdição, com
+    suas tempestades de areia que trazem estranhos
+                                                        de outros mundos. Galrasia, a terra
+    esquecida pelo tempo. Tamu-ra, o Império de Jade
+                                                         . A Ilha Nobre, com seus habitantes
+   herdeiros de animais.
+        E precisamos discutir algo que ameaça Arton inte
+                                                               ira. Algo que todo aventureiro
+   teme ou anseia enfrentar — em geral ambos. Esto
+                                                       u falando da Tormenta.
+        Para alguém como eu, parece que tudo começou
+                                                             há meros instantes. A Tempestade
+   Rubra chegou poucas décadas atrás. Mas, depois
+                                                        de sua chegada, tudo mudou. E, eu
+   temo, nada nunca mais será como antes.
+       Áreas de Tormenta são as mais terríveis máculas
+                                                              sobre nosso mundo. São regiões de
+  chuva ácida e sangrenta, paisagens de pesadelos
+                                                       tomadas por demônios. Talvez um dia
+  você enfrente a Tormenta, estudante… mas não hoje
+                                                           . Essa é uma lição mais avançada. E
+  você já sabe: tudo que vale a pena ser sabido mer
+                                                      ece ser aprendido com calma.
+       Se você realmente almeja uma vida maior que as
+                                                             fazendas, aldeias e castelos das
+  pessoas comuns, deverá decidir como fazer isso.
+                                                     E, se existem infinitas ameaças, tenho a
+  felicidade de lhe dizer que também existem infin
+                                                      itas formas de enfrentá-las.
+       Existem armas, armaduras e força bruta. Existe furt
+                                                                ividade e esperteza. Existe
+  magia arcana misteriosa, e magia divina que cana
+                                                       liza o poder do Panteão. Existe ciência
+ revolucionária, engenhocas que rivalizam com os
+                                                      mais potentes feitiços. Cada aventureiro
+ escolhe sua forma de proteger Arton ou é escolhido
+                                                       por uma delas. Isso porque Arton é
+ mais que um mundo mágico — é um mundo maravilh
+                                                           oso. É um mundo de variedade quase
+ incompreensível… e seus habitantes sabem disso.
+      Sei que o que estou falando parece contraditório
+                                                         . Eu mesmo, quando cheguei a Arton
+ tantos séculos atrás, tive essa sensação. Mas ouça
+                                                       minhas palavras e lembre-se delas.
+      Em Arton, o fantástico existe todos os dias, em todo
+                                                               s os lugares. E nunca se torna
+ banal. Sabendo disso, você realmente poderá conh
+                                                       ecer este mundo.
+      E assim concluímos sua primeira lição, estudant
+                                                         e. Agora começa a segunda.
+      Eu poderia passar sua vida inteira falando. Talv
+                                                        ez até minha vida inteira. E talvez
+pudesse assim esgotar meus conhecimentos sobr
+                                                     e este mundo.
+     Mas você não iria entendê-lo.
+     Arton não pode ser apenas recebida, deve ser conq
+                                                           uistada. Essas terras não podem
+ser apenas aprendidas, devem ser exploradas. E o
+                                                     mundo que você descobrir será muito
+diferente do meu. Quando descobrir o que é Arto
+                                                    n para você, notará que já a ama.
+     Então a segunda lição é por sua conta, estudante.
+     Abra a porta. Dê o primeiro passo.
+     Desbrave Arton.
+
+
+
+
+                                                                                                  9
+Introdução
+A
+          rton é um mundo de cidades agitadas e               Mas, se o tempo se estende para trás além da
+          masmorras sombrias, de aventureiros             memória dos mais antigos deuses, se cada fase dessa
+          ousados e vilões cruéis, de alianças            história parece transcorrer com a lentidão das forças
+          honradas e guerras inclementes. Mas,            primordiais, tudo fica mais rápido e imprevisível à
+antes de conhecer as terras, as pessoas e a               medida que os mortais se desenvolvem.
+política de Arton, é preciso saber sua história.              Reinos são fundados e destruídos dentro da
+                                                          mesma geração. Nobres se enfrentam, fazem trégua
+    A trajetória da Criação é repleta de heroísmo,
+                                                          e voltam a guerrear. Alianças são firmadas e dissol-
+horrores, eventos fantásticos e sacrifícios. É uma
+                                                          vidas, inimizades se acendem e se resolvem. Porque,
+saga épica em que deuses e mortais passam por
+                                                          enquanto os povos artonianos crescem e se espalham,
+perigos e provações — e nem sempre saem ilesos,
+                                                          multiplicam-se aqueles que fazem a história se mover:
+ou mesmo vivos. Forças cósmicas deram início a
+tudo que existe, mas não podem controlar aquilo               Heróis.
+que criaram. Divindades deram vida aos mortais e              A história de Arton é uma história de aventuras.
+os guiam, mas ao mesmo tempo são modificadas,             Desde a saga primordial, quando algo passou a existir
+desafiadas e até vencidas por eles. A história de Arton   onde antes não havia nada, até a busca mais recente,
+é a história de suas entidades mais poderosas e de        quando uma jovem acabou de pegar uma espada e
+suas criaturas mais humildes. Todos têm seu papel a       deixar sua fazenda.
+desempenhar… E muitas vezes os papéis se invertem.
+                                                              O início da história artoniana está escrito, mas
+    Ao longo da história de Arton,                        não seu fim.
+houve eras brutais e violentas —
+                                                             Porque, enquanto houver heróis, nunca haverá
+épocas em que apenas os mais fortes
+                                                          um fim verdadeiro.
+prosperavam —, assim como idades
+utópicas, cheias de maravilhas, em que a
+ciência e a arte floresceram. Impérios pare-
+ciam eternos, mas acabaram. Povos passaram
+séculos em desgraça, mas se ergueram.
+                     Uma breve história de Arton
+
+
+     N
+               arrar toda a trajetória artoniana, com          é que alcançá-los envolve segredos, portais místicos
+               suas complexidades, contradições                ou jornadas longuíssimas — nunca fáceis e quase
+               e redemoinhos de eventos, seria                 sempre mortíferas. Mas mesmo as moradas do próprio
+               impossível — ao menos em poucas                 Panteão são deixadas de lado pelos imortais diante do
+     páginas. Este é um resumo conforme os estudos             verdadeiro alvo de seus desejos.
+     mais atuais dos escribas da Caverna do Saber.                 Arton, o centro da Criação.
+     Pesquisas escolhidas para registro especial no                O que antes era disforme foi moldado pelos deuses.
+     Helladarion, o Artefato Vivo, preservador das             E os deuses, por sua vez, descobririam que a fé dos
+     memórias de todos os devotos que dedicaram                habitantes deste mundo era capaz de aumentar ou
+     vidas inteiras a buscar conhecimento.                     diminuir seu poder e até mesmo de fazê-los ascender
+                                                               ou cair. Segundo contam os antigos, a vida surgiu em
+                                                               Arton com uma lágrima de Lena, a Deusa Criança,
+     O Início de Tudo                                          quando ela se entristeceu ao contemplar a superfície
+                                                               estéril e desolada desse mundo. Oceano foi o primeiro
+     (7 bilhões de anos AE a 1007 CE)                          criador, tomando a lágrima e moldando-a habilmen-
+                                                               te em uma miríade de seres para povoar as águas.
+           De antes da Criação até a queda de Sszzaas          Allihanna, a Mãe Natureza, fez com que parte deles
+                                                               deixasse os mares e habitasse as terras emersas. Foi
+     A origem do Panteão                                       então que o bestial Megalokk usou seu poder para
+         No princípio, havia apenas o Nada e o Vazio.          corromper as criações de sua irmã e, a partir dos
+                                                               animais, criou os primeiros monstros.
+         Entidades cósmicas inatingíveis, alheias a tudo,
+     de poder sem limites.                                         A opressão de suas feras titânicas sobre Arton
+                                                               durou até 65 milhões de anos antes da chegada dos
+         Do encontro dessas forças, nasceram as divindades     elfos, quando o restante dos deuses se uniu e resolveu
+     maiores, conhecidas como o Panteão. Capazes de            exterminá-las. Khalmyr, o Juiz Supremo, decretou:
+     moldar o universo à sua vontade, comportavam-se           a partir daquele dia, grandes predadores conhecidos
+     de maneira bem diferente dos pais. Eram criaturas         como lagartos-trovão deveriam habitar apenas regiões
+     imperfeitas, movidas por paixão e fúria. Eram, em         extremas, dando chance para civilizações crescerem e
+     suma, indivíduos. Ao longo das eras, alguns deuses        prosperarem. E assim aconteceu.
+     maiores ascenderam; outros caíram. Seu número,
+     entretanto, jamais mudou: vinte. Sempre vinte.                Até hoje, pouco se sabe sobre o que despertou
+                                                               no Panteão a vontade de criar. Alguns dizem ter sido
+         Antes de o próprio tempo existir, cada membro         vaidade, o impulso de repetir o feito do Nada e do
+     do Panteão ergueu para si um domínio planar, um           Vazio. Outros, que sua motivação foi o simples tédio
+     reino dos deuses. Um mundo espelhando sua                 de uma existência eterna. Seja como for, as coisas
+     natureza, seu caráter, onde a destruição final não        nunca mais foram as mesmas.
+     poderia tocá-lo. Tais lugares se tornariam o descanso
+     final para os mortos de Arton, nobres ou plebeus,
+     heróis ou vilões. Dizem que, exceto quando um             O nascer
+     deus demonstra interesse especial por alguém, a           das civilizações
+     destinação de cada alma é decidida ao acaso. Se será          Arton, tal qual vista por uma criatura voando
+     paraíso ou inferno, isso depende das crenças que          nas alturas mais remotas, assemelha-se a um mar
+     alimentou enquanto viveu.                                 interminável cercado por um céu com um sol e uma
+         Os reinos são Planos flutuando no espaço entre        lua. Da sua imensidão oceânica despontam duas
+     as realidades ou esferas viajando através do éter         enormes massas de terra, além de incontáveis ilhas.
+     divino? É um problema teológico complexo, assunto         Os continentes irmãos são chamados de Lamnor — ou
+     de discussões acaloradas e infindáveis. A única certeza   Arton Sul — e Ramnor — ou Arton Norte. Já foram
+
+
+
+     Introdução
+12
+interligados por uma ponte natural conhecida
+como o Istmo de Hangpharstyth, mas ela foi
+destruída pela fatídica queda de um cometa.
+    Mesmo antes do fim da Era dos
+Monstros, as paragens artonianas foram
+habitadas por seres inteligentes, como
+as crias de Kallyadranoch, o Deus
+dos Dragões. Dragões eram as
+únicas criaturas capazes de rivalizar
+com bestas gigantes, mas no fim
+sofreram o mesmo destino e
+foram exilados. De qualquer
+forma, eram individualistas
+e, até onde se sabe, nunca
+formaram sociedades.
+     Após o declínio dos filhos
+de Megalokk, diversos seres meno-
+res, mas inteligentes e capazes de se
+unir, começaram a surgir. Primeiro,
+Glórienn, a Deusa dos Elfos, criou o
+povo élfico em seu próprio reino divi-
+no. Depois, já em Arton, surgiram as
+fadas, de um sonho louco de Wynna,                                    Aqueles que viriam a dominar
+a Deusa da Magia, ao ouvir os                                    Arton foram criados por Valkaria, a
+sussurros de Nimb, o Deus                                        Deusa da Ambição e da Aventura,
+do Caos, da Sorte e do                                            sempre insatisfeita. De acordo com
+Azar. Os anões, filhos                                            algumas histórias, ela só ficaria
+da paixão de Khalmyr                                              contente quando seus filhos supe-
+e Tenebra, a Deusa                                             rassem os deuses. A humanidade teve
+das Trevas. E diversos                                um começo humilde, em tribos primitivas se
+outros povos, até…                                  escondendo de predadores em cavernas enquanto
+Os humanos.                                    aprendiam a dominar ferramentas. Mas, desse começo
+                                               modesto, os humanos cresceriam e realizariam faça-
+                                               nhas incríveis — para o bem e para o mal.
+                                                    Qual foi o primeiro reino a existir? A resposta
+                                               para essa pergunta se perdeu no tempo. Houve muitos
+                                               falsos começos de civilizações de todo tipo e por todo
+                                               lugar. Em ambos os continentes existem vestígios de
+                                               sociedades que foram destruídas pela fúria da natu-
+                                               reza, pelo duelo de deuses menores ou por maldições
+                                               terríveis. Desses precursores restaram apenas ruínas.
+                                                  Mas, nas verdejantes terras de Arton Sul, muitos
+                                               povos encontrariam um berço fértil onde crescer.
+                                                   A verdade é que, apesar do banimento dos lagar-
+                                               tos-trovão, muitos monstros continuaram a existir.
+                                               Embora não mais dominassem o mundo, tais criaturas
+                                               eram abundantes no norte, limitando o crescimento
+                                               da população e deixando vastidões de terras ermas
+                                               e despovoadas. Em Lamnor, essas ameaças eram
+O Nada e o Vazio, como representados           relativamente mais brandas, mas isso não significa
+pelo pintor élfico Alantharir Edhallas em      que as culturas locais tenham levado uma existência
+afrescos na Catedral de Valkaria               pacata ou livre de privações.
+
+
+
+                                                                        Boas-vindas a Arton
+                                                                                                        13
+

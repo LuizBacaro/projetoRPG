@@ -1,7 +1,9 @@
 {
   "_meta": {
     "fonte": "Tormenta 20 — Módulo Básico (Cap. 5, talentos). Textos resumidos para autocomplete na ficha; expandir conforme mesa.",
-    "nota": "Chave de merge é o nome (case-insensitive) com a lista agregada das classes MB. Itens só neste ficheiro aparecem no catálogo se não estiverem nas tabelas de classe."
+    "nota": "Chave de merge é o nome (case-insensitive) com a lista agregada das classes MB. Itens só neste ficheiro aparecem no catálogo se não estiverem nas tabelas de classe.",
+    "nomenclatura_v13": "Na v1.3 do jogo, «talentos» passam a ser «poderes» (gerais, de classe e concedidos); este catálogo alimenta a UI de Poderes na ficha.",
+    "categorias_v13": ["geral", "combate", "destino", "magia", "concedido", "tormenta", "classe"]
   },
   "itens": [
     {
@@ -203,6 +205,24 @@
       "prerequisitos": "Capacidade de conjurar magias",
       "descricao_resumo": "+2 na CD de resistência de magias de uma escola escolhida (MB).",
       "pagina_referencia": "MB p. 132"
+    },
+    {
+      "nome": "Ataque Poderoso",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "secao": "Ataque",
+      "prerequisitos": "For 13",
+      "descricao_resumo": "Sacrifica precisão por dano extra no ataque corpo a corpo (v1.3 p.125).",
+      "pagina_referencia": "v1.3 p. 125"
+    },
+    {
+      "nome": "Ataque Preciso",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "secao": "Ataque",
+      "prerequisitos": "Des 13, Ataque Poderoso",
+      "descricao_resumo": "Ignora parte da Defesa do alvo com ataques corpo a corpo (v1.3 p.125).",
+      "pagina_referencia": "v1.3 p. 125"
     }
   ]
 }

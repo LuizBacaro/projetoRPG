@@ -30,11 +30,105 @@ _MAGIA_STRING_FIELDS: Tuple[str, ...] = tuple(_MAGIA_FIELD_LIMITS)
 _TALENT_FIELD_LIMITS: Dict[str, int] = {
     "secao": 200,
     "categoria": 80,
+    "categoria_v13": 40,
     "prerequisitos": 500,
     "descricao_resumo": 2000,
     "pagina_referencia": 80,
+    "custo_pm": 4,
 }
-_TALENT_EXTRA_FIELDS: Tuple[str, ...] = tuple(_TALENT_FIELD_LIMITS)
+_TALENT_EXTRA_FIELDS: Tuple[str, ...] = tuple(_TALENT_FIELD_LIMITS) + (
+    "pre_requisitos_v13",
+)
+
+
+def _norm_nome_catalogo(texto: str) -> str:
+    import unicodedata
+
+    s = unicodedata.normalize("NFKD", str(texto or "").strip().lower())
+    return "".join(c for c in s if not unicodedata.combining(c))
+
+
+@lru_cache(maxsize=1)
+def _mapa_armaduras_por_nome() -> Dict[str, Dict[str, Any]]:
+    from app.games.tormenta.rules.catalogo_armaduras_t20 import (
+        lista_armaduras_protecao_catalogo,
+    )
+
+    out: Dict[str, Dict[str, Any]] = {}
+    for row in lista_armaduras_protecao_catalogo():
+        chave = _norm_nome_catalogo(str(row.get("nome", "")))
+        if chave:
+            out[chave] = dict(row)
+    return out
+
+
+_ARMA_OVERLAY_KEYS = (
+    "secao",
+    "custo",
+    "dano_p",
+    "dano_m",
+    "tipo_dano",
+    "critico",
+    "alcance",
+    "peso",
+    "proficiencia",
+    "empunhadura",
+)
+
+
+@lru_cache(maxsize=1)
+def _mapa_armas_v13_por_nome() -> Dict[str, Dict[str, Any]]:
+    from app.games.tormenta.rules.catalogo_armas_v13_t20 import mapa_armas_v13_por_nome
+
+    return mapa_armas_v13_por_nome()
+
+
+def _score_busca_equipamento(qn: str, nome: str) -> tuple[int, str]:
+    """Prioriza match exato, depois prefixo, depois substring (nome mais curto)."""
+    nl = str(nome or "").lower()
+    if nl == qn:
+        return (0, nl)
+    if nl.startswith(qn):
+        return (1, nl)
+    if qn in nl:
+        return (2, nl)
+    return (99, nl)
+
+
+def _enriquecer_equipamento_v13(item: Dict[str, Any]) -> Dict[str, Any]:
+    """Mescla metadados v1.3 de armaduras/armas e calcula espacos de carga."""
+    from app.games.tormenta.rules.carga_t20 import espacos_por_item
+
+    out = dict(item)
+    chave = _norm_nome_catalogo(out.get("nome", ""))
+    arm = _mapa_armaduras_por_nome().get(chave)
+    if arm:
+        out["tipo"] = str(arm.get("tipo", "") or "").strip() or out.get("tipo")
+        out["bonus_ca"] = int(arm.get("bonus_ca", 0) or 0)
+        out["penalidade"] = int(arm.get("penalidade", 0) or 0)
+        if arm.get("peso") and not out.get("peso"):
+            out["peso"] = str(arm.get("peso"))
+        out["regra_versao"] = "v13"
+    arma = _mapa_armas_v13_por_nome().get(chave)
+    if arma:
+        for key in _ARMA_OVERLAY_KEYS:
+            if out.get(key) is None and arma.get(key) is not None:
+                out[key] = arma[key]
+        out["regra_versao"] = "v13"
+    esp = espacos_por_item(
+        {
+            "nome": out.get("nome"),
+            "categoria": out.get("categoria"),
+            "tipo": out.get("tipo"),
+            "espacos": out.get("espacos"),
+        }
+    )
+    out["espacos"] = esp
+    if out.get("regra_versao") is None and (
+        out.get("bonus_ca") is not None or out.get("espacos") is not None
+    ):
+        out["regra_versao"] = "v13"
+    return out
 
 
 @lru_cache(maxsize=1)
@@ -64,20 +158,29 @@ def _carregar_equipamentos() -> List[Dict[str, Any]]:
                 return None
             return t[:mx]
 
-        out.append(
-            {
-                "nome": nome,
-                "categoria": cat,
-                "secao": _s("secao", 200),
-                "custo": _s("custo", 80),
-                "dano_p": _s("dano_p", 40),
-                "dano_m": _s("dano_m", 40),
-                "tipo_dano": _s("tipo_dano", 120),
-                "critico": _s("critico", 80),
-                "alcance": _s("alcance", 80),
-                "peso": _s("peso", 80),
-            }
-        )
+        item: Dict[str, Any] = {
+            "nome": nome,
+            "categoria": cat,
+            "secao": _s("secao", 200),
+            "custo": _s("custo", 80),
+            "dano_p": _s("dano_p", 40),
+            "dano_m": _s("dano_m", 40),
+            "tipo_dano": _s("tipo_dano", 120),
+            "critico": _s("critico", 80),
+            "alcance": _s("alcance", 80),
+            "peso": _s("peso", 80),
+        }
+        for opt in (
+            "tipo",
+            "espacos",
+            "bonus_ca",
+            "penalidade",
+            "proficiencia",
+            "empunhadura",
+        ):
+            if row.get(opt) is not None:
+                item[opt] = row.get(opt)
+        out.append(_enriquecer_equipamento_v13(item))
     return out
 
 
@@ -128,7 +231,11 @@ def filtrar_equipamentos_mb(
     rows = [dict(r) for r in lista_equipamentos_mb_catalogo()]
     qn = (q or "").strip().lower()
     if qn:
-        rows = [r for r in rows if qn in str(r.get("nome", "")).lower()]
+        filtrados = [r for r in rows if qn in str(r.get("nome", "")).lower()]
+        filtrados.sort(
+            key=lambda r: _score_busca_equipamento(qn, str(r.get("nome", "")))
+        )
+        rows = filtrados
     for i, item in enumerate(rows, start=1):
         item["id"] = i
     total = len(rows)
@@ -193,7 +300,11 @@ def lista_talentos_mb_catalogo() -> List[Dict[str, Any]]:
         out.append(item)
 
     out.sort(key=lambda x: str(x["nome"]).lower())
-    return out
+    from app.games.tormenta.rules.poderes_catalogo_v13_t20 import (
+        enriquecer_item_catalogo_poder,
+    )
+
+    return [enriquecer_item_catalogo_poder(r) for r in out]
 
 
 def _haystack_talento_mb(r: Dict[str, Any]) -> str:
@@ -213,12 +324,19 @@ def _haystack_talento_mb(r: Dict[str, Any]) -> str:
 
 
 def filtrar_talentos_mb(
-    q: str | None, skip: int, limit: int
+    q: str | None,
+    skip: int,
+    limit: int,
+    *,
+    categoria_v13: str | None = None,
 ) -> Tuple[List[Dict[str, Any]], int]:
     rows = [dict(r) for r in lista_talentos_mb_catalogo()]
     qn = (q or "").strip().lower()
     if qn:
         rows = [r for r in rows if qn in _haystack_talento_mb(r)]
+    cat_f = str(categoria_v13 or "").strip().lower()
+    if cat_f:
+        rows = [r for r in rows if str(r.get("categoria_v13") or "") == cat_f]
     for i, item in enumerate(rows, start=1):
         item["id"] = i
     total = len(rows)

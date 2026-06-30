@@ -194,3 +194,69 @@ class TormentaPersonagemEquipamentosService:
             vinculos_criados=criados,
             ignorados_duplicados=dup,
         )
+
+    def sincronizar_equipamentos_automaticos_v13(
+        self, personagem_id: int, ficha_json: dict
+    ) -> dict:
+        """Garante vínculos SQL para itens de origem e kit inicial v1.3."""
+        from app.games.tormenta.rules.equipamentos_ficha_v13_t20 import (
+            AUTO_EQUIP_NOTA_PREFIX,
+            listar_equipamentos_sync_v13,
+        )
+
+        desejados = listar_equipamentos_sync_v13(ficha_json)
+        desejados_notas = {e["notas"] for e in desejados}
+
+        rows = (
+            self.db.query(TormentaEquipamentoPersonagem)
+            .filter(TormentaEquipamentoPersonagem.personagem_id == personagem_id)
+            .all()
+        )
+
+        removidos = 0
+        for row in rows:
+            nota = (row.notas or "").strip()
+            if nota.startswith(AUTO_EQUIP_NOTA_PREFIX) and nota not in desejados_notas:
+                self.db.delete(row)
+                removidos += 1
+
+        if removidos:
+            self.db.flush()
+
+        existentes = (
+            self.db.query(TormentaEquipamentoPersonagem)
+            .filter(TormentaEquipamentoPersonagem.personagem_id == personagem_id)
+            .all()
+        )
+        vinculados_equip_ids = {r.equipamento_id for r in existentes}
+        notas_existentes = {
+            (r.notas or "").strip() for r in existentes if (r.notas or "").strip()
+        }
+
+        criados = 0
+        for item in desejados:
+            nota = item["notas"]
+            if nota in notas_existentes:
+                continue
+            nome = str(item.get("nome") or "").strip()
+            if not nome:
+                continue
+            e = self._buscar_ou_criar_equip_por_nome(nome)
+            if e.id in vinculados_equip_ids:
+                continue
+            qtd = int(item.get("quantidade") or 1)
+            self.db.add(
+                TormentaEquipamentoPersonagem(
+                    personagem_id=personagem_id,
+                    equipamento_id=e.id,
+                    quantidade=max(1, min(9999, qtd)),
+                    notas=nota,
+                )
+            )
+            vinculados_equip_ids.add(e.id)
+            criados += 1
+
+        if criados or removidos:
+            commit_with_rollback(self.db)
+
+        return {"vinculos_criados": criados, "vinculos_removidos": removidos}

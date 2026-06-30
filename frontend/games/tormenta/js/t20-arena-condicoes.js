@@ -36,6 +36,8 @@
     }
 
     function rotuloDoInput(inp) {
+        const canon = inp.getAttribute('data-cond-rotulo');
+        if (canon && String(canon).trim()) return String(canon).trim();
         const lb = inp.closest('label');
         if (!lb) return '';
         const t = lb.innerText.replace(/\s+/g, ' ').trim();

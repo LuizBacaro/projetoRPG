@@ -58,6 +58,8 @@ from app.games.tormenta.schemas.progressao import (
 )
 from app.games.tormenta.schemas.talento_personagem import (
     TormentaMigrarTalentosJsonResponse,
+    TormentaPoderAtivarRequest,
+    TormentaPoderAtivarResponse,
     TormentaTalentoPersonagemItem,
     TormentaTalentoVinculoCreate,
 )
@@ -214,6 +216,31 @@ def migrar_talentos_mb_lista_do_json(
 ):
     try:
         return talentos_svc.migrar_talentos_mb_lista_do_json(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/poderes/ativar",
+    response_model=TormentaPoderAtivarResponse,
+    summary="Ativa poder v1.3 debitando PM do pool universal",
+)
+def ativar_poder_personagem(
+    personagem_id: int,
+    payload: TormentaPoderAtivarRequest,
+    talentos_svc: TormentaPersonagemTalentosService = Depends(
+        get_tormenta_personagem_talentos_service
+    ),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return talentos_svc.ativar_poder_com_pm(
+            personagem_id,
+            payload.vinculo_id,
+            custo_pm_override=payload.custo_pm,
+        )
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -465,13 +492,19 @@ def preview_subir_nivel_personagem(
     nivel_alvo: int = Query(
         ..., ge=1, le=40, description="Próximo nível (deve ser atual + 1)."
     ),
+    classe_slug: Optional[str] = Query(
+        None,
+        description="Classe v1.3 que recebe +1 (multiclasse). Omitido = classe principal.",
+    ),
     prog_svc: TormentaPersonagemProgressaoService = Depends(
         get_tormenta_personagem_progressao_service
     ),
     _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
 ):
     try:
-        return prog_svc.preview_subir_nivel(personagem_id, nivel_alvo)
+        return prog_svc.preview_subir_nivel(
+            personagem_id, nivel_alvo, classe_slug=classe_slug
+        )
     except DadosInvalidos as e:
         raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:

@@ -533,9 +533,35 @@
 }
 
 /* Perícias sujeitas a penalidade de armadura (marcação na ficha) */
-.t20-pericias-table tbody tr:has(.p-pen-arm:checked) {
+.t20-pericias-table tbody tr:has(.p-pen-arm:checked),
+.t20-pericias-table tbody tr.t20-pericia-pen-arm-ativa {
     background: rgba(224, 234, 252, 0.55);
     box-shadow: inset 3px 0 0 0 var(--t20-ink);
+}
+
+.t20-pen-arm-cell {
+    white-space: nowrap;
+}
+
+.t20-pen-val {
+    display: inline-block;
+    min-width: 1.5rem;
+    margin-left: 0.15rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #b00020;
+}
+
+.t20-pen-nat {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.2rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+.t20-pen-nat input {
+    margin: 0 0.15rem 0 0;
 }
 
 #f_pts_compra.t20-compra-pontos-ok {
@@ -2224,4 +2250,19 @@
     border: none;
     background: transparent;
     padding: 0.15rem;
+}
+
+.t20-obrig-list {
+    margin: 0;
+    padding-left: 1.15rem;
+    font-size: 0.88rem;
+}
+
+.t20-obrig-list li {
+    margin: 0.15rem 0;
+}
+
+.t20-obrig-pag {
+    font-weight: normal;
+    opacity: 0.85;
 }

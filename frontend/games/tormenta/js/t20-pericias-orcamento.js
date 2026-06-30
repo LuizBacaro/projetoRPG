@@ -31,6 +31,13 @@
         return v;
     }
 
+    function humanoVersatilOrcamento() {
+        const el = q('f_humano_versatil');
+        const v = el && el.value ? String(el.value).trim() : '';
+        if (!v || v === 'duas_pericias') return null;
+        return v;
+    }
+
     function coletarPericiasOrcamento() {
         if (typeof window.coletarPericias === 'function') {
             return window.coletarPericias();
@@ -50,15 +57,42 @@
         return out;
     }
 
+    function getRegraVersaoOrcamento() {
+        if (typeof window.getRegraVersaoAtiva === 'function') {
+            return window.getRegraVersaoAtiva();
+        }
+        return window.T20RegraVersao ? window.T20RegraVersao.DEFAULT_NOVA_FICHA : 'v13';
+    }
+
+    function labelVersaoOrcamento() {
+        return window.T20RegraVersao
+            ? window.T20RegraVersao.labelVersaoCurta(getRegraVersaoOrcamento())
+            : 'MB';
+    }
+
+    function origemBeneficiosOrcamento() {
+        const picks = window.__t20OrigemBeneficios;
+        return Array.isArray(picks) && picks.length ? picks.slice() : null;
+    }
+
     function formatarResumo(p) {
         if (!p || p.vagas_treinadas == null) {
-            return 'Orçamento perícias: selecione classe MB em Editar ficha.';
+            return `Orçamento perícias: selecione classe em Editar ficha (${labelVersaoOrcamento()}).`;
         }
         const tr = `${p.usadas_treinadas}/${p.vagas_treinadas} treinadas`;
+        const ok = p.valido ? 'OK' : 'inválido';
+        const lv = labelVersaoOrcamento();
+        if (window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoOrcamento())) {
+            const cfg = p.pericias_classe_config || p.pericias_classe || {};
+            const vc = cfg.vagas_classe != null ? cfg.vagas_classe : '—';
+            const extraOrig = p.pericias_treinadas_extra_origem
+                ? ` + origem (+${p.pericias_treinadas_extra_origem})`
+                : '';
+            return `Orçamento ${lv} (${ok}): ${tr} · classe ${vc} + INT + racial${extraOrig}.`;
+        }
         const gtr = `${p.gasto_grad_treinadas}/${p.pontos_grad_treinadas} grad. tr.`;
         const gnt = `${p.gasto_grad_nao_treinadas}/${p.pontos_grad_nao_treinadas} grad. n-tr`;
-        const ok = p.valido ? 'OK' : 'inválido';
-        return `Orçamento MB (${ok}): ${tr}; ${gtr}; ${gnt}`;
+        return `Orçamento ${lv} (${ok}): ${tr}; ${gtr}; ${gnt}`;
     }
 
     async function validarPericiasOrcamentoMb() {
@@ -72,7 +106,7 @@
                 hint.className = 't20-hint';
                 hint.textContent = slug
                     ? ''
-                    : 'Orçamento perícias: selecione classe MB em Editar ficha.';
+                    : `Orçamento perícias: selecione classe em Editar ficha (${labelVersaoOrcamento()}).`;
             }
             return { ok: true, preview: null };
         }
@@ -83,6 +117,9 @@
                 int_valor: intValor(),
                 slug_raca: slugRaca() || null,
                 pericias: coletarPericiasOrcamento(),
+                regraVersao: getRegraVersaoOrcamento(),
+                humanoVersatil: humanoVersatilOrcamento(),
+                origem_beneficios: origemBeneficiosOrcamento(),
             });
             if (hint) {
                 hint.textContent = formatarResumo(preview);
@@ -97,7 +134,7 @@
             }
             return {
                 ok: Boolean(preview.valido),
-                msg: preview.motivo || 'Orçamento de perícias MB inválido.',
+                msg: preview.motivo || `Orçamento de perícias inválido (${labelVersaoOrcamento()}).`,
                 preview,
             };
         } catch (e) {
@@ -127,7 +164,7 @@
                 }
             });
         }
-        ['f_nivel', 'f_classe_mb', 'f_raca_select', 'fichaIntResumo'].forEach((id) => {
+        ['f_nivel', 'f_classe_mb', 'f_raca_select', 'fichaIntResumo', 'f_humano_versatil'].forEach((id) => {
             const el = q(id);
             if (el) {
                 el.addEventListener('change', () => validarPericiasOrcamentoMb());

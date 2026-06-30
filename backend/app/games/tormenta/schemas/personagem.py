@@ -53,12 +53,12 @@ class TormentaPersonagemBase(BaseModel):
     foto_url: Optional[str] = Field(None, max_length=2048)
 
     # Padrão 10 em cada (compra por pontos + raça aplicada na ficha; ver ficha_json.atributos_compra).
-    for_valor: int = Field(default=10, ge=0, le=99)
-    des_valor: int = Field(default=10, ge=0, le=99)
-    con_valor: int = Field(default=10, ge=0, le=99)
-    int_valor: int = Field(default=10, ge=0, le=99)
-    sab_valor: int = Field(default=10, ge=0, le=99)
-    car_valor: int = Field(default=10, ge=0, le=99)
+    for_valor: int = Field(default=10, ge=-99, le=99)
+    des_valor: int = Field(default=10, ge=-99, le=99)
+    con_valor: int = Field(default=10, ge=-99, le=99)
+    int_valor: int = Field(default=10, ge=-99, le=99)
+    sab_valor: int = Field(default=10, ge=-99, le=99)
+    car_valor: int = Field(default=10, ge=-99, le=99)
 
     pv_max: int = Field(default=1, ge=0, le=9999)
     pv_atual: Optional[int] = Field(None, ge=-9999, le=9999)

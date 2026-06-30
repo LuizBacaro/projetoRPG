@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "fonte": "Tormenta 20 — Módulo Básico (tendências e panteão).",
-    "tendencias_paginas_mb": "116–119 (grade de alinhamento; rótulos em português do MB).",
-    "divindades_paginas_mb": "120–126 (Os Vinte; ordem alfabética por nome próprio).",
-    "nota": "`slug` em divindades: chave estável para motor futuro (devotos, regras); a ficha e a API de personagem continuam a persistir o texto canónico em `rotulo` no campo `divindade`."
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Tabela 1-20 p.96–109 (Os Vinte).",
+    "tendencias_paginas": "109–111 (alinhamento narrativo).",
+    "divindades_paginas": "96–109",
+    "nota": "`slug` estável para motor; ficha persiste `rotulo` em divindade."
   },
   "tendencias": [
     "Leal e Bondoso",
@@ -17,25 +17,225 @@
     "Caótico e Malvado"
   ],
   "divindades": [
-    { "slug": "aharadak", "rotulo": "Aharadak, Deus da Tormenta" },
-    { "slug": "allihanna", "rotulo": "Allihanna, Deusa da Natureza" },
-    { "slug": "arsenal", "rotulo": "Arsenal, Deus da Guerra" },
-    { "slug": "azgher", "rotulo": "Azgher, Deus do Sol" },
-    { "slug": "hyninn", "rotulo": "Hyninn, Deus da Trapaça" },
-    { "slug": "kallyadranoch", "rotulo": "Kallyadranoch, Deus dos Dragões" },
-    { "slug": "khalmyr", "rotulo": "Khalmyr, Deus da Justiça" },
-    { "slug": "lena", "rotulo": "Lena, Deusa da Vida" },
-    { "slug": "lin_wu", "rotulo": "Lin-Wu, Deus da Honra" },
-    { "slug": "marah", "rotulo": "Marah, Deusa da Paz" },
-    { "slug": "megalokk", "rotulo": "Megalokk, Deus dos Monstros" },
-    { "slug": "nimb", "rotulo": "Nimb, Deus do Caos" },
-    { "slug": "oceano", "rotulo": "Oceano, Deus do Oceano" },
-    { "slug": "sszzaas", "rotulo": "Sszzaas, Deus da Traição" },
-    { "slug": "tanna_toh", "rotulo": "Tanna-Toh, Deusa do Conhecimento" },
-    { "slug": "tenebra", "rotulo": "Tenebra, Deusa da Noite" },
-    { "slug": "thwor", "rotulo": "Thwor, Deus dos Goblinóides" },
-    { "slug": "thyatis", "rotulo": "Thyatis, Deus da Ressurreição" },
-    { "slug": "valkaria", "rotulo": "Valkaria, Deusa da Ambição" },
-    { "slug": "wynna", "rotulo": "Wynna, Deusa da Magia" }
+    {
+      "slug": "aharadak",
+      "rotulo": "Aharadak, Deus da Tormenta",
+      "energia": "negativa",
+      "poderes_concedidos": [
+        "afinidade_com_a_tormenta",
+        "extase_da_loucura",
+        "percepcao_temporal",
+        "rejeicao_divina"
+      ]
+    },
+    {
+      "slug": "allihanna",
+      "rotulo": "Allihanna, Deusa da Natureza",
+      "energia": "positiva",
+      "poderes_concedidos": [
+        "compreender_os_ermos",
+        "dedo_verde",
+        "descanso_natural",
+        "voz_da_natureza"
+      ]
+    },
+    {
+      "slug": "arsenal",
+      "rotulo": "Arsenal, Deus da Guerra",
+      "energia": "qualquer",
+      "poderes_concedidos": [
+        "conjurar_arma",
+        "coragem_total",
+        "fe_guerreira",
+        "sangue_de_ferro"
+      ]
+    },
+    {
+      "slug": "azgher",
+      "rotulo": "Azgher, Deus do Sol",
+      "energia": "positiva",
+      "poderes_concedidos": [
+        "espada_solar",
+        "fulgor_solar",
+        "habitante_do_deserto",
+        "inimigo_de_tenebra"
+      ]
+    },
+    {
+      "slug": "hyninn",
+      "rotulo": "Hyninn, Deus da Trapaça",
+      "energia": "qualquer",
+      "poderes_concedidos": [
+        "apostar_com_o_trapaceiro",
+        "farsa_do_fingidor",
+        "forma_de_macaco",
+        "golpista_divino"
+      ]
+    },
+    {
+      "slug": "kallyadranoch",
+      "rotulo": "Kallyadranoch, Deus dos Dragões",
+      "energia": "negativa",
+      "poderes_concedidos": [
+        "aura_de_medo",
+        "escamas_draconicas",
+        "presas_primordiais",
+        "servos_do_dragao"
+      ]
+    },
+    {
+      "slug": "khalmyr",
+      "rotulo": "Khalmyr, Deus da Justiça",
+      "energia": "positiva",
+      "poderes_concedidos": [
+        "coragem_total",
+        "dom_da_verdade",
+        "espada_justiceira",
+        "reparar_injustica"
+      ]
+    },
+    {
+      "slug": "lena",
+      "rotulo": "Lena, Deusa da Vida",
+      "energia": "positiva",
+      "poderes_concedidos": [
+        "ataque_piedoso",
+        "aura_restauradora",
+        "cura_gentil",
+        "curandeira_perfeita"
+      ]
+    },
+    {
+      "slug": "lin_wu",
+      "rotulo": "Lin-Wu, Deus da Honra",
+      "energia": "qualquer",
+      "poderes_concedidos": [
+        "coragem_total",
+        "kiai_divino",
+        "mente_vazia",
+        "tradicao_de_lin_wu"
+      ]
+    },
+    {
+      "slug": "marah",
+      "rotulo": "Marah, Deusa da Paz",
+      "energia": "positiva",
+      "poderes_concedidos": [
+        "aura_de_paz",
+        "dom_da_esperanca",
+        "palavras_de_bondade",
+        "talento_artistico"
+      ]
+    },
+    {
+      "slug": "megalokk",
+      "rotulo": "Megalokk, Deus dos Monstros",
+      "energia": "negativa",
+      "poderes_concedidos": [
+        "olhar_amedrontador",
+        "presas_primordiais",
+        "urro_divino",
+        "voz_dos_monstros"
+      ]
+    },
+    {
+      "slug": "nimb",
+      "rotulo": "Nimb, Deus do Caos",
+      "energia": "qualquer",
+      "poderes_concedidos": [
+        "extase_da_loucura",
+        "poder_oculto",
+        "sorte_dos_loucos",
+        "transmissao_da_loucura"
+      ]
+    },
+    {
+      "slug": "oceano",
+      "rotulo": "Oceano, Deus do Oceano",
+      "energia": "qualquer",
+      "poderes_concedidos": [
+        "anfibio",
+        "arsenal_das_profundezas",
+        "mestre_dos_mares",
+        "sopro_do_mar"
+      ]
+    },
+    {
+      "slug": "sszzaas",
+      "rotulo": "Sszzaas, Deus da Traição",
+      "energia": "negativa",
+      "poderes_concedidos": [
+        "astucia_da_serpente",
+        "familiar_ofidico",
+        "presas_venenosas",
+        "sangue_ofidico"
+      ]
+    },
+    {
+      "slug": "tanna_toh",
+      "rotulo": "Tanna-Toh, Deusa do Conhecimento",
+      "energia": "qualquer",
+      "poderes_concedidos": [
+        "conhecimento_enciclopedico",
+        "mente_analitica",
+        "pesquisa_abencoada",
+        "voz_da_civilizacao"
+      ]
+    },
+    {
+      "slug": "tenebra",
+      "rotulo": "Tenebra, Deusa da Noite",
+      "energia": "negativa",
+      "poderes_concedidos": [
+        "caricia_sombria",
+        "manto_da_penumbra",
+        "visao_nas_trevas",
+        "zumbificar"
+      ]
+    },
+    {
+      "slug": "thwor",
+      "rotulo": "Thwor, Deus dos Goblinóides",
+      "energia": "qualquer",
+      "poderes_concedidos": [
+        "almejar_o_impossivel",
+        "furia_divina",
+        "olhar_amedrontador",
+        "tropas_duyshidakk"
+      ]
+    },
+    {
+      "slug": "thyatis",
+      "rotulo": "Thyatis, Deus da Ressurreição",
+      "energia": "positiva",
+      "poderes_concedidos": [
+        "ataque_piedoso",
+        "dom_da_imortalidade",
+        "dom_da_profecia",
+        "dom_da_ressurreicao"
+      ]
+    },
+    {
+      "slug": "valkaria",
+      "rotulo": "Valkaria, Deusa da Ambição",
+      "energia": "positiva",
+      "poderes_concedidos": [
+        "almejar_o_impossivel",
+        "armas_da_ambicao",
+        "coragem_total",
+        "liberdade_divina"
+      ]
+    },
+    {
+      "slug": "wynna",
+      "rotulo": "Wynna, Deusa da Magia",
+      "energia": "qualquer",
+      "poderes_concedidos": [
+        "bencao_do_mana",
+        "centelha_magica",
+        "escudo_magico",
+        "teurgista_mistico"
+      ]
+    }
   ]
 }
