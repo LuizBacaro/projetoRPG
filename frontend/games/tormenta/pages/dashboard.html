@@ -1031,7 +1031,7 @@
 <script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
 <script src="/games/tormenta/js/t20-dashboard-poderes-ha-v13.js?v=20260704ha4"></script>
-<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260704ha4"></script>
+<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260704modal"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -2739,7 +2739,6 @@
     function abrirCadastro(tipo) {
         resetFormCadastro(tipo);
         closeOverlay('overlaySeletorTipo');
-        openOverlay('overlayCadastro');
         const t = (tipo || 'jogador').toLowerCase();
         if (t === 'jogador') {
             resetCompraPontosDash();
@@ -2748,6 +2747,7 @@
         if (window.T20DashWizardV13) {
             T20DashWizardV13.onAbrirCadastro();
         }
+        openOverlay('overlayCadastro');
     }
 
     document.getElementById('btnNovoCombatente')?.addEventListener('click', () => {
@@ -2764,12 +2764,6 @@
 
     document.querySelectorAll('[data-close]').forEach((btn) => {
         btn.addEventListener('click', () => closeOverlay(btn.getAttribute('data-close')));
-    });
-
-    document.querySelectorAll('.t20-dash-overlay').forEach((ov) => {
-        ov.addEventListener('click', (e) => {
-            if (e.target === ov) closeOverlay(ov.id);
-        });
     });
 
     document.querySelectorAll('.t20-dash-filtros button[data-tipo]').forEach((btn) => {
