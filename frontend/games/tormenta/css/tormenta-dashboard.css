@@ -305,6 +305,31 @@
     }
 }
 
+.cad-racial-badge {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 0.08rem 0.3rem;
+    border-radius: 4px;
+    margin-top: 0.18rem;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    user-select: none;
+}
+
+.cad-racial-badge--pos {
+    background: rgba(34, 120, 50, 0.1);
+    color: #1e7a36;
+    border: 1px solid rgba(34, 120, 50, 0.28);
+}
+
+.cad-racial-badge--neg {
+    background: rgba(180, 40, 40, 0.1);
+    color: #a02828;
+    border: 1px solid rgba(180, 40, 40, 0.28);
+}
+
 .t20-dash-modal__ft {
     padding: 0.75rem 1rem 1rem;
     border-top: 1px solid var(--t20-grid-line);

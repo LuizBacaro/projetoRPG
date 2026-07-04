@@ -36,9 +36,14 @@
         return String(v).trim().toLowerCase();
     }
 
+    function getCadRacialDeltasPericias() {
+        return (global.__t20GetCadRacialDeltas && global.__t20GetCadRacialDeltas()) || {};
+    }
+
     function intValorFinal() {
         const n = Number(q('cadInt') && q('cadInt').value);
-        return Number.isFinite(n) ? Math.floor(n) : 0;
+        const base = Number.isFinite(n) ? Math.floor(n) : 0;
+        return base + (getCadRacialDeltasPericias().int || 0);
     }
 
     function nivelCadastro() {
