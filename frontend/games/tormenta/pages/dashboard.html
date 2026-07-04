@@ -9,7 +9,7 @@
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260703racial" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260704ha" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -602,14 +602,15 @@
 
             <div class="cad-wizard-step" data-cad-step="2">
                 <div class="t20-dash-form-grid">
-                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapHeroisArton" style="display: none">
-                        <label class="t20-dash-check">
+                    <div class="t20-dash-field t20-dash-field--full t20-dash-ha-toggle" id="cadWrapHeroisArton" style="display: none">
+                        <label class="t20-dash-check" for="cadUsarHeroisArton">
                             <input type="checkbox" id="cadUsarHeroisArton" />
-                            Incluir conteúdo <em>Heróis de Arton</em> (raças, classes variantes, origens)
+                            <span class="t20-dash-check-copy">
+                                Incluir conteúdo <em>Heróis de Arton</em>
+                                <span class="t20-dash-check-meta">(raças, classes variantes, origens)</span>
+                            </span>
                         </label>
-                        <p class="t20-dash-hint" style="margin: 0.35rem 0 0">
-                            Ativa raças e classes do suplemento. Variantes excluem a classe base correspondente.
-                        </p>
+                        <p class="t20-dash-ha-toggle-hint">Variantes excluem a classe base correspondente.</p>
                     </div>
                     <div class="t20-dash-field t20-dash-field--full">
                         <label for="cadClasseMb">Classe MB (BBA / tabela)</label>
@@ -785,6 +786,60 @@
                             </div>
                         </fieldset>
                     </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapDuende" style="display: none">
+                        <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0;padding:0.65rem">
+                            <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Duende — construção modular [HA]</legend>
+                            <p class="t20-dash-hint" style="margin:0 0 0.5rem">Natureza, tamanho, dons, 3 presentes e tabu (Heróis de Arton p.10–13).</p>
+                            <div class="t20-dash-form-grid">
+                                <div class="t20-dash-field">
+                                    <label for="cadDuendeNatureza">1. Natureza *</label>
+                                    <select id="cadDuendeNatureza" class="t20-input"><option value="">— Natureza —</option></select>
+                                </div>
+                                <div class="t20-dash-field" id="cadWrapDuendeNaturezaAttr" style="display:none">
+                                    <label for="cadDuendeNaturezaAttr">Atributo +1 (animal) *</label>
+                                    <select id="cadDuendeNaturezaAttr" class="t20-input"><option value="">— Atributo —</option></select>
+                                </div>
+                                <div class="t20-dash-field">
+                                    <label for="cadDuendeTamanho">2. Tamanho *</label>
+                                    <select id="cadDuendeTamanho" class="t20-input"><option value="">— Tamanho —</option></select>
+                                </div>
+                                <div class="t20-dash-field">
+                                    <label for="cadDuendeDonA">3. Don A (+1) *</label>
+                                    <select id="cadDuendeDonA" class="t20-input"><option value="">— Atributo —</option></select>
+                                </div>
+                                <div class="t20-dash-field">
+                                    <label for="cadDuendeDonB">3. Don B (+1) *</label>
+                                    <select id="cadDuendeDonB" class="t20-input"><option value="">— Atributo —</option></select>
+                                </div>
+                                <div class="t20-dash-field t20-dash-field--full">
+                                    <span class="t20-dash-hint" style="display:block;margin-bottom:0.35rem">4. Presentes (escolha 3) *</span>
+                                    <div id="cadDuendePresentesHost"></div>
+                                    <p id="cadDuendePresentesHint" class="t20-dash-hint" style="margin:0.35rem 0 0"></p>
+                                </div>
+                                <div class="t20-dash-field t20-dash-field--full" id="cadWrapDuendePresentesOpcoes" style="display:none">
+                                    <span class="t20-dash-hint" style="display:block;margin-bottom:0.35rem">Opções dos presentes</span>
+                                    <div id="cadDuendePresentesOpcoesHost" class="t20-dash-form-grid"></div>
+                                </div>
+                                <div class="t20-dash-field t20-dash-field--full">
+                                    <label for="cadDuendeTabuTexto">5. Tabu (texto livre) *</label>
+                                    <input id="cadDuendeTabuTexto" class="t20-input" maxlength="240" placeholder="Ex.: Nunca senta em cadeiras…" />
+                                </div>
+                                <div class="t20-dash-field">
+                                    <label for="cadDuendeTabuPenalidade">Penalidade do tabu *</label>
+                                    <select id="cadDuendeTabuPenalidade" class="t20-input"><option value="">— Perícia −5 —</option></select>
+                                </div>
+                                <div class="t20-dash-field">
+                                    <label style="display:flex;align-items:center;gap:0.45rem;margin-top:1.4rem;cursor:pointer">
+                                        <input type="checkbox" id="cadDuendeGeracaoAleatoria" />
+                                        <span>Geração aleatória (+2 PM)</span>
+                                    </label>
+                                </div>
+                                <div class="t20-dash-field">
+                                    <button type="button" class="tormenta-btn" id="cadBtnDuendeRolar" style="margin-top:1.2rem">Rolar aleatório</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
             </div>
 
@@ -935,6 +990,7 @@
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
 <script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/t20-ha-preferencias.js?v=20260704ha"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260629t01"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
@@ -943,6 +999,7 @@
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704ma"></script>
+<script src="/games/tormenta/js/t20-duende-v13.js?v=20260704du"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260630s01"></script>
@@ -1016,8 +1073,9 @@
     }
 
     async function carregarRacasTormentaDash() {
-        const sup =
-            window.T20RegraVersao && dashSuplementoAtivo()
+        const haRequested =
+            window.T20RegraVersao && dashSuplementoAtivo();
+        const sup = haRequested
                 ? window.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
                 : null;
         try {
@@ -1027,6 +1085,11 @@
             });
             return Array.isArray(d.racas) ? d.racas : [];
         } catch (e1) {
+            if (haRequested && typeof Toast !== 'undefined' && Toast.error) {
+                Toast.error(
+                    'Heróis de Arton: falha ao carregar raças pela API. Usando catálogo core local (sem conteúdo HA).'
+                );
+            }
             const path =
                 DASH_REGRA_VERSAO === 'v13'
                     ? '/games/tormenta/data/racas_v13.json?v=20260629'
@@ -1039,8 +1102,9 @@
     }
 
     async function carregarClassesTormentaDash() {
-        const sup =
-            window.T20RegraVersao && dashSuplementoAtivo()
+        const haRequested =
+            window.T20RegraVersao && dashSuplementoAtivo();
+        const sup = haRequested
                 ? window.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
                 : null;
         try {
@@ -1050,6 +1114,11 @@
             });
             return Array.isArray(d.classes) ? d.classes : [];
         } catch (e1) {
+            if (haRequested && typeof Toast !== 'undefined' && Toast.error) {
+                Toast.error(
+                    'Heróis de Arton: falha ao carregar classes pela API. Usando catálogo core local (sem conteúdo HA).'
+                );
+            }
             const path =
                 DASH_REGRA_VERSAO === 'v13'
                     ? '/games/tormenta/data/classes_v13.json?v=20260629'
@@ -1122,6 +1191,16 @@
             const keysOk1 = ATTR_KEYS_DASH.filter((key) => !excl.includes(key));
             if (c1 && keysOk1.includes(c1)) d[c1] += 2;
         }
+        if (
+            slug === 'duende' &&
+            window.T20DuendeV13 &&
+            typeof window.T20DuendeV13.modificadoresAtributos === 'function'
+        ) {
+            const dm = window.T20DuendeV13.modificadoresAtributos();
+            ATTR_KEYS_DASH.forEach((k) => {
+                d[k] += Number(dm[k] || 0);
+            });
+        }
         return d;
     }
 
@@ -1175,6 +1254,10 @@
 
     // Expõe os deltas raciais para outros módulos (step2, pericias).
     window.__t20GetCadRacialDeltas = () => racialDeltasMapDash();
+    window.__t20AtualizarModRacialDash = () => {
+        aplicarCadRacaSomenteAjustes();
+        atualizarBadgesModRacialDash();
+    };
 
     function atributosCompraDash() {
         // Os inputs agora guardam apenas o valor-base; racial é somado em attrsDoForm.
@@ -1573,6 +1656,9 @@
         atualizarUiMetodoGeracaoDash();
         if (window.T20DashStep2V13 && T20DashStep2V13.atualizarUiPasso2) {
             T20DashStep2V13.atualizarUiPasso2();
+        }
+        if (window.T20DuendeV13 && T20DuendeV13.atualizarUi) {
+            void T20DuendeV13.atualizarUi();
         }
         if (isDashV13() && window.T20TracosRaciaisV13 && slug && slug !== '__livre__') {
             void window.T20TracosRaciaisV13.aplicarTracosRaciaisCadastro(slug);
@@ -2701,6 +2787,12 @@
     }
     (async () => {
         void carregar();
+        const wrapHa = document.getElementById('cadWrapHeroisArton');
+        if (wrapHa) wrapHa.style.display = isDashV13() ? '' : 'none';
+        const cbHa = document.getElementById('cadUsarHeroisArton');
+        if (window.T20HaPreferencias) {
+            window.T20HaPreferencias.aplicarCheckboxHeroisArton(cbHa);
+        }
         try {
             const [racas, classes] = await Promise.all([
                 carregarRacasTormentaDash(),
@@ -2719,12 +2811,17 @@
         bindCadRacialDashOnce();
         onCadRacaSelectChange(false);
         void carregarRegrasCompra();
-        const wrapHa = document.getElementById('cadWrapHeroisArton');
-        if (wrapHa) wrapHa.style.display = isDashV13() ? '' : 'none';
-        const cbHa = document.getElementById('cadUsarHeroisArton');
         if (cbHa && !cbHa.__boundHeroisArton) {
             cbHa.__boundHeroisArton = true;
-            cbHa.addEventListener('change', () => void recarregarCatalogosDashHerois());
+            cbHa.addEventListener('change', () => {
+                if (window.T20HaPreferencias) {
+                    window.T20HaPreferencias.salvarUsarHeroisArton(cbHa.checked);
+                }
+                void recarregarCatalogosDashHerois();
+            });
+        }
+        if (window.T20DuendeV13) {
+            window.T20DuendeV13.init();
         }
         const selClMb = document.getElementById('cadClasseMb');
         if (selClMb && !selClMb.__boundVariantesHa3) {

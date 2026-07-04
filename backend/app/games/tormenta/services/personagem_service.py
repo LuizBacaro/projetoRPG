@@ -19,6 +19,7 @@ from app.games.tormenta.rules.conjuracao_t20 import (
     pontos_magia_maximos_conjuracao,
 )
 from app.games.tormenta.rules.defesa_t20 import defesa_base_ca
+from app.games.tormenta.rules.duende_t20 import validar_duende_ficha
 from app.games.tormenta.rules.melhor_amigo_t20 import validar_melhor_amigo_ficha
 from app.games.tormenta.rules.origens_t20 import (
     sincronizar_pericias_origem_ficha_json,
@@ -454,6 +455,20 @@ class TormentaPersonagemService:
             raise DadosInvalidos(motivo or "Melhor Amigo inválido.")
 
     @staticmethod
+    def _validar_duende_v13(tipo: str, ficha_json: Optional[dict]) -> None:
+        if (tipo or "").lower() != "jogador":
+            return
+        fj = dict(ficha_json or {})
+        if regra_versao_de_ficha(fj) != REGRA_VERSAO_V13:
+            return
+        slug = str(fj.get("raca_tormenta_slug") or "").strip().lower()
+        if slug != "duende" and not fj.get("duende"):
+            return
+        ok, motivo = validar_duende_ficha(fj)
+        if not ok:
+            raise DadosInvalidos(motivo or "Duende inválido.")
+
+    @staticmethod
     def _preparar_ficha_json_tormenta(ficha_json: Optional[dict]) -> dict:
         """Normaliza ficha_json v1.3 (ex.: perícias treinadas pela origem)."""
         fj = dict(ficha_json or {})
@@ -592,6 +607,7 @@ class TormentaPersonagemService:
             payload.tipo, ficha_prep, int(payload.nivel or 1)
         )
         self._validar_melhor_amigo_v13(payload.tipo, ficha_prep)
+        self._validar_duende_v13(payload.tipo, ficha_prep)
         self._validar_devocao_v13(
             payload.tipo,
             ficha_prep,
@@ -687,6 +703,7 @@ class TormentaPersonagemService:
             self._validar_origem_v13(tipo_final, fj)
             self._validar_classes_variantes_v13(tipo_final, fj, nv_final)
             self._validar_melhor_amigo_v13(tipo_final, fj)
+            self._validar_duende_v13(tipo_final, fj)
             div_rot = str(data.get("divindade", ent.divindade) or "").strip() or None
             self._validar_devocao_v13(tipo_final, fj, divindade_rotulo=div_rot)
         fj = self._preparar_ficha_json_tormenta(fj)

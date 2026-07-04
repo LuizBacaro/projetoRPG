@@ -291,6 +291,12 @@ class TormentaRegrasService {
         if (opts.silfideMagias) {
             sp.set('silfide_magias', String(opts.silfideMagias).trim());
         }
+        if (opts.duendeTamanho) {
+            sp.set('duende_tamanho', String(opts.duendeTamanho).trim());
+        }
+        if (opts.duendePresentes) {
+            sp.set('duende_presentes', String(opts.duendePresentes).trim());
+        }
         const res = await fetch(`${this._urlTracosRaciaisPreview()}?${sp}`, { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar traços raciais');
     }
@@ -437,6 +443,27 @@ class TormentaRegrasService {
             headers: this._headers(),
         });
         return this._handleJson(res, 'Erro ao carregar tipos do Melhor Amigo');
+    }
+
+    async obterPresentesDuende() {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/presentes-duende'), {
+            headers: this._headers(),
+        });
+        return this._handleJson(res, 'Erro ao carregar presentes do Duende');
+    }
+
+    async obterDuendeOpcoes() {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/duende-opcoes'), {
+            headers: this._headers(),
+        });
+        return this._handleJson(res, 'Erro ao carregar opções do Duende');
+    }
+
+    async obterDuendeAleatorio() {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/duende-aleatorio'), {
+            headers: this._headers(),
+        });
+        return this._handleJson(res, 'Erro ao rolar Duende aleatório');
     }
 
     /**

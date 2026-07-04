@@ -147,6 +147,10 @@ class TormentaRacaMbItem(BaseModel):
         max_length=500,
         description="Idioma próprio da raça no MB (null = só valkar + INT).",
     )
+    construcao_modular_duende: bool = Field(
+        default=False,
+        description="Heróis de Arton: raça Duende — construção modular em ficha_json.duende.",
+    )
 
 
 class TormentaIdiomaTabelaItem(BaseModel):
@@ -1055,3 +1059,37 @@ class TormentaTipoMelhorAmigoItem(BaseModel):
 
 class TormentaTiposMelhorAmigoResponse(BaseModel):
     tipos: List[TormentaTipoMelhorAmigoItem] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# Heróis de Arton — Duende (raça modular)
+# ---------------------------------------------------------------------------
+
+
+class TormentaPresenteDuendeItem(BaseModel):
+    slug: str = Field(..., max_length=60)
+    nome: str = Field(..., max_length=120)
+    descricao: str = Field(default="", max_length=2000)
+    requer_opcao: Optional[str] = Field(default=None, max_length=40)
+
+
+class TormentaPresentesDuendeResponse(BaseModel):
+    presentes: List[TormentaPresenteDuendeItem] = Field(default_factory=list)
+    qtd_presentes: int = Field(default=3, ge=1, le=6)
+
+
+class TormentaDuendeOpcoesResponse(BaseModel):
+    naturezas: List[Dict[str, Any]] = Field(default_factory=list)
+    tamanhos: List[Dict[str, Any]] = Field(default_factory=list)
+    tabu_penalidades: List[Dict[str, Any]] = Field(default_factory=list)
+    limitacoes_fixas: List[Dict[str, Any]] = Field(default_factory=list)
+    afinidade_elementos: List[Dict[str, Any]] = Field(default_factory=list)
+    maldicao_resistencias: List[Dict[str, Any]] = Field(default_factory=list)
+    maldicao_efeitos: List[Dict[str, Any]] = Field(default_factory=list)
+    formas_selvagem_metamorfose: List[Dict[str, Any]] = Field(default_factory=list)
+    qtd_presentes: int = Field(default=3, ge=1, le=6)
+    pm_bonus_geracao_aleatoria: int = Field(default=2, ge=0)
+
+
+class TormentaDuendeAleatorioResponse(BaseModel):
+    config: Dict[str, Any] = Field(default_factory=dict)

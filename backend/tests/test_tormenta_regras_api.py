@@ -166,9 +166,27 @@ def test_get_regras_racas_v13_herois_arton(client_regras_tormenta):
     )
     assert r.status_code == 200
     body = r.json()
-    assert len(body["racas"]) == 21  # 17 core + 4 suplemento (sem Duende)
+    assert len(body["racas"]) == 22  # 17 core + 5 suplemento (incl. Duende)
     eir = next(x for x in body["racas"] if x["slug"] == "eiradaan")
     assert eir["fonte_catalogo"] == "herois_arton"
+    du = next(x for x in body["racas"] if x["slug"] == "duende")
+    assert du["construcao_modular_duende"] is True
+
+
+def test_get_regras_presentes_duende(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/presentes-duende")
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["presentes"]) == 12
+    assert body["qtd_presentes"] == 3
+
+
+def test_get_regras_duende_opcoes(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/duende-opcoes")
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["naturezas"]) == 3
+    assert len(body["tamanhos"]) == 4
 
 
 def test_get_regras_escolhas_raciais_lefou(client_regras_tormenta):

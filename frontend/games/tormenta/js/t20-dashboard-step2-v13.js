@@ -149,6 +149,9 @@
         if (global.T20MelhorAmigoV13 && global.T20MelhorAmigoV13.atualizarUi) {
             void global.T20MelhorAmigoV13.atualizarUi();
         }
+        if (global.T20DuendeV13 && global.T20DuendeV13.atualizarUi) {
+            void global.T20DuendeV13.atualizarUi();
+        }
         void atualizarPvSugerido(false);
     }
 
@@ -199,6 +202,11 @@
             if (!vMa.ok) return vMa;
         }
 
+        if (global.T20DuendeV13 && typeof global.T20DuendeV13.validar === 'function') {
+            const vDu = global.T20DuendeV13.validar();
+            if (!vDu.ok) return vDu;
+        }
+
         return { ok: true };
     }
 
@@ -238,6 +246,10 @@
             Object.assign(out, global.T20MelhorAmigoV13.lerPayload());
         }
 
+        if (global.T20DuendeV13 && typeof global.T20DuendeV13.lerPayload === 'function') {
+            Object.assign(out, global.T20DuendeV13.lerPayload());
+        }
+
         return out;
     }
 
@@ -268,6 +280,10 @@
         if (global.T20MelhorAmigoV13 && typeof global.T20MelhorAmigoV13.resumo === 'function') {
             const ma = global.T20MelhorAmigoV13.resumo();
             if (ma) parts.push(ma);
+        }
+        if (global.T20DuendeV13 && typeof global.T20DuendeV13.resumo === 'function') {
+            const du = global.T20DuendeV13.resumo();
+            if (du) parts.push(du);
         }
         return parts.join(' · ');
     }
@@ -324,6 +340,7 @@
         if (q('cadArcanistaCaminho')) q('cadArcanistaCaminho').value = '';
         if (global.T20EscolhasRaciaisV13) global.T20EscolhasRaciaisV13.resetCadastro();
         if (global.T20MelhorAmigoV13 && global.T20MelhorAmigoV13.reset) global.T20MelhorAmigoV13.reset();
+        if (global.T20DuendeV13 && global.T20DuendeV13.reset) global.T20DuendeV13.reset();
         if (q('cadHintPvSugerido')) q('cadHintPvSugerido').textContent = '';
     }
 

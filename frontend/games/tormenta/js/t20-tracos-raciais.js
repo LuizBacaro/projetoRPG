@@ -127,6 +127,9 @@
         if (rv === 'v13' && window.T20EscolhasRaciaisV13) {
             Object.assign(opts, window.T20EscolhasRaciaisV13.optsPreviewTracos(slug));
         }
+        if (rv === 'v13' && slug === 'duende' && window.T20DuendeV13) {
+            Object.assign(opts, window.T20DuendeV13.optsPreviewTracos());
+        }
         return regras().obterTracosRaciaisPreview(slug, opts);
     }
 

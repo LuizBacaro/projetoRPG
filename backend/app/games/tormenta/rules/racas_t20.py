@@ -147,6 +147,7 @@ def _processar_racas(
                 "pericias_treinadas_extra": int(
                     row.get("pericias_treinadas_extra", 0) or 0
                 ),
+                "construcao_modular_duende": bool(row.get("construcao_modular_duende")),
             }
         )
     return out

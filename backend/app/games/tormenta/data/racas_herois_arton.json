@@ -5,6 +5,14 @@
   },
   "racas": [
     {
+      "slug": "duende",
+      "nome": "Duende",
+      "fonte_catalogo": "herois_arton",
+      "tipo": "espirito",
+      "construcao_modular_duende": true,
+      "tracos_resumo": "Raça modular: natureza, tamanho, dons, 3 presentes e tabu (p.10–13)."
+    },
+    {
       "slug": "eiradaan",
       "nome": "Eiradaan",
       "fonte_catalogo": "herois_arton",

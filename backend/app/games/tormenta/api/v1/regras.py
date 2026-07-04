@@ -50,6 +50,11 @@ from app.games.tormenta.rules.devocao_divindade_t20 import (
 from app.games.tormenta.rules.dinheiro_inicial_v13_t20 import (
     preview_dinheiro_inicial_v13,
 )
+from app.games.tormenta.rules.duende_t20 import (
+    lista_presentes_duende,
+    opcoes_duende_catalogo,
+    rolar_duende_aleatorio,
+)
 from app.games.tormenta.rules.escolhas_raciais_t20 import escolhas_por_raca
 from app.games.tormenta.rules.kit_inicial_v13_t20 import opcoes_kit_inicial_v13
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
@@ -120,6 +125,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaCustoAtributoItem,
     TormentaDinheiroInicialResponse,
     TormentaDivindadeMbOpcao,
+    TormentaDuendeAleatorioResponse,
+    TormentaDuendeOpcoesResponse,
     TormentaEscolhaRacialAscendenciaItem,
     TormentaEscolhaRacialFonteItem,
     TormentaEscolhaRacialMagiaInataItem,
@@ -145,6 +152,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaPmMulticlassePreviewResponse,
     TormentaPoderValidarPreRequisitosRequest,
     TormentaPoderValidarPreRequisitosResponse,
+    TormentaPresenteDuendeItem,
+    TormentaPresentesDuendeResponse,
     TormentaPvPreviewResponse,
     TormentaRacaMbItem,
     TormentaRegrasAtributosResponse,
@@ -399,6 +408,45 @@ def obter_tipos_melhor_amigo(
 ) -> TormentaTiposMelhorAmigoResponse:
     tipos = [TormentaTipoMelhorAmigoItem(**t) for t in lista_tipos_melhor_amigo()]
     return TormentaTiposMelhorAmigoResponse(tipos=tipos)
+
+
+@router.get(
+    "/presentes-duende",
+    response_model=TormentaPresentesDuendeResponse,
+    summary="12 Presentes de Magia e de Caos (Duende — Heróis de Arton)",
+)
+def obter_presentes_duende(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPresentesDuendeResponse:
+    rows = [TormentaPresenteDuendeItem(**p) for p in lista_presentes_duende()]
+    op = opcoes_duende_catalogo()
+    return TormentaPresentesDuendeResponse(
+        presentes=rows,
+        qtd_presentes=int(op.get("qtd_presentes") or 3),
+    )
+
+
+@router.get(
+    "/duende-opcoes",
+    response_model=TormentaDuendeOpcoesResponse,
+    summary="Opções de construção modular do Duende (Heróis de Arton)",
+)
+def obter_duende_opcoes(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaDuendeOpcoesResponse:
+    op = opcoes_duende_catalogo()
+    return TormentaDuendeOpcoesResponse(**op)
+
+
+@router.get(
+    "/duende-aleatorio",
+    response_model=TormentaDuendeAleatorioResponse,
+    summary="Rola configuração aleatória de Duende (+2 PM bônus)",
+)
+def obter_duende_aleatorio(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaDuendeAleatorioResponse:
+    return TormentaDuendeAleatorioResponse(config=rolar_duende_aleatorio())
 
 
 @router.get(
@@ -838,6 +886,16 @@ def obter_tracos_raciais_preview(
         max_length=200,
         description="Sílfide v1.3: slugs de magias separados por vírgula.",
     ),
+    duende_tamanho: Optional[str] = Query(
+        None,
+        max_length=20,
+        description="Duende HA: minusculo | pequeno | medio | grande.",
+    ),
+    duende_presentes: Optional[str] = Query(
+        None,
+        max_length=300,
+        description="Duende HA: slugs de presentes separados por vírgula.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaTracosRaciaisPreviewResponse:
     per_lefou = None
@@ -855,6 +913,17 @@ def obter_tracos_raciais_preview(
         mag_silfide = [
             p.strip().lower() for p in str(silfide_magias).split(",") if p.strip()
         ]
+    du_cfg = None
+    if duende_tamanho or duende_presentes:
+        pres = []
+        if duende_presentes:
+            pres = [
+                p.strip().lower() for p in str(duende_presentes).split(",") if p.strip()
+            ]
+        du_cfg = {
+            "tamanho_raca": str(duende_tamanho or "medio").strip().lower(),
+            "presentes": pres,
+        }
     data = preview_tracos_raciais(
         slug.strip().lower(),
         regra_versao=regra_versao,
@@ -869,6 +938,7 @@ def obter_tracos_raciais_preview(
         kliren_pericia=kliren_pericia,
         kliren_oficio=kliren_oficio,
         silfide_magias=mag_silfide,
+        duende_config=du_cfg,
     )
     return TormentaTracosRaciaisPreviewResponse(**data)
 

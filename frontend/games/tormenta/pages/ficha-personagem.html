@@ -916,6 +916,59 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="fWrapDuende" style="display: none">
+                                <p class="t20-hint" style="margin: 0 0 0.35rem">
+                                    <strong>Duende</strong> — construção modular (Heróis de Arton)
+                                </p>
+                                <div class="t20-identity-grid t20-identity-grid--compact">
+                                    <div class="t20-ficha-field">
+                                        <label for="f_duende_natureza">Natureza *</label>
+                                        <select id="f_duende_natureza" class="t20-input"><option value="">— Natureza —</option></select>
+                                    </div>
+                                    <div class="t20-ficha-field" id="fWrapDuendeNaturezaAttr" style="display:none">
+                                        <label for="f_duende_natureza_attr">Atributo +1 (animal) *</label>
+                                        <select id="f_duende_natureza_attr" class="t20-input"><option value="">— Atributo —</option></select>
+                                    </div>
+                                    <div class="t20-ficha-field">
+                                        <label for="f_duende_tamanho">Tamanho *</label>
+                                        <select id="f_duende_tamanho" class="t20-input"><option value="">— Tamanho —</option></select>
+                                    </div>
+                                    <div class="t20-ficha-field">
+                                        <label for="f_duende_don_a">Don A (+1) *</label>
+                                        <select id="f_duende_don_a" class="t20-input"><option value="">— Atributo —</option></select>
+                                    </div>
+                                    <div class="t20-ficha-field">
+                                        <label for="f_duende_don_b">Don B (+1) *</label>
+                                        <select id="f_duende_don_b" class="t20-input"><option value="">— Atributo —</option></select>
+                                    </div>
+                                    <div class="t20-ficha-field t20-ficha-field--wide">
+                                        <label>Presentes (3) *</label>
+                                        <div id="f_duende_presentes_host"></div>
+                                        <p id="f_duende_presentes_hint" class="t20-hint" style="margin:0.35rem 0 0"></p>
+                                    </div>
+                                    <div class="t20-ficha-field t20-ficha-field--wide" id="fWrapDuendePresentesOpcoes" style="display:none">
+                                        <label>Opções dos presentes</label>
+                                        <div id="f_duende_presentes_opcoes_host" class="t20-identity-grid t20-identity-grid--compact"></div>
+                                    </div>
+                                    <div class="t20-ficha-field t20-ficha-field--wide">
+                                        <label for="f_duende_tabu_texto">Tabu *</label>
+                                        <input id="f_duende_tabu_texto" class="t20-input" maxlength="240" />
+                                    </div>
+                                    <div class="t20-ficha-field">
+                                        <label for="f_duende_tabu_penalidade">Penalidade do tabu *</label>
+                                        <select id="f_duende_tabu_penalidade" class="t20-input"><option value="">— Perícia −5 —</option></select>
+                                    </div>
+                                    <div class="t20-ficha-field">
+                                        <label style="display:flex;align-items:center;gap:0.45rem;margin-top:1.2rem;cursor:pointer">
+                                            <input type="checkbox" id="f_duende_geracao_aleatoria" />
+                                            <span>Geração aleatória (+2 PM)</span>
+                                        </label>
+                                    </div>
+                                    <div class="t20-ficha-field">
+                                        <button type="button" class="tormenta-btn" id="fBtnDuendeRolar" style="margin-top:1rem">Rolar aleatório</button>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="t20-ficha-field t20-ficha-field--wide" id="wrapDinheiroTabelaV13" style="display: none">
                                 <p class="t20-hint" style="margin: 0 0 0.35rem">
                                     <strong>Dinheiro inicial</strong> — Tabela 3-1 (personagens acima do 1º nível).
@@ -1508,6 +1561,7 @@
 <script src="/games/tormenta/js/t20-origens-v13.js?v=20260629dev"></script>
 <script src="/games/tormenta/js/t20-origem-trocas-ficha-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704"></script>
+<script src="/games/tormenta/js/t20-duende-v13.js?v=20260704du"></script>
 <script src="/games/tormenta/js/t20-kit-inicial-v13.js?v=20260629"></script>
 <script>
 (function () {
@@ -2661,6 +2715,9 @@
         if (window.T20MelhorAmigoV13 && window.T20MelhorAmigoV13.atualizarUi) {
             void window.T20MelhorAmigoV13.atualizarUi();
         }
+        if (window.T20DuendeV13 && window.T20DuendeV13.atualizarUi) {
+            void window.T20DuendeV13.atualizarUi();
+        }
         if (window.T20OrigemTrocasFichaV13 && window.T20OrigemTrocasFichaV13.renderUi) {
             window.T20OrigemTrocasFichaV13.renderUi();
         }
@@ -2752,6 +2809,13 @@
                 idiomas_tabela_mb: Array.isArray(d.idiomas_tabela_mb) ? d.idiomas_tabela_mb : [],
             };
         } catch (e1) {
+            const haAtivo =
+                sup === (window.T20RegraVersao && window.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON);
+            if (haAtivo && typeof Toast !== 'undefined' && Toast.error) {
+                Toast.error(
+                    'Heróis de Arton: falha ao carregar raças pela API. Usando catálogo core local (sem conteúdo HA).'
+                );
+            }
             const path =
                 rv === 'v13'
                     ? '/games/tormenta/data/racas_v13.json?v=20260629'
@@ -2980,6 +3044,18 @@
                 if (!vma.ok) {
                     bloqueado = true;
                     title = vma.msg;
+                }
+            }
+            if (
+                !bloqueado &&
+                window.T20DuendeV13 &&
+                window.T20RegraVersao &&
+                window.T20RegraVersao.isV13(getRegraVersaoAtiva())
+            ) {
+                const vdu = window.T20DuendeV13.validar();
+                if (!vdu.ok) {
+                    bloqueado = true;
+                    title = vdu.msg;
                 }
             }
         }
@@ -6684,6 +6760,7 @@
                     : null,
             ...(window.T20EscolhasRaciaisV13 ? window.T20EscolhasRaciaisV13.lerPayloadFicha() : {}),
             ...(window.T20MelhorAmigoV13 ? window.T20MelhorAmigoV13.lerPayload() : {}),
+            ...(window.T20DuendeV13 ? window.T20DuendeV13.lerPayload() : {}),
             ...(__t20GameSuplementoFicha ? { game_suplemento: __t20GameSuplementoFicha } : {}),
             tormenta_classe_mb_slug: (q('f_classe_mb') && q('f_classe_mb').value) || null,
             arcanista_caminho:
@@ -6817,6 +6894,9 @@
         }
         if (window.T20MelhorAmigoV13 && window.T20MelhorAmigoV13.aplicarPayload) {
             window.T20MelhorAmigoV13.aplicarPayload(j);
+        }
+        if (window.T20DuendeV13 && window.T20DuendeV13.aplicarPayload) {
+            window.T20DuendeV13.aplicarPayload(j);
         }
         if (window.T20OrigemTrocasFichaV13 && window.T20OrigemTrocasFichaV13.renderUi) {
             window.T20OrigemTrocasFichaV13.renderUi();
@@ -7483,6 +7563,13 @@
                 console.warn(eMa);
             }
         }
+        if (window.T20DuendeV13) {
+            try {
+                window.T20DuendeV13.initFicha();
+            } catch (eDu) {
+                console.warn(eDu);
+            }
+        }
         if (window.T20PoderesV13) {
             try {
                 window.T20PoderesV13.init();
@@ -8061,6 +8148,13 @@
                 const vma = window.T20MelhorAmigoV13.validar();
                 if (!vma.ok) {
                     Toast.error(vma.msg);
+                    return;
+                }
+            }
+            if (window.T20DuendeV13 && window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())) {
+                const vdu = window.T20DuendeV13.validar();
+                if (!vdu.ok) {
+                    Toast.error(vdu.msg);
                     return;
                 }
             }

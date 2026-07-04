@@ -7,6 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from app.games.tormenta.rules.duende_t20 import calcular_tracos_duende
 from app.games.tormenta.rules.escolhas_raciais_t20 import aplicar_escolhas_ao_preview
 from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_MB,
@@ -165,6 +166,7 @@ def preview_tracos_raciais(
     kliren_pericia: Optional[str] = None,
     kliren_oficio: Optional[str] = None,
     silfide_magias: Optional[List[str]] = None,
+    duende_config: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Resumo de bônus raciais aplicáveis para a ficha.
@@ -240,7 +242,23 @@ def preview_tracos_raciais(
         "escolhas_resumo": [],
         "pericias_treinadas_escolha": [],
     }
-    base = _enriquecer_tamanho_desloc(base, row)
+    if s == "duende" and isinstance(duende_config, dict) and duende_config:
+        dt = calcular_tracos_duende(duende_config)
+        base["tamanho"] = dt.get("tamanho")
+        base["deslocamento_m"] = dt.get("deslocamento_m")
+        base["furtividade_bonus"] = int(dt.get("furtividade_bonus", 0) or 0)
+        pb = dt.get("pericias_bonus") or {}
+        if isinstance(pb, dict):
+            base["pericias_bonus"] = {str(k): int(v) for k, v in pb.items()}
+        row_tam = {
+            "tamanho": dt.get("tamanho"),
+            "deslocamento_m": dt.get("deslocamento_m"),
+            "deslocamento_pairar_m": dt.get("deslocamento_pairar_m"),
+            "deslocamento_voo_m": dt.get("deslocamento_voo_m"),
+        }
+    else:
+        row_tam = row
+    base = _enriquecer_tamanho_desloc(base, row_tam)
     return aplicar_escolhas_ao_preview(
         base,
         slug,
