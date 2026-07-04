@@ -105,4 +105,30 @@ def listar_poderes_sync_v13(ficha_json: Optional[dict]) -> List[Dict[str, str]]:
         if hvs:
             _add("versatil", hvs)
 
+    raca = str(fj.get("raca_tormenta_slug") or "").strip().lower()
+    if raca == "meio_elfo":
+        ah = str(fj.get("ambicao_herdada_poder_slug") or "").strip()
+        if ah:
+            _add("ambicao_herdada", ah)
+
+    if raca == "duende":
+        from app.games.tormenta.rules.duende_t20 import (
+            lista_presentes_duende,
+            presentes_duende_slugs_ficha,
+        )
+
+        nomes = {p["slug"]: p["nome"] for p in lista_presentes_duende()}
+        for slug in presentes_duende_slugs_ficha(fj):
+            nota = nota_auto_poder_v13("presente_duende", slug)
+            if nota in seen_notas:
+                continue
+            seen_notas.add(nota)
+            out.append(
+                {
+                    "slug": _normalizar_slug(slug),
+                    "nome": nomes.get(slug, slug.replace("_", " ").title()),
+                    "notas": nota,
+                }
+            )
+
     return out

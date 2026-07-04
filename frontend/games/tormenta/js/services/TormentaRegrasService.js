@@ -300,6 +300,15 @@ class TormentaRegrasService {
         if (opts.duendePresentes) {
             sp.set('duende_presentes', String(opts.duendePresentes).trim());
         }
+        if (opts.duendeNatureza) {
+            sp.set('duende_natureza', String(opts.duendeNatureza).trim());
+        }
+        if (opts.duendeTabuPenalidade) {
+            sp.set('duende_tabu_penalidade', String(opts.duendeTabuPenalidade).trim());
+        }
+        if (opts.duendeTabuTexto) {
+            sp.set('duende_tabu_texto', String(opts.duendeTabuTexto).trim());
+        }
         const res = await fetch(`${this._urlTracosRaciaisPreview()}?${sp}`, { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar traços raciais');
     }
@@ -467,6 +476,15 @@ class TormentaRegrasService {
             headers: this._headers(),
         });
         return this._handleJson(res, 'Erro ao rolar Duende aleatório');
+    }
+
+    async calcularDuende(payload) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/duende-calcular'), {
+            method: 'POST',
+            headers: this._headers({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify(payload || {}),
+        });
+        return this._handleJson(res, 'Erro ao calcular Duende');
     }
 
     /**

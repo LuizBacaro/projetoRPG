@@ -138,6 +138,8 @@ def rolar_dano(
             mod_atributo=body.mod_atributo,
             confirmar_critico=body.confirmar_critico,
             aplicar_ao_id=body.aplicar_ao_alvo_id,
+            atacante_id=body.atacante_id,
+            forca_dos_titas=body.forca_dos_titas,
         )
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
@@ -163,6 +165,7 @@ def testar_resistencia_magia(
             conjurador_id=body.conjurador_id,
             magia_slug=body.magia_slug,
             falha_voluntaria=body.falha_voluntaria,
+            efeito_mental=body.efeito_mental,
         )
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)

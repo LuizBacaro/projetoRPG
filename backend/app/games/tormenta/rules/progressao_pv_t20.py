@@ -172,6 +172,10 @@ def pm_bonus_racial_ha_de_ficha(
     raw = str(fj.get("raca_tormenta_slug") or "").strip().lower()
     if raw == "meio_elfo":
         return pm_bonus_meio_elfo(nivel)
+    if raw == "duende":
+        du = fj.get("duende")
+        if isinstance(du, dict) and du.get("geracao_aleatoria"):
+            return 2
     return 0
 
 

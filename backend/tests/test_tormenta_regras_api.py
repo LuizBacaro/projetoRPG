@@ -187,6 +187,29 @@ def test_get_regras_duende_opcoes(client_regras_tormenta):
     body = r.json()
     assert len(body["naturezas"]) == 3
     assert len(body["tamanhos"]) == 4
+    assert body["patamares_troca_poder"] == [5, 10, 15, 20]
+
+
+def test_post_regras_duende_calcular(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/duende-calcular",
+        json={
+            "raca_tormenta_slug": "duende",
+            "duende": {
+                "natureza": "vegetal",
+                "tamanho_raca": "medio",
+                "dons": ["car", "int"],
+                "presentes": ["voo", "invisibilidade", "lingua_da_natureza"],
+                "tabu_texto": "Nunca usa ferro",
+                "tabu_penalidade": "luta",
+            },
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["valido"] is True
+    assert body["tracos"]["presentes_ativos"]
+    assert body["tracos"]["pericias_bonus"]["Luta"] == -5
 
 
 def test_get_regras_escolhas_raciais_lefou(client_regras_tormenta):

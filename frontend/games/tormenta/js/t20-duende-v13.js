@@ -45,11 +45,15 @@
             presentesHint: 'f_duende_presentes_hint',
             wrapOpcoes: 'fWrapDuendePresentesOpcoes',
             opcoesHost: 'f_duende_presentes_opcoes_host',
+            wrapTrocas: 'fWrapDuendeTrocas',
+            trocasHost: 'f_duende_trocas_host',
+            trocasHint: 'f_duende_trocas_hint',
             tabuTexto: 'f_duende_tabu_texto',
             tabuPen: 'f_duende_tabu_penalidade',
             aleatorio: 'f_duende_geracao_aleatoria',
             btnRolar: 'fBtnDuendeRolar',
             racaSel: 'f_raca_select',
+            nivelInput: 'f_nivel',
         },
     };
 
@@ -57,6 +61,7 @@
     let opcoes = null;
     let presentes = [];
     let qtdPresentes = 3;
+    const PATAMARES_TROCA_PADRAO = [5, 10, 15, 20];
 
     function q(id) {
         return document.getElementById(id);
@@ -186,7 +191,19 @@
         const hint = q(ids().presentesHint);
         if (!hint) return;
         const n = presentesMarcados().length;
-        hint.textContent = `${n}/${qtdPresentes} presentes escolhidos.`;
+        const lim =
+            opcoes && Array.isArray(opcoes.limitacoes_fixas)
+                ? opcoes.limitacoes_fixas
+                      .filter((x) => x && x.slug !== 'tabu')
+                      .map((x) => x.nome)
+                      .join(', ')
+                : '';
+        let txt = `${n}/${qtdPresentes} presentes escolhidos.`;
+        if (lim) txt += ` Limitações fixas: ${lim}.`;
+        if (opcoes && opcoes.pm_bonus_geracao_aleatoria) {
+            txt += ` Geração aleatória: +${opcoes.pm_bonus_geracao_aleatoria} PM.`;
+        }
+        hint.textContent = txt;
     }
 
     function renderOpcoesPresentes() {
@@ -285,6 +302,259 @@
         }
     }
 
+    function patamaresTroca() {
+        const p = opcoes && opcoes.patamares_troca_poder;
+        return Array.isArray(p) && p.length ? p.slice() : PATAMARES_TROCA_PADRAO.slice();
+    }
+
+    function nivelPersonagem() {
+        if (ctx !== CONTEXTS.ficha) return 20;
+        const el = q(ids().nivelInput);
+        const n = parseInt(el && el.value, 10);
+        return Number.isFinite(n) && n >= 1 ? n : 1;
+    }
+
+    function isFichaComTrocas() {
+        return ctx === CONTEXTS.ficha && !!q(ids().trocasHost);
+    }
+
+    function prefixOpcoesTroca(nivel) {
+        return `${ids().trocasHost}_troca_${nivel}`;
+    }
+
+    function renderOpcoesTroca(nivel, opcoesSalvas) {
+        const host = document.querySelector(`[data-duende-troca-opcoes="${nivel}"]`);
+        const sel = document.querySelector(`select[data-duende-troca-presente="${nivel}"]`);
+        if (!host || !sel || !opcoes) return;
+        const slug = String(sel.value || '').trim().toLowerCase();
+        const prefix = prefixOpcoesTroca(nivel);
+        const saved = opcoesSalvas && typeof opcoesSalvas === 'object' ? opcoesSalvas : {};
+        const parts = [];
+        if (slug === 'afinidade_elemental') {
+            parts.push(
+                `<div class="t20-dash-field"><label>Afinidade Elemental — elemento</label>` +
+                    `<select id="${prefix}_elem" class="t20-input">` +
+                    (opcoes.afinidade_elementos || [])
+                        .map(
+                            (e) =>
+                                `<option value="${e.slug}">${e.nome || e.slug}</option>`
+                        )
+                        .join('') +
+                    `</select></div>`
+            );
+        }
+        if (slug === 'maldicao') {
+            parts.push(
+                `<div class="t20-dash-field"><label>Maldição — resistência</label>` +
+                    `<select id="${prefix}_mal_res" class="t20-input">` +
+                    (opcoes.maldicao_resistencias || [])
+                        .map((e) => `<option value="${e.slug}">${e.nome}</option>`)
+                        .join('') +
+                    `</select></div>` +
+                    `<div class="t20-dash-field"><label>Maldição — efeito</label>` +
+                    `<select id="${prefix}_mal_efe" class="t20-input">` +
+                    (opcoes.maldicao_efeitos || [])
+                        .map((e) => `<option value="${e.slug}">${e.nome}</option>`)
+                        .join('') +
+                    `</select></div>`
+            );
+        }
+        if (slug === 'metamorfose_animal') {
+            parts.push(
+                `<div class="t20-dash-field"><label>Metamorfose — forma selvagem</label>` +
+                    `<select id="${prefix}_meta" class="t20-input">` +
+                    (opcoes.formas_selvagem_metamorfose || [])
+                        .map((e) => `<option value="${e.slug}">${e.nome}</option>`)
+                        .join('') +
+                    `</select></div>`
+            );
+        }
+        if (!parts.length) {
+            host.innerHTML = '';
+            host.style.display = 'none';
+            return;
+        }
+        host.style.display = '';
+        host.innerHTML = parts.join('');
+        if (saved.afinidade_elemental) {
+            const el = q(`${prefix}_elem`);
+            if (el) el.value = saved.afinidade_elemental;
+        }
+        if (saved.maldicao && typeof saved.maldicao === 'object') {
+            const res = q(`${prefix}_mal_res`);
+            const efe = q(`${prefix}_mal_efe`);
+            if (res && saved.maldicao.resistencia) res.value = saved.maldicao.resistencia;
+            if (efe && saved.maldicao.efeito) efe.value = saved.maldicao.efeito;
+        }
+        if (saved.metamorfose_animal) {
+            const meta = q(`${prefix}_meta`);
+            if (meta) meta.value = saved.metamorfose_animal;
+        }
+        host.querySelectorAll('select').forEach((el) => {
+            el.addEventListener('change', () => notificarMudanca());
+        });
+    }
+
+    function lerOpcoesTroca(nivel) {
+        const out = {};
+        const prefix = prefixOpcoesTroca(nivel);
+        const elem = q(`${prefix}_elem`);
+        if (elem && elem.value) out.afinidade_elemental = elem.value;
+        const res = q(`${prefix}_mal_res`);
+        const efe = q(`${prefix}_mal_efe`);
+        if (res && efe && res.value && efe.value) {
+            out.maldicao = { resistencia: res.value, efeito: efe.value };
+        }
+        const meta = q(`${prefix}_meta`);
+        if (meta && meta.value) out.metamorfose_animal = meta.value;
+        return out;
+    }
+
+    function lerTrocasPoderPresente() {
+        if (!isFichaComTrocas()) return [];
+        const host = q(ids().trocasHost);
+        if (!host) return [];
+        const out = [];
+        host.querySelectorAll('select[data-duende-troca-presente]').forEach((sel) => {
+            const nivel = parseInt(sel.getAttribute('data-duende-troca-presente'), 10);
+            const presente = String(sel.value || '').trim().toLowerCase();
+            if (!presente) return;
+            const entry = { nivel, presente };
+            const op = lerOpcoesTroca(nivel);
+            if (Object.keys(op).length) entry.opcoes = op;
+            out.push(entry);
+        });
+        return out.sort((a, b) => a.nivel - b.nivel);
+    }
+
+    function atualizarHintTrocas() {
+        const hint = q(ids().trocasHint);
+        if (!hint || !isFichaComTrocas()) return;
+        const n = lerTrocasPoderPresente().length;
+        const nv = nivelPersonagem();
+        hint.textContent =
+            n === 0
+                ? `Nível ${nv}: nenhuma troca registrada (opcional).`
+                : `${n} troca(s) registrada(s) · nível do personagem: ${nv}.`;
+    }
+
+    function renderTrocas() {
+        const wrap = q(ids().wrapTrocas);
+        const host = q(ids().trocasHost);
+        if (!isFichaComTrocas()) {
+            if (wrap) wrap.style.display = 'none';
+            return;
+        }
+        if (wrap) wrap.style.display = '';
+        if (!host) return;
+        const curMap = Object.fromEntries(
+            lerTrocasPoderPresente().map((t) => [t.nivel, t])
+        );
+        const nvChar = nivelPersonagem();
+        if (!presentes.length) {
+            host.innerHTML = '<p class="t20-hint" style="margin:0">Carregando presentes…</p>';
+            return;
+        }
+        host.innerHTML = patamaresTroca()
+            .map((nivel) => {
+                const cur = curMap[nivel] || {};
+                const disabled = nvChar < nivel;
+                let opts = '<option value="">— Manter poder de classe —</option>';
+                presentes.forEach((p) => {
+                    const slug = String(p.slug || '').trim().toLowerCase();
+                    opts +=
+                        `<option value="${slug}" ${cur.presente === slug ? 'selected' : ''}>` +
+                        `${p.nome || slugParaLabel(slug)}</option>`;
+                });
+                return (
+                    `<div class="t20-duende-troca-row" data-duende-troca-nivel="${nivel}" ` +
+                    `style="margin:.4rem 0;padding:.35rem 0;border-bottom:1px solid rgba(128,128,128,.25)">` +
+                    `<div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center">` +
+                    `<label style="min-width:4.2rem;font-weight:600">Nível ${nivel}</label>` +
+                    `<select data-duende-troca-presente="${nivel}" class="t20-input" ` +
+                    `${disabled ? 'disabled' : ''} style="flex:1;min-width:12rem">${opts}</select>` +
+                    (disabled
+                        ? '<span class="t20-hint">(disponível ao atingir este nível)</span>'
+                        : '') +
+                    `</div>` +
+                    `<div data-duende-troca-opcoes="${nivel}" style="margin-top:.35rem"></div>` +
+                    `</div>`
+                );
+            })
+            .join('');
+        host.querySelectorAll('select[data-duende-troca-presente]').forEach((sel) => {
+            const nivel = parseInt(sel.getAttribute('data-duende-troca-presente'), 10);
+            const cur = curMap[nivel];
+            renderOpcoesTroca(nivel, cur && cur.opcoes);
+            sel.addEventListener('change', () => {
+                renderOpcoesTroca(nivel);
+                atualizarHintTrocas();
+                notificarMudanca();
+            });
+        });
+        atualizarHintTrocas();
+    }
+
+    function aplicarTrocas(trocas) {
+        if (!isFichaComTrocas()) return;
+        renderTrocas();
+        const map = Object.fromEntries(
+            (Array.isArray(trocas) ? trocas : []).map((t) => [Number(t.nivel), t])
+        );
+        patamaresTroca().forEach((nivel) => {
+            const sel = document.querySelector(`select[data-duende-troca-presente="${nivel}"]`);
+            if (!sel) return;
+            const row = map[nivel];
+            sel.value = row && row.presente ? row.presente : '';
+            renderOpcoesTroca(nivel, row && row.opcoes);
+        });
+        atualizarHintTrocas();
+    }
+
+    function validarTrocas() {
+        if (!isFichaComTrocas()) return { ok: true };
+        const trocas = lerTrocasPoderPresente();
+        const seen = new Set();
+        const nvChar = nivelPersonagem();
+        for (const t of trocas) {
+            if (seen.has(t.nivel)) {
+                return { ok: false, msg: 'Duende: patamar duplicado na troca poder→presente.' };
+            }
+            seen.add(t.nivel);
+            if (nvChar < t.nivel) {
+                return {
+                    ok: false,
+                    msg: `Duende: troca no nível ${t.nivel} exige personagem de nível ${t.nivel} ou superior.`,
+                };
+            }
+            if (t.presente === 'afinidade_elemental' && !(t.opcoes && t.opcoes.afinidade_elemental)) {
+                return {
+                    ok: false,
+                    msg: `Duende: troca no nível ${t.nivel} — Afinidade Elemental exige elemento.`,
+                };
+            }
+            if (
+                t.presente === 'maldicao' &&
+                !(t.opcoes && t.opcoes.maldicao && t.opcoes.maldicao.resistencia && t.opcoes.maldicao.efeito)
+            ) {
+                return {
+                    ok: false,
+                    msg: `Duende: troca no nível ${t.nivel} — Maldição exige resistência e efeito.`,
+                };
+            }
+            if (
+                t.presente === 'metamorfose_animal' &&
+                !(t.opcoes && t.opcoes.metamorfose_animal)
+            ) {
+                return {
+                    ok: false,
+                    msg: `Duende: troca no nível ${t.nivel} — Metamorfose Animal exige forma selvagem.`,
+                };
+            }
+        }
+        return { ok: true };
+    }
+
     function atualizarUiNaturezaAttr() {
         const wrap = q(ids().wrapNatAttr);
         const nat = q(ids().natureza);
@@ -295,7 +565,11 @@
 
     function notificarMudanca() {
         if (global.T20TracosRaciaisV13 && isDuendeSelecionado()) {
-            void global.T20TracosRaciaisV13.aplicarTracosRaciaisCadastro('duende');
+            if (ctx === CONTEXTS.ficha) {
+                void global.T20TracosRaciaisV13.aplicarTracosRaciais('duende');
+            } else {
+                void global.T20TracosRaciaisV13.aplicarTracosRaciaisCadastro('duende');
+            }
         }
         if (typeof global.__t20AtualizarModRacialDash === 'function') {
             global.__t20AtualizarModRacialDash();
@@ -338,6 +612,7 @@
         popularSelectAttrs(q(ids().donA), q(ids().donA) && q(ids().donA).value);
         popularSelectAttrs(q(ids().donB), q(ids().donB) && q(ids().donB).value);
         renderPresentes();
+        renderTrocas();
         atualizarUiNaturezaAttr();
     }
 
@@ -367,11 +642,21 @@
     function optsPreviewTracos() {
         if (!isDuendeSelecionado()) return {};
         const tam = q(ids().tamanho) && q(ids().tamanho).value;
-        const pres = presentesMarcados();
-        return {
+        const pres = presentesMarcados().slice();
+        lerTrocasPoderPresente().forEach((t) => {
+            if (t.presente && !pres.includes(t.presente)) pres.push(t.presente);
+        });
+        const out = {
             duendeTamanho: tam || 'medio',
             duendePresentes: pres.join(','),
         };
+        const nat = q(ids().natureza) && q(ids().natureza).value;
+        if (nat) out.duendeNatureza = nat;
+        const pen = q(ids().tabuPen) && q(ids().tabuPen).value;
+        if (pen) out.duendeTabuPenalidade = pen;
+        const tabu = q(ids().tabuTexto) && q(ids().tabuTexto).value.trim();
+        if (tabu) out.duendeTabuTexto = tabu;
+        return out;
     }
 
     function validar() {
@@ -407,6 +692,8 @@
         }
         const pen = (q(ids().tabuPen) && q(ids().tabuPen).value) || '';
         if (!pen) return { ok: false, msg: 'Duende: escolha a penalidade do tabu.' };
+        const vt = validarTrocas();
+        if (!vt.ok) return vt;
         return { ok: true };
     }
 
@@ -431,6 +718,10 @@
         if (String(out.duende.natureza || '').toLowerCase() === 'animal') {
             out.duende.natureza_atributo =
                 (q(ids().naturezaAttr) && q(ids().naturezaAttr).value) || null;
+        }
+        if (isFichaComTrocas()) {
+            const trocas = lerTrocasPoderPresente();
+            if (trocas.length) out.duende.trocas_poder_presente = trocas;
         }
         return out;
     }
@@ -459,6 +750,7 @@
                 });
             }
             aplicarPresentesOpcoes(du.presentes_opcoes || {});
+            aplicarTrocas(du.trocas_poder_presente || []);
             atualizarHintPresentes();
         });
     }
@@ -472,6 +764,8 @@
         if (tam) parts.push(tam.textContent);
         const n = presentesMarcados().length;
         if (n) parts.push(`${n} presente(s)`);
+        const nt = lerTrocasPoderPresente().length;
+        if (nt) parts.push(`${nt} troca(s)`);
         return parts.join(' · ');
     }
 
@@ -493,6 +787,8 @@
         if (host) host.innerHTML = '';
         const op = q(ids().opcoesHost);
         if (op) op.innerHTML = '';
+        const th = q(ids().trocasHost);
+        if (th) th.innerHTML = '';
     }
 
     async function rolarAleatorio() {
@@ -523,6 +819,14 @@
                 q(id)?.addEventListener('change', () => notificarMudanca());
             });
             q(c.btnRolar)?.addEventListener('click', () => void rolarAleatorio());
+            if (c.nivelInput) {
+                q(c.nivelInput)?.addEventListener('change', () => {
+                    if (ctx === CONTEXTS.ficha && isDuendeSelecionado()) {
+                        renderTrocas();
+                        notificarMudanca();
+                    }
+                });
+            }
         });
     }
 

@@ -28,20 +28,28 @@
       "vontade_bonus": 0,
       "pericias_bonus": {},
       "magia_instintiva": true,
-      "notas": "Magia Instintiva: atributo-chave de magia arcana substituído por Sab. Canção da Melancolia: desvantagem em Vontade vs efeitos mentais."
+      "sentidos_misticos": true,
+      "cancao_melancolia": true,
+      "pm_aprimoramento_conjuracao": 1,
+      "visao_penumbra": true,
+      "notas": "Magia Instintiva: atributo-chave de magia arcana substituído por Sab. Canção da Melancolia: pior de 2d20 em Vontade vs efeitos mentais."
     },
     "galokk": {
       "tamanho": "grande",
       "deslocamento_m": 9,
-      "ca_bonus": 0,
-      "ataque_bonus": 0,
+      "ca_bonus": -1,
+      "ataque_bonus": 1,
+      "manobra_bonus": 2,
+      "armas_aumentadas": true,
       "furtividade_bonus": -4,
       "fortitude_bonus": 0,
       "reflexos_bonus": 0,
       "vontade_bonus": 0,
       "pericias_bonus": {},
       "pericias_treinadas_extra": 1,
-      "notas": "Tamanho Grande: bônus de manobra calculados pelo motor de combate. Força dos Titãs: dado extra de dano quando resultado máximo."
+      "forca_dos_titas": true,
+      "tipo_criatura": "humanoide_gigante",
+      "notas": "Tamanho Grande (Tabela 1-21). Força dos Titãs: dado extra de dano quando resultado máximo (1 PM, limite = mod. Força)."
     },
     "meio_elfo": {
       "tamanho": "medio",
@@ -54,7 +62,9 @@
       "vontade_bonus": 0,
       "pericias_bonus": {},
       "pm_bonus_por_nivel_impar": true,
-      "notas": "+1 PM a cada nível ímpar (cumulative: nível 1 → +1 PM, nível 3 → +2 PM, ..., nível n ímpar → +(n+1)/2 PM). Considerado elfo."
+      "considerado_elfo": true,
+      "ambicao_herdada": true,
+      "notas": "+1 PM a cada nível ímpar. Ambição Herdada: 1 poder geral ou único de origem na criação. Considerado elfo."
     },
     "satiro": {
       "tamanho": "medio",
@@ -68,6 +78,7 @@
       "pericias_bonus": {
         "Atuação": 2
       },
+      "instrumentista_magico": true,
       "notas": "Instrumentista Mágico: pode lançar magias usando instrumento em mãos como componente."
     }
   }

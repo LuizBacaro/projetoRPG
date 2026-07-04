@@ -93,8 +93,17 @@
         if (td) parts.push(td);
         if (data.ca_bonus) {
             const tamHint = data.tamanho_label || 'raça';
-            parts.push(`CA +${data.ca_bonus} (${tamHint})`);
+            const sinal = data.ca_bonus > 0 ? '+' : '';
+            parts.push(`CA ${sinal}${data.ca_bonus} (${tamHint})`);
+        } else if (data.ca_bonus < 0) {
+            parts.push(`CA ${data.ca_bonus} (${data.tamanho_label || 'Grande'})`);
         }
+        if (data.ataque_bonus) parts.push(`Ataque +${data.ataque_bonus} (tamanho)`);
+        if (data.manobra_bonus) {
+            const sinal = data.manobra_bonus > 0 ? '+' : '';
+            parts.push(`Manobras ${sinal}${data.manobra_bonus}`);
+        }
+        if (data.armas_aumentadas) parts.push('Armas aumentadas');
         if (data.ca_vs_grande_ou_maior) parts.push(`CA +${data.ca_vs_grande_ou_maior} vs Grande+`);
         if (data.fortitude_bonus) parts.push(`Fort +${data.fortitude_bonus}`);
         if (data.reflexos_bonus) parts.push(`Ref +${data.reflexos_bonus}`);

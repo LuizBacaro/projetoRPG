@@ -49,6 +49,12 @@ class TormentaCombateRolarDanoRequest(BaseModel):
     mod_atributo: int = Field(0, ge=-99, le=99)
     confirmar_critico: bool = False
     aplicar_ao_alvo_id: Optional[int] = None
+    atacante_id: Optional[int] = Field(
+        None, description="Opcional: aplica Força dos Titãs se Galokk e flag ativa."
+    )
+    forca_dos_titas: bool = Field(
+        False, description="Gasta 1 PM — dado extra no dano máximo (Galokk)."
+    )
 
 
 class TormentaCombateTestarResistenciaMagiaRequest(BaseModel):
@@ -67,3 +73,7 @@ class TormentaCombateTestarResistenciaMagiaRequest(BaseModel):
         description="Opcional: infere tipo de teste do catálogo MB.",
     )
     falha_voluntaria: bool = False
+    efeito_mental: bool = Field(
+        False,
+        description="Eiradaan: Canção da Melancolia (pior de 2d20 em Vontade).",
+    )

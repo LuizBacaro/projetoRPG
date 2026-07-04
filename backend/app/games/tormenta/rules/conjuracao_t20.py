@@ -418,3 +418,30 @@ def texto_custo_pm_por_circulo_mb(regra_versao: Optional[str] = None) -> str:
             "1º: 1 PM; 2º: 3; 3º: 6; 4º: 10; 5º: 15. Truques via aprimoramento (0 PM)."
         )
     return "Truque (círculo 0): 0 PM. Círculo C≥1: C PM."
+
+
+def pm_aprimoramento_bonus_racial(slug_raca: Optional[str]) -> int:
+    """PM extra para aprimoramentos ao lançar magia (Eiradaan: +1)."""
+    from app.games.tormenta.rules.tracos_raciais_t20 import tracos_mecanicos_por_slug
+
+    row = tracos_mecanicos_por_slug(slug_raca, REGRA_VERSAO_V13)
+    if not row:
+        return 0
+    return int(row.get("pm_aprimoramento_conjuracao", 0) or 0)
+
+
+def instrumentista_magico_racial(slug_raca: Optional[str]) -> bool:
+    """True se a raça pode conjurar via instrumento (Sátiro)."""
+    from app.games.tormenta.rules.tracos_raciais_t20 import tracos_mecanicos_por_slug
+
+    row = tracos_mecanicos_por_slug(slug_raca, REGRA_VERSAO_V13)
+    return bool(row and row.get("instrumentista_magico"))
+
+
+def pode_conjurar_via_instrumento(
+    slug_raca: Optional[str],
+    *,
+    instrumento_empunhado: bool,
+) -> bool:
+    """Instrumentista Mágico exige instrumento em mãos."""
+    return instrumentista_magico_racial(slug_raca) and bool(instrumento_empunhado)

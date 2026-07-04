@@ -87,6 +87,29 @@ def _raca_slug_de_ficha(ficha_json: Optional[dict]) -> Optional[str]:
     return normalizar_slug_poder_ha(raw)
 
 
+def racas_que_atendem_exigencia(raca_ficha: str) -> set[str]:
+    """Slugs de raça equivalentes (ex.: meio_elfo → também elfo)."""
+    from app.games.tormenta.rules.tracos_raciais_t20 import tracos_mecanicos_por_slug
+
+    s = normalizar_slug_poder_ha(raca_ficha)
+    if not s:
+        return set()
+    out = {s}
+    row = tracos_mecanicos_por_slug(s, "v13")
+    if row and row.get("considerado_elfo"):
+        out.add("elfo")
+    return out
+
+
+def raca_atende_exigencia(raca_exigida: str, raca_ficha: Optional[str]) -> bool:
+    req = normalizar_slug_poder_ha(raca_exigida)
+    if not req:
+        return True
+    if not raca_ficha:
+        return False
+    return req in racas_que_atendem_exigencia(raca_ficha)
+
+
 def _classes_slugs_de_ficha(ficha_json: Optional[dict]) -> set[str]:
     fj = dict(ficha_json or {})
     slugs: set[str] = set()
@@ -179,7 +202,7 @@ def _poder_elegivel_ficha(row: Dict[str, Any], ficha_json: Optional[dict]) -> bo
     raca_req = str(row.get("raca_exigida") or "").strip()
     if raca_req:
         raca_ficha = _raca_slug_de_ficha(ficha_json)
-        if not raca_ficha or raca_ficha != normalizar_slug_poder_ha(raca_req):
+        if not raca_ficha or not raca_atende_exigencia(raca_req, raca_ficha):
             return False
     classe_req = str(row.get("classe_exigida") or "").strip()
     if classe_req:

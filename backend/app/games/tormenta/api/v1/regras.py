@@ -51,6 +51,7 @@ from app.games.tormenta.rules.dinheiro_inicial_v13_t20 import (
     preview_dinheiro_inicial_v13,
 )
 from app.games.tormenta.rules.duende_t20 import (
+    calcular_duende,
     lista_presentes_duende,
     opcoes_duende_catalogo,
     rolar_duende_aleatorio,
@@ -126,6 +127,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaDinheiroInicialResponse,
     TormentaDivindadeMbOpcao,
     TormentaDuendeAleatorioResponse,
+    TormentaDuendeCalcularRequest,
+    TormentaDuendeCalcularResponse,
     TormentaDuendeOpcoesResponse,
     TormentaEscolhaRacialAscendenciaItem,
     TormentaEscolhaRacialFonteItem,
@@ -447,6 +450,23 @@ def obter_duende_aleatorio(
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaDuendeAleatorioResponse:
     return TormentaDuendeAleatorioResponse(config=rolar_duende_aleatorio())
+
+
+@router.post(
+    "/duende-calcular",
+    response_model=TormentaDuendeCalcularResponse,
+    summary="Resume mecânicas do Duende (traços, limitações, PM bônus)",
+)
+def calcular_duende_regras(
+    body: TormentaDuendeCalcularRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaDuendeCalcularResponse:
+    fj = {
+        "raca_tormenta_slug": str(body.raca_tormenta_slug or "duende").strip().lower(),
+        "duende": dict(body.duende or {}),
+    }
+    data = calcular_duende(fj) or {}
+    return TormentaDuendeCalcularResponse(**data)
 
 
 @router.get(
@@ -903,6 +923,21 @@ def obter_tracos_raciais_preview(
         max_length=300,
         description="Duende HA: slugs de presentes separados por vírgula.",
     ),
+    duende_natureza: Optional[str] = Query(
+        None,
+        max_length=20,
+        description="Duende HA: animal | vegetal | mineral.",
+    ),
+    duende_tabu_penalidade: Optional[str] = Query(
+        None,
+        max_length=20,
+        description="Duende HA: diplomacia | iniciativa | luta | percepcao.",
+    ),
+    duende_tabu_texto: Optional[str] = Query(
+        None,
+        max_length=200,
+        description="Duende HA: texto do tabu (para resumo no preview).",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaTracosRaciaisPreviewResponse:
     per_lefou = None
@@ -921,7 +956,7 @@ def obter_tracos_raciais_preview(
             p.strip().lower() for p in str(silfide_magias).split(",") if p.strip()
         ]
     du_cfg = None
-    if duende_tamanho or duende_presentes:
+    if duende_tamanho or duende_presentes or duende_natureza or duende_tabu_penalidade:
         pres = []
         if duende_presentes:
             pres = [
@@ -931,6 +966,12 @@ def obter_tracos_raciais_preview(
             "tamanho_raca": str(duende_tamanho or "medio").strip().lower(),
             "presentes": pres,
         }
+        if duende_natureza:
+            du_cfg["natureza"] = str(duende_natureza).strip().lower()
+        if duende_tabu_penalidade:
+            du_cfg["tabu_penalidade"] = str(duende_tabu_penalidade).strip().lower()
+        if duende_tabu_texto:
+            du_cfg["tabu_texto"] = str(duende_tabu_texto).strip()
     data = preview_tracos_raciais(
         slug.strip().lower(),
         regra_versao=regra_versao,

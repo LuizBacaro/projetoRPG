@@ -134,6 +134,63 @@ def humano_versatil_pericias_extra(humano_versatil: Optional[str]) -> int:
     return 2
 
 
+def tamanho_racial_de_ficha(ficha_json: Optional[Dict[str, Any]]) -> str:
+    """Tamanho de combate derivado da raça (e config Duende quando aplicável)."""
+    from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
+
+    fj = ficha_json if isinstance(ficha_json, dict) else {}
+    slug = str(fj.get("raca_tormenta_slug") or fj.get("raca") or "").strip().lower()
+    if not slug or slug == "__livre__":
+        return "medio"
+    rv = regra_versao_de_ficha(fj)
+    duende_cfg = fj.get("duende") if slug == "duende" else None
+    prev = preview_tracos_raciais(
+        slug,
+        regra_versao=rv,
+        duende_config=duende_cfg if isinstance(duende_cfg, dict) else None,
+    )
+    return str(prev.get("tamanho") or "medio").strip().lower()
+
+
+def _escolhas_resumo_ha(slug: str, row: Dict[str, Any]) -> List[str]:
+    """Linhas de resumo para traços raciais Heróis de Arton."""
+    s = str(slug or "").strip().lower()
+    linhas: List[str] = []
+    if row.get("magia_instintiva"):
+        linhas.append("Magia Instintiva (Sab no lugar de atributo-chave arcano)")
+    if row.get("sentidos_misticos"):
+        linhas.append("Sentidos Místicos (Visão Mística básica permanente)")
+    if row.get("cancao_melancolia"):
+        linhas.append(
+            "Canção da Melancolia (pior de 2d20 em Vontade vs efeitos mentais)"
+        )
+    if row.get("forca_dos_titas"):
+        linhas.append(
+            "Força dos Titãs (dado extra no dano máximo, 1 PM, limite = mod. Força)"
+        )
+    if row.get("armas_aumentadas"):
+        linhas.append("Armas aumentadas (tamanho Grande)")
+    mb = int(row.get("manobra_bonus", 0) or 0)
+    if mb:
+        sinal = "+" if mb > 0 else ""
+        linhas.append(f"Manobras {sinal}{mb} (tamanho {row.get('tamanho', 'grande')})")
+    if row.get("instrumentista_magico"):
+        linhas.append("Instrumentista Mágico (conjuração via instrumento em mãos)")
+    if row.get("ambicao_herdada"):
+        linhas.append("Ambição Herdada (1 poder geral ou único de origem na criação)")
+    if row.get("considerado_elfo"):
+        linhas.append("Considerado elfo para pré-requisitos")
+    if row.get("pm_bonus_por_nivel_impar"):
+        linhas.append("+1 PM a cada nível ímpar")
+    if int(row.get("pm_aprimoramento_conjuracao", 0) or 0):
+        linhas.append(
+            f"+{int(row['pm_aprimoramento_conjuracao'])} PM para aprimoramentos ao lançar magia"
+        )
+    if row.get("visao_penumbra"):
+        linhas.append("Visão na penumbra")
+    return linhas
+
+
 def pericias_treinadas_extra_de_tracos(
     slug: str,
     regra_versao: Optional[str] = None,
@@ -247,9 +304,21 @@ def preview_tracos_raciais(
         base["tamanho"] = dt.get("tamanho")
         base["deslocamento_m"] = dt.get("deslocamento_m")
         base["furtividade_bonus"] = int(dt.get("furtividade_bonus", 0) or 0)
+        base["ca_bonus"] = int(dt.get("ca_bonus", 0) or 0)
+        base["ataque_bonus"] = int(dt.get("ataque_bonus", 0) or 0)
+        base["manobra_bonus"] = int(dt.get("manobra_bonus", 0) or 0)
         pb = dt.get("pericias_bonus") or {}
         if isinstance(pb, dict):
             base["pericias_bonus"] = {str(k): int(v) for k, v in pb.items()}
+        rd = dt.get("reducao_dano") or {}
+        if isinstance(rd, dict) and rd:
+            base["reducao_dano"] = {str(k): int(v) for k, v in rd.items()}
+        mag = dt.get("magias_inatas") or []
+        if isinstance(mag, list) and mag:
+            base["magias_inatas"] = [str(m) for m in mag]
+        resumo = list(dt.get("escolhas_resumo") or [])
+        lim = list(dt.get("limitacoes_resumo") or [])
+        base["escolhas_resumo"] = resumo + [f"Limitação: {x}" for x in lim if x]
         row_tam = {
             "tamanho": dt.get("tamanho"),
             "deslocamento_m": dt.get("deslocamento_m"),
@@ -258,6 +327,11 @@ def preview_tracos_raciais(
         }
     else:
         row_tam = row
+    base["manobra_bonus"] = int(row.get("manobra_bonus", 0) or 0)
+    base["armas_aumentadas"] = bool(row.get("armas_aumentadas"))
+    ha_resumo = _escolhas_resumo_ha(s, row)
+    if ha_resumo and not base.get("escolhas_resumo"):
+        base["escolhas_resumo"] = ha_resumo
     base = _enriquecer_tamanho_desloc(base, row_tam)
     return aplicar_escolhas_ao_preview(
         base,

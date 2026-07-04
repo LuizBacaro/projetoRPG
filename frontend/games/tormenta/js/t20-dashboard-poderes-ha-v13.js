@@ -280,9 +280,17 @@
     function lerPayload() {
         const sel = selecionados();
         if (!sel.length) return {};
-        return {
+        const out = {
             talentos_mb_lista: sel.map((p) => ({ nome: p.nome })),
         };
+        const racaRaw = (q('cadRacaSelect') && q('cadRacaSelect').value) || '';
+        if (String(racaRaw).trim().toLowerCase() === 'meio_elfo') {
+            const livre = sel.find((p) => String(p.slug || '').toLowerCase() !== 'ambicao_herdada');
+            if (livre && livre.slug) {
+                out.ambicao_herdada_poder_slug = String(livre.slug).trim().toLowerCase();
+            }
+        }
+        return out;
     }
 
     function resumo() {

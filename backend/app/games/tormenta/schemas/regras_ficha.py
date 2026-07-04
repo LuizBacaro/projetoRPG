@@ -1089,7 +1089,24 @@ class TormentaDuendeOpcoesResponse(BaseModel):
     formas_selvagem_metamorfose: List[Dict[str, Any]] = Field(default_factory=list)
     qtd_presentes: int = Field(default=3, ge=1, le=6)
     pm_bonus_geracao_aleatoria: int = Field(default=2, ge=0)
+    patamares_troca_poder: List[int] = Field(default_factory=list)
 
 
 class TormentaDuendeAleatorioResponse(BaseModel):
     config: Dict[str, Any] = Field(default_factory=dict)
+
+
+class TormentaDuendeCalcularRequest(BaseModel):
+    raca_tormenta_slug: str = Field(default="duende", max_length=40)
+    duende: Dict[str, Any] = Field(default_factory=dict)
+
+
+class TormentaDuendeCalcularResponse(BaseModel):
+    valido: bool = False
+    motivo: str = ""
+    modificadores_atributos: Dict[str, int] = Field(default_factory=dict)
+    tracos: Dict[str, Any] = Field(default_factory=dict)
+    pm_bonus_geracao_aleatoria: int = Field(default=0, ge=0)
+    trocas_poder_presente: List[Dict[str, Any]] = Field(default_factory=list)
+    patamares_troca_poder: List[int] = Field(default_factory=list)
+    limitacoes_fixas: List[str] = Field(default_factory=list)
