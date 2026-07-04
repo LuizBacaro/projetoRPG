@@ -38,9 +38,9 @@ from app.games.tormenta.rules.condicoes_t20 import (
 from app.games.tormenta.rules.conjuracao_t20 import (
     cd_resistencia_magia_t20,
     custo_pm_preparar_ou_lancar_magia,
-    habilidade_chave_conjuracao,
+    habilidade_chave_conjuracao_efetiva,
     lista_regras_conjuracao_por_versao,
-    modificador_conjuracao_mb,
+    modificador_conjuracao_efetivo,
     pontos_magia_maximos_conjuracao,
     texto_custo_pm_por_circulo_mb,
 )
@@ -720,17 +720,23 @@ def obter_conjuracao_preview_mb(
         max_length=16,
         description="Caminho arcanista v1.3: bruxo | mago | feiticeiro.",
     ),
+    raca_tormenta_slug: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Slug da raça v1.3 (ex.: eiradaan) para overrides de conjuração.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaConjuracaoPreviewResponse:
     rv = normalizar_regra_versao(regra_versao)
     slug = classe_slug.strip().lower()
+    raca = (raca_tormenta_slug or "").strip().lower() or None
     nv = int(nivel_conjurador) if nivel_conjurador is not None else int(nivel)
     if nv < 1:
         nv = 1
     if nv > 40:
         nv = 40
-    hk = habilidade_chave_conjuracao(slug, rv, arcanista_caminho)
-    mod = modificador_conjuracao_mb(
+    hk = habilidade_chave_conjuracao_efetiva(slug, rv, arcanista_caminho, raca)
+    mod = modificador_conjuracao_efetivo(
         slug,
         for_valor,
         des_valor,
@@ -740,6 +746,7 @@ def obter_conjuracao_preview_mb(
         car_valor,
         regra_versao=rv,
         arcanista_caminho=arcanista_caminho,
+        slug_raca=raca,
     )
     if rv == REGRA_VERSAO_V13 and mod is not None:
         cd_magia = cd_resistencia_magia_t20(nv, mod, rv)

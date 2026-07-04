@@ -136,6 +136,45 @@ def classe_atende_exigencia(classe_exigida: str, classes_ficha: set[str]) -> boo
     return False
 
 
+def poder_por_nome(nome: str) -> Optional[Dict[str, Any]]:
+    """Metadados de um poder HA pelo nome exibido ou slug."""
+    n = str(nome or "").strip().lower()
+    if len(n) < 2:
+        return None
+    slug = normalizar_slug_poder_ha(nome)
+    for row in lista_poderes_herois_arton():
+        if str(row.get("nome") or "").strip().lower() == n:
+            return dict(row)
+        if row.get("slug") == slug:
+            return dict(row)
+    return None
+
+
+def validar_vinculo_poder_ha(nome: str, ficha_json: Optional[dict]) -> None:
+    """
+    Exige suplemento HA e elegibilidade (raça/classe) para poderes do catálogo HA.
+    No-op se ``nome`` não pertencer ao catálogo HA.
+    """
+    from app.shared.exceptions.custom_exceptions import DadosInvalidos
+
+    row = poder_por_nome(nome)
+    if not row:
+        return
+    nom = str(row.get("nome") or nome).strip()
+    if game_suplemento_de_ficha(ficha_json) != SUPLEMENTO_HEROIS_ARTON:
+        raise DadosInvalidos(
+            f"«{nom}» é um poder de Heróis de Arton. Ative o suplemento na ficha."
+        )
+    if not _poder_elegivel_ficha(row, ficha_json):
+        partes: List[str] = []
+        if row.get("raca_exigida"):
+            partes.append(f"raça {row['raca_exigida']}")
+        if row.get("classe_exigida"):
+            partes.append(f"classe {row['classe_exigida']}")
+        extra = f" ({', '.join(partes)})" if partes else ""
+        raise DadosInvalidos(f"«{nom}» não é elegível para este personagem{extra}.")
+
+
 def _poder_elegivel_ficha(row: Dict[str, Any], ficha_json: Optional[dict]) -> bool:
     raca_req = str(row.get("raca_exigida") or "").strip()
     if raca_req:

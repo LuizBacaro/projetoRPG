@@ -220,6 +220,47 @@ def classe_conjuracao_mb_registrada(slug: str) -> bool:
     return bool(s and s in _mapa_conjuracao_por_slug())
 
 
+def habilidade_chave_conjuracao_efetiva(
+    slug_classe: str,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
+    slug_raca: Optional[str] = None,
+) -> Optional[HabilidadeChaveConjuracao]:
+    hk = habilidade_chave_conjuracao(slug_classe, regra_versao, arcanista_caminho)
+    if not hk:
+        return None
+    return override_habilidade_chave_por_raca(slug_raca, slug_classe, hk)
+
+
+def modificador_conjuracao_efetivo(
+    slug_classe: str,
+    forca: int,
+    destreza: int,
+    constituicao: int,
+    inteligencia: int,
+    sabedoria: int,
+    carisma: int,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
+    slug_raca: Optional[str] = None,
+) -> Optional[int]:
+    hk = habilidade_chave_conjuracao_efetiva(
+        slug_classe, regra_versao, arcanista_caminho, slug_raca
+    )
+    if not hk:
+        return None
+    return _modificador_chave(
+        hk,
+        forca,
+        destreza,
+        constituicao,
+        inteligencia,
+        sabedoria,
+        carisma,
+        regra_versao,
+    )
+
+
 def habilidade_chave_conjuracao(
     slug_classe: str,
     regra_versao: Optional[str] = None,

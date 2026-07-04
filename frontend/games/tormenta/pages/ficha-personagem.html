@@ -2737,13 +2737,15 @@
         const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
         const row = getRacaRowPorSlug(slug);
         const tresMais1 = row && row.escolhe_tres_mais1;
-        const ex = tresMais1
-            ? Array.isArray(row.excluir_atributos_mais1)
-                ? row.excluir_atributos_mais1
-                : []
-            : row && Array.isArray(row.excluir_atributos_mais2)
-              ? row.excluir_atributos_mais2
-              : [];
+        const umMais1 = row && row.escolhe_um_mais1;
+        const ex =
+            tresMais1 || umMais1
+                ? Array.isArray(row.excluir_atributos_mais1)
+                    ? row.excluir_atributos_mais1
+                    : []
+                : row && Array.isArray(row.excluir_atributos_mais2)
+                  ? row.excluir_atributos_mais2
+                  : [];
         const cur = el.value;
         el.innerHTML = '<option value="">—</option>';
         const keys = ATTR_KEYS.filter((k) => !ex.includes(k));
@@ -2915,6 +2917,23 @@
                 if (k && ATTR_KEYS.includes(k) && !excl.includes(k)) d[k] += 1;
             });
         }
+        if (row.escolhe_dois_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1)
+                ? row.excluir_atributos_mais1
+                : [];
+            const a = q('f_raca_mais2a') && q('f_raca_mais2a').value;
+            const b = q('f_raca_mais2b') && q('f_raca_mais2b').value;
+            [a, b].forEach((k) => {
+                if (k && ATTR_KEYS.includes(k) && !excl.includes(k)) d[k] += 1;
+            });
+        }
+        if (row.escolhe_um_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1)
+                ? row.excluir_atributos_mais1
+                : [];
+            const c1 = q('f_raca_mais1') && q('f_raca_mais1').value;
+            if (c1 && ATTR_KEYS.includes(c1) && !excl.includes(c1)) d[c1] += 1;
+        }
         if (row.escolhe_suraggel_subtipo) {
             const sub = (q('f_suraggel_subtipo') && q('f_suraggel_subtipo').value) || '';
             if (sub === 'aggelus') {
@@ -2930,6 +2949,16 @@
             const c1 = q('f_raca_mais1') && q('f_raca_mais1').value;
             const keysOk1 = ATTR_KEYS.filter((k) => !excl.includes(k));
             if (c1 && keysOk1.includes(c1)) d[c1] += 2;
+        }
+        if (
+            slug === 'duende' &&
+            window.T20DuendeV13 &&
+            typeof window.T20DuendeV13.modificadoresAtributos === 'function'
+        ) {
+            const dm = window.T20DuendeV13.modificadoresAtributos();
+            ATTR_KEYS.forEach((k) => {
+                d[k] += Number(dm[k] || 0);
+            });
         }
         return d;
     }
@@ -3078,6 +3107,34 @@
             }
             if (a === b) return { ok: false, msg: 'As duas habilidades com +2 devem ser diferentes.' };
         }
+        if (row.escolhe_um_mais1) {
+            const x = q('f_raca_mais1') && q('f_raca_mais1').value;
+            if (!x) {
+                return { ok: false, msg: 'Escolha o atributo +1 da raça.' };
+            }
+            const ex = row.excluir_atributos_mais1 || [];
+            if (ex.includes(x)) return { ok: false, msg: 'Atributo inválido para +1 nesta raça.' };
+        }
+        if (row.escolhe_dois_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1)
+                ? row.excluir_atributos_mais1
+                : [];
+            const picks = [
+                q('f_raca_mais2a') && q('f_raca_mais2a').value,
+                q('f_raca_mais2b') && q('f_raca_mais2b').value,
+            ].filter(Boolean);
+            if (picks.length !== 2) {
+                return { ok: false, msg: 'Escolha dois atributos diferentes para +1.' };
+            }
+            if (new Set(picks).size !== 2) {
+                return { ok: false, msg: 'Os dois +1 raciais devem ser atributos diferentes.' };
+            }
+            for (const p of picks) {
+                if (excl.includes(p)) {
+                    return { ok: false, msg: 'Atributo inválido para +1 nesta raça.' };
+                }
+            }
+        }
         if (row.escolhe_tres_mais1) {
             const excl = Array.isArray(row.excluir_atributos_mais1)
                 ? row.excluir_atributos_mais1
@@ -3152,7 +3209,17 @@
             const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
             const row = getRacaRowPorSlug(slug);
             const excluiCar = row && (row.mod_car_fixo || 0) < 0;
-            const keys = ATTR_KEYS.filter((k) => !(excluiCar && k === 'car'));
+            let excl = [];
+            if (
+                row &&
+                (row.escolhe_tres_mais1 || row.escolhe_dois_mais1) &&
+                Array.isArray(row.excluir_atributos_mais1)
+            ) {
+                excl = row.excluir_atributos_mais1;
+            }
+            const keys = ATTR_KEYS.filter(
+                (k) => !excl.includes(k) && !(excluiCar && k === 'car')
+            );
             const cur = el.value;
             el.innerHTML = '<option value="">—</option>';
             keys.forEach((k) => {
@@ -3227,10 +3294,12 @@
         const row = getRacaRowPorSlug(slug);
         if (wrapL) wrapL.style.display = slug === '__livre__' ? '' : 'none';
         const tresMais1 = row && row.escolhe_tres_mais1;
+        const doisMais1 = row && row.escolhe_dois_mais1;
+        const umMais1 = row && row.escolhe_um_mais1;
         const duasMais2 = row && row.escolhe_duas_mais2;
         const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
-        if (wrapM) wrapM.style.display = tresMais1 || duasMais2 ? '' : 'none';
-        if (wrapM1) wrapM1.style.display = tresMais1 || (row && row.escolhe_um_mais2) ? '' : 'none';
+        if (wrapM) wrapM.style.display = tresMais1 || duasMais2 || doisMais1 ? '' : 'none';
+        if (wrapM1) wrapM1.style.display = tresMais1 || (row && row.escolhe_um_mais2) || umMais1 ? '' : 'none';
         if (wrapVers) {
             wrapVers.style.display = isV13 && slug === 'humano' ? '' : 'none';
         }
@@ -3244,12 +3313,15 @@
         const lbl2a = document.querySelector('label[for="f_raca_mais2a"]');
         const lbl2b = document.querySelector('label[for="f_raca_mais2b"]');
         const lbl1 = q('lbl_raca_mais1');
-        if (lbl2a) lbl2a.textContent = tresMais1 ? '+1 em habilidade (1ª)' : '+2 em habilidade (1ª)';
-        if (lbl2b) lbl2b.textContent = tresMais1 ? '+1 em habilidade (2ª)' : '+2 em habilidade (2ª)';
+        if (lbl2a) lbl2a.textContent = doisMais1 || tresMais1 ? '+1 em habilidade (1ª)' : '+2 em habilidade (1ª)';
+        if (lbl2b) lbl2b.textContent = doisMais1 || tresMais1 ? '+1 em habilidade (2ª)' : '+2 em habilidade (2ª)';
         if (lbl1) {
-            lbl1.textContent = tresMais1
-                ? '+1 em habilidade (3ª)'
-                : 'Meio-orc: +2 em outra habilidade (exceto INT e CAR)';
+            if (umMais1) lbl1.textContent = '+1 em habilidade';
+            else {
+                lbl1.textContent = tresMais1
+                    ? '+1 em habilidade (3ª)'
+                    : 'Meio-orc: +2 em outra habilidade (exceto INT e CAR)';
+            }
         }
         popularOpcoesMais2Selects();
         popularOpcoesMais1Select();
@@ -5621,12 +5693,17 @@
                         q('f_arcanista_caminho') && q('f_arcanista_caminho').value
                             ? String(q('f_arcanista_caminho').value).trim().toLowerCase()
                             : null;
+                    const racaSlug =
+                        (q('f_raca_select') && q('f_raca_select').value) || '';
                     const prev = await regras.obterConjuracaoPreview({
                         classe_slug: slug,
                         nivel: nvSafe,
                         regraVersao: rv,
                         ...(camArc && slug === 'arcanista' ? { arcanista_caminho: camArc } : {}),
                         ...(nvEff !== nvSafe ? { nivel_conjurador: nvEff } : {}),
+                        ...(racaSlug && racaSlug !== '__livre__'
+                            ? { raca_tormenta_slug: racaSlug }
+                            : {}),
                         for_valor: valorFinalAtributoCampo('for'),
                         des_valor: valorFinalAtributoCampo('des'),
                         con_valor: valorFinalAtributoCampo('con'),

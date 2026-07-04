@@ -142,7 +142,11 @@ class TormentaPersonagemService:
         if rv == REGRA_VERSAO_V13:
             linhas = niveis_multiclasse_v13_de_ficha(fj, int(nivel_personagem))
             if linhas:
-                prev = preview_pm_multiclasse_v13(linhas)
+                prev = preview_pm_multiclasse_v13(
+                    linhas,
+                    ficha_json=fj,
+                    nivel_personagem=int(nivel_personagem),
+                )
                 pm = prev.get("pm_max")
                 return int(pm) if pm is not None else None
         arcanista = str(fj.get("arcanista_caminho") or "").strip().lower() or None

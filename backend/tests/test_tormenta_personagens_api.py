@@ -593,6 +593,46 @@ def test_talentos_crud_e_get_personagem_inclui_lista(tormenta_personagens_db):
     assert (r_empty.json().get("talentos") or []) == []
 
 
+def test_talento_ha_bloqueado_sem_suplemento_ou_raca(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_json(nome="HaTalento"),
+    ).json()["id"]
+    client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={
+            "ficha_json": {
+                "regra_versao": "v13",
+                "tormenta_classe_mb_slug": "guerreiro",
+                "raca_tormenta_slug": "galokk",
+            }
+        },
+    )
+    r_bad = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/talentos",
+        json={"nome": "Eco Arcano"},
+    )
+    assert r_bad.status_code in (400, 422), r_bad.text
+    client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={
+            "ficha_json": {
+                "regra_versao": "v13",
+                "game_suplemento": "herois_arton",
+                "tormenta_classe_mb_slug": "guerreiro",
+                "raca_tormenta_slug": "eiradaan",
+            }
+        },
+    )
+    r_ok = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/talentos",
+        json={"nome": "Eco Arcano"},
+    )
+    assert r_ok.status_code == 201, r_ok.text
+
+
 def test_magias_crud_e_get_personagem_inclui_lista(tormenta_personagens_db):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))

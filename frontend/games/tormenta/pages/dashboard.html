@@ -1201,6 +1201,19 @@
                 if (k && ATTR_KEYS_DASH.includes(k) && !excl.includes(k)) d[k] += 1;
             });
         }
+        if (row.escolhe_dois_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1) ? row.excluir_atributos_mais1 : [];
+            const a = document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value;
+            const b = document.getElementById('cadRacaMais2b') && document.getElementById('cadRacaMais2b').value;
+            [a, b].forEach((k) => {
+                if (k && ATTR_KEYS_DASH.includes(k) && !excl.includes(k)) d[k] += 1;
+            });
+        }
+        if (row.escolhe_um_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1) ? row.excluir_atributos_mais1 : [];
+            const c1 = document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value;
+            if (c1 && ATTR_KEYS_DASH.includes(c1) && !excl.includes(c1)) d[c1] += 1;
+        }
         if (row.escolhe_suraggel_subtipo) {
             const sub =
                 (document.getElementById('cadSuraggelSubtipo') &&
@@ -1329,7 +1342,7 @@
             const row = getRacaRowPorSlugDash(slug);
             const excluiCar = row && (row.mod_car_fixo || 0) < 0;
             let excl = [];
-            if (row && row.escolhe_tres_mais1 && Array.isArray(row.excluir_atributos_mais1)) {
+            if (row && (row.escolhe_tres_mais1 || row.escolhe_dois_mais1) && Array.isArray(row.excluir_atributos_mais1)) {
                 excl = row.excluir_atributos_mais1;
             }
             const keys = ATTR_KEYS_DASH.filter(
@@ -1355,7 +1368,7 @@
         const slug = (sel && sel.value) || '';
         const row = getRacaRowPorSlugDash(slug);
         let ex = [];
-        if (row && row.escolhe_tres_mais1 && Array.isArray(row.excluir_atributos_mais1)) {
+        if (row && (row.escolhe_tres_mais1 || row.escolhe_um_mais1) && Array.isArray(row.excluir_atributos_mais1)) {
             ex = row.excluir_atributos_mais1;
         } else if (row && Array.isArray(row.excluir_atributos_mais2)) {
             ex = row.excluir_atributos_mais2;
@@ -1523,6 +1536,32 @@
             const ex = row.excluir_atributos_mais2 || [];
             if (ex.includes(x)) return { ok: false, msg: 'Meio-orc: escolha inválida para o +2 opcional.' };
         }
+        if (row.escolhe_um_mais1) {
+            const x = document.getElementById('cadRacaMais1') && document.getElementById('cadRacaMais1').value;
+            if (!x) {
+                return { ok: false, msg: 'Escolha o atributo +1 da raça.' };
+            }
+            const ex = row.excluir_atributos_mais1 || [];
+            if (ex.includes(x)) return { ok: false, msg: 'Atributo inválido para +1 nesta raça.' };
+        }
+        if (row.escolhe_dois_mais1) {
+            const excl = Array.isArray(row.excluir_atributos_mais1) ? row.excluir_atributos_mais1 : [];
+            const picks = [
+                document.getElementById('cadRacaMais2a') && document.getElementById('cadRacaMais2a').value,
+                document.getElementById('cadRacaMais2b') && document.getElementById('cadRacaMais2b').value,
+            ].filter(Boolean);
+            if (picks.length !== 2) {
+                return { ok: false, msg: 'Escolha dois atributos diferentes para +1.' };
+            }
+            if (new Set(picks).size !== 2) {
+                return { ok: false, msg: 'Os dois +1 raciais devem ser atributos diferentes.' };
+            }
+            for (const p of picks) {
+                if (excl.includes(p)) {
+                    return { ok: false, msg: 'Atributo inválido para +1 nesta raça.' };
+                }
+            }
+        }
         if (row.escolhe_tres_mais1 && isDashV13()) {
             const excl = Array.isArray(row.excluir_atributos_mais1) ? row.excluir_atributos_mais1 : [];
             const picks = [
@@ -1664,18 +1703,34 @@
             const inp = document.getElementById('cadRacaLivre');
             if (inp) inp.value = '';
         }
-        if (!(row && (row.escolhe_duas_mais2 || row.escolhe_tres_mais1))) {
+        if (!(row && (row.escolhe_duas_mais2 || row.escolhe_tres_mais1 || row.escolhe_dois_mais1))) {
             const a = document.getElementById('cadRacaMais2a');
             const b = document.getElementById('cadRacaMais2b');
             if (a) a.value = '';
             if (b) b.value = '';
         }
-        if (!(row && (row.escolhe_um_mais2 || row.escolhe_tres_mais1))) {
+        if (!(row && (row.escolhe_um_mais2 || row.escolhe_tres_mais1 || row.escolhe_um_mais1))) {
             const m1 = document.getElementById('cadRacaMais1');
             if (m1) m1.value = '';
         }
-        if (wrapM2) wrapM2.style.display = row && (row.escolhe_duas_mais2 || row.escolhe_tres_mais1) ? '' : 'none';
-        if (wrapM1) wrapM1.style.display = row && (row.escolhe_um_mais2 || row.escolhe_tres_mais1) ? '' : 'none';
+        if (wrapM2) {
+            wrapM2.style.display =
+                row && (row.escolhe_duas_mais2 || row.escolhe_tres_mais1 || row.escolhe_dois_mais1)
+                    ? ''
+                    : 'none';
+        }
+        if (wrapM1) {
+            wrapM1.style.display =
+                row && (row.escolhe_um_mais2 || row.escolhe_tres_mais1 || row.escolhe_um_mais1)
+                    ? ''
+                    : 'none';
+        }
+        const lblM1 = document.getElementById('cadLabelRacaMais1');
+        if (lblM1) {
+            if (row && row.escolhe_um_mais1) lblM1.textContent = 'Raça HA: +1 em um atributo';
+            else if (row && row.escolhe_tres_mais1) lblM1.textContent = 'Raça MB: +1 em uma habilidade (3ª)';
+            else lblM1.textContent = 'Raça MB: +2 em uma habilidade (Meio-orc)';
+        }
         popularCadOpcoesMais2Selects();
         popularCadOpcoesMais1Select();
         if (window.T20DashPericiasV13 && T20DashPericiasV13.invalidarPericias) {

@@ -151,6 +151,82 @@ def test_poderes_disponiveis_multiclasse_v13_treinador() -> None:
     assert "eco_arcano" not in slugs
 
 
+def test_validar_vinculo_poder_ha_exige_suplemento() -> None:
+    from app.games.tormenta.rules.poderes_herois_arton_t20 import (
+        validar_vinculo_poder_ha,
+    )
+    from app.shared.exceptions.custom_exceptions import DadosInvalidos
+
+    with pytest.raises(DadosInvalidos, match="Heróis de Arton"):
+        validar_vinculo_poder_ha(
+            "Eco Arcano",
+            {"regra_versao": "v13", "raca_tormenta_slug": "eiradaan"},
+        )
+
+
+def test_validar_vinculo_poder_ha_bloqueia_raca_errada() -> None:
+    from app.games.tormenta.rules.poderes_herois_arton_t20 import (
+        validar_vinculo_poder_ha,
+    )
+    from app.shared.exceptions.custom_exceptions import DadosInvalidos
+
+    ficha = {
+        "regra_versao": "v13",
+        "game_suplemento": "herois_arton",
+        "raca_tormenta_slug": "galokk",
+    }
+    with pytest.raises(DadosInvalidos, match="elegível"):
+        validar_vinculo_poder_ha("Eco Arcano", ficha)
+
+
+def test_validar_vinculo_poder_ha_ok_eiradaan() -> None:
+    from app.games.tormenta.rules.poderes_herois_arton_t20 import (
+        validar_vinculo_poder_ha,
+    )
+
+    ficha = {
+        "regra_versao": "v13",
+        "game_suplemento": "herois_arton",
+        "raca_tormenta_slug": "eiradaan",
+    }
+    validar_vinculo_poder_ha("Eco Arcano", ficha)
+
+
+def test_pm_bonus_meio_elfo_ha_ficha() -> None:
+    from app.games.tormenta.rules.progressao_pv_t20 import (
+        pm_bonus_racial_ha_de_ficha,
+        preview_pm_multiclasse_v13,
+    )
+
+    fj = {
+        "game_suplemento": "herois_arton",
+        "raca_tormenta_slug": "meio_elfo",
+    }
+    assert pm_bonus_racial_ha_de_ficha(fj, 1) == 1
+    assert pm_bonus_racial_ha_de_ficha(fj, 3) == 2
+    assert pm_bonus_racial_ha_de_ficha({"raca_tormenta_slug": "meio_elfo"}, 1) == 0
+    prev = preview_pm_multiclasse_v13(
+        [{"slug": "guerreiro", "nivel": 1}],
+        ficha_json=fj,
+        nivel_personagem=1,
+    )
+    assert prev["pm_max"] == 4  # 3 + 1 racial
+
+
+def test_conjuracao_eiradaan_magia_instintiva() -> None:
+    from app.games.tormenta.rules.conjuracao_t20 import (
+        habilidade_chave_conjuracao_efetiva,
+        modificador_conjuracao_efetivo,
+    )
+
+    hk = habilidade_chave_conjuracao_efetiva("arcanista", "v13", None, "eiradaan")
+    assert hk == "sab"
+    mod = modificador_conjuracao_efetivo(
+        "arcanista", 0, 0, 0, 2, 4, 0, "v13", None, "eiradaan"
+    )
+    assert mod == 4
+
+
 def test_classe_atende_exigencia_treinador_variante() -> None:
     from app.games.tormenta.rules.poderes_herois_arton_t20 import (
         classe_atende_exigencia,

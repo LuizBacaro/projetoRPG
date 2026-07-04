@@ -225,6 +225,9 @@ class TormentaRegrasService {
         }
         if (p.regraVersao) sp.set('regra_versao', String(p.regraVersao).trim());
         if (p.arcanista_caminho) sp.set('arcanista_caminho', String(p.arcanista_caminho).trim());
+        if (p.raca_tormenta_slug) {
+            sp.set('raca_tormenta_slug', String(p.raca_tormenta_slug).trim());
+        }
         ['for', 'des', 'con', 'int', 'sab', 'car'].forEach((k) => {
             const key = `${k}_valor`;
             if (p[key] != null) sp.set(key, String(p[key]));
