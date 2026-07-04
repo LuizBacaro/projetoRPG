@@ -6,7 +6,10 @@
   },
   "classes": {
     "arcanista": {
-      "pericias_fixas": ["misticismo", "vontade"],
+      "pericias_fixas": [
+        "misticismo",
+        "vontade"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 2,
       "pericias_escolha_de": [
@@ -24,7 +27,10 @@
       ]
     },
     "barbaro": {
-      "pericias_fixas": ["fortitude", "luta"],
+      "pericias_fixas": [
+        "fortitude",
+        "luta"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 4,
       "pericias_escolha_de": [
@@ -39,7 +45,10 @@
       ]
     },
     "bardo": {
-      "pericias_fixas": ["atuacao", "reflexos"],
+      "pericias_fixas": [
+        "atuacao",
+        "reflexos"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 6,
       "pericias_escolha_de": [
@@ -60,8 +69,15 @@
       ]
     },
     "bucaneiro": {
-      "pericias_fixas": ["reflexos"],
-      "pericias_escolha_um_de": [["luta", "pontaria"]],
+      "pericias_fixas": [
+        "reflexos"
+      ],
+      "pericias_escolha_um_de": [
+        [
+          "luta",
+          "pontaria"
+        ]
+      ],
       "pericias_escolha_qtd": 4,
       "pericias_escolha_de": [
         "acrobacia",
@@ -82,8 +98,15 @@
       ]
     },
     "cacador": {
-      "pericias_fixas": ["sobrevivencia"],
-      "pericias_escolha_um_de": [["luta", "pontaria"]],
+      "pericias_fixas": [
+        "sobrevivencia"
+      ],
+      "pericias_escolha_um_de": [
+        [
+          "luta",
+          "pontaria"
+        ]
+      ],
       "pericias_escolha_qtd": 6,
       "pericias_escolha_de": [
         "adestramento",
@@ -103,7 +126,10 @@
       ]
     },
     "cavaleiro": {
-      "pericias_fixas": ["fortitude", "luta"],
+      "pericias_fixas": [
+        "fortitude",
+        "luta"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 2,
       "pericias_escolha_de": [
@@ -118,7 +144,10 @@
       ]
     },
     "clerigo": {
-      "pericias_fixas": ["religiao", "vontade"],
+      "pericias_fixas": [
+        "religiao",
+        "vontade"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 2,
       "pericias_escolha_de": [
@@ -133,7 +162,10 @@
       ]
     },
     "druida": {
-      "pericias_fixas": ["sobrevivencia", "vontade"],
+      "pericias_fixas": [
+        "sobrevivencia",
+        "vontade"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 4,
       "pericias_escolha_de": [
@@ -149,8 +181,15 @@
       ]
     },
     "guerreiro": {
-      "pericias_fixas": ["fortitude"],
-      "pericias_escolha_um_de": [["luta", "pontaria"]],
+      "pericias_fixas": [
+        "fortitude"
+      ],
+      "pericias_escolha_um_de": [
+        [
+          "luta",
+          "pontaria"
+        ]
+      ],
       "pericias_escolha_qtd": 2,
       "pericias_escolha_de": [
         "adestramento",
@@ -167,7 +206,10 @@
       ]
     },
     "inventor": {
-      "pericias_fixas": ["oficio", "vontade"],
+      "pericias_fixas": [
+        "oficio",
+        "vontade"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 4,
       "pericias_escolha_de": [
@@ -184,7 +226,10 @@
       ]
     },
     "ladino": {
-      "pericias_fixas": ["ladinagem", "reflexos"],
+      "pericias_fixas": [
+        "ladinagem",
+        "reflexos"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 8,
       "pericias_escolha_de": [
@@ -208,7 +253,10 @@
       ]
     },
     "lutador": {
-      "pericias_fixas": ["fortitude", "luta"],
+      "pericias_fixas": [
+        "fortitude",
+        "luta"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 4,
       "pericias_escolha_de": [
@@ -222,8 +270,15 @@
       ]
     },
     "nobre": {
-      "pericias_fixas": ["vontade"],
-      "pericias_escolha_um_de": [["diplomacia", "intimidacao"]],
+      "pericias_fixas": [
+        "vontade"
+      ],
+      "pericias_escolha_um_de": [
+        [
+          "diplomacia",
+          "intimidacao"
+        ]
+      ],
       "pericias_escolha_qtd": 4,
       "pericias_escolha_de": [
         "atletismo",
@@ -242,7 +297,10 @@
       ]
     },
     "paladino": {
-      "pericias_fixas": ["luta", "vontade"],
+      "pericias_fixas": [
+        "luta",
+        "vontade"
+      ],
       "pericias_escolha_um_de": [],
       "pericias_escolha_qtd": 2,
       "pericias_escolha_de": [
@@ -256,6 +314,339 @@
         "intuicao",
         "oficio",
         "percepcao"
+      ]
+    },
+    "treinador": {
+      "pericias_fixas": [
+        "adestramento",
+        "vontade"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 4,
+      "pericias_escolha_de": [
+        "atletismo",
+        "cavalgar",
+        "diplomacia",
+        "guerra",
+        "iniciativa",
+        "intimidacao",
+        "intuicao",
+        "luta",
+        "oficio",
+        "percepcao",
+        "pontaria",
+        "reflexos",
+        "religiao",
+        "sobrevivencia"
+      ]
+    },
+    "alquimista": {
+      "pericias_fixas": [
+        "oficio",
+        "vontade"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 4,
+      "pericias_escolha_de": [
+        "conhecimento",
+        "enganacao",
+        "fortitude",
+        "guerra",
+        "iniciativa",
+        "intuicao",
+        "investigacao",
+        "ladinagem",
+        "medicina",
+        "misticismo",
+        "percepcao",
+        "pilotagem"
+      ]
+    },
+    "atleta": {
+      "pericias_fixas": [
+        "atletismo",
+        "fortitude"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 4,
+      "pericias_escolha_de": [
+        "adestramento",
+        "atletismo",
+        "cavalgar",
+        "fortitude",
+        "guerra",
+        "iniciativa",
+        "intimidacao",
+        "luta",
+        "oficio",
+        "percepcao",
+        "pontaria"
+      ]
+    },
+    "burgues": {
+      "pericias_fixas": [
+        "oficio",
+        "diplomacia"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 4,
+      "pericias_escolha_de": [
+        "atletismo",
+        "cavalgar",
+        "conhecimento",
+        "diplomacia",
+        "guerra",
+        "iniciativa",
+        "intimidacao",
+        "intuicao",
+        "jogatina",
+        "ladinagem",
+        "nobreza",
+        "percepcao",
+        "vontade"
+      ]
+    },
+    "duelista": {
+      "pericias_fixas": [
+        "reflexos",
+        "luta"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 4,
+      "pericias_escolha_de": [
+        "acrobacia",
+        "atletismo",
+        "cavalgar",
+        "conhecimento",
+        "enganacao",
+        "iniciativa",
+        "intimidacao",
+        "percepcao",
+        "pontaria",
+        "reflexos"
+      ]
+    },
+    "ermitao": {
+      "pericias_fixas": [
+        "sobrevivencia",
+        "vontade"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 4,
+      "pericias_escolha_de": [
+        "adestramento",
+        "atletismo",
+        "cavalgar",
+        "conhecimento",
+        "cura",
+        "furtividade",
+        "iniciativa",
+        "intuicao",
+        "percepcao"
+      ]
+    },
+    "inovador": {
+      "pericias_fixas": [
+        "oficio",
+        "vontade"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 4,
+      "pericias_escolha_de": [
+        "conhecimento",
+        "enganacao",
+        "fortitude",
+        "guerra",
+        "iniciativa",
+        "intuicao",
+        "investigacao",
+        "misticismo",
+        "percepcao",
+        "pilotagem"
+      ]
+    },
+    "machado_de_pedra": {
+      "pericias_fixas": [
+        "fortitude"
+      ],
+      "pericias_escolha_um_de": [
+        [
+          "luta",
+          "pontaria"
+        ]
+      ],
+      "pericias_escolha_qtd": 2,
+      "pericias_escolha_de": [
+        "adestramento",
+        "atletismo",
+        "cavalgar",
+        "fortitude",
+        "guerra",
+        "iniciativa",
+        "intimidacao",
+        "luta",
+        "oficio",
+        "percepcao",
+        "pontaria"
+      ]
+    },
+    "magimarcialista": {
+      "pericias_fixas": [
+        "misticismo",
+        "luta"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 2,
+      "pericias_escolha_de": [
+        "conhecimento",
+        "diplomacia",
+        "enganacao",
+        "guerra",
+        "iniciativa",
+        "intimidacao",
+        "intuicao",
+        "investigacao",
+        "luta",
+        "nobreza",
+        "oficio",
+        "percepcao"
+      ]
+    },
+    "necromante": {
+      "pericias_fixas": [
+        "misticismo",
+        "vontade"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 2,
+      "pericias_escolha_de": [
+        "conhecimento",
+        "diplomacia",
+        "enganacao",
+        "guerra",
+        "iniciativa",
+        "intimidacao",
+        "intuicao",
+        "investigacao",
+        "nobreza",
+        "oficio",
+        "percepcao"
+      ]
+    },
+    "santo": {
+      "pericias_fixas": [
+        "religiao",
+        "vontade"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 2,
+      "pericias_escolha_de": [
+        "conhecimento",
+        "cura",
+        "diplomacia",
+        "iniciativa",
+        "intuicao",
+        "misticismo",
+        "oficio",
+        "percepcao"
+      ]
+    },
+    "seteiro": {
+      "pericias_fixas": [
+        "pontaria",
+        "sobrevivencia"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 6,
+      "pericias_escolha_de": [
+        "adestramento",
+        "atletismo",
+        "cavalgar",
+        "conhecimento",
+        "cura",
+        "furtividade",
+        "iniciativa",
+        "intuicao",
+        "luta",
+        "oficio",
+        "percepcao",
+        "pontaria",
+        "reflexos",
+        "sobrevivencia"
+      ]
+    },
+    "usurpador": {
+      "pericias_fixas": [
+        "enganacao",
+        "ladinagem"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 6,
+      "pericias_escolha_de": [
+        "acrobacia",
+        "atletismo",
+        "cavalgar",
+        "conhecimento",
+        "diplomacia",
+        "enganacao",
+        "furtividade",
+        "iniciativa",
+        "intuicao",
+        "investigacao",
+        "jogatina",
+        "ladinagem",
+        "misticismo",
+        "percepcao"
+      ]
+    },
+    "vassalo": {
+      "pericias_fixas": [
+        "fortitude",
+        "luta"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 2,
+      "pericias_escolha_de": [
+        "atletismo",
+        "cavalgar",
+        "diplomacia",
+        "guerra",
+        "iniciativa",
+        "intimidacao",
+        "nobreza",
+        "percepcao"
+      ]
+    },
+    "ventanista": {
+      "pericias_fixas": [
+        "atletismo",
+        "reflexos"
+      ],
+      "pericias_escolha_um_de": [],
+      "pericias_escolha_qtd": 6,
+      "pericias_escolha_de": [
+        "acrobacia",
+        "adestramento",
+        "atletismo",
+        "atuacao",
+        "cavalgar",
+        "conhecimento",
+        "cura",
+        "diplomacia",
+        "enganacao",
+        "furtividade",
+        "iniciativa",
+        "intimidacao",
+        "intuicao",
+        "investigacao",
+        "jogatina",
+        "ladinagem",
+        "luta",
+        "oficio",
+        "percepcao",
+        "pontaria",
+        "reflexos",
+        "sobrevivencia"
       ]
     }
   }

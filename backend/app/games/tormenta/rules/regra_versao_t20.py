@@ -30,3 +30,13 @@ def regra_versao_de_ficha(ficha_json: Optional[Mapping[str, Any]]) -> str:
     if not ficha_json:
         return REGRA_VERSAO_PADRAO
     return normalizar_regra_versao(ficha_json.get("regra_versao"))
+
+
+def game_suplemento_de_ficha(ficha_json: Optional[Mapping[str, Any]]) -> Optional[str]:
+    if not ficha_json:
+        return None
+    raw = ficha_json.get("game_suplemento")
+    if raw is None or str(raw).strip() == "":
+        return None
+    s = str(raw).strip().lower()
+    return s if s in SUPLEMENTOS_VALIDOS else None

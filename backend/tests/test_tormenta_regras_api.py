@@ -151,10 +151,24 @@ def test_get_regras_racas_v13(client_regras_tormenta):
     slugs = {x["slug"] for x in body["racas"]}
     assert "hynne" in slugs and "dahllan" in slugs
     assert "gnomo" not in slugs
+    assert "eiradaan" not in slugs
+    assert all(x.get("fonte_catalogo") == "core" for x in body["racas"])
     hum = next(x for x in body["racas"] if x["slug"] == "humano")
     assert hum["escolhe_tres_mais1"] is True
     lef = next(x for x in body["racas"] if x["slug"] == "lefou")
     assert lef["escolhe_lefou_deformidade"] is True
+
+
+def test_get_regras_racas_v13_herois_arton(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/racas",
+        params={"regra_versao": "v13", "suplemento": "herois_arton"},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["racas"]) == 21  # 17 core + 4 suplemento (sem Duende)
+    eir = next(x for x in body["racas"] if x["slug"] == "eiradaan")
+    assert eir["fonte_catalogo"] == "herois_arton"
 
 
 def test_get_regras_escolhas_raciais_lefou(client_regras_tormenta):

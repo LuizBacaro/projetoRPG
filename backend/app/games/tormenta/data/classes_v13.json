@@ -15,7 +15,10 @@
       "pv_por_nivel": 2,
       "pericias_treinadas": "2 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 2,
-      "pericias_fixas": ["misticismo", "vontade"],
+      "pericias_fixas": [
+        "misticismo",
+        "vontade"
+      ],
       "pericias_classe": "Misticismo (Int), Vontade (Sab) + 2 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Arcanista; caminho Bruxo, Mago ou Feiticeiro (irreversível).",
       "habilidades_por_nivel": {
@@ -26,7 +29,8 @@
         "5": "Poder de arcanista.",
         "10": "Poder de arcanista.",
         "20": "Poder de arcanista; ápice (v1.3 p.39)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "barbaro",
@@ -38,7 +42,10 @@
       "pv_por_nivel": 6,
       "pericias_treinadas": "4 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 4,
-      "pericias_fixas": ["fortitude", "luta"],
+      "pericias_fixas": [
+        "fortitude",
+        "luta"
+      ],
       "pericias_classe": "Fortitude (Con), Luta (For) + 4 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Bárbaro; proficiências de armas e armaduras leves/médias.",
       "habilidades_por_nivel": {
@@ -47,7 +54,8 @@
         "3": "Poder de bárbaro; fúria 2/dia.",
         "5": "Poder de bárbaro.",
         "20": "Poder de bárbaro; ápice (v1.3 p.41)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "bardo",
@@ -59,14 +67,18 @@
       "pv_por_nivel": 3,
       "pericias_treinadas": "6 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 6,
-      "pericias_fixas": ["atuacao", "reflexos"],
+      "pericias_fixas": [
+        "atuacao",
+        "reflexos"
+      ],
       "pericias_classe": "Atuação (Car), Reflexos (Des) + 6 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Bardo; conjuração arcana espontânea (chave Car).",
       "habilidades_por_nivel": {
         "1": "Poder de bardo; inspiração; conjuração (v1.3 p.42).",
         "2": "Poder de bardo.",
         "20": "Poder de bardo; ápice (v1.3 p.43)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "bucaneiro",
@@ -78,13 +90,16 @@
       "pv_por_nivel": 4,
       "pericias_treinadas": "4 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 4,
-      "pericias_fixas": ["reflexos"],
+      "pericias_fixas": [
+        "reflexos"
+      ],
       "pericias_classe": "Luta (For) ou Pontaria (Des), Reflexos (Des) + 4 à escolha.",
       "talentos_adicionais": "Poder de Bucaneiro; audácia; proficiências marciais.",
       "habilidades_por_nivel": {
         "1": "Poder de bucaneiro; audácia (v1.3 p.44).",
         "20": "Poder de bucaneiro; ápice (v1.3 p.45)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "cacador",
@@ -96,13 +111,16 @@
       "pv_por_nivel": 4,
       "pericias_treinadas": "6 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 6,
-      "pericias_fixas": ["sobrevivencia"],
+      "pericias_fixas": [
+        "sobrevivencia"
+      ],
       "pericias_classe": "Luta (For) ou Pontaria (Des), Sobrevivência (Sab) + 6 à escolha.",
       "talentos_adicionais": "Poder de Caçador; conjuração divina (chave Sab); PM 4/nível.",
       "habilidades_por_nivel": {
         "1": "Poder de caçador; marca; conjuração divina (v1.3 p.49).",
         "20": "Poder de caçador; ápice (v1.3 p.50)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "cavaleiro",
@@ -114,13 +132,17 @@
       "pv_por_nivel": 5,
       "pericias_treinadas": "2 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 2,
-      "pericias_fixas": ["fortitude", "luta"],
+      "pericias_fixas": [
+        "fortitude",
+        "luta"
+      ],
       "pericias_classe": "Fortitude (Con), Luta (For) + 2 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Cavaleiro; baluarte; proficiências completas.",
       "habilidades_por_nivel": {
         "1": "Poder de cavaleiro; baluarte (v1.3 p.51).",
         "20": "Poder de cavaleiro; ápice (v1.3 p.52)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "clerigo",
@@ -132,13 +154,17 @@
       "pv_por_nivel": 4,
       "pericias_treinadas": "2 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 2,
-      "pericias_fixas": ["religiao", "vontade"],
+      "pericias_fixas": [
+        "religiao",
+        "vontade"
+      ],
       "pericias_classe": "Religião (Int), Vontade (Sab) + 2 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Clérigo; devoção; conjuração divina (chave Sab).",
       "habilidades_por_nivel": {
         "1": "Poder de clérigo; devoção; conjuração divina (v1.3 p.53).",
         "20": "Poder de clérigo; ápice (v1.3 p.54)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "druida",
@@ -150,13 +176,17 @@
       "pv_por_nivel": 4,
       "pericias_treinadas": "4 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 4,
-      "pericias_fixas": ["sobrevivencia", "vontade"],
+      "pericias_fixas": [
+        "sobrevivencia",
+        "vontade"
+      ],
       "pericias_classe": "Sobrevivência (Sab), Vontade (Sab) + 4 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Druida; devoção; conjuração divina (chave Sab).",
       "habilidades_por_nivel": {
         "1": "Poder de druida; devoção; conjuração divina (v1.3 p.55).",
         "20": "Poder de druida; ápice (v1.3 p.56)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "guerreiro",
@@ -168,13 +198,16 @@
       "pv_por_nivel": 5,
       "pericias_treinadas": "2 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 2,
-      "pericias_fixas": ["fortitude"],
+      "pericias_fixas": [
+        "fortitude"
+      ],
       "pericias_classe": "Luta (For) ou Pontaria (Des), Fortitude (Con) + 2 à escolha.",
       "talentos_adicionais": "Poder de Guerreiro; proficiências completas.",
       "habilidades_por_nivel": {
         "1": "Poder de guerreiro (v1.3 p.57).",
         "20": "Poder de guerreiro; ápice (v1.3 p.58)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "inventor",
@@ -186,13 +219,17 @@
       "pv_por_nivel": 3,
       "pericias_treinadas": "4 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 4,
-      "pericias_fixas": ["oficio", "vontade"],
+      "pericias_fixas": [
+        "oficio",
+        "vontade"
+      ],
       "pericias_classe": "Ofício (Int), Vontade (Sab) + 4 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Inventor; engenhoca; proficiências limitadas.",
       "habilidades_por_nivel": {
         "1": "Poder de inventor; engenhoca (v1.3 p.59).",
         "20": "Poder de inventor; ápice (v1.3 p.60)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "ladino",
@@ -204,13 +241,17 @@
       "pv_por_nivel": 3,
       "pericias_treinadas": "8 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 8,
-      "pericias_fixas": ["ladinagem", "reflexos"],
+      "pericias_fixas": [
+        "ladinagem",
+        "reflexos"
+      ],
       "pericias_classe": "Ladinagem (Des), Reflexos (Des) + 8 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Ladino; ataque furtivo.",
       "habilidades_por_nivel": {
         "1": "Poder de ladino; ataque furtivo +1d6 (v1.3 p.61).",
         "20": "Poder de ladino; ápice (v1.3 p.62)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "lutador",
@@ -222,13 +263,17 @@
       "pv_por_nivel": 5,
       "pericias_treinadas": "4 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 4,
-      "pericias_fixas": ["fortitude", "luta"],
+      "pericias_fixas": [
+        "fortitude",
+        "luta"
+      ],
       "pericias_classe": "Fortitude (Con), Luta (For) + 4 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Lutador; golpe relâmpago.",
       "habilidades_por_nivel": {
         "1": "Poder de lutador; golpe relâmpago (v1.3 p.63).",
         "20": "Poder de lutador; ápice (v1.3 p.64)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "nobre",
@@ -240,13 +285,16 @@
       "pv_por_nivel": 4,
       "pericias_treinadas": "4 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 4,
-      "pericias_fixas": ["vontade"],
+      "pericias_fixas": [
+        "vontade"
+      ],
       "pericias_classe": "Diplomacia (Car) ou Intimidação (Car), Vontade (Sab) + 4 à escolha.",
       "talentos_adicionais": "Poder de Nobre; riqueza; proficiências leves.",
       "habilidades_por_nivel": {
         "1": "Poder de nobre; riqueza (v1.3 p.65).",
         "20": "Poder de nobre; ápice (v1.3 p.66)."
-      }
+      },
+      "fonte_catalogo": "core"
     },
     {
       "slug": "paladino",
@@ -258,13 +306,17 @@
       "pv_por_nivel": 5,
       "pericias_treinadas": "2 + modificador de Inteligência (v1.3)",
       "pericias_treinadas_base": 2,
-      "pericias_fixas": ["luta", "vontade"],
+      "pericias_fixas": [
+        "luta",
+        "vontade"
+      ],
       "pericias_classe": "Luta (For), Vontade (Sab) + 2 à escolha da lista de classe.",
       "talentos_adicionais": "Poder de Paladino; devoção; conjuração divina (chave Sab).",
       "habilidades_por_nivel": {
         "1": "Poder de paladino; devoção; conjuração divina (v1.3 p.67).",
         "20": "Poder de paladino; ápice (v1.3 p.68)."
-      }
+      },
+      "fonte_catalogo": "core"
     }
   ]
 }

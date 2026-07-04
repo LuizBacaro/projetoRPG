@@ -10,6 +10,12 @@ class TormentaRegrasService {
         return `${url}${sep}regra_versao=${encodeURIComponent(rv)}`;
     }
 
+    _appendQuery(url, key, value) {
+        if (value == null || String(value).trim() === '') return url;
+        const sep = url.includes('?') ? '&' : '?';
+        return `${url}${sep}${encodeURIComponent(key)}=${encodeURIComponent(String(value).trim())}`;
+    }
+
     _urlAtributos(regraVersao) {
         return this._appendRegraVersao(
             window.getApiUrl('/tormenta/regras/atributos'),
@@ -17,11 +23,12 @@ class TormentaRegrasService {
         );
     }
 
-    _urlRacas(regraVersao) {
-        return this._appendRegraVersao(
+    _urlRacas(regraVersao, suplemento) {
+        let url = this._appendRegraVersao(
             window.getApiUrl('/tormenta/regras/racas'),
             regraVersao
         );
+        return this._appendQuery(url, 'suplemento', suplemento);
     }
 
     _headers() {
@@ -64,19 +71,24 @@ class TormentaRegrasService {
     }
 
     async obterRacas(opts = {}) {
-        const res = await fetch(this._urlRacas(opts.regraVersao), { headers: this._headers() });
+        const res = await fetch(this._urlRacas(opts.regraVersao, opts.suplemento), {
+            headers: this._headers(),
+        });
         return this._handleJson(res, 'Erro ao carregar raças Tormenta');
     }
 
-    _urlClasses(regraVersao) {
-        return this._appendRegraVersao(
+    _urlClasses(regraVersao, suplemento) {
+        let url = this._appendRegraVersao(
             window.getApiUrl('/tormenta/regras/classes'),
             regraVersao
         );
+        return this._appendQuery(url, 'suplemento', suplemento);
     }
 
     async obterClasses(opts = {}) {
-        const res = await fetch(this._urlClasses(opts.regraVersao), { headers: this._headers() });
+        const res = await fetch(this._urlClasses(opts.regraVersao, opts.suplemento), {
+            headers: this._headers(),
+        });
         return this._handleJson(res, 'Erro ao carregar classes Tormenta');
     }
 
@@ -92,11 +104,12 @@ class TormentaRegrasService {
         );
     }
 
-    _urlOrigens(regraVersao) {
-        return this._appendRegraVersao(
+    _urlOrigens(regraVersao, suplemento) {
+        let url = this._appendRegraVersao(
             window.getApiUrl('/tormenta/regras/origens'),
             regraVersao || 'v13'
         );
+        return this._appendQuery(url, 'suplemento', suplemento);
     }
 
     /** Tendências (alinhamento) e divindades (Os Vinte) do MB para combos na ficha. */
@@ -107,7 +120,9 @@ class TormentaRegrasService {
 
     /** Origens v1.3 (Tabela 1-19) — benefícios de perícia e poder. */
     async obterOrigens(opts = {}) {
-        const res = await fetch(this._urlOrigens(opts.regraVersao), { headers: this._headers() });
+        const res = await fetch(this._urlOrigens(opts.regraVersao, opts.suplemento), {
+            headers: this._headers(),
+        });
         return this._handleJson(res, 'Erro ao carregar origens v1.3');
     }
 

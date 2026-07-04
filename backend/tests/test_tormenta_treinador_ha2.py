@@ -19,6 +19,10 @@ from app.games.tormenta.rules.melhor_amigo_t20 import (
     truques_disponiveis,
     validar_melhor_amigo_ficha,
 )
+from app.games.tormenta.rules.pericias_classe_t20 import (
+    config_pericias_classe_v13,
+    vagas_classe_v13,
+)
 from app.games.tormenta.rules.progressao_pv_t20 import preview_pv_mb
 from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTO_HEROIS_ARTON
 
@@ -44,6 +48,14 @@ def test_classe_por_slug_encontra_treinador() -> None:
     assert row is not None
     assert row["pv_inicial"] == 12
     assert row["pv_por_nivel"] == 3
+
+
+def test_treinador_pericias_classe_config() -> None:
+    cfg = config_pericias_classe_v13("treinador")
+    assert cfg is not None
+    assert cfg["pericias_fixas"] == ["adestramento", "vontade"]
+    assert cfg["pericias_escolha_qtd"] == 4
+    assert vagas_classe_v13("treinador") == 6
 
 
 def test_preview_pv_treinador() -> None:

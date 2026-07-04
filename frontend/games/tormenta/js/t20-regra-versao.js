@@ -8,6 +8,7 @@
     const RV_MB = 'mb';
     const RV_V13 = 'v13';
     const DEFAULT_NOVA_FICHA = RV_V13;
+    const SUPLEMENTO_HEROIS_ARTON = 'herois_arton';
 
     function normalizar(valor) {
         const s = String(valor == null ? '' : valor)
@@ -112,10 +113,17 @@
         return 10 + des + bonus + outros;
     }
 
+    function getGameSuplementoFicha(fichaJson) {
+        if (!fichaJson || fichaJson.game_suplemento == null) return null;
+        const s = String(fichaJson.game_suplemento).trim().toLowerCase();
+        return s === SUPLEMENTO_HEROIS_ARTON ? s : null;
+    }
+
     global.T20RegraVersao = {
         RV_MB,
         RV_V13,
         DEFAULT_NOVA_FICHA,
+        SUPLEMENTO_HEROIS_ARTON,
         normalizar,
         getRegraVersaoFicha,
         isV13,
@@ -128,5 +136,6 @@
         temArmaduraPesada,
         somaBonusProtecao,
         defesaTotalV13,
+        getGameSuplementoFicha,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

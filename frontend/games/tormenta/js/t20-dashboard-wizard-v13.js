@@ -77,12 +77,21 @@
             .replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
+    function suplementoWizardAtivo() {
+        const cb = q('cadUsarHeroisArton');
+        if (!cb || !cb.checked) return null;
+        return global.T20RegraVersao
+            ? global.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
+            : 'herois_arton';
+    }
+
     async function carregarCatalogos() {
         if (!isV13()) return;
         try {
             const svc = new TormentaRegrasService();
+            const sup = suplementoWizardAtivo();
             const [orig, ident] = await Promise.all([
-                svc.obterOrigens({ regraVersao: 'v13' }),
+                svc.obterOrigens({ regraVersao: 'v13', suplemento: sup }),
                 svc.obterIdentidadeMb(),
             ]);
             ORIGENS = Array.isArray(orig.origens) ? orig.origens : [];
@@ -1037,6 +1046,9 @@
         });
         q('cadTendencia')?.addEventListener('change', () => renderResumo());
         q('cadClasseMb')?.addEventListener('change', () => {
+            if (typeof global.popularCadClasseMbSelect === 'function') {
+                global.popularCadClasseMbSelect();
+            }
             if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
                 global.T20DashPericiasV13.invalidarPericias();
             }
@@ -1090,5 +1102,6 @@
         mostrarPasso,
         renderResumo,
         renderChecklistRevisao,
+        carregarCatalogos,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -602,6 +602,15 @@
 
             <div class="cad-wizard-step" data-cad-step="2">
                 <div class="t20-dash-form-grid">
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapHeroisArton" style="display: none">
+                        <label class="t20-dash-check">
+                            <input type="checkbox" id="cadUsarHeroisArton" />
+                            Incluir conteúdo <em>Heróis de Arton</em> (raças, classes variantes, origens)
+                        </label>
+                        <p class="t20-dash-hint" style="margin: 0.35rem 0 0">
+                            Ativa raças e classes do suplemento. Variantes excluem a classe base correspondente.
+                        </p>
+                    </div>
                     <div class="t20-dash-field t20-dash-field--full">
                         <label for="cadClasseMb">Classe MB (BBA / tabela)</label>
                         <select id="cadClasseMb" class="t20-input"></select>
@@ -981,8 +990,15 @@
     }
 
     async function carregarRacasTormentaDash() {
+        const sup =
+            window.T20RegraVersao && dashSuplementoAtivo()
+                ? window.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
+                : null;
         try {
-            const d = await new TormentaRegrasService().obterRacas({ regraVersao: DASH_REGRA_VERSAO });
+            const d = await new TormentaRegrasService().obterRacas({
+                regraVersao: DASH_REGRA_VERSAO,
+                suplemento: sup,
+            });
             return Array.isArray(d.racas) ? d.racas : [];
         } catch (e1) {
             const path =
@@ -997,8 +1013,15 @@
     }
 
     async function carregarClassesTormentaDash() {
+        const sup =
+            window.T20RegraVersao && dashSuplementoAtivo()
+                ? window.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
+                : null;
         try {
-            const d = await new TormentaRegrasService().obterClasses({ regraVersao: DASH_REGRA_VERSAO });
+            const d = await new TormentaRegrasService().obterClasses({
+                regraVersao: DASH_REGRA_VERSAO,
+                suplemento: sup,
+            });
             return Array.isArray(d.classes) ? d.classes : [];
         } catch (e1) {
             const path =
@@ -1414,6 +1437,47 @@
         return CLASSES_MB.find((x) => x.slug === slug) || null;
     }
 
+    function dashSuplementoAtivo() {
+        const cb = document.getElementById('cadUsarHeroisArton');
+        return !!(cb && cb.checked && isDashV13());
+    }
+
+    function classeDisponivelCadastro(row) {
+        const sel = document.getElementById('cadClasseMb');
+        const cur = (sel && sel.value) || '';
+        if (!row || !cur || row.slug === cur) return true;
+        const excl = Array.isArray(row.exclusivo_com) ? row.exclusivo_com : [];
+        if (excl.includes(cur)) return false;
+        const curRow = getClasseMbRowPorSlugDash(cur);
+        if (!curRow) return true;
+        const curExcl = Array.isArray(curRow.exclusivo_com) ? curRow.exclusivo_com : [];
+        if (curExcl.includes(row.slug)) return false;
+        const base = row.classe_variante_base;
+        if (base && cur === base) return false;
+        const curBase = curRow.classe_variante_base;
+        if (curBase && row.slug === curBase) return false;
+        return true;
+    }
+
+    async function recarregarCatalogosDashHerois() {
+        try {
+            const [racas, classes] = await Promise.all([
+                carregarRacasTormentaDash(),
+                carregarClassesTormentaDash(),
+            ]);
+            RACAS_MB = Array.isArray(racas) ? racas : [];
+            CLASSES_MB = Array.isArray(classes) ? classes : [];
+        } catch (e) {
+            console.warn(e);
+        }
+        popularCadRacaSelect();
+        popularCadClasseMbSelect();
+        onCadRacaSelectChange(false);
+        if (window.T20DashWizardV13 && T20DashWizardV13.carregarCatalogos) {
+            void T20DashWizardV13.carregarCatalogos();
+        }
+    }
+
     function popularCadRacaSelect() {
         const sel = document.getElementById('cadRacaSelect');
         if (!sel) return;
@@ -1426,7 +1490,9 @@
         RACAS_MB.forEach((row) => {
             const o = document.createElement('option');
             o.value = row.slug;
-            o.textContent = row.nome;
+            const tag =
+                row.fonte_catalogo === 'herois_arton' ? ' [HA]' : '';
+            o.textContent = `${row.nome}${tag}`;
             sel.appendChild(o);
         });
         const ox = document.createElement('option');
@@ -1445,10 +1511,16 @@
         o0.value = '';
         o0.textContent = '— Livre / multiclasse (texto na ficha)';
         sel.appendChild(o0);
-        CLASSES_MB.forEach((row) => {
+        CLASSES_MB.filter((row) => classeDisponivelCadastro(row)).forEach((row) => {
             const o = document.createElement('option');
             o.value = row.slug;
-            o.textContent = `${row.nome}${row.abreviatura ? ` (${row.abreviatura})` : ''}`;
+            const tag =
+                row.fonte_catalogo === 'herois_arton'
+                    ? row.classe_variante_base
+                        ? ' [variante]'
+                        : ' [HA]'
+                    : '';
+            o.textContent = `${row.nome}${row.abreviatura ? ` (${row.abreviatura})` : ''}${tag}`;
             sel.appendChild(o);
         });
         if (cur && CLASSES_MB.some((x) => x.slug === cur)) sel.value = cur;
@@ -2250,6 +2322,9 @@
             travar_raca_classe_mb: false,
             cadastro_dashboard: true,
         };
+        if (dashSuplementoAtivo() && window.T20RegraVersao) {
+            fichaBase.game_suplemento = window.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON;
+        }
         if (t === 'jogador') {
             const bases = atributosCompraDash();
             fichaBase.metodo_geracao_atributos = getMetodoGeracaoDash();
@@ -2631,7 +2706,15 @@
         bindCadRacialDashOnce();
         onCadRacaSelectChange(false);
         void carregarRegrasCompra();
+        const wrapHa = document.getElementById('cadWrapHeroisArton');
+        if (wrapHa) wrapHa.style.display = isDashV13() ? '' : 'none';
+        const cbHa = document.getElementById('cadUsarHeroisArton');
+        if (cbHa && !cbHa.__boundHeroisArton) {
+            cbHa.__boundHeroisArton = true;
+            cbHa.addEventListener('change', () => void recarregarCatalogosDashHerois());
+        }
     })();
+    global.popularCadClasseMbSelect = popularCadClasseMbSelect;
 })();
 </script>
 </body>
