@@ -42,9 +42,14 @@
         return sel && sel.value ? String(sel.value).trim().toLowerCase() : '';
     }
 
+    function getCadRacialDeltasStep2() {
+        return (global.__t20GetCadRacialDeltas && global.__t20GetCadRacialDeltas()) || {};
+    }
+
     function conValorCadastro() {
         const n = Number(q('cadCon') && q('cadCon').value);
-        return Number.isFinite(n) ? Math.floor(n) : 0;
+        const base = Number.isFinite(n) ? Math.floor(n) : 0;
+        return base + (getCadRacialDeltasStep2().con || 0);
     }
 
     function nivelCadastro() {
@@ -263,16 +268,17 @@
             return null;
         }
         try {
+            const _racDelPv = getCadRacialDeltasStep2();
             const payload = {
                 classe_slug: slug,
                 nivel: Math.max(1, nivelCadastro()),
                 con_valor: conValorCadastro(),
                 regraVersao: 'v13',
-                for_valor: Math.floor(Number(q('cadFor') && q('cadFor').value) || 0),
-                des_valor: Math.floor(Number(q('cadDes') && q('cadDes').value) || 0),
-                int_valor: Math.floor(Number(q('cadInt') && q('cadInt').value) || 0),
-                sab_valor: Math.floor(Number(q('cadSab') && q('cadSab').value) || 0),
-                car_valor: Math.floor(Number(q('cadCar') && q('cadCar').value) || 0),
+                for_valor: Math.floor(Number(q('cadFor') && q('cadFor').value) || 0) + (_racDelPv.for || 0),
+                des_valor: Math.floor(Number(q('cadDes') && q('cadDes').value) || 0) + (_racDelPv.des || 0),
+                int_valor: Math.floor(Number(q('cadInt') && q('cadInt').value) || 0) + (_racDelPv.int || 0),
+                sab_valor: Math.floor(Number(q('cadSab') && q('cadSab').value) || 0) + (_racDelPv.sab || 0),
+                car_valor: Math.floor(Number(q('cadCar') && q('cadCar').value) || 0) + (_racDelPv.car || 0),
             };
             if (slug === 'arcanista') {
                 const cam = (q('cadArcanistaCaminho') && q('cadArcanistaCaminho').value) || '';

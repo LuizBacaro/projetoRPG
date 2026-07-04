@@ -79,7 +79,10 @@ class TormentaCombateService:
 
             pers = self.personagem_repo.get_by_ids(list(combate.personagens_ids or []))
             by_id = {p.id: p for p in pers}
-            ordenados = [by_id[i] for i in combate.personagens_ids if i in by_id]
+            # Filtrar IDs inexistentes (personagens deletados) para não exibir #N na arena.
+            existing_ids = [i for i in (combate.personagens_ids or []) if i in by_id]
+            payload["personagens_ids"] = existing_ids
+            ordenados = [by_id[i] for i in existing_ids]
             personagens_out: List[Dict[str, Any]] = []
             for p in ordenados:
                 dump = TormentaPersonagemResponse.model_validate(p).model_dump()
