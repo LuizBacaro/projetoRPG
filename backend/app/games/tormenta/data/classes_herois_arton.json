@@ -1,0 +1,333 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.16–44",
+    "nota": "Classes suplemento: Treinador (nova) + 14 classes variantes. Não reproduz texto longo."
+  },
+  "classes": [
+    {
+      "slug": "treinador",
+      "nome": "Treinador",
+      "abreviatura": "Tre",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": null,
+      "exclusivo_com": [],
+      "atributo_principal": "CAR",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 12,
+      "pv_por_nivel": 3,
+      "pm_por_nivel": 4,
+      "pericias_treinadas": "2 + modificador de Inteligência",
+      "pericias_treinadas_base": 2,
+      "pericias_fixas": ["adestramento", "vontade"],
+      "pericias_classe": "Adestramento (Car), Vontade (Sab) + 4 à escolha: Atletismo, Cavalgar, Diplomacia, Guerra, Iniciativa, Intimidação, Intuição, Luta, Ofício, Percepção, Pontaria, Reflexos, Religião, Sobrevivência.",
+      "talentos_adicionais": "Melhor Amigo; Direcionar; poderes de treinador.",
+      "habilidades_por_nivel": {
+        "1":  "Direcionar; Melhor Amigo (2 truques). p.20.",
+        "2":  "Domar Criatura (2d8); Poder de Treinador. p.20.",
+        "4":  "Melhor Amigo (3 truques). p.20.",
+        "5":  "Domar Criatura (cena); Treino Especializado. p.20.",
+        "6":  "Domar Criatura (4d8); Sincronia de Combate. p.20.",
+        "7":  "Melhor Amigo (4 truques). p.20.",
+        "8":  "Domar Criatura (dia). p.20.",
+        "10": "Domar Criatura (6d8); Melhor Amigo (5 truques). p.20.",
+        "14": "Domar Criatura (8d8). p.20.",
+        "18": "Domar Criatura (10d8). p.20.",
+        "20": "Sincronia Perfeita. p.20."
+      }
+    },
+    {
+      "slug": "alquimista",
+      "nome": "Alquimista",
+      "abreviatura": "Alq",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "inventor",
+      "exclusivo_com": ["inventor", "inovador"],
+      "atributo_principal": "INT",
+      "bba_tipo": "meio",
+      "pv_inicial": 12,
+      "pv_por_nivel": 3,
+      "pm_por_nivel": 4,
+      "pericias_treinadas": "4 + modificador de Inteligência",
+      "pericias_treinadas_base": 4,
+      "pericias_fixas": ["oficio", "vontade"],
+      "pericias_classe": "Mesmas do Inventor, mais Medicina (Int) e Ladinagem (Des).",
+      "talentos_adicionais": "Mistura Básica; Magia Engarrafada; poderes de inventor.",
+      "habilidades_por_nivel": {
+        "1": "Mistura Básica; Magia Engarrafada. Variante de Inventor — substitui Engenhoca. p.22."
+      }
+    },
+    {
+      "slug": "atleta",
+      "nome": "Atleta",
+      "abreviatura": "Atl",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "guerreiro",
+      "exclusivo_com": ["guerreiro", "machado_de_pedra"],
+      "atributo_principal": "FOR ou DES",
+      "bba_tipo": "plein",
+      "pv_inicial": 20,
+      "pv_por_nivel": 5,
+      "pm_por_nivel": 3,
+      "pericias_treinadas": "4 + modificador de Inteligência",
+      "pericias_treinadas_base": 4,
+      "pericias_fixas": ["atletismo", "fortitude"],
+      "pericias_classe": "Atletismo (For), Fortitude (Con) + 4 à escolha da lista de Guerreiro.",
+      "talentos_adicionais": "Façanhas Físicas; Resistência de Campeão; poderes de guerreiro.",
+      "habilidades_por_nivel": {
+        "1": "Façanhas Físicas; Resistência de Campeão. Variante de Guerreiro. p.24."
+      }
+    },
+    {
+      "slug": "burgues",
+      "nome": "Burguês",
+      "abreviatura": "Brg",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "nobre",
+      "exclusivo_com": ["nobre"],
+      "atributo_principal": "CAR",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 16,
+      "pv_por_nivel": 4,
+      "pm_por_nivel": 4,
+      "pericias_treinadas": "4 + modificador de Inteligência",
+      "pericias_treinadas_base": 4,
+      "pericias_fixas": ["oficio"],
+      "pericias_classe": "Ofício (Int), Diplomacia (Car) + 4 à escolha da lista de Nobre.",
+      "talentos_adicionais": "Comércio; Alta Sociedade; poderes de nobre.",
+      "habilidades_por_nivel": {
+        "1": "Comércio; Alta Sociedade. Variante de Nobre. p.25."
+      }
+    },
+    {
+      "slug": "duelista",
+      "nome": "Duelista",
+      "abreviatura": "Due",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": null,
+      "exclusivo_com": [],
+      "atributo_principal": "DES",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 12,
+      "pv_por_nivel": 3,
+      "pm_por_nivel": 3,
+      "pericias_treinadas": "4 + modificador de Inteligência",
+      "pericias_treinadas_base": 4,
+      "pericias_fixas": ["reflexos"],
+      "pericias_classe": "Reflexos (Des), Luta (For) + 4 à escolha.",
+      "talentos_adicionais": "Combate Um-a-Um; Estilo do Florete; poderes de classe livre.",
+      "habilidades_por_nivel": {
+        "1": "Combate Um-a-Um; Estilo do Florete. Variante livre (sem classe base). p.27."
+      }
+    },
+    {
+      "slug": "ermitao",
+      "nome": "Ermitão",
+      "abreviatura": "Erm",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "druida",
+      "exclusivo_com": ["druida"],
+      "atributo_principal": "SAB",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 16,
+      "pv_por_nivel": 4,
+      "pm_por_nivel": 4,
+      "pericias_treinadas": "4 + modificador de Inteligência",
+      "pericias_treinadas_base": 4,
+      "pericias_fixas": ["sobrevivencia", "vontade"],
+      "pericias_classe": "Mesmas do Druida.",
+      "talentos_adicionais": "Reclusão; Meditação; poderes de druida.",
+      "habilidades_por_nivel": {
+        "1": "Reclusão; Meditação. Variante de Druida. p.29."
+      }
+    },
+    {
+      "slug": "inovador",
+      "nome": "Inovador",
+      "abreviatura": "Ino",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "inventor",
+      "exclusivo_com": ["inventor", "alquimista"],
+      "atributo_principal": "INT",
+      "bba_tipo": "meio",
+      "pv_inicial": 12,
+      "pv_por_nivel": 3,
+      "pm_por_nivel": 4,
+      "pericias_treinadas": "4 + modificador de Inteligência",
+      "pericias_treinadas_base": 4,
+      "pericias_fixas": ["oficio", "vontade"],
+      "pericias_classe": "Mesmas do Inventor.",
+      "talentos_adicionais": "Criatividade Extrema; Inventos Únicos; poderes de inventor.",
+      "habilidades_por_nivel": {
+        "1": "Criatividade Extrema; Inventos Únicos. Variante de Inventor. p.30."
+      }
+    },
+    {
+      "slug": "machado_de_pedra",
+      "nome": "Machado de Pedra",
+      "abreviatura": "MdP",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "guerreiro",
+      "exclusivo_com": ["guerreiro", "atleta"],
+      "atributo_principal": "FOR",
+      "bba_tipo": "plein",
+      "pv_inicial": 20,
+      "pv_por_nivel": 5,
+      "pm_por_nivel": 3,
+      "pericias_treinadas": "2 + modificador de Inteligência",
+      "pericias_treinadas_base": 2,
+      "pericias_fixas": ["fortitude"],
+      "pericias_classe": "Mesmas do Guerreiro.",
+      "talentos_adicionais": "Especialista em Machado; proficiência armadura pesada; poderes de guerreiro.",
+      "habilidades_por_nivel": {
+        "1": "Especialista em Machado. Variante de Guerreiro (anão). p.32."
+      }
+    },
+    {
+      "slug": "magimarcialista",
+      "nome": "Magimarcialista",
+      "abreviatura": "Mgm",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "arcanista",
+      "exclusivo_com": ["arcanista", "lutador"],
+      "atributo_principal": "INT e FOR",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 16,
+      "pv_por_nivel": 4,
+      "pm_por_nivel": 4,
+      "pericias_treinadas": "2 + modificador de Inteligência",
+      "pericias_treinadas_base": 2,
+      "pericias_fixas": ["misticismo", "luta"],
+      "pericias_classe": "Misticismo (Int), Luta (For) + 2 à escolha.",
+      "talentos_adicionais": "Fusão Magia-Combate; Ataques Mágicos; conjuração arcana.",
+      "habilidades_por_nivel": {
+        "1": "Fusão Magia-Combate. Variante de Arcanista/Lutador. p.33."
+      }
+    },
+    {
+      "slug": "necromante",
+      "nome": "Necromante",
+      "abreviatura": "Nec",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "arcanista",
+      "exclusivo_com": ["arcanista"],
+      "atributo_principal": "INT",
+      "bba_tipo": "meio",
+      "pv_inicial": 8,
+      "pv_por_nivel": 2,
+      "pm_por_nivel": 6,
+      "pericias_treinadas": "2 + modificador de Inteligência",
+      "pericias_treinadas_base": 2,
+      "pericias_fixas": ["misticismo", "vontade"],
+      "pericias_classe": "Mesmas do Arcanista.",
+      "talentos_adicionais": "Magia de Morte; Mortos-Vivos Aliados; conjuração arcana.",
+      "habilidades_por_nivel": {
+        "1": "Magia de Morte; Mortos-Vivos Aliados. Variante de Arcanista. p.34."
+      }
+    },
+    {
+      "slug": "santo",
+      "nome": "Santo",
+      "abreviatura": "Snt",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "clerigo",
+      "exclusivo_com": ["clerigo"],
+      "atributo_principal": "SAB e CAR",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 16,
+      "pv_por_nivel": 4,
+      "pm_por_nivel": 5,
+      "pericias_treinadas": "2 + modificador de Inteligência",
+      "pericias_treinadas_base": 2,
+      "pericias_fixas": ["religiao", "vontade"],
+      "pericias_classe": "Mesmas do Clérigo.",
+      "talentos_adicionais": "Devoção Absoluta; Milagres Sem Magia; poderes de clérigo.",
+      "habilidades_por_nivel": {
+        "1": "Devoção Absoluta; Milagres Sem Magia. Variante de Clérigo. p.37."
+      }
+    },
+    {
+      "slug": "seteiro",
+      "nome": "Seteiro",
+      "abreviatura": "Set",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "cacador",
+      "exclusivo_com": ["cacador", "ventanista"],
+      "atributo_principal": "DES",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 16,
+      "pv_por_nivel": 4,
+      "pm_por_nivel": 3,
+      "pericias_treinadas": "6 + modificador de Inteligência",
+      "pericias_treinadas_base": 6,
+      "pericias_fixas": ["pontaria", "sobrevivencia"],
+      "pericias_classe": "Pontaria (Des), Sobrevivência (Sab) + 6 à escolha da lista de Caçador.",
+      "talentos_adicionais": "Arqueiro Especializado; Pontaria Avançada; poderes de caçador.",
+      "habilidades_por_nivel": {
+        "1": "Arqueiro Especializado. Variante de Caçador. p.38."
+      }
+    },
+    {
+      "slug": "usurpador",
+      "nome": "Usurpador",
+      "abreviatura": "Usu",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "bardo",
+      "exclusivo_com": ["bardo", "ladino"],
+      "atributo_principal": "CAR ou DES",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 12,
+      "pv_por_nivel": 3,
+      "pm_por_nivel": 3,
+      "pericias_treinadas": "6 + modificador de Inteligência",
+      "pericias_treinadas_base": 6,
+      "pericias_fixas": ["enganacao", "ladinagem"],
+      "pericias_classe": "Enganação (Car), Ladinagem (Des) + 6 à escolha.",
+      "talentos_adicionais": "Dissimulação Política; Disfarces; poderes de bardo/ladino.",
+      "habilidades_por_nivel": {
+        "1": "Dissimulação Política; Disfarces. Variante de Bardo/Ladino. p.40."
+      }
+    },
+    {
+      "slug": "vassalo",
+      "nome": "Vassalo",
+      "abreviatura": "Vas",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "cavaleiro",
+      "exclusivo_com": ["cavaleiro"],
+      "atributo_principal": "FOR",
+      "bba_tipo": "plein",
+      "pv_inicial": 20,
+      "pv_por_nivel": 5,
+      "pm_por_nivel": 3,
+      "pericias_treinadas": "2 + modificador de Inteligência",
+      "pericias_treinadas_base": 2,
+      "pericias_fixas": ["fortitude", "luta"],
+      "pericias_classe": "Mesmas do Cavaleiro.",
+      "talentos_adicionais": "Serviço Leal; Bênção do Senhor; poderes de cavaleiro.",
+      "habilidades_por_nivel": {
+        "1": "Serviço Leal. Variante de Cavaleiro. p.41."
+      }
+    },
+    {
+      "slug": "ventanista",
+      "nome": "Ventanista",
+      "abreviatura": "Ven",
+      "fonte_catalogo": "herois_arton",
+      "classe_variante_base": "cacador",
+      "exclusivo_com": ["cacador", "ladino", "seteiro"],
+      "atributo_principal": "DES",
+      "bba_tipo": "tres_quartos",
+      "pv_inicial": 12,
+      "pv_por_nivel": 3,
+      "pm_por_nivel": 4,
+      "pericias_treinadas": "6 + modificador de Inteligência",
+      "pericias_treinadas_base": 6,
+      "pericias_fixas": ["atletismo", "reflexos"],
+      "pericias_classe": "Atletismo (For), Reflexos (Des) + 6 à escolha.",
+      "talentos_adicionais": "Acrobacia; Armas de Corda; movimentação avançada; poderes de caçador/ladino.",
+      "habilidades_por_nivel": {
+        "1": "Acrobacia; Armas de Corda. Variante de Caçador/Ladino. p.44."
+      }
+    }
+  ]
+}

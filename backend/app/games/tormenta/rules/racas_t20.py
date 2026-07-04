@@ -19,6 +19,7 @@ from app.games.tormenta.rules.regra_versao_t20 import (
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _RACAS_JSON = _DATA_DIR / "racas_mb.json"
 _RACAS_V13_JSON = _DATA_DIR / "racas_v13.json"
+_RACAS_HEROIS_ARTON_JSON = _DATA_DIR / "racas_herois_arton.json"
 
 
 @lru_cache(maxsize=2)
@@ -37,6 +38,14 @@ def _carregar_racas(regra_versao: str = "mb") -> Dict[str, Any]:
 @lru_cache(maxsize=1)
 def _carregar_racas_mb() -> Dict[str, Any]:
     return _carregar_racas("mb")
+
+
+@lru_cache(maxsize=1)
+def _carregar_racas_herois_arton() -> Dict[str, Any]:
+    """Carrega raças do suplemento Heróis de Arton v1.1."""
+    if not _RACAS_HEROIS_ARTON_JSON.is_file():
+        return {"racas": []}
+    return json.loads(_RACAS_HEROIS_ARTON_JSON.read_text(encoding="utf-8"))
 
 
 def idiomas_mb_extras() -> Tuple[str, List[Dict[str, str]]]:
@@ -65,11 +74,15 @@ def lista_racas_mb() -> List[Dict[str, Any]]:
     return lista_racas(REGRA_VERSAO_MB)
 
 
-def lista_racas(regra_versao: Optional[str] = None) -> List[Dict[str, Any]]:
-    """Lista ordenada de raças para API/ficha conforme edição (mb ou v13)."""
-    data = _carregar_racas(normalizar_regra_versao(regra_versao))
+def _processar_racas(
+    rows: List[Any],
+    *,
+    regra_versao: Optional[str] = None,
+    fonte_catalogo: str = "core",
+) -> List[Dict[str, Any]]:
+    """Converte lista raw de raças (JSON) no formato normalizado da API."""
     out: List[Dict[str, Any]] = []
-    for row in data.get("racas", []):
+    for row in rows:
         slug = str(row.get("slug", "")).strip()
         nome = str(row.get("nome", "")).strip()
         if not slug or not nome:
@@ -99,14 +112,19 @@ def lista_racas(regra_versao: Optional[str] = None) -> List[Dict[str, Any]]:
         esc_cfg = escolhas_por_raca(slug, regra_versao)
         esc_tipo = str((esc_cfg or {}).get("tipo") or "")
         esc_flag = flag_escolha_por_tipo(esc_tipo, slug)
+        # campo fonte_catalogo: usa o do JSON se explícito, senão o padrão do caller
+        fc = str(row.get("fonte_catalogo") or fonte_catalogo).strip()
         out.append(
             {
                 "slug": slug,
                 "nome": nome,
+                "fonte_catalogo": fc,
                 "ajustes": ajustes_limpo,
                 "escolhe_duas_mais2": bool(row.get("escolhe_duas_mais2")),
                 "escolhe_tres_mais1": bool(row.get("escolhe_tres_mais1")),
                 "escolhe_um_mais2": bool(row.get("escolhe_um_mais2")),
+                "escolhe_um_mais1": bool(row.get("escolhe_um_mais1")),
+                "escolhe_dois_mais1": bool(row.get("escolhe_dois_mais1")),
                 "escolhe_suraggel_subtipo": bool(row.get("escolhe_suraggel_subtipo")),
                 "escolhe_lefou_deformidade": esc_flag == "escolhe_lefou_deformidade",
                 "escolhe_qareen_ascendencia": esc_flag == "escolhe_qareen_ascendencia",
@@ -129,6 +147,43 @@ def lista_racas(regra_versao: Optional[str] = None) -> List[Dict[str, Any]]:
                 "pericias_treinadas_extra": int(
                     row.get("pericias_treinadas_extra", 0) or 0
                 ),
+                "construcao_modular_duende": bool(row.get("construcao_modular_duende")),
             }
         )
     return out
+
+
+def lista_racas(regra_versao: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Lista ordenada de raças para API/ficha conforme edição (mb ou v13).
+
+    Retorna apenas raças core. Para incluir suplemento Heróis de Arton,
+    use ``lista_racas_com_suplemento``.
+    """
+    data = _carregar_racas(normalizar_regra_versao(regra_versao))
+    return _processar_racas(
+        data.get("racas", []),
+        regra_versao=regra_versao,
+        fonte_catalogo="core",
+    )
+
+
+def lista_racas_herois_arton() -> List[Dict[str, Any]]:
+    """Lista de raças do suplemento Heróis de Arton v1.1."""
+    data = _carregar_racas_herois_arton()
+    return _processar_racas(
+        data.get("racas", []),
+        fonte_catalogo="herois_arton",
+    )
+
+
+def lista_racas_com_suplemento(
+    regra_versao: Optional[str] = None,
+    suplemento: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Lista raças core + suplemento quando ``suplemento='herois_arton'``."""
+    from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTO_HEROIS_ARTON
+
+    racas = lista_racas(regra_versao)
+    if suplemento and str(suplemento).strip().lower() == SUPLEMENTO_HEROIS_ARTON:
+        racas = racas + lista_racas_herois_arton()
+    return racas

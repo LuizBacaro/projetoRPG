@@ -47,11 +47,36 @@
         return isV13() && String(tipo || '').toLowerCase() === 'jogador';
     }
 
-    function totalPassos() {
-        return isWizardAtivo() ? 8 : 1;
+    function passoPoderesHaAplica() {
+        return (
+            global.T20DashPoderesHaV13 &&
+            typeof global.T20DashPoderesHaV13.passoAplica === 'function' &&
+            global.T20DashPoderesHaV13.passoAplica()
+        );
     }
 
-    const PASSO_KIT = 7;
+    function totalPassos() {
+        if (!isWizardAtivo()) return 1;
+        return passoPoderesHaAplica() ? 9 : 8;
+    }
+
+    function passoKit() {
+        return passoPoderesHaAplica() ? 8 : 7;
+    }
+
+    function passoRevisao() {
+        return passoPoderesHaAplica() ? 9 : 8;
+    }
+
+    /** Passo lógico do wizard → data-cad-step no DOM. */
+    function domStepFromLogical(s) {
+        if (!passoPoderesHaAplica()) {
+            if (s <= 6) return s;
+            if (s === 7) return 8;
+            if (s === 8) return 9;
+        }
+        return s;
+    }
 
     function nivelCadastro() {
         const n = parseInt(String(q('cadNivel') && q('cadNivel').value || '1'), 10);
@@ -77,12 +102,21 @@
             .replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
+    function suplementoWizardAtivo() {
+        const cb = q('cadUsarHeroisArton');
+        if (!cb || !cb.checked) return null;
+        return global.T20RegraVersao
+            ? global.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
+            : 'herois_arton';
+    }
+
     async function carregarCatalogos() {
         if (!isV13()) return;
         try {
             const svc = new TormentaRegrasService();
+            const sup = suplementoWizardAtivo();
             const [orig, ident] = await Promise.all([
-                svc.obterOrigens({ regraVersao: 'v13' }),
+                svc.obterOrigens({ regraVersao: 'v13', suplemento: sup }),
                 svc.obterIdentidadeMb(),
             ]);
             ORIGENS = Array.isArray(orig.origens) ? orig.origens : [];
@@ -253,8 +287,10 @@
         const row = origemPorSlug(sel.value);
         if (!row) {
             host.innerHTML = '';
+            global.__cadOrigemPermiteTroca = false;
             return;
         }
+        global.__cadOrigemPermiteTroca = Boolean(row.troca_pericia_treinada);
         const saved = global.__cadOrigemBeneficios || [];
         const opts = [];
         (row.beneficios_pericias || []).forEach((p) => {
@@ -290,6 +326,7 @@
                     return;
                 }
                 global.__cadOrigemBeneficios = picks;
+                global.__cadOrigemTrocasPericia = {};
                 if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
                     global.T20DashPericiasV13.invalidarPericias();
                 }
@@ -504,9 +541,10 @@
             'Origem',
             'Perícias',
             'Devoção',
-            nivelCadastro() <= 1 ? 'Equipamento' : 'Dinheiro (T$)',
-            'Revisão',
         ];
+        if (passoPoderesHaAplica()) labels.push('Poderes HA');
+        labels.push(nivelCadastro() <= 1 ? 'Equipamento' : 'Dinheiro (T$)');
+        labels.push('Revisão');
         nav.innerHTML = labels
             .map((lab, i) => {
                 const n = i + 1;
@@ -523,6 +561,7 @@
 
     function mostrarPasso(n) {
         stepAtual = Math.max(1, Math.min(totalPassos(), n));
+        const domStep = domStepFromLogical(stepAtual);
         document.querySelectorAll('.cad-wizard-step').forEach((el) => {
             const s = parseInt(el.getAttribute('data-cad-step') || '0', 10);
             if (!isWizardAtivo()) {
@@ -530,7 +569,7 @@
                 el.style.display = v13only ? 'none' : '';
                 return;
             }
-            el.style.display = s === stepAtual ? '' : 'none';
+            el.style.display = s === domStep ? '' : 'none';
         });
         renderNav();
         atualizarBotoesRodape();
@@ -548,11 +587,14 @@
             sincronizarDevotoObrigatorioWizard();
             renderPoderesConcedidos();
         }
-        if (stepAtual === 7) {
+        if (passoPoderesHaAplica() && stepAtual === 7 && global.T20DashPoderesHaV13) {
+            void global.T20DashPoderesHaV13.prepararPasso();
+        }
+        if (stepAtual === passoKit()) {
             renderUiKit();
             renderEquipamentosPreview();
         }
-        if (stepAtual === 8) {
+        if (stepAtual === passoRevisao()) {
             void renderChecklistRevisao();
             renderResumo();
         }
@@ -605,10 +647,25 @@
             optional: !devoto && v6.ok,
         });
 
-        if (passoKitAplica() || nivelCadastro() > 1) {
-            const v7 = validarPasso(7);
+        if (passoPoderesHaAplica()) {
+            const sel =
+                global.T20DashPoderesHaV13 && global.T20DashPoderesHaV13.selecionados
+                    ? global.T20DashPoderesHaV13.selecionados()
+                    : [];
             items.push({
                 passo: 7,
+                label: 'Poderes HA',
+                ok: true,
+                msg: '',
+                detalhe: sel.length ? `${sel.length} escolhido(s)` : 'Opcional — nenhum',
+                optional: !sel.length,
+            });
+        }
+
+        if (passoKitAplica() || nivelCadastro() > 1) {
+            const v7 = validarPasso(passoKit());
+            items.push({
+                passo: passoKit(),
                 label: passoKitAplica() ? 'Kit inicial' : 'Dinheiro (Tabela 3-1)',
                 ok: v7.ok,
                 msg: v7.msg || '',
@@ -683,8 +740,15 @@
 
     async function validarAntesCriar() {
         if (!isWizardAtivo()) return { ok: true };
-        for (let s = 4; s <= 7; s++) {
-            if (s === 7 && !passoKitAplica()) continue;
+        for (let s = 4; s <= passoKit(); s++) {
+            if (s === passoKit() && !passoKitAplica() && nivelCadastro() <= 1) continue;
+            if (passoPoderesHaAplica() && s === 7) {
+                const vP = global.T20DashPoderesHaV13 && global.T20DashPoderesHaV13.validar
+                    ? global.T20DashPoderesHaV13.validar()
+                    : { ok: true };
+                if (!vP.ok) return { ok: false, msg: vP.msg, passo: 7 };
+                continue;
+            }
             if (
                 s === 5 &&
                 global.T20DashPericiasV13 &&
@@ -761,10 +825,15 @@
             global.T20DashPericiasV13 && global.T20DashPericiasV13.resumoPericias
                 ? global.T20DashPericiasV13.resumoPericias()
                 : '';
+        const podHa =
+            global.T20DashPoderesHaV13 && global.T20DashPoderesHaV13.resumo
+                ? global.T20DashPoderesHaV13.resumo()
+                : '';
         host.innerHTML =
             `<p><strong>${nome || '—'}</strong> · Nv ${nv || '1'}</p>` +
             `<p>Classe: ${cls ? cls.textContent : '—'} · Raça: ${rac ? rac.textContent : '—'}</p>` +
             (step2Extra ? `<p>${step2Extra}</p>` : '') +
+            (podHa ? `<p>${podHa}</p>` : '') +
             (perRes ? `<p>${perRes}</p>` : '') +
             `<p>Origem: ${orig ? orig.textContent : '—'}</p>` +
             `<p>Benefícios: ${bens}</p>` +
@@ -859,7 +928,13 @@
             }
             return { ok: true };
         }
-        if (n === 7) {
+        if (passoPoderesHaAplica() && n === 7) {
+            if (global.T20DashPoderesHaV13 && global.T20DashPoderesHaV13.validar) {
+                return global.T20DashPoderesHaV13.validar();
+            }
+            return { ok: true };
+        }
+        if (n === passoKit()) {
             const nv = parseInt(String(q('cadNivel') && q('cadNivel').value || '1'), 10);
             if (nv > 1) {
                 if (
@@ -876,7 +951,7 @@
             if (!arma) return { ok: false, msg: 'Escolha a arma simples do kit inicial.' };
             return { ok: true };
         }
-        if (n === 8) {
+        if (n === passoRevisao()) {
             if (global.__cadWizardChecklistOk === false) {
                 return {
                     ok: false,
@@ -917,6 +992,8 @@
         stepAtual = 1;
         global.__cadOrigemBeneficios = [];
         global.__cadOrigemItensEscolha = {};
+        global.__cadOrigemTrocasPericia = {};
+        global.__cadOrigemPermiteTroca = false;
         global.__cadKitInicial = {};
         global.__cadWizardChecklistOk = null;
         if (q('cadOrigemSlug')) q('cadOrigemSlug').value = '';
@@ -932,6 +1009,9 @@
         }
         if (global.T20DashPericiasV13 && global.T20DashPericiasV13.resetPericias) {
             global.T20DashPericiasV13.resetPericias();
+        }
+        if (global.T20DashPoderesHaV13 && global.T20DashPoderesHaV13.reset) {
+            global.T20DashPoderesHaV13.reset();
         }
     }
 
@@ -1019,6 +1099,8 @@
         q('cadWizardNext')?.addEventListener('click', () => avancar());
         q('cadOrigemSlug')?.addEventListener('change', () => {
             global.__cadOrigemBeneficios = [];
+            global.__cadOrigemTrocasPericia = {};
+            global.__cadOrigemPermiteTroca = false;
             if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
                 global.T20DashPericiasV13.invalidarPericias();
             }
@@ -1037,6 +1119,9 @@
         });
         q('cadTendencia')?.addEventListener('change', () => renderResumo());
         q('cadClasseMb')?.addEventListener('change', () => {
+            if (typeof window.popularCadClasseMbSelect === 'function') {
+                window.popularCadClasseMbSelect();
+            }
             if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
                 global.T20DashPericiasV13.invalidarPericias();
             }
@@ -1051,8 +1136,17 @@
             if (global.T20DashStep2V13 && global.T20DashStep2V13.atualizarPvSugerido) {
                 void global.T20DashStep2V13.atualizarPvSugerido(false);
             }
-            if (isWizardAtivo() && stepAtual === PASSO_KIT) {
+            if (isWizardAtivo() && stepAtual === passoKit()) {
                 renderNav();
+            }
+        });
+        q('cadUsarHeroisArton')?.addEventListener('change', () => {
+            if (!isWizardAtivo()) return;
+            if (stepAtual > totalPassos()) {
+                mostrarPasso(totalPassos());
+            } else {
+                renderNav();
+                mostrarPasso(stepAtual);
             }
         });
         q('cadBtnKitRolarDinheiro')?.addEventListener('click', () => rolarDinheiroKit());
@@ -1087,8 +1181,10 @@
         lerPayloadOrigemKit,
         lerPayloadCamposPersonagem,
         passoKitAplica,
+        passoRevisao,
         mostrarPasso,
         renderResumo,
         renderChecklistRevisao,
+        carregarCatalogos,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

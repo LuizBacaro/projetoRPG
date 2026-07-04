@@ -146,6 +146,12 @@
         if (global.T20EscolhasRaciaisV13) {
             global.T20EscolhasRaciaisV13.atualizarUiCadastro();
         }
+        if (global.T20MelhorAmigoV13 && global.T20MelhorAmigoV13.atualizarUi) {
+            void global.T20MelhorAmigoV13.atualizarUi();
+        }
+        if (global.T20DuendeV13 && global.T20DuendeV13.atualizarUi) {
+            void global.T20DuendeV13.atualizarUi();
+        }
         void atualizarPvSugerido(false);
     }
 
@@ -191,6 +197,16 @@
             if (!vEsc.ok) return vEsc;
         }
 
+        if (global.T20MelhorAmigoV13 && typeof global.T20MelhorAmigoV13.validar === 'function') {
+            const vMa = global.T20MelhorAmigoV13.validar();
+            if (!vMa.ok) return vMa;
+        }
+
+        if (global.T20DuendeV13 && typeof global.T20DuendeV13.validar === 'function') {
+            const vDu = global.T20DuendeV13.validar();
+            if (!vDu.ok) return vDu;
+        }
+
         return { ok: true };
     }
 
@@ -226,6 +242,14 @@
             Object.assign(out, global.T20EscolhasRaciaisV13.lerPayloadCadastro());
         }
 
+        if (global.T20MelhorAmigoV13 && typeof global.T20MelhorAmigoV13.lerPayload === 'function') {
+            Object.assign(out, global.T20MelhorAmigoV13.lerPayload());
+        }
+
+        if (global.T20DuendeV13 && typeof global.T20DuendeV13.lerPayload === 'function') {
+            Object.assign(out, global.T20DuendeV13.lerPayload());
+        }
+
         return out;
     }
 
@@ -252,6 +276,14 @@
         if (global.T20EscolhasRaciaisV13) {
             const extra = global.T20EscolhasRaciaisV13.resumoCadastro();
             if (extra) parts.push(extra);
+        }
+        if (global.T20MelhorAmigoV13 && typeof global.T20MelhorAmigoV13.resumo === 'function') {
+            const ma = global.T20MelhorAmigoV13.resumo();
+            if (ma) parts.push(ma);
+        }
+        if (global.T20DuendeV13 && typeof global.T20DuendeV13.resumo === 'function') {
+            const du = global.T20DuendeV13.resumo();
+            if (du) parts.push(du);
         }
         return parts.join(' · ');
     }
@@ -307,6 +339,8 @@
         if (q('cadSuraggelSubtipo')) q('cadSuraggelSubtipo').value = '';
         if (q('cadArcanistaCaminho')) q('cadArcanistaCaminho').value = '';
         if (global.T20EscolhasRaciaisV13) global.T20EscolhasRaciaisV13.resetCadastro();
+        if (global.T20MelhorAmigoV13 && global.T20MelhorAmigoV13.reset) global.T20MelhorAmigoV13.reset();
+        if (global.T20DuendeV13 && global.T20DuendeV13.reset) global.T20DuendeV13.reset();
         if (q('cadHintPvSugerido')) q('cadHintPvSugerido').textContent = '';
     }
 
@@ -345,6 +379,9 @@
         q('cadClasseMb')?.addEventListener('change', () => atualizarUiPasso2());
         q('cadNivel')?.addEventListener('change', () => {
             void atualizarPvSugerido(false);
+            if (global.T20MelhorAmigoV13 && global.T20MelhorAmigoV13.atualizarUi) {
+                void global.T20MelhorAmigoV13.atualizarUi();
+            }
         });
         q('cadCon')?.addEventListener('input', () => {
             void atualizarPvSugerido(false);

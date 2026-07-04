@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf p.11–12",
+    "nota": "12 Presentes de Magia e de Caos — slugs estáveis para ficha_json.duende.presentes"
+  },
+  "presentes": [
+    {
+      "slug": "afinidade_elemental",
+      "nome": "Afinidade Elemental",
+      "descricao": "Ligação com água, fogo ou vegetação; magias e movimento conforme elemento escolhido.",
+      "requer_opcao": "elemento"
+    },
+    {
+      "slug": "encantar_objetos",
+      "nome": "Encantar Objetos",
+      "descricao": "Ação de movimento e 3 PM: encanta item tocado até fim da cena."
+    },
+    {
+      "slug": "enfeiticar",
+      "nome": "Enfeitiçar",
+      "descricao": "Lança Enfeitiçar como arcanista de mesmo nível."
+    },
+    {
+      "slug": "invisibilidade",
+      "nome": "Invisibilidade",
+      "descricao": "Lança Invisibilidade como arcanista de mesmo nível."
+    },
+    {
+      "slug": "lingua_da_natureza",
+      "nome": "Língua da Natureza",
+      "descricao": "+2 em Adestramento e Sobrevivência; fala com animais e plantas."
+    },
+    {
+      "slug": "maldicao",
+      "nome": "Maldição",
+      "descricao": "Amaldiçoa criatura em alcance curto (3 PM); escolha resistência e efeito.",
+      "requer_opcao": "maldicao"
+    },
+    {
+      "slug": "mais_la_do_que_aqui",
+      "nome": "Mais Lá do que Aqui",
+      "descricao": "Corpo parcialmente invisível (2 PM): camuflagem leve e +5 Furtividade."
+    },
+    {
+      "slug": "metamorfose_animal",
+      "nome": "Metamorfose Animal",
+      "descricao": "Assume forma selvagem de druida (3 PM); fala e lança magias na forma.",
+      "requer_opcao": "forma_selvagem"
+    },
+    {
+      "slug": "sonhos_profeticos",
+      "nome": "Sonhos Proféticos",
+      "descricao": "1× por cena, 3 PM: rola 1d20 antecipado para substituir teste de criatura."
+    },
+    {
+      "slug": "velocidade_do_pensamento",
+      "nome": "Velocidade do Pensamento",
+      "descricao": "1º turno da cena: ação padrão extra por 2 PM; pula turno na rodada 2."
+    },
+    {
+      "slug": "visao_feerica",
+      "nome": "Visão Feérica",
+      "descricao": "Visão na penumbra; Visão Mística permanente (invisíveis)."
+    },
+    {
+      "slug": "voo",
+      "nome": "Voo",
+      "descricao": "Flutua 1,5 m (desloc. base +3 m) ou voa gastando 1 PM/rodada."
+    }
+  ]
+}

@@ -127,7 +127,6 @@ def preview_pv_mb(
 
 
 def _niveis_por_classe_de_lista(classes: List[Dict[str, Any]]) -> Dict[str, int]:
-    """Agrega linhas ``[{slug, nivel}]`` em mapa slug → nível total."""
     out: Dict[str, int] = {}
     for item in classes or []:
         if not isinstance(item, dict):
@@ -145,7 +144,47 @@ def _niveis_por_classe_de_lista(classes: List[Dict[str, Any]]) -> Dict[str, int]
     return out
 
 
-def preview_pm_multiclasse_v13(classes: List[Dict[str, Any]]) -> Dict[str, Any]:
+def pm_bonus_meio_elfo(nivel: int) -> int:
+    """Bônus cumulativo de PM do Meio-Elfo (Heróis de Arton).
+
+    +1 PM a cada nível ímpar: nível 1 → +1, nível 3 → +2, nível 5 → +3, ...
+    Fórmula: (nivel + 1) // 2
+    """
+    try:
+        nv = max(0, int(nivel))
+    except (TypeError, ValueError):
+        nv = 0
+    return (nv + 1) // 2
+
+
+def pm_bonus_racial_ha_de_ficha(
+    ficha_json: Optional[Dict[str, Any]], nivel: int
+) -> int:
+    """Bônus cumulativos de PM por traço racial HA (ex.: Meio-Elfo)."""
+    from app.games.tormenta.rules.regra_versao_t20 import (
+        SUPLEMENTO_HEROIS_ARTON,
+        game_suplemento_de_ficha,
+    )
+
+    fj = ficha_json if isinstance(ficha_json, dict) else {}
+    if game_suplemento_de_ficha(fj) != SUPLEMENTO_HEROIS_ARTON:
+        return 0
+    raw = str(fj.get("raca_tormenta_slug") or "").strip().lower()
+    if raw == "meio_elfo":
+        return pm_bonus_meio_elfo(nivel)
+    if raw == "duende":
+        du = fj.get("duende")
+        if isinstance(du, dict) and du.get("geracao_aleatoria"):
+            return 2
+    return 0
+
+
+def preview_pm_multiclasse_v13(
+    classes: List[Dict[str, Any]],
+    *,
+    ficha_json: Optional[Dict[str, Any]] = None,
+    nivel_personagem: Optional[int] = None,
+) -> Dict[str, Any]:
     """Breakdown de PM máximos v1.3 para multiclasse (soma nível × pm/nível)."""
     niveis_map = _niveis_por_classe_de_lista(classes)
     breakdown: List[Dict[str, Any]] = []
@@ -195,9 +234,23 @@ def preview_pm_multiclasse_v13(classes: List[Dict[str, Any]]) -> Dict[str, Any]:
         )
         partes.append(f"{nome} {nv}×{pm_pn}={pm_classe}")
     formula = " + ".join(partes) + (f" = {total} PM" if partes else "")
+    bonus_racial = 0
+    if ficha_json is not None:
+        try:
+            nv_bonus = (
+                int(nivel_personagem)
+                if nivel_personagem is not None
+                else sum(niveis_map.values())
+            )
+        except (TypeError, ValueError):
+            nv_bonus = sum(niveis_map.values()) if niveis_map else 1
+        bonus_racial = pm_bonus_racial_ha_de_ficha(ficha_json, max(1, nv_bonus))
+    if bonus_racial and total is not None:
+        total += bonus_racial
+        formula = (formula + f" + {bonus_racial} racial HA = {total} PM").strip()
     return {
         "regra_versao": REGRA_VERSAO_V13,
-        "pm_max": total if partes else None,
+        "pm_max": total if partes or bonus_racial else None,
         "breakdown": breakdown,
         "formula": formula,
         "nivel_total_classes": sum(niveis_map.values()) if niveis_map else 0,

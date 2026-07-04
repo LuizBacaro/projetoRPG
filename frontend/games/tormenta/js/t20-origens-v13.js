@@ -26,12 +26,20 @@
             .replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
+    function suplementoAtivo() {
+        if (typeof global.t20GetSuplementoFichaAtivo === 'function') {
+            return global.t20GetSuplementoFichaAtivo();
+        }
+        return null;
+    }
+
     async function carregarCatalogos() {
         if (!isV13()) return;
         try {
             const svc = new TormentaRegrasService();
+            const sup = suplementoAtivo();
             const [orig, ident] = await Promise.all([
-                svc.obterOrigens({ regraVersao: 'v13' }),
+                svc.obterOrigens({ regraVersao: 'v13', suplemento: sup }),
                 svc.obterIdentidadeMb(),
             ]);
             ORIGENS_V13 = Array.isArray(orig.origens) ? orig.origens : [];
@@ -129,6 +137,9 @@
                 global.__t20OrigemBeneficios = picks;
                 if (typeof global.t20AplicarPericiasOrigemBeneficios === 'function') {
                     global.t20AplicarPericiasOrigemBeneficios();
+                }
+                if (global.T20OrigemTrocasFichaV13 && global.T20OrigemTrocasFichaV13.renderUi) {
+                    global.T20OrigemTrocasFichaV13.renderUi();
                 }
                 if (typeof global.t20AplicarPoderesAutomaticosNaLista === 'function') {
                     global.t20AplicarPoderesAutomaticosNaLista();
@@ -244,12 +255,19 @@
         }
         const slug = q('f_origem_slug') ? q('f_origem_slug').value : '';
         const row = origemPorSlug(slug);
+        const trocasPayload =
+            global.T20OrigemTrocasFichaV13 && global.T20OrigemTrocasFichaV13.lerPayload
+                ? global.T20OrigemTrocasFichaV13.lerPayload()
+                : {};
         return {
             origem: row ? row.nome : q('f_origem') ? q('f_origem').value || '' : '',
             origem_slug: slug || null,
             origem_beneficios: Array.isArray(global.__t20OrigemBeneficios)
                 ? global.__t20OrigemBeneficios.slice()
                 : [],
+            ...(trocasPayload.origem_trocas_pericia
+                ? { origem_trocas_pericia: trocasPayload.origem_trocas_pericia }
+                : {}),
             origem_itens_escolha:
                 global.__t20OrigemItensEscolha && typeof global.__t20OrigemItensEscolha === 'object'
                     ? { ...global.__t20OrigemItensEscolha }
@@ -271,6 +289,9 @@
             fj.origem_itens_escolha && typeof fj.origem_itens_escolha === 'object'
                 ? { ...fj.origem_itens_escolha }
                 : {};
+        if (global.T20OrigemTrocasFichaV13 && global.T20OrigemTrocasFichaV13.aplicarPayload) {
+            global.T20OrigemTrocasFichaV13.aplicarPayload(fj);
+        }
         if (isV13()) {
             preencherSelectOrigens();
             atualizarPoderesConcedidos();
@@ -288,6 +309,9 @@
         if (typeof global.t20AplicarPoderesAutomaticosNaLista === 'function') {
             global.t20AplicarPoderesAutomaticosNaLista();
         }
+        if (global.T20OrigemTrocasFichaV13 && global.T20OrigemTrocasFichaV13.renderUi) {
+            global.T20OrigemTrocasFichaV13.renderUi();
+        }
     }
 
     function wireEvents() {
@@ -297,10 +321,14 @@
             const row = origemPorSlug(q('f_origem_slug').value);
             if (q('f_origem') && row) q('f_origem').value = row.nome;
             global.__t20OrigemBeneficios = [];
+            global.__t20OrigemTrocasPericia = {};
             renderBeneficiosOrigem();
             atualizarUiOrigemItens();
             if (typeof global.t20AplicarPericiasOrigemBeneficios === 'function') {
                 global.t20AplicarPericiasOrigemBeneficios();
+            }
+            if (global.T20OrigemTrocasFichaV13 && global.T20OrigemTrocasFichaV13.renderUi) {
+                global.T20OrigemTrocasFichaV13.renderUi();
             }
             if (typeof global.t20AplicarPoderesAutomaticosNaLista === 'function') {
                 global.t20AplicarPoderesAutomaticosNaLista();

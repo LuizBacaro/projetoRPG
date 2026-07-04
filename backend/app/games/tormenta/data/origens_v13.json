@@ -17,7 +17,8 @@
         "medicina",
         "membro_da_igreja",
         "vontade_de_ferro"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "amigo_animais",
@@ -29,7 +30,8 @@
       ],
       "beneficios_poderes": [
         "amigo_especial"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "amnesico",
@@ -37,7 +39,8 @@
       "pagina": 86,
       "beneficios_pericias": [],
       "beneficios_poderes": [],
-      "poder_unico": "lembrancas_graduais"
+      "poder_unico": "lembrancas_graduais",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "aristocrata",
@@ -51,7 +54,8 @@
       "beneficios_poderes": [
         "comandar",
         "sangue_azul"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "artesao",
@@ -64,7 +68,8 @@
       "beneficios_poderes": [
         "frutos_do_trabalho",
         "sortudo"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "artista",
@@ -79,7 +84,8 @@
         "dom_artistico",
         "sortudo",
         "torcida"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "assistente_laboratorio",
@@ -93,7 +99,8 @@
         "esse_cheiro",
         "veneficio",
         "poder_da_tormenta"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "batedor",
@@ -108,7 +115,8 @@
         "a_prova_de_tudo",
         "estilo_de_disparo",
         "sentidos_agucados"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "capanga",
@@ -121,7 +129,8 @@
       "beneficios_poderes": [
         "confissao",
         "poder_de_combate"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "charlatao",
@@ -135,7 +144,8 @@
         "alpinista_social",
         "aparencia_inofensiva",
         "sortudo"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "circense",
@@ -150,7 +160,8 @@
         "acrobatico",
         "torcida",
         "truque_de_magica"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "criminoso",
@@ -164,7 +175,8 @@
       "beneficios_poderes": [
         "punguista",
         "veneficio"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "curandeiro",
@@ -178,7 +190,8 @@
         "medicina",
         "medico_de_campo",
         "veneficio"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "eremita",
@@ -192,7 +205,8 @@
       "beneficios_poderes": [
         "busca_interior",
         "lobo_solitario"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "escravo",
@@ -206,7 +220,8 @@
       "beneficios_poderes": [
         "desejo_de_liberdade",
         "vitalidade"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "estudioso",
@@ -220,7 +235,8 @@
       "beneficios_poderes": [
         "aparencia_inofensiva",
         "palpite_fundamentado"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "fazendeiro",
@@ -235,7 +251,8 @@
       "beneficios_poderes": [
         "agua_no_feijao",
         "ginete"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "forasteiro",
@@ -249,7 +266,8 @@
       "beneficios_poderes": [
         "cultura_exotica",
         "lobo_solitario"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "gladiador",
@@ -264,7 +282,8 @@
         "pao_e_circo",
         "torcida",
         "poder_de_combate"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "guarda",
@@ -279,7 +298,8 @@
         "detetive",
         "investigador",
         "poder_de_combate"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "herdeiro",
@@ -293,7 +313,8 @@
       "beneficios_poderes": [
         "comandar",
         "heranca"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "heroi_campones",
@@ -308,7 +329,8 @@
         "sortudo",
         "surto_heroico",
         "torcida"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "marujo",
@@ -322,7 +344,8 @@
       "beneficios_poderes": [
         "acrobatico",
         "passagem_de_navio"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "mateiro",
@@ -337,7 +360,8 @@
         "lobo_solitario",
         "sentidos_agucados",
         "vendedor_de_caracas"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "membro_guilda",
@@ -352,7 +376,8 @@
       "beneficios_poderes": [
         "foco_em_pericia",
         "rede_de_contatos"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "mercador",
@@ -367,7 +392,8 @@
         "negociacao",
         "proficiencia",
         "sortudo"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "minerador",
@@ -382,7 +408,8 @@
         "ataque_poderoso",
         "escavador",
         "sentidos_agucados"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "nomade",
@@ -397,7 +424,8 @@
         "lobo_solitario",
         "mochileiro",
         "sentidos_agucados"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "pivete",
@@ -412,7 +440,8 @@
         "acrobatico",
         "aparencia_inofensiva",
         "quebra_galho"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "refugiado",
@@ -426,7 +455,8 @@
       "beneficios_poderes": [
         "estoico",
         "vontade_de_ferro"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "seguidor",
@@ -440,7 +470,8 @@
         "antigo_mestre",
         "proficiencia",
         "surto_heroico"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "selvagem",
@@ -455,7 +486,8 @@
         "lobo_solitario",
         "vida_rustica",
         "vitalidade"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "soldado",
@@ -470,7 +502,8 @@
       "beneficios_poderes": [
         "influencia_militar",
         "poder_de_combate"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "taverneiro",
@@ -485,7 +518,8 @@
         "gororoba",
         "proficiencia",
         "vitalidade"
-      ]
+      ],
+      "fonte_catalogo": "core"
     },
     {
       "slug": "trabalhador",
@@ -498,7 +532,8 @@
       "beneficios_poderes": [
         "atletico",
         "esforcado"
-      ]
+      ],
+      "fonte_catalogo": "core"
     }
   ]
 }

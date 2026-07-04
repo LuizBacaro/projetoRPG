@@ -151,10 +151,65 @@ def test_get_regras_racas_v13(client_regras_tormenta):
     slugs = {x["slug"] for x in body["racas"]}
     assert "hynne" in slugs and "dahllan" in slugs
     assert "gnomo" not in slugs
+    assert "eiradaan" not in slugs
+    assert all(x.get("fonte_catalogo") == "core" for x in body["racas"])
     hum = next(x for x in body["racas"] if x["slug"] == "humano")
     assert hum["escolhe_tres_mais1"] is True
     lef = next(x for x in body["racas"] if x["slug"] == "lefou")
     assert lef["escolhe_lefou_deformidade"] is True
+
+
+def test_get_regras_racas_v13_herois_arton(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/racas",
+        params={"regra_versao": "v13", "suplemento": "herois_arton"},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["racas"]) == 22  # 17 core + 5 suplemento (incl. Duende)
+    eir = next(x for x in body["racas"] if x["slug"] == "eiradaan")
+    assert eir["fonte_catalogo"] == "herois_arton"
+    du = next(x for x in body["racas"] if x["slug"] == "duende")
+    assert du["construcao_modular_duende"] is True
+
+
+def test_get_regras_presentes_duende(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/presentes-duende")
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["presentes"]) == 12
+    assert body["qtd_presentes"] == 3
+
+
+def test_get_regras_duende_opcoes(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/duende-opcoes")
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["naturezas"]) == 3
+    assert len(body["tamanhos"]) == 4
+    assert body["patamares_troca_poder"] == [5, 10, 15, 20]
+
+
+def test_post_regras_duende_calcular(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/duende-calcular",
+        json={
+            "raca_tormenta_slug": "duende",
+            "duende": {
+                "natureza": "vegetal",
+                "tamanho_raca": "medio",
+                "dons": ["car", "int"],
+                "presentes": ["voo", "invisibilidade", "lingua_da_natureza"],
+                "tabu_texto": "Nunca usa ferro",
+                "tabu_penalidade": "luta",
+            },
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["valido"] is True
+    assert body["tracos"]["presentes_ativos"]
+    assert body["tracos"]["pericias_bonus"]["Luta"] == -5
 
 
 def test_get_regras_escolhas_raciais_lefou(client_regras_tormenta):
@@ -346,6 +401,51 @@ def test_get_regras_origens_v13(client_regras_tormenta):
     assert acolito["nome"] == "Acólito"
     assert "cura" in acolito["beneficios_pericias"]
     assert "medicina" in acolito["beneficios_poderes"]
+
+
+def test_get_regras_classes_herois_arton(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/classes",
+        params={"regra_versao": "v13", "suplemento": "herois_arton"},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert len(body["classes"]) == 29  # 14 core + 15 suplemento
+    tre = next(c for c in body["classes"] if c["slug"] == "treinador")
+    assert tre["fonte_catalogo"] == "herois_arton"
+    assert tre["pm_por_nivel"] == 4
+
+
+def test_get_regras_origens_herois_arton(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/origens",
+        params={"regra_versao": "v13", "suplemento": "herois_arton"},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert len(body["origens"]) == 49  # 35 core + 14 suplemento
+    bacharel = next(o for o in body["origens"] if o["slug"] == "bacharel")
+    assert bacharel["fonte_catalogo"] == "herois_arton"
+    assert bacharel["troca_pericia_treinada"] is True
+
+
+def test_get_truques_melhor_amigo(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/truques-melhor-amigo",
+        params={"nivel_treinador": 5},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["nivel_treinador"] == 5
+    assert body["qtd_maxima_truques"] == 3
+    assert len(body["truques"]) >= 8
+
+
+def test_get_tipos_melhor_amigo(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/tipos-melhor-amigo")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert len(body["tipos"]) == 5
 
 
 def test_get_regras_armaduras_protecao_pagina(client_regras_tormenta):

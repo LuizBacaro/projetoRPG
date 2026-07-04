@@ -75,6 +75,19 @@
         return Array.isArray(picks) && picks.length ? picks.slice() : null;
     }
 
+    function origemSlugOrcamento() {
+        const sel = q('f_origem_slug');
+        return sel && sel.value ? String(sel.value).trim().toLowerCase() : null;
+    }
+
+    function origemTrocasOrcamento() {
+        if (window.T20OrigemTrocasFichaV13 && window.T20OrigemTrocasFichaV13.origemTrocasMap) {
+            const m = window.T20OrigemTrocasFichaV13.origemTrocasMap();
+            return Object.keys(m).length ? m : null;
+        }
+        return null;
+    }
+
     function formatarResumo(p) {
         if (!p || p.vagas_treinadas == null) {
             return `Orçamento perícias: selecione classe em Editar ficha (${labelVersaoOrcamento()}).`;
@@ -120,6 +133,8 @@
                 regraVersao: getRegraVersaoOrcamento(),
                 humanoVersatil: humanoVersatilOrcamento(),
                 origem_beneficios: origemBeneficiosOrcamento(),
+                origemSlug: origemSlugOrcamento(),
+                origemTrocasPericia: origemTrocasOrcamento(),
             });
             if (hint) {
                 hint.textContent = formatarResumo(preview);
@@ -164,7 +179,7 @@
                 }
             });
         }
-        ['f_nivel', 'f_classe_mb', 'f_raca_select', 'fichaIntResumo', 'f_humano_versatil'].forEach((id) => {
+        ['f_nivel', 'f_classe_mb', 'f_raca_select', 'fichaIntResumo', 'f_humano_versatil', 'f_origem_slug'].forEach((id) => {
             const el = q(id);
             if (el) {
                 el.addEventListener('change', () => validarPericiasOrcamentoMb());

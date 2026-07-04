@@ -83,6 +83,33 @@ class TormentaPersonagemBase(BaseModel):
     von_total: int = Field(default=0, ge=-99, le=99)
 
     ficha_json: Dict[str, Any] = Field(default_factory=dict)
+    game_suplemento: Optional[str] = Field(
+        None,
+        max_length=64,
+        description="Suplemento ativo (ex.: herois_arton); persistido em ficha_json.",
+    )
+
+    @model_validator(mode="after")
+    def _merge_game_suplemento_em_ficha(self) -> Self:
+        if self.game_suplemento and str(self.game_suplemento).strip():
+            fj = dict(self.ficha_json or {})
+            fj["game_suplemento"] = str(self.game_suplemento).strip().lower()
+            object.__setattr__(self, "ficha_json", fj)
+        return self
+
+    @field_validator("game_suplemento", mode="before")
+    @classmethod
+    def _validar_game_suplemento(cls, v: Any) -> Optional[str]:
+        if v is None or str(v).strip() == "":
+            return None
+        from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTOS_VALIDOS
+
+        s = str(v).strip().lower()
+        if s not in SUPLEMENTOS_VALIDOS:
+            raise ValueError(
+                f"game_suplemento inválido: {s!r}. Valores: {sorted(SUPLEMENTOS_VALIDOS)}"
+            )
+        return s
 
     @field_validator("ficha_json", mode="before")
     @classmethod
@@ -134,6 +161,33 @@ class TormentaPersonagemUpdate(BaseModel):
     von_total: Optional[int] = Field(None, ge=-99, le=99)
 
     ficha_json: Optional[Dict[str, Any]] = None
+    game_suplemento: Optional[str] = Field(
+        None,
+        max_length=64,
+        description="Suplemento ativo (ex.: herois_arton); persistido em ficha_json.",
+    )
+
+    @model_validator(mode="after")
+    def _merge_game_suplemento_em_ficha_upd(self) -> Self:
+        if self.game_suplemento and str(self.game_suplemento).strip():
+            fj = dict(self.ficha_json or {})
+            fj["game_suplemento"] = str(self.game_suplemento).strip().lower()
+            object.__setattr__(self, "ficha_json", fj)
+        return self
+
+    @field_validator("game_suplemento", mode="before")
+    @classmethod
+    def _validar_game_suplemento_upd(cls, v: Any) -> Optional[str]:
+        if v is None or str(v).strip() == "":
+            return None
+        from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTOS_VALIDOS
+
+        s = str(v).strip().lower()
+        if s not in SUPLEMENTOS_VALIDOS:
+            raise ValueError(
+                f"game_suplemento inválido: {s!r}. Valores: {sorted(SUPLEMENTOS_VALIDOS)}"
+            )
+        return s
 
     @field_validator("ficha_json", mode="before")
     @classmethod

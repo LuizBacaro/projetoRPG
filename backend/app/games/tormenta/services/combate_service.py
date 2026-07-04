@@ -243,29 +243,42 @@ class TormentaCombateService:
         penalidades: int = 0,
         ca_alvo: Optional[int] = None,
     ) -> Dict[str, Any]:
-        from app.games.tormenta.rules.combate_t20 import rolar_ataque
+        from app.games.tormenta.rules.combate_t20 import (
+            modificadores_tamanho_combate,
+            rolar_ataque,
+        )
         from app.games.tormenta.rules.defesa_t20 import ca_efetiva_personagem
+        from app.games.tormenta.rules.tracos_raciais_t20 import tamanho_racial_de_ficha
 
         combate = self._exigir_combate_ativo()
         atacante = self._personagem_no_combate(combate, atacante_id)
         alvo = self._personagem_no_combate(combate, alvo_id)
+        fj_atk = atacante.ficha_json if isinstance(atacante.ficha_json, dict) else {}
+        fj_alvo = alvo.ficha_json if isinstance(alvo.ficha_json, dict) else {}
+        tam_atk = tamanho_racial_de_ficha(fj_atk)
+        tam_alvo = tamanho_racial_de_ficha(fj_alvo)
+        mods_tam = modificadores_tamanho_combate(tam_atk, tam_alvo)
         if ca_alvo is not None:
             ca_base = int(ca_alvo)
         else:
             ca_base = ca_efetiva_personagem(
                 des_valor=self._des_valor_personagem(alvo),
                 ca=int(alvo.ca or 10),
-                ficha_json=alvo.ficha_json if isinstance(alvo.ficha_json, dict) else {},
+                ficha_json=fj_alvo,
             )
         mods_atk = self._mods_condicoes_personagem(combate, atacante_id)
         mods_alvo = self._mods_condicoes_personagem(combate, alvo_id)
-        ca = max(0, ca_base + int(mods_alvo.get("ca", 0)))
+        ca = max(
+            0,
+            ca_base + int(mods_alvo.get("ca", 0)) + int(mods_tam.get("ca_defensor", 0)),
+        )
         roll = rolar_ataque(
             bab,
             mod_atributo,
             bonus_arma=bonus_arma,
             penalidades=penalidades,
             modificador_condicoes=mods_atk.get("ataque", 0),
+            bonus_tamanho=int(mods_tam.get("ataque", 0)),
             ca_alvo=ca,
         )
         return {
@@ -273,6 +286,10 @@ class TormentaCombateService:
             "alvo_id": alvo_id,
             "atacante_nome": atacante.nome,
             "alvo_nome": alvo.nome,
+            "tamanho_atacante": tam_atk,
+            "tamanho_alvo": tam_alvo,
+            "modificador_tamanho_ataque": int(mods_tam.get("ataque", 0)),
+            "modificador_tamanho_ca_alvo": int(mods_tam.get("ca_defensor", 0)),
             "modificador_condicoes_ataque": mods_atk.get("ataque", 0),
             "modificador_condicoes_ca_alvo": mods_alvo.get("ca", 0),
             "ca_base_alvo": ca_base,
@@ -285,17 +302,43 @@ class TormentaCombateService:
         mod_atributo: int = 0,
         confirmar_critico: bool = False,
         aplicar_ao_id: Optional[int] = None,
+        *,
+        atacante_id: Optional[int] = None,
+        forca_dos_titas: bool = False,
     ) -> Dict[str, Any]:
+        from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
         from app.games.tormenta.rules.combate_t20 import rolar_dano
         from app.games.tormenta.rules.conjuracao_combate_t20 import (
             processar_concentracao_apos_dano_mb,
         )
+        from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
+        from app.games.tormenta.rules.tracos_raciais_t20 import (
+            tracos_mecanicos_por_slug,
+        )
 
         combate = self._exigir_combate_ativo()
+        usar_titas = bool(forca_dos_titas)
+        limite_for = 0
+        if atacante_id is not None:
+            atacante = self._personagem_no_combate(combate, int(atacante_id))
+            fj = atacante.ficha_json if isinstance(atacante.ficha_json, dict) else {}
+            raca = str(fj.get("raca_tormenta_slug") or "").strip().lower()
+            row = tracos_mecanicos_por_slug(raca, regra_versao_de_ficha(fj))
+            if usar_titas and row and row.get("forca_dos_titas"):
+                rv = regra_versao_de_ficha(fj)
+                limite_for = max(
+                    0,
+                    contribuicao_atributo_t20(int(atacante.for_valor or 10), rv),
+                )
+            else:
+                usar_titas = False
+
         roll = rolar_dano(
             formula_dano,
             mod_atributo,
             confirmar_critico=confirmar_critico,
+            forca_dos_titas=usar_titas,
+            limite_dados_extra_forca=limite_for,
         )
         out: Dict[str, Any] = dict(roll)
         if aplicar_ao_id is not None:
@@ -335,15 +378,21 @@ class TormentaCombateService:
         conjurador_id: Optional[int] = None,
         magia_slug: Optional[str] = None,
         falha_voluntaria: bool = False,
+        efeito_mental: bool = False,
     ) -> Dict[str, Any]:
         from app.games.tormenta.rules.catalogo_t20 import metadados_magia_mb_por_slug
+        from app.games.tormenta.rules.combate_t20 import rolar_teste_vontade_racial
         from app.games.tormenta.rules.conjuracao_combate_t20 import (
             bonus_resistencia_magia_efetivo_mb,
+            bonus_teste_resistencia_personagem_mb,
             cd_teste_resistencia_magia_mb,
             inferir_tipo_resistencia_mb,
             mod_habilidade_chave_conjurador_mb,
             normalizar_tipo_resistencia_request,
             rolar_teste_resistencia_magia_mb,
+        )
+        from app.games.tormenta.rules.tracos_raciais_t20 import (
+            tracos_mecanicos_por_slug,
         )
 
         combate = self._exigir_combate_ativo()
@@ -427,6 +476,28 @@ class TormentaCombateService:
             bonus_rm=bonus_rm,
             cd=int(cd_final),
         )
+        raca = str(fj.get("raca_tormenta_slug") or "").strip().lower()
+        row_raca = tracos_mecanicos_por_slug(raca, "v13")
+        if (
+            tipo_res == "vontade"
+            and efeito_mental
+            and row_raca
+            and row_raca.get("cancao_melancolia")
+        ):
+            partes = bonus_teste_resistencia_personagem_mb(
+                tipo=tipo_res,
+                fort_total=int(alvo.fort_total or 0),
+                ref_total=int(alvo.ref_total or 0),
+                von_total=int(alvo.von_total or 0),
+                bonus_rm=bonus_rm or 0,
+            )
+            mel = rolar_teste_vontade_racial(
+                partes["bonus_total"],
+                int(cd_final),
+                slug_raca=raca,
+                efeito_mental=True,
+            )
+            teste = {**partes, **mel, "passou": bool(mel.get("sucesso"))}
         return {
             "alvo_id": alvo.id,
             "alvo_nome": alvo.nome,

@@ -264,6 +264,61 @@
     grid-column: 1 / -1;
 }
 
+/* Checkbox HA — uma linha, alinhado ao checkbox */
+.t20-dash-ha-toggle {
+    padding: 0.2rem 0;
+}
+
+.t20-dash-field label.t20-dash-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--t20-ink);
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.35;
+}
+
+.t20-dash-check input[type='checkbox'] {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--t20-red);
+}
+
+.t20-dash-check-copy {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.t20-dash-check-copy em {
+    font-style: italic;
+    font-weight: 700;
+}
+
+.t20-dash-check-meta {
+    font-weight: 500;
+    color: var(--t20-muted);
+}
+
+.t20-dash-ha-toggle-hint {
+    margin: 0.28rem 0 0 1.5rem;
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--t20-muted);
+    line-height: 1.35;
+}
+
 .t20-dash-field label {
     display: block;
     font-size: 0.65rem;
@@ -343,6 +398,84 @@
     font-size: 0.68rem;
     color: var(--t20-muted);
     margin: 0.35rem 0 0;
+}
+
+.t20-dash-poderes-ha-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.65rem;
+}
+
+.t20-dash-poderes-ha-toolbar .t20-input {
+    flex: 1 1 8rem;
+    min-width: 0;
+}
+
+.t20-dash-poderes-ha-filtro {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.t20-dash-poderes-ha-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    min-height: 12rem;
+}
+
+@media (max-width: 640px) {
+    .t20-dash-poderes-ha-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.t20-dash-poderes-ha-col {
+    min-width: 0;
+}
+
+.t20-dash-poderes-ha-scroll {
+    max-height: 14rem;
+    overflow-y: auto;
+    border: 1px solid var(--t20-grid-line);
+    border-radius: 6px;
+    padding: 0.35rem 0.5rem;
+    background: var(--t20-surface, #fff);
+}
+
+.t20-dash-poderes-ha-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.t20-dash-poderes-ha-lista li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--t20-grid-line);
+    font-size: 0.78rem;
+}
+
+.t20-dash-poderes-ha-lista li:last-child {
+    border-bottom: none;
+}
+
+.t20-dash-poderes-ha-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.t20-dash-poderes-ha-rm {
+    font-size: 0.68rem;
+    padding: 0.15rem 0.45rem;
 }
 
 .t20-dash-badge-perfil {

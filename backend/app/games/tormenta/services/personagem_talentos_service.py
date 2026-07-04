@@ -14,6 +14,7 @@ from app.games.tormenta.rules.poderes_ficha_v13_t20 import (
     AUTO_PODER_NOTA_PREFIX,
     listar_poderes_sync_v13,
 )
+from app.games.tormenta.rules.poderes_herois_arton_t20 import validar_vinculo_poder_ha
 from app.games.tormenta.rules.poderes_pre_requisitos_v13_t20 import (
     PersonagemPoderContext,
     contexto_poder_de_personagem,
@@ -126,6 +127,14 @@ class TormentaPersonagemTalentosService:
                 f"Pré-requisitos não atendidos para «{nome_poder.strip()}»: {detalhe}."
             )
 
+    def _validar_elegibilidade_ha_ao_vincular(
+        self,
+        personagem: TormentaPersonagem,
+        nome_poder: str,
+    ) -> None:
+        fj = personagem.ficha_json if isinstance(personagem.ficha_json, dict) else {}
+        validar_vinculo_poder_ha(nome_poder, fj)
+
     @staticmethod
     def preview_validar_pre_requisitos(body: Dict[str, Any]) -> Dict[str, Any]:
         fj = body.get("ficha_json") if isinstance(body.get("ficha_json"), dict) else {}
@@ -143,6 +152,17 @@ class TormentaPersonagemTalentosService:
             regra_versao=rv,
         )
         nome = str(body.get("nome_poder") or "").strip()
+        try:
+            validar_vinculo_poder_ha(nome, fj)
+        except DadosInvalidos as exc:
+            msg = str(getattr(exc, "message", None) or exc)
+            return {
+                "valido": False,
+                "nome_poder": nome,
+                "faltando": [],
+                "pre_requisitos": [],
+                "motivo": msg,
+            }
         res = validar_pre_requisitos_poder(nome, ctx)
         faltando = res.get("faltando") or []
         motivo = ""
@@ -170,6 +190,7 @@ class TormentaPersonagemTalentosService:
 
         p = self.db.get(TormentaPersonagem, personagem_id)
         if p:
+            self._validar_elegibilidade_ha_ao_vincular(p, t.nome)
             self._validar_pre_requisitos_ao_vincular(
                 p,
                 t.nome,
@@ -232,6 +253,7 @@ class TormentaPersonagemTalentosService:
                 continue
             if len(nome) < 2:
                 continue
+            validar_vinculo_poder_ha(nome, fj)
             t = self._buscar_ou_criar_talento_por_nome(nome)
             if t.id in vistos_talento_ids:
                 dup += 1

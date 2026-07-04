@@ -74,7 +74,6 @@ def habilidade_chave_conjuracao_v13(
 
 
 def lista_regras_conjuracao_classe_mb() -> List[Dict[str, Any]]:
-    """Linhas do JSON de conjuração MB (slug, chave, constantes de Pontos de Magia — PM)."""
     return _lista_regras_conjuracao_mb()
 
 
@@ -114,6 +113,39 @@ def _lista_regras_conjuracao_mb() -> List[Dict[str, Any]]:
             }
         )
     return sorted(out, key=lambda x: x["slug"])
+
+
+# ---------------------------------------------------------------------------
+# Heróis de Arton — overrides raciais de habilidade-chave de conjuração
+# ---------------------------------------------------------------------------
+
+#: Raças cujo traço racial substitui a habilidade-chave de conjuração arcana.
+#: Fonte: Heróis de Arton v1.1 p.8 (Eiradaan — Magia Instintiva).
+_OVERRIDE_HABILIDADE_CHAVE_POR_RACA: Dict[str, Dict[str, str]] = {
+    # raca_slug -> {classe_slug -> nova_habilidade_chave}
+    # "any_arcana" é um marcador especial para qualquer classe que usa INT arcano.
+    "eiradaan": {"arcanista": "sab"},
+}
+
+
+def override_habilidade_chave_por_raca(
+    slug_raca: Optional[str],
+    slug_classe: Optional[str],
+    habilidade_atual: Optional[str],
+) -> Optional[HabilidadeChaveConjuracao]:
+    """Retorna a habilidade-chave substituída por traço racial, ou ``habilidade_atual`` se não houver override.
+
+    Exemplo: Eiradaan arcanista → "sab" no lugar de "int".
+    """
+    if not slug_raca or not slug_classe:
+        return habilidade_atual  # type: ignore[return-value]
+    overrides = _OVERRIDE_HABILIDADE_CHAVE_POR_RACA.get(
+        str(slug_raca).strip().lower(), {}
+    )
+    nova = overrides.get(str(slug_classe).strip().lower())
+    if nova and nova in ("int", "sab", "car"):
+        return nova  # type: ignore[return-value]
+    return habilidade_atual  # type: ignore[return-value]
 
 
 def lista_regras_conjuracao_por_versao(
@@ -186,6 +218,47 @@ def classe_conjuracao_mb_registrada(slug: str) -> bool:
     """True se o slug está na tabela MB de conjuração (bardo, mago, paladino etc.)."""
     s = str(slug or "").strip().lower()
     return bool(s and s in _mapa_conjuracao_por_slug())
+
+
+def habilidade_chave_conjuracao_efetiva(
+    slug_classe: str,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
+    slug_raca: Optional[str] = None,
+) -> Optional[HabilidadeChaveConjuracao]:
+    hk = habilidade_chave_conjuracao(slug_classe, regra_versao, arcanista_caminho)
+    if not hk:
+        return None
+    return override_habilidade_chave_por_raca(slug_raca, slug_classe, hk)
+
+
+def modificador_conjuracao_efetivo(
+    slug_classe: str,
+    forca: int,
+    destreza: int,
+    constituicao: int,
+    inteligencia: int,
+    sabedoria: int,
+    carisma: int,
+    regra_versao: Optional[str] = None,
+    arcanista_caminho: Optional[str] = None,
+    slug_raca: Optional[str] = None,
+) -> Optional[int]:
+    hk = habilidade_chave_conjuracao_efetiva(
+        slug_classe, regra_versao, arcanista_caminho, slug_raca
+    )
+    if not hk:
+        return None
+    return _modificador_chave(
+        hk,
+        forca,
+        destreza,
+        constituicao,
+        inteligencia,
+        sabedoria,
+        carisma,
+        regra_versao,
+    )
 
 
 def habilidade_chave_conjuracao(
@@ -345,3 +418,30 @@ def texto_custo_pm_por_circulo_mb(regra_versao: Optional[str] = None) -> str:
             "1º: 1 PM; 2º: 3; 3º: 6; 4º: 10; 5º: 15. Truques via aprimoramento (0 PM)."
         )
     return "Truque (círculo 0): 0 PM. Círculo C≥1: C PM."
+
+
+def pm_aprimoramento_bonus_racial(slug_raca: Optional[str]) -> int:
+    """PM extra para aprimoramentos ao lançar magia (Eiradaan: +1)."""
+    from app.games.tormenta.rules.tracos_raciais_t20 import tracos_mecanicos_por_slug
+
+    row = tracos_mecanicos_por_slug(slug_raca, REGRA_VERSAO_V13)
+    if not row:
+        return 0
+    return int(row.get("pm_aprimoramento_conjuracao", 0) or 0)
+
+
+def instrumentista_magico_racial(slug_raca: Optional[str]) -> bool:
+    """True se a raça pode conjurar via instrumento (Sátiro)."""
+    from app.games.tormenta.rules.tracos_raciais_t20 import tracos_mecanicos_por_slug
+
+    row = tracos_mecanicos_por_slug(slug_raca, REGRA_VERSAO_V13)
+    return bool(row and row.get("instrumentista_magico"))
+
+
+def pode_conjurar_via_instrumento(
+    slug_raca: Optional[str],
+    *,
+    instrumento_empunhado: bool,
+) -> bool:
+    """Instrumentista Mágico exige instrumento em mãos."""
+    return instrumentista_magico_racial(slug_raca) and bool(instrumento_empunhado)
