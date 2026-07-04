@@ -27,10 +27,20 @@
             .replace(/"/g, '&quot;');
     }
 
-    async function carregarSlugsClasses() {
-        if (CLASSES_SLUGS.length) return CLASSES_SLUGS.slice();
+    function suplementoAtivo() {
+        if (typeof global.t20GetSuplementoFichaAtivo === 'function') {
+            return global.t20GetSuplementoFichaAtivo();
+        }
+        return null;
+    }
+
+    async function carregarSlugsClasses(force) {
+        if (CLASSES_SLUGS.length && !force) return CLASSES_SLUGS.slice();
         try {
-            const d = await new TormentaRegrasService().obterClasses({ regraVersao: 'v13' });
+            const d = await new TormentaRegrasService().obterClasses({
+                regraVersao: 'v13',
+                suplemento: suplementoAtivo(),
+            });
             CLASSES_SLUGS = (Array.isArray(d.classes) ? d.classes : [])
                 .map((c) => String(c.slug || '').trim().toLowerCase())
                 .filter(Boolean)

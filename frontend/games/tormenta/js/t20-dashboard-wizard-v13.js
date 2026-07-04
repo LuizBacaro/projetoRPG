@@ -262,8 +262,10 @@
         const row = origemPorSlug(sel.value);
         if (!row) {
             host.innerHTML = '';
+            global.__cadOrigemPermiteTroca = false;
             return;
         }
+        global.__cadOrigemPermiteTroca = Boolean(row.troca_pericia_treinada);
         const saved = global.__cadOrigemBeneficios || [];
         const opts = [];
         (row.beneficios_pericias || []).forEach((p) => {
@@ -299,6 +301,7 @@
                     return;
                 }
                 global.__cadOrigemBeneficios = picks;
+                global.__cadOrigemTrocasPericia = {};
                 if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
                     global.T20DashPericiasV13.invalidarPericias();
                 }
@@ -926,6 +929,8 @@
         stepAtual = 1;
         global.__cadOrigemBeneficios = [];
         global.__cadOrigemItensEscolha = {};
+        global.__cadOrigemTrocasPericia = {};
+        global.__cadOrigemPermiteTroca = false;
         global.__cadKitInicial = {};
         global.__cadWizardChecklistOk = null;
         if (q('cadOrigemSlug')) q('cadOrigemSlug').value = '';
@@ -1028,6 +1033,8 @@
         q('cadWizardNext')?.addEventListener('click', () => avancar());
         q('cadOrigemSlug')?.addEventListener('change', () => {
             global.__cadOrigemBeneficios = [];
+            global.__cadOrigemTrocasPericia = {};
+            global.__cadOrigemPermiteTroca = false;
             if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
                 global.T20DashPericiasV13.invalidarPericias();
             }

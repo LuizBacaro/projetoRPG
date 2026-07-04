@@ -419,6 +419,23 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao carregar dinheiro inicial');
     }
 
+    async obterTruquesMelhorAmigo(opts = {}) {
+        const sp = new URLSearchParams();
+        sp.set('nivel_treinador', String(opts.nivelTreinador != null ? opts.nivelTreinador : 1));
+        const res = await fetch(
+            `${window.getApiUrl('/tormenta/regras/truques-melhor-amigo')}?${sp}`,
+            { headers: this._headers() }
+        );
+        return this._handleJson(res, 'Erro ao carregar truques do Melhor Amigo');
+    }
+
+    async obterTiposMelhorAmigo() {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/tipos-melhor-amigo'), {
+            headers: this._headers(),
+        });
+        return this._handleJson(res, 'Erro ao carregar tipos do Melhor Amigo');
+    }
+
     /**
      * Valida orçamento de perícias treinadas e graduações (MB).
      */
@@ -429,6 +446,15 @@ class TormentaRegrasService {
         }
         if (body.humanoVersatil && payload.humano_versatil == null) {
             payload.humano_versatil = body.humanoVersatil;
+        }
+        if (body.origemSlug && payload.origem_slug == null) {
+            payload.origem_slug = body.origemSlug;
+        }
+        if (body.origemBeneficios && payload.origem_beneficios == null) {
+            payload.origem_beneficios = body.origemBeneficios;
+        }
+        if (body.origemTrocasPericia && payload.origem_trocas_pericia == null) {
+            payload.origem_trocas_pericia = body.origemTrocasPericia;
         }
         const res = await fetch(window.getApiUrl('/tormenta/regras/pericias/validar-criacao'), {
             method: 'POST',

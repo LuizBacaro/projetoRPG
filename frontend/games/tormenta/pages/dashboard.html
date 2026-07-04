@@ -762,6 +762,29 @@
                             <option value="feiticeiro">Feiticeiro</option>
                         </select>
                     </div>
+                    <div class="t20-dash-field t20-dash-field--full" id="cadWrapMelhorAmigo" style="display: none">
+                        <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0;padding:0.65rem">
+                            <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Melhor Amigo (Treinador)</legend>
+                            <div class="t20-dash-form-grid">
+                                <div class="t20-dash-field t20-dash-field--full">
+                                    <label for="cadMelhorAmigoNome">Nome do parceiro *</label>
+                                    <input id="cadMelhorAmigoNome" class="t20-input" maxlength="80" placeholder="Ex.: Rex, Falcão…" />
+                                </div>
+                                <div class="t20-dash-field t20-dash-field--full">
+                                    <label for="cadMelhorAmigoTipo">Tipo *</label>
+                                    <select id="cadMelhorAmigoTipo" class="t20-input">
+                                        <option value="">— Tipo do parceiro —</option>
+                                    </select>
+                                    <p id="cadMelhorAmigoTipoHint" class="t20-dash-hint" style="margin:0.35rem 0 0"></p>
+                                </div>
+                                <div class="t20-dash-field t20-dash-field--full">
+                                    <span class="t20-dash-hint" style="display:block;margin-bottom:0.35rem">Truques iniciais *</span>
+                                    <div id="cadMelhorAmigoTruquesHost"></div>
+                                    <p id="cadMelhorAmigoTruquesHint" class="t20-dash-hint" style="margin:0.35rem 0 0"></p>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
             </div>
 
@@ -810,6 +833,7 @@
                 <p class="t20-dash-hint" style="margin-top:0">
                     Marque as perícias <strong>treinadas</strong> (classe + INT + racial + origem). Perícias de classe e origem já vêm marcadas.
                 </p>
+                <div id="cadOrigemTrocasHost" class="t20-dash-field t20-dash-field--full" style="display:none"></div>
                 <div id="cadPericiasHost" class="cad-pericias-grid" style="max-height:16rem;overflow:auto;border:1px solid var(--t20-border,#333);padding:0.65rem;border-radius:0.35rem;display:grid;gap:0.35rem"></div>
                 <p id="cadPericiasHint" class="t20-dash-hint" style="margin:0.35rem 0 0"></p>
             </div>
@@ -918,6 +942,7 @@
 <script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260703racial"></script>
+<script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704ma"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260630s01"></script>
 <script>

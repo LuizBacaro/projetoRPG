@@ -826,6 +826,7 @@
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--wide" id="wrapOrigemBeneficios" style="display: none">
                                 <div id="t20OrigemBeneficiosHost"></div>
+                                <div id="fOrigemTrocasHost" class="t20-ficha-field t20-ficha-field--wide" style="display: none; margin-top: 0.35rem"></div>
                                 <div id="t20OrigemItensEscolhaHost" style="display: none; margin-top: 0.35rem"></div>
                                 <p id="t20OrigemItensLista" class="t20-hint" style="margin: 0.35rem 0 0"></p>
                             </div>
@@ -887,6 +888,29 @@
                             <div class="t20-ficha-field t20-ficha-field--wide" id="wrapPericiasClasseOu" style="display: none">
                                 <label>Perícias de classe — escolha «ou» (v1.3)</label>
                                 <div id="t20PericiasClasseOuHost"></div>
+                            </div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="fWrapMelhorAmigo" style="display: none">
+                                <p class="t20-hint" style="margin: 0 0 0.35rem">
+                                    <strong>Melhor Amigo</strong> (Treinador — Heróis de Arton)
+                                </p>
+                                <div class="t20-identity-grid t20-identity-grid--compact">
+                                    <div class="t20-ficha-field">
+                                        <label for="f_melhor_amigo_nome">Nome do parceiro *</label>
+                                        <input id="f_melhor_amigo_nome" class="t20-input" maxlength="80" placeholder="Ex.: Rex, Falcão…" />
+                                    </div>
+                                    <div class="t20-ficha-field">
+                                        <label for="f_melhor_amigo_tipo">Tipo *</label>
+                                        <select id="f_melhor_amigo_tipo" class="t20-input">
+                                            <option value="">— Tipo do parceiro —</option>
+                                        </select>
+                                        <p id="f_melhor_amigo_tipo_hint" class="t20-hint" style="margin:0.35rem 0 0"></p>
+                                    </div>
+                                    <div class="t20-ficha-field t20-ficha-field--wide">
+                                        <label>Truques do parceiro *</label>
+                                        <div id="f_melhor_amigo_truques_host"></div>
+                                        <p id="f_melhor_amigo_truques_hint" class="t20-hint" style="margin:0.35rem 0 0"></p>
+                                    </div>
+                                </div>
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--wide" id="wrapDinheiroTabelaV13" style="display: none">
                                 <p class="t20-hint" style="margin: 0 0 0.35rem">
@@ -1471,6 +1495,8 @@
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260629p8"></script>
 <script src="/games/tormenta/js/t20-origens-v13.js?v=20260629dev"></script>
+<script src="/games/tormenta/js/t20-origem-trocas-ficha-v13.js?v=20260704"></script>
+<script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-kit-inicial-v13.js?v=20260629"></script>
 <script>
 (function () {
@@ -2101,10 +2127,27 @@
     /** No primeiro salvar da ficha após abrir um personagem do dashboard, grava `travar_raca_classe_mb: true`. */
     let forcarTravarNoProximoExtrair = false;
 
+    /** Suplemento Heróis de Arton gravado em ficha_json.game_suplemento. */
+    let __t20GameSuplementoFicha = null;
+
+    function t20GetSuplementoFichaAtivo() {
+        return __t20GameSuplementoFicha;
+    }
+    window.t20GetSuplementoFichaAtivo = t20GetSuplementoFichaAtivo;
+
+    function t20AplicarGameSuplementoFicha(fj) {
+        if (window.T20RegraVersao && typeof window.T20RegraVersao.getGameSuplementoFicha === 'function') {
+            __t20GameSuplementoFicha = window.T20RegraVersao.getGameSuplementoFicha(fj || {});
+        } else {
+            __t20GameSuplementoFicha = null;
+        }
+    }
+
     async function carregarClassesTormenta() {
         const rv = getRegraVersaoAtiva();
+        const sup = t20GetSuplementoFichaAtivo();
         try {
-            const d = await new TormentaRegrasService().obterClasses({ regraVersao: rv });
+            const d = await new TormentaRegrasService().obterClasses({ regraVersao: rv, suplemento: sup });
             return {
                 classes: Array.isArray(d.classes) ? d.classes : [],
                 beneficios_por_nivel: Array.isArray(d.beneficios_por_nivel) ? d.beneficios_por_nivel : [],
@@ -2205,7 +2248,7 @@
             window.T20OrigensV13.atualizarUiOrigemV13();
         }
         if (window.T20MulticlasseV13) {
-            await window.T20MulticlasseV13.carregarSlugsClasses();
+            await window.T20MulticlasseV13.carregarSlugsClasses(true);
             window.T20MulticlasseV13.atualizarVisibilidade();
         }
         if (window.T20DinheiroTabelaV13) {
@@ -2575,6 +2618,12 @@
         if (typeof window.t20AplicarPericiasClasseV13 === 'function') {
             window.t20AplicarPericiasClasseV13();
         }
+        if (window.T20MelhorAmigoV13 && window.T20MelhorAmigoV13.atualizarUi) {
+            void window.T20MelhorAmigoV13.atualizarUi();
+        }
+        if (window.T20OrigemTrocasFichaV13 && window.T20OrigemTrocasFichaV13.renderUi) {
+            window.T20OrigemTrocasFichaV13.renderUi();
+        }
         t20AtualizarGrimorioElegibilidadeVisual(null);
         agendarAtualizarGrimorioSeModalAberto();
         if (typeof t20AtualizarPenalidadesPericias === 'function') t20AtualizarPenalidadesPericias();
@@ -2630,6 +2679,9 @@
                 atualizarResistenciasBreakdownTormenta();
                 t20AtualizarGrimorioElegibilidadeVisual(null);
                 agendarAtualizarGrimorioSeModalAberto();
+                if (window.T20MelhorAmigoV13 && window.T20MelhorAmigoV13.atualizarUi) {
+                    void window.T20MelhorAmigoV13.atualizarUi();
+                }
             });
         }
         const ncj = q('f_nivel_conj_mb');
@@ -2646,9 +2698,10 @@
 
     async function carregarRacasTormenta() {
         const rv = getRegraVersaoAtiva();
+        const sup = t20GetSuplementoFichaAtivo();
         const empty = { racas: [], idiomas_geral_mb: '', idiomas_tabela_mb: [] };
         try {
-            const d = await new TormentaRegrasService().obterRacas({ regraVersao: rv });
+            const d = await new TormentaRegrasService().obterRacas({ regraVersao: rv, suplemento: sup });
             return {
                 racas: Array.isArray(d.racas) ? d.racas : [],
                 idiomas_geral_mb: typeof d.idiomas_geral_mb === 'string' ? d.idiomas_geral_mb : '',
@@ -2873,6 +2926,16 @@
                 if (!cam || !String(cam).trim()) {
                     bloqueado = true;
                     title = 'Arcanista (v1.3): escolha o caminho Bruxo, Mago ou Feiticeiro.';
+                }
+            } else if (
+                window.T20MelhorAmigoV13 &&
+                window.T20RegraVersao &&
+                window.T20RegraVersao.isV13(getRegraVersaoAtiva())
+            ) {
+                const vma = window.T20MelhorAmigoV13.validar();
+                if (!vma.ok) {
+                    bloqueado = true;
+                    title = vma.msg;
                 }
             }
         }
@@ -6094,12 +6157,17 @@
     function t20AplicarPericiasOrigemBeneficios() {
         if (!window.T20RegraVersao || !window.T20RegraVersao.isV13(getRegraVersaoAtiva())) return;
         const picks = Array.isArray(window.__t20OrigemBeneficios) ? window.__t20OrigemBeneficios : [];
-        const slugs = new Set(
-            picks
-                .filter((b) => String(b).startsWith('pericia:'))
-                .map((b) => String(b).split(':')[1].trim().toLowerCase())
-                .filter(Boolean)
-        );
+        let slugs;
+        if (window.T20OrigemTrocasFichaV13 && window.T20OrigemTrocasFichaV13.slugsOrigemEfetivos) {
+            slugs = window.T20OrigemTrocasFichaV13.slugsOrigemEfetivos();
+        } else {
+            slugs = new Set(
+                picks
+                    .filter((b) => String(b).startsWith('pericia:'))
+                    .map((b) => String(b).split(':')[1].trim().toLowerCase())
+                    .filter(Boolean)
+            );
+        }
         document.querySelectorAll('#tblPericias tbody tr[data-per-slug]').forEach((tr) => {
             const slug = (tr.getAttribute('data-per-slug') || '').trim().toLowerCase();
             if (!slugs.has(slug)) return;
@@ -6548,6 +6616,8 @@
                     ? String(q('f_suraggel_subtipo').value).trim().toLowerCase()
                     : null,
             ...(window.T20EscolhasRaciaisV13 ? window.T20EscolhasRaciaisV13.lerPayloadFicha() : {}),
+            ...(window.T20MelhorAmigoV13 ? window.T20MelhorAmigoV13.lerPayload() : {}),
+            ...(__t20GameSuplementoFicha ? { game_suplemento: __t20GameSuplementoFicha } : {}),
             tormenta_classe_mb_slug: (q('f_classe_mb') && q('f_classe_mb').value) || null,
             arcanista_caminho:
                 caminhoArc && String(caminhoArc).trim() ? String(caminhoArc).trim().toLowerCase() : null,
@@ -6630,6 +6700,7 @@
 
     function aplicarFichaJson(j) {
         if (!j || typeof j !== 'object') return;
+        t20AplicarGameSuplementoFicha(j);
         aplicarRacaCamposDoJson(j);
         const mbSel = q('f_classe_mb');
         if (mbSel && j.tormenta_classe_mb_slug != null && String(j.tormenta_classe_mb_slug).trim()) {
@@ -6676,6 +6747,12 @@
             window.T20OrigensV13.aplicarOrigemPayload(j);
         } else {
             q('f_origem').value = j.origem || '';
+        }
+        if (window.T20MelhorAmigoV13 && window.T20MelhorAmigoV13.aplicarPayload) {
+            window.T20MelhorAmigoV13.aplicarPayload(j);
+        }
+        if (window.T20OrigemTrocasFichaV13 && window.T20OrigemTrocasFichaV13.renderUi) {
+            window.T20OrigemTrocasFichaV13.renderUi();
         }
         if (window.T20KitInicialV13) {
             window.T20KitInicialV13.aplicarKitPayload(j);
@@ -7220,11 +7297,13 @@
     }
     window.t20PreencherFormPersonagem = preencherForm;
     window.getRegraVersaoAtiva = getRegraVersaoAtiva;
+    window.getClasseMbRowPorSlug = getClasseMbRowPorSlug;
     window.coletarPericias = coletarPericias;
     window.preencherPericias = preencherPericias;
     window.t20AplicarPericiasOrigemBeneficios = t20AplicarPericiasOrigemBeneficios;
     window.t20AplicarPoderesAutomaticosNaLista = t20AplicarPoderesAutomaticosNaLista;
     window.t20AplicarEquipamentosAutomaticosNaLista = t20AplicarEquipamentosAutomaticosNaLista;
+    window.t20AtualizarEstadoBotaoSalvar = t20AtualizarEstadoBotaoSalvar;
 
     function aplicarTravaRacaClasseMb() {
         const sr = q('f_raca_select');
@@ -7286,6 +7365,7 @@
                 const peek = await svc.obter(idEarly);
                 if (window.T20RegraVersao) {
                     T20_REGRA_VERSAO_FICHA = window.T20RegraVersao.getRegraVersaoFicha(peek.ficha_json || {});
+                    t20AplicarGameSuplementoFicha(peek.ficha_json || {});
                 }
             } catch (ePeek) {
                 console.warn(ePeek);
@@ -7320,6 +7400,20 @@
                 await window.T20OrigensV13.init();
             } catch (eOrig) {
                 console.warn(eOrig);
+            }
+        }
+        if (window.T20OrigemTrocasFichaV13) {
+            try {
+                window.T20OrigemTrocasFichaV13.init();
+            } catch (eTroca) {
+                console.warn(eTroca);
+            }
+        }
+        if (window.T20MelhorAmigoV13) {
+            try {
+                window.T20MelhorAmigoV13.initFicha();
+            } catch (eMa) {
+                console.warn(eMa);
             }
         }
         if (window.T20PoderesV13) {
@@ -7893,6 +7987,13 @@
                 const cam = q('f_arcanista_caminho') && q('f_arcanista_caminho').value;
                 if (!cam || !String(cam).trim()) {
                     Toast.error('Arcanista (v1.3): escolha o caminho Bruxo, Mago ou Feiticeiro.');
+                    return;
+                }
+            }
+            if (window.T20MelhorAmigoV13 && window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())) {
+                const vma = window.T20MelhorAmigoV13.validar();
+                if (!vma.ok) {
+                    Toast.error(vma.msg);
                     return;
                 }
             }
