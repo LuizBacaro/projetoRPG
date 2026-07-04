@@ -1082,13 +1082,14 @@
 
     function onAbrirCadastro() {
         resetWizard();
+        mostrarPasso(1);
         void carregarCatalogos().then(() => {
             preencherSelectOrigens();
             preencherSelectTendencias();
             preencherSelectDivindades();
             renderPoderesConcedidos();
             void carregarKitOpcoes().then(renderUiKit);
-            mostrarPasso(1);
+            mostrarPasso(stepAtual);
         });
     }
 
