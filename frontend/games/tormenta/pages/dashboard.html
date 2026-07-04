@@ -920,7 +920,34 @@
                 </div>
             </div>
 
-            <div class="cad-wizard-step cad-wizard-step--v13" id="cadWizardStepKit" data-cad-step="7" style="display:none">
+            <div class="cad-wizard-step cad-wizard-step--v13" id="cadWizardStepPoderesHa" data-cad-step="7" style="display:none">
+                <p class="t20-dash-hint" style="margin-top:0">
+                    Poderes de <em>Heróis de Arton</em> elegíveis para a raça/classe escolhida (opcional).
+                </p>
+                <div class="t20-dash-poderes-ha-toolbar">
+                    <input id="cadPoderesHaBusca" class="t20-input" type="search" placeholder="Buscar poder…" autocomplete="off" />
+                    <select id="cadPoderesHaCategoria" class="t20-input">
+                        <option value="">Todas as categorias</option>
+                    </select>
+                    <label class="t20-dash-check t20-dash-poderes-ha-filtro">
+                        <input type="checkbox" id="cadPoderesHaSomenteElegiveis" checked />
+                        <span class="t20-dash-check-copy">Só elegíveis</span>
+                    </label>
+                </div>
+                <div class="t20-dash-poderes-ha-grid">
+                    <div class="t20-dash-poderes-ha-col">
+                        <p class="t20-dash-hint" style="margin:0 0 0.35rem"><strong>Catálogo</strong></p>
+                        <div id="cadPoderesHaCatalogoHost" class="t20-dash-poderes-ha-scroll"></div>
+                    </div>
+                    <div class="t20-dash-poderes-ha-col">
+                        <p class="t20-dash-hint" style="margin:0 0 0.35rem"><strong>Escolhidos</strong></p>
+                        <div id="cadPoderesHaSelecionadosHost" class="t20-dash-poderes-ha-scroll"></div>
+                    </div>
+                </div>
+                <p id="cadPoderesHaHint" class="t20-dash-hint" style="margin:0.5rem 0 0"></p>
+            </div>
+
+            <div class="cad-wizard-step cad-wizard-step--v13" id="cadWizardStepKit" data-cad-step="8" style="display:none">
                 <p class="t20-dash-hint" id="cadWizardStepKitHint" style="margin-top:0">Kit inicial (nível 1) — p.140 v1.3. Mochila, saco de dormir e traje são adicionados automaticamente.</p>
                 <div id="cadWrapKitNv1">
                 <div class="t20-dash-form-grid">
@@ -959,7 +986,7 @@
                 </div>
             </div>
 
-            <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="8" style="display:none">
+            <div class="cad-wizard-step cad-wizard-step--v13" data-cad-step="9" style="display:none">
                 <p class="t20-dash-hint" style="margin-top:0">Revise os dados antes de criar. Itens pendentes aparecem no checklist abaixo.</p>
                 <div id="cadWizardChecklist" class="cad-wizard-checklist-wrap" aria-live="polite"></div>
                 <div id="cadWizardResumo" class="cad-wizard-resumo"></div>
@@ -1002,7 +1029,9 @@
 <script src="/games/tormenta/js/t20-duende-v13.js?v=20260704du"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
-<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260630s01"></script>
+<script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
+<script src="/games/tormenta/js/t20-dashboard-poderes-ha-v13.js?v=20260704ha4"></script>
+<script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260704ha4"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -2373,7 +2402,9 @@
                 if (vr.passo && T20DashWizardV13.mostrarPasso) {
                     T20DashWizardV13.mostrarPasso(vr.passo);
                 } else if (T20DashWizardV13.mostrarPasso) {
-                    T20DashWizardV13.mostrarPasso(8);
+                    T20DashWizardV13.mostrarPasso(
+                        T20DashWizardV13.passoRevisao ? T20DashWizardV13.passoRevisao() : 8
+                    );
                 }
                 return false;
             }
@@ -2446,6 +2477,9 @@
             }
             if (window.T20DashPericiasV13 && T20DashPericiasV13.lerPayloadPericias) {
                 Object.assign(fichaBase, T20DashPericiasV13.lerPayloadPericias());
+            }
+            if (window.T20DashPoderesHaV13 && T20DashPoderesHaV13.lerPayload) {
+                Object.assign(fichaBase, T20DashPoderesHaV13.lerPayload());
             }
         }
 
@@ -2716,6 +2750,19 @@
                     Toast.warning(e2.message || 'Personagem criado, mas não foi possível enviar o retrato.');
                 }
             }
+            const poderesHa =
+                payload.ficha_json &&
+                Array.isArray(payload.ficha_json.talentos_mb_lista) &&
+                payload.ficha_json.talentos_mb_lista.length;
+            if (poderesHa) {
+                try {
+                    await svc.migrarTalentosDoJson(created.id);
+                } catch (e3) {
+                    Toast.warning(
+                        e3.message || 'Personagem criado, mas não foi possível vincular os poderes HA.'
+                    );
+                }
+            }
             Toast.success(`${created.nome} criado. Abrindo ficha…`);
             closeOverlay('overlayCadastro');
             window.location.href = 'ficha-personagem.html?id=' + encodeURIComponent(created.id);
@@ -2765,6 +2812,9 @@
     }
     if (window.T20DashPericiasV13) {
         T20DashPericiasV13.init({ regraVersao: DASH_REGRA_VERSAO });
+    }
+    if (window.T20DashPoderesHaV13) {
+        T20DashPoderesHaV13.init();
     }
     if (window.T20DashStep2V13) {
         T20DashStep2V13.init({
