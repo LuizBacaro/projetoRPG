@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.20–23 (Melhor Amigo)",
+    "nota": "Catálogo de truques disponíveis para o Melhor Amigo do Treinador."
+  },
+  "truques": [
+    {
+      "slug": "alado",
+      "nome": "Alado",
+      "descricao": "O parceiro ganha deslocamento de voo igual ao seu deslocamento base.",
+      "nivel_minimo": 1
+    },
+    {
+      "slug": "amigao",
+      "nome": "Amigão",
+      "descricao": "O parceiro pode usar a ação Ajudar em combate como ação de movimento (em vez de padrão).",
+      "nivel_minimo": 1
+    },
+    {
+      "slug": "asas_aliadas",
+      "nome": "Asas Aliadas",
+      "descricao": "O parceiro pode carregar o Treinador enquanto voa (se tiver truque Alado e for de tamanho suficiente).",
+      "nivel_minimo": 3,
+      "pre_requisito": "alado"
+    },
+    {
+      "slug": "ataque_extra",
+      "nome": "Ataque Extra",
+      "descricao": "O parceiro pode realizar um ataque extra por rodada quando usar ação de ataque.",
+      "nivel_minimo": 5
+    },
+    {
+      "slug": "deslocamento_especial",
+      "nome": "Deslocamento Especial",
+      "descricao": "O parceiro ganha escalada, natação ou escavação (escolher ao aprender) com deslocamento base.",
+      "nivel_minimo": 1
+    },
+    {
+      "slug": "familiar_magico",
+      "nome": "Familiar Mágico",
+      "descricao": "O parceiro pode servir como familiar; o Treinador pode lançar magias através dele a até 30m.",
+      "nivel_minimo": 5
+    },
+    {
+      "slug": "faro_aguçado",
+      "nome": "Faro Aguçado",
+      "descricao": "O parceiro não pode ser surpreendido e recebe +4 em Percepção.",
+      "nivel_minimo": 1
+    },
+    {
+      "slug": "golpe_preciso",
+      "nome": "Golpe Preciso",
+      "descricao": "Ataques do parceiro ignoram 5 pontos de RD.",
+      "nivel_minimo": 3
+    },
+    {
+      "slug": "magia_inata",
+      "nome": "Magia Inata",
+      "descricao": "O parceiro pode lançar uma magia de 1º círculo (escolher ao aprender) 1×/cena, com PM do Treinador.",
+      "nivel_minimo": 3
+    },
+    {
+      "slug": "obedecer_aliado",
+      "nome": "Obedecer Aliado",
+      "descricao": "O parceiro obedece comandos de um aliado designado pelo Treinador na ausência deste.",
+      "nivel_minimo": 1
+    },
+    {
+      "slug": "pericia_extra",
+      "nome": "Perícia Extra",
+      "descricao": "O parceiro treina uma perícia adicional (escolher ao aprender).",
+      "nivel_minimo": 1
+    },
+    {
+      "slug": "resiliente",
+      "nome": "Resiliente",
+      "descricao": "O parceiro ganha +2 em todas as resistências (Fortitude, Reflexos, Vontade).",
+      "nivel_minimo": 1
+    },
+    {
+      "slug": "sombra",
+      "nome": "Sombra",
+      "descricao": "O parceiro pode se tornar invisível por 1 PM (ação de movimento); duração: 1 minuto ou até atacar.",
+      "nivel_minimo": 5
+    },
+    {
+      "slug": "tamanho_aumentado",
+      "nome": "Tamanho Aumentado",
+      "descricao": "O parceiro aumenta uma categoria de tamanho (até Enorme) permanentemente.",
+      "nivel_minimo": 7
+    },
+    {
+      "slug": "telepata",
+      "nome": "Telepata",
+      "descricao": "O Treinador pode se comunicar telepaticamente com o parceiro a até 1 km de distância.",
+      "nivel_minimo": 1
+    }
+  ]
+}

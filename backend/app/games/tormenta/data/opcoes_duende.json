@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf p.10–13"
+  },
+  "naturezas": [
+    {
+      "slug": "animal",
+      "nome": "Animal",
+      "descricao": "Carne e osso; +1 em um atributo à escolha (pode empilhar com um Don)."
+    },
+    {
+      "slug": "vegetal",
+      "nome": "Vegetal",
+      "descricao": "Natureza Vegetal e Florescer Feérico."
+    },
+    {
+      "slug": "mineral",
+      "nome": "Mineral",
+      "descricao": "Imune a metabolismo; RD 5 corte/fogo/perfuração; sem alimentação."
+    }
+  ],
+  "tamanhos": [
+    {
+      "slug": "minusculo",
+      "nome": "Minúsculo",
+      "deslocamento_m": 6,
+      "furtividade_bonus": 5,
+      "mod_for": -1
+    },
+    {
+      "slug": "pequeno",
+      "nome": "Pequeno",
+      "deslocamento_m": 6,
+      "furtividade_bonus": 2
+    },
+    {
+      "slug": "medio",
+      "nome": "Médio",
+      "deslocamento_m": 9,
+      "furtividade_bonus": 0
+    },
+    {
+      "slug": "grande",
+      "nome": "Grande",
+      "deslocamento_m": 9,
+      "furtividade_bonus": -2,
+      "mod_des": -1
+    }
+  ],
+  "tabu_penalidades": [
+    { "slug": "diplomacia", "nome": "Diplomacia", "modificador": -5 },
+    { "slug": "iniciativa", "nome": "Iniciativa", "modificador": -5 },
+    { "slug": "luta", "nome": "Luta", "modificador": -5 },
+    { "slug": "percepcao", "nome": "Percepção", "modificador": -5 }
+  ],
+  "limitacoes_fixas": [
+    {
+      "slug": "aversao_ferro",
+      "nome": "Aversão a Ferro",
+      "descricao": "+1 dano/dado de armas de ferro/aço; 1d6/rodada se empunhar ou vestir ferro."
+    },
+    {
+      "slug": "aversao_sinos",
+      "nome": "Aversão a Sinos",
+      "descricao": "Alquebrado e esmorecido ao ouvir sino; 1d6 em cenas urbanas (1 = ouve sino)."
+    },
+    {
+      "slug": "tabu",
+      "nome": "Tabu",
+      "descricao": "Comportamento proibido; −5 em perícia escolhida; desobedecer → fatigado → exausto → morte."
+    },
+    {
+      "slug": "longevidade",
+      "nome": "Longevidade",
+      "descricao": "Não segue ciclo natural de envelhecimento."
+    },
+    {
+      "slug": "devocao",
+      "nome": "Devoção",
+      "descricao": "Allihanna, Hyninn, Nimb, Wynna."
+    }
+  ],
+  "afinidade_elementos": [
+    { "slug": "agua", "nome": "Água" },
+    { "slug": "fogo", "nome": "Fogo" },
+    { "slug": "vegetacao", "nome": "Vegetação" }
+  ],
+  "maldicao_resistencias": [
+    { "slug": "fortitude", "nome": "Fortitude" },
+    { "slug": "vontade", "nome": "Vontade" }
+  ],
+  "maldicao_efeitos": [
+    { "slug": "apatia_profunda", "nome": "Apatia Profunda" },
+    { "slug": "coracao_geleia", "nome": "Coração de Geleia" },
+    { "slug": "envelhecimento_subito", "nome": "Envelhecimento Súbito" },
+    { "slug": "loucura_verao", "nome": "Loucura do Verão" },
+    { "slug": "mil_verrugas", "nome": "Mil Verrugas" },
+    { "slug": "ruina_corpo", "nome": "Ruína do Corpo" }
+  ],
+  "formas_selvagem_metamorfose": [
+    { "slug": "agil", "nome": "Ágil" },
+    { "slug": "forte", "nome": "Forte" },
+    { "slug": "rapido", "nome": "Rápido" },
+    { "slug": "resistente", "nome": "Resistente" },
+    { "slug": "veloz", "nome": "Veloz" }
+  ]
+}

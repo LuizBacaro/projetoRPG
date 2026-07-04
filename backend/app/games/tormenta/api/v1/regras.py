@@ -27,7 +27,10 @@ from app.games.tormenta.rules.catalogo_t20 import (
     filtrar_magias_mb,
     filtrar_talentos_mb,
 )
-from app.games.tormenta.rules.classes_t20 import lista_classes
+from app.games.tormenta.rules.classes_t20 import (
+    lista_classes,
+    lista_classes_com_suplemento,
+)
 from app.games.tormenta.rules.condicoes_t20 import (
     lista_condicoes_v13,
     lista_situacoes_especiais_v13,
@@ -35,10 +38,9 @@ from app.games.tormenta.rules.condicoes_t20 import (
 from app.games.tormenta.rules.conjuracao_t20 import (
     cd_resistencia_magia_t20,
     custo_pm_preparar_ou_lancar_magia,
-    habilidade_chave_conjuracao,
-    lista_regras_conjuracao_classe_mb,
+    habilidade_chave_conjuracao_efetiva,
     lista_regras_conjuracao_por_versao,
-    modificador_conjuracao_mb,
+    modificador_conjuracao_efetivo,
     pontos_magia_maximos_conjuracao,
     texto_custo_pm_por_circulo_mb,
 )
@@ -48,13 +50,24 @@ from app.games.tormenta.rules.devocao_divindade_t20 import (
 from app.games.tormenta.rules.dinheiro_inicial_v13_t20 import (
     preview_dinheiro_inicial_v13,
 )
+from app.games.tormenta.rules.duende_t20 import (
+    calcular_duende,
+    lista_presentes_duende,
+    opcoes_duende_catalogo,
+    rolar_duende_aleatorio,
+)
 from app.games.tormenta.rules.escolhas_raciais_t20 import escolhas_por_raca
 from app.games.tormenta.rules.kit_inicial_v13_t20 import opcoes_kit_inicial_v13
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
     tipo_lista_magias_por_classe_mb,
 )
-from app.games.tormenta.rules.origens_t20 import lista_origens_v13
+from app.games.tormenta.rules.melhor_amigo_t20 import (
+    lista_tipos_melhor_amigo,
+    qtd_truques_por_nivel,
+    truques_disponiveis,
+)
+from app.games.tormenta.rules.origens_t20 import lista_origens_com_suplemento
 from app.games.tormenta.rules.penalidade_armadura_t20 import (
     penalidade_armadura_pericia,
     pericia_aplica_penalidade_armadura,
@@ -79,9 +92,13 @@ from app.games.tormenta.rules.progressao_pv_t20 import (
     preview_pm_multiclasse_v13,
     preview_pv_mb,
 )
-from app.games.tormenta.rules.racas_t20 import idiomas_mb_extras, lista_racas
+from app.games.tormenta.rules.racas_t20 import (
+    idiomas_mb_extras,
+    lista_racas_com_suplemento,
+)
 from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_V13,
+    SUPLEMENTO_HEROIS_ARTON,
     normalizar_regra_versao,
 )
 from app.games.tormenta.rules.tendencias_divindades_t20 import (
@@ -109,6 +126,10 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaCustoAtributoItem,
     TormentaDinheiroInicialResponse,
     TormentaDivindadeMbOpcao,
+    TormentaDuendeAleatorioResponse,
+    TormentaDuendeCalcularRequest,
+    TormentaDuendeCalcularResponse,
+    TormentaDuendeOpcoesResponse,
     TormentaEscolhaRacialAscendenciaItem,
     TormentaEscolhaRacialFonteItem,
     TormentaEscolhaRacialMagiaInataItem,
@@ -134,6 +155,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaPmMulticlassePreviewResponse,
     TormentaPoderValidarPreRequisitosRequest,
     TormentaPoderValidarPreRequisitosResponse,
+    TormentaPresenteDuendeItem,
+    TormentaPresentesDuendeResponse,
     TormentaPvPreviewResponse,
     TormentaRacaMbItem,
     TormentaRegrasAtributosResponse,
@@ -144,7 +167,11 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaRegrasOrigensResponse,
     TormentaRegrasPericiasResponse,
     TormentaRegrasRacasResponse,
+    TormentaTipoMelhorAmigoItem,
+    TormentaTiposMelhorAmigoResponse,
     TormentaTracosRaciaisPreviewResponse,
+    TormentaTruqueMelhorAmigoItem,
+    TormentaTruquesMelhorAmigoResponse,
 )
 from app.games.tormenta.services.personagem_talentos_service import (
     TormentaPersonagemTalentosService,
@@ -239,11 +266,19 @@ def obter_regras_racas(
         None,
         description="Edição: mb (11 raças) ou v13 (17 raças). Padrão mb.",
     ),
+    suplemento: Optional[str] = Query(
+        None,
+        description=(
+            f"Incluir raças de suplemento: '{SUPLEMENTO_HEROIS_ARTON}' "
+            "adiciona Eiradaan, Galokk, Meio-Elfo e Sátiro."
+        ),
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasRacasResponse:
     rv = normalizar_regra_versao(regra_versao)
     geral, tabela = idiomas_mb_extras()
-    racas = [TormentaRacaMbItem(**row) for row in lista_racas(rv)]
+    racas_list = lista_racas_com_suplemento(rv, suplemento=suplemento)
+    racas = [TormentaRacaMbItem(**row) for row in racas_list]
     idiomas_rows = [TormentaIdiomaTabelaItem(**row) for row in tabela]
     return TormentaRegrasRacasResponse(
         regra_versao=rv,
@@ -263,13 +298,23 @@ def obter_regras_classes(
         None,
         description="Versão de regras: mb (legado) ou v13 (Edição Jogo do Ano v1.3). Default: mb.",
     ),
+    suplemento: Optional[str] = Query(
+        None,
+        description=(
+            f"Incluir classes de suplemento: '{SUPLEMENTO_HEROIS_ARTON}' adiciona "
+            "Treinador + 14 classes variantes."
+        ),
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasClassesResponse:
     rv = normalizar_regra_versao(regra_versao)
     ben = [
         TormentaBeneficioNivelMbItem(**row) for row in lista_beneficios_por_nivel(rv)
     ]
-    cls_rows = [TormentaClasseMbItem(**row) for row in lista_classes(rv)]
+    cls_rows = [
+        TormentaClasseMbItem(**row)
+        for row in lista_classes_com_suplemento(rv, suplemento)
+    ]
     return TormentaRegrasClassesResponse(
         regra_versao=rv,
         beneficios_por_nivel=ben,
@@ -316,11 +361,112 @@ def obter_regras_origens(
         None,
         description="Versão de regras: v13 (padrão para origens).",
     ),
+    suplemento: Optional[str] = Query(
+        None,
+        description=(
+            f"Incluir origens de suplemento: '{SUPLEMENTO_HEROIS_ARTON}' adiciona "
+            "14 origens especiais."
+        ),
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaRegrasOrigensResponse:
     rv = normalizar_regra_versao(regra_versao or REGRA_VERSAO_V13)
-    rows = [TormentaOrigemV13Item(**row) for row in lista_origens_v13()]
+    rows = [
+        TormentaOrigemV13Item(**row) for row in lista_origens_com_suplemento(suplemento)
+    ]
     return TormentaRegrasOrigensResponse(regra_versao=rv, origens=rows)
+
+
+@router.get(
+    "/truques-melhor-amigo",
+    response_model=TormentaTruquesMelhorAmigoResponse,
+    summary="Truques disponíveis para o Melhor Amigo do Treinador (Heróis de Arton)",
+)
+def obter_truques_melhor_amigo(
+    nivel_treinador: int = Query(
+        default=1,
+        ge=1,
+        le=20,
+        description="Nível atual do Treinador para filtrar truques por nivel_minimo.",
+    ),
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaTruquesMelhorAmigoResponse:
+    truques = [
+        TormentaTruqueMelhorAmigoItem(**t) for t in truques_disponiveis(nivel_treinador)
+    ]
+    return TormentaTruquesMelhorAmigoResponse(
+        nivel_treinador=nivel_treinador,
+        qtd_maxima_truques=qtd_truques_por_nivel(nivel_treinador),
+        truques=truques,
+    )
+
+
+@router.get(
+    "/tipos-melhor-amigo",
+    response_model=TormentaTiposMelhorAmigoResponse,
+    summary="Tipos de Melhor Amigo e bônus automáticos (Heróis de Arton)",
+)
+def obter_tipos_melhor_amigo(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaTiposMelhorAmigoResponse:
+    tipos = [TormentaTipoMelhorAmigoItem(**t) for t in lista_tipos_melhor_amigo()]
+    return TormentaTiposMelhorAmigoResponse(tipos=tipos)
+
+
+@router.get(
+    "/presentes-duende",
+    response_model=TormentaPresentesDuendeResponse,
+    summary="12 Presentes de Magia e de Caos (Duende — Heróis de Arton)",
+)
+def obter_presentes_duende(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPresentesDuendeResponse:
+    rows = [TormentaPresenteDuendeItem(**p) for p in lista_presentes_duende()]
+    op = opcoes_duende_catalogo()
+    return TormentaPresentesDuendeResponse(
+        presentes=rows,
+        qtd_presentes=int(op.get("qtd_presentes") or 3),
+    )
+
+
+@router.get(
+    "/duende-opcoes",
+    response_model=TormentaDuendeOpcoesResponse,
+    summary="Opções de construção modular do Duende (Heróis de Arton)",
+)
+def obter_duende_opcoes(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaDuendeOpcoesResponse:
+    op = opcoes_duende_catalogo()
+    return TormentaDuendeOpcoesResponse(**op)
+
+
+@router.get(
+    "/duende-aleatorio",
+    response_model=TormentaDuendeAleatorioResponse,
+    summary="Rola configuração aleatória de Duende (+2 PM bônus)",
+)
+def obter_duende_aleatorio(
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaDuendeAleatorioResponse:
+    return TormentaDuendeAleatorioResponse(config=rolar_duende_aleatorio())
+
+
+@router.post(
+    "/duende-calcular",
+    response_model=TormentaDuendeCalcularResponse,
+    summary="Resume mecânicas do Duende (traços, limitações, PM bônus)",
+)
+def calcular_duende_regras(
+    body: TormentaDuendeCalcularRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaDuendeCalcularResponse:
+    fj = {
+        "raca_tormenta_slug": str(body.raca_tormenta_slug or "duende").strip().lower(),
+        "duende": dict(body.duende or {}),
+    }
+    data = calcular_duende(fj) or {}
+    return TormentaDuendeCalcularResponse(**data)
 
 
 @router.get(
@@ -382,14 +528,42 @@ def listar_catalogo_talentos(
     categoria_v13: Optional[str] = Query(
         None,
         max_length=40,
-        description="Filtrar por categoria v1.3 (geral, combate, destino, magia, concedido, tormenta, classe).",
+        description=(
+            "Filtrar por categoria v1.3 (geral, combate, destino, magia, concedido, "
+            "tormenta, classe, raca, grupo, treinador, distincao)."
+        ),
+    ),
+    suplemento: Optional[str] = Query(
+        None,
+        description=(
+            f"Incluir poderes de suplemento: '{SUPLEMENTO_HEROIS_ARTON}' adiciona "
+            "poderes de Treinador, raça, classe e gerais do livro Heróis de Arton."
+        ),
+    ),
+    raca: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Filtrar poderes de raça pela raça exigida (ex.: eiradaan).",
+    ),
+    classe_exigida: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Filtrar poderes pela classe exigida (ex.: treinador, guerreiro).",
     ),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=200),
     response: Response = None,
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaCatalogoPaginaResponse:
-    slice_rows, total = filtrar_talentos_mb(q, skip, limit, categoria_v13=categoria_v13)
+    slice_rows, total = filtrar_talentos_mb(
+        q,
+        skip,
+        limit,
+        categoria_v13=categoria_v13,
+        suplemento=suplemento,
+        raca=raca,
+        classe_exigida=classe_exigida,
+    )
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)
@@ -566,17 +740,23 @@ def obter_conjuracao_preview_mb(
         max_length=16,
         description="Caminho arcanista v1.3: bruxo | mago | feiticeiro.",
     ),
+    raca_tormenta_slug: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Slug da raça v1.3 (ex.: eiradaan) para overrides de conjuração.",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaConjuracaoPreviewResponse:
     rv = normalizar_regra_versao(regra_versao)
     slug = classe_slug.strip().lower()
+    raca = (raca_tormenta_slug or "").strip().lower() or None
     nv = int(nivel_conjurador) if nivel_conjurador is not None else int(nivel)
     if nv < 1:
         nv = 1
     if nv > 40:
         nv = 40
-    hk = habilidade_chave_conjuracao(slug, rv, arcanista_caminho)
-    mod = modificador_conjuracao_mb(
+    hk = habilidade_chave_conjuracao_efetiva(slug, rv, arcanista_caminho, raca)
+    mod = modificador_conjuracao_efetivo(
         slug,
         for_valor,
         des_valor,
@@ -586,6 +766,7 @@ def obter_conjuracao_preview_mb(
         car_valor,
         regra_versao=rv,
         arcanista_caminho=arcanista_caminho,
+        slug_raca=raca,
     )
     if rv == REGRA_VERSAO_V13 and mod is not None:
         cd_magia = cd_resistencia_magia_t20(nv, mod, rv)
@@ -732,6 +913,31 @@ def obter_tracos_raciais_preview(
         max_length=200,
         description="Sílfide v1.3: slugs de magias separados por vírgula.",
     ),
+    duende_tamanho: Optional[str] = Query(
+        None,
+        max_length=20,
+        description="Duende HA: minusculo | pequeno | medio | grande.",
+    ),
+    duende_presentes: Optional[str] = Query(
+        None,
+        max_length=300,
+        description="Duende HA: slugs de presentes separados por vírgula.",
+    ),
+    duende_natureza: Optional[str] = Query(
+        None,
+        max_length=20,
+        description="Duende HA: animal | vegetal | mineral.",
+    ),
+    duende_tabu_penalidade: Optional[str] = Query(
+        None,
+        max_length=20,
+        description="Duende HA: diplomacia | iniciativa | luta | percepcao.",
+    ),
+    duende_tabu_texto: Optional[str] = Query(
+        None,
+        max_length=200,
+        description="Duende HA: texto do tabu (para resumo no preview).",
+    ),
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaTracosRaciaisPreviewResponse:
     per_lefou = None
@@ -749,6 +955,23 @@ def obter_tracos_raciais_preview(
         mag_silfide = [
             p.strip().lower() for p in str(silfide_magias).split(",") if p.strip()
         ]
+    du_cfg = None
+    if duende_tamanho or duende_presentes or duende_natureza or duende_tabu_penalidade:
+        pres = []
+        if duende_presentes:
+            pres = [
+                p.strip().lower() for p in str(duende_presentes).split(",") if p.strip()
+            ]
+        du_cfg = {
+            "tamanho_raca": str(duende_tamanho or "medio").strip().lower(),
+            "presentes": pres,
+        }
+        if duende_natureza:
+            du_cfg["natureza"] = str(duende_natureza).strip().lower()
+        if duende_tabu_penalidade:
+            du_cfg["tabu_penalidade"] = str(duende_tabu_penalidade).strip().lower()
+        if duende_tabu_texto:
+            du_cfg["tabu_texto"] = str(duende_tabu_texto).strip()
     data = preview_tracos_raciais(
         slug.strip().lower(),
         regra_versao=regra_versao,
@@ -763,6 +986,7 @@ def obter_tracos_raciais_preview(
         kliren_pericia=kliren_pericia,
         kliren_oficio=kliren_oficio,
         silfide_magias=mag_silfide,
+        duende_config=du_cfg,
     )
     return TormentaTracosRaciaisPreviewResponse(**data)
 
@@ -1045,6 +1269,8 @@ def validar_pericias_criacao_mb(
         regra_versao=rv,
         humano_versatil=body.humano_versatil,
         origem_beneficios=body.origem_beneficios,
+        origem_slug=(body.origem_slug or "").strip().lower() or None,
+        origem_trocas_pericia=body.origem_trocas_pericia,
     )
     return TormentaPericiasValidarCriacaoResponse(**data)
 

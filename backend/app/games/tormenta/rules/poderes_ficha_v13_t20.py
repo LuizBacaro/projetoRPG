@@ -7,6 +7,11 @@ import unicodedata
 from typing import Any, Dict, List, Optional
 
 from app.games.tormenta.rules.catalogo_t20 import lista_talentos_mb_catalogo
+from app.games.tormenta.rules.poderes_herois_arton_t20 import (
+    normalizar_slug_poder_ha,
+    poder_por_slug,
+    poderes_disponiveis_ficha,
+)
 from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_V13,
     regra_versao_de_ficha,
@@ -22,11 +27,17 @@ def _normalizar_slug(texto: str) -> str:
 
 
 def nome_poder_por_slug_v13(slug: str) -> str:
-    """Resolve slug v1.3 para nome exibido (catálogo MB ou título a partir do slug)."""
+    """Resolve slug v1.3 para nome exibido (catálogo MB, HA ou título a partir do slug)."""
     s = _normalizar_slug(slug)
     if not s:
         return ""
+    ha = poder_por_slug(s)
+    if ha and ha.get("nome"):
+        return str(ha["nome"]).strip()
     for row in lista_talentos_mb_catalogo():
+        row_slug = str(row.get("slug") or "").strip().lower()
+        if row_slug and normalizar_slug_poder_ha(row_slug) == s:
+            return str(row.get("nome", "")).strip()
         nome = str(row.get("nome", "")).strip()
         if nome and _normalizar_slug(nome) == s:
             return nome
@@ -93,5 +104,31 @@ def listar_poderes_sync_v13(ficha_json: Optional[dict]) -> List[Dict[str, str]]:
         hvs = str(fj.get("humano_versatil_poder_slug") or "").strip()
         if hvs:
             _add("versatil", hvs)
+
+    raca = str(fj.get("raca_tormenta_slug") or "").strip().lower()
+    if raca == "meio_elfo":
+        ah = str(fj.get("ambicao_herdada_poder_slug") or "").strip()
+        if ah:
+            _add("ambicao_herdada", ah)
+
+    if raca == "duende":
+        from app.games.tormenta.rules.duende_t20 import (
+            lista_presentes_duende,
+            presentes_duende_slugs_ficha,
+        )
+
+        nomes = {p["slug"]: p["nome"] for p in lista_presentes_duende()}
+        for slug in presentes_duende_slugs_ficha(fj):
+            nota = nota_auto_poder_v13("presente_duende", slug)
+            if nota in seen_notas:
+                continue
+            seen_notas.add(nota)
+            out.append(
+                {
+                    "slug": _normalizar_slug(slug),
+                    "nome": nomes.get(slug, slug.replace("_", " ").title()),
+                    "notas": nota,
+                }
+            )
 
     return out

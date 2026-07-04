@@ -295,6 +295,14 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao sincronizar magias da ficha');
     }
 
+    async migrarTalentosDoJson(id) {
+        const res = await fetch(this._url(`/${id}/talentos/migrar-do-json`), {
+            method: 'POST',
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao vincular poderes da ficha');
+    }
+
     async encerrarConcentracao(id) {
         const res = await fetch(this._url(`/${id}/magias/encerrar-concentracao`), {
             method: 'POST',

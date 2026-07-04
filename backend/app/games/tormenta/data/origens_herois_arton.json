@@ -1,0 +1,149 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.48–55",
+    "nota": "14 origens especiais do suplemento Heróis de Arton v1.1. Não reproduz texto longo."
+  },
+  "origens": [
+    {
+      "slug": "bacharel",
+      "nome": "Bacharel",
+      "pagina": 48,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["conhecimento", "diplomacia", "nobreza"],
+      "beneficios_poderes": ["retórica"],
+      "poder_unico": "mudar_atitude_livre",
+      "troca_pericia_treinada": true,
+      "notas": "Mudar Atitude como ação livre 1×/cena."
+    },
+    {
+      "slug": "boticario",
+      "nome": "Boticário",
+      "pagina": 49,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["alquimia", "medicina"],
+      "beneficios_poderes": ["fabricar_pocao", "fabricar_veneno"],
+      "troca_pericia_treinada": true,
+      "notas": "Pode fabricar poções e venenos sem nível mínimo de magia."
+    },
+    {
+      "slug": "cacador_de_ratos",
+      "nome": "Caçador de Ratos",
+      "pagina": 49,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["furtividade", "investigacao", "sobrevivencia"],
+      "beneficios_poderes": ["rastreador_urbano"],
+      "troca_pericia_treinada": true,
+      "notas": "+2 em ataques e Defesa contra criaturas 2 ou mais tamanhos menores."
+    },
+    {
+      "slug": "cao_de_briga",
+      "nome": "Cão de Briga",
+      "pagina": 50,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["oficio"],
+      "beneficios_poderes": ["rd_corte_2", "ignorar_rd"],
+      "troca_pericia_treinada": false,
+      "notas": "RD corte 2; armas de corte ignoram 5 pontos de RD do alvo."
+    },
+    {
+      "slug": "chef_hynne",
+      "nome": "Chef Hynne",
+      "pagina": 50,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["oficio"],
+      "beneficios_poderes": ["culinaria_aprimorada"],
+      "troca_pericia_treinada": true,
+      "notas": "Ofício (cozinheiro) aprimorado; instrumentos especiais de culinária."
+    },
+    {
+      "slug": "cirurgiao_barbeiro",
+      "nome": "Cirurgião-Barbeiro",
+      "pagina": 51,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["medicina", "oficio"],
+      "beneficios_poderes": ["cura_avancada"],
+      "troca_pericia_treinada": true,
+      "notas": "Cura e extração cirúrgica de projéteis/parasitas."
+    },
+    {
+      "slug": "coureiro",
+      "nome": "Coureiro",
+      "pagina": 52,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["oficio"],
+      "beneficios_poderes": ["melhorar_armadura_leve"],
+      "troca_pericia_treinada": true,
+      "notas": "Trabalha couro; melhora armaduras leves adicionando +1 Defesa."
+    },
+    {
+      "slug": "ferreiro_militar",
+      "nome": "Ferreiro Militar",
+      "pagina": 53,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["oficio"],
+      "beneficios_poderes": ["forjar_armas", "forjar_armaduras"],
+      "troca_pericia_treinada": true,
+      "notas": "Forja armas e armaduras militares; manutenção de equipamento."
+    },
+    {
+      "slug": "freira",
+      "nome": "Freira",
+      "pagina": 53,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["religiao", "vontade"],
+      "beneficios_poderes": ["devocao_monastica"],
+      "troca_pericia_treinada": true,
+      "notas": "Devoção monástica; resistência espiritual."
+    },
+    {
+      "slug": "goradista",
+      "nome": "Goradista",
+      "pagina": 53,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["oficio", "diplomacia"],
+      "beneficios_poderes": ["culinaria_gorad"],
+      "troca_pericia_treinada": true,
+      "notas": "Especialista no ingrediente especial Gorad; culinária e negociação."
+    },
+    {
+      "slug": "ladrao_de_tumulos",
+      "nome": "Ladrão de Túmulos",
+      "pagina": 54,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["investigacao", "furtividade"],
+      "beneficios_poderes": ["conhece_armadilhas", "conhece_masmorras"],
+      "troca_pericia_treinada": true,
+      "notas": "Conhece masmorras e armadilhas; +2 em Reflexos vs armadilhas."
+    },
+    {
+      "slug": "menestrel",
+      "nome": "Menestrel",
+      "pagina": 54,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["atuacao"],
+      "beneficios_poderes": ["repertorio_historico"],
+      "troca_pericia_treinada": true,
+      "notas": "Conhecimento de histórias e lendas; +2 em Conhecimento para lore."
+    },
+    {
+      "slug": "naufrago",
+      "nome": "Náufrago",
+      "pagina": 54,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["sobrevivencia", "atletismo"],
+      "beneficios_poderes": ["resistencia_maritima"],
+      "troca_pericia_treinada": true,
+      "notas": "Sobrevivência aquática avançada; resistência a condições adversas."
+    },
+    {
+      "slug": "servo",
+      "nome": "Servo",
+      "pagina": 55,
+      "fonte_catalogo": "herois_arton",
+      "beneficios_pericias": ["diplomacia", "intuicao"],
+      "beneficios_poderes": ["serventia"],
+      "troca_pericia_treinada": true,
+      "notas": "Serventia na nobreza; conhecimento de protocolo e hierarquia."
+    }
+  ]
+}

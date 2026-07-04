@@ -57,6 +57,11 @@
         return v && v !== 'duas_pericias' ? v : null;
     }
 
+    function origemSlug() {
+        const sel = q('cadOrigemSlug');
+        return sel && sel.value ? String(sel.value).trim().toLowerCase() : '';
+    }
+
     function origemBeneficios() {
         const picks = global.__cadOrigemBeneficios;
         return Array.isArray(picks) ? picks.slice() : [];
@@ -67,6 +72,111 @@
             .filter((b) => String(b).startsWith('pericia:'))
             .map((b) => String(b).slice('pericia:'.length).trim().toLowerCase())
             .filter(Boolean);
+    }
+
+    function origemTrocasMap() {
+        const raw = global.__cadOrigemTrocasPericia;
+        if (!raw || typeof raw !== 'object') return {};
+        const out = {};
+        Object.keys(raw).forEach((k) => {
+            const de = String(k || '').trim().toLowerCase();
+            const para = String(raw[k] || '').trim().toLowerCase();
+            if (de && para) out[de] = para;
+        });
+        return out;
+    }
+
+    function slugsOrigemEfetivos() {
+        const trocas = origemTrocasMap();
+        const out = new Set();
+        slugsOrigemPericias().forEach((slug) => {
+            if (trocas[slug]) out.add(trocas[slug]);
+            else out.add(slug);
+        });
+        return out;
+    }
+
+    function treinadosAtuaisSemOrigem() {
+        const out = new Set(slugsFixas());
+        const host = q('cadPericiasHost');
+        if (host) {
+            host.querySelectorAll('input[data-pericia-slug]').forEach((inp) => {
+                const slug = String(inp.getAttribute('data-pericia-slug') || '').trim().toLowerCase();
+                if (slug && inp.checked) out.add(slug);
+            });
+        }
+        return out;
+    }
+
+    function periciasOrigemRedundantes() {
+        const pool = slugsPoolClasse();
+        const treinados = treinadosAtuaisSemOrigem();
+        return slugsOrigemPericias().filter((slug) => pool.has(slug) && treinados.has(slug));
+    }
+
+    function opcoesTrocaPara(slugDe) {
+        const pool = slugsPoolClasse();
+        const treinados = treinadosAtuaisSemOrigem();
+        const trocas = origemTrocasMap();
+        const usados = new Set(Object.values(trocas));
+        return Array.from(pool).filter((slug) => {
+            if (slug === slugDe) return false;
+            if (treinados.has(slug)) return false;
+            if (usados.has(slug)) return false;
+            return true;
+        });
+    }
+
+    function renderOrigemTrocas() {
+        const host = q('cadOrigemTrocasHost');
+        if (!host) return;
+        const permite = Boolean(global.__cadOrigemPermiteTroca);
+        const redundantes = periciasOrigemRedundantes();
+        if (!permite || !redundantes.length) {
+            host.innerHTML = '';
+            host.style.display = 'none';
+            return;
+        }
+        host.style.display = '';
+        const trocas = origemTrocasMap();
+        host.innerHTML =
+            '<p class="t20-dash-hint" style="margin:0 0 .35rem">' +
+            '<strong>Troca de perícia (Heróis de Arton):</strong> benefício de origem coincide com perícia de classe. ' +
+            'Opcionalmente troque por outra da lista de classe.</p>' +
+            redundantes
+                .map((slugDe) => {
+                    const opts = opcoesTrocaPara(slugDe);
+                    const cur = trocas[slugDe] || '';
+                    return (
+                        `<div class="t20-dash-field" style="margin:0 0 .5rem">` +
+                        `<label for="cadOrigemTroca_${slugDe}">${nomePorSlug(slugDe)} (já da classe) →</label>` +
+                        `<select id="cadOrigemTroca_${slugDe}" class="t20-input cad-origem-troca-sel" data-troca-de="${slugDe}">` +
+                        `<option value="">— Manter sem vaga extra —</option>` +
+                        opts
+                            .map(
+                                (slug) =>
+                                    `<option value="${slug}" ${cur === slug ? 'selected' : ''}>${nomePorSlug(slug)}</option>`
+                            )
+                            .join('') +
+                        `</select></div>`
+                    );
+                })
+                .join('');
+        host.querySelectorAll('.cad-origem-troca-sel').forEach((sel) => {
+            sel.addEventListener('change', () => {
+                const de = String(sel.getAttribute('data-troca-de') || '').trim().toLowerCase();
+                if (!global.__cadOrigemTrocasPericia) global.__cadOrigemTrocasPericia = {};
+                const para = String(sel.value || '').trim().toLowerCase();
+                if (para) global.__cadOrigemTrocasPericia[de] = para;
+                else delete global.__cadOrigemTrocasPericia[de];
+                renderUiPericias();
+                void atualizarHintOrcamento();
+            });
+        });
+    }
+
+    function slugsBloqueadosOrigem() {
+        return slugsOrigemEfetivos();
     }
 
     function nomePorSlug(slug) {
@@ -124,10 +234,6 @@
         return out;
     }
 
-    function slugsBloqueadosOrigem() {
-        return new Set(slugsOrigemPericias());
-    }
-
     function renderUiPericias() {
         const host = q('cadPericiasHost');
         const hint = q('cadPericiasHint');
@@ -135,8 +241,14 @@
         if (!isV13Wizard() || !classeSlug()) {
             host.innerHTML = '';
             if (hint) hint.textContent = '';
+            const trocaHost = q('cadOrigemTrocasHost');
+            if (trocaHost) {
+                trocaHost.innerHTML = '';
+                trocaHost.style.display = 'none';
+            }
             return;
         }
+        renderOrigemTrocas();
         const fixas = new Set(slugsFixas());
         const pool = slugsPoolClasse();
         const origemSlugs = slugsBloqueadosOrigem();
@@ -169,6 +281,7 @@
         host.querySelectorAll('input[data-pericia-slug]').forEach((inp) => {
             if (inp.disabled) return;
             inp.addEventListener('change', () => {
+                renderOrigemTrocas();
                 void atualizarHintOrcamento();
             });
         });
@@ -220,6 +333,8 @@
                 regraVersao: 'v13',
                 humanoVersatil: humanoVersatilModo(),
                 origem_beneficios: origemBeneficios(),
+                origemSlug: origemSlug() || null,
+                origemTrocasPericia: origemTrocasMap(),
             });
             const tr = `${preview.usadas_treinadas}/${preview.vagas_treinadas} treinadas`;
             const ok = preview.valido ? 'OK' : 'incompleto';
@@ -268,8 +383,16 @@
     function lerPayloadPericias() {
         if (!isV13Wizard()) return {};
         const lista = coletarPericiasPayload().filter((p) => p.treinado);
-        if (!lista.length) return {};
-        return { pericias: lista, pericias_wizard_v13: true };
+        const out = {};
+        if (lista.length) {
+            out.pericias = lista;
+            out.pericias_wizard_v13 = true;
+        }
+        const trocas = origemTrocasMap();
+        if (Object.keys(trocas).length) {
+            out.origem_trocas_pericia = trocas;
+        }
+        return out;
     }
 
     function resumoPericias() {
@@ -318,10 +441,16 @@
 
     function resetPericias() {
         global.__cadPericiasTreinadas = {};
+        global.__cadOrigemTrocasPericia = {};
         global.__cadPericiasWizardCompleto = false;
         global.__cadPericiasOrcamentoOk = false;
         global.__cadPericiasOrcamentoMsg = '';
         if (q('cadPericiasHost')) q('cadPericiasHost').innerHTML = '';
+        const trocaHost = q('cadOrigemTrocasHost');
+        if (trocaHost) {
+            trocaHost.innerHTML = '';
+            trocaHost.style.display = 'none';
+        }
         if (q('cadPericiasHint')) q('cadPericiasHint').textContent = '';
     }
 

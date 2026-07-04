@@ -15,6 +15,10 @@ CATEGORIAS_PODER_V13: List[str] = [
     "concedido",
     "tormenta",
     "classe",
+    "raca",
+    "grupo",
+    "treinador",
+    "distincao",
 ]
 
 _CATEGORIA_MAP = {
@@ -26,6 +30,10 @@ _CATEGORIA_MAP = {
     "talento": "geral",
     "concedido": "concedido",
     "tormenta": "tormenta",
+    "raca": "raca",
+    "grupo": "grupo",
+    "treinador": "treinador",
+    "distincao": "distincao",
 }
 
 _PM_RE = re.compile(

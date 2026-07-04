@@ -14,7 +14,10 @@ from app.games.tormenta.rules.beneficios_nivel_t20 import (
     beneficio_nivel_mb,
 )
 from app.games.tormenta.rules.classes_t20 import lista_classes
-from app.games.tormenta.rules.origens_t20 import contar_vagas_pericias_extra_origem
+from app.games.tormenta.rules.origens_t20 import (
+    contar_vagas_pericias_extra_origem_resolvidas,
+    slugs_pericias_de_beneficios_origem,
+)
 from app.games.tormenta.rules.pericias_classe_t20 import (
     preview_pericias_classe_v13,
     vagas_classe_v13,
@@ -200,6 +203,8 @@ def validar_pericias_ficha(
     regra_versao: Optional[str] = None,
     humano_versatil: Optional[str] = None,
     origem_beneficios: Optional[List[str]] = None,
+    origem_slug: Optional[str] = None,
+    origem_trocas_pericia: Optional[Dict[str, str]] = None,
 ) -> Tuple[bool, str, Dict[str, Any]]:
     """
     Valida orçamento de perícias treinadas (e graduações MB).
@@ -212,13 +217,52 @@ def validar_pericias_ficha(
     if vagas is None:
         return True, "", {"ignorado": True, "motivo": "classe_desconhecida"}
 
+    lista = pericias if isinstance(pericias, list) else []
     extra_origem = 0
-    if rv == REGRA_VERSAO_V13:
+    origem_meta: Dict[str, Any] = {}
+    if rv == REGRA_VERSAO_V13 and slugs_pericias_de_beneficios_origem(
+        origem_beneficios or []
+    ):
+        from app.games.tormenta.rules.pericias_classe_t20 import (
+            slugs_pericias_treinadas,
+        )
+
+        treinados_pre = slugs_pericias_treinadas(lista, rv)
+        slug_orig = str(origem_slug or "").strip().lower()
+        if slug_orig:
+            extra_origem = contar_vagas_pericias_extra_origem_resolvidas(
+                slug_orig,
+                origem_beneficios or [],
+                treinados_pre,
+                str(slug_classe).strip().lower(),
+                origem_trocas_pericia,
+            )
+            from app.games.tormenta.rules.origens_t20 import (
+                resolver_pericias_origem_efetivas,
+            )
+
+            _, origem_meta = resolver_pericias_origem_efetivas(
+                slug_orig,
+                origem_beneficios or [],
+                treinados_pre,
+                str(slug_classe).strip().lower(),
+                origem_trocas_pericia,
+            )
+        else:
+            from app.games.tormenta.rules.origens_t20 import (
+                contar_vagas_pericias_extra_origem,
+            )
+
+            extra_origem = contar_vagas_pericias_extra_origem(origem_beneficios or [])
+    elif rv == REGRA_VERSAO_V13:
+        from app.games.tormenta.rules.origens_t20 import (
+            contar_vagas_pericias_extra_origem,
+        )
+
         extra_origem = contar_vagas_pericias_extra_origem(origem_beneficios or [])
     vagas_efetivas = vagas + extra_origem if vagas is not None else vagas
 
     pts_tr, pts_ntr = orcamento_graduacoes_por_nivel(nivel, rv)
-    lista = pericias if isinstance(pericias, list) else []
 
     count_tr = 0
     sum_grad_tr = 0
@@ -235,6 +279,21 @@ def validar_pericias_ficha(
         else:
             sum_grad_ntr += grad
 
+    if origem_meta.get("efetivas"):
+        treinados_marcados = {
+            str(p.get("slug") or "").strip().lower()
+            for p in lista
+            if isinstance(p, dict) and p.get("treinado") and p.get("slug")
+        }
+        if not treinados_marcados:
+            from app.games.tormenta.rules.pericias_classe_t20 import (
+                slugs_pericias_treinadas,
+            )
+
+            treinados_marcados = slugs_pericias_treinadas(lista, rv)
+        projetadas = set(treinados_marcados) | set(origem_meta.get("efetivas") or [])
+        count_tr = max(count_tr, len(projetadas))
+
     edicao = "v1.3" if rv == REGRA_VERSAO_V13 else "MB"
     resumo = {
         "vagas_treinadas": vagas_efetivas,
@@ -249,6 +308,8 @@ def validar_pericias_ficha(
         "classe_slug": str(slug_classe).strip().lower(),
         "regra_versao": rv,
     }
+    if origem_meta:
+        resumo["origem_pericias"] = origem_meta
 
     if count_tr > vagas_efetivas:
         return (
@@ -302,16 +363,43 @@ def preview_pericias_criacao(
     regra_versao: Optional[str] = None,
     humano_versatil: Optional[str] = None,
     origem_beneficios: Optional[List[str]] = None,
+    origem_slug: Optional[str] = None,
+    origem_trocas_pericia: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     rv = normalizar_regra_versao(regra_versao)
     vagas = vagas_pericias_treinadas(
         slug_classe, int_valor, slug_raca, rv, humano_versatil=humano_versatil
     )
-    extra_origem = (
-        contar_vagas_pericias_extra_origem(origem_beneficios or [])
-        if rv == REGRA_VERSAO_V13
-        else 0
-    )
+    extra_origem = 0
+    if rv == REGRA_VERSAO_V13 and slugs_pericias_de_beneficios_origem(
+        origem_beneficios or []
+    ):
+        from app.games.tormenta.rules.pericias_classe_t20 import (
+            slugs_pericias_treinadas,
+        )
+
+        treinados_pre = slugs_pericias_treinadas(pericias or [], rv)
+        slug_orig = str(origem_slug or "").strip().lower()
+        if slug_orig:
+            extra_origem = contar_vagas_pericias_extra_origem_resolvidas(
+                slug_orig,
+                origem_beneficios or [],
+                treinados_pre,
+                slug_classe.strip().lower(),
+                origem_trocas_pericia,
+            )
+        else:
+            from app.games.tormenta.rules.origens_t20 import (
+                contar_vagas_pericias_extra_origem,
+            )
+
+            extra_origem = contar_vagas_pericias_extra_origem(origem_beneficios or [])
+    elif rv == REGRA_VERSAO_V13:
+        from app.games.tormenta.rules.origens_t20 import (
+            contar_vagas_pericias_extra_origem,
+        )
+
+        extra_origem = contar_vagas_pericias_extra_origem(origem_beneficios or [])
     pts_tr, pts_ntr = orcamento_graduacoes_por_nivel(nivel, rv)
     ok, motivo, resumo = validar_pericias_ficha(
         nivel=nivel,
@@ -322,6 +410,8 @@ def preview_pericias_criacao(
         regra_versao=rv,
         humano_versatil=humano_versatil,
         origem_beneficios=origem_beneficios,
+        origem_slug=origem_slug,
+        origem_trocas_pericia=origem_trocas_pericia,
     )
     ben = beneficio_nivel(nivel, rv)
     contrib_int = int_extra_vagas_pericias(int_valor, rv)

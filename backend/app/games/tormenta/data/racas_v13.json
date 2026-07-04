@@ -10,109 +10,181 @@
       "ajustes": {},
       "escolhe_tres_mais1": true,
       "pericias_treinadas_extra": 2,
-      "tracos_resumo": "Versátil: 2 perícias treinadas OU 1 perícia + 1 poder geral (p.19)."
+      "tracos_resumo": "Versátil: 2 perícias treinadas OU 1 perícia + 1 poder geral (p.19).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "anao",
       "nome": "Anão",
-      "ajustes": { "con": 2, "sab": 1, "des": -1 },
-      "tracos_resumo": "Desloc. 6 m; visão no escuro; resistências (p.19)."
+      "ajustes": {
+        "con": 2,
+        "sab": 1,
+        "des": -1
+      },
+      "tracos_resumo": "Desloc. 6 m; visão no escuro; resistências (p.19).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "dahllan",
       "nome": "Dahllan",
-      "ajustes": { "sab": 2, "des": 1, "int": -1 },
-      "tracos_resumo": "Empatia selvagem; amigo dos animais (p.20)."
+      "ajustes": {
+        "sab": 2,
+        "des": 1,
+        "int": -1
+      },
+      "tracos_resumo": "Empatia selvagem; amigo dos animais (p.20).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "elfo",
       "nome": "Elfo",
-      "ajustes": { "int": 2, "des": 1, "con": -1 },
-      "tracos_resumo": "Visão na penumbra; graça de Wynna (p.20)."
+      "ajustes": {
+        "int": 2,
+        "des": 1,
+        "con": -1
+      },
+      "tracos_resumo": "Visão na penumbra; graça de Wynna (p.20).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "goblin",
       "nome": "Goblin",
-      "ajustes": { "des": 2, "int": 1, "car": -1 },
-      "tracos_resumo": "Pequeno; desloc. 9 m; engenhoso (p.21)."
+      "ajustes": {
+        "des": 2,
+        "int": 1,
+        "car": -1
+      },
+      "tracos_resumo": "Pequeno; desloc. 9 m; engenhoso (p.21).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "lefou",
       "nome": "Lefou",
-      "ajustes": { "car": -1 },
+      "ajustes": {
+        "car": -1
+      },
       "escolhe_tres_mais1": true,
-      "excluir_atributos_mais1": ["car"],
-      "tracos_resumo": "Deformidade; afinidade Tormenta (p.22)."
+      "excluir_atributos_mais1": [
+        "car"
+      ],
+      "tracos_resumo": "Deformidade; afinidade Tormenta (p.22).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "minotauro",
       "nome": "Minotauro",
-      "ajustes": { "for": 2, "con": 1, "sab": -1 },
-      "tracos_resumo": "Medo de altura; chifres; faro (p.23)."
+      "ajustes": {
+        "for": 2,
+        "con": 1,
+        "sab": -1
+      },
+      "tracos_resumo": "Medo de altura; chifres; faro (p.23).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "qareen",
       "nome": "Qareen",
-      "ajustes": { "car": 2, "int": 1, "sab": -1 },
-      "tracos_resumo": "Desejos; herança de Wynna (p.24)."
+      "ajustes": {
+        "car": 2,
+        "int": 1,
+        "sab": -1
+      },
+      "tracos_resumo": "Desejos; herança de Wynna (p.24).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "golem",
       "nome": "Golem",
-      "ajustes": { "for": 2, "con": 1, "car": -1 },
-      "tracos_resumo": "Construto; sem fome/sono (p.25)."
+      "ajustes": {
+        "for": 2,
+        "con": 1,
+        "car": -1
+      },
+      "tracos_resumo": "Construto; sem fome/sono (p.25).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "hynne",
       "nome": "Hynne",
-      "ajustes": { "des": 2, "car": 1, "for": -1 },
-      "tracos_resumo": "Pequeno; sorte hynne (p.26)."
+      "ajustes": {
+        "des": 2,
+        "car": 1,
+        "for": -1
+      },
+      "tracos_resumo": "Pequeno; sorte hynne (p.26).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "kliren",
       "nome": "Kliren",
-      "ajustes": { "int": 2, "car": 1, "for": -1 },
-      "tracos_resumo": "Híbrido gnoll; vanguardista (p.27)."
+      "ajustes": {
+        "int": 2,
+        "car": 1,
+        "for": -1
+      },
+      "tracos_resumo": "Híbrido gnoll; vanguardista (p.27).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "medusa",
       "nome": "Medusa",
-      "ajustes": { "des": 2, "car": 1 },
-      "tracos_resumo": "Olhar atordoante; serpentes (p.28)."
+      "ajustes": {
+        "des": 2,
+        "car": 1
+      },
+      "tracos_resumo": "Olhar atordoante; serpentes (p.28).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "osteon",
       "nome": "Osteon",
-      "ajustes": { "con": -1 },
+      "ajustes": {
+        "con": -1
+      },
       "escolhe_tres_mais1": true,
-      "excluir_atributos_mais1": ["con"],
-      "tracos_resumo": "Morto-vivo; memória póstuma (p.28)."
+      "excluir_atributos_mais1": [
+        "con"
+      ],
+      "tracos_resumo": "Morto-vivo; memória póstuma (p.28).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "sereia_tritao",
       "nome": "Sereia/Tritão",
       "ajustes": {},
       "escolhe_tres_mais1": true,
-      "tracos_resumo": "Anfíbio; transformação aquática (p.29)."
+      "tracos_resumo": "Anfíbio; transformação aquática (p.29).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "silfide",
       "nome": "Sílfide",
-      "ajustes": { "car": 2, "des": 1, "for": -2 },
-      "tracos_resumo": "Minúscula; voo (PM) (p.30)."
+      "ajustes": {
+        "car": 2,
+        "des": 1,
+        "for": -2
+      },
+      "tracos_resumo": "Minúscula; voo (PM) (p.30).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "suraggel",
       "nome": "Suraggel",
       "ajustes": {},
       "escolhe_suraggel_subtipo": true,
-      "tracos_resumo": "Aggelus (+Sab,+Car) ou Sulfure (+Des,+Int) (p.30)."
+      "tracos_resumo": "Aggelus (+Sab,+Car) ou Sulfure (+Des,+Int) (p.30).",
+      "fonte_catalogo": "core"
     },
     {
       "slug": "trog",
       "nome": "Trog",
-      "ajustes": { "con": 2, "for": 1, "int": -1 },
-      "tracos_resumo": "Reptiliano; camuflagem (p.31)."
+      "ajustes": {
+        "con": 2,
+        "for": 1,
+        "int": -1
+      },
+      "tracos_resumo": "Reptiliano; camuflagem (p.31).",
+      "fonte_catalogo": "core"
     }
   ]
 }
