@@ -329,6 +329,31 @@ def test_patch_ficha_json(tormenta_personagens_db):
     assert r.json()["ficha_json"]["notas"] == "teste"
 
 
+def test_patch_aceita_atributos_v13_negativos(tormenta_personagens_db):
+    """PATCH alinha ge=-99 do Update ao Create/Base (v1.3 usa −2…+4)."""
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    rid = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_json(nome="V13Neg"),
+    ).json()["id"]
+    r = client.patch(
+        f"/api/v1/tormenta/personagens/{rid}",
+        json={
+            "for_valor": -1,
+            "des_valor": 0,
+            "con_valor": 2,
+            "int_valor": -2,
+            "sab_valor": 1,
+            "car_valor": 0,
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["for_valor"] == -1
+    assert body["int_valor"] == -2
+
+
 def test_post_rejeita_pericias_mb_invalidas(tormenta_personagens_db):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))

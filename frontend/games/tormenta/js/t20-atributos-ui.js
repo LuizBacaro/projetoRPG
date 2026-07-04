@@ -29,11 +29,11 @@
         const pts = pontosCompra != null ? pontosCompra : isV13(rv) ? 10 : 20;
         if (isV13(rv)) {
             return (
-                'v1.3: o <strong>valor do atributo</strong> entra direto nas fórmulas (CA = 10 + DES + armadura). ' +
-                'O valor e o modificador são exibidos juntos no resumo da ficha para maior clareza. ' +
+                'v1.3: use a coluna <strong>Rolagem</strong> da Tabela 1-1 nos campos (10 = atributo 0). ' +
+                'O valor nativo e o modificador entram nas fórmulas; a ficha exibe ambos no resumo. ' +
                 'Jogador: <strong>compra ' +
                 pts +
-                ' pts</strong> (bases −2 a +4, Tabela 1-1) ou <strong>4d6</strong> (soma dos seis ≥ 6). ' +
+                ' pts</strong> (bases −2 a +4) ou <strong>4d6</strong> (soma dos seis ≥ 6). ' +
                 'Edite em <strong>Editar ficha</strong>.'
             );
         }
@@ -48,12 +48,9 @@
     }
 
     function hintEdicaoAtributosHtml(rv) {
-        const base = fallbackAttrDefault(rv);
         if (isV13(rv)) {
             return (
-                'Edite os valores finais (base + racial). Jogadores v1.3: método abaixo; compra reinicia em <strong>' +
-                base +
-                '</strong> (+ racial nos finais).'
+                'Edite os valores finais (base + racial). Jogadores v1.3: rolagem padrão <strong>10</strong> (atributo 0); compra reinicia em 10 nos campos (+ racial nos finais).'
             );
         }
         return (

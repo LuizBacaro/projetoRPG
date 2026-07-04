@@ -134,19 +134,40 @@
         return out;
     }
 
+    /** v1.3: valor nativo (−2…+4) → rolagem exibida (Tabela 1-1: 0 → 10–11). */
+    function scoreDeNativeV13(native) {
+        return 10 + 2 * Math.trunc(Number(native) || 0);
+    }
+
+    /** v1.3: rolagem exibida → valor nativo para custo/API (10–11 → 0, 12–13 → +1…). */
+    function nativeDeScoreV13(score) {
+        return Math.trunc((Number(score) - 10) / 2);
+    }
+
     function aplicarBasesNosCampos(bases, campoIds, racialDeltas, opts) {
         // racialDeltas mantido por compatibilidade de assinatura, mas os inputs
         // recebem apenas o valor-base; o racial é somado só no momento do envio.
         const rv = opts && opts.regraVersao;
         const isV13 = global.T20RegraVersao && global.T20RegraVersao.isV13(rv);
         const fallbackBase = isV13 ? 0 : 10;
-        const minBase = isV13 ? -99 : 1;
+        const minBase = isV13 ? -2 : 1;
+        const maxBase = isV13 ? 4 : 99;
         T20_ATTR_KEYS.forEach((a) => {
             const id = campoIds[a];
             const inp = id ? document.getElementById(id) : null;
             if (!inp) return;
-            const base = Math.floor(Number(bases[a]));
-            inp.value = String(Math.max(minBase, Number.isFinite(base) ? base : fallbackBase));
+            let base = Math.floor(Number(bases[a]));
+            if (!Number.isFinite(base)) base = fallbackBase;
+            base = Math.min(maxBase, Math.max(minBase, base));
+            if (isV13) {
+                inp.value = String(scoreDeNativeV13(base));
+                inp.min = '6';
+                inp.max = '18';
+            } else {
+                inp.value = String(Math.max(minBase, base));
+                inp.min = String(minBase);
+                inp.max = '99';
+            }
         });
     }
 
@@ -196,6 +217,8 @@
         gerarSeisValores4d6Local,
         valoresParaMapa,
         basesPadraoCompra,
+        scoreDeNativeV13,
+        nativeDeScoreV13,
         aplicarBasesNosCampos,
         validarBases4d6,
     };
