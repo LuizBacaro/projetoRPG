@@ -348,6 +348,51 @@ def test_get_regras_origens_v13(client_regras_tormenta):
     assert "medicina" in acolito["beneficios_poderes"]
 
 
+def test_get_regras_classes_herois_arton(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/classes",
+        params={"regra_versao": "v13", "suplemento": "herois_arton"},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert len(body["classes"]) == 29  # 14 core + 15 suplemento
+    tre = next(c for c in body["classes"] if c["slug"] == "treinador")
+    assert tre["fonte_catalogo"] == "herois_arton"
+    assert tre["pm_por_nivel"] == 4
+
+
+def test_get_regras_origens_herois_arton(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/origens",
+        params={"regra_versao": "v13", "suplemento": "herois_arton"},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert len(body["origens"]) == 49  # 35 core + 14 suplemento
+    bacharel = next(o for o in body["origens"] if o["slug"] == "bacharel")
+    assert bacharel["fonte_catalogo"] == "herois_arton"
+    assert bacharel["troca_pericia_treinada"] is True
+
+
+def test_get_truques_melhor_amigo(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/truques-melhor-amigo",
+        params={"nivel_treinador": 5},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["nivel_treinador"] == 5
+    assert body["qtd_maxima_truques"] == 3
+    assert len(body["truques"]) >= 8
+
+
+def test_get_tipos_melhor_amigo(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/tipos-melhor-amigo")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert len(body["tipos"]) == 5
+
+
 def test_get_regras_armaduras_protecao_pagina(client_regras_tormenta):
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/armaduras-protecao", params={"skip": 0, "limit": 20}

@@ -127,7 +127,6 @@ def preview_pv_mb(
 
 
 def _niveis_por_classe_de_lista(classes: List[Dict[str, Any]]) -> Dict[str, int]:
-    """Agrega linhas ``[{slug, nivel}]`` em mapa slug → nível total."""
     out: Dict[str, int] = {}
     for item in classes or []:
         if not isinstance(item, dict):
@@ -143,6 +142,19 @@ def _niveis_por_classe_de_lista(classes: List[Dict[str, Any]]) -> Dict[str, int]
             continue
         out[slug] = out.get(slug, 0) + nv
     return out
+
+
+def pm_bonus_meio_elfo(nivel: int) -> int:
+    """Bônus cumulativo de PM do Meio-Elfo (Heróis de Arton).
+
+    +1 PM a cada nível ímpar: nível 1 → +1, nível 3 → +2, nível 5 → +3, ...
+    Fórmula: (nivel + 1) // 2
+    """
+    try:
+        nv = max(0, int(nivel))
+    except (TypeError, ValueError):
+        nv = 0
+    return (nv + 1) // 2
 
 
 def preview_pm_multiclasse_v13(classes: List[Dict[str, Any]]) -> Dict[str, Any]:

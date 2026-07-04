@@ -9,6 +9,10 @@ REGRA_VERSAO_V13 = "v13"
 REGRA_VERSOES_VALIDAS = frozenset({REGRA_VERSAO_MB, REGRA_VERSAO_V13})
 REGRA_VERSAO_PADRAO = REGRA_VERSAO_MB
 
+# Suplemento: Heróis de Arton v1.1
+SUPLEMENTO_HEROIS_ARTON = "herois_arton"
+SUPLEMENTOS_VALIDOS = frozenset({SUPLEMENTO_HEROIS_ARTON})
+
 
 def normalizar_regra_versao(valor: Optional[str]) -> str:
     """Normaliza alias de versão; padrão MB para compatibilidade com fichas existentes."""

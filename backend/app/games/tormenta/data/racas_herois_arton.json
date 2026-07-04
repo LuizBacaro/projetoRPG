@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.8–15",
+    "nota": "Raças suplemento Heróis de Arton v1.1. Não reproduz texto longo — apenas estrutura mecânica."
+  },
+  "racas": [
+    {
+      "slug": "eiradaan",
+      "nome": "Eiradaan",
+      "fonte_catalogo": "herois_arton",
+      "tipo": "espirito",
+      "ajustes": { "sab": 2, "car": 1, "for": -1 },
+      "tracos_resumo": "Magia Instintiva (Sab no lugar de atributo arcano); Sentidos Místicos permanentes; Canção da Melancolia (pior de 2d em Vontade vs efeitos mentais). p.8."
+    },
+    {
+      "slug": "galokk",
+      "nome": "Galokk",
+      "fonte_catalogo": "herois_arton",
+      "tipo": "humanoide_gigante",
+      "ajustes": { "for": 1, "con": 1, "car": -1 },
+      "escolhe_um_mais1": true,
+      "tracos_resumo": "Tamanho Grande; Força dos Titãs (dado extra de dano se resultado máximo, até modificador de Força); Meio-Gigante; treinado em 1 perícia livre. p.13."
+    },
+    {
+      "slug": "meio_elfo",
+      "nome": "Meio-Elfo",
+      "fonte_catalogo": "herois_arton",
+      "tipo": "humanoide",
+      "ajustes": { "int": 1 },
+      "escolhe_dois_mais1": true,
+      "excluir_atributos_mais1": ["con"],
+      "tracos_resumo": "Ambição Herdada (1 poder geral ou único de origem ao criar); +1 PM a cada nível ímpar; considerado elfo para pré-requisitos. p.14."
+    },
+    {
+      "slug": "satiro",
+      "nome": "Sátiro",
+      "fonte_catalogo": "herois_arton",
+      "tipo": "espirito",
+      "ajustes": { "car": 2, "des": 1, "sab": -1 },
+      "tracos_resumo": "+2 Atuação e Fortitude; Instrumentista Mágico (lança magias usando instrumento em mãos). p.15."
+    }
+  ]
+}

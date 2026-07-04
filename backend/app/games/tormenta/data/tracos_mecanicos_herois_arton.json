@@ -1,0 +1,61 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.8–15",
+    "nota": "Traços mecânicos das raças do suplemento Heróis de Arton v1.1. Mesmo schema de tracos_mecanicos_v13.json."
+  },
+  "racas": {
+    "eiradaan": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {},
+      "magia_instintiva": true,
+      "notas": "Magia Instintiva: atributo-chave de magia arcana substituído por Sab. Canção da Melancolia: desvantagem em Vontade vs efeitos mentais."
+    },
+    "galokk": {
+      "tamanho": "grande",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": -4,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {},
+      "pericias_treinadas_extra": 1,
+      "notas": "Tamanho Grande: bônus de manobra calculados pelo motor de combate. Força dos Titãs: dado extra de dano quando resultado máximo."
+    },
+    "meio_elfo": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 0,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {},
+      "pm_bonus_por_nivel_impar": true,
+      "notas": "+1 PM a cada nível ímpar (cumulative: nível 1 → +1 PM, nível 3 → +2 PM, ..., nível n ímpar → +(n+1)/2 PM). Considerado elfo."
+    },
+    "satiro": {
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
+      "fortitude_bonus": 2,
+      "reflexos_bonus": 0,
+      "vontade_bonus": 0,
+      "pericias_bonus": {
+        "Atuação": 2
+      },
+      "notas": "Instrumentista Mágico: pode lançar magias usando instrumento em mãos como componente."
+    }
+  }
+}

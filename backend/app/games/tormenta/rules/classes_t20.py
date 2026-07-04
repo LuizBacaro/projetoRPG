@@ -17,6 +17,7 @@ _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _CLASS_MB_JSON = _DATA_DIR / "classes_mb.json"
 _CLASS_V13_JSON = _DATA_DIR / "classes_v13.json"
 _CONJ_V13_JSON = _DATA_DIR / "conjuracao_classe_v13.json"
+_CLASSES_HEROIS_ARTON_JSON = _DATA_DIR / "classes_herois_arton.json"
 
 
 from app.games.tormenta.rules.beneficios_nivel_t20 import (
@@ -96,6 +97,10 @@ def _normalizar_classe_row(
         "habilidades_por_nivel": _parse_habilidades_por_nivel(
             row.get("habilidades_por_nivel") or {}
         ),
+        # campos de suplemento (pass-through; None = classe core)
+        "fonte_catalogo": str(row.get("fonte_catalogo") or "core").strip(),
+        "classe_variante_base": row.get("classe_variante_base"),
+        "exclusivo_com": list(row.get("exclusivo_com") or []),
     }
     base_pt = row.get("pericias_treinadas_base")
     if base_pt is not None:
@@ -113,6 +118,17 @@ def _normalizar_classe_row(
         pm = pm_map.get(slug.lower())
         if pm is not None:
             item["pm_por_nivel"] = pm
+        elif row.get("pm_por_nivel") is not None:
+            # fallback: pm_por_nivel direto no JSON (classes de suplemento)
+            try:
+                item["pm_por_nivel"] = int(row["pm_por_nivel"])
+            except (TypeError, ValueError):
+                pass
+    elif row.get("pm_por_nivel") is not None:
+        try:
+            item["pm_por_nivel"] = int(row["pm_por_nivel"])
+        except (TypeError, ValueError):
+            pass
     return item
 
 
@@ -181,6 +197,10 @@ def classe_por_slug(
     for row in lista_classes(regra_versao):
         if str(row.get("slug", "")).lower() == s:
             return row
+    if normalizar_regra_versao(regra_versao) == REGRA_VERSAO_V13:
+        for row in lista_classes_herois_arton():
+            if str(row.get("slug", "")).lower() == s:
+                return row
     return None
 
 
@@ -195,3 +215,117 @@ def bba_por_nivel_classe(nivel_classe: int, bba_tipo: str) -> int:
     if t == "tres_quartos":
         return (n * 3) // 4
     return n
+
+
+# ---------------------------------------------------------------------------
+# Heróis de Arton — Treinador + 14 classes variantes
+# ---------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=1)
+def _carregar_classes_herois_arton() -> Dict[str, Any]:
+    if not _CLASSES_HEROIS_ARTON_JSON.is_file():
+        return {"classes": []}
+    return json.loads(_CLASSES_HEROIS_ARTON_JSON.read_text(encoding="utf-8"))
+
+
+def lista_classes_herois_arton() -> List[Dict[str, Any]]:
+    """Treinador + 14 classes variantes do suplemento Heróis de Arton v1.1."""
+    rows = _carregar_classes_herois_arton().get("classes") or []
+    out: List[Dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        parsed = _normalizar_classe_row(row, pm_map=None)
+        if parsed:
+            out.append(parsed)
+    return out
+
+
+def lista_classes_com_suplemento(
+    regra_versao: Optional[str] = None,
+    suplemento: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Classes core + suplemento quando ``suplemento='herois_arton'``."""
+    from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTO_HEROIS_ARTON
+
+    classes = lista_classes(regra_versao)
+    if suplemento and str(suplemento).strip().lower() == SUPLEMENTO_HEROIS_ARTON:
+        classes = classes + lista_classes_herois_arton()
+    return classes
+
+
+def validar_classe_variante(
+    slug_nova_classe: str,
+    slugs_classes_existentes: List[str],
+) -> Optional[str]:
+    """Valida compatibilidade de classe variante com classes já selecionadas.
+
+    Retorna mensagem de erro se incompatível, ou ``None`` se OK.
+    Regra: uma classe variante é mutuamente exclusiva com sua classe base e
+    com todas as classes listadas em ``exclusivo_com``.
+    """
+    slug = str(slug_nova_classe or "").strip().lower()
+    if not slug:
+        return None
+
+    # Buscar definição da nova classe no catálogo do suplemento
+    todas_ha = lista_classes_herois_arton()
+    nova_def = next((c for c in todas_ha if c["slug"] == slug), None)
+    if nova_def is None:
+        return None  # não é classe variante — sem restrição
+
+    exclusivos = [str(e).strip().lower() for e in (nova_def.get("exclusivo_com") or [])]
+    base = nova_def.get("classe_variante_base")
+    if base:
+        exclusivos.append(str(base).strip().lower())
+    exclusivos = list(set(exclusivos))
+
+    slugs_existentes_l = [str(s).strip().lower() for s in slugs_classes_existentes]
+
+    conflitos = [s for s in slugs_existentes_l if s in exclusivos]
+    if conflitos:
+        nomes_conflito = ", ".join(conflitos)
+        return (
+            f"A classe variante '{nova_def['nome']}' é incompatível com: {nomes_conflito}. "
+            "Classes variantes e suas bases são mutuamente exclusivas."
+        )
+
+    # Verificar também se outra classe variante já selecionada conflita com esta
+    for slug_ex in slugs_existentes_l:
+        classe_ex = next((c for c in todas_ha if c["slug"] == slug_ex), None)
+        if classe_ex is None:
+            continue
+        exclusivos_ex = [str(e).lower() for e in (classe_ex.get("exclusivo_com") or [])]
+        base_ex = classe_ex.get("classe_variante_base")
+        if base_ex:
+            exclusivos_ex.append(str(base_ex).lower())
+        if slug in exclusivos_ex:
+            return f"'{classe_ex['nome']}' já selecionada é incompatível com '{nova_def['nome']}'."
+
+    return None
+
+
+def validar_compatibilidade_classes_v13(
+    ficha_json: Optional[Dict[str, Any]],
+    nivel_personagem: int = 1,
+) -> Optional[str]:
+    """Valida exclusão mútua entre classes variantes e bases na ficha v1.3."""
+    from app.games.tormenta.rules.progressao_pv_t20 import (
+        niveis_multiclasse_v13_de_ficha,
+    )
+
+    fj = dict(ficha_json or {})
+    try:
+        nv = int(nivel_personagem)
+    except (TypeError, ValueError):
+        nv = 1
+    linhas = niveis_multiclasse_v13_de_ficha(fj, nv)
+    slugs = [str(linha.get("slug") or "").strip().lower() for linha in linhas]
+    slugs = [s for s in slugs if s]
+    for slug in slugs:
+        outros = [s for s in slugs if s != slug]
+        err = validar_classe_variante(slug, outros)
+        if err:
+            return err
+    return None

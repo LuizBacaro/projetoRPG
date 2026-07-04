@@ -17,6 +17,7 @@ from app.games.tormenta.rules.regra_versao_t20 import (
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _TRACOS_MB_JSON = _DATA_DIR / "tracos_mecanicos_mb.json"
 _TRACOS_V13_JSON = _DATA_DIR / "tracos_mecanicos_v13.json"
+_TRACOS_HEROIS_ARTON_JSON = _DATA_DIR / "tracos_mecanicos_herois_arton.json"
 
 # Legado MB → v1.3 quando ficha antiga usa slug MB no motor v13.
 _SLUG_ALIASES_V13: Dict[str, str] = {
@@ -90,11 +91,22 @@ def _carregar_tracos(regra_versao: str = REGRA_VERSAO_MB) -> Dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+@lru_cache(maxsize=1)
+def _carregar_tracos_herois_arton() -> Dict[str, Any]:
+    """Traços mecânicos das raças do suplemento Heróis de Arton v1.1."""
+    if not _TRACOS_HEROIS_ARTON_JSON.is_file():
+        return {"racas": {}}
+    return json.loads(_TRACOS_HEROIS_ARTON_JSON.read_text(encoding="utf-8"))
+
+
 def tracos_mecanicos_por_slug(
     slug: str,
     regra_versao: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
-    """Efeitos mecânicos da raça ou None se slug desconhecido."""
+    """Efeitos mecânicos da raça ou None se slug desconhecido.
+
+    Procura primeiro nos traços core (MB/v1.3) e depois no suplemento Heróis de Arton.
+    """
     rv = normalizar_regra_versao(regra_versao)
     s = _resolver_slug(slug, rv)
     if not s:
@@ -103,9 +115,14 @@ def tracos_mecanicos_por_slug(
     if not isinstance(racas, dict):
         return None
     row = racas.get(s)
-    if not isinstance(row, dict):
-        return None
-    return dict(row)
+    if isinstance(row, dict):
+        return dict(row)
+    # fallback: verificar raças do suplemento Heróis de Arton
+    racas_ha = _carregar_tracos_herois_arton().get("racas") or {}
+    row_ha = racas_ha.get(s) if isinstance(racas_ha, dict) else None
+    if isinstance(row_ha, dict):
+        return dict(row_ha)
+    return None
 
 
 def humano_versatil_pericias_extra(humano_versatil: Optional[str]) -> int:

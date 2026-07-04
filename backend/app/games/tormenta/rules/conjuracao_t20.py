@@ -74,7 +74,6 @@ def habilidade_chave_conjuracao_v13(
 
 
 def lista_regras_conjuracao_classe_mb() -> List[Dict[str, Any]]:
-    """Linhas do JSON de conjuração MB (slug, chave, constantes de Pontos de Magia — PM)."""
     return _lista_regras_conjuracao_mb()
 
 
@@ -114,6 +113,39 @@ def _lista_regras_conjuracao_mb() -> List[Dict[str, Any]]:
             }
         )
     return sorted(out, key=lambda x: x["slug"])
+
+
+# ---------------------------------------------------------------------------
+# Heróis de Arton — overrides raciais de habilidade-chave de conjuração
+# ---------------------------------------------------------------------------
+
+#: Raças cujo traço racial substitui a habilidade-chave de conjuração arcana.
+#: Fonte: Heróis de Arton v1.1 p.8 (Eiradaan — Magia Instintiva).
+_OVERRIDE_HABILIDADE_CHAVE_POR_RACA: Dict[str, Dict[str, str]] = {
+    # raca_slug -> {classe_slug -> nova_habilidade_chave}
+    # "any_arcana" é um marcador especial para qualquer classe que usa INT arcano.
+    "eiradaan": {"arcanista": "sab"},
+}
+
+
+def override_habilidade_chave_por_raca(
+    slug_raca: Optional[str],
+    slug_classe: Optional[str],
+    habilidade_atual: Optional[str],
+) -> Optional[HabilidadeChaveConjuracao]:
+    """Retorna a habilidade-chave substituída por traço racial, ou ``habilidade_atual`` se não houver override.
+
+    Exemplo: Eiradaan arcanista → "sab" no lugar de "int".
+    """
+    if not slug_raca or not slug_classe:
+        return habilidade_atual  # type: ignore[return-value]
+    overrides = _OVERRIDE_HABILIDADE_CHAVE_POR_RACA.get(
+        str(slug_raca).strip().lower(), {}
+    )
+    nova = overrides.get(str(slug_classe).strip().lower())
+    if nova and nova in ("int", "sab", "car"):
+        return nova  # type: ignore[return-value]
+    return habilidade_atual  # type: ignore[return-value]
 
 
 def lista_regras_conjuracao_por_versao(

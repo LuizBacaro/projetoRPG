@@ -19,6 +19,9 @@ from app.games.tormenta.rules.regra_versao_t20 import (
 
 _DATA = Path(__file__).resolve().parent.parent / "data" / "origens_v13.json"
 _DATA_ITENS = Path(__file__).resolve().parent.parent / "data" / "origens_itens_v13.json"
+_DATA_HEROIS_ARTON = (
+    Path(__file__).resolve().parent.parent / "data" / "origens_herois_arton.json"
+)
 
 
 @lru_cache(maxsize=1)
@@ -115,7 +118,64 @@ def origem_por_slug(slug: str) -> Optional[Dict[str, Any]]:
     for row in lista_origens_v13():
         if row.get("slug") == s:
             return row
+    for row in lista_origens_herois_arton():
+        if row.get("slug") == s:
+            return row
     return None
+
+
+# ---------------------------------------------------------------------------
+# Heróis de Arton — 14 origens especiais
+# ---------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=1)
+def _documento_herois_arton() -> Dict[str, Any]:
+    if not _DATA_HEROIS_ARTON.is_file():
+        return {"origens": []}
+    return json.loads(_DATA_HEROIS_ARTON.read_text(encoding="utf-8"))
+
+
+def lista_origens_herois_arton() -> List[Dict[str, Any]]:
+    """14 origens especiais do suplemento Heróis de Arton v1.1."""
+    rows = _documento_herois_arton().get("origens") or []
+    out: List[Dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        slug = str(row.get("slug", "")).strip().lower()
+        if not slug:
+            continue
+        out.append(
+            {
+                "slug": slug,
+                "nome": str(row.get("nome", "") or slug).strip(),
+                "pagina": int(row.get("pagina", 0) or 0),
+                "fonte_catalogo": str(
+                    row.get("fonte_catalogo") or "herois_arton"
+                ).strip(),
+                "beneficios_pericias": list(row.get("beneficios_pericias") or []),
+                "beneficios_poderes": list(row.get("beneficios_poderes") or []),
+                "poder_unico": row.get("poder_unico"),
+                "itens": [],
+                "itens_escolha": None,
+                "troca_pericia_treinada": bool(row.get("troca_pericia_treinada")),
+                "notas": str(row.get("notas") or "").strip(),
+            }
+        )
+    return sorted(out, key=lambda x: x["nome"].lower())
+
+
+def lista_origens_com_suplemento(
+    suplemento: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Origens core v1.3 + suplemento quando ``suplemento='herois_arton'``."""
+    from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTO_HEROIS_ARTON
+
+    origens = lista_origens_v13()
+    if suplemento and str(suplemento).strip().lower() == SUPLEMENTO_HEROIS_ARTON:
+        origens = origens + lista_origens_herois_arton()
+    return origens
 
 
 def validar_beneficios_origem(

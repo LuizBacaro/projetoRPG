@@ -12,12 +12,20 @@ class TormentaCampanhaCreate(BaseModel):
     nome: str = Field(..., max_length=120)
     descricao: Optional[str] = Field(None, max_length=500)
     personagem_ids: Optional[List[int]] = None
+    regras_opcionais_ativas: Optional[List[str]] = Field(
+        None,
+        description="Módulos de regras opcionais ativos na campanha (ex.: combate_avancado, lesoes).",
+    )
 
 
 class TormentaCampanhaUpdate(BaseModel):
     nome: Optional[str] = Field(None, max_length=120)
     descricao: Optional[str] = Field(None, max_length=500)
     personagem_ids: Optional[List[int]] = None
+    regras_opcionais_ativas: Optional[List[str]] = Field(
+        None,
+        description="Módulos de regras opcionais ativos na campanha.",
+    )
 
 
 class TormentaCampanhaAssociarPersonagens(BaseModel):
@@ -33,6 +41,7 @@ class TormentaCampanhaResponse(BaseModel):
     mestre_id: int
     nome: str
     descricao: Optional[str] = ""
+    regras_opcionais_ativas: Optional[List[str]] = Field(default_factory=list)
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     total_personagens: int = 0

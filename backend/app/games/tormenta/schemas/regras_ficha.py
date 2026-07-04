@@ -80,6 +80,10 @@ class TormentaGerarAtributosResponse(BaseModel):
 class TormentaRacaMbItem(BaseModel):
     slug: str = Field(..., max_length=40)
     nome: str = Field(..., max_length=120)
+    fonte_catalogo: str = Field(
+        default="core",
+        description="core = Módulo Básico / v1.3; herois_arton = suplemento Heróis de Arton.",
+    )
     ajustes: Dict[str, int] = Field(default_factory=dict)
     escolhe_duas_mais2: bool = False
     escolhe_tres_mais1: bool = Field(
@@ -127,6 +131,14 @@ class TormentaRacaMbItem(BaseModel):
     escolhe_silfide_magias: bool = Field(
         default=False,
         description="v1.3: Sílfide — 2 magias das Fadas.",
+    )
+    escolhe_um_mais1: bool = Field(
+        default=False,
+        description="Heróis de Arton: +1 em um atributo livre (ex.: Galokk).",
+    )
+    escolhe_dois_mais1: bool = Field(
+        default=False,
+        description="Heróis de Arton: +1 em dois atributos livres (ex.: Meio-Elfo, exceto Con).",
     )
     mod_car_fixo: int = Field(default=0, ge=-10, le=10)
     tracos_resumo: str = Field(default="", max_length=8000)
@@ -189,6 +201,19 @@ class TormentaClasseMbItem(BaseModel):
     slug: str = Field(..., max_length=40)
     nome: str = Field(..., max_length=80)
     abreviatura: str = Field(default="", max_length=8)
+    fonte_catalogo: str = Field(
+        default="core",
+        description="core = classe base v1.3; herois_arton = suplemento Heróis de Arton.",
+    )
+    classe_variante_base: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="Slug da classe base quando esta é uma variante (ex.: 'inventor' para 'alquimista').",
+    )
+    exclusivo_com: List[str] = Field(
+        default_factory=list,
+        description="Slugs de classes mutuamente exclusivas (variantes não podem ser usadas juntas).",
+    )
     bba_tipo: Literal["plein", "tres_quartos", "meio"] = Field(
         default="plein",
         description="plein = BBA igual ao nível de classe; tres_quartos; meio (mago/feiticeiro).",
@@ -301,11 +326,20 @@ class TormentaOrigemV13Item(BaseModel):
     slug: str = Field(..., max_length=40)
     nome: str = Field(..., max_length=80)
     pagina: int = Field(default=0, ge=0, le=999)
+    fonte_catalogo: str = Field(
+        default="core",
+        description="core = EJA v1.3; herois_arton = suplemento Heróis de Arton.",
+    )
     beneficios_pericias: List[str] = Field(default_factory=list)
     beneficios_poderes: List[str] = Field(default_factory=list)
     poder_unico: Optional[str] = Field(default=None, max_length=60)
     itens: List[str] = Field(default_factory=list)
     itens_escolha: Optional[Dict[str, Any]] = Field(default=None)
+    troca_pericia_treinada: bool = Field(
+        default=False,
+        description="Se perícia já treinada pode ser trocada por outra de classe (Heróis de Arton).",
+    )
+    notas: str = Field(default="", max_length=500)
 
 
 class TormentaKitInicialV13Opcoes(BaseModel):
@@ -953,3 +987,39 @@ class TormentaPoderValidarPreRequisitosResponse(BaseModel):
     faltando: List[TormentaPoderPreRequisitoFaltandoItem] = Field(default_factory=list)
     pre_requisitos: List[Dict[str, Any]] = Field(default_factory=list)
     motivo: str = Field(default="", max_length=500)
+
+
+# ---------------------------------------------------------------------------
+# Heróis de Arton — Melhor Amigo (Treinador)
+# ---------------------------------------------------------------------------
+
+
+class TormentaTruqueMelhorAmigoItem(BaseModel):
+    slug: str = Field(..., max_length=60)
+    nome: str = Field(..., max_length=120)
+    descricao: str = Field(default="", max_length=2000)
+    nivel_minimo: int = Field(default=1, ge=1, le=20)
+    pre_requisito: Optional[str] = Field(default=None, max_length=60)
+
+
+class TormentaTruquesMelhorAmigoResponse(BaseModel):
+    nivel_treinador: int = Field(default=1, ge=1, le=20)
+    qtd_maxima_truques: int = Field(default=2)
+    truques: List[TormentaTruqueMelhorAmigoItem] = Field(default_factory=list)
+
+
+class TormentaTipoMelhorAmigoItem(BaseModel):
+    slug: str = Field(..., max_length=40)
+    nome: str = Field(..., max_length=80)
+    descricao: str = Field(default="", max_length=2000)
+    bonus_atributos: Dict[str, int] = Field(default_factory=dict)
+    sentidos: List[str] = Field(default_factory=list)
+    imunidades: List[str] = Field(default_factory=list)
+    bonus_pericias: Dict[str, int] = Field(default_factory=dict)
+    rd_bonus: int = Field(default=0, ge=0)
+    margem_ameaca_bonus: int = Field(default=0, ge=0)
+    notas: str = Field(default="", max_length=1000)
+
+
+class TormentaTiposMelhorAmigoResponse(BaseModel):
+    tipos: List[TormentaTipoMelhorAmigoItem] = Field(default_factory=list)

@@ -1,0 +1,54 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.20–23 (Melhor Amigo — tipos de parceiro)",
+    "nota": "5 tipos de Melhor Amigo com bônus automáticos por tipo."
+  },
+  "tipos": [
+    {
+      "slug": "animal",
+      "nome": "Animal",
+      "descricao": "Criatura natural de tipo animal (cachorro, cavalo, falcão, lobo etc.).",
+      "bonus_atributos": {"for": 1, "des": 1, "sab": 1},
+      "sentidos": ["faro", "visao_penumbra"],
+      "bonus_pericias": {"Percepção": 2, "Sobrevivência": 2},
+      "margem_ameaca_bonus": 1,
+      "notas": "+1 For, +1 Des, +1 Sab; faro; visão na penumbra; +2 Percepção e Sobrevivência; margem de ameaça +1."
+    },
+    {
+      "slug": "construto",
+      "nome": "Construto",
+      "descricao": "Autômato ou golem criado (robot, boneco animado etc.).",
+      "bonus_atributos": {"con": 2},
+      "sentidos": ["visao_escuro"],
+      "imunidades": ["cansaco", "efeitos_metabolicos"],
+      "notas": "+2 Con; visão no escuro; imune a cansaço e efeitos metabólicos."
+    },
+    {
+      "slug": "espirito",
+      "nome": "Espírito",
+      "descricao": "Entidade de natureza espiritual (fantasma, elemental menor, fada etc.).",
+      "bonus_atributos": {"car": 1},
+      "sentidos": ["visao_escuro"],
+      "bonus_pericias": {"Misticismo": 2},
+      "notas": "+1 Car; visão no escuro; +2 Misticismo. Não precisa de alimento ou sono."
+    },
+    {
+      "slug": "monstro",
+      "nome": "Monstro",
+      "descricao": "Criatura mágica ou aberração (grifo, basilisco jovem, hidra filhote etc.).",
+      "bonus_atributos": {"for": 2},
+      "bonus_pericias": {"Intimidação": 2},
+      "rd_bonus": 2,
+      "notas": "+2 For; +2 Intimidação; RD 2 contra qualquer dano."
+    },
+    {
+      "slug": "morto_vivo",
+      "nome": "Morto-Vivo",
+      "descricao": "Criatura morta-viva controlada (zumbi inteligente, esqueleto superior etc.).",
+      "bonus_atributos": {"con": 2},
+      "imunidades": ["efeitos_metabolicos", "veneno", "doenca"],
+      "sentidos": ["visao_escuro"],
+      "notas": "+2 Con; imune a efeitos metabólicos, veneno e doença; visão no escuro."
+    }
+  ]
+}
