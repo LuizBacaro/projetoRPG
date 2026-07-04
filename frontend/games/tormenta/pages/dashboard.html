@@ -9,7 +9,7 @@
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260629wiz" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260703racial" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -758,7 +758,7 @@
 
             <div class="cad-wizard-step" data-cad-step="3">
                 <p class="t20-dash-hint" id="hintAttrsJogador" style="display:none">
-                    Tipo jogador: os seis números são os <strong>valores finais</strong> (base + bônus racial MB).
+                    Tipo jogador: informe os <strong>valores-base</strong> em cada campo. O bônus racial aparece como badge ao lado (somente leitura).
                     <strong>Compra por pontos:</strong> base 8–18, soma dos custos = <strong>20</strong>.
                     <strong>4d6:</strong> role seis valores 3–18 (descarta o menor); reroll MB se soma de mods &lt; +4 e nenhum 14+.
                 </p>
@@ -777,12 +777,12 @@
                 <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0.75rem 0 0;padding:0.65rem">
                     <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Atributos</legend>
                     <div class="t20-dash-attrs6">
-                        <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="0" max="99" value="0" required /></div>
-                        <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="0" max="99" value="0" required /></div>
-                        <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="0" max="99" value="0" required /></div>
-                        <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="0" max="99" value="0" required /></div>
-                        <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="0" max="99" value="0" required /></div>
-                        <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="0" max="99" value="0" required /></div>
+                        <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="0" max="99" value="0" required /><span id="badgeRacialFor" class="cad-racial-badge" hidden aria-label="Modificador racial de Força"></span></div>
+                        <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="0" max="99" value="0" required /><span id="badgeRacialDes" class="cad-racial-badge" hidden aria-label="Modificador racial de Destreza"></span></div>
+                        <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="0" max="99" value="0" required /><span id="badgeRacialCon" class="cad-racial-badge" hidden aria-label="Modificador racial de Constituição"></span></div>
+                        <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="0" max="99" value="0" required /><span id="badgeRacialInt" class="cad-racial-badge" hidden aria-label="Modificador racial de Inteligência"></span></div>
+                        <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="0" max="99" value="0" required /><span id="badgeRacialSab" class="cad-racial-badge" hidden aria-label="Modificador racial de Sabedoria"></span></div>
+                        <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="0" max="99" value="0" required /><span id="badgeRacialCar" class="cad-racial-badge" hidden aria-label="Modificador racial de Carisma"></span></div>
                     </div>
                 </fieldset>
             </div>
@@ -902,13 +902,13 @@
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
 <script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260629rv"></script>
-<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260629t01"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
-<script src="/games/tormenta/js/t20-dashboard-pericias-v13.js?v=20260630s01"></script>
+<script src="/games/tormenta/js/t20-dashboard-pericias-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
-<script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260629s42"></script>
+<script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260630s01"></script>
 <script>
@@ -1080,6 +1080,25 @@
         return DASH_REGRA_VERSAO === 'v13';
     }
 
+    function atualizarBadgesModRacialDash() {
+        const deltas = racialDeltasMapDash();
+        const idMap = { for: 'badgeRacialFor', des: 'badgeRacialDes', con: 'badgeRacialCon', int: 'badgeRacialInt', sab: 'badgeRacialSab', car: 'badgeRacialCar' };
+        ATTR_KEYS_DASH.forEach((k) => {
+            const el = document.getElementById(idMap[k]);
+            if (!el) return;
+            const v = deltas[k] || 0;
+            if (v === 0) {
+                el.hidden = true;
+                el.textContent = '';
+                el.className = 'cad-racial-badge';
+            } else {
+                el.hidden = false;
+                el.textContent = (v > 0 ? '+' : '') + v + ' racial';
+                el.className = 'cad-racial-badge ' + (v > 0 ? 'cad-racial-badge--pos' : 'cad-racial-badge--neg');
+            }
+        });
+    }
+
     function atualizarLabelCompraPontosDash() {
         const opt = document.querySelector('#cadMetodoGeracao option[value="compra_pontos"]');
         if (opt) opt.textContent = `Compra por pontos (${pontosIniciaisCompra} pts)`;
@@ -1094,24 +1113,26 @@
         }
         if (isDashV13()) {
             hj.innerHTML =
-                'Tipo jogador v1.3: os seis números são os valores finais no modo compra por pontos e os valores-base no modo 4d6. ' +
+                'Tipo jogador v1.3: informe os <strong>valores-base</strong> (sem bônus racial). O modificador racial aparece em verde/vermelho ao lado de cada campo. ' +
                 '<strong>Compra por pontos:</strong> base −2 a +4, soma dos custos = <strong>10</strong>. ' +
                 '<strong>4d6:</strong> role seis valores 4d6, converta cada soma pela Tabela 1-1 e use os seis valores-base resultantes; a soma dos seis deve ser ≥ 6.';
         } else {
             hj.innerHTML =
-                'Tipo jogador: os seis números são os <strong>valores finais</strong> (base + bônus racial MB). ' +
+                'Tipo jogador: informe os <strong>valores-base</strong> em cada campo. O bônus racial aparece como badge ao lado (somente leitura). ' +
                 '<strong>Compra por pontos:</strong> base 8–18, soma dos custos = <strong>20</strong>. ' +
                 '<strong>4d6:</strong> role seis valores 3–18 (descarta o menor); reroll MB se soma de mods &lt; +4 e nenhum 14+.';
         }
     }
 
+    // Expõe os deltas raciais para outros módulos (step2, pericias).
+    window.__t20GetCadRacialDeltas = () => racialDeltasMapDash();
+
     function atributosCompraDash() {
-        const rDel = racialDeltasMapDash();
+        // Os inputs agora guardam apenas o valor-base; racial é somado em attrsDoForm.
         const minBase = isDashV13() ? -99 : 1;
         const out = {};
         ATTR_KEYS_DASH.forEach((a) => {
-            const fin = valorFinalCadAttr(a);
-            out[a] = Math.max(minBase, fin - (rDel[a] || 0));
+            out[a] = Math.max(minBase, valorFinalCadAttr(a));
         });
         return out;
     }
@@ -1374,6 +1395,7 @@
                 el.addEventListener('change', () => {
                     aplicarCadRacaSomenteAjustes();
                     atualizarHintMetodoGeracaoDash();
+                    atualizarBadgesModRacialDash();
                 });
             }
         });
@@ -1383,6 +1405,7 @@
             m1.addEventListener('change', () => {
                 aplicarCadRacaSomenteAjustes();
                 atualizarHintMetodoGeracaoDash();
+                atualizarBadgesModRacialDash();
             });
         }
     }
@@ -1471,6 +1494,7 @@
         } else if (window.T20TracosRaciaisV13) {
             void window.T20TracosRaciaisV13.aplicarTracosRaciaisCadastro('');
         }
+        atualizarBadgesModRacialDash();
     }
 
     function escapeHtml(s) {
@@ -1520,9 +1544,10 @@
         condPorId: Object.create(null),
         statsVisiveis: (function () {
             try {
-                return localStorage.getItem(T20_ARENA_STATS_LS) === '1';
+                // Padrão visivel (true); só oculta se o utilizador guardou explicitamente '0'.
+                return localStorage.getItem(T20_ARENA_STATS_LS) !== '0';
             } catch (_e) {
-                return false;
+                return true;
             }
         })(),
     };
@@ -1790,6 +1815,12 @@
                 if (fromCache) t20Arena.byId[id] = { ...fromCache };
             }
         });
+        // Remover IDs sem dados (personagens deletados) para não exibir "#N" na arena.
+        const validIds = t20Arena.ordemIds.filter((id) => t20Arena.byId[id]);
+        if (validIds.length !== t20Arena.ordemIds.length) {
+            t20Arena.ordemIds = validIds;
+            t20Arena.turnoIdx = Math.min(t20Arena.turnoIdx, Math.max(0, validIds.length - 1));
+        }
         t20Arena.condPorId = Object.create(null);
         const cm = st.condicoes_mb;
         if (cm && typeof cm === 'object') {
@@ -2102,13 +2133,14 @@
     }
 
     function attrsDoForm() {
+        const rDel = racialDeltasMapDash();
         return {
-            for_valor: Math.floor(Number(document.getElementById('cadFor').value) || 0),
-            des_valor: Math.floor(Number(document.getElementById('cadDes').value) || 0),
-            con_valor: Math.floor(Number(document.getElementById('cadCon').value) || 0),
-            int_valor: Math.floor(Number(document.getElementById('cadInt').value) || 0),
-            sab_valor: Math.floor(Number(document.getElementById('cadSab').value) || 0),
-            car_valor: Math.floor(Number(document.getElementById('cadCar').value) || 0),
+            for_valor: Math.floor(Number(document.getElementById('cadFor').value) || 0) + (rDel.for || 0),
+            des_valor: Math.floor(Number(document.getElementById('cadDes').value) || 0) + (rDel.des || 0),
+            con_valor: Math.floor(Number(document.getElementById('cadCon').value) || 0) + (rDel.con || 0),
+            int_valor: Math.floor(Number(document.getElementById('cadInt').value) || 0) + (rDel.int || 0),
+            sab_valor: Math.floor(Number(document.getElementById('cadSab').value) || 0) + (rDel.sab || 0),
+            car_valor: Math.floor(Number(document.getElementById('cadCar').value) || 0) + (rDel.car || 0),
         };
     }
 
@@ -2567,6 +2599,7 @@
             onRacaAttrChange: () => {
                 aplicarCadRacaSomenteAjustes();
                 atualizarHintMetodoGeracaoDash();
+                atualizarBadgesModRacialDash();
             },
         });
     }
