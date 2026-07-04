@@ -26,8 +26,9 @@ from tests.test_tormenta_personagens_api import (
     _build_client,
     _t20_post_jogador_v13_json,
     _usuario,
-    tormenta_personagens_db,
 )
+
+pytest_plugins = ("tests.test_tormenta_personagens_api",)
 
 
 @pytest.fixture(scope="function")
