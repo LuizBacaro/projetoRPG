@@ -168,6 +168,9 @@ class TormentaRegrasService {
         const q = new URLSearchParams();
         if (params.q) q.set('q', params.q);
         if (params.categoria_v13) q.set('categoria_v13', params.categoria_v13);
+        if (params.suplemento) q.set('suplemento', String(params.suplemento).trim());
+        if (params.raca) q.set('raca', String(params.raca).trim());
+        if (params.classe_exigida) q.set('classe_exigida', String(params.classe_exigida).trim());
         if (params.skip != null) q.set('skip', String(params.skip));
         if (params.limit != null) q.set('limit', String(params.limit));
         const qs = q.toString();

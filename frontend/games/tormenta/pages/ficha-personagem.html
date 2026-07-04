@@ -1301,6 +1301,12 @@
                         <span class="equipamentos-busca-label">Categoria</span>
                         <select id="talentosMbCategoriaV13" class="t20-input equipamentos-busca"></select>
                     </div>
+                    <div id="talentosMbHaControles" class="equipamentos-busca-wrapper" style="display: none">
+                        <label class="equipamentos-busca-label" for="talentosMbHaSomenteElegiveis">
+                            <input type="checkbox" id="talentosMbHaSomenteElegiveis" />
+                            Só poderes HA elegíveis (raça/classe)
+                        </label>
+                    </div>
                 </div>
                 <div class="equipamentos-abas">
                     <button type="button" class="equipamentos-aba ativa" id="abaListarTalMb">📋 Listar talentos</button>
@@ -1493,7 +1499,7 @@
 <script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614subirnivel"></script>
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
-<script src="/games/tormenta/js/t20-poderes-v13.js?v=20260629p8"></script>
+<script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
 <script src="/games/tormenta/js/t20-origens-v13.js?v=20260629dev"></script>
 <script src="/games/tormenta/js/t20-origem-trocas-ficha-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704"></script>
@@ -2141,6 +2147,9 @@
         } else {
             __t20GameSuplementoFicha = null;
         }
+        if (window.T20PoderesV13 && typeof window.T20PoderesV13.atualizarUiModalHa === 'function') {
+            window.T20PoderesV13.atualizarUiModalHa();
+        }
     }
 
     async function carregarClassesTormenta() {
@@ -2320,9 +2329,17 @@
         }
         const subModalTal = q('subModalGerenciarTalentos');
         if (subModalTal) {
-            subModalTal.innerHTML = v13
-                ? 'Catálogo v1.3 (poderes gerais e de classe) e poder livre. <span class="t20-hint">Esc fecha.</span>'
-                : 'Catálogo MB (talentos das classes) e talento livre. <span class="t20-hint">Esc fecha.</span>';
+            if (v13 && window.T20PoderesV13 && window.T20PoderesV13.isHaAtivo && window.T20PoderesV13.isHaAtivo()) {
+                subModalTal.innerHTML =
+                    'Catálogo v1.3 + <strong>Heróis de Arton</strong>. Use categoria ou «só elegíveis» para filtrar. <span class="t20-hint">Esc fecha.</span>';
+            } else {
+                subModalTal.innerHTML = v13
+                    ? 'Catálogo v1.3 (poderes gerais e de classe) e poder livre. <span class="t20-hint">Esc fecha.</span>'
+                    : 'Catálogo MB (talentos das classes) e talento livre. <span class="t20-hint">Esc fecha.</span>';
+            }
+        }
+        if (window.T20PoderesV13 && typeof window.T20PoderesV13.atualizarUiModalHa === 'function') {
+            window.T20PoderesV13.atualizarUiModalHa();
         }
         const titClasseMb = Array.from(document.querySelectorAll('.t20-ficha-secao-titulo')).find(
             (el) => el.textContent && el.textContent.includes('Classe')
@@ -4446,11 +4463,22 @@
         try {
             if (st) st.textContent = 'Carregando…';
             const params = { q: query || '', skip: _catalogoSkip, limit: _catalogoLimit };
+            const listParams =
+                _catalogoMode === 'talento' && window.T20PoderesV13 && window.T20PoderesV13.paramsCatalogoPoderes
+                    ? window.T20PoderesV13.paramsCatalogoPoderes(params)
+                    : params;
             const data =
                 _catalogoMode === 'talento'
-                    ? await svcRegras.listarTalentosCatalogo(params)
+                    ? await svcRegras.listarTalentosCatalogo(listParams)
                     : await svcRegras.listarEquipamentosCatalogo(params);
-            const itens = data.itens || [];
+            let itens = data.itens || [];
+            if (
+                _catalogoMode === 'talento' &&
+                window.T20PoderesV13 &&
+                typeof window.T20PoderesV13.posProcessarItensCatalogo === 'function'
+            ) {
+                itens = window.T20PoderesV13.posProcessarItensCatalogo(itens);
+            }
             const total = typeof data.total === 'number' ? data.total : itens.length;
             if (lista) {
                 lista.innerHTML = '';
@@ -4873,8 +4901,14 @@
         const nomeEnc = encodeURIComponent(nome);
         const secLinha =
             (it.secao && String(it.secao).trim()) || (it.categoria && String(it.categoria).trim()) || '';
+        const haBadge =
+            window.T20PoderesV13 && typeof window.T20PoderesV13.badgeHaHtml === 'function'
+                ? window.T20PoderesV13.badgeHaHtml(it)
+                : '';
         const specs = [
             _eqSpecPar('Categoria', it.categoria_v13 || it.categoria),
+            _eqSpecPar('Raça exigida', it.raca_exigida),
+            _eqSpecPar('Classe exigida', it.classe_exigida),
             _eqSpecPar('Pré-requisitos', it.prerequisitos),
             _eqSpecPar('PM ao ativar', it.custo_pm != null && it.custo_pm > 0 ? String(it.custo_pm) : null),
             _eqSpecPar('Página', it.pagina_referencia),
@@ -4887,7 +4921,7 @@
             <div class="talento-linha-conteudo">
                 <div class="talento-linha-cabecalho">
                     <span class="talento-linha-nome">${escHtml(nome)}</span>
-                    ${secLinha ? `<span class="talento-linha-secao">${escHtml(secLinha)}</span>` : ''}
+                    ${haBadge || (secLinha ? `<span class="talento-linha-secao">${escHtml(secLinha)}</span>` : '')}
                 </div>
                 <div class="equipamento-spec-grid equipamento-spec-grid--unica">${corpo}</div>
             </div>
@@ -4920,7 +4954,10 @@
                     ? window.T20PoderesV13.paramsCatalogoPoderes(baseParams)
                     : baseParams
             );
-            const itens = data.itens || [];
+            let itens = data.itens || [];
+            if (window.T20PoderesV13 && typeof window.T20PoderesV13.posProcessarItensCatalogo === 'function') {
+                itens = window.T20PoderesV13.posProcessarItensCatalogo(itens);
+            }
             _talCatalogTotal = typeof data.total === 'number' ? data.total : itens.length;
             let pag = lista.querySelector('.talentos-paginacao--lista-tal');
             if (pag) pag.remove();
@@ -4953,6 +4990,9 @@
         const ov = q('modalTalentosMb');
         const busca = q('talentosMbBusca');
         if (busca) busca.value = '';
+        if (window.T20PoderesV13 && typeof window.T20PoderesV13.atualizarUiModalHa === 'function') {
+            window.T20PoderesV13.atualizarUiModalHa();
+        }
         abaTalMbModal('listar');
         if (ov) {
             ov.classList.add('is-open');

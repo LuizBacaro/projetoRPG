@@ -460,14 +460,42 @@ def listar_catalogo_talentos(
     categoria_v13: Optional[str] = Query(
         None,
         max_length=40,
-        description="Filtrar por categoria v1.3 (geral, combate, destino, magia, concedido, tormenta, classe).",
+        description=(
+            "Filtrar por categoria v1.3 (geral, combate, destino, magia, concedido, "
+            "tormenta, classe, raca, grupo, treinador, distincao)."
+        ),
+    ),
+    suplemento: Optional[str] = Query(
+        None,
+        description=(
+            f"Incluir poderes de suplemento: '{SUPLEMENTO_HEROIS_ARTON}' adiciona "
+            "poderes de Treinador, raça, classe e gerais do livro Heróis de Arton."
+        ),
+    ),
+    raca: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Filtrar poderes de raça pela raça exigida (ex.: eiradaan).",
+    ),
+    classe_exigida: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Filtrar poderes pela classe exigida (ex.: treinador, guerreiro).",
     ),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=200),
     response: Response = None,
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaCatalogoPaginaResponse:
-    slice_rows, total = filtrar_talentos_mb(q, skip, limit, categoria_v13=categoria_v13)
+    slice_rows, total = filtrar_talentos_mb(
+        q,
+        skip,
+        limit,
+        categoria_v13=categoria_v13,
+        suplemento=suplemento,
+        raca=raca,
+        classe_exigida=classe_exigida,
+    )
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)

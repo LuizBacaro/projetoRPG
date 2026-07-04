@@ -1,0 +1,258 @@
+{
+    "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.16–21, p.56–77, p.78–95",
+    "nota": "Catálogo HA-4: 20 poderes Treinador + raça/classe. Não reproduz texto longo."
+  },
+  "poderes": [
+    {
+      "slug": "amigo_divino",
+      "nome": "Amigo Divino",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Melhor Amigo pode ser espírito ou construto celestial.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "bom_garoto",
+      "nome": "Bom Garoto",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Melhor Amigo ganha +2 em testes de perícia baseados em Carisma.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "coracao_grande",
+      "nome": "Coração Grande",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Pode ter um Melhor Amigo adicional.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "ensinar_truque",
+      "nome": "Ensinar Truque",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Melhor Amigo aprende um truque adicional.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "comando_defensivo",
+      "nome": "Comando Defensivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 2,
+      "descricao_resumo": "Melhor Amigo usa ação de proteção como reação (2 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "domador_cativante",
+      "nome": "Domador Cativante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "+2 em testes de Adestramento para domar criaturas.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "investida_conjunta",
+      "nome": "Investida Conjunta",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 2,
+      "descricao_resumo": "Você e Melhor Amigo fazem investida coordenada (2 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "direcionamento_marcial",
+      "nome": "Direcionamento Marcial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 2,
+      "descricao_resumo": "Direcionar soma Carisma em ataques do Melhor Amigo (2 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "asas_aliadas",
+      "nome": "Asas Aliadas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Melhor Amigo alado ganha deslocamento de voo.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "domador_lendario",
+      "nome": "Domador Lendário",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Domar Criatura pode afetar criaturas de ND até metade do seu nível.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "comandos_distantes",
+      "nome": "Comandos Distantes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 1,
+      "descricao_resumo": "Comandos ao Melhor Amigo funcionam em alcance médio (1 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "convocar_enxame",
+      "nome": "Convocar Enxame",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 4,
+      "descricao_resumo": "Convoca enxame de criaturas pequenas por uma cena (4 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "aumento_de_atributo",
+      "nome": "Aumento de Atributo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Melhor Amigo recebe +1 em Força, Destreza ou Sabedoria (escolher ao aprender).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "comando_ofensivo",
+      "nome": "Comando Ofensivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 2,
+      "descricao_resumo": "Melhor Amigo realiza um ataque como reação ao seu comando (2 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "proteger_o_amigo",
+      "nome": "Proteger o Amigo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 2,
+      "descricao_resumo": "Intercepta um ataque contra o Melhor Amigo como reação (2 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "amigo_fiel",
+      "nome": "Amigo Fiel",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 1,
+      "descricao_resumo": "Melhor Amigo pode rerrolar um teste de resistência 1× por cena (1 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "mestre_das_feras",
+      "nome": "Mestre das Feras",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "+2 em testes de Adestramento para Domar Criatura.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "treino_rigoroso",
+      "nome": "Treino Rigoroso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Melhor Amigo recebe +1 PV por nível de Treinador.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "comunicacao_silenciosa",
+      "nome": "Comunicação Silenciosa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 1,
+      "descricao_resumo": "Comandos ao Melhor Amigo não exigem gestos nem palavras (1 PM).",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "parceiro_veterano",
+      "nome": "Parceiro Veterano",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "classe_exigida": "treinador",
+      "custo_pm": 0,
+      "descricao_resumo": "Melhor Amigo aumenta uma categoria de dano de armas naturais.",
+      "pagina_referencia": "HA p.20"
+    },
+    {
+      "slug": "eco_arcano",
+      "nome": "Eco Arcano",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "raca_exigida": "eiradaan",
+      "custo_pm": 0,
+      "descricao_resumo": "Eiradaan: uma magia arcana de 1º círculo como habilidade racial.",
+      "pagina_referencia": "HA p.8"
+    },
+    {
+      "slug": "forca_titanica",
+      "nome": "Força Titânica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "raca_exigida": "galokk",
+      "custo_pm": 0,
+      "descricao_resumo": "Galokk: +1 em testes de Força e dano corpo a corpo.",
+      "pagina_referencia": "HA p.13"
+    },
+    {
+      "slug": "ambicao_herdada",
+      "nome": "Ambição Herdada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "raca_exigida": "meio_elfo",
+      "custo_pm": 0,
+      "descricao_resumo": "Meio-Elfo: escolhe 1 poder geral ou único de origem ao criar o personagem.",
+      "pagina_referencia": "HA p.14"
+    },
+    {
+      "slug": "chuva_de_golpes",
+      "nome": "Chuva de Golpes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "classe_exigida": "guerreiro",
+      "custo_pm": 2,
+      "descricao_resumo": "Guerreiro: dois ataques com arma leve na mão secundária (2 PM).",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "slug": "escudo_heroico",
+      "nome": "Escudo Heroico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "classe_exigida": "guerreiro",
+      "custo_pm": 2,
+      "descricao_resumo": "Guerreiro: arremessa escudo como ataque à distância (2 PM).",
+      "pagina_referencia": "HA p.68"
+    }
+  ]
+}

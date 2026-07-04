@@ -307,15 +307,77 @@ def lista_talentos_mb_catalogo() -> List[Dict[str, Any]]:
     return [enriquecer_item_catalogo_poder(r) for r in out]
 
 
+def _poder_ha_para_catalogo(row: Dict[str, Any]) -> Dict[str, Any]:
+    from app.games.tormenta.rules.poderes_catalogo_v13_t20 import (
+        enriquecer_item_catalogo_poder,
+    )
+
+    slug = str(row.get("slug") or "").strip().lower()
+    nome = str(row.get("nome") or slug).strip()
+    item: Dict[str, Any] = {
+        "slug": slug,
+        "nome": nome,
+        "fonte_catalogo": str(row.get("fonte_catalogo") or "herois_arton"),
+        "categoria_v13": str(row.get("categoria_v13") or "geral").strip().lower(),
+        "secao": "Heróis de Arton",
+        "categoria": str(row.get("categoria_v13") or "Geral").replace("_", " ").title(),
+    }
+    for opt in (
+        "classe_exigida",
+        "raca_exigida",
+        "descricao_resumo",
+        "pagina_referencia",
+        "prerequisitos",
+        "custo_pm",
+    ):
+        if row.get(opt) is not None:
+            item[opt] = row[opt]
+    return enriquecer_item_catalogo_poder(item)
+
+
+def lista_poderes_catalogo_v13(
+    suplemento: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Catálogo MB + suplemento Heróis de Arton quando ``suplemento='herois_arton'``."""
+    from app.games.tormenta.rules.poderes_herois_arton_t20 import (
+        lista_poderes_herois_arton,
+    )
+    from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTO_HEROIS_ARTON
+
+    out = lista_talentos_mb_catalogo()
+    if not suplemento or str(suplemento).strip().lower() != SUPLEMENTO_HEROIS_ARTON:
+        return out
+    seen = {
+        str(r.get("slug") or _norm_nome_catalogo(str(r.get("nome", ""))))
+        .strip()
+        .lower()
+        for r in out
+        if r.get("slug") or r.get("nome")
+    }
+    for row in lista_poderes_herois_arton():
+        slug = str(row.get("slug") or "").strip().lower()
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        out.append(_poder_ha_para_catalogo(row))
+    out.sort(key=lambda x: str(x["nome"]).lower())
+    return out
+
+
 def _haystack_talento_mb(r: Dict[str, Any]) -> str:
     parts: List[str] = []
     for k in (
+        "slug",
         "nome",
         "secao",
         "categoria",
+        "categoria_v13",
         "prerequisitos",
         "descricao_resumo",
         "pagina_referencia",
+        "raca_exigida",
+        "classe_exigida",
+        "fonte_catalogo",
     ):
         v = r.get(k)
         if v is not None and str(v).strip():
@@ -329,14 +391,31 @@ def filtrar_talentos_mb(
     limit: int,
     *,
     categoria_v13: str | None = None,
+    suplemento: str | None = None,
+    raca: str | None = None,
+    classe_exigida: str | None = None,
 ) -> Tuple[List[Dict[str, Any]], int]:
-    rows = [dict(r) for r in lista_talentos_mb_catalogo()]
+    rows = [dict(r) for r in lista_poderes_catalogo_v13(suplemento)]
     qn = (q or "").strip().lower()
     if qn:
         rows = [r for r in rows if qn in _haystack_talento_mb(r)]
     cat_f = str(categoria_v13 or "").strip().lower()
     if cat_f:
         rows = [r for r in rows if str(r.get("categoria_v13") or "") == cat_f]
+    raca_f = str(raca or "").strip().lower()
+    if raca_f:
+        rows = [
+            r
+            for r in rows
+            if str(r.get("raca_exigida") or "").strip().lower() == raca_f
+        ]
+    classe_f = str(classe_exigida or "").strip().lower()
+    if classe_f:
+        rows = [
+            r
+            for r in rows
+            if str(r.get("classe_exigida") or "").strip().lower() == classe_f
+        ]
     for i, item in enumerate(rows, start=1):
         item["id"] = i
     total = len(rows)

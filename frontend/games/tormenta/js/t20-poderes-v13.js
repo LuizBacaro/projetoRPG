@@ -1,8 +1,13 @@
 /**
- * Poderes v1.3 — filtro por categoria, custo PM e ativação na ficha.
+ * Poderes v1.3 — filtro por categoria, custo PM, ativação e catálogo Heróis de Arton.
  */
 (function (global) {
     'use strict';
+
+    const SUPLEMENTO_HA =
+        global.T20RegraVersao && global.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
+            ? global.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
+            : 'herois_arton';
 
     const CATEGORIAS = [
         { slug: '', label: 'Todas as categorias' },
@@ -13,6 +18,10 @@
         { slug: 'concedido', label: 'Concedidos' },
         { slug: 'tormenta', label: 'Tormenta' },
         { slug: 'classe', label: 'Classe' },
+        { slug: 'raca', label: 'Raça (HA)' },
+        { slug: 'treinador', label: 'Treinador (HA)' },
+        { slug: 'grupo', label: 'Grupo (HA)' },
+        { slug: 'distincao', label: 'Distinção (HA)' },
     ];
 
     function q(id) {
@@ -27,10 +36,60 @@
         );
     }
 
+    function isHaAtivo() {
+        if (typeof global.t20GetSuplementoFichaAtivo === 'function') {
+            return global.t20GetSuplementoFichaAtivo() === SUPLEMENTO_HA;
+        }
+        return false;
+    }
+
     function labelCategoria(slug) {
         const s = String(slug || '').trim().toLowerCase();
         const row = CATEGORIAS.find((c) => c.slug === s);
         return row ? row.label : slug || '';
+    }
+
+    function getSlugsFicha() {
+        const racaRaw = (q('f_raca_select') && q('f_raca_select').value) || '';
+        const raca = racaRaw === '__livre__' ? '' : String(racaRaw).trim().toLowerCase();
+        const classes = new Set();
+        if (global.T20MulticlasseV13 && typeof global.T20MulticlasseV13.niveisEfetivosParaPm === 'function') {
+            (global.T20MulticlasseV13.niveisEfetivosParaPm() || []).forEach((row) => {
+                const cs = String((row && row.slug) || '').trim().toLowerCase();
+                if (cs) classes.add(cs);
+            });
+        } else {
+            const main = ((q('f_classe_mb') && q('f_classe_mb').value) || '').trim().toLowerCase();
+            if (main) classes.add(main);
+        }
+        return { raca, classes: [...classes] };
+    }
+
+    function classeAtendeExigencia(classeExigida, classesFicha) {
+        const req = String(classeExigida || '').trim().toLowerCase();
+        if (!req) return true;
+        return (classesFicha || []).some(
+            (c) => c === req || (req === 'treinador' && c.startsWith('treinador'))
+        );
+    }
+
+    function poderElegivelParaFicha(item, ctx) {
+        if (!item || item.fonte_catalogo !== SUPLEMENTO_HA) return true;
+        const racaReq = String(item.raca_exigida || '').trim().toLowerCase();
+        if (racaReq && racaReq !== ctx.raca) return false;
+        const classeReq = String(item.classe_exigida || '').trim().toLowerCase();
+        if (classeReq && !classeAtendeExigencia(classeReq, ctx.classes)) return false;
+        return true;
+    }
+
+    function filtrarItensElegiveis(itens) {
+        const ctx = getSlugsFicha();
+        return (itens || []).filter((it) => poderElegivelParaFicha(it, ctx));
+    }
+
+    function somenteElegiveisHaAtivo() {
+        const cb = q('talentosMbHaSomenteElegiveis');
+        return !!(cb && cb.checked && isHaAtivo());
     }
 
     function montarFiltroCategoriaModal() {
@@ -51,13 +110,61 @@
         });
     }
 
+    function montarControlesHaModal() {
+        const host = q('talentosMbHaControles');
+        if (!host) return;
+        if (!isV13() || !isHaAtivo()) {
+            host.style.display = 'none';
+            return;
+        }
+        host.style.display = '';
+        if (host.dataset.boundHa) return;
+        host.dataset.boundHa = '1';
+        const cb = q('talentosMbHaSomenteElegiveis');
+        if (cb) {
+            cb.addEventListener('change', () => {
+                if (typeof global.carregarTalCatalogoTormenta === 'function') {
+                    global.carregarTalCatalogoTormenta(true);
+                }
+            });
+        }
+    }
+
+    function atualizarUiModalHa() {
+        montarControlesHaModal();
+        const sub = q('subModalGerenciarTalentos');
+        if (sub && isV13() && isHaAtivo()) {
+            sub.innerHTML =
+                'Catálogo v1.3 + <strong>Heróis de Arton</strong>. Use categoria ou «só elegíveis» para filtrar. <span class="t20-hint">Esc fecha.</span>';
+        }
+    }
+
     function paramsCatalogoPoderes(base) {
         const p = Object.assign({}, base || {});
         if (isV13()) {
             const cat = q('talentosMbCategoriaV13');
             if (cat && cat.value) p.categoria_v13 = cat.value;
         }
+        if (isHaAtivo()) {
+            p.suplemento = SUPLEMENTO_HA;
+            if (somenteElegiveisHaAtivo()) {
+                p.limit = Math.max(Number(p.limit) || 25, 200);
+            }
+        }
         return p;
+    }
+
+    function posProcessarItensCatalogo(itens) {
+        if (!somenteElegiveisHaAtivo()) return itens || [];
+        return filtrarItensElegiveis(itens);
+    }
+
+    function badgeHaHtml(item) {
+        if (!item || item.fonte_catalogo !== SUPLEMENTO_HA) return '';
+        const parts = ['HA'];
+        if (item.raca_exigida) parts.push(`raça: ${item.raca_exigida}`);
+        if (item.classe_exigida) parts.push(`classe: ${item.classe_exigida}`);
+        return `<span class="talento-linha-secao t20-poder-ha-badge" title="Heróis de Arton">${parts.join(' · ')}</span>`;
     }
 
     function atualizarPmNaFicha(depois, max) {
@@ -170,6 +277,7 @@
 
     function init() {
         montarFiltroCategoriaModal();
+        montarControlesHaModal();
         wireModalFiltro();
     }
 
@@ -177,9 +285,16 @@
         init,
         decorarLinha,
         paramsCatalogoPoderes,
+        posProcessarItensCatalogo,
+        badgeHaHtml,
+        filtrarItensElegiveis,
+        poderElegivelParaFicha,
+        atualizarUiModalHa,
         labelCategoria,
         validarAntesDeAdicionar,
         coletarNomesPoderesFicha,
+        isHaAtivo,
         CATEGORIAS,
+        SUPLEMENTO_HA,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

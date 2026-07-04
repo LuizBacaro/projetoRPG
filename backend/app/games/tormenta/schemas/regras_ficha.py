@@ -384,7 +384,27 @@ class TormentaCatalogoItem(BaseModel):
     id: int = Field(
         ..., ge=1, description="Identificador estável após carregar o JSON (1..N)."
     )
+    slug: Optional[str] = Field(
+        default=None,
+        max_length=80,
+        description="Identificador estável do poder (suplemento Heróis de Arton).",
+    )
     nome: str = Field(..., max_length=200)
+    fonte_catalogo: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="core = Módulo Básico; herois_arton = suplemento Heróis de Arton.",
+    )
+    raca_exigida: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="Raça exigida para poderes de raça (suplemento HA).",
+    )
+    classe_exigida: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="Classe exigida para poderes de classe/treinador (suplemento HA).",
+    )
     categoria: Optional[str] = Field(
         default=None,
         max_length=80,
@@ -413,7 +433,7 @@ class TormentaCatalogoItem(BaseModel):
     categoria_v13: Optional[str] = Field(
         default=None,
         max_length=40,
-        description="Categoria v1.3: geral, combate, destino, magia, concedido, tormenta, classe.",
+        description="Categoria v1.3: geral, combate, destino, magia, concedido, tormenta, classe, raca, grupo, treinador, distincao.",
     )
     custo_pm: Optional[int] = Field(
         default=None,

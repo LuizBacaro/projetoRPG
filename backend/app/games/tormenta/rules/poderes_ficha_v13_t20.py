@@ -7,6 +7,11 @@ import unicodedata
 from typing import Any, Dict, List, Optional
 
 from app.games.tormenta.rules.catalogo_t20 import lista_talentos_mb_catalogo
+from app.games.tormenta.rules.poderes_herois_arton_t20 import (
+    normalizar_slug_poder_ha,
+    poder_por_slug,
+    poderes_disponiveis_ficha,
+)
 from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_V13,
     regra_versao_de_ficha,
@@ -22,11 +27,17 @@ def _normalizar_slug(texto: str) -> str:
 
 
 def nome_poder_por_slug_v13(slug: str) -> str:
-    """Resolve slug v1.3 para nome exibido (catálogo MB ou título a partir do slug)."""
+    """Resolve slug v1.3 para nome exibido (catálogo MB, HA ou título a partir do slug)."""
     s = _normalizar_slug(slug)
     if not s:
         return ""
+    ha = poder_por_slug(s)
+    if ha and ha.get("nome"):
+        return str(ha["nome"]).strip()
     for row in lista_talentos_mb_catalogo():
+        row_slug = str(row.get("slug") or "").strip().lower()
+        if row_slug and normalizar_slug_poder_ha(row_slug) == s:
+            return str(row.get("nome", "")).strip()
         nome = str(row.get("nome", "")).strip()
         if nome and _normalizar_slug(nome) == s:
             return nome

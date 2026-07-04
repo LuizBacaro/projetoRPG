@@ -1053,8 +1053,8 @@
         });
         q('cadTendencia')?.addEventListener('change', () => renderResumo());
         q('cadClasseMb')?.addEventListener('change', () => {
-            if (typeof global.popularCadClasseMbSelect === 'function') {
-                global.popularCadClasseMbSelect();
+            if (typeof window.popularCadClasseMbSelect === 'function') {
+                window.popularCadClasseMbSelect();
             }
             if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
                 global.T20DashPericiasV13.invalidarPericias();
