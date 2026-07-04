@@ -875,6 +875,10 @@
                             <div class="t20-ficha-field t20-ficha-field--wide">
                                 <label for="f_classe_mb" id="lbl_classe_mb">Classe (tabela)</label>
                                 <select id="f_classe_mb" class="t20-input"></select>
+                                <p id="t20HintClassesVariantesHa" class="t20-hint" style="display:none;margin:0.35rem 0 0">
+                                    Heróis de Arton: classes <strong>variantes</strong> são mutuamente exclusivas com a
+                                    classe base e com outras variantes do mesmo grupo (ex.: Alquimista × Inventor).
+                                </p>
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--wide" id="wrapArcanistaCaminho" style="display: none">
                                 <label for="f_arcanista_caminho">Caminho do Arcanista (v1.3 — irreversível)</label>
@@ -1494,7 +1498,8 @@
 <script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260629pp"></script>
 <script src="/games/tormenta/js/t20-percepcao-passiva.js?v=20260629pp"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260629mc"></script>
-<script src="/games/tormenta/js/t20-multiclasse-v13.js?v=20260629mc"></script>
+<script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
+<script src="/games/tormenta/js/t20-multiclasse-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614subirnivel"></script>
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260629"></script>
@@ -2398,19 +2403,37 @@
         const sel = q('f_classe_mb');
         if (!sel) return;
         const cur = sel.value;
+        const CV = window.T20ClassesVariantesV13;
+        const outros = CV ? CV.slugsSelecionadosDeDom(q, { excluirSlug: cur }) : [];
         sel.innerHTML = '';
         const o0 = document.createElement('option');
         o0.value = '';
         o0.textContent = '— Livre / multiclasse (texto ao lado)';
         sel.appendChild(o0);
         CLASSES_MB.forEach((row) => {
+            if (CV && outros.length && !CV.classeDisponivel(row, outros, CLASSES_MB)) return;
             const o = document.createElement('option');
             o.value = row.slug;
-            o.textContent = `${row.nome}${row.abreviatura ? ` (${row.abreviatura})` : ''}`;
+            o.textContent = CV ? CV.labelClasseMb(row) : `${row.nome}${row.abreviatura ? ` (${row.abreviatura})` : ''}`;
             sel.appendChild(o);
         });
         if (cur && CLASSES_MB.some((x) => x.slug === cur)) sel.value = cur;
+        atualizarHintClassesVariantesHa();
     }
+
+    function atualizarHintClassesVariantesHa() {
+        const hint = q('t20HintClassesVariantesHa');
+        if (!hint) return;
+        const CV = window.T20ClassesVariantesV13;
+        const ha =
+            CV &&
+            CV.haAtivoNoCatalogo(CLASSES_MB) &&
+            window.T20RegraVersao &&
+            window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        hint.style.display = ha ? '' : 'none';
+    }
+
+    window.popularSelectClassesMb = popularSelectClassesMb;
 
     function sincronizarClasseMbApartirDoTexto() {
         const sel = q('f_classe_mb');
@@ -2640,6 +2663,10 @@
         }
         if (window.T20OrigemTrocasFichaV13 && window.T20OrigemTrocasFichaV13.renderUi) {
             window.T20OrigemTrocasFichaV13.renderUi();
+        }
+        popularSelectClassesMb();
+        if (window.T20MulticlasseV13 && window.T20MulticlasseV13.revalidarTodasLinhas) {
+            window.T20MulticlasseV13.revalidarTodasLinhas();
         }
         t20AtualizarGrimorioElegibilidadeVisual(null);
         agendarAtualizarGrimorioSeModalAberto();
@@ -8034,6 +8061,13 @@
                 const vma = window.T20MelhorAmigoV13.validar();
                 if (!vma.ok) {
                     Toast.error(vma.msg);
+                    return;
+                }
+            }
+            if (window.T20MulticlasseV13 && window.T20MulticlasseV13.validarAntesSalvar) {
+                const vcv = window.T20MulticlasseV13.validarAntesSalvar();
+                if (!vcv.ok) {
+                    Toast.error(vcv.msg);
                     return;
                 }
             }

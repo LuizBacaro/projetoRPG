@@ -944,6 +944,7 @@
 <script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704ma"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
+<script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-dashboard-wizard-v13.js?v=20260630s01"></script>
 <script>
 (function () {
@@ -1470,18 +1471,10 @@
     function classeDisponivelCadastro(row) {
         const sel = document.getElementById('cadClasseMb');
         const cur = (sel && sel.value) || '';
-        if (!row || !cur || row.slug === cur) return true;
-        const excl = Array.isArray(row.exclusivo_com) ? row.exclusivo_com : [];
-        if (excl.includes(cur)) return false;
-        const curRow = getClasseMbRowPorSlugDash(cur);
-        if (!curRow) return true;
-        const curExcl = Array.isArray(curRow.exclusivo_com) ? curRow.exclusivo_com : [];
-        if (curExcl.includes(row.slug)) return false;
-        const base = row.classe_variante_base;
-        if (base && cur === base) return false;
-        const curBase = curRow.classe_variante_base;
-        if (curBase && row.slug === curBase) return false;
-        return true;
+        if (!row || !cur) return true;
+        const CV = window.T20ClassesVariantesV13;
+        if (!CV) return true;
+        return CV.classeDisponivel(row, [cur], CLASSES_MB);
     }
 
     async function recarregarCatalogosDashHerois() {
@@ -1536,16 +1529,11 @@
         o0.value = '';
         o0.textContent = '— Livre / multiclasse (texto na ficha)';
         sel.appendChild(o0);
+        const CV = window.T20ClassesVariantesV13;
         CLASSES_MB.filter((row) => classeDisponivelCadastro(row)).forEach((row) => {
             const o = document.createElement('option');
             o.value = row.slug;
-            const tag =
-                row.fonte_catalogo === 'herois_arton'
-                    ? row.classe_variante_base
-                        ? ' [variante]'
-                        : ' [HA]'
-                    : '';
-            o.textContent = `${row.nome}${row.abreviatura ? ` (${row.abreviatura})` : ''}${tag}`;
+            o.textContent = CV ? CV.labelClasseMb(row) : row.nome;
             sel.appendChild(o);
         });
         if (cur && CLASSES_MB.some((x) => x.slug === cur)) sel.value = cur;
@@ -2737,6 +2725,11 @@
         if (cbHa && !cbHa.__boundHeroisArton) {
             cbHa.__boundHeroisArton = true;
             cbHa.addEventListener('change', () => void recarregarCatalogosDashHerois());
+        }
+        const selClMb = document.getElementById('cadClasseMb');
+        if (selClMb && !selClMb.__boundVariantesHa3) {
+            selClMb.__boundVariantesHa3 = true;
+            selClMb.addEventListener('change', () => popularCadClasseMbSelect());
         }
     })();
     window.popularCadClasseMbSelect = popularCadClasseMbSelect;
