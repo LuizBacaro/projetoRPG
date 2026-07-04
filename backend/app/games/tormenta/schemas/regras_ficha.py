@@ -926,6 +926,18 @@ class TormentaPericiasValidarCriacaoRequest(BaseModel):
         default=None,
         description="Benefícios de origem v1.3 (pericia:slug / poder:slug).",
     )
+    origem_slug: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="Slug da origem v1.3 (necessário para trocas Heróis de Arton).",
+    )
+    origem_trocas_pericia: Optional[Dict[str, str]] = Field(
+        default=None,
+        description=(
+            "Mapa perícia redundante → perícia de classe substituta "
+            "(origens com troca_pericia_treinada)."
+        ),
+    )
 
 
 class TormentaPericiasValidarCriacaoResponse(BaseModel):

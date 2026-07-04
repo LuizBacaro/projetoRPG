@@ -221,6 +221,172 @@ def contar_vagas_pericias_extra_origem(beneficios: Any) -> int:
     return len(slugs_pericias_de_beneficios_origem(beneficios))
 
 
+def origem_permite_troca_pericia(slug_origem: str) -> bool:
+    orig = origem_por_slug(slug_origem)
+    if not orig:
+        return False
+    return bool(orig.get("troca_pericia_treinada"))
+
+
+def _normalizar_mapa_trocas_pericia(origem_trocas: Any) -> Dict[str, str]:
+    if not isinstance(origem_trocas, dict):
+        return {}
+    out: Dict[str, str] = {}
+    for de, para in origem_trocas.items():
+        d = str(de or "").strip().lower()
+        p = str(para or "").strip().lower()
+        if d and p:
+            out[d] = p
+    return out
+
+
+def resolver_pericias_origem_efetivas(
+    slug_origem: str,
+    beneficios: Any,
+    treinados: set[str],
+    slug_classe: str,
+    origem_trocas: Any = None,
+) -> tuple[List[str], Dict[str, Any]]:
+    """Resolve slugs de perícia a treinar pela origem (com troca se redundante)."""
+    from app.games.tormenta.rules.pericias_classe_t20 import (
+        config_pericias_classe_v13,
+        universo_pericias_classe,
+    )
+
+    beneficio_slugs = slugs_pericias_de_beneficios_origem(beneficios)
+    trocas = _normalizar_mapa_trocas_pericia(origem_trocas)
+    permite = origem_permite_troca_pericia(slug_origem) if slug_origem else False
+    cfg = config_pericias_classe_v13(slug_classe)
+    universo = universo_pericias_classe(cfg) if cfg else set()
+
+    efetivas: List[str] = []
+    redundantes: List[str] = []
+    trocas_aplicadas: Dict[str, str] = {}
+    ignoradas: List[str] = []
+
+    for slug in beneficio_slugs:
+        redundante = bool(universo and slug in treinados and slug in universo)
+        if redundante:
+            redundantes.append(slug)
+            if permite and slug in trocas:
+                para = trocas[slug]
+                efetivas.append(para)
+                trocas_aplicadas[slug] = para
+            else:
+                ignoradas.append(slug)
+        else:
+            efetivas.append(slug)
+
+    meta: Dict[str, Any] = {
+        "permite_troca": permite,
+        "redundantes": redundantes,
+        "efetivas": efetivas,
+        "trocas_aplicadas": trocas_aplicadas,
+        "ignoradas_redundantes": ignoradas,
+        "universo_classe": sorted(universo),
+    }
+    return efetivas, meta
+
+
+def contar_vagas_pericias_extra_origem_resolvidas(
+    slug_origem: str,
+    beneficios: Any,
+    treinados: set[str],
+    slug_classe: str,
+    origem_trocas: Any = None,
+) -> int:
+    """Vagas extras de origem após resolver trocas (redundante sem troca não conta)."""
+    efetivas, _ = resolver_pericias_origem_efetivas(
+        slug_origem,
+        beneficios,
+        treinados,
+        slug_classe,
+        origem_trocas,
+    )
+    return len(efetivas)
+
+
+def validar_trocas_pericia_origem(
+    slug_origem: str,
+    beneficios: Any,
+    origem_trocas: Any,
+    slug_classe: str,
+    pericias: Any,
+) -> tuple[bool, str]:
+    """Valida mapa ``origem_trocas_pericia`` para origens Heróis de Arton."""
+    from app.games.tormenta.rules.pericias_classe_t20 import (
+        config_pericias_classe_v13,
+        slugs_pericias_treinadas,
+        universo_pericias_classe,
+    )
+
+    if not slug_origem:
+        return True, ""
+
+    beneficio_slugs = slugs_pericias_de_beneficios_origem(beneficios)
+    if not beneficio_slugs:
+        return True, ""
+
+    trocas = _normalizar_mapa_trocas_pericia(origem_trocas)
+    permite = origem_permite_troca_pericia(slug_origem)
+    if trocas and not permite:
+        return False, "Esta origem não permite trocar perícia já treinada."
+
+    for de in trocas:
+        if de not in beneficio_slugs:
+            return (
+                False,
+                f"Troca inválida: '{de}' não é um benefício de perícia escolhido.",
+            )
+
+    treinados = slugs_pericias_treinadas(
+        pericias if isinstance(pericias, list) else [],
+        REGRA_VERSAO_V13,
+    )
+    efetivas, meta = resolver_pericias_origem_efetivas(
+        slug_origem,
+        beneficios,
+        treinados,
+        slug_classe,
+        trocas,
+    )
+    cfg = config_pericias_classe_v13(slug_classe)
+    universo = universo_pericias_classe(cfg) if cfg else set()
+
+    for slug in beneficio_slugs:
+        if slug not in trocas:
+            continue
+        if not (universo and slug in treinados and slug in universo):
+            return (
+                False,
+                f"Troca de '{slug.replace('_', ' ')}' só é permitida quando "
+                "a perícia já está treinada pela classe.",
+            )
+        para = trocas[slug]
+        if para == slug:
+            return False, "A perícia de troca deve ser diferente da original."
+        if cfg and para not in universo:
+            return (
+                False,
+                f"Perícia de troca '{para.replace('_', ' ')}' deve ser da "
+                "lista de perícias de classe.",
+            )
+        if para in treinados:
+            return (
+                False,
+                f"Perícia de troca '{para.replace('_', ' ')}' já está treinada.",
+            )
+
+    if len(efetivas) != len(set(efetivas)):
+        return False, "Perícias efetivas da origem não podem se repetir."
+
+    if meta.get("ignoradas_redundantes") and permite:
+        # Redundante sem troca: permitido (benefício não gera vaga extra).
+        pass
+
+    return True, ""
+
+
 def _linha_pericia_padrao(meta: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "nome": str(meta.get("nome", "") or "").strip(),
@@ -237,16 +403,33 @@ def aplicar_pericias_origem_em_lista(
     beneficios: Any,
     *,
     regra_versao: str = REGRA_VERSAO_V13,
+    slug_origem: Optional[str] = None,
+    slug_classe: Optional[str] = None,
+    origem_trocas: Any = None,
 ) -> List[Dict[str, Any]]:
-    """Marca treinado=true nas perícias escolhidas como benefício de origem v1.3."""
-    slugs = slugs_pericias_de_beneficios_origem(beneficios)
+    """Marca treinado=true nas perícias efetivas do benefício de origem v1.3."""
+    from app.games.tormenta.rules.pericias_classe_t20 import slugs_pericias_treinadas
+
     lista: List[Dict[str, Any]] = (
         [dict(p) for p in pericias if isinstance(p, dict)]
         if isinstance(pericias, list)
         else []
     )
-    if not slugs:
+    beneficio_slugs = slugs_pericias_de_beneficios_origem(beneficios)
+    if not beneficio_slugs:
         return lista
+
+    treinados = slugs_pericias_treinadas(lista, regra_versao)
+    if slug_origem and slug_classe:
+        slugs, _ = resolver_pericias_origem_efetivas(
+            slug_origem,
+            beneficios,
+            treinados,
+            slug_classe,
+            origem_trocas,
+        )
+    else:
+        slugs = beneficio_slugs
 
     norm_to_idx: Dict[str, int] = {}
     for i, row in enumerate(lista):
@@ -291,5 +474,9 @@ def sincronizar_pericias_origem_ficha_json(
         fj.get("pericias"),
         beneficios,
         regra_versao=REGRA_VERSAO_V13,
+        slug_origem=str(fj.get("origem_slug") or "").strip().lower() or None,
+        slug_classe=str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
+        or None,
+        origem_trocas=fj.get("origem_trocas_pericia"),
     )
     return fj

@@ -1123,6 +1123,8 @@ def validar_pericias_criacao_mb(
         regra_versao=rv,
         humano_versatil=body.humano_versatil,
         origem_beneficios=body.origem_beneficios,
+        origem_slug=(body.origem_slug or "").strip().lower() or None,
+        origem_trocas_pericia=body.origem_trocas_pericia,
     )
     return TormentaPericiasValidarCriacaoResponse(**data)
 

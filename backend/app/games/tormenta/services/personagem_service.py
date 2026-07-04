@@ -23,6 +23,7 @@ from app.games.tormenta.rules.melhor_amigo_t20 import validar_melhor_amigo_ficha
 from app.games.tormenta.rules.origens_t20 import (
     sincronizar_pericias_origem_ficha_json,
     validar_beneficios_origem,
+    validar_trocas_pericia_origem,
 )
 from app.games.tormenta.rules.pericias_criacao_t20 import validar_pericias_ficha
 from app.games.tormenta.rules.progressao_pv_t20 import (
@@ -351,6 +352,9 @@ class TormentaPersonagemService:
             regra_versao=regra_versao_de_ficha(ficha_json),
             humano_versatil=ficha_json.get("humano_versatil"),
             origem_beneficios=ficha_json.get("origem_beneficios"),
+            origem_slug=str(ficha_json.get("origem_slug") or "").strip().lower()
+            or None,
+            origem_trocas_pericia=ficha_json.get("origem_trocas_pericia"),
         )
         if not ok:
             raise DadosInvalidos(motivo or "Orçamento de perícias MB inválido.")
@@ -394,6 +398,16 @@ class TormentaPersonagemService:
         ok, motivo = validar_beneficios_origem(slug, ben)
         if not ok:
             raise DadosInvalidos(motivo or "Benefícios de origem inválidos.")
+        cls = str(fj.get("tormenta_classe_mb_slug") or "").strip().lower()
+        ok_troca, motivo_troca = validar_trocas_pericia_origem(
+            slug,
+            ben,
+            fj.get("origem_trocas_pericia"),
+            cls,
+            fj.get("pericias"),
+        )
+        if not ok_troca:
+            raise DadosInvalidos(motivo_troca or "Troca de perícia de origem inválida.")
 
     @staticmethod
     def _validar_devocao_v13(
@@ -553,7 +567,7 @@ class TormentaPersonagemService:
         if not nome:
             raise DadosInvalidos("Nome e obrigatorio")
 
-        ficha_prep = self._preparar_ficha_json_tormenta(payload.ficha_json)
+        ficha_prep = dict(payload.ficha_json or {})
 
         self._validar_atributos_criacao_jogador(
             payload.tipo,
@@ -583,6 +597,8 @@ class TormentaPersonagemService:
             ficha_prep,
             divindade_rotulo=(payload.divindade or "").strip() or None,
         )
+
+        ficha_prep = self._preparar_ficha_json_tormenta(ficha_prep)
 
         pv_max = payload.pv_max
         pv_atual = payload.pv_atual if payload.pv_atual is not None else pv_max
@@ -652,9 +668,6 @@ class TormentaPersonagemService:
         fj = dict(ent.ficha_json or {})
         if "ficha_json" in data and data["ficha_json"] is not None:
             fj.update(dict(data["ficha_json"] or {}))
-        fj = self._preparar_ficha_json_tormenta(fj)
-        if "ficha_json" in data:
-            data["ficha_json"] = fj
         if self._patch_mexe_compra_pontos(data):
             self._validar_atributos_criacao_jogador(
                 tipo_final,
@@ -676,6 +689,9 @@ class TormentaPersonagemService:
             self._validar_melhor_amigo_v13(tipo_final, fj)
             div_rot = str(data.get("divindade", ent.divindade) or "").strip() or None
             self._validar_devocao_v13(tipo_final, fj, divindade_rotulo=div_rot)
+        fj = self._preparar_ficha_json_tormenta(fj)
+        if "ficha_json" in data:
+            data["ficha_json"] = fj
 
         if "foto_url" in data:
             raw = data["foto_url"]
