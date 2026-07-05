@@ -590,7 +590,6 @@
             <div class="t20-ficha-dialog__panel">
                 <div class="t20-ficha-dialog__head">
                     <h2 class="t20-ficha-dialog__titulo">Dados da ficha</h2>
-                    <button type="button" class="tormenta-btn" id="btnT20FecharDialog" autofocus>Fechar</button>
                 </div>
                 <div class="t20-ficha-dialog__body">
                     <div class="t20-ficha-secao">
@@ -1085,6 +1084,12 @@
                         <div class="t20-ficha-field"><label for="f_outros_j">Outros jogadores</label><input id="f_outros_j" /></div>
                         <div class="t20-ficha-field"><label for="f_notas">Notas</label><textarea id="f_notas" rows="2"></textarea></div>
                     </div>
+                </div>
+                <div class="t20-ficha-dialog__foot">
+                    <p class="t20-hint t20-ficha-dialog__foot-hint"><strong>Salvar</strong> grava no servidor, confirma e volta à ficha. <strong>Fechar</strong> só fecha o diálogo (com aviso se houver alterações não gravadas).</p>
+                    <p id="t20DialogSaveStatus" class="t20-dialog-save-status" hidden role="alert"></p>
+                    <button type="button" class="tormenta-btn" id="btnT20FecharDialog">Fechar</button>
+                    <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnT20SalvarDialog">Salvar</button>
                 </div>
             </div>
         </dialog>
@@ -1705,6 +1710,83 @@
 
     function q(id) { return document.getElementById(id); }
 
+    /** Confirmação estilizada (Promise). Monta dentro do diálogo aberto para ficar acima do `<dialog>`. */
+    function t20Confirmar(opcoes) {
+        const opts = opcoes && typeof opcoes === 'object' ? opcoes : {};
+        return new Promise((resolve) => {
+            const editDlg = q('t20EditarFichaDialog');
+            const host =
+                editDlg && editDlg.open
+                    ? editDlg.querySelector('.t20-ficha-dialog__panel') || editDlg
+                    : document.body;
+            const overlay = document.createElement('div');
+            overlay.className = 't20-confirm-overlay';
+            overlay.setAttribute('role', 'alertdialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.innerHTML =
+                '<div class="t20-confirm-box">' +
+                '<div class="t20-confirm-head">' +
+                `<span class="t20-confirm-icone">${opts.icone || '⚠️'}</span>` +
+                `<h3 class="t20-confirm-titulo">${opts.titulo || 'Confirmar'}</h3>` +
+                '</div>' +
+                `<p class="t20-confirm-texto">${opts.texto || 'Deseja continuar?'}</p>` +
+                '<div class="t20-confirm-botoes">' +
+                `<button type="button" class="tormenta-btn" data-t20-confirm-cancel>${opts.textoCancelar || 'Cancelar'}</button>` +
+                `<button type="button" class="tormenta-btn tormenta-btn--primary${opts.perigo ? ' t20-confirm-btn--perigo' : ''}" data-t20-confirm-ok>${opts.textoConfirmar || 'Confirmar'}</button>` +
+                '</div></div>';
+            host.appendChild(overlay);
+            const btnOk = overlay.querySelector('[data-t20-confirm-ok]');
+            const btnCancel = overlay.querySelector('[data-t20-confirm-cancel]');
+            let fechando = false;
+            const fechar = (ok) => {
+                if (fechando) return;
+                fechando = true;
+                document.removeEventListener('keydown', onKey);
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    if (overlay.parentNode) overlay.remove();
+                    resolve(!!ok);
+                }, 180);
+            };
+            const onKey = (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    fechar(false);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    fechar(true);
+                }
+            };
+            btnCancel.addEventListener('click', () => fechar(false));
+            btnOk.addEventListener('click', () => fechar(true));
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) fechar(false);
+            });
+            document.addEventListener('keydown', onKey);
+            requestAnimationFrame(() => {
+                overlay.classList.add('show');
+                if (btnOk) btnOk.focus();
+            });
+        });
+    }
+
+    async function t20PosSalvarRefresh(fidAfter) {
+        if (!fidAfter) return;
+        try {
+            await t20FlushInventarioDomSemVinculo(fidAfter);
+        } catch (eFl) {
+            console.warn(eFl);
+        }
+        try {
+            const pGr = await svc.obter(fidAfter);
+            __t20LastPersonagemPayload = pGr;
+            t20AplicarInventarioDasColunasApi(pGr);
+            t20AtualizarGrimorioElegibilidadeVisual(pGr);
+        } catch (eBg) {
+            console.warn(eBg);
+        }
+    }
+
     /** Bônus de iniciativa na ficha: só o modificador de DES (MB; o 1d20 é na jogada). */
     function t20IniciativaTotalMbFromSheet() {
         return modificadorAtributoT20((q('fichaDesResumo') && q('fichaDesResumo').value) || '10');
@@ -2089,6 +2171,198 @@
             el.addEventListener('input', () => {
                 t20SyncResDialogToSheet();
             });
+        });
+    }
+
+    /** Snapshot dos campos do diálogo «Dados da ficha» ao abrir (detecta alterações não gravadas no servidor). */
+    let __t20DialogEditSnapshot = '';
+
+    function t20SnapshotDialogEditState() {
+        const dlg = q('t20EditarFichaDialog');
+        if (!dlg) return '';
+        const fields = {};
+        dlg.querySelectorAll('input, select, textarea').forEach((el) => {
+            if (!el.id || el.type === 'hidden') return;
+            fields[el.id] = el.type === 'checkbox' ? !!el.checked : String(el.value ?? '');
+        });
+        return JSON.stringify(fields);
+    }
+
+    function t20DialogEditTemAlteracoes() {
+        if (!__t20DialogEditSnapshot) return false;
+        return t20SnapshotDialogEditState() !== __t20DialogEditSnapshot;
+    }
+
+    function t20MarcarDialogEditSnapshot() {
+        __t20DialogEditSnapshot = t20SnapshotDialogEditState();
+    }
+
+    function t20SyncDialogEditParaSheet() {
+        t20SyncAttrsDialogToSheet();
+        t20SyncResDialogToSheet();
+        t20SyncDeslTamDialogToSheet();
+    }
+
+    function t20ValidarAntesSalvarFicha() {
+        const nome = q('f_nome').value.trim();
+        if (!nome) {
+            return { ok: false, msg: 'Informe o nome do personagem.' };
+        }
+        t20SyncDialogEditParaSheet();
+        const comp = validarCompraPontosJogador();
+        if (!comp.ok) return comp;
+        const vr = validarEscolhasRacaMb();
+        if (!vr.ok) return vr;
+        const slugCl = (q('f_classe_mb') && q('f_classe_mb').value) || '';
+        if (
+            window.T20RegraVersao &&
+            window.T20RegraVersao.isV13(getRegraVersaoAtiva()) &&
+            slugCl === 'arcanista'
+        ) {
+            const cam = q('f_arcanista_caminho') && q('f_arcanista_caminho').value;
+            if (!cam || !String(cam).trim()) {
+                return {
+                    ok: false,
+                    msg: 'Arcanista (v1.3): escolha o caminho Bruxo, Mago ou Feiticeiro.',
+                };
+            }
+        }
+        if (window.T20MelhorAmigoV13 && window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())) {
+            const vma = window.T20MelhorAmigoV13.validar();
+            if (!vma.ok) return vma;
+        }
+        if (window.T20DuendeV13 && window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())) {
+            const vdu = window.T20DuendeV13.validar();
+            if (!vdu.ok) return vdu;
+        }
+        if (window.T20MulticlasseV13 && window.T20MulticlasseV13.validarAntesSalvar) {
+            const vcv = window.T20MulticlasseV13.validarAntesSalvar();
+            if (!vcv.ok) return vcv;
+        }
+        return { ok: true };
+    }
+
+    function t20LimparDialogSaveStatus() {
+        const el = q('t20DialogSaveStatus');
+        if (!el) return;
+        el.textContent = '';
+        el.hidden = true;
+    }
+
+    function t20MostrarDialogSaveErro(msg) {
+        const texto = String(msg || 'Erro ao salvar.').trim();
+        Toast.error(texto);
+        const el = q('t20DialogSaveStatus');
+        if (!el) return;
+        el.textContent = texto;
+        el.hidden = false;
+    }
+
+    async function t20SalvarFicha(opts = {}) {
+        const fecharDialog = !!opts.fecharDialog;
+        t20LimparDialogSaveStatus();
+        const validacao = t20ValidarAntesSalvarFicha();
+        if (!validacao.ok) {
+            t20MostrarDialogSaveErro(validacao.msg);
+            return { ok: false };
+        }
+        if (cadastroDashboardOrigem && !travaRacaClasseMb) {
+            forcarTravarNoProximoExtrair = true;
+        }
+        const body = payloadBase();
+        forcarTravarNoProximoExtrair = false;
+        const fid = q('fichaId').value;
+        const btnDlg = q('btnT20SalvarDialog');
+        const btnMain = q('btnSalvar');
+        const lblSalvarDlg = btnDlg ? btnDlg.textContent : '';
+        if (btnDlg) {
+            btnDlg.disabled = true;
+            btnDlg.classList.add('t20-btn-salvando');
+            btnDlg.textContent = 'Salvando…';
+        }
+        if (btnMain) btnMain.disabled = true;
+        try {
+            if (fid) {
+                await svc.atualizar(fid, body);
+                if (!fecharDialog) Toast.success('Ficha salva.');
+            } else {
+                const criado = await svc.criar(body);
+                q('fichaId').value = String(criado.id);
+                history.replaceState(null, '', `ficha-personagem.html?id=${criado.id}`);
+                q('f_status').textContent = `Editando #${criado.id}`;
+                if (!fecharDialog) Toast.success('Ficha criada.');
+            }
+            if (cadastroDashboardOrigem) {
+                travaRacaClasseMb = true;
+                aplicarTravaRacaClasseMb();
+            }
+            const fidAfter = q('fichaId').value;
+            t20MarcarDialogEditSnapshot();
+            if (fecharDialog) {
+                t20LimparDialogSaveStatus();
+                t20SyncDialogEditParaSheet();
+                const dlg = q('t20EditarFichaDialog');
+                if (dlg && typeof dlg.close === 'function') dlg.close();
+                atualizarTagsHeader();
+                atualizarResumoClasseMb();
+                setTimeout(() => {
+                    Toast.success(
+                        'Alterações salvas com sucesso! Suas informações foram gravadas no servidor.',
+                    );
+                }, 80);
+                if (fidAfter) void t20PosSalvarRefresh(fidAfter);
+            } else if (fidAfter) {
+                await t20PosSalvarRefresh(fidAfter);
+            }
+            return { ok: true };
+        } catch (e) {
+            t20MostrarDialogSaveErro(e.message || 'Erro ao salvar');
+            return { ok: false };
+        } finally {
+            if (btnDlg) {
+                btnDlg.classList.remove('t20-btn-salvando');
+                btnDlg.textContent = lblSalvarDlg || 'Salvar';
+            }
+            t20AtualizarEstadoBotaoSalvar();
+        }
+    }
+
+    async function t20FecharDialogEditarFicha() {
+        const dlg = q('t20EditarFichaDialog');
+        if (!dlg) return;
+        const fechar = () => {
+            t20SyncDialogEditParaSheet();
+            if (typeof dlg.close === 'function') dlg.close();
+            atualizarTagsHeader();
+            t20AtualizarEstadoBotaoSalvar();
+        };
+        if (t20DialogEditTemAlteracoes()) {
+            const ok = await t20Confirmar({
+                icone: '💾',
+                titulo: 'Alterações não gravadas',
+                texto:
+                    'Há alterações que ainda não foram salvas no servidor. Fechar mesmo assim? As mudanças permanecem visíveis na ficha até você usar Salvar.',
+                textoCancelar: 'Continuar editando',
+                textoConfirmar: 'Fechar sem salvar',
+                perigo: true,
+            });
+            if (!ok) return;
+        }
+        fechar();
+    }
+
+    function t20BindDialogEditSaveCloseOnce() {
+        const dlg = q('t20EditarFichaDialog');
+        if (!dlg || dlg.dataset.t20DlgSaveClose) return;
+        dlg.dataset.t20DlgSaveClose = '1';
+        dlg.addEventListener('cancel', (e) => {
+            if (!t20DialogEditTemAlteracoes()) return;
+            e.preventDefault();
+            void t20FecharDialogEditarFicha();
+        });
+        dlg.addEventListener('close', () => {
+            t20SyncDialogEditParaSheet();
+            atualizarTagsHeader();
         });
     }
 
@@ -2997,8 +3271,22 @@
         return out;
     }
 
+    /** Bases de compra gravadas na ficha (preferir sobre recálculo final − racial). */
+    function basesCompraAtributosEfetivas() {
+        if (fichaBasesAtributos && typeof fichaBasesAtributos === 'object') {
+            const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+            const out = {};
+            ATTR_KEYS.forEach((a) => {
+                const v = fichaBasesAtributos[a];
+                out[a] = Number.isFinite(Number(v)) ? Math.trunc(Number(v)) : isV13 ? 0 : 10;
+            });
+            return out;
+        }
+        return atributosCompraAtuais();
+    }
+
     function somaCustosCompraAtributos() {
-        const bases = atributosCompraAtuais();
+        const bases = basesCompraAtributosEfetivas();
         let soma = 0;
         for (const a of ATTR_KEYS) {
             const c = custoCompraAtributo(bases[a]);
@@ -3012,7 +3300,7 @@
         const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
         if (tipo !== 'jogador') return { ok: true };
         const met = getMetodoGeracaoFicha();
-        const bases = atributosCompraAtuais();
+        const bases = basesCompraAtributosEfetivas();
         if (met === '4d6') {
             const AG = window.T20AtributosGeracao;
             if (!AG) return { ok: true };
@@ -3046,7 +3334,7 @@
 
     function t20AtualizarEstadoBotaoSalvar() {
         const btn = q('btnSalvar');
-        if (!btn) return;
+        const btnDlg = q('btnT20SalvarDialog');
         const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
         let bloqueado = false;
         let title = '';
@@ -3096,8 +3384,14 @@
                 }
             }
         }
-        btn.disabled = bloqueado;
-        btn.title = title || 'Gravar personagem no servidor';
+        const titleFinal = title || 'Gravar personagem no servidor';
+        if (btn) {
+            btn.disabled = bloqueado;
+            btn.title = titleFinal;
+        }
+        if (btnDlg) {
+            btnDlg.title = bloqueado ? titleFinal : 'Gravar dados da ficha no servidor';
+        }
     }
 
     function validarEscolhasRacaMb() {
@@ -6894,7 +7188,7 @@
                 return out;
             })(),
             metodo_geracao_atributos: getMetodoGeracaoFicha(),
-            atributos_compra: atributosCompraAtuais(),
+            atributos_compra: basesCompraAtributosEfetivas(),
             pericias: coletarPericias(),
             oficio_especialidades:
                 window.T20OficioEspecialidadesV13 && window.T20OficioEspecialidadesV13.lerLista
@@ -7526,6 +7820,7 @@
         t20SyncAttrsSheetToDialog();
         t20SyncResSheetToDialog();
         t20SyncDeslTamSheetToDialog();
+        __t20DialogEditSnapshot = '';
     }
     window.t20PreencherFormPersonagem = preencherForm;
     window.getRegraVersaoAtiva = getRegraVersaoAtiva;
@@ -7788,20 +8083,28 @@
         const dlg = q('t20EditarFichaDialog');
         const btnEdit = q('btnT20EditarFicha');
         const btnFechar = q('btnT20FecharDialog');
+        const btnSalvarDlg = q('btnT20SalvarDialog');
+        t20BindDialogEditSaveCloseOnce();
         if (btnEdit && dlg && typeof dlg.showModal === 'function') {
             btnEdit.addEventListener('click', () => {
                 t20SyncAttrsSheetToDialog();
                 t20SyncResSheetToDialog();
                 t20SyncDeslTamSheetToDialog();
+                t20LimparDialogSaveStatus();
                 dlg.showModal();
+                t20MarcarDialogEditSnapshot();
+                t20AtualizarEstadoBotaoSalvar();
                 atualizarTagsHeader();
             });
         }
         if (btnFechar && dlg) {
             btnFechar.addEventListener('click', () => {
-                t20SyncDeslTamDialogToSheet();
-                if (typeof dlg.close === 'function') dlg.close();
-                atualizarTagsHeader();
+                t20FecharDialogEditarFicha();
+            });
+        }
+        if (btnSalvarDlg) {
+            btnSalvarDlg.addEventListener('click', async () => {
+                await t20SalvarFicha({ fecharDialog: true });
             });
         }
 
@@ -7970,13 +8273,14 @@
             btnLimparPrep.addEventListener('click', async () => {
                 const pid = q('fichaId') && q('fichaId').value;
                 if (!pid) return;
-                if (
-                    !window.confirm(
-                        'Remover todas as magias preparadas hoje? (Novo dia / descanso longo MB)'
-                    )
-                ) {
-                    return;
-                }
+                const ok = await t20Confirmar({
+                    icone: '📜',
+                    titulo: 'Limpar magias preparadas',
+                    texto: 'Remover todas as magias preparadas hoje? (Novo dia / descanso longo MB)',
+                    textoConfirmar: 'Limpar preparadas',
+                    perigo: true,
+                });
+                if (!ok) return;
                 try {
                     const res = await new TormentaPersonagemService().limparPreparadas(pid);
                     Toast.success(
@@ -8199,97 +8503,7 @@
         atualizarTagsHeader();
 
         q('btnSalvar').addEventListener('click', async () => {
-            const nome = q('f_nome').value.trim();
-            if (!nome) {
-                Toast.error('Informe o nome do personagem.');
-                return;
-            }
-            t20SyncAttrsDialogToSheet();
-            t20SyncResDialogToSheet();
-            t20SyncDeslTamDialogToSheet();
-            const comp = validarCompraPontosJogador();
-            if (!comp.ok) {
-                Toast.error(comp.msg);
-                return;
-            }
-            const vr = validarEscolhasRacaMb();
-            if (!vr.ok) {
-                Toast.error(vr.msg);
-                return;
-            }
-            const slugCl = (q('f_classe_mb') && q('f_classe_mb').value) || '';
-            if (
-                window.T20RegraVersao &&
-                window.T20RegraVersao.isV13(getRegraVersaoAtiva()) &&
-                slugCl === 'arcanista'
-            ) {
-                const cam = q('f_arcanista_caminho') && q('f_arcanista_caminho').value;
-                if (!cam || !String(cam).trim()) {
-                    Toast.error('Arcanista (v1.3): escolha o caminho Bruxo, Mago ou Feiticeiro.');
-                    return;
-                }
-            }
-            if (window.T20MelhorAmigoV13 && window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())) {
-                const vma = window.T20MelhorAmigoV13.validar();
-                if (!vma.ok) {
-                    Toast.error(vma.msg);
-                    return;
-                }
-            }
-            if (window.T20DuendeV13 && window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())) {
-                const vdu = window.T20DuendeV13.validar();
-                if (!vdu.ok) {
-                    Toast.error(vdu.msg);
-                    return;
-                }
-            }
-            if (window.T20MulticlasseV13 && window.T20MulticlasseV13.validarAntesSalvar) {
-                const vcv = window.T20MulticlasseV13.validarAntesSalvar();
-                if (!vcv.ok) {
-                    Toast.error(vcv.msg);
-                    return;
-                }
-            }
-            if (cadastroDashboardOrigem && !travaRacaClasseMb) {
-                forcarTravarNoProximoExtrair = true;
-            }
-            const body = payloadBase();
-            forcarTravarNoProximoExtrair = false;
-            const fid = q('fichaId').value;
-            try {
-                if (fid) {
-                    await svc.atualizar(fid, body);
-                    Toast.success('Ficha salva.');
-                } else {
-                    const criado = await svc.criar(body);
-                    q('fichaId').value = String(criado.id);
-                    history.replaceState(null, '', `ficha-personagem.html?id=${criado.id}`);
-                    q('f_status').textContent = `Editando #${criado.id}`;
-                    Toast.success('Ficha criada.');
-                }
-                if (cadastroDashboardOrigem) {
-                    travaRacaClasseMb = true;
-                    aplicarTravaRacaClasseMb();
-                }
-                const fidAfter = q('fichaId').value;
-                if (fidAfter) {
-                    try {
-                        await t20FlushInventarioDomSemVinculo(fidAfter);
-                    } catch (eFl) {
-                        console.warn(eFl);
-                    }
-                    try {
-                        const pGr = await svc.obter(fidAfter);
-                        __t20LastPersonagemPayload = pGr;
-                        t20AplicarInventarioDasColunasApi(pGr);
-                        t20AtualizarGrimorioElegibilidadeVisual(pGr);
-                    } catch (eBg) {
-                        console.warn(eBg);
-                    }
-                }
-            } catch (e) {
-                Toast.error(e.message || 'Erro ao salvar');
-            }
+            await t20SalvarFicha();
         });
 
         const btnEx = q('btnT20ExportarJson');
@@ -8310,15 +8524,18 @@
         const inpIm = q('t20ImportFichaFile');
         if (btnIm && inpIm) {
             btnIm.addEventListener('click', () => {
-                if (
-                    !window.confirm(
+                void t20Confirmar({
+                    icone: '📥',
+                    titulo: 'Importar ficha JSON',
+                    texto:
                         'Importar substitui os dados desta ficha no navegador (não grava no servidor até você clicar em Salvar). Continuar?',
-                    )
-                ) {
-                    return;
-                }
-                inpIm.value = '';
-                inpIm.click();
+                    textoConfirmar: 'Importar',
+                    perigo: true,
+                }).then((ok) => {
+                    if (!ok) return;
+                    inpIm.value = '';
+                    inpIm.click();
+                });
             });
             inpIm.addEventListener('change', () => {
                 const f = inpIm.files && inpIm.files[0];

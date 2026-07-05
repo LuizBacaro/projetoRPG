@@ -24,7 +24,12 @@ class TormentaPersonagemService {
             let d = e.detail;
             if (Array.isArray(d)) {
                 d = d
-                    .map((x) => (typeof x === 'string' ? x : x.msg || JSON.stringify(x)))
+                    .map((x) => {
+                        if (typeof x === 'string') return x;
+                        const loc = Array.isArray(x.loc) ? x.loc.filter((p) => p !== 'body').join('.') : '';
+                        const msg = x.msg || JSON.stringify(x);
+                        return loc ? `${loc}: ${msg}` : msg;
+                    })
                     .join('; ');
             } else if (d && typeof d === 'object') {
                 d = JSON.stringify(d);

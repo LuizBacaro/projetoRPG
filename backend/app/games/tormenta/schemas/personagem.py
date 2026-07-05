@@ -136,12 +136,12 @@ class TormentaPersonagemUpdate(BaseModel):
 
     foto_url: Optional[str] = Field(None, max_length=2048)
 
-    for_valor: Optional[int] = Field(None, ge=0, le=99)
-    des_valor: Optional[int] = Field(None, ge=0, le=99)
-    con_valor: Optional[int] = Field(None, ge=0, le=99)
-    int_valor: Optional[int] = Field(None, ge=0, le=99)
-    sab_valor: Optional[int] = Field(None, ge=0, le=99)
-    car_valor: Optional[int] = Field(None, ge=0, le=99)
+    for_valor: Optional[int] = Field(None, ge=-99, le=99)
+    des_valor: Optional[int] = Field(None, ge=-99, le=99)
+    con_valor: Optional[int] = Field(None, ge=-99, le=99)
+    int_valor: Optional[int] = Field(None, ge=-99, le=99)
+    sab_valor: Optional[int] = Field(None, ge=-99, le=99)
+    car_valor: Optional[int] = Field(None, ge=-99, le=99)
 
     pv_max: Optional[int] = Field(None, ge=0, le=9999)
     pv_atual: Optional[int] = Field(None, ge=-9999, le=9999)

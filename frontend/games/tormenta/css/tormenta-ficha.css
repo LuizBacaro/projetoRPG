@@ -1595,6 +1595,7 @@
 }
 
 .t20-ficha-dialog__panel {
+    position: relative;
     background: var(--t20-white);
     border: 2px solid var(--t20-ink);
     border-radius: 8px;
@@ -2140,6 +2141,13 @@
     background: rgba(255, 252, 245, 0.98);
 }
 
+.t20-ficha-dialog__foot-hint {
+    flex: 1 1 12rem;
+    margin: 0;
+    align-self: center;
+    font-size: 0.72rem;
+}
+
 .t20-ficha-comp-bd {
     max-height: min(78vh, 36rem);
 }
@@ -2265,4 +2273,98 @@
 .t20-obrig-pag {
     font-weight: normal;
     opacity: 0.85;
+}
+
+/* Confirmações estilizadas (substituem window.confirm na ficha T20) */
+.t20-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100010;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(20, 12, 8, 0.55);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.t20-ficha-dialog__panel > .t20-confirm-overlay {
+    position: absolute;
+    border-radius: 6px;
+}
+
+.t20-confirm-overlay.show {
+    opacity: 1;
+}
+
+.t20-confirm-box {
+    width: min(100%, 22rem);
+    padding: 1.1rem 1.15rem 1rem;
+    border: 2px solid var(--t20-ink);
+    border-radius: 8px;
+    background: var(--t20-white);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+    transform: translateY(-8px);
+    transition: transform 0.2s ease;
+}
+
+.t20-confirm-overlay.show .t20-confirm-box {
+    transform: translateY(0);
+}
+
+.t20-confirm-head {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.65rem;
+}
+
+.t20-confirm-icone {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.t20-confirm-titulo {
+    margin: 0;
+    font-family: var(--t20-font-medieval);
+    font-size: 1.05rem;
+    color: var(--t20-red-deep);
+}
+
+.t20-confirm-texto {
+    margin: 0 0 1rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--t20-muted);
+}
+
+.t20-confirm-botoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem;
+}
+
+.tormenta-btn.t20-confirm-btn--perigo {
+    background: linear-gradient(180deg, var(--t20-red-bright), var(--t20-red));
+    border-color: var(--t20-red-deep);
+    color: #fff;
+}
+
+.tormenta-btn[disabled].t20-btn-salvando {
+    opacity: 0.72;
+    cursor: wait;
+}
+
+.t20-dialog-save-status {
+    flex: 1 1 100%;
+    margin: 0;
+    padding: 0.45rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    border: 1px solid rgba(139, 0, 0, 0.35);
+    background: rgba(139, 0, 0, 0.08);
+    color: var(--t20-red-deep);
 }
