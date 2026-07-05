@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260621header" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260704penarm" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260629s47" />
 </head>
 <body class="tormenta-ficha-body">
@@ -1087,6 +1087,7 @@
                 </div>
                 <div class="t20-ficha-dialog__foot">
                     <p class="t20-hint t20-ficha-dialog__foot-hint"><strong>Salvar</strong> grava no servidor, confirma e volta à ficha. <strong>Fechar</strong> só fecha o diálogo (com aviso se houver alterações não gravadas).</p>
+                    <p id="t20DialogPericiasAviso" class="t20-dialog-pericias-aviso" hidden role="status"></p>
                     <p id="t20DialogSaveStatus" class="t20-dialog-save-status" hidden role="alert"></p>
                     <button type="button" class="tormenta-btn" id="btnT20FecharDialog">Fechar</button>
                     <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnT20SalvarDialog">Salvar</button>
@@ -1568,7 +1569,7 @@
 <script src="/games/tormenta/js/t20-multiclasse-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614subirnivel"></script>
-<script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260704orc"></script>
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
 <script src="/games/tormenta/js/t20-origens-v13.js?v=20260629dev"></script>
@@ -2203,7 +2204,7 @@
         t20SyncDeslTamDialogToSheet();
     }
 
-    function t20ValidarAntesSalvarFicha() {
+    async function t20ValidarAntesSalvarFicha() {
         const nome = q('f_nome').value.trim();
         if (!nome) {
             return { ok: false, msg: 'Informe o nome do personagem.' };
@@ -2213,6 +2214,22 @@
         if (!comp.ok) return comp;
         const vr = validarEscolhasRacaMb();
         if (!vr.ok) return vr;
+        const tipo = (q('f_tipo') && q('f_tipo').value) || 'jogador';
+        if (
+            tipo === 'jogador' &&
+            typeof window.t20ValidarPericiasOrcamentoMb === 'function'
+        ) {
+            const vp = await window.t20ValidarPericiasOrcamentoMb();
+            if (!vp.ok) {
+                return {
+                    ok: false,
+                    msg:
+                        vp.msg ||
+                        window.__t20PericiasOrcamentoMsg ||
+                        'Orçamento de perícias inválido.',
+                };
+            }
+        }
         const slugCl = (q('f_classe_mb') && q('f_classe_mb').value) || '';
         if (
             window.T20RegraVersao &&
@@ -2261,7 +2278,7 @@
     async function t20SalvarFicha(opts = {}) {
         const fecharDialog = !!opts.fecharDialog;
         t20LimparDialogSaveStatus();
-        const validacao = t20ValidarAntesSalvarFicha();
+        const validacao = await t20ValidarAntesSalvarFicha();
         if (!validacao.ok) {
             t20MostrarDialogSaveErro(validacao.msg);
             return { ok: false };
@@ -3259,6 +3276,8 @@
         return Math.floor(n);
     }
 
+    window.valorFinalAtributoCampo = valorFinalAtributoCampo;
+
     function atributosCompraAtuais() {
         const rDel = racialDeltasMap();
         const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
@@ -3349,7 +3368,9 @@
                 title = r.msg;
             } else if (window.__t20PericiasOrcamentoOk === false) {
                 bloqueado = true;
-                title = window.__t20PericiasOrcamentoMsg || 'Orçamento de perícias MB inválido.';
+                title =
+                    window.__t20PericiasOrcamentoMsg ||
+                    'Orçamento de perícias inválido — ajuste treinadas ou INT antes de salvar.';
             } else if (
                 window.T20RegraVersao &&
                 window.T20RegraVersao.isV13(getRegraVersaoAtiva()) &&
@@ -3390,9 +3411,29 @@
             btn.title = titleFinal;
         }
         if (btnDlg) {
+            btnDlg.disabled = bloqueado;
             btnDlg.title = bloqueado ? titleFinal : 'Gravar dados da ficha no servidor';
         }
+        t20AtualizarAvisoPericiasDialog();
     }
+
+    function t20AtualizarAvisoPericiasDialog() {
+        const aviso = q('t20DialogPericiasAviso');
+        const dlg = q('t20EditarFichaDialog');
+        if (!aviso) return;
+        const dlgAberto = dlg && dlg.open;
+        const invalido = window.__t20PericiasOrcamentoOk === false;
+        const msg = window.__t20PericiasOrcamentoMsg || '';
+        if (dlgAberto && invalido && msg) {
+            aviso.textContent = msg;
+            aviso.hidden = false;
+            return;
+        }
+        aviso.textContent = '';
+        aviso.hidden = true;
+    }
+
+    window.t20AtualizarAvisoPericiasDialog = t20AtualizarAvisoPericiasDialog;
 
     function validarEscolhasRacaMb() {
         const slug = (q('f_raca_select') && q('f_raca_select').value) || '';
@@ -6590,6 +6631,23 @@
             .replace(/'/g, '&#39;');
     }
 
+    function renderCelulaPenArm(row) {
+        const penArmRegra = row.penalidade_armadura === true;
+        const penArmChecked = penArmRegra ? ' checked' : '';
+        const isAtletismo = row.slug === 'atletismo';
+        const armInput = isAtletismo
+            ? '<input type="checkbox" class="p-pen-arm t20-sr-only" tabindex="-1" aria-hidden="true" />'
+            : `<input type="checkbox" class="p-pen-arm" title="Perícia sujeita a penalidade de armadura (Tabela 2-1)"${penArmChecked} />`;
+        const armBadge = penArmRegra
+            ? '<span class="t20-pen-arm-badge" title="Penalidade de armadura (Tabela 2-1)">A</span>'
+            : '';
+        const natCtrl = isAtletismo
+            ? '<label class="t20-pen-nat" title="Natação — aplica penalidade de armadura"><input type="checkbox" class="p-pen-natacao" /><span class="t20-pen-nat-ico" aria-hidden="true">🏊</span><span class="t20-sr-only">Natação</span></label>'
+            : '';
+        const cls = isAtletismo ? ' t20-pen-arm-cell--atletismo' : '';
+        return `<td class="t20-pen-arm-cell${cls}"><div class="t20-pen-arm-stack"><div class="t20-pen-arm-row">${armInput}${armBadge}<span class="p-pen-val t20-pen-val" aria-live="polite"></span></div>${natCtrl}</div></td>`;
+    }
+
     function montarTabelaPericias() {
         const tb = document.querySelector('#tblPericias tbody');
         if (!PERICIAS_META.length) {
@@ -6605,12 +6663,6 @@
                     : '';
             const soTreinaRegra = row.somente_treinado === true;
             const soTreinaChecked = soTreinaRegra ? ' checked' : '';
-            const penArmRegra = row.penalidade_armadura === true;
-            const penArmChecked = penArmRegra ? ' checked' : '';
-            const isAtletismo = row.slug === 'atletismo';
-            const natCtrl = isAtletismo
-                ? '<label class="t20-pen-nat" title="Natação — aplica penalidade de armadura"><input type="checkbox" class="p-pen-natacao" /> 🏊</label>'
-                : '';
             const cellNome =
                 nome === '—'
                     ? '<input class="nome-livre t20-input" placeholder="Outra" />'
@@ -6624,7 +6676,7 @@
                 <td><input type="number" class="p-mod t20-input" value="0" /></td>
                 <td><input type="number" class="p-out t20-input" value="0" /></td>
                 <td><input type="checkbox" class="p-so-treina" title="Somente treinado (regra base; pode desmarcar se a mesa permitir)"${soTreinaChecked} /></td>
-                <td class="t20-pen-arm-cell"><input type="checkbox" class="p-pen-arm" title="Perícia sujeita a penalidade de armadura (Tabela 2-1)"${penArmChecked} /><span class="p-pen-val t20-pen-val" aria-live="polite"></span>${natCtrl}</td>
+                ${renderCelulaPenArm(row)}
             </tr>`;
         }).join('');
         tb.querySelectorAll('.p-pen-natacao').forEach((cb) => {
@@ -6854,12 +6906,15 @@
 
     function t20AtualizarUiPericiasVersao() {
         const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
+        const tbl = q('tblPericias');
+        if (tbl) tbl.classList.toggle('t20-pericias-table--v13', isV13);
         const thTotal = q('thPericiasTotal');
         const thMod = q('thPericiasMod');
         const hint = q('fichaPericiasHint');
         if (thTotal) thTotal.style.display = isV13 ? 'none' : '';
         if (thMod) thMod.textContent = isV13 ? 'Atrib.' : 'Mod';
-        document.querySelectorAll('#tblPericias tbody tr').forEach((tr) => {
+        document.querySelectorAll('#tblPericias tbody tr').forEach((tr, idx) => {
+            const meta = PERICIAS_META[idx] || {};
             const totInp = tr.querySelector('.p-total');
             if (totInp) {
                 const td = totInp.closest('td');
@@ -6867,8 +6922,22 @@
                 if (isV13) totInp.value = '0';
             }
             const penArm = tr.querySelector('.p-pen-arm');
-            if (penArm) penArm.disabled = isV13;
-            const penNat = tr.querySelector('.p-pen-nat');
+            const badge = tr.querySelector('.t20-pen-arm-badge');
+            if (penArm) {
+                if (isV13) {
+                    penArm.disabled = true;
+                    penArm.classList.add('t20-sr-only');
+                    penArm.tabIndex = -1;
+                    penArm.setAttribute('aria-hidden', 'true');
+                } else {
+                    penArm.disabled = false;
+                    penArm.classList.remove('t20-sr-only');
+                    penArm.removeAttribute('aria-hidden');
+                    penArm.tabIndex = 0;
+                }
+            }
+            if (badge) badge.hidden = !isV13 || meta.penalidade_armadura !== true;
+            const penNat = tr.querySelector('.t20-pen-nat');
             if (penNat) penNat.style.display = isV13 ? '' : 'none';
         });
         if (hint) {
@@ -8094,6 +8163,7 @@
                 dlg.showModal();
                 t20MarcarDialogEditSnapshot();
                 t20AtualizarEstadoBotaoSalvar();
+                t20AtualizarAvisoPericiasDialog();
                 atualizarTagsHeader();
             });
         }

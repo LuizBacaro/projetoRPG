@@ -524,11 +524,21 @@
     color: var(--t20-red);
 }
 
-.t20-pericias-table input[type="checkbox"] {
+.t20-pericias-table input[type="checkbox"].p-treinado,
+.t20-pericias-table input[type="checkbox"].p-so-treina {
     width: 1rem;
     height: 1rem;
     margin: 0 auto;
     display: block;
+    accent-color: var(--t20-red);
+}
+
+.t20-pericias-table input[type="checkbox"].p-pen-arm:not(.t20-sr-only),
+.t20-pericias-table input[type="checkbox"].p-pen-natacao {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    display: inline-block;
     accent-color: var(--t20-red);
 }
 
@@ -540,28 +550,94 @@
 }
 
 .t20-pen-arm-cell {
-    white-space: nowrap;
+    vertical-align: middle;
+    min-width: 3.1rem;
+    text-align: center;
+}
+
+.t20-pen-arm-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    padding: 0.08rem 0;
+}
+
+.t20-pen-arm-row {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    min-height: 1.15rem;
+}
+
+.t20-pen-arm-badge {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 3px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--t20-ink);
+    background: rgba(224, 234, 252, 0.92);
+    border: 1px solid rgba(15, 23, 42, 0.35);
+    flex-shrink: 0;
+}
+
+.t20-pericias-table--v13 .t20-pen-arm-badge {
+    display: inline-flex;
 }
 
 .t20-pen-val {
     display: inline-block;
-    min-width: 1.5rem;
-    margin-left: 0.15rem;
+    min-width: 1.35rem;
     font-size: 0.72rem;
     font-weight: 700;
     color: #b00020;
+    line-height: 1.1;
+    text-align: center;
 }
 
 .t20-pen-nat {
     display: inline-flex;
     align-items: center;
-    margin-left: 0.2rem;
-    font-size: 0.72rem;
+    justify-content: center;
+    gap: 0.12rem;
+    margin: 0;
+    padding: 0.06rem 0.2rem;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    line-height: 1;
     cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.t20-pen-nat:hover {
+    background: rgba(224, 234, 252, 0.75);
 }
 
 .t20-pen-nat input {
-    margin: 0 0.15rem 0 0;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.t20-pen-nat-ico {
+    font-size: 0.82rem;
+    line-height: 1;
+}
+
+.t20-pen-arm-cell--atletismo .t20-pen-arm-row {
+    min-height: 0;
+}
+
+.t20-pen-arm-cell--atletismo .p-pen-val:empty {
+    display: none;
 }
 
 #f_pts_compra.t20-compra-pontos-ok {
@@ -571,6 +647,23 @@
 #f_pts_compra.t20-compra-pontos-erro {
     color: #b00020;
     font-weight: 700;
+}
+
+#fichaPericiasOrcamento.t20-compra-pontos-erro {
+    color: #b00020;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.t20-dialog-pericias-aviso {
+    margin: 0 0 0.55rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 0.82rem;
+    line-height: 1.35;
 }
 
 /* Blocos texto grandes (planilha 1) */
