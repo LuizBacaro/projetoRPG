@@ -7815,7 +7815,7 @@
         q('f_tipo').value = p.tipo || 'jogador';
         q('f_tipo').disabled = !isMestre;
         document.getElementById('wrapTipo').classList.toggle('is-mestre', isMestre);
-        q('f_jogador').value = AuthService.getNome();
+        q('f_jogador').value = (p.dono_nome || '').trim() || AuthService.getNome();
         q('f_raca').value = p.raca || '';
         const sp = splitClasseNivel(p.classe_nivel, p.nivel);
         q('f_classe_só').value = sp.classe;
@@ -8072,7 +8072,7 @@
         t20AtualizarUiPericiasVersao();
         renderIdiomasListaDoCampo();
         destacarPericiasClasseMb();
-        q('f_jogador').value = AuthService.getNome();
+        q('f_jogador').value = (p.dono_nome || '').trim() || AuthService.getNome();
 
         t20BindDialogAttrsEdicaoOnce();
         t20BindDialogResEdicaoOnce();

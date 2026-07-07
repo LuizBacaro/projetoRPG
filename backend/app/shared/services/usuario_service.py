@@ -4,12 +4,16 @@ SRP: regras de negócio para usuários
 DIP: depende da abstração do repositório
 """
 
+import logging
+
 from fastapi import HTTPException, status
 
 from ..core.security import hash_senha, verificar_senha
 from ..models.usuario import PerfilUsuario, Usuario
 from ..ports import UsuarioRepositoryProtocol
 from ..schemas.usuario import UsuarioCreate, UsuarioUpdate
+
+logger = logging.getLogger(__name__)
 
 
 class UsuarioService:
@@ -45,10 +49,20 @@ class UsuarioService:
             )
         return usuario
 
+    def _avisar_perfil_mestre_legado(self, email: str, operacao: str) -> None:
+        logger.warning(
+            "Perfil mestre atribuído via admin (%s) para %s — legado; "
+            "preferir campanha com mestre_id (ADR 0005).",
+            operacao,
+            email,
+        )
+
     def criar(
         self, dados: UsuarioCreate, usuario_responsavel: str = "sistema"
     ) -> Usuario:
         self._validar_email_unico(dados.email)
+        if dados.perfil == PerfilUsuario.MESTRE:
+            self._avisar_perfil_mestre_legado(dados.email, "criar")
         usuario = Usuario(
             perfil=dados.perfil,
             nome=dados.nome,
@@ -84,6 +98,11 @@ class UsuarioService:
         if dados.nome is not None:
             usuario.nome = dados.nome
         if dados.perfil is not None:
+            if (
+                dados.perfil == PerfilUsuario.MESTRE
+                and usuario.perfil != PerfilUsuario.MESTRE
+            ):
+                self._avisar_perfil_mestre_legado(usuario.email, "atualizar")
             usuario.perfil = dados.perfil
         if dados.senha is not None:
             usuario.senha_hash = hash_senha(dados.senha)

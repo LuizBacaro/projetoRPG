@@ -26,6 +26,7 @@ from app.games.dnd5e.schemas.personagem import (
     normalizar_ficha_para_gravacao,
 )
 from app.repositories.base import commit_with_rollback
+from app.shared.core.usuario_lookup import enriquecer_dono_nome_em_entidades
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.shared.models.usuario import PerfilUsuario, Usuario
 
@@ -104,10 +105,12 @@ class Dnd5ePersonagemService:
         )
 
     def _to_response(self, ent: Dnd5ePersonagem) -> Dnd5ePersonagemResponse:
+        enriquecer_dono_nome_em_entidades(self.repo.db, [ent])
         ph = self._personagem_habilidades(ent)
         return Dnd5ePersonagemResponse(
             id=ent.id,
             dono_id=ent.dono_id,
+            dono_nome=getattr(ent, "dono_nome", "") or "",
             tipo=ent.tipo,
             nome=ent.nome,
             jogador_nome=ent.jogador_nome,

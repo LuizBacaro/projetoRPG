@@ -100,6 +100,26 @@ def test_registro_publico_cria_jogador(auth_db):
     assert payload["ativo"] is True
 
 
+def test_registro_publico_ignora_perfil_mestre_legado(auth_db):
+    """Clientes antigos que ainda enviam perfil=mestre recebem conta jogador."""
+    _, test_db_factory = auth_db
+    client = _build_client(test_db_factory)
+
+    response = client.post(
+        "/api/v1/auth/registro",
+        json={
+            "nome": "Legado Mestre",
+            "email": "legado_mestre@example.com",
+            "senha": "SenhaSegura123",
+            "perfil": "mestre",
+            "campanha_nome": "Campanha que não deve ser criada",
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json()["perfil"] == "jogador"
+
+
 def test_registro_publico_rejeita_email_duplicado(auth_db):
     test_db, test_db_factory = auth_db
     _create_user(test_db, email="duplicado@example.com", senha="SenhaSegura123")

@@ -1432,7 +1432,7 @@
     async function carregarPersonagem(p) {
         if (p.tipo) tipoCriacao = p.tipo;
         el('f5e_nome').value = p.nome || '';
-        el('f5e_jogador').value = p.jogador_nome || nomeJogadorLogado();
+        el('f5e_jogador').value = (p.dono_nome || '').trim() || p.jogador_nome || nomeJogadorLogado();
         el('f5e_nivel').value = p.nivel;
         el('f5e_xp').value = p.experiencia;
         xpSalvoNoServidor = parseInt(p.experiencia, 10) || 0;

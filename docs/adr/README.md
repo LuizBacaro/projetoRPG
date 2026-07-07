@@ -14,3 +14,4 @@ Nome sugerido: `0001-titulo-em-kebab-case.md` (incrementar o prefixo numérico).
 | [0002](0002-tormenta-ficha-json-evolucao.md) | Tormenta: SQL + `ficha_json` |
 | [0003](0003-dnd5e-fonte-dados-5e-database.md) | D&D 5E: catálogos vs 5e-database |
 | [0004](0004-fase5-apps-separados-adiado.md) | Fase 5 `apps/` separados: adiado |
+| [0005](0005-rbac-campanha-vs-perfil-global.md) | RBAC: mestre por campanha vs perfil global |

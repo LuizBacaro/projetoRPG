@@ -14,8 +14,11 @@ from starlette.requests import Request
 
 from ...games.dnd5e.models.personagem import Dnd5ePersonagem
 from ...games.dnd35.models.ataque import MagiaSlot
+from ...games.dnd35.models.campanha import Campanha
 from ...games.dnd35.models.combatente import Combatente
+from ...games.gurps.models.campanha import GurpsCampanha
 from ...games.gurps.models.personagem import GurpsPersonagem
+from ...games.tormenta.models.campanha import TormentaCampanha
 from ...games.tormenta.models.personagem import TormentaPersonagem
 from ...shared.core.config import settings
 from ...shared.core.database import get_db
@@ -509,6 +512,144 @@ def requer_mestre_ou_admin(
     return usuario
 
 
+def usuario_e_mestre_global_ou_admin(usuario) -> bool:
+    """Perfil global legado (mestre/admin). Ver ADR 0005 — preferir campanha."""
+    return usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE)
+
+
+def usuario_tem_campanha_dnd35_como_mestre(usuario_id: int, db: Session) -> bool:
+    row = (
+        db.query(Campanha.id).filter(Campanha.mestre_id == usuario_id).limit(1).scalar()
+    )
+    return isinstance(row, int)
+
+
+def usuario_e_mestre_dnd35(usuario, db: Session) -> bool:
+    """Mestre na mesa D&D 3.5: admin, perfil global mestre ou dono de campanha."""
+    if usuario_e_mestre_global_ou_admin(usuario):
+        return True
+    return usuario_tem_campanha_dnd35_como_mestre(usuario.id, db)
+
+
+def requer_mestre_dnd35_ou_admin(
+    request: Request,
+    usuario=Depends(get_usuario_atual),
+    db: Session = Depends(get_db),
+) -> Usuario:
+    """Dependency: Arena e ferramentas de GM D&D 3.5 (campanha ou perfil legado)."""
+    if usuario_e_mestre_dnd35(usuario, db):
+        logger.info(f"✅ Mestre D&D 3.5 autorizado: {usuario.email}")
+        return usuario
+
+    log_security_event(
+        "rbac_mestre_dnd35",
+        "denied",
+        request=request,
+        user_email=usuario.email,
+        reason="no_campaign_or_role",
+        level=logging.WARNING,
+    )
+    logger.warning(
+        f"⚠️  Acesso negado — sem campanha como mestre (D&D 3.5): {usuario.email}"
+    )
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=(
+            "Crie uma campanha em D&D 3.5 para usar a Arena e ferramentas de mestre"
+        ),
+    )
+
+
+def usuario_tem_campanha_tormenta_como_mestre(usuario_id: int, db: Session) -> bool:
+    row = (
+        db.query(TormentaCampanha.id)
+        .filter(TormentaCampanha.mestre_id == usuario_id)
+        .limit(1)
+        .scalar()
+    )
+    return isinstance(row, int)
+
+
+def usuario_e_mestre_tormenta(usuario, db: Session) -> bool:
+    """Mestre na mesa Tormenta: admin, perfil global mestre ou dono de campanha."""
+    if usuario_e_mestre_global_ou_admin(usuario):
+        return True
+    return usuario_tem_campanha_tormenta_como_mestre(usuario.id, db)
+
+
+def requer_mestre_tormenta_ou_admin(
+    request: Request,
+    usuario=Depends(get_usuario_atual),
+    db: Session = Depends(get_db),
+) -> Usuario:
+    """Dependency: Arena e ferramentas de GM Tormenta (campanha ou perfil legado)."""
+    if usuario_e_mestre_tormenta(usuario, db):
+        logger.info(f"✅ Mestre Tormenta autorizado: {usuario.email}")
+        return usuario
+
+    log_security_event(
+        "rbac_mestre_tormenta",
+        "denied",
+        request=request,
+        user_email=usuario.email,
+        reason="no_campaign_or_role",
+        level=logging.WARNING,
+    )
+    logger.warning(
+        f"⚠️  Acesso negado — sem campanha como mestre (Tormenta): {usuario.email}"
+    )
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=(
+            "Crie uma campanha em Tormenta para usar a Arena e ferramentas de mestre"
+        ),
+    )
+
+
+def usuario_tem_campanha_gurps_como_mestre(usuario_id: int, db: Session) -> bool:
+    row = (
+        db.query(GurpsCampanha.id)
+        .filter(GurpsCampanha.mestre_id == usuario_id)
+        .limit(1)
+        .scalar()
+    )
+    return isinstance(row, int)
+
+
+def usuario_e_mestre_gurps(usuario, db: Session) -> bool:
+    """Mestre na mesa GURPS: admin, perfil global mestre ou dono de campanha."""
+    if usuario_e_mestre_global_ou_admin(usuario):
+        return True
+    return usuario_tem_campanha_gurps_como_mestre(usuario.id, db)
+
+
+def requer_mestre_gurps_ou_admin(
+    request: Request,
+    usuario=Depends(get_usuario_atual),
+    db: Session = Depends(get_db),
+) -> Usuario:
+    """Dependency: Arena e ferramentas de GM GURPS (campanha ou perfil legado)."""
+    if usuario_e_mestre_gurps(usuario, db):
+        logger.info(f"✅ Mestre GURPS autorizado: {usuario.email}")
+        return usuario
+
+    log_security_event(
+        "rbac_mestre_gurps",
+        "denied",
+        request=request,
+        user_email=usuario.email,
+        reason="no_campaign_or_role",
+        level=logging.WARNING,
+    )
+    logger.warning(
+        f"⚠️  Acesso negado — sem campanha como mestre (GURPS): {usuario.email}"
+    )
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Crie uma campanha em GURPS para usar a Arena e ferramentas de mestre",
+    )
+
+
 def requer_jogador(request: Request, usuario=Depends(get_usuario_atual)) -> Usuario:
     """
     Dependency: Valida se é JOGADOR (ou superior).
@@ -558,7 +699,7 @@ def requer_dono_ou_admin_combatente(
             detail=f"Combatente {combatente_id} não encontrado",
         )
 
-    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+    if usuario_e_mestre_dnd35(usuario, db):
         return usuario
 
     if combatente.dono_id != usuario.id:
@@ -602,7 +743,7 @@ def requer_dono_ou_admin_slot_magia(
             detail=f"Combatente {slot.combatente_id} não encontrado",
         )
 
-    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+    if usuario_e_mestre_dnd35(usuario, db):
         return usuario
 
     if combatente.dono_id != usuario.id:
@@ -629,7 +770,7 @@ def validar_combatentes_do_usuario(
     db: Session,
 ) -> None:
     """Valida lista de combatentes para operações em lote (ex.: iniciar combate)."""
-    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+    if usuario_e_mestre_dnd35(usuario, db):
         return
 
     ids_unicos = list(set(combatente_ids))
@@ -669,7 +810,7 @@ def validar_gurps_personagens_do_usuario(
     db: Session,
 ) -> None:
     """Valida lista de personagens GURPS para operações em lote (ex.: combate)."""
-    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+    if usuario_e_mestre_gurps(usuario, db):
         return
 
     ids_unicos = list(set(personagem_ids))
@@ -711,7 +852,7 @@ def validar_tormenta_personagens_do_usuario(
     db: Session,
 ) -> None:
     """Valida lista de personagens Tormenta para operações em lote (ex.: combate na Arena)."""
-    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+    if usuario_e_mestre_tormenta(usuario, db):
         return
 
     ids_unicos = list(set(personagem_ids))
@@ -763,7 +904,7 @@ def requer_dono_ou_admin_gurps_personagem(
             detail=f"Personagem {personagem_id} não encontrado",
         )
 
-    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+    if usuario_e_mestre_gurps(usuario, db):
         return usuario
 
     if personagem.dono_id != usuario.id:
@@ -839,7 +980,7 @@ def requer_dono_ou_admin_tormenta_personagem(
             detail=f"Personagem {personagem_id} não encontrado",
         )
 
-    if usuario.perfil in (PerfilUsuario.ADMINISTRADOR, PerfilUsuario.MESTRE):
+    if usuario_e_mestre_tormenta(usuario, db):
         return usuario
 
     if personagem.dono_id != usuario.id:

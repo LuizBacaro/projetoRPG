@@ -21,11 +21,7 @@ from app.games.tormenta.services.campanha_service import TormentaCampanhaService
 from app.games.tormenta.services.sessao_campanha_service import (
     TormentaSessaoCampanhaService,
 )
-from app.shared.core.deps import (
-    get_usuario_atual,
-    requer_game_tormenta,
-    requer_mestre_ou_admin,
-)
+from app.shared.core.deps import get_usuario_atual, requer_game_tormenta
 from app.shared.exceptions.custom_exceptions import ArenaBaseException
 from app.shared.models.usuario import Usuario
 
@@ -55,7 +51,7 @@ def listar_sessoes(
     service: TormentaSessaoCampanhaService = Depends(
         get_tormenta_sessao_campanha_service
     ),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     rows = service.listar_para_mestre_ou_admin(usuario.perfil, usuario.id)
     return [TormentaSessaoCampanhaResponse.model_validate(s) for s in rows]
@@ -71,7 +67,7 @@ def criar_sessao(
     service: TormentaSessaoCampanhaService = Depends(
         get_tormenta_sessao_campanha_service
     ),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     try:
         s = service.criar(
@@ -93,7 +89,7 @@ def atualizar_sessao(
     service: TormentaSessaoCampanhaService = Depends(
         get_tormenta_sessao_campanha_service
     ),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     try:
         s = service.atualizar(
@@ -114,7 +110,7 @@ def deletar_sessao(
     service: TormentaSessaoCampanhaService = Depends(
         get_tormenta_sessao_campanha_service
     ),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     try:
         service.deletar(usuario.id, usuario.perfil, sessao_id)
@@ -126,7 +122,7 @@ def deletar_sessao(
 @router.get("", response_model=list[TormentaCampanhaResponse])
 def listar(
     service: TormentaCampanhaService = Depends(get_tormenta_campanha_service),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     rows = service.listar_para_mestre_ou_admin(usuario.perfil, usuario.id)
     return [TormentaCampanhaResponse.model_validate(c) for c in rows]
@@ -140,7 +136,7 @@ def listar(
 def criar(
     payload: TormentaCampanhaCreate,
     service: TormentaCampanhaService = Depends(get_tormenta_campanha_service),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     try:
         c = service.criar(
@@ -159,7 +155,7 @@ def atualizar(
     campanha_id: int,
     payload: TormentaCampanhaUpdate,
     service: TormentaCampanhaService = Depends(get_tormenta_campanha_service),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     try:
         c = service.atualizar(
@@ -180,7 +176,7 @@ def associar_personagens(
     campanha_id: int,
     payload: TormentaCampanhaAssociarPersonagens,
     service: TormentaCampanhaService = Depends(get_tormenta_campanha_service),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     try:
         c = service.associar_personagens(
@@ -195,7 +191,7 @@ def associar_personagens(
 def deletar(
     campanha_id: int,
     service: TormentaCampanhaService = Depends(get_tormenta_campanha_service),
-    usuario: Usuario = Depends(requer_mestre_ou_admin),
+    usuario: Usuario = Depends(get_usuario_atual),
 ):
     try:
         service.deletar(campanha_id, usuario.id, usuario.perfil)

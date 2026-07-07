@@ -1033,10 +1033,12 @@
         recalcularCustosPericiasVisiveis();
     }
 
-    function preencherJogador() {
+    function preencherJogador(personagem) {
         const u = typeof AuthService !== 'undefined' ? AuthService.getUsuario() : null;
         const inp = el('#fg_jogador_leitura');
-        if (inp) inp.value = u?.nome || u?.email || '—';
+        if (!inp) return;
+        const dono = String(personagem?.dono_nome || '').trim();
+        inp.value = dono || u?.nome || u?.email || '—';
     }
 
     async function carregar() {
@@ -1052,6 +1054,7 @@
         }
         try {
             const p = await svc.obter(Number(id));
+            preencherJogador(p);
             preencher(p);
             el('#fg_titulo_sub').textContent = p.nome ? ` — ${p.nome}` : '';
             const ex = p.extras && typeof p.extras === 'object' ? p.extras : {};

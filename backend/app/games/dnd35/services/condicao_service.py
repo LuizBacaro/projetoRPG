@@ -10,6 +10,7 @@ from app.games.dnd35.ports import (
     CombatenteRepositoryProtocol,
     CondicaoRepositoryProtocol,
 )
+from app.shared.core.deps import usuario_e_mestre_dnd35
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
@@ -304,13 +305,7 @@ class CondicaoService:
                 "Usuário autenticado é obrigatório", status_code=401
             )
 
-        perfil = getattr(usuario, "perfil", None)
-        if perfil in (
-            PerfilUsuario.ADMINISTRADOR,
-            PerfilUsuario.ADMINISTRADOR.value,
-            PerfilUsuario.MESTRE,
-            PerfilUsuario.MESTRE.value,
-        ):
+        if usuario_e_mestre_dnd35(usuario, self.combatente_repo.db):
             return
 
         if combatente.dono_id != getattr(usuario, "id", None):

@@ -332,10 +332,13 @@
                 .map((p) => {
                     const classe =
                         p.ficha && p.ficha.classe_slug ? p.ficha.classe_slug : '—';
+                    const nomeExibicao = (p.dono_nome && String(p.tipo || '').toLowerCase() === 'jogador')
+                        ? `${p.nome} — ${p.dono_nome}`
+                        : p.nome;
                     return `
                 <tr>
                     <td>${celulaFoto(p)}</td>
-                    <td>${escapeHtml(p.nome)}</td>
+                    <td>${escapeHtml(nomeExibicao)}</td>
                     <td>${badgeTipo(p.tipo)}</td>
                     <td>${p.nivel} <span class="cell-muted">(${escapeHtml(classe)})</span></td>
                     <td>${p.strength} (${fmtMod(p.strength_mod)})</td>

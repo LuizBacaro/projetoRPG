@@ -17,6 +17,7 @@ from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_game_gurps,
+    requer_mestre_gurps_ou_admin,
     validar_gurps_personagens_do_usuario,
 )
 from app.shared.exceptions.custom_exceptions import ArenaBaseException
@@ -25,7 +26,7 @@ from app.shared.models.usuario import Usuario
 router = APIRouter(
     prefix="/gurps/combate",
     tags=["GURPS — Combate"],
-    dependencies=[Depends(requer_game_gurps)],
+    dependencies=[Depends(requer_game_gurps), Depends(requer_mestre_gurps_ou_admin)],
 )
 
 

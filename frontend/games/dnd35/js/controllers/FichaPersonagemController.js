@@ -621,6 +621,7 @@ export class FichaPersonagemController {
         const alinhamento = document.getElementById('fichaAlinhamento');
         const divindade   = document.getElementById('fichaDivindade');
         const campanha    = document.getElementById('fichaCampanha');
+        const jogador     = document.getElementById('fichaJogador');
         const dominios    = document.getElementById('fichaDominios');
         const placeholder = document.getElementById('fichaFotoPlaceholder');
         const foto        = document.getElementById('fichaFoto');
@@ -639,6 +640,11 @@ export class FichaPersonagemController {
         if (alinhamento) alinhamento.textContent = `Alinhamento: ${this.combatente.alinhamento || '—'}`;
         if (divindade) divindade.textContent = `Divindade: ${this._formatarDivindadeExibicao(this.combatente.divindade)}`;
         if (campanha) campanha.textContent = `Campanha: ${this.combatente.campanha_nome || '—'}`;
+        if (jogador) {
+            const dono = String(this.combatente.dono_nome || '').trim();
+            jogador.textContent = dono ? `Jogador: ${dono}` : 'Jogador: —';
+            jogador.style.display = dono ? '' : 'none';
+        }
         if (dominios) {
             if (this._ehClasseClerigo()) {
                 dominios.textContent = `Domínios: ${this._formatarDominios(this.combatente.dominios)}`;
