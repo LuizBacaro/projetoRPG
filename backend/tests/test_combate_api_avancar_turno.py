@@ -1,7 +1,14 @@
+from types import SimpleNamespace
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.games.dnd35.api.v1.combate import router as combate_router
+from app.shared.core.deps import get_usuario_atual, requer_mestre_dnd35_ou_admin
+
+_MESTRE_TESTE = SimpleNamespace(
+    id=1, perfil="mestre", email="combate@test", nome="Mestre Teste"
+)
 
 
 class _FakeCombate:
@@ -73,11 +80,11 @@ def test_avancar_turno_endpoint_delega_condicoes_e_retorna_status():
     fake_combate_service = _FakeCombateService(fake_combate)
 
     from app.core.dependencies import get_combate_service, get_condicao_service
-    from app.shared.core.deps import get_usuario_atual
 
     app.dependency_overrides[get_combate_service] = lambda: fake_combate_service
     app.dependency_overrides[get_condicao_service] = lambda: fake_condicao_service
-    app.dependency_overrides[get_usuario_atual] = lambda: object()
+    app.dependency_overrides[get_usuario_atual] = lambda: _MESTRE_TESTE
+    app.dependency_overrides[requer_mestre_dnd35_ou_admin] = lambda: _MESTRE_TESTE
 
     client = TestClient(app)
     response = client.post(
@@ -109,11 +116,11 @@ def test_avancar_turno_endpoint_resumido_nao_retorna_combatentes():
     fake_combate_service = _FakeCombateService(fake_combate)
 
     from app.core.dependencies import get_combate_service, get_condicao_service
-    from app.shared.core.deps import get_usuario_atual
 
     app.dependency_overrides[get_combate_service] = lambda: fake_combate_service
     app.dependency_overrides[get_condicao_service] = lambda: fake_condicao_service
-    app.dependency_overrides[get_usuario_atual] = lambda: object()
+    app.dependency_overrides[get_usuario_atual] = lambda: _MESTRE_TESTE
+    app.dependency_overrides[requer_mestre_dnd35_ou_admin] = lambda: _MESTRE_TESTE
 
     client = TestClient(app)
     response = client.post(
