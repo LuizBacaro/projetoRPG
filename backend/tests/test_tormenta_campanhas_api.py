@@ -9,6 +9,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.games.tormenta.api.v1.campanhas import router as tormenta_campanhas_router
+from app.games.tormenta.api.v1.personagens import router as tormenta_personagens_router
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.shared.core.database import Base, get_db
 from app.shared.core.deps import get_usuario_atual
@@ -64,6 +65,7 @@ def _usuario(u: Usuario) -> SimpleNamespace:
 def _client(SessionLocal, usuario: SimpleNamespace) -> TestClient:
     app = FastAPI()
     app.include_router(tormenta_campanhas_router, prefix="/api/v1")
+    app.include_router(tormenta_personagens_router, prefix="/api/v1")
 
     def _override_get_db():
         db = SessionLocal()
@@ -151,3 +153,142 @@ def test_mestre_cria_lista_e_sessao(tormenta_mestre_e_jogador_db):
     rv = c_j.get("/api/v1/tormenta/campanhas/sessoes/visiveis")
     assert rv.status_code == 200
     assert any(s["id"] == sid for s in rv.json())
+
+
+def test_mestre_de_campanha_lista_somente_proprios_sem_campanha_id(
+    tormenta_mestre_e_jogador_db,
+):
+    """Dono de campanha (perfil jogador) não vê personagens alheios na aba Combatentes."""
+    SessionLocal, _mestre, jog = tormenta_mestre_e_jogador_db
+    db = SessionLocal()
+    p_jog = TormentaPersonagem(
+        dono_id=jog.id, tipo="jogador", nome="Meu Herói", ficha_json={}
+    )
+    p_outro = TormentaPersonagem(
+        dono_id=_mestre.id, tipo="jogador", nome="Outro Herói", ficha_json={}
+    )
+    db.add_all([p_jog, p_outro])
+    db.commit()
+    db.refresh(p_jog)
+    db.close()
+
+    c_jog = _client(SessionLocal, _usuario(jog))
+    r_camp = c_jog.post(
+        "/api/v1/tormenta/campanhas",
+        json={"nome": "Mesa RBAC", "personagem_ids": [p_jog.id]},
+    )
+    assert r_camp.status_code == 201
+
+    r_list = c_jog.get("/api/v1/tormenta/personagens")
+    assert r_list.status_code == 200
+    nomes = {p["nome"] for p in r_list.json()}
+    assert "Meu Herói" in nomes
+    assert "Outro Herói" not in nomes
+
+
+def test_listar_por_campanha_id_inclui_participantes(tormenta_mestre_e_jogador_db):
+    SessionLocal, _mestre, jog = tormenta_mestre_e_jogador_db
+    db = SessionLocal()
+    p_jog = TormentaPersonagem(
+        dono_id=jog.id, tipo="jogador", nome="Jogador A", ficha_json={}
+    )
+    p_npc = TormentaPersonagem(dono_id=None, tipo="npc", nome="NPC Mesa", ficha_json={})
+    db.add_all([p_jog, p_npc])
+    db.commit()
+    db.refresh(p_jog)
+    db.refresh(p_npc)
+    db.close()
+
+    c_jog = _client(SessionLocal, _usuario(jog))
+    cid = c_jog.post(
+        "/api/v1/tormenta/campanhas",
+        json={"nome": "Mesa Lista", "personagem_ids": [p_jog.id]},
+    ).json()["id"]
+
+    db = SessionLocal()
+    p_npc.campanha_id = cid
+    db.add(p_npc)
+    db.commit()
+    db.close()
+
+    r = c_jog.get(f"/api/v1/tormenta/personagens?campanha_id={cid}")
+    assert r.status_code == 200
+    nomes = {p["nome"] for p in r.json()}
+    assert nomes == {"Jogador A", "NPC Mesa"}
+
+
+def test_criar_monstro_com_campanha_id_vincula_mesa(tormenta_mestre_e_jogador_db):
+    SessionLocal, _mestre, jog = tormenta_mestre_e_jogador_db
+    c_jog = _client(SessionLocal, _usuario(jog))
+    cid = c_jog.post("/api/v1/tormenta/campanhas", json={"nome": "Mesa Criar"}).json()[
+        "id"
+    ]
+
+    r = c_jog.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "nome": "Goblin",
+            "tipo": "monstro",
+            "campanha_id": cid,
+            "for_valor": 10,
+            "des_valor": 10,
+            "con_valor": 10,
+            "int_valor": 10,
+            "sab_valor": 10,
+            "car_valor": 10,
+        },
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["campanha_id"] == cid
+    assert body["tipo"] == "monstro"
+
+
+def test_solicitacao_entrada_campanha_aceite_pelo_mestre(tormenta_mestre_e_jogador_db):
+    SessionLocal, mestre, jog = tormenta_mestre_e_jogador_db
+    db = SessionLocal()
+    p_jog = TormentaPersonagem(
+        dono_id=jog.id, tipo="jogador", nome="Herói Sol", ficha_json={}
+    )
+    db.add(p_jog)
+    db.commit()
+    db.refresh(p_jog)
+    db.close()
+
+    c_mestre = _client(SessionLocal, _usuario(mestre))
+    c_jog = _client(SessionLocal, _usuario(jog))
+
+    cid = c_mestre.post(
+        "/api/v1/tormenta/campanhas", json={"nome": "Mesa Solicitacao"}
+    ).json()["id"]
+
+    r_sol = c_jog.post(
+        "/api/v1/tormenta/campanhas/solicitacoes",
+        json={"campanha_id": cid, "personagem_id": p_jog.id},
+    )
+    assert r_sol.status_code == 201, r_sol.text
+    body = r_sol.json()
+    assert body["status"] == "pendente"
+    sid = body["id"]
+
+    r_pend = c_mestre.get("/api/v1/tormenta/campanhas/solicitacoes/pendentes")
+    assert r_pend.status_code == 200
+    assert any(x["id"] == sid for x in r_pend.json())
+
+    r_ok = c_mestre.post(f"/api/v1/tormenta/campanhas/solicitacoes/{sid}/aceitar")
+    assert r_ok.status_code == 200
+    assert r_ok.json()["status"] == "aceita"
+
+    r_p = c_jog.get(f"/api/v1/tormenta/personagens/{p_jog.id}")
+    assert r_p.json()["campanha_id"] == cid
+
+
+def test_listar_disponiveis_retorna_campanhas(tormenta_mestre_e_jogador_db):
+    SessionLocal, mestre, jog = tormenta_mestre_e_jogador_db
+    c_mestre = _client(SessionLocal, _usuario(mestre))
+    c_jog = _client(SessionLocal, _usuario(jog))
+    c_mestre.post("/api/v1/tormenta/campanhas", json={"nome": "Camp Publica"})
+    r = c_jog.get("/api/v1/tormenta/campanhas/disponiveis")
+    assert r.status_code == 200
+    nomes = {c["nome"] for c in r.json()}
+    assert "Camp Publica" in nomes

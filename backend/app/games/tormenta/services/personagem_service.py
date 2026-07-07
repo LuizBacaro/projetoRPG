@@ -110,6 +110,31 @@ class TormentaPersonagemService:
         )
         return isinstance(row, int)
 
+    @staticmethod
+    def _usuario_e_admin(usuario: Usuario) -> bool:
+        return usuario.perfil == PerfilUsuario.ADMINISTRADOR
+
+    def _assert_mestre_da_campanha(self, usuario: Usuario, campanha_id: int) -> None:
+        if self._usuario_e_admin(usuario):
+            campanha = (
+                self.repo.db.query(TormentaCampanha)
+                .filter(TormentaCampanha.id == campanha_id)
+                .first()
+            )
+        else:
+            campanha = (
+                self.repo.db.query(TormentaCampanha)
+                .filter(
+                    TormentaCampanha.id == campanha_id,
+                    TormentaCampanha.mestre_id == usuario.id,
+                )
+                .first()
+            )
+        if not campanha:
+            raise ArenaBaseException(
+                "Campanha nao encontrada ou sem permissao", status_code=403
+            )
+
     def _resolver_dono(self, usuario: Usuario, tipo: str) -> Optional[int]:
         t = (tipo or "").lower()
         if self._usuario_pode_mestrar_tormenta(usuario):
@@ -529,8 +554,19 @@ class TormentaPersonagemService:
         skip: int = 0,
         limit: int = 100,
         apenas_meus: bool = False,
+        campanha_id: Optional[int] = None,
     ) -> List[TormentaPersonagemResponse]:
-        if not self._usuario_pode_mestrar_tormenta(usuario):
+        if campanha_id is not None:
+            self._assert_mestre_da_campanha(usuario, campanha_id)
+            if tipo:
+                rows = self.repo.get_by_campanha(
+                    campanha_id, tipo, skip=skip, limit=limit
+                )
+            else:
+                rows = self.repo.get_by_campanha(campanha_id, skip=skip, limit=limit)
+            return self._para_respostas(rows)
+
+        if not self._usuario_e_admin(usuario):
             if tipo:
                 rows = self.repo.get_by_owner_and_tipo(
                     usuario.id, tipo, skip=skip, limit=limit
@@ -560,8 +596,13 @@ class TormentaPersonagemService:
         *,
         usuario: Usuario,
         apenas_meus: bool = False,
+        campanha_id: Optional[int] = None,
     ) -> int:
-        if not self._usuario_pode_mestrar_tormenta(usuario):
+        if campanha_id is not None:
+            self._assert_mestre_da_campanha(usuario, campanha_id)
+            return self.repo.count_by_campanha(campanha_id, tipo)
+
+        if not self._usuario_e_admin(usuario):
             if tipo:
                 return self.repo.count_by_owner_and_tipo(usuario.id, tipo)
             return self.repo.count_by_owner(usuario.id)
@@ -641,6 +682,10 @@ class TormentaPersonagemService:
             divindade_rotulo=(payload.divindade or "").strip() or None,
         )
 
+        campanha_id = payload.campanha_id
+        if campanha_id is not None:
+            self._assert_mestre_da_campanha(usuario, campanha_id)
+
         ficha_prep = self._preparar_ficha_json_tormenta(ficha_prep)
 
         pv_max = payload.pv_max
@@ -651,6 +696,7 @@ class TormentaPersonagemService:
 
         ent = TormentaPersonagem(
             dono_id=self._resolver_dono(usuario, payload.tipo),
+            campanha_id=campanha_id,
             tipo=payload.tipo.lower(),
             nome=nome,
             jogador_nome=(payload.jogador_nome or "").strip() or None,

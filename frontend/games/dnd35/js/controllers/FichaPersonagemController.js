@@ -143,6 +143,7 @@ export class FichaPersonagemController {
 
             // ── Renderizar tudo ──
             this.renderizarIdentidade();
+            await this._initCampanhaSolicitacao();
             this._atualizarHeaderNome();
             this.renderizarAtributos();
             this.renderizarDefesa();
@@ -611,6 +612,27 @@ export class FichaPersonagemController {
     // ─────────────────────────────────────────────────────────
     // IDENTIDADE
     // ─────────────────────────────────────────────────────────
+
+    async _initCampanhaSolicitacao() {
+        if (!window.D35FichaCampanhaSolicitacao) return;
+        const tipo = String(this.combatente?.tipo || '').toLowerCase();
+        if (tipo !== 'jogador') return;
+        const uid = window.AuthService?.getUsuario?.()?.id;
+        if (!uid || Number(this.combatente.dono_id) !== Number(uid)) return;
+        await window.D35FichaCampanhaSolicitacao.init({
+            getPersonagemId: () => this.combatente?.id,
+            getCampanhaIdVinculada: () => this.combatente?.campanha_id ?? null,
+            onCampanhaNomeChange: (nome) => {
+                const tag = document.getElementById('fichaCampanha');
+                if (tag && nome) tag.textContent = `Campanha: ${nome}`;
+            },
+            Toast: window.Toast,
+        });
+        const vinculoId = this.combatente?.campanha_id;
+        if (vinculoId && window.D35FichaCampanhaSolicitacao.setVinculadoCampanhaId) {
+            window.D35FichaCampanhaSolicitacao.setVinculadoCampanhaId(vinculoId);
+        }
+    }
 
     renderizarIdentidade() {
         const nomeHeader  = document.getElementById('fichaHeaderNome');

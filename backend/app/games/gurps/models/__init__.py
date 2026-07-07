@@ -1,4 +1,4 @@
-from app.games.gurps.models.campanha import GurpsCampanha
+from app.games.gurps.models.campanha import GurpsCampanha, GurpsCampanhaSolicitacao
 from app.games.gurps.models.combate import GurpsCombate
 from app.games.gurps.models.personagem import (
     GurpsPersonagem,
@@ -10,6 +10,7 @@ from app.games.gurps.models.sessao_campanha import GurpsSessaoCampanha
 
 __all__ = [
     "GurpsCampanha",
+    "GurpsCampanhaSolicitacao",
     "GurpsSessaoCampanha",
     "GurpsCombate",
     "GurpsPersonagem",

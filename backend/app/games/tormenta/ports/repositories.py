@@ -26,6 +26,18 @@ class TormentaPersonagemRepositoryProtocol(Protocol):
 
     def get_all(self, skip: int = 0, limit: int = 100) -> List[TormentaPersonagem]: ...
 
+    def get_by_campanha(
+        self,
+        campanha_id: int,
+        tipo: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[TormentaPersonagem]: ...
+
+    def count_by_campanha(
+        self, campanha_id: int, tipo: Optional[str] = None
+    ) -> int: ...
+
     def count_by_owner_and_tipo(self, dono_id: int, tipo: str) -> int: ...
 
     def count_by_owner(self, dono_id: int) -> int: ...

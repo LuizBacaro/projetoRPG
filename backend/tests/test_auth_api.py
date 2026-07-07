@@ -205,6 +205,41 @@ def test_refresh_sucesso_gera_novos_tokens(auth_db):
     assert payload["usuario"]["email"] == usuario.email
 
 
+def test_refresh_preserva_game_slug_do_refresh_token(auth_db):
+    test_db, test_db_factory = auth_db
+    usuario = _create_user(
+        test_db, email="refresh-game@example.com", senha="SenhaSegura123"
+    )
+    client = _build_client(test_db_factory)
+
+    refresh_token = criar_token(
+        {
+            "sub": usuario.email,
+            "game_slug": "tormenta",
+            "perfil_no_jogo": "jogador",
+            "profile": "jogador",
+        },
+        settings.SECRET_KEY,
+        expires_delta=timedelta(days=1),
+        token_type="refresh",
+    )
+
+    response = client.post(
+        "/api/v1/auth/refresh",
+        json={"refresh_token": refresh_token},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    from app.shared.core.security import decodificar_token
+
+    access_payload = decodificar_token(payload["access_token"], settings.SECRET_KEY)
+    refresh_payload = decodificar_token(payload["refresh_token"], settings.SECRET_KEY)
+    assert access_payload["game_slug"] == "tormenta"
+    assert refresh_payload["game_slug"] == "tormenta"
+    assert access_payload["perfil_no_jogo"] == "jogador"
+
+
 def test_me_retorna_usuario_autenticado(auth_db):
     test_db, test_db_factory = auth_db
     usuario = _create_user(test_db, email="me@example.com", senha="SenhaSegura123")

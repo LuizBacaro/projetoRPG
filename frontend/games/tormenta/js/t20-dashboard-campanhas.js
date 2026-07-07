@@ -18,6 +18,11 @@
         const getLista = typeof opts.getLista === 'function' ? opts.getLista : () => [];
         const recarregarTabela = opts.recarregarTabela || function () {};
         const onCampanhaCriada = typeof opts.onCampanhaCriada === 'function' ? opts.onCampanhaCriada : null;
+        const onSelecionarCampanha =
+            typeof opts.onSelecionarCampanha === 'function' ? opts.onSelecionarCampanha : null;
+        const onSairCampanha = typeof opts.onSairCampanha === 'function' ? opts.onSairCampanha : null;
+        const onCampanhasAtualizadas =
+            typeof opts.onCampanhasAtualizadas === 'function' ? opts.onCampanhasAtualizadas : null;
         const Toast = opts.Toast || global.Toast;
 
         const svc = new global.TormentaCampanhaService();
@@ -77,6 +82,10 @@
                 campanhas = await svc.listar();
                 if (!Array.isArray(campanhas)) campanhas = [];
                 renderListaCampanhas();
+                if (global.__t20CampanhaWorkspace) {
+                    global.__t20CampanhaWorkspace.renderBotoesCampanhas(campanhas);
+                }
+                if (onCampanhasAtualizadas) onCampanhasAtualizadas(campanhas);
             } catch (e) {
                 lista.innerHTML = `<p class="tormenta-cell-muted">${esc(e.message || 'Erro')}</p>`;
             }
@@ -294,13 +303,23 @@
         }
 
         function ativarSubaba(which) {
+            const w = String(which || '');
+            const isMesa = w.startsWith('mesa-');
             document.querySelectorAll('#t20campSubAbas [data-t20camp-sub]').forEach((b) => {
                 b.classList.toggle('t20-camp-subaba-btn--active', b.getAttribute('data-t20camp-sub') === which);
             });
             const c = document.getElementById('t20campSubabaCadastro');
             const s = document.getElementById('t20campSubabaSessoes');
+            const ws = document.getElementById('t20campSubabaWorkspace');
             if (c) c.classList.toggle('t20-camp-subaba-pane--active', which === 'cadastro');
             if (s) s.classList.toggle('t20-camp-subaba-pane--active', which === 'sessoes');
+            if (ws) ws.classList.toggle('t20-camp-subaba-pane--active', isMesa);
+            if (isMesa) {
+                const id = Number(w.replace('mesa-', ''));
+                if (onSelecionarCampanha) onSelecionarCampanha(id);
+            } else if (onSairCampanha) {
+                onSairCampanha();
+            }
         }
 
         document.getElementById('t20campSubAbas')?.addEventListener('click', (ev) => {
@@ -336,18 +355,23 @@
                 return;
             }
             try {
+                let criada = null;
                 if (campanhaEdicaoId) {
                     await svc.atualizar(campanhaEdicaoId, { nome, descricao, personagem_ids: ids });
                     Toast.success('Campanha atualizada.');
                 } else {
-                    await svc.criar({ nome, descricao, personagem_ids: ids });
-                    Toast.success('Campanha criada.');
-                    if (onCampanhaCriada) onCampanhaCriada();
+                    criada = await svc.criar({ nome, descricao, personagem_ids: ids });
+                    Toast.success('Campanha criada. Você é o mestre desta mesa.');
+                    if (onCampanhaCriada) onCampanhaCriada(criada);
                 }
                 resetFormCampanha();
                 await carregarCampanhas();
                 await carregarSessoes();
                 recarregarTabela();
+                if (criada && criada.id && global.__t20CampanhaWorkspace) {
+                    document.querySelector('.t20-dash-nav button[data-tab="campanhas"]')?.click();
+                    global.__t20CampanhaWorkspace.abrirCampanha(criada.id);
+                }
             } catch (e) {
                 Toast.error(e.message || 'Erro ao salvar');
             }
@@ -384,6 +408,12 @@
         });
 
         document.getElementById('t20campBtnCancelarSessao')?.addEventListener('click', () => resetFormSessao());
+
+        global.__t20DashCampanhas = {
+            getCampanhas: () => campanhas.slice(),
+            recarregarCampanhas: carregarCampanhas,
+            ativarSubaba,
+        };
 
         document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((b) => {
             if (b.getAttribute('data-tab') === 'campanhas') {

@@ -4,12 +4,18 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.games.gurps.repositories.campanha_repository import GurpsCampanhaRepository
+from app.games.gurps.repositories.campanha_solicitacao_repository import (
+    GurpsCampanhaSolicitacaoRepository,
+)
 from app.games.gurps.repositories.combate_repository import GurpsCombateRepository
 from app.games.gurps.repositories.personagem_repository import GurpsPersonagemRepository
 from app.games.gurps.repositories.sessao_campanha_repository import (
     GurpsSessaoCampanhaRepository,
 )
 from app.games.gurps.services.campanha_service import GurpsCampanhaService
+from app.games.gurps.services.campanha_solicitacao_service import (
+    GurpsCampanhaSolicitacaoService,
+)
 from app.games.gurps.services.combate_service import GurpsCombateService
 from app.games.gurps.services.personagem_service import GurpsPersonagemService
 from app.games.gurps.services.sessao_campanha_service import GurpsSessaoCampanhaService
@@ -66,6 +72,28 @@ def get_gurps_sessao_campanha_service(
     ),
 ) -> GurpsSessaoCampanhaService:
     return GurpsSessaoCampanhaService(sessao_repository, campanha_repository)
+
+
+def get_gurps_campanha_solicitacao_repository(
+    db: Session = Depends(get_db),
+) -> GurpsCampanhaSolicitacaoRepository:
+    return GurpsCampanhaSolicitacaoRepository(db)
+
+
+def get_gurps_campanha_solicitacao_service(
+    solicitacao_repository: GurpsCampanhaSolicitacaoRepository = Depends(
+        get_gurps_campanha_solicitacao_repository
+    ),
+    campanha_repository: GurpsCampanhaRepository = Depends(
+        get_gurps_campanha_repository
+    ),
+    personagem_repository: GurpsPersonagemRepository = Depends(
+        get_gurps_personagem_repository
+    ),
+) -> GurpsCampanhaSolicitacaoService:
+    return GurpsCampanhaSolicitacaoService(
+        solicitacao_repository, campanha_repository, personagem_repository
+    )
 
 
 def get_gurps_combate_service(

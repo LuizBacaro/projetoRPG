@@ -106,13 +106,19 @@ router = APIRouter(
 def listar(
     tipo: Optional[str] = None,
     meus: bool = Query(False),
+    campanha_id: Optional[int] = Query(None, ge=1),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     response: Response = None,
     service: TormentaPersonagemService = Depends(get_tormenta_personagem_service),
     usuario_atual: Usuario = Depends(get_usuario_atual),
 ):
-    total = service.contar_todos(tipo, usuario=usuario_atual, apenas_meus=meus)
+    total = service.contar_todos(
+        tipo,
+        usuario=usuario_atual,
+        apenas_meus=meus,
+        campanha_id=campanha_id,
+    )
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)
@@ -123,6 +129,7 @@ def listar(
         skip=skip,
         limit=limit,
         apenas_meus=meus,
+        campanha_id=campanha_id,
     )
 
 
