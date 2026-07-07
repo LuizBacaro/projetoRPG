@@ -62,6 +62,27 @@ def gurps_personagens_db():
 
 
 @pytest.fixture(scope="function")
+def gurps_personagens_com_campanha_db(gurps_personagens_db):
+    """Jogadores GURPS com campanha do u1 — necessário para testes da Arena."""
+    from app.games.gurps.models.campanha import GurpsCampanha
+
+    SessionLocal, u1, u2 = gurps_personagens_db
+    db = SessionLocal()
+    try:
+        db.add(
+            GurpsCampanha(
+                mestre_id=u1.id,
+                nome="Mesa teste",
+                descricao="",
+            )
+        )
+        db.commit()
+    finally:
+        db.close()
+    yield SessionLocal, u1, u2
+
+
+@pytest.fixture(scope="function")
 def dnd5e_personagens_db():
     """SQLite em memória + dois jogadores — testes de API D&D 5e."""
     engine = create_engine(

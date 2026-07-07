@@ -246,6 +246,7 @@ class GurpsPersonagemResponse(GurpsPersonagemBase):
 
     id: int
     dono_id: Optional[int] = None
+    dono_nome: Optional[str] = ""
     foto_url: Optional[str] = None
     pvs_atual: int
     fadiga_atual: int

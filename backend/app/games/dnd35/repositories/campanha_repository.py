@@ -19,6 +19,15 @@ class CampanhaRepository(BaseRepository[Campanha]):
     def __init__(self, db: Session):
         super().__init__(Campanha, db)
 
+    def usuario_tem_campanha_como_mestre(self, usuario_id: int) -> bool:
+        row = (
+            self.db.query(Campanha.id)
+            .filter(Campanha.mestre_id == usuario_id)
+            .limit(1)
+            .scalar()
+        )
+        return isinstance(row, int)
+
     def listar_por_mestre(self, mestre_id: int) -> List[Campanha]:
         return (
             self.db.query(Campanha)

@@ -10,12 +10,16 @@ from sqlalchemy.pool import StaticPool
 from app.games.dnd35.api.v1.divindades_custom import router as divindades_router
 from app.games.dnd35.api.v1.magias import router as magias_router
 from app.shared.core.database import Base, get_db
-from app.shared.core.deps import get_usuario_atual, requer_mestre_ou_admin
+from app.shared.core.deps import get_usuario_atual, requer_mestre_dnd35_ou_admin
+from app.shared.models.usuario import PerfilUsuario
 
 
 class _UsuarioDummy:
-    def __init__(self, user_id: int = 77):
+    def __init__(self, user_id: int = 77, perfil: PerfilUsuario = PerfilUsuario.MESTRE):
         self.id = user_id
+        self.perfil = perfil
+        self.email = "mestre@test"
+        self.nome = "Mestre Teste"
 
 
 @pytest.fixture(scope="function")
@@ -41,7 +45,7 @@ def div_custom_client():
 
     app.dependency_overrides[get_db] = _override_get_db
     app.dependency_overrides[get_usuario_atual] = lambda: _UsuarioDummy(77)
-    app.dependency_overrides[requer_mestre_ou_admin] = lambda: _UsuarioDummy(77)
+    app.dependency_overrides[requer_mestre_dnd35_ou_admin] = lambda: _UsuarioDummy(77)
 
     yield TestClient(app)
 

@@ -36,6 +36,7 @@ class DashboardController {
         this.combatenteEmEdicao = null;
         this.actions             = {};
         this.perfil              = AuthService.getPerfil();
+        this._podeMestrarCampanha = this.perfil === 'mestre' || this.perfil === 'administrador';
         // Cache local das divindades do catalogo oficial (carregado sob demanda ao
         // abrir o modal "Nova Divindade"). Usado para popular o select de domínios.
         this._dominiosCatalogoCache = null;
@@ -63,10 +64,35 @@ class DashboardController {
 
         this._registrarGlobais();
         this._inicializar();
+        void this._bootstrapGmStatus();
     }
 
     _isMestre() {
-        return this.perfil === 'mestre' || this.perfil === 'administrador';
+        if (this.perfil === 'mestre' || this.perfil === 'administrador') return true;
+        return this._podeMestrarCampanha === true;
+    }
+
+    _ativarGmPorCampanha() {
+        if (this._podeMestrarCampanha) return;
+        this._podeMestrarCampanha = true;
+        if (window.AuthService?.marcarPodeMestrarNoJogoAtual) {
+            AuthService.marcarPodeMestrarNoJogoAtual(true);
+        }
+        this._configurarLinksGovernanca();
+        this._aplicarRestricoesPerfil();
+        this._configurarFiltroEscopo();
+    }
+
+    async _bootstrapGmStatus() {
+        if (this._podeMestrarCampanha) return;
+        if (!window.AuthService?.carregarPodeMestrarNoJogoAtual) return;
+        const ok = await AuthService.carregarPodeMestrarNoJogoAtual();
+        if (ok) {
+            this._podeMestrarCampanha = true;
+            this._configurarLinksGovernanca();
+            this._aplicarRestricoesPerfil();
+            this._configurarFiltroEscopo();
+        }
     }
 
     _registrarGlobais() {
@@ -143,7 +169,8 @@ class DashboardController {
     _configurarLinksGovernanca() {
         const linkMagias = document.getElementById('linkMagias');
         if (linkMagias) {
-            linkMagias.style.display = this._isMestre() ? '' : 'none';
+            linkMagias.style.display =
+                (this.perfil === 'mestre' || this.perfil === 'administrador') ? '' : 'none';
         }
         const btnNovaDiv = document.getElementById('btnNovaDivindade');
         if (btnNovaDiv) {
@@ -151,29 +178,31 @@ class DashboardController {
         }
         const tabCampanhas = document.querySelector('.nav-tab[data-tab="campanhas"]');
         if (tabCampanhas) {
-            tabCampanhas.style.display = this._isMestre() ? '' : 'none';
+            tabCampanhas.style.display = '';
         }
     }
 
     _aplicarRestricoesPerfil() {
-        if (this._isMestre()) return;
+        const arenaTab = document.querySelector('.nav-tab[data-tab="arena"]');
+        const filtroMonstro = document.querySelector('.filter-btn[data-tipo="monstro"]');
+        const filtroNpc = document.querySelector('.filter-btn[data-tipo="npc"]');
+        const cardMonstro = document.getElementById('totalMonstros')?.closest('.resumo-card');
+        const cardNpc = document.getElementById('totalNPCs')?.closest('.resumo-card');
 
-        // Jogador vê o botão '+ Novo Combatente' (abre direto o modal de jogador)
-        const elementos = [
-            { query: '.nav-tab[data-tab="arena"]', id: null },
-            { query: '.filter-btn[data-tipo="monstro"]', id: null },
-            { query: '.filter-btn[data-tipo="npc"]', id: null },
-            { id: 'totalMonstros', closest: '.resumo-card', query: null },
-            { id: 'totalNPCs', closest: '.resumo-card', query: null }
-        ];
+        if (!this._isMestre()) {
+            if (arenaTab) arenaTab.style.display = 'none';
+            if (filtroMonstro) filtroMonstro.style.display = 'none';
+            if (filtroNpc) filtroNpc.style.display = 'none';
+            if (cardMonstro) cardMonstro.style.display = 'none';
+            if (cardNpc) cardNpc.style.display = 'none';
+            return;
+        }
 
-        elementos.forEach(el => {
-            const elem = el.id ? document.getElementById(el.id) : document.querySelector(el.query);
-            if (elem) {
-                const target = el.closest ? elem.closest(el.closest) : elem;
-                if (target) target.style.display = 'none';
-            }
-        });
+        if (arenaTab) arenaTab.style.removeProperty('display');
+        if (filtroMonstro) filtroMonstro.style.removeProperty('display');
+        if (filtroNpc) filtroNpc.style.removeProperty('display');
+        if (cardMonstro) cardMonstro.style.removeProperty('display');
+        if (cardNpc) cardNpc.style.removeProperty('display');
     }
 
     _configurarAbas() {
@@ -698,11 +727,13 @@ class DashboardController {
     }
 
     _configurarCampanhas() {
-        if (!this._isMestre() || !this.campanhaService) return;
+        if (!this.campanhaService) return;
         const form = document.getElementById('formCampanha');
         const lista = document.getElementById('listaCampanhas');
         const formSessao = document.getElementById('formSessaoCampanha');
         if (!form || !lista) return;
+        if (form.dataset.boundCampanhas) return;
+        form.dataset.boundCampanhas = '1';
         const inputBuscaPersonagem = document.getElementById('campanhaPersonagensBusca');
         const filtrosTipo = document.getElementById('campanhaPersonagensTipoFiltros');
 
@@ -730,6 +761,7 @@ class DashboardController {
                 this._resetFormCampanha();
                 await this._carregarCampanhas();
                 await this.carregarCombatentes();
+                if (!emEdicao) this._ativarGmPorCampanha();
                 Toast.success(emEdicao ? 'Campanha atualizada com sucesso!' : 'Campanha criada com sucesso!');
             } catch (error) {
                 Toast.error(error.message || 'Erro ao salvar campanha');
@@ -806,9 +838,9 @@ class DashboardController {
     }
 
     _configurarSubAbasCampanhas() {
-        if (!this._isMestre()) return;
         const container = document.getElementById('campanhasSubAbas');
-        if (!container) return;
+        if (!container || container.dataset.boundSubAbas) return;
+        container.dataset.boundSubAbas = '1';
         const ativar = (alvo) => {
             const subaba = alvo === 'sessoes' ? 'sessoes' : 'cadastro';
             container.querySelectorAll('[data-campanhas-subaba]').forEach((btn) => {
@@ -846,7 +878,7 @@ class DashboardController {
     }
 
     async _carregarCampanhas() {
-        if (!this.campanhaService || !this._isMestre()) return;
+        if (!this.campanhaService) return;
         const lista = document.getElementById('listaCampanhas');
         if (!lista) return;
         lista.innerHTML = '<p class="dash-divcustom-vazio">Carregando campanhas...</p>';
@@ -861,7 +893,7 @@ class DashboardController {
     }
 
     async _carregarSessoesCampanha() {
-        if (!this.campanhaService || !this._isMestre()) return;
+        if (!this.campanhaService) return;
         const lista = document.getElementById('listaSessoesCampanha');
         if (!lista) return;
         lista.innerHTML = '<p class="dash-divcustom-vazio">Carregando sessões...</p>';
@@ -1078,7 +1110,6 @@ class DashboardController {
     }
 
     async _atualizarSelectPersonagensCampanha(combatentes) {
-        if (!this._isMestre()) return;
         const container = document.getElementById('campanhaPersonagens');
         if (!container) return;
         let personagensFonte = Array.isArray(combatentes) ? combatentes : [];
@@ -1106,8 +1137,10 @@ class DashboardController {
             const tipo = String(item.tipo || '').toLowerCase();
             if (filtroTipo !== 'todos' && tipo !== filtroTipo) return false;
             if (!filtro) return true;
-            const nome = String(item.nome || '').toLowerCase();
-            return nome.includes(filtro);
+            const busca = (typeof PersonagemRotulo !== 'undefined' && PersonagemRotulo.textoBuscaPersonagem)
+                ? PersonagemRotulo.textoBuscaPersonagem(item)
+                : String(item.nome || '').toLowerCase();
+            return busca.includes(filtro);
         });
         if (!personagens.length) {
             const vazio = filtro
@@ -1118,14 +1151,13 @@ class DashboardController {
         }
         container.innerHTML = personagens.map((personagem) => {
             const checked = idsSelecionados.has(personagem.id) ? 'checked' : '';
-            const tipoLabel = String(personagem.tipo || '').toLowerCase();
-            const tipoExibicao = tipoLabel
-                ? tipoLabel.charAt(0).toUpperCase() + tipoLabel.slice(1)
-                : 'Personagem';
+            const rotulo = (typeof PersonagemRotulo !== 'undefined' && PersonagemRotulo.rotuloPersonagemComDono)
+                ? PersonagemRotulo.rotuloPersonagemComDono(personagem, `Nv ${personagem.nivel || 1}`)
+                : `${personagem.nome} (Nv ${personagem.nivel || 1})`;
             return `
                 <label class="campanha-personagem-item">
                     <input type="checkbox" data-personagem-id="${personagem.id}" ${checked} />
-                    <span class="campanha-personagem-nome">${escapeHtml(personagem.nome)} (${tipoExibicao} • Nv ${personagem.nivel || 1})</span>
+                    <span class="campanha-personagem-nome">${escapeHtml(rotulo)}</span>
                 </label>
             `;
         }).join('');
@@ -1204,7 +1236,6 @@ class DashboardController {
     }
 
     _configurarFecharPainelCampanhas() {
-        if (!this._isMestre()) return;
         const btnFechar = document.getElementById('btnFecharPainelCampanhas');
         const btnReabrir = document.getElementById('btnReabrirPainelCampanhas');
         const painel = document.getElementById('painelCampanhasMestre');

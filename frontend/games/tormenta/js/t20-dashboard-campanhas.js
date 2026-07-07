@@ -1,5 +1,5 @@
 /**
- * Painel Campanhas — dashboard Tormenta (mestre/admin).
+ * Painel Campanhas — dashboard Tormenta (qualquer usuário autenticado).
  * Inicializado via window.__t20DashCampanhasInit(opts) a partir de dashboard.html.
  */
 (function (global) {
@@ -13,10 +13,11 @@
     }
 
     global.__t20DashCampanhasInit = function (opts) {
-        if (!opts || !opts.isMestre) return;
+        if (!opts) return;
 
         const getLista = typeof opts.getLista === 'function' ? opts.getLista : () => [];
         const recarregarTabela = opts.recarregarTabela || function () {};
+        const onCampanhaCriada = typeof opts.onCampanhaCriada === 'function' ? opts.onCampanhaCriada : null;
         const Toast = opts.Toast || global.Toast;
 
         const svc = new global.TormentaCampanhaService();
@@ -34,8 +35,10 @@
                 const tipo = String(p.tipo || '').toLowerCase();
                 if (filtroTipoCamp !== 'todos' && tipo !== filtroTipoCamp) return false;
                 if (!q) return true;
-                const nome = String(p.nome || '').toLowerCase();
-                return nome.includes(q);
+                const busca = global.PersonagemRotulo
+                    ? global.PersonagemRotulo.textoBuscaPersonagem(p)
+                    : String(p.nome || '').toLowerCase();
+                return busca.includes(q);
             });
         }
 
@@ -52,8 +55,10 @@
                 .map((p) => {
                     const id = Number(p.id);
                     const ck = set.has(id) ? ' checked' : '';
-                    const tipo = esc(p.tipo || '');
-                    return `<label class="t20-camp-cb-item"><input type="checkbox" class="t20-camp-cb-inp" value="${id}"${ck} /><span class="t20-camp-cb-nome">${esc(p.nome)}</span><span class="t20-camp-cb-tipo">${tipo}</span></label>`;
+                    const rotulo = global.PersonagemRotulo
+                        ? esc(global.PersonagemRotulo.rotuloPersonagemComDono(p, `Nv ${p.nivel || 1}`))
+                        : `${esc(p.nome)} (${esc(p.tipo || '')})`;
+                    return `<label class="t20-camp-cb-item"><input type="checkbox" class="t20-camp-cb-inp" value="${id}"${ck} /><span class="t20-camp-cb-nome">${rotulo}</span></label>`;
                 })
                 .join('');
         }
@@ -337,6 +342,7 @@
                 } else {
                     await svc.criar({ nome, descricao, personagem_ids: ids });
                     Toast.success('Campanha criada.');
+                    if (onCampanhaCriada) onCampanhaCriada();
                 }
                 resetFormCampanha();
                 await carregarCampanhas();

@@ -45,11 +45,12 @@ def _criar_personagem(client: TestClient, nome: str) -> int:
     return r.json()["id"]
 
 
-def test_jogador_nao_lista_todas_sessoes_apenas_mestre(gurps_mestre_e_jogadores_db):
+def test_jogador_sem_campanha_lista_sessoes_vazias(gurps_mestre_e_jogadores_db):
     SessionLocal, _, j1, _ = gurps_mestre_e_jogadores_db
     c = _client(SessionLocal, _usuario(j1))
     r = c.get("/api/v1/gurps/campanhas/sessoes")
-    assert r.status_code == 403
+    assert r.status_code == 200
+    assert r.json() == []
 
 
 def test_mestre_crud_sessao_e_jogador_ve_visivel(gurps_mestre_e_jogadores_db):

@@ -177,6 +177,7 @@ class CombatenteResponse(CombatenteBase):
     # ✅ NOVO: exposto no response para o frontend exibir na ficha/arena
     pagina_referencia: Optional[str] = ""
     campanha_nome: Optional[str] = ""
+    dono_nome: Optional[str] = ""
     bonus_base_ataque: Optional[str] = ""
     habilidades_especiais: Optional[str] = ""
     # Novo campo enriquecido; fallback legado permanece em `habilidades_especiais`.

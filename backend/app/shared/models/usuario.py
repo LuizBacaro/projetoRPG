@@ -15,6 +15,7 @@ from ...shared.core.database import Base
 
 class PerfilUsuario(str, enum.Enum):
     ADMINISTRADOR = "administrador"
+    # Legado: preferir mestre via campanha (campanhas.mestre_id). Ver ADR 0005.
     MESTRE = "mestre"
     JOGADOR = "jogador"
 

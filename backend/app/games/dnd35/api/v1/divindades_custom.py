@@ -24,7 +24,7 @@ from .....shared.core.database import get_db
 from .....shared.core.deps import (
     get_usuario_atual,
     requer_game_dnd35,
-    requer_mestre_ou_admin,
+    requer_mestre_dnd35_ou_admin,
 )
 from .....shared.exceptions.custom_exceptions import ArenaBaseException
 from ...schemas.divindade_custom import DivindadeCustomCreate, DivindadeCustomResponse
@@ -67,7 +67,7 @@ def listar_divindades_custom(
 def criar_divindade_custom(
     payload: DivindadeCustomCreate,
     service: DivindadeCustomService = Depends(get_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(requer_mestre_dnd35_ou_admin),
 ):
     """Cria uma divindade customizada (restrito a Mestre/Administrador)."""
     try:
@@ -87,7 +87,7 @@ def criar_divindade_custom(
 def deletar_divindade_custom(
     divindade_id: int,
     service: DivindadeCustomService = Depends(get_service),
-    _=Depends(requer_mestre_ou_admin),
+    _=Depends(requer_mestre_dnd35_ou_admin),
 ):
     """Remove uma divindade customizada (restrito a Mestre/Administrador)."""
     try:
