@@ -323,9 +323,11 @@
 <script>
     if (!AuthService.exigirJogo('gurps')) {}
 </script>
+<script src="/games/dnd35/js/ui/ModalConfirm.js"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
 <script src="../js/services/GurpsPersonagemService.js"></script>
-<script src="../js/services/GurpsCampanhaService.js"></script>
+<script src="../js/services/GurpsCampanhaService.js?v=20260707solic"></script>
+<script src="../js/gurps-dashboard-solicitacoes-campanha.js?v=20260707solic"></script>
 <script src="../js/services/GurpsCombateService.js"></script>
 <script>
 (function () {
@@ -1256,6 +1258,18 @@
             }
         }
         loadPersonagens().finally(() => refreshArena());
+        if (window.GurpsCampanhaSolicitacoesMestre?.iniciarPolling) {
+            window.GurpsCampanhaSolicitacoesMestre.iniciarPolling(
+                {
+                    Toast,
+                    onAceita: () => {
+                        void carregarAbaCampanhas();
+                        void loadPersonagens();
+                    },
+                },
+                90000
+            );
+        }
     })();
 })();
 </script>

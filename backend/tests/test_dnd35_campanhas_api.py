@@ -111,3 +111,57 @@ def test_mestre_legado_cria_campanha(dnd35_mestre_e_jogador_db):
     )
     assert r.status_code == 201, r.text
     assert r.json()["nome"] == "Mesa Legado"
+
+
+def test_solicitacao_entrada_campanha_aceite_pelo_mestre(dnd35_mestre_e_jogador_db):
+    from app.games.dnd35.models.combatente import Combatente
+
+    SessionLocal, mestre, jog = dnd35_mestre_e_jogador_db
+    db = SessionLocal()
+    comb = Combatente(
+        dono_id=jog.id,
+        tipo="jogador",
+        nome="Herói D35",
+        classe="Guerreiro",
+        hp_atual=10,
+        hp_maximo=10,
+    )
+    db.add(comb)
+    db.commit()
+    db.refresh(comb)
+    db.close()
+
+    c_mestre = _client(SessionLocal, _usuario(mestre))
+    c_jog = _client(SessionLocal, _usuario(jog))
+
+    cid = c_mestre.post(
+        "/api/v1/campanhas", json={"nome": "Mesa Solicitacao D35"}
+    ).json()["id"]
+
+    r_sol = c_jog.post(
+        "/api/v1/campanhas/solicitacoes",
+        json={"campanha_id": cid, "personagem_id": comb.id},
+    )
+    assert r_sol.status_code == 201, r_sol.text
+    sid = r_sol.json()["id"]
+
+    r_pend = c_mestre.get("/api/v1/campanhas/solicitacoes/pendentes")
+    assert any(x["id"] == sid for x in r_pend.json())
+
+    r_ok = c_mestre.post(f"/api/v1/campanhas/solicitacoes/{sid}/aceitar")
+    assert r_ok.status_code == 200
+
+    db = SessionLocal()
+    atualizado = db.query(Combatente).filter(Combatente.id == comb.id).first()
+    assert atualizado.campanha_id == cid
+    db.close()
+
+
+def test_listar_disponiveis_retorna_campanhas(dnd35_mestre_e_jogador_db):
+    SessionLocal, mestre, jog = dnd35_mestre_e_jogador_db
+    c_mestre = _client(SessionLocal, _usuario(mestre))
+    c_jog = _client(SessionLocal, _usuario(jog))
+    c_mestre.post("/api/v1/campanhas", json={"nome": "Camp Publica D35"})
+    r = c_jog.get("/api/v1/campanhas/disponiveis")
+    assert r.status_code == 200
+    assert "Camp Publica D35" in {c["nome"] for c in r.json()}

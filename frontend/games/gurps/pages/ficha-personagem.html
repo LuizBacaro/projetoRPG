@@ -272,7 +272,13 @@
                     <option value="monstro">Monstro</option>
                     <option value="npc">NPC</option>
                 </select></label>
-                <label>Campanha (id) <input id="fg_campanha_id" type="number" min="1" placeholder="opcional" /></label>
+                <label>Campanha
+                    <select id="fg_campanha">
+                        <option value="">— Nenhuma / escolher —</option>
+                    </select>
+                </label>
+                <p id="gurpsCampanhaSolicitacaoHint" class="ficha-hint" hidden style="margin:0.2rem 0 0;font-size:0.82rem"></p>
+                <button type="button" class="ficha-btn" id="gurpsBtnCancelarSolicitacaoCampanha" hidden style="margin-top:0.2rem;font-size:0.78rem">Cancelar solicitação</button>
             </div>
             <button type="button" class="ficha-btn ficha-btn--gold" id="btnSalvarFicha">Salvar ficha</button>
         </footer>
@@ -290,7 +296,9 @@
 <script>
     if (!AuthService.exigirJogo('gurps')) {}
 </script>
+<script src="../js/services/GurpsCampanhaService.js?v=20260707solic"></script>
+<script src="../js/gurps-ficha-campanha-solicitacao.js?v=20260707solic"></script>
 <script src="../js/services/GurpsPersonagemService.js"></script>
-<script src="../js/pages/ficha-gurps.js?v=20260504p"></script>
+<script src="../js/pages/ficha-gurps.js?v=20260707solic"></script>
 </body>
 </html>

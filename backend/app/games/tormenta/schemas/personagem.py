@@ -118,7 +118,11 @@ class TormentaPersonagemBase(BaseModel):
 
 
 class TormentaPersonagemCreate(TormentaPersonagemBase):
-    pass
+    campanha_id: Optional[int] = Field(
+        None,
+        ge=1,
+        description="Vínculo à mesa (workspace do mestre da campanha).",
+    )
 
 
 class TormentaPersonagemUpdate(BaseModel):

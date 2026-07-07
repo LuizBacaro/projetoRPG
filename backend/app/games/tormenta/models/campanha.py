@@ -72,3 +72,40 @@ class TormentaSessaoCampanha(Base):
     )
 
     campanha = relationship("TormentaCampanha", back_populates="sessoes", lazy="joined")
+
+
+class TormentaCampanhaSolicitacao(Base):
+    """Pedido de entrada de um personagem jogador numa campanha (aprovação do mestre)."""
+
+    __tablename__ = "tormenta_campanha_solicitacoes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    campanha_id = Column(
+        Integer,
+        ForeignKey("tormenta_campanhas.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    personagem_id = Column(
+        Integer,
+        ForeignKey("tormenta_personagens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    solicitante_id = Column(
+        Integer, ForeignKey("usuarios.id"), nullable=False, index=True
+    )
+    status = Column(String(20), nullable=False, default="pendente", index=True)
+    created_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+    resolved_at = Column(DateTime(timezone=True), nullable=True)
+
+    campanha = relationship("TormentaCampanha", lazy="joined")
+    personagem = relationship("TormentaPersonagem", lazy="joined")

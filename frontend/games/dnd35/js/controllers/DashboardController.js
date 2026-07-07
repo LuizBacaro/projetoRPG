@@ -154,6 +154,18 @@ class DashboardController {
         this._configurarFecharPainelCampanhas();
         this._configurarSubAbasCampanhas();
         this._configurarCampanhas();
+        if (window.D35CampanhaSolicitacoesMestre?.iniciarPolling) {
+            window.D35CampanhaSolicitacoesMestre.iniciarPolling(
+                {
+                    Toast,
+                    onAceita: () => {
+                        void this.carregarCombatentes();
+                        void this._carregarCampanhas();
+                    },
+                },
+                90000
+            );
+        }
         this.carregarCombatentes();
     }
 

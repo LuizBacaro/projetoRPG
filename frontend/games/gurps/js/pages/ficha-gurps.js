@@ -812,7 +812,7 @@
             conceito: str('#fg_conceito') || null,
             reacao: str('#fg_reacao') || null,
             idade: str('#fg_idade') || null,
-            campanha_id: optInt('#fg_campanha_id'),
+            campanha_id: null,
             iniciativa: num('#fg_iniciativa', 0),
             st_custo: num('#fg_st_custo'),
             st_valor: num('#fg_st_valor', 10),
@@ -958,7 +958,6 @@
         set('#fg_conceito', p.conceito);
         set('#fg_reacao', p.reacao);
         set('#fg_idade', p.idade);
-        set('#fg_campanha_id', p.campanha_id || '');
         set('#fg_iniciativa', p.iniciativa);
         set('#fg_st_custo', p.st_custo);
         set('#fg_st_valor', p.st_valor);
@@ -1041,6 +1040,22 @@
         inp.value = dono || u?.nome || u?.email || '—';
     }
 
+    async function initCampanhaSolicitacao(personagem) {
+        if (!window.GurpsFichaCampanhaSolicitacao) return;
+        const tipo = String(personagem?.tipo || 'jogador').toLowerCase();
+        if (tipo !== 'jogador') return;
+        const uid = typeof AuthService !== 'undefined' ? AuthService.getUsuario?.()?.id : null;
+        if (!uid || Number(personagem.dono_id) !== Number(uid)) return;
+        await window.GurpsFichaCampanhaSolicitacao.init({
+            getPersonagemId: () => (id ? Number(id) : null),
+            getCampanhaIdVinculada: () => personagem?.campanha_id ?? null,
+            Toast,
+        });
+        if (personagem?.campanha_id && window.GurpsFichaCampanhaSolicitacao.setVinculadoCampanhaId) {
+            window.GurpsFichaCampanhaSolicitacao.setVinculadoCampanhaId(personagem.campanha_id);
+        }
+    }
+
     async function carregar() {
         updatePortraitHint();
         preencherJogador();
@@ -1056,6 +1071,7 @@
             const p = await svc.obter(Number(id));
             preencherJogador(p);
             preencher(p);
+            await initCampanhaSolicitacao(p);
             el('#fg_titulo_sub').textContent = p.nome ? ` — ${p.nome}` : '';
             const ex = p.extras && typeof p.extras === 'object' ? p.extras : {};
             applyExtrasPayload(ex);

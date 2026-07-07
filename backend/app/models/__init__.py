@@ -13,7 +13,7 @@ from app.games.dnd35.models.armadura_protecao import (
     ArmaduraProtecaoJogador,
 )
 from app.games.dnd35.models.ataque import Ataque, MagiaPreparada, MagiaSlot
-from app.games.dnd35.models.campanha import Campanha
+from app.games.dnd35.models.campanha import Campanha, CampanhaSolicitacao
 from app.games.dnd35.models.combate import Combate, CombateHistorico
 from app.games.dnd35.models.combatente import Combatente
 from app.games.dnd35.models.combatente_condicao import CombatenteCondicao
@@ -32,7 +32,7 @@ from app.games.dnd35.models.magia import Magia, MagiaClasse
 from app.games.dnd35.models.pericia import Pericia, PericiaClasse, PericiaJogador
 from app.games.dnd35.models.sessao_campanha import SessaoCampanha
 from app.games.dnd35.models.talento import Talento, TalentoJogador
-from app.games.gurps.models.campanha import GurpsCampanha
+from app.games.gurps.models.campanha import GurpsCampanha, GurpsCampanhaSolicitacao
 from app.games.gurps.models.catalogo_ficha import (
     GurpsCatalogoFichaDesvantagem,
     GurpsCatalogoFichaPericia,
@@ -46,7 +46,11 @@ from app.games.gurps.models.personagem import (
     GurpsPersonagemVantagem,
 )
 from app.games.gurps.models.sessao_campanha import GurpsSessaoCampanha
-from app.games.tormenta.models.campanha import TormentaCampanha, TormentaSessaoCampanha
+from app.games.tormenta.models.campanha import (
+    TormentaCampanha,
+    TormentaCampanhaSolicitacao,
+    TormentaSessaoCampanha,
+)
 from app.games.tormenta.models.combate import TormentaCombate
 from app.games.tormenta.models.consumivel import (
     TormentaConsumivel,
@@ -92,10 +96,12 @@ __all__ = [
     "GrimorioNotificacao",
     "DivindadeCustom",
     "Campanha",
+    "CampanhaSolicitacao",
     "SessaoCampanha",
     "Game",
     "UserGameMembership",
     "GurpsCampanha",
+    "GurpsCampanhaSolicitacao",
     "GurpsSessaoCampanha",
     "GurpsCombate",
     "GurpsPersonagem",
@@ -106,6 +112,7 @@ __all__ = [
     "GurpsCatalogoFichaDesvantagem",
     "GurpsCatalogoFichaPericia",
     "TormentaCampanha",
+    "TormentaCampanhaSolicitacao",
     "TormentaSessaoCampanha",
     "TormentaCombate",
     "TormentaPersonagem",

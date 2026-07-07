@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import app.models  # noqa: F401 — registra todos os mappers antes das queries
+
 from sqlalchemy.orm import Session
 
 from app.games.dnd35.models.campanha import Campanha
