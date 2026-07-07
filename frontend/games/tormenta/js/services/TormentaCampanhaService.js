@@ -29,8 +29,72 @@ class TormentaCampanhaService {
     }
 
     async listar() {
-        const res = await fetch(this._url(), { headers: this._headers(false) });
+        const res = await fetch(this._url(), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
         return this._handleResponse(res, 'Erro ao carregar campanhas');
+    }
+
+    async listarDisponiveis() {
+        const res = await fetch(this._url('/disponiveis'), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
+        return this._handleResponse(res, 'Erro ao carregar campanhas disponíveis');
+    }
+
+    async listarSolicitacoesPendentes() {
+        const res = await fetch(this._url('/solicitacoes/pendentes'), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
+        return this._handleResponse(res, 'Erro ao carregar solicitações');
+    }
+
+    async obterMinhaSolicitacao(personagemId) {
+        const res = await fetch(
+            this._url(`/solicitacoes/minhas?personagem_id=${encodeURIComponent(String(personagemId))}`),
+            { headers: this._headers(false), cache: 'no-store' }
+        );
+        if (res.status === 204) return null;
+        return this._handleResponse(res, 'Erro ao carregar solicitação');
+    }
+
+    async criarSolicitacao(payload) {
+        const res = await fetch(this._url('/solicitacoes'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload),
+        });
+        return this._handleResponse(res, 'Erro ao solicitar entrada na campanha');
+    }
+
+    async aceitarSolicitacao(solicitacaoId) {
+        const res = await fetch(this._url(`/solicitacoes/${solicitacaoId}/aceitar`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: '{}',
+        });
+        return this._handleResponse(res, 'Erro ao aceitar solicitação');
+    }
+
+    async recusarSolicitacao(solicitacaoId) {
+        const res = await fetch(this._url(`/solicitacoes/${solicitacaoId}/recusar`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: '{}',
+        });
+        return this._handleResponse(res, 'Erro ao recusar solicitação');
+    }
+
+    async cancelarSolicitacao(solicitacaoId) {
+        const res = await fetch(this._url(`/solicitacoes/${solicitacaoId}`), {
+            method: 'DELETE',
+            headers: this._headers(false),
+        });
+        await this._handleResponse(res, 'Erro ao cancelar solicitação');
+        return true;
     }
 
     async criar(payload) {

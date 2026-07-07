@@ -37,3 +37,40 @@ class Campanha(Base):
         lazy="selectin",
         cascade="all, delete-orphan",
     )
+
+
+class CampanhaSolicitacao(Base):
+    """Pedido de entrada de um combatente jogador numa campanha (aprovação do mestre)."""
+
+    __tablename__ = "campanha_solicitacoes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    campanha_id = Column(
+        Integer,
+        ForeignKey("campanhas.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    personagem_id = Column(
+        Integer,
+        ForeignKey("combatentes.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    solicitante_id = Column(
+        Integer, ForeignKey("usuarios.id"), nullable=False, index=True
+    )
+    status = Column(String(20), nullable=False, default="pendente", index=True)
+    created_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+    resolved_at = Column(DateTime(timezone=True), nullable=True)
+
+    campanha = relationship("Campanha", lazy="joined")
+    personagem = relationship("Combatente", lazy="joined")

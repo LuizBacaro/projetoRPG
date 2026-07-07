@@ -44,10 +44,14 @@ class TormentaPersonagemService {
         const q = new URLSearchParams();
         if (params.tipo) q.set('tipo', params.tipo);
         if (params.meus) q.set('meus', 'true');
+        if (params.campanha_id != null) q.set('campanha_id', String(params.campanha_id));
         if (params.skip != null) q.set('skip', String(params.skip));
         if (params.limit != null) q.set('limit', String(params.limit));
         const qs = q.toString();
-        const res = await fetch(this._url(qs ? `?${qs}` : ''), { headers: this._headers(false) });
+        const res = await fetch(this._url(qs ? `?${qs}` : ''), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
         return this._handleResponse(res, 'Erro ao listar personagens');
     }
 

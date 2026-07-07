@@ -8,6 +8,9 @@ from app.games.dnd35.repositories.armadura_protecao_repository import (
     ArmaduraProtecaoRepository,
 )
 from app.games.dnd35.repositories.campanha_repository import CampanhaRepository
+from app.games.dnd35.repositories.campanha_solicitacao_repository import (
+    CampanhaSolicitacaoRepository,
+)
 from app.games.dnd35.repositories.combate_repository import CombateRepository
 from app.games.dnd35.repositories.combatente_repository import CombatenteRepository
 from app.games.dnd35.repositories.companheiro_animal_repository import (
@@ -41,6 +44,9 @@ from app.games.dnd35.repositories.talento_repository import (
 )
 from app.games.dnd35.services.armadura_protecao_service import ArmaduraProtecaoService
 from app.games.dnd35.services.campanha_service import CampanhaService
+from app.games.dnd35.services.campanha_solicitacao_service import (
+    CampanhaSolicitacaoService,
+)
 from app.games.dnd35.services.combate_service import CombateService
 from app.games.dnd35.services.combatente_service import CombatenteService
 from app.games.dnd35.services.companheiro_animal_service import CompanheiroAnimalService
@@ -329,6 +335,24 @@ def get_campanha_service(
     combatente_repository: CombatenteRepository = Depends(get_combatente_repository),
 ) -> CampanhaService:
     return CampanhaService(campanha_repository, combatente_repository)
+
+
+def get_campanha_solicitacao_repository(
+    db: Session = Depends(get_db),
+) -> CampanhaSolicitacaoRepository:
+    return CampanhaSolicitacaoRepository(db)
+
+
+def get_campanha_solicitacao_service(
+    solicitacao_repository: CampanhaSolicitacaoRepository = Depends(
+        get_campanha_solicitacao_repository
+    ),
+    campanha_repository: CampanhaRepository = Depends(get_campanha_repository),
+    combatente_repository: CombatenteRepository = Depends(get_combatente_repository),
+) -> CampanhaSolicitacaoService:
+    return CampanhaSolicitacaoService(
+        solicitacao_repository, campanha_repository, combatente_repository
+    )
 
 
 def get_sessao_campanha_service(

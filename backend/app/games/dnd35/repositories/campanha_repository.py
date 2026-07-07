@@ -36,6 +36,12 @@ class CampanhaRepository(BaseRepository[Campanha]):
             .all()
         )
 
+    def listar_todas(self) -> List[Campanha]:
+        return self.db.query(Campanha).order_by(Campanha.nome.asc()).all()
+
+    def obter_por_id(self, campanha_id: int) -> Optional[Campanha]:
+        return self.db.query(Campanha).filter(Campanha.id == campanha_id).first()
+
     def obter_por_id_e_mestre(
         self, campanha_id: int, mestre_id: int
     ) -> Optional[Campanha]:

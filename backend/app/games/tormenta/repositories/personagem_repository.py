@@ -87,6 +87,28 @@ class TormentaPersonagemRepository(BaseRepository[TormentaPersonagem]):
             .all()
         )
 
+    def get_by_campanha(
+        self,
+        campanha_id: int,
+        tipo: Optional[str] = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[TormentaPersonagem]:
+        q = self.db.query(TormentaPersonagem).filter(
+            TormentaPersonagem.campanha_id == campanha_id
+        )
+        if tipo:
+            q = q.filter(TormentaPersonagem.tipo == tipo)
+        return q.order_by(TormentaPersonagem.nome.asc()).offset(skip).limit(limit).all()
+
+    def count_by_campanha(self, campanha_id: int, tipo: Optional[str] = None) -> int:
+        q = self.db.query(TormentaPersonagem).filter(
+            TormentaPersonagem.campanha_id == campanha_id
+        )
+        if tipo:
+            q = q.filter(TormentaPersonagem.tipo == tipo)
+        return q.count()
+
     def get_by_ids(self, ids: List[int]) -> List[TormentaPersonagem]:
         if not ids:
             return []

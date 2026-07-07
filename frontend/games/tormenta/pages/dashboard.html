@@ -9,13 +9,13 @@
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260704ha" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260707nav" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
     <div>
         <h1>Tormenta 20</h1>
-        <p>Combatentes e fichas Tormenta 20. Crie uma <strong>campanha</strong> para desbloquear a <strong>Arena</strong> e ferramentas de mestre na mesa.</p>
+        <p>Como <strong>jogador</strong>, gerencie seus personagens. Crie uma <strong>campanha</strong> para mestrar na mesa (combatentes da campanha e Arena).</p>
     </div>
     <div class="tormenta-header-actions">
         <span id="nomeUsuario">…</span>
@@ -30,7 +30,6 @@
     <nav class="t20-dash-nav" aria-label="Seções do dashboard">
         <button type="button" class="t20-dash-nav--active" data-tab="combatentes">⚔️ Combatentes</button>
         <button type="button" class="t20-dash-nav--campanhas" data-tab="campanhas" id="tabBtnCampanhas">📜 Campanhas</button>
-        <button type="button" data-tab="arena" id="tabBtnArena">🏟️ Arena</button>
     </nav>
 
     <section class="t20-dash-section t20-dash-section--active" id="tab-combatentes">
@@ -79,13 +78,14 @@
     <section class="t20-dash-section" id="tab-campanhas">
         <div id="t20campPanelTop" class="t20-camp-painel">
             <p class="t20-dash-hint" style="margin-top:0;max-width:44rem">
-                Cadastre <strong>campanhas</strong>, associe <strong>combatentes</strong> (jogadores, monstros, NPCs) e registre <strong>sessões</strong> com resumo — alinhado ao fluxo do dashboard D&amp;D 3.5.
+                Crie uma <strong>campanha</strong> para ser <strong>mestre da mesa</strong> (combatentes da campanha e Arena). Como <strong>jogador</strong>, na aba Combatentes você vê só os seus personagens.
             </p>
             <div id="t20campSubAbas" class="t20-camp-subabas" role="tablist">
                 <button type="button" class="t20-camp-subaba-btn t20-camp-subaba-btn--active" data-t20camp-sub="cadastro">Cadastro de campanhas</button>
                 <button type="button" class="t20-camp-subaba-btn" data-t20camp-sub="sessoes">Registro de sessões</button>
+                <span id="t20campSubAbasCampanhas" class="t20-camp-subabas-campanhas" role="presentation"></span>
             </div>
-            <div id="t20campSubabaCadastro" class="t20-camp-subaba-pane t20-camp-subaba-pane--active">
+            <div id="t20campSubabaCadastro" class="t20-camp-subaba-pane t20-camp-subaba-pane--active t20-camp-painel-narrow">
                 <form id="t20campFormCampanha" class="t20-camp-form" autocomplete="off">
                     <input type="hidden" id="t20campIdEdicao" value="" />
                     <div id="t20campEdicaoBadge" class="t20-camp-edicao-badge" style="display:none"></div>
@@ -118,7 +118,7 @@
                     <p class="tormenta-cell-muted">Abra esta aba para carregar.</p>
                 </div>
             </div>
-            <div id="t20campSubabaSessoes" class="t20-camp-subaba-pane">
+            <div id="t20campSubabaSessoes" class="t20-camp-subaba-pane t20-camp-painel-narrow">
                 <form id="t20campFormSessao" class="t20-camp-form" autocomplete="off">
                     <input type="hidden" id="t20campSessaoId" value="" />
                     <div id="t20campSessaoEdicaoBadge" class="t20-camp-edicao-badge" style="display:none"></div>
@@ -146,10 +146,56 @@
                     <p class="tormenta-cell-muted">Abra esta aba para carregar.</p>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section class="t20-dash-section" id="tab-arena">
+            <div id="t20campSubabaWorkspace" class="t20-camp-subaba-pane">
+                <div class="t20-camp-ws-header">
+                    <span id="t20campWsBadge" class="t20-camp-ws-badge">Mestre da mesa</span>
+                    <p id="t20campWsHint" class="t20-dash-hint" style="margin:0.35rem 0 0;max-width:44rem">
+                        Você é <strong>mestre desta campanha</strong>. Gerencie combatentes da mesa e use a Arena aqui — fora desta aba você continua como jogador dos seus personagens.
+                    </p>
+                </div>
+                <div class="t20-camp-ws-nav" role="tablist" aria-label="Mesa da campanha">
+                    <button type="button" class="t20-camp-ws-nav-btn t20-camp-ws-nav-btn--active" data-camp-ws="combatentes">⚔️ Combatentes</button>
+                    <button type="button" class="t20-camp-ws-nav-btn" data-camp-ws="arena">🏟️ Arena</button>
+                </div>
+                <div id="t20campWsCombatentes" class="t20-camp-ws-pane t20-camp-ws-pane--active">
+                    <div class="t20-dash-resumo">
+                        <div class="t20-dash-resumo-card"><div class="t20-dash-num" id="totalJogadoresCamp">—</div><div class="t20-dash-lbl">Jogadores</div></div>
+                        <div class="t20-dash-resumo-card"><div class="t20-dash-num" id="totalMonstrosCamp">—</div><div class="t20-dash-lbl">Monstros</div></div>
+                        <div class="t20-dash-resumo-card"><div class="t20-dash-num" id="totalNPCsCamp">—</div><div class="t20-dash-lbl">NPCs</div></div>
+                        <div class="t20-dash-resumo-card"><div class="t20-dash-num" id="totalGeralCamp">—</div><div class="t20-dash-lbl">Total</div></div>
+                    </div>
+                    <div class="t20-dash-toolbar">
+                        <div class="t20-dash-filtros" id="t20campWsFiltros">
+                            <button type="button" class="t20-dash-filter--active" data-tipo-camp="todos">Todos</button>
+                            <button type="button" data-tipo-camp="jogador">Jogadores</button>
+                            <button type="button" data-tipo-camp="monstro">Monstros</button>
+                            <button type="button" data-tipo-camp="npc">NPCs</button>
+                        </div>
+                        <div class="t20-dash-acoes">
+                            <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnNovoCombatenteCamp">+ Novo combatente</button>
+                        </div>
+                    </div>
+                    <div class="tormenta-table-wrap">
+                        <table class="tormenta-table">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Nome</th>
+                                    <th>Classe</th>
+                                    <th>Nível</th>
+                                    <th>PV máx.</th>
+                                    <th>CA</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblPersonagensCamp">
+                                <tr><td colspan="7" class="tormenta-cell-muted">Selecione uma campanha acima.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="t20campWsArena" class="t20-camp-ws-pane">
+    <div class="t20-camp-arena-host" id="tab-arena">
         <div id="t20ArenaBloqueioJogador" class="t20-dash-placeholder" hidden>
             <p><strong>Arena de combate</strong> e criação de <strong>monstros/NPCs</strong> ficam disponíveis depois que você criar sua primeira <strong>campanha</strong> na aba Campanhas.</p>
         </div>
@@ -239,6 +285,10 @@
                     <div class="t20-arena-turn-row">
                         <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnProximo">Encerrar turno (próximo)</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
                 </div>
             </div>
         </div>
@@ -1008,10 +1058,12 @@
 <script>
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
-<script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260511t20camp"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260707mesa"></script>
+<script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
-<script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260707gm"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260707mesa"></script>
+<script src="/games/tormenta/js/t20-dashboard-solicitacoes-campanha.js?v=20260707solic"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanha-workspace.js?v=20260707mesa"></script>
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
@@ -1038,11 +1090,41 @@
     const combateSvc = new TormentaCombateService();
     window.__t20ArenaCombateSvc = combateSvc;
     const perfil = (AuthService.getPerfil && AuthService.getPerfil()) || 'jogador';
-    let isGmTormenta = perfil === 'mestre' || perfil === 'administrador';
+    const isAdmin = perfil === 'administrador';
+    let campanhaMestreAtivaId = null;
+    let campanhasComoMestre = [];
+    let cacheListaCampanha = [];
+    let filtroTipoCampWs = 'todos';
+
+    function isGmNaCampanhaAtiva() {
+        return campanhaMestreAtivaId != null && Number(campanhaMestreAtivaId) > 0;
+    }
+
+    function arenaListaFonte() {
+        return isGmNaCampanhaAtiva() ? cacheListaCampanha : [];
+    }
+
+    function atualizarBadgePerfil() {
+        const badge = document.getElementById('badgePerfil');
+        if (!badge) return;
+        if (isGmNaCampanhaAtiva()) {
+            const c = campanhasComoMestre.find((x) => Number(x.id) === Number(campanhaMestreAtivaId));
+            badge.textContent = c ? `Mestre · ${c.nome}` : 'Mestre da mesa';
+            badge.className = 't20-dash-badge-perfil mestre-campanha';
+            return;
+        }
+        if (isAdmin) {
+            badge.textContent = 'Administrador';
+            badge.className = 't20-dash-badge-perfil administrador';
+            return;
+        }
+        badge.textContent = 'Jogador';
+        badge.className = 't20-dash-badge-perfil jogador';
+    }
 
     function ativarGmTormentaNaUi() {
         aplicarRestricoesPerfilUi();
-        if (isGmTormenta) t20ArenaBindOnce();
+        if (isGmNaCampanhaAtiva()) t20ArenaBindOnce();
     }
 
     const DASH_REGRA_VERSAO =
@@ -1898,11 +1980,12 @@
     function t20ArenaRenderPick() {
         const host = document.getElementById('t20ArenaPick');
         if (!host) return;
-        if (!cacheLista.length) {
-            host.innerHTML = '<p class="t20-arena-empty">Nenhum combatente cadastrado.</p>';
+        const lista = arenaListaFonte();
+        if (!lista.length) {
+            host.innerHTML = '<p class="t20-arena-empty">Nenhum combatente nesta campanha.</p>';
             return;
         }
-        host.innerHTML = cacheLista
+        host.innerHTML = lista
             .map((p) => {
                 const foto = p.foto_url
                     ? `<img src="${escapeHtml(t20ArenaResolveMediaUrl(p.foto_url))}" alt="${escapeHtml(p.nome)}">`
@@ -2104,7 +2187,7 @@
     }
 
     async function t20ArenaRefreshFromApi() {
-        if (!isGmTormenta) return;
+        if (!isGmNaCampanhaAtiva()) return;
         try {
             const st = await combateSvc.status();
             t20ArenaApplyFromApi(st);
@@ -2263,50 +2346,68 @@
         }
     }
 
+    function sairMesaCampanhaNaUi() {
+        sairWorkspaceCampanha();
+        if (window.__t20DashCampanhas && typeof window.__t20DashCampanhas.ativarSubaba === 'function') {
+            window.__t20DashCampanhas.ativarSubaba('cadastro');
+        }
+    }
+
     function setTabs() {
         document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((b) => {
             b.addEventListener('click', () => {
                 const tab = b.getAttribute('data-tab');
-                if (tab === 'arena' && !isGmTormenta) return;
                 document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((x) => x.classList.remove('t20-dash-nav--active'));
                 b.classList.add('t20-dash-nav--active');
                 document.querySelectorAll('.t20-dash-section').forEach((s) => {
                     s.classList.toggle('t20-dash-section--active', s.id === 'tab-' + tab);
                 });
-                if (tab === 'arena') void t20ArenaRefreshFromApi();
+                if (tab === 'combatentes') {
+                    sairMesaCampanhaNaUi();
+                }
+                if (tab === 'campanhas' && window.__t20DashCampanhas) {
+                    void window.__t20DashCampanhas.recarregarCampanhas();
+                }
             });
         });
     }
 
+    function garantirNavCampanhasVisivel() {
+        const btn = document.getElementById('tabBtnCampanhas');
+        if (!btn) return;
+        btn.hidden = false;
+        btn.style.removeProperty('display');
+        btn.removeAttribute('aria-hidden');
+    }
+
     function aplicarRestricoesPerfilUi() {
-        const badge = document.getElementById('badgePerfil');
-        if (badge) {
-            badge.textContent = perfil || '—';
-            badge.className = 't20-dash-badge-perfil ' + (perfil || 'jogador');
-        }
+        garantirNavCampanhasVisivel();
+        atualizarBadgePerfil();
         const bloqArena = document.getElementById('t20ArenaBloqueioJogador');
-        const arenaSetup = document.getElementById('t20ArenaSetup');
-        const arenaActive = document.getElementById('t20ArenaActive');
-        if (!isGmTormenta) {
+        if (bloqArena) bloqArena.hidden = true;
+        if (!isAdmin) {
             document.getElementById('filtroMonstro')?.style.setProperty('display', 'none');
             document.getElementById('filtroNpc')?.style.setProperty('display', 'none');
             document.getElementById('cardResumoMonstro')?.style.setProperty('display', 'none');
             document.getElementById('cardResumoNpc')?.style.setProperty('display', 'none');
-            document.getElementById('tabBtnArena')?.style.setProperty('display', 'none');
-            if (bloqArena) bloqArena.hidden = false;
-            if (arenaSetup) arenaSetup.hidden = true;
-            if (arenaActive) arenaActive.hidden = true;
+            document.getElementById('wrapChkMeus')?.style.setProperty('display', 'none');
         } else {
             document.getElementById('filtroMonstro')?.style.removeProperty('display');
             document.getElementById('filtroNpc')?.style.removeProperty('display');
             document.getElementById('cardResumoMonstro')?.style.removeProperty('display');
             document.getElementById('cardResumoNpc')?.style.removeProperty('display');
-            document.getElementById('tabBtnArena')?.style.removeProperty('display');
             document.getElementById('wrapChkMeus')?.style.setProperty('display', '');
-            if (bloqArena) bloqArena.hidden = true;
         }
-        document.getElementById('tabBtnCampanhas')?.style.removeProperty('display');
     }
+
+    window.addEventListener('pageshow', (ev) => {
+        if (!AuthService.getGameSlugAtivo || AuthService.getGameSlugAtivo() !== 'tormenta') return;
+        garantirNavCampanhasVisivel();
+        aplicarRestricoesPerfilUi();
+        if (ev.persisted) {
+            setTabs();
+        }
+    });
 
     async function carregarRegrasCompra() {
         try {
@@ -2573,6 +2674,7 @@
             divindade: topWizard.divindade != null ? topWizard.divindade : null,
             pv_max: pvMax,
             pv_atual: pvMax,
+            campanha_id: isGmNaCampanhaAtiva() ? Number(campanhaMestreAtivaId) : undefined,
             deslocamento:
                 tdCache.deslocamento_racial_m != null ? String(tdCache.deslocamento_racial_m) : '',
             tamanho: tdCache.tamanho_racial_ui || '',
@@ -2586,7 +2688,7 @@
         };
     }
 
-    function atualizarResumo(arr) {
+    function atualizarResumo(arr, suffix = '') {
         const cj = (x) => arr.filter((p) => (p.tipo || '').toLowerCase() === x).length;
         const jog = cj('jogador');
         const mon = cj('monstro');
@@ -2595,17 +2697,17 @@
             const n = document.getElementById(id);
             if (n) n.textContent = String(v);
         };
-        set('totalJogadores', jog);
-        set('totalMonstros', mon);
-        set('totalNPCs', npc);
-        set('totalGeral', arr.length);
+        set('totalJogadores' + suffix, jog);
+        set('totalMonstros' + suffix, mon);
+        set('totalNPCs' + suffix, npc);
+        set('totalGeral' + suffix, arr.length);
     }
 
-    function renderTabela(arr) {
-        const tb = document.getElementById('tblPersonagens');
+    function renderTabelaCorpo(arr, filtroAtual, tb, aoExcluir) {
+        if (!tb) return;
         let rows = arr.slice();
-        if (filtroTipo !== 'todos') {
-            rows = rows.filter((p) => (p.tipo || '').toLowerCase() === filtroTipo);
+        if (filtroAtual !== 'todos') {
+            rows = rows.filter((p) => (p.tipo || '').toLowerCase() === filtroAtual);
         }
         if (!rows.length) {
             tb.innerHTML =
@@ -2616,10 +2718,16 @@
             .map((p) => {
                 const cl = escapeHtml((p.classe_nivel || '').trim() || '—');
                 const nv = p.nivel != null ? escapeHtml(p.nivel) : '—';
+                const rotulo =
+                    typeof PersonagemRotulo !== 'undefined' && PersonagemRotulo.rotuloPersonagemComDono
+                        ? escapeHtml(
+                              PersonagemRotulo.rotuloPersonagemComDono(p, `Nv ${p.nivel || 1}`)
+                          )
+                        : escapeHtml(p.nome);
                 return `
                 <tr>
                     <td>${chipTipo(p.tipo)}</td>
-                    <td>${escapeHtml(p.nome)}</td>
+                    <td>${rotulo}</td>
                     <td>${cl}</td>
                     <td>${nv}</td>
                     <td>${escapeHtml(p.pv_max)}</td>
@@ -2641,12 +2749,11 @@
                     try {
                         await svc.excluir(id);
                         Toast.success('Ficha excluída.');
-                        carregar();
+                        if (typeof aoExcluir === 'function') await aoExcluir();
                     } catch (e) {
                         Toast.error(e.message || 'Erro ao excluir');
                     }
                 };
-
                 if (window.ModalConfirm && typeof window.ModalConfirm.mostrar === 'function') {
                     window.ModalConfirm.mostrar({
                         titulo: 'Excluir ficha',
@@ -2658,24 +2765,81 @@
                     });
                     return;
                 }
-
                 if (!confirm('Excluir esta ficha permanentemente?')) return;
                 await executarExclusao();
             });
         });
     }
 
+    function renderTabela(arr) {
+        renderTabelaCorpo(arr, filtroTipo, document.getElementById('tblPersonagens'), carregar);
+    }
+
+    function renderTabelaCamp(arr) {
+        renderTabelaCorpo(
+            arr,
+            filtroTipoCampWs,
+            document.getElementById('tblPersonagensCamp'),
+            () => carregarWorkspaceCampanha(campanhaMestreAtivaId)
+        );
+    }
+
+    async function carregarCampanhasComoMestre() {
+        try {
+            const campSvc = new TormentaCampanhaService();
+            const lista = await campSvc.listar();
+            campanhasComoMestre = Array.isArray(lista) ? lista : [];
+            if (window.__t20CampanhaWorkspace) {
+                window.__t20CampanhaWorkspace.renderBotoesCampanhas(campanhasComoMestre);
+            }
+        } catch (_e) {
+            campanhasComoMestre = [];
+        }
+    }
+
+    function sairWorkspaceCampanha() {
+        campanhaMestreAtivaId = null;
+        cacheListaCampanha = [];
+        if (window.__t20CampanhaWorkspace && typeof window.__t20CampanhaWorkspace.sairMesa === 'function') {
+            window.__t20CampanhaWorkspace.sairMesa();
+        }
+        atualizarBadgePerfil();
+    }
+
+    async function carregarWorkspaceCampanha(campanhaId) {
+        const id = Number(campanhaId);
+        if (!Number.isFinite(id) || id <= 0) return;
+        campanhaMestreAtivaId = id;
+        atualizarBadgePerfil();
+        const camp = campanhasComoMestre.find((c) => Number(c.id) === id);
+        const badge = document.getElementById('t20campWsBadge');
+        if (badge) badge.textContent = camp ? `Mestre · ${camp.nome}` : 'Mestre da mesa';
+        const tb = document.getElementById('tblPersonagensCamp');
+        if (tb) tb.innerHTML = '<tr><td colspan="7" class="tormenta-cell-muted">Carregando…</td></tr>';
+        try {
+            const rows = await svc.listar({ campanha_id: id, limit: 500 });
+            cacheListaCampanha = Array.isArray(rows) ? rows : [];
+            atualizarResumo(cacheListaCampanha, 'Camp');
+            renderTabelaCamp(cacheListaCampanha);
+            t20ArenaRenderPick();
+            t20ArenaBindOnce();
+            void t20ArenaRefreshFromApi();
+        } catch (e) {
+            if (tb) {
+                tb.innerHTML = `<tr><td colspan="7" class="tormenta-cell-muted">${escapeHtml(e.message || 'Erro')}</td></tr>`;
+            }
+        }
+    }
+
     async function carregar() {
         const tb = document.getElementById('tblPersonagens');
         tb.innerHTML = '<tr><td colspan="7" class="tormenta-cell-muted">Carregando…</td></tr>';
-        const meus = isGmTormenta && document.getElementById('chkMeus')?.checked;
+        const meus = isAdmin && document.getElementById('chkMeus')?.checked;
         try {
             const rows = await svc.listar({ meus: !!meus, limit: 500 });
             cacheLista = Array.isArray(rows) ? rows : [];
             atualizarResumo(cacheLista);
             renderTabela(cacheLista);
-            t20ArenaRenderPick();
-            if (isGmTormenta) void t20ArenaRefreshFromApi();
         } catch (e) {
             tb.innerHTML = `<tr><td colspan="7" class="tormenta-cell-muted">${escapeHtml(e.message || 'Erro')}</td></tr>`;
         }
@@ -2773,8 +2937,21 @@
     }
 
     document.getElementById('btnNovoCombatente')?.addEventListener('click', () => {
-        if (isGmTormenta) openOverlay('overlaySeletorTipo');
-        else abrirCadastro('jogador');
+        abrirCadastro('jogador');
+    });
+
+    document.getElementById('btnNovoCombatenteCamp')?.addEventListener('click', () => {
+        if (isGmNaCampanhaAtiva()) openOverlay('overlaySeletorTipo');
+    });
+
+    document.querySelectorAll('#t20campWsFiltros button[data-tipo-camp]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            filtroTipoCampWs = btn.getAttribute('data-tipo-camp') || 'todos';
+            document.querySelectorAll('#t20campWsFiltros button[data-tipo-camp]').forEach((b) => {
+                b.classList.toggle('t20-dash-filter--active', b === btn);
+            });
+            renderTabelaCamp(cacheListaCampanha);
+        });
     });
 
     document.querySelectorAll('[data-escolher-tipo]').forEach((btn) => {
@@ -2788,12 +2965,12 @@
         btn.addEventListener('click', () => closeOverlay(btn.getAttribute('data-close')));
     });
 
-    document.querySelectorAll('.t20-dash-filtros button[data-tipo]').forEach((btn) => {
+    document.querySelectorAll('#tab-combatentes .t20-dash-filtros button[data-tipo]').forEach((btn) => {
         btn.addEventListener('click', () => {
             const t = btn.getAttribute('data-tipo');
-            if (!isGmTormenta && (t === 'monstro' || t === 'npc')) return;
+            if (!isAdmin && (t === 'monstro' || t === 'npc')) return;
             filtroTipo = t;
-            document.querySelectorAll('.t20-dash-filtros button[data-tipo]').forEach((b) => {
+            document.querySelectorAll('#tab-combatentes .t20-dash-filtros button[data-tipo]').forEach((b) => {
                 b.classList.toggle('t20-dash-filter--active', b.getAttribute('data-tipo') === t);
             });
             renderTabela(cacheLista);
@@ -2872,21 +3049,31 @@
 
     aplicarRestricoesPerfilUi();
     setTabs();
-    if (isGmTormenta) t20ArenaBindOnce();
     if (typeof window.__t20DashCampanhasInit === 'function') {
         window.__t20DashCampanhasInit({
             getLista: () => cacheLista,
             recarregarTabela: carregar,
             Toast,
-            onCampanhaCriada: () => {
-                if (!isGmTormenta) {
-                    isGmTormenta = true;
-                    if (AuthService.marcarPodeMestrarNoJogoAtual) {
-                        AuthService.marcarPodeMestrarNoJogoAtual(true);
-                    }
-                    ativarGmTormentaNaUi();
+            onCampanhaCriada: async (criada) => {
+                await carregarCampanhasComoMestre();
+                if (criada && criada.id) {
+                    campanhasComoMestre = window.__t20DashCampanhas
+                        ? window.__t20DashCampanhas.getCampanhas()
+                        : campanhasComoMestre;
                 }
             },
+            onSelecionarCampanha: (id) => void carregarWorkspaceCampanha(id),
+            onSairCampanha: () => sairWorkspaceCampanha(),
+            onCampanhasAtualizadas: (lista) => {
+                campanhasComoMestre = Array.isArray(lista) ? lista : [];
+            },
+        });
+    }
+    if (typeof window.__t20CampanhaWorkspaceInit === 'function') {
+        window.__t20CampanhaWorkspaceInit({
+            onSelecionarCampanha: (id) => void carregarWorkspaceCampanha(id),
+            onSairCampanha: () => sairWorkspaceCampanha(),
+            onAbrirArena: () => void t20ArenaRefreshFromApi(),
         });
     }
     if (window.T20DashPericiasV13) {
@@ -2915,13 +3102,7 @@
         });
     }
     (async () => {
-        if (!isGmTormenta && AuthService.carregarPodeMestrarNoJogoAtual) {
-            const ok = await AuthService.carregarPodeMestrarNoJogoAtual();
-            if (ok) {
-                isGmTormenta = true;
-                ativarGmTormentaNaUi();
-            }
-        }
+        await carregarCampanhasComoMestre();
         void carregar();
         const wrapHa = document.getElementById('cadWrapHeroisArton');
         if (wrapHa) wrapHa.style.display = isDashV13() ? '' : 'none';
@@ -2958,6 +3139,23 @@
         }
         if (window.T20DuendeV13) {
             window.T20DuendeV13.init();
+        }
+        if (window.T20CampanhaSolicitacoesMestre) {
+            window.T20CampanhaSolicitacoesMestre.iniciarPolling(
+                {
+                    Toast,
+                    onAceita: (sol) => {
+                        if (
+                            campanhaMestreAtivaId &&
+                            sol &&
+                            Number(sol.campanha_id) === Number(campanhaMestreAtivaId)
+                        ) {
+                            void carregarWorkspaceCampanha(campanhaMestreAtivaId);
+                        }
+                    },
+                },
+                90000
+            );
         }
         const selClMb = document.getElementById('cadClasseMb');
         if (selClMb && !selClMb.__boundVariantesHa3) {

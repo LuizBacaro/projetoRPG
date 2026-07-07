@@ -36,6 +36,14 @@
                     <span id="fichaAlinhamento" class="ficha-tag ficha-tag-alinhamento">Alinhamento: —</span>
                     <span id="fichaDivindade"   class="ficha-tag ficha-tag-alinhamento">Divindade: —</span>
                     <span id="fichaCampanha"    class="ficha-tag ficha-tag-dominio">Campanha: —</span>
+                    <div id="d35CampanhaSolicitacaoWrap" class="ficha-campanha-solicitacao" hidden>
+                        <label for="f_campanha" class="ficha-tag">Campanha</label>
+                        <select id="f_campanha" class="ficha-modal-input" style="max-width:16rem;margin-left:0.35rem">
+                            <option value="">— Nenhuma / escolher —</option>
+                        </select>
+                        <p id="d35CampanhaSolicitacaoHint" class="ficha-hint" hidden style="margin:0.25rem 0 0;font-size:0.82rem"></p>
+                        <button type="button" class="ficha-btn" id="d35BtnCancelarSolicitacaoCampanha" hidden style="margin-top:0.25rem;font-size:0.8rem">Cancelar solicitação</button>
+                    </div>
                     <span id="fichaJogador"    class="ficha-tag ficha-tag-jogador">Jogador: —</span>
                     <span id="fichaDominios"    class="ficha-tag ficha-tag-dominio">Domínios: —</span>
                     <button id="btnEditarPerfilMagico" class="ficha-btn-editar-identidade" type="button">✏️ Editar</button>
@@ -1040,6 +1048,8 @@
         window.AuthService.exigirJogo('dnd35');
     }
 </script>
+<script src="../js/services/CampanhaService.js?v=20260707solic"></script>
+<script src="../js/d35-ficha-campanha-solicitacao.js?v=20260707solic"></script>
 <script type="module" src="../js/services/NotificationService.js?v=28"></script>
 <script type="module" src="../js/controllers/FichaPersonagemController.js?v=20260524f"></script>
 <script type="module" src="../js/controllers/ConsumiveisFichaController.js?v=1"></script>

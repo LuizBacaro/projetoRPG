@@ -6,6 +6,9 @@ from sqlalchemy.orm import Session
 from app.games.tormenta.repositories.campanha_repository import (
     TormentaCampanhaRepository,
 )
+from app.games.tormenta.repositories.campanha_solicitacao_repository import (
+    TormentaCampanhaSolicitacaoRepository,
+)
 from app.games.tormenta.repositories.combate_repository import TormentaCombateRepository
 from app.games.tormenta.repositories.personagem_repository import (
     TormentaPersonagemRepository,
@@ -14,6 +17,9 @@ from app.games.tormenta.repositories.sessao_campanha_repository import (
     TormentaSessaoCampanhaRepository,
 )
 from app.games.tormenta.services.campanha_service import TormentaCampanhaService
+from app.games.tormenta.services.campanha_solicitacao_service import (
+    TormentaCampanhaSolicitacaoService,
+)
 from app.games.tormenta.services.combate_service import TormentaCombateService
 from app.games.tormenta.services.personagem_consumiveis_service import (
     TormentaPersonagemConsumiveisService,
@@ -114,6 +120,28 @@ def get_tormenta_sessao_campanha_repository(
     db: Session = Depends(get_db),
 ) -> TormentaSessaoCampanhaRepository:
     return TormentaSessaoCampanhaRepository(db)
+
+
+def get_tormenta_campanha_solicitacao_repository(
+    db: Session = Depends(get_db),
+) -> TormentaCampanhaSolicitacaoRepository:
+    return TormentaCampanhaSolicitacaoRepository(db)
+
+
+def get_tormenta_campanha_solicitacao_service(
+    solicitacao_repository: TormentaCampanhaSolicitacaoRepository = Depends(
+        get_tormenta_campanha_solicitacao_repository
+    ),
+    campanha_repository: TormentaCampanhaRepository = Depends(
+        get_tormenta_campanha_repository
+    ),
+    personagem_repository: TormentaPersonagemRepository = Depends(
+        get_tormenta_personagem_repository
+    ),
+) -> TormentaCampanhaSolicitacaoService:
+    return TormentaCampanhaSolicitacaoService(
+        solicitacao_repository, campanha_repository, personagem_repository
+    )
 
 
 def get_tormenta_campanha_service(

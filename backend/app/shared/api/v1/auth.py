@@ -455,7 +455,15 @@ def refresh(
     logger.info(f"✅ Token renovado com sucesso: {usuario.email}")
     log_security_event("refresh", "success", request=request, user_email=usuario.email)
 
-    return TokenResponse(**emitir_par_tokens(usuario))
+    game_slug = token_payload.get("game_slug")
+    perfil_no_jogo = token_payload.get("perfil_no_jogo") or token_payload.get("profile")
+    return TokenResponse(
+        **emitir_par_tokens(
+            usuario,
+            game_slug=game_slug,
+            perfil_no_jogo=perfil_no_jogo,
+        )
+    )
 
 
 @router.get(

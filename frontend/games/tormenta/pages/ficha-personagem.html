@@ -18,7 +18,7 @@
         <header class="t20-ficha-header-dndlike">
             <div class="t20-ficha-header__bar">
                 <div class="t20-ficha-header__esq">
-                    <a class="tormenta-btn tormenta-btn--primary" href="dashboard.html" style="color:#fff;text-decoration:none;">← Lista</a>
+                    <a class="tormenta-btn tormenta-btn--primary" href="dashboard.html?v=20260707nav" style="color:#fff;text-decoration:none;">← Lista</a>
                 </div>
                 <div class="t20-ficha-header__centro ficha-titulo">
                     <div class="t20-ficha-header__titulo-wrap">
@@ -1078,7 +1078,14 @@
                     <div class="t20-ficha-secao">
                         <h3 class="t20-ficha-secao-titulo">Mesa &amp; notas</h3>
                         <div class="t20-defesa-grid">
-                            <div class="t20-ficha-field"><label for="f_campanha">Campanha</label><input id="f_campanha" /></div>
+                            <div class="t20-ficha-field">
+                                <label for="f_campanha">Campanha</label>
+                                <select id="f_campanha" class="t20-input">
+                                    <option value="">— Nenhuma / escolher —</option>
+                                </select>
+                                <p id="t20CampanhaSolicitacaoHint" class="t20-dash-hint" hidden></p>
+                                <button type="button" class="tormenta-btn t20-btn-inline" id="t20BtnCancelarSolicitacaoCampanha" hidden>Cancelar solicitação</button>
+                            </div>
                             <div class="t20-ficha-field"><label for="f_mestre">Mestre</label><input id="f_mestre" /></div>
                         </div>
                         <div class="t20-ficha-field"><label for="f_outros_j">Outros jogadores</label><input id="f_outros_j" /></div>
@@ -1542,11 +1549,13 @@
 </div>
 <script src="/js/shared/render-api-origin-boot.js?v=2"></script>
 <script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
-<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/services/AuthService.js?v=20260707gm"></script>
 <script src="/games/dnd35/js/ui/Toast.js"></script>
 <script>
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
+<script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
+<script src="/games/tormenta/js/t20-ficha-campanha-solicitacao.js?v=20260707solic"></script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioAuto"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260629s44"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
@@ -2484,6 +2493,34 @@
 
     /** Último payload de personagem da API (para badge do grimório ao mudar classe/nível no formulário). */
     let __t20LastPersonagemPayload = null;
+    let __t20CampanhaNomeFicha = '';
+
+    async function t20InitCampanhaFicha(personagem) {
+        if (!window.T20FichaCampanhaSolicitacao) return;
+        const p = personagem || {};
+        if (p.ficha_json && p.ficha_json.campanha) {
+            __t20CampanhaNomeFicha = String(p.ficha_json.campanha);
+        } else if (p.campanha_id) {
+            __t20CampanhaNomeFicha = __t20CampanhaNomeFicha || '';
+        }
+        const vinculoId = p.campanha_id != null ? Number(p.campanha_id) : null;
+        await window.T20FichaCampanhaSolicitacao.init({
+            getPersonagemId: () => {
+                const v = q('fichaId') && q('fichaId').value.trim();
+                return v ? Number(v) : null;
+            },
+            getCampanhaIdVinculada: () => vinculoId,
+            onCampanhaNomeChange: (nome) => {
+                __t20CampanhaNomeFicha = nome || '';
+                atualizarTagsHeader();
+            },
+            Toast,
+        });
+        if (vinculoId && window.T20FichaCampanhaSolicitacao.setVinculadoCampanhaId) {
+            window.T20FichaCampanhaSolicitacao.setVinculadoCampanhaId(vinculoId);
+        }
+        atualizarTagsHeader();
+    }
     /** Quando true, raça MB e classe MB vêm do cadastro rápido no dashboard e ficam somente leitura na ficha. */
     let travaRacaClasseMb = false;
     /** Personagem criado pelo cadastro rápido do dashboard (`ficha_json.cadastro_dashboard`). */
@@ -2872,7 +2909,7 @@
         const tdh = q('t20TagDivindadeHdr');
         if (tdh) tdh.textContent = `Divindade: ${(q('f_divindade') && q('f_divindade').value.trim()) || '—'}`;
         const tc = q('t20TagCampanha');
-        if (tc) tc.textContent = `Campanha: ${(q('f_campanha') && q('f_campanha').value.trim()) || '—'}`;
+        if (tc) tc.textContent = `Campanha: ${__t20CampanhaNomeFicha || '—'}`;
         const tDesl = q('t20TagDesl');
         if (tDesl) {
             const v = (q('f_desl') && String(q('f_desl').value).trim()) || '';
@@ -7273,7 +7310,7 @@
             carga: t20CargaParaJson(),
             armaduras_protecao: t20ArmadurasEquipadas,
             idiomas: q('f_idiomas').value,
-            campanha: q('f_campanha').value,
+            campanha: __t20CampanhaNomeFicha || '',
             mestre: q('f_mestre').value,
             outros_jogadores: q('f_outros_j').value,
             xp_atual: q('f_xp').value,
@@ -7362,7 +7399,7 @@
         renderT20ArmadurasLista();
         q('f_idiomas').value = j.idiomas || '';
         renderIdiomasListaDoCampo();
-        q('f_campanha').value = j.campanha || '';
+        __t20CampanhaNomeFicha = j.campanha || '';
         q('f_mestre').value = j.mestre || '';
         q('f_outros_j').value = j.outros_jogadores || '';
         q('f_xp').value = j.xp_atual != null ? String(j.xp_atual) : '';
@@ -7890,6 +7927,7 @@
         t20SyncResSheetToDialog();
         t20SyncDeslTamSheetToDialog();
         __t20DialogEditSnapshot = '';
+        void t20InitCampanhaFicha(p);
     }
     window.t20PreencherFormPersonagem = preencherForm;
     window.getRegraVersaoAtiva = getRegraVersaoAtiva;
@@ -8072,7 +8110,6 @@
         t20AtualizarUiPericiasVersao();
         renderIdiomasListaDoCampo();
         destacarPericiasClasseMb();
-        q('f_jogador').value = (p.dono_nome || '').trim() || AuthService.getNome();
 
         t20BindDialogAttrsEdicaoOnce();
         t20BindDialogResEdicaoOnce();
@@ -8550,6 +8587,7 @@
             }
         } else {
             q('f_status').textContent = 'Nova ficha';
+            q('f_jogador').value = (AuthService.getNome && AuthService.getNome()) || '';
             aplicarFotoUrl('');
             if (!isMestre) {
                 q('f_tipo').value = 'jogador';
@@ -8566,6 +8604,7 @@
             t20SyncDeslTamSheetToDialog();
             __t20LastPersonagemPayload = null;
             t20AtualizarGrimorioElegibilidadeVisual(null);
+            void t20InitCampanhaFicha(null);
         }
         const wrap = q('wrapTipo');
         if (wrap) wrap.classList.toggle('is-mestre', isMestre);

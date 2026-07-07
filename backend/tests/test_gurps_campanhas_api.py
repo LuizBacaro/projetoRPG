@@ -217,3 +217,40 @@ def test_mestre_nao_altera_campanha_de_outro(gurps_mestre_e_jogadores_db):
         json={"nome": "Invadir"},
     )
     assert r_forbidden.status_code == 404
+
+
+def test_solicitacao_entrada_campanha_aceite_pelo_mestre(gurps_mestre_e_jogadores_db):
+    SessionLocal, mestre, j1, _ = gurps_mestre_e_jogadores_db
+    c_mestre = _client_campanhas(SessionLocal, _usuario(mestre))
+    c_jog = _client_campanhas(SessionLocal, _usuario(j1))
+
+    p1 = _criar_personagem(c_jog, "Herói Sol GURPS")
+    cid = c_mestre.post(
+        "/api/v1/gurps/campanhas", json={"nome": "Mesa Solicitacao GURPS"}
+    ).json()["id"]
+
+    r_sol = c_jog.post(
+        "/api/v1/gurps/campanhas/solicitacoes",
+        json={"campanha_id": cid, "personagem_id": p1},
+    )
+    assert r_sol.status_code == 201, r_sol.text
+    sid = r_sol.json()["id"]
+
+    r_pend = c_mestre.get("/api/v1/gurps/campanhas/solicitacoes/pendentes")
+    assert any(x["id"] == sid for x in r_pend.json())
+
+    r_ok = c_mestre.post(f"/api/v1/gurps/campanhas/solicitacoes/{sid}/aceitar")
+    assert r_ok.status_code == 200
+
+    r_p = c_jog.get(f"/api/v1/gurps/personagens/{p1}")
+    assert r_p.json()["campanha_id"] == cid
+
+
+def test_listar_disponiveis_retorna_campanhas(gurps_mestre_e_jogadores_db):
+    SessionLocal, mestre, j1, _ = gurps_mestre_e_jogadores_db
+    c_mestre = _client_campanhas(SessionLocal, _usuario(mestre))
+    c_jog = _client_campanhas(SessionLocal, _usuario(j1))
+    c_mestre.post("/api/v1/gurps/campanhas", json={"nome": "Camp Publica GURPS"})
+    r = c_jog.get("/api/v1/gurps/campanhas/disponiveis")
+    assert r.status_code == 200
+    assert "Camp Publica GURPS" in {c["nome"] for c in r.json()}
