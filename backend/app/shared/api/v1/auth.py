@@ -11,7 +11,6 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
 
-from ....games.dnd35.models.campanha import Campanha
 from ...core.config import settings
 from ...core.deps import get_db, get_usuario_atual
 from ...core.security import decodificar_token, hash_senha, verificar_senha
@@ -88,15 +87,11 @@ class UsuarioResponse(BaseModel):
 
 
 class RegistroRequest(BaseModel):
-    """Schema para cadastro público de nova conta."""
+    """Schema para cadastro público de nova conta — sempre perfil Jogador."""
 
     nome: str = Field(..., min_length=1, max_length=100)
     email: EmailStr = Field(..., max_length=150)
     senha: str = Field(..., min_length=6, max_length=128)
-    perfil: str = Field(
-        default=PerfilUsuario.JOGADOR.value, pattern="^(jogador|mestre)$"
-    )
-    campanha_nome: Optional[str] = Field(default=None, max_length=120)
 
 
 class RegistroResponse(BaseModel):
@@ -287,8 +282,8 @@ def logout(request: Request):
     "/registro",
     response_model=RegistroResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Cadastro público de jogador/mestre",
-    description="Cria nova conta com perfil jogador ou mestre. Para mestre, exige nome da primeira campanha.",
+    summary="Cadastro público de jogador",
+    description="Cria nova conta com perfil Jogador. Campanhas são criadas depois, dentro da plataforma.",
     responses={
         201: {"description": "Conta criada com sucesso"},
         409: {"description": "E-mail já cadastrado"},
@@ -315,21 +310,8 @@ def registrar(
             detail="E-mail já cadastrado",
         )
 
-    perfil_solicitado = payload.perfil.strip().lower()
-    perfil = (
-        PerfilUsuario.MESTRE
-        if perfil_solicitado == PerfilUsuario.MESTRE.value
-        else PerfilUsuario.JOGADOR
-    )
-    campanha_nome = (payload.campanha_nome or "").strip()
-    if perfil == PerfilUsuario.MESTRE and not campanha_nome:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Nome da campanha é obrigatório para cadastro como mestre",
-        )
-
     novo_usuario = Usuario(
-        perfil=perfil,
+        perfil=PerfilUsuario.JOGADOR,
         nome=payload.nome.strip(),
         email=payload.email.strip().lower(),
         senha_hash=hash_senha(payload.senha),
@@ -338,15 +320,6 @@ def registrar(
     )
     try:
         db.add(novo_usuario)
-        db.flush()
-        if perfil == PerfilUsuario.MESTRE:
-            db.add(
-                Campanha(
-                    mestre_id=novo_usuario.id,
-                    nome=campanha_nome,
-                    descricao="Campanha inicial criada no cadastro do mestre.",
-                )
-            )
         db.commit()
         db.refresh(novo_usuario)
     except Exception:

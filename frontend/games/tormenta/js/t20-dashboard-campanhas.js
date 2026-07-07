@@ -1,5 +1,5 @@
 /**
- * Painel Campanhas — dashboard Tormenta (mestre/admin).
+ * Painel Campanhas — dashboard Tormenta (qualquer usuário autenticado).
  * Inicializado via window.__t20DashCampanhasInit(opts) a partir de dashboard.html.
  */
 (function (global) {
@@ -13,10 +13,11 @@
     }
 
     global.__t20DashCampanhasInit = function (opts) {
-        if (!opts || !opts.isMestre) return;
+        if (!opts) return;
 
         const getLista = typeof opts.getLista === 'function' ? opts.getLista : () => [];
         const recarregarTabela = opts.recarregarTabela || function () {};
+        const onCampanhaCriada = typeof opts.onCampanhaCriada === 'function' ? opts.onCampanhaCriada : null;
         const Toast = opts.Toast || global.Toast;
 
         const svc = new global.TormentaCampanhaService();
@@ -337,6 +338,7 @@
                 } else {
                     await svc.criar({ nome, descricao, personagem_ids: ids });
                     Toast.success('Campanha criada.');
+                    if (onCampanhaCriada) onCampanhaCriada();
                 }
                 resetFormCampanha();
                 await carregarCampanhas();

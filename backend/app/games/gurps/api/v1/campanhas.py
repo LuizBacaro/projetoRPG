@@ -19,11 +19,7 @@ from app.games.gurps.schemas.sessao_campanha import (
 )
 from app.games.gurps.services.campanha_service import GurpsCampanhaService
 from app.games.gurps.services.sessao_campanha_service import GurpsSessaoCampanhaService
-from app.shared.core.deps import (
-    get_usuario_atual,
-    requer_game_gurps,
-    requer_mestre_ou_admin,
-)
+from app.shared.core.deps import get_usuario_atual, requer_game_gurps
 from app.shared.exceptions.custom_exceptions import ArenaBaseException
 
 router = APIRouter(
@@ -48,7 +44,7 @@ def listar_sessoes_visiveis_para_jogador(
 @router.get("/sessoes", response_model=list[GurpsSessaoCampanhaResponse])
 def listar_sessoes(
     service: GurpsSessaoCampanhaService = Depends(get_gurps_sessao_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     rows = service.listar_para_mestre_ou_admin(usuario.perfil, usuario.id)
     return [GurpsSessaoCampanhaResponse.model_validate(s) for s in rows]
@@ -62,7 +58,7 @@ def listar_sessoes(
 def criar_sessao(
     payload: GurpsSessaoCampanhaCreate,
     service: GurpsSessaoCampanhaService = Depends(get_gurps_sessao_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         s = service.criar(
@@ -82,7 +78,7 @@ def atualizar_sessao(
     sessao_id: int,
     payload: GurpsSessaoCampanhaUpdate,
     service: GurpsSessaoCampanhaService = Depends(get_gurps_sessao_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         s = service.atualizar(
@@ -101,7 +97,7 @@ def atualizar_sessao(
 def deletar_sessao(
     sessao_id: int,
     service: GurpsSessaoCampanhaService = Depends(get_gurps_sessao_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         service.deletar(usuario.id, usuario.perfil, sessao_id)
@@ -112,7 +108,7 @@ def deletar_sessao(
 @router.get("", response_model=list[GurpsCampanhaResponse])
 def listar(
     service: GurpsCampanhaService = Depends(get_gurps_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     rows = service.listar_para_mestre_ou_admin(usuario.perfil, usuario.id)
     return [GurpsCampanhaResponse.model_validate(c) for c in rows]
@@ -124,7 +120,7 @@ def listar(
 def criar(
     payload: GurpsCampanhaCreate,
     service: GurpsCampanhaService = Depends(get_gurps_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         c = service.criar(
@@ -143,7 +139,7 @@ def atualizar(
     campanha_id: int,
     payload: GurpsCampanhaUpdate,
     service: GurpsCampanhaService = Depends(get_gurps_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         c = service.atualizar(
@@ -164,7 +160,7 @@ def associar_personagens(
     campanha_id: int,
     payload: GurpsCampanhaAssociarPersonagens,
     service: GurpsCampanhaService = Depends(get_gurps_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         c = service.associar_personagens(
@@ -179,7 +175,7 @@ def associar_personagens(
 def deletar(
     campanha_id: int,
     service: GurpsCampanhaService = Depends(get_gurps_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         service.deletar(campanha_id, usuario.id, usuario.perfil)

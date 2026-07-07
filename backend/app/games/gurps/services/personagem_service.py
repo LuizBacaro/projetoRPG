@@ -10,6 +10,7 @@ from app.games.gurps.core.pericias_lite import (
     listar_pericias_lite,
     validar_pre_requisitos_lite,
 )
+from app.games.gurps.models.campanha import GurpsCampanha
 from app.games.gurps.models.personagem import (
     GurpsPersonagem,
     GurpsPersonagemDesvantagem,
@@ -36,12 +37,23 @@ class GurpsPersonagemService:
     def _tipos_validos() -> set:
         return {"jogador", "monstro", "npc"}
 
-    def _resolver_dono(self, usuario: Usuario, tipo: str) -> Optional[int]:
-        t = (tipo or "").lower()
+    def _usuario_pode_mestrar_gurps(self, usuario: Usuario) -> bool:
         if usuario.perfil in (
             PerfilUsuario.ADMINISTRADOR,
             PerfilUsuario.MESTRE,
         ):
+            return True
+        row = (
+            self.repo.db.query(GurpsCampanha.id)
+            .filter(GurpsCampanha.mestre_id == usuario.id)
+            .limit(1)
+            .scalar()
+        )
+        return isinstance(row, int)
+
+    def _resolver_dono(self, usuario: Usuario, tipo: str) -> Optional[int]:
+        t = (tipo or "").lower()
+        if self._usuario_pode_mestrar_gurps(usuario):
             if t in ("monstro", "npc"):
                 return None
         return usuario.id
@@ -90,7 +102,7 @@ class GurpsPersonagemService:
         apenas_meus: bool = False,
     ) -> List[GurpsPersonagemResponse]:
         # Jogador: apenas personagens próprios (paridade com D&D 3.5).
-        if usuario.perfil == PerfilUsuario.JOGADOR:
+        if not self._usuario_pode_mestrar_gurps(usuario):
             if tipo:
                 rows = self.repo.get_by_owner_and_tipo(
                     usuario.id, tipo, skip=skip, limit=limit
@@ -121,7 +133,7 @@ class GurpsPersonagemService:
         usuario: Usuario,
         apenas_meus: bool = False,
     ) -> int:
-        if usuario.perfil == PerfilUsuario.JOGADOR:
+        if not self._usuario_pode_mestrar_gurps(usuario):
             if tipo:
                 return self.repo.count_by_owner_and_tipo(usuario.id, tipo)
             return self.repo.count_by_owner(usuario.id)
@@ -146,7 +158,7 @@ class GurpsPersonagemService:
     ) -> GurpsPersonagemResponse:
         self._validar_tipo(payload.tipo)
         if (
-            usuario.perfil == PerfilUsuario.JOGADOR
+            not self._usuario_pode_mestrar_gurps(usuario)
             and payload.tipo.lower() != "jogador"
         ):
             raise DadosInvalidos("Jogadores so podem criar fichas do tipo jogador")

@@ -16,7 +16,7 @@
     <div class="header-nav">
         <div class="header-titulo">
             <h1>⚙️ GURPS — Arena</h1>
-            <p>Combatentes (personagens), campanhas e arena (ordem de turno por Velocidade básica, GURPS).</p>
+            <p>Combatentes (personagens), campanhas e arena. Crie uma <strong>campanha</strong> para desbloquear a <strong>Arena</strong> e ferramentas de mestre.</p>
         </div>
         <div class="header-usuario-container">
             <div class="header-usuario">
@@ -32,7 +32,7 @@
 <nav class="dashboard-nav gurps-dash-nav" role="tablist">
     <button type="button" class="nav-tab active" data-tab="combatentes">⚔️ Combatentes</button>
     <button type="button" class="nav-tab" data-tab="campanhas">📜 Campanhas</button>
-    <button type="button" class="nav-tab" data-tab="arena">🏟️ Arena</button>
+    <button type="button" class="nav-tab" data-tab="arena" id="tabBtnArenaGurps">🏟️ Arena</button>
 </nav>
 
 <div class="dashboard-body gurps-dash-body">
@@ -72,7 +72,7 @@
             <h2 class="gurps-dash-card-title">Campanhas</h2>
             <div id="campanhasJogador" hidden>
                 <p class="gurps-dash-msg gurps-dash-msg--info gurps-mt-0">
-                    Campanhas são organizadas pelo mestre. Quando sua ficha estiver vinculada a uma mesa, os resumos que o mestre disponibilizar aparecem abaixo.
+                    Quando sua ficha estiver vinculada a uma mesa, os resumos que o mestre disponibilizar aparecem abaixo.
                 </p>
                 <h3 class="dash-divcustom-titulo">Resumos de sessão (leitura)</h3>
                 <div id="listaSessoesJogadorGurps" class="dash-divcustom-listagem">
@@ -318,7 +318,7 @@
 
 <script src="/js/shared/render-api-origin-boot.js?v=2"></script>
 <script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
-<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/services/AuthService.js?v=20260707gm"></script>
 <script src="/games/dnd35/js/ui/Toast.js"></script>
 <script>
     if (!AuthService.exigirJogo('gurps')) {}
@@ -329,7 +329,7 @@
 <script>
 (function () {
     const perfil = AuthService.getPerfil();
-    const isMestre = perfil === 'mestre' || perfil === 'administrador';
+    let isGmGurps = perfil === 'mestre' || perfil === 'administrador';
     const ps = new GurpsPersonagemService();
     const cs = new GurpsCampanhaService();
     const kb = new GurpsCombateService();
@@ -342,6 +342,23 @@
     let sessaoEmEdicaoIdGurps = null;
     let arenaStatusCache = null;
     let arenaActionHistory = [];
+
+    function ativarGmGurpsNaUi() {
+        aplicarRestricoesPerfilGurps();
+    }
+
+    function aplicarRestricoesPerfilGurps() {
+        const arenaTab = document.getElementById('tabBtnArenaGurps');
+        const arenaSection = document.getElementById('tab-arena');
+        if (!isGmGurps) {
+            if (arenaTab) arenaTab.style.display = 'none';
+            if (arenaSection && arenaSection.classList.contains('active')) {
+                tab('combatentes');
+            }
+        } else if (arenaTab) {
+            arenaTab.style.removeProperty('display');
+        }
+    }
 
     function classeBadgeTipo(tipo) {
         const t = String(tipo || '').toLowerCase();
@@ -359,8 +376,8 @@
         });
         if (name === 'arena') refreshArena();
         if (name === 'campanhas') {
-            if (isMestre) carregarAbaCampanhas();
-            else carregarResumosJogadorGurps();
+            carregarAbaCampanhas();
+            carregarResumosJogadorGurps();
         }
     }
 
@@ -1164,6 +1181,13 @@
                     resetFormCampanha();
                     await carregarAbaCampanhas();
                     await loadPersonagens();
+                    if (!isGmGurps) {
+                        isGmGurps = true;
+                        if (AuthService.marcarPodeMestrarNoJogoAtual) {
+                            AuthService.marcarPodeMestrarNoJogoAtual(true);
+                        }
+                        ativarGmGurpsNaUi();
+                    }
                 } catch (e) {
                     Toast.error(e.message || 'Erro ao salvar campanha');
                 }
@@ -1213,14 +1237,23 @@
     document.getElementById('btnLogout').addEventListener('click', () => AuthService.logout && AuthService.logout());
     AuthService.configurarHeaderUsuario();
 
-    if (isMestre) {
-        document.getElementById('campanhasMestre').hidden = false;
-        configurarUiCampanhasMestre();
-    } else {
-        document.getElementById('campanhasJogador').hidden = false;
-    }
+    document.getElementById('campanhasMestre').hidden = false;
+    configurarUiCampanhasMestre();
+    document.getElementById('campanhasJogador').hidden = false;
 
-    loadPersonagens().finally(() => refreshArena());
+    aplicarRestricoesPerfilGurps();
+
+    (async () => {
+        if (!isGmGurps && AuthService.carregarPodeMestrarNoJogoAtual) {
+            const ok = await AuthService.carregarPodeMestrarNoJogoAtual();
+            if (ok) {
+                isGmGurps = true;
+                ativarGmGurpsNaUi();
+                await carregarAbaCampanhas();
+            }
+        }
+        loadPersonagens().finally(() => refreshArena());
+    })();
 })();
 </script>
 </body>

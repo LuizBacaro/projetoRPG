@@ -22,7 +22,7 @@ from app.games.dnd35.schemas.sessao_campanha import (
 )
 from app.games.dnd35.services.campanha_service import CampanhaService
 from app.games.dnd35.services.sessao_campanha_service import SessaoCampanhaService
-from app.shared.core.deps import requer_game_dnd35, requer_mestre_ou_admin
+from app.shared.core.deps import get_usuario_atual, requer_game_dnd35
 from app.shared.exceptions.custom_exceptions import ArenaBaseException
 
 router = APIRouter(
@@ -35,7 +35,7 @@ router = APIRouter(
 @router.get("", response_model=list[CampanhaResponse])
 def listar_campanhas(
     service: CampanhaService = Depends(get_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     return service.listar_por_mestre(usuario.id)
 
@@ -44,7 +44,7 @@ def listar_campanhas(
 def criar_campanha(
     payload: CampanhaCreate,
     service: CampanhaService = Depends(get_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         return service.criar(
@@ -62,7 +62,7 @@ def atualizar_campanha(
     campanha_id: int,
     payload: CampanhaUpdate,
     service: CampanhaService = Depends(get_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         return service.atualizar(
@@ -81,7 +81,7 @@ def associar_personagens(
     campanha_id: int,
     personagem_ids: list[int],
     service: CampanhaService = Depends(get_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         return service.associar_personagens(campanha_id, usuario.id, personagem_ids)
@@ -93,7 +93,7 @@ def associar_personagens(
 def deletar_campanha(
     campanha_id: int,
     service: CampanhaService = Depends(get_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         service.deletar(campanha_id, usuario.id)
@@ -105,7 +105,7 @@ def deletar_campanha(
 @router.get("/sessoes", response_model=list[SessaoCampanhaResponse])
 def listar_sessoes_campanha(
     service: SessaoCampanhaService = Depends(get_sessao_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     return service.listar_por_mestre(usuario.id)
 
@@ -118,7 +118,7 @@ def listar_sessoes_campanha(
 def criar_sessao_campanha(
     payload: SessaoCampanhaCreate,
     service: SessaoCampanhaService = Depends(get_sessao_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         return service.criar(
@@ -136,7 +136,7 @@ def atualizar_sessao_campanha(
     sessao_id: int,
     payload: SessaoCampanhaUpdate,
     service: SessaoCampanhaService = Depends(get_sessao_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         return service.atualizar(
@@ -153,7 +153,7 @@ def atualizar_sessao_campanha(
 def deletar_sessao_campanha(
     sessao_id: int,
     service: SessaoCampanhaService = Depends(get_sessao_campanha_service),
-    usuario=Depends(requer_mestre_ou_admin),
+    usuario=Depends(get_usuario_atual),
 ):
     try:
         service.deletar(usuario.id, sessao_id)

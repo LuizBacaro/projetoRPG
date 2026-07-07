@@ -40,6 +40,15 @@ class GurpsCampanhaRepository(BaseRepository[GurpsCampanha]):
             .first()
         )
 
+    def usuario_tem_campanha_como_mestre(self, usuario_id: int) -> bool:
+        row = (
+            self.db.query(GurpsCampanha.id)
+            .filter(GurpsCampanha.mestre_id == usuario_id)
+            .limit(1)
+            .scalar()
+        )
+        return isinstance(row, int)
+
     def delete_hard(self, campanha: GurpsCampanha) -> None:
         self.db.delete(campanha)
         commit_with_rollback(self.db)

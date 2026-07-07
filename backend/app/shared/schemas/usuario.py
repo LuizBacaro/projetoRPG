@@ -13,7 +13,14 @@ from ..models.usuario import PerfilUsuario
 
 
 class UsuarioBase(BaseModel):
-    perfil: PerfilUsuario
+    perfil: PerfilUsuario = Field(
+        ...,
+        description=(
+            "Perfil da conta. Novos cadastros públicos são sempre jogador. "
+            "Mestre de mesa: criar campanha no jogo (ADR 0005). "
+            "Valor mestre aqui é legado/admin."
+        ),
+    )
     nome: str = Field(..., min_length=1, max_length=100)
     email: str = Field(..., min_length=3, max_length=150)
 

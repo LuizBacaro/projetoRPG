@@ -144,6 +144,74 @@ class AuthService {
     static isMestre()  { return ['mestre', 'administrador'].includes(this.getPerfil()); }
     static isJogador() { return this.getPerfil() === 'jogador'; }
 
+    /** Cache: usuário com ao menos uma campanha como mestre no jogo ativo. */
+    static _podeMestrarNoJogo = null;
+
+    static _urlApiV1(path) {
+        if (typeof window.getApiUrl === 'function') {
+            return window.getApiUrl(path);
+        }
+        const base = this._apiBaseUrl().replace(/\/$/, '');
+        const p = path.startsWith('/') ? path : `/${path}`;
+        return `${base}/api/v1${p}`;
+    }
+
+    /**
+     * Consulta a API e define se o usuário pode mestrar no jogo ativo
+     * (Tormenta: possui campanha com mestre_id = usuário).
+     * @returns {Promise<boolean>}
+     */
+    static async carregarPodeMestrarNoJogoAtual() {
+        if (this.isAdmin() || this.isMestre()) {
+            this._podeMestrarNoJogo = true;
+            return true;
+        }
+        const slug = this.getGameSlugAtivo();
+        if (slug !== 'tormenta' && slug !== 'dnd35' && slug !== 'gurps') {
+            this._podeMestrarNoJogo = false;
+            return false;
+        }
+        const token = this.getToken();
+        if (!token) {
+            this._podeMestrarNoJogo = false;
+            return false;
+        }
+        const pathCampanhas =
+            slug === 'tormenta'
+                ? '/tormenta/campanhas'
+                : slug === 'gurps'
+                  ? '/gurps/campanhas'
+                  : '/campanhas';
+        try {
+            const res = await fetch(this._urlApiV1(pathCampanhas), {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (this.lidarComJogoAusenteOuTrocado(res)) {
+                this._podeMestrarNoJogo = false;
+                return false;
+            }
+            if (res.ok) {
+                const data = await res.json();
+                this._podeMestrarNoJogo = Array.isArray(data) && data.length > 0;
+                return this._podeMestrarNoJogo;
+            }
+        } catch (_err) {
+            /* rede / cold start */
+        }
+        this._podeMestrarNoJogo = false;
+        return false;
+    }
+
+    /** Síncrono — use após `carregarPodeMestrarNoJogoAtual()` ou `marcarPodeMestrarNoJogoAtual`. */
+    static podeMestrarNoJogoAtual() {
+        if (this.isAdmin() || this.isMestre()) return true;
+        return this._podeMestrarNoJogo === true;
+    }
+
+    static marcarPodeMestrarNoJogoAtual(valor = true) {
+        this._podeMestrarNoJogo = Boolean(valor);
+    }
+
     // ── Navegação 
     static logout() {
         localStorage.removeItem(this.TOKEN_KEY);

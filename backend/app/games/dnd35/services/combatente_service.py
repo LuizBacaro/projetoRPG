@@ -37,6 +37,7 @@ from app.games.dnd35.repositories.divindade_custom_repository import (
 )
 from app.repositories.base import commit_with_rollback
 from app.services.file_service import FileService
+from app.shared.core.deps import usuario_e_mestre_dnd35
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
@@ -207,6 +208,11 @@ class CombatenteService:
         )
         self._condicao_id_cache: Dict[str, int] = {}
 
+    def _usuario_pode_mestrar_dnd35(self, usuario) -> bool:
+        if usuario is None:
+            return False
+        return usuario_e_mestre_dnd35(usuario, self.repository.db)
+
     # ── CRUD ─────────────────────────────────────────────
 
     def listar_todos(
@@ -232,8 +238,8 @@ class CombatenteService:
                 )
             return combatentes
 
-        # Jogador enxerga apenas seus próprios combatentes (qualquer tipo)
-        if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
+        # Escopo restrito: apenas combatentes do próprio usuário
+        if usuario and not self._usuario_pode_mestrar_dnd35(usuario):
             if tipo:
                 return _enriquecer(
                     self.repository.get_by_owner_and_tipo(
@@ -245,29 +251,19 @@ class CombatenteService:
             )
 
         if usuario and apenas_meus:
-            if usuario.perfil == PerfilUsuario.MESTRE:
-                if tipo:
-                    return _enriquecer(
-                        self.repository.get_by_owner_or_campanha_mestre_and_tipo(
-                            usuario.id,
-                            tipo,
-                            skip=skip,
-                            limit=limit,
-                        )
-                    )
-                return _enriquecer(
-                    self.repository.get_by_owner_or_campanha_mestre(
-                        usuario.id, skip=skip, limit=limit
-                    )
-                )
             if tipo:
                 return _enriquecer(
-                    self.repository.get_by_owner_and_tipo(
-                        usuario.id, tipo, skip=skip, limit=limit
+                    self.repository.get_by_owner_or_campanha_mestre_and_tipo(
+                        usuario.id,
+                        tipo,
+                        skip=skip,
+                        limit=limit,
                     )
                 )
             return _enriquecer(
-                self.repository.get_by_owner(usuario.id, skip=skip, limit=limit)
+                self.repository.get_by_owner_or_campanha_mestre(
+                    usuario.id, skip=skip, limit=limit
+                )
             )
 
         if tipo:
@@ -281,21 +277,17 @@ class CombatenteService:
     ) -> int:
         """Conta combatentes respeitando escopo do usuário e filtro por tipo."""
         # Jogador conta apenas seus próprios combatentes (qualquer tipo)
-        if usuario and usuario.perfil == PerfilUsuario.JOGADOR:
+        if usuario and not self._usuario_pode_mestrar_dnd35(usuario):
             if tipo:
                 return self.repository.count_by_owner_and_tipo(usuario.id, tipo)
             return self.repository.count_by_owner(usuario.id)
 
         if usuario and apenas_meus:
-            if usuario.perfil == PerfilUsuario.MESTRE:
-                if tipo:
-                    return self.repository.count_by_owner_or_campanha_mestre_and_tipo(
-                        usuario.id, tipo
-                    )
-                return self.repository.count_by_owner_or_campanha_mestre(usuario.id)
             if tipo:
-                return self.repository.count_by_owner_and_tipo(usuario.id, tipo)
-            return self.repository.count_by_owner(usuario.id)
+                return self.repository.count_by_owner_or_campanha_mestre_and_tipo(
+                    usuario.id, tipo
+                )
+            return self.repository.count_by_owner_or_campanha_mestre(usuario.id)
 
         if tipo:
             return self.repository.count_by_tipo(tipo)
@@ -1144,13 +1136,7 @@ class CombatenteService:
                 "Usuário autenticado é obrigatório", status_code=401
             )
 
-        perfil = getattr(usuario, "perfil", None)
-        if perfil in (
-            PerfilUsuario.ADMINISTRADOR,
-            PerfilUsuario.ADMINISTRADOR.value,
-            PerfilUsuario.MESTRE,
-            PerfilUsuario.MESTRE.value,
-        ):
+        if self._usuario_pode_mestrar_dnd35(usuario):
             return
 
         if combatente.dono_id != getattr(usuario, "id", None):

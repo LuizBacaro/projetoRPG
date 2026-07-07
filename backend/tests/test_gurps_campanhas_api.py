@@ -46,11 +46,29 @@ def _criar_personagem(client: TestClient, nome: str) -> int:
     return r.json()["id"]
 
 
-def test_jogador_nao_lista_campanhas(gurps_mestre_e_jogadores_db):
+def test_jogador_lista_campanhas_vazias(gurps_mestre_e_jogadores_db):
     SessionLocal, _, j1, _ = gurps_mestre_e_jogadores_db
     client = _client_campanhas(SessionLocal, _usuario(j1))
     r = client.get("/api/v1/gurps/campanhas")
-    assert r.status_code == 403
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_jogador_cria_campanha(gurps_mestre_e_jogadores_db):
+    SessionLocal, _, j1, _ = gurps_mestre_e_jogadores_db
+    c_jog = _client_campanhas(SessionLocal, _usuario(j1))
+    p1 = _criar_personagem(c_jog, "Herói solo")
+    r = c_jog.post(
+        "/api/v1/gurps/campanhas",
+        json={"nome": "Minha mesa", "personagem_ids": [p1]},
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["nome"] == "Minha mesa"
+    assert body["mestre_id"] == j1.id
+    lst = c_jog.get("/api/v1/gurps/campanhas")
+    assert lst.status_code == 200
+    assert any(c["id"] == body["id"] for c in lst.json())
 
 
 def test_mestre_cria_e_lista_campanha_com_personagens(gurps_mestre_e_jogadores_db):

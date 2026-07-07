@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
+from app.games.tormenta.models.campanha import TormentaCampanha
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.ports import TormentaPersonagemRepositoryProtocol
 from app.games.tormenta.rules.atributos_t20 import (
@@ -94,12 +95,23 @@ class TormentaPersonagemService:
     def _tipos_validos() -> set:
         return {"jogador", "monstro", "npc"}
 
-    def _resolver_dono(self, usuario: Usuario, tipo: str) -> Optional[int]:
-        t = (tipo or "").lower()
+    def _usuario_pode_mestrar_tormenta(self, usuario: Usuario) -> bool:
         if usuario.perfil in (
             PerfilUsuario.ADMINISTRADOR,
             PerfilUsuario.MESTRE,
         ):
+            return True
+        row = (
+            self.repo.db.query(TormentaCampanha.id)
+            .filter(TormentaCampanha.mestre_id == usuario.id)
+            .limit(1)
+            .scalar()
+        )
+        return isinstance(row, int)
+
+    def _resolver_dono(self, usuario: Usuario, tipo: str) -> Optional[int]:
+        t = (tipo or "").lower()
+        if self._usuario_pode_mestrar_tormenta(usuario):
             if t in ("monstro", "npc"):
                 return None
         return usuario.id
@@ -507,7 +519,7 @@ class TormentaPersonagemService:
         limit: int = 100,
         apenas_meus: bool = False,
     ) -> List[TormentaPersonagemResponse]:
-        if usuario.perfil == PerfilUsuario.JOGADOR:
+        if not self._usuario_pode_mestrar_tormenta(usuario):
             if tipo:
                 rows = self.repo.get_by_owner_and_tipo(
                     usuario.id, tipo, skip=skip, limit=limit
@@ -538,7 +550,7 @@ class TormentaPersonagemService:
         usuario: Usuario,
         apenas_meus: bool = False,
     ) -> int:
-        if usuario.perfil == PerfilUsuario.JOGADOR:
+        if not self._usuario_pode_mestrar_tormenta(usuario):
             if tipo:
                 return self.repo.count_by_owner_and_tipo(usuario.id, tipo)
             return self.repo.count_by_owner(usuario.id)
@@ -578,7 +590,7 @@ class TormentaPersonagemService:
     ) -> TormentaPersonagemResponse:
         self._validar_tipo(payload.tipo)
         if (
-            usuario.perfil == PerfilUsuario.JOGADOR
+            not self._usuario_pode_mestrar_tormenta(usuario)
             and payload.tipo.lower() != "jogador"
         ):
             raise DadosInvalidos("Jogadores so podem criar fichas do tipo jogador")

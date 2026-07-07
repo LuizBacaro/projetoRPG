@@ -27,6 +27,7 @@ from app.shared.core.database import get_db
 from app.shared.core.deps import (
     get_usuario_atual,
     requer_game_dnd35,
+    requer_mestre_dnd35_ou_admin,
     validar_combatentes_do_usuario,
 )
 from app.shared.exceptions.custom_exceptions import ArenaBaseException
@@ -35,7 +36,7 @@ from app.shared.models.usuario import Usuario
 router = APIRouter(
     prefix="/combate",
     tags=["Combate"],
-    dependencies=[Depends(requer_game_dnd35)],
+    dependencies=[Depends(requer_game_dnd35), Depends(requer_mestre_dnd35_ou_admin)],
 )
 
 

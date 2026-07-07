@@ -15,7 +15,7 @@
 <header class="tormenta-header">
     <div>
         <h1>Tormenta 20</h1>
-        <p>Combatentes e fichas Tormenta 20. <strong>Campanhas</strong> e <strong>Arena de combate</strong> ficam disponíveis apenas para perfil <strong>mestre</strong> ou <strong>administrador</strong>.</p>
+        <p>Combatentes e fichas Tormenta 20. Crie uma <strong>campanha</strong> para desbloquear a <strong>Arena</strong> e ferramentas de mestre na mesa.</p>
     </div>
     <div class="tormenta-header-actions">
         <span id="nomeUsuario">…</span>
@@ -151,8 +151,7 @@
 
     <section class="t20-dash-section" id="tab-arena">
         <div id="t20ArenaBloqueioJogador" class="t20-dash-placeholder" hidden>
-            <p><strong>Arena de combate</strong> é exclusiva de <strong>mestre</strong> ou <strong>administrador</strong>. A API também bloqueia outros perfis.</p>
-            <p style="margin-top:0.75rem">Peça elevação de perfil a um administrador da plataforma ou use uma conta de mestre.</p>
+            <p><strong>Arena de combate</strong> e criação de <strong>monstros/NPCs</strong> ficam disponíveis depois que você criar sua primeira <strong>campanha</strong> na aba Campanhas.</p>
         </div>
         <div id="t20ArenaSetup" class="t20-arena-setup">
             <p class="t20-dash-hint" style="margin-top:0;max-width:42rem">
@@ -1003,7 +1002,7 @@
 
 <script src="/js/shared/render-api-origin-boot.js?v=2"></script>
 <script src="/games/dnd35/js/config/api-url-global.js?v=2"></script>
-<script src="/games/dnd35/js/services/AuthService.js"></script>
+<script src="/games/dnd35/js/services/AuthService.js?v=20260707gm"></script>
 <script src="/games/dnd35/js/ui/Toast.js"></script>
 <script src="/games/dnd35/js/ui/ModalConfirm.js"></script>
 <script>
@@ -1011,7 +1010,7 @@
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260511t20camp"></script>
-<script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260511t20camp"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260707gm"></script>
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
@@ -1038,7 +1037,12 @@
     const combateSvc = new TormentaCombateService();
     window.__t20ArenaCombateSvc = combateSvc;
     const perfil = (AuthService.getPerfil && AuthService.getPerfil()) || 'jogador';
-    const isMestre = perfil === 'mestre' || perfil === 'administrador';
+    let isGmTormenta = perfil === 'mestre' || perfil === 'administrador';
+
+    function ativarGmTormentaNaUi() {
+        aplicarRestricoesPerfilUi();
+        if (isGmTormenta) t20ArenaBindOnce();
+    }
 
     const DASH_REGRA_VERSAO =
         window.T20RegraVersao && window.T20RegraVersao.DEFAULT_NOVA_FICHA
@@ -2261,7 +2265,7 @@
         document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((b) => {
             b.addEventListener('click', () => {
                 const tab = b.getAttribute('data-tab');
-                if ((tab === 'arena' || tab === 'campanhas') && !isMestre) return;
+                if (tab === 'arena' && !isGmTormenta) return;
                 document.querySelectorAll('.t20-dash-nav button[data-tab]').forEach((x) => x.classList.remove('t20-dash-nav--active'));
                 b.classList.add('t20-dash-nav--active');
                 document.querySelectorAll('.t20-dash-section').forEach((s) => {
@@ -2281,20 +2285,25 @@
         const bloqArena = document.getElementById('t20ArenaBloqueioJogador');
         const arenaSetup = document.getElementById('t20ArenaSetup');
         const arenaActive = document.getElementById('t20ArenaActive');
-        if (!isMestre) {
+        if (!isGmTormenta) {
             document.getElementById('filtroMonstro')?.style.setProperty('display', 'none');
             document.getElementById('filtroNpc')?.style.setProperty('display', 'none');
             document.getElementById('cardResumoMonstro')?.style.setProperty('display', 'none');
             document.getElementById('cardResumoNpc')?.style.setProperty('display', 'none');
-            document.getElementById('tabBtnCampanhas')?.style.setProperty('display', 'none');
             document.getElementById('tabBtnArena')?.style.setProperty('display', 'none');
             if (bloqArena) bloqArena.hidden = false;
             if (arenaSetup) arenaSetup.hidden = true;
             if (arenaActive) arenaActive.hidden = true;
         } else {
+            document.getElementById('filtroMonstro')?.style.removeProperty('display');
+            document.getElementById('filtroNpc')?.style.removeProperty('display');
+            document.getElementById('cardResumoMonstro')?.style.removeProperty('display');
+            document.getElementById('cardResumoNpc')?.style.removeProperty('display');
+            document.getElementById('tabBtnArena')?.style.removeProperty('display');
             document.getElementById('wrapChkMeus')?.style.setProperty('display', '');
             if (bloqArena) bloqArena.hidden = true;
         }
+        document.getElementById('tabBtnCampanhas')?.style.removeProperty('display');
     }
 
     async function carregarRegrasCompra() {
@@ -2657,7 +2666,7 @@
     async function carregar() {
         const tb = document.getElementById('tblPersonagens');
         tb.innerHTML = '<tr><td colspan="7" class="tormenta-cell-muted">Carregando…</td></tr>';
-        const meus = isMestre && document.getElementById('chkMeus')?.checked;
+        const meus = isGmTormenta && document.getElementById('chkMeus')?.checked;
         try {
             const rows = await svc.listar({ meus: !!meus, limit: 500 });
             cacheLista = Array.isArray(rows) ? rows : [];
@@ -2762,7 +2771,7 @@
     }
 
     document.getElementById('btnNovoCombatente')?.addEventListener('click', () => {
-        if (isMestre) openOverlay('overlaySeletorTipo');
+        if (isGmTormenta) openOverlay('overlaySeletorTipo');
         else abrirCadastro('jogador');
     });
 
@@ -2780,7 +2789,7 @@
     document.querySelectorAll('.t20-dash-filtros button[data-tipo]').forEach((btn) => {
         btn.addEventListener('click', () => {
             const t = btn.getAttribute('data-tipo');
-            if (!isMestre && (t === 'monstro' || t === 'npc')) return;
+            if (!isGmTormenta && (t === 'monstro' || t === 'npc')) return;
             filtroTipo = t;
             document.querySelectorAll('.t20-dash-filtros button[data-tipo]').forEach((b) => {
                 b.classList.toggle('t20-dash-filter--active', b.getAttribute('data-tipo') === t);
@@ -2861,13 +2870,21 @@
 
     aplicarRestricoesPerfilUi();
     setTabs();
-    if (isMestre) t20ArenaBindOnce();
-    if (isMestre && typeof window.__t20DashCampanhasInit === 'function') {
+    if (isGmTormenta) t20ArenaBindOnce();
+    if (typeof window.__t20DashCampanhasInit === 'function') {
         window.__t20DashCampanhasInit({
             getLista: () => cacheLista,
-            isMestre,
             recarregarTabela: carregar,
             Toast,
+            onCampanhaCriada: () => {
+                if (!isGmTormenta) {
+                    isGmTormenta = true;
+                    if (AuthService.marcarPodeMestrarNoJogoAtual) {
+                        AuthService.marcarPodeMestrarNoJogoAtual(true);
+                    }
+                    ativarGmTormentaNaUi();
+                }
+            },
         });
     }
     if (window.T20DashPericiasV13) {
@@ -2896,6 +2913,13 @@
         });
     }
     (async () => {
+        if (!isGmTormenta && AuthService.carregarPodeMestrarNoJogoAtual) {
+            const ok = await AuthService.carregarPodeMestrarNoJogoAtual();
+            if (ok) {
+                isGmTormenta = true;
+                ativarGmTormentaNaUi();
+            }
+        }
         void carregar();
         const wrapHa = document.getElementById('cadWrapHeroisArton');
         if (wrapHa) wrapHa.style.display = isDashV13() ? '' : 'none';

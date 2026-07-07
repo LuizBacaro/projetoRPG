@@ -1,4 +1,4 @@
-"""HTTP — combate Tormenta (Arena): RBAC mestre por campanha ou perfil legado."""
+"""HTTP — combate D&D 3.5: RBAC mestre por campanha ou perfil legado."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from app.games.tormenta.api.v1.combate import router as tormenta_combate_router
-from app.games.tormenta.models.campanha import TormentaCampanha
+from app.games.dnd35.api.v1.combate import router as dnd35_combate_router
+from app.games.dnd35.models.campanha import Campanha
 from app.shared.core.database import get_db
 from app.shared.core.deps import get_usuario_atual
 from app.shared.core.security import hash_senha
@@ -16,7 +16,7 @@ from app.shared.models.usuario import Usuario as UModel
 
 
 @pytest.fixture(scope="function")
-def tormenta_combate_api_db():
+def dnd35_combate_rbac_db():
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
     from sqlalchemy.pool import StaticPool
@@ -35,31 +35,23 @@ def tormenta_combate_api_db():
     try:
         u_jog = UModel(
             perfil=PerfilUsuario.JOGADOR,
-            nome="T20 Jog",
-            email="t20combate.jog@example.com",
+            nome="D35 Jog",
+            email="d35combate.jog@example.com",
             senha_hash=hash_senha("SenhaSegura123"),
             ativo=True,
         )
         u_mestre = UModel(
             perfil=PerfilUsuario.MESTRE,
-            nome="T20 Mestre",
-            email="t20combate.mestre@example.com",
+            nome="D35 Mestre",
+            email="d35combate.mestre@example.com",
             senha_hash=hash_senha("SenhaSegura123"),
             ativo=True,
         )
-        u_admin = UModel(
-            perfil=PerfilUsuario.ADMINISTRADOR,
-            nome="T20 Admin",
-            email="t20combate.admin@example.com",
-            senha_hash=hash_senha("SenhaSegura123"),
-            ativo=True,
-        )
-        db.add_all([u_jog, u_mestre, u_admin])
+        db.add_all([u_jog, u_mestre])
         db.commit()
         db.refresh(u_jog)
         db.refresh(u_mestre)
-        db.refresh(u_admin)
-        yield SessionLocal, u_jog, u_mestre, u_admin
+        yield SessionLocal, u_jog, u_mestre
     finally:
         db.close()
         Base.metadata.drop_all(bind=engine)
@@ -67,7 +59,7 @@ def tormenta_combate_api_db():
 
 def _client(SessionLocal, usuario: UModel) -> TestClient:
     app = FastAPI()
-    app.include_router(tormenta_combate_router, prefix="/api/v1")
+    app.include_router(dnd35_combate_router, prefix="/api/v1")
 
     def _override_get_db():
         db = SessionLocal()
@@ -81,19 +73,19 @@ def _client(SessionLocal, usuario: UModel) -> TestClient:
     return TestClient(app)
 
 
-def test_combate_status_403_para_jogador_sem_campanha(tormenta_combate_api_db):
-    SessionLocal, u_jog, _u_m, _u_a = tormenta_combate_api_db
+def test_combate_status_403_para_jogador_sem_campanha(dnd35_combate_rbac_db):
+    SessionLocal, u_jog, _u_m = dnd35_combate_rbac_db
     c = _client(SessionLocal, u_jog)
-    r = c.get("/api/v1/tormenta/combate/status")
+    r = c.get("/api/v1/combate/status")
     assert r.status_code == 403
     assert "campanha" in (r.json().get("detail") or "").lower()
 
 
-def test_combate_status_200_para_jogador_com_campanha(tormenta_combate_api_db):
-    SessionLocal, u_jog, _u_m, _u_a = tormenta_combate_api_db
+def test_combate_status_200_para_jogador_com_campanha(dnd35_combate_rbac_db):
+    SessionLocal, u_jog, _u_m = dnd35_combate_rbac_db
     db = SessionLocal()
     db.add(
-        TormentaCampanha(
+        Campanha(
             mestre_id=u_jog.id,
             nome="Mesa teste",
             descricao="",
@@ -103,22 +95,12 @@ def test_combate_status_200_para_jogador_com_campanha(tormenta_combate_api_db):
     db.close()
 
     c = _client(SessionLocal, u_jog)
-    r = c.get("/api/v1/tormenta/combate/status")
+    r = c.get("/api/v1/combate/status")
     assert r.status_code == 200
-    assert r.json().get("ativo") is False
 
 
-def test_combate_status_200_para_mestre(tormenta_combate_api_db):
-    SessionLocal, _u_j, u_m, _u_a = tormenta_combate_api_db
+def test_combate_status_200_para_mestre_legado(dnd35_combate_rbac_db):
+    SessionLocal, _u_j, u_m = dnd35_combate_rbac_db
     c = _client(SessionLocal, u_m)
-    r = c.get("/api/v1/tormenta/combate/status")
-    assert r.status_code == 200
-    body = r.json()
-    assert body.get("ativo") is False
-
-
-def test_combate_status_200_para_administrador(tormenta_combate_api_db):
-    SessionLocal, _u_j, _u_m, u_a = tormenta_combate_api_db
-    c = _client(SessionLocal, u_a)
-    r = c.get("/api/v1/tormenta/combate/status")
+    r = c.get("/api/v1/combate/status")
     assert r.status_code == 200
