@@ -25,6 +25,7 @@ from app.games.gurps.schemas.personagem import (
     normalizar_extras_para_gravacao,
 )
 from app.repositories.base import commit_with_rollback
+from app.shared.core.usuario_lookup import enriquecer_dono_nome_em_entidades
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.shared.models.usuario import PerfilUsuario, Usuario
 
@@ -92,6 +93,16 @@ class GurpsPersonagemService:
         # GURPS Lite: Esquiva = parte inteira da VB + 3.
         return int(velocidade_valor.to_integral_value(rounding=ROUND_FLOOR)) + 3
 
+    def _para_resposta(self, ent: GurpsPersonagem) -> GurpsPersonagemResponse:
+        enriquecer_dono_nome_em_entidades(self.repo.db, [ent])
+        return GurpsPersonagemResponse.model_validate(ent)
+
+    def _para_respostas(
+        self, rows: List[GurpsPersonagem]
+    ) -> List[GurpsPersonagemResponse]:
+        enriquecer_dono_nome_em_entidades(self.repo.db, rows)
+        return [GurpsPersonagemResponse.model_validate(r) for r in rows]
+
     def listar_todos(
         self,
         tipo: Optional[str],
@@ -109,7 +120,7 @@ class GurpsPersonagemService:
                 )
             else:
                 rows = self.repo.get_by_owner(usuario.id, skip=skip, limit=limit)
-            return [GurpsPersonagemResponse.model_validate(r) for r in rows]
+            return self._para_respostas(rows)
 
         if apenas_meus:
             if tipo:
@@ -118,13 +129,13 @@ class GurpsPersonagemService:
                 )
             else:
                 rows = self.repo.get_by_owner(usuario.id, skip=skip, limit=limit)
-            return [GurpsPersonagemResponse.model_validate(r) for r in rows]
+            return self._para_respostas(rows)
 
         if tipo:
             rows = self.repo.get_by_tipo(tipo, skip=skip, limit=limit)
         else:
             rows = self.repo.get_all(skip=skip, limit=limit)
-        return [GurpsPersonagemResponse.model_validate(r) for r in rows]
+        return self._para_respostas(rows)
 
     def contar_todos(
         self,
@@ -281,7 +292,7 @@ class GurpsPersonagemService:
         self.repo.db.add(ent)
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
-        return GurpsPersonagemResponse.model_validate(ent)
+        return self._para_resposta(ent)
 
     def atualizar(
         self, personagem_id: int, payload: GurpsPersonagemUpdate
@@ -380,4 +391,4 @@ class GurpsPersonagemService:
 
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
-        return GurpsPersonagemResponse.model_validate(ent)
+        return self._para_resposta(ent)

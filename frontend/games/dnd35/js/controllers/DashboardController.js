@@ -1137,8 +1137,10 @@ class DashboardController {
             const tipo = String(item.tipo || '').toLowerCase();
             if (filtroTipo !== 'todos' && tipo !== filtroTipo) return false;
             if (!filtro) return true;
-            const nome = String(item.nome || '').toLowerCase();
-            return nome.includes(filtro);
+            const busca = (typeof PersonagemRotulo !== 'undefined' && PersonagemRotulo.textoBuscaPersonagem)
+                ? PersonagemRotulo.textoBuscaPersonagem(item)
+                : String(item.nome || '').toLowerCase();
+            return busca.includes(filtro);
         });
         if (!personagens.length) {
             const vazio = filtro
@@ -1149,14 +1151,13 @@ class DashboardController {
         }
         container.innerHTML = personagens.map((personagem) => {
             const checked = idsSelecionados.has(personagem.id) ? 'checked' : '';
-            const tipoLabel = String(personagem.tipo || '').toLowerCase();
-            const tipoExibicao = tipoLabel
-                ? tipoLabel.charAt(0).toUpperCase() + tipoLabel.slice(1)
-                : 'Personagem';
+            const rotulo = (typeof PersonagemRotulo !== 'undefined' && PersonagemRotulo.rotuloPersonagemComDono)
+                ? PersonagemRotulo.rotuloPersonagemComDono(personagem, `Nv ${personagem.nivel || 1}`)
+                : `${personagem.nome} (Nv ${personagem.nivel || 1})`;
             return `
                 <label class="campanha-personagem-item">
                     <input type="checkbox" data-personagem-id="${personagem.id}" ${checked} />
-                    <span class="campanha-personagem-nome">${escapeHtml(personagem.nome)} (${tipoExibicao} • Nv ${personagem.nivel || 1})</span>
+                    <span class="campanha-personagem-nome">${escapeHtml(rotulo)}</span>
                 </label>
             `;
         }).join('');

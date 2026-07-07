@@ -38,6 +38,7 @@ from app.games.dnd35.repositories.divindade_custom_repository import (
 from app.repositories.base import commit_with_rollback
 from app.services.file_service import FileService
 from app.shared.core.deps import usuario_e_mestre_dnd35
+from app.shared.core.usuario_lookup import enriquecer_dono_nome_em_entidades
 from app.shared.exceptions.custom_exceptions import (
     ArenaBaseException,
     CombatenteNaoEncontrado,
@@ -229,6 +230,7 @@ class CombatenteService:
             self._sincronizar_progressao_em_memoria(combatentes)
             self._enriquecer_dados_raciais_em_memoria(combatentes)
             self._enriquecer_habilidades_especiais_em_memoria(combatentes)
+            enriquecer_dono_nome_em_entidades(self.repository.db, combatentes)
             for combatente in combatentes:
                 campanha = getattr(combatente, "campanha", None)
                 setattr(
@@ -305,6 +307,7 @@ class CombatenteService:
         self._sincronizar_progressao_em_memoria([combatente])
         self._enriquecer_dados_raciais_em_memoria([combatente])
         self._enriquecer_habilidades_especiais_em_memoria([combatente])
+        enriquecer_dono_nome_em_entidades(self.repository.db, [combatente])
         campanha = getattr(combatente, "campanha", None)
         setattr(
             combatente,

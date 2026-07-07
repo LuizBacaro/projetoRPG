@@ -1010,6 +1010,7 @@
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js"></script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260511t20camp"></script>
+<script src="/js/shared/personagem-rotulo.js?v=1"></script>
 <script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260707gm"></script>
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
@@ -2103,6 +2104,7 @@
     }
 
     async function t20ArenaRefreshFromApi() {
+        if (!isGmTormenta) return;
         try {
             const st = await combateSvc.status();
             t20ArenaApplyFromApi(st);
@@ -2673,7 +2675,7 @@
             atualizarResumo(cacheLista);
             renderTabela(cacheLista);
             t20ArenaRenderPick();
-            void t20ArenaRefreshFromApi();
+            if (isGmTormenta) void t20ArenaRefreshFromApi();
         } catch (e) {
             tb.innerHTML = `<tr><td colspan="7" class="tormenta-cell-muted">${escapeHtml(e.message || 'Erro')}</td></tr>`;
         }

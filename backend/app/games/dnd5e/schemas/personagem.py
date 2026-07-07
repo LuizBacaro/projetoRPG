@@ -105,6 +105,7 @@ class Dnd5ePersonagemResponse(Dnd5ePersonagemBase):
 
     id: int
     dono_id: Optional[int] = None
+    dono_nome: Optional[str] = ""
     foto_url: Optional[str] = None
     hp_atual: int
     ficha: Dict[str, Any] = Field(default_factory=dict)

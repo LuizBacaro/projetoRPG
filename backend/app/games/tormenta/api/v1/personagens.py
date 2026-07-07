@@ -146,7 +146,7 @@ def obter(
 ):
     try:
         ent = service.obter_por_id_sincronizando_pm_mb(personagem_id)
-        base = TormentaPersonagemResponse.model_validate(ent)
+        base = service._para_resposta(ent)
         itens_t = talentos_svc.listar_por_personagem(personagem_id)
         itens_e = equip_svc.listar_por_personagem(personagem_id)
         itens_c = consum_svc.listar_por_personagem(personagem_id)

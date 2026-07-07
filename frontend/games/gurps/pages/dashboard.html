@@ -323,6 +323,7 @@
 <script>
     if (!AuthService.exigirJogo('gurps')) {}
 </script>
+<script src="/js/shared/personagem-rotulo.js?v=1"></script>
 <script src="../js/services/GurpsPersonagemService.js"></script>
 <script src="../js/services/GurpsCampanhaService.js"></script>
 <script src="../js/services/GurpsCombateService.js"></script>
@@ -553,6 +554,7 @@
     }
 
     async function refreshArena() {
+        if (!isGmGurps) return;
         const pre = document.getElementById('arenaStatus');
         const setup = document.getElementById('gurpsArenaSetup');
         const active = document.getElementById('gurpsArenaActive');
@@ -819,8 +821,10 @@
             const tipo = String(item.tipo || '').toLowerCase();
             if (filtroTipo !== 'todos' && tipo !== filtroTipo) return false;
             if (!filtro) return true;
-            const nome = String(item.nome || '').toLowerCase();
-            return nome.includes(filtro);
+            const busca = (typeof PersonagemRotulo !== 'undefined' && PersonagemRotulo.textoBuscaPersonagem)
+                ? PersonagemRotulo.textoBuscaPersonagem(item)
+                : String(item.nome || '').toLowerCase();
+            return busca.includes(filtro);
         });
         if (!personagens.length) {
             const vazio = filtro
@@ -831,15 +835,14 @@
         }
         container.innerHTML = personagens.map((personagem) => {
             const checked = idsSelecionados.has(personagem.id) ? 'checked' : '';
-            const tipoLabel = String(personagem.tipo || '').toLowerCase();
-            const tipoExibicao = tipoLabel
-                ? tipoLabel.charAt(0).toUpperCase() + tipoLabel.slice(1)
-                : 'Personagem';
             const pts = personagem.pontos_total != null ? personagem.pontos_total : 0;
+            const rotulo = (typeof PersonagemRotulo !== 'undefined' && PersonagemRotulo.rotuloPersonagemComDono)
+                ? PersonagemRotulo.rotuloPersonagemComDono(personagem, `${pts} pts`)
+                : `${personagem.nome} (${pts} pts)`;
             return `
                 <label class="campanha-personagem-item">
                     <input type="checkbox" data-personagem-id="${personagem.id}" ${checked} />
-                    <span class="campanha-personagem-nome">${escapeHtml(personagem.nome)} (${tipoExibicao} • ${pts} pts)</span>
+                    <span class="campanha-personagem-nome">${escapeHtml(rotulo)}</span>
                 </label>
             `;
         }).join('');

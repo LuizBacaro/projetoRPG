@@ -83,7 +83,7 @@ def obter(
 ):
     try:
         ent = service.obter_por_id(personagem_id)
-        return GurpsPersonagemResponse.model_validate(ent)
+        return service._para_resposta(ent)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 

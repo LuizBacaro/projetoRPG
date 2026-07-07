@@ -49,6 +49,7 @@ from app.games.tormenta.services.personagem_talentos_service import (
     TormentaPersonagemTalentosService,
 )
 from app.repositories.base import commit_with_rollback
+from app.shared.core.usuario_lookup import enriquecer_dono_nome_em_entidades
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
 from app.shared.models.usuario import PerfilUsuario, Usuario
 
@@ -510,6 +511,16 @@ class TormentaPersonagemService:
             self.repo.db
         ).sincronizar_equipamentos_automaticos_v13(personagem_id, fj)
 
+    def _para_resposta(self, ent: TormentaPersonagem) -> TormentaPersonagemResponse:
+        enriquecer_dono_nome_em_entidades(self.repo.db, [ent])
+        return TormentaPersonagemResponse.model_validate(ent)
+
+    def _para_respostas(
+        self, rows: List[TormentaPersonagem]
+    ) -> List[TormentaPersonagemResponse]:
+        enriquecer_dono_nome_em_entidades(self.repo.db, rows)
+        return [TormentaPersonagemResponse.model_validate(r) for r in rows]
+
     def listar_todos(
         self,
         tipo: Optional[str],
@@ -526,7 +537,7 @@ class TormentaPersonagemService:
                 )
             else:
                 rows = self.repo.get_by_owner(usuario.id, skip=skip, limit=limit)
-            return [TormentaPersonagemResponse.model_validate(r) for r in rows]
+            return self._para_respostas(rows)
 
         if apenas_meus:
             if tipo:
@@ -535,13 +546,13 @@ class TormentaPersonagemService:
                 )
             else:
                 rows = self.repo.get_by_owner(usuario.id, skip=skip, limit=limit)
-            return [TormentaPersonagemResponse.model_validate(r) for r in rows]
+            return self._para_respostas(rows)
 
         if tipo:
             rows = self.repo.get_by_tipo(tipo, skip=skip, limit=limit)
         else:
             rows = self.repo.get_all(skip=skip, limit=limit)
-        return [TormentaPersonagemResponse.model_validate(r) for r in rows]
+        return self._para_respostas(rows)
 
     def contar_todos(
         self,
@@ -682,7 +693,7 @@ class TormentaPersonagemService:
         )
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
-        return TormentaPersonagemResponse.model_validate(ent)
+        return self._para_resposta(ent)
 
     def atualizar(
         self, personagem_id: int, payload: TormentaPersonagemUpdate
@@ -758,7 +769,7 @@ class TormentaPersonagemService:
         )
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
-        return TormentaPersonagemResponse.model_validate(ent)
+        return self._para_resposta(ent)
 
     def excluir(self, personagem_id: int) -> None:
         ent = self.obter_por_id(personagem_id)
