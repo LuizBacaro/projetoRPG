@@ -1412,6 +1412,118 @@ body {
     display: block;
 }
 
+.d35-pedidos-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    margin-left: .35rem;
+    padding: 0 .35rem;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #1b1300;
+    background: #facc15;
+}
+
+.d35-pedidos-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: .5rem 0 .8rem;
+}
+
+.d35-pedidos-filtros {
+    display: flex;
+    gap: .4rem;
+}
+
+.d35-pedidos-filtro {
+    border: 1px solid rgba(148, 163, 184, .45);
+    background: rgba(15, 23, 42, .5);
+    color: #cbd5e1;
+    padding: .3rem .8rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.d35-pedidos-filtro.active {
+    background: rgba(250, 204, 21, .16);
+    border-color: rgba(250, 204, 21, .75);
+    color: #fde68a;
+}
+
+.d35-pedidos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+}
+
+.d35-pedido-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: .7rem .9rem;
+    border: 1px solid rgba(148, 163, 184, .35);
+    border-radius: .6rem;
+    background: rgba(15, 23, 42, .5);
+}
+
+.d35-pedido-card--hist {
+    opacity: .9;
+}
+
+.d35-pedido-info {
+    display: flex;
+    flex-direction: column;
+    gap: .12rem;
+}
+
+.d35-pedido-jogador {
+    font-weight: 700;
+    color: #fde68a;
+}
+
+.d35-pedido-detalhe {
+    font-size: .86rem;
+    color: #cbd5e1;
+}
+
+.d35-pedido-acoes {
+    display: flex;
+    gap: .5rem;
+}
+
+.d35-pedido-btn-recusar {
+    color: #fca5a5;
+}
+
+.d35-pedido-status {
+    font-size: .82rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.d35-pedido-status--aceita {
+    color: #6ee7a0;
+}
+
+.d35-pedido-status--recusada {
+    color: #fca5a5;
+}
+
+.d35-pedido-status--cancelada {
+    color: #cbd5e1;
+}
+
 .dash-divcustom-form .dash-form-row {
     gap: .8rem;
 }

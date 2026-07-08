@@ -9,7 +9,7 @@
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260707nav" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260708pedidos" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -156,6 +156,10 @@
                 <div class="t20-camp-ws-nav" role="tablist" aria-label="Mesa da campanha">
                     <button type="button" class="t20-camp-ws-nav-btn t20-camp-ws-nav-btn--active" data-camp-ws="combatentes">⚔️ Combatentes</button>
                     <button type="button" class="t20-camp-ws-nav-btn" data-camp-ws="arena">🏟️ Arena</button>
+                    <button type="button" class="t20-camp-ws-nav-btn" data-camp-ws="pedidos">
+                        📨 Pedidos de Acesso
+                        <span id="t20campPedidosBadge" class="t20-camp-ws-nav-badge" hidden>0</span>
+                    </button>
                 </div>
                 <div id="t20campWsCombatentes" class="t20-camp-ws-pane t20-camp-ws-pane--active">
                     <div class="t20-dash-resumo">
@@ -289,6 +293,24 @@
             </div>
         </div>
     </div>
+                </div>
+                <div id="t20campWsPedidos" class="t20-camp-ws-pane">
+                    <div class="t20-camp-pedidos-head">
+                        <div>
+                            <h3 class="t20-camp-pedidos-titulo">Pedidos de acesso à campanha</h3>
+                            <p class="t20-dash-hint" style="margin:0.25rem 0 0;max-width:44rem">
+                                Jogadores que solicitaram entrar nesta campanha. Aceite para vincular o personagem à mesa ou recuse — a decisão pode ser tomada a qualquer momento.
+                            </p>
+                        </div>
+                        <button type="button" class="tormenta-btn" id="t20campPedidosRecarregar" title="Recarregar pedidos">↻ Atualizar</button>
+                    </div>
+                    <div class="t20-camp-pedidos-filtros" role="tablist" aria-label="Filtro de pedidos">
+                        <button type="button" class="t20-camp-pedidos-filtro t20-camp-pedidos-filtro--active" data-pedidos-filtro="pendentes">Pendentes</button>
+                        <button type="button" class="t20-camp-pedidos-filtro" data-pedidos-filtro="historico">Histórico</button>
+                    </div>
+                    <div id="t20campPedidosLista" class="t20-camp-pedidos-lista" aria-live="polite">
+                        <p class="tormenta-cell-muted">Selecione uma campanha acima.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1062,8 +1084,8 @@
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
 <script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260707mesa"></script>
-<script src="/games/tormenta/js/t20-dashboard-solicitacoes-campanha.js?v=20260707solic"></script>
-<script src="/games/tormenta/js/t20-dashboard-campanha-workspace.js?v=20260707mesa"></script>
+<script src="/games/tormenta/js/t20-dashboard-solicitacoes-campanha.js?v=20260708pedidos"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanha-workspace.js?v=20260708pedidos"></script>
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
@@ -2813,6 +2835,9 @@
         const camp = campanhasComoMestre.find((c) => Number(c.id) === id);
         const badge = document.getElementById('t20campWsBadge');
         if (badge) badge.textContent = camp ? `Mestre · ${camp.nome}` : 'Mestre da mesa';
+        if (window.T20CampanhaSolicitacoesMestre) {
+            window.T20CampanhaSolicitacoesMestre.setCampanhaAtiva(id);
+        }
         const tb = document.getElementById('tblPersonagensCamp');
         if (tb) tb.innerHTML = '<tr><td colspan="7" class="tormenta-cell-muted">Carregando…</td></tr>';
         try {
@@ -3081,6 +3106,11 @@
             onSelecionarCampanha: (id) => void carregarWorkspaceCampanha(id),
             onSairCampanha: () => sairWorkspaceCampanha(),
             onAbrirArena: () => void t20ArenaRefreshFromApi(),
+            onAbrirPedidos: () => {
+                if (window.T20CampanhaSolicitacoesMestre) {
+                    void window.T20CampanhaSolicitacoesMestre.abrirPainel(campanhaMestreAtivaId);
+                }
+            },
         });
     }
     if (window.T20DashPericiasV13) {

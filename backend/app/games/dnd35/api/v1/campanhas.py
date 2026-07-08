@@ -66,6 +66,17 @@ def listar_solicitacoes_pendentes(
 
 
 @router.get(
+    "/solicitacoes/historico",
+    response_model=list[CampanhaSolicitacaoResponse],
+)
+def listar_solicitacoes_historico(
+    service: CampanhaSolicitacaoService = Depends(get_campanha_solicitacao_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    return service.listar_historico_mestre(usuario)
+
+
+@router.get(
     "/solicitacoes/minhas",
     response_model=CampanhaSolicitacaoResponse | None,
 )

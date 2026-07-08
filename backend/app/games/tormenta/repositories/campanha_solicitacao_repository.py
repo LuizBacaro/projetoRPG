@@ -70,6 +70,36 @@ class TormentaCampanhaSolicitacaoRepository(
             .all()
         )
 
+    def listar_historico_para_mestre(
+        self, mestre_id: int, limit: int = 100
+    ) -> List[TormentaCampanhaSolicitacao]:
+        """Solicitações já resolvidas (aceita/recusada/cancelada) das mesas do mestre."""
+        return (
+            self.db.query(TormentaCampanhaSolicitacao)
+            .join(
+                TormentaCampanha,
+                TormentaCampanhaSolicitacao.campanha_id == TormentaCampanha.id,
+            )
+            .filter(
+                TormentaCampanha.mestre_id == mestre_id,
+                TormentaCampanhaSolicitacao.status != "pendente",
+            )
+            .order_by(TormentaCampanhaSolicitacao.resolved_at.desc().nullslast())
+            .limit(limit)
+            .all()
+        )
+
+    def listar_historico_todas(
+        self, limit: int = 100
+    ) -> List[TormentaCampanhaSolicitacao]:
+        return (
+            self.db.query(TormentaCampanhaSolicitacao)
+            .filter(TormentaCampanhaSolicitacao.status != "pendente")
+            .order_by(TormentaCampanhaSolicitacao.resolved_at.desc().nullslast())
+            .limit(limit)
+            .all()
+        )
+
     def obter_por_id(
         self, solicitacao_id: int
     ) -> Optional[TormentaCampanhaSolicitacao]:

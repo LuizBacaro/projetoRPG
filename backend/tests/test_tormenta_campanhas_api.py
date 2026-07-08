@@ -283,6 +283,44 @@ def test_solicitacao_entrada_campanha_aceite_pelo_mestre(tormenta_mestre_e_jogad
     assert r_p.json()["campanha_id"] == cid
 
 
+def test_solicitacao_recusada_aparece_no_historico(tormenta_mestre_e_jogador_db):
+    SessionLocal, mestre, jog = tormenta_mestre_e_jogador_db
+    db = SessionLocal()
+    p_jog = TormentaPersonagem(
+        dono_id=jog.id, tipo="jogador", nome="Herói Lua", ficha_json={}
+    )
+    db.add(p_jog)
+    db.commit()
+    db.refresh(p_jog)
+    db.close()
+
+    c_mestre = _client(SessionLocal, _usuario(mestre))
+    c_jog = _client(SessionLocal, _usuario(jog))
+
+    cid = c_mestre.post(
+        "/api/v1/tormenta/campanhas", json={"nome": "Mesa Historico"}
+    ).json()["id"]
+
+    sid = c_jog.post(
+        "/api/v1/tormenta/campanhas/solicitacoes",
+        json={"campanha_id": cid, "personagem_id": p_jog.id},
+    ).json()["id"]
+
+    r_rec = c_mestre.post(f"/api/v1/tormenta/campanhas/solicitacoes/{sid}/recusar")
+    assert r_rec.status_code == 200
+    assert r_rec.json()["status"] == "recusada"
+
+    r_pend = c_mestre.get("/api/v1/tormenta/campanhas/solicitacoes/pendentes")
+    assert all(x["id"] != sid for x in r_pend.json())
+
+    r_hist = c_mestre.get("/api/v1/tormenta/campanhas/solicitacoes/historico")
+    assert r_hist.status_code == 200
+    hist = r_hist.json()
+    achado = next((x for x in hist if x["id"] == sid), None)
+    assert achado is not None
+    assert achado["status"] == "recusada"
+
+
 def test_listar_disponiveis_retorna_campanhas(tormenta_mestre_e_jogador_db):
     SessionLocal, mestre, jog = tormenta_mestre_e_jogador_db
     c_mestre = _client(SessionLocal, _usuario(mestre))

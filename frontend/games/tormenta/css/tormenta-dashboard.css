@@ -1961,6 +1961,125 @@
     display: block;
 }
 
+.t20-camp-ws-nav-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    margin-left: 0.35rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff8f0;
+    background: linear-gradient(180deg, #b3261e, #8b2500);
+    box-shadow: 0 0 0 2px rgba(255, 244, 232, 0.6);
+}
+
+.t20-camp-pedidos-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+}
+
+.t20-camp-pedidos-titulo {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.t20-camp-pedidos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.t20-camp-pedido-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.7rem 0.9rem;
+    border: 2px solid rgba(60, 35, 20, 0.25);
+    border-radius: 10px;
+    background: #fffef8;
+}
+
+.t20-camp-pedido-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.t20-camp-pedido-jogador {
+    font-weight: 700;
+    color: var(--t20-red-deep, #8b2500);
+}
+
+.t20-camp-pedido-detalhe {
+    font-size: 0.9rem;
+}
+
+.t20-camp-pedido-acoes {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.t20-camp-pedido-btn-recusar {
+    border-color: rgba(139, 37, 0, 0.55);
+    color: #8b2500;
+}
+
+.t20-camp-pedidos-filtros {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.7rem;
+}
+
+.t20-camp-pedidos-filtro {
+    font: inherit;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    border: 2px solid rgba(60, 35, 20, 0.3);
+    background: #fffef8;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.t20-camp-pedidos-filtro--active {
+    border-color: var(--t20-red-deep, #8b2500);
+    background: linear-gradient(180deg, #fff4e8, #ebe2d6);
+    font-weight: 700;
+}
+
+.t20-camp-pedido-card--hist {
+    opacity: 0.92;
+    background: #faf7f0;
+}
+
+.t20-camp-pedido-status {
+    font-size: 0.82rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.t20-camp-pedido-status--aceita {
+    color: #1f7a33;
+}
+
+.t20-camp-pedido-status--recusada {
+    color: #8b2500;
+}
+
+.t20-camp-pedido-status--cancelada {
+    color: #6b5a45;
+}
+
 .t20-camp-arena-host .t20-arena-setup,
 .t20-camp-arena-host .t20-arena-active {
     margin-top: 0.25rem;
