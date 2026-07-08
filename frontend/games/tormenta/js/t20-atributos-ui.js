@@ -29,8 +29,8 @@
         const pts = pontosCompra != null ? pontosCompra : isV13(rv) ? 10 : 20;
         if (isV13(rv)) {
             return (
-                'v1.3: use a coluna <strong>Rolagem</strong> da Tabela 1-1 nos campos (10 = atributo 0). ' +
-                'O valor nativo e o modificador entram nas fórmulas; a ficha exibe ambos no resumo. ' +
+                'v1.3: atributos na escala do livro (<strong>0</strong> = humano médio; ex.: For 2, Int −1). ' +
+                'O número entra direto nas fórmulas (Defesa, perícias, CD). ' +
                 'Jogador: <strong>compra ' +
                 pts +
                 ' pts</strong> (bases −2 a +4) ou <strong>4d6</strong> (soma dos seis ≥ 6). ' +
@@ -50,7 +50,8 @@
     function hintEdicaoAtributosHtml(rv) {
         if (isV13(rv)) {
             return (
-                'Edite os valores finais (base + racial). Jogadores v1.3: rolagem padrão <strong>10</strong> (atributo 0); compra reinicia em 10 nos campos (+ racial nos finais).'
+                'Edite os valores finais (base + racial) na escala v1.3 (ex.: 0, 1, 2, −1). ' +
+                'Compra reinicia bases em <strong>0</strong>; o racial soma no valor final exibido.'
             );
         }
         return (
@@ -136,11 +137,15 @@
         modIds.forEach((id) => {
             const el = q(id);
             if (el) {
-                // Sempre mostrar contribuição na ficha de atributos;
-                // em v1.3 ela coincide com o valor bruto e dá clareza ao jogador.
-                el.style.display = '';
+                el.style.display = v13 ? 'none' : '';
             }
         });
+
+        const titulo = document.getElementById('t20TituloAtributos');
+        if (titulo) titulo.textContent = v13 ? '⚔️ Atributos' : '⚔️ Atributos (valor / mod.)';
+
+        const tituloDlg = document.getElementById('t20TituloAtributosDlg');
+        if (tituloDlg) tituloDlg.textContent = v13 ? 'Atributos' : 'Atributos (valor / mod.)';
     }
 
     global.T20AtributosUi = {

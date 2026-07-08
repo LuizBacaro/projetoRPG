@@ -103,6 +103,9 @@
         const linhas = [];
         if (isV13()) {
             linhas.push(montarSelectClasseAlvo());
+            linhas.push(
+                '<p class="t20-hint">Atributos <strong>não mudam</strong> ao subir de nível (escala v1.3: For 2, Int 0…).</p>'
+            );
         }
         const clsTxt = p.classe_slug || '';
         const nvCls =

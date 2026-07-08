@@ -27,11 +27,7 @@
         const n = Number(raw);
         if (!Number.isFinite(n)) return isV13 ? 0 : 10;
         if (isV13) {
-            const AG = window.T20AtributosGeracao;
-            if (AG && typeof AG.nativeDeScoreV13 === 'function') {
-                return AG.nativeDeScoreV13(n);
-            }
-            return Math.trunc((n - 10) / 2);
+            return Math.trunc(n);
         }
         return Math.floor(n);
     }

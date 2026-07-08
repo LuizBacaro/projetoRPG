@@ -913,12 +913,12 @@
                 <fieldset style="border:1px solid var(--t20-grid-line);border-radius:8px;margin:0.75rem 0 0;padding:0.65rem">
                     <legend style="font-size:0.75rem;font-weight:800;color:var(--t20-red-deep)">Atributos</legend>
                     <div class="t20-dash-attrs6">
-                        <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="6" max="18" value="10" required title="v1.3: rolagem Tabela 1-1 (10 = atributo 0)" /><span id="badgeRacialFor" class="cad-racial-badge" hidden aria-label="Modificador racial de Força"></span></div>
-                        <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="6" max="18" value="10" required title="v1.3: rolagem Tabela 1-1 (10 = atributo 0)" /><span id="badgeRacialDes" class="cad-racial-badge" hidden aria-label="Modificador racial de Destreza"></span></div>
-                        <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="6" max="18" value="10" required title="v1.3: rolagem Tabela 1-1 (10 = atributo 0)" /><span id="badgeRacialCon" class="cad-racial-badge" hidden aria-label="Modificador racial de Constituição"></span></div>
-                        <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="6" max="18" value="10" required title="v1.3: rolagem Tabela 1-1 (10 = atributo 0)" /><span id="badgeRacialInt" class="cad-racial-badge" hidden aria-label="Modificador racial de Inteligência"></span></div>
-                        <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="6" max="18" value="10" required title="v1.3: rolagem Tabela 1-1 (10 = atributo 0)" /><span id="badgeRacialSab" class="cad-racial-badge" hidden aria-label="Modificador racial de Sabedoria"></span></div>
-                        <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="6" max="18" value="10" required title="v1.3: rolagem Tabela 1-1 (10 = atributo 0)" /><span id="badgeRacialCar" class="cad-racial-badge" hidden aria-label="Modificador racial de Carisma"></span></div>
+                        <div class="t20-dash-field"><label for="cadFor">FOR</label><input id="cadFor" type="number" min="-2" max="4" value="0" required title="v1.3: valor-base (−2 a +4); racial no badge" /><span id="badgeRacialFor" class="cad-racial-badge" hidden aria-label="Modificador racial de Força"></span></div>
+                        <div class="t20-dash-field"><label for="cadDes">DES</label><input id="cadDes" type="number" min="-2" max="4" value="0" required title="v1.3: valor-base (−2 a +4); racial no badge" /><span id="badgeRacialDes" class="cad-racial-badge" hidden aria-label="Modificador racial de Destreza"></span></div>
+                        <div class="t20-dash-field"><label for="cadCon">CON</label><input id="cadCon" type="number" min="-2" max="4" value="0" required title="v1.3: valor-base (−2 a +4); racial no badge" /><span id="badgeRacialCon" class="cad-racial-badge" hidden aria-label="Modificador racial de Constituição"></span></div>
+                        <div class="t20-dash-field"><label for="cadInt">INT</label><input id="cadInt" type="number" min="-2" max="4" value="0" required title="v1.3: valor-base (−2 a +4); racial no badge" /><span id="badgeRacialInt" class="cad-racial-badge" hidden aria-label="Modificador racial de Inteligência"></span></div>
+                        <div class="t20-dash-field"><label for="cadSab">SAB</label><input id="cadSab" type="number" min="-2" max="4" value="0" required title="v1.3: valor-base (−2 a +4); racial no badge" /><span id="badgeRacialSab" class="cad-racial-badge" hidden aria-label="Modificador racial de Sabedoria"></span></div>
+                        <div class="t20-dash-field"><label for="cadCar">CAR</label><input id="cadCar" type="number" min="-2" max="4" value="0" required title="v1.3: valor-base (−2 a +4); racial no badge" /><span id="badgeRacialCar" class="cad-racial-badge" hidden aria-label="Modificador racial de Carisma"></span></div>
                     </div>
                 </fieldset>
             </div>
@@ -1068,10 +1068,10 @@
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
 <script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
-<script src="/games/tormenta/js/t20-regra-versao.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/t20-regra-versao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-ha-preferencias.js?v=20260704ha"></script>
-<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260704score"></script>
-<script src="/games/tormenta/js/t20-atributos-ui.js?v=20260629t01"></script>
+<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
+<script src="/games/tormenta/js/t20-atributos-ui.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
 <script src="/games/tormenta/js/t20-dashboard-pericias-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260629"></script>
@@ -1257,8 +1257,7 @@
         const n = Number(raw);
         if (!Number.isFinite(n)) return isDashV13() ? 0 : 10;
         if (isDashV13()) {
-            const AG = window.T20AtributosGeracao;
-            return AG && AG.nativeDeScoreV13 ? AG.nativeDeScoreV13(n) : Math.trunc((n - 10) / 2);
+            return Math.trunc(n);
         }
         return Math.floor(n);
     }
@@ -1374,9 +1373,9 @@
         }
         if (isDashV13()) {
             hj.innerHTML =
-                'Tipo jogador v1.3: informe a <strong>rolagem</strong> de cada atributo (coluna «Rolagem» da Tabela 1-1). Padrão <strong>10</strong> = atributo 0 (custo 0 pt); 11 também; 12–13 = +1 (1 pt); 16–17 = +3 (4 pts); 18 = +4 (7 pts). ' +
-                'Sem bônus racial nos campos — o racial aparece no badge ao lado. ' +
-                '<strong>Compra:</strong> soma dos custos = <strong>10</strong>. <strong>4d6:</strong> soma dos seis nativos ≥ 6.';
+                'Tipo jogador v1.3: informe o <strong>valor-base</strong> de cada atributo (−2 a +4 na compra). ' +
+                'O bônus racial aparece no badge ao lado (ex.: base 0 + racial +2 → For 2 na ficha). ' +
+                '<strong>Compra:</strong> soma dos custos = <strong>10</strong>. <strong>4d6:</strong> soma dos seis bases ≥ 6.';
         } else {
             hj.innerHTML =
                 'Tipo jogador: informe os <strong>valores-base</strong> em cada campo. O bônus racial aparece como badge ao lado (somente leitura). ' +
@@ -2547,8 +2546,8 @@
         } else {
             const vals = Object.values(a);
             for (let i = 0; i < vals.length; i++) {
-                if (vals[i] < 0 || vals[i] > 99) {
-                    Toast.error('Cada atributo deve estar entre 0 e 99.');
+                if (vals[i] < -99 || vals[i] > 99) {
+                    Toast.error('Cada atributo deve estar entre −99 e 99.');
                     return false;
                 }
             }
@@ -2874,7 +2873,9 @@
         if (t === 'jogador') {
             resetAtributosDash();
         } else {
-            const defAttrs = { cadFor: 10, cadDes: 10, cadCon: 10, cadInt: 10, cadSab: 10, cadCar: 10 };
+            const defAttrs = isDashV13()
+                ? { cadFor: 0, cadDes: 0, cadCon: 0, cadInt: 0, cadSab: 0, cadCar: 0 }
+                : { cadFor: 10, cadDes: 10, cadCon: 10, cadInt: 10, cadSab: 10, cadCar: 10 };
             Object.entries(defAttrs).forEach(([id, v]) => {
                 const el = document.getElementById(id);
                 if (el) el.value = String(v);
@@ -2900,9 +2901,15 @@
             const el = document.getElementById(id);
             if (!el) return;
             if (isDashV13()) {
-                el.min = '6';
-                el.max = '18';
-                el.title = 'Rolagem Tabela 1-1 (10 = atributo 0)';
+                if (t === 'jogador') {
+                    el.min = '-2';
+                    el.max = '4';
+                    el.title = 'v1.3: valor-base na compra (−2 a +4); racial no badge';
+                } else {
+                    el.min = '-99';
+                    el.max = '99';
+                    el.title = 'v1.3: atributo nativo (ex.: For 5, Int −1)';
+                }
             } else {
                 el.min = '0';
                 el.max = '99';

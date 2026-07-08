@@ -5,10 +5,14 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, Optional
 
-from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
 from app.games.tormenta.rules.pericias_t20 import (
     bonus_meio_nivel_t20,
     rolar_teste_pericia,
+)
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_V13,
+    normalizar_regra_versao,
 )
 
 _CHAVE_SESSAO = "tormenta_grimorio_sessao_mb"
@@ -164,6 +168,7 @@ def bonus_manter_concentracao_mb(
     con_valor: int,
     nivel: int,
     fort_total: Optional[int] = None,
+    regra_versao: Optional[str] = None,
 ) -> int:
     """
     Bônus no teste para manter concentração.
@@ -177,7 +182,9 @@ def bonus_manter_concentracao_mb(
         else:
             if ft != 0:
                 return ft
-    mod_con = modificador_atributo_t20(int(con_valor or 10))
+    rv = normalizar_regra_versao(regra_versao)
+    default_con = 0 if rv == REGRA_VERSAO_V13 else 10
+    mod_con = contribuicao_atributo_t20(int(con_valor or default_con), rv)
     return mod_con + bonus_meio_nivel_t20(int(nivel or 1))
 
 
@@ -319,14 +326,17 @@ def mod_habilidade_chave_conjurador_mb(
     int_valor: int,
     sab_valor: int,
     car_valor: int,
+    regra_versao: Optional[str] = None,
 ) -> int:
     """INT (mago), SAB (clérigo/druida/ranger), CAR (bardo/feiticeiro/paladino)."""
+    rv = normalizar_regra_versao(regra_versao)
+    default = 0 if rv == REGRA_VERSAO_V13 else 10
     slug = str(classe_slug or "").strip().lower()
     if slug in ("mago",):
-        return modificador_atributo_t20(int_valor)
+        return contribuicao_atributo_t20(int(int_valor or default), rv)
     if slug in ("bardo", "feiticeiro", "paladino"):
-        return modificador_atributo_t20(car_valor)
-    return modificador_atributo_t20(sab_valor)
+        return contribuicao_atributo_t20(int(car_valor or default), rv)
+    return contribuicao_atributo_t20(int(sab_valor or default), rv)
 
 
 def normalizar_tipo_resistencia_request(tipo: str) -> str:
