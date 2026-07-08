@@ -19,6 +19,7 @@
         const onSairCampanha = typeof opts.onSairCampanha === 'function' ? opts.onSairCampanha : null;
 
         const onAbrirArena = typeof opts.onAbrirArena === 'function' ? opts.onAbrirArena : null;
+        const onAbrirPedidos = typeof opts.onAbrirPedidos === 'function' ? opts.onAbrirPedidos : null;
 
         let campanhaMesaAtivaId = null;
 
@@ -70,9 +71,12 @@
             });
             const comb = document.getElementById('t20campWsCombatentes');
             const arena = document.getElementById('t20campWsArena');
+            const pedidos = document.getElementById('t20campWsPedidos');
             if (comb) comb.classList.toggle('t20-camp-ws-pane--active', which === 'combatentes');
             if (arena) arena.classList.toggle('t20-camp-ws-pane--active', which === 'arena');
+            if (pedidos) pedidos.classList.toggle('t20-camp-ws-pane--active', which === 'pedidos');
             if (which === 'arena' && onAbrirArena) onAbrirArena();
+            if (which === 'pedidos' && onAbrirPedidos) onAbrirPedidos();
         }
 
         function renderBotoesCampanhas(campanhas) {

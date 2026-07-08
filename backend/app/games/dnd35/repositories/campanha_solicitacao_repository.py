@@ -60,6 +60,31 @@ class CampanhaSolicitacaoRepository(BaseRepository[CampanhaSolicitacao]):
             .all()
         )
 
+    def listar_historico_para_mestre(
+        self, mestre_id: int, limit: int = 100
+    ) -> List[CampanhaSolicitacao]:
+        """Solicitações já resolvidas (aceita/recusada/cancelada) das mesas do mestre."""
+        return (
+            self.db.query(CampanhaSolicitacao)
+            .join(Campanha, CampanhaSolicitacao.campanha_id == Campanha.id)
+            .filter(
+                Campanha.mestre_id == mestre_id,
+                CampanhaSolicitacao.status != "pendente",
+            )
+            .order_by(CampanhaSolicitacao.resolved_at.desc().nullslast())
+            .limit(limit)
+            .all()
+        )
+
+    def listar_historico_todas(self, limit: int = 100) -> List[CampanhaSolicitacao]:
+        return (
+            self.db.query(CampanhaSolicitacao)
+            .filter(CampanhaSolicitacao.status != "pendente")
+            .order_by(CampanhaSolicitacao.resolved_at.desc().nullslast())
+            .limit(limit)
+            .all()
+        )
+
     def obter_por_id(self, solicitacao_id: int) -> Optional[CampanhaSolicitacao]:
         return (
             self.db.query(CampanhaSolicitacao)

@@ -64,6 +64,35 @@ class GurpsCampanhaSolicitacaoRepository(BaseRepository[GurpsCampanhaSolicitacao
             .all()
         )
 
+    def listar_historico_para_mestre(
+        self, mestre_id: int, limit: int = 100
+    ) -> List[GurpsCampanhaSolicitacao]:
+        """Solicitações já resolvidas (aceita/recusada/cancelada) das mesas do mestre."""
+        return (
+            self.db.query(GurpsCampanhaSolicitacao)
+            .join(
+                GurpsCampanha, GurpsCampanhaSolicitacao.campanha_id == GurpsCampanha.id
+            )
+            .filter(
+                GurpsCampanha.mestre_id == mestre_id,
+                GurpsCampanhaSolicitacao.status != "pendente",
+            )
+            .order_by(GurpsCampanhaSolicitacao.resolved_at.desc().nullslast())
+            .limit(limit)
+            .all()
+        )
+
+    def listar_historico_todas(
+        self, limit: int = 100
+    ) -> List[GurpsCampanhaSolicitacao]:
+        return (
+            self.db.query(GurpsCampanhaSolicitacao)
+            .filter(GurpsCampanhaSolicitacao.status != "pendente")
+            .order_by(GurpsCampanhaSolicitacao.resolved_at.desc().nullslast())
+            .limit(limit)
+            .all()
+        )
+
     def obter_por_id(self, solicitacao_id: int) -> Optional[GurpsCampanhaSolicitacao]:
         return (
             self.db.query(GurpsCampanhaSolicitacao)

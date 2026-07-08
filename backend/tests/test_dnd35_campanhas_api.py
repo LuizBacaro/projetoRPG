@@ -157,6 +157,47 @@ def test_solicitacao_entrada_campanha_aceite_pelo_mestre(dnd35_mestre_e_jogador_
     db.close()
 
 
+def test_solicitacao_recusada_aparece_no_historico(dnd35_mestre_e_jogador_db):
+    from app.games.dnd35.models.combatente import Combatente
+
+    SessionLocal, mestre, jog = dnd35_mestre_e_jogador_db
+    db = SessionLocal()
+    comb = Combatente(
+        dono_id=jog.id,
+        tipo="jogador",
+        nome="Herói D35 Hist",
+        classe="Mago",
+        hp_atual=8,
+        hp_maximo=8,
+    )
+    db.add(comb)
+    db.commit()
+    db.refresh(comb)
+    db.close()
+
+    c_mestre = _client(SessionLocal, _usuario(mestre))
+    c_jog = _client(SessionLocal, _usuario(jog))
+
+    cid = c_mestre.post("/api/v1/campanhas", json={"nome": "Mesa Hist D35"}).json()[
+        "id"
+    ]
+
+    sid = c_jog.post(
+        "/api/v1/campanhas/solicitacoes",
+        json={"campanha_id": cid, "personagem_id": comb.id},
+    ).json()["id"]
+
+    r_rec = c_mestre.post(f"/api/v1/campanhas/solicitacoes/{sid}/recusar")
+    assert r_rec.status_code == 200
+    assert r_rec.json()["status"] == "recusada"
+
+    r_hist = c_mestre.get("/api/v1/campanhas/solicitacoes/historico")
+    assert r_hist.status_code == 200
+    achado = next((x for x in r_hist.json() if x["id"] == sid), None)
+    assert achado is not None
+    assert achado["status"] == "recusada"
+
+
 def test_listar_disponiveis_retorna_campanhas(dnd35_mestre_e_jogador_db):
     SessionLocal, mestre, jog = dnd35_mestre_e_jogador_db
     c_mestre = _client(SessionLocal, _usuario(mestre))
