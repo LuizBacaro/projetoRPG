@@ -57,46 +57,46 @@
             <aside class="ficha-coluna-esquerda t20-ficha-col-esq">
                 <textarea id="f_talentos" class="t20-sr-only" tabindex="-1" aria-hidden="true" rows="1" title="Campo legado (dados antigos); use a lista de talentos MB."></textarea>
                 <div class="ficha-secao t20-ficha-secao">
-                    <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">⚔️ Atributos (valor / mod.)</h3>
+                    <h3 class="ficha-secao-titulo t20-ficha-secao-titulo" id="t20TituloAtributos">⚔️ Atributos</h3>
                     <div class="ficha-atributos-circulo-grid-resumo t20-circulos-attrs" id="t20AttrsRow">
                         <div class="ficha-atributo-circulo" data-attr="for">
                             <div class="circulo-externo">
-                                <input id="fichaForResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Força" aria-describedby="fichaForModResumo" />
+                                <input id="fichaForResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="-99" max="99" value="0" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Força" aria-describedby="fichaForModResumo" />
                                 <span class="circulo-mod" id="fichaForModResumo" aria-label="Modificador de Força">+0</span>
                             </div>
                             <span class="circulo-label">FOR</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="des">
                             <div class="circulo-externo">
-                                <input id="fichaDesResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Destreza" aria-describedby="fichaDesModResumo" />
+                                <input id="fichaDesResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="-99" max="99" value="0" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Destreza" aria-describedby="fichaDesModResumo" />
                                 <span class="circulo-mod" id="fichaDesModResumo" aria-label="Modificador de Destreza">+0</span>
                             </div>
                             <span class="circulo-label">DES</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="con">
                             <div class="circulo-externo">
-                                <input id="fichaConResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Constituição" aria-describedby="fichaConModResumo" />
+                                <input id="fichaConResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="-99" max="99" value="0" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Constituição" aria-describedby="fichaConModResumo" />
                                 <span class="circulo-mod" id="fichaConModResumo" aria-label="Modificador de Constituição">+0</span>
                             </div>
                             <span class="circulo-label">CON</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="int">
                             <div class="circulo-externo">
-                                <input id="fichaIntResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Inteligência" aria-describedby="fichaIntModResumo" />
+                                <input id="fichaIntResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="-99" max="99" value="0" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Inteligência" aria-describedby="fichaIntModResumo" />
                                 <span class="circulo-mod" id="fichaIntModResumo" aria-label="Modificador de Inteligência">+0</span>
                             </div>
                             <span class="circulo-label">INT</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="sab">
                             <div class="circulo-externo">
-                                <input id="fichaSabResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Sabedoria" aria-describedby="fichaSabModResumo" />
+                                <input id="fichaSabResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="-99" max="99" value="0" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Sabedoria" aria-describedby="fichaSabModResumo" />
                                 <span class="circulo-mod" id="fichaSabModResumo" aria-label="Modificador de Sabedoria">+0</span>
                             </div>
                             <span class="circulo-label">SAB</span>
                         </div>
                         <div class="ficha-atributo-circulo" data-attr="car">
                             <div class="circulo-externo">
-                                <input id="fichaCarResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="0" max="99" value="10" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Carisma" aria-describedby="fichaCarModResumo" />
+                                <input id="fichaCarResumo" class="t20-circulo-valor-inp circulo-valor t20-circulo-valor--readonly" type="number" min="-99" max="99" value="0" readonly tabindex="-1" title="Só leitura aqui; altere em Editar ficha (diálogo)." aria-label="Carisma" aria-describedby="fichaCarModResumo" />
                                 <span class="circulo-mod" id="fichaCarModResumo" aria-label="Modificador de Carisma">+0</span>
                             </div>
                             <span class="circulo-label">CAR</span>
@@ -632,12 +632,12 @@
                             </div>
                         </div>
                         <div class="t20-identity-grid t20-identity-grid--compact">
-                            <div class="t20-ficha-field"><label for="f_dlg_attr_for">FOR</label><input id="f_dlg_attr_for" type="number" min="0" max="99" class="t20-input" value="10" /></div>
-                            <div class="t20-ficha-field"><label for="f_dlg_attr_des">DES</label><input id="f_dlg_attr_des" type="number" min="0" max="99" class="t20-input" value="10" /></div>
-                            <div class="t20-ficha-field"><label for="f_dlg_attr_con">CON</label><input id="f_dlg_attr_con" type="number" min="0" max="99" class="t20-input" value="10" /></div>
-                            <div class="t20-ficha-field"><label for="f_dlg_attr_int">INT</label><input id="f_dlg_attr_int" type="number" min="0" max="99" class="t20-input" value="10" /></div>
-                            <div class="t20-ficha-field"><label for="f_dlg_attr_sab">SAB</label><input id="f_dlg_attr_sab" type="number" min="0" max="99" class="t20-input" value="10" /></div>
-                            <div class="t20-ficha-field"><label for="f_dlg_attr_car">CAR</label><input id="f_dlg_attr_car" type="number" min="0" max="99" class="t20-input" value="10" /></div>
+                            <div class="t20-ficha-field"><label for="f_dlg_attr_for">FOR</label><input id="f_dlg_attr_for" type="number" min="-99" max="99" class="t20-input" value="0" /></div>
+                            <div class="t20-ficha-field"><label for="f_dlg_attr_des">DES</label><input id="f_dlg_attr_des" type="number" min="-99" max="99" class="t20-input" value="0" /></div>
+                            <div class="t20-ficha-field"><label for="f_dlg_attr_con">CON</label><input id="f_dlg_attr_con" type="number" min="-99" max="99" class="t20-input" value="0" /></div>
+                            <div class="t20-ficha-field"><label for="f_dlg_attr_int">INT</label><input id="f_dlg_attr_int" type="number" min="-99" max="99" class="t20-input" value="0" /></div>
+                            <div class="t20-ficha-field"><label for="f_dlg_attr_sab">SAB</label><input id="f_dlg_attr_sab" type="number" min="-99" max="99" class="t20-input" value="0" /></div>
+                            <div class="t20-ficha-field"><label for="f_dlg_attr_car">CAR</label><input id="f_dlg_attr_car" type="number" min="-99" max="99" class="t20-input" value="0" /></div>
                         </div>
                     </div>
                     <div class="t20-ficha-secao">
@@ -1141,7 +1141,7 @@
                         </div>
                     </div>
                     <div class="t20-ficha-secao">
-                        <h3 class="t20-ficha-secao-titulo">Atributos (valor / mod.)</h3>
+                        <h3 class="t20-ficha-secao-titulo" id="t20TituloAtributosDlg">Atributos</h3>
                         <div class="t20-ficha-comp-attrs">
                             <div class="t20-ficha-comp-attr">
                                 <span>FOR</span><input id="t20CompForV" class="t20-input" inputmode="numeric" /><input id="t20CompForM" class="t20-input" inputmode="numeric" />
@@ -1557,10 +1557,10 @@
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
 <script src="/games/tormenta/js/t20-ficha-campanha-solicitacao.js?v=20260707solic"></script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioAuto"></script>
-<script src="/games/tormenta/js/t20-regra-versao.js?v=20260629s44"></script>
-<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260629rv"></script>
-<script src="/games/tormenta/js/t20-atributos-ui.js?v=20260629t01"></script>
-<script src="/games/tormenta/js/t20-atributos-resumo.js?v=20260630a"></script>
+<script src="/games/tormenta/js/t20-regra-versao.js?v=20260707v13attr"></script>
+<script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
+<script src="/games/tormenta/js/t20-atributos-ui.js?v=20260707v13attr"></script>
+<script src="/games/tormenta/js/t20-atributos-resumo.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
@@ -1577,8 +1577,8 @@
 <script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-multiclasse-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
-<script src="/games/tormenta/js/t20-subir-nivel.js?v=20260614subirnivel"></script>
-<script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260704orc"></script>
+<script src="/games/tormenta/js/t20-subir-nivel.js?v=20260707v13attr"></script>
+<script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
 <script src="/games/tormenta/js/t20-origens-v13.js?v=20260629dev"></script>
@@ -1879,11 +1879,9 @@
             const total = t20CalcularCaTotal();
             const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
             if (isV13) {
-                // desV é o score d20; desAttr é o modificador nativo v1.3 para exibição no texto
-                const desScore = Math.trunc(Number((q('fichaDesResumo') && q('fichaDesResumo').value) || 0));
-                const desAttr = window.T20RegraVersao
-                    ? window.T20RegraVersao.contribuicaoAtributo(desScore, getRegraVersaoAtiva())
-                    : desScore;
+                const desAttr = Math.trunc(
+                    Number((q('fichaDesResumo') && q('fichaDesResumo').value) || 0)
+                );
                 const desFmt = (desAttr >= 0 ? '+' : '') + desAttr;
                 const pesada =
                     window.T20RegraVersao &&
@@ -1944,21 +1942,18 @@
             const base = Math.floor(Number(bases[a]));
             const fin = Math.max(minFin, (Number.isFinite(base) ? base : fallbackBase) + (rDel[a] || 0));
             valoresNativos[a] = String(fin);
-            // Diálogo: exibe score d20 para v1.3 (ex.: 14) ou valor MB direto (ex.: 12)
             const idDlg = T20_ATTR_DLG[a];
-            if (idDlg && q(idDlg)) q(idDlg).value = String(isV13 ? 10 + 2 * fin : fin);
+            if (idDlg && q(idDlg)) q(idDlg).value = String(fin);
         });
         if (window.T20AtributosResumo && typeof window.T20AtributosResumo.aplicarValoresResumoAtributos === 'function') {
             window.T20AtributosResumo.aplicarValoresResumoAtributos(valoresNativos, {
                 fallback: fallbackBase,
                 ids: T20_ATTR_INP,
-                v13Score: isV13,
             });
         } else {
             ATTR_KEYS.forEach((a) => {
                 const idInp = T20_ATTR_INP[a];
-                const fin = Number(valoresNativos[a]);
-                if (idInp && q(idInp)) q(idInp).value = String(isV13 ? 10 + 2 * fin : fin);
+                if (idInp && q(idInp)) q(idInp).value = valoresNativos[a];
             });
         }
         atualizarModsAtributos();
@@ -2046,12 +2041,16 @@
     }
 
     function t20SyncAttrsDialogToSheet() {
+        const fb =
+            window.T20AtributosUi && window.T20AtributosUi.fallbackAttrDefault
+                ? window.T20AtributosUi.fallbackAttrDefault(getRegraVersaoAtiva())
+                : 10;
         ATTR_KEYS.forEach((a) => {
             const dst = q(T20_ATTR_INP[a]);
             const src = q(T20_ATTR_DLG[a]);
             if (!dst || !src) return;
             let v = String(src.value || '').trim();
-            if (v === '') v = '10';
+            if (v === '') v = String(fb);
             dst.value = v;
         });
         atualizarModsAtributos();
@@ -3308,9 +3307,7 @@
         if (!raw) return fallback;
         const n = Number(raw);
         if (!Number.isFinite(n)) return fallback;
-        // v1.3: input exibe score d20 (10+2×attr); converte de volta para nativo (−2 a +4)
-        if (isV13) return Math.trunc((n - 10) / 2);
-        return Math.floor(n);
+        return Math.trunc(n);
     }
 
     window.valorFinalAtributoCampo = valorFinalAtributoCampo;
@@ -7088,8 +7085,8 @@
     }
 
     function t20AtualizarModHabAtaquePlanilhaDeAtributos() {
-        const mFor = modificadorAtributoT20((q('fichaForResumo') && q('fichaForResumo').value) || '10');
-        const mDes = modificadorAtributoT20((q('fichaDesResumo') && q('fichaDesResumo').value) || '10');
+        const mFor = modificadorAtributoT20((q('fichaForResumo') && q('fichaForResumo').value) || '0');
+        const mDes = modificadorAtributoT20((q('fichaDesResumo') && q('fichaDesResumo').value) || '0');
         t20SetInputNumOptional('t20AtqCacModhab', mFor);
         t20SetInputNumOptional('t20AtqDistModhab', mDes);
         t20AtualizarTotaisAtaquesPlanilha();
@@ -7875,18 +7872,16 @@
                 {
                     fallback: _isV13Preenche ? 0 : 10,
                     ids: T20_ATTR_INP,
-                    v13Score: _isV13Preenche,
                 }
             );
         } else {
-            // Fallback: converte para score d20 se v1.3
-            const _v13s = _isV13Preenche ? (v) => 10 + 2 * (Number(v) || 0) : (v) => v;
-            q('fichaForResumo').value = _v13s(p.for_valor);
-            q('fichaDesResumo').value = _v13s(p.des_valor);
-            q('fichaConResumo').value = _v13s(p.con_valor);
-            q('fichaIntResumo').value = _v13s(p.int_valor);
-            q('fichaSabResumo').value = _v13s(p.sab_valor);
-            q('fichaCarResumo').value = _v13s(p.car_valor);
+            const fb = _isV13Preenche ? 0 : 10;
+            q('fichaForResumo').value = p.for_valor != null ? String(p.for_valor) : String(fb);
+            q('fichaDesResumo').value = p.des_valor != null ? String(p.des_valor) : String(fb);
+            q('fichaConResumo').value = p.con_valor != null ? String(p.con_valor) : String(fb);
+            q('fichaIntResumo').value = p.int_valor != null ? String(p.int_valor) : String(fb);
+            q('fichaSabResumo').value = p.sab_valor != null ? String(p.sab_valor) : String(fb);
+            q('fichaCarResumo').value = p.car_valor != null ? String(p.car_valor) : String(fb);
         }
         atualizarModsAtributos();
         t20WritePairSlash('fichaPv', p.pv_atual, p.pv_max);

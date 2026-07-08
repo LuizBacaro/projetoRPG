@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
 from app.games.tormenta.rules.catalogo_t20 import metadados_magia_mb_por_slug
 from app.games.tormenta.rules.grimorio_conjuracao_t20 import (
     modo_conjuracao_classe,
@@ -16,6 +16,10 @@ from app.games.tormenta.rules.grimorio_conjuracao_t20 import (
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
     tipo_lista_magias_por_classe_mb,
+)
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_V13,
+    normalizar_regra_versao,
 )
 
 _DATA = Path(__file__).resolve().parent.parent / "data" / "magias_preparadas_mb.json"
@@ -62,8 +66,11 @@ def _mod_habilidade_preparadas(
     int_valor: int = 10,
     sab_valor: int = 10,
     car_valor: int = 10,
+    regra_versao: Optional[str] = None,
 ) -> int:
     ch = str(row.get("habilidade_chave") or "int").strip().lower()
+    rv = normalizar_regra_versao(regra_versao)
+    default = 0 if rv == REGRA_VERSAO_V13 else 10
     vals = {
         "for": for_valor,
         "des": des_valor,
@@ -72,7 +79,7 @@ def _mod_habilidade_preparadas(
         "sab": sab_valor,
         "car": car_valor,
     }
-    return modificador_atributo_t20(int(vals.get(ch, 10)))
+    return contribuicao_atributo_t20(int(vals.get(ch, default)), rv)
 
 
 def teto_preparadas_mb(
@@ -111,6 +118,7 @@ def teto_preparadas_mb(
             int_valor=int_valor,
             sab_valor=sab_valor,
             car_valor=car_valor,
+            regra_versao=regra_versao,
         )
         return max(minimo, nv + mod)
     return None
@@ -468,6 +476,7 @@ def preview_preparadas_mb(
             int_valor=int_valor,
             sab_valor=sab_valor,
             car_valor=car_valor,
+            regra_versao=regra_versao,
         )
     return {
         "classe_slug": str(slug_classe).strip().lower(),

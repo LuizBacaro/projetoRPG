@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from app.games.tormenta.rules.atributos_t20 import modificador_atributo_t20
+from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
 from app.games.tormenta.rules.conjuracao_t20 import habilidade_chave_conjuracao
 from app.games.tormenta.rules.grimorio_conjuracao_t20 import (
     modo_conjuracao_classe,
@@ -16,6 +16,10 @@ from app.games.tormenta.rules.grimorio_conjuracao_t20 import (
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
     tipo_lista_magias_por_classe_mb,
+)
+from app.games.tormenta.rules.regra_versao_t20 import (
+    REGRA_VERSAO_V13,
+    normalizar_regra_versao,
 )
 
 _DATA = (
@@ -68,8 +72,11 @@ def _mod_habilidade_chave(
     int_valor: int = 10,
     sab_valor: int = 10,
     car_valor: int = 10,
+    regra_versao: Optional[str] = None,
 ) -> int:
     ch = habilidade_chave_conjuracao(slug_classe) or "sab"
+    rv = normalizar_regra_versao(regra_versao)
+    default = 0 if rv == REGRA_VERSAO_V13 else 10
     vals = {
         "for": for_valor,
         "des": des_valor,
@@ -78,7 +85,7 @@ def _mod_habilidade_chave(
         "sab": sab_valor,
         "car": car_valor,
     }
-    return modificador_atributo_t20(int(vals.get(ch, 10)))
+    return contribuicao_atributo_t20(int(vals.get(ch, default)), rv)
 
 
 def orcamento_repertorio_mb(
@@ -116,6 +123,7 @@ def orcamento_repertorio_mb(
         int_valor=int_valor,
         sab_valor=sab_valor,
         car_valor=car_valor,
+        regra_versao=regra_versao,
     )
     if inicial.get("bonus_mod_habilidade_circulo_1") is True:
         base_c1 += mod

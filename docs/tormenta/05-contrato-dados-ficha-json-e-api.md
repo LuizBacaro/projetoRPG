@@ -4,7 +4,7 @@
 
 | Coluna | Uso |
 |--------|-----|
-| Atributos `*_valor` | FOR, DES, CON, INT, SAB, CAR |
+| Atributos `*_valor` | FOR, DES, CON, INT, SAB, CAR — **v1.3:** valor nativo de jogo (−2…+4 na criação típica; monstros ex.: For 5). **MB:** score 8–18 |
 | `pv_max`, `pv_atual` | Pontos de vida |
 | `pa_max`, `pa_atual` | Pontos de Magia (PM na UI; colunas `pa_*` no banco) |
 | `ca`, `rd`, `nivel`, `iniciativa`, `deslocamento`, `tamanho` | Combate / exploracao |
@@ -20,14 +20,17 @@ Documentado também em `backend/app/games/tormenta/README.md`. Resumo:
 - `defesa_detalhe`, `armadura_escudo_tabela`
 - `talentos_texto`, `magias_texto`, `raca_origem_texto`
 - `raca_tormenta_slug`, `raca_tormenta_mais2a`, `raca_tormenta_mais2b`, `raca_tormenta_livre` (raça MB + escolhas Humano/Lefou ou texto livre)
-- `atributos_compra` — mapa `{ for, des, con, int, sab, car }` com valores-base 8–18 (compra por pontos; soma dos custos na tabela MB = **20**)
+- `atributos_compra` — mapa `{ for, des, con, int, sab, car }` com **valores-base na geração** (v1.3: −2…+4 + Tabela 1-1; MB: 8–18 + 20 pts)
+- `regra_versao` — `v13` (Edição Jogo do Ano) ou `mb` (legado)
 - `dinheiro`, `carga`, `idiomas`, `campanha`, `mestre`, `outros_jogadores`, `xp_atual`, `xp_proximo`
 - `historia`, `personalidade`, `aparencia`, `notas`
 - **Grimório / conjuração MB:** `tormenta_classe_mb_slug`, `tormenta_conjuracao_manual_mb`, `tormenta_nivel_conjurador_mb` (opcional), `tormenta_niveis_classe_mb` (opcional, lista `{slug, nivel}` — editável na ficha em «Multiclasse — classes conjuradoras» ou no JSON), `tormenta_grimorio_sessao_mb` (`pm_gastos_sessao`, `preparadas_anotacao` — lembretes de sessão)
 
 Novas chaves devem ser **aditivas** (nunca remover silenciosamente) para compatibilidade com fichas já salvas.
 
-**Compra por pontos (jogador):** ao criar ou atualizar via API, a soma dos custos dos seis atributos (8–18) deve ser **exatamente 20** pontos (MB). Monstro/NPC: sem essa regra.
+**Compra por pontos (jogador):** v1.3 — bases −2…+4, soma dos custos = **10** pts (Tabela 1-1). MB — bases 8–18, soma = **20** pts. Monstro/NPC: sem essa regra; `*_valor` = atributo nativo livre.
+
+**Escala 6–18 (Tabela 1-1):** usada **somente** na conversão 4d6 durante a criação — **não** persistir nem exibir na ficha pronta v1.3.
 
 ### Evolução recomendada
 

@@ -51,8 +51,8 @@
     }
 
     /**
-     * Converte atributo nativo v1.3 (−2 a +4) para score d20-equivalente
-     * (ex.: 2 → 14, 1 → 12, 0 → 10).  Exibição nos círculos da ficha.
+     * Converte atributo nativo v1.3 para score de rolagem 4d6 (Tabela 1-1).
+     * Uso restrito ao wizard de criação — não exibir na ficha pronta.
      */
     function v13AttrToScore(attr) {
         const n = Number(attr);
@@ -60,16 +60,19 @@
     }
 
     /**
-     * Contribuição mecânica do atributo para fórmulas.
-     * v1.3: val é o score d20-equivalente (10+2×attr); retorna o atributo nativo (−2 a +4).
-     * MB:   val é o score MB (8–18+); retorna o modificador pelo livro.
+     * Contribuição mecânica do atributo para fórmulas (Defesa, perícias, CD…).
+     * v1.3: `val` é o atributo nativo persistido (−2…+4 típico; monstros podem exceder).
+     * MB:   `val` é o score MB (8–18+); retorna modificador por faixa do livro.
      */
     function contribuicaoAtributo(val, regraVersao) {
-        if (isV13(regraVersao)) {
-            const n = Number(val);
-            return Number.isFinite(n) ? Math.trunc((n - 10) / 2) : 0;
+        const n = Number(val);
+        if (!Number.isFinite(n)) {
+            return isV13(regraVersao) ? 0 : 0;
         }
-        return modificadorAtributoMb(val);
+        if (isV13(regraVersao)) {
+            return Math.trunc(n);
+        }
+        return modificadorAtributoMb(Math.trunc(n));
     }
 
     function labelVersaoCurta(regraVersao) {

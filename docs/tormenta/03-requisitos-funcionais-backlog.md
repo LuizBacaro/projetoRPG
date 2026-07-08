@@ -70,7 +70,7 @@ Rastreio transversal da Edição Jogo do Ano. Detalhe por domínio: `.cursor/req
 
 | ID | Requisito | Prioridade | Notas |
 |----|-----------|------------|-------|
-| RF-T01-v13 | Atributos v1.3: valor direto, compra 10 pts Tabela 1-1, 4d6 soma ≥ 6 | **Feito** | Backend + wizard/ficha v1.3; `t20-atributos-ui.js`; RF-T01g/h fora do escopo |
+| RF-T01-v13 | Atributos v1.3: valor direto, compra 10 pts Tabela 1-1, 4d6 soma ≥ 6 | **Feito** | Backend + UI/mesa nativa — RF-T01-ui-a…m; RF-T01-ui-n migração pendente |
 | RF-T03-v13 | **14 classes** v1.3: PV/PM por fórmula, ocultar legado MB | **Feito** | `classes_v13.json`, API `regra_versao=v13`, wizard/ficha, PM no painel classe |
 | RF-T03-v13b | Arcanista: caminho Bruxo/Mago/Feiticeiro | **Feito** | Wizard + ficha + validação salvar |
 | RF-T03-v13c | PM multiclasse (soma nível × pm/nível) | **Feito** | API `POST /pm-preview-multiclasse`, UI `multiclasse_v13` na ficha, soma automática PM |
