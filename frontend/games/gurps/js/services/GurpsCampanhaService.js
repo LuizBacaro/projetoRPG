@@ -49,6 +49,14 @@ class GurpsCampanhaService {
         return this._handleResponse(res, 'Erro ao carregar solicitações');
     }
 
+    async listarHistoricoSolicitacoes() {
+        const res = await fetch(this._url('/solicitacoes/historico'), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
+        return this._handleResponse(res, 'Erro ao carregar histórico de solicitações');
+    }
+
     async obterMinhaSolicitacao(personagemId) {
         const res = await fetch(
             this._url(`/solicitacoes/minhas?personagem_id=${encodeURIComponent(String(personagemId))}`),

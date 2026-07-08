@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/combatentes.css" />
     <link rel="stylesheet" href="/games/dnd35/css/formularios.css" />
     <link rel="stylesheet" href="/games/dnd35/css/modais.css" />
-    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=22">
+    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=23">
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
 </head>
 <body>
@@ -109,6 +109,10 @@
                 <div id="campanhasSubAbas" class="campanhas-subabas">
                     <button type="button" class="campanhas-subaba-btn active" data-campanhas-subaba="cadastro">Cadastro de Campanhas</button>
                     <button type="button" class="campanhas-subaba-btn" data-campanhas-subaba="sessoes">Registro de Sessões</button>
+                    <button type="button" class="campanhas-subaba-btn" data-campanhas-subaba="pedidos">
+                        📨 Pedidos de Acesso
+                        <span id="d35PedidosBadge" class="d35-pedidos-badge" hidden>0</span>
+                    </button>
                 </div>
 
                 <div id="campanhasSubabaCadastro" class="campanhas-subaba-pane active">
@@ -179,6 +183,23 @@
                     </form>
                     <div id="listaSessoesCampanha" class="dash-divcustom-listagem">
                         <p class="dash-divcustom-vazio">Carregando sessões...</p>
+                    </div>
+                </div>
+
+                <div id="campanhasSubabaPedidos" class="campanhas-subaba-pane">
+                    <h3 class="dash-divcustom-titulo">Pedidos de acesso às suas campanhas</h3>
+                    <p class="dash-divcustom-info">
+                        Jogadores que solicitaram entrar nas campanhas em que você é mestre. Aceite para vincular o personagem à mesa ou recuse — a decisão pode ser tomada a qualquer momento.
+                    </p>
+                    <div class="d35-pedidos-toolbar">
+                        <div class="d35-pedidos-filtros" role="tablist" aria-label="Filtro de pedidos">
+                            <button type="button" class="d35-pedidos-filtro active" data-d35-pedidos-filtro="pendentes">Pendentes</button>
+                            <button type="button" class="d35-pedidos-filtro" data-d35-pedidos-filtro="historico">Histórico</button>
+                        </div>
+                        <button type="button" class="btn-dash-save" id="d35PedidosRecarregar" title="Recarregar pedidos">↻ Atualizar</button>
+                    </div>
+                    <div id="d35PedidosLista" class="d35-pedidos-lista" aria-live="polite">
+                        <p class="dash-divcustom-vazio">Carregando pedidos…</p>
                     </div>
                 </div>
             </div>
@@ -755,8 +776,8 @@
 
 <!-- FASE 7: DashboardController (carregado por último) -->
 <script src="/games/dnd35/js/services/DivindadeCustomService.js?v=2"></script>
-<script src="/games/dnd35/js/services/CampanhaService.js?v=20260707solic"></script>
-<script src="/games/dnd35/js/d35-dashboard-solicitacoes-campanha.js?v=20260707solic"></script>
+<script src="/games/dnd35/js/services/CampanhaService.js?v=20260708pedidos"></script>
+<script src="/games/dnd35/js/d35-dashboard-solicitacoes-campanha.js?v=20260708pedidos"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
 <script src="/games/dnd35/js/controllers/DashboardController.js?v=33"></script>
 

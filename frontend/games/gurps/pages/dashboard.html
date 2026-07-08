@@ -6,7 +6,7 @@
     <title>Dashboard GURPS — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/dnd35/css/layout.css" />
-    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=22" />
+    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=23" />
     <link rel="stylesheet" href="../css/gurps-dashboard.css" />
     <link rel="stylesheet" href="../css/gurps-arena.css" />
 </head>
@@ -83,6 +83,10 @@
                 <div id="gurpsCampanhasSubAbas" class="campanhas-subabas">
                     <button type="button" class="campanhas-subaba-btn active" data-gurps-campanhas-subaba="cadastro">Cadastro de campanhas</button>
                     <button type="button" class="campanhas-subaba-btn" data-gurps-campanhas-subaba="sessoes">Registro de sessões</button>
+                    <button type="button" class="campanhas-subaba-btn" data-gurps-campanhas-subaba="pedidos">
+                        📨 Pedidos de Acesso
+                        <span id="gurpsPedidosBadge" class="d35-pedidos-badge" hidden>0</span>
+                    </button>
                 </div>
                 <div id="gurpsCampanhasSubabaCadastro" class="campanhas-subaba-pane active">
                     <p class="dash-divcustom-info gurps-mt-0">
@@ -149,6 +153,22 @@
                     </form>
                     <div id="listaSessoesCampanhaGurps" class="dash-divcustom-listagem">
                         <p class="dash-divcustom-vazio">Carregando sessões…</p>
+                    </div>
+                </div>
+                <div id="gurpsCampanhasSubabaPedidos" class="campanhas-subaba-pane">
+                    <h3 class="dash-divcustom-titulo">Pedidos de acesso às suas campanhas</h3>
+                    <p class="dash-divcustom-info gurps-mt-0">
+                        Jogadores que solicitaram entrar nas campanhas em que você é mestre. Aceite para vincular o personagem à mesa ou recuse — a decisão pode ser tomada a qualquer momento.
+                    </p>
+                    <div class="d35-pedidos-toolbar">
+                        <div class="d35-pedidos-filtros" role="tablist" aria-label="Filtro de pedidos">
+                            <button type="button" class="d35-pedidos-filtro active" data-gurps-pedidos-filtro="pendentes">Pendentes</button>
+                            <button type="button" class="d35-pedidos-filtro" data-gurps-pedidos-filtro="historico">Histórico</button>
+                        </div>
+                        <button type="button" class="btn-dash-save" id="gurpsPedidosRecarregar" title="Recarregar pedidos">↻ Atualizar</button>
+                    </div>
+                    <div id="gurpsPedidosLista" class="d35-pedidos-lista" aria-live="polite">
+                        <p class="dash-divcustom-vazio">Carregando pedidos…</p>
                     </div>
                 </div>
             </div>
@@ -327,7 +347,7 @@
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
 <script src="../js/services/GurpsPersonagemService.js"></script>
 <script src="../js/services/GurpsCampanhaService.js?v=20260707solic"></script>
-<script src="../js/gurps-dashboard-solicitacoes-campanha.js?v=20260707solic"></script>
+<script src="../js/gurps-dashboard-solicitacoes-campanha.js?v=20260708pedidos"></script>
 <script src="../js/services/GurpsCombateService.js"></script>
 <script>
 (function () {
@@ -946,6 +966,7 @@
         });
         document.getElementById('gurpsCampanhasSubabaCadastro')?.classList.toggle('active', sub === 'cadastro');
         document.getElementById('gurpsCampanhasSubabaSessoes')?.classList.toggle('active', sub === 'sessoes');
+        document.getElementById('gurpsCampanhasSubabaPedidos')?.classList.toggle('active', sub === 'pedidos');
         try {
             localStorage.setItem('dashboard:gurps-campanhas-subaba', sub);
         } catch (_err) {}
@@ -956,9 +977,13 @@
         if (!wrap) return;
         let inicial = 'cadastro';
         try {
-            if (localStorage.getItem('dashboard:gurps-campanhas-subaba') === 'sessoes') inicial = 'sessoes';
+            const salvo = localStorage.getItem('dashboard:gurps-campanhas-subaba');
+            if (salvo === 'sessoes' || salvo === 'pedidos') inicial = salvo;
         } catch (_err) {}
         aplicarSubabaCampanhasGurps(inicial);
+        if (inicial === 'pedidos' && window.GurpsCampanhaSolicitacoesMestre?.abrirPainel) {
+            void window.GurpsCampanhaSolicitacoesMestre.abrirPainel();
+        }
         wrap.querySelectorAll('[data-gurps-campanhas-subaba]').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const sub = btn.dataset.gurpsCampanhasSubaba || 'cadastro';
@@ -966,6 +991,9 @@
                 if (sub === 'sessoes') {
                     atualizarSelectCampanhasSessaoGurps();
                     carregarSessoesMestreGurps();
+                }
+                if (sub === 'pedidos' && window.GurpsCampanhaSolicitacoesMestre?.abrirPainel) {
+                    void window.GurpsCampanhaSolicitacoesMestre.abrirPainel();
                 }
             });
         });

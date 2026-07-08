@@ -22,7 +22,8 @@ O campo **Campanha** na ficha era texto livre (`ficha_json.campanha`), sem vínc
 | GET | `/disponiveis` | autenticado no jogo | Lista campanhas para select na ficha |
 | POST | `/solicitacoes` | dono do personagem | Cria solicitação `pendente` ou vincula se for mestre da campanha |
 | GET | `/solicitacoes/minhas?personagem_id=` | dono do personagem | Solicitação ativa (pendente) do PJ |
-| GET | `/solicitacoes/pendentes` | mestre de campanha / admin | Fila para popup no dashboard |
+| GET | `/solicitacoes/pendentes` | mestre de campanha / admin | Fila da aba «Pedidos de Acesso» + badge |
+| GET | `/solicitacoes/historico` | mestre de campanha / admin | Pedidos resolvidos (aceitos/recusados/cancelados), aba «Histórico» |
 | POST | `/solicitacoes/{id}/aceitar` | mestre da campanha / admin | `personagem.campanha_id = campanha_id`, status `aceita` |
 | POST | `/solicitacoes/{id}/recusar` | mestre da campanha / admin | status `recusada` |
 | DELETE | `/solicitacoes/{id}` | solicitante | Cancela solicitação `pendente` |
@@ -63,9 +64,12 @@ Tabela `tormenta_campanha_solicitacoes`:
 
 ### Dashboard (mestre)
 
-- Ao carregar aba Campanhas (ou periodicamente): `GET /solicitacoes/pendentes`.
-- Popup (`ModalConfirm` ou diálogo dedicado): aceitar / recusar por solicitação.
-- Após aceitar, mesa da campanha lista o PJ via `GET /personagens?campanha_id=`.
+- Aba/sub-aba dedicada **«Pedidos de Acesso»** (não mais popup bloqueante):
+  - **Tormenta:** aba na mesa da campanha (ao lado de Combatentes/Arena), filtrada pela campanha ativa; badge com contagem de pendentes.
+  - **D&D 3.5 / GURPS:** sub-aba dentro de Campanhas listando pedidos de todas as mesas do mestre (com nome da campanha por linha); badge no botão da sub-aba.
+- Filtro **Pendentes / Histórico** por aba; histórico usa `GET /solicitacoes/historico`.
+- Polling (~90s) apenas atualiza o badge e emite **toast leve** ao chegar novos pedidos; a decisão é tomada quando o mestre quiser.
+- Aceitar/recusar por linha; após aceitar, mesa lista o PJ via `GET /personagens?campanha_id=`.
 
 ## Cache
 

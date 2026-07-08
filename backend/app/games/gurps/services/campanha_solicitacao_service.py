@@ -161,6 +161,17 @@ class GurpsCampanhaSolicitacaoService:
             rows = self.solicitacao_repository.listar_pendentes_para_mestre(usuario.id)
         return [self._para_resposta(r) for r in rows]
 
+    def listar_historico_mestre(
+        self, usuario: Usuario, limit: int = 100
+    ) -> List[GurpsCampanhaSolicitacaoResponse]:
+        if usuario.perfil == PerfilUsuario.ADMINISTRADOR:
+            rows = self.solicitacao_repository.listar_historico_todas(limit)
+        else:
+            rows = self.solicitacao_repository.listar_historico_para_mestre(
+                usuario.id, limit
+            )
+        return [self._para_resposta(r) for r in rows]
+
     def _assert_mestre_solicitacao(
         self, usuario: Usuario, sol: GurpsCampanhaSolicitacao
     ) -> GurpsCampanha:

@@ -854,14 +854,20 @@ class DashboardController {
         if (!container || container.dataset.boundSubAbas) return;
         container.dataset.boundSubAbas = '1';
         const ativar = (alvo) => {
-            const subaba = alvo === 'sessoes' ? 'sessoes' : 'cadastro';
+            const validas = ['cadastro', 'sessoes', 'pedidos'];
+            const subaba = validas.includes(alvo) ? alvo : 'cadastro';
             container.querySelectorAll('[data-campanhas-subaba]').forEach((btn) => {
                 btn.classList.toggle('active', btn.getAttribute('data-campanhas-subaba') === subaba);
             });
             const paneCadastro = document.getElementById('campanhasSubabaCadastro');
             const paneSessoes = document.getElementById('campanhasSubabaSessoes');
+            const panePedidos = document.getElementById('campanhasSubabaPedidos');
             if (paneCadastro) paneCadastro.classList.toggle('active', subaba === 'cadastro');
             if (paneSessoes) paneSessoes.classList.toggle('active', subaba === 'sessoes');
+            if (panePedidos) panePedidos.classList.toggle('active', subaba === 'pedidos');
+            if (subaba === 'pedidos' && window.D35CampanhaSolicitacoesMestre?.abrirPainel) {
+                void window.D35CampanhaSolicitacoesMestre.abrirPainel();
+            }
             this._persistirSubAbaCampanhas(subaba);
         };
         ativar(this._lerSubAbaCampanhasPersistida());
@@ -875,7 +881,7 @@ class DashboardController {
     _lerSubAbaCampanhasPersistida() {
         try {
             const valor = localStorage.getItem('dashboard:campanhas-subaba');
-            return valor === 'sessoes' ? 'sessoes' : 'cadastro';
+            return ['sessoes', 'pedidos'].includes(valor) ? valor : 'cadastro';
         } catch (_err) {
             return 'cadastro';
         }
@@ -883,7 +889,8 @@ class DashboardController {
 
     _persistirSubAbaCampanhas(valor) {
         try {
-            localStorage.setItem('dashboard:campanhas-subaba', valor === 'sessoes' ? 'sessoes' : 'cadastro');
+            const v = ['sessoes', 'pedidos'].includes(valor) ? valor : 'cadastro';
+            localStorage.setItem('dashboard:campanhas-subaba', v);
         } catch (_err) {
             // ignore storage errors
         }
