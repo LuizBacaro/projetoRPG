@@ -430,11 +430,13 @@ class TormentaCombateService:
             conj_nome = conj.nome
             fj_conj = conj.ficha_json if isinstance(conj.ficha_json, dict) else {}
             classe = str(fj_conj.get("tormenta_classe_mb_slug") or "").strip().lower()
+            regra_versao = fj_conj.get("regra_versao")
             mod_chave = mod_habilidade_chave_conjurador_mb(
                 classe_slug=classe,
                 int_valor=int(conj.int_valor or 10),
                 sab_valor=int(conj.sab_valor or 10),
                 car_valor=int(conj.car_valor or 10),
+                regra_versao=regra_versao,
             )
             cd_final = cd_teste_resistencia_magia_mb(int(circ), mod_chave)
 

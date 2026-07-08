@@ -25,7 +25,7 @@
 
     /**
      * Normaliza um valor de atributo para exibição no INPUT de resumo.
-     * opts.v13Score: se true, converte do nativo v1.3 (−2..+4) para score d20 (10+2×attr).
+     * opts.v13Score (legado): se true, converte nativo → score 4d6 — só no wizard de criação.
      */
     function normalizarValorResumoAtributo(valor, fallback, opts) {
         const fb = Number.isFinite(Number(fallback)) ? Number(fallback) : 0;

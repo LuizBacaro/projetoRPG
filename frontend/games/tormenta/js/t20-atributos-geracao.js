@@ -160,9 +160,9 @@
             if (!Number.isFinite(base)) base = fallbackBase;
             base = Math.min(maxBase, Math.max(minBase, base));
             if (isV13) {
-                inp.value = String(scoreDeNativeV13(base));
-                inp.min = '6';
-                inp.max = '18';
+                inp.value = String(base);
+                inp.min = String(minBase);
+                inp.max = String(maxBase);
             } else {
                 inp.value = String(Math.max(minBase, base));
                 inp.min = String(minBase);
