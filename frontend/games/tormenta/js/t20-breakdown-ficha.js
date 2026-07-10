@@ -329,24 +329,30 @@
         });
     }
 
+    function aplicarCalcBonusLinha(tr, calc) {
+        const valEl = tr.querySelector('.t20-p-bonus-val');
+        if (!valEl) return;
+        const rv = getRegraVersao();
+        const isV13 = global.T20RegraVersao && global.T20RegraVersao.isV13(rv);
+        const total = calc.bonus_total != null ? calc.bonus_total : 0;
+        const formula = montarFormulaPericia(tr, calc, isV13);
+        valEl.textContent = fmtSigned(total);
+        valEl.classList.toggle('t20-p-bonus-val--bloqueado', calc.pode_usar === false);
+        const cell = tr.querySelector('.t20-p-bonus-cell');
+        if (cell) {
+            cell.title = formula;
+            cell.setAttribute('aria-label', `Bônus total: ${fmtSigned(total)}. ${formula}`);
+        }
+        const bd = tr.querySelector('.t20-p-breakdown');
+        if (bd) bd.textContent = formula;
+    }
+
     async function atualizarLinhaBonusPericia(tr) {
         const valEl = tr.querySelector('.t20-p-bonus-val');
         if (!valEl || !global.T20PericiasRolador) return;
-        const rv = getRegraVersao();
-        const isV13 = global.T20RegraVersao && global.T20RegraVersao.isV13(rv);
         try {
             const calc = await global.T20PericiasRolador.calcularBonusLinha(tr);
-            const total = calc.bonus_total != null ? calc.bonus_total : 0;
-            const formula = montarFormulaPericia(tr, calc, isV13);
-            valEl.textContent = fmtSigned(total);
-            valEl.classList.toggle('t20-p-bonus-val--bloqueado', calc.pode_usar === false);
-            const cell = tr.querySelector('.t20-p-bonus-cell');
-            if (cell) {
-                cell.title = formula;
-                cell.setAttribute('aria-label', `Bônus total: ${fmtSigned(total)}. ${formula}`);
-            }
-            const bd = tr.querySelector('.t20-p-breakdown');
-            if (bd) bd.textContent = formula;
+            aplicarCalcBonusLinha(tr, calc);
         } catch (_e) {
             valEl.textContent = '—';
             valEl.classList.remove('t20-p-bonus-val--bloqueado');
@@ -354,17 +360,28 @@
     }
 
     async function atualizarTodasPericias() {
-        const rows = document.querySelectorAll('#tblPericias tbody tr[data-per-idx]');
+        const rows = Array.from(
+            document.querySelectorAll('#tblPericias tbody tr[data-per-idx]')
+        );
         if (!rows.length || !global.T20PericiasRolador) return;
         const mySeq = ++seqPericias;
-        await Promise.all(
-            Array.from(rows).map((tr) =>
-                atualizarLinhaBonusPericia(tr).catch(() => {
-                    /* linha isolada */
-                })
-            )
-        );
-        if (mySeq !== seqPericias) return;
+        try {
+            const calcs = await global.T20PericiasRolador.calcularBonusLote(rows);
+            if (mySeq !== seqPericias) return;
+            rows.forEach((tr, idx) => {
+                const calc = calcs[idx];
+                if (calc) aplicarCalcBonusLinha(tr, calc);
+            });
+        } catch (_e) {
+            if (mySeq !== seqPericias) return;
+            rows.forEach((tr) => {
+                const valEl = tr.querySelector('.t20-p-bonus-val');
+                if (valEl) {
+                    valEl.textContent = '—';
+                    valEl.classList.remove('t20-p-bonus-val--bloqueado');
+                }
+            });
+        }
     }
 
     function agendarPericias() {
