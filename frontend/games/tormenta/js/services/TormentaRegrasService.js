@@ -146,8 +146,38 @@ class TormentaRegrasService {
         return window.getApiUrl('/tormenta/regras/equipamentos');
     }
 
+    _urlBestiario() {
+        return window.getApiUrl('/tormenta/regras/bestiario');
+    }
+
     _urlTalentos() {
         return window.getApiUrl('/tormenta/regras/talentos');
+    }
+
+    /**
+     * Catálogo stub MB de criaturas (RF-T12g).
+     * @param {{ q?: string, skip?: number, limit?: number }} params
+     */
+    async listarBestiarioCatalogo(params = {}) {
+        const q = new URLSearchParams();
+        if (params.q) q.set('q', params.q);
+        if (params.skip != null) q.set('skip', String(params.skip));
+        if (params.limit != null) q.set('limit', String(params.limit));
+        const qs = q.toString();
+        const res = await fetch(this._urlBestiario() + (qs ? `?${qs}` : ''), {
+            headers: this._headers(),
+            cache: 'no-store',
+        });
+        return this._handleJson(res, 'Erro ao carregar bestiário');
+    }
+
+    async obterBestiarioDetalhe(slug) {
+        const s = encodeURIComponent(String(slug || '').trim());
+        const res = await fetch(`${this._urlBestiario()}/${s}`, {
+            headers: this._headers(),
+            cache: 'no-store',
+        });
+        return this._handleJson(res, 'Criatura não encontrada no bestiário');
     }
 
     /**

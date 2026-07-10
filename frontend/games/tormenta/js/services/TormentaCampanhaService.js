@@ -222,6 +222,50 @@ class TormentaCampanhaService {
         await this._handleResponse(res, 'Erro ao excluir handout');
         return true;
     }
+
+    async obterStatusConvite(campanhaId) {
+        const res = await fetch(this._url(`/${campanhaId}/convite`), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
+        return this._handleResponse(res, 'Erro ao carregar convite');
+    }
+
+    async gerarConvite(campanhaId) {
+        const res = await fetch(this._url(`/${campanhaId}/convite`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: '{}',
+        });
+        return this._handleResponse(res, 'Erro ao gerar convite');
+    }
+
+    async revogarConvite(campanhaId) {
+        const res = await fetch(this._url(`/${campanhaId}/convite`), {
+            method: 'DELETE',
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao revogar convite');
+    }
+
+    async obterInfoConvite(token) {
+        const t = encodeURIComponent(String(token || '').trim());
+        const res = await fetch(this._url(`/convite/${t}`), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
+        return this._handleResponse(res, 'Convite inválido ou revogado');
+    }
+
+    async entrarViaConvite(token, personagemId) {
+        const t = encodeURIComponent(String(token || '').trim());
+        const res = await fetch(this._url(`/convite/${t}/entrar`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify({ personagem_id: Number(personagemId) }),
+        });
+        return this._handleResponse(res, 'Erro ao entrar na campanha');
+    }
 }
 
 window.TormentaCampanhaService = TormentaCampanhaService;

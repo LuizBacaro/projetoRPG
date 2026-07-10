@@ -310,6 +310,25 @@ def test_get_regras_equipamentos_pagina(client_regras_tormenta):
     assert r.headers.get("X-Total-Count")
 
 
+def test_get_regras_bestiario_pagina_e_detalhe(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/bestiario",
+        params={"q": "lobo", "limit": 5},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["total"] >= 1
+    assert any(x["slug"] == "lobo" for x in body["itens"])
+
+    r2 = client_regras_tormenta.get("/api/v1/tormenta/regras/bestiario/lobo")
+    assert r2.status_code == 200, r2.text
+    det = r2.json()
+    assert det["nome"] == "Lobo"
+    assert det["pv_max"] == 13
+    assert len(det["ataques"]) >= 1
+    assert det["ataques"][0]["nome"] == "Mordida"
+
+
 def test_get_regras_equipamentos_armadura_v13(client_regras_tormenta):
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/equipamentos",

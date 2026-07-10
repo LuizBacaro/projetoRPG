@@ -34,8 +34,8 @@ Objetivo: mesa mais fluida (menos digitação manual, mais regras aplicadas na U
 | PM multiclasse | **Feito** — `multiclasse_v13` + preview API |
 | Arena combate | **Parcial** — iniciativa, ataque, dano, condições MB, concentração |
 | Drag-and-drop compendium → ficha | **Feito** (equip, poder, magia, consumível) |
-| Handouts / revelar para jogadores | **Não feito** |
-| Sincronização ficha ↔ arena tempo real | **Parcial** (D&D 3.5 `BroadcastChannel`; Tormenta limitado) |
+| Handouts / revelar para jogadores | **Feito** |
+| Sincronização ficha ↔ arena tempo real | **Feito** (`BroadcastChannel` Tormenta) |
 | Mapa / tokens / iluminação | **Fora de escopo** neste RF |
 
 ## Princípios de implementação
@@ -116,6 +116,8 @@ Objetivo: mesa mais fluida (menos digitação manual, mais regras aplicadas na U
 | RF-T12f Handouts | **Feito** | API `tormenta_handouts`; mestre CRUD; jogador lê em Campanhas + arena |
 | RF-T12h Sync ficha↔arena | **Feito** | `BroadcastChannel` `tormenta-t20-sync`; PV/PM/condições arena→ficha e ficha→arena |
 | RF-T12i Layout compacto | **Feito** | Toggle «Vista compacta» + `localStorage`; oculta equipamento, grimório, retrato, etc. |
+| RF-T12k Convite campanha | **Feito** | Token em `tormenta_campanhas`; link `dashboard.html?convite=`; entrada automática |
+| RF-T12g Import bestiário → arena | **Feito** | Catálogo stub `bestiario_mb_stub.json`; API + modal na arena |
 | RF-T12l Mapa VTT | **Fora de escopo** |
 
 ## Gap código / dependências

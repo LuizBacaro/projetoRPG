@@ -18,6 +18,9 @@ from app.games.tormenta.repositories.campanha_solicitacao_repository import (
 from app.games.tormenta.repositories.personagem_repository import (
     TormentaPersonagemRepository,
 )
+from app.games.tormenta.schemas.campanha_convite import (
+    TormentaCampanhaConviteInfoResponse,
+)
 from app.games.tormenta.schemas.campanha_solicitacao import (
     TormentaCampanhaDisponivelResponse,
     TormentaCampanhaSolicitacaoResponse,
@@ -244,3 +247,68 @@ class TormentaCampanhaSolicitacaoService:
         sol.status = "cancelada"
         sol.resolved_at = datetime.now(timezone.utc)
         self.solicitacao_repository.salvar(sol)
+
+    def obter_info_convite(self, token: str) -> TormentaCampanhaConviteInfoResponse:
+        campanha = self.campanha_repository.obter_por_convite_token(token)
+        if not campanha:
+            raise ArenaBaseException(
+                "Link de convite invalido ou revogado", status_code=404
+            )
+        mapa = mapa_nomes_usuarios_por_ids(
+            self.campanha_repository.db, [campanha.mestre_id]
+        )
+        return TormentaCampanhaConviteInfoResponse(
+            campanha_id=campanha.id,
+            nome=campanha.nome,
+            mestre_nome=mapa.get(campanha.mestre_id, ""),
+            descricao=str(campanha.descricao or ""),
+        )
+
+    def entrar_via_convite(
+        self, usuario: Usuario, token: str, personagem_id: int
+    ) -> TormentaCampanhaSolicitacaoResponse:
+        campanha = self.campanha_repository.obter_por_convite_token(token)
+        if not campanha:
+            raise ArenaBaseException(
+                "Link de convite invalido ou revogado", status_code=404
+            )
+        personagem = self._personagem_do_jogador(personagem_id, usuario.id)
+
+        if personagem.campanha_id is not None:
+            if int(personagem.campanha_id) == int(campanha.id):
+                return TormentaCampanhaSolicitacaoResponse(
+                    id=0,
+                    campanha_id=campanha.id,
+                    campanha_nome=campanha.nome,
+                    personagem_id=personagem.id,
+                    personagem_nome=personagem.nome or "",
+                    solicitante_id=usuario.id,
+                    solicitante_nome=usuario.nome or "",
+                    status="aceita",
+                    created_at=None,
+                    updated_at=None,
+                    resolved_at=None,
+                    vinculado_direto=True,
+                )
+            raise DadosInvalidos(
+                "Personagem ja esta vinculado a outra campanha. Peça ao mestre para remover o vinculo."
+            )
+
+        pendente_outra = self.solicitacao_repository.obter_pendente_por_personagem(
+            personagem_id
+        )
+        if pendente_outra and int(pendente_outra.campanha_id) != int(campanha.id):
+            pendente_outra.status = "cancelada"
+            pendente_outra.resolved_at = datetime.now(timezone.utc)
+            self.solicitacao_repository.salvar(pendente_outra)
+
+        self._vincular_personagem_campanha(personagem, campanha)
+        sol = TormentaCampanhaSolicitacao(
+            campanha_id=campanha.id,
+            personagem_id=personagem_id,
+            solicitante_id=usuario.id,
+            status="aceita",
+            resolved_at=datetime.now(timezone.utc),
+        )
+        sol = self.solicitacao_repository.criar(sol)
+        return self._para_resposta(sol, vinculado_direto=True)

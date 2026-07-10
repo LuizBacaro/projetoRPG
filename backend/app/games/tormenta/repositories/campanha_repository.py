@@ -53,6 +53,19 @@ class TormentaCampanhaRepository(BaseRepository[TormentaCampanha]):
             .first()
         )
 
+    def obter_por_convite_token(self, token: str) -> Optional[TormentaCampanha]:
+        t = str(token or "").strip()
+        if not t or len(t) > 64:
+            return None
+        return (
+            self.db.query(TormentaCampanha)
+            .filter(
+                TormentaCampanha.convite_token == t,
+                TormentaCampanha.convite_ativo.is_(True),
+            )
+            .first()
+        )
+
     def delete_hard(self, campanha: TormentaCampanha) -> None:
         self.db.delete(campanha)
         commit_with_rollback(self.db)

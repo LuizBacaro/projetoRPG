@@ -14,6 +14,11 @@ from app.games.tormenta.schemas.campanha import (
     TormentaCampanhaResponse,
     TormentaCampanhaUpdate,
 )
+from app.games.tormenta.schemas.campanha_convite import (
+    TormentaCampanhaConviteEntrarRequest,
+    TormentaCampanhaConviteInfoResponse,
+    TormentaCampanhaConviteStatusResponse,
+)
 from app.games.tormenta.schemas.campanha_solicitacao import (
     TormentaCampanhaDisponivelResponse,
     TormentaCampanhaSolicitacaoCreate,
@@ -224,6 +229,40 @@ def deletar_sessao(
     return None
 
 
+@router.get("/convite/{token}", response_model=TormentaCampanhaConviteInfoResponse)
+def obter_info_convite(
+    token: str,
+    service: TormentaCampanhaSolicitacaoService = Depends(
+        get_tormenta_campanha_solicitacao_service
+    ),
+    _: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        return service.obter_info_convite(token)
+    except ArenaBaseException as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+
+@router.post(
+    "/convite/{token}/entrar",
+    response_model=TormentaCampanhaSolicitacaoResponse,
+)
+def entrar_via_convite(
+    token: str,
+    payload: TormentaCampanhaConviteEntrarRequest,
+    service: TormentaCampanhaSolicitacaoService = Depends(
+        get_tormenta_campanha_solicitacao_service
+    ),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        return service.entrar_via_convite(usuario, token, payload.personagem_id)
+    except DadosInvalidos as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+    except ArenaBaseException as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+
 @router.get("/disponiveis", response_model=list[TormentaCampanhaDisponivelResponse])
 def listar_disponiveis(
     service: TormentaCampanhaSolicitacaoService = Depends(
@@ -402,6 +441,48 @@ def atualizar(
         return TormentaCampanhaResponse.model_validate(c)
     except ArenaBaseException as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message)
+
+
+@router.get(
+    "/{campanha_id}/convite", response_model=TormentaCampanhaConviteStatusResponse
+)
+def obter_status_convite(
+    campanha_id: int,
+    service: TormentaCampanhaService = Depends(get_tormenta_campanha_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        return service.obter_status_convite(campanha_id, usuario.id, usuario.perfil)
+    except ArenaBaseException as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+
+@router.post(
+    "/{campanha_id}/convite", response_model=TormentaCampanhaConviteStatusResponse
+)
+def gerar_convite_campanha(
+    campanha_id: int,
+    service: TormentaCampanhaService = Depends(get_tormenta_campanha_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        return service.gerar_convite(campanha_id, usuario.id, usuario.perfil)
+    except ArenaBaseException as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+
+@router.delete(
+    "/{campanha_id}/convite", response_model=TormentaCampanhaConviteStatusResponse
+)
+def revogar_convite_campanha(
+    campanha_id: int,
+    service: TormentaCampanhaService = Depends(get_tormenta_campanha_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        return service.revogar_convite(campanha_id, usuario.id, usuario.perfil)
+    except ArenaBaseException as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
 
 
 @router.post("/{campanha_id}/personagens", response_model=TormentaCampanhaResponse)

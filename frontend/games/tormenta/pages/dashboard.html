@@ -9,7 +9,7 @@
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260710ini" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260710bestiario" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -107,6 +107,19 @@
                     <div class="t20-dash-field">
                         <label for="t20campDescricao">Descrição</label>
                         <textarea id="t20campDescricao" rows="2" maxlength="500" placeholder="Resumo da campanha (opcional)"></textarea>
+                    </div>
+                    <div id="t20campConviteWrap" class="t20-camp-convite-wrap" hidden>
+                        <h4 class="t20-camp-convite-titulo">Convite de jogadores</h4>
+                        <p class="t20-dash-hint" style="margin:0 0 0.5rem">Gere um link para jogadores entrarem direto nesta campanha (sem procurar na lista).</p>
+                        <p id="t20campConviteStatus" class="t20-camp-convite-status">Nenhum link ativo.</p>
+                        <div class="t20-camp-convite-url-row">
+                            <input id="t20campConviteUrl" type="text" class="t20-input" readonly placeholder="Gere o link acima" aria-label="URL do convite" />
+                            <button type="button" class="tormenta-btn" id="t20campBtnCopiarConvite" title="Copiar link">Copiar</button>
+                        </div>
+                        <div class="t20-camp-convite-acoes">
+                            <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20campBtnGerarConvite">Gerar / renovar link</button>
+                            <button type="button" class="tormenta-btn" id="t20campBtnRevogarConvite">Revogar link</button>
+                        </div>
                     </div>
                     <div class="t20-dash-field">
                         <label for="t20campBusca">Participantes (combatentes cadastrados)</label>
@@ -261,6 +274,7 @@
             </p>
             <div class="t20-arena-actions-row">
                 <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnIniciar">Iniciar combate</button>
+                <button type="button" class="tormenta-btn" id="t20ArenaBtnBestiario" title="Importar criatura do catálogo stub">Importar do bestiário</button>
             </div>
             <p class="t20-arena-participantes-label">Participantes</p>
             <div id="t20ArenaPick" class="t20-arena-pick-grid" role="group" aria-label="Seleção de combatentes Tormenta"></div>
@@ -722,6 +736,54 @@
     <div class="t20-arena-modal__ft">
         <button type="button" class="tormenta-btn" id="t20ArenaModalPericiaCancelar">Cancelar</button>
         <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalPericiaRolar">Rolar teste</button>
+    </div>
+</dialog>
+
+<dialog id="t20DialogConviteEntrada" class="t20-arena-modal">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo">Convite para campanha</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ConviteFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd">
+        <p class="t20-dash-hint" style="margin-top:0">Você recebeu um link de convite. Escolha com qual personagem deseja entrar.</p>
+        <h4 id="t20ConviteCampanhaNome" class="t20-convite-camp-nome">—</h4>
+        <p id="t20ConviteCampanhaMeta" class="t20-convite-camp-meta">—</p>
+        <div class="t20-dash-field">
+            <label for="t20ConvitePersonagem">Personagem</label>
+            <select id="t20ConvitePersonagem" class="t20-input"></select>
+        </div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ConviteCancelar">Agora não</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ConviteEntrar">Entrar na campanha</button>
+    </div>
+</dialog>
+
+<dialog id="t20DialogBestiario" class="t20-arena-modal t20-arena-modal--wide">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo">Importar do bestiário</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20BestiarioFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd t20-bestiario-modal-bd">
+        <p class="t20-dash-hint" style="margin-top:0">Catálogo stub MB — cria um combatente <strong>monstro</strong> na campanha ativa com PV, CA e ataques prontos para a arena.</p>
+        <div class="t20-dash-field">
+            <label for="t20BestiarioBusca">Buscar</label>
+            <input id="t20BestiarioBusca" type="search" class="t20-input" placeholder="Nome ou tipo (ex.: lobo, morto-vivo)…" autocomplete="off" />
+        </div>
+        <div class="t20-bestiario-layout">
+            <div id="t20BestiarioLista" class="t20-bestiario-lista" role="listbox" aria-label="Criaturas do bestiário"></div>
+            <div id="t20BestiarioPreview" class="t20-bestiario-preview">
+                <p class="t20-dash-hint">Selecione uma criatura para ver os detalhes.</p>
+            </div>
+        </div>
+        <div class="t20-dash-field" style="margin-top:0.65rem">
+            <label for="t20BestiarioNomeOverride">Nome na mesa (opcional)</label>
+            <input id="t20BestiarioNomeOverride" type="text" class="t20-input" maxlength="120" placeholder="Ex.: Goblin #2" />
+        </div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20BestiarioCancelar">Cancelar</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20BestiarioBtnImportar" disabled>Adicionar à mesa</button>
     </div>
 </dialog>
 
@@ -1208,16 +1270,19 @@
 <script>
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260707mesa"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260710bestiario"></script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260710handouts"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
 <script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260710handouts"></script>
 <script src="/games/tormenta/js/t20-dashboard-handouts.js?v=20260710handouts"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanha-convite.js?v=20260710convite"></script>
+<script src="/games/tormenta/js/t20-convite-campanha-entrada.js?v=20260710convite"></script>
 <script src="/games/tormenta/js/t20-dashboard-solicitacoes-campanha.js?v=20260708pedidos"></script>
 <script src="/games/tormenta/js/t20-dashboard-campanha-workspace.js?v=20260710handouts"></script>
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260710ini"></script>
 <script src="/games/tormenta/js/t20-arena-log-mesa.js?v=20260710ini"></script>
 <script src="/games/tormenta/js/t20-arena-handouts.js?v=20260710handouts"></script>
+<script src="/games/tormenta/js/t20-arena-bestiario-import.js?v=20260710bestiario"></script>
 <script src="/games/tormenta/js/t20-arena-npc-compact.js?v=20260710i"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260710i"></script>
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260710ini"></script>
@@ -1228,7 +1293,7 @@
 <script src="/games/tormenta/js/t20-ha-preferencias.js?v=20260704ha"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260707v13attr"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260629rv"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260710bestiario"></script>
 <script src="/games/tormenta/js/t20-dashboard-pericias-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
@@ -3331,6 +3396,28 @@
     }
     if (typeof window.__t20DashHandoutsInit === 'function') {
         window.__t20DashHandoutsInit({ Toast });
+    }
+    if (window.__t20DashCampanhaConvite && typeof window.__t20DashCampanhaConvite.bindOnce === 'function') {
+        window.__t20DashCampanhaConvite.bindOnce({ Toast });
+    }
+    if (window.__t20ArenaBestiarioImport && typeof window.__t20ArenaBestiarioImport.bindOnce === 'function') {
+        window.__t20ArenaBestiarioImport.bindOnce({
+            Toast,
+            getCampanhaId: () => campanhaMestreAtivaId,
+            onImported: async (criado) => {
+                if (campanhaMestreAtivaId) {
+                    await carregarWorkspaceCampanha(campanhaMestreAtivaId);
+                }
+                const pid = criado && criado.id;
+                if (pid) {
+                    const cb = document.querySelector(`.t20-arena-pick-cb[value="${pid}"]`);
+                    if (cb) {
+                        cb.checked = true;
+                        cb.dispatchEvent(new Event('change'));
+                    }
+                }
+            },
+        });
     }
     if (typeof window.__t20CampanhaWorkspaceInit === 'function') {
         window.__t20CampanhaWorkspaceInit({

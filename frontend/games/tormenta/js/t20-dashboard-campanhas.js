@@ -197,6 +197,9 @@
                 b.classList.toggle('t20-dash-filter--active', b.getAttribute('data-t20camp-tipo') === 'todos');
             });
             renderChecklist([]);
+            if (global.__t20DashCampanhaConvite && typeof global.__t20DashCampanhaConvite.aoResetForm === 'function') {
+                global.__t20DashCampanhaConvite.aoResetForm();
+            }
         }
 
         function editarCampanha(id) {
@@ -226,6 +229,9 @@
             if (sub) sub.classList.add('t20-camp-subaba-pane--active');
             if (paneS) paneS.classList.remove('t20-camp-subaba-pane--active');
             renderChecklist(c.personagem_ids || []);
+            if (global.__t20DashCampanhaConvite && typeof global.__t20DashCampanhaConvite.aoEditarCampanha === 'function') {
+                void global.__t20DashCampanhaConvite.aoEditarCampanha(id);
+            }
             const top = document.getElementById('t20campPanelTop');
             if (top) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }

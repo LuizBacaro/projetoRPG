@@ -234,3 +234,20 @@ class TormentaPersonagemResponse(TormentaPersonagemBase):
         self.grimorio_mb_permitido = ok
         self.grimorio_mb_motivo = None if ok else (msg or None)
         return self
+
+
+class TormentaBestiarioImportRequest(BaseModel):
+    """RF-T12g — importar criatura do catálogo stub para combatente na mesa."""
+
+    slug: str = Field(..., max_length=80)
+    tipo: str = Field(default="monstro", max_length=20)
+    campanha_id: Optional[int] = Field(
+        None,
+        ge=1,
+        description="Vincula o combatente à campanha ativa do mestre.",
+    )
+    nome_override: Optional[str] = Field(
+        None,
+        max_length=120,
+        description="Nome customizado na mesa (ex.: Lobo #2).",
+    )
