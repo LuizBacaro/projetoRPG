@@ -21,6 +21,7 @@ from app.games.tormenta.rules.conjuracao_t20 import (
     pontos_magia_maximos_conjuracao,
 )
 from app.games.tormenta.rules.defesa_t20 import defesa_base_ca
+from app.games.tormenta.rules.duende_t20 import validar_duende_ficha
 from app.games.tormenta.rules.melhor_amigo_t20 import validar_melhor_amigo_ficha
 from app.games.tormenta.rules.origens_t20 import (
     sincronizar_pericias_origem_ficha_json,
