@@ -410,6 +410,24 @@ class TormentaRegrasService {
     }
 
     /**
+     * PV máximos v1.3 — multiclasse (classe primária + demais, p.34).
+     * @param {{ classes: Array<{slug: string, nivel: number}>, slug_primario: string, con_valor?: number, regraVersao?: string }} p
+     */
+    async obterPvPreviewMulticlasse(p) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/pv-preview-multiclasse'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                classes: Array.isArray(p.classes) ? p.classes : [],
+                slug_primario: String(p.slug_primario || '').trim(),
+                con_valor: p.con_valor != null ? Number(p.con_valor) : 0,
+                regra_versao: p.regraVersao || 'v13',
+            }),
+        });
+        return this._handleJson(res, 'Erro ao calcular PV multiclasse');
+    }
+
+    /**
      * PM máximos v1.3 — soma multiclasse (nível × pm/nível por classe).
      * @param {{ classes: Array<{slug: string, nivel: number}>, regraVersao?: string }} p
      */

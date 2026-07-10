@@ -288,6 +288,9 @@
         debouncePm = setTimeout(() => {
             debouncePm = null;
             void atualizarPmSugerido(false);
+            if (typeof global.t20AtualizarVitaisSugeridos === 'function') {
+                void global.t20AtualizarVitaisSugeridos();
+            }
         }, 280);
     }
 

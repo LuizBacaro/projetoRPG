@@ -116,9 +116,8 @@
                     </div>
                     <div class="ficha-defesa-box ficha-pv-box">
                         <span class="ficha-defesa-label">PV</span>
-                        <span id="fichaPv" class="ficha-defesa-valor ficha-pv-valor" title="PV atuais / PV máximos">1 / 1</span>
+                        <span id="fichaPv" class="ficha-defesa-valor ficha-pv-valor" title="PV atuais / PV máximos (máx. calculado: classe + nível + CON, T20 v1.3)">1 / 1</span>
                         <span id="fichaPvBreakdown" class="ficha-res-breakdown">Atuais / máximos</span>
-                        <button type="button" id="btnT20CalcularPvMb" class="tormenta-btn t20-btn-pv-mb" style="font-size:0.65rem;margin-top:0.15rem;padding:0.15rem 0.35rem" title="Calcular PV máximos pelo Módulo Básico (classe + nível + CON)">Calcular PV (MB)</button>
                     </div>
                     <div class="ficha-defesa-box ficha-pm-box">
                         <span class="ficha-defesa-label" title="Pontos de Magia (PM) — Módulo Básico">PM</span>
@@ -1573,7 +1572,7 @@
 <script src="/games/tormenta/js/t20-penalidade-armadura.js?v=20260629s47"></script>
 <script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260629pp"></script>
 <script src="/games/tormenta/js/t20-percepcao-passiva.js?v=20260629pp"></script>
-<script src="/games/tormenta/js/t20-progressao-pv.js?v=20260629mc"></script>
+<script src="/games/tormenta/js/t20-progressao-pv.js?v=20260710b"></script>
 <script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-multiclasse-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
@@ -2055,6 +2054,9 @@
         });
         atualizarModsAtributos();
         atualizarSugestaoPvMbClasse();
+        if (typeof window.t20AtualizarVitaisSugeridos === 'function') {
+            window.t20AtualizarVitaisSugeridos();
+        }
     }
 
     function t20BindDialogAttrsEdicaoOnce() {
@@ -2674,9 +2676,6 @@
         const lblPm = document.querySelector('.ficha-pm-box .ficha-defesa-label');
         if (lblPm) {
             lblPm.title = `Pontos de Magia (PM) — ${lv}`;
-        }
-        if (typeof window.t20AtualizarBotaoCalcularPv === 'function') {
-            window.t20AtualizarBotaoCalcularPv();
         }
         const btnSub = q('btnT20SubirNivelMb');
         const titSub = q('tituloModalSubirNivel');
@@ -7906,6 +7905,9 @@
             sincronizarClasseMbApartirDoTexto();
         }
         atualizarResumoClasseMb();
+        if (typeof window.t20AtualizarVitaisSugeridos === 'function') {
+            void window.t20AtualizarVitaisSugeridos();
+        }
         if (fj.habilidade_classe_mb != null && String(fj.habilidade_classe_mb).trim() && q('f_hab_classe_mb')) {
             q('f_hab_classe_mb').value = String(fj.habilidade_classe_mb).trim();
         }
