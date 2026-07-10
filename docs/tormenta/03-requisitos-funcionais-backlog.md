@@ -119,3 +119,18 @@ Rastreio transversal da Edição Jogo do Ano. Detalhe por domínio: `.cursor/req
 | ID | Requisito | Prioridade | Notas |
 |----|-----------|------------|-------|
 | RF-DOC-v13 | Atualizar `_meta.fonte` e secções **Gap código** desatualizadas (ex.: `09-origens-divindades-tormenta.md`) | **P2** | Refletir wizard 8 passos e itens já feitos |
+
+### UX mesa (benchmark Roll20)
+
+Documento canónico: **[.cursor/requisitos/tormenta/12-inspiracao-roll20-ux-mesa.md](../.cursor/requisitos/tormenta/12-inspiracao-roll20-ux-mesa.md)**.
+
+| ID | Requisito | Prioridade | Notas |
+|----|-----------|------------|-------|
+| RF-T12a | Breakdown PV/CA/perícias/ataques na ficha | **P0** | PV parcialmente feito |
+| RF-T12b | Drag-and-drop catálogo → ficha | **P0** | Poderes, equipamento, grimório |
+| RF-T12c | Rolagem contextual (perícia/ataque) | **P0** | API existe; UX incompleta |
+| RF-T12d | Condições → rolagens arena | **P1** | Alinha RF-T05c |
+| RF-T12e | Ficha NPC compacta na arena | **P1** | |
+| RF-T12f | Handouts (mestre revela para jogadores) | **P1** | |
+| RF-T12g–k | Monstro→NPC, sync ficha↔arena, layout compacto, log, convite | **P2** | |
+| RF-T12l | Mapa VTT / tokens / fog | **P3** | Escopo separado |

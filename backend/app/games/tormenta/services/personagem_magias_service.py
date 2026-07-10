@@ -291,7 +291,7 @@ class TormentaPersonagemMagiasService:
         )
         if dup:
             raise ArenaBaseException(
-                "Esta magia ja esta vinculada ao personagem com o mesmo papel",
+                "Esta magia já está vinculada ao personagem com o mesmo papel",
                 status_code=409,
             )
 

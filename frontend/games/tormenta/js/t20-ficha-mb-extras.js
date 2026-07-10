@@ -71,6 +71,10 @@
     function fecharModalConsumiveisTormenta() {
         const ov = document.getElementById('modalConsumiveisTormenta');
         if (!ov) return;
+        const ae = document.activeElement;
+        if (ae && typeof ov.contains === 'function' && ov.contains(ae)) {
+            ae.blur();
+        }
         ov.classList.remove('is-open');
         ov.setAttribute('aria-hidden', 'true');
     }
@@ -133,7 +137,12 @@
             }
             fecharModalConsumiveisTormenta();
         } catch (e) {
-            if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro ao adicionar consumível');
+            if (window.TormentaPersonagemService && window.TormentaPersonagemService.isErroDuplicado(e)) {
+                if (typeof Toast !== 'undefined' && Toast.warning) Toast.warning(e.message);
+                else if (typeof Toast !== 'undefined' && Toast.error) Toast.error(e.message);
+            } else if (typeof Toast !== 'undefined' && Toast.error) {
+                Toast.error(e.message || 'Erro ao adicionar consumível');
+            }
         }
     }
 
@@ -387,6 +396,7 @@
     window.T20FichaMbExtras = {
         openConsumiveisModal: openConsumiveisModal,
         fecharModalConsumiveisTormenta: fecharModalConsumiveisTormenta,
+        persistirConsumivelDnd: persistirConsumivelNaFicha,
 
         async init(ctx) {
             const { svc, q, preencherConsumiveisFromApi } = ctx;

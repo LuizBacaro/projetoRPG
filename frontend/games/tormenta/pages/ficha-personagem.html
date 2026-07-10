@@ -124,9 +124,9 @@
                         <span id="fichaPm" class="ficha-defesa-valor ficha-pv-valor" title="PM atuais / PM máximos (Pontos de Magia, MB)">0 / 0</span>
                         <span id="fichaPmBreakdown" class="ficha-res-breakdown">Atuais / máximos</span>
                     </div>
-                    <div class="ficha-defesa-box ficha-ini-box">
+                    <div class="ficha-defesa-box ficha-ini-box ficha-ini-box--rolavel" title="Clique para rolar iniciativa (1d20 + DES)">
                         <span class="ficha-defesa-label">Iniciativa</span>
-                        <span id="fichaIniciativa" class="ficha-defesa-valor" title="Total na ficha (somente leitura)" role="text" aria-label="Iniciativa">+0</span>
+                        <span id="fichaIniciativa" class="ficha-defesa-valor t20-roll-alvo" title="Clique para rolar 1d20 + DES" role="button" tabindex="0" aria-label="Iniciativa — clique para rolar">+0</span>
                         <span id="fichaIniciativaBreakdown" class="ficha-res-breakdown">DES +0 — bônus de iniciativa (1d20 + este valor na mesa)</span>
                     </div>
                     <div class="ficha-defesa-box ficha-ini-box ficha-pp-box" title="Percepção passiva = 10 + bônus total de Percepção">
@@ -158,14 +158,14 @@
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo" id="titSecaoTalentosPoderes">Talentos (MB / escolhidos)</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnT20AddTalentoMb" title="Adicionar talento">➕ Adicionar</button>
                     </div>
-                    <div id="t20FichaTalentosMb" class="t20-ficha-dnd-lista"><span class="t20-ficha-vazio">Nenhum talento na lista.</span></div>
+                    <div id="t20FichaTalentosMb" class="t20-ficha-dnd-lista t20-dnd-drop-zone" data-dnd-accept="talento"><span class="t20-ficha-vazio">Nenhum talento na lista.</span></div>
                 </div>
                 <div class="ficha-secao t20-ficha-secao">
                     <div class="ficha-secao-header">
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">🎒 Equipamentos</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnAdicionarEquipamento" title="Adicionar equipamento">➕ Adicionar</button>
                     </div>
-                    <div id="fichaEquipamentos" class="ficha-equipamentos-lista"><span class="ficha-vazio">Nenhum equipamento cadastrado</span></div>
+                    <div id="fichaEquipamentos" class="ficha-equipamentos-lista t20-dnd-drop-zone" data-dnd-accept="equip"><span class="ficha-vazio">Nenhum equipamento cadastrado</span></div>
                 </div>
                 <div class="ficha-secao t20-ficha-secao" style="margin-top:0.65rem">
                     <div class="ficha-secao-header">
@@ -175,7 +175,7 @@
                     <p class="t20-hint" style="margin:0 0 0.45rem;font-size:0.72rem">
                         Use <strong>Adicionar</strong> para o catálogo MB (p.250–253) ou consumível livre — mesmo fluxo de equipamentos.
                     </p>
-                    <div id="t20FichaConsumiveis" class="t20-ficha-dnd-lista"><span class="t20-ficha-vazio">Nenhum consumível cadastrado</span></div>
+                    <div id="t20FichaConsumiveis" class="t20-ficha-dnd-lista t20-dnd-drop-zone" data-dnd-accept="consumivel"><span class="t20-ficha-vazio">Nenhum consumível cadastrado</span></div>
                 </div>
                 <div class="ficha-secao t20-ficha-secao" style="margin-top:0.65rem">
                     <div class="ficha-secao-header">
@@ -203,7 +203,7 @@
                 <div class="ficha-secao t20-ficha-secao t20-ficha-secao--ataques-planilha">
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Ataques</h3>
                     <p class="t20-hint t20-ataques-planilha-legend">
-                        Bônus na jogada de ataque (MB): <strong>Total</strong> = bônus base de ataque + modificador de habilidade + modificador de tamanho + outros. Os totais atualizam ao mudar os demais campos.
+                        Bônus na jogada de ataque (MB): <strong>Total</strong> = BBA + modificador de habilidade + modificador de tamanho + outros. A fórmula aparece abaixo de cada linha e no tooltip do total.
                     </p>
                     <div id="t20AtaquesPlanilhaRoot" class="t20-ataques-planilha" aria-label="Bônus de ataque corpo a corpo e à distância">
                         <div class="t20-ap-corner" aria-hidden="true"></div>
@@ -217,7 +217,7 @@
                         <div class="t20-ap-sym" aria-hidden="true">+</div>
                         <div class="t20-ap-h">Outros</div>
 
-                        <div class="t20-ap-rowlabel">Corpo a corpo</div>
+                        <div class="t20-ap-rowlabel t20-ap-rowlabel--rolavel" data-t20-roll="cac" title="Clique para rolar ataque corpo a corpo">Corpo a corpo 🎲</div>
                         <input id="t20AtqCacTotal" class="t20-ap-inp t20-ap-inp--total" type="number" inputmode="numeric" readonly aria-label="Total ataque corpo a corpo (calculado)" title="Soma automática dos campos à direita" />
                         <span class="t20-ap-eq" aria-hidden="true">=</span>
                         <input id="t20AtqCacBba" class="t20-ap-inp" type="number" inputmode="numeric" readonly tabindex="-1" aria-label="Bônus base corpo a corpo (BBA MB)" title="Igual ao BBA base (MB) à esquerda; altere classe ou nível na ficha." />
@@ -227,8 +227,9 @@
                         <input id="t20AtqCacModtam" class="t20-ap-inp" type="number" inputmode="numeric" aria-label="Modificador de tamanho corpo a corpo" />
                         <span class="t20-ap-plus" aria-hidden="true">+</span>
                         <input id="t20AtqCacOutros" class="t20-ap-inp" type="number" inputmode="numeric" aria-label="Outros corpo a corpo" />
+                        <div id="t20AtqCacBreakdown" class="t20-ap-breakdown ficha-res-breakdown" style="grid-column: 1 / -1">—</div>
 
-                        <div class="t20-ap-rowlabel">À distância</div>
+                        <div class="t20-ap-rowlabel t20-ap-rowlabel--rolavel" data-t20-roll="dist" title="Clique para rolar ataque à distância">À distância 🎲</div>
                         <input id="t20AtqDistTotal" class="t20-ap-inp t20-ap-inp--total" type="number" inputmode="numeric" readonly aria-label="Total ataque à distância (calculado)" title="Soma automática dos campos à direita" />
                         <span class="t20-ap-eq" aria-hidden="true">=</span>
                         <input id="t20AtqDistBba" class="t20-ap-inp" type="number" inputmode="numeric" readonly tabindex="-1" aria-label="Bônus base à distância (BBA MB)" title="Igual ao BBA base (MB); altere classe ou nível na ficha." />
@@ -238,6 +239,7 @@
                         <input id="t20AtqDistModtam" class="t20-ap-inp" type="number" inputmode="numeric" aria-label="Modificador de tamanho à distância" />
                         <span class="t20-ap-plus" aria-hidden="true">+</span>
                         <input id="t20AtqDistOutros" class="t20-ap-inp" type="number" inputmode="numeric" aria-label="Outros à distância" />
+                        <div id="t20AtqDistBreakdown" class="t20-ap-breakdown ficha-res-breakdown" style="grid-column: 1 / -1">—</div>
                     </div>
                 </div>
 
@@ -297,7 +299,7 @@
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">⚔️ Ataques</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="t20BtnAdicionarAtaques" title="Adicionar ou editar armas / ataques na lista">➕ Adicionar</button>
                     </div>
-                    <p class="t20-hint" style="margin:0 0 0.35rem;font-size:0.68rem">Marque <strong>Emp.</strong> nos ataques empunhados (limite 2 com escudos — p.141). v1.3: arma não proficiente = <strong>−5</strong> no ataque.</p>
+                    <p class="t20-hint" style="margin:0 0 0.35rem;font-size:0.68rem">Marque <strong>Emp.</strong> nos ataques empunhados (limite 2 com escudos — p.141). v1.3: arma não proficiente = <strong>−5</strong>. Clique na linha do ataque para rolar 🎲.</p>
                     <p class="t20-hint" id="t20AtaquesLimitesHint" style="margin:0 0 0.35rem;font-size:0.68rem"></p>
                     <div class="ficha-ataques-tabela">
                         <div class="ficha-ataque-header">
@@ -322,22 +324,34 @@
                     </div>
                 </div>
 
-                <div class="t20-ficha-secao">
+                <div class="t20-ficha-secao t20-dnd-drop-zone" id="t20GrimorioDropZone" data-dnd-accept="magia">
                     <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnT20Grimorio" style="width:100%;min-height:2.6rem;font-size:1rem" title="Catálogo MB, vínculos na ficha, Pontos de Magia (PM) e importação do texto legado. Esc fecha o painel.">
                         📖 Grimório MB
                     </button>
                     <p id="t20GrimorioBadge" class="t20-hint" style="margin:.35rem 0 0;text-align:center;font-size:.75rem"></p>
+                    <p class="t20-hint t20-dnd-hint" style="margin:.25rem 0 0;text-align:center;font-size:.68rem">Arraste magias do catálogo para cá ou para a lista no grimório.</p>
                     <textarea id="f_magias" class="t20-sr-only" tabindex="-1" aria-hidden="true" rows="1" title="Magias e rituais (legado em JSON até o Grimório)"></textarea>
                 </div>
 
                 <div class="t20-ficha-secao t20-ficha-secao--pericias">
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Perícias</h3>
-                    <p class="t20-hint" id="fichaPericiasHint" style="margin-top:0">½ nível usa o nível em <strong>Editar ficha</strong>. Marque treinado quando aplicável (+2 no T20). Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe MB.</p>
+                    <p class="t20-hint" id="fichaPericiasHint" style="margin-top:0">Clique no <strong>nome</strong> ou em <strong>Σ</strong> para rolar perícia. Passe o mouse em <strong>Σ</strong> para a fórmula.</p>
+                    <p class="t20-hint" id="fichaUltimaRolagem" style="margin-top:0.2rem;font-size:0.68rem;font-style:italic" aria-live="polite"></p>
                     <p class="t20-hint" id="fichaPericiasOrcamento" style="margin-top:0.2rem;font-size:0.72rem"></p>
                     <p class="t20-hint" id="fichaPercepcaoPassivaInline" style="margin-top:0.2rem;font-size:0.72rem"></p>
                     <p class="t20-hint" id="fichaPenArmEquipHint" style="margin-top:0.2rem;font-size:0.72rem"></p>
                     <div class="t20-pericias-scroll">
                         <table class="t20-pericias-table" id="tblPericias">
+                            <colgroup>
+                                <col class="t20-col-per-tr" />
+                                <col class="t20-col-per-nome" />
+                                <col class="t20-col-per-total" />
+                                <col class="t20-col-per-half" />
+                                <col class="t20-col-per-mod" />
+                                <col class="t20-col-per-out" />
+                                <col class="t20-col-per-bonus" />
+                                <col class="t20-col-per-sot" />
+                            </colgroup>
                             <thead>
                                 <tr>
                                     <th title="Treinado">Tr</th>
@@ -346,8 +360,8 @@
                                     <th>½ nv</th>
                                     <th id="thPericiasMod">Mod</th>
                                     <th>Out</th>
+                                    <th id="thPericiasBonus" title="Bônus total (atributo + ½ nv + treino + outros + racial − pen. armadura)">Σ</th>
                                     <th title="Somente treinado (regra)">✱</th>
-                                    <th title="Penalidade de armadura (regra)">Arm.</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -1243,7 +1257,7 @@
                         <span class="equipamentos-icone">🎒</span>
                         <div>
                             <h2 class="equipamentos-titulo">Gerenciar Equipamentos</h2>
-                            <p class="equipamentos-subtitulo">Adicione itens ao inventário (catálogo MB Tormenta). <span class="t20-hint">Esc fecha.</span></p>
+                            <p class="equipamentos-subtitulo">Adicione itens ao inventário (catálogo MB Tormenta). Arraste para a lista de equipamentos ou use ➕. <span class="t20-hint">Esc fecha.</span></p>
                         </div>
                     </div>
                     <button type="button" class="equipamentos-fechar" id="btnFecharModalEquipamentos" aria-label="Fechar">✕</button>
@@ -1303,7 +1317,7 @@
                         <div>
                             <h2 class="equipamentos-titulo">Gerenciar consumíveis</h2>
                             <p class="equipamentos-subtitulo">
-                                Poções e pergaminhos do catálogo MB (Tormenta 20) e itens livres.
+                                Poções e pergaminhos do catálogo MB (Tormenta 20). Arraste para a lista de consumíveis ou use ➕.
                                 <span class="t20-hint">Esc fecha.</span>
                             </p>
                         </div>
@@ -1364,7 +1378,7 @@
                         <span class="equipamentos-icone">📜</span>
                         <div>
                             <h2 class="equipamentos-titulo" id="titModalGerenciarTalentos">Gerenciar talentos</h2>
-                            <p class="equipamentos-subtitulo" id="subModalGerenciarTalentos">Catálogo MB (talentos das classes) e talento livre. <span class="t20-hint">Esc fecha.</span></p>
+                            <p class="equipamentos-subtitulo" id="subModalGerenciarTalentos">Catálogo MB (talentos das classes) e talento livre. Arraste para a lista de talentos/poderes. <span class="t20-hint">Esc fecha.</span></p>
                         </div>
                     </div>
                     <button type="button" class="equipamentos-fechar" id="btnFecharModalTalentosMb" aria-label="Fechar">✕</button>
@@ -1421,7 +1435,7 @@
                         <span class="equipamentos-icone">📖</span>
                         <div>
                             <h2 class="equipamentos-titulo">Grimório (Tormenta 20)</h2>
-                            <p class="equipamentos-subtitulo">Catálogo MB por slug, vínculos na ficha e custo em PM (Pontos de Magia). <span class="t20-hint">Esc fecha. O catálogo carrega em páginas (use «Carregar mais»).</span></p>
+                            <p class="equipamentos-subtitulo">Catálogo MB por slug, vínculos na ficha e custo em PM. Arraste magias para «Minhas magias» ou para o grimório na ficha. <span class="t20-hint">Esc fecha. O catálogo carrega em páginas (use «Carregar mais»).</span></p>
                         </div>
                     </div>
                     <button type="button" class="equipamentos-fechar" id="btnFecharModalGrimorioTormenta" aria-label="Fechar">✕</button>
@@ -1450,7 +1464,7 @@
                             <button type="button" class="equipamentos-aba" data-grim-vinc-filt="grimorio">📖 No livro</button>
                             <button type="button" class="equipamentos-aba" data-grim-vinc-filt="preparada">🕯️ Preparadas hoje</button>
                         </div>
-                        <div class="equipamentos-lista talentos-lista-linhas" id="grimorioTormentaListaVinculos"></div>
+                        <div class="equipamentos-lista talentos-lista-linhas t20-dnd-drop-zone" id="grimorioTormentaListaVinculos" data-dnd-accept="magia"></div>
                     </div>
                     <div id="conteudoGrimorioCatalogo" class="equipamentos-conteudo">
                         <div class="equipamentos-controles" style="flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem">
@@ -1529,20 +1543,6 @@
 
         <div class="t20-ficha-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem">
             <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnSalvar">Salvar ficha</button>
-            <details class="t20-ficha-backup-details">
-                <summary>Cópia de segurança (arquivo)</summary>
-                <p class="t20-hint" style="margin:0.35rem 0 0">Guarde ou restaure uma cópia da ficha no seu computador. Formato técnico JSON — útil para backup ou mudar de navegador. Depois de carregar, use «Salvar ficha» para gravar no servidor.</p>
-                <div class="t20-ficha-backup-btns">
-                    <button type="button" class="tormenta-btn tormenta-btn--outline-red" id="btnT20ExportarJson" title="Exporta JSON: campos do formulário e inventário em SQL quando a ficha já tem ID">
-                        Descarregar cópia
-                    </button>
-                    <button type="button" class="tormenta-btn tormenta-btn--outline-red" id="btnT20ImportarJson" title="Carrega um arquivo JSON no navegador; use Salvar para gravar no servidor">
-                        Carregar cópia
-                    </button>
-                </div>
-            </details>
-            <input type="file" id="t20ImportFichaFile" accept="application/json,.json" class="t20-sr-only" tabindex="-1" aria-hidden="true" />
-            <span id="f_status" class="tormenta-cell-muted" style="color:var(--t20-muted);"></span>
         </div>
     </div>
 </div>
@@ -1555,7 +1555,7 @@
 </script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
 <script src="/games/tormenta/js/t20-ficha-campanha-solicitacao.js?v=20260707solic"></script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260614grimorioAuto"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260710g"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260707v13attr"></script>
@@ -1570,8 +1570,11 @@
 <script src="/games/tormenta/js/t20-proficiencia-arma.js?v=20260629s49"></script>
 <script src="/games/tormenta/js/t20-limites-equipamento-v13.js?v=20260629s48"></script>
 <script src="/games/tormenta/js/t20-penalidade-armadura.js?v=20260629s47"></script>
-<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260629pp"></script>
-<script src="/games/tormenta/js/t20-percepcao-passiva.js?v=20260629pp"></script>
+<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260710d"></script>
+<script src="/games/tormenta/js/t20-rolagem-contextual.js?v=20260710c"></script>
+<script src="/games/tormenta/js/t20-percepcao-passiva.js?v=20260710c"></script>
+<script src="/games/tormenta/js/t20-breakdown-ficha.js?v=20260710e"></script>
+<script src="/games/tormenta/js/t20-compendium-dnd.js?v=20260710f"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260710b"></script>
 <script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-multiclasse-v13.js?v=20260704ha3"></script>
@@ -1870,33 +1873,21 @@
         return m ? parseInt(m[1], 10) : 0;
     }
 
+    window.T20FichaVitais = {
+        getArmaduras: () => t20ArmadurasEquipadas,
+        somaBonusArmaduras: () => t20SomaBonusArmaduras(),
+        calcularCaTotal: () => t20CalcularCaTotal(),
+        getCaBaseSemItens: () => __t20CaBaseSemItens,
+    };
+
+    function t20SyncArmadurasWindow() {
+        window.t20ArmadurasEquipadas = t20ArmadurasEquipadas;
+    }
+
     function t20AtualizarVitaisBreakdownTormenta() {
-        const caBd = q('fichaCaBreakdown');
-        if (caBd) {
-            const arm = t20SomaBonusArmaduras();
-            const base = __t20CaBaseSemItens;
-            const total = t20CalcularCaTotal();
-            const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva());
-            if (isV13) {
-                const desAttr = Math.trunc(
-                    Number((q('fichaDesResumo') && q('fichaDesResumo').value) || 0)
-                );
-                const desFmt = (desAttr >= 0 ? '+' : '') + desAttr;
-                const pesada =
-                    window.T20RegraVersao &&
-                    window.T20RegraVersao.temArmaduraPesada(t20ArmadurasEquipadas);
-                if (arm === 0) {
-                    caBd.textContent = `10 + DES ${desFmt} = ${total} (v1.3)`;
-                } else if (pesada) {
-                    caBd.textContent = `10 + itens ${arm >= 0 ? '+' : ''}${arm} = ${total} (v1.3; armadura pesada — DES ${desFmt} não aplica)`;
-                } else {
-                    caBd.textContent = `10 + DES ${desFmt} + itens ${arm >= 0 ? '+' : ''}${arm} = ${total} (v1.3)`;
-                }
-            } else if (arm === 0) {
-                caBd.textContent = `CA salva: ${base} (lista de armaduras sem bônus de CA)`;
-            } else {
-                caBd.textContent = `Base ${base} + itens ${arm >= 0 ? '+' : ''}${arm} = ${total}`;
-            }
+        t20SyncArmadurasWindow();
+        if (window.T20BreakdownFicha && typeof window.T20BreakdownFicha.atualizarCa === 'function') {
+            window.T20BreakdownFicha.atualizarCa();
         }
         t20AtualizarCaExibida();
         const iniBd = q('fichaIniciativaBreakdown');
@@ -1917,6 +1908,9 @@
         const pmBd = q('fichaPmBreakdown');
         if (pmBd && !(pmBd.dataset && pmBd.dataset.t20PmFormula)) {
             pmBd.textContent = 'Atuais / máximos';
+        }
+        if (window.T20BreakdownFicha && typeof window.T20BreakdownFicha.agendarPericias === 'function') {
+            window.T20BreakdownFicha.agendarPericias();
         }
     }
 
@@ -2316,7 +2310,6 @@
                 const criado = await svc.criar(body);
                 q('fichaId').value = String(criado.id);
                 history.replaceState(null, '', `ficha-personagem.html?id=${criado.id}`);
-                q('f_status').textContent = `Editando #${criado.id}`;
                 if (!fecharDialog) Toast.success('Ficha criada.');
             }
             if (cadastroDashboardOrigem) {
@@ -2724,11 +2717,11 @@
         if (subModalTal) {
             if (v13 && window.T20PoderesV13 && window.T20PoderesV13.isHaAtivo && window.T20PoderesV13.isHaAtivo()) {
                 subModalTal.innerHTML =
-                    'Catálogo v1.3 + <strong>Heróis de Arton</strong>. Use categoria ou «só elegíveis» para filtrar. <span class="t20-hint">Esc fecha.</span>';
+                    'Catálogo v1.3 + <strong>Heróis de Arton</strong>. Arraste para a lista de poderes ou use ➕. <span class="t20-hint">Esc fecha.</span>';
             } else {
                 subModalTal.innerHTML = v13
-                    ? 'Catálogo v1.3 (poderes gerais e de classe) e poder livre. <span class="t20-hint">Esc fecha.</span>'
-                    : 'Catálogo MB (talentos das classes) e talento livre. <span class="t20-hint">Esc fecha.</span>';
+                    ? 'Catálogo v1.3 (poderes gerais e de classe). Arraste para a lista ou use ➕. <span class="t20-hint">Esc fecha.</span>'
+                    : 'Catálogo MB (talentos das classes). Arraste para a lista ou use ➕. <span class="t20-hint">Esc fecha.</span>';
             }
         }
         if (window.T20PoderesV13 && typeof window.T20PoderesV13.atualizarUiModalHa === 'function') {
@@ -4013,6 +4006,7 @@
         document.querySelectorAll('.t20-p-half').forEach((el) => {
             el.textContent = String(v);
         });
+        if (window.T20BreakdownFicha) window.T20BreakdownFicha.agendarPericias();
     }
 
     function splitClasseNivel(texto, nivelApi) {
@@ -4029,6 +4023,9 @@
     }
 
     let t20AtaquesLista = [];
+    function t20SyncAtaquesWindow() {
+        window.t20AtaquesLista = t20AtaquesLista;
+    }
     let t20ArmadurasEquipadas = [];
     let t20CatalogoArmadurasCache = [];
     let t20CatalogoArmadurasTotal = 0;
@@ -4324,9 +4321,12 @@
             lista.appendChild(empty);
             return;
         }
-        for (const a of t20AtaquesLista) {
+        for (let i = 0; i < t20AtaquesLista.length; i++) {
+            const a = t20AtaquesLista[i];
             const row = document.createElement('div');
-            row.className = 'ficha-ataque-linha';
+            row.className = 'ficha-ataque-linha t20-ataque--rolavel';
+            row.dataset.atqIdx = String(i);
+            row.title = 'Clique para rolar ataque (1d20 + bônus)';
             if (a.bonus_ativo === false) row.classList.add('t20-equip-inativo');
             const nm = document.createElement('span');
             nm.className = 'ficha-ataque-nome';
@@ -4341,7 +4341,7 @@
                       ? 'Empunhado'
                       : '';
             const atk = document.createElement('span');
-            atk.className = 'ficha-ataque-bonus';
+            atk.className = 'ficha-ataque-bonus t20-roll-alvo';
             const atkTxt = t20FormatarBonusAtaqueExibido(a);
             atk.textContent = atkTxt !== '—' ? atkTxt : '—';
             if (
@@ -4354,9 +4354,12 @@
                     t20SlugClasseMb(),
                     { nomeArma: a.nome, proficienciaArma: a.proficiencia_arma }
                 );
-                if (!aj.proficiente) {
+                if (!aj.proficiente && !window.T20BreakdownFicha) {
                     atk.title = `Não proficiente (${aj.proficiencia_arma}) — −5 no ataque (p.142)`;
                 }
+            }
+            if (window.T20BreakdownFicha && window.T20BreakdownFicha.aplicarBreakdownLinhaAtaque) {
+                window.T20BreakdownFicha.aplicarBreakdownLinhaAtaque(atk, a);
             }
             const dn = document.createElement('span');
             dn.className = 'ficha-ataque-dano';
@@ -4365,6 +4368,10 @@
             lista.appendChild(row);
         }
         t20AtualizarHintsLimitesEquipamento();
+        t20SyncAtaquesWindow();
+        if (window.T20BreakdownFicha && typeof window.T20BreakdownFicha.atualizarListaAtaquesBreakdown === 'function') {
+            window.T20BreakdownFicha.atualizarListaAtaquesBreakdown();
+        }
     }
 
     function t20AbrirEditorAtaques() {
@@ -4494,6 +4501,7 @@
         );
         t20ArmadurasEquipadas = aplicado.armaduras;
         t20AtaquesLista = aplicado.ataques;
+        t20SyncAtaquesWindow();
     }
 
     function t20AplicarLimitesArmadurasEquipadas() {
@@ -4543,6 +4551,7 @@
 
     function renderT20ArmadurasLista() {
         t20AplicarLimitesArmadurasEquipadas();
+        t20SyncArmadurasWindow();
         const lista = q('t20FichaArmadurasProtecao');
         const sumEl = q('t20ArmadurasSomaCa');
         const soma = t20SomaBonusArmaduras();
@@ -4994,6 +5003,17 @@
     let _catalogoTargetInput = null;
     let _catalogoSkip = 0;
     const _catalogoLimit = 25;
+    let _t20CatalogAddLock = null;
+
+    async function t20ComLockCatalogo(key, fn) {
+        if (_t20CatalogAddLock === key) return;
+        _t20CatalogAddLock = key;
+        try {
+            await fn();
+        } finally {
+            if (_t20CatalogAddLock === key) _t20CatalogAddLock = null;
+        }
+    }
 
     async function abrirModalCatalogo(mode, targetInput) {
         if (mode === 'equip') {
@@ -5064,7 +5084,7 @@
                                     linha.dataset.t20TalentoId = String(item.talento_id);
                                 }
                             } catch (e2) {
-                                if (typeof Toast !== 'undefined' && Toast.error) Toast.error(e2.message || 'Erro ao vincular talento');
+                                t20ToastErroApi(e2, 'Erro ao vincular talento/poder');
                             }
                             return;
                         }
@@ -5098,11 +5118,20 @@
     const _equipCatalogLimit = 25;
     let _equipCatalogTotal = 0;
 
+    function t20FecharOverlayA11y(ov) {
+        if (!ov) return;
+        const ae = document.activeElement;
+        if (ae && typeof ov.contains === 'function' && ov.contains(ae)) {
+            ae.blur();
+        }
+        ov.classList.remove('is-open');
+        ov.setAttribute('aria-hidden', 'true');
+    }
+
     function fecharModalEquipamentosTormenta() {
         const ov = q('modalEquipamentos');
         if (!ov) return;
-        ov.classList.remove('is-open');
-        ov.setAttribute('aria-hidden', 'true');
+        t20FecharOverlayA11y(ov);
         _equipModalTargetInput = null;
         _equipModalTargetRow = null;
     }
@@ -5247,6 +5276,67 @@
         if (qt) qt.value = qtdStr != null ? String(qtdStr) : '';
     }
 
+    function t20ToastErroApi(e, fallback) {
+        const msg = (e && e.message) || fallback || 'Erro na operação.';
+        if (window.TormentaPersonagemService && window.TormentaPersonagemService.isErroDuplicado(e)) {
+            if (typeof Toast !== 'undefined' && Toast.warning) Toast.warning(msg);
+            else if (typeof Toast !== 'undefined' && Toast.info) Toast.info(msg);
+            else alert(msg);
+            return;
+        }
+        if (typeof Toast !== 'undefined' && Toast.error) Toast.error(msg);
+        else alert(msg);
+    }
+
+    async function t20IncrementarEquipExistente(fid, opts) {
+        const o = opts || {};
+        const qtdAdd = Math.max(1, Number(o.qtdAdd) || 1);
+        const catalogEquipId = o.catalogEquipId;
+        const nomeTrim = String(o.nomeTrim || '').trim();
+        let row = null;
+        if (catalogEquipId != null && String(catalogEquipId).trim() !== '') {
+            row = document.querySelector(
+                `#fichaEquipamentos .ficha-equipamento-linha[data-t20-equipamento-id="${String(catalogEquipId)}"]`
+            );
+        }
+        if (!row && nomeTrim) {
+            document.querySelectorAll('#fichaEquipamentos .ficha-equipamento-linha').forEach((r) => {
+                if (row) return;
+                const inp = r.querySelector('.eq-item');
+                if (inp && String(inp.value || '').trim() === nomeTrim) row = r;
+            });
+        }
+        if (row && row.dataset.t20VinculoEquip) {
+            const vid = row.dataset.t20VinculoEquip;
+            const qtInp = row.querySelector('.eq-qtd');
+            const atual = Math.max(1, parseInt(String((qtInp && qtInp.value) || '1'), 10) || 1);
+            const novaQtd = Math.min(9999, atual + qtdAdd);
+            const updated = await svc.atualizarEquipamentoQuantidade(fid, vid, novaQtd);
+            aplicarQuantidadeNaLinhaEquip(row, String(updated.quantidade));
+            row.classList.add('t20-vinculo-duplicado-pulse');
+            setTimeout(() => row.classList.remove('t20-vinculo-duplicado-pulse'), 1400);
+            if (typeof Toast !== 'undefined' && Toast.info) {
+                Toast.info(`Quantidade atualizada: ${updated.nome} (${updated.quantidade}).`);
+            }
+            return updated;
+        }
+        const p = await svc.obter(fid);
+        const eqs = Array.isArray(p.equipamentos) ? p.equipamentos : [];
+        const match = eqs.find((x) => {
+            if (catalogEquipId != null && String(x.equipamento_id) === String(catalogEquipId)) return true;
+            if (nomeTrim && String(x.nome || '').trim() === nomeTrim) return true;
+            return false;
+        });
+        if (!match) return null;
+        const novaQtd = Math.min(9999, Number(match.quantidade || 1) + qtdAdd);
+        const updated = await svc.atualizarEquipamentoQuantidade(fid, match.id, novaQtd);
+        preencherEquipFromApi(eqs.map((x) => (x.id === match.id ? updated : x)));
+        if (typeof Toast !== 'undefined' && Toast.info) {
+            Toast.info(`Quantidade atualizada: ${updated.nome} (${updated.quantidade}).`);
+        }
+        return updated;
+    }
+
     async function adicionarEquipNomeQuantidadeTormenta(nome, qtdRaw, catalogEquipId) {
         const nomeTrim = String(nome || '').trim();
         if (!nomeTrim) return;
@@ -5265,7 +5355,19 @@
             const body = Number.isFinite(cidRaw)
                 ? { equipamento_id: cidRaw, quantidade: qtdNum }
                 : { nome: nomeTrim, quantidade: qtdNum };
-            return svc.adicionarEquipamento(fid, body);
+            try {
+                return await svc.adicionarEquipamento(fid, body);
+            } catch (eDup) {
+                if (window.TormentaPersonagemService && window.TormentaPersonagemService.isErroDuplicado(eDup)) {
+                    const inc = await t20IncrementarEquipExistente(fid, {
+                        catalogEquipId: Number.isFinite(cidRaw) ? cidRaw : null,
+                        nomeTrim,
+                        qtdAdd: qtdNum,
+                    });
+                    if (inc) return inc;
+                }
+                throw eDup;
+            }
         };
 
         if (_equipModalTargetInput) {
@@ -5283,7 +5385,7 @@
                         aplicarQuantidadeNaLinhaEquip(_equipModalTargetInput.closest('.ficha-equipamento-linha'), String(item.quantidade));
                     }
                 } catch (e1) {
-                    if (typeof Toast !== 'undefined' && Toast.error) Toast.error(e1.message || 'Erro ao vincular equipamento');
+                    t20ToastErroApi(e1, 'Erro ao vincular equipamento');
                     return;
                 }
             } else {
@@ -5308,7 +5410,7 @@
                             aplicarQuantidadeNaLinhaEquip(_equipModalTargetRow, String(item.quantidade));
                         }
                     } catch (e1) {
-                        if (typeof Toast !== 'undefined' && Toast.error) Toast.error(e1.message || 'Erro ao vincular equipamento');
+                        t20ToastErroApi(e1, 'Erro ao vincular equipamento');
                         return;
                     }
                 } else {
@@ -5344,7 +5446,7 @@
                     );
                 }
             } catch (e1) {
-                if (typeof Toast !== 'undefined' && Toast.error) Toast.error(e1.message || 'Erro ao vincular equipamento');
+                t20ToastErroApi(e1, 'Erro ao vincular equipamento');
             }
         } else {
             holder.appendChild(criarLinhaEquip(nomeTrim, qtdStr));
@@ -5405,8 +5507,7 @@
     function fecharModalTalentosMb() {
         const ov = q('modalTalentosMb');
         if (!ov) return;
-        ov.classList.remove('is-open');
-        ov.setAttribute('aria-hidden', 'true');
+        t20FecharOverlayA11y(ov);
         _talModalTargetInput = null;
         _talModalTargetRow = null;
     }
@@ -5840,8 +5941,7 @@
     function fecharModalGrimorioTormenta() {
         const ov = q('modalGrimorioTormenta');
         if (!ov) return;
-        ov.classList.remove('is-open');
-        ov.setAttribute('aria-hidden', 'true');
+        t20FecharOverlayA11y(ov);
     }
 
     function montarHtmlGrimorioCatalogoItem(it) {
@@ -6301,7 +6401,7 @@
                     Toast.success('Magia adicionada.');
                     await carregarGrimorioVinculosNaLista();
                 } catch (e) {
-                    Toast.error(e.message || 'Erro ao adicionar');
+                    t20ToastErroApi(e, 'Erro ao adicionar magia');
                 }
             });
         }
@@ -6490,7 +6590,7 @@
                 const item = await svc.adicionarTalento(fid, { nome: nomeTrim });
                 aplicarNaLinha(item);
             } catch (e1) {
-                if (typeof Toast !== 'undefined' && Toast.error) Toast.error(e1.message || 'Erro ao vincular talento');
+                t20ToastErroApi(e1, 'Erro ao vincular talento/poder');
                 return;
             }
         } else {
@@ -6516,6 +6616,37 @@
         }
         if (_talModalTargetInput && _talModalTargetInput.id === 'f_golem_poder_geral_nome') {
             window.__t20GolemPoderSlug = t20SlugifyPoderSlug(nomeTrim);
+        }
+    }
+
+    async function t20DndAdicionarMagia(slug, papel) {
+        const pid0 = q('fichaId') && q('fichaId').value;
+        if (!pid0) {
+            if (typeof Toast !== 'undefined' && Toast.error) Toast.error('Salve a ficha antes de adicionar magias.');
+            return;
+        }
+        const slugNorm = String(slug || '').trim().toLowerCase();
+        if (!slugNorm) return;
+        const pap = String(papel || t20PapelGrimorioPadraoMb()).trim();
+        const permitidos = t20PapeisGrimorioPermitidosMb();
+        if (!permitidos.includes(pap)) {
+            const modo = t20ModoConjuracaoMbEfetivo();
+            if (typeof Toast !== 'undefined' && Toast.error) {
+                Toast.error(
+                    modo === 'preparar'
+                        ? 'Esta classe usa grimório ou preparadas — não «conhecida».'
+                        : 'Esta classe usa magias conhecidas — não grimório nem preparadas.'
+                );
+            }
+            return;
+        }
+        try {
+            await grimorioSvc.adicionarVinculo(pid0, { magia_slug: slugNorm, papel: pap });
+            if (typeof Toast !== 'undefined' && Toast.success) Toast.success('Magia adicionada.');
+            await carregarGrimorioVinculosNaLista();
+            await carregarGrimorioResumoPm();
+        } catch (e) {
+            t20ToastErroApi(e, 'Erro ao adicionar magia');
         }
     }
 
@@ -6664,21 +6795,18 @@
             .replace(/'/g, '&#39;');
     }
 
-    function renderCelulaPenArm(row) {
+    function renderExtrasPenArmPericia(row) {
         const penArmRegra = row.penalidade_armadura === true;
         const penArmChecked = penArmRegra ? ' checked' : '';
         const isAtletismo = row.slug === 'atletismo';
-        const armInput = isAtletismo
-            ? '<input type="checkbox" class="p-pen-arm t20-sr-only" tabindex="-1" aria-hidden="true" />'
-            : `<input type="checkbox" class="p-pen-arm" title="Perícia sujeita a penalidade de armadura (Tabela 2-1)"${penArmChecked} />`;
+        const armInput = `<input type="checkbox" class="p-pen-arm t20-sr-only" title="Perícia sujeita a penalidade de armadura (Tabela 2-1)"${penArmChecked} tabindex="-1" aria-hidden="true" />`;
         const armBadge = penArmRegra
-            ? '<span class="t20-pen-arm-badge" title="Penalidade de armadura (Tabela 2-1)">A</span>'
+            ? '<span class="t20-pen-arm-badge t20-pen-arm-badge--nome" title="Penalidade de armadura (Tabela 2-1)">A</span>'
             : '';
         const natCtrl = isAtletismo
-            ? '<label class="t20-pen-nat" title="Natação — aplica penalidade de armadura"><input type="checkbox" class="p-pen-natacao" /><span class="t20-pen-nat-ico" aria-hidden="true">🏊</span><span class="t20-sr-only">Natação</span></label>'
+            ? '<label class="t20-pen-nat t20-pen-nat--nome" title="Natação — aplica penalidade de armadura"><input type="checkbox" class="p-pen-natacao" /><span class="t20-pen-nat-ico" aria-hidden="true">🏊</span><span class="t20-sr-only">Natação</span></label>'
             : '';
-        const cls = isAtletismo ? ' t20-pen-arm-cell--atletismo' : '';
-        return `<td class="t20-pen-arm-cell${cls}"><div class="t20-pen-arm-stack"><div class="t20-pen-arm-row">${armInput}${armBadge}<span class="p-pen-val t20-pen-val" aria-live="polite"></span></div>${natCtrl}</div></td>`;
+        return { armInput, armBadge, natCtrl };
     }
 
     function montarTabelaPericias() {
@@ -6696,26 +6824,32 @@
                     : '';
             const soTreinaRegra = row.somente_treinado === true;
             const soTreinaChecked = soTreinaRegra ? ' checked' : '';
-            const cellNome =
+            const extras = renderExtrasPenArmPericia(row);
+            const cellNomeInner =
                 nome === '—'
                     ? '<input class="nome-livre t20-input" placeholder="Outra" />'
-                    : `<span class="t20-p-nome">${escHtml(nome)}</span>`;
+                    : `<span class="t20-p-nome t20-p-nome--rolavel" title="Clique para rolar 1d20 + bônus">${escHtml(nome)}</span>`;
+            const cellNome = `<td class="t20-p-nome-cell">${extras.armInput}${extras.natCtrl}<span class="t20-p-nome-wrap">${extras.armBadge}${cellNomeInner}</span></td>`;
             const slugAttr = row.slug ? ` data-per-slug="${escHtml(String(row.slug))}"` : '';
             return `<tr data-per-idx="${i}"${dataAttr}${slugAttr}>
                 <td><input type="checkbox" class="p-treinado" /></td>
-                <td>${cellNome}</td>
+                ${cellNome}
                 <td><input type="number" class="p-total t20-input" value="0" /></td>
                 <td><span class="t20-p-half">0</span></td>
                 <td><input type="number" class="p-mod t20-input" value="0" /></td>
                 <td><input type="number" class="p-out t20-input" value="0" /></td>
+                <td class="t20-p-bonus-cell" title="Bônus total — passe o mouse para fórmula; clique para rolar"><span class="t20-p-bonus-val">—</span><span class="t20-p-breakdown t20-sr-only" aria-hidden="true"></span></td>
                 <td><input type="checkbox" class="p-so-treina" title="Somente treinado (regra base; pode desmarcar se a mesa permitir)"${soTreinaChecked} /></td>
-                ${renderCelulaPenArm(row)}
             </tr>`;
         }).join('');
         tb.querySelectorAll('.p-pen-natacao').forEach((cb) => {
             cb.addEventListener('change', () => t20AtualizarPenalidadesPericias());
         });
         if (window.T20PercepcaoPassiva) window.T20PercepcaoPassiva.agendarAtualizacao();
+        if (window.T20BreakdownFicha) window.T20BreakdownFicha.agendarPericias();
+        if (window.T20PericiasRolador && typeof window.T20PericiasRolador.initRolador === 'function') {
+            window.T20PericiasRolador.initRolador();
+        }
         if (window.T20OficioEspecialidadesV13) window.T20OficioEspecialidadesV13.initAposTabelaPericias();
     }
 
@@ -6742,11 +6876,17 @@
             const meta = PERICIAS_META[i] || {};
             const usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
             const pen = penApi.penalidadeArmaduraPericia(meta, itens, usoNat, slugClasse);
-            const span = tr.querySelector('.p-pen-val');
-            if (span) span.textContent = pen > 0 ? `−${pen}` : '';
+            const badge = tr.querySelector('.t20-pen-arm-badge--nome');
+            if (badge) {
+                badge.title =
+                    pen > 0
+                        ? `Penalidade de armadura: −${pen}`
+                        : 'Penalidade de armadura (Tabela 2-1)';
+            }
             tr.classList.toggle('t20-pericia-pen-arm-ativa', pen > 0);
         });
         if (window.T20PercepcaoPassiva) window.T20PercepcaoPassiva.agendarAtualizacao();
+        if (window.T20BreakdownFicha) window.T20BreakdownFicha.agendarPericias();
     }
 
     function atualizarModsPericiasDasHabilidades() {
@@ -6759,6 +6899,7 @@
                 modInp.value = String(modificadorAtributoT20(inpAb.value));
             }
         });
+        if (window.T20BreakdownFicha) window.T20BreakdownFicha.agendarPericias();
     }
 
     function t20AplicarPericiasOrigemBeneficios() {
@@ -6955,28 +7096,21 @@
                 if (isV13) totInp.value = '0';
             }
             const penArm = tr.querySelector('.p-pen-arm');
-            const badge = tr.querySelector('.t20-pen-arm-badge');
             if (penArm) {
-                if (isV13) {
-                    penArm.disabled = true;
-                    penArm.classList.add('t20-sr-only');
-                    penArm.tabIndex = -1;
-                    penArm.setAttribute('aria-hidden', 'true');
-                } else {
-                    penArm.disabled = false;
-                    penArm.classList.remove('t20-sr-only');
-                    penArm.removeAttribute('aria-hidden');
-                    penArm.tabIndex = 0;
-                }
+                penArm.disabled = true;
+                penArm.classList.add('t20-sr-only');
+                penArm.tabIndex = -1;
+                penArm.setAttribute('aria-hidden', 'true');
             }
+            const badge = tr.querySelector('.t20-pen-arm-badge--nome');
             if (badge) badge.hidden = !isV13 || meta.penalidade_armadura !== true;
-            const penNat = tr.querySelector('.t20-pen-nat');
-            if (penNat) penNat.style.display = isV13 ? '' : 'none';
+            const penNat = tr.querySelector('.t20-pen-nat--nome');
+            if (penNat) penNat.style.display = isV13 && meta.slug === 'atletismo' ? '' : 'none';
         });
         if (hint) {
             hint.innerHTML = isV13
-                ? '½ nível usa o nível em <strong>Editar ficha</strong>. Treino +2 (1º–6º), +4 (7º–14º), +6 (15º+) — v1.3. Coluna <strong>Atrib.</strong> = valor do atributo-chave. <strong>Percepção passiva</strong> (10 + bônus) aparece no cartão <strong>Pass.</strong> acima dos talentos. Coluna <strong>Arm.</strong> mostra penalidade automática dos itens equipados (Acrobacia, Furtividade, Ladinagem; Atletismo só com 🏊 natação; <strong>sem proficiência</strong> → todas For/Des). Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe.'
-                : '½ nível usa o nível em <strong>Editar ficha</strong>. Marque treinado quando aplicável (+2 no MB). <strong>Percepção passiva</strong> no cartão <strong>Pass.</strong> Coluna <strong>Total</strong> = graduações. Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe MB.';
+                ? 'Clique no <strong>nome</strong> ou <strong>Σ</strong> para rolar. <strong>Σ</strong> = atributo + ½ nv + treino + outros ± penalidade de armadura. Atletismo 🏊 = natação.'
+                : 'Clique no <strong>nome</strong> da perícia para rolar. ½ nível em <strong>Editar ficha</strong>. <strong>Total</strong> = graduações MB. Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe.';
         }
         t20AtualizarPenalidadesPericias();
         if (window.T20OficioEspecialidadesV13) window.T20OficioEspecialidadesV13.syncVisibilidade();
@@ -7104,6 +7238,10 @@
             t20ParseIntInputById('t20AtqDistOutros');
         t20SetInputNumOptional('t20AtqCacTotal', cac);
         t20SetInputNumOptional('t20AtqDistTotal', dist);
+        if (window.T20BreakdownFicha && typeof window.T20BreakdownFicha.atualizarAtaquesPlanilha === 'function') {
+            window.T20BreakdownFicha.atualizarAtaquesPlanilha();
+            window.T20BreakdownFicha.atualizarListaAtaquesBreakdown();
+        }
     }
 
     function t20BbaMbComoInt() {
@@ -7185,6 +7323,7 @@
                 empunhado: o.empunhado === true,
             }))
             .filter((x) => x.nome || x.dano || x.bonus_ataque);
+        t20SyncAtaquesWindow();
         t20AplicarLimitesEquipamentoFicha();
         renderT20AtaquesLista();
     }
@@ -7737,110 +7876,6 @@
         };
     }
 
-    function t20SlugNomeArquivo(nome) {
-        const s = String(nome || 'personagem')
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9._-]+/g, '')
-            .slice(0, 48);
-        return s || 'personagem';
-    }
-
-    function t20BaixarJson(obj, nomeArquivo) {
-        const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json;charset=utf-8' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = nomeArquivo;
-        a.rel = 'noopener';
-        document.body.appendChild(a);
-        a.click();
-        URL.revokeObjectURL(a.href);
-        a.remove();
-    }
-
-    async function t20MontarExportacaoTormenta() {
-        t20SyncAttrsDialogToSheet();
-        t20SyncResDialogToSheet();
-        t20SyncDeslTamDialogToSheet();
-        const body = payloadBase();
-        const fid = (q('fichaId') && q('fichaId').value.trim()) || '';
-        let base;
-        if (fid) {
-            base = await svc.obter(fid);
-        } else {
-            base = {
-                nome: body.nome,
-                tipo: body.tipo,
-                jogador_nome: body.jogador_nome,
-                raca: body.raca,
-                classe_nivel: body.classe_nivel,
-                sexo: body.sexo,
-                idade: body.idade,
-                tendencia: body.tendencia,
-                divindade: body.divindade,
-                for_valor: body.for_valor,
-                des_valor: body.des_valor,
-                con_valor: body.con_valor,
-                int_valor: body.int_valor,
-                sab_valor: body.sab_valor,
-                car_valor: body.car_valor,
-                pv_max: body.pv_max,
-                pv_atual: body.pv_atual,
-                pa_max: body.pa_max,
-                pa_atual: body.pa_atual,
-                ca: body.ca,
-                rd: body.rd,
-                nivel: body.nivel,
-                iniciativa: body.iniciativa,
-                deslocamento: body.deslocamento,
-                tamanho: body.tamanho,
-                fort_total: body.fort_total,
-                ref_total: body.ref_total,
-                von_total: body.von_total,
-                ficha_json: body.ficha_json,
-                foto_url: body.foto_url,
-                talentos: [],
-                equipamentos: [],
-                consumiveis: [],
-                magias: [],
-            };
-        }
-        const merged = {
-            ...base,
-            ...body,
-            ficha_json: body.ficha_json,
-            foto_url: body.foto_url != null ? body.foto_url : base.foto_url,
-        };
-        return {
-            schema: 'tormenta_ficha_export',
-            version: 1,
-            exported_at: new Date().toISOString(),
-            personagem: merged,
-        };
-    }
-
-    function t20ExtrairPersonagemDeImport(data) {
-        if (!data || typeof data !== 'object') return null;
-        if (data.schema === 'tormenta_ficha_export' && data.version === 1 && data.personagem && typeof data.personagem === 'object') {
-            return data.personagem;
-        }
-        if (typeof data.nome === 'string' && data.nome.trim() && (data.ficha_json != null || data.for_valor != null)) {
-            return data;
-        }
-        return null;
-    }
-
-    function t20AjustarIdImportado(personagem) {
-        const p = { ...personagem };
-        const cur = (q('fichaId') && q('fichaId').value.trim()) || '';
-        const fileId = p.id != null && p.id !== '' ? String(p.id) : '';
-        if (fileId && cur && fileId !== cur) {
-            delete p.id;
-        }
-        return p;
-    }
-
     function preencherForm(p) {
         _t20RdLegado = p.rd != null && p.rd !== undefined ? String(p.rd) : '';
         q('fichaId').value = p.id != null && p.id !== '' ? String(p.id) : '';
@@ -8230,7 +8265,7 @@
             listaEq.dataset.eqDeleg = '1';
             listaEq.addEventListener('click', async (ev) => {
                 const btn = ev.target.closest('[data-equip-add]');
-                if (!btn) return;
+                if (!btn || btn.disabled) return;
                 const enc = btn.getAttribute('data-equip-add');
                 const catId = btn.getAttribute('data-equip-catalog-id');
                 let nome = '';
@@ -8241,7 +8276,14 @@
                 }
                 const qtdInp = q('equipamentosQuantidade');
                 const qtd = qtdInp ? qtdInp.value : '1';
-                await adicionarEquipNomeQuantidadeTormenta(nome, qtd, catId);
+                btn.disabled = true;
+                try {
+                    await t20ComLockCatalogo(`equip:${enc}`, () =>
+                        adicionarEquipNomeQuantidadeTormenta(nome, qtd, catId)
+                    );
+                } finally {
+                    btn.disabled = false;
+                }
             });
         }
 
@@ -8293,9 +8335,14 @@
             listaTalMb.dataset.talDeleg = '1';
             listaTalMb.addEventListener('click', async (ev) => {
                 const btn = ev.target.closest('[data-tal-add]');
-                if (!btn) return;
+                if (!btn || btn.disabled) return;
                 const enc = btn.getAttribute('data-tal-add') || '';
-                await adicionarTalentoDesdeModalMb(enc);
+                btn.disabled = true;
+                try {
+                    await t20ComLockCatalogo(`tal:${enc}`, () => adicionarTalentoDesdeModalMb(enc));
+                } finally {
+                    btn.disabled = false;
+                }
             });
         }
         const btnFecharTal = q('btnFecharModalTalentosMb');
@@ -8486,6 +8533,37 @@
             window.T20FichaMbExtras.init({ svc, q, preencherConsumiveisFromApi });
         }
 
+        window.__t20DndHandlers = {
+            addEquip: adicionarEquipNomeQuantidadeTormenta,
+            addTalento: (nomeEnc) => adicionarTalentoDesdeModalMb(nomeEnc),
+            addMagia: t20DndAdicionarMagia,
+            addConsumivel: async (nome, qtd) => {
+                if (
+                    window.T20FichaMbExtras &&
+                    typeof window.T20FichaMbExtras.persistirConsumivelDnd === 'function'
+                ) {
+                    await window.T20FichaMbExtras.persistirConsumivelDnd(nome, qtd);
+                }
+            },
+            readPapelGrimorio: t20LerPapelGrimorioDoArtigo,
+            afterEquipDrop: () => fecharModalEquipamentosTormenta(),
+            afterTalentoDrop: () => fecharModalTalentosMb(),
+            afterConsumivelDrop: () => {
+                if (
+                    window.T20FichaMbExtras &&
+                    typeof window.T20FichaMbExtras.fecharModalConsumiveisTormenta === 'function'
+                ) {
+                    window.T20FichaMbExtras.fecharModalConsumiveisTormenta();
+                }
+            },
+            afterMagiaDrop: async () => {
+                await carregarGrimorioResumoPm();
+            },
+        };
+        if (window.T20CompendiumDnd && typeof window.T20CompendiumDnd.init === 'function') {
+            window.T20CompendiumDnd.init();
+        }
+
         const btnId = q('btnAdicionarIdiomaT20');
         const inpId = q('inputNovoIdiomaT20');
         if (btnId && inpId) {
@@ -8569,7 +8647,6 @@
                     }
                 }
                 preencherForm(p);
-                q('f_status').textContent = `Editando #${id}`;
                 if (wantsEditar && dlg && typeof dlg.showModal === 'function') {
                     dlg.showModal();
                     atualizarTagsHeader();
@@ -8583,7 +8660,6 @@
                 Toast.error(e.message || 'Erro ao carregar');
             }
         } else {
-            q('f_status').textContent = 'Nova ficha';
             q('f_jogador').value = (AuthService.getNome && AuthService.getNome()) || '';
             aplicarFotoUrl('');
             if (!isMestre) {
@@ -8611,98 +8687,6 @@
         q('btnSalvar').addEventListener('click', async () => {
             await t20SalvarFicha();
         });
-
-        const btnEx = q('btnT20ExportarJson');
-        if (btnEx) {
-            btnEx.addEventListener('click', async () => {
-                try {
-                    const pack = await t20MontarExportacaoTormenta();
-                    const idp = pack.personagem && pack.personagem.id != null ? String(pack.personagem.id) : 'nova';
-                    const fn = `tormenta-ficha-${t20SlugNomeArquivo(pack.personagem.nome)}-${idp}.json`;
-                    t20BaixarJson(pack, fn);
-                    if (typeof Toast !== 'undefined' && Toast.success) Toast.success('Exportação JSON gerada.');
-                } catch (eEx) {
-                    if (typeof Toast !== 'undefined' && Toast.error) Toast.error(eEx.message || 'Erro ao exportar');
-                }
-            });
-        }
-        const btnIm = q('btnT20ImportarJson');
-        const inpIm = q('t20ImportFichaFile');
-        if (btnIm && inpIm) {
-            btnIm.addEventListener('click', () => {
-                void t20Confirmar({
-                    icone: '📥',
-                    titulo: 'Importar ficha JSON',
-                    texto:
-                        'Importar substitui os dados desta ficha no navegador (não grava no servidor até você clicar em Salvar). Continuar?',
-                    textoConfirmar: 'Importar',
-                    perigo: true,
-                }).then((ok) => {
-                    if (!ok) return;
-                    inpIm.value = '';
-                    inpIm.click();
-                });
-            });
-            inpIm.addEventListener('change', () => {
-                const f = inpIm.files && inpIm.files[0];
-                inpIm.value = '';
-                if (!f) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    try {
-                        const data = JSON.parse(String(reader.result || '{}'));
-                        const personagem = t20ExtrairPersonagemDeImport(data);
-                        if (!personagem) {
-                            Toast.error(
-                                'Arquivo JSON inválido ou formato não reconhecido (use Exportar JSON ou o formato da API de personagem).',
-                            );
-                            return;
-                        }
-                        const curAntes = (q('fichaId') && q('fichaId').value.trim()) || '';
-                        const fileId = personagem.id != null && personagem.id !== '' ? String(personagem.id) : '';
-                        const otherIdDropped = !!(fileId && curAntes && fileId !== curAntes);
-                        const p2 = t20AjustarIdImportado(personagem);
-                        preencherForm(p2);
-                        const st = q('f_status');
-                        if (st) {
-                            st.textContent =
-                                p2.id != null && String(p2.id)
-                                    ? `Editando #${p2.id} (importado)`
-                                    : 'Nova ficha (importada)';
-                        }
-                        t20AtualizarEstadoBotaoSalvar();
-                        if (typeof Toast !== 'undefined' && Toast.success) {
-                            Toast.success(
-                                otherIdDropped
-                                    ? 'Ficha importada (arquivo era de outro personagem — ID removido; salve para criar cópia).'
-                                    : 'Ficha importada na memória do navegador — salve para persistir.',
-                            );
-                        }
-                        try {
-                            if (p2.id != null && String(p2.id)) {
-                                history.replaceState(
-                                    null,
-                                    '',
-                                    `ficha-personagem.html?id=${encodeURIComponent(String(p2.id))}`,
-                                );
-                            } else {
-                                history.replaceState(null, '', 'ficha-personagem.html');
-                            }
-                        } catch (eH2) {
-                            /* ignore */
-                        }
-                    } catch (eIm) {
-                        if (typeof Toast !== 'undefined' && Toast.error) {
-                            Toast.error(eIm.message || 'Erro ao ler JSON');
-                        }
-                    }
-                };
-                reader.onerror = () => {
-                    if (typeof Toast !== 'undefined' && Toast.error) Toast.error('Não foi possível ler o arquivo.');
-                };
-                reader.readAsText(f, 'UTF-8');
-            });
-        }
 
         t20AtualizarEstadoBotaoSalvar();
     }

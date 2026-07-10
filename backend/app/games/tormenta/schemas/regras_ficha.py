@@ -828,6 +828,47 @@ class TormentaPericiaRolarResponse(BaseModel):
     margem: int
 
 
+class TormentaAtaqueRolarRequest(BaseModel):
+    bonus: Optional[int] = Field(
+        default=None,
+        ge=-99,
+        le=99,
+        description="Bônus total pré-calculado (arma na ficha). Se omitido, usa BBA + mod + arma + tam − pen.",
+    )
+    bab: int = Field(0, ge=-99, le=99)
+    mod_atributo: int = Field(0, ge=-99, le=99)
+    bonus_arma: int = Field(0, ge=-99, le=99)
+    bonus_tamanho: int = Field(0, ge=-99, le=99)
+    penalidades: int = Field(0, ge=0, le=99)
+    ca_alvo: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=99,
+        description="CA do alvo; omitido = só rola 1d20 + bônus sem comparar.",
+    )
+
+
+class TormentaAtaqueRolarResponse(BaseModel):
+    d20: int
+    bonus: int
+    total: int
+    ca_alvo: Optional[int] = None
+    acertou: Optional[bool] = None
+    falha_critica: bool
+    ameaca_critica: bool
+    margem: Optional[int] = None
+
+
+class TormentaIniciativaRolarRequest(BaseModel):
+    mod_destreza: int = Field(0, ge=-99, le=99)
+
+
+class TormentaIniciativaRolarResponse(BaseModel):
+    d20: int
+    modificador: int
+    total: int
+
+
 class TormentaAtaqueBonusRequest(BaseModel):
     bonus_base: int = Field(0, ge=-99, le=99)
     nome_arma: Optional[str] = Field(default=None, max_length=120)
