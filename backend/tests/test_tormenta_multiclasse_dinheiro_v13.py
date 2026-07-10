@@ -11,6 +11,8 @@ from app.games.tormenta.rules.dinheiro_inicial_v13_t20 import (
 from app.games.tormenta.rules.progressao_pv_t20 import (
     pm_maximos_v13_multiclasse,
     preview_pm_multiclasse_v13,
+    preview_pv_multiclasse_v13,
+    pv_maximos_v13_multiclasse,
 )
 
 
@@ -30,6 +32,36 @@ def test_pm_multiclasse_v13_agrega_mesma_classe() -> None:
     assert prev["pm_max"] == 9  # 3×3
     assert len(prev["breakdown"]) == 1
     assert prev["breakdown"][0]["nivel"] == 3
+
+
+def test_pv_multiclasse_v13_exemplo_livro() -> None:
+    """Arcanista 3 + Paladino 1, CON 0 — p.34."""
+    prev = preview_pv_multiclasse_v13(
+        [{"slug": "arcanista", "nivel": 3}, {"slug": "paladino", "nivel": 1}],
+        con_valor=0,
+        slug_primario="arcanista",
+    )
+    assert prev["pv_max"] == 17
+    assert prev["encontrado"] is True
+    assert "Arcanista" in prev["formula"]
+    assert (
+        pv_maximos_v13_multiclasse(
+            [{"slug": "arcanista", "nivel": 3}, {"slug": "paladino", "nivel": 1}],
+            con_valor=0,
+            slug_primario="arcanista",
+        )
+        == 17
+    )
+
+
+def test_pv_multiclasse_v13_barbaro_con2() -> None:
+    """Classe única via multiclasse: Bárbaro 1, CON 2 = 26."""
+    prev = preview_pv_multiclasse_v13(
+        [{"slug": "barbaro", "nivel": 1}],
+        con_valor=2,
+        slug_primario="barbaro",
+    )
+    assert prev["pv_max"] == 26
 
 
 def test_dinheiro_nivel_1_e_4d6() -> None:

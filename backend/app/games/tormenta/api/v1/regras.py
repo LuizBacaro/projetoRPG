@@ -91,6 +91,7 @@ from app.games.tormenta.rules.proficiencia_armadura_t20 import (
 from app.games.tormenta.rules.progressao_pv_t20 import (
     preview_pm_multiclasse_v13,
     preview_pv_mb,
+    preview_pv_multiclasse_v13,
 )
 from app.games.tormenta.rules.racas_t20 import (
     idiomas_mb_extras,
@@ -157,6 +158,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaPoderValidarPreRequisitosResponse,
     TormentaPresenteDuendeItem,
     TormentaPresentesDuendeResponse,
+    TormentaPvMulticlassePreviewRequest,
+    TormentaPvMulticlassePreviewResponse,
     TormentaPvPreviewResponse,
     TormentaRacaMbItem,
     TormentaRegrasAtributosResponse,
@@ -1210,6 +1213,30 @@ def obter_pm_preview_multiclasse_v13(
     classes = [{"slug": c.slug.strip().lower(), "nivel": c.nivel} for c in body.classes]
     data = preview_pm_multiclasse_v13(classes)
     return TormentaPmMulticlassePreviewResponse(**data)
+
+
+@router.post(
+    "/pv-preview-multiclasse",
+    response_model=TormentaPvMulticlassePreviewResponse,
+    summary="PV máximos v1.3 — multiclasse (classe primária + demais, p.34)",
+)
+def obter_pv_preview_multiclasse_v13(
+    body: TormentaPvMulticlassePreviewRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPvMulticlassePreviewResponse:
+    rv = normalizar_regra_versao(body.regra_versao or REGRA_VERSAO_V13)
+    if rv != REGRA_VERSAO_V13:
+        raise HTTPException(
+            status_code=400,
+            detail="PV multiclasse só está disponível na regra v1.3.",
+        )
+    classes = [{"slug": c.slug.strip().lower(), "nivel": c.nivel} for c in body.classes]
+    data = preview_pv_multiclasse_v13(
+        classes,
+        body.con_valor,
+        body.slug_primario.strip().lower(),
+    )
+    return TormentaPvMulticlassePreviewResponse(**data)
 
 
 @router.get(

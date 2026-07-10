@@ -683,6 +683,25 @@ def test_get_pv_preview_barbaro_v13_pm(client_regras_tormenta):
     assert body["pm_max"] == 3
 
 
+def test_post_pv_preview_multiclasse_v13(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pv-preview-multiclasse",
+        json={
+            "classes": [
+                {"slug": "arcanista", "nivel": 3},
+                {"slug": "paladino", "nivel": 1},
+            ],
+            "slug_primario": "arcanista",
+            "con_valor": 0,
+            "regra_versao": "v13",
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["pv_max"] == 17
+    assert body["encontrado"] is True
+
+
 def test_post_pericias_validar_criacao_ok(client_regras_tormenta):
     r = client_regras_tormenta.post(
         "/api/v1/tormenta/regras/pericias/validar-criacao",
