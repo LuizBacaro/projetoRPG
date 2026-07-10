@@ -92,7 +92,7 @@ class TormentaPersonagemConsumiveisService:
         )
         if dup:
             raise ArenaBaseException(
-                "Este consumivel ja esta no inventario do personagem",
+                "Este consumível já está no inventário do personagem",
                 status_code=409,
             )
 

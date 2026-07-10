@@ -59,6 +59,15 @@
     }
 
     function pedirDcPericia(nome) {
+        if (window.T20RolagemContextual && window.T20RolagemContextual.pedirValorRolagem) {
+            return window.T20RolagemContextual.pedirValorRolagem({
+                modo: 'dc',
+                titulo: `Teste: ${nome}`,
+                label: `CD para ${nome} (padrão 15)`,
+                hint: 'Informe a Classe de Dificuldade (CD) do teste. O resultado será 1d20 + bônus da perícia.',
+                defaultVal: 15,
+            }).then((v) => (v === undefined ? null : v));
+        }
         bindDcDialog();
         const dlg = q('t20ModalPericiaDc');
         if (!dlg) {
@@ -192,53 +201,75 @@
                 bonus: calc.bonus_total,
                 dc,
             });
-            let msg = `${nome}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total} vs DC ${dc} → `;
-            msg += roll.sucesso ? 'SUCESSO' : 'FALHA';
-            if (calc.penalidade_armadura_aplicada > 0) {
-                msg += ` (pen. armadura −${calc.penalidade_armadura_aplicada})`;
+            if (window.T20RolagemContextual && window.T20RolagemContextual.exibirResultadoPericia) {
+                window.T20RolagemContextual.exibirResultadoPericia(nome, roll, calc);
+            } else {
+                let msg = `${nome}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total} vs DC ${dc} → `;
+                msg += roll.sucesso ? 'SUCESSO' : 'FALHA';
+                if (calc.penalidade_armadura_aplicada > 0) {
+                    msg += ` (pen. armadura −${calc.penalidade_armadura_aplicada})`;
+                }
+                if (roll.falha_critica) msg += ' (falha crítica)';
+                if (roll.sucesso_critico) msg += ' (sucesso crítico)';
+                if (calc.percepcao_passiva != null) {
+                    msg += ` · Passiva: ${calc.percepcao_passiva}`;
+                }
+                if (typeof Toast !== 'undefined' && Toast.info) Toast.info(msg);
+                else alert(msg);
             }
-            if (roll.falha_critica) msg += ' (falha crítica)';
-            if (roll.sucesso_critico) msg += ' (sucesso crítico)';
-            if (calc.percepcao_passiva != null) {
-                msg += ` · Passiva: ${calc.percepcao_passiva}`;
-            }
-            if (typeof Toast !== 'undefined' && Toast.info) Toast.info(msg);
-            else alert(msg);
         } catch (e) {
             if (typeof Toast !== 'undefined' && Toast.error) Toast.error(e.message || 'Erro ao rolar');
         }
     }
 
-    function injetarBotoesRolar() {
-        const tbl = document.querySelector('#tblPericias thead tr');
-        const tb = document.querySelector('#tblPericias tbody');
-        if (!tbl || !tb || tbl.dataset.rollCol) return;
-        tbl.dataset.rollCol = '1';
-        const th = document.createElement('th');
-        th.textContent = 'Teste';
-        th.title = 'Rolar 1d20 + bônus vs DC';
-        tbl.appendChild(th);
-        tb.querySelectorAll('tr').forEach((tr) => {
-            const td = document.createElement('td');
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'tormenta-btn tormenta-btn--sm';
-            btn.textContent = '🎲';
-            btn.title = 'Rolar teste de perícia';
-            btn.addEventListener('click', () => rolarPericia(tr));
-            td.appendChild(btn);
-            tr.appendChild(td);
+    function removerColunaTesteLegada() {
+        const tbl = document.querySelector('#tblPericias');
+        const theadTr = document.querySelector('#tblPericias thead tr');
+        if (!theadTr) return;
+        const ths = theadTr.querySelectorAll('th');
+        const lastTh = ths[ths.length - 1];
+        if (!lastTh || lastTh.textContent.trim() !== 'Teste') return;
+        lastTh.remove();
+        document.querySelectorAll('#tblPericias tbody tr').forEach((tr) => {
+            const tds = tr.querySelectorAll('td');
+            const lastTd = tds[tds.length - 1];
+            if (lastTd && lastTd.querySelector('.tormenta-btn')) {
+                lastTd.remove();
+            }
+        });
+        if (tbl) delete tbl.querySelector('thead tr')?.dataset.rollCol;
+    }
+
+    function bindRolarPericiasNaFicha() {
+        const tbl = document.querySelector('#tblPericias');
+        if (!tbl || tbl.dataset.rollBound === '1') return;
+        tbl.dataset.rollBound = '1';
+        tbl.addEventListener('click', (ev) => {
+            if (ev.target.closest('input, button, label, .t20-oficio-esp-wrap')) return;
+            const nomeEl = ev.target.closest('.t20-p-nome--rolavel');
+            const bonusCell = ev.target.closest('.t20-p-bonus-cell');
+            if (!nomeEl && !bonusCell) return;
+            const tr = (nomeEl || bonusCell).closest('tr');
+            if (tr) rolarPericia(tr);
         });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        bindDcDialog();
-        const obs = new MutationObserver(() => {
-            if (document.querySelector('#tblPericias tbody tr')) injetarBotoesRolar();
-        });
+    function initRoladorPericias() {
+        if (!window.T20RolagemContextual) bindDcDialog();
+        removerColunaTesteLegada();
+        bindRolarPericiasNaFicha();
         const tb = document.querySelector('#tblPericias tbody');
-        if (tb) obs.observe(tb, { childList: true });
-        setTimeout(injetarBotoesRolar, 800);
+        if (!tb || tb.dataset.rollObs === '1') return;
+        tb.dataset.rollObs = '1';
+        const obs = new MutationObserver(() => {
+            removerColunaTesteLegada();
+        });
+        obs.observe(tb, { childList: true });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initRoladorPericias();
+        setTimeout(initRoladorPericias, 800);
     });
 
     function encontrarLinhaPorSlug(slug) {
@@ -264,5 +295,6 @@
         encontrarLinhaPorSlug,
         encontrarLinhaPorNome,
         rolarPericia,
+        initRolador: initRoladorPericias,
     };
 })();

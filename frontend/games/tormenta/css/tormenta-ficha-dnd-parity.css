@@ -1909,35 +1909,6 @@ body::before {
     white-space: nowrap;
 }
 
-.t20-ficha-backup-details {
-    margin: 0;
-    border: 1px solid rgba(92, 58, 30, 0.25);
-    border-radius: 4px;
-    padding: 0.35rem 0.5rem;
-    background: rgba(92, 58, 30, 0.04);
-}
-
-.t20-ficha-backup-details > summary {
-    cursor: pointer;
-    font-size: 0.72rem;
-    font-weight: 700;
-    font-family: var(--fonte-titulo);
-    color: var(--cor-madeira-clara);
-    text-transform: uppercase;
-    list-style: none;
-}
-
-.t20-ficha-backup-details > summary::-webkit-details-marker {
-    display: none;
-}
-
-.t20-ficha-backup-details .t20-ficha-backup-btns {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    margin-top: 0.4rem;
-    align-items: center;
-}
 
 .equipamentos-quantidade-wrapper {
     display: flex;

@@ -655,6 +655,38 @@ def test_post_pericias_rolar(client_regras_tormenta):
     assert "d20" in body and "sucesso" in body
 
 
+def test_post_ataque_rolar_com_ca(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/ataque/rolar",
+        json={"bab": 2, "mod_atributo": 3, "bonus_arma": 0, "ca_alvo": 15},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert "d20" in body and "acertou" in body
+    assert body["ca_alvo"] == 15
+
+
+def test_post_ataque_rolar_sem_ca(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/ataque/rolar",
+        json={"bonus": 7},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["ca_alvo"] is None
+    assert body["acertou"] is None
+
+
+def test_post_iniciativa_rolar(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/iniciativa/rolar",
+        json={"mod_destreza": 2},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["total"] == body["d20"] + body["modificador"]
+
+
 def test_get_pv_preview_barbaro(client_regras_tormenta):
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/pv-preview",

@@ -43,6 +43,8 @@ Principais mudanças v1.3 (sem copiar texto do livro):
 | [08-poderes-tormenta.md](08-poderes-tormenta.md) | Poderes gerais e de classe | Cap. 2 p.124–136 |
 | [09-origens-divindades-tormenta.md](09-origens-divindades-tormenta.md) | Origens, deuses, alinhamento | Cap. 1 p.85–109; suplemento Deuses |
 | [10-suplementos-opcionais.md](10-suplementos-opcionais.md) | Heróis, Atlas, regras opcionais | Heróis + Atlas + Deuses |
+| [11-herois-de-arton-plano-implementacao.md](11-herois-de-arton-plano-implementacao.md) | Plano Heróis de Arton | Suplemento HA |
+| [12-inspiracao-roll20-ux-mesa.md](12-inspiracao-roll20-ux-mesa.md) | Benchmark Roll20 — UX ficha/mesa (sem VTT mapa) | Referência externa |
 
 ## Direitos autorais
 

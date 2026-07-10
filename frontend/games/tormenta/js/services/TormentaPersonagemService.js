@@ -2,6 +2,50 @@
  * Cliente API — personagens Tormenta (`/api/v1/tormenta/personagens`).
  */
 class TormentaPersonagemService {
+    static humanizarErroApi(status, detail, fallbackMessage) {
+        const raw = typeof detail === 'string' ? detail.trim() : '';
+        const d = raw.toLowerCase();
+        if (status === 409) {
+            if (d.includes('equipamento') && d.includes('invent')) {
+                return {
+                    code: 'DUPLICATE_EQUIP',
+                    message:
+                        'Este equipamento já está no inventário. A quantidade será somada se você adicionar de novo.',
+                };
+            }
+            if (d.includes('talento') && d.includes('vincul')) {
+                return {
+                    code: 'DUPLICATE_TALENTO',
+                    message: 'Este poder/talento já está na ficha.',
+                };
+            }
+            if (d.includes('consum') && d.includes('invent')) {
+                return {
+                    code: 'DUPLICATE_CONSUMIVEL',
+                    message: 'Este consumível já está na ficha.',
+                };
+            }
+            if (d.includes('magia') && d.includes('vincul')) {
+                return {
+                    code: 'DUPLICATE_MAGIA',
+                    message: 'Esta magia já está na ficha com o mesmo papel (grimório/preparada/conhecida).',
+                };
+            }
+            return {
+                code: 'CONFLICT',
+                message: raw || 'Este item já existe na ficha.',
+            };
+        }
+        return { code: 'API_ERROR', message: raw || fallbackMessage };
+    }
+
+    static isErroDuplicado(err) {
+        if (!err) return false;
+        if (err.status === 409) return true;
+        const code = String(err.code || '');
+        return code.startsWith('DUPLICATE_') || code === 'CONFLICT';
+    }
+
     _url(path = '') {
         return window.getApiUrl('/tormenta/personagens' + path);
     }
@@ -34,7 +78,17 @@ class TormentaPersonagemService {
             } else if (d && typeof d === 'object') {
                 d = JSON.stringify(d);
             }
-            throw new Error(typeof d === 'string' && d ? d : fallbackMessage);
+            const detail = typeof d === 'string' ? d : '';
+            const { code, message } = TormentaPersonagemService.humanizarErroApi(
+                res.status,
+                detail,
+                fallbackMessage
+            );
+            const err = new Error(message);
+            err.status = res.status;
+            err.code = code;
+            err.apiDetail = detail;
+            throw err;
         }
         if (res.status === 204) return null;
         return res.json();

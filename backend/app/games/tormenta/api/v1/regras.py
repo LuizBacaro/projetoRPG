@@ -31,6 +31,7 @@ from app.games.tormenta.rules.classes_t20 import (
     lista_classes,
     lista_classes_com_suplemento,
 )
+from app.games.tormenta.rules.combate_t20 import rolar_ataque, rolar_iniciativa
 from app.games.tormenta.rules.condicoes_t20 import (
     lista_condicoes_v13,
     lista_situacoes_especiais_v13,
@@ -112,6 +113,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaArmaduraCatalogoPaginaResponse,
     TormentaAtaqueBonusRequest,
     TormentaAtaqueBonusResponse,
+    TormentaAtaqueRolarRequest,
+    TormentaAtaqueRolarResponse,
     TormentaBeneficioNivelMbItem,
     TormentaCargaDetalheItem,
     TormentaCargaPreviewRequest,
@@ -141,6 +144,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaGerarAtributosRequest,
     TormentaGerarAtributosResponse,
     TormentaIdiomaTabelaItem,
+    TormentaIniciativaRolarRequest,
+    TormentaIniciativaRolarResponse,
     TormentaKitInicialV13Opcoes,
     TormentaMagiaMbCatalogoItem,
     TormentaMagiaMbCatalogoPaginaResponse,
@@ -1106,6 +1111,91 @@ def rolar_pericia_mb(
 ) -> TormentaPericiaRolarResponse:
     data = rolar_teste_pericia(body.bonus, body.dc)
     return TormentaPericiaRolarResponse(**data)
+
+
+def _bonus_ataque_ficha(body: TormentaAtaqueRolarRequest) -> int:
+    if body.bonus is not None:
+        return int(body.bonus)
+    return (
+        int(body.bab)
+        + int(body.mod_atributo)
+        + int(body.bonus_arma)
+        + int(body.bonus_tamanho)
+        - int(body.penalidades)
+    )
+
+
+@router.post(
+    "/ataque/rolar",
+    response_model=TormentaAtaqueRolarResponse,
+    summary="Rola ataque 1d20 + bônus (opcional vs CA)",
+)
+def rolar_ataque_ficha_mb(
+    body: TormentaAtaqueRolarRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaAtaqueRolarResponse:
+    bonus = _bonus_ataque_ficha(body)
+    if body.ca_alvo is not None:
+        if body.bonus is not None:
+            raw = rolar_ataque(
+                0,
+                0,
+                bonus_arma=bonus,
+                ca_alvo=int(body.ca_alvo),
+            )
+        else:
+            raw = rolar_ataque(
+                int(body.bab),
+                int(body.mod_atributo),
+                bonus_arma=int(body.bonus_arma),
+                penalidades=int(body.penalidades),
+                bonus_tamanho=int(body.bonus_tamanho),
+                ca_alvo=int(body.ca_alvo),
+            )
+        return TormentaAtaqueRolarResponse(
+            d20=raw["d20"],
+            bonus=raw["bonus"],
+            total=raw["total"],
+            ca_alvo=raw["ca_alvo"],
+            acertou=raw["acertou"],
+            falha_critica=raw["falha_critica"],
+            ameaca_critica=raw["ameaca_critica"],
+            margem=raw["total"] - raw["ca_alvo"],
+        )
+    if body.bonus is not None:
+        raw = rolar_ataque(0, 0, bonus_arma=bonus, ca_alvo=0)
+    else:
+        raw = rolar_ataque(
+            int(body.bab),
+            int(body.mod_atributo),
+            bonus_arma=int(body.bonus_arma),
+            penalidades=int(body.penalidades),
+            bonus_tamanho=int(body.bonus_tamanho),
+            ca_alvo=0,
+        )
+    return TormentaAtaqueRolarResponse(
+        d20=raw["d20"],
+        bonus=raw["bonus"],
+        total=raw["total"],
+        ca_alvo=None,
+        acertou=None,
+        falha_critica=raw["falha_critica"],
+        ameaca_critica=raw["ameaca_critica"],
+        margem=None,
+    )
+
+
+@router.post(
+    "/iniciativa/rolar",
+    response_model=TormentaIniciativaRolarResponse,
+    summary="Rola iniciativa 1d20 + modificador de Destreza",
+)
+def rolar_iniciativa_ficha_mb(
+    body: TormentaIniciativaRolarRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaIniciativaRolarResponse:
+    data = rolar_iniciativa(body.mod_destreza)
+    return TormentaIniciativaRolarResponse(**data)
 
 
 @router.post(

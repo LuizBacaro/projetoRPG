@@ -207,7 +207,7 @@ class TormentaPersonagemTalentosService:
         )
         if dup:
             raise ArenaBaseException(
-                "Este talento ja esta vinculado ao personagem",
+                "Este talento já está vinculado ao personagem",
                 status_code=409,
             )
 
