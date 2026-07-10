@@ -381,3 +381,55 @@ def test_mestre_cria_handout_e_jogador_ve_revelado(tormenta_mestre_e_jogador_db)
     assert r_hide.status_code == 200
     r_vis2 = c_j.get("/api/v1/tormenta/campanhas/handouts/visiveis")
     assert all(h["id"] != hid for h in r_vis2.json())
+
+
+def test_convite_campanha_gerar_entrar_e_revogar(tormenta_mestre_e_jogador_db):
+    SessionLocal, mestre, jog = tormenta_mestre_e_jogador_db
+    c_mestre = _client(SessionLocal, _usuario(mestre))
+    c_jog = _client(SessionLocal, _usuario(jog))
+
+    p_jog = TormentaPersonagem(
+        dono_id=jog.id,
+        tipo="jogador",
+        nome="Convidado",
+        ficha_json={},
+    )
+    db = SessionLocal()
+    db.add(p_jog)
+    db.commit()
+    db.refresh(p_jog)
+    db.close()
+
+    cid = c_mestre.post(
+        "/api/v1/tormenta/campanhas",
+        json={"nome": "Mesa Convite", "descricao": "Teste T12k"},
+    ).json()["id"]
+
+    r_gen = c_mestre.post(f"/api/v1/tormenta/campanhas/{cid}/convite")
+    assert r_gen.status_code == 200
+    body = r_gen.json()
+    assert body["ativo"] is True
+    assert body["token"]
+    assert "convite=" in (body["url_path"] or "")
+    token = body["token"]
+
+    r_info = c_jog.get(f"/api/v1/tormenta/campanhas/convite/{token}")
+    assert r_info.status_code == 200
+    assert r_info.json()["nome"] == "Mesa Convite"
+
+    r_ent = c_jog.post(
+        f"/api/v1/tormenta/campanhas/convite/{token}/entrar",
+        json={"personagem_id": p_jog.id},
+    )
+    assert r_ent.status_code == 200
+    assert r_ent.json()["vinculado_direto"] is True
+
+    r_p = c_jog.get(f"/api/v1/tormenta/personagens/{p_jog.id}")
+    assert r_p.json()["campanha_id"] == cid
+
+    r_rev = c_mestre.delete(f"/api/v1/tormenta/campanhas/{cid}/convite")
+    assert r_rev.status_code == 200
+    assert r_rev.json()["ativo"] is False
+
+    r_info2 = c_jog.get(f"/api/v1/tormenta/campanhas/convite/{token}")
+    assert r_info2.status_code == 404

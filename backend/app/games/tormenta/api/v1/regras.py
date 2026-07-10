@@ -23,9 +23,11 @@ from app.games.tormenta.rules.catalogo_armaduras_t20 import (
     filtrar_armaduras_protecao_mb,
 )
 from app.games.tormenta.rules.catalogo_t20 import (
+    filtrar_bestiario_mb,
     filtrar_equipamentos_mb,
     filtrar_magias_mb,
     filtrar_talentos_mb,
+    obter_bestiario_mb_por_slug,
 )
 from app.games.tormenta.rules.classes_t20 import (
     lista_classes,
@@ -118,6 +120,9 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaAtaqueRolarRequest,
     TormentaAtaqueRolarResponse,
     TormentaBeneficioNivelMbItem,
+    TormentaBestiarioDetalheResponse,
+    TormentaBestiarioPaginaResponse,
+    TormentaBestiarioResumoItem,
     TormentaCargaDetalheItem,
     TormentaCargaPreviewRequest,
     TormentaCargaPreviewResponse,
@@ -522,6 +527,83 @@ def listar_catalogo_equipamentos(
         response.headers["X-Limit"] = str(limit)
     itens = [TormentaCatalogoItem.model_validate(r) for r in slice_rows]
     return TormentaCatalogoPaginaResponse(itens=itens, total=total)
+
+
+def _bestiario_resumo_de_row(row: dict) -> TormentaBestiarioResumoItem:
+    return TormentaBestiarioResumoItem.model_validate(
+        {
+            "id": row.get("id"),
+            "slug": row.get("slug"),
+            "nome": row.get("nome"),
+            "nd": row.get("nd"),
+            "tipo_criatura": row.get("tipo_criatura"),
+            "pv_max": row.get("pv_max"),
+            "ca": row.get("ca"),
+            "descricao_curta": row.get("descricao_curta"),
+        }
+    )
+
+
+def _bestiario_detalhe_de_row(row: dict) -> TormentaBestiarioDetalheResponse:
+    ataques = []
+    for i, raw in enumerate(row.get("ataques") or []):
+        if not isinstance(raw, dict):
+            continue
+        ataques.append(
+            {
+                "nome": str(raw.get("nome") or raw.get("arma") or f"Ataque {i + 1}"),
+                "bonus_ataque": str(
+                    raw.get("bonus_ataque")
+                    if raw.get("bonus_ataque") is not None
+                    else raw.get("teste") or "+0"
+                ),
+                "dano": str(raw.get("dano") or ""),
+            }
+        )
+    return TormentaBestiarioDetalheResponse.model_validate(
+        {
+            **{k: row.get(k) for k in row if k != "ataques"},
+            "ataques": ataques,
+        }
+    )
+
+
+@router.get(
+    "/bestiario",
+    response_model=TormentaBestiarioPaginaResponse,
+    summary="Catálogo stub MB de criaturas (busca e paginação)",
+)
+def listar_catalogo_bestiario(
+    q: Optional[str] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=200),
+    response: Response = None,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaBestiarioPaginaResponse:
+    slice_rows, total = filtrar_bestiario_mb(q, skip, limit)
+    if response is not None:
+        response.headers["X-Total-Count"] = str(total)
+        response.headers["X-Skip"] = str(skip)
+        response.headers["X-Limit"] = str(limit)
+    itens = [_bestiario_resumo_de_row(r) for r in slice_rows]
+    return TormentaBestiarioPaginaResponse(itens=itens, total=total)
+
+
+@router.get(
+    "/bestiario/{slug}",
+    response_model=TormentaBestiarioDetalheResponse,
+    summary="Detalhe de uma criatura do bestiário stub",
+)
+def obter_catalogo_bestiario(
+    slug: str,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaBestiarioDetalheResponse:
+    row = obter_bestiario_mb_por_slug(slug)
+    if not row:
+        raise HTTPException(
+            status_code=404, detail="Criatura não encontrada no bestiário"
+        )
+    return _bestiario_detalhe_de_row(row)
 
 
 @router.get(

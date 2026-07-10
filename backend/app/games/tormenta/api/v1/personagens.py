@@ -47,6 +47,7 @@ from app.games.tormenta.schemas.magia_personagem import (
     TormentaMigrarMagiasJsonResponse,
 )
 from app.games.tormenta.schemas.personagem import (
+    TormentaBestiarioImportRequest,
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
     TormentaPersonagemUpdate,
@@ -735,6 +736,26 @@ def criar(
 ):
     try:
         return service.criar(usuario_atual, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        code = getattr(e, "status_code", 400)
+        raise HTTPException(status_code=code, detail=getattr(e, "message", str(e)))
+
+
+@router.post(
+    "/importar-bestiario",
+    response_model=TormentaPersonagemResponse,
+    status_code=201,
+    summary="Importar criatura do catálogo stub para combatente (RF-T12g)",
+)
+def importar_bestiario(
+    payload: TormentaBestiarioImportRequest,
+    service: TormentaPersonagemService = Depends(get_tormenta_personagem_service),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        return service.importar_do_bestiario(usuario_atual, payload)
     except DadosInvalidos as e:
         raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:

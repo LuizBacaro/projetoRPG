@@ -123,6 +123,15 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao criar personagem');
     }
 
+    async importarBestiario(payload) {
+        const res = await fetch(this._url('/importar-bestiario'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload),
+        });
+        return this._handleResponse(res, 'Erro ao importar criatura');
+    }
+
     async atualizar(id, payload) {
         const res = await fetch(this._url(`/${id}`), {
             method: 'PATCH',

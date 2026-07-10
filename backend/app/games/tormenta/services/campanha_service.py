@@ -1,5 +1,8 @@
 """Regras de negócio — campanhas Tormenta 20."""
 
+from __future__ import annotations
+
+import secrets
 from typing import List
 
 from app.games.tormenta.models.campanha import TormentaCampanha
@@ -8,6 +11,9 @@ from app.games.tormenta.repositories.campanha_repository import (
 )
 from app.games.tormenta.repositories.personagem_repository import (
     TormentaPersonagemRepository,
+)
+from app.games.tormenta.schemas.campanha_convite import (
+    TormentaCampanhaConviteStatusResponse,
 )
 from app.repositories.base import commit_with_rollback
 from app.shared.exceptions.custom_exceptions import ArenaBaseException, DadosInvalidos
@@ -187,3 +193,54 @@ class TormentaCampanhaService:
             personagem.campanha_id = campanha_id
         if commit:
             commit_with_rollback(self.campanha_repository.db)
+
+    @staticmethod
+    def _url_path_convite(token: str) -> str:
+        return f"dashboard.html?convite={token}"
+
+    def obter_status_convite(
+        self, campanha_id: int, usuario_id: int, perfil: PerfilUsuario
+    ) -> TormentaCampanhaConviteStatusResponse:
+        campanha = self._campanha_gestao(campanha_id, usuario_id, perfil)
+        token = campanha.convite_token if campanha.convite_ativo else None
+        return TormentaCampanhaConviteStatusResponse(
+            campanha_id=campanha.id,
+            ativo=bool(campanha.convite_ativo and campanha.convite_token),
+            token=token,
+            url_path=self._url_path_convite(token) if token else None,
+        )
+
+    def gerar_convite(
+        self, campanha_id: int, usuario_id: int, perfil: PerfilUsuario
+    ) -> TormentaCampanhaConviteStatusResponse:
+        campanha = self._campanha_gestao(campanha_id, usuario_id, perfil)
+        for _ in range(8):
+            token = secrets.token_urlsafe(32)
+            existente = self.campanha_repository.obter_por_convite_token(token)
+            if existente and existente.id != campanha.id:
+                continue
+            campanha.convite_token = token
+            campanha.convite_ativo = True
+            self.campanha_repository.update(campanha)
+            return TormentaCampanhaConviteStatusResponse(
+                campanha_id=campanha.id,
+                ativo=True,
+                token=token,
+                url_path=self._url_path_convite(token),
+            )
+        raise ArenaBaseException(
+            "Nao foi possivel gerar token de convite", status_code=500
+        )
+
+    def revogar_convite(
+        self, campanha_id: int, usuario_id: int, perfil: PerfilUsuario
+    ) -> TormentaCampanhaConviteStatusResponse:
+        campanha = self._campanha_gestao(campanha_id, usuario_id, perfil)
+        campanha.convite_ativo = False
+        self.campanha_repository.update(campanha)
+        return TormentaCampanhaConviteStatusResponse(
+            campanha_id=campanha.id,
+            ativo=False,
+            token=None,
+            url_path=None,
+        )
