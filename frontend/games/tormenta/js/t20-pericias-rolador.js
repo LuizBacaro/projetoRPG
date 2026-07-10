@@ -136,7 +136,7 @@
         return raw;
     }
 
-    async function calcularBonusLinha(tr) {
+    function buildBonusBody(tr) {
         const nomeEl = tr.querySelector('.t20-p-nome');
         const nome = nomeEl ? nomeEl.textContent.trim() : '';
         const treinado = Boolean(tr.querySelector('.p-treinado')?.checked);
@@ -172,8 +172,19 @@
         } else {
             body.penalidade_armadura = 0;
         }
-        const res = await regras().calcularBonusPericia(body);
+        return body;
+    }
+
+    async function calcularBonusLinha(tr) {
+        const res = await regras().calcularBonusPericia(buildBonusBody(tr));
         return res;
+    }
+
+    async function calcularBonusLote(trs) {
+        const rows = Array.isArray(trs) ? trs : [];
+        if (!rows.length) return [];
+        const bodies = rows.map((tr) => buildBonusBody(tr));
+        return regras().calcularBonusPericiaLote(bodies);
     }
 
     async function rolarPericia(tr) {
@@ -291,7 +302,9 @@
     }
 
     window.T20PericiasRolador = {
+        buildBonusBody,
         calcularBonusLinha,
+        calcularBonusLote,
         encontrarLinhaPorSlug,
         encontrarLinhaPorNome,
         rolarPericia,

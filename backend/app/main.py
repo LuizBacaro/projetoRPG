@@ -847,6 +847,10 @@ def _inicializar_banco_schema_guards() -> None:
             _garantir_colunas_armaduras_protecao,
         ),
         (
+            "garantir_colunas_tormenta_campanha_convite",
+            _garantir_colunas_tormenta_campanha_convite,
+        ),
+        (
             "garantir_coluna_pericia_destaque_arena",
             _garantir_coluna_pericia_destaque_arena,
         ),
@@ -1342,6 +1346,41 @@ def _garantir_colunas_perfil_divino() -> None:
             conn.execute(
                 text(
                     f"ALTER TABLE combatentes ADD COLUMN {coluna} {tipo_sql} DEFAULT ''"
+                )
+            )
+
+
+def _garantir_colunas_tormenta_campanha_convite() -> None:
+    """RF-T12k — colunas de convite em tormenta_campanhas (bancos sem migration p1q2)."""
+    inspector = inspect(engine)
+    if "tormenta_campanhas" not in set(inspector.get_table_names()):
+        return
+    colunas = {col["name"] for col in inspector.get_columns("tormenta_campanhas")}
+    with engine.begin() as conn:
+        if "convite_token" not in colunas:
+            logger.warning(
+                "⚠️  coluna tormenta_campanhas.convite_token ausente; aplicando schema guard"
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE tormenta_campanhas ADD COLUMN convite_token VARCHAR(64)"
+                )
+            )
+        if "convite_ativo" not in colunas:
+            logger.warning(
+                "⚠️  coluna tormenta_campanhas.convite_ativo ausente; aplicando schema guard"
+            )
+            conn.execute(
+                text(
+                    "ALTER TABLE tormenta_campanhas ADD COLUMN convite_ativo BOOLEAN NOT NULL DEFAULT false"
+                )
+            )
+        indexes = {idx["name"] for idx in inspector.get_indexes("tormenta_campanhas")}
+        if "ix_tormenta_campanhas_convite_token" not in indexes:
+            conn.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS ix_tormenta_campanhas_convite_token "
+                    "ON tormenta_campanhas (convite_token)"
                 )
             )
 
