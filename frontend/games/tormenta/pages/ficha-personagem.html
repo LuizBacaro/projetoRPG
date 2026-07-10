@@ -1562,7 +1562,7 @@
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
-<script src="/games/tormenta/js/t20-ficha-campanha-solicitacao.js?v=20260707solic"></script>
+<script src="/games/tormenta/js/t20-ficha-campanha-solicitacao.js?v=20260710solic"></script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260710g"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
@@ -2511,12 +2511,18 @@
             __t20CampanhaNomeFicha = __t20CampanhaNomeFicha || '';
         }
         const vinculoId = p.campanha_id != null ? Number(p.campanha_id) : null;
+        const uid = AuthService.getUsuario && AuthService.getUsuario()?.id;
+        const souDono =
+            uid != null &&
+            p.dono_id != null &&
+            Number(uid) === Number(p.dono_id);
         await window.T20FichaCampanhaSolicitacao.init({
             getPersonagemId: () => {
                 const v = q('fichaId') && q('fichaId').value.trim();
                 return v ? Number(v) : null;
             },
             getCampanhaIdVinculada: () => vinculoId,
+            souDono,
             onCampanhaNomeChange: (nome) => {
                 __t20CampanhaNomeFicha = nome || '';
                 atualizarTagsHeader();
