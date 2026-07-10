@@ -522,6 +522,37 @@ def test_criar_monstro_dez_em_todos_ok(tormenta_personagens_db):
     assert r.json()["for_valor"] == 10
 
 
+def test_importar_bestiario_cria_monstro_com_ataques(tormenta_personagens_db):
+    SessionLocal, _, _, u_mestre = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u_mestre))
+    r = client.post(
+        "/api/v1/tormenta/personagens/importar-bestiario",
+        json={"slug": "goblin", "tipo": "monstro"},
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["tipo"] == "monstro"
+    assert body["nome"] == "Goblin"
+    assert body["pv_max"] == 4
+    assert body["ca"] == 14
+    fj = body.get("ficha_json") or {}
+    assert fj.get("bestiario_slug") == "goblin"
+    ataques = fj.get("ataques") or []
+    assert len(ataques) == 2
+    assert ataques[0]["nome"] == "Machado"
+
+
+def test_importar_bestiario_jogador_rejeita(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens/importar-bestiario",
+        json={"slug": "lobo", "tipo": "monstro"},
+    )
+    assert r.status_code == 422
+    assert "mestre" in r.json().get("detail", "").lower()
+
+
 def test_patch_jogador_atributos_compra_ultrapassa_rejeita(tormenta_personagens_db):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))

@@ -12,6 +12,7 @@ _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _EQUIP_JSON = _DATA_DIR / "equipamentos_mb_catalogo.json"
 _TALENT_JSON = _DATA_DIR / "talentos_mb_catalogo.json"
 _MAGIAS_JSON = _DATA_DIR / "magias_mb_catalogo.json"
+_BESTIARIO_JSON = _DATA_DIR / "bestiario_mb_stub.json"
 
 _MAGIA_FIELD_LIMITS: Dict[str, int] = {
     "slug": 80,
@@ -614,6 +615,77 @@ def filtrar_magias_mb(
     if escola is not None and str(escola).strip():
         en = str(escola).strip().lower()
         rows = [r for r in rows if en in str(r.get("escola") or "").lower()]
+    for i, item in enumerate(rows, start=1):
+        item["id"] = i
+    total = len(rows)
+    s = max(0, int(skip))
+    lim = max(1, min(200, int(limit)))
+    return rows[s : s + lim], total
+
+
+@lru_cache(maxsize=1)
+def _carregar_bestiario_mb() -> List[Dict[str, Any]]:
+    if not _BESTIARIO_JSON.is_file():
+        return []
+    try:
+        raw = json.loads(_BESTIARIO_JSON.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    rows = raw.get("criaturas") if isinstance(raw, dict) else raw
+    if not isinstance(rows, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        slug = str(row.get("slug") or "").strip()
+        nome = str(row.get("nome") or "").strip()
+        if not slug or not nome:
+            continue
+        item = dict(row)
+        item["slug"] = slug
+        item["nome"] = nome
+        out.append(item)
+    return out
+
+
+def lista_bestiario_mb_catalogo() -> List[Dict[str, Any]]:
+    """Lista completa do bestiário stub MB."""
+    return [dict(r) for r in _carregar_bestiario_mb()]
+
+
+def obter_bestiario_mb_por_slug(slug: str) -> Optional[Dict[str, Any]]:
+    s = str(slug or "").strip().lower()
+    if not s:
+        return None
+    for row in _carregar_bestiario_mb():
+        if str(row.get("slug", "")).strip().lower() == s:
+            return dict(row)
+    return None
+
+
+def _score_busca_bestiario(qn: str, row: Dict[str, Any]) -> tuple[int, str]:
+    nome = str(row.get("nome", "")).lower()
+    slug = str(row.get("slug", "")).lower()
+    tipo = str(row.get("tipo_criatura", "")).lower()
+    if nome == qn or slug == qn:
+        return (0, nome)
+    if nome.startswith(qn) or slug.startswith(qn):
+        return (1, nome)
+    if qn in nome or qn in slug or qn in tipo:
+        return (2, nome)
+    return (99, nome)
+
+
+def filtrar_bestiario_mb(
+    q: str | None, skip: int, limit: int
+) -> Tuple[List[Dict[str, Any]], int]:
+    rows = [dict(r) for r in lista_bestiario_mb_catalogo()]
+    qn = (q or "").strip().lower()
+    if qn:
+        filtrados = [r for r in rows if _score_busca_bestiario(qn, r)[0] < 99]
+        filtrados.sort(key=lambda r: _score_busca_bestiario(qn, r))
+        rows = filtrados
     for i, item in enumerate(rows, start=1):
         item["id"] = i
     total = len(rows)

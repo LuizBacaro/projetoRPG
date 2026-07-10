@@ -14,6 +14,7 @@ from app.games.tormenta.rules.atributos_t20 import (
     pontos_iniciais_compra,
     validar_valores_base_4d6,
 )
+from app.games.tormenta.rules.bestiario_import_t20 import criar_payload_import_bestiario
 from app.games.tormenta.rules.classes_t20 import validar_compatibilidade_classes_v13
 from app.games.tormenta.rules.conjuracao_t20 import (
     classe_conjuracao_mb_registrada,
@@ -38,6 +39,7 @@ from app.games.tormenta.rules.regra_versao_t20 import (
 )
 from app.games.tormenta.rules.tendencias_divindades_t20 import validar_devocao_v13
 from app.games.tormenta.schemas.personagem import (
+    TormentaBestiarioImportRequest,
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
     TormentaPersonagemUpdate,
@@ -745,6 +747,19 @@ class TormentaPersonagemService:
         commit_with_rollback(self.repo.db)
         self.repo.db.refresh(ent)
         return self._para_resposta(ent)
+
+    def importar_do_bestiario(
+        self, usuario: Usuario, payload: TormentaBestiarioImportRequest
+    ) -> TormentaPersonagemResponse:
+        if not self._usuario_pode_mestrar_tormenta(usuario):
+            raise DadosInvalidos("Somente mestre pode importar criaturas do bestiário")
+        create_payload = criar_payload_import_bestiario(
+            payload.slug,
+            tipo=payload.tipo,
+            campanha_id=payload.campanha_id,
+            nome_override=payload.nome_override,
+        )
+        return self.criar(usuario, create_payload)
 
     def atualizar(
         self, personagem_id: int, payload: TormentaPersonagemUpdate

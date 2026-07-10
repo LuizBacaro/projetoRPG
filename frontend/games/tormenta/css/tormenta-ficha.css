@@ -946,6 +946,20 @@
     border-bottom-width: 2px;
 }
 
+.t20-ficha-header__acoes {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+    width: 100%;
+    min-width: 8.5rem;
+}
+
+.t20-ficha-header__acoes .tormenta-btn {
+    width: 100%;
+    justify-content: center;
+}
+
 /* Rodapé da planilha (espelho leve do header) — descrição & narrativa */
 .t20-ficha-footer-dndlike {
     margin-top: 0.65rem;
@@ -1479,9 +1493,11 @@
         flex-direction: column;
     }
 
-    .t20-btn-editar-ficha {
-        width: 100%;
+    .t20-ficha-header__acoes {
+        min-width: 0;
         max-width: 14rem;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 

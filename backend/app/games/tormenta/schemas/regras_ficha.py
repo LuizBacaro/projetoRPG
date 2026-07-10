@@ -481,6 +481,54 @@ class TormentaCatalogoPaginaResponse(BaseModel):
     )
 
 
+class TormentaBestiarioAtaqueItem(BaseModel):
+    nome: str = Field(..., max_length=120)
+    bonus_ataque: str = Field(default="+0", max_length=20)
+    dano: str = Field(default="", max_length=80)
+
+
+class TormentaBestiarioResumoItem(BaseModel):
+    id: int = Field(..., ge=1)
+    slug: str = Field(..., max_length=80)
+    nome: str = Field(..., max_length=200)
+    nd: Optional[int] = Field(default=None, ge=0, le=50)
+    tipo_criatura: Optional[str] = Field(default=None, max_length=80)
+    pv_max: Optional[int] = Field(default=None, ge=0, le=9999)
+    ca: Optional[int] = Field(default=None, ge=0, le=99)
+    descricao_curta: Optional[str] = Field(default=None, max_length=500)
+
+
+class TormentaBestiarioPaginaResponse(BaseModel):
+    itens: List[TormentaBestiarioResumoItem]
+    total: int = Field(..., ge=0)
+
+
+class TormentaBestiarioDetalheResponse(BaseModel):
+    slug: str = Field(..., max_length=80)
+    nome: str = Field(..., max_length=200)
+    nd: Optional[int] = Field(default=None, ge=0, le=50)
+    tipo_criatura: Optional[str] = Field(default=None, max_length=80)
+    nivel: int = Field(default=1, ge=0, le=40)
+    for_valor: int = Field(default=10, ge=-99, le=99)
+    des_valor: int = Field(default=10, ge=-99, le=99)
+    con_valor: int = Field(default=10, ge=-99, le=99)
+    int_valor: int = Field(default=10, ge=-99, le=99)
+    sab_valor: int = Field(default=10, ge=-99, le=99)
+    car_valor: int = Field(default=10, ge=-99, le=99)
+    pv_max: int = Field(default=1, ge=0, le=9999)
+    ca: int = Field(default=10, ge=0, le=99)
+    iniciativa: int = Field(default=0, ge=-99, le=99)
+    deslocamento: str = Field(default="", max_length=80)
+    tamanho: str = Field(default="", max_length=80)
+    fort_total: int = Field(default=0, ge=-99, le=99)
+    ref_total: int = Field(default=0, ge=-99, le=99)
+    von_total: int = Field(default=0, ge=-99, le=99)
+    rd: str = Field(default="", max_length=80)
+    ataques: List[TormentaBestiarioAtaqueItem] = Field(default_factory=list)
+    descricao_curta: Optional[str] = Field(default=None, max_length=500)
+    pagina_referencia: Optional[str] = Field(default=None, max_length=80)
+
+
 class TormentaArmaduraCatalogoItem(BaseModel):
     """Item do catálogo de armadura / proteção (Tormenta 20 — livro base)."""
 
