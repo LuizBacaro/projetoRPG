@@ -299,17 +299,90 @@ def niveis_multiclasse_v13_de_ficha(
     return []
 
 
-def _pv_contribuicao_classe_v13(
-    slug: str, nivel: int, *, primaria: bool
-) -> Optional[int]:
-    row = classe_por_slug(slug, REGRA_VERSAO_V13)
-    if not row or nivel < 1:
-        return None
-    pv_ini = int(row.get("pv_inicial", 8) or 8)
-    pv_pn = int(row.get("pv_por_nivel", 2) or 0)
-    if primaria:
-        return pv_ini + max(0, nivel - 1) * pv_pn
-    return nivel * pv_pn
+def preview_pv_multiclasse_v13(
+    classes: List[Dict[str, Any]],
+    con_valor: int,
+    slug_primario: str,
+) -> Dict[str, Any]:
+    """Breakdown PV máximos v1.3 multiclasse (p.34)."""
+    niveis_map = _niveis_por_classe_de_lista(classes)
+    mod_con = contribuicao_atributo_t20(int(con_valor), REGRA_VERSAO_V13)
+    if not niveis_map:
+        return {
+            "regra_versao": REGRA_VERSAO_V13,
+            "encontrado": False,
+            "pv_max": None,
+            "mod_con": mod_con,
+            "contrib_constituicao": 0,
+            "breakdown": [],
+            "formula": "",
+            "nivel_total_classes": 0,
+            "slug_primario": str(slug_primario or "").strip().lower(),
+        }
+    pri = str(slug_primario or "").strip().lower()
+    breakdown: List[Dict[str, Any]] = []
+    partes: List[str] = []
+    base = 0
+    total_nv = 0
+    todas_ok = True
+    for slug in sorted(niveis_map.keys()):
+        nv = niveis_map[slug]
+        row = classe_por_slug(slug, REGRA_VERSAO_V13)
+        primaria = slug == pri
+        if not row:
+            todas_ok = False
+            breakdown.append(
+                {
+                    "slug": slug,
+                    "nome": slug,
+                    "nivel": nv,
+                    "primaria": primaria,
+                    "pv_inicial": None,
+                    "pv_por_nivel": None,
+                    "pv_classe": None,
+                }
+            )
+            continue
+        pv_ini = int(row.get("pv_inicial", 8) or 8)
+        pv_pn = int(row.get("pv_por_nivel", 2) or 0)
+        if primaria:
+            pv_classe = pv_ini + max(0, nv - 1) * pv_pn
+            partes.append(
+                f"{row.get('nome', slug)} {pv_ini}+{max(0, nv - 1)}×{pv_pn}={pv_classe}"
+            )
+        else:
+            pv_classe = nv * pv_pn
+            partes.append(f"{row.get('nome', slug)} {nv}×{pv_pn}={pv_classe}")
+        base += pv_classe
+        total_nv += nv
+        breakdown.append(
+            {
+                "slug": slug,
+                "nome": str(row.get("nome", slug)),
+                "nivel": nv,
+                "primaria": primaria,
+                "pv_inicial": pv_ini if primaria else None,
+                "pv_por_nivel": pv_pn,
+                "pv_classe": pv_classe,
+            }
+        )
+    de_con = total_nv * mod_con
+    pv_max = base + de_con if todas_ok and breakdown else None
+    formula = ""
+    if partes and pv_max is not None:
+        con_txt = f"{total_nv}×{mod_con}" if mod_con != 0 else f"{total_nv}×CON"
+        formula = " + ".join(partes) + f" + {con_txt} = {pv_max} PV"
+    return {
+        "regra_versao": REGRA_VERSAO_V13,
+        "encontrado": pv_max is not None,
+        "pv_max": pv_max,
+        "mod_con": mod_con,
+        "contrib_constituicao": de_con,
+        "breakdown": breakdown,
+        "formula": formula,
+        "nivel_total_classes": total_nv,
+        "slug_primario": pri,
+    }
 
 
 def pv_maximos_v13_multiclasse(
@@ -318,17 +391,5 @@ def pv_maximos_v13_multiclasse(
     slug_primario: str,
 ) -> Optional[int]:
     """PV máximos v1.3 multiclasse — soma por classe + CON × nível total (p.34)."""
-    niveis_map = _niveis_por_classe_de_lista(classes)
-    if not niveis_map:
-        return None
-    pri = str(slug_primario or "").strip().lower()
-    base = 0
-    total_nv = 0
-    for slug, nv in niveis_map.items():
-        contrib = _pv_contribuicao_classe_v13(slug, nv, primaria=(slug == pri))
-        if contrib is None:
-            return None
-        base += contrib
-        total_nv += nv
-    mod_con = contribuicao_atributo_t20(int(con_valor), REGRA_VERSAO_V13)
-    return base + total_nv * mod_con
+    prev = preview_pv_multiclasse_v13(classes, con_valor, slug_primario)
+    return prev.get("pv_max")

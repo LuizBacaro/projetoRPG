@@ -102,7 +102,7 @@ Escolha de caminho **irreversível** na criação (`ficha_json.caminho_arcanista
 |------|--------|
 | `classes_v13.json` (14 classes) | **Feito** |
 | API `GET /regras/classes?regra_versao=v13` | **Feito** |
-| PV automático por fórmula v1.3 | **Feito** | `progressao_pv_t20.py`, botão Calcular PV, wizard |
+| PV automático por fórmula v1.3 | **Feito** | `progressao_pv_t20.py`, cálculo automático na ficha, wizard |
 | PM/nível por classe (todas as classes) | **Feito** | `conjuracao_classe_v13.json` + preview |
 | Arcanista 3 caminhos | **Feito** | Wizard + ficha + validação salvar |
 | Bucaneiro, Caçador, Cavaleiro, Inventor, Lutador, Nobre | **Feito** | `classes_v13.json` |

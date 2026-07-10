@@ -903,6 +903,35 @@ class TormentaPmMulticlassePreviewResponse(BaseModel):
     nivel_total_classes: int = Field(default=0, ge=0, le=800)
 
 
+class TormentaPvMulticlasseLinha(BaseModel):
+    slug: str = Field(..., max_length=40)
+    nome: str = Field(default="", max_length=80)
+    nivel: int = Field(..., ge=1, le=40)
+    primaria: bool = False
+    pv_inicial: Optional[int] = Field(default=None, ge=1, le=99)
+    pv_por_nivel: Optional[int] = Field(default=None, ge=0, le=30)
+    pv_classe: Optional[int] = Field(default=None, ge=0, le=999)
+
+
+class TormentaPvMulticlassePreviewRequest(BaseModel):
+    classes: List[TormentaMulticlasseClasseItem] = Field(default_factory=list)
+    slug_primario: str = Field(..., min_length=1, max_length=40)
+    con_valor: int = Field(default=0, ge=-99, le=99)
+    regra_versao: Optional[str] = Field(default=None, max_length=8)
+
+
+class TormentaPvMulticlassePreviewResponse(BaseModel):
+    regra_versao: str = Field(default="v13", max_length=8)
+    encontrado: bool = True
+    pv_max: Optional[int] = Field(default=None, ge=1, le=999)
+    mod_con: int = Field(default=0, ge=-99, le=99)
+    contrib_constituicao: int = Field(default=0, ge=-999, le=999)
+    breakdown: List[TormentaPvMulticlasseLinha] = Field(default_factory=list)
+    formula: str = Field(default="", max_length=500)
+    nivel_total_classes: int = Field(default=0, ge=0, le=800)
+    slug_primario: str = Field(default="", max_length=40)
+
+
 class TormentaDinheiroInicialResponse(BaseModel):
     regra_versao: str = Field(default="v13", max_length=8)
     nivel: int = Field(..., ge=1, le=40)
