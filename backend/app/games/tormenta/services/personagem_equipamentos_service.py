@@ -100,7 +100,7 @@ class TormentaPersonagemEquipamentosService:
         )
         if dup:
             raise ArenaBaseException(
-                "Este equipamento ja esta no inventario do personagem",
+                "Este equipamento já está no inventário do personagem",
                 status_code=409,
             )
 

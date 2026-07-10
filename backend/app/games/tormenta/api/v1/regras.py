@@ -18,7 +18,7 @@ from app.games.tormenta.rules.atributos_t20 import (
     valores_4d6_para_mapa,
 )
 from app.games.tormenta.rules.beneficios_nivel_t20 import lista_beneficios_por_nivel
-from app.games.tormenta.rules.carga_t20 import preview_carga_v13
+from app.games.tormenta.rules.carga_t20 import PENALIDADE_SOBRECARGA, preview_carga_v13
 from app.games.tormenta.rules.catalogo_armaduras_t20 import (
     filtrar_armaduras_protecao_mb,
 )

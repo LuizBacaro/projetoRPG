@@ -33,7 +33,7 @@ Objetivo: mesa mais fluida (menos digitação manual, mais regras aplicadas na U
 | PV automático por classe/CON | **Feito** — cálculo local na ficha (`t20-progressao-pv.js`) |
 | PM multiclasse | **Feito** — `multiclasse_v13` + preview API |
 | Arena combate | **Parcial** — iniciativa, ataque, dano, condições MB, concentração |
-| Drag-and-drop compendium → ficha | **Não feito** |
+| Drag-and-drop compendium → ficha | **Feito** (equip, poder, magia, consumível) |
 | Handouts / revelar para jogadores | **Não feito** |
 | Sincronização ficha ↔ arena tempo real | **Parcial** (D&D 3.5 `BroadcastChannel`; Tormenta limitado) |
 | Mapa / tokens / iluminação | **Fora de escopo** neste RF |
@@ -73,10 +73,12 @@ Objetivo: mesa mais fluida (menos digitação manual, mais regras aplicadas na U
 
 ### RF-T12b — Drag-and-drop compendium (detalhe)
 
-- Modais existentes (equipamentos, poderes, grimório) aceitam **arrastar** item da lista para zona de destino na ficha.
-- Payload mínimo: `slug` + metadados do catálogo; vínculo persiste em SQL ou `ficha_json` conforme tipo.
-- Fallback: duplo clique ou botão «Adicionar» (já existente) permanece.
-- Não exige painel Roll20-style separado; reutilizar overlays Tormenta (`is-open`).
+- Modais existentes (equipamentos, poderes, grimório, consumíveis) aceitam **arrastar** item da lista para zona de destino na ficha.
+- **Duplo clique** na linha do catálogo equivale ao botão «Adicionar».
+- Zonas de drop: `#fichaEquipamentos`, `#t20FichaTalentosMb`, `#t20FichaConsumiveis`, `#t20GrimorioDropZone`, `#grimorioTormentaListaVinculos`.
+- Payload mínimo: `nome` / `slug` + metadados do catálogo; vínculo persiste via handlers existentes (`adicionarEquip…`, `adicionarTalento`, `grimorioSvc.adicionarVinculo`).
+- Fallback: botão «Adicionar» e fluxo modal permanecem.
+- Implementação: `frontend/games/tormenta/js/t20-compendium-dnd.js`.
 
 ### RF-T12c — Rolagem contextual (detalhe)
 
@@ -106,7 +108,7 @@ Objetivo: mesa mais fluida (menos digitação manual, mais regras aplicadas na U
 | Item | Estado |
 |------|--------|
 | RF-T12a breakdown | **Feito** | PV, CA, perícias (Σ) e ataques (`t20-breakdown-ficha.js`) |
-| RF-T12b DnD compendium | **Não feito** |
+| RF-T12b DnD compendium | **Feito** | Equipamento, poder/talento, magia (grimório), consumível; duplo clique; `t20-compendium-dnd.js` |
 | RF-T12c Rolagem contextual | **Feito** (ficha) | Perícias, planilha/arma, iniciativa; log `#fichaUltimaRolagem`; arena já tinha modais |
 | RF-T12d Condições → rolagens | **Parcial** | Motor ataque/CA; arena Tormenta |
 | RF-T12e NPC compacto | **Não feito** |
