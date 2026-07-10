@@ -613,3 +613,5 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao validar pré-requisitos do poder');
     }
 }
+
+window.TormentaRegrasService = TormentaRegrasService;
