@@ -85,6 +85,15 @@ class TormentaCombateService {
         return this._handleResponse(res, 'Erro ao rolar iniciativa');
     }
 
+    async aplicarIniciativaManual(porPersonagem) {
+        const res = await fetch(this._url('/aplicar-iniciativa-manual'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify({ por_personagem: porPersonagem }),
+        });
+        return this._handleResponse(res, 'Erro ao aplicar iniciativa manual');
+    }
+
     async rolarAtaque(payload) {
         const res = await fetch(this._url('/rolar-ataque'), {
             method: 'POST',

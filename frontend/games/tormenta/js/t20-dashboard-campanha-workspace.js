@@ -30,6 +30,7 @@
         function esconderTodosPanes() {
             document.getElementById('t20campSubabaCadastro')?.classList.remove('t20-camp-subaba-pane--active');
             document.getElementById('t20campSubabaSessoes')?.classList.remove('t20-camp-subaba-pane--active');
+            document.getElementById('t20campSubabaHandouts')?.classList.remove('t20-camp-subaba-pane--active');
             document.getElementById('t20campSubabaWorkspace')?.classList.remove('t20-camp-subaba-pane--active');
         }
 
@@ -54,6 +55,15 @@
                 document.getElementById('t20campSubabaSessoes')?.classList.add('t20-camp-subaba-pane--active');
                 campanhaMesaAtivaId = null;
                 if (onSairCampanha) onSairCampanha();
+                return;
+            }
+            if (which === 'handouts') {
+                document.getElementById('t20campSubabaHandouts')?.classList.add('t20-camp-subaba-pane--active');
+                campanhaMesaAtivaId = null;
+                if (onSairCampanha) onSairCampanha();
+                if (global.__t20DashHandouts && global.__t20DashHandouts.carregarHandouts) {
+                    void global.__t20DashHandouts.carregarHandouts();
+                }
                 return;
             }
             if (which.startsWith('mesa-')) {

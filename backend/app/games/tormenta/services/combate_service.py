@@ -189,11 +189,9 @@ class TormentaCombateService:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         return p
 
-    def _mods_condicoes_personagem(
+    def _rotulos_condicoes_personagem(
         self, combate: TormentaCombate, pid: int
-    ) -> Dict[str, int]:
-        from app.games.tormenta.rules.combate_t20 import modificadores_de_condicoes_mb
-
+    ) -> List[str]:
         raw = (
             combate.condicoes_mb_json
             if isinstance(combate.condicoes_mb_json, dict)
@@ -203,7 +201,16 @@ class TormentaCombateService:
         rotulos = entry.get("rotulos") if isinstance(entry, dict) else []
         if not isinstance(rotulos, list):
             rotulos = []
-        return modificadores_de_condicoes_mb([str(x) for x in rotulos])
+        return [str(x) for x in rotulos if str(x).strip()]
+
+    def _mods_condicoes_personagem(
+        self, combate: TormentaCombate, pid: int
+    ) -> Dict[str, int]:
+        from app.games.tormenta.rules.combate_t20 import modificadores_de_condicoes_mb
+
+        return modificadores_de_condicoes_mb(
+            self._rotulos_condicoes_personagem(combate, pid)
+        )
 
     def rolar_iniciativa_combate(self, personagem_ids: List[int]) -> Dict[str, Any]:
         from app.games.tormenta.rules.atributos_t20 import contribuicao_atributo_t20
@@ -216,14 +223,56 @@ class TormentaCombateService:
             p = self._personagem_no_combate(combate, int(pid))
             rv = regra_versao_de_ficha(p.ficha_json)
             des_mod = contribuicao_atributo_t20(int(p.des_valor or 10), rv)
-            roll = rolar_iniciativa(des_mod)
+            mods = self._mods_condicoes_personagem(combate, int(pid))
+            mod_cond = int(mods.get("iniciativa", 0))
+            roll = rolar_iniciativa(des_mod + mod_cond)
             p.iniciativa = int(roll["total"])
             self.personagem_repo.update(p)
             resultados.append(
                 {
                     "personagem_id": p.id,
                     "nome": p.nome,
+                    "modificador_condicoes": mod_cond,
                     **roll,
+                }
+            )
+        resultados.sort(key=lambda x: (-x["total"], (x.get("nome") or "").lower()))
+        ordenados = [r["personagem_id"] for r in resultados]
+        combate.personagens_ids = ordenados
+        combate.turno_atual = 0
+        self.combate_repo.update(combate)
+        return {"resultados": resultados, "ordem": ordenados}
+
+    def aplicar_iniciativa_manual(
+        self, por_personagem: Dict[str, int]
+    ) -> Dict[str, Any]:
+        combate = self._exigir_combate_ativo()
+        ids_combate = [int(x) for x in (combate.personagens_ids or [])]
+        if not ids_combate:
+            raise DadosInvalidos("Nenhum combatente no combate ativo.")
+
+        enviados = {int(k) for k in por_personagem.keys()}
+        esperados = set(ids_combate)
+        faltando = esperados - enviados
+        if faltando:
+            raise DadosInvalidos(
+                "Informe a iniciativa de todos os combatentes na arena."
+            )
+        extras = enviados - esperados
+        if extras:
+            raise DadosInvalidos("Há personagens fora do combate ativo.")
+
+        resultados: List[Dict[str, Any]] = []
+        for pid in ids_combate:
+            total = int(por_personagem[str(pid)])
+            p = self._personagem_no_combate(combate, pid)
+            p.iniciativa = total
+            self.personagem_repo.update(p)
+            resultados.append(
+                {
+                    "personagem_id": p.id,
+                    "nome": p.nome,
+                    "total": total,
                 }
             )
         resultados.sort(key=lambda x: (-x["total"], (x.get("nome") or "").lower()))
@@ -382,6 +431,7 @@ class TormentaCombateService:
     ) -> Dict[str, Any]:
         from app.games.tormenta.rules.catalogo_t20 import metadados_magia_mb_por_slug
         from app.games.tormenta.rules.combate_t20 import rolar_teste_vontade_racial
+        from app.games.tormenta.rules.condicoes_t20 import modificador_condicao_pericia
         from app.games.tormenta.rules.conjuracao_combate_t20 import (
             bonus_resistencia_magia_efetivo_mb,
             bonus_teste_resistencia_personagem_mb,
@@ -391,6 +441,7 @@ class TormentaCombateService:
             normalizar_tipo_resistencia_request,
             rolar_teste_resistencia_magia_mb,
         )
+        from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
         from app.games.tormenta.rules.tracos_raciais_t20 import (
             tracos_mecanicos_por_slug,
         )
@@ -441,6 +492,9 @@ class TormentaCombateService:
             cd_final = cd_teste_resistencia_magia_mb(int(circ), mod_chave)
 
         fj = alvo.ficha_json if isinstance(alvo.ficha_json, dict) else {}
+        rv = regra_versao_de_ficha(fj)
+        rotulos = self._rotulos_condicoes_personagem(combate, int(alvo_id))
+        mod_cond = modificador_condicao_pericia(tipo_res, rotulos, regra_versao=rv)
         bonus_rm = bonus_resistencia_magia_efetivo_mb(fj)
 
         if falha_voluntaria:
@@ -478,6 +532,18 @@ class TormentaCombateService:
             bonus_rm=bonus_rm,
             cd=int(cd_final),
         )
+        if mod_cond:
+            bonus_ajustado = int(teste.get("bonus_total", 0)) + mod_cond
+            from app.games.tormenta.rules.pericias_t20 import rolar_teste_pericia
+
+            reroll = rolar_teste_pericia(bonus_ajustado, int(cd_final))
+            teste = {
+                **teste,
+                **reroll,
+                "bonus_total": bonus_ajustado,
+                "passou": bool(reroll.get("sucesso")),
+                "modificador_condicoes": mod_cond,
+            }
         raca = str(fj.get("raca_tormenta_slug") or "").strip().lower()
         row_raca = tracos_mecanicos_por_slug(raca, "v13")
         if (

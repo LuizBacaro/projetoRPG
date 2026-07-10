@@ -1068,6 +1068,35 @@ class TormentaCondicoesV13Response(BaseModel):
     total: int = Field(..., ge=0)
 
 
+class TormentaCondicoesModificadoresRequest(BaseModel):
+    rotulos: List[str] = Field(default_factory=list, max_length=80)
+    pericia_slug: Optional[str] = Field(
+        default=None,
+        max_length=60,
+        description="Slug ou nome da perícia — retorna modificador específico em pericia.",
+    )
+    regra_versao: Optional[str] = Field(default="v13", max_length=8)
+
+
+class TormentaCondicoesModificadoresResponse(BaseModel):
+    ataque: int = 0
+    ca: int = 0
+    pericia: int = Field(
+        0,
+        description="Modificador para a perícia informada (ou 0 se omitida).",
+    )
+    pericia_geral: int = Field(
+        0,
+        description="Soma de mod_pericia (todas as perícias).",
+    )
+    pericia_fisica: int = 0
+    percepcao: int = 0
+    reflexos: int = 0
+    iniciativa: int = 0
+    atributo_fisico: int = 0
+    atributo_mental: int = 0
+
+
 class TormentaPoderPreRequisitoFaltandoItem(BaseModel):
     tipo: str = Field(default="", max_length=40)
     descricao: str = Field(default="", max_length=200)

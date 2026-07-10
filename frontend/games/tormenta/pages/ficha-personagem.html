@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260704penarm" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260710sync" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260629s47" />
 </head>
 <body class="tormenta-ficha-body">
@@ -33,6 +33,7 @@
                             <span class="t20-ficha-tag t20-ficha-tag--classe" id="t20TagClasse">Classe: —</span>
                             <span class="t20-ficha-tag t20-ficha-tag--nivel"><span class="t20-ficha-nivel-lbl">Nív.</span> <strong id="t20TagNivel">—</strong></span>
                         </div>
+                        <button type="button" class="tormenta-btn" id="btnT20FichaLayoutCompacto" aria-pressed="false" title="Ocultar seções secundárias — foco em combate e perícias">Vista compacta</button>
                         <button type="button" class="tormenta-btn tormenta-btn--primary t20-btn-editar-ficha" id="btnT20EditarFicha">Editar ficha</button>
                     </div>
                     <div class="t20-ficha-meta-tags t20-ficha-meta-tags--sec ficha-meta-secundaria" aria-live="polite">
@@ -102,11 +103,11 @@
                             <span class="circulo-label">CAR</span>
                         </div>
                     </div>
-                    <p class="t20-hint" id="hintAtributos" style="margin-top:0.35rem;font-size:0.72rem">
+                    <p class="t20-hint t20-ficha-secao--so-completa" id="hintAtributos" style="margin-top:0.35rem;font-size:0.72rem">
                         Valor e modificador do atributo são mostrados juntos para facilitar a leitura. Os <strong>valores dos atributos</strong> são editados em <strong>Editar ficha</strong> (diálogo); aqui ficam só leitura.
                         Fichas <strong>jogador</strong>: <strong>compra por pontos</strong> (bases 8–18, soma = 20) ou <strong>4d6</strong> (bases 3–18, reroll MB).
                     </p>
-                    <p class="t20-hint t20-compra-pontos-ok" id="f_pts_compra" style="margin-top:0.2rem;font-size:0.72rem;">Atributos: …</p>
+                    <p class="t20-hint t20-compra-pontos-ok t20-ficha-secao--so-completa" id="f_pts_compra" style="margin-top:0.2rem;font-size:0.72rem;">Atributos: …</p>
                 </div>
                 <div class="ficha-defesa-row ficha-defesa-row--col-esq" style="margin-top:0.45rem">
                     <div class="ficha-defesa-box ficha-ca-box">
@@ -149,25 +150,30 @@
                         </button>
                     </div>
                 </div>
-                <details class="t20-hint" id="detailsPmMbResumo" style="margin-top: 0.35rem; max-width: 100%">
+                <div id="t20FichaCondMesaWrap" class="ficha-secao t20-ficha-cond-mesa-wrap" hidden>
+                    <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">⚔️ Condições (mesa)</h3>
+                    <div id="t20FichaCondMesaBody" class="t20-ficha-cond-mesa-body" aria-live="polite"></div>
+                    <p class="t20-hint t20-ficha-cond-mesa-hint">Sincronizado com a arena quando a mesa aplica condições MB.</p>
+                </div>
+                <details class="t20-hint t20-ficha-secao--so-completa" id="detailsPmMbResumo" style="margin-top: 0.35rem; max-width: 100%">
                     <summary>Pontos de Magia (PM) — resumo MB</summary>
                     <div id="t20PmMbResumoCorpo" style="margin-top: 0.4rem; font-size: 0.72rem; line-height: 1.45; white-space: pre-line"></div>
                 </details>
-                <div class="ficha-secao t20-ficha-secao" style="margin-top:0.65rem">
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa" style="margin-top:0.65rem">
                     <div class="ficha-secao-header">
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo" id="titSecaoTalentosPoderes">Talentos (MB / escolhidos)</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnT20AddTalentoMb" title="Adicionar talento">➕ Adicionar</button>
                     </div>
                     <div id="t20FichaTalentosMb" class="t20-ficha-dnd-lista t20-dnd-drop-zone" data-dnd-accept="talento"><span class="t20-ficha-vazio">Nenhum talento na lista.</span></div>
                 </div>
-                <div class="ficha-secao t20-ficha-secao">
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa">
                     <div class="ficha-secao-header">
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">🎒 Equipamentos</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnAdicionarEquipamento" title="Adicionar equipamento">➕ Adicionar</button>
                     </div>
                     <div id="fichaEquipamentos" class="ficha-equipamentos-lista t20-dnd-drop-zone" data-dnd-accept="equip"><span class="ficha-vazio">Nenhum equipamento cadastrado</span></div>
                 </div>
-                <div class="ficha-secao t20-ficha-secao" style="margin-top:0.65rem">
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa" style="margin-top:0.65rem">
                     <div class="ficha-secao-header">
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">🧪 Consumíveis</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnT20AddConsumivel" title="Adicionar consumível">➕ Adicionar</button>
@@ -177,7 +183,7 @@
                     </p>
                     <div id="t20FichaConsumiveis" class="t20-ficha-dnd-lista t20-dnd-drop-zone" data-dnd-accept="consumivel"><span class="t20-ficha-vazio">Nenhum consumível cadastrado</span></div>
                 </div>
-                <div class="ficha-secao t20-ficha-secao" style="margin-top:0.65rem">
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa" style="margin-top:0.65rem">
                     <div class="ficha-secao-header">
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">🐾 Companheiro animal</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnT20FichaAddComp" title="Adicionar companheiro">➕ Adicionar</button>
@@ -190,7 +196,7 @@
             </aside>
 
             <section class="ficha-coluna-central t20-ficha-col-centro">
-                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--retrato" style="text-align:center">
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--retrato t20-ficha-secao--so-completa" style="text-align:center">
                     <div class="ficha-foto-container ficha-foto-container--t20-full">
                         <img id="fichaFoto" src="" alt="Foto do personagem" class="ficha-foto" decoding="async" />
                         <div id="fichaFotoPlaceholder" class="ficha-foto-placeholder">🧙</div>
@@ -202,7 +208,7 @@
 
                 <div class="ficha-secao t20-ficha-secao t20-ficha-secao--ataques-planilha">
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Ataques</h3>
-                    <p class="t20-hint t20-ataques-planilha-legend">
+                    <p class="t20-hint t20-ataques-planilha-legend t20-ficha-secao--so-completa">
                         Bônus na jogada de ataque (MB): <strong>Total</strong> = BBA + modificador de habilidade + modificador de tamanho + outros. A fórmula aparece abaixo de cada linha e no tooltip do total.
                     </p>
                     <div id="t20AtaquesPlanilhaRoot" class="t20-ataques-planilha" aria-label="Bônus de ataque corpo a corpo e à distância">
@@ -264,7 +270,7 @@
                     </div>
                 </div>
 
-                <div class="ficha-secao t20-ficha-secao">
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa">
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">✨ Habilidades Especiais</h3>
                     <div id="fichaHabilidadesEspeciais" class="ficha-habilidades-especiais-lista">
                         <span class="ficha-vazio">Nenhuma habilidade especial mapeada.</span>
@@ -283,7 +289,7 @@
             </section>
 
             <aside class="ficha-coluna-direita t20-ficha-col-dir t20-sidebar">
-                <div class="ficha-secao t20-ficha-secao">
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa">
                     <div class="ficha-secao-header">
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">🛡️ Armadura/Item de Proteção</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="t20BtnAdicionarArmaduraProtecao" title="Adicionar armadura/item de proteção">➕ Adicionar</button>
@@ -294,7 +300,7 @@
                     <div id="t20FichaArmadurasProtecao" class="ficha-equipamentos-lista"><span class="ficha-vazio">Nenhuma armadura/item de proteção cadastrado</span></div>
                 </div>
 
-                <div class="ficha-secao t20-ficha-secao">
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa">
                     <div class="ficha-secao-header">
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">⚔️ Ataques</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="t20BtnAdicionarAtaques" title="Adicionar ou editar armas / ataques na lista">➕ Adicionar</button>
@@ -324,7 +330,7 @@
                     </div>
                 </div>
 
-                <div class="t20-ficha-secao t20-dnd-drop-zone" id="t20GrimorioDropZone" data-dnd-accept="magia">
+                <div class="t20-ficha-secao t20-dnd-drop-zone t20-ficha-secao--so-completa" id="t20GrimorioDropZone" data-dnd-accept="magia">
                     <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnT20Grimorio" style="width:100%;min-height:2.6rem;font-size:1rem" title="Catálogo MB, vínculos na ficha, Pontos de Magia (PM) e importação do texto legado. Esc fecha o painel.">
                         📖 Grimório MB
                     </button>
@@ -369,7 +375,7 @@
                     </div>
                 </div>
 
-                <div class="t20-ficha-secao">
+                <div class="t20-ficha-secao t20-ficha-secao--so-completa">
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Idiomas</h3>
                     <div class="t20-ficha-idiomas-form">
                         <input id="inputNovoIdiomaT20" type="text" class="t20-input" placeholder="Ex.: Anão, Élfico, Dracônico" maxlength="80" />
@@ -1588,6 +1594,8 @@
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-duende-v13.js?v=20260704trocas"></script>
 <script src="/games/tormenta/js/t20-kit-inicial-v13.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-sync-ficha-arena.js?v=20260710sync"></script>
+<script src="/games/tormenta/js/t20-ficha-layout-compacto.js?v=20260710sync"></script>
 <script>
 (function () {
     const svc = new TormentaPersonagemService();
@@ -2117,7 +2125,7 @@
             const n = Number(v);
             t20SetResTotalSpan(T20_RES_SHEET[k], Number.isFinite(n) ? n : 0);
         });
-        atualizarResistenciasBreakdownTormenta();
+        atualizarResistenciasBreakdownTormenta({ somenteBreakdown: true });
     }
 
     function t20SyncDeslTamSheetToDialog() {
@@ -2333,6 +2341,9 @@
                 if (fidAfter) void t20PosSalvarRefresh(fidAfter);
             } else if (fidAfter) {
                 await t20PosSalvarRefresh(fidAfter);
+            }
+            if (window.T20SyncFichaArena && typeof window.T20SyncFichaArena.notificarSalvarFicha === 'function') {
+                window.T20SyncFichaArena.notificarSalvarFicha(body, Number(fidAfter || fid));
             }
             return { ok: true };
         } catch (e) {
@@ -2843,27 +2854,51 @@
         return Number.isFinite(n) ? n : null;
     }
 
-    /** MB: meio de nível soma em Outros (CA) e nas três resistências. */
+    /** MB legado: botão «forçar meio de nível» — recalcula Fort/Ref/Von pela fórmula completa. */
     function aplicarBonusMeioNvNosTotais(bonus, forcar) {
-        if (!Number.isFinite(bonus) || bonus < 0) return;
-        const b = Math.floor(bonus);
-        if (forcar) {
-            t20SetResTotalSpan('fichaFort', b);
-            t20SetResTotalSpan('fichaReflex', b);
-            t20SetResTotalSpan('fichaVont', b);
-            atualizarResistenciasBreakdownTormenta();
-            return;
+        void bonus;
+        atualizarResistenciasTotaisTormenta(Boolean(forcar));
+        atualizarResistenciasBreakdownTormenta({ somenteBreakdown: true });
+    }
+
+    function bonusRacialResistenciaTormenta(kind) {
+        const c = window.__t20TracosRaciaisCache;
+        if (!c) return 0;
+        const map = {
+            fort: 'fortitude_bonus',
+            reflex: 'reflexos_bonus',
+            vont: 'vontade_bonus',
+        };
+        const key = map[kind];
+        return key ? Math.trunc(Number(c[key] || 0)) : 0;
+    }
+
+    function contribuicaoAtributoResistenciaTormenta(slug) {
+        const id = T20_ATTR_INP[slug];
+        const el = id ? q(id) : null;
+        const val = (el && el.value) || '0';
+        const rv = getRegraVersaoAtiva();
+        if (window.T20RegraVersao && typeof window.T20RegraVersao.contribuicaoAtributo === 'function') {
+            return window.T20RegraVersao.contribuicaoAtributo(val, rv);
         }
-        const vf = t20ReadResTotalSpan('fichaFort');
-        const vr = t20ReadResTotalSpan('fichaReflex');
-        const vv = t20ReadResTotalSpan('fichaVont');
-        const todosVazios = (vf === 0) && (vr === 0) && (vv === 0);
-        if (todosVazios) {
-            t20SetResTotalSpan('fichaFort', b);
-            t20SetResTotalSpan('fichaReflex', b);
-            t20SetResTotalSpan('fichaVont', b);
-            atualizarResistenciasBreakdownTormenta();
+        return modificadorAtributoT20(val);
+    }
+
+    /** Fort/Ref/Von = ⌊nível/2⌋ + atributo-chave + bônus racial (v1.3 e MB). */
+    function calcularResistenciaTotalTormenta(attrSlug, resKind) {
+        return meioNivel() + contribuicaoAtributoResistenciaTormenta(attrSlug) + bonusRacialResistenciaTormenta(resKind);
+    }
+
+    function atualizarResistenciasTotaisTormenta(forcar) {
+        if (!forcar) {
+            const vf = t20ReadResTotalSpan('fichaFort');
+            const vr = t20ReadResTotalSpan('fichaReflex');
+            const vv = t20ReadResTotalSpan('fichaVont');
+            if (!(vf === 0 && vr === 0 && vv === 0)) return;
         }
+        t20SetResTotalSpan('fichaFort', calcularResistenciaTotalTormenta('con', 'fort'));
+        t20SetResTotalSpan('fichaReflex', calcularResistenciaTotalTormenta('des', 'reflex'));
+        t20SetResTotalSpan('fichaVont', calcularResistenciaTotalTormenta('sab', 'vont'));
     }
 
     function atualizarTagsHeader() {
@@ -3106,7 +3141,7 @@
             nv.addEventListener('input', () => {
                 atualizarMeioNivelColuna();
                 atualizarResumoClasseMb();
-                atualizarResistenciasBreakdownTormenta();
+                atualizarResistenciasBreakdownTormenta({ forcarTotais: true });
                 t20AtualizarGrimorioElegibilidadeVisual(null);
                 agendarAtualizarGrimorioSeModalAberto();
                 if (window.T20MelhorAmigoV13 && window.T20MelhorAmigoV13.atualizarUi) {
@@ -3951,7 +3986,8 @@
         };
     }
 
-    function atualizarResistenciasBreakdownTormenta() {
+    function atualizarResistenciasBreakdownTormenta(opts) {
+        const o = opts && typeof opts === 'object' ? opts : {};
         const half = meioNivel();
         const rv = getRegraVersaoAtiva();
         const modLine = (slug) => {
@@ -3963,13 +3999,20 @@
             const ab = { for: 'FOR', des: 'DES', con: 'CON', int: 'INT', sab: 'SAB', car: 'CAR' }[slug];
             return `${ab} ${formatModificadorAtributo(modificadorAtributoT20((el && el.value) || '10'))}`;
         };
+        const racialSuffix = (kind) => {
+            const rac = bonusRacialResistenciaTormenta(kind);
+            return rac ? ` • raça +${rac}` : '';
+        };
         const b = q('fichaFortBreakdown');
         const r = q('fichaReflexBreakdown');
         const v = q('fichaVontBreakdown');
         const linha = `½ nv +${half} • `;
-        if (b) b.textContent = `${linha}${modLine('con')}`;
-        if (r) r.textContent = `${linha}${modLine('des')}`;
-        if (v) v.textContent = `${linha}${modLine('sab')}`;
+        if (b) b.textContent = `${linha}${modLine('con')}${racialSuffix('fort')}`;
+        if (r) r.textContent = `${linha}${modLine('des')}${racialSuffix('reflex')}`;
+        if (v) v.textContent = `${linha}${modLine('sab')}${racialSuffix('vont')}`;
+        if (!o.somenteBreakdown) {
+            atualizarResistenciasTotaisTormenta(Boolean(o.forcarTotais));
+        }
     }
 
     function atualizarModsAtributos() {
@@ -3987,7 +4030,7 @@
         atualizarLinhaCompraPontos();
         atualizarModsPericiasDasHabilidades();
         atualizarSugestaoIdiomasMb();
-        atualizarResistenciasBreakdownTormenta();
+        atualizarResistenciasBreakdownTormenta({ forcarTotais: true });
         t20AtualizarModHabAtaquePlanilhaDeAtributos();
         t20AtualizarVitaisBreakdownTormenta();
         t20AtualizarCargaV13();
@@ -7960,9 +8003,14 @@
         t20SyncDeslTamSheetToDialog();
         __t20DialogEditSnapshot = '';
         void t20InitCampanhaFicha(p);
+        if (typeof window.t20ValidarPericiasOrcamentoMb === 'function') {
+            void window.t20ValidarPericiasOrcamentoMb();
+        }
     }
     window.t20PreencherFormPersonagem = preencherForm;
     window.getRegraVersaoAtiva = getRegraVersaoAtiva;
+    window.atualizarResistenciasTotaisTormenta = atualizarResistenciasTotaisTormenta;
+    window.atualizarResistenciasBreakdownTormenta = atualizarResistenciasBreakdownTormenta;
     window.getClasseMbRowPorSlug = getClasseMbRowPorSlug;
     window.coletarPericias = coletarPericias;
     window.preencherPericias = preencherPericias;
@@ -8683,6 +8731,10 @@
         if (wrap) wrap.classList.toggle('is-mestre', isMestre);
 
         atualizarTagsHeader();
+
+        if (window.T20SyncFichaArena && typeof window.T20SyncFichaArena.initFicha === 'function') {
+            window.T20SyncFichaArena.initFicha();
+        }
 
         q('btnSalvar').addEventListener('click', async () => {
             await t20SalvarFicha();

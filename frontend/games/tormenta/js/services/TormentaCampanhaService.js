@@ -163,6 +163,65 @@ class TormentaCampanhaService {
         await this._handleResponse(res, 'Erro ao excluir sessão');
         return true;
     }
+
+    async listarHandouts(campanhaId) {
+        const q =
+            campanhaId != null && campanhaId !== ''
+                ? `?campanha_id=${encodeURIComponent(String(campanhaId))}`
+                : '';
+        const res = await fetch(this._url(`/handouts${q}`), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
+        return this._handleResponse(res, 'Erro ao carregar handouts');
+    }
+
+    async listarHandoutsVisiveis(campanhaId) {
+        const q =
+            campanhaId != null && campanhaId !== ''
+                ? `?campanha_id=${encodeURIComponent(String(campanhaId))}`
+                : '';
+        const res = await fetch(this._url(`/handouts/visiveis${q}`), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
+        return this._handleResponse(res, 'Erro ao carregar handouts revelados');
+    }
+
+    async listarSessoesVisiveis() {
+        const res = await fetch(this._url('/sessoes/visiveis'), {
+            headers: this._headers(false),
+            cache: 'no-store',
+        });
+        return this._handleResponse(res, 'Erro ao carregar sessões visíveis');
+    }
+
+    async criarHandout(payload) {
+        const res = await fetch(this._url('/handouts'), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload),
+        });
+        return this._handleResponse(res, 'Erro ao criar handout');
+    }
+
+    async atualizarHandout(handoutId, payload) {
+        const res = await fetch(this._url(`/handouts/${handoutId}`), {
+            method: 'PUT',
+            headers: this._headers(true),
+            body: JSON.stringify(payload),
+        });
+        return this._handleResponse(res, 'Erro ao atualizar handout');
+    }
+
+    async deletarHandout(handoutId) {
+        const res = await fetch(this._url(`/handouts/${handoutId}`), {
+            method: 'DELETE',
+            headers: this._headers(false),
+        });
+        await this._handleResponse(res, 'Erro ao excluir handout');
+        return true;
+    }
 }
 
 window.TormentaCampanhaService = TormentaCampanhaService;

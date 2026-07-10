@@ -773,6 +773,20 @@
     font-weight: 700;
 }
 
+.t20-arena-ini-list li.is-view:not(.is-active) {
+    background: rgba(60, 35, 20, 0.06);
+    border-color: rgba(60, 35, 20, 0.2);
+    cursor: pointer;
+}
+
+.t20-arena-ini-list li[data-combatente-id] {
+    cursor: pointer;
+}
+
+.t20-arena-ini-list li[data-combatente-id]:hover {
+    background: rgba(163, 22, 22, 0.06);
+}
+
 .t20-arena-ini-num {
     color: var(--t20-muted);
     margin-right: 0.2rem;
@@ -1452,7 +1466,12 @@
     gap: 0.3rem;
 }
 
-.t20-arena-cond-pill {
+.t20-arena-cond-mods-hint {
+    margin: 0.35rem 0 0;
+    font-size: 0.68rem;
+    color: var(--t20-muted, #8a9bb0);
+    font-style: italic;
+}
     font-size: 0.62rem;
     font-weight: 700;
     padding: 0.18rem 0.48rem;
@@ -1595,6 +1614,144 @@
 .t20-arena-cond-resumo-ul {
     margin: 0;
     padding-left: 1.1rem;
+}
+
+.t20-arena-log-wrap {
+    margin-top: 0.55rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid rgba(60, 35, 20, 0.18);
+    max-height: min(220px, 28vh);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.t20-arena-log-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+    margin-bottom: 0.3rem;
+}
+
+.t20-arena-log-titulo {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--t20-red-deep);
+}
+
+.t20-arena-log-limpar {
+    padding: 0.15rem 0.4rem !important;
+    font-size: 0.62rem !important;
+}
+
+.t20-arena-log-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    font-size: 0.66rem;
+    line-height: 1.35;
+    flex: 1;
+    min-height: 0;
+}
+
+.t20-arena-log-vazio {
+    color: var(--t20-muted);
+    font-style: italic;
+    padding: 0.25rem 0;
+}
+
+.t20-arena-log-item {
+    padding: 0.22rem 0;
+    border-bottom: 1px solid rgba(60, 35, 20, 0.08);
+}
+
+.t20-arena-log-meta {
+    display: block;
+    color: var(--t20-muted);
+    font-size: 0.58rem;
+    margin-bottom: 0.05rem;
+}
+
+.t20-arena-log-hora {
+    font-variant-numeric: tabular-nums;
+}
+
+.t20-arena-log-tipo {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.t20-arena-log-txt {
+    display: block;
+    word-break: break-word;
+}
+
+.t20-arena-npc-compact {
+    margin-top: 0.65rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(60, 35, 20, 0.15);
+}
+
+.t20-arena-npc-compact__tit {
+    margin: 0 0 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--t20-red-deep);
+}
+
+.t20-arena-npc-atq-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+}
+
+.t20-arena-npc-atq-table th,
+.t20-arena-npc-atq-table td {
+    padding: 0.28rem 0.35rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(60, 35, 20, 0.12);
+}
+
+.t20-arena-npc-atq-table th {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    color: var(--t20-muted);
+}
+
+.t20-arena-npc-atq-btn {
+    padding: 0.15rem 0.4rem !important;
+    font-size: 0.75rem !important;
+    min-width: 2rem;
+}
+
+.t20-arena-npc-sem-ataques {
+    margin: 0;
+    font-size: 0.68rem;
+    color: var(--t20-muted);
+    font-style: italic;
+}
+
+.t20-arena-npc-compact__hint {
+    margin: 0.35rem 0 0;
+    font-size: 0.65rem;
+}
+
+.t20-arena-main--npc .t20-arena-char-meta {
+    font-weight: 600;
+}
+
+.t20-arena-turn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
 }
 
 .t20-arena-cons-toolbar {
@@ -2374,4 +2531,133 @@
 .t20-obrig-pag {
     font-weight: normal;
     opacity: 0.85;
+}
+
+/* RF-T12f — Handouts */
+.t20-camp-leitura-jogador {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(60, 35, 20, 0.15);
+}
+
+.t20-camp-card--leitura {
+    border-left: 3px solid var(--t20-gold, #c9a227);
+}
+
+.t20-handout-corpo-preview {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin: 0.35rem 0 0;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.t20-handout-fig {
+    margin: 0.5rem 0 0;
+}
+
+.t20-handout-fig img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.35rem;
+    border: 1px solid rgba(60, 35, 20, 0.2);
+}
+
+.t20-camp-handout-revelar-acoes {
+    display: flex;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+}
+
+.t20-arena-handouts-wrap {
+    margin-top: 0.65rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(60, 35, 20, 0.15);
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.t20-arena-handouts-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    max-height: 10rem;
+    font-size: 0.72rem;
+}
+
+.t20-arena-handout-item {
+    padding: 0.35rem 0.2rem;
+    border-bottom: 1px solid rgba(60, 35, 20, 0.1);
+}
+
+.t20-arena-handout-snippet {
+    display: block;
+    opacity: 0.85;
+    margin-top: 0.15rem;
+}
+
+.t20-arena-handout-tag {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.t20-arena-handout-vazio {
+    opacity: 0.75;
+    padding: 0.35rem 0.2rem;
+}
+
+/* Iniciativa — escolha automática/manual */
+.t20-arena-ini-escolha-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.t20-arena-ini-manual-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    max-height: min(52vh, 22rem);
+    overflow-y: auto;
+    padding-right: 0.15rem;
+}
+
+.t20-arena-ini-manual-row {
+    display: grid;
+    grid-template-columns: 1fr minmax(5.5rem, 7rem);
+    gap: 0.55rem;
+    align-items: center;
+    padding: 0.35rem 0.45rem;
+    border: 1px solid var(--t20-grid-line, rgba(120, 72, 48, 0.2));
+    border-radius: 6px;
+    background: rgba(255, 252, 248, 0.7);
+}
+
+.t20-arena-ini-manual-lbl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    min-width: 0;
+}
+
+.t20-arena-ini-manual-nome {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.t20-arena-ini-manual-inp {
+    width: 100%;
+    padding: 0.35rem 0.45rem;
+    font-size: 0.9rem;
+    text-align: center;
+    border: 1px solid var(--t20-grid-line, rgba(120, 72, 48, 0.25));
+    border-radius: 4px;
 }

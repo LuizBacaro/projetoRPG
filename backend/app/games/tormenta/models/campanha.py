@@ -45,6 +45,12 @@ class TormentaCampanha(Base):
         lazy="selectin",
         cascade="all, delete-orphan",
     )
+    handouts = relationship(
+        "TormentaHandout",
+        back_populates="campanha",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+    )
 
 
 class TormentaSessaoCampanha(Base):
@@ -109,3 +115,34 @@ class TormentaCampanhaSolicitacao(Base):
 
     campanha = relationship("TormentaCampanha", lazy="joined")
     personagem = relationship("TormentaPersonagem", lazy="joined")
+
+
+class TormentaHandout(Base):
+    """Notas/imagens reveladas pelo mestre para jogador(es) da campanha (RF-T12f)."""
+
+    __tablename__ = "tormenta_handouts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    campanha_id = Column(
+        Integer,
+        ForeignKey("tormenta_campanhas.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    titulo = Column(String(200), nullable=False)
+    corpo_md = Column(String(8000), nullable=False, default="")
+    imagem_url = Column(String(2048), nullable=True)
+    visivel_para_user_ids = Column(JSON, nullable=False, default=list)
+    created_at = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    campanha = relationship(
+        "TormentaCampanha", back_populates="handouts", lazy="joined"
+    )

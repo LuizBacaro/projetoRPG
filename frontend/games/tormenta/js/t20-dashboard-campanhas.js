@@ -310,15 +310,20 @@
             });
             const c = document.getElementById('t20campSubabaCadastro');
             const s = document.getElementById('t20campSubabaSessoes');
+            const h = document.getElementById('t20campSubabaHandouts');
             const ws = document.getElementById('t20campSubabaWorkspace');
             if (c) c.classList.toggle('t20-camp-subaba-pane--active', which === 'cadastro');
             if (s) s.classList.toggle('t20-camp-subaba-pane--active', which === 'sessoes');
+            if (h) h.classList.toggle('t20-camp-subaba-pane--active', which === 'handouts');
             if (ws) ws.classList.toggle('t20-camp-subaba-pane--active', isMesa);
             if (isMesa) {
                 const id = Number(w.replace('mesa-', ''));
                 if (onSelecionarCampanha) onSelecionarCampanha(id);
-            } else if (onSairCampanha) {
-                onSairCampanha();
+            } else {
+                if (onSairCampanha) onSairCampanha();
+                if (which === 'handouts' && global.__t20DashHandouts && global.__t20DashHandouts.carregarHandouts) {
+                    void global.__t20DashHandouts.carregarHandouts();
+                }
             }
         }
 
@@ -420,6 +425,10 @@
                 b.addEventListener('click', () => {
                     void carregarCampanhas();
                     void carregarSessoes();
+                    if (global.__t20DashHandouts) {
+                        void global.__t20DashHandouts.carregarHandouts();
+                        void global.__t20DashHandouts.carregarLeituraJogador();
+                    }
                     renderChecklist(idsSelecionadosChecklist());
                 });
             }

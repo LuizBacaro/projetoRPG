@@ -9,7 +9,7 @@
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260708pedidos" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260710ini" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -76,6 +76,16 @@
     </section>
 
     <section class="t20-dash-section" id="tab-campanhas">
+        <div id="t20campLeituraJogador" class="t20-camp-leitura-jogador" hidden>
+            <h2 class="t20-camp-lista-titulo">Mesa — leitura</h2>
+            <p class="t20-dash-hint" style="margin-top:0;max-width:44rem">
+                Handouts e resumos de sessão que o mestre revelou para você.
+            </p>
+            <h3 class="t20-camp-lista-titulo" style="font-size:0.95rem">Handouts</h3>
+            <div id="t20campListaHandoutsJogador" class="t20-camp-lista"></div>
+            <h3 class="t20-camp-lista-titulo" style="font-size:0.95rem;margin-top:1rem">Resumos de sessão</h3>
+            <div id="t20campListaSessoesJogador" class="t20-camp-lista"></div>
+        </div>
         <div id="t20campPanelTop" class="t20-camp-painel">
             <p class="t20-dash-hint" style="margin-top:0;max-width:44rem">
                 Crie uma <strong>campanha</strong> para ser <strong>mestre da mesa</strong> (combatentes da campanha e Arena). Como <strong>jogador</strong>, na aba Combatentes você vê só os seus personagens.
@@ -83,6 +93,7 @@
             <div id="t20campSubAbas" class="t20-camp-subabas" role="tablist">
                 <button type="button" class="t20-camp-subaba-btn t20-camp-subaba-btn--active" data-t20camp-sub="cadastro">Cadastro de campanhas</button>
                 <button type="button" class="t20-camp-subaba-btn" data-t20camp-sub="sessoes">Registro de sessões</button>
+                <button type="button" class="t20-camp-subaba-btn" data-t20camp-sub="handouts">Handouts</button>
                 <span id="t20campSubAbasCampanhas" class="t20-camp-subabas-campanhas" role="presentation"></span>
             </div>
             <div id="t20campSubabaCadastro" class="t20-camp-subaba-pane t20-camp-subaba-pane--active t20-camp-painel-narrow">
@@ -143,6 +154,46 @@
                 </form>
                 <h3 class="t20-camp-lista-titulo">Sessões registradas</h3>
                 <div id="t20campListaSessoes" class="t20-camp-lista">
+                    <p class="tormenta-cell-muted">Abra esta aba para carregar.</p>
+                </div>
+            </div>
+            <div id="t20campSubabaHandouts" class="t20-camp-subaba-pane t20-camp-painel-narrow">
+                <form id="t20campFormHandout" class="t20-camp-form" autocomplete="off">
+                    <input type="hidden" id="t20campHandoutId" value="" />
+                    <div id="t20campHandoutEdicaoBadge" class="t20-camp-edicao-badge" style="display:none"></div>
+                    <div class="t20-dash-field">
+                        <label for="t20campHandoutCampanhaId">Campanha *</label>
+                        <select id="t20campHandoutCampanhaId" required>
+                            <option value="">Selecione a campanha</option>
+                        </select>
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campHandoutTitulo">Título *</label>
+                        <input id="t20campHandoutTitulo" type="text" maxlength="200" required placeholder="Ex.: Pista do templo" />
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campHandoutCorpo">Texto (Markdown simples)</label>
+                        <textarea id="t20campHandoutCorpo" rows="5" maxlength="8000" placeholder="Notas para os jogadores…"></textarea>
+                    </div>
+                    <div class="t20-dash-field">
+                        <label for="t20campHandoutImagem">URL da imagem (opcional)</label>
+                        <input id="t20campHandoutImagem" type="url" maxlength="2048" placeholder="https://…" />
+                    </div>
+                    <div class="t20-dash-field">
+                        <span class="t20-camp-visivel-lbl" style="display:block;margin-bottom:0.35rem">Revelar para jogadores</span>
+                        <div class="t20-camp-handout-revelar-acoes">
+                            <button type="button" class="tormenta-btn tormenta-btn--secondary" id="t20campBtnRevelarTodosHandout">Todos</button>
+                            <button type="button" class="tormenta-btn tormenta-btn--secondary" id="t20campBtnOcultarTodosHandout">Nenhum</button>
+                        </div>
+                        <div id="t20campHandoutJogadores" class="t20-camp-checklist" aria-label="Jogadores que podem ver"></div>
+                    </div>
+                    <div class="t20-camp-form-acoes">
+                        <button type="button" class="tormenta-btn" id="t20campBtnCancelarHandout" style="display:none">Cancelar edição</button>
+                        <button type="submit" class="tormenta-btn tormenta-btn--primary" id="t20campBtnSalvarHandout">Criar handout</button>
+                    </div>
+                </form>
+                <h3 class="t20-camp-lista-titulo">Handouts da campanha</h3>
+                <div id="t20campListaHandouts" class="t20-camp-lista">
                     <p class="tormenta-cell-muted">Abra esta aba para carregar.</p>
                 </div>
             </div>
@@ -226,6 +277,20 @@
                 <aside class="t20-arena-ini-sidebar" aria-label="Ordem de iniciativa">
                     <div class="t20-arena-ini-titulo">Iniciativa</div>
                     <ul id="t20ArenaIniList" class="t20-arena-ini-list"></ul>
+                    <div class="t20-arena-log-wrap" aria-label="Log da mesa">
+                        <div class="t20-arena-log-hd">
+                            <span class="t20-arena-log-titulo">Log da mesa</span>
+                            <button type="button" class="tormenta-btn tormenta-btn--secondary t20-arena-log-limpar" id="t20ArenaLogLimpar" title="Limpar histórico">Limpar</button>
+                        </div>
+                        <ol id="t20ArenaLogLista" class="t20-arena-log-list" aria-live="polite"></ol>
+                    </div>
+                    <div class="t20-arena-handouts-wrap" aria-label="Handouts revelados">
+                        <div class="t20-arena-log-hd">
+                            <span class="t20-arena-log-titulo">Handouts</span>
+                            <button type="button" class="tormenta-btn tormenta-btn--secondary t20-arena-log-limpar" id="t20ArenaHandoutsAtualizar" title="Atualizar handouts">↻</button>
+                        </div>
+                        <ul id="t20ArenaHandoutsLista" class="t20-arena-handouts-list"></ul>
+                    </div>
                 </aside>
                 <div class="t20-arena-photo-col" aria-label="Retrato e ações rápidas">
                     <div class="t20-arena-portrait-vertical" id="t20ArenaPortraitWrap">
@@ -237,7 +302,8 @@
                         <div class="t20-arena-quick-btns">
                             <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnPvModal">Dano / Cura (PV)</button>
                             <button type="button" class="tormenta-btn" id="t20ArenaBtnMagias" title="Lançar magia MB (debita PM na ficha)">✨ Magias (PM)</button>
-                            <button type="button" class="tormenta-btn t20-arena-btn-cond" id="t20ArenaBtnCondicoes">Condições (MB)</button>
+                            <button type="button" class="tormenta-btn t20-arena-btn-cond" id="t20ArenaBtnCondicoes">Condições</button>
+                            <button type="button" class="tormenta-btn" id="t20ArenaBtnRolarPericia" title="Teste de perícia com bônus da ficha e condições">Rolar perícia</button>
                             <button type="button" class="tormenta-btn" id="t20ArenaBtnRolarIniciativa">Rolar iniciativa</button>
                             <button type="button" class="tormenta-btn" id="t20ArenaBtnRolarAtaque">Rolar ataque</button>
                             <button type="button" class="tormenta-btn" id="t20ArenaBtnRolarDano">Rolar dano</button>
@@ -288,6 +354,12 @@
                     </div>
                     <div class="t20-arena-turn-row">
                         <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnProximo">Encerrar turno (próximo)</button>
+                        <button type="button" class="tormenta-btn" id="t20ArenaBtnSeguirTurno" hidden title="Voltar a exibir o combatente do turno atual">Seguir turno</button>
+                    </div>
+                    <div id="t20ArenaNpcCompact" class="t20-arena-npc-compact" hidden>
+                        <h4 class="t20-arena-npc-compact__tit">Ataques (NPC / monstro)</h4>
+                        <div id="t20ArenaNpcAtaques" class="t20-arena-npc-ataques"></div>
+                        <p class="t20-dash-hint t20-arena-npc-compact__hint" id="t20ArenaNpcCompactHint"></p>
                     </div>
                 </div>
             </div>
@@ -342,6 +414,39 @@
     <div class="t20-arena-modal__ft">
         <button type="button" class="tormenta-btn" id="t20ArenaModalPvCancelar">Cancelar</button>
         <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalPvAplicar">Aplicar</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalIniEscolha" class="t20-arena-modal">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo">Iniciativa</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalIniEscolhaFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd">
+        <p class="t20-dash-hint" style="margin: 0 0 0.75rem">Como deseja definir a ordem de iniciativa?</p>
+        <div class="t20-arena-ini-escolha-btns">
+            <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaIniEscolhaAutomatica">Rolar automaticamente</button>
+            <button type="button" class="tormenta-btn" id="t20ArenaIniEscolhaManual">Informar manualmente</button>
+        </div>
+        <p class="t20-dash-hint" style="margin: 0.65rem 0 0; font-size: 0.72rem">Automático: 1d20 + DES (+ condições) para cada combatente. Manual: você informa o total de cada um.</p>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalIniEscolhaCancelar">Cancelar</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalIniManual" class="t20-arena-modal t20-arena-modal--wide-pv">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo">Iniciativa manual</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalIniManualFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd">
+        <p class="t20-dash-hint" style="margin: 0 0 0.5rem">Informe o valor total de iniciativa de cada combatente (resultado da jogada na mesa).</p>
+        <div id="t20ArenaIniManualLista" class="t20-arena-ini-manual-lista" role="group" aria-label="Iniciativa por combatente"></div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalIniManualCancelar">Cancelar</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalIniManualAplicar">Aplicar</button>
     </div>
 </dialog>
 
@@ -594,6 +699,29 @@
         <button type="button" class="tormenta-btn" id="t20ArenaModalCondCancelar">Cancelar</button>
         <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalCondAplicar">Aplicar aos selecionados</button>
         <button type="button" class="tormenta-btn" id="t20ArenaModalCondFecharFt">Fechar</button>
+    </div>
+</dialog>
+
+<dialog id="t20ArenaModalPericia" class="t20-arena-modal t20-arena-modal--wide-pv">
+    <div class="t20-arena-modal__hd">
+        <h3 class="t20-arena-modal__titulo" id="t20ArenaPericiaTitulo">Rolar perícia</h3>
+        <button type="button" class="t20-arena-modal__x" id="t20ArenaModalPericiaFechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="t20-arena-modal__bd">
+        <p id="t20ArenaPericiaCondHint" class="t20-dash-hint" style="margin-top:0" aria-live="polite"></p>
+        <div class="t20-dash-field">
+            <label for="t20ArenaPericiaSelect">Perícia ou resistência</label>
+            <select id="t20ArenaPericiaSelect" class="t20-input"></select>
+        </div>
+        <div class="t20-dash-field">
+            <label for="t20ArenaPericiaDc">CD do teste</label>
+            <input id="t20ArenaPericiaDc" type="number" min="1" max="99" class="t20-input" value="15" />
+        </div>
+        <div id="t20ArenaPericiaResultado" class="t20-arena-roll-result" hidden aria-live="polite"></div>
+    </div>
+    <div class="t20-arena-modal__ft">
+        <button type="button" class="tormenta-btn" id="t20ArenaModalPericiaCancelar">Cancelar</button>
+        <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaModalPericiaRolar">Rolar teste</button>
     </div>
 </dialog>
 
@@ -1081,15 +1209,21 @@
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260707mesa"></script>
-<script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
+<script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260710handouts"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
-<script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260707mesa"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260710handouts"></script>
+<script src="/games/tormenta/js/t20-dashboard-handouts.js?v=20260710handouts"></script>
 <script src="/games/tormenta/js/t20-dashboard-solicitacoes-campanha.js?v=20260708pedidos"></script>
-<script src="/games/tormenta/js/t20-dashboard-campanha-workspace.js?v=20260708pedidos"></script>
-<script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260511condMbApi"></script>
-<script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260511condMbApi"></script>
-<script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260614arenaSrFix"></script>
-<script src="/games/tormenta/js/t20-arena-magias.js?v=20260614grimorioPolish"></script>
+<script src="/games/tormenta/js/t20-dashboard-campanha-workspace.js?v=20260710handouts"></script>
+<script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260710ini"></script>
+<script src="/games/tormenta/js/t20-arena-log-mesa.js?v=20260710ini"></script>
+<script src="/games/tormenta/js/t20-arena-handouts.js?v=20260710handouts"></script>
+<script src="/games/tormenta/js/t20-arena-npc-compact.js?v=20260710i"></script>
+<script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260710i"></script>
+<script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260710ini"></script>
+<script src="/games/tormenta/js/t20-arena-pericias.js?v=20260710i"></script>
+<script src="/games/tormenta/js/t20-arena-magias.js?v=20260710sync"></script>
+<script src="/games/tormenta/js/t20-sync-ficha-arena.js?v=20260710sync"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-ha-preferencias.js?v=20260704ha"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
@@ -1909,6 +2043,7 @@
         turnoIdx: 0,
         rodada: 1,
         condPorId: Object.create(null),
+        viewId: null,
         statsVisiveis: (function () {
             try {
                 // Padrão visivel (true); só oculta se o utilizador guardou explicitamente '0'.
@@ -1941,7 +2076,9 @@
         if (!wrap || !body) return;
         const ids = t20Arena.ordemIds;
         const ativoId = ids.length ? ids[t20Arena.turnoIdx] : null;
-        const rec = ativoId != null ? t20Arena.condPorId[ativoId] : null;
+        const displayId =
+            t20Arena.viewId != null && t20Arena.byId[t20Arena.viewId] ? t20Arena.viewId : ativoId;
+        const rec = displayId != null ? t20Arena.condPorId[displayId] : null;
         const rotulos = rec && Array.isArray(rec.rotulos) ? rec.rotulos.filter(Boolean) : [];
         if (!rotulos.length) {
             wrap.hidden = true;
@@ -1956,6 +2093,31 @@
         body.innerHTML = rotulos
             .map((label) => `<span class="t20-arena-cond-pill">${escapeHtml(label)}</span>`)
             .join('');
+        const mods = rec && rec.mods && typeof rec.mods === 'object' ? rec.mods : null;
+        const modsTxt = [];
+        if (mods) {
+            if (mods.ataque) modsTxt.push(`Atq ${mods.ataque > 0 ? '+' : ''}${mods.ataque}`);
+            if (mods.ca) modsTxt.push(`CA ${mods.ca > 0 ? '+' : ''}${mods.ca}`);
+            if (mods.pericia_geral) modsTxt.push(`Perícias ${mods.pericia_geral > 0 ? '+' : ''}${mods.pericia_geral}`);
+            if (mods.reflexos) modsTxt.push(`Ref ${mods.reflexos > 0 ? '+' : ''}${mods.reflexos}`);
+            if (mods.iniciativa) modsTxt.push(`Ini ${mods.iniciativa > 0 ? '+' : ''}${mods.iniciativa}`);
+        }
+        if (modsTxt.length) {
+            body.innerHTML += `<p class="t20-arena-cond-mods-hint">${modsTxt.map((x) => escapeHtml(x)).join(' · ')}</p>`;
+        }
+        if (displayId != null && rec && rotulos.length && !rec.mods && !rec._modsLoading) {
+            rec._modsLoading = true;
+            new TormentaRegrasService()
+                .condicoesModificadores({ rotulos, regra_versao: 'v13' })
+                .then((r) => {
+                    rec.mods = r;
+                    rec._modsLoading = false;
+                    t20ArenaRenderCondicaoStatus();
+                })
+                .catch(() => {
+                    rec._modsLoading = false;
+                });
+        }
     }
 
     function t20ArenaPvPopularListaAlvos() {
@@ -2049,6 +2211,8 @@
         const ids = t20Arena.ordemIds;
         const ul = document.getElementById('t20ArenaIniList');
         const ativoId = ids.length ? ids[t20Arena.turnoIdx] : null;
+        const displayId =
+            t20Arena.viewId != null && t20Arena.byId[t20Arena.viewId] ? t20Arena.viewId : ativoId;
         if (ul) {
             ul.innerHTML = ids.length
                 ? ids
@@ -2059,6 +2223,8 @@
                           const iniRaw = p && p.iniciativa != null ? escapeHtml(String(p.iniciativa)) : '—';
                           const ini = maskL ? '?' : iniRaw;
                           const cls = id === ativoId ? 'is-active' : '';
+                          const isView =
+                              t20Arena.viewId != null && Number(t20Arena.viewId) === Number(id) ? ' is-view' : '';
                           const hasCond =
                               t20Arena.condPorId[id] &&
                               Array.isArray(t20Arena.condPorId[id].rotulos) &&
@@ -2066,12 +2232,12 @@
                           const condDot = hasCond
                               ? '<span class="t20-arena-ini-cond-dot" title="Cenário MB (condições) aplicado na arena"></span>'
                               : '';
-                          return `<li class="${cls}">${condDot}<span class="t20-arena-ini-num">${idx + 1}.</span><span class="t20-arena-ini-meta">${ini} — ${nome}</span></li>`;
+                          return `<li class="${cls}${isView}" data-combatente-id="${id}" role="button" tabindex="0" title="Clique para visualizar">${condDot}<span class="t20-arena-ini-num">${idx + 1}.</span><span class="t20-arena-ini-meta">${ini} — ${nome}</span></li>`;
                       })
                       .join('')
                 : '<li>—</li>';
         }
-        const p = ativoId ? t20Arena.byId[ativoId] : null;
+        const p = displayId ? t20Arena.byId[displayId] : null;
         const setTxt = (id, t) => {
             const n = document.getElementById(id);
             if (n) n.textContent = t;
@@ -2148,6 +2314,9 @@
         setTxt('t20ArenaTurnoIdx', `${turnoHum} / ${ids.length || 0}`);
         t20ArenaRenderCondicaoStatus();
         t20ArenaSyncToggleStatsBtn();
+        if (typeof window.__t20ArenaNpcCompactRender === 'function') {
+            window.__t20ArenaNpcCompactRender(p, mask);
+        }
     }
 
     function t20ArenaApplyFromApi(st) {
@@ -2158,6 +2327,7 @@
             t20Arena.turnoIdx = 0;
             t20Arena.rodada = 1;
             t20Arena.condPorId = Object.create(null);
+            t20Arena.viewId = null;
             t20ArenaUiSetup();
             t20ArenaRenderPick();
             t20ArenaRenderActive();
@@ -2220,6 +2390,7 @@
     window.__t20ArenaApplyFromApi = t20ArenaApplyFromApi;
     window.__t20ArenaRefreshFromApi = t20ArenaRefreshFromApi;
     window.__t20ArenaRenderActive = t20ArenaRenderActive;
+    window.__t20ArenaRenderPick = t20ArenaRenderPick;
 
     function t20ArenaBindOnce() {
         const root = document.getElementById('tab-arena');
@@ -2236,7 +2407,11 @@
             }
             try {
                 const st = await combateSvc.iniciar(chosen);
+                if (window.T20ArenaLogMesa) window.T20ArenaLogMesa.clear();
                 t20ArenaApplyFromApi(st);
+                if (window.T20ArenaLogMesa) {
+                    window.T20ArenaLogMesa.append('sistema', `Combate iniciado com ${chosen.length} combatente(s).`);
+                }
                 Toast.success('Combate Tormenta iniciado (guardado na sua conta).');
             } catch (e) {
                 Toast.error(e.message || 'Erro ao iniciar combate.');
@@ -2247,6 +2422,7 @@
             try {
                 const st = await combateSvc.finalizar();
                 t20ArenaApplyFromApi(st);
+                if (window.T20ArenaLogMesa) window.T20ArenaLogMesa.append('sistema', 'Combate encerrado.');
                 Toast.info('Combate encerrado.');
             } catch (e) {
                 Toast.error(e.message || 'Erro ao encerrar combate.');
@@ -2257,7 +2433,16 @@
             if (!t20Arena.ativo || !t20Arena.ordemIds.length) return;
             try {
                 const st = await combateSvc.avancarTurno();
+                t20Arena.viewId = null;
                 t20ArenaApplyFromApi(st);
+                const depois = t20Arena.ordemIds[t20Arena.turnoIdx];
+                const p = depois != null ? t20Arena.byId[depois] : null;
+                if (window.T20ArenaLogMesa) {
+                    window.T20ArenaLogMesa.append(
+                        'turno',
+                        `Rodada ${t20Arena.rodada} · turno de ${p ? p.nome : '#' + depois}`
+                    );
+                }
             } catch (e) {
                 Toast.error(e.message || 'Erro ao avançar turno.');
             }
@@ -2355,7 +2540,29 @@
                 t20ArenaRenderActive();
                 await t20ArenaRefreshFromApi();
                 fecharModal();
+                const nomes = alvos.map((id) => (t20Arena.byId[id] && t20Arena.byId[id].nome) || `#${id}`).join(', ');
+                if (window.T20ArenaLogMesa) {
+                    if (dano > 0) {
+                        window.T20ArenaLogMesa.append('pv', `Dano ${dano} em ${nomes}`);
+                    } else {
+                        window.T20ArenaLogMesa.append('pv', `Cura ${cura} em ${nomes}`);
+                    }
+                }
                 Toast.success(dano > 0 ? `Dano ${dano} aplicado aos selecionados.` : `Cura ${cura} aplicada aos selecionados.`);
+                if (window.T20SyncFichaArena && typeof window.T20SyncFichaArena.publicarVitais === 'function') {
+                    alvos.forEach((id) => {
+                        const p = t20Arena.byId[id];
+                        if (!p) return;
+                        window.T20SyncFichaArena.publicarVitais({
+                            origem: 'arena',
+                            personagem_id: id,
+                            pv_atual: p.pv_atual,
+                            pv_max: p.pv_max,
+                            pa_atual: p.pa_atual,
+                            pa_max: p.pa_max,
+                        });
+                    });
+                }
             } catch (e) {
                 Toast.error(e.message || 'Erro ao salvar PV');
             }
@@ -2364,6 +2571,24 @@
         void t20ArenaRefreshFromApi();
         if (typeof window.__t20ArenaCondicoesInit === 'function') {
             window.__t20ArenaCondicoesInit();
+        }
+        if (typeof window.__t20ArenaPericiasInit === 'function') {
+            window.__t20ArenaPericiasInit();
+        }
+        if (typeof window.__t20ArenaNpcCompactInit === 'function') {
+            window.__t20ArenaNpcCompactInit();
+        }
+        if (window.T20ArenaLogMesa && typeof window.T20ArenaLogMesa.render === 'function') {
+            window.T20ArenaLogMesa.render();
+        }
+        if (window.T20SyncFichaArena && typeof window.T20SyncFichaArena.initArena === 'function') {
+            window.__t20ArenaOnVitaisSync = function (personagemId, patch) {
+                const ix = cacheLista.findIndex((x) => Number(x.id) === Number(personagemId));
+                if (ix >= 0) {
+                    cacheLista[ix] = { ...cacheLista[ix], ...patch };
+                }
+            };
+            window.T20SyncFichaArena.initArena();
         }
     }
 
@@ -2848,6 +3073,9 @@
             t20ArenaRenderPick();
             t20ArenaBindOnce();
             void t20ArenaRefreshFromApi();
+            if (window.T20ArenaHandouts && window.T20ArenaHandouts.agendar) {
+                window.T20ArenaHandouts.agendar();
+            }
         } catch (e) {
             if (tb) {
                 tb.innerHTML = `<tr><td colspan="7" class="tormenta-cell-muted">${escapeHtml(e.message || 'Erro')}</td></tr>`;
@@ -3100,6 +3328,9 @@
                 campanhasComoMestre = Array.isArray(lista) ? lista : [];
             },
         });
+    }
+    if (typeof window.__t20DashHandoutsInit === 'function') {
+        window.__t20DashHandoutsInit({ Toast });
     }
     if (typeof window.__t20CampanhaWorkspaceInit === 'function') {
         window.__t20CampanhaWorkspaceInit({

@@ -203,6 +203,16 @@
             } else if (typeof t20ArenaRenderActive === 'function') {
                 t20ArenaRenderActive();
             }
+            if (window.T20SyncFichaArena && typeof window.T20SyncFichaArena.publicarVitais === 'function') {
+                window.T20SyncFichaArena.publicarVitais({
+                    origem: 'arena',
+                    personagem_id: personagemId,
+                    pa_atual: res.pa_atual_depois,
+                    pa_max: res.pa_max != null ? res.pa_max : ar && ar.byId[personagemId] ? ar.byId[personagemId].pa_max : null,
+                    pv_atual: ar && ar.byId[personagemId] ? ar.byId[personagemId].pv_atual : null,
+                    pv_max: ar && ar.byId[personagemId] ? ar.byId[personagemId].pv_max : null,
+                });
+            }
             if (dlg && typeof dlg.close === 'function') dlg.close();
         } catch (e) {
             if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro ao lançar magia');

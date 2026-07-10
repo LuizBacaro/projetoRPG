@@ -369,6 +369,15 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao rolar perícia');
     }
 
+    async condicoesModificadores(body) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/condicoes/modificadores'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        return this._handleJson(res, 'Erro ao calcular modificadores de condições');
+    }
+
     async rolarAtaque(body) {
         const res = await fetch(window.getApiUrl('/tormenta/regras/ataque/rolar'), {
             method: 'POST',

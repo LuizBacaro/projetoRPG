@@ -374,14 +374,19 @@ class TormentaPersonagemService:
             return
         if not ficha_json:
             return
-        if criacao and ficha_json.get("cadastro_dashboard"):
-            if not ficha_json.get("pericias_wizard_v13"):
-                return
+        wizard_v13 = bool(ficha_json.get("pericias_wizard_v13"))
+        cadastro_dash = bool(ficha_json.get("cadastro_dashboard"))
+        if criacao and cadastro_dash and not wizard_v13:
+            return
         slug = str(ficha_json.get("tormenta_classe_mb_slug") or "").strip().lower()
         if not slug:
             return
         pericias = ficha_json.get("pericias")
         if not isinstance(pericias, list) or len(pericias) == 0:
+            if wizard_v13 or (criacao and cadastro_dash):
+                raise DadosInvalidos(
+                    "Orçamento de perícias: selecione perícias treinadas na criação."
+                )
             return
         raca_slug = str(ficha_json.get("raca_tormenta_slug") or "").strip().lower()
         if raca_slug in ("__livre__", ""):
