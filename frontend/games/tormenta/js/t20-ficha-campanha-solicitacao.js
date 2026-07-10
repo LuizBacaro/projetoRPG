@@ -34,6 +34,7 @@
                 opts && typeof opts.onCampanhaNomeChange === 'function'
                     ? opts.onCampanhaNomeChange
                     : null;
+            const souDono = opts && opts.souDono === true;
             const Toast = opts && opts.Toast ? opts.Toast : global.Toast;
             const campSvc = new global.TormentaCampanhaService();
 
@@ -55,7 +56,9 @@
                 }
             }
 
-            if (this._personagemId) {
+            const jaVinculado =
+                this._vinculadoId != null && Number(this._vinculadoId) > 0;
+            if (this._personagemId && souDono && !jaVinculado) {
                 try {
                     this._pendente = await campSvc.obterMinhaSolicitacao(this._personagemId);
                 } catch (_e) {
@@ -64,11 +67,12 @@
             }
 
             this._renderSelect(sel);
-            this._atualizarUi(sel, hint, btnCancel, onCampanhaNomeChange);
+            this._atualizarUi(sel, hint, btnCancel, onCampanhaNomeChange, souDono);
 
             if (!this._bound) {
                 this._bound = true;
                 sel.addEventListener('change', async () => {
+                    if (!souDono) return;
                     const val = sel.value.trim();
                     if (!val) return;
                     const campanhaId = Number(val);
@@ -99,7 +103,7 @@
                                 Toast.success('Solicitação enviada ao mestre da campanha.');
                             }
                         }
-                        this._atualizarUi(sel, hint, btnCancel, onCampanhaNomeChange);
+                        this._atualizarUi(sel, hint, btnCancel, onCampanhaNomeChange, souDono);
                     } catch (e) {
                         if (Toast && Toast.error) Toast.error(e.message || 'Erro ao solicitar');
                         sel.value = this._valorSelectAtual();
@@ -107,13 +111,14 @@
                 });
 
                 btnCancel?.addEventListener('click', async () => {
+                    if (!souDono) return;
                     if (!this._pendente || !this._pendente.id) return;
                     try {
                         await campSvc.cancelarSolicitacao(this._pendente.id);
                         this._pendente = null;
                         sel.value = '';
                         if (Toast && Toast.success) Toast.success('Solicitação cancelada.');
-                        this._atualizarUi(sel, hint, btnCancel, onCampanhaNomeChange);
+                        this._atualizarUi(sel, hint, btnCancel, onCampanhaNomeChange, souDono);
                     } catch (e) {
                         if (Toast && Toast.error) Toast.error(e.message || 'Erro ao cancelar');
                     }
@@ -142,11 +147,20 @@
             sel.value = this._valorSelectAtual();
         },
 
-        _atualizarUi(sel, hint, btnCancel, onCampanhaNomeChange) {
+        _atualizarUi(sel, hint, btnCancel, onCampanhaNomeChange, souDono = true) {
             const vinculado = this._vinculadoId != null && Number(this._vinculadoId) > 0;
             const pendente = this._pendente && this._pendente.status === 'pendente';
 
-            if (vinculado) {
+            if (!souDono) {
+                sel.disabled = true;
+                if (hint) {
+                    hint.textContent = vinculado
+                        ? 'Campanha vinculada (visualização — apenas o dono do personagem solicita entrada).'
+                        : 'Campanha (somente o dono do personagem pode solicitar entrada).';
+                    hint.hidden = false;
+                }
+                if (btnCancel) btnCancel.hidden = true;
+            } else if (vinculado) {
                 sel.disabled = true;
                 if (hint) {
                     const c = this._campanhas.find(

@@ -65,7 +65,7 @@ class TormentaCampanhaService {
             this._url(`/solicitacoes/minhas?personagem_id=${encodeURIComponent(String(personagemId))}`),
             { headers: this._headers(false), cache: 'no-store' }
         );
-        if (res.status === 204) return null;
+        if (res.status === 204 || res.status === 403) return null;
         return this._handleResponse(res, 'Erro ao carregar solicitação');
     }
 
