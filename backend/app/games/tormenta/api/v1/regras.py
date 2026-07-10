@@ -160,6 +160,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaMagiaMbCatalogoPaginaResponse,
     TormentaOrigemV13Item,
     TormentaPericiaAtributoItem,
+    TormentaPericiaBonusLoteRequest,
+    TormentaPericiaBonusLoteResponse,
     TormentaPericiaBonusRequest,
     TormentaPericiaBonusResponse,
     TormentaPericiaRolarRequest,
@@ -1151,14 +1153,8 @@ def obter_regras_pericias(
     )
 
 
-@router.post(
-    "/pericias/calcular-bonus",
-    response_model=TormentaPericiaBonusResponse,
-    summary="Calcula bônus total de perícia",
-)
-def calcular_bonus_pericia_mb(
+def _calcular_bonus_pericia_response(
     body: TormentaPericiaBonusRequest,
-    _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaPericiaBonusResponse:
     rv = normalizar_regra_versao(body.regra_versao)
     racial = int(body.racial_bonus)
@@ -1214,6 +1210,32 @@ def calcular_bonus_pericia_mb(
         percepcao_passiva=pp,
         pode_usar=pode,
         motivo_bloqueio=motivo,
+    )
+
+
+@router.post(
+    "/pericias/calcular-bonus",
+    response_model=TormentaPericiaBonusResponse,
+    summary="Calcula bônus total de perícia",
+)
+def calcular_bonus_pericia_mb(
+    body: TormentaPericiaBonusRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPericiaBonusResponse:
+    return _calcular_bonus_pericia_response(body)
+
+
+@router.post(
+    "/pericias/calcular-bonus-lote",
+    response_model=TormentaPericiaBonusLoteResponse,
+    summary="Calcula bônus de várias perícias em uma requisição",
+)
+def calcular_bonus_pericia_lote(
+    body: TormentaPericiaBonusLoteRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaPericiaBonusLoteResponse:
+    return TormentaPericiaBonusLoteResponse(
+        itens=[_calcular_bonus_pericia_response(item) for item in body.itens]
     )
 
 

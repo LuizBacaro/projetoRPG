@@ -383,3 +383,5 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao encerrar concentração');
     }
 }
+
+window.TormentaPersonagemService = TormentaPersonagemService;

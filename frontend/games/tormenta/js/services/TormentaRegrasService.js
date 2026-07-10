@@ -378,16 +378,80 @@ class TormentaRegrasService {
     }
 
     async calcularBonusPericia(body) {
+        const payload = this._normalizarBonusPayload(body);
+        const cacheKey = this._bonusCacheKey(payload);
+        if (this._bonusCache && this._bonusCache.has(cacheKey)) {
+            return this._bonusCache.get(cacheKey);
+        }
+        if (this._bonusInflight && this._bonusInflight.has(cacheKey)) {
+            return this._bonusInflight.get(cacheKey);
+        }
+        const promise = (async () => {
+            const res = await fetch(window.getApiUrl('/tormenta/regras/pericias/calcular-bonus'), {
+                method: 'POST',
+                headers: { ...this._headers(), 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await this._handleJson(res, 'Erro ao calcular bônus de perícia');
+            this._guardarBonusCache(cacheKey, data);
+            return data;
+        })();
+        if (!this._bonusInflight) this._bonusInflight = new Map();
+        this._bonusInflight.set(cacheKey, promise);
+        try {
+            return await promise;
+        } finally {
+            this._bonusInflight.delete(cacheKey);
+        }
+    }
+
+    async calcularBonusPericiaLote(itens) {
+        const lista = Array.isArray(itens) ? itens : [];
+        if (!lista.length) return [];
+        if (lista.length === 1) {
+            const um = await this.calcularBonusPericia(lista[0]);
+            return [um];
+        }
+        const payloads = lista.map((item) => this._normalizarBonusPayload(item));
+        const res = await fetch(
+            window.getApiUrl('/tormenta/regras/pericias/calcular-bonus-lote'),
+            {
+                method: 'POST',
+                headers: { ...this._headers(), 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itens: payloads }),
+            }
+        );
+        const data = await this._handleJson(res, 'Erro ao calcular bônus de perícias');
+        const rows = Array.isArray(data.itens) ? data.itens : [];
+        payloads.forEach((payload, idx) => {
+            if (rows[idx]) this._guardarBonusCache(this._bonusCacheKey(payload), rows[idx]);
+        });
+        return rows;
+    }
+
+    _normalizarBonusPayload(body) {
         const payload = { ...body };
         if (body.regraVersao && payload.regra_versao == null) {
             payload.regra_versao = body.regraVersao;
         }
-        const res = await fetch(window.getApiUrl('/tormenta/regras/pericias/calcular-bonus'), {
-            method: 'POST',
-            headers: { ...this._headers(), 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
-        return this._handleJson(res, 'Erro ao calcular bônus de perícia');
+        return payload;
+    }
+
+    _bonusCacheKey(payload) {
+        return JSON.stringify(payload);
+    }
+
+    _guardarBonusCache(key, data) {
+        if (!this._bonusCache) this._bonusCache = new Map();
+        if (this._bonusCache.size > 240) {
+            const first = this._bonusCache.keys().next().value;
+            if (first != null) this._bonusCache.delete(first);
+        }
+        this._bonusCache.set(key, data);
+    }
+
+    limparCacheBonusPericia() {
+        if (this._bonusCache) this._bonusCache.clear();
     }
 
     async rolarPericia(body) {
@@ -613,3 +677,5 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao validar pré-requisitos do poder');
     }
 }
+
+window.TormentaRegrasService = TormentaRegrasService;

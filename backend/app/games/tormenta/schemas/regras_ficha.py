@@ -860,6 +860,18 @@ class TormentaPericiaBonusResponse(BaseModel):
     motivo_bloqueio: str = Field(default="", max_length=300)
 
 
+class TormentaPericiaBonusLoteRequest(BaseModel):
+    itens: List[TormentaPericiaBonusRequest] = Field(
+        default_factory=list,
+        max_length=80,
+        description="Lista de perícias para calcular em uma única requisição.",
+    )
+
+
+class TormentaPericiaBonusLoteResponse(BaseModel):
+    itens: List[TormentaPericiaBonusResponse] = Field(default_factory=list)
+
+
 class TormentaPericiaRolarRequest(BaseModel):
     bonus: int = Field(0, ge=-99, le=99)
     dc: int = Field(15, ge=0, le=99)

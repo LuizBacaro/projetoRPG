@@ -550,6 +550,35 @@ def test_post_pericias_calcular_bonus_v13(client_regras_tormenta):
     assert body["penalidade_armadura_aplicada"] == 0
 
 
+def test_post_pericias_calcular_bonus_lote(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pericias/calcular-bonus-lote",
+        json={
+            "itens": [
+                {
+                    "nivel": 7,
+                    "mod_atributo": 3,
+                    "treinado": True,
+                    "regra_versao": "v13",
+                    "nome_pericia": "Acrobacia",
+                },
+                {
+                    "nivel": 5,
+                    "mod_atributo": 2,
+                    "treinado": True,
+                    "regra_versao": "v13",
+                    "nome_pericia": "Percepção",
+                },
+            ]
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["itens"]) == 2
+    assert body["itens"][0]["bonus_total"] == 10
+    assert body["itens"][1]["percepcao_passiva"] == 10 + body["itens"][1]["bonus_total"]
+
+
 def test_post_pericias_calcular_bonus_acrobacia_com_armadura(client_regras_tormenta):
     r = client_regras_tormenta.post(
         "/api/v1/tormenta/regras/pericias/calcular-bonus",
