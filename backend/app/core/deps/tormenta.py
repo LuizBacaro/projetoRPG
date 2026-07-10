@@ -10,6 +10,7 @@ from app.games.tormenta.repositories.campanha_solicitacao_repository import (
     TormentaCampanhaSolicitacaoRepository,
 )
 from app.games.tormenta.repositories.combate_repository import TormentaCombateRepository
+from app.games.tormenta.repositories.handout_repository import TormentaHandoutRepository
 from app.games.tormenta.repositories.personagem_repository import (
     TormentaPersonagemRepository,
 )
@@ -21,6 +22,7 @@ from app.games.tormenta.services.campanha_solicitacao_service import (
     TormentaCampanhaSolicitacaoService,
 )
 from app.games.tormenta.services.combate_service import TormentaCombateService
+from app.games.tormenta.services.handout_service import TormentaHandoutService
 from app.games.tormenta.services.personagem_consumiveis_service import (
     TormentaPersonagemConsumiveisService,
 )
@@ -122,6 +124,12 @@ def get_tormenta_sessao_campanha_repository(
     return TormentaSessaoCampanhaRepository(db)
 
 
+def get_tormenta_handout_repository(
+    db: Session = Depends(get_db),
+) -> TormentaHandoutRepository:
+    return TormentaHandoutRepository(db)
+
+
 def get_tormenta_campanha_solicitacao_repository(
     db: Session = Depends(get_db),
 ) -> TormentaCampanhaSolicitacaoRepository:
@@ -164,3 +172,14 @@ def get_tormenta_sessao_campanha_service(
     ),
 ) -> TormentaSessaoCampanhaService:
     return TormentaSessaoCampanhaService(sessao_repository, campanha_repository)
+
+
+def get_tormenta_handout_service(
+    handout_repository: TormentaHandoutRepository = Depends(
+        get_tormenta_handout_repository
+    ),
+    campanha_repository: TormentaCampanhaRepository = Depends(
+        get_tormenta_campanha_repository
+    ),
+) -> TormentaHandoutService:
+    return TormentaHandoutService(handout_repository, campanha_repository)

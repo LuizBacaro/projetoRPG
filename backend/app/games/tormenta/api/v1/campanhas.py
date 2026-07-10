@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.core.dependencies import (
     get_tormenta_campanha_service,
     get_tormenta_campanha_solicitacao_service,
+    get_tormenta_handout_service,
     get_tormenta_sessao_campanha_service,
 )
 from app.games.tormenta.schemas.campanha import (
@@ -18,6 +19,11 @@ from app.games.tormenta.schemas.campanha_solicitacao import (
     TormentaCampanhaSolicitacaoCreate,
     TormentaCampanhaSolicitacaoResponse,
 )
+from app.games.tormenta.schemas.handout import (
+    TormentaHandoutCreate,
+    TormentaHandoutResponse,
+    TormentaHandoutUpdate,
+)
 from app.games.tormenta.schemas.sessao_campanha import (
     TormentaSessaoCampanhaCreate,
     TormentaSessaoCampanhaResponse,
@@ -27,6 +33,7 @@ from app.games.tormenta.services.campanha_service import TormentaCampanhaService
 from app.games.tormenta.services.campanha_solicitacao_service import (
     TormentaCampanhaSolicitacaoService,
 )
+from app.games.tormenta.services.handout_service import TormentaHandoutService
 from app.games.tormenta.services.sessao_campanha_service import (
     TormentaSessaoCampanhaService,
 )
@@ -39,6 +46,95 @@ router = APIRouter(
     tags=["Tormenta — Campanhas"],
     dependencies=[Depends(requer_game_tormenta)],
 )
+
+
+@router.get(
+    "/handouts/visiveis",
+    response_model=list[TormentaHandoutResponse],
+)
+def listar_handouts_visiveis_para_jogador(
+    campanha_id: int | None = Query(None, ge=1),
+    service: TormentaHandoutService = Depends(get_tormenta_handout_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    rows = service.listar_visiveis_para_usuario(usuario.id, campanha_id=campanha_id)
+    return [TormentaHandoutResponse.model_validate(h) for h in rows]
+
+
+@router.get("/handouts", response_model=list[TormentaHandoutResponse])
+def listar_handouts(
+    campanha_id: int | None = Query(None, ge=1),
+    service: TormentaHandoutService = Depends(get_tormenta_handout_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    rows = service.listar_para_mestre_ou_admin(
+        usuario.perfil, usuario.id, campanha_id=campanha_id
+    )
+    return [TormentaHandoutResponse.model_validate(h) for h in rows]
+
+
+@router.post(
+    "/handouts",
+    response_model=TormentaHandoutResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def criar_handout(
+    payload: TormentaHandoutCreate,
+    service: TormentaHandoutService = Depends(get_tormenta_handout_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        h = service.criar(
+            usuario_id=usuario.id,
+            perfil=usuario.perfil,
+            campanha_id=payload.campanha_id,
+            titulo=payload.titulo,
+            corpo_md=payload.corpo_md,
+            imagem_url=payload.imagem_url,
+            visivel_para_user_ids=payload.visivel_para_user_ids,
+        )
+        return TormentaHandoutResponse.model_validate(h)
+    except ArenaBaseException as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+    except DadosInvalidos as exc:
+        raise HTTPException(status_code=422, detail=exc.message) from exc
+
+
+@router.put("/handouts/{handout_id}", response_model=TormentaHandoutResponse)
+def atualizar_handout(
+    handout_id: int,
+    payload: TormentaHandoutUpdate,
+    service: TormentaHandoutService = Depends(get_tormenta_handout_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        h = service.atualizar(
+            usuario_id=usuario.id,
+            perfil=usuario.perfil,
+            handout_id=handout_id,
+            titulo=payload.titulo,
+            corpo_md=payload.corpo_md,
+            imagem_url=payload.imagem_url,
+            visivel_para_user_ids=payload.visivel_para_user_ids,
+        )
+        return TormentaHandoutResponse.model_validate(h)
+    except ArenaBaseException as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+    except DadosInvalidos as exc:
+        raise HTTPException(status_code=422, detail=exc.message) from exc
+
+
+@router.delete("/handouts/{handout_id}", status_code=status.HTTP_204_NO_CONTENT)
+def deletar_handout(
+    handout_id: int,
+    service: TormentaHandoutService = Depends(get_tormenta_handout_service),
+    usuario: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        service.deletar(usuario.id, usuario.perfil, handout_id)
+    except ArenaBaseException as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+    return None
 
 
 @router.get(

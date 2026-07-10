@@ -1572,3 +1572,23 @@ def test_criar_jogador_v13_com_pericias_wizard(tormenta_personagens_db):
     fj = r.json()["ficha_json"]
     treinadas = [p for p in (fj.get("pericias") or []) if p.get("treinado")]
     assert len(treinadas) >= 7
+
+
+def test_criar_jogador_v13_wizard_sem_pericias_rejeita(tormenta_personagens_db):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="Sem Pericias",
+            nivel=1,
+            ficha_json={
+                "tormenta_classe_mb_slug": "barbaro",
+                "raca_tormenta_slug": "humano",
+                "cadastro_dashboard": True,
+                "pericias_wizard_v13": True,
+                "pericias": [],
+            },
+        ),
+    )
+    assert r.status_code == 422, r.text

@@ -34,6 +34,28 @@ class TormentaCombateRolarIniciativaRequest(BaseModel):
     personagem_ids: List[int] = Field(..., min_length=1)
 
 
+class TormentaCombateAplicarIniciativaManualRequest(BaseModel):
+    """Chaves = id do personagem (string); valor = iniciativa total na mesa."""
+
+    por_personagem: Dict[str, int] = Field(..., min_length=1)
+
+    @field_validator("por_personagem")
+    @classmethod
+    def _validar_totais(cls, v: Dict[str, int]) -> Dict[str, int]:
+        out: Dict[str, int] = {}
+        for k, val in (v or {}).items():
+            try:
+                n = int(val)
+            except (TypeError, ValueError) as e:
+                raise ValueError(f"Iniciativa inválida para personagem {k}") from e
+            if n < -99 or n > 99:
+                raise ValueError(
+                    f"Iniciativa fora do intervalo (-99 a 99) para personagem {k}"
+                )
+            out[str(k)] = n
+        return out
+
+
 class TormentaCombateRolarAtaqueRequest(BaseModel):
     atacante_id: int
     alvo_id: int

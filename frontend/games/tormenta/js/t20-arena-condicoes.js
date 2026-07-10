@@ -156,6 +156,16 @@
                     if (typeof Toast !== 'undefined' && Toast.error) Toast.error('Serviço de combate indisponível.');
                     return;
                 }
+                let modsPorAlvo = {};
+                try {
+                    const regrasSvc = new TormentaRegrasService();
+                    const mods = await regrasSvc.condicoesModificadores({ rotulos, regra_versao: 'v13' });
+                    alvos.forEach((id) => {
+                        modsPorAlvo[id] = mods;
+                    });
+                } catch (_e) {
+                    modsPorAlvo = {};
+                }
                 const payload = {};
                 alvos.forEach((id) => {
                     payload[String(id)] = { tips: tips.slice(), rotulos: rotulos.slice() };
@@ -166,12 +176,39 @@
                     if (typeof window.__t20ArenaApplyFromApi === 'function') window.__t20ArenaApplyFromApi(st);
                     else {
                         alvos.forEach((id) => {
-                            ar.condPorId[id] = { tips: tips.slice(), rotulos: rotulos.slice() };
+                            ar.condPorId[id] = {
+                                tips: tips.slice(),
+                                rotulos: rotulos.slice(),
+                                mods: modsPorAlvo[id] || null,
+                            };
                         });
                     }
+                    alvos.forEach((id) => {
+                        if (!ar.condPorId[id]) {
+                            ar.condPorId[id] = { tips: tips.slice(), rotulos: rotulos.slice() };
+                        }
+                        ar.condPorId[id].mods = modsPorAlvo[id] || null;
+                    });
                     if (typeof window.__t20ArenaRenderCondStatus === 'function') window.__t20ArenaRenderCondStatus();
                     fecharCondDlg(dlg);
                     if (typeof Toast !== 'undefined' && Toast.success) Toast.success(`Cenário gravado para ${alvos.length} combatente(s).`);
+                    if (window.T20ArenaLogMesa) {
+                        window.T20ArenaLogMesa.append(
+                            'condicao',
+                            `Condições aplicadas a ${alvos.length} combatente(s): ${rotulos.slice(0, 4).join(', ')}${rotulos.length > 4 ? '…' : ''}`
+                        );
+                    }
+                    if (window.T20SyncFichaArena && typeof window.T20SyncFichaArena.publicarCondicoes === 'function') {
+                        alvos.forEach((id) => {
+                            window.T20SyncFichaArena.publicarCondicoes({
+                                origem: 'arena',
+                                personagem_id: id,
+                                rotulos: rotulos.slice(),
+                                tips: tips.slice(),
+                                mods: modsPorAlvo[id] || null,
+                            });
+                        });
+                    }
                 } catch (e) {
                     if (typeof Toast !== 'undefined' && Toast.error) Toast.error(e.message || 'Erro ao gravar condições.');
                 } finally {

@@ -14,6 +14,19 @@
         return window.__t20ArenaRef;
     }
 
+    function logMesa(tipo, msg) {
+        if (window.T20ArenaLogMesa && typeof window.T20ArenaLogMesa.append === 'function') {
+            window.T20ArenaLogMesa.append(tipo, msg);
+        }
+    }
+
+    function combatenteExibidoId(ar) {
+        if (!ar || !ar.ordemIds.length) return null;
+        const turnId = ar.ordemIds[ar.turnoIdx];
+        if (ar.viewId != null && ar.byId[ar.viewId]) return ar.viewId;
+        return turnId;
+    }
+
     function statsMascarados(ar) {
         return !!(ar && ar.ativo && !ar.statsVisiveis);
     }
@@ -179,8 +192,20 @@
         const hit = r.acertou
             ? '<span class="t20-arena-roll-ok">ACERTO</span>'
             : '<span class="t20-arena-roll-fail">ERRO</span>';
+        const modAtk =
+            r.modificador_condicoes_ataque != null && r.modificador_condicoes_ataque !== 0
+                ? ` <span class="t20-arena-roll-result__hint">(cond. atacante ${r.modificador_condicoes_ataque >= 0 ? '+' : ''}${r.modificador_condicoes_ataque})</span>`
+                : '';
+        const modCa =
+            r.modificador_condicoes_ca_alvo != null && r.modificador_condicoes_ca_alvo !== 0
+                ? ` <span class="t20-arena-roll-result__hint">(cond. alvo CA ${r.modificador_condicoes_ca_alvo >= 0 ? '+' : ''}${r.modificador_condicoes_ca_alvo})</span>`
+                : '';
+        const caBase =
+            r.ca_base_alvo != null && r.modificador_condicoes_ca_alvo
+                ? ` <span class="t20-arena-roll-result__hint">(base ${r.ca_base_alvo})</span>`
+                : '';
         box.innerHTML = `<p class="t20-arena-roll-result__tit">${esc(r.atacante_nome)} → ${esc(r.alvo_nome)}</p>
-            <p class="t20-arena-roll-result__linha"><strong>${r.d20}</strong> + ${r.bonus} = <strong>${r.total}</strong> vs CA <strong>${r.ca_alvo}</strong> → ${hit}${crit}</p>`;
+            <p class="t20-arena-roll-result__linha"><strong>${r.d20}</strong> + ${r.bonus} = <strong>${r.total}</strong>${modAtk} vs CA <strong>${r.ca_alvo}</strong>${modCa}${caBase} → ${hit}${crit}</p>`;
         box.hidden = false;
     }
 
@@ -217,10 +242,150 @@
                     .join(' · ');
                 Toast.info(`Iniciativa: ${linhas}`);
             }
-            await arenaRefresh();
+            if (res.resultados && res.resultados.length) {
+                res.resultados.forEach((r) => {
+                    let linha = `${r.nome}: ${r.d20}+${r.modificador}=${r.total}`;
+                    if (r.modificador_condicoes) {
+                        linha += ` (cond. ${r.modificador_condicoes >= 0 ? '+' : ''}${r.modificador_condicoes})`;
+                    }
+                    logMesa('iniciativa', linha);
+                });
+            }
+            if (res.status && typeof window.__t20ArenaApplyFromApi === 'function') {
+                window.__t20ArenaApplyFromApi(res.status);
+            } else {
+                await arenaRefresh();
+            }
         } catch (e) {
             if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro');
         }
+    }
+
+    function fecharModalIniEscolha() {
+        const dlg = document.getElementById('t20ArenaModalIniEscolha');
+        if (dlg && typeof dlg.close === 'function') dlg.close();
+    }
+
+    function fecharModalIniManual() {
+        const dlg = document.getElementById('t20ArenaModalIniManual');
+        if (dlg && typeof dlg.close === 'function') dlg.close();
+    }
+
+    function abrirEscolhaIniciativa() {
+        const ar = arenaRef();
+        if (!ar || !ar.ativo || !ar.ordemIds.length) {
+            if (typeof Toast !== 'undefined') Toast.error('Inicie o combate antes.');
+            return;
+        }
+        const dlg = document.getElementById('t20ArenaModalIniEscolha');
+        if (!dlg || typeof dlg.showModal !== 'function') {
+            void rolarIniciativaTodos();
+            return;
+        }
+        dlg.showModal();
+    }
+
+    function popularListaIniManual() {
+        const host = document.getElementById('t20ArenaIniManualLista');
+        const ar = arenaRef();
+        if (!host || !ar) return;
+        const ids = ar.ordemIds || [];
+        if (!ids.length) {
+            host.innerHTML = '<p class="t20-arena-cb-vazio">Nenhum combatente no combate.</p>';
+            return;
+        }
+        host.innerHTML = ids
+            .map((id) => {
+                const p = ar.byId[id];
+                const nome = p ? esc(p.nome) : `#${id}`;
+                const tipo = p ? String(p.tipo || '').toLowerCase() : '';
+                const badge = tipo
+                    ? `<span class="t20-arena-cb-tipo t20-arena-cb-tipo--${esc(tipo)}">${esc(tipo)}</span>`
+                    : '';
+                const cur = p && p.iniciativa != null && Number.isFinite(Number(p.iniciativa)) ? Number(p.iniciativa) : '';
+                return `<div class="t20-arena-ini-manual-row">
+                    <label class="t20-arena-ini-manual-lbl" for="t20-ini-manual-${id}">
+                        <span class="t20-arena-ini-manual-nome">${nome}</span>${badge}
+                    </label>
+                    <input type="number" class="t20-arena-ini-manual-inp" id="t20-ini-manual-${id}" data-personagem-id="${id}" min="-99" max="99" step="1" value="${cur !== '' ? esc(String(cur)) : ''}" placeholder="Total" aria-label="Iniciativa de ${nome}" />
+                </div>`;
+            })
+            .join('');
+    }
+
+    function abrirModalIniManual() {
+        fecharModalIniEscolha();
+        const dlg = document.getElementById('t20ArenaModalIniManual');
+        if (!dlg || typeof dlg.showModal !== 'function') return;
+        popularListaIniManual();
+        dlg.showModal();
+        const first = dlg.querySelector('.t20-arena-ini-manual-inp');
+        if (first) first.focus();
+    }
+
+    async function aplicarIniciativaManual() {
+        const ar = arenaRef();
+        if (!ar || !ar.ordemIds.length) {
+            if (typeof Toast !== 'undefined') Toast.error('Nenhum combatente no combate.');
+            return;
+        }
+        const porPersonagem = {};
+        const faltando = [];
+        ar.ordemIds.forEach((id) => {
+            const inp = document.getElementById(`t20-ini-manual-${id}`);
+            if (!inp) {
+                faltando.push(id);
+                return;
+            }
+            const raw = String(inp.value ?? '').trim();
+            if (raw === '') {
+                const p = ar.byId[id];
+                faltando.push(p && p.nome ? p.nome : `#${id}`);
+                return;
+            }
+            const n = Number(raw);
+            if (!Number.isFinite(n)) {
+                const p = ar.byId[id];
+                faltando.push(p && p.nome ? p.nome : `#${id}`);
+                return;
+            }
+            porPersonagem[String(id)] = Math.trunc(n);
+        });
+        if (faltando.length) {
+            if (typeof Toast !== 'undefined') {
+                Toast.error(`Informe a iniciativa de: ${faltando.slice(0, 4).join(', ')}${faltando.length > 4 ? '…' : ''}`);
+            }
+            return;
+        }
+        const btn = document.getElementById('t20ArenaModalIniManualAplicar');
+        if (btn) btn.disabled = true;
+        try {
+            const res = await combate().aplicarIniciativaManual(porPersonagem);
+            if (typeof Toast !== 'undefined') {
+                const linhas = (res.resultados || [])
+                    .map((r) => `${esc(r.nome)}: ${r.total}`)
+                    .join(' · ');
+                Toast.success(`Iniciativa aplicada: ${linhas}`);
+            }
+            (res.resultados || []).forEach((r) => {
+                logMesa('iniciativa', `${r.nome}: ${r.total} (manual)`);
+            });
+            fecharModalIniManual();
+            if (res.status && typeof window.__t20ArenaApplyFromApi === 'function') {
+                window.__t20ArenaApplyFromApi(res.status);
+            } else {
+                await arenaRefresh();
+            }
+        } catch (e) {
+            if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro ao aplicar iniciativa');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    async function confirmarIniciativaAutomatica() {
+        fecharModalIniEscolha();
+        await rolarIniciativaTodos();
     }
 
     function regraVersaoPersonagemArena(p) {
@@ -259,7 +424,7 @@
         }
         const dlg = document.getElementById('t20ArenaModalAtaque');
         if (!dlg) return;
-        const ativoId = ar.ordemIds[ar.turnoIdx];
+        const ativoId = combatenteExibidoId(ar);
         const alvoDefault = defaultAlvoInimigo(ar, ativoId);
         popularListaAlvos('t20ArenaAtaqueListaAlvos', {
             mode: 'radio',
@@ -297,7 +462,7 @@
     async function confirmarRolarAtaque() {
         const ar = arenaRef();
         if (!ar || !ar.ativo) return;
-        const ativoId = ar.ordemIds[ar.turnoIdx];
+        const ativoId = combatenteExibidoId(ar);
         const alvoId = alvoIdSelecionado('t20ArenaAtaqueListaAlvos', 't20ataque-alvo');
         if (!alvoId) {
             if (typeof Toast !== 'undefined') Toast.error('Escolha um alvo.');
@@ -325,6 +490,7 @@
             const r = await combate().rolarAtaque(payload);
             renderResultadoAtaque(document.getElementById('t20ArenaAtaqueResultado'), r);
             const msg = `${r.atacante_nome} → ${r.alvo_nome}: ${r.d20}+${r.bonus}=${r.total} vs CA ${r.ca_alvo} → ${r.acertou ? 'ACERTO' : 'ERRO'}`;
+            logMesa('ataque', msg);
             if (typeof Toast !== 'undefined') Toast.info(msg);
         } catch (e) {
             if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro ao rolar ataque');
@@ -339,7 +505,7 @@
         }
         const dlg = document.getElementById('t20ArenaModalDano');
         if (!dlg) return;
-        const ativoId = ar.ordemIds[ar.turnoIdx];
+        const ativoId = combatenteExibidoId(ar);
         const alvoDefault = defaultAlvoInimigo(ar, null);
         const aplicarPv = document.getElementById('t20ArenaDanoAplicarPv');
         const aplicarChecked = aplicarPv ? aplicarPv.checked : true;
@@ -360,7 +526,7 @@
         if (form) form.value = '1d8';
         const mod = document.getElementById('t20ArenaDanoMod');
         const ar2 = arenaRef();
-        const ativoId2 = ar2 && ar2.ativo ? ar2.ordemIds[ar2.turnoIdx] : null;
+        const ativoId2 = ar2 && ar2.ativo ? combatenteExibidoId(ar2) : null;
         const at2 = ativoId2 != null ? ar2.byId[ativoId2] : null;
         if (mod) mod.value = String(modAtributoCombatePersonagem(at2, 'for'));
         const crit = document.getElementById('t20ArenaDanoCritico');
@@ -406,6 +572,7 @@
             );
             let msg = `Dano: ${r.dano}`;
             if (r.pv_antes != null) msg += ` · PV ${r.pv_antes}→${r.pv_depois}`;
+            logMesa('dano', msg);
             if (typeof Toast !== 'undefined') Toast.info(msg);
             await arenaRefresh();
         } catch (e) {
@@ -628,9 +795,13 @@
             r.bonus_resistencia_magia > 0
                 ? ` (+${r.bonus_resistencia_magia} RM)`
                 : '';
+        const modCond =
+            r.modificador_condicoes != null && r.modificador_condicoes !== 0
+                ? ` <span class="t20-arena-roll-result__hint">(cond. ${r.modificador_condicoes >= 0 ? '+' : ''}${r.modificador_condicoes})</span>`
+                : '';
         const tipoLbl = esc(String(r.tipo || '').replace(/^./, (c) => c.toUpperCase()));
         box.innerHTML = `<p class="t20-arena-roll-result__tit">${esc(r.alvo_nome)} · ${tipoLbl}</p>
-            <p class="t20-arena-roll-result__linha"><strong>${r.d20}</strong> + ${r.bonus_total} (${r.bonus_base}${rm}) = <strong>${r.total}</strong> vs CD <strong>${r.cd}</strong> → ${hit}</p>
+            <p class="t20-arena-roll-result__linha"><strong>${r.d20}</strong> + ${r.bonus_total} (${r.bonus_base}${rm})${modCond} = <strong>${r.total}</strong> vs CD <strong>${r.cd}</strong> → ${hit}</p>
             ${r.conjurador_nome ? `<p class="t20-arena-roll-result__hint">Conjurador: ${esc(r.conjurador_nome)}${r.magia_slug ? ` · ${esc(r.magia_slug)}` : ''}</p>` : ''}`;
         box.hidden = false;
     }
@@ -643,7 +814,7 @@
         }
         const dlg = document.getElementById('t20ArenaModalResistenciaMagia');
         if (!dlg) return;
-        const ativoId = ar.ordemIds[ar.turnoIdx];
+        const ativoId = combatenteExibidoId(ar);
         const alvoDefault = defaultAlvoInimigo(ar, ativoId);
         popularListaAlvos('t20ArenaSrListaAlvos', {
             mode: 'radio',
@@ -733,13 +904,35 @@
                 msg = `${r.alvo_nome}: ${r.d20}+${r.bonus_total}=${r.total} vs CD ${r.cd} → ${pass ? 'PASSOU' : 'FALHOU'}`;
             }
             if (typeof Toast !== 'undefined') Toast.info(msg);
+            logMesa('resistencia', msg);
         } catch (e) {
             if (typeof Toast !== 'undefined') Toast.error(e.message || 'Erro no teste de resistência');
         }
     }
 
+    function abrirModalAtaqueComPreset(presetIdx) {
+        abrirModalAtaque();
+        const sel = document.getElementById('t20ArenaAtaquePreset');
+        if (sel && presetIdx != null && Number.isFinite(Number(presetIdx))) {
+            sel.value = String(presetIdx);
+            sel.dispatchEvent(new Event('change'));
+        }
+    }
+
     function init() {
-        document.getElementById('t20ArenaBtnRolarIniciativa')?.addEventListener('click', rolarIniciativaTodos);
+        document.getElementById('t20ArenaBtnRolarIniciativa')?.addEventListener('click', abrirEscolhaIniciativa);
+        document.getElementById('t20ArenaIniEscolhaAutomatica')?.addEventListener('click', () => {
+            void confirmarIniciativaAutomatica();
+        });
+        document.getElementById('t20ArenaIniEscolhaManual')?.addEventListener('click', abrirModalIniManual);
+        document.getElementById('t20ArenaModalIniEscolhaFechar')?.addEventListener('click', fecharModalIniEscolha);
+        document.getElementById('t20ArenaModalIniEscolhaCancelar')?.addEventListener('click', fecharModalIniEscolha);
+        document.getElementById('t20ArenaModalIniManualFechar')?.addEventListener('click', fecharModalIniManual);
+        document.getElementById('t20ArenaModalIniManualCancelar')?.addEventListener('click', fecharModalIniManual);
+        document.getElementById('t20ArenaModalIniManualAplicar')?.addEventListener('click', () => {
+            void aplicarIniciativaManual();
+        });
+
         document.getElementById('t20ArenaBtnRolarAtaque')?.addEventListener('click', abrirModalAtaque);
         document.getElementById('t20ArenaBtnRolarDano')?.addEventListener('click', abrirModalDano);
         document.getElementById('t20ArenaBtnResistenciaMagia')?.addEventListener('click', abrirModalResistenciaMagia);
@@ -800,6 +993,7 @@
     }
 
     window.__t20ArenaAbrirModalAtaque = abrirModalAtaque;
+    window.__t20ArenaAbrirModalAtaquePreset = abrirModalAtaqueComPreset;
     window.__t20ArenaAbrirModalDano = abrirModalDano;
     window.__t20ArenaAbrirModalResistenciaMagia = abrirModalResistenciaMagia;
 })();

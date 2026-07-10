@@ -330,3 +330,54 @@ def test_listar_disponiveis_retorna_campanhas(tormenta_mestre_e_jogador_db):
     assert r.status_code == 200
     nomes = {c["nome"] for c in r.json()}
     assert "Camp Publica" in nomes
+
+
+def test_mestre_cria_handout_e_jogador_ve_revelado(tormenta_mestre_e_jogador_db):
+    SessionLocal, mestre, jog = tormenta_mestre_e_jogador_db
+    db = SessionLocal()
+    p1 = TormentaPersonagem(
+        dono_id=jog.id,
+        tipo="jogador",
+        nome="Herói Handout",
+        ficha_json={},
+    )
+    db.add(p1)
+    db.commit()
+    db.refresh(p1)
+    db.close()
+
+    c_m = _client(SessionLocal, _usuario(mestre))
+    c_j = _client(SessionLocal, _usuario(jog))
+    cid = c_m.post(
+        "/api/v1/tormenta/campanhas",
+        json={"nome": "Mesa Handouts", "personagem_ids": [p1.id]},
+    ).json()["id"]
+
+    r_create = c_m.post(
+        "/api/v1/tormenta/campanhas/handouts",
+        json={
+            "campanha_id": cid,
+            "titulo": "Mapa da masmorra",
+            "corpo_md": "Sala 1: armadilhas de dardos.",
+            "visivel_para_user_ids": [jog.id],
+        },
+    )
+    assert r_create.status_code == 201, r_create.text
+    hid = r_create.json()["id"]
+
+    r_list_m = c_m.get(f"/api/v1/tormenta/campanhas/handouts?campanha_id={cid}")
+    assert r_list_m.status_code == 200
+    assert any(h["id"] == hid for h in r_list_m.json())
+
+    r_vis = c_j.get("/api/v1/tormenta/campanhas/handouts/visiveis")
+    assert r_vis.status_code == 200
+    vis = r_vis.json()
+    assert any(h["id"] == hid and h["titulo"] == "Mapa da masmorra" for h in vis)
+
+    r_hide = c_m.put(
+        f"/api/v1/tormenta/campanhas/handouts/{hid}",
+        json={"visivel_para_user_ids": []},
+    )
+    assert r_hide.status_code == 200
+    r_vis2 = c_j.get("/api/v1/tormenta/campanhas/handouts/visiveis")
+    assert all(h["id"] != hid for h in r_vis2.json())

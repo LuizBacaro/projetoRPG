@@ -2653,3 +2653,100 @@ article.t20-dnd-source--dragging {
         background: rgba(160, 48, 48, 0.14);
     }
 }
+
+/* ── RF-T12h sync ficha ↔ arena ── */
+@keyframes t20-sync-pulse {
+    0%,
+    100% {
+        box-shadow: none;
+    }
+    40% {
+        box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.45);
+    }
+}
+
+.ficha-pv-valor.t20-sync-pulse,
+.ficha-defesa-valor.t20-sync-pulse {
+    border-radius: 4px;
+    animation: t20-sync-pulse 0.85s ease;
+}
+
+.t20-ficha-cond-mesa-wrap {
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid rgba(120, 72, 48, 0.22);
+    border-radius: 6px;
+    background: rgba(255, 248, 240, 0.65);
+}
+
+.t20-ficha-cond-mesa-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.28rem;
+    margin-top: 0.25rem;
+}
+
+.t20-ficha-cond-pill {
+    display: inline-block;
+    font-size: 0.68rem;
+    padding: 0.12rem 0.42rem;
+    border-radius: 999px;
+    background: rgba(160, 48, 48, 0.12);
+    color: var(--t20-red-deep, #6b2e2e);
+    border: 1px solid rgba(160, 48, 48, 0.22);
+}
+
+.t20-ficha-cond-mods {
+    margin: 0.35rem 0 0;
+    font-size: 0.68rem;
+    color: var(--t20-muted, #6b5a4a);
+    width: 100%;
+}
+
+.t20-ficha-cond-mesa-hint {
+    margin: 0.3rem 0 0;
+    font-size: 0.65rem;
+    color: var(--t20-muted, #6b5a4a);
+}
+
+/* ── RF-T12i vista compacta ── */
+.ficha-layout-dnd--compacto .t20-ficha-secao--so-completa {
+    display: none !important;
+}
+
+.ficha-layout-dnd--compacto .t20-ficha-meta-tags--sec {
+    display: none;
+}
+
+.ficha-layout-dnd--compacto .t20-ficha-corpo {
+    grid-template-columns: minmax(11rem, 0.88fr) minmax(14rem, 1fr);
+    gap: 0.45rem;
+}
+
+.ficha-layout-dnd--compacto .t20-ficha-col-dir {
+    grid-column: 1 / -1;
+}
+
+.ficha-layout-dnd--compacto .ficha-res-breakdown {
+    font-size: 0.62rem;
+}
+
+.ficha-layout-dnd--compacto .t20-ficha-cond-mesa-hint {
+    display: none;
+}
+
+@media (max-width: 1100px) {
+    .ficha-layout-dnd--compacto .t20-ficha-corpo {
+        grid-template-columns: 1fr;
+    }
+
+    .ficha-layout-dnd--compacto .t20-ficha-col-dir {
+        grid-column: auto;
+    }
+}
+
+#btnT20FichaLayoutCompacto {
+    font-size: 0.74rem;
+    padding: 0.32rem 0.62rem;
+    white-space: nowrap;
+}

@@ -93,7 +93,7 @@ Escolha de caminho **irreversível** na criação (`ficha_json.caminho_arcanista
 | RF-T03d | Perícias de classe (fixas + N escolhas + INT) | P0 |
 | RF-T03e | Modal benefícios / Poder de [Classe] por nível (1–20) | P0 |
 | RF-T03f | Multiclasse: PV/PM/perícias conforme p.34 | P1 |
-| RF-T03g | Orçamento perícias na criação | P1 |
+| RF-T03g | Orçamento perícias na criação | P1 | **Feito** — wizard v1.3 + validação API + hint na ficha |
 | RF-T03h | Habilidades ativas (fúria, etc.) na arena | P2 |
 
 ## Estado de implementação
@@ -110,6 +110,7 @@ Escolha de caminho **irreversível** na criação (`ficha_json.caminho_arcanista
 | PM multiclasse na UI | **Feito** | `multiclasse_v13` + `t20-multiclasse-v13.js`; API `/pm-preview-multiclasse` |
 | Subir nível multiclasse | **Feito** | Modal escolhe classe; `multiclasse_v13` + PV/PM p.34 |
 | Modal 20 níveis | **Feito** (texto v1.3 quando `regra_versao=v13`) |
+| Orçamento perícias wizard/ficha v1.3 | **Feito** | `t20-dashboard-pericias-v13.js`, `t20-pericias-orcamento.js`, API validar-criacao |
 
 ## Gap código (MB → v1.3)
 
