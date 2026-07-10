@@ -71,6 +71,10 @@
     function fecharModalConsumiveisTormenta() {
         const ov = document.getElementById('modalConsumiveisTormenta');
         if (!ov) return;
+        const ae = document.activeElement;
+        if (ae && typeof ov.contains === 'function' && ov.contains(ae)) {
+            ae.blur();
+        }
         ov.classList.remove('is-open');
         ov.setAttribute('aria-hidden', 'true');
     }

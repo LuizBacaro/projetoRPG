@@ -483,14 +483,29 @@
 
 .t20-pericias-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
-    font-size: 0.62rem;
+    font-size: 0.68rem;
+}
+
+.t20-col-per-tr { width: 1.75rem; }
+.t20-col-per-nome { width: auto; min-width: 5.5rem; }
+.t20-col-per-total { width: 2.6rem; }
+.t20-col-per-half { width: 2.25rem; }
+.t20-col-per-mod { width: 2.55rem; }
+.t20-col-per-out { width: 2.55rem; }
+.t20-col-per-bonus { width: 2.35rem; }
+.t20-col-per-sot { width: 1.65rem; }
+
+.t20-pericias-table--v13 .t20-col-per-total {
+    width: 0;
+    visibility: collapse;
 }
 
 .t20-pericias-table th,
 .t20-pericias-table td {
     border-bottom: 1px solid var(--t20-grid-line);
-    padding: 0.15rem 0.12rem;
+    padding: 0.22rem 0.18rem;
     vertical-align: middle;
 }
 
@@ -499,29 +514,152 @@
     font-weight: 800;
     text-transform: uppercase;
     color: var(--t20-muted);
-    font-size: 0.55rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.02em;
     background: rgba(224, 234, 252, 0.6);
+    white-space: nowrap;
 }
 
 .t20-pericias-table .t20-p-nome {
     text-align: left;
     font-weight: 600;
+    font-size: 0.68rem;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.t20-p-nome-cell {
+    text-align: left;
+    vertical-align: middle;
+    padding-left: 0.28rem;
+    padding-right: 0.22rem;
+}
+
+.t20-p-nome-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+    min-height: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.t20-pen-arm-badge--nome {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 3px;
     font-size: 0.62rem;
-    max-width: 7.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--t20-ink);
+    background: rgba(224, 234, 252, 0.92);
+    border: 1px solid rgba(15, 23, 42, 0.35);
+    flex-shrink: 0;
+}
+
+.t20-pericias-table--v13 .t20-pen-arm-badge--nome {
+    display: inline-flex;
+}
+
+.t20-pen-nat--nome {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.12rem;
+    vertical-align: middle;
+}
+
+.t20-pen-nat--nome .t20-pen-nat-ico {
+    font-size: 0.78rem;
+    line-height: 1;
+    opacity: 0.85;
+}
+
+.t20-pericias-table .t20-p-nome--rolavel {
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 0.06rem 0.12rem;
+    margin: -0.06rem -0.12rem;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.t20-pericias-table .t20-p-nome--rolavel:hover {
+    background: rgba(160, 48, 48, 0.1);
+    color: var(--t20-red);
 }
 
 .t20-pericias-table input[type="number"] {
     width: 100%;
-    max-width: 2.4rem;
+    max-width: 2.75rem;
+    min-width: 2.1rem;
     text-align: center;
     margin: 0 auto;
     display: block;
+    padding: 0.12rem 0.08rem;
+    font-size: 0.72rem;
 }
 
 .t20-pericias-table .t20-p-half {
     text-align: center;
     font-weight: 700;
     color: var(--t20-red);
+    font-size: 0.72rem;
+    display: inline-block;
+    min-width: 1.35rem;
+}
+
+.t20-pericias-table .t20-p-bonus-cell {
+    text-align: center;
+    cursor: pointer;
+    min-width: 2rem;
+}
+
+.t20-pericias-table .t20-p-bonus-cell:focus-visible {
+    outline: 2px solid rgba(160, 48, 48, 0.45);
+    outline-offset: 1px;
+}
+
+.t20-pericias-table .t20-p-bonus-val {
+    display: inline-block;
+    font-weight: 700;
+    color: var(--t20-red);
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.t20-pericias-table .t20-p-bonus-val--bloqueado {
+    color: rgba(120, 84, 45, 0.55);
+    text-decoration: line-through;
+}
+
+.t20-pericias-table .t20-p-nome--rolavel::after {
+    content: ' 🎲';
+    font-size: 0.62rem;
+    opacity: 0.55;
+}
+
+.t20-roll-alvo,
+.t20-ap-rowlabel--rolavel,
+.ficha-ini-box--rolavel,
+.ficha-ataque-linha.t20-ataque--rolavel {
+    cursor: pointer;
+}
+
+.t20-ap-rowlabel--rolavel:hover {
+    filter: brightness(1.08);
+}
+
+.ficha-ini-box--rolavel:hover .ficha-defesa-valor,
+.ficha-ataque-linha.t20-ataque--rolavel:hover {
+    color: var(--t20-red);
+}
+
+.ficha-ataque-linha.t20-ataque--rolavel .ficha-ataque-bonus::before {
+    content: '🎲 ';
+    font-size: 0.68rem;
+    opacity: 0.65;
 }
 
 .t20-pericias-table input[type="checkbox"].p-treinado,
@@ -551,8 +689,10 @@
 
 .t20-pen-arm-cell {
     vertical-align: middle;
-    min-width: 3.1rem;
+    min-width: 2.2rem;
     text-align: center;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
 }
 
 .t20-pen-arm-stack {
@@ -1921,6 +2061,20 @@
     line-height: 1.2;
     border: 1px solid rgba(0, 0, 0, 0.35);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.t20-ap-breakdown {
+    font-size: 0.58rem;
+    color: var(--cor-madeira-clara, rgba(120, 84, 45, 0.85));
+    text-align: center;
+    line-height: 1.25;
+    padding: 0.02rem 0.15rem 0.18rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.ficha-ataque-bonus {
+    cursor: help;
 }
 
 .t20-ap-inp {

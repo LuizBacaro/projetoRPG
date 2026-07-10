@@ -26,9 +26,9 @@
             if (inline) inline.textContent = '';
             return;
         }
-        const bonusTxt = bonus != null ? (bonus >= 0 ? `+${bonus}` : String(bonus)) : '—';
         if (val) val.textContent = String(passiva);
-        let txt = `10 + ${bonusTxt} (Percepção)`;
+        let txt =
+            bonus != null ? `10 ${bonus >= 0 ? '+' : ''}${bonus} (Percepção)` : '10 + — (Percepção)';
         if (pen > 0) txt += ` · pen. armadura −${pen}`;
         if (bd) bd.textContent = txt;
         if (inline) inline.textContent = `Percepção passiva: ${passiva} (${txt})`;
