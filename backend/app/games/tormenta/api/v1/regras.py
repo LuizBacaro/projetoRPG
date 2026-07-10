@@ -35,6 +35,8 @@ from app.games.tormenta.rules.combate_t20 import rolar_ataque, rolar_iniciativa
 from app.games.tormenta.rules.condicoes_t20 import (
     lista_condicoes_v13,
     lista_situacoes_especiais_v13,
+    modificador_condicao_pericia,
+    modificadores_de_condicoes,
 )
 from app.games.tormenta.rules.conjuracao_t20 import (
     cd_resistencia_magia_t20,
@@ -123,6 +125,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaCatalogoPaginaResponse,
     TormentaClasseMbItem,
     TormentaCondicaoV13Item,
+    TormentaCondicoesModificadoresRequest,
+    TormentaCondicoesModificadoresResponse,
     TormentaCondicoesV13Response,
     TormentaConjuracaoClasseMbItem,
     TormentaConjuracaoCustoCirculoItem,
@@ -618,6 +622,37 @@ def listar_condicoes_v13(
         condicoes=cond,
         situacoes_especiais=sit,
         total=len(cond) + len(sit),
+    )
+
+
+@router.post(
+    "/condicoes/modificadores",
+    response_model=TormentaCondicoesModificadoresResponse,
+    summary="Soma modificadores numéricos de condições (ataque, CA, perícias)",
+)
+def calcular_modificadores_condicoes(
+    body: TormentaCondicoesModificadoresRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaCondicoesModificadoresResponse:
+    rv = normalizar_regra_versao(body.regra_versao)
+    rotulos = [str(x).strip() for x in (body.rotulos or []) if str(x).strip()]
+    mods = modificadores_de_condicoes(rotulos)
+    pericia_mod = 0
+    if body.pericia_slug:
+        pericia_mod = modificador_condicao_pericia(
+            body.pericia_slug, rotulos, regra_versao=rv
+        )
+    return TormentaCondicoesModificadoresResponse(
+        ataque=int(mods.get("ataque", 0)),
+        ca=int(mods.get("ca", 0)),
+        pericia=pericia_mod,
+        pericia_geral=int(mods.get("pericia", 0)),
+        pericia_fisica=int(mods.get("pericia_fisica", 0)),
+        percepcao=int(mods.get("percepcao", 0)),
+        reflexos=int(mods.get("reflexos", 0)),
+        iniciativa=int(mods.get("iniciativa", 0)),
+        atributo_fisico=int(mods.get("atributo_fisico", 0)),
+        atributo_mental=int(mods.get("atributo_mental", 0)),
     )
 
 

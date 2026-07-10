@@ -159,14 +159,11 @@
                 aplicarCamposTamanhoDesloc(data, { modo: modoCad ? 'cadastro' : 'ficha' });
             }
             if (!modoCad) {
-                const fort = readResSpan('fichaFort');
-                const ref = readResSpan('fichaReflex');
-                const von = readResSpan('fichaVont');
-                if (fort === 0 && data.fortitude_bonus) setResSpan('fichaFort', data.fortitude_bonus);
-                if (ref === 0 && data.reflexos_bonus) setResSpan('fichaReflex', data.reflexos_bonus);
-                if (von === 0 && data.vontade_bonus) setResSpan('fichaVont', data.vontade_bonus);
+                if (typeof atualizarResistenciasTotaisTormenta === 'function') {
+                    atualizarResistenciasTotaisTormenta(true);
+                }
                 if (typeof atualizarResistenciasBreakdownTormenta === 'function') {
-                    atualizarResistenciasBreakdownTormenta();
+                    atualizarResistenciasBreakdownTormenta({ somenteBreakdown: true });
                 }
                 const hint = q('t20TracosMecanicosHint');
                 if (hint) hint.textContent = montarHintMecanicos(data, rv);

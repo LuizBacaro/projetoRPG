@@ -103,6 +103,26 @@ def resolver_entrada_condicao(rotulo: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+_MOD_CAMPOS = (
+    "ataque",
+    "ca",
+    "pericia",
+    "pericia_fisica",
+    "percepcao",
+    "reflexos",
+    "iniciativa",
+    "atributo_fisico",
+    "atributo_mental",
+)
+
+_ATRIBUTO_FISICO = frozenset({"for", "des", "con"})
+_ATRIBUTO_MENTAL = frozenset({"int", "sab", "car"})
+
+
+def _mods_vazios() -> Dict[str, int]:
+    return {k: 0 for k in _MOD_CAMPOS}
+
+
 def _acumular_mods_entrada(
     entry: Dict[str, Any],
     mods: Dict[str, int],
@@ -113,14 +133,16 @@ def _acumular_mods_entrada(
         return
     if slug:
         visitados.add(slug)
-    try:
-        mods["ataque"] += int(entry.get("mod_ataque") or 0)
-    except (TypeError, ValueError):
-        pass
-    try:
-        mods["ca"] += int(entry.get("mod_ca") or 0)
-    except (TypeError, ValueError):
-        pass
+    for campo in _MOD_CAMPOS:
+        chave_json = (
+            f"mod_{campo}"
+            if campo != "ataque" and campo != "ca"
+            else ("mod_ataque" if campo == "ataque" else "mod_ca")
+        )
+        try:
+            mods[campo] += int(entry.get(chave_json) or 0)
+        except (TypeError, ValueError):
+            pass
     for imp in entry.get("implica") or []:
         s = str(imp or "").strip().lower()
         if not s or s in visitados:
@@ -137,7 +159,7 @@ def modificadores_de_condicoes(
     Soma modificadores de ataque (atacante) e CA efetiva (alvo) a partir de rótulos.
     Compatível com catálogo v1.3 e rótulos legados MB.
     """
-    mods = {"ataque": 0, "ca": 0}
+    mods = _mods_vazios()
     if not rotulos:
         return mods
     vistos_rotulo: Set[str] = set()
@@ -157,8 +179,35 @@ def modificadores_de_condicoes(
     return mods
 
 
+def modificador_condicao_pericia(
+    slug_ou_nome: str,
+    rotulos: Optional[List[str]],
+    *,
+    regra_versao: str = "v13",
+) -> int:
+    """Soma modificadores de condição aplicáveis a uma perícia (p.394 v1.3)."""
+    from app.games.tormenta.rules.pericias_t20 import meta_pericia_por_nome
+
+    mods = modificadores_de_condicoes(rotulos)
+    total = int(mods.get("pericia", 0))
+    meta = meta_pericia_por_nome(slug_ou_nome, regra_versao) or {}
+    slug = str(meta.get("slug") or slug_ou_nome or "").strip().lower()
+    atr = str(meta.get("atributo") or "").strip().lower()
+    if int(mods.get("pericia_fisica", 0)) and atr in _ATRIBUTO_FISICO:
+        total += int(mods["pericia_fisica"])
+    if slug == "percepcao":
+        total += int(mods.get("percepcao", 0))
+    if slug == "reflexos":
+        total += int(mods.get("reflexos", 0))
+    if atr in _ATRIBUTO_FISICO:
+        total += int(mods.get("atributo_fisico", 0))
+    if atr in _ATRIBUTO_MENTAL:
+        total += int(mods.get("atributo_mental", 0))
+    return total
+
+
 def _mods_legado(chave: str) -> Dict[str, int]:
-    mods = {"ataque": 0, "ca": 0}
+    mods = _mods_vazios()
     for key, val in _LEGACY_MOD_ATQ.items():
         if key in chave:
             mods["ataque"] += val

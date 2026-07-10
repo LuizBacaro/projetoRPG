@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_tormenta_combate_service
 from app.games.tormenta.schemas.combate import (
+    TormentaCombateAplicarIniciativaManualRequest,
     TormentaCombateCondicoesMbRequest,
     TormentaCombateRolarAtaqueRequest,
     TormentaCombateRolarDanoRequest,
@@ -95,6 +96,22 @@ def rolar_iniciativa(
     try:
         validar_tormenta_personagens_do_usuario(body.personagem_ids, usuario_atual, db)
         result = service.rolar_iniciativa_combate(body.personagem_ids)
+        return {**result, "status": service.obter_status_combate()}
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post("/aplicar-iniciativa-manual")
+def aplicar_iniciativa_manual(
+    body: TormentaCombateAplicarIniciativaManualRequest,
+    service: TormentaCombateService = Depends(get_tormenta_combate_service),
+    db: Session = Depends(get_db),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        ids = [int(k) for k in body.por_personagem.keys()]
+        validar_tormenta_personagens_do_usuario(ids, usuario_atual, db)
+        result = service.aplicar_iniciativa_manual(body.por_personagem)
         return {**result, "status": service.obter_status_combate()}
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)

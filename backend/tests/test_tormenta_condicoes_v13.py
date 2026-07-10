@@ -6,6 +6,7 @@ from app.games.tormenta.rules.catalogo_armas_v13_t20 import lista_armas_v13_over
 from app.games.tormenta.rules.combate_t20 import modificadores_de_condicoes_mb
 from app.games.tormenta.rules.condicoes_t20 import (
     lista_condicoes_v13,
+    modificador_condicao_pericia,
     modificadores_de_condicoes,
     resolver_entrada_condicao,
 )
@@ -52,6 +53,27 @@ def test_resolver_entrada_por_nome() -> None:
     row = resolver_entrada_condicao("Vulnerável")
     assert row is not None
     assert row.get("slug") == "vulneravel"
+
+
+def test_modificadores_abalado_pericia() -> None:
+    m = modificadores_de_condicoes(["Abalado"])
+    assert m["pericia"] == -2
+    assert m["ataque"] == 0
+
+
+def test_modificador_condicao_pericia_desprevenido_reflexos() -> None:
+    mod = modificador_condicao_pericia("reflexos", ["Desprevenido"])
+    assert mod == -5
+
+
+def test_modificador_condicao_pericia_cego_fisicas() -> None:
+    mod = modificador_condicao_pericia("atletismo", ["Cego"])
+    assert mod == -5
+
+
+def test_modificadores_surdo_iniciativa() -> None:
+    m = modificadores_de_condicoes(["Surdo"])
+    assert m["iniciativa"] == -5
 
 
 def test_armas_overlay_lote4_total() -> None:

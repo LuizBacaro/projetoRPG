@@ -3,6 +3,7 @@
 from app.games.tormenta.models.campanha import (
     TormentaCampanha,
     TormentaCampanhaSolicitacao,
+    TormentaHandout,
     TormentaSessaoCampanha,
 )
 from app.games.tormenta.models.combate import TormentaCombate
@@ -21,6 +22,7 @@ from app.games.tormenta.models.talento import TormentaTalento, TormentaTalentoPe
 __all__ = [
     "TormentaCampanha",
     "TormentaCampanhaSolicitacao",
+    "TormentaHandout",
     "TormentaSessaoCampanha",
     "TormentaCombate",
     "TormentaPersonagem",

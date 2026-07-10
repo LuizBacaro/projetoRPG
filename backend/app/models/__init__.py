@@ -49,6 +49,7 @@ from app.games.gurps.models.sessao_campanha import GurpsSessaoCampanha
 from app.games.tormenta.models.campanha import (
     TormentaCampanha,
     TormentaCampanhaSolicitacao,
+    TormentaHandout,
     TormentaSessaoCampanha,
 )
 from app.games.tormenta.models.combate import TormentaCombate
@@ -113,6 +114,7 @@ __all__ = [
     "GurpsCatalogoFichaPericia",
     "TormentaCampanha",
     "TormentaCampanhaSolicitacao",
+    "TormentaHandout",
     "TormentaSessaoCampanha",
     "TormentaCombate",
     "TormentaPersonagem",

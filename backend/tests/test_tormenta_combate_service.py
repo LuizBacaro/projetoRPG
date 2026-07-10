@@ -17,7 +17,7 @@ from app.games.tormenta.schemas.combate import TormentaCombateCondicaoMbItem
 from app.games.tormenta.services.combate_service import TormentaCombateService
 from app.shared.core.database import Base
 from app.shared.core.security import hash_senha
-from app.shared.exceptions.custom_exceptions import CombateJaAtivoError
+from app.shared.exceptions.custom_exceptions import CombateJaAtivoError, DadosInvalidos
 from app.shared.models.usuario import PerfilUsuario
 from app.shared.models.usuario import Usuario as UModel
 
@@ -208,6 +208,60 @@ def test_rolar_iniciativa_v13_usa_valor_des(db_tormenta_combate):
     r0 = out["resultados"][0]
     assert r0["modificador"] == 2
     assert r0["total"] == r0["d20"] + 2
+
+
+def test_aplicar_iniciativa_manual_reordena_combate(db_tormenta_combate):
+    db, u = db_tormenta_combate
+    rapido = TormentaPersonagem(
+        dono_id=u.id,
+        tipo="jogador",
+        nome="Zara",
+        iniciativa=0,
+        ficha_json={},
+    )
+    lento = TormentaPersonagem(
+        dono_id=u.id,
+        tipo="monstro",
+        nome="Orc",
+        iniciativa=0,
+        ficha_json={},
+    )
+    db.add_all([rapido, lento])
+    db.commit()
+    db.refresh(rapido)
+    db.refresh(lento)
+
+    svc = TormentaCombateService(
+        TormentaCombateRepository(db),
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    svc.iniciar_combate([lento.id, rapido.id])
+    out = svc.aplicar_iniciativa_manual({str(lento.id): 8, str(rapido.id): 19})
+    assert out["ordem"] == [rapido.id, lento.id]
+    assert out["resultados"][0]["total"] == 19
+    st = svc.obter_status_combate()
+    assert st["personagens_ids"] == [rapido.id, lento.id]
+    assert st["turno_atual"] == 0
+
+
+def test_aplicar_iniciativa_manual_exige_todos_combatentes(db_tormenta_combate):
+    db, u = db_tormenta_combate
+    a = TormentaPersonagem(dono_id=u.id, tipo="jogador", nome="A", ficha_json={})
+    b = TormentaPersonagem(dono_id=u.id, tipo="jogador", nome="B", ficha_json={})
+    db.add_all([a, b])
+    db.commit()
+    db.refresh(a)
+    db.refresh(b)
+
+    svc = TormentaCombateService(
+        TormentaCombateRepository(db),
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    svc.iniciar_combate([a.id, b.id])
+    with pytest.raises(DadosInvalidos):
+        svc.aplicar_iniciativa_manual({str(a.id): 12})
 
 
 def test_rolar_ataque_usa_ca_com_armaduras_ficha(db_tormenta_combate):

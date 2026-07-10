@@ -110,10 +110,12 @@ Objetivo: mesa mais fluida (menos digitação manual, mais regras aplicadas na U
 | RF-T12a breakdown | **Feito** | PV, CA, perícias (Σ) e ataques (`t20-breakdown-ficha.js`) |
 | RF-T12b DnD compendium | **Feito** | Equipamento, poder/talento, magia (grimório), consumível; duplo clique; `t20-compendium-dnd.js` |
 | RF-T12c Rolagem contextual | **Feito** (ficha) | Perícias, planilha/arma, iniciativa; log `#fichaUltimaRolagem`; arena já tinha modais |
-| RF-T12d Condições → rolagens | **Parcial** | Motor ataque/CA; arena Tormenta |
-| RF-T12e NPC compacto | **Não feito** |
-| RF-T12f Handouts | **Não feito** |
-| RF-T12h Sync ficha↔arena | **Não feito** (Tormenta) |
+| RF-T12d Condições → rolagens | **Feito** (arena) | Atq/CA; perícias; Reflexos (SR); iniciativa; breakdown na UI |
+| RF-T12e NPC compacto | **Feito** | Ataques inline; ini clicável; PM oculto se 0; preset 🎲 |
+| RF-T12j Log de mesa | **Feito** (arena) | Painel lateral; ataque/dano/perícia/ini/SR/PV/turno/condição |
+| RF-T12f Handouts | **Feito** | API `tormenta_handouts`; mestre CRUD; jogador lê em Campanhas + arena |
+| RF-T12h Sync ficha↔arena | **Feito** | `BroadcastChannel` `tormenta-t20-sync`; PV/PM/condições arena→ficha e ficha→arena |
+| RF-T12i Layout compacto | **Feito** | Toggle «Vista compacta» + `localStorage`; oculta equipamento, grimório, retrato, etc. |
 | RF-T12l Mapa VTT | **Fora de escopo** |
 
 ## Gap código / dependências
