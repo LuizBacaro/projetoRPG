@@ -268,6 +268,10 @@
             <p><strong>Arena de combate</strong> e criação de <strong>monstros/NPCs</strong> ficam disponíveis depois que você criar sua primeira <strong>campanha</strong> na aba Campanhas.</p>
         </div>
         <div id="t20ArenaSetup" class="t20-arena-setup">
+            <div id="t20ArenaFantasma" class="t20-arena-fantasma" hidden>
+                <p><strong>Combate anterior pendente.</strong> Há um combate ativo na sua conta, mas os combatentes não existem mais (foram removidos). Encerre-o para iniciar um novo combate.</p>
+                <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20ArenaBtnEncerrarFantasma">Encerrar combate pendente</button>
+            </div>
             <p class="t20-dash-hint" style="margin-top:0;max-width:42rem">
                 Selecione os personagens Tormenta 20, inicie o combate e use a ordem por <strong>iniciativa</strong> (empate: nome).
                 Dano e cura ajustam <strong>PV atuais</strong> na API. <strong>Magias (PM)</strong> debita Pontos de Magia do conjurador ativo (preparadas, conhecidas ou truques no livro). O botão <strong>Condições (MB)</strong> abre a tabela de ataque (~p.220 MB). Consumíveis MB e companheiro animal ficam na <a href="ficha-personagem.html">ficha do personagem</a>.
@@ -2264,6 +2268,17 @@
         t20ArenaSyncToggleStatsBtn();
     }
 
+    function t20ArenaUiFantasma() {
+        t20ArenaUiSetup();
+        const box = document.getElementById('t20ArenaFantasma');
+        if (box) box.hidden = false;
+    }
+
+    function t20ArenaOcultarFantasma() {
+        const box = document.getElementById('t20ArenaFantasma');
+        if (box) box.hidden = true;
+    }
+
     function t20ArenaUiActive() {
         const s = document.getElementById('t20ArenaSetup');
         const a = document.getElementById('t20ArenaActive');
@@ -2385,6 +2400,22 @@
     }
 
     function t20ArenaApplyFromApi(st) {
+        if (st && st.ativo && Array.isArray(st.personagens_ids) && !st.personagens_ids.length) {
+            t20Arena.ativo = false;
+            t20Arena.fantasma = true;
+            t20Arena.ordemIds = [];
+            t20Arena.byId = {};
+            t20Arena.turnoIdx = 0;
+            t20Arena.rodada = 1;
+            t20Arena.condPorId = Object.create(null);
+            t20Arena.viewId = null;
+            t20ArenaUiFantasma();
+            t20ArenaRenderPick();
+            t20ArenaRenderActive();
+            return;
+        }
+        t20Arena.fantasma = false;
+        t20ArenaOcultarFantasma();
         if (!st || !st.ativo || !Array.isArray(st.personagens_ids) || !st.personagens_ids.length) {
             t20Arena.ativo = false;
             t20Arena.ordemIds = [];
@@ -2491,6 +2522,17 @@
                 Toast.info('Combate encerrado.');
             } catch (e) {
                 Toast.error(e.message || 'Erro ao encerrar combate.');
+            }
+        });
+
+        document.getElementById('t20ArenaBtnEncerrarFantasma')?.addEventListener('click', async () => {
+            try {
+                const st = await combateSvc.finalizar();
+                t20ArenaApplyFromApi(st);
+                if (window.T20ArenaLogMesa) window.T20ArenaLogMesa.append('sistema', 'Combate pendente encerrado.');
+                Toast.success('Combate pendente encerrado. Você já pode iniciar outro.');
+            } catch (e) {
+                Toast.error(e.message || 'Erro ao encerrar combate pendente.');
             }
         });
 

@@ -354,3 +354,88 @@ def test_rolar_ataque_aplica_condicao_desprevenido_no_alvo(db_tormenta_combate):
     assert roll["ca_base_alvo"] == 10
     assert roll["modificador_condicoes_ca_alvo"] == -5
     assert roll["ca_alvo"] == 5
+
+
+def test_status_finaliza_combate_orfao_automaticamente(db_tormenta_combate):
+    from app.games.tormenta.models.combate import TormentaCombate
+
+    db, u = db_tormenta_combate
+    combate_repo = TormentaCombateRepository(db)
+    combate_repo.create(
+        TormentaCombate(
+            usuario_id=u.id,
+            personagens_ids=[99999],
+            turno_atual=0,
+            rodada_atual=1,
+            ativo=True,
+            condicoes_mb_json={},
+        )
+    )
+
+    svc = TormentaCombateService(
+        combate_repo,
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    st = svc.obter_status_combate()
+    assert st["ativo"] is False
+    assert combate_repo.get_ativo_por_usuario(u.id) is None
+
+
+def test_iniciar_combate_apos_orfao_permite_novo(db_tormenta_combate):
+    from app.games.tormenta.models.combate import TormentaCombate
+
+    db, u = db_tormenta_combate
+    combate_repo = TormentaCombateRepository(db)
+    combate_repo.create(
+        TormentaCombate(
+            usuario_id=u.id,
+            personagens_ids=[99999],
+            turno_atual=0,
+            rodada_atual=1,
+            ativo=True,
+            condicoes_mb_json={},
+        )
+    )
+    p = TormentaPersonagem(
+        dono_id=u.id, tipo="monstro", nome="Goblin", iniciativa=3, ficha_json={}
+    )
+    db.add(p)
+    db.commit()
+    db.refresh(p)
+
+    svc = TormentaCombateService(
+        combate_repo,
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    svc.iniciar_combate([p.id])
+    st = svc.obter_status_combate()
+    assert st["ativo"] is True
+    assert st["personagens_ids"] == [p.id]
+
+
+def test_excluir_personagem_finaliza_combate_orfao(db_tormenta_combate):
+    from app.games.tormenta.services.personagem_service import TormentaPersonagemService
+
+    db, u = db_tormenta_combate
+    p = TormentaPersonagem(
+        dono_id=u.id, tipo="monstro", nome="NPC", iniciativa=1, ficha_json={}
+    )
+    db.add(p)
+    db.commit()
+    db.refresh(p)
+
+    combate_svc = TormentaCombateService(
+        TormentaCombateRepository(db),
+        TormentaPersonagemRepository(db),
+        u.id,
+    )
+    combate_svc.iniciar_combate([p.id])
+
+    personagem_svc = TormentaPersonagemService(TormentaPersonagemRepository(db))
+    personagem_svc.excluir(p.id)
+
+    st = combate_svc.obter_status_combate()
+    assert st["ativo"] is False
+    assert TormentaCombateRepository(db).get_ativo_por_usuario(u.id) is None

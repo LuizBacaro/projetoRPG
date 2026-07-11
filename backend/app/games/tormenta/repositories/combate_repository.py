@@ -1,6 +1,6 @@
 """Repository — combates Tormenta (Arena)."""
 
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -25,3 +25,18 @@ class TormentaCombateRepository(BaseRepository[TormentaCombate]):
 
     def existe_combate_ativo_por_usuario(self, usuario_id: int) -> bool:
         return self.get_ativo_por_usuario(usuario_id) is not None
+
+    def list_ativos_referenciando_personagem(
+        self, personagem_id: int
+    ) -> List[TormentaCombate]:
+        pid = int(personagem_id)
+        rows = (
+            self.db.query(TormentaCombate)
+            .filter(TormentaCombate.ativo == True)  # noqa: E712
+            .all()
+        )
+        return [
+            combate
+            for combate in rows
+            if pid in [int(x) for x in (combate.personagens_ids or [])]
+        ]

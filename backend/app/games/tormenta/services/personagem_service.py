@@ -838,5 +838,23 @@ class TormentaPersonagemService:
         return self._para_resposta(ent)
 
     def excluir(self, personagem_id: int) -> None:
+        from app.games.tormenta.repositories.combate_repository import (
+            TormentaCombateRepository,
+        )
+
         ent = self.obter_por_id(personagem_id)
+        combate_repo = TormentaCombateRepository(self.repo.db)
+        for combate in combate_repo.list_ativos_referenciando_personagem(personagem_id):
+            ids_restantes = [
+                int(pid)
+                for pid in (combate.personagens_ids or [])
+                if int(pid) != int(personagem_id)
+            ]
+            if not ids_restantes:
+                combate.finalizar()
+            else:
+                combate.personagens_ids = ids_restantes
+                if combate.turno_atual >= len(ids_restantes):
+                    combate.turno_atual = 0
+            combate_repo.update(combate)
         self.repo.delete(ent)
