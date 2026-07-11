@@ -6,6 +6,22 @@
 
     const CACHE = {};
     let bound = false;
+    let periciasCatalogo = null;
+    let periciasCatalogoPromise = null;
+
+    const PERICIAS_FALLBACK_NOMES = [
+        'Acrobacia',
+        'Adestramento',
+        'Atletismo',
+        'Enganação',
+        'Furtividade',
+        'Iniciativa',
+        'Intimidação',
+        'Ladinagem',
+        'Misticismo',
+        'Percepção',
+        'Sobrevivência',
+    ];
 
     function q(id) {
         return document.getElementById(id);
@@ -208,24 +224,62 @@
         }
     }
 
-    function nomesPericiasDisponiveis() {
+    function normalizarCatalogoPericias(rows) {
+        return (Array.isArray(rows) ? rows : [])
+            .map((r) => {
+                const nome = String((r && r.nome) || '').trim();
+                if (!nome) return null;
+                const slug = String((r && r.slug) || '').trim().toLowerCase();
+                return r && typeof r === 'object' ? { ...r, nome, slug } : { nome, slug };
+            })
+            .filter(Boolean)
+            .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    }
+
+    function aplicarCatalogoPericias(rows) {
+        const catalogo = normalizarCatalogoPericias(rows);
+        if (!catalogo.length) return null;
+        periciasCatalogo = catalogo;
+        if (!Array.isArray(global.PERICIAS_META) || !global.PERICIAS_META.length) {
+            global.PERICIAS_META = catalogo;
+        }
+        return catalogo;
+    }
+
+    async function carregarCatalogoPericias() {
+        if (periciasCatalogo && periciasCatalogo.length) return periciasCatalogo;
         const meta = global.PERICIAS_META;
+        if (Array.isArray(meta) && meta.length) {
+            const cached = aplicarCatalogoPericias(meta);
+            if (cached) return cached;
+        }
+        if (periciasCatalogoPromise) return periciasCatalogoPromise;
+        periciasCatalogoPromise = (async () => {
+            try {
+                const data = await new TormentaRegrasService().obterAtributos({
+                    regraVersao: isV13() ? 'v13' : 'mb',
+                });
+                const cached = aplicarCatalogoPericias(data && data.pericias);
+                if (cached) return cached;
+            } catch (_e) {
+                /* fallback abaixo */
+            }
+            periciasCatalogo = PERICIAS_FALLBACK_NOMES.map((nome) => ({ nome, slug: '' }));
+            return periciasCatalogo;
+        })();
+        try {
+            return await periciasCatalogoPromise;
+        } finally {
+            periciasCatalogoPromise = null;
+        }
+    }
+
+    function nomesPericiasDisponiveis() {
+        const meta = periciasCatalogo || global.PERICIAS_META;
         if (Array.isArray(meta) && meta.length) {
             return meta.map((r) => r.nome).filter(Boolean);
         }
-        return [
-            'Acrobacia',
-            'Adestramento',
-            'Atletismo',
-            'Enganação',
-            'Furtividade',
-            'Iniciativa',
-            'Intimidação',
-            'Ladinagem',
-            'Misticismo',
-            'Percepção',
-            'Sobrevivência',
-        ];
+        return PERICIAS_FALLBACK_NOMES.slice();
     }
 
     function popularSelectPericias(sel, cur) {
@@ -303,6 +357,9 @@
             return;
         }
 
+        if (showLefou || showOsteon || showKliren) {
+            await carregarCatalogoPericias();
+        }
         if (showLefou) {
             popularSelectPericias(idset.lefouPer1);
             popularSelectPericias(idset.lefouPer2);
@@ -813,6 +870,7 @@
 
     global.T20EscolhasRaciaisV13 = {
         bindOnce,
+        carregarCatalogoPericias,
         atualizarUiFicha: () => atualizarUi('ficha'),
         atualizarUiCadastro: () => atualizarUi('cad'),
         onRacaChangeFicha: () => onRacaChange('ficha'),
@@ -830,5 +888,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         bindOnce();
+        if (isV13()) void carregarCatalogoPericias();
     });
 })(typeof window !== 'undefined' ? window : globalThis);
