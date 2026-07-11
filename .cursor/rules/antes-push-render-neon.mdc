@@ -1,0 +1,30 @@
+---
+description: Antes de push/deploy no Render ou produção Neon — stamp Alembic pendente (projetoRPG_Oreon). Ler quando o usuário mencionar push, deploy, Render, produção ou merge para prod.
+alwaysApply: false
+---
+
+# Antes do push Render + Neon (stamp pendente)
+
+## Quando ativar
+
+Se o usuário for fazer **push**, **deploy**, **merge para produção** ou mencionar **Render** / **Neon production**:
+
+1. Ler [PENDENTE-STAMP-NEON.md](../../PENDENTE-STAMP-NEON.md) na raiz do repo.
+2. Se o stamp ainda estiver pendente, **avisar explicitamente** antes de apoiar o push.
+3. Guiar passo a passo: backup → pre-check → `scripts/neon-producao-alinhar-alembic.sh` → validar → só então push.
+
+## Mensagem padrão ao usuário
+
+> Há um **stamp Alembic pendente** no Neon production (`a7b9d3e1c2f4` → `p1q2r3s4t5u6`). Produção pode estar estável, mas o **próximo deploy** no Render roda `alembic upgrade head` no Procfile. Recomendo concluir o stamp **antes** do push (~5 min, não apaga dados). Quer que eu te guie agora?
+
+## Regras críticas
+
+- Usar **`alembic stamp head`**, nunca `upgrade head` neste banco legado em `public`.
+- `DATABASE_URL`: projeto **projetoRPG_Oreon**, Oregon (`us-west-2`), branch **production**.
+- Runbook: [docs/runbook-neon-producao-alembic.md](../../docs/runbook-neon-producao-alembic.md)
+- Skill: [arena-producao-dados-neon-render](../skills/arena-producao-dados-neon-render/SKILL.md)
+
+## Após stamp concluído
+
+- Pedir ao usuário apagar ou marcar feito `PENDENTE-STAMP-NEON.md`.
+- Aí sim apoiar push/deploy normalmente.

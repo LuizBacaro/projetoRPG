@@ -1299,7 +1299,7 @@
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-dashboard-pericias-v13.js?v=20260703racial"></script>
-<script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260711pericias"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704ma"></script>
@@ -2765,6 +2765,9 @@
     async function carregarRegrasCompra() {
         try {
             const d = await new TormentaRegrasService().obterAtributos({ regraVersao: DASH_REGRA_VERSAO });
+            if (Array.isArray(d.pericias) && d.pericias.length) {
+                window.PERICIAS_META = d.pericias;
+            }
             pontosIniciaisCompra =
                 typeof d.pontos_compra_iniciais === 'number' ? d.pontos_compra_iniciais : 10;
             const m = {};
