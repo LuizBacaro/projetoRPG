@@ -42,8 +42,29 @@ class TormentaCombateService:
 
         return sorted(personagens, key=chave)
 
+    def _personagens_existentes_ids(self, combate: TormentaCombate) -> List[int]:
+        ids = [int(x) for x in (combate.personagens_ids or [])]
+        if not ids:
+            return []
+        encontrados = self.personagem_repo.get_by_ids(ids)
+        by_id = {p.id for p in encontrados}
+        return [pid for pid in ids if pid in by_id]
+
+    def _finalizar_se_orfao(
+        self, combate: Optional[TormentaCombate]
+    ) -> Optional[TormentaCombate]:
+        """Encerra combate ativo cujos combatentes foram removidos do banco."""
+        if not combate or not combate.ativo:
+            return combate
+        if self._personagens_existentes_ids(combate):
+            return combate
+        combate.finalizar()
+        self.combate_repo.update(combate)
+        return None
+
     def obter_combate_ativo(self) -> Optional[TormentaCombate]:
-        return self.combate_repo.get_ativo_por_usuario(self.usuario_id)
+        combate = self.combate_repo.get_ativo_por_usuario(self.usuario_id)
+        return self._finalizar_se_orfao(combate)
 
     @staticmethod
     def _des_valor_personagem(p: TormentaPersonagem) -> int:
@@ -103,7 +124,7 @@ class TormentaCombateService:
         return self.montar_status(combate, incluir_personagens=incluir_personagens)
 
     def iniciar_combate(self, personagem_ids: List[int]) -> TormentaCombate:
-        if self.combate_repo.existe_combate_ativo_por_usuario(self.usuario_id):
+        if self.obter_combate_ativo():
             raise CombateJaAtivoError(
                 "Ja existe um combate Tormenta ativo para sua conta. Encerre-o antes de iniciar outro."
             )
@@ -136,7 +157,7 @@ class TormentaCombateService:
         return self.combate_repo.update(combate)
 
     def finalizar_combate(self) -> bool:
-        combate = self.obter_combate_ativo()
+        combate = self.combate_repo.get_ativo_por_usuario(self.usuario_id)
         if not combate:
             raise CombateNotFoundError("Nenhum combate Tormenta ativo")
         combate.finalizar()

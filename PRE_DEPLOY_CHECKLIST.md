@@ -33,6 +33,7 @@
 
 ### Checklist rápido (antes de cada deploy em produção)
 
+- [ ] **Stamp Alembic pendente?** Ver [PENDENTE-STAMP-NEON.md](PENDENTE-STAMP-NEON.md) — concluir **antes** do push se ainda estiver 🔴
 - [ ] No Render, confirmei que `DATABASE_URL` é o do Neon **de produção** (projeto + branch corretos).
 - [ ] O mesmo commit já foi validado em **staging** (ou cópia do schema), quando existir fluxo.
 - [ ] Sei até **quando** o restore no tempo do Neon ainda cobre o horário atual, se precisar desfazer algo.
