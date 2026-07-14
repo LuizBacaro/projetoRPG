@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260710header" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260714origem" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260629s47" />
 </head>
 <body class="tormenta-ficha-body">
@@ -31,6 +31,7 @@
                         <div class="t20-ficha-meta-tags ficha-header-identity" aria-live="polite">
                             <span class="t20-ficha-tag t20-ficha-tag--raca" id="t20TagRaca">Raça: —</span>
                             <span class="t20-ficha-tag t20-ficha-tag--classe" id="t20TagClasse">Classe: —</span>
+                            <span class="t20-ficha-tag t20-ficha-tag--origem" id="t20TagOrigem">Origem: —</span>
                             <span class="t20-ficha-tag t20-ficha-tag--nivel"><span class="t20-ficha-nivel-lbl">Nív.</span> <strong id="t20TagNivel">—</strong></span>
                         </div>
                     </div>
@@ -1591,7 +1592,7 @@
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
-<script src="/games/tormenta/js/t20-origens-v13.js?v=20260629dev"></script>
+<script src="/games/tormenta/js/t20-origens-v13.js?v=20260714origem"></script>
 <script src="/games/tormenta/js/t20-origem-trocas-ficha-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-duende-v13.js?v=20260704trocas"></script>
@@ -2925,6 +2926,23 @@
         if (tagR) tagR.textContent = `Raça: ${racaTxt}`;
         const cl = (q('f_classe_só') && q('f_classe_só').value.trim()) || '—';
         if (tagC) tagC.textContent = `Classe: ${cl}`;
+        const tagO = q('t20TagOrigem');
+        if (tagO) {
+            let origTxt = (q('f_origem') && q('f_origem').value.trim()) || '';
+            if (!origTxt) {
+                const slugO = (q('f_origem_slug') && q('f_origem_slug').value) || '';
+                if (
+                    slugO &&
+                    window.T20OrigensV13 &&
+                    typeof window.T20OrigensV13.origemPorSlug === 'function'
+                ) {
+                    const rowO = window.T20OrigensV13.origemPorSlug(slugO);
+                    if (rowO && rowO.nome) origTxt = rowO.nome;
+                    else if (slugO) origTxt = slugO;
+                }
+            }
+            tagO.textContent = `Origem: ${origTxt || '—'}`;
+        }
         const nv = (q('f_nivel') && q('f_nivel').value) || '';
         if (tagN) tagN.textContent = nv !== '' ? String(nv) : '—';
         const nome = (q('f_nome') && q('f_nome').value.trim()) || '';
@@ -8213,7 +8231,7 @@
             fclTxt.dataset.tagHdr = '1';
             fclTxt.addEventListener('input', atualizarTagsHeader);
         }
-        ['f_nivel', 'f_tendencia', 'f_divindade', 'f_campanha'].forEach((fid) => {
+        ['f_nivel', 'f_tendencia', 'f_divindade', 'f_campanha', 'f_origem', 'f_origem_slug'].forEach((fid) => {
             const el = q(fid);
             if (el && !el.dataset.tagHdr) {
                 el.dataset.tagHdr = '1';
