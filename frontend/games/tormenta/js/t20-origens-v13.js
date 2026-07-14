@@ -297,7 +297,14 @@
             atualizarPoderesConcedidos();
         }
         if (q('f_origem_slug') && fj.origem_slug) q('f_origem_slug').value = fj.origem_slug;
-        if (q('f_origem') && fj.origem) q('f_origem').value = fj.origem;
+        if (q('f_origem')) {
+            if (fj.origem) {
+                q('f_origem').value = fj.origem;
+            } else if (fj.origem_slug) {
+                const row = origemPorSlug(fj.origem_slug);
+                if (row && row.nome) q('f_origem').value = row.nome;
+            }
+        }
         if (q('f_poder_concedido') && fj.poder_concedido_slug) {
             q('f_poder_concedido').value = fj.poder_concedido_slug;
         }

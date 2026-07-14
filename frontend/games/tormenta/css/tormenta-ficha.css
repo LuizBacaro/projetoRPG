@@ -1079,6 +1079,10 @@
     border-left: 3px solid #1a4a7a;
 }
 
+.t20-ficha-tag--origem {
+    border-left: 3px solid #5a6b2e;
+}
+
 .t20-ficha-tag--nivel {
     border-left: 3px solid var(--t20-red-bright);
     background: linear-gradient(180deg, #faf3e8, #efe0cc);
