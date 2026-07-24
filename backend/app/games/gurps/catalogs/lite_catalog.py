@@ -34,6 +34,49 @@ def _parse_custo_opcional(custo_texto: str | None) -> int | None:
     return int(m.group(1))
 
 
+# Campos enriquecidos preservados no JSON de sumário (contrato v1 do catálogo).
+# Devem ser refletidos exatamente na resposta da API para que o frontend possa
+# renderizar UI de custo por nível / opções discretas / faixa / autocontrole.
+_CAMPOS_ENRIQUECIDOS = (
+    "cost_model",
+    "custo_por_nivel",
+    "custo_base",
+    "custo_min",
+    "custo_max",
+    "opcoes_custo",
+    "autocontrole",
+    "unidade_nivel",
+    "tipo_mfsoc",
+    "exotica_sob",
+    "paginas",
+)
+
+
+def _montar_item_enriquecido(bruto: dict[str, Any], nome: str) -> dict[str, Any]:
+    """Constrói o item da API preservando os campos de custo enriquecido.
+
+    Aceita entradas *legacy* (só `custo_texto`) e novas (com `cost_model`).
+    Quando `custo` vier explícito no JSON, ele prevalece sobre o parser regex
+    (indispensável para valores negativos com asterisco de autocontrole).
+    """
+
+    ct = bruto.get("custo_texto")
+    item: dict[str, Any] = {
+        "nome": nome,
+        "custo": (
+            bruto["custo"]
+            if "custo" in bruto
+            and (bruto["custo"] is None or isinstance(bruto["custo"], int))
+            else _parse_custo_opcional(ct)
+        ),
+        "custo_texto": ct,
+    }
+    for chave in _CAMPOS_ENRIQUECIDOS:
+        if chave in bruto and bruto[chave] is not None:
+            item[chave] = bruto[chave]
+    return item
+
+
 def carregar_apenas_lite_json() -> dict[str, Any]:
     with open(_CATALOGO_LITE_PATH, encoding="utf-8") as f:
         return json.load(f)
@@ -71,28 +114,14 @@ def _aplicar_sumario_sobre_catalogo(
         nome = (v.get("nome") or "").strip()
         if not nome:
             continue
-        ct = v.get("custo_texto")
-        vant.append(
-            {
-                "nome": nome,
-                "custo": _parse_custo_opcional(ct),
-                "custo_texto": ct,
-            }
-        )
+        vant.append(_montar_item_enriquecido(v, nome))
 
     desv: list[dict[str, Any]] = []
     for d in sumario.get("desvantagens", []):
         nome = (d.get("nome") or "").strip()
         if not nome:
             continue
-        ct = d.get("custo_texto")
-        desv.append(
-            {
-                "nome": nome,
-                "custo": _parse_custo_opcional(ct),
-                "custo_texto": ct,
-            }
-        )
+        desv.append(_montar_item_enriquecido(d, nome))
 
     out["pericias"] = per
     out["vantagens"] = vant

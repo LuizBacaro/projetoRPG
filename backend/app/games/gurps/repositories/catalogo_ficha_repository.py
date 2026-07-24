@@ -14,6 +14,42 @@ from app.games.gurps.models.catalogo_ficha import (
     GurpsCatalogoFichaVantagem,
 )
 
+# Campos enriquecidos que trafegam dentro da coluna JSON `meta_custo`.
+# Mantido em sincronia com `lite_catalog._CAMPOS_ENRIQUECIDOS`.
+_CAMPOS_META = (
+    "cost_model",
+    "custo_por_nivel",
+    "custo_base",
+    "custo_min",
+    "custo_max",
+    "opcoes_custo",
+    "autocontrole",
+    "unidade_nivel",
+    "tipo_mfsoc",
+    "exotica_sob",
+    "paginas",
+)
+
+
+def _extrair_meta_custo(item: dict[str, Any]) -> dict[str, Any] | None:
+    meta = {k: item[k] for k in _CAMPOS_META if k in item and item[k] is not None}
+    return meta or None
+
+
+def _linha_para_resposta_api(
+    nome: str, custo, custo_texto, meta_custo
+) -> dict[str, Any]:
+    resp: dict[str, Any] = {
+        "nome": nome,
+        "custo": custo,
+        "custo_texto": custo_texto,
+    }
+    if isinstance(meta_custo, dict):
+        for k, v in meta_custo.items():
+            if v is not None:
+                resp[k] = v
+    return resp
+
 
 class GurpsCatalogoFichaRepository:
     def __init__(self, db: Session):
@@ -36,7 +72,7 @@ class GurpsCatalogoFichaRepository:
             .all()
         )
         base["vantagens"] = [
-            {"nome": r.nome, "custo": r.custo, "custo_texto": r.custo_texto}
+            _linha_para_resposta_api(r.nome, r.custo, r.custo_texto, r.meta_custo)
             for r in vant_rows
         ]
         desv_rows = (
@@ -47,7 +83,7 @@ class GurpsCatalogoFichaRepository:
             .all()
         )
         base["desvantagens"] = [
-            {"nome": r.nome, "custo": r.custo, "custo_texto": r.custo_texto}
+            _linha_para_resposta_api(r.nome, r.custo, r.custo_texto, r.meta_custo)
             for r in desv_rows
         ]
         per_rows = (
@@ -68,7 +104,11 @@ class GurpsCatalogoFichaRepository:
 
 
 def repopular_catalogo_ficha_de_arquivos(db: Session) -> tuple[int, int, int]:
-    """Apaga o catálogo persistido e reinsere a mesma união Lite + sumário PDF usada pelos JSON."""
+    """Apaga o catálogo persistido e reinsere a mesma união Lite + sumário PDF usada pelos JSON.
+
+    A partir do commit `q2r3s4t5u6v7` também persiste `meta_custo` com o contrato
+    enriquecido do catálogo (cost_model, opcoes_custo, faixa, autocontrole, etc.).
+    """
     payload = montar_catalogo_de_arquivos()
     db.execute(delete(GurpsCatalogoFichaVantagem))
     db.execute(delete(GurpsCatalogoFichaDesvantagem))
@@ -84,6 +124,7 @@ def repopular_catalogo_ficha_de_arquivos(db: Session) -> tuple[int, int, int]:
                 custo=v.get("custo"),
                 custo_texto=v.get("custo_texto"),
                 ordem=i,
+                meta_custo=_extrair_meta_custo(v),
             )
         )
         nv += 1
@@ -97,6 +138,7 @@ def repopular_catalogo_ficha_de_arquivos(db: Session) -> tuple[int, int, int]:
                 custo=d.get("custo"),
                 custo_texto=d.get("custo_texto"),
                 ordem=i,
+                meta_custo=_extrair_meta_custo(d),
             )
         )
         nd += 1
