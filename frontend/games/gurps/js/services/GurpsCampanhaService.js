@@ -172,3 +172,5 @@ class GurpsCampanhaService {
         return true;
     }
 }
+
+window.GurpsCampanhaService = GurpsCampanhaService;
