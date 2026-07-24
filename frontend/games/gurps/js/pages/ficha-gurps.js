@@ -410,11 +410,48 @@
         return row.querySelector(`.fg-${prefix}-custo`);
     }
 
+    function fgCustoLabel(row) {
+        return row.querySelector('.fg-trait-label--custo');
+    }
+
     /**
-     * Renderiza o slot de controle (nível ▲▼ / opções discretas / hint) da linha
-     * conforme o `cost_model` do item do catálogo. Nunca substitui o input
-     * de custo — apenas orquestra os ajustes automáticos.
-     * Retorna sempre o item aplicado para caller ler `custo` derivado.
+     * Quando o custo vem de select/nível, esconde o campo CUSTO duplicado
+     * (valor continua no input oculto para persistência).
+     * mode: 'manual' | 'derivado'
+     */
+    function setModoCustoUi(row, prefix, mode) {
+        const derivado = mode === 'derivado';
+        row.classList.toggle('fg-trait-row--custo-derivado', derivado);
+        const label = fgCustoLabel(row);
+        const custoInp = fgCustoInput(row, prefix);
+        if (label) label.hidden = derivado;
+        if (custoInp) {
+            if (derivado) {
+                custoInp.setAttribute('hidden', '');
+                custoInp.readOnly = true;
+                custoInp.tabIndex = -1;
+            } else {
+                custoInp.removeAttribute('hidden');
+                custoInp.readOnly = false;
+                custoInp.removeAttribute('tabindex');
+            }
+        }
+    }
+
+    function formatOpcaoCustoLabel(opcao, item) {
+        const c = Number(opcao?.custo);
+        const cTxt = Number.isFinite(c) ? String(c) : '';
+        if (opcao?.rotulo) return `${opcao.rotulo} (${cTxt})`;
+        const ct = String(item?.custo_texto || '');
+        if (/\/\s*n[ií]vel/i.test(ct)) return `${cTxt}/nível`;
+        return cTxt;
+    }
+
+    /**
+     * Um único controle de custo por traço, conforme o livro:
+     * - opcoes_discretas → select com as opções (Pacifismo, Hierarquia…)
+     * - por_nivel → − nível + e pts derivados
+     * - faixa / variável / fixo → só o campo CUSTO (sem caixa extra no meio)
      */
     function renderControleCusto(row, prefix, item) {
         const slot = fgControleRoot(row, prefix);
@@ -423,6 +460,7 @@
         slot.innerHTML = '';
         slot.hidden = true;
         row.dataset.costModel = item ? String(item.cost_model || '') : '';
+        setModoCustoUi(row, prefix, 'manual');
         if (!item) return;
 
         const modelo = item.cost_model || 'fixo';
@@ -432,18 +470,22 @@
             const base = Number(item.custo_base || 0);
             const unidade = item.unidade_nivel || 'nível';
             const nivelInicial = Math.max(1, Number(row.dataset.nivel || 1));
+            setModoCustoUi(row, prefix, 'derivado');
             slot.hidden = false;
             slot.innerHTML =
                 `<button type="button" class="fg-cost-step" data-dir="-1" aria-label="Diminuir ${unidade}" title="${unidade}">−</button>` +
                 `<input type="number" class="fg-cost-nivel" value="${nivelInicial}" min="1" inputmode="numeric" aria-label="${unidade}" title="${unidade}" />` +
-                `<button type="button" class="fg-cost-step" data-dir="1" aria-label="Aumentar ${unidade}" title="${unidade}">+</button>`;
+                `<button type="button" class="fg-cost-step" data-dir="1" aria-label="Aumentar ${unidade}" title="${unidade}">+</button>` +
+                `<span class="fg-cost-pts" aria-live="polite"></span>`;
             const nivelInp = slot.querySelector('.fg-cost-nivel');
+            const ptsEl = slot.querySelector('.fg-cost-pts');
             const recalc = () => {
                 const n = Math.max(1, Number(nivelInp.value || 1));
                 nivelInp.value = String(n);
                 row.dataset.nivel = String(n);
                 const total = base + passo * n;
                 custoInp.value = String(total);
+                if (ptsEl) ptsEl.textContent = `${total} pts`;
                 atualizarResumoPontosListas();
             };
             slot.querySelectorAll('.fg-cost-step').forEach((btn) => {
@@ -459,18 +501,21 @@
         }
 
         if (modelo === 'opcoes_discretas' && Array.isArray(item.opcoes_custo) && item.opcoes_custo.length) {
+            setModoCustoUi(row, prefix, 'derivado');
             slot.hidden = false;
             const salvo = row.dataset.opcao || '';
             const opts = item.opcoes_custo
                 .map((o, i) => {
                     const c = Number(o.custo);
-                    const label = o.rotulo ? `${o.rotulo} (${c})` : String(c);
+                    const label = formatOpcaoCustoLabel(o, item);
                     const val = `${i}`;
                     const sel = val === salvo ? ' selected' : '';
                     return `<option value="${val}"${sel} data-custo="${c}">${label}</option>`;
                 })
                 .join('');
-            slot.innerHTML = `<select class="fg-cost-opcao" aria-label="Variante">${opts}</select>`;
+            slot.innerHTML =
+                `<label class="fg-trait-label fg-trait-label--opcao">Custo</label>` +
+                `<select class="fg-cost-opcao" aria-label="Opção de custo">${opts}</select>`;
             const sel = slot.querySelector('.fg-cost-opcao');
             const apply = () => {
                 const opt = sel.selectedOptions[0];
@@ -480,34 +525,38 @@
                 atualizarResumoPontosListas();
             };
             sel.addEventListener('change', apply);
-            if (!salvo) apply();
+            if (salvo !== '') apply();
+            else apply();
             return;
         }
 
         if (modelo === 'faixa' && item.custo_min != null && item.custo_max != null) {
-            slot.hidden = false;
             const min = Number(item.custo_min);
             const max = Number(item.custo_max);
-            slot.innerHTML =
-                `<span class="fg-cost-hint" title="Custo entre ${min} e ${max}${pageRefForItem(item)}">Faixa ${min}…${max}</span>`;
-            custoInp.min = String(Math.min(min, max));
-            custoInp.max = String(Math.max(min, max));
+            const lo = Math.min(min, max);
+            const hi = Math.max(min, max);
+            custoInp.min = String(lo);
+            custoInp.max = String(hi);
+            custoInp.title = `Custo entre ${lo} e ${hi}${pageRefForItem(item)}`;
+            custoInp.placeholder = `${lo}…${hi}`;
             if (!custoInp.value || Number(custoInp.value) === 0) custoInp.value = String(min);
+            // Sem caixa extra no meio — só o campo CUSTO com a faixa.
             return;
         }
 
         if (modelo === 'variavel') {
-            slot.hidden = false;
             const txt = item.custo_texto || 'Variável';
-            slot.innerHTML = `<span class="fg-cost-hint" title="Custo variável${pageRefForItem(item)}">${txt}</span>`;
+            custoInp.title = `Custo variável${pageRefForItem(item)}: ${txt}`;
+            custoInp.placeholder = txt;
             return;
         }
 
-        // fixo — mostra hint com auto-controle quando aplicável
+        // fixo (inclui autocontrole*): só o campo CUSTO, sem caixa intermediária.
         if (item.autocontrole) {
-            slot.hidden = false;
-            slot.innerHTML =
-                `<span class="fg-cost-hint" title="Marcada com autocontrole no livro (*)${pageRefForItem(item)}">Autocontrole *</span>`;
+            custoInp.title = `Autocontrole padrão 12 (custo do livro)${pageRefForItem(item)}`;
+        }
+        if (item.custo_texto) {
+            custoInp.placeholder = String(item.custo_texto);
         }
     }
 
@@ -540,20 +589,35 @@
         // Preserva o custo salvo (renderControleCusto pode ter recalculado).
         const custoInp = fgCustoInput(row, prefix);
         if (custoInp && Number.isFinite(custoSalvo)) custoInp.value = String(custoSalvo);
+        // Re-sincroniza select/nível com o valor preservado.
+        if (item.cost_model === 'opcoes_discretas') {
+            const sel = row.querySelector('.fg-cost-opcao');
+            if (sel && row.dataset.opcao != null) {
+                sel.selectedIndex = Number(row.dataset.opcao);
+            }
+        }
+        if (item.cost_model === 'por_nivel' || item.cost_model === 'fixo_mais_por_nivel') {
+            const ptsEl = row.querySelector('.fg-cost-pts');
+            if (ptsEl && Number.isFinite(custoSalvo)) ptsEl.textContent = `${custoSalvo} pts`;
+        }
     }
 
     function limparControleCusto(row, prefix) {
         const slot = fgControleRoot(row, prefix);
-        if (!slot) return;
-        slot.innerHTML = '';
-        slot.hidden = true;
+        if (slot) {
+            slot.innerHTML = '';
+            slot.hidden = true;
+        }
         row.dataset.costModel = '';
         row.dataset.nivel = '';
         row.dataset.opcao = '';
+        setModoCustoUi(row, prefix, 'manual');
         const custoInp = fgCustoInput(row, prefix);
         if (custoInp) {
             custoInp.removeAttribute('min');
             custoInp.removeAttribute('max');
+            custoInp.removeAttribute('title');
+            custoInp.placeholder = '';
         }
     }
 
