@@ -390,6 +390,173 @@
         }
     }
 
+    // ------------------------------------------------------------------
+    // Contrato de custo enriquecido do catálogo (cost_model)
+    // Ver `.cursor/requisitos/gurps/02-vantagens-desvantagens-gurps.md`
+    // ------------------------------------------------------------------
+
+    function pageRefForItem(item) {
+        if (!item) return '';
+        const p = Array.isArray(item.paginas) ? item.paginas[0] : null;
+        return p != null ? ` (p.${p})` : '';
+    }
+
+    function fgControleRoot(row, prefix) {
+        // prefix = 'vant' | 'desv'
+        return row.querySelector(`.fg-${prefix}-controle`);
+    }
+
+    function fgCustoInput(row, prefix) {
+        return row.querySelector(`.fg-${prefix}-custo`);
+    }
+
+    /**
+     * Renderiza o slot de controle (nível ▲▼ / opções discretas / hint) da linha
+     * conforme o `cost_model` do item do catálogo. Nunca substitui o input
+     * de custo — apenas orquestra os ajustes automáticos.
+     * Retorna sempre o item aplicado para caller ler `custo` derivado.
+     */
+    function renderControleCusto(row, prefix, item) {
+        const slot = fgControleRoot(row, prefix);
+        const custoInp = fgCustoInput(row, prefix);
+        if (!slot || !custoInp) return;
+        slot.innerHTML = '';
+        slot.hidden = true;
+        row.dataset.costModel = item ? String(item.cost_model || '') : '';
+        if (!item) return;
+
+        const modelo = item.cost_model || 'fixo';
+
+        if (modelo === 'por_nivel' || modelo === 'fixo_mais_por_nivel') {
+            const passo = Number(item.custo_por_nivel || item.custo || 0);
+            const base = Number(item.custo_base || 0);
+            const unidade = item.unidade_nivel || 'nível';
+            const nivelInicial = Math.max(1, Number(row.dataset.nivel || 1));
+            slot.hidden = false;
+            slot.innerHTML =
+                `<button type="button" class="fg-cost-step" data-dir="-1" aria-label="Diminuir ${unidade}">−</button>` +
+                `<input type="number" class="fg-cost-nivel" value="${nivelInicial}" min="1" inputmode="numeric" aria-label="${unidade}" />` +
+                `<button type="button" class="fg-cost-step" data-dir="1" aria-label="Aumentar ${unidade}">+</button>`;
+            const nivelInp = slot.querySelector('.fg-cost-nivel');
+            const recalc = () => {
+                const n = Math.max(1, Number(nivelInp.value || 1));
+                nivelInp.value = String(n);
+                row.dataset.nivel = String(n);
+                const total = base + passo * n;
+                custoInp.value = String(total);
+                atualizarResumoPontosListas();
+            };
+            slot.querySelectorAll('.fg-cost-step').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const dir = Number(btn.dataset.dir || 0);
+                    nivelInp.value = String(Math.max(1, Number(nivelInp.value || 1) + dir));
+                    recalc();
+                });
+            });
+            nivelInp.addEventListener('input', recalc);
+            recalc();
+            return;
+        }
+
+        if (modelo === 'opcoes_discretas' && Array.isArray(item.opcoes_custo) && item.opcoes_custo.length) {
+            slot.hidden = false;
+            const salvo = row.dataset.opcao || '';
+            const opts = item.opcoes_custo
+                .map((o, i) => {
+                    const c = Number(o.custo);
+                    const label = o.rotulo ? `${o.rotulo} (${c})` : String(c);
+                    const val = `${i}`;
+                    const sel = val === salvo ? ' selected' : '';
+                    return `<option value="${val}"${sel} data-custo="${c}">${label}</option>`;
+                })
+                .join('');
+            slot.innerHTML = `<select class="fg-cost-opcao" aria-label="Variante">${opts}</select>`;
+            const sel = slot.querySelector('.fg-cost-opcao');
+            const apply = () => {
+                const opt = sel.selectedOptions[0];
+                if (!opt) return;
+                row.dataset.opcao = String(sel.selectedIndex);
+                custoInp.value = opt.dataset.custo;
+                atualizarResumoPontosListas();
+            };
+            sel.addEventListener('change', apply);
+            if (!salvo) apply();
+            return;
+        }
+
+        if (modelo === 'faixa' && item.custo_min != null && item.custo_max != null) {
+            slot.hidden = false;
+            const min = Number(item.custo_min);
+            const max = Number(item.custo_max);
+            slot.innerHTML =
+                `<span class="fg-cost-hint" title="Custo entre ${min} e ${max}${pageRefForItem(item)}">${min}…${max}</span>`;
+            custoInp.min = String(Math.min(min, max));
+            custoInp.max = String(Math.max(min, max));
+            if (!custoInp.value || Number(custoInp.value) === 0) custoInp.value = String(min);
+            return;
+        }
+
+        if (modelo === 'variavel') {
+            slot.hidden = false;
+            const txt = item.custo_texto || 'Variável';
+            slot.innerHTML = `<span class="fg-cost-hint" title="Custo variável${pageRefForItem(item)}">${txt}</span>`;
+            return;
+        }
+
+        // fixo — mostra hint com auto-controle quando aplicável
+        if (item.autocontrole) {
+            slot.hidden = false;
+            slot.innerHTML =
+                `<span class="fg-cost-hint" title="Marcada com autocontrole no livro (*)${pageRefForItem(item)}">*</span>`;
+        }
+    }
+
+    /**
+     * Reidrata o controle de custo (nível / opção) de uma linha usando o valor
+     * já salvo em `.fg-{prefix}-custo`. Infere o nível a partir do custo salvo
+     * e da regra do catálogo — necessário para reabrir fichas antigas sem regredir.
+     */
+    function aplicarControleCustoSalvo(row, prefix, saved) {
+        const cat = window.__gurpsLiteCatalogo;
+        const lista = cat && (prefix === 'vant' ? cat.vantagens : cat.desvantagens);
+        if (!lista) return;
+        const item = findCatalogItemSmart(lista, (saved && saved.nome) || '');
+        if (!item) return;
+        const custoSalvo = Number(saved?.custo);
+
+        if (item.cost_model === 'por_nivel' && item.custo_por_nivel) {
+            const nivel = Math.max(1, Math.round(custoSalvo / Number(item.custo_por_nivel)));
+            row.dataset.nivel = String(Number.isFinite(nivel) && nivel > 0 ? nivel : 1);
+        } else if (item.cost_model === 'fixo_mais_por_nivel' && item.custo_por_nivel) {
+            const base = Number(item.custo_base || 0);
+            const nivel = Math.max(1, Math.round((custoSalvo - base) / Number(item.custo_por_nivel)));
+            row.dataset.nivel = String(Number.isFinite(nivel) && nivel > 0 ? nivel : 1);
+        } else if (item.cost_model === 'opcoes_discretas' && Array.isArray(item.opcoes_custo)) {
+            const idx = item.opcoes_custo.findIndex((o) => Number(o.custo) === custoSalvo);
+            if (idx >= 0) row.dataset.opcao = String(idx);
+        }
+
+        renderControleCusto(row, prefix, item);
+        // Preserva o custo salvo (renderControleCusto pode ter recalculado).
+        const custoInp = fgCustoInput(row, prefix);
+        if (custoInp && Number.isFinite(custoSalvo)) custoInp.value = String(custoSalvo);
+    }
+
+    function limparControleCusto(row, prefix) {
+        const slot = fgControleRoot(row, prefix);
+        if (!slot) return;
+        slot.innerHTML = '';
+        slot.hidden = true;
+        row.dataset.costModel = '';
+        row.dataset.nivel = '';
+        row.dataset.opcao = '';
+        const custoInp = fgCustoInput(row, prefix);
+        if (custoInp) {
+            custoInp.removeAttribute('min');
+            custoInp.removeAttribute('max');
+        }
+    }
+
     function normText(v) {
         return String(v || '')
             .normalize('NFD')
@@ -577,9 +744,13 @@
             if (!cat?.vantagens) return;
             const n = nome.value.trim();
             const item = findCatalogItemSmart(cat.vantagens, n);
-            if (!item) return;
+            if (!item) {
+                limparControleCusto(row, 'vant');
+                return;
+            }
             const custoInp = row.querySelector('.fg-vant-custo');
             applyCatalogCostToInput(custoInp, item);
+            renderControleCusto(row, 'vant', item);
             atualizarResumoPontosListas();
         };
         nome.addEventListener('change', fillCost);
@@ -598,9 +769,13 @@
             if (!cat?.desvantagens) return;
             const n = nome.value.trim();
             const item = findCatalogItemSmart(cat.desvantagens, n);
-            if (!item) return;
+            if (!item) {
+                limparControleCusto(row, 'desv');
+                return;
+            }
             const custoInp = row.querySelector('.fg-desv-custo');
             applyCatalogCostToInput(custoInp, item);
+            renderControleCusto(row, 'desv', item);
             atualizarResumoPontosListas();
         };
         nome.addEventListener('change', fillCost);
@@ -894,7 +1069,8 @@
         d.className = 'ficha-linha fg-row-vant';
         d.innerHTML =
             '<input class="fg-vant-nome" type="text" placeholder="Vantagem" />' +
-            '<input class="fg-vant-custo" type="number" value="0" />' +
+            '<div class="fg-vant-controle fg-cost-controle" hidden></div>' +
+            '<input class="fg-vant-custo" type="number" value="0" inputmode="numeric" />' +
             '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button>';
         d.querySelector('button').addEventListener('click', () => {
             d.remove();
@@ -912,7 +1088,8 @@
         d.className = 'ficha-linha fg-row-desv';
         d.innerHTML =
             '<input class="fg-desv-nome" type="text" placeholder="Desvantagem" />' +
-            '<input class="fg-desv-custo" type="number" value="0" />' +
+            '<div class="fg-desv-controle fg-cost-controle" hidden></div>' +
+            '<input class="fg-desv-custo" type="number" value="0" inputmode="numeric" />' +
             '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button>';
         d.querySelector('button').addEventListener('click', () => {
             d.remove();
@@ -1006,6 +1183,7 @@
             if (r && v) {
                 r.querySelector('.fg-vant-nome').value = v.nome;
                 r.querySelector('.fg-vant-custo').value = v.custo;
+                aplicarControleCustoSalvo(r, 'vant', v);
             }
         });
         (p.desvantagens || []).forEach((v) => {
@@ -1015,6 +1193,7 @@
             if (r && v) {
                 r.querySelector('.fg-desv-nome').value = v.nome;
                 r.querySelector('.fg-desv-custo').value = v.custo;
+                aplicarControleCustoSalvo(r, 'desv', v);
             }
         });
         (p.pericias || []).forEach((v) => {

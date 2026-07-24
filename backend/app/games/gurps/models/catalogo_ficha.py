@@ -1,8 +1,12 @@
 """Catálogo global da ficha (perícias / vantagens / desvantagens) — opcional; vazio = API usa JSON."""
 
-from sqlalchemy import Boolean, Column, Integer, String, UniqueConstraint
+from sqlalchemy import JSON, Boolean, Column, Integer, String, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 
 from app.shared.core.database import Base
+
+# JSONB no Postgres; JSON genérico em SQLite/testes.
+_META_CUSTO_TYPE = JSON().with_variant(JSONB(), "postgresql")
 
 
 class GurpsCatalogoFichaVantagem(Base):
@@ -14,6 +18,10 @@ class GurpsCatalogoFichaVantagem(Base):
     custo = Column(Integer, nullable=True)
     custo_texto = Column(String(255), nullable=True)
     ordem = Column(Integer, nullable=False, server_default="0")
+    # Contrato enriquecido (cost_model, opcoes_custo, faixa, autocontrole, etc.).
+    # Espelha o item bruto do JSON `gurps_personagens_sumario_catalogo.json`
+    # (menos `nome`, `custo`, `custo_texto` que já estão em colunas dedicadas).
+    meta_custo = Column(_META_CUSTO_TYPE, nullable=True)
 
 
 class GurpsCatalogoFichaDesvantagem(Base):
@@ -25,6 +33,7 @@ class GurpsCatalogoFichaDesvantagem(Base):
     custo = Column(Integer, nullable=True)
     custo_texto = Column(String(255), nullable=True)
     ordem = Column(Integer, nullable=False, server_default="0")
+    meta_custo = Column(_META_CUSTO_TYPE, nullable=True)
 
 
 class GurpsCatalogoFichaPericia(Base):

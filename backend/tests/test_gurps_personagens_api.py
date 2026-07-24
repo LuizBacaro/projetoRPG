@@ -494,6 +494,79 @@ def test_catalogo_lite_ficha_via_banco_apos_seed(gurps_personagens_db):
     assert body["meta"].get("catalogo_listas_origem") == "postgres"
 
 
+def _por_nome(itens, nome):
+    for it in itens:
+        if it.get("nome") == nome:
+            return it
+    return None
+
+
+def test_catalogo_lite_ficha_contem_indulgente_e_pacifismo(gurps_personagens_db):
+    """Regressão: entradas ausentes do sumário antigo (Módulo Personagens p.146/p.151)."""
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+
+    r = client.get("/api/v1/gurps/personagens/catalogo/lite-ficha")
+    assert r.status_code == 200, r.text
+    body = r.json()
+
+    indulgente = _por_nome(body["desvantagens"], "Indulgente")
+    assert indulgente is not None, "Indulgente ausente do catálogo"
+    assert indulgente["custo"] == -15
+    assert indulgente.get("autocontrole") is True
+    assert indulgente.get("cost_model") == "fixo"
+
+    pacifismo = _por_nome(body["desvantagens"], "Pacifismo")
+    assert pacifismo is not None, "Pacifismo ausente do catálogo"
+    assert pacifismo.get("cost_model") == "opcoes_discretas"
+    opcoes = pacifismo.get("opcoes_custo") or []
+    custos = sorted({o.get("custo") for o in opcoes if isinstance(o, dict)})
+    assert -5 in custos and -10 in custos and -15 in custos and -30 in custos
+
+
+def test_catalogo_lite_ficha_cost_model_por_nivel(gurps_personagens_db):
+    """Traços leveled (Status, Carisma) devem expor custo_por_nivel."""
+    SessionLocal, u1, _ = gurps_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.get("/api/v1/gurps/personagens/catalogo/lite-ficha")
+    body = r.json()
+
+    carisma = _por_nome(body["vantagens"], "Carisma")
+    assert carisma and carisma.get("cost_model") == "por_nivel"
+    assert carisma.get("custo_por_nivel") == 5
+
+    status_v = _por_nome(body["vantagens"], "Status")
+    assert status_v and status_v.get("cost_model") == "por_nivel"
+    assert status_v.get("custo_por_nivel") == 5
+
+    status_d = _por_nome(body["desvantagens"], "Status")
+    assert status_d and status_d.get("cost_model") == "por_nivel"
+    assert status_d.get("custo_por_nivel") == -5
+
+
+def test_catalogo_lite_ficha_preserva_meta_custo_no_banco(gurps_personagens_db):
+    """Após seed, `meta_custo` deve reaparecer nas respostas (cost_model, opcoes_custo)."""
+    SessionLocal, u1, _ = gurps_personagens_db
+    db = SessionLocal()
+    try:
+        repopular_catalogo_ficha_de_arquivos(db)
+        db.commit()
+    finally:
+        db.close()
+
+    client = _build_client(SessionLocal, _usuario(u1))
+    r = client.get("/api/v1/gurps/personagens/catalogo/lite-ficha")
+    body = r.json()
+    assert body["meta"].get("catalogo_listas_origem") == "postgres"
+
+    pacifismo = _por_nome(body["desvantagens"], "Pacifismo")
+    assert pacifismo and pacifismo.get("cost_model") == "opcoes_discretas"
+    assert isinstance(pacifismo.get("opcoes_custo"), list)
+
+    indulgente = _por_nome(body["desvantagens"], "Indulgente")
+    assert indulgente and indulgente.get("autocontrole") is True
+
+
 def test_criar_rejeita_pericia_lite_sem_pre_requisito(gurps_personagens_db):
     SessionLocal, u1, _ = gurps_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))
