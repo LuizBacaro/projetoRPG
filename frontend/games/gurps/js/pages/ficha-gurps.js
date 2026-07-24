@@ -441,7 +441,7 @@
     function formatOpcaoCustoLabel(opcao, item) {
         const c = Number(opcao?.custo);
         const cTxt = Number.isFinite(c) ? String(c) : '';
-        if (opcao?.rotulo) return `${opcao.rotulo} (${cTxt})`;
+        if (opcao?.rotulo) return String(opcao.rotulo);
         const ct = String(item?.custo_texto || '');
         if (/\/\s*n[ií]vel/i.test(ct)) return `${cTxt}/nível`;
         return cTxt;
@@ -459,6 +459,7 @@
         if (!slot || !custoInp) return;
         slot.innerHTML = '';
         slot.hidden = true;
+        slot.classList.remove('fg-cost-controle--opcoes');
         row.dataset.costModel = item ? String(item.cost_model || '') : '';
         setModoCustoUi(row, prefix, 'manual');
         if (!item) return;
@@ -503,6 +504,7 @@
         if (modelo === 'opcoes_discretas' && Array.isArray(item.opcoes_custo) && item.opcoes_custo.length) {
             setModoCustoUi(row, prefix, 'derivado');
             slot.hidden = false;
+            slot.classList.add('fg-cost-controle--opcoes');
             const salvo = row.dataset.opcao || '';
             const opts = item.opcoes_custo
                 .map((o, i) => {
@@ -510,23 +512,28 @@
                     const label = formatOpcaoCustoLabel(o, item);
                     const val = `${i}`;
                     const sel = val === salvo ? ' selected' : '';
-                    return `<option value="${val}"${sel} data-custo="${c}">${label}</option>`;
+                    const tituloCusto = Number.isFinite(c) ? ` (${c} pts)` : '';
+                    return `<option value="${val}"${sel} data-custo="${c}" title="${label}${tituloCusto}">${label}</option>`;
                 })
                 .join('');
             slot.innerHTML =
-                `<label class="fg-trait-label fg-trait-label--opcao">Custo</label>` +
-                `<select class="fg-cost-opcao" aria-label="Opção de custo">${opts}</select>`;
+                `<label class="fg-trait-label fg-trait-label--opcao">Nível</label>` +
+                `<select class="fg-cost-opcao" aria-label="Nível / opção">${opts}</select>` +
+                `<span class="fg-cost-pts fg-cost-pts--opcao" aria-live="polite"></span>`;
             const sel = slot.querySelector('.fg-cost-opcao');
+            const ptsEl = slot.querySelector('.fg-cost-pts--opcao');
             const apply = () => {
                 const opt = sel.selectedOptions[0];
                 if (!opt) return;
                 row.dataset.opcao = String(sel.selectedIndex);
-                custoInp.value = opt.dataset.custo;
+                const c = Number(opt.dataset.custo);
+                custoInp.value = String(c);
+                if (ptsEl) ptsEl.textContent = Number.isFinite(c) ? `${c} pts` : '';
+                sel.title = `${opt.textContent}${Number.isFinite(c) ? ` — ${c} pts` : ''}`;
                 atualizarResumoPontosListas();
             };
             sel.addEventListener('change', apply);
-            if (salvo !== '') apply();
-            else apply();
+            apply();
             return;
         }
 
