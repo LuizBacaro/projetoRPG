@@ -13,1270 +13,5358 @@
       301,
       305
     ],
-    "nota": "Lista refeita a partir das tabelas das pags. 297-304, com deduplicacao por chave normalizada e filtro de ruido OCR."
+    "nota": "Catalogo enriquecido (2026-07-24) — tabelas rapidas do Modulo Basico Personagens pags. 298-301, com cost_model e opcoes discretas quando aplicavel. Autocontrole (*) preservado; texto original em custo_texto.",
+    "cost_model_versao": 1,
+    "cost_model_valores": [
+      "fixo",
+      "por_nivel",
+      "fixo_mais_por_nivel",
+      "opcoes_discretas",
+      "faixa",
+      "variavel"
+    ]
   },
   "vantagens": [
     {
-      "nome": "Abascanto",
-      "custo_texto": "2/nível"
+      "nome": "Abafador de Mana",
+      "custo_texto": "10/nível",
+      "custo": 10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        34
+      ]
     },
     {
-      "nome": "Acesso",
-      "custo_texto": "Variável"
+      "nome": "Abascanto",
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        34
+      ]
+    },
+    {
+      "nome": "Abençoado",
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        35
+      ]
+    },
+    {
+      "nome": "Acessórios",
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        100
+      ]
+    },
+    {
+      "nome": "Adaptabilidade Cultural",
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        35
+      ]
     },
     {
       "nome": "Adaptação ao Terreno",
-      "custo_texto": "0 ou 5"
+      "custo_texto": "0 ou 5",
+      "custo": 0,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 0
+        },
+        {
+          "custo": 5
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        35
+      ]
     },
     {
       "nome": "Aderência",
-      "custo_texto": "20"
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        35
+      ]
     },
     {
       "nome": "Agente Cativante",
-      "custo_texto": "15/nível"
+      "custo_texto": "15/nível",
+      "custo": 15,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 15,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        90
+      ]
+    },
+    {
+      "nome": "Aliados",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        35
+      ]
     },
     {
       "nome": "Ambidestria",
-      "custo_texto": "5"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        38
+      ]
     },
     {
-      "nome": "Ampliada M",
-      "custo_texto": "45 pontos"
+      "nome": "Ampliador de Mana",
+      "custo_texto": "50/nível",
+      "custo": 50,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 50,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        38
+      ]
     },
     {
       "nome": "Anfíbio",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        39
+      ]
     },
     {
       "nome": "Antecedentes Incomuns",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        39
+      ]
     },
     {
       "nome": "Apagado",
-      "custo_texto": "10 pontos"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        39
+      ]
     },
     {
       "nome": "Aparência",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        21
+      ]
     },
     {
       "nome": "Apetrechos",
-      "custo_texto": "10 pontos"
+      "custo_texto": "5/apetrecho",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "unidade_nivel": "apetrecho",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        39
+      ]
     },
     {
       "nome": "Aptidão Mágica",
-      "custo_texto": "5 + 10/nível"
+      "custo_texto": "5 + 10/nível",
+      "custo": 5,
+      "cost_model": "fixo_mais_por_nivel",
+      "custo_base": 5,
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        40
+      ]
     },
     {
       "nome": "Arrebatador",
-      "custo_texto": "80"
+      "custo_texto": "80",
+      "custo": 80,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        41
+      ]
     },
     {
       "nome": "Arremedo",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        42
+      ]
     },
     {
       "nome": "Artífice",
-      "custo_texto": "10/nível"
+      "custo_texto": "10/nível",
+      "custo": 10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "Artista Talentoso",
-      "custo_texto": "5/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "Ataque Adicional",
-      "custo_texto": "25 pontos/nível"
+      "custo_texto": "25/nível",
+      "custo": 25,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 25,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        42
+      ]
     },
     {
       "nome": "Ataque Constritivo",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        42
+      ]
     },
     {
       "nome": "Ataque Inato",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        42
+      ]
     },
     {
       "nome": "Atirador",
-      "custo_texto": "25 pontos"
-    },
-    {
-      "nome": "Atraso",
-      "custo_texto": "Variável"
+      "custo_texto": "25",
+      "custo": 25,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        43
+      ]
     },
     {
       "nome": "Atribulação",
-      "custo_texto": "10 pontos/nível"
+      "custo_texto": "10/nível",
+      "custo": 10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        44
+      ]
+    },
+    {
+      "nome": "Audição Aguçada",
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        89
+      ]
     },
     {
       "nome": "Audição Discriminatória",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        45
+      ]
     },
     {
       "nome": "Audição Parabólica",
-      "custo_texto": "4 pontos/nível"
+      "custo_texto": "4/nível",
+      "custo": 4,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 4,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        45
+      ]
     },
     {
       "nome": "Audição Subsônica",
-      "custo_texto": "0 ou 5 pontos"
+      "custo_texto": "0 ou 5",
+      "custo": 0,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 0
+        },
+        {
+          "custo": 5
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        45
+      ]
+    },
+    {
+      "nome": "Autotranse",
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        100
+      ]
     },
     {
       "nome": "Boa Forma",
-      "custo_texto": "5 ou 15 pontos"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        45
+      ]
     },
     {
       "nome": "Boca Adicional",
-      "custo_texto": "5 pontos/boca"
+      "custo_texto": "5/boca",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "unidade_nivel": "boca",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        45
+      ]
     },
     {
       "nome": "Bom Senso",
-      "custo_texto": "10 pontos"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        45
+      ]
     },
     {
       "nome": "Braços Adicionais",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        45
+      ]
     },
     {
       "nome": "Cabeça Adicional",
-      "custo_texto": "15 pontos/cabeça"
+      "custo_texto": "15/nível",
+      "custo": 15,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 15,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        46
+      ]
     },
     {
       "nome": "Cálculos Instantâneos",
-      "custo_texto": "2 ou 5 pontos"
+      "custo_texto": "2",
+      "custo": 2,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        46
+      ]
     },
     {
       "nome": "Camaleão",
-      "custo_texto": "5 pontos/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        46
+      ]
+    },
+    {
+      "nome": "Camaleão Social",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        46
+      ]
     },
     {
       "nome": "Caminhar no Ar",
-      "custo_texto": "20 pontos"
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        47
+      ]
+    },
+    {
+      "nome": "Caminhar sobre Líquidos",
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        47
+      ]
+    },
+    {
+      "nome": "Canalização",
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        47
+      ]
     },
     {
       "nome": "Carga Útil",
-      "custo_texto": "1/nível"
+      "custo_texto": "1/nível",
+      "custo": 1,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 1,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        47
+      ]
     },
     {
       "nome": "Carisma",
-      "custo_texto": "5 pontos/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        47
+      ]
     },
     {
       "nome": "Cibernética",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        47
+      ]
     },
     {
       "nome": "Clarisenciência",
-      "custo_texto": "50 pontos"
+      "custo_texto": "50",
+      "custo": 50,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        47
+      ]
     },
     {
       "nome": "Clericato",
-      "custo_texto": "5 pontos"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        48
+      ]
     },
     {
       "nome": "Companheiro Animal",
-      "custo_texto": "5/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "Consumo Reduzido",
-      "custo_texto": "2 pontos/nível"
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        48
+      ]
     },
     {
       "nome": "Contatos",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        48
+      ]
     },
     {
       "nome": "Controle da Mente",
-      "custo_texto": "50 pontos"
+      "custo_texto": "50",
+      "custo": 50,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        49
+      ]
     },
     {
       "nome": "Controle do Metabolismo",
-      "custo_texto": "5 pontos/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        50
+      ]
     },
     {
       "nome": "Controle Térmico",
-      "custo_texto": "5 pontos/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "M/F",
+      "exotica_sob": "X",
+      "paginas": [
+        50
+      ]
     },
     {
       "nome": "Crescimento",
-      "custo_texto": "10 pontos/nível"
+      "custo_texto": "10/nível",
+      "custo": 10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        51
+      ]
     },
     {
       "nome": "Cronolocalização",
-      "custo_texto": "5"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        73
+      ]
     },
     {
       "nome": "Cura",
-      "custo_texto": "30"
+      "custo_texto": "30",
+      "custo": 30,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        51
+      ]
+    },
+    {
+      "nome": "Dedos Verdes",
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        90
+      ]
+    },
+    {
+      "nome": "Defesas Ampliadas",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        52
+      ]
+    },
+    {
+      "nome": "Dentes",
+      "custo_texto": "0, 1 ou 2",
+      "custo": 0,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 0
+        },
+        {
+          "custo": 1
+        },
+        {
+          "custo": 2
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        52
+      ]
+    },
+    {
+      "nome": "Desenvolvedor",
+      "custo_texto": "25 ou 50",
+      "custo": 25,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 25
+        },
+        {
+          "custo": 50
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        52
+      ]
+    },
+    {
+      "nome": "Deslocamento Ampliado",
+      "custo_texto": "20/nível",
+      "custo": 20,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 20,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        52
+      ]
+    },
+    {
+      "nome": "Destemor",
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        53
+      ]
+    },
+    {
+      "nome": "Destino",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        53
+      ]
+    },
+    {
+      "nome": "Destreza Manual Elevada",
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        53
+      ]
+    },
+    {
+      "nome": "Detectar",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M/F",
+      "exotica_sob": "X",
+      "paginas": [
+        53
+      ]
+    },
+    {
+      "nome": "Difícil de Subjugar",
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        54
+      ]
+    },
+    {
+      "nome": "Digestão Universal",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        54
+      ]
+    },
+    {
+      "nome": "Dobra",
+      "custo_texto": "100",
+      "custo": 100,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        54
+      ]
+    },
+    {
+      "nome": "Dominação",
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        55
+      ]
+    },
+    {
+      "nome": "Dorminhoco",
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        101
+      ]
+    },
+    {
+      "nome": "Duplicação",
+      "custo_texto": "35/copia",
+      "custo": 35,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 35,
+      "unidade_nivel": "copia",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        56
+      ]
     },
     {
       "nome": "Durabilidade Sobrenatural",
-      "custo_texto": "150 pontos"
+      "custo_texto": "150",
+      "custo": 150,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "Sob",
+      "paginas": [
+        56
+      ]
     },
     {
       "nome": "Duro de Matar",
-      "custo_texto": "2 pontos/nível"
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        56
+      ]
+    },
+    {
+      "nome": "Elasticidade",
+      "custo_texto": "6/nível",
+      "custo": 6,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 6,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        57
+      ]
     },
     {
       "nome": "Elo Mental",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        57
+      ]
+    },
+    {
+      "nome": "Empatia",
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        57
+      ]
+    },
+    {
+      "nome": "Empatia com Animais",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        57
+      ]
+    },
+    {
+      "nome": "Empatia com Espíritos",
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        57
+      ]
+    },
+    {
+      "nome": "Empatia com Plantas",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        58
+      ]
+    },
+    {
+      "nome": "Encolhimento",
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        58
+      ]
+    },
+    {
+      "nome": "Equilíbrio Perfeito",
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        58
+      ]
+    },
+    {
+      "nome": "Equipamento Característico",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        58
+      ]
+    },
+    {
+      "nome": "Escavação",
+      "custo_texto": "30 + 5/nível",
+      "custo": 30,
+      "cost_model": "fixo_mais_por_nivel",
+      "custo_base": 30,
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        58
+      ]
+    },
+    {
+      "nome": "Escorregadio",
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        59
+      ]
+    },
+    {
+      "nome": "Escudo Mental",
+      "custo_texto": "4/nível",
+      "custo": 4,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 4,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        59
+      ]
+    },
+    {
+      "nome": "Espinhos",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        59
+      ]
+    },
+    {
+      "nome": "Estabilidade no Emprego",
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        59
+      ]
+    },
+    {
+      "nome": "Estática Psíquica",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        59
+      ]
+    },
+    {
+      "nome": "Estilo",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M/F",
+      "paginas": [
+        100
+      ]
+    },
+    {
+      "nome": "Expectativa de Vida Ampliada",
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        59
+      ]
+    },
+    {
+      "nome": "Experiência-G",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Explorador",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Facilidade para Idiomas",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Fala Subaquática",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Fala Subsônica",
+      "custo_texto": "0 ou 10",
+      "custo": 0,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 0
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Fala Ultrassônica",
+      "custo_texto": "0 a 10",
+      "custo": 0,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 0
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Falar com Animais",
+      "custo_texto": "25",
+      "custo": 25,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Falar com Plantas",
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Familiaridade Cultural",
+      "custo_texto": "1 ou 2/cultura",
+      "custo": 1,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 1
+        },
+        {
+          "custo": 2
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        23
+      ]
+    },
+    {
+      "nome": "Favor",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        55
+      ]
+    },
+    {
+      "nome": "Fé",
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Fleuma",
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        60
+      ]
+    },
+    {
+      "nome": "Flexibilidade",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        56
+      ]
     },
     {
       "nome": "Forma Alternativa",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        61
+      ]
+    },
+    {
+      "nome": "Forma de Sombras",
+      "custo_texto": "50",
+      "custo": 50,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        61
+      ]
+    },
+    {
+      "nome": "Garras",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        61
+      ]
+    },
+    {
+      "nome": "Golpeadores",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        62
+      ]
+    },
+    {
+      "nome": "Grupo de Contato",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        62
+      ]
+    },
+    {
+      "nome": "Habilidade Matemática",
+      "custo_texto": "10/nível",
+      "custo": 10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        90
+      ]
+    },
+    {
+      "nome": "Habilidade Musical",
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        90
+      ]
+    },
+    {
+      "nome": "Habilidades Modulares",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M/F",
+      "paginas": [
+        63
+      ]
     },
     {
       "nome": "Hierarquia",
-      "custo_texto": "5 ou 10/nível"
+      "custo_texto": "5 ou 10/nível",
+      "custo": 5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 5
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        29
+      ]
     },
     {
       "nome": "Hierarquia Administrativa",
-      "custo_texto": "5 ou 10/nível"
+      "custo_texto": "5 ou 10/nível",
+      "custo": 5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 5
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        29
+      ]
     },
     {
       "nome": "Hierarquia Comercial",
-      "custo_texto": "5 ou 10/nível"
+      "custo_texto": "5 ou 10/nível",
+      "custo": 5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 5
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        29
+      ]
     },
     {
       "nome": "Hierarquia Honorária",
-      "custo_texto": "1/nível"
+      "custo_texto": "1/nível",
+      "custo": 1,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 1,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        29
+      ]
     },
     {
       "nome": "Hierarquia Militar",
-      "custo_texto": "5 ou 10/nível"
+      "custo_texto": "5 ou 10/nível",
+      "custo": 5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 5
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        29
+      ]
     },
     {
       "nome": "Hierarquia Policial",
-      "custo_texto": "5 ou 10/nível"
+      "custo_texto": "5 ou 10/nível",
+      "custo": 5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 5
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        29
+      ]
     },
     {
       "nome": "Hierarquia Religiosa",
-      "custo_texto": "5 ou 10/nível"
+      "custo_texto": "5 ou 10/nível",
+      "custo": 5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 5
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        29
+      ]
+    },
+    {
+      "nome": "Hipoalgia (Alto Limiar de Dor)",
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        63
+      ]
     },
     {
       "nome": "Idade Imutável",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        63
+      ]
+    },
+    {
+      "nome": "Identidade Alternativa",
+      "custo_texto": "5 ou 15",
+      "custo": 5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Legal",
+          "custo": 5
+        },
+        {
+          "rotulo": "Ilegal",
+          "custo": 15
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        63
+      ]
     },
     {
       "nome": "Iluminado",
-      "custo_texto": "15"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        64
+      ]
     },
     {
-      "nome": "Imprecação",
-      "custo_texto": "Variável"
+      "nome": "Impossível de Matar",
+      "custo_texto": "50 a 150",
+      "custo": 50,
+      "cost_model": "faixa",
+      "custo_min": 50,
+      "custo_max": 150,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        64
+      ]
     },
     {
       "nome": "Imunidade Legal",
-      "custo_texto": "5 a 20"
+      "custo_texto": "5 a 20",
+      "custo": 5,
+      "cost_model": "faixa",
+      "custo_min": 5,
+      "custo_max": 20,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        65
+      ]
     },
     {
       "nome": "Indomável",
-      "custo_texto": "15"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        65
+      ]
     },
     {
       "nome": "Inércia Temporal",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        65
+      ]
+    },
+    {
+      "nome": "Infravisão",
+      "custo_texto": "0 ou 10",
+      "custo": 0,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 0
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        65
+      ]
     },
     {
       "nome": "Insubstancialidade",
-      "custo_texto": "80 pontos"
+      "custo_texto": "80",
+      "custo": 80,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M/F",
+      "exotica_sob": "X",
+      "paginas": [
+        65
+      ]
     },
     {
       "nome": "Interposição",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        66
+      ]
     },
     {
       "nome": "Intuição",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        67
+      ]
     },
     {
       "nome": "Investidura de Poder",
-      "custo_texto": "10 pontos/nível"
+      "custo_texto": "10/nível",
+      "custo": 10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        67
+      ]
     },
     {
       "nome": "Invisibilidade",
-      "custo_texto": "40 pontos"
+      "custo_texto": "40",
+      "custo": 40,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M/F",
+      "exotica_sob": "X",
+      "paginas": [
+        67
+      ]
     },
     {
       "nome": "Lacrado",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        68
+      ]
+    },
+    {
+      "nome": "Lamentável",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        22
+      ]
+    },
+    {
+      "nome": "Leitura da Mente",
+      "custo_texto": "30",
+      "custo": 30,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        68
+      ]
     },
     {
       "nome": "Língua Ferina",
-      "custo_texto": "5 pontos"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        68
+      ]
     },
     {
       "nome": "Longevidade",
-      "custo_texto": "2 pontos"
+      "custo_texto": "2",
+      "custo": 2,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        69
+      ]
+    },
+    {
+      "nome": "Matemático Intuitivo",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        46
+      ]
     },
     {
       "nome": "Médium",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        69
+      ]
     },
     {
       "nome": "Membrana Nictitante",
-      "custo_texto": "1/nível"
+      "custo_texto": "1/nível",
+      "custo": 1,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 1,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        69
+      ]
+    },
+    {
+      "nome": "Memória Eidética",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        69
+      ]
     },
     {
       "nome": "Memória Fotográfica",
-      "custo_texto": "10 pontos"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        69
+      ]
+    },
+    {
+      "nome": "Memória Racial",
+      "custo_texto": "15 ou 40",
+      "custo": 15,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Passiva",
+          "custo": 15
+        },
+        {
+          "rotulo": "Ativa",
+          "custo": 40
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        69
+      ]
     },
     {
       "nome": "Mente Digital",
-      "custo_texto": "5 pontos"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        69
+      ]
+    },
+    {
+      "nome": "Mente Segmentada",
+      "custo_texto": "50/nível",
+      "custo": 50,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 50,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        70
+      ]
     },
     {
       "nome": "Mestre de Armas",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        70
+      ]
     },
     {
       "nome": "Metabolismo Impoluto",
-      "custo_texto": "1"
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        101
+      ]
+    },
+    {
+      "nome": "Metamorfose",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        71
+      ]
+    },
+    {
+      "nome": "Mordida de Vampiro",
+      "custo_texto": "30 + 5/nível",
+      "custo": 30,
+      "cost_model": "fixo_mais_por_nivel",
+      "custo_base": 30,
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        72
+      ]
     },
     {
       "nome": "Morfose",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        71
+      ]
     },
     {
       "nome": "Não Come nem Bebe",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        72
+      ]
     },
     {
       "nome": "Não Dorme",
-      "custo_texto": "20"
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        73
+      ]
     },
     {
       "nome": "Não Respira",
-      "custo_texto": "20"
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        73
+      ]
     },
     {
       "nome": "Neutralizar",
-      "custo_texto": "50"
+      "custo_texto": "50",
+      "custo": 50,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        73
+      ]
     },
     {
       "nome": "Noção do Perigo",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        73
+      ]
     },
     {
-      "nome": "Obscurecer",
-      "custo_texto": "2 pontos/nível"
+      "nome": "Noção do Tempo Ampliado",
+      "custo_texto": "45",
+      "custo": 45,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        73
+      ]
+    },
+    {
+      "nome": "Noção Exata do Tempo",
+      "custo_texto": "2",
+      "custo": 2,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        74
+      ]
+    },
+    {
+      "nome": "Noção Tridimensional do Espaço",
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        87
+      ]
+    },
+    {
+      "nome": "NT Alto",
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        23
+      ]
     },
     {
       "nome": "Olfato Discriminatório",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        74
+      ]
     },
     {
       "nome": "Oráculo",
-      "custo_texto": "15 pontos"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        74
+      ]
     },
     {
       "nome": "Padrão de Tempo Alterado",
-      "custo_texto": "100/nível"
+      "custo_texto": "100/nível",
+      "custo": 100,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 100,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        75
+      ]
     },
     {
       "nome": "Paladar Discriminatório",
-      "custo_texto": "10 pontos"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        75
+      ]
     },
     {
       "nome": "Patronos",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        72
+      ]
     },
     {
       "nome": "Pelagem",
-      "custo_texto": "1"
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        75
+      ]
     },
     {
-      "nome": "Pele Elástica",
-      "custo_texto": "20 pontos"
+      "nome": "Pele Elastica",
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        75
+      ]
     },
     {
       "nome": "Pendulear",
-      "custo_texto": "5 pontos"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        75
+      ]
     },
     {
       "nome": "Permissão de Segurança",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        76
+      ]
     },
     {
       "nome": "Pernas Adicionais",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        76
+      ]
     },
     {
       "nome": "Poderes Legais",
-      "custo_texto": "5, 10, ou 15"
+      "custo_texto": "5, 10 ou 15",
+      "custo": 5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 5
+        },
+        {
+          "custo": 10
+        },
+        {
+          "custo": 15
+        }
+      ],
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        76
+      ]
     },
     {
       "nome": "Por Dentro da Moda",
-      "custo_texto": "5"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        22
+      ]
     },
     {
       "nome": "Pouco Sono",
-      "custo_texto": "2/nível"
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        76
+      ]
     },
     {
       "nome": "Precognição",
-      "custo_texto": "25 pontos"
+      "custo_texto": "25",
+      "custo": 25,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        77
+      ]
     },
     {
       "nome": "Prender a Respiração",
-      "custo_texto": "2/nível"
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        77
+      ]
     },
     {
       "nome": "Propósito Maior",
-      "custo_texto": "5 pontos"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        77
+      ]
     },
     {
       "nome": "Psicometria",
-      "custo_texto": "20 pontos"
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        78
+      ]
     },
     {
       "nome": "Pulmões com Filtro",
-      "custo_texto": "5 pontos"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        78
+      ]
     },
     {
       "nome": "Queda de Gato",
-      "custo_texto": "10 pontos"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        78
+      ]
     },
     {
       "nome": "Rastreamento Ampliado",
-      "custo_texto": "5/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        82
+      ]
     },
     {
       "nome": "Reconhecimento Social",
-      "custo_texto": "5/nível"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        82
+      ]
     },
     {
       "nome": "Recuperação Acelerada",
-      "custo_texto": "5"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        82
+      ]
     },
     {
       "nome": "Recuperação da Consciência",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        82
+      ]
     },
     {
       "nome": "Recuperação Muito Acelerada",
-      "custo_texto": "15"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        82
+      ]
     },
     {
       "nome": "Redespertar",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        82
+      ]
     },
     {
       "nome": "Reflexos em Combate",
-      "custo_texto": "15"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        82
+      ]
     },
     {
       "nome": "Regeneração",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        82
+      ]
     },
     {
       "nome": "Reivindicar Hospitalidade",
-      "custo_texto": "1 a 10"
+      "custo_texto": "1 a 10",
+      "custo": 1,
+      "cost_model": "faixa",
+      "custo_min": 1,
+      "custo_max": 10,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        83
+      ]
     },
     {
       "nome": "Renda Própria",
-      "custo_texto": "1/nível"
+      "custo_texto": "1/nível",
+      "custo": 1,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 1,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        26
+      ]
     },
     {
       "nome": "Reputação",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        26
+      ]
     },
     {
       "nome": "Resistência a Dano",
-      "custo_texto": "5/nível"
-    },
-    {
-      "nome": "Resistência ao Vácuo",
-      "custo_texto": "5"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        83
+      ]
     },
     {
       "nome": "Resistência à Pressão",
-      "custo_texto": "5 a 15"
+      "custo_texto": "5 a 15",
+      "custo": 5,
+      "cost_model": "faixa",
+      "custo_min": 5,
+      "custo_max": 15,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        84
+      ]
+    },
+    {
+      "nome": "Resistência ao Vácuo",
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        85
+      ]
     },
     {
       "nome": "Resistente",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        85
+      ]
     },
     {
       "nome": "Restaurar Membros",
-      "custo_texto": "40"
+      "custo_texto": "40",
+      "custo": 40,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        85
+      ]
     },
     {
       "nome": "Retenção",
-      "custo_texto": "2/nível"
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        85
+      ]
     },
     {
       "nome": "Riqueza",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        25
+      ]
     },
     {
       "nome": "Rosto Sincero",
-      "custo_texto": "1"
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        101
+      ]
     },
     {
       "nome": "Saltador",
-      "custo_texto": "100"
+      "custo_texto": "100",
+      "custo": 100,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        86
+      ]
     },
     {
       "nome": "Sem Ressaca",
-      "custo_texto": "1"
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        101
+      ]
     },
     {
       "nome": "Sensível",
-      "custo_texto": "5"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        57
+      ]
     },
     {
       "nome": "Senso de Direção",
-      "custo_texto": "5"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        87
+      ]
     },
     {
       "nome": "Sentido de Monitoramento",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        87
+      ]
     },
     {
       "nome": "Sentido de Vibração",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        88
+      ]
     },
     {
       "nome": "Sentido Protegido",
-      "custo_texto": "5 pontos/sentido"
+      "custo_texto": "5/sentido",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "unidade_nivel": "sentido",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        88
+      ]
     },
     {
       "nome": "Serendipidade",
-      "custo_texto": "15/nível"
+      "custo_texto": "15/nível",
+      "custo": 15,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 15,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        89
+      ]
     },
     {
       "nome": "Silêncio",
-      "custo_texto": "5/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        89
+      ]
     },
     {
       "nome": "Sonda Mental",
-      "custo_texto": "20"
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        89
+      ]
     },
     {
       "nome": "Sorte",
-      "custo_texto": "Variável"
-    },
-    {
-      "nome": "Status",
-      "custo_texto": "5/nível"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        89
+      ]
     },
     {
       "nome": "ST Braçal",
-      "custo_texto": "3, 5, ou 8/nível"
+      "custo_texto": "3, 5 ou 8/nível",
+      "custo": 3,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 3
+        },
+        {
+          "custo": 5
+        },
+        {
+          "custo": 8
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "ST de Golpe",
-      "custo_texto": "5/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "ST de Levantamento",
-      "custo_texto": "3/nível"
+      "custo_texto": "3/nível",
+      "custo": 3,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 3,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        90
+      ]
     },
     {
-      "nome": "Superaudição",
-      "custo_texto": "0 ou 5"
+      "nome": "Status",
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        28
+      ]
     },
     {
       "nome": "Super Escalada",
-      "custo_texto": "3/nível"
+      "custo_texto": "3/nível",
+      "custo": 3,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 3,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "Super Salto",
-      "custo_texto": "10/nível"
+      "custo_texto": "10/nível",
+      "custo": 10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "Super Sorte",
-      "custo_texto": "100"
+      "custo_texto": "100",
+      "custo": 100,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        90
+      ]
+    },
+    {
+      "nome": "Superaudição",
+      "custo_texto": "0 ou 5",
+      "custo": 0,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 0
+        },
+        {
+          "custo": 5
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "Talento",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        90
+      ]
     },
     {
       "nome": "Talento Instintivo",
-      "custo_texto": "20/nível"
+      "custo_texto": "20/nível",
+      "custo": 20,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 20,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        92
+      ]
     },
     {
       "nome": "Tato Apurado",
-      "custo_texto": "2/nível"
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        89
+      ]
     },
     {
       "nome": "Telecinese",
-      "custo_texto": "5/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "M/F",
+      "exotica_sob": "X",
+      "paginas": [
+        92
+      ]
     },
     {
       "nome": "Telecomunicação",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M/F",
+      "exotica_sob": "X",
+      "paginas": [
+        93
+      ]
     },
     {
       "nome": "Terror",
-      "custo_texto": "30 + 10/nível"
+      "custo_texto": "30 + 10/nível",
+      "custo": 30,
+      "cost_model": "fixo_mais_por_nivel",
+      "custo_base": 30,
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        94
+      ]
     },
     {
       "nome": "Títere",
-      "custo_texto": "5 a 10"
+      "custo_texto": "5 a 10",
+      "custo": 5,
+      "cost_model": "faixa",
+      "custo_min": 5,
+      "custo_max": 10,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        94
+      ]
     },
     {
       "nome": "Tolerância a Ferimentos",
-      "custo_texto": "Variável"
-    },
-    {
-      "nome": "Tolerância ao Álcool",
-      "custo_texto": "1"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        94
+      ]
     },
     {
       "nome": "Tolerância à Radiação",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        95
+      ]
     },
     {
       "nome": "Tolerância à Temperatura",
-      "custo_texto": "1/nível"
+      "custo_texto": "1/nível",
+      "custo": 1,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 1,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        96
+      ]
+    },
+    {
+      "nome": "Tolerância ao Álcool",
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        101
+      ]
     },
     {
       "nome": "Tolerância-G Ampliada",
-      "custo_texto": "5 a 25"
+      "custo_texto": "5 a 25",
+      "custo": 5,
+      "cost_model": "faixa",
+      "custo_min": 5,
+      "custo_max": 25,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        96
+      ]
     },
     {
       "nome": "Toque Sensível",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        96
+      ]
     },
     {
       "nome": "Treinado por um Mestre",
-      "custo_texto": "30"
+      "custo_texto": "30",
+      "custo": 30,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        96
+      ]
     },
     {
       "nome": "Ultraflexibilidade das Juntas",
-      "custo_texto": "15"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        97
+      ]
     },
     {
       "nome": "Ultravisão",
-      "custo_texto": "0 ou 10 pontos"
+      "custo_texto": "0 ou 10",
+      "custo": 0,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": 0
+        },
+        {
+          "custo": 10
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        97
+      ]
     },
     {
       "nome": "Venturoso",
-      "custo_texto": "15"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        97
+      ]
     },
     {
       "nome": "Ver o Invisível",
-      "custo_texto": "15"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        97
+      ]
     },
     {
       "nome": "Versátil",
-      "custo_texto": "5"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        98
+      ]
     },
     {
       "nome": "Vida Extra",
-      "custo_texto": "25/vida"
+      "custo_texto": "25/vida",
+      "custo": 25,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 25,
+      "unidade_nivel": "vida",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        98
+      ]
     },
     {
       "nome": "Vínculo Especial",
-      "custo_texto": "5 pontos"
+      "custo_texto": "5",
+      "custo": 5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        98
+      ]
     },
     {
-      "nome": "Visão 360 graus",
-      "custo_texto": "25"
+      "nome": "Visão 360 Graus",
+      "custo_texto": "25",
+      "custo": 25,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        98
+      ]
     },
     {
       "nome": "Visão Aguçada",
-      "custo_texto": "2/nível"
+      "custo_texto": "2/nível",
+      "custo": 2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        98
+      ]
     },
     {
       "nome": "Visão Hiperespectral",
-      "custo_texto": "25"
+      "custo_texto": "25",
+      "custo": 25,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        98
+      ]
     },
     {
       "nome": "Visão Microscópica",
-      "custo_texto": "5/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        99
+      ]
     },
     {
       "nome": "Visão no Escuro",
-      "custo_texto": "25"
+      "custo_texto": "25",
+      "custo": 25,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        99
+      ]
     },
     {
       "nome": "Visão Noturna",
-      "custo_texto": "1/nível"
+      "custo_texto": "1/nível",
+      "custo": 1,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 1,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        99
+      ]
     },
     {
       "nome": "Visão Penetrante",
-      "custo_texto": "10/nível"
+      "custo_texto": "10/nível",
+      "custo": 10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 10,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        99
+      ]
     },
     {
       "nome": "Visão Periférica",
-      "custo_texto": "15"
+      "custo_texto": "15",
+      "custo": 15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        99
+      ]
     },
     {
       "nome": "Visão Telescópica",
-      "custo_texto": "5/nível"
+      "custo_texto": "5/nível",
+      "custo": 5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": 5,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        99
+      ]
     },
     {
       "nome": "Visualização",
-      "custo_texto": "10 pontos"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        100
+      ]
     },
     {
       "nome": "Voz Melodiosa",
-      "custo_texto": "10"
+      "custo_texto": "10",
+      "custo": 10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        101
+      ]
     },
     {
       "nome": "Voz Penetrante",
-      "custo_texto": "1"
+      "custo_texto": "1",
+      "custo": 1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        101
+      ]
     },
     {
       "nome": "Xeno-adaptabilidade",
-      "custo_texto": "20"
+      "custo_texto": "20",
+      "custo": 20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        100
+      ]
     }
   ],
   "desvantagens": [
     {
       "nome": "Acima do Peso",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        19
+      ]
     },
     {
       "nome": "Acomodado",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        163
+      ]
+    },
+    {
+      "nome": "Alcoolismo",
+      "custo_texto": "-15 ou -20",
+      "custo": -15,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Alcoolismo",
+          "custo": -15
+        },
+        {
+          "rotulo": "Alcoolismo severo",
+          "custo": -20
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        122
+      ]
     },
     {
       "nome": "Altruísmo",
-      "custo_texto": "-5 pontos *"
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        122
+      ]
     },
     {
       "nome": "Amigável",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        122
+      ]
     },
     {
       "nome": "Amnésia",
-      "custo_texto": "-10 ou -25"
-    },
-    {
-      "nome": "Ampliado",
-      "custo_texto": "Variável"
+      "custo_texto": "-10 ou -25",
+      "custo": -10,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Parcial",
+          "custo": -10
+        },
+        {
+          "rotulo": "Total",
+          "custo": -25
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        122
+      ]
     },
     {
       "nome": "Antecedentes Mundanos",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        122
+      ]
+    },
+    {
+      "nome": "Antipático",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        163
+      ]
     },
     {
       "nome": "Aparência",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        20
+      ]
+    },
+    {
+      "nome": "Apetite Incontrolável",
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "Sob",
+      "paginas": [
+        122
+      ]
     },
     {
       "nome": "Assexuado",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        165
+      ]
     },
     {
       "nome": "Assustar Animais",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        123
+      ]
     },
     {
       "nome": "Ataque Infeccioso",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "Sob",
+      "paginas": [
+        123
+      ]
     },
     {
       "nome": "Atavismo por Estresse",
-      "custo_texto": "Variável*"
+      "custo_texto": "Variável*",
+      "custo": null,
+      "cost_model": "variavel",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        123
+      ]
+    },
+    {
+      "nome": "Atento",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        163
+      ]
+    },
+    {
+      "nome": "Atrapalhado",
+      "custo_texto": "-5 ou -10",
+      "custo": -5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -5
+        },
+        {
+          "custo": -10
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        123
+      ]
     },
     {
       "nome": "Autodestruição",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        123
+      ]
     },
     {
       "nome": "Avareza",
-      "custo_texto": "-10 pontos*"
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        123
+      ]
     },
     {
       "nome": "Aversão",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        123
+      ]
+    },
+    {
+      "nome": "Aversões",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        163
+      ]
     },
     {
       "nome": "Azar",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        124
+      ]
     },
     {
       "nome": "Baixa Autoestima",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        124
+      ]
     },
     {
       "nome": "Barulhento",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-2/nível",
+      "custo": -2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        124
+      ]
     },
     {
       "nome": "Bestial",
-      "custo_texto": "-10 ou -15"
+      "custo_texto": "-10 ou -15",
+      "custo": -10,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -10
+        },
+        {
+          "custo": -15
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        124
+      ]
     },
     {
       "nome": "Bioquímica Incomum",
-      "custo_texto": "-5 pontos"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        124
+      ]
     },
     {
-      "nome": "Briguento fl",
-      "custo_texto": "-10 pontos*"
+      "nome": "Briguento",
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        125
+      ]
     },
     {
       "nome": "Castrado",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        165
+      ]
     },
     {
       "nome": "Cegueira",
-      "custo_texto": "-50 pontos"
+      "custo_texto": "-50",
+      "custo": -50,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        125
+      ]
     },
     {
       "nome": "Cegueira Noturna",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        126
+      ]
     },
     {
       "nome": "Chauvinista",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        163
+      ]
     },
     {
       "nome": "Circunspecção",
-      "custo_texto": "10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        126
+      ]
+    },
+    {
+      "nome": "Cleptomania",
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        126
+      ]
+    },
+    {
+      "nome": "Cobiça",
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        126
+      ]
     },
     {
       "nome": "Código de Honra",
-      "custo_texto": "-1 ou -5 a -15"
+      "custo_texto": "-1 ou -5 a -15",
+      "custo": -1,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Peculiaridade",
+          "custo": -1
+        },
+        {
+          "rotulo": "Pessoal",
+          "custo": -5
+        },
+        {
+          "rotulo": "Profissional",
+          "custo": -10
+        },
+        {
+          "rotulo": "Estrito",
+          "custo": -15
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        126
+      ]
+    },
+    {
+      "nome": "Completamente Desastrado",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        131
+      ]
     },
     {
       "nome": "Complexo de Culpa",
-      "custo_texto": "-5 pontos"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        127
+      ]
     },
     {
       "nome": "Compreensivo",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        163
+      ]
+    },
+    {
+      "nome": "Compulsão",
+      "custo_texto": "-5 a -15*",
+      "custo": -5,
+      "cost_model": "faixa",
+      "custo_min": -5,
+      "custo_max": -15,
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        127
+      ]
     },
     {
       "nome": "Confuso",
-      "custo_texto": "-10 pontos*"
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        128
+      ]
     },
     {
       "nome": "Consumo Ampliado",
-      "custo_texto": "-10 pontos/nível"
+      "custo_texto": "-10/nível",
+      "custo": -10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -10,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        128
+      ]
+    },
+    {
+      "nome": "Convulsões Pós-combate",
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        129
+      ]
     },
     {
       "nome": "Corcunda",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        129
+      ]
+    },
+    {
+      "nome": "Covardia",
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        129
+      ]
     },
     {
       "nome": "Credulidade",
-      "custo_texto": "-10 pontos*"
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        129
+      ]
     },
     {
       "nome": "Criativo",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
     },
     {
       "nome": "Cuidadoso",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
     },
     {
       "nome": "Curiosidade",
-      "custo_texto": "-5 pontos*"
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        129
+      ]
     },
     {
       "nome": "Daltonismo",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        129
+      ]
     },
     {
       "nome": "Deficiência Física",
-      "custo_texto": "-10 a -30"
+      "custo_texto": "-10 a -30",
+      "custo": -10,
+      "cost_model": "faixa",
+      "custo_min": -10,
+      "custo_max": -30,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        129
+      ]
     },
     {
       "nome": "Deficiências Menores",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        165
+      ]
     },
     {
       "nome": "Dependência",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        130
+      ]
     },
     {
       "nome": "Dependentes",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        131
+      ]
     },
     {
       "nome": "Depressão Crônica",
-      "custo_texto": "-15 pontos*"
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        131
+      ]
+    },
+    {
+      "nome": "Desastrado",
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        131
+      ]
     },
     {
       "nome": "Desatento",
-      "custo_texto": "-10 pontos*"
-    },
-    {
-      "nome": "Despretensioso",
-      "custo_texto": "-1"
-    },
-    {
-      "nome": "Destino",
-      "custo_texto": "Variável"
-    },
-    {
-      "nome": "Destruidor da Vida",
-      "custo_texto": "-10"
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        131
+      ]
     },
     {
       "nome": "Dever",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        133
+      ]
     },
     {
       "nome": "Dieta Restrita",
-      "custo_texto": "-10 a -40"
+      "custo_texto": "-10 a -40",
+      "custo": -10,
+      "cost_model": "faixa",
+      "custo_min": -10,
+      "custo_max": -40,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        133
+      ]
     },
     {
-      "nome": "Fanatismo §",
-      "custo_texto": "-15 pontos"
+      "nome": "Disopia",
+      "custo_texto": "-25",
+      "custo": -25,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        134
+      ]
+    },
+    {
+      "nome": "Disosmia",
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        135
+      ]
+    },
+    {
+      "nome": "Distração",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        135
+      ]
+    },
+    {
+      "nome": "Distraído",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
+    },
+    {
+      "nome": "Distúrbio Neurológico",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        135
+      ]
+    },
+    {
+      "nome": "Dívidas",
+      "custo_texto": "-1/nível",
+      "custo": -1,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -1,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        26
+      ]
+    },
+    {
+      "nome": "Doença Contagiosa",
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        135
+      ]
+    },
+    {
+      "nome": "Doente Terminal",
+      "custo_texto": "-50, -75 ou -100",
+      "custo": -50,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "6 meses a 2 anos",
+          "custo": -50
+        },
+        {
+          "rotulo": "1 semana a 6 meses",
+          "custo": -75
+        },
+        {
+          "rotulo": "menos de 1 semana",
+          "custo": -100
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        135
+      ]
+    },
+    {
+      "nome": "Dor Crônica",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        135
+      ]
+    },
+    {
+      "nome": "Dorminhoco",
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        136
+      ]
+    },
+    {
+      "nome": "Doutrinas Religiosas",
+      "custo_texto": "-5 a -15",
+      "custo": -5,
+      "cost_model": "faixa",
+      "custo_min": -5,
+      "custo_max": -15,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        136
+      ]
+    },
+    {
+      "nome": "Drenagem",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "Sob",
+      "paginas": [
+        136
+      ]
+    },
+    {
+      "nome": "Duro de Ouvido",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Egoísmo",
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Elétrico",
+      "custo_texto": "-20",
+      "custo": -20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Embotado",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
+    },
+    {
+      "nome": "Enjoadiço",
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Enjoo",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Enjoo Espacial",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Enjoo Temporal",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Entorpecido",
+      "custo_texto": "-20",
+      "custo": -20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Enxerido",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
+    },
+    {
+      "nome": "Epilepsia",
+      "custo_texto": "-30",
+      "custo": -30,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        137
+      ]
+    },
+    {
+      "nome": "Estigma Social",
+      "custo_texto": "-5 a -20",
+      "custo": -5,
+      "cost_model": "faixa",
+      "custo_min": -5,
+      "custo_max": -20,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        138
+      ]
+    },
+    {
+      "nome": "Estômago Sensível",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        165
+      ]
+    },
+    {
+      "nome": "Excesso de Confiança",
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        139
+      ]
+    },
+    {
+      "nome": "Expectativa de Vida Reduzida",
+      "custo_texto": "-10/nível",
+      "custo": -10,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -10,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        139
+      ]
+    },
+    {
+      "nome": "Fácil de Decifrar",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        139
+      ]
+    },
+    {
+      "nome": "Fácil de Matar",
+      "custo_texto": "-2/nível",
+      "custo": -2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        139
+      ]
+    },
+    {
+      "nome": "Fanatismo",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        139
+      ]
+    },
+    {
+      "nome": "Fantasias",
+      "custo_texto": "-1 ou -5 a -15",
+      "custo": -1,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Peculiaridade",
+          "custo": -1
+        },
+        {
+          "rotulo": "Fantasia",
+          "custo": -5
+        },
+        {
+          "rotulo": "Delírio sério",
+          "custo": -10
+        },
+        {
+          "rotulo": "Delírio grave",
+          "custo": -15
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        139
+      ]
+    },
+    {
+      "nome": "Feições Estranhas",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        22
+      ]
+    },
+    {
+      "nome": "Ferido",
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        140
+      ]
+    },
+    {
+      "nome": "Flashbacks",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        140
+      ]
     },
     {
       "nome": "Fobias",
-      "custo_texto": "Variável\"'"
+      "custo_texto": "Variável*",
+      "custo": null,
+      "cost_model": "variavel",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        140
+      ]
     },
     {
-      "nome": "Forma de Sombras",
-      "custo_texto": "-20 pontos"
+      "nome": "Fora de Forma",
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        142
+      ]
+    },
+    {
+      "nome": "Fragilidade",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        142
+      ]
+    },
+    {
+      "nome": "Fragilidade em Aceleracao",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        165
+      ]
+    },
+    {
+      "nome": "Fraqueza",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        143
+      ]
+    },
+    {
+      "nome": "Fúria",
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        143
+      ]
+    },
+    {
+      "nome": "Gagueira",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        143
+      ]
+    },
+    {
+      "nome": "Gigantismo",
+      "custo_texto": "0",
+      "custo": 0,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        19
+      ]
+    },
+    {
+      "nome": "Gordo",
+      "custo_texto": "-3",
+      "custo": -3,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        19
+      ]
+    },
+    {
+      "nome": "Gregário",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        122
+      ]
+    },
+    {
+      "nome": "Gula",
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        143
+      ]
+    },
+    {
+      "nome": "Hábitos Detestáveis",
+      "custo_texto": "-5, -10 ou -15",
+      "custo": -5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -5
+        },
+        {
+          "custo": -10
+        },
+        {
+          "custo": -15
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        22
+      ]
+    },
+    {
+      "nome": "Hábitos ou Expressões",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
+    },
+    {
+      "nome": "Hemofilia",
+      "custo_texto": "-30",
+      "custo": -30,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        144
+      ]
+    },
+    {
+      "nome": "Hiperalgia",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        144
+      ]
+    },
+    {
+      "nome": "Honestidade",
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        144
+      ]
+    },
+    {
+      "nome": "Horizontal",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        145
+      ]
     },
     {
       "nome": "Identidade Secreta",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        145
+      ]
+    },
+    {
+      "nome": "Identidade Trocada",
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        21
+      ]
+    },
+    {
+      "nome": "Impulsividade",
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        145
+      ]
+    },
+    {
+      "nome": "Indulgente",
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        146
+      ]
     },
     {
       "nome": "Inimigos",
-      "custo_texto": "-5 pontos*"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        146
+      ]
     },
     {
       "nome": "Insensível",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        147
+      ]
     },
     {
       "nome": "Insone",
-      "custo_texto": "-10 ou -15"
+      "custo_texto": "-10 ou -15",
+      "custo": -10,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Leve",
+          "custo": -10
+        },
+        {
+          "rotulo": "Grave",
+          "custo": -15
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        147
+      ]
+    },
+    {
+      "nome": "Intolerância",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        147
+      ]
     },
     {
       "nome": "Intolerância ao Álcool",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        165
+      ]
+    },
+    {
+      "nome": "Intolerância-G",
+      "custo_texto": "-10 ou -20",
+      "custo": -10,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -10
+        },
+        {
+          "custo": -20
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        147
+      ]
     },
     {
       "nome": "Inveja",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        147
+      ]
     },
     {
       "nome": "Invertebrado",
-      "custo_texto": "-20 pontos"
+      "custo_texto": "-20",
+      "custo": -20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        147
+      ]
     },
     {
       "nome": "Irritabilidade",
-      "custo_texto": "-10 pontos*"
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        147
+      ]
     },
     {
       "nome": "Lunático",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        148
+      ]
     },
     {
       "nome": "Luxúria",
-      "custo_texto": "-15*"
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        148
+      ]
+    },
+    {
+      "nome": "Magnetismo Sobrenatural",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        148
+      ]
     },
     {
       "nome": "Magro",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        18
+      ]
+    },
+    {
+      "nome": "Maldição",
+      "custo_texto": "-75",
+      "custo": -75,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        148
+      ]
     },
     {
       "nome": "Maldição Divina",
-      "custo_texto": "Variável"
-    },
-    {
-      "nome": "Maneta (Uma Mão)",
-      "custo_texto": "-15 pontos"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        148
+      ]
     },
     {
       "nome": "Maneta (Um Braço)",
-      "custo_texto": "-20 pontos"
+      "custo_texto": "-20",
+      "custo": -20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        148
+      ]
+    },
+    {
+      "nome": "Maneta (Uma Mão)",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        148
+      ]
     },
     {
       "nome": "Maníaco-depressivo",
-      "custo_texto": "-20 pontos"
+      "custo_texto": "-20",
+      "custo": -20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        149
+      ]
     },
     {
       "nome": "Manuseadores Precários",
-      "custo_texto": "-30"
+      "custo_texto": "-30",
+      "custo": -30,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        149
+      ]
     },
     {
       "nome": "Manutenção",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        149
+      ]
     },
     {
       "nome": "Mão Fraca",
-      "custo_texto": "-5 pontos/nível"
+      "custo_texto": "-5/nível",
+      "custo": -5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -5,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        150
+      ]
     },
     {
       "nome": "Marca Registrada",
-      "custo_texto": "-1 ou -5 a -15"
+      "custo_texto": "-1 ou -5 a -15",
+      "custo": -1,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Peculiaridade",
+          "custo": -1
+        },
+        {
+          "rotulo": "Sutil",
+          "custo": -5
+        },
+        {
+          "rotulo": "Assinatura",
+          "custo": -10
+        },
+        {
+          "rotulo": "Marca elaborada",
+          "custo": -15
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        150
+      ]
     },
     {
       "nome": "Mau Cheiro",
-      "custo_texto": "-10 pontos"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        150
+      ]
     },
     {
       "nome": "Megalomania",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        150
+      ]
+    },
+    {
+      "nome": "Mentalidade de Escravo",
+      "custo_texto": "-40",
+      "custo": -40,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        150
+      ]
     },
     {
       "nome": "Mente Aberta",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
     },
     {
       "nome": "Mordida Fraca",
-      "custo_texto": "-2 pontos"
+      "custo_texto": "-2",
+      "custo": -2,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        151
+      ]
+    },
+    {
+      "nome": "Mudança de Personalidade",
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
+    },
+    {
+      "nome": "Mudez",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        145
+      ]
+    },
+    {
+      "nome": "Muito Fora de Forma",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        142
+      ]
     },
     {
       "nome": "Muito Gordo",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        19
+      ]
+    },
+    {
+      "nome": "Nanismo",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        19
+      ]
     },
     {
       "nome": "Não-iconográfico",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        151
+      ]
+    },
+    {
+      "nome": "No Limite",
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        151
+      ]
     },
     {
       "nome": "Noturno",
-      "custo_texto": "-20 pontos"
+      "custo_texto": "-20",
+      "custo": -20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        151
+      ]
+    },
+    {
+      "nome": "NT Baixo",
+      "custo_texto": "-5/nível",
+      "custo": -5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -5,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        22
+      ]
     },
     {
       "nome": "Oblívio",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        151
+      ]
     },
     {
       "nome": "Obsessão",
-      "custo_texto": "-1, -5, ou -10*"
+      "custo_texto": "-1, -5 ou -10*",
+      "custo": -1,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Peculiaridade",
+          "custo": -1
+        },
+        {
+          "rotulo": "Curto prazo",
+          "custo": -5
+        },
+        {
+          "rotulo": "Longo prazo",
+          "custo": -10
+        }
+      ],
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        151
+      ]
     },
     {
       "nome": "Orgulhoso",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
+    },
+    {
+      "nome": "Pacifismo",
+      "custo_texto": "Variável",
+      "custo": -5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Assassino Relutante",
+          "custo": -5
+        },
+        {
+          "rotulo": "Incapaz de Ferir Inocentes",
+          "custo": -10
+        },
+        {
+          "rotulo": "Incapaz de Matar",
+          "custo": -15
+        },
+        {
+          "rotulo": "Legítima Defesa",
+          "custo": -15
+        },
+        {
+          "rotulo": "Não-Violência Total",
+          "custo": -30
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        151
+      ]
+    },
+    {
+      "nome": "Padrão de Tempo Reduzido",
+      "custo_texto": "-100",
+      "custo": -100,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        152
+      ]
+    },
+    {
+      "nome": "Paralisia Frente ao Combate",
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        152
+      ]
+    },
+    {
+      "nome": "Paranoia",
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        152
+      ]
     },
     {
       "nome": "Perna Torta",
-      "custo_texto": "-1"
-    },
-    {
-      "nome": "Personalidade",
-      "custo_texto": "-15 pontos*"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        165
+      ]
     },
     {
       "nome": "Pesadelos",
-      "custo_texto": "-5 pontos*"
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        152
+      ]
     },
     {
       "nome": "Piromania",
-      "custo_texto": "-5 pontos*"
-    },
-    {
-      "nome": "Pós-Combate",
-      "custo_texto": "-5 pontos*"
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        152
+      ]
     },
     {
       "nome": "Pouca Empatia",
-      "custo_texto": "-20 pontos"
+      "custo_texto": "-20",
+      "custo": -20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        153
+      ]
     },
     {
       "nome": "Preferências",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
     },
     {
       "nome": "Preguiça",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        153
+      ]
     },
     {
       "nome": "Problemas na Coluna",
-      "custo_texto": "-15 ou -25"
+      "custo_texto": "-15 ou -25",
+      "custo": -15,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -15
+        },
+        {
+          "custo": -25
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        153
+      ]
     },
     {
       "nome": "Recuperação Lenta",
-      "custo_texto": "-5/nível"
+      "custo_texto": "-5/nível",
+      "custo": -5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -5,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        153
+      ]
     },
     {
       "nome": "Refeição Demorada",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        153
+      ]
     },
     {
       "nome": "Reprogramável",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "X",
+      "paginas": [
+        153
+      ]
     },
     {
       "nome": "Repugnância",
-      "custo_texto": "-5 a -15"
+      "custo_texto": "-5 a -15",
+      "custo": -5,
+      "cost_model": "faixa",
+      "custo_min": -5,
+      "custo_max": -15,
+      "tipo_mfsoc": "F",
+      "exotica_sob": "Sob",
+      "paginas": [
+        153
+      ]
     },
     {
       "nome": "Reputação",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        26
+      ]
     },
     {
       "nome": "Ressacas Terríveis",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        165
+      ]
     },
     {
       "nome": "Riqueza",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        25
+      ]
     },
     {
       "nome": "Sadismo",
-      "custo_texto": "-15 pontos*"
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        154
+      ]
     },
     {
       "nome": "Sangue Frio",
-      "custo_texto": "-5 ou -10"
+      "custo_texto": "-5 ou -10",
+      "custo": -5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -5
+        },
+        {
+          "custo": -10
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        154
+      ]
     },
     {
       "nome": "Sanguinolência",
-      "custo_texto": "-10 pontos\"'"
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        154
+      ]
     },
     {
       "nome": "Segredo",
-      "custo_texto": "-5 a -30"
-    },
-    {
-      "nome": "Semiereto",
-      "custo_texto": "-5"
+      "custo_texto": "-5 a -30",
+      "custo": -5,
+      "cost_model": "faixa",
+      "custo_min": -5,
+      "custo_max": -30,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        155
+      ]
     },
     {
       "nome": "Sem Imaginação",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        155
+      ]
     },
     {
       "nome": "Sem Manuseadores",
-      "custo_texto": "-50"
+      "custo_texto": "-50",
+      "custo": -50,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        149
+      ]
     },
     {
       "nome": "Sem Noção de Profundidade",
-      "custo_texto": "-15"
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        155
+      ]
     },
     {
       "nome": "Sem Pernas",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        155
+      ]
     },
     {
-      "nome": "Sem Recuperação",
-      "custo_texto": "-20 ou -30"
+      "nome": "Sem Recuperacao",
+      "custo_texto": "-20 ou -30",
+      "custo": -20,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -20
+        },
+        {
+          "custo": -30
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        156
+      ]
     },
     {
       "nome": "Sem um Dedo",
-      "custo_texto": "-2 ou -5"
+      "custo_texto": "-2 ou -5",
+      "custo": -2,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -2
+        },
+        {
+          "custo": -5
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        156
+      ]
+    },
+    {
+      "nome": "Semiereto",
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        156
+      ]
     },
     {
       "nome": "Senso do Dever",
-      "custo_texto": "-2 a -20"
+      "custo_texto": "-2 a -20",
+      "custo": -2,
+      "cost_model": "faixa",
+      "custo_min": -2,
+      "custo_max": -20,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        156
+      ]
     },
     {
       "nome": "Simpático",
-      "custo_texto": "-1"
-    },
-    {
-      "nome": "Sobrenatural",
-      "custo_texto": "-15 pontos"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
     },
     {
       "nome": "Solitário",
-      "custo_texto": "-5*"
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        157
+      ]
     },
     {
       "nome": "Sonambulismo",
-      "custo_texto": "-5*"
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        157
+      ]
     },
     {
       "nome": "Sonhador",
-      "custo_texto": "-1"
+      "custo_texto": "-1",
+      "custo": -1,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        164
+      ]
     },
     {
       "nome": "Sono Complementar",
-      "custo_texto": "-2/nível"
-    },
-    {
-      "nome": "Sonolento",
-      "custo_texto": "Variável"
+      "custo_texto": "-2/nível",
+      "custo": -2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -2,
+      "tipo_mfsoc": "F",
+      "paginas": [
+        157
+      ]
     },
     {
       "nome": "Sono Leve",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        157
+      ]
+    },
+    {
+      "nome": "Sonolento",
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        157
+      ]
     },
     {
       "nome": "Status",
-      "custo_texto": "-5/nível"
+      "custo_texto": "-5/nível",
+      "custo": -5,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -5,
+      "tipo_mfsoc": "Soc",
+      "paginas": [
+        28
+      ]
     },
     {
       "nome": "Supersensitivo",
-      "custo_texto": "-15"
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        157
+      ]
     },
     {
       "nome": "Suporte de Vida Ampliado",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        157
+      ]
     },
     {
       "nome": "Surdez",
-      "custo_texto": "-20 pontos"
+      "custo_texto": "-20",
+      "custo": -20,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        158
+      ]
     },
     {
       "nome": "Susceptibilidade à Magia",
-      "custo_texto": "-3/nível"
+      "custo_texto": "-3/nível",
+      "custo": -3,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -3,
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        158
+      ]
     },
     {
       "nome": "Suscetível",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        158
+      ]
     },
     {
       "nome": "Teimosia",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        158
+      ]
     },
     {
       "nome": "Temor",
-      "custo_texto": "-2/nível"
+      "custo_texto": "-2/nível",
+      "custo": -2,
+      "cost_model": "por_nivel",
+      "custo_por_nivel": -2,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        158
+      ]
     },
     {
       "nome": "Tetraplégico",
-      "custo_texto": "-80"
+      "custo_texto": "-80",
+      "custo": -80,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        158
+      ]
     },
     {
       "nome": "Timidez",
-      "custo_texto": "-5, -10 ou -20"
+      "custo_texto": "-5, -10 ou -20",
+      "custo": -5,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "custo": -5
+        },
+        {
+          "custo": -10
+        },
+        {
+          "custo": -20
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        159
+      ]
     },
     {
       "nome": "Trapaceiro",
-      "custo_texto": "-15*"
+      "custo_texto": "-15*",
+      "custo": -15,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        159
+      ]
     },
     {
       "nome": "Único",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "exotica_sob": "Sob",
+      "paginas": [
+        159
+      ]
     },
     {
       "nome": "Veracidade",
-      "custo_texto": "-5*"
+      "custo_texto": "-5*",
+      "custo": -5,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        159
+      ]
     },
     {
       "nome": "Viciado em Trabalho",
-      "custo_texto": "-5"
+      "custo_texto": "-5",
+      "custo": -5,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "M",
+      "paginas": [
+        159
+      ]
     },
     {
       "nome": "Vício",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "M/F",
+      "paginas": [
+        159
+      ]
     },
     {
       "nome": "Visão Restrita",
-      "custo_texto": "-15 ou -30"
+      "custo_texto": "-15 ou -30",
+      "custo": -15,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Um olho",
+          "custo": -15
+        },
+        {
+          "rotulo": "Túnel",
+          "custo": -30
+        }
+      ],
+      "tipo_mfsoc": "F",
+      "paginas": [
+        160
+      ]
     },
     {
       "nome": "Voto",
-      "custo_texto": "-1 ou -5 a -15"
-    },
-    {
-      "nome": "Vozes Fantasmagóricas",
-      "custo_texto": "-5 a -15"
+      "custo_texto": "-1 ou -5 a -15",
+      "custo": -1,
+      "cost_model": "opcoes_discretas",
+      "opcoes_custo": [
+        {
+          "rotulo": "Peculiaridade",
+          "custo": -1
+        },
+        {
+          "rotulo": "Menor",
+          "custo": -5
+        },
+        {
+          "rotulo": "Moderado",
+          "custo": -10
+        },
+        {
+          "rotulo": "Grande",
+          "custo": -15
+        }
+      ],
+      "tipo_mfsoc": "M",
+      "paginas": [
+        160
+      ]
     },
     {
       "nome": "Voz Irritante",
-      "custo_texto": "-10"
+      "custo_texto": "-10",
+      "custo": -10,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        161
+      ]
+    },
+    {
+      "nome": "Vozes Fantasmagoricas",
+      "custo_texto": "-5 a -15",
+      "custo": -5,
+      "cost_model": "faixa",
+      "custo_min": -5,
+      "custo_max": -15,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        161
+      ]
     },
     {
       "nome": "Vulnerabilidade",
-      "custo_texto": "Variável"
+      "custo_texto": "Variável",
+      "custo": null,
+      "cost_model": "variavel",
+      "tipo_mfsoc": "F",
+      "exotica_sob": "X",
+      "paginas": [
+        161
+      ]
     },
     {
       "nome": "Xenofilia",
-      "custo_texto": "-10*"
+      "custo_texto": "-10*",
+      "custo": -10,
+      "cost_model": "fixo",
+      "autocontrole": true,
+      "tipo_mfsoc": "M",
+      "paginas": [
+        161
+      ]
     },
     {
       "nome": "Zarolho",
-      "custo_texto": "-15"
+      "custo_texto": "-15",
+      "custo": -15,
+      "cost_model": "fixo",
+      "tipo_mfsoc": "F",
+      "paginas": [
+        162
+      ]
     }
   ],
   "pericias": [

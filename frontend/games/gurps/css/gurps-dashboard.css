@@ -434,3 +434,248 @@ button.gurps-btn-secondary:hover {
 .gurps-dash-body .badge {
     border: 1px solid rgba(212, 175, 55, 0.25);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Mobile — P0: lista de combatentes acessível (sem corte)
+   Causa: dashboard.css aplica overflow:hidden em .tabela-wrapper
+   DEPOIS do media query de scroll; GURPS não carrega responsivo.css.
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .dashboard-body.gurps-dash-body {
+        padding: 1rem 0.85rem 2.5rem;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .gurps-dash-card {
+        padding: 1rem 0.9rem;
+        border-radius: 10px;
+    }
+
+    .dashboard-nav.gurps-dash-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 0.5rem;
+        gap: 0;
+        scrollbar-width: thin;
+    }
+
+    .gurps-dash-nav .nav-tab {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 0.75rem 0.9rem;
+        font-size: 0.84rem;
+    }
+
+    .gurps-dash-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    a.gurps-btn-novo {
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+
+    .gurps-dash-toolbar label.filter-chip {
+        justify-content: center;
+        min-height: 44px;
+    }
+
+    /*
+     * Lista: cards empilhados (sem scroll horizontal / sem overflow:hidden).
+     * Specifidade .gurps-dash-body vence o overflow:hidden do dashboard.css.
+     */
+    .gurps-dash-body .tabela-wrapper {
+        overflow: visible;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .gurps-dash-body .tabela-combatentes {
+        min-width: 0 !important;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .gurps-dash-body .tabela-combatentes thead {
+        display: none;
+    }
+
+    .gurps-dash-body .tabela-combatentes,
+    .gurps-dash-body .tabela-combatentes tbody,
+    .gurps-dash-body .tabela-combatentes tr,
+    .gurps-dash-body .tabela-combatentes td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .gurps-dash-body .tabela-combatentes tbody tr {
+        margin-bottom: 0.75rem;
+        padding: 0.85rem 0.95rem 0.95rem;
+        background: linear-gradient(180deg, #161f14 0%, #0f160d 100%);
+        border: 1px solid var(--gurps-dash-border);
+        border-radius: 10px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+    }
+
+    .gurps-dash-body .tabela-combatentes tbody tr:hover td {
+        background: transparent;
+    }
+
+    .gurps-dash-body .tabela-combatentes td {
+        white-space: normal;
+        border-bottom: none;
+        padding: 0.35rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.65rem;
+        font-size: 0.9rem;
+    }
+
+    .gurps-dash-body .tabela-combatentes td[data-label]::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(232, 197, 71, 0.72);
+    }
+
+    .gurps-dash-body .tabela-combatentes td.gurps-pers-acoes {
+        margin-top: 0.45rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(59, 77, 49, 0.65);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: stretch;
+    }
+
+    .gurps-dash-body .tabela-combatentes td.gurps-pers-acoes::before {
+        display: none;
+    }
+
+    .gurps-dash-body .tabela-combatentes td.cell-muted {
+        display: block;
+        text-align: center;
+        padding: 1rem 0.5rem;
+    }
+
+    .gurps-dash-body .tabela-combatentes td.cell-muted::before {
+        display: none;
+    }
+
+    a.gurps-link-ficha {
+        flex: 1 1 auto;
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+        padding: 0.55rem 0.85rem;
+        font-size: 0.88rem;
+        box-sizing: border-box;
+    }
+
+    /* Campanhas / formulários */
+    .gurps-dash-body .campanhas-subabas {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.4rem;
+        padding-bottom: 0.15rem;
+        scrollbar-width: thin;
+    }
+
+    .gurps-dash-body .campanhas-subaba-btn {
+        flex-shrink: 0;
+        min-height: 40px;
+    }
+
+    .gurps-dash-body .dash-modal-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .gurps-dash-body .btn-dash-cancel,
+    .gurps-dash-body .btn-dash-save {
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+
+    .gurps-dash-body .filtros-escopo {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .gurps-dash-body .campanha-personagens-checklist {
+        max-height: min(42vh, 280px);
+    }
+
+    .gurps-dash-field {
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .gurps-arena-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .gurps-arena-actions .gurps-btn-primary,
+    .gurps-arena-actions .gurps-btn-secondary {
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+
+    .gurps-inline-actions-row {
+        flex-wrap: wrap;
+    }
+
+    .gurps-dash-body .dash-divcustom-card-head {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .gurps-dash-body .dash-divcustom-card-head .gurps-inline-actions-row,
+    .gurps-dash-body .dash-divcustom-card-head > div:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-left: auto;
+    }
+
+    .gurps-dash-body .d35-pedidos-toolbar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .gurps-dash-body .d35-pedidos-filtros {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-body.gurps-dash-body {
+        padding: 0.75rem 0.65rem 2rem;
+    }
+
+    .gurps-dash-card {
+        padding: 0.85rem 0.7rem;
+    }
+
+    .gurps-dash-card-title {
+        font-size: 0.98rem;
+    }
+}

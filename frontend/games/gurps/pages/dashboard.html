@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/dnd35/css/layout.css" />
     <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=23" />
-    <link rel="stylesheet" href="../css/gurps-dashboard.css" />
-    <link rel="stylesheet" href="../css/gurps-arena.css" />
+    <link rel="stylesheet" href="../css/gurps-dashboard.css?v=20260724m" />
+    <link rel="stylesheet" href="../css/gurps-arena.css?v=20260724m" />
 </head>
 <body>
 
@@ -423,13 +423,15 @@
                 return;
             }
             tb.innerHTML = rows.map((r) => `
-                <tr>
-                    <td><span class="badge ${classeBadgeTipo(r.tipo)}">${escapeHtml(r.tipo)}</span></td>
-                    <td>${escapeHtml(r.nome)}</td>
-                    <td>${r.pontos_total ?? 0}</td>
-                    <td>${r.pvs_atual ?? ''}/${r.pvs_valor ?? ''}</td>
-                    <td>${r.velocidade_valor ?? '—'}</td>
-                    <td><a class="gurps-link-ficha" href="ficha-personagem.html?id=${r.id}">Ficha</a></td>
+                <tr class="gurps-pers-row">
+                    <td data-label="Tipo"><span class="badge ${classeBadgeTipo(r.tipo)}">${escapeHtml(r.tipo)}</span></td>
+                    <td data-label="Nome">${escapeHtml(r.nome)}</td>
+                    <td data-label="Pontos">${r.pontos_total ?? 0}</td>
+                    <td data-label="PV">${r.pvs_atual ?? ''}/${r.pvs_valor ?? ''}</td>
+                    <td data-label="VB">${r.velocidade_valor ?? '—'}</td>
+                    <td class="gurps-pers-acoes" data-label="Ações">
+                        <a class="gurps-link-ficha" href="ficha-personagem.html?id=${r.id}">Abrir ficha</a>
+                    </td>
                 </tr>
             `).join('');
             renderArenaPick();

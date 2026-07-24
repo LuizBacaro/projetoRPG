@@ -300,6 +300,27 @@
     .gurps-arena-char-grid {
         grid-template-columns: 1fr;
     }
+
+    .gurps-arena-pick-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.55rem;
+    }
+
+    .gurps-arena-active-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .gurps-arena-end-combat {
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+
+    .gurps-arena-main {
+        padding: 0.7rem 0.65rem 0.85rem;
+    }
 }
 
 .gurps-arena-portrait-col {
