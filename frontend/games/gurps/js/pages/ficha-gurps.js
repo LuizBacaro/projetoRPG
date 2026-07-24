@@ -434,9 +434,9 @@
             const nivelInicial = Math.max(1, Number(row.dataset.nivel || 1));
             slot.hidden = false;
             slot.innerHTML =
-                `<button type="button" class="fg-cost-step" data-dir="-1" aria-label="Diminuir ${unidade}">−</button>` +
-                `<input type="number" class="fg-cost-nivel" value="${nivelInicial}" min="1" inputmode="numeric" aria-label="${unidade}" />` +
-                `<button type="button" class="fg-cost-step" data-dir="1" aria-label="Aumentar ${unidade}">+</button>`;
+                `<button type="button" class="fg-cost-step" data-dir="-1" aria-label="Diminuir ${unidade}" title="${unidade}">−</button>` +
+                `<input type="number" class="fg-cost-nivel" value="${nivelInicial}" min="1" inputmode="numeric" aria-label="${unidade}" title="${unidade}" />` +
+                `<button type="button" class="fg-cost-step" data-dir="1" aria-label="Aumentar ${unidade}" title="${unidade}">+</button>`;
             const nivelInp = slot.querySelector('.fg-cost-nivel');
             const recalc = () => {
                 const n = Math.max(1, Number(nivelInp.value || 1));
@@ -489,7 +489,7 @@
             const min = Number(item.custo_min);
             const max = Number(item.custo_max);
             slot.innerHTML =
-                `<span class="fg-cost-hint" title="Custo entre ${min} e ${max}${pageRefForItem(item)}">${min}…${max}</span>`;
+                `<span class="fg-cost-hint" title="Custo entre ${min} e ${max}${pageRefForItem(item)}">Faixa ${min}…${max}</span>`;
             custoInp.min = String(Math.min(min, max));
             custoInp.max = String(Math.max(min, max));
             if (!custoInp.value || Number(custoInp.value) === 0) custoInp.value = String(min);
@@ -507,7 +507,7 @@
         if (item.autocontrole) {
             slot.hidden = false;
             slot.innerHTML =
-                `<span class="fg-cost-hint" title="Marcada com autocontrole no livro (*)${pageRefForItem(item)}">*</span>`;
+                `<span class="fg-cost-hint" title="Marcada com autocontrole no livro (*)${pageRefForItem(item)}">Autocontrole *</span>`;
         }
     }
 
@@ -1066,13 +1066,15 @@
         const w = el('#fg_vant_wrap');
         if (!w) return;
         const d = document.createElement('div');
-        d.className = 'ficha-linha fg-row-vant';
+        d.className = 'ficha-linha fg-row-vant fg-trait-row';
         d.innerHTML =
-            '<input class="fg-vant-nome" type="text" placeholder="Vantagem" />' +
+            '<span class="fg-trait-label fg-trait-label--nome">Nome</span>' +
+            '<input class="fg-vant-nome fg-trait-nome" type="text" placeholder="Vantagem…" autocomplete="off" aria-label="Nome da vantagem" />' +
             '<div class="fg-vant-controle fg-cost-controle" hidden></div>' +
-            '<input class="fg-vant-custo" type="number" value="0" inputmode="numeric" />' +
-            '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button>';
-        d.querySelector('button').addEventListener('click', () => {
+            '<span class="fg-trait-label fg-trait-label--custo">Custo</span>' +
+            '<input class="fg-vant-custo fg-trait-custo" type="number" value="0" inputmode="numeric" aria-label="Custo em pontos" />' +
+            '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost fg-trait-remove" aria-label="Remover">✕</button>';
+        d.querySelector('.fg-trait-remove').addEventListener('click', () => {
             d.remove();
             atualizarResumoPontosListas();
         });
@@ -1085,13 +1087,15 @@
         const w = el('#fg_desv_wrap');
         if (!w) return;
         const d = document.createElement('div');
-        d.className = 'ficha-linha fg-row-desv';
+        d.className = 'ficha-linha fg-row-desv fg-trait-row';
         d.innerHTML =
-            '<input class="fg-desv-nome" type="text" placeholder="Desvantagem" />' +
+            '<span class="fg-trait-label fg-trait-label--nome">Nome</span>' +
+            '<input class="fg-desv-nome fg-trait-nome" type="text" placeholder="Desvantagem…" autocomplete="off" aria-label="Nome da desvantagem" />' +
             '<div class="fg-desv-controle fg-cost-controle" hidden></div>' +
-            '<input class="fg-desv-custo" type="number" value="0" inputmode="numeric" />' +
-            '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost" aria-label="Remover">✕</button>';
-        d.querySelector('button').addEventListener('click', () => {
+            '<span class="fg-trait-label fg-trait-label--custo">Custo</span>' +
+            '<input class="fg-desv-custo fg-trait-custo" type="number" value="0" inputmode="numeric" aria-label="Custo em pontos" />' +
+            '<button type="button" class="ficha-btn ficha-btn--icon ficha-btn--ghost fg-trait-remove" aria-label="Remover">✕</button>';
+        d.querySelector('.fg-trait-remove').addEventListener('click', () => {
             d.remove();
             atualizarResumoPontosListas();
         });
